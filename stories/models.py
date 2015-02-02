@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
+from projects.models import Project, Release
 
 
 class Story(models.Model):
@@ -41,6 +42,19 @@ class Story(models.Model):
     description = models.TextField(
         _('description'),
         blank=True)
+
+    project = models.ForeignKey(
+        Project,
+        verbose_name=_('project'),
+        related_name='stories')
+    release = models.ForeignKey(
+        Release,
+        verbose_name=_('release'),
+        related_name='stories',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL)
+
     status = models.PositiveIntegerField(
         _('status'),
         choices=STATUS_CHOICES,
@@ -76,7 +90,7 @@ class Story(models.Model):
     position = models.PositiveIntegerField(_('position'), default=0)
 
     class Meta:
-        ordering = ('position',)
+        ordering = ('position', 'id')
         verbose_name = _('story')
         verbose_name_plural = _('stories')
 

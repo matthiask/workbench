@@ -39,6 +39,7 @@ INSTALLED_APPS = (
 
     'ftool',
     'accounts',
+    'projects',
     'stories',
 )
 
