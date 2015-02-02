@@ -1,0 +1,9 @@
+*.py?
+*~
+.*.sw*
+.DS_Store
+\#*#
+/docs/_build
+/build
+/venv
+/db.sqlite3
