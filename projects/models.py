@@ -18,8 +18,6 @@ class ProjectManager(models.Model):
 class Project(models.Model):
     INITIAL = 10
     PROPOSED = 20
-    WAITING_HOT = 30
-    WAITING_COLD = 40
     STARTED = 50
     FINISHED = 60
     REJECTED = 100
@@ -27,8 +25,6 @@ class Project(models.Model):
     STATUS_CHOICES = (
         (INITIAL, _('initial')),
         (PROPOSED, _('proposed')),
-        (WAITING_HOT, _('waiting (hot)')),
-        (WAITING_COLD, _('waiting (cold)')),
         (STARTED, _('started')),
         (FINISHED, _('finished')),
         (REJECTED, _('rejected')),
