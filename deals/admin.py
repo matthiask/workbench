@@ -11,5 +11,10 @@ class RequiredServiceInline(admin.TabularInline):
 admin.site.register(Funnel)
 admin.site.register(
     Deal,
+    list_display=(
+        'funnel', 'title', 'owned_by', 'estimated_value', 'status',
+        'created_at'),
+    list_display_links=('title',),
+    list_filter=('funnel', 'status'),
     inlines=(RequiredServiceInline,),
 )
