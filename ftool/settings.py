@@ -52,6 +52,13 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'ftool.urls'
 WSGI_APPLICATION = 'wsgi.application'
 
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'templates'),
+)
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'conf', 'locale'),
+)
+
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
@@ -60,7 +67,7 @@ DATABASES = {
     'default': dj_database_url.config(default='sqlite:///db.sqlite3'),
 }
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'de-ch'
 TIME_ZONE = 'Europe/Zurich'
 USE_I18N = True
 USE_L10N = True

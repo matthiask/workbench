@@ -1,0 +1,254 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-02-03 15:17+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: accounts/admin.py:15
+msgid "Password"
+msgstr "Passwort"
+
+#: accounts/admin.py:17
+msgid "Password confirmation"
+msgstr "Passwort bestätigen"
+
+#: accounts/admin.py:28
+msgid "Passwords don't match"
+msgstr "Passwörter stimmen nicht überein"
+
+#: accounts/models.py:49
+msgid "email"
+msgstr "Email"
+
+#: accounts/models.py:50
+msgid "is active"
+msgstr "ist aktiv"
+
+#: accounts/models.py:51
+msgid "is admin"
+msgstr "ist Admin"
+
+#: accounts/models.py:52
+msgid "date of birth"
+msgstr "Geburtsdatum"
+
+#: accounts/models.py:54
+msgid "short name"
+msgstr "Kurzer Name"
+
+#: accounts/models.py:55
+msgid "full name"
+msgstr "Voller Name"
+
+#: accounts/models.py:61
+msgid "user"
+msgstr "Benutzer"
+
+#: accounts/models.py:62
+msgid "users"
+msgstr "Benutzer"
+
+#: deals/models.py:11 deals/models.py:16 deals/models.py:44
+msgid "funnel"
+msgstr "Trichter"
+
+#: deals/models.py:17
+msgid "funnels"
+msgstr "Trichter"
+
+#: deals/models.py:33 projects/models.py:26
+msgid "initial"
+msgstr "Anfang"
+
+#: deals/models.py:34
+msgid "negotiating"
+msgstr "in Verhandlung"
+
+#: deals/models.py:35
+msgid "improbable"
+msgstr "unwahrscheinlich"
+
+#: deals/models.py:36
+msgid "probable in the future"
+msgstr "wahrscheinlich in der Zukunft"
+
+#: deals/models.py:37
+msgid "probable soon"
+msgstr "wahrscheinlich bald"
+
+#: deals/models.py:38 stories/models.py:24
+msgid "accepted"
+msgstr "Akzeptiert"
+
+#: deals/models.py:39
+msgid "declined"
+msgstr "Abgelehnt"
+
+#: deals/models.py:48 projects/models.py:34 projects/models.py:64
+#: services/models.py:7 stories/models.py:40
+msgid "title"
+msgstr "Titel"
+
+#: deals/models.py:51 projects/models.py:37 stories/models.py:43
+msgid "description"
+msgstr "Beschreibung"
+
+#: deals/models.py:55 stories/models.py:37
+msgid "owned by"
+msgstr "im Besitz von"
+
+#: deals/models.py:57
+msgid "estimated value"
+msgstr "geschätzter Wert"
+
+#: deals/models.py:62 projects/models.py:41 stories/models.py:59
+msgid "status"
+msgstr "Status"
+
+#: deals/models.py:67 stories/models.py:29
+msgid "created at"
+msgstr "Erstellt um"
+
+#: deals/models.py:70
+msgid "closed at"
+msgstr "Geschlossen um"
+
+#: deals/models.py:75 deals/models.py:85
+msgid "deal"
+msgstr "Geschäft"
+
+#: deals/models.py:76
+msgid "deals"
+msgstr "Geschäfte"
+
+#: deals/models.py:89 services/models.py:21
+msgid "service type"
+msgstr "Leistungstyp"
+
+#: deals/models.py:92
+msgid "hours"
+msgstr "Stunden"
+
+#: deals/models.py:97
+msgid "required service"
+msgstr "benötigte Leistung"
+
+#: deals/models.py:98
+msgid "required services"
+msgstr "benötigte Leistungen"
+
+#: projects/models.py:27
+msgid "proposed"
+msgstr "vorgeschlagen"
+
+#: projects/models.py:28 stories/models.py:21
+msgid "started"
+msgstr "gestartet"
+
+#: projects/models.py:29 stories/models.py:22
+msgid "finished"
+msgstr "beendet"
+
+#: projects/models.py:30 stories/models.py:25
+msgid "rejected"
+msgstr "abgewiesen"
+
+#: projects/models.py:49 projects/models.py:60 stories/models.py:48
+msgid "project"
+msgstr "Projekt"
+
+#: projects/models.py:50
+msgid "projects"
+msgstr "Projekte"
+
+#: projects/models.py:67
+msgid "is default"
+msgstr "ist Standard"
+
+#: projects/models.py:71 services/models.py:16 stories/models.py:90
+msgid "position"
+msgstr "Position"
+
+#: projects/models.py:76 stories/models.py:52
+msgid "release"
+msgstr "Version"
+
+#: projects/models.py:77
+msgid "releases"
+msgstr "Versionen"
+
+#: services/models.py:11
+msgid "billing per hour"
+msgstr "Verrechnung pro Stunde"
+
+#: services/models.py:22
+msgid "service types"
+msgstr "Leistungstypen"
+
+#: stories/models.py:19
+msgid "unscheduled"
+msgstr "nicht eingeplant"
+
+#: stories/models.py:20
+msgid "scheduled"
+msgstr "eingeplant"
+
+#: stories/models.py:23
+msgid "delivered"
+msgstr "geliefert"
+
+#: stories/models.py:33
+msgid "requested by"
+msgstr "angefordert von"
+
+#: stories/models.py:63
+msgid "accepted at"
+msgstr "akzeptiert um"
+
+#: stories/models.py:68
+msgid "best case effort"
+msgstr "Effort (bester Fall)"
+
+#: stories/models.py:73
+msgid "Time required if everything falls into place."
+msgstr "Benötigte Zeit wenn alles perfekt läuft."
+
+#: stories/models.py:75
+msgid "safe case effort"
+msgstr "Effort (sichere Erreichung)"
+
+#: stories/models.py:81
+msgid ""
+"This story can be delivered in this time frame with almost certainty (90%)."
+msgstr ""
+"Diese Story kann in dieser Zeit mit an Sicherheit grenzender"
+" Wahrscheinlichkeit abgeliefert werden."
+
+#: stories/models.py:85
+msgid "due on"
+msgstr "fällig am"
+
+#: stories/models.py:88
+msgid "This field should be left empty most of the time."
+msgstr "Dieses Feld sollte meistens leer gelassen werden."
+
+#: stories/models.py:94
+msgid "story"
+msgstr "Story"
+
+#: stories/models.py:95
+msgid "stories"
+msgstr "Stories"
