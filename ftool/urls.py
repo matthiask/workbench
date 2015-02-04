@@ -15,5 +15,10 @@ urlpatterns = patterns(
         r'^bootstrap/$',
         generic.TemplateView.as_view(template_name='bootstrap.html')),
 
+    url(
+        r'^deals/funnel/(?P<pk>\d+)/$',
+        'deals.views.funnel_detail',
+        name='funnel_detail'),
+
     url(r'^admin/', include(admin.site.urls)),
 ) + staticfiles_urlpatterns()

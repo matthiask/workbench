@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -18,6 +19,9 @@ class Funnel(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('funnel_detail', kwargs={'pk': self.pk})
 
 
 class Deal(models.Model):
