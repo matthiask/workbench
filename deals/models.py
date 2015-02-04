@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
 from services.models import ServiceType
+from tools.models import SearchManager
 from tools.urls import model_urls
 
 
@@ -73,6 +74,8 @@ class Deal(models.Model):
         _('closed at'),
         blank=True,
         null=True)
+
+    objects = SearchManager()
 
     class Meta:
         verbose_name = _('deal')
