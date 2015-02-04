@@ -17,4 +17,5 @@ admin.site.register(
     list_display_links=('title',),
     list_filter=('funnel', 'status'),
     inlines=(RequiredServiceInline,),
+    search_fields=('title', 'description'),
 )
