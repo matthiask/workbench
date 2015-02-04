@@ -2,22 +2,28 @@ from collections import defaultdict
 
 from django.shortcuts import get_object_or_404, render
 
+import vanilla
+
 from deals.models import Funnel, Deal
 
 
-def funnel_detail(request, pk):
-    funnel = get_object_or_404(Funnel, pk=pk)
+class FunnelViewMixin(object):
+    model = Funnel
 
-    deals = defaultdict(list)
-    for deal in funnel.deals.all():
-        deals[deal.status].append(deal)
+    def get_queryset(self):
+        return self.model.objects.all()
 
-    return render(request, 'deals/funnel_detail.html', {
-        'funnel': funnel,
-        'funnel_details': [
-            {
-                'title': title,
-                'deals': deals.get(status, []),
-            } for status, title in Deal.STATUS_CHOICES
-        ],
-    })
+
+class FunnelDetailView(FunnelViewMixin, vanilla.DetailView):
+    def get_context_data(self, **kwargs):
+        deals = defaultdict(list)
+        for deal in self.object.deals.all():
+            deals[deal.status].append(deal)
+
+        return super().get_context_data(
+            funnel_details=[
+                {
+                    'title': title,
+                    'deals': deals.get(status, []),
+                } for status, title in Deal.STATUS_CHOICES
+            ], **kwargs)
