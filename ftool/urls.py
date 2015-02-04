@@ -11,5 +11,9 @@ urlpatterns = patterns(
     # url(r'^blog/', include('blog.urls')),
     url(r'^$', generic.TemplateView.as_view(template_name='base.html')),
 
+    url(
+        r'^bootstrap/$',
+        generic.TemplateView.as_view(template_name='bootstrap.html')),
+
     url(r'^admin/', include(admin.site.urls)),
 ) + staticfiles_urlpatterns()
