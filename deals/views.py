@@ -27,5 +27,14 @@ class FunnelDetailView(FunnelViewMixin, vanilla.DetailView):
             ], **kwargs)
 
 
+class DealListView(vanilla.ListView):
+    model = Deal
+
+    def get_queryset(self):
+        queryset = self.model.objects.all()
+        q = self.request.GET.get('q')
+        return queryset.search(q) if q else queryset
+
+
 class DealDetailView(vanilla.DetailView):
     model = Deal

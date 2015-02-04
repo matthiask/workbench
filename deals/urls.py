@@ -11,6 +11,10 @@ urlpatterns = patterns(
         name='deals_funnel_detail'),
 
     url(
+        r'^deal/$',
+        views.DealListView.as_view(),
+        name='deals_deal_list'),
+    url(
         r'^deal/(?P<pk>\d+)/$',
         views.DealDetailView.as_view(),
         name='deals_deal_detail'),
