@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}{{ deal }} - {% trans "deals" %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <a href="{{ deal.funnel.urls.detail }}">&lt; {{ deal.funnel }}</a>
+    <h1>{{ deal }}</h1>
+  </div>
+</div>
+{% endblock %}
