@@ -1,5 +1,4 @@
 from django.core.urlresolvers import NoReverseMatch, reverse
-from django.utils.functional import cached_property
 
 
 class _MUHelper(object):

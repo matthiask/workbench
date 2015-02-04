@@ -1,6 +1,7 @@
 from django.db import models
-from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+
+from tools.urls import model_urls
 
 
 class ProjectManager(models.Model):
@@ -15,6 +16,7 @@ class ProjectManager(models.Model):
         return project
 
 
+@model_urls()
 class Project(models.Model):
     INITIAL = 10
     PROPOSED = 20
@@ -53,7 +55,7 @@ class Project(models.Model):
         return self.title
 
 
-
+@model_urls()
 class Release(models.Model):
     project = models.ForeignKey(
         Project,

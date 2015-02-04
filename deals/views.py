@@ -1,7 +1,5 @@
 from collections import defaultdict
 
-from django.shortcuts import get_object_or_404, render
-
 import vanilla
 
 from deals.models import Funnel, Deal
