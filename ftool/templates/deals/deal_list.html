@@ -14,13 +14,17 @@
     <table class="table table-hover table-striped">
       <thead>
         <tr>
-          <td>
-            <form method="GET" action=".">
+          <td colspan="5">
+            <form method="GET" action="." class="form-inline form-search">
+              <label class="sr-only">{% trans 'search' %}</label>
               <input
+                class="form-control"
                 type="search"
                 name="q"
                 placeholder="{% trans 'search' %}"
                 value="{{ view.request.GET.q|default:'' }}">
+              <label class="sr-only">{% trans 'funnel' %}</label>
+              {{ view.search_form.f }}
             </form>
           </td>
         </tr>
@@ -47,4 +51,12 @@
 
   </div>
 </div>
+{% endblock %}
+
+{% block js %}{{ block.super }}
+<script>
+  $('.form-search select').on('change', function() {
+    $(this).closest('form').submit();
+  });
+</script>
 {% endblock %}
