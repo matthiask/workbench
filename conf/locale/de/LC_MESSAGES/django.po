@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-03 15:17+0100\n"
+"POT-Creation-Date: 2015-02-04 17:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -61,132 +61,143 @@ msgstr "Benutzer"
 msgid "users"
 msgstr "Benutzer"
 
-#: deals/models.py:11 deals/models.py:16 deals/models.py:44
+#: deals/models.py:14 deals/models.py:19 deals/models.py:48
+#: ftool/templates/deals/deal_list.html:28
 msgid "funnel"
 msgstr "Trichter"
 
-#: deals/models.py:17
+#: deals/models.py:20 ftool/templates/deals/funnel_detail.html:5
 msgid "funnels"
 msgstr "Trichter"
 
-#: deals/models.py:33 projects/models.py:26
+#: deals/models.py:37 projects/models.py:28
 msgid "initial"
 msgstr "Anfang"
 
-#: deals/models.py:34
+#: deals/models.py:38
 msgid "negotiating"
 msgstr "in Verhandlung"
 
-#: deals/models.py:35
+#: deals/models.py:39
 msgid "improbable"
 msgstr "unwahrscheinlich"
 
-#: deals/models.py:36
+#: deals/models.py:40
 msgid "probable in the future"
 msgstr "wahrscheinlich in der Zukunft"
 
-#: deals/models.py:37
+#: deals/models.py:41
 msgid "probable soon"
 msgstr "wahrscheinlich bald"
 
-#: deals/models.py:38 stories/models.py:24
+#: deals/models.py:42 stories/models.py:24
 msgid "accepted"
 msgstr "Akzeptiert"
 
-#: deals/models.py:39
+#: deals/models.py:43
 msgid "declined"
 msgstr "Abgelehnt"
 
-#: deals/models.py:48 projects/models.py:34 projects/models.py:64
+#: deals/models.py:52 projects/models.py:36 projects/models.py:66
 #: services/models.py:7 stories/models.py:40
 msgid "title"
 msgstr "Titel"
 
-#: deals/models.py:51 projects/models.py:37 stories/models.py:43
+#: deals/models.py:55 projects/models.py:39 stories/models.py:43
 msgid "description"
 msgstr "Beschreibung"
 
-#: deals/models.py:55 stories/models.py:37
+#: deals/models.py:59 ftool/templates/deals/deal_list.html:30
+#: stories/models.py:37
 msgid "owned by"
-msgstr "im Besitz von"
+msgstr "gehört"
 
-#: deals/models.py:57
+#: deals/models.py:61 ftool/templates/deals/deal_list.html:31
 msgid "estimated value"
 msgstr "geschätzter Wert"
 
-#: deals/models.py:62 projects/models.py:41 stories/models.py:59
+#: deals/models.py:66 ftool/templates/deals/deal_list.html:32
+#: projects/models.py:43 stories/models.py:59
 msgid "status"
 msgstr "Status"
 
-#: deals/models.py:67 stories/models.py:29
+#: deals/models.py:71 stories/models.py:29
 msgid "created at"
 msgstr "Erstellt um"
 
-#: deals/models.py:70
+#: deals/models.py:74
 msgid "closed at"
 msgstr "Geschlossen um"
 
-#: deals/models.py:75 deals/models.py:85
+#: deals/models.py:81 deals/models.py:91
+#: ftool/templates/deals/deal_list.html:29
 msgid "deal"
 msgstr "Geschäft"
 
-#: deals/models.py:76
+#: deals/models.py:82 ftool/templates/base.html:27
+#: ftool/templates/deals/deal_detail.html:5
+#: ftool/templates/deals/deal_list.html:5
+#: ftool/templates/deals/deal_list.html:12
 msgid "deals"
 msgstr "Geschäfte"
 
-#: deals/models.py:89 services/models.py:21
+#: deals/models.py:95 services/models.py:21
 msgid "service type"
 msgstr "Leistungstyp"
 
-#: deals/models.py:92
+#: deals/models.py:98
 msgid "hours"
 msgstr "Stunden"
 
-#: deals/models.py:97
+#: deals/models.py:103
 msgid "required service"
 msgstr "benötigte Leistung"
 
-#: deals/models.py:98
+#: deals/models.py:104
 msgid "required services"
 msgstr "benötigte Leistungen"
 
-#: projects/models.py:27
-msgid "proposed"
-msgstr "vorgeschlagen"
-
-#: projects/models.py:28 stories/models.py:21
-msgid "started"
-msgstr "gestartet"
-
-#: projects/models.py:29 stories/models.py:22
-msgid "finished"
-msgstr "beendet"
-
-#: projects/models.py:30 stories/models.py:25
-msgid "rejected"
-msgstr "abgewiesen"
-
-#: projects/models.py:49 projects/models.py:60 stories/models.py:48
-msgid "project"
-msgstr "Projekt"
-
-#: projects/models.py:50
+#: ftool/templates/base.html:28 projects/models.py:52
 msgid "projects"
 msgstr "Projekte"
 
-#: projects/models.py:67
+#: ftool/templates/deals/deal_list.html:22
+msgid "search"
+msgstr "Suche"
+
+#: projects/models.py:29
+msgid "proposed"
+msgstr "vorgeschlagen"
+
+#: projects/models.py:30 stories/models.py:21
+msgid "started"
+msgstr "gestartet"
+
+#: projects/models.py:31 stories/models.py:22
+msgid "finished"
+msgstr "beendet"
+
+#: projects/models.py:32 stories/models.py:25
+msgid "rejected"
+msgstr "abgewiesen"
+
+#: projects/models.py:51 projects/models.py:62 stories/models.py:48
+msgid "project"
+msgstr "Projekt"
+
+#: projects/models.py:69
 msgid "is default"
 msgstr "ist Standard"
 
-#: projects/models.py:71 services/models.py:16 stories/models.py:90
+#: projects/models.py:73 services/models.py:16 stories/models.py:90
 msgid "position"
 msgstr "Position"
 
-#: projects/models.py:76 stories/models.py:52
+#: projects/models.py:78 stories/models.py:52
 msgid "release"
 msgstr "Version"
 
-#: projects/models.py:77
+#: projects/models.py:79
 msgid "releases"
 msgstr "Versionen"
 
@@ -234,8 +245,8 @@ msgstr "Effort (sichere Erreichung)"
 msgid ""
 "This story can be delivered in this time frame with almost certainty (90%)."
 msgstr ""
-"Diese Story kann in dieser Zeit mit an Sicherheit grenzender"
-" Wahrscheinlichkeit abgeliefert werden."
+"Diese Story kann in dieser Zeit mit an Sicherheit grenzender "
+"Wahrscheinlichkeit abgeliefert werden."
 
 #: stories/models.py:85
 msgid "due on"
