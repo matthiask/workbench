@@ -25,6 +25,7 @@
                 value="{{ view.request.GET.q|default:'' }}">
               <label class="sr-only">{% trans 'funnel' %}</label>
               {{ view.search_form.f }}
+
             </form>
           </td>
         </tr>
@@ -47,6 +48,16 @@
           </tr>
         {% endfor %}
       </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="5">
+            {{ view.counts.search }} {% trans 'objects' %}
+            {% if view.counts.root != view.counts.search %}
+            (<a href=".">{% blocktrans with total=view.counts.root %}{{ total }} total{% endblocktrans %}</a>)
+            {% endif %}
+          </th>
+        </tr>
+      </tfoot>
     </table>
 
   </div>
