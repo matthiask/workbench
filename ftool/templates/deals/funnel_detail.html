@@ -9,26 +9,36 @@
   <div class="col-md-12">
     <h1>{{ funnel }}</h1>
 
-    {% for funnel_detail in funnel_details %}
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h3>
-            {{ funnel_detail.title }}
-            <small>
-              ({{ funnel_detail.deals|length }})
-            </small>
-          </h3>
-        </div>
-        <div class="panel-body">
+    <div class="flexbox-equal">
+      {% for funnel_detail in funnel_details %}
+        <div class="list-group">
+          <div class="list-group-item">
+            <h4 class="list-group-item-heading">
+              {{ funnel_detail.title }}
+              <small>
+                ({{ funnel_detail.deals|length }})
+              </small>
+            </h4>
+          </div>
           {% for deal in funnel_detail.deals %}
-            <div class="card">
+            <a href="{{ deal.get_absolute_url }}" class="list-group-item">
               {{ deal }}
-            </div>
+            </a>
           {% endfor %}
         </div>
-      </div>
-    {% endfor %}
+      {% endfor %}
+    </div>
 
   </div>
 </div>
+<style>
+  .flexbox-equal {
+    display: -webkit-flex;
+    display: flex;
+  }
+  .flexbox-equal > div {
+    -webkit-flex: 1;
+    flex: 1;
+  }
+</style>
 {% endblock %}
