@@ -5,8 +5,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
 from services.models import ServiceType
+from tools.urls import model_urls
 
 
+@model_urls()
 class Funnel(models.Model):
     title = models.CharField(
         _('funnel'),
@@ -20,10 +22,8 @@ class Funnel(models.Model):
     def __str__(self):
         return self.title
 
-    def get_absolute_url(self):
-        return reverse('funnel_detail', kwargs={'pk': self.pk})
 
-
+@model_urls()
 class Deal(models.Model):
     INITIAL = 10
     NEGOTIATING = 20

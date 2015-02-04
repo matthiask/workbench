@@ -8,5 +8,10 @@ urlpatterns = patterns(
     url(
         r'^funnel/(?P<pk>\d+)/$',
         views.FunnelDetailView.as_view(),
-        name='funnel_detail'),
+        name='deals_funnel_detail'),
+
+    url(
+        r'^deal/(?P<pk>\d+)/$',
+        views.DealDetailView.as_view(),
+        name='deals_deal_detail'),
 )

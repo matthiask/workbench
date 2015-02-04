@@ -27,3 +27,7 @@ class FunnelDetailView(FunnelViewMixin, vanilla.DetailView):
                     'deals': deals.get(status, []),
                 } for status, title in Deal.STATUS_CHOICES
             ], **kwargs)
+
+
+class DealDetailView(vanilla.DetailView):
+    model = Deal
