@@ -1,7 +1,5 @@
 from collections import defaultdict
 
-from django.utils.functional import cached_property
-
 import vanilla
 
 from deals.forms import DealSearchForm
