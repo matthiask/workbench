@@ -33,6 +33,7 @@ INSTALLED_APPS = (
 
     'ftool',
     'accounts',
+    'contacts',
     'deals',
     'projects',
     'services',
