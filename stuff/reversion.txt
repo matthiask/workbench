@@ -1,0 +1,38 @@
+>>> from deals.models import *
+>>> import reversion
+>>> d = Deal.objects.get(pk=3)
+>>> d
+<Deal: AXA Metronom Pflege & Support>
+>>> reversion.get_for_object(d)
+[<Version: AXA Metronom Pflege & Support>, <Version: AXA Metronom Pflege>, <Version: AXA Metronom Pflege>]
+>>> r = _
+>>> from pprint import pprint
+>>> pprint([v.field_dict for v in r])
+[{'closed_at': None,
+  'created_at': datetime.datetime(2015, 2, 13, 21, 18, 52, tzinfo=<UTC>),
+  'description': '',
+  'estimated_value': Decimal('5000.00'),
+  'funnel': 1,
+  'id': 3,
+  'owned_by': 1,
+  'status': 10,
+  'title': 'AXA Metronom Pflege & Support'},
+ {'closed_at': None,
+  'created_at': datetime.datetime(2015, 2, 13, 22, 18, 52, tzinfo=<django.utils.timezone.FixedOffset object at 0x103b18048>),
+  'description': '',
+  'estimated_value': Decimal('5000.00'),
+  'funnel': 1,
+  'id': 3,
+  'owned_by': 1,
+  'status': 10,
+  'title': 'AXA Metronom Pflege'},
+ {'closed_at': None,
+  'created_at': datetime.datetime(2015, 2, 13, 21, 18, 52, 800000, tzinfo=<UTC>),
+  'description': '',
+  'estimated_value': Decimal('5000.00'),
+  'funnel': 1,
+  'id': 3,
+  'owned_by': 1,
+  'status': 10,
+  'title': 'AXA Metronom Pflege'}]
+>>>

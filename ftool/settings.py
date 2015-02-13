@@ -32,6 +32,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'bootstrap3',
+    'reversion',
 
     'accounts',
     'contacts',
@@ -53,6 +54,7 @@ MIDDLEWARE_CLASSES = (
     'accounts.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'reversion.middleware.RevisionMiddleware',
 )
 
 ROOT_URLCONF = 'ftool.urls'
