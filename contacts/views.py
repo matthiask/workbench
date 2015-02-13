@@ -21,7 +21,12 @@ class OrganizationDetailView(OrganizationViewMixin, DetailView):
 
 
 class OrganizationCreateView(OrganizationViewMixin, CreateView):
-    pass
+    def get_form(self, data=None, files=None, **kwargs):
+        kwargs.setdefault('initial', {}).update({
+            'primary_contact': self.request.user.pk,
+        })
+        form_class = self.get_form_class()
+        return form_class(data, files, **kwargs)
 
 
 class OrganizationUpdateView(OrganizationViewMixin, UpdateView):
@@ -38,7 +43,12 @@ class PersonDetailView(PersonViewMixin, DetailView):
 
 
 class PersonCreateView(PersonViewMixin, CreateView):
-    pass
+    def get_form(self, data=None, files=None, **kwargs):
+        kwargs.setdefault('initial', {}).update({
+            'primary_contact': self.request.user.pk,
+        })
+        form_class = self.get_form_class()
+        return form_class(data, files, **kwargs)
 
 
 class PersonUpdateView(PersonViewMixin, UpdateView):
