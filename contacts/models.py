@@ -47,6 +47,7 @@ class Person(models.Model):
     notes = models.TextField(_('notes'), blank=True)
     organization = models.ForeignKey(
         Organization,
+        blank=True, null=True,
         verbose_name=_('organization'),
         related_name='people')
     primary_contact = models.ForeignKey(
