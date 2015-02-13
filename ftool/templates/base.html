@@ -1,6 +1,6 @@
 {% extends "site_base.html" %}
 
-{% load i18n mark_current %}
+{% load bootstrap3 i18n mark_current %}
 
 {% block body %}
   <!-- Fixed navbar -->
@@ -40,6 +40,8 @@
   </nav>
 
   <div class="container-fluid theme-showcase" role="main">
+
+    {% bootstrap_messages %}
 
     {% block content %}{% endblock %}
 

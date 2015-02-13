@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n %}
+{% load bootstrap3 i18n %}
 
 {% block title %}{% trans "projects" %} - {{ block.super }}{% endblock %}
 
@@ -45,14 +45,16 @@
       <tfoot>
         <tr>
           <th colspan="5">
-            {{ view.counts.search }} {% trans 'objects' %}
-            {% if view.counts.root != view.counts.search %}
-            (<a href=".">{% blocktrans with total=view.counts.root %}{{ total }} total{% endblocktrans %}</a>)
+            {{ paginator.count }} {% trans 'objects' %}
+            {% if view.root_queryset_count != paginator.count %}
+            (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
             {% endif %}
           </th>
         </tr>
       </tfoot>
     </table>
+
+    {% bootstrap_pagination page=page_obj %}
   </div>
 </div>
 {% endblock %}

@@ -10,8 +10,9 @@ from tools.views import ListView
 class FunnelViewMixin(object):
     model = Funnel
 
-    def get_queryset(self):
-        return self.model.objects.all()
+
+class DealViewMixin(object):
+    model = Deal
 
 
 class FunnelDetailView(FunnelViewMixin, vanilla.DetailView):
@@ -29,18 +30,18 @@ class FunnelDetailView(FunnelViewMixin, vanilla.DetailView):
             ], **kwargs)
 
 
-class DealListView(ListView):
-    model = Deal
-
+class DealListView(DealViewMixin, ListView):
     def get_queryset(self):
-        super().get_queryset()
+        queryset = super().get_queryset()
 
         self.search_form = DealSearchForm(self.request.GET)
         if self.search_form.is_valid():
             data = self.search_form.cleaned_data
             if data.get('f'):
-                self.queryset = self.queryset.filter(funnel=data.get('f'))
+                queryset = queryset.filter(funnel=data.get('f'))
+
+        return queryset
 
 
-class DealDetailView(vanilla.DetailView):
-    model = Deal
+class DealDetailView(DealViewMixin, vanilla.DetailView):
+    pass

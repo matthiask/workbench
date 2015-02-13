@@ -4,16 +4,14 @@ import vanilla
 
 
 class ListView(vanilla.ListView):
+    paginate_by = 10
+
     def get_queryset(self):
-        self.root_queryset = queryset = self.model.objects.all()
+        self.root_queryset = self.model.objects.all()
 
         q = self.request.GET.get('q')
-        self.queryset = queryset.search(q) if q else queryset
-        return self.queryset
+        return self.root_queryset.search(q) if q else self.root_queryset.all()
 
     @cached_property
-    def counts(self):
-        return {
-            'root': self.root_queryset.count(),
-            'search': self.queryset.count(),
-        }
+    def root_queryset_count(self):
+        return self.root_queryset.count()

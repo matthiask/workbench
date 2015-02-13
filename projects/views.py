@@ -9,7 +9,7 @@ class ProjectViewMixin(object):
 
 
 class ProjectListView(ProjectViewMixin, ListView):
-    model = Project
+    pass
 
 
 class ProjectDetailView(ProjectViewMixin, vanilla.DetailView):
