@@ -29,7 +29,8 @@ class OrganizationUpdateView(OrganizationViewMixin, UpdateView):
 
 
 class PersonListView(PersonViewMixin, ListView):
-    pass
+    def get_queryset(self):
+        return super().get_queryset().select_related('organization')
 
 
 class PersonDetailView(PersonViewMixin, DetailView):

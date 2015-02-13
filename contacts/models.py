@@ -62,6 +62,8 @@ class Person(models.Model):
         verbose_name_plural = _('people')
 
     def __str__(self):
+        if self.organization_id:
+            return '%s / %s' % (self.full_name, self.organization)
         return self.full_name
 
 
