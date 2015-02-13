@@ -1,5 +1,3 @@
-import vanilla
-
 from projects.forms import ProjectForm
 from projects.models import Project
 from tools.views import ListView, DetailView, CreateView
