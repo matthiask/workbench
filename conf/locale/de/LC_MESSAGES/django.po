@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-13 17:33+0100\n"
+"POT-Creation-Date: 2015-02-13 20:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr "Passwort bestätigen"
 msgid "Passwords don't match"
 msgstr "Passwörter stimmen nicht überein"
 
-#: accounts/models.py:49 contacts/models.py:96
+#: accounts/models.py:49 contacts/models.py:97
 msgid "email"
 msgstr "Email"
 
@@ -78,11 +78,11 @@ msgstr "Gruppen"
 msgid "name"
 msgstr "Name"
 
-#: contacts/models.py:26 contacts/models.py:54
+#: contacts/models.py:26 contacts/models.py:55
 msgid "primary contact"
 msgstr "Hauptkontakt"
 
-#: contacts/models.py:32 contacts/models.py:50
+#: contacts/models.py:32 contacts/models.py:51 ftool/templates/base.html:27
 msgid "organization"
 msgstr "Organisation"
 
@@ -102,40 +102,40 @@ msgstr "Z.B. Lieber Hans."
 msgid "notes"
 msgstr "Bemerkungen"
 
-#: contacts/models.py:60 contacts/models.py:70 contacts/models.py:93
-#: contacts/models.py:116
+#: contacts/models.py:61 contacts/models.py:71 contacts/models.py:94
+#: contacts/models.py:117 ftool/templates/base.html:28
 msgid "person"
 msgstr "Person"
 
-#: contacts/models.py:61 ftool/templates/base.html:25
+#: contacts/models.py:62 ftool/templates/base.html:25
 msgid "people"
 msgstr "Personen"
 
-#: contacts/models.py:72 contacts/models.py:95 contacts/models.py:118
+#: contacts/models.py:73 contacts/models.py:96 contacts/models.py:119
 msgid "type"
 msgstr "Typ"
 
-#: contacts/models.py:73 contacts/models.py:76
+#: contacts/models.py:74 contacts/models.py:77
 msgid "phone number"
 msgstr "Telefonnummer"
 
-#: contacts/models.py:77
+#: contacts/models.py:78
 msgid "phone numbers"
 msgstr "Telefonnummern"
 
-#: contacts/models.py:99
+#: contacts/models.py:100
 msgid "email address"
 msgstr "Emailadresse"
 
-#: contacts/models.py:100
+#: contacts/models.py:101
 msgid "email addresses"
 msgstr "Emailadressen"
 
-#: contacts/models.py:119 contacts/models.py:122
+#: contacts/models.py:120 contacts/models.py:123
 msgid "postal address"
 msgstr "Postadresse"
 
-#: contacts/models.py:123
+#: contacts/models.py:124
 msgid "postal addresses"
 msgstr "Postadressen"
 
@@ -213,7 +213,7 @@ msgstr "Geschlossen um"
 msgid "deal"
 msgstr "Geschäft"
 
-#: deals/models.py:82 ftool/templates/base.html:28
+#: deals/models.py:82 ftool/templates/base.html:31
 #: ftool/templates/deals/deal_detail.html:5
 #: ftool/templates/deals/deal_list.html:5
 #: ftool/templates/deals/deal_list.html:12
@@ -240,11 +240,28 @@ msgstr "benötigte Leistungen"
 msgid "contacts"
 msgstr "Kontakte"
 
-#: ftool/templates/base.html:29 ftool/templates/projects/project_detail.html:5
+#: ftool/templates/base.html:32 ftool/templates/projects/project_detail.html:5
 #: ftool/templates/projects/project_list.html:5
 #: ftool/templates/projects/project_list.html:10 projects/models.py:53
 msgid "projects"
 msgstr "Projekte"
+
+#: ftool/templates/base.html:35
+msgid "account"
+msgstr "Konto"
+
+#: ftool/templates/base.html:37
+#| msgid "negotiating"
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: ftool/templates/base.html:38
+msgid "Change my password"
+msgstr "Mein Passwort ändern"
+
+#: ftool/templates/base.html:40
+msgid "Sign off"
+msgstr "Abmelden"
 
 #: ftool/templates/deals/deal_list.html:19
 #: ftool/templates/deals/deal_list.html:24
@@ -389,6 +406,12 @@ msgid "stories"
 msgstr "Stories"
 
 #: tools/views.py:58
+#, python-format
+#| msgid "%(class)s \"%(object)s\" has been successfully updated."
+msgid "%(class)s \"%(object)s\" has been successfully created."
+msgstr "%(class)s \"%(object)s\" wurde erfolgreich erstellt."
+
+#: tools/views.py:70
 #, python-format
 msgid "%(class)s \"%(object)s\" has been successfully updated."
 msgstr "%(class)s \"%(object)s\" wurde erfolgreich geändert."
