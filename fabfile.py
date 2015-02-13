@@ -7,6 +7,7 @@ env.hosts = ['deploy@ftool.feinheit.ch']
 
 @task
 def deploy():
+    local('flake8 .')
     local('git push origin master')
     with cd('www/ftool/'):
         run('git checkout master')
