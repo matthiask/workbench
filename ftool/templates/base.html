@@ -21,25 +21,16 @@
           <li><a href="/">Home</a></li>
           <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" href="/contacts/">{% trans 'contacts' %} <span class="caret"></span></a>
             <ul class="dropdown-menu" role="menu">
-              <li><a href="/contacts/organizations/">{% trans 'organizations' %}</a></li>
-              <li><a href="/contacts/people/">{% trans 'people' %}</a></li>
+              <li><a href="{% url 'contacts_organization_list' %}">{% trans 'organizations' %}</a></li>
+              <li><a href="{% url 'contacts_person_list' %}">{% trans 'people' %}</a></li>
+              <li class="divider"></li>
+              <li><a href="{% url 'contacts_organization_create' %}">+ {% trans 'organization' %}</a></li>
+              <li><a href="{% url 'contacts_person_create' %}">+ {% trans 'person' %}</a></li>
             </ul>
           </li>
           <li><a href="/deals/">{% trans 'deals' %}</a></li>
           <li><a href="/projects/">{% trans 'projects' %}</a></li>
           {% endmark_current %}
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
-            <ul class="dropdown-menu" role="menu">
-              <li><a href="#">Action</a></li>
-              <li><a href="#">Another action</a></li>
-              <li><a href="#">Something else here</a></li>
-              <li class="divider"></li>
-              <li class="dropdown-header">Nav header</li>
-              <li><a href="#">Separated link</a></li>
-              <li><a href="#">One more separated link</a></li>
-            </ul>
-          </li>
         </ul>
       </div><!--/.nav-collapse -->
     </div>

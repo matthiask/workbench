@@ -1,10 +1,15 @@
 from django.conf.urls import patterns, url
+from django.shortcuts import redirect
 
 from contacts import views
 
 
 urlpatterns = patterns(
     '',
+    url(
+        r'^$',
+        lambda request: redirect('contacts_organization_list'),
+        name='contacts'),
     url(
         r'^organizations/$',
         views.OrganizationListView.as_view(),
@@ -13,6 +18,14 @@ urlpatterns = patterns(
         r'^organizations/(?P<pk>\d+)/$',
         views.OrganizationDetailView.as_view(),
         name='contacts_organization_detail'),
+    url(
+        r'^organizations/create/$',
+        views.OrganizationCreateView.as_view(),
+        name='contacts_organization_create'),
+    url(
+        r'^organizations/(?P<pk>\d+)/update/$',
+        views.OrganizationUpdateView.as_view(),
+        name='contacts_organization_update'),
 
     url(
         r'^people/$',

@@ -20,6 +20,14 @@ class OrganizationDetailView(OrganizationViewMixin, DetailView):
     pass
 
 
+class OrganizationCreateView(OrganizationViewMixin, CreateView):
+    pass
+
+
+class OrganizationUpdateView(OrganizationViewMixin, UpdateView):
+    pass
+
+
 class PersonListView(PersonViewMixin, ListView):
     pass
 
