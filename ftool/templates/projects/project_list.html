@@ -2,19 +2,17 @@
 
 {% load i18n %}
 
-{% block title %}{% trans "deals" %} - {{ block.super }}{% endblock %}
+{% block title %}{% trans "projects" %} - {{ block.super }}{% endblock %}
 
 {% block content %}
-
 <div class="row">
   <div class="col-sm-12">
-
-    <h1>{% trans 'deals' %}</h1>
+    <h1>{% trans "projects" %}</h1>
 
     <table class="table table-hover table-striped">
       <thead>
         <tr>
-          <td colspan="5">
+          <td colspan="4">
             <form method="GET" action="." class="form-inline form-search">
               <label class="sr-only">{% trans 'search' %}</label>
               <input
@@ -23,27 +21,24 @@
                 name="q"
                 placeholder="{% trans 'search' %}"
                 value="{{ view.request.GET.q|default:'' }}">
-              <label class="sr-only">{% trans 'funnel' %}</label>
-              {{ view.search_form.f }}
             </form>
           </td>
         </tr>
         <tr>
-          <th>{% trans 'funnel' %}</th>
-          <th>{% trans 'deal' %}</th>
-          <th>{% trans 'owned by' %}</th>
-          <th>{% trans 'estimated value' %}</th>
+          <th>{% trans 'project' %}</th>
+          <th>{% trans 'customer' %}</th>
           <th>{% trans 'status' %}</th>
         </tr>
       </thead>
       <tbody>
-        {% for deal in object_list %}
+        {% for project in object_list %}
           <tr>
-            <td>{{ deal.funnel }}</td>
-            <th><a href="{{ deal.urls.detail }}">{{ deal }}</a></th>
-            <td>{{ deal.owned_by.get_short_name }}</td>
-            <td>{{ deal.estimated_value }}</td>
-            <td>{{ deal.get_status_display }}</td>
+            <th><a href="{{ project.urls.detail }}">
+                {{ project }}
+            </a></th>
+            <td>{{ project.customer }}</td>
+            <td>{{ project.owned_by.get_short_name }}</td>
+            <td>{{ project.get_status_display }}</td>
           </tr>
         {% endfor %}
       </tbody>
@@ -58,15 +53,6 @@
         </tr>
       </tfoot>
     </table>
-
   </div>
 </div>
-{% endblock %}
-
-{% block js %}{{ block.super }}
-<script>
-  $('.form-search select').on('change', function() {
-    $(this).closest('form').submit();
-  });
-</script>
 {% endblock %}

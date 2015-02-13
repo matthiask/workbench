@@ -1,10 +1,11 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from tools.models import SearchManager
 from tools.urls import model_urls
 
 
-class ProjectManager(models.Model):
+class ProjectManager(SearchManager):
     def create_project(self, title):
         project = Project.objects.create(
             title=title,
