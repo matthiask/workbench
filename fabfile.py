@@ -27,3 +27,8 @@ def pull_database():
         'ssh root@ftool.feinheit.ch "sudo -u postgres pg_dump ftool'
         ' --no-privileges --no-owner --no-reconnect"'
         ' | psql ftool')
+
+
+@task(alias='mm')
+def makemessages():
+    local('venv/bin/python manage.py makemessages -a -i venv')

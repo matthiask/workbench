@@ -19,6 +19,12 @@
         <ul class="nav navbar-nav">
           {% mark_current request.path %}
           <li><a href="/">Home</a></li>
+          <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" href="/contacts/">{% trans 'contacts' %} <span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="/contacts/organizations/">{% trans 'organizations' %}</a></li>
+              <li><a href="/contacts/people/">{% trans 'people' %}</a></li>
+            </ul>
+          </li>
           <li><a href="/deals/">{% trans 'deals' %}</a></li>
           <li><a href="/projects/">{% trans 'projects' %}</a></li>
           {% endmark_current %}

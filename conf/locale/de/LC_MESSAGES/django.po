@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-13 16:16+0100\n"
+"POT-Creation-Date: 2015-02-13 17:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,7 +75,6 @@ msgid "groups"
 msgstr "Gruppen"
 
 #: contacts/models.py:23
-#| msgid "full name"
 msgid "name"
 msgstr "Name"
 
@@ -84,11 +83,10 @@ msgid "primary contact"
 msgstr "Hauptkontakt"
 
 #: contacts/models.py:32 contacts/models.py:50
-#| msgid "position"
 msgid "organization"
 msgstr "Organisation"
 
-#: contacts/models.py:33
+#: contacts/models.py:33 ftool/templates/base.html:24
 msgid "organizations"
 msgstr "Organisationen"
 
@@ -109,7 +107,7 @@ msgstr "Bemerkungen"
 msgid "person"
 msgstr "Person"
 
-#: contacts/models.py:61
+#: contacts/models.py:61 ftool/templates/base.html:25
 msgid "people"
 msgstr "Personen"
 
@@ -142,7 +140,6 @@ msgid "postal addresses"
 msgstr "Postadressen"
 
 #: deals/forms.py:11
-#| msgid "funnels"
 msgid "All funnels"
 msgstr "Alle Trichter"
 
@@ -216,7 +213,7 @@ msgstr "Geschlossen um"
 msgid "deal"
 msgstr "Geschäft"
 
-#: deals/models.py:82 ftool/templates/base.html:22
+#: deals/models.py:82 ftool/templates/base.html:28
 #: ftool/templates/deals/deal_detail.html:5
 #: ftool/templates/deals/deal_list.html:5
 #: ftool/templates/deals/deal_list.html:12
@@ -239,7 +236,12 @@ msgstr "benötigte Leistung"
 msgid "required services"
 msgstr "benötigte Leistungen"
 
-#: ftool/templates/base.html:23 ftool/templates/projects/project_detail.html:5
+#: ftool/templates/base.html:22
+#| msgid "primary contact"
+msgid "contacts"
+msgstr "Kontakte"
+
+#: ftool/templates/base.html:29 ftool/templates/projects/project_detail.html:5
 #: ftool/templates/projects/project_list.html:5
 #: ftool/templates/projects/project_list.html:10 projects/models.py:53
 msgid "projects"
@@ -249,17 +251,23 @@ msgstr "Projekte"
 #: ftool/templates/deals/deal_list.html:24
 #: ftool/templates/projects/project_list.html:17
 #: ftool/templates/projects/project_list.html:22
+#: ftool/templates/tools/object_list.html:17
+#: ftool/templates/tools/object_list.html:22
 msgid "search"
 msgstr "Suche"
 
 #: ftool/templates/deals/deal_list.html:53
 #: ftool/templates/projects/project_list.html:48
-#| msgid "projects"
+#: ftool/templates/tools/object_detail.html:5
+#: ftool/templates/tools/object_list.html:5
+#: ftool/templates/tools/object_list.html:10
+#: ftool/templates/tools/object_list.html:43
 msgid "objects"
 msgstr "Objekte"
 
 #: ftool/templates/deals/deal_list.html:55
 #: ftool/templates/projects/project_list.html:50
+#: ftool/templates/tools/object_list.html:45
 #, python-format
 msgid "%(total)s total"
 msgstr "%(total)s insgesamt"
@@ -280,6 +288,11 @@ msgstr "Anmeldung"
 #: ftool/templates/registration/login.html:16
 msgid "submit"
 msgstr "absenden"
+
+#: ftool/templates/tools/object_list.html:28
+#| msgid "objects"
+msgid "object"
+msgstr "Objekt"
 
 #: projects/models.py:30
 msgid "proposed"

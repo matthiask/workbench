@@ -1,10 +1,8 @@
 from collections import defaultdict
 
-import vanilla
-
 from deals.forms import DealSearchForm
 from deals.models import Funnel, Deal
-from tools.views import ListView
+from tools.views import ListView, DetailView
 
 
 class FunnelViewMixin(object):
@@ -15,7 +13,7 @@ class DealViewMixin(object):
     model = Deal
 
 
-class FunnelDetailView(FunnelViewMixin, vanilla.DetailView):
+class FunnelDetailView(FunnelViewMixin, DetailView):
     def get_context_data(self, **kwargs):
         deals = defaultdict(list)
         for deal in self.object.deals.all():
@@ -43,5 +41,5 @@ class DealListView(DealViewMixin, ListView):
         return queryset
 
 
-class DealDetailView(DealViewMixin, vanilla.DetailView):
+class DealDetailView(DealViewMixin, DetailView):
     pass

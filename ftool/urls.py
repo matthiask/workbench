@@ -15,6 +15,7 @@ urlpatterns = patterns(
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include('django.contrib.auth.urls')),
 
+    url(r'^contacts/', include('contacts.urls')),
     url(r'^deals/', include('deals.urls')),
     url(r'^projects/', include('projects.urls')),
 
