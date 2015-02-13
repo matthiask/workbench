@@ -1,7 +1,8 @@
 import vanilla
 
+from projects.forms import ProjectForm
 from projects.models import Project
-from tools.views import ListView
+from tools.views import ListView, DetailView, CreateView
 
 
 class ProjectViewMixin(object):
@@ -12,5 +13,9 @@ class ProjectListView(ProjectViewMixin, ListView):
     pass
 
 
-class ProjectDetailView(ProjectViewMixin, vanilla.DetailView):
+class ProjectDetailView(ProjectViewMixin, DetailView):
     pass
+
+
+class ProjectCreateView(ProjectViewMixin, CreateView):
+    form_class = ProjectForm

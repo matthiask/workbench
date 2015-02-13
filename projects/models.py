@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from contacts.models import Organization, Person
 from tools.models import SearchManager
 from tools.urls import model_urls
 
@@ -32,6 +33,19 @@ class Project(models.Model):
         (FINISHED, _('finished')),
         (REJECTED, _('rejected')),
     )
+
+    customer = models.ForeignKey(
+        Organization,
+        verbose_name=_('customer'),
+        related_name='+',
+        on_delete=models.PROTECT)
+    contact = models.ForeignKey(
+        Person,
+        blank=True,
+        null=True,
+        verbose_name=_('contact'),
+        related_name='+',
+        on_delete=models.SET_NULL)
 
     title = models.CharField(
         _('title'),
