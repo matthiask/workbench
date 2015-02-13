@@ -1,5 +1,8 @@
+from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpResponseRedirect
 from django.utils.functional import cached_property
+from django.utils.translation import ugettext as _
 
 import vanilla
 
@@ -45,3 +48,27 @@ class ListView(ToolsMixin, vanilla.ListView):
 
 class DetailView(ToolsMixin, vanilla.DetailView):
     pass
+
+
+class CreateView(ToolsMixin, vanilla.CreateView):
+    def form_valid(self, form):
+        self.object = form.save()
+        messages.success(
+            self.request,
+            _('%(class)s "%(object)s" has been successfully created.') % {
+                'class': self.object._meta.verbose_name,
+                'object': self.object,
+            })
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class UpdateView(ToolsMixin, vanilla.UpdateView):
+    def form_valid(self, form):
+        self.object = form.save()
+        messages.success(
+            self.request,
+            _('%(class)s "%(object)s" has been successfully updated.') % {
+                'class': self.object._meta.verbose_name,
+                'object': self.object,
+            })
+        return HttpResponseRedirect(self.get_success_url())

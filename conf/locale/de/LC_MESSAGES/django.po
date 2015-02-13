@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-13 17:17+0100\n"
+"POT-Creation-Date: 2015-02-13 17:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -237,7 +237,6 @@ msgid "required services"
 msgstr "benötigte Leistungen"
 
 #: ftool/templates/base.html:22
-#| msgid "primary contact"
 msgid "contacts"
 msgstr "Kontakte"
 
@@ -286,11 +285,11 @@ msgid "login"
 msgstr "Anmeldung"
 
 #: ftool/templates/registration/login.html:16
+#: ftool/templates/tools/object_form.html:18
 msgid "submit"
 msgstr "absenden"
 
 #: ftool/templates/tools/object_list.html:28
-#| msgid "objects"
 msgid "object"
 msgstr "Objekt"
 
@@ -388,3 +387,8 @@ msgstr "Story"
 #: stories/models.py:95
 msgid "stories"
 msgstr "Stories"
+
+#: tools/views.py:58
+#, python-format
+msgid "%(class)s \"%(object)s\" has been successfully updated."
+msgstr "%(class)s \"%(object)s\" wurde erfolgreich geändert."

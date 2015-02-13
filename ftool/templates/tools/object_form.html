@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% load bootstrap3 i18n %}
+
+{% block title %}{{ object }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+
+    <h1>{{ object }}</h1>
+
+    <form method="POST" action="." class="form">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      {% buttons %}
+        <button type="submit" class="btn btn-primary">
+          {% trans 'submit' %}</button>
+      {% endbuttons %}
+    </form>
+
+  </div>
+</div>
+{% endblock %}

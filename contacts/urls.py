@@ -22,4 +22,12 @@ urlpatterns = patterns(
         r'^people/(?P<pk>\d+)/$',
         views.PersonDetailView.as_view(),
         name='contacts_person_detail'),
+    url(
+        r'^people/create/$',
+        views.PersonCreateView.as_view(),
+        name='contacts_person_create'),
+    url(
+        r'^people/(?P<pk>\d+)/update/$',
+        views.PersonUpdateView.as_view(),
+        name='contacts_person_update'),
 )
