@@ -7,12 +7,17 @@
 {% block content %}
 <div class="row">
   <div class="col-sm-12">
-    <h1>{% trans "projects" %}</h1>
+    <h1>{{ view.meta.verbose_name_plural }}</h1>
 
     <table class="table table-hover table-striped">
       <thead>
         <tr>
           <td colspan="4">
+            <a href="{% url 'projects_project_create' %}" class="btn btn-default pull-right">
+              <span class="glyphicon glyphicon-plus"></span>
+              {{ view.meta.verbose_name }}
+            </a>
+
             <form method="GET" action="." class="form-inline form-search">
               <label class="sr-only">{% trans 'search' %}</label>
               <input
@@ -45,7 +50,7 @@
       <tfoot>
         <tr>
           <th colspan="5">
-            {{ paginator.count }} {% trans 'objects' %}
+            {{ paginator.count }} {{ view.meta.verbose_name_plural }}
             {% if view.root_queryset_count != paginator.count %}
             (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
             {% endif %}

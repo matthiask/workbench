@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from deals.forms import DealSearchForm
 from deals.models import Funnel, Deal
-from tools.views import ListView, DetailView
+from tools.views import ListView, DetailView, CreateView, UpdateView
 
 
 class FunnelViewMixin(object):
@@ -43,3 +43,20 @@ class DealListView(DealViewMixin, ListView):
 
 class DealDetailView(DealViewMixin, DetailView):
     pass
+
+
+class DealCreateView(DealViewMixin, CreateView):
+    fields = (
+        'funnel', 'title', 'description', 'owned_by', 'estimated_value')
+
+    def get_form(self, data=None, files=None, **kwargs):
+        kwargs.setdefault('initial', {}).update({
+            'owned_by': self.request.user.pk,
+        })
+        form_class = self.get_form_class()
+        return form_class(data, files, **kwargs)
+
+
+class DealUpdateView(DealViewMixin, UpdateView):
+    fields = (
+        'funnel', 'title', 'description', 'owned_by', 'estimated_value')

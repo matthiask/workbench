@@ -2,13 +2,19 @@
 
 {% load bootstrap3 i18n %}
 
-{% block title %}{{ object }} - {{ block.super }}{% endblock %}
+{% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
-
-    <h1>{{ object }}</h1>
+    <h1>
+      {% if object %}
+        {% blocktrans %}Update {{ object }}{% endblocktrans %}
+        {{ object }}
+      {% else %}
+        {% blocktrans with class=view.meta.verbose_name %}Create {{ class }}{% endblocktrans %}
+      {% endif %}
+    </h1>
 
     <form method="POST" action="." class="form">
       {% csrf_token %}

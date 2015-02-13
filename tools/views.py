@@ -31,6 +31,10 @@ class ToolsMixin(object):
             "'template_name_suffix', or override 'get_template_names()'"
         raise ImproperlyConfigured(msg % self.__class__.__name__)
 
+    @property
+    def meta(self):
+        return self.model._meta
+
 
 class ListView(ToolsMixin, vanilla.ListView):
     paginate_by = 10
