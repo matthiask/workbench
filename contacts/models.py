@@ -26,6 +26,12 @@ class Organization(models.Model):
         verbose_name=_('primary contact'),
         related_name='+')
 
+    objects = SearchManager()
+
+    class Meta:
+        verbose_name = _('organization')
+        verbose_name_plural = _('organizations')
+
     def __str__(self):
         return self.name
 
@@ -47,6 +53,8 @@ class Person(models.Model):
         User,
         verbose_name=_('primary contact'),
         related_name='+')
+
+    objects = SearchManager()
 
     class Meta:
         verbose_name = _('person')
