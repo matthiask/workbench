@@ -63,6 +63,15 @@ LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'conf', 'locale'),
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.core.context_processors.request',
+    'django.core.context_processors.static',
+    'django.contrib.auth.context_processors.auth',
+    'django.contrib.messages.context_processors.messages',
+)
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
