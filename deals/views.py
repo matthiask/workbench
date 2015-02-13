@@ -6,6 +6,7 @@ import vanilla
 
 from deals.forms import DealSearchForm
 from deals.models import Funnel, Deal
+from tools.views import ListView
 
 
 class FunnelViewMixin(object):
@@ -30,28 +31,17 @@ class FunnelDetailView(FunnelViewMixin, vanilla.DetailView):
             ], **kwargs)
 
 
-class DealListView(vanilla.ListView):
+class DealListView(ListView):
     model = Deal
 
     def get_queryset(self):
-        self.root_queryset = queryset = self.model.objects.all()
+        super().get_queryset()
 
         self.search_form = DealSearchForm(self.request.GET)
         if self.search_form.is_valid():
             data = self.search_form.cleaned_data
             if data.get('f'):
-                queryset = queryset.filter(funnel=data.get('f'))
-
-        q = self.request.GET.get('q')
-        self.queryset = queryset.search(q) if q else queryset
-        return self.queryset
-
-    @cached_property
-    def counts(self):
-        return {
-            'root': self.root_queryset.count(),
-            'search': self.queryset.count(),
-        }
+                self.queryset = self.queryset.filter(funnel=data.get('f'))
 
 
 class DealDetailView(vanilla.DetailView):
