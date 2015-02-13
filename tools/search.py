@@ -1,5 +1,25 @@
 """
 PostgreSQL full text search support
+
+An example migration for adding full text search support to a model would
+look like this::
+
+    # -*- coding: utf-8 -*-
+    from __future__ import unicode_literals
+    from django.db import models, migrations
+    from tools.search import migration_sql
+
+    class Migration(migrations.Migration):
+        dependencies = [
+            # ...
+        ]
+
+        operations = [
+            migrations.RunSQL(*migration_sql(
+                'database_table',
+                'field1, field2, field3'
+            )),
+        ]
 """
 
 
