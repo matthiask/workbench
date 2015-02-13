@@ -1,5 +1,5 @@
-from contacts.forms import (
-    PhoneNumberFormset, EmailAddressFormset, PostalAddressFormset)
+# from contacts.forms import (
+#     PhoneNumberFormset, EmailAddressFormset, PostalAddressFormset)
 from contacts.models import Organization, Person
 from tools.views import ListView, DetailView, CreateView, UpdateView
 
