@@ -1,14 +1,8 @@
-<!doctype html>
-{% load i18n static %}
-<html lang="{{ LANGUAGE_CODE }}">
-<head>
-  <title>{% block title %}FeinTOOL{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'ftool/css/bootstrap.min.css' %}">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
+{% extends "site_base.html" %}
 
-<body role="document">
+{% load i18n %}
 
+{% block body %}
   <!-- Fixed navbar -->
   <nav class="navbar navbar-inverse _navbar-fixed-top">
     <div class="container">
@@ -48,13 +42,4 @@
     {% block content %}{% endblock %}
 
   </div> <!-- /container -->
-
-
-  <!-- Bootstrap core JavaScript
-  ================================================== -->
-  <!-- Placed at the end of the document so the pages load faster -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-  <script src="{% static 'ftool/js/bootstrap.min.js' %}"></script>
-  {% block js %}{% endblock %}
-</body>
-</html>
+{% endblock body %}
