@@ -1,9 +1,8 @@
 from collections import defaultdict
 
-import reversion
-
 from deals.forms import DealSearchForm
 from deals.models import Funnel, Deal
+from tools.history import changes
 from tools.views import ListView, DetailView, CreateView, UpdateView
 
 
@@ -41,27 +40,6 @@ class DealListView(DealViewMixin, ListView):
                 queryset = queryset.filter(funnel=data.get('f'))
 
         return queryset
-
-
-def changes(instance, fields):
-    versions = reversion.get_for_object(instance)[::-1]
-    changes = []
-    for previous, update in zip(versions, versions[1:]):
-        version_changes = []
-        for field in fields:
-            f = (
-                instance._meta.get_field(field).verbose_name,
-                previous.field_dict.get(field),
-                update.field_dict.get(field),
-            )
-
-            if f[1] == f[2]:
-                continue
-
-            version_changes.append('"%s" changed from "%s" to "%s".' % f)
-
-        changes.append(version_changes)
-    return changes
 
 
 class DealDetailView(DealViewMixin, DetailView):

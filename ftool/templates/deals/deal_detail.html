@@ -10,11 +10,14 @@
     <a href="{{ deal.funnel.urls.detail }}">&lt; {{ deal.funnel }}</a>
     <h1>{{ deal }}</h1>
 
-    {% for version_changes in changes %}
-    <h2>Version {{ forloop.counter0 }}</h2>
+    {% for change in changes %}
+      <h2>
+        Version {{ forloop.counter0 }}
+        <small>{{ change.version.revision.date_created }}</small>
+      </h2>
       <ul>
-        {% for change in version_changes %}
-          <li>{{ change }}</li>
+        {% for pretty in change.changes %}
+          <li>{{ pretty }}</li>
         {% endfor %}
       </ul>
     {% endfor %}
