@@ -58,8 +58,7 @@ def changes(instance, fields):
             if f[1] == f[2]:
                 continue
 
-            version_changes.append(
-                'The field "%s" changed its value from "%s" to "%s".' % f)
+            version_changes.append('"%s" changed from "%s" to "%s".' % f)
 
         changes.append(version_changes)
     return changes
