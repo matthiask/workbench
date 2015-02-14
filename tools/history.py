@@ -11,11 +11,14 @@ Change = namedtuple('Change', 'changes version')
 def changes(instance, fields):
     versions = reversion.get_for_object(instance)[::-1]
     changes = []
-    for previous, update in zip(versions, versions[1:]):
+    for previous, current in zip(versions, versions[1:]):
         version_changes = []
+        previous_object = previous.object_version.object
+        current_object = current.object_version.object
+
         for field in fields:
-            prev = previous.field_dict.get(field)
-            curr = update.field_dict.get(field)
+            prev = getattr(previous_object, field)
+            curr = getattr(current_object, field)
 
             if prev == curr:
                 continue
@@ -39,6 +42,6 @@ def changes(instance, fields):
 
         changes.append(Change(
             changes=version_changes,
-            version=update,
+            version=current,
         ))
     return changes
