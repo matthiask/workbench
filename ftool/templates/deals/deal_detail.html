@@ -9,6 +9,15 @@
   <div class="col-md-12">
     <a href="{{ deal.funnel.urls.detail }}">&lt; {{ deal.funnel }}</a>
     <h1>{{ deal }}</h1>
+
+    {% for version_changes in changes %}
+    <h2>Version {{ forloop.counter0 }}</h2>
+      <ul>
+        {% for change in version_changes %}
+          <li>{{ change }}</li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
   </div>
 </div>
 {% endblock %}
