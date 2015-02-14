@@ -2,7 +2,7 @@
 
 {% load i18n %}
 
-{% block title %}{{ object }} - {% trans "objects" %} - {{ block.super }}{% endblock %}
+{% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row">
