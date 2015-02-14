@@ -10,11 +10,37 @@
     <a href="{{ deal.funnel.urls.detail }}">&lt; {{ deal.funnel }}</a>
     <h1>{{ deal }}</h1>
 
+    <table class="table table-striped">
+      <tr>
+        <th>{% trans 'funnel' %}</th>
+        <td><a href="{{ deal.funnel.urls.detail }}">
+          {{ deal.funnel }}
+        </a></td>
+      </tr>
+      <tr>
+        <th>{% trans 'description' %}</th>
+        <td>{{ deal.description|default:"&ndash;"|linebreaksbr }}</td>
+      </tr>
+      <tr>
+        <th>{% trans 'owned by' %}</th>
+        <td>{{ deal.owned_by.get_full_name }}</td>
+      </tr>
+      <tr>
+        <th>{% trans 'estimated value' %}</th>
+        <td>{{ deal.estimated_value }}</td>
+      </tr>
+      <tr>
+        <th>{% trans 'status' %}</th>
+        <td>{{ deal.get_status_display }}</td>
+      </tr>
+    </table>
+
+    <h2>{% trans 'History' %}</h2>
     {% for change in changes %}
-      <h2>
+      <h3>
         Version {{ forloop.counter0 }}
         <small>{{ change.version.revision.date_created }}</small>
-      </h2>
+      </h3>
       <ul>
         {% for pretty in change.changes %}
           <li>{{ pretty }}</li>
