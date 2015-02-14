@@ -19,6 +19,9 @@
     <form method="POST" action="." class="form">
       {% csrf_token %}
       {% bootstrap_form form %}
+      {% for formset in view.formsets.values %}
+        {% bootstrap_formset formset %}
+      {% endfor %}
       {% buttons %}
         <button type="submit" class="btn btn-primary">
           {% trans 'submit' %}</button>

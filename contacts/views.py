@@ -1,5 +1,5 @@
-# from contacts.forms import (
-#     PhoneNumberFormset, EmailAddressFormset, PostalAddressFormset)
+from contacts.forms import (
+    PhoneNumberFormset, EmailAddressFormset, PostalAddressFormset)
 from contacts.models import Organization, Person
 from tools.views import ListView, DetailView, CreateView, UpdateView
 
@@ -48,6 +48,13 @@ class PersonCreateView(PersonViewMixin, CreateView):
             'primary_contact': self.request.user.pk,
         })
         form_class = self.get_form_class()
+
+        self.formsets = {
+            'phonenumbers': PhoneNumberFormset(data, files),
+            'emailaddresses': EmailAddressFormset(data, files),
+            'postaladdresses': PostalAddressFormset(data, files),
+        }
+
         return form_class(data, files, **kwargs)
 
 
