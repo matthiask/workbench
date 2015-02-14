@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+import reversion
+
 from accounts.models import User
 from services.models import ServiceType
 from tools.models import SearchManager
@@ -105,3 +107,7 @@ class RequiredService(models.Model):
 
     def __str__(self):
         return '%.2fh %s' % (self.hours, self.service_type)
+
+
+reversion.register(Funnel)
+reversion.register(Deal, follow=['funnel'])
