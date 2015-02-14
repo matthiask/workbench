@@ -29,6 +29,7 @@ class Organization(models.Model):
     objects = SearchManager()
 
     class Meta:
+        ordering = ('name',)
         verbose_name = _('organization')
         verbose_name_plural = _('organizations')
 
@@ -58,6 +59,7 @@ class Person(models.Model):
     objects = SearchManager()
 
     class Meta:
+        ordering = ('full_name',)
         verbose_name = _('person')
         verbose_name_plural = _('people')
 
