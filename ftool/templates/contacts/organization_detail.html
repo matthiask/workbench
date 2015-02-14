@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}{{ organization }} - {% trans "organizations" %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+<div class="col-md-12">
+  <h1>{{ organization }}</h1>
+  <table class="table table-striped">
+    <tr>
+      <td class="text-right">{% trans 'organization' %}</td>
+      <td>
+        {% if person.organization %}
+          <a href="{{ person.organization.get_absolute_url }}">
+            {{ person.organization }}
+          </a>
+        {% else %}&ndash;{% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td class="text-right">{% trans 'people' %}</td>
+      <td>
+        {% for person in organization.people.all %}
+          <a href="{{ person.urls.detail }}">
+            {{ person.full_name }}
+          </a>
+          <br>
+        {% endfor %}
+      </td>
+    </tr>
+  </table>
+</div>
+</div>
+{% endblock %}
