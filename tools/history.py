@@ -20,10 +20,18 @@ def changes(instance, fields):
             if prev == curr:
                 continue
 
+            f = instance._meta.get_field(field)
+
+            # Handle choice fields
+            if f.choices:
+                d = dict(f.flatchoices)
+                prev = d.get(prev, prev)
+                curr = d.get(curr, curr)
+
             version_changes.append(
                 _('"%(field)s" changed from "%(previous)s" to "%(current)s".')
                 % {
-                    'field': instance._meta.get_field(field).verbose_name,
+                    'field': f.verbose_name,
                     'previous': prev,
                     'current': curr,
                 }

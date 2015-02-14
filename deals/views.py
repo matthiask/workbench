@@ -47,7 +47,7 @@ class DealDetailView(DealViewMixin, DetailView):
         return super().get_context_data(
             changes=changes(
                 self.object,
-                ('funnel', 'title', 'owned_by', 'estimated_value'),
+                ('funnel', 'title', 'owned_by', 'status', 'estimated_value'),
             ), **kwargs)
 
 
