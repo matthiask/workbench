@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from contacts.forms import (
     PhoneNumberFormset, EmailAddressFormset, PostalAddressFormset)
 from contacts.models import Organization, Person
@@ -49,14 +51,31 @@ class PersonCreateView(PersonViewMixin, CreateView):
         })
         form_class = self.get_form_class()
 
-        self.formsets = {
-            'phonenumbers': PhoneNumberFormset(data, files),
-            'emailaddresses': EmailAddressFormset(data, files),
-            'postaladdresses': PostalAddressFormset(data, files),
-        }
+        kw = {'data': data, 'files': files}
+        self.formsets = OrderedDict((
+            ('phonenumbers', PhoneNumberFormset(**kw)),
+            ('emailaddresses', EmailAddressFormset(**kw)),
+            ('postaladdresses', PostalAddressFormset(**kw)),
+        ))
 
         return form_class(data, files, **kwargs)
 
 
 class PersonUpdateView(PersonViewMixin, UpdateView):
-    pass
+    def get_form(self, data=None, files=None, **kwargs):
+        form_class = self.get_form_class()
+
+        kw = {'data': data, 'files': files, 'instance': self.object}
+        self.formsets = OrderedDict((
+            ('phonenumbers', PhoneNumberFormset(**kw)),
+            ('emailaddresses', EmailAddressFormset(**kw)),
+            ('postaladdresses', PostalAddressFormset(**kw)),
+        ))
+
+        return form_class(data, files, **kwargs)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        for formset in self.formsets.values():
+            formset.save()
+        return response

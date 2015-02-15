@@ -7,14 +7,14 @@ from contacts.models import (
 PhoneNumberFormset = inlineformset_factory(
     Person,
     PhoneNumber,
-    extra=3)
+    extra=2)
 
 EmailAddressFormset = inlineformset_factory(
     Person,
     EmailAddress,
-    extra=3)
+    extra=2)
 
 PostalAddressFormset = inlineformset_factory(
     Person,
     PostalAddress,
-    extra=0)
+    extra=2)
