@@ -9,19 +9,27 @@
   <div class="col-md-3"></div>
   <div class="col-md-6">
     <div class="hidden-xs" style="height:10em"></div>
-    <h1>{% trans 'Sign in' %}</h1>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3>FeinTOOL</h3>
+      </div>
+      <div class="panel-body">
+
     <form method="POST" action="." class="form">
       {% csrf_token %}
       {% bootstrap_form form %}
       {% buttons %}
         <button type="submit" class="btn btn-primary">
-          {% trans 'submit' %}
+          {% trans 'Sign in' %}
         </button>
 
         <a href="{% url 'password_reset' %}" class="btn btn-default pull-right">
           {% trans 'Reset my password' %}</a>
       {% endbuttons %}
     </form>
+
+      </div>
+    </div>
   </div>
   <div class="col-md-3"></div>
 </div>
