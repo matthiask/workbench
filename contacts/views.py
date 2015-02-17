@@ -3,7 +3,8 @@ from collections import OrderedDict
 from contacts.forms import (
     PhoneNumberFormset, EmailAddressFormset, PostalAddressFormset)
 from contacts.models import Organization, Person
-from tools.views import ListView, DetailView, CreateView, UpdateView
+from tools.views import (
+    ListView, DetailView, CreateView, UpdateView, DeleteView)
 
 
 class OrganizationViewMixin(object):
@@ -79,3 +80,7 @@ class PersonUpdateView(PersonViewMixin, UpdateView):
         for formset in self.formsets.values():
             formset.save()
         return response
+
+
+class PersonDeleteView(PersonViewMixin, DeleteView):
+    pass

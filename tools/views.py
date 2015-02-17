@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
@@ -76,3 +77,20 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
                 'object': self.object,
             })
         return HttpResponseRedirect(self.get_success_url())
+
+
+class DeleteView(ToolsMixin, vanilla.DeleteView):
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        messages.success(
+            self.request,
+            _('%(class)s "%(object)s" has been successfully deleted.') % {
+                'class': self.object._meta.verbose_name,
+                'object': self.object,
+            })
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        opts = self.model._meta
+        return reverse('%s_%s_list' % (opts.app_label, opts.model_name))
