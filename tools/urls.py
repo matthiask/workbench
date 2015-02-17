@@ -53,3 +53,14 @@ def model_urls(
         cls.get_absolute_url = lambda self: self.urls.url(default)
         return cls
     return _dec
+
+
+def tryreverse(*args, **kwargs):
+    """
+    Calls ``django.core.urlresolvers.reverse``, and returns ``None`` on
+    failure instead of raising an exception.
+    """
+    try:
+        return reverse(*args, **kwargs)
+    except NoReverseMatch:
+        return None

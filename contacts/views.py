@@ -2,12 +2,12 @@ from collections import OrderedDict
 
 from django.contrib import messages
 from django.db.models import ProtectedError
-from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 
 from contacts.forms import (
     PhoneNumberFormset, EmailAddressFormset, PostalAddressFormset)
-from contacts.models import Organization, Person, PhoneNumber, EmailAddress, PostalAddress
+from contacts.models import (
+    Organization, Person, PhoneNumber, EmailAddress, PostalAddress)
 from tools.deletion import related_classes
 from tools.views import (
     ListView, DetailView, CreateView, UpdateView, DeleteView)
