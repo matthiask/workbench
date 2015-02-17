@@ -77,6 +77,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
 )
 
+AUTHENTICATION_BACKENDS = (
+    'accounts.backends.AuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
@@ -92,3 +97,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+OAUTH2_CLIENT_ID = env.env('OAUTH2_CLIENT_ID', default='')
+OAUTH2_CLIENT_SECRET = env.env('OAUTH2_CLIENT_SECRET', default=None)
