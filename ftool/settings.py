@@ -51,10 +51,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    'accounts.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'reversion.middleware.RevisionMiddleware',
+    'accounts.middleware.LoginRequiredMiddleware',
 )
 
 ROOT_URLCONF = 'ftool.urls'
@@ -79,7 +79,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 AUTHENTICATION_BACKENDS = (
     'accounts.backends.AuthBackend',
-    'django.contrib.auth.backends.ModelBackend',
 )
 
 # Database

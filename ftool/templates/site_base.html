@@ -1,5 +1,5 @@
 <!doctype html>
-{% load i18n static %}
+{% load bootstrap3 i18n static %}
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
   <title>{% block title %}FeinTOOL{% endblock %}</title>
@@ -13,6 +13,8 @@
   {% block body %}
 
     <div class="container-fluid theme-showcase" role="main">
+
+      {% bootstrap_messages %}
 
       {% block content %}{% endblock %}
 

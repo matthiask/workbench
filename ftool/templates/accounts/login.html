@@ -14,20 +14,9 @@
         <h3>FeinTOOL</h3>
       </div>
       <div class="panel-body">
-
-    <form method="POST" action="." class="form">
-      {% csrf_token %}
-      {% bootstrap_form form %}
-      {% buttons %}
-        <button type="submit" class="btn btn-primary">
+        <a href="{% url 'accounts_oauth2' %}" class="btn btn-primary">
           {% trans 'Sign in' %}
-        </button>
-
-        <a href="{% url 'password_reset' %}" class="btn btn-default pull-right">
-          {% trans 'Reset my password' %}</a>
-      {% endbuttons %}
-    </form>
-
+        </a>
       </div>
     </div>
   </div>
