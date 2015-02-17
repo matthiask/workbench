@@ -10,7 +10,6 @@
     <h1>
       {% if object %}
         {% blocktrans %}Update {{ object }}{% endblocktrans %}
-        {{ object }}
       {% else %}
         {% blocktrans with class=view.meta.verbose_name %}Create {{ class }}{% endblocktrans %}
       {% endif %}
