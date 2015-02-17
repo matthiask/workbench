@@ -1,8 +1,14 @@
 from collections import OrderedDict
 
+from django.contrib import messages
+from django.db.models import ProtectedError
+from django.http import HttpResponseRedirect
+from django.utils.translation import ugettext as _
+
 from contacts.forms import (
     PhoneNumberFormset, EmailAddressFormset, PostalAddressFormset)
-from contacts.models import Organization, Person
+from contacts.models import Organization, Person, PhoneNumber, EmailAddress, PostalAddress
+from tools.deletion import related_classes
 from tools.views import (
     ListView, DetailView, CreateView, UpdateView, DeleteView)
 
@@ -34,6 +40,23 @@ class OrganizationCreateView(OrganizationViewMixin, CreateView):
 
 class OrganizationUpdateView(OrganizationViewMixin, UpdateView):
     pass
+
+
+class OrganizationDeleteView(OrganizationViewMixin, DeleteView):
+    def allow_delete(self, silent=False):
+        try:
+            if related_classes(self.object) <= {Organization}:
+                return True
+        except ProtectedError:
+            pass
+
+        if not silent:
+            messages.error(
+                self.request,
+                _('Cannot delete "%s" because of related objects.')
+                % self.object)
+
+        return False
 
 
 class PersonListView(PersonViewMixin, ListView):
@@ -83,4 +106,22 @@ class PersonUpdateView(PersonViewMixin, UpdateView):
 
 
 class PersonDeleteView(PersonViewMixin, DeleteView):
-    pass
+    def allow_delete(self, silent=False):
+        try:
+            if related_classes(self.object) <= {
+                Person,
+                PhoneNumber,
+                EmailAddress,
+                PostalAddress,
+            }:
+                return True
+        except ProtectedError:
+            pass
+
+        if not silent:
+            messages.error(
+                self.request,
+                _('Cannot delete "%s" because of related objects.')
+                % self.object)
+
+        return False

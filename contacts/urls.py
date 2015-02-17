@@ -26,6 +26,10 @@ urlpatterns = patterns(
         r'^organizations/(?P<pk>\d+)/update/$',
         views.OrganizationUpdateView.as_view(),
         name='contacts_organization_update'),
+    url(
+        r'^organizations/(?P<pk>\d+)/delete/$',
+        views.OrganizationDeleteView.as_view(),
+        name='contacts_organization_delete'),
 
     url(
         r'^people/$',
