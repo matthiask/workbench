@@ -13,7 +13,7 @@ class LoginRequiredMiddleware(object):
 
         messages.info(
             request,
-            _('Please authenticate first.'))
+            _('Please authenticate.'))
 
         response = HttpResponseRedirect(reverse('login'))
         response.set_signed_cookie('next', request.path, salt='next')
