@@ -98,6 +98,13 @@ class PersonUpdateView(PersonViewMixin, UpdateView):
 
         return form_class(data, files, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        form = self.get_form(data=request.POST, files=request.FILES)
+        if form.is_valid() and all(
+                f.is_valid() for f in self.formsets.values()):
+            return self.form_valid(form)
+        return self.form_invalid(form)
+
     def form_valid(self, form):
         response = super().form_valid(form)
         for formset in self.formsets.values():
