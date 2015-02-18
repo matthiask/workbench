@@ -30,8 +30,8 @@ def safe_queryset_and(head, *tail):
             res = qs1 & qs2
 
         res._transform_fns = list(set(
-            getattr(qs1, '_transform_fns', [])
-            + getattr(qs2, '_transform_fns', [])))
+            getattr(qs1, '_transform_fns', []) +
+            getattr(qs2, '_transform_fns', [])))
 
         if not (qs1.query.standard_ordering and qs2.query.standard_ordering):
             res.query.standard_ordering = False
@@ -55,8 +55,8 @@ def safe_queryset_and(head, *tail):
                 res = res.select_related()
 
         res._prefetch_related_lookups = list(
-            set(qs1._prefetch_related_lookups)
-            | set(qs2._prefetch_related_lookups))
+            set(qs1._prefetch_related_lookups) |
+            set(qs2._prefetch_related_lookups))
 
         return res
 

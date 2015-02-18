@@ -71,8 +71,8 @@ def oauth2(request):
         email = credentials.id_token['email']
         new_user = False
 
-        if (not User.objects.filter(email=email).exists()
-                and email.endswith('@feinheit.ch')):
+        if (not User.objects.filter(email=email).exists() and
+                email.endswith('@feinheit.ch')):
             User.objects.create(
                 email=email,
                 is_active=True,
