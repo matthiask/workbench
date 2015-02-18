@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import ProtectedError
-from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _

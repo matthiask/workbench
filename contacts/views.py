@@ -1,7 +1,6 @@
 from collections import OrderedDict
 
-from django.contrib import messages
-from django.utils.translation import ugettext as _
+from django.shortcuts import redirect
 
 from contacts.forms import (
     PhoneNumberFormset, EmailAddressFormset, PostalAddressFormset)
@@ -80,9 +79,9 @@ class PersonUpdateView(PersonViewMixin, UpdateView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if not Permission.allow_update(
-                request, instance=self.object, message=False):
-            return self.failure()
+        if not self.allow_update():
+            return redirect(self.object)
+
         form = self.get_form(
             data=request.POST, files=request.FILES, instance=self.object)
         if form.is_valid() and all(
