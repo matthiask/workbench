@@ -15,11 +15,11 @@
       {% endif %}
     </h1>
 
-    <form method="POST" action="." class="form">
+    <form method="POST" action="." class="form-horizontal">
       {% csrf_token %}
-      {% bootstrap_form form %}
+      {% bootstrap_form form layout='horizontal' %}
       {% for formset in view.formsets.values %}
-        {% bootstrap_formset formset %}
+        {% bootstrap_formset formset layout='horizontal' %}
       {% endfor %}
       {% buttons %}
         <button type="submit" class="btn btn-primary">
