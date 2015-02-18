@@ -102,3 +102,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 OAUTH2_CLIENT_ID = env.env('OAUTH2_CLIENT_ID', default='')
 OAUTH2_CLIENT_SECRET = env.env('OAUTH2_CLIENT_SECRET', default=None)
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+SESSION_COOKIE_HTTPONLY = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 86400
+# SESSION_COOKIE_SECURE = True
