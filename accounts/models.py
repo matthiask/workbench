@@ -4,11 +4,9 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, _short_name, _full_name, date_of_birth,
-                    password=None):
+    def create_user(self, email, _short_name, _full_name, date_of_birth):
         """
-        Creates and saves a User with the given email, date of
-        birth and password.
+        Creates and saves a User with the given email, date of birth.
         """
         if not email:
             raise ValueError('Users must have an email address')
@@ -20,19 +18,16 @@ class UserManager(BaseUserManager):
             date_of_birth=date_of_birth,
         )
 
-        user.set_password(password)
+        user.set_unusable_password()
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, _short_name, _full_name, date_of_birth,
-                         password):
+    def create_superuser(self, email, _short_name, _full_name, date_of_birth):
         """
-        Creates and saves a superuser with the given email, date of
-        birth and password.
+        Creates and saves a superuser with the given email, date of birth.
         """
         user = self.create_user(
             email,
-            password=password,
             _short_name=_short_name,
             _full_name=_full_name,
             date_of_birth=date_of_birth,
