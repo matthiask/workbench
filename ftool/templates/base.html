@@ -21,7 +21,7 @@
           <li>
             <form class="navbar-form" role="search" method="GET" action="{% url 'search' %}">
               <div class="input-group">
-                <input name="q" type="text" class="form-control" placeholder="Search" value="{{ search.query|default:'' }}">
+                <input name="q" type="text" class="form-control" placeholder="{% trans 'Search' %}" value="{{ search.query|default:'' }}">
                 <div class="input-group-btn">
                   <button class="btn btn-info">
                     <span class="glyphicon glyphicon-search"></span>
