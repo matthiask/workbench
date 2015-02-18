@@ -58,7 +58,8 @@ class Deal(models.Model):
         blank=True)
     owned_by = models.ForeignKey(
         User,
-        verbose_name=_('owned by'))
+        verbose_name=_('owned by'),
+        related_name='+')
     estimated_value = models.DecimalField(
         _('estimated value'),
         max_digits=10,

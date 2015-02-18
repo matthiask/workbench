@@ -32,6 +32,7 @@
         <tr>
           <th>{% trans 'project' %}</th>
           <th>{% trans 'customer' %}</th>
+          <th>{% trans 'owned by' %}</th>
           <th>{% trans 'status' %}</th>
         </tr>
       </thead>
@@ -49,7 +50,7 @@
       </tbody>
       <tfoot>
         <tr>
-          <th colspan="5">
+          <th colspan="4">
             {{ paginator.count }} {{ view.meta.verbose_name_plural }}
             {% if view.root_queryset_count != paginator.count %}
             (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)

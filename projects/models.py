@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from accounts.models import User
 from contacts.models import Organization, Person
 from tools.models import SearchManager
 from tools.urls import model_urls
@@ -53,6 +54,10 @@ class Project(models.Model):
     description = models.TextField(
         _('description'),
         blank=True)
+    owned_by = models.ForeignKey(
+        User,
+        verbose_name=_('owned by'),
+        related_name='+')
 
     status = models.PositiveIntegerField(
         _('status'),
