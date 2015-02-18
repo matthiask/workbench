@@ -1,10 +1,14 @@
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models import ProtectedError
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 
 import vanilla
+
+from tools.deletion import related_classes
 
 
 class ToolsMixin(object):
@@ -35,6 +39,37 @@ class ToolsMixin(object):
     def meta(self):
         return self.model._meta
 
+    def allow_create(self):
+        return True
+
+    def allow_update(self):
+        return True
+
+    allow_delete_if_only = None
+
+    def allow_delete(self):
+        if self.allow_delete_if_only:
+            try:
+                if related_classes(self.object) <= self.allow_delete_if_only:
+                    return True
+            except ProtectedError:
+                pass
+
+            messages.error(
+                self.request,
+                _('Cannot delete "%s" because of related objects.')
+                % self.object)
+            return False
+
+        messages.error(
+            self.request,
+            _('Deletion of %(class)s "%(object)s" is not allowed.') % {
+                'class': self.object._meta.verbose_name,
+                'object': self.object,
+            })
+
+        return False
+
 
 class ListView(ToolsMixin, vanilla.ListView):
     paginate_by = 10
@@ -55,6 +90,23 @@ class DetailView(ToolsMixin, vanilla.DetailView):
 
 
 class CreateView(ToolsMixin, vanilla.CreateView):
+    def get(self, request, *args, **kwargs):
+        if not self.allow_create():
+            return redirect('../')
+
+        form = self.get_form()
+        context = self.get_context_data(form=form)
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        if not self.allow_create():
+            return redirect('../')
+
+        form = self.get_form(data=request.POST, files=request.FILES)
+        if form.is_valid():
+            return self.form_valid(form)
+        return self.form_invalid(form)
+
     def form_valid(self, form):
         self.object = form.save()
         messages.success(
@@ -63,10 +115,32 @@ class CreateView(ToolsMixin, vanilla.CreateView):
                 'class': self.object._meta.verbose_name,
                 'object': self.object,
             })
-        return HttpResponseRedirect(self.get_success_url())
+        return redirect(self.get_success_url())
 
 
 class UpdateView(ToolsMixin, vanilla.UpdateView):
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.allow_update():
+            return redirect(self.object)
+
+        form = self.get_form(instance=self.object)
+        context = self.get_context_data(form=form)
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.allow_update():
+            return redirect(self.object)
+
+        form = self.get_form(
+            data=request.POST,
+            files=request.FILES,
+            instance=self.object)
+        if form.is_valid():
+            return self.form_valid(form)
+        return self.form_invalid(form)
+
     def form_valid(self, form):
         self.object = form.save()
         messages.success(
@@ -75,40 +149,28 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
                 'class': self.object._meta.verbose_name,
                 'object': self.object,
             })
-        return HttpResponseRedirect(self.get_success_url())
+        return redirect(self.get_success_url())
 
 
 class DeleteView(ToolsMixin, vanilla.DeleteView):
-    def allow_delete(self, silent=False):
-        if not silent:
-            messages.error(
-                self.request,
-                _('Deletion of %(class)s "%(object)s" is not allowed.') % {
-                    'class': self.object._meta.verbose_name,
-                    'object': self.object,
-                })
-
-        return False
-
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if not self.allow_delete(silent=False):
-            return HttpResponseRedirect(self.object.get_absolute_url())
+        if not self.allow_delete():
+            return redirect(self.object)
+
         context = self.get_context_data()
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if not self.allow_delete(silent=True):
-            return HttpResponseRedirect(self.object.get_absolute_url())
-        self.object.delete()
-        return self.success()
+        if not self.allow_delete():
+            return redirect(self.object)
 
-    def success(self):
+        self.object.delete()
         messages.success(
             self.request,
             _('%(class)s "%(object)s" has been successfully deleted.') % {
                 'class': self.model._meta.verbose_name,
                 'object': self.object,
             })
-        return HttpResponseRedirect(self.model().urls.url('list'))
+        return redirect(self.model().urls.url('list'))

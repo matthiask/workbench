@@ -1,24 +1,25 @@
 from collections import OrderedDict
 
 from django.contrib import messages
-from django.db.models import ProtectedError
 from django.utils.translation import ugettext as _
 
 from contacts.forms import (
     PhoneNumberFormset, EmailAddressFormset, PostalAddressFormset)
 from contacts.models import (
     Organization, Person, PhoneNumber, EmailAddress, PostalAddress)
-from tools.deletion import related_classes
 from tools.views import (
     ListView, DetailView, CreateView, UpdateView, DeleteView)
 
 
 class OrganizationViewMixin(object):
     model = Organization
+    allow_delete_if_only = {Organization}
 
 
 class PersonViewMixin(object):
     model = Person
+    allow_delete_if_only = {
+        Person, PhoneNumber, EmailAddress, PostalAddress}
 
 
 class OrganizationListView(OrganizationViewMixin, ListView):
@@ -43,20 +44,7 @@ class OrganizationUpdateView(OrganizationViewMixin, UpdateView):
 
 
 class OrganizationDeleteView(OrganizationViewMixin, DeleteView):
-    def allow_delete(self, silent=False):
-        try:
-            if related_classes(self.object) <= {Organization}:
-                return True
-        except ProtectedError:
-            pass
-
-        if not silent:
-            messages.error(
-                self.request,
-                _('Cannot delete "%s" because of related objects.')
-                % self.object)
-
-        return False
+    pass
 
 
 class PersonListView(PersonViewMixin, ListView):
@@ -74,14 +62,6 @@ class PersonCreateView(PersonViewMixin, CreateView):
             'primary_contact': self.request.user.pk,
         })
         form_class = self.get_form_class()
-
-        kw = {'data': data, 'files': files}
-        self.formsets = OrderedDict((
-            ('phonenumbers', PhoneNumberFormset(**kw)),
-            ('emailaddresses', EmailAddressFormset(**kw)),
-            ('postaladdresses', PostalAddressFormset(**kw)),
-        ))
-
         return form_class(data, files, **kwargs)
 
 
@@ -100,6 +80,9 @@ class PersonUpdateView(PersonViewMixin, UpdateView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        if not Permission.allow_update(
+                request, instance=self.object, message=False):
+            return self.failure()
         form = self.get_form(
             data=request.POST, files=request.FILES, instance=self.object)
         if form.is_valid() and all(
@@ -115,22 +98,4 @@ class PersonUpdateView(PersonViewMixin, UpdateView):
 
 
 class PersonDeleteView(PersonViewMixin, DeleteView):
-    def allow_delete(self, silent=False):
-        try:
-            if related_classes(self.object) <= {
-                Person,
-                PhoneNumber,
-                EmailAddress,
-                PostalAddress,
-            }:
-                return True
-        except ProtectedError:
-            pass
-
-        if not silent:
-            messages.error(
-                self.request,
-                _('Cannot delete "%s" because of related objects.')
-                % self.object)
-
-        return False
+    pass
