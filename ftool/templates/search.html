@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans 'Search' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <h1>{% trans 'Search' %}</h1>
+    {% for verbose_name_plural, results in search.results %}
+      {% for result in results %}
+        {% if forloop.first %}
+          <h2>{{ verbose_name_plural }}</h2>
+          <ul>
+        {% endif %}
+          <li>
+          <a href="{{ result.get_absolute_url }}">{{ result }}</a>
+          </li>
+        {% if forloop.last %}
+          </ul>
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}{{ block.super }}
+<script>
+  $(function() {
+    $('form[role=search] input').focus();
+  });
+</script>
+{% endblock %}

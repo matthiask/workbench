@@ -19,4 +19,6 @@ urlpatterns = patterns(
     url(r'^deals/', include('deals.urls')),
     url(r'^projects/', include('projects.urls')),
 
+    url(r'^search/$', 'ftool.views.search', name='search'),
+
 ) + staticfiles_urlpatterns()
