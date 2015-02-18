@@ -99,7 +99,9 @@ class PersonUpdateView(PersonViewMixin, UpdateView):
         return form_class(data, files, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        form = self.get_form(data=request.POST, files=request.FILES)
+        self.object = self.get_object()
+        form = self.get_form(
+            data=request.POST, files=request.FILES, instance=self.object)
         if form.is_valid() and all(
                 f.is_valid() for f in self.formsets.values()):
             return self.form_valid(form)
