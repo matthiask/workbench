@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-17 21:41+0100\n"
+"POT-Creation-Date: 2015-02-18 08:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -164,6 +164,11 @@ msgstr "Postadresse"
 msgid "postal addresses"
 msgstr "Postadressen"
 
+#: contacts/views.py:56 contacts/views.py:124
+#, python-format
+msgid "Cannot delete \"%s\" because of related objects."
+msgstr "Kann \"%s\" wegen Abhängigkeiten nicht löschen."
+
 #: deals/forms.py:11
 msgid "All funnels"
 msgstr "Alle Trichter"
@@ -289,13 +294,21 @@ msgstr "Einstellungen"
 msgid "Sign off"
 msgstr "Abmelden"
 
+#: ftool/templates/contacts/organization_detail.html:37
+#: ftool/templates/contacts/person_detail.html:48
+msgid "Update"
+msgstr "Aktualisieren"
+
+#: ftool/templates/contacts/organization_detail.html:39
+#: ftool/templates/contacts/person_detail.html:50
+msgid "Delete"
+msgstr "Löschen"
+
 #: ftool/templates/contacts/person_detail.html:5
-#| msgid "person"
 msgid "persons"
 msgstr "Personen"
 
 #: ftool/templates/deals/deal_detail.html:38
-#| msgid "story"
 msgid "History"
 msgstr "Geschichte"
 
@@ -323,6 +336,20 @@ msgstr "Projekt"
 #: ftool/templates/projects/project_list.html:34 projects/models.py:39
 msgid "customer"
 msgstr "Kunde"
+
+#: ftool/templates/tools/object_confirm_delete.html:11
+#, python-format
+#| msgid "Update %(object)s"
+msgid "Delete %(object)s"
+msgstr "%(object)s löschen"
+
+#: ftool/templates/tools/object_confirm_delete.html:18
+msgid "cancel"
+msgstr "Abbruch"
+
+#: ftool/templates/tools/object_confirm_delete.html:20
+msgid "delete"
+msgstr "Löschen"
 
 #: ftool/templates/tools/object_form.html:12
 #, python-format
@@ -456,6 +483,18 @@ msgstr "%(class)s \"%(object)s\" wurde erfolgreich erstellt."
 #, python-format
 msgid "%(class)s \"%(object)s\" has been successfully updated."
 msgstr "%(class)s \"%(object)s\" wurde erfolgreich geändert."
+
+#: tools/views.py:86
+#, python-format
+#| msgid "%(class)s \"%(object)s\" has been successfully created."
+msgid "Deletion of %(class)s \"%(object)s\" is not allowed."
+msgstr "%(class)s \"%(object)s\" löschen ist nicht erlaubt."
+
+#: tools/views.py:110
+#, python-format
+#| msgid "%(class)s \"%(object)s\" has been successfully created."
+msgid "%(class)s \"%(object)s\" has been successfully deleted."
+msgstr "%(class)s \"%(object)s\" wurde erfolgreich gelöscht."
 
 #~ msgid "Change my password"
 #~ msgstr "Mein Passwort ändern"
