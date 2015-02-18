@@ -1,3 +1,5 @@
+import re
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -69,15 +71,38 @@ class Person(models.Model):
         return self.full_name
 
 
-class PhoneNumber(models.Model):
+class PersonDetail(models.Model):
+    WEIGHTS = (
+        (re.compile(r'mobile'), 30),
+        (re.compile(r'work'), 20),
+        (re.compile(r'home'), 10),
+    )
+
+    type = models.CharField(_('type'), max_length=40)
+    weight = models.PositiveIntegerField(
+        _('weight'), default=0, editable=False)
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        self.weight = sum((
+            weight for regex, weight in self.WEIGHTS
+            if regex.search(self.type)
+        ), 0)
+        super().save(*args, **kwargs)
+    save.alters_data = True
+
+
+class PhoneNumber(PersonDetail):
     person = models.ForeignKey(
         Person,
         verbose_name=_('person'),
         related_name='phonenumbers')
-    type = models.CharField(_('type'), max_length=40)
     phone_number = models.CharField(_('phone number'), max_length=100)
 
     class Meta:
+        ordering = ('-weight', 'id')
         verbose_name = _('phone number')
         verbose_name_plural = _('phone numbers')
 
@@ -92,15 +117,15 @@ class PhoneNumber(models.Model):
         return self.person.urls
 
 
-class EmailAddress(models.Model):
+class EmailAddress(PersonDetail):
     person = models.ForeignKey(
         Person,
         verbose_name=_('person'),
         related_name='emailaddresses')
-    type = models.CharField(_('type'), max_length=40)
     email = models.EmailField(_('email'), max_length=254)
 
     class Meta:
+        ordering = ('-weight', 'id')
         verbose_name = _('email address')
         verbose_name_plural = _('email addresses')
 
@@ -115,15 +140,15 @@ class EmailAddress(models.Model):
         return self.person.urls
 
 
-class PostalAddress(models.Model):
+class PostalAddress(PersonDetail):
     person = models.ForeignKey(
         Person,
         verbose_name=_('person'),
         related_name='postaladdresses')
-    type = models.CharField(_('type'), max_length=40)
     postal_address = models.TextField(_('postal address'))
 
     class Meta:
+        ordering = ('-weight', 'id')
         verbose_name = _('postal address')
         verbose_name_plural = _('postal addresses')
 
