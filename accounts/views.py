@@ -8,6 +8,7 @@ from django.contrib.auth import (
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
+from django.views.decorators.cache import never_cache
 
 from oauth2client.client import OAuth2WebServerFlow, FlowExchangeError
 
@@ -46,12 +47,14 @@ def oauth2_flow(request):
     return OAuth2WebServerFlow(**flow_kwargs)
 
 
+@never_cache
 def login(request):
     if request.user.is_authenticated():
         return http.HttpResponseRedirect('/')
     return render(request, 'accounts/login.html')
 
 
+@never_cache
 def oauth2(request):
     flow = oauth2_flow(request)
 
