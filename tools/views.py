@@ -71,7 +71,7 @@ class ToolsMixin(object):
 
 
 class ListView(ToolsMixin, vanilla.ListView):
-    paginate_by = 10
+    paginate_by = 50
 
     def get_queryset(self):
         self.root_queryset = self.model.objects.all()
