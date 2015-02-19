@@ -24,10 +24,12 @@ class UserAdmin(UserAdmin):
         'is_active', 'is_admin')
     list_filter = ('is_active', 'is_admin')
     fieldsets = (
-        (None, {'fields': ('is_active', 'email')}),
+        (None, {'fields': (
+            'email',
+            ('is_active', 'is_admin'),
+        )}),
         ('Personal info', {'fields': (
             '_short_name', '_full_name', 'date_of_birth',)}),
-        ('Permissions', {'fields': ('is_admin',)}),
     )
     add_fieldsets = fieldsets
     search_fields = ('email', '_short_name', '_full_name')
