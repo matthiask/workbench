@@ -22,7 +22,7 @@ class PersonViewMixin(object):
 
 
 class OrganizationListView(OrganizationViewMixin, ListView):
-    pass
+    paginate_by = 50
 
 
 class OrganizationDetailView(OrganizationViewMixin, DetailView):
@@ -47,6 +47,8 @@ class OrganizationDeleteView(OrganizationViewMixin, DeleteView):
 
 
 class PersonListView(PersonViewMixin, ListView):
+    paginate_by = 50
+
     def get_queryset(self):
         return super().get_queryset().select_related('organization')
 
