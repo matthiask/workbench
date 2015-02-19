@@ -1,7 +1,15 @@
 from django import forms
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 from projects.models import Project
+
+
+class ProjectSearchForm(forms.Form):
+    s = forms.ChoiceField(
+        choices=(('', _('All states')),) + Project.STATUS_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
 
 
 class ProjectForm(forms.ModelForm):

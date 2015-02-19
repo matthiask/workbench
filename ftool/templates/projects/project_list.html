@@ -26,6 +26,8 @@
                 name="q"
                 placeholder="{% trans 'search' %}"
                 value="{{ view.request.GET.q|default:'' }}">
+              <label class="sr-only">{% trans 'status' %}</label>
+              {{ view.search_form.s }}
             </form>
           </td>
         </tr>
@@ -63,4 +65,12 @@
     {% bootstrap_pagination page=page_obj %}
   </div>
 </div>
+{% endblock %}
+
+{% block js %}{{ block.super }}
+<script>
+  $('.form-search select').on('change', function() {
+    $(this).closest('form').submit();
+  });
+</script>
 {% endblock %}
