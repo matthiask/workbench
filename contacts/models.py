@@ -73,9 +73,9 @@ class Person(models.Model):
 
 class PersonDetail(models.Model):
     WEIGHTS = (
-        (re.compile(r'mobile'), 30),
-        (re.compile(r'work'), 20),
-        (re.compile(r'home'), 10),
+        (re.compile(r'mobile', re.I), 30),
+        (re.compile(r'work', re.I), 20),
+        (re.compile(r'home', re.I), 10),
     )
 
     type = models.CharField(_('type'), max_length=40)
