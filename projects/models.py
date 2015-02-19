@@ -21,18 +21,14 @@ class ProjectManager(SearchManager):
 
 @model_urls()
 class Project(models.Model):
-    INITIAL = 10
-    PROPOSED = 20
-    STARTED = 50
-    FINISHED = 60
-    REJECTED = 100
+    IN_PREPARATION = 10
+    WORK_IN_PROGRESS = 20
+    FINISHED = 30
 
     STATUS_CHOICES = (
-        (INITIAL, _('initial')),
-        (PROPOSED, _('proposed')),
-        (STARTED, _('started')),
-        (FINISHED, _('finished')),
-        (REJECTED, _('rejected')),
+        (IN_PREPARATION, _('In preparation')),
+        (WORK_IN_PROGRESS, _('Work in progress')),
+        (FINISHED, _('Finished')),
     )
 
     customer = models.ForeignKey(
@@ -62,7 +58,7 @@ class Project(models.Model):
     status = models.PositiveIntegerField(
         _('status'),
         choices=STATUS_CHOICES,
-        default=INITIAL)
+        default=IN_PREPARATION)
 
     objects = ProjectManager()
 
