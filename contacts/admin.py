@@ -20,7 +20,10 @@ class PostalAddressInline(admin.TabularInline):
 
 
 admin.site.register(Group)
-admin.site.register(Organization)
+admin.site.register(
+    Organization,
+    filter_horizontal=('groups',),
+)
 admin.site.register(
     Person,
     inlines=[PhoneNumberInline, EmailAddressInline, PostalAddressInline],
