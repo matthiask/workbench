@@ -54,7 +54,7 @@
       </tfoot>
     </table>
 
-    {% bootstrap_pagination page=page_obj %}
+    {% bootstrap_pagination page=page_obj extra=request.GET.urlencode %}
   </div>
 </div>
 {% endblock %}
