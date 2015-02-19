@@ -27,6 +27,10 @@ class Organization(models.Model):
         User,
         verbose_name=_('primary contact'),
         related_name='+')
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name=_('groups'),
+        related_name='+')
 
     objects = SearchManager()
 
