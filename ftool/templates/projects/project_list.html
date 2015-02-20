@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load bootstrap3 i18n %}
+{% load bootstrap3 i18n querystring %}
 
 {% block title %}{% trans "projects" %} - {{ block.super }}{% endblock %}
 
@@ -62,7 +62,7 @@
       </tfoot>
     </table>
 
-    {% bootstrap_pagination page=page_obj extra=request.GET.urlencode %}
+    {% bootstrap_pagination page=page_obj extra=request.GET|querystring:'page' %}
   </div>
 </div>
 {% endblock %}
