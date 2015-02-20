@@ -43,8 +43,16 @@
             <th><a href="{{ person.urls.detail }}">
                 {{ person }}
             </a></th>
-            <td>{{ person.email|default:"&ndash;" }}</td>
-            <td>{{ person.phone_number|default:"&ndash;" }}</td>
+            <td>
+              {% if person.email %}
+                <a href="mailto:{{ person.email }}">{{ person.email }}</a>
+              {% else %}&ndash;{% endif %}
+            </td>
+            <td>
+              {% if person.phone_number %}
+                <a href="tel:{{ person.phone_number }}">{{ person.phone_number }}</a>
+              {% else %}&ndash;{% endif %}
+            </td>
           </tr>
         {% endfor %}
       </tbody>
