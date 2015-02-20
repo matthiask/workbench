@@ -33,7 +33,6 @@ class OrganizationListView(OrganizationViewMixin, ListView):
                 queryset = queryset.filter(groups=data.get('g'))
 
         return queryset
-    pass
 
 
 class OrganizationDetailView(OrganizationViewMixin, DetailView):
@@ -59,7 +58,28 @@ class OrganizationDeleteView(OrganizationViewMixin, DeleteView):
 
 class PersonListView(PersonViewMixin, ListView):
     def get_queryset(self):
-        return super().get_queryset().select_related('organization')
+        queryset = super().get_queryset()
+
+        self.search_form = OrganizationSearchForm(self.request.GET)
+        if self.search_form.is_valid():
+            data = self.search_form.cleaned_data
+            if data.get('g'):
+                queryset = queryset.filter(groups=data.get('g'))
+
+        return queryset.select_related(
+            'organization',
+        ).extra(select={
+            'email': (
+                '(SELECT email FROM contacts_emailaddress'
+                ' WHERE contacts_emailaddress.person_id=contacts_person.id'
+                ' ORDER BY weight DESC LIMIT 1)'
+            ),
+            'phone_number': (
+                '(SELECT phone_number FROM contacts_phonenumber'
+                ' WHERE contacts_phonenumber.person_id=contacts_person.id'
+                ' ORDER BY weight DESC LIMIT 1)'
+            ),
+        })
 
 
 class PersonDetailView(PersonViewMixin, DetailView):

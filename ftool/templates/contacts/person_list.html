@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% load bootstrap3 i18n querystring %}
+
+{% block title %}{% trans "people" %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-sm-12">
+    <h1>{{ view.meta.verbose_name_plural }}</h1>
+
+    <table class="table table-hover table-striped">
+      <thead>
+        <tr>
+          <td colspan="3">
+            <a href="{% url 'contacts_person_create' %}" class="btn btn-default pull-right">
+              <span class="glyphicon glyphicon-plus"></span>
+              {{ view.meta.verbose_name }}
+            </a>
+
+            <form method="GET" action="." class="form-inline form-search">
+              <label class="sr-only">{% trans 'search' %}</label>
+              <input
+                class="form-control"
+                type="search"
+                name="q"
+                placeholder="{% trans 'search' %}"
+                value="{{ view.request.GET.q|default:'' }}">
+              <label class="sr-only">{% trans 'status' %}</label>
+              {{ view.search_form.g }}
+            </form>
+          </td>
+        </tr>
+        <tr>
+          <th>{% trans 'person' %}</th>
+          <td>{% trans 'email' %}</td>
+          <td>{% trans 'phone number' %}</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for person in object_list %}
+          <tr>
+            <th><a href="{{ person.urls.detail }}">
+                {{ person }}
+            </a></th>
+            <td>{{ person.email|default:"&ndash;" }}</td>
+            <td>{{ person.phone_number|default:"&ndash;" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="3">
+            {{ paginator.count }} {{ view.meta.verbose_name_plural }}
+            {% if view.root_queryset_count != paginator.count %}
+            (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
+            {% endif %}
+          </th>
+        </tr>
+      </tfoot>
+    </table>
+
+    {% bootstrap_pagination page=page_obj extra=request.GET|querystring:'page' %}
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}{{ block.super }}
+<script>
+  $('.form-search select').on('change', function() {
+    $(this).closest('form').submit();
+  });
+</script>
+{% endblock %}
