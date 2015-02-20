@@ -23,6 +23,7 @@ class Group(models.Model):
 @model_urls()
 class Organization(models.Model):
     name = models.TextField(_('name'))
+    notes = models.TextField(_('notes'), blank=True)
     primary_contact = models.ForeignKey(
         User,
         verbose_name=_('primary contact'),
