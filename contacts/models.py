@@ -13,6 +13,7 @@ class Group(models.Model):
     title = models.CharField(_('title'), max_length=100)
 
     class Meta:
+        ordering = ('title',)
         verbose_name = _('group')
         verbose_name_plural = _('groups')
 

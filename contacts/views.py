@@ -3,7 +3,8 @@ from collections import OrderedDict
 from django.shortcuts import redirect
 
 from contacts.forms import (
-    PhoneNumberFormset, EmailAddressFormset, PostalAddressFormset)
+    OrganizationSearchForm, PhoneNumberFormset, EmailAddressFormset,
+    PostalAddressFormset)
 from contacts.models import (
     Organization, Person, PhoneNumber, EmailAddress, PostalAddress)
 from tools.views import (
@@ -22,6 +23,16 @@ class PersonViewMixin(object):
 
 
 class OrganizationListView(OrganizationViewMixin, ListView):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        self.search_form = OrganizationSearchForm(self.request.GET)
+        if self.search_form.is_valid():
+            data = self.search_form.cleaned_data
+            if data.get('g'):
+                queryset = queryset.filter(groups=data.get('g'))
+
+        return queryset
     pass
 
 

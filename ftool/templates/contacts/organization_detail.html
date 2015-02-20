@@ -37,6 +37,17 @@
       </td>
     </tr>
     <tr>
+      <td class="text-right">{% trans 'groups' %}</td>
+      <td>
+        {% for group in organization.groups.all %}
+          <a href="{% url 'contacts_organization_list' %}?g={{ group.id }}">
+            {{ group }}
+          </a>
+          <br>
+        {% endfor %}
+      </td>
+    </tr>
+    <tr>
       <td></td>
       <td>
         <a href="{{ object.urls.update }}" class="btn btn-default">
