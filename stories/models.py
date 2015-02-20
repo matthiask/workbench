@@ -4,8 +4,11 @@ from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
 from projects.models import Project, Release
+from services.models import ServiceType
+from tools.urls import model_urls
 
 
+@model_urls()
 class Story(models.Model):
     UNSCHEDULED = 10
     SCHEDULED = 20
@@ -64,23 +67,6 @@ class Story(models.Model):
         blank=True,
         null=True)
 
-    effort_best_case = models.DecimalField(
-        _('best case effort'),
-        max_digits=5,
-        decimal_places=2,
-        blank=True,
-        null=True,
-        help_text=_('Time required if everything falls into place.'))
-    effort_safe_case = models.DecimalField(
-        _('safe case effort'),
-        max_digits=5,
-        decimal_places=2,
-        blank=True,
-        null=True,
-        help_text=_(
-            'This story can be delivered in this time frame with'
-            ' almost certainty (90%).'))
-
     due_on = models.DateField(
         _('due on'),
         blank=True,
@@ -96,3 +82,44 @@ class Story(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class RequiredService(models.Model):
+    story = models.ForeignKey(
+        Story,
+        verbose_name=_('story'),
+        related_name='requiredservices',
+    )
+    service_type = models.ForeignKey(
+        ServiceType,
+        verbose_name=_('service type'),
+        related_name='+',
+    )
+    effort_best_case = models.DecimalField(
+        _('best case effort'),
+        max_digits=5,
+        decimal_places=2,
+        help_text=_('Hours required if everything falls into place.'))
+    effort_safe_case = models.DecimalField(
+        _('safe case effort'),
+        max_digits=5,
+        decimal_places=2,
+        help_text=_(
+            'Hours required to be almost certain that the work will be'
+            ' completed.'))
+
+    class Meta:
+        ordering = ('service_type',)
+        unique_together = (('story', 'service_type'),)
+        verbose_name = _('required service')
+        verbose_name_plural = _('required services')
+
+    def __str__(self):
+        return '%s' % self.service_type
+
+    @property
+    def urls(self):
+        return self.story.urls
+
+    def get_absolute_url(self):
+        return self.story.get_absolute_url()

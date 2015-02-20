@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from stories.models import Story
+from stories.models import Story, RequiredService
+
+
+class RequiredServiceInline(admin.TabularInline):
+    model = RequiredService
+    extra = 0
 
 
 admin.site.register(
@@ -10,5 +15,6 @@ admin.site.register(
     list_display_links=('title',),
     list_filter=('status',),
     filter_horizontal=('owned_by',),
+    inlines=(RequiredServiceInline,),
     raw_id_fields=('requested_by', 'project', 'release'),
 )
