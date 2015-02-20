@@ -23,8 +23,10 @@ admin.site.register(Group)
 admin.site.register(
     Organization,
     filter_horizontal=('groups',),
+    raw_id_fields=('primary_contact',),
 )
 admin.site.register(
     Person,
     inlines=[PhoneNumberInline, EmailAddressInline, PostalAddressInline],
+    raw_id_fields=('organization', 'primary_contact'),
 )

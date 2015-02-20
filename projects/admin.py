@@ -13,5 +13,9 @@ admin.site.register(
     inlines=(ReleaseInline,),
     list_display=('title', 'status'),
     list_filter=('status',),
+    raw_id_fields=('customer', 'contact', 'owned_by'),
 )
-admin.site.register(Release)
+admin.site.register(
+    Release,
+    raw_id_fields=('project',),
+)

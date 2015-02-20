@@ -17,6 +17,7 @@ class DealAdmin(reversion.VersionAdmin):
     list_display_links = ('title',)
     list_filter = ('funnel', 'status')
     inlines = (RequiredServiceInline,)
+    raw_id_fields = ('owned_by',)
     search_fields = ('title', 'description')
 
 
