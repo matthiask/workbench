@@ -2,12 +2,7 @@ from django.contrib import admin
 
 import reversion
 
-from deals.models import Funnel, Deal, RequiredService
-
-
-class RequiredServiceInline(admin.TabularInline):
-    extra = 0
-    model = RequiredService
+from deals.models import Funnel, Deal
 
 
 class DealAdmin(reversion.VersionAdmin):
@@ -16,7 +11,6 @@ class DealAdmin(reversion.VersionAdmin):
         'created_at')
     list_display_links = ('title',)
     list_filter = ('funnel', 'status')
-    inlines = (RequiredServiceInline,)
     raw_id_fields = ('owned_by',)
     search_fields = ('title', 'description')
 

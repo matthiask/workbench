@@ -5,7 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 import reversion
 
 from accounts.models import User
-from services.models import ServiceType
 from tools.models import SearchManager
 from tools.urls import model_urls
 
@@ -86,28 +85,6 @@ class Deal(models.Model):
 
     def __str__(self):
         return self.title
-
-
-class RequiredService(models.Model):
-    deal = models.ForeignKey(
-        Deal,
-        verbose_name=_('deal'),
-        related_name='required_services')
-    service_type = models.ForeignKey(
-        ServiceType,
-        verbose_name=_('service type'),
-        related_name='+')
-    hours = models.DecimalField(
-        _('hours'),
-        max_digits=5,
-        decimal_places=2)
-
-    class Meta:
-        verbose_name = _('required service')
-        verbose_name_plural = _('required services')
-
-    def __str__(self):
-        return '%.2fh %s' % (self.hours, self.service_type)
 
 
 reversion.register(Funnel)
