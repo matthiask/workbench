@@ -22,7 +22,7 @@
     <tr>
       <td class="text-right">{% trans 'notes' %}</td>
       <td>
-        {{ person.notes|linebreaksbr|default:"&ndash" }}
+        {{ person.notes|linebreaksbr|default:"&ndash;" }}
       </td>
     </tr>
     {% for phone in person.phonenumbers.all %}
