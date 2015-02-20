@@ -19,6 +19,12 @@
         {% else %}&ndash;{% endif %}
       </td>
     </tr>
+    <tr>
+      <td class="text-right">{% trans 'notes' %}</td>
+      <td>
+        {{ person.notes|linebreaksbr|default:"&ndash" }}
+      </td>
+    </tr>
     {% for phone in person.phonenumbers.all %}
       <tr>
         <td class="text-right">{{ phone.type }}</td>

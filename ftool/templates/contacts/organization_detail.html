@@ -20,6 +20,12 @@
       </td>
     </tr>
     <tr>
+      <td class="text-right">{% trans 'notes' %}</td>
+      <td>
+        {{ organization.notes|linebreaksbr|default:"&ndash" }}
+      </td>
+    </tr>
+    <tr>
       <td class="text-right">{% trans 'people' %}</td>
       <td>
         {% for person in organization.people.all %}
