@@ -44,7 +44,7 @@
             <th><a href="{{ project.urls.detail }}">
                 {{ project }}
             </a></th>
-            <td>{{ project.customer }}</td>
+            <td>{{ project.contact|default:project.customer }}</td>
             <td>{{ project.owned_by.get_short_name }}</td>
             <td>{{ project.get_status_display }}</td>
           </tr>

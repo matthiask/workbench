@@ -9,7 +9,10 @@ class ProjectViewMixin(object):
 
 class ProjectListView(ProjectViewMixin, ListView):
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().select_related(
+            'customer',
+            'contact__organization',
+        )
 
         self.search_form = ProjectSearchForm(self.request.GET)
         if self.search_form.is_valid():
