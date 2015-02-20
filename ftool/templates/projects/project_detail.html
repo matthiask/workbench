@@ -8,6 +8,45 @@
 <div class="row">
 <div class="col-md-12">
   <h1>{{ project }}</h1>
+
+  <h2>{% trans 'stories' %}</h2>
+  {% for story in project.overview %}
+    {% ifchanged story.release %}
+      <h3>{{ story.release }}</h3>
+    {% endifchanged %}
+    <div class="well">
+      {{ story.title }}: {{ story.description }}<br>
+      <small>
+        {{ story.owned_by.all }}
+        {{ story.get_status_display }}
+      </small>
+      <div class="row">
+        <div class="col-md-6">
+          <table class="table table-condensed">
+            {% for service_type, best_case, safe_case in story.required %}
+              <tr>
+                <th>{{ service_type }}</th>
+                <td>{{ best_case }}h</td>
+                <td>{{ safe_case }}h</td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+        <div class="col-md-6">
+          <table class="table table-condensed">
+            {% for rendered_by, hours in story.rendered %}
+              <tr>
+                <th>{{ rendered_by }}</th>
+                <td>{{ hours }}h</td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  {{ project.overall_effort }}
+  {{ project.overall_hours }}
 </div>
 </div>
 {% endblock %}

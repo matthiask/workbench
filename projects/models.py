@@ -70,6 +70,63 @@ class Project(models.Model):
     def __str__(self):
         return self.title
 
+    def overview(self):
+        from collections import defaultdict
+        from django.db.models import Sum
+        from services.models import RenderedService
+        from stories.models import RequiredService
+
+        required = RequiredService.objects.filter(
+            story__project=self,
+        ).order_by('service_type').values(
+            'story',
+            'service_type__title',
+        ).annotate(
+            Sum('effort_best_case'),
+            Sum('effort_safe_case'),
+        )
+
+        rendered = RenderedService.objects.filter(
+            story__project=self,
+        ).order_by('rendered_by').values(
+            'story',
+            'rendered_by___full_name'
+        ).annotate(
+            Sum('hours'),
+        )
+
+        required_dict = defaultdict(list)
+        overall_effort = [0, 0]
+
+        for row in required:
+            required_dict[row['story']].append((
+                row['service_type__title'],
+                row['effort_best_case__sum'],
+                row['effort_safe_case__sum'],
+            ))
+            overall_effort[0] += row['effort_best_case__sum']
+            overall_effort[1] += row['effort_safe_case__sum']
+
+        rendered_dict = defaultdict(list)
+        overall_hours = 0
+
+        for row in rendered:
+            rendered_dict[row['story']].append((
+                row['rendered_by___full_name'],
+                row['hours__sum'],
+            ))
+            overall_hours += row['hours__sum']
+
+        stories = self.stories.all()
+        for story in stories:
+            story.required = required_dict.get(story.id, [])
+            story.rendered = rendered_dict.get(story.id, [])
+
+        self.overall_effort = overall_effort
+        self.overall_hours = overall_hours
+
+        return stories
+
 
 @model_urls()
 class Release(models.Model):
