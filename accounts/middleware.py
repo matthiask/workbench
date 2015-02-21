@@ -16,5 +16,6 @@ class LoginRequiredMiddleware(object):
             _('Please authenticate.'))
 
         response = HttpResponseRedirect(reverse('login'))
-        response.set_signed_cookie('next', request.path, salt='next')
+        response.set_signed_cookie(
+            'next', request.get_full_path(), salt='next')
         return response
