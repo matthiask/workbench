@@ -86,6 +86,7 @@ class PersonDetail(models.Model):
         (re.compile(r'mobile', re.I), 30),
         (re.compile(r'work', re.I), 20),
         (re.compile(r'home', re.I), 10),
+        (re.compile(r'organization', re.I), -100),
     )
 
     type = models.CharField(_('type'), max_length=40)
