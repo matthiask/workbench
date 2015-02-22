@@ -19,13 +19,7 @@
         {% else %}&ndash;{% endif %}
       </td>
     </tr>
-    <tr>
-      <td class="text-right">{% trans 'notes' %}</td>
-      <td>
-        {{ organization.notes|linebreaksbr|default:"&ndash;" }}
-      </td>
-    </tr>
-    <tr>
+   <tr>
       <td class="text-right">{% trans 'people' %}</td>
       <td>
         {% for person in organization.people.all %}
@@ -45,6 +39,12 @@
           </a>
           <br>
         {% endfor %}
+      </td>
+    </tr>
+    <tr>
+      <td class="text-right">{% trans 'notes' %}</td>
+      <td>
+        {{ organization.notes|linebreaksbr|default:"&ndash;" }}
       </td>
     </tr>
     <tr>
