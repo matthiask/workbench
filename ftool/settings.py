@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'reversion',
 
     'accounts',
+    'activities',
     'contacts',
     'deals',
     'projects',
