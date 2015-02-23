@@ -1,0 +1,416 @@
+-- cat migration.txt | ssh root@metronom.feinheit.ch 'sudo -u postgres psql ftool'
+
+CREATE EXTENSION dblink;
+
+TRUNCATE accounts_user RESTART IDENTITY CASCADE;
+TRUNCATE contacts_group RESTART IDENTITY CASCADE;
+TRUNCATE projects_project RESTART IDENTITY CASCADE;
+TRUNCATE services_servicetype RESTART IDENTITY CASCADE;
+
+
+--
+-- Service types
+--
+
+INSERT INTO services_servicetype
+(title, billing_per_hour, position)
+VALUES
+('Beratung', 200, 10),
+('Konzept', 200, 20),
+('Grafik', 160, 30),
+('Programmierung', 180, 40),
+('Projektorganisation', 130, 50);
+
+
+--
+-- User accounts
+--
+
+INSERT INTO accounts_user
+(id, password, last_login, email, is_active, is_admin, date_of_birth, _short_name, _full_name)
+SELECT id, '', last_login, email, is_active, is_superuser, COALESCE(dob, '1970-01-01'), username, concat(first_name, ' ', last_name) FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT u.id, u.last_login, u.email, u.is_active, u.is_superuser, u.username, u.first_name, u.last_name, a.dob FROM auth_user u LEFT JOIN accounts_profile p ON p.user_id=u.id LEFT JOIN addressbook_person a ON p.person_id=a.id'
+) AS p(id int, last_login timestamp with time zone, email varchar(255), is_active bool, is_superuser bool, username varchar(255), first_name varchar(100), last_name varchar(100), dob date);
+
+--
+-- Contact groups
+--
+
+INSERT INTO contacts_group
+(id, title)
+SELECT * FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT id, name FROM addressbook_group'
+) AS p(id int, title varchar(100));
+
+--
+-- Organizations and their group membership
+--
+
+INSERT INTO contacts_organization
+(id, name, primary_contact_id, notes)
+SELECT id, name, primary_contact_id, '' FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT id, name, contact_id FROM addressbook_person WHERE company=TRUE'
+) AS p(id int, name text, primary_contact_id int);
+
+INSERT INTO contacts_organization_groups
+(organization_id, group_id)
+SELECT * FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT pg.person_id, pg.group_id FROM addressbook_person_groups pg LEFT JOIN addressbook_person p ON pg.person_id=p.id WHERE p.company=TRUE'
+) AS p(organization_id int, group_id int);
+
+--
+-- Persons and their details
+--
+
+INSERT INTO contacts_person
+(id, full_name, address, notes, organization_id, primary_contact_id)
+SELECT id, concat(first_name, ' ', name), '', CASE WHEN title!='' THEN CONCAT('Titel: ', title, E'\n', notes) ELSE notes END, organization_id, primary_contact_id FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT id, first_name, name, title, notes, NULL, contact_id FROM addressbook_person WHERE company=FALSE'
+) AS p(id int, first_name varchar(100), name text, title text, notes text, organization_id int, primary_contact_id int);
+
+INSERT INTO contacts_person_groups
+(person_id, group_id)
+SELECT * FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT pg.person_id, pg.group_id FROM addressbook_person_groups pg LEFT JOIN addressbook_person p ON pg.person_id=p.id WHERE p.company=FALSE'
+) AS p(person_id int, group_id int);
+
+INSERT INTO contacts_emailaddress
+(person_id, type, email, weight)
+SELECT person_id, type, email, 0 FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT e.person_id, type, email FROM addressbook_email e LEFT JOIN addressbook_person p ON e.person_id=p.id WHERE p.company=FALSE'
+) AS p(person_id int, type varchar(20), email varchar(300));
+
+INSERT INTO contacts_phonenumber
+(person_id, type, phone_number, weight)
+SELECT person_id, type, phone_number, 0 FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT e.person_id, type, number FROM addressbook_phonenumber e LEFT JOIN addressbook_person p ON e.person_id=p.id WHERE p.company=FALSE'
+) AS p(person_id int, type varchar(20), phone_number varchar(300));
+
+INSERT INTO contacts_postaladdress
+(person_id, type, postal_address, weight)
+SELECT person_id, CASE WHEN type=1 THEN 'work' ELSE 'home' END, CONCAT(COALESCE(employer_name, ''), E'\n', first_name, ' ', name, E'\n', function, E'\n', address, E'\n', zip_code, ' ', city, E'\n', country), 0 FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT p.id, a.type, e.name, p.first_name, p.name, a.function, a.address, a.zip_code, a.city, a.country FROM addressbook_address a LEFT JOIN addressbook_person p ON a.person_id=p.id LEFT OUTER JOIN addressbook_person e ON a.employer_id=e.id WHERE p.company=FALSE AND a.active=TRUE'
+) AS p(person_id int, type int, employer_name varchar(300), first_name varchar(100), name varchar(300), function text, address text, zip_code varchar(20), city varchar(100), country varchar(100));
+
+
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^\n+', '');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^\n+', '');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^\n+', '');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n+$', '');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n+$', '');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n+$', '');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n');
+
+INSERT INTO contacts_postaladdress
+(person_id, type, postal_address, weight)
+SELECT person_id, 'override', full_override, 0 FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT a.person_id, a.full_override FROM addressbook_address a LEFT JOIN addressbook_person p ON a.person_id=p.id WHERE company=FALSE AND full_override!='''' AND active=TRUE'
+) AS p(person_id int, full_override text);
+
+
+--
+-- Assign persons to organizations
+--
+
+UPDATE contacts_person
+SET organization_id=employer_id FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT employer_id, person_id FROM addressbook_address WHERE employer_id IS NOT NULL AND active'
+) AS p(employer_id int, person_id int)
+WHERE contacts_person.id=p.person_id;
+
+
+--
+-- Distribute information from organizations to all employees
+--
+
+INSERT INTO contacts_postaladdress
+(person_id, type, postal_address, weight)
+SELECT person.id, CONCAT('organization ', CASE WHEN type=1 THEN 'work' ELSE 'home' END), value, 0 FROM
+contacts_person person,
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT a.person_id, a.type, a.full_override FROM addressbook_address a LEFT JOIN addressbook_person p ON a.person_id=p.id WHERE company=TRUE AND full_override!='''' AND active=TRUE'
+) AS p(employer_person_id int, type int, value text)
+WHERE person.organization_id=employer_person_id;
+
+INSERT INTO contacts_emailaddress
+(person_id, type, email, weight)
+SELECT person.id, CONCAT('organization ', type), value, 0 FROM
+contacts_person person,
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT a.person_id, a.type, a.email FROM addressbook_email a LEFT JOIN addressbook_person p ON a.person_id=p.id WHERE company=TRUE'
+) AS p(employer_person_id int, type text, value text)
+WHERE person.organization_id=employer_person_id;
+
+INSERT INTO contacts_phonenumber
+(person_id, type, phone_number, weight)
+SELECT person.id, CONCAT('organization ', type), value, 0 FROM
+contacts_person person,
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT a.person_id, a.type, a.number FROM addressbook_phonenumber a LEFT JOIN addressbook_person p ON a.person_id=p.id WHERE company=TRUE'
+) AS p(employer_person_id int, type text, value text)
+WHERE person.organization_id=employer_person_id;
+
+
+--
+-- Import additional details (URLs and Instant Messaging contacts)
+--
+
+UPDATE contacts_organization
+SET notes=CONCAT(o.notes, E'\n', url)
+FROM contacts_organization o,
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT array_to_string(array_agg((type, url)), E''\n''), p.id FROM addressbook_url u LEFT JOIN addressbook_person p ON u.person_id=p.id WHERE company=TRUE GROUP BY p.id'
+) AS p(url text, person_id int)
+WHERE o.id=person_id AND contacts_organization.id=o.id;
+
+UPDATE contacts_person
+SET notes=CONCAT(o.notes, E'\n', url)
+FROM contacts_person o,
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT array_to_string(array_agg((type, url)), E''\n''), p.id FROM addressbook_url u LEFT JOIN addressbook_person p ON u.person_id=p.id WHERE company=FALSE GROUP BY p.id'
+) AS p(url text, person_id int)
+WHERE o.id=person_id AND contacts_person.id=o.id;
+
+UPDATE contacts_organization
+SET notes=CONCAT(o.notes, E'\n', url)
+FROM contacts_organization o,
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT array_to_string(array_agg((type, contact)), E''\n''), p.id FROM addressbook_imcontact u LEFT JOIN addressbook_person p ON u.person_id=p.id WHERE company=TRUE GROUP BY p.id'
+) AS p(url text, person_id int)
+WHERE o.id=person_id AND contacts_organization.id=o.id;
+
+UPDATE contacts_person
+SET notes=CONCAT(o.notes, E'\n', url)
+FROM contacts_person o,
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT array_to_string(array_agg((type, contact)), E''\n''), p.id FROM addressbook_imcontact u LEFT JOIN addressbook_person p ON u.person_id=p.id WHERE company=FALSE GROUP BY p.id'
+) AS p(url text, person_id int)
+WHERE o.id=person_id AND contacts_person.id=o.id;
+
+
+--
+-- Person detail weighting
+--
+
+UPDATE contacts_emailaddress SET weight=weight + 30 WHERE type ILIKE '%mobile%';
+UPDATE contacts_emailaddress SET weight=weight + 20 WHERE type ILIKE '%work%';
+UPDATE contacts_emailaddress SET weight=weight + 10 WHERE type ILIKE '%home%';
+UPDATE contacts_emailaddress SET weight=weight - 100 WHERE type ILIKE '%organization%';
+
+UPDATE contacts_phonenumber SET weight=weight + 30 WHERE type ILIKE '%mobile%';
+UPDATE contacts_phonenumber SET weight=weight + 20 WHERE type ILIKE '%work%';
+UPDATE contacts_phonenumber SET weight=weight + 10 WHERE type ILIKE '%home%';
+UPDATE contacts_phonenumber SET weight=weight - 100 WHERE type ILIKE '%organization%';
+
+UPDATE contacts_postaladdress SET weight=weight + 30 WHERE type ILIKE '%mobile%';
+UPDATE contacts_postaladdress SET weight=weight + 20 WHERE type ILIKE '%work%';
+UPDATE contacts_postaladdress SET weight=weight + 10 WHERE type ILIKE '%home%';
+UPDATE contacts_postaladdress SET weight=weight - 100 WHERE type ILIKE '%organization%';
+
+
+--
+-- Import projects (jobs in Metronom lingo)
+--
+
+INSERT INTO projects_project
+(id, title, description, status, customer_id, contact_id, owned_by_id)
+SELECT id, title, description, status, customer_id, contact_id, owned_by_id FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT j.id, j.name, j.description, CASE WHEN state=30 THEN 30 ELSE 20 END, CASE WHEN p.company=TRUE THEN customer_id ELSE 1 END, CASE WHEN cp.company=FALSE THEN contact.person_id ELSE NULL END, manager_id FROM jobs_job j LEFT JOIN addressbook_person p ON j.customer_id=p.id LEFT OUTER JOIN addressbook_address contact ON j.contact_id=contact.id LEFT OUTER JOIN addressbook_person cp ON contact.person_id=cp.id'
+) AS p(id int, title varchar(100), description text, status int, customer_id int, contact_id int, owned_by_id int);
+
+
+--
+-- Import bound joboffers as releases
+--
+
+INSERT INTO projects_release
+(id, title, is_default, position, project_id)
+SELECT id, name, FALSE, 0, job_id FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT id, name, job_id FROM offers_joboffer WHERE job_id IS NOT NULL'
+) AS p(id int, name text, job_id int);
+
+INSERT INTO stories_story
+(id, created_at, title, status, position, requested_by_id, description, project_id, release_id)
+SELECT id, NOW(), activity_name, 10, 0, 1, notes, job_id, joboffer_id FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
+) AS p(id int, activity_name text, notes text, job_id int, joboffer_id int);
+
+INSERT INTO stories_requiredservice
+(story_id, service_type_id, effort_best_case, effort_safe_case)
+SELECT story_id, service_type_id, effort_best_case, effort_safe_case FROM
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT a.id, 1, a.hours, a.hours FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id WHERE jo.job_id IS NOT NULL AND a.included'
+) p(story_id int, service_type_id int, effort_best_case numeric(5,2), effort_safe_case numeric(5,2));
+
+UPDATE stories_requiredservice SET service_type_id=2
+FROM stories_story s
+WHERE stories_requiredservice.story_id=s.id AND s.title IN ('Konzept', 'Marketing');
+UPDATE stories_requiredservice SET service_type_id=3
+FROM stories_story s
+WHERE stories_requiredservice.story_id=s.id AND s.title IN ('Grafik', 'Multimedia & Film', '3D');
+UPDATE stories_requiredservice SET service_type_id=4
+FROM stories_story s
+WHERE stories_requiredservice.story_id=s.id AND s.title IN ('Programmierung', 'IT-Dienstleistungen');
+UPDATE stories_requiredservice SET service_type_id=5
+FROM stories_story s
+WHERE stories_requiredservice.story_id=s.id AND s.title IN ('Projektorganisation', 'Administration', 'Intern');
+
+
+--
+-- Full text search
+--
+
+UPDATE contacts_organization SET fts_document=contacts_organization_fts_document(id);
+UPDATE contacts_person SET fts_document=contacts_person_fts_document(id);
+UPDATE deals_deal SET fts_document=deals_deal_fts_document(id);
+UPDATE projects_project SET fts_document=projects_project_fts_document(id);
+
+
+--
+-- Fix sequences
+--
+
+SELECT SETVAL('public.accounts_user_id_seq', COALESCE(MAX(id), 1) ) FROM public.accounts_user;
+SELECT SETVAL('public.activities_activity_id_seq', COALESCE(MAX(id), 1) ) FROM public.activities_activity;
+SELECT SETVAL('public.auth_group_id_seq', COALESCE(MAX(id), 1) ) FROM public.auth_group;
+SELECT SETVAL('public.auth_group_permissions_id_seq', COALESCE(MAX(id), 1) ) FROM public.auth_group_permissions;
+SELECT SETVAL('public.auth_permission_id_seq', COALESCE(MAX(id), 1) ) FROM public.auth_permission;
+SELECT SETVAL('public.contacts_emailaddress_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_emailaddress;
+SELECT SETVAL('public.contacts_group_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_group;
+SELECT SETVAL('public.contacts_organization_groups_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_organization_groups;
+SELECT SETVAL('public.contacts_organization_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_organization;
+SELECT SETVAL('public.contacts_person_groups_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_person_groups;
+SELECT SETVAL('public.contacts_person_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_person;
+SELECT SETVAL('public.contacts_phonenumber_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_phonenumber;
+SELECT SETVAL('public.contacts_postaladdress_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_postaladdress;
+SELECT SETVAL('public.deals_deal_id_seq', COALESCE(MAX(id), 1) ) FROM public.deals_deal;
+SELECT SETVAL('public.deals_funnel_id_seq', COALESCE(MAX(id), 1) ) FROM public.deals_funnel;
+SELECT SETVAL('public.django_admin_log_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_admin_log;
+SELECT SETVAL('public.django_content_type_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_content_type;
+SELECT SETVAL('public.django_migrations_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_migrations;
+SELECT SETVAL('public.projects_project_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_project;
+SELECT SETVAL('public.projects_release_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_release;
+SELECT SETVAL('public.reversion_revision_id_seq', COALESCE(MAX(id), 1) ) FROM public.reversion_revision;
+SELECT SETVAL('public.reversion_version_id_seq', COALESCE(MAX(id), 1) ) FROM public.reversion_version;
+SELECT SETVAL('public.services_renderedservice_id_seq', COALESCE(MAX(id), 1) ) FROM public.services_renderedservice;
+SELECT SETVAL('public.services_servicetype_id_seq', COALESCE(MAX(id), 1) ) FROM public.services_servicetype;
+SELECT SETVAL('public.stories_requiredservice_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_requiredservice;
+SELECT SETVAL('public.stories_story_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_story;
+SELECT SETVAL('public.stories_story_owned_by_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_story_owned_by;
+
+--
+-- Autogenerate some data
+--
+
+INSERT INTO projects_release
+(title, is_default, position, project_id)
+SELECT 'V1', TRUE, 0, id FROM projects_project;
+INSERT INTO stories_story
+(created_at, title, status, position, requested_by_id, description, project_id, release_id)
+SELECT NOW(), 'V1', 30, 0, owned_by_id, '', r.project_id, r.id
+FROM projects_release r LEFT JOIN projects_project p ON r.project_id=p.id
+WHERE r.is_default=TRUE;
+
+
+--
+-- Import worklogs
+--
+
+INSERT INTO services_renderedservice
+(created_at, rendered_on, hours, description, created_by_id, rendered_by_id, story_id)
+SELECT created, date, hours, notes, created_by_id, worker_id, s.id
+FROM stories_story s, projects_release r,
+dblink(
+    'dbname=fineware_feinheit',
+    'SELECT created, date, hours, notes, created_by_id, worker_id, job_id FROM worklog_worklogentry'
+) AS p(created timestamp, date date, hours numeric, notes text, created_by_id int, worker_id int, job_id int)
+WHERE s.release_id=r.id AND r.is_default AND r.project_id=p.job_id;
+
+
+
+
+--
+--
+--
+-- fineware_feinheit=# select sorting_field, a.person_id, count(*) from addressbook_address a left join addressbook_person p on a.person_id=p.id where employer_id is not null and active group by sorting_field, a.person_id having count(*)>1 order by sorting_field;
+--     sorting_field    | person_id | count
+-- ---------------------+-----------+-------
+--  Angst Walter        |      1544 |     2
+--  Arezina Andrea      |      4310 |     2
+--  Brennwald Ivo       |      4640 |     2
+--  Bucher Mike         |      2467 |     2
+--  Cahn Esther         |      2761 |     2
+--  Cerny Caroline      |      2912 |     2
+--  Dick Andreas        |      2775 |     2
+--  Forster Nicola      |       170 |     2
+--  Freimüller Andreas  |      1428 |     2
+--  Frei Reto           |      1471 |     2
+--  Furrer Rolf         |      2717 |     2
+--  Gehri Philipp       |      2460 |     2
+--  Grob Andreas        |      4898 |     2
+--  Haas Marc           |      1429 |     2
+--  Haberstich Peter    |      3858 |     2
+--  Handschin Martin    |      2787 |     2
+--  Hintermüller Kaspar |      1187 |     2
+--  Katz Susa           |      2140 |     2
+--  Kleiner Jan         |      3535 |     2
+--  Krumes Andreas      |      3259 |     2
+--  Krüttli Thomas      |      4321 |     2
+--  Menzl Mathias       |      1489 |     2
+--  Molina Fabian       |      5144 |     2
+--  Morini Diana        |      3073 |     4
+--  Moser Gerhard       |      1536 |     2
+--  Nick Sascha         |      1605 |     2
+--  Oberhänsli Erwin    |      2701 |     2
+--  Perez Christian     |      2083 |     2
+--  Polzer Katrin       |      2556 |     2
+--  Sablonier Yves      |      5267 |     2
+--  Schaub Christoph    |      2488 |     2
+--  Scheffold Fabian    |      3142 |     2
+--  Schmid Patrik       |      2031 |     2
+--  Twerenbold Georg    |      3252 |     2
+--  Wagner Ruth         |      3462 |     2
+--  Widmer Diana        |      3955 |     2
+--  Wieczorek Jola      |      3616 |     2
+--  Zemp Gaudenz        |      4410 |     2
+--  Zumbühl Moritz      |        10 |     2
+-- (39 rows)
+--
