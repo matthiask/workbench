@@ -90,7 +90,7 @@ class PersonDetail(models.Model):
     )
 
     type = models.CharField(_('type'), max_length=40)
-    weight = models.PositiveIntegerField(
+    weight = models.SmallIntegerField(
         _('weight'), default=0, editable=False)
 
     class Meta:
