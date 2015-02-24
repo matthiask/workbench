@@ -8,10 +8,13 @@ env.hosts = ['deploy@ftool.feinheit.ch']
 @task
 def deploy():
     local('flake8 .')
-    local('git push origin master')
+    local(
+        'git push deploy@ftool.feinheit.ch:www/ftool/'
+        ' master:refs/heads/update')
+
     with cd('www/ftool/'):
         run('git checkout master')
-        run('git pull')
+        run('git merge update')
         run('find . -name "*.pyc" -delete')
         run('venv/bin/pip install -r requirements/production.txt')
         run('venv/bin/python manage.py migrate')
