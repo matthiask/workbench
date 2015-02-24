@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
+from tools.urls import model_urls
 
 
 class ServiceType(models.Model):
@@ -30,6 +31,7 @@ class ServiceType(models.Model):
         return self.title
 
 
+@model_urls()
 class RenderedService(models.Model):
     story = models.ForeignKey(
         'stories.Story',

@@ -18,6 +18,7 @@ urlpatterns = patterns(
     url(r'^contacts/', include('contacts.urls')),
     url(r'^deals/', include('deals.urls')),
     url(r'^projects/', include('projects.urls')),
+    url(r'^services/', include('services.urls')),
 
     url(r'^search/$', 'ftool.views.search', name='search'),
 
