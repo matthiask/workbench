@@ -1,9 +1,15 @@
 $(function() {
 
   // AJAX modals
+  var initModal = function(data) {
+    $(data).modal();
+    setTimeout(function() {
+      $('.modal').find('input, select').filter(':visible').first().focus();
+    }, 500);
+  };
   $(document.body).on('click', '[data-toggle=ajaxmodal]', function(event) {
     $.get(this.href, function(data) {
-      $(data).modal();
+      initModal(data);
     });
     return false;
   });
@@ -13,7 +19,7 @@ $(function() {
       if (jqXHR.status === 201) {
         $('.modal').modal('hide');
       } else {
-        $(data).modal();
+        initModal(data);
       }
     });
     return false;
