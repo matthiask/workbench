@@ -1,6 +1,5 @@
-from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
-from django.utils.translation import ugettext as _
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 
 from services.forms import RenderedServiceForm
 from services.models import RenderedService
@@ -39,10 +38,5 @@ class RenderedServiceCreateView(RenderedServiceMixin, CreateView):
         self.object.created_by = self.request.user
         self.object.story = self.story
         self.object.save()
-        messages.success(
-            self.request,
-            _('%(class)s "%(object)s" has been successfully created.') % {
-                'class': self.object._meta.verbose_name,
-                'object': self.object,
-            })
-        return redirect(self.get_success_url())
+
+        return HttpResponse('Thanks', status=201)  # Created

@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import ProtectedError
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
@@ -108,6 +109,8 @@ class CreateView(ToolsMixin, vanilla.CreateView):
 
     def form_valid(self, form):
         self.object = form.save()
+        if self.request.is_ajax():
+            return HttpResponse('Thanks', status=201)  # Created
         messages.success(
             self.request,
             _('%(class)s "%(object)s" has been successfully created.') % {

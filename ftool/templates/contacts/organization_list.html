@@ -60,11 +60,3 @@
   </div>
 </div>
 {% endblock %}
-
-{% block js %}{{ block.super }}
-<script>
-  $('.form-search select').on('change', function() {
-    $(this).closest('form').submit();
-  });
-</script>
-{% endblock %}
