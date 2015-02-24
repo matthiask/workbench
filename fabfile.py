@@ -14,7 +14,7 @@ def deploy():
 
     with cd('www/ftool/'):
         run('git checkout master')
-        run('git merge update')
+        run('git merge --ff-only update')
         run('find . -name "*.pyc" -delete')
         run('venv/bin/pip install -r requirements/production.txt')
         run('venv/bin/python manage.py migrate')
