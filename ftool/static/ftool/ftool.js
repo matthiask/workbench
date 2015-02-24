@@ -8,6 +8,8 @@ $(function() {
     }, 500);
   };
   $(document.body).on('click', '[data-toggle=ajaxmodal]', function(event) {
+    $('.modal').remove();
+
     $.get(this.href, function(data) {
       initModal(data);
     });
