@@ -3,8 +3,8 @@ from collections import OrderedDict
 from django.shortcuts import redirect
 
 from contacts.forms import (
-    OrganizationSearchForm, PhoneNumberFormset, EmailAddressFormset,
-    PostalAddressFormset)
+    OrganizationSearchForm, OrganizationForm, PersonForm, PhoneNumberFormset,
+    EmailAddressFormset, PostalAddressFormset)
 from contacts.models import (
     Organization, Person, PhoneNumber, EmailAddress, PostalAddress)
 from tools.views import (
@@ -40,6 +40,8 @@ class OrganizationDetailView(OrganizationViewMixin, DetailView):
 
 
 class OrganizationCreateView(OrganizationViewMixin, CreateView):
+    form_class = OrganizationForm
+
     def get_form(self, data=None, files=None, **kwargs):
         kwargs.setdefault('initial', {}).update({
             'primary_contact': self.request.user.pk,
@@ -49,7 +51,7 @@ class OrganizationCreateView(OrganizationViewMixin, CreateView):
 
 
 class OrganizationUpdateView(OrganizationViewMixin, UpdateView):
-    pass
+    form_class = OrganizationForm
 
 
 class OrganizationDeleteView(OrganizationViewMixin, DeleteView):
@@ -87,6 +89,8 @@ class PersonDetailView(PersonViewMixin, DetailView):
 
 
 class PersonCreateView(PersonViewMixin, CreateView):
+    form_class = PersonForm
+
     def get_form(self, data=None, files=None, **kwargs):
         kwargs.setdefault('initial', {}).update({
             'primary_contact': self.request.user.pk,
@@ -96,6 +100,8 @@ class PersonCreateView(PersonViewMixin, CreateView):
 
 
 class PersonUpdateView(PersonViewMixin, UpdateView):
+    form_class = PersonForm
+
     def get_form(self, data=None, files=None, **kwargs):
         form_class = self.get_form_class()
 

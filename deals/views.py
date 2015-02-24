@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from deals.forms import DealSearchForm
+from deals.forms import DealSearchForm, DealForm
 from deals.models import Funnel, Deal
 from tools.history import changes
 from tools.views import ListView, DetailView, CreateView, UpdateView
@@ -52,8 +52,7 @@ class DealDetailView(DealViewMixin, DetailView):
 
 
 class DealCreateView(DealViewMixin, CreateView):
-    fields = (
-        'funnel', 'title', 'description', 'owned_by', 'estimated_value')
+    form_class = DealForm
 
     def get_form(self, data=None, files=None, **kwargs):
         kwargs.setdefault('initial', {}).update({
@@ -64,5 +63,4 @@ class DealCreateView(DealViewMixin, CreateView):
 
 
 class DealUpdateView(DealViewMixin, UpdateView):
-    fields = (
-        'funnel', 'title', 'description', 'owned_by', 'estimated_value')
+    form_class = DealForm
