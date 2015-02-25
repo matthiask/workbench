@@ -95,18 +95,23 @@ class RequiredService(models.Model):
         verbose_name=_('service type'),
         related_name='+',
     )
-    effort_best_case = models.DecimalField(
-        _('best case effort'),
+    estimated_effort = models.DecimalField(
+        _('estimated effort'),
         max_digits=5,
         decimal_places=2,
-        help_text=_('Hours required if everything falls into place.'))
-    effort_safe_case = models.DecimalField(
-        _('safe case effort'),
+        help_text=_('The original estimate.'))
+    offered_effort = models.DecimalField(
+        _('offered effort'),
+        max_digits=5,
+        decimal_places=2,
+        help_text=_('Effort offered to the customer.'))
+    planning_effort = models.DecimalField(
+        _('planning effort'),
         max_digits=5,
         decimal_places=2,
         help_text=_(
-            'Hours required to be almost certain that the work will be'
-            ' completed.'))
+            'Effort for planning. This value should reflect the current '
+            ' state of affairs also when work is already in progress.'))
 
     class Meta:
         ordering = ('service_type',)

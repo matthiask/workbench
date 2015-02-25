@@ -25,11 +25,12 @@
       <div class="row">
         <div class="col-md-6">
           <table class="table table-condensed">
-            {% for service_type, best_case, safe_case in story.required %}
+            {% for service_type, estimated, offered, planning in story.required %}
               <tr>
                 <th>{{ service_type }}</th>
-                <td>{{ best_case }}h</td>
-                <td>{{ safe_case }}h</td>
+                <td>{{ estimated }}h</td>
+                <td>{{ offered }}h</td>
+                <td>{{ planning }}h</td>
               </tr>
             {% endfor %}
           </table>

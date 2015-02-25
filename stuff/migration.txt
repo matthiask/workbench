@@ -273,12 +273,12 @@ dblink(
 ) AS p(id int, activity_name text, notes text, job_id int, joboffer_id int);
 
 INSERT INTO stories_requiredservice
-(story_id, service_type_id, effort_best_case, effort_safe_case)
-SELECT story_id, service_type_id, effort_best_case, effort_safe_case FROM
+(story_id, service_type_id, estimated_effort, offered_effort, planning_effort)
+SELECT story_id, service_type_id, effort, effort, effort FROM
 dblink(
     'dbname=fineware_feinheit',
-    'SELECT a.id, 1, a.hours, a.hours FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id WHERE jo.job_id IS NOT NULL AND a.included'
-) p(story_id int, service_type_id int, effort_best_case numeric(5,2), effort_safe_case numeric(5,2));
+    'SELECT a.id, 1, a.hours FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id WHERE jo.job_id IS NOT NULL AND a.included'
+) p(story_id int, service_type_id int, effort numeric(5,2));
 
 UPDATE stories_requiredservice SET service_type_id=2
 FROM stories_story s

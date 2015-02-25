@@ -82,8 +82,9 @@ class Project(models.Model):
             'story',
             'service_type__title',
         ).annotate(
-            Sum('effort_best_case'),
-            Sum('effort_safe_case'),
+            Sum('estimated_effort'),
+            Sum('offered_effort'),
+            Sum('planning_effort'),
         )
 
         rendered = RenderedService.objects.filter(
@@ -96,16 +97,18 @@ class Project(models.Model):
         )
 
         required_dict = defaultdict(list)
-        overall_effort = [0, 0]
+        overall_effort = [0, 0, 0]
 
         for row in required:
             required_dict[row['story']].append((
                 row['service_type__title'],
-                row['effort_best_case__sum'],
-                row['effort_safe_case__sum'],
+                row['estimated_effort__sum'],
+                row['offered_effort__sum'],
+                row['planning_effort__sum'],
             ))
-            overall_effort[0] += row['effort_best_case__sum']
-            overall_effort[1] += row['effort_safe_case__sum']
+            overall_effort[0] += row['estimated_effort__sum']
+            overall_effort[1] += row['offered_effort__sum']
+            overall_effort[2] += row['planning_effort__sum']
 
         rendered_dict = defaultdict(list)
         overall_hours = 0
