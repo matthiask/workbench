@@ -1,7 +1,9 @@
 from django import forms
 from django.utils.translation import ugettext, ugettext_lazy as _
 
+from contacts.models import Organization, Person
 from projects.models import Project
+from tools.forms import ModelForm, Picker
 
 
 class ProjectSearchForm(forms.Form):
@@ -12,10 +14,20 @@ class ProjectSearchForm(forms.Form):
     )
 
 
-class ProjectForm(forms.ModelForm):
+class ProjectForm(ModelForm):
+    user_fields = ('owned_by',)
+
     class Meta:
         model = Project
-        fields = ('customer', 'contact', 'title', 'description')
+        fields = ('customer', 'contact', 'title', 'description', 'owned_by')
+        widgets = {
+            'customer': Picker(
+                model=Organization,
+            ),
+            'contact': Picker(
+                model=Organization,
+            ),
+        }
 
     def clean(self):
         data = super().clean()

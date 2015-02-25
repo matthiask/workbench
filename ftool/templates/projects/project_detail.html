@@ -49,6 +49,10 @@
   {% endfor %}
   {{ project.overall_effort }}
   {{ project.overall_hours }}
+
+  <a href="{{ project.urls.update }}" class="btn btn-default">
+    {% trans 'Update' %}
+  </a>
 </div>
 </div>
 {% endblock %}

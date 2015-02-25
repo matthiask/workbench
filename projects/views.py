@@ -1,6 +1,6 @@
 from projects.forms import ProjectSearchForm, ProjectForm
 from projects.models import Project
-from tools.views import ListView, DetailView, CreateView
+from tools.views import ListView, DetailView, CreateView, UpdateView
 
 
 class ProjectViewMixin(object):
@@ -28,4 +28,15 @@ class ProjectDetailView(ProjectViewMixin, DetailView):
 
 
 class ProjectCreateView(ProjectViewMixin, CreateView):
+    form_class = ProjectForm
+
+    def get_form(self, data=None, files=None, **kwargs):
+        kwargs.setdefault('initial', {}).update({
+            'owned_by': self.request.user.pk,
+        })
+        form_class = self.get_form_class()
+        return form_class(data, files, **kwargs)
+
+
+class ProjectUpdateView(ProjectViewMixin, UpdateView):
     form_class = ProjectForm

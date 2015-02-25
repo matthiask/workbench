@@ -17,4 +17,8 @@ urlpatterns = patterns(
         r'^create/$',
         views.ProjectCreateView.as_view(),
         name='projects_project_create'),
+    url(
+        r'^(?P<pk>\d+)/update/$',
+        views.ProjectUpdateView.as_view(),
+        name='projects_project_update'),
 )

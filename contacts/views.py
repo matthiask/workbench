@@ -58,6 +58,10 @@ class OrganizationDeleteView(OrganizationViewMixin, DeleteView):
     pass
 
 
+class OrganizationPickerView(OrganizationListView):
+    template_name_suffix = '_picker'
+
+
 class PersonListView(PersonViewMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()

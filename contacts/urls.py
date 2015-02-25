@@ -15,6 +15,10 @@ urlpatterns = patterns(
         views.OrganizationListView.as_view(),
         name='contacts_organization_list'),
     url(
+        r'^organizations/picker/$',
+        views.OrganizationPickerView.as_view(),
+        name='contacts_organization_picker'),
+    url(
         r'^organizations/(?P<pk>\d+)/$',
         views.OrganizationDetailView.as_view(),
         name='contacts_organization_detail'),
