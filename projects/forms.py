@@ -25,7 +25,7 @@ class ProjectForm(ModelForm):
                 model=Organization,
             ),
             'contact': Picker(
-                model=Organization,
+                model=Person,
             ),
         }
 

@@ -40,6 +40,10 @@ urlpatterns = patterns(
         views.PersonListView.as_view(),
         name='contacts_person_list'),
     url(
+        r'^people/picker/$',
+        views.PersonPickerView.as_view(),
+        name='contacts_person_picker'),
+    url(
         r'^people/(?P<pk>\d+)/$',
         views.PersonDetailView.as_view(),
         name='contacts_person_detail'),

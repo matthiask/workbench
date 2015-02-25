@@ -35,6 +35,10 @@ class OrganizationListView(OrganizationViewMixin, ListView):
         return queryset
 
 
+class OrganizationPickerView(OrganizationListView):
+    template_name_suffix = '_picker'
+
+
 class OrganizationDetailView(OrganizationViewMixin, DetailView):
     pass
 
@@ -56,10 +60,6 @@ class OrganizationUpdateView(OrganizationViewMixin, UpdateView):
 
 class OrganizationDeleteView(OrganizationViewMixin, DeleteView):
     pass
-
-
-class OrganizationPickerView(OrganizationListView):
-    template_name_suffix = '_picker'
 
 
 class PersonListView(PersonViewMixin, ListView):
@@ -86,6 +86,10 @@ class PersonListView(PersonViewMixin, ListView):
                 ' ORDER BY weight DESC LIMIT 1)'
             ),
         })
+
+
+class PersonPickerView(PersonListView):
+    template_name_suffix = '_picker'
 
 
 class PersonDetailView(PersonViewMixin, DetailView):
