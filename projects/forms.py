@@ -21,12 +21,8 @@ class ProjectForm(ModelForm):
         model = Project
         fields = ('customer', 'contact', 'title', 'description', 'owned_by')
         widgets = {
-            'customer': Picker(
-                model=Organization,
-            ),
-            'contact': Picker(
-                model=Person,
-            ),
+            'customer': Picker(model=Organization),
+            'contact': Picker(model=Person),
         }
 
     def clean(self):

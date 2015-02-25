@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from contacts.models import (
     Group, Organization, Person, PhoneNumber, EmailAddress, PostalAddress)
-from tools.forms import ModelForm, Textarea
+from tools.forms import ModelForm, Picker, Textarea
 
 
 class OrganizationSearchForm(forms.Form):
@@ -40,6 +40,7 @@ class PersonForm(ModelForm):
             'groups')
         widgets = {
             'notes': Textarea(),
+            'organization': Picker(model=Organization),
             'groups': forms.CheckboxSelectMultiple(),
         }
 
