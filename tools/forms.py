@@ -72,23 +72,22 @@ class Picker(forms.TextInput):
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_text(self._format_value(value))
-        html = format_html('<input{} />', flatatt(final_attrs))
 
-        instance = ''
+        pretty = ''
         try:
             if value:
-                instance = str(self.model.objects.get(pk=value))
-        except self.model.DoesNotExist:
+                pretty = str(self.model.objects.get(pk=value))
+        except (self.model.DoesNotExist, TypeError, ValueError):
             pass
 
         opts = self.model._meta
 
         return mark_safe(_PICKER_TEMPLATE % {
-            'id': attrs['id'],
+            'id': final_attrs['id'],
             'url': '%s?id=%s' % (
                 reverse('%s_%s_picker' % (opts.app_label, opts.model_name)),
-                attrs['id'],
+                final_attrs['id'],
             ),
-            'field': html,
-            'pretty': escape(instance),
+            'field': format_html('<input{} />', flatatt(final_attrs)),
+            'pretty': escape(pretty),
         })
