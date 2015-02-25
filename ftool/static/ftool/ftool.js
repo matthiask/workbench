@@ -41,7 +41,7 @@ $(function() {
       pretty = el.data('pretty');
 
     $('#' + id).val(key);
-    $('#' + id + '_pretty').text(pretty);
+    $('#' + id + '_pretty').val(pretty);
     $('.modal').modal('hide');
   });
 

@@ -47,6 +47,19 @@ class ModelForm(forms.ModelForm):
         formfield.choices = choices
 
 
+_PICKER_TEMPLATE = '''
+<div class="input-group">
+  <a href="%(url)s" class="btn btn-default input-group-addon"
+      data-toggle="ajaxmodal">
+    <span class="glyphicon glyphicon-search"></span>
+  </a>
+  <input type="text" class="form-control" id="%(id)s_pretty"
+    value="%(pretty)s" disabled>
+  %(field)s
+</div>
+'''
+
+
 class Picker(forms.TextInput):
     def __init__(self, model, attrs=None):
         super().__init__(attrs)
@@ -68,18 +81,14 @@ class Picker(forms.TextInput):
         except self.model.DoesNotExist:
             pass
 
-        id = attrs['id']
         opts = self.model._meta
-        return mark_safe(''.join((
-            html,
-            '<a href="',
-            reverse('%s_%s_picker' % (opts.app_label, opts.model_name)),
-            '?id=',
-            id,
-            '" class="btn btn-default" data-toggle="ajaxmodal">Pick</a>',
-            '<span id="',
-            id,
-            '_pretty">',
-            escape(instance),
-            '</span>',
-        )))
+
+        return mark_safe(_PICKER_TEMPLATE % {
+            'id': attrs['id'],
+            'url': '%s?id=%s' % (
+                reverse('%s_%s_picker' % (opts.app_label, opts.model_name)),
+                attrs['id'],
+            ),
+            'field': html,
+            'pretty': escape(instance),
+        })
