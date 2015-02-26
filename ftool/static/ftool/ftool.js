@@ -52,20 +52,25 @@ $(function() {
 
 
   // Hotkeys
-  $(document.body).on('keyup', function(event) {
-    if (/Mac/.test(navigator.platform) ? !event.ctrlKey : !event.altKey) {
+  $(document.body).on('keyup', function(e) {
+    if (/Mac/.test(navigator.platform) ? !e.ctrlKey : !e.altKey) {
       return;
     }
 
-    if (event.keyCode === 70) {  // f
+    if (e.keyCode === 70) {  // f
       $('.navbar-form input[name=q]').focus().select();
-    } else if (event.keyCode === 67 && !event.shiftKey) {  // c
+    } else if (e.keyCode === 67 && !e.shiftKey) {  // c
       window.location.href = '/contacts/people/';
-    } else if (event.keyCode === 67 && event.shiftKey) {  // C
+    } else if (e.keyCode === 67 && e.shiftKey) {  // C
       window.location.href = '/contacts/organizations/';
+    } else if (e.keyCode === 13) {
+      $(e.target).parents('form').submit();
+    } else {
+      console.log(event, event.keyCode);
+      return;
     }
 
-    console.log(event, event.keyCode);
+    return false;
   });
 
 });
