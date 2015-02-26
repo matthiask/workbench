@@ -50,4 +50,22 @@ $(function() {
     $(this).closest('form').submit();
   });
 
+
+  // Hotkeys
+  $(document.body).on('keyup', function(event) {
+    if (/Mac/.test(navigator.platform) ? !event.ctrlKey : !event.altKey) {
+      return;
+    }
+
+    if (event.keyCode === 70) {  // f
+      $('.navbar-form input[name=q]').focus().select();
+    } else if (event.keyCode === 67 && !event.shiftKey) {  // c
+      window.location.href = '/contacts/people/';
+    } else if (event.keyCode === 67 && event.shiftKey) {  // C
+      window.location.href = '/contacts/organizations/';
+    }
+
+    console.log(event, event.keyCode);
+  });
+
 });
