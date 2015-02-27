@@ -1,0 +1,20 @@
+@media only screen and (max-width: 760px) {
+  .table-linearize table,
+  .table-linearize thead,
+  .table-linearize tbody,
+  .table-linearize tfoot,
+  .table-linearize th,
+  .table-linearize td,
+  .table-linearize tr {
+    display: block;
+  }
+
+  .table-linearize th {
+    padding: 8px 8px 4px 8px !important;
+  }
+
+  .table-linearize td {
+    border: none !important;
+    padding: 4px 8px !important;
+  }
+}
