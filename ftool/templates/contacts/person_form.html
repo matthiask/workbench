@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load bootstrap3 i18n %}
+{% load bootstrap3 formset i18n %}
 
 {% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
@@ -19,15 +19,13 @@
       {% csrf_token %}
       {% bootstrap_form form layout='horizontal' %}
 
-      {% for formset in view.formsets.values %}{{ formset.management_form }}{% endfor %}
-
       <div class="row">
         <label class="col-md-3 control-label">
           {% trans 'phone numbers' %}
         </label>
         <div class="col-md-9 form-inline fieldset">
-          {% for form in view.formsets.phonenumbers %}
-            <div class="row">
+          {% formset view.formsets.phonenumbers "phonenumbers" %}
+            <div class="row" id="{{ form_id }}">
               <div class="col-md-4">
                 {{ form.id }}
                 {% bootstrap_field form.type layout='inline' %}
@@ -39,7 +37,10 @@
                 {{ form.DELETE }}
               </div>
             </div>
-          {% endfor %}
+          {% endformset %}
+          <a class="btn btn-default" href="javascript:addInlineForm('phonenumbers')">
+            <span class="glyphicon glyphicon-plus"></span>
+          </a>
         </div>
       </div>
 
@@ -48,8 +49,8 @@
           {% trans 'email addresses' %}
         </label>
         <div class="col-md-9 form-inline fieldset">
-          {% for form in view.formsets.emailaddresses %}
-            <div class="row">
+          {% formset view.formsets.emailaddresses "emailaddresses" %}
+            <div class="row" id="{{ form_id }}">
               <div class="col-md-4">
                 {{ form.id }}
                 {% bootstrap_field form.type layout='inline' %}
@@ -61,7 +62,7 @@
                 {{ form.DELETE }}
               </div>
             </div>
-          {% endfor %}
+          {% endformset %}
         </div>
       </div>
 
@@ -70,8 +71,8 @@
           {% trans 'postal addresses' %}
         </label>
         <div class="col-md-9 form-inline fieldset">
-          {% for form in view.formsets.postaladdresses %}
-            <div class="row">
+          {% formset view.formsets.postaladdresses "postaladdresses" %}
+            <div class="row" id="{{ form_id }}">
               <div class="col-md-4">
                 {{ form.id }}
                 {% bootstrap_field form.type layout='inline' %}
@@ -83,7 +84,7 @@
                 {{ form.DELETE }}
               </div>
             </div>
-          {% endfor %}
+          {% endformset %}
         </div>
       </div>
 
