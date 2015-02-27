@@ -19,6 +19,7 @@
       {% csrf_token %}
       {% bootstrap_form form layout='horizontal' %}
 
+      {% if view.formsets %}
       <div class="row">
         <label class="col-md-3 control-label">
           {% trans 'phone numbers' %}
@@ -38,7 +39,7 @@
               </div>
             </div>
           {% endformset %}
-          <a class="btn btn-default" href="javascript:addInlineForm('phonenumbers')">
+          <a class="btn btn-default pull-right" href="javascript:addInlineForm('phonenumbers')">
             <span class="glyphicon glyphicon-plus"></span>
           </a>
         </div>
@@ -63,6 +64,9 @@
               </div>
             </div>
           {% endformset %}
+          <a class="btn btn-default pull-right" href="javascript:addInlineForm('emailaddresses')">
+            <span class="glyphicon glyphicon-plus"></span>
+          </a>
         </div>
       </div>
 
@@ -85,8 +89,12 @@
               </div>
             </div>
           {% endformset %}
+          <a class="btn btn-default pull-right" href="javascript:addInlineForm('postaladdresses')">
+            <span class="glyphicon glyphicon-plus"></span>
+          </a>
         </div>
       </div>
+      {% endif %}
 
       {% buttons %}
         <button type="submit" class="btn btn-primary col-md-offset-3">
