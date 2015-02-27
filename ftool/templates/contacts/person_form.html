@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% load bootstrap3 i18n %}
+
+{% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <h1>
+      {% if object %}
+        {% blocktrans %}Update {{ object }}{% endblocktrans %}
+      {% else %}
+        {% blocktrans with class=view.meta.verbose_name %}Create {{ class }}{% endblocktrans %}
+      {% endif %}
+    </h1>
+
+    <form method="POST" action="." class="form-horizontal">
+      {% csrf_token %}
+      {% bootstrap_form form layout='horizontal' %}
+
+      {% for formset in view.formsets.values %}{{ formset.management_form }}{% endfor %}
+
+      <div class="row">
+        <label class="col-md-3 control-label">
+          {% trans 'phone numbers' %}
+        </label>
+        <div class="col-md-9 form-inline fieldset">
+          {% for form in view.formsets.phonenumbers %}
+            <div class="row">
+              <div class="col-md-4">
+                {{ form.id }}
+                {% bootstrap_field form.type layout='inline' %}
+              </div>
+              <div class="col-md-7">
+                {% bootstrap_field form.phone_number layout='inline' %}
+              </div>
+              <div class="col-md-1">
+                {{ form.DELETE }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="col-md-3 control-label">
+          {% trans 'email addresses' %}
+        </label>
+        <div class="col-md-9 form-inline fieldset">
+          {% for form in view.formsets.emailaddresses %}
+            <div class="row">
+              <div class="col-md-4">
+                {{ form.id }}
+                {% bootstrap_field form.type layout='inline' %}
+              </div>
+              <div class="col-md-7">
+                {% bootstrap_field form.email layout='inline' %}
+              </div>
+              <div class="col-md-1">
+                {{ form.DELETE }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="col-md-3 control-label">
+          {% trans 'postal addresses' %}
+        </label>
+        <div class="col-md-9 form-inline fieldset">
+          {% for form in view.formsets.postaladdresses %}
+            <div class="row">
+              <div class="col-md-4">
+                {{ form.id }}
+                {% bootstrap_field form.type layout='inline' %}
+              </div>
+              <div class="col-md-7">
+                {% bootstrap_field form.postal_address layout='inline' %}
+              </div>
+              <div class="col-md-1">
+                {{ form.DELETE }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% buttons %}
+        <button type="submit" class="btn btn-primary col-md-offset-3">
+          {% trans 'submit' %}</button>
+      {% endbuttons %}
+    </form>
+
+  </div>
+</div>
+
+<style>
+  .form-inline.fieldset .form-group {
+    margin-bottom: 15px;
+    display: inline-block;
+    width: 100%; }
+  .form-inline.fieldset input,
+  .form-inline.fieldset textarea { width: 100%; }
+</style>
+{% endblock %}

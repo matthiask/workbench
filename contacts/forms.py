@@ -55,7 +55,16 @@ EmailAddressFormset = inlineformset_factory(
     EmailAddress,
     extra=2)
 
+
+class PostalAddressForm(forms.ModelForm):
+    class Meta:
+        model = PostalAddress
+        widgets = {
+            'postal_address': Textarea(attrs={'rows': 6}),
+        }
+
 PostalAddressFormset = inlineformset_factory(
     Person,
     PostalAddress,
+    form=PostalAddressForm,
     extra=2)
