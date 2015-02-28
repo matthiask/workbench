@@ -10,7 +10,7 @@
   <h1>{{ project }}</h1>
 
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-4">
       <h2>{% trans 'releases and stories' %}</h2>
       <div class="list-group">
         {% for story in project.overview %}
@@ -35,72 +35,9 @@
       </div>
     </div>
 
-    <div class="col-md-6" id="story">
+    <div class="col-md-8">
     </div>
   </div>
-  <h2>{% trans 'stories' %}</h2>
-  {% for story in project.overview %}
-    {% ifchanged story.release %}
-      <h3>
-        <a href="{{ story.release.urls.detail }}">
-          {{ story.release }}
-        </a>
-      </h3>
-    {% endifchanged %}
-    <div class="well">
-      <a class="btn btn-primary pull-right" data-toggle="ajaxmodal"
-        href="{% url 'services_renderedservice_create' story=story.pk %}">Create</a>
-      {{ story.title }}: {{ story.description }}<br>
-      <small>
-        {{ story.owned_by.all }}
-        {{ story.get_status_display }}
-      </small>
-      <div class="row">
-        <div class="col-md-6">
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th>{% trans 'service type' %}</th>
-                <th>{% trans 'estimated effort' %}</th>
-                <th>{% trans 'offered effort' %}</th>
-                <th>{% trans 'planning effort' %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for service_type, estimated, offered, planning in story.required %}
-                <tr>
-                  <th>{{ service_type }}</th>
-                  <td>{{ estimated }}h</td>
-                  <td>{{ offered }}h</td>
-                  <td>{{ planning }}h</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        <div class="col-md-6">
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th>{% trans 'hours' %}</th>
-                <th>{% trans 'rendered by' %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for rendered_by, hours in story.rendered %}
-                <tr>
-                  <td>{{ hours }}h</td>
-                  <th>{{ rendered_by }}</th>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  {% endfor %}
-  {{ project.overall_effort }}
-  {{ project.overall_hours }}
 
   <a href="{{ project.urls.update }}" class="btn btn-default">
     {% trans 'Update' %}
