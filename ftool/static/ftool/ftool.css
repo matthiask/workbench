@@ -18,3 +18,9 @@
     padding: 4px 8px !important;
   }
 }
+
+body {
+    /* Work-around for https://github.com/twbs/bootstrap/issues/9855 */
+    overflow: scroll !important;
+    padding-right: 0 !important;
+}
