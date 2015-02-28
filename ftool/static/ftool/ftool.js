@@ -4,9 +4,11 @@ $(function() {
   var initModal = function(data) {
     $('.modal').modal('hide');
     $(data).modal();
-    setTimeout(function() {
-      $('.modal').find('input, select').filter(':visible').first().focus();
-    }, 500);
+    if (!('ontouchstart' in document.documentElement)) {
+      setTimeout(function() {
+        $('.modal').find('input, select').filter(':visible').first().focus();
+      }, 500);
+    }
   };
   $(document.body).on('click', '[data-toggle=ajaxmodal]', function(event) {
     $('.modal').remove();
