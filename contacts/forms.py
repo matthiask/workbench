@@ -48,17 +48,20 @@ class PersonForm(ModelForm):
 PhoneNumberFormset = inlineformset_factory(
     Person,
     PhoneNumber,
+    fields=('type', 'phone_number'),
     extra=0)
 
 EmailAddressFormset = inlineformset_factory(
     Person,
     EmailAddress,
+    fields=('type', 'email'),
     extra=0)
 
 
 class PostalAddressForm(forms.ModelForm):
     class Meta:
         model = PostalAddress
+        fields = ('type', 'postal_address')
         widgets = {
           'postal_address': Textarea(attrs={'rows': 6}),
         }
