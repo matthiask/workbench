@@ -1,11 +1,10 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
 
 from accounts import views
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         r'^$',
         views.accounts,
@@ -28,4 +27,4 @@ urlpatterns = patterns(
         r'^logout/$',
         views.logout,
         name='logout'),
-)
+]

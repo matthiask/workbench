@@ -1,10 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from projects import views
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         r'^$',
         views.ProjectListView.as_view(),
@@ -21,4 +20,4 @@ urlpatterns = patterns(
         r'^(?P<pk>\d+)/update/$',
         views.ProjectUpdateView.as_view(),
         name='projects_project_update'),
-)
+]

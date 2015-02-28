@@ -1,10 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from services import views
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         r'^rendered/$',
         views.RenderedServiceListView.as_view(),
@@ -17,4 +16,4 @@ urlpatterns = patterns(
         r'^rendered/create/(?P<story>\d+)/$',
         views.RenderedServiceCreateView.as_view(),
         name='services_renderedservice_create'),
-)
+]

@@ -1,10 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from deals import views
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         r'^funnel/(?P<pk>\d+)/$',
         views.FunnelDetailView.as_view(),
@@ -26,4 +25,4 @@ urlpatterns = patterns(
         r'^(?P<pk>\d+)/update/$',
         views.DealUpdateView.as_view(),
         name='deals_deal_update'),
-)
+]

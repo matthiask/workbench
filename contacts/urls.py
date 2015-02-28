@@ -1,11 +1,10 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.shortcuts import redirect
 
 from contacts import views
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         r'^$',
         lambda request: redirect('contacts_organization_list'),
@@ -59,4 +58,4 @@ urlpatterns = patterns(
         r'^people/(?P<pk>\d+)/delete/$',
         views.PersonDeleteView.as_view(),
         name='contacts_person_delete'),
-)
+]
