@@ -20,26 +20,17 @@
             </div>
           {% endifchanged %}
 
-          <div class="list-group-item list-group-item-success">
-            <div class="row">
-              <a class="col-sm-11" href="{{ story.urls.ajaxdetail }}" data-target="#story" data-toggle="ajaxload">
-                <h4 class="list-group-item-heading">{{ story.title }}</h4>
-                <div class="list-group-item-text">
-                  {{ story.description }}
-                  <br>
-                  <small>
-                    {{ story.required }} / {{ story.rendered }}
-                  </small>
-                </div>
-              </a>
-              <div class="col-sm-1">
-                <a class="btn btn-default pull-right" data-toggle="ajaxmodal"
-                  href="{% url 'services_renderedservice_create' story=story.pk %}">
-                  <span class="glyphicon glyphicon-time"></span>
-                </a>
-              </div>
+          <a class="list-group-item list-group-item-success"
+              href="{{ story.urls.detail }}" data-toggle="ajaxmodal">
+            <h4 class="list-group-item-heading">{{ story.title }}</h4>
+            <div class="list-group-item-text">
+              {{ story.description }}
+              <br>
+              <small>
+                {{ story.required }} / {{ story.rendered }}
+              </small>
             </div>
-          </div>
+          </a>
         {% endfor %}
       </div>
     </div>

@@ -5,7 +5,7 @@ from stories import views
 
 urlpatterns = [
     url(
-        r'^(?P<pk>\d+)/ajax/$',
-        views.StoryAjaxDetailView.as_view(),
-        name='stories_story_ajaxdetail'),
+        r'^(?P<pk>\d+)/$',
+        views.StoryDetailView.as_view(),
+        name='stories_story_detail'),
 ]

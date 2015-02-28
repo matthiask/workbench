@@ -45,13 +45,6 @@ $(function() {
     $('.modal').modal('hide');
   });
 
-  // AJAX loads
-  $(document.body).on('click', '[data-toggle=ajaxload]', function() {
-    var el = $(this);
-    $(el.data('target')).load(el.attr('href'));
-    return false;
-  });
-
   // Search forms
   $('.form-search select').on('change', function() {
     $(this).closest('form').submit();

@@ -33,12 +33,14 @@ class Story(models.Model):
         default=timezone.now)
     requested_by = models.ForeignKey(
         User,
-        verbose_name=_('requested by'))
-    owned_by = models.ManyToManyField(
+        verbose_name=_('requested by'),
+        related_name='+')
+    owned_by = models.ForeignKey(
         User,
         blank=True,
+        null=True,
         verbose_name=_('owned by'),
-        related_name='owned_stories')
+        related_name='+')
     title = models.CharField(
         _('title'),
         max_length=200)
@@ -84,7 +86,6 @@ class Story(models.Model):
         return self.title
 
     def overview(self):
-        from collections import defaultdict
         from django.db.models import Sum
         required = self.requiredservices.order_by('service_type').values(
             'service_type__title',
