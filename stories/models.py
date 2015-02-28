@@ -83,6 +83,25 @@ class Story(models.Model):
     def __str__(self):
         return self.title
 
+    def overview(self):
+        from collections import defaultdict
+        from django.db.models import Sum
+        required = self.requiredservices.order_by('service_type').values(
+            'service_type__title',
+        ).annotate(
+            Sum('estimated_effort'),
+            Sum('offered_effort'),
+            Sum('planning_effort'),
+        )
+
+        rendered = self.renderedservices.order_by('rendered_by').values(
+            'rendered_by___full_name',
+        ).annotate(
+            Sum('hours'),
+        )
+
+        return list(required), list(rendered)
+
 
 class RequiredService(models.Model):
     story = models.ForeignKey(
