@@ -18,7 +18,7 @@
             <div class="col-md-8">
               <h4>{% trans 'overview' %}</h4>
               {{ story.overview }}
-              <table class="table table-striped table-condensed">
+              <table class="table table-striped table-condensed table-linearize">
               {% for rendered in story.renderedservices.all %}
               {% ifchanged rendered.rendered_on %}
               <tr>
