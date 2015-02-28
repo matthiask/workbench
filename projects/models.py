@@ -131,7 +131,7 @@ class Project(models.Model):
         return stories
 
 
-@model_urls()
+@model_urls(lambda object: {'project_id': object.project_id, 'pk': object.pk})
 class Release(models.Model):
     project = models.ForeignKey(
         Project,

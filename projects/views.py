@@ -1,5 +1,8 @@
+from django.core.exceptions import ImproperlyConfigured
+from django.shortcuts import get_object_or_404
+
 from projects.forms import ProjectSearchForm, ProjectForm
-from projects.models import Project
+from projects.models import Project, Release
 from tools.views import ListView, DetailView, CreateView, UpdateView
 
 
@@ -40,3 +43,19 @@ class ProjectCreateView(ProjectViewMixin, CreateView):
 
 class ProjectUpdateView(ProjectViewMixin, UpdateView):
     form_class = ProjectForm
+
+
+class ReleaseViewMixin(object):
+    model = Release
+
+
+class ReleaseDetailView(ReleaseViewMixin, DetailView):
+    def get_object(self):
+        try:
+            return get_object_or_404(
+                self.get_queryset(),
+                project_id=self.kwargs['project_id'],
+                pk=self.kwargs['pk'])
+        except KeyError:
+            raise ImproperlyConfigured(
+                "Values 'project_id' and 'pk' not available.")

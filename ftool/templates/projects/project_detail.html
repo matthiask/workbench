@@ -12,7 +12,11 @@
   <h2>{% trans 'stories' %}</h2>
   {% for story in project.overview %}
     {% ifchanged story.release %}
-      <h3>{{ story.release }}</h3>
+      <h3>
+        <a href="{{ story.release.urls.detail }}">
+          {{ story.release }}
+        </a>
+      </h3>
     {% endifchanged %}
     <div class="well">
       <a class="btn btn-primary pull-right" data-toggle="ajaxmodal"
