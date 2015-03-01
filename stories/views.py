@@ -2,10 +2,11 @@ from django.shortcuts import redirect
 
 from services.forms import RenderedServiceForm
 from stories.models import Story
-from tools.views import DetailView
+from tools.views import DetailView, DeleteView
 
 
 class StoryMixin(object):
+    allow_delete_if_only = {Story}
     model = Story
 
 
@@ -37,3 +38,7 @@ class StoryDetailView(StoryMixin, DetailView):
             form = self.get_form()
 
         return self.render_to_response(self.get_context_data(form=form))
+
+
+class StoryDeleteView(StoryMixin, DeleteView):
+    pass

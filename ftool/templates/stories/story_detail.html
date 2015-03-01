@@ -46,6 +46,9 @@
 
       </div>
       <div class="modal-footer">
+        <a href="{{ story.urls.delete }}" class="btn btn-danger pull-left" data-toggle="ajaxmodal">
+          {% trans 'Delete' %}
+        </a>
         <button type="button" class="btn btn-default" data-dismiss="modal" aria-label="Close">
           {% trans 'Close' %}
         </button>

@@ -1,0 +1,17 @@
+{% extends "modalform.html" %}
+
+{% load i18n %}
+
+{% block title %}
+  {% blocktrans %}Delete {{ object }}{% endblocktrans %}
+{% endblock %}
+
+{% block body %}
+{% endblock %}
+
+{% block footer %}
+  <button type="button" class="btn btn-primary" data-dismiss="modal">
+    {% trans 'cancel' %}
+  </button>
+  <button type="submit" class="btn btn-danger">{% trans 'Delete' %}</button>
+{% endblock %}

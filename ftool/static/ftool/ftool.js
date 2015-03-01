@@ -19,10 +19,26 @@ $(function() {
     return false;
   });
 
-  $(document.body).on('submit', '.modal-dialog form', function() {
+  // Include the name and value of the submit button
+  $(document.body).on('click', ':submit', function(event) {
+    var el = $(this),
+      form = el.parents('form');
+    form.find('.hidden-submit-value').remove();
+    if (!form.length || !el.attr('name')) {
+      return;
+    }
+    form.append(
+      $('<input type="hidden" class="hidden-submit-value">').attr({
+        name: el.attr('name'),
+        value: el.attr('value')
+      })
+    );
+  });
+
+  $(document.body).on('submit', '.modal-dialog form', function(event) {
     if (this.method.toLowerCase() == 'post') {
       $.post(this.action, $(this).serialize(), function(data, status, jqXHR) {
-        if (jqXHR.status === 201) {
+        if (jqXHR.status === 201 || jqXHR.status === 204) {  // Created or No content
           $('.modal').modal('hide');
         } else {
           initModal(data);

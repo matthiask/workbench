@@ -90,7 +90,10 @@ class StoryCreateView(CreateView):
             story.project = self.project
             story.save()
 
-            return HttpResponse('Thanks', status=201)  # Created
+            if '_continue' in request.POST:
+                form = self.get_form()
+            else:
+                return HttpResponse('Thanks', status=201)  # Created
 
         return self.render_to_response(self.get_context_data(form=form))
 

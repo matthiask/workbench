@@ -169,6 +169,9 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
             return redirect(self.object)
 
         self.object.delete()
+        if request.is_ajax():
+            return HttpResponse('Thanks', status=204)  # No content
+
         messages.success(
             self.request,
             _('%(class)s "%(object)s" has been successfully deleted.') % {
