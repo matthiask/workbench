@@ -29,4 +29,12 @@ urlpatterns = [
         r'^(?P<pk>\d+)/storyinventory/$',
         views.StoryInventoryView.as_view(),
         name='projects_project_storyinventory'),
+    url(
+        r'^(?P<pk>\d+)/estimation/$',
+        views.EstimationView.as_view(),
+        name='projects_project_estimation'),
+    # url(
+    #     r'^(?P<pk>\d+)/planning/$',
+    #     views.PlanningView.as_view(),
+    #     name='projects_project_planning'),
 ]

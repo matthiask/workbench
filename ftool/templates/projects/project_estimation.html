@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% load bootstrap3 i18n %}
+
+{% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <h1>
+      {% if object %}
+        {% blocktrans %}Update {{ object }}{% endblocktrans %}
+      {% else %}
+        {% blocktrans with class=view.meta.verbose_name %}Create {{ class }}{% endblocktrans %}
+      {% endif %}
+    </h1>
+
+    <form method="POST" action="." class="form-inline fieldset">
+      {% csrf_token %}
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>{% trans 'story' %}</th>
+            {% for servicetype in form.servicetypes %}
+              <th>{{ servicetype }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in form.stories %}
+            {% ifchanged row.story.release %}
+            <tr>
+              <th colspan="6">
+                <h3>
+                  {{ row.story.release }}
+                </h3>
+              </th>
+            </tr>
+            {% endifchanged %}
+            <tr>
+              <td>
+                <strong>
+                  {{ row.story }}
+                </strong><br>
+                {{ row.story.description }}
+              </td>
+              {% for servicetype in row.servicetypes %}
+                <td>{% bootstrap_field servicetype.field layout='inline' %}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% buttons %}
+        <button type="submit" class="btn btn-primary">
+          {% trans 'submit' %}</button>
+      {% endbuttons %}
+    </form>
+
+  </div>
+</div>
+
+<style>
+  .form-inline.fieldset .form-group {
+    margin-bottom: 15px;
+    display: inline-block;
+    width: 100%; }
+  .form-inline.fieldset input,
+  .form-inline.fieldset textarea { width: 100%; }
+</style>
+{% endblock %}

@@ -1,7 +1,8 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import get_object_or_404
 
-from projects.forms import ProjectSearchForm, ProjectForm, StoryFormset
+from projects.forms import (
+    ProjectSearchForm, ProjectForm, StoryFormset, EstimationForm)
 from projects.models import Project, Release
 from tools.views import ListView, DetailView, CreateView, UpdateView
 
@@ -66,3 +67,8 @@ class StoryInventoryView(ProjectViewMixin, UpdateView):
 
     def get_form(self, data=None, files=None, **kwargs):
         return StoryFormset(data, files, **kwargs)
+
+
+class EstimationView(ProjectViewMixin, UpdateView):
+    template_name_suffix = '_estimation'
+    form_class = EstimationForm
