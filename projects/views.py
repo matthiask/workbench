@@ -1,7 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import get_object_or_404
 
-from projects.forms import ProjectSearchForm, ProjectForm
+from projects.forms import ProjectSearchForm, ProjectForm, StoryFormset
 from projects.models import Project, Release
 from tools.views import ListView, DetailView, CreateView, UpdateView
 
@@ -59,3 +59,10 @@ class ReleaseDetailView(ReleaseViewMixin, DetailView):
         except KeyError:
             raise ImproperlyConfigured(
                 "Values 'project_id' and 'pk' not available.")
+
+
+class StoryUpdateView(ProjectViewMixin, UpdateView):
+    template_name_suffix = '_stories'
+
+    def get_form(self, data=None, files=None, **kwargs):
+        return StoryFormset(data, files, **kwargs)

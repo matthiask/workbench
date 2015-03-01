@@ -25,4 +25,8 @@ urlpatterns = [
         r'^(?P<project_id>\d+)/release/(?P<pk>\d+)/$',
         views.ReleaseDetailView.as_view(),
         name='projects_release_detail'),
+    url(
+        r'^(?P<pk>\d+)/stories/$',
+        views.StoryUpdateView.as_view(),
+        name='projects_project_stories'),
 ]
