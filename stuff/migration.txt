@@ -266,7 +266,7 @@ dblink(
 
 INSERT INTO stories_story
 (id, created_at, title, status, position, requested_by_id, description, project_id, release_id)
-SELECT id, NOW(), activity_name, 10, 0, 1, notes, job_id, joboffer_id FROM
+SELECT id, NOW(), substring(notes from 0 for 200), 10, 0, 1, concat(activity_name, ': ', notes), job_id, joboffer_id FROM
 dblink(
     'dbname=fineware_feinheit',
     'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
@@ -282,16 +282,16 @@ dblink(
 
 UPDATE stories_requiredservice SET service_type_id=2
 FROM stories_story s
-WHERE stories_requiredservice.story_id=s.id AND s.title IN ('Konzept', 'Marketing');
+WHERE stories_requiredservice.story_id=s.id AND s.description ~ '^(Konzept:|Marketing:)';
 UPDATE stories_requiredservice SET service_type_id=3
 FROM stories_story s
-WHERE stories_requiredservice.story_id=s.id AND s.title IN ('Grafik', 'Multimedia & Film', '3D');
+WHERE stories_requiredservice.story_id=s.id AND s.description ~'^(Grafik|Multimedia|3D)';
 UPDATE stories_requiredservice SET service_type_id=4
 FROM stories_story s
-WHERE stories_requiredservice.story_id=s.id AND s.title IN ('Programmierung', 'IT-Dienstleistungen');
+WHERE stories_requiredservice.story_id=s.id AND s.description ~ '^(Programmierung|IT-Dienstleistungen)%';
 UPDATE stories_requiredservice SET service_type_id=5
 FROM stories_story s
-WHERE stories_requiredservice.story_id=s.id AND s.title IN ('Projektorganisation', 'Administration', 'Intern');
+WHERE stories_requiredservice.story_id=s.id AND s.description ~ '^(Projektorganisation|Administration|Intern)%';
 
 
 --
@@ -334,7 +334,7 @@ SELECT SETVAL('public.services_renderedservice_id_seq', COALESCE(MAX(id), 1) ) F
 SELECT SETVAL('public.services_servicetype_id_seq', COALESCE(MAX(id), 1) ) FROM public.services_servicetype;
 SELECT SETVAL('public.stories_requiredservice_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_requiredservice;
 SELECT SETVAL('public.stories_story_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_story;
-SELECT SETVAL('public.stories_story_owned_by_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_story_owned_by;
+
 
 --
 -- Autogenerate some data
