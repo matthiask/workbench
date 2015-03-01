@@ -24,3 +24,12 @@ body {
     overflow: scroll !important;
     padding-right: 0 !important;
 }
+
+.form-inline.fieldset .form-group {
+    margin-bottom: 15px;
+    display: inline-block;
+    width: 100%;
+}
+.form-inline.fieldset input,
+.form-inline.fieldset select,
+.form-inline.fieldset textarea { width: 100%; }
