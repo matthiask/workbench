@@ -61,8 +61,8 @@ class ReleaseDetailView(ReleaseViewMixin, DetailView):
                 "Values 'project_id' and 'pk' not available.")
 
 
-class StoryUpdateView(ProjectViewMixin, UpdateView):
-    template_name_suffix = '_stories'
+class StoryInventoryView(ProjectViewMixin, UpdateView):
+    template_name_suffix = '_storyinventory'
 
     def get_form(self, data=None, files=None, **kwargs):
         return StoryFormset(data, files, **kwargs)
