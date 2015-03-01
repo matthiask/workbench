@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.shortcuts import redirect
 
 from services.forms import RenderedServiceForm
@@ -11,8 +10,6 @@ class StoryMixin(object):
 
 
 class StoryDetailView(StoryMixin, DetailView):
-    template_name_suffix = '_detail'
-
     def get_form(self, data=None, files=None, **kwargs):
         kwargs.setdefault('initial', {}).update({
             'rendered_by': self.request.user.pk,
@@ -37,6 +34,6 @@ class StoryDetailView(StoryMixin, DetailView):
             service.story = self.object
             service.save()
 
-            return HttpResponse('Thanks', status=201)  # Created
+            form = self.get_form()
 
         return self.render_to_response(self.get_context_data(form=form))
