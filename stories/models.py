@@ -78,7 +78,7 @@ class Story(models.Model):
     position = models.PositiveIntegerField(_('position'), default=0)
 
     class Meta:
-        ordering = ('position', 'id')
+        ordering = ('release', 'position', 'id')
         verbose_name = _('story')
         verbose_name_plural = _('stories')
 

@@ -1,9 +1,11 @@
 from django.core.exceptions import ImproperlyConfigured
-from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect
 
 from projects.forms import (
-    ProjectSearchForm, ProjectForm, StoryFormset, EstimationForm)
+    ProjectSearchForm, ProjectForm, StoryForm, EstimationForm)
 from projects.models import Project, Release
+from stories.models import Story
 from tools.views import ListView, DetailView, CreateView, UpdateView
 
 
@@ -62,11 +64,35 @@ class ReleaseDetailView(ReleaseViewMixin, DetailView):
                 "Values 'project_id' and 'pk' not available.")
 
 
-class StoryInventoryView(ProjectViewMixin, UpdateView):
-    template_name_suffix = '_storyinventory'
+class StoryCreateView(CreateView):
+    model = Story
+
+    def allow_create(self):
+        self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        return True
 
     def get_form(self, data=None, files=None, **kwargs):
-        return StoryFormset(data, files, **kwargs)
+        kwargs.setdefault('initial', {}).update({
+            'requested_by': self.request.user.id,
+            'owned_by': self.request.user.id,
+            'release': self.project.releases.filter(is_default=True).first(),
+        })
+        return StoryForm(data, files, project=self.project, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if not self.allow_create():
+            return redirect('../')
+
+        form = self.get_form(request.POST, request.FILES)
+        if form.is_valid():
+            story = form.save(commit=False)
+            story.requested_by = self.request.user
+            story.project = self.project
+            story.save()
+
+            return HttpResponse('Thanks', status=201)  # Created
+
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 class EstimationView(ProjectViewMixin, UpdateView):

@@ -39,10 +39,10 @@
     </div>
   </div>
 
+  <a href="{{ project.urls.createstory }}" class="btn btn-default"
+    data-toggle="ajaxmodal">{% trans 'create story' %}</a>
   <a href="{{ project.urls.update }}" class="btn btn-default">
     {% trans 'Update' %}
-  <a href="{{ project.urls.storyinventory }}" class="btn btn-default">
-    {% trans 'story inventory' %}
   <a href="{{ project.urls.estimation }}" class="btn btn-default">
     {% trans 'estimation' %}
   </a>

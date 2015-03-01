@@ -1,11 +1,10 @@
 from collections import defaultdict
 
 from django import forms
-from django.forms.models import inlineformset_factory
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 from contacts.models import Organization, Person
-from projects.models import Project, Release
+from projects.models import Project
 from services.models import ServiceType
 from stories.models import Story, RequiredService
 from tools.forms import ModelForm, Picker, Textarea
@@ -46,26 +45,20 @@ class ProjectForm(ModelForm):
         return data
 
 
-class StoryForm(forms.ModelForm):
+class StoryForm(ModelForm):
+    user_fields = ('owned_by',)
+
     class Meta:
         model = Story
-        fields = ('title', 'description', 'release')
+        fields = ('release', 'title', 'description', 'owned_by')
         widgets = {
             'description': Textarea(),
         }
 
     def __init__(self, *args, **kwargs):
+        self.project = kwargs.pop('project')
         super().__init__(*args, **kwargs)
-        self.fields['release'].queryset = Release.objects.filter(
-            project=self.instance.project_id)
-
-
-StoryFormset = inlineformset_factory(
-    Project,
-    Story,
-    form=StoryForm,
-    can_delete=False,
-    extra=0)
+        self.fields['release'].queryset = self.project.releases.all()
 
 
 class EffortForm(forms.Form):
@@ -122,7 +115,7 @@ class EffortForm(forms.Form):
         for story in self.project.stories.all():
             for type in self.servicetypes:
                 value = self.cleaned_data.get('e_%s_%s' % (story.id, type.id))
-                if value:
+                if value is not None:
                     try:
                         rs = self.requiredservices[story.id][type.id]
                     except KeyError:
