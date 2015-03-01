@@ -1,6 +1,8 @@
+from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.translation import ugettext as _
 
 from projects.forms import (
     ProjectSearchForm, ProjectForm, StoryForm, EstimationForm)
@@ -90,8 +92,15 @@ class StoryCreateView(CreateView):
             story.project = self.project
             story.save()
 
+            messages.success(
+                self.request,
+                _('%(class)s "%(object)s" has been successfully created.') % {
+                    'class': story._meta.verbose_name,
+                    'object': story,
+                })
+
             if '_continue' in request.POST:
-                form = self.get_form()
+                return redirect('.')
             else:
                 return HttpResponse('Thanks', status=201)  # Created
 

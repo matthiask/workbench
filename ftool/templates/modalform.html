@@ -11,6 +11,7 @@
           </h4>
         </div>
         <div class="modal-body clearfix">
+          {% bootstrap_messages %}
           {% csrf_token %}
           {% block body %}
             {% bootstrap_form form layout='horizontal' %}

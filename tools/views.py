@@ -109,14 +109,14 @@ class CreateView(ToolsMixin, vanilla.CreateView):
 
     def form_valid(self, form):
         self.object = form.save()
-        if self.request.is_ajax():
-            return HttpResponse('Thanks', status=201)  # Created
         messages.success(
             self.request,
             _('%(class)s "%(object)s" has been successfully created.') % {
                 'class': self.object._meta.verbose_name,
                 'object': self.object,
             })
+        if self.request.is_ajax():
+            return HttpResponse('Thanks', status=201)  # Created
         return redirect(self.get_success_url())
 
 
@@ -169,13 +169,12 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
             return redirect(self.object)
 
         self.object.delete()
-        if request.is_ajax():
-            return HttpResponse('Thanks', status=204)  # No content
-
         messages.success(
             self.request,
             _('%(class)s "%(object)s" has been successfully deleted.') % {
                 'class': self.model._meta.verbose_name,
                 'object': self.object,
             })
+        if request.is_ajax():
+            return HttpResponse('Thanks', status=204)  # No content
         return redirect(self.model().urls.url('list'))
