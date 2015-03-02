@@ -1,7 +1,7 @@
 from django.db.models.deletion import Collector
 
 
-def related_classes(instance):
+def related_classes(instance, include_auto_created=True):
     """
     Return all classes which would be deleted if the passed instance
     were deleted too by employing the cascade machinery of Django
@@ -20,4 +20,7 @@ def related_classes(instance):
     # instances but we don't have to tell anybody :-)
     # instance._collected_objects = collector.data
 
-    return set(collector.data.keys())
+    models = list(collector.data.keys())
+    if not include_auto_created:
+        models = [m for m in models if not m._meta.auto_created]
+    return set(models)

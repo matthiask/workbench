@@ -172,3 +172,8 @@ class PostalAddress(PersonDetail):
     @property
     def urls(self):
         return self.person.urls
+
+
+Organization.allow_delete_if_only = {Organization}
+Person.allow_delete_if_only = {
+    Person, PhoneNumber, EmailAddress, PostalAddress}

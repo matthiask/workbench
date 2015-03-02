@@ -219,3 +219,7 @@ class RenderedService(ProtectRelationsModel):
 
     def __str__(self):
         return self.description
+
+
+Story.allow_delete_if_only = {Story, RequiredService}
+RequiredService.allow_delete_if_only = {RequiredService}

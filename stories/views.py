@@ -7,7 +7,6 @@ from tools.views import ListView, DetailView, CreateView, DeleteView
 
 
 class StoryMixin(object):
-    allow_delete_if_only = {Story}
     model = Story
 
 

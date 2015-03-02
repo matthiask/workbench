@@ -5,21 +5,17 @@ from django.shortcuts import redirect
 from contacts.forms import (
     OrganizationSearchForm, OrganizationForm, PersonForm, PhoneNumberFormset,
     EmailAddressFormset, PostalAddressFormset)
-from contacts.models import (
-    Organization, Person, PhoneNumber, EmailAddress, PostalAddress)
+from contacts.models import Organization, Person
 from tools.views import (
     ListView, DetailView, CreateView, UpdateView, DeleteView)
 
 
 class OrganizationViewMixin(object):
     model = Organization
-    allow_delete_if_only = {Organization}
 
 
 class PersonViewMixin(object):
     model = Person
-    allow_delete_if_only = {
-        Person, PhoneNumber, EmailAddress, PostalAddress}
 
 
 class OrganizationListView(OrganizationViewMixin, ListView):

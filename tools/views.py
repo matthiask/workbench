@@ -45,12 +45,11 @@ class ToolsMixin(object):
     def allow_update(self):
         return True
 
-    allow_delete_if_only = None
-
     def allow_delete(self):
-        if self.allow_delete_if_only:
+        if self.model.allow_delete_if_only:
             try:
-                if related_classes(self.object) <= self.allow_delete_if_only:
+                rel = related_classes(self.object, include_auto_created=False)
+                if rel <= self.model.allow_delete_if_only:
                     return True
             except ProtectedError:
                 pass
