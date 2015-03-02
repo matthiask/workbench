@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
 from contacts.models import Organization, Person
-from tools.models import SearchManager, ProtectRelationsModel
+from tools.models import SearchManager
 from tools.urls import model_urls
 
 
@@ -20,7 +20,7 @@ class ProjectManager(SearchManager):
 
 
 @model_urls()
-class Project(ProtectRelationsModel):
+class Project(models.Model):
     IN_PREPARATION = 10
     WORK_IN_PROGRESS = 20
     FINISHED = 30
@@ -33,16 +33,16 @@ class Project(ProtectRelationsModel):
 
     customer = models.ForeignKey(
         Organization,
+        on_delete=models.PROTECT,
         verbose_name=_('customer'),
-        related_name='+',
-        on_delete=models.PROTECT)
+        related_name='+')
     contact = models.ForeignKey(
         Person,
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
         verbose_name=_('contact'),
-        related_name='+',
-        on_delete=models.SET_NULL)
+        related_name='+')
 
     title = models.CharField(
         _('title'),
@@ -52,6 +52,7 @@ class Project(ProtectRelationsModel):
         blank=True)
     owned_by = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         verbose_name=_('owned by'),
         related_name='+')
 
@@ -131,9 +132,10 @@ class Project(ProtectRelationsModel):
 
 
 @model_urls(lambda object: {'project_id': object.project_id, 'pk': object.pk})
-class Release(ProtectRelationsModel):
+class Release(models.Model):
     project = models.ForeignKey(
         Project,
+        on_delete=models.CASCADE,
         verbose_name=_('project'),
         related_name='releases')
 

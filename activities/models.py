@@ -5,19 +5,20 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.models import User
 from contacts.models import Person
 from deals.models import Deal
-from tools.models import ProtectRelationsModel
 from tools.urls import model_urls
 
 
 @model_urls()
-class Activity(ProtectRelationsModel):
+class Activity(models.Model):
     contact = models.ForeignKey(
         Person,
+        on_delete=models.PROTECT,
         verbose_name=_('contact'),
         related_name='activities',
     )
     deal = models.ForeignKey(
         Deal,
+        on_delete=models.SET_NULL,
         verbose_name=_('deal'),
         blank=True,
         null=True,
@@ -26,6 +27,7 @@ class Activity(ProtectRelationsModel):
     title = models.CharField(_('title'), max_length=200)
     owned_by = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         verbose_name=_('owned by'),
         related_name='activities',
     )

@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
-from tools.models import SearchManager, ProtectRelationsModel
+from tools.models import SearchManager
 from tools.urls import model_urls
 
 
@@ -22,11 +22,12 @@ class Group(models.Model):
 
 
 @model_urls()
-class Organization(ProtectRelationsModel):
+class Organization(models.Model):
     name = models.TextField(_('name'))
     notes = models.TextField(_('notes'), blank=True)
     primary_contact = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         verbose_name=_('primary contact'),
         related_name='+')
     groups = models.ManyToManyField(
@@ -46,7 +47,7 @@ class Organization(ProtectRelationsModel):
 
 
 @model_urls()
-class Person(ProtectRelationsModel):
+class Person(models.Model):
     full_name = models.CharField(_('full name'), max_length=100)
     address = models.CharField(
         _('address'),
@@ -56,11 +57,13 @@ class Person(ProtectRelationsModel):
     notes = models.TextField(_('notes'), blank=True)
     organization = models.ForeignKey(
         Organization,
+        on_delete=models.PROTECT,
         blank=True, null=True,
         verbose_name=_('organization'),
         related_name='people')
     primary_contact = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         verbose_name=_('primary contact'),
         related_name='+')
     groups = models.ManyToManyField(
@@ -108,6 +111,7 @@ class PersonDetail(models.Model):
 class PhoneNumber(PersonDetail):
     person = models.ForeignKey(
         Person,
+        on_delete=models.CASCADE,
         verbose_name=_('person'),
         related_name='phonenumbers')
     phone_number = models.CharField(_('phone number'), max_length=100)
@@ -131,6 +135,7 @@ class PhoneNumber(PersonDetail):
 class EmailAddress(PersonDetail):
     person = models.ForeignKey(
         Person,
+        on_delete=models.CASCADE,
         verbose_name=_('person'),
         related_name='emailaddresses')
     email = models.EmailField(_('email'), max_length=254)
@@ -154,6 +159,7 @@ class EmailAddress(PersonDetail):
 class PostalAddress(PersonDetail):
     person = models.ForeignKey(
         Person,
+        on_delete=models.CASCADE,
         verbose_name=_('person'),
         related_name='postaladdresses')
     postal_address = models.TextField(_('postal address'))

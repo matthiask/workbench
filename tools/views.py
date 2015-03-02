@@ -1,14 +1,13 @@
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import ProtectedError
+from django.db.models.deletion import Collector
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 
 import vanilla
-
-from tools.deletion import related_classes
 
 
 class ToolsMixin(object):
@@ -46,28 +45,23 @@ class ToolsMixin(object):
         return True
 
     def allow_delete(self):
-        if self.model.allow_delete_if_only:
-            try:
-                rel = related_classes(self.object, include_auto_created=False)
-                if rel <= self.model.allow_delete_if_only:
-                    return True
-            except ProtectedError:
-                pass
-
+        collector = Collector(using=self.object._state.db)
+        try:
+            collector.collect([self.object])
+        except ProtectedError as exc:
             messages.error(
                 self.request,
-                _('Cannot delete "%s" because of related objects.')
-                % self.object)
+                _(
+                    'Cannot delete \'%(object)s\''
+                    ' because of related objects (%(related)s).'
+                ) % {
+                    'object': self.object,
+                    'related': ', '.join(
+                        str(o) for o in exc.protected_objects[:10]),
+                })
             return False
-
-        messages.error(
-            self.request,
-            _('Deletion of %(class)s "%(object)s" is not allowed.') % {
-                'class': self.object._meta.verbose_name,
-                'object': self.object,
-            })
-
-        return False
+        else:
+            return True
 
 
 class ListView(ToolsMixin, vanilla.ListView):

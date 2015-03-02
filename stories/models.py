@@ -7,12 +7,11 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.models import User
 from projects.models import Project, Release
 from services.models import ServiceType
-from tools.models import ProtectRelationsModel
 from tools.urls import model_urls
 
 
 @model_urls()
-class Story(ProtectRelationsModel):
+class Story(models.Model):
     UNSCHEDULED = 10
     SCHEDULED = 20
     STARTED = 30
@@ -36,10 +35,12 @@ class Story(ProtectRelationsModel):
         default=timezone.now)
     requested_by = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         verbose_name=_('requested by'),
         related_name='+')
     owned_by = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         blank=True,
         null=True,
         verbose_name=_('owned by'),
@@ -53,15 +54,16 @@ class Story(ProtectRelationsModel):
 
     project = models.ForeignKey(
         Project,
+        on_delete=models.PROTECT,
         verbose_name=_('project'),
         related_name='stories')
     release = models.ForeignKey(
         Release,
+        on_delete=models.SET_NULL,
         verbose_name=_('release'),
         related_name='stories',
         blank=True,
-        null=True,
-        on_delete=models.SET_NULL)
+        null=True)
 
     status = models.PositiveIntegerField(
         _('status'),
@@ -134,14 +136,16 @@ class Story(ProtectRelationsModel):
             self.delete()
 
 
-class RequiredService(ProtectRelationsModel):
+class RequiredService(models.Model):
     story = models.ForeignKey(
         Story,
+        on_delete=models.CASCADE,
         verbose_name=_('story'),
         related_name='requiredservices',
     )
     service_type = models.ForeignKey(
         ServiceType,
+        on_delete=models.PROTECT,
         verbose_name=_('service type'),
         related_name='+',
     )
@@ -181,9 +185,10 @@ class RequiredService(ProtectRelationsModel):
 
 
 @model_urls()
-class RenderedService(ProtectRelationsModel):
+class RenderedService(models.Model):
     story = models.ForeignKey(
         Story,
+        on_delete=models.PROTECT,
         verbose_name=_('story'),
         related_name='renderedservices',
     )
@@ -193,6 +198,7 @@ class RenderedService(ProtectRelationsModel):
     )
     created_by = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         verbose_name=_('created by'),
         related_name='+',
     )
@@ -202,6 +208,7 @@ class RenderedService(ProtectRelationsModel):
     )
     rendered_by = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         verbose_name=_('rendered by'),
         related_name='renderedservices',
     )

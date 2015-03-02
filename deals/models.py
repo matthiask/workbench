@@ -6,12 +6,12 @@ import reversion
 
 from accounts.models import User
 from tools.history import changes
-from tools.models import SearchManager, ProtectRelationsModel
+from tools.models import SearchManager
 from tools.urls import model_urls
 
 
 @model_urls()
-class Funnel(ProtectRelationsModel):
+class Funnel(models.Model):
     title = models.CharField(
         _('funnel'),
         max_length=200)
@@ -26,7 +26,7 @@ class Funnel(ProtectRelationsModel):
 
 
 @model_urls()
-class Deal(ProtectRelationsModel):
+class Deal(models.Model):
     INITIAL = 10
     NEGOTIATING = 20
     IMPROBABLE = 30
@@ -47,6 +47,7 @@ class Deal(ProtectRelationsModel):
 
     funnel = models.ForeignKey(
         Funnel,
+        on_delete=models.PROTECT,
         verbose_name=_('funnel'),
         related_name='deals')
 
@@ -58,6 +59,7 @@ class Deal(ProtectRelationsModel):
         blank=True)
     owned_by = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         verbose_name=_('owned by'),
         related_name='+')
     estimated_value = models.DecimalField(

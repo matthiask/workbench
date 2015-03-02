@@ -1,10 +1,8 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from tools.models import ProtectRelationsModel
 
-
-class ServiceType(ProtectRelationsModel):
+class ServiceType(models.Model):
     title = models.CharField(
         _('title'),
         max_length=40)
