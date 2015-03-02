@@ -156,6 +156,10 @@ class Release(ProtectRelationsModel):
     def __str__(self):
         return self.title
 
+    @property
+    def urls(self):
+        return self.project.urls
+
 
 Project.allow_delete_if_only = {Project, Release}
 Release.allow_delete_if_only = {Release}

@@ -1,37 +1,47 @@
 from django.conf.urls import url
 
-from projects import views
+from projects.forms import ProjectForm
+from projects.models import Project
+from projects.views import ProjectListView, StoryCreateView, EstimationView
+from tools.views import (
+    DetailView, CreateView, UpdateView, DeleteView)
 
 
 urlpatterns = [
     url(
         r'^$',
-        views.ProjectListView.as_view(),
+        ProjectListView.as_view(),
         name='projects_project_list'),
     url(
         r'^(?P<pk>\d+)/$',
-        views.ProjectDetailView.as_view(),
+        DetailView.as_view(model=Project),
         name='projects_project_detail'),
     url(
         r'^create/$',
-        views.ProjectCreateView.as_view(),
+        CreateView.as_view(
+            form_class=ProjectForm,
+            model=Project,
+        ),
         name='projects_project_create'),
     url(
         r'^(?P<pk>\d+)/update/$',
-        views.ProjectUpdateView.as_view(),
+        UpdateView.as_view(
+            form_class=ProjectForm,
+            model=Project,
+        ),
         name='projects_project_update'),
+    url(
+        r'^(?P<pk>\d+)/delete/$',
+        DeleteView.as_view(model=Project),
+        name='projects_project_delete'),
 
     url(
-        r'^(?P<project_id>\d+)/release/(?P<pk>\d+)/$',
-        views.ReleaseDetailView.as_view(),
-        name='projects_release_detail'),
-    url(
         r'^(?P<pk>\d+)/createstory/$',
-        views.StoryCreateView.as_view(),
+        StoryCreateView.as_view(),
         name='projects_project_createstory'),
     url(
         r'^(?P<pk>\d+)/estimation/$',
-        views.EstimationView.as_view(),
+        EstimationView.as_view(),
         name='projects_project_estimation'),
     # url(
     #     r'^(?P<pk>\d+)/planning/$',
