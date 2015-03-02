@@ -86,7 +86,7 @@ class Story(ProtectRelationsModel):
         verbose_name_plural = _('stories')
 
     def __str__(self):
-        return self.title
+        return '%s (#%s)' % (self.title, self.pk)
 
     def overview(self):
         from django.db.models import Sum
