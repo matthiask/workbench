@@ -114,6 +114,8 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 86400
 # SESSION_COOKIE_SECURE = True
 
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
 BOOTSTRAP3 = {
     'horizontal_label_class': 'col-md-3',
     'horizontal_field_class': 'col-md-9',

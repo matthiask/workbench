@@ -1,5 +1,7 @@
+from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.translation import ugettext as _
 
 from stories.forms import RenderedServiceForm, MergeStoryForm
 from stories.models import Story, RenderedService
@@ -36,6 +38,13 @@ class StoryDetailView(StoryMixin, DetailView):
             service.save()
 
             form = self.get_form()
+
+            messages.success(
+                self.request,
+                _('%(class)s "%(object)s" has been successfully created.') % {
+                    'class': service._meta.verbose_name,
+                    'object': service,
+                })
 
         return self.render_to_response(self.get_context_data(form=form))
 
