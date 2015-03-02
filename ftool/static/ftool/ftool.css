@@ -20,15 +20,15 @@
 }
 
 body {
-    /* Work-around for https://github.com/twbs/bootstrap/issues/9855 */
-    overflow: scroll !important;
-    padding-right: 0 !important;
+  /* Work-around for https://github.com/twbs/bootstrap/issues/9855 */
+  overflow: scroll !important;
+  padding-right: 0 !important;
 }
 
 .form-inline.fieldset .form-group {
-    margin-bottom: 15px;
-    display: inline-block;
-    width: 100%;
+  margin-bottom: 15px;
+  display: inline-block;
+  width: 100%;
 }
 .form-inline.fieldset input,
 .form-inline.fieldset select,
