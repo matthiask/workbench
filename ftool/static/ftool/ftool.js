@@ -38,7 +38,8 @@ $(function() {
   $(document.body).on('submit', '.modal-dialog form', function(event) {
     if (this.method.toLowerCase() == 'post') {
       $.post(this.action, $(this).serialize(), function(data, status, jqXHR) {
-        if (jqXHR.status === 201 || jqXHR.status === 204) {  // Created or No content
+        // 201 CREATED, 202 ACCEPTED or 204 NO CONTENT
+        if (jqXHR.status === 201 || jqXHR.status === 202 || jqXHR.status === 204) {
           $('.modal').modal('hide');
         } else {
           initModal(data);

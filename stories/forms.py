@@ -9,6 +9,7 @@ from tools.forms import ModelForm
 
 class RenderedServiceForm(ModelForm):
     user_fields = ('rendered_by',)
+    default_to_current_user = user_fields
 
     class Meta:
         model = RenderedService
@@ -27,7 +28,7 @@ class MergeStoryForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        self.story = kwargs.pop('story')
+        self.story = kwargs.pop('instance')
         super().__init__(*args, **kwargs)
 
         stories = self.story.project.stories.exclude(pk=self.story.pk)
@@ -36,3 +37,8 @@ class MergeStoryForm(forms.Form):
             for key, group
             in itertools.groupby(stories, key=lambda story: story.release)
         ]
+
+    def save(self):
+        merge_into = self.cleaned_data['merge_into']
+        self.story.merge_into(merge_into)
+        return merge_into

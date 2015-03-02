@@ -166,6 +166,8 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
                 'class': self.object._meta.verbose_name,
                 'object': self.object,
             })
+        if self.request.is_ajax():
+            return HttpResponse('Thanks', status=202)  # Accepted
         return redirect(self.get_success_url())
 
 
