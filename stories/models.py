@@ -1,6 +1,6 @@
 from datetime import date
 
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -104,6 +104,32 @@ class Story(models.Model):
         )
 
         return list(required), list(rendered)
+
+    def merge_into(self, story):
+        with transaction.atomic():
+            story_rs = dict(
+                (rs.service_type, rs)
+                for rs in story.requiredservices.all())
+
+            for rs in self.requiredservices.all():
+                if rs.service_type in story_rs:
+                    obj = story_rs[rs.service_type]
+                else:
+                    obj = story_rs.requiredservices.model(
+                        story=story,
+                        service_type=rs.service_type,
+                        estimated_effort=0,
+                        offered_effort=0,
+                        planning_effort=0,
+                    )
+
+                obj.estimated_effort += rs.estimated_effort
+                obj.offered_effort += rs.offered_effort
+                obj.planning_effort += rs.planning_effort
+                obj.save()
+
+            self.renderedservices.update(story=story)
+            self.delete()
 
 
 class RequiredService(models.Model):

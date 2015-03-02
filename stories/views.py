@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 
-from stories.forms import RenderedServiceForm
+from stories.forms import RenderedServiceForm, MergeStoryForm
 from stories.models import Story, RenderedService
 from tools.views import ListView, DetailView, CreateView, DeleteView
 
@@ -43,6 +43,31 @@ class StoryDetailView(StoryMixin, DetailView):
 
 class StoryDeleteView(StoryMixin, DeleteView):
     pass
+
+
+class StoryMergeView(StoryMixin, DetailView):
+    template_name = 'modalform.html'
+
+    def get_form(self, data=None, files=None, **kwargs):
+        kwargs['story'] = self.object
+        return MergeStoryForm(data, files, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs['title'] = self.object
+
+        if 'form' not in kwargs:
+            kwargs['form'] = self.get_form()
+
+        return super().get_context_data(**kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form(request.POST, request.FILES)
+        if form.is_valid():
+            self.object.merge_into(form.cleaned_data['merge_into'])
+            return HttpResponse('Thanks', status=204)
+
+        return super().get_context_data(**kwargs)
 
 
 class RenderedServiceMixin(object):

@@ -12,6 +12,10 @@ urlpatterns = [
         r'^(?P<pk>\d+)/delete/$',
         views.StoryDeleteView.as_view(),
         name='stories_story_delete'),
+    url(
+        r'^(?P<pk>\d+)/merge/$',
+        views.StoryMergeView.as_view(),
+        name='stories_story_merge'),
 
     url(
         r'^rendered/$',

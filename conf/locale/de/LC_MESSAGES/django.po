@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-02 11:43+0100\n"
+"POT-Creation-Date: 2015-03-02 13:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -111,7 +111,7 @@ msgid "Duration in hours (if applicable)."
 msgstr "Dauer in Stunden (falls zutreffend)."
 
 #: activities/models.py:50 deals/models.py:73 stories/models.py:34
-#: stories/models.py:163
+#: stories/models.py:189
 msgid "created at"
 msgstr "Erstellt um"
 
@@ -268,7 +268,7 @@ msgid "declined"
 msgstr "Abgelehnt"
 
 #: deals/models.py:56 ftool/templates/deals/deal_detail.html:21
-#: projects/models.py:51 stories/models.py:50 stories/models.py:185
+#: projects/models.py:51 stories/models.py:50 stories/models.py:211
 msgid "description"
 msgstr "Beschreibung"
 
@@ -397,17 +397,15 @@ msgstr "Versionen und Stories"
 
 #: ftool/templates/projects/project_detail.html:43
 #: ftool/templates/stories/story_form.html:6
-#| msgid "created at"
 msgid "create story"
 msgstr "Story erstellen"
 
 #: ftool/templates/projects/project_detail.html:47
-#| msgid "description"
 msgid "estimation"
 msgstr "Schätzung"
 
 #: ftool/templates/projects/project_estimation.html:24 stories/models.py:84
-#: stories/models.py:112 stories/models.py:159
+#: stories/models.py:138 stories/models.py:185
 msgid "story"
 msgstr "Story"
 
@@ -435,16 +433,19 @@ msgstr "Abbruch"
 msgid "overview"
 msgstr "Übersicht"
 
-#: ftool/templates/stories/story_detail.html:38 stories/models.py:189
+#: ftool/templates/stories/story_detail.html:38 stories/models.py:215
 msgid "rendered service"
 msgstr "erbrachte Leistung"
 
 #: ftool/templates/stories/story_detail.html:42
-#| msgid "created at"
 msgid "create"
 msgstr "erstellen"
 
 #: ftool/templates/stories/story_detail.html:54
+msgid "Merge"
+msgstr "Zusammenführen"
+
+#: ftool/templates/stories/story_detail.html:57
 msgid "Close"
 msgstr "Schliessen"
 
@@ -506,7 +507,7 @@ msgstr "%(class)s \"%(object)s\" wurde erfolgreich erstellt."
 msgid "billing per hour"
 msgstr "Verrechnung pro Stunde"
 
-#: services/models.py:21 stories/models.py:117
+#: services/models.py:21 stories/models.py:143
 msgid "service type"
 msgstr "Leistungstyp"
 
@@ -554,27 +555,27 @@ msgstr "Dieses Feld sollte meistens leer gelassen werden."
 msgid "stories"
 msgstr "Stories"
 
-#: stories/models.py:121
+#: stories/models.py:147
 msgid "estimated effort"
 msgstr "geschätzter Aufwand"
 
-#: stories/models.py:124
+#: stories/models.py:150
 msgid "The original estimate."
 msgstr "Die ursprüngliche Schätzung."
 
-#: stories/models.py:126
+#: stories/models.py:152
 msgid "offered effort"
 msgstr "offerierter Aufwand"
 
-#: stories/models.py:129
+#: stories/models.py:155
 msgid "Effort offered to the customer."
 msgstr "Aufwand welcher dem Kunden offeriert wurde."
 
-#: stories/models.py:131
+#: stories/models.py:157
 msgid "planning effort"
 msgstr "Aufwand für Planung"
 
-#: stories/models.py:135
+#: stories/models.py:161
 msgid ""
 "Effort for planning. This value should reflect the current  state of affairs "
 "also when work is already in progress."
@@ -582,31 +583,31 @@ msgstr ""
 "Aufwand für Planung. Dieser Wert sollte den aktuellen Wissenstand abbilden, "
 "auch wenn schon gearbeitet wird."
 
-#: stories/models.py:141
+#: stories/models.py:167
 msgid "required service"
 msgstr "benötigte Leistung"
 
-#: stories/models.py:142
+#: stories/models.py:168
 msgid "required services"
 msgstr "benötigte Leistungen"
 
-#: stories/models.py:168
+#: stories/models.py:194
 msgid "created by"
 msgstr "Erstellt von"
 
-#: stories/models.py:172
+#: stories/models.py:198
 msgid "rendered on"
 msgstr "Erbracht am"
 
-#: stories/models.py:177
+#: stories/models.py:203
 msgid "rendered by"
 msgstr "Erbracht von"
 
-#: stories/models.py:181
+#: stories/models.py:207
 msgid "hours"
 msgstr "Stunden"
 
-#: stories/models.py:190
+#: stories/models.py:216
 msgid "rendered services"
 msgstr "erbrachte Leistungen"
 
