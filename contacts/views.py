@@ -1,12 +1,6 @@
-from collections import OrderedDict
-
-from django.shortcuts import redirect
-
-from contacts.forms import (
-    OrganizationSearchForm, PersonForm, PhoneNumberFormset,
-    EmailAddressFormset, PostalAddressFormset)
+from contacts.forms import OrganizationSearchForm
 from contacts.models import Person
-from tools.views import ListView, UpdateView
+from tools.views import ListView
 
 
 class PersonListView(ListView):
@@ -28,38 +22,3 @@ class PersonListView(ListView):
                 ' ORDER BY weight DESC LIMIT 1)'
             ),
         })
-
-
-class PersonUpdateView(UpdateView):
-    form_class = PersonForm
-    model = Person
-
-    def get_form(self, data=None, files=None, **kwargs):
-        form_class = self.get_form_class()
-
-        kw = {'data': data, 'files': files, 'instance': self.object}
-        self.formsets = OrderedDict((
-            ('phonenumbers', PhoneNumberFormset(**kw)),
-            ('emailaddresses', EmailAddressFormset(**kw)),
-            ('postaladdresses', PostalAddressFormset(**kw)),
-        ))
-
-        return form_class(data, files, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if not self.allow_update():
-            return redirect(self.object)
-
-        form = self.get_form(
-            data=request.POST, files=request.FILES, instance=self.object)
-        if form.is_valid() and all(
-                f.is_valid() for f in self.formsets.values()):
-            return self.form_valid(form)
-        return self.form_invalid(form)
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        for formset in self.formsets.values():
-            formset.save()
-        return response

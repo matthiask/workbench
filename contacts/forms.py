@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django import forms
 from django.forms.models import inlineformset_factory
 from django.utils.translation import ugettext_lazy as _
@@ -55,6 +57,25 @@ class PersonForm(ModelForm):
             'organization': Picker(model=Organization),
             'groups': forms.CheckboxSelectMultiple(),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.formsets = OrderedDict((
+            ('phonenumbers', PhoneNumberFormset(*args, **kwargs)),
+            ('emailaddresses', EmailAddressFormset(*args, **kwargs)),
+            ('postaladdresses', PostalAddressFormset(*args, **kwargs)),
+        )) if self.instance.pk else OrderedDict()
+
+    def is_valid(self):
+        return all(
+            [super().is_valid()] +
+            [formset.is_valid() for formset in self.formsets.values()])
+
+    def save(self, commit=True):
+        instance = super().save()
+        for formset in self.formsets.values():
+            formset.save()
+        return instance
 
 
 PhoneNumberFormset = inlineformset_factory(

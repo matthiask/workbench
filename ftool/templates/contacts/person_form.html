@@ -19,13 +19,13 @@
       {% csrf_token %}
       {% bootstrap_form form layout='horizontal' %}
 
-      {% if view.formsets %}
+      {% if form.formsets %}
       <div class="row">
         <label class="col-md-3 control-label">
           {% trans 'phone numbers' %}
         </label>
         <div class="col-md-9 form-inline fieldset">
-          {% formset view.formsets.phonenumbers "phonenumbers" %}
+          {% formset form.formsets.phonenumbers "phonenumbers" %}
             <div class="row" id="{{ form_id }}">
               <div class="col-md-4">
                 {{ form.id }}
@@ -39,7 +39,8 @@
               </div>
             </div>
           {% endformset %}
-          <a class="btn btn-default pull-right" href="javascript:addInlineForm('phonenumbers')">
+          <a class="btn btn-default pull-right" href="#"
+            onclick="return addInlineForm('phonenumbers')">
             <span class="glyphicon glyphicon-plus"></span>
           </a>
         </div>
@@ -50,7 +51,7 @@
           {% trans 'email addresses' %}
         </label>
         <div class="col-md-9 form-inline fieldset">
-          {% formset view.formsets.emailaddresses "emailaddresses" %}
+          {% formset form.formsets.emailaddresses "emailaddresses" %}
             <div class="row" id="{{ form_id }}">
               <div class="col-md-4">
                 {{ form.id }}
@@ -64,7 +65,8 @@
               </div>
             </div>
           {% endformset %}
-          <a class="btn btn-default pull-right" href="javascript:addInlineForm('emailaddresses')">
+          <a class="btn btn-default pull-right" href="#"
+            onclick="return addInlineForm('emailaddresses')">
             <span class="glyphicon glyphicon-plus"></span>
           </a>
         </div>
@@ -75,7 +77,7 @@
           {% trans 'postal addresses' %}
         </label>
         <div class="col-md-9 form-inline fieldset">
-          {% formset view.formsets.postaladdresses "postaladdresses" %}
+          {% formset form.formsets.postaladdresses "postaladdresses" %}
             <div class="row" id="{{ form_id }}">
               <div class="col-md-4">
                 {{ form.id }}
@@ -89,7 +91,8 @@
               </div>
             </div>
           {% endformset %}
-          <a class="btn btn-default pull-right" href="javascript:addInlineForm('postaladdresses')">
+          <a class="btn btn-default pull-right" href="#"
+            onclick="return addInlineForm('postaladdresses')">
             <span class="glyphicon glyphicon-plus"></span>
           </a>
         </div>
