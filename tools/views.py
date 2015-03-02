@@ -131,6 +131,7 @@ class CreateView(ToolsMixin, vanilla.CreateView):
                 'object': self.object,
             })
         if self.request.is_ajax():
+            # TODO Show messages in the popup?
             return HttpResponse('Thanks', status=201)  # Created
         return redirect(self.get_success_url())
 
