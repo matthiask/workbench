@@ -16,9 +16,20 @@ class OrganizationSearchForm(forms.Form):
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
 
+    def filter(self, queryset):
+        if not self.is_valid():
+            return queryset
+
+        data = self.cleaned_data
+
+        if data.get('g'):
+            queryset = queryset.filter(groups=data.get('g'))
+        return queryset
+
 
 class OrganizationForm(ModelForm):
     user_fields = ('primary_contact',)
+    default_to_current_user = user_fields
 
     class Meta:
         model = Organization
@@ -32,6 +43,7 @@ class OrganizationForm(ModelForm):
 
 class PersonForm(ModelForm):
     user_fields = ('primary_contact',)
+    default_to_current_user = user_fields
 
     class Meta:
         model = Person

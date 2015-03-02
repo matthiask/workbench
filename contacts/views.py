@@ -3,72 +3,18 @@ from collections import OrderedDict
 from django.shortcuts import redirect
 
 from contacts.forms import (
-    OrganizationSearchForm, OrganizationForm, PersonForm, PhoneNumberFormset,
+    OrganizationSearchForm, PersonForm, PhoneNumberFormset,
     EmailAddressFormset, PostalAddressFormset)
-from contacts.models import Organization, Person
-from tools.views import (
-    ListView, DetailView, CreateView, UpdateView, DeleteView)
+from contacts.models import Person
+from tools.views import ListView, UpdateView
 
 
-class OrganizationViewMixin(object):
-    model = Organization
-
-
-class PersonViewMixin(object):
+class PersonListView(ListView):
     model = Person
+    search_form_class = OrganizationSearchForm
 
-
-class OrganizationListView(OrganizationViewMixin, ListView):
     def get_queryset(self):
-        queryset = super().get_queryset()
-
-        self.search_form = OrganizationSearchForm(self.request.GET)
-        if self.search_form.is_valid():
-            data = self.search_form.cleaned_data
-            if data.get('g'):
-                queryset = queryset.filter(groups=data.get('g'))
-
-        return queryset
-
-
-class OrganizationPickerView(OrganizationListView):
-    template_name_suffix = '_picker'
-
-
-class OrganizationDetailView(OrganizationViewMixin, DetailView):
-    pass
-
-
-class OrganizationCreateView(OrganizationViewMixin, CreateView):
-    form_class = OrganizationForm
-
-    def get_form(self, data=None, files=None, **kwargs):
-        kwargs.setdefault('initial', {}).update({
-            'primary_contact': self.request.user.pk,
-        })
-        form_class = self.get_form_class()
-        return form_class(data, files, **kwargs)
-
-
-class OrganizationUpdateView(OrganizationViewMixin, UpdateView):
-    form_class = OrganizationForm
-
-
-class OrganizationDeleteView(OrganizationViewMixin, DeleteView):
-    pass
-
-
-class PersonListView(PersonViewMixin, ListView):
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        self.search_form = OrganizationSearchForm(self.request.GET)
-        if self.search_form.is_valid():
-            data = self.search_form.cleaned_data
-            if data.get('g'):
-                queryset = queryset.filter(groups=data.get('g'))
-
-        return queryset.select_related(
+        return super().get_queryset().select_related(
             'organization',
         ).extra(select={
             'email': (
@@ -84,27 +30,9 @@ class PersonListView(PersonViewMixin, ListView):
         })
 
 
-class PersonPickerView(PersonListView):
-    template_name_suffix = '_picker'
-
-
-class PersonDetailView(PersonViewMixin, DetailView):
-    pass
-
-
-class PersonCreateView(PersonViewMixin, CreateView):
+class PersonUpdateView(UpdateView):
     form_class = PersonForm
-
-    def get_form(self, data=None, files=None, **kwargs):
-        kwargs.setdefault('initial', {}).update({
-            'primary_contact': self.request.user.pk,
-        })
-        form_class = self.get_form_class()
-        return form_class(data, files, **kwargs)
-
-
-class PersonUpdateView(PersonViewMixin, UpdateView):
-    form_class = PersonForm
+    model = Person
 
     def get_form(self, data=None, files=None, **kwargs):
         form_class = self.get_form_class()
@@ -135,7 +63,3 @@ class PersonUpdateView(PersonViewMixin, UpdateView):
         for formset in self.formsets.values():
             formset.save()
         return response
-
-
-class PersonDeleteView(PersonViewMixin, DeleteView):
-    pass

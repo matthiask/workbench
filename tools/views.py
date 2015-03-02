@@ -72,12 +72,21 @@ class ToolsMixin(object):
 
 class ListView(ToolsMixin, vanilla.ListView):
     paginate_by = 50
+    search_form_class = None
 
     def get_queryset(self):
         self.root_queryset = self.model.objects.all()
 
         q = self.request.GET.get('q')
-        return self.root_queryset.search(q) if q else self.root_queryset.all()
+        queryset = (
+            self.root_queryset.search(q) if q
+            else self.root_queryset.all())
+
+        if self.search_form_class:
+            self.search_form = self.search_form_class(self.request.GET)
+            queryset = self.search_form.filter(queryset)
+
+        return queryset
 
     @cached_property
     def root_queryset_count(self):
@@ -89,6 +98,13 @@ class DetailView(ToolsMixin, vanilla.DetailView):
 
 
 class CreateView(ToolsMixin, vanilla.CreateView):
+    def get_form(self, data=None, files=None, **kwargs):
+        form_class = self.get_form_class()
+        for field in getattr(form_class, 'default_to_current_user', ()):
+            kwargs.setdefault('initial', {}).setdefault(
+                field, self.request.user.pk)
+        return form_class(data, files, **kwargs)
+
     def get(self, request, *args, **kwargs):
         if not self.allow_create():
             return redirect('../')

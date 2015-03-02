@@ -22,6 +22,7 @@ class Textarea(forms.Textarea):
 
 class ModelForm(forms.ModelForm):
     user_fields = ()
+    default_to_current_user = ()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
