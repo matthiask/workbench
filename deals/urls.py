@@ -1,28 +1,45 @@
 from django.conf.urls import url
 
-from deals import views
+from deals.forms import DealSearchForm, DealForm
+from deals.models import Deal
+from deals.views import FunnelDetailView
+from tools.views import (
+    ListView, DetailView, CreateView, UpdateView, DeleteView)
 
 
 urlpatterns = [
     url(
         r'^funnel/(?P<pk>\d+)/$',
-        views.FunnelDetailView.as_view(),
+        FunnelDetailView.as_view(),
         name='deals_funnel_detail'),
 
     url(
         r'^$',
-        views.DealListView.as_view(),
+        ListView.as_view(
+            model=Deal,
+            search_form_class=DealSearchForm,
+        ),
         name='deals_deal_list'),
     url(
         r'^(?P<pk>\d+)/$',
-        views.DealDetailView.as_view(),
+        DetailView.as_view(model=Deal),
         name='deals_deal_detail'),
     url(
         r'^create/$',
-        views.DealCreateView.as_view(),
+        CreateView.as_view(
+            form_class=DealForm,
+            model=Deal,
+        ),
         name='deals_deal_create'),
     url(
         r'^(?P<pk>\d+)/update/$',
-        views.DealUpdateView.as_view(),
+        UpdateView.as_view(
+            form_class=DealForm,
+            model=Deal,
+        ),
         name='deals_deal_update'),
+    url(
+        r'^(?P<pk>\d+)/delete/$',
+        DeleteView.as_view(model=Deal),
+        name='deals_deal_delete'),
 ]

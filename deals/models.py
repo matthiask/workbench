@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 import reversion
 
 from accounts.models import User
+from tools.history import changes
 from tools.models import SearchManager, ProtectRelationsModel
 from tools.urls import model_urls
 
@@ -86,6 +87,14 @@ class Deal(ProtectRelationsModel):
     def __str__(self):
         return self.title
 
+    def changes(self):
+        return changes(
+            self,
+            ('funnel', 'title', 'owned_by', 'status', 'estimated_value'),
+        )
+
 
 reversion.register(Funnel)
 reversion.register(Deal, follow=['funnel'])
+
+Deal.allow_delete_if_only = {Deal}

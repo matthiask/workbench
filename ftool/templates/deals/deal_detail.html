@@ -36,9 +36,9 @@
     </table>
 
     <h2>{% trans 'History' %}</h2>
-    {% for change in changes %}
+    {% for change in deal.changes %}
       <h3>
-        Version {{ forloop.counter0 }}
+        Version {{ forloop.counter0 }} by {{ change.version.revision.user }}
         <small>{{ change.version.revision.date_created }}</small>
       </h3>
       <ul>

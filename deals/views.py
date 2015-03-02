@@ -1,20 +1,12 @@
 from collections import defaultdict
 
-from deals.forms import DealSearchForm, DealForm
 from deals.models import Funnel, Deal
-from tools.history import changes
-from tools.views import ListView, DetailView, CreateView, UpdateView
+from tools.views import DetailView
 
 
-class FunnelViewMixin(object):
+class FunnelDetailView(DetailView):
     model = Funnel
 
-
-class DealViewMixin(object):
-    model = Deal
-
-
-class FunnelDetailView(FunnelViewMixin, DetailView):
     def get_context_data(self, **kwargs):
         deals = defaultdict(list)
         for deal in self.object.deals.all():
@@ -27,40 +19,3 @@ class FunnelDetailView(FunnelViewMixin, DetailView):
                     'deals': deals.get(status, []),
                 } for status, title in Deal.STATUS_CHOICES
             ], **kwargs)
-
-
-class DealListView(DealViewMixin, ListView):
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        self.search_form = DealSearchForm(self.request.GET)
-        if self.search_form.is_valid():
-            data = self.search_form.cleaned_data
-            if data.get('f'):
-                queryset = queryset.filter(funnel=data.get('f'))
-
-        return queryset
-
-
-class DealDetailView(DealViewMixin, DetailView):
-    def get_context_data(self, **kwargs):
-        return super().get_context_data(
-            changes=changes(
-                self.object,
-                ('funnel', 'title', 'owned_by', 'status', 'estimated_value'),
-            ), **kwargs)
-
-
-class DealCreateView(DealViewMixin, CreateView):
-    form_class = DealForm
-
-    def get_form(self, data=None, files=None, **kwargs):
-        kwargs.setdefault('initial', {}).update({
-            'owned_by': self.request.user.pk,
-        })
-        form_class = self.get_form_class()
-        return form_class(data, files, **kwargs)
-
-
-class DealUpdateView(DealViewMixin, UpdateView):
-    form_class = DealForm
