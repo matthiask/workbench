@@ -116,7 +116,7 @@ class Story(ProtectRelationsModel):
                 if rs.service_type in story_rs:
                     obj = story_rs[rs.service_type]
                 else:
-                    obj = story_rs.requiredservices.model(
+                    obj = story.requiredservices.model(
                         story=story,
                         service_type=rs.service_type,
                         estimated_effort=0,
