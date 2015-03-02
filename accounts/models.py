@@ -1,5 +1,10 @@
+from datetime import date, timedelta
+from decimal import Decimal
+
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
+from django.db.models import Sum
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from tools.models import ProtectRelationsModel
@@ -82,3 +87,20 @@ class User(ProtectRelationsModel, AbstractBaseUser):
         """Is the user a member of staff?"""
         # Simplest possible answer: All admins are staff
         return self.is_admin
+
+    @cached_property
+    def hours(self):
+        today = date.today()
+        monday = today - timedelta(days=today.weekday())
+
+        per_day = dict((
+            row['rendered_on'],
+            row['hours__sum'],
+        ) for row in self.renderedservices.filter(
+            rendered_on__gte=monday,
+        ).order_by().values('rendered_on').annotate(Sum('hours')))
+
+        return {
+            'today': per_day.get(today, Decimal('0.00')),
+            'week': sum(per_day.values(), Decimal('0.00')),
+        }

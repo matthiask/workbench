@@ -8,7 +8,7 @@ from ftool import views
 
 
 urlpatterns = [
-    url(r'^$', vanilla.TemplateView.as_view(template_name='base.html')),
+    url(r'^$', vanilla.TemplateView.as_view(template_name='start.html')),
     url(
         r'^bootstrap/$',
         vanilla.TemplateView.as_view(template_name='bootstrap.html')),

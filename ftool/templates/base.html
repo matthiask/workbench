@@ -48,7 +48,10 @@
           <li><a href="/projects/">{% trans 'projects' %}</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-          <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" href="/accounts/">{% trans 'account'|capfirst %} <span class="caret"></span></a>
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" href="/accounts/">
+              Hi, {{ user.get_short_name }}! <span class="caret"></span>
+            </a>
             <ul class="dropdown-menu" role="menu">
               <li><a href="{% url 'accounts_update' %}">
                 <span class="glyphicon glyphicon-user"></span>

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-3 col-md-offset-3">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <h2>Hi, {{ user }}</h2>
+        <table>
+          <tr>
+            <td class="text-right">{{ user.hours.today }}h</td>
+            <th>{% trans 'Hours today' %}</th>
+          </tr>
+          <tr>
+            <td class="text-right">{{ user.hours.week }}h</td>
+            <th>{% trans 'Hours this week' %}</th>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
