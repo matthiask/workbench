@@ -19,7 +19,6 @@ urlpatterns = [
     url(r'^contacts/', include('contacts.urls')),
     url(r'^deals/', include('deals.urls')),
     url(r'^projects/', include('projects.urls')),
-    url(r'^services/', include('services.urls')),
     url(r'^stories/', include('stories.urls')),
 
     url(r'^search/$', views.search, name='search'),

@@ -73,8 +73,7 @@ class Project(models.Model):
     def overview(self):
         from collections import defaultdict
         from django.db.models import Sum
-        from services.models import RenderedService
-        from stories.models import RequiredService
+        from stories.models import RequiredService, RenderedService
 
         required = RequiredService.objects.filter(
             story__project=self,

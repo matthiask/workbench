@@ -1,9 +1,8 @@
 from django import forms
 # from django.utils.translation import ugettext_lazy as _, ugettext
 
-from services.models import RenderedService
+from stories.models import RenderedService
 from tools.forms import ModelForm
-# from stories.models import Story
 
 
 class RenderedServiceForm(ModelForm):

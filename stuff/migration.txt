@@ -330,8 +330,8 @@ SELECT SETVAL('public.projects_project_id_seq', COALESCE(MAX(id), 1) ) FROM publ
 SELECT SETVAL('public.projects_release_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_release;
 SELECT SETVAL('public.reversion_revision_id_seq', COALESCE(MAX(id), 1) ) FROM public.reversion_revision;
 SELECT SETVAL('public.reversion_version_id_seq', COALESCE(MAX(id), 1) ) FROM public.reversion_version;
-SELECT SETVAL('public.services_renderedservice_id_seq', COALESCE(MAX(id), 1) ) FROM public.services_renderedservice;
 SELECT SETVAL('public.services_servicetype_id_seq', COALESCE(MAX(id), 1) ) FROM public.services_servicetype;
+SELECT SETVAL('public.stories_renderedservice_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_renderedservice;
 SELECT SETVAL('public.stories_requiredservice_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_requiredservice;
 SELECT SETVAL('public.stories_story_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_story;
 
@@ -354,7 +354,7 @@ WHERE r.is_default=TRUE;
 -- Import worklogs
 --
 
-INSERT INTO services_renderedservice
+INSERT INTO stories_renderedservice
 (created_at, rendered_on, hours, description, created_by_id, rendered_by_id, story_id)
 SELECT created, date, hours, notes, created_by_id, worker_id, s.id
 FROM stories_story s, projects_release r,
