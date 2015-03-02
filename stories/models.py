@@ -129,6 +129,7 @@ class Story(ProtectRelationsModel):
                 obj.planning_effort += rs.planning_effort
                 obj.save()
 
+            self.requiredservices.all().delete()
             self.renderedservices.update(story=story)
             self.delete()
 
