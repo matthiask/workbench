@@ -7,11 +7,12 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.models import User
 from projects.models import Project, Release
 from services.models import ServiceType
+from tools.models import ProtectRelationsModel
 from tools.urls import model_urls
 
 
 @model_urls()
-class Story(models.Model):
+class Story(ProtectRelationsModel):
     UNSCHEDULED = 10
     SCHEDULED = 20
     STARTED = 30

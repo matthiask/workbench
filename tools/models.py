@@ -1,5 +1,7 @@
+from django.core.exceptions import PermissionDenied
 from django.db import models
 
+from tools.deletion import related_classes
 from tools.search import search
 
 
@@ -64,3 +66,16 @@ def safe_queryset_and(head, *tail):
         head = _merge(head, tail[0])
         tail = tail[1:]
     return head
+
+
+class ProtectRelationsModel(models.Model):
+    def delete(self, *args, **kwargs):
+        rel = related_classes(self)
+        if rel > {self.__class__}:
+            raise PermissionDenied(
+                'Deleting %s with related objects is not allowed (%s)' % (
+                    self._meta.verbose_name_plural,
+                    rel,
+                ))
+        super().delete(*args, **kwargs)
+    delete.alters_data = True
