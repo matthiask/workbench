@@ -1,3 +1,5 @@
+import itertools
+
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
@@ -20,7 +22,7 @@ class RenderedServiceForm(ModelForm):
 
 class MergeStoryForm(forms.Form):
     merge_into = forms.ModelChoiceField(
-        Story,
+        Story.objects.all(),
         label=_('Merge into'),
     )
 
@@ -29,4 +31,8 @@ class MergeStoryForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         stories = self.story.project.stories.exclude(pk=self.story.pk)
-        self.fields['merge_into'].queryset = stories
+        self.fields['merge_into'].choices = [('', '----------')] + [
+            (str(key), [(story.id, story) for story in group])
+            for key, group
+            in itertools.groupby(stories, key=lambda story: story.release)
+        ]
