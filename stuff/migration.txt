@@ -288,10 +288,10 @@ FROM stories_story s
 WHERE stories_requiredservice.story_id=s.id AND s.description ~'^(Grafik|Multimedia|3D)';
 UPDATE stories_requiredservice SET service_type_id=4
 FROM stories_story s
-WHERE stories_requiredservice.story_id=s.id AND s.description ~ '^(Programmierung|IT-Dienstleistungen)%';
+WHERE stories_requiredservice.story_id=s.id AND s.description ~ '^(Programmierung|IT-Dienstleistungen)';
 UPDATE stories_requiredservice SET service_type_id=5
 FROM stories_story s
-WHERE stories_requiredservice.story_id=s.id AND s.description ~ '^(Projektorganisation|Administration|Intern)%';
+WHERE stories_requiredservice.story_id=s.id AND s.description ~ '^(Projektorganisation|Administration|Intern)';
 
 
 --
