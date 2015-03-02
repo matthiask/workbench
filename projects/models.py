@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
 from contacts.models import Organization, Person
-from tools.models import SearchManager
+from tools.models import SearchManager, ProtectRelationsModel
 from tools.urls import model_urls
 
 
@@ -20,7 +20,7 @@ class ProjectManager(SearchManager):
 
 
 @model_urls()
-class Project(models.Model):
+class Project(ProtectRelationsModel):
     IN_PREPARATION = 10
     WORK_IN_PROGRESS = 20
     FINISHED = 30
@@ -131,7 +131,7 @@ class Project(models.Model):
 
 
 @model_urls(lambda object: {'project_id': object.project_id, 'pk': object.pk})
-class Release(models.Model):
+class Release(ProtectRelationsModel):
     project = models.ForeignKey(
         Project,
         verbose_name=_('project'),

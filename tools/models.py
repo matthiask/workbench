@@ -69,6 +69,9 @@ def safe_queryset_and(head, *tail):
 
 
 class ProtectRelationsModel(models.Model):
+    class Meta:
+        abstract = True
+
     def delete(self, *args, **kwargs):
         rel = related_classes(self)
         if rel > {self.__class__}:

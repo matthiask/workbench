@@ -133,7 +133,7 @@ class Story(ProtectRelationsModel):
             self.delete()
 
 
-class RequiredService(models.Model):
+class RequiredService(ProtectRelationsModel):
     story = models.ForeignKey(
         Story,
         verbose_name=_('story'),
@@ -180,7 +180,7 @@ class RequiredService(models.Model):
 
 
 @model_urls()
-class RenderedService(models.Model):
+class RenderedService(ProtectRelationsModel):
     story = models.ForeignKey(
         Story,
         verbose_name=_('story'),

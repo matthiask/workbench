@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
-from tools.models import SearchManager
+from tools.models import SearchManager, ProtectRelationsModel
 from tools.urls import model_urls
 
 
@@ -22,7 +22,7 @@ class Group(models.Model):
 
 
 @model_urls()
-class Organization(models.Model):
+class Organization(ProtectRelationsModel):
     name = models.TextField(_('name'))
     notes = models.TextField(_('notes'), blank=True)
     primary_contact = models.ForeignKey(
@@ -46,7 +46,7 @@ class Organization(models.Model):
 
 
 @model_urls()
-class Person(models.Model):
+class Person(ProtectRelationsModel):
     full_name = models.CharField(_('full name'), max_length=100)
     address = models.CharField(
         _('address'),

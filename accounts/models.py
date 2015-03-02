@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from tools.models import ProtectRelationsModel
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, _short_name, _full_name, date_of_birth):
@@ -37,7 +39,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser):
+class User(ProtectRelationsModel, AbstractBaseUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['_full_name', '_short_name', 'date_of_birth']
 

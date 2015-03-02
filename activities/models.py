@@ -5,11 +5,12 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.models import User
 from contacts.models import Person
 from deals.models import Deal
+from tools.models import ProtectRelationsModel
 from tools.urls import model_urls
 
 
 @model_urls()
-class Activity(models.Model):
+class Activity(ProtectRelationsModel):
     contact = models.ForeignKey(
         Person,
         verbose_name=_('contact'),
