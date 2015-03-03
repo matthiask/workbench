@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
@@ -17,6 +18,20 @@ class ProjectManager(SearchManager):
             is_default=True,
         )
         return project
+
+
+class SummationDict(dict):
+    def __iadd__(self, other):
+        for key, value in other.items():
+            self.setdefault(key, 0)
+            self[key] += value
+        return self
+
+    def __getitem__(self, key):
+        try:
+            return dict.__getitem__(self, key)
+        except KeyError:
+            return 0
 
 
 @model_urls()
@@ -72,63 +87,51 @@ class Project(models.Model):
         return self.title
 
     def overview(self):
-        from collections import defaultdict
-        from django.db.models import Sum
+        # Avoid circular imports
         from stories.models import RequiredService, RenderedService
 
         required = RequiredService.objects.filter(
             story__project=self,
         ).order_by('service_type').values(
             'story',
-            'service_type__title',
         ).annotate(
-            Sum('estimated_effort'),
-            Sum('offered_effort'),
-            Sum('planning_effort'),
+            estimated=Sum('estimated_effort'),
+            offered=Sum('offered_effort'),
+            planning=Sum('planning_effort'),
         )
 
         rendered = RenderedService.objects.filter(
             story__project=self,
         ).order_by('rendered_by').values(
             'story',
-            'rendered_by___full_name'
         ).annotate(
-            Sum('hours'),
+            hours=Sum('hours'),
         )
 
-        required_dict = defaultdict(list)
-        overall_effort = [0, 0, 0]
+        stories = self.stories.all()
+        story_dict = {}
+        stats = SummationDict()
+
+        for story in stories:
+            story_dict[story.id] = story
+            story.stats = SummationDict()
 
         for row in required:
-            required_dict[row['story']].append((
-                row['service_type__title'],
-                row['estimated_effort__sum'],
-                row['offered_effort__sum'],
-                row['planning_effort__sum'],
-            ))
-            overall_effort[0] += row['estimated_effort__sum']
-            overall_effort[1] += row['offered_effort__sum']
-            overall_effort[2] += row['planning_effort__sum']
-
-        rendered_dict = defaultdict(list)
-        overall_hours = 0
+            story = story_dict[row.pop('story')]
+            d = SummationDict(**row)
+            story.stats += d
+            stats += d
 
         for row in rendered:
-            rendered_dict[row['story']].append((
-                row['rendered_by___full_name'],
-                row['hours__sum'],
-            ))
-            overall_hours += row['hours__sum']
+            story = story_dict[row.pop('story')]
+            d = SummationDict(**row)
+            story.stats += d
+            stats += d
 
-        stories = self.stories.all()
-        for story in stories:
-            story.required = required_dict.get(story.id, [])
-            story.rendered = rendered_dict.get(story.id, [])
-
-        self.overall_effort = overall_effort
-        self.overall_hours = overall_hours
-
-        return stories
+        return {
+            'stats': stats,
+            'stories': stories,
+        }
 
 
 @model_urls(lambda object: {'project_id': object.project_id, 'pk': object.pk})

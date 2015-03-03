@@ -12,8 +12,15 @@
   <div class="row">
     <div class="col-md-4">
       <h2>{% trans 'releases and stories' %}</h2>
+      {% with overview=project.overview %}
+      <p>
+        <small>
+          {{ overview.stats.hours }}h / {{ overview.stats.planning }}h
+        </small>
+      </p>
+
       <div class="list-group">
-        {% for story in project.overview %}
+        {% for story in overview.stories %}
           {% ifchanged story.release %}
             <div class="list-group-item">
               <h3 class="list-group-item-heading">{{ story.release }}</h3>
@@ -27,12 +34,13 @@
               {{ story.description }}
               <br>
               <small>
-                {{ story.required }} / {{ story.rendered }}
+                {{ story.stats.hours }}h / {{ story.stats.planning }}h
               </small>
             </div>
           </a>
         {% endfor %}
       </div>
+      {% endwith %}
     </div>
 
     <div class="col-md-8">
