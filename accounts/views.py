@@ -36,7 +36,8 @@ def oauth2_flow(request):
     flow_kwargs = {
         'client_id': settings.OAUTH2_CLIENT_ID,
         'client_secret': settings.OAUTH2_CLIENT_SECRET,
-        'scope': 'openid email',
+        'scope': 'email',
+        'access_type': 'online',  # Should be the default...
         'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
         'token_uri': 'https://accounts.google.com/o/oauth2/token',
         'revoke_uri': 'https://accounts.google.com/o/oauth2/revoke',
