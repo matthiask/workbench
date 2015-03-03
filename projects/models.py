@@ -23,8 +23,7 @@ class ProjectManager(SearchManager):
 class SummationDict(dict):
     def __iadd__(self, other):
         for key, value in other.items():
-            self.setdefault(key, 0)
-            self[key] += value
+            self[key] = self[key] + value
         return self
 
     def __getitem__(self, key):
