@@ -35,15 +35,17 @@ body {
 .form-inline.fieldset textarea { width: 100%; }
 
 th.number {
-text-align: right;
+  text-align: right;
 }
 .number input {
-border: none;
-border-bottom: 1px solid #ddd;
-border-radius: 0;
-box-shadow: none;
-text-align: right;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  border-radius: 0;
+  box-shadow: none;
+  text-align: right;
 }
 
-.number input:input-placeholder { color: #ccc; }
-.number input::-webkit-input-placeholder { color: #ccc; }
+.number input:-moz-placeholder { color: #ccc; text-overflow: ellipsis; }
+.number input::-moz-input-placeholder { color: #ccc; text-overflow: ellipsis; }
+.number input::-webkit-input-placeholder { color: #ccc; text-overflow: ellipsis; }
+.number input:-ms-input-placeholder { color: #ccc; text-overflow: ellipsis; }
