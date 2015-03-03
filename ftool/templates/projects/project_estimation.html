@@ -23,7 +23,7 @@
           <tr>
             <th>{% trans 'story' %}</th>
             {% for servicetype in form.servicetypes %}
-              <th>{{ servicetype }}</th>
+              <th class="number">{{ servicetype }}</th>
             {% endfor %}
           </tr>
         </thead>
@@ -46,7 +46,7 @@
                 {{ row.story.description }}
               </td>
               {% for servicetype in row.servicetypes %}
-                <td>{% bootstrap_field servicetype.field layout='inline' %}</td>
+                <td class="number">{% bootstrap_field servicetype.field layout='inline' %}</td>
               {% endfor %}
             </tr>
           {% endfor %}
@@ -61,13 +61,4 @@
 
   </div>
 </div>
-
-<style>
-  .form-inline.fieldset .form-group {
-    margin-bottom: 15px;
-    display: inline-block;
-    width: 100%; }
-  .form-inline.fieldset input,
-  .form-inline.fieldset textarea { width: 100%; }
-</style>
 {% endblock %}

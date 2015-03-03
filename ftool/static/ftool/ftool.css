@@ -33,3 +33,17 @@ body {
 .form-inline.fieldset input,
 .form-inline.fieldset select,
 .form-inline.fieldset textarea { width: 100%; }
+
+th.number {
+text-align: right;
+}
+.number input {
+border: none;
+border-bottom: 1px solid #ddd;
+border-radius: 0;
+box-shadow: none;
+text-align: right;
+}
+
+.number input:input-placeholder { color: #ccc; }
+.number input::-webkit-input-placeholder { color: #ccc; }
