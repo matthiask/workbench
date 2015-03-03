@@ -87,7 +87,7 @@ def oauth2(request):
             )
             messages.success(
                 request,
-                _('Welcome to FeinTOOL! Please fill in your details.'))
+                _('Welcome! Please fill in your details.'))
             new_user = True
 
         user = authenticate(email=email)
