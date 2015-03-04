@@ -9,23 +9,45 @@ import reversion
 Change = namedtuple('Change', 'changes version number')
 
 
+def single_change(previous_object, current_object, field):
+    f = current_object._meta.get_field(field)
+    choices = {}
+    if f.choices:
+        choices = dict(f.flatchoices)
+
+    curr = getattr(current_object, field)
+
+    if previous_object is None:
+        return _(
+            "Initial value of '%(field)s' was '%(current)s'."
+        ) % {
+            'field': capfirst(f.verbose_name),
+            'current': choices.get(curr, curr),
+        }
+
+    else:
+        prev = getattr(previous_object, field)
+        if prev == curr:
+            return None
+
+        return _(
+            "'%(field)s' changed from '%(previous)s' to '%(current)s'."
+        ) % {
+            'field': capfirst(f.verbose_name),
+            'current': choices.get(curr, curr),
+            'previous': choices.get(prev, prev),
+        }
+
+
 def changes(instance, fields):
     versions = reversion.get_for_object(instance)[::-1]
     changes = []
-    version_changes = []
+
     current_object = versions[0].object_version.object
-
-    for field in fields:
-        curr = getattr(current_object, field)
-        f = instance._meta.get_field(field)
-
-        version_changes.append(
-            _("Initial value of '%(field)s' was '%(current)s'.")
-            % {
-                'field': capfirst(f.verbose_name),
-                'current': curr,
-            }
-        )
+    version_changes = [change for change in (
+        single_change(None, current_object, field)
+        for field in fields
+    ) if change]
 
     changes.append(Change(
         changes=version_changes,
@@ -34,33 +56,13 @@ def changes(instance, fields):
     ))
 
     for previous, current in zip(versions, versions[1:]):
-        version_changes = []
         previous_object = previous.object_version.object
         current_object = current.object_version.object
 
-        for field in fields:
-            prev = getattr(previous_object, field)
-            curr = getattr(current_object, field)
-
-            if prev == curr:
-                continue
-
-            f = instance._meta.get_field(field)
-
-            # Handle choice fields
-            if f.choices:
-                d = dict(f.flatchoices)
-                prev = d.get(prev, prev)
-                curr = d.get(curr, curr)
-
-            version_changes.append(
-                _("'%(field)s' changed from '%(previous)s' to '%(current)s'.")
-                % {
-                    'field': capfirst(f.verbose_name),
-                    'previous': prev,
-                    'current': curr,
-                }
-            )
+        version_changes = [change for change in (
+            single_change(previous_object, current_object, field)
+            for field in fields
+        ) if change]
 
         changes.append(Change(
             changes=version_changes,
