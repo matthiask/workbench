@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
 import reversion
@@ -19,9 +20,9 @@ def changes(instance, fields):
         f = instance._meta.get_field(field)
 
         version_changes.append(
-            _('Initial value of "%(field)s" was "%(current)s".')
+            _("Initial value of '%(field)s' was '%(current)s'.")
             % {
-                'field': f.verbose_name,
+                'field': capfirst(f.verbose_name),
                 'current': curr,
             }
         )
@@ -53,9 +54,9 @@ def changes(instance, fields):
                 curr = d.get(curr, curr)
 
             version_changes.append(
-                _('"%(field)s" changed from "%(previous)s" to "%(current)s".')
+                _("'%(field)s' changed from '%(previous)s' to '%(current)s'.")
                 % {
-                    'field': f.verbose_name,
+                    'field': capfirst(f.verbose_name),
                     'previous': prev,
                     'current': curr,
                 }

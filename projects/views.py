@@ -49,7 +49,7 @@ class StoryCreateView(CreateView):
 
             messages.success(
                 self.request,
-                _('%(class)s "%(object)s" has been successfully created.') % {
+                _("%(class)s '%(object)s' has been successfully created.") % {
                     'class': story._meta.verbose_name,
                     'object': story,
                 })

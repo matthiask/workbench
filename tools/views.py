@@ -52,8 +52,8 @@ class ToolsMixin(object):
             messages.error(
                 self.request,
                 _(
-                    'Cannot delete \'%(object)s\''
-                    ' because of related objects (%(related)s).'
+                    "Cannot delete '%(object)s'"
+                    " because of related objects (%(related)s)."
                 ) % {
                     'object': self.object,
                     'related': ', '.join(
@@ -120,7 +120,7 @@ class CreateView(ToolsMixin, vanilla.CreateView):
         self.object = form.save()
         messages.success(
             self.request,
-            _('%(class)s "%(object)s" has been successfully created.') % {
+            _("%(class)s '%(object)s' has been successfully created.") % {
                 'class': self.object._meta.verbose_name,
                 'object': self.object,
             })
@@ -157,7 +157,7 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
         self.object = form.save()
         messages.success(
             self.request,
-            _('%(class)s "%(object)s" has been successfully updated.') % {
+            _("%(class)s '%(object)s' has been successfully updated.") % {
                 'class': self.object._meta.verbose_name,
                 'object': self.object,
             })
@@ -183,7 +183,7 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
         self.object.delete()
         messages.success(
             self.request,
-            _('%(class)s "%(object)s" has been successfully deleted.') % {
+            _("%(class)s '%(object)s' has been successfully deleted.") % {
                 'class': self.model._meta.verbose_name,
                 'object': self.object,
             })
