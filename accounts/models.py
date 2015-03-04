@@ -91,12 +91,12 @@ class User(AbstractBaseUser):
         today = date.today()
         monday = today - timedelta(days=today.weekday())
 
-        per_day = dict((
-            row['rendered_on'],
-            row['hours__sum'],
-        ) for row in self.renderedservices.filter(
-            rendered_on__gte=monday,
-        ).order_by().values('rendered_on').annotate(Sum('hours')))
+        per_day = {
+            row['rendered_on']: row['hours__sum']
+            for row in self.renderedservices.filter(
+                rendered_on__gte=monday,
+            ).order_by().values('rendered_on').annotate(Sum('hours'))
+        }
 
         return {
             'today': per_day.get(today, Decimal('0.00')),

@@ -54,5 +54,5 @@ def resolve_args_and_kwargs(context, args, kwargs):
     """
     return (
         [v.resolve(context) for v in args],
-        dict((k, v.resolve(context)) for k, v in kwargs.items()),
+        {k: v.resolve(context) for k, v in kwargs.items()},
     )

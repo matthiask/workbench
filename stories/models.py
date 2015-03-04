@@ -110,9 +110,10 @@ class Story(models.Model):
 
     def merge_into(self, story):
         with transaction.atomic():
-            story_rs = dict(
-                (rs.service_type, rs)
-                for rs in story.requiredservices.all())
+            story_rs = {
+                rs.service_type: rs
+                for rs in story.requiredservices.all()
+            }
 
             for rs in self.requiredservices.all():
                 if rs.service_type in story_rs:
