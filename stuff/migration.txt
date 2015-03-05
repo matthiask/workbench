@@ -266,7 +266,7 @@ dblink(
 
 INSERT INTO stories_story
 (id, created_at, title, status, position, requested_by_id, description, project_id, release_id)
-SELECT id, NOW(), substring(notes from 0 for 200), 10, 0, 1, concat(activity_name, ': ', notes), job_id, joboffer_id FROM
+SELECT id, NOW(), CASE WHEN notes!='' THEN substring(notes from 0 for 200) ELSE activity_name END, 10, 0, 1, concat(activity_name, ': ', notes), job_id, joboffer_id FROM
 dblink(
     'dbname=fineware_feinheit',
     'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
