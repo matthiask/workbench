@@ -342,10 +342,10 @@ SELECT SETVAL('public.stories_story_id_seq', COALESCE(MAX(id), 1) ) FROM public.
 
 INSERT INTO projects_release
 (title, is_default, position, project_id)
-SELECT 'V1', TRUE, 0, id FROM projects_project;
+SELECT 'Import', TRUE, 0, id FROM projects_project;
 INSERT INTO stories_story
 (created_at, title, status, position, requested_by_id, description, project_id, release_id)
-SELECT NOW(), 'V1', 30, 0, owned_by_id, '', r.project_id, r.id
+SELECT NOW(), 'Import', 30, 0, owned_by_id, '', r.project_id, r.id
 FROM projects_release r LEFT JOIN projects_project p ON r.project_id=p.id
 WHERE r.is_default=TRUE;
 
