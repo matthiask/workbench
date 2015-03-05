@@ -1,3 +1,5 @@
+import itertools
+
 from django.db import models
 from django.db.models import Sum
 from django.utils.translation import ugettext_lazy as _
@@ -126,6 +128,13 @@ class Project(models.Model):
             d = SummationDict(**row)
             story.stats += d
             stats += d
+
+        stories = [(key, list(group)) for key, group in itertools.groupby(
+            sorted(
+                stories,
+                key=lambda s: s.release.position if s.release else -1),
+            lambda story: story.release,
+        )]
 
         return {
             'stats': stats,

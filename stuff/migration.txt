@@ -340,14 +340,10 @@ SELECT SETVAL('public.stories_story_id_seq', COALESCE(MAX(id), 1) ) FROM public.
 -- Autogenerate some data
 --
 
-INSERT INTO projects_release
-(title, is_default, position, project_id)
-SELECT 'Import', TRUE, 0, id FROM projects_project;
 INSERT INTO stories_story
 (created_at, title, status, position, requested_by_id, description, project_id, release_id)
-SELECT NOW(), 'Import', 30, 0, owned_by_id, '', r.project_id, r.id
-FROM projects_release r LEFT JOIN projects_project p ON r.project_id=p.id
-WHERE r.is_default=TRUE;
+SELECT NOW(), 'Import', 30, 0, owned_by_id, '', p.id, NULL
+FROM projects_project p;
 
 
 --
@@ -357,12 +353,12 @@ WHERE r.is_default=TRUE;
 INSERT INTO stories_renderedservice
 (created_at, rendered_on, hours, description, created_by_id, rendered_by_id, story_id)
 SELECT created, date, hours, notes, created_by_id, worker_id, s.id
-FROM stories_story s, projects_release r,
+FROM stories_story s,
 dblink(
     'dbname=fineware_feinheit',
     'SELECT created, date, hours, notes, created_by_id, worker_id, job_id FROM worklog_worklogentry'
 ) AS p(created timestamp, date date, hours numeric, notes text, created_by_id int, worker_id int, job_id int)
-WHERE s.release_id=r.id AND r.is_default AND r.project_id=p.job_id;
+WHERE s.project_id=p.job_id AND s.release_id IS NULL;
 
 
 
