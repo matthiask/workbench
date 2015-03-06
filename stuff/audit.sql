@@ -94,7 +94,8 @@ BEGIN
         TG_TABLE_SCHEMA::text,                        -- schema_name
         TG_TABLE_NAME::text,                          -- table_name
         TG_RELID,                                     -- relation OID for much quicker searches
-        session_user::text,                           -- session_user_name
+        (SELECT current_setting('audit.current_user_name')),
+        -- session_user::text,                           -- session_user_name
         current_timestamp,                            -- action_tstamp_tx
         statement_timestamp(),                        -- action_tstamp_stm
         clock_timestamp(),                            -- action_tstamp_clk

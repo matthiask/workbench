@@ -3,30 +3,42 @@ from collections import namedtuple
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
-import reversion
+from ftool.models import LoggedAction
 
 
 Change = namedtuple('Change', 'changes version number')
 
 
-def single_change(previous_object, current_object, field):
-    f = current_object._meta.get_field(field)
-    choices = {}
-    if f.choices:
-        choices = dict(f.flatchoices)
+def single_change(model, previous_object, current_object, field):
+    f = model._meta.get_field(field)
+    choices = None
+    queryset = None
 
-    curr = getattr(current_object, field)
+    if f.choices:
+        choices = {str(key): value for key, value in f.flatchoices}
+    if f.related_model:
+        queryset = f.related_model._default_manager.all()
+
+    def format(value):
+        if choices is not None:
+            print(repr(choices), repr(value))
+            return choices.get(value, value)
+        if queryset is not None:
+            return str(queryset.get(pk=value))
+        return value
+
+    curr = current_object.get(f.attname)
 
     if previous_object is None:
         return _(
             "Initial value of '%(field)s' was '%(current)s'."
         ) % {
             'field': capfirst(f.verbose_name),
-            'current': choices.get(curr, curr),
+            'current': format(curr),
         }
 
     else:
-        prev = getattr(previous_object, field)
+        prev = previous_object.get(f.attname)
         if prev == curr:
             return None
 
@@ -34,18 +46,18 @@ def single_change(previous_object, current_object, field):
             "'%(field)s' changed from '%(previous)s' to '%(current)s'."
         ) % {
             'field': capfirst(f.verbose_name),
-            'current': choices.get(curr, curr),
-            'previous': choices.get(prev, prev),
+            'current': format(curr),
+            'previous': format(prev),
         }
 
 
 def changes(instance, fields):
-    versions = reversion.get_for_object(instance)[::-1]
+    versions = LoggedAction.objects.for_instance(instance)
     changes = []
 
-    current_object = versions[0].object_version.object
+    current_object = versions[0].row_data
     version_changes = [change for change in (
-        single_change(None, current_object, field)
+        single_change(instance, None, current_object, field)
         for field in fields
     ) if change]
 
@@ -55,18 +67,22 @@ def changes(instance, fields):
         number=1,
     ))
 
-    for previous, current in zip(versions, versions[1:]):
-        previous_object = previous.object_version.object
-        current_object = current.object_version.object
+    for change in versions[1:]:
+        changed_fields = set(change.changed_fields.keys())
+        changed_fields.discard('fts_document')
 
         version_changes = [change for change in (
-            single_change(previous_object, current_object, field)
-            for field in fields
+            single_change(
+                instance,
+                {field: change.row_data.get(field)},
+                {field: change.changed_fields.get(field)},
+                field,
+            ) for field in changed_fields
         ) if change]
 
         changes.append(Change(
             changes=version_changes,
-            version=current,
+            version=change,
             number=changes[-1].number + 1,
         ))
 

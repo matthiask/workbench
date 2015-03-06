@@ -38,8 +38,8 @@
     <h2>{% trans 'History' %}</h2>
     {% for change in deal.changes reversed %}
       <h3>
-        Version {{ change.number }} by {{ change.version.revision.user }}
-        <small>{{ change.version.revision.date_created }}</small>
+        Version {{ change.number }} by {{ change.version.session_user_name }}
+        <small>{{ change.version.action_tstamp_stm }}</small>
       </h3>
       <ul>
         {% for pretty in change.changes %}

@@ -14,6 +14,12 @@ class LoggedActionManager(models.Manager):
         self.register_hstore()
         return super().get_queryset(*args, **kwargs)
 
+    def for_instance(self, instance):
+        return self.filter(
+            table_name=instance._meta.db_table,
+            row_data__id=instance.id,
+        )
+
 
 class LoggedAction(models.Model):
     event_id = models.IntegerField(primary_key=True)
@@ -38,3 +44,4 @@ class LoggedAction(models.Model):
     class Meta:
         managed = False
         db_table = 'audit_logged_actions'
+        ordering = ('action_tstamp_stm',)
