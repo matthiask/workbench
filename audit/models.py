@@ -17,7 +17,7 @@ class LoggedActionManager(models.Manager):
     def for_instance(self, instance):
         return self.filter(
             table_name=instance._meta.db_table,
-            object_id=instance.id,
+            row_data__id=instance.id,
         )
 
 
