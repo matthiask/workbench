@@ -8,7 +8,7 @@ TRUNCATE projects_project RESTART IDENTITY CASCADE;
 TRUNCATE services_servicetype RESTART IDENTITY CASCADE;
 TRUNCATE audit_logged_actions RESTART IDENTITY CASCADE;
 
-SET audit.current_user_name TO 'Import';
+SET application_name TO 'Import';
 
 
 --
