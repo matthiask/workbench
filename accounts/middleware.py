@@ -8,7 +8,7 @@ from django.utils.translation import ugettext as _
 class LoginRequiredMiddleware(object):
     def set_user_name(self, username):
         connections['default'].cursor().execute(
-            'SET SESSION audit.current_user_name TO %s',
+            'SET SESSION application_name TO %s',
             [username])
 
     def process_request(self, request):

@@ -2,7 +2,7 @@
 
 {% for change in changes reversed %}
   <h3>
-    {% blocktrans with number=change.number user_name=change.version.session_user_name trimmed %}
+    {% blocktrans with number=change.number user_name=change.version.user_name trimmed %}
       Version {{ number }} by {{ user_name }}
     {% endblocktrans %}
     <small>{{ change.version.action_tstamp_stm }}</small>
