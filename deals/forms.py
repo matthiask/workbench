@@ -31,4 +31,8 @@ class DealForm(ModelForm):
     class Meta:
         model = Deal
         fields = (
-            'funnel', 'title', 'description', 'owned_by', 'estimated_value')
+            'funnel', 'title', 'description', 'owned_by', 'estimated_value',
+            'status')
+        widgets = {
+            'status': forms.RadioSelect,
+        }
