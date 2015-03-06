@@ -22,42 +22,31 @@ class LoggedActionManager(models.Manager):
 
 
 class LoggedAction(models.Model):
-    ACTION_TYPES = {
-        'I': 'INSERT',
-        'U': 'UPDATE',
-        'D': 'DELETE',
-        'T': 'TRUNCATE',
-    }
+    ACTION_TYPES = (
+        ('I', 'INSERT'),
+        ('U', 'UPDATE'),
+        ('D', 'DELETE'),
+        ('T', 'TRUNCATE'),
+    )
 
     event_id = models.IntegerField(primary_key=True)
-    schema_name = models.TextField()
     table_name = models.TextField()
-    relid = models.IntegerField()
-    object_id = models.IntegerField()
-    session_user_name = models.TextField(null=True)
-    action_tstamp_tx = models.DateTimeField()
-    action_tstamp_stm = models.DateTimeField()
-    action_tstamp_clk = models.DateTimeField()
-    transaction_id = models.IntegerField(null=True)
-    application_name = models.TextField(null=True)
-    client_addr = models.GenericIPAddressField(null=True)
-    client_port = models.IntegerField(null=True)
-    client_query = models.TextField(null=True)
-    action = models.TextField()
+    user_name = models.TextField(null=True)
+    created_at = models.DateTimeField()
+    action = models.CharField(max_length=1, choices=ACTION_TYPES)
     row_data = HStoreField(null=True)
     changed_fields = HStoreField(null=True)
-    statement_only = models.BooleanField()
 
     objects = LoggedActionManager()
 
     class Meta:
         managed = False
         db_table = 'audit_logged_actions'
-        ordering = ('action_tstamp_stm',)
+        ordering = ('created_at',)
 
     def __str__(self):
         return '%s %s at %s' % (
-            self.ACTION_TYPES.get(self.action, self.action),
+            self.get_action_display(),
             self.table_name,
-            self.action_tstamp_stm,
+            self.created_at,
         )

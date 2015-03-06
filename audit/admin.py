@@ -6,13 +6,13 @@ from audit.models import LoggedAction
 
 
 class LoggedActionAdmin(admin.ModelAdmin):
-    date_hierarchy = 'action_tstamp_stm'
+    date_hierarchy = 'created_at'
     list_display = (
         '__str__',
         'data',
-        'action_tstamp_stm',
+        'created_at',
     )
-    ordering = ('-action_tstamp_stm',)
+    ordering = ('-created_at',)
 
     def has_add_permission(self, request, obj=None):
         return False
