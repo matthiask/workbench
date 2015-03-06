@@ -41,8 +41,6 @@ CREATE TABLE audit_logged_actions (
     changed_fields hstore
 );
 
-REVOKE ALL ON audit_logged_actions FROM public;
-
 CREATE INDEX logged_actions_relid_idx ON audit_logged_actions(table_name);
 CREATE INDEX logged_actions_action_tstamp_tx_stm_idx ON audit_logged_actions(created_at);
 CREATE INDEX logged_actions_action_idx ON audit_logged_actions(action);
@@ -94,7 +92,6 @@ BEGIN
 END;
 $body$
 LANGUAGE plpgsql
-SECURITY DEFINER
 SET search_path = pg_catalog, public;
 
 
