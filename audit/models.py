@@ -22,6 +22,13 @@ class LoggedActionManager(models.Manager):
 
 
 class LoggedAction(models.Model):
+    ACTION_TYPES = {
+        'I': 'INSERT',
+        'U': 'UPDATE',
+        'D': 'DELETE',
+        'T': 'TRUNCATE',
+    }
+
     event_id = models.IntegerField(primary_key=True)
     schema_name = models.TextField()
     table_name = models.TextField()
@@ -29,6 +36,7 @@ class LoggedAction(models.Model):
     session_user_name = models.TextField(null=True)
     action_tstamp_tx = models.DateTimeField()
     action_tstamp_stm = models.DateTimeField()
+    action_tstamp_clk = models.DateTimeField()
     transaction_id = models.IntegerField(null=True)
     application_name = models.TextField(null=True)
     client_addr = models.GenericIPAddressField(null=True)
@@ -45,3 +53,10 @@ class LoggedAction(models.Model):
         managed = False
         db_table = 'audit_logged_actions'
         ordering = ('action_tstamp_stm',)
+
+    def __str__(self):
+        return '%s %s at %s' % (
+            self.ACTION_TYPES.get(self.action, self.action),
+            self.table_name,
+            self.action_tstamp_stm,
+        )
