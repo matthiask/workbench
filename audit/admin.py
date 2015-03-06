@@ -1,3 +1,5 @@
+import json
+
 from django.contrib import admin
 
 from audit.models import LoggedAction
@@ -7,8 +9,8 @@ class LoggedActionAdmin(admin.ModelAdmin):
     date_hierarchy = 'action_tstamp_stm'
     list_display = (
         '__str__',
+        'data',
         'action_tstamp_stm',
-        'client_query',
     )
     ordering = ('-action_tstamp_stm',)
 
@@ -23,6 +25,12 @@ class LoggedActionAdmin(admin.ModelAdmin):
 
     def get_actions(self, request):
         return []
+
+    def data(self, instance):
+        if instance.action == 'U':
+            instance.changed_fields.pop('fts_document', None)
+            return json.dumps(instance.changed_fields)
+        return json.dumps(instance.row_data)
 
 
 admin.site.register(LoggedAction, LoggedActionAdmin)
