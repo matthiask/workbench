@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             io.open(
-                os.path.join(settings.BASE_DIR, 'tools', 'audit.sql')
+                os.path.join(settings.BASE_DIR, 'stuff', 'audit.sql')
             ).read(),
             None,
         ),

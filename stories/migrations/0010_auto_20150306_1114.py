@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             "SELECT audit_audit_table('stories_story');"
-            "SELECT audit_audit_table('stories_requiredservice');",
+            "SELECT audit_audit_table('stories_requiredservice');"
             "SELECT audit_audit_table('stories_renderedservice');",
             '',
         ),
