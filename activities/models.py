@@ -2,8 +2,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-import reversion
-
 from accounts.models import User
 from contacts.models import Person
 from deals.models import Deal
@@ -67,6 +65,3 @@ class Activity(models.Model):
 
     def __str__(self):
         return self.title
-
-
-reversion.register(Activity)

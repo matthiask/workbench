@@ -1,7 +1,5 @@
 from django.contrib import admin
 
-import reversion
-
 from projects.models import Project, Release
 
 
@@ -10,14 +8,14 @@ class ReleaseInline(admin.TabularInline):
     model = Release
 
 
-class ProjectAdmin(reversion.VersionAdmin):
+class ProjectAdmin(admin.ModelAdmin):
     inlines = (ReleaseInline,)
     list_display = ('title', 'status')
     list_filter = ('status',)
     raw_id_fields = ('customer', 'contact', 'owned_by')
 
 
-class ReleaseAdmin(reversion.VersionAdmin):
+class ReleaseAdmin(admin.ModelAdmin):
     raw_id_fields = ('project',)
 
 

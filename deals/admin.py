@@ -1,11 +1,9 @@
 from django.contrib import admin
 
-import reversion
-
 from deals.models import Funnel, Deal
 
 
-class DealAdmin(reversion.VersionAdmin):
+class DealAdmin(admin.ModelAdmin):
     list_display = (
         'funnel', 'title', 'owned_by', 'estimated_value', 'status',
         'created_at')

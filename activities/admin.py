@@ -1,11 +1,9 @@
 from django.contrib import admin
 
-import reversion
-
 from activities.models import Activity
 
 
-class ActivityAdmin(reversion.VersionAdmin):
+class ActivityAdmin(admin.ModelAdmin):
     list_display = (
         'contact', 'deal', 'title', 'owned_by', 'due_on', 'completed_at')
     list_display_links = ('title',)

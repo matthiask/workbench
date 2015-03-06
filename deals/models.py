@@ -2,8 +2,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-import reversion
-
 from accounts.models import User
 from tools.history import changes
 from tools.models import SearchManager
@@ -94,7 +92,3 @@ class Deal(models.Model):
             self,
             ('funnel', 'title', 'owned_by', 'status', 'estimated_value'),
         )
-
-
-reversion.register(Funnel)
-reversion.register(Deal)

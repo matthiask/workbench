@@ -35,7 +35,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'bootstrap3',
-    'reversion',
 
     'accounts',
     'activities',
@@ -58,7 +57,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'django.middleware.security.SecurityMiddleware',  # Revisit when SSLing.
-    'reversion.middleware.RevisionMiddleware',
     'accounts.middleware.LoginRequiredMiddleware',
 )
 

@@ -1,4 +1,4 @@
--- cat migration.txt | ssh root@metronom.feinheit.ch 'sudo -u postgres psql ftool' ; ssh deploy@metronom.feinheit.ch 'cd www/ftool && venv/bin/python manage.py createinitialrevisions'
+-- cat migration.txt | ssh root@metronom.feinheit.ch 'sudo -u postgres psql ftool'
 
 CREATE EXTENSION dblink;
 
@@ -6,6 +6,7 @@ TRUNCATE accounts_user RESTART IDENTITY CASCADE;
 TRUNCATE contacts_group RESTART IDENTITY CASCADE;
 TRUNCATE projects_project RESTART IDENTITY CASCADE;
 TRUNCATE services_servicetype RESTART IDENTITY CASCADE;
+TRUNCATE audit_logged_actions RESTART IDENTITY CASCADE;
 
 
 --
@@ -328,8 +329,6 @@ SELECT SETVAL('public.django_content_type_id_seq', COALESCE(MAX(id), 1) ) FROM p
 SELECT SETVAL('public.django_migrations_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_migrations;
 SELECT SETVAL('public.projects_project_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_project;
 SELECT SETVAL('public.projects_release_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_release;
-SELECT SETVAL('public.reversion_revision_id_seq', COALESCE(MAX(id), 1) ) FROM public.reversion_revision;
-SELECT SETVAL('public.reversion_version_id_seq', COALESCE(MAX(id), 1) ) FROM public.reversion_version;
 SELECT SETVAL('public.services_servicetype_id_seq', COALESCE(MAX(id), 1) ) FROM public.services_servicetype;
 SELECT SETVAL('public.stories_renderedservice_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_renderedservice;
 SELECT SETVAL('public.stories_requiredservice_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_requiredservice;

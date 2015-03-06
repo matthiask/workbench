@@ -1,7 +1,5 @@
 from django.contrib import admin
 
-import reversion
-
 from stories.models import Story, RequiredService, RenderedService
 
 
@@ -10,7 +8,7 @@ class RequiredServiceInline(admin.TabularInline):
     extra = 0
 
 
-class StoryAdmin(reversion.VersionAdmin):
+class StoryAdmin(admin.ModelAdmin):
     list_display = (
         'project', 'release', 'title', 'status')
     list_display_links = ('title',)
@@ -19,7 +17,7 @@ class StoryAdmin(reversion.VersionAdmin):
     raw_id_fields = ('requested_by', 'owned_by', 'project', 'release')
 
 
-class RenderedServiceAdmin(reversion.VersionAdmin):
+class RenderedServiceAdmin(admin.ModelAdmin):
     list_display = (
         'story', 'rendered_on', 'rendered_by', 'hours', 'description')
     raw_id_fields = ('story', 'created_by', 'rendered_by')

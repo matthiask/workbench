@@ -4,8 +4,6 @@ from django.db import models
 from django.db.models import Sum
 from django.utils.translation import ugettext_lazy as _
 
-import reversion
-
 from accounts.models import User
 from contacts.models import Organization, Person
 from tools.models import SearchManager
@@ -174,7 +172,3 @@ class Release(models.Model):
     @property
     def urls(self):
         return self.project.urls
-
-
-reversion.register(Project)
-reversion.register(Release)

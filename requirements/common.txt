@@ -1,7 +1,6 @@
 dj-database-url==0.3.0
 Django==1.8b1
 django-bootstrap3==5.1.1
-django-reversion==1.8.5
 django-vanilla-views==1.0.3
 oauth2client==1.4.6
 pip-tools==0.3.5
