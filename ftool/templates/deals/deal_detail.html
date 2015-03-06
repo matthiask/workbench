@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n %}
+{% load history i18n %}
 
 {% block title %}{{ deal }} - {% trans "deals" %} - {{ block.super }}{% endblock %}
 
@@ -36,17 +36,7 @@
     </table>
 
     <h2>{% trans 'History' %}</h2>
-    {% for change in deal.changes reversed %}
-      <h3>
-        Version {{ change.number }} by {{ change.version.session_user_name }}
-        <small>{{ change.version.action_tstamp_stm }}</small>
-      </h3>
-      <ul>
-        {% for pretty in change.changes %}
-          <li>{{ pretty }}</li>
-        {% endfor %}
-      </ul>
-    {% endfor %}
+    {% history deal 'funnel, title, description, owned_by, status, estimated_value' %}
   </div>
 </div>
 {% endblock %}

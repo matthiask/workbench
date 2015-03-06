@@ -1,4 +1,5 @@
 from collections import namedtuple
+from functools import lru_cache
 
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -9,57 +10,44 @@ from ftool.models import LoggedAction
 Change = namedtuple('Change', 'changes version number')
 
 
-def single_change(model, previous_object, current_object, field):
-    f = model._meta.get_field(field)
-    choices = None
-    queryset = None
+@lru_cache()
+def formatter(field):
+    """
+    Returns a formatter for the passed model field instance
+    """
+    if field.choices:
+        choices = {str(key): value for key, value in field.flatchoices}
+        return lambda value: choices.get(value, value)
 
-    if f.choices:
-        choices = {str(key): value for key, value in f.flatchoices}
-    if f.related_model:
-        queryset = f.related_model._default_manager.all()
+    if field.related_model:
+        model = field.related_model
+        queryset = model._default_manager.all()
 
-    def format(value):
-        if choices is not None:
-            print(repr(choices), repr(value))
-            return choices.get(value, value)
-        if queryset is not None:
-            return str(queryset.get(pk=value))
-        return value
+        def _fn(value):
+            try:
+                return str(queryset.get(pk=value))
+            except model.DoesNotExist:
+                return _('Deleted %s instance') % model._meta.verbose_name
 
-    curr = current_object.get(f.attname)
+        return _fn
 
-    if previous_object is None:
-        return _(
-            "Initial value of '%(field)s' was '%(current)s'."
-        ) % {
-            'field': capfirst(f.verbose_name),
-            'current': format(curr),
-        }
-
-    else:
-        prev = previous_object.get(f.attname)
-        if prev == curr:
-            return None
-
-        return _(
-            "'%(field)s' changed from '%(previous)s' to '%(current)s'."
-        ) % {
-            'field': capfirst(f.verbose_name),
-            'current': format(curr),
-            'previous': format(prev),
-        }
+    return lambda value: value
 
 
 def changes(instance, fields):
     versions = LoggedAction.objects.for_instance(instance)
     changes = []
 
-    current_object = versions[0].row_data
-    version_changes = [change for change in (
-        single_change(instance, None, current_object, field)
-        for field in fields
-    ) if change]
+    field_instances = [instance._meta.get_field(f) for f in fields]
+
+    values = versions[0].row_data
+    version_changes = [
+        _("Initial value of '%(field)s' was '%(current)s'.") % {
+            'field': capfirst(f.verbose_name),
+            'current': formatter(f)(values.get(f.attname)),
+        }
+        for f in field_instances
+    ]
 
     changes.append(Change(
         changes=version_changes,
@@ -68,22 +56,21 @@ def changes(instance, fields):
     ))
 
     for change in versions[1:]:
-        changed_fields = set(change.changed_fields.keys())
-        changed_fields.discard('fts_document')
+        version_changes = [
+            _("'%(field)s' changed from '%(previous)s' to '%(current)s'.") % {
+                'field': capfirst(f.verbose_name),
+                'current': formatter(f)(change.changed_fields.get(f.attname)),
+                'previous': formatter(f)(change.row_data.get(f.attname)),
+            }
+            for f in field_instances
+            if f.attname in change.changed_fields
+        ]
 
-        version_changes = [change for change in (
-            single_change(
-                instance,
-                {field: change.row_data.get(field)},
-                {field: change.changed_fields.get(field)},
-                field,
-            ) for field in changed_fields
-        ) if change]
-
-        changes.append(Change(
-            changes=version_changes,
-            version=change,
-            number=changes[-1].number + 1,
-        ))
+        if version_changes:
+            changes.append(Change(
+                changes=version_changes,
+                version=change,
+                number=changes[-1].number + 1,
+            ))
 
     return changes

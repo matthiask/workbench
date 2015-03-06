@@ -3,7 +3,6 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
-from tools.history import changes
 from tools.models import SearchManager
 from tools.urls import model_urls
 
@@ -86,9 +85,3 @@ class Deal(models.Model):
 
     def __str__(self):
         return self.title
-
-    def changes(self):
-        return changes(
-            self,
-            ('funnel', 'title', 'owned_by', 'status', 'estimated_value'),
-        )
