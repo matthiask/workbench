@@ -1,4 +1,4 @@
--- cat migration.txt | ssh root@metronom.feinheit.ch 'sudo -u postgres psql ftool'
+-- cat migration.txt | ssh root@metronom.feinheit.ch 'sudo -u postgres psql ftool' ; ssh deploy@metronom.feinheit.ch 'cd www/ftool && venv/bin/python manage.py createinitialrevisions'
 
 CREATE EXTENSION dblink;
 

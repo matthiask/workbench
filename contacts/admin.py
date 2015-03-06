@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+import reversion
+
 from contacts.models import (
     Group, Organization, Person, EmailAddress, PhoneNumber, PostalAddress)
 
@@ -19,15 +21,17 @@ class PostalAddressInline(admin.TabularInline):
     extra = 0
 
 
+class OrganizationAdmin(reversion.VersionAdmin):
+    filter_horizontal = ('groups',)
+    raw_id_fields = ('primary_contact',)
+
+
+class PersonAdmin(reversion.VersionAdmin):
+    filter_horizontal = ('groups',)
+    inlines = [PhoneNumberInline, EmailAddressInline, PostalAddressInline]
+    raw_id_fields = ('organization', 'primary_contact')
+
+
 admin.site.register(Group)
-admin.site.register(
-    Organization,
-    filter_horizontal=('groups',),
-    raw_id_fields=('primary_contact',),
-)
-admin.site.register(
-    Person,
-    filter_horizontal=('groups',),
-    inlines=[PhoneNumberInline, EmailAddressInline, PostalAddressInline],
-    raw_id_fields=('organization', 'primary_contact'),
-)
+admin.site.register(Organization, OrganizationAdmin)
+admin.site.register(Person, PersonAdmin)

@@ -4,6 +4,8 @@ from django.db import models
 from django.db.models import Sum
 from django.utils.translation import ugettext_lazy as _
 
+import reversion
+
 from accounts.models import User
 from contacts.models import Organization, Person
 from tools.models import SearchManager
@@ -174,5 +176,5 @@ class Release(models.Model):
         return self.project.urls
 
 
-Project.allow_delete_if_only = {Project, Release}
-Release.allow_delete_if_only = {Release}
+reversion.register(Project)
+reversion.register(Release)

@@ -97,6 +97,4 @@ class Deal(models.Model):
 
 
 reversion.register(Funnel)
-reversion.register(Deal, follow=['funnel'])
-
-Deal.allow_delete_if_only = {Deal}
+reversion.register(Deal)

@@ -4,6 +4,8 @@ from django.db import models, transaction
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+import reversion
+
 from accounts.models import User
 from projects.models import Project, Release
 from services.models import ServiceType
@@ -229,5 +231,7 @@ class RenderedService(models.Model):
         return self.description
 
 
-Story.allow_delete_if_only = {Story, RequiredService}
-RequiredService.allow_delete_if_only = {RequiredService}
+reversion.register(RequiredService)
+# TODO Does it also save the story when required services change?
+reversion.register(Story, follow=['requiredservices'])
+reversion.register(RenderedService)

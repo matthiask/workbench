@@ -3,6 +3,8 @@ import re
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+import reversion
+
 from accounts.models import User
 from tools.models import SearchManager
 from tools.urls import model_urls
@@ -180,6 +182,10 @@ class PostalAddress(PersonDetail):
         return self.person.urls
 
 
-Organization.allow_delete_if_only = {Organization}
-Person.allow_delete_if_only = {
-    Person, PhoneNumber, EmailAddress, PostalAddress}
+reversion.register(Organization)
+reversion.register(PhoneNumber)
+reversion.register(EmailAddress)
+reversion.register(PostalAddress)
+reversion.register(Person, follow=[
+    'phonenumbers', 'emailaddresses', 'postaladdresses',
+])
