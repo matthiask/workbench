@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ftool', '0002_loggedaction'),
+        ('audit', '0002_loggedaction'),
     ]
 
     operations = [

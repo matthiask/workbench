@@ -8,7 +8,7 @@ import django.contrib.postgres.fields.hstore
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ftool', '0001_initial'),
+        ('audit', '0001_initial'),
     ]
 
     operations = [

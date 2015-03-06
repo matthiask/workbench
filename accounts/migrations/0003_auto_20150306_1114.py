@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('accounts', '0002_auto_20150228_1035'),
-        ('ftool', '0001_initial'),
+        ('audit', '0001_initial'),
     ]
 
     operations = [
