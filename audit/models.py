@@ -17,7 +17,7 @@ class LoggedActionManager(models.Manager):
     def for_instance(self, instance):
         return self.filter(
             table_name=instance._meta.db_table,
-            row_data__id=instance.id,
+            object_id=instance.id,
         )
 
 
@@ -33,6 +33,7 @@ class LoggedAction(models.Model):
     schema_name = models.TextField()
     table_name = models.TextField()
     relid = models.IntegerField()
+    object_id = models.IntegerField()
     session_user_name = models.TextField(null=True)
     action_tstamp_tx = models.DateTimeField()
     action_tstamp_stm = models.DateTimeField()

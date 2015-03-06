@@ -36,6 +36,7 @@ CREATE TABLE audit_logged_actions (
     schema_name text not null,
     table_name text not null,
     relid oid not null,
+    object_id bigint not null,
     session_user_name text,
     action_tstamp_tx TIMESTAMP WITH TIME ZONE NOT NULL,
     action_tstamp_stm TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -58,6 +59,7 @@ COMMENT ON COLUMN audit_logged_actions.event_id IS 'Unique identifier for each a
 COMMENT ON COLUMN audit_logged_actions.schema_name IS 'Database schema audited table for this event is in';
 COMMENT ON COLUMN audit_logged_actions.table_name IS 'Non-schema-qualified table name of table event occured in';
 COMMENT ON COLUMN audit_logged_actions.relid IS 'Table OID. Changes with drop/create. Get with ''tablename''::regclass';
+COMMENT ON COLUMN audit_logged_actions.object_id IS 'Object primary key';
 COMMENT ON COLUMN audit_logged_actions.session_user_name IS 'Login / session user whose statement caused the audited event';
 COMMENT ON COLUMN audit_logged_actions.action_tstamp_tx IS 'Transaction start timestamp for tx in which audited event occurred';
 COMMENT ON COLUMN audit_logged_actions.action_tstamp_stm IS 'Statement start timestamp for tx in which audited event occurred';
@@ -73,6 +75,7 @@ COMMENT ON COLUMN audit_logged_actions.changed_fields IS 'New values of fields c
 COMMENT ON COLUMN audit_logged_actions.statement_only IS '''t'' if audit event is from an FOR EACH STATEMENT trigger, ''f'' for FOR EACH ROW';
 
 CREATE INDEX logged_actions_relid_idx ON audit_logged_actions(relid);
+CREATE INDEX logged_actions_object_id_idx ON audit_logged_actions(object_id);
 CREATE INDEX logged_actions_action_tstamp_tx_stm_idx ON audit_logged_actions(action_tstamp_stm);
 CREATE INDEX logged_actions_action_idx ON audit_logged_actions(action);
 
@@ -94,7 +97,8 @@ BEGIN
         TG_TABLE_SCHEMA::text,                        -- schema_name
         TG_TABLE_NAME::text,                          -- table_name
         TG_RELID,                                     -- relation OID for much quicker searches
-        (SELECT current_setting('audit.current_user_name')),
+        NEW.id,                                       -- object PK
+        current_setting('audit.current_user_name'),
         -- session_user::text,                           -- session_user_name
         current_timestamp,                            -- action_tstamp_tx
         statement_timestamp(),                        -- action_tstamp_stm
