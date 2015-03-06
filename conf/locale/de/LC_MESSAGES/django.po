@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-04 09:15+0100\n"
+"POT-Creation-Date: 2015-03-06 14:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: accounts/middleware.py:16
+#: accounts/middleware.py:26
 msgid "Please authenticate."
 msgstr "Bitte authentifizieren."
 
@@ -71,25 +71,25 @@ msgstr "Kein Benutzer mit Emailadresse %s gefunden."
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
-#: activities/models.py:16 projects/models.py:58
+#: activities/models.py:16 projects/models.py:60
 msgid "contact"
 msgstr "Kontakt"
 
-#: activities/models.py:22 deals/models.py:86
+#: activities/models.py:22 deals/models.py:83
 #: ftool/templates/deals/deal_list.html:37
 msgid "deal"
 msgstr "Geschäft"
 
-#: activities/models.py:27 contacts/models.py:13 deals/models.py:55
-#: projects/models.py:62 projects/models.py:145 services/models.py:7
+#: activities/models.py:27 contacts/models.py:13 deals/models.py:52
+#: projects/models.py:64 projects/models.py:154 services/models.py:7
 #: stories/models.py:49
 msgid "title"
 msgstr "Titel"
 
-#: activities/models.py:31 deals/models.py:63
+#: activities/models.py:31 deals/models.py:60
 #: ftool/templates/deals/deal_detail.html:25
 #: ftool/templates/deals/deal_list.html:38
-#: ftool/templates/projects/project_list.html:37 projects/models.py:70
+#: ftool/templates/projects/project_list.html:37 projects/models.py:72
 #: stories/models.py:46
 msgid "owned by"
 msgstr "gehört"
@@ -110,8 +110,8 @@ msgstr "Dauer"
 msgid "Duration in hours (if applicable)."
 msgstr "Dauer in Stunden (falls zutreffend)."
 
-#: activities/models.py:53 deals/models.py:76 stories/models.py:34
-#: stories/models.py:196
+#: activities/models.py:53 deals/models.py:73 stories/models.py:34
+#: stories/models.py:197
 msgid "created at"
 msgstr "Erstellt um"
 
@@ -228,70 +228,70 @@ msgstr "Postadressen"
 msgid "All funnels"
 msgstr "Alle Trichter"
 
-#: deals/models.py:16 deals/models.py:21 deals/models.py:51
+#: deals/models.py:13 deals/models.py:18 deals/models.py:48
 #: ftool/templates/deals/deal_detail.html:15
 #: ftool/templates/deals/deal_list.html:30
 #: ftool/templates/deals/deal_list.html:36
 msgid "funnel"
 msgstr "Trichter"
 
-#: deals/models.py:22 ftool/templates/deals/funnel_detail.html:5
+#: deals/models.py:19 ftool/templates/deals/funnel_detail.html:5
 msgid "funnels"
 msgstr "Trichter"
 
-#: deals/models.py:39
+#: deals/models.py:36
 msgid "initial"
 msgstr "Anfang"
 
-#: deals/models.py:40
+#: deals/models.py:37
 msgid "negotiating"
 msgstr "in Verhandlung"
 
-#: deals/models.py:41
+#: deals/models.py:38
 msgid "improbable"
 msgstr "unwahrscheinlich"
 
-#: deals/models.py:42
+#: deals/models.py:39
 msgid "probable in the future"
 msgstr "wahrscheinlich in der Zukunft"
 
-#: deals/models.py:43
+#: deals/models.py:40
 msgid "probable soon"
 msgstr "wahrscheinlich bald"
 
-#: deals/models.py:44 stories/models.py:29
+#: deals/models.py:41 stories/models.py:29
 msgid "accepted"
 msgstr "Akzeptiert"
 
-#: deals/models.py:45
+#: deals/models.py:42
 msgid "declined"
 msgstr "Abgelehnt"
 
-#: deals/models.py:58 ftool/templates/deals/deal_detail.html:21
-#: projects/models.py:65 stories/models.py:52 stories/models.py:220
+#: deals/models.py:55 ftool/templates/deals/deal_detail.html:21
+#: projects/models.py:67 stories/models.py:52 stories/models.py:221
 msgid "description"
 msgstr "Beschreibung"
 
-#: deals/models.py:66 ftool/templates/deals/deal_detail.html:29
+#: deals/models.py:63 ftool/templates/deals/deal_detail.html:29
 #: ftool/templates/deals/deal_list.html:39
 msgid "estimated value"
 msgstr "geschätzter Wert"
 
-#: deals/models.py:71 ftool/templates/contacts/organization_list.html:29
+#: deals/models.py:68 ftool/templates/contacts/organization_list.html:29
 #: ftool/templates/contacts/person_list.html:29
 #: ftool/templates/deals/deal_detail.html:33
 #: ftool/templates/deals/deal_list.html:40
 #: ftool/templates/projects/project_list.html:29
-#: ftool/templates/projects/project_list.html:38 projects/models.py:74
+#: ftool/templates/projects/project_list.html:38 projects/models.py:76
 #: stories/models.py:69
 msgid "status"
 msgstr "Status"
 
-#: deals/models.py:79
+#: deals/models.py:76
 msgid "closed at"
 msgstr "Geschlossen um"
 
-#: deals/models.py:87 ftool/templates/base.html:47
+#: deals/models.py:84 ftool/templates/base.html:47
 #: ftool/templates/deals/deal_detail.html:5
 msgid "deals"
 msgstr "Geschäfte"
@@ -312,7 +312,7 @@ msgid "contacts"
 msgstr "Kontakte"
 
 #: ftool/templates/base.html:48 ftool/templates/projects/project_detail.html:5
-#: ftool/templates/projects/project_list.html:5 projects/models.py:83
+#: ftool/templates/projects/project_list.html:5 projects/models.py:85
 msgid "projects"
 msgstr "Projekte"
 
@@ -326,7 +326,7 @@ msgstr "Abmelden"
 
 #: ftool/templates/contacts/organization_detail.html:54
 #: ftool/templates/contacts/person_detail.html:54
-#: ftool/templates/projects/project_detail.html:53
+#: ftool/templates/projects/project_detail.html:55
 msgid "Update"
 msgstr "Aktualisieren"
 
@@ -384,33 +384,39 @@ msgid "submit"
 msgstr "absenden"
 
 #: ftool/templates/deals/deal_detail.html:38
+#: ftool/templates/projects/project_detail.html:59
 msgid "History"
 msgstr "Geschichte"
+
+#: ftool/templates/history.html:5
+#, python-format
+msgid "Version %(number)s by %(user_name)s"
+msgstr "Version %(number)s erstellt von %(user_name)s"
 
 #: ftool/templates/projects/project_detail.html:14
 msgid "releases and stories"
 msgstr "Versionen und Stories"
 
-#: ftool/templates/projects/project_detail.html:51
+#: ftool/templates/projects/project_detail.html:53
 #: ftool/templates/stories/story_form.html:6
 msgid "create story"
 msgstr "Story erstellen"
 
-#: ftool/templates/projects/project_detail.html:55
+#: ftool/templates/projects/project_detail.html:57
 msgid "estimation"
 msgstr "Schätzung"
 
 #: ftool/templates/projects/project_estimation.html:24 stories/models.py:87
-#: stories/models.py:143 stories/models.py:192
+#: stories/models.py:144 stories/models.py:193
 msgid "story"
 msgstr "Story"
 
-#: ftool/templates/projects/project_list.html:35 projects/models.py:82
-#: projects/models.py:141 stories/models.py:58
+#: ftool/templates/projects/project_list.html:35 projects/models.py:84
+#: projects/models.py:150 stories/models.py:58
 msgid "project"
 msgstr "Projekt"
 
-#: ftool/templates/projects/project_list.html:36 projects/models.py:51
+#: ftool/templates/projects/project_list.html:36 projects/models.py:53
 msgid "customer"
 msgstr "Kunde"
 
@@ -437,7 +443,7 @@ msgstr "Abbruch"
 msgid "overview"
 msgstr "Übersicht"
 
-#: ftool/templates/stories/story_detail.html:38 stories/models.py:224
+#: ftool/templates/stories/story_detail.html:38 stories/models.py:225
 msgid "rendered service"
 msgstr "erbrachte Leistung"
 
@@ -474,31 +480,31 @@ msgstr "Alle Stati"
 msgid "The contact %(person)s does not belong to  %(organization)s."
 msgstr "Der Kontakt %(person)s gehört nicht zu %(organization)s."
 
-#: projects/models.py:43
+#: projects/models.py:45
 msgid "In preparation"
 msgstr "In Vorbereitung"
 
-#: projects/models.py:44
+#: projects/models.py:46
 msgid "Work in progress"
 msgstr "In Arbeit"
 
-#: projects/models.py:45
+#: projects/models.py:47
 msgid "Finished"
 msgstr "Erledigt"
 
-#: projects/models.py:148
+#: projects/models.py:157
 msgid "is default"
 msgstr "ist Standard"
 
-#: projects/models.py:152 services/models.py:16 stories/models.py:83
+#: projects/models.py:161 services/models.py:16 stories/models.py:83
 msgid "position"
 msgstr "Position"
 
-#: projects/models.py:157 stories/models.py:63
+#: projects/models.py:166 stories/models.py:63
 msgid "release"
 msgstr "Version"
 
-#: projects/models.py:158
+#: projects/models.py:167
 msgid "releases"
 msgstr "Versionen"
 
@@ -511,7 +517,7 @@ msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
 msgid "billing per hour"
 msgstr "Verrechnung pro Stunde"
 
-#: services/models.py:21 stories/models.py:149
+#: services/models.py:21 stories/models.py:150
 msgid "service type"
 msgstr "Leistungstyp"
 
@@ -563,27 +569,27 @@ msgstr "Dieses Feld sollte meistens leer gelassen werden."
 msgid "stories"
 msgstr "Stories"
 
-#: stories/models.py:153
+#: stories/models.py:154
 msgid "estimated effort"
 msgstr "geschätzter Aufwand"
 
-#: stories/models.py:156
+#: stories/models.py:157
 msgid "The original estimate."
 msgstr "Die ursprüngliche Schätzung."
 
-#: stories/models.py:158
+#: stories/models.py:159
 msgid "offered effort"
 msgstr "offerierter Aufwand"
 
-#: stories/models.py:161
+#: stories/models.py:162
 msgid "Effort offered to the customer."
 msgstr "Aufwand welcher dem Kunden offeriert wurde."
 
-#: stories/models.py:163
+#: stories/models.py:164
 msgid "planning effort"
 msgstr "Aufwand für Planung"
 
-#: stories/models.py:167
+#: stories/models.py:168
 msgid ""
 "Effort for planning. This value should reflect the current  state of affairs "
 "also when work is already in progress."
@@ -591,31 +597,31 @@ msgstr ""
 "Aufwand für Planung. Dieser Wert sollte den aktuellen Wissenstand abbilden, "
 "auch wenn schon gearbeitet wird."
 
-#: stories/models.py:173
+#: stories/models.py:174
 msgid "required service"
 msgstr "benötigte Leistung"
 
-#: stories/models.py:174
+#: stories/models.py:175
 msgid "required services"
 msgstr "benötigte Leistungen"
 
-#: stories/models.py:202
+#: stories/models.py:203
 msgid "created by"
 msgstr "Erstellt von"
 
-#: stories/models.py:206
+#: stories/models.py:207
 msgid "rendered on"
 msgstr "Erbracht am"
 
-#: stories/models.py:212
+#: stories/models.py:213
 msgid "rendered by"
 msgstr "Erbracht von"
 
-#: stories/models.py:216
+#: stories/models.py:217
 msgid "hours"
 msgstr "Stunden"
 
-#: stories/models.py:225
+#: stories/models.py:226
 msgid "rendered services"
 msgstr "erbrachte Leistungen"
 
@@ -623,12 +629,17 @@ msgstr "erbrachte Leistungen"
 msgid "Active"
 msgstr "Aktiv"
 
-#: tools/history.py:23
+#: tools/history.py:30
+#, python-format
+msgid "Deleted %s instance"
+msgstr "Gelöschte %s-Instanz"
+
+#: tools/history.py:45
 #, python-format
 msgid "Initial value of '%(field)s' was '%(current)s'."
 msgstr "Anfangswert von '%(field)s' war '%(current)s'."
 
-#: tools/history.py:57
+#: tools/history.py:60
 #, python-format
 msgid "'%(field)s' changed from '%(previous)s' to '%(current)s'."
 msgstr "'%(field)s' änderte von '%(previous)s' zu '%(current)s'."
