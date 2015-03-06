@@ -4,7 +4,7 @@ from functools import lru_cache
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
-from ftool.models import LoggedAction
+from audit.models import LoggedAction
 
 
 Change = namedtuple('Change', 'changes version number')
