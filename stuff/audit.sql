@@ -84,8 +84,7 @@ BEGIN
         audit_row.row_data = hstore(OLD.*) - excluded_cols;
     ELSIF (TG_OP = 'INSERT' AND TG_LEVEL = 'ROW') THEN
         audit_row.row_data = hstore(NEW.*) - excluded_cols;
-    -- ELSIF (TG_LEVEL = 'STATEMENT' AND TG_OP IN ('INSERT','UPDATE','DELETE','TRUNCATE')) THEN
-    --    audit_row.statement_only = 't';
+    ELSIF (TG_LEVEL = 'STATEMENT' AND TG_OP IN ('INSERT','UPDATE','DELETE','TRUNCATE')) THEN
     ELSE
         RAISE EXCEPTION '[audit_if_modified_func] - Trigger func added as trigger for unhandled case: %, %',TG_OP, TG_LEVEL;
         RETURN NULL;
@@ -153,8 +152,7 @@ BEGIN
 
     _q_txt = 'CREATE TRIGGER audit_trigger_stm AFTER ' || stm_targets || ' ON ' ||
              target_table ||
-             ' FOR EACH STATEMENT EXECUTE PROCEDURE audit_if_modified_func('||
-             quote_literal(audit_query_text) || ');';
+             ' FOR EACH STATEMENT EXECUTE PROCEDURE audit_if_modified_func();';
     RAISE NOTICE '%',_q_txt;
     EXECUTE _q_txt;
 
