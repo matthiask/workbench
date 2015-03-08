@@ -26,7 +26,9 @@
             </tr>
             {% endifchanged %}
             <tr>
-              <th>{{ rendered }}</th>
+              <th><a href="{{ rendered.urls.detail }}" data-toggle="ajaxmodal">
+                  {{ rendered }}
+              </a></th>
               <td>{{ rendered.rendered_by.get_short_name }}</td>
               <td>{{ rendered.hours }}h</td>
             </tr>

@@ -1,0 +1,11 @@
+{% extends "modal.html" %}
+
+{% load history i18n %}
+
+{% block title %}
+{{ object }}
+{% endblock %}
+
+{% block body %}
+{% history object %}
+{% endblock %}
