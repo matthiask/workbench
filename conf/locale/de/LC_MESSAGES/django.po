@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-09 15:37+0100\n"
+"POT-Creation-Date: 2015-03-09 17:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -497,12 +497,10 @@ msgid "Offered"
 msgstr "Offeriert"
 
 #: offers/models.py:31
-#| msgid "accepted"
 msgid "Accepted"
 msgstr "Akzeptiert"
 
 #: offers/models.py:32
-#| msgid "rejected"
 msgid "Rejected"
 msgstr "Abgewiesen"
 
@@ -511,7 +509,6 @@ msgid "Replaced"
 msgstr "Ersetzt"
 
 #: offers/models.py:50
-#| msgid "offered effort"
 msgid "offered on"
 msgstr "offerierter am"
 
@@ -519,11 +516,11 @@ msgstr "offerierter am"
 msgid "stories"
 msgstr "Stories"
 
-#: offers/models.py:87
+#: offers/models.py:87 tools/pdf.py:90
 msgid "subtotal"
 msgstr "Zwischentotal"
 
-#: offers/models.py:89
+#: offers/models.py:89 tools/pdf.py:94
 msgid "discount"
 msgstr "Rabatt"
 
@@ -694,6 +691,19 @@ msgstr "Anfangswert von '%(field)s' war '%(current)s'."
 #, python-format
 msgid "'%(field)s' changed from '%(previous)s' to '%(current)s'."
 msgstr "'%(field)s' änderte von '%(previous)s' zu '%(current)s'."
+
+#: tools/pdf.py:69
+#| msgid "service types"
+msgid "Services"
+msgstr "Leistungen"
+
+#: tools/pdf.py:98
+msgid "tax"
+msgstr "MwSt"
+
+#: tools/pdf.py:103 tools/pdf.py:107
+msgid "total incl. tax"
+msgstr "Total inkl. MwSt"
 
 #: tools/views.py:55
 #, python-format
