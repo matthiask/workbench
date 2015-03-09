@@ -1,6 +1,7 @@
 from decimal import Decimal as D
 from functools import partial
 
+from django.template.defaultfilters import date as date_fmt
 from django.utils.translation import ugettext as _
 
 from pdfdocument.document import (
@@ -63,6 +64,21 @@ class PDFDocument(_PDFDocument):
                 ('RIGHTPADDING', (0, 0), (0, -1), 2 * mm),
             ),
         ]
+
+    def postal_address(self, postal_address):
+        self.smaller('FEINHEIT GmbH • Molkenstrasse 21 • 8004 Zürich')
+        self.spacer(1 * mm)
+
+        self.p(postal_address)
+        self.next_frame()
+
+    def date_line(self, date, short_name=None):
+        elements = [
+            date_fmt(date, 'l, d.m.Y'),
+        ]
+        if short_name:
+            elements.append(short_name)
+        self.smaller(' / '.join(elements))
 
     def table_stories(self, stories):
         table = [
