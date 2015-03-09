@@ -11,6 +11,40 @@ Z = D('0')
 
 
 class PDFDocument(_PDFDocument):
+    def offer_stationery(self):
+        pdf = self
+
+        def _fn(canvas, doc):
+            canvas.saveState()
+
+            canvas.setFont(pdf.style.fontName, 6)
+
+            canvas.drawCentredString(
+                108 * mm,
+                11 * mm,
+                'Bestandteil dieser Offerte sind die zum Zeitpunkt'
+                ' des Vertragsabschlusses aktuellen Allgemeinen'
+                ' Geschäftsbedingungen der FEINHEIT GmbH.')
+            canvas.drawCentredString(
+                108 * mm,
+                8 * mm,
+                'Die jeweils aktuelle Version'
+                ' finden Sie auf www.feinheit.ch/agb/.')
+
+            canvas.drawRightString(
+                190 * mm,
+                8 * mm,
+                '%d/%d' % doc.page_index())
+
+            canvas.restoreState()
+
+        return _fn
+
+    def init_offer(self):
+        super().init_letter(
+            page_fn=self.offer_stationery(),
+        )
+
     def generate_style(self, *args, **kwargs):
         super().generate_style(*args, **kwargs)
 
