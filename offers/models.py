@@ -110,6 +110,10 @@ class Offer(models.Model):
 
     save.alters_data = True
 
+    @property
+    def tax_amount(self):
+        return (self.subtotal - self.discount) * self.tax_rate / 100
+
     def add_stories(self, stories):
         types = {
             type.id: type.billing_per_hour

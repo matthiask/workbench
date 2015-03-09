@@ -4,5 +4,7 @@ django-bootstrap3==5.1.1
 django-pgjson==0.2.3
 django-vanilla-views==1.0.3
 oauth2client==1.4.6
+pdfdocument==3.1
 pip-tools==0.3.5
 psycopg2==2.6
+reportlab==3.1.44
