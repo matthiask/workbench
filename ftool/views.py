@@ -4,6 +4,7 @@ from django.utils.translation import ugettext as _
 
 from contacts.models import Organization, Person
 from deals.models import Deal
+from offers.models import Offer
 from projects.models import Project
 
 
@@ -19,6 +20,7 @@ def search(request):
             Person,
             Project,
             Deal,
+            Offer,
         )]
     else:
         messages.error(request, _('Search query missing.'))

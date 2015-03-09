@@ -44,8 +44,9 @@
                 {% trans 'person' %}</a></li>
             </ul>
           </li>
-          <li><a href="/deals/">{% trans 'deals' %}</a></li>
-          <li><a href="/projects/">{% trans 'projects' %}</a></li>
+          <li><a href="{% url 'deals_deal_list' %}">{% trans 'deals' %}</a></li>
+          <li><a href="{% url 'offers_offer_list' %}">{% trans 'offers' %}</a></li>
+          <li><a href="{% url 'projects_project_list' %}">{% trans 'projects' %}</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
