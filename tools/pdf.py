@@ -120,5 +120,21 @@ class PDFDocument(_PDFDocument):
             (instance.total.quantize(Z), _('total incl. tax')),
         ], *self.style.table_stories)
 
+    def process_offer(self, offer):
+        self.postal_address(offer.postal_address)
+        self.date_line(
+            offer.offered_on,
+            short_name=offer.owned_by.get_short_name())
+
+        self.h1(offer.title)
+        self.spacer(2 * mm)
+
+        self.p(offer.description)
+        self.spacer()
+
+        if offer.story_data and offer.story_data.get('stories'):
+            self.table_stories(offer.story_data['stories'])
+        self.table_total(offer)
+
 
 pdf_response = partial(_pdf_response, pdfdocument=PDFDocument)
