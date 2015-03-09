@@ -120,3 +120,10 @@ BOOTSTRAP3 = {
     'horizontal_label_class': 'col-md-3',
     'horizontal_field_class': 'col-md-9',
 }
+
+FONTS = {
+    'regular': os.path.join(BASE_DIR, 'stuff', 'fonts', 'ZuricBTLig.ttf'),
+    'bold': os.path.join(BASE_DIR, 'stuff', 'fonts', 'ZuricBTBol.ttf'),
+    'italic': os.path.join(BASE_DIR, 'stuff', 'fonts', 'ZuricBTLigIta.ttf'),
+    'bolditalic': os.path.join(BASE_DIR, 'stuff', 'fonts', 'ZuricBTBol.ttf'),
+}

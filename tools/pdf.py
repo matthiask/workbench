@@ -1,12 +1,19 @@
 from decimal import Decimal as D
 from functools import partial
 
+from django.conf import settings
 from django.template.defaultfilters import date as date_fmt
 from django.utils.translation import ugettext as _
 
 from pdfdocument.document import (
-    MarkupParagraph, sanitize, PDFDocument as _PDFDocument, cm, mm)
+    MarkupParagraph, sanitize, PDFDocument as _PDFDocument, cm, mm,
+    register_fonts_from_paths)
 from pdfdocument.utils import pdf_response as _pdf_response
+
+
+register_fonts_from_paths(
+    font_name='Reporting',
+    **settings.FONTS)
 
 
 Z = D('0.00')
@@ -54,6 +61,7 @@ class PDFDocument(_PDFDocument):
         )
 
     def generate_style(self, *args, **kwargs):
+        kwargs['font_name'] = 'Reporting'
         super().generate_style(*args, **kwargs)
 
         self.style.table_stories = [
