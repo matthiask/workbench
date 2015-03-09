@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'audit',
     'contacts',
     'deals',
+    'offers',
     'projects',
     'services',
     'stories',
