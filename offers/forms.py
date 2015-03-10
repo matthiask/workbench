@@ -1,9 +1,8 @@
 from django import forms
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
-from contacts.models import Organization, Person
 from offers.models import Offer
-from tools.forms import ModelForm, Picker
+from tools.forms import ModelForm
 
 
 class OfferSearchForm(forms.Form):
@@ -30,6 +29,9 @@ class OfferForm(ModelForm):
 
     class Meta:
         model = Offer
-        fields = ('project', 'title', 'description', 'owned_by')
+        fields = (
+            'offered_on', 'title', 'description', 'owned_by', 'status',
+            'postal_address')
         widgets = {
+            'status': forms.RadioSelect,
         }

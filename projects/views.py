@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 
+from offers.forms import OfferForm
+from offers.models import Offer
 from projects.forms import (
     ProjectSearchForm, StoryForm, EstimationForm)
 from projects.models import Project
@@ -58,6 +60,41 @@ class StoryCreateView(CreateView):
                 return redirect('.')
             else:
                 return HttpResponse('Thanks', status=201)  # Created
+
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+class OfferCreateView(CreateView):
+    model = Offer
+
+    def allow_create(self):
+        self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        return True
+
+    def get_form(self, data=None, files=None, **kwargs):
+        kwargs.setdefault('initial', {}).update({
+            'owned_by': self.request.user.id,
+        })
+        return OfferForm(data, files, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if not self.allow_create():
+            return redirect('../')
+
+        form = self.get_form(request.POST, request.FILES)
+        if form.is_valid():
+            offer = form.save(commit=False)
+            offer.project = self.project
+            offer.save()
+
+            messages.success(
+                self.request,
+                _("%(class)s '%(object)s' has been successfully created.") % {
+                    'class': offer._meta.verbose_name,
+                    'object': offer,
+                })
+
+            return redirect(offer.urls.url('update'))
 
         return self.render_to_response(self.get_context_data(form=form))
 

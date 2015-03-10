@@ -2,7 +2,8 @@ from django.conf.urls import url
 
 from projects.forms import ProjectForm
 from projects.models import Project
-from projects.views import ProjectListView, StoryCreateView, EstimationView
+from projects.views import (
+    ProjectListView, StoryCreateView, OfferCreateView, EstimationView)
 from tools.views import (
     DetailView, CreateView, UpdateView, DeleteView)
 
@@ -39,6 +40,10 @@ urlpatterns = [
         r'^(?P<pk>\d+)/createstory/$',
         StoryCreateView.as_view(),
         name='projects_project_createstory'),
+    url(
+        r'^(?P<pk>\d+)/createoffer/$',
+        OfferCreateView.as_view(),
+        name='projects_project_createoffer'),
     url(
         r'^(?P<pk>\d+)/estimation/$',
         EstimationView.as_view(),
