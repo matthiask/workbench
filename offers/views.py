@@ -14,8 +14,8 @@ class OfferListView(ListView):
 
     def get_queryset(self):
         return super().get_queryset().select_related(
-            'customer',
-            'contact__organization',
+            'project__customer',
+            'project__contact__organization',
         )
 
 

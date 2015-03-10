@@ -4,7 +4,7 @@ from offers import models
 
 
 class OfferAdmin(admin.ModelAdmin):
-    raw_id_fields = ('customer', 'contact', 'stories')
+    raw_id_fields = ('project', 'stories')
 
 
 admin.site.register(models.Offer, OfferAdmin)

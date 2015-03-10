@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_pgjson.fields import JsonBField
 
 from accounts.models import User
-from contacts.models import Organization, Person
+from projects.models import Project
 from services.models import ServiceType
 from stories.models import Story
 from tools.models import SearchManager
@@ -33,18 +33,11 @@ class Offer(models.Model):
         (REPLACED, _('Replaced')),
     )
 
-    customer = models.ForeignKey(
-        Organization,
+    project = models.ForeignKey(
+        Project,
         on_delete=models.PROTECT,
-        verbose_name=_('customer'),
-        related_name='+')
-    contact = models.ForeignKey(
-        Person,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        verbose_name=_('contact'),
-        related_name='+')
+        verbose_name=_('project'),
+        related_name='offers')
 
     offered_on = models.DateField(
         _('offered on'),
