@@ -20,6 +20,18 @@ class RenderedServiceForm(ModelForm):
             'description': forms.Textarea(attrs={'rows': 4}),
         }
 
+    def __init__(self, *args, **kwargs):
+        self.story = kwargs.pop('story')
+        super().__init__(*args, **kwargs)
+
+    def save(self):
+        instance = super().save(commit=False)
+        if not instance.pk:
+            instance.created_by = self.request.user
+        instance.story = self.story
+        instance.save()
+        return instance
+
 
 class MergeStoryForm(forms.Form):
     merge_into = forms.ModelChoiceField(
@@ -29,6 +41,8 @@ class MergeStoryForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.story = kwargs.pop('instance')
+        self.request = kwargs.pop('request')
+
         super().__init__(*args, **kwargs)
 
         stories = self.story.project.stories.exclude(pk=self.story.pk)

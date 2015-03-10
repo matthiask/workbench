@@ -68,8 +68,20 @@ class StoryForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project')
+        kwargs['initial'] = {
+            'release': self.project.releases.filter(is_default=True).first(),
+        }
+
         super().__init__(*args, **kwargs)
         self.fields['release'].queryset = self.project.releases.all()
+
+    def save(self):
+        instance = super().save(commit=False)
+        if not instance.pk:
+            instance.requested_by = self.request.user
+        instance.project = self.project
+        instance.save()
+        return instance
 
 
 class EffortForm(forms.Form):
@@ -81,6 +93,8 @@ class EffortForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('instance')
+        self.request = kwargs.pop('request')
+
         super().__init__(*args, **kwargs)
 
         self.requiredservices = defaultdict(dict)

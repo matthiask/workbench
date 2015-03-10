@@ -25,7 +25,15 @@ class ModelForm(forms.ModelForm):
     default_to_current_user = ()
 
     def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request')
+
+        if self.default_to_current_user:
+            initial = kwargs.setdefault('initial', {})
+            for field in self.default_to_current_user:
+                initial.setdefault(field, self.request.user.pk)
+
         super().__init__(*args, **kwargs)
+
         for field in self.user_fields:
             self._only_active_and_initial_users(
                 self.fields[field],
@@ -45,6 +53,8 @@ class ModelForm(forms.ModelForm):
         choices = [(_('Active'), d.get(True, []))]
         if d.get(False):
             choices[0:0] = d.get(False)
+        if not formfield.required:
+            choices.insert(0, ('', '----------'))
         formfield.choices = choices
 
 

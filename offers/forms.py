@@ -40,6 +40,9 @@ class OfferForm(ModelForm):
 
 
 class CreateOfferForm(ModelForm):
+    user_fields = ('owned_by',)
+    default_to_current_user = user_fields
+
     class Meta:
         model = Offer
         fields = (
@@ -48,6 +51,8 @@ class CreateOfferForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project')
+        kwargs['initial'] = {'title': self.project.title}
+
         super().__init__(*args, **kwargs)
 
         postal_addresses = []

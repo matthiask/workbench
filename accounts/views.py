@@ -12,6 +12,7 @@ from django.views.decorators.cache import never_cache
 
 from oauth2client.client import OAuth2WebServerFlow, FlowExchangeError
 
+from accounts.forms import UserForm
 from accounts.models import User
 from tools.views import UpdateView
 
@@ -25,7 +26,7 @@ def accounts(request):
 
 class UserUpdateView(UpdateView):
     model = User
-    fields = ('_full_name', '_short_name', 'email', 'date_of_birth')
+    form_class = UserForm
     success_url = reverse_lazy('accounts_update')
 
     def get_object(self):

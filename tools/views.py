@@ -63,6 +63,11 @@ class ToolsMixin(object):
         else:
             return True
 
+    def get_form(self, data=None, files=None, **kwargs):
+        kwargs['request'] = self.request
+        cls = self.get_form_class()
+        return cls(data=data, files=files, **kwargs)
+
 
 class ListView(ToolsMixin, vanilla.ListView):
     paginate_by = 50
@@ -92,13 +97,6 @@ class DetailView(ToolsMixin, vanilla.DetailView):
 
 
 class CreateView(ToolsMixin, vanilla.CreateView):
-    def get_form(self, data=None, files=None, **kwargs):
-        form_class = self.get_form_class()
-        for field in getattr(form_class, 'default_to_current_user', ()):
-            kwargs.setdefault('initial', {}).setdefault(
-                field, self.request.user.pk)
-        return form_class(data, files, **kwargs)
-
     def get(self, request, *args, **kwargs):
         if not self.allow_create():
             return redirect('../')
@@ -124,6 +122,9 @@ class CreateView(ToolsMixin, vanilla.CreateView):
                 'class': self.object._meta.verbose_name,
                 'object': self.object,
             })
+
+        if '_continue' in self.request.POST:
+            return redirect('.')
         if self.request.is_ajax():
             # TODO Show messages in the popup?
             return HttpResponse('Thanks', status=201)  # Created

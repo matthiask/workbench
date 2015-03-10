@@ -9,12 +9,11 @@ from tools.views import DetailView, UpdateView
 
 class StoryDetailView(DetailView):
     model = Story
+    form_class = RenderedServiceForm
 
-    def get_form(self, data=None, files=None, **kwargs):
-        kwargs.setdefault('initial', {}).update({
-            'rendered_by': self.request.user.pk,
-        })
-        return RenderedServiceForm(data, files, **kwargs)
+    def get_form(self, data=None, files=None):
+        return RenderedServiceForm(
+            data, files, story=self.object, request=self.request)
 
     def get_context_data(self, **kwargs):
         if 'form' not in kwargs:
@@ -29,11 +28,7 @@ class StoryDetailView(DetailView):
 
         form = self.get_form(request.POST, request.FILES)
         if form.is_valid():
-            service = form.save(commit=False)
-            service.created_by = request.user
-            service.story = self.object
-            service.save()
-
+            service = form.save()
             form = self.get_form()
 
             messages.success(
