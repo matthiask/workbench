@@ -1,3 +1,4 @@
+from copy import deepcopy
 from decimal import Decimal as D
 from functools import partial
 
@@ -6,20 +7,104 @@ from django.template.defaultfilters import date as date_fmt
 from django.utils.translation import ugettext as _
 
 from pdfdocument.document import (
-    MarkupParagraph, sanitize, PDFDocument as _PDFDocument, cm, mm,
-    register_fonts_from_paths)
+    MarkupParagraph, sanitize, PDFDocument as _PDFDocument, cm, mm, colors,
+    getSampleStyleSheet, register_fonts_from_paths)
 from pdfdocument.utils import pdf_response as _pdf_response
 
 
 register_fonts_from_paths(
-    font_name='Reporting',
+    font_name='Rep',
     **settings.FONTS)
 
 
 Z = D('0.00')
 
 
+class Empty(object):
+    pass
+
+
+def style(base, **kwargs):
+    style = deepcopy(base)
+    for key, value in kwargs.items():
+        setattr(style, key, value)
+    return style
+
+
 class PDFDocument(_PDFDocument):
+    def generate_style(self, *args, **kwargs):
+        self.style = Empty()
+        self.style.fontName = 'Rep'
+        self.style.fontSize = 9
+
+        self.style.normal = style(
+            getSampleStyleSheet()['Normal'],
+            fontName='Rep',
+            fontSize=self.style.fontSize,
+            firstLineIndent=0,
+        )
+        self.style.heading1 = style(
+            self.style.normal,
+            fontName='Rep-Bold',
+            fontSize=1.5 * self.style.fontSize,
+            leading=2 * self.style.fontSize,
+        )
+        self.style.heading2 = style(
+            self.style.normal,
+            fontName='Rep-Bold',
+            fontSize=1.25 * self.style.fontSize,
+            leading=1.75 * self.style.fontSize,
+        )
+        self.style.heading3 = style(
+            self.style.normal,
+            fontName='Rep-Bold',
+            fontSize=1.1 * self.style.fontSize,
+            leading=1.5 * self.style.fontSize,
+        )
+
+        self.style.small = style(
+            self.style.normal,
+            fontSize=self.style.fontSize * 0.9,
+        )
+        self.style.smaller = style(
+            self.style.normal,
+            fontSize=self.style.fontSize * 0.75,
+        )
+        self.style.bold = style(
+            self.style.normal,
+            fontName='Rep-Bold',
+        )
+        self.style.paragraph = style(
+            self.style.normal,
+            spaceBefore=1,
+            spaceAfter=1,
+        )
+        self.style.table = (
+            ('FONT', (0, 0), (-1, -1), 'Rep', self.style.fontSize),
+            ('TOPPADDING', (0, 0), (-1, -1), 0),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+            ('FIRSTLINEINDENT', (0, 0), (-1, -1), 0),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        )
+
+        self.style.tableHeadLine = self.style.table + (
+            ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
+            ('RIGHTPADDING', (0, 0), (0, -1), 2 * mm),
+
+            ('LINEABOVE', (0, 0), (-1, 0), 0.2, colors.black),
+            ('LINEBELOW', (0, 0), (-1, 0), 0.2, colors.black),
+            ('FONT', (0, 0), (-1, 0), 'Rep-Bold', self.style.fontSize),
+            ('TOPPADDING', (0, 0), (-1, 0), 1),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 2),
+        )
+
+        self.style.tableHead = self.style.tableHeadLine + (
+            ('TOPPADDING', (0, 1), (-1, 1), 1),
+        )
+
     def offer_stationery(self):
         pdf = self
 
@@ -60,19 +145,6 @@ class PDFDocument(_PDFDocument):
             page_fn=self.offer_stationery(),
         )
 
-    def generate_style(self, *args, **kwargs):
-        kwargs['font_name'] = 'Reporting'
-        super().generate_style(*args, **kwargs)
-
-        self.style.table_stories = [
-            (1.8 * cm, 14.6 * cm),
-            self.style.tableHead + (
-                ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
-                ('ALIGN', (1, 0), (1, -1), 'LEFT'),
-                ('RIGHTPADDING', (0, 0), (0, -1), 2 * mm),
-            ),
-        ]
-
     def postal_address(self, postal_address):
         self.smaller('FEINHEIT GmbH · Molkenstrasse 21 · 8004 Zürich')
         self.spacer(1 * mm)
@@ -103,7 +175,10 @@ class PDFDocument(_PDFDocument):
                 ), self.style.normal),
             ])
 
-        self.table(table, *self.style.table_stories)
+        self.table(
+            table,
+            (1.8 * cm, 14.6 * cm),
+            self.style.tableHead)
 
     def table_total(self, instance):
         total = [
@@ -121,11 +196,11 @@ class PDFDocument(_PDFDocument):
             ))
 
         if len(total) > 1:
-            self.table(total, *self.style.table_stories)
+            self.table(total, (1.8 * cm, 14.6 * cm), self.style.tableHead)
 
         self.table([
             (instance.total.quantize(Z), _('total incl. tax')),
-        ], *self.style.table_stories)
+        ], (1.8 * cm, 14.6 * cm), self.style.tableHeadLine)
 
     def process_offer(self, offer):
         self.postal_address(offer.postal_address)
