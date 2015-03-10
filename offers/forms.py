@@ -49,7 +49,10 @@ class CreateOfferForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project')
-        kwargs['initial'] = {'title': self.project.title}
+        kwargs['initial'] = {
+            'title': self.project.title,
+            'description': self.project.description,
+        }
 
         super().__init__(*args, **kwargs)
 
