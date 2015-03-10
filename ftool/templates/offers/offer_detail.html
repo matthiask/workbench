@@ -1,0 +1,24 @@
+
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+<div class="col-md-12">
+  <h1>{{ object }}</h1>
+
+  <a href="{{ object.urls.update }}" class="btn btn-default">
+    {% trans 'Update' %}
+  </a>
+  <a href="{{ object.urls.refresh }}" class="btn btn-default">
+    {% trans 'Refresh' %}
+  </a>
+  <a href="{{ object.urls.delete }}" class="btn btn-danger">
+    {% trans 'Delete' %}
+  </a>
+</div>
+</div>
+{% endblock %}

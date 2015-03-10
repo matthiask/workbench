@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from offers.forms import OfferForm
 from offers.models import Offer
-from offers.views import OfferListView, OfferPDFView
+from offers.views import OfferListView, OfferRefreshView, OfferPDFView
 from tools.views import (
     DetailView, CreateView, UpdateView, DeleteView)
 
@@ -35,6 +35,10 @@ urlpatterns = [
         DeleteView.as_view(model=Offer),
         name='offers_offer_delete'),
 
+    url(
+        r'^(?P<pk>\d+)/refresh/$',
+        OfferRefreshView.as_view(),
+        name='offers_offer_refresh'),
     url(
         r'^(?P<pk>\d+)/pdf/$',
         OfferPDFView.as_view(),
