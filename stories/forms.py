@@ -8,8 +8,7 @@ from tools.forms import ModelForm
 
 
 class RenderedServiceForm(ModelForm):
-    user_fields = ('rendered_by',)
-    default_to_current_user = user_fields
+    user_fields = default_to_current_user = ('rendered_by',)
 
     class Meta:
         model = RenderedService

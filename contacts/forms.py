@@ -30,8 +30,7 @@ class OrganizationSearchForm(forms.Form):
 
 
 class OrganizationForm(ModelForm):
-    user_fields = ('primary_contact',)
-    default_to_current_user = user_fields
+    user_fields = default_to_current_user = ('primary_contact',)
 
     class Meta:
         model = Organization
@@ -44,8 +43,7 @@ class OrganizationForm(ModelForm):
 
 
 class PersonForm(ModelForm):
-    user_fields = ('primary_contact',)
-    default_to_current_user = user_fields
+    user_fields = default_to_current_user = ('primary_contact',)
 
     class Meta:
         model = Person

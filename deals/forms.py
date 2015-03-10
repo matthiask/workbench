@@ -25,8 +25,7 @@ class DealSearchForm(forms.Form):
 
 
 class DealForm(ModelForm):
-    user_fields = ('owned_by',)
-    default_to_current_user = user_fields
+    user_fields = default_to_current_user = ('owned_by',)
 
     class Meta:
         model = Deal
