@@ -67,9 +67,12 @@ class StoryForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project')
-        kwargs['initial'] = {
-            'release': self.project.releases.filter(is_default=True).first(),
-        }
+
+        if not kwargs.get('instance'):
+            kwargs['initial'] = {
+                'release': self.project.releases.filter(
+                    is_default=True).first(),
+            }
 
         super().__init__(*args, **kwargs)
         self.fields['release'].queryset = self.project.releases.all()
