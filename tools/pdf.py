@@ -74,7 +74,7 @@ class PDFDocument(_PDFDocument):
         ]
 
     def postal_address(self, postal_address):
-        self.smaller('FEINHEIT GmbH • Molkenstrasse 21 • 8004 Zürich')
+        self.smaller('FEINHEIT GmbH · Molkenstrasse 21 · 8004 Zürich')
         self.spacer(1 * mm)
 
         self.p(postal_address)
@@ -83,10 +83,9 @@ class PDFDocument(_PDFDocument):
     def date_line(self, date, short_name=None):
         elements = [
             date_fmt(date, 'l, d.m.Y'),
+            short_name,
         ]
-        if short_name:
-            elements.append(short_name)
-        self.smaller(' / '.join(elements))
+        self.smaller(' / '.join(e for e in elements))
 
     def table_stories(self, stories):
         table = [
