@@ -122,8 +122,8 @@ BOOTSTRAP3 = {
 }
 
 FONTS = {
-    'regular': os.path.join(BASE_DIR, 'stuff', 'fonts', 'ZuricBTLig.ttf'),
-    'bold': os.path.join(BASE_DIR, 'stuff', 'fonts', 'ZuricBTBol.ttf'),
-    'italic': os.path.join(BASE_DIR, 'stuff', 'fonts', 'ZuricBTLigIta.ttf'),
-    'bolditalic': os.path.join(BASE_DIR, 'stuff', 'fonts', 'ZuricBTBol.ttf'),
+    'regular': os.path.join(BASE_DIR, 'stuff', 'fonts', 'Lato-Light.ttf'),
+    'bold': os.path.join(BASE_DIR, 'stuff', 'fonts', 'Lato-Semibold.ttf'),
+    'italic': os.path.join(BASE_DIR, 'stuff', 'fonts', 'Lato-LightItalic.ttf'),
+    'bolditalic': os.path.join(BASE_DIR, 'stuff', 'fonts', 'Lato-Bold.ttf'),
 }
