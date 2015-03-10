@@ -53,10 +53,12 @@
     data-toggle="ajaxmodal">{% trans 'create story' %}</a>
   <a href="{{ project.urls.createoffer }}" class="btn btn-default">
     {% trans 'create offer' %}</a>
-  <a href="{{ project.urls.update }}" class="btn btn-default">
-    {% trans 'Update' %}</a>
   <a href="{{ project.urls.estimation }}" class="btn btn-default">
     {% trans 'estimation' %}</a>
+  <a href="{{ project.urls.update }}" class="btn btn-default">
+    {% trans 'Update' %}</a>
+  <a href="{{ project.urls.delete }}" class="btn btn-danger">
+    {% trans 'Delete' %}</a>
 
   <h2>{% trans 'History' %}</h2>
   {% history project 'customer, contact, title, description, owned_by, status' %}
