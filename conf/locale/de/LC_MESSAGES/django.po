@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-09 17:46+0100\n"
+"POT-Creation-Date: 2015-03-10 16:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,7 +71,7 @@ msgstr "Kein Benutzer mit Emailadresse %s gefunden."
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
-#: activities/models.py:16 offers/models.py:46 projects/models.py:60
+#: activities/models.py:16 projects/models.py:60
 msgid "contact"
 msgstr "Kontakt"
 
@@ -81,7 +81,7 @@ msgid "deal"
 msgstr "Geschäft"
 
 #: activities/models.py:27 contacts/models.py:13 deals/models.py:52
-#: offers/models.py:59 projects/models.py:64 projects/models.py:154
+#: offers/models.py:52 projects/models.py:64 projects/models.py:154
 #: services/models.py:7 stories/models.py:49
 msgid "title"
 msgstr "Titel"
@@ -89,7 +89,7 @@ msgstr "Titel"
 #: activities/models.py:31 deals/models.py:60
 #: ftool/templates/deals/deal_detail.html:25
 #: ftool/templates/deals/deal_list.html:38
-#: ftool/templates/projects/project_list.html:37 offers/models.py:67
+#: ftool/templates/projects/project_list.html:37 offers/models.py:60
 #: projects/models.py:72 stories/models.py:46
 msgid "owned by"
 msgstr "gehört"
@@ -216,7 +216,8 @@ msgstr "Emailadresse"
 msgid "email addresses"
 msgstr "Emailadressen"
 
-#: contacts/models.py:165 contacts/models.py:169 offers/models.py:76
+#: contacts/models.py:165 contacts/models.py:169 offers/forms.py:73
+#: offers/models.py:69
 msgid "postal address"
 msgstr "Postadresse"
 
@@ -268,7 +269,7 @@ msgid "declined"
 msgstr "Abgelehnt"
 
 #: deals/models.py:55 ftool/templates/deals/deal_detail.html:21
-#: offers/models.py:62 projects/models.py:67 stories/models.py:52
+#: offers/models.py:55 projects/models.py:67 stories/models.py:52
 #: stories/models.py:221
 msgid "description"
 msgstr "Beschreibung"
@@ -283,12 +284,12 @@ msgstr "geschätzter Wert"
 #: ftool/templates/deals/deal_detail.html:33
 #: ftool/templates/deals/deal_list.html:40
 #: ftool/templates/projects/project_list.html:29
-#: ftool/templates/projects/project_list.html:38 offers/models.py:71
+#: ftool/templates/projects/project_list.html:38 offers/models.py:64
 #: projects/models.py:76 stories/models.py:69
 msgid "status"
 msgstr "Status"
 
-#: deals/models.py:76 offers/models.py:54
+#: deals/models.py:76 offers/models.py:47
 msgid "closed at"
 msgstr "Geschlossen um"
 
@@ -312,7 +313,7 @@ msgstr "Suche"
 msgid "contacts"
 msgstr "Kontakte"
 
-#: ftool/templates/base.html:48 offers/models.py:100
+#: ftool/templates/base.html:48 offers/models.py:93
 msgid "offers"
 msgstr "Offerten"
 
@@ -332,13 +333,15 @@ msgstr "Abmelden"
 #: ftool/templates/contacts/organization_detail.html:54
 #: ftool/templates/contacts/person_detail.html:54
 #: ftool/templates/deals/deal_detail.html:39
-#: ftool/templates/projects/project_detail.html:55
+#: ftool/templates/offers/offer_detail.html:16
+#: ftool/templates/projects/project_detail.html:57
 msgid "Update"
 msgstr "Aktualisieren"
 
 #: ftool/templates/contacts/organization_detail.html:56
 #: ftool/templates/contacts/person_detail.html:56
 #: ftool/templates/deals/deal_detail.html:41
+#: ftool/templates/offers/offer_detail.html:22
 #: ftool/templates/stories/story_confirm_delete.html:16
 #: ftool/templates/stories/story_detail.html:53
 msgid "Delete"
@@ -391,7 +394,8 @@ msgid "submit"
 msgstr "absenden"
 
 #: ftool/templates/deals/deal_detail.html:43
-#: ftool/templates/projects/project_detail.html:59
+#: ftool/templates/offers/offer_detail.html:25
+#: ftool/templates/projects/project_detail.html:61
 msgid "History"
 msgstr "Geschichte"
 
@@ -404,6 +408,10 @@ msgstr "Version %(number)s erstellt von %(user_name)s"
 msgid "Close"
 msgstr "Schliessen"
 
+#: ftool/templates/offers/offer_detail.html:19
+msgid "Refresh"
+msgstr "Aktualisieren"
+
 #: ftool/templates/projects/project_detail.html:14
 msgid "releases and stories"
 msgstr "Versionen und Stories"
@@ -413,7 +421,12 @@ msgstr "Versionen und Stories"
 msgid "create story"
 msgstr "Story erstellen"
 
-#: ftool/templates/projects/project_detail.html:57
+#: ftool/templates/projects/project_detail.html:55
+#| msgid "create story"
+msgid "create offer"
+msgstr "Offerte erstellen"
+
+#: ftool/templates/projects/project_detail.html:59
 msgid "estimation"
 msgstr "Schätzung"
 
@@ -422,13 +435,12 @@ msgstr "Schätzung"
 msgid "story"
 msgstr "Story"
 
-#: ftool/templates/projects/project_list.html:35 projects/models.py:84
-#: projects/models.py:150 stories/models.py:58
+#: ftool/templates/projects/project_list.html:35 offers/models.py:39
+#: projects/models.py:84 projects/models.py:150 stories/models.py:58
 msgid "project"
 msgstr "Projekt"
 
-#: ftool/templates/projects/project_list.html:36 offers/models.py:39
-#: projects/models.py:53
+#: ftool/templates/projects/project_list.html:36 projects/models.py:53
 msgid "customer"
 msgstr "Kunde"
 
@@ -479,14 +491,13 @@ msgstr "Löschen"
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
 
-#: offers/forms.py:11 projects/forms.py:15
+#: offers/forms.py:12 projects/forms.py:15
 msgid "All states"
 msgstr "Alle Stati"
 
-#: offers/forms.py:45 projects/forms.py:49
-#, python-format
-msgid "The contact %(person)s does not belong to  %(organization)s."
-msgstr "Der Kontakt %(person)s gehört nicht zu %(organization)s."
+#: offers/forms.py:74
+msgid "The exact address can be edited later."
+msgstr "Die exakte Adresse kann später bearbeitet werden."
 
 #: offers/models.py:29 projects/models.py:45
 msgid "In preparation"
@@ -508,33 +519,42 @@ msgstr "Abgewiesen"
 msgid "Replaced"
 msgstr "Ersetzt"
 
-#: offers/models.py:50
+#: offers/models.py:43
 msgid "offered on"
 msgstr "offeriert am"
 
-#: offers/models.py:79 offers/models.py:82 stories/models.py:88
+#: offers/models.py:72 offers/models.py:75 stories/models.py:88
 msgid "stories"
 msgstr "Stories"
 
-#: offers/models.py:87 tools/pdf.py:90
+#: offers/models.py:80 tools/pdf.py:183
 msgid "subtotal"
 msgstr "Zwischentotal"
 
-#: offers/models.py:89 tools/pdf.py:94
+#: offers/models.py:82 tools/pdf.py:188
 msgid "discount"
 msgstr "Rabatt"
 
-#: offers/models.py:91
+#: offers/models.py:84
 msgid "tax rate"
 msgstr "MwSt-Satz"
 
-#: offers/models.py:93
+#: offers/models.py:86
 msgid "total"
 msgstr "Total"
 
-#: offers/models.py:99
+#: offers/models.py:92
 msgid "offer"
 msgstr "Offerte"
+
+#: offers/views.py:30
+msgid "Successfully refreshed the offer."
+msgstr ""
+
+#: projects/forms.py:49
+#, python-format
+msgid "The contact %(person)s does not belong to  %(organization)s."
+msgstr "Der Kontakt %(person)s gehört nicht zu %(organization)s."
 
 #: projects/models.py:46
 msgid "Work in progress"
@@ -560,7 +580,7 @@ msgstr "Version"
 msgid "releases"
 msgstr "Versionen"
 
-#: projects/views.py:52 stories/views.py:41 tools/views.py:123
+#: projects/views.py:54 stories/views.py:41 tools/views.py:123
 #, python-format
 msgid "%(class)s '%(object)s' has been successfully created."
 msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
@@ -677,31 +697,34 @@ msgstr "erbrachte Leistungen"
 msgid "Active"
 msgstr "Aktiv"
 
-#: tools/history.py:30
+#: tools/history.py:36
 #, python-format
 msgid "Deleted %s instance"
 msgstr "Gelöschte %s-Instanz"
 
-#: tools/history.py:45
+#: tools/history.py:40
+msgid "<no value>"
+msgstr ""
+
+#: tools/history.py:51
 #, python-format
 msgid "Initial value of '%(field)s' was '%(current)s'."
 msgstr "Anfangswert von '%(field)s' war '%(current)s'."
 
-#: tools/history.py:60
+#: tools/history.py:66
 #, python-format
 msgid "'%(field)s' changed from '%(previous)s' to '%(current)s'."
 msgstr "'%(field)s' änderte von '%(previous)s' zu '%(current)s'."
 
-#: tools/pdf.py:69
-#| msgid "service types"
+#: tools/pdf.py:162
 msgid "Services"
 msgstr "Leistungen"
 
-#: tools/pdf.py:98
+#: tools/pdf.py:193
 msgid "tax"
 msgstr "MwSt"
 
-#: tools/pdf.py:103 tools/pdf.py:107
+#: tools/pdf.py:200
 msgid "total incl. tax"
 msgstr "Total inkl. MwSt"
 

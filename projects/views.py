@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 
-from offers.forms import OfferForm
+from offers.forms import CreateOfferForm
 from offers.models import Offer
 from projects.forms import (
     ProjectSearchForm, StoryForm, EstimationForm)
@@ -75,28 +75,7 @@ class OfferCreateView(CreateView):
         kwargs.setdefault('initial', {}).update({
             'owned_by': self.request.user.id,
         })
-        return OfferForm(data, files, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        if not self.allow_create():
-            return redirect('../')
-
-        form = self.get_form(request.POST, request.FILES)
-        if form.is_valid():
-            offer = form.save(commit=False)
-            offer.project = self.project
-            offer.save()
-
-            messages.success(
-                self.request,
-                _("%(class)s '%(object)s' has been successfully created.") % {
-                    'class': offer._meta.verbose_name,
-                    'object': offer,
-                })
-
-            return redirect(offer.urls.url('update'))
-
-        return self.render_to_response(self.get_context_data(form=form))
+        return CreateOfferForm(data, files, project=self.project, **kwargs)
 
 
 class EstimationView(UpdateView):
