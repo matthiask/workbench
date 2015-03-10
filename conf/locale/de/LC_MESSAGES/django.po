@@ -510,7 +510,7 @@ msgstr "Ersetzt"
 
 #: offers/models.py:50
 msgid "offered on"
-msgstr "offerierter am"
+msgstr "offeriert am"
 
 #: offers/models.py:79 offers/models.py:82 stories/models.py:88
 msgid "stories"
