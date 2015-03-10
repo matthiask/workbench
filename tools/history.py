@@ -10,6 +10,10 @@ from audit.models import LoggedAction
 Change = namedtuple('Change', 'changes version number')
 
 
+def default_if_none(value, default):
+    return default if value is None else value
+
+
 @lru_cache()
 def formatter(field):
     """
@@ -17,7 +21,9 @@ def formatter(field):
     """
     if field.choices:
         choices = {str(key): value for key, value in field.flatchoices}
-        return lambda value: choices.get(value, value)
+        return lambda value: default_if_none(
+            choices.get(value, value),
+            '<empty>')
 
     if field.related_model:
         model = field.related_model
@@ -31,7 +37,7 @@ def formatter(field):
 
         return _fn
 
-    return lambda value: value
+    return lambda value: default_if_none(value, _('<no value>'))
 
 
 def changes(instance, fields):
