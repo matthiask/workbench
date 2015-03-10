@@ -116,7 +116,7 @@ class Offer(models.Model):
 
     @property
     def code(self):
-        return '%06d' % self.pk
+        return 'O-%06d' % self.pk
 
     def add_stories(self, stories):
         types = {

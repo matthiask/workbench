@@ -47,19 +47,19 @@ class PDFDocument(_PDFDocument):
             self.style.normal,
             fontName='Rep-Bold',
             fontSize=1.5 * self.style.fontSize,
-            leading=2 * self.style.fontSize,
+            leading=1.75 * self.style.fontSize,
         )
         self.style.heading2 = style(
             self.style.normal,
             fontName='Rep-Bold',
             fontSize=1.25 * self.style.fontSize,
-            leading=1.75 * self.style.fontSize,
+            leading=1.5 * self.style.fontSize,
         )
         self.style.heading3 = style(
             self.style.normal,
             fontName='Rep-Bold',
             fontSize=1.1 * self.style.fontSize,
-            leading=1.5 * self.style.fontSize,
+            leading=1.3 * self.style.fontSize,
         )
 
         self.style.small = style(
@@ -152,11 +152,9 @@ class PDFDocument(_PDFDocument):
         self.p(postal_address)
         self.next_frame()
 
-    def date_line(self, date, short_name=None):
-        elements = [
-            date_fmt(date, 'l, d.m.Y'),
-            short_name,
-        ]
+    def date_line(self, date, *args):
+        elements = [date_fmt(date, 'l, d.m.Y')]
+        elements.extend(args)
         self.smaller(' / '.join(e for e in elements))
 
     def table_stories(self, stories):
@@ -206,7 +204,8 @@ class PDFDocument(_PDFDocument):
         self.postal_address(offer.postal_address)
         self.date_line(
             offer.offered_on,
-            short_name=offer.owned_by.get_short_name())
+            offer.owned_by.get_short_name(),
+            offer.code)
 
         self.h1(offer.title)
         self.spacer(2 * mm)
