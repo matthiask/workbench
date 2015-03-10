@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n %}
+{% load history i18n %}
 
 {% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
@@ -21,6 +21,9 @@
   <a href="{{ object.urls.delete }}" class="btn btn-danger">
     {% trans 'Delete' %}
   </a>
+
+  <h2>{% trans 'History' %}</h2>
+  {% history object 'offered_on, closed_at, title, description, owned_by, status, discount, total' %}
 </div>
 </div>
 {% endblock %}
