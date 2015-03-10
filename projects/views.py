@@ -74,6 +74,7 @@ class OfferCreateView(CreateView):
     def get_form(self, data=None, files=None, **kwargs):
         kwargs.setdefault('initial', {}).update({
             'owned_by': self.request.user.id,
+            'title': self.project.title,
         })
         return CreateOfferForm(data, files, project=self.project, **kwargs)
 
