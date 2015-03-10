@@ -103,12 +103,14 @@ class Offer(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        self.total = self.subtotal - self.discount
-        self.total *= 1 + self.tax_rate / 100
-
+        self._calculate_total()
         super().save(*args, **kwargs)
 
     save.alters_data = True
+
+    def _calculate_total(self):
+        self.total = self.subtotal - self.discount
+        self.total *= 1 + self.tax_rate / 100
 
     @property
     def tax_amount(self):
@@ -118,7 +120,7 @@ class Offer(models.Model):
     def code(self):
         return 'O-%06d' % self.pk
 
-    def add_stories(self, stories):
+    def add_stories(self, stories, save=True):
         types = {
             type.id: type.billing_per_hour
             for type in ServiceType.objects.all()}
@@ -150,3 +152,12 @@ class Offer(models.Model):
             )
             for story in self.story_data['stories']
         ], Decimal('0'))
+
+        self._calculate_total()
+
+        if save:
+            self.save()
+
+    def refresh(self, save=True):
+        self.story_data = {}
+        self.add_stories(self.stories.all(), save=save)
