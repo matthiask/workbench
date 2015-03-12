@@ -1,14 +1,14 @@
 from decimal import Decimal
 
 from django.db import models
+from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
 
 from django_pgjson.fields import JsonBField
 
 from accounts.models import User
 from projects.models import Project
-from services.models import ServiceType
-from stories.models import Story
+from stories.models import Story, RequiredService
 from tools.models import SearchManager
 from tools.urls import model_urls
 
@@ -114,10 +114,6 @@ class Offer(models.Model):
         return 'O-%06d' % self.pk
 
     def add_stories(self, stories, save=True):
-        types = {
-            type.id: type.billing_per_hour
-            for type in ServiceType.objects.all()}
-
         if not self.story_data:
             self.story_data = {}
 
@@ -128,11 +124,15 @@ class Offer(models.Model):
                 'billing': [
                     (
                         str(rs.offered_effort),
-                        str(types[rs.service_type_id]),
+                        str(rs.service_type.billing_per_hour),
                     ) for rs in story.requiredservices.all()
                 ],
             } for story in stories.prefetch_related(
-                'requiredservices',
+                Prefetch(
+                    'requiredservices',
+                    queryset=RequiredService.objects.select_related(
+                        'service_type'),
+                ),
             )
         ))
 
@@ -151,6 +151,11 @@ class Offer(models.Model):
         if save:
             self.save()
 
-    def refresh(self, save=True):
+    def clear_stories(self, save=True):
+        self.stories.clear()
         self.story_data = {}
-        self.add_stories(self.stories.all(), save=save)
+        self.subtotal = Decimal('0')
+        self._calculate_total()
+
+        if save:
+            self.save()

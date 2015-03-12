@@ -25,19 +25,6 @@ class OfferSearchForm(forms.Form):
         return queryset
 
 
-class OfferForm(ModelForm):
-    user_fields = default_to_current_user = ('owned_by',)
-
-    class Meta:
-        model = Offer
-        fields = (
-            'offered_on', 'title', 'description', 'owned_by', 'status',
-            'postal_address')
-        widgets = {
-            'status': forms.RadioSelect,
-        }
-
-
 class CreateOfferForm(ModelForm):
     user_fields = default_to_current_user = ('owned_by',)
 
@@ -88,4 +75,31 @@ class CreateOfferForm(ModelForm):
             instance.postal_address = self.cleaned_data['pa'].postal_address
         instance.project = self.project
         instance.save()
+        return instance
+
+
+class OfferForm(ModelForm):
+    user_fields = default_to_current_user = ('owned_by',)
+
+    class Meta:
+        model = Offer
+        fields = (
+            'offered_on', 'title', 'description', 'owned_by', 'status',
+            'postal_address', 'stories')
+        widgets = {
+            'status': forms.RadioSelect,
+            'stories': forms.CheckboxSelectMultiple,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['stories'].queryset = self.instance.project.stories.all()
+
+    def save(self):
+        instance = super().save(commit=False)
+        # Leave out save_m2m by purpose.
+        instance.clear_stories(save=False)
+        instance.add_stories(
+            self.cleaned_data.get('stories'),
+            save=True)
         return instance
