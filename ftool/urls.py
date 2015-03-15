@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^offers/', include('offers.urls')),
     url(r'^projects/', include('projects.urls')),
     url(r'^stories/', include('stories.urls')),
+    url(r'^invoices/', include('invoices.urls')),
 
     url(r'^search/$', views.search, name='search'),
 

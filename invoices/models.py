@@ -66,6 +66,14 @@ class Invoice(models.Model):
         verbose_name=_('project'),
         related_name='+')
 
+    invoiced_on = models.DateField(
+        _('invoiced on'),
+        blank=True,
+        null=True)
+    due_on = models.DateField(
+        _('due on'),
+        blank=True,
+        null=True)
     title = models.CharField(
         _('title'),
         max_length=200)
