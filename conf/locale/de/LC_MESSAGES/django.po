@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-15 11:05+0100\n"
+"POT-Creation-Date: 2015-03-15 21:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -323,7 +323,6 @@ msgid "projects"
 msgstr "Projekte"
 
 #: ftool/templates/base.html:50 invoices/models.py:130
-#| msgid "Services"
 msgid "invoices"
 msgstr "Rechnungen"
 
@@ -515,7 +514,6 @@ msgid "Paid"
 msgstr "Bezahlt"
 
 #: invoices/models.py:35
-#| msgid "cancel"
 msgid "Canceled"
 msgstr "Storniert"
 
@@ -527,7 +525,7 @@ msgstr "Ersetzt"
 msgid "Fixed amount"
 msgstr "Fixbetrag"
 
-#: invoices/models.py:45 tools/pdf.py:162
+#: invoices/models.py:45 tools/pdf.py:196
 msgid "Services"
 msgstr "Leistungen"
 
@@ -548,11 +546,11 @@ msgstr "Anzahlung angewendet auf"
 msgid "stories"
 msgstr "Stories"
 
-#: invoices/models.py:117 offers/models.py:80 tools/pdf.py:183
+#: invoices/models.py:117 offers/models.py:80 tools/pdf.py:217
 msgid "subtotal"
 msgstr "Zwischentotal"
 
-#: invoices/models.py:119 offers/models.py:82 tools/pdf.py:188
+#: invoices/models.py:119 offers/models.py:82 tools/pdf.py:222
 msgid "discount"
 msgstr "Rabatt"
 
@@ -757,11 +755,11 @@ msgstr "Anfangswert von '%(field)s' war '%(current)s'."
 msgid "'%(field)s' changed from '%(previous)s' to '%(current)s'."
 msgstr "'%(field)s' änderte von '%(previous)s' zu '%(current)s'."
 
-#: tools/pdf.py:193
+#: tools/pdf.py:227
 msgid "tax"
 msgstr "MwSt"
 
-#: tools/pdf.py:200
+#: tools/pdf.py:234
 msgid "total incl. tax"
 msgstr "Total inkl. MwSt"
 
