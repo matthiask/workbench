@@ -1,5 +1,6 @@
 from copy import deepcopy
 from decimal import Decimal as D
+from datetime import timedelta
 from functools import partial
 
 from django.conf import settings
@@ -140,9 +141,42 @@ class PDFDocument(_PDFDocument):
 
         return _fn
 
+    def invoice_stationery(self):
+        pdf = self
+
+        def _fn(canvas, doc):
+            canvas.saveState()
+
+            canvas.setFont(pdf.style.fontName + '-Bold', 10)
+            canvas.drawString(
+                26 * mm,
+                284 * mm,
+                'FEINHEIT GmbH')
+
+            canvas.setFont(pdf.style.fontName, 6)
+            canvas.drawString(
+                26 * mm,
+                8 * mm,
+                'CHE-113.948.417 MWST')
+
+            canvas.setFont(pdf.style.fontName, 6)
+            canvas.drawRightString(
+                190 * mm,
+                8 * mm,
+                '%d/%d' % doc.page_index())
+
+            canvas.restoreState()
+
+        return _fn
+
     def init_offer(self):
         super().init_letter(
             page_fn=self.offer_stationery(),
+        )
+
+    def init_invoice(self):
+        super().init_letter(
+            page_fn=self.invoice_stationery(),
         )
 
     def postal_address(self, postal_address):
@@ -216,6 +250,32 @@ class PDFDocument(_PDFDocument):
         if offer.story_data and offer.story_data.get('stories'):
             self.table_stories(offer.story_data['stories'])
         self.table_total(offer)
+
+    def process_invoice(self, invoice):
+        self.postal_address(invoice.postal_address)
+        self.date_line(
+            invoice.invoiced_on,
+            invoice.owned_by.get_short_name(),
+            invoice.code)
+
+        self.h1(invoice.title)
+        self.spacer(2 * mm)
+        self.p(invoice.description)
+        self.spacer()
+        self.table_total(invoice)
+
+        self.spacer()
+        self.p(
+            'Wir bedanken uns für die Überweisung des Betrags mit Angabe'
+            ' der Referenznummer %(code)s innerhalb von %(days)s Tagen'
+            ' (%(due)s) auf Postkonto 85-206645-2'
+            ' / IBAN CH50 0900 0000 8520 6645 2.' % {
+                'code': invoice.code,
+                'days': 15,
+                'due': date_fmt(
+                    invoice.invoiced_on + timedelta(days=15),
+                    'd.m.Y'),
+                })
 
 
 pdf_response = partial(_pdf_response, pdfdocument=PDFDocument)
