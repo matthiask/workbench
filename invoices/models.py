@@ -41,7 +41,7 @@ class Invoice(models.Model):
     DOWN_PAYMENT = 'down-payment'
 
     TYPE_CHOICES = (
-        (FIXED, _('Fixed')),
+        (FIXED, _('Fixed amount')),
         (SERVICES, _('Services')),
         (DOWN_PAYMENT, _('Down payment')),
     )
