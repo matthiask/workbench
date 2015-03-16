@@ -1,5 +1,6 @@
 from django.contrib.postgres.fields import HStoreField
 from django.db import connections, models
+from django.utils.translation import ugettext_lazy as _
 
 from psycopg2.extras import register_hstore
 
@@ -43,6 +44,8 @@ class LoggedAction(models.Model):
         managed = False
         db_table = 'audit_logged_actions'
         ordering = ('created_at',)
+        verbose_name = _('logged action')
+        verbose_name_plural = _('logged actions')
 
     def __str__(self):
         return '%s %s at %s' % (
