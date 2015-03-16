@@ -33,7 +33,7 @@
             <tr>
               <th colspan="6">
                 <h3>
-                  {{ row.story.release }}
+                  {{ row.story.release|default_if_none:_('No release') }}
                 </h3>
               </th>
             </tr>
