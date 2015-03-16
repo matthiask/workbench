@@ -12,17 +12,7 @@
 
 <body role="document">
 
-  {% block body %}
-
-    <div class="container-fluid theme-showcase" role="main">
-
-      {% bootstrap_messages %}
-
-      {% block content %}{% endblock %}
-
-    </div> <!-- /container -->
-
-  {% endblock body %}
+  {% block body %}{% endblock body %}
 
   <script src="{% static 'ftool/jquery-2.1.3.min.js' %}"></script>
   <script src="{% static 'ftool/js/bootstrap.min.js' %}"></script>

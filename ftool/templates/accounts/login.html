@@ -4,22 +4,28 @@
 
 {% block title %}{% trans 'Sign in' %} - {{ block.super }}{% endblock %}
 
-{% block content %}
-<div class="row">
-  <div class="col-md-3"></div>
-  <div class="col-md-6">
-    <div class="hidden-xs" style="height:10em"></div>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3>FeinTOOL</h3>
+{% block body %}
+  <div class="container-fluid theme-showcase" role="main">
+    <div class="row">
+      <div class="col-md-3"></div>
+      <div class="col-md-6">
+        <div class="hidden-xs" style="height:10em"></div>
+
+        {% bootstrap_messages %}
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3>FeinTOOL</h3>
+          </div>
+          <div class="panel-body">
+            <a href="{% url 'accounts_oauth2' %}" class="btn btn-primary">
+              {% trans 'Sign in' %}
+            </a>
+          </div>
+        </div>
       </div>
-      <div class="panel-body">
-        <a href="{% url 'accounts_oauth2' %}" class="btn btn-primary">
-          {% trans 'Sign in' %}
-        </a>
-      </div>
+      <div class="col-md-3"></div>
     </div>
-  </div>
-  <div class="col-md-3"></div>
-</div>
-{% endblock %}
+
+  </div> <!-- /container -->
+{% endblock body %}
