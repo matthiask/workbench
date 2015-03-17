@@ -74,6 +74,11 @@ class Invoice(ModelWithTotal):
         _('due on'),
         blank=True,
         null=True)
+    closed_at = models.DateTimeField(
+        _('closed at'),
+        blank=True,
+        null=True)
+
     title = models.CharField(
         _('title'),
         max_length=200)
