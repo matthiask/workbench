@@ -304,6 +304,8 @@ WHERE stories_requiredservice.story_id=s.id AND s.description ~ '^(Projektorgani
 UPDATE contacts_organization SET fts_document=contacts_organization_fts_document(id);
 UPDATE contacts_person SET fts_document=contacts_person_fts_document(id);
 UPDATE deals_deal SET fts_document=deals_deal_fts_document(id);
+UPDATE invoices_invoice SET fts_document=invoices_invoice_fts_document(id);
+UPDATE offers_offer SET fts_document=offers_offer_fts_document(id);
 UPDATE projects_project SET fts_document=projects_project_fts_document(id);
 
 
