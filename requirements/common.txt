@@ -1,7 +1,7 @@
-git+https://github.com/elky/django-flat-theme.git@master
 dj-database-url==0.3.0
 Django==1.8b1
 django-bootstrap3==5.1.1
+django-flat-theme==0.9.1
 django-pgjson==0.2.3
 django-vanilla-views==1.0.3
 oauth2client==1.4.6
