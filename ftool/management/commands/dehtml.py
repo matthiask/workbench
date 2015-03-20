@@ -3,6 +3,7 @@ import re
 
 from django.core.management.base import NoArgsCommand
 
+from invoices.models import Invoice
 from offers.models import Offer
 from projects.models import Project
 
@@ -54,6 +55,9 @@ class Command(NoArgsCommand):
     help = 'De-htmlizes description fields'
 
     def handle_noargs(self, **options):
+        for instance in Invoice.objects.all():
+            instance.description = dehtml(instance.description)
+            instance.save(update_fields=('description',))
         for instance in Offer.objects.all():
             instance.description = dehtml(instance.description)
             instance.save(update_fields=('description',))
