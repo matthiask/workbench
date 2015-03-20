@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
 
 from stories.models import Story, RequiredService, RenderedService
 
@@ -18,9 +19,19 @@ class StoryAdmin(admin.ModelAdmin):
 
 
 class RenderedServiceAdmin(admin.ModelAdmin):
+    date_hierarchy = 'rendered_on'
     list_display = (
-        'story', 'rendered_on', 'rendered_by', 'hours', 'description')
+        'project', 'story', 'rendered_on', 'rendered_by', 'hours',
+        'description')
+    list_display_links = ('project', 'story')
+    list_select_related = (
+        'story__project', 'rendered_by')
     raw_id_fields = ('story', 'created_by', 'rendered_by')
+
+    def project(self, instance):
+        return instance.story.project
+
+    project.short_description = _('project')
 
 
 admin.site.register(Story, StoryAdmin)
