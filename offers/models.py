@@ -69,7 +69,7 @@ class Offer(models.Model):
         _('postal address'),
         blank=True)
 
-    story_data = JsonBField(_('stories'))
+    story_data = JsonBField(_('stories'), blank=True, null=True)
     stories = models.ManyToManyField(
         Story,
         verbose_name=_('stories'),
