@@ -28,9 +28,11 @@ class ModelForm(forms.ModelForm):
         self.request = kwargs.pop('request')
 
         if self.default_to_current_user:
-            initial = kwargs.setdefault('initial', {})
-            for field in self.default_to_current_user:
-                initial.setdefault(field, self.request.user.pk)
+            instance = kwargs.get('instance')
+            if not instance or not instance.pk:
+                initial = kwargs.setdefault('initial', {})
+                for field in self.default_to_current_user:
+                    initial.setdefault(field, self.request.user.pk)
 
         super().__init__(*args, **kwargs)
 
