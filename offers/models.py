@@ -9,7 +9,7 @@ from django_pgjson.fields import JsonBField
 from accounts.models import User
 from projects.models import Project
 from stories.models import Story, RequiredService
-from tools.models import SearchManager
+from tools.models import ModelWithTotal, SearchManager
 from tools.urls import model_urls
 
 
@@ -18,7 +18,7 @@ class OfferManager(SearchManager):
 
 
 @model_urls()
-class Offer(models.Model):
+class Offer(ModelWithTotal):
     IN_PREPARATION = 10
     OFFERED = 20
     ACCEPTED = 30
@@ -76,15 +76,6 @@ class Offer(models.Model):
         blank=True,
         related_name='offers')
 
-    subtotal = models.DecimalField(
-        _('subtotal'), max_digits=10, decimal_places=2, default=0)
-    discount = models.DecimalField(
-        _('discount'), max_digits=10, decimal_places=2, default=0)
-    tax_rate = models.DecimalField(
-        _('tax rate'), max_digits=10, decimal_places=2, default=0)
-    total = models.DecimalField(
-        _('total'), max_digits=10, decimal_places=2, default=0)
-
     objects = OfferManager()
 
     class Meta:
@@ -94,20 +85,6 @@ class Offer(models.Model):
 
     def __str__(self):
         return self.title
-
-    def save(self, *args, **kwargs):
-        self._calculate_total()
-        super().save(*args, **kwargs)
-
-    save.alters_data = True
-
-    def _calculate_total(self):
-        self.total = self.subtotal - self.discount
-        self.total *= 1 + self.tax_rate / 100
-
-    @property
-    def tax_amount(self):
-        return (self.subtotal - self.discount) * self.tax_rate / 100
 
     @property
     def code(self):

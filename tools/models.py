@@ -1,4 +1,7 @@
+from decimal import Decimal
+
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from tools.search import search
 
@@ -64,3 +67,35 @@ def safe_queryset_and(head, *tail):
         head = _merge(head, tail[0])
         tail = tail[1:]
     return head
+
+
+class ModelWithTotal(models.Model):
+    subtotal = models.DecimalField(
+        _('subtotal'), max_digits=10, decimal_places=2, default=0)
+    discount = models.DecimalField(
+        _('discount'), max_digits=10, decimal_places=2, default=0)
+    tax_rate = models.DecimalField(
+        _('tax rate'), max_digits=10, decimal_places=2, default=8)
+    total = models.DecimalField(
+        _('total'), max_digits=10, decimal_places=2, default=0)
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        self._calculate_total()
+        super().save(*args, **kwargs)
+
+    save.alters_data = True
+
+    def _calculate_total(self):
+        self.total = self.subtotal - self.discount
+        self.total *= 1 + self.tax_rate / 100
+        self.total = self._round_5cents(self.total)
+
+    def _round_5cents(self, value):
+        return (value / 5).quantize(Decimal('0.00')) * 5
+
+    @property
+    def tax_amount(self):
+        return (self.subtotal - self.discount) * self.tax_rate / 100
