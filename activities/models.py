@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.models import User
 from contacts.models import Person
 from deals.models import Deal
+from projects.models import Project
 from tools.urls import model_urls
 
 
@@ -13,12 +14,22 @@ class Activity(models.Model):
     contact = models.ForeignKey(
         Person,
         on_delete=models.PROTECT,
+        blank=True,
+        null=True,
         verbose_name=_('contact'),
+        related_name='activities',
+    )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        verbose_name=_('project'),
         related_name='activities',
     )
     deal = models.ForeignKey(
         Deal,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         verbose_name=_('deal'),
         blank=True,
         null=True,
