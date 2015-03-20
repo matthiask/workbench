@@ -313,6 +313,7 @@ UPDATE projects_project SET fts_document=projects_project_fts_document(id);
 
 SELECT SETVAL('public.accounts_user_id_seq', COALESCE(MAX(id), 1) ) FROM public.accounts_user;
 SELECT SETVAL('public.activities_activity_id_seq', COALESCE(MAX(id), 1) ) FROM public.activities_activity;
+SELECT SETVAL('public.audit_logged_actions_event_id_seq', COALESCE(MAX(event_id), 1) ) FROM public.audit_logged_actions;
 SELECT SETVAL('public.auth_group_id_seq', COALESCE(MAX(id), 1) ) FROM public.auth_group;
 SELECT SETVAL('public.auth_group_permissions_id_seq', COALESCE(MAX(id), 1) ) FROM public.auth_group_permissions;
 SELECT SETVAL('public.auth_permission_id_seq', COALESCE(MAX(id), 1) ) FROM public.auth_permission;
@@ -329,6 +330,10 @@ SELECT SETVAL('public.deals_funnel_id_seq', COALESCE(MAX(id), 1) ) FROM public.d
 SELECT SETVAL('public.django_admin_log_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_admin_log;
 SELECT SETVAL('public.django_content_type_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_content_type;
 SELECT SETVAL('public.django_migrations_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_migrations;
+SELECT SETVAL('public.invoices_invoice_id_seq', COALESCE(MAX(id), 1) ) FROM public.invoices_invoice;
+SELECT SETVAL('public.invoices_invoice_stories_id_seq', COALESCE(MAX(id), 1) ) FROM public.invoices_invoice_stories;
+SELECT SETVAL('public.offers_offer_id_seq', COALESCE(MAX(id), 1) ) FROM public.offers_offer;
+SELECT SETVAL('public.offers_offer_stories_id_seq', COALESCE(MAX(id), 1) ) FROM public.offers_offer_stories;
 SELECT SETVAL('public.projects_project_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_project;
 SELECT SETVAL('public.projects_release_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_release;
 SELECT SETVAL('public.services_servicetype_id_seq', COALESCE(MAX(id), 1) ) FROM public.services_servicetype;
