@@ -10,12 +10,14 @@ class ReleaseInline(admin.TabularInline):
 
 class ProjectAdmin(admin.ModelAdmin):
     inlines = (ReleaseInline,)
-    list_display = ('title', 'status')
+    list_display = ('title', 'customer', 'owned_by', 'status')
     list_filter = ('status',)
     raw_id_fields = ('customer', 'contact', 'owned_by')
 
 
 class ReleaseAdmin(admin.ModelAdmin):
+    list_display = ('project', 'title')
+    list_display_links = ('title',)
     raw_id_fields = ('project',)
 
 

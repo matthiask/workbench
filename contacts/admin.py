@@ -21,13 +21,17 @@ class PostalAddressInline(admin.TabularInline):
 
 class OrganizationAdmin(admin.ModelAdmin):
     filter_horizontal = ('groups',)
+    list_display = ('name', 'primary_contact')
     raw_id_fields = ('primary_contact',)
+    search_fields = ('name', 'notes')
 
 
 class PersonAdmin(admin.ModelAdmin):
     filter_horizontal = ('groups',)
     inlines = [PhoneNumberInline, EmailAddressInline, PostalAddressInline]
+    list_display = ('full_name', 'organization', 'primary_contact')
     raw_id_fields = ('organization', 'primary_contact')
+    search_fields = ('full_name', 'notes')
 
 
 admin.site.register(Group)
