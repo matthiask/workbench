@@ -129,3 +129,21 @@ FONTS = {
     'italic': os.path.join(BASE_DIR, 'stuff', 'fonts', 'Lato-LightItalic.ttf'),
     'bolditalic': os.path.join(BASE_DIR, 'stuff', 'fonts', 'Lato-Bold.ttf'),
 }
+
+FTOOL_SSO_DOMAIN = 'feinheit.ch'
+FTOOL_PDF_COMPANY = 'FEINHEIT GmbH'
+FTOOL_PDF_ADDRESS = 'FEINHEIT GmbH · Molkenstrasse 21 · 8004 Zürich'
+FTOOL_PDF_VAT_NO = 'CHE-113.948.417 MWST'
+FTOOL_PDF_OFFER_TERMS = [
+    'Bestandteil dieser Offerte sind die zum Zeitpunkt'
+    ' des Vertragsabschlusses aktuellen Allgemeinen'
+    ' Geschäftsbedingungen der FEINHEIT GmbH.',
+    'Die jeweils aktuelle Version'
+    ' finden Sie auf www.feinheit.ch/agb/.',
+]
+FTOOL_PDF_INVOICE_PAYMENT = (
+    'Wir bedanken uns für die Überweisung des Betrags mit Angabe'
+    ' der Referenznummer %(code)s innerhalb von %(days)s Tagen'
+    ' (%(due)s) auf Postkonto 85-206645-2'
+    ' / IBAN CH50 0900 0000 8520 6645 2.'
+)

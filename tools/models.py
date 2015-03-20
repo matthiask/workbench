@@ -89,8 +89,9 @@ class ModelWithTotal(models.Model):
     save.alters_data = True
 
     def _calculate_total(self):
-        self.total = self.subtotal - self.discount
-        self.total *= 1 + self.tax_rate / 100
+        # Why is the Decimal() coercion necessary??
+        self.total = Decimal(self.subtotal) - self.discount
+        self.total *= 1 + Decimal(self.tax_rate) / 100
         self.total = self._round_5cents(self.total)
 
     def _round_5cents(self, value):

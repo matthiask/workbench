@@ -116,20 +116,14 @@ class PDFDocument(_PDFDocument):
             canvas.drawString(
                 26 * mm,
                 284 * mm,
-                'FEINHEIT GmbH')
+                settings.FTOOL_PDF_COMPANY)
 
             canvas.setFont(pdf.style.fontName, 6)
-            canvas.drawCentredString(
-                108 * mm,
-                11 * mm,
-                'Bestandteil dieser Offerte sind die zum Zeitpunkt'
-                ' des Vertragsabschlusses aktuellen Allgemeinen'
-                ' Geschäftsbedingungen der FEINHEIT GmbH.')
-            canvas.drawCentredString(
-                108 * mm,
-                8 * mm,
-                'Die jeweils aktuelle Version'
-                ' finden Sie auf www.feinheit.ch/agb/.')
+            for i, text in enumerate(reversed(settings.FTOOL_PDF_OFFER_TERMS)):
+                canvas.drawCentredString(
+                    108 * mm,
+                    (8 + 3 * i) * mm,
+                    text)
 
             canvas.setFont(pdf.style.fontName, 6)
             canvas.drawRightString(
@@ -151,13 +145,13 @@ class PDFDocument(_PDFDocument):
             canvas.drawString(
                 26 * mm,
                 284 * mm,
-                'FEINHEIT GmbH')
+                settings.FTOOL_PDF_COMPANY)
 
             canvas.setFont(pdf.style.fontName, 6)
             canvas.drawString(
                 26 * mm,
                 8 * mm,
-                'CHE-113.948.417 MWST')
+                settings.FTOOL_PDF_VAT_NO)
 
             canvas.setFont(pdf.style.fontName, 6)
             canvas.drawRightString(
@@ -180,14 +174,14 @@ class PDFDocument(_PDFDocument):
         )
 
     def postal_address(self, postal_address):
-        self.smaller('FEINHEIT GmbH · Molkenstrasse 21 · 8004 Zürich')
+        self.smaller(settings.FTOOL_PDF_ADDRESS)
         self.spacer(1 * mm)
 
         self.p(postal_address)
         self.next_frame()
 
     def date_line(self, date, *args):
-        elements = [date_fmt(date, 'l, d.m.Y')]
+        elements = [date_fmt(date, 'l, d.m.Y') if date else _('NO DATE YET')]
         elements.extend(args)
         self.smaller(' / '.join(e for e in elements))
 
@@ -265,17 +259,13 @@ class PDFDocument(_PDFDocument):
         self.table_total(invoice)
 
         self.spacer()
-        self.p(
-            'Wir bedanken uns für die Überweisung des Betrags mit Angabe'
-            ' der Referenznummer %(code)s innerhalb von %(days)s Tagen'
-            ' (%(due)s) auf Postkonto 85-206645-2'
-            ' / IBAN CH50 0900 0000 8520 6645 2.' % {
-                'code': invoice.code,
-                'days': 15,
-                'due': date_fmt(
-                    invoice.invoiced_on + timedelta(days=15),
-                    'd.m.Y'),
-                })
+        self.p(settings.FTOOL_PDF_INVOICE_PAYMENT % {
+            'code': invoice.code,
+            'days': 15,
+            'due': date_fmt(
+                invoice.invoiced_on + timedelta(days=15),
+                'd.m.Y'),
+        })
 
 
 pdf_response = partial(_pdf_response, pdfdocument=PDFDocument)

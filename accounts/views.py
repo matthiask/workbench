@@ -77,7 +77,7 @@ def oauth2(request):
         new_user = False
 
         if (not User.objects.filter(email=email).exists() and
-                email.endswith('@feinheit.ch')):
+                email.endswith('@%s' % settings.FTOOL_SSO_DOMAIN)):
             User.objects.create(
                 email=email,
                 is_active=True,
