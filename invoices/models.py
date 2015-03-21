@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 
 from django.db import models
@@ -127,6 +128,25 @@ class Invoice(ModelWithTotal):
 
     def __str__(self):
         return self.title
+
+    def pretty_status(self):
+        d = {
+            'invoiced_on': self.invoiced_on,
+            'reminded_on': self.invoiced_on,  # XXX
+            'closed_on': self.closed_at.date() if self.closed_at else None,
+        }
+
+        if self.status == self.SENT:
+            if self.due_on and date.today() > self.due_on:
+                return _('Sent on %(invoiced_on)s, but overdue') % d
+
+            return _('Sent on %(invoiced_on)s') % d
+        elif self.status == self.REMINDED:
+            return _('Sent on %(invoiced_on)s, reminded on %(reminded_on)') % d
+        elif self.status == self.PAID:
+            return _('Paid on %(closed_on)s') % d
+        else:
+            return self.get_status_display()
 
     @property
     def code(self):
