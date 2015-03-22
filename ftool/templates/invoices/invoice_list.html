@@ -13,12 +13,10 @@
       <thead>
         <tr>
           <td colspan="4">
-            {% comment %}
-            <a href="{% url 'invoices_invoice_add' %}" class="btn btn-default pull-right">
+            <a href="{% url 'invoices_invoice_create' %}" class="btn btn-default pull-right">
               <span class="glyphicon glyphicon-plus"></span>
               {{ view.meta.verbose_name }}
             </a>
-            {% endcomment %}
 
             <form method="GET" action="." class="form-inline form-search">
               <label class="sr-only">{% trans 'search' %}</label>
