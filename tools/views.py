@@ -191,3 +191,18 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
         if request.is_ajax():
             return HttpResponse('Thanks', status=204)  # No content
         return redirect(self.model().urls.url('list'))
+
+
+class MessageView(vanilla.View):
+    redirect_to = None
+    message = None
+    level = messages.INFO
+
+    def get(self, request, *args, **kwargs):
+        if self.message:
+            messages.add_message(
+                request,
+                self.level,
+                self.message)
+
+        return redirect(self.redirect_to)

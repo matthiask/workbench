@@ -1,10 +1,11 @@
 from django.conf.urls import url
+from django.utils.translation import ugettext_lazy as _
 
 from offers.forms import OfferForm
 from offers.models import Offer
 from offers.views import OfferListView, OfferPDFView
 from tools.views import (
-    DetailView, CreateView, UpdateView, DeleteView)
+    DetailView, UpdateView, DeleteView, MessageView)
 
 
 urlpatterns = [
@@ -16,13 +17,18 @@ urlpatterns = [
         r'^(?P<pk>\d+)/$',
         DetailView.as_view(model=Offer),
         name='offers_offer_detail'),
+
     url(
         r'^create/$',
-        CreateView.as_view(
-            form_class=OfferForm,
-            model=Offer,
+        MessageView.as_view(
+            redirect_to='projects_project_create',
+            message=_(
+                'Create a project, add and estimate stories, and put those'
+                ' stories into an offer.'
+            ),
         ),
         name='offers_offer_create'),
+
     url(
         r'^(?P<pk>\d+)/update/$',
         UpdateView.as_view(
