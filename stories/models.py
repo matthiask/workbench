@@ -64,6 +64,13 @@ class Story(models.Model):
         related_name='stories',
         blank=True,
         null=True)
+    offer = models.ForeignKey(
+        'offers.Offer',
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        verbose_name=_('offer'),
+        related_name='stories')
 
     status = models.PositiveIntegerField(
         _('status'),
@@ -219,6 +226,20 @@ class RenderedService(models.Model):
         decimal_places=2,
     )
     description = models.TextField(_('description'))
+
+    invoice = models.ForeignKey(
+        'invoices.Invoice',
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        verbose_name=_('invoice'),
+        related_name='+',
+    )
+    archived_at = models.DateTimeField(
+        _('archived at'),
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         ordering = ('-rendered_on', '-created_at')

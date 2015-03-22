@@ -8,7 +8,7 @@ from django_pgjson.fields import JsonBField
 
 from accounts.models import User
 from projects.models import Project
-from stories.models import Story, RequiredService
+from stories.models import RequiredService
 from tools.models import ModelWithTotal, SearchManager
 from tools.urls import model_urls
 
@@ -70,11 +70,6 @@ class Offer(ModelWithTotal):
         blank=True)
 
     story_data = JsonBField(_('stories'), blank=True, null=True)
-    stories = models.ManyToManyField(
-        Story,
-        verbose_name=_('stories'),
-        blank=True,
-        related_name='offers')
 
     objects = OfferManager()
 
@@ -113,7 +108,7 @@ class Offer(ModelWithTotal):
             )
         ))
 
-        self.stories.add(*list(stories))
+        stories.update(offer=self)
 
         self.subtotal = sum([
             sum(
@@ -129,7 +124,7 @@ class Offer(ModelWithTotal):
             self.save()
 
     def clear_stories(self, save=True):
-        self.stories.clear()
+        self.stories.update(offer=None)
         self.story_data = {}
         self.subtotal = Decimal('0')
         self._calculate_total()

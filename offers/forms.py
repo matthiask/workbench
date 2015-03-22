@@ -75,6 +75,9 @@ class CreateOfferForm(ModelForm):
             instance.postal_address = self.cleaned_data['pa'].postal_address
         instance.project = self.project
         instance.save()
+        instance.add_stories(
+            self.project.stories.filter(offer=None),
+            save=True)
         return instance
 
 
