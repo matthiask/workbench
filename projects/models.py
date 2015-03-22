@@ -87,6 +87,13 @@ class Project(models.Model):
     def __str__(self):
         return self.title
 
+    def css(self):
+        return {
+            self.IN_PREPARATION: 'warning',
+            self.WORK_IN_PROGRESS: '',
+            self.FINISHED: 'success',
+        }[self.status]
+
     def overview(self):
         # Avoid circular imports
         from stories.models import RequiredService, RenderedService
