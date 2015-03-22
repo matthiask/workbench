@@ -1,3 +1,16 @@
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Lato Light'), local('Lato-Light'), url(./Lato-Light.woff) format('woff');
+}
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Lato Bold'), local('Lato-Bold'), url(./Lato-Bold.woff) format('woff');
+}
+
 @media only screen and (max-width: 760px) {
   .table-linearize table,
   .table-linearize thead,
