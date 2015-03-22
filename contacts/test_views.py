@@ -9,6 +9,11 @@ class ContactsTestCase(TestCase):
 
     def test_login(self):
         user = factories.UserFactory.create(email='test@feinheit.ch')
+
+        self.assertRedirects(
+            self.client.get('/'),
+            '/accounts/login/')
+
         self.client.login(email=user.email)
 
         self.assertContains(
