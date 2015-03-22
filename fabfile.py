@@ -34,4 +34,4 @@ def pull_database():
 
 @task(alias='mm')
 def makemessages():
-    local('venv/bin/python manage.py makemessages -a -i venv')
+    local('venv/bin/python manage.py makemessages -a -i venv -i htmlcov')

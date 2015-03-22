@@ -142,7 +142,9 @@ class Invoice(ModelWithTotal):
 
             return _('Sent on %(invoiced_on)s') % d
         elif self.status == self.REMINDED:
-            return _('Sent on %(invoiced_on)s, reminded on %(reminded_on)') % d
+            return _(
+                'Sent on %(invoiced_on)s, reminded on %(reminded_on)s'
+            ) % d
         elif self.status == self.PAID:
             return _('Paid on %(closed_on)s') % d
         else:

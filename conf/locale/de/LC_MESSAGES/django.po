@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-16 17:37+0100\n"
+"POT-Creation-Date: 2015-03-22 17:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,59 +75,66 @@ msgstr "Kein Benutzer mit Emailadresse %s gefunden."
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
-#: activities/__init__.py:10 activities/models.py:64
+#: activities/__init__.py:10 activities/models.py:75
 msgid "activities"
 msgstr "Aktivitäten"
 
-#: activities/models.py:16 invoices/models.py:59 projects/models.py:60
+#: activities/models.py:19 invoices/models.py:60 projects/models.py:60
 msgid "contact"
 msgstr "Kontakt"
 
-#: activities/models.py:22 deals/models.py:83
+#: activities/models.py:27 ftool/templates/projects/project_list.html:35
+#: invoices/models.py:67 offers/models.py:39 projects/models.py:84
+#: projects/models.py:150 stories/admin.py:35 stories/models.py:58
+msgid "project"
+msgstr "Projekt"
+
+#: activities/models.py:33 deals/models.py:83
 #: ftool/templates/deals/deal_list.html:37
 msgid "deal"
 msgstr "Geschäft"
 
-#: activities/models.py:27 contacts/models.py:13 deals/models.py:52
-#: invoices/models.py:78 offers/models.py:52 projects/models.py:64
+#: activities/models.py:38 contacts/models.py:13 deals/models.py:52
+#: invoices/models.py:84 offers/models.py:52 projects/models.py:64
 #: projects/models.py:154 services/models.py:7 stories/models.py:49
 msgid "title"
 msgstr "Titel"
 
-#: activities/models.py:31 deals/models.py:60
+#: activities/models.py:42 deals/models.py:60
 #: ftool/templates/deals/deal_detail.html:25
 #: ftool/templates/deals/deal_list.html:38
-#: ftool/templates/projects/project_list.html:37 invoices/models.py:86
+#: ftool/templates/invoices/invoice_list.html:37
+#: ftool/templates/projects/project_list.html:37 invoices/models.py:92
 #: offers/models.py:60 projects/models.py:72 stories/models.py:46
 msgid "owned by"
 msgstr "gehört"
 
-#: activities/models.py:35 invoices/models.py:74 stories/models.py:78
+#: activities/models.py:46 invoices/models.py:75 stories/models.py:85
 msgid "due on"
 msgstr "fällig am"
 
-#: activities/models.py:40
+#: activities/models.py:51
 msgid "time"
 msgstr "Zeit"
 
-#: activities/models.py:45
+#: activities/models.py:56
 msgid "duration"
 msgstr "Dauer"
 
-#: activities/models.py:50
+#: activities/models.py:61
 msgid "Duration in hours (if applicable)."
 msgstr "Dauer in Stunden (falls zutreffend)."
 
-#: activities/models.py:53 deals/models.py:73 stories/models.py:34
-#: stories/models.py:197
+#: activities/models.py:64 deals/models.py:73 stories/models.py:34
+#: stories/models.py:204
 msgid "created at"
 msgstr "Erstellt um"
 
-#: activities/models.py:57
+#: activities/models.py:68
 msgid "completed at"
 msgstr "Erledigt um"
 
-#: activities/models.py:63
+#: activities/models.py:74
 msgid "activity"
 msgstr "Aktivität"
 
@@ -136,12 +143,10 @@ msgid "audit"
 msgstr "Beweissicherung"
 
 #: audit/models.py:47
-#| msgid "closed at"
 msgid "logged action"
 msgstr "aufgezeichnete Aktion"
 
 #: audit/models.py:48
-#| msgid "closed at"
 msgid "logged actions"
 msgstr "aufgezeichnete Aktionen"
 
@@ -213,7 +218,7 @@ msgstr "Person"
 msgid "people"
 msgstr "Personen"
 
-#: contacts/models.py:95 invoices/models.py:94
+#: contacts/models.py:95 invoices/models.py:100
 msgid "type"
 msgstr "Typ"
 
@@ -226,7 +231,7 @@ msgstr "Gewichtung"
 msgid "phone number"
 msgstr "Telefonnummer"
 
-#: contacts/models.py:122 ftool/templates/contacts/person_form.html:25
+#: contacts/models.py:122 ftool/templates/contacts/person_form.html:29
 msgid "phone numbers"
 msgstr "Telefonnummern"
 
@@ -234,16 +239,16 @@ msgstr "Telefonnummern"
 msgid "email address"
 msgstr "Emailadresse"
 
-#: contacts/models.py:146 ftool/templates/contacts/person_form.html:51
+#: contacts/models.py:146 ftool/templates/contacts/person_form.html:55
 msgid "email addresses"
 msgstr "Emailadressen"
 
-#: contacts/models.py:165 contacts/models.py:169 invoices/models.py:106
-#: offers/forms.py:66 offers/models.py:69
+#: contacts/models.py:165 contacts/models.py:169 invoices/models.py:112
+#: offers/forms.py:67 offers/models.py:69
 msgid "postal address"
 msgstr "Postadresse"
 
-#: contacts/models.py:170 ftool/templates/contacts/person_form.html:77
+#: contacts/models.py:170 ftool/templates/contacts/person_form.html:81
 msgid "postal addresses"
 msgstr "Postadressen"
 
@@ -296,8 +301,8 @@ msgid "declined"
 msgstr "Abgelehnt"
 
 #: deals/models.py:55 ftool/templates/deals/deal_detail.html:21
-#: invoices/models.py:81 offers/models.py:55 projects/models.py:67
-#: stories/models.py:52 stories/models.py:221
+#: invoices/models.py:87 offers/models.py:55 projects/models.py:67
+#: stories/models.py:52 stories/models.py:228
 msgid "description"
 msgstr "Beschreibung"
 
@@ -310,13 +315,15 @@ msgstr "geschätzter Wert"
 #: ftool/templates/contacts/person_list.html:29
 #: ftool/templates/deals/deal_detail.html:33
 #: ftool/templates/deals/deal_list.html:40
+#: ftool/templates/invoices/invoice_list.html:29
+#: ftool/templates/invoices/invoice_list.html:38
 #: ftool/templates/projects/project_list.html:29
-#: ftool/templates/projects/project_list.html:38 invoices/models.py:90
-#: offers/models.py:64 projects/models.py:76 stories/models.py:69
+#: ftool/templates/projects/project_list.html:38 invoices/models.py:96
+#: offers/models.py:64 projects/models.py:76 stories/models.py:76
 msgid "status"
 msgstr "Status"
 
-#: deals/models.py:76 offers/models.py:47
+#: deals/models.py:76 invoices/models.py:79 offers/models.py:47
 msgid "closed at"
 msgstr "Geschlossen um"
 
@@ -331,7 +338,7 @@ msgstr "Anmelden"
 msgid "Search"
 msgstr "Suche"
 
-#: ftool/templates/base.html:48 offers/__init__.py:10 offers/models.py:93
+#: ftool/templates/base.html:48 offers/__init__.py:10 offers/models.py:79
 msgid "offers"
 msgstr "Offerten"
 
@@ -341,7 +348,8 @@ msgstr "Offerten"
 msgid "projects"
 msgstr "Projekte"
 
-#: ftool/templates/base.html:50 invoices/__init__.py:10 invoices/models.py:130
+#: ftool/templates/base.html:50 ftool/templates/invoices/invoice_list.html:5
+#: invoices/__init__.py:10 invoices/models.py:127
 msgid "invoices"
 msgstr "Rechnungen"
 
@@ -379,6 +387,8 @@ msgstr "Löschen"
 #: ftool/templates/contacts/person_list.html:27
 #: ftool/templates/deals/deal_list.html:23
 #: ftool/templates/deals/deal_list.html:28
+#: ftool/templates/invoices/invoice_list.html:22
+#: ftool/templates/invoices/invoice_list.html:27
 #: ftool/templates/projects/project_list.html:22
 #: ftool/templates/projects/project_list.html:27
 #: ftool/templates/tools/object_list.html:22
@@ -389,6 +399,7 @@ msgstr "Suche"
 #: ftool/templates/contacts/organization_list.html:52
 #: ftool/templates/contacts/person_list.html:64
 #: ftool/templates/deals/deal_list.html:59
+#: ftool/templates/invoices/invoice_list.html:58
 #: ftool/templates/projects/project_list.html:58
 #: ftool/templates/tools/object_list.html:50
 #, python-format
@@ -413,7 +424,7 @@ msgstr "%(object)s aktualisieren"
 msgid "Create %(class)s"
 msgstr "%(class)s erstellen"
 
-#: ftool/templates/contacts/person_form.html:104
+#: ftool/templates/contacts/person_form.html:109
 #: ftool/templates/projects/project_estimation.html:58
 #: ftool/templates/tools/object_form.html:26
 msgid "submit"
@@ -430,6 +441,17 @@ msgstr "Geschichte"
 #, python-format
 msgid "Version %(number)s by %(user_name)s"
 msgstr "Version %(number)s erstellt von %(user_name)s"
+
+#: ftool/templates/invoices/invoice_list.html:35 invoices/models.py:126
+#: stories/models.py:235
+msgid "invoice"
+msgstr "Rechnung"
+
+#: ftool/templates/invoices/invoice_list.html:36
+#: ftool/templates/projects/project_list.html:36 invoices/models.py:53
+#: projects/models.py:53
+msgid "customer"
+msgstr "Kunde"
 
 #: ftool/templates/modal.html:19 ftool/templates/stories/story_detail.html:59
 msgid "Close"
@@ -452,25 +474,14 @@ msgstr "Offerte erstellen"
 msgid "estimation"
 msgstr "Schätzung"
 
-#: ftool/templates/projects/project_estimation.html:24 stories/models.py:87
-#: stories/models.py:144 stories/models.py:193
+#: ftool/templates/projects/project_estimation.html:24 stories/models.py:94
+#: stories/models.py:151 stories/models.py:200
 msgid "story"
 msgstr "Story"
 
 #: ftool/templates/projects/project_estimation.html:36
 msgid "No release"
 msgstr "Keine Version"
-
-#: ftool/templates/projects/project_list.html:35 invoices/models.py:66
-#: offers/models.py:39 projects/models.py:84 projects/models.py:150
-#: stories/models.py:58
-msgid "project"
-msgstr "Projekt"
-
-#: ftool/templates/projects/project_list.html:36 invoices/models.py:52
-#: projects/models.py:53
-msgid "customer"
-msgstr "Kunde"
 
 #: ftool/templates/start.html:14
 msgid "Hours today"
@@ -495,7 +506,7 @@ msgstr "Abbruch"
 msgid "overview"
 msgstr "Übersicht"
 
-#: ftool/templates/stories/story_detail.html:40 stories/models.py:225
+#: ftool/templates/stories/story_detail.html:40 stories/models.py:246
 msgid "rendered service"
 msgstr "erbrachte Leistung"
 
@@ -519,80 +530,87 @@ msgstr "Löschen"
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
 
-#: invoices/forms.py:10 offers/forms.py:12 projects/forms.py:15
+#: invoices/forms.py:10 offers/forms.py:13 projects/forms.py:15
 msgid "All states"
 msgstr "Alle Stati"
 
-#: invoices/models.py:31 offers/models.py:29 projects/models.py:45
+#: invoices/models.py:32 offers/models.py:29 projects/models.py:45
 msgid "In preparation"
 msgstr "In Vorbereitung"
 
-#: invoices/models.py:32
+#: invoices/models.py:33
 msgid "Sent"
 msgstr "Versendet"
 
-#: invoices/models.py:33
+#: invoices/models.py:34
 msgid "Reminded"
 msgstr "Gemahnt"
 
-#: invoices/models.py:34
+#: invoices/models.py:35
 msgid "Paid"
 msgstr "Bezahlt"
 
-#: invoices/models.py:35
+#: invoices/models.py:36
 msgid "Canceled"
 msgstr "Storniert"
 
-#: invoices/models.py:36 offers/models.py:33
+#: invoices/models.py:37 offers/models.py:33
 msgid "Replaced"
 msgstr "Ersetzt"
 
-#: invoices/models.py:44
+#: invoices/models.py:45
 msgid "Fixed amount"
 msgstr "Fixbetrag"
 
-#: invoices/models.py:45 tools/pdf.py:196
+#: invoices/models.py:46 tools/pdf.py:190
 msgid "Services"
 msgstr "Leistungen"
 
-#: invoices/models.py:46
+#: invoices/models.py:47
 msgid "Down payment"
 msgstr "Anzahlung"
 
-#: invoices/models.py:70
+#: invoices/models.py:71
 msgid "invoiced on"
 msgstr "Verrechnet am"
 
-#: invoices/models.py:102
+#: invoices/models.py:108
 msgid "down payment applied to"
 msgstr "Anzahlung angewendet auf"
 
-#: invoices/models.py:109 invoices/models.py:112 offers/models.py:72
-#: offers/models.py:75 stories/__init__.py:10 stories/models.py:88
+#: invoices/models.py:115 invoices/models.py:118 offers/forms.py:105
+#: offers/models.py:72 stories/__init__.py:10 stories/models.py:95
 msgid "stories"
 msgstr "Stories"
 
-#: invoices/models.py:117 offers/models.py:80 tools/pdf.py:217
-msgid "subtotal"
-msgstr "Zwischentotal"
+#: invoices/models.py:141
+#, python-format
+msgid "Sent on %(invoiced_on)s, but overdue"
+msgstr "Versendet am %(invoiced_on)s, aber überfällig"
 
-#: invoices/models.py:119 offers/models.py:82 tools/pdf.py:222
-msgid "discount"
-msgstr "Rabatt"
+#: invoices/models.py:143
+#, python-format
+msgid "Sent on %(invoiced_on)s"
+msgstr "Versendet am %(invoiced_on)s"
 
-#: invoices/models.py:121 offers/models.py:84
-msgid "tax rate"
-msgstr "MwSt-Satz"
+#: invoices/models.py:145
+msgid "Sent on %(invoiced_on)s, reminded on %(reminded_on)s"
+msgstr "Versendet am %(invoiced_on)s, gemahnt am %(reminded_on)s"
 
-#: invoices/models.py:123 offers/models.py:86
-msgid "total"
-msgstr "Total"
+#: invoices/models.py:147
+#, python-format
+msgid "Paid on %(closed_on)s"
+msgstr "Bezahlt am %(closed_on)s"
 
-#: invoices/models.py:129
-msgid "invoice"
-msgstr "Rechnung"
+#: invoices/urls.py:26
+msgid ""
+"Invoices cannot be added directly yet. Create invoices by navigating to the "
+"organization or project first."
+msgstr ""
+"Rechnungen können nicht direkt erstellt werden. Navigiere zuerst zur "
+"Organisation oder zum Projekt."
 
-#: offers/forms.py:67
+#: offers/forms.py:68
 msgid "The exact address can be edited later."
 msgstr "Die exakte Adresse kann später bearbeitet werden."
 
@@ -612,9 +630,17 @@ msgstr "Abgewiesen"
 msgid "offered on"
 msgstr "offeriert am"
 
-#: offers/models.py:92
+#: offers/models.py:78 stories/models.py:72
 msgid "offer"
 msgstr "Offerte"
+
+#: offers/urls.py:26
+msgid ""
+"Create a project, add and estimate stories, and put those stories into an "
+"offer."
+msgstr ""
+"Erstelle ein Projekt, erstelle und schätze Stories und füge diese zu einer "
+"Offerte hinzu."
 
 #: projects/forms.py:48
 #, python-format
@@ -633,7 +659,7 @@ msgstr "Erledigt"
 msgid "is default"
 msgstr "ist Standard"
 
-#: projects/models.py:161 services/models.py:16 stories/models.py:83
+#: projects/models.py:161 services/models.py:16 stories/models.py:90
 msgid "position"
 msgstr "Position"
 
@@ -646,7 +672,6 @@ msgid "releases"
 msgstr "Versionen"
 
 #: services/__init__.py:10
-#| msgid "Services"
 msgid "services"
 msgstr "Leistungen"
 
@@ -654,7 +679,7 @@ msgstr "Leistungen"
 msgid "billing per hour"
 msgstr "Verrechnung pro Stunde"
 
-#: services/models.py:21 stories/models.py:150
+#: services/models.py:21 stories/models.py:157
 msgid "service type"
 msgstr "Leistungstyp"
 
@@ -694,35 +719,35 @@ msgstr "abgewiesen"
 msgid "requested by"
 msgstr "angefordert von"
 
-#: stories/models.py:73
+#: stories/models.py:80
 msgid "accepted at"
 msgstr "akzeptiert um"
 
-#: stories/models.py:81
+#: stories/models.py:88
 msgid "This field should be left empty most of the time."
 msgstr "Dieses Feld sollte meistens leer gelassen werden."
 
-#: stories/models.py:154
+#: stories/models.py:161
 msgid "estimated effort"
 msgstr "geschätzter Aufwand"
 
-#: stories/models.py:157
+#: stories/models.py:164
 msgid "The original estimate."
 msgstr "Die ursprüngliche Schätzung."
 
-#: stories/models.py:159
+#: stories/models.py:166
 msgid "offered effort"
 msgstr "offerierter Aufwand"
 
-#: stories/models.py:162
+#: stories/models.py:169
 msgid "Effort offered to the customer."
 msgstr "Aufwand welcher dem Kunden offeriert wurde."
 
-#: stories/models.py:164
+#: stories/models.py:171
 msgid "planning effort"
 msgstr "Aufwand für Planung"
 
-#: stories/models.py:168
+#: stories/models.py:175
 msgid ""
 "Effort for planning. This value should reflect the current  state of affairs "
 "also when work is already in progress."
@@ -730,31 +755,35 @@ msgstr ""
 "Aufwand für Planung. Dieser Wert sollte den aktuellen Wissenstand abbilden, "
 "auch wenn schon gearbeitet wird."
 
-#: stories/models.py:174
+#: stories/models.py:181
 msgid "required service"
 msgstr "benötigte Leistung"
 
-#: stories/models.py:175
+#: stories/models.py:182
 msgid "required services"
 msgstr "benötigte Leistungen"
 
-#: stories/models.py:203
+#: stories/models.py:210
 msgid "created by"
 msgstr "Erstellt von"
 
-#: stories/models.py:207
+#: stories/models.py:214
 msgid "rendered on"
 msgstr "Erbracht am"
 
-#: stories/models.py:213
+#: stories/models.py:220
 msgid "rendered by"
 msgstr "Erbracht von"
 
-#: stories/models.py:217
+#: stories/models.py:224
 msgid "hours"
 msgstr "Stunden"
 
-#: stories/models.py:226
+#: stories/models.py:239
+msgid "archived at"
+msgstr "archiviert um"
+
+#: stories/models.py:247
 msgid "rendered services"
 msgstr "erbrachte Leistungen"
 
@@ -763,7 +792,7 @@ msgstr "erbrachte Leistungen"
 msgid "%(class)s '%(object)s' has been successfully created."
 msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
 
-#: tools/forms.py:53
+#: tools/forms.py:55
 msgid "Active"
 msgstr "Aktiv"
 
@@ -786,11 +815,31 @@ msgstr "Anfangswert von '%(field)s' war '%(current)s'."
 msgid "'%(field)s' changed from '%(previous)s' to '%(current)s'."
 msgstr "'%(field)s' änderte von '%(previous)s' zu '%(current)s'."
 
-#: tools/pdf.py:227
+#: tools/models.py:74 tools/pdf.py:211
+msgid "subtotal"
+msgstr "Zwischentotal"
+
+#: tools/models.py:76 tools/pdf.py:216
+msgid "discount"
+msgstr "Rabatt"
+
+#: tools/models.py:78
+msgid "tax rate"
+msgstr "MwSt-Satz"
+
+#: tools/models.py:80
+msgid "total"
+msgstr "Total"
+
+#: tools/pdf.py:184
+msgid "NO DATE YET"
+msgstr "NOCH KEIN DATUM"
+
+#: tools/pdf.py:221
 msgid "tax"
 msgstr "MwSt"
 
-#: tools/pdf.py:234
+#: tools/pdf.py:228
 msgid "total incl. tax"
 msgstr "Total inkl. MwSt"
 
