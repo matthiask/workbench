@@ -97,6 +97,21 @@ class Story(models.Model):
     def __str__(self):
         return '%s (#%s)' % (self.title, self.pk)
 
+    def css(self):
+        class_dict = {
+            self.UNSCHEDULED: 'warning',
+            self.SCHEDULED: 'active',
+            self.STARTED: 'active',
+            self.FINISHED: 'info',
+            self.DELIVERED: 'info',
+            self.ACCEPTED: 'success',
+            self.REJECTED: 'danger',
+        }
+        # active, success, info, warning, danger
+        if not self.offer_id:
+            return 'warning'
+        return class_dict[self.status]
+
     def overview(self):
         from django.db.models import Sum
         required = self.requiredservices.order_by('service_type').values(
