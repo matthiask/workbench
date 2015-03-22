@@ -81,6 +81,9 @@ class Offer(ModelWithTotal):
     def __str__(self):
         return self.title
 
+    def pretty_status(self):
+        return self.get_status_display()
+
     @property
     def code(self):
         return 'O-%06d' % self.pk
