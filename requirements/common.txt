@@ -1,10 +1,10 @@
 dj-database-url==0.3.0
-Django==1.8b1
+Django==1.8c1
 django-bootstrap3==5.1.1
-django-flat-theme==0.9.1
+django-flat-theme==0.9.2
 django-pgjson==0.2.3
 django-vanilla-views==1.0.3
-oauth2client==1.4.6
+oauth2client==1.4.7
 pdfdocument==3.1
 pip-tools==0.3.5
 psycopg2==2.6
