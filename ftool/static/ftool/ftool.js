@@ -1,8 +1,14 @@
 $(function() {
 
   // AJAX modals
+  var dismissModals = function() {
+    // LOL, dismiss.
+    $('.modal, .modal-backdrop').remove();
+  };
+
   var initModal = function(data) {
-    $('.modal').modal('hide');
+    dismissModals();
+
     $(data).modal();
     if (!('ontouchstart' in document.documentElement)) {
       setTimeout(function() {
@@ -10,9 +16,8 @@ $(function() {
       }, 500);
     }
   };
-  $(document.body).on('click', '[data-toggle=ajaxmodal]', function(event) {
-    $('.modal').remove();
 
+  $(document.body).on('click', '[data-toggle=ajaxmodal]', function(event) {
     $.get(this.href, function(data) {
       initModal(data);
     });
@@ -40,7 +45,7 @@ $(function() {
       $.post(this.action, $(this).serialize(), function(data, status, jqXHR) {
         // 201 CREATED, 202 ACCEPTED or 204 NO CONTENT
         if (jqXHR.status === 201 || jqXHR.status === 202 || jqXHR.status === 204) {
-          $('.modal').modal('hide');
+          dismissModals();
         } else {
           initModal(data);
         }
@@ -61,7 +66,7 @@ $(function() {
 
     $('#' + id).val(key);
     $('#' + id + '_pretty').val(pretty);
-    $('.modal').modal('hide');
+    dismissModals();
   });
 
   // Search forms
