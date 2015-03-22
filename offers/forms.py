@@ -1,4 +1,5 @@
 from django import forms
+from django.db.models import Q
 from django.template.defaultfilters import linebreaksbr
 from django.utils.translation import ugettext_lazy as _
 
@@ -88,19 +89,23 @@ class OfferForm(ModelForm):
         model = Offer
         fields = (
             'offered_on', 'title', 'description', 'owned_by', 'status',
-            'postal_address', 'stories')
+            'postal_address')
         widgets = {
             'status': forms.RadioSelect,
-            'stories': forms.CheckboxSelectMultiple,
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['stories'].queryset = self.instance.project.stories.all()
+        self.fields['stories'] = forms.ModelMultipleChoiceField(
+            queryset=self.instance.project.stories.filter(
+                Q(offer=None) | Q(offer=self.instance)
+            ),
+            widget=forms.CheckboxSelectMultiple,
+            initial=self.instance.stories.all(),
+            label=_('stories'))
 
     def save(self):
         instance = super().save(commit=False)
-        # Leave out save_m2m by purpose.
         instance.clear_stories(save=False)
         instance.add_stories(
             self.cleaned_data.get('stories'),

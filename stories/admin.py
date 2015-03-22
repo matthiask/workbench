@@ -15,7 +15,8 @@ class StoryAdmin(admin.ModelAdmin):
     list_display_links = ('title',)
     list_filter = ('status',)
     inlines = (RequiredServiceInline,)
-    raw_id_fields = ('requested_by', 'owned_by', 'project', 'release')
+    raw_id_fields = (
+        'requested_by', 'owned_by', 'project', 'release', 'offer')
 
 
 class RenderedServiceAdmin(admin.ModelAdmin):
@@ -26,7 +27,7 @@ class RenderedServiceAdmin(admin.ModelAdmin):
     list_display_links = ('project', 'story')
     list_select_related = (
         'story__project', 'rendered_by')
-    raw_id_fields = ('story', 'created_by', 'rendered_by')
+    raw_id_fields = ('story', 'created_by', 'rendered_by', 'invoice')
 
     def project(self, instance):
         return instance.story.project
