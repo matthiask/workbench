@@ -30,6 +30,9 @@ def formatter(field):
         queryset = model._default_manager.all()
 
         def _fn(value):
+            if value is None:
+                return _('<no value>')
+
             try:
                 return str(queryset.get(pk=value))
             except model.DoesNotExist:

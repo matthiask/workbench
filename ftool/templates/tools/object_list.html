@@ -26,6 +26,8 @@
                 name="q"
                 placeholder="{% trans 'search' %}"
                 value="{{ view.request.GET.q|default:'' }}">
+
+              {% for f in view.search_form %}{{ f }}{% endfor %}
             </form>
           </td>
         </tr>

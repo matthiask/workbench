@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n %}
+{% load history i18n %}
 
 {% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
@@ -8,6 +8,16 @@
 <div class="row">
 <div class="col-md-12">
   <h1>{{ object }}</h1>
+
+  <a href="{{ object.urls.update }}" class="btn btn-default">
+    {% trans 'Update' %}
+  </a>
+  <a href="{{ object.urls.delete }}" class="btn btn-danger">
+    {% trans 'Delete' %}
+  </a>
+
+  <h2>{% trans 'History' %}</h2>
+  {% history object %}
 </div>
 </div>
 {% endblock %}
