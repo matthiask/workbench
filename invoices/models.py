@@ -150,10 +150,6 @@ class Invoice(ModelWithTotal):
         else:
             return self.get_status_display()
 
-    @property
-    def code(self):
-        return 'I-%06d' % self.pk
-
     def add_stories(self, stories, save=True):
         if not self.story_data:
             self.story_data = {}
