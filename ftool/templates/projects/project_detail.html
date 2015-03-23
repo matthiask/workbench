@@ -49,6 +49,8 @@
     </div>
   </div>
 
+  <a href="{% url 'activities_activity_create' %}?project={{ project.pk }}" class="btn btn-default"
+    data-toggle="ajaxmodal">{% trans 'create activity' %}</a>
   <a href="{{ project.urls.createstory }}" class="btn btn-default"
     data-toggle="ajaxmodal">{% trans 'create story' %}</a>
   <a href="{{ project.urls.createoffer }}" class="btn btn-default">

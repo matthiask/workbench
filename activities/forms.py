@@ -4,6 +4,9 @@ from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
 from activities.models import Activity
+from contacts.models import Person
+from deals.models import Deal
+from projects.models import Project
 from tools.forms import ModelForm
 
 
@@ -56,5 +59,23 @@ class ActivityForm(ModelForm):
         instance = super().save(commit=False)
         if not instance.completed_at and self.cleaned_data.get('is_completed'):
             instance.completed_at = timezone.now()
+
+        for model, field in [
+            (Project, 'project'),
+            (Person, 'contact'),
+            (Deal, 'deal'),
+        ]:
+            try:
+                pk = self.request.GET.get(field)
+                if pk is None:
+                    continue
+
+                setattr(
+                    instance,
+                    field,
+                    model._default_manager.get(pk=pk))
+            except (model.DoesNotExist, TypeError, ValueError):
+                pass
+
         instance.save()
         return instance

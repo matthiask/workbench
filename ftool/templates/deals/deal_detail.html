@@ -35,6 +35,8 @@
       </tr>
     </table>
 
+    <a href="{% url 'activities_activity_create' %}?deal={{ deal.pk }}" class="btn btn-default"
+      data-toggle="ajaxmodal">{% trans 'create activity' %}</a>
     <a href="{{ deal.urls.update }}" class="btn btn-default">
       {% trans 'Update' %}</a>
     <a href="{{ deal.urls.delete }}" class="btn btn-danger">
