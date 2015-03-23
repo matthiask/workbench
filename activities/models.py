@@ -75,6 +75,7 @@ class Activity(Model):
     )
 
     class Meta:
+        ordering = ('due_on',)
         verbose_name = _('activity')
         verbose_name_plural = _('activities')
 

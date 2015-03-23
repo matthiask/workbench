@@ -44,16 +44,19 @@ class ActivitySearchForm(forms.Form):
 class ActivityForm(ModelForm):
     user_fields = default_to_current_user = ('owned_by',)
 
-    is_completed = forms.BooleanField(
-        label=_('is completed'),
-        required=False,
-    )
-
     class Meta:
         model = Activity
         fields = (
             'title', 'owned_by', 'due_on',
         )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields['is_completed'] = forms.BooleanField(
+                label=_('is completed'),
+                required=False,
+            )
 
     def save(self):
         instance = super().save(commit=False)
