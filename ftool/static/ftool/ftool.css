@@ -63,3 +63,7 @@ th.number {
 .number input::-moz-input-placeholder { color: #ccc; text-overflow: ellipsis; }
 .number input::-webkit-input-placeholder { color: #ccc; text-overflow: ellipsis; }
 .number input:-ms-input-placeholder { color: #ccc; text-overflow: ellipsis; }
+
+.navbar a {
+  font-weight: bold;
+}
