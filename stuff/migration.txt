@@ -382,7 +382,6 @@ SELECT SETVAL('public.django_migrations_id_seq', COALESCE(MAX(id), 1) ) FROM pub
 SELECT SETVAL('public.invoices_invoice_id_seq', COALESCE(MAX(id), 1) ) FROM public.invoices_invoice;
 SELECT SETVAL('public.invoices_invoice_stories_id_seq', COALESCE(MAX(id), 1) ) FROM public.invoices_invoice_stories;
 SELECT SETVAL('public.offers_offer_id_seq', COALESCE(MAX(id), 1) ) FROM public.offers_offer;
-SELECT SETVAL('public.offers_offer_stories_id_seq', COALESCE(MAX(id), 1) ) FROM public.offers_offer_stories;
 SELECT SETVAL('public.projects_project_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_project;
 SELECT SETVAL('public.projects_release_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_release;
 SELECT SETVAL('public.services_servicetype_id_seq', COALESCE(MAX(id), 1) ) FROM public.services_servicetype;
