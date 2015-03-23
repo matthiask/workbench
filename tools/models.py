@@ -1,7 +1,10 @@
 from decimal import Decimal
 
+from django.contrib import messages
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.db.models import ProtectedError
+from django.db.models.deletion import Collector
+from django.utils.translation import ugettext_lazy as _, ugettext
 
 from tools.search import search
 
@@ -69,7 +72,52 @@ def safe_queryset_and(head, *tail):
     return head
 
 
-class ModelWithTotal(models.Model):
+class Model(models.Model):
+    class Meta:
+        abstract = True
+
+    @classmethod
+    def allow_create(cls, request):
+        return True
+
+    @classmethod
+    def allow_update(cls, instance, request):
+        return True
+
+    @classmethod
+    def allow_delete(cls, instance, request):
+        collector = Collector(using=instance._state.db)
+        try:
+            collector.collect([instance])
+        except ProtectedError as exc:
+            messages.error(
+                request,
+                ugettext(
+                    "Cannot delete '%(object)s'"
+                    " because of related objects (%(related)s)."
+                ) % {
+                    'object': instance,
+                    'related': ', '.join(
+                        str(o) for o in exc.protected_objects[:10]),
+                })
+            return False
+        else:
+            return True
+
+    def css(self):
+        return ''
+
+    @property
+    def code(self):
+        return '%s-%06d' % (
+            self.__class__.__name__[0].upper(),
+            self.pk)
+
+    def pretty_status(self):
+        return self.get_status_display()
+
+
+class ModelWithTotal(Model):
     subtotal = models.DecimalField(
         _('subtotal'), max_digits=10, decimal_places=2, default=0)
     discount = models.DecimalField(

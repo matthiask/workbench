@@ -6,11 +6,12 @@ from accounts.models import User
 from contacts.models import Person
 from deals.models import Deal
 from projects.models import Project
+from tools.models import Model
 from tools.urls import model_urls
 
 
 @model_urls()
-class Activity(models.Model):
+class Activity(Model):
     contact = models.ForeignKey(
         Person,
         on_delete=models.PROTECT,

@@ -7,11 +7,12 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.models import User
 from projects.models import Project, Release
 from services.models import ServiceType
+from tools.models import Model
 from tools.urls import model_urls
 
 
 @model_urls()
-class Story(models.Model):
+class Story(Model):
     UNSCHEDULED = 10
     SCHEDULED = 20
     STARTED = 30
@@ -159,7 +160,7 @@ class Story(models.Model):
             self.delete()
 
 
-class RequiredService(models.Model):
+class RequiredService(Model):
     story = models.ForeignKey(
         Story,
         on_delete=models.CASCADE,
@@ -208,7 +209,7 @@ class RequiredService(models.Model):
 
 
 @model_urls()
-class RenderedService(models.Model):
+class RenderedService(Model):
     story = models.ForeignKey(
         Story,
         on_delete=models.PROTECT,

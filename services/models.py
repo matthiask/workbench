@@ -1,8 +1,10 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from tools.models import Model
 
-class ServiceType(models.Model):
+
+class ServiceType(Model):
     title = models.CharField(
         _('title'),
         max_length=40)

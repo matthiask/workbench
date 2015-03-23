@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
 from contacts.models import Organization, Person
-from tools.models import SearchManager
+from tools.models import SearchManager, Model
 from tools.urls import model_urls
 
 
@@ -36,7 +36,7 @@ class SummationDict(dict):
 
 
 @model_urls()
-class Project(models.Model):
+class Project(Model):
     IN_PREPARATION = 10
     WORK_IN_PROGRESS = 20
     FINISHED = 30
@@ -150,7 +150,7 @@ class Project(models.Model):
 
 
 @model_urls(lambda object: {'project_id': object.project_id, 'pk': object.pk})
-class Release(models.Model):
+class Release(Model):
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE,

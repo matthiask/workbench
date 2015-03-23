@@ -3,12 +3,12 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
-from tools.models import SearchManager
+from tools.models import SearchManager, Model
 from tools.urls import model_urls
 
 
 @model_urls()
-class Funnel(models.Model):
+class Funnel(Model):
     title = models.CharField(
         _('funnel'),
         max_length=200)
@@ -23,7 +23,7 @@ class Funnel(models.Model):
 
 
 @model_urls()
-class Deal(models.Model):
+class Deal(Model):
     INITIAL = 10
     NEGOTIATING = 20
     IMPROBABLE = 30

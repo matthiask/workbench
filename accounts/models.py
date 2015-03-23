@@ -7,6 +7,8 @@ from django.db.models import Sum
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
+from tools.models import Model
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, _short_name, _full_name, date_of_birth):
@@ -42,7 +44,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser):
+class User(Model, AbstractBaseUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['_full_name', '_short_name', 'date_of_birth']
 

@@ -1,7 +1,5 @@
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models import ProtectedError
-from django.db.models.deletion import Collector
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.functional import cached_property
@@ -38,31 +36,6 @@ class ToolsMixin(object):
     def meta(self):
         return self.model._meta
 
-    def allow_create(self):
-        return True
-
-    def allow_update(self):
-        return True
-
-    def allow_delete(self):
-        collector = Collector(using=self.object._state.db)
-        try:
-            collector.collect([self.object])
-        except ProtectedError as exc:
-            messages.error(
-                self.request,
-                _(
-                    "Cannot delete '%(object)s'"
-                    " because of related objects (%(related)s)."
-                ) % {
-                    'object': self.object,
-                    'related': ', '.join(
-                        str(o) for o in exc.protected_objects[:10]),
-                })
-            return False
-        else:
-            return True
-
     def get_form(self, data=None, files=None, **kwargs):
         kwargs['request'] = self.request
         cls = self.get_form_class()
@@ -98,7 +71,7 @@ class DetailView(ToolsMixin, vanilla.DetailView):
 
 class CreateView(ToolsMixin, vanilla.CreateView):
     def get(self, request, *args, **kwargs):
-        if not self.allow_create():
+        if not self.model.allow_create(request):
             return redirect('../')
 
         form = self.get_form()
@@ -106,7 +79,7 @@ class CreateView(ToolsMixin, vanilla.CreateView):
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
-        if not self.allow_create():
+        if not self.model.allow_create(request):
             return redirect('../')
 
         form = self.get_form(data=request.POST, files=request.FILES)
@@ -134,7 +107,7 @@ class CreateView(ToolsMixin, vanilla.CreateView):
 class UpdateView(ToolsMixin, vanilla.UpdateView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if not self.allow_update():
+        if not self.object.allow_update(self.object, request):
             return redirect(self.object)
 
         form = self.get_form(instance=self.object)
@@ -143,7 +116,7 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if not self.allow_update():
+        if not self.object.allow_update(self.object, request):
             return redirect(self.object)
 
         form = self.get_form(
@@ -170,7 +143,7 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
 class DeleteView(ToolsMixin, vanilla.DeleteView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if not self.allow_delete():
+        if not self.object.allow_delete(self.object, request):
             return redirect(self.object)
 
         context = self.get_context_data()
@@ -178,7 +151,7 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if not self.allow_delete():
+        if not self.object.allow_delete(self.object, request):
             return redirect(self.object)
 
         self.object.delete()

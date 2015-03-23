@@ -4,12 +4,12 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
-from tools.models import SearchManager
+from tools.models import SearchManager, Model
 from tools.urls import model_urls
 
 
 @model_urls()
-class Group(models.Model):
+class Group(Model):
     title = models.CharField(_('title'), max_length=100)
 
     class Meta:
@@ -22,7 +22,7 @@ class Group(models.Model):
 
 
 @model_urls()
-class Organization(models.Model):
+class Organization(Model):
     name = models.TextField(_('name'))
     notes = models.TextField(_('notes'), blank=True)
     primary_contact = models.ForeignKey(
@@ -47,7 +47,7 @@ class Organization(models.Model):
 
 
 @model_urls()
-class Person(models.Model):
+class Person(Model):
     full_name = models.CharField(_('full name'), max_length=100)
     address = models.CharField(
         _('address'),
@@ -84,7 +84,7 @@ class Person(models.Model):
         return self.full_name
 
 
-class PersonDetail(models.Model):
+class PersonDetail(Model):
     WEIGHTS = (
         (re.compile(r'mobile', re.I), 30),
         (re.compile(r'work', re.I), 20),

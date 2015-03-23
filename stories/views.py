@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
 from stories.forms import RenderedServiceForm, MergeStoryForm
-from stories.models import Story
+from stories.models import Story, RenderedService
 from tools.views import DetailView, UpdateView
 
 
@@ -23,7 +23,7 @@ class StoryDetailView(DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if not self.allow_create():  # TODO RenderedService, not Story
+        if not RenderedService.allow_create(request):
             return redirect('../')
 
         form = self.get_form(request.POST, request.FILES)
