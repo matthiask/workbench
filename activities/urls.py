@@ -22,6 +22,7 @@ urlpatterns = [
         CreateView.as_view(
             model=Activity,
             form_class=ActivityForm,
+            template_name='modalform.html',
         ),
         name='activities_activity_create'),
     url(

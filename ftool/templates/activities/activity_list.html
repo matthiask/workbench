@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% load bootstrap3 i18n querystring %}
+
+{% block title %}{{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-sm-12">
+    <h1>{{ view.meta.verbose_name_plural }}</h1>
+
+    <table class="table table-hover table-striped">
+      <thead>
+        <tr>
+          <td colspan="4">
+            <a href="{{ view.model.urls.create }}" class="btn btn-default pull-right"
+              data-toggle="ajaxmodal">
+              <span class="glyphicon glyphicon-plus"></span>
+              {{ view.meta.verbose_name }}
+            </a>
+
+            <form method="GET" action="." class="form-inline form-search">
+              <label class="sr-only">{% trans 'search' %}</label>
+              <input
+                class="form-control"
+                type="search"
+                name="q"
+                placeholder="{% trans 'search' %}"
+                value="{{ view.request.GET.q|default:'' }}">
+
+              {% for f in view.search_form %}{{ f }}{% endfor %}
+            </form>
+          </td>
+        </tr>
+        <tr>
+          <th>{{ view.meta.verbose_name }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for object in object_list %}
+          <tr>
+            <th><a href="{{ object.urls.detail }}">
+                {{ object }}
+            </a></th>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="5">
+            {{ paginator.count }} {{ view.meta.verbose_name_plural }}
+            {% if view.root_queryset_count != paginator.count %}
+            (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
+            {% endif %}
+          </th>
+        </tr>
+      </tfoot>
+    </table>
+
+    {% bootstrap_pagination page=page_obj extra=request.GET|querystring:'page' %}
+  </div>
+</div>
+{% endblock %}

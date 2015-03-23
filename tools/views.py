@@ -75,7 +75,10 @@ class CreateView(ToolsMixin, vanilla.CreateView):
             return redirect('../')
 
         form = self.get_form()
-        context = self.get_context_data(form=form)
+        context = self.get_context_data(
+            form=form,
+            title=_('Create %s') % self.model._meta.verbose_name,
+        )
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -111,7 +114,10 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
             return redirect(self.object)
 
         form = self.get_form(instance=self.object)
-        context = self.get_context_data(form=form)
+        context = self.get_context_data(
+            form=form,
+            title=_('Update %s') % self.object._meta.verbose_name,
+        )
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -146,7 +152,9 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
         if not self.object.allow_delete(self.object, request):
             return redirect(self.object)
 
-        context = self.get_context_data()
+        context = self.get_context_data(
+            title=_('Delete %s') % self.object._meta.verbose_name,
+        )
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
