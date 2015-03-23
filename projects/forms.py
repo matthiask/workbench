@@ -6,8 +6,8 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 from contacts.models import Organization, Person
 from projects.models import Project
 from services.models import ServiceType
-from stories.models import Story, RequiredService
-from tools.forms import ModelForm, Picker, Textarea
+from stories.models import RequiredService
+from tools.forms import ModelForm, Picker
 
 
 class ProjectSearchForm(forms.Form):
@@ -53,37 +53,6 @@ class ProjectForm(ModelForm):
                     },
                 })
         return data
-
-
-class StoryForm(ModelForm):
-    user_fields = ('owned_by',)
-
-    class Meta:
-        model = Story
-        fields = ('release', 'title', 'description', 'owned_by')
-        widgets = {
-            'description': Textarea(),
-        }
-
-    def __init__(self, *args, **kwargs):
-        self.project = kwargs.pop('project')
-
-        if not kwargs.get('instance'):
-            kwargs['initial'] = {
-                'release': self.project.releases.filter(
-                    is_default=True).first(),
-            }
-
-        super().__init__(*args, **kwargs)
-        self.fields['release'].queryset = self.project.releases.all()
-
-    def save(self):
-        instance = super().save(commit=False)
-        if not instance.pk:
-            instance.requested_by = self.request.user
-        instance.project = self.project
-        instance.save()
-        return instance
 
 
 class EffortForm(forms.Form):

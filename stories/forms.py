@@ -4,7 +4,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from stories.models import Story, RenderedService
-from tools.forms import ModelForm
+from tools.forms import ModelForm, Textarea
 
 
 class RenderedServiceForm(ModelForm):
@@ -28,6 +28,39 @@ class RenderedServiceForm(ModelForm):
         if not instance.pk:
             instance.created_by = self.request.user
         instance.story = self.story
+        instance.save()
+        return instance
+
+
+class StoryForm(ModelForm):
+    user_fields = ('owned_by',)
+
+    class Meta:
+        model = Story
+        fields = ('release', 'title', 'description', 'owned_by')
+        widgets = {
+            'description': Textarea(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance')
+        if instance and instance.pk:
+            self.project = instance.project
+        else:
+            self.project = kwargs.pop('project')
+            kwargs['initial'] = {
+                'release': self.project.releases.filter(
+                    is_default=True).first(),
+            }
+
+        super().__init__(*args, **kwargs)
+        self.fields['release'].queryset = self.project.releases.all()
+
+    def save(self):
+        instance = super().save(commit=False)
+        if not instance.pk:
+            instance.requested_by = self.request.user
+            instance.project = self.project
         instance.save()
         return instance
 
