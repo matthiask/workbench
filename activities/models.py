@@ -1,4 +1,7 @@
+from datetime import date
+
 from django.db import models
+from django.template.defaultfilters import date as date_fmt
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -77,3 +80,31 @@ class Activity(Model):
 
     def __str__(self):
         return self.title
+
+    def context(self):
+        return [c for c in [self.contact, self.deal, self.project] if c]
+
+    def pretty_status(self):
+        if self.completed_at:
+            return _('completed at %s') % self.completed_at
+
+        if self.due_on:
+            ctx = {
+                'date': date_fmt(self.due_on, 'd.m.Y'),
+            }
+
+            days = (self.due_on - date.today()).days
+            if days > 14:
+                ctx['relative'] = _('in %s weeks') % (days // 7)
+            elif days > 1:
+                ctx['relative'] = _('in %s days') % days
+            elif days == 1:
+                ctx['relative'] = _('tomorrow')
+            elif days == 0:
+                ctx['relative'] = _('today')
+            else:
+                ctx['relative'] = _('overdue!')
+
+            return _('due on %(date)s (%(relative)s)') % ctx
+
+        return _('open')
