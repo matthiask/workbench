@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.models import User
 from projects.models import Project, Release
 from services.models import ServiceType
-from tools.models import Model
+from tools.models import SearchManager, Model
 from tools.urls import model_urls
 
 
@@ -89,6 +89,8 @@ class Story(Model):
         help_text=_('This field should be left empty most of the time.'))
 
     position = models.PositiveIntegerField(_('position'), default=0)
+
+    objects = SearchManager()
 
     class Meta:
         ordering = ('release', 'position', 'id')
@@ -256,6 +258,8 @@ class RenderedService(Model):
         blank=True,
         null=True,
     )
+
+    objects = SearchManager()
 
     class Meta:
         ordering = ('-rendered_on', '-created_at')
