@@ -13,16 +13,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ServiceType',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
                 ('title', models.CharField(verbose_name='title', max_length=40)),
-                ('billing_per_hour', models.DecimalField(verbose_name='billing per hour', max_digits=5, decimal_places=2)),
-                ('position', models.PositiveIntegerField(default=0, verbose_name='position')),
+                ('billing_per_hour', models.DecimalField(verbose_name='billing per hour', decimal_places=2, max_digits=5)),
+                ('position', models.PositiveIntegerField(verbose_name='position', default=0)),
             ],
             options={
-                'verbose_name': 'service',
+                'verbose_name': 'service type',
                 'ordering': ('position', 'id'),
-                'verbose_name_plural': 'services',
+                'verbose_name_plural': 'service types',
             },
-            bases=(models.Model,),
         ),
     ]

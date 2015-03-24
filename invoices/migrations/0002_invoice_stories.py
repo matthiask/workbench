@@ -7,13 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('invoices', '0007_auto_20150320_1534'),
+        ('invoices', '0001_initial'),
+        ('stories', '0001_initial'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='invoice',
-            name='closed_at',
-            field=models.DateTimeField(null=True, verbose_name='closed at', blank=True),
+            name='stories',
+            field=models.ManyToManyField(verbose_name='stories', to='stories.Story', blank=True, related_name='invoices'),
         ),
     ]

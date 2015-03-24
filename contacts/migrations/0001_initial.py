@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+import django.db.models.deletion
 from django.conf import settings
 
 
@@ -15,87 +16,94 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='EmailAddress',
             fields=[
-                ('id', models.AutoField(serialize=False, primary_key=True, auto_created=True, verbose_name='ID')),
-                ('type', models.CharField(max_length=40, verbose_name='type')),
-                ('email', models.EmailField(max_length=254, verbose_name='email')),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
+                ('type', models.CharField(verbose_name='type', max_length=40)),
+                ('weight', models.SmallIntegerField(verbose_name='weight', editable=False, default=0)),
+                ('email', models.EmailField(verbose_name='email', max_length=254)),
             ],
             options={
-                'verbose_name_plural': 'email addresses',
                 'verbose_name': 'email address',
+                'ordering': ('-weight', 'id'),
+                'verbose_name_plural': 'email addresses',
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Group',
             fields=[
-                ('id', models.AutoField(serialize=False, primary_key=True, auto_created=True, verbose_name='ID')),
-                ('title', models.CharField(max_length=100, verbose_name='title')),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
+                ('title', models.CharField(verbose_name='title', max_length=100)),
             ],
             options={
-                'verbose_name_plural': 'groups',
                 'verbose_name': 'group',
+                'ordering': ('title',),
+                'verbose_name_plural': 'groups',
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Organization',
             fields=[
-                ('id', models.AutoField(serialize=False, primary_key=True, auto_created=True, verbose_name='ID')),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
                 ('name', models.TextField(verbose_name='name')),
-                ('primary_contact', models.ForeignKey(related_name='+', verbose_name='primary contact', to=settings.AUTH_USER_MODEL)),
+                ('notes', models.TextField(verbose_name='notes', blank=True)),
+                ('groups', models.ManyToManyField(verbose_name='groups', to='contacts.Group', related_name='+')),
+                ('primary_contact', models.ForeignKey(verbose_name='primary contact', on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, related_name='+')),
             ],
             options={
+                'verbose_name': 'organization',
+                'ordering': ('name',),
+                'verbose_name_plural': 'organizations',
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Person',
             fields=[
-                ('id', models.AutoField(serialize=False, primary_key=True, auto_created=True, verbose_name='ID')),
-                ('full_name', models.CharField(max_length=100, verbose_name='full name')),
-                ('address', models.CharField(max_length=100, verbose_name='address', blank=True, help_text='E.g. Dear John.')),
-                ('notes', models.TextField(blank=True, verbose_name='notes')),
-                ('organization', models.ForeignKey(related_name='people', verbose_name='organization', to='contacts.Organization')),
-                ('primary_contact', models.ForeignKey(related_name='+', verbose_name='primary contact', to=settings.AUTH_USER_MODEL)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
+                ('full_name', models.CharField(verbose_name='full name', max_length=100)),
+                ('address', models.CharField(verbose_name='address', max_length=100, blank=True, help_text='E.g. Dear John.')),
+                ('notes', models.TextField(verbose_name='notes', blank=True)),
+                ('groups', models.ManyToManyField(verbose_name='groups', to='contacts.Group', related_name='+')),
+                ('organization', models.ForeignKey(verbose_name='organization', on_delete=django.db.models.deletion.PROTECT, null=True, to='contacts.Organization', blank=True, related_name='people')),
+                ('primary_contact', models.ForeignKey(verbose_name='primary contact', on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, related_name='+')),
             ],
             options={
-                'verbose_name_plural': 'people',
                 'verbose_name': 'person',
+                'ordering': ('full_name',),
+                'verbose_name_plural': 'people',
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='PhoneNumber',
             fields=[
-                ('id', models.AutoField(serialize=False, primary_key=True, auto_created=True, verbose_name='ID')),
-                ('type', models.CharField(max_length=40, verbose_name='type')),
-                ('phone_number', models.CharField(max_length=100, verbose_name='phone number')),
-                ('person', models.ForeignKey(related_name='phonenumbers', verbose_name='person', to='contacts.Person')),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
+                ('type', models.CharField(verbose_name='type', max_length=40)),
+                ('weight', models.SmallIntegerField(verbose_name='weight', editable=False, default=0)),
+                ('phone_number', models.CharField(verbose_name='phone number', max_length=100)),
+                ('person', models.ForeignKey(verbose_name='person', to='contacts.Person', related_name='phonenumbers')),
             ],
             options={
-                'verbose_name_plural': 'phone numbers',
                 'verbose_name': 'phone number',
+                'ordering': ('-weight', 'id'),
+                'verbose_name_plural': 'phone numbers',
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='PostalAddress',
             fields=[
-                ('id', models.AutoField(serialize=False, primary_key=True, auto_created=True, verbose_name='ID')),
-                ('type', models.CharField(max_length=40, verbose_name='type')),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
+                ('type', models.CharField(verbose_name='type', max_length=40)),
+                ('weight', models.SmallIntegerField(verbose_name='weight', editable=False, default=0)),
                 ('postal_address', models.TextField(verbose_name='postal address')),
-                ('person', models.ForeignKey(related_name='postaladdresses', verbose_name='person', to='contacts.Person')),
+                ('person', models.ForeignKey(verbose_name='person', to='contacts.Person', related_name='postaladdresses')),
             ],
             options={
-                'verbose_name_plural': 'postal addresses',
                 'verbose_name': 'postal address',
+                'ordering': ('-weight', 'id'),
+                'verbose_name_plural': 'postal addresses',
             },
-            bases=(models.Model,),
         ),
         migrations.AddField(
             model_name='emailaddress',
             name='person',
-            field=models.ForeignKey(related_name='emailaddresses', verbose_name='person', to='contacts.Person'),
-            preserve_default=True,
+            field=models.ForeignKey(verbose_name='person', to='contacts.Person', related_name='emailaddresses'),
         ),
     ]
