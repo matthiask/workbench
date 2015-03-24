@@ -42,7 +42,7 @@
       <tbody>
         {% for object in object_list %}
           <tr>
-            <th><a href="{{ object.urls.detail }}">
+            <th><a href="{{ object.urls.detail }}" data-toggle="ajaxmodal">
                 {{ object }}
             </a></th>
             <td>
