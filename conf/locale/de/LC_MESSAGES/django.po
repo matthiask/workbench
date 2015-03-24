@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 15:39+0100\n"
+"POT-Creation-Date: 2015-03-24 22:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,14 +75,16 @@ msgstr "Kein Benutzer mit Emailadresse %s gefunden."
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
-#: activities/__init__.py:10 activities/models.py:79
+#: activities/__init__.py:10 activities/models.py:80
 #: ftool/templates/base.html:51
+#: ftool/templates/projects/project_detail.html:68
 msgid "activities"
 msgstr "Aktivitäten"
 
-#: activities/forms.py:15 activities/models.py:46 deals/models.py:60
-#: ftool/templates/deals/deal_detail.html:25
-#: ftool/templates/deals/deal_list.html:38
+#: activities/forms.py:15 activities/models.py:46 deals/models.py:39
+#: ftool/templates/activities/activity_list.html:38
+#: ftool/templates/deals/deal_detail.html:18
+#: ftool/templates/deals/deal_list.html:40
 #: ftool/templates/invoices/invoice_list.html:37
 #: ftool/templates/offers/offer_list.html:38
 #: ftool/templates/projects/project_list.html:37 invoices/models.py:92
@@ -91,7 +93,6 @@ msgid "owned by"
 msgstr "gehört"
 
 #: activities/forms.py:23
-#| msgid "All states"
 msgid "All users"
 msgstr "Alle Benutzer"
 
@@ -103,8 +104,7 @@ msgstr "Gehört inaktiven Benutzern"
 msgid "Active"
 msgstr "Aktiv"
 
-#: activities/forms.py:48
-#| msgid "completed at"
+#: activities/forms.py:57
 msgid "is completed"
 msgstr "ist erledigt"
 
@@ -119,12 +119,12 @@ msgstr "Kontakt"
 msgid "project"
 msgstr "Projekt"
 
-#: activities/models.py:37 deals/models.py:83
-#: ftool/templates/deals/deal_list.html:37
+#: activities/models.py:37 deals/models.py:62
+#: ftool/templates/deals/deal_list.html:39
 msgid "deal"
 msgstr "Geschäft"
 
-#: activities/models.py:42 contacts/models.py:13 deals/models.py:52
+#: activities/models.py:42 contacts/models.py:13 deals/models.py:31
 #: invoices/models.py:84 offers/models.py:52 projects/models.py:64
 #: projects/models.py:161 services/models.py:9 stories/models.py:50
 msgid "title"
@@ -146,7 +146,7 @@ msgstr "Dauer"
 msgid "Duration in hours (if applicable)."
 msgstr "Dauer in Stunden (falls zutreffend)."
 
-#: activities/models.py:68 deals/models.py:73 stories/models.py:35
+#: activities/models.py:68 deals/models.py:52 stories/models.py:35
 #: stories/models.py:220
 msgid "created at"
 msgstr "Erstellt um"
@@ -155,46 +155,43 @@ msgstr "Erstellt um"
 msgid "completed at"
 msgstr "Erledigt um"
 
-#: activities/models.py:78
+#: activities/models.py:79 ftool/templates/projects/project_detail.html:66
 msgid "activity"
 msgstr "Aktivität"
 
-#: activities/models.py:89
+#: activities/models.py:90
 #, python-format
-#| msgid "completed at"
 msgid "completed at %s"
 msgstr "Erledigt um %s"
 
-#: activities/models.py:98
+#: activities/models.py:99
 #, python-format
 msgid "in %s weeks"
 msgstr "in %s Wochen"
 
-#: activities/models.py:100
+#: activities/models.py:101
 #, python-format
 msgid "in %s days"
 msgstr "in %s Tagen"
 
-#: activities/models.py:102
+#: activities/models.py:103
 msgid "tomorrow"
 msgstr "morgen"
 
-#: activities/models.py:104
-#| msgid "Hours today"
+#: activities/models.py:105
 msgid "today"
 msgstr "heute"
 
-#: activities/models.py:106
-#| msgid "overview"
+#: activities/models.py:107
 msgid "overdue!"
 msgstr "überfällig!"
 
-#: activities/models.py:108
+#: activities/models.py:109
 #, python-format
 msgid "due on %(date)s (%(relative)s)"
 msgstr "fällig am %(date)s (%(relative)s)"
 
-#: activities/models.py:110
+#: activities/models.py:111
 msgid "open"
 msgstr "offen"
 
@@ -312,70 +309,60 @@ msgstr "Postadresse"
 msgid "postal addresses"
 msgstr "Postadressen"
 
-#: deals/__init__.py:10 deals/models.py:84 ftool/templates/base.html:47
+#: deals/__init__.py:10 deals/models.py:63 ftool/templates/base.html:47
 #: ftool/templates/deals/deal_detail.html:5
 msgid "deals"
 msgstr "Geschäfte"
 
-#: deals/forms.py:12
-msgid "All funnels"
-msgstr "Alle Trichter"
+#: deals/forms.py:10 invoices/forms.py:10 offers/forms.py:13
+#: projects/forms.py:15
+msgid "All states"
+msgstr "Alle Stati"
 
-#: deals/models.py:13 deals/models.py:18 deals/models.py:48
-#: ftool/templates/deals/deal_detail.html:15
-#: ftool/templates/deals/deal_list.html:30
-#: ftool/templates/deals/deal_list.html:36
-msgid "funnel"
-msgstr "Trichter"
-
-#: deals/models.py:19 ftool/templates/deals/funnel_detail.html:5
-msgid "funnels"
-msgstr "Trichter"
-
-#: deals/models.py:36
+#: deals/models.py:21
 msgid "initial"
 msgstr "Anfang"
 
-#: deals/models.py:37
+#: deals/models.py:22
 msgid "negotiating"
 msgstr "in Verhandlung"
 
-#: deals/models.py:38
+#: deals/models.py:23
 msgid "improbable"
 msgstr "unwahrscheinlich"
 
-#: deals/models.py:39
+#: deals/models.py:24
 msgid "probable in the future"
 msgstr "wahrscheinlich in der Zukunft"
 
-#: deals/models.py:40
+#: deals/models.py:25
 msgid "probable soon"
 msgstr "wahrscheinlich bald"
 
-#: deals/models.py:41 stories/models.py:30
+#: deals/models.py:26 stories/models.py:30
 msgid "accepted"
 msgstr "Akzeptiert"
 
-#: deals/models.py:42
+#: deals/models.py:27
 msgid "declined"
 msgstr "Abgelehnt"
 
-#: deals/models.py:55 ftool/templates/deals/deal_detail.html:21
+#: deals/models.py:34 ftool/templates/deals/deal_detail.html:14
 #: invoices/models.py:87 offers/models.py:55 projects/models.py:67
 #: stories/models.py:53 stories/models.py:244
 msgid "description"
 msgstr "Beschreibung"
 
-#: deals/models.py:63 ftool/templates/deals/deal_detail.html:29
-#: ftool/templates/deals/deal_list.html:39
+#: deals/models.py:42 ftool/templates/deals/deal_detail.html:22
+#: ftool/templates/deals/deal_list.html:41
 msgid "estimated value"
 msgstr "geschätzter Wert"
 
-#: deals/models.py:68 ftool/templates/activities/activity_list.html:38
+#: deals/models.py:47 ftool/templates/activities/activity_list.html:39
 #: ftool/templates/contacts/organization_list.html:29
 #: ftool/templates/contacts/person_list.html:29
-#: ftool/templates/deals/deal_detail.html:33
-#: ftool/templates/deals/deal_list.html:40
+#: ftool/templates/deals/deal_detail.html:26
+#: ftool/templates/deals/deal_list.html:42
 #: ftool/templates/invoices/invoice_list.html:29
 #: ftool/templates/invoices/invoice_list.html:38
 #: ftool/templates/offers/offer_list.html:29
@@ -386,7 +373,7 @@ msgstr "geschätzter Wert"
 msgid "status"
 msgstr "Status"
 
-#: deals/models.py:76 invoices/models.py:79 offers/models.py:47
+#: deals/models.py:55 invoices/models.py:79 offers/models.py:47
 msgid "closed at"
 msgstr "Geschlossen um"
 
@@ -415,14 +402,13 @@ msgid "search"
 msgstr "Suche"
 
 #: ftool/templates/activities/activity_list.html:37
-#| msgid "contact"
 msgid "context"
 msgstr "Kontext"
 
-#: ftool/templates/activities/activity_list.html:61
+#: ftool/templates/activities/activity_list.html:63
 #: ftool/templates/contacts/organization_list.html:52
 #: ftool/templates/contacts/person_list.html:64
-#: ftool/templates/deals/deal_list.html:59
+#: ftool/templates/deals/deal_list.html:60
 #: ftool/templates/invoices/invoice_list.html:58
 #: ftool/templates/offers/offer_list.html:60
 #: ftool/templates/projects/project_list.html:58
@@ -463,22 +449,23 @@ msgstr "Abmelden"
 
 #: ftool/templates/contacts/organization_detail.html:54
 #: ftool/templates/contacts/person_detail.html:56
-#: ftool/templates/deals/deal_detail.html:41
+#: ftool/templates/deals/deal_detail.html:34
 #: ftool/templates/invoices/invoice_detail.html:16
 #: ftool/templates/offers/offer_detail.html:16
-#: ftool/templates/projects/project_detail.html:61
+#: ftool/templates/projects/project_detail.html:56
+#: ftool/templates/stories/story_detail.html:53
 #: ftool/templates/tools/object_detail.html:13
 msgid "Update"
 msgstr "Aktualisieren"
 
 #: ftool/templates/contacts/organization_detail.html:56
 #: ftool/templates/contacts/person_detail.html:58
-#: ftool/templates/deals/deal_detail.html:43
+#: ftool/templates/deals/deal_detail.html:36
 #: ftool/templates/invoices/invoice_detail.html:19
 #: ftool/templates/offers/offer_detail.html:19
-#: ftool/templates/projects/project_detail.html:63
+#: ftool/templates/projects/project_detail.html:58
 #: ftool/templates/stories/story_confirm_delete.html:16
-#: ftool/templates/stories/story_detail.html:53
+#: ftool/templates/stories/story_detail.html:59
 #: ftool/templates/tools/object_detail.html:16
 msgid "Delete"
 msgstr "Löschen"
@@ -488,9 +475,7 @@ msgid "persons"
 msgstr "Personen"
 
 #: ftool/templates/contacts/person_detail.html:54
-#: ftool/templates/deals/deal_detail.html:39
-#: ftool/templates/projects/project_detail.html:53
-#| msgid "created at"
+#: ftool/templates/deals/deal_detail.html:32
 msgid "create activity"
 msgstr "Aktivität erstellen"
 
@@ -514,10 +499,10 @@ msgstr "%(class)s erstellen"
 msgid "submit"
 msgstr "absenden"
 
-#: ftool/templates/deals/deal_detail.html:45
+#: ftool/templates/deals/deal_detail.html:38
 #: ftool/templates/invoices/invoice_detail.html:22
 #: ftool/templates/offers/offer_detail.html:22
-#: ftool/templates/projects/project_detail.html:65
+#: ftool/templates/projects/project_detail.html:88
 #: ftool/templates/tools/object_detail.html:19
 msgid "History"
 msgstr "Geschichte"
@@ -539,7 +524,7 @@ msgstr "Rechnung"
 msgid "customer"
 msgstr "Kunde"
 
-#: ftool/templates/modal.html:19 ftool/templates/stories/story_detail.html:59
+#: ftool/templates/modal.html:19 ftool/templates/stories/story_detail.html:62
 msgid "Close"
 msgstr "Schliessen"
 
@@ -552,16 +537,19 @@ msgstr "Offerte"
 msgid "releases and stories"
 msgstr "Versionen und Stories"
 
-#: ftool/templates/projects/project_detail.html:55
-#: ftool/templates/stories/story_form.html:6
+#: ftool/templates/projects/project_detail.html:40
+msgid "No owner"
+msgstr "Gehört niemandem"
+
+#: ftool/templates/projects/project_detail.html:50
 msgid "create story"
 msgstr "Story erstellen"
 
-#: ftool/templates/projects/project_detail.html:57
+#: ftool/templates/projects/project_detail.html:52
 msgid "create offer"
 msgstr "Offerte erstellen"
 
-#: ftool/templates/projects/project_detail.html:59
+#: ftool/templates/projects/project_detail.html:54
 msgid "estimation"
 msgstr "Schätzung"
 
@@ -609,7 +597,7 @@ msgstr "erstellen"
 msgid "Merge"
 msgstr "Zusammenführen"
 
-#: ftool/templates/stories/story_form.html:12
+#: ftool/templates/stories/story_form.html:8
 msgid "Save and add another"
 msgstr "Sichern und neu hinzufügen"
 
@@ -620,10 +608,6 @@ msgstr "Löschen"
 #: ftool/views.py:26
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
-
-#: invoices/forms.py:10 offers/forms.py:13 projects/forms.py:15
-msgid "All states"
-msgstr "Alle Stati"
 
 #: invoices/models.py:32 offers/models.py:29 projects/models.py:45
 msgid "In preparation"
@@ -775,7 +759,7 @@ msgstr "Leistungstyp"
 msgid "service types"
 msgstr "Leistungstypen"
 
-#: stories/forms.py:38
+#: stories/forms.py:71
 msgid "Merge into"
 msgstr "Zusammenführen mit"
 
@@ -934,13 +918,11 @@ msgstr "Total inkl. MwSt"
 
 #: tools/views.py:80
 #, python-format
-#| msgid "Create %(class)s"
 msgid "Create %s"
 msgstr "%s erstellen"
 
 #: tools/views.py:119
-#,  python-format
-#| msgid "Update"
+#, python-format
 msgid "Update %s"
 msgstr "%s aktualisieren"
 
@@ -951,7 +933,6 @@ msgstr "%(class)s '%(object)s' wurde erfolgreich geändert."
 
 #: tools/views.py:156
 #, python-format
-#| msgid "Delete"
 msgid "Delete %s"
 msgstr "%s löschen"
 
@@ -959,6 +940,3 @@ msgstr "%s löschen"
 #, python-format
 msgid "%(class)s '%(object)s' has been successfully deleted."
 msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
-
-#~ msgid "Refresh"
-#~ msgstr "Aktualisieren"

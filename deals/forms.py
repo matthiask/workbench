@@ -1,15 +1,14 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from deals.models import Funnel, Deal
+from deals.models import Deal
 from tools.forms import ModelForm
 
 
 class DealSearchForm(forms.Form):
-    f = forms.ModelChoiceField(
-        queryset=Funnel.objects.all(),
+    s = forms.ChoiceField(
+        choices=(('', _('All states')),) + Deal.STATUS_CHOICES,
         required=False,
-        empty_label=_('All funnels'),
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
 
@@ -18,8 +17,8 @@ class DealSearchForm(forms.Form):
             return queryset
 
         data = self.cleaned_data
-        if data.get('f'):
-            queryset = queryset.filter(funnel=data.get('f'))
+        if data.get('s'):
+            queryset = queryset.filter(status=data.get('s'))
 
         return queryset
 
@@ -30,8 +29,7 @@ class DealForm(ModelForm):
     class Meta:
         model = Deal
         fields = (
-            'funnel', 'title', 'description', 'owned_by', 'estimated_value',
-            'status')
+            'title', 'description', 'owned_by', 'estimated_value', 'status')
         widgets = {
             'status': forms.RadioSelect,
         }

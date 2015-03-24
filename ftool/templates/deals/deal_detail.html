@@ -7,16 +7,9 @@
 {% block content %}
 <div class="row">
   <div class="col-md-12">
-    <a href="{{ deal.funnel.urls.detail }}">&lt; {{ deal.funnel }}</a>
     <h1>{{ deal }}</h1>
 
     <table class="table table-striped">
-      <tr>
-        <th>{% trans 'funnel' %}</th>
-        <td><a href="{{ deal.funnel.urls.detail }}">
-          {{ deal.funnel }}
-        </a></td>
-      </tr>
       <tr>
         <th>{% trans 'description' %}</th>
         <td>{{ deal.description|default:"&ndash;"|linebreaksbr }}</td>
@@ -43,7 +36,7 @@
       {% trans 'Delete' %}</a>
 
     <h2>{% trans 'History' %}</h2>
-    {% history deal 'funnel, title, description, owned_by, status, estimated_value' %}
+    {% history deal 'title, description, owned_by, status, estimated_value' %}
   </div>
 </div>
 {% endblock %}

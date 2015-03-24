@@ -8,21 +8,6 @@ from tools.urls import model_urls
 
 
 @model_urls()
-class Funnel(Model):
-    title = models.CharField(
-        _('funnel'),
-        max_length=200)
-
-    class Meta:
-        ordering = ('title',)
-        verbose_name = _('funnel')
-        verbose_name_plural = _('funnels')
-
-    def __str__(self):
-        return self.title
-
-
-@model_urls()
 class Deal(Model):
     INITIAL = 10
     NEGOTIATING = 20
@@ -41,12 +26,6 @@ class Deal(Model):
         (ACCEPTED, _('accepted')),
         (DECLINED, _('declined')),
     )
-
-    funnel = models.ForeignKey(
-        Funnel,
-        on_delete=models.PROTECT,
-        verbose_name=_('funnel'),
-        related_name='deals')
 
     title = models.CharField(
         _('title'),

@@ -2,17 +2,11 @@ from django.conf.urls import url
 
 from deals.forms import DealSearchForm, DealForm
 from deals.models import Deal
-from deals.views import FunnelDetailView
 from tools.views import (
     ListView, DetailView, CreateView, UpdateView, DeleteView)
 
 
 urlpatterns = [
-    url(
-        r'^funnel/(?P<pk>\d+)/$',
-        FunnelDetailView.as_view(),
-        name='deals_funnel_detail'),
-
     url(
         r'^$',
         ListView.as_view(
