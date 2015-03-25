@@ -41,11 +41,13 @@ class Project(Model):
     ACQUISITION = 10
     WORK_IN_PROGRESS = 20
     FINISHED = 30
+    DECLINED = 40
 
     STATUS_CHOICES = (
         (ACQUISITION, _('Acquisition')),
         (WORK_IN_PROGRESS, _('Work in progress')),
         (FINISHED, _('Finished')),
+        (DECLINED, _('Declined')),
     )
 
     customer = models.ForeignKey(
