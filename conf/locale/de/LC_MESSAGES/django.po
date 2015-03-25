@@ -26,7 +26,7 @@ msgid "Please authenticate."
 msgstr "Bitte authentifizieren."
 
 #: accounts/models.py:51 contacts/models.py:141
-#: ftool/templates/contacts/person_list.html:36
+#: workbench/templates/contacts/person_list.html:36
 msgid "email"
 msgstr "Email"
 
@@ -76,18 +76,18 @@ msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
 #: activities/__init__.py:10 activities/models.py:80
-#: ftool/templates/base.html:51
-#: ftool/templates/projects/project_detail.html:68
+#: workbench/templates/base.html:51
+#: workbench/templates/projects/project_detail.html:68
 msgid "activities"
 msgstr "Aktivitäten"
 
 #: activities/forms.py:15 activities/models.py:46 deals/models.py:39
-#: ftool/templates/activities/activity_list.html:38
-#: ftool/templates/deals/deal_detail.html:18
-#: ftool/templates/deals/deal_list.html:40
-#: ftool/templates/invoices/invoice_list.html:37
-#: ftool/templates/offers/offer_list.html:38
-#: ftool/templates/projects/project_list.html:37 invoices/models.py:92
+#: workbench/templates/activities/activity_list.html:38
+#: workbench/templates/deals/deal_detail.html:18
+#: workbench/templates/deals/deal_list.html:40
+#: workbench/templates/invoices/invoice_list.html:37
+#: workbench/templates/offers/offer_list.html:38
+#: workbench/templates/projects/project_list.html:37 invoices/models.py:92
 #: offers/models.py:60 projects/models.py:72 stories/models.py:47
 msgid "owned by"
 msgstr "gehört"
@@ -112,15 +112,15 @@ msgstr "ist erledigt"
 msgid "contact"
 msgstr "Kontakt"
 
-#: activities/models.py:31 ftool/templates/offers/offer_list.html:37
-#: ftool/templates/projects/project_list.html:35 invoices/models.py:67
+#: activities/models.py:31 workbench/templates/offers/offer_list.html:37
+#: workbench/templates/projects/project_list.html:35 invoices/models.py:67
 #: offers/models.py:39 projects/models.py:84 projects/models.py:157
 #: stories/admin.py:35 stories/models.py:59
 msgid "project"
 msgstr "Projekt"
 
 #: activities/models.py:37 deals/models.py:62
-#: ftool/templates/deals/deal_list.html:39
+#: workbench/templates/deals/deal_list.html:39
 msgid "deal"
 msgstr "Geschäft"
 
@@ -155,7 +155,7 @@ msgstr "Erstellt um"
 msgid "completed at"
 msgstr "Erledigt um"
 
-#: activities/models.py:79 ftool/templates/projects/project_detail.html:66
+#: activities/models.py:79 workbench/templates/projects/project_detail.html:66
 msgid "activity"
 msgstr "Aktivität"
 
@@ -207,7 +207,7 @@ msgstr "aufgezeichnete Aktion"
 msgid "logged actions"
 msgstr "aufgezeichnete Aktionen"
 
-#: contacts/__init__.py:10 ftool/templates/base.html:34
+#: contacts/__init__.py:10 workbench/templates/base.html:34
 msgid "contacts"
 msgstr "Kontakte"
 
@@ -224,7 +224,7 @@ msgid "group"
 msgstr "Gruppe"
 
 #: contacts/models.py:18 contacts/models.py:35 contacts/models.py:71
-#: ftool/templates/contacts/organization_detail.html:34
+#: workbench/templates/contacts/organization_detail.html:34
 msgid "groups"
 msgstr "Gruppen"
 
@@ -233,8 +233,8 @@ msgid "name"
 msgstr "Name"
 
 #: contacts/models.py:27 contacts/models.py:57
-#: ftool/templates/contacts/organization_detail.html:45
-#: ftool/templates/contacts/person_detail.html:45
+#: workbench/templates/contacts/organization_detail.html:45
+#: workbench/templates/contacts/person_detail.html:45
 msgid "notes"
 msgstr "Bemerkungen"
 
@@ -242,16 +242,16 @@ msgstr "Bemerkungen"
 msgid "primary contact"
 msgstr "Hauptkontakt"
 
-#: contacts/models.py:42 contacts/models.py:62 ftool/templates/base.html:41
-#: ftool/templates/contacts/organization_detail.html:13
-#: ftool/templates/contacts/organization_list.html:35
-#: ftool/templates/contacts/person_detail.html:13
+#: contacts/models.py:42 contacts/models.py:62 workbench/templates/base.html:41
+#: workbench/templates/contacts/organization_detail.html:13
+#: workbench/templates/contacts/organization_list.html:35
+#: workbench/templates/contacts/person_detail.html:13
 msgid "organization"
 msgstr "Organisation"
 
-#: contacts/models.py:43 ftool/templates/base.html:36
-#: ftool/templates/contacts/organization_detail.html:5
-#: ftool/templates/contacts/organization_list.html:5
+#: contacts/models.py:43 workbench/templates/base.html:36
+#: workbench/templates/contacts/organization_detail.html:5
+#: workbench/templates/contacts/organization_list.html:5
 msgid "organizations"
 msgstr "Organisationen"
 
@@ -264,14 +264,14 @@ msgid "E.g. Dear John."
 msgstr "Z.B. Lieber Hans."
 
 #: contacts/models.py:78 contacts/models.py:115 contacts/models.py:139
-#: contacts/models.py:163 ftool/templates/base.html:44
-#: ftool/templates/contacts/person_list.html:35
+#: contacts/models.py:163 workbench/templates/base.html:44
+#: workbench/templates/contacts/person_list.html:35
 msgid "person"
 msgstr "Person"
 
-#: contacts/models.py:79 ftool/templates/base.html:37
-#: ftool/templates/contacts/organization_detail.html:23
-#: ftool/templates/contacts/person_list.html:5
+#: contacts/models.py:79 workbench/templates/base.html:37
+#: workbench/templates/contacts/organization_detail.html:23
+#: workbench/templates/contacts/person_list.html:5
 msgid "people"
 msgstr "Personen"
 
@@ -284,11 +284,11 @@ msgid "weight"
 msgstr "Gewichtung"
 
 #: contacts/models.py:117 contacts/models.py:121
-#: ftool/templates/contacts/person_list.html:37
+#: workbench/templates/contacts/person_list.html:37
 msgid "phone number"
 msgstr "Telefonnummer"
 
-#: contacts/models.py:122 ftool/templates/contacts/person_form.html:29
+#: contacts/models.py:122 workbench/templates/contacts/person_form.html:29
 msgid "phone numbers"
 msgstr "Telefonnummern"
 
@@ -296,7 +296,7 @@ msgstr "Telefonnummern"
 msgid "email address"
 msgstr "Emailadresse"
 
-#: contacts/models.py:146 ftool/templates/contacts/person_form.html:55
+#: contacts/models.py:146 workbench/templates/contacts/person_form.html:55
 msgid "email addresses"
 msgstr "Emailadressen"
 
@@ -305,12 +305,12 @@ msgstr "Emailadressen"
 msgid "postal address"
 msgstr "Postadresse"
 
-#: contacts/models.py:170 ftool/templates/contacts/person_form.html:81
+#: contacts/models.py:170 workbench/templates/contacts/person_form.html:81
 msgid "postal addresses"
 msgstr "Postadressen"
 
-#: deals/__init__.py:10 deals/models.py:63 ftool/templates/base.html:47
-#: ftool/templates/deals/deal_detail.html:5
+#: deals/__init__.py:10 deals/models.py:63 workbench/templates/base.html:47
+#: workbench/templates/deals/deal_detail.html:5
 msgid "deals"
 msgstr "Geschäfte"
 
@@ -347,28 +347,28 @@ msgstr "Akzeptiert"
 msgid "declined"
 msgstr "Abgelehnt"
 
-#: deals/models.py:34 ftool/templates/deals/deal_detail.html:14
+#: deals/models.py:34 workbench/templates/deals/deal_detail.html:14
 #: invoices/models.py:87 offers/models.py:55 projects/models.py:67
 #: stories/models.py:53 stories/models.py:244
 msgid "description"
 msgstr "Beschreibung"
 
-#: deals/models.py:42 ftool/templates/deals/deal_detail.html:22
-#: ftool/templates/deals/deal_list.html:41
+#: deals/models.py:42 workbench/templates/deals/deal_detail.html:22
+#: workbench/templates/deals/deal_list.html:41
 msgid "estimated value"
 msgstr "geschätzter Wert"
 
-#: deals/models.py:47 ftool/templates/activities/activity_list.html:39
-#: ftool/templates/contacts/organization_list.html:29
-#: ftool/templates/contacts/person_list.html:29
-#: ftool/templates/deals/deal_detail.html:26
-#: ftool/templates/deals/deal_list.html:42
-#: ftool/templates/invoices/invoice_list.html:29
-#: ftool/templates/invoices/invoice_list.html:38
-#: ftool/templates/offers/offer_list.html:29
-#: ftool/templates/offers/offer_list.html:39
-#: ftool/templates/projects/project_list.html:29
-#: ftool/templates/projects/project_list.html:38 invoices/models.py:96
+#: deals/models.py:47 workbench/templates/activities/activity_list.html:39
+#: workbench/templates/contacts/organization_list.html:29
+#: workbench/templates/contacts/person_list.html:29
+#: workbench/templates/deals/deal_detail.html:26
+#: workbench/templates/deals/deal_list.html:42
+#: workbench/templates/invoices/invoice_list.html:29
+#: workbench/templates/invoices/invoice_list.html:38
+#: workbench/templates/offers/offer_list.html:29
+#: workbench/templates/offers/offer_list.html:39
+#: workbench/templates/projects/project_list.html:29
+#: workbench/templates/projects/project_list.html:38 invoices/models.py:96
 #: offers/models.py:64 projects/models.py:76 stories/models.py:77
 msgid "status"
 msgstr "Status"
@@ -377,235 +377,235 @@ msgstr "Status"
 msgid "closed at"
 msgstr "Geschlossen um"
 
-#: ftool/templates/accounts/login.html:5
-#: ftool/templates/accounts/login.html:22
+#: workbench/templates/accounts/login.html:5
+#: workbench/templates/accounts/login.html:22
 msgid "Sign in"
 msgstr "Anmelden"
 
-#: ftool/templates/activities/activity_list.html:23
-#: ftool/templates/activities/activity_list.html:28
-#: ftool/templates/contacts/organization_list.html:22
-#: ftool/templates/contacts/organization_list.html:27
-#: ftool/templates/contacts/person_list.html:22
-#: ftool/templates/contacts/person_list.html:27
-#: ftool/templates/deals/deal_list.html:23
-#: ftool/templates/deals/deal_list.html:28
-#: ftool/templates/invoices/invoice_list.html:22
-#: ftool/templates/invoices/invoice_list.html:27
-#: ftool/templates/offers/offer_list.html:22
-#: ftool/templates/offers/offer_list.html:27
-#: ftool/templates/projects/project_list.html:22
-#: ftool/templates/projects/project_list.html:27
-#: ftool/templates/tools/object_list.html:22
-#: ftool/templates/tools/object_list.html:27
+#: workbench/templates/activities/activity_list.html:23
+#: workbench/templates/activities/activity_list.html:28
+#: workbench/templates/contacts/organization_list.html:22
+#: workbench/templates/contacts/organization_list.html:27
+#: workbench/templates/contacts/person_list.html:22
+#: workbench/templates/contacts/person_list.html:27
+#: workbench/templates/deals/deal_list.html:23
+#: workbench/templates/deals/deal_list.html:28
+#: workbench/templates/invoices/invoice_list.html:22
+#: workbench/templates/invoices/invoice_list.html:27
+#: workbench/templates/offers/offer_list.html:22
+#: workbench/templates/offers/offer_list.html:27
+#: workbench/templates/projects/project_list.html:22
+#: workbench/templates/projects/project_list.html:27
+#: workbench/templates/tools/object_list.html:22
+#: workbench/templates/tools/object_list.html:27
 msgid "search"
 msgstr "Suche"
 
-#: ftool/templates/activities/activity_list.html:37
+#: workbench/templates/activities/activity_list.html:37
 msgid "context"
 msgstr "Kontext"
 
-#: ftool/templates/activities/activity_list.html:63
-#: ftool/templates/contacts/organization_list.html:52
-#: ftool/templates/contacts/person_list.html:64
-#: ftool/templates/deals/deal_list.html:60
-#: ftool/templates/invoices/invoice_list.html:58
-#: ftool/templates/offers/offer_list.html:60
-#: ftool/templates/projects/project_list.html:58
-#: ftool/templates/tools/object_list.html:52
+#: workbench/templates/activities/activity_list.html:63
+#: workbench/templates/contacts/organization_list.html:52
+#: workbench/templates/contacts/person_list.html:64
+#: workbench/templates/deals/deal_list.html:60
+#: workbench/templates/invoices/invoice_list.html:58
+#: workbench/templates/offers/offer_list.html:60
+#: workbench/templates/projects/project_list.html:58
+#: workbench/templates/tools/object_list.html:52
 #, python-format
 msgid "%(total)s total"
 msgstr "%(total)s insgesamt"
 
-#: ftool/templates/base.html:24 ftool/templates/search.html:5
-#: ftool/templates/search.html.py:10
-#: ftool/templates/tools/object_picker.html:12
+#: workbench/templates/base.html:24 workbench/templates/search.html:5
+#: workbench/templates/search.html.py:10
+#: workbench/templates/tools/object_picker.html:12
 msgid "Search"
 msgstr "Suche"
 
-#: ftool/templates/base.html:48 ftool/templates/offers/offer_list.html:5
+#: workbench/templates/base.html:48 workbench/templates/offers/offer_list.html:5
 #: offers/__init__.py:10 offers/models.py:79
 msgid "offers"
 msgstr "Offerten"
 
-#: ftool/templates/base.html:49 ftool/templates/projects/project_detail.html:5
-#: ftool/templates/projects/project_list.html:5 projects/__init__.py:10
+#: workbench/templates/base.html:49 workbench/templates/projects/project_detail.html:5
+#: workbench/templates/projects/project_list.html:5 projects/__init__.py:10
 #: projects/models.py:85
 msgid "projects"
 msgstr "Projekte"
 
-#: ftool/templates/base.html:50 ftool/templates/invoices/invoice_list.html:5
+#: workbench/templates/base.html:50 workbench/templates/invoices/invoice_list.html:5
 #: invoices/__init__.py:10 invoices/models.py:127
 msgid "invoices"
 msgstr "Rechnungen"
 
-#: ftool/templates/base.html:61
+#: workbench/templates/base.html:61
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: ftool/templates/base.html:65
+#: workbench/templates/base.html:65
 msgid "Sign off"
 msgstr "Abmelden"
 
-#: ftool/templates/contacts/organization_detail.html:54
-#: ftool/templates/contacts/person_detail.html:56
-#: ftool/templates/deals/deal_detail.html:34
-#: ftool/templates/invoices/invoice_detail.html:16
-#: ftool/templates/offers/offer_detail.html:16
-#: ftool/templates/projects/project_detail.html:56
-#: ftool/templates/stories/story_detail.html:53
-#: ftool/templates/tools/object_detail.html:13
+#: workbench/templates/contacts/organization_detail.html:54
+#: workbench/templates/contacts/person_detail.html:56
+#: workbench/templates/deals/deal_detail.html:34
+#: workbench/templates/invoices/invoice_detail.html:16
+#: workbench/templates/offers/offer_detail.html:16
+#: workbench/templates/projects/project_detail.html:56
+#: workbench/templates/stories/story_detail.html:53
+#: workbench/templates/tools/object_detail.html:13
 msgid "Update"
 msgstr "Aktualisieren"
 
-#: ftool/templates/contacts/organization_detail.html:56
-#: ftool/templates/contacts/person_detail.html:58
-#: ftool/templates/deals/deal_detail.html:36
-#: ftool/templates/invoices/invoice_detail.html:19
-#: ftool/templates/offers/offer_detail.html:19
-#: ftool/templates/projects/project_detail.html:58
-#: ftool/templates/stories/story_confirm_delete.html:16
-#: ftool/templates/stories/story_detail.html:59
-#: ftool/templates/tools/object_detail.html:16
+#: workbench/templates/contacts/organization_detail.html:56
+#: workbench/templates/contacts/person_detail.html:58
+#: workbench/templates/deals/deal_detail.html:36
+#: workbench/templates/invoices/invoice_detail.html:19
+#: workbench/templates/offers/offer_detail.html:19
+#: workbench/templates/projects/project_detail.html:58
+#: workbench/templates/stories/story_confirm_delete.html:16
+#: workbench/templates/stories/story_detail.html:59
+#: workbench/templates/tools/object_detail.html:16
 msgid "Delete"
 msgstr "Löschen"
 
-#: ftool/templates/contacts/person_detail.html:5
+#: workbench/templates/contacts/person_detail.html:5
 msgid "persons"
 msgstr "Personen"
 
-#: ftool/templates/contacts/person_detail.html:54
-#: ftool/templates/deals/deal_detail.html:32
+#: workbench/templates/contacts/person_detail.html:54
+#: workbench/templates/deals/deal_detail.html:32
 msgid "create activity"
 msgstr "Aktivität erstellen"
 
-#: ftool/templates/contacts/person_form.html:12
-#: ftool/templates/projects/project_estimation.html:12
-#: ftool/templates/tools/object_form.html:12
+#: workbench/templates/contacts/person_form.html:12
+#: workbench/templates/projects/project_estimation.html:12
+#: workbench/templates/tools/object_form.html:12
 #, python-format
 msgid "Update %(object)s"
 msgstr "%(object)s aktualisieren"
 
-#: ftool/templates/contacts/person_form.html:14
-#: ftool/templates/projects/project_estimation.html:14
-#: ftool/templates/tools/object_form.html:14
+#: workbench/templates/contacts/person_form.html:14
+#: workbench/templates/projects/project_estimation.html:14
+#: workbench/templates/tools/object_form.html:14
 #, python-format
 msgid "Create %(class)s"
 msgstr "%(class)s erstellen"
 
-#: ftool/templates/contacts/person_form.html:109
-#: ftool/templates/projects/project_estimation.html:58
-#: ftool/templates/tools/object_form.html:26
+#: workbench/templates/contacts/person_form.html:109
+#: workbench/templates/projects/project_estimation.html:58
+#: workbench/templates/tools/object_form.html:26
 msgid "submit"
 msgstr "absenden"
 
-#: ftool/templates/deals/deal_detail.html:38
-#: ftool/templates/invoices/invoice_detail.html:22
-#: ftool/templates/offers/offer_detail.html:22
-#: ftool/templates/projects/project_detail.html:88
-#: ftool/templates/tools/object_detail.html:19
+#: workbench/templates/deals/deal_detail.html:38
+#: workbench/templates/invoices/invoice_detail.html:22
+#: workbench/templates/offers/offer_detail.html:22
+#: workbench/templates/projects/project_detail.html:88
+#: workbench/templates/tools/object_detail.html:19
 msgid "History"
 msgstr "Geschichte"
 
-#: ftool/templates/history.html:5
+#: workbench/templates/history.html:5
 #, python-format
 msgid "Version %(number)s by %(user_name)s"
 msgstr "Version %(number)s erstellt von %(user_name)s"
 
-#: ftool/templates/invoices/invoice_list.html:35 invoices/models.py:126
+#: workbench/templates/invoices/invoice_list.html:35 invoices/models.py:126
 #: stories/models.py:251
 msgid "invoice"
 msgstr "Rechnung"
 
-#: ftool/templates/invoices/invoice_list.html:36
-#: ftool/templates/offers/offer_list.html:36
-#: ftool/templates/projects/project_list.html:36 invoices/models.py:53
+#: workbench/templates/invoices/invoice_list.html:36
+#: workbench/templates/offers/offer_list.html:36
+#: workbench/templates/projects/project_list.html:36 invoices/models.py:53
 #: projects/models.py:53
 msgid "customer"
 msgstr "Kunde"
 
-#: ftool/templates/modal.html:19 ftool/templates/stories/story_detail.html:62
+#: workbench/templates/modal.html:19 workbench/templates/stories/story_detail.html:62
 msgid "Close"
 msgstr "Schliessen"
 
-#: ftool/templates/offers/offer_list.html:35 offers/models.py:78
+#: workbench/templates/offers/offer_list.html:35 offers/models.py:78
 #: stories/models.py:73
 msgid "offer"
 msgstr "Offerte"
 
-#: ftool/templates/projects/project_detail.html:14
+#: workbench/templates/projects/project_detail.html:14
 msgid "releases and stories"
 msgstr "Versionen und Stories"
 
-#: ftool/templates/projects/project_detail.html:40
+#: workbench/templates/projects/project_detail.html:40
 msgid "No owner"
 msgstr "Gehört niemandem"
 
-#: ftool/templates/projects/project_detail.html:50
+#: workbench/templates/projects/project_detail.html:50
 msgid "create story"
 msgstr "Story erstellen"
 
-#: ftool/templates/projects/project_detail.html:52
+#: workbench/templates/projects/project_detail.html:52
 msgid "create offer"
 msgstr "Offerte erstellen"
 
-#: ftool/templates/projects/project_detail.html:54
+#: workbench/templates/projects/project_detail.html:54
 msgid "estimation"
 msgstr "Schätzung"
 
-#: ftool/templates/projects/project_estimation.html:24 stories/models.py:95
+#: workbench/templates/projects/project_estimation.html:24 stories/models.py:95
 #: stories/models.py:167 stories/models.py:216
 msgid "story"
 msgstr "Story"
 
-#: ftool/templates/projects/project_estimation.html:36
+#: workbench/templates/projects/project_estimation.html:36
 msgid "No release"
 msgstr "Keine Version"
 
-#: ftool/templates/start.html:14
+#: workbench/templates/start.html:14
 msgid "Hours today"
 msgstr "Stunden heute"
 
-#: ftool/templates/start.html:18
+#: workbench/templates/start.html:18
 msgid "Hours this week"
 msgstr "Stunden diese Woche"
 
-#: ftool/templates/stories/story_confirm_delete.html:6
-#: ftool/templates/tools/object_confirm_delete.html:11
+#: workbench/templates/stories/story_confirm_delete.html:6
+#: workbench/templates/tools/object_confirm_delete.html:11
 #, python-format
 msgid "Delete %(object)s"
 msgstr "%(object)s löschen"
 
-#: ftool/templates/stories/story_confirm_delete.html:14
-#: ftool/templates/tools/object_confirm_delete.html:18
+#: workbench/templates/stories/story_confirm_delete.html:14
+#: workbench/templates/tools/object_confirm_delete.html:18
 msgid "cancel"
 msgstr "Abbruch"
 
-#: ftool/templates/stories/story_detail.html:19
+#: workbench/templates/stories/story_detail.html:19
 msgid "overview"
 msgstr "Übersicht"
 
-#: ftool/templates/stories/story_detail.html:40 stories/models.py:262
+#: workbench/templates/stories/story_detail.html:40 stories/models.py:262
 msgid "rendered service"
 msgstr "erbrachte Leistung"
 
-#: ftool/templates/stories/story_detail.html:44
+#: workbench/templates/stories/story_detail.html:44
 msgid "create"
 msgstr "erstellen"
 
-#: ftool/templates/stories/story_detail.html:56
+#: workbench/templates/stories/story_detail.html:56
 msgid "Merge"
 msgstr "Zusammenführen"
 
-#: ftool/templates/stories/story_form.html:8
+#: workbench/templates/stories/story_form.html:8
 msgid "Save and add another"
 msgstr "Sichern und neu hinzufügen"
 
-#: ftool/templates/tools/object_confirm_delete.html:20
+#: workbench/templates/tools/object_confirm_delete.html:20
 msgid "delete"
 msgstr "Löschen"
 
-#: ftool/views.py:26
+#: workbench/views.py:26
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
 

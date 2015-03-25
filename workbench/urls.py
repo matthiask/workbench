@@ -4,7 +4,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 import vanilla
 
-from ftool import views
+from workbench import views
 
 
 urlpatterns = [

@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from ftool import factories
+from workbench import factories
 
 
 class LoginTestCase(TestCase):

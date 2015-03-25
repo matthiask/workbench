@@ -9,7 +9,7 @@ from tools.search import migration_sql
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ftool', '0001_initial'),
+        ('workbench', '0001_initial'),
         ('activities', '0001_initial'),
         ('contacts', '0001_initial'),
         ('deals', '0001_initial'),

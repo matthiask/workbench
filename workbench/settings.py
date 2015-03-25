@@ -1,5 +1,5 @@
 """
-Django settings for ftool project.
+Django settings for workbench project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.7/topics/settings/
@@ -25,7 +25,7 @@ ADMINS = (
 )
 
 INSTALLED_APPS = (
-    'ftool',
+    'workbench',
 
     'flat',
     'django.contrib.admin',
@@ -64,14 +64,14 @@ MIDDLEWARE_CLASSES = (
     'accounts.middleware.LoginRequiredMiddleware',
 )
 
-ROOT_URLCONF = 'ftool.urls'
+ROOT_URLCONF = 'workbench.urls'
 WSGI_APPLICATION = 'wsgi.application'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'ftool', 'templates'),
+            os.path.join(BASE_DIR, 'workbench', 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -132,18 +132,18 @@ FONTS = {
     'bolditalic': os.path.join(BASE_DIR, 'stuff', 'fonts', 'Lato-Bold.ttf'),
 }
 
-FTOOL_SSO_DOMAIN = 'feinheit.ch'
-FTOOL_PDF_COMPANY = 'FEINHEIT GmbH'
-FTOOL_PDF_ADDRESS = 'FEINHEIT GmbH · Molkenstrasse 21 · 8004 Zürich'
-FTOOL_PDF_VAT_NO = 'CHE-113.948.417 MWST'
-FTOOL_PDF_OFFER_TERMS = [
+WORKBENCH_SSO_DOMAIN = 'feinheit.ch'
+WORKBENCH_PDF_COMPANY = 'FEINHEIT GmbH'
+WORKBENCH_PDF_ADDRESS = 'FEINHEIT GmbH · Molkenstrasse 21 · 8004 Zürich'
+WORKBENCH_PDF_VAT_NO = 'CHE-113.948.417 MWST'
+WORKBENCH_PDF_OFFER_TERMS = [
     'Bestandteil dieser Offerte sind die zum Zeitpunkt'
     ' des Vertragsabschlusses aktuellen Allgemeinen'
     ' Geschäftsbedingungen der FEINHEIT GmbH.',
     'Die jeweils aktuelle Version'
     ' finden Sie auf www.feinheit.ch/agb/.',
 ]
-FTOOL_PDF_INVOICE_PAYMENT = (
+WORKBENCH_PDF_INVOICE_PAYMENT = (
     'Wir bedanken uns für die Überweisung des Betrags mit Angabe'
     ' der Referenznummer %(code)s innerhalb von %(days)s Tagen'
     ' (%(due)s) auf Postkonto 85-206645-2'

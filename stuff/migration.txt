@@ -1,4 +1,4 @@
--- cat migration.txt | ssh root@metronom.feinheit.ch 'sudo -u postgres psql ftool'
+-- cat migration.txt | ssh root@metronom.feinheit.ch 'sudo -u postgres psql workbench'
 
 CREATE EXTENSION dblink;
 
