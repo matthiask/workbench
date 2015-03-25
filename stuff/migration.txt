@@ -251,7 +251,7 @@ INSERT INTO projects_project
 SELECT id, title, description, status, created, NOT no_profit, ongoing, customer_id, contact_id, owned_by_id FROM
 dblink(
     'dbname=fineware_feinheit',
-    'SELECT j.id, j.name, j.description, CASE WHEN state=30 THEN 30 ELSE 20 END, created, no_profit, ongoing, CASE WHEN p.company=TRUE THEN customer_id ELSE 1 END, CASE WHEN cp.company=FALSE THEN contact.person_id ELSE NULL END, manager_id FROM jobs_job j LEFT JOIN addressbook_person p ON j.customer_id=p.id LEFT OUTER JOIN addressbook_address contact ON j.contact_id=contact.id LEFT OUTER JOIN addressbook_person cp ON contact.person_id=cp.id'
+    'SELECT j.id, j.name, j.description, CASE WHEN state=30 THEN 30 ELSE 20 END, j.created, no_profit, ongoing, CASE WHEN p.company=TRUE THEN customer_id ELSE 1 END, CASE WHEN cp.company=FALSE THEN contact.person_id ELSE NULL END, manager_id FROM jobs_job j LEFT JOIN addressbook_person p ON j.customer_id=p.id LEFT OUTER JOIN addressbook_address contact ON j.contact_id=contact.id LEFT OUTER JOIN addressbook_person cp ON contact.person_id=cp.id'
 ) AS p(id int, title varchar(100), description text, status int, created timestamp, no_profit bool, ongoing bool, customer_id int, contact_id int, owned_by_id int);
 
 
