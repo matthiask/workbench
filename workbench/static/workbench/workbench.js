@@ -90,7 +90,7 @@ $(function() {
     } else if (e.keyCode === 13) {
       $(e.target).parents('form').submit();
     } else {
-      console.log(event, event.keyCode);
+      console.log(e, e.keyCode);
       return;
     }
 
