@@ -1,6 +1,7 @@
 from collections import namedtuple
 from functools import lru_cache
 
+from django.db import models
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
@@ -8,6 +9,14 @@ from audit.models import LoggedAction
 
 
 Change = namedtuple('Change', 'changes version number')
+
+
+def boolean_formatter(value):
+    if value in (True, 't'):
+        return _('yes')
+    elif value in (False, 'f'):
+        return _('no')
+    return value
 
 
 def default_if_none(value, default):
@@ -39,6 +48,9 @@ def formatter(field):
                 return _('Deleted %s instance') % model._meta.verbose_name
 
         return _fn
+
+    if isinstance(field, (models.BooleanField, models.NullBooleanField)):
+        return lambda value: boolean_formatter(value)
 
     return lambda value: default_if_none(value, _('<no value>'))
 
