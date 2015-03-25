@@ -8,13 +8,12 @@ env.hosts = ['deploy@workbench.feinheit.ch']
 @task
 def deploy():
     local('flake8 .')
-    local(
-        'git push deploy@workbench.feinheit.ch:www/workbench/'
-        ' master:refs/heads/update')
+    local('git push origin master')
 
     with cd('www/workbench/'):
         run('git checkout master')
-        run('git merge --ff-only update')
+        run('git fetch origin')
+        run('git merge --ff-only origin/master')
         run('find . -name "*.pyc" -delete')
         run('venv/bin/pip install -r requirements/production.txt')
         run('venv/bin/python manage.py migrate')
