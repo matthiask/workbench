@@ -33,7 +33,9 @@ class ProjectForm(ModelForm):
 
     class Meta:
         model = Project
-        fields = ('customer', 'contact', 'title', 'description', 'owned_by')
+        fields = (
+            'customer', 'contact', 'title', 'description', 'owned_by',
+            'status', 'invoicing', 'maintenance')
         widgets = {
             'customer': Picker(model=Organization),
             'contact': Picker(model=Person),

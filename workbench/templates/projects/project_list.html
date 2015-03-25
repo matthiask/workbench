@@ -46,7 +46,7 @@
             </a></th>
             <td>{{ project.contact|default:project.customer }}</td>
             <td class="hidden-xs">{{ project.owned_by.get_short_name }}</td>
-            <td>{{ project.get_status_display }}</td>
+            <td>{{ project.pretty_status }}</td>
           </tr>
         {% endfor %}
       </tbody>
