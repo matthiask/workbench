@@ -3,7 +3,7 @@ import itertools
 from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext
 
 from accounts.models import User
 from contacts.models import Organization, Person
@@ -38,12 +38,12 @@ class SummationDict(dict):
 
 @model_urls()
 class Project(Model):
-    IN_PREPARATION = 10
+    ACQUISITION = 10
     WORK_IN_PROGRESS = 20
     FINISHED = 30
 
     STATUS_CHOICES = (
-        (IN_PREPARATION, _('In preparation')),
+        (ACQUISITION, _('Acquisition')),
         (WORK_IN_PROGRESS, _('Work in progress')),
         (FINISHED, _('Finished')),
     )
@@ -76,17 +76,19 @@ class Project(Model):
     status = models.PositiveIntegerField(
         _('status'),
         choices=STATUS_CHOICES,
-        default=IN_PREPARATION)
+        default=ACQUISITION)
 
     created_at = models.DateTimeField(
         _('created at'),
         default=timezone.now)
     invoicing = models.BooleanField(
         _('invoicing'),
-        default=True)
+        default=True,
+        help_text=_('This project is eligible for invoicing.'))
     maintenance = models.BooleanField(
         _('maintenance'),
-        default=False)
+        default=False,
+        help_text=_('This project is used for maintenance work.'))
 
     objects = ProjectManager()
 
@@ -100,7 +102,7 @@ class Project(Model):
 
     def css(self):
         return {
-            self.IN_PREPARATION: 'warning',
+            self.ACQUISITION: 'warning',
             self.WORK_IN_PROGRESS: '',
             self.FINISHED: 'success',
         }[self.status]
@@ -158,6 +160,14 @@ class Project(Model):
             'stats': stats,
             'stories': stories,
         }
+
+    def pretty_status(self):
+        parts = [self.get_status_display()]
+        if not self.invoicing:
+            parts.append(ugettext('no invoicing'))
+        if self.maintenance:
+            parts.append(ugettext('maintenance'))
+        return ', '.join(parts)
 
 
 @model_urls(lambda object: {'project_id': object.project_id, 'pk': object.pk})
