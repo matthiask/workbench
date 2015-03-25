@@ -26,6 +26,7 @@ urlpatterns = [
         ListView.as_view(
             model=Organization,
             template_name_suffix='_picker',
+            paginate_by=10,
         ),
         name='contacts_organization_picker'),
     url(
@@ -58,7 +59,10 @@ urlpatterns = [
         name='contacts_person_list'),
     url(
         r'^people/picker/$',
-        PersonListView.as_view(template_name_suffix='_picker'),
+        PersonListView.as_view(
+            template_name_suffix='_picker',
+            paginate_by=10,
+        ),
         name='contacts_person_picker'),
     url(
         r'^people/(?P<pk>\d+)/$',

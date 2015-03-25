@@ -9,7 +9,8 @@
       <div class="modal-body">
         <form method="get" action="{{ view.request.path }}" class="form form-inline">
           <input type="hidden" name="id" value="{{ view.request.GET.id }}">
-          <input type="text" name="q" placeholder="{% trans 'Search' %}" class="form-control">
+          <input type="text" name="q" placeholder="{% trans 'Search' %}" class="form-control"
+            value="{{ view.request.GET.q }}">
         </form>
         <div class="list-group">
           {% for object in object_list %}
