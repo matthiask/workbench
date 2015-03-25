@@ -2,6 +2,7 @@ import itertools
 
 from django.db import models
 from django.db.models import Sum
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
@@ -76,6 +77,16 @@ class Project(Model):
         _('status'),
         choices=STATUS_CHOICES,
         default=IN_PREPARATION)
+
+    created_at = models.DateTimeField(
+        _('created at'),
+        default=timezone.now)
+    invoicing = models.BooleanField(
+        _('invoicing'),
+        default=True)
+    maintenance = models.BooleanField(
+        _('maintenance'),
+        default=False)
 
     objects = ProjectManager()
 
