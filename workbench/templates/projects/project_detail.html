@@ -11,14 +11,43 @@
 
   <div class="row">
     <div class="col-md-6">
-      <h2>{% trans 'releases and stories' %}</h2>
       {% with overview=project.overview %}
-      <p>
-        <small>
-          {{ overview.stats.hours }}h / {{ overview.stats.planning }}h
-        </small>
-      </p>
+      <table class="table">
+        <tr>
+          <th>{% trans 'description' %}</th>
+          <td>{{ project.description|linebreaksbr }}</td>
+        </tr>
+        <tr>
+          <th>
+            {% trans 'Overall' %}
+          </th>
+          <td>
+            {{ overview.stats.hours }}h / {{ overview.stats.planning }}h
+          </td>
+        </tr>
+        <tr>
+          <th>{% trans 'owned by' %}</th>
+          <td>{{ project.owned_by.get_full_name }}</td>
+        </tr>
+        <tr>
+          <th>{% trans 'customer' %}</th>
+          <td>
+            <a href="{{ project.customer.urls.detail }}">
+              {{ project.customer }}
+            </a>
+            /
+            <a href="{{ project.contact.urls.detail }}">
+              {{ project.contact.full_name }}
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <th>{% trans 'status' %}</th>
+          <td>{{ project.pretty_status }}</td>
+        </tr>
+      </table>
 
+      <h2>{% trans 'releases and stories' %}</h2>
       <div class="list-group">
         {% for release, stories in overview.stories %}
           {% if release %}
