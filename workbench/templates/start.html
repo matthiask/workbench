@@ -20,6 +20,27 @@
         </table>
       </div>
     </div>
+
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <h2>{% trans 'activities' %}</h2>
+        <table class="table table-condensed">
+          {% for activity in user.activities.open %}
+          <tr class="{{ activity.css }}">
+              <th><a href="{{ activity.urls.detail }}" data-toggle="ajaxmodal">
+                  {{ activity }}
+              </a></th>
+              <td>
+                {% for c in activity.context %}
+                  <a href="{{ c.get_absolute_url }}">{{ c }}</a>{% if not forloop.last %},{% endif %}
+                {% endfor %}
+              </td>
+              <td>{{ activity.pretty_status }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

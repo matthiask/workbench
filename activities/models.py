@@ -9,8 +9,16 @@ from accounts.models import User
 from contacts.models import Person
 from deals.models import Deal
 from projects.models import Project
-from tools.models import Model
+from tools.models import SearchQuerySet, Model
 from tools.urls import model_urls
+
+
+class ActivityQuerySet(SearchQuerySet):
+    def open(self):
+        return self.filter(completed_at__isnull=True)
+
+    def completed(self):
+        return self.filter(completed_at__isnull=False)
 
 
 @model_urls()
@@ -73,6 +81,8 @@ class Activity(Model):
         blank=True,
         null=True,
     )
+
+    objects = models.Manager.from_queryset(ActivityQuerySet)()
 
     class Meta:
         ordering = ('due_on',)
