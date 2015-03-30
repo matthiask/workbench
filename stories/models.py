@@ -7,8 +7,12 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.models import User
 from projects.models import Project, Release
 from services.models import ServiceType
-from tools.models import SearchManager, Model
+from tools.models import SearchQuerySet, SearchManager, Model
 from tools.urls import model_urls
+
+
+class StoryQuerySet(SearchQuerySet):
+    pass
 
 
 @model_urls()
@@ -90,7 +94,7 @@ class Story(Model):
 
     position = models.PositiveIntegerField(_('position'), default=0)
 
-    objects = SearchManager()
+    objects = models.Manager.from_queryset(StoryQuerySet)()
 
     class Meta:
         ordering = ('release', 'position', 'id')

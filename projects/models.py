@@ -7,11 +7,11 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 
 from accounts.models import User
 from contacts.models import Organization, Person
-from tools.models import SearchManager, Model
+from tools.models import SearchQuerySet, Model
 from tools.urls import model_urls
 
 
-class ProjectManager(SearchManager):
+class ProjectQuerySet(SearchQuerySet):
     def create_project(self, title):
         project = Project.objects.create(
             title=title,
@@ -92,7 +92,7 @@ class Project(Model):
         default=False,
         help_text=_('This project is used for maintenance work.'))
 
-    objects = ProjectManager()
+    objects = models.Manager.from_queryset(ProjectQuerySet)()
 
     class Meta:
         ordering = ('-id',)

@@ -11,11 +11,11 @@ from accounts.models import User
 from contacts.models import Organization, Person
 from projects.models import Project
 from stories.models import Story, RequiredService
-from tools.models import ModelWithTotal, SearchManager
+from tools.models import ModelWithTotal, SearchQuerySet
 from tools.urls import model_urls
 
 
-class InvoiceManager(SearchManager):
+class InvoiceQuerySet(SearchQuerySet):
     pass
 
 
@@ -119,7 +119,7 @@ class Invoice(ModelWithTotal):
         blank=True,
         related_name='invoices')
 
-    objects = InvoiceManager()
+    objects = models.Manager.from_queryset(InvoiceQuerySet)()
 
     class Meta:
         ordering = ('-id',)

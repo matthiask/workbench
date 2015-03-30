@@ -9,11 +9,11 @@ from django_pgjson.fields import JsonBField
 from accounts.models import User
 from projects.models import Project
 from stories.models import RequiredService
-from tools.models import ModelWithTotal, SearchManager
+from tools.models import ModelWithTotal, SearchQuerySet
 from tools.urls import model_urls
 
 
-class OfferManager(SearchManager):
+class OfferQuerySet(SearchQuerySet):
     pass
 
 
@@ -71,7 +71,7 @@ class Offer(ModelWithTotal):
 
     story_data = JsonBField(_('stories'), blank=True, null=True)
 
-    objects = OfferManager()
+    objects = models.Manager.from_queryset(OfferQuerySet)()
 
     class Meta:
         ordering = ('-id',)
