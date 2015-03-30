@@ -1,20 +1,6 @@
-from invoices.forms import InvoiceSearchForm
 from invoices.models import Invoice
 from tools.pdf import pdf_response
-from tools.views import DetailView, ListView
-
-
-class InvoiceListView(ListView):
-    model = Invoice
-    search_form_class = InvoiceSearchForm
-
-    def get_queryset(self):
-        return super().get_queryset().select_related(
-            'customer',
-            'contact__organization',
-            'project',
-            'owned_by',
-        )
+from tools.views import DetailView
 
 
 class InvoicePDFView(DetailView):

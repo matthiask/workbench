@@ -1,17 +1,25 @@
 from django.conf.urls import url
 
-from projects.forms import ProjectForm
+from projects.forms import ProjectSearchForm, ProjectForm
 from projects.models import Project
 from projects.views import (
-    ProjectListView, StoryCreateView, OfferCreateView, EstimationView)
+    StoryCreateView, OfferCreateView, EstimationView)
 from tools.views import (
-    DetailView, CreateView, UpdateView, DeleteView)
+    ListView, DetailView, CreateView, UpdateView, DeleteView)
 
 
 urlpatterns = [
     url(
         r'^$',
-        ProjectListView.as_view(),
+        ListView.as_view(
+            model=Project,
+            search_form_class=ProjectSearchForm,
+            select_related=(
+                'customer',
+                'contact__organization',
+                'owned_by',
+            ),
+        ),
         name='projects_project_list'),
     url(
         r'^(?P<pk>\d+)/$',

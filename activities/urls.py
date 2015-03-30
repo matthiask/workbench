@@ -1,15 +1,24 @@
 from django.conf.urls import url
 
-from activities.forms import ActivityForm
+from activities.forms import ActivitySearchForm, ActivityForm
 from activities.models import Activity
-from activities.views import ActivityListView
-from tools.views import DetailView, CreateView, UpdateView, DeleteView
+from tools.views import (
+    ListView, DetailView, CreateView, UpdateView, DeleteView)
 
 
 urlpatterns = [
     url(
         r'^$',
-        ActivityListView.as_view(),
+        ListView.as_view(
+            model=Activity,
+            search_form_class=ActivitySearchForm,
+            select_related=(
+                'project',
+                'deal',
+                'contact__organization',
+                'owned_by',
+            ),
+        ),
         name='activities_activity_list'),
     url(
         r'^(?P<pk>\d+)/$',

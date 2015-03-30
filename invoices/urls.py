@@ -2,17 +2,26 @@ from django.conf.urls import url
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 
-from invoices.forms import InvoiceForm
+from invoices.forms import InvoiceSearchForm, InvoiceForm
 from invoices.models import Invoice
-from invoices.views import InvoiceListView, InvoicePDFView
+from invoices.views import InvoicePDFView
 from tools.views import (
-    DetailView, UpdateView, DeleteView, MessageView)
+    ListView, DetailView, UpdateView, DeleteView, MessageView)
 
 
 urlpatterns = [
     url(
         r'^$',
-        InvoiceListView.as_view(),
+        ListView.as_view(
+            model=Invoice,
+            search_form_class=InvoiceSearchForm,
+            select_related=(
+                'customer',
+                'contact__organization',
+                'project',
+                'owned_by',
+            ),
+        ),
         name='invoices_invoice_list'),
     url(
         r'^(?P<pk>\d+)/$',

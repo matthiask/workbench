@@ -2,23 +2,11 @@ from django.shortcuts import get_object_or_404
 
 from offers.forms import CreateOfferForm
 from offers.models import Offer
-from projects.forms import ProjectSearchForm, EstimationForm
+from projects.forms import EstimationForm
 from projects.models import Project
 from stories.forms import StoryForm
 from stories.models import Story
-from tools.views import ListView, CreateView, UpdateView
-
-
-class ProjectListView(ListView):
-    model = Project
-    search_form_class = ProjectSearchForm
-
-    def get_queryset(self):
-        return super().get_queryset().select_related(
-            'customer',
-            'contact__organization',
-            'owned_by',
-        )
+from tools.views import CreateView, UpdateView
 
 
 class StoryCreateView(CreateView):

@@ -1,17 +1,24 @@
 from django.conf.urls import url
 from django.utils.translation import ugettext_lazy as _
 
-from offers.forms import OfferForm
+from offers.forms import OfferSearchForm, OfferForm
 from offers.models import Offer
-from offers.views import OfferListView, OfferPDFView
+from offers.views import OfferPDFView
 from tools.views import (
-    DetailView, UpdateView, DeleteView, MessageView)
+    ListView, DetailView, UpdateView, DeleteView, MessageView)
 
 
 urlpatterns = [
     url(
         r'^$',
-        OfferListView.as_view(),
+        ListView.as_view(
+            model=Offer,
+            search_form_class=OfferSearchForm,
+            select_related=(
+                'project__customer',
+                'project__contact__organization',
+            ),
+        ),
         name='offers_offer_list'),
     url(
         r'^(?P<pk>\d+)/$',

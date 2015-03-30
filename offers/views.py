@@ -1,18 +1,6 @@
-from offers.forms import OfferSearchForm
 from offers.models import Offer
 from tools.pdf import pdf_response
-from tools.views import DetailView, ListView
-
-
-class OfferListView(ListView):
-    model = Offer
-    search_form_class = OfferSearchForm
-
-    def get_queryset(self):
-        return super().get_queryset().select_related(
-            'project__customer',
-            'project__contact__organization',
-        )
+from tools.views import DetailView
 
 
 class OfferPDFView(DetailView):
