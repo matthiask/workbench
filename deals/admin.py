@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from deals.models import Deal
+from deals.models import Deal, Stage
 
 
 class DealAdmin(admin.ModelAdmin):
@@ -13,3 +13,8 @@ class DealAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Deal, DealAdmin)
+admin.site.register(
+    Stage,
+    list_display=('title', 'position'),
+    list_editable=('position',),
+)

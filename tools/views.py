@@ -45,6 +45,7 @@ class ToolsMixin(object):
 class ListView(ToolsMixin, vanilla.ListView):
     paginate_by = 50
     search_form_class = None
+    select_related = None
 
     def get_queryset(self):
         self.root_queryset = self.model.objects.all()
@@ -57,6 +58,9 @@ class ListView(ToolsMixin, vanilla.ListView):
         if self.search_form_class:
             self.search_form = self.search_form_class(self.request.GET)
             queryset = self.search_form.filter(queryset)
+
+        if self.select_related:
+            queryset = queryset.select_related(*self.select_related)
 
         return queryset
 

@@ -3,30 +3,52 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
-from tools.models import SearchManager, Model
+from tools.models import SearchQuerySet, Model
 from tools.urls import model_urls
+
+
+class Stage(Model):
+    title = models.CharField(
+        _('title'),
+        max_length=200,
+    )
+    position = models.PositiveIntegerField(
+        _('position'),
+        default=0,
+    )
+
+    class Meta:
+        ordering = ('position', 'id')
+        verbose_name = _('stage')
+        verbose_name_plural = _('stages')
+
+    def __str__(self):
+        return self.title
+
+
+class DealQuerySet(SearchQuerySet):
+    def open(self):
+        return self.filter(closed_at__isnull=True)
 
 
 @model_urls()
 class Deal(Model):
-    INITIAL = 10
-    NEGOTIATING = 20
-    IMPROBABLE = 30
-    PROBABLE_FUTURE = 40
-    PROBABLE_SOON = 50
-    ACCEPTED = 60
-    DECLINED = 70
+    OPEN = 10
+    ACCEPTED = 20
+    DECLINED = 30
 
     STATUS_CHOICES = (
-        (INITIAL, _('initial')),
-        (NEGOTIATING, _('negotiating')),
-        (IMPROBABLE, _('improbable')),
-        (PROBABLE_FUTURE, _('probable in the future')),
-        (PROBABLE_FUTURE, _('probable soon')),
+        (OPEN, _('open')),
         (ACCEPTED, _('accepted')),
         (DECLINED, _('declined')),
     )
 
+    stage = models.ForeignKey(
+        Stage,
+        on_delete=models.PROTECT,
+        verbose_name=_('stage'),
+        related_name='deals',
+    )
     title = models.CharField(
         _('title'),
         max_length=200)
@@ -46,7 +68,7 @@ class Deal(Model):
     status = models.PositiveIntegerField(
         _('status'),
         choices=STATUS_CHOICES,
-        default=INITIAL)
+        default=OPEN)
 
     created_at = models.DateTimeField(
         _('created at'),
@@ -56,7 +78,7 @@ class Deal(Model):
         blank=True,
         null=True)
 
-    objects = SearchManager()
+    objects = models.Manager.from_queryset(DealQuerySet)()
 
     class Meta:
         verbose_name = _('deal')
