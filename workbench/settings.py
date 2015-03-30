@@ -18,7 +18,6 @@ env.read_dotenv()
 
 SECRET_KEY = env.env('SECRET_KEY', required=True)
 DEBUG = any(arg in ('runserver',) for arg in sys.argv)
-TEMPLATE_DEBUG = DEBUG
 ALLOWED_HOSTS = env.env('ALLOWED_HOSTS', default=[])
 ADMINS = (
     ('Matthias Kestenholz', 'mk@feinheit.ch'),
