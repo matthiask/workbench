@@ -12,4 +12,5 @@ class ActivityListView(ListView):
             'project',
             'deal',
             'contact',
+            'owned_by',
         )

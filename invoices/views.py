@@ -13,6 +13,7 @@ class InvoiceListView(ListView):
             'customer',
             'contact__organization',
             'project',
+            'owned_by',
         )
 
 

@@ -17,6 +17,7 @@ class ProjectListView(ListView):
         return super().get_queryset().select_related(
             'customer',
             'contact__organization',
+            'owned_by',
         )
 
 
