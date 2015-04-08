@@ -3,6 +3,7 @@ import itertools
 from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from accounts.models import User
@@ -109,6 +110,7 @@ class Project(Model):
             self.FINISHED: 'success',
         }[self.status]
 
+    @cached_property
     def overview(self):
         # Avoid circular imports
         from stories.models import RequiredService, RenderedService
