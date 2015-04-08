@@ -1,7 +1,10 @@
+from collections import namedtuple
 from datetime import date
 
 from django.db import models, transaction
+from django.db.models import Sum
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
@@ -13,6 +16,12 @@ from tools.urls import model_urls
 
 class StoryQuerySet(SearchQuerySet):
     pass
+
+
+RequiredHours = namedtuple(
+    'RequiredService',
+    'service_type estimated_effort offered_effort planning_effort')
+RenderedHours = namedtuple('RenderedHours', 'name hours')
 
 
 @model_urls()
@@ -119,8 +128,8 @@ class Story(Model):
             return 'warning'
         return class_dict[self.status]
 
+    @cached_property
     def overview(self):
-        from django.db.models import Sum
         required = self.requiredservices.order_by('service_type').values(
             'service_type__title',
         ).annotate(
@@ -129,23 +138,39 @@ class Story(Model):
             Sum('planning_effort'),
         )
 
-        rendered = self.renderedservices.order_by('rendered_by').values(
+        rendered = self.renderedservices.values(
             'rendered_by___full_name',
         ).annotate(
             Sum('hours'),
-        )
+        ).order_by('-hours__sum', 'rendered_by___full_name')
 
-        return (
-            list(required),
-            [
-                (row['rendered_by___full_name'], row['hours__sum'])
-                for row in sorted(
-                    rendered,
-                    key=lambda row: row['hours__sum'],
-                    reverse=True,
-                )
+        data = {
+            'required': [
+                RequiredHours(
+                    service_type=row['service_type__title'],
+                    estimated_effort=row['estimated_effort__sum'],
+                    offered_effort=row['offered_effort__sum'],
+                    planning_effort=row['planning_effort__sum'],
+                ) for row in required
             ],
-        )
+            'rendered': [
+                RenderedHours(
+                    name=row['rendered_by___full_name'],
+                    hours=row['hours__sum'],
+                ) for row in rendered
+            ],
+        }
+        data.update({
+            'required_total': {
+                f: sum((getattr(item, f) for item in data['required']), 0)
+                for f in RequiredHours._fields[1:]
+            },
+            'rendered_total': {
+                f: sum((getattr(item, f) for item in data['rendered']), 0)
+                for f in RenderedHours._fields[1:]
+            }
+        })
+        return data
 
     def merge_into(self, story):
         with transaction.atomic():
