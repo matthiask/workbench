@@ -68,6 +68,7 @@ def changes(instance, fields):
             'current': formatter(f)(values.get(f.attname)),
         }
         for f in field_instances
+        if not (f.many_to_many or f.one_to_many)  # Avoid those relation types.
     ]
 
     changes.append(Change(
