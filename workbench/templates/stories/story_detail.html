@@ -17,7 +17,14 @@
         <div class="row">
           <div class="col-md-8">
             <h4>{% trans 'overview' %}</h4>
-            {{ story.overview }}
+            <table class="table table-striped table-condensed table-linearize">
+              {% for name, hours in story.overview.1 %}
+              <tr>
+                <td class="text-right">{{ hours }}h</td>
+                <th>{{ name }}</th>
+              </tr>
+              {% endfor %}
+            </table>
             <table class="table table-striped table-condensed table-linearize">
             {% for rendered in story.renderedservices.all|slice:":10" %}
             {% ifchanged rendered.rendered_on %}

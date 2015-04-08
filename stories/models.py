@@ -135,7 +135,17 @@ class Story(Model):
             Sum('hours'),
         )
 
-        return list(required), list(rendered)
+        return (
+            list(required),
+            [
+                (row['rendered_by___full_name'], row['hours__sum'])
+                for row in sorted(
+                    rendered,
+                    key=lambda row: row['hours__sum'],
+                    reverse=True,
+                )
+            ],
+        )
 
     def merge_into(self, story):
         with transaction.atomic():
