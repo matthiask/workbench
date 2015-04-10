@@ -39,6 +39,7 @@ urlpatterns = [
         UpdateView.as_view(
             model=Activity,
             form_class=ActivityForm,
+            template_name='modalform.html',
         ),
         name='activities_activity_update'),
     url(
