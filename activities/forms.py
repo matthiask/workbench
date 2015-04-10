@@ -56,12 +56,15 @@ class ActivityForm(ModelForm):
             self.fields['is_completed'] = forms.BooleanField(
                 label=_('is completed'),
                 required=False,
+                initial=bool(self.instance.completed_at),
             )
 
     def save(self):
         instance = super().save(commit=False)
         if not instance.completed_at and self.cleaned_data.get('is_completed'):
             instance.completed_at = timezone.now()
+        if instance.completed_at and not self.cleaned_data.get('is_completed'):
+            instance.completed_at = None
 
         for model, field in [
             (Project, 'project'),
