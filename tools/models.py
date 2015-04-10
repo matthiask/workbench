@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db import models
 from django.db.models import ProtectedError
 from django.db.models.deletion import Collector
+from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from tools.search import search
@@ -115,6 +116,21 @@ class Model(models.Model):
 
     def pretty_status(self):
         return self.get_status_display()
+
+    def snippet(self):
+        opts = self._meta
+        return render_to_string(
+            [
+                '%s/%s_snippet.html' % (
+                    opts.app_label,
+                    opts.model_name.lower()),
+                'tools/object_snippet.html',
+            ],
+            {
+                'object': self,
+                opts.model_name.lower(): self,
+            },
+        )
 
 
 class ModelWithTotal(Model):

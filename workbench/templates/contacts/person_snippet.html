@@ -1,0 +1,10 @@
+{{ person.organization }}<br>
+<a href="{{ person.get_absolute_url }}">
+<strong>{{ person.full_name }}</strong><br>
+</a>
+{% for pn in person.phonenumbers.all %}
+<a href="tel:{{ pn.phone_number }}">{{ pn.phone_number }} ({{ pn.type }})</a><br>
+{% endfor %}
+{% for ea in person.emailaddresses.all %}
+<a href="mailto:{{ ea.email }}">{{ ea.email }} ({{ ea.type }})</a><br>
+{% endfor %}

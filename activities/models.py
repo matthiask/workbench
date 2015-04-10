@@ -15,7 +15,12 @@ from tools.urls import model_urls
 
 class ActivityQuerySet(SearchQuerySet):
     def open(self):
-        return self.filter(completed_at__isnull=True)
+        return self.filter(completed_at__isnull=True).select_related(
+            'contact__organization',
+            'project',
+            'deal',
+            'owned_by',
+        )
 
     def completed(self):
         return self.filter(completed_at__isnull=False)
