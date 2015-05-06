@@ -9,7 +9,7 @@ $(function() {
   var initModal = function(data) {
     dismissModals();
 
-    $(data).modal({backdrop: false});
+    $(data).modal();
     if (!('ontouchstart' in document.documentElement)) {
       setTimeout(function() {
         $('.modal').find('input, select').filter(':visible').first().focus();
