@@ -39,6 +39,7 @@ class ProjectForm(ModelForm):
         widgets = {
             'customer': Picker(model=Organization),
             'contact': Picker(model=Person),
+            'status': forms.RadioSelect,
         }
 
     def clean(self):
