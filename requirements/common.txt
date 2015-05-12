@@ -1,12 +1,11 @@
 dj-database-url==0.3.0
-Django==1.8
-django-bootstrap3==5.3.1
+Django==1.8.1
+django-bootstrap3==5.4.0
 django-flat-theme==0.9.3
 django-pgjson==0.2.3
-django-vanilla-views==1.0.3
+django-vanilla-views==1.0.4
 oauth2client==1.4.7
 pdfdocument==3.1
 Pillow==2.8.1
-pip-tools==0.3.5
 psycopg2==2.6
 reportlab==3.1.44
