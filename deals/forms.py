@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from deals.models import Deal
+from deals.models import Deal, Stage
 from tools.forms import ModelForm
 
 
@@ -26,10 +26,18 @@ class DealSearchForm(forms.Form):
 class DealForm(ModelForm):
     user_fields = default_to_current_user = ('owned_by',)
 
+    stage = forms.ModelChoiceField(
+        queryset=Stage.objects.all(),
+        label=_('stage'),
+        empty_label=None,
+        widget=forms.RadioSelect,
+    )
+
     class Meta:
         model = Deal
         fields = (
-            'title', 'description', 'owned_by', 'estimated_value', 'status')
+            'title', 'description', 'stage', 'owned_by', 'estimated_value',
+            'status')
         widgets = {
             'status': forms.RadioSelect,
         }
