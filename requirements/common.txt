@@ -1,9 +1,9 @@
 dj-database-url==0.3.0
-django-bootstrap3==6.1.0
-django-flat-theme==0.9.5
+django-bootstrap3==6.2.2
+django-flat-theme==1.1.0
 django-pgjson==0.3.1
 django-vanilla-views==1.0.4
-Django==1.8.3
+Django==1.8.4
 httplib2==0.9.1
 oauth2client==1.4.12
 pdfdocument==3.1
