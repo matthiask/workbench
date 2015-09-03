@@ -18,7 +18,7 @@ def deploy():
         run('venv/bin/pip install -r requirements/production.txt')
         run('venv/bin/python manage.py migrate')
         run('venv/bin/python manage.py collectstatic --noinput')
-        run('sudo service www-workbench restart')
+        run('sudo systemctl restart workbench.service')
 
 
 @task
