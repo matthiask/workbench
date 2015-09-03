@@ -95,7 +95,7 @@ class PostalAddressForm(forms.ModelForm):
         model = PostalAddress
         fields = ('type', 'postal_address')
         widgets = {
-          'postal_address': Textarea(attrs={'rows': 6}),
+            'postal_address': Textarea(attrs={'rows': 6}),
         }
 
 PostalAddressFormset = inlineformset_factory(
