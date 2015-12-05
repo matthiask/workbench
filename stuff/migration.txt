@@ -1,4 +1,5 @@
 -- cat migration.txt | ssh root@metronom.feinheit.ch 'sudo -u postgres psql workbench'
+-- ssh deploy@metronom.feinheit.ch 'cd www/workbench && venv/bin/python manage.py dehtml'
 
 CREATE EXTENSION dblink;
 
