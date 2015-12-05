@@ -26,7 +26,6 @@ ADMINS = (
 INSTALLED_APPS = (
     'workbench',
 
-    'flat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
