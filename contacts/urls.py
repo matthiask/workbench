@@ -1,8 +1,7 @@
 from django.conf.urls import url
 from django.shortcuts import redirect
 
-from contacts.forms import (
-    OrganizationSearchForm, OrganizationForm, PersonForm)
+from contacts.forms import (OrganizationForm, PersonForm)
 from contacts.models import Organization, Person
 from contacts.views import OrganizationListView, PersonListView
 from tools.views import (
