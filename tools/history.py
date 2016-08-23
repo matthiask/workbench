@@ -65,7 +65,7 @@ def changes(instance, fields):
     version_changes = [
         _("Initial value of '%(field)s' was '%(current)s'.") % {
             'field': capfirst(f.verbose_name),
-            'current': formatter(f)(values.get(f.attname)),
+            'current': formatter(f)(values.get(f.name)),
         }
         for f in field_instances
         if not (f.many_to_many or f.one_to_many)  # Avoid those relation types.
@@ -81,11 +81,11 @@ def changes(instance, fields):
         version_changes = [
             _("'%(field)s' changed from '%(previous)s' to '%(current)s'.") % {
                 'field': capfirst(f.verbose_name),
-                'current': formatter(f)(change.changed_fields.get(f.attname)),
-                'previous': formatter(f)(change.row_data.get(f.attname)),
+                'current': formatter(f)(change.changed_fields.get(f.name)),
+                'previous': formatter(f)(change.row_data.get(f.name)),
             }
             for f in field_instances
-            if f.attname in change.changed_fields
+            if f.name in change.changed_fields
         ]
 
         if version_changes:
