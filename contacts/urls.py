@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from contacts.forms import (
     OrganizationSearchForm, OrganizationForm, PersonForm)
 from contacts.models import Organization, Person
-from contacts.views import PersonListView
+from contacts.views import OrganizationListView, PersonListView
 from tools.views import (
     ListView, DetailView, CreateView, UpdateView, DeleteView)
 
@@ -16,10 +16,7 @@ urlpatterns = [
         name='contacts'),
     url(
         r'^organizations/$',
-        ListView.as_view(
-            model=Organization,
-            search_form_class=OrganizationSearchForm,
-        ),
+        OrganizationListView.as_view(),
         name='contacts_organization_list'),
     url(
         r'^organizations/picker/$',

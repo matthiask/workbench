@@ -1,6 +1,14 @@
 from contacts.forms import OrganizationSearchForm
-from contacts.models import Person
+from contacts.models import Organization, Person
 from tools.views import ListView
+
+
+class OrganizationListView(ListView):
+    model = Organization
+    search_form_class = OrganizationSearchForm
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('people')
 
 
 class PersonListView(ListView):
