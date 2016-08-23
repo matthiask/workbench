@@ -101,7 +101,14 @@ $(function() {
     return false;
   });
 
+  // Widgets
+  initWidgets();
+
 });
+
+function initWidgets() {
+  $('#id_invoiced_on').datetimepicker({locale: 'de', format: 'DD.MM.YYYY'});
+}
 
 function addInlineForm(slug, onComplete) {
   var totalForms = $('#id_' + slug + '-TOTAL_FORMS'),
