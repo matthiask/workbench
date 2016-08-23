@@ -87,6 +87,10 @@ $(function() {
       window.location.href = '/contacts/people/';
     } else if (e.keyCode === 67 && e.shiftKey) {  // C
       window.location.href = '/contacts/organizations/';
+    } else if (e.keyCode === 80) {
+      window.location.href = '/projects/';
+    } else if (e.keyCode === 82) {
+      window.location.href = '/invoices/';
     } else if (e.keyCode === 13) {
       $(e.target).parents('form').submit();
     } else {
