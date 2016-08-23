@@ -33,7 +33,9 @@ class Organization(Model):
     groups = models.ManyToManyField(
         Group,
         verbose_name=_('groups'),
-        related_name='+')
+        related_name='+',
+        blank=True,
+    )
 
     objects = SearchManager()
 
@@ -69,7 +71,9 @@ class Person(Model):
     groups = models.ManyToManyField(
         Group,
         verbose_name=_('groups'),
-        related_name='+')
+        related_name='+',
+        blank=True,
+    )
 
     objects = SearchManager()
 
