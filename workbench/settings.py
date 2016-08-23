@@ -45,6 +45,8 @@ INSTALLED_APPS = (
     'projects',
     'services',
     'stories',
+
+    'debug_toolbar',
 )
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -150,3 +152,7 @@ WORKBENCH_PDF_INVOICE_PAYMENT = (
     ' (%(due)s) auf Postkonto 85-206645-2'
     ' / IBAN CH50 0900 0000 8520 6645 2.'
 )
+
+if DEBUG:
+    MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+    INTERNAL_IPS = ['127.0.0.1']
