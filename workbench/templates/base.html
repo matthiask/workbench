@@ -31,19 +31,8 @@
             </form>
           </li>
           <li><a href="/">Home</a></li>
-          <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" href="/contacts/">{% trans 'contacts' %} <span class="caret"></span></a>
-            <ul class="dropdown-menu" role="menu">
-              <li><a href="{% url 'contacts_organization_list' %}">{% trans 'organizations' %}</a></li>
-              <li><a href="{% url 'contacts_person_list' %}">{% trans 'people' %}</a></li>
-              <li class="divider"></li>
-              <li><a href="{% url 'contacts_organization_create' %}">
-                <span class="glyphicon glyphicon-plus"></span>
-                {% trans 'organization' %}</a></li>
-              <li><a href="{% url 'contacts_person_create' %}">
-                <span class="glyphicon glyphicon-plus"></span>
-                {% trans 'person' %}</a></li>
-            </ul>
-          </li>
+          <li><a href="{% url 'contacts_organization_list' %}">{% trans 'organizations' %}</a></li>
+          <li><a href="{% url 'contacts_person_list' %}">{% trans 'people' %}</a></li>
           <li><a href="{% url 'deals_deal_list' %}">{% trans 'deals' %}</a></li>
           <li><a href="{% url 'projects_project_list' %}">{% trans 'projects' %}</a></li>
           <li><a href="{% url 'offers_offer_list' %}">{% trans 'offers' %}</a></li>

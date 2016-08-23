@@ -1,10 +1,9 @@
 from decimal import Decimal
 
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
-
-from django_pgjson.fields import JsonBField
 
 from accounts.models import User
 from projects.models import Project
@@ -69,7 +68,7 @@ class Offer(ModelWithTotal):
         _('postal address'),
         blank=True)
 
-    story_data = JsonBField(_('stories'), blank=True, null=True)
+    story_data = JSONField(_('stories'), blank=True, null=True)
 
     objects = models.Manager.from_queryset(OfferQuerySet)()
 

@@ -1,11 +1,10 @@
 from datetime import date
 from decimal import Decimal
 
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
-
-from django_pgjson.fields import JsonBField
 
 from accounts.models import User
 from contacts.models import Organization, Person
@@ -112,7 +111,7 @@ class Invoice(ModelWithTotal):
         _('postal address'),
         blank=True)
 
-    story_data = JsonBField(_('stories'), blank=True, null=True)
+    story_data = JSONField(_('stories'), blank=True, null=True)
     stories = models.ManyToManyField(
         Story,
         verbose_name=_('stories'),

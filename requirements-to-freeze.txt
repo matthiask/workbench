@@ -3,7 +3,6 @@ Pillow
 coverage
 dj-database-url
 django-bootstrap3
-django-pgjson
 django-vanilla-views
 factory-boy
 gunicorn

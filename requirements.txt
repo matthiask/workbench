@@ -2,7 +2,6 @@ coverage==4.2
 dj-database-url==0.4.1
 Django==1.10
 django-bootstrap3==7.0.1
-django-pgjson==0.3.1
 django-vanilla-views==1.0.4
 factory-boy==2.7.0
 fake-factory==0.6.0
