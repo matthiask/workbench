@@ -2,6 +2,7 @@ coverage==4.2
 dj-database-url==0.4.1
 Django==1.10
 django-bootstrap3==7.0.1
+django-debug-toolbar==1.5
 django-vanilla-views==1.0.4
 factory-boy==2.7.0
 fake-factory==0.6.0
@@ -17,3 +18,4 @@ python-dateutil==2.5.3
 reportlab==3.3.0
 rsa==3.4.2
 six==1.10.0
+sqlparse==0.2.1
