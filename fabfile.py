@@ -15,7 +15,7 @@ def deploy():
         run('git fetch origin')
         run('git merge --ff-only origin/master')
         run('find . -name "*.pyc" -delete')
-        run('venv/bin/pip install -r requirements/production.txt')
+        run('venv/bin/pip install -r requirements.txt')
         run('venv/bin/python manage.py migrate')
         run('venv/bin/python manage.py collectstatic --noinput')
         run('sudo systemctl restart workbench.service')
@@ -34,3 +34,9 @@ def pull_database():
 @task(alias='mm')
 def makemessages():
     local('venv/bin/python manage.py makemessages -a -i venv -i htmlcov')
+
+
+@task
+def update_requirements():
+    local('venv/bin/pip install -U -r requirements-to-freeze.txt')
+    local('venv/bin/pip freeze -l > requirements.txt')

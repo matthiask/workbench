@@ -1,2 +1,0 @@
--r common.txt
-gunicorn==19.4
