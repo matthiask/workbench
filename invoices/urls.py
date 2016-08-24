@@ -1,12 +1,11 @@
 from django.conf.urls import url
-from django.contrib import messages
-from django.utils.translation import ugettext_lazy as _
 
-from invoices.forms import InvoiceSearchForm, InvoiceForm
+from invoices.forms import (
+    InvoiceSearchForm, InvoiceForm, CreatePersonInvoiceForm)
 from invoices.models import Invoice
 from invoices.views import InvoicePDFView
 from tools.views import (
-    ListView, DetailView, UpdateView, DeleteView, MessageView, HistoryView)
+    ListView, CreateView, DetailView, UpdateView, DeleteView, HistoryView)
 
 
 urlpatterns = [
@@ -29,16 +28,11 @@ urlpatterns = [
         name='invoices_invoice_detail'),
     url(
         r'^create/$',
-        MessageView.as_view(
-            redirect_to='invoices_invoice_list',
-            message=_(
-                'Invoices cannot be added directly yet. Create invoices'
-                ' by navigating to the organization or project first.'
-            ),
-            level=messages.WARNING,
+        CreateView.as_view(
+            model=Invoice,
+            form_class=CreatePersonInvoiceForm,
         ),
         name='invoices_invoice_create'),
-
     url(
         r'^(?P<pk>\d+)/update/$',
         UpdateView.as_view(

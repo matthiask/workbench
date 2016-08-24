@@ -50,6 +50,9 @@
     <tr>
       <td></td>
       <td>
+        <a href="{% url 'invoices_invoice_create' %}?person={{ object.pk }}" class="btn btn-default">
+          {% trans 'create invoice' %}
+        </a>
         <a href="{% url 'activities_activity_create' %}?contact={{ object.pk }}" class="btn btn-default"
           data-toggle="ajaxmodal">{% trans 'create activity' %}</a>
         <a href="{{ object.urls.update }}" class="btn btn-default">

@@ -1,11 +1,14 @@
+from datetime import date
+
 from django import forms
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from contacts.models import Organization, Person
 from invoices.models import Invoice
 from stories.models import RenderedService
-from tools.forms import ModelForm
+from tools.forms import ModelForm, Picker
 
 
 class InvoiceSearchForm(forms.Form):
@@ -78,4 +81,44 @@ class InvoiceForm(ModelForm):
                 archived_at=timezone.now(),
             )
 
+        return instance
+
+
+class CreatePersonInvoiceForm(ModelForm):
+    user_fields = default_to_current_user = ('owned_by',)
+    type = forms.ChoiceField(
+        label=_('type'),
+        choices=Invoice.TYPE_CHOICES,
+        initial=Invoice.FIXED,
+        disabled=True,
+    )
+
+    class Meta:
+        model = Invoice
+        fields = (
+            'customer', 'contact', 'invoiced_on', 'due_on', 'title',
+            'description', 'owned_by', 'subtotal'
+        )
+        widgets = {
+            'customer': Picker(model=Organization),
+            'contact': Picker(model=Person),
+        }
+
+    def __init__(self, *args, **kwargs):
+        request = kwargs['request']
+        if request.GET.get('person'):
+            person = Person.objects.get(pk=request.GET.get('person'))
+            kwargs.setdefault('initial', {}).update({
+                'customer': person.organization,
+                'contact': person,
+                'invoiced_on': date.today(),
+                'subtotal': None,
+            })
+
+        super().__init__(*args, **kwargs)
+
+    def save(self):
+        instance = super().save(commit=False)
+        instance.type = instance.FIXED
+        instance.save()
         return instance
