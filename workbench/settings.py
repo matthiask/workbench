@@ -128,12 +128,9 @@ BOOTSTRAP3 = {
     'horizontal_field_class': 'col-md-9',
 }
 
-FONTS = {
-    'regular': os.path.join(BASE_DIR, 'stuff', 'fonts', 'Lato-Light.ttf'),
-    'bold': os.path.join(BASE_DIR, 'stuff', 'fonts', 'Lato-Semibold.ttf'),
-    'italic': os.path.join(BASE_DIR, 'stuff', 'fonts', 'Lato-LightItalic.ttf'),
-    'bolditalic': os.path.join(BASE_DIR, 'stuff', 'fonts', 'Lato-Bold.ttf'),
-}
+
+def font(name):
+    return os.path.join(BASE_DIR, 'stuff', 'fonts', name)
 
 NAMESPACE = env.env('NAMESPACE', required=True)
 WORKBENCH = {
@@ -155,6 +152,12 @@ WORKBENCH = {
             ' (%(due)s) auf Postkonto 85-206645-2'
             ' / IBAN CH50 0900 0000 8520 6645 2.'
         ),
+        FONTS={
+            'regular': font('Lato-Light.ttf'),
+            'bold': font('Lato-Semibold.ttf'),
+            'italic': font('Lato-LightItalic.ttf'),
+            'bolditalic': font('Lato-Bold.ttf'),
+        },
     ),
     'dbpag': types.SimpleNamespace(
         SSO_DOMAIN='diebruchpiloten.com',
@@ -171,6 +174,12 @@ WORKBENCH = {
             ' der Referenznummer %(code)s innerhalb von %(days)s Tagen'
             ' (%(due)s) auf IBAN CH45 0023 0230 2849 4501 Y.'
         ),
+        FONTS={
+            'regular': font('HelveticaNeueLight.ttf'),
+            'bold': font('HelveticaNeueBold.ttf'),
+            'italic': font('HelveticaNeueLightItalic.ttf'),
+            'bolditalic': font('HelveticaNeueBoldItalic.ttf'),
+        },
     ),
 }[env.env('NAMESPACE', required=True)]
 

@@ -15,7 +15,7 @@ from pdfdocument.utils import pdf_response as _pdf_response
 
 register_fonts_from_paths(
     font_name='Rep',
-    **settings.FONTS)
+    **settings.WORKBENCH.FONTS)
 
 
 Z = D('0.00')
