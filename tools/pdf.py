@@ -38,7 +38,7 @@ class PDFDocument(_PDFDocument):
     def generate_style(self, *args, **kwargs):
         self.style = Empty()
         self.style.fontName = 'Rep'
-        self.style.fontSize = 9
+        self.style.fontSize = 10
 
         self.style.normal = style(
             getSampleStyleSheet()['Normal'],
@@ -117,7 +117,7 @@ class PDFDocument(_PDFDocument):
             canvas.setFont(pdf.style.fontName + '-Bold', 10)
             canvas.drawString(
                 26 * mm,
-                284 * mm,
+                280 * mm,
                 settings.WORKBENCH.PDF_COMPANY)
 
             canvas.setFont(pdf.style.fontName, 6)
@@ -125,13 +125,13 @@ class PDFDocument(_PDFDocument):
                     settings.WORKBENCH.PDF_OFFER_TERMS)):
                 canvas.drawCentredString(
                     108 * mm,
-                    (8 + 3 * i) * mm,
+                    (12 + 3 * i) * mm,
                     text)
 
             canvas.setFont(pdf.style.fontName, 6)
             canvas.drawRightString(
                 190 * mm,
-                8 * mm,
+                12 * mm,
                 '%d/%d' % doc.page_index())
 
             canvas.restoreState()
@@ -147,19 +147,19 @@ class PDFDocument(_PDFDocument):
             canvas.setFont(pdf.style.fontName + '-Bold', 10)
             canvas.drawString(
                 26 * mm,
-                284 * mm,
+                280 * mm,
                 settings.WORKBENCH.PDF_COMPANY)
 
             canvas.setFont(pdf.style.fontName, 6)
             canvas.drawString(
                 26 * mm,
-                8 * mm,
+                12 * mm,
                 settings.WORKBENCH.PDF_VAT_NO)
 
             canvas.setFont(pdf.style.fontName, 6)
             canvas.drawRightString(
                 190 * mm,
-                8 * mm,
+                12 * mm,
                 '%d/%d' % doc.page_index())
 
             canvas.restoreState()
