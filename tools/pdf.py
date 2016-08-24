@@ -252,7 +252,8 @@ class PDFDocument(_PDFDocument):
         self.spacer(2 * mm)
 
         self.table([
-            (_('invoice'), invoice.code),
+            (_('invoice'), '%s/%s' % (
+                invoice.code, invoice.owned_by.get_short_name())),
             (_('date'), (
                 date_fmt(invoice.invoiced_on, 'd.m.Y') if invoice.invoiced_on
                 else _('NO DATE YET')
