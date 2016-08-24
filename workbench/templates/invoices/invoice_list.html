@@ -1,70 +1,42 @@
-{% extends "base.html" %}
+{% extends "tools/object_list.html" %}
 
 {% load bootstrap3 i18n querystring workbench %}
 
-{% block title %}{% trans "invoices" %} - {{ block.super }}{% endblock %}
+{% block objects %}
 
-{% block content %}
-<div class="row">
-  <div class="col-sm-12">
-    <h1>{{ view.meta.verbose_name_plural }}</h1>
+<table class="table table-hover table-striped table-linearize">
+  <thead>
+    <tr>
+      <th>{% trans 'invoice' %}</th>
+      <th>{% trans 'customer' %}</th>
+      <th class="hidden-xs">{% trans 'owned by' %}</th>
+      <th>{% trans 'status' %}</th>
+      <th class="text-right">{% trans 'total excl. tax' %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for invoice in object_list %}
+      <tr>
+        <th><a href="{{ invoice.urls.detail }}">
+            {{ invoice }}
+        </a></th>
+        <td>{{ invoice.contact|default:invoice.customer }}</td>
+        <td class="hidden-xs">{{ invoice.owned_by.get_short_name }}</td>
+        <td>{{ invoice.pretty_status }}</td>
+        <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <th colspan="5">
+        {{ paginator.count }} {{ view.meta.verbose_name_plural }}
+        {% if view.root_queryset_count != paginator.count %}
+        (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
+        {% endif %}
+      </th>
+    </tr>
+  </tfoot>
+</table>
 
-    <table class="table table-hover table-striped table-linearize">
-      <thead>
-        <tr>
-          <td colspan="5">
-            <a href="{% url 'invoices_invoice_create' %}" class="btn btn-default pull-right">
-              <span class="glyphicon glyphicon-plus"></span>
-              {{ view.meta.verbose_name }}
-            </a>
-
-            <form method="GET" action="." class="form-inline form-search">
-              <label class="sr-only">{% trans 'search' %}</label>
-              <input
-                class="form-control"
-                type="search"
-                name="q"
-                placeholder="{% trans 'search' %}"
-                value="{{ view.request.GET.q|default:'' }}">
-              <label class="sr-only">{% trans 'status' %}</label>
-              {{ view.search_form.s }}
-            </form>
-          </td>
-        </tr>
-        <tr>
-          <th>{% trans 'invoice' %}</th>
-          <th>{% trans 'customer' %}</th>
-          <th class="hidden-xs">{% trans 'owned by' %}</th>
-          <th>{% trans 'status' %}</th>
-          <th class="text-right">{% trans 'total excl. tax' %}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for invoice in object_list %}
-          <tr>
-            <th><a href="{{ invoice.urls.detail }}">
-                {{ invoice }}
-            </a></th>
-            <td>{{ invoice.contact|default:invoice.customer }}</td>
-            <td class="hidden-xs">{{ invoice.owned_by.get_short_name }}</td>
-            <td>{{ invoice.pretty_status }}</td>
-            <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-      <tfoot>
-        <tr>
-          <th colspan="5">
-            {{ paginator.count }} {{ view.meta.verbose_name_plural }}
-            {% if view.root_queryset_count != paginator.count %}
-            (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
-            {% endif %}
-          </th>
-        </tr>
-      </tfoot>
-    </table>
-
-    {% bootstrap_pagination page=page_obj extra=request.GET|querystring:'page' %}
-  </div>
-</div>
 {% endblock %}

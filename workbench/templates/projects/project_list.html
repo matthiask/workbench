@@ -1,68 +1,40 @@
-{% extends "base.html" %}
+{% extends "tools/object_list.html" %}
 
 {% load bootstrap3 i18n querystring %}
 
-{% block title %}{% trans "projects" %} - {{ block.super }}{% endblock %}
+{% block objects %}
 
-{% block content %}
-<div class="row">
-  <div class="col-sm-12">
-    <h1>{{ view.meta.verbose_name_plural }}</h1>
+<table class="table table-hover table-striped table-linearize">
+  <thead>
+    <tr>
+      <th>{% trans 'project' %}</th>
+      <th>{% trans 'customer' %}</th>
+      <th class="hidden-xs">{% trans 'owned by' %}</th>
+      <th>{% trans 'status' %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for project in object_list %}
+      <tr class="{{ project.css }}">
+        <th><a href="{{ project.urls.detail }}">
+            {{ project }}
+        </a></th>
+        <td>{{ project.contact|default:project.customer }}</td>
+        <td class="hidden-xs">{{ project.owned_by.get_short_name }}</td>
+        <td>{{ project.pretty_status }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <th colspan="4">
+        {{ paginator.count }} {{ view.meta.verbose_name_plural }}
+        {% if view.root_queryset_count != paginator.count %}
+        (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
+        {% endif %}
+      </th>
+    </tr>
+  </tfoot>
+</table>
 
-    <table class="table table-hover table-striped table-linearize">
-      <thead>
-        <tr>
-          <td colspan="4">
-            <a href="{% url 'projects_project_create' %}" class="btn btn-default pull-right">
-              <span class="glyphicon glyphicon-plus"></span>
-              {{ view.meta.verbose_name }}
-            </a>
-
-            <form method="GET" action="." class="form-inline form-search">
-              <label class="sr-only">{% trans 'search' %}</label>
-              <input
-                class="form-control"
-                type="search"
-                name="q"
-                placeholder="{% trans 'search' %}"
-                value="{{ view.request.GET.q|default:'' }}">
-              <label class="sr-only">{% trans 'status' %}</label>
-              {{ view.search_form.s }}
-            </form>
-          </td>
-        </tr>
-        <tr>
-          <th>{% trans 'project' %}</th>
-          <th>{% trans 'customer' %}</th>
-          <th class="hidden-xs">{% trans 'owned by' %}</th>
-          <th>{% trans 'status' %}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for project in object_list %}
-          <tr class="{{ project.css }}">
-            <th><a href="{{ project.urls.detail }}">
-                {{ project }}
-            </a></th>
-            <td>{{ project.contact|default:project.customer }}</td>
-            <td class="hidden-xs">{{ project.owned_by.get_short_name }}</td>
-            <td>{{ project.pretty_status }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-      <tfoot>
-        <tr>
-          <th colspan="4">
-            {{ paginator.count }} {{ view.meta.verbose_name_plural }}
-            {% if view.root_queryset_count != paginator.count %}
-            (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
-            {% endif %}
-          </th>
-        </tr>
-      </tfoot>
-    </table>
-
-    {% bootstrap_pagination page=page_obj extra=request.GET|querystring:'page' %}
-  </div>
-</div>
 {% endblock %}

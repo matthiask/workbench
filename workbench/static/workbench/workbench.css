@@ -61,3 +61,13 @@ h1 .tiny-icons {
   background: #fff;
   color: #e74c3c;
 }
+
+@media screen and (min-width: 768px) {
+  .right-head {
+    text-align: right;
+    padding-top: 21px;
+  }
+  .right-head>* {
+    display: inline-block;
+  }
+}
