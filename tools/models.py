@@ -110,9 +110,7 @@ class Model(models.Model):
 
     @property
     def code(self):
-        return '%s-%06d' % (
-            self.__class__.__name__[0].upper(),
-            self.pk)
+        return '%05d' % self.pk
 
     def pretty_status(self):
         return self.get_status_display()

@@ -162,7 +162,10 @@ WORKBENCH = {
     'dbpag': types.SimpleNamespace(
         SSO_DOMAIN='diebruchpiloten.com',
         PDF_COMPANY='Die Bruchpiloten AG',
-        PDF_ADDRESS='Die Bruchpiloten AG · Molkenstrasse 21 · 8004 Zürich',
+        PDF_ADDRESS=(
+            'Die Bruchpiloten AG · Molkenstrasse 21 · 8004 Zürich'
+            ' · diebruchpiloten.com'
+        ),
         PDF_VAT_NO='CHE-239.647.366 MWST',
         PDF_OFFER_TERMS=[
             'Bestandteil dieser Offerte sind die zum Zeitpunkt'

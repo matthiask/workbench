@@ -49,20 +49,20 @@ class PDFDocument(_PDFDocument):
         self.style.heading1 = style(
             self.style.normal,
             fontName='Rep-Bold',
-            fontSize=1.5 * self.style.fontSize,
-            leading=1.75 * self.style.fontSize,
+            fontSize=1.25 * self.style.fontSize,
+            leading=1.25 * self.style.fontSize,
         )
         self.style.heading2 = style(
             self.style.normal,
             fontName='Rep-Bold',
-            fontSize=1.25 * self.style.fontSize,
-            leading=1.5 * self.style.fontSize,
+            fontSize=1.15 * self.style.fontSize,
+            leading=1.15 * self.style.fontSize,
         )
         self.style.heading3 = style(
             self.style.normal,
             fontName='Rep-Bold',
             fontSize=1.1 * self.style.fontSize,
-            leading=1.3 * self.style.fontSize,
+            leading=1.2 * self.style.fontSize,
         )
 
         self.style.small = style(
@@ -154,7 +154,7 @@ class PDFDocument(_PDFDocument):
             canvas.drawString(
                 26 * mm,
                 12 * mm,
-                settings.WORKBENCH.PDF_VAT_NO)
+                settings.WORKBENCH.PDF_ADDRESS)
 
             canvas.setFont(pdf.style.fontName, 6)
             canvas.drawRightString(
@@ -177,9 +177,6 @@ class PDFDocument(_PDFDocument):
         )
 
     def postal_address(self, postal_address):
-        self.smaller(settings.WORKBENCH.PDF_ADDRESS)
-        self.spacer(1 * mm)
-
         self.p(postal_address)
         self.next_frame()
 
@@ -250,13 +247,20 @@ class PDFDocument(_PDFDocument):
 
     def process_invoice(self, invoice):
         self.postal_address(invoice.postal_address)
-        self.date_line(
-            invoice.invoiced_on,
-            invoice.owned_by.get_short_name(),
-            invoice.code)
 
         self.h1(invoice.title)
         self.spacer(2 * mm)
+
+        self.table([
+            (_('invoice'), invoice.code),
+            (_('date'), (
+                date_fmt(invoice.invoiced_on, 'd.m.Y') if invoice.invoiced_on
+                else _('NO DATE YET')
+            )),
+            ('MwSt.-Nr.', settings.WORKBENCH.PDF_VAT_NO),
+        ], (1.8 * cm, 14.6 * cm), self.style.table)
+        self.spacer()
+
         self.p(invoice.description)
         self.spacer()
         self.table_total(invoice)
