@@ -1,3 +1,7 @@
+.container-fluid[role="main"] {
+  padding-bottom: 20px;
+}
+
 @media only screen and (max-width: 760px) {
   .table-linearize table,
   .table-linearize thead,
