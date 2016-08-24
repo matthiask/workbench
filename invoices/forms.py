@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from invoices.models import Invoice
-from services.models import RenderedService
+from stories.models import RenderedService
 from tools.forms import ModelForm
 
 
