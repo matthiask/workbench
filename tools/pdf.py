@@ -12,6 +12,8 @@ from pdfdocument.document import (
     getSampleStyleSheet, register_fonts_from_paths)
 from pdfdocument.utils import pdf_response as _pdf_response
 
+from workbench.templatetags.workbench import currency
+
 
 register_fonts_from_paths(
     font_name='Rep',
@@ -209,16 +211,16 @@ class PDFDocument(_PDFDocument):
 
     def table_total(self, instance):
         total = [
-            (instance.subtotal.quantize(Z), _('subtotal')),
+            (currency(instance.subtotal.quantize(Z)), _('subtotal')),
         ]
         if instance.discount:
             total.append((
-                instance.discount.quantize(Z),
+                currency(instance.discount.quantize(Z)),
                 _('discount'),
             ))
         if instance.tax_amount:
             total.append((
-                instance.tax_amount.quantize(Z),
+                currency(instance.tax_amount.quantize(Z)),
                 '%0.1f%% %s' % (instance.tax_rate, _('tax')),
             ))
 
@@ -226,7 +228,7 @@ class PDFDocument(_PDFDocument):
             self.table(total, (1.8 * cm, 14.6 * cm), self.style.tableHead)
 
         self.table([
-            (instance.total.quantize(Z), _('total incl. tax')),
+            (currency(instance.total.quantize(Z)), _('total CHF incl. tax')),
         ], (1.8 * cm, 14.6 * cm), self.style.tableHeadLine)
 
     def process_offer(self, offer):

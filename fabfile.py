@@ -50,6 +50,11 @@ def makemessages():
     local('venv/bin/python manage.py makemessages -a -i venv -i htmlcov')
 
 
+@task(alias='cp')
+def compilemessages():
+    local('cd conf && ../venv/bin/python ../manage.py compilemessages')
+
+
 @task
 def update_requirements():
     local('venv/bin/pip install -U -r requirements-to-freeze.txt')

@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from contacts.models import Organization, Person
 from invoices.models import Invoice
 from stories.models import RenderedService
-from tools.forms import ModelForm, Picker
+from tools.forms import ModelForm, Picker, Textarea
 
 
 class InvoiceSearchForm(forms.Form):
@@ -38,6 +38,11 @@ class InvoiceForm(ModelForm):
             'invoiced_on', 'due_on', 'title', 'description', 'owned_by',
             'status', 'postal_address',
         )
+        widgets = {
+            'status': forms.RadioSelect,
+            'description': Textarea,
+            'postal_address': Textarea,
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
