@@ -32,13 +32,17 @@ def deploy():
 
 
 @task
-def pull_database():
+def pull_database(namespace):
+    remote = {
+        'fh': 'workbench',
+        'dbpag': 'dbpag-workbench',
+    }[namespace]
+
     local('dropdb --if-exists workbench')
     local('createdb --encoding UTF8 workbench')
     local(
-        'ssh root@workbench.feinheit.ch "sudo -u postgres pg_dump workbench'
-        ' --no-privileges --no-owner --no-reconnect"'
-        ' | psql workbench')
+        'ssh root@workbench.feinheit.ch "sudo -u postgres pg_dump -Ox %s"'
+        ' | psql workbench' % remote)
 
 
 @task(alias='mm')
