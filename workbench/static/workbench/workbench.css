@@ -50,6 +50,10 @@ th.number {
 
 .tiny-icons {
   display: inline-block;
+  transform: scale(.8) translateY(-10%);
+}
+
+h1 .tiny-icons {
   transform: scale(.5) translateY(-30%);
 }
 

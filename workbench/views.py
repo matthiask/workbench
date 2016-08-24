@@ -1,5 +1,7 @@
+from django.apps import apps
 from django.contrib import messages
-from django.shortcuts import render
+from django.http import Http404
+from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext as _
 
 from contacts.models import Organization, Person
@@ -32,4 +34,31 @@ def search(request):
             'query': q,
             'results': results,
         },
+    })
+
+
+HISTORY = {
+    'contacts.organization': '',
+    'contacts.person': '',
+    'deals.deal': 'title, description, owned_by, stage, status, estimated_value',  # noqa
+    'invoices.invoice': 'invoiced_on, due_on, title, description, owned_by, status, discount, total',  # noqa
+    'offers.offer': 'offered_on, closed_at, title, description, owned_by, status, discount, total',  # noqa
+    'projects.project': 'customer, contact, title, description, owned_by, status, invoicing, maintenance',  # noqa
+    'stories.story': '',
+}
+
+
+def history(request, label, pk):
+    try:
+        fields = HISTORY[label]
+    except KeyError:
+        raise Http404('No or disallowed history: %s' % label)
+
+    instance = get_object_or_404(
+        apps.get_model(label),
+        pk=pk)
+
+    return render(request, 'history_modal.html', {
+        'instance': instance,
+        'fields': fields,
     })

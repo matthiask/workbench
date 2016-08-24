@@ -7,7 +7,7 @@
 {% block content %}
 <div class="row">
 <div class="col-md-6 col-md-offset-3">
-  <h1>{{ object }}</h1>
+  <h1>{{ object }} {% history_link object %}</h1>
 
   <a href="{{ object.urls.pdf }}" class="btn btn-default">
     PDF
@@ -18,9 +18,6 @@
   <a href="{{ object.urls.delete }}" class="btn btn-danger btn-inverse pull-right">
     {% trans 'Delete' %}
   </a>
-
-  <h2>{% trans 'History' %}</h2>
-  {% history object 'offered_on, closed_at, title, description, owned_by, status, discount, total' %}
 </div>
 </div>
 {% endblock %}

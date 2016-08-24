@@ -7,6 +7,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">
           {{ story }}
+          {% history_link story %}
           <br>
           <small>{{ story.description }}</small>
         </h4>
@@ -78,7 +79,6 @@
             {% endfor %}
             </table>
 
-            {% history story %}
           </div>
           <div class="col-md-4">
             <form method="post" action="{{ request.path }}" class="form">

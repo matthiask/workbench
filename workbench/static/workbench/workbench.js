@@ -4,6 +4,7 @@ $(function() {
   var dismissModals = function() {
     // LOL, dismiss.
     $('.modal, .modal-backdrop').remove();
+    $(document.body).removeClass('modal-open');
   };
 
   var initModal = function(data) {

@@ -6,5 +6,5 @@
 {% block title %}{% trans 'History' %}{% endblock %}
 
 {% block body %}
-{% history object 'invoiced_on, due_on, title, description, owned_by, status, discount, total' %}
+{% history instance fields %}
 {% endblock %}

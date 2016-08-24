@@ -5,7 +5,7 @@ from invoices.forms import (
 from invoices.models import Invoice
 from invoices.views import InvoicePDFView
 from tools.views import (
-    ListView, CreateView, DetailView, UpdateView, DeleteView, HistoryView)
+    ListView, CreateView, DetailView, UpdateView, DeleteView)
 
 
 urlpatterns = [
@@ -49,9 +49,4 @@ urlpatterns = [
         r'^(?P<pk>\d+)/pdf/$',
         InvoicePDFView.as_view(),
         name='invoices_invoice_pdf'),
-
-    url(
-        r'^(?P<pk>\d+)/history/$',
-        HistoryView.as_view(model=Invoice),
-        name='invoices_invoice_history'),
 ]

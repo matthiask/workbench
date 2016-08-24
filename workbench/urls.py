@@ -26,7 +26,7 @@ urlpatterns = [
     url(r'^invoices/', include('invoices.urls')),
 
     url(r'^search/$', views.search, name='search'),
-
+    url(r'^history/(\w+\.\w+)/(\d+)/$', views.history, name='history'),
 ]
 
 if settings.DEBUG:
