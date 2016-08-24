@@ -9,9 +9,7 @@ class OfferPDFView(DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        pdf, response = pdf_response(
-            'offer-%d' % self.object.pk,
-            as_attachment=False)
+        pdf, response = pdf_response(self.object.code, as_attachment=False)
 
         pdf.init_offer()
         pdf.process_offer(self.object)

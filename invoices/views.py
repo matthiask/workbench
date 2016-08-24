@@ -9,9 +9,7 @@ class InvoicePDFView(DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        pdf, response = pdf_response(
-            'invoice-%d' % self.object.pk,
-            as_attachment=False)
+        pdf, response = pdf_response(self.object.code, as_attachment=False)
 
         pdf.init_invoice()
         pdf.process_invoice(self.object)
