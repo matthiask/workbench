@@ -40,10 +40,21 @@ def search(request):
 HISTORY = {
     'contacts.organization': '',
     'contacts.person': '',
-    'deals.deal': 'title, description, owned_by, stage, status, estimated_value',  # noqa
-    'invoices.invoice': 'invoiced_on, due_on, title, description, owned_by, status, discount, total',  # noqa
-    'offers.offer': 'offered_on, closed_at, title, description, owned_by, status, discount, total',  # noqa
-    'projects.project': 'customer, contact, title, description, owned_by, status, invoicing, maintenance',  # noqa
+    'deals.deal': (
+        'title, description, owned_by, stage, status, estimated_value'
+    ),
+    'invoices.invoice': (
+        'invoiced_on, due_on, title, description, owned_by, status,'
+        'subtotal, discount, tax_rate, total'
+    ),
+    'offers.offer': (
+        'offered_on, closed_at, title, description, owned_by, status,'
+        'subtotal, discount, tax_rate, total'
+    ),
+    'projects.project': (
+        'customer, contact, title, description, owned_by, status,'
+        'invoicing, maintenance'
+    ),
     'stories.story': '',
 }
 
