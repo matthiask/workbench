@@ -50,7 +50,7 @@ def makemessages():
     local('venv/bin/python manage.py makemessages -a -i venv -i htmlcov')
 
 
-@task(alias='cp')
+@task(alias='cm')
 def compilemessages():
     local('cd conf && ../venv/bin/python ../manage.py compilemessages')
 
