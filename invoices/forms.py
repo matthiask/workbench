@@ -116,7 +116,11 @@ class InvoiceForm(WarningsForm, ModelForm):
     def save(self):
         instance = super().save(commit=False)
 
-        if instance.type in (self.instance.SERVICES,):
+        if instance.type in (instance.FIXED, instance.DOWN_PAYMENT):
+            instance.subtotal = self.cleaned_data['subtotal']
+            instance.save()
+
+        elif instance.type in (self.instance.SERVICES,):
             # Leave out save_m2m by purpose.
             instance.clear_stories(save=False)
             instance.add_stories(
@@ -127,8 +131,6 @@ class InvoiceForm(WarningsForm, ModelForm):
                 invoice=instance,
                 archived_at=timezone.now(),
             )
-        else:
-            instance.save()
 
         return instance
 
