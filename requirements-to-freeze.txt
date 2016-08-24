@@ -11,3 +11,4 @@ oauth2client
 pdfdocument
 psycopg2
 reportlab
+flake8

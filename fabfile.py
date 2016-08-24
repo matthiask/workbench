@@ -6,8 +6,13 @@ env.hosts = ['deploy@workbench.feinheit.ch']
 
 
 @task
+def check():
+    local('venv/bin/flake8 .')
+
+
+@task
 def deploy():
-    local('flake8 .')
+    check()
     local('git push origin master')
 
     with cd('www/workbench/'):
