@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="row">
-<div class="col-md-12">
+<div class="col-md-6 col-md-offset-3">
   <h1>
     {{ object }}
 
@@ -53,7 +53,7 @@
   <a href="{{ object.urls.update }}" class="btn btn-default">
     {% trans 'Update' %}
   </a>
-  <a href="{{ object.urls.delete }}" class="btn btn-danger">
+  <a href="{{ object.urls.delete }}" class="btn btn-danger btn-inverse pull-right">
     {% trans 'Delete' %}
   </a>
 </div>

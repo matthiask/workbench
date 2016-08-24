@@ -13,7 +13,7 @@ class RenderedServiceForm(ModelForm):
     class Meta:
         model = RenderedService
         fields = (
-            'rendered_on', 'rendered_by', 'hours', 'description',
+            'rendered_by', 'rendered_on', 'hours', 'description',
         )
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),

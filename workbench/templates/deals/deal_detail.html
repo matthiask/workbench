@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-6 col-md-offset-3">
     <h1>{{ deal }}</h1>
 
     <table class="table table-striped">
@@ -36,7 +36,7 @@
       data-toggle="ajaxmodal">{% trans 'create activity' %}</a>
     <a href="{{ deal.urls.update }}" class="btn btn-default">
       {% trans 'Update' %}</a>
-    <a href="{{ deal.urls.delete }}" class="btn btn-danger">
+    <a href="{{ deal.urls.delete }}" class="btn btn-danger btn-inverse pull-right">
       {% trans 'Delete' %}</a>
 
     <h2>{% trans 'History' %}</h2>

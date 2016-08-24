@@ -21,10 +21,19 @@
       {% for formset in view.formsets.values %}
         {% bootstrap_formset formset layout='horizontal' %}
       {% endfor %}
+
       {% buttons %}
-        <button type="submit" class="btn btn-primary col-md-offset-3">
-          {% trans 'submit' %}</button>
+        <div class="col-md-9 col-md-offset-3">
+          <button type="submit" class="btn btn-primary">
+            {% trans 'save' %}</button>
+
+          {% if object.get_absolute_url %}
+          <a href="{{ object.get_absolute_url }}" class="btn pull-right btn-danger btn-inverse">
+            {% trans 'cancel' %}</a>
+          {% endif %}
+        </div>
       {% endbuttons %}
+
     </form>
 
   </div>

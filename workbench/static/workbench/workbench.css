@@ -52,3 +52,8 @@ th.number {
   display: inline-block;
   transform: scale(.5) translateY(-30%);
 }
+
+.btn-danger.btn-inverse {
+  background: #fff;
+  color: #e74c3c;
+}

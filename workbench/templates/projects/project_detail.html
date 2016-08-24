@@ -76,14 +76,16 @@
       {% endwith %}
 
       <a href="{{ project.urls.createstory }}" class="btn btn-default"
-        data-toggle="ajaxmodal">{% trans 'create story' %}</a>
+        data-toggle="ajaxmodal">
+        <i class="glyphicon glyphicon-plus"></i> {% trans 'story' %}</a>
       <a href="{{ project.urls.createoffer }}" class="btn btn-default">
-        {% trans 'create offer' %}</a>
+        <i class="glyphicon glyphicon-plus"></i>
+        {% trans 'offer' %}</a>
       <a href="{{ project.urls.estimation }}" class="btn btn-default">
         {% trans 'estimation' %}</a>
       <a href="{{ project.urls.update }}" class="btn btn-default">
         {% trans 'Update' %}</a>
-      <a href="{{ project.urls.delete }}" class="btn btn-danger">
+      <a href="{{ project.urls.delete }}" class="btn btn-danger btn-inverse pull-right">
         {% trans 'Delete' %}</a>
 
     </div>

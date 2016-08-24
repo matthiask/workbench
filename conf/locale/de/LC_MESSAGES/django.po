@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-24 13:03+0200\n"
+"POT-Creation-Date: 2016-08-24 13:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -772,7 +772,7 @@ msgstr "%s erstellen"
 #: tools/views.py:123
 #, python-format
 msgid "Update %s"
-msgstr "%s aktualisieren"
+msgstr "%s bearbeiten"
 
 #: tools/views.py:144
 #, python-format
@@ -809,7 +809,7 @@ msgstr "Kontext"
 #: workbench/templates/stories/story_detail.html:98
 #: workbench/templates/tools/object_detail.html:13
 msgid "Update"
-msgstr "Aktualisieren"
+msgstr "Bearbeiten"
 
 #: workbench/templates/activities/activity_detail.html:34
 #: workbench/templates/modal.html:19
@@ -892,7 +892,7 @@ msgstr "Aktivität erstellen"
 #: workbench/templates/tools/object_form.html:12
 #, python-format
 msgid "Update %(object)s"
-msgstr "%(object)s aktualisieren"
+msgstr "%(object)s bearbeiten"
 
 #: workbench/templates/contacts/person_form.html:14
 #: workbench/templates/projects/project_estimation.html:14
@@ -903,7 +903,6 @@ msgstr "%(class)s erstellen"
 
 #: workbench/templates/contacts/person_form.html:102
 #: workbench/templates/projects/project_estimation.html:58
-#: workbench/templates/tools/object_form.html:26
 msgid "submit"
 msgstr "absenden"
 
@@ -960,6 +959,7 @@ msgstr "%(object)s löschen"
 
 #: workbench/templates/stories/story_confirm_delete.html:14
 #: workbench/templates/tools/object_confirm_delete.html:18
+#: workbench/templates/tools/object_form.html:32
 msgid "cancel"
 msgstr "Abbruch"
 
@@ -994,6 +994,10 @@ msgstr "Sichern und neu hinzufügen"
 #: workbench/templates/tools/object_confirm_delete.html:20
 msgid "delete"
 msgstr "Löschen"
+
+#: workbench/templates/tools/object_form.html:28
+msgid "save"
+msgstr "Sichern"
 
 #: workbench/views.py:28
 msgid "Search query missing."
