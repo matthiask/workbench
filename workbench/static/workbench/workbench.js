@@ -83,13 +83,15 @@ $(function() {
 
     if (e.keyCode === 70) {  // f
       $('.navbar-form input[name=q]').focus().select();
+    } else if (e.keyCode === 72) {  // h
+      window.location.href = '/';
     } else if (e.keyCode === 67 && !e.shiftKey) {  // c
       window.location.href = '/contacts/people/';
     } else if (e.keyCode === 67 && e.shiftKey) {  // C
       window.location.href = '/contacts/organizations/';
-    } else if (e.keyCode === 80) {
+    } else if (e.keyCode === 80) {  // p
       window.location.href = '/projects/';
-    } else if (e.keyCode === 82) {
+    } else if (e.keyCode === 82) {  // r
       window.location.href = '/invoices/';
     } else if (e.keyCode === 13) {
       $(e.target).parents('form').submit();
@@ -107,7 +109,10 @@ $(function() {
 });
 
 function initWidgets() {
-  $('#id_invoiced_on').datetimepicker({locale: 'de', format: 'DD.MM.YYYY'});
+  $('.datepicker:not(.has-datepicker)').addClass('has-datepicker').datetimepicker({
+    locale: 'de',
+    format: 'DD.MM.YYYY'
+  });
 }
 
 function addInlineForm(slug, onComplete) {

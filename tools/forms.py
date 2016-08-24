@@ -45,6 +45,11 @@ class ModelForm(forms.ModelForm):
                     None)
             )
 
+        for name, field in self.fields.items():
+            if isinstance(field, forms.DateField):
+                css = field.widget.attrs.get('class', '')
+                field.widget.attrs['class'] = css + ' datepicker'
+
     def _only_active_and_initial_users(self, formfield, pk):
         d = defaultdict(list)
         for user in User.objects.filter(Q(is_active=True) | Q(pk=pk)):
