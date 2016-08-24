@@ -5,7 +5,7 @@ from projects.models import Project
 from projects.views import (
     StoryCreateView, OfferCreateView, EstimationView)
 from tools.views import (
-    ListView, DetailView, CreateView, UpdateView, DeleteView)
+    ListView, DetailView, CreateView, UpdateView, DeleteView, HistoryView)
 
 
 urlpatterns = [
@@ -60,4 +60,8 @@ urlpatterns = [
     #     r'^(?P<pk>\d+)/planning/$',
     #     views.PlanningView.as_view(),
     #     name='projects_project_planning'),
+    url(
+        r'^(?P<pk>\d+)/history/$',
+        HistoryView.as_view(model=Project),
+        name='projects_project_history'),
 ]

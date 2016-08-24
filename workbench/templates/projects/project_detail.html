@@ -1,13 +1,20 @@
 {% extends "base.html" %}
 
-{% load history i18n %}
+{% load history i18n workbench %}
 
 {% block title %}{{ project }} - {% trans "projects" %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row">
 <div class="col-md-12">
-  <h1>{{ project }}</h1>
+  <h1>
+    {{ project }}
+
+    <a href="{{ object.urls.history }}" class="tiny-icons" data-toggle="ajaxmodal"
+        title="{% trans 'History' %}">
+      <i class="glyphicon glyphicon-time"></i>
+    </a>
+  </h1>
 
   <div class="row">
     <div class="col-md-6">
@@ -15,7 +22,7 @@
       <table class="table">
         <tr>
           <th>{% trans 'description' %}</th>
-          <td>{{ project.description|linebreaksbr }}</td>
+          <td>{{ project.description|linebreaksbr|default:'&ndash;' }}</td>
         </tr>
         <tr>
           <th>
@@ -31,15 +38,11 @@
         </tr>
         <tr>
           <th>{% trans 'customer' %}</th>
-          <td>
-            <a href="{{ project.customer.urls.detail }}">
-              {{ project.customer }}
-            </a>
-            /
-            <a href="{{ project.contact.urls.detail }}">
-              {{ project.contact.full_name }}
-            </a>
-          </td>
+          <td>{% link_or_none project.customer %}</td>
+        </tr>
+        <tr>
+          <th>{% trans 'contact' %}</th>
+          <td>{% link_or_none project.contact %}</td>
         </tr>
         <tr>
           <th>{% trans 'status' %}</th>
@@ -115,9 +118,6 @@
           </tr>
         {% endfor %}
       </table>
-
-      <h2>{% trans 'History' %}</h2>
-      {% history project 'customer, contact, title, description, owned_by, status, invoicing, maintenance' %}
     </div>
   </div>
 
