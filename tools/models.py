@@ -164,3 +164,7 @@ class ModelWithTotal(Model):
     @property
     def tax_amount(self):
         return (self.subtotal - self.discount) * self.tax_rate / 100
+
+    @property
+    def total_excl_tax(self):
+        return self.subtotal - self.discount

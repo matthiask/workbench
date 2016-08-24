@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load bootstrap3 i18n querystring %}
+{% load bootstrap3 i18n querystring workbench %}
 
 {% block title %}{% trans "invoices" %} - {{ block.super }}{% endblock %}
 
@@ -12,7 +12,7 @@
     <table class="table table-hover table-striped table-linearize">
       <thead>
         <tr>
-          <td colspan="4">
+          <td colspan="5">
             <a href="{% url 'invoices_invoice_create' %}" class="btn btn-default pull-right">
               <span class="glyphicon glyphicon-plus"></span>
               {{ view.meta.verbose_name }}
@@ -36,6 +36,7 @@
           <th>{% trans 'customer' %}</th>
           <th class="hidden-xs">{% trans 'owned by' %}</th>
           <th>{% trans 'status' %}</th>
+          <th class="text-right">{% trans 'total excl. tax' %}</th>
         </tr>
       </thead>
       <tbody>
@@ -47,12 +48,13 @@
             <td>{{ invoice.contact|default:invoice.customer }}</td>
             <td class="hidden-xs">{{ invoice.owned_by.get_short_name }}</td>
             <td>{{ invoice.pretty_status }}</td>
+            <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
           </tr>
         {% endfor %}
       </tbody>
       <tfoot>
         <tr>
-          <th colspan="4">
+          <th colspan="5">
             {{ paginator.count }} {{ view.meta.verbose_name_plural }}
             {% if view.root_queryset_count != paginator.count %}
             (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
