@@ -95,8 +95,12 @@ $(function() {
       window.location.href = '/contacts/organizations/';
     } else if (e.keyCode === 80) {  // p
       window.location.href = '/projects/';
+    } else if (e.keyCode === 79) {  // o
+        window.location.href = '/offers/';
     } else if (e.keyCode === 82) {  // r
       window.location.href = '/invoices/';
+    } else if (e.keyCode === 65) {  // a
+      window.location.href = '/activities/';
     } else if (e.keyCode === 13) {
       $(e.target).parents('form').submit();
     } else {
