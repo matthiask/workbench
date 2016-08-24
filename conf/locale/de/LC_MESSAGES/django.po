@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-24 14:40+0200\n"
+"POT-Creation-Date: 2016-08-24 17:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,7 +26,7 @@ msgid "Please authenticate."
 msgstr "Bitte authentifizieren."
 
 #: accounts/models.py:51 contacts/models.py:145
-#: workbench/templates/contacts/person_list.html:36
+#: workbench/templates/contacts/person_list.html:10
 msgid "email"
 msgstr "Email"
 
@@ -77,7 +77,7 @@ msgstr "Du wurdest abgemeldet."
 
 #: activities/__init__.py:10 activities/models.py:95
 #: workbench/templates/base.html:39
-#: workbench/templates/projects/project_detail.html:99
+#: workbench/templates/projects/project_detail.html:95
 #: workbench/templates/start.html:26
 msgid "activities"
 msgstr "Aktivitäten"
@@ -85,13 +85,12 @@ msgstr "Aktivitäten"
 #: activities/forms.py:15 activities/models.py:59 deals/models.py:61
 #: invoices/models.py:92 offers/models.py:59 projects/models.py:76
 #: stories/models.py:60 workbench/templates/activities/activity_detail.html:10
-#: workbench/templates/activities/activity_list.html:38
-#: workbench/templates/deals/deal_detail.html:18
-#: workbench/templates/deals/deal_list.html:40
-#: workbench/templates/invoices/invoice_list.html:37
-#: workbench/templates/offers/offer_list.html:38
-#: workbench/templates/projects/project_detail.html:29
-#: workbench/templates/projects/project_list.html:37
+#: workbench/templates/activities/activity_list.html:43
+#: workbench/templates/deals/deal_list.html:11
+#: workbench/templates/invoices/invoice_list.html:12
+#: workbench/templates/offers/offer_list.html:13
+#: workbench/templates/projects/project_detail.html:37
+#: workbench/templates/projects/project_list.html:12
 msgid "owned by"
 msgstr "Gehört"
 
@@ -112,20 +111,21 @@ msgid "is completed"
 msgstr "ist erledigt"
 
 #: activities/models.py:36 invoices/models.py:60 projects/models.py:64
-#: workbench/templates/invoices/invoice_detail.html:25
+#: workbench/templates/invoices/invoice_detail.html:18
+#: workbench/templates/projects/project_detail.html:33
 msgid "contact"
 msgstr "Kontakt"
 
 #: activities/models.py:44 invoices/models.py:67 offers/models.py:38
 #: projects/models.py:100 projects/models.py:182 stories/admin.py:35
-#: stories/models.py:72 workbench/templates/invoices/invoice_detail.html:29
-#: workbench/templates/offers/offer_list.html:37
-#: workbench/templates/projects/project_list.html:35
+#: stories/models.py:72 workbench/templates/invoices/invoice_detail.html:22
+#: workbench/templates/offers/offer_list.html:12
+#: workbench/templates/projects/project_list.html:10
 msgid "project"
 msgstr "Projekt"
 
 #: activities/models.py:50 deals/models.py:84
-#: workbench/templates/deals/deal_list.html:39
+#: workbench/templates/deals/deal_list.html:10
 msgid "deal"
 msgstr "Geschäft"
 
@@ -162,7 +162,8 @@ msgid "completed at"
 msgstr "Erledigt um"
 
 #: activities/models.py:94 workbench/templates/contacts/person_detail.html:58
-#: workbench/templates/projects/project_detail.html:97
+#: workbench/templates/deals/deal_detail.html:29
+#: workbench/templates/projects/project_detail.html:93
 msgid "activity"
 msgstr "Aktivität"
 
@@ -231,7 +232,7 @@ msgid "group"
 msgstr "Gruppe"
 
 #: contacts/models.py:18 contacts/models.py:35 contacts/models.py:73
-#: workbench/templates/contacts/organization_detail.html:34
+#: workbench/templates/contacts/organization_detail.html:35
 msgid "groups"
 msgstr "Gruppen"
 
@@ -240,7 +241,7 @@ msgid "name"
 msgstr "Name"
 
 #: contacts/models.py:27 contacts/models.py:59
-#: workbench/templates/contacts/organization_detail.html:46
+#: workbench/templates/contacts/organization_detail.html:47
 #: workbench/templates/contacts/person_detail.html:45
 msgid "notes"
 msgstr "Bemerkungen"
@@ -250,15 +251,14 @@ msgid "primary contact"
 msgstr "Hauptkontakt"
 
 #: contacts/models.py:44 contacts/models.py:64
-#: workbench/templates/contacts/organization_detail.html:13
-#: workbench/templates/contacts/organization_list.html:35
+#: workbench/templates/contacts/organization_detail.html:14
+#: workbench/templates/contacts/organization_list.html:9
 #: workbench/templates/contacts/person_detail.html:13
 msgid "organization"
 msgstr "Organisation"
 
 #: contacts/models.py:45 workbench/templates/base.html:33
 #: workbench/templates/contacts/organization_detail.html:5
-#: workbench/templates/contacts/organization_list.html:5
 msgid "organizations"
 msgstr "Organisationen"
 
@@ -271,18 +271,17 @@ msgid "E.g. Dear John."
 msgstr "Z.B. Lieber Hans."
 
 #: contacts/models.py:82 contacts/models.py:119 contacts/models.py:143
-#: contacts/models.py:167 workbench/templates/contacts/person_list.html:35
+#: contacts/models.py:167 workbench/templates/contacts/person_list.html:9
 msgid "person"
 msgstr "Person"
 
 #: contacts/models.py:83 workbench/templates/base.html:34
-#: workbench/templates/contacts/organization_detail.html:23
-#: workbench/templates/contacts/organization_list.html:36
-#: workbench/templates/contacts/person_list.html:5
+#: workbench/templates/contacts/organization_detail.html:24
+#: workbench/templates/contacts/organization_list.html:10
 msgid "people"
 msgstr "Personen"
 
-#: contacts/models.py:99 invoices/forms.py:140 invoices/models.py:100
+#: contacts/models.py:99 invoices/forms.py:141 invoices/models.py:100
 msgid "type"
 msgstr "Typ"
 
@@ -291,7 +290,7 @@ msgid "weight"
 msgstr "Gewichtung"
 
 #: contacts/models.py:121 contacts/models.py:125
-#: workbench/templates/contacts/person_list.html:37
+#: workbench/templates/contacts/person_list.html:11
 msgid "phone number"
 msgstr "Telefonnummer"
 
@@ -309,7 +308,7 @@ msgstr "Emailadressen"
 
 #: contacts/models.py:169 contacts/models.py:173 invoices/models.py:112
 #: offers/forms.py:67 offers/models.py:68
-#: workbench/templates/invoices/invoice_detail.html:41
+#: workbench/templates/invoices/invoice_detail.html:34
 msgid "postal address"
 msgstr "Postadresse"
 
@@ -328,8 +327,7 @@ msgid "All states"
 msgstr "Alle Stati"
 
 #: deals/forms.py:31 deals/models.py:22 deals/models.py:49
-#: workbench/templates/deals/deal_detail.html:26
-#: workbench/templates/deals/deal_list.html:42
+#: workbench/templates/deals/deal_list.html:13
 msgid "stage"
 msgstr "Stadium"
 
@@ -352,33 +350,26 @@ msgstr "Abgelehnt"
 
 #: deals/models.py:56 invoices/models.py:87 offers/models.py:54
 #: projects/models.py:71 stories/models.py:66 stories/models.py:285
-#: workbench/templates/deals/deal_detail.html:14
-#: workbench/templates/invoices/invoice_detail.html:37
+#: workbench/templates/invoices/invoice_detail.html:30
 #: workbench/templates/projects/project_detail.html:17
 msgid "description"
 msgstr "Beschreibung"
 
-#: deals/models.py:64 workbench/templates/deals/deal_detail.html:22
-#: workbench/templates/deals/deal_list.html:41
+#: deals/models.py:64 workbench/templates/deals/deal_detail.html:18
+#: workbench/templates/deals/deal_list.html:12
 msgid "estimated value"
 msgstr "geschätzter Wert"
 
 #: deals/models.py:69 invoices/models.py:96 offers/models.py:63
 #: projects/models.py:80 stories/models.py:90
 #: workbench/templates/activities/activity_detail.html:14
-#: workbench/templates/activities/activity_list.html:39
-#: workbench/templates/contacts/organization_list.html:29
-#: workbench/templates/contacts/person_list.html:29
-#: workbench/templates/deals/deal_detail.html:30
-#: workbench/templates/deals/deal_list.html:43
-#: workbench/templates/invoices/invoice_detail.html:33
-#: workbench/templates/invoices/invoice_list.html:29
-#: workbench/templates/invoices/invoice_list.html:38
-#: workbench/templates/offers/offer_list.html:29
-#: workbench/templates/offers/offer_list.html:39
-#: workbench/templates/projects/project_detail.html:45
-#: workbench/templates/projects/project_list.html:29
-#: workbench/templates/projects/project_list.html:38
+#: workbench/templates/activities/activity_list.html:44
+#: workbench/templates/deals/deal_list.html:14
+#: workbench/templates/invoices/invoice_detail.html:26
+#: workbench/templates/invoices/invoice_list.html:13
+#: workbench/templates/offers/offer_list.html:14
+#: workbench/templates/projects/project_detail.html:41
+#: workbench/templates/projects/project_list.html:13
 msgid "status"
 msgstr "Status"
 
@@ -388,12 +379,11 @@ msgstr "Geschlossen um"
 
 #: invoices/__init__.py:10 invoices/models.py:127
 #: workbench/templates/base.html:38
-#: workbench/templates/invoices/invoice_list.html:5
 msgid "invoices"
 msgstr "Rechnungen"
 
 #: invoices/forms.py:54 tools/models.py:138 tools/pdf.py:214
-#: workbench/templates/invoices/invoice_detail.html:45
+#: workbench/templates/invoices/invoice_detail.html:38
 msgid "subtotal"
 msgstr "Zwischentotal"
 
@@ -410,9 +400,8 @@ msgstr ""
 "Sie haben %(fields)s geändert. Ich versuche, unabsichtliche Änderungen an "
 "Feldern ausser Status zu verhindern. Sind Sie sicher?"
 
-#: invoices/forms.py:108
+#: invoices/forms.py:107
 #, python-format
-#| msgid "Moving status from %(from)s to status %(to)s. Are you sure?"
 msgid "Moving status from '%(from)s' to '%(to)s'. Are you sure?"
 msgstr "Status von '%(from)s' zu '%(to)s' ändern. Sind Sie sicher?"
 
@@ -453,11 +442,11 @@ msgid "Down payment"
 msgstr "Anzahlung"
 
 #: invoices/models.py:53 projects/models.py:57
-#: workbench/templates/invoices/invoice_detail.html:21
-#: workbench/templates/invoices/invoice_list.html:36
-#: workbench/templates/offers/offer_list.html:36
-#: workbench/templates/projects/project_detail.html:33
-#: workbench/templates/projects/project_list.html:36
+#: workbench/templates/invoices/invoice_detail.html:14
+#: workbench/templates/invoices/invoice_list.html:11
+#: workbench/templates/offers/offer_list.html:11
+#: workbench/templates/projects/project_detail.html:29
+#: workbench/templates/projects/project_list.html:11
 msgid "customer"
 msgstr "Kunde"
 
@@ -476,13 +465,14 @@ msgstr "Stories"
 
 #: invoices/models.py:126 stories/models.py:292
 #: workbench/templates/contacts/person_detail.html:54
-#: workbench/templates/invoices/invoice_list.html:35
+#: workbench/templates/invoices/invoice_list.html:10
 msgid "invoice"
 msgstr "Rechnung"
 
 #: invoices/models.py:143
 msgid "Invoice and/or due date missing for selected state."
-msgstr "Rechnungs- und/oder Fälligkeitsdatum fehlen für den augewählten Status."
+msgstr ""
+"Rechnungs- und/oder Fälligkeitsdatum fehlen für den augewählten Status."
 
 #: invoices/models.py:156
 #, python-format
@@ -505,7 +495,6 @@ msgid "Paid on %(closed_on)s"
 msgstr "Bezahlt am %(closed_on)s"
 
 #: offers/__init__.py:10 offers/models.py:78 workbench/templates/base.html:37
-#: workbench/templates/offers/offer_list.html:5
 msgid "offers"
 msgstr "Offerten"
 
@@ -530,8 +519,8 @@ msgid "offered on"
 msgstr "offeriert am"
 
 #: offers/models.py:77 stories/models.py:86
-#: workbench/templates/offers/offer_list.html:35
-#: workbench/templates/projects/project_detail.html:83
+#: workbench/templates/offers/offer_list.html:10
+#: workbench/templates/projects/project_detail.html:79
 msgid "offer"
 msgstr "Offerte"
 
@@ -546,7 +535,6 @@ msgstr ""
 #: projects/__init__.py:10 projects/models.py:101
 #: workbench/templates/base.html:36
 #: workbench/templates/projects/project_detail.html:5
-#: workbench/templates/projects/project_list.html:5
 msgid "projects"
 msgstr "Projekte"
 
@@ -660,7 +648,7 @@ msgid "This field should be left empty most of the time."
 msgstr "Dieses Feld sollte meistens leer gelassen werden."
 
 #: stories/models.py:110 stories/models.py:208 stories/models.py:257
-#: workbench/templates/projects/project_detail.html:80
+#: workbench/templates/projects/project_detail.html:76
 #: workbench/templates/projects/project_estimation.html:24
 #: workbench/templates/stories/renderedservice_detail.html:12
 msgid "story"
@@ -818,19 +806,19 @@ msgid "Sign in"
 msgstr "Anmelden"
 
 #: workbench/templates/activities/activity_detail.html:18
-#: workbench/templates/activities/activity_list.html:37
+#: workbench/templates/activities/activity_list.html:42
 msgid "context"
 msgstr "Kontext"
 
 #: workbench/templates/activities/activity_detail.html:30
-#: workbench/templates/contacts/organization_detail.html:54
+#: workbench/templates/contacts/organization_detail.html:55
 #: workbench/templates/contacts/person_detail.html:60
-#: workbench/templates/deals/deal_detail.html:38
-#: workbench/templates/invoices/invoice_detail.html:54
+#: workbench/templates/deals/deal_detail.html:31
+#: workbench/templates/invoices/invoice_detail.html:47
 #: workbench/templates/offers/offer_detail.html:16
-#: workbench/templates/projects/project_detail.html:87
+#: workbench/templates/projects/project_detail.html:83
 #: workbench/templates/stories/story_detail.html:98
-#: workbench/templates/tools/object_detail.html:13
+#: workbench/templates/tools/object_detail.html:22
 msgid "Update"
 msgstr "Bearbeiten"
 
@@ -839,33 +827,21 @@ msgstr "Bearbeiten"
 msgid "Close"
 msgstr "Schliessen"
 
-#: workbench/templates/activities/activity_list.html:23
-#: workbench/templates/activities/activity_list.html:28
-#: workbench/templates/contacts/organization_list.html:22
-#: workbench/templates/contacts/organization_list.html:27
-#: workbench/templates/contacts/person_list.html:22
-#: workbench/templates/contacts/person_list.html:27
-#: workbench/templates/deals/deal_list.html:23
-#: workbench/templates/deals/deal_list.html:28
-#: workbench/templates/invoices/invoice_list.html:22
-#: workbench/templates/invoices/invoice_list.html:27
-#: workbench/templates/offers/offer_list.html:22
-#: workbench/templates/offers/offer_list.html:27
-#: workbench/templates/projects/project_list.html:22
-#: workbench/templates/projects/project_list.html:27
+#: workbench/templates/activities/activity_list.html:17
+#: workbench/templates/activities/activity_list.html:22
+#: workbench/templates/tools/object_list.html:17
 #: workbench/templates/tools/object_list.html:22
-#: workbench/templates/tools/object_list.html:27
 msgid "search"
 msgstr "Suche"
 
-#: workbench/templates/activities/activity_list.html:63
-#: workbench/templates/contacts/organization_list.html:58
-#: workbench/templates/contacts/person_list.html:64
-#: workbench/templates/deals/deal_list.html:62
-#: workbench/templates/invoices/invoice_list.html:60
-#: workbench/templates/offers/offer_list.html:60
-#: workbench/templates/projects/project_list.html:58
-#: workbench/templates/tools/object_list.html:52
+#: workbench/templates/activities/activity_list.html:68
+#: workbench/templates/contacts/organization_list.html:32
+#: workbench/templates/contacts/person_list.html:38
+#: workbench/templates/deals/deal_list.html:33
+#: workbench/templates/invoices/invoice_list.html:35
+#: workbench/templates/offers/offer_list.html:35
+#: workbench/templates/projects/project_list.html:33
+#: workbench/templates/tools/object_list.html:59
 #, python-format
 msgid "%(total)s total"
 msgstr "%(total)s insgesamt"
@@ -881,18 +857,22 @@ msgid "Settings"
 msgstr "Einstellungen"
 
 #: workbench/templates/base.html:53
+msgid "Admin panel"
+msgstr "Verwaltung"
+
+#: workbench/templates/base.html:59
 msgid "Sign off"
 msgstr "Abmelden"
 
-#: workbench/templates/contacts/organization_detail.html:56
+#: workbench/templates/contacts/organization_detail.html:57
 #: workbench/templates/contacts/person_detail.html:62
-#: workbench/templates/deals/deal_detail.html:40
-#: workbench/templates/invoices/invoice_detail.html:57
+#: workbench/templates/deals/deal_detail.html:33
+#: workbench/templates/invoices/invoice_detail.html:50
 #: workbench/templates/offers/offer_detail.html:19
-#: workbench/templates/projects/project_detail.html:89
+#: workbench/templates/projects/project_detail.html:85
 #: workbench/templates/stories/story_confirm_delete.html:16
 #: workbench/templates/stories/story_detail.html:104
-#: workbench/templates/tools/object_detail.html:16
+#: workbench/templates/tools/object_detail.html:25
 msgid "Delete"
 msgstr "Löschen"
 
@@ -919,20 +899,12 @@ msgstr "%(class)s erstellen"
 msgid "submit"
 msgstr "absenden"
 
-#: workbench/templates/deals/deal_detail.html:36
-msgid "create activity"
-msgstr "Aktivität erstellen"
-
-#: workbench/templates/deals/deal_detail.html:42
-#: workbench/templates/invoices/invoice_detail.html:14
-#: workbench/templates/invoices/invoice_history.html:6
-#: workbench/templates/offers/offer_detail.html:22
-#: workbench/templates/projects/project_detail.html:119
-#: workbench/templates/tools/object_detail.html:19
+#: workbench/templates/history_modal.html:6
+#: workbench/templatetags/history.py:42
 msgid "History"
 msgstr "Geschichte"
 
-#: workbench/templates/invoices/invoice_list.html:39
+#: workbench/templates/invoices/invoice_list.html:14
 msgid "total excl. tax"
 msgstr "Total exkl. MwSt"
 
@@ -940,15 +912,15 @@ msgstr "Total exkl. MwSt"
 msgid "Overall"
 msgstr "Gesamt"
 
-#: workbench/templates/projects/project_detail.html:50
+#: workbench/templates/projects/project_detail.html:46
 msgid "releases and stories"
 msgstr "Versionen und Stories"
 
-#: workbench/templates/projects/project_detail.html:69
+#: workbench/templates/projects/project_detail.html:65
 msgid "No owner"
 msgstr "Gehört niemandem"
 
-#: workbench/templates/projects/project_detail.html:85
+#: workbench/templates/projects/project_detail.html:81
 msgid "estimation"
 msgstr "Schätzung"
 
@@ -976,19 +948,19 @@ msgstr "%(object)s löschen"
 msgid "cancel"
 msgstr "Abbruch"
 
-#: workbench/templates/stories/story_detail.html:19
+#: workbench/templates/stories/story_detail.html:20
 msgid "overview"
 msgstr "Übersicht"
 
-#: workbench/templates/stories/story_detail.html:24
+#: workbench/templates/stories/story_detail.html:25
 msgid "estimated"
 msgstr "geschätzt"
 
-#: workbench/templates/stories/story_detail.html:25
+#: workbench/templates/stories/story_detail.html:26
 msgid "offered"
 msgstr "offeriert"
 
-#: workbench/templates/stories/story_detail.html:26
+#: workbench/templates/stories/story_detail.html:27
 msgid "planning"
 msgstr "geplant"
 
@@ -1017,9 +989,12 @@ msgstr "Löschen"
 msgid "Yes, I am sure."
 msgstr "Ja, ich bin sicher."
 
-#: workbench/views.py:28
+#: workbench/views.py:30
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
+
+#~ msgid "create activity"
+#~ msgstr "Aktivität erstellen"
 
 #~ msgid "create invoice"
 #~ msgstr "Rechnung erstellen"
