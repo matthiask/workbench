@@ -47,6 +47,12 @@
               <li><a href="{% url 'accounts_update' %}">
                 <span class="glyphicon glyphicon-user"></span>
                 {% trans 'Settings' %}</a></li>
+              {% if request.user.is_admin %}
+              <li><a href="{% url 'admin:index' %}">
+                <span class="glyphicon glyphicon-cog"></span>
+                {% trans 'Admin panel' %}
+              </a></li>
+              {% endif %}
               <li class="divider"></li>
               <li><a href="{% url 'logout' %}">
                 <span class="glyphicon glyphicon-log-out"></span>
