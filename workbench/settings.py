@@ -12,6 +12,7 @@ import dj_database_url
 import env
 import os
 import sys
+import types
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 env.read_dotenv()
@@ -134,23 +135,44 @@ FONTS = {
     'bolditalic': os.path.join(BASE_DIR, 'stuff', 'fonts', 'Lato-Bold.ttf'),
 }
 
-WORKBENCH_SSO_DOMAIN = 'feinheit.ch'
-WORKBENCH_PDF_COMPANY = 'FEINHEIT GmbH'
-WORKBENCH_PDF_ADDRESS = 'FEINHEIT GmbH · Molkenstrasse 21 · 8004 Zürich'
-WORKBENCH_PDF_VAT_NO = 'CHE-113.948.417 MWST'
-WORKBENCH_PDF_OFFER_TERMS = [
-    'Bestandteil dieser Offerte sind die zum Zeitpunkt'
-    ' des Vertragsabschlusses aktuellen Allgemeinen'
-    ' Geschäftsbedingungen der FEINHEIT GmbH.',
-    'Die jeweils aktuelle Version'
-    ' finden Sie auf www.feinheit.ch/agb/.',
-]
-WORKBENCH_PDF_INVOICE_PAYMENT = (
-    'Wir bedanken uns für die Überweisung des Betrags mit Angabe'
-    ' der Referenznummer %(code)s innerhalb von %(days)s Tagen'
-    ' (%(due)s) auf Postkonto 85-206645-2'
-    ' / IBAN CH50 0900 0000 8520 6645 2.'
-)
+NAMESPACE = env.env('NAMESPACE', required=True)
+WORKBENCH = {
+    'feinheit': types.SimpleNamespace(
+        SSO_DOMAIN='feinheit.ch',
+        PDF_COMPANY='FEINHEIT AG',
+        PDF_ADDRESS='FEINHEIT AG · Molkenstrasse 21 · 8004 Zürich',
+        PDF_VAT_NO='CHE-113.948.417 MWST',
+        PDF_OFFER_TERMS=[
+            'Bestandteil dieser Offerte sind die zum Zeitpunkt'
+            ' des Vertragsabschlusses aktuellen Allgemeinen'
+            ' Geschäftsbedingungen der FEINHEIT AG.',
+            'Die jeweils aktuelle Version'
+            ' finden Sie auf www.feinheit.ch/agb/.',
+        ],
+        PDF_INVOICE_PAYMENT=(
+            'Wir bedanken uns für die Überweisung des Betrags mit Angabe'
+            ' der Referenznummer %(code)s innerhalb von %(days)s Tagen'
+            ' (%(due)s) auf Postkonto 85-206645-2'
+            ' / IBAN CH50 0900 0000 8520 6645 2.'
+        ),
+    ),
+    'dbpag': types.SimpleNamespace(
+        SSO_DOMAIN='diebruchpiloten.com',
+        PDF_COMPANY='Die Bruchpiloten AG',
+        PDF_ADDRESS='Die Bruchpiloten AG · Molkenstrasse 21 · 8004 Zürich',
+        PDF_VAT_NO='CHE-239.647.366 MWST',
+        PDF_OFFER_TERMS=[
+            'Bestandteil dieser Offerte sind die zum Zeitpunkt'
+            ' des Vertragsabschlusses aktuellen Allgemeinen'
+            ' Geschäftsbedingungen der Die Bruchpiloten AG.'
+        ],
+        PDF_INVOICE_PAYMENT=(
+            'Wir bedanken uns für die Überweisung des Betrags mit Angabe'
+            ' der Referenznummer %(code)s innerhalb von %(days)s Tagen'
+            ' (%(due)s) auf IBAN CH45 0023 0230 2849 4501 Y.'
+        ),
+    ),
+}[env.env('NAMESPACE', required=True)]
 
 SILENCED_SYSTEM_CHECKS = [
     '1_10.W001',  # MIDDLEWARE_CLASSES is not used anymore, thank you.

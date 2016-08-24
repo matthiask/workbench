@@ -116,11 +116,11 @@ class PDFDocument(_PDFDocument):
             canvas.drawString(
                 26 * mm,
                 284 * mm,
-                settings.WORKBENCH_PDF_COMPANY)
+                settings.WORKBENCH.PDF_COMPANY)
 
             canvas.setFont(pdf.style.fontName, 6)
             for i, text in enumerate(reversed(
-                    settings.WORKBENCH_PDF_OFFER_TERMS)):
+                    settings.WORKBENCH.PDF_OFFER_TERMS)):
                 canvas.drawCentredString(
                     108 * mm,
                     (8 + 3 * i) * mm,
@@ -146,13 +146,13 @@ class PDFDocument(_PDFDocument):
             canvas.drawString(
                 26 * mm,
                 284 * mm,
-                settings.WORKBENCH_PDF_COMPANY)
+                settings.WORKBENCH.PDF_COMPANY)
 
             canvas.setFont(pdf.style.fontName, 6)
             canvas.drawString(
                 26 * mm,
                 8 * mm,
-                settings.WORKBENCH_PDF_VAT_NO)
+                settings.WORKBENCH.PDF_VAT_NO)
 
             canvas.setFont(pdf.style.fontName, 6)
             canvas.drawRightString(
@@ -175,7 +175,7 @@ class PDFDocument(_PDFDocument):
         )
 
     def postal_address(self, postal_address):
-        self.smaller(settings.WORKBENCH_PDF_ADDRESS)
+        self.smaller(settings.WORKBENCH.PDF_ADDRESS)
         self.spacer(1 * mm)
 
         self.p(postal_address)
@@ -260,7 +260,7 @@ class PDFDocument(_PDFDocument):
         self.table_total(invoice)
 
         self.spacer()
-        self.p(settings.WORKBENCH_PDF_INVOICE_PAYMENT % {
+        self.p(settings.WORKBENCH.PDF_INVOICE_PAYMENT % {
             'code': invoice.code,
             'days': 15,
             'due': date_fmt(
