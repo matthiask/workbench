@@ -1,7 +1,10 @@
 from django import forms
+from django.db.models import Q
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from invoices.models import Invoice
+from services.models import RenderedService
 from tools.forms import ModelForm
 
 
@@ -33,15 +36,46 @@ class InvoiceForm(ModelForm):
             'status', 'postal_address',
         )
 
-    def _inactive__init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['stories'].queryset = self.instance.project.stories.all()
 
-    def _inactive_save(self):
+        if self.instance.type in (
+                self.instance.FIXED,
+                self.instance.DOWN_PAYMENT):
+            self.fields['subtotal'] = forms.DecimalField(
+                label=_('subtotal'),
+                max_digits=10,
+                decimal_places=2,
+                initial=self.instance.subtotal,
+            )
+
+        elif self.instance.type in (self.instance.SERVICES,):
+            self.fields['services'] = forms.ModelMultipleChoiceField(
+                queryset=RenderedService.objects.filter(
+                    Q(story__project=self.instance.project),
+                    Q(
+                        invoice=None,
+                        archived_at__isnull=False,
+                    ) | Q(invoice=self.instance),
+                ),
+                widget=forms.CheckboxSelectMultiple,
+                initial=RenderedService.objects.filter(invoice=self.instance),
+                label=_('rendered services'),
+            )
+
+    def save(self):
         instance = super().save(commit=False)
-        # Leave out save_m2m by purpose.
-        instance.clear_stories(save=False)
-        instance.add_stories(
-            self.cleaned_data.get('stories'),
-            save=True)
+
+        if instance.type in (self.instance.SERVICES,):
+            # Leave out save_m2m by purpose.
+            instance.clear_stories(save=False)
+            instance.add_stories(
+                self.cleaned_data.get('stories'),
+                save=True)
+
+            self.cleaned_data.get('services').update(
+                invoice=instance,
+                archived_at=timezone.now(),
+            )
+
         return instance
