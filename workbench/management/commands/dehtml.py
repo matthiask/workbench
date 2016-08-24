@@ -54,7 +54,7 @@ def dehtml(text):
 class Command(BaseCommand):
     help = 'De-htmlizes description fields'
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         for instance in Invoice.objects.all():
             instance.description = dehtml(instance.description)
             instance.save(update_fields=('description',))
