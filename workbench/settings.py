@@ -18,6 +18,7 @@ env.read_dotenv()
 
 SECRET_KEY = env.env('SECRET_KEY', required=True)
 DEBUG = any(arg in ('runserver',) for arg in sys.argv)
+LIVE = env.env('LIVE', default=False)
 ALLOWED_HOSTS = env.env('ALLOWED_HOSTS', default=[])
 ADMINS = (
     ('Matthias Kestenholz', 'mk@feinheit.ch'),
@@ -52,7 +53,8 @@ INSTALLED_APPS = (
 AUTH_USER_MODEL = 'accounts.User'
 LOGIN_REDIRECT_URL = '/'
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
+    # 'django.middleware.security.SecurityMiddleware',  # Revisit when SSLing.
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -60,8 +62,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'django.middleware.security.SecurityMiddleware',  # Revisit when SSLing.
-    'accounts.middleware.LoginRequiredMiddleware',
+    'accounts.middleware.login_required',
 )
 
 ROOT_URLCONF = 'workbench.urls'
@@ -153,6 +154,18 @@ WORKBENCH_PDF_INVOICE_PAYMENT = (
     ' / IBAN CH50 0900 0000 8520 6645 2.'
 )
 
+SILENCED_SYSTEM_CHECKS = [
+    '1_10.W001',  # MIDDLEWARE_CLASSES is not used anymore, thank you.
+]
+
 if DEBUG:
-    MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+    MIDDLEWARE += ('workbench.middleware.WorkingDebugToolbarMiddleware',)
     INTERNAL_IPS = ['127.0.0.1']
+
+if LIVE:
+    MIDDLEWARE = (
+        'django.middleware.security.SecurityMiddleware',
+    ) + MIDDLEWARE
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_HTTPONLY = True
+    X_FRAME_OPTIONS = 'DENY'

@@ -14,7 +14,7 @@ urlpatterns = [
         r'^bootstrap/$',
         vanilla.TemplateView.as_view(template_name='bootstrap.html')),
 
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 
     url(r'^accounts/', include('accounts.urls')),
     url(r'^activities/', include('activities.urls')),

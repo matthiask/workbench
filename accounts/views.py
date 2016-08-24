@@ -20,7 +20,7 @@ from tools.views import UpdateView
 def accounts(request):
     return http.HttpResponseRedirect(
         reverse('accounts_update')
-        if request.user.is_authenticated()
+        if request.user.is_authenticated
         else reverse('login'))
 
 
@@ -51,7 +51,7 @@ def oauth2_flow(request):
 
 @never_cache
 def login(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return http.HttpResponseRedirect('/')
     return render(request, 'accounts/login.html')
 
