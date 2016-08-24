@@ -33,16 +33,16 @@
           </td>
         </tr>
         <tr>
-          <th>{% trans 'owned by' %}</th>
-          <td>{{ project.owned_by.get_full_name }}</td>
-        </tr>
-        <tr>
           <th>{% trans 'customer' %}</th>
           <td>{% link_or_none project.customer %}</td>
         </tr>
         <tr>
           <th>{% trans 'contact' %}</th>
-          <td>{% link_or_none project.contact %}</td>
+          <td>{% link_or_none project.contact project.contact.full_name %}</td>
+        </tr>
+        <tr>
+          <th>{% trans 'owned by' %}</th>
+          <td>{{ project.owned_by.get_full_name }}</td>
         </tr>
         <tr>
           <th>{% trans 'status' %}</th>

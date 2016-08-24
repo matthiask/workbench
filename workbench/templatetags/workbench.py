@@ -6,16 +6,16 @@ register = template.Library()
 
 
 @register.simple_tag
-def link_or_none(object):
+def link_or_none(object, pretty=None):
     if not object:
         return mark_safe('&ndash;')
     elif hasattr(object, 'get_absolute_url'):
         return format_html(
             '<a href="{}">{}</a>',
             object.get_absolute_url(),
-            object,
+            pretty or object,
         )
-    return object
+    return pretty or object
 
 
 @register.filter
