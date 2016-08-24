@@ -3,7 +3,8 @@ from django.shortcuts import redirect
 
 from contacts.forms import (OrganizationForm, PersonForm)
 from contacts.models import Organization, Person
-from contacts.views import OrganizationListView, PersonListView
+from contacts.views import (
+    OrganizationListView, PersonListView, PersonCreateView)
 from tools.views import (
     ListView, DetailView, CreateView, UpdateView, DeleteView)
 
@@ -66,10 +67,7 @@ urlpatterns = [
         name='contacts_person_detail'),
     url(
         r'^people/create/$',
-        CreateView.as_view(
-            form_class=PersonForm,
-            model=Person,
-        ),
+        PersonCreateView.as_view(),
         name='contacts_person_create'),
     url(
         r'^people/(?P<pk>\d+)/update/$',

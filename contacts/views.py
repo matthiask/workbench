@@ -1,6 +1,6 @@
-from contacts.forms import OrganizationSearchForm
+from contacts.forms import OrganizationSearchForm, PersonForm
 from contacts.models import Organization, Person
-from tools.views import ListView
+from tools.views import ListView, CreateView
 
 
 class OrganizationListView(ListView):
@@ -30,3 +30,11 @@ class PersonListView(ListView):
                 ' ORDER BY weight DESC LIMIT 1)'
             ),
         })
+
+
+class PersonCreateView(CreateView):
+    form_class = PersonForm
+    model = Person
+
+    def get_success_url(self):
+        return self.object.urls.url('update')
