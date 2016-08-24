@@ -1,0 +1,10 @@
+{% extends "modal.html" %}
+{% load history i18n %}
+
+{% block size %}modal-lg{% endblock %}
+
+{% block title %}{% trans 'History' %}{% endblock %}
+
+{% block body %}
+{% history object 'invoiced_on, due_on, title, description, owned_by, status, discount, total' %}
+{% endblock %}

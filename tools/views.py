@@ -191,3 +191,7 @@ class MessageView(vanilla.View):
                 self.message)
 
         return redirect(self.redirect_to)
+
+
+class HistoryView(DetailView):
+    template_name_suffix = '_history'

@@ -47,3 +47,8 @@ th.number {
 .navbar a {
   font-weight: bold;
 }
+
+.tiny-icons {
+  display: inline-block;
+  transform: scale(.5) translateY(-30%);
+}

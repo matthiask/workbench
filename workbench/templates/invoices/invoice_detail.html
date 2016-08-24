@@ -7,7 +7,14 @@
 {% block content %}
 <div class="row">
 <div class="col-md-12">
-  <h1>{{ object }}</h1>
+  <h1>
+    {{ object }}
+
+    <a href="{{ object.urls.history }}" class="tiny-icons" data-toggle="ajaxmodal"
+        title="{% trans 'History' %}">
+      <i class="glyphicon glyphicon-time"></i>
+    </a>
+  </h1>
 
   <a href="{{ object.urls.pdf }}" class="btn btn-default">
     PDF
@@ -19,8 +26,9 @@
     {% trans 'Delete' %}
   </a>
 
-  <h2>{% trans 'History' %}</h2>
-  {% history object 'invoiced_on, due_on, title, description, owned_by, status, discount, total' %}
+  <a href="{{ object.urls.history }}" class="btn btn-default" data-toggle="ajaxmodal">
+    History
+  </a>
 </div>
 </div>
 {% endblock %}

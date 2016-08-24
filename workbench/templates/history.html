@@ -1,12 +1,9 @@
 {% load i18n %}
 
 {% for change in changes reversed %}
-  <h3>
-    {% blocktrans with number=change.number user_name=change.version.user_name trimmed %}
-      Version {{ number }} by {{ user_name }}
-    {% endblocktrans %}
-    <small>{{ change.version.action_tstamp_stm }}</small>
-  </h3>
+  <h5>
+    Version {{ change.number }} / {{ change.version.user_name }} / {{ change.version.created_at }}
+  </h5>
   <ul>
     {% for pretty in change.changes %}
       <li>{{ pretty }}</li>
