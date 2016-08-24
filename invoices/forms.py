@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from contacts.models import Organization, Person
 from invoices.models import Invoice
 from stories.models import RenderedService
-from tools.forms import ModelForm, Picker, Textarea
+from tools.forms import ModelForm, Picker, Textarea, WarningsForm
 
 
 class InvoiceSearchForm(forms.Form):
@@ -29,7 +29,7 @@ class InvoiceSearchForm(forms.Form):
         return queryset
 
 
-class InvoiceForm(ModelForm):
+class InvoiceForm(WarningsForm, ModelForm):
     user_fields = default_to_current_user = ('owned_by',)
 
     class Meta:
@@ -70,6 +70,48 @@ class InvoiceForm(ModelForm):
                 initial=RenderedService.objects.filter(invoice=self.instance),
                 label=_('rendered services'),
             )
+
+        if 'ignore_warnings' in self.fields:
+            self.fields.move_to_end('ignore_warnings', last=False)
+
+    def _is_status_unexpected(self, to_status):
+        if not to_status:
+            return False
+
+        from_status = self.instance._orig_status
+
+        if from_status > to_status or from_status >= Invoice.PAID:
+            return True
+        return False
+
+    def clean(self):
+        data = super().clean()
+
+        if self.instance.status > self.instance.IN_PREPARATION:
+            if (set(self.changed_data) - {'status'}):
+                self.add_warning(_(
+                    'You are attempting to change %(fields)s.'
+                    ' I am trying to prevent unintentional changes to'
+                    ' anything but the status field.'
+                    ' Are you sure?'
+                ) % {
+                    'fields': ', '.join(
+                        "'%s'" % self.fields[field].label
+                        for field in self.changed_data
+                    ),
+                })
+
+        if self._is_status_unexpected(data.get('status')):
+            s_dict = dict(Invoice.STATUS_CHOICES)
+            self.add_warning(_(
+                "Moving status from '%(from)s' to '%(to)s'."
+                " Are you sure?"
+            ) % {
+                'from': s_dict[self.instance._orig_status],
+                'to': s_dict[data['status']],
+            })
+
+        return data
 
     def save(self):
         instance = super().save(commit=False)

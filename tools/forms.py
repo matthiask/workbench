@@ -109,3 +109,44 @@ class Picker(forms.TextInput):
             'field': format_html('<input{} />', flatatt(final_attrs)),
             'pretty': escape(pretty),
         })
+
+
+class WarningsForm(forms.BaseForm):
+    """
+    Form subclass which allows implementing validation warnings
+    In contrast to Django's ``ValidationError``, these warnings may
+    be ignored by checking a checkbox.
+    The warnings support consists of the following methods and properties:
+    * ``WarningsForm.add_warning(<warning>)``: Adds a new warning message
+    * ``WarningsForm.warnings``: A list of warnings or an empty list if there
+      are none.
+    * ``WarningsForm.is_valid()``: Overridden ``Form.is_valid()``
+      implementation which returns ``False`` for otherwise valid forms with
+      warnings, if those warnings have not been explicitly ignored (by checking
+      a checkbox or by passing ``ignore_warnings=True`` to ``is_valid()``.
+    * An additional form field named ``ignore_warnings`` is available - this
+      field should only be displayed if ``WarningsForm.warnings`` is non-emtpy.
+    """
+    def __init__(self, *args, **kwargs):
+        super(WarningsForm, self).__init__(*args, **kwargs)
+
+        self.warnings = []
+
+    def add_warning(self, warning):
+        """
+        Adds a new warning, should be called while cleaning the data
+        """
+        self.warnings.append(warning)
+
+    def is_valid(self, ignore_warnings=False):
+        """
+        ``is_valid()`` override which returns ``False`` for forms with warnings
+        if these warnings haven't been explicitly ignored
+        """
+        if not super(WarningsForm, self).is_valid():
+            return False
+
+        if self.warnings and not self.request.POST.get('ignore_warnings'):
+            return False
+
+        return True

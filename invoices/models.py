@@ -2,6 +2,7 @@ from datetime import date
 from decimal import Decimal
 
 from django.contrib.postgres.fields import JSONField
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
@@ -125,8 +126,23 @@ class Invoice(ModelWithTotal):
         verbose_name = _('invoice')
         verbose_name_plural = _('invoices')
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._orig_status = self.status
+
     def __str__(self):
         return self.title
+
+    def clean(self):
+        super().clean()
+
+        if self.status >= self.SENT:
+            if not self.invoiced_on or not self.due_on:
+                raise ValidationError({
+                    'status': _(
+                        'Invoice and/or due date missing for selected state.'
+                    ),
+                })
 
     def pretty_status(self):
         d = {

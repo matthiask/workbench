@@ -1,9 +1,9 @@
 {% load i18n %}
 
 {% for change in changes reversed %}
-  <h5>
+  <h4>
     Version {{ change.number }} / {{ change.version.user_name }} / {{ change.version.created_at }}
-  </h5>
+  </h4>
   <ul>
     {% for pretty in change.changes %}
       <li>{{ pretty }}</li>
