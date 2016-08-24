@@ -45,7 +45,7 @@
             <td>
               {% for person in organization.people.all %}
                 <a href="{{ person.get_absolute_url }}">{{ person.full_name }}</a>{% if not forloop.last %},{% endif %}
-              {% endfor %}
+              {% empty %}&ndash;{% endfor %}
             </td>
           </tr>
         {% endfor %}
