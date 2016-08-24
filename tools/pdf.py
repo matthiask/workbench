@@ -8,6 +8,7 @@ from django.template.defaultfilters import date as date_fmt
 from django.utils.translation import ugettext as _
 
 from pdfdocument.document import (
+    Frame, PageTemplate, NextPageTemplate,
     MarkupParagraph, sanitize, PDFDocument as _PDFDocument, cm, mm, colors,
     getSampleStyleSheet, register_fonts_from_paths)
 from pdfdocument.utils import pdf_response as _pdf_response
@@ -108,6 +109,59 @@ class PDFDocument(_PDFDocument):
             ('TOPPADDING', (0, 1), (-1, 1), 1),
         )
 
+        self.bounds = Empty()
+        self.bounds.N = 280 * mm
+        self.bounds.E = 187 * mm
+        self.bounds.S = 12 * mm
+        self.bounds.W = 23 * mm
+        self.style.tableColumns = (18 * mm, 146 * mm)
+
+    def init_letter(self, page_fn, page_fn_later=None,
+                    address_y=None, address_x=None):
+        self.generate_style()
+
+        frame_kwargs = {
+            'showBoundary': self.show_boundaries,
+            'leftPadding': 0,
+            'rightPadding': 0,
+            'topPadding': 0,
+            'bottomPadding': 0,
+        }
+
+        address_frame = Frame(
+            self.bounds.W,
+            address_y or 20.2 * cm,
+            16.4 * cm,
+            4 * cm,
+            **frame_kwargs
+        )
+        rest_frame = Frame(
+            self.bounds.W,
+            self.bounds.S,
+            self.bounds.E - self.bounds.W,
+            18.2 * cm,
+            **frame_kwargs
+        )
+        full_frame = Frame(
+            self.bounds.W,
+            self.bounds.S,
+            self.bounds.E - self.bounds.W,
+            self.bounds.N - self.bounds.S,
+            **frame_kwargs
+        )
+
+        self.doc.addPageTemplates([
+            PageTemplate(
+                id='First',
+                frames=[address_frame, rest_frame],
+                onPage=page_fn),
+            PageTemplate(
+                id='Later',
+                frames=[full_frame],
+                onPage=page_fn_later or page_fn),
+        ])
+        self.story.append(NextPageTemplate('Later'))
+
     def offer_stationery(self):
         pdf = self
 
@@ -116,23 +170,23 @@ class PDFDocument(_PDFDocument):
 
             canvas.setFont(pdf.style.fontName + '-Bold', 10)
             canvas.drawString(
-                26 * mm,
-                280 * mm,
+                pdf.bounds.W,
+                pdf.bounds.N,
                 settings.WORKBENCH.PDF_COMPANY)
 
             canvas.setFont(pdf.style.fontName, 6)
             for i, text in enumerate(reversed(
                     settings.WORKBENCH.PDF_OFFER_TERMS)):
                 canvas.drawCentredString(
-                    108 * mm,
-                    (12 + 3 * i) * mm,
+                    pdf.bounds.W + .5 * (pdf.bounds.E - pdf.bounds.W),
+                    (pdf.bounds.S + 3 * i) * mm,
                     text)
 
             canvas.setFont(pdf.style.fontName, 6)
             canvas.drawRightString(
-                190 * mm,
-                12 * mm,
-                '%d/%d' % doc.page_index())
+                pdf.bounds.E,
+                pdf.bounds.S,
+                _('page %d') % doc.page)
 
             canvas.restoreState()
 
@@ -146,21 +200,21 @@ class PDFDocument(_PDFDocument):
 
             canvas.setFont(pdf.style.fontName + '-Bold', 10)
             canvas.drawString(
-                26 * mm,
-                280 * mm,
+                pdf.bounds.W,
+                pdf.bounds.N,
                 settings.WORKBENCH.PDF_COMPANY)
 
             canvas.setFont(pdf.style.fontName, 6)
             canvas.drawString(
-                26 * mm,
-                12 * mm,
+                pdf.bounds.W,
+                pdf.bounds.S,
                 settings.WORKBENCH.PDF_ADDRESS)
 
             canvas.setFont(pdf.style.fontName, 6)
             canvas.drawRightString(
-                190 * mm,
-                12 * mm,
-                '%d/%d' % doc.page_index())
+                pdf.bounds.E,
+                pdf.bounds.S,
+                _('page %d') % doc.page)
 
             canvas.restoreState()
 
@@ -203,7 +257,7 @@ class PDFDocument(_PDFDocument):
 
         self.table(
             table,
-            (1.8 * cm, 14.6 * cm),
+            self.style.tableColumns,
             self.style.tableHead)
 
     def table_total(self, instance):
@@ -222,11 +276,11 @@ class PDFDocument(_PDFDocument):
             ))
 
         if len(total) > 1:
-            self.table(total, (1.8 * cm, 14.6 * cm), self.style.tableHead)
+            self.table(total, self.style.tableColumns, self.style.tableHead)
 
         self.table([
             (currency(instance.total.quantize(Z)), _('total CHF incl. tax')),
-        ], (1.8 * cm, 14.6 * cm), self.style.tableHeadLine)
+        ], self.style.tableColumns, self.style.tableHeadLine)
 
     def process_offer(self, offer):
         self.postal_address(offer.postal_address)
@@ -259,7 +313,7 @@ class PDFDocument(_PDFDocument):
                 else _('NO DATE YET')
             )),
             ('MwSt.-Nr.', settings.WORKBENCH.PDF_VAT_NO),
-        ], (1.8 * cm, 14.6 * cm), self.style.table)
+        ], self.style.tableColumns, self.style.table)
         self.spacer(5 * mm)
 
         self.p(invoice.description)
