@@ -9,6 +9,10 @@ import django.contrib.postgres.fields.hstore
 from django.db import migrations, models
 
 
+with io.open(os.path.join(settings.BASE_DIR, 'stuff', 'audit.sql')) as f:
+    AUDIT_SQL = f.read()
+
+
 class Migration(migrations.Migration):
 
     initial = True
@@ -36,7 +40,5 @@ class Migration(migrations.Migration):
                 'db_table': 'audit_logged_actions',
             },
         ),
-        migrations.RunSQL(io.open(
-            os.path.join(settings.BASE_DIR, 'stuff', 'audit.sql'),
-        ).read()),
+        migrations.RunSQL(AUDIT_SQL),
     ]

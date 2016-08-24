@@ -1,6 +1,7 @@
 import re
 
 from django import template
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import ugettext as _
 
@@ -37,6 +38,6 @@ def history_link(instance):
           <i class="glyphicon glyphicon-time"></i>
         </a>
         ''',
-        '/history/%s/%s/' % (instance._meta.label_lower, instance.pk),
+        reverse('history', args=(instance._meta.label_lower, instance.pk)),
         _('History'),
     )

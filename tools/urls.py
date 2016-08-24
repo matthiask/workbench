@@ -1,4 +1,4 @@
-from django.core.urlresolvers import NoReverseMatch, reverse
+from django.urls import NoReverseMatch, reverse
 
 
 class _MUHelper(object):
