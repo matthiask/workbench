@@ -10,11 +10,14 @@ $(function() {
     dismissModals();
 
     $(data).modal();
+
     if (!('ontouchstart' in document.documentElement)) {
       setTimeout(function() {
         $('.modal').find('input, select').filter(':visible').first().focus();
       }, 500);
     }
+
+    initWidgets();
   };
 
   $(document.body).on('click', '[data-toggle=ajaxmodal]', function(event) {
