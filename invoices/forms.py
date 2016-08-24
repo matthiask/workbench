@@ -80,6 +80,8 @@ class InvoiceForm(ModelForm):
                 invoice=instance,
                 archived_at=timezone.now(),
             )
+        else:
+            instance.save()
 
         return instance
 
