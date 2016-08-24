@@ -1,7 +1,7 @@
 from html.parser import HTMLParser
 import re
 
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 from invoices.models import Invoice
 from offers.models import Offer
@@ -51,7 +51,7 @@ def dehtml(text):
         return text
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = 'De-htmlizes description fields'
 
     def handle_noargs(self, **options):

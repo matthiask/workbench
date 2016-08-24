@@ -1,11 +1,11 @@
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from django.db import connections
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = 'Fixes all sequences to yield non-existing keys afterwards'
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         cursor = connections['default'].cursor()
 
         # Thanks, https://wiki.postgresql.org/wiki/Fixing_Sequences
