@@ -14,10 +14,13 @@ def set_user_name(username):
 def login_required(get_response):
     def middleware(request):
         if request.user.is_authenticated:
-            set_user_name(request.user.get_full_name())
+            set_user_name('user-%d-%s' % (
+                request.user.id,
+                request.user.get_short_name(),
+            ))
             return get_response(request)
 
-        set_user_name('Anonymous')
+        set_user_name('user-0-anonymous')
 
         if request.path.startswith('/accounts/'):
             return get_response(request)

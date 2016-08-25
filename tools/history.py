@@ -1,10 +1,12 @@
 from collections import namedtuple
 from functools import lru_cache
+import re
 
 from django.db import models
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
+from accounts.models import User
 from audit.models import LoggedAction
 
 
@@ -58,6 +60,15 @@ def formatter(field):
 def changes(instance, fields):
     versions = LoggedAction.objects.for_instance(instance)
     changes = []
+
+    users = {str(u.pk): u.get_full_name() for u in User.objects.all()}
+    for version in versions:
+        match = re.search(r'^user-(\d+)-', version.user_name)
+        if match:
+            pk = match.groups()[0]
+            version.pretty_user_name = users.get(pk) or version.user_name
+        else:
+            version.pretty_user_name = version.user_name
 
     field_instances = [instance._meta.get_field(f) for f in fields]
 

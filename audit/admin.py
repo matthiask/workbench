@@ -10,6 +10,7 @@ class LoggedActionAdmin(admin.ModelAdmin):
     list_display = (
         '__str__',
         'data',
+        'user_name',
         'created_at',
     )
     ordering = ('-created_at',)
