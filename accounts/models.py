@@ -11,7 +11,7 @@ from tools.models import Model
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, _short_name, _full_name, date_of_birth):
+    def create_user(self, email, password):
         """
         Creates and saves a User with the given email, date of birth.
         """
@@ -20,25 +20,19 @@ class UserManager(BaseUserManager):
 
         user = self.model(
             email=self.normalize_email(email),
-            _short_name=_short_name,
-            _full_name=_full_name,
-            date_of_birth=date_of_birth,
         )
-
         user.set_unusable_password()
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, _short_name, _full_name, date_of_birth):
+    def create_superuser(self, email, password):
         """
         Creates and saves a superuser with the given email, date of birth.
         """
-        user = self.create_user(
-            email,
-            _short_name=_short_name,
-            _full_name=_full_name,
-            date_of_birth=date_of_birth,
+        user = self.model(
+            email=self.normalize_email(email),
         )
+        user.set_unusable_password()
         user.is_admin = True
         user.save(using=self._db)
         return user
@@ -46,12 +40,11 @@ class UserManager(BaseUserManager):
 
 class User(Model, AbstractBaseUser):
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['_full_name', '_short_name', 'date_of_birth']
+    REQUIRED_FIELDS = []
 
     email = models.EmailField(_('email'), max_length=254, unique=True)
     is_active = models.BooleanField(_('is active'), default=True)
     is_admin = models.BooleanField(_('is admin'), default=False)
-    date_of_birth = models.DateField(_('date of birth'))
 
     _short_name = models.CharField(_('short name'), blank=True, max_length=30)
     _full_name = models.CharField(_('full name'), blank=True, max_length=200)

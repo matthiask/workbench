@@ -10,8 +10,7 @@ class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
         fields = (
-            'email', '_short_name', '_full_name', 'date_of_birth',
-            'is_active', 'is_admin',
+            'email', '_short_name', '_full_name', 'is_active', 'is_admin'
         )
 
 
@@ -20,16 +19,21 @@ class UserAdmin(UserAdmin):
     add_form = UserChangeForm
 
     list_display = (
-        'email', '_short_name', '_full_name', 'date_of_birth',
-        'is_active', 'is_admin')
+        'email', '_short_name', '_full_name', 'is_active', 'is_admin')
     list_filter = ('is_active', 'is_admin')
     fieldsets = (
-        (None, {'fields': (
-            'email',
-            ('is_active', 'is_admin'),
-        )}),
-        ('Personal info', {'fields': (
-            '_short_name', '_full_name', 'date_of_birth',)}),
+        (None, {
+            'fields': (
+                'email',
+                ('is_active', 'is_admin'),
+            ),
+        }),
+        ('Personal info', {
+            'fields': (
+                '_short_name',
+                '_full_name',
+            ),
+        }),
     )
     add_fieldsets = fieldsets
     search_fields = ('email', '_short_name', '_full_name')

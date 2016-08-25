@@ -1,5 +1,3 @@
-from datetime import date
-
 from django import http
 from django.conf import settings
 from django.contrib import messages
@@ -82,7 +80,6 @@ def oauth2(request):
                 email=email,
                 is_active=True,
                 is_admin=False,
-                date_of_birth=date.today(),
                 _short_name='',
                 _full_name='',
             )
