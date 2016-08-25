@@ -121,6 +121,15 @@ function initWidgets() {
     locale: 'de',
     format: 'DD.MM.YYYY'
   });
+
+  var invoicedOn = $('#id_invoiced_on');
+  var dueOn = $('#id_due_on');
+  if (invoicedOn.length && dueOn.length) {
+      invoicedOn.on('dp.change', function(e) {
+          dueOn.val(e.date.add(14, 'days').calendar());
+      });
+  }
+
 }
 
 function addInlineForm(slug, onComplete) {
