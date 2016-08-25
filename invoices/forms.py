@@ -2,6 +2,7 @@ from datetime import date
 
 from django import forms
 from django.db.models import Q
+from django.template.defaultfilters import date as date_fmt
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -82,12 +83,15 @@ class InvoiceForm(WarningsForm, ModelForm):
 
         from_status = self.instance._orig_status
 
+        if from_status == to_status:
+            return False
         if from_status > to_status or from_status >= Invoice.PAID:
             return True
         return False
 
     def clean(self):
         data = super().clean()
+        s_dict = dict(Invoice.STATUS_CHOICES)
 
         if self.instance.status > self.instance.IN_PREPARATION:
             if (set(self.changed_data) - {'status'}):
@@ -104,7 +108,6 @@ class InvoiceForm(WarningsForm, ModelForm):
                 })
 
         if self._is_status_unexpected(data.get('status')):
-            s_dict = dict(Invoice.STATUS_CHOICES)
             self.add_warning(_(
                 "Moving status from '%(from)s' to '%(to)s'."
                 " Are you sure?"
@@ -112,6 +115,23 @@ class InvoiceForm(WarningsForm, ModelForm):
                 'from': s_dict[self.instance._orig_status],
                 'to': s_dict[data['status']],
             })
+
+        if data.get('status', 0) >= Invoice.PAID:
+            if not self.instance.closed_at:
+                self.instance.closed_at = timezone.now()
+
+        if self.instance.closed_at and data.get('status', 99) < Invoice.PAID:
+            if self.request.POST.get('ignore_warnings'):
+                self.instance.closed_at = None
+            else:
+                self.add_warning(_(
+                    "You are attempting to set status to '%(to)s',"
+                    " but the invoice has already been closed on %(closed)s."
+                    " Are you sure?"
+                ) % {
+                    'to': s_dict[data['status']],
+                    'closed': date_fmt(self.instance.closed_at, 'd.m.Y'),
+                })
 
         return data
 
