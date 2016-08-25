@@ -144,6 +144,7 @@ class CreatePersonInvoiceForm(ModelForm):
         choices=Invoice.TYPE_CHOICES,
         initial=Invoice.FIXED,
         disabled=True,
+        widget=forms.RadioSelect,
     )
 
     class Meta:
@@ -159,14 +160,19 @@ class CreatePersonInvoiceForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         request = kwargs['request']
+        initial = kwargs.setdefault('initial', {})
+        initial.update({'invoiced_on': date.today(), 'subtotal': None})
+
         if request.GET.get('person'):
-            person = Person.objects.get(pk=request.GET.get('person'))
-            kwargs.setdefault('initial', {}).update({
-                'customer': person.organization,
-                'contact': person,
-                'invoiced_on': date.today(),
-                'subtotal': None,
-            })
+            try:
+                person = Person.objects.get(pk=request.GET.get('person'))
+            except (Person.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update({
+                    'customer': person.organization,
+                    'contact': person,
+                })
 
         super().__init__(*args, **kwargs)
 

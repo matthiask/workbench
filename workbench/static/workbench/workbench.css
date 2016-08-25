@@ -32,6 +32,10 @@
 .form-inline.fieldset select,
 .form-inline.fieldset textarea { width: 100%; }
 
+.form-group.required>.control-label {
+  /* TODO? */
+}
+
 th.number {
   text-align: right;
 }
