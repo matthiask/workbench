@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-24 22:28+0200\n"
+"POT-Creation-Date: 2016-08-25 15:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,7 +83,7 @@ msgid "activities"
 msgstr "Aktivitäten"
 
 #: activities/forms.py:15 activities/models.py:59 deals/models.py:61
-#: invoices/models.py:92 offers/models.py:59 projects/models.py:76
+#: invoices/models.py:94 offers/models.py:59 projects/models.py:76
 #: stories/models.py:60 workbench/templates/activities/activity_detail.html:10
 #: workbench/templates/activities/activity_list.html:43
 #: workbench/templates/deals/deal_list.html:11
@@ -102,7 +102,7 @@ msgstr "Alle Benutzer"
 msgid "Owned by inactive users"
 msgstr "Gehört inaktiven Benutzern"
 
-#: activities/forms.py:25 tools/forms.py:60
+#: activities/forms.py:25 tools/forms.py:67
 msgid "Active"
 msgstr "Aktiv"
 
@@ -130,7 +130,7 @@ msgid "deal"
 msgstr "Geschäft"
 
 #: activities/models.py:55 contacts/models.py:13 deals/models.py:12
-#: deals/models.py:53 invoices/models.py:84 offers/models.py:51
+#: deals/models.py:53 invoices/models.py:86 offers/models.py:51
 #: projects/models.py:68 projects/models.py:186 services/models.py:9
 #: stories/models.py:63
 msgid "title"
@@ -281,7 +281,7 @@ msgstr "Person"
 msgid "people"
 msgstr "Personen"
 
-#: contacts/models.py:99 invoices/forms.py:141 invoices/models.py:100
+#: contacts/models.py:99 invoices/forms.py:163 invoices/models.py:102
 msgid "type"
 msgstr "Typ"
 
@@ -306,7 +306,7 @@ msgstr "Emailadresse"
 msgid "email addresses"
 msgstr "Emailadressen"
 
-#: contacts/models.py:169 contacts/models.py:173 invoices/models.py:112
+#: contacts/models.py:169 contacts/models.py:173 invoices/models.py:114
 #: offers/forms.py:67 offers/models.py:68
 #: workbench/templates/invoices/invoice_detail.html:34
 msgid "postal address"
@@ -321,7 +321,7 @@ msgstr "Postadressen"
 msgid "deals"
 msgstr "Geschäfte"
 
-#: deals/forms.py:10 invoices/forms.py:16 offers/forms.py:13
+#: deals/forms.py:10 invoices/forms.py:17 offers/forms.py:13
 #: projects/forms.py:15
 msgid "All states"
 msgstr "Alle Stati"
@@ -348,7 +348,7 @@ msgstr "Akzeptiert"
 msgid "declined"
 msgstr "Abgelehnt"
 
-#: deals/models.py:56 invoices/models.py:87 offers/models.py:54
+#: deals/models.py:56 invoices/models.py:89 offers/models.py:54
 #: projects/models.py:71 stories/models.py:66 stories/models.py:285
 #: workbench/templates/invoices/invoice_detail.html:30
 #: workbench/templates/projects/project_detail.html:17
@@ -360,7 +360,7 @@ msgstr "Beschreibung"
 msgid "estimated value"
 msgstr "geschätzter Wert"
 
-#: deals/models.py:69 invoices/models.py:96 offers/models.py:63
+#: deals/models.py:69 invoices/models.py:98 offers/models.py:63
 #: projects/models.py:80 stories/models.py:90
 #: workbench/templates/activities/activity_detail.html:14
 #: workbench/templates/activities/activity_list.html:44
@@ -373,25 +373,25 @@ msgstr "geschätzter Wert"
 msgid "status"
 msgstr "Status"
 
-#: deals/models.py:77 invoices/models.py:79 offers/models.py:46
+#: deals/models.py:77 invoices/models.py:81 offers/models.py:46
 msgid "closed at"
 msgstr "Geschlossen um"
 
-#: invoices/__init__.py:10 invoices/models.py:127
+#: invoices/__init__.py:10 invoices/models.py:129
 #: workbench/templates/base.html:36
 msgid "invoices"
 msgstr "Rechnungen"
 
-#: invoices/forms.py:54 tools/models.py:136 tools/pdf.py:214
+#: invoices/forms.py:57 tools/models.py:136 tools/pdf.py:265
 #: workbench/templates/invoices/invoice_detail.html:38
 msgid "subtotal"
 msgstr "Zwischentotal"
 
-#: invoices/forms.py:71 stories/models.py:306
+#: invoices/forms.py:74 stories/models.py:306
 msgid "rendered services"
 msgstr "erbrachte Leistungen"
 
-#: invoices/forms.py:93
+#: invoices/forms.py:99
 #, python-format
 msgid ""
 "You are attempting to change %(fields)s. I am trying to prevent "
@@ -400,10 +400,19 @@ msgstr ""
 "Sie haben %(fields)s geändert. Ich versuche, unabsichtliche Änderungen an "
 "Feldern ausser Status zu verhindern. Sind Sie sicher?"
 
-#: invoices/forms.py:107
+#: invoices/forms.py:112
 #, python-format
 msgid "Moving status from '%(from)s' to '%(to)s'. Are you sure?"
 msgstr "Status von '%(from)s' zu '%(to)s' ändern. Sind Sie sicher?"
+
+#: invoices/forms.py:128
+#, python-format
+msgid ""
+"You are attempting to set status to '%(to)s', but the invoice has already "
+"been closed on %(closed)s. Are you sure?"
+msgstr ""
+"Sie versuchen, den Status auf '%(to)s' zu setzen, aber die Rechnung wurde "
+"schon am %(closed)s geschlossen. Sind Sie sicher?"
 
 #: invoices/models.py:32 offers/models.py:28
 msgid "In preparation"
@@ -433,7 +442,7 @@ msgstr "Ersetzt"
 msgid "Fixed amount"
 msgstr "Fixbetrag"
 
-#: invoices/models.py:46 tools/pdf.py:193
+#: invoices/models.py:46 tools/pdf.py:244
 msgid "Services"
 msgstr "Leistungen"
 
@@ -454,42 +463,42 @@ msgstr "Kunde"
 msgid "invoiced on"
 msgstr "Verrechnet am"
 
-#: invoices/models.py:108
+#: invoices/models.py:110
 msgid "down payment applied to"
 msgstr "Anzahlung angewendet auf"
 
-#: invoices/models.py:115 invoices/models.py:118 offers/forms.py:105
+#: invoices/models.py:117 invoices/models.py:120 offers/forms.py:105
 #: offers/models.py:71 stories/__init__.py:10 stories/models.py:111
 msgid "stories"
 msgstr "Stories"
 
-#: invoices/models.py:126 stories/models.py:292 tools/pdf.py:264
+#: invoices/models.py:128 stories/models.py:292 tools/pdf.py:309
 #: workbench/templates/contacts/person_detail.html:54
 #: workbench/templates/invoices/invoice_list.html:10
 msgid "invoice"
 msgstr "Rechnung"
 
-#: invoices/models.py:143
+#: invoices/models.py:145
 msgid "Invoice and/or due date missing for selected state."
 msgstr ""
 "Rechnungs- und/oder Fälligkeitsdatum fehlen für den augewählten Status."
 
-#: invoices/models.py:156
+#: invoices/models.py:158
 #, python-format
 msgid "Sent on %(invoiced_on)s, but overdue"
 msgstr "Versendet am %(invoiced_on)s, aber überfällig"
 
-#: invoices/models.py:158
+#: invoices/models.py:160
 #, python-format
 msgid "Sent on %(invoiced_on)s"
 msgstr "Versendet am %(invoiced_on)s"
 
-#: invoices/models.py:161
+#: invoices/models.py:163
 #, python-format
 msgid "Sent on %(invoiced_on)s, reminded on %(reminded_on)s"
 msgstr "Versendet am %(invoiced_on)s, gemahnt am %(reminded_on)s"
 
-#: invoices/models.py:164
+#: invoices/models.py:166
 #, python-format
 msgid "Paid on %(closed_on)s"
 msgstr "Bezahlt am %(closed_on)s"
@@ -537,11 +546,6 @@ msgstr ""
 #: workbench/templates/projects/project_detail.html:5
 msgid "projects"
 msgstr "Projekte"
-
-#: projects/forms.py:51
-#, python-format
-msgid "The contact %(person)s does not belong to  %(organization)s."
-msgstr "Der Kontakt %(person)s gehört nicht zu %(organization)s."
 
 #: projects/models.py:48
 msgid "Acquisition"
@@ -719,6 +723,11 @@ msgstr "erbrachte Leistung"
 msgid "%(class)s '%(object)s' has been successfully created."
 msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
 
+#: tools/forms.py:85
+#, python-format
+msgid "The contact %(person)s does not belong to  %(organization)s."
+msgstr "Der Kontakt %(person)s gehört nicht zu %(organization)s."
+
 #: tools/history.py:16
 msgid "yes"
 msgstr "ja"
@@ -751,7 +760,7 @@ msgstr "'%(field)s' änderte von '%(previous)s' zu '%(current)s'."
 msgid "Cannot delete '%(object)s' because of related objects (%(related)s)."
 msgstr "Kann '%(object)s' wegen Abhängigkeiten nicht löschen (%(related)s)."
 
-#: tools/models.py:138 tools/pdf.py:219
+#: tools/models.py:138 tools/pdf.py:270
 msgid "discount"
 msgstr "Rabatt"
 
@@ -763,19 +772,24 @@ msgstr "MwSt-Satz"
 msgid "total"
 msgstr "Total"
 
-#: tools/pdf.py:187 tools/pdf.py:267
+#: tools/pdf.py:189 tools/pdf.py:217
+#, python-format
+msgid "page %d"
+msgstr "Seite %d"
+
+#: tools/pdf.py:238 tools/pdf.py:313
 msgid "NO DATE YET"
 msgstr "NOCH KEIN DATUM"
 
-#: tools/pdf.py:224
+#: tools/pdf.py:275
 msgid "tax"
 msgstr "MwSt"
 
-#: tools/pdf.py:231
+#: tools/pdf.py:282
 msgid "total CHF incl. tax"
 msgstr "Total CHF inkl. MwSt"
 
-#: tools/pdf.py:265
+#: tools/pdf.py:311
 msgid "date"
 msgstr "Datum"
 
