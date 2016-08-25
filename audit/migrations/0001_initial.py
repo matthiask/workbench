@@ -6,6 +6,7 @@ import io, os
 
 from django.conf import settings
 import django.contrib.postgres.fields.hstore
+from django.contrib.postgres.operations import (HStoreExtension, UnaccentExtension)
 from django.db import migrations, models
 
 
@@ -21,6 +22,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        HStoreExtension(),
+        UnaccentExtension(),
+
         migrations.CreateModel(
             name='LoggedAction',
             fields=[

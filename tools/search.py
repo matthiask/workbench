@@ -29,7 +29,10 @@ CREATE FUNCTION {table}_fts_document(integer) RETURNS tsvector AS $$
 DECLARE
  {table}_document TEXT;
 BEGIN
- SELECT concat_ws(' ', {fields}) INTO {table}_document
+ SELECT regexp_replace(
+  unaccent(concat_ws(' ', {fields})),
+  '[^0-9A-Za-z]+', ' ')
+ INTO {table}_document
  FROM {table} WHERE id=$1;
  RETURN to_tsvector('pg_catalog.german', {table}_document);
 END;
@@ -72,7 +75,7 @@ def search(queryset, terms):
     return queryset.extra(
         where=[
             '%s.fts_document'
-            ' @@ plainto_tsquery(\'pg_catalog.german\', %%s)' % (
+            ' @@ plainto_tsquery(\'pg_catalog.german\', unaccent(%%s))' % (
                 queryset.model._meta.db_table,
             ),
         ],
