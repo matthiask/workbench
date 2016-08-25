@@ -7,7 +7,7 @@ from django.forms.utils import flatatt
 from django.utils.encoding import force_text
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 from accounts.models import User
 
@@ -50,6 +50,10 @@ class ModelForm(forms.ModelForm):
                 css = field.widget.attrs.get('class', '')
                 field.widget.attrs['class'] = css + ' datepicker'
 
+        if all(f in self.fields for f in ('customer', 'contact')):
+            self.customer_and_contact = True
+            self.fields['customer'].required = False
+
     def _only_active_and_initial_users(self, formfield, pk):
         d = defaultdict(list)
         for user in User.objects.filter(Q(is_active=True) | Q(pk=pk)):
@@ -63,6 +67,32 @@ class ModelForm(forms.ModelForm):
         if not formfield.required:
             choices.insert(0, ('', '----------'))
         formfield.choices = choices
+
+    def clean(self):
+        data = super().clean()
+
+        if self.customer_and_contact:
+            if data.get('contact') and not data.get('customer'):
+                data['customer'] = data['contact'].organization
+
+            if data.get('customer') and data.get('contact'):
+                if data.get('customer') != data.get('contact').organization:
+                    raise forms.ValidationError({
+                        'contact': ugettext(
+                            'The contact %(person)s does not belong to'
+                            '  %(organization)s.'
+                        ) % {
+                            'person': data.get('contact'),
+                            'organization': data.get('customer'),
+                        },
+                    })
+
+            if not data.get('customer'):
+                raise forms.ValidationError({
+                    'customer': self.error_messages['required'],
+                }, code='required')
+
+        return data
 
 
 _PICKER_TEMPLATE = '''

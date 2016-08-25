@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from django import forms
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 from contacts.models import Organization, Person
 from projects.models import Project
@@ -41,21 +41,6 @@ class ProjectForm(ModelForm):
             'contact': Picker(model=Person),
             'status': forms.RadioSelect,
         }
-
-    def clean(self):
-        data = super().clean()
-        if data.get('customer') and data.get('contact'):
-            if data.get('customer') != data.get('contact').organization:
-                raise forms.ValidationError({
-                    'contact': ugettext(
-                        'The contact %(person)s does not belong to'
-                        '  %(organization)s.'
-                    ) % {
-                        'person': data.get('contact'),
-                        'organization': data.get('customer'),
-                    },
-                })
-        return data
 
 
 class EffortForm(forms.Form):
