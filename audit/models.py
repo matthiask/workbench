@@ -1,20 +1,9 @@
 from django.contrib.postgres.fields import HStoreField
-from django.db import connections, models
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-from psycopg2.extras import register_hstore
 
 
 class LoggedActionManager(models.Manager):
-    def register_hstore(self):
-        register_hstore(
-            connections['default'].cursor(),
-            globally=True)
-
-    def get_queryset(self, *args, **kwargs):
-        self.register_hstore()
-        return super().get_queryset(*args, **kwargs)
-
     def for_instance(self, instance):
         return self.filter(
             table_name=instance._meta.db_table,
