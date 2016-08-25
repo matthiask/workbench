@@ -23,6 +23,7 @@ class Textarea(forms.Textarea):
 class ModelForm(forms.ModelForm):
     user_fields = ()
     default_to_current_user = ()
+    customer_and_contact = False
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request')

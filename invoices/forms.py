@@ -35,10 +35,12 @@ class InvoiceForm(WarningsForm, ModelForm):
     class Meta:
         model = Invoice
         fields = (
-            'invoiced_on', 'due_on', 'title', 'description', 'owned_by',
-            'status', 'postal_address',
+            'customer', 'contact', 'invoiced_on', 'due_on', 'title',
+            'description', 'owned_by', 'status', 'postal_address',
         )
         widgets = {
+            'customer': Picker(model=Organization),
+            'contact': Picker(model=Person),
             'status': forms.RadioSelect,
             'description': Textarea,
             'postal_address': Textarea,
