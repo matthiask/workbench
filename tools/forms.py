@@ -23,7 +23,6 @@ class Textarea(forms.Textarea):
 class ModelForm(forms.ModelForm):
     user_fields = ()
     default_to_current_user = ()
-    customer_and_contact = False
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request')
@@ -37,22 +36,23 @@ class ModelForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
 
-        for field in self.user_fields:
-            self._only_active_and_initial_users(
-                self.fields[field],
-                self.instance and getattr(
-                    self.instance,
-                    '%s_id' % field,
-                    None)
-            )
-
         for name, field in self.fields.items():
             if isinstance(field, forms.DateField):
                 css = field.widget.attrs.get('class', '')
                 field.widget.attrs['class'] = css + ' datepicker'
 
-        if all(f in self.fields for f in ('customer', 'contact')):
-            self.customer_and_contact = True
+            elif name in self.user_fields:
+                self._only_active_and_initial_users(
+                    field,
+                    self.instance and getattr(
+                        self.instance,
+                        '%s_id' % name,
+                        None)
+                )
+
+        self.customer_and_contact = all(
+            f in self.fields for f in ('customer', 'contact'))
+        if self.customer_and_contact:
             self.fields['customer'].required = False
 
     def _only_active_and_initial_users(self, formfield, pk):
