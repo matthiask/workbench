@@ -90,7 +90,7 @@ class ModelForm(forms.ModelForm):
 
             if not data.get('customer'):
                 raise forms.ValidationError({
-                    'customer': self.error_messages['required'],
+                    'customer': self.fields['customer'].error_messages['required'],  # noqa
                 }, code='required')
 
         return data
