@@ -4,7 +4,7 @@ from datetime import timedelta
 from functools import partial
 
 from django.conf import settings
-from django.template.defaultfilters import date as date_fmt
+from django.utils.formats import date_format
 from django.utils.translation import ugettext as _
 
 from pdfdocument.document import (
@@ -235,7 +235,8 @@ class PDFDocument(_PDFDocument):
         self.next_frame()
 
     def date_line(self, date, *args):
-        elements = [date_fmt(date, 'l, d.m.Y') if date else _('NO DATE YET')]
+        elements = [
+            date_format(date, 'l, d.m.Y') if date else _('NO DATE YET')]
         elements.extend(args)
         self.smaller(' / '.join(e for e in elements))
 
@@ -309,7 +310,8 @@ class PDFDocument(_PDFDocument):
             (_('invoice'), '%s/%s' % (
                 invoice.code, invoice.owned_by.get_short_name())),
             (_('date'), (
-                date_fmt(invoice.invoiced_on, 'd.m.Y') if invoice.invoiced_on
+                date_format(invoice.invoiced_on, 'd.m.Y')
+                if invoice.invoiced_on
                 else _('NO DATE YET')
             )),
             ('MwSt.-Nr.', settings.WORKBENCH.PDF_VAT_NO),
@@ -324,7 +326,7 @@ class PDFDocument(_PDFDocument):
         self.p(settings.WORKBENCH.PDF_INVOICE_PAYMENT % {
             'code': invoice.code,
             'days': 15,
-            'due': date_fmt(
+            'due': date_format(
                 invoice.invoiced_on + timedelta(days=15),
                 'd.m.Y'),
         })

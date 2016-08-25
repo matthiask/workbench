@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Prefetch
+from django.utils.formats import date_format
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
@@ -148,9 +149,11 @@ class Invoice(ModelWithTotal):
 
     def pretty_status(self):
         d = {
-            'invoiced_on': self.invoiced_on,
-            'reminded_on': self.invoiced_on,  # XXX
-            'closed_on': self.closed_at.date() if self.closed_at else None,
+            'invoiced_on': date_format(self.invoiced_on, 'd.m.Y'),
+            'reminded_on': date_format(self.invoiced_on,  'd.m.Y'),  # XXX
+            'closed_on': (
+                date_format(self.closed_at.date(), 'd.m.Y')
+                if self.closed_at else None),
         }
 
         if self.status == self.SENT:
