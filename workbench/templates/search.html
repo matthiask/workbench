@@ -15,7 +15,7 @@
           <ul>
         {% endif %}
           <li>
-          <a href="{{ result.get_absolute_url }}">{{ result }}</a>
+            <a href="{{ result.get_absolute_url }}">{% firstof result.html result %}</a>
           </li>
         {% if forloop.last %}
           </ul>

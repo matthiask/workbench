@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Prefetch
+from django.utils.html import format_html
 from django.utils.formats import date_format
 from django.utils.translation import ugettext_lazy as _
 
@@ -12,6 +13,7 @@ from accounts.models import User
 from contacts.models import Organization, Person
 from projects.models import Project
 from stories.models import Story, RequiredService
+from tools.html import str_html_variant
 from tools.models import ModelWithTotal, SearchQuerySet
 from tools.urls import model_urls
 
@@ -134,7 +136,14 @@ class Invoice(ModelWithTotal):
         self._orig_status = self.status
 
     def __str__(self):
-        return self.title
+        return str_html_variant(
+            '%s %s' % (self.code, self.title),
+            lambda: format_html(
+                '<small>{}</small> {}',
+                self.code,
+                self.title,
+            )
+        )
 
     def clean(self):
         super().clean()

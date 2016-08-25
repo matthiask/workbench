@@ -79,3 +79,7 @@ h1 .tiny-icons {
     display: inline-block;
   }
 }
+
+small {
+  font-size: 80%;
+}
