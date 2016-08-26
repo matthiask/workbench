@@ -18,7 +18,7 @@
     {% for invoice in object_list %}
       <tr>
         <th><a href="{{ invoice.urls.detail }}">
-            {{ invoice }}
+            {{ invoice|h }}
         </a></th>
         <td>{{ invoice.contact|default:invoice.customer }}</td>
         <td class="hidden-xs">{{ invoice.owned_by.get_short_name }}</td>

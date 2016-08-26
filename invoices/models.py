@@ -13,7 +13,6 @@ from accounts.models import User
 from contacts.models import Organization, Person
 from projects.models import Project
 from stories.models import Story, RequiredService
-from tools.html import str_html_variant
 from tools.models import ModelWithTotal, SearchQuerySet
 from tools.urls import model_urls
 
@@ -136,13 +135,13 @@ class Invoice(ModelWithTotal):
         self._orig_status = self.status
 
     def __str__(self):
-        return str_html_variant(
-            '%s %s' % (self.code, self.title),
-            lambda: format_html(
-                '<small>{}</small> {}',
-                self.code,
-                self.title,
-            )
+        return '%s %s' % (self.code, self.title)
+
+    def __html__(self):
+        return format_html(
+            '<small>{}</small> {}',
+            self.code,
+            self.title,
         )
 
     def clean(self):

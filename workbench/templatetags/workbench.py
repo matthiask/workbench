@@ -15,7 +15,7 @@ def link_or_none(object, pretty=None):
         return format_html(
             '<a href="{}">{}</a>',
             object.get_absolute_url(),
-            pretty or object,
+            h(pretty or object),
         )
     return pretty or object
 
@@ -44,3 +44,10 @@ def field_value_pairs(object, fields=''):
             yield pairs[f.strip()]
     else:
         yield from pairs.values()
+
+
+@register.filter
+def h(object):
+    if hasattr(object, '__html__'):
+        return object.__html__()
+    return object

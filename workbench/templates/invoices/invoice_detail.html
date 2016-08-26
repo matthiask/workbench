@@ -2,12 +2,12 @@
 
 {% load history i18n workbench %}
 
-{% block title %}{{ object.title }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
+{% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row">
 <div class="col-md-6 col-md-offset-3">
-  <h1>{{ object }} {% history_link object %}</h1>
+  <h1>{{ object|h }} {% history_link object %}</h1>
 
   <table class="table table-striped">
     <tr>
