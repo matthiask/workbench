@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Prefetch
+from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.formats import date_format
 from django.utils.translation import ugettext_lazy as _
@@ -96,6 +97,9 @@ class Invoice(ModelWithTotal):
         verbose_name=_('owned by'),
         related_name='+')
 
+    created_at = models.DateTimeField(
+        _('created at'),
+        default=timezone.now)
     status = models.PositiveIntegerField(
         _('status'),
         choices=STATUS_CHOICES,
@@ -165,12 +169,15 @@ class Invoice(ModelWithTotal):
         d = {
             'invoiced_on': date_format(self.invoiced_on, 'd.m.Y'),
             'reminded_on': date_format(self.invoiced_on,  'd.m.Y'),  # XXX
+            'created_at': date_format(self.created_at, 'd.m.Y'),
             'closed_on': (
-                date_format(self.closed_at.date(), 'd.m.Y')
+                date_format(self.closed_at, 'd.m.Y')
                 if self.closed_at else None),
         }
 
-        if self.status == self.SENT:
+        if self.status == self.IN_PREPARATION:
+            return _('In preparation since %(created_at)s') % d
+        elif self.status == self.SENT:
             if self.due_on and date.today() > self.due_on:
                 return _('Sent on %(invoiced_on)s, but overdue') % d
 
