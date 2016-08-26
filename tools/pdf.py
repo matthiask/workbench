@@ -278,6 +278,7 @@ class PDFDocument(_PDFDocument):
 
         if len(total) > 1:
             self.table(total, self.style.tableColumns, self.style.tableHead)
+            self.spacer(.7 * mm)
 
         self.table([
             (currency(instance.total.quantize(Z)), _('total CHF incl. tax')),
