@@ -155,6 +155,12 @@ class Invoice(ModelWithTotal):
                     ),
                 })
 
+        if self.invoiced_on and self.due_on:
+            if self.invoiced_on > self.due_on:
+                raise ValidationError({
+                    'due_on': _('Due date has to be after invoice date.'),
+                })
+
     def pretty_status(self):
         d = {
             'invoiced_on': date_format(self.invoiced_on, 'd.m.Y'),
