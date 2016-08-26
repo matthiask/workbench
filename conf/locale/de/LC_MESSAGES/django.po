@@ -65,7 +65,7 @@ msgstr "Willkommen! Bitte fülle das folgende Formular aus."
 #: accounts/views.py:97
 #, python-format
 msgid "No user with email address %s found."
-msgstr "Kein Benutzer mit Emailadresse %s gefunden."
+msgstr "Keinen Benutzer mit Emailadresse %s gefunden."
 
 #: accounts/views.py:112
 msgid "You have been signed out."
