@@ -317,9 +317,11 @@ class PDFDocument(_PDFDocument):
             )),
             ('MwSt.-Nr.', settings.WORKBENCH.PDF_VAT_NO),
         ], self.style.tableColumns, self.style.table)
-        self.spacer(5 * mm)
 
-        self.p(invoice.description)
+        if invoice.description:
+            self.spacer(5 * mm)
+            self.p(invoice.description)
+
         self.spacer()
         self.table_total(invoice)
 
