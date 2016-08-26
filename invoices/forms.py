@@ -199,5 +199,8 @@ class CreatePersonInvoiceForm(ModelForm):
     def save(self):
         instance = super().save(commit=False)
         instance.type = instance.FIXED
+        pa = instance.contact and instance.contact.postaladdresses.first()
+        if pa:
+            instance.postal_address = pa.postal_address
         instance.save()
         return instance
