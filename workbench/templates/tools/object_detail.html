@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load history i18n %}
+{% load history i18n workbench %}
 
 {% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
@@ -10,7 +10,7 @@
   <h1>{{ object }} {% history_link object %}</h1>
 
   <table class="table table-striped">
-    {% for name, value in field_value_pairs %}
+    {% for name, value in object|field_value_pairs %}
     <tr>
       <th class="text-right">{{ name }}</th>
       <td>{% link_or_none value %}</td>
