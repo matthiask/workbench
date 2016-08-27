@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-26 08:52+0200\n"
+"POT-Creation-Date: 2016-08-27 22:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -276,7 +276,7 @@ msgstr "Person"
 msgid "people"
 msgstr "Personen"
 
-#: contacts/models.py:99 invoices/forms.py:163 invoices/models.py:108
+#: contacts/models.py:99 invoices/forms.py:172 invoices/models.py:108
 msgid "type"
 msgstr "Typ"
 
@@ -386,7 +386,16 @@ msgstr "Zwischentotal"
 msgid "rendered services"
 msgstr "erbrachte Leistungen"
 
-#: invoices/forms.py:99
+#: invoices/forms.py:100
+msgid ""
+"Invoice date is in the past, but invoice is still in preparation. Are you "
+"sure you do not want to set the invoice date to today?"
+msgstr ""
+"Rechnungsdatum liegt in der Vergangenheit, aber Rechnung ist immer noch "
+"in Vorbereitung. Sind Sie sicher, dass Sie das Rechnungsdatum nicht auf "
+"heute setzen wollen?"
+
+#: invoices/forms.py:108
 #, python-format
 msgid ""
 "You are attempting to change %(fields)s. I am trying to prevent "
@@ -395,12 +404,12 @@ msgstr ""
 "Sie haben %(fields)s geändert. Ich versuche, unabsichtliche Änderungen an "
 "Feldern ausser Status zu verhindern. Sind Sie sicher?"
 
-#: invoices/forms.py:112
+#: invoices/forms.py:121
 #, python-format
 msgid "Moving status from '%(from)s' to '%(to)s'. Are you sure?"
 msgstr "Status von '%(from)s' zu '%(to)s' ändern. Sind Sie sicher?"
 
-#: invoices/forms.py:128
+#: invoices/forms.py:137
 #, python-format
 msgid ""
 "You are attempting to set status to '%(to)s', but the invoice has already "
@@ -837,7 +846,7 @@ msgstr "Kontext"
 #: workbench/templates/contacts/person_detail.html:60
 #: workbench/templates/deals/deal_detail.html:31
 #: workbench/templates/invoices/invoice_detail.html:47
-#: workbench/templates/offers/offer_detail.html:16
+#: workbench/templates/offers/offer_detail.html:25
 #: workbench/templates/projects/project_detail.html:83
 #: workbench/templates/stories/story_detail.html:98
 #: workbench/templates/tools/object_detail.html:22
@@ -890,7 +899,7 @@ msgstr "Abmelden"
 #: workbench/templates/contacts/person_detail.html:62
 #: workbench/templates/deals/deal_detail.html:33
 #: workbench/templates/invoices/invoice_detail.html:50
-#: workbench/templates/offers/offer_detail.html:19
+#: workbench/templates/offers/offer_detail.html:28
 #: workbench/templates/projects/project_detail.html:85
 #: workbench/templates/stories/story_confirm_delete.html:16
 #: workbench/templates/stories/story_detail.html:104
