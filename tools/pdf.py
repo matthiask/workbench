@@ -179,7 +179,7 @@ class PDFDocument(_PDFDocument):
                     settings.WORKBENCH.PDF_OFFER_TERMS)):
                 canvas.drawCentredString(
                     pdf.bounds.W + .5 * (pdf.bounds.E - pdf.bounds.W),
-                    (pdf.bounds.S + 3 * i) * mm,
+                    pdf.bounds.S + 3 * i * mm,
                     text)
 
             canvas.setFont(pdf.style.fontName, 6)
