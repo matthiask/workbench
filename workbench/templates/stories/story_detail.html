@@ -9,6 +9,10 @@
 <div class="row">
   <div class="col-md-12">
 
+    <h2><a href="{{ story.project.get_absolute_url }}">
+        <small><i class="glyphicon glyphicon-menu-left"></i></small>
+        {{ story.project|h }}</a></h2>
+
     <h1>{{ story|h }} {% history_link story %}</h1>
     <p>{{ story.description|linebreaksbr }}</p>
 

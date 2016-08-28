@@ -151,8 +151,6 @@ class Project(Model):
             story.stats += d
             stats += d
 
-        print(stats, stats.__dict__)
-
         stories = {
             k: list(v)
             for k, v in

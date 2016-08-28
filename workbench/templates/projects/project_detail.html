@@ -10,7 +10,7 @@
   <h1>{{ project }} {% history_link project %}</h1>
 
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-8">
       {% with overview=project.overview %}
       <table class="table">
         <tr>
@@ -43,8 +43,7 @@
         </tr>
       </table>
 
-      <a href="{{ project.urls.createstory }}" class="btn btn-default"
-        data-toggle="ajaxmodal">
+      <a href="{{ project.urls.createstory }}" class="btn btn-default">
         <i class="glyphicon glyphicon-plus"></i> {% trans 'story' %}</a>
       <a href="{{ project.urls.createoffer }}" class="btn btn-default">
         <i class="glyphicon glyphicon-plus"></i>
@@ -58,7 +57,7 @@
 
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-4">
       <a href="{% url 'activities_activity_create' %}?project={{ project.pk }}"
         class="btn btn-default pull-right"
         data-toggle="ajaxmodal">
@@ -115,7 +114,7 @@
                   <div class="progress">
                     <div class="progress-bar progress-bar-{{ perc|percentage_to_css }}"
                          role="progressbar"
-                         style="width:{{ perc }}%"></div>
+                         style="width:{{ perc|stringformat:'f' }}%"></div>
 
                   </div>
                   {% endwith %}
