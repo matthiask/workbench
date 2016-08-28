@@ -43,7 +43,11 @@ class StoryForm(ModelForm):
     def __init__(self, *args, **kwargs):
         instance = kwargs.get('instance')
         if instance and instance.pk:
+            # stories' UpdateView
             self.project = instance.project
+        else:
+            # projects' StoryCreateView
+            self.project = kwargs.pop('project')
 
         super().__init__(*args, **kwargs)
 
