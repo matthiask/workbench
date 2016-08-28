@@ -20,7 +20,7 @@ class StoryQuerySet(SearchQuerySet):
 
 RequiredHours = namedtuple(
     'RequiredService',
-    'service_type estimated_effort offered_effort planning_effort')
+    'service_type offered_effort planning_effort')
 RenderedHours = namedtuple('RenderedHours', 'name hours')
 
 
@@ -122,7 +122,6 @@ class Story(Model):
         required = self.requiredservices.order_by('service_type').values(
             'service_type__title',
         ).annotate(
-            Sum('estimated_effort'),
             Sum('offered_effort'),
             Sum('planning_effort'),
         )
@@ -137,7 +136,6 @@ class Story(Model):
             'required': [
                 RequiredHours(
                     service_type=row['service_type__title'],
-                    estimated_effort=row['estimated_effort__sum'],
                     offered_effort=row['offered_effort__sum'],
                     planning_effort=row['planning_effort__sum'],
                 ) for row in required
@@ -175,12 +173,10 @@ class Story(Model):
                     obj = story.requiredservices.model(
                         story=story,
                         service_type=rs.service_type,
-                        estimated_effort=0,
                         offered_effort=0,
                         planning_effort=0,
                     )
 
-                obj.estimated_effort += rs.estimated_effort
                 obj.offered_effort += rs.offered_effort
                 obj.planning_effort += rs.planning_effort
                 obj.save()
@@ -203,11 +199,6 @@ class RequiredService(Model):
         verbose_name=_('service type'),
         related_name='+',
     )
-    estimated_effort = models.DecimalField(
-        _('estimated effort'),
-        max_digits=5,
-        decimal_places=2,
-        help_text=_('The original estimate.'))
     offered_effort = models.DecimalField(
         _('offered effort'),
         max_digits=5,

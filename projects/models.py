@@ -113,7 +113,6 @@ class Project(Model):
         ).order_by('service_type').values(
             'story',
         ).annotate(
-            estimated=Sum('estimated_effort'),
             offered=Sum('offered_effort'),
             planning=Sum('planning_effort'),
         )

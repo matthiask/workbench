@@ -117,4 +117,4 @@ class EffortForm(forms.Form):
 
 
 class EstimationForm(EffortForm):
-    effort_field = 'estimated_effort'
+    effort_field = 'offered_effort'

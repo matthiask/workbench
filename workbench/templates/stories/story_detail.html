@@ -15,12 +15,11 @@
 
     <div class="row">
       <div class="col-md-8">
-        <h4>{% trans 'overview' %}</h4>
+        <h4>{% trans 'required services' %}</h4>
         <table class="table table-striped table-condensed table-linearize">
           <thead>
             <tr>
               <th></th>
-              <th class="text-right">{% trans 'estimated' %}</th>
               <th class="text-right">{% trans 'offered' %}</th>
               <th class="text-right">{% trans 'planning' %}</th>
             </tr>
@@ -29,7 +28,6 @@
             {% for requiredhours in story.overview.required %}
               <tr>
                 <th>{{ requiredhours.service_type }}</th>
-                <td class="text-right">{{ requiredhours.estimated_effort }}h</td>
                 <td class="text-right">{{ requiredhours.offered_effort }}h</td>
                 <td class="text-right">{{ requiredhours.planning_effort }}h</td>
               </tr>
@@ -38,7 +36,6 @@
           <tfoot>
             <tr>
               <th></th>
-              <th class="text-right">{{ story.overview.required_total.estimated_effort }}h</th>
               <th class="text-right">{{ story.overview.required_total.offered_effort }}h</th>
               <th class="text-right">{{ story.overview.required_total.planning_effort }}h</th>
             </tr>
