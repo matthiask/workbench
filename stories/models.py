@@ -97,7 +97,7 @@ class Story(Model):
     objects = models.Manager.from_queryset(StoryQuerySet)()
 
     class Meta:
-        ordering = ('position', 'id')
+        ordering = ('status', 'position', 'id')
         verbose_name = _('story')
         verbose_name_plural = _('stories')
 
@@ -105,6 +105,7 @@ class Story(Model):
         return '%s (#%s)' % (self.title, self.pk)
 
     def css(self):
+        return ''
         class_dict = {
             self.INBOX: 'warning',
             self.BACKLOG: 'active',
@@ -114,8 +115,6 @@ class Story(Model):
             self.ARCHIVED: '',
         }
         # active, success, info, warning, danger
-        if not self.offer_id:
-            return 'warning'
         return class_dict[self.status]
 
     @cached_property

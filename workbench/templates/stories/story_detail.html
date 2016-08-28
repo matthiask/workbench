@@ -1,109 +1,108 @@
-{% load bootstrap3 history i18n %}
+{% extends "base.html" %}
 
-<div class="modal">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">
-          {{ story }}
-          {% history_link story %}
-          <br>
-          <small>{{ story.description }}</small>
-        </h4>
-      </div>
-      <div class="modal-body clearfix">
-        {% bootstrap_messages %}
+{% load bootstrap3 history i18n workbench %}
 
-        <div class="row">
-          <div class="col-md-8">
-            <h4>{% trans 'overview' %}</h4>
-            <table class="table table-striped table-condensed table-linearize">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th class="text-right">{% trans 'estimated' %}</th>
-                  <th class="text-right">{% trans 'offered' %}</th>
-                  <th class="text-right">{% trans 'planning' %}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for requiredhours in story.overview.required %}
-                  <tr>
-                    <th>{{ requiredhours.service_type }}</th>
-                    <td class="text-right">{{ requiredhours.estimated_effort }}h</td>
-                    <td class="text-right">{{ requiredhours.offered_effort }}h</td>
-                    <td class="text-right">{{ requiredhours.planning_effort }}h</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <th></th>
-                  <th class="text-right">{{ story.overview.required_total.estimated_effort }}h</th>
-                  <th class="text-right">{{ story.overview.required_total.offered_effort }}h</th>
-                  <th class="text-right">{{ story.overview.required_total.planning_effort }}h</th>
-                </tr>
-              </tfoot>
-            </table>
-            <table class="table table-striped table-condensed table-linearize">
-              <tbody>
-                {% for renderedhours in story.overview.rendered %}
-                <tr>
-                  <td class="text-right">{{ renderedhours.hours }}h</td>
-                  <th>{{ renderedhours.name }}</th>
-                </tr>
-                {% endfor %}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <th class="text-right">{{ story.overview.rendered_total.hours }}h</th>
-                  <th></th>
-                </tr>
-              </tfoot>
-            </table>
-            <table class="table table-striped table-condensed table-linearize">
-            {% for rendered in story.renderedservices.all|slice:":10" %}
-            {% ifchanged rendered.rendered_on %}
+{% block title %}{{ story }} - {{ story.project }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-12">
+
+    <h1>{{ story|h }} {% history_link story %}</h1>
+    <p>{{ story.description|linebreaksbr }}</p>
+
+
+    <div class="row">
+      <div class="col-md-8">
+        <h4>{% trans 'overview' %}</h4>
+        <table class="table table-striped table-condensed table-linearize">
+          <thead>
             <tr>
-              <td colspan="3">{{ rendered.rendered_on }}</td>
+              <th></th>
+              <th class="text-right">{% trans 'estimated' %}</th>
+              <th class="text-right">{% trans 'offered' %}</th>
+              <th class="text-right">{% trans 'planning' %}</th>
             </tr>
-            {% endifchanged %}
+          </thead>
+          <tbody>
+            {% for requiredhours in story.overview.required %}
+              <tr>
+                <th>{{ requiredhours.service_type }}</th>
+                <td class="text-right">{{ requiredhours.estimated_effort }}h</td>
+                <td class="text-right">{{ requiredhours.offered_effort }}h</td>
+                <td class="text-right">{{ requiredhours.planning_effort }}h</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
             <tr>
-              <th><a href="{{ rendered.urls.detail }}" data-toggle="ajaxmodal">
-                  {{ rendered }}
-              </a></th>
-              <td>{{ rendered.rendered_by.get_short_name }}</td>
-              <td>{{ rendered.hours }}h</td>
+              <th></th>
+              <th class="text-right">{{ story.overview.required_total.estimated_effort }}h</th>
+              <th class="text-right">{{ story.overview.required_total.offered_effort }}h</th>
+              <th class="text-right">{{ story.overview.required_total.planning_effort }}h</th>
+            </tr>
+          </tfoot>
+        </table>
+        <table class="table table-striped table-condensed table-linearize">
+          <tbody>
+            {% for renderedhours in story.overview.rendered %}
+            <tr>
+              <td class="text-right">{{ renderedhours.hours }}h</td>
+              <th>{{ renderedhours.name }}</th>
             </tr>
             {% endfor %}
-            </table>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th class="text-right">{{ story.overview.rendered_total.hours }}h</th>
+              <th></th>
+            </tr>
+          </tfoot>
+        </table>
+        <table class="table table-striped table-condensed table-linearize">
+        {% for rendered in story.renderedservices.all|slice:":10" %}
+        {% ifchanged rendered.rendered_on %}
+        <tr>
+          <td colspan="3">{{ rendered.rendered_on }}</td>
+        </tr>
+        {% endifchanged %}
+        <tr>
+          <th><a href="{{ rendered.urls.detail }}" data-toggle="ajaxmodal">
+              {{ rendered }}
+          </a></th>
+          <td>{{ rendered.rendered_by.get_short_name }}</td>
+          <td>{{ rendered.hours }}h</td>
+        </tr>
+        {% endfor %}
+        </table>
 
-          </div>
-          <div class="col-md-4">
-            <form method="post" action="{{ request.path }}" class="form">
-              <h4>{% trans 'rendered service' %}</h4>
-              {% csrf_token %}
-              {% bootstrap_form form layout='inline' %}
-              <button type="submit" class="btn btn-primary">
-                {% trans 'create' %}
-              </button>
-            </form>
-          </div>
-        </div>
 
-      </div>
-      <div class="modal-footer">
-        <a href="{{ story.urls.update }}" class="btn btn-default pull-left" data-toggle="ajaxmodal">
+        <a href="{{ story.urls.update }}" class="btn btn-default">
           {% trans 'Update' %}
         </a>
-        <a href="{{ story.urls.merge }}" class="btn btn-default pull-left" data-toggle="ajaxmodal">
+        <a href="{{ story.urls.merge }}" class="btn btn-default">
           {% trans 'Merge' %}
         </a>
-        <a href="{{ story.urls.delete }}" class="btn btn-danger btn-inverse" data-toggle="ajaxmodal">
+        <a href="{{ story.urls.delete }}" class="btn btn-danger btn-inverse pull-right">
           {% trans 'Delete' %}
         </a>
+
+
       </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
+      <div class="col-md-4">
+        <form method="post" action="{{ request.path }}" class="form">
+          <h4>{% trans 'rendered service' %}</h4>
+          {% csrf_token %}
+          {% bootstrap_form form layout='inline' %}
+          <button type="submit" class="btn btn-primary">
+            {% trans 'create' %}
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
 </div>
+
+{% endblock %}

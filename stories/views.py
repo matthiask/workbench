@@ -38,13 +38,15 @@ class StoryDetailView(DetailView):
                     'object': service,
                 })
 
+            return redirect(self.object)
+
         return self.render_to_response(self.get_context_data(form=form))
 
 
 class StoryMergeView(UpdateView):
     model = Story
     form_class = MergeStoryForm
-    template_name = 'modalform.html'
+    template_name = 'tools/object_form.html'
 
     def get_context_data(self, **kwargs):
         kwargs['title'] = self.object

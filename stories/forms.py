@@ -30,7 +30,7 @@ class RenderedServiceForm(ModelForm):
         return instance
 
 
-class StoryForm(ModelForm):
+class CreateStoryForm(ModelForm):
     user_fields = ('owned_by',)
 
     class Meta:
@@ -41,23 +41,27 @@ class StoryForm(ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        instance = kwargs.get('instance')
-        if instance and instance.pk:
-            # stories' UpdateView
-            self.project = instance.project
-        else:
-            # projects' StoryCreateView
-            self.project = kwargs.pop('project')
-
+        self.project = kwargs.pop('project')
         super().__init__(*args, **kwargs)
 
     def save(self):
         instance = super().save(commit=False)
-        if not instance.pk:
-            instance.requested_by = self.request.user
-            instance.project = self.project
+        instance.requested_by = self.request.user
+        instance.project = self.project
         instance.save()
         return instance
+
+
+class StoryForm(ModelForm):
+    user_fields = ('owned_by',)
+
+    class Meta:
+        model = Story
+        fields = ('title', 'description', 'owned_by', 'status')
+        widgets = {
+            'description': Textarea(),
+            'status': forms.RadioSelect,
+        }
 
 
 class MergeStoryForm(forms.Form):

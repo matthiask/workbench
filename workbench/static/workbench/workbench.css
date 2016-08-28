@@ -83,3 +83,28 @@ h1 .tiny-icons {
 small {
   font-size: 80%;
 }
+
+.columns {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+}
+
+.columns > .column {
+  width: 16%;
+}
+
+.story {
+  overflow: hidden;
+}
+
+.story__title {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display:  block;
+  overflow: hidden;
+}
+
+.card {
+  margin: 4px 2px;
+}

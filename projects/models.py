@@ -1,3 +1,6 @@
+import itertools
+import operator
+
 from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
@@ -103,7 +106,7 @@ class Project(Model):
     @cached_property
     def overview(self):
         # Avoid circular imports
-        from stories.models import RequiredService, RenderedService
+        from stories.models import Story, RequiredService, RenderedService
 
         required = RequiredService.objects.filter(
             story__project=self,
@@ -143,9 +146,18 @@ class Project(Model):
             story.stats += d
             stats += d
 
+        stories = {
+            k: list(v)
+            for k, v in
+            itertools.groupby(stories, operator.attrgetter('status'))
+        }
+
         return {
             'stats': stats,
-            'stories': stories,
+            'stories': [
+                (value, title, list(stories.get(value, ())))
+                for value, title in Story.STATUS_CHOICES
+            ],
         }
 
     def pretty_status(self):
