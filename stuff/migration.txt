@@ -257,24 +257,13 @@ dblink(
 
 
 --
--- Import bound joboffers as releases
---
-
-INSERT INTO projects_release
-(id, title, is_default, position, project_id)
-SELECT id, name, FALSE, 0, job_id FROM
-dblink(
-    'dbname=fineware_feinheit',
-    'SELECT id, name, job_id FROM offers_joboffer WHERE job_id IS NOT NULL'
-) AS p(id int, name text, job_id int);
-
 INSERT INTO stories_story
-(id, created_at, title, status, position, requested_by_id, description, project_id, release_id)
-SELECT id, NOW(), CASE WHEN notes!='' THEN substring(notes from 0 for 200) ELSE activity_name END, 10, 0, 1, concat(activity_name, ': ', notes), job_id, joboffer_id FROM
+(id, created_at, title, status, position, requested_by_id, description, project_id)
+SELECT id, NOW(), CASE WHEN notes!='' THEN substring(notes from 0 for 200) ELSE activity_name END, 10, 0, 1, concat(activity_name, ': ', notes), job_id FROM
 dblink(
     'dbname=fineware_feinheit',
-    'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
-) AS p(id int, activity_name text, notes text, job_id int, joboffer_id int);
+    'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
+) AS p(id int, activity_name text, notes text, job_id int);
 
 INSERT INTO stories_requiredservice
 (story_id, service_type_id, estimated_effort, offered_effort, planning_effort)
@@ -384,7 +373,6 @@ SELECT SETVAL('public.invoices_invoice_id_seq', COALESCE(MAX(id), 1) ) FROM publ
 SELECT SETVAL('public.invoices_invoice_stories_id_seq', COALESCE(MAX(id), 1) ) FROM public.invoices_invoice_stories;
 SELECT SETVAL('public.offers_offer_id_seq', COALESCE(MAX(id), 1) ) FROM public.offers_offer;
 SELECT SETVAL('public.projects_project_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_project;
-SELECT SETVAL('public.projects_release_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_release;
 SELECT SETVAL('public.services_servicetype_id_seq', COALESCE(MAX(id), 1) ) FROM public.services_servicetype;
 SELECT SETVAL('public.stories_renderedservice_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_renderedservice;
 SELECT SETVAL('public.stories_requiredservice_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_requiredservice;
@@ -396,8 +384,8 @@ SELECT SETVAL('public.stories_story_id_seq', COALESCE(MAX(id), 1) ) FROM public.
 --
 
 INSERT INTO stories_story
-(created_at, title, status, position, requested_by_id, description, project_id, release_id)
-SELECT NOW(), 'Import', 30, 0, owned_by_id, '', p.id, NULL
+(created_at, title, status, position, requested_by_id, description, project_id)
+SELECT NOW(), 'Import', 30, 0, owned_by_id, '', p.id
 FROM projects_project p;
 
 
@@ -413,7 +401,7 @@ dblink(
     'dbname=fineware_feinheit',
     'SELECT created, date, hours, notes, created_by_id, worker_id, job_id FROM worklog_worklogentry'
 ) AS p(created timestamp, date date, hours numeric, notes text, created_by_id int, worker_id int, job_id int)
-WHERE s.project_id=p.job_id AND s.release_id IS NULL;
+WHERE s.project_id=p.job_id AND s.title=='Import';
 
 
 
