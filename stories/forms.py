@@ -1,5 +1,3 @@
-import itertools
-
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
@@ -37,7 +35,7 @@ class StoryForm(ModelForm):
 
     class Meta:
         model = Story
-        fields = ('release', 'title', 'description', 'owned_by')
+        fields = ('title', 'description', 'owned_by')
         widgets = {
             'description': Textarea(),
         }
@@ -46,15 +44,8 @@ class StoryForm(ModelForm):
         instance = kwargs.get('instance')
         if instance and instance.pk:
             self.project = instance.project
-        else:
-            self.project = kwargs.pop('project')
-            kwargs['initial'] = {
-                'release': self.project.releases.filter(
-                    is_default=True).first(),
-            }
 
         super().__init__(*args, **kwargs)
-        self.fields['release'].queryset = self.project.releases.all()
 
     def save(self):
         instance = super().save(commit=False)
@@ -77,12 +68,8 @@ class MergeStoryForm(forms.Form):
 
         super().__init__(*args, **kwargs)
 
-        stories = self.story.project.stories.exclude(pk=self.story.pk)
-        self.fields['merge_into'].choices = [('', '----------')] + [
-            (str(key), [(story.id, story) for story in group])
-            for key, group
-            in itertools.groupby(stories, key=lambda story: story.release)
-        ]
+        self.fields['merge_into'].queryset =\
+            self.story.project.stories.exclude(pk=self.story.pk)
 
     def save(self):
         merge_into = self.cleaned_data['merge_into']

@@ -29,15 +29,6 @@
         </thead>
         <tbody>
           {% for row in form.stories %}
-            {% ifchanged row.story.release %}
-            <tr>
-              <th colspan="6">
-                <h3>
-                  {{ row.story.release|default_if_none:_('No release') }}
-                </h3>
-              </th>
-            </tr>
-            {% endifchanged %}
             <tr>
               <td>
                 <strong>

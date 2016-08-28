@@ -1,5 +1,3 @@
-import itertools
-
 from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
@@ -13,15 +11,7 @@ from tools.urls import model_urls
 
 
 class ProjectQuerySet(SearchQuerySet):
-    def create_project(self, title):
-        project = Project.objects.create(
-            title=title,
-        )
-        project.releases.create(
-            title='INBOX',
-            is_default=True,
-        )
-        return project
+    pass
 
 
 class SummationDict(dict):
@@ -153,13 +143,6 @@ class Project(Model):
             story.stats += d
             stats += d
 
-        stories = [(key, list(group)) for key, group in itertools.groupby(
-            sorted(
-                stories,
-                key=lambda s: s.release.position if s.release else -1),
-            lambda story: story.release,
-        )]
-
         return {
             'stats': stats,
             'stories': stories,
@@ -172,35 +155,3 @@ class Project(Model):
         if self.maintenance:
             parts.append(ugettext('maintenance'))
         return ', '.join(parts)
-
-
-@model_urls(lambda object: {'project_id': object.project_id, 'pk': object.pk})
-class Release(Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE,
-        verbose_name=_('project'),
-        related_name='releases')
-
-    title = models.CharField(
-        _('title'),
-        max_length=200)
-    is_default = models.BooleanField(
-        _('is default'),
-        default=False)
-
-    position = models.PositiveIntegerField(
-        _('position'),
-        default=0)
-
-    class Meta:
-        ordering = ('position', 'id')
-        verbose_name = _('release')
-        verbose_name_plural = _('releases')
-
-    def __str__(self):
-        return self.title
-
-    @property
-    def urls(self):
-        return self.project.urls

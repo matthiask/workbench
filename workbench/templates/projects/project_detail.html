@@ -43,30 +43,22 @@
         </tr>
       </table>
 
-      <h2>{% trans 'releases and stories' %}</h2>
+      <h2>{% trans 'stories' %}</h2>
       <div class="list-group">
-        {% for release, stories in overview.stories %}
-          {% if release %}
-            <div class="list-group-item">
-              <h3 class="list-group-item-heading">{{ release }}</h3>
+        {% for story in stories %}
+          <a class="list-group-item list-group-item-{{ story.css }}"
+              href="{{ story.urls.detail }}" data-toggle="ajaxmodal">
+            <h4 class="list-group-item-heading">{{ story }}</h4>
+            <div class="list-group-item-text clearfix">
+              <small class="pull-left">
+                {{ story.stats.hours }}h / {{ story.stats.planning }}h
+              </small>
+              <small class="pull-right">
+                {{ story.get_status_display }} |
+                {{ story.owned_by.get_full_name|default:_('No owner') }}
+              </small>
             </div>
-          {% endif %}
-
-          {% for story in stories %}
-            <a class="list-group-item list-group-item-{{ story.css }}"
-                href="{{ story.urls.detail }}" data-toggle="ajaxmodal">
-              <h4 class="list-group-item-heading">{{ story }}</h4>
-              <div class="list-group-item-text clearfix">
-                <small class="pull-left">
-                  {{ story.stats.hours }}h / {{ story.stats.planning }}h
-                </small>
-                <small class="pull-right">
-                  {{ story.get_status_display }} |
-                  {{ story.owned_by.get_full_name|default:_('No owner') }}
-                </small>
-              </div>
-            </a>
-          {% endfor %}
+          </a>
         {% endfor %}
       </div>
       {% endwith %}

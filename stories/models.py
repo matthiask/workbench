@@ -8,7 +8,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
-from projects.models import Project, Release
+from projects.models import Project
 from services.models import ServiceType
 from tools.models import SearchQuerySet, SearchManager, Model
 from tools.urls import model_urls
@@ -71,13 +71,6 @@ class Story(Model):
         on_delete=models.PROTECT,
         verbose_name=_('project'),
         related_name='stories')
-    release = models.ForeignKey(
-        Release,
-        on_delete=models.SET_NULL,
-        verbose_name=_('release'),
-        related_name='stories',
-        blank=True,
-        null=True)
     offer = models.ForeignKey(
         'offers.Offer',
         on_delete=models.PROTECT,
@@ -106,7 +99,7 @@ class Story(Model):
     objects = models.Manager.from_queryset(StoryQuerySet)()
 
     class Meta:
-        ordering = ('release', 'position', 'id')
+        ordering = ('position', 'id')
         verbose_name = _('story')
         verbose_name_plural = _('stories')
 
