@@ -45,7 +45,7 @@
 
       <h2>{% trans 'stories' %}</h2>
       <div class="list-group">
-        {% for story in stories %}
+        {% for story in overview.stories %}
           <a class="list-group-item list-group-item-{{ story.css }}"
               href="{{ story.urls.detail }}" data-toggle="ajaxmodal">
             <h4 class="list-group-item-heading">{{ story }}</h4>

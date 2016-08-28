@@ -26,22 +26,20 @@ RenderedHours = namedtuple('RenderedHours', 'name hours')
 
 @model_urls()
 class Story(Model):
-    UNSCHEDULED = 10
-    SCHEDULED = 20
-    STARTED = 30
-    FINISHED = 40
-    DELIVERED = 50
-    ACCEPTED = 60
-    REJECTED = 15
+    INBOX = 10
+    BACKLOG = 20
+    IN_PROGRESS = 30
+    READY_FOR_TEST = 40
+    DONE = 50
+    ARCHIVED = 60
 
     STATUS_CHOICES = (
-        (UNSCHEDULED, _('unscheduled')),
-        (SCHEDULED, _('scheduled')),
-        (STARTED, _('started')),
-        (FINISHED, _('finished')),
-        (DELIVERED, _('delivered')),
-        (ACCEPTED, _('accepted')),
-        (REJECTED, _('rejected')),
+        (INBOX, _('Inbox')),
+        (BACKLOG, _('Backlog')),
+        (IN_PROGRESS, _('In progress')),
+        (READY_FOR_TEST, _('Ready for test')),
+        (DONE, _('Done')),
+        (ARCHIVED, _('Archived')),
     )
 
     created_at = models.DateTimeField(
@@ -82,7 +80,7 @@ class Story(Model):
     status = models.PositiveIntegerField(
         _('status'),
         choices=STATUS_CHOICES,
-        default=UNSCHEDULED)
+        default=INBOX)
     accepted_at = models.DateTimeField(
         _('accepted at'),
         blank=True,
@@ -108,13 +106,12 @@ class Story(Model):
 
     def css(self):
         class_dict = {
-            self.UNSCHEDULED: 'warning',
-            self.SCHEDULED: 'active',
-            self.STARTED: 'active',
-            self.FINISHED: 'info',
-            self.DELIVERED: 'info',
-            self.ACCEPTED: 'success',
-            self.REJECTED: 'danger',
+            self.INBOX: 'warning',
+            self.BACKLOG: 'active',
+            self.IN_PROGRESS: 'active',
+            self.READY_FOR_TEST: 'info',
+            self.DONE: 'success',
+            self.ARCHIVED: '',
         }
         # active, success, info, warning, danger
         if not self.offer_id:
