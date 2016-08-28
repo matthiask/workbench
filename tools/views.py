@@ -81,7 +81,6 @@ class CreateView(ToolsMixin, vanilla.CreateView):
         form = self.get_form()
         context = self.get_context_data(
             form=form,
-            title=_('Create %s') % self.model._meta.verbose_name,
         )
         return self.render_to_response(context)
 
@@ -110,6 +109,12 @@ class CreateView(ToolsMixin, vanilla.CreateView):
             return HttpResponse('Thanks', status=201)  # Created
         return redirect(self.get_success_url())
 
+    def get_context_data(self, **kwargs):
+        kwargs.setdefault('title', _('Create %s') % (
+            self.model._meta.verbose_name,
+        ))
+        return super().get_context_data(**kwargs)
+
 
 class UpdateView(ToolsMixin, vanilla.UpdateView):
     def get(self, request, *args, **kwargs):
@@ -120,7 +125,6 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
         form = self.get_form(instance=self.object)
         context = self.get_context_data(
             form=form,
-            title=_('Update %s') % self.object._meta.verbose_name,
         )
         return self.render_to_response(context)
 
@@ -149,6 +153,12 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
             return HttpResponse('Thanks', status=202)  # Accepted
         return redirect(self.get_success_url())
 
+    def get_context_data(self, **kwargs):
+        kwargs.setdefault('title', _('Update %s') % (
+            self.model._meta.verbose_name,
+        ))
+        return super().get_context_data(**kwargs)
+
 
 class DeleteView(ToolsMixin, vanilla.DeleteView):
     def get(self, request, *args, **kwargs):
@@ -156,9 +166,7 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
         if not self.object.allow_delete(self.object, request):
             return redirect(self.object)
 
-        context = self.get_context_data(
-            title=_('Delete %s') % self.object._meta.verbose_name,
-        )
+        context = self.get_context_data()
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -176,6 +184,12 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
         if request.is_ajax():
             return HttpResponse('Thanks', status=204)  # No content
         return redirect(self.model().urls.url('list'))
+
+    def get_context_data(self, **kwargs):
+        kwargs.setdefault('title', _('Delete %s') % (
+            self.model._meta.verbose_name,
+        ))
+        return super().get_context_data(**kwargs)
 
 
 class MessageView(vanilla.View):
