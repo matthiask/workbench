@@ -19,6 +19,8 @@ class StoryDetailView(DetailView):
         if 'form' not in kwargs:
             kwargs['form'] = self.get_form()
 
+        kwargs['recent_rendered'] =\
+            self.object.renderedservices.select_related('rendered_by')[:5]
         return super().get_context_data(**kwargs)
 
     def post(self, request, *args, **kwargs):
