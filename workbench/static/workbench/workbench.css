@@ -91,20 +91,48 @@ small {
 }
 
 .columns > .column {
-  width: 16%;
+  width: 250px;
+}
+
+.stories {
+  overflow-x: scroll;
+}
+
+.stories .toggled {
+  width: auto;
+}
+
+.stories .toggled>h3,
+.stories .toggled>.list-group {
+  display: none;
 }
 
 .story {
-  overflow: hidden;
+  padding: 0;
+
+  display: flex;
+  flex-flow: row nowrap;
 }
 
-.story__title {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  display:  block;
-  overflow: hidden;
+.story__avatar {
+  flex: 0 0 44px;
+}
+.story__avatar .glyphicon {
+  font-size: 37px;
+}
+
+.story__content {
+  flex: 0 1 auto;
+}
+
+.story .progress {
+  margin: 0;
+  position: absolute;
+  right: 0; bottom: 0; left: 0;
+  border-radius: 0;
+  height: 3px;
 }
 
 .card {
-  margin: 4px 2px;
+  margin: 0 5px 10px 0;
 }

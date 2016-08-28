@@ -51,3 +51,12 @@ def h(object):
     if hasattr(object, '__html__'):
         return object.__html__()
     return object
+
+
+@register.filter
+def percentage_to_css(value):
+    if value < 80:
+        return 'info'
+    elif value < 100:
+        return 'warning'
+    return 'danger'

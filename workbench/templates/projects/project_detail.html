@@ -90,22 +90,35 @@
       <div class="stories columns">
         {% for status_key, status_title, stories in overview.stories %}
           <div class="column stories--{{ status_key }}">
+            <input type="checkbox" checked data-toggle=".stories--{{ status_key }}"/>
             <h3>{{ status_title }}</h3>
 
             <div class="list-group">
               {% for story in stories %}
                 <a class="list-group-item list-group-item-{{ story.css }} story card"
                     href="{{ story.urls.detail }}">
-                  <strong class="list-group-item-heading story__title">{{ story }}</strong>
-                  <div class="list-group-item-text clearfix">
-                    <small class="pull-left">
-                      {{ story.stats.hours }}h / {{ story.stats.planning }}h
-                    </small>
-                    <small class="pull-right">
-                      {{ story.get_status_display }} |
-                      {{ story.owned_by.get_full_name|default:_('No owner') }}
-                    </small>
+
+                  <div class="story__avatar">
+                    {% if story.owned_by %}
+                      <img src="{{ story.owned_by.avatar }}?s=40" alt=""
+                        class="avatar"/>
+                    {% else %}
+                      <i class="glyphicon glyphicon-user avatar"></i>
+                    {% endif %}
                   </div>
+
+                  <div class="story__content">
+                    <strong class="story__title">{{ story }}</strong>
+                  </div>
+
+                  {% with perc=story.stats.used_percentage %}
+                  <div class="progress">
+                    <div class="progress-bar progress-bar-{{ perc|percentage_to_css }}"
+                         role="progressbar"
+                         style="width:{{ perc }}%"></div>
+
+                  </div>
+                  {% endwith %}
                 </a>
               {% endfor %}
             </div>

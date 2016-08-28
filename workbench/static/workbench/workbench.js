@@ -21,11 +21,16 @@ $(function() {
     initWidgets();
   };
 
-  $(document.body).on('click', '[data-toggle=ajaxmodal]', function(event) {
-    $.get(this.href, function(data) {
-      initModal(data);
-    });
-    return false;
+  $(document.body).on('click', '[data-toggle]', function(event) {
+    if (this.dataset.toggle == 'ajaxmodal') {
+      event.preventDefault();
+      $.get(this.href, function(data) {
+        initModal(data);
+      });
+    }
+
+    var el = $(this.dataset.toggle);
+    if (el.length) el.toggleClass('toggled');
   });
 
   // Include the name and value of the submit button

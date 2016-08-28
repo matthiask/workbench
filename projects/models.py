@@ -24,6 +24,12 @@ class SummationDict(dict):
         return self
 
     def __getitem__(self, key):
+        if key == 'used_percentage':
+            try:
+                return 100 * self['hours'] / self['planning']
+            except Exception as exc:
+                return 0
+
         try:
             return dict.__getitem__(self, key)
         except KeyError:
@@ -144,6 +150,8 @@ class Project(Model):
             d = SummationDict(**row)
             story.stats += d
             stats += d
+
+        print(stats, stats.__dict__)
 
         stories = {
             k: list(v)
