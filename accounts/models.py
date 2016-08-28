@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 from decimal import Decimal
+import hashlib
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
@@ -97,3 +98,9 @@ class User(Model, AbstractBaseUser):
             'today': per_day.get(today, Decimal('0.00')),
             'week': sum(per_day.values(), Decimal('0.00')),
         }
+
+    @property
+    def avatar(self):
+        return 'https://www.gravatar.com/avatar/%s' % (
+            hashlib.md5(self.email.lower().encode('utf-8')).hexdigest(),
+        )
