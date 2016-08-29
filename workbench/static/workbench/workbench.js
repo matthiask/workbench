@@ -73,13 +73,13 @@ $(function() {
       key = el.data('key'),
       pretty = el.data('pretty');
 
-    $('#' + id).val(key);
     $('#' + id + '_pretty').val(pretty);
+    $('#' + id).val(key).trigger('change');
     dismissModals();
   });
 
   // Search forms
-  $('.form-search select').on('change', function() {
+  $('.form-search').on('change', 'select, input', function() {
     $(this).closest('form').submit();
   });
 
