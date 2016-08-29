@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n %}
+{% load i18n workbench %}
 
 {% block title %}{% trans 'Search' %} - {{ block.super }}{% endblock %}
 
@@ -15,7 +15,7 @@
           <ul>
         {% endif %}
           <li>
-            <a href="{{ result.get_absolute_url }}">{% firstof result.html result %}</a>
+            <a href="{{ result.get_absolute_url }}">{% firstof result.html result|h %}</a>
           </li>
         {% if forloop.last %}
           </ul>
