@@ -93,7 +93,7 @@ class InvoiceForm(WarningsForm, ModelForm):
         data = super().clean()
         s_dict = dict(Invoice.STATUS_CHOICES)
 
-        if data.get('status') < self.instance.SENT:
+        if self.instance._orig_status < self.instance.SENT:
             invoiced_on = data.get('invoiced_on')
             if invoiced_on and invoiced_on < date.today():
                 self.add_warning(_(
