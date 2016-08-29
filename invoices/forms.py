@@ -18,6 +18,11 @@ class InvoiceSearchForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
+    org = forms.ModelChoiceField(
+        queryset=Organization.objects.all(),
+        required=False,
+        widget=Picker(model=Organization),
+    )
 
     def filter(self, queryset):
         if not self.is_valid():
@@ -26,6 +31,8 @@ class InvoiceSearchForm(forms.Form):
         data = self.cleaned_data
         if data.get('s'):
             queryset = queryset.filter(status=data.get('s'))
+        if data.get('org'):
+            queryset = queryset.filter(customer=data.get('org'))
 
         return queryset
 
