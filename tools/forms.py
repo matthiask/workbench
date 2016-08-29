@@ -122,7 +122,7 @@ class Picker(forms.TextInput):
         final_attrs = self.build_attrs(attrs, type='hidden', name=name)
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
-            final_attrs['value'] = force_text(self._format_value(value))
+            final_attrs['value'] = force_text(self.format_value(value))
 
         pretty = ''
         try:
