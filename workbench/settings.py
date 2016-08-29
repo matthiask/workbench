@@ -25,7 +25,7 @@ ADMINS = (
     ('Matthias Kestenholz', 'mk@feinheit.ch'),
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [a for a in [
     'workbench',
 
     'django.contrib.admin',
@@ -49,14 +49,15 @@ INSTALLED_APPS = (
     'services',
     'stories',
 
-    'debug_toolbar',
-)
+    'debug_toolbar' if DEBUG else '',
+] if a]
 
 AUTH_USER_MODEL = 'accounts.User'
 LOGIN_REDIRECT_URL = '/'
 
-MIDDLEWARE = (
-    # 'django.middleware.security.SecurityMiddleware',  # Revisit when SSLing.
+MIDDLEWARE = [m for m in [
+    'django.middleware.security.SecurityMiddleware' if LIVE else '',
+    'workbench.middleware.WorkingDebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -65,28 +66,35 @@ MIDDLEWARE = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'accounts.middleware.login_required',
-)
+] if m]
 
 ROOT_URLCONF = 'workbench.urls'
 WSGI_APPLICATION = 'wsgi.application'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'workbench', 'templates'),
+TEMPLATES = [{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [
+        os.path.join(BASE_DIR, 'workbench', 'templates'),
+    ],
+    'OPTIONS': {
+        'context_processors': [
+            'django.template.context_processors.debug',
+            'django.template.context_processors.request',
+            'django.contrib.auth.context_processors.auth',
+            'django.contrib.messages.context_processors.messages',
         ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
+        'loaders': [
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        ] if DEBUG else [
+            ('django.template.loaders.cached.Loader', [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ]),
+        ],
+        'debug': DEBUG,
     },
-]
+}]
 
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'conf', 'locale'),
@@ -95,9 +103,6 @@ LOCALE_PATHS = (
 AUTHENTICATION_BACKENDS = (
     'accounts.backends.AuthBackend',
 )
-
-# Database
-# https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
 DATABASES = {
     'default': dj_database_url.config(default='sqlite:///db.sqlite3'),
@@ -191,14 +196,9 @@ SILENCED_SYSTEM_CHECKS = [
     '1_10.W001',  # MIDDLEWARE_CLASSES is not used anymore, thank you.
 ]
 
-if DEBUG:
-    MIDDLEWARE += ('workbench.middleware.WorkingDebugToolbarMiddleware',)
-    INTERNAL_IPS = ['127.0.0.1']
+INTERNAL_IPS = ['127.0.0.1']
 
 if LIVE:
-    MIDDLEWARE = (
-        'django.middleware.security.SecurityMiddleware',
-    ) + MIDDLEWARE
     CSRF_COOKIE_SECURE = True
     CSRF_COOKIE_HTTPONLY = True
     X_FRAME_OPTIONS = 'DENY'

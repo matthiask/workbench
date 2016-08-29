@@ -1,9 +1,9 @@
 from collections import defaultdict
 
 from django import forms
-from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.forms.utils import flatatt
+from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe

@@ -57,7 +57,7 @@ def model_urls(
 
 def tryreverse(*args, **kwargs):
     """
-    Calls ``django.core.urlresolvers.reverse``, and returns ``None`` on
+    Calls ``django.urls.reverse``, and returns ``None`` on
     failure instead of raising an exception.
     """
     try:
