@@ -100,3 +100,11 @@ class Deal(Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if self.status == self.OPEN:
+            self.closed_at = None
+        elif not self.closed_at:
+            self.closed_at = timezone.now()
+        super().save(*args, **kwargs)
+    save.alters_data = True
