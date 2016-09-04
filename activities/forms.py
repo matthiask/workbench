@@ -47,7 +47,7 @@ class ActivityForm(ModelForm):
     class Meta:
         model = Activity
         fields = (
-            'title', 'owned_by', 'due_on',
+            'title', 'owned_by', 'due_on', 'time', 'duration'
         )
 
     def __init__(self, *args, **kwargs):
