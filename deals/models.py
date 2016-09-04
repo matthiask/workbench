@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
+from contacts.models import Organization, Person
 from tools.models import SearchQuerySet, Model
 from tools.urls import model_urls
 
@@ -42,6 +43,19 @@ class Deal(Model):
         (ACCEPTED, _('accepted')),
         (DECLINED, _('declined')),
     )
+
+    customer = models.ForeignKey(
+        Organization,
+        on_delete=models.PROTECT,
+        verbose_name=_('customer'),
+        related_name='+')
+    contact = models.ForeignKey(
+        Person,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_('contact'),
+        related_name='+')
 
     stage = models.ForeignKey(
         Stage,

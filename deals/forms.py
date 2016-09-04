@@ -1,8 +1,9 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
+from contacts.models import Organization, Person
 from deals.models import Deal, Stage
-from tools.forms import ModelForm
+from tools.forms import ModelForm, Picker
 
 
 class DealSearchForm(forms.Form):
@@ -36,8 +37,10 @@ class DealForm(ModelForm):
     class Meta:
         model = Deal
         fields = (
-            'title', 'description', 'stage', 'owned_by', 'estimated_value',
-            'status')
+            'customer', 'contact', 'title', 'description', 'stage',
+            'owned_by', 'estimated_value', 'status')
         widgets = {
+            'customer': Picker(model=Organization),
+            'contact': Picker(model=Person),
             'status': forms.RadioSelect,
         }
