@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.utils.formats import date_format
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
@@ -108,3 +109,15 @@ class Deal(Model):
             self.closed_at = timezone.now()
         super().save(*args, **kwargs)
     save.alters_data = True
+
+    def pretty_status(self):
+        d = {
+            'created_at': date_format(self.created_at, 'd.m.Y'),
+            'closed_at': self.closed_at and date_format(
+                self.closed_at, 'd.m.Y'),
+            'status': self.get_status_display(),
+        }
+
+        if self.status == self.OPEN:
+            return _('Open since %(created_at)s') % d
+        return _('%(status)s on %(closed_at)s') % d

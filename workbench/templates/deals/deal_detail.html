@@ -10,7 +10,7 @@
     <h1>{{ deal }} {% history_link deal %}</h1>
 
     <table class="table table-striped">
-      {% for name, value in object|field_value_pairs:'description, owned_by' %}
+      {% for name, value in object|field_value_pairs:'description, owned_by, stage' %}
       <tr><th class="text-right">{{ name }}</th><td>{% link_or_none value %}</td></tr>
       {% endfor %}
 
@@ -18,10 +18,10 @@
         <th class="text-right">{% trans 'estimated value' %}</th>
         <td>{{ deal.estimated_value|currency }}</td>
       </tr>
-
-      {% for name, value in object|field_value_pairs:'stage, estimated_value, status, created_at, closed_at' %}
-      <tr><th class="text-right">{{ name }}</th><td>{% link_or_none value %}</td></tr>
-      {% endfor %}
+      <tr>
+        <th class="text-right">{% trans 'status' %}</th>
+        <td>{{ deal.pretty_status }}</td>
+      </tr>
     </table>
 
     <a href="{% url 'activities_activity_create' %}?deal={{ deal.pk }}" class="btn btn-default"
