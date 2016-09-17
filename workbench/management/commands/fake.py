@@ -5,7 +5,7 @@ from django.core.management import BaseCommand
 
 from accounts.models import User
 from contacts.models import Person
-from projects.models import Project
+from projects.models import Project, Task
 from stories.models import Story
 
 
@@ -24,6 +24,22 @@ class Command(BaseCommand):
             owned_by=owned_by,
             status=Project.WORK_IN_PROGRESS,
         )
+
+        for i in range(30):
+            task = Task.objects.create(
+                project=project,
+                created_by=owned_by,
+                title=f.name(),
+                type=random.choice(('task', 'bug', 'enhancement', 'question')),
+                priority=random.choice((20, 30, 40, 50)),
+                owned_by=random.choice((owned_by, None)),
+            )
+
+            for i in range(random.randint(0, 5)):
+                task.comments.create(
+                    created_by=owned_by,
+                    notes=f.text(),
+                )
 
         for i in range(30):
             Story.objects.create(

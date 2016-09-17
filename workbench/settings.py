@@ -44,6 +44,7 @@ INSTALLED_APPS = [a for a in [
     'contacts',
     'deals',
     'invoices',
+    'logbook',
     'offers',
     'projects',
     'services',

@@ -1,9 +1,9 @@
 from django.conf.urls import url
 
-from projects.forms import ProjectSearchForm, ProjectForm
-from projects.models import Project
+from projects.forms import ProjectSearchForm, ProjectForm, TaskForm
+from projects.models import Project, Task
 from projects.views import (
-    CreateStoryView, OfferCreateView, EstimationView)
+    CreateTaskView, OfferCreateView, EstimationView, TaskDetailView)
 from tools.views import (
     ListView, DetailView, CreateView, UpdateView, DeleteView)
 
@@ -45,9 +45,9 @@ urlpatterns = [
         name='projects_project_delete'),
 
     url(
-        r'^(?P<pk>\d+)/createstory/$',
-        CreateStoryView.as_view(),
-        name='projects_project_createstory'),
+        r'^(?P<pk>\d+)/createtask/$',
+        CreateTaskView.as_view(),
+        name='projects_project_createtask'),
     url(
         r'^(?P<pk>\d+)/createoffer/$',
         OfferCreateView.as_view(),
@@ -56,6 +56,22 @@ urlpatterns = [
         r'^(?P<pk>\d+)/estimation/$',
         EstimationView.as_view(),
         name='projects_project_estimation'),
+
+    url(
+        r'^tasks/(?P<pk>\d+)/$',
+        TaskDetailView.as_view(),
+        name='projects_task_detail'),
+    url(
+        r'^tasks/(?P<pk>\d+)/update/$',
+        UpdateView.as_view(
+            model=Task,
+            form_class=TaskForm,
+        ),
+        name='projects_task_update'),
+    url(
+        r'^tasks/(?P<pk>\d+)/delete/$',
+        DeleteView.as_view(model=Task),
+        name='projects_task_delete'),
     # url(
     #     r'^(?P<pk>\d+)/planning/$',
     #     views.PlanningView.as_view(),

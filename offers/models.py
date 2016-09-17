@@ -1,14 +1,11 @@
-from decimal import Decimal
-
-from django.contrib.postgres.fields import JSONField
 from django.db import models
-from django.db.models import Prefetch
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
 from projects.models import Project
-from stories.models import RequiredService
-from tools.models import ModelWithTotal, SearchQuerySet
+from services.models import ServiceType
+from tools.models import Model, ModelWithTotal, SearchQuerySet
 from tools.urls import model_urls
 
 
@@ -68,8 +65,6 @@ class Offer(ModelWithTotal):
         _('postal address'),
         blank=True)
 
-    story_data = JSONField(_('stories'), blank=True, null=True)
-
     objects = models.Manager.from_queryset(OfferQuerySet)()
 
     class Meta:
@@ -80,49 +75,110 @@ class Offer(ModelWithTotal):
     def __str__(self):
         return self.title
 
-    def add_stories(self, stories, save=True):
-        if not self.story_data:
-            self.story_data = {}
 
-        self.story_data.setdefault('stories', []).extend((
-            {
-                'title': story.title,
-                'description': story.description,
-                'billing': [
-                    (
-                        str(rs.offered_effort),
-                        str(rs.service_type.billing_per_hour),
-                    ) for rs in story.requiredservices.all()
-                ],
-            } for story in stories.prefetch_related(
-                Prefetch(
-                    'requiredservices',
-                    queryset=RequiredService.objects.select_related(
-                        'service_type'),
-                ),
-            )
-        ))
+@model_urls()
+class Service(Model):
+    created_at = models.DateTimeField(
+        _('created at'),
+        default=timezone.now,
+    )
+    offer = models.ForeignKey(
+        Offer,
+        on_delete=models.CASCADE,
+        related_name='services',
+        verbose_name=_('offer'),
+    )
 
-        stories.update(offer=self)
+    title = models.CharField(
+        _('title'),
+        max_length=200,
+    )
+    description = models.TextField(
+        _('description'),
+        blank=True,
+    )
+    position = models.PositiveIntegerField(
+        _('position'),
+        default=0,
+    )
 
-        self.subtotal = sum([
-            sum(
-                (Decimal(e) * Decimal(p) for e, p in story['billing']),
-                Decimal('0')
-            )
-            for story in self.story_data['stories']
-        ], Decimal('0'))
+    class Meta:
+        ordering = ('position', 'created_at')
+        verbose_name = _('service')
+        verbose_name_plural = _('services')
 
-        self._calculate_total()
+    def __str__(self):
+        return self.title
 
-        if save:
-            self.save()
 
-    def clear_stories(self, save=True):
-        self.stories.update(offer=None)
-        self.story_data = {}
-        self.subtotal = Decimal('0')
-        self._calculate_total()
+class Effort(Model):
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        related_name='efforts',
+        verbose_name=_('service'),
+    )
+    service_type = models.ForeignKey(
+        ServiceType,
+        on_delete=models.PROTECT,
+        verbose_name=_('service type'),
+        related_name='+',
+    )
+    hours = models.DecimalField(
+        _('hours'),
+        max_digits=5,
+        decimal_places=2,
+    )
 
-        if save:
-            self.save()
+    class Meta:
+        ordering = ('service_type',)
+        unique_together = (('service', 'service_type'),)
+        verbose_name = _('effort')
+        verbose_name_plural = _('efforts')
+
+    def __str__(self):
+        return '%s' % self.service_type
+
+    @property
+    def urls(self):
+        return self.service.urls
+
+    def get_absolute_url(self):
+        return self.service.get_absolute_url()
+
+
+class Cost(Model):
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        related_name='costs',
+        verbose_name=_('service'),
+    )
+    title = models.CharField(
+        _('title'),
+        max_length=200,
+    )
+    cost = models.DecimalField(
+        _('cost'),
+        max_digits=10,
+        decimal_places=2,
+    )
+    position = models.PositiveIntegerField(
+        _('position'),
+        default=0,
+    )
+
+    class Meta:
+        ordering = ('position', 'pk')
+        verbose_name = _('cost')
+        verbose_name_plural = _('costs')
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def urls(self):
+        return self.service.urls
+
+    def get_absolute_url(self):
+        return self.service.get_absolute_url()

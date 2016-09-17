@@ -4,10 +4,10 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from contacts.models import Organization, Person
-from projects.models import Project
+from projects.models import Project, Task, Comment
 from services.models import ServiceType
 from stories.models import RequiredService
-from tools.forms import ModelForm, Picker
+from tools.forms import ModelForm, Picker, Textarea
 
 
 class ProjectSearchForm(forms.Form):
@@ -118,3 +118,56 @@ class EffortForm(forms.Form):
 
 class EstimationForm(EffortForm):
     effort_field = 'offered_effort'
+
+
+class TaskForm(ModelForm):
+    user_fields = ('owned_by',)
+
+    class Meta:
+        model = Task
+        fields = (
+            'title',
+            'description',
+            'type',
+            'priority',
+            'owned_by',
+            'status',
+            'due_on',
+        )
+        widgets = {
+            'type': forms.RadioSelect,
+            'priority': forms.RadioSelect,
+            'status': forms.RadioSelect,
+            'description': Textarea(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.project = kwargs.pop('project', None)
+        super().__init__(*args, **kwargs)
+
+    def save(self):
+        instance = super().save(commit=False)
+        if self.project and not instance.project:
+            instance.project = self.project
+        instance.save()
+        return instance
+
+
+class CommentForm(ModelForm):
+    class Meta:
+        model = Comment
+        fields = ('notes',)
+        widgets = {
+            'notes': Textarea(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.task = kwargs.pop('task')
+        super().__init__(*args, **kwargs)
+
+    def save(self):
+        instance = super().save(commit=False)
+        instance.created_by = self.request.user
+        instance.task = self.task
+        instance.save()
+        return instance

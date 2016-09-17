@@ -55,6 +55,7 @@ HISTORY = {
         'customer, contact, title, description, owned_by, status,'
         'invoicing, maintenance'
     ),
+    'projects.task': '',
     'stories.story': '',
 }
 

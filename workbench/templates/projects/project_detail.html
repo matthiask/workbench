@@ -7,11 +7,11 @@
 {% block content %}
 <div class="row">
 <div class="col-md-12">
+{% with overview=project.overview %}
   <h1>{{ project }} {% history_link project %}</h1>
 
   <div class="row">
     <div class="col-md-8">
-      {% with overview=project.overview %}
       <table class="table">
         <tr>
           <th>{% trans 'description' %}</th>
@@ -43,8 +43,8 @@
         </tr>
       </table>
 
-      <a href="{{ project.urls.createstory }}" class="btn btn-default">
-        <i class="glyphicon glyphicon-plus"></i> {% trans 'story' %}</a>
+      <a href="{{ project.urls.createtask }}" class="btn btn-default">
+        <i class="glyphicon glyphicon-plus"></i> {% trans 'task' %}</a>
       <a href="{{ project.urls.createoffer }}" class="btn btn-default">
         <i class="glyphicon glyphicon-plus"></i>
         {% trans 'offer' %}</a>
@@ -85,48 +85,35 @@
     </div>
   </div>
 
-      <h2>{% trans 'stories' %}</h2>
-      <div class="stories columns">
-        {% for status_key, status_title, stories in overview.stories %}
-          <div class="column stories--{{ status_key }}">
-            <input type="checkbox" checked data-toggle=".stories--{{ status_key }}"/>
-            <h3>{{ status_title }}</h3>
+  <h2>{% trans 'tasks' %}</h2>
+  <table class="table table-hover table-striped">
+    <thead>
+      <tr>
+        <th>{% trans 'type' %}</th>
+        <th>{% trans 'priority' %}</th>
+        <th>{% trans 'title' %}</th>
+        <th>{% trans 'status' %}</th>
+        <th>{% trans 'created at' %}</th>
+        <th>{% trans 'owned by' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for task in project.tasks.all %}
+        <tr>
+          <td>{{ task.get_type_display }}</td>
+          <td>{{ task.get_priority_display }}</td>
+          <th><a href="{{ task.get_absolute_url }}">{{ task.title }}</a></th>
+          <td>{{ task.get_status_display }}</td>
+          <td>{{ task.created_at }}</td>
+          <td>
+            {{ task.owned_by|default:'&ndash;' }}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-            <div class="list-group">
-              {% for story in stories %}
-                <a class="list-group-item list-group-item-{{ story.css }} story card"
-                    href="{{ story.urls.detail }}">
-
-                  <div class="story__avatar">
-                    {% if story.owned_by %}
-                      <img src="{{ story.owned_by.avatar }}?s=40" alt=""
-                        class="avatar"/>
-                    {% else %}
-                      <i class="glyphicon glyphicon-user avatar"></i>
-                    {% endif %}
-                  </div>
-
-                  <div class="story__content">
-                    <strong class="story__title">{{ story }}</strong>
-                  </div>
-
-                  {% with perc=story.stats.used_percentage %}
-                  <div class="progress">
-                    <div class="progress-bar progress-bar-{{ perc|percentage_to_css }}"
-                         role="progressbar"
-                         style="width:{{ perc|stringformat:'f' }}%"></div>
-
-                  </div>
-                  {% endwith %}
-                </a>
-              {% endfor %}
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-      {% endwith %}
-
-
+{% endwith %}
 </div>
 </div>
 {% endblock %}

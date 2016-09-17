@@ -1,10 +1,12 @@
 import itertools
+from markdown2 import markdown
 import operator
 
 from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.html import mark_safe, strip_tags
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from accounts.models import User
@@ -27,7 +29,7 @@ class SummationDict(dict):
         if key == 'used_percentage':
             try:
                 return 100 * self['hours'] / self['planning']
-            except Exception as exc:
+            except Exception:
                 return 0
 
         try:
@@ -172,3 +174,181 @@ class Project(Model):
         if self.maintenance:
             parts.append(ugettext('maintenance'))
         return ', '.join(parts)
+
+
+@model_urls()
+class Task(Model):
+    INBOX = 10
+    BACKLOG = 20
+    IN_PROGRESS = 30
+    READY_FOR_TEST = 40
+    DONE = 50
+    ARCHIVED = 60
+
+    STATUS_CHOICES = (
+        (INBOX, _('Inbox')),
+        (BACKLOG, _('Backlog')),
+        (IN_PROGRESS, _('In progress')),
+        (READY_FOR_TEST, _('Ready for test')),
+        (DONE, _('Done')),
+        (ARCHIVED, _('Archived')),
+    )
+
+    TASK = 'task'
+    BUG = 'bug'
+    ENHANCEMENT = 'enhancement'
+    QUESTION = 'question'
+
+    TYPE_CHOICES = (
+        (TASK, _('Task')),
+        (BUG, _('Bug')),
+        (ENHANCEMENT, _('Enhancement')),
+        (QUESTION, _('Question')),
+    )
+
+    BLOCKER = 50
+    HIGH = 40
+    NORMAL = 30
+    LOW = 20
+
+    PRIORITY_CHOICES = (
+        (BLOCKER, _('Blocker')),
+        (HIGH, _('High')),
+        (NORMAL, _('Normal')),
+        (LOW, _('Low')),
+    )
+
+    created_at = models.DateTimeField(
+        _('created at'),
+        default=timezone.now)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        verbose_name=_('created by'),
+        related_name='+')
+
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.PROTECT,
+        verbose_name=_('project'),
+        related_name='tasks')
+    title = models.CharField(
+        _('title'),
+        max_length=200)
+    description = models.TextField(
+        _('description'),
+        blank=True)
+    type = models.CharField(
+        _('type'),
+        max_length=20,
+        choices=TYPE_CHOICES,
+        default=TASK,
+    )
+    priority = models.PositiveIntegerField(
+        _('priority'),
+        choices=PRIORITY_CHOICES,
+        default=NORMAL,
+    )
+    owned_by = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        verbose_name=_('owned by'),
+        related_name='+')
+
+    service = models.ForeignKey(
+        'offers.Service',
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        verbose_name=_('service'),
+        related_name='tasks',
+    )
+
+    status = models.PositiveIntegerField(
+        _('status'),
+        choices=STATUS_CHOICES,
+        default=INBOX)
+    closed_at = models.DateTimeField(
+        _('accepted at'),
+        blank=True,
+        null=True)
+
+    due_on = models.DateField(
+        _('due on'),
+        blank=True,
+        null=True,
+        help_text=_('This field should be left empty most of the time.'))
+
+    # position = models.PositiveIntegerField(_('position'), default=0)
+
+    class Meta:
+        ordering = ('-priority', 'pk')
+        verbose_name = _('task')
+        verbose_name_plural = _('task')
+
+    def __str__(self):
+        return self.title
+
+
+class Attachment(Model):
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE,
+        related_name='attachments',
+        verbose_name=_('task'),
+    )
+    created_at = models.DateTimeField(
+        _('created at'),
+        default=timezone.now)
+    title = models.CharField(
+        _('title'),
+        max_length=200,
+        blank=True,
+    )
+    file = models.FileField(
+        _('file'),
+        upload_to='attachments/%Y/%m',
+    )
+
+    class Meta:
+        ordering = ('created_at',)
+        verbose_name = _('attachment')
+        verbose_name_plural = _('attachments')
+
+    def __str__(self):
+        return self.title or self.file.name
+
+
+class Comment(Model):
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name=_('task'),
+    )
+    created_at = models.DateTimeField(
+        _('created at'),
+        default=timezone.now)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        verbose_name=_('created by'),
+        related_name='+')
+    notes = models.TextField(
+        _('notes'),
+    )
+
+    def get_absolute_url(self):
+        return self.task.urls['detail']
+
+    @property
+    def urls(self):
+        return self.task.urls
+
+    def html(self):
+        return mark_safe(markdown(strip_tags(self.notes)))
+
+    def __str__(self):
+        return self.notes[:30] + '...'

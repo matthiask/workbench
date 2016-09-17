@@ -2,22 +2,31 @@
 
 {% load bootstrap3 history i18n workbench %}
 
-{% block title %}{{ story }} - {{ story.project }} - {{ block.super }}{% endblock %}
+{% block title %}{{ task }} - {{ task.project }} - {{ block.super }}{% endblock %}
 
 {% block content %}
 
 <div class="row">
   <div class="col-md-12">
 
-    <h2><a href="{{ story.project.get_absolute_url }}">
+    <h2><a href="{{ task.project.get_absolute_url }}">
         <small><i class="glyphicon glyphicon-menu-left"></i></small>
-        {{ story.project|h }}</a></h2>
+        {{ task.project|h }}</a></h2>
 
-    <h1>{{ story|h }} {% history_link story %}</h1>
-    <p>{{ story.description|linebreaksbr }}</p>
+    <h1>{{ task|h }} {% history_link task %}</h1>
 
     <div class="row">
       <div class="col-md-8">
+
+        <table class="table table-striped">
+          {% for name, value in object|field_value_pairs %}
+          <tr>
+            <th class="text-right">{{ name }}</th>
+            <td>{% link_or_none value %}</td>
+          </tr>
+          {% endfor %}
+        </table>
+
         <h4>{% trans 'required services' %}</h4>
         <table class="table table-striped table-condensed table-linearize">
           <thead>
@@ -28,7 +37,7 @@
             </tr>
           </thead>
           <tbody>
-            {% for requiredhours in story.overview.required %}
+            {% for requiredhours in task.overview.required %}
               <tr>
                 <th>{{ requiredhours.service_type }}</th>
                 <td class="text-right">{{ requiredhours.offered_effort }}h</td>
@@ -39,15 +48,15 @@
           <tfoot>
             <tr>
               <th></th>
-              <th class="text-right">{{ story.overview.required_total.offered_effort }}h</th>
-              <th class="text-right">{{ story.overview.required_total.planning_effort }}h</th>
+              <th class="text-right">{{ task.overview.required_total.offered_effort }}h</th>
+              <th class="text-right">{{ task.overview.required_total.planning_effort }}h</th>
             </tr>
           </tfoot>
         </table>
         <h4>{% trans 'rendered services' %}</h4>
         <table class="table table-striped table-condensed table-linearize">
           <tbody>
-            {% for renderedhours in story.overview.rendered %}
+            {% for renderedhours in task.overview.rendered %}
             <tr>
               <td class="text-right">{{ renderedhours.hours }}h</td>
               <th>{{ renderedhours.name }}</th>
@@ -56,7 +65,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <th class="text-right">{{ story.overview.rendered_total.hours }}h</th>
+              <th class="text-right">{{ task.overview.rendered_total.hours }}h</th>
               <th></th>
             </tr>
           </tfoot>
@@ -81,27 +90,48 @@
         </table>
 
 
-        <a href="{{ story.urls.update }}" class="btn btn-default">
+        <a href="{{ task.urls.update }}" class="btn btn-default">
           {% trans 'Update' %}
         </a>
-        <a href="{{ story.urls.merge }}" class="btn btn-default">
-          {% trans 'Merge' %}
-        </a>
-        <a href="{{ story.urls.delete }}" class="btn btn-danger btn-inverse pull-right">
+        <a href="{{ task.urls.delete }}" class="btn btn-danger btn-inverse pull-right">
           {% trans 'Delete' %}
         </a>
+
+
+        <h3>{% trans 'comments' %}</h3>
+        {% for comment in task.comments.all %}
+        <div class="comment">
+          <h4>{{ comment.created_by }} {{ comment.created_at }}</h4>
+          {{ comment.html }}
+        </div>
+        {% endfor %}
+
+        <div class="comment">
+          <h4>{{ request.user }}</h4>
+          <form method="post" action="{{ request.path }}" class="form">
+            <input type="hidden" name="form" value="comment_form"/>
+            {% csrf_token %}
+            {% bootstrap_form comment_form layout='inline' %}
+            <button type="submit" class="btn btn-primary">
+              {% trans 'add comment' %}
+            </button>
+          </form>
+        </div>
 
 
       </div>
       <div class="col-md-4">
         <form method="post" action="{{ request.path }}" class="form">
-          <h4>{% trans 'rendered service' %}</h4>
+          <h4>{% trans 'logged hours' %}</h4>
+            <input type="hidden" name="form" value="logbook_form"/>
           {% csrf_token %}
-          {% bootstrap_form form layout='inline' %}
+          {% bootstrap_form logbook_form layout='inline' %}
           <button type="submit" class="btn btn-primary">
             {% trans 'create' %}
           </button>
         </form>
+
+        {{ task.loggedhours.all }}
       </div>
     </div>
 
