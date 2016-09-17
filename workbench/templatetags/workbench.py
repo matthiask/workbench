@@ -60,3 +60,8 @@ def percentage_to_css(value):
     elif value < 100:
         return 'warning'
     return 'danger'
+
+
+@register.filter
+def select_related(queryset, rel):
+    return queryset.select_related(*rel.split(','))
