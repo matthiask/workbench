@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from offers.forms import ServiceForm
 from offers.models import Offer, Service
 from tools.pdf import pdf_response
-from tools.views import DetailView, CreateView
+from tools.views import DetailView, CreateView, UpdateView
 
 
 class OfferPDFView(DetailView):
@@ -27,7 +27,6 @@ class CreateServiceView(CreateView):
     model = Service
 
     def get(self, request, *args, **kwargs):
-
         if not self.model.allow_create(request):
             return redirect('../')
 
@@ -43,9 +42,22 @@ class CreateServiceView(CreateView):
         return self.render_to_response(context)
 
     def get_form(self, data=None, files=None, **kwargs):
+        if not hasattr(self, 'offer'):
+            self.offer = get_object_or_404(Offer, pk=self.kwargs['pk'])
         return ServiceForm(
             data,
             files,
             offer=self.offer,
             request=self.request,
             **kwargs)
+
+    def get_success_url(self):
+        return self.object.urls.url('update')
+
+
+class UpdateServiceView(UpdateView):
+    model = Service
+    form_class = ServiceForm
+
+    def get_success_url(self):
+        return self.object.offer.get_absolute_url()

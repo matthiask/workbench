@@ -2,9 +2,9 @@ from django.conf.urls import url
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext_lazy as _
 
-from offers.forms import OfferSearchForm, OfferForm, ServiceForm
+from offers.forms import OfferSearchForm, OfferForm
 from offers.models import Offer, Service
-from offers.views import OfferPDFView, CreateServiceView
+from offers.views import OfferPDFView, CreateServiceView, UpdateServiceView
 from tools.views import (
     ListView, DetailView, UpdateView, DeleteView, MessageView)
 
@@ -58,10 +58,7 @@ urlpatterns = [
         lambda request, pk: redirect(get_object_or_404(Service, pk=pk).offer),
         name='offers_service_detail'),
     url(r'^service/(?P<pk>\d+)/update/$',
-        UpdateView.as_view(
-            model=Service,
-            form_class=ServiceForm,
-        ),
+        UpdateServiceView.as_view(),
         name='offers_service_update'),
     url(r'^service/(?P<pk>\d+)/delete/$',
         DeleteView.as_view(model=Service),
