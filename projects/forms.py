@@ -1,12 +1,9 @@
-from collections import defaultdict
-
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from contacts.models import Organization, Person
 from projects.models import Project, Task, Comment
-from services.models import ServiceType
-from stories.models import RequiredService
+from offers.models import Service
 from tools.forms import ModelForm, Picker, Textarea
 
 
@@ -43,6 +40,7 @@ class ProjectForm(ModelForm):
         }
 
 
+"""
 class EffortForm(forms.Form):
     effort_field = None
 
@@ -118,6 +116,7 @@ class EffortForm(forms.Form):
 
 class EstimationForm(EffortForm):
     effort_field = 'offered_effort'
+"""
 
 
 class TaskForm(ModelForm):
@@ -133,6 +132,7 @@ class TaskForm(ModelForm):
             'owned_by',
             'status',
             'due_on',
+            'service',
         )
         widgets = {
             'type': forms.RadioSelect,
@@ -144,6 +144,9 @@ class TaskForm(ModelForm):
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project', None)
         super().__init__(*args, **kwargs)
+        self.fields['service'].queryset = Service.objects.filter(
+            offer__project=self.project or self.instance.project,
+        )
 
     def save(self):
         instance = super().save(commit=False)

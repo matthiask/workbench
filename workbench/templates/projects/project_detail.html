@@ -22,7 +22,7 @@
             {% trans 'Overall' %}
           </th>
           <td>
-            {{ overview.stats.hours }}h / {{ overview.stats.planning }}h
+            {{ overview.stats.logged_hours }}h / {{ overview.stats.effort_hours }}h
           </td>
         </tr>
         <tr>
@@ -98,13 +98,34 @@
       </tr>
     </thead>
     <tbody>
-      {% for task in project.tasks.all %}
+      {% for task in tasks %}
+
+        {% if tasks_view == 'services' %}
+        {% ifchanged task.service %}
         <tr>
-          <td>{{ task.get_type_display }}</td>
-          <td>{{ task.get_priority_display }}</td>
-          <th><a href="{{ task.get_absolute_url }}">{{ task.title }}</a></th>
+          <th colspan="6">
+            <h3>
+              {{ task.service|default:_('No service') }}
+            </h3>
+          </th>
+        </tr>
+        {% endifchanged %}
+        {% endif %}
+
+        <tr>
+          <td>
+            <i
+              title="{{ task.get_type_display }}"
+              class="{{ task.type_css }}"></i>
+          </td>
+          <td>
+            <span
+              title="{{ task.get_priority_display }}"
+              class="{{ task.priority_css }}">&nbsp;</span>
+          </td>
+          <th><a href="{{ task.get_absolute_url }}">{{ task|h }}</a></th>
           <td>{{ task.get_status_display }}</td>
-          <td>{{ task.created_at }}</td>
+          <td>{{ task.created_at|date:'d.m.Y' }}</td>
           <td>
             {{ task.owned_by|default:'&ndash;' }}
           </td>

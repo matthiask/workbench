@@ -23,6 +23,9 @@
   }
 }
 
+.form-inline.fieldset>.row {
+  margin-left: 0;
+}
 .form-inline.fieldset .form-group {
   margin-bottom: 15px;
   display: inline-block;
@@ -135,4 +138,20 @@ small {
 
 .card {
   margin: 0 5px 10px 0;
+}
+
+.icon-red {
+  color: #e74c3c;
+}
+.icon-green {
+  color: #18bc9c;
+}
+.icon-blue {
+  color: #3498db;
+}
+
+small.right {
+  display: inline-block;
+  min-width: 3em;
+  text-align: right;
 }

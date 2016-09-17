@@ -1,12 +1,10 @@
-import itertools
 from markdown2 import markdown
-import operator
 
 from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.html import mark_safe, strip_tags
+from django.utils.html import format_html, mark_safe, strip_tags
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from accounts.models import User
@@ -114,57 +112,51 @@ class Project(Model):
     @cached_property
     def overview(self):
         # Avoid circular imports
-        from stories.models import Story, RequiredService, RenderedService
+        from logbook.models import LoggedHours
+        from offers.models import Service, Effort
 
-        required = RequiredService.objects.filter(
-            story__project=self,
+        required = Effort.objects.filter(
+            service__offer__project=self,
         ).order_by('service_type').values(
-            'story',
+            'service',
         ).annotate(
-            offered=Sum('offered_effort'),
-            planning=Sum('planning_effort'),
+            effort_hours=Sum('hours'),
         )
 
-        rendered = RenderedService.objects.filter(
-            story__project=self,
+        rendered = LoggedHours.objects.filter(
+            task__project=self,
         ).order_by('rendered_by').values(
-            'story',
+            'task__service',
         ).annotate(
-            hours=Sum('hours'),
+            logged_hours=Sum('hours'),
         )
 
-        stories = self.stories.all()
-        story_dict = {}
+        services = Service.objects.filter(offer__project=self)
+        services_dict = {}
         stats = SummationDict()
 
-        for story in stories:
-            story_dict[story.id] = story
-            story.stats = SummationDict()
+        for service in services:
+            services_dict[service.id] = service
+            service.stats = SummationDict()
+
+        services_dict[None] = Service()
+        services_dict[None].stats = SummationDict()
 
         for row in required:
-            story = story_dict[row.pop('story')]
+            service = services_dict[row.pop('service')]
             d = SummationDict(**row)
-            story.stats += d
+            service.stats += d
             stats += d
 
         for row in rendered:
-            story = story_dict[row.pop('story')]
+            service = services_dict[row.pop('task__service')]
             d = SummationDict(**row)
-            story.stats += d
+            service.stats += d
             stats += d
-
-        stories = {
-            k: list(v)
-            for k, v in
-            itertools.groupby(stories, operator.attrgetter('status'))
-        }
 
         return {
             'stats': stats,
-            'stories': [
-                (value, title, list(stories.get(value, ())))
-                for value, title in Story.STATUS_CHOICES
-            ],
+            'services': services,
         }
 
     def pretty_status(self):
@@ -290,6 +282,29 @@ class Task(Model):
 
     def __str__(self):
         return self.title
+
+    def __html__(self):
+        return format_html(
+            '<small class="right">#{}</small> {}',
+            self.pk,
+            self.title,
+        )
+
+    def type_css(self):
+        return {
+            self.TASK: '',
+            self.BUG: 'glyphicon glyphicon-exclamation-sign icon-red',
+            self.ENHANCEMENT: 'glyphicon glyphicon-plus-sign icon-green',
+            self.QUESTION: 'glyphicon glyphicon-question-sign icon-blue',
+        }[self.type]
+
+    def priority_css(self):
+        return {
+            self.BLOCKER: 'label label-danger',
+            self.HIGH: 'label label-warning',
+            self.NORMAL: 'label label-info',
+            self.LOW: 'label label-default',
+        }[self.priority]
 
 
 class Attachment(Model):

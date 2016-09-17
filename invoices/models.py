@@ -1,10 +1,7 @@
 from datetime import date
-from decimal import Decimal
 
-from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Prefetch
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.formats import date_format
@@ -13,7 +10,6 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.models import User
 from contacts.models import Organization, Person
 from projects.models import Project
-from stories.models import Story, RequiredService
 from tools.models import ModelWithTotal, SearchQuerySet
 from tools.urls import model_urls
 
@@ -120,13 +116,6 @@ class Invoice(ModelWithTotal):
         _('postal address'),
         blank=True)
 
-    story_data = JSONField(_('stories'), blank=True, null=True)
-    stories = models.ManyToManyField(
-        Story,
-        verbose_name=_('stories'),
-        blank=True,
-        related_name='invoices')
-
     objects = models.Manager.from_queryset(InvoiceQuerySet)()
 
     class Meta:
@@ -190,50 +179,3 @@ class Invoice(ModelWithTotal):
             return _('Paid on %(closed_on)s') % d
         else:
             return self.get_status_display()
-
-    def add_stories(self, stories, save=True):
-        if not self.story_data:
-            self.story_data = {}
-
-        self.story_data.setdefault('stories', []).extend((
-            {
-                'title': story.title,
-                'description': story.description,
-                'billing': [
-                    (
-                        str(rs.offered_effort),
-                        str(rs.service_type.billing_per_hour),
-                    ) for rs in story.requiredservices.all()
-                ],
-            } for story in stories.prefetch_related(
-                Prefetch(
-                    'requiredservices',
-                    queryset=RequiredService.objects.select_related(
-                        'service_type'),
-                ),
-            )
-        ))
-
-        self.stories.add(*list(stories))
-
-        self.subtotal = sum([
-            sum(
-                (Decimal(e) * Decimal(p) for e, p in story['billing']),
-                Decimal('0')
-            )
-            for story in self.story_data['stories']
-        ], Decimal('0'))
-
-        self._calculate_total()
-
-        if save:
-            self.save()
-
-    def clear_stories(self, save=True):
-        self.stories.clear()
-        self.story_data = {}
-        self.subtotal = Decimal('0')
-        self._calculate_total()
-
-        if save:
-            self.save()

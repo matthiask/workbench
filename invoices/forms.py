@@ -1,14 +1,12 @@
 from datetime import date
 
 from django import forms
-from django.db.models import Q
 from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.translation import ugettext_lazy as _
 
 from contacts.models import Organization, Person
 from invoices.models import Invoice
-from stories.models import RenderedService
 from tools.forms import ModelForm, Picker, Textarea, WarningsForm
 
 
@@ -68,6 +66,8 @@ class InvoiceForm(WarningsForm, ModelForm):
             )
 
         elif self.instance.type in (self.instance.SERVICES,):
+            pass
+            """
             self.fields['services'] = forms.ModelMultipleChoiceField(
                 queryset=RenderedService.objects.filter(
                     Q(story__project=self.instance.project),
@@ -80,6 +80,7 @@ class InvoiceForm(WarningsForm, ModelForm):
                 initial=RenderedService.objects.filter(invoice=self.instance),
                 label=_('rendered services'),
             )
+            """
 
         if 'ignore_warnings' in self.fields:
             self.fields.move_to_end('ignore_warnings', last=False)

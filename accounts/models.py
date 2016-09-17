@@ -89,7 +89,7 @@ class User(Model, AbstractBaseUser):
 
         per_day = {
             row['rendered_on']: row['hours__sum']
-            for row in self.renderedservices.filter(
+            for row in self.loggedhours.filter(
                 rendered_on__gte=monday,
             ).order_by().values('rendered_on').annotate(Sum('hours'))
         }

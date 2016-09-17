@@ -3,9 +3,10 @@ from django.conf.urls import url
 from projects.forms import ProjectSearchForm, ProjectForm, TaskForm
 from projects.models import Project, Task
 from projects.views import (
-    CreateTaskView, OfferCreateView, EstimationView, TaskDetailView)
+    ProjectDetailView, CreateTaskView, OfferCreateView,
+    TaskDetailView)
 from tools.views import (
-    ListView, DetailView, CreateView, UpdateView, DeleteView)
+    ListView, CreateView, UpdateView, DeleteView)
 
 
 urlpatterns = [
@@ -23,7 +24,7 @@ urlpatterns = [
         name='projects_project_list'),
     url(
         r'^(?P<pk>\d+)/$',
-        DetailView.as_view(model=Project),
+        ProjectDetailView.as_view(),
         name='projects_project_detail'),
     url(
         r'^create/$',
@@ -52,10 +53,11 @@ urlpatterns = [
         r'^(?P<pk>\d+)/createoffer/$',
         OfferCreateView.as_view(),
         name='projects_project_createoffer'),
-    url(
-        r'^(?P<pk>\d+)/estimation/$',
-        EstimationView.as_view(),
-        name='projects_project_estimation'),
+
+    # url(
+    #     r'^(?P<pk>\d+)/estimation/$',
+    #     EstimationView.as_view(),
+    #     name='projects_project_estimation'),
 
     url(
         r'^tasks/(?P<pk>\d+)/$',

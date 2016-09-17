@@ -56,7 +56,6 @@ HISTORY = {
         'invoicing, maintenance'
     ),
     'projects.task': '',
-    'stories.story': '',
 }
 
 

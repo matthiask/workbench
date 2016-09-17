@@ -297,8 +297,8 @@ class PDFDocument(_PDFDocument):
         self.p(offer.description)
         self.spacer()
 
-        if offer.story_data and offer.story_data.get('stories'):
-            self.table_stories(offer.story_data['stories'])
+        # if offer.story_data and offer.story_data.get('stories'):
+        #     self.table_stories(offer.story_data['stories'])
         self.table_total(offer)
 
     def process_invoice(self, invoice):

@@ -1,3 +1,7 @@
+from decimal import Decimal
+import itertools
+
+from django.contrib import messages
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -68,12 +72,21 @@ class Offer(ModelWithTotal):
     objects = models.Manager.from_queryset(OfferQuerySet)()
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('-offered_on',)
         verbose_name = _('offer')
         verbose_name_plural = _('offers')
 
     def __str__(self):
         return self.title
+
+    def _calculate_total(self):
+        self.subtotal = sum((item.cost for item in itertools.chain(
+            Effort.objects.filter(
+                service__offer=self).select_related('service_type'),
+            Cost.objects.filter(
+                service__offer=self),
+        )), Decimal())
+        super()._calculate_total()
 
 
 @model_urls()
@@ -110,6 +123,28 @@ class Service(Model):
     def __str__(self):
         return self.title
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.offer.save()
+
+    @classmethod
+    def allow_update(cls, instance, request):
+        if instance.offer.status > Offer.IN_PREPARATION:
+            messages.error(request, _(
+                'Cannot modify an offer which is not in preparation anymore.'
+            ))
+            return False
+        return True
+
+    @classmethod
+    def allow_delete(cls, instance, request):
+        if instance.offer.status > Offer.IN_PREPARATION:
+            messages.error(request, _(
+                'Cannot modify an offer which is not in preparation anymore.'
+            ))
+            return False
+        return super().allow_delete(instance, request)
+
 
 class Effort(Model):
     service = models.ForeignKey(
@@ -145,6 +180,10 @@ class Effort(Model):
 
     def get_absolute_url(self):
         return self.service.get_absolute_url()
+
+    @property
+    def cost(self):
+        return self.service_type.billing_per_hour * self.hours
 
 
 class Cost(Model):

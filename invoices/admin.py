@@ -10,8 +10,7 @@ class InvoiceAdmin(admin.ModelAdmin):
         'total')
     list_filter = ('status',)
     raw_id_fields = (
-        'customer', 'contact', 'project', 'stories',
-        'down_payment_applied_to')
+        'customer', 'contact', 'project', 'down_payment_applied_to')
 
 
 admin.site.register(models.Invoice, InvoiceAdmin)

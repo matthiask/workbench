@@ -6,9 +6,9 @@ from logbook.forms import LoggedHoursForm
 from logbook.models import LoggedHours
 from offers.forms import CreateOfferForm
 from offers.models import Offer
-from projects.forms import EstimationForm, CommentForm, TaskForm
+from projects.forms import CommentForm, TaskForm
 from projects.models import Project, Task, Comment
-from tools.views import DetailView, CreateView, UpdateView
+from tools.views import DetailView, CreateView
 
 
 class CreateTaskView(CreateView):
@@ -37,11 +37,32 @@ class OfferCreateView(CreateView):
             **kwargs)
 
 
-class EstimationView(UpdateView):
+# class EstimationView(UpdateView):
+#     model = Project
+#
+#     template_name_suffix = '_estimation'
+#     form_class = EstimationForm
+
+
+class ProjectDetailView(DetailView):
     model = Project
 
-    template_name_suffix = '_estimation'
-    form_class = EstimationForm
+    def get_context_data(self, **kwargs):
+        view = self.request.GET.get('view')
+        if view == 'services':
+            kwargs['tasks'] = self.object.tasks.order_by(
+                'service__offer',
+                'service',
+                '-priority',
+                'pk',
+            ).select_related('owned_by', 'service')
+            kwargs['tasks_view'] = 'services'
+
+        else:
+            kwargs['tasks'] = self.object.tasks.select_related('owned_by')
+            kwargs['tasks_view'] = 'tasks'
+
+        return super().get_context_data(**kwargs)
 
 
 class TaskDetailView(DetailView):
