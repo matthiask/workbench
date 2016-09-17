@@ -134,7 +134,7 @@
         <table class="table table-striped table-hover">
           {% for hours in task.loggedhours.all|select_related:'rendered_by' %}
           <tr>
-            <td>{{ hours.rendered_by }}</td>
+            <td>{{ hours.rendered_by.get_short_name }}</td>
             <td>{{ hours.rendered_on|date:'d.m.Y' }}</td>
             <td>{{ hours.hours }}h</td>
             <td>{{ hours.description }}</td>

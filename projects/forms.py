@@ -150,7 +150,8 @@ class TaskForm(ModelForm):
 
     def save(self):
         instance = super().save(commit=False)
-        if self.project and not instance.project:
+        if not instance.pk:
+            instance.created_by = self.request.user
             instance.project = self.project
         instance.save()
         return instance
