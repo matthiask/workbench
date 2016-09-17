@@ -1,6 +1,6 @@
 coverage==4.2
 dj-database-url==0.4.1
-Django==1.10
+Django==1.10.1
 django-bootstrap3==7.0.1
 django-debug-toolbar==1.5
 django-vanilla-views==1.0.4

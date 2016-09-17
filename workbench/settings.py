@@ -57,7 +57,8 @@ LOGIN_REDIRECT_URL = '/'
 
 MIDDLEWARE = [m for m in [
     'django.middleware.security.SecurityMiddleware' if LIVE else '',
-    'workbench.middleware.WorkingDebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'workbench.middleware.WorkingDebugToolbarMiddleware' if DEBUG else '',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
