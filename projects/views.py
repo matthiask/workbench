@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from logbook.forms import LoggedHoursForm
 from logbook.models import LoggedHours
 from offers.forms import CreateOfferForm
-from offers.models import Offer, Effort
+from offers.models import Offer, Service, Effort
 from projects.forms import CommentForm, TaskForm
 from projects.models import Project, Task, Comment
 from tools.views import DetailView, CreateView, DeleteView
@@ -65,7 +65,7 @@ class ServicesView(object):
             logged_hours=Sum('loggedhours__hours'),
         )
 
-        self.services = {
+        self.effort_per_service = {
             row['service']: row['effort_hours']
             for row in Effort.objects.order_by().filter(
                 service__offer__project=self.project,
@@ -76,20 +76,33 @@ class ServicesView(object):
             )
         }
 
-        # TODO add services without tasks
-
-    def __iter__(self):
+        self.services = {}
         for key, group in itertools.groupby(
                 self.tasks,
                 lambda task: task.service_id
         ):
             group = list(group)
-            yield ServiceTasks(
+            self.services[key] = ServiceTasks(
                 group[0].service,
-                self.services.get(key) or 0,
+                self.effort_per_service.get(key) or 0,
                 sum(((task.logged_hours or 0) for task in group), Decimal()),
                 group,
             )
+
+    def __iter__(self):
+        if None in self.services:
+            yield self.services[None]
+
+        for service in Service.objects.filter(offer__project=self.project):
+            if service.id in self.services:
+                yield self.services[service.id]
+            else:
+                yield ServiceTasks(
+                    service,
+                    self.effort_per_service.get(service.id) or 0,
+                    0,
+                    [],
+                )
 
 
 class ProjectDetailView(DetailView):
