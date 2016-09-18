@@ -11,6 +11,11 @@ from tools.forms import ModelForm
 
 
 class ActivitySearchForm(forms.Form):
+    s = forms.ChoiceField(
+        choices=(('', _('All')), ('open', _('Open'))),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
     owned_by = forms.TypedChoiceField(
         label=_('owned by'),
         required=False,
@@ -33,6 +38,8 @@ class ActivitySearchForm(forms.Form):
             return queryset
 
         data = self.cleaned_data
+        if data.get('s') == 'open':
+            queryset = queryset.filter(completed_at__isnull=True)
         if data.get('owned_by') == 0:
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get('owned_by'):
