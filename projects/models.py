@@ -296,7 +296,7 @@ class Task(Model):
             }
 
         elif self.due_on:
-            return _('%(status)s (due: %(pretty_due)s)') % {
+            return _('%(status)s (%(pretty_due)s)') % {
                 'status': self.get_status_display(),
                 'pretty_due': pretty_due(self.due_on),
             }

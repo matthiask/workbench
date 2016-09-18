@@ -14,12 +14,12 @@ def local_date_format(dttm, fmt):
 def pretty_due(day):
     days = (day - date.today()).days
     if days > 14:
-        return _('in %s weeks') % (days // 7)
+        return _('due in %s weeks') % (days // 7)
     elif days > 1:
-        return _('in %s days') % days
+        return _('due in %s days') % days
     elif days == 1:
-        return _('tomorrow')
+        return _('due tomorrow')
     elif days == 0:
-        return _('today')
+        return _('due today')
     else:
         return _('overdue!')

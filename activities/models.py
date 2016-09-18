@@ -105,11 +105,9 @@ class Activity(Model):
             }
 
         if self.due_on:
-            ctx = {
-                'date': local_date_format(self.due_on, 'd.m.Y'),
-                'relative': pretty_due(self.due_on),
-            }
-
-            return _('due on %(date)s (%(relative)s)') % ctx
+            return '%s (%s)' % (
+                pretty_due(self.due_on),
+                local_date_format(self.due_on, 'd.m.Y'),
+            )
 
         return _('open')

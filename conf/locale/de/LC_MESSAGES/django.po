@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-18 15:27+0200\n"
+"POT-Creation-Date: 2016-09-18 15:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -171,16 +171,10 @@ msgstr "Aktivität"
 
 #: activities/models.py:103
 #, python-format
-#| msgid "Offered on %(offered_on)s"
 msgid "completed on %(completed_on)s"
 msgstr "Geschlossen am %(completed_on)s"
 
-#: activities/models.py:113
-#, python-format
-msgid "due on %(date)s (%(relative)s)"
-msgstr "fällig am %(date)s (%(relative)s)"
-
-#: activities/models.py:115 deals/models.py:43
+#: activities/models.py:113 deals/models.py:43
 msgid "open"
 msgstr "Offen"
 
@@ -365,7 +359,7 @@ msgstr "Geschätzter Wert"
 #: workbench/templates/projects/project_detail.html:51
 #: workbench/templates/projects/project_detail.html:104
 #: workbench/templates/projects/project_list.html:13
-#: workbench/templates/projects/task_detail.html:29
+#: workbench/templates/projects/task_detail.html:36
 msgid "status"
 msgstr "Status"
 
@@ -537,7 +531,7 @@ msgid "archived at"
 msgstr "archiviert um"
 
 #: logbook/models.py:68 logbook/models.py:69
-#: workbench/templates/projects/task_detail.html:129
+#: workbench/templates/projects/task_detail.html:73
 msgid "logged hours"
 msgstr "aufgezeichnete Stunden"
 
@@ -598,6 +592,7 @@ msgstr "%(status)s am %(closed_on)s"
 
 #: offers/models.py:152 offers/models.py:194 offers/models.py:234
 #: projects/models.py:256 workbench/templates/offers/offer_detail.html:69
+#: workbench/templates/projects/task_detail.html:29
 msgid "service"
 msgstr "Leistung"
 
@@ -752,8 +747,9 @@ msgstr "Erledigt am %(closed_on)s"
 
 #: projects/models.py:299
 #, python-format
-msgid "%(status)s (due: %(pretty_due)s)"
-msgstr "%(status)s (fällig: %(pretty_due)s)"
+#| msgid "%(status)s (due: %(pretty_due)s)"
+msgid "%(status)s (%(pretty_due)s)"
+msgstr "%(status)s (%(pretty_due)s)"
 
 #: projects/models.py:339
 msgid "file"
@@ -790,21 +786,25 @@ msgstr "Zusammenführen mit"
 
 #: tools/formats.py:17
 #, python-format
-msgid "in %s weeks"
-msgstr "in %s Wochen"
+#| msgid "in %s weeks"
+msgid "due in %s weeks"
+msgstr "fällig in %s Wochen"
 
 #: tools/formats.py:19
 #, python-format
-msgid "in %s days"
-msgstr "in %s Tagen"
+#| msgid "in %s days"
+msgid "due in %s days"
+msgstr "fällig in %s Tagen"
 
 #: tools/formats.py:21
-msgid "tomorrow"
-msgstr "morgen"
+#| msgid "tomorrow"
+msgid "due tomorrow"
+msgstr "morgen fällig"
 
 #: tools/formats.py:23
-msgid "today"
-msgstr "heute"
+#| msgid "today"
+msgid "due today"
+msgstr "heute fällig"
 
 #: tools/formats.py:25
 msgid "overdue!"
@@ -923,7 +923,7 @@ msgstr "Kontext"
 #: workbench/templates/invoices/invoice_detail.html:51
 #: workbench/templates/offers/offer_detail.html:75
 #: workbench/templates/projects/project_detail.html:82
-#: workbench/templates/projects/task_detail.html:98
+#: workbench/templates/projects/task_detail.html:42
 #: workbench/templates/stories/story_detail.html:85
 #: workbench/templates/tools/object_detail.html:22
 msgid "Update"
@@ -977,7 +977,7 @@ msgstr "Abmelden"
 #: workbench/templates/invoices/invoice_detail.html:54
 #: workbench/templates/offers/offer_detail.html:78
 #: workbench/templates/projects/project_detail.html:84
-#: workbench/templates/projects/task_detail.html:101
+#: workbench/templates/projects/task_detail.html:45
 #: workbench/templates/stories/story_confirm_delete.html:16
 #: workbench/templates/stories/story_detail.html:91
 #: workbench/templates/tools/object_detail.html:25
@@ -1040,7 +1040,6 @@ msgid "Overall"
 msgstr "Gesamt"
 
 #: workbench/templates/projects/project_detail.html:120
-#| msgid "Not offered service"
 msgid "Not offered services"
 msgstr "Nicht offerierte Leistungen"
 
@@ -1049,40 +1048,15 @@ msgstr "Nicht offerierte Leistungen"
 msgid "story"
 msgstr "Story"
 
-#: workbench/templates/projects/task_detail.html:34
-#: workbench/templates/stories/story_detail.html:21
-msgid "required services"
-msgstr "benötigte Leistungen"
-
-#: workbench/templates/projects/task_detail.html:39
-#: workbench/templates/stories/story_detail.html:26
-msgid "offered"
-msgstr "offeriert"
-
-#: workbench/templates/projects/task_detail.html:40
-#: workbench/templates/stories/story_detail.html:27
-msgid "planning"
-msgstr "geplant"
-
-#: workbench/templates/projects/task_detail.html:60
-#: workbench/templates/stories/story_detail.html:47
-msgid "rendered services"
-msgstr "erbrachte Leistungen"
-
-#: workbench/templates/projects/task_detail.html:78
-#: workbench/templates/stories/story_detail.html:65
-msgid "recent services"
-msgstr "neueste Leistungen"
-
-#: workbench/templates/projects/task_detail.html:105
+#: workbench/templates/projects/task_detail.html:49
 msgid "comments"
 msgstr "Kommentare"
 
-#: workbench/templates/projects/task_detail.html:120
+#: workbench/templates/projects/task_detail.html:64
 msgid "add comment"
 msgstr "Kommentar hinzufügen"
 
-#: workbench/templates/projects/task_detail.html:134
+#: workbench/templates/projects/task_detail.html:78
 #: workbench/templates/stories/story_detail.html:102
 msgid "create"
 msgstr "erstellen"
@@ -1107,6 +1081,26 @@ msgstr "%(object)s löschen"
 msgid "cancel"
 msgstr "Abbruch"
 
+#: workbench/templates/stories/story_detail.html:21
+msgid "required services"
+msgstr "benötigte Leistungen"
+
+#: workbench/templates/stories/story_detail.html:26
+msgid "offered"
+msgstr "offeriert"
+
+#: workbench/templates/stories/story_detail.html:27
+msgid "planning"
+msgstr "geplant"
+
+#: workbench/templates/stories/story_detail.html:47
+msgid "rendered services"
+msgstr "erbrachte Leistungen"
+
+#: workbench/templates/stories/story_detail.html:65
+msgid "recent services"
+msgstr "neueste Leistungen"
+
 #: workbench/templates/stories/story_detail.html:88
 msgid "Merge"
 msgstr "Zusammenführen"
@@ -1122,6 +1116,9 @@ msgstr "Ja, ich bin sicher."
 #: workbench/views.py:30
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
+
+#~ msgid "due on %(date)s (%(relative)s)"
+#~ msgstr "fällig am %(date)s (%(relative)s)"
 
 #~ msgid "completed at %s"
 #~ msgstr "Erledigt um %s"
