@@ -3,14 +3,15 @@ import random
 
 from django.core.management import BaseCommand
 
+from accounts.middleware import set_user_name
 from accounts.models import User
 from contacts.models import Person
 from projects.models import Project, Task
-from stories.models import Story
 
 
 class Command(BaseCommand):
     def handle(self, **options):
+        set_user_name('Faker')
         f = faker.Factory.create('de')
 
         contact = Person.objects.filter(organization__isnull=False).first()
@@ -25,7 +26,7 @@ class Command(BaseCommand):
             status=Project.WORK_IN_PROGRESS,
         )
 
-        for i in range(30):
+        for i in range(5):
             task = Task.objects.create(
                 project=project,
                 created_by=owned_by,
@@ -40,12 +41,3 @@ class Command(BaseCommand):
                     created_by=owned_by,
                     notes=f.text(),
                 )
-
-        for i in range(30):
-            Story.objects.create(
-                requested_by=owned_by,
-                title=f.name(),
-                description=f.text(),
-                project=project,
-                status=random.choice(list(range(10, 70, 10))),
-            )

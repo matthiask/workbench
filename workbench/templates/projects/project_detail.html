@@ -41,6 +41,33 @@
           <th>{% trans 'status' %}</th>
           <td>{{ project.pretty_status }}</td>
         </tr>
+        <tr>
+          <th>{% trans 'offers' %}</th>
+          {% with offers=project.offers.all %}
+          {% if offers %}
+            <td class="nopad">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>{% trans 'offer' %}</th>
+                    <th>{% trans 'status' %}</th>
+                    <th class="text-right">{% trans 'total excl. tax' %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for offer in offers %}
+                    <tr>
+                      <th><a href="{{ offer.get_absolute_url }}">{{ offer }}</a></th>
+                      <td>{{ offer.pretty_status }}</td>
+                      <td class="text-right">{{ offer.total_excl_tax|currency }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </td>
+          {% else %}<td>&ndash;</td>{% endif %}
+          {% endwith %}
+        </tr>
       </table>
 
       <a href="{{ project.urls.createtask }}" class="btn btn-default">
@@ -83,7 +110,12 @@
     </div>
   </div>
 
-  <h2>{% trans 'tasks' %}</h2>
+  <h2>
+    {% trans 'tasks' %}
+    <small>
+      (<a href=".">standard</a>, <a href="?view=services">services</a>)
+    </small>
+  </h2>
   <table class="table table-hover table-striped">
     <thead>
       <tr>
@@ -103,7 +135,11 @@
         <tr>
           <th colspan="6">
             <h3>
-              {{ task.service|default:_('Not offered service') }}
+              {% if task.service %}
+                <a href="{{ task.service.get_absolute_url }}">{{ task.service }}</a>
+              {% else %}
+                {% trans 'Not offered service' %}
+              {% endif %}
             </h3>
           </th>
         </tr>

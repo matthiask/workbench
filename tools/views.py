@@ -183,7 +183,10 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
             })
         if request.is_ajax():
             return HttpResponse('Thanks', status=204)  # No content
-        return redirect(self.model().urls.url('list'))
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return self.model().urls.url('list')
 
     def get_context_data(self, **kwargs):
         kwargs.setdefault('title', _('Delete %s') % (

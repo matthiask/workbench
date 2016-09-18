@@ -8,7 +8,7 @@ from offers.forms import CreateOfferForm
 from offers.models import Offer
 from projects.forms import CommentForm, TaskForm
 from projects.models import Project, Task, Comment
-from tools.views import DetailView, CreateView
+from tools.views import DetailView, CreateView, DeleteView
 
 
 class CreateTaskView(CreateView):
@@ -55,7 +55,7 @@ class ProjectDetailView(DetailView):
                 'service',
                 '-priority',
                 'pk',
-            ).select_related('owned_by', 'service')
+            ).select_related('owned_by', 'service__offer')
             kwargs['tasks_view'] = 'services'
 
         else:
@@ -117,3 +117,10 @@ class TaskDetailView(DetailView):
                 return redirect(self.object)
 
         return self.render_to_response(self.get_context_data(**context))
+
+
+class TaskDeleteView(DeleteView):
+    model = Task
+
+    def get_success_url(self):
+        return self.object.project.get_absolute_url()

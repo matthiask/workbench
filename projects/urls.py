@@ -4,7 +4,7 @@ from projects.forms import ProjectSearchForm, ProjectForm, TaskForm
 from projects.models import Project, Task
 from projects.views import (
     ProjectDetailView, CreateTaskView, OfferCreateView,
-    TaskDetailView)
+    TaskDetailView, TaskDeleteView)
 from tools.views import (
     ListView, CreateView, UpdateView, DeleteView)
 
@@ -72,7 +72,7 @@ urlpatterns = [
         name='projects_task_update'),
     url(
         r'^tasks/(?P<pk>\d+)/delete/$',
-        DeleteView.as_view(model=Task),
+        TaskDeleteView.as_view(),
         name='projects_task_delete'),
     # url(
     #     r'^(?P<pk>\d+)/planning/$',

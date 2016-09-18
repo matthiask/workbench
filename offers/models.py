@@ -121,7 +121,7 @@ class Service(Model):
         verbose_name_plural = _('services')
 
     def __str__(self):
-        return self.title
+        return '%s - %s' % (self.offer, self.title)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
