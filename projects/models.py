@@ -263,7 +263,7 @@ class Task(Model):
         choices=STATUS_CHOICES,
         default=INBOX)
     closed_at = models.DateTimeField(
-        _('accepted at'),
+        _('closed at'),
         blank=True,
         null=True)
 
