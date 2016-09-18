@@ -27,7 +27,7 @@
   </table>
 
   <table class="table table-striped table-hover">
-    {% for service in object.services.all %}
+    {% for service in object.services.all|prefetch_related:'efforts__service_type,costs' %}
       <tr>
         <td>
           <a href="{{ service.urls.move }}?up" class="move" title="{% trans 'Move up' %}">
@@ -47,7 +47,7 @@
           {% endif %}
         </td>
       </tr>
-      {% for effort in service.efforts.select_related %}
+      {% for effort in service.efforts.all %}
         <tr>
           <td></td>
           <td>{{ effort.service_type }}</td>
@@ -55,7 +55,7 @@
           <td class="text-right">{{ effort.cost|currency }}</td>
         </tr>
       {% endfor %}
-      {% for cost in service.costs.select_related %}
+      {% for cost in service.costs.all %}
         <tr>
           <td></td>
           <td colspan="2">{{ cost.title }}</td>
