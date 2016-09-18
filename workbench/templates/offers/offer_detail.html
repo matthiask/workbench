@@ -10,7 +10,7 @@
   <h1>{{ object }} {% history_link object %}</h1>
 
   <table class="table table-striped">
-    {% for name, value in object|field_value_pairs:'project,offered_on,description,owned_by' %}
+    {% for name, value in object|field_value_pairs:'project,description,owned_by' %}
     <tr>
       <th class="text-right">{{ name }}</th>
       <td>{% link_or_none value %}</td>
