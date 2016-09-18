@@ -272,10 +272,10 @@ class Task(Model):
         null=True,
         help_text=_('This field should be left empty most of the time.'))
 
-    # position = models.PositiveIntegerField(_('position'), default=0)
+    position = models.PositiveIntegerField(_('position'), default=0)
 
     class Meta:
-        ordering = ('-priority', 'pk')
+        ordering = ('-priority', 'position', 'pk')
         verbose_name = _('task')
         verbose_name_plural = _('tasks')
 
