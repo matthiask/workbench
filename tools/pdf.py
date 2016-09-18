@@ -177,8 +177,8 @@ class PDFDocument(_PDFDocument):
             canvas.setFont(pdf.style.fontName, 6)
             for i, text in enumerate(reversed(
                     settings.WORKBENCH.PDF_OFFER_TERMS)):
-                canvas.drawCentredString(
-                    pdf.bounds.W + .5 * (pdf.bounds.E - pdf.bounds.W),
+                canvas.drawString(
+                    pdf.bounds.W,
                     pdf.bounds.S + 3 * i * mm,
                     text)
 
