@@ -34,14 +34,19 @@
             </a>
           </label>
           <div class="col-md-9 form-inline fieldset">
+            <div class="row">
+              <div class="col-md-4 nopad">{% trans 'hours' %}</div>
+              <div class="col-md-7 nopad">{% trans 'service type' %}</div>
+              <div class="col-md-1 nopad">{% trans 'delete' %}</div>
+            </div>
             {% formset form.formsets.efforts "efforts" %}
               <div class="row" id="{{ form_id }}">
                 <div class="col-md-4">
                   {{ form.id }}
-                  {% bootstrap_field form.service_type layout='inline' %}
+                  {% bootstrap_field form.hours layout='inline' %}
                 </div>
                 <div class="col-md-7">
-                  {% bootstrap_field form.hours layout='inline' %}
+                  {% bootstrap_field form.service_type layout='inline' %}
                 </div>
                 <div class="col-md-1">
                   {{ form.DELETE }}
@@ -60,6 +65,11 @@
             </a>
           </label>
           <div class="col-md-9 form-inline fieldset">
+            <div class="row">
+              <div class="col-md-4 nopad">{% trans 'cost' %}</div>
+              <div class="col-md-7 nopad">{% trans 'title' %}</div>
+              <div class="col-md-1 nopad">{% trans 'delete' %}</div>
+            </div>
             {% formset form.formsets.costs "costs" %}
               <div class="row" id="{{ form_id }}">
                 <div class="col-md-4">

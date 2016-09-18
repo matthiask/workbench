@@ -155,3 +155,7 @@ small.right {
   min-width: 3em;
   text-align: right;
 }
+
+.nopad {
+  padding: 0;
+}
