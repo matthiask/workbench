@@ -61,3 +61,30 @@ class UpdateServiceView(UpdateView):
 
     def get_success_url(self):
         return self.object.offer.get_absolute_url()
+
+
+class MoveServiceView(DetailView):
+    model = Service
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.model.allow_update(self.object, request):
+            return redirect(self.object.offer)
+        if self.object.offer.status > Offer.IN_PREPARATION:
+            messages.error(request, _(
+                'Cannot modify an offer which is not in preparation anymore.'
+            ))
+            return redirect(self.object.offer)
+
+        pks = list(
+            self.object.offer.services.values_list('id', flat=True))
+        index = pks.index(self.object.pk)
+        if 'up' in request.GET and index > 0:
+            pks[index], pks[index - 1] = pks[index - 1], pks[index]
+        elif 'down' in request.GET and index < len(pks) - 1:
+            pks[index], pks[index + 1] = pks[index + 1], pks[index]
+
+        for index, pk in enumerate(pks):
+            Service.objects.filter(pk=pk).update(position=(index + 1) * 10)
+
+        return redirect(self.object.offer)

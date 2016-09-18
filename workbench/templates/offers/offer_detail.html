@@ -29,6 +29,14 @@
   <table class="table table-striped table-hover">
     {% for service in object.services.all %}
       <tr>
+        <td>
+          <a href="{{ service.urls.move }}?up" class="move" title="{% trans 'Move up' %}">
+            <i class="glyphicon glyphicon-chevron-up"></i>
+          </a>
+          <a href="{{ service.urls.move }}?down" class="move" title="{% trans 'Move down' %}">
+            <i class="glyphicon glyphicon-chevron-down"></i>
+          </a>
+        </td>
         <td colspan="3">
           <a href="{{ service.urls.update }}">
             <strong>{{ service.title }}</strong>
@@ -41,6 +49,7 @@
       </tr>
       {% for effort in service.efforts.select_related %}
         <tr>
+          <td></td>
           <td>{{ effort.service_type }}</td>
           <td class="text-right">{{ effort.hours }}h</td>
           <td class="text-right">{{ effort.cost|currency }}</td>
@@ -48,6 +57,7 @@
       {% endfor %}
       {% for cost in service.costs.select_related %}
         <tr>
+          <td></td>
           <td colspan="2">{{ cost.title }}</td>
           <td class="text-right">{{ cost.cost|currency }}</td>
         </tr>
@@ -55,10 +65,12 @@
     {% endfor %}
     <tfoot>
       <tr>
+        <td></td>
         <th colspan="2">{% trans 'total excl. tax' %}</th>
         <td class="text-right">{{ object.total_excl_tax|currency }}</td>
       </tr>
       <tr>
+        <td></td>
         <th colspan="2">{% trans 'total CHF incl. tax' %}</th>
         <td class="text-right">{{ object.total|currency }}</td>
       </tr>

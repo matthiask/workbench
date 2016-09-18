@@ -114,3 +114,8 @@ small.right {
 .table .table {
   background: transparent;
 }
+
+.move {
+  display: block;
+  text-decoration: none;
+}
