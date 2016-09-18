@@ -2,6 +2,8 @@ from collections import OrderedDict
 from datetime import date, datetime
 
 from django import template
+from django.db import models
+from django.template.defaultfilters import linebreaksbr
 from django.utils.html import format_html, mark_safe
 
 from tools.formats import local_date_format
@@ -38,6 +40,11 @@ def field_value_pairs(object, fields=''):
         if field.choices:
             pairs[field.name] = (
                 field.verbose_name, object._get_FIELD_display(field))
+
+        elif isinstance(field, models.TextField):
+            pairs[field.name] = (
+                field.verbose_name,
+                linebreaksbr(getattr(object, field.name)))
 
         else:
             value = getattr(object, field.name)

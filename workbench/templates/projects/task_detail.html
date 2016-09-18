@@ -19,80 +19,24 @@
       <div class="col-md-8">
 
         <table class="table table-striped">
-          {% for name, value in object|field_value_pairs:'created_at,description,type,priority,owned_by,service' %}
+          {% for name, value in object|field_value_pairs:'created_at,description,type,priority,owned_by' %}
           <tr>
             <th class="text-right">{{ name }}</th>
             <td>{% link_or_none value %}</td>
           </tr>
           {% endfor %}
           <tr>
+            <th class="text-right">{% trans 'service' %}</th>
+            <td>
+              {% link_or_none object.service %}
+              HOURS ETC.
+            </td>
+          </tr>
+          <tr>
             <th class="text-right">{% trans 'status' %}</th>
             <td>{{ object.pretty_status }}</td>
           </tr>
         </table>
-
-        <h4>{% trans 'required services' %}</h4>
-        <table class="table table-striped table-condensed table-linearize">
-          <thead>
-            <tr>
-              <th></th>
-              <th class="text-right">{% trans 'offered' %}</th>
-              <th class="text-right">{% trans 'planning' %}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for requiredhours in task.overview.required %}
-              <tr>
-                <th>{{ requiredhours.service_type }}</th>
-                <td class="text-right">{{ requiredhours.offered_effort }}h</td>
-                <td class="text-right">{{ requiredhours.planning_effort }}h</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-          <tfoot>
-            <tr>
-              <th></th>
-              <th class="text-right">{{ task.overview.required_total.offered_effort }}h</th>
-              <th class="text-right">{{ task.overview.required_total.planning_effort }}h</th>
-            </tr>
-          </tfoot>
-        </table>
-        <h4>{% trans 'rendered services' %}</h4>
-        <table class="table table-striped table-condensed table-linearize">
-          <tbody>
-            {% for renderedhours in task.overview.rendered %}
-            <tr>
-              <td class="text-right">{{ renderedhours.hours }}h</td>
-              <th>{{ renderedhours.name }}</th>
-            </tr>
-            {% endfor %}
-          </tbody>
-          <tfoot>
-            <tr>
-              <th class="text-right">{{ task.overview.rendered_total.hours }}h</th>
-              <th></th>
-            </tr>
-          </tfoot>
-        </table>
-
-        <h4>{% trans 'recent services' %}</h4>
-        <table class="table table-striped table-condensed table-linearize">
-        {% for rendered in recent_rendered %}
-          {% ifchanged rendered.rendered_on %}
-            <tr>
-              <td colspan="3">{{ rendered.rendered_on|date:'d.m.Y' }}</td>
-            </tr>
-          {% endifchanged %}
-          <tr>
-            <th><a href="{{ rendered.urls.detail }}" data-toggle="ajaxmodal">
-                {{ rendered }}
-            </a></th>
-            <td>{{ rendered.rendered_by.get_short_name }}</td>
-            <td>{{ rendered.hours }}h</td>
-          </tr>
-        {% endfor %}
-        </table>
-
 
         <a href="{{ task.urls.update }}" class="btn btn-default">
           {% trans 'Update' %}
