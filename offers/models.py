@@ -145,6 +145,14 @@ class Service(Model):
             return False
         return super().allow_delete(instance, request)
 
+    @property
+    def cost(self):
+        return sum((
+            item.cost for item in itertools.chain(
+                self.efforts.all(),
+                self.costs.all(),
+            )), Decimal())
+
 
 class Effort(Model):
     service = models.ForeignKey(

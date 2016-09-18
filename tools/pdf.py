@@ -261,6 +261,34 @@ class PDFDocument(_PDFDocument):
             self.style.tableColumns,
             self.style.tableHead)
 
+    def table_services(self, services):
+        table = [
+            ('', _('Services')),
+        ]
+        for service in services:
+            table.append((
+                '',
+                MarkupParagraph('<b>%s</b><br/>%s' % (
+                    sanitize(service.title),
+                    sanitize(service.description),
+                ), self.style.normal),
+            ))
+            for effort in service.efforts.all():
+                table.append((
+                    effort.cost.quantize(Z),
+                    effort.service_type.title,
+                ))
+            for cost in service.costs.all():
+                table.append((
+                    cost.cost.quantize(Z),
+                    cost.title,
+                ))
+
+        self.table(
+            table,
+            self.style.tableColumns,
+            self.style.tableHead)
+
     def table_total(self, instance):
         total = [
             (currency(instance.subtotal.quantize(Z)), _('subtotal')),
@@ -297,8 +325,8 @@ class PDFDocument(_PDFDocument):
         self.p(offer.description)
         self.spacer()
 
-        # if offer.story_data and offer.story_data.get('stories'):
-        #     self.table_stories(offer.story_data['stories'])
+        self.table_services(offer.services.prefetch_related(
+            'efforts', 'costs'))
         self.table_total(offer)
 
     def process_invoice(self, invoice):
