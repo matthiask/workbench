@@ -69,7 +69,7 @@ class InvoiceForm(WarningsForm, ModelForm):
             pass
             """
             self.fields['services'] = forms.ModelMultipleChoiceField(
-                queryset=RenderedService.objects.filter(
+                queryset=Service.objects.filter(
                     Q(story__project=self.instance.project),
                     Q(
                         invoice=None,
@@ -81,9 +81,6 @@ class InvoiceForm(WarningsForm, ModelForm):
                 label=_('rendered services'),
             )
             """
-
-        if 'ignore_warnings' in self.fields:
-            self.fields.move_to_end('ignore_warnings', last=False)
 
     def _is_status_unexpected(self, to_status):
         if not to_status:

@@ -240,27 +240,6 @@ class PDFDocument(_PDFDocument):
         elements.extend(args)
         self.smaller(' / '.join(e for e in elements))
 
-    def table_stories(self, stories):
-        table = [
-            ('', _('Services')),
-        ]
-        for story in stories:
-            table.append([
-                sum(
-                    (D(e) * D(p) for e, p in story['billing']),
-                    Z,
-                ).quantize(Z),
-                MarkupParagraph('<b>%s</b><br/>%s' % (
-                    sanitize(story['title']),
-                    sanitize(story['description']),
-                ), self.style.normal),
-            ])
-
-        self.table(
-            table,
-            self.style.tableColumns,
-            self.style.tableHead)
-
     def table_services(self, services):
         table = [
             ('', _('Services')),

@@ -31,8 +31,8 @@ urlpatterns = [
         MessageView.as_view(
             redirect_to='projects_project_create',
             message=_(
-                'Create a project, add and estimate stories, and put those'
-                ' stories into an offer.'
+                'Create a project, add and estimate services, and put those'
+                ' services into an offer.'
             ),
         ),
         name='offers_offer_create'),
