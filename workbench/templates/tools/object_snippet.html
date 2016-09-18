@@ -1,1 +1,4 @@
-<strong>{{ object }}</strong>
+{% load workbench %}
+{% if object.get_absolute_url %}<a href="{{ object.get_absolute_url }}">{% endif %}
+  {{ verbose_name }}: {{ object|h }}
+{% if object.get_absolute_url %}</a>{% endif %}

@@ -28,7 +28,8 @@
           {% endfor %}
         </form>
 
-        <a href="{{ view.model.urls.create }}" class="btn btn-default">
+        <a href="{{ view.model.urls.create }}" class="btn btn-default"
+          data-toggle="ajaxmodal">
           <span class="glyphicon glyphicon-plus"></span>
           {{ view.meta.verbose_name }}
         </a>
@@ -52,7 +53,7 @@
             </a></th>
             <td>
               {% for c in object.context %}
-                <a href="{{ c.get_absolute_url }}">{{ c }}</a>{% if not forloop.last %},{% endif %}
+                {{ c.snippet }}
               {% endfor %}
             </td>
             <td>{{ object.owned_by.get_full_name }}</td>

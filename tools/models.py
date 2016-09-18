@@ -72,6 +72,7 @@ class Model(models.Model):
             {
                 'object': self,
                 opts.model_name.lower(): self,
+                'verbose_name': opts.verbose_name,
             },
         )
 

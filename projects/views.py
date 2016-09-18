@@ -1,11 +1,16 @@
+from collections import namedtuple
+from decimal import Decimal
+import itertools
+
 from django.contrib import messages
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext_lazy as _
 
 from logbook.forms import LoggedHoursForm
 from logbook.models import LoggedHours
 from offers.forms import CreateOfferForm
-from offers.models import Offer
+from offers.models import Offer, Effort
 from projects.forms import CommentForm, TaskForm
 from projects.models import Project, Task, Comment
 from tools.views import DetailView, CreateView, DeleteView
@@ -44,22 +49,75 @@ class OfferCreateView(CreateView):
 #     form_class = EstimationForm
 
 
+ServiceTasks = namedtuple('ServiceTasks', 'service effort logged tasks')
+
+
+class ServicesView(object):
+    def __init__(self, project):
+        self.project = project
+
+        self.tasks = self.project.tasks.order_by(
+            'service__offer__offered_on',
+            'service',
+            '-priority',
+            'pk',
+        ).select_related('owned_by', 'service__offer').annotate(
+            logged_hours=Sum('loggedhours__hours'),
+        )
+
+        self.services = {
+            row['service']: row['effort_hours']
+            for row in Effort.objects.order_by().filter(
+                service__offer__project=self.project,
+            ).values(
+                'service',
+            ).annotate(
+                effort_hours=Sum('hours'),
+            )
+        }
+
+        # TODO add services without tasks
+
+    def __iter__(self):
+        for key, group in itertools.groupby(
+                self.tasks,
+                lambda task: task.service_id
+        ):
+            group = list(group)
+            yield ServiceTasks(
+                group[0].service,
+                self.services.get(key) or 0,
+                sum(((task.logged_hours or 0) for task in group), Decimal()),
+                group,
+            )
+
+
 class ProjectDetailView(DetailView):
     model = Project
 
     def get_context_data(self, **kwargs):
         view = self.request.GET.get('view')
         if view == 'services':
-            kwargs['tasks'] = self.object.tasks.order_by(
-                'service__offer',
-                'service',
-                '-priority',
-                'pk',
-            ).select_related('owned_by', 'service__offer')
+            kwargs['tasks'] = ServicesView(self.object)
             kwargs['tasks_view'] = 'services'
 
         else:
-            kwargs['tasks'] = self.object.tasks.select_related('owned_by')
+            tasks = self.object.tasks.select_related('owned_by').annotate(
+                logged_hours=Sum('loggedhours__hours'),
+            )
+            kwargs['tasks'] = [
+                ServiceTasks(
+                    None,
+                    Effort.objects.order_by().filter(
+                        service__offer__project=self.object,
+                    ).aggregate(h=Sum('hours'))['h'] or 0,
+                    sum(
+                        ((task.logged_hours or 0) for task in tasks),
+                        Decimal(),
+                    ),
+                    tasks,
+                )
+            ]
             kwargs['tasks_view'] = 'tasks'
 
         return super().get_context_data(**kwargs)

@@ -159,3 +159,7 @@ small.right {
 .nopad {
   padding: 0 !important;
 }
+
+.table .table {
+  background: transparent;
+}

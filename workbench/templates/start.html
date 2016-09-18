@@ -23,7 +23,9 @@
 
     <div class="panel panel-default">
       <div class="panel-body">
-        <h2>{% trans 'activities' %}</h2>
+        <h2><a href="{% url 'activities_activity_list' %}">
+          {% trans 'activities' %}
+        </a></h2>
         <table class="table table-condensed">
           {% for activity in user.activities.open %}
           <tr class="{{ activity.css }}">
