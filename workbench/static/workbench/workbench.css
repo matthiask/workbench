@@ -87,6 +87,10 @@ small {
   font-size: 80%;
 }
 
+small>a.active {
+  text-decoration: underline;
+}
+
 .icon-red {
   color: #e74c3c;
 }

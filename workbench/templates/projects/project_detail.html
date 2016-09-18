@@ -91,7 +91,8 @@
   <h2>
     {% trans 'tasks' %}
     <small>
-      (<a href=".">standard</a>, <a href="?view=services">services</a>)
+      (<a {% if tasks_view == 'tasks' %}class="active"{% endif %} href=".">{% trans 'by priority' %}</a>,
+      <a {% if tasks_view == 'services' %}class="active"{% endif %} href="?view=services">{% trans 'by services' %}</a>)
     </small>
   </h2>
 

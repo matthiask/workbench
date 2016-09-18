@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-18 16:19+0200\n"
+"POT-Creation-Date: 2016-09-18 16:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -95,7 +95,7 @@ msgstr "Offen"
 #: workbench/templates/invoices/invoice_list.html:12
 #: workbench/templates/offers/offer_list.html:13
 #: workbench/templates/projects/project_detail.html:35
-#: workbench/templates/projects/project_detail.html:106
+#: workbench/templates/projects/project_detail.html:107
 #: workbench/templates/projects/project_list.html:12
 msgid "owned by"
 msgstr "Gehört"
@@ -140,7 +140,7 @@ msgstr "Geschäft"
 #: offers/models.py:138 offers/models.py:237 projects/models.py:68
 #: projects/models.py:227 projects/models.py:334 services/models.py:9
 #: workbench/templates/offers/service_form.html:70
-#: workbench/templates/projects/project_detail.html:103
+#: workbench/templates/projects/project_detail.html:104
 msgid "title"
 msgstr "Titel"
 
@@ -163,7 +163,7 @@ msgstr "Dauer in Stunden (falls zutreffend)."
 #: activities/models.py:79 deals/models.py:89 invoices/models.py:97
 #: logbook/models.py:22 offers/models.py:39 offers/models.py:127
 #: projects/models.py:85 projects/models.py:213 projects/models.py:331
-#: projects/models.py:360 workbench/templates/projects/project_detail.html:105
+#: projects/models.py:360 workbench/templates/projects/project_detail.html:106
 msgid "created at"
 msgstr "Erstellt um"
 
@@ -264,7 +264,7 @@ msgid "people"
 msgstr "Personen"
 
 #: contacts/models.py:99 invoices/forms.py:178 invoices/models.py:104
-#: projects/models.py:233 workbench/templates/projects/project_detail.html:101
+#: projects/models.py:233 workbench/templates/projects/project_detail.html:102
 msgid "type"
 msgstr "Typ"
 
@@ -365,7 +365,7 @@ msgstr "Geschätzter Wert"
 #: workbench/templates/offers/offer_list.html:14
 #: workbench/templates/projects/project_detail.html:39
 #: workbench/templates/projects/project_detail.html:51
-#: workbench/templates/projects/project_detail.html:104
+#: workbench/templates/projects/project_detail.html:105
 #: workbench/templates/projects/project_list.html:13
 #: workbench/templates/projects/task_detail.html:36
 msgid "status"
@@ -736,7 +736,7 @@ msgstr "Normal"
 msgid "Low"
 msgstr "Niedrig"
 
-#: projects/models.py:239 workbench/templates/projects/project_detail.html:102
+#: projects/models.py:239 workbench/templates/projects/project_detail.html:103
 msgid "priority"
 msgstr "Priorität"
 
@@ -1027,7 +1027,17 @@ msgstr "Löschen"
 msgid "Overall"
 msgstr "Gesamt"
 
-#: workbench/templates/projects/project_detail.html:120
+#: workbench/templates/projects/project_detail.html:94
+#| msgid "priority"
+msgid "by priority"
+msgstr "nach Priorität"
+
+#: workbench/templates/projects/project_detail.html:95
+#| msgid "services"
+msgid "by services"
+msgstr "nach Leistungen"
+
+#: workbench/templates/projects/project_detail.html:121
 msgid "Not offered services"
 msgstr "Nicht offerierte Leistungen"
 
