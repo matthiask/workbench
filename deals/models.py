@@ -1,10 +1,10 @@
 from django.db import models
 from django.utils import timezone
-from django.utils.formats import date_format
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
 from contacts.models import Organization, Person
+from tools.formats import local_date_format
 from tools.models import SearchQuerySet, Model
 from tools.urls import model_urls
 
@@ -112,8 +112,8 @@ class Deal(Model):
 
     def pretty_status(self):
         d = {
-            'created_at': date_format(self.created_at, 'd.m.Y'),
-            'closed_at': self.closed_at and date_format(
+            'created_at': local_date_format(self.created_at, 'd.m.Y'),
+            'closed_at': self.closed_at and local_date_format(
                 self.closed_at, 'd.m.Y'),
             'status': self.get_status_display(),
         }

@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 
 from accounts.models import User
 from contacts.models import Organization, Person
+from tools.formats import local_date_format, pretty_due
 from tools.models import SearchQuerySet, Model
 from tools.urls import model_urls
 
@@ -175,7 +176,6 @@ class Task(Model):
     IN_PROGRESS = 30
     READY_FOR_TEST = 40
     DONE = 50
-    ARCHIVED = 60
 
     STATUS_CHOICES = (
         (INBOX, _('Inbox')),
@@ -183,7 +183,6 @@ class Task(Model):
         (IN_PROGRESS, _('In progress')),
         (READY_FOR_TEST, _('Ready for test')),
         (DONE, _('Done')),
-        (ARCHIVED, _('Archived')),
     )
 
     TASK = 'task'
@@ -289,6 +288,20 @@ class Task(Model):
             self.pk,
             self.title,
         )
+
+    def pretty_status(self):
+        if self.status == self.DONE:
+            return _('Done since %(closed_on)s') % {
+                'closed_on': local_date_format(self.closed_at, 'd.m.Y'),
+            }
+
+        elif self.due_on:
+            return _('%(status)s (due: %(pretty_due)s)') % {
+                'status': self.get_status_display(),
+                'pretty_due': pretty_due(self.due_on),
+            }
+
+        return self.get_status_display()
 
     def type_css(self):
         return {

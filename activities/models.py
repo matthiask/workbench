@@ -1,7 +1,4 @@
-from datetime import date
-
 from django.db import models
-from django.template.defaultfilters import date as date_fmt
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -9,6 +6,7 @@ from accounts.models import User
 from contacts.models import Person
 from deals.models import Deal
 from projects.models import Project
+from tools.formats import local_date_format, pretty_due
 from tools.models import SearchQuerySet, Model
 from tools.urls import model_urls
 
@@ -106,20 +104,9 @@ class Activity(Model):
 
         if self.due_on:
             ctx = {
-                'date': date_fmt(self.due_on, 'd.m.Y'),
+                'date': local_date_format(self.due_on, 'd.m.Y'),
+                'relative': pretty_due(self.due_on),
             }
-
-            days = (self.due_on - date.today()).days
-            if days > 14:
-                ctx['relative'] = _('in %s weeks') % (days // 7)
-            elif days > 1:
-                ctx['relative'] = _('in %s days') % days
-            elif days == 1:
-                ctx['relative'] = _('tomorrow')
-            elif days == 0:
-                ctx['relative'] = _('today')
-            else:
-                ctx['relative'] = _('overdue!')
 
             return _('due on %(date)s (%(relative)s)') % ctx
 

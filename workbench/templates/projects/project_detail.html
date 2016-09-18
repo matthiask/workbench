@@ -103,7 +103,7 @@
         <tr>
           <th colspan="6">
             <h3>
-              {{ task.service|default:_('No service') }}
+              {{ task.service|default:_('Not offered service') }}
             </h3>
           </th>
         </tr>
@@ -122,7 +122,7 @@
               class="{{ task.priority_css }}">&nbsp;</span>
           </td>
           <th><a href="{{ task.get_absolute_url }}">{{ task|h }}</a></th>
-          <td>{{ task.get_status_display }}</td>
+          <td>{{ task.pretty_status }}</td>
           <td>{{ task.created_at|date:'d.m.Y' }}</td>
           <td>
             {{ task.owned_by|default:'&ndash;' }}

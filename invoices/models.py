@@ -4,12 +4,12 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.html import format_html
-from django.utils.formats import date_format
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
 from contacts.models import Organization, Person
 from projects.models import Project
+from tools.formats import local_date_format
 from tools.models import ModelWithTotal, SearchQuerySet
 from tools.urls import model_urls
 
@@ -156,11 +156,11 @@ class Invoice(ModelWithTotal):
 
     def pretty_status(self):
         d = {
-            'invoiced_on': date_format(self.invoiced_on, 'd.m.Y'),
-            'reminded_on': date_format(self.invoiced_on,  'd.m.Y'),  # XXX
-            'created_at': date_format(self.created_at, 'd.m.Y'),
+            'invoiced_on': local_date_format(self.invoiced_on, 'd.m.Y'),
+            'reminded_on': local_date_format(self.invoiced_on,  'd.m.Y'),
+            'created_at': local_date_format(self.created_at, 'd.m.Y'),
             'closed_on': (
-                date_format(self.closed_at, 'd.m.Y')
+                local_date_format(self.closed_at, 'd.m.Y')
                 if self.closed_at else None),
         }
 

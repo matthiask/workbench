@@ -2,11 +2,11 @@ from datetime import date
 
 from django import forms
 from django.utils import timezone
-from django.utils.formats import date_format
 from django.utils.translation import ugettext_lazy as _
 
 from contacts.models import Organization, Person
 from invoices.models import Invoice
+from tools.formats import local_date_format
 from tools.forms import ModelForm, Picker, Textarea, WarningsForm
 
 
@@ -147,7 +147,8 @@ class InvoiceForm(WarningsForm, ModelForm):
                     " Are you sure?"
                 ) % {
                     'to': s_dict[data['status']],
-                    'closed': date_format(self.instance.closed_at, 'd.m.Y'),
+                    'closed': local_date_format(
+                        self.instance.closed_at, 'd.m.Y'),
                 })
 
         return data

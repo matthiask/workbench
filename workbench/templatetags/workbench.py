@@ -1,7 +1,10 @@
 from collections import OrderedDict
+from datetime import date, datetime
 
 from django import template
 from django.utils.html import format_html, mark_safe
+
+from tools.formats import local_date_format
 
 
 register = template.Library()
@@ -35,9 +38,15 @@ def field_value_pairs(object, fields=''):
         if field.choices:
             pairs[field.name] = (
                 field.verbose_name, object._get_FIELD_display(field))
+
         else:
-            pairs[field.name] = (
-                field.verbose_name, getattr(object, field.name))
+            value = getattr(object, field.name)
+            if isinstance(value, datetime):
+                value = local_date_format(value, 'd.m.Y H:i')
+            elif isinstance(value, date):
+                value = local_date_format(value, 'd.m.Y')
+
+            pairs[field.name] = (field.verbose_name, value)
 
     if fields:
         for f in fields.split(','):

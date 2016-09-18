@@ -19,12 +19,16 @@
       <div class="col-md-8">
 
         <table class="table table-striped">
-          {% for name, value in object|field_value_pairs:'description,type,priority,owned_by,service,status,closed_at,due_on' %}
+          {% for name, value in object|field_value_pairs:'created_at,description,type,priority,owned_by,service' %}
           <tr>
             <th class="text-right">{{ name }}</th>
             <td>{% link_or_none value %}</td>
           </tr>
           {% endfor %}
+          <tr>
+            <th class="text-right">{% trans 'status' %}</th>
+            <td>{{ object.pretty_status }}</td>
+          </tr>
         </table>
 
         <h4>{% trans 'required services' %}</h4>
