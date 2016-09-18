@@ -113,13 +113,13 @@
         <tr>
           <th colspan="6">
             {% if tasks_view == 'services' %}
-              <h3>
+              <strong>
                 {% if service_tasks.service %}
                   <a href="{{ service_tasks.service.get_absolute_url }}">{{ service_tasks.service }}</a>
                 {% else %}
                   {% trans 'Not offered services' %}
                 {% endif %}
-              </h3>
+              </strong>
             {% endif %}
           </th>
           <th class="text-right">
