@@ -2,6 +2,7 @@ from decimal import Decimal
 import itertools
 
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -9,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.models import User
 from projects.models import Project
 from services.models import ServiceType
+from tools.formats import local_date_format
 from tools.models import Model, ModelWithTotal, SearchQuerySet
 from tools.urls import model_urls
 
@@ -33,6 +35,9 @@ class Offer(ModelWithTotal):
         (REPLACED, _('Replaced')),
     )
 
+    created_at = models.DateTimeField(
+        _('created at'),
+        default=timezone.now)
     project = models.ForeignKey(
         Project,
         on_delete=models.PROTECT,
@@ -87,6 +92,33 @@ class Offer(ModelWithTotal):
                 service__offer=self),
         )), Decimal())
         super()._calculate_total()
+
+    def clean(self):
+        super().clean()
+
+        if self.status in (self.OFFERED, self.ACCEPTED, self.REJECTED):
+            if not self.offered_on:
+                raise ValidationError({
+                    'status': _(
+                        'Offered on date missing for selected state.',
+                    ),
+                })
+
+    def pretty_status(self):
+        if self.status == self.IN_PREPARATION:
+            return _('In preparation since %(created_at)s') % {
+                'created_at': local_date_format(self.created_at, 'd.m.Y'),
+            }
+        elif self.status == self.OFFERED:
+            return _('Offered on %(offered_on)s') % {
+                'offered_on': local_date_format(self.offered_on, 'd.m.Y'),
+            }
+        elif self.status in (self.ACCEPTED, self.REJECTED):
+            return _('%(status)s on %(closed_on)s') % {
+                'status': self.get_status_display(),
+                'closed_on': local_date_format(self.closed_at, 'd.m.Y'),
+            }
+        return self.get_status_display()
 
 
 @model_urls()

@@ -277,7 +277,7 @@ class Task(Model):
     class Meta:
         ordering = ('-priority', 'pk')
         verbose_name = _('task')
-        verbose_name_plural = _('task')
+        verbose_name_plural = _('tasks')
 
     def __str__(self):
         return self.title

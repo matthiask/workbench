@@ -3,11 +3,13 @@ from collections import OrderedDict
 from django import forms
 from django.forms.models import inlineformset_factory
 from django.template.defaultfilters import linebreaksbr
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from contacts.models import PostalAddress
 from offers.models import Offer, Service, Effort, Cost
-from tools.forms import ModelForm, Textarea
+from tools.formats import local_date_format
+from tools.forms import ModelForm, Textarea, WarningsForm
 
 
 class OfferSearchForm(forms.Form):
@@ -81,7 +83,7 @@ class CreateOfferForm(ModelForm):
         return instance
 
 
-class OfferForm(ModelForm):
+class OfferForm(WarningsForm, ModelForm):
     user_fields = default_to_current_user = ('owned_by',)
 
     class Meta:
@@ -92,6 +94,30 @@ class OfferForm(ModelForm):
         widgets = {
             'status': forms.RadioSelect,
         }
+
+    def clean(self):
+        data = super().clean()
+        s_dict = dict(Offer.STATUS_CHOICES)
+
+        if data.get('status', 0) >= Offer.ACCEPTED:
+            if not self.instance.closed_at:
+                self.instance.closed_at = timezone.now()
+
+        if self.instance.closed_at and data.get('status', 99) < Offer.ACCEPTED:
+            if self.request.POST.get('ignore_warnings'):
+                self.instance.closed_at = None
+            else:
+                self.add_warning(_(
+                    "You are attempting to set status to '%(to)s',"
+                    " but the offer has already been closed on %(closed)s."
+                    " Are you sure?"
+                ) % {
+                    'to': s_dict[data['status']],
+                    'closed': local_date_format(
+                        self.instance.closed_at, 'd.m.Y'),
+                })
+
+        return data
 
 
 class ServiceForm(ModelForm):
