@@ -5,7 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from offers.forms import OfferSearchForm, OfferForm
 from offers.models import Offer, Service
 from offers.views import (
-    OfferPDFView, CreateServiceView, UpdateServiceView, MoveServiceView)
+    OfferPDFView, CreateServiceView, UpdateServiceView, DeleteServiceView,
+    MoveServiceView)
 from tools.views import (
     ListView, DetailView, UpdateView, DeleteView, MessageView)
 
@@ -62,7 +63,7 @@ urlpatterns = [
         UpdateServiceView.as_view(),
         name='offers_service_update'),
     url(r'^service/(?P<pk>\d+)/delete/$',
-        DeleteView.as_view(model=Service),
+        DeleteServiceView.as_view(),
         name='offers_service_delete'),
     url(r'^service/(?P<pk>\d+)/move/$',
         MoveServiceView.as_view(),

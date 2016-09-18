@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from offers.forms import ServiceForm
 from offers.models import Offer, Service
 from tools.pdf import pdf_response
-from tools.views import DetailView, CreateView, UpdateView
+from tools.views import DetailView, CreateView, UpdateView, DeleteView
 
 
 class OfferPDFView(DetailView):
@@ -58,6 +58,13 @@ class CreateServiceView(CreateView):
 class UpdateServiceView(UpdateView):
     model = Service
     form_class = ServiceForm
+
+    def get_success_url(self):
+        return self.object.offer.get_absolute_url()
+
+
+class DeleteServiceView(DeleteView):
+    model = Service
 
     def get_success_url(self):
         return self.object.offer.get_absolute_url()
