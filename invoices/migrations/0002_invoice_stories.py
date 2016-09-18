@@ -10,7 +10,6 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('stories', '0001_initial'),
         ('invoices', '0001_initial'),
     ]
 

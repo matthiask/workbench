@@ -48,7 +48,6 @@ INSTALLED_APPS = [a for a in [
     'offers',
     'projects',
     'services',
-    'stories',
 
     'debug_toolbar' if DEBUG else '',
 ] if a]
