@@ -4,6 +4,7 @@ import itertools
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Max
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -156,6 +157,9 @@ class Service(Model):
         return '%s - %s' % (self.offer, self.title)
 
     def save(self, *args, **kwargs):
+        if not self.position:
+            max_pos = self.offer.services.aggregate(m=Max('position'))['m']
+            self.position = 10 + (max_pos or 0)
         super().save(*args, **kwargs)
         self.offer.save()
 
