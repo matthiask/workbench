@@ -1,162 +1,165 @@
 {% extends "base.html" %}
 
-{% load history i18n workbench %}
+{% load history i18n mark_current workbench %}
 
 {% block title %}{{ project }} - {% trans "projects" %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row">
 <div class="col-md-12">
+
 {% with overview=project.overview %}
+
   <h1>{{ project }} {% history_link project %}</h1>
+  <ul class="nav nav-tabs">
+    {% mark_current request.path %}
+    <li><a href="{{ project.urls.overview }}">{% trans 'overview' %}</a></li>
+    <li><a href="{{ project.urls.tasks }}">{% trans 'tasks' %}</a></li>
+    <li><a href="{{ project.urls.services }}">{% trans 'services' %}</a></li>
+    {% endmark_current %}
+  </ul>
 
-  <table class="table table-striped">
-    <tr>
-      <th class="text-right">{% trans 'description' %}</th>
-      <td>{{ project.description|linebreaksbr|default:'&ndash;' }}</td>
-    </tr>
-    <tr>
-      <th class="text-right">
-        {% trans 'Overall' %}
-      </th>
-      <td>
-        {{ overview.stats.logged_hours }}h / {{ overview.stats.effort_hours }}h
-      </td>
-    </tr>
-    <tr>
-      <th class="text-right">{% trans 'customer' %}</th>
-      <td>{% link_or_none project.customer %}</td>
-    </tr>
-    <tr>
-      <th class="text-right">{% trans 'contact' %}</th>
-      <td>{% link_or_none project.contact project.contact.full_name %}</td>
-    </tr>
-    <tr>
-      <th class="text-right">{% trans 'owned by' %}</th>
-      <td>{{ project.owned_by.get_full_name }}</td>
-    </tr>
-    <tr>
-      <th class="text-right">{% trans 'status' %}</th>
-      <td><span class="label label-{{ object.status_css }}">
-        {{ object.pretty_status }}
-      </span></td>
-    </tr>
-    <tr>
-      <th class="text-right">{% trans 'offers' %}</th>
-      {% with offers=project.offers.all %}
-      {% if offers %}
-        <td class="nopad">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>{% trans 'offer' %}</th>
-                <th>{% trans 'status' %}</th>
-                <th class="text-right">{% trans 'total excl. tax' %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for offer in offers %}
-                <tr>
-                  <th><a href="{{ offer.get_absolute_url }}">{{ offer }}</a></th>
-                  <td>{{ offer.pretty_status }}</td>
-                  <td class="text-right">{{ offer.total_excl_tax|currency }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </td>
-      {% else %}<td>&ndash;</td>{% endif %}
-      {% endwith %}
-    </tr>
-  </table>
+  {% if view.project_view == 'overview' %}
 
-  <a href="{% url 'activities_activity_create' %}?project={{ project.pk }}"
-    class="btn btn-default"
-    data-toggle="ajaxmodal">
-    <span class="glyphicon glyphicon-plus"></span> {% trans 'activity' %}
-  </a>
-  <a href="{{ project.urls.createtask }}" class="btn btn-default">
-    <i class="glyphicon glyphicon-plus"></i> {% trans 'task' %}</a>
-  <a href="{{ project.urls.createoffer }}" class="btn btn-default">
-    <i class="glyphicon glyphicon-plus"></i>
-    {% trans 'offer' %}</a>
-  <a href="{{ project.urls.update }}" class="btn btn-default">
-    {% trans 'Update' %}</a>
-  <a href="{{ project.urls.delete }}" class="btn btn-danger btn-inverse pull-right">
-    {% trans 'Delete' %}</a>
-
-</div>
-</div>
-<div class="row">
-<div class="col-md-12">
-
-  <h2>
-    {% trans 'tasks' %}
-    <small>
-      (<a {% if tasks_view == 'tasks' %}class="active"{% endif %} href=".">{% trans 'by priority' %}</a>,
-      <a {% if tasks_view == 'services' %}class="active"{% endif %} href="?view=services">{% trans 'by services' %}</a>)
-    </small>
-  </h2>
-
-  <table class="table table-hover table-striped">
-    <thead>
+    <table class="table table-striped">
       <tr>
-        <th>{% trans 'type' %}</th>
-        <th>{% trans 'priority' %}</th>
-        <th>{% trans 'title' %}</th>
-        <th>{% trans 'status' %}</th>
-        <th>{% trans 'created at' %}</th>
-        <th>{% trans 'owned by' %}</th>
-        <th></th>
+        <th class="text-right">{% trans 'description' %}</th>
+        <td>{{ project.description|linebreaksbr|default:'&ndash;' }}</td>
       </tr>
-    </thead>
-    <tbody>
-      {% for service_tasks in tasks %}
+      <tr>
+        <th class="text-right">
+          {% trans 'Overall' %}
+        </th>
+        <td>
+          {{ overview.stats.logged_hours }}h / {{ overview.stats.effort_hours }}h
+        </td>
+      </tr>
+      <tr>
+        <th class="text-right">{% trans 'customer' %}</th>
+        <td>{% link_or_none project.customer %}</td>
+      </tr>
+      <tr>
+        <th class="text-right">{% trans 'contact' %}</th>
+        <td>{% link_or_none project.contact project.contact.full_name %}</td>
+      </tr>
+      <tr>
+        <th class="text-right">{% trans 'owned by' %}</th>
+        <td>{{ project.owned_by.get_full_name }}</td>
+      </tr>
+      <tr>
+        <th class="text-right">{% trans 'status' %}</th>
+        <td><span class="label label-{{ object.status_css }}">
+          {{ object.pretty_status }}
+        </span></td>
+      </tr>
+      <tr>
+        <th class="text-right">{% trans 'offers' %}</th>
+        {% with offers=project.offers.all %}
+        {% if offers %}
+          <td class="nopad">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>{% trans 'offer' %}</th>
+                  <th>{% trans 'status' %}</th>
+                  <th class="text-right">{% trans 'total excl. tax' %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for offer in offers %}
+                  <tr>
+                    <th><a href="{{ offer.get_absolute_url }}">{{ offer }}</a></th>
+                    <td>{{ offer.pretty_status }}</td>
+                    <td class="text-right">{{ offer.total_excl_tax|currency }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </td>
+        {% else %}<td>&ndash;</td>{% endif %}
+        {% endwith %}
+      </tr>
+    </table>
 
+    <a href="{% url 'activities_activity_create' %}?project={{ project.pk }}"
+      class="btn btn-default"
+      data-toggle="ajaxmodal">
+      <span class="glyphicon glyphicon-plus"></span> {% trans 'activity' %}
+    </a>
+    <a href="{{ project.urls.createoffer }}" class="btn btn-default">
+      <i class="glyphicon glyphicon-plus"></i>
+      {% trans 'offer' %}</a>
+    <a href="{{ project.urls.update }}" class="btn btn-default">
+      {% trans 'Update' %}</a>
+    <a href="{{ project.urls.delete }}" class="btn btn-danger btn-inverse pull-right">
+      {% trans 'Delete' %}</a>
+
+  {% else %}
+
+    <table class="table table-hover table-striped">
+      <thead>
         <tr>
-          <th colspan="6">
-            {% if tasks_view == 'services' %}
-              <strong>
-                {% if service_tasks.service %}
-                  <a href="{{ service_tasks.service.get_absolute_url }}">{{ service_tasks.service }}</a>
-                {% else %}
-                  {% trans 'Not offered services' %}
-                {% endif %}
-              </strong>
-            {% endif %}
-          </th>
-          <th class="text-right">
-            {{ service_tasks.logged }}h / {{ service_tasks.effort }}h
-          </th>
+          <th>{% trans 'type' %}</th>
+          <th>{% trans 'priority' %}</th>
+          <th>{% trans 'title' %}</th>
+          <th>{% trans 'status' %}</th>
+          <th>{% trans 'created at' %}</th>
+          <th>{% trans 'owned by' %}</th>
+          <th></th>
         </tr>
+      </thead>
+      <tbody>
+        {% for service_tasks in tasks %}
 
-        {% for task in service_tasks.tasks %}
           <tr>
-            <td>
-              <i
-                title="{{ task.get_type_display }}"
-                class="{{ task.type_css }}"></i>
-            </td>
-            <td>
-              <span
-                title="{{ task.get_priority_display }}"
-                class="{{ task.priority_css }}">&nbsp;</span>
-            </td>
-            <th><a href="{{ task.get_absolute_url }}">{{ task|h }}</a></th>
-            <td>{{ task.pretty_status }}</td>
-            <td>{{ task.created_at|date:'d.m.Y' }}</td>
-            <td>
-              {{ task.owned_by|default:'&ndash;' }}
-            </td>
-            <td class="text-right">
-              {{ task.logged_hours|default:0 }}h
-            </td>
+            <th colspan="6">
+              {% if view.project_view == 'services' %}
+                <strong>
+                  {% if service_tasks.service %}
+                    <a href="{{ service_tasks.service.get_absolute_url }}">{{ service_tasks.service }}</a>
+                  {% else %}
+                    {% trans 'Not offered services' %}
+                  {% endif %}
+                </strong>
+              {% endif %}
+            </th>
+            <th class="text-right">
+              {{ service_tasks.logged }}h / {{ service_tasks.effort }}h
+            </th>
           </tr>
-        {% endfor %}
 
-      {% endfor %}
-    </tbody>
-  </table>
+          {% for task in service_tasks.tasks %}
+            <tr>
+              <td>
+                <i
+                  title="{{ task.get_type_display }}"
+                  class="{{ task.type_css }}"></i>
+              </td>
+              <td>
+                <span
+                  title="{{ task.get_priority_display }}"
+                  class="{{ task.priority_css }}">&nbsp;</span>
+              </td>
+              <th><a href="{{ task.get_absolute_url }}">{{ task|h }}</a></th>
+              <td>{{ task.pretty_status }}</td>
+              <td>{{ task.created_at|date:'d.m.Y' }}</td>
+              <td>
+                {{ task.owned_by|default:'&ndash;' }}
+              </td>
+              <td class="text-right">
+                {{ task.logged_hours|default:0 }}h
+              </td>
+            </tr>
+          {% endfor %}
+
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <a href="{{ project.urls.createtask }}" class="btn btn-default">
+      <i class="glyphicon glyphicon-plus"></i> {% trans 'task' %}</a>
+
+  {% endif %}
 
 {% endwith %}
 </div>

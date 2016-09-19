@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.shortcuts import redirect
 
 from projects.forms import ProjectSearchForm, ProjectForm, TaskForm
 from projects.models import Project, Task
@@ -22,10 +23,24 @@ urlpatterns = [
             ),
         ),
         name='projects_project_list'),
+
     url(
         r'^(?P<pk>\d+)/$',
-        ProjectDetailView.as_view(),
+        lambda request, pk: redirect('overview/'),
         name='projects_project_detail'),
+    url(
+        r'^(?P<pk>\d+)/overview/$',
+        ProjectDetailView.as_view(project_view='overview'),
+        name='projects_project_overview'),
+    url(
+        r'^(?P<pk>\d+)/tasks/$',
+        ProjectDetailView.as_view(project_view='tasks'),
+        name='projects_project_tasks'),
+    url(
+        r'^(?P<pk>\d+)/services/$',
+        ProjectDetailView.as_view(project_view='services'),
+        name='projects_project_services'),
+
     url(
         r'^create/$',
         CreateView.as_view(

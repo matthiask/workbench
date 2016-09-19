@@ -1,6 +1,6 @@
 {% extends "tools/object_list.html" %}
 
-{% load bootstrap3 i18n querystring %}
+{% load bootstrap3 i18n querystring workbench %}
 
 {% block objects %}
 
@@ -16,9 +16,7 @@
     {% for project in object_list %}
       <tr>
         <th>
-          <a href="{{ project.urls.detail }}">
-            {{ project }}
-          </a>
+          <a href="{{ project.urls.overview }}">{{ project|h }}</a>
         </th>
         <td>{{ project.contact|default:project.customer }}</td>
         <td>

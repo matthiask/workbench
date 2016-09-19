@@ -61,11 +61,8 @@ th.number {
 
 .tiny-icons {
   display: inline-block;
-  transform: scale(.8) translateY(-10%);
-}
-
-h1 .tiny-icons {
-  transform: scale(.5) translateY(-30%);
+  font-size: .5em;
+  vertical-align: top;
 }
 
 .btn-danger.btn-inverse {
@@ -124,4 +121,10 @@ small.right {
 .move {
   display: block;
   text-decoration: none;
+}
+
+th > a {
+  display: block;
+  margin: -8px;
+  padding: 8px;
 }

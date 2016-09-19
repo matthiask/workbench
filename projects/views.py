@@ -107,12 +107,11 @@ class ServicesView(object):
 
 class ProjectDetailView(DetailView):
     model = Project
+    project_view = None
 
     def get_context_data(self, **kwargs):
-        view = self.request.GET.get('view')
-        if view == 'services':
+        if self.project_view == 'services':
             kwargs['tasks'] = ServicesView(self.object)
-            kwargs['tasks_view'] = 'services'
 
         else:
             tasks = self.object.tasks.select_related('owned_by').annotate(
@@ -131,7 +130,6 @@ class ProjectDetailView(DetailView):
                     tasks,
                 )
             ]
-            kwargs['tasks_view'] = 'tasks'
 
         return super().get_context_data(**kwargs)
 
@@ -194,4 +192,4 @@ class TaskDeleteView(DeleteView):
     model = Task
 
     def get_success_url(self):
-        return self.object.project.get_absolute_url()
+        return self.object.project.urls.url('tasks')
