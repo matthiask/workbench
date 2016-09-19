@@ -12,7 +12,11 @@ from tools.forms import ModelForm, Picker, Textarea, WarningsForm
 
 class InvoiceSearchForm(forms.Form):
     s = forms.ChoiceField(
-        choices=(('', _('All states')),) + Invoice.STATUS_CHOICES,
+        choices=(
+            ('', _('All states')),
+            ('open', _('Open')),
+            (_('Exact'), Invoice.STATUS_CHOICES),
+        ),
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
@@ -27,7 +31,13 @@ class InvoiceSearchForm(forms.Form):
             return queryset
 
         data = self.cleaned_data
-        if data.get('s'):
+        if data.get('s') == 'open':
+            queryset = queryset.filter(status__in=(
+                Invoice.IN_PREPARATION,
+                Invoice.SENT,
+                Invoice.REMINDED,
+            ))
+        elif data.get('s'):
             queryset = queryset.filter(status=data.get('s'))
         if data.get('org'):
             queryset = queryset.filter(customer=data.get('org'))
