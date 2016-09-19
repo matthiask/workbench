@@ -241,6 +241,9 @@ class PDFDocument(_PDFDocument):
         self.smaller(' / '.join(e for e in elements))
 
     def table_services(self, services):
+        if not services:
+            return
+
         table = [
             ('', _('Services')),
         ]
