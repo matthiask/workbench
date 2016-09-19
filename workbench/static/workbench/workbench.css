@@ -91,6 +91,12 @@ small>a.active {
   text-decoration: underline;
 }
 
+.label {
+  font-size: 85%;
+  padding: .1em .4em;
+  font-weight: normal;
+}
+
 .icon-red {
   color: #e74c3c;
 }
