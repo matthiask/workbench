@@ -46,6 +46,8 @@
             {{ activity.pretty_status }}
           </td>
         </tr>
+      {% empty %}
+        <tr><th class="nopad">{% trans 'No activities' %}</th></tr>
       {% endfor %}
     </table>
     <a href="{% url 'activities_activity_create' %}?deal={{ deal.pk }}"
