@@ -18,11 +18,11 @@
     {% for invoice in object_list %}
       <tr>
         <th><a href="{{ invoice.urls.detail }}">
-            {{ invoice|h }}
+          {{ invoice|h }}
         </a></th>
         <td>{{ invoice.contact|default:invoice.customer }}</td>
         <td class="hidden-xs">{{ invoice.owned_by.get_short_name }}</td>
-        <td>{{ invoice.pretty_status }}</td>
+        <td><span class="label label-{{ invoice.status_css }}">{{ invoice.pretty_status }}</span></td>
         <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
       </tr>
     {% endfor %}

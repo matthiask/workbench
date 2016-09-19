@@ -103,11 +103,12 @@ class Project(Model):
     def __str__(self):
         return self.title
 
-    def css(self):
+    def status_css(self):
         return {
-            self.ACQUISITION: 'warning',
-            self.WORK_IN_PROGRESS: '',
-            self.FINISHED: 'success',
+            self.ACQUISITION: 'success',
+            self.WORK_IN_PROGRESS: 'info',
+            self.FINISHED: 'default',
+            self.DECLINED: 'warning',
         }[self.status]
 
     @cached_property

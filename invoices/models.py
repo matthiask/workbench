@@ -179,3 +179,13 @@ class Invoice(ModelWithTotal):
             return _('Paid on %(closed_on)s') % d
         else:
             return self.get_status_display()
+
+    def status_css(self):
+        return {
+            self.IN_PREPARATION: 'success',
+            self.SENT: 'info',
+            self.REMINDED: 'warning',
+            self.PAID: 'default',
+            self.CANCELED: 'danger',
+            self.REPLACED: '',
+        }[self.status]

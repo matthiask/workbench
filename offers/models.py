@@ -121,6 +121,15 @@ class Offer(ModelWithTotal):
             }
         return self.get_status_display()
 
+    def status_css(self):
+        return {
+            self.IN_PREPARATION: 'success',
+            self.OFFERED: 'info',
+            self.ACCEPTED: 'default',
+            self.REJECTED: 'danger',
+            self.REPLACED: '',
+        }[self.status]
+
 
 @model_urls()
 class Service(Model):
