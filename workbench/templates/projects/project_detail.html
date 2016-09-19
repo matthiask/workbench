@@ -37,7 +37,9 @@
     </tr>
     <tr>
       <th class="text-right">{% trans 'status' %}</th>
-      <td>{{ project.pretty_status }}</td>
+      <td><span class="label label-{{ object.status_css }}">
+        {{ object.pretty_status }}
+      </span></td>
     </tr>
     <tr>
       <th class="text-right">{% trans 'offers' %}</th>

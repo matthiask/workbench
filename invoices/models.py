@@ -181,6 +181,10 @@ class Invoice(ModelWithTotal):
             return self.get_status_display()
 
     def status_css(self):
+        if self.status == self.SENT:
+            if self.due_on and date.today() > self.due_on:
+                return 'warning'
+
         return {
             self.IN_PREPARATION: 'success',
             self.SENT: 'info',
