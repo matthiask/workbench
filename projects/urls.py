@@ -1,8 +1,9 @@
 from django.conf.urls import url
 from django.shortcuts import redirect
 
-from projects.forms import ProjectSearchForm, ProjectForm, TaskForm
-from projects.models import Project, Task
+from projects.forms import (
+    ProjectSearchForm, ProjectForm, TaskForm, CommentForm)
+from projects.models import Project, Task, Comment
 from projects.views import (
     ProjectDetailView, CreateTaskView, OfferCreateView,
     TaskDetailView, TaskDeleteView)
@@ -93,4 +94,19 @@ urlpatterns = [
     #     r'^(?P<pk>\d+)/planning/$',
     #     views.PlanningView.as_view(),
     #     name='projects_project_planning'),
+
+    url(
+        r'^comments/(?P<pk>\d+)/update/$',
+        UpdateView.as_view(
+            model=Comment,
+            form_class=CommentForm,
+            template_name='modalform.html',
+        ),
+        name='projects_comment_update'),
+    url(
+        r'^comments/(?P<pk>\d+)/delete/$',
+        DeleteView.as_view(
+            model=Comment,
+        ),
+        name='projects_comment_delete'),
 ]

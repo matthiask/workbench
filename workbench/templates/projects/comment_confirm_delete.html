@@ -1,0 +1,17 @@
+{% extends "modalform.html" %}
+
+{% load bootstrap3 i18n %}
+
+{% block title %}
+  {% blocktrans %}Delete {{ object }}{% endblocktrans %}
+{% endblock %}
+
+{% block body %}
+{% endblock %}
+
+{% block footer %}
+  <a href="{{ object.get_absolute_url }}" class="btn btn-primary pull-left">
+    {% trans 'cancel' %}</a>
+  <button type="submit" class="btn btn-danger">
+    {% trans 'delete' %}</button>
+{% endblock %}

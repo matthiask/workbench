@@ -87,12 +87,13 @@ class CommentForm(ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        self.task = kwargs.pop('task')
+        self.task = kwargs.pop('task', None)
         super().__init__(*args, **kwargs)
 
     def save(self):
         instance = super().save(commit=False)
-        instance.created_by = self.request.user
-        instance.task = self.task
+        if not instance.pk:
+            instance.created_by = self.request.user
+            instance.task = self.task
         instance.save()
         return instance

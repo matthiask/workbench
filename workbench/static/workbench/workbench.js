@@ -55,6 +55,7 @@ $(function() {
         // 201 CREATED, 202 ACCEPTED or 204 NO CONTENT
         if (jqXHR.status === 201 || jqXHR.status === 202 || jqXHR.status === 204) {
           dismissModals();
+          window.location.reload();
         } else {
           initModal(data);
         }

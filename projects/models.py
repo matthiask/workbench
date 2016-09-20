@@ -350,6 +350,7 @@ class Attachment(Model):
         return self.title or self.file.name
 
 
+@model_urls(default='update')
 class Comment(Model):
     task = models.ForeignKey(
         Task,
@@ -369,12 +370,10 @@ class Comment(Model):
         _('notes'),
     )
 
-    def get_absolute_url(self):
-        return self.task.urls['detail']
-
-    @property
-    def urls(self):
-        return self.task.urls
+    class Meta:
+        ordering = ('created_at',)
+        verbose_name = _('comment')
+        verbose_name_plural = _('comments')
 
     def html(self):
         html = markdown(strip_tags(self.notes))
