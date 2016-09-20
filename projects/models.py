@@ -377,7 +377,9 @@ class Comment(Model):
         return self.task.urls
 
     def html(self):
-        return mark_safe(markdown(strip_tags(self.notes)))
+        html = markdown(strip_tags(self.notes))
+        html = html.replace('<img', '<img class="img-responsive"')
+        return mark_safe(html)
 
     def __str__(self):
         return self.notes[:30] + '...'
