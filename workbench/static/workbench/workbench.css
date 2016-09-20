@@ -127,3 +127,7 @@ th > a {
   margin: -8px;
   padding: 8px;
 }
+
+.pagination {
+  margin: -10px 0 0 5px;
+}
