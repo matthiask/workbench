@@ -14,9 +14,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='invoice',
-            name='stories',
-            field=models.ManyToManyField(blank=True, related_name='invoices', to='stories.Story', verbose_name='stories'),
-        ),
     ]

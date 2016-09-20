@@ -14,10 +14,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RemoveField(
             model_name='invoice',
-            name='stories',
-        ),
-        migrations.RemoveField(
-            model_name='invoice',
             name='story_data',
         ),
     ]
