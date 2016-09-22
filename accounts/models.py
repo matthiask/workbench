@@ -110,5 +110,6 @@ class User(Model, AbstractBaseUser):
 
         return Task.objects.filter(
             Q(owned_by=self),
-            Q(priority=Task.BLOCKER) | Q(due_on__lte=date.today() + timedelta(days=15))
+            Q(priority=Task.BLOCKER) |
+            Q(due_on__lte=date.today() + timedelta(days=15))
         ).select_related('project')
