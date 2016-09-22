@@ -46,7 +46,7 @@
         </a>
 
 
-        <h3>{% trans 'changes' %}</h3>
+        <h3>{% trans 'updates' %}</h3>
         <table class="table table-striped table-linearize">
           {% for created_at, type, data in changes %}
             {% if type == 'change' %}
@@ -83,7 +83,7 @@
               </tr>
             {% else %}
               <tr>
-                <td><h4>{% trans 'Unknown change' %}: {{ data }}</h4></td>
+                <td><h4>{% trans 'Unknown update' %}: {{ data }}</h4></td>
               </tr>
             {% endif %}
           {% endfor %}

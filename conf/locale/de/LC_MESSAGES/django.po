@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-19 22:14+0200\n"
+"POT-Creation-Date: 2016-09-22 13:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -162,7 +162,7 @@ msgstr "Dauer in Stunden (falls zutreffend)."
 #: activities/models.py:79 deals/models.py:89 invoices/models.py:97
 #: logbook/models.py:22 offers/models.py:40 offers/models.py:137
 #: projects/models.py:85 projects/models.py:214 projects/models.py:332
-#: projects/models.py:361 workbench/templates/projects/project_detail.html:132
+#: projects/models.py:362 workbench/templates/projects/project_detail.html:132
 msgid "created at"
 msgstr "Erstellt um"
 
@@ -222,7 +222,7 @@ msgstr "Gruppen"
 msgid "name"
 msgstr "Name"
 
-#: contacts/models.py:27 contacts/models.py:59 projects/models.py:369
+#: contacts/models.py:27 contacts/models.py:59 projects/models.py:370
 #: workbench/templates/contacts/organization_detail.html:37
 #: workbench/templates/contacts/person_detail.html:45
 msgid "notes"
@@ -395,7 +395,7 @@ msgstr "Rechnungen"
 msgid "Exact"
 msgstr "Exakt"
 
-#: invoices/forms.py:72 tools/models.py:82 tools/pdf.py:273
+#: invoices/forms.py:72 tools/models.py:82 tools/pdf.py:276
 msgid "subtotal"
 msgstr "Zwischentotal"
 
@@ -459,7 +459,7 @@ msgstr "Ersetzt"
 msgid "Fixed amount"
 msgstr "Fixbetrag"
 
-#: invoices/models.py:45 tools/pdf.py:245
+#: invoices/models.py:45 tools/pdf.py:248
 msgid "Services"
 msgstr "Leistungen"
 
@@ -475,7 +475,7 @@ msgstr "Verrechnet am"
 msgid "down payment applied to"
 msgstr "Anzahlung angewendet auf"
 
-#: invoices/models.py:123 logbook/models.py:55 tools/pdf.py:318
+#: invoices/models.py:123 logbook/models.py:55 tools/pdf.py:321
 #: workbench/templates/contacts/person_detail.html:54
 #: workbench/templates/invoices/invoice_list.html:10
 msgid "invoice"
@@ -516,11 +516,11 @@ msgid "Paid on %(closed_on)s"
 msgstr "Bezahlt am %(closed_on)s"
 
 #: logbook/models.py:19 projects/models.py:280 projects/models.py:329
-#: projects/models.py:358 workbench/templates/projects/project_detail.html:186
+#: projects/models.py:359 workbench/templates/projects/project_detail.html:186
 msgid "task"
 msgstr "Aufgabe"
 
-#: logbook/models.py:29 projects/models.py:219 projects/models.py:366
+#: logbook/models.py:29 projects/models.py:219 projects/models.py:367
 msgid "created by"
 msgstr "Erstellt von"
 
@@ -542,7 +542,7 @@ msgid "archived at"
 msgstr "archiviert um"
 
 #: logbook/models.py:68 logbook/models.py:69
-#: workbench/templates/projects/task_detail.html:73
+#: workbench/templates/projects/task_detail.html:108
 msgid "logged hours"
 msgstr "aufgezeichnete Stunden"
 
@@ -775,7 +775,16 @@ msgstr "Anhang"
 msgid "attachments"
 msgstr "Anhänge"
 
-#: projects/views.py:180 tools/views.py:100
+#: projects/models.py:375
+#| msgid "comments"
+msgid "comment"
+msgstr "Kommentar"
+
+#: projects/models.py:376
+msgid "comments"
+msgstr "Kommentare"
+
+#: projects/views.py:194 tools/views.py:100
 #, python-format
 msgid "%(class)s '%(object)s' has been successfully created."
 msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
@@ -847,7 +856,7 @@ msgstr "'%(field)s' änderte von '%(previous)s' zu '%(current)s'."
 msgid "Cannot delete '%(object)s' because of related objects (%(related)s)."
 msgstr "Kann '%(object)s' wegen Abhängigkeiten nicht löschen (%(related)s)."
 
-#: tools/models.py:84 tools/pdf.py:278
+#: tools/models.py:84 tools/pdf.py:281
 msgid "discount"
 msgstr "Rabatt"
 
@@ -864,20 +873,20 @@ msgstr "Total"
 msgid "page %d"
 msgstr "Seite %d"
 
-#: tools/pdf.py:239 tools/pdf.py:323
+#: tools/pdf.py:239 tools/pdf.py:326
 msgid "NO DATE YET"
 msgstr "NOCH KEIN DATUM"
 
-#: tools/pdf.py:283
+#: tools/pdf.py:286
 msgid "tax"
 msgstr "MwSt"
 
-#: tools/pdf.py:291 workbench/templates/invoices/invoice_detail.html:44
+#: tools/pdf.py:294 workbench/templates/invoices/invoice_detail.html:44
 #: workbench/templates/offers/offer_detail.html:76
 msgid "total CHF incl. tax"
 msgstr "Total CHF inkl. MwSt"
 
-#: tools/pdf.py:320
+#: tools/pdf.py:323
 msgid "date"
 msgstr "Datum"
 
@@ -911,6 +920,29 @@ msgstr "%s löschen"
 msgid "Sign in"
 msgstr "Anmelden"
 
+#: workbench/templates/activities/activity_confirm_delete.html:6
+#: workbench/templates/projects/comment_confirm_delete.html:6
+#: workbench/templates/tools/object_confirm_delete.html:11
+#, python-format
+msgid "Delete %(object)s"
+msgstr "%(object)s löschen"
+
+#: workbench/templates/activities/activity_confirm_delete.html:14
+#: workbench/templates/projects/comment_confirm_delete.html:14
+#: workbench/templates/tools/object_confirm_delete.html:18
+#: workbench/templates/tools/object_form.html:48
+msgid "cancel"
+msgstr "Abbruch"
+
+#: workbench/templates/activities/activity_confirm_delete.html:16
+#: workbench/templates/offers/service_form.html:40
+#: workbench/templates/offers/service_form.html:71
+#: workbench/templates/offers/service_form.html:98
+#: workbench/templates/projects/comment_confirm_delete.html:16
+#: workbench/templates/tools/object_confirm_delete.html:20
+msgid "delete"
+msgstr "Löschen"
+
 #: workbench/templates/activities/activity_detail.html:18
 #: workbench/templates/activities/activity_list.html:43
 msgid "context"
@@ -927,6 +959,18 @@ msgstr "Kontext"
 #: workbench/templates/tools/object_detail.html:22
 msgid "Update"
 msgstr "Bearbeiten"
+
+#: workbench/templates/activities/activity_detail.html:33
+#: workbench/templates/contacts/organization_detail.html:49
+#: workbench/templates/contacts/person_detail.html:62
+#: workbench/templates/deals/deal_detail.html:30
+#: workbench/templates/invoices/invoice_detail.html:56
+#: workbench/templates/offers/offer_detail.html:92
+#: workbench/templates/projects/project_detail.html:92
+#: workbench/templates/projects/task_detail.html:45
+#: workbench/templates/tools/object_detail.html:25
+msgid "Delete"
+msgstr "Löschen"
 
 #: workbench/templates/activities/activity_list.html:17
 #: workbench/templates/activities/activity_list.html:22
@@ -965,17 +1009,6 @@ msgstr "Verwaltung"
 msgid "Sign off"
 msgstr "Abmelden"
 
-#: workbench/templates/contacts/organization_detail.html:49
-#: workbench/templates/contacts/person_detail.html:62
-#: workbench/templates/deals/deal_detail.html:30
-#: workbench/templates/invoices/invoice_detail.html:56
-#: workbench/templates/offers/offer_detail.html:92
-#: workbench/templates/projects/project_detail.html:92
-#: workbench/templates/projects/task_detail.html:45
-#: workbench/templates/tools/object_detail.html:25
-msgid "Delete"
-msgstr "Löschen"
-
 #: workbench/templates/contacts/person_detail.html:5
 msgid "persons"
 msgstr "Personen"
@@ -1001,7 +1034,6 @@ msgstr "absenden"
 
 #: workbench/templates/deals/deal_detail.html:50
 #: workbench/templates/projects/project_detail.html:112
-#| msgid "activities"
 msgid "No activities"
 msgstr "Keine Aktivitäten"
 
@@ -1035,13 +1067,6 @@ msgstr "Nach oben"
 msgid "Move down"
 msgstr "Nach unten"
 
-#: workbench/templates/offers/service_form.html:40
-#: workbench/templates/offers/service_form.html:71
-#: workbench/templates/offers/service_form.html:98
-#: workbench/templates/tools/object_confirm_delete.html:20
-msgid "delete"
-msgstr "Löschen"
-
 #: workbench/templates/projects/project_detail.html:16
 msgid "overview"
 msgstr "Übersicht"
@@ -1055,14 +1080,18 @@ msgid "Not offered services"
 msgstr "Nicht offerierte Leistungen"
 
 #: workbench/templates/projects/task_detail.html:49
-msgid "comments"
-msgstr "Kommentare"
+msgid "updates"
+msgstr "Änderungen"
 
-#: workbench/templates/projects/task_detail.html:64
+#: workbench/templates/projects/task_detail.html:86
+msgid "Unknown update"
+msgstr "Unbekannte Änderung"
+
+#: workbench/templates/projects/task_detail.html:99
 msgid "add comment"
 msgstr "Kommentar hinzufügen"
 
-#: workbench/templates/projects/task_detail.html:78
+#: workbench/templates/projects/task_detail.html:113
 msgid "create"
 msgstr "erstellen"
 
@@ -1073,16 +1102,6 @@ msgstr "Stunden heute"
 #: workbench/templates/start.html:18
 msgid "Hours this week"
 msgstr "Stunden diese Woche"
-
-#: workbench/templates/tools/object_confirm_delete.html:11
-#, python-format
-msgid "Delete %(object)s"
-msgstr "%(object)s löschen"
-
-#: workbench/templates/tools/object_confirm_delete.html:18
-#: workbench/templates/tools/object_form.html:48
-msgid "cancel"
-msgstr "Abbruch"
 
 #: workbench/templates/tools/object_form.html:32
 msgid "Yes, I am sure."
