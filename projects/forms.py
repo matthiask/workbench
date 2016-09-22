@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from contacts.models import Organization, Person
@@ -102,6 +103,12 @@ class TaskForm(ModelForm):
         if not instance.pk:
             instance.created_by = self.request.user
             instance.project = self.project
+
+        if instance.status == instance.DONE and not instance.closed_at:
+            instance.closed_at = timezone.now()
+        elif instance.status != instance.DONE:
+            instance.closed_at = None
+
         instance.save()
         return instance
 
