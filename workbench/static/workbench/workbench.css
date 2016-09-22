@@ -131,3 +131,11 @@ th > a {
 .pagination {
   margin: -10px 0 0 5px;
 }
+
+.panel-heading > h3 {
+  margin: 0 0 3px 0;
+}
+
+.panel-body > table {
+  margin-bottom: 0;
+}

@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 
-{% load i18n %}
+{% load i18n workbench %}
 
 {% block content %}
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
+
     <div class="panel panel-default">
+      <div class="panel-heading"><h3>Hi, {{ user }}</h3></div>
       <div class="panel-body">
-        <h2>Hi, {{ user }}</h2>
         <table class="table table-condensed">
           <tr>
             <td class="text-right">{{ user.hours.today }}h</td>
@@ -22,10 +23,10 @@
     </div>
 
     <div class="panel panel-default">
+      <div class="panel-heading"><h3>
+        <a href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a>
+      </h3></div>
       <div class="panel-body">
-        <h2><a href="{% url 'activities_activity_list' %}">
-          {% trans 'activities' %}
-        </a></h2>
         <table class="table table-condensed">
           {% for activity in user.activities.open %}
           <tr class="{{ activity.css }}">
@@ -39,10 +40,30 @@
               </td>
               <td>{{ activity.pretty_status }}</td>
             </tr>
+          {% empty %}
+          <tr><th>{% trans 'no activities!' %}</th></tr>
           {% endfor %}
         </table>
       </div>
     </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading"><h3>{% trans 'Important tasks' %}</h3></div>
+      <div class="panel-body">
+        <table class="table table-condensed">
+          {% for task in user.important_tasks %}
+          <tr>
+            <td><i title="{{ task.get_type_display }}" class="{{ task.type_css }}"></i></td>
+            <td><label class="label label-{{ task.priority_css }}">{{ task.get_priority_display }}</label></td>
+            <th><a href="{{ task.urls.detail }}">{{ task|h }}</a></th>
+            <td>{% link_or_none task.project %}</td>
+            <td>{{ task.pretty_status }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+
   </div>
 </div>
 {% endblock %}

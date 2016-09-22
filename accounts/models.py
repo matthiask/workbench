@@ -4,7 +4,7 @@ import hashlib
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
@@ -104,3 +104,11 @@ class User(Model, AbstractBaseUser):
         return 'https://www.gravatar.com/avatar/%s' % (
             hashlib.md5(self.email.lower().encode('utf-8')).hexdigest(),
         )
+
+    def important_tasks(self):
+        from projects.models import Task
+
+        return Task.objects.filter(
+            Q(owned_by=self),
+            Q(priority=Task.BLOCKER) | Q(due_on__lte=date.today() + timedelta(days=15))
+        ).select_related('project')
