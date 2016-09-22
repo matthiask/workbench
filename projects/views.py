@@ -100,30 +100,8 @@ class ProjectDetailView(DetailView):
     project_view = None
 
     def get_context_data(self, **kwargs):
-        if self.project_view == 'services':
+        if self.project_view == 'tasks':
             kwargs['tasks'] = ServicesView(self.object)
-
-        else:
-            tasks = self.object.tasks.select_related('owned_by').annotate(
-                logged_hours=Sum('loggedhours__hours'),
-            )
-            kwargs['tasks'] = [
-                ServiceTasks(
-                    None,
-                    sum(
-                        (
-                            service.approved_hours for service in
-                            Service.objects.filter(offer__project=self.object)
-                        ),
-                        Decimal()),
-                    sum(
-                        ((task.logged_hours or 0) for task in tasks),
-                        Decimal(),
-                    ),
-                    tasks,
-                )
-            ]
-
         return super().get_context_data(**kwargs)
 
 

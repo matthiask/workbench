@@ -13,7 +13,6 @@
     {% mark_current request.path %}
     <li><a href="{{ project.urls.overview }}">{% trans 'overview' %}</a></li>
     <li><a href="{{ project.urls.tasks }}">{% trans 'tasks' %}</a></li>
-    <li><a href="{{ project.urls.services }}">{% trans 'services' %}</a></li>
     {% endmark_current %}
   </ul>
 
@@ -139,7 +138,7 @@
 
           <tr>
             <th colspan="6">
-              {% if view.project_view == 'services' %}
+              {% if view.project_view == 'tasks' %}
                 <strong>
                   {% if service_tasks.service %}
                     <a href="{{ service_tasks.service.get_absolute_url }}">{{ service_tasks.service }}</a>
