@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from logbook.forms import LoggedHoursForm
 from logbook.models import LoggedHours
 from offers.forms import CreateOfferForm
-from offers.models import Offer, Service, Effort
+from offers.models import Offer, Service
 from projects.forms import CommentForm, TaskForm
 from projects.models import Project, Task, Comment
 from tools.history import changes
@@ -110,9 +110,12 @@ class ProjectDetailView(DetailView):
             kwargs['tasks'] = [
                 ServiceTasks(
                     None,
-                    Effort.objects.order_by().filter(
-                        service__offer__project=self.object,
-                    ).aggregate(h=Sum('hours'))['h'] or 0,
+                    sum(
+                        (
+                            service.approved_hours for service in
+                            Service.objects.filter(offer__project=self.object)
+                        ),
+                        Decimal()),
                     sum(
                         ((task.logged_hours or 0) for task in tasks),
                         Decimal(),
