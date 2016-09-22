@@ -54,7 +54,7 @@
           {% for task in user.important_tasks %}
             <tr>
               <td><i title="{{ task.get_type_display }}" class="{{ task.type_css }}"></i></td>
-              <td><label class="label label-{{ task.priority_css }}">{{ task.get_priority_display }}</label></td>
+              <td><span class="label label-{{ task.priority_css }}">{{ task.get_priority_display }}</span></td>
               <th><a href="{{ task.urls.detail }}">{{ task|h }}</a></th>
               <td>{% link_or_none task.project %}</td>
               <td>{{ task.pretty_status }}</td>

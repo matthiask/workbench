@@ -131,7 +131,7 @@
           <th>{% trans 'status' %}</th>
           <th>{% trans 'created at' %}</th>
           <th>{% trans 'owned by' %}</th>
-          <th></th>
+          <th class="text-right">{% trans 'hours' %}</th>
         </tr>
       </thead>
       <tbody>
@@ -163,8 +163,7 @@
               </td>
               <td>
                 <span
-                  title="{{ task.get_priority_display }}"
-                  class="{{ task.priority_css }}">&nbsp;</span>
+                  class="{{ task.priority_css }}">{{ task.get_priority_display }}</span>
               </td>
               <th><a href="{{ task.get_absolute_url }}">{{ task|h }}</a></th>
               <td>{{ task.pretty_status }}</td>
