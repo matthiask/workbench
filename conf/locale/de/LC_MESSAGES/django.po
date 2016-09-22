@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-22 13:29+0200\n"
+"POT-Creation-Date: 2016-09-22 22:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,8 +88,8 @@ msgid "Open"
 msgstr "Offen"
 
 #: activities/forms.py:20 activities/models.py:57 deals/models.py:76
-#: invoices/models.py:93 offers/models.py:66 projects/models.py:76
-#: projects/models.py:249
+#: invoices/models.py:93 offers/models.py:66 projects/models.py:58
+#: projects/models.py:197
 #: workbench/templates/activities/activity_detail.html:10
 #: workbench/templates/activities/activity_list.html:44
 #: workbench/templates/deals/deal_list.html:11
@@ -116,13 +116,13 @@ msgid "is completed"
 msgstr "ist erledigt"
 
 #: activities/models.py:34 deals/models.py:58 invoices/models.py:59
-#: projects/models.py:64 workbench/templates/invoices/invoice_detail.html:18
+#: projects/models.py:46 workbench/templates/invoices/invoice_detail.html:18
 #: workbench/templates/projects/project_detail.html:44
 msgid "contact"
 msgstr "Kontakt"
 
 #: activities/models.py:42 invoices/models.py:66 offers/models.py:45
-#: projects/models.py:100 projects/models.py:225
+#: projects/models.py:82 projects/models.py:173
 #: workbench/templates/invoices/invoice_detail.html:22
 #: workbench/templates/offers/offer_list.html:12
 #: workbench/templates/projects/project_list.html:10
@@ -136,14 +136,14 @@ msgstr "Geschäft"
 
 #: activities/models.py:53 contacts/models.py:13 deals/models.py:14
 #: deals/models.py:68 invoices/models.py:85 offers/models.py:58
-#: offers/models.py:148 offers/models.py:250 projects/models.py:68
-#: projects/models.py:228 projects/models.py:335 services/models.py:9
+#: offers/models.py:148 offers/models.py:266 projects/models.py:50
+#: projects/models.py:176 projects/models.py:302 services/models.py:9
 #: workbench/templates/offers/service_form.html:70
 #: workbench/templates/projects/project_detail.html:130
 msgid "title"
 msgstr "Titel"
 
-#: activities/models.py:61 invoices/models.py:74 projects/models.py:271
+#: activities/models.py:61 invoices/models.py:74 projects/models.py:219
 msgid "due on"
 msgstr "Fällig am"
 
@@ -161,8 +161,8 @@ msgstr "Dauer in Stunden (falls zutreffend)."
 
 #: activities/models.py:79 deals/models.py:89 invoices/models.py:97
 #: logbook/models.py:22 offers/models.py:40 offers/models.py:137
-#: projects/models.py:85 projects/models.py:214 projects/models.py:332
-#: projects/models.py:362 workbench/templates/projects/project_detail.html:132
+#: projects/models.py:67 projects/models.py:162 projects/models.py:299
+#: projects/models.py:329 workbench/templates/projects/project_detail.html:132
 msgid "created at"
 msgstr "Erstellt um"
 
@@ -222,7 +222,7 @@ msgstr "Gruppen"
 msgid "name"
 msgstr "Name"
 
-#: contacts/models.py:27 contacts/models.py:59 projects/models.py:370
+#: contacts/models.py:27 contacts/models.py:59 projects/models.py:337
 #: workbench/templates/contacts/organization_detail.html:37
 #: workbench/templates/contacts/person_detail.html:45
 msgid "notes"
@@ -263,7 +263,7 @@ msgid "people"
 msgstr "Personen"
 
 #: contacts/models.py:99 invoices/forms.py:188 invoices/models.py:104
-#: projects/models.py:234 workbench/templates/projects/project_detail.html:128
+#: projects/models.py:182 workbench/templates/projects/project_detail.html:128
 msgid "type"
 msgstr "Typ"
 
@@ -289,7 +289,7 @@ msgid "email addresses"
 msgstr "Emailadressen"
 
 #: contacts/models.py:169 contacts/models.py:173 invoices/models.py:116
-#: offers/forms.py:71 offers/models.py:75
+#: offers/forms.py:72 offers/models.py:75
 #: workbench/templates/invoices/invoice_detail.html:36
 #: workbench/templates/offers/offer_detail.html:26
 msgid "postal address"
@@ -304,7 +304,7 @@ msgstr "Postadressen"
 msgid "deals"
 msgstr "Geschäfte"
 
-#: deals/forms.py:11 invoices/forms.py:16 offers/forms.py:17
+#: deals/forms.py:11 invoices/forms.py:16 offers/forms.py:18
 #: projects/forms.py:12
 msgid "All states"
 msgstr "Alle Stati"
@@ -314,8 +314,8 @@ msgstr "Alle Stati"
 msgid "stage"
 msgstr "Stadium"
 
-#: deals/models.py:18 offers/models.py:156 offers/models.py:259
-#: projects/models.py:276 services/models.py:18
+#: deals/models.py:18 offers/models.py:156 offers/models.py:275
+#: projects/models.py:224 services/models.py:18
 msgid "position"
 msgstr "Position"
 
@@ -331,7 +331,7 @@ msgstr "Akzeptiert"
 msgid "declined"
 msgstr "Abgelehnt"
 
-#: deals/models.py:51 invoices/models.py:52 projects/models.py:57
+#: deals/models.py:51 invoices/models.py:52 projects/models.py:39
 #: workbench/templates/invoices/invoice_detail.html:14
 #: workbench/templates/invoices/invoice_list.html:11
 #: workbench/templates/offers/offer_list.html:11
@@ -341,9 +341,9 @@ msgid "customer"
 msgstr "Kunde"
 
 #: deals/models.py:71 invoices/models.py:88 logbook/models.py:47
-#: offers/models.py:61 offers/models.py:152 projects/models.py:71
-#: projects/models.py:231 workbench/templates/invoices/invoice_detail.html:32
-#: workbench/templates/projects/project_detail.html:28
+#: offers/models.py:61 offers/models.py:152 projects/models.py:53
+#: projects/models.py:179 workbench/templates/invoices/invoice_detail.html:32
+#: workbench/templates/projects/project_detail.html:26
 msgid "description"
 msgstr "Beschreibung"
 
@@ -353,7 +353,7 @@ msgid "estimated value"
 msgstr "Geschätzter Wert"
 
 #: deals/models.py:84 invoices/models.py:100 offers/models.py:70
-#: projects/models.py:80 projects/models.py:262
+#: projects/models.py:62 projects/models.py:210
 #: workbench/templates/activities/activity_detail.html:14
 #: workbench/templates/activities/activity_list.html:45
 #: workbench/templates/deals/deal_detail.html:22
@@ -366,12 +366,12 @@ msgstr "Geschätzter Wert"
 #: workbench/templates/projects/project_detail.html:66
 #: workbench/templates/projects/project_detail.html:131
 #: workbench/templates/projects/project_list.html:12
-#: workbench/templates/projects/task_detail.html:36
+#: workbench/templates/projects/task_detail.html:41
 msgid "status"
 msgstr "Status"
 
 #: deals/models.py:92 invoices/models.py:80 offers/models.py:53
-#: projects/models.py:266
+#: projects/models.py:214
 msgid "closed at"
 msgstr "Geschlossen um"
 
@@ -515,12 +515,12 @@ msgstr "Versendet am %(invoiced_on)s, gemahnt am %(reminded_on)s"
 msgid "Paid on %(closed_on)s"
 msgstr "Bezahlt am %(closed_on)s"
 
-#: logbook/models.py:19 projects/models.py:280 projects/models.py:329
-#: projects/models.py:359 workbench/templates/projects/project_detail.html:186
+#: logbook/models.py:19 projects/models.py:228 projects/models.py:296
+#: projects/models.py:326 workbench/templates/projects/project_detail.html:186
 msgid "task"
 msgstr "Aufgabe"
 
-#: logbook/models.py:29 projects/models.py:219 projects/models.py:367
+#: logbook/models.py:29 projects/models.py:167 projects/models.py:334
 msgid "created by"
 msgstr "Erstellt von"
 
@@ -532,7 +532,7 @@ msgstr "Erbracht am"
 msgid "rendered by"
 msgstr "Erbracht von"
 
-#: logbook/models.py:42 offers/models.py:216
+#: logbook/models.py:42 offers/models.py:232
 #: workbench/templates/offers/service_form.html:38
 msgid "hours"
 msgstr "Stunden"
@@ -542,7 +542,7 @@ msgid "archived at"
 msgstr "archiviert um"
 
 #: logbook/models.py:68 logbook/models.py:69
-#: workbench/templates/projects/task_detail.html:108
+#: workbench/templates/projects/task_detail.html:113
 msgid "logged hours"
 msgstr "aufgezeichnete Stunden"
 
@@ -551,11 +551,11 @@ msgstr "aufgezeichnete Stunden"
 msgid "offers"
 msgstr "Offerten"
 
-#: offers/forms.py:72
+#: offers/forms.py:73
 msgid "The exact address can be edited later."
 msgstr "Die exakte Adresse kann später bearbeitet werden."
 
-#: offers/forms.py:111
+#: offers/forms.py:112
 #, python-format
 msgid ""
 "You are attempting to set status to '%(to)s', but the offer has already been "
@@ -601,41 +601,51 @@ msgstr "Offeriert am %(offered_on)s"
 msgid "%(status)s on %(closed_on)s"
 msgstr "%(status)s am %(closed_on)s"
 
-#: offers/models.py:162 offers/models.py:207 offers/models.py:247
-#: projects/models.py:257 workbench/templates/offers/offer_detail.html:83
-#: workbench/templates/projects/task_detail.html:29
-msgid "service"
-msgstr "Leistung"
+#: offers/models.py:161
+#| msgid "efforts"
+msgid "effort hours"
+msgstr "Aufwände in Stunden"
 
-#: offers/models.py:163 services/__init__.py:10
-#: workbench/templates/projects/project_detail.html:18
-msgid "services"
-msgstr "Leistungen"
+#: offers/models.py:166
+#| msgid "logged hours"
+msgid "approved hours"
+msgstr "freigegebene Stunden"
 
-#: offers/models.py:179 offers/models.py:188 offers/views.py:36
-#: offers/views.py:82
-msgid "Cannot modify an offer which is not in preparation anymore."
-msgstr "Kann Offerte, welche nicht in Vorbereitung ist, nicht mehr bearbeiten."
-
-#: offers/models.py:212 services/models.py:23
-#: workbench/templates/offers/service_form.html:39
-msgid "service type"
-msgstr "Leistungstyp"
-
-#: offers/models.py:224
-msgid "effort"
-msgstr "Aufwand"
-
-#: offers/models.py:225 workbench/templates/offers/service_form.html:30
-msgid "efforts"
-msgstr "Aufwände"
-
-#: offers/models.py:254 offers/models.py:265
+#: offers/models.py:173 offers/models.py:270 offers/models.py:281
 #: workbench/templates/offers/service_form.html:69
 msgid "cost"
 msgstr "Kosten"
 
-#: offers/models.py:266 workbench/templates/offers/service_form.html:61
+#: offers/models.py:180 offers/models.py:223 offers/models.py:263
+#: projects/models.py:205 workbench/templates/offers/offer_detail.html:83
+#: workbench/templates/projects/task_detail.html:29
+msgid "service"
+msgstr "Leistung"
+
+#: offers/models.py:181 services/__init__.py:10
+#: workbench/templates/projects/project_detail.html:16
+msgid "services"
+msgstr "Leistungen"
+
+#: offers/models.py:203 offers/models.py:212 offers/views.py:36
+#: offers/views.py:82
+msgid "Cannot modify an offer which is not in preparation anymore."
+msgstr "Kann Offerte, welche nicht in Vorbereitung ist, nicht mehr bearbeiten."
+
+#: offers/models.py:228 services/models.py:23
+#: workbench/templates/offers/service_form.html:39
+msgid "service type"
+msgstr "Leistungstyp"
+
+#: offers/models.py:240
+msgid "effort"
+msgstr "Aufwand"
+
+#: offers/models.py:241 workbench/templates/offers/service_form.html:30
+msgid "efforts"
+msgstr "Aufwände"
+
+#: offers/models.py:282 workbench/templates/offers/service_form.html:61
 msgid "costs"
 msgstr "Kosten"
 
@@ -647,144 +657,143 @@ msgstr ""
 "Erstelle ein Projekt, erstelle und schätze Leistungen und füge diese zu "
 "einer Offerte hinzu."
 
-#: projects/__init__.py:10 projects/models.py:101
+#: projects/__init__.py:10 projects/models.py:83
 #: workbench/templates/base.html:36
 #: workbench/templates/projects/project_detail.html:5
 msgid "projects"
 msgstr "Projekte"
 
-#: projects/models.py:48
+#: projects/models.py:30
 msgid "Acquisition"
 msgstr "Akquise"
 
-#: projects/models.py:49
+#: projects/models.py:31
 msgid "Work in progress"
 msgstr "In Arbeit"
 
-#: projects/models.py:50
+#: projects/models.py:32
 msgid "Finished"
 msgstr "Erledigt"
 
-#: projects/models.py:51
+#: projects/models.py:33
 msgid "Declined"
 msgstr "Abgelehnt"
 
-#: projects/models.py:88
+#: projects/models.py:70
 msgid "invoicing"
 msgstr "Verrechnung"
 
-#: projects/models.py:90
+#: projects/models.py:72
 msgid "This project is eligible for invoicing."
 msgstr "Dieses Projekt soll verrechnet werden."
 
-#: projects/models.py:92 projects/models.py:169
+#: projects/models.py:74 projects/models.py:117
 msgid "maintenance"
 msgstr "Wartung"
 
-#: projects/models.py:94
+#: projects/models.py:76
 msgid "This project is used for maintenance work."
 msgstr "Dieses Projekt wird für Wartungsarbeiten verwendet."
 
-#: projects/models.py:167
+#: projects/models.py:115
 msgid "no invoicing"
 msgstr "keine Verrechnung"
 
-#: projects/models.py:182
+#: projects/models.py:130
 msgid "Inbox"
 msgstr "Inbox"
 
-#: projects/models.py:183
+#: projects/models.py:131
 msgid "Backlog"
 msgstr "Backlog"
 
-#: projects/models.py:184
+#: projects/models.py:132
 msgid "In progress"
 msgstr "In Arbeit"
 
-#: projects/models.py:185
+#: projects/models.py:133
 msgid "Ready for test"
 msgstr "Bereit zum Testen"
 
-#: projects/models.py:186
+#: projects/models.py:134
 msgid "Done"
 msgstr "Fertig"
 
-#: projects/models.py:195
+#: projects/models.py:143
 msgid "Task"
 msgstr "Aufgabe"
 
-#: projects/models.py:196
+#: projects/models.py:144
 msgid "Bug"
 msgstr "Fehler"
 
-#: projects/models.py:197
+#: projects/models.py:145
 msgid "Enhancement"
 msgstr "Verbesserung"
 
-#: projects/models.py:198
+#: projects/models.py:146
 msgid "Question"
 msgstr "Frage"
 
-#: projects/models.py:207
+#: projects/models.py:155
 msgid "Blocker"
 msgstr "Blocker"
 
-#: projects/models.py:208
+#: projects/models.py:156
 msgid "High"
 msgstr "Hoch"
 
-#: projects/models.py:209
+#: projects/models.py:157
 msgid "Normal"
 msgstr "Normal"
 
-#: projects/models.py:210
+#: projects/models.py:158
 msgid "Low"
 msgstr "Niedrig"
 
-#: projects/models.py:240 workbench/templates/projects/project_detail.html:129
+#: projects/models.py:188 workbench/templates/projects/project_detail.html:129
 msgid "priority"
 msgstr "Priorität"
 
-#: projects/models.py:274
+#: projects/models.py:222
 msgid "This field should be left empty most of the time."
 msgstr "Dieses Feld sollte meistens leer gelassen werden."
 
-#: projects/models.py:281 workbench/templates/projects/project_detail.html:17
+#: projects/models.py:229 workbench/templates/projects/project_detail.html:15
 msgid "tasks"
 msgstr "Aufgaben"
 
-#: projects/models.py:295
+#: projects/models.py:243
 #, python-format
 msgid "Done since %(closed_on)s"
 msgstr "Erledigt am %(closed_on)s"
 
-#: projects/models.py:300
+#: projects/models.py:248
 #, python-format
 msgid "%(status)s (%(pretty_due)s)"
 msgstr "%(status)s (%(pretty_due)s)"
 
-#: projects/models.py:340
+#: projects/models.py:307
 msgid "file"
 msgstr "Datei"
 
-#: projects/models.py:346
+#: projects/models.py:313
 msgid "attachment"
 msgstr "Anhang"
 
-#: projects/models.py:347
+#: projects/models.py:314
 msgid "attachments"
 msgstr "Anhänge"
 
-#: projects/models.py:375
-#| msgid "comments"
+#: projects/models.py:342
 msgid "comment"
 msgstr "Kommentar"
 
-#: projects/models.py:376
+#: projects/models.py:343
 msgid "comments"
 msgstr "Kommentare"
 
-#: projects/views.py:194 tools/views.py:100
+#: projects/views.py:183 tools/views.py:100
 #, python-format
 msgid "%(class)s '%(object)s' has been successfully created."
 msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
@@ -955,7 +964,7 @@ msgstr "Kontext"
 #: workbench/templates/invoices/invoice_detail.html:53
 #: workbench/templates/offers/offer_detail.html:89
 #: workbench/templates/projects/project_detail.html:90
-#: workbench/templates/projects/task_detail.html:42
+#: workbench/templates/projects/task_detail.html:47
 #: workbench/templates/tools/object_detail.html:22
 msgid "Update"
 msgstr "Bearbeiten"
@@ -967,7 +976,7 @@ msgstr "Bearbeiten"
 #: workbench/templates/invoices/invoice_detail.html:56
 #: workbench/templates/offers/offer_detail.html:92
 #: workbench/templates/projects/project_detail.html:92
-#: workbench/templates/projects/task_detail.html:45
+#: workbench/templates/projects/task_detail.html:50
 #: workbench/templates/tools/object_detail.html:25
 msgid "Delete"
 msgstr "Löschen"
@@ -1067,11 +1076,11 @@ msgstr "Nach oben"
 msgid "Move down"
 msgstr "Nach unten"
 
-#: workbench/templates/projects/project_detail.html:16
+#: workbench/templates/projects/project_detail.html:14
 msgid "overview"
 msgstr "Übersicht"
 
-#: workbench/templates/projects/project_detail.html:33
+#: workbench/templates/projects/project_detail.html:31
 msgid "Overall"
 msgstr "Gesamt"
 
@@ -1079,29 +1088,55 @@ msgstr "Gesamt"
 msgid "Not offered services"
 msgstr "Nicht offerierte Leistungen"
 
-#: workbench/templates/projects/task_detail.html:49
+#: workbench/templates/projects/project_detail.html:188
+msgid "edit approved hours"
+msgstr "freigegebene Stunden bearbeiten"
+
+#: workbench/templates/projects/task_detail.html:34
+#, python-format
+msgid ""
+"%(logged_tasks)sh / %(approved)sh on service. This task accounts for "
+"%(logged_this)sh."
+msgstr ""
+"%(logged_tasks)sh / %(approved)sh auf Leistung. Diese Aufgabe macht "
+"%(logged_this)sh aus."
+
+#: workbench/templates/projects/task_detail.html:54
 msgid "updates"
 msgstr "Änderungen"
 
-#: workbench/templates/projects/task_detail.html:86
+#: workbench/templates/projects/task_detail.html:91
 msgid "Unknown update"
 msgstr "Unbekannte Änderung"
 
-#: workbench/templates/projects/task_detail.html:99
+#: workbench/templates/projects/task_detail.html:104
 msgid "add comment"
 msgstr "Kommentar hinzufügen"
 
-#: workbench/templates/projects/task_detail.html:113
+#: workbench/templates/projects/task_detail.html:118
 msgid "create"
 msgstr "erstellen"
 
-#: workbench/templates/start.html:14
+#: workbench/templates/start.html:15
 msgid "Hours today"
 msgstr "Stunden heute"
 
-#: workbench/templates/start.html:18
+#: workbench/templates/start.html:19
 msgid "Hours this week"
 msgstr "Stunden diese Woche"
+
+#: workbench/templates/start.html:44
+#| msgid "No activities"
+msgid "no activities!"
+msgstr "Keine Aktivitäten!"
+
+#: workbench/templates/start.html:51
+msgid "Important tasks"
+msgstr "Wichtige Aufgaben"
+
+#: workbench/templates/start.html:63
+msgid "no important tasks! (how can this be?)"
+msgstr "Keine wichtigen Aufgaben! (Wie kann das sein?)"
 
 #: workbench/templates/tools/object_form.html:32
 msgid "Yes, I am sure."

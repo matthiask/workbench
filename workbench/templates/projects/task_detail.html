@@ -29,7 +29,12 @@
             <th class="text-right">{% trans 'service' %}</th>
             <td>
               {% link_or_none object.service %}
-              HOURS ETC.
+              {% with overview=object.overview %}{% if overview %}
+                <br>
+                {% blocktrans with logged_tasks=overview.logged_tasks logged_this=overview.logged_this approved=overview.approved trimmed %}
+                  {{ logged_tasks }}h / {{ approved }}h on service. This task accounts for {{ logged_this }}h.
+                {% endblocktrans %}
+              {% endif %}{% endwith %}
             </td>
           </tr>
           <tr>

@@ -268,6 +268,25 @@ class Task(Model):
             self.LOW: 'label label-default',
         }[self.priority]
 
+    @cached_property
+    def overview(self):
+        from logbook.models import LoggedHours
+        if not self.service:
+            return {}
+
+        hours_per_task = {
+            row['task']: row['hours__sum']
+            for row in LoggedHours.objects.filter(
+                task__service=self.service,
+            ).order_by().values('task').annotate(Sum('hours'))
+        }
+
+        return {
+            'logged_this': hours_per_task.get(self.pk),
+            'logged_tasks': sum(hours_per_task.values(), Decimal()),
+            'approved': self.service.approved_hours,
+        }
+
 
 class Attachment(Model):
     task = models.ForeignKey(
