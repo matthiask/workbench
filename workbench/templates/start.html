@@ -41,7 +41,7 @@
               <td>{{ activity.pretty_status }}</td>
             </tr>
           {% empty %}
-          <tr><th>{% trans 'no activities!' %}</th></tr>
+            <tr><th>{% trans 'no activities!' %}</th></tr>
           {% endfor %}
         </table>
       </div>
@@ -52,13 +52,15 @@
       <div class="panel-body">
         <table class="table table-condensed">
           {% for task in user.important_tasks %}
-          <tr>
-            <td><i title="{{ task.get_type_display }}" class="{{ task.type_css }}"></i></td>
-            <td><label class="label label-{{ task.priority_css }}">{{ task.get_priority_display }}</label></td>
-            <th><a href="{{ task.urls.detail }}">{{ task|h }}</a></th>
-            <td>{% link_or_none task.project %}</td>
-            <td>{{ task.pretty_status }}</td>
-          </tr>
+            <tr>
+              <td><i title="{{ task.get_type_display }}" class="{{ task.type_css }}"></i></td>
+              <td><label class="label label-{{ task.priority_css }}">{{ task.get_priority_display }}</label></td>
+              <th><a href="{{ task.urls.detail }}">{{ task|h }}</a></th>
+              <td>{% link_or_none task.project %}</td>
+              <td>{{ task.pretty_status }}</td>
+            </tr>
+          {% empty %}
+            <tr><th>{% trans 'no important tasks! (how can this be?)' %}</th></tr>
           {% endfor %}
         </table>
       </div>
