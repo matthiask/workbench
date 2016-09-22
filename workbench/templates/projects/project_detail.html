@@ -142,6 +142,7 @@
                 <strong>
                   {% if service_tasks.service %}
                     <a href="{{ service_tasks.service.get_absolute_url }}">{{ service_tasks.service }}</a>
+                    <div style="font-weight:normal">{{ service_tasks.service.description|linebreaksbr }}</div>
                   {% else %}
                     {% trans 'Not offered services' %}
                   {% endif %}
