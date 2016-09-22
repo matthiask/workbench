@@ -50,7 +50,7 @@ class OfferCreateView(CreateView):
 #     form_class = EstimationForm
 
 
-ServiceTasks = namedtuple('ServiceTasks', 'service effort logged tasks')
+ServiceTasks = namedtuple('ServiceTasks', 'service approved logged tasks')
 
 
 class ServicesView(object):
@@ -66,17 +66,6 @@ class ServicesView(object):
             logged_hours=Sum('loggedhours__hours'),
         )
 
-        self.effort_per_service = {
-            row['service']: row['effort_hours']
-            for row in Effort.objects.order_by().filter(
-                service__offer__project=self.project,
-            ).values(
-                'service',
-            ).annotate(
-                effort_hours=Sum('hours'),
-            )
-        }
-
         self.services = {}
         for key, group in itertools.groupby(
                 self.tasks,
@@ -85,7 +74,7 @@ class ServicesView(object):
             group = list(group)
             self.services[key] = ServiceTasks(
                 group[0].service,
-                self.effort_per_service.get(key) or 0,
+                group[0].service.approved_hours if group[0].service else 0,
                 sum(((task.logged_hours or 0) for task in group), Decimal()),
                 group,
             )
@@ -100,7 +89,7 @@ class ServicesView(object):
             else:
                 yield ServiceTasks(
                     service,
-                    self.effort_per_service.get(service.id) or 0,
+                    service.approved_hours,
                     0,
                     [],
                 )

@@ -40,6 +40,34 @@ class ProjectForm(ModelForm):
         }
 
 
+class ApprovedHoursForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.project = kwargs.pop('instance')
+        self.request = kwargs.pop('request')
+
+        super().__init__(*args, **kwargs)
+
+        for service in Service.objects.filter(offer__project=self.project):
+            self.fields['service_%s_approved_hours' % service.id] =\
+                forms.DecimalField(
+                    label='%s (%.1fh)' % (
+                        service.title,
+                        service.effort_hours,
+                    ),
+                    required=False,
+                    max_digits=5,
+                    decimal_places=2,
+                    initial=service._approved_hours,
+                )
+
+    def save(self):
+        for service in Service.objects.filter(offer__project=self.project):
+            service._approved_hours = self.cleaned_data.get(
+                'service_%s_approved_hours' % service.id)
+            service.save()
+        return self.project
+
+
 class TaskForm(ModelForm):
     user_fields = ('owned_by',)
 

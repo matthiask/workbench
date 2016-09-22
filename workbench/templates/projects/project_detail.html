@@ -8,8 +8,6 @@
 <div class="row">
 <div class="col-md-12">
 
-{% with overview=project.overview %}
-
   <h1>{{ project }} {% history_link project %}</h1>
   <ul class="nav nav-tabs">
     {% mark_current request.path %}
@@ -33,7 +31,9 @@
             {% trans 'Overall' %}
           </th>
           <td>
-            {{ overview.stats.logged_hours }}h / {{ overview.stats.effort_hours }}h
+            {% with overview=project.overview %}
+            {{ overview.logged }}h / {{ overview.approved }}h
+            {% endwith %}
           </td>
         </tr>
         <tr>
@@ -150,7 +150,7 @@
               {% endif %}
             </th>
             <th class="text-right">
-              {{ service_tasks.logged }}h / {{ service_tasks.effort }}h
+              {{ service_tasks.logged }}h / {{ service_tasks.approved }}h
             </th>
           </tr>
 
@@ -184,10 +184,12 @@
 
     <a href="{{ project.urls.createtask }}" class="btn btn-default">
       <i class="glyphicon glyphicon-plus"></i> {% trans 'task' %}</a>
+    <a href="{{ project.urls.approved_hours }}" class="btn btn-default">
+      {% trans 'edit approved hours' %}
+    </a>
 
   {% endif %}
 
-{% endwith %}
 </div>
 </div>
 {% endblock %}

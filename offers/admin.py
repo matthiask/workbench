@@ -27,7 +27,9 @@ class CostInline(admin.TabularInline):
 
 
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ('offer', 'title', 'description', 'position')
+    list_display = (
+        'offer', 'title', 'description', 'position',
+        'effort_hours', 'cost', 'approved_hours')
     inlines = [EffortInline, CostInline]
 
 

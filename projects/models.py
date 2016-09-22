@@ -1,3 +1,4 @@
+from decimal import Decimal
 from markdown2 import markdown
 
 from django.db import models
@@ -16,25 +17,6 @@ from tools.urls import model_urls
 
 class ProjectQuerySet(SearchQuerySet):
     pass
-
-
-class SummationDict(dict):
-    def __iadd__(self, other):
-        for key, value in other.items():
-            self[key] = self[key] + value
-        return self
-
-    def __getitem__(self, key):
-        if key == 'used_percentage':
-            try:
-                return 100 * self['hours'] / self['planning']
-            except Exception:
-                return 0
-
-        try:
-            return dict.__getitem__(self, key)
-        except KeyError:
-            return 0
 
 
 @model_urls()
@@ -115,50 +97,16 @@ class Project(Model):
     def overview(self):
         # Avoid circular imports
         from logbook.models import LoggedHours
-        from offers.models import Service, Effort
-
-        required = Effort.objects.filter(
-            service__offer__project=self,
-        ).order_by('service_type').values(
-            'service',
-        ).annotate(
-            effort_hours=Sum('hours'),
-        )
-
-        rendered = LoggedHours.objects.filter(
-            task__project=self,
-        ).order_by('rendered_by').values(
-            'task__service',
-        ).annotate(
-            logged_hours=Sum('hours'),
-        )
-
-        services = Service.objects.filter(offer__project=self)
-        services_dict = {}
-        stats = SummationDict()
-
-        for service in services:
-            services_dict[service.id] = service
-            service.stats = SummationDict()
-
-        services_dict[None] = Service()
-        services_dict[None].stats = SummationDict()
-
-        for row in required:
-            service = services_dict[row.pop('service')]
-            d = SummationDict(**row)
-            service.stats += d
-            stats += d
-
-        for row in rendered:
-            service = services_dict[row.pop('task__service')]
-            d = SummationDict(**row)
-            service.stats += d
-            stats += d
+        from offers.models import Service
 
         return {
-            'stats': stats,
-            'services': services,
+            'logged': LoggedHours.objects.filter(
+                task__project=self,
+            ).order_by().aggregate(h=Sum('hours'))['h'] or Decimal(),
+            'approved': sum(
+                (service.approved_hours for service in Service.objects.filter(
+                    offer__project=self)),
+                Decimal()),
         }
 
     def pretty_status(self):

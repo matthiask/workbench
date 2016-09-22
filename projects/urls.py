@@ -2,7 +2,7 @@ from django.conf.urls import url
 from django.shortcuts import redirect
 
 from projects.forms import (
-    ProjectSearchForm, ProjectForm, TaskForm, CommentForm)
+    ProjectSearchForm, ProjectForm, ApprovedHoursForm, TaskForm, CommentForm)
 from projects.models import Project, Task, Comment
 from projects.views import (
     ProjectDetailView, CreateTaskView, OfferCreateView,
@@ -56,6 +56,13 @@ urlpatterns = [
             model=Project,
         ),
         name='projects_project_update'),
+    url(
+        r'^(?P<pk>\d+)/approved-hours/$',
+        UpdateView.as_view(
+            form_class=ApprovedHoursForm,
+            model=Project,
+        ),
+        name='projects_project_approved_hours'),
     url(
         r'^(?P<pk>\d+)/delete/$',
         DeleteView.as_view(model=Project),

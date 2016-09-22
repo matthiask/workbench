@@ -157,6 +157,24 @@ class Service(Model):
         default=0,
     )
 
+    effort_hours = models.DecimalField(
+        _('effort hours'),
+        max_digits=5,
+        decimal_places=2,
+    )
+    _approved_hours = models.DecimalField(
+        _('approved hours'),
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+    cost = models.DecimalField(
+        _('cost'),
+        max_digits=10,
+        decimal_places=2,
+    )
+
     class Meta:
         ordering = ('position', 'created_at')
         verbose_name = _('service')
@@ -171,6 +189,12 @@ class Service(Model):
             self.position = 10 + (max_pos or 0)
         super().save(*args, **kwargs)
         self.offer.save()
+
+    @property
+    def approved_hours(self):
+        return (
+            self.effort_hours if self._approved_hours is None
+            else self._approved_hours)
 
     @classmethod
     def allow_update(cls, instance, request):
@@ -189,14 +213,6 @@ class Service(Model):
             ))
             return False
         return super().allow_delete(instance, request)
-
-    @property
-    def cost(self):
-        return sum((
-            item.cost for item in itertools.chain(
-                self.efforts.all(),
-                self.costs.all(),
-            )), Decimal())
 
 
 class Effort(Model):

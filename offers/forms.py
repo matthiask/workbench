@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from decimal import Decimal
 
 from django import forms
 from django.forms.models import inlineformset_factory
@@ -148,6 +149,11 @@ class ServiceForm(ModelForm):
             instance.offer = self.offer
         for formset in self.formsets.values():
             formset.save()
+
+        efforts = instance.efforts.all()
+        instance.effort_hours = sum((e.hours for e in efforts), Decimal())
+        instance.cost += sum((e.cost for e in efforts), Decimal())
+        instance.cost += sum((c.cost for c in instance.costs.all()), Decimal())
         instance.save()
         return instance
 
