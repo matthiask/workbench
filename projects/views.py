@@ -13,6 +13,7 @@ from offers.forms import CreateOfferForm
 from offers.models import Offer, Service, Effort
 from projects.forms import CommentForm, TaskForm
 from projects.models import Project, Task, Comment
+from tools.history import changes
 from tools.views import DetailView, CreateView, DeleteView
 
 
@@ -147,6 +148,19 @@ class TaskDetailView(DetailView):
     }
 
     def get_context_data(self, **kwargs):
+        ch = [
+            (change.version.created_at, 'change', change)
+            for change in changes(self.object, (
+                'title', 'description', 'type', 'priority', 'owned_by',
+                'service', 'status', 'closed_at', 'due_on',
+            ))[1:]
+        ]
+
+        ch.extend(
+            (comment.created_at, 'comment', comment)
+            for comment in self.object.comments.select_related('created_by')
+        )
+
         for key, cfg in self.FORMS.items():
             if key not in kwargs:
                 kwargs[key] = cfg[1](
@@ -156,7 +170,7 @@ class TaskDetailView(DetailView):
 
         # kwargs['recent_rendered'] =\
             # self.object.renderedservices.select_related('rendered_by')[:5]
-        return super().get_context_data(**kwargs)
+        return super().get_context_data(changes=sorted(ch), **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
