@@ -51,7 +51,7 @@ class ApprovedHoursForm(forms.Form):
             self.fields['service_%s_approved_hours' % service.id] =\
                 forms.DecimalField(
                     label='%s (%.1fh)' % (
-                        service.title,
+                        service,
                         service.effort_hours,
                     ),
                     required=False,
