@@ -43,13 +43,6 @@ class OfferCreateView(CreateView):
             **kwargs)
 
 
-# class EstimationView(UpdateView):
-#     model = Project
-#
-#     template_name_suffix = '_estimation'
-#     form_class = EstimationForm
-
-
 ServiceTasks = namedtuple('ServiceTasks', 'service approved logged tasks')
 
 
