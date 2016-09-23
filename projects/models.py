@@ -1,11 +1,13 @@
 from decimal import Decimal
 from markdown2 import markdown
+import lxml.html
+import lxml.html.clean
 
 from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.html import format_html, mark_safe, strip_tags
+from django.utils.html import format_html, mark_safe
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from accounts.models import User
@@ -13,6 +15,24 @@ from contacts.models import Organization, Person
 from tools.formats import local_date_format, pretty_due
 from tools.models import SearchQuerySet, Model
 from tools.urls import model_urls
+
+
+def markdownify(text):
+    html = markdown(text, extras=[
+        'code-friendly',
+        'fenced-code-blocks',
+        'cuddled-lists',
+    ])
+    html = html.replace('<img', '<img class="img-responsive"')
+    doc = lxml.html.fromstring(html)
+    cleaner = lxml.html.clean.Cleaner(
+        scripts=False,
+        style=False,
+        remove_tags=('script', 'style'),
+    )
+    cleaner(doc)
+    html = lxml.html.tostring(doc, method='xml').decode('utf-8')
+    return mark_safe(html)
 
 
 class ProjectQuerySet(SearchQuerySet):
@@ -238,6 +258,9 @@ class Task(Model):
             self.title,
         )
 
+    def description_html(self):
+        return markdownify(self.description)
+
     def pretty_status(self):
         if self.status == self.DONE:
             return _('Done since %(closed_on)s') % {
@@ -342,10 +365,8 @@ class Comment(Model):
         verbose_name = _('comment')
         verbose_name_plural = _('comments')
 
-    def html(self):
-        html = markdown(strip_tags(self.notes))
-        html = html.replace('<img', '<img class="img-responsive"')
-        return mark_safe(html)
+    def notes_html(self):
+        return markdownify(self.notes)
 
     def __str__(self):
         return self.notes[:30] + '...'

@@ -19,7 +19,11 @@
       <div class="col-md-8">
 
         <table class="table table-striped">
-          {% for name, value in object|field_value_pairs:'created_at,description,type,priority,owned_by' %}
+          <tr>
+            <th class="text-right">{% trans 'description' %}</th>
+            <td>{{ object.description_html }}</td>
+          </tr>
+          {% for name, value in object|field_value_pairs:'created_at,type,priority,owned_by' %}
           <tr>
             <th class="text-right">{{ name }}</th>
             <td>{% link_or_none value %}</td>
@@ -75,7 +79,7 @@
                     {{ data.created_by }}
                     <small>{{ data.created_at|date:'SHORT_DATETIME_FORMAT' }}</small>
                   </h4>
-                  {{ data.html }}
+                  {{ data.notes_html }}
                 </td>
                 <td class="text-right">
                   <a href="{{ data.urls.update }}" data-toggle="ajaxmodal">
