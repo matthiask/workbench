@@ -37,6 +37,10 @@ urlpatterns = [
         r'^(?P<pk>\d+)/tasks/$',
         ProjectDetailView.as_view(project_view='tasks'),
         name='projects_project_tasks'),
+    url(
+        r'^(?P<pk>\d+)/costs/$',
+        ProjectDetailView.as_view(project_view='costs'),
+        name='projects_project_costs'),
 
     url(
         r'^create/$',

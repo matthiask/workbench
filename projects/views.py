@@ -88,6 +88,46 @@ class ServicesView(object):
                 )
 
 
+ServiceCosts = namedtuple('ServiceCosts', 'service offered logged costs')
+
+
+class CostView(object):
+    def __init__(self, project):
+        self.project = project
+
+        self.costs = self.project.loggedcosts.order_by(
+            'service',
+            'rendered_on',
+        ).select_related('created_by')
+
+        self.services = {}
+        for key, group in itertools.groupby(
+                self.costs,
+                lambda cost: cost.service_id,
+        ):
+            group = list(group)
+            self.services[key] = list(group)
+
+    def __iter__(self):
+        if None in self.services:
+            yield ServiceCosts(
+                None,
+                0,
+                sum((c.cost for c in self.services[None]), 0),
+                self.services[None])
+
+        for service in Service.objects.filter(
+            offer__project=self.project,
+        ).prefetch_related('costs'):
+            if service.id in self.services or service.costs.all():
+                entries = self.services.get(service.id, [])
+                yield ServiceCosts(
+                    service,
+                    sum((c.cost for c in service.costs.all()), 0),
+                    sum((c.cost for c in entries), 0),
+                    entries)
+
+
 class ProjectDetailView(DetailView):
     model = Project
     project_view = None
@@ -95,6 +135,10 @@ class ProjectDetailView(DetailView):
     def get_context_data(self, **kwargs):
         if self.project_view == 'tasks':
             kwargs['tasks'] = ServicesView(self.object)
+
+        elif self.project_view == 'costs':
+            kwargs['costs'] = CostView(self.object)
+
         return super().get_context_data(**kwargs)
 
 

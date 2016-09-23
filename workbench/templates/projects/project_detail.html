@@ -13,6 +13,7 @@
     {% mark_current request.path %}
     <li><a href="{{ project.urls.overview }}">{% trans 'overview' %}</a></li>
     <li><a href="{{ project.urls.tasks }}">{% trans 'tasks' %}</a></li>
+    <li><a href="{{ project.urls.costs }}">{% trans 'costs' %}</a></li>
     {% endmark_current %}
   </ul>
 
@@ -119,7 +120,7 @@
 
     </div></div>
 
-  {% else %}
+  {% elif view.project_view == 'tasks' %}
 
     <table class="table table-hover table-striped">
       <thead>
@@ -186,6 +187,65 @@
     <a href="{{ project.urls.approved_hours }}" class="btn btn-default">
       {% trans 'edit approved hours' %}
     </a>
+
+  {% elif view.project_view == 'costs' %}
+
+    <div class="row"><div class="col-md-6 col-md-offset-3">
+
+    <table class="table table-hover table-striped">
+      <thead>
+        <tr>
+          <th>{% trans 'created by' %}</th>
+          <th>{% trans 'rendered on' %}</th>
+          <th>{% trans 'description' %}</th>
+          <th class="text-right">{% trans 'cost' %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for service, offered, logged, service_costs in costs %}
+          <tr>
+            <th colspan="3">
+              <strong>
+                {% if service %}
+                  <a href="{{ service.get_absolute_url }}">{{ service }}</a>
+                  <div style="font-weight:normal">{{ service.description|linebreaksbr }}</div>
+                {% else %}
+                  {% trans 'Not offered services' %}
+                {% endif %}
+              </strong>
+            </th>
+            <th class="text-right">
+              {{ logged|currency }} / {{ offered|currency }}
+            </th>
+          </tr>
+
+          {% for cost in service.costs.all %}
+            <tr>
+              <td colspan="2"></td>
+              <td>{{ cost.title }}</td>
+              <td class="text-right">{{ cost.cost|currency }}</td>
+            </tr>
+          {% endfor %}
+
+          {% for cost in service_costs %}
+            <tr>
+              <td>{{ cost.created_by.get_short_name }}</td>
+              <td>{{ cost.rendered_on|date:'SHORT_DATE_FORMAT' }}</td>
+              <th>
+                <a href="#">{{ cost.description }}</a>
+              </th>
+              <td class="text-right">{{ cost.cost|currency }}</td>
+            </tr>
+          {% endfor %}
+
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <a href="{#{ project.urls.createcost }#}" class="btn btn-default">
+      <i class="glyphicon glyphicon-plus"></i> {% trans 'cost' %}</a>
+
+    </div></div>
 
   {% endif %}
 
