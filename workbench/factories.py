@@ -70,6 +70,7 @@ class OfferFactory(factory.DjangoModelFactory):
 
 class ServiceFactory(factory.DjangoModelFactory):
     offer = factory.SubFactory(OfferFactory)
+    effort_hours = 0
 
     class Meta:
         model = Service
