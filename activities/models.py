@@ -7,7 +7,7 @@ from contacts.models import Person
 from deals.models import Deal
 from projects.models import Project
 from tools.formats import local_date_format, pretty_due
-from tools.models import SearchQuerySet, Model
+from tools.models import SearchQuerySet, Model, HoursField
 from tools.urls import model_urls
 
 
@@ -67,10 +67,8 @@ class Activity(Model):
         blank=True,
         null=True,
     )
-    duration = models.DecimalField(
+    duration = HoursField(
         _('duration'),
-        max_digits=5,
-        decimal_places=2,
         blank=True,
         null=True,
         help_text=_('Duration in hours (if applicable).'),

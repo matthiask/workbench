@@ -12,7 +12,8 @@ from accounts.models import User
 from projects.models import Project
 from services.models import ServiceType
 from tools.formats import local_date_format
-from tools.models import Model, ModelWithTotal, SearchQuerySet, MoneyField
+from tools.models import (
+    Model, ModelWithTotal, SearchQuerySet, MoneyField, HoursField)
 from tools.urls import model_urls
 
 
@@ -163,15 +164,11 @@ class Service(Model):
         default=0,
     )
 
-    effort_hours = models.DecimalField(
+    effort_hours = HoursField(
         _('effort hours'),
-        max_digits=5,
-        decimal_places=2,
     )
-    _approved_hours = models.DecimalField(
+    _approved_hours = HoursField(
         _('approved hours'),
-        max_digits=5,
-        decimal_places=2,
         blank=True,
         null=True,
     )
@@ -230,10 +227,8 @@ class Effort(Model):
         verbose_name=_('service type'),
         related_name='+',
     )
-    hours = models.DecimalField(
+    hours = HoursField(
         _('hours'),
-        max_digits=5,
-        decimal_places=2,
     )
 
     class Meta:

@@ -86,6 +86,13 @@ MoneyField = partial(
 )
 
 
+HoursField = partial(
+    models.DecimalField,
+    max_digits=5,
+    decimal_places=2,
+)
+
+
 class ModelWithTotal(Model):
     subtotal = MoneyField(_('subtotal'))
     discount = MoneyField(_('discount'))

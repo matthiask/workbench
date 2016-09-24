@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.models import User
 from offers.models import Service
 from projects.models import Project, Task
-from tools.models import SearchManager, Model, MoneyField
+from tools.models import SearchManager, Model, MoneyField, HoursField
 from tools.urls import model_urls
 
 
@@ -39,10 +39,8 @@ class LoggedHours(Model):
         related_name='loggedhours',
         verbose_name=_('rendered by'),
     )
-    hours = models.DecimalField(
+    hours = HoursField(
         _('hours'),
-        max_digits=5,
-        decimal_places=2,
     )
     description = models.TextField(
         _('description'),

@@ -1,22 +1,23 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from tools.models import Model
+from tools.models import Model, HoursField
 
 
 class ServiceType(Model):
     title = models.CharField(
         _('title'),
-        max_length=40)
+        max_length=40,
+    )
 
-    billing_per_hour = models.DecimalField(
+    billing_per_hour = HoursField(
         _('billing per hour'),
-        max_digits=5,
-        decimal_places=2)
+    )
 
     position = models.PositiveIntegerField(
         _('position'),
-        default=0)
+        default=0,
+    )
 
     class Meta:
         ordering = ('position', 'id')
