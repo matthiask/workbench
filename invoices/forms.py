@@ -1,13 +1,17 @@
 from datetime import date
 
 from django import forms
+from django.db.models import Q
+from django.template.defaultfilters import linebreaksbr
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
-from contacts.models import Organization, Person
+from contacts.models import Organization, Person, PostalAddress
 from invoices.models import Invoice
 from tools.formats import local_date_format
 from tools.forms import ModelForm, Picker, Textarea, WarningsForm
+from workbench.templatetags.workbench import currency
 
 
 class InvoiceSearchForm(forms.Form):
@@ -45,6 +49,80 @@ class InvoiceSearchForm(forms.Form):
         return queryset
 
 
+class CreateInvoiceForm(ModelForm):
+    user_fields = default_to_current_user = ('owned_by',)
+
+    class Meta:
+        model = Invoice
+        fields = (
+            'contact', 'title', 'description', 'owned_by', 'type',
+        )
+        widgets = {
+            'contact': Picker(model=Person),
+            'type': forms.RadioSelect,
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.project = kwargs.pop('project')
+        kwargs['initial'] = {
+            'title': self.project.title,
+            'description': self.project.description,
+            'contact': self.project.contact_id,
+        }
+
+        super().__init__(*args, **kwargs)
+
+        self.fields['type'].choices = Invoice.TYPE_CHOICES
+
+        postal_addresses = []
+
+        if self.project.contact:
+            postal_addresses.extend(
+                (pa.id, linebreaksbr(pa.postal_address))
+                for pa in PostalAddress.objects.filter(
+                    person=self.project.contact,
+                )
+            )
+
+        postal_addresses.extend(
+            (pa.id, linebreaksbr(pa.postal_address))
+            for pa in PostalAddress.objects.filter(
+                person__organization=self.project.customer,
+            ).exclude(person=self.project.contact)
+        )
+
+        if postal_addresses:
+            self.fields['pa'] = forms.ModelChoiceField(
+                PostalAddress.objects.all(),
+                label=_('postal address'),
+                help_text=_('The exact address can be edited later.'),
+                widget=forms.RadioSelect,
+            )
+            self.fields['pa'].choices = postal_addresses
+
+    def clean(self):
+        data = super().clean()
+        if data.get('contact'):
+            if data['contact'].organization != self.project.customer:
+                raise forms.ValidationError({
+                    'contact': _(
+                        'Selected contact does not belong to project\'s'
+                        ' organization, %(organization)s.'
+                    ) % {'organization': self.project.customer},
+                })
+        return data
+
+    def save(self):
+        instance = super().save(commit=False)
+        if self.cleaned_data.get('pa'):
+            instance.customer = self.project.customer
+            instance.contact = self.project.contact
+            instance.postal_address = self.cleaned_data['pa'].postal_address
+        instance.project = self.project
+        instance.save()
+        return instance
+
+
 class InvoiceForm(WarningsForm, ModelForm):
     user_fields = default_to_current_user = ('owned_by',)
 
@@ -53,6 +131,7 @@ class InvoiceForm(WarningsForm, ModelForm):
         fields = (
             'customer', 'contact', 'invoiced_on', 'due_on', 'title',
             'description', 'owned_by', 'status', 'postal_address',
+            'type',
         )
         widgets = {
             'customer': Picker(model=Organization),
@@ -60,10 +139,14 @@ class InvoiceForm(WarningsForm, ModelForm):
             'status': forms.RadioSelect,
             'description': Textarea,
             'postal_address': Textarea,
+            'type': forms.RadioSelect,
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.fields['type'].choices = Invoice.TYPE_CHOICES
+        self.fields['type'].disabled = True
 
         if self.instance.type in (
                 self.instance.FIXED,
@@ -74,6 +157,39 @@ class InvoiceForm(WarningsForm, ModelForm):
                 decimal_places=2,
                 initial=self.instance.subtotal,
             )
+
+        # TODO this check should not be necessary -- down payment invoices
+        # should ALWAYS have a project
+        if (self.instance.type != Invoice.DOWN_PAYMENT and
+                self.instance.project_id):
+            eligible_down_payment_invoices = Invoice.objects.filter(
+                Q(project=self.instance.project),
+                Q(type=Invoice.DOWN_PAYMENT),
+                Q(down_payment_applied_to__isnull=True) |
+                Q(down_payment_applied_to=self.instance),
+            )
+            if eligible_down_payment_invoices:
+                self.fields['apply_down_payment'] =\
+                    forms.ModelMultipleChoiceField(
+                        label=_('Apply down payment invoices'),
+                        queryset=eligible_down_payment_invoices,
+                        widget=forms.CheckboxSelectMultiple,
+                        required=False,
+                        initial=Invoice.objects.filter(
+                            down_payment_applied_to=self.instance,
+                        ).values_list('id', flat=True),
+                    )
+                self.fields['apply_down_payment'].choices = [
+                    (
+                        invoice.id,
+                        format_html(
+                            '{}<br/>{}, {}',
+                            invoice.__html__(),
+                            currency(invoice.total),
+                            invoice.pretty_status(),
+                        )
+                    ) for invoice in eligible_down_payment_invoices
+                ]
 
         elif self.instance.type in (self.instance.SERVICES,):
             pass
@@ -165,9 +281,17 @@ class InvoiceForm(WarningsForm, ModelForm):
 
         if instance.type in (instance.FIXED, instance.DOWN_PAYMENT):
             instance.subtotal = self.cleaned_data['subtotal']
-            instance.save()
+            instance.discount = 0  # TODO down payment is not a discount
 
-        elif instance.type in (self.instance.SERVICES,):
+        if self.cleaned_data.get('apply_down_payment'):
+            for invoice in self.cleaned_data.get('apply_down_payment'):
+                invoice.down_payment_applied_to = instance
+                invoice.save()
+                instance.discount += invoice.total_excl_tax
+
+        instance.save()
+
+        if instance.type in (self.instance.SERVICES,):
             # Leave out save_m2m by purpose.
             instance.clear_stories(save=False)
             instance.add_stories(
@@ -206,7 +330,7 @@ class CreatePersonInvoiceForm(ModelForm):
     def __init__(self, *args, **kwargs):
         request = kwargs['request']
         initial = kwargs.setdefault('initial', {})
-        initial.update({'invoiced_on': date.today(), 'subtotal': None})
+        initial.update({'subtotal': None})  # Invalid -- force input.
 
         if request.GET.get('person'):
             try:

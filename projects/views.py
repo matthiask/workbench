@@ -7,54 +7,19 @@ from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext_lazy as _
 
-from logbook.forms import LoggedHoursForm, LoggedCostForm
-from logbook.models import LoggedHours, LoggedCost
-from offers.forms import CreateOfferForm
-from offers.models import Offer, Service
-from projects.forms import CommentForm, TaskForm
+from logbook.forms import LoggedHoursForm
+from logbook.models import LoggedHours
+from offers.models import Service
+from projects.forms import CommentForm
 from projects.models import Project, Task, Comment
 from tools.history import changes
 from tools.views import DetailView, CreateView, DeleteView
 
 
-class CreateTaskView(CreateView):
-    model = Task
-
+class CreateRelatedView(CreateView):
     def get_form(self, data=None, files=None, **kwargs):
-        self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
-        return TaskForm(
-            data,
-            files,
-            project=self.project,
-            request=self.request,
-            **kwargs)
-
-
-class CreateCostView(CreateView):
-    model = LoggedCost
-    template_name = 'modalform.html'
-
-    def get_form(self, data=None, files=None, **kwargs):
-        self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
-        return LoggedCostForm(
-            data,
-            files,
-            project=self.project,
-            request=self.request,
-            **kwargs)
-
-
-class OfferCreateView(CreateView):
-    model = Offer
-
-    def get_form(self, data=None, files=None, **kwargs):
-        self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
-        return CreateOfferForm(
-            data,
-            files,
-            project=self.project,
-            request=self.request,
-            **kwargs)
+        self.project = get_object_or_404(Project, pk=self.kwargs.pop('pk'))
+        return super().get_form(data, files, project=self.project, **kwargs)
 
 
 ServiceTasks = namedtuple('ServiceTasks', 'service approved logged tasks')

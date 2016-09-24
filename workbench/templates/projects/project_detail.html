@@ -81,11 +81,43 @@
           {% else %}<td>&ndash;</td>{% endif %}
           {% endwith %}
         </tr>
+        <tr>
+          <th class="text-right">{% trans 'invoices' %}</th>
+          {% with invoices=project.invoices.all %}
+          {% if invoices %}
+            <td class="nopad">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>{% trans 'invoice' %}</th>
+                    <th>{% trans 'type' %}</th>
+                    <th>{% trans 'status' %}</th>
+                    <th class="text-right">{% trans 'total excl. tax' %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for invoice in invoices %}
+                    <tr>
+                      <th><a href="{{ invoice.get_absolute_url }}">{{ invoice }}</a></th>
+                      <td>{{ invoice.get_type_display }}</td>
+                      <td>{{ invoice.pretty_status }}</td>
+                      <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </td>
+          {% else %}<td>&ndash;</td>{% endif %}
+          {% endwith %}
+        </tr>
       </table>
 
       <a href="{{ project.urls.createoffer }}" class="btn btn-default">
         <i class="glyphicon glyphicon-plus"></i>
         {% trans 'offer' %}</a>
+      <a href="{{ project.urls.createinvoice }}" class="btn btn-default">
+        <i class="glyphicon glyphicon-plus"></i>
+        {% trans 'invoice' %}</a>
       <a href="{{ project.urls.update }}" class="btn btn-default">
         {% trans 'Update' %}</a>
       <a href="{{ project.urls.delete }}" class="btn btn-danger btn-inverse pull-right">

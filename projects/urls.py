@@ -1,14 +1,17 @@
 from django.conf.urls import url
 from django.shortcuts import redirect
 
+from invoices.forms import CreateInvoiceForm
+from invoices.models import Invoice
 from logbook.forms import LoggedCostForm
 from logbook.models import LoggedCost
+from offers.forms import CreateOfferForm
+from offers.models import Offer
 from projects.forms import (
     ProjectSearchForm, ProjectForm, ApprovedHoursForm, TaskForm, CommentForm)
 from projects.models import Project, Task, Comment
 from projects.views import (
-    ProjectDetailView, CreateTaskView, CreateCostView, OfferCreateView,
-    TaskDetailView, TaskDeleteView)
+    ProjectDetailView, CreateRelatedView, TaskDetailView, TaskDeleteView)
 from tools.views import (
     ListView, CreateView, UpdateView, DeleteView)
 
@@ -72,12 +75,25 @@ urlpatterns = [
 
     url(
         r'^(?P<pk>\d+)/createtask/$',
-        CreateTaskView.as_view(),
+        CreateRelatedView.as_view(
+            model=Task,
+            form_class=TaskForm,
+        ),
         name='projects_project_createtask'),
     url(
         r'^(?P<pk>\d+)/createoffer/$',
-        OfferCreateView.as_view(),
+        CreateRelatedView.as_view(
+            model=Offer,
+            form_class=CreateOfferForm,
+        ),
         name='projects_project_createoffer'),
+    url(
+        r'^(?P<pk>\d+)/createinvoice/$',
+        CreateRelatedView.as_view(
+            model=Invoice,
+            form_class=CreateInvoiceForm,
+        ),
+        name='projects_project_createinvoice'),
 
     # url(
     #     r'^(?P<pk>\d+)/estimation/$',
@@ -122,7 +138,10 @@ urlpatterns = [
     # COSTS
     url(
         r'^(?P<pk>\d+)/createcost/$',
-        CreateCostView.as_view(),
+        CreateRelatedView.as_view(
+            model=LoggedCost,
+            form_class=LoggedCostForm,
+        ),
         name='projects_project_createcost'),
     url(
         r'^cost/(?P<pk>\d+)/update/$',

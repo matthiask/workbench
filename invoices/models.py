@@ -64,7 +64,7 @@ class Invoice(ModelWithTotal):
         blank=True,
         null=True,
         verbose_name=_('project'),
-        related_name='+')
+        related_name='invoices')
 
     invoiced_on = models.DateField(
         _('invoiced on'),
@@ -156,8 +156,12 @@ class Invoice(ModelWithTotal):
 
     def pretty_status(self):
         d = {
-            'invoiced_on': local_date_format(self.invoiced_on, 'd.m.Y'),
-            'reminded_on': local_date_format(self.invoiced_on,  'd.m.Y'),
+            'invoiced_on': (
+                local_date_format(self.invoiced_on, 'd.m.Y')
+                if self.invoiced_on else None),
+            'reminded_on': (
+                local_date_format(self.invoiced_on,  'd.m.Y')
+                if self.invoiced_on else None),
             'created_at': local_date_format(self.created_at, 'd.m.Y'),
             'closed_on': (
                 local_date_format(self.closed_at, 'd.m.Y')

@@ -341,7 +341,7 @@ class PDFDocument(_PDFDocument):
             'days': 15,
             'due': local_date_format(
                 invoice.invoiced_on + timedelta(days=15),
-                'd.m.Y'),
+                'd.m.Y') if invoice.invoiced_on else _('NO DATE YET'),
         })
 
 
