@@ -106,7 +106,7 @@ class LoggedCost(Model):
         _('cost'),
         max_digits=10,
         decimal_places=2,
-        help_text=_('The amount we did have to pay.'),
+        help_text=_('Total incl. tax for third-party costs.'),
     )
     description = models.TextField(
         _('description'),

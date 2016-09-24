@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-24 09:44+0200\n"
+"POT-Creation-Date: 2016-09-24 10:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -568,11 +568,10 @@ msgid "cost"
 msgstr "Kosten"
 
 #: logbook/models.py:109
-msgid "The amount we did have to pay."
-msgstr "Der Rechnungsbetrag, welchen wir bezahlt haben."
+msgid "Total incl. tax for third-party costs."
+msgstr "Total inkl. MwSt bei Fremdkosten."
 
 #: logbook/models.py:133 logbook/models.py:134
-#| msgid "logged actions"
 msgid "logged cost"
 msgstr "erfasste Kosten"
 
@@ -947,6 +946,7 @@ msgid "Sign in"
 msgstr "Anmelden"
 
 #: workbench/templates/activities/activity_confirm_delete.html:6
+#: workbench/templates/modal_confirm_delete.html:6
 #: workbench/templates/projects/comment_confirm_delete.html:6
 #: workbench/templates/tools/object_confirm_delete.html:11
 #, python-format
@@ -954,6 +954,7 @@ msgid "Delete %(object)s"
 msgstr "%(object)s löschen"
 
 #: workbench/templates/activities/activity_confirm_delete.html:14
+#: workbench/templates/modal_confirm_delete.html:14
 #: workbench/templates/projects/comment_confirm_delete.html:14
 #: workbench/templates/tools/object_confirm_delete.html:18
 #: workbench/templates/tools/object_form.html:48
@@ -961,6 +962,8 @@ msgid "cancel"
 msgstr "Abbruch"
 
 #: workbench/templates/activities/activity_confirm_delete.html:16
+#: workbench/templates/logbook/loggedcost_form.html:9
+#: workbench/templates/modal_confirm_delete.html:16
 #: workbench/templates/offers/service_form.html:40
 #: workbench/templates/offers/service_form.html:71
 #: workbench/templates/offers/service_form.html:98
@@ -1076,14 +1079,15 @@ msgstr "Geschichte"
 msgid "total excl. tax"
 msgstr "Total exkl. MwSt"
 
-#: workbench/templates/modal.html:19
-msgid "Close"
-msgstr "Schliessen"
-
+#: workbench/templates/logbook/loggedcost_form.html:12
 #: workbench/templates/modalform.html:22
 #: workbench/templates/tools/object_form.html:44
 msgid "save"
 msgstr "Sichern"
+
+#: workbench/templates/modal.html:19
+msgid "Close"
+msgstr "Schliessen"
 
 #: workbench/templates/offers/offer_detail.html:35
 msgid "Move up"
@@ -1162,6 +1166,9 @@ msgstr "Ja, ich bin sicher."
 #: workbench/views.py:30
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
+
+#~ msgid "The amount we did have to pay."
+#~ msgstr "Der Rechnungsbetrag, welchen wir bezahlt haben."
 
 #~| msgid "priority"
 #~ msgid "by priority"
