@@ -3,12 +3,12 @@ from decimal import Decimal
 
 from django import forms
 from django.db.models import Q
-from django.template.defaultfilters import linebreaksbr
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
-from contacts.models import Organization, Person, PostalAddress
+from contacts.forms import PostalAddressSelectionForm
+from contacts.models import Organization, Person
 from invoices.models import Invoice
 from tools.formats import local_date_format
 from tools.forms import ModelForm, Picker, Textarea, WarningsForm
@@ -50,7 +50,7 @@ class InvoiceSearchForm(forms.Form):
         return queryset
 
 
-class CreateInvoiceForm(ModelForm):
+class CreateInvoiceForm(PostalAddressSelectionForm):
     user_fields = default_to_current_user = ('owned_by',)
 
     class Meta:
@@ -74,33 +74,14 @@ class CreateInvoiceForm(ModelForm):
         super().__init__(*args, **kwargs)
 
         self.instance.project = self.project
+        self.instance.customer = self.project.customer
+        self.instance.contact = self.project.contact
+
         self.fields['type'].choices = Invoice.TYPE_CHOICES
 
-        postal_addresses = []
-
-        if self.project.contact:
-            postal_addresses.extend(
-                (pa.id, linebreaksbr(pa.postal_address))
-                for pa in PostalAddress.objects.filter(
-                    person=self.project.contact,
-                )
-            )
-
-        postal_addresses.extend(
-            (pa.id, linebreaksbr(pa.postal_address))
-            for pa in PostalAddress.objects.filter(
-                person__organization=self.project.customer,
-            ).exclude(person=self.project.contact)
-        )
-
-        if postal_addresses:
-            self.fields['pa'] = forms.ModelChoiceField(
-                PostalAddress.objects.all(),
-                label=_('postal address'),
-                help_text=_('The exact address can be edited later.'),
-                widget=forms.RadioSelect,
-            )
-            self.fields['pa'].choices = postal_addresses
+        self.add_postal_address_selection(
+            organization=self.project.customer,
+            person=self.project.contact)
 
     def clean(self):
         data = super().clean()
@@ -117,8 +98,6 @@ class CreateInvoiceForm(ModelForm):
     def save(self):
         instance = super().save(commit=False)
         if self.cleaned_data.get('pa'):
-            instance.customer = self.project.customer
-            instance.contact = self.project.contact
             instance.postal_address = self.cleaned_data['pa'].postal_address
         instance.save()
         return instance
@@ -327,7 +306,7 @@ class InvoiceForm(WarningsForm, ModelForm):
         return instance
 
 
-class CreatePersonInvoiceForm(ModelForm):
+class CreatePersonInvoiceForm(PostalAddressSelectionForm):
     user_fields = default_to_current_user = ('owned_by',)
     type = forms.ChoiceField(
         label=_('type'),
@@ -357,7 +336,7 @@ class CreatePersonInvoiceForm(ModelForm):
             try:
                 person = Person.objects.get(pk=request.GET.get('person'))
             except (Person.DoesNotExist, TypeError, ValueError):
-                pass
+                person = None
             else:
                 initial.update({
                     'customer': person.organization,
@@ -366,11 +345,7 @@ class CreatePersonInvoiceForm(ModelForm):
 
         super().__init__(*args, **kwargs)
 
-    def save(self):
-        instance = super().save(commit=False)
-        instance.type = instance.FIXED
-        pa = instance.contact and instance.contact.postaladdresses.first()
-        if pa:
-            instance.postal_address = pa.postal_address
-        instance.save()
-        return instance
+        self.instance.type = Invoice.FIXED
+
+        if person:
+            self.add_postal_address_selection(person=person)

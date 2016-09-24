@@ -3,11 +3,10 @@ from decimal import Decimal
 
 from django import forms
 from django.forms.models import inlineformset_factory
-from django.template.defaultfilters import linebreaksbr
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from contacts.models import PostalAddress
+from contacts.forms import PostalAddressSelectionForm
 from offers.models import Offer, Service, Effort, Cost
 from tools.formats import local_date_format
 from tools.forms import ModelForm, Textarea, WarningsForm
@@ -31,7 +30,7 @@ class OfferSearchForm(forms.Form):
         return queryset
 
 
-class CreateOfferForm(ModelForm):
+class CreateOfferForm(PostalAddressSelectionForm):
     user_fields = default_to_current_user = ('owned_by',)
 
     class Meta:
@@ -49,39 +48,11 @@ class CreateOfferForm(ModelForm):
 
         super().__init__(*args, **kwargs)
 
-        postal_addresses = []
-
-        if self.project.contact:
-            postal_addresses.extend(
-                (pa.id, linebreaksbr(pa.postal_address))
-                for pa in PostalAddress.objects.filter(
-                    person=self.project.contact,
-                )
-            )
-
-        postal_addresses.extend(
-            (pa.id, linebreaksbr(pa.postal_address))
-            for pa in PostalAddress.objects.filter(
-                person__organization=self.project.customer,
-            ).exclude(person=self.project.contact)
+        self.instance.project = self.project
+        self.add_postal_address_selection(
+            organization=self.project.customer,
+            person=self.project.contact,
         )
-
-        if postal_addresses:
-            self.fields['pa'] = forms.ModelChoiceField(
-                PostalAddress.objects.all(),
-                label=_('postal address'),
-                help_text=_('The exact address can be edited later.'),
-                widget=forms.RadioSelect,
-            )
-            self.fields['pa'].choices = postal_addresses
-
-    def save(self):
-        instance = super().save(commit=False)
-        if self.cleaned_data.get('pa'):
-            instance.postal_address = self.cleaned_data['pa'].postal_address
-        instance.project = self.project
-        instance.save()
-        return instance
 
 
 class OfferForm(WarningsForm, ModelForm):
@@ -138,6 +109,9 @@ class ServiceForm(ModelForm):
             ('costs', CostFormset(*args, **kwargs)),
         )) if self.instance.pk else OrderedDict()
 
+        if self.offer:
+            self.instance.offer = self.offer
+
     def is_valid(self):
         return all(
             [super().is_valid()] +
@@ -145,8 +119,6 @@ class ServiceForm(ModelForm):
 
     def save(self):
         instance = super().save(commit=False)
-        if self.offer:
-            instance.offer = self.offer
         for formset in self.formsets.values():
             formset.save()
 

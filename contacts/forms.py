@@ -2,6 +2,7 @@ from collections import OrderedDict
 
 from django import forms
 from django.forms.models import inlineformset_factory
+from django.template.defaultfilters import linebreaksbr
 from django.utils.translation import ugettext_lazy as _
 
 from contacts.models import (
@@ -103,3 +104,41 @@ PostalAddressFormset = inlineformset_factory(
     PostalAddress,
     form=PostalAddressForm,
     extra=0)
+
+
+class PostalAddressSelectionForm(ModelForm):
+    def add_postal_address_selection(self, *, organization=None, person=None):
+        postal_addresses = []
+
+        if person:
+            postal_addresses.extend(
+                (pa.id, linebreaksbr(pa.postal_address))
+                for pa in PostalAddress.objects.filter(
+                    person=person,
+                )
+            )
+
+        if organization:
+            postal_addresses.extend(
+                (pa.id, linebreaksbr(pa.postal_address))
+                for pa in PostalAddress.objects.filter(
+                    person__organization=organization,
+                ).exclude(person=person)
+            )
+
+        if postal_addresses:
+            self.fields['pa'] = forms.ModelChoiceField(
+                PostalAddress.objects.all(),
+                label=_('postal address'),
+                help_text=_('The exact address can be edited later.'),
+                widget=forms.RadioSelect,
+            )
+            self.fields['pa'].choices = postal_addresses
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if self.cleaned_data.get('pa'):
+            instance.postal_address = self.cleaned_data['pa'].postal_address
+        if commit:
+            instance.save()
+        return instance
