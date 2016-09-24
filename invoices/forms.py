@@ -162,8 +162,6 @@ class InvoiceForm(WarningsForm, ModelForm):
                 initial=self.instance.subtotal,
             )
 
-        # TODO this check should not be necessary -- down payment invoices
-        # should ALWAYS have a project
         if (self.instance.type != Invoice.DOWN_PAYMENT and
                 self.instance.project_id):
             eligible_down_payment_invoices = Invoice.objects.filter(
