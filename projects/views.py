@@ -7,8 +7,8 @@ from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext_lazy as _
 
-from logbook.forms import LoggedHoursForm
-from logbook.models import LoggedHours
+from logbook.forms import LoggedHoursForm, LoggedCostForm
+from logbook.models import LoggedHours, LoggedCost
 from offers.forms import CreateOfferForm
 from offers.models import Offer, Service
 from projects.forms import CommentForm, TaskForm
@@ -23,6 +23,20 @@ class CreateTaskView(CreateView):
     def get_form(self, data=None, files=None, **kwargs):
         self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
         return TaskForm(
+            data,
+            files,
+            project=self.project,
+            request=self.request,
+            **kwargs)
+
+
+class CreateCostView(CreateView):
+    model = LoggedCost
+    template_name = 'modalform.html'
+
+    def get_form(self, data=None, files=None, **kwargs):
+        self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        return LoggedCostForm(
             data,
             files,
             project=self.project,

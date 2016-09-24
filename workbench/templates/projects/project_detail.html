@@ -232,7 +232,7 @@
               <td>{{ cost.created_by.get_short_name }}</td>
               <td>{{ cost.rendered_on|date:'SHORT_DATE_FORMAT' }}</td>
               <th>
-                <a href="#">{{ cost.description }}</a>
+                <a href="{{ cost.urls.update }}" data-toggle="ajaxmodal">{{ cost.description }}</a>
               </th>
               <td class="text-right">{{ cost.cost|currency }}</td>
             </tr>
@@ -242,7 +242,8 @@
       </tbody>
     </table>
 
-    <a href="{#{ project.urls.createcost }#}" class="btn btn-default">
+    <a href="{{ project.urls.createcost }}" class="btn btn-default"
+      data-toggle="ajaxmodal">
       <i class="glyphicon glyphicon-plus"></i> {% trans 'cost' %}</a>
 
     </div></div>

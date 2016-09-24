@@ -1,0 +1,13 @@
+{% extends "modalform.html" %}
+
+{% load i18n %}
+
+{% block footer %}
+  {% if object %}
+  <a href="{{ object.urls.delete }}" data-toggle="ajaxmodal"
+    class="pull-left btn btn-danger btn-inverse">
+    {% trans 'delete' %}
+  </a>
+  {% endif %}
+  <button type="submit" class="btn btn-primary">{% trans 'save' %}</button>
+{% endblock %}

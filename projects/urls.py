@@ -1,11 +1,13 @@
 from django.conf.urls import url
 from django.shortcuts import redirect
 
+from logbook.forms import LoggedCostForm
+from logbook.models import LoggedCost
 from projects.forms import (
     ProjectSearchForm, ProjectForm, ApprovedHoursForm, TaskForm, CommentForm)
 from projects.models import Project, Task, Comment
 from projects.views import (
-    ProjectDetailView, CreateTaskView, OfferCreateView,
+    ProjectDetailView, CreateTaskView, CreateCostView, OfferCreateView,
     TaskDetailView, TaskDeleteView)
 from tools.views import (
     ListView, CreateView, UpdateView, DeleteView)
@@ -116,4 +118,24 @@ urlpatterns = [
             model=Comment,
         ),
         name='projects_comment_delete'),
+
+    # COSTS
+    url(
+        r'^(?P<pk>\d+)/createcost/$',
+        CreateCostView.as_view(),
+        name='projects_project_createcost'),
+    url(
+        r'^cost/(?P<pk>\d+)/update/$',
+        UpdateView.as_view(
+            model=LoggedCost,
+            form_class=LoggedCostForm,
+        ),
+        name='logbook_loggedcost_update'),
+    url(
+        r'^cost/(?P<pk>\d+)/delete/$',
+        DeleteView.as_view(
+            model=LoggedCost,
+            template_name='modal_confirm_delete.html',
+        ),
+        name='logbook_loggedcost_delete'),
 ]

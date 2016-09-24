@@ -73,7 +73,7 @@ class LoggedHours(Model):
         return self.description
 
 
-@model_urls()
+@model_urls(default='update')
 class LoggedCost(Model):
     project = models.ForeignKey(
         Project,
