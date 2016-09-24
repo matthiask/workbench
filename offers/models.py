@@ -12,7 +12,7 @@ from accounts.models import User
 from projects.models import Project
 from services.models import ServiceType
 from tools.formats import local_date_format
-from tools.models import Model, ModelWithTotal, SearchQuerySet
+from tools.models import Model, ModelWithTotal, SearchQuerySet, MoneyField
 from tools.urls import model_urls
 
 
@@ -175,11 +175,7 @@ class Service(Model):
         blank=True,
         null=True,
     )
-    cost = models.DecimalField(
-        _('cost'),
-        max_digits=10,
-        decimal_places=2,
-    )
+    cost = MoneyField(_('cost'))
 
     class Meta:
         ordering = ('position', 'created_at')
@@ -272,11 +268,7 @@ class Cost(Model):
         _('title'),
         max_length=200,
     )
-    cost = models.DecimalField(
-        _('cost'),
-        max_digits=10,
-        decimal_places=2,
-    )
+    cost = MoneyField(_('cost'), default=None)
     position = models.PositiveIntegerField(
         _('position'),
         default=0,

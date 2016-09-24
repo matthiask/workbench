@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.models import User
 from contacts.models import Organization, Person
 from tools.formats import local_date_format
-from tools.models import SearchQuerySet, Model
+from tools.models import SearchQuerySet, Model, MoneyField
 from tools.urls import model_urls
 
 
@@ -75,10 +75,9 @@ class Deal(Model):
         on_delete=models.PROTECT,
         verbose_name=_('owned by'),
         related_name='+')
-    estimated_value = models.DecimalField(
+    estimated_value = MoneyField(
         _('estimated value'),
-        max_digits=10,
-        decimal_places=2)
+        default=None)
 
     status = models.PositiveIntegerField(
         _('status'),

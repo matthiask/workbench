@@ -1,4 +1,5 @@
 from decimal import Decimal
+from functools import partial
 
 from django.contrib import messages
 from django.db import models
@@ -77,21 +78,25 @@ class Model(models.Model):
         )
 
 
+MoneyField = partial(
+    models.DecimalField,
+    max_digits=10,
+    decimal_places=2,
+    default=Decimal('0'),
+)
+
+
 class ModelWithTotal(Model):
-    subtotal = models.DecimalField(
-        _('subtotal'), max_digits=10, decimal_places=2, default=0)
-    discount = models.DecimalField(
-        _('discount'), max_digits=10, decimal_places=2, default=0)
+    subtotal = MoneyField(_('subtotal'))
+    discount = MoneyField(_('discount'))
     liable_to_vat = models.BooleanField(
         _('liable to VAT'), default=True,
         help_text=_(
             'For example invoices to foreign institutions are not'
             ' liable to VAT.'
         ))
-    tax_rate = models.DecimalField(
-        _('tax rate'), max_digits=10, decimal_places=2, default=8)
-    total = models.DecimalField(
-        _('total'), max_digits=10, decimal_places=2, default=0)
+    tax_rate = MoneyField(_('tax rate'), default=Decimal('8'))
+    total = MoneyField(_('total'))
 
     class Meta:
         abstract = True

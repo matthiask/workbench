@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.models import User
 from offers.models import Service
 from projects.models import Project, Task
-from tools.models import SearchManager, Model
+from tools.models import SearchManager, Model, MoneyField
 from tools.urls import model_urls
 
 
@@ -102,10 +102,9 @@ class LoggedCost(Model):
         _('rendered on'),
         default=date.today,
     )
-    cost = models.DecimalField(
+    cost = MoneyField(
         _('cost'),
-        max_digits=10,
-        decimal_places=2,
+        default=None,
         help_text=_('Total incl. tax for third-party costs.'),
     )
     description = models.TextField(

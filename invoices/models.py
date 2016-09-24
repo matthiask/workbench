@@ -10,7 +10,7 @@ from accounts.models import User
 from contacts.models import Organization, Person
 from projects.models import Project
 from tools.formats import local_date_format
-from tools.models import ModelWithTotal, SearchQuerySet
+from tools.models import ModelWithTotal, SearchQuerySet, MoneyField
 from tools.urls import model_urls
 
 
@@ -111,8 +111,7 @@ class Invoice(ModelWithTotal):
         null=True,
         verbose_name=_('down payment applied to'),
         related_name='down_payment_invoices')
-    down_payment_total = models.DecimalField(
-        _('down payment total'), max_digits=10, decimal_places=2, default=0)
+    down_payment_total = MoneyField(_('down payment total'))
 
     postal_address = models.TextField(
         _('postal address'),
