@@ -82,6 +82,12 @@ class ModelWithTotal(Model):
         _('subtotal'), max_digits=10, decimal_places=2, default=0)
     discount = models.DecimalField(
         _('discount'), max_digits=10, decimal_places=2, default=0)
+    liable_to_vat = models.BooleanField(
+        _('liable to VAT'), default=True,
+        help_text=_(
+            'For example invoices to foreign institutions are not'
+            ' liable to VAT.'
+        ))
     tax_rate = models.DecimalField(
         _('tax rate'), max_digits=10, decimal_places=2, default=8)
     total = models.DecimalField(
@@ -97,9 +103,9 @@ class ModelWithTotal(Model):
     save.alters_data = True
 
     def _calculate_total(self):
-        # Why is the Decimal() coercion necessary??
-        self.total = Decimal(self.subtotal) - self.discount
-        self.total *= 1 + Decimal(self.tax_rate) / 100
+        self.total = self.total_excl_tax
+        if self.liable_to_vat:
+            self.total *= 1 + self.tax_rate / 100
         self.total = self._round_5cents(self.total)
 
     def _round_5cents(self, value):
@@ -107,7 +113,9 @@ class ModelWithTotal(Model):
 
     @property
     def tax_amount(self):
-        return (self.subtotal - self.discount) * self.tax_rate / 100
+        return (
+            self.total_excl_tax * self.tax_rate / 100
+            if self.liable_to_vat else Decimal())
 
     @property
     def total_excl_tax(self):

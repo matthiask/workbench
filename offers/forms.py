@@ -91,7 +91,7 @@ class OfferForm(WarningsForm, ModelForm):
         model = Offer
         fields = (
             'offered_on', 'title', 'description', 'owned_by', 'status',
-            'postal_address')
+            'postal_address', 'liable_to_vat')
         widgets = {
             'status': forms.RadioSelect,
         }

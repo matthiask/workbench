@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 
 from django import forms
 from django.db.models import Q
@@ -131,7 +132,7 @@ class InvoiceForm(WarningsForm, ModelForm):
         fields = (
             'customer', 'contact', 'invoiced_on', 'due_on', 'title',
             'description', 'owned_by', 'status', 'postal_address',
-            'type',
+            'type', 'discount', 'liable_to_vat',
         )
         widgets = {
             'customer': Picker(model=Organization),
@@ -147,6 +148,9 @@ class InvoiceForm(WarningsForm, ModelForm):
 
         self.fields['type'].choices = Invoice.TYPE_CHOICES
         self.fields['type'].disabled = True
+
+        if self.instance.project:
+            del self.fields['customer']
 
         if self.instance.type in (
                 self.instance.FIXED,
@@ -208,6 +212,11 @@ class InvoiceForm(WarningsForm, ModelForm):
             )
             """
 
+        self.fields.move_to_end('discount')
+        if 'apply_down_payment' in self.fields:
+            self.fields.move_to_end('apply_down_payment')
+        self.fields.move_to_end('liable_to_vat')
+
     def _is_status_unexpected(self, to_status):
         if not to_status:
             return False
@@ -223,6 +232,15 @@ class InvoiceForm(WarningsForm, ModelForm):
     def clean(self):
         data = super().clean()
         s_dict = dict(Invoice.STATUS_CHOICES)
+
+        if self.instance.project and data.get('contact'):
+            if data['contact'].organization != self.instance.project.customer:
+                raise forms.ValidationError({
+                    'contact': _(
+                        'Selected contact does not belong to project\'s'
+                        ' organization, %(organization)s.'
+                    ) % {'organization': self.instance.project.customer},
+                })
 
         if self.instance._orig_status < self.instance.SENT:
             invoiced_on = data.get('invoiced_on')
@@ -281,13 +299,15 @@ class InvoiceForm(WarningsForm, ModelForm):
 
         if instance.type in (instance.FIXED, instance.DOWN_PAYMENT):
             instance.subtotal = self.cleaned_data['subtotal']
-            instance.discount = 0  # TODO down payment is not a discount
+            instance.down_payment_total = Decimal()
 
-        if self.cleaned_data.get('apply_down_payment'):
-            for invoice in self.cleaned_data.get('apply_down_payment'):
-                invoice.down_payment_applied_to = instance
-                invoice.save()
-                instance.discount += invoice.total_excl_tax
+        if 'apply_down_payment' in self.cleaned_data:
+            instance.down_payment_invoices.set(
+                self.cleaned_data.get('apply_down_payment'))
+            instance.down_payment_total = sum((
+                invoice.total_excl_tax
+                for invoice in self.cleaned_data.get('apply_down_payment')
+            ), Decimal())
 
         instance.save()
 

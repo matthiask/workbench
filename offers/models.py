@@ -130,6 +130,12 @@ class Offer(ModelWithTotal):
             self.REPLACED: '',
         }[self.status]
 
+    @property
+    def total_title(self):
+        return (
+            _('total CHF incl. tax')
+            if self.liable_to_vat else _('total CHF'))
+
 
 @model_urls()
 class Service(Model):

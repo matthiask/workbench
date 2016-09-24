@@ -110,7 +110,9 @@ class Invoice(ModelWithTotal):
         blank=True,
         null=True,
         verbose_name=_('down payment applied to'),
-        related_name='+')
+        related_name='down_payment_invoices')
+    down_payment_total = models.DecimalField(
+        _('down payment total'), max_digits=10, decimal_places=2, default=0)
 
     postal_address = models.TextField(
         _('postal address'),
@@ -136,6 +138,10 @@ class Invoice(ModelWithTotal):
             self.code,
             self.title,
         )
+
+    @property
+    def total_excl_tax(self):
+        return self.subtotal - self.discount - self.down_payment_total
 
     def clean(self):
         super().clean()
@@ -197,3 +203,14 @@ class Invoice(ModelWithTotal):
             self.CANCELED: 'danger',
             self.REPLACED: '',
         }[self.status]
+
+    @property
+    def total_title(self):
+        if self.type == self.DOWN_PAYMENT:
+            return (
+                _('down payment total CHF incl. tax')
+                if self.liable_to_vat else _('down payment total CHF'))
+        else:
+            return (
+                _('total CHF incl. tax')
+                if self.liable_to_vat else _('total CHF'))

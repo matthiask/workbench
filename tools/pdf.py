@@ -277,9 +277,20 @@ class PDFDocument(_PDFDocument):
         ]
         if instance.discount:
             total.append((
-                currency(instance.discount.quantize(Z)),
+                currency(-instance.discount.quantize(Z)),
                 _('discount'),
             ))
+        if getattr(instance, 'down_payment_total', None):
+            for invoice in instance.down_payment_invoices.all():
+                total.append((
+                    currency(-invoice.total_excl_tax.quantize(Z)),
+                    '%s: %s (%s)' % (
+                        _('Down payment'),
+                        invoice,
+                        invoice.invoiced_on.strftime('%d.%m.%Y')
+                        if invoice.invoiced_on else _('NO DATE YET'),
+                    ),
+                ))
         if instance.tax_amount:
             total.append((
                 currency(instance.tax_amount.quantize(Z)),
@@ -291,7 +302,7 @@ class PDFDocument(_PDFDocument):
             self.spacer(.7 * mm)
 
         self.table([
-            (currency(instance.total.quantize(Z)), _('total CHF incl. tax')),
+            (currency(instance.total.quantize(Z)), instance.total_title),
         ], self.style.tableColumns, self.style.tableHeadLine)
 
     def process_offer(self, offer):
