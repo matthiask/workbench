@@ -56,7 +56,7 @@ class Model(models.Model):
 
     @property
     def code(self):
-        return '%05d' % self.pk
+        return '%05d' % self.pk if self.pk else ''
 
     def pretty_status(self):
         return self.get_status_display()
