@@ -78,13 +78,6 @@
           <td class="text-right">-{{ object.discount|currency }}</td>
         </tr>
       {% endif %}
-      {% if object.down_payment_total %}
-        <tr>
-          <td></td>
-          <th colspan="2">{% trans 'discount' %}</th>
-          <td class="text-right">-{{ object.down_payment_total|currency }}</td>
-        </tr>
-      {% endif %}
       {% if object.liable_to_vat and object.subtotal != object.total_excl_tax %}
         <tr>
           <td></td>
