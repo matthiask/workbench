@@ -160,6 +160,14 @@ class Invoice(ModelWithTotal):
                     'due_on': _('Due date has to be after invoice date.'),
                 })
 
+        if (self.type in (self.SERVICES, self.DOWN_PAYMENT) and
+                not self.project):
+            raise ValidationError({
+                _('Invoices of type %(type)s require a project.') % {
+                    'type': self.get_type_display(),
+                }
+            })
+
     def pretty_status(self):
         d = {
             'invoiced_on': (
