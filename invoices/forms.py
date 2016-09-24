@@ -73,6 +73,7 @@ class CreateInvoiceForm(ModelForm):
 
         super().__init__(*args, **kwargs)
 
+        self.instance.project = self.project
         self.fields['type'].choices = Invoice.TYPE_CHOICES
 
         postal_addresses = []
@@ -119,7 +120,6 @@ class CreateInvoiceForm(ModelForm):
             instance.customer = self.project.customer
             instance.contact = self.project.contact
             instance.postal_address = self.cleaned_data['pa'].postal_address
-        instance.project = self.project
         instance.save()
         return instance
 
