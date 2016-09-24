@@ -156,7 +156,10 @@ class InvoiceForm(WarningsForm, ModelForm):
                 self.instance.FIXED,
                 self.instance.DOWN_PAYMENT):
             self.fields['subtotal'] = forms.DecimalField(
-                label=_('subtotal'),
+                label=(
+                    _('Down payment')
+                    if self.instance.type == Invoice.DOWN_PAYMENT
+                    else _('subtotal')),
                 max_digits=10,
                 decimal_places=2,
                 initial=self.instance.subtotal,
