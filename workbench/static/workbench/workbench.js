@@ -125,7 +125,12 @@ $(function() {
 function initWidgets() {
   $('.datepicker:not(.has-datepicker)').addClass('has-datepicker').datetimepicker({
     locale: 'de',
-    format: 'DD.MM.YYYY'
+    format: 'DD.MM.YYYY',
+    useCurrent: false,
+    showTodayButton: true,
+    icons: {
+      today: 'glyphicon glyphicon-calendar set-to-today'
+    }
   });
 
   var invoicedOn = $('#id_invoiced_on');

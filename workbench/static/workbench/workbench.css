@@ -139,3 +139,12 @@ th > a {
 .panel-body > table {
   margin-bottom: 0;
 }
+
+.set-to-today::after {
+  content: 'Today';
+  display: inline-block;
+  position: relative;
+  left: 5px;
+  top: -2px;
+  font-family: Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
