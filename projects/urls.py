@@ -23,11 +23,6 @@ urlpatterns = [
         ListView.as_view(
             model=Project,
             search_form_class=ProjectSearchForm,
-            select_related=(
-                'customer',
-                'contact__organization',
-                'owned_by',
-            ),
         ),
         name='projects_project_list'),
 
@@ -106,10 +101,6 @@ urlpatterns = [
         ListView.as_view(
             model=Task,
             search_form_class=TaskSearchForm,
-            select_related=(
-                'project',
-                'owned_by',
-            ),
             show_create_button=False,
         ),
         name='projects_task_list'),

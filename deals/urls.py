@@ -12,7 +12,6 @@ urlpatterns = [
         ListView.as_view(
             model=Deal,
             search_form_class=DealSearchForm,
-            select_related=('owned_by', 'stage'),
         ),
         name='deals_deal_list'),
     url(

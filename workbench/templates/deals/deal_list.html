@@ -1,6 +1,6 @@
 {% extends "tools/object_list.html" %}
 
-{% load bootstrap3 i18n %}
+{% load bootstrap3 i18n workbench %}
 
 {% block objects %}
 
@@ -15,7 +15,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for deal in object_list %}
+    {% for deal in object_list|select_related:'stage,owned_by' %}
       <tr>
         <th><a href="{{ deal.urls.detail }}">{{ deal }}</a></th>
         <td>{{ deal.owned_by.get_short_name }}</td>

@@ -14,12 +14,6 @@ urlpatterns = [
         ListView.as_view(
             model=Invoice,
             search_form_class=InvoiceSearchForm,
-            select_related=(
-                'customer',
-                'contact__organization',
-                'project',
-                'owned_by',
-            ),
         ),
         name='invoices_invoice_list'),
     url(

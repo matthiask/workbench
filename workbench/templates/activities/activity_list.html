@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load bootstrap3 i18n querystring %}
+{% load bootstrap3 i18n querystring workbench %}
 
 {% block title %}{{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
@@ -46,7 +46,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for object in object_list %}
+        {% for object in object_list|select_related:'project,deal,contact__organization,owned_by' %}
           <tr>
             <th><a href="{{ object.urls.detail }}" data-toggle="ajaxmodal">
                 {{ object }}

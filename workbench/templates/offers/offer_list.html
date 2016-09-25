@@ -15,7 +15,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for offer in object_list %}
+    {% for offer in object_list|select_related:'project__customer,project__contact__organization' %}
       <tr>
         <th><a href="{{ offer.urls.detail }}">
           {{ offer|h }}

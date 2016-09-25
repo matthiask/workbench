@@ -17,10 +17,6 @@ urlpatterns = [
         ListView.as_view(
             model=Offer,
             search_form_class=OfferSearchForm,
-            select_related=(
-                'project__customer',
-                'project__contact__organization',
-            ),
         ),
         name='offers_offer_list'),
     url(
