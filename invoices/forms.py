@@ -32,9 +32,6 @@ class InvoiceSearchForm(forms.Form):
     )
 
     def filter(self, queryset):
-        if not self.is_valid():
-            return queryset
-
         data = self.cleaned_data
         if data.get('s') == 'open':
             queryset = queryset.filter(status__in=(

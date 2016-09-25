@@ -20,9 +20,6 @@ class OfferSearchForm(forms.Form):
     )
 
     def filter(self, queryset):
-        if not self.is_valid():
-            return queryset
-
         data = self.cleaned_data
         if data.get('s'):
             queryset = queryset.filter(status=data.get('s'))

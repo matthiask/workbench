@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
@@ -48,6 +48,15 @@ class ListView(ToolsMixin, vanilla.ListView):
     select_related = None
     show_create_button = True
 
+    def get(self, request, *args, **kwargs):
+        if self.search_form_class:
+            self.search_form = self.search_form_class(request.GET)
+            if not self.search_form.is_valid():
+                messages.warning(
+                    request, _('Search form was invalid.'))
+                return HttpResponseRedirect('.')
+        return super().get(request, *args, **kwargs)
+
     def get_queryset(self):
         self.root_queryset = self.model.objects.all()
 
@@ -56,8 +65,7 @@ class ListView(ToolsMixin, vanilla.ListView):
             self.root_queryset.search(q) if q
             else self.root_queryset.all())
 
-        if self.search_form_class:
-            self.search_form = self.search_form_class(self.request.GET)
+        if self.search_form:
             queryset = self.search_form.filter(queryset)
 
         if self.select_related:
