@@ -37,13 +37,13 @@ class Invoice(ModelWithTotal):
     )
 
     FIXED = 'fixed'
-    SERVICES = 'services'
     DOWN_PAYMENT = 'down-payment'
+    SERVICES = 'services'
 
     TYPE_CHOICES = (
         (FIXED, _('Fixed amount')),
-        (SERVICES, _('Services')),
         (DOWN_PAYMENT, _('Down payment')),
+        (SERVICES, _('Services')),
     )
 
     customer = models.ForeignKey(
