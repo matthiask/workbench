@@ -8,7 +8,8 @@ from logbook.models import LoggedCost
 from offers.forms import CreateOfferForm
 from offers.models import Offer
 from projects.forms import (
-    ProjectSearchForm, ProjectForm, ApprovedHoursForm, TaskForm, CommentForm)
+    ProjectSearchForm, ProjectForm, ApprovedHoursForm, TaskSearchForm,
+    TaskForm, CommentForm)
 from projects.models import Project, Task, Comment
 from projects.views import (
     ProjectDetailView, CreateRelatedView, TaskDetailView, TaskDeleteView)
@@ -100,6 +101,18 @@ urlpatterns = [
     #     EstimationView.as_view(),
     #     name='projects_project_estimation'),
 
+    url(
+        r'^tasks/$',
+        ListView.as_view(
+            model=Task,
+            search_form_class=TaskSearchForm,
+            select_related=(
+                'project',
+                'owned_by',
+            ),
+            show_create_button=False,
+        ),
+        name='projects_task_list'),
     url(
         r'^tasks/(?P<pk>\d+)/$',
         TaskDetailView.as_view(),

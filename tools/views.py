@@ -46,6 +46,7 @@ class ListView(ToolsMixin, vanilla.ListView):
     paginate_by = 50
     search_form_class = None
     select_related = None
+    show_create_button = True
 
     def get_queryset(self):
         self.root_queryset = self.model.objects.all()

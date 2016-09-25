@@ -2,6 +2,7 @@ from django import forms
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from accounts.models import User
 from contacts.models import Organization, Person
 from projects.models import Project, Task, Comment
 from offers.models import Service
@@ -67,6 +68,54 @@ class ApprovedHoursForm(forms.Form):
                 'service_%s_approved_hours' % service.id)
             service.save()
         return self.project
+
+
+class TaskSearchForm(forms.Form):
+    s = forms.ChoiceField(
+        choices=(
+            ('', _('All states')),
+            ('open', _('Open')),
+            (_('Exact'), Task.STATUS_CHOICES),
+        ),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+    owned_by = forms.TypedChoiceField(
+        label=_('owned by'),
+        coerce=int,
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['owned_by'].choices = [
+            ('', _('All users')),
+            (-1, _('Owned by nobody')),
+            (-2, _('Owned by inactive users')),
+            (_('Active'), [
+                (u.id, u.get_full_name())
+                for u in User.objects.filter(is_active=True)
+            ]),
+        ]
+
+    def filter(self, queryset):
+        if not self.is_valid():
+            return queryset
+
+        data = self.cleaned_data
+        if data.get('s') == 'open':
+            queryset = queryset.filter(status__lt=Task.DONE)
+        elif data.get('s'):
+            queryset = queryset.filter(status=data.get('s'))
+        if data.get('owned_by') == -1:
+            queryset = queryset.filter(owned_by__isnull=True)
+        elif data.get('owned_by') == -2:
+            queryset = queryset.filter(owned_by__is_active=False)
+        elif data.get('owned_by'):
+            queryset = queryset.filter(owned_by=data.get('owned_by'))
+
+        return queryset
 
 
 class TaskForm(ModelForm):

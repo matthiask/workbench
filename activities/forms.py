@@ -18,6 +18,7 @@ class ActivitySearchForm(forms.Form):
     )
     owned_by = forms.TypedChoiceField(
         label=_('owned by'),
+        coerce=int,
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'}),
     )

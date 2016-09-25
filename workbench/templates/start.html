@@ -48,7 +48,9 @@
     </div>
 
     <div class="panel panel-default">
-      <div class="panel-heading"><h3>{% trans 'Important tasks' %}</h3></div>
+      <div class="panel-heading"><h3>
+          <a href="{% url 'projects_task_list' %}?s=open&amp;owned_by={{ request.user.id }}">{% trans 'Important tasks' %}</a>
+      </h3></div>
       <div class="panel-body">
         <table class="table table-condensed">
           {% for task in user.important_tasks %}

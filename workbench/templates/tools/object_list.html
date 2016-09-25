@@ -28,10 +28,12 @@
           {% endfor %}
         </form>
 
-        <a href="{{ view.model.urls.create }}" class="btn btn-default">
-          <span class="glyphicon glyphicon-plus"></span>
-          {{ view.meta.verbose_name }}
-        </a>
+        {% if view.show_create_button %}
+          <a href="{{ view.model.urls.create }}" class="btn btn-default">
+            <span class="glyphicon glyphicon-plus"></span>
+            {{ view.meta.verbose_name }}
+          </a>
+        {% endif %}
       </div>
     </div>
 
