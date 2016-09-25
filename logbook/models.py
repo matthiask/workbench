@@ -84,6 +84,8 @@ class LoggedCost(Model):
         on_delete=models.PROTECT,
         related_name='loggedcosts',
         verbose_name=_('service'),
+        blank=True,
+        null=True,
     )
 
     created_at = models.DateTimeField(
