@@ -148,3 +148,7 @@ th > a {
   top: -2px;
   font-family: Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
+
+.help-block {
+  font-size: 13px;
+}
