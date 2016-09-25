@@ -332,11 +332,13 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
         initial = kwargs.setdefault('initial', {})
         initial.update({'subtotal': None})  # Invalid -- force input.
 
+        person = None
+
         if request.GET.get('person'):
             try:
                 person = Person.objects.get(pk=request.GET.get('person'))
             except (Person.DoesNotExist, TypeError, ValueError):
-                person = None
+                pass
             else:
                 initial.update({
                     'customer': person.organization,
