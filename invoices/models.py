@@ -145,6 +145,11 @@ class Invoice(ModelWithTotal):
     def clean(self):
         super().clean()
 
+        if self.type == self.SERVICES:
+            raise ValidationError({
+                'type': _('Not implemented yet.'),
+            })
+
         if self.status >= self.SENT:
             if not self.invoiced_on or not self.due_on:
                 raise ValidationError({
