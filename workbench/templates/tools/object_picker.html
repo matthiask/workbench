@@ -1,4 +1,4 @@
-{% load bootstrap3 i18n %}
+{% load bootstrap3 i18n querystring %}
 <div class="modal">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -23,8 +23,22 @@
             </a>
           {% endfor %}
         </div>
-      </div>
-      <div class="modal-footer">
+        <ul class="pagination clearfix" style="display:block">
+          {% if page_obj.has_previous %}
+            <li class="prev">
+              <a href="{{ view.request.path }}?{{ view.request.GET|querystring:'page' }}&amp;page={{ page_obj.previous_page_number }}"
+                 class="btn btn-default pull-left"
+                 data-toggle="ajaxmodal">&laquo;</a>
+            </li>
+          {% endif %}
+          {% if page_obj.has_next %}
+            <li class="next pull-right">
+              <a href="{{ view.request.path }}?{{ view.request.GET|querystring:'page' }}&amp;page={{ page_obj.next_page_number }}"
+                 class="btn btn-default pull-right"
+                 data-toggle="ajaxmodal">&raquo;</a>
+            </li>
+          {% endif %}
+        </ul>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
