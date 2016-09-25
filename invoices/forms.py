@@ -311,6 +311,8 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
         initial=Invoice.FIXED,
         disabled=True,
         widget=forms.RadioSelect,
+        help_text=_(
+            'Other invoice types must be created directly on a project.'),
     )
 
     class Meta:
