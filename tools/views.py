@@ -65,7 +65,7 @@ class ListView(ToolsMixin, vanilla.ListView):
             self.root_queryset.search(q) if q
             else self.root_queryset.all())
 
-        if self.search_form:
+        if self.search_form_class:
             queryset = self.search_form.filter(queryset)
 
         if self.select_related:
