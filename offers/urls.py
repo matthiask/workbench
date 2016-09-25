@@ -27,7 +27,7 @@ urlpatterns = [
     url(
         r'^create/$',
         MessageView.as_view(
-            redirect_to='projects_project_create',
+            redirect_to='projects_project_list',
             message=_(
                 'Create a project, add and estimate services, and put those'
                 ' services into an offer.'
