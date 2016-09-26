@@ -122,10 +122,12 @@ small.right {
   text-decoration: none;
 }
 
-th > a {
+.table th > a:not(.btn),  /* override */
+table th > a {
   display: block;
   margin: -8px;
   padding: 8px;
+  text-decoration: none;
 }
 
 .pagination {
