@@ -1,5 +1,8 @@
+from decimal import Decimal, ROUND_UP
+
 # from django import forms
 # from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
 from logbook.models import LoggedHours, LoggedCost
 from tools.forms import ModelForm, Textarea
@@ -17,6 +20,16 @@ class LoggedHoursForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.task = kwargs.pop('task')
+        latest = LoggedHours.objects.filter(
+            rendered_by=kwargs['request'].user,
+        ).order_by('-created_at').first()
+        if latest and (timezone.now() - latest.created_at).seconds < 14400:
+            seconds = (timezone.now() - latest.created_at).seconds
+            kwargs.setdefault('initial', {}).setdefault(
+                'hours',
+                (seconds / Decimal(3600)).quantize(
+                    Decimal('0.0'), rounding=ROUND_UP),
+            )
         super().__init__(*args, **kwargs)
 
     def save(self):
