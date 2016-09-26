@@ -1,5 +1,7 @@
 from collections import OrderedDict
 from datetime import date, datetime
+from decimal import Decimal
+import itertools
 
 from django import template
 from django.db import models
@@ -86,3 +88,17 @@ def select_related(queryset, rel):
 @register.filter
 def prefetch_related(queryset, rel):
     return queryset.prefetch_related(*rel.split(','))
+
+
+@register.filter
+def group_hours_by_day(iterable):
+    for day, instances in itertools.groupby(
+            iterable,
+            lambda logged: logged.rendered_on,
+    ):
+        instances = list(instances)
+        yield (
+            day,
+            sum((item.hours for item in instances), Decimal()),
+            instances,
+        )
