@@ -24,7 +24,7 @@
         <td>
           {% if task.owned_by %}{{ task.owned_by.get_short_name }}{% else %}&ndash;{% endif %}
         </td>
-        <td>{% link_or_none task.project %}</td>
+        <td><a href="{{ task.project.urls.tasks }}">{{ task.project|h }}</a></td>
         <td>{{ task.pretty_status }}</td>
       </tr>
     {% endfor %}
