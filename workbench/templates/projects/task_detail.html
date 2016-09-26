@@ -122,14 +122,13 @@
           {% for day, sum, instances in task.loggedhours|select_related:'rendered_by'|group_hours_by_day %}
             <thead>
               <tr>
-                <th colspan="3">{{ day|date:'d.m.Y' }}</th>
+                <th colspan="2">{{ day|date:'d.m.Y' }}</th>
                 <th class="text-right">{{ sum }}h</th>
               </tr>
             </thead>
             <tbody>
             {% for hours in instances %}
             <tr>
-              <td>{{ hours.created_at|date:'H:i' }}</td>
               <td>{{ hours.rendered_by.get_short_name }}</td>
               <td>{{ hours.description }}</td>
               <td class="text-right">{{ hours.hours }}h</td>
