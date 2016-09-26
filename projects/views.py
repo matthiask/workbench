@@ -142,6 +142,11 @@ class TaskDetailView(DetailView):
             for comment in self.object.comments.select_related('created_by')
         )
 
+        ch.extend(
+            (hours.created_at, 'hours', hours)
+            for hours in self.object.loggedhours.select_related('rendered_by')
+        )
+
         for key, cfg in self.FORMS.items():
             if key not in kwargs:
                 kwargs[key] = cfg[1](

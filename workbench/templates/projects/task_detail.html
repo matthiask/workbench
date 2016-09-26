@@ -7,7 +7,7 @@
 {% block content %}
 
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-8 col-md-offset-2">
 
     <h2><a href="{{ task.project.urls.tasks }}">
         <small><i class="glyphicon glyphicon-menu-left"></i></small>
@@ -15,96 +15,111 @@
 
     <h1>{{ task|h }} {% history_link task %}</h1>
 
-    <div class="row">
-      <div class="col-md-8">
+    <table class="table table-striped">
+      <tr>
+        <th class="text-right">{% trans 'description' %}</th>
+        <td>{{ object.description_html }}</td>
+      </tr>
+      {% for name, value in object|field_value_pairs:'created_at,type,priority,owned_by' %}
+      <tr>
+        <th class="text-right">{{ name }}</th>
+        <td>{% link_or_none value %}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <th class="text-right">{% trans 'service' %}</th>
+        <td>
+          {% link_or_none object.service %}
+          {% with overview=object.overview %}{% if overview %}
+            <br>
+            {% blocktrans with logged_tasks=overview.logged_tasks logged_this=overview.logged_this approved=overview.approved trimmed %}
+              {{ logged_tasks }}h / {{ approved }}h on service. This task accounts for {{ logged_this }}h.
+            {% endblocktrans %}
+          {% endif %}{% endwith %}
+        </td>
+      </tr>
+      <tr>
+        <th class="text-right">{% trans 'status' %}</th>
+        <td>{{ object.pretty_status }}</td>
+      </tr>
+    </table>
 
-        <table class="table table-striped">
+    <a href="{{ task.project.urls.createhours }}?task={{ task.id }}"
+        data-toggle="ajaxmodal"
+        class="btn btn-default">
+      <i class="glyphicon glyphicon-plus"></i> {% trans 'hours' %}
+    </a>
+    <a href="{{ task.urls.update }}" class="btn btn-default">
+      {% trans 'Update' %}
+    </a>
+    <a href="{{ task.urls.delete }}" class="btn btn-danger btn-inverse pull-right">
+      {% trans 'Delete' %}
+    </a>
+
+
+    <h3>{% trans 'updates' %}</h3>
+    <table class="table table-striped table-linearize">
+      {% for created_at, type, data in changes %}
+        {% if type == 'change' %}
           <tr>
-            <th class="text-right">{% trans 'description' %}</th>
-            <td>{{ object.description_html }}</td>
-          </tr>
-          {% for name, value in object|field_value_pairs:'created_at,type,priority,owned_by' %}
-          <tr>
-            <th class="text-right">{{ name }}</th>
-            <td>{% link_or_none value %}</td>
-          </tr>
-          {% endfor %}
-          <tr>
-            <th class="text-right">{% trans 'service' %}</th>
             <td>
-              {% link_or_none object.service %}
-              {% with overview=object.overview %}{% if overview %}
-                <br>
-                {% blocktrans with logged_tasks=overview.logged_tasks logged_this=overview.logged_this approved=overview.approved trimmed %}
-                  {{ logged_tasks }}h / {{ approved }}h on service. This task accounts for {{ logged_this }}h.
-                {% endblocktrans %}
-              {% endif %}{% endwith %}
+              <i class="glyphicon glyphicon-time" title="{% trans 'change' %}"></i>
+            </td>
+            <td colspan="2">
+              <strong>
+                {{ data.version.pretty_user_name }}
+                <small>{{ data.version.created_at|date:'SHORT_DATETIME_FORMAT' }}</small>
+              </strong>
+              <ul>
+                {% for pretty in data.changes %}
+                  <li>{{ pretty }}</li>
+                {% endfor %}
+              </ul>
             </td>
           </tr>
+        {% elif type == 'comment' %}
           <tr>
-            <th class="text-right">{% trans 'status' %}</th>
-            <td>{{ object.pretty_status }}</td>
+            <td>
+              <i class="glyphicon glyphicon-comment" title="{% trans 'comment' %}"></i>
+            </td>
+            <td>
+              <strong>
+                {{ data.created_by }}
+                <small>{{ data.created_at|date:'SHORT_DATETIME_FORMAT' }}</small>
+              </strong><br>
+              {{ data.notes_html }}
+            </td>
+            <td class="text-right">
+              <a href="{{ data.urls.update }}" data-toggle="ajaxmodal">
+                <i class="glyphicon glyphicon-pencil"></i>
+              </a><br>
+              <a href="{{ data.urls.delete }}" data-toggle="ajaxmodal">
+                <i class="glyphicon glyphicon-trash"></i>
+              </a>
+            </td>
           </tr>
-        </table>
-
-        <a href="{{ task.project.urls.createhours }}?task={{ task.id }}"
-            data-toggle="ajaxmodal"
-            class="btn btn-default">
-          <i class="glyphicon glyphicon-plus"></i> {% trans 'hours' %}
-        </a>
-        <a href="{{ task.urls.update }}" class="btn btn-default">
-          {% trans 'Update' %}
-        </a>
-        <a href="{{ task.urls.delete }}" class="btn btn-danger btn-inverse pull-right">
-          {% trans 'Delete' %}
-        </a>
-
-
-        <h3>{% trans 'updates' %}</h3>
-        <table class="table table-striped table-linearize">
-          {% for created_at, type, data in changes %}
-            {% if type == 'change' %}
-              <tr>
-                <td colspan="2">
-                  <h4>
-                    {{ data.version.pretty_user_name }}
-                    <small>{{ data.version.created_at|date:'SHORT_DATETIME_FORMAT' }}</small>
-                  </h4>
-                  <ul>
-                    {% for pretty in data.changes %}
-                      <li>{{ pretty }}</li>
-                    {% endfor %}
-                  </ul>
-                </td>
-              </tr>
-            {% elif type == 'comment' %}
-              <tr>
-                <td>
-                  <h4>
-                    {{ data.created_by }}
-                    <small>{{ data.created_at|date:'SHORT_DATETIME_FORMAT' }}</small>
-                  </h4>
-                  {{ data.notes_html }}
-                </td>
-                <td class="text-right">
-                  <a href="{{ data.urls.update }}" data-toggle="ajaxmodal">
-                    <i class="glyphicon glyphicon-pencil"></i>
-                  </a><br>
-                  <a href="{{ data.urls.delete }}" data-toggle="ajaxmodal">
-                    <i class="glyphicon glyphicon-trash"></i>
-                  </a>
-                </td>
-              </tr>
-            {% else %}
-              <tr>
-                <td><h4>{% trans 'Unknown update' %}: {{ data }}</h4></td>
-              </tr>
-            {% endif %}
-          {% endfor %}
-        </table>
-
-        <div class="comment">
-          <h4>{{ request.user }}</h4>
+        {% elif type == 'hours' %}
+          <tr>
+            <td>
+              <i class="glyphicon glyphicon-hourglass" title="{% trans 'hours' %}"></i>
+            </td>
+            <td>
+              <strong>
+                {{ data.rendered_by }}
+                <small>{{ data.created_at|date:'SHORT_DATETIME_FORMAT' }}</small>
+              </strong><br>
+              {{ data.hours }}h, {{ data.description|linebreaksbr }}
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td><h4>{% trans 'Unknown update' %}: {{ data }}</h4></td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+      <tr>
+        <td><i class="glyphicon glyphicon-comment"></i></td>
+        <td>
           <form method="post" action="{{ request.path }}" class="form">
             <input type="hidden" name="form" value="comment_form"/>
             {% csrf_token %}
@@ -113,32 +128,10 @@
               {% trans 'add comment' %}
             </button>
           </form>
-        </div>
-
-
-      </div>
-      <div class="col-md-4">
-        <table class="table table-striped table-hover">
-          {% for day, sum, instances in task.loggedhours|select_related:'rendered_by'|group_hours_by_day %}
-            <thead>
-              <tr>
-                <th colspan="2">{{ day|date:'d.m.Y' }}</th>
-                <th class="text-right">{{ sum }}h</th>
-              </tr>
-            </thead>
-            <tbody>
-            {% for hours in instances %}
-            <tr>
-              <td>{{ hours.rendered_by.get_short_name }}</td>
-              <td>{{ hours.description }}</td>
-              <td class="text-right">{{ hours.hours }}h</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-          {% endfor %}
-        </table>
-      </div>
-    </div>
+        </td>
+        <td></td>
+      </tr>
+    </table>
 
   </div>
 </div>
