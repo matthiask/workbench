@@ -1,0 +1,41 @@
+{% extends "modalform.html" %}
+
+{% load i18n %}
+
+{% block body %}
+  {% if request.user.recent_hours %}
+    <table class="table table-condensed">
+      <tr>
+        <td colspan="3">
+          <strong>{% trans 'recent hours' %}</strong>
+        </td>
+      </tr>
+      {% for hours in request.user.recent_hours %}
+        <tr>
+          <td>{{ hours.created_at|date:'H:i' }}</td>
+          <td>
+            <a href="{{ hours.urls.detail }}">
+              <strong>
+                {{ hours.task.project }}: {{ hours.task }}
+              </strong><br/>
+              {{ hours.description }}
+            </a>
+          </td>
+          <td class="text-right">{{ hours.hours }}h</td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% endif %}
+
+  {{ block.super }}
+{% endblock %}
+
+{% block footer %}
+  {% if object %}
+  <a href="{{ object.urls.delete }}" data-toggle="ajaxmodal"
+    class="pull-left btn btn-danger btn-inverse">
+    {% trans 'delete' %}
+  </a>
+  {% endif %}
+  <button type="submit" class="btn btn-primary">{% trans 'save' %}</button>
+{% endblock %}

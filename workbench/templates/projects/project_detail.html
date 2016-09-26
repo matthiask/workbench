@@ -216,6 +216,9 @@
 
     <a href="{{ project.urls.createtask }}" class="btn btn-default">
       <i class="glyphicon glyphicon-plus"></i> {% trans 'task' %}</a>
+    <a href="{{ project.urls.createhours }}" class="btn btn-default"
+      data-toggle="ajaxmodal">
+      <i class="glyphicon glyphicon-plus"></i> {% trans 'hours' %}</a>
     <a href="{{ project.urls.approved_hours }}" class="btn btn-default">
       {% trans 'edit approved hours' %}
     </a>

@@ -47,6 +47,11 @@
           </tr>
         </table>
 
+        <a href="{{ task.project.urls.createhours }}?task={{ task.id }}"
+            data-toggle="ajaxmodal"
+            class="btn btn-default">
+          <i class="glyphicon glyphicon-plus"></i> {% trans 'hours' %}
+        </a>
         <a href="{{ task.urls.update }}" class="btn btn-default">
           {% trans 'Update' %}
         </a>
@@ -113,16 +118,6 @@
 
       </div>
       <div class="col-md-4">
-        <form method="post" action="{{ request.path }}" class="form">
-          <h4>{% trans 'logged hours' %}</h4>
-            <input type="hidden" name="form" value="logbook_form"/>
-          {% csrf_token %}
-          {% bootstrap_form logbook_form layout='inline' %}
-          <button type="submit" class="btn btn-primary">
-            {% trans 'create' %}
-          </button>
-        </form>
-
         <table class="table table-striped table-hover">
           {% for day, sum, instances in task.loggedhours|select_related:'rendered_by'|group_hours_by_day %}
             <thead>

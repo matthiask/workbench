@@ -13,30 +13,39 @@ class LoggedHoursForm(ModelForm):
 
     class Meta:
         model = LoggedHours
-        fields = ('rendered_by', 'rendered_on', 'hours', 'description')
+        fields = ('task', 'rendered_by', 'rendered_on', 'hours', 'description')
         widgets = {
             'description': Textarea(),
         }
 
     def __init__(self, *args, **kwargs):
-        self.task = kwargs.pop('task')
+        self.project = kwargs.pop('project')
+        initial = kwargs.setdefault('initial', {})
+        request = kwargs['request']
+
+        if request.GET.get('task'):
+            initial['task'] = request.GET.get('task')
+
         latest = LoggedHours.objects.filter(
             rendered_by=kwargs['request'].user,
         ).order_by('-created_at').first()
-        if latest and (timezone.now() - latest.created_at).seconds < 14400:
+        if latest and (timezone.now() - latest.created_at).seconds < 7200:
             seconds = (timezone.now() - latest.created_at).seconds
-            kwargs.setdefault('initial', {}).setdefault(
+            initial.setdefault(
                 'hours',
                 (seconds / Decimal(3600)).quantize(
                     Decimal('0.0'), rounding=ROUND_UP),
             )
         super().__init__(*args, **kwargs)
+        self.fields['task'].choices = [('', '----------')] + [(
+            task.id,
+            task.__html__(),
+        ) for task in self.project.tasks.all()]
 
     def save(self):
         instance = super().save(commit=False)
         if not instance.pk:
             instance.created_by = self.request.user
-        instance.task = self.task
         instance.save()
         return instance
 

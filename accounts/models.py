@@ -105,6 +105,7 @@ class User(Model, AbstractBaseUser):
             hashlib.md5(self.email.lower().encode('utf-8')).hexdigest(),
         )
 
+    @cached_property
     def important_tasks(self):
         from projects.models import Task
 
@@ -114,3 +115,9 @@ class User(Model, AbstractBaseUser):
             Q(priority__gte=Task.HIGH) |
             Q(due_on__lte=date.today() + timedelta(days=15)),
         ).select_related('project')
+
+    @cached_property
+    def recent_hours(self):
+        return reversed(self.loggedhours.filter(
+            rendered_on=date.today(),
+            ).order_by('-created_at')[:2])

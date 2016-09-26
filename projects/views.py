@@ -7,8 +7,6 @@ from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext_lazy as _
 
-from logbook.forms import LoggedHoursForm
-from logbook.models import LoggedHours
 from offers.models import Service
 from projects.forms import CommentForm
 from projects.models import Project, Task, Comment
@@ -128,8 +126,6 @@ class TaskDetailView(DetailView):
             Comment, CommentForm, {'prefix': 'comment'}),
         # 'attachment_form': (
         #     AttachmentForm, Attachment, {'prefix': 'attachment'}),
-        'logbook_form': (
-            LoggedHours, LoggedHoursForm, {'prefix': 'logbook'}),
     }
 
     def get_context_data(self, **kwargs):

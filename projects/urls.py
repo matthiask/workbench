@@ -3,8 +3,8 @@ from django.shortcuts import redirect
 
 from invoices.forms import CreateInvoiceForm
 from invoices.models import Invoice
-from logbook.forms import LoggedCostForm
-from logbook.models import LoggedCost
+from logbook.forms import LoggedHoursForm, LoggedCostForm
+from logbook.models import LoggedHours, LoggedCost
 from offers.forms import CreateOfferForm
 from offers.models import Offer
 from projects.forms import (
@@ -138,6 +138,15 @@ urlpatterns = [
             model=Comment,
         ),
         name='projects_comment_delete'),
+
+    # HOURS
+    url(
+        r'^(?P<pk>\d+)/createcost/$',
+        CreateRelatedView.as_view(
+            model=LoggedHours,
+            form_class=LoggedHoursForm,
+        ),
+        name='projects_project_createhours'),
 
     # COSTS
     url(

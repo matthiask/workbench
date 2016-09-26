@@ -123,6 +123,7 @@ small.right {
 }
 
 .table th > a:not(.btn),  /* override */
+.table td > a:not(.btn),  /* override */
 table th > a {
   display: block;
   margin: -8px;
