@@ -244,7 +244,7 @@ class Task(Model):
     position = models.PositiveIntegerField(_('position'), default=0)
 
     class Meta:
-        ordering = ('-priority', 'position', 'pk')
+        ordering = ('pk',)
         verbose_name = _('task')
         verbose_name_plural = _('tasks')
 

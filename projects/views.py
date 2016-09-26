@@ -32,7 +32,6 @@ class ServicesView(object):
         self.tasks = self.project.tasks.order_by(
             'service__offer__offered_on',
             'service',
-            '-priority',
             'pk',
         ).select_related('owned_by', 'service__offer').annotate(
             logged_hours=Sum('loggedhours__hours'),
