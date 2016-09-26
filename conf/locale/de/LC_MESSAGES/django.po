@@ -615,7 +615,7 @@ msgstr "archiviert um"
 #: logbook/models.py:67 logbook/models.py:68
 #: workbench/templates/projects/task_detail.html:117
 msgid "logged hours"
-msgstr "erfasste Stunden"
+msgstr "Erfasste Stunden"
 
 #: logbook/models.py:86 offers/models.py:179 offers/models.py:222
 #: offers/models.py:260 projects/models.py:225
@@ -637,7 +637,7 @@ msgstr "Total inkl. MwSt bei Fremdkosten."
 
 #: logbook/models.py:132 logbook/models.py:133
 msgid "logged cost"
-msgstr "erfasste Kosten"
+msgstr "Erfasste Kosten"
 
 #: offers/__init__.py:10 offers/models.py:84 workbench/templates/base.html:37
 #: workbench/templates/projects/project_detail.html:58

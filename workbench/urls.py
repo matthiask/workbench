@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^activities/', include('activities.urls')),
     url(r'^contacts/', include('contacts.urls')),
     url(r'^deals/', include('deals.urls')),
+    url(r'^logbook/', include('logbook.urls')),
     url(r'^offers/', include('offers.urls')),
     url(r'^projects/', include('projects.urls')),
     url(r'^invoices/', include('invoices.urls')),
