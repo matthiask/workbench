@@ -5,6 +5,7 @@ import lxml.html.clean
 
 from django.db import models
 from django.db.models import Sum
+from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.html import format_html, mark_safe
@@ -242,6 +243,7 @@ class Task(Model):
         help_text=_('This field should be left empty most of the time.'))
 
     position = models.PositiveIntegerField(_('position'), default=0)
+    _code = models.IntegerField(_('code'))
 
     class Meta:
         ordering = ('pk',)
@@ -254,9 +256,23 @@ class Task(Model):
     def __html__(self):
         return format_html(
             '<small class="right">#{}</small> {}',
-            self.pk,
+            self.code,
             self.title,
         )
+
+    @property
+    def code(self):
+        return str(self._code)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self._code = RawSQL(
+                'SELECT COALESCE(MAX(_code), 0) + 1 FROM projects_task'
+                ' WHERE project_id=%s',
+                (self.project_id,),
+            )
+        super().save(*args, **kwargs)
+    save.alters_data = True
 
     def description_html(self):
         return markdownify(self.description)
