@@ -61,8 +61,11 @@ class ListView(ToolsMixin, vanilla.ListView):
                     return response
         return super().get(request, *args, **kwargs)
 
+    def get_root_queryset(self):
+        return self.model.objects.all()
+
     def get_queryset(self):
-        self.root_queryset = self.model.objects.all()
+        self.root_queryset = self.get_root_queryset()
 
         q = self.request.GET.get('q')
         queryset = (
