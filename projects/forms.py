@@ -11,17 +11,27 @@ from tools.forms import ModelForm, Picker, Textarea
 
 class ProjectSearchForm(forms.Form):
     s = forms.ChoiceField(
-        choices=(('', _('All states')),) + Project.STATUS_CHOICES,
+        choices=(
+            ('', _('All states')),
+            ('open', _('Open')),
+            (_('Exact'), Project.STATUS_CHOICES),
+        ),
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get('s'):
+        if data.get('s') == 'open':
+            queryset = queryset.filter(status__lte=Project.WORK_IN_PROGRESS)
+        elif data.get('s'):
             queryset = queryset.filter(status=data.get('s'))
 
         return queryset
+
+    def response(self, request):
+        if 's' not in request.GET:
+            return http.HttpResponseRedirect('?s=open')
 
 
 class ProjectForm(ModelForm):
