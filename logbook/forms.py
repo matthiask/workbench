@@ -15,6 +15,7 @@ class LoggedHoursSearchForm(forms.Form):
         label=_('rendered by'),
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'}),
+        empty_label=_('All users'),
     )
 
     def filter(self, queryset):
