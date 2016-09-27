@@ -80,7 +80,9 @@
             <td colspan="2">
               <strong>
                 {{ data.version.pretty_user_name }}
-                <small>{{ data.version.created_at|date:'SHORT_DATETIME_FORMAT' }}</small>
+                <small title="{{ created_at|date:'SHORT_DATETIME_FORMAT' }}">
+                  {{ created_at|timesince_short }}
+                </small>
               </strong>
               <ul>
                 {% for pretty in data.changes %}
@@ -97,7 +99,9 @@
             <td>
               <strong>
                 {{ data.created_by }}
-                <small>{{ data.created_at|date:'SHORT_DATETIME_FORMAT' }}</small>
+                <small title="{{ created_at|date:'SHORT_DATETIME_FORMAT' }}">
+                  {{ created_at|timesince_short }}
+                </small>
               </strong><br>
               {{ data.notes_html }}
             </td>
@@ -120,7 +124,9 @@
             <td>
               <strong>
                 {{ data.rendered_by }}
-                <small>{{ data.created_at|date:'SHORT_DATETIME_FORMAT' }}</small>
+                <small title="{{ created_at|date:'SHORT_DATETIME_FORMAT' }}">
+                  {{ created_at|timesince_short }}
+                </small>
               </strong><br>
               {{ data.hours }}h, {{ data.description|linebreaksbr }}
             </td>
