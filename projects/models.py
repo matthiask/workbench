@@ -258,14 +258,14 @@ class Task(Model):
 
     def __html__(self):
         return format_html(
-            '<small class="right">#{}</small> {}',
+            '<small>{}</small> {}',
             self.code,
             self.title,
         )
 
     @property
     def code(self):
-        return str(self._code)
+        return '#%s' % self._code
 
     def save(self, *args, **kwargs):
         if not self.pk:

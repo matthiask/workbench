@@ -107,12 +107,6 @@ small>a.active {
   color: #3498db;
 }
 
-small.right {
-  display: inline-block;
-  min-width: 3em;
-  text-align: right;
-}
-
 .nopad {
   padding: 0 !important;
 }
