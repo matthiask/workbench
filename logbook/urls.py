@@ -1,5 +1,6 @@
 from django.conf.urls import url
 
+from logbook.forms import LoggedHoursSearchForm
 from logbook.models import LoggedHours
 
 from tools.views import ListView, DetailView, MessageView
@@ -10,6 +11,7 @@ urlpatterns = [
         r'^$',
         ListView.as_view(
             model=LoggedHours,
+            search_form_class=LoggedHoursSearchForm,
             show_create_button=False,
         ),
         name='logbook_loggedhours_list'),

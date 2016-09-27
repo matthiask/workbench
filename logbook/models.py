@@ -68,7 +68,7 @@ class LoggedHours(Model):
         verbose_name_plural = _('logged hours')
 
     def __str__(self):
-        return self.description
+        return '%s %s' % (self.task.title, self.description)
 
 
 @model_urls(default='update')

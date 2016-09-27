@@ -1,11 +1,28 @@
 from decimal import Decimal, ROUND_UP
 
-# from django import forms
-# from django.utils.translation import ugettext_lazy as _
+from django import forms
+from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
+from accounts.models import User
 from logbook.models import LoggedHours, LoggedCost
 from tools.forms import ModelForm, Textarea
+
+
+class LoggedHoursSearchForm(forms.Form):
+    rendered_by = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        label=_('rendered by'),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+
+    def filter(self, queryset):
+        data = self.cleaned_data
+        if data.get('rendered_by'):
+            queryset = queryset.filter(rendered_by=data.get('rendered_by'))
+
+        return queryset
 
 
 class LoggedHoursForm(ModelForm):

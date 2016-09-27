@@ -18,8 +18,8 @@
   <tbody>
     {% for day, sum, instances in object_list|select_related:'task__project,rendered_by'|group_hours_by_day %}
       <tr>
-        <td colspan="5">{{ day|date:'d.m.Y' }}</td>
-        <td class="text-right">{{ sum }}h</td>
+        <td colspan="5"><strong>{{ day|date:'d.m.Y' }}</strong></td>
+        <td class="text-right"><strong>{{ sum }}h</strong></td>
       </tr>
       {% for hours in instances %}
         <tr>
