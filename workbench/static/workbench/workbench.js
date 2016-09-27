@@ -86,7 +86,7 @@ $(function() {
 
 
   // Hotkeys
-  $(document.body).on('keyup', function(e) {
+  $(document.body).on('keydown', function(e) {
     if (/Mac/.test(navigator.platform) ? !e.ctrlKey : !e.altKey) {
       return;
     }
