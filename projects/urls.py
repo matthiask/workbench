@@ -147,7 +147,7 @@ urlpatterns = [
 
     # HOURS
     url(
-        r'^(?P<pk>\d+)/createcost/$',
+        r'^(?P<pk>\d+)/createhours/$',
         CreateRelatedView.as_view(
             model=LoggedHours,
             form_class=LoggedHoursForm,
