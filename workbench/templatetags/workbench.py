@@ -6,7 +6,9 @@ import itertools
 from django import template
 from django.db import models
 from django.template.defaultfilters import linebreaksbr
+from django.utils import timezone
 from django.utils.html import format_html, mark_safe
+from django.utils.translation import ugettext as _
 
 from tools.formats import local_date_format
 
@@ -102,3 +104,17 @@ def group_hours_by_day(iterable):
             sum((item.hours for item in instances), Decimal()),
             instances,
         )
+
+
+@register.filter
+def timesince_short(dttm):
+    delta = (timezone.now() - dttm).seconds
+    if delta > 86400 * 14:
+        return _('%s weeks ago') % (delta // (86400 * 7))
+    if delta > 86400 * 2:
+        return _('%s days ago') % (delta // 86400)
+    elif delta > 7200:
+        return _('%s hours ago') % (delta // 3600)
+    elif delta > 120:
+        return _('%s minutes ago') % (delta // 60)
+    return _('%s seconds ago') % delta

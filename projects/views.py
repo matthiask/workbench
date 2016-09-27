@@ -3,7 +3,7 @@ from decimal import Decimal
 import itertools
 
 from django.contrib import messages
-from django.db.models import Count, Sum
+from django.db.models import Count, Max, Sum
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext_lazy as _
 
@@ -36,15 +36,18 @@ class ServicesView(object):
         )
 
         comment_counts = {
-            row['task']: row['count']
+            row['task']: (row['count'], row['max'])
             for row in Comment.objects.filter(
                 task__project=self.project,
             ).order_by().values('task').annotate(
                 count=Count('id'),
+                max=Max('created_at'),
             )
         }
         for task in self.tasks:
-            task.comment_count = comment_counts.get(task.id, 0)
+            data = comment_counts.get(task.id)
+            task.comment_count = data[0] if data else 0
+            task.latest_comment = data[1] if data else None
 
         self.services = {}
         for key, group in itertools.groupby(
