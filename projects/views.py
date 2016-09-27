@@ -134,6 +134,7 @@ class ProjectDetailView(DetailView):
 
 class TaskListView(ListView):
     template_name = 'projects/project_task_list.html'
+    paginate_by = None
 
     def get_root_queryset(self):
         self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
