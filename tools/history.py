@@ -3,11 +3,13 @@ from functools import lru_cache
 import re
 
 from django.db import models
+from django.utils import dateparse
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
 from accounts.models import User
 from audit.models import LoggedAction
+from tools.formats import local_date_format
 
 
 Change = namedtuple('Change', 'changes version number')
@@ -23,6 +25,18 @@ def boolean_formatter(value):
 
 def default_if_none(value, default):
     return default if value is None else value
+
+
+def date_formatter(value):
+    if value is None:
+        return _('<no value>')
+    dt = dateparse.parse_datetime(value)
+    if dt:
+        return local_date_format(dt, 'SHORT_DATETIME_FORMAT')
+    dt = dateparse.parse_date(value)
+    if dt:
+        return local_date_format(dt, 'SHORT_DATE_FORMAT')
+    return value
 
 
 @lru_cache()
@@ -52,7 +66,10 @@ def formatter(field):
         return _fn
 
     if isinstance(field, (models.BooleanField, models.NullBooleanField)):
-        return lambda value: boolean_formatter(value)
+        return boolean_formatter
+
+    if isinstance(field, models.DateField):
+        return date_formatter
 
     return lambda value: default_if_none(value, _('<no value>'))
 
