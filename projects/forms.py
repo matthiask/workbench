@@ -112,7 +112,7 @@ class TaskSearchForm(forms.Form):
         return queryset
 
     def response(self, request):
-        if not request.GET:
+        if 's' not in request.GET:
             return http.HttpResponseRedirect('?s=open')
 
 
