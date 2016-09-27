@@ -1,4 +1,4 @@
-from django import forms
+from django import forms, http
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -110,6 +110,10 @@ class TaskSearchForm(forms.Form):
             queryset = queryset.filter(owned_by=data.get('owned_by'))
 
         return queryset
+
+    def response(self, request):
+        if not request.GET:
+            return http.HttpResponseRedirect('?s=open')
 
 
 class TaskForm(ModelForm):

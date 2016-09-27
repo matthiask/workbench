@@ -54,6 +54,11 @@ class ListView(ToolsMixin, vanilla.ListView):
                 messages.warning(
                     request, _('Search form was invalid.'))
                 return HttpResponseRedirect('.')
+
+            if hasattr(self.search_form, 'response'):
+                response = self.search_form.response(request)
+                if response:
+                    return response
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
