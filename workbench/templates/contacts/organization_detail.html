@@ -14,7 +14,7 @@
       <td class="text-right">{% trans 'people' %}</td>
       <td>
         {% for person in organization.people.all %}
-          <a href="{{ person.urls.detail }}">
+          <a class="inline" href="{{ person.urls.detail }}">
             {{ person.full_name }}
           </a>
           <br>

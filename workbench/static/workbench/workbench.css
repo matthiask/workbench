@@ -128,6 +128,10 @@ tbody th > a {
   text-decoration: none;
 }
 
+.inline {
+  display: inline !important;
+}
+
 .pagination {
   margin: -10px 0 0 5px;
 }

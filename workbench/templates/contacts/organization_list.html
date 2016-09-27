@@ -18,7 +18,7 @@
         </a></th>
         <td>
           {% for person in organization.people.all %}
-            <a href="{{ person.get_absolute_url }}">{{ person.full_name }}</a>{% if not forloop.last %},{% endif %}
+            <a class="inline" href="{{ person.get_absolute_url }}">{{ person.full_name }}</a>{% if not forloop.last %},{% endif %}
           {% empty %}&ndash;{% endfor %}
         </td>
       </tr>
