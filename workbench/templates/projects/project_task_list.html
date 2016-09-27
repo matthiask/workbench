@@ -65,30 +65,41 @@
     </tr>
   </thead>
   <tbody>
-    {% for task in object_list|select_related:'created_by,owned_by'|tasks_info %}
+    {% for service, logged_hours_sum, tasks in object_list|select_related:'created_by,owned_by'|tasks_info:view.project %}
       <tr>
-        <td><i title="{{ task.get_type_display }}" class="{{ task.type_css }}"></i></td>
-        <td><span class="label label-{{ task.priority_css }}">{{ task.get_priority_display }}</span></td>
-        <th><a href="{{ task.urls.detail }}">{{ task|h }}</a></th>
-        <td>
-          <span class="{{ task.status_css }}">{{ task.pretty_status }}</span>
-        </td>
-        <td>
-          {{ task.created_at|date:'SHORT_DATE_FORMAT' }} {% trans 'by' %}
-          {{ task.created_by.get_short_name }}
-        </td>
-        <td>
-          {% if task.owned_by %}{{ task.owned_by.get_short_name }}{% else %}&ndash;{% endif %}
-        </td>
-        <td class="text-right">{{ task.logged_hours|default:0 }}h</td>
-        <td>
-          {% if task.comment_count %}
-            <a href="{{ task.get_absolute_url }}#comments">
-              <i class="glyphicon glyphicon-comment"></i> {{ task.comment_count }}
-            </a>
-          {% endif %}
-        </td>
+        {% if service %}
+          <th colspan="6">{{ service }}</th>
+          <th class="text-right">{{ logged_hours_sum }}h / {{ service.approved_hours }}h</th>
+        {% else %}
+          <th colspan="6">{% trans 'Not offered services' %}</th>
+          <th class="text-right">{{ logged_hours_sum }}h</th>
+        {% endif %}
       </tr>
+      {% for task in tasks %}
+        <tr>
+          <td><i title="{{ task.get_type_display }}" class="{{ task.type_css }}"></i></td>
+          <td><span class="label label-{{ task.priority_css }}">{{ task.get_priority_display }}</span></td>
+          <th><a href="{{ task.urls.detail }}">{{ task|h }}</a></th>
+          <td>
+            <span class="{{ task.status_css }}">{{ task.pretty_status }}</span>
+          </td>
+          <td>
+            {{ task.created_at|date:'SHORT_DATE_FORMAT' }} {% trans 'by' %}
+            {{ task.created_by.get_short_name }}
+          </td>
+          <td>
+            {% if task.owned_by %}{{ task.owned_by.get_short_name }}{% else %}&ndash;{% endif %}
+          </td>
+          <td class="text-right">{{ task.logged_hours|default:0 }}h</td>
+          <td>
+            {% if task.comment_count %}
+              <a href="{{ task.get_absolute_url }}#comments">
+                <i class="glyphicon glyphicon-comment"></i> {{ task.comment_count }}
+              </a>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
     {% endfor %}
   </tbody>
 </table>

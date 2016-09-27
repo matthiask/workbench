@@ -1,9 +1,7 @@
 from collections import namedtuple
-from decimal import Decimal
 import itertools
 
 from django.contrib import messages
-from django.db.models import Count, Max, Sum
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext_lazy as _
 
@@ -18,64 +16,6 @@ class CreateRelatedView(CreateView):
     def get_form(self, data=None, files=None, **kwargs):
         self.project = get_object_or_404(Project, pk=self.kwargs.pop('pk'))
         return super().get_form(data, files, project=self.project, **kwargs)
-
-
-ServiceTasks = namedtuple('ServiceTasks', 'service approved logged tasks')
-
-
-class ServicesView(object):
-    def __init__(self, project):
-        self.project = project
-
-        self.tasks = self.project.tasks.order_by(
-            'service__offer__offered_on',
-            'service',
-            'pk',
-        ).select_related('owned_by', 'service__offer').annotate(
-            logged_hours=Sum('loggedhours__hours'),
-        )
-
-        comment_counts = {
-            row['task']: (row['count'], row['max'])
-            for row in Comment.objects.filter(
-                task__project=self.project,
-            ).order_by().values('task').annotate(
-                count=Count('id'),
-                max=Max('created_at'),
-            )
-        }
-        for task in self.tasks:
-            data = comment_counts.get(task.id)
-            task.comment_count = data[0] if data else 0
-            task.latest_comment = data[1] if data else None
-
-        self.services = {}
-        for key, group in itertools.groupby(
-                self.tasks,
-                lambda task: task.service_id
-        ):
-            group = list(group)
-            self.services[key] = ServiceTasks(
-                group[0].service,
-                group[0].service.approved_hours if group[0].service else 0,
-                sum(((task.logged_hours or 0) for task in group), Decimal()),
-                group,
-            )
-
-    def __iter__(self):
-        if None in self.services:
-            yield self.services[None]
-
-        for service in Service.objects.filter(offer__project=self.project):
-            if service.id in self.services:
-                yield self.services[service.id]
-            else:
-                yield ServiceTasks(
-                    service,
-                    service.approved_hours,
-                    0,
-                    [],
-                )
 
 
 ServiceCosts = namedtuple('ServiceCosts', 'service offered logged costs')
@@ -123,10 +63,7 @@ class ProjectDetailView(DetailView):
     project_view = None
 
     def get_context_data(self, **kwargs):
-        if self.project_view == 'tasks':
-            kwargs['tasks'] = ServicesView(self.object)
-
-        elif self.project_view == 'costs':
+        if self.project_view == 'costs':
             kwargs['costs'] = CostView(self.object)
 
         return super().get_context_data(**kwargs)
