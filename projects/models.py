@@ -96,6 +96,8 @@ class Project(Model):
         default=False,
         help_text=_('This project is used for maintenance work.'))
 
+    _code = models.IntegerField(_('code'))
+
     objects = models.Manager.from_queryset(ProjectQuerySet)()
 
     class Meta:
@@ -105,6 +107,28 @@ class Project(Model):
 
     def __str__(self):
         return self.title
+
+    def __html__(self):
+        return format_html(
+            '<small>{}</small> {}',
+            self.code,
+            self.title)
+
+    @property
+    def code(self):
+        return '%s-%04d' % (
+            self.created_at.year,
+            self._code)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self._code = RawSQL(
+                'SELECT COALESCE(MAX(_code), 0) + 1 FROM projects_project'
+                ' WHERE EXTRACT(year FROM created_at) = %s',
+                (timezone.now().year,),
+            )
+        super().save(*args, **kwargs)
+    save.alters_data = True
 
     def status_css(self):
         return {

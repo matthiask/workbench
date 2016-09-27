@@ -8,7 +8,7 @@
 <div class="row">
 <div class="col-md-12">
 
-  <h1>{{ project }} {% history_link project %}</h1>
+  <h1>{{ project|h }} {% history_link project %}</h1>
   <ul class="nav nav-tabs">
     {% mark_current request.path %}
     <li><a href="{{ project.urls.overview }}">{% trans 'overview' %}</a></li>
