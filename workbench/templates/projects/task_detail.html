@@ -102,12 +102,14 @@
               {{ data.notes_html }}
             </td>
             <td class="text-right">
-              <a href="{{ data.urls.update }}" data-toggle="ajaxmodal">
-                <i class="glyphicon glyphicon-pencil"></i>
-              </a><br>
-              <a href="{{ data.urls.delete }}" data-toggle="ajaxmodal">
-                <i class="glyphicon glyphicon-trash"></i>
-              </a>
+              {% if data.created_by == request.user %}
+                <a href="{{ data.urls.update }}" data-toggle="ajaxmodal">
+                  <i class="glyphicon glyphicon-pencil"></i>
+                </a><br>
+                <a href="{{ data.urls.delete }}" data-toggle="ajaxmodal">
+                  <i class="glyphicon glyphicon-trash"></i>
+                </a>
+              {% endif %}
             </td>
           </tr>
         {% elif type == 'hours' %}
@@ -132,6 +134,7 @@
       <tr>
         <td><i class="glyphicon glyphicon-comment"></i></td>
         <td>
+          <a name="comments"></a>
           <form method="post" action="{{ request.path }}" class="form">
             <input type="hidden" name="form" value="comment_form"/>
             {% csrf_token %}

@@ -164,6 +164,7 @@
           <th>{% trans 'created at' %}</th>
           <th>{% trans 'owned by' %}</th>
           <th class="text-right">{% trans 'hours' %}</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -185,6 +186,7 @@
             <th class="text-right">
               {{ service_tasks.logged }}h / {{ service_tasks.approved }}h
             </th>
+            <th></th>
           </tr>
 
           {% for task in service_tasks.tasks %}
@@ -206,6 +208,13 @@
               </td>
               <td class="text-right">
                 {{ task.logged_hours|default:0 }}h
+              </td>
+              <td>
+                <a href="{{ task.get_absolute_url }}#comments">
+                  {% if task.comment_count %}
+                    <i class="glyphicon glyphicon-comment"></i> {{ task.comment_count }}
+                  {% endif %}
+                </a>
               </td>
             </tr>
           {% endfor %}

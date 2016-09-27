@@ -3,7 +3,7 @@ from decimal import Decimal
 import itertools
 
 from django.contrib import messages
-from django.db.models import Sum
+from django.db.models import Count, Sum
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext_lazy as _
 
@@ -34,6 +34,17 @@ class ServicesView(object):
         ).select_related('owned_by', 'service__offer').annotate(
             logged_hours=Sum('loggedhours__hours'),
         )
+
+        comment_counts = {
+            row['task']: row['count']
+            for row in Comment.objects.filter(
+                task__project=self.project,
+            ).order_by().values('task').annotate(
+                count=Count('id'),
+            )
+        }
+        for task in self.tasks:
+            task.comment_count = comment_counts.get(task.id, 0)
 
         self.services = {}
         for key, group in itertools.groupby(
