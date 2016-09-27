@@ -210,11 +210,11 @@
                 {{ task.logged_hours|default:0 }}h
               </td>
               <td>
-                <a href="{{ task.get_absolute_url }}#comments">
-                  {% if task.comment_count %}
+                {% if task.comment_count %}
+                  <a href="{{ task.get_absolute_url }}#comments">
                     <i class="glyphicon glyphicon-comment"></i> {{ task.comment_count }}
-                  {% endif %}
-                </a>
+                  </a>
+                {% endif %}
               </td>
             </tr>
           {% endfor %}
