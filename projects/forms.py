@@ -59,14 +59,14 @@ class ApprovedHoursForm(forms.Form):
         for service in Service.objects.filter(offer__project=self.project):
             self.fields['service_%s_approved_hours' % service.id] =\
                 forms.DecimalField(
-                    label='%s (%.1fh)' % (
-                        service,
-                        service.effort_hours,
-                    ),
+                    label=service.title,
                     required=False,
                     max_digits=5,
                     decimal_places=2,
                     initial=service._approved_hours,
+                    help_text=_(
+                        'The sum of all offered efforts amount to %.1f hours.'
+                    ) % (service.effort_hours,),
                 )
 
     def save(self):
