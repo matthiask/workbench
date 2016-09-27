@@ -1,9 +1,9 @@
 from django.conf.urls import url
 
-from logbook.forms import LoggedHoursSearchForm
+from logbook.forms import LoggedHoursSearchForm, LoggedHoursForm
 from logbook.models import LoggedHours
 
-from tools.views import ListView, DetailView, MessageView
+from tools.views import ListView, DetailView, UpdateView, MessageView
 
 
 urlpatterns = [
@@ -23,9 +23,10 @@ urlpatterns = [
         name='logbook_loggedhours_detail'),
     url(
         r'^(?P<pk>\d+)/update/$',
-        MessageView.as_view(
-            redirect_to='logbook_loggedhours_list',
-            message='Not implemented yet.',
+        UpdateView.as_view(
+            model=LoggedHours,
+            form_class=LoggedHoursForm,
+            template_name='modalform.html',
         ),
         name='logbook_loggedhours_update'),
     url(

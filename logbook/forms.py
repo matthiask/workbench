@@ -36,23 +36,27 @@ class LoggedHoursForm(ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        self.project = kwargs.pop('project')
-        initial = kwargs.setdefault('initial', {})
-        request = kwargs['request']
+        self.project = kwargs.pop('project', None)
+        if self.project:
+            initial = kwargs.setdefault('initial', {})
+            request = kwargs['request']
 
-        if request.GET.get('task'):
-            initial['task'] = request.GET.get('task')
+            if request.GET.get('task'):
+                initial['task'] = request.GET.get('task')
 
-        latest = LoggedHours.objects.filter(
-            rendered_by=kwargs['request'].user,
-        ).order_by('-created_at').first()
-        if latest and (timezone.now() - latest.created_at).seconds < 7200:
-            seconds = (timezone.now() - latest.created_at).seconds
-            initial.setdefault(
-                'hours',
-                (seconds / Decimal(3600)).quantize(
-                    Decimal('0.0'), rounding=ROUND_UP),
-            )
+            latest = LoggedHours.objects.filter(
+                rendered_by=kwargs['request'].user,
+            ).order_by('-created_at').first()
+            if latest and (timezone.now() - latest.created_at).seconds < 7200:
+                seconds = (timezone.now() - latest.created_at).seconds
+                initial.setdefault(
+                    'hours',
+                    (seconds / Decimal(3600)).quantize(
+                        Decimal('0.0'), rounding=ROUND_UP),
+                )
+        else:
+            self.project = kwargs['instance'].task.project
+
         super().__init__(*args, **kwargs)
         self.fields['task'].choices = [('', '----------')] + [(
             task.id,

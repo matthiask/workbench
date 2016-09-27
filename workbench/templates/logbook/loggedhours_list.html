@@ -28,7 +28,7 @@
           <td>{% link_or_none hours.task.project %}</td>
           <td>{{ hours.rendered_by.get_short_name }}</td>
           <th>
-            <a href="{{ hours.urls.detail }}">
+            <a href="{{ hours.urls.detail }}" data-toggle="ajaxmodal">
               {{ hours.description }}
             </a>
           </td>
