@@ -1,39 +1,18 @@
 from decimal import Decimal
-from markdown2 import markdown
-import lxml.html
-import lxml.html.clean
 
 from django.db import models
 from django.db.models import Sum
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.html import format_html, mark_safe
+from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from accounts.models import User
 from contacts.models import Organization, Person
-from tools.formats import local_date_format, pretty_due
+from tools.formats import local_date_format, pretty_due, markdownify
 from tools.models import SearchQuerySet, Model
 from tools.urls import model_urls
-
-
-def markdownify(text):
-    html = markdown(text, extras=[
-        'code-friendly',
-        'fenced-code-blocks',
-        'cuddled-lists',
-    ])
-    html = html.replace('<img', '<img class="img-responsive"')
-    doc = lxml.html.fromstring(html)
-    cleaner = lxml.html.clean.Cleaner(
-        scripts=False,
-        style=False,
-        remove_tags=('script', 'style'),
-    )
-    cleaner(doc)
-    html = lxml.html.tostring(doc, method='xml').decode('utf-8')
-    return mark_safe(html)
 
 
 class ProjectQuerySet(SearchQuerySet):
