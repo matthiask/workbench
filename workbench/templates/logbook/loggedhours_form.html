@@ -14,7 +14,7 @@
         <tr>
           <td>{{ hours.created_at|date:'H:i' }}</td>
           <td>
-            <a href="{{ hours.urls.detail }}">
+            <a href="{{ hours.urls.detail }}" data-toggle="ajaxmodal">
               <strong>
                 {{ hours.task.project }}: {{ hours.task }}
               </strong><br/>
