@@ -5,15 +5,23 @@
 {% block title %}{{ task }} - {{ task.project }} - {{ block.super }}{% endblock %}
 
 {% block content %}
+<div class="row">
+<div class="col-md-12">
+
+  <h1>{{ task.project }} {% history_link task.project %}</h1>
+  <ul class="nav nav-tabs">
+    <li><a href="{{ task.project.urls.overview }}">{% trans 'overview' %}</a></li>
+    <li class="active"><a href="{{ task.project.urls.tasks }}">{% trans 'tasks' %}</a></li>
+    <li><a href="{{ task.project.urls.costs }}">{% trans 'costs' %}</a></li>
+  </ul>
+</div>
+</div>
+
 
 <div class="row">
   <div class="col-md-8 col-md-offset-2">
 
-    <h2><a href="{{ task.project.urls.tasks }}">
-        <small><i class="glyphicon glyphicon-menu-left"></i></small>
-        {{ task.project|h }}</a></h2>
-
-    <h1>{{ task|h }} {% history_link task %}</h1>
+    <h1>{{ task|h }}</h1>
 
     <table class="table table-striped">
       <tr>
