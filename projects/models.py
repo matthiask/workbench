@@ -299,7 +299,7 @@ class Task(Model):
     save.alters_data = True
 
     def description_html(self):
-        return markdownify(self.description)
+        return markdownify(self.description) if self.description else '–'
 
     def pretty_status(self):
         if self.status == self.DONE:
