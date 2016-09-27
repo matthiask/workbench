@@ -5,7 +5,7 @@ import itertools
 
 from django import template
 from django.db import models
-from django.db.models import Count, Max
+from django.db.models import Count
 from django.template.defaultfilters import linebreaksbr
 from django.utils import timezone
 from django.utils.html import format_html, mark_safe
@@ -127,16 +127,13 @@ def tasks_info(tasks):
     tasks = list(tasks)
     if tasks:
         comment_counts = {
-            row['task']: (row['count'], row['max'])
+            row['task']: row['count']
             for row in Comment.objects.filter(
                 task__project=tasks[0].project_id,
             ).order_by().values('task').annotate(
                 count=Count('id'),
-                max=Max('created_at'),
             )
         }
         for task in tasks:
-            data = comment_counts.get(task.id)
-            task.comment_count = data[0] if data else 0
-            task.latest_comment = data[1] if data else None
+            task.comment_count = comment_counts.get(task.id, 0)
     return tasks

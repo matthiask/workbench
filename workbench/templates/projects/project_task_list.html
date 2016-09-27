@@ -61,7 +61,7 @@
       <th>{% trans 'created' %}</th>
       <th>{% trans 'owned by' %}</th>
       <th class="text-right">{% trans 'hours' %}</th>
-      <th>{% trans 'comments' %}</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -85,9 +85,6 @@
           {% if task.comment_count %}
             <a href="{{ task.get_absolute_url }}#comments">
               <i class="glyphicon glyphicon-comment"></i> {{ task.comment_count }}
-              <small>
-                ({{ task.latest_comment|timesince_short }})
-              </small>
             </a>
           {% endif %}
         </td>
