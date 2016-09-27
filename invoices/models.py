@@ -208,8 +208,8 @@ class Invoice(ModelWithTotal):
                 return 'warning'
 
         return {
-            self.IN_PREPARATION: 'success',
-            self.SENT: 'info',
+            self.IN_PREPARATION: 'info',
+            self.SENT: 'success',
             self.REMINDED: 'warning',
             self.PAID: 'default',
             self.CANCELED: 'danger',

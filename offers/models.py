@@ -124,8 +124,8 @@ class Offer(ModelWithTotal):
 
     def status_css(self):
         return {
-            self.IN_PREPARATION: 'success',
-            self.OFFERED: 'info',
+            self.IN_PREPARATION: 'info',
+            self.OFFERED: 'success',
             self.ACCEPTED: 'default',
             self.REJECTED: 'danger',
             self.REPLACED: '',

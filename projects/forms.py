@@ -87,6 +87,15 @@ class TaskSearchForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
+    p = forms.ChoiceField(
+        choices=(
+            ('', _('All priorities')),
+            ('high', _('High and higher')),
+            (_('Exact'), Task.PRIORITY_CHOICES),
+        ),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
     owned_by = forms.TypedChoiceField(
         label=_('owned by'),
         coerce=int,
@@ -112,6 +121,10 @@ class TaskSearchForm(forms.Form):
             queryset = queryset.filter(status__lt=Task.DONE)
         elif data.get('s'):
             queryset = queryset.filter(status=data.get('s'))
+        if data.get('p') == 'high':
+            queryset = queryset.filter(priority__gte=Task.HIGH)
+        elif data.get('p'):
+            queryset = queryset.filter(priority=data.get('p'))
         if data.get('owned_by') == -1:
             queryset = queryset.filter(owned_by__isnull=True)
         elif data.get('owned_by') == -2:

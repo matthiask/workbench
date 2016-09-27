@@ -111,8 +111,8 @@ class Project(Model):
 
     def status_css(self):
         return {
-            self.ACQUISITION: 'success',
-            self.WORK_IN_PROGRESS: 'info',
+            self.ACQUISITION: 'info',
+            self.WORK_IN_PROGRESS: 'success',
             self.FINISHED: 'default',
             self.DECLINED: 'warning',
         }[self.status]
@@ -309,6 +309,15 @@ class Task(Model):
             self.NORMAL: 'label label-info',
             self.LOW: 'label label-default',
         }[self.priority]
+
+    def status_css(self):
+        return {
+            self.INBOX: 'label label-default',
+            self.BACKLOG: 'label label-info',
+            self.IN_PROGRESS: 'label label-primary',
+            self.READY_FOR_TEST: 'label label-success',
+            self.DONE: 'label label-default',
+        }[self.status]
 
     @cached_property
     def overview(self):
