@@ -2,6 +2,7 @@ from datetime import date
 
 from django.db import models
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import User
@@ -68,7 +69,13 @@ class LoggedHours(Model):
         verbose_name_plural = _('logged hours')
 
     def __str__(self):
-        return '%s %s' % (self.task.title, self.description)
+        return '%s: %s' % (self.task.title, self.description)
+
+    def __html__(self):
+        return format_html(
+            '{}:<br>{}',
+            self.task.title,
+            self.description)
 
 
 @model_urls(default='update')
