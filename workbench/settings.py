@@ -118,6 +118,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_STORAGE =\
+    'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 OAUTH2_CLIENT_ID = env.env('OAUTH2_CLIENT_ID', default='')
 OAUTH2_CLIENT_SECRET = env.env('OAUTH2_CLIENT_SECRET', default=None)
