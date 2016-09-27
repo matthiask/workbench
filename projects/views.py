@@ -11,7 +11,7 @@ from offers.models import Service
 from projects.forms import CommentForm
 from projects.models import Project, Task, Comment
 from tools.history import changes
-from tools.views import DetailView, CreateView, DeleteView
+from tools.views import ListView, DetailView, CreateView, DeleteView
 
 
 class CreateRelatedView(CreateView):
@@ -130,6 +130,25 @@ class ProjectDetailView(DetailView):
             kwargs['costs'] = CostView(self.object)
 
         return super().get_context_data(**kwargs)
+
+
+class TaskListView(ListView):
+    template_name = 'projects/project_task_list.html'
+
+    def get_queryset(self):
+        self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        self.root_queryset = self.model.objects.filter(
+            project=self.project)
+
+        q = self.request.GET.get('q')
+        queryset = (
+            self.root_queryset.search(q) if q
+            else self.root_queryset.all())
+
+        if self.search_form_class:
+            queryset = self.search_form.filter(queryset)
+
+        return queryset
 
 
 class TaskDetailView(DetailView):

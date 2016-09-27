@@ -122,9 +122,9 @@ small.right {
   text-decoration: none;
 }
 
-.table th > a:not(.btn),  /* override */
-.table td > a:not(.btn),  /* override */
-table th > a {
+.table tbody th > a:not(.btn),  /* override */
+.table tbody td > a:not(.btn),  /* override */
+tbody th > a {
   display: block;
   margin: -8px;
   padding: 8px;

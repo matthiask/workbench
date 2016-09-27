@@ -12,7 +12,8 @@ from projects.forms import (
     TaskForm, CommentForm)
 from projects.models import Project, Task, Comment
 from projects.views import (
-    ProjectDetailView, CreateRelatedView, TaskDetailView, TaskDeleteView)
+    ProjectDetailView, CreateRelatedView, TaskListView, TaskDetailView,
+    TaskDeleteView)
 from tools.views import (
     ListView, CreateView, UpdateView, DeleteView)
 
@@ -36,7 +37,12 @@ urlpatterns = [
         name='projects_project_overview'),
     url(
         r'^(?P<pk>\d+)/tasks/$',
-        ProjectDetailView.as_view(project_view='tasks'),
+        TaskListView.as_view(
+            model=Task,
+            search_form_class=TaskSearchForm,
+            show_create_button=False,
+        ),
+        # ProjectDetailView.as_view(project_view='tasks'),
         name='projects_project_tasks'),
     url(
         r'^(?P<pk>\d+)/costs/$',
