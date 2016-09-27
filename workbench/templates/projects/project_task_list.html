@@ -14,7 +14,14 @@
     </ul>
 
     <div class="row">
-      <div class="col-md-3"></div>
+      <div class="col-md-3 left-head">
+        <a href="{{ view.project.urls.createtask }}" class="btn btn-default">
+          <i class="glyphicon glyphicon-plus"></i> {% trans 'task' %}</a>
+        <a href="{{ view.project.urls.createhours }}" class="btn btn-default"
+          data-toggle="ajaxmodal">
+          <i class="glyphicon glyphicon-plus"></i> {% trans 'hours' %}</a>
+      </div>
+
       <div class="col-md-9 right-head">
         <form method="GET" action="." class="form-inline form-search">
           <label class="sr-only">{% trans 'search' %}</label>
@@ -85,7 +92,7 @@
   </tbody>
   <tfoot>
     <tr>
-      <td colspan="7">
+      <td colspan="8">
         {{ paginator.count }} {{ view.meta.verbose_name_plural }}
         {% if view.root_queryset_count != paginator.count %}
         (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)

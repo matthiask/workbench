@@ -71,6 +71,9 @@ th.number {
 }
 
 @media screen and (min-width: 768px) {
+  .left-head {
+    padding-top: 21px;
+  }
   .right-head {
     text-align: right;
     padding-top: 21px;
