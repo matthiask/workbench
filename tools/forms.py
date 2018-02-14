@@ -119,7 +119,7 @@ class Picker(forms.TextInput):
     def render(self, name, value, attrs=None, choices=()):
         if value is None:
             value = ''
-        final_attrs = self.build_attrs(attrs, type='hidden', name=name)
+        final_attrs = self.build_attrs(attrs, {'type': 'hidden', 'name': name})
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_text(self.format_value(value))
