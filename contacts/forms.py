@@ -96,6 +96,7 @@ class PostalAddressForm(forms.ModelForm):
             'postal_address': Textarea(attrs={'rows': 6}),
         }
 
+
 PostalAddressFormset = inlineformset_factory(
     Person,
     PostalAddress,

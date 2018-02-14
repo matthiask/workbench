@@ -141,6 +141,7 @@ BOOTSTRAP3 = {
 def font(name):
     return os.path.join(BASE_DIR, 'stuff', 'fonts', name)
 
+
 NAMESPACE = env.env('NAMESPACE', required=True)
 WORKBENCH = {
     'feinheit': types.SimpleNamespace(

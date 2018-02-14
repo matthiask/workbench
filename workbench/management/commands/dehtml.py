@@ -47,7 +47,7 @@ def dehtml(text):
         parser.feed(text)
         parser.close()
         return parser.text()
-    except:
+    except Exception:
         return text
 
 
