@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-27 22:38+0200\n"
+"POT-Creation-Date: 2018-02-14 14:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -212,14 +212,14 @@ msgstr "Alle Gruppen"
 msgid "Group"
 msgstr "Gruppe"
 
-#: contacts/forms.py:129 contacts/models.py:169 contacts/models.py:173
+#: contacts/forms.py:130 contacts/models.py:169 contacts/models.py:173
 #: invoices/models.py:117 offers/models.py:76
 #: workbench/templates/invoices/invoice_detail.html:36
 #: workbench/templates/offers/offer_detail.html:26
 msgid "postal address"
 msgstr "Postadresse"
 
-#: contacts/forms.py:130
+#: contacts/forms.py:131
 msgid "The exact address can be edited later."
 msgstr "Die exakte Adresse kann später bearbeitet werden."
 
@@ -1316,25 +1316,31 @@ msgstr "Ja, ich bin sicher."
 
 #: workbench/templatetags/workbench.py:117
 #, python-format
+#| msgid "%s minutes ago"
+msgid "%s months ago"
+msgstr "vor %s Monaten"
+
+#: workbench/templatetags/workbench.py:119
+#, python-format
 msgid "%s weeks ago"
 msgstr "vor %s Wochen"
 
-#: workbench/templatetags/workbench.py:119
+#: workbench/templatetags/workbench.py:121
 #, python-format
 msgid "%s days ago"
 msgstr "vor %s Tagen"
 
-#: workbench/templatetags/workbench.py:121
+#: workbench/templatetags/workbench.py:123
 #, python-format
 msgid "%s hours ago"
 msgstr "vor %s Stunden"
 
-#: workbench/templatetags/workbench.py:123
+#: workbench/templatetags/workbench.py:125
 #, python-format
 msgid "%s minutes ago"
 msgstr "vor %s Minuten"
 
-#: workbench/templatetags/workbench.py:124
+#: workbench/templatetags/workbench.py:126
 #, python-format
 msgid "%s seconds ago"
 msgstr "vor %s Sekunden"

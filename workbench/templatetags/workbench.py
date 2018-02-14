@@ -113,13 +113,15 @@ def group_hours_by_day(iterable):
 @register.filter
 def timesince_short(dttm):
     delta = int((timezone.now() - dttm).total_seconds())
+    if delta > 86400 * 180:
+        return _('%s months ago') % int(delta // (86400 * 365 / 12))
     if delta > 86400 * 14:
         return _('%s weeks ago') % (delta // (86400 * 7))
     if delta > 86400 * 2:
         return _('%s days ago') % (delta // 86400)
-    elif delta > 7200:
+    if delta > 7200:
         return _('%s hours ago') % (delta // 3600)
-    elif delta > 120:
+    if delta > 120:
         return _('%s minutes ago') % (delta // 60)
     return _('%s seconds ago') % delta
 
