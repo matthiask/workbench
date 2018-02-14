@@ -62,5 +62,8 @@ def compilemessages():
 
 @task
 def update_requirements():
+    local('rm -rf venv')
+    local('python3 -m venv venv')
+    local('venv/bin/pip install -U pip wheel')
     local('venv/bin/pip install -U -r requirements-to-freeze.txt')
     local('venv/bin/pip freeze -l > requirements.txt')
