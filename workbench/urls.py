@@ -11,7 +11,7 @@ urlpatterns = [
     url(r'^bootstrap/$', render, {'template_name': 'bootstrap.html'}),
     url(r'^404/$', render, {'template_name': '404.html'}),
 
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin/', include(admin.site.urls)),
 
     url(r'^accounts/', include('accounts.urls')),
     url(r'^activities/', include('activities.urls')),
@@ -31,5 +31,5 @@ if settings.DEBUG:
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
     urlpatterns = urlpatterns + [
-        url(r'^__debug__/', debug_toolbar.urls),
+        url(r'^__debug__/', include(debug_toolbar.urls)),
     ] + staticfiles_urlpatterns()
