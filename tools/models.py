@@ -102,7 +102,7 @@ class ModelWithTotal(Model):
             'For example invoices to foreign institutions are not'
             ' liable to VAT.'
         ))
-    tax_rate = MoneyField(_('tax rate'), default=Decimal('8'))
+    tax_rate = MoneyField(_('tax rate'), default=Decimal('7.7'))
     total = MoneyField(_('total'))
 
     class Meta:
