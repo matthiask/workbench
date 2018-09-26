@@ -147,7 +147,7 @@ WORKBENCH = {
     'feinheit': types.SimpleNamespace(
         SSO_DOMAIN='feinheit.ch',
         PDF_COMPANY='FEINHEIT AG',
-        PDF_ADDRESS='FEINHEIT AG · Molkenstrasse 21 · 8004 Zürich',
+        PDF_ADDRESS='FEINHEIT AG · Fabrikstrasse 54 · 8005 Zürich',
         PDF_VAT_NO='CHE-113.948.417 MWST',
         PDF_OFFER_TERMS=[
             'Bestandteil dieser Offerte sind die zum Zeitpunkt'
@@ -173,7 +173,7 @@ WORKBENCH = {
         SSO_DOMAIN='diebruchpiloten.com',
         PDF_COMPANY='Die Bruchpiloten AG',
         PDF_ADDRESS=(
-            'Die Bruchpiloten AG · Molkenstrasse 21 · 8004 Zürich'
+            'Die Bruchpiloten AG · Fabrikstrasse 54 · 8005 Zürich'
             ' · diebruchpiloten.com'
         ),
         PDF_VAT_NO='CHE-239.647.366 MWST',
@@ -185,7 +185,7 @@ WORKBENCH = {
         PDF_INVOICE_PAYMENT=(
             'Wir bedanken uns für die Überweisung des Betrags mit Angabe'
             ' der Referenznummer %(code)s innerhalb von %(days)s Tagen'
-            ' (%(due)s) auf IBAN CH45 0023 0230 2849 4501 Y.'
+            ' (%(due)s) auf IBAN CH78 0070 0110 0070 4877 9.'
         ),
         FONTS={
             'regular': font('HelveticaNeueLight.ttf'),
