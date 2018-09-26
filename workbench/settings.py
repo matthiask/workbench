@@ -19,6 +19,7 @@ env.read_dotenv()
 
 SECRET_KEY = env.env('SECRET_KEY', required=True)
 DEBUG = any(arg in ('runserver',) for arg in sys.argv)
+TESTING = any(arg in ('test',) for arg in sys.argv)
 LIVE = env.env('LIVE', default=False)
 ALLOWED_HOSTS = env.env('ALLOWED_HOSTS', default=[])
 ADMINS = (
@@ -117,8 +118,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATICFILES_STORAGE =\
-    'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+if not TESTING:
+    STATICFILES_STORAGE =\
+        'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 OAUTH2_CLIENT_ID = env.env('OAUTH2_CLIENT_ID', default='')
 OAUTH2_CLIENT_SECRET = env.env('OAUTH2_CLIENT_SECRET', default=None)
