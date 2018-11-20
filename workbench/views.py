@@ -4,20 +4,13 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext as _
 
-from workbench.contacts.models import Organization, Person
-from workbench.deals.models import Deal
-from workbench.invoices.models import Invoice
-from workbench.offers.models import Offer
-from workbench.projects.models import Project
-
 
 def search(request):
     results = []
     q = request.GET.get("q", "")
     if q:
         results = [
-            (model._meta.verbose_name_plural, model.objects.search(q))
-            for model in (Organization, Person, Project, Invoice, Deal, Offer)
+            (model._meta.verbose_name_plural, model.objects.search(q)) for model in []
         ]
     else:
         messages.error(request, _("Search query missing."))

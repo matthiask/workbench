@@ -1,17 +1,10 @@
-coverage
 Django<2
 django-bootstrap3
 django-debug-toolbar
 django-vanilla-views
 dj-database-url
-factory-boy
 flake8
 gunicorn
-lxml
-markdown2
 oauth2client
-pdfdocument
-Pillow
 psycopg2-binary
-reportlab
 speckenv

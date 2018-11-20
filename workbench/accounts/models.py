@@ -1,11 +1,5 @@
-from datetime import date, timedelta
-from decimal import Decimal
-import hashlib
-
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
-from django.db.models import Sum, Q
-from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from workbench.tools.models import Model
@@ -77,46 +71,3 @@ class User(Model, AbstractBaseUser):
         """Is the user a member of staff?"""
         # Simplest possible answer: All admins are staff
         return self.is_admin
-
-    @cached_property
-    def hours(self):
-        today = date.today()
-        monday = today - timedelta(days=today.weekday())
-
-        per_day = {
-            row["rendered_on"]: row["hours__sum"]
-            for row in self.loggedhours.filter(rendered_on__gte=monday)
-            .order_by()
-            .values("rendered_on")
-            .annotate(Sum("hours"))
-        }
-
-        return {
-            "today": per_day.get(today, Decimal("0.00")),
-            "week": sum(per_day.values(), Decimal("0.00")),
-        }
-
-    @property
-    def avatar(self):
-        return "https://www.gravatar.com/avatar/%s" % (
-            hashlib.md5(self.email.lower().encode("utf-8")).hexdigest(),
-        )
-
-    @cached_property
-    def important_tasks(self):
-        from workbench.projects.models import Task
-
-        return Task.objects.filter(
-            Q(owned_by=self),
-            ~Q(status=Task.DONE),
-            Q(priority__gte=Task.HIGH)
-            | Q(due_on__lte=date.today() + timedelta(days=15)),
-        ).select_related("project")
-
-    @cached_property
-    def recent_hours(self):
-        return reversed(
-            self.loggedhours.filter(rendered_on=date.today()).order_by("-created_at")[
-                :2
-            ]
-        )

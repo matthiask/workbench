@@ -24,7 +24,7 @@
 
     <div class="panel panel-default">
       <div class="panel-heading"><h3>
-        <a href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a>
+        <a href="{# % url 'activities_activity_list' % #}">{% trans 'activities' %}</a>
       </h3></div>
       <div class="panel-body">
         <table class="table table-condensed">
@@ -49,7 +49,7 @@
 
     <div class="panel panel-default">
       <div class="panel-heading"><h3>
-          <a href="{% url 'projects_task_list' %}?s=open&amp;owned_by={{ request.user.id }}">{% trans 'Important tasks' %}</a>
+          <a href="{# % url 'projects_task_list' % #}?s=open&amp;owned_by={{ request.user.id }}">{% trans 'Important tasks' %}</a>
       </h3></div>
       <div class="panel-body">
         <table class="table table-condensed">

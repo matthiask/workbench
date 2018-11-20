@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import dj_database_url
 import os
 import sys
-import types
 from speckenv import read_speckenv, env
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -37,15 +36,7 @@ INSTALLED_APPS = [
         "django.contrib.postgres",
         "bootstrap3",
         "workbench.accounts",
-        "workbench.activities",
         "workbench.audit",
-        "workbench.contacts",
-        "workbench.deals",
-        "workbench.invoices",
-        "workbench.logbook",
-        "workbench.offers",
-        "workbench.projects",
-        "workbench.services",
         "debug_toolbar" if DEBUG else "",
     ]
     if a
@@ -107,7 +98,7 @@ TEMPLATES = [
 
 LOCALE_PATHS = (os.path.join(BASE_DIR, "conf", "locale"),)
 
-AUTHENTICATION_BACKENDS = ("workbench.accounts.backends.AuthBackend",)
+AUTHENTICATION_BACKENDS = ["workbench.accounts.backends.AuthBackend"]
 
 DATABASES = {"default": dj_database_url.config(default="sqlite:///db.sqlite3")}
 
@@ -146,63 +137,6 @@ def font(name):
     return os.path.join(BASE_DIR, "stuff", "fonts", name)
 
 
-NAMESPACE = env("NAMESPACE", required=True)
-WORKBENCH = {
-    "feinheit": types.SimpleNamespace(
-        SSO_DOMAIN="feinheit.ch",
-        PDF_COMPANY="FEINHEIT AG",
-        PDF_ADDRESS="FEINHEIT AG · Fabrikstrasse 54 · 8005 Zürich",
-        PDF_VAT_NO="CHE-113.948.417 MWST",
-        PDF_OFFER_TERMS=[
-            "Bestandteil dieser Offerte sind die zum Zeitpunkt"
-            " des Vertragsabschlusses aktuellen Allgemeinen"
-            " Geschäftsbedingungen der FEINHEIT AG.",
-            "Die jeweils aktuelle Version" " finden Sie auf www.feinheit.ch/agb/.",
-        ],
-        PDF_INVOICE_PAYMENT=(
-            "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
-            " der Referenznummer %(code)s innerhalb von %(days)s Tagen"
-            " (%(due)s) auf Postkonto 85-206645-2"
-            " / IBAN CH50 0900 0000 8520 6645 2."
-        ),
-        FONTS={
-            "regular": font("Lato-Light.ttf"),
-            "bold": font("Lato-Semibold.ttf"),
-            "italic": font("Lato-LightItalic.ttf"),
-            "bolditalic": font("Lato-Bold.ttf"),
-        },
-    ),
-    "dbpag": types.SimpleNamespace(
-        SSO_DOMAIN="diebruchpiloten.com",
-        PDF_COMPANY="Die Bruchpiloten AG",
-        PDF_ADDRESS=(
-            "Die Bruchpiloten AG · Fabrikstrasse 54 · 8005 Zürich"
-            " · diebruchpiloten.com"
-        ),
-        PDF_VAT_NO="CHE-239.647.366 MWST",
-        PDF_OFFER_TERMS=[
-            "Bestandteil dieser Offerte sind die zum Zeitpunkt"
-            " des Vertragsabschlusses aktuellen Allgemeinen"
-            " Geschäftsbedingungen der Die Bruchpiloten AG."
-        ],
-        PDF_INVOICE_PAYMENT=(
-            "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
-            " der Referenznummer %(code)s innerhalb von %(days)s Tagen"
-            " (%(due)s) auf IBAN CH78 0070 0110 0070 4877 9."
-        ),
-        FONTS={
-            "regular": font("HelveticaNeueLight.ttf"),
-            "bold": font("HelveticaNeueBold.ttf"),
-            "italic": font("HelveticaNeueLightItalic.ttf"),
-            "bolditalic": font("HelveticaNeueBoldItalic.ttf"),
-        },
-    ),
-}[env("NAMESPACE", required=True)]
-
-SILENCED_SYSTEM_CHECKS = [
-    "1_10.W001"  # MIDDLEWARE_CLASSES is not used anymore, thank you.
-]
-
 INTERNAL_IPS = ["127.0.0.1"]
 
 if LIVE:
@@ -213,5 +147,5 @@ if LIVE:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_SSL_REDIRECT = True
-    SECURE_HSTS_SECONDS = 604800  # One week
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    # SECURE_HSTS_SECONDS = 604800  # One week
+    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True

@@ -30,10 +30,12 @@
               </div>
             </form>
           </li>
+          {% comment %}
           <li><a href="{% url 'contacts_organization_list' %}">{% trans 'organizations' %}</a></li>
           <li><a href="{% url 'contacts_person_list' %}">{% trans 'people' %}</a></li>
           <li><a href="{% url 'projects_project_list' %}">{% trans 'projects' %}</a></li>
           <li><a href="{% url 'invoices_invoice_list' %}">{% trans 'invoices' %}</a></li>
+          {% endcomment %}
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
@@ -50,6 +52,7 @@
                 {% trans 'Admin panel' %}
               </a></li>
               {% endif %}
+              {% comment %}
               <li class="divider"></li>
               <li><a href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a></li>
               <li><a href="{% url 'projects_task_list' %}">{% trans 'tasks' %}</a></li>
@@ -57,6 +60,7 @@
               <li class="divider"></li>
               <li><a href="{% url 'deals_deal_list' %}">{% trans 'deals' %}</a></li>
               <li><a href="{% url 'offers_offer_list' %}">{% trans 'offers' %}</a></li>
+              {% endcomment %}
               <li class="divider"></li>
               <li><a href="{% url 'logout' %}">
                 <span class="glyphicon glyphicon-log-out"></span>

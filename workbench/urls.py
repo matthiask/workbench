@@ -12,13 +12,6 @@ urlpatterns = [
     url(r"^404/$", render, {"template_name": "404.html"}),
     url(r"^admin/", include(admin.site.urls)),
     url(r"^accounts/", include("workbench.accounts.urls")),
-    url(r"^activities/", include("workbench.activities.urls")),
-    url(r"^contacts/", include("workbench.contacts.urls")),
-    url(r"^deals/", include("workbench.deals.urls")),
-    url(r"^logbook/", include("workbench.logbook.urls")),
-    url(r"^offers/", include("workbench.offers.urls")),
-    url(r"^projects/", include("workbench.projects.urls")),
-    url(r"^invoices/", include("workbench.invoices.urls")),
     url(r"^search/$", views.search, name="search"),
     url(r"^history/(\w+\.\w+)/([0-9]+)/$", views.history, name="history"),
 ]

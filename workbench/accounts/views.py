@@ -69,20 +69,18 @@ def oauth2(request):
 
     if credentials.id_token["email_verified"]:
         email = credentials.id_token["email"]
-        new_user = False
 
-        if not User.objects.filter(email=email).exists() and email.endswith(
-            "@%s" % settings.WORKBENCH.SSO_DOMAIN
-        ):
-            User.objects.create(
-                email=email,
-                is_active=True,
-                is_admin=False,
-                _short_name="",
-                _full_name="",
-            )
+        _u, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                "is_active": True,
+                "is_admin": False,
+                "_short_name": "",
+                "_full_name": "",
+            },
+        )
+        if created:
             messages.success(request, _("Welcome! Please fill in your details."))
-            new_user = True
 
         user = authenticate(email=email)
         if user and user.is_active:
@@ -90,7 +88,7 @@ def oauth2(request):
         else:
             messages.error(request, _("No user with email address %s found.") % email)
 
-        if new_user:
+        if created:
             return http.HttpResponseRedirect(reverse("accounts_update"))
 
     next = request.get_signed_cookie("next", default=None, salt="next")
