@@ -24,7 +24,7 @@ def accounts(request):
 class UserUpdateView(generic.UpdateView):
     model = User
     form_class = UserForm
-    success_url = reverse_lazy("accounts_update")
+    success_url = "/"
 
     def get_object(self):
         if self.request.user.is_authenticated:
@@ -35,14 +35,16 @@ class UserUpdateView(generic.UpdateView):
             raise http.Http404
 
     def form_valid(self, form):
+        response = http.HttpResponseRedirect(self.get_success_url())
         self.object = form.save(commit=False)
         if self.object.pk:  # Existed already
-            return http.HttpResponseRedirect(self.get_success_url())
+            self.object.save()
+            return response
 
         self.object.email = self.request.session.pop("user_email")
         self.object.save()
         auth.login(self.request, auth.authenticate(email=self.object.email))
-        return http.HttpResponseRedirect("/")
+        return response
 
 
 def oauth2_flow(request):
