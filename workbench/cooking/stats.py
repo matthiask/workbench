@@ -19,12 +19,12 @@ def run(year=2019):
     presences_sum = sum((presences[user.id] for user in users), 0)
 
     for user in users:
-        reached = round(presences[user.id] / presences_sum * counts_sum)
+        reached = presences[user.id] / presences_sum * counts_sum
         print(
             "{:>20.20}: {:>3}%, Soll {:>3}, Ist {:>3}, Erreichung {}%".format(
                 user.get_full_name(),
                 presences[user.id],
-                reached,
+                round(reached),
                 counts[user.id],
                 round(100 * counts[user.id] / reached),
             )
