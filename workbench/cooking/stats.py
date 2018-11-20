@@ -24,12 +24,6 @@ def run(year=2019):
         0,
     )
 
-    print(
-        "{} Tage gesamt, davon {} zu verteilen auf {}% Präsenz".format(
-            sum(counts.values()), counts_sum, presences_sum
-        )
-    )
-
     with_presence = []
     without_presence = []
 
@@ -49,9 +43,17 @@ def run(year=2019):
             )
         else:
             without_presence.append(
-                "{:>20.20}: Kein Soll, Ist {:>3}".format(
-                    user.get_full_name(), counts[user.id]
+                "{:>20.20}:            {:>3} Tage".format(
+                    user.get_full_name(), -counts[user.id]
                 )
             )
 
-    print("{}\n\n{}".format("\n".join(with_presence), "\n".join(without_presence)))
+    print("Gesamthaft                       {} Tage".format(sum(counts.values())))
+    print("\n".join(without_presence))
+    print()
+    print(
+        "Zu verteilen          {:>3}%       {:>3} Tage".format(
+            presences_sum, counts_sum
+        )
+    )
+    print("\n".join(with_presence))
