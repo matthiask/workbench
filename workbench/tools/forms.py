@@ -31,9 +31,9 @@ class ModelForm(forms.ModelForm):
 
         if self.default_to_current_user:
             instance = kwargs.get("instance")
-            if not instance or not instance.pk:
-                initial = kwargs.setdefault("initial", {})
-                for field in self.default_to_current_user:
+            initial = kwargs.setdefault("initial", {})
+            for field in self.default_to_current_user:
+                if not getattr(instance, field, None):
                     initial.setdefault(field, self.request.user.pk)
 
         super().__init__(*args, **kwargs)
