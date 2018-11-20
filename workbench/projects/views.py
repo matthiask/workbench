@@ -9,7 +9,7 @@ from workbench.offers.models import Service
 from workbench.projects.forms import CommentForm
 from workbench.projects.models import Project, Task, Comment
 from workbench.tools.history import changes
-from workbench.tools.views import ListView, DetailView, CreateView, DeleteView
+from workbench.generic import ListView, DetailView, CreateView, DeleteView
 
 
 class CreateRelatedView(CreateView):

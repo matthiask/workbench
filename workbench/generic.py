@@ -26,7 +26,7 @@ class ToolsMixin(object):
                     self.model._meta.object_name.lower(),
                     self.template_name_suffix,
                 ),
-                "tools/object%s.html" % self.template_name_suffix,
+                "generic/object%s.html" % self.template_name_suffix,
             ]
 
         msg = (

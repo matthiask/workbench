@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from workbench.activities.forms import ActivitySearchForm, ActivityForm
 from workbench.activities.models import Activity
-from workbench.tools.views import (
+from workbench.generic import (
     ListView,
     DetailView,
     CreateView,

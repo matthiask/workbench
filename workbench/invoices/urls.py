@@ -7,7 +7,7 @@ from workbench.invoices.forms import (
 )
 from workbench.invoices.models import Invoice
 from workbench.invoices.views import InvoicePDFView
-from workbench.tools.views import (
+from workbench.generic import (
     ListView,
     CreateView,
     DetailView,

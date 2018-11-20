@@ -8,7 +8,7 @@ from workbench.contacts.views import (
     PersonListView,
     PersonCreateView,
 )
-from workbench.tools.views import (
+from workbench.generic import (
     ListView,
     DetailView,
     CreateView,

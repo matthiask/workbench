@@ -23,7 +23,7 @@ from workbench.projects.views import (
     TaskDetailView,
     TaskDeleteView,
 )
-from workbench.tools.views import ListView, CreateView, UpdateView, DeleteView
+from workbench.generic import ListView, CreateView, UpdateView, DeleteView
 
 
 urlpatterns = [

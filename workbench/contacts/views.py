@@ -1,6 +1,6 @@
 from workbench.contacts.forms import OrganizationSearchForm, PersonForm
 from workbench.contacts.models import Organization, Person
-from workbench.tools.views import ListView, CreateView
+from workbench.generic import ListView, CreateView
 
 
 class OrganizationListView(ListView):

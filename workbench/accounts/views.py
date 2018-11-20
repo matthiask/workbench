@@ -11,7 +11,7 @@ from oauth2client.client import OAuth2WebServerFlow, FlowExchangeError
 
 from workbench.accounts.forms import UserForm
 from workbench.accounts.models import User
-from workbench.tools.views import UpdateView
+from workbench.generic import UpdateView
 
 
 def accounts(request):

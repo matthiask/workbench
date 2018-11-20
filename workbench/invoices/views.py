@@ -1,6 +1,6 @@
 from workbench.invoices.models import Invoice
 from workbench.tools.pdf import pdf_response
-from workbench.tools.views import DetailView
+from workbench.generic import DetailView
 
 
 class InvoicePDFView(DetailView):

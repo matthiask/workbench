@@ -11,7 +11,7 @@ from workbench.offers.views import (
     DeleteServiceView,
     MoveServiceView,
 )
-from workbench.tools.views import (
+from workbench.generic import (
     ListView,
     DetailView,
     UpdateView,

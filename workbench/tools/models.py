@@ -67,7 +67,7 @@ class Model(models.Model):
         return render_to_string(
             [
                 "%s/%s_snippet.html" % (opts.app_label, opts.model_name.lower()),
-                "tools/object_snippet.html",
+                "generic/object_snippet.html",
             ],
             {
                 "object": self,

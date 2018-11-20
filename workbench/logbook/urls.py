@@ -3,7 +3,7 @@ from django.conf.urls import url
 from workbench.logbook.forms import LoggedHoursSearchForm, LoggedHoursForm
 from workbench.logbook.models import LoggedHours
 
-from workbench.tools.views import ListView, DetailView, UpdateView, MessageView
+from workbench.generic import ListView, DetailView, UpdateView, MessageView
 
 
 urlpatterns = [

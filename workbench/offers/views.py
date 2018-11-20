@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from workbench.offers.forms import ServiceForm
 from workbench.offers.models import Offer, Service
 from workbench.tools.pdf import pdf_response
-from workbench.tools.views import DetailView, CreateView, UpdateView, DeleteView
+from workbench.generic import DetailView, CreateView, UpdateView, DeleteView
 
 
 class OfferPDFView(DetailView):
