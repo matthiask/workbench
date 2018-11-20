@@ -32,7 +32,7 @@ class UserUpdateView(generic.UpdateView):
         elif "user_email" in self.request.session:
             return User(email=self.request.session["user_email"])
         else:
-            return None  # ???
+            raise http.Http404
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
