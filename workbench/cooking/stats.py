@@ -30,15 +30,28 @@ def run(year=2019):
         )
     )
 
+    with_presence = []
+    without_presence = []
+
     for user in users:
-        presence = presences.get(user.id, 0)
-        reached = presence / presences_sum * counts_sum
-        print(
-            "{:>20.20}: {:>3}%, Soll {:>3}, Ist {:>3}, Erreichung {}%".format(
-                user.get_full_name(),
-                presence,
-                round(reached),
-                counts[user.id],
-                round(100 * counts[user.id] / reached) if reached else "-",
+        if user.id in presences:
+            presence = presences[user.id]
+            reached = presence / presences_sum * counts_sum
+
+            with_presence.append(
+                "{:>20.20}: {:>3}%, Soll {:>3}, Ist {:>3}, Erreichung {}%".format(
+                    user.get_full_name(),
+                    presence,
+                    round(reached),
+                    counts[user.id],
+                    round(100 * counts[user.id] / reached) if reached else "-",
+                )
             )
-        )
+        else:
+            without_presence.append(
+                "{:>20.20}: Kein Soll, Ist {:>3}".format(
+                    user.get_full_name(), counts[user.id]
+                )
+            )
+
+    print("{}\n\n{}".format("\n".join(with_presence), "\n".join(without_presence)))
