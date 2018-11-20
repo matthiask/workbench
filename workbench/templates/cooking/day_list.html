@@ -3,7 +3,7 @@
 {% load bootstrap3 calendar i18n querystring %}
 
 {% block objects %}
-<table class="table table-hover table-striped" style="table-layout:fixed">
+<table class="table table-hover table-striped table-condensed" style="table-layout:fixed">
 
   {% for start, week in object_list|calendar %}
   {% ifchanged start|date:"mY" %}
