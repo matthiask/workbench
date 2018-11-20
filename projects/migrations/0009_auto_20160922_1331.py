@@ -7,13 +7,15 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('projects', '0008_auto_20160918_1729'),
-    ]
+    dependencies = [("projects", "0008_auto_20160918_1729")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='comment',
-            options={'ordering': ('created_at',), 'verbose_name': 'comment', 'verbose_name_plural': 'comments'},
-        ),
+            name="comment",
+            options={
+                "ordering": ("created_at",),
+                "verbose_name": "comment",
+                "verbose_name_plural": "comments",
+            },
+        )
     ]

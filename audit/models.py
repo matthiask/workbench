@@ -5,18 +5,15 @@ from django.utils.translation import ugettext_lazy as _
 
 class LoggedActionManager(models.Manager):
     def for_instance(self, instance):
-        return self.filter(
-            table_name=instance._meta.db_table,
-            row_data__id=instance.id,
-        )
+        return self.filter(table_name=instance._meta.db_table, row_data__id=instance.id)
 
 
 class LoggedAction(models.Model):
     ACTION_TYPES = (
-        ('I', 'INSERT'),
-        ('U', 'UPDATE'),
-        ('D', 'DELETE'),
-        ('T', 'TRUNCATE'),
+        ("I", "INSERT"),
+        ("U", "UPDATE"),
+        ("D", "DELETE"),
+        ("T", "TRUNCATE"),
     )
 
     event_id = models.IntegerField(primary_key=True)
@@ -31,13 +28,13 @@ class LoggedAction(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'audit_logged_actions'
-        ordering = ('created_at',)
-        verbose_name = _('logged action')
-        verbose_name_plural = _('logged actions')
+        db_table = "audit_logged_actions"
+        ordering = ("created_at",)
+        verbose_name = _("logged action")
+        verbose_name_plural = _("logged actions")
 
     def __str__(self):
-        return '%s %s at %s' % (
+        return "%s %s at %s" % (
             self.get_action_display(),
             self.table_name,
             self.created_at,

@@ -6,11 +6,11 @@ import io, os
 
 from django.conf import settings
 import django.contrib.postgres.fields.hstore
-from django.contrib.postgres.operations import (HStoreExtension, UnaccentExtension)
+from django.contrib.postgres.operations import HStoreExtension, UnaccentExtension
 from django.db import migrations, models
 
 
-with io.open(os.path.join(settings.BASE_DIR, 'stuff', 'audit.sql')) as f:
+with io.open(os.path.join(settings.BASE_DIR, "stuff", "audit.sql")) as f:
     AUDIT_SQL = f.read()
 
 
@@ -18,30 +18,45 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         HStoreExtension(),
         UnaccentExtension(),
-
         migrations.CreateModel(
-            name='LoggedAction',
+            name="LoggedAction",
             fields=[
-                ('event_id', models.IntegerField(primary_key=True, serialize=False)),
-                ('table_name', models.TextField()),
-                ('user_name', models.TextField(null=True)),
-                ('created_at', models.DateTimeField()),
-                ('action', models.CharField(choices=[('I', 'INSERT'), ('U', 'UPDATE'), ('D', 'DELETE'), ('T', 'TRUNCATE')], max_length=1)),
-                ('row_data', django.contrib.postgres.fields.hstore.HStoreField(null=True)),
-                ('changed_fields', django.contrib.postgres.fields.hstore.HStoreField(null=True)),
+                ("event_id", models.IntegerField(primary_key=True, serialize=False)),
+                ("table_name", models.TextField()),
+                ("user_name", models.TextField(null=True)),
+                ("created_at", models.DateTimeField()),
+                (
+                    "action",
+                    models.CharField(
+                        choices=[
+                            ("I", "INSERT"),
+                            ("U", "UPDATE"),
+                            ("D", "DELETE"),
+                            ("T", "TRUNCATE"),
+                        ],
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "row_data",
+                    django.contrib.postgres.fields.hstore.HStoreField(null=True),
+                ),
+                (
+                    "changed_fields",
+                    django.contrib.postgres.fields.hstore.HStoreField(null=True),
+                ),
             ],
             options={
-                'verbose_name_plural': 'logged actions',
-                'ordering': ('created_at',),
-                'verbose_name': 'logged action',
-                'managed': False,
-                'db_table': 'audit_logged_actions',
+                "verbose_name_plural": "logged actions",
+                "ordering": ("created_at",),
+                "verbose_name": "logged action",
+                "managed": False,
+                "db_table": "audit_logged_actions",
             },
         ),
         migrations.RunSQL(AUDIT_SQL),

@@ -8,24 +8,41 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('invoices', '0004_auto_20160917_2112'),
-    ]
+    dependencies = [("invoices", "0004_auto_20160917_2112")]
 
     operations = [
         migrations.AddField(
-            model_name='invoice',
-            name='down_payment_total',
-            field=models.DecimalField(decimal_places=2, default=0, max_digits=10, verbose_name='down payment total'),
+            model_name="invoice",
+            name="down_payment_total",
+            field=models.DecimalField(
+                decimal_places=2,
+                default=0,
+                max_digits=10,
+                verbose_name="down payment total",
+            ),
         ),
         migrations.AlterField(
-            model_name='invoice',
-            name='down_payment_applied_to',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='down_payment_invoices', to='invoices.Invoice', verbose_name='down payment applied to'),
+            model_name="invoice",
+            name="down_payment_applied_to",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="down_payment_invoices",
+                to="invoices.Invoice",
+                verbose_name="down payment applied to",
+            ),
         ),
         migrations.AlterField(
-            model_name='invoice',
-            name='project',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='invoices', to='projects.Project', verbose_name='project'),
+            model_name="invoice",
+            name="project",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="invoices",
+                to="projects.Project",
+                verbose_name="project",
+            ),
         ),
     ]

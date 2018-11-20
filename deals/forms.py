@@ -8,25 +8,25 @@ from tools.forms import ModelForm, Picker
 
 class DealSearchForm(forms.Form):
     s = forms.ChoiceField(
-        choices=(('', _('All states')),) + Deal.STATUS_CHOICES,
+        choices=(("", _("All states")),) + Deal.STATUS_CHOICES,
         required=False,
-        widget=forms.Select(attrs={'class': 'form-control'}),
+        widget=forms.Select(attrs={"class": "form-control"}),
     )
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get('s'):
-            queryset = queryset.filter(status=data.get('s'))
+        if data.get("s"):
+            queryset = queryset.filter(status=data.get("s"))
 
         return queryset
 
 
 class DealForm(ModelForm):
-    user_fields = default_to_current_user = ('owned_by',)
+    user_fields = default_to_current_user = ("owned_by",)
 
     stage = forms.ModelChoiceField(
         queryset=Stage.objects.all(),
-        label=_('stage'),
+        label=_("stage"),
         empty_label=None,
         widget=forms.RadioSelect,
     )
@@ -34,10 +34,17 @@ class DealForm(ModelForm):
     class Meta:
         model = Deal
         fields = (
-            'customer', 'contact', 'title', 'description', 'stage',
-            'owned_by', 'estimated_value', 'status')
+            "customer",
+            "contact",
+            "title",
+            "description",
+            "stage",
+            "owned_by",
+            "estimated_value",
+            "status",
+        )
         widgets = {
-            'customer': Picker(model=Organization),
-            'contact': Picker(model=Person),
-            'status': forms.RadioSelect,
+            "customer": Picker(model=Organization),
+            "contact": Picker(model=Person),
+            "status": forms.RadioSelect,
         }

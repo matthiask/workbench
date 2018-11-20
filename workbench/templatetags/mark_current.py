@@ -7,7 +7,7 @@ register = template.Library()
 
 
 class_matcher = re.compile('(class="[^"]+)(")')
-tag_matcher = re.compile(r'<([a-z0-9]+)([ >])')
+tag_matcher = re.compile(r"<([a-z0-9]+)([ >])")
 
 
 def mark_current(navigation, current):
@@ -33,7 +33,7 @@ def mark_current(navigation, current):
         This tag works line by line. so if <li> and <a ..> are on the same
         line, both get marked.
     """
-    current_tokens = current.split('/')
+    current_tokens = current.split("/")
     tokens = []
 
     low = 1
@@ -41,22 +41,22 @@ def mark_current(navigation, current):
         low = 2
 
     for i in range(low, len(current_tokens)):
-        tokens.append(re.escape('/'.join(current_tokens[0:i]) + '/'))
+        tokens.append(re.escape("/".join(current_tokens[0:i]) + "/"))
 
-    current_matcher = re.compile('href="(' + '|'.join(tokens) + ')"')
+    current_matcher = re.compile('href="(' + "|".join(tokens) + ')"')
 
     lines = navigation.splitlines()
     out = []
     for line in lines:
         if current_matcher.search(line):
             if class_matcher.search(line):
-                out.append(class_matcher.sub(r'\1 active\2', line))
+                out.append(class_matcher.sub(r"\1 active\2", line))
             else:
                 out.append(tag_matcher.sub(r'<\1 class="active"\2', line))
         else:
             out.append(line)
 
-    return '\n'.join(out)
+    return "\n".join(out)
 
 
 def do_mark_current(parser, token):
@@ -64,9 +64,10 @@ def do_mark_current(parser, token):
         tag_name, url_variable = token.split_contents()
     except ValueError:
         raise template.TemplateSyntaxError(
-            "%r tag requires one argument" % token.contents.split()[0])
+            "%r tag requires one argument" % token.contents.split()[0]
+        )
 
-    nodelist = parser.parse(('endmark_current',))
+    nodelist = parser.parse(("endmark_current",))
     parser.delete_first_token()
     return MarkCurrentNode(nodelist, url_variable)
 
@@ -81,4 +82,4 @@ class MarkCurrentNode(template.Node):
         return mark_current(output, self.url_variable.resolve(context))
 
 
-register.tag('mark_current', do_mark_current)
+register.tag("mark_current", do_mark_current)

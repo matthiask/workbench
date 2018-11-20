@@ -9,27 +9,38 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('audit', '0001_initial'),
-    ]
+    dependencies = [("audit", "0001_initial")]
 
     operations = [
         migrations.CreateModel(
-            name='ServiceType',
+            name="ServiceType",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=40, verbose_name='title')),
-                ('billing_per_hour', models.DecimalField(decimal_places=2, max_digits=5, verbose_name='billing per hour')),
-                ('position', models.PositiveIntegerField(default=0, verbose_name='position')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=40, verbose_name="title")),
+                (
+                    "billing_per_hour",
+                    models.DecimalField(
+                        decimal_places=2, max_digits=5, verbose_name="billing per hour"
+                    ),
+                ),
+                (
+                    "position",
+                    models.PositiveIntegerField(default=0, verbose_name="position"),
+                ),
             ],
             options={
-                'verbose_name_plural': 'service types',
-                'verbose_name': 'service type',
-                'ordering': ('position', 'id'),
+                "verbose_name_plural": "service types",
+                "verbose_name": "service type",
+                "ordering": ("position", "id"),
             },
         ),
-        migrations.RunSQL(
-            "SELECT audit_audit_table('services_servicetype');",
-            ''
-        ),
+        migrations.RunSQL("SELECT audit_audit_table('services_servicetype');", ""),
     ]

@@ -20,16 +20,19 @@ class ToolsMixin(object):
 
         if self.model is not None and self.template_name_suffix is not None:
             return [
-                "%s/%s%s.html" % (
+                "%s/%s%s.html"
+                % (
                     self.model._meta.app_label,
                     self.model._meta.object_name.lower(),
-                    self.template_name_suffix
+                    self.template_name_suffix,
                 ),
                 "tools/object%s.html" % self.template_name_suffix,
             ]
 
-        msg = "'%s' must either define 'template_name' or 'model' and " \
+        msg = (
+            "'%s' must either define 'template_name' or 'model' and "
             "'template_name_suffix', or override 'get_template_names()'"
+        )
         raise ImproperlyConfigured(msg % self.__class__.__name__)
 
     @property
@@ -37,7 +40,7 @@ class ToolsMixin(object):
         return self.model._meta
 
     def get_form(self, data=None, files=None, **kwargs):
-        kwargs['request'] = self.request
+        kwargs["request"] = self.request
         cls = self.get_form_class()
         return cls(data=data, files=files, **kwargs)
 
@@ -51,11 +54,10 @@ class ListView(ToolsMixin, vanilla.ListView):
         if self.search_form_class:
             self.search_form = self.search_form_class(request.GET)
             if not self.search_form.is_valid():
-                messages.warning(
-                    request, _('Search form was invalid.'))
-                return HttpResponseRedirect('.')
+                messages.warning(request, _("Search form was invalid."))
+                return HttpResponseRedirect(".")
 
-            if hasattr(self.search_form, 'response'):
+            if hasattr(self.search_form, "response"):
                 response = self.search_form.response(request)
                 if response:
                     return response
@@ -67,10 +69,8 @@ class ListView(ToolsMixin, vanilla.ListView):
     def get_queryset(self):
         self.root_queryset = self.get_root_queryset()
 
-        q = self.request.GET.get('q')
-        queryset = (
-            self.root_queryset.search(q) if q
-            else self.root_queryset.all())
+        q = self.request.GET.get("q")
+        queryset = self.root_queryset.search(q) if q else self.root_queryset.all()
 
         if self.search_form_class:
             queryset = self.search_form.filter(queryset)
@@ -89,17 +89,15 @@ class DetailView(ToolsMixin, vanilla.DetailView):
 class CreateView(ToolsMixin, vanilla.CreateView):
     def get(self, request, *args, **kwargs):
         if not self.model.allow_create(request):
-            return redirect('../')
+            return redirect("../")
 
         form = self.get_form()
-        context = self.get_context_data(
-            form=form,
-        )
+        context = self.get_context_data(form=form)
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         if not self.model.allow_create(request):
-            return redirect('../')
+            return redirect("../")
 
         form = self.get_form(data=request.POST, files=request.FILES)
         if form.is_valid():
@@ -110,22 +108,19 @@ class CreateView(ToolsMixin, vanilla.CreateView):
         self.object = form.save()
         messages.success(
             self.request,
-            _("%(class)s '%(object)s' has been successfully created.") % {
-                'class': self.object._meta.verbose_name,
-                'object': self.object,
-            })
+            _("%(class)s '%(object)s' has been successfully created.")
+            % {"class": self.object._meta.verbose_name, "object": self.object},
+        )
 
-        if '_continue' in self.request.POST:
-            return redirect('.')
+        if "_continue" in self.request.POST:
+            return redirect(".")
         if self.request.is_ajax():
             # TODO Show messages in the popup?
-            return HttpResponse('Thanks', status=201)  # Created
+            return HttpResponse("Thanks", status=201)  # Created
         return redirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
-        kwargs.setdefault('title', _('Create %s') % (
-            self.model._meta.verbose_name,
-        ))
+        kwargs.setdefault("title", _("Create %s") % (self.model._meta.verbose_name,))
         return super().get_context_data(**kwargs)
 
 
@@ -136,9 +131,7 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
             return redirect(self.object)
 
         form = self.get_form(instance=self.object)
-        context = self.get_context_data(
-            form=form,
-        )
+        context = self.get_context_data(form=form)
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -147,9 +140,8 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
             return redirect(self.object)
 
         form = self.get_form(
-            data=request.POST,
-            files=request.FILES,
-            instance=self.object)
+            data=request.POST, files=request.FILES, instance=self.object
+        )
         if form.is_valid():
             return self.form_valid(form)
         return self.form_invalid(form)
@@ -158,18 +150,15 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
         self.object = form.save()
         messages.success(
             self.request,
-            _("%(class)s '%(object)s' has been successfully updated.") % {
-                'class': self.object._meta.verbose_name,
-                'object': self.object,
-            })
+            _("%(class)s '%(object)s' has been successfully updated.")
+            % {"class": self.object._meta.verbose_name, "object": self.object},
+        )
         if self.request.is_ajax():
-            return HttpResponse('Thanks', status=202)  # Accepted
+            return HttpResponse("Thanks", status=202)  # Accepted
         return redirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
-        kwargs.setdefault('title', _('Update %s') % (
-            self.model._meta.verbose_name,
-        ))
+        kwargs.setdefault("title", _("Update %s") % (self.model._meta.verbose_name,))
         return super().get_context_data(**kwargs)
 
 
@@ -190,21 +179,18 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
         self.object.delete()
         messages.success(
             self.request,
-            _("%(class)s '%(object)s' has been successfully deleted.") % {
-                'class': self.model._meta.verbose_name,
-                'object': self.object,
-            })
+            _("%(class)s '%(object)s' has been successfully deleted.")
+            % {"class": self.model._meta.verbose_name, "object": self.object},
+        )
         if request.is_ajax():
-            return HttpResponse('Thanks', status=204)  # No content
+            return HttpResponse("Thanks", status=204)  # No content
         return redirect(self.get_success_url())
 
     def get_success_url(self):
-        return self.model().urls.url('list')
+        return self.model().urls.url("list")
 
     def get_context_data(self, **kwargs):
-        kwargs.setdefault('title', _('Delete %s') % (
-            self.model._meta.verbose_name,
-        ))
+        kwargs.setdefault("title", _("Delete %s") % (self.model._meta.verbose_name,))
         return super().get_context_data(**kwargs)
 
 
@@ -215,9 +201,6 @@ class MessageView(vanilla.View):
 
     def get(self, request, *args, **kwargs):
         if self.message:
-            messages.add_message(
-                request,
-                self.level,
-                self.message)
+            messages.add_message(request, self.level, self.message)
 
         return redirect(self.redirect_to)

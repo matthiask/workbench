@@ -7,14 +7,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('deals', '0002_auto_20160904_1105'),
-    ]
+    dependencies = [("deals", "0002_auto_20160904_1105")]
 
     operations = [
         migrations.AlterField(
-            model_name='deal',
-            name='estimated_value',
-            field=models.DecimalField(decimal_places=2, default=None, max_digits=10, verbose_name='estimated value'),
-        ),
+            model_name="deal",
+            name="estimated_value",
+            field=models.DecimalField(
+                decimal_places=2,
+                default=None,
+                max_digits=10,
+                verbose_name="estimated value",
+            ),
+        )
     ]

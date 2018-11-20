@@ -3,13 +3,14 @@ from django.db import connections
 
 
 class Command(BaseCommand):
-    help = 'Fixes all sequences to yield non-existing keys afterwards'
+    help = "Fixes all sequences to yield non-existing keys afterwards"
 
     def handle(self, **options):
-        cursor = connections['default'].cursor()
+        cursor = connections["default"].cursor()
 
         # Thanks, https://wiki.postgresql.org/wiki/Fixing_Sequences
-        cursor.execute('''
+        cursor.execute(
+            """
 SELECT
  'SELECT SETVAL(' ||
  quote_literal(quote_ident(PGT.schemaname) || '.' || quote_ident(S.relname)) ||
@@ -27,7 +28,8 @@ WHERE S.relkind = 'S'
  AND D.refobjid = C.attrelid
  AND D.refobjsubid = C.attnum
  AND T.relname = PGT.tablename
-ORDER BY S.relname''')
+ORDER BY S.relname"""
+        )
 
         statements = list(cursor)
 

@@ -8,14 +8,14 @@ import django.utils.timezone
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('invoices', '0002_invoice_stories'),
-    ]
+    dependencies = [("invoices", "0002_invoice_stories")]
 
     operations = [
         migrations.AddField(
-            model_name='invoice',
-            name='created_at',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='created at'),
-        ),
+            model_name="invoice",
+            name="created_at",
+            field=models.DateTimeField(
+                default=django.utils.timezone.now, verbose_name="created at"
+            ),
+        )
     ]

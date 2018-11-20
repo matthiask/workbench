@@ -13,7 +13,7 @@ class _MUHelper(object):
         kw = self.kwargs
         if kwargs:
             kw = kw.copy()
-            kw['kwargs'].update(kwargs)
+            kw["kwargs"].update(kwargs)
 
         try:
             return reverse(self.viewname_pattern % item, **kw)
@@ -25,9 +25,7 @@ class _MUHelper(object):
                 raise e
 
 
-def model_urls(
-        reverse_kwargs_fn=lambda object: {'pk': object.pk},
-        default='detail'):
+def model_urls(reverse_kwargs_fn=lambda object: {"pk": object.pk}, default="detail"):
     """
     Usage::
 
@@ -38,20 +36,22 @@ def model_urls(
         instance = MyModel.objects.get(...)
         instance.urls.url('detail') == instance.get_absolute_url()
     """
+
     def _dec(cls):
         class _descriptor(object):
             def __get__(self, obj, objtype=None):
-                viewname_pattern = '%s_%s_%%s' % (
+                viewname_pattern = "%s_%s_%%s" % (
                     obj._meta.app_label,
-                    obj._meta.model_name)
-                kwargs = {'kwargs': reverse_kwargs_fn(obj)}
-                helper = obj.__dict__['urls'] = _MUHelper(
-                    viewname_pattern, kwargs)
+                    obj._meta.model_name,
+                )
+                kwargs = {"kwargs": reverse_kwargs_fn(obj)}
+                helper = obj.__dict__["urls"] = _MUHelper(viewname_pattern, kwargs)
                 return helper
 
         cls.urls = _descriptor()
         cls.get_absolute_url = lambda self: self.urls.url(default)
         return cls
+
     return _dec
 
 

@@ -7,14 +7,18 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('logbook', '0003_auto_20160924_1350'),
-    ]
+    dependencies = [("logbook", "0003_auto_20160924_1350")]
 
     operations = [
         migrations.AlterField(
-            model_name='loggedcost',
-            name='cost',
-            field=models.DecimalField(decimal_places=2, default=None, help_text='Total incl. tax for third-party costs.', max_digits=10, verbose_name='cost'),
-        ),
+            model_name="loggedcost",
+            name="cost",
+            field=models.DecimalField(
+                decimal_places=2,
+                default=None,
+                help_text="Total incl. tax for third-party costs.",
+                max_digits=10,
+                verbose_name="cost",
+            ),
+        )
     ]

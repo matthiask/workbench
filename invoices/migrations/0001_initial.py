@@ -15,47 +15,174 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('projects', '0001_initial'),
+        ("projects", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('contacts', '0001_initial'),
-        ('audit', '0001_initial'),
+        ("contacts", "0001_initial"),
+        ("audit", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Invoice',
+            name="Invoice",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('subtotal', models.DecimalField(decimal_places=2, default=0, max_digits=10, verbose_name='subtotal')),
-                ('discount', models.DecimalField(decimal_places=2, default=0, max_digits=10, verbose_name='discount')),
-                ('tax_rate', models.DecimalField(decimal_places=2, default=8, max_digits=10, verbose_name='tax rate')),
-                ('total', models.DecimalField(decimal_places=2, default=0, max_digits=10, verbose_name='total')),
-                ('invoiced_on', models.DateField(blank=True, null=True, verbose_name='invoiced on')),
-                ('due_on', models.DateField(blank=True, null=True, verbose_name='due on')),
-                ('closed_at', models.DateTimeField(blank=True, null=True, verbose_name='closed at')),
-                ('title', models.CharField(max_length=200, verbose_name='title')),
-                ('description', models.TextField(blank=True, verbose_name='description')),
-                ('status', models.PositiveIntegerField(choices=[(10, 'In preparation'), (20, 'Sent'), (30, 'Reminded'), (40, 'Paid'), (50, 'Canceled'), (60, 'Replaced')], default=10, verbose_name='status')),
-                ('type', models.CharField(choices=[('fixed', 'Fixed amount'), ('services', 'Services'), ('down-payment', 'Down payment')], max_length=20, verbose_name='type')),
-                ('postal_address', models.TextField(blank=True, verbose_name='postal address')),
-                ('story_data', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True, verbose_name='stories')),
-                ('contact', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='contacts.Person', verbose_name='contact')),
-                ('customer', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='contacts.Organization', verbose_name='customer')),
-                ('down_payment_applied_to', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='+', to='invoices.Invoice', verbose_name='down payment applied to')),
-                ('owned_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to=settings.AUTH_USER_MODEL, verbose_name='owned by')),
-                ('project', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='+', to='projects.Project', verbose_name='project')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "subtotal",
+                    models.DecimalField(
+                        decimal_places=2,
+                        default=0,
+                        max_digits=10,
+                        verbose_name="subtotal",
+                    ),
+                ),
+                (
+                    "discount",
+                    models.DecimalField(
+                        decimal_places=2,
+                        default=0,
+                        max_digits=10,
+                        verbose_name="discount",
+                    ),
+                ),
+                (
+                    "tax_rate",
+                    models.DecimalField(
+                        decimal_places=2,
+                        default=8,
+                        max_digits=10,
+                        verbose_name="tax rate",
+                    ),
+                ),
+                (
+                    "total",
+                    models.DecimalField(
+                        decimal_places=2, default=0, max_digits=10, verbose_name="total"
+                    ),
+                ),
+                (
+                    "invoiced_on",
+                    models.DateField(blank=True, null=True, verbose_name="invoiced on"),
+                ),
+                (
+                    "due_on",
+                    models.DateField(blank=True, null=True, verbose_name="due on"),
+                ),
+                (
+                    "closed_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="closed at"
+                    ),
+                ),
+                ("title", models.CharField(max_length=200, verbose_name="title")),
+                (
+                    "description",
+                    models.TextField(blank=True, verbose_name="description"),
+                ),
+                (
+                    "status",
+                    models.PositiveIntegerField(
+                        choices=[
+                            (10, "In preparation"),
+                            (20, "Sent"),
+                            (30, "Reminded"),
+                            (40, "Paid"),
+                            (50, "Canceled"),
+                            (60, "Replaced"),
+                        ],
+                        default=10,
+                        verbose_name="status",
+                    ),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            ("fixed", "Fixed amount"),
+                            ("services", "Services"),
+                            ("down-payment", "Down payment"),
+                        ],
+                        max_length=20,
+                        verbose_name="type",
+                    ),
+                ),
+                (
+                    "postal_address",
+                    models.TextField(blank=True, verbose_name="postal address"),
+                ),
+                (
+                    "story_data",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True, null=True, verbose_name="stories"
+                    ),
+                ),
+                (
+                    "contact",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to="contacts.Person",
+                        verbose_name="contact",
+                    ),
+                ),
+                (
+                    "customer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to="contacts.Organization",
+                        verbose_name="customer",
+                    ),
+                ),
+                (
+                    "down_payment_applied_to",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to="invoices.Invoice",
+                        verbose_name="down payment applied to",
+                    ),
+                ),
+                (
+                    "owned_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="owned by",
+                    ),
+                ),
+                (
+                    "project",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to="projects.Project",
+                        verbose_name="project",
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'invoices',
-                'verbose_name': 'invoice',
-                'ordering': ('-id',),
+                "verbose_name_plural": "invoices",
+                "verbose_name": "invoice",
+                "ordering": ("-id",),
             },
         ),
-        migrations.RunSQL(*migration_sql(
-            'invoices_invoice', 'title, description, postal_address'
-        )),
         migrations.RunSQL(
-            "SELECT audit_audit_table('invoices_invoice');",
-            '',
+            *migration_sql("invoices_invoice", "title, description, postal_address")
         ),
+        migrations.RunSQL("SELECT audit_audit_table('invoices_invoice');", ""),
     ]

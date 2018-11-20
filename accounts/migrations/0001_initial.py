@@ -9,28 +9,60 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('audit', '0001_initial'),
-    ]
+    dependencies = [("audit", "0001_initial")]
 
     operations = [
         migrations.CreateModel(
-            name='User',
+            name="User",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('password', models.CharField(max_length=128, verbose_name='password')),
-                ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('email', models.EmailField(max_length=254, unique=True, verbose_name='email')),
-                ('is_active', models.BooleanField(default=True, verbose_name='is active')),
-                ('is_admin', models.BooleanField(default=False, verbose_name='is admin')),
-                ('date_of_birth', models.DateField(verbose_name='date of birth')),
-                ('_short_name', models.CharField(blank=True, max_length=30, verbose_name='short name')),
-                ('_full_name', models.CharField(blank=True, max_length=200, verbose_name='full name')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("password", models.CharField(max_length=128, verbose_name="password")),
+                (
+                    "last_login",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="last login"
+                    ),
+                ),
+                (
+                    "email",
+                    models.EmailField(
+                        max_length=254, unique=True, verbose_name="email"
+                    ),
+                ),
+                (
+                    "is_active",
+                    models.BooleanField(default=True, verbose_name="is active"),
+                ),
+                (
+                    "is_admin",
+                    models.BooleanField(default=False, verbose_name="is admin"),
+                ),
+                ("date_of_birth", models.DateField(verbose_name="date of birth")),
+                (
+                    "_short_name",
+                    models.CharField(
+                        blank=True, max_length=30, verbose_name="short name"
+                    ),
+                ),
+                (
+                    "_full_name",
+                    models.CharField(
+                        blank=True, max_length=200, verbose_name="full name"
+                    ),
+                ),
             ],
             options={
-                'ordering': ('_full_name',),
-                'verbose_name_plural': 'users',
-                'verbose_name': 'user',
+                "ordering": ("_full_name",),
+                "verbose_name_plural": "users",
+                "verbose_name": "user",
             },
         ),
         migrations.RunSQL("SELECT audit_audit_table('accounts_user')"),

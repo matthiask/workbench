@@ -16,51 +16,103 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('audit', '0001_initial'),
+        ("audit", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Deal',
+            name="Deal",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200, verbose_name='title')),
-                ('description', models.TextField(blank=True, verbose_name='description')),
-                ('estimated_value', models.DecimalField(decimal_places=2, max_digits=10, verbose_name='estimated value')),
-                ('status', models.PositiveIntegerField(choices=[(10, 'open'), (20, 'accepted'), (30, 'declined')], default=10, verbose_name='status')),
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now, verbose_name='created at')),
-                ('closed_at', models.DateTimeField(blank=True, null=True, verbose_name='closed at')),
-                ('owned_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to=settings.AUTH_USER_MODEL, verbose_name='owned by')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200, verbose_name="title")),
+                (
+                    "description",
+                    models.TextField(blank=True, verbose_name="description"),
+                ),
+                (
+                    "estimated_value",
+                    models.DecimalField(
+                        decimal_places=2, max_digits=10, verbose_name="estimated value"
+                    ),
+                ),
+                (
+                    "status",
+                    models.PositiveIntegerField(
+                        choices=[(10, "open"), (20, "accepted"), (30, "declined")],
+                        default=10,
+                        verbose_name="status",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="created at"
+                    ),
+                ),
+                (
+                    "closed_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="closed at"
+                    ),
+                ),
+                (
+                    "owned_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="owned by",
+                    ),
+                ),
             ],
-            options={
-                'verbose_name_plural': 'deals',
-                'verbose_name': 'deal',
-            },
+            options={"verbose_name_plural": "deals", "verbose_name": "deal"},
         ),
         migrations.CreateModel(
-            name='Stage',
+            name="Stage",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200, verbose_name='title')),
-                ('position', models.PositiveIntegerField(default=0, verbose_name='position')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200, verbose_name="title")),
+                (
+                    "position",
+                    models.PositiveIntegerField(default=0, verbose_name="position"),
+                ),
             ],
             options={
-                'verbose_name_plural': 'stages',
-                'verbose_name': 'stage',
-                'ordering': ('position', 'id'),
+                "verbose_name_plural": "stages",
+                "verbose_name": "stage",
+                "ordering": ("position", "id"),
             },
         ),
         migrations.AddField(
-            model_name='deal',
-            name='stage',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='deals', to='deals.Stage', verbose_name='stage'),
+            model_name="deal",
+            name="stage",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="deals",
+                to="deals.Stage",
+                verbose_name="stage",
+            ),
         ),
-        migrations.RunSQL(*migration_sql(
-            'deals_deal', 'title, description'
-        )),
+        migrations.RunSQL(*migration_sql("deals_deal", "title, description")),
         migrations.RunSQL(
             "SELECT audit_audit_table('deals_deal');"
             "SELECT audit_audit_table('deals_stage');",
-            ''
+            "",
         ),
     ]

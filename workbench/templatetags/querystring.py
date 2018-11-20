@@ -9,23 +9,23 @@ register = template.Library()
 
 
 @register.filter
-def querystring(data, exclude='page,all'):
+def querystring(data, exclude="page,all"):
     """
     Returns the current querystring, excluding specified GET parameters::
 
         {% request.GET|querystring:"page,all" %}
     """
 
-    exclude = exclude.split(',')
+    exclude = exclude.split(",")
 
     items = reduce(
         operator.add,
         (
             list((k, v) for v in values)
-            for k, values
-            in data.lists()
+            for k, values in data.lists()
             if k not in exclude
         ),
-        [])
+        [],
+    )
 
     return urlencode(sorted(items))

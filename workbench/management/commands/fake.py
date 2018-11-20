@@ -11,8 +11,8 @@ from projects.models import Project, Task
 
 class Command(BaseCommand):
     def handle(self, **options):
-        set_user_name('Faker')
-        f = faker.Factory.create('de')
+        set_user_name("Faker")
+        f = faker.Factory.create("de")
 
         contact = Person.objects.filter(organization__isnull=False).first()
         owned_by = User.objects.first()
@@ -31,13 +31,10 @@ class Command(BaseCommand):
                 project=project,
                 created_by=owned_by,
                 title=f.name(),
-                type=random.choice(('task', 'bug', 'enhancement', 'question')),
+                type=random.choice(("task", "bug", "enhancement", "question")),
                 priority=random.choice((20, 30, 40, 50)),
                 owned_by=random.choice((owned_by, None)),
             )
 
             for i in range(random.randint(0, 5)):
-                task.comments.create(
-                    created_by=owned_by,
-                    notes=f.text(),
-                )
+                task.comments.create(created_by=owned_by, notes=f.text())

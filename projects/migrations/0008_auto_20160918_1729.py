@@ -7,18 +7,20 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('projects', '0007_auto_20160918_1621'),
-    ]
+    dependencies = [("projects", "0007_auto_20160918_1621")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='task',
-            options={'ordering': ('-priority', 'position', 'pk'), 'verbose_name': 'task', 'verbose_name_plural': 'tasks'},
+            name="task",
+            options={
+                "ordering": ("-priority", "position", "pk"),
+                "verbose_name": "task",
+                "verbose_name_plural": "tasks",
+            },
         ),
         migrations.AddField(
-            model_name='task',
-            name='position',
-            field=models.PositiveIntegerField(default=0, verbose_name='position'),
+            model_name="task",
+            name="position",
+            field=models.PositiveIntegerField(default=0, verbose_name="position"),
         ),
     ]

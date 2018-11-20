@@ -7,26 +7,34 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('offers', '0004_auto_20160918_1035'),
-    ]
+    dependencies = [("offers", "0004_auto_20160918_1035")]
 
     operations = [
         migrations.AddField(
-            model_name='service',
-            name='approved_hours',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=5, null=True, verbose_name='approved hours'),
+            model_name="service",
+            name="approved_hours",
+            field=models.DecimalField(
+                blank=True,
+                decimal_places=2,
+                max_digits=5,
+                null=True,
+                verbose_name="approved hours",
+            ),
         ),
         migrations.AddField(
-            model_name='service',
-            name='cost',
-            field=models.DecimalField(decimal_places=2, default=0, max_digits=10, verbose_name='cost'),
+            model_name="service",
+            name="cost",
+            field=models.DecimalField(
+                decimal_places=2, default=0, max_digits=10, verbose_name="cost"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='service',
-            name='effort_hours',
-            field=models.DecimalField(decimal_places=2, default=0, max_digits=5, verbose_name='effort hours'),
+            model_name="service",
+            name="effort_hours",
+            field=models.DecimalField(
+                decimal_places=2, default=0, max_digits=5, verbose_name="effort hours"
+            ),
             preserve_default=False,
         ),
     ]

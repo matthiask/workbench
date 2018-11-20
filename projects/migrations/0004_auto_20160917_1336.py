@@ -8,18 +8,13 @@ from tools.search import migration_sql
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('projects', '0003_auto_20160917_1324'),
-    ]
+    dependencies = [("projects", "0003_auto_20160917_1324")]
 
     operations = [
         migrations.RunSQL(
             "SELECT audit_audit_table('projects_task');"
             "SELECT audit_audit_table('projects_comment');",
-            '',
+            "",
         ),
-        migrations.RunSQL(*migration_sql(
-            'projects_task',
-            'title, description',
-        )),
+        migrations.RunSQL(*migration_sql("projects_task", "title, description")),
     ]

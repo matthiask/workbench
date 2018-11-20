@@ -28,31 +28,29 @@ class CreateServiceView(CreateView):
 
     def get(self, request, *args, **kwargs):
         if not self.model.allow_create(request):
-            return redirect('../')
+            return redirect("../")
 
-        self.offer = get_object_or_404(Offer, pk=self.kwargs['pk'])
+        self.offer = get_object_or_404(Offer, pk=self.kwargs["pk"])
         if self.offer.status > Offer.IN_PREPARATION:
-            messages.error(request, _(
-                'Cannot modify an offer which is not in preparation anymore.'
-            ))
-            return redirect('../')
+            messages.error(
+                request,
+                _("Cannot modify an offer which is not in preparation anymore."),
+            )
+            return redirect("../")
 
         form = self.get_form()
         context = self.get_context_data(form=form)
         return self.render_to_response(context)
 
     def get_form(self, data=None, files=None, **kwargs):
-        if not hasattr(self, 'offer'):
-            self.offer = get_object_or_404(Offer, pk=self.kwargs['pk'])
+        if not hasattr(self, "offer"):
+            self.offer = get_object_or_404(Offer, pk=self.kwargs["pk"])
         return ServiceForm(
-            data,
-            files,
-            offer=self.offer,
-            request=self.request,
-            **kwargs)
+            data, files, offer=self.offer, request=self.request, **kwargs
+        )
 
     def get_success_url(self):
-        return self.object.urls.url('update')
+        return self.object.urls.url("update")
 
 
 class UpdateServiceView(UpdateView):
@@ -78,17 +76,17 @@ class MoveServiceView(DetailView):
         if not self.model.allow_update(self.object, request):
             return redirect(self.object.offer)
         if self.object.offer.status > Offer.IN_PREPARATION:
-            messages.error(request, _(
-                'Cannot modify an offer which is not in preparation anymore.'
-            ))
+            messages.error(
+                request,
+                _("Cannot modify an offer which is not in preparation anymore."),
+            )
             return redirect(self.object.offer)
 
-        pks = list(
-            self.object.offer.services.values_list('id', flat=True))
+        pks = list(self.object.offer.services.values_list("id", flat=True))
         index = pks.index(self.object.pk)
-        if 'up' in request.GET and index > 0:
+        if "up" in request.GET and index > 0:
             pks[index], pks[index - 1] = pks[index - 1], pks[index]
-        elif 'down' in request.GET and index < len(pks) - 1:
+        elif "down" in request.GET and index < len(pks) - 1:
             pks[index], pks[index + 1] = pks[index + 1], pks[index]
 
         for index, pk in enumerate(pks):

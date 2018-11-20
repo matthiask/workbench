@@ -17,36 +17,93 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('invoices', '0003_invoice_created_at'),
-        ('projects', '0004_auto_20160917_1336'),
+        ("invoices", "0003_invoice_created_at"),
+        ("projects", "0004_auto_20160917_1336"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='LoggedHours',
+            name="LoggedHours",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now, verbose_name='created at')),
-                ('rendered_on', models.DateField(default=datetime.date.today, verbose_name='rendered on')),
-                ('hours', models.DecimalField(decimal_places=2, max_digits=5, verbose_name='hours')),
-                ('description', models.TextField(verbose_name='description')),
-                ('archived_at', models.DateTimeField(blank=True, null=True, verbose_name='archived at')),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to=settings.AUTH_USER_MODEL, verbose_name='created by')),
-                ('invoice', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='+', to='invoices.Invoice', verbose_name='invoice')),
-                ('rendered_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='loggedhours', to=settings.AUTH_USER_MODEL, verbose_name='rendered by')),
-                ('task', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='loggedhours', to='projects.Task', verbose_name='task')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="created at"
+                    ),
+                ),
+                (
+                    "rendered_on",
+                    models.DateField(
+                        default=datetime.date.today, verbose_name="rendered on"
+                    ),
+                ),
+                (
+                    "hours",
+                    models.DecimalField(
+                        decimal_places=2, max_digits=5, verbose_name="hours"
+                    ),
+                ),
+                ("description", models.TextField(verbose_name="description")),
+                (
+                    "archived_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="archived at"
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="created by",
+                    ),
+                ),
+                (
+                    "invoice",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to="invoices.Invoice",
+                        verbose_name="invoice",
+                    ),
+                ),
+                (
+                    "rendered_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="loggedhours",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="rendered by",
+                    ),
+                ),
+                (
+                    "task",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="loggedhours",
+                        to="projects.Task",
+                        verbose_name="task",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'logged hours',
-                'verbose_name_plural': 'logged hours',
-                'ordering': ('-rendered_on', '-created_at'),
+                "verbose_name": "logged hours",
+                "verbose_name_plural": "logged hours",
+                "ordering": ("-rendered_on", "-created_at"),
             },
         ),
-
-        migrations.RunSQL(*migration_sql(
-            'logbook_loggedhours', 'description',
-        )),
-        migrations.RunSQL(
-            "SELECT audit_audit_table('logbook_loggedhours');",
-        ),
+        migrations.RunSQL(*migration_sql("logbook_loggedhours", "description")),
+        migrations.RunSQL("SELECT audit_audit_table('logbook_loggedhours');"),
     ]

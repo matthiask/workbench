@@ -7,14 +7,12 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('offers', '0002_auto_20160917_2027'),
-    ]
+    dependencies = [("offers", "0002_auto_20160917_2027")]
 
     operations = [
         migrations.RunSQL(
             "SELECT audit_audit_table('offers_service');"
             "SELECT audit_audit_table('offers_effort');"
-            "SELECT audit_audit_table('offers_cost');",
-        ),
+            "SELECT audit_audit_table('offers_cost');"
+        )
     ]

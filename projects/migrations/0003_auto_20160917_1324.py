@@ -12,63 +12,209 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('projects', '0002_auto_20160828_0959'),
+        ("projects", "0002_auto_20160828_0959"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Attachment',
+            name="Attachment",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now, verbose_name='created at')),
-                ('title', models.CharField(blank=True, max_length=200, verbose_name='title')),
-                ('file', models.FileField(upload_to='attachments/%Y/%m', verbose_name='file')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="created at"
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(blank=True, max_length=200, verbose_name="title"),
+                ),
+                (
+                    "file",
+                    models.FileField(
+                        upload_to="attachments/%Y/%m", verbose_name="file"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'attachment',
-                'verbose_name_plural': 'attachments',
-                'ordering': ('created_at',),
+                "verbose_name": "attachment",
+                "verbose_name_plural": "attachments",
+                "ordering": ("created_at",),
             },
         ),
         migrations.CreateModel(
-            name='Comment',
+            name="Comment",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now, verbose_name='created at')),
-                ('notes', models.TextField(verbose_name='notes')),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to=settings.AUTH_USER_MODEL, verbose_name='created by')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="created at"
+                    ),
+                ),
+                ("notes", models.TextField(verbose_name="notes")),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="created by",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Task',
+            name="Task",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now, verbose_name='created at')),
-                ('title', models.CharField(max_length=200, verbose_name='title')),
-                ('description', models.TextField(blank=True, verbose_name='description')),
-                ('type', models.CharField(choices=[('task', 'Task'), ('bug', 'Bug'), ('enhancement', 'Enhancement'), ('question', 'Question')], default='task', max_length=20, verbose_name='type')),
-                ('priority', models.PositiveIntegerField(choices=[(50, 'Blocker'), (40, 'High'), (30, 'Normal'), (20, 'Low')], default=30, verbose_name='priority')),
-                ('status', models.PositiveIntegerField(choices=[(10, 'Inbox'), (20, 'Backlog'), (30, 'In progress'), (40, 'Ready for test'), (50, 'Done'), (60, 'Archived')], default=10, verbose_name='status')),
-                ('closed_at', models.DateTimeField(blank=True, null=True, verbose_name='accepted at')),
-                ('due_on', models.DateField(blank=True, help_text='This field should be left empty most of the time.', null=True, verbose_name='due on')),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to=settings.AUTH_USER_MODEL, verbose_name='created by')),
-                ('owned_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='+', to=settings.AUTH_USER_MODEL, verbose_name='owned by')),
-                ('project', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='tasks', to='projects.Project', verbose_name='project')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="created at"
+                    ),
+                ),
+                ("title", models.CharField(max_length=200, verbose_name="title")),
+                (
+                    "description",
+                    models.TextField(blank=True, verbose_name="description"),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            ("task", "Task"),
+                            ("bug", "Bug"),
+                            ("enhancement", "Enhancement"),
+                            ("question", "Question"),
+                        ],
+                        default="task",
+                        max_length=20,
+                        verbose_name="type",
+                    ),
+                ),
+                (
+                    "priority",
+                    models.PositiveIntegerField(
+                        choices=[
+                            (50, "Blocker"),
+                            (40, "High"),
+                            (30, "Normal"),
+                            (20, "Low"),
+                        ],
+                        default=30,
+                        verbose_name="priority",
+                    ),
+                ),
+                (
+                    "status",
+                    models.PositiveIntegerField(
+                        choices=[
+                            (10, "Inbox"),
+                            (20, "Backlog"),
+                            (30, "In progress"),
+                            (40, "Ready for test"),
+                            (50, "Done"),
+                            (60, "Archived"),
+                        ],
+                        default=10,
+                        verbose_name="status",
+                    ),
+                ),
+                (
+                    "closed_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="accepted at"
+                    ),
+                ),
+                (
+                    "due_on",
+                    models.DateField(
+                        blank=True,
+                        help_text="This field should be left empty most of the time.",
+                        null=True,
+                        verbose_name="due on",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="created by",
+                    ),
+                ),
+                (
+                    "owned_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="owned by",
+                    ),
+                ),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="tasks",
+                        to="projects.Project",
+                        verbose_name="project",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'task',
-                'verbose_name_plural': 'task',
-                'ordering': ('-priority', 'pk'),
+                "verbose_name": "task",
+                "verbose_name_plural": "task",
+                "ordering": ("-priority", "pk"),
             },
         ),
         migrations.AddField(
-            model_name='comment',
-            name='task',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='projects.Task', verbose_name='task'),
+            model_name="comment",
+            name="task",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="comments",
+                to="projects.Task",
+                verbose_name="task",
+            ),
         ),
         migrations.AddField(
-            model_name='attachment',
-            name='task',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='attachments', to='projects.Task', verbose_name='task'),
+            model_name="attachment",
+            name="task",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="attachments",
+                to="projects.Task",
+                verbose_name="task",
+            ),
         ),
     ]

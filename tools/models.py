@@ -42,21 +42,22 @@ class Model(models.Model):
                 ugettext(
                     "Cannot delete '%(object)s'"
                     " because of related objects (%(related)s)."
-                ) % {
-                    'object': instance,
-                    'related': ', '.join(
-                        str(o) for o in exc.protected_objects[:10]),
-                })
+                )
+                % {
+                    "object": instance,
+                    "related": ", ".join(str(o) for o in exc.protected_objects[:10]),
+                },
+            )
             return False
         else:
             return True
 
     def css(self):
-        return ''
+        return ""
 
     @property
     def code(self):
-        return '%05d' % self.pk if self.pk else ''
+        return "%05d" % self.pk if self.pk else ""
 
     def pretty_status(self):
         return self.get_status_display()
@@ -65,45 +66,37 @@ class Model(models.Model):
         opts = self._meta
         return render_to_string(
             [
-                '%s/%s_snippet.html' % (
-                    opts.app_label,
-                    opts.model_name.lower()),
-                'tools/object_snippet.html',
+                "%s/%s_snippet.html" % (opts.app_label, opts.model_name.lower()),
+                "tools/object_snippet.html",
             ],
             {
-                'object': self,
+                "object": self,
                 opts.model_name.lower(): self,
-                'verbose_name': opts.verbose_name,
+                "verbose_name": opts.verbose_name,
             },
         )
 
 
 MoneyField = partial(
-    models.DecimalField,
-    max_digits=10,
-    decimal_places=2,
-    default=Decimal('0'),
+    models.DecimalField, max_digits=10, decimal_places=2, default=Decimal("0")
 )
 
 
-HoursField = partial(
-    models.DecimalField,
-    max_digits=5,
-    decimal_places=2,
-)
+HoursField = partial(models.DecimalField, max_digits=5, decimal_places=2)
 
 
 class ModelWithTotal(Model):
-    subtotal = MoneyField(_('subtotal'))
-    discount = MoneyField(_('discount'))
+    subtotal = MoneyField(_("subtotal"))
+    discount = MoneyField(_("discount"))
     liable_to_vat = models.BooleanField(
-        _('liable to VAT'), default=True,
+        _("liable to VAT"),
+        default=True,
         help_text=_(
-            'For example invoices to foreign institutions are not'
-            ' liable to VAT.'
-        ))
-    tax_rate = MoneyField(_('tax rate'), default=Decimal('7.7'))
-    total = MoneyField(_('total'))
+            "For example invoices to foreign institutions are not" " liable to VAT."
+        ),
+    )
+    tax_rate = MoneyField(_("tax rate"), default=Decimal("7.7"))
+    total = MoneyField(_("total"))
 
     class Meta:
         abstract = True
@@ -121,13 +114,15 @@ class ModelWithTotal(Model):
         self.total = self._round_5cents(self.total)
 
     def _round_5cents(self, value):
-        return (value / 5).quantize(Decimal('0.00')) * 5
+        return (value / 5).quantize(Decimal("0.00")) * 5
 
     @property
     def tax_amount(self):
         return (
             self.total_excl_tax * self.tax_rate / 100
-            if self.liable_to_vat else Decimal())
+            if self.liable_to_vat
+            else Decimal()
+        )
 
     @property
     def total_excl_tax(self):

@@ -9,11 +9,10 @@ class ServiceInline(admin.TabularInline):
 
 
 class OfferAdmin(admin.ModelAdmin):
-    list_display = (
-        'project', 'title', 'offered_on', 'owned_by', 'status', 'total')
-    list_filter = ('status',)
+    list_display = ("project", "title", "offered_on", "owned_by", "status", "total")
+    list_filter = ("status",)
     inlines = [ServiceInline]
-    raw_id_fields = ('project',)
+    raw_id_fields = ("project",)
 
 
 class EffortInline(admin.TabularInline):
@@ -28,8 +27,14 @@ class CostInline(admin.TabularInline):
 
 class ServiceAdmin(admin.ModelAdmin):
     list_display = (
-        'offer', 'title', 'description', 'position',
-        'effort_hours', 'cost', 'approved_hours')
+        "offer",
+        "title",
+        "description",
+        "position",
+        "effort_hours",
+        "cost",
+        "approved_hours",
+    )
     inlines = [EffortInline, CostInline]
 
 

@@ -7,13 +7,15 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('projects', '0006_auto_20160918_1035'),
-    ]
+    dependencies = [("projects", "0006_auto_20160918_1035")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='task',
-            options={'ordering': ('-priority', 'pk'), 'verbose_name': 'task', 'verbose_name_plural': 'tasks'},
-        ),
+            name="task",
+            options={
+                "ordering": ("-priority", "pk"),
+                "verbose_name": "task",
+                "verbose_name_plural": "tasks",
+            },
+        )
     ]

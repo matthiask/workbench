@@ -9,35 +9,22 @@ from accounts.models import User
 class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = (
-            'email', '_short_name', '_full_name', 'is_active', 'is_admin'
-        )
+        fields = ("email", "_short_name", "_full_name", "is_active", "is_admin")
 
 
 class UserAdmin(UserAdmin):
     form = UserChangeForm
     add_form = UserChangeForm
 
-    list_display = (
-        'email', '_short_name', '_full_name', 'is_active', 'is_admin')
-    list_filter = ('is_active', 'is_admin')
+    list_display = ("email", "_short_name", "_full_name", "is_active", "is_admin")
+    list_filter = ("is_active", "is_admin")
     fieldsets = (
-        (None, {
-            'fields': (
-                'email',
-                ('is_active', 'is_admin'),
-            ),
-        }),
-        ('Personal info', {
-            'fields': (
-                '_short_name',
-                '_full_name',
-            ),
-        }),
+        (None, {"fields": ("email", ("is_active", "is_admin"))}),
+        ("Personal info", {"fields": ("_short_name", "_full_name")}),
     )
     add_fieldsets = fieldsets
-    search_fields = ('email', '_short_name', '_full_name')
-    ordering = ('email',)
+    search_fields = ("email", "_short_name", "_full_name")
+    ordering = ("email",)
     filter_horizontal = ()
 
 

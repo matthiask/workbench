@@ -16,53 +16,140 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('contacts', '0001_initial'),
-        ('audit', '0001_initial'),
+        ("contacts", "0001_initial"),
+        ("audit", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Project',
+            name="Project",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200, verbose_name='title')),
-                ('description', models.TextField(blank=True, verbose_name='description')),
-                ('status', models.PositiveIntegerField(choices=[(10, 'Acquisition'), (20, 'Work in progress'), (30, 'Finished'), (40, 'Declined')], default=10, verbose_name='status')),
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now, verbose_name='created at')),
-                ('invoicing', models.BooleanField(default=True, help_text='This project is eligible for invoicing.', verbose_name='invoicing')),
-                ('maintenance', models.BooleanField(default=False, help_text='This project is used for maintenance work.', verbose_name='maintenance')),
-                ('contact', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='contacts.Person', verbose_name='contact')),
-                ('customer', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='contacts.Organization', verbose_name='customer')),
-                ('owned_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to=settings.AUTH_USER_MODEL, verbose_name='owned by')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200, verbose_name="title")),
+                (
+                    "description",
+                    models.TextField(blank=True, verbose_name="description"),
+                ),
+                (
+                    "status",
+                    models.PositiveIntegerField(
+                        choices=[
+                            (10, "Acquisition"),
+                            (20, "Work in progress"),
+                            (30, "Finished"),
+                            (40, "Declined"),
+                        ],
+                        default=10,
+                        verbose_name="status",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="created at"
+                    ),
+                ),
+                (
+                    "invoicing",
+                    models.BooleanField(
+                        default=True,
+                        help_text="This project is eligible for invoicing.",
+                        verbose_name="invoicing",
+                    ),
+                ),
+                (
+                    "maintenance",
+                    models.BooleanField(
+                        default=False,
+                        help_text="This project is used for maintenance work.",
+                        verbose_name="maintenance",
+                    ),
+                ),
+                (
+                    "contact",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to="contacts.Person",
+                        verbose_name="contact",
+                    ),
+                ),
+                (
+                    "customer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to="contacts.Organization",
+                        verbose_name="customer",
+                    ),
+                ),
+                (
+                    "owned_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="owned by",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'project',
-                'verbose_name_plural': 'projects',
-                'ordering': ('-id',),
+                "verbose_name": "project",
+                "verbose_name_plural": "projects",
+                "ordering": ("-id",),
             },
         ),
         migrations.CreateModel(
-            name='Release',
+            name="Release",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200, verbose_name='title')),
-                ('is_default', models.BooleanField(default=False, verbose_name='is default')),
-                ('position', models.PositiveIntegerField(default=0, verbose_name='position')),
-                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='releases', to='projects.Project', verbose_name='project')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200, verbose_name="title")),
+                (
+                    "is_default",
+                    models.BooleanField(default=False, verbose_name="is default"),
+                ),
+                (
+                    "position",
+                    models.PositiveIntegerField(default=0, verbose_name="position"),
+                ),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="releases",
+                        to="projects.Project",
+                        verbose_name="project",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'release',
-                'verbose_name_plural': 'releases',
-                'ordering': ('position', 'id'),
+                "verbose_name": "release",
+                "verbose_name_plural": "releases",
+                "ordering": ("position", "id"),
             },
         ),
         migrations.RunSQL(
             "SELECT audit_audit_table('projects_project');"
             "SELECT audit_audit_table('projects_release');",
-            '',
+            "",
         ),
-        migrations.RunSQL(*migration_sql(
-            'projects_project',
-            'title, description',
-        )),
+        migrations.RunSQL(*migration_sql("projects_project", "title, description")),
     ]

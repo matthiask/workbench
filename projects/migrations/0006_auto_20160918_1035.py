@@ -7,19 +7,27 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('projects', '0005_task_service'),
-    ]
+    dependencies = [("projects", "0005_task_service")]
 
     operations = [
         migrations.AlterField(
-            model_name='task',
-            name='closed_at',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='closed at'),
+            model_name="task",
+            name="closed_at",
+            field=models.DateTimeField(blank=True, null=True, verbose_name="closed at"),
         ),
         migrations.AlterField(
-            model_name='task',
-            name='status',
-            field=models.PositiveIntegerField(choices=[(10, 'Inbox'), (20, 'Backlog'), (30, 'In progress'), (40, 'Ready for test'), (50, 'Done')], default=10, verbose_name='status'),
+            model_name="task",
+            name="status",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (10, "Inbox"),
+                    (20, "Backlog"),
+                    (30, "In progress"),
+                    (40, "Ready for test"),
+                    (50, "Done"),
+                ],
+                default=10,
+                verbose_name="status",
+            ),
         ),
     ]

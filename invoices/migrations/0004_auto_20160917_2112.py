@@ -7,13 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('invoices', '0003_invoice_created_at'),
-    ]
+    dependencies = [("invoices", "0003_invoice_created_at")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='invoice',
-            name='story_data',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="invoice", name="story_data")]

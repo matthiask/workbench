@@ -24,7 +24,7 @@ look like this::
 
 
 def migration_sql(table, fields):
-    FORWARD_SQL = '''
+    FORWARD_SQL = """
 CREATE FUNCTION {table}_fts_document(integer) RETURNS tsvector AS $$
 DECLARE
  {table}_document TEXT;
@@ -52,16 +52,16 @@ CREATE TRIGGER {table}_fts_update_trigger BEFORE UPDATE ON {table}
 CREATE TRIGGER {table}_fts_insert_trigger BEFORE INSERT ON {table}
  FOR EACH ROW EXECUTE PROCEDURE {table}_fts_document_trigger();
 CREATE INDEX {table}_fts_index ON {table} USING gin(fts_document);
-    '''
+    """
 
-    BACKWARD_SQL = '''
+    BACKWARD_SQL = """
 DROP INDEX {table}_fts_index;
 ALTER TABLE {table} DROP COLUMN fts_document;
 DROP TRIGGER {table}_fts_update_trigger ON {table};
 DROP TRIGGER {table}_fts_insert_trigger ON {table};
 DROP FUNCTION {table}_fts_document (integer);
 DROP FUNCTION {table}_fts_document_trigger ();
-    '''
+    """
 
     return (
         FORWARD_SQL.format(table=table, fields=fields),
@@ -74,10 +74,9 @@ def search(queryset, terms):
         return queryset
     return queryset.extra(
         where=[
-            '%s.fts_document'
-            ' @@ plainto_tsquery(\'pg_catalog.german\', unaccent(%%s))' % (
-                queryset.model._meta.db_table,
-            ),
+            "%s.fts_document"
+            " @@ plainto_tsquery('pg_catalog.german', unaccent(%%s))"
+            % (queryset.model._meta.db_table,)
         ],
         params=[terms],
     )

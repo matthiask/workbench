@@ -9,79 +9,140 @@ import django.utils.timezone
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('services', '0001_initial'),
-        ('offers', '0001_initial'),
-    ]
+    dependencies = [("services", "0001_initial"), ("offers", "0001_initial")]
 
     operations = [
         migrations.CreateModel(
-            name='Cost',
+            name="Cost",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200, verbose_name='title')),
-                ('cost', models.DecimalField(decimal_places=2, max_digits=10, verbose_name='cost')),
-                ('position', models.PositiveIntegerField(default=0, verbose_name='position')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200, verbose_name="title")),
+                (
+                    "cost",
+                    models.DecimalField(
+                        decimal_places=2, max_digits=10, verbose_name="cost"
+                    ),
+                ),
+                (
+                    "position",
+                    models.PositiveIntegerField(default=0, verbose_name="position"),
+                ),
             ],
             options={
-                'verbose_name': 'cost',
-                'ordering': ('position', 'pk'),
-                'verbose_name_plural': 'costs',
+                "verbose_name": "cost",
+                "ordering": ("position", "pk"),
+                "verbose_name_plural": "costs",
             },
         ),
         migrations.CreateModel(
-            name='Effort',
+            name="Effort",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('hours', models.DecimalField(decimal_places=2, max_digits=5, verbose_name='hours')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "hours",
+                    models.DecimalField(
+                        decimal_places=2, max_digits=5, verbose_name="hours"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'effort',
-                'ordering': ('service_type',),
-                'verbose_name_plural': 'efforts',
+                "verbose_name": "effort",
+                "ordering": ("service_type",),
+                "verbose_name_plural": "efforts",
             },
         ),
         migrations.CreateModel(
-            name='Service',
+            name="Service",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now, verbose_name='created at')),
-                ('title', models.CharField(max_length=200, verbose_name='title')),
-                ('description', models.TextField(blank=True, verbose_name='description')),
-                ('position', models.PositiveIntegerField(default=0, verbose_name='position')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="created at"
+                    ),
+                ),
+                ("title", models.CharField(max_length=200, verbose_name="title")),
+                (
+                    "description",
+                    models.TextField(blank=True, verbose_name="description"),
+                ),
+                (
+                    "position",
+                    models.PositiveIntegerField(default=0, verbose_name="position"),
+                ),
             ],
             options={
-                'verbose_name': 'service',
-                'ordering': ('position', 'created_at'),
-                'verbose_name_plural': 'services',
+                "verbose_name": "service",
+                "ordering": ("position", "created_at"),
+                "verbose_name_plural": "services",
             },
         ),
-        migrations.RemoveField(
-            model_name='offer',
-            name='story_data',
+        migrations.RemoveField(model_name="offer", name="story_data"),
+        migrations.AddField(
+            model_name="service",
+            name="offer",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="services",
+                to="offers.Offer",
+                verbose_name="offer",
+            ),
         ),
         migrations.AddField(
-            model_name='service',
-            name='offer',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='services', to='offers.Offer', verbose_name='offer'),
+            model_name="effort",
+            name="service",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="efforts",
+                to="offers.Service",
+                verbose_name="service",
+            ),
         ),
         migrations.AddField(
-            model_name='effort',
-            name='service',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='efforts', to='offers.Service', verbose_name='service'),
+            model_name="effort",
+            name="service_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="+",
+                to="services.ServiceType",
+                verbose_name="service type",
+            ),
         ),
         migrations.AddField(
-            model_name='effort',
-            name='service_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='services.ServiceType', verbose_name='service type'),
-        ),
-        migrations.AddField(
-            model_name='cost',
-            name='service',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='costs', to='offers.Service', verbose_name='service'),
+            model_name="cost",
+            name="service",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="costs",
+                to="offers.Service",
+                verbose_name="service",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='effort',
-            unique_together=set([('service', 'service_type')]),
+            name="effort", unique_together=set([("service", "service_type")])
         ),
     ]

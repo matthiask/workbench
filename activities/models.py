@@ -14,10 +14,7 @@ from tools.urls import model_urls
 class ActivityQuerySet(SearchQuerySet):
     def open(self):
         return self.filter(completed_at__isnull=True).select_related(
-            'contact__organization',
-            'project',
-            'deal',
-            'owned_by',
+            "contact__organization", "project", "deal", "owned_by"
         )
 
     def completed(self):
@@ -31,64 +28,49 @@ class Activity(Model):
         on_delete=models.PROTECT,
         blank=True,
         null=True,
-        verbose_name=_('contact'),
-        related_name='activities',
+        verbose_name=_("contact"),
+        related_name="activities",
     )
     project = models.ForeignKey(
         Project,
         on_delete=models.PROTECT,
         blank=True,
         null=True,
-        verbose_name=_('project'),
-        related_name='activities',
+        verbose_name=_("project"),
+        related_name="activities",
     )
     deal = models.ForeignKey(
         Deal,
         on_delete=models.PROTECT,
-        verbose_name=_('deal'),
+        verbose_name=_("deal"),
         blank=True,
         null=True,
-        related_name='activities',
+        related_name="activities",
     )
-    title = models.CharField(_('title'), max_length=200)
+    title = models.CharField(_("title"), max_length=200)
     owned_by = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
-        verbose_name=_('owned by'),
-        related_name='activities',
+        verbose_name=_("owned by"),
+        related_name="activities",
     )
-    due_on = models.DateField(
-        _('due on'),
-        blank=True,
-        null=True,
-    )
-    time = models.TimeField(
-        _('time'),
-        blank=True,
-        null=True,
-    )
+    due_on = models.DateField(_("due on"), blank=True, null=True)
+    time = models.TimeField(_("time"), blank=True, null=True)
     duration = HoursField(
-        _('duration'),
+        _("duration"),
         blank=True,
         null=True,
-        help_text=_('Duration in hours (if applicable).'),
+        help_text=_("Duration in hours (if applicable)."),
     )
-    created_at = models.DateTimeField(
-        _('created at'),
-        default=timezone.now,
-    )
-    completed_at = models.DateTimeField(
-        _('completed at'),
-        blank=True,
-        null=True,
-    )
+    created_at = models.DateTimeField(_("created at"), default=timezone.now)
+    completed_at = models.DateTimeField(_("completed at"), blank=True, null=True)
 
     objects = models.Manager.from_queryset(ActivityQuerySet)()
 
     class Meta:
-        ordering = ('due_on',)
-        verbose_name = _('activity')
-        verbose_name_plural = _('activities')
+        ordering = ("due_on",)
+        verbose_name = _("activity")
+        verbose_name_plural = _("activities")
 
     def __str__(self):
         return self.title
@@ -98,14 +80,14 @@ class Activity(Model):
 
     def pretty_status(self):
         if self.completed_at:
-            return _('completed on %(completed_on)s') % {
-                'completed_on': local_date_format(self.completed_at, 'd.m.Y'),
+            return _("completed on %(completed_on)s") % {
+                "completed_on": local_date_format(self.completed_at, "d.m.Y")
             }
 
         if self.due_on:
-            return '%s (%s)' % (
+            return "%s (%s)" % (
                 pretty_due(self.due_on),
-                local_date_format(self.due_on, 'd.m.Y'),
+                local_date_format(self.due_on, "d.m.Y"),
             )
 
-        return _('open')
+        return _("open")

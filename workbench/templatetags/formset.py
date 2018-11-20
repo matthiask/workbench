@@ -16,7 +16,7 @@ def formset(parser, token):
     """
 
     tokens = token.split_contents()
-    nodelist = parser.parse(('endformset',))
+    nodelist = parser.parse(("endformset",))
     parser.delete_first_token()
 
     return DynamicFormsetNode(tokens[1], tokens[2], nodelist)
@@ -34,21 +34,15 @@ class DynamicFormsetNode(template.Node):
 
         result = [str(formset.management_form)]
 
-        context.update({
-            'form_id': '%s-empty' % slug,
-            'form': formset.empty_form,
-        })
+        context.update({"form_id": "%s-empty" % slug, "form": formset.empty_form})
         result.append('<script type="text/template" id="%s-empty">' % slug)
         result.append(self.nodelist.render(context))
-        result.append('</script>')
+        result.append("</script>")
         context.pop()
 
         for idx, form in enumerate(formset.forms):
-            context.update({
-                'form_id': '%s-%s' % (slug, idx),
-                'form': form,
-            })
+            context.update({"form_id": "%s-%s" % (slug, idx), "form": form})
             result.append(self.nodelist.render(context))
             context.pop()
 
-        return ''.join(result)
+        return "".join(result)

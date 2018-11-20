@@ -10,19 +10,15 @@ from django.db import migrations
 
 def forward(apps, schema_editor):
     codes = defaultdict(lambda: itertools.count(start=1))
-    Project = apps.get_model('projects', 'Project')
+    Project = apps.get_model("projects", "Project")
 
-    for project in Project.objects.order_by('created_at'):
+    for project in Project.objects.order_by("created_at"):
         project._code = next(codes[project.created_at.year])
         project.save()
 
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('projects', '0011_project__code'),
-    ]
+    dependencies = [("projects", "0011_project__code")]
 
-    operations = [
-        migrations.RunPython(forward),
-    ]
+    operations = [migrations.RunPython(forward)]

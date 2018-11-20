@@ -7,14 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('offers', '0006_auto_20160922_2218'),
-    ]
+    dependencies = [("offers", "0006_auto_20160922_2218")]
 
     operations = [
         migrations.AddField(
-            model_name='offer',
-            name='disable_tax',
-            field=models.BooleanField(default=False, help_text='Disable tax, for example because recipient is not a resident of Switzerland.', verbose_name='disable tax'),
-        ),
+            model_name="offer",
+            name="disable_tax",
+            field=models.BooleanField(
+                default=False,
+                help_text="Disable tax, for example because recipient is not a resident of Switzerland.",
+                verbose_name="disable tax",
+            ),
+        )
     ]

@@ -7,14 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('invoices', '0005_auto_20160924_1350'),
-    ]
+    dependencies = [("invoices", "0005_auto_20160924_1350")]
 
     operations = [
         migrations.AddField(
-            model_name='invoice',
-            name='liable_to_vat',
-            field=models.BooleanField(default=True, help_text='For example invoices to foreign institutions are not liable to VAT.', verbose_name='liable to VAT'),
-        ),
+            model_name="invoice",
+            name="liable_to_vat",
+            field=models.BooleanField(
+                default=True,
+                help_text="For example invoices to foreign institutions are not liable to VAT.",
+                verbose_name="liable to VAT",
+            ),
+        )
     ]

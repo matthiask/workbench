@@ -7,15 +7,13 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('projects', '0010_auto_20160927_0916'),
-    ]
+    dependencies = [("projects", "0010_auto_20160927_0916")]
 
     operations = [
         migrations.AddField(
-            model_name='project',
-            name='_code',
-            field=models.IntegerField(default=0, verbose_name='code'),
+            model_name="project",
+            name="_code",
+            field=models.IntegerField(default=0, verbose_name="code"),
             preserve_default=False,
-        ),
+        )
     ]

@@ -15,41 +15,123 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('projects', '0001_initial'),
+        ("projects", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('audit', '0001_initial'),
+        ("audit", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Offer',
+            name="Offer",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('subtotal', models.DecimalField(decimal_places=2, default=0, max_digits=10, verbose_name='subtotal')),
-                ('discount', models.DecimalField(decimal_places=2, default=0, max_digits=10, verbose_name='discount')),
-                ('tax_rate', models.DecimalField(decimal_places=2, default=8, max_digits=10, verbose_name='tax rate')),
-                ('total', models.DecimalField(decimal_places=2, default=0, max_digits=10, verbose_name='total')),
-                ('offered_on', models.DateField(blank=True, null=True, verbose_name='offered on')),
-                ('closed_at', models.DateTimeField(blank=True, null=True, verbose_name='closed at')),
-                ('title', models.CharField(max_length=200, verbose_name='title')),
-                ('description', models.TextField(blank=True, verbose_name='description')),
-                ('status', models.PositiveIntegerField(choices=[(10, 'In preparation'), (20, 'Offered'), (30, 'Accepted'), (40, 'Rejected'), (50, 'Replaced')], default=10, verbose_name='status')),
-                ('postal_address', models.TextField(blank=True, verbose_name='postal address')),
-                ('story_data', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True, verbose_name='stories')),
-                ('owned_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to=settings.AUTH_USER_MODEL, verbose_name='owned by')),
-                ('project', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='offers', to='projects.Project', verbose_name='project')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "subtotal",
+                    models.DecimalField(
+                        decimal_places=2,
+                        default=0,
+                        max_digits=10,
+                        verbose_name="subtotal",
+                    ),
+                ),
+                (
+                    "discount",
+                    models.DecimalField(
+                        decimal_places=2,
+                        default=0,
+                        max_digits=10,
+                        verbose_name="discount",
+                    ),
+                ),
+                (
+                    "tax_rate",
+                    models.DecimalField(
+                        decimal_places=2,
+                        default=8,
+                        max_digits=10,
+                        verbose_name="tax rate",
+                    ),
+                ),
+                (
+                    "total",
+                    models.DecimalField(
+                        decimal_places=2, default=0, max_digits=10, verbose_name="total"
+                    ),
+                ),
+                (
+                    "offered_on",
+                    models.DateField(blank=True, null=True, verbose_name="offered on"),
+                ),
+                (
+                    "closed_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="closed at"
+                    ),
+                ),
+                ("title", models.CharField(max_length=200, verbose_name="title")),
+                (
+                    "description",
+                    models.TextField(blank=True, verbose_name="description"),
+                ),
+                (
+                    "status",
+                    models.PositiveIntegerField(
+                        choices=[
+                            (10, "In preparation"),
+                            (20, "Offered"),
+                            (30, "Accepted"),
+                            (40, "Rejected"),
+                            (50, "Replaced"),
+                        ],
+                        default=10,
+                        verbose_name="status",
+                    ),
+                ),
+                (
+                    "postal_address",
+                    models.TextField(blank=True, verbose_name="postal address"),
+                ),
+                (
+                    "story_data",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True, null=True, verbose_name="stories"
+                    ),
+                ),
+                (
+                    "owned_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="owned by",
+                    ),
+                ),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="offers",
+                        to="projects.Project",
+                        verbose_name="project",
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'offers',
-                'verbose_name': 'offer',
-                'ordering': ('-id',),
+                "verbose_name_plural": "offers",
+                "verbose_name": "offer",
+                "ordering": ("-id",),
             },
         ),
-        migrations.RunSQL(*migration_sql(
-            'offers_offer', 'title, description, postal_address'
-        )),
         migrations.RunSQL(
-            "SELECT audit_audit_table('offers_offer');",
-            '',
+            *migration_sql("offers_offer", "title, description, postal_address")
         ),
+        migrations.RunSQL("SELECT audit_audit_table('offers_offer');", ""),
     ]

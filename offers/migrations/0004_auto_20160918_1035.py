@@ -8,18 +8,22 @@ import django.utils.timezone
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('offers', '0003_auto_20160917_2057'),
-    ]
+    dependencies = [("offers", "0003_auto_20160917_2057")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='offer',
-            options={'ordering': ('-offered_on',), 'verbose_name': 'offer', 'verbose_name_plural': 'offers'},
+            name="offer",
+            options={
+                "ordering": ("-offered_on",),
+                "verbose_name": "offer",
+                "verbose_name_plural": "offers",
+            },
         ),
         migrations.AddField(
-            model_name='offer',
-            name='created_at',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='created at'),
+            model_name="offer",
+            name="created_at",
+            field=models.DateTimeField(
+                default=django.utils.timezone.now, verbose_name="created at"
+            ),
         ),
     ]

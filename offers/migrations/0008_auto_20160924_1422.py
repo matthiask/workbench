@@ -7,18 +7,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('offers', '0007_offer_disable_tax'),
-    ]
+    dependencies = [("offers", "0007_offer_disable_tax")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='offer',
-            name='disable_tax',
-        ),
+        migrations.RemoveField(model_name="offer", name="disable_tax"),
         migrations.AddField(
-            model_name='offer',
-            name='liable_to_vat',
-            field=models.BooleanField(default=True, help_text='For example invoices to foreign institutions are not liable to VAT.', verbose_name='liable to VAT'),
+            model_name="offer",
+            name="liable_to_vat",
+            field=models.BooleanField(
+                default=True,
+                help_text="For example invoices to foreign institutions are not liable to VAT.",
+                verbose_name="liable to VAT",
+            ),
         ),
     ]

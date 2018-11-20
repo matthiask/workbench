@@ -14,7 +14,7 @@ from accounts.models import User
 
 class Textarea(forms.Textarea):
     def __init__(self, attrs=None):
-        default_attrs = {'cols': 40, 'rows': 4}
+        default_attrs = {"cols": 40, "rows": 4}
         if attrs:
             default_attrs.update(attrs)
         super().__init__(default_attrs)
@@ -23,16 +23,16 @@ class Textarea(forms.Textarea):
 class ModelForm(forms.ModelForm):
     user_fields = ()
     default_to_current_user = ()
-    required_css_class = 'required'
-    error_css_class = 'has-error'
+    required_css_class = "required"
+    error_css_class = "has-error"
 
     def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request')
+        self.request = kwargs.pop("request")
 
         if self.default_to_current_user:
-            instance = kwargs.get('instance')
+            instance = kwargs.get("instance")
             if not instance or not instance.pk:
-                initial = kwargs.setdefault('initial', {})
+                initial = kwargs.setdefault("initial", {})
                 for field in self.default_to_current_user:
                     initial.setdefault(field, self.request.user.pk)
 
@@ -40,65 +40,70 @@ class ModelForm(forms.ModelForm):
 
         for name, field in self.fields.items():
             if isinstance(field, forms.DateField):
-                css = field.widget.attrs.get('class', '')
-                field.widget.attrs['class'] = css + ' datepicker'
+                css = field.widget.attrs.get("class", "")
+                field.widget.attrs["class"] = css + " datepicker"
 
             elif name in self.user_fields:
                 self._only_active_and_initial_users(
                     field,
-                    self.instance and getattr(
-                        self.instance,
-                        '%s_id' % name,
-                        None)
+                    self.instance and getattr(self.instance, "%s_id" % name, None),
                 )
 
         self.customer_and_contact = all(
-            f in self.fields for f in ('customer', 'contact'))
+            f in self.fields for f in ("customer", "contact")
+        )
         if self.customer_and_contact:
-            self.fields['customer'].required = False
+            self.fields["customer"].required = False
 
     def _only_active_and_initial_users(self, formfield, pk):
         d = defaultdict(list)
         for user in User.objects.filter(Q(is_active=True) | Q(pk=pk)):
-            d[user.is_active].append((
-                formfield.prepare_value(user),
-                formfield.label_from_instance(user),
-            ))
-        choices = [(_('Active'), d.get(True, []))]
+            d[user.is_active].append(
+                (formfield.prepare_value(user), formfield.label_from_instance(user))
+            )
+        choices = [(_("Active"), d.get(True, []))]
         if d.get(False):
             choices[0:0] = d.get(False)
         if not formfield.required:
-            choices.insert(0, ('', '----------'))
+            choices.insert(0, ("", "----------"))
         formfield.choices = choices
 
     def clean(self):
         data = super().clean()
 
         if self.customer_and_contact:
-            if data.get('contact') and not data.get('customer'):
-                data['customer'] = data['contact'].organization
+            if data.get("contact") and not data.get("customer"):
+                data["customer"] = data["contact"].organization
 
-            if data.get('customer') and data.get('contact'):
-                if data.get('customer') != data.get('contact').organization:
-                    raise forms.ValidationError({
-                        'contact': ugettext(
-                            'The contact %(person)s does not belong to'
-                            '  %(organization)s.'
-                        ) % {
-                            'person': data.get('contact'),
-                            'organization': data.get('customer'),
-                        },
-                    })
+            if data.get("customer") and data.get("contact"):
+                if data.get("customer") != data.get("contact").organization:
+                    raise forms.ValidationError(
+                        {
+                            "contact": ugettext(
+                                "The contact %(person)s does not belong to"
+                                "  %(organization)s."
+                            )
+                            % {
+                                "person": data.get("contact"),
+                                "organization": data.get("customer"),
+                            }
+                        }
+                    )
 
-            if not data.get('customer'):
-                raise forms.ValidationError({
-                    'customer': self.fields['customer'].error_messages['required'],  # noqa
-                }, code='required')
+            if not data.get("customer"):
+                raise forms.ValidationError(
+                    {
+                        "customer": self.fields["customer"].error_messages[
+                            "required"
+                        ]  # noqa
+                    },
+                    code="required",
+                )
 
         return data
 
 
-_PICKER_TEMPLATE = '''
+_PICKER_TEMPLATE = """
 <div class="input-group">
   <a href="%(url)s" class="btn btn-default input-group-addon"
       data-toggle="ajaxmodal">
@@ -108,7 +113,7 @@ _PICKER_TEMPLATE = '''
     value="%(pretty)s" disabled>
   %(field)s
 </div>
-'''
+"""
 
 
 class Picker(forms.TextInput):
@@ -118,13 +123,13 @@ class Picker(forms.TextInput):
 
     def render(self, name, value, attrs=None, choices=()):
         if value is None:
-            value = ''
-        final_attrs = self.build_attrs(attrs, {'type': 'hidden', 'name': name})
-        if value != '':
+            value = ""
+        final_attrs = self.build_attrs(attrs, {"type": "hidden", "name": name})
+        if value != "":
             # Only add the 'value' attribute if a value is non-empty.
-            final_attrs['value'] = force_text(self.format_value(value))
+            final_attrs["value"] = force_text(self.format_value(value))
 
-        pretty = ''
+        pretty = ""
         try:
             if value:
                 pretty = str(self.model.objects.get(pk=value))
@@ -133,15 +138,19 @@ class Picker(forms.TextInput):
 
         opts = self.model._meta
 
-        return mark_safe(_PICKER_TEMPLATE % {
-            'id': final_attrs['id'],
-            'url': '%s?id=%s' % (
-                reverse('%s_%s_picker' % (opts.app_label, opts.model_name)),
-                final_attrs['id'],
-            ),
-            'field': format_html('<input{} />', flatatt(final_attrs)),
-            'pretty': escape(pretty),
-        })
+        return mark_safe(
+            _PICKER_TEMPLATE
+            % {
+                "id": final_attrs["id"],
+                "url": "%s?id=%s"
+                % (
+                    reverse("%s_%s_picker" % (opts.app_label, opts.model_name)),
+                    final_attrs["id"],
+                ),
+                "field": format_html("<input{} />", flatatt(final_attrs)),
+                "pretty": escape(pretty),
+            }
+        )
 
 
 class WarningsForm(forms.BaseForm):
@@ -160,6 +169,7 @@ class WarningsForm(forms.BaseForm):
     * An additional form field named ``ignore_warnings`` is available - this
       field should only be displayed if ``WarningsForm.warnings`` is non-emtpy.
     """
+
     def __init__(self, *args, **kwargs):
         super(WarningsForm, self).__init__(*args, **kwargs)
 
@@ -179,7 +189,7 @@ class WarningsForm(forms.BaseForm):
         if not super(WarningsForm, self).is_valid():
             return False
 
-        if self.warnings and not self.request.POST.get('ignore_warnings'):
+        if self.warnings and not self.request.POST.get("ignore_warnings"):
             return False
 
         return True

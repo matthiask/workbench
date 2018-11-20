@@ -10,6 +10,6 @@ class AuthBackend(object):
 
     def authenticate(self, **kwargs):
         try:
-            return User.objects.get(email=kwargs.get('email'))
+            return User.objects.get(email=kwargs.get("email"))
         except User.DoesNotExist:
             pass

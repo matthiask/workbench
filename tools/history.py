@@ -12,14 +12,14 @@ from audit.models import LoggedAction
 from tools.formats import local_date_format
 
 
-Change = namedtuple('Change', 'changes version number')
+Change = namedtuple("Change", "changes version number")
 
 
 def boolean_formatter(value):
-    if value in (True, 't'):
-        return _('yes')
-    elif value in (False, 'f'):
-        return _('no')
+    if value in (True, "t"):
+        return _("yes")
+    elif value in (False, "f"):
+        return _("no")
     return value
 
 
@@ -29,13 +29,13 @@ def default_if_none(value, default):
 
 def date_formatter(value):
     if value is None:
-        return _('<no value>')
+        return _("<no value>")
     dt = dateparse.parse_datetime(value)
     if dt:
-        return local_date_format(dt, 'SHORT_DATETIME_FORMAT')
+        return local_date_format(dt, "SHORT_DATETIME_FORMAT")
     dt = dateparse.parse_date(value)
     if dt:
-        return local_date_format(dt, 'SHORT_DATE_FORMAT')
+        return local_date_format(dt, "SHORT_DATE_FORMAT")
     return value
 
 
@@ -46,9 +46,7 @@ def formatter(field):
     """
     if field.choices:
         choices = {str(key): value for key, value in field.flatchoices}
-        return lambda value: default_if_none(
-            choices.get(value, value),
-            '<empty>')
+        return lambda value: default_if_none(choices.get(value, value), "<empty>")
 
     if field.related_model:
         model = field.related_model
@@ -56,12 +54,12 @@ def formatter(field):
 
         def _fn(value):
             if value is None:
-                return _('<no value>')
+                return _("<no value>")
 
             try:
                 return str(queryset.get(pk=value))
             except model.DoesNotExist:
-                return _('Deleted %s instance') % model._meta.verbose_name
+                return _("Deleted %s instance") % model._meta.verbose_name
 
         return _fn
 
@@ -71,7 +69,7 @@ def formatter(field):
     if isinstance(field, models.DateField):
         return date_formatter
 
-    return lambda value: default_if_none(value, _('<no value>'))
+    return lambda value: default_if_none(value, _("<no value>"))
 
 
 def changes(instance, fields):
@@ -80,7 +78,7 @@ def changes(instance, fields):
 
     users = {str(u.pk): u.get_full_name() for u in User.objects.all()}
     for version in versions:
-        match = re.search(r'^user-(\d+)-', version.user_name)
+        match = re.search(r"^user-([0-9]+)-", version.user_name)
         if match:
             pk = match.groups()[0]
             version.pretty_user_name = users.get(pk) or version.user_name
@@ -91,36 +89,36 @@ def changes(instance, fields):
 
     values = versions[0].row_data
     version_changes = [
-        _("Initial value of '%(field)s' was '%(current)s'.") % {
-            'field': capfirst(f.verbose_name),
-            'current': formatter(f)(values.get(f.attname)),
+        _("Initial value of '%(field)s' was '%(current)s'.")
+        % {
+            "field": capfirst(f.verbose_name),
+            "current": formatter(f)(values.get(f.attname)),
         }
         for f in field_instances
         if not (f.many_to_many or f.one_to_many)  # Avoid those relation types.
     ]
 
-    changes.append(Change(
-        changes=version_changes,
-        version=versions[0],
-        number=1,
-    ))
+    changes.append(Change(changes=version_changes, version=versions[0], number=1))
 
     for change in versions[1:]:
         version_changes = [
-            _("'%(field)s' changed from '%(previous)s' to '%(current)s'.") % {
-                'field': capfirst(f.verbose_name),
-                'current': formatter(f)(change.changed_fields.get(f.attname)),
-                'previous': formatter(f)(change.row_data.get(f.attname)),
+            _("'%(field)s' changed from '%(previous)s' to '%(current)s'.")
+            % {
+                "field": capfirst(f.verbose_name),
+                "current": formatter(f)(change.changed_fields.get(f.attname)),
+                "previous": formatter(f)(change.row_data.get(f.attname)),
             }
             for f in field_instances
             if f.attname in change.changed_fields
         ]
 
         if version_changes:
-            changes.append(Change(
-                changes=version_changes,
-                version=change,
-                number=changes[-1].number + 1,
-            ))
+            changes.append(
+                Change(
+                    changes=version_changes,
+                    version=change,
+                    number=changes[-1].number + 1,
+                )
+            )
 
     return changes
