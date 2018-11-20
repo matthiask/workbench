@@ -44,10 +44,7 @@ class Day(Model):
 @model_urls()
 class Presence(Model):
     user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="+",
-        verbose_name=_("user"),
+        User, on_delete=models.CASCADE, related_name="+", verbose_name=_("user")
     )
     year = models.IntegerField(_("year"))
     percentage = models.IntegerField(_("percentage"))
