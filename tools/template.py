@@ -1,7 +1,7 @@
 import re
 
 
-_KWARG_RE = re.compile("(?:([-\w]+)=)?(.+)")
+_KWARG_RE = re.compile(r"(?:([-\w]+)=)?(.+)")
 
 
 def parse_args_and_kwargs(parser, bits):

@@ -11,7 +11,7 @@ from contacts.forms import PostalAddressSelectionForm
 from contacts.models import Organization, Person
 from invoices.models import Invoice
 from tools.formats import local_date_format
-from tools.forms import ModelForm, Picker, Textarea, WarningsForm
+from tools.forms import Picker, Textarea, WarningsForm
 from workbench.templatetags.workbench import currency
 
 
