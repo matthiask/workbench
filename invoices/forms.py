@@ -100,7 +100,7 @@ class CreateInvoiceForm(PostalAddressSelectionForm):
         return instance
 
 
-class InvoiceForm(WarningsForm, ModelForm):
+class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
     user_fields = default_to_current_user = ('owned_by',)
 
     class Meta:
@@ -193,6 +193,9 @@ class InvoiceForm(WarningsForm, ModelForm):
         if 'apply_down_payment' in self.fields:
             self.fields.move_to_end('apply_down_payment')
         self.fields.move_to_end('liable_to_vat')
+
+        if not self.instance.postal_address:
+            self.add_postal_address_selection(person=self.instance.contact)
 
     def _is_status_unexpected(self, to_status):
         if not to_status:
