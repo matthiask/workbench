@@ -1,35 +1,34 @@
 {% extends "generic/object_list.html" %}
 
-{% load bootstrap3 i18n querystring %}
+{% load bootstrap3 calendar i18n querystring %}
 
 {% block objects %}
 <table class="table table-hover table-striped">
 
+  {% for week in object_list|calendar %}
+  {% ifchanged week.0.dy|date:"mY" %}
+    <tr>
+      <th>{{ week.0.day|date:"F Y" }}</th>
+      <td>Mo</td>
+      <td>Di</td>
+      <td>Mi</td>
+      <td>Do</td>
+      <td>Fr</td>
+      <td>Sa</td>
+      <td>So</td>
+    </tr>
+  {% endifchanged %}
   <tr>
-    {% for object in object_list %}
-    {% ifchanged object.day|date:"mY" %}
-      </tr>
-      <tr>
-        <th>{{ object.day|date:"F Y" }}</th>
-        <td>Mo</td>
-        <td>Di</td>
-        <td>Mi</td>
-        <td>Do</td>
-        <td>Fr</td>
-      </tr>
-      <tr>
-    {% endifchanged %}
-    {% ifchanged object.day|date:"WY" %}
-      </tr>
-      <tr>
-        <td>KW{{ object.day|date:"W" }}</td>
-    {% endifchanged %}
+    <td>KW {{ week.0.day|date:"W" }}</td>
+    {% for day in week %}
     <td>
-      <a href="{{ object.urls.detail }}">{{ object.day|date:"d" }}</a>
+      {% if day %}
+      <a href="{{ day.urls.detail }}">{{ day.day|date:"d" }}</a>
+      {% endif %}
     </td>
     {% endfor %}
   </tr>
-
+  {% endfor %}
 </table>
 
 

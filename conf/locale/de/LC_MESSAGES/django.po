@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-20 15:47+0100\n"
+"POT-Creation-Date: 2018-11-20 17:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,7 +26,6 @@ msgid "Please authenticate."
 msgstr "Bitte authentifizieren."
 
 #: workbench/accounts/models.py:36
-#: workbench/templates/contacts/person_list.html:10
 msgid "email"
 msgstr "Email"
 
@@ -54,20 +53,18 @@ msgstr "Benutzer"
 msgid "users"
 msgstr "Benutzer"
 
-#: workbench/accounts/views.py:67
+#: workbench/accounts/views.py:83
 msgid "OAuth2 error: Credential exchange failed"
 msgstr "OAuth2 Fehler: Anmeldedaten-Tausch fehlgeschlagen"
 
-#: workbench/accounts/views.py:83
-msgid "Welcome! Please fill in your details."
-msgstr "Willkommen! Bitte fülle das folgende Formular aus."
-
-#: workbench/accounts/views.py:89
-#, python-format
-msgid "No user with email address %s found."
+#: workbench/accounts/views.py:96
+#, fuzzy, python-format
+#| msgid "No user with email address %s found."
+msgid ""
+"No user with email address %s found, do you want to create a new account?"
 msgstr "Keinen Benutzer mit Emailadresse %s gefunden."
 
-#: workbench/accounts/views.py:102
+#: workbench/accounts/views.py:112
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
@@ -83,11 +80,15 @@ msgstr "aufgezeichnete Aktion"
 msgid "logged actions"
 msgstr "aufgezeichnete Aktionen"
 
-#: workbench/cooking/models.py:24 workbench/cooking/models.py:33
+#: workbench/cooking/models.py:23 workbench/cooking/models.py:37
 msgid "day"
 msgstr "Tag"
 
-#: workbench/cooking/models.py:34
+#: workbench/cooking/models.py:30
+msgid "handled by"
+msgstr "bearbeitet von"
+
+#: workbench/cooking/models.py:38
 msgid "days"
 msgstr "Tage"
 
@@ -130,116 +131,6 @@ msgstr "%s löschen"
 msgid "Sign in"
 msgstr "Anmelden"
 
-#: workbench/templates/activities/activity_confirm_delete.html:6
-#: workbench/templates/generic/object_confirm_delete.html:11
-#: workbench/templates/modal_confirm_delete.html:6
-#: workbench/templates/projects/comment_confirm_delete.html:6
-#, python-format
-msgid "Delete %(object)s"
-msgstr "%(object)s löschen"
-
-#: workbench/templates/activities/activity_confirm_delete.html:14
-#: workbench/templates/generic/object_confirm_delete.html:18
-#: workbench/templates/generic/object_form.html:48
-#: workbench/templates/modal_confirm_delete.html:14
-#: workbench/templates/projects/comment_confirm_delete.html:14
-msgid "cancel"
-msgstr "Abbruch"
-
-#: workbench/templates/activities/activity_confirm_delete.html:16
-#: workbench/templates/generic/object_confirm_delete.html:20
-#: workbench/templates/logbook/loggedcost_form.html:9
-#: workbench/templates/logbook/loggedhours_form.html:37
-#: workbench/templates/modal_confirm_delete.html:16
-#: workbench/templates/offers/service_form.html:40
-#: workbench/templates/offers/service_form.html:71
-#: workbench/templates/offers/service_form.html:98
-#: workbench/templates/projects/comment_confirm_delete.html:16
-msgid "delete"
-msgstr "Löschen"
-
-#: workbench/templates/activities/activity_detail.html:10
-#: workbench/templates/activities/activity_list.html:44
-#: workbench/templates/deals/deal_list.html:11
-#: workbench/templates/invoices/invoice_list.html:12
-#: workbench/templates/projects/project_detail.html:48
-#: workbench/templates/projects/project_task_list.html:57
-#: workbench/templates/projects/task_list.html:16
-msgid "owned by"
-msgstr "Gehört"
-
-#: workbench/templates/activities/activity_detail.html:14
-#: workbench/templates/activities/activity_list.html:45
-#: workbench/templates/deals/deal_detail.html:22
-#: workbench/templates/deals/deal_list.html:14
-#: workbench/templates/invoices/invoice_detail.html:26
-#: workbench/templates/invoices/invoice_list.html:13
-#: workbench/templates/offers/offer_detail.html:20
-#: workbench/templates/offers/offer_list.html:13
-#: workbench/templates/projects/project_detail.html:52
-#: workbench/templates/projects/project_detail.html:66
-#: workbench/templates/projects/project_detail.html:94
-#: workbench/templates/projects/project_list.html:12
-#: workbench/templates/projects/project_task_list.html:55
-#: workbench/templates/projects/task_detail.html:54
-#: workbench/templates/projects/task_list.html:14
-msgid "status"
-msgstr "Status"
-
-#: workbench/templates/activities/activity_detail.html:18
-#: workbench/templates/activities/activity_list.html:43
-msgid "context"
-msgstr "Kontext"
-
-#: workbench/templates/activities/activity_detail.html:30
-#: workbench/templates/contacts/organization_detail.html:47
-#: workbench/templates/contacts/person_detail.html:60
-#: workbench/templates/deals/deal_detail.html:28
-#: workbench/templates/generic/object_detail.html:22
-#: workbench/templates/invoices/invoice_detail.html:71
-#: workbench/templates/logbook/loggedhours_detail.html:60
-#: workbench/templates/offers/offer_detail.html:103
-#: workbench/templates/projects/project_detail.html:122
-#: workbench/templates/projects/task_detail.html:65
-msgid "Update"
-msgstr "Bearbeiten"
-
-#: workbench/templates/activities/activity_detail.html:33
-#: workbench/templates/contacts/organization_detail.html:49
-#: workbench/templates/contacts/person_detail.html:62
-#: workbench/templates/deals/deal_detail.html:30
-#: workbench/templates/generic/object_detail.html:25
-#: workbench/templates/invoices/invoice_detail.html:74
-#: workbench/templates/logbook/loggedhours_detail.html:64
-#: workbench/templates/offers/offer_detail.html:106
-#: workbench/templates/projects/project_detail.html:124
-#: workbench/templates/projects/task_detail.html:68
-msgid "Delete"
-msgstr "Löschen"
-
-#: workbench/templates/activities/activity_list.html:17
-#: workbench/templates/activities/activity_list.html:22
-#: workbench/templates/generic/object_list.html:17
-#: workbench/templates/generic/object_list.html:22
-#: workbench/templates/projects/project_task_list.html:24
-#: workbench/templates/projects/project_task_list.html:29
-msgid "search"
-msgstr "Suche"
-
-#: workbench/templates/activities/activity_list.html:69
-#: workbench/templates/contacts/organization_list.html:32
-#: workbench/templates/contacts/person_list.html:38
-#: workbench/templates/deals/deal_list.html:33
-#: workbench/templates/generic/object_list.html:61
-#: workbench/templates/invoices/invoice_list.html:39
-#: workbench/templates/logbook/loggedhours_list.html:48
-#: workbench/templates/offers/offer_list.html:35
-#: workbench/templates/projects/project_list.html:35
-#: workbench/templates/projects/task_list.html:44
-#, python-format
-msgid "%(total)s total"
-msgstr "%(total)s insgesamt"
-
 #: workbench/templates/base.html:24
 #: workbench/templates/generic/object_picker.html:12
 #: workbench/templates/search.html:5 workbench/templates/search.html:10
@@ -262,378 +153,69 @@ msgstr "Verwaltung"
 msgid "Sign off"
 msgstr "Abmelden"
 
-#: workbench/templates/contacts/organization_detail.html:5
-msgid "organizations"
-msgstr "Organisationen"
+#: workbench/templates/cooking/day_list.html:55
+#: workbench/templates/generic/object_list.html:61
+#, python-format
+msgid "%(total)s total"
+msgstr "%(total)s insgesamt"
 
-#: workbench/templates/contacts/organization_detail.html:14
-#: workbench/templates/contacts/organization_list.html:10
-msgid "people"
-msgstr "Personen"
+#: workbench/templates/generic/object_confirm_delete.html:11
+#: workbench/templates/modal_confirm_delete.html:6
+#, python-format
+msgid "Delete %(object)s"
+msgstr "%(object)s löschen"
 
-#: workbench/templates/contacts/organization_detail.html:25
-msgid "groups"
-msgstr "Gruppen"
+#: workbench/templates/generic/object_confirm_delete.html:18
+#: workbench/templates/generic/object_form.html:48
+#: workbench/templates/modal_confirm_delete.html:14
+msgid "cancel"
+msgstr "Abbruch"
 
-#: workbench/templates/contacts/organization_detail.html:37
-#: workbench/templates/contacts/person_detail.html:45
-msgid "notes"
-msgstr "Bemerkungen"
+#: workbench/templates/generic/object_confirm_delete.html:20
+#: workbench/templates/modal_confirm_delete.html:16
+msgid "delete"
+msgstr "Löschen"
 
-#: workbench/templates/contacts/organization_detail.html:45
-#: workbench/templates/projects/project_detail.html:85
-msgid "invoices"
-msgstr "Rechnungen"
+#: workbench/templates/generic/object_detail.html:22
+msgid "Update"
+msgstr "Bearbeiten"
 
-#: workbench/templates/contacts/organization_list.html:9
-#: workbench/templates/contacts/person_detail.html:13
-msgid "organization"
-msgstr "Organisation"
+#: workbench/templates/generic/object_detail.html:25
+msgid "Delete"
+msgstr "Löschen"
 
-#: workbench/templates/contacts/person_detail.html:5
-msgid "persons"
-msgstr "Personen"
-
-#: workbench/templates/contacts/person_detail.html:54
-#: workbench/templates/invoices/invoice_list.html:10
-#: workbench/templates/projects/project_detail.html:92
-#: workbench/templates/projects/project_detail.html:120
-msgid "invoice"
-msgstr "Rechnung"
-
-#: workbench/templates/contacts/person_detail.html:58
-#: workbench/templates/deals/deal_detail.html:56
-#: workbench/templates/projects/project_detail.html:150
-msgid "activity"
-msgstr "Aktivität"
-
-#: workbench/templates/contacts/person_form.html:12
 #: workbench/templates/generic/object_form.html:13
-#: workbench/templates/offers/service_form.html:18
 #, python-format
 msgid "Update %(object)s"
 msgstr "%(object)s bearbeiten"
 
-#: workbench/templates/contacts/person_form.html:14
 #: workbench/templates/generic/object_form.html:16
-#: workbench/templates/offers/service_form.html:20
 #, python-format
 msgid "Create %(class)s"
 msgstr "%(class)s erstellen"
-
-#: workbench/templates/contacts/person_form.html:24
-msgid "phone numbers"
-msgstr "Telefonnummern"
-
-#: workbench/templates/contacts/person_form.html:50
-msgid "email addresses"
-msgstr "Emailadressen"
-
-#: workbench/templates/contacts/person_form.html:76
-msgid "postal addresses"
-msgstr "Postadressen"
-
-#: workbench/templates/contacts/person_form.html:102
-#: workbench/templates/offers/service_form.html:94
-msgid "submit"
-msgstr "absenden"
-
-#: workbench/templates/contacts/person_list.html:9
-msgid "person"
-msgstr "Person"
-
-#: workbench/templates/contacts/person_list.html:11
-msgid "phone number"
-msgstr "Telefonnummer"
-
-#: workbench/templates/deals/deal_detail.html:5
-msgid "deals"
-msgstr "Geschäfte"
-
-#: workbench/templates/deals/deal_detail.html:18
-#: workbench/templates/deals/deal_list.html:12
-msgid "estimated value"
-msgstr "Geschätzter Wert"
-
-#: workbench/templates/deals/deal_detail.html:32
-#: workbench/templates/projects/project_detail.html:126
-#: workbench/templates/start.html:27
-msgid "activities"
-msgstr "Aktivitäten"
-
-#: workbench/templates/deals/deal_detail.html:50
-#: workbench/templates/projects/project_detail.html:144
-msgid "No activities"
-msgstr "Keine Aktivitäten"
-
-#: workbench/templates/deals/deal_list.html:10
-msgid "deal"
-msgstr "Geschäft"
-
-#: workbench/templates/deals/deal_list.html:13
-msgid "stage"
-msgstr "Stadium"
 
 #: workbench/templates/generic/object_form.html:32
 msgid "Yes, I am sure."
 msgstr "Ja, ich bin sicher."
 
 #: workbench/templates/generic/object_form.html:44
-#: workbench/templates/logbook/loggedcost_form.html:12
-#: workbench/templates/logbook/loggedhours_form.html:40
 #: workbench/templates/modalform.html:22
 msgid "save"
 msgstr "Sichern"
+
+#: workbench/templates/generic/object_list.html:17
+#: workbench/templates/generic/object_list.html:22
+msgid "search"
+msgstr "Suche"
 
 #: workbench/templates/history_modal.html:6
 #: workbench/templatetags/history.py:40
 msgid "History"
 msgstr "Geschichte"
 
-#: workbench/templates/invoices/invoice_detail.html:14
-#: workbench/templates/invoices/invoice_list.html:11
-#: workbench/templates/offers/offer_list.html:11
-#: workbench/templates/projects/project_detail.html:40
-#: workbench/templates/projects/project_list.html:11
-msgid "customer"
-msgstr "Kunde"
-
-#: workbench/templates/invoices/invoice_detail.html:18
-#: workbench/templates/projects/project_detail.html:44
-msgid "contact"
-msgstr "Kontakt"
-
-#: workbench/templates/invoices/invoice_detail.html:22
-#: workbench/templates/logbook/loggedhours_detail.html:13
-#: workbench/templates/offers/offer_list.html:12
-#: workbench/templates/projects/project_list.html:10
-#: workbench/templates/projects/task_list.html:13
-msgid "project"
-msgstr "Projekt"
-
-#: workbench/templates/invoices/invoice_detail.html:32
-#: workbench/templates/logbook/loggedhours_detail.html:39
-#: workbench/templates/logbook/loggedhours_list.html:13
-#: workbench/templates/projects/project_detail.html:26
-#: workbench/templates/projects/project_detail.html:164
-#: workbench/templates/projects/task_detail.html:28
-msgid "description"
-msgstr "Beschreibung"
-
-#: workbench/templates/invoices/invoice_detail.html:36
-#: workbench/templates/offers/offer_detail.html:26
-msgid "postal address"
-msgstr "Postadresse"
-
-#: workbench/templates/invoices/invoice_detail.html:40
-#: workbench/templates/offers/offer_detail.html:71 workbench/tools/models.py:94
-msgid "subtotal"
-msgstr "Zwischentotal"
-
-#: workbench/templates/invoices/invoice_detail.html:45
-#: workbench/templates/offers/offer_detail.html:77 workbench/tools/models.py:95
-msgid "discount"
-msgstr "Rabatt"
-
-#: workbench/templates/invoices/invoice_detail.html:51
-msgid "down payment total"
-msgstr "Anzahlungstotal"
-
-#: workbench/templates/invoices/invoice_detail.html:57
-#: workbench/templates/invoices/invoice_list.html:15
-#: workbench/templates/offers/offer_detail.html:84
-#: workbench/templates/offers/offer_list.html:14
-#: workbench/templates/projects/project_detail.html:67
-#: workbench/templates/projects/project_detail.html:95
-msgid "total excl. tax"
-msgstr "Total exkl. MwSt"
-
-#: workbench/templates/invoices/invoice_list.html:14
-#: workbench/templates/projects/project_detail.html:93
-#: workbench/templates/projects/project_task_list.html:52
-#: workbench/templates/projects/task_list.html:10
-msgid "type"
-msgstr "Typ"
-
-#: workbench/templates/invoices/invoice_list.html:16
-msgid "total CHF"
-msgstr "Total CHF"
-
-#: workbench/templates/logbook/loggedhours_detail.html:17
-#: workbench/templates/logbook/loggedhours_list.html:11
-#: workbench/templates/projects/project_task_list.html:54
-#: workbench/templates/projects/project_task_list.html:105
-#: workbench/templates/projects/task_list.html:12
-msgid "task"
-msgstr "Aufgabe"
-
-#: workbench/templates/logbook/loggedhours_detail.html:21
-#: workbench/templates/logbook/loggedhours_list.html:10
-#: workbench/templates/projects/project_task_list.html:56
-#: workbench/templates/projects/task_detail.html:32
-#: workbench/templates/projects/task_list.html:15
-msgid "created"
-msgstr "Erstellt"
-
-#: workbench/templates/logbook/loggedhours_detail.html:23
-#: workbench/templates/logbook/loggedhours_detail.html:30
-#: workbench/templates/projects/project_task_list.html:82
-#: workbench/templates/projects/task_detail.html:33
-#: workbench/templates/projects/task_list.html:30
-msgid "by"
-msgstr "von"
-
-#: workbench/templates/logbook/loggedhours_detail.html:28
-#: workbench/templates/logbook/loggedhours_list.html:12
-msgid "rendered"
-msgstr "Erbracht"
-
-#: workbench/templates/logbook/loggedhours_detail.html:35
-#: workbench/templates/logbook/loggedhours_list.html:14
-#: workbench/templates/offers/service_form.html:38
-#: workbench/templates/projects/project_task_list.html:58
-#: workbench/templates/projects/project_task_list.html:108
-#: workbench/templates/projects/task_detail.html:62
-#: workbench/templates/projects/task_detail.html:122
-msgid "hours"
-msgstr "Stunden"
-
-#: workbench/templates/logbook/loggedhours_detail.html:43
-msgid "invoicing"
-msgstr "Verrechnung"
-
-#: workbench/templates/logbook/loggedhours_detail.html:47
-#, python-format
-msgid "Archived at %(archived_at)s"
-msgstr "Archiviert um %(archived_at)s"
-
-#: workbench/templates/logbook/loggedhours_form.html:10
-msgid "recent hours"
-msgstr "Neueste Einträge"
-
 #: workbench/templates/modal.html:19
 msgid "Close"
 msgstr "Schliessen"
-
-#: workbench/templates/offers/offer_detail.html:35
-msgid "Move up"
-msgstr "Nach oben"
-
-#: workbench/templates/offers/offer_detail.html:38
-msgid "Move down"
-msgstr "Nach unten"
-
-#: workbench/templates/offers/offer_detail.html:97
-#: workbench/templates/projects/task_detail.html:42
-msgid "service"
-msgstr "Leistung"
-
-#: workbench/templates/offers/offer_list.html:10
-#: workbench/templates/projects/project_detail.html:65
-#: workbench/templates/projects/project_detail.html:117
-msgid "offer"
-msgstr "Offerte"
-
-#: workbench/templates/offers/service_form.html:30
-msgid "efforts"
-msgstr "Aufwände"
-
-#: workbench/templates/offers/service_form.html:39
-msgid "service type"
-msgstr "Leistungstyp"
-
-#: workbench/templates/offers/service_form.html:61
-#: workbench/templates/projects/project_detail.html:16
-#: workbench/templates/projects/project_task_list.html:15
-#: workbench/templates/projects/task_detail.html:15
-msgid "costs"
-msgstr "Kosten"
-
-#: workbench/templates/offers/service_form.html:69
-#: workbench/templates/projects/project_detail.html:165
-#: workbench/templates/projects/project_detail.html:211
-msgid "cost"
-msgstr "Kosten"
-
-#: workbench/templates/offers/service_form.html:70
-msgid "title"
-msgstr "Titel"
-
-#: workbench/templates/projects/project_detail.html:5
-msgid "projects"
-msgstr "Projekte"
-
-#: workbench/templates/projects/project_detail.html:14
-#: workbench/templates/projects/project_task_list.html:13
-#: workbench/templates/projects/task_detail.html:13
-msgid "overview"
-msgstr "Übersicht"
-
-#: workbench/templates/projects/project_detail.html:15
-#: workbench/templates/projects/project_task_list.html:5
-#: workbench/templates/projects/project_task_list.html:14
-#: workbench/templates/projects/task_detail.html:14
-msgid "tasks"
-msgstr "Aufgaben"
-
-#: workbench/templates/projects/project_detail.html:31
-msgid "Overall"
-msgstr "Gesamt"
-
-#: workbench/templates/projects/project_detail.html:58
-msgid "offers"
-msgstr "Offerten"
-
-#: workbench/templates/projects/project_detail.html:162
-msgid "created by"
-msgstr "Erstellt von"
-
-#: workbench/templates/projects/project_detail.html:163
-msgid "rendered on"
-msgstr "Erbracht am"
-
-#: workbench/templates/projects/project_detail.html:177
-#: workbench/templates/projects/project_task_list.html:69
-msgid "Not offered services"
-msgstr "Nicht offerierte Leistungen"
-
-#: workbench/templates/projects/project_task_list.html:53
-#: workbench/templates/projects/task_list.html:11
-msgid "priority"
-msgstr "Priorität"
-
-#: workbench/templates/projects/project_task_list.html:110
-msgid "edit approved hours"
-msgstr "freigegebene Stunden bearbeiten"
-
-#: workbench/templates/projects/task_detail.html:47
-#, python-format
-msgid ""
-"%(logged_tasks)sh / %(approved)sh on service. This task accounts for "
-"%(logged_this)sh."
-msgstr ""
-"%(logged_tasks)sh / %(approved)sh auf Leistung. Diese Aufgabe macht "
-"%(logged_this)sh aus."
-
-#: workbench/templates/projects/task_detail.html:72
-msgid "updates"
-msgstr "Änderungen"
-
-#: workbench/templates/projects/task_detail.html:78
-msgid "change"
-msgstr "Änderung"
-
-#: workbench/templates/projects/task_detail.html:97
-msgid "comment"
-msgstr "Kommentar"
-
-#: workbench/templates/projects/task_detail.html:136
-msgid "Unknown update"
-msgstr "Unbekannte Änderung"
-
-#: workbench/templates/projects/task_detail.html:149
-msgid "add comment"
-msgstr "Kommentar hinzufügen"
 
 #: workbench/templates/start.html:15
 msgid "Hours today"
@@ -642,6 +224,10 @@ msgstr "Stunden heute"
 #: workbench/templates/start.html:19
 msgid "Hours this week"
 msgstr "Stunden diese Woche"
+
+#: workbench/templates/start.html:27
+msgid "activities"
+msgstr "Aktivitäten"
 
 #: workbench/templates/start.html:44
 msgid "no activities!"
@@ -749,6 +335,14 @@ msgstr "'%(field)s' änderte von '%(previous)s' zu '%(current)s'."
 msgid "Cannot delete '%(object)s' because of related objects (%(related)s)."
 msgstr "Kann '%(object)s' wegen Abhängigkeiten nicht löschen (%(related)s)."
 
+#: workbench/tools/models.py:94
+msgid "subtotal"
+msgstr "Zwischentotal"
+
+#: workbench/tools/models.py:95
+msgid "discount"
+msgstr "Rabatt"
+
 #: workbench/tools/models.py:97
 msgid "liable to VAT"
 msgstr "Mehrwertsteuerpflichtig"
@@ -770,6 +364,205 @@ msgstr "Total"
 #: workbench/views.py:16
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
+
+#~ msgid "Welcome! Please fill in your details."
+#~ msgstr "Willkommen! Bitte fülle das folgende Formular aus."
+
+#~ msgid "status"
+#~ msgstr "Status"
+
+#~ msgid "context"
+#~ msgstr "Kontext"
+
+#~ msgid "organizations"
+#~ msgstr "Organisationen"
+
+#~ msgid "people"
+#~ msgstr "Personen"
+
+#~ msgid "groups"
+#~ msgstr "Gruppen"
+
+#~ msgid "notes"
+#~ msgstr "Bemerkungen"
+
+#~ msgid "invoices"
+#~ msgstr "Rechnungen"
+
+#~ msgid "organization"
+#~ msgstr "Organisation"
+
+#~ msgid "persons"
+#~ msgstr "Personen"
+
+#~ msgid "invoice"
+#~ msgstr "Rechnung"
+
+#~ msgid "activity"
+#~ msgstr "Aktivität"
+
+#~ msgid "phone numbers"
+#~ msgstr "Telefonnummern"
+
+#~ msgid "email addresses"
+#~ msgstr "Emailadressen"
+
+#~ msgid "postal addresses"
+#~ msgstr "Postadressen"
+
+#~ msgid "submit"
+#~ msgstr "absenden"
+
+#~ msgid "person"
+#~ msgstr "Person"
+
+#~ msgid "phone number"
+#~ msgstr "Telefonnummer"
+
+#~ msgid "deals"
+#~ msgstr "Geschäfte"
+
+#~ msgid "estimated value"
+#~ msgstr "Geschätzter Wert"
+
+#~ msgid "No activities"
+#~ msgstr "Keine Aktivitäten"
+
+#~ msgid "deal"
+#~ msgstr "Geschäft"
+
+#~ msgid "stage"
+#~ msgstr "Stadium"
+
+#~ msgid "customer"
+#~ msgstr "Kunde"
+
+#~ msgid "contact"
+#~ msgstr "Kontakt"
+
+#~ msgid "project"
+#~ msgstr "Projekt"
+
+#~ msgid "description"
+#~ msgstr "Beschreibung"
+
+#~ msgid "postal address"
+#~ msgstr "Postadresse"
+
+#~ msgid "down payment total"
+#~ msgstr "Anzahlungstotal"
+
+#~ msgid "total excl. tax"
+#~ msgstr "Total exkl. MwSt"
+
+#~ msgid "type"
+#~ msgstr "Typ"
+
+#~ msgid "total CHF"
+#~ msgstr "Total CHF"
+
+#~ msgid "task"
+#~ msgstr "Aufgabe"
+
+#~ msgid "created"
+#~ msgstr "Erstellt"
+
+#~ msgid "by"
+#~ msgstr "von"
+
+#~ msgid "rendered"
+#~ msgstr "Erbracht"
+
+#~ msgid "hours"
+#~ msgstr "Stunden"
+
+#~ msgid "invoicing"
+#~ msgstr "Verrechnung"
+
+#~ msgid "Archived at %(archived_at)s"
+#~ msgstr "Archiviert um %(archived_at)s"
+
+#~ msgid "recent hours"
+#~ msgstr "Neueste Einträge"
+
+#~ msgid "Move up"
+#~ msgstr "Nach oben"
+
+#~ msgid "Move down"
+#~ msgstr "Nach unten"
+
+#~ msgid "service"
+#~ msgstr "Leistung"
+
+#~ msgid "offer"
+#~ msgstr "Offerte"
+
+#~ msgid "efforts"
+#~ msgstr "Aufwände"
+
+#~ msgid "service type"
+#~ msgstr "Leistungstyp"
+
+#~ msgid "costs"
+#~ msgstr "Kosten"
+
+#~ msgid "cost"
+#~ msgstr "Kosten"
+
+#~ msgid "title"
+#~ msgstr "Titel"
+
+#~ msgid "projects"
+#~ msgstr "Projekte"
+
+#~ msgid "overview"
+#~ msgstr "Übersicht"
+
+#~ msgid "tasks"
+#~ msgstr "Aufgaben"
+
+#~ msgid "Overall"
+#~ msgstr "Gesamt"
+
+#~ msgid "offers"
+#~ msgstr "Offerten"
+
+#~ msgid "created by"
+#~ msgstr "Erstellt von"
+
+#~ msgid "rendered on"
+#~ msgstr "Erbracht am"
+
+#~ msgid "Not offered services"
+#~ msgstr "Nicht offerierte Leistungen"
+
+#~ msgid "priority"
+#~ msgstr "Priorität"
+
+#~ msgid "edit approved hours"
+#~ msgstr "freigegebene Stunden bearbeiten"
+
+#~ msgid ""
+#~ "%(logged_tasks)sh / %(approved)sh on service. This task accounts for "
+#~ "%(logged_this)sh."
+#~ msgstr ""
+#~ "%(logged_tasks)sh / %(approved)sh auf Leistung. Diese Aufgabe macht "
+#~ "%(logged_this)sh aus."
+
+#~ msgid "updates"
+#~ msgstr "Änderungen"
+
+#~ msgid "change"
+#~ msgstr "Änderung"
+
+#~ msgid "comment"
+#~ msgstr "Kommentar"
+
+#~ msgid "Unknown update"
+#~ msgstr "Unbekannte Änderung"
+
+#~ msgid "add comment"
+#~ msgstr "Kommentar hinzufügen"
 
 #~ msgid "All"
 #~ msgstr "Alle"
