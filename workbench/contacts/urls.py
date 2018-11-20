@@ -8,13 +8,7 @@ from workbench.contacts.views import (
     PersonListView,
     PersonCreateView,
 )
-from workbench.generic import (
-    ListView,
-    DetailView,
-    CreateView,
-    UpdateView,
-    DeleteView,
-)
+from workbench.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 
 urlpatterns = [

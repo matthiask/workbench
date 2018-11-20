@@ -26,26 +26,24 @@ def search(request):
 
 
 HISTORY = {
-    "workbench.contacts.organization": "",
-    "workbench.contacts.person": "",
-    "workbench.deals.deal": (
-        "title, description, owned_by, stage, status, estimated_value"
-    ),
-    "workbench.invoices.invoice": (
+    "contacts.organization": "",
+    "contacts.person": "",
+    "deals.deal": "title, description, owned_by, stage, status, estimated_value",
+    "invoices.invoice": (
         "invoiced_on, due_on, title, description, postal_address, owned_by,"
         " status, closed_at, subtotal, discount, tax_rate, total"
     ),
-    "workbench.logbook.loggedhours": "",
-    "workbench.logbook.loggedcosts": "",
-    "workbench.offers.offer": (
+    "logbook.loggedhours": "",
+    "logbook.loggedcosts": "",
+    "offers.offer": (
         "offered_on, closed_at, title, description, owned_by, status,"
         "subtotal, discount, tax_rate, total"
     ),
-    "workbench.projects.project": (
+    "projects.project": (
         "customer, contact, title, description, owned_by, status,"
         "invoicing, maintenance"
     ),
-    "workbench.projects.task": "",
+    "projects.task": "",
 }
 
 

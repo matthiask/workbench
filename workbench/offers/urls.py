@@ -11,13 +11,7 @@ from workbench.offers.views import (
     DeleteServiceView,
     MoveServiceView,
 )
-from workbench.generic import (
-    ListView,
-    DetailView,
-    UpdateView,
-    DeleteView,
-    MessageView,
-)
+from workbench.generic import ListView, DetailView, UpdateView, DeleteView, MessageView
 
 
 urlpatterns = [

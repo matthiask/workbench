@@ -2,13 +2,7 @@ from django.conf.urls import url
 
 from workbench.activities.forms import ActivitySearchForm, ActivityForm
 from workbench.activities.models import Activity
-from workbench.generic import (
-    ListView,
-    DetailView,
-    CreateView,
-    UpdateView,
-    DeleteView,
-)
+from workbench.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 
 urlpatterns = [

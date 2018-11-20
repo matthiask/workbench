@@ -7,13 +7,7 @@ from workbench.invoices.forms import (
 )
 from workbench.invoices.models import Invoice
 from workbench.invoices.views import InvoicePDFView
-from workbench.generic import (
-    ListView,
-    CreateView,
-    DetailView,
-    UpdateView,
-    DeleteView,
-)
+from workbench.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
 
 urlpatterns = [
