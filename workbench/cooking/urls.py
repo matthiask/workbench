@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.urls import reverse_lazy
 
 from workbench import generic
 
@@ -24,7 +25,9 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>[0-9]+)/update/$",
-        generic.UpdateView.as_view(model=Day, form_class=DayForm),
+        generic.UpdateView.as_view(
+            model=Day, form_class=DayForm, success_url=reverse_lazy("cooking_day_list")
+        ),
         name="cooking_day_update",
     ),
     url(
