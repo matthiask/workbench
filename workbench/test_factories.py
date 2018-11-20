@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from audit.models import LoggedAction
+from workbench.audit.models import LoggedAction
 from workbench import factories
 
 

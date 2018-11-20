@@ -4,11 +4,11 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext as _
 
-from contacts.models import Organization, Person
-from deals.models import Deal
-from invoices.models import Invoice
-from offers.models import Offer
-from projects.models import Project
+from workbench.contacts.models import Organization, Person
+from workbench.deals.models import Deal
+from workbench.invoices.models import Invoice
+from workbench.offers.models import Offer
+from workbench.projects.models import Project
 
 
 def search(request):
@@ -26,24 +26,24 @@ def search(request):
 
 
 HISTORY = {
-    "contacts.organization": "",
-    "contacts.person": "",
-    "deals.deal": ("title, description, owned_by, stage, status, estimated_value"),
-    "invoices.invoice": (
+    "workbench.contacts.organization": "",
+    "workbench.contacts.person": "",
+    "workbench.deals.deal": ("title, description, owned_by, stage, status, estimated_value"),
+    "workbench.invoices.invoice": (
         "invoiced_on, due_on, title, description, postal_address, owned_by,"
         " status, closed_at, subtotal, discount, tax_rate, total"
     ),
-    "logbook.loggedhours": "",
-    "logbook.loggedcosts": "",
-    "offers.offer": (
+    "workbench.logbook.loggedhours": "",
+    "workbench.logbook.loggedcosts": "",
+    "workbench.offers.offer": (
         "offered_on, closed_at, title, description, owned_by, status,"
         "subtotal, discount, tax_rate, total"
     ),
-    "projects.project": (
+    "workbench.projects.project": (
         "customer, contact, title, description, owned_by, status,"
         "invoicing, maintenance"
     ),
-    "projects.task": "",
+    "workbench.projects.task": "",
 }
 
 

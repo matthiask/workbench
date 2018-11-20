@@ -36,16 +36,16 @@ INSTALLED_APPS = [
         "django.contrib.staticfiles",
         "django.contrib.postgres",
         "bootstrap3",
-        "accounts",
-        "activities",
-        "audit",
-        "contacts",
-        "deals",
-        "invoices",
-        "logbook",
-        "offers",
-        "projects",
-        "services",
+        "workbench.accounts",
+        "workbench.activities",
+        "workbench.audit",
+        "workbench.contacts",
+        "workbench.deals",
+        "workbench.invoices",
+        "workbench.logbook",
+        "workbench.offers",
+        "workbench.projects",
+        "workbench.services",
         "debug_toolbar" if DEBUG else "",
     ]
     if a
@@ -66,7 +66,7 @@ MIDDLEWARE = [
         "django.contrib.auth.middleware.SessionAuthenticationMiddleware",
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
-        "accounts.middleware.login_required",
+        "workbench.accounts.middleware.login_required",
     ]
     if m
 ]
@@ -107,7 +107,7 @@ TEMPLATES = [
 
 LOCALE_PATHS = (os.path.join(BASE_DIR, "conf", "locale"),)
 
-AUTHENTICATION_BACKENDS = ("accounts.backends.AuthBackend",)
+AUTHENTICATION_BACKENDS = ("workbench.accounts.backends.AuthBackend",)
 
 DATABASES = {"default": dj_database_url.config(default="sqlite:///db.sqlite3")}
 

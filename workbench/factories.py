@@ -2,12 +2,12 @@ import factory
 from faker import Factory
 import types
 
-from accounts.models import User
-from contacts.models import Organization, Person
-from invoices.models import Invoice
-from offers.models import Offer, Service
-from projects.models import Project, Task
-from services.models import ServiceType
+from workbench.accounts.models import User
+from workbench.contacts.models import Organization, Person
+from workbench.invoices.models import Invoice
+from workbench.offers.models import Offer, Service
+from workbench.projects.models import Project, Task
+from workbench.services.models import ServiceType
 
 
 faker = Factory.create("de")

@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import ugettext as _
 
-from tools.history import changes
+from workbench.tools.history import changes
 
 
 register = template.Library()

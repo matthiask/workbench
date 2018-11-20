@@ -11,10 +11,10 @@ from django.utils import timezone
 from django.utils.html import format_html, mark_safe
 from django.utils.translation import ugettext as _
 
-from logbook.models import LoggedHours
-from offers.models import Service
-from projects.models import Comment
-from tools.formats import local_date_format
+from workbench.logbook.models import LoggedHours
+from workbench.offers.models import Service
+from workbench.projects.models import Comment
+from workbench.tools.formats import local_date_format
 
 
 register = template.Library()
