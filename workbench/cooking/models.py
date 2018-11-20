@@ -10,13 +10,12 @@ from workbench.tools.urls import model_urls
 
 class DayQuerySet(models.QuerySet):
     def create_days(self):
-        today = date.today()
-        latest = self.order_by("-day").first()
-        start_from = max(0, (latest.day - today).days if latest else 0)
-        for offset in range(start_from, 180):
-            day = today + timedelta(days=offset)
-            if 0 < day.weekday() < 6:  # No weekends
-                self.get_or_create(day=today + timedelta(days=offset))
+        year = date.today().year + 1
+        start = date(year, 1, 1)
+        for offset in range(0, 366):
+            day = start + timedelta(days=offset)
+            if day.isoweekday() <= 5 and day.year == year:
+                self.get_or_create(day=day)
 
 
 @model_urls()
