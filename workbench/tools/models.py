@@ -19,6 +19,11 @@ class SearchQuerySet(models.QuerySet):
 SearchManager = models.Manager.from_queryset(SearchQuerySet)
 
 
+class SlowCollector(Collector):
+    def can_fast_delete(self, *args, **kwargs):
+        return False
+
+
 class Model(models.Model):
     class Meta:
         abstract = True
@@ -33,7 +38,7 @@ class Model(models.Model):
 
     @classmethod
     def allow_delete(cls, instance, request):
-        collector = Collector(using=instance._state.db)
+        collector = SlowCollector(using=instance._state.db)
         try:
             collector.collect([instance])
         except ProtectedError as exc:
