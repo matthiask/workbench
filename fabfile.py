@@ -50,13 +50,13 @@ def pull_database(namespace):
     )
 
 
-@task(alias="mm")
-def makemessages():
+@task
+def mm():
     local("venv/bin/python manage.py makemessages -a -i venv -i htmlcov")
 
 
-@task(alias="cm")
-def compilemessages():
+@task
+def cm():
     local("cd conf && ../venv/bin/python ../manage.py compilemessages")
 
 

@@ -14,7 +14,7 @@ import sys
 from speckenv import read_speckenv, env
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-read_speckenv()
+read_speckenv(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("SECRET_KEY", required=True)
 DEBUG = any(arg in ("runserver",) for arg in sys.argv)
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
         "bootstrap3",
         "workbench.accounts",
         "workbench.audit",
+        "workbench.cooking",
         "debug_toolbar" if DEBUG else "",
     ]
     if a

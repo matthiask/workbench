@@ -12,6 +12,7 @@ urlpatterns = [
     url(r"^404/$", render, {"template_name": "404.html"}),
     url(r"^admin/", include(admin.site.urls)),
     url(r"^accounts/", include("workbench.accounts.urls")),
+    url(r"^cooking/", include("workbench.cooking.urls")),
     url(r"^search/$", views.search, name="search"),
     url(r"^history/(\w+\.\w+)/([0-9]+)/$", views.history, name="history"),
 ]
