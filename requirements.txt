@@ -28,3 +28,4 @@ rsa==4.0
 six==1.11.0
 sqlparse==0.2.4
 text-unidecode==1.2
+speckenv

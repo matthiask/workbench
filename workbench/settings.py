@@ -9,19 +9,19 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
 import dj_database_url
-import env
 import os
 import sys
 import types
+from speckenv import read_speckenv, env
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-env.read_dotenv()
+read_speckenv()
 
-SECRET_KEY = env.env("SECRET_KEY", required=True)
+SECRET_KEY = env("SECRET_KEY", required=True)
 DEBUG = any(arg in ("runserver",) for arg in sys.argv)
 TESTING = any(arg in ("test",) for arg in sys.argv)
-LIVE = env.env("LIVE", default=False)
-ALLOWED_HOSTS = env.env("ALLOWED_HOSTS", default=[])
+LIVE = env("LIVE", default=False)
+ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
 ADMINS = (("Matthias Kestenholz", "mk@feinheit.ch"),)
 
 INSTALLED_APPS = [
@@ -124,8 +124,8 @@ if not TESTING:
         "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
     )
 
-OAUTH2_CLIENT_ID = env.env("OAUTH2_CLIENT_ID", default="")
-OAUTH2_CLIENT_SECRET = env.env("OAUTH2_CLIENT_SECRET", default=None)
+OAUTH2_CLIENT_ID = env("OAUTH2_CLIENT_ID", default="")
+OAUTH2_CLIENT_SECRET = env("OAUTH2_CLIENT_SECRET", default=None)
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
 
@@ -146,7 +146,7 @@ def font(name):
     return os.path.join(BASE_DIR, "stuff", "fonts", name)
 
 
-NAMESPACE = env.env("NAMESPACE", required=True)
+NAMESPACE = env("NAMESPACE", required=True)
 WORKBENCH = {
     "feinheit": types.SimpleNamespace(
         SSO_DOMAIN="feinheit.ch",
@@ -197,7 +197,7 @@ WORKBENCH = {
             "bolditalic": font("HelveticaNeueBoldItalic.ttf"),
         },
     ),
-}[env.env("NAMESPACE", required=True)]
+}[env("NAMESPACE", required=True)]
 
 SILENCED_SYSTEM_CHECKS = [
     "1_10.W001"  # MIDDLEWARE_CLASSES is not used anymore, thank you.

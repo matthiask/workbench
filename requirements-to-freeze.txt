@@ -14,3 +14,4 @@ pdfdocument
 Pillow
 psycopg2-binary
 reportlab
+speckenv
