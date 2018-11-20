@@ -23,7 +23,12 @@ class DayQuerySet(models.QuerySet):
 class Day(Model):
     day = models.DateField(_("day"))
     handled_by = models.ForeignKey(
-        User, on_delete=models.SET_NULL, related_name="+", blank=True, null=True, verbose_name=_("handled by")
+        User,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        blank=True,
+        null=True,
+        verbose_name=_("handled by"),
     )
 
     objects = DayQuerySet.as_manager()

@@ -1,7 +1,6 @@
 from django import http
 from django.conf import settings
-from django.contrib import messages
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib import auth, messages
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import ugettext as _
@@ -9,9 +8,9 @@ from django.views.decorators.cache import never_cache
 
 from oauth2client.client import OAuth2WebServerFlow, FlowExchangeError
 
+from workbench import generic
 from workbench.accounts.forms import UserForm
 from workbench.accounts.models import User
-from workbench.generic import UpdateView
 
 
 def accounts(request):
@@ -22,13 +21,28 @@ def accounts(request):
     )
 
 
-class UserUpdateView(UpdateView):
+class UserUpdateView(generic.UpdateView):
     model = User
     form_class = UserForm
     success_url = reverse_lazy("accounts_update")
 
     def get_object(self):
-        return self.request.user
+        if self.request.user.is_authenticated:
+            return self.request.user
+        elif "user_email" in self.request.session:
+            return User(email=self.request.session["user_email"])
+        else:
+            return None  # ???
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        if self.object.pk:  # Existed already
+            return http.HttpResponseRedirect(self.get_success_url())
+
+        self.object.email = self.request.session.pop("user_email")
+        self.object.save()
+        auth.login(self.request, auth.authenticate(email=self.object.email))
+        return http.HttpResponseRedirect(self.get_success_url())
 
 
 def oauth2_flow(request):
@@ -70,25 +84,19 @@ def oauth2(request):
     if credentials.id_token["email_verified"]:
         email = credentials.id_token["email"]
 
-        _u, created = User.objects.get_or_create(
-            email=email,
-            defaults={
-                "is_active": True,
-                "is_admin": False,
-                "_short_name": "",
-                "_full_name": "",
-            },
-        )
-        if created:
-            messages.success(request, _("Welcome! Please fill in your details."))
-
-        user = authenticate(email=email)
+        user = auth.authenticate(email=email)
         if user and user.is_active:
-            auth_login(request, user)
+            auth.login(request, user)
         else:
-            messages.error(request, _("No user with email address %s found.") % email)
-
-        if created:
+            messages.info(
+                request,
+                _(
+                    "No user with email address %s found,"
+                    " do you want to create a new account?"
+                )
+                % email,
+            )
+            request.session["user_email"] = email
             return http.HttpResponseRedirect(reverse("accounts_update"))
 
     next = request.get_signed_cookie("next", default=None, salt="next")
@@ -98,6 +106,6 @@ def oauth2(request):
 
 
 def logout(request):
-    auth_logout(request)
+    auth.logout(request)
     messages.success(request, _("You have been signed out."))
     return http.HttpResponseRedirect(reverse("login"))
