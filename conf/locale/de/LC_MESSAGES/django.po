@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-20 17:38+0100\n"
+"POT-Creation-Date: 2018-11-20 22:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,11 +58,12 @@ msgid "OAuth2 error: Credential exchange failed"
 msgstr "OAuth2 Fehler: Anmeldedaten-Tausch fehlgeschlagen"
 
 #: workbench/accounts/views.py:96
-#, fuzzy, python-format
-#| msgid "No user with email address %s found."
+#, python-format
 msgid ""
 "No user with email address %s found, do you want to create a new account?"
-msgstr "Keinen Benutzer mit Emailadresse %s gefunden."
+msgstr ""
+"Keinen Benutzer mit Emailadresse %s gefunden, willst Du ein neues Konto "
+"erstellen?"
 
 #: workbench/accounts/views.py:112
 msgid "You have been signed out."
@@ -153,7 +154,7 @@ msgstr "Verwaltung"
 msgid "Sign off"
 msgstr "Abmelden"
 
-#: workbench/templates/cooking/day_list.html:55
+#: workbench/templates/cooking/day_list.html:44
 #: workbench/templates/generic/object_list.html:61
 #, python-format
 msgid "%(total)s total"
