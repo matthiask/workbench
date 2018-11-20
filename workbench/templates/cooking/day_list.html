@@ -5,10 +5,10 @@
 {% block objects %}
 <table class="table table-hover table-striped">
 
-  {% for week in object_list|calendar %}
-  {% ifchanged week.0.dy|date:"mY" %}
+  {% for start, week in object_list|calendar %}
+  {% ifchanged start|date:"mY" %}
     <tr>
-      <th>{{ week.0.day|date:"F Y" }}</th>
+      <th>{{ start|date:"F Y" }}</th>
       <td>Mo</td>
       <td>Di</td>
       <td>Mi</td>
@@ -19,7 +19,7 @@
     </tr>
   {% endifchanged %}
   <tr>
-    <td>KW {{ week.0.day|date:"W" }}</td>
+    <td>KW {{ start|date:"W" }}</td>
     {% for day in week %}
     <td>
       {% if day %}

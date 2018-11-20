@@ -66,7 +66,9 @@
     </table>
     {% endblock %}
 
-    {% bootstrap_pagination page=page_obj extra=request.GET|querystring:'page' %}
+    {% if page_obj %}
+      {% bootstrap_pagination page=page_obj extra=request.GET|querystring:'page' %}
+    {% endif %}
   </div>
 </div>
 {% endblock %}

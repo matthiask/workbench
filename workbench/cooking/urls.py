@@ -7,7 +7,11 @@ from .models import Day
 
 
 urlpatterns = [
-    url(r"^$", generic.ListView.as_view(model=Day), name="cooking_day_list"),
+    url(
+        r"^$",
+        generic.ListView.as_view(model=Day, paginate_by=None),
+        name="cooking_day_list",
+    ),
     url(
         r"^(?P<pk>[0-9]+)/$",
         generic.DetailView.as_view(model=Day),
