@@ -86,7 +86,7 @@ msgstr "Tag"
 
 #: workbench/cooking/models.py:30
 msgid "handled by"
-msgstr "bearbeitet von"
+msgstr "bewältigt von"
 
 #: workbench/cooking/models.py:38
 msgid "days"
