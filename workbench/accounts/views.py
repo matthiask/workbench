@@ -42,7 +42,7 @@ class UserUpdateView(generic.UpdateView):
         self.object.email = self.request.session.pop("user_email")
         self.object.save()
         auth.login(self.request, auth.authenticate(email=self.object.email))
-        return http.HttpResponseRedirect(self.get_success_url())
+        return http.HttpResponseRedirect("/")
 
 
 def oauth2_flow(request):
