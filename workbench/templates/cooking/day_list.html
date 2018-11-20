@@ -3,7 +3,7 @@
 {% load bootstrap3 calendar i18n querystring %}
 
 {% block objects %}
-<table class="table table-hover table-striped">
+<table class="table table-hover table-striped" style="table-layout:fixed">
 
   {% for start, week in object_list|calendar %}
   {% ifchanged start|date:"mY" %}
@@ -14,42 +14,31 @@
       <td>Mi</td>
       <td>Do</td>
       <td>Fr</td>
-      <td>Sa</td>
-      <td>So</td>
+      {# <td>Sa</td> #}
+      {# <td>So</td> #}
     </tr>
   {% endifchanged %}
   <tr>
     <td>KW {{ start|date:"W" }}</td>
     {% for day in week %}
-    <td>
+    <th>
       {% if day %}
-      <a href="{{ day.urls.detail }}">{{ day.day|date:"d" }}</a>
+        {% if day.handled_by %}
+          <a href="{{ day.urls.detail }}">
+            {{ day.day|date:"d" }}
+            <span class="hidden-xs">- {{ day.handled_by }}</span>
+          </a>
+        {% else %}
+          <a href="{{ day.urls.update }}">{{ day.day|date:"d" }}</a>
+        {% endif %}
       {% endif %}
-    </td>
+    </th>
     {% endfor %}
   </tr>
   {% endfor %}
-</table>
-
-
-<table class="table table-hover table-striped">
-  <thead>
-    <tr>
-      <th>{{ view.meta.verbose_name }}</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for object in object_list %}
-      <tr>
-        <th><a href="{{ object.urls.detail }}">
-            {{ object }}
-        </a></th>
-      </tr>
-    {% endfor %}
-  </tbody>
   <tfoot>
     <tr>
-      <td>
+      <td colspan="6">
         {{ paginator.count }} {{ view.meta.verbose_name_plural }}
         {% if view.root_queryset_count != paginator.count %}
         (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
