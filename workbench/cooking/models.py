@@ -39,3 +39,24 @@ class Day(Model):
 
     def __str__(self):
         return "{} - {}".format(self.day, self.handled_by or "?")
+
+
+@model_urls()
+class Presence(Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="+",
+        verbose_name=_("user"),
+    )
+    year = models.IntegerField(_("year"))
+    percentage = models.IntegerField(_("percentage"))
+
+    class Meta:
+        ordering = ["year"]
+        unique_together = [("user", "year")]
+        verbose_name = _("presence")
+        verbose_name_plural = _("presences")
+
+    def __str__(self):
+        return "{}%".format(self.percentage)
