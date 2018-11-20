@@ -3,8 +3,18 @@ from django.shortcuts import redirect
 
 from workbench.contacts.forms import OrganizationForm, PersonForm
 from workbench.contacts.models import Organization, Person
-from workbench.contacts.views import OrganizationListView, PersonListView, PersonCreateView
-from workbench.tools.views import ListView, DetailView, CreateView, UpdateView, DeleteView
+from workbench.contacts.views import (
+    OrganizationListView,
+    PersonListView,
+    PersonCreateView,
+)
+from workbench.tools.views import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+)
 
 
 urlpatterns = [

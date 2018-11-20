@@ -28,7 +28,9 @@ def search(request):
 HISTORY = {
     "workbench.contacts.organization": "",
     "workbench.contacts.person": "",
-    "workbench.deals.deal": ("title, description, owned_by, stage, status, estimated_value"),
+    "workbench.deals.deal": (
+        "title, description, owned_by, stage, status, estimated_value"
+    ),
     "workbench.invoices.invoice": (
         "invoiced_on, due_on, title, description, postal_address, owned_by,"
         " status, closed_at, subtotal, discount, tax_rate, total"

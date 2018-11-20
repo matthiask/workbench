@@ -2,7 +2,13 @@ from django.conf.urls import url
 
 from workbench.deals.forms import DealSearchForm, DealForm
 from workbench.deals.models import Deal
-from workbench.tools.views import ListView, DetailView, CreateView, UpdateView, DeleteView
+from workbench.tools.views import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+)
 
 
 urlpatterns = [

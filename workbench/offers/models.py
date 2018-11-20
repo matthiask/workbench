@@ -12,7 +12,13 @@ from workbench.accounts.models import User
 from workbench.projects.models import Project
 from workbench.services.models import ServiceType
 from workbench.tools.formats import local_date_format
-from workbench.tools.models import Model, ModelWithTotal, SearchQuerySet, MoneyField, HoursField
+from workbench.tools.models import (
+    Model,
+    ModelWithTotal,
+    SearchQuerySet,
+    MoneyField,
+    HoursField,
+)
 from workbench.tools.urls import model_urls
 
 

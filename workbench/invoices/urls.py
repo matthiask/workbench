@@ -1,9 +1,19 @@
 from django.conf.urls import url
 
-from workbench.invoices.forms import InvoiceSearchForm, InvoiceForm, CreatePersonInvoiceForm
+from workbench.invoices.forms import (
+    InvoiceSearchForm,
+    InvoiceForm,
+    CreatePersonInvoiceForm,
+)
 from workbench.invoices.models import Invoice
 from workbench.invoices.views import InvoicePDFView
-from workbench.tools.views import ListView, CreateView, DetailView, UpdateView, DeleteView
+from workbench.tools.views import (
+    ListView,
+    CreateView,
+    DetailView,
+    UpdateView,
+    DeleteView,
+)
 
 
 urlpatterns = [
