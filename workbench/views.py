@@ -44,8 +44,8 @@ HISTORY = {
         'title, description, owned_by, stage, status, estimated_value'
     ),
     'invoices.invoice': (
-        'invoiced_on, due_on, title, description, owned_by, status, closed_at,'
-        'subtotal, discount, tax_rate, total'
+        'invoiced_on, due_on, title, description, postal_address, owned_by,'
+        ' status, closed_at, subtotal, discount, tax_rate, total'
     ),
     'logbook.loggedhours': '',
     'logbook.loggedcosts': '',
