@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 from django.db import models
+from django.utils.dates import WEEKDAYS
 from django.utils.translation import ugettext_lazy as _
 
 from workbench.accounts.models import User
@@ -57,3 +58,29 @@ class Presence(Model):
 
     def __str__(self):
         return "{}%".format(self.percentage)
+
+
+class DayOfWeekDefault(Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="+", verbose_name=_("user")
+    )
+    day_of_week = models.IntegerField(
+        _("day of week"), choices=sorted(WEEKDAYS.items()), unique=True
+    )
+
+    class Meta:
+        ordering = ["day_of_week"]
+        verbose_name = _("day of week default")
+        verbose_name_plural = _("day of week defaults")
+
+    def __str__(self):
+        return self.get_day_of_week_display()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        Day.objects.filter(
+            day__week_day=(self.day_of_week + 1) % 7 + 1,
+            handled_by=None,
+        ).update(handled_by=self.user)
+
+    save.alters_data = True

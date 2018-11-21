@@ -43,7 +43,7 @@ def run(year=2019):
             )
         else:
             without_presence.append(
-                "{:>20.20}:            {:>3} Tage".format(
+                "{:>20.20}:           {:>4} Tage".format(
                     user.get_full_name(), -counts[user.id]
                 )
             )
