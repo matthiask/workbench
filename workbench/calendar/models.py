@@ -235,7 +235,10 @@ class DayOfWeekDefault(Model):
 
 def on_user_saved(sender, instance, created, **kwargs):
     if created:
-        instance.apps.set(App.objects.all())
+        if "feinheit" in instance.email:
+            instance.apps.set(App.objects.all())
+        else:
+            instance.apps.set(App.objects.filter(slug="kochen"))
 
     elif not instance.is_active:
         Day.objects.filter(handled_by=instance, day__gte=date.today()).update(
