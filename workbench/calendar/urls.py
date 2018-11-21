@@ -41,7 +41,11 @@ urlpatterns = [
     url(
         r"^(?P<app>\w+)/$",
         app_mixin(generic.ListView).as_view(
-            model=Day, search_form_class=DaySearchForm, paginate_by=None
+            model=Day,
+            search_form_class=DaySearchForm,
+            paginate_by=None,
+            show_search_field=False,
+            show_create_button=False,
         ),
         name="calendar_day_list",
     ),

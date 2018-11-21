@@ -62,6 +62,11 @@ class App(Model):
                 )
 
 
+class DayQuerySet(models.QuerySet):
+    def search(self, terms):
+        return self
+
+
 @model_urls(lambda obj: {"app": current_app, "pk": obj.pk})
 class Day(Model):
     app = models.ForeignKey(
@@ -76,6 +81,8 @@ class Day(Model):
         null=True,
         verbose_name=_("handled by"),
     )
+
+    objects = DayQuerySet.as_manager()
 
     class Meta:
         ordering = ["day"]

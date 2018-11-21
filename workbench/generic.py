@@ -49,6 +49,7 @@ class ListView(ToolsMixin, vanilla.ListView):
     paginate_by = 50
     search_form_class = None
     show_create_button = True
+    show_search_field = True
 
     def get(self, request, *args, **kwargs):
         if self.search_form_class:

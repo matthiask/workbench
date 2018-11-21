@@ -1,16 +1,17 @@
 from collections import Counter
+from datetime import date
 
 from workbench.accounts.models import User
 
 from .models import App
 
 
-def run():
+def run(year=None):
     for app in App.objects.all():
-        run_app(app)
+        run_app(app, year=date.today().year if year is None else year)
 
 
-def run_app(app, year=2019):
+def run_app(app, year):
     print("{}".format(app))
     counts = Counter(
         app.days.filter(day__year=year).values_list("handled_by", flat=True)

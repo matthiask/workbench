@@ -14,6 +14,7 @@
       </div>
       <div class="col-md-9 right-head">
         <form method="GET" action="." class="form-inline form-search">
+          {% if view.show_search_field %}
           <label class="sr-only">{% trans 'search' %}</label>
           <input
             class="form-control"
@@ -21,6 +22,7 @@
             name="q"
             placeholder="{% trans 'search' %}"
             value="{{ view.request.GET.q|default:'' }}">
+          {% endif %}
 
           {% for f in view.search_form %}
             <label class="sr-only">{{ f.label }}</label>
