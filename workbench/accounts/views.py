@@ -25,6 +25,7 @@ class UserUpdateView(generic.UpdateView):
     model = User
     form_class = UserForm
     success_url = "/"
+    fields = ["_full_name", "_short_name", "email"]
 
     def get_object(self):
         if self.request.user.is_authenticated:

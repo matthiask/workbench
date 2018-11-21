@@ -2,7 +2,7 @@ from fabric.api import cd, env, local, run, task
 
 
 env.forward_agent = True
-env.hosts = ["deploy@workbench.feinheit.ch"]
+env.hosts = ["www-data@feinheit06.nine.ch"]
 
 
 @task
@@ -15,33 +15,18 @@ def deploy():
     check()
     local("git push origin master")
 
-    """
-    with cd('www/workbench/'):
-        run('git checkout master')
-        run('git fetch origin')
-        run('git merge --ff-only origin/master')
-        run('find . -name "*.pyc" -delete')
-        run('venv/bin/pip install -r requirements.txt')
-        run('venv/bin/python manage.py migrate')
-        run('venv/bin/python manage.py collectstatic --noinput')
-        run('sudo systemctl restart workbench.service')
-    """
-
-    with cd("www/dbpag-workbench/"):
-        run("git checkout master")
+    with cd("hangar.diebruchpiloten.com"):
         run("git fetch origin")
-        run("git merge --ff-only origin/master")
+        run("git merge --ff-only origin/solomon")
         run('find . -name "*.pyc" -delete')
         run("venv/bin/pip install -r requirements.txt")
         run("venv/bin/python manage.py migrate")
         run("venv/bin/python manage.py collectstatic --noinput")
-        run("sudo systemctl restart dbpag-workbench.service")
+        run("systemctl --user restart gunicorn@hangar.diebruchpiloten.com.service")
 
 
 @task
-def pull_database(namespace):
-    remote = {"fh": "workbench", "dbpag": "dbpag-workbench"}[namespace]
-
+def pull_database():
     local("dropdb --if-exists workbench")
     local("createdb --encoding UTF8 workbench")
     local(
