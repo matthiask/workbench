@@ -1,3 +1,4 @@
+from collections import Counter
 from contextlib import contextmanager
 from datetime import date, timedelta
 from threading import local
@@ -62,6 +63,61 @@ class App(Model):
                     day=day,
                     defaults={"handled_by": defaults.get(day.isoweekday() - 1)},
                 )
+
+    def stats(self, year=None):
+        year = date.today().year if year is None else year
+        counts = Counter(
+            self.days.filter(day__year=year).values_list("handled_by", flat=True)
+        )
+        presences = dict(
+            self.presences.filter(year=year).values_list("user", "percentage")
+        )
+
+        users = (
+            User.objects.filter(id__in=set(counts.keys()) | set(presences))
+            | self.users.all()
+        ).distinct()
+        presences_sum = sum(presences.values())
+        counts_sum = sum(
+            (
+                count
+                for user_id, count in counts.items()
+                if user_id in presences or user_id is None
+            ),
+            0,
+        )
+
+        rows = []
+        for user in users:
+            if user.id in presences:
+                presence = presences[user.id]
+                target = presence / presences_sum * counts_sum
+            elif counts[user.id]:
+                presence = None
+                target = None
+            else:
+                continue
+
+            rows.append(
+                {
+                    "user": user,
+                    "presence": presence,
+                    "target": round(target) if target else None,
+                    "handled": counts[user.id],
+                    "reached": (
+                        round(100 * counts[user.id] / target) if target else None
+                    ),
+                }
+            )
+
+        return {
+            "year": year,
+            "users": sorted(
+                rows,
+                key=lambda row: 1e9 if row["reached"] is None else row["reached"],
+                reverse=True,
+            ),
+        }
 
 
 class DayQuerySet(models.QuerySet):

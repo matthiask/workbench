@@ -164,3 +164,13 @@ tbody th > a {
 .columns > * {
   display: block;
 }
+
+.progress {
+  height: 20px;
+  margin-bottom: 0;
+}
+.progress,
+.progress .progress-bar {
+  font-size: 13px;
+  line-height: 1.5;
+}
