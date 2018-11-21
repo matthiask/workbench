@@ -86,4 +86,4 @@ class User(Model, AbstractBaseUser):
         ).select_related("app"):
             days[day.app][0 if day.handled_by_id else 1].append(day)
 
-        return sorted(days.items(), key=lambda row: row[0].title)
+        return sorted(days.items(), key=lambda row: row[0].ordering)
