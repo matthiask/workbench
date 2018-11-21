@@ -19,11 +19,20 @@
             <a href="{{ app.get_absolute_url }}">{{ app.title }}</a>
         </h3></div>
         <div class="panel-body">
+          <h4>Eigene Tage</h4>
           <div style="column-width:10em">
-            {% for day in days %}
-            <div>{{ day.day|date:"D d.m.Y" }}</div>
+            {% for day in days.0 %}
+            <div><a href="{% url 'calendar_day_detail' pk=day.pk app=app.slug %}">{{ day.day|date:"D d.m.Y" }}</a></div>
             {% endfor %}
           </div>
+          {% if days.1 %}
+            <h4>Nicht besetzte Tage</h4>
+            <div style="column-width:10em">
+              {% for day in days.1 %}
+              <div><a href="{% url 'calendar_day_update' pk=day.pk app=app.slug %}">{{ day.day|date:"D d.m.Y" }}</a></div>
+              {% endfor %}
+            </div>
+          {% endif %}
         </div>
       </div>
     {% endfor %}

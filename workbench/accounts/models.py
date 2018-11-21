@@ -1,8 +1,9 @@
 from collections import defaultdict
-from datetime import date
+from datetime import date, timedelta
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from workbench.tools.models import Model
@@ -76,8 +77,13 @@ class User(Model, AbstractBaseUser):
         return self.is_admin
 
     def future_days(self):
-        days = defaultdict(list)
-        for day in self.days.filter(day__gte=date.today()).select_related("app"):
-            days[day.app].append(day)
+        days = defaultdict(lambda: [[], []])
+        today = date.today()
+        for day in self.days.model._default_manager.filter(
+            Q(day__gte=today),
+            Q(handled_by=self)
+            | Q(handled_by=None, day__lte=today + timedelta(days=30)),
+        ).select_related("app"):
+            days[day.app][0 if day.handled_by_id else 1].append(day)
 
         return sorted(days.items(), key=lambda row: row[0].title)
