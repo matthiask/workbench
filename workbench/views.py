@@ -19,7 +19,7 @@ def search(request):
 
 
 HISTORY = {
-    "cooking.day": "",
+    "calendar.day": "",
     "contacts.organization": "",
     "contacts.person": "",
     "deals.deal": "title, description, owned_by, stage, status, estimated_value",

@@ -44,7 +44,13 @@ def model_urls(reverse_kwargs_fn=lambda object: {"pk": object.pk}, default="deta
                     obj._meta.app_label,
                     obj._meta.model_name,
                 )
-                kwargs = {"kwargs": reverse_kwargs_fn(obj)}
+                kwargs = {
+                    "kwargs": {
+                        key: value
+                        for key, value in reverse_kwargs_fn(obj).items()
+                        if value is not None
+                    }
+                }
                 helper = obj.__dict__["urls"] = _MUHelper(viewname_pattern, kwargs)
                 return helper
 

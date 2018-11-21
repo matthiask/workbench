@@ -1,0 +1,68 @@
+from django.conf.urls import url
+from django.contrib import messages
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from django.utils.translation import ugettext_lazy as _
+
+from workbench import generic
+
+from .forms import DayForm
+from .models import App, Day, activate_app, current_app
+
+
+def app_mixin(view):
+    class View(view):
+        def dispatch(self, request, *args, **kwargs):
+            app = kwargs.get("app")
+            if app:
+                app = get_object_or_404(App, users=request.user, slug=app)
+            with activate_app(app.slug):
+                response = super().dispatch(request, *args, **kwargs)
+                if hasattr(response, "render"):
+                    # Have to render responses inside the activate_app block.
+                    response.render()
+                return response
+
+    return View
+
+
+list_url = reverse_lazy("calendar_day_list", kwargs={"app": current_app})
+
+
+urlpatterns = [
+    url(
+        r"^(?P<app>\w+)/$",
+        app_mixin(generic.ListView).as_view(model=Day, paginate_by=None),
+        name="calendar_day_list",
+    ),
+    url(
+        r"^(?P<app>\w+)/(?P<pk>[0-9]+)/$",
+        app_mixin(generic.DetailView).as_view(model=Day),
+        name="calendar_day_detail",
+    ),
+    url(
+        r"^(?P<app>\w+)/create/$",
+        app_mixin(generic.MessageView).as_view(
+            redirect_to=list_url,
+            message=_("Creating days is not supported."),
+            level=messages.WARNING,
+        ),
+        name="calendar_day_create",
+    ),
+    url(
+        r"^(?P<app>\w+)/(?P<pk>[0-9]+)/update/$",
+        app_mixin(generic.UpdateView).as_view(
+            model=Day, form_class=DayForm, success_url=list_url
+        ),
+        name="calendar_day_update",
+    ),
+    url(
+        r"^(?P<app>\w+)/(?P<pk>[0-9]+)/delete/$",
+        app_mixin(generic.MessageView).as_view(
+            redirect_to=list_url,
+            message=_("Deleting days is not supported."),
+            level=messages.WARNING,
+        ),
+        name="calendar_day_delete",
+    ),
+]

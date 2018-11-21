@@ -37,7 +37,7 @@ INSTALLED_APPS = [
         "bootstrap3",
         "workbench.accounts",
         "workbench.audit",
-        "workbench.cooking",
+        "workbench.calendar",
         "debug_toolbar" if DEBUG else "",
     ]
     if a
