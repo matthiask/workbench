@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from workbench import generic
 
-from .forms import DayForm
+from .forms import DayForm, DaySearchForm
 from .models import App, Day, activate_app, current_app
 
 
@@ -23,8 +23,8 @@ def app_mixin(view):
                     response.render()
                 return response
 
-        def get_queryset(self):
-            return super().get_queryset().filter(app=self.app)
+        def get_root_queryset(self):
+            return super().get_root_queryset().filter(app=self.app)
 
     return View
 
@@ -35,7 +35,9 @@ list_url = reverse_lazy("calendar_day_list", kwargs={"app": current_app})
 urlpatterns = [
     url(
         r"^(?P<app>\w+)/$",
-        app_mixin(generic.ListView).as_view(model=Day, paginate_by=None),
+        app_mixin(generic.ListView).as_view(
+            model=Day, search_form_class=DaySearchForm, paginate_by=None
+        ),
         name="calendar_day_list",
     ),
     url(
@@ -55,6 +57,7 @@ urlpatterns = [
     url(
         r"^(?P<app>\w+)/(?P<pk>[0-9]+)/update/$",
         app_mixin(generic.UpdateView).as_view(
+            # TODO go to list URL of year
             model=Day, form_class=DayForm, success_url=list_url
         ),
         name="calendar_day_update",

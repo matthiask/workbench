@@ -24,12 +24,12 @@
     <th>
       {% if day %}
         {% if day.handled_by %}
-          <a href="{{ day.urls.detail }}">
+          <a href="{{ day.urls.detail }}" class="{{ day.css }}">
             {{ day.day|date:"d" }}
             <span class="hidden-xs">- {{ day.handled_by }}</span>
           </a>
         {% else %}
-          <a href="{{ day.urls.update }}" class="text-warning">{{ day.day|date:"d" }}</a>
+          <a href="{{ day.urls.update }}" class="{{ day.css }}">{{ day.day|date:"d" }}</a>
         {% endif %}
       {% endif %}
     </th>

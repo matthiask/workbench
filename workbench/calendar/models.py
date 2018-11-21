@@ -8,6 +8,7 @@ from django.utils.dates import WEEKDAYS
 from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
 
+from workbench.accounts.middleware import set_user_name
 from workbench.accounts.models import User
 from workbench.tools.models import Model
 from workbench.tools.urls import model_urls
@@ -41,13 +42,15 @@ class App(Model):
     def get_absolute_url(self):
         return reverse("calendar_day_list", kwargs={"app": self.slug})
 
-    def create_days(self):
+    def create_days(self, year=None):
+        set_user_name("Solomon")
+
+        year = date.today().year if year is None else year
         defaults = {
             default.day_of_week: default.user
             for default in DayOfWeekDefault.objects.filter(app=self)
         }
 
-        year = date.today().year + 1
         start = date(year, 1, 1)
         for offset in range(0, 366):
             day = start + timedelta(days=offset)
@@ -89,6 +92,14 @@ class Day(Model):
     @classmethod
     def allow_delete(cls, instance, request):
         return False
+
+    def css(self):
+        today = date.today()
+        return " ".join(filter(None, [
+            self.day == today and "bg-primary",
+            self.day < today and "text-muted",
+            self.day >= today and not self.handled_by and "text-warning",
+        ]))
 
 
 @model_urls()

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-21 10:11+0100\n"
+"POT-Creation-Date: 2018-11-21 10:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,12 +45,12 @@ msgstr "Kurzer Name"
 msgid "full name"
 msgstr "Voller Name"
 
-#: workbench/accounts/models.py:47 workbench/calendar/models.py:98
-#: workbench/calendar/models.py:118
+#: workbench/accounts/models.py:47 workbench/calendar/models.py:111
+#: workbench/calendar/models.py:130
 msgid "user"
 msgstr "Benutzer"
 
-#: workbench/accounts/models.py:48 workbench/calendar/models.py:31
+#: workbench/accounts/models.py:48 workbench/calendar/models.py:32
 msgid "users"
 msgstr "Benutzer"
 
@@ -82,68 +82,81 @@ msgstr "aufgezeichnete Aktion"
 msgid "logged actions"
 msgstr "aufgezeichnete Aktionen"
 
-#: workbench/calendar/forms.py:26 workbench/tools/forms.py:64
+#: workbench/calendar/forms.py:49 workbench/tools/forms.py:64
 msgid "Active"
 msgstr "Aktiv"
 
-#: workbench/calendar/models.py:28 workbench/calendar/models.py:63
-#: workbench/calendar/models.py:95 workbench/calendar/models.py:115
+#: workbench/calendar/forms.py:61
+msgid ""
+"You are editing a day which is already handled by someone else. Are you sure "
+"this is correct?"
+msgstr ""
+"Du bearbeitest einen Tag, welcher schon von jemand anderem bewältigt wird. "
+"Bist Du sicher, dass dies korrekt ist?"
+
+#: workbench/calendar/models.py:29 workbench/calendar/models.py:36
+#: workbench/calendar/models.py:68 workbench/calendar/models.py:108
+#: workbench/calendar/models.py:127
 msgid "app"
 msgstr "App"
 
-#: workbench/calendar/models.py:29
+#: workbench/calendar/models.py:30
 msgid "slug"
 msgstr "Slug"
 
-#: workbench/calendar/models.py:30
+#: workbench/calendar/models.py:31
 msgid "ordering"
 msgstr "Sortierung"
 
-#: workbench/calendar/models.py:65 workbench/calendar/models.py:77
+#: workbench/calendar/models.py:37
+msgid "apps"
+msgstr ""
+
+#: workbench/calendar/models.py:70 workbench/calendar/models.py:82
 msgid "day"
 msgstr "Tag"
 
-#: workbench/calendar/models.py:72
+#: workbench/calendar/models.py:77
 msgid "handled by"
 msgstr "bewältigt von"
 
-#: workbench/calendar/models.py:78
+#: workbench/calendar/models.py:83
 msgid "days"
 msgstr "Tage"
 
-#: workbench/calendar/models.py:100
+#: workbench/calendar/models.py:113
 msgid "year"
 msgstr "Jahr"
 
-#: workbench/calendar/models.py:101
+#: workbench/calendar/models.py:114
 msgid "percentage"
 msgstr "Prozent"
 
-#: workbench/calendar/models.py:106
+#: workbench/calendar/models.py:118
 msgid "presence"
 msgstr "Präsenz"
 
-#: workbench/calendar/models.py:107
+#: workbench/calendar/models.py:119
 msgid "presences"
 msgstr "Präsenzen"
 
-#: workbench/calendar/models.py:121
+#: workbench/calendar/models.py:133
 msgid "day of week"
 msgstr "Wochentag"
 
-#: workbench/calendar/models.py:127
+#: workbench/calendar/models.py:138
 msgid "day of week default"
 msgstr "Standardzuteilung zu Wochentag"
 
-#: workbench/calendar/models.py:128
+#: workbench/calendar/models.py:139
 msgid "day of week defaults"
 msgstr "Standardzuteilungen zu Wochentag"
 
-#: workbench/calendar/urls.py:50
+#: workbench/calendar/urls.py:52
 msgid "Creating days is not supported."
 msgstr "Tage erstellen ist nicht erlaubt."
 
-#: workbench/calendar/urls.py:66
+#: workbench/calendar/urls.py:68
 msgid "Deleting days is not supported."
 msgstr "Tage löschen ist nicht erlaubt."
 
