@@ -34,6 +34,7 @@ INSTALLED_APPS = [
         "django.contrib.messages",
         "django.contrib.staticfiles",
         "django.contrib.postgres",
+        "admin_ordering",
         "bootstrap3",
         "workbench.accounts",
         "workbench.audit",

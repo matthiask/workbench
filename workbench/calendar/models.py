@@ -37,7 +37,7 @@ class App(Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse("calendar_day_list", kwargs={"app": current_app})
+        return reverse("calendar_day_list", kwargs={"app": self.slug})
 
     def create_days(self):
         defaults = {
@@ -60,7 +60,7 @@ class App(Model):
 @model_urls(lambda obj: {"app": current_app, "pk": obj.pk})
 class Day(Model):
     app = models.ForeignKey(
-        App, on_delete=models.CASCADE, related_name="+", verbose_name=_("app")
+        App, on_delete=models.CASCADE, related_name="days", verbose_name=_("app")
     )
     day = models.DateField(_("day"))
     handled_by = models.ForeignKey(
@@ -92,7 +92,7 @@ class Day(Model):
 @model_urls()
 class Presence(Model):
     app = models.ForeignKey(
-        App, on_delete=models.CASCADE, related_name="+", verbose_name=_("app")
+        App, on_delete=models.CASCADE, related_name="presences", verbose_name=_("app")
     )
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="+", verbose_name=_("user")
@@ -118,11 +118,12 @@ class DayOfWeekDefault(Model):
         User, on_delete=models.CASCADE, related_name="+", verbose_name=_("user")
     )
     day_of_week = models.IntegerField(
-        _("day of week"), choices=sorted(WEEKDAYS.items()), unique=True
+        _("day of week"), choices=sorted(WEEKDAYS.items())
     )
 
     class Meta:
         ordering = ["day_of_week"]
+        unique_together = [("app", "day_of_week")]
         verbose_name = _("day of week default")
         verbose_name_plural = _("day of week defaults")
 

@@ -2,18 +2,25 @@ from collections import Counter
 
 from workbench.accounts.models import User
 
-from .models import Day, Presence
+from .models import App
 
 
-def run(year=2019):
+def run():
+    for app in App.objects.all():
+        run_app(app)
+
+
+def run_app(app, year=2019):
+    print("{}".format(app))
     counts = Counter(
-        Day.objects.filter(day__year=year).values_list("handled_by", flat=True)
+        app.days.filter(day__year=year).values_list("handled_by", flat=True)
     )
-    presences = dict(
-        Presence.objects.filter(year=year).values_list("user", "percentage")
-    )
+    presences = dict(app.presences.filter(year=year).values_list("user", "percentage"))
 
-    users = User.objects.filter(id__in=set(counts.keys()) | set(presences))
+    users = (
+        User.objects.filter(id__in=set(counts.keys()) | set(presences))
+        | app.users.all()
+    ).distinct()
     presences_sum = sum(presences.values())
     counts_sum = sum(
         (

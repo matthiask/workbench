@@ -1,13 +1,16 @@
 from django.contrib import admin
 
+from admin_ordering.admin import OrderableAdmin
+
 from . import models
 
 
 @admin.register(models.App)
-class AppAdmin(admin.ModelAdmin):
+class AppAdmin(OrderableAdmin, admin.ModelAdmin):
     filter_horizontal = ["users"]
     list_display = ["title", "ordering"]
     list_editable = ["ordering"]
+    ordering_field = "ordering"
     prepopulated_fields = {"slug": ["title"]}
 
 

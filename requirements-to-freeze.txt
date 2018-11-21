@@ -1,4 +1,5 @@
 Django<2
+django-admin-ordering
 django-bootstrap3
 django-debug-toolbar
 django-vanilla-views

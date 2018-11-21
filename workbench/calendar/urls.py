@@ -15,13 +15,16 @@ def app_mixin(view):
         def dispatch(self, request, *args, **kwargs):
             app = kwargs.get("app")
             if app:
-                app = get_object_or_404(App, users=request.user, slug=app)
-            with activate_app(app.slug):
+                self.app = get_object_or_404(App, users=request.user, slug=app)
+            with activate_app(self.app.slug):
                 response = super().dispatch(request, *args, **kwargs)
                 if hasattr(response, "render"):
                     # Have to render responses inside the activate_app block.
                     response.render()
                 return response
+
+        def get_queryset(self):
+            return super().get_queryset().filter(app=self.app)
 
     return View
 
