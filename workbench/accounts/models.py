@@ -80,6 +80,7 @@ class User(Model, AbstractBaseUser):
         days = defaultdict(lambda: [[], []])
         today = date.today()
         for day in self.days.model._default_manager.filter(
+            Q(app__users=self),
             Q(day__gte=today),
             Q(handled_by=self)
             | Q(handled_by=None, day__lte=today + timedelta(days=30)),
