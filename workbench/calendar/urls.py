@@ -29,6 +29,11 @@ def app_mixin(view):
     return View
 
 
+class DayUpdateView(generic.UpdateView):
+    def get_success_url(self):
+        return "{}?year={}".format(list_url, self.object.day.year)
+
+
 list_url = reverse_lazy("calendar_day_list", kwargs={"app": current_app})
 
 
@@ -56,10 +61,7 @@ urlpatterns = [
     ),
     url(
         r"^(?P<app>\w+)/(?P<pk>[0-9]+)/update/$",
-        app_mixin(generic.UpdateView).as_view(
-            # TODO go to list URL of year
-            model=Day, form_class=DayForm, success_url=list_url
-        ),
+        app_mixin(DayUpdateView).as_view(model=Day, form_class=DayForm),
         name="calendar_day_update",
     ),
     url(

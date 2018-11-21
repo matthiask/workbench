@@ -57,8 +57,10 @@ class DayForm(WarningsForm, ModelForm):
         data = super().clean()
         print(self.instance.handled_by, data.get("handled_by"))
         if self.instance.handled_by and self.request.user != self.instance.handled_by:
-            self.add_warning(_(
-                "You are editing a day which is already handled by someone else."
-                " Are you sure this is correct?"
-            ))
+            self.add_warning(
+                _(
+                    "You are editing a day which is already handled by someone else."
+                    " Are you sure this is correct?"
+                )
+            )
         return data

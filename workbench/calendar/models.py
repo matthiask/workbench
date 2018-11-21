@@ -95,11 +95,16 @@ class Day(Model):
 
     def css(self):
         today = date.today()
-        return " ".join(filter(None, [
-            self.day == today and "bg-primary",
-            self.day < today and "text-muted",
-            self.day >= today and not self.handled_by and "text-warning",
-        ]))
+        return " ".join(
+            filter(
+                None,
+                [
+                    self.day == today and "bg-primary",
+                    self.day < today and "text-muted",
+                    self.day >= today and not self.handled_by and "text-warning",
+                ],
+            )
+        )
 
 
 @model_urls()
