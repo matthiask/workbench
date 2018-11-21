@@ -223,7 +223,7 @@ class DayOfWeekDefault(Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        self._affected().update(handled_by=self.user)
+        self._affected().filter(handled_by=None).update(handled_by=self.user)
 
     def delete(self, *args, **kwargs):
         super().save(*args, **kwargs)
