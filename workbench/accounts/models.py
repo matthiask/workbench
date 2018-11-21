@@ -43,7 +43,7 @@ class User(Model, AbstractBaseUser):
     objects = UserManager()
 
     class Meta:
-        ordering = ("_full_name",)
+        ordering = ("_full_name", "_short_name", "email")
         verbose_name = _("user")
         verbose_name_plural = _("users")
 
