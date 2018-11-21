@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-20 22:00+0100\n"
+"POT-Creation-Date: 2018-11-21 10:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,11 +45,12 @@ msgstr "Kurzer Name"
 msgid "full name"
 msgstr "Voller Name"
 
-#: workbench/accounts/models.py:47
+#: workbench/accounts/models.py:47 workbench/calendar/models.py:98
+#: workbench/calendar/models.py:118
 msgid "user"
 msgstr "Benutzer"
 
-#: workbench/accounts/models.py:48
+#: workbench/accounts/models.py:48 workbench/calendar/models.py:31
 msgid "users"
 msgstr "Benutzer"
 
@@ -81,17 +82,70 @@ msgstr "aufgezeichnete Aktion"
 msgid "logged actions"
 msgstr "aufgezeichnete Aktionen"
 
-#: workbench/cooking/models.py:23 workbench/cooking/models.py:37
+#: workbench/calendar/forms.py:26 workbench/tools/forms.py:64
+msgid "Active"
+msgstr "Aktiv"
+
+#: workbench/calendar/models.py:28 workbench/calendar/models.py:63
+#: workbench/calendar/models.py:95 workbench/calendar/models.py:115
+msgid "app"
+msgstr "App"
+
+#: workbench/calendar/models.py:29
+msgid "slug"
+msgstr "Slug"
+
+#: workbench/calendar/models.py:30
+msgid "ordering"
+msgstr "Sortierung"
+
+#: workbench/calendar/models.py:65 workbench/calendar/models.py:77
 msgid "day"
 msgstr "Tag"
 
-#: workbench/cooking/models.py:30
+#: workbench/calendar/models.py:72
 msgid "handled by"
 msgstr "bewältigt von"
 
-#: workbench/cooking/models.py:38
+#: workbench/calendar/models.py:78
 msgid "days"
 msgstr "Tage"
+
+#: workbench/calendar/models.py:100
+msgid "year"
+msgstr "Jahr"
+
+#: workbench/calendar/models.py:101
+msgid "percentage"
+msgstr "Prozent"
+
+#: workbench/calendar/models.py:106
+msgid "presence"
+msgstr "Präsenz"
+
+#: workbench/calendar/models.py:107
+msgid "presences"
+msgstr "Präsenzen"
+
+#: workbench/calendar/models.py:121
+msgid "day of week"
+msgstr "Wochentag"
+
+#: workbench/calendar/models.py:127
+msgid "day of week default"
+msgstr "Standardzuteilung zu Wochentag"
+
+#: workbench/calendar/models.py:128
+msgid "day of week defaults"
+msgstr "Standardzuteilungen zu Wochentag"
+
+#: workbench/calendar/urls.py:50
+msgid "Creating days is not supported."
+msgstr "Tage erstellen ist nicht erlaubt."
+
+#: workbench/calendar/urls.py:66
+msgid "Deleting days is not supported."
+msgstr "Tage löschen ist nicht erlaubt."
 
 #: workbench/generic.py:57
 msgid "Search form was invalid."
@@ -138,23 +192,19 @@ msgstr "Anmelden"
 msgid "Search"
 msgstr "Suche"
 
-#: workbench/templates/base.html:33
-msgid "cooking"
-msgstr "Kochen"
-
-#: workbench/templates/base.html:50
+#: workbench/templates/base.html:52
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: workbench/templates/base.html:54
+#: workbench/templates/base.html:56
 msgid "Admin panel"
 msgstr "Verwaltung"
 
-#: workbench/templates/base.html:70
+#: workbench/templates/base.html:72
 msgid "Sign off"
 msgstr "Abmelden"
 
-#: workbench/templates/cooking/day_list.html:44
+#: workbench/templates/calendar/day_list.html:44
 #: workbench/templates/generic/object_list.html:61
 #, python-format
 msgid "%(total)s total"
@@ -294,10 +344,6 @@ msgstr "heute fällig"
 msgid "overdue!"
 msgstr "überfällig!"
 
-#: workbench/tools/forms.py:64
-msgid "Active"
-msgstr "Aktiv"
-
 #: workbench/tools/forms.py:83
 #, python-format
 msgid "The contact %(person)s does not belong to  %(organization)s."
@@ -365,6 +411,9 @@ msgstr "Total"
 #: workbench/views.py:16
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
+
+#~ msgid "cooking"
+#~ msgstr "Kochen"
 
 #~ msgid "Welcome! Please fill in your details."
 #~ msgstr "Willkommen! Bitte fülle das folgende Formular aus."

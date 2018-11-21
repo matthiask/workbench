@@ -59,7 +59,7 @@ def run_app(app, year=2019):
     print("\n".join(without_presence))
     print()
     print(
-        "Zu verteilen          {:>3}%       {:>3} Tage".format(
+        "Zu verteilen auf      {:>3}%:      {:>3} Tage".format(
             presences_sum, counts_sum
         )
     )

@@ -32,6 +32,8 @@ class App(Model):
 
     class Meta:
         ordering = ["ordering"]
+        verbose_name = _("app")
+        verbose_name_plural = _("apps")
 
     def __str__(self):
         return self.title
@@ -101,7 +103,6 @@ class Presence(Model):
     percentage = models.IntegerField(_("percentage"))
 
     class Meta:
-        ordering = ["year"]
         unique_together = [("user", "year")]
         verbose_name = _("presence")
         verbose_name_plural = _("presences")
@@ -122,7 +123,6 @@ class DayOfWeekDefault(Model):
     )
 
     class Meta:
-        ordering = ["day_of_week"]
         unique_together = [("app", "day_of_week")]
         verbose_name = _("day of week default")
         verbose_name_plural = _("day of week defaults")

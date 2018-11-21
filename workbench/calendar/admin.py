@@ -26,9 +26,11 @@ class PresenceAdmin(admin.ModelAdmin):
     list_display = ["app", "user", "year", "percentage"]
     list_editable = ["year", "percentage"]
     list_filter = ["app", "year", "user"]
+    ordering = ["app", "user", "year"]
 
 
 @admin.register(models.DayOfWeekDefault)
 class DayOfWeekDefaultAdmin(admin.ModelAdmin):
     list_display = ["app", "user", "day_of_week"]
     list_filter = ["app"]
+    ordering = ["app", "day_of_week"]
