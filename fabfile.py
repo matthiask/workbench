@@ -30,8 +30,8 @@ def pull_database():
     local("dropdb --if-exists workbench")
     local("createdb --encoding UTF8 workbench")
     local(
-        'ssh root@workbench.feinheit.ch "sudo -u postgres pg_dump -Ox %s"'
-        " | psql workbench" % remote
+        'ssh www-data@feinheit06.nine.ch "source .profile && pg_dump -Ox'
+        ' hangar_diebruchpiloten_com" | psql workbench'
     )
 
 

@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from threading import local
 
 from django.db import models
+from django.db.models import signals
 from django.urls import reverse
 from django.utils.dates import WEEKDAYS
 from django.utils.functional import lazy
@@ -160,3 +161,11 @@ class DayOfWeekDefault(Model):
         ).update(handled_by=self.user)
 
     save.alters_data = True
+
+
+def add_all_apps(sender, instance, created, **kwargs):
+    if created:
+        instance.apps.set(App.objects.all())
+
+
+signals.post_save.connect(add_all_apps, sender=User)
