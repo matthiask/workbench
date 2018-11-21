@@ -13,7 +13,7 @@ def check():
 @task
 def deploy():
     check()
-    local("git push origin master")
+    local("git push origin")
 
     with cd("hangar.diebruchpiloten.com"):
         run("git fetch origin")
