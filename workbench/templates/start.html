@@ -20,16 +20,22 @@
         </h3></div>
         <div class="panel-body">
           <h4>Eigene Tage</h4>
-          <div style="column-width:10em">
+          <div class="columns">
             {% for day in days.0 %}
-            <div><a href="{% url 'calendar_day_detail' pk=day.pk app=app.slug %}">{{ day.day|date:"D d.m.Y" }}</a></div>
+            <a href="{% url 'calendar_day_detail' pk=day.pk app=app.slug %}">
+              {{ day.day|date:"D d.m.Y" }}
+            </a>
+            {% empty %}
+            Keine!
             {% endfor %}
           </div>
           {% if days.1 %}
             <h4>Nicht besetzte Tage</h4>
-            <div style="column-width:10em">
+            <div class="columns">
               {% for day in days.1 %}
-              <div><a href="{% url 'calendar_day_update' pk=day.pk app=app.slug %}">{{ day.day|date:"D d.m.Y" }}</a></div>
+              <a href="{% url 'calendar_day_update' pk=day.pk app=app.slug %}">
+                {{ day.day|date:"D d.m.Y" }}
+              </a>
               {% endfor %}
             </div>
           {% endif %}

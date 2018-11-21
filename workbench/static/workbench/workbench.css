@@ -156,3 +156,11 @@ tbody th > a {
 .help-block {
   font-size: 13px;
 }
+
+.columns {
+  column-width: 15em;
+}
+
+.columns > * {
+  display: block;
+}
