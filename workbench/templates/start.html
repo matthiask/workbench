@@ -9,66 +9,24 @@
     <div class="panel panel-default">
       <div class="panel-heading"><h3>Hi, {{ user }}</h3></div>
       <div class="panel-body">
-        <table class="table table-condensed">
-          <tr>
-            <td class="text-right">{{ user.hours.today }}h</td>
-            <th>{% trans 'Hours today' %}</th>
-          </tr>
-          <tr>
-            <td class="text-right">{{ user.hours.week }}h</td>
-            <th>{% trans 'Hours this week' %}</th>
-          </tr>
-        </table>
+
       </div>
     </div>
 
-    <div class="panel panel-default">
-      <div class="panel-heading"><h3>
-        <a href="{# % url 'activities_activity_list' % #}">{% trans 'activities' %}</a>
-      </h3></div>
-      <div class="panel-body">
-        <table class="table table-condensed">
-          {% for activity in user.activities.open %}
-          <tr class="{{ activity.css }}">
-              <th><a href="{{ activity.urls.detail }}" data-toggle="ajaxmodal">
-                  {{ activity }}
-              </a></th>
-              <td>
-                {% for c in activity.context %}
-                  <a href="{{ c.get_absolute_url }}">{{ c }}</a>{% if not forloop.last %},{% endif %}
-                {% endfor %}
-              </td>
-              <td>{{ activity.pretty_status }}</td>
-            </tr>
-          {% empty %}
-            <tr><th>{% trans 'no activities!' %}</th></tr>
-          {% endfor %}
-        </table>
+    {% for app, days in user.future_days %}
+      <div class="panel panel-default">
+        <div class="panel-heading"><h3>
+            <a href="{{ app.get_absolute_url }}">{{ app.title }}</a>
+        </h3></div>
+        <div class="panel-body">
+          <div style="column-width:10em">
+            {% for day in days %}
+            <div>{{ day.day|date:"D d.m.Y" }}</div>
+            {% endfor %}
+          </div>
+        </div>
       </div>
-    </div>
-
-    <div class="panel panel-default">
-      <div class="panel-heading"><h3>
-          <a href="{# % url 'projects_task_list' % #}?s=open&amp;owned_by={{ request.user.id }}">{% trans 'Important tasks' %}</a>
-      </h3></div>
-      <div class="panel-body">
-        <table class="table table-condensed">
-          {% for task in user.important_tasks %}
-            <tr>
-              <td><i title="{{ task.get_type_display }}" class="{{ task.type_css }}"></i></td>
-              <td><span class="label label-{{ task.priority_css }}">{{ task.get_priority_display }}</span></td>
-              <th><a href="{{ task.urls.detail }}">{{ task|h }}</a></th>
-              <td>{% link_or_none task.project %}</td>
-              <td>
-                <span class="{{ task.status_css }}">{{ task.pretty_status }}</span>
-              </td>
-            </tr>
-          {% empty %}
-            <tr><th>{% trans 'no important tasks! (how can this be?)' %}</th></tr>
-          {% endfor %}
-        </table>
-      </div>
-    </div>
+    {% endfor %}
 
   </div>
 </div>

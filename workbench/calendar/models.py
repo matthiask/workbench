@@ -45,7 +45,7 @@ class App(Model):
         return reverse("calendar_day_list", kwargs={"app": self.slug})
 
     def create_days(self, year=None):
-        set_user_name("Solomon")
+        set_user_name("Hangar")
 
         year = date.today().year if year is None else year
         defaults = {
@@ -78,7 +78,7 @@ class Day(Model):
     handled_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
-        related_name="+",
+        related_name="days",
         blank=True,
         null=True,
         verbose_name=_("handled by"),
@@ -113,7 +113,7 @@ class Day(Model):
                 [
                     self.day == today and "bg-primary",
                     self.day < today and "text-muted",
-                    self.day >= today and not self.handled_by and "text-warning",
+                    self.day >= today and not self.handled_by and "text-danger",
                 ],
             )
         )
@@ -158,15 +158,23 @@ class DayOfWeekDefault(Model):
     def __str__(self):
         return self.get_day_of_week_display()
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        Day.objects.filter(
+    def _affected(self):
+        return Day.objects.filter(
             Q(app=self.app),
             Q(day__week_day=(self.day_of_week + 1) % 7 + 1),
-            Q(handled_by=None) | Q(handled_by__is_active=False),
-        ).update(handled_by=self.user)
+            Q(day__gte=date.today()),
+        )
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self._affected().update(handled_by=self.user)
+
+    def delete(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self._affected().filter(handled_by=self.user).update(handled_by=None)
 
     save.alters_data = True
+    delete.alters_data = True
 
 
 def on_user_saved(sender, instance, created, **kwargs):

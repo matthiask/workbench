@@ -1,3 +1,6 @@
+from collections import defaultdict
+from datetime import date
+
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -71,3 +74,10 @@ class User(Model, AbstractBaseUser):
         """Is the user a member of staff?"""
         # Simplest possible answer: All admins are staff
         return self.is_admin
+
+    def future_days(self):
+        days = defaultdict(list)
+        for day in self.days.filter(day__gte=date.today()).select_related("app"):
+            days[day.app].append(day)
+
+        return sorted(days.items(), key=lambda row: row[0].title)

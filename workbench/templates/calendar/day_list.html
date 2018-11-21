@@ -24,7 +24,7 @@
     <th>
       {% if day %}
         {% if day.handled_by %}
-          <a href="{{ day.urls.detail }}" class="{{ day.css }}">
+        <a href="{{ day.urls.detail }}" class="{{ day.css }} {% if day.handled_by == request.user %}text-warning{% endif %}">
             {{ day.day|date:"d" }}
             <span class="hidden-xs">- {{ day.handled_by }}</span>
           </a>
