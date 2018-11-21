@@ -11,25 +11,55 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('cooking', '0002_auto_20181120_2206'),
+        ("cooking", "0002_auto_20181120_2206"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DayOfWeekDefault',
+            name="DayOfWeekDefault",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('day_of_week', models.IntegerField(choices=[(0, 'Monday'), (1, 'Tuesday'), (2, 'Wednesday'), (3, 'Thursday'), (4, 'Friday'), (5, 'Saturday'), (6, 'Sunday')], unique=True, verbose_name='day of week')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to=settings.AUTH_USER_MODEL, verbose_name='user')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "day_of_week",
+                    models.IntegerField(
+                        choices=[
+                            (0, "Monday"),
+                            (1, "Tuesday"),
+                            (2, "Wednesday"),
+                            (3, "Thursday"),
+                            (4, "Friday"),
+                            (5, "Saturday"),
+                            (6, "Sunday"),
+                        ],
+                        unique=True,
+                        verbose_name="day of week",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="user",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'day of week default',
-                'verbose_name_plural': 'day of week defaults',
-                'ordering': ['day_of_week'],
+                "verbose_name": "day of week default",
+                "verbose_name_plural": "day of week defaults",
+                "ordering": ["day_of_week"],
             },
         ),
         migrations.AlterUniqueTogether(
-            name='presence',
-            unique_together=set([('user', 'year')]),
+            name="presence", unique_together=set([("user", "year")])
         ),
     ]

@@ -11,12 +11,19 @@ from workbench.tools.urls import model_urls
 
 class DayQuerySet(models.QuerySet):
     def create_days(self):
+        defaults = {
+            default.day_of_week: default.user
+            for default in DayOfWeekDefault.objects.all()
+        }
+
         year = date.today().year + 1
         start = date(year, 1, 1)
         for offset in range(0, 366):
             day = start + timedelta(days=offset)
             if day.isoweekday() <= 5 and day.year == year:
-                self.get_or_create(day=day)
+                self.get_or_create(
+                    day=day, defaults={"handled_by": defaults.get(day.isoweekday())}
+                )
 
 
 @model_urls()
@@ -79,8 +86,7 @@ class DayOfWeekDefault(Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         Day.objects.filter(
-            day__week_day=(self.day_of_week + 1) % 7 + 1,
-            handled_by=None,
+            day__week_day=(self.day_of_week + 1) % 7 + 1, handled_by=None
         ).update(handled_by=self.user)
 
     save.alters_data = True
