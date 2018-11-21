@@ -1,12 +1,13 @@
 from django.conf.urls import url
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from workbench import generic
 
-from .forms import DayForm, DaySearchForm
+from .forms import DayForm, DaySearchForm, PresenceForm
 from .models import App, Day, activate_app, current_app
 
 
@@ -76,5 +77,18 @@ urlpatterns = [
             level=messages.WARNING,
         ),
         name="calendar_day_delete",
+    ),
+    url(
+        r"^(?P<app>\w+)/update/$",
+        staff_member_required(
+            app_mixin(generic.UpdateView).as_view(
+                model=App,
+                form_class=PresenceForm,
+                lookup_field="slug",
+                lookup_url_kwarg="app",
+                success_url="/",
+            )
+        ),
+        name="calendar_app_update",
     ),
 ]

@@ -16,7 +16,12 @@
     {% for app, days in user.future_days %}
       <div class="panel panel-default">
         <div class="panel-heading"><h3>
-            <a href="{{ app.get_absolute_url }}">{{ app.title }}</a>
+          <a href="{{ app.get_absolute_url }}">{{ app.title }}</a>
+          {% if user.is_admin %}
+          <small>
+            <a href="{% url 'calendar_app_update' app=app.slug %}">{% trans 'presences' %}</a>
+          </small>
+          {% endif %}
         </h3></div>
         <div class="panel-body">
           <h4>Eigene Tage</h4>

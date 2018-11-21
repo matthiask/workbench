@@ -64,3 +64,35 @@ class DayForm(WarningsForm, ModelForm):
                 )
             )
         return data
+
+
+class PresenceForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.app = kwargs.pop("instance")
+        self.request = kwargs.pop("request")
+        self.year = date.today().year
+        super().__init__(*args, **kwargs)
+        presences = {
+            p.user_id: p.percentage for p in self.app.presences.filter(year=self.year)
+        }
+
+        for user in self.app.users.all():
+            self.fields["presence_{}".format(user.id)] = forms.IntegerField(
+                label=user.get_full_name(),
+                required=False,
+                initial=presences.get(user.id),
+            )
+
+    def save(self):
+        to_delete = set()
+        for user in self.app.users.all():
+            value = self.cleaned_data.get("presence_{}".format(user.id))
+            if value is None:
+                to_delete.add(user.id)
+            else:
+                self.app.presences.update_or_create(
+                    year=self.year, user=user, defaults={"percentage": value}
+                )
+        if to_delete:
+            self.app.presences.filter(year=self.year, user__in=to_delete).delete()
+        return self.app

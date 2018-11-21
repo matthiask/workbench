@@ -187,7 +187,7 @@ class Presence(Model):
     percentage = models.IntegerField(_("percentage"))
 
     class Meta:
-        unique_together = [("user", "year")]
+        unique_together = [("app", "user", "year")]
         verbose_name = _("presence")
         verbose_name_plural = _("presences")
 
