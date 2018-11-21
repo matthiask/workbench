@@ -102,7 +102,7 @@ class App(Model):
                 {
                     "user": user,
                     "presence": presence,
-                    "target": round(target) if target else None,
+                    "target": round(target, 1) if target else None,
                     "handled": counts[user.id],
                     "reached": (
                         round(100 * counts[user.id] / target) if target else None
