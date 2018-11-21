@@ -3,7 +3,7 @@ from datetime import date, timedelta
 from threading import local
 
 from django.db import models
-from django.db.models import signals
+from django.db.models import Q, signals
 from django.urls import reverse
 from django.utils.dates import WEEKDAYS
 from django.utils.functional import lazy
@@ -161,15 +161,22 @@ class DayOfWeekDefault(Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         Day.objects.filter(
-            app=self.app, day__week_day=(self.day_of_week + 1) % 7 + 1, handled_by=None
+            Q(app=self.app),
+            Q(day__week_day=(self.day_of_week + 1) % 7 + 1),
+            Q(handled_by=None) | Q(handled_by__is_active=False),
         ).update(handled_by=self.user)
 
     save.alters_data = True
 
 
-def add_all_apps(sender, instance, created, **kwargs):
+def on_user_saved(sender, instance, created, **kwargs):
     if created:
         instance.apps.set(App.objects.all())
 
+    elif not instance.is_active:
+        Day.objects.filter(handled_by=instance, day__gte=date.today()).update(
+            handled_by=None
+        )
 
-signals.post_save.connect(add_all_apps, sender=User)
+
+signals.post_save.connect(on_user_saved, sender=User)
