@@ -11,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from workbench.accounts.middleware import set_user_name
 from workbench.accounts.models import User
+from workbench.tools.formats import local_date_format
 from workbench.tools.models import Model
 from workbench.tools.urls import model_urls
 
@@ -91,7 +92,10 @@ class Day(Model):
         verbose_name_plural = _("days")
 
     def __str__(self):
-        return "{} - {}".format(self.day, self.handled_by or "?")
+        parts = [local_date_format(self.day, "D d.m.Y")]
+        if self.handled_by:
+            parts.append("({})".format(self.handled_by))
+        return " ".join(parts)
 
     @classmethod
     def allow_create(cls, request):
