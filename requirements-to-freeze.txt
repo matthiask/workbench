@@ -1,6 +1,7 @@
 Django<2
 django-admin-ordering
 django-bootstrap3
+django-canonical-domain
 django-debug-toolbar
 django-vanilla-views
 dj-database-url

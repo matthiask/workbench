@@ -22,6 +22,8 @@ TESTING = any(arg in ("test",) for arg in sys.argv)
 LIVE = env("LIVE", default=False)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
 ADMINS = (("Matthias Kestenholz", "mk@feinheit.ch"),)
+CANONICAL_DOMAIN = env("CANONICAL_DOMAIN", default=None)
+CANONICAL_DOMAIN_SECURE = env("CANONICAL_DOMAIN_SECURE", default=False)
 
 INSTALLED_APPS = [
     a
@@ -50,7 +52,7 @@ LOGIN_REDIRECT_URL = "/"
 MIDDLEWARE = [
     m
     for m in [
-        "django.middleware.security.SecurityMiddleware" if LIVE else "",
+        "canonical_domain.middleware.CanonicalDomainMiddleware" if LIVE else "",
         "debug_toolbar.middleware.DebugToolbarMiddleware" if DEBUG else "",
         "django.contrib.sessions.middleware.SessionMiddleware",
         "django.middleware.common.CommonMiddleware",

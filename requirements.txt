@@ -2,6 +2,7 @@ dj-database-url==0.5.0
 Django==1.11.16
 django-admin-ordering==0.9.0
 django-bootstrap3==11.0.0
+django-canonical-domain==0.2.0
 django-debug-toolbar==1.10.1
 django-js-asset==1.1.0
 django-vanilla-views==1.0.5
