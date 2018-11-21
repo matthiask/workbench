@@ -10,7 +10,7 @@ urlpatterns = [
     url(r"^$", render, {"template_name": "start.html"}),
     url(r"^bootstrap/$", render, {"template_name": "bootstrap.html"}),
     url(r"^404/$", render, {"template_name": "404.html"}),
-    url(r"^admin/", include(admin.site.urls)),
+    url(r"^admin/", admin.site.urls),
     url(r"^accounts/", include("workbench.accounts.urls")),
     url(r"^calendar/", include("workbench.calendar.urls")),
     url(r"^search/$", views.search, name="search"),

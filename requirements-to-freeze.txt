@@ -1,4 +1,4 @@
-Django<2
+Django
 django-admin-ordering
 django-bootstrap3
 django-canonical-domain
