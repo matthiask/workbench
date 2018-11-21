@@ -57,7 +57,7 @@ class User(Model, AbstractBaseUser):
         return self._short_name or self.email
 
     def __str__(self):
-        return self.get_full_name()
+        return self._short_name or self._full_name or self.email
 
     def has_perm(self, perm, obj=None):
         """Does the user have a specific permission?"""
