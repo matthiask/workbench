@@ -59,7 +59,7 @@
               <tr {% if row.user == request.user %}style="display:table-row !important" class="text-success"{% else %}class="hidden"{% endif %}>
                 <th>{{ row.user }}</th>
                 <td>{{ row.handled }}</td>
-                <td>{% if row.target is not None %}{{ row.target }} ({{ row.presence }}%){% endif %}</td>
+                <td>{% if row.target is not None %}{{ row.target }} ({{ row.presence }}%){% else %}&ndash;{% endif %}</td>
                 <td>
                   {% if row.reached is not None %}
                   <div class="progress">
