@@ -2,13 +2,21 @@
 
 {% load bootstrap3 calendar i18n querystring %}
 
+{% block content %}
+<div class="row">
+  <div class="col-md-8 col-md-offset-2">
+    {{ block.super }}
+  </div>
+</div>
+{% endblock %}
+
 {% block objects %}
 <table class="table table-hover table-striped table-condensed" style="table-layout:fixed">
 
   {% for start, week in object_list|calendar %}
   {% ifchanged start|date:"mY" %}
     <tr>
-      <th>{{ start|date:"F Y" }}</th>
+      <th>{{ start|date:"F" }}</th>
       <td>Mo</td>
       <td>Di</td>
       <td>Mi</td>

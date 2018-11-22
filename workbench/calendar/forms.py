@@ -1,9 +1,8 @@
 from collections import defaultdict
-from datetime import date
+from datetime import date, timedelta
 
 from django import forms
 from django.db.models import Q
-from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 
 from workbench.accounts.models import User
@@ -12,9 +11,14 @@ from workbench.tools.forms import ModelForm, WarningsForm
 from .models import Day, current_app
 
 
+def years():
+    year = date.today().year
+    return [("", _("year"))] + [(y, y) for y in range(year, year + 2)]
+
+
 class DaySearchForm(forms.Form):
     year = forms.TypedChoiceField(
-        choices=[(year, year) for year in range(2018, 2021)],
+        choices=years,
         required=False,
         widget=forms.Select(attrs={"class": "form-control"}),
         coerce=int,
@@ -24,11 +28,12 @@ class DaySearchForm(forms.Form):
         data = self.cleaned_data
         if data.get("year"):
             return queryset.filter(day__year=data["year"])
-        return queryset
-
-    def response(self, request):
-        if "year" not in request.GET:
-            return HttpResponseRedirect("?year={}".format(date.today().year))
+        else:
+            today = date.today()
+            monday = today - timedelta(days=today.weekday())
+            return queryset.filter(
+                day__range=[monday - timedelta(days=7), monday + timedelta(days=7 * 12)]
+            )
 
 
 class DayForm(WarningsForm, ModelForm):
