@@ -157,20 +157,29 @@ tbody th > a {
   font-size: 13px;
 }
 
-.columns {
-  column-width: 15em;
+.cells {
+  display: flex;
+  flex-flow: row wrap;
 }
 
-.columns > * {
-  display: block;
+.cell {
+  width: 8em;
+  position: relative;
+  margin: 0 1rem 1rem 0;
+  overflow: hidden;
 }
 
-.progress {
-  height: 20px;
-  margin-bottom: 0;
+.cell.with-svg {
+  padding-left: 40px;
 }
-.progress,
-.progress .progress-bar {
-  font-size: 13px;
-  line-height: 1.5;
+
+.cell h5 {
+  margin: 0;
+  font-weight: bold;
+}
+
+.cell svg {
+  position: absolute;
+  left: 0;
+  top: 3px;
 }

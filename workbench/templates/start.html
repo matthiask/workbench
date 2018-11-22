@@ -24,64 +24,41 @@
           {% endif %}
         </h3></div>
         <div class="panel-body">
-          <h4>Eigene Tage</h4>
-          <div class="columns">
-            {% for day in days.0 %}
-            <a href="{% url 'calendar_day_detail' pk=day.pk app=app.slug %}">
-              {{ day.day|date:"D d.m.Y" }}
-            </a>
-            {% empty %}
-            Keine!
-            {% endfor %}
-          </div>
+          {% if days.0 %}
+            <h4>Eigene Tage</h4>
+            <div class="cells">
+              {% for day in days.0 %}
+                <a href="{% url 'calendar_day_detail' pk=day.pk app=app.slug %}" class="cell">
+                  {{ day.day|date:"D d.m.Y" }}
+                </a>
+              {% endfor %}
+            </div>
+          {% endif %}
+
           {% if days.1 %}
             <h4>Nicht besetzte Tage</h4>
-            <div class="columns">
+            <div class="cells">
               {% for day in days.1 %}
-              <a href="{% url 'calendar_day_update' pk=day.pk app=app.slug %}">
-                {{ day.day|date:"D d.m.Y" }}
-              </a>
+                <a href="{% url 'calendar_day_update' pk=day.pk app=app.slug %}" class="cell">
+                  {{ day.day|date:"D d.m.Y" }}
+                </a>
               {% endfor %}
             </div>
           {% endif %}
 
           {% with stats=app.stats %}
-          <h4>Statistik</h4>
-          <table class="table table-striped table-condensed">
-            <thead>
-              <tr>
-                <th>
-                  {{ stats.year }}
-                  <a href="#" onclick="this.closest('table').querySelectorAll('tbody>tr').forEach(function(el) { el.classList.toggle('hidden') });return false">(alle)</button>
-                </th>
-                <th>Ist</th>
-                <th>Soll</th>
-                <th>Erreichung</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for row in stats.users %}
-              <tr {% if row.user == request.user %}style="display:table-row !important" class="text-success"{% else %}class="hidden"{% endif %}>
-                <th>{{ row.user }}</th>
-                <td>{{ row.handled }}</td>
-                <td>{% if row.target is not None %}{{ row.target }}{% else %}&ndash;{% endif %}</td>
-                <td>
-                  {% if row.reached is not None %}
-                  <div class="progress">
-                    <div class="progress-bar" role="progressbar" style="min-width:5%;width:{{ row.reached }}%">{{ row.reached }}%</div>
-                  </div>
-                  {% endif %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="4">
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+          <h4>Statistik {{ stats.year }}</h4>
+          <div class="cells">
+            {% for row in stats.users %}
+            <div class="cell with-svg">
+              <svg width="32" height="32" style="transform:rotate(-90deg);border-radius:50%">
+                <circle r="16" cx="16" cy="16" style="fill:#ecf0f1;stroke:#18bc9c;stroke-width:32;stroke-dasharray:{{ row.reached }} 200"></circle>
+              </svg>
+              <h5>{{ row.user }}</h5>
+              {{ row.handled }} {% if row.target %}/ {{ row.target|stringformat:'.1f' }}{% endif %}
+            </div>
+            {% endfor %}
+          </div>
           {% endwith %}
 
         </div>

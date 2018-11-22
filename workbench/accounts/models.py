@@ -78,6 +78,8 @@ class User(Model, AbstractBaseUser):
 
     def future_days(self):
         days = defaultdict(lambda: [[], []])
+        [days[app] for app in self.apps.all()]
+
         today = date.today()
         for day in self.days.model._default_manager.filter(
             Q(app__users=self),
