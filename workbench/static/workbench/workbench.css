@@ -176,6 +176,9 @@ tbody th > a {
 .cell h5 {
   margin: 0;
   font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cell svg {
