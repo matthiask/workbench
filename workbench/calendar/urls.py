@@ -89,5 +89,5 @@ urlpatterns = [
         ),
         name="calendar_app_update",
     ),
-    url(r"^(?P<code>[^/]+)/hangar\.ics$", views.ics, name="calendar_ics"),
+    url(r"^ics/(?P<code>[^/]+)/hangar\.ics$", views.ics, name="calendar_ics"),
 ]
