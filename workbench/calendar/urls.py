@@ -9,6 +9,7 @@ from workbench import generic
 
 from .forms import DayForm, DaySearchForm, PresenceForm
 from .models import App, Day, activate_app, current_app
+from . import views
 
 
 def app_mixin(view):
@@ -88,4 +89,5 @@ urlpatterns = [
         ),
         name="calendar_app_update",
     ),
+    url(r"^(?P<code>[^/]+)/hangar\.ics$", views.ics, name="calendar_ics"),
 ]

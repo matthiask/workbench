@@ -7,6 +7,7 @@ django-vanilla-views
 dj-database-url
 flake8
 gunicorn
+icalendar
 oauth2client
 psycopg2-binary
 speckenv

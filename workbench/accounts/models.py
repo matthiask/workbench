@@ -2,8 +2,10 @@ from collections import defaultdict
 from datetime import date, timedelta
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.core.signing import Signer
 from django.db import models
 from django.db.models import Q
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from workbench.tools.models import Model
@@ -90,3 +92,8 @@ class User(Model, AbstractBaseUser):
             days[day.app][0 if day.handled_by_id else 1].append(day)
 
         return sorted(days.items(), key=lambda row: row[0].ordering)
+
+    def get_ics_url(self):
+        return reverse(
+            "calendar_ics", kwargs={"code": Signer(salt="ics").sign(self.email)}
+        )
