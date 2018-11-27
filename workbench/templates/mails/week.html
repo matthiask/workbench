@@ -1,0 +1,14 @@
+<h2>Wochenplan: {{ app.title }}</h2>
+{% for week, days in weeks %}
+<h3>KW {{ week|date:"W" }}</h3>
+<ul>
+{% for day in days %}
+<li>
+  {{ day.day|date:"D d.m.Y" }}:
+  {% if day.handled_by %}<a href="https://hangar.diebruchpiloten.com{{ day.urls.detail }}">{{ day.handled_by }}</a>
+  {% else %}<a href="https://hangar.diebruchpiloten.com{{ day.urls.update }}" style="color:#bc2323">noch niemand</a>
+  {% endif %}
+</li>
+{% endfor %}
+</ul>
+{% endfor %}
