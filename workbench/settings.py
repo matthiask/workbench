@@ -25,6 +25,8 @@ ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
 ADMINS = (("Matthias Kestenholz", "mk@feinheit.ch"),)
 CANONICAL_DOMAIN = env("CANONICAL_DOMAIN", default=None)
 CANONICAL_DOMAIN_SECURE = env("CANONICAL_DOMAIN_SECURE", default=False)
+DEFAULT_FROM_EMAIL = "no-reply@hangar.diebruchpiloten.com"
+SERVER_EMAIL = "no-reply@hangar.diebruchpiloten.com"
 
 INSTALLED_APPS = [
     a
