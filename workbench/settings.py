@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
 import dj_database_url
+import dj_email_url
 import os
 import sys
 from speckenv import read_speckenv, env
@@ -152,3 +153,8 @@ if LIVE:
     SECURE_SSL_REDIRECT = True
     # SECURE_HSTS_SECONDS = 604800  # One week
     # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+if DEBUG:
+    globals().update(dj_email_url.config(default="console:"))
+else:
+    globals().update(dj_email_url.config())
