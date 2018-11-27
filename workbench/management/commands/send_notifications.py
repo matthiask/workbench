@@ -47,7 +47,7 @@ class Command(BaseCommand):
     def unhandled_mails(self):
         per_app = {}
         for day in Day.objects.filter(
-            day__range=[self.today, self.today + timedelta(days=2)], handled_by=None
+            day__range=[self.today, self.monday + timedelta(days=7)], handled_by=None
         ).select_related("app"):
             per_app.setdefault(day.app, []).append(day)
 
