@@ -48,16 +48,26 @@ class App(Model):
     def create_days(self, year=None):
         set_user_name("Hangar")
 
-        year = date.today().year if year is None else year
+        today = date.today()
+        year = today.year if year is None else year
         defaults = {
             default.day_of_week: default.user
             for default in DayOfWeekDefault.objects.filter(app=self)
         }
 
+        public_holidays = set(day.day for day in PublicHoliday.objects.all())
+        company_holidays = list(CompanyHoliday.objects.all())
+
         start = date(year, 1, 1)
         for offset in range(0, 366):
             day = start + timedelta(days=offset)
             if day.isoweekday() <= 5 and day.year == year:
+                if (
+                    day < today
+                    or day in public_holidays
+                    or any(ch.contains(day) for ch in company_holidays)
+                ):
+                    continue
                 Day.objects.get_or_create(
                     app=self,
                     day=day,
@@ -247,3 +257,30 @@ def on_user_saved(sender, instance, created, **kwargs):
 
 
 signals.post_save.connect(on_user_saved, sender=User)
+
+
+class PublicHoliday(models.Model):
+    name = models.CharField(_("name"), max_length=100)
+    day = models.DateField(_("day"), unique=True)
+
+    class Meta:
+        verbose_name = _("public holiday")
+        verbose_name_plural = _("public holidays")
+
+    def __str__(self):
+        return "{} ({})".format(self.name, self.day)
+
+
+class CompanyHoliday(models.Model):
+    date_from = models.DateField(_("date from"))
+    date_until = models.DateField(_("date until"))
+
+    class Meta:
+        verbose_name = _("company holiday")
+        verbose_name_plural = _("company holidays")
+
+    def __str__(self):
+        return "{} - {}".format(self.date_from, self.date_until)
+
+    def contains(self, day):
+        return self.date_from <= day <= self.date_until

@@ -34,3 +34,17 @@ class DayOfWeekDefaultAdmin(admin.ModelAdmin):
     list_display = ["app", "user", "day_of_week"]
     list_filter = ["app"]
     ordering = ["app", "day_of_week"]
+
+
+@admin.register(models.PublicHoliday)
+class PublicHolidayAdmin(admin.ModelAdmin):
+    date_hierarchy = "day"
+    list_display = ["name", "day"]
+    ordering = ["day"]
+
+
+@admin.register(models.CompanyHoliday)
+class CompanyHolidayAdmin(admin.ModelAdmin):
+    date_hierarchy = "date_from"
+    list_display = ["date_from", "date_until"]
+    ordering = ["date_from"]
