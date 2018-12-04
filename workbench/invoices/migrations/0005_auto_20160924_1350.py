@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.PROTECT,
                 related_name="invoices",
-                to="workbench.projects.Project",
+                to="projects.Project",
                 verbose_name="project",
             ),
         ),

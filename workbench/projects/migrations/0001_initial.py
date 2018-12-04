@@ -80,7 +80,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="+",
-                        to="workbench.contacts.Person",
+                        to="contacts.Person",
                         verbose_name="contact",
                     ),
                 ),
@@ -89,7 +89,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="+",
-                        to="workbench.contacts.Organization",
+                        to="contacts.Organization",
                         verbose_name="customer",
                     ),
                 ),
@@ -135,7 +135,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="releases",
-                        to="workbench.projects.Project",
+                        to="projects.Project",
                         verbose_name="project",
                     ),
                 ),

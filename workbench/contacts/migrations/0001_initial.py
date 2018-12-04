@@ -85,7 +85,7 @@ class Migration(migrations.Migration):
                     models.ManyToManyField(
                         blank=True,
                         related_name="_organization_groups_+",
-                        to="workbench.contacts.Group",
+                        to="contacts.Group",
                         verbose_name="groups",
                     ),
                 ),
@@ -136,7 +136,7 @@ class Migration(migrations.Migration):
                     models.ManyToManyField(
                         blank=True,
                         related_name="_person_groups_+",
-                        to="workbench.contacts.Group",
+                        to="contacts.Group",
                         verbose_name="groups",
                     ),
                 ),
@@ -147,7 +147,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="people",
-                        to="workbench.contacts.Organization",
+                        to="contacts.Organization",
                         verbose_name="organization",
                     ),
                 ),
@@ -195,7 +195,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="phonenumbers",
-                        to="workbench.contacts.Person",
+                        to="contacts.Person",
                         verbose_name="person",
                     ),
                 ),
@@ -231,7 +231,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="postaladdresses",
-                        to="workbench.contacts.Person",
+                        to="contacts.Person",
                         verbose_name="person",
                     ),
                 ),
@@ -248,7 +248,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="emailaddresses",
-                to="workbench.contacts.Person",
+                to="contacts.Person",
                 verbose_name="person",
             ),
         ),

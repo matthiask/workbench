@@ -108,7 +108,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="services",
-                to="workbench.offers.Offer",
+                to="offers.Offer",
                 verbose_name="offer",
             ),
         ),
@@ -128,7 +128,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.PROTECT,
                 related_name="+",
-                to="workbench.services.ServiceType",
+                to="services.ServiceType",
                 verbose_name="service type",
             ),
         ),

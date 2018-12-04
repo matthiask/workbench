@@ -186,7 +186,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="tasks",
-                        to="workbench.projects.Project",
+                        to="projects.Project",
                         verbose_name="project",
                     ),
                 ),
@@ -203,7 +203,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="comments",
-                to="workbench.projects.Task",
+                to="projects.Task",
                 verbose_name="task",
             ),
         ),
@@ -213,7 +213,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="attachments",
-                to="workbench.projects.Task",
+                to="projects.Task",
                 verbose_name="task",
             ),
         ),
