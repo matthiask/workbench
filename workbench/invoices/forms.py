@@ -342,6 +342,8 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
             "description",
             "owned_by",
             "subtotal",
+            "discount",
+            "liable_to_vat",
         )
         widgets = {
             "customer": Picker(model=Organization),
@@ -362,6 +364,28 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
                 pass
             else:
                 initial.update({"customer": person.organization, "contact": person})
+
+        elif request.GET.get("copy_invoice"):
+            try:
+                invoice = Invoice.objects.get(pk=request.GET.get("copy_invoice"))
+                person = invoice.contact
+            except (Invoice.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update(
+                    {
+                        "customer": invoice.customer_id,
+                        "contact": invoice.contact_id,
+                        "title": invoice.title,
+                        "description": invoice.description,
+                        "type": invoice.type,
+                        "subtotal": invoice.subtotal,
+                        "discount": invoice.discount,
+                        "liable_to_vat": invoice.liable_to_vat,
+                        "tax_rate": invoice.tax_rate,
+                        "total": invoice.total,
+                    }
+                )
 
         super().__init__(*args, **kwargs)
 
