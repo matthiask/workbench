@@ -236,7 +236,7 @@ class DayOfWeekDefault(Model):
         self._affected().filter(handled_by=None).update(handled_by=self.user)
 
     def delete(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+        super().delete(*args, **kwargs)
         self._affected().filter(handled_by=self.user).update(handled_by=None)
 
     save.alters_data = True
