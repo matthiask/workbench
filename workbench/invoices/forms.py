@@ -45,7 +45,7 @@ class InvoiceSearchForm(forms.Form):
         return queryset
 
 
-class CreateInvoiceForm(PostalAddressSelectionForm):
+class CreateInvoiceForm(WarningsForm, PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
 
     class Meta:
@@ -86,6 +86,8 @@ class CreateInvoiceForm(PostalAddressSelectionForm):
                         % {"organization": self.project.customer}
                     }
                 )
+        else:
+            self.add_warning(_("No contact selected."))
         return data
 
     def save(self):
@@ -285,6 +287,8 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
                     }
                 )
 
+        if not data.get("contact"):
+            self.add_warning(_("No contact selected."))
         return data
 
     def save(self):

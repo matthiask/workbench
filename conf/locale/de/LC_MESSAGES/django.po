@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-04 11:39+0100\n"
+"POT-Creation-Date: 2018-12-10 16:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -291,7 +291,7 @@ msgstr "Person"
 msgid "people"
 msgstr "Personen"
 
-#: workbench/contacts/models.py:95 workbench/invoices/forms.py:326
+#: workbench/contacts/models.py:95 workbench/invoices/forms.py:330
 #: workbench/invoices/models.py:88 workbench/projects/models.py:194
 #: workbench/templates/invoices/invoice_list.html:14
 #: workbench/templates/projects/project_detail.html:93
@@ -473,7 +473,7 @@ msgstr "Rechnungen"
 msgid "Exact"
 msgstr "Exakt"
 
-#: workbench/invoices/forms.py:83 workbench/invoices/forms.py:224
+#: workbench/invoices/forms.py:83 workbench/invoices/forms.py:226
 #, python-format
 msgid ""
 "Selected contact does not belong to project's organization, %(organization)s."
@@ -481,23 +481,27 @@ msgstr ""
 "Der gewählte Kontakt gehört nicht zur Organisation des Projekts, "
 "%(organization)s."
 
-#: workbench/invoices/forms.py:139 workbench/invoices/models.py:45
+#: workbench/invoices/forms.py:90 workbench/invoices/forms.py:291
+msgid "No contact selected."
+msgstr "Kein Kontakt ausgewählt."
+
+#: workbench/invoices/forms.py:141 workbench/invoices/models.py:45
 #: workbench/tools/pdf.py:249
 msgid "Down payment"
 msgstr "Anzahlung"
 
-#: workbench/invoices/forms.py:141
+#: workbench/invoices/forms.py:143
 #: workbench/templates/invoices/invoice_detail.html:40
 #: workbench/templates/offers/offer_detail.html:71 workbench/tools/models.py:94
 #: workbench/tools/pdf.py:239
 msgid "subtotal"
 msgstr "Zwischentotal"
 
-#: workbench/invoices/forms.py:157
+#: workbench/invoices/forms.py:159
 msgid "Apply down payment invoices"
 msgstr "Anzahlungen anwenden"
 
-#: workbench/invoices/forms.py:236
+#: workbench/invoices/forms.py:238
 msgid ""
 "Invoice date is in the past, but invoice is still in preparation. Are you "
 "sure you do not want to set the invoice date to today?"
@@ -506,7 +510,7 @@ msgstr ""
 "Vorbereitung. Sind Sie sicher, dass Sie das Rechnungsdatum nicht auf heute "
 "setzen wollen?"
 
-#: workbench/invoices/forms.py:246
+#: workbench/invoices/forms.py:248
 #, python-format
 msgid ""
 "You are attempting to change %(fields)s. I am trying to prevent "
@@ -515,12 +519,12 @@ msgstr ""
 "Sie haben %(fields)s geändert. Ich versuche, unabsichtliche Änderungen an "
 "Feldern ausser Status zu verhindern. Sind Sie sicher?"
 
-#: workbench/invoices/forms.py:261
+#: workbench/invoices/forms.py:263
 #, python-format
 msgid "Moving status from '%(from)s' to '%(to)s'. Are you sure?"
 msgstr "Status von '%(from)s' zu '%(to)s' ändern. Sind Sie sicher?"
 
-#: workbench/invoices/forms.py:278
+#: workbench/invoices/forms.py:280
 #, python-format
 msgid ""
 "You are attempting to set status to '%(to)s', but the invoice has already "
@@ -529,7 +533,7 @@ msgstr ""
 "Sie versuchen, den Status auf '%(to)s' zu setzen, aber die Rechnung wurde "
 "schon am %(closed)s geschlossen. Sind Sie sicher?"
 
-#: workbench/invoices/forms.py:331
+#: workbench/invoices/forms.py:335
 msgid "Other invoice types must be created directly on a project."
 msgstr "Andere Rechnungstypen müssen direkt auf einem Projekt erstellt werden."
 
