@@ -5,7 +5,7 @@
 {% for day in days %}
 <li>
   {{ day.day|date:"D d.m.Y" }}:
-  {% if day.handled_by %}<a href="https://hangar.diebruchpiloten.com{{ day.urls.detail }}">{{ day.handled_by }}</a>
+  {% if day.handled_by %}<a href="https://hangar.diebruchpiloten.com{{ day.urls.detail }}">{{ day.handled_by.get_full_name }}</a>
   {% else %}<a href="https://hangar.diebruchpiloten.com{{ day.urls.update }}" style="color:#bc2323">noch niemand</a>
   {% endif %}
 </li>
