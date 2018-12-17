@@ -32,6 +32,9 @@ class Command(BaseCommand):
                 ).select_related("handled_by"):
                     weeks.setdefault(monday(day.day), []).append(day)
 
+                if not weeks:
+                    continue
+
                 mail = EmailMultiAlternatives(
                     "Wochenplan: {}".format(app.title),
                     bcc=[user.email for user in app.users.all()],
