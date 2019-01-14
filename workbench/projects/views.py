@@ -47,7 +47,7 @@ class CostView(object):
             offer__project=self.project
         ).prefetch_related("costs"):
             if service.id in self.services or service.costs.all():
-                entries = self.workbench.services.get(service.id, [])
+                entries = self.services.get(service.id, [])
                 yield ServiceCosts(
                     service,
                     sum((c.cost for c in service.costs.all()), 0),

@@ -82,7 +82,7 @@ class MoveServiceView(DetailView):
             )
             return redirect(self.object.offer)
 
-        pks = list(self.object.offer.workbench.services.values_list("id", flat=True))
+        pks = list(self.object.offer.services.values_list("id", flat=True))
         index = pks.index(self.object.pk)
         if "up" in request.GET and index > 0:
             pks[index], pks[index - 1] = pks[index - 1], pks[index]

@@ -157,7 +157,7 @@ class Service(Model):
 
     def save(self, *args, **kwargs):
         if not self.position:
-            max_pos = self.offer.workbench.services.aggregate(m=Max("position"))["m"]
+            max_pos = self.offer.services.aggregate(m=Max("position"))["m"]
             self.position = 10 + (max_pos or 0)
         super().save(*args, **kwargs)
         self.offer.save()
