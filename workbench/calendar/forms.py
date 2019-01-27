@@ -47,7 +47,7 @@ class DayForm(WarningsForm, ModelForm):
         d = defaultdict(list)
         for user in User.objects.filter(
             Q(is_active=True, apps__slug=current_app) | Q(pk=pk)
-        ):
+        ).distinct():
             d[user.is_active].append(
                 (formfield.prepare_value(user), formfield.label_from_instance(user))
             )
