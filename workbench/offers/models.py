@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Max
+from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -64,6 +65,7 @@ class Offer(ModelWithTotal):
     )
 
     postal_address = models.TextField(_("postal address"), blank=True)
+    _code = models.IntegerField(_("code"))
 
     objects = models.Manager.from_queryset(OfferQuerySet)()
 
@@ -74,6 +76,21 @@ class Offer(ModelWithTotal):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self._code = RawSQL(
+                "SELECT COALESCE(MAX(_code), 0) + 1 FROM offers_offer"
+                " WHERE project_id = %s",
+                (self.project_id,),
+            )
+        super().save(*args, **kwargs)
+
+    save.alters_data = True
+
+    @property
+    def code(self):
+        return "%s-o%02d" % (self.project.code, self._code)
 
     def _calculate_total(self):
         self.subtotal = sum(

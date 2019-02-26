@@ -3,9 +3,9 @@ import re
 
 from django.core.management.base import BaseCommand
 
-from invoices.models import Invoice
-from offers.models import Offer
-from projects.models import Project
+from workbench.invoices.models import Invoice
+from workbench.offers.models import Offer
+from workbench.projects.models import Project
 
 
 class _DeHTMLParser(HTMLParser):

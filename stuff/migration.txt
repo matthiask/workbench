@@ -248,15 +248,68 @@ UPDATE contacts_postaladdress SET weight=weight - 100 WHERE type ILIKE '%organiz
 --
 
 INSERT INTO projects_project
-(id, title, description, status, created_at, invoicing, maintenance, customer_id, contact_id, owned_by_id)
-SELECT id, title, description, status, created, NOT no_profit, ongoing, customer_id, contact_id, owned_by_id FROM
+(id, title, description, status, created_at, invoicing, maintenance, customer_id, contact_id, owned_by_id, _code)
+SELECT id, title, description, status, created, NOT no_profit, ongoing, customer_id, contact_id, owned_by_id, _code % 10000 FROM
 dblink(
     'dbname=fineware_feinheit',
-    'SELECT j.id, j.name, j.description, CASE WHEN state=30 THEN 30 ELSE 20 END, j.created, no_profit, ongoing, CASE WHEN p.company=TRUE THEN customer_id ELSE 1 END, CASE WHEN cp.company=FALSE THEN contact.person_id ELSE NULL END, manager_id FROM jobs_job j LEFT JOIN addressbook_person p ON j.customer_id=p.id LEFT OUTER JOIN addressbook_address contact ON j.contact_id=contact.id LEFT OUTER JOIN addressbook_person cp ON contact.person_id=cp.id'
-) AS p(id int, title varchar(100), description text, status int, created timestamp, no_profit bool, ongoing bool, customer_id int, contact_id int, owned_by_id int);
+    'SELECT j.id, j.name, j.description, CASE WHEN state=30 THEN 30 ELSE 20 END, j.created, no_profit, ongoing, CASE WHEN p.company=TRUE THEN customer_id ELSE 1 END, CASE WHEN cp.company=FALSE THEN contact.person_id ELSE NULL END, manager_id, replace(job_id, ''-'', '''')::integer FROM jobs_job j LEFT JOIN addressbook_person p ON j.customer_id=p.id LEFT OUTER JOIN addressbook_address contact ON j.contact_id=contact.id LEFT OUTER JOIN addressbook_person cp ON contact.person_id=cp.id'
+) AS p(id int, title varchar(100), description text, status int, created timestamp, no_profit bool, ongoing bool, customer_id int, contact_id int, owned_by_id int, _code int);
 
 
 --
+-- Import invoices
+--
+
+INSERT INTO invoices_invoice
+(id, title, description, created_at, status, type, postal_address, subtotal, discount, tax_rate, liable_to_vat, total, contact_id, customer_id, owned_by_id, project_id, down_payment_applied_to_id, down_payment_total, due_on, invoiced_on, _code)
+SELECT
+    invoices.id,
+    invoices.name,
+    invoices.description,
+    invoices.created,
+    CASE
+        WHEN state IN (10, 20) THEN state
+        WHEN state=25 THEN 30
+        WHEN state=30 THEN 40
+        WHEN state=35 THEN 50
+        WHEN state=40 THEN 60
+    END,
+    CASE WHEN down_payment THEN 'down-payment' ELSE 'fixed' END,
+    CASE WHEN invoices.invoice_full_override!='' THEN invoices.invoice_full_override ELSE
+        CONCAT(
+            invoice_company, E'\n',
+            invoice_first_name, ' ', invoice_last_name, E'\n',
+            invoice_address, E'\n',
+            invoice_zip_code, ' ', invoice_city, E'\n',
+            invoice_country
+        )
+    END,
+    subtotal,
+    discount,
+    tax,
+    tax > 0,
+    total,
+    p.contact_id,
+    p.customer_id,
+    manager_id,
+    job_id,
+    NULL,
+    0, -- TODO down payment applied to
+    due_date,
+    invoice_date,
+    _invoice_id
+FROM projects_project p, dblink(
+    'dbname=fineware_feinheit',
+    'SELECT id, name, description, created, state, down_payment, subtotal, discount, tax, total, manager_id, job_id, due_date, invoice_date, invoice_full_override, invoice_company, invoice_first_name, invoice_last_name, invoice_address, invoice_zip_code, invoice_city, invoice_country, _invoice_id FROM invoicing_jobinvoice'
+) AS invoices(id int, name text, description text, created timestamp, state int, down_payment bool, subtotal numeric(10,2), tax numeric(10, 2), discount numeric(10,2), total numeric(10,2), manager_id int, job_id int, due_date date, invoice_date date, invoice_full_override text, invoice_company text, invoice_first_name text, invoice_last_name text, invoice_address text, invoice_zip_code text, invoice_city text, invoice_country text, _invoice_id int)
+WHERE
+    p.id=invoices.job_id;
+
+
+--
+-- Import services / stories
+--
+
 INSERT INTO stories_story
 (id, created_at, title, status, position, requested_by_id, description, project_id)
 SELECT id, NOW(), CASE WHEN notes!='' THEN substring(notes from 0 for 200) ELSE activity_name END, 10, 0, 1, concat(activity_name, ': ', notes), job_id FROM
@@ -285,54 +338,6 @@ WHERE stories_requiredservice.story_id=s.id AND s.description ~ '^(Programmierun
 UPDATE stories_requiredservice SET service_type_id=5
 FROM stories_story s
 WHERE stories_requiredservice.story_id=s.id AND s.description ~ '^(Projektorganisation|Administration|Intern)';
-
-
---
--- Import invoices
---
-
-INSERT INTO invoices_invoice
-(id, title, description, created_at, status, type, postal_address, story_data, subtotal, discount, tax_rate, total, contact_id, customer_id, owned_by_id, project_id, down_payment_applied_to_id, due_on, invoiced_on)
-SELECT
-    invoices.id,
-    invoices.name,
-    invoices.description,
-    invoices.created,
-    CASE
-        WHEN state IN (10, 20) THEN state
-        WHEN state=25 THEN 30
-        WHEN state=30 THEN 40
-        WHEN state=35 THEN 50
-        WHEN state=40 THEN 60
-    END,
-    CASE WHEN down_payment THEN 'down-payment' ELSE 'fixed' END,
-    CASE WHEN invoices.invoice_full_override!='' THEN invoices.invoice_full_override ELSE
-        CONCAT(
-            invoice_company, E'\n',
-            invoice_first_name, ' ', invoice_last_name, E'\n',
-            invoice_address, E'\n',
-            invoice_zip_code, ' ', invoice_city, E'\n',
-            invoice_country
-        )
-    END,
-    '{}'::jsonb,
-    subtotal,
-    discount,
-    8,
-    total,
-    p.contact_id,
-    p.customer_id,
-    manager_id,
-    job_id,
-    NULL,
-    due_date,
-    invoice_date
-FROM projects_project p, dblink(
-    'dbname=fineware_feinheit',
-    'SELECT id, name, description, created, state, down_payment, subtotal, discount, total, manager_id, job_id, due_date, invoice_date, invoice_full_override, invoice_company, invoice_first_name, invoice_last_name, invoice_address, invoice_zip_code, invoice_city, invoice_country FROM invoicing_jobinvoice'
-) AS invoices(id int, name text, description text, created timestamp, state int, down_payment bool, subtotal numeric(10,2), discount numeric(10,2), total numeric(10,2), manager_id int, job_id int, due_date date, invoice_date date, invoice_full_override text, invoice_company text, invoice_first_name text, invoice_last_name text, invoice_address text, invoice_zip_code text, invoice_city text, invoice_country text)
-WHERE
-    p.id=invoices.job_id;
 
 
 --

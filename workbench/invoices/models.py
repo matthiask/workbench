@@ -2,6 +2,7 @@ from datetime import date
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
@@ -97,6 +98,7 @@ class Invoice(ModelWithTotal):
     down_payment_total = MoneyField(_("down payment total"))
 
     postal_address = models.TextField(_("postal address"), blank=True)
+    _code = models.IntegerField(_("code"))
 
     objects = models.Manager.from_queryset(InvoiceQuerySet)()
 
@@ -114,6 +116,21 @@ class Invoice(ModelWithTotal):
 
     def __html__(self):
         return format_html("<small>{}</small> {}", self.code, self.title)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self._code = RawSQL(
+                "SELECT COALESCE(MAX(_code), 0) + 1 FROM invoices_invoice"
+                " WHERE project_id = %s",
+                (self.project_id,),
+            )
+        super().save(*args, **kwargs)
+
+    save.alters_data = True
+
+    @property
+    def code(self):
+        return "%s-%04d" % (self.project.code, self._code)
 
     @property
     def total_excl_tax(self):
