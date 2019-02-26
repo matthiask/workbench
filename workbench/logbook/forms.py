@@ -31,7 +31,7 @@ class LoggedHoursForm(ModelForm):
 
     class Meta:
         model = LoggedHours
-        fields = ("task", "rendered_by", "rendered_on", "hours", "description")
+        fields = ("rendered_by", "rendered_on", "service", "hours", "description")
         widgets = {"description": Textarea()}
 
     def __init__(self, *args, **kwargs):
@@ -40,8 +40,8 @@ class LoggedHoursForm(ModelForm):
             initial = kwargs.setdefault("initial", {})
             request = kwargs["request"]
 
-            if request.GET.get("task"):
-                initial["task"] = request.GET.get("task")
+            if request.GET.get("service"):
+                initial["service"] = request.GET.get("service")
 
             latest = (
                 LoggedHours.objects.filter(rendered_by=kwargs["request"].user)
@@ -57,11 +57,11 @@ class LoggedHoursForm(ModelForm):
                     ),
                 )
         else:
-            self.project = kwargs["instance"].task.project
+            self.project = kwargs["instance"].service.offer.project
 
         super().__init__(*args, **kwargs)
-        self.fields["task"].choices = [("", "----------")] + [
-            (task.id, task.__html__()) for task in self.project.tasks.all()
+        self.fields["service"].choices = [("", "----------")] + [
+            (service.id, service.__str__()) for service in self.project.services
         ]
 
     def save(self):

@@ -8,14 +8,14 @@
   <thead>
     <tr>
       <th>{% trans 'created' %}</th>
-      <th>{% trans 'task' %}</th>
+      <th>{% trans 'service' %}</th>
       <th>{% trans 'rendered' %}</th>
       <th>{% trans 'description' %}</th>
       <th class="text-right">{% trans 'hours' %}</th>
     </tr>
   </thead>
   <tbody>
-    {% for day, sum, instances in object_list|select_related:'task__project,rendered_by'|group_hours_by_day %}
+    {% for day, sum, instances in object_list|select_related:'service__offer__project,rendered_by'|group_hours_by_day %}
       <tr>
         <td colspan="4"><strong>{{ day|date:'d.m.Y' }}</strong></td>
         <td class="text-right"><strong>{{ sum }}h</strong></td>
@@ -24,9 +24,9 @@
         <tr>
           <td>{{ hours.created_at|date:'H:i' }}</td>
           <td>
-            <a href="{{ hours.task.get_absolute_url }}">
-              {{ hours.task.project }}:<br>
-              {{ hours.task }}
+            <a href="{{ hours.service.get_absolute_url }}">
+              {{ hours.service.offer.project }}:<br>
+              {{ hours.service }}
             </a>
           </td>
           <td>{{ hours.rendered_by.get_short_name }}</td>

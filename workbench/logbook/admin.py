@@ -5,7 +5,7 @@ from . import models
 
 class LoggedHoursAdmin(admin.ModelAdmin):
     list_display = (
-        "task",
+        "service",
         "created_at",
         "created_by",
         "rendered_on",
@@ -13,7 +13,7 @@ class LoggedHoursAdmin(admin.ModelAdmin):
         "hours",
         "description",
     )
-    raw_id_fields = ("task", "invoice")
+    raw_id_fields = ("service", "invoice")
 
 
 class LoggedCostAdmin(admin.ModelAdmin):

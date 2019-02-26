@@ -11,11 +11,11 @@
   <table class="table table-striped">
     <tr>
       <th class="text-right">{% trans 'project' %}</th>
-      <td>{% link_or_none object.task.project %}</td>
+      <td>{% link_or_none object.service.offer.project %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'task' %}</th>
-      <td>{% link_or_none object.task %}</td>
+      <th class="text-right">{% trans 'service' %}</th>
+      <td>{% link_or_none object.service %}</td>
     </tr>
     <tr>
       <th class="text-right">{% trans 'created' %}</th>

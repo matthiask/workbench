@@ -6,22 +6,13 @@ from workbench.invoices.models import Invoice
 from workbench.logbook.forms import LoggedHoursForm, LoggedCostForm
 from workbench.logbook.models import LoggedHours, LoggedCost
 from workbench.offers.forms import CreateOfferForm
-from workbench.offers.models import Offer
-from workbench.projects.forms import (
-    ProjectSearchForm,
-    ProjectForm,
-    ApprovedHoursForm,
-    TaskSearchForm,
-    TaskForm,
-    CommentForm,
-)
-from workbench.projects.models import Project, Task, Comment
+from workbench.offers.models import Offer, Service
+from workbench.projects.forms import ProjectSearchForm, ProjectForm, ApprovedHoursForm
+from workbench.projects.models import Project
 from workbench.projects.views import (
     ProjectDetailView,
     CreateRelatedView,
-    TaskListView,
-    TaskDetailView,
-    TaskDeleteView,
+    ServiceListView,
 )
 from workbench.generic import ListView, CreateView, UpdateView, DeleteView
 
@@ -41,14 +32,6 @@ urlpatterns = [
         r"^(?P<pk>\d+)/overview/$",
         ProjectDetailView.as_view(project_view="overview"),
         name="projects_project_overview",
-    ),
-    url(
-        r"^(?P<pk>\d+)/tasks/$",
-        TaskListView.as_view(
-            model=Task, search_form_class=TaskSearchForm, show_create_button=False
-        ),
-        # ProjectDetailView.as_view(project_view='tasks'),
-        name="projects_project_tasks",
     ),
     url(
         r"^(?P<pk>\d+)/costs/$",
@@ -76,11 +59,6 @@ urlpatterns = [
         name="projects_project_delete",
     ),
     url(
-        r"^(?P<pk>\d+)/createtask/$",
-        CreateRelatedView.as_view(model=Task, form_class=TaskForm),
-        name="projects_project_createtask",
-    ),
-    url(
         r"^(?P<pk>\d+)/createoffer/$",
         CreateRelatedView.as_view(model=Offer, form_class=CreateOfferForm),
         name="projects_project_createoffer",
@@ -94,39 +72,14 @@ urlpatterns = [
     #     r'^(?P<pk>\d+)/estimation/$',
     #     EstimationView.as_view(),
     #     name='projects_project_estimation'),
-    url(
-        r"^tasks/$",
-        ListView.as_view(
-            model=Task, search_form_class=TaskSearchForm, show_create_button=False
-        ),
-        name="projects_task_list",
-    ),
-    url(r"^tasks/(?P<pk>\d+)/$", TaskDetailView.as_view(), name="projects_task_detail"),
-    url(
-        r"^tasks/(?P<pk>\d+)/update/$",
-        UpdateView.as_view(model=Task, form_class=TaskForm),
-        name="projects_task_update",
-    ),
-    url(
-        r"^tasks/(?P<pk>\d+)/delete/$",
-        TaskDeleteView.as_view(),
-        name="projects_task_delete",
-    ),
     # url(
     #     r'^(?P<pk>\d+)/planning/$',
     #     views.PlanningView.as_view(),
     #     name='projects_project_planning'),
     url(
-        r"^comments/(?P<pk>\d+)/update/$",
-        UpdateView.as_view(
-            model=Comment, form_class=CommentForm, template_name="modalform.html"
-        ),
-        name="projects_comment_update",
-    ),
-    url(
-        r"^comments/(?P<pk>\d+)/delete/$",
-        DeleteView.as_view(model=Comment),
-        name="projects_comment_delete",
+        r"^(?P<pk>\d+)/services/$",
+        ServiceListView.as_view(model=Service, show_create_button=False),
+        name="projects_project_services",
     ),
     # HOURS
     url(

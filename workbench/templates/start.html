@@ -47,29 +47,6 @@
       </div>
     </div>
 
-    <div class="panel panel-default">
-      <div class="panel-heading"><h3>
-          <a href="{% url 'projects_task_list' %}?s=open&amp;owned_by={{ request.user.id }}">{% trans 'Important tasks' %}</a>
-      </h3></div>
-      <div class="panel-body">
-        <table class="table table-condensed">
-          {% for task in user.important_tasks %}
-            <tr>
-              <td><i title="{{ task.get_type_display }}" class="{{ task.type_css }}"></i></td>
-              <td><span class="label label-{{ task.priority_css }}">{{ task.get_priority_display }}</span></td>
-              <th><a href="{{ task.urls.detail }}">{{ task|h }}</a></th>
-              <td>{% link_or_none task.project %}</td>
-              <td>
-                <span class="{{ task.status_css }}">{{ task.pretty_status }}</span>
-              </td>
-            </tr>
-          {% empty %}
-            <tr><th>{% trans 'no important tasks! (how can this be?)' %}</th></tr>
-          {% endfor %}
-        </table>
-      </div>
-    </div>
-
   </div>
 </div>
 {% endblock %}

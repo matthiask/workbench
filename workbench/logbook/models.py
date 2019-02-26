@@ -7,18 +7,18 @@ from django.utils.translation import ugettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.offers.models import Service
-from workbench.projects.models import Project, Task
+from workbench.projects.models import Project
 from workbench.tools.models import SearchManager, Model, MoneyField, HoursField
 from workbench.tools.urls import model_urls
 
 
 @model_urls()
 class LoggedHours(Model):
-    task = models.ForeignKey(
-        Task,
+    service = models.ForeignKey(
+        Service,
         on_delete=models.PROTECT,
         related_name="loggedhours",
-        verbose_name=_("task"),
+        verbose_name=_("service"),
     )
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     created_by = models.ForeignKey(
@@ -52,10 +52,10 @@ class LoggedHours(Model):
         verbose_name_plural = _("logged hours")
 
     def __str__(self):
-        return "%s: %s" % (self.task.title, self.description)
+        return "%s: %s" % (self.service.title, self.description)
 
     def __html__(self):
-        return format_html("{}:<br>{}", self.task.title, self.description)
+        return format_html("{}:<br>{}", self.service.title, self.description)
 
 
 @model_urls(default="update")

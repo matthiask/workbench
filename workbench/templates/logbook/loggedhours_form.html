@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block body %}
-  {% if request.user.recent_hours %}
+  {% if request.user.recent_hours|length %}
     <table class="table table-condensed">
       <tr>
         <td colspan="3">
@@ -16,7 +16,7 @@
           <td>
             <a href="{{ hours.urls.detail }}" data-toggle="ajaxmodal">
               <strong>
-                {{ hours.task.project }}: {{ hours.task }}
+                {{ hours.service.offer.project }}: {{ hours.service }}
               </strong><br/>
               {{ hours.description }}
             </a>

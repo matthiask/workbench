@@ -6,7 +6,7 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer, Service
-from workbench.projects.models import Project, Task
+from workbench.projects.models import Project
 from workbench.services.models import ServiceType
 
 
@@ -52,11 +52,6 @@ class ProjectFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Project
-
-
-class TaskFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Task
 
 
 # OFFERS ######################################################################

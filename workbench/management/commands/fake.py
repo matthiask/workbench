@@ -1,12 +1,13 @@
 import faker
-import random
+
+# import random
 
 from django.core.management import BaseCommand
 
 from accounts.middleware import set_user_name
 from accounts.models import User
 from contacts.models import Person
-from projects.models import Project, Task
+from projects.models import Project
 
 
 class Command(BaseCommand):
@@ -26,7 +27,11 @@ class Command(BaseCommand):
             status=Project.WORK_IN_PROGRESS,
         )
 
+        project  # pass
+
+        # TODO Offer and service instead.
         for i in range(5):
+            """
             task = Task.objects.create(
                 project=project,
                 created_by=owned_by,
@@ -35,6 +40,4 @@ class Command(BaseCommand):
                 priority=random.choice((20, 30, 40, 50)),
                 owned_by=random.choice((owned_by, None)),
             )
-
-            for i in range(random.randint(0, 5)):
-                task.comments.create(created_by=owned_by, notes=f.text())
+            """

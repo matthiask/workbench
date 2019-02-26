@@ -1,19 +1,18 @@
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 from datetime import date, datetime
 from decimal import Decimal
 import itertools
 
 from django import template
 from django.db import models
-from django.db.models import Count, Sum
+from django.db.models import Sum
 from django.template.defaultfilters import linebreaksbr
 from django.utils import timezone
 from django.utils.html import format_html, mark_safe
 from django.utils.translation import ugettext as _
 
 from workbench.logbook.models import LoggedHours
-from workbench.offers.models import Service
-from workbench.projects.models import Comment
+from workbench.offers.models import Effort
 from workbench.tools.formats import local_date_format
 
 
@@ -120,53 +119,26 @@ def timesince_short(dttm):
 
 
 @register.filter
-def tasks_info(tasks, project):
-    tasks = list(tasks)
+def services_info(services, project):
+    services = list(services)
 
-    comment_counts = {
-        row["task"]: row["count"]
-        for row in Comment.objects.filter(task__project=project)
-        .order_by()
-        .values("task")
-        .annotate(count=Count("id"))
-    }
-
-    hours_per_task = {
-        row["task"]: row["hours__sum"]
+    logged_hours_per_service = {
+        row["service"]: row["hours__sum"]
         for row in LoggedHours.objects.order_by()
-        .filter(task__project=project)
-        .values("task")
+        .filter(service__in=services)
+        .values("service")
         .annotate(Sum("hours"))
     }
-    hours_per_service = {
-        row["task__service"]: row["hours__sum"]
-        for row in LoggedHours.objects.order_by()
-        .filter(task__project=project)
-        .values("task__service")
-        .annotate(Sum("hours"))
-    }
-    hours_per_task = {
-        row["task"]: row["hours__sum"]
-        for row in LoggedHours.objects.order_by()
-        .filter(task__project=project)
-        .values("task")
+    effort_hours_per_service = {
+        row["service"]: row["hours__sum"]
+        for row in Effort.objects.order_by()
+        .filter(service__in=services)
+        .values("service")
         .annotate(Sum("hours"))
     }
 
-    tasks_per_service = defaultdict(list)
-    for task in tasks:
-        task.comment_count = comment_counts.get(task.id, 0)
-        task.logged_hours = hours_per_task.get(task.id, 0)
-        tasks_per_service[task.service].append(task)
+    for service in services:
+        service.logged_hours = logged_hours_per_service.get(service.id, 0)
+        service.effort_hours = effort_hours_per_service.get(service.id, 0)
 
-    if tasks_per_service[None] or None in hours_per_service:
-        yield (None, hours_per_service.get(None, Decimal()), tasks_per_service[None])
-
-    for service in Service.objects.filter(offer__project=project).select_related(
-        "offer"
-    ):
-        yield (
-            service,
-            hours_per_service.get(service.id, Decimal()),
-            tasks_per_service[service],
-        )
+    return services
