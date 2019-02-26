@@ -110,7 +110,7 @@ class PDFDocument(_PDFDocument):
         self.bounds.S = 18 * mm
         self.bounds.W = 20 * mm
         self.bounds.outsideS = self.bounds.S - 5 * mm
-        self.style.tableColumns = (18 * mm, 146 * mm)
+        self.style.tableColumns = (20 * mm, self.bounds.E - self.bounds.W - 20 * mm)
 
     def init_letter(self, page_fn, page_fn_later=None, address_y=None, address_x=None):
         self.generate_style()
