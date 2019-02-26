@@ -46,7 +46,7 @@ class PDFDocument(_PDFDocument):
     def generate_style(self, *args, **kwargs):
         self.style = Empty()
         self.style.fontName = "Rep"
-        self.style.fontSize = 10
+        self.style.fontSize = 9
 
         self.style.normal = style(
             getSampleStyleSheet()["Normal"],
@@ -106,9 +106,10 @@ class PDFDocument(_PDFDocument):
 
         self.bounds = Empty()
         self.bounds.N = 280 * mm
-        self.bounds.E = 187 * mm
-        self.bounds.S = 12 * mm
-        self.bounds.W = 23 * mm
+        self.bounds.E = 190 * mm
+        self.bounds.S = 18 * mm
+        self.bounds.W = 20 * mm
+        self.bounds.outsideS = self.bounds.S - 5 * mm
         self.style.tableColumns = (18 * mm, 146 * mm)
 
     def init_letter(self, page_fn, page_fn_later=None, address_y=None, address_x=None):
@@ -123,7 +124,11 @@ class PDFDocument(_PDFDocument):
         }
 
         address_frame = Frame(
-            self.bounds.W, address_y or 20.2 * cm, 16.4 * cm, 4 * cm, **frame_kwargs
+            self.bounds.W,
+            address_y or 20.2 * cm,
+            self.bounds.E - self.bounds.W,
+            40 * mm,
+            **frame_kwargs
         )
         rest_frame = Frame(
             self.bounds.W,
@@ -165,10 +170,12 @@ class PDFDocument(_PDFDocument):
 
             canvas.setFont(pdf.style.fontName, 6)
             for i, text in enumerate(reversed(settings.WORKBENCH.PDF_OFFER_TERMS)):
-                canvas.drawString(pdf.bounds.W, pdf.bounds.S + 3 * i * mm, text)
+                canvas.drawString(pdf.bounds.W, pdf.bounds.outsideS + 3 * i * mm, text)
 
             canvas.setFont(pdf.style.fontName, 6)
-            canvas.drawRightString(pdf.bounds.E, pdf.bounds.S, _("page %d") % doc.page)
+            canvas.drawRightString(
+                pdf.bounds.E, pdf.bounds.outsideS, _("page %d") % doc.page
+            )
 
             canvas.restoreState()
 
@@ -187,21 +194,23 @@ class PDFDocument(_PDFDocument):
 
             canvas.setFont(pdf.style.fontName, 6)
             canvas.drawString(
-                pdf.bounds.W, pdf.bounds.S, settings.WORKBENCH.PDF_ADDRESS
+                pdf.bounds.W, pdf.bounds.outsideS, settings.WORKBENCH.PDF_ADDRESS
             )
 
             canvas.setFont(pdf.style.fontName, 6)
-            canvas.drawRightString(pdf.bounds.E, pdf.bounds.S, _("page %d") % doc.page)
+            canvas.drawRightString(
+                pdf.bounds.E, pdf.bounds.outsideS, _("page %d") % doc.page
+            )
 
             canvas.restoreState()
 
         return _fn
 
     def init_offer(self):
-        super().init_letter(page_fn=self.offer_stationery())
+        self.init_letter(page_fn=self.offer_stationery())
 
     def init_invoice(self):
-        super().init_letter(page_fn=self.invoice_stationery())
+        self.init_letter(page_fn=self.invoice_stationery())
 
     def postal_address(self, postal_address):
         self.p(postal_address)
