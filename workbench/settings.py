@@ -162,8 +162,8 @@ WORKBENCH = {
         PDF_INVOICE_PAYMENT=(
             "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
             " der Referenznummer %(code)s innerhalb von %(days)s Tagen"
-            " (%(due)s) auf Postkonto 85-206645-2"
-            " / IBAN CH50 0900 0000 8520 6645 2."
+            " (%(due)s) auf unser ZKB Konto"
+            " IBAN CH52 0070 0114 8022 0855 1."
         ),
         FONTS={
             "regular": font("Lato-Light.ttf"),
