@@ -371,17 +371,22 @@ SELECT SETVAL('public.contacts_person_id_seq', COALESCE(MAX(id), 1) ) FROM publi
 SELECT SETVAL('public.contacts_phonenumber_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_phonenumber;
 SELECT SETVAL('public.contacts_postaladdress_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_postaladdress;
 SELECT SETVAL('public.deals_deal_id_seq', COALESCE(MAX(id), 1) ) FROM public.deals_deal;
+SELECT SETVAL('public.deals_stage_id_seq', COALESCE(MAX(id), 1) ) FROM public.deals_stage;
 SELECT SETVAL('public.django_admin_log_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_admin_log;
 SELECT SETVAL('public.django_content_type_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_content_type;
 SELECT SETVAL('public.django_migrations_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_migrations;
 SELECT SETVAL('public.invoices_invoice_id_seq', COALESCE(MAX(id), 1) ) FROM public.invoices_invoice;
-SELECT SETVAL('public.invoices_invoice_stories_id_seq', COALESCE(MAX(id), 1) ) FROM public.invoices_invoice_stories;
+SELECT SETVAL('public.logbook_loggedcost_id_seq', COALESCE(MAX(id), 1) ) FROM public.logbook_loggedcost;
+SELECT SETVAL('public.logbook_loggedhours_id_seq', COALESCE(MAX(id), 1) ) FROM public.logbook_loggedhours;
+SELECT SETVAL('public.offers_cost_id_seq', COALESCE(MAX(id), 1) ) FROM public.offers_cost;
+SELECT SETVAL('public.offers_effort_id_seq', COALESCE(MAX(id), 1) ) FROM public.offers_effort;
 SELECT SETVAL('public.offers_offer_id_seq', COALESCE(MAX(id), 1) ) FROM public.offers_offer;
+SELECT SETVAL('public.offers_service_id_seq', COALESCE(MAX(id), 1) ) FROM public.offers_service;
+SELECT SETVAL('public.projects_attachment_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_attachment;
+SELECT SETVAL('public.projects_comment_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_comment;
 SELECT SETVAL('public.projects_project_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_project;
+SELECT SETVAL('public.projects_task_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_task;
 SELECT SETVAL('public.services_servicetype_id_seq', COALESCE(MAX(id), 1) ) FROM public.services_servicetype;
-SELECT SETVAL('public.stories_renderedservice_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_renderedservice;
-SELECT SETVAL('public.stories_requiredservice_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_requiredservice;
-SELECT SETVAL('public.stories_story_id_seq', COALESCE(MAX(id), 1) ) FROM public.stories_story;
 
 
 --
