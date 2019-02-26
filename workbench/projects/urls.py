@@ -1,18 +1,22 @@
 from django.conf.urls import url
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 
 from workbench.invoices.forms import CreateInvoiceForm
 from workbench.invoices.models import Invoice
 from workbench.logbook.forms import LoggedHoursForm, LoggedCostForm
 from workbench.logbook.models import LoggedHours, LoggedCost
 from workbench.offers.forms import CreateOfferForm
-from workbench.offers.models import Offer, Service
+from workbench.offers.models import Offer
 from workbench.projects.forms import ProjectSearchForm, ProjectForm, ApprovedHoursForm
-from workbench.projects.models import Project
+from workbench.projects.models import Project, Service
 from workbench.projects.views import (
     ProjectDetailView,
     CreateRelatedView,
     ServiceListView,
+    CreateServiceView,
+    UpdateServiceView,
+    DeleteServiceView,
+    MoveServiceView,
 )
 from workbench.generic import ListView, CreateView, UpdateView, DeleteView
 
@@ -102,5 +106,31 @@ urlpatterns = [
         r"^cost/(?P<pk>\d+)/delete/$",
         DeleteView.as_view(model=LoggedCost, template_name="modal_confirm_delete.html"),
         name="logbook_loggedcost_delete",
+    ),
+    # Services
+    url(
+        r"^(?P<pk>\d+)/createservice/$",
+        CreateServiceView.as_view(),
+        name="projects_project_createservice",
+    ),
+    url(
+        r"^service/(?P<pk>\d+)/$",
+        lambda request, pk: redirect(get_object_or_404(Service, pk=pk).project),
+        name="projects_service_detail",
+    ),
+    url(
+        r"^service/(?P<pk>\d+)/update/$",
+        UpdateServiceView.as_view(),
+        name="projects_service_update",
+    ),
+    url(
+        r"^service/(?P<pk>\d+)/delete/$",
+        DeleteServiceView.as_view(),
+        name="projects_service_delete",
+    ),
+    url(
+        r"^service/(?P<pk>\d+)/move/$",
+        MoveServiceView.as_view(),
+        name="projects_service_move",
     ),
 ]

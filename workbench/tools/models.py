@@ -2,6 +2,7 @@ from decimal import Decimal
 from functools import partial
 
 from django.contrib import messages
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import ProtectedError
 from django.db.models.deletion import Collector
@@ -83,11 +84,20 @@ class Model(models.Model):
 
 
 MoneyField = partial(
-    models.DecimalField, max_digits=10, decimal_places=2, default=Decimal("0")
+    models.DecimalField,
+    max_digits=10,
+    decimal_places=2,
+    default=Decimal("0"),
+    validators=[MinValueValidator(0)],
 )
 
 
-HoursField = partial(models.DecimalField, max_digits=5, decimal_places=2)
+HoursField = partial(
+    models.DecimalField,
+    max_digits=5,
+    decimal_places=2,
+    validators=[MinValueValidator(0.1)],
+)
 
 
 class ModelWithTotal(Model):

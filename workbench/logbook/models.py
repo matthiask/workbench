@@ -6,8 +6,7 @@ from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.offers.models import Service
-from workbench.projects.models import Project
+from workbench.projects.models import Project, Service
 from workbench.tools.models import SearchManager, Model, MoneyField, HoursField
 from workbench.tools.urls import model_urls
 

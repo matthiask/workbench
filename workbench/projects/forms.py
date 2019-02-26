@@ -1,10 +1,13 @@
+from collections import OrderedDict
+from decimal import Decimal
+
 from django import forms, http
+from django.forms.models import inlineformset_factory
 from django.utils.translation import ugettext_lazy as _
 
 from workbench.contacts.models import Organization, Person
-from workbench.projects.models import Project
-from workbench.offers.models import Service
-from workbench.tools.forms import ModelForm, Picker
+from workbench.projects.models import Project, Service, Effort, Cost
+from workbench.tools.forms import ModelForm, Textarea, Picker
 
 
 class ProjectSearchForm(forms.Form):
@@ -79,3 +82,53 @@ class ApprovedHoursForm(forms.Form):
             )
             service.save()
         return self.project
+
+
+class ServiceForm(ModelForm):
+    class Meta:
+        model = Service
+        fields = ("title", "description")
+        widgets = {"description": Textarea()}
+
+    def __init__(self, *args, **kwargs):
+        self.offer = kwargs.pop("offer", None)
+        super().__init__(*args, **kwargs)
+        kwargs.pop("request")
+        self.formsets = (
+            OrderedDict(
+                (
+                    ("efforts", EffortFormset(*args, **kwargs)),
+                    ("costs", CostFormset(*args, **kwargs)),
+                )
+            )
+            if self.instance.pk
+            else OrderedDict()
+        )
+
+        if self.offer:
+            self.instance.offer = self.offer
+
+    def is_valid(self):
+        return all(
+            [super().is_valid()]
+            + [formset.is_valid() for formset in self.formsets.values()]
+        )
+
+    def save(self):
+        instance = super().save(commit=False)
+        for formset in self.formsets.values():
+            formset.save()
+
+        efforts = instance.efforts.all()
+        instance.effort_hours = sum((e.hours for e in efforts), Decimal())
+        instance.cost += sum((e.cost for e in efforts), Decimal())
+        instance.cost += sum((c.cost for c in instance.costs.all()), Decimal())
+        instance.save()
+        return instance
+
+
+EffortFormset = inlineformset_factory(
+    Service, Effort, fields=("service_type", "hours"), extra=0
+)
+
+CostFormset = inlineformset_factory(Service, Cost, fields=("title", "cost"), extra=0)
