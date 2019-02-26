@@ -134,7 +134,11 @@ class Invoice(ModelWithTotal):
 
     @property
     def code(self):
-        return "%s-%04d" % (self.project.code, self._code)
+        return (
+            "%s-%04d" % (self.project.code, self._code)
+            if self.project
+            else "%05d" % self.pk
+        )
 
     @property
     def total_excl_tax(self):
