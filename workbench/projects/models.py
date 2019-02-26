@@ -113,7 +113,6 @@ class Project(Model):
     def overview(self):
         # Avoid circular imports
         from workbench.logbook.models import LoggedHours
-        from workbench.offers.models import Service
 
         return {
             "logged": LoggedHours.objects.filter(service__offer__project=self)
@@ -136,13 +135,6 @@ class Project(Model):
         if self.maintenance:
             parts.append(ugettext("maintenance"))
         return ", ".join(parts)
-
-    @property
-    def services(self):
-        from workbench.offers.models import Service
-
-        # TODO service archival?
-        return Service.objects.filter(offer__project=self)
 
 
 @model_urls()
@@ -167,9 +159,9 @@ class Service(Model):
     description = models.TextField(_("description"), blank=True)
     position = models.PositiveIntegerField(_("position"), default=0)
 
-    # effort_hours = HoursField(_("effort hours"))
+    effort_hours = HoursField(_("effort hours"))
     # _approved_hours = HoursField(_("approved hours"), blank=True, null=True)
-    # cost = MoneyField(_("cost"))
+    cost = MoneyField(_("cost"))
 
     class Meta:
         ordering = ("position", "created_at")
@@ -177,14 +169,13 @@ class Service(Model):
         verbose_name_plural = _("services")
 
     def __str__(self):
-        return "%s - %s" % (self.offer, self.title)
+        return "%s - %s" % (self.offer or _("no offer yet"), self.title)
 
     def save(self, *args, **kwargs):
         if not self.position:
-            max_pos = self.offer.services.aggregate(m=Max("position"))["m"]
+            max_pos = self.__class__._default_manager.aggregate(m=Max("position"))["m"]
             self.position = 10 + (max_pos or 0)
         super().save(*args, **kwargs)
-        self.offer.save()
 
     @property
     def approved_hours(self):

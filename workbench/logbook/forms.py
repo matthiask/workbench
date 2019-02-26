@@ -61,7 +61,7 @@ class LoggedHoursForm(ModelForm):
 
         super().__init__(*args, **kwargs)
         self.fields["service"].choices = [("", "----------")] + [
-            (service.id, service.__str__()) for service in self.project.services
+            (service.id, service.__str__()) for service in self.project.services.all()
         ]
 
     def save(self):

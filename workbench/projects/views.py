@@ -82,23 +82,16 @@ class CreateServiceView(CreateView):
         if not self.model.allow_create(request):
             return redirect("../")
 
-        self.offer = get_object_or_404(Offer, pk=self.kwargs["pk"])
-        if self.offer.status > Offer.IN_PREPARATION:
-            messages.error(
-                request,
-                _("Cannot modify an offer which is not in preparation anymore."),
-            )
-            return redirect("../")
-
+        self.project = get_object_or_404(Project, pk=self.kwargs["pk"])
         form = self.get_form()
         context = self.get_context_data(form=form)
         return self.render_to_response(context)
 
     def get_form(self, data=None, files=None, **kwargs):
-        if not hasattr(self, "offer"):
-            self.offer = get_object_or_404(Offer, pk=self.kwargs["pk"])
+        if not hasattr(self, "project"):
+            self.project = get_object_or_404(Project, pk=self.kwargs["pk"])
         return ServiceForm(
-            data, files, offer=self.offer, request=self.request, **kwargs
+            data, files, project=self.project, request=self.request, **kwargs
         )
 
     def get_success_url(self):

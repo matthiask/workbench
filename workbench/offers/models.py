@@ -69,13 +69,17 @@ class Offer(ModelWithTotal):
         return self.title
 
     def save(self, *args, **kwargs):
+        new = False
         if not self.pk:
             self._code = RawSQL(
                 "SELECT COALESCE(MAX(_code), 0) + 1 FROM offers_offer"
                 " WHERE project_id = %s",
                 (self.project_id,),
             )
+            new = True
         super().save(*args, **kwargs)
+        if new:
+            self.refresh_from_db()
 
     save.alters_data = True
 

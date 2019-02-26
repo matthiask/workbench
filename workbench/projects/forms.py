@@ -91,7 +91,7 @@ class ServiceForm(ModelForm):
         widgets = {"description": Textarea()}
 
     def __init__(self, *args, **kwargs):
-        self.offer = kwargs.pop("offer", None)
+        self.project = kwargs.pop("project", None)
         super().__init__(*args, **kwargs)
         kwargs.pop("request")
         self.formsets = (
@@ -105,8 +105,8 @@ class ServiceForm(ModelForm):
             else OrderedDict()
         )
 
-        if self.offer:
-            self.instance.offer = self.offer
+        if self.project:
+            self.instance.project = self.project
 
     def is_valid(self):
         return all(
