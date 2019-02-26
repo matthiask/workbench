@@ -83,6 +83,7 @@ class LoggedCost(Model):
     cost = MoneyField(
         _("cost"), default=None, help_text=_("Total incl. tax for third-party costs.")
     )
+    # TODO what we paid vs. what we invoice
     description = models.TextField(_("description"))
 
     invoice = models.ForeignKey(
