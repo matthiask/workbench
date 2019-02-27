@@ -74,6 +74,7 @@ class Deal(Model):
     objects = models.Manager.from_queryset(DealQuerySet)()
 
     class Meta:
+        ordering = ["-created_at"]
         verbose_name = _("deal")
         verbose_name_plural = _("deals")
 
