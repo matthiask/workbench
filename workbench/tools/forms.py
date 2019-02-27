@@ -121,7 +121,7 @@ class Picker(forms.TextInput):
         super().__init__(attrs)
         self.model = model
 
-    def render(self, name, value, attrs=None, choices=()):
+    def render(self, name, value, attrs=None, choices=(), renderer=None):
         if value is None:
             value = ""
         final_attrs = self.build_attrs(attrs, {"type": "hidden", "name": name})
