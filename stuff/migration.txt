@@ -261,7 +261,7 @@ dblink(
 --
 
 INSERT INTO invoices_invoice
-(id, title, description, created_at, status, type, postal_address, subtotal, discount, tax_rate, liable_to_vat, total, contact_id, customer_id, owned_by_id, project_id, down_payment_applied_to_id, down_payment_total, due_on, invoiced_on, _code)
+(id, title, description, created_at, status, type, postal_address, subtotal, discount, tax_rate, liable_to_vat, total, contact_id, customer_id, owned_by_id, project_id, down_payment_applied_to_id, down_payment_total, due_on, invoiced_on, _code, payment_notice)
 SELECT
     invoices.id,
     invoices.name,
@@ -297,7 +297,8 @@ SELECT
     0, -- TODO down payment applied to
     due_date,
     invoice_date,
-    _invoice_id
+    _invoice_id,
+    ''
 FROM projects_project p, dblink(
     'dbname=fineware_feinheit',
     'SELECT id, name, description, created, state, down_payment, subtotal, discount, tax, total, manager_id, job_id, due_date, invoice_date, invoice_full_override, invoice_company, invoice_first_name, invoice_last_name, invoice_address, invoice_zip_code, invoice_city, invoice_country, _invoice_id FROM invoicing_jobinvoice'
