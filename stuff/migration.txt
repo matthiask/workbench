@@ -108,7 +108,7 @@ dblink(
 
 INSERT INTO contacts_postaladdress
 (person_id, type, postal_address, weight)
-SELECT person_id, CASE WHEN type=1 THEN 'work' ELSE 'home' END, CONCAT(COALESCE(employer_name, ''), E'\n', first_name, ' ', name, E'\n', function, E'\n', address, E'\n', zip_code, ' ', city, E'\n', country), 0 FROM
+SELECT person_id, CASE WHEN type=1 THEN 'work' ELSE 'home' END, CONCAT(COALESCE(employer_name, ''), E'\n', first_name, ' ', name, E'\n', function, E'\n', address, E'\n', zip_code, ' ', city, E'\n', CASE WHEN country = 'CH' THEN '' ELSE country END), 0 FROM
 dblink(
     'dbname=fineware_feinheit',
     'SELECT p.id, a.type, e.name, p.first_name, p.name, a.function, a.address, a.zip_code, a.city, a.country FROM addressbook_address a LEFT JOIN addressbook_person p ON a.person_id=p.id LEFT OUTER JOIN addressbook_person e ON a.employer_id=e.id WHERE p.company=FALSE AND a.active=TRUE'
