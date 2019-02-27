@@ -1,9 +1,11 @@
 from django import forms
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.offers.models import Offer
+from workbench.projects.models import Service
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import ModelForm, WarningsForm
 
@@ -61,6 +63,21 @@ class OfferForm(WarningsForm, ModelForm):
         )
         widgets = {"status": forms.RadioSelect}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.service_candidates = Service.objects.filter(
+                Q(project=self.instance.project),
+                Q(offer__isnull=True) | Q(offer=self.instance),
+            )
+
+            self.fields["services"] = forms.ModelMultipleChoiceField(
+                queryset=self.service_candidates,
+                label=_("services"),
+                widget=forms.CheckboxSelectMultiple,
+                required=False,
+            )
+
     def clean(self):
         data = super().clean()
         s_dict = dict(Offer.STATUS_CHOICES)
@@ -86,3 +103,11 @@ class OfferForm(WarningsForm, ModelForm):
                 )
 
         return data
+
+    def save(self):
+        instance = super().save(commit=False)
+        if instance.pk:
+            self.cleaned_data["services"].update(offer=instance)
+            self.service_candidates.exclude(id__in=self.cleaned_data["services"]).update(offer=None)
+        instance.save()
+        return instance
