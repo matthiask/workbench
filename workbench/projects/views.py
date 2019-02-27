@@ -101,7 +101,7 @@ class UpdateServiceView(UpdateView):
     form_class = ServiceForm
 
     def get_success_url(self):
-        return self.object.project.get_absolute_url()
+        return self.object.project.get_absolute_url() + "services/"
 
 
 class DeleteServiceView(DeleteView):
