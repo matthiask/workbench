@@ -139,3 +139,7 @@ class Offer(ModelWithTotal):
     @property
     def total_title(self):
         return _("total CHF incl. tax") if self.liable_to_vat else _("total CHF")
+
+    @property
+    def is_locked(self):
+        return self.status > self.IN_PREPARATION

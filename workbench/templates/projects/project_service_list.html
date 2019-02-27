@@ -35,7 +35,11 @@
       {% endifchanged %}
       <tr>
         <td style="padding-left:4rem">
-          <a href="{{ service.urls.update }}"><strong>{{ service }}</strong></a>
+          {% if not service.offer or not service.offer.is_locked %}
+            <a href="{{ service.urls.update }}"><strong>{{ service }}</strong></a>
+          {% else %}
+            <strong>{{ service }}</strong>
+          {% endif %}
           <br>
           {{ service.description|linebreaksbr }}<br><br>
           {% for effort in service.efforts.all %}
