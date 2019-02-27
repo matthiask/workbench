@@ -1,6 +1,7 @@
+from datetime import date
+
 from django import forms
 from django.db.models import Q
-from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from workbench.contacts.forms import PostalAddressSelectionForm
@@ -84,12 +85,12 @@ class OfferForm(WarningsForm, ModelForm):
         s_dict = dict(Offer.STATUS_CHOICES)
 
         if data.get("status", 0) >= Offer.ACCEPTED:
-            if not self.instance.closed_at:
-                self.instance.closed_at = timezone.now()
+            if not self.instance.closed_on:
+                self.instance.closed_on = date.today()
 
-        if self.instance.closed_at and data.get("status", 99) < Offer.ACCEPTED:
+        if self.instance.closed_on and data.get("status", 99) < Offer.ACCEPTED:
             if self.request.POST.get("ignore_warnings"):
-                self.instance.closed_at = None
+                self.instance.closed_on = None
             else:
                 self.add_warning(
                     _(
@@ -99,7 +100,7 @@ class OfferForm(WarningsForm, ModelForm):
                     )
                     % {
                         "to": s_dict[data["status"]],
-                        "closed": local_date_format(self.instance.closed_at, "d.m.Y"),
+                        "closed": local_date_format(self.instance.closed_on, "d.m.Y"),
                     }
                 )
 

@@ -72,9 +72,15 @@ class Invoice(ModelWithTotal):
 
     invoiced_on = models.DateField(_("invoiced on"), blank=True, null=True)
     due_on = models.DateField(_("due on"), blank=True, null=True)
-    # TODO do we require a paid_on DateField? Or is the automatically managed
-    # closed_at field sufficient?
-    closed_at = models.DateTimeField(_("closed at"), blank=True, null=True)
+    closed_on = models.DateField(
+        _("closed on"),
+        blank=True,
+        null=True,
+        help_text=_(
+            "Payment date for paid invoices, date of"
+            " replacement or cancellation otherwise."
+        ),
+    )
 
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
@@ -184,7 +190,7 @@ class Invoice(ModelWithTotal):
             ),
             "created_at": local_date_format(self.created_at, "d.m.Y"),
             "closed_on": (
-                local_date_format(self.closed_at, "d.m.Y") if self.closed_at else None
+                local_date_format(self.closed_on, "d.m.Y") if self.closed_on else None
             ),
         }
 

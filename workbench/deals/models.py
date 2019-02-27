@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -24,7 +26,7 @@ class Stage(Model):
 
 class DealQuerySet(SearchQuerySet):
     def open(self):
-        return self.filter(closed_at__isnull=True)
+        return self.filter(closed_on__isnull=True)
 
 
 @model_urls()
@@ -69,7 +71,7 @@ class Deal(Model):
     )
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
-    closed_at = models.DateTimeField(_("closed at"), blank=True, null=True)
+    closed_on = models.DateField(_("closed on"), blank=True, null=True)
 
     objects = models.Manager.from_queryset(DealQuerySet)()
 
@@ -83,9 +85,9 @@ class Deal(Model):
 
     def save(self, *args, **kwargs):
         if self.status == self.OPEN:
-            self.closed_at = None
-        elif not self.closed_at:
-            self.closed_at = timezone.now()
+            self.closed_on = None
+        elif not self.closed_on:
+            self.closed_on = date.today()
         super().save(*args, **kwargs)
 
     save.alters_data = True
@@ -93,10 +95,10 @@ class Deal(Model):
     def pretty_status(self):
         d = {
             "created_at": local_date_format(self.created_at, "d.m.Y"),
-            "closed_at": self.closed_at and local_date_format(self.closed_at, "d.m.Y"),
+            "closed_on": self.closed_on and local_date_format(self.closed_on, "d.m.Y"),
             "status": self.get_status_display(),
         }
 
         if self.status == self.OPEN:
             return _("Open since %(created_at)s") % d
-        return _("%(status)s on %(closed_at)s") % d
+        return _("%(status)s on %(closed_on)s") % d

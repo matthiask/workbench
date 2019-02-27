@@ -31,12 +31,12 @@ HISTORY = {
     "deals.deal": "title, description, owned_by, stage, status, estimated_value",
     "invoices.invoice": (
         "invoiced_on, due_on, title, description, postal_address, owned_by,"
-        " status, closed_at, subtotal, discount, tax_rate, total"
+        " status, closed_on, subtotal, discount, tax_rate, total"
     ),
     "logbook.loggedhours": "",
     "logbook.loggedcosts": "",
     "offers.offer": (
-        "offered_on, closed_at, title, description, owned_by, status,"
+        "offered_on, closed_on, title, description, owned_by, status,"
         "subtotal, discount, tax_rate, total"
     ),
     "projects.project": (

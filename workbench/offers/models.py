@@ -43,7 +43,7 @@ class Offer(ModelWithTotal):
     )
 
     offered_on = models.DateField(_("offered on"), blank=True, null=True)
-    closed_at = models.DateTimeField(_("closed at"), blank=True, null=True)
+    closed_on = models.DateField(_("closed on"), blank=True, null=True)
 
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
@@ -123,7 +123,7 @@ class Offer(ModelWithTotal):
         elif self.status in (self.ACCEPTED, self.REJECTED):
             return _("%(status)s on %(closed_on)s") % {
                 "status": self.get_status_display(),
-                "closed_on": local_date_format(self.closed_at, "d.m.Y"),
+                "closed_on": local_date_format(self.closed_on, "d.m.Y"),
             }
         return self.get_status_display()
 

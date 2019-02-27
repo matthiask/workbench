@@ -112,6 +112,7 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
             "description",
             "owned_by",
             "status",
+            "closed_on",
             "postal_address",
             "type",
             "discount",
@@ -268,12 +269,12 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
             )
 
         if data.get("status", 0) >= Invoice.PAID:
-            if not self.instance.closed_at:
-                self.instance.closed_at = timezone.now()
+            if not self.instance.closed_on:
+                self.instance.closed_on = date.today()
 
-        if self.instance.closed_at and data.get("status", 99) < Invoice.PAID:
+        if self.instance.closed_on and data.get("status", 99) < Invoice.PAID:
             if self.request.POST.get("ignore_warnings"):
-                self.instance.closed_at = None
+                self.instance.closed_on = None
             else:
                 self.add_warning(
                     _(
@@ -283,7 +284,7 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
                     )
                     % {
                         "to": s_dict[data["status"]],
-                        "closed": local_date_format(self.instance.closed_at, "d.m.Y"),
+                        "closed": local_date_format(self.instance.closed_on, "d.m.Y"),
                     }
                 )
 
