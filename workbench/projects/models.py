@@ -155,8 +155,8 @@ class Service(Model):
     description = models.TextField(_("description"), blank=True)
     position = models.PositiveIntegerField(_("position"), default=0)
 
-    effort_hours = HoursField(_("effort hours"))
-    cost = MoneyField(_("cost"))
+    effort_hours = HoursField(_("effort hours"), default=0)
+    cost = MoneyField(_("cost"), default=0)
 
     class Meta:
         ordering = ("position", "created_at")
