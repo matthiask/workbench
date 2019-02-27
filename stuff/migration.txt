@@ -281,7 +281,7 @@ SELECT
             invoice_first_name, ' ', invoice_last_name, E'\n',
             invoice_address, E'\n',
             invoice_zip_code, ' ', invoice_city, E'\n',
-            invoice_country
+            CASE WHEN invoice_country = 'CH' THEN '' ELSE invoice_country END
         )
     END,
     subtotal,
