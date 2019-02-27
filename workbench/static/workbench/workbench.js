@@ -127,7 +127,6 @@ function initWidgets() {
     language: "de-DE",
     format: "dd.mm.yyyy",
     autoHide: true,
-    autoPick: true,
   });
 
   var invoicedOn = $('#id_invoiced_on');
