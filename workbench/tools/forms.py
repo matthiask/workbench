@@ -90,7 +90,7 @@ class ModelForm(forms.ModelForm):
                         }
                     )
 
-            if not data.get("customer"):
+            if not data.get("customer") and "customer" in self.fields:
                 raise forms.ValidationError(
                     {
                         "customer": self.fields["customer"].error_messages[
