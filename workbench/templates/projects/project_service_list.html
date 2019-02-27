@@ -49,39 +49,48 @@
 <table class="table table-hover table-striped table-linearize">
   <thead>
     <tr>
-      <th>{% trans 'type' %}</th>
-      <th>{% trans 'priority' %}</th>
       <th>{% trans 'service' %}</th>
-      <th>{% trans 'status' %}</th>
-      <th>{% trans 'created' %}</th>
-      <th>{% trans 'owned by' %}</th>
-      <th class="text-right">{% trans 'hours' %}</th>
+      <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
-    {% for service in object_list|select_related:'offer'|services_info:view.project %}
+    {% for service in object_list|select_related:'offer'|prefetch_related:'efforts__service_type,costs'|services_info:view.project %}
+      {% ifchanged service.offer %}
       <tr>
-        <th colspan="5">{{ service }}</th>
-        <th class="text-right">{{ service.logged_hours }}h / {{ service.effort_hours }}h</th>
+        <th colspan="3">
+          {% if service.offer %}
+            <a href="{{ service.offer.get_absolute_url }}">
+              {{ service.offer|h }}
+              <span class="label label-{{ service.offer.status_css }}">{{ service.offer.pretty_status }}</span>
+            </a>
+          {% else %}Noch nicht offeriert
+          {% endif %}
+        </th>
       </tr>
-      {% for task in tasks %}
-        <tr>
-          <td><i title="{{ task.get_type_display }}" class="{{ task.type_css }}"></i></td>
-          <td><span class="label label-{{ task.priority_css }}">{{ task.get_priority_display }}</span></td>
-          <th><a href="{{ task.urls.detail }}">{{ task|h }}</a></th>
-          <td>
-            <span class="{{ task.status_css }}">{{ task.pretty_status }}</span>
-          </td>
-          <td>
-            {{ task.created_at|date:'SHORT_DATE_FORMAT' }} {% trans 'by' %}
-            {{ task.created_by.get_short_name }}
-          </td>
-          <td>
-            {% if task.owned_by %}{{ task.owned_by.get_short_name }}{% else %}&ndash;{% endif %}
-          </td>
-          <td class="text-right">{{ task.logged_hours|default:0 }}h</td>
-        </tr>
-      {% endfor %}
+      {% endifchanged %}
+      <tr>
+        <td style="padding-left:4rem">
+          <a href="{{ service.get_absolute_url }}"><strong>{{ service }}</strong></a>
+          <br>
+          {{ service.description|linebreaksbr }}<br><br>
+          {% for effort in service.efforts.all %}
+            {{ effort.hours }}h {{ effort.service_type }}{% if not forloop.last %},{% endif %}
+          {% endfor %}
+          {% for cost in service.costs.all %}
+            {{ cost.title }} ({{ cost.cost|currency }}){% if not forloop.last %},{% endif %}
+          {% endfor %}
+        </td>
+        <th class="text-right">{{ service.logged_hours }}h / {{ service.effort_hours }}h</th>
+        <th style="white-space:nowrap">
+          <a href="{{ view.project.urls.createhours }}?service={{ service.pk }}"
+            data-toggle="ajaxmodal">
+            <i class="glyphicon glyphicon-plus"></i> {% trans 'hours' %}</a>
+          <a href="{{ view.project.urls.createcost }}?service={{ service.pk }}"
+            data-toggle="ajaxmodal">
+            <i class="glyphicon glyphicon-plus"></i> {% trans 'cost' %}</a>
+        </th>
+      </tr>
     {% endfor %}
   </tbody>
 </table>
