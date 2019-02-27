@@ -7,19 +7,22 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('invoices', '0011_auto_20190227_1754'),
-    ]
+    dependencies = [("invoices", "0011_auto_20190227_1754")]
 
     operations = [
         migrations.AddField(
-            model_name='invoice',
-            name='payment_notice',
-            field=models.TextField(blank=True, verbose_name='payment notice'),
+            model_name="invoice",
+            name="payment_notice",
+            field=models.TextField(blank=True, verbose_name="payment notice"),
         ),
         migrations.AlterField(
-            model_name='invoice',
-            name='closed_on',
-            field=models.DateField(blank=True, help_text='Payment date for paid invoices, date of replacement or cancellation otherwise.', null=True, verbose_name='closed on'),
+            model_name="invoice",
+            name="closed_on",
+            field=models.DateField(
+                blank=True,
+                help_text="Payment date for paid invoices, date of replacement or cancellation otherwise.",
+                null=True,
+                verbose_name="closed on",
+            ),
         ),
     ]

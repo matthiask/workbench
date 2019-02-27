@@ -8,7 +8,6 @@ class InvoiceAdmin(admin.ModelAdmin):
     list_display = (
         "title",
         "customer",
-        "project",
         "invoiced_on",
         "owned_by",
         "type",
