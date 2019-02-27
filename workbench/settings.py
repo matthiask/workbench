@@ -150,13 +150,13 @@ NAMESPACE = env("NAMESPACE", required=True)
 WORKBENCH = {
     "feinheit": types.SimpleNamespace(
         SSO_DOMAIN="feinheit.ch",
-        PDF_COMPANY="FEINHEIT AG",
-        PDF_ADDRESS="FEINHEIT AG · Fabrikstrasse 54 · 8005 Zürich",
+        PDF_COMPANY="Feinheit AG",
+        PDF_ADDRESS="Feinheit AG · Fabrikstrasse 54 · 8005 Zürich",
         PDF_VAT_NO="CHE-113.948.417 MWST",
         PDF_OFFER_TERMS=[
             "Bestandteil dieser Offerte sind die zum Zeitpunkt"
             " des Vertragsabschlusses aktuellen Allgemeinen"
-            " Geschäftsbedingungen der FEINHEIT AG.",
+            " Geschäftsbedingungen der Feinheit AG.",
             "Die jeweils aktuelle Version" " finden Sie auf www.feinheit.ch/agb/.",
         ],
         PDF_INVOICE_PAYMENT=(
@@ -166,10 +166,10 @@ WORKBENCH = {
             " IBAN CH52 0070 0114 8022 0855 1."
         ),
         FONTS={
-            "regular": font("Lato-Light.ttf"),
-            "bold": font("Lato-Semibold.ttf"),
-            "italic": font("Lato-LightItalic.ttf"),
-            "bolditalic": font("Lato-Bold.ttf"),
+            "regular": font("ZuricBTLig.ttf"),
+            "bold": font("ZuricBTBol.ttf"),
+            "italic": font("ZuricBTLigIta.ttf"),
+            "bolditalic": font("ZuricBTBolIta.ttf"),
         },
     ),
     "dbpag": types.SimpleNamespace(
