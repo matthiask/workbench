@@ -15,45 +15,9 @@
       <li><a href="{{ view.project.urls.costs }}">{% trans 'costs' %}</a></li>
     </ul>
 
-    <div class="row">
-      <div class="col-md-3 left-head">
-      </div>
-
-      <div class="col-md-9 right-head">
-        <form method="GET" action="." class="form-inline form-search">
-          <label class="sr-only">{% trans 'search' %}</label>
-          <input
-            class="form-control"
-            type="search"
-            name="q"
-            placeholder="{% trans 'search' %}"
-            value="{{ view.request.GET.q|default:'' }}">
-
-          {% for f in view.search_form %}
-            <label class="sr-only">{{ f.label }}</label>
-            {{ f }}
-          {% endfor %}
-        </form>
-
-        {% if view.show_create_button %}
-          <a href="{{ view.model.urls.create }}" class="btn btn-default">
-            <span class="glyphicon glyphicon-plus"></span>
-            {{ view.meta.verbose_name }}
-          </a>
-        {% endif %}
-      </div>
-    </div>
-
 {% block objects %}
 
 <table class="table table-hover table-striped table-linearize">
-  <thead>
-    <tr>
-      <th>{% trans 'service' %}</th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
   <tbody>
     {% for service in object_list|select_related:'offer'|prefetch_related:'efforts__service_type,costs'|services_info:view.project %}
       {% ifchanged service.offer %}
@@ -71,7 +35,7 @@
       {% endifchanged %}
       <tr>
         <td style="padding-left:4rem">
-          <a href="{{ service.get_absolute_url }}"><strong>{{ service }}</strong></a>
+          <a href="{{ service.urls.update }}"><strong>{{ service }}</strong></a>
           <br>
           {{ service.description|linebreaksbr }}<br><br>
           {% for effort in service.efforts.all %}
@@ -101,6 +65,8 @@
     <a href="{{ view.project.urls.createtask }}" class="btn btn-default">
       <i class="glyphicon glyphicon-plus"></i> {% trans 'task' %}</a>
     {% endcomment %}
+    <a href="{{ view.project.urls.createservice }}" class="btn btn-default">
+      <i class="glyphicon glyphicon-plus"></i> {% trans 'service' %}</a>
     <a href="{{ view.project.urls.createhours }}" class="btn btn-default"
       data-toggle="ajaxmodal">
       <i class="glyphicon glyphicon-plus"></i> {% trans 'hours' %}</a>
