@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
-from workbench.projects.models import Project
+from workbench.projects.models import Project, Service
 
 
 class _DeHTMLParser(HTMLParser):
@@ -64,3 +64,8 @@ class Command(BaseCommand):
         for instance in Project.objects.all():
             instance.description = dehtml(instance.description)
             instance.save(update_fields=("description",))
+
+        for service in Service.objects.prefetch_related(
+            "efforts__service_type", "costs"
+        ):
+            service.save()
