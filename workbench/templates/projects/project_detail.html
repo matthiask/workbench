@@ -11,15 +11,15 @@
   <h1>{{ project|h }} {% history_link project %}</h1>
   <ul class="nav nav-tabs">
     {% mark_current request.path %}
-    <li><a href="{{ project.urls.overview }}">{% trans 'overview' %}</a></li>
-    <li><a href="{{ project.urls.services }}">{% trans 'services' %}</a></li>
-    <li><a href="{{ project.urls.costs }}">{% trans 'costs' %}</a></li>
+    <li class="nav-item"><a class="nav-link" href="{{ project.urls.overview }}">{% trans 'overview' %}</a></li>
+    <li class="nav-item"><a class="nav-link" href="{{ project.urls.services }}">{% trans 'services' %}</a></li>
+    <li class="nav-item"><a class="nav-link" href="{{ project.urls.costs }}">{% trans 'costs' %}</a></li>
     {% endmark_current %}
   </ul>
 
   {% if view.project_view == 'overview' %}
 
-    <div class="row"><div class="col-md-6 col-md-offset-3">
+    <div class="row"><div class="col-md-6 offset-md-3">
 
       <table class="table table-striped">
         <tr>
@@ -50,7 +50,7 @@
         </tr>
         <tr>
           <th class="text-right">{% trans 'status' %}</th>
-          <td><span class="label label-{{ object.status_css }}">
+          <td><span class="badge badge-{{ object.status_css }}">
             {{ object.pretty_status }}
           </span></td>
         </tr>
@@ -112,13 +112,13 @@
         </tr>
       </table>
 
-      <a href="{{ project.urls.createoffer }}" class="btn btn-default">
-        <i class="glyphicon glyphicon-plus"></i>
+      <a href="{{ project.urls.createoffer }}" class="btn btn-secondary">
+        {% include "svg/plus.svg" %}
         {% trans 'offer' %}</a>
-      <a href="{{ project.urls.createinvoice }}" class="btn btn-default">
-        <i class="glyphicon glyphicon-plus"></i>
+      <a href="{{ project.urls.createinvoice }}" class="btn btn-secondary">
+        {% include "svg/plus.svg" %}
         {% trans 'invoice' %}</a>
-      <a href="{{ project.urls.update }}" class="btn btn-default">
+      <a href="{{ project.urls.update }}" class="btn btn-secondary">
         {% trans 'Update' %}</a>
       <a href="{{ project.urls.delete }}" class="btn btn-danger btn-inverse pull-right">
         {% trans 'Delete' %}</a>
@@ -145,16 +145,16 @@
         {% endfor %}
       </table>
       <a href="{% url 'activities_activity_create' %}?project={{ project.pk }}"
-        class="btn btn-default"
+        class="btn btn-secondary"
         data-toggle="ajaxmodal">
-        <span class="glyphicon glyphicon-plus"></span> {% trans 'activity' %}
+        {% include "svg/plus.svg" %} {% trans 'activity' %}
       </a>
 
     </div></div>
 
   {% elif view.project_view == 'costs' %}
 
-    <div class="row"><div class="col-md-6 col-md-offset-3">
+    <div class="row"><div class="col-md-6 offset-md-3">
 
     <table class="table table-hover table-striped">
       <thead>
@@ -206,9 +206,9 @@
       </tbody>
     </table>
 
-    <a href="{{ project.urls.createcost }}" class="btn btn-default"
+    <a href="{{ project.urls.createcost }}" class="btn btn-secondary"
       data-toggle="ajaxmodal">
-      <i class="glyphicon glyphicon-plus"></i> {% trans 'cost' %}</a>
+      {% include "svg/plus.svg" %} {% trans 'cost' %}</a>
 
     </div></div>
 

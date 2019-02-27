@@ -35,7 +35,7 @@ INSTALLED_APPS = [
         "django.contrib.messages",
         "django.contrib.staticfiles",
         "django.contrib.postgres",
-        "bootstrap3",
+        "bootstrap4",
         "workbench.accounts",
         "workbench.activities",
         "workbench.audit",
@@ -136,9 +136,9 @@ SESSION_COOKIE_AGE = 86400
 
 MESSAGE_STORAGE = "django.contrib.messages.storage.cookie.CookieStorage"
 
-BOOTSTRAP3 = {
-    "horizontal_label_class": "col-md-3",
-    "horizontal_field_class": "col-md-9",
+BOOTSTRAP4 = {
+    "horizontal_label_class": "col-lg-4 text-lg-right",
+    "horizontal_field_class": "col-lg-8",
 }
 
 

@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% load bootstrap3 formset i18n %}
+{% load bootstrap4 formset i18n %}
 
 {% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row">
-  <div class="col-md-8 col-md-offset-2">
+  <div class="col-md-8 offset-md-2">
     <h1>
       {% if object %}
         {% blocktrans with object=object.full_name %}Update {{ object }}{% endblocktrans %}
@@ -24,7 +24,7 @@
             {% trans 'phone numbers' %}
             <a href="#"
               onclick="return addInlineForm('phonenumbers')">
-              <span class="glyphicon glyphicon-plus"></span>
+              {% include 'svg/plus.svg' %}
             </a>
           </label>
           <div class="col-md-9 form-inline fieldset">
@@ -50,7 +50,7 @@
             {% trans 'email addresses' %}
             <a href="#"
               onclick="return addInlineForm('emailaddresses')">
-              <i class="glyphicon glyphicon-plus"></i>
+              {% include 'svg/plus.svg' %}
             </a>
           </label>
           <div class="col-md-9 form-inline fieldset">
@@ -76,7 +76,7 @@
             {% trans 'postal addresses' %}
             <a href="#"
               onclick="return addInlineForm('postaladdresses')">
-              <span class="glyphicon glyphicon-plus"></span>
+              {% include 'svg/plus.svg' %}
             </a>
           </label>
           <div class="col-md-9 form-inline fieldset">
@@ -98,7 +98,7 @@
         </div>
       {% endif %}
 
-      <button type="submit" class="btn btn-primary col-md-offset-3">
+      <button type="submit" class="btn btn-primary offset-lg-4">
         {% trans 'submit' %}</button>
     </form>
 

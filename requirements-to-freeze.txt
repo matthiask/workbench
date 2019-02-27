@@ -1,6 +1,6 @@
 coverage
 Django<2
-django-bootstrap3
+django-bootstrap4
 django-debug-toolbar
 django-vanilla-views
 dj-database-url

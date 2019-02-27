@@ -1,6 +1,6 @@
 {% extends "site_base.html" %}
 
-{% load bootstrap3 i18n %}
+{% load bootstrap4 i18n %}
 
 {% block title %}{% trans 'Sign in' %} - {{ block.super }}{% endblock %}
 
@@ -14,14 +14,19 @@
 
         {% bootstrap_messages %}
 
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3>Workbench</h3>
-          </div>
-          <div class="panel-body">
-            <a href="{% url 'accounts_oauth2' %}" class="btn btn-primary">
-              {% trans 'Sign in' %}
-            </a>
+        <div class="card card-primary">
+          <h3 class="card-header">
+            Workbench
+          </h3>
+
+          <div class="card-body">
+
+            <div class="card-text">
+              <a href="{% url 'accounts_oauth2' %}" class="btn btn-primary">
+                {% trans 'Sign in' %}
+              </a>
+            </div>
+
           </div>
         </div>
       </div>

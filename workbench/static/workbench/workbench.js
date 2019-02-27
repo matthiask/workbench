@@ -123,14 +123,23 @@ $(function() {
 });
 
 function initWidgets() {
-  $('.datepicker:not(.has-datepicker)').addClass('has-datepicker').datetimepicker({
-    locale: 'de',
-    format: 'DD.MM.YYYY',
-    useCurrent: false,
-    showTodayButton: true,
-    icons: {
-      today: 'glyphicon glyphicon-calendar set-to-today'
-    }
+  $('.datepicker:not(.has-datepicker)').each(function() {
+    var el = this;
+    el.setAttribute("data-toggle", "datetimepicker");
+    el.setAttribute("data-target", "#" + el.getAttribute("id"));
+    el.classList.add("has-datepicker")
+    $(el).datetimepicker({
+      locale: 'de',
+      format: 'DD.MM.YYYY',
+      useCurrent: false,
+      keepOpen: false,
+      buttons: {
+        showToday: true,
+      },
+      icons: {
+        today: 'glyphicon glyphicon-calendar set-to-today'
+      }
+    });
   });
 
   var invoicedOn = $('#id_invoiced_on');
@@ -140,7 +149,6 @@ function initWidgets() {
           dueOn.val(e.date.add(14, 'days').calendar());
       });
   }
-
 }
 
 function addInlineForm(slug, onComplete) {

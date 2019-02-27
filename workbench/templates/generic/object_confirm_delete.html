@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% load bootstrap3 i18n %}
+{% load bootstrap4 i18n %}
 
 {% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row">
-  <div class="col-md-6 col-md-offset-3">
+  <div class="col-md-6 offset-md-3">
     <h1>
       {% blocktrans %}Delete {{ object }}{% endblocktrans %}
     </h1>

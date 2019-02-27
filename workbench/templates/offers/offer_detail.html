@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="row">
-<div class="col-md-6 col-md-offset-3">
+<div class="col-md-6 offset-md-3">
   <h1>{{ object }} {% history_link object %}</h1>
 
   <table class="table table-striped">
@@ -18,7 +18,7 @@
     {% endfor %}
     <tr>
       <th class="text-right">{% trans 'status' %}</th>
-      <td><span class="label label-{{ object.status_css }}">
+      <td><span class="badge badge-{{ object.status_css }}">
         {{ object.pretty_status }}
       </span></td>
     </tr>
@@ -33,10 +33,10 @@
       <tr>
         <td>
           <a href="{{ service.urls.move }}?up" class="move" title="{% trans 'Move up' %}">
-            <i class="glyphicon glyphicon-chevron-up"></i>
+            {% include "svg/chevron-up.svg" %}
           </a>
           <a href="{{ service.urls.move }}?down" class="move" title="{% trans 'Move down' %}">
-            <i class="glyphicon glyphicon-chevron-down"></i>
+            {% include "svg/chevron-down.svg" %}
           </a>
         </td>
         <td colspan="3">
@@ -93,13 +93,13 @@
     </tfoot>
   </table>
 
-  <a href="{{ object.project.urls.createservice }}" class="btn btn-default">
-    <i class="glyphicon glyphicon-plus-sign"></i> {% trans 'service' %}
+  <a href="{{ object.project.urls.createservice }}" class="btn btn-secondary">
+    {% include 'svg/plus.svg' %} {% trans 'service' %}
   </a>
-  <a href="{{ object.urls.pdf }}" class="btn btn-default">
+  <a href="{{ object.urls.pdf }}" class="btn btn-secondary">
     PDF
   </a>
-  <a href="{{ object.urls.update }}" class="btn btn-default">
+  <a href="{{ object.urls.update }}" class="btn btn-secondary">
     {% trans 'Update' %}
   </a>
   <a href="{{ object.urls.delete }}" class="btn btn-danger btn-inverse pull-right">

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load bootstrap3 i18n querystring %}
+{% load bootstrap4 i18n querystring %}
 
 {% block title %}{{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
@@ -29,8 +29,8 @@
         </form>
 
         {% if view.show_create_button %}
-          <a href="{{ view.model.urls.create }}" class="btn btn-default">
-            <span class="glyphicon glyphicon-plus"></span>
+          <a href="{{ view.model.urls.create }}" class="btn btn-secondary">
+            {% include "svg/plus.svg" %}
             {{ view.meta.verbose_name }}
           </a>
         {% endif %}

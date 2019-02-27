@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="row">
-  <div class="col-md-6 col-md-offset-3">
+  <div class="col-md-6 offset-md-3">
     <h1>{{ deal }} {% history_link deal %}</h1>
 
     <table class="table table-striped">
@@ -24,7 +24,7 @@
       </tr>
     </table>
 
-    <a href="{{ deal.urls.update }}" class="btn btn-default">
+    <a href="{{ deal.urls.update }}" class="btn btn-secondary">
       {% trans 'Update' %}</a>
     <a href="{{ deal.urls.delete }}" class="btn btn-danger btn-inverse pull-right">
       {% trans 'Delete' %}</a>
@@ -51,9 +51,9 @@
       {% endfor %}
     </table>
     <a href="{% url 'activities_activity_create' %}?deal={{ deal.pk }}"
-      class="btn btn-default"
+      class="btn btn-secondary"
       data-toggle="ajaxmodal">
-      <span class="glyphicon glyphicon-plus"></span> {% trans 'activity' %}
+      {% include "svg/plus.svg" %} {% trans 'activity' %}
     </a>
   </div>
 </div>

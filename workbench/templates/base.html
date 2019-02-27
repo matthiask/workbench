@@ -1,70 +1,53 @@
 {% extends "site_base.html" %}
 
-{% load bootstrap3 i18n mark_current %}
+{% load bootstrap4 i18n mark_current %}
 
 {% block body %}
   <!-- Fixed navbar -->
-  <nav class="navbar navbar-default navbar-static-top">
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="/">Workbench</a>
-      </div>
-      <div id="navbar" class="navbar-collapse collapse">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/">Workbench</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
         {% mark_current request.path %}
-        <ul class="nav navbar-nav">
-          <li>
-            <form class="navbar-form" role="search" method="GET" action="{% url 'search' %}">
-              <div class="input-group">
-                <input name="q" type="text" class="form-control" placeholder="{% trans 'Search' %}" value="{{ search.query|default:'' }}">
-                <div class="input-group-btn">
-                  <button class="btn btn-info">
-                    <span class="glyphicon glyphicon-search"></span>
-                  </button>
-                </div>
-              </div>
-            </form>
-          </li>
-          <li><a href="{% url 'contacts_organization_list' %}">{% trans 'organizations' %}</a></li>
-          <li><a href="{% url 'contacts_person_list' %}">{% trans 'people' %}</a></li>
-          <li><a href="{% url 'projects_project_list' %}">{% trans 'projects' %}</a></li>
-          <li><a href="{% url 'invoices_invoice_list' %}">{% trans 'invoices' %}</a></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-          <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" href="/accounts/">
-              Hi, {{ user.get_short_name }}! <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu" role="menu">
-              <li><a href="{% url 'accounts_update' %}">
-                <span class="glyphicon glyphicon-user"></span>
-                {% trans 'Settings' %}</a></li>
-              {% if request.user.is_admin %}
-              <li><a href="{% url 'admin:index' %}">
-                <span class="glyphicon glyphicon-cog"></span>
-                {% trans 'Admin panel' %}
-              </a></li>
-              {% endif %}
-              <li class="divider"></li>
-              <li><a href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a></li>
-              <li><a href="{% url 'logbook_loggedhours_list' %}">{% trans 'logged hours' %}</a></li>
-              <li class="divider"></li>
-              <li><a href="{% url 'deals_deal_list' %}">{% trans 'deals' %}</a></li>
-              <li><a href="{% url 'offers_offer_list' %}">{% trans 'offers' %}</a></li>
-              <li class="divider"></li>
-              <li><a href="{% url 'logout' %}">
-                <span class="glyphicon glyphicon-log-out"></span>
-                {% trans 'Sign off' %}</a></li>
-            </ul>
-          </li>
-        </ul>
+        <li class="nav-item"><a class="nav-link" href="{% url 'contacts_organization_list' %}">{% trans 'organizations' %}</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'contacts_person_list' %}">{% trans 'people' %}</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'projects_project_list' %}">{% trans 'projects' %}</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'invoices_invoice_list' %}">{% trans 'invoices' %}</a></li>
         {% endmark_current %}
-      </div><!--/.nav-collapse -->
+      </ul>
+
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+          </form>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Hi, {{ user.get_short_name }}!
+          </a>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{% url 'accounts_update' %}">{% trans 'Settings' %}</a>
+            {% if request.user.is_admin %}
+            <a class="dropdown-item" href="{% url 'admin:index' %}">{% trans 'Admin panel' %}</a>
+            {% endif %}
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a>
+            <a class="dropdown-item" href="{% url 'logbook_loggedhours_list' %}">{% trans 'logged hours' %}</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'deals_deal_list' %}">{% trans 'deals' %}</a>
+            <a class="dropdown-item" href="{% url 'offers_offer_list' %}">{% trans 'offers' %}</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'logout' %}">{% trans 'Sign out' %}</a>
+          </div>
+        </li>
+      </ul>
+
     </div>
   </nav>
 

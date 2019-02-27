@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load bootstrap3 history i18n querystring workbench %}
+{% load bootstrap4 history i18n querystring workbench %}
 
 {% block title %}{% trans 'services' %} - {{ view.project }} - {{ block.super }}{% endblock %}
 
@@ -10,9 +10,9 @@
 
     <h1>{{ view.project|h }} {% history_link view.project %}</h1>
     <ul class="nav nav-tabs">
-      <li><a href="{{ view.project.urls.overview }}">{% trans 'overview' %}</a></li>
-      <li class="active"><a href="{{ view.project.urls.services }}">{% trans 'services' %}</a></li>
-      <li><a href="{{ view.project.urls.costs }}">{% trans 'costs' %}</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ view.project.urls.overview }}">{% trans 'overview' %}</a></li>
+      <li class="nav-item active"><a class="nav-link" href="{{ view.project.urls.services }}">{% trans 'services' %}</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ view.project.urls.costs }}">{% trans 'costs' %}</a></li>
     </ul>
 
 {% block objects %}
@@ -26,7 +26,7 @@
           {% if service.offer %}
             <a href="{{ service.offer.get_absolute_url }}">
               {{ service.offer|h }}
-              <span class="label label-{{ service.offer.status_css }}">{{ service.offer.pretty_status }}</span>
+              <span class="badge badge-{{ service.offer.status_css }}">{{ service.offer.pretty_status }}</span>
             </a>
           {% else %}Noch nicht offeriert
           {% endif %}
@@ -53,10 +53,10 @@
         <th style="white-space:nowrap">
           <a href="{{ view.project.urls.createhours }}?service={{ service.pk }}"
             data-toggle="ajaxmodal">
-            <i class="glyphicon glyphicon-plus"></i> {% trans 'hours' %}</a>
+            {% include "svg/plus.svg" %} {% trans 'hours' %}</a>
           <a href="{{ view.project.urls.createcost }}?service={{ service.pk }}"
             data-toggle="ajaxmodal">
-            <i class="glyphicon glyphicon-plus"></i> {% trans 'cost' %}</a>
+            {% include "svg/plus.svg" %} {% trans 'cost' %}</a>
         </th>
       </tr>
     {% endfor %}
@@ -66,14 +66,14 @@
 {% endblock %}
 
     {% comment %}
-    <a href="{{ view.project.urls.createtask }}" class="btn btn-default">
-      <i class="glyphicon glyphicon-plus"></i> {% trans 'task' %}</a>
+    <a href="{{ view.project.urls.createtask }}" class="btn btn-secondary">
+      {% include "svg/plus.svg" %} {% trans 'task' %}</a>
     {% endcomment %}
-    <a href="{{ view.project.urls.createservice }}" class="btn btn-default">
-      <i class="glyphicon glyphicon-plus"></i> {% trans 'service' %}</a>
-    <a href="{{ view.project.urls.createhours }}" class="btn btn-default"
+    <a href="{{ view.project.urls.createservice }}" class="btn btn-secondary">
+      {% include "svg/plus.svg" %} {% trans 'service' %}</a>
+    <a href="{{ view.project.urls.createhours }}" class="btn btn-secondary"
       data-toggle="ajaxmodal">
-      <i class="glyphicon glyphicon-plus"></i> {% trans 'hours' %}</a>
+      {% include "svg/plus.svg" %} {% trans 'hours' %}</a>
 
   </div>
 </div>

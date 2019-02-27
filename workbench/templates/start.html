@@ -4,46 +4,52 @@
 
 {% block content %}
 <div class="row">
-  <div class="col-md-8 col-md-offset-2">
+  <div class="col-md-8 offset-md-2">
 
-    <div class="panel panel-default">
-      <div class="panel-heading"><h3>Hi, {{ user }}</h3></div>
-      <div class="panel-body">
-        <table class="table table-condensed">
-          <tr>
-            <td class="text-right">{{ user.hours.today }}h</td>
-            <th>{% trans 'Hours today' %}</th>
-          </tr>
-          <tr>
-            <td class="text-right">{{ user.hours.week }}h</td>
-            <th>{% trans 'Hours this week' %}</th>
-          </tr>
-        </table>
+    <div class="card">
+      <div class="card-header"><h3>Hi, {{ user }}</h3></div>
+      <div class="card-body">
+        <div class="card-text">
+
+          <table class="table table-condensed">
+            <tr>
+              <td class="text-right">{{ user.hours.today }}h</td>
+              <th>{% trans 'Hours today' %}</th>
+            </tr>
+            <tr>
+              <td class="text-right">{{ user.hours.week }}h</td>
+              <th>{% trans 'Hours this week' %}</th>
+            </tr>
+          </table>
+
+        </div>
       </div>
     </div>
 
-    <div class="panel panel-default">
-      <div class="panel-heading"><h3>
+    <div class="card">
+      <div class="card-header"><h3>
         <a href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a>
       </h3></div>
-      <div class="panel-body">
-        <table class="table table-condensed">
-          {% for activity in user.activities.open %}
-          <tr class="{{ activity.css }}">
-              <th><a href="{{ activity.urls.detail }}" data-toggle="ajaxmodal">
-                  {{ activity }}
-              </a></th>
-              <td>
-                {% for c in activity.context %}
-                  <a href="{{ c.get_absolute_url }}">{{ c }}</a>{% if not forloop.last %},{% endif %}
-                {% endfor %}
-              </td>
-              <td>{{ activity.pretty_status }}</td>
-            </tr>
-          {% empty %}
-            <tr><th>{% trans 'no activities!' %}</th></tr>
-          {% endfor %}
-        </table>
+      <div class="card-body">
+        <div class="card-text">
+          <table class="table table-condensed">
+            {% for activity in user.activities.open %}
+            <tr class="{{ activity.css }}">
+                <th><a href="{{ activity.urls.detail }}" data-toggle="ajaxmodal">
+                    {{ activity }}
+                </a></th>
+                <td>
+                  {% for c in activity.context %}
+                    <a href="{{ c.get_absolute_url }}">{{ c }}</a>{% if not forloop.last %},{% endif %}
+                  {% endfor %}
+                </td>
+                <td>{{ activity.pretty_status }}</td>
+              </tr>
+            {% empty %}
+              <tr><th>{% trans 'no activities!' %}</th></tr>
+            {% endfor %}
+          </table>
+        </div>
       </div>
     </div>
 

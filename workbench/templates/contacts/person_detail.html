@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="row">
-<div class="col-md-6 col-md-offset-3">
+<div class="col-md-6 offset-md-3">
   <h1>{{ person.full_name }} {% history_link person %}</h1>
   <table class="table table-striped">
     <tr>
@@ -49,14 +49,14 @@
     </tr>
   </table>
 
-<a href="{% url 'invoices_invoice_create' %}?person={{ object.pk }}" class="btn btn-default">
-  <i class="glyphicon glyphicon-plus"></i>
+<a href="{% url 'invoices_invoice_create' %}?person={{ object.pk }}" class="btn btn-secondary">
+  {% include "svg/plus.svg" %}
   {% trans 'invoice' %}
 </a>
-<a href="{% url 'activities_activity_create' %}?contact={{ object.pk }}" class="btn btn-default" data-toggle="ajaxmodal">
-  <i class="glyphicon glyphicon-plus"></i>
+<a href="{% url 'activities_activity_create' %}?contact={{ object.pk }}" class="btn btn-secondary" data-toggle="ajaxmodal">
+  {% include "svg/plus.svg" %}
   {% trans 'activity' %}</a>
-<a href="{{ object.urls.update }}" class="btn btn-default">
+<a href="{{ object.urls.update }}" class="btn btn-secondary">
   {% trans 'Update' %}</a>
 <a href="{{ object.urls.delete }}" class="btn btn-danger btn-inverse pull-right">
   {% trans 'Delete' %}</a>
