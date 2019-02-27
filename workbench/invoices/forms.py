@@ -243,7 +243,7 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
                 )
 
         if self.instance.status > self.instance.IN_PREPARATION:
-            if set(self.changed_data) - {"status"}:
+            if set(self.changed_data) - {"status", "closed_on"}:
                 self.add_warning(
                     _(
                         "You are attempting to change %(fields)s."
