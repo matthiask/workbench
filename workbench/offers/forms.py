@@ -76,6 +76,7 @@ class OfferForm(WarningsForm, ModelForm):
                 label=_("services"),
                 widget=forms.CheckboxSelectMultiple,
                 required=False,
+                initial=self.instance.services.values_list("pk", flat=True),
             )
 
     def clean(self):
