@@ -15,7 +15,6 @@ def deploy():
     check()
     local("git push origin master")
 
-    """
     with cd('www/workbench/'):
         run('git checkout master')
         run('git fetch origin')
@@ -25,7 +24,6 @@ def deploy():
         run('venv/bin/python manage.py migrate')
         run('venv/bin/python manage.py collectstatic --noinput')
         run('sudo systemctl restart workbench.service')
-    """
 
     with cd("www/dbpag-workbench/"):
         run("git checkout master")
