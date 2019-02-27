@@ -91,7 +91,7 @@ class PDFDocument(_PDFDocument):
         )
 
         self.style.tableHeadLine = self.style.table + (
-            ("ALIGN", (0, 0), (0, -1), "RIGHT"),
+            ("ALIGN", (1, 0), (1, -1), "RIGHT"),
             ("RIGHTPADDING", (0, 0), (0, -1), 2 * mm),
             ("LINEABOVE", (0, 0), (-1, 0), 0.2, colors.black),
             ("LINEBELOW", (0, 0), (-1, 0), 0.2, colors.black),
@@ -225,34 +225,42 @@ class PDFDocument(_PDFDocument):
         if not services:
             return
 
-        table = [("", _("Services"))]
+        table = [(_("Services"), "")]
         for service in services:
             table.append(
                 (
-                    "",
                     MarkupParagraph(
                         "<b>%s</b><br/>%s"
                         % (sanitize(service.title), sanitize(service.description)),
                         self.style.normal,
                     ),
+                    "",
                 )
             )
             for effort in service.efforts.all():
-                table.append((effort.cost.quantize(Z), effort.service_type.title))
+                table.append((
+                    effort.service_type.title,
+                    effort.cost.quantize(Z),
+                    ))
             for cost in service.costs.all():
-                table.append((cost.cost.quantize(Z), cost.title))
+                table.append((cost.title, cost.cost.quantize(Z)))
 
         self.table(table, self.style.tableColumns, self.style.tableHead)
 
     def table_total(self, instance):
-        total = [(currency(instance.subtotal.quantize(Z)), _("subtotal"))]
+        total = [(
+            _("subtotal"),
+            currency(instance.subtotal.quantize(Z)),
+            )]
         if instance.discount:
-            total.append((currency(-instance.discount.quantize(Z)), _("discount")))
+            total.append((
+                _("discount"),
+                currency(-instance.discount.quantize(Z)),
+                ))
         if getattr(instance, "down_payment_total", None):
             for invoice in instance.down_payment_invoices.all():
                 total.append(
                     (
-                        currency(-invoice.total_excl_tax.quantize(Z)),
                         "%s: %s (%s)"
                         % (
                             _("Down payment"),
@@ -261,13 +269,14 @@ class PDFDocument(_PDFDocument):
                             if invoice.invoiced_on
                             else _("NO DATE YET"),
                         ),
+                        currency(-invoice.total_excl_tax.quantize(Z)),
                     )
                 )
         if instance.tax_amount:
             total.append(
                 (
-                    currency(instance.tax_amount.quantize(Z)),
                     "%0.1f%% %s" % (instance.tax_rate, _("tax")),
+                    currency(instance.tax_amount.quantize(Z)),
                 )
             )
 
@@ -276,7 +285,10 @@ class PDFDocument(_PDFDocument):
             self.spacer(0.7 * mm)
 
         self.table(
-            [(currency(instance.total.quantize(Z)), instance.total_title)],
+            [(
+                instance.total_title,
+                currency(instance.total.quantize(Z)),
+                )],
             self.style.tableColumns,
             self.style.tableHeadLine,
         )
