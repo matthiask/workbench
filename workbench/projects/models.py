@@ -182,7 +182,10 @@ class Service(Model):
         if instance.offer and instance.offer.status > instance.offer.IN_PREPARATION:
             messages.error(
                 request,
-                _("Cannot modify an offer which is not in preparation anymore."),
+                _(
+                    "Cannot modify a service bound to an offer"
+                    " which is not in preparation anymore."
+                ),
             )
             return False
         return True
@@ -192,7 +195,10 @@ class Service(Model):
         if instance.offer and instance.offer.status > instance.offer.IN_PREPARATION:
             messages.error(
                 request,
-                _("Cannot modify an offer which is not in preparation anymore."),
+                _(
+                    "Cannot modify a service bound to an offer"
+                    " which is not in preparation anymore."
+                ),
             )
             return False
         return super().allow_delete(instance, request)
