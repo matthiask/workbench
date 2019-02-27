@@ -125,8 +125,8 @@ $(function() {
 function initWidgets() {
   $('.datepicker:not(.has-datepicker)').addClass("has-datepicker").datepicker({
     language: "de-DE",
-    format: "dd.mm.yyyy",
     autoHide: true,
+    zIndex: 1500,
   });
 
   var invoicedOn = $('#id_invoiced_on');
