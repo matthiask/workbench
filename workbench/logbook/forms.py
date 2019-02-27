@@ -57,7 +57,7 @@ class LoggedHoursForm(ModelForm):
                     ),
                 )
         else:
-            self.project = kwargs["instance"].service.offer.project
+            self.project = kwargs["instance"].service.project
 
         super().__init__(*args, **kwargs)
         self.fields["service"].choices = [("", "----------")] + [
@@ -80,9 +80,17 @@ class LoggedCostForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project", None)
-        super().__init__(*args, **kwargs)
-        if not self.project:
+        if self.project:
+            initial = kwargs.setdefault("initial", {})
+            request = kwargs["request"]
+
+            if request.GET.get("service"):
+                initial["service"] = request.GET.get("service")
+
+        else:
             self.project = self.instance.project
+
+        super().__init__(*args, **kwargs)
         self.fields["service"].queryset = self.fields["service"].queryset.filter(
             project=self.project
         )
