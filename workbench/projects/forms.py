@@ -1,5 +1,4 @@
 from collections import OrderedDict
-from decimal import Decimal
 
 from django import forms, http
 from django.forms.models import inlineformset_factory

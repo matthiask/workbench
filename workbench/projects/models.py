@@ -120,11 +120,7 @@ class Project(Model):
             .aggregate(h=Sum("hours"))["h"]
             or Decimal(),
             "effort": sum(
-                (
-                    service.effort_hours
-                    for service in self.services.all()
-                ),
-                Decimal(),
+                (service.effort_hours for service in self.services.all()), Decimal()
             ),
         }
 

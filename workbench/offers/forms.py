@@ -108,6 +108,8 @@ class OfferForm(WarningsForm, ModelForm):
         instance = super().save(commit=False)
         if instance.pk:
             self.cleaned_data["services"].update(offer=instance)
-            self.service_candidates.exclude(id__in=self.cleaned_data["services"]).update(offer=None)
+            self.service_candidates.exclude(
+                id__in=self.cleaned_data["services"]
+            ).update(offer=None)
         instance.save()
         return instance

@@ -238,25 +238,16 @@ class PDFDocument(_PDFDocument):
                 )
             )
             for effort in service.efforts.all():
-                table.append((
-                    effort.service_type.title,
-                    effort.cost.quantize(Z),
-                    ))
+                table.append((effort.service_type.title, effort.cost.quantize(Z)))
             for cost in service.costs.all():
                 table.append((cost.title, cost.cost.quantize(Z)))
 
         self.table(table, self.style.tableColumns, self.style.tableHead)
 
     def table_total(self, instance):
-        total = [(
-            _("subtotal"),
-            currency(instance.subtotal.quantize(Z)),
-            )]
+        total = [(_("subtotal"), currency(instance.subtotal.quantize(Z)))]
         if instance.discount:
-            total.append((
-                _("discount"),
-                currency(-instance.discount.quantize(Z)),
-                ))
+            total.append((_("discount"), currency(-instance.discount.quantize(Z))))
         if getattr(instance, "down_payment_total", None):
             for invoice in instance.down_payment_invoices.all():
                 total.append(
@@ -285,10 +276,7 @@ class PDFDocument(_PDFDocument):
             self.spacer(0.7 * mm)
 
         self.table(
-            [(
-                instance.total_title,
-                currency(instance.total.quantize(Z)),
-                )],
+            [(instance.total_title, currency(instance.total.quantize(Z)))],
             self.style.tableColumns,
             self.style.tableHeadLine,
         )
