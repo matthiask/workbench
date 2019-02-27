@@ -17,13 +17,13 @@ SET application_name TO 'Import';
 --
 
 INSERT INTO services_servicetype
-(title, billing_per_hour, position)
+(id, title, billing_per_hour, position)
 VALUES
-('Beratung', 200, 10),
-('Konzept', 200, 20),
-('Grafik', 160, 30),
-('Programmierung', 180, 40),
-('Projektorganisation', 130, 50);
+(1, 'Beratung', 200, 10),
+(2, 'Konzept', 200, 20),
+(3, 'Grafik', 160, 30),
+(4, 'Programmierung', 180, 40),
+(5, 'Projektorganisation', 130, 50);
 
 
 --
@@ -310,34 +310,43 @@ WHERE
 -- Import services / stories
 --
 
-INSERT INTO stories_story
-(id, created_at, title, status, position, requested_by_id, description, project_id)
-SELECT id, NOW(), CASE WHEN notes!='' THEN substring(notes from 0 for 200) ELSE activity_name END, 10, 0, 1, concat(activity_name, ': ', notes), job_id FROM
+INSERT INTO projects_service
+(id, created_at, title, position, description, project_id, cost, effort_hours)
+SELECT
+  id,
+  NOW(),
+  CASE WHEN notes!='' THEN substring(notes from 0 for 200) ELSE activity_name END,
+  0,
+  concat(activity_name, ': ', notes),
+  job_id,
+  0.0, -- FIXME calculate cost
+  0.0 -- FIXME calculate effort hours
+FROM
 dblink(
     'dbname=fineware_feinheit',
     'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
 ) AS p(id int, activity_name text, notes text, job_id int);
 
-INSERT INTO stories_requiredservice
-(story_id, service_type_id, estimated_effort, offered_effort, planning_effort)
-SELECT story_id, service_type_id, effort, effort, effort FROM
+INSERT INTO projects_effort
+(service_id, service_type_id, hours)
+SELECT service_id, service_type_id, effort FROM
 dblink(
     'dbname=fineware_feinheit',
     'SELECT a.id, 1, a.hours FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id WHERE jo.job_id IS NOT NULL AND a.included'
-) p(story_id int, service_type_id int, effort numeric(5,2));
+) p(service_id int, service_type_id int, effort numeric(5,2));
 
-UPDATE stories_requiredservice SET service_type_id=2
-FROM stories_story s
-WHERE stories_requiredservice.story_id=s.id AND s.description ~ '^(Konzept:|Marketing:)';
-UPDATE stories_requiredservice SET service_type_id=3
-FROM stories_story s
-WHERE stories_requiredservice.story_id=s.id AND s.description ~'^(Grafik|Multimedia|3D)';
-UPDATE stories_requiredservice SET service_type_id=4
-FROM stories_story s
-WHERE stories_requiredservice.story_id=s.id AND s.description ~ '^(Programmierung|IT-Dienstleistungen)';
-UPDATE stories_requiredservice SET service_type_id=5
-FROM stories_story s
-WHERE stories_requiredservice.story_id=s.id AND s.description ~ '^(Projektorganisation|Administration|Intern)';
+UPDATE projects_effort SET service_type_id=2
+FROM projects_service s
+WHERE projects_effort.service_id=s.id AND s.description ~ '^(Konzept:|Marketing:)';
+UPDATE projects_effort SET service_type_id=3
+FROM projects_service s
+WHERE projects_effort.service_id=s.id AND s.description ~'^(Grafik|Multimedia|3D)';
+UPDATE projects_effort SET service_type_id=4
+FROM projects_service s
+WHERE projects_effort.service_id=s.id AND s.description ~ '^(Programmierung|IT-Dienstleistungen)';
+UPDATE projects_effort SET service_type_id=5
+FROM projects_service s
+WHERE projects_effort.service_id=s.id AND s.description ~ '^(Projektorganisation|Administration|Intern)';
 
 
 --
@@ -378,14 +387,11 @@ SELECT SETVAL('public.django_migrations_id_seq', COALESCE(MAX(id), 1) ) FROM pub
 SELECT SETVAL('public.invoices_invoice_id_seq', COALESCE(MAX(id), 1) ) FROM public.invoices_invoice;
 SELECT SETVAL('public.logbook_loggedcost_id_seq', COALESCE(MAX(id), 1) ) FROM public.logbook_loggedcost;
 SELECT SETVAL('public.logbook_loggedhours_id_seq', COALESCE(MAX(id), 1) ) FROM public.logbook_loggedhours;
-SELECT SETVAL('public.offers_cost_id_seq', COALESCE(MAX(id), 1) ) FROM public.offers_cost;
-SELECT SETVAL('public.offers_effort_id_seq', COALESCE(MAX(id), 1) ) FROM public.offers_effort;
 SELECT SETVAL('public.offers_offer_id_seq', COALESCE(MAX(id), 1) ) FROM public.offers_offer;
-SELECT SETVAL('public.offers_service_id_seq', COALESCE(MAX(id), 1) ) FROM public.offers_service;
-SELECT SETVAL('public.projects_attachment_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_attachment;
-SELECT SETVAL('public.projects_comment_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_comment;
+SELECT SETVAL('public.projects_cost_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_cost;
+SELECT SETVAL('public.projects_effort_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_effort;
 SELECT SETVAL('public.projects_project_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_project;
-SELECT SETVAL('public.projects_task_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_task;
+SELECT SETVAL('public.projects_service_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_service;
 SELECT SETVAL('public.services_servicetype_id_seq', COALESCE(MAX(id), 1) ) FROM public.services_servicetype;
 
 
