@@ -305,6 +305,14 @@ FROM projects_project p, dblink(
 WHERE
     p.id=invoices.job_id;
 
+UPDATE invoices_invoice
+SET closed_on=paid_on, payment_notice=notes
+FROM dblink(
+    'dbname=fineware_feinheit',
+    'SELECT DISTINCT ON (invoice_id) date, notes, invoice_id FROM invoicing_jobinvoiceupdate WHERE state=30 ORDER BY invoice_id, date DESC, id DESC'
+) AS p(paid_on date, notes text, invoice_id int)
+WHERE invoices_invoice.id=p.invoice_id;
+
 
 --
 -- Import services / stories

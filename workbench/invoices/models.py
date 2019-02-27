@@ -106,6 +106,8 @@ class Invoice(ModelWithTotal):
     postal_address = models.TextField(_("postal address"), blank=True)
     _code = models.IntegerField(_("code"))
 
+    payment_notice = models.TextField(_("payment notice"), blank=True)
+
     objects = models.Manager.from_queryset(InvoiceQuerySet)()
 
     class Meta:
