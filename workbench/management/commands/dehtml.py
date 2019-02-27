@@ -55,17 +55,22 @@ class Command(BaseCommand):
     help = "De-htmlizes description fields"
 
     def handle(self, **options):
+        self.stdout.write("dehtmling invoices...")
         for instance in Invoice.objects.all():
             instance.description = dehtml(instance.description)
             instance.save(update_fields=("description",))
+        self.stdout.write("dehtmling offers...")
         for instance in Offer.objects.all():
             instance.description = dehtml(instance.description)
             instance.save(update_fields=("description",))
+        self.stdout.write("dehtmling projects...")
         for instance in Project.objects.all():
             instance.description = dehtml(instance.description)
             instance.save(update_fields=("description",))
-
-        for service in Service.objects.prefetch_related(
-            "efforts__service_type", "costs"
+        self.stdout.write("refreshing services...")
+        for idx, service in enumerate(
+            Service.objects.prefetch_related("efforts__service_type", "costs")
         ):
+            if idx % 250 == 0:
+                print("processed %s services" % idx)
             service.save()
