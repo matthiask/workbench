@@ -42,9 +42,7 @@ class CostView(object):
                 self.services[None],
             )
 
-        for service in Service.objects.filter(
-            offer__project=self.project
-        ).prefetch_related("costs"):
+        for service in self.project.services.prefetch_related("costs"):
             if service.id in self.services or service.costs.all():
                 entries = self.services.get(service.id, [])
                 yield ServiceCosts(
@@ -72,7 +70,7 @@ class ServiceListView(ListView):
 
     def get_root_queryset(self):
         self.project = get_object_or_404(Project, pk=self.kwargs["pk"])
-        return self.model.objects.filter(offer__project=self.project)
+        return self.model.objects.filter(project=self.project)
 
 
 class CreateServiceView(CreateView):

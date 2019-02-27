@@ -7,7 +7,7 @@ from workbench.logbook.forms import LoggedHoursForm, LoggedCostForm
 from workbench.logbook.models import LoggedHours, LoggedCost
 from workbench.offers.forms import CreateOfferForm
 from workbench.offers.models import Offer
-from workbench.projects.forms import ProjectSearchForm, ProjectForm, ApprovedHoursForm
+from workbench.projects.forms import ProjectSearchForm, ProjectForm
 from workbench.projects.models import Project, Service
 from workbench.projects.views import (
     ProjectDetailView,
@@ -51,11 +51,6 @@ urlpatterns = [
         r"^(?P<pk>\d+)/update/$",
         UpdateView.as_view(form_class=ProjectForm, model=Project),
         name="projects_project_update",
-    ),
-    url(
-        r"^(?P<pk>\d+)/approved-hours/$",
-        UpdateView.as_view(form_class=ApprovedHoursForm, model=Project),
-        name="projects_project_approved_hours",
     ),
     url(
         r"^(?P<pk>\d+)/delete/$",

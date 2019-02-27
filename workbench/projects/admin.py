@@ -21,9 +21,8 @@ class ServiceAdmin(admin.ModelAdmin):
         "title",
         "description",
         "position",
-        # "effort_hours",
-        # "cost",
-        # "approved_hours",
+        "effort_hours",
+        "cost",
     )
     inlines = [EffortInline, CostInline]
 

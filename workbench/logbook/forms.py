@@ -84,7 +84,7 @@ class LoggedCostForm(ModelForm):
         if not self.project:
             self.project = self.instance.project
         self.fields["service"].queryset = self.fields["service"].queryset.filter(
-            offer__project=self.project
+            project=self.project
         )
 
     def save(self):

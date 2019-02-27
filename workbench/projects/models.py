@@ -115,14 +115,14 @@ class Project(Model):
         from workbench.logbook.models import LoggedHours
 
         return {
-            "logged": LoggedHours.objects.filter(service__offer__project=self)
+            "logged": LoggedHours.objects.filter(service__project=self)
             .order_by()
             .aggregate(h=Sum("hours"))["h"]
             or Decimal(),
-            "approved": sum(
+            "effort": sum(
                 (
-                    service.approved_hours
-                    for service in Service.objects.filter(offer__project=self)
+                    service.effort_hours
+                    for service in self.services.all()
                 ),
                 Decimal(),
             ),
@@ -160,7 +160,6 @@ class Service(Model):
     position = models.PositiveIntegerField(_("position"), default=0)
 
     effort_hours = HoursField(_("effort hours"))
-    # _approved_hours = HoursField(_("approved hours"), blank=True, null=True)
     cost = MoneyField(_("cost"))
 
     class Meta:
@@ -169,19 +168,18 @@ class Service(Model):
         verbose_name_plural = _("services")
 
     def __str__(self):
-        return "%s - %s" % (self.offer or _("no offer yet"), self.title)
+        return self.title
 
     def save(self, *args, **kwargs):
         if not self.position:
             max_pos = self.__class__._default_manager.aggregate(m=Max("position"))["m"]
             self.position = 10 + (max_pos or 0)
+        if self.pk:
+            efforts = self.efforts.all()
+            self.effort_hours = sum((e.hours for e in efforts), Decimal())
+            self.cost += sum((e.cost for e in efforts), Decimal())
+            self.cost += sum((c.cost for c in self.costs.all()), Decimal())
         super().save(*args, **kwargs)
-
-    @property
-    def approved_hours(self):
-        return (
-            self.effort_hours if self._approved_hours is None else self._approved_hours
-        )
 
     @classmethod
     def allow_update(cls, instance, request):

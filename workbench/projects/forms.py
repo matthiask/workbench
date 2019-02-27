@@ -57,33 +57,6 @@ class ProjectForm(ModelForm):
         }
 
 
-class ApprovedHoursForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        self.project = kwargs.pop("instance")
-        self.request = kwargs.pop("request")
-
-        super().__init__(*args, **kwargs)
-
-        for service in Service.objects.filter(offer__project=self.project):
-            self.fields["service_%s_approved_hours" % service.id] = forms.DecimalField(
-                label=service.title,
-                required=False,
-                max_digits=5,
-                decimal_places=2,
-                initial=service._approved_hours,
-                help_text=_("The sum of all offered efforts amount to %.1f hours.")
-                % (service.effort_hours,),
-            )
-
-    def save(self):
-        for service in Service.objects.filter(offer__project=self.project):
-            service._approved_hours = self.cleaned_data.get(
-                "service_%s_approved_hours" % service.id
-            )
-            service.save()
-        return self.project
-
-
 class ServiceForm(ModelForm):
     class Meta:
         model = Service
@@ -118,11 +91,6 @@ class ServiceForm(ModelForm):
         instance = super().save(commit=False)
         for formset in self.formsets.values():
             formset.save()
-
-        efforts = instance.efforts.all()
-        instance.effort_hours = sum((e.hours for e in efforts), Decimal())
-        instance.cost += sum((e.cost for e in efforts), Decimal())
-        instance.cost += sum((c.cost for c in instance.costs.all()), Decimal())
         instance.save()
         return instance
 
