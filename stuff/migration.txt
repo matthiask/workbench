@@ -301,7 +301,7 @@ SELECT
 FROM projects_project p, dblink(
     'dbname=fineware_feinheit',
     'SELECT id, name, description, created, state, down_payment, subtotal, discount, tax, total, manager_id, job_id, due_date, invoice_date, invoice_full_override, invoice_company, invoice_first_name, invoice_last_name, invoice_address, invoice_zip_code, invoice_city, invoice_country, _invoice_id FROM invoicing_jobinvoice'
-) AS invoices(id int, name text, description text, created timestamp, state int, down_payment bool, subtotal numeric(10,2), tax numeric(10, 2), discount numeric(10,2), total numeric(10,2), manager_id int, job_id int, due_date date, invoice_date date, invoice_full_override text, invoice_company text, invoice_first_name text, invoice_last_name text, invoice_address text, invoice_zip_code text, invoice_city text, invoice_country text, _invoice_id int)
+) AS invoices(id int, name text, description text, created timestamp, state int, down_payment bool, subtotal numeric(10,2), discount numeric(10, 2), tax numeric(10,2), total numeric(10,2), manager_id int, job_id int, due_date date, invoice_date date, invoice_full_override text, invoice_company text, invoice_first_name text, invoice_last_name text, invoice_address text, invoice_zip_code text, invoice_city text, invoice_country text, _invoice_id int)
 WHERE
     p.id=invoices.job_id;
 
