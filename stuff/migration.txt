@@ -315,9 +315,9 @@ INSERT INTO projects_service
 SELECT
   id,
   NOW(),
-  CASE WHEN notes!='' THEN substring(notes from 0 for 200) ELSE activity_name END,
+  activity_name,
   0,
-  concat(activity_name, ': ', notes),
+  notes,
   job_id,
   0.0, -- FIXME calculate cost
   0.0 -- FIXME calculate effort hours
