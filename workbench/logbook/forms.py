@@ -48,14 +48,21 @@ class LoggedHoursForm(ModelForm):
                 .order_by("-created_at")
                 .first()
             )
-            if latest and (timezone.now() - latest.created_at).seconds < 7200:
-                seconds = (timezone.now() - latest.created_at).seconds
+            timesince = latest and int(
+                (timezone.now() - latest.created_at).total_seconds()
+            )
+            if timesince and timesince < 3 * 3600:
                 initial.setdefault(
                     "hours",
-                    (seconds / Decimal(3600)).quantize(
+                    (timesince / Decimal(3600)).quantize(
                         Decimal("0.0"), rounding=ROUND_UP
                     ),
                 )
+                if "service" not in initial:
+                    latest_on_project = LoggedHours.objects.filter(
+                        rendered_by=kwargs["request"].user, service__project=self.project,
+                    ).order_by("-created_at").first()
+                    initial.setdefault("service", latest_on_project.service_id)
         else:
             self.project = kwargs["instance"].service.project
 

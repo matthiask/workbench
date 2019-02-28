@@ -28,6 +28,62 @@
 
     <div class="card">
       <div class="card-header"><h3>
+        <a href="{% url 'projects_project_list' %}">{% trans 'active projects' %}</a>
+      </h3></div>
+      <div class="card-body">
+        <div class="card-text">
+          <table class="table table-condensed">
+            {% for project in user.active_projects %}
+              <tr>
+                <th><a href="{{ project.urls.detail }}">
+                  {{ project|h }}
+                </a></th>
+                <td>
+                  <span class="badge badge-{{ project.status_css }}">
+                    {{ project.pretty_status }}
+                  </span>
+                </td>
+                <td style="white-space:nowrap">
+                  <a href="{{ project.urls.createhours }}" data-toggle="ajaxmodal">
+                    {% include 'svg/plus.svg' %} {% trans 'hours' %}
+                  </a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><th>{% trans 'no active projects!' %}</th></tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>
+        <a href="{% url 'logbook_loggedhours_list' %}">{% trans 'recent hours' %}</a>
+      </h3></div>
+      <div class="card-body">
+        <div class="card-text">
+          <table class="table table-condensed">
+            {% for hours in user.recent_hours|slice:':5' reversed %}
+              <tr class="{{ hours.css }}">
+                <td>{{ hours.created_at|date:'H:i' }}</td>
+                <td>
+                  <a href="{{ hours.urls.detail }}" data-toggle="ajaxmodal">
+                    {{ hours }}
+                  </a>
+                </td>
+                <td class="text-right">{{ hours.hours }}h</td>
+              </tr>
+            {% empty %}
+              <tr><th>{% trans 'no recent hours!' %}</th></tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>
         <a href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a>
       </h3></div>
       <div class="card-body">

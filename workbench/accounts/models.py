@@ -104,8 +104,14 @@ class User(Model, AbstractBaseUser):
 
     @cached_property
     def recent_hours(self):
-        return reversed(
-            self.loggedhours.filter(rendered_on=date.today()).order_by("-created_at")[
-                :2
-            ]
-        )
+        return reversed(self.loggedhours.order_by("-created_at"))
+
+    @cached_property
+    def active_projects(self):
+        from workbench.projects.models import Project
+
+        return Project.objects.filter(
+            id__in=self.loggedhours.filter(
+                rendered_on__gte=date.today() - timedelta(days=7)
+            ).values("service__project")
+        ).select_related("owned_by")

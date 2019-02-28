@@ -96,7 +96,7 @@ HoursField = partial(
     models.DecimalField,
     max_digits=5,
     decimal_places=2,
-    validators=[MinValueValidator(0.1)],
+    validators=[MinValueValidator(Decimal("0.1"))],
 )
 
 
