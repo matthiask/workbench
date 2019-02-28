@@ -5,8 +5,8 @@
 {% block title %}{{ organization }} - {% trans "organizations" %} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="row">
-<div class="col-md-6 offset-md-3">
+<div class="row justify-content-center">
+<div class="col-md-10 col-lg-8">
   <h1>{{ object }} {% history_link object %}</h1>
 
   <table class="table table-striped">
@@ -14,10 +14,7 @@
       <td class="text-right">{% trans 'people' %}</td>
       <td>
         {% for person in organization.people.all %}
-          <a class="inline" href="{{ person.urls.detail }}">
-            {{ person.full_name }}
-          </a>
-          <br>
+          <a class="inline" href="{{ person.urls.detail }}">{{ person.full_name }}</a>{% if not forloop.last %},{% endif %}
         {% endfor %}
       </td>
     </tr>

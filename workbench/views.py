@@ -16,7 +16,7 @@ def search(request):
     q = request.GET.get("q", "")
     if q:
         results = [
-            (queryset.model._meta.verbose_name_plural, queryset.search(q))
+            (queryset.model._meta.verbose_name_plural, queryset.search(q)[:101])
             for queryset in (
                 Organization.objects.all(),
                 Person.objects.all(),

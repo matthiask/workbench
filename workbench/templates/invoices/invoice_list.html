@@ -9,10 +9,10 @@
     <span style="float:right" class="badge badge-{{ invoice.status_css }}">{{ invoice.pretty_status }}</span>
     <h5 class="mb-1">{{ invoice|h }}</h5>
     <div class="row">
-      <div class="col-md-6">{{ invoice.contact|default:invoice.customer }}</div>
-      <div class="col-md-3">{{ invoice.get_type_display }}</div>
-      <div class="col-md-3 text-right">
-        {{ invoice.total_excl_tax|currency }} /
+      <div class="col-md-7">{{ invoice.contact|default:invoice.customer }}</div>
+      <div class="col-md-2">{{ invoice.get_type_display }}</div>
+      <div class="col-md-3 text-md-right">
+        {{ invoice.total_excl_tax|currency }} exkl. /
         {{ invoice.total|currency }}
       </div>
     </div>
