@@ -16,8 +16,15 @@ def search(request):
     q = request.GET.get("q", "")
     if q:
         results = [
-            (model._meta.verbose_name_plural, model.objects.search(q))
-            for model in (Organization, Person, Project, Invoice, Deal, Offer)
+            (queryset.model._meta.verbose_name_plural, queryset.search(q))
+            for queryset in (
+                Organization.objects.all(),
+                Person.objects.all(),
+                Project.objects.select_related("owned_by"),
+                Invoice.objects.select_related("project"),
+                Deal.objects.all(),
+                Offer.objects.all(),
+            )
         ]
     else:
         messages.error(request, _("Search query missing."))
