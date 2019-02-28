@@ -3,42 +3,37 @@
 {% load bootstrap4 i18n querystring %}
 
 {% block objects %}
-<table class="table table-hover table-striped table-linearize">
-  <thead>
-    <tr>
-      <th>{% trans 'person' %}</th>
-      <td>{% trans 'email' %}</td>
-      <td>{% trans 'phone number' %}</td>
-    </tr>
-  </thead>
-  <tbody>
-    {% for person in object_list %}
-      <tr>
-        <th><a href="{{ person.urls.detail }}">
-            {{ person }}
-        </a></th>
-        <td>
-          {% if person.email %}
-            <a href="mailto:{{ person.email }}">{{ person.email }}</a>
-          {% else %}&ndash;{% endif %}
-        </td>
-        <td>
-          {% if person.phone_number %}
-            <a href="tel:{{ person.phone_number }}">{{ person.phone_number }}</a>
-          {% else %}&ndash;{% endif %}
-        </td>
-      </tr>
-    {% endfor %}
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="3">
-        {{ paginator.count }} {{ view.meta.verbose_name_plural }}
-        {% if view.root_queryset_count != paginator.count %}
-        (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
+<div class="list-group list-group-flush">
+  {% for person in object_list %}
+  <div class="list-group-item">
+    <h5 class="mb-1"><a href="{{ person.urls.detail }}">{{ person.full_name }}</a></h5>
+    <div class="row">
+      <div class="col-md-5 text-truncate">
+        {% if person.organization %}
+        <a href="{{ person.organization.urls.detail }}">{{ person.organization }}</a>
         {% endif %}
-      </td>
-    </tr>
-  </tfoot>
-</table>
+      </div>
+      <div class="col-md-4 text-truncate">
+        {% if person.email %}
+          <a href="mailto:{{ person.email }}">{{ person.email }}</a>
+        {% endif %}
+      </div>
+      <div class="col-md-3 text-truncate">
+        {% if person.phone_number %}
+          <a href="tel:{{ person.phone_number }}">{{ person.phone_number }}</a>
+        {% endif %}
+      </div>
+    </div>
+    <p class="mb-0">
+    </p>
+  </div>
+  {% endfor %}
+</div>
+
+<p>
+  {{ paginator.count }} {{ view.meta.verbose_name_plural }}
+  {% if view.root_queryset_count != paginator.count %}
+  (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
+  {% endif %}
+</p>
 {% endblock %}

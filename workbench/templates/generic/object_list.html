@@ -67,7 +67,7 @@
     </table>
     {% endblock %}
 
-    {% bootstrap_pagination page=page_obj extra=request.GET|querystring:'page' %}
+    {% bootstrap_pagination page=page_obj extra=request.GET|querystring:'page' pages_to_show=6 justify_content='center' %}
   </div>
 </div>
 {% endblock %}
