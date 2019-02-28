@@ -2,6 +2,10 @@
 
 {% load i18n %}
 
+{% block title %}
+{% if view.project %}{{ view.project.title }}{% else %}{{ block.super }}{% endif %}
+{% endblock %}
+
 {% block footer %}
   {% if object %}
   <a href="{{ object.urls.delete }}" data-toggle="ajaxmodal"
