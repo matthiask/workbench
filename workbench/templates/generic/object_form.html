@@ -5,8 +5,8 @@
 {% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-md-6 offset-md-3">
+<div class="row justify-content-center">
+  <div class="col-md-10 col-lg-8">
     <h1>
       {% if object %}
         <a href="{{ object.get_absolute_url }}">

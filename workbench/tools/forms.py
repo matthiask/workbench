@@ -24,7 +24,7 @@ class ModelForm(forms.ModelForm):
     user_fields = ()
     default_to_current_user = ()
     required_css_class = "required"
-    error_css_class = "has-error"
+    error_css_class = "is-invalid"
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request")

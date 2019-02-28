@@ -1,15 +1,8 @@
 {% load i18n %}
 {% if top_errors or has_field_errors %}
-<div class="grid-x grid-padding-x errors">
-  <div class="cell small-12">
-    <h3>{% trans "Please correct the following errors:" %}</h3>
-    {% if top_errors %}
-      <ul class="errorlist nonfield">
-        {% for error in top_errors %}
-          <li>{{ error }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  </div>
+<div class="alert alert-danger alert-dismissable alert-link">
+  <button class="close" type="button" data-dismiss="alert" aria-hidden="true">&#215;</button>
+  {% trans "Please correct the following errors:" %}<br>
+  {% for error in top_errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
 </div>
 {% endif %}

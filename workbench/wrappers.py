@@ -8,7 +8,7 @@ from fineforms.wrappers import FieldWrapper, html_safe
 class BootstrapFieldWrapper(FieldWrapper):
     template_name = "fineforms/field.html"
     label_suffix = ""
-    error_css_class = "error"
+    error_css_class = "is-invalid"
     required_css_class = "required"
 
     def __init__(self, field):
@@ -32,7 +32,16 @@ class BootstrapFieldWrapper(FieldWrapper):
         elif isinstance(widget, (forms.RadioSelect, forms.CheckboxSelectMultiple)):
             pass
         else:
-            widget.attrs["class"] = widget.attrs.get("class", "") + " form-control"
+            widget.attrs["class"] = " ".join(
+                filter(
+                    None,
+                    (
+                        widget.attrs.get("class", ""),
+                        "form-control",
+                        " is-invalid" if self.field.errors else "",
+                    ),
+                )
+            )
 
         html = render_to_string(
             self.template_name,
