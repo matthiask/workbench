@@ -3,8 +3,8 @@
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
   <title>{% block title %}Workbench{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'workbench/css/bootstrap.min.css' %}">
-  <link rel="stylesheet" href="{% static 'workbench/css/datepicker.min.css' %}">
+  <link rel="stylesheet" href="{% static 'workbench/lib/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'workbench/lib/datepicker.min.css' %}">
   <link rel="stylesheet" href="{% static 'workbench/workbench.css' %}">
   <link rel="shortcut icon" href="{% static 'workbench/favicon.ico' %}">
   <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
@@ -15,11 +15,10 @@
 
   {% block body %}{% endblock body %}
 
-  <script src="{% static 'workbench/jquery-3.3.1.min.js' %}"></script>
-  <script src="{% static 'workbench/js/moment-with-locales.min.js' %}"></script>
-  <script src="{% static 'workbench/js/bootstrap.min.js' %}"></script>
-  <script src="{% static 'workbench/js/datepicker.min.js' %}"></script>
-  <script src="{% static 'workbench/js/datepicker.de-DE.js' %}"></script>
+  <script src="{% static 'workbench/lib/jquery-3.3.1.min.js' %}"></script>
+  <script src="{% static 'workbench/lib/bootstrap.min.js' %}"></script>
+  <script src="{% static 'workbench/lib/datepicker.min.js' %}"></script>
+  <script src="{% static 'workbench/lib/datepicker.de-DE.js' %}"></script>
   <script src="{% static 'workbench/workbench.js' %}"></script>
   {% block js %}{% endblock %}
 </body>
