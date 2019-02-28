@@ -3,52 +3,13 @@
 }
 
 .container-fluid[role="main"] {
-  padding-bottom: 20px;
-}
-
-@media only screen and (max-width: 760px) {
-  .table-linearize table,
-  .table-linearize thead,
-  .table-linearize tbody,
-  .table-linearize tfoot,
-  .table-linearize th,
-  .table-linearize td,
-  .table-linearize tr {
-    display: block;
-  }
-
-  .table-linearize th {
-    padding: 8px 8px 4px 8px !important;
-  }
-
-  .table-linearize td {
-    border: none !important;
-    padding: 4px 8px !important;
-  }
+  padding-top: 15px;
+  padding-bottom: 30px;
 }
 
 .input-group .short {
   max-width: 8em;
 }
-
-.form-group.required>.control-label {
-}
-
-th.number {
-  text-align: right;
-}
-.number input {
-  border: none;
-  border-bottom: 1px solid #ddd;
-  border-radius: 0;
-  box-shadow: none;
-  text-align: right;
-}
-
-.number input:-moz-placeholder { color: #ccc; text-overflow: ellipsis; }
-.number input::-moz-input-placeholder { color: #ccc; text-overflow: ellipsis; }
-.number input::-webkit-input-placeholder { color: #ccc; text-overflow: ellipsis; }
-.number input:-ms-input-placeholder { color: #ccc; text-overflow: ellipsis; }
 
 .tiny-icons {
   display: inline-block;
@@ -60,43 +21,12 @@ th.number {
   fill: white;
 }
 
-.btn-danger.btn-inverse {
-  background: #fff;
-  color: #e74c3c;
-}
-
-@media screen and (min-width: 768px) {
-  .left-head {
-    padding-top: 21px;
-  }
-  .right-head {
-    display: flex;
-    justify-content: flex-end;
-  }
-}
-
 small {
   font-size: 80%;
 }
 
-small>a.active {
+small > a.active {
   text-decoration: underline;
-}
-
-.label {
-  font-size: 85%;
-  padding: .1em .4em;
-  font-weight: normal;
-}
-
-.icon-red {
-  color: #e74c3c;
-}
-.icon-green {
-  color: #18bc9c;
-}
-.icon-blue {
-  color: #3498db;
 }
 
 .nopad {
@@ -122,10 +52,6 @@ tbody th > a {
 
 .inline {
   display: inline !important;
-}
-
-.help-block {
-  font-size: 13px;
 }
 
 .form-search input,
