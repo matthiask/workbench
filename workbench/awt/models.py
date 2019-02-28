@@ -51,15 +51,15 @@ class Year(Model):
 
 class Quota(Model):
     user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name=_("user"),
-        related_name="quotas",
+        User, on_delete=models.CASCADE, verbose_name=_("user"), related_name="quotas"
     )
     date_from = models.DateField(_("date from"))
     date_until = models.DateField(_("date until"), blank=True, null=True)
     percentage = models.IntegerField(_("percentage"))
-    vacation_days = models.DecimalField(_("vacation days"), help_text=_("Vacation days if percentage was active for a full year."))
+    vacation_days = models.DecimalField(
+        _("vacation days"),
+        help_text=_("Vacation days if percentage was active for a full year."),
+    )
 
     class Meta:
         ordering = ["date_from"]
@@ -72,10 +72,7 @@ class Quota(Model):
 
 class Break(Model):
     user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name=_("user"),
-        related_name="breaks",
+        User, on_delete=models.CASCADE, verbose_name=_("user"), related_name="breaks"
     )
     starts_on = models.DateField(_("starts_on"))
     hours = HoursField(_("hours"))
