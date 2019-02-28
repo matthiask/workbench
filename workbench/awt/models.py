@@ -1,10 +1,12 @@
 from datetime import date, timedelta
 
+from django.contrib import messages
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.tools.models import Model, HoursField
+from workbench.tools.urls import model_urls
 
 
 class Year(Model):
@@ -93,6 +95,7 @@ class Employment(Model):
     save.alters_data = True
 
 
+@model_urls()
 class Absence(Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name=_("user"), related_name="absences"
@@ -109,3 +112,12 @@ class Absence(Model):
 
     def __str__(self):
         return self.description
+
+    @classmethod
+    def allow_update(cls, instance, request):
+        if instance.starts_on.year < date.today().year:
+            messages.error(request, _("Absences of past years are locked."))
+            return False
+        return True
+
+    allow_delete = allow_update

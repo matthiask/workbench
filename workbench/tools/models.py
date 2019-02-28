@@ -66,7 +66,7 @@ class Model(models.Model):
         return "%05d" % self.pk if self.pk else ""
 
     def pretty_status(self):
-        return self.get_status_display()
+        return self.get_status_display() if hasattr(self, "get_status_display") else ""
 
     def snippet(self):
         opts = self._meta

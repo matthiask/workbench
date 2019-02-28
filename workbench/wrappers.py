@@ -37,7 +37,9 @@ class BootstrapFieldWrapper(FieldWrapper):
                     None,
                     (
                         widget.attrs.get("class", ""),
-                        "form-control",
+                        "custom-select"
+                        if isinstance(widget, forms.Select)
+                        else "form-control",
                         " is-invalid" if self.field.errors else "",
                     ),
                 )

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-28 17:17+0100\n"
+"POT-Creation-Date: 2019-02-28 20:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,7 +45,8 @@ msgstr "Kurzer Name"
 msgid "full name"
 msgstr "Voller Name"
 
-#: workbench/accounts/models.py:53
+#: workbench/accounts/models.py:53 workbench/awt/forms.py:11
+#: workbench/awt/models.py:60 workbench/awt/models.py:101
 msgid "user"
 msgstr "Benutzer"
 
@@ -98,8 +99,9 @@ msgstr "Offen"
 msgid "owned by"
 msgstr "Gehört"
 
-#: workbench/activities/forms.py:29 workbench/invoices/forms.py:44
-#: workbench/logbook/forms.py:18 workbench/projects/forms.py:33
+#: workbench/activities/forms.py:29 workbench/awt/forms.py:23
+#: workbench/invoices/forms.py:44 workbench/logbook/forms.py:18
+#: workbench/projects/forms.py:33
 msgid "All users"
 msgstr "Alle Benutzer"
 
@@ -108,8 +110,9 @@ msgstr "Alle Benutzer"
 msgid "Owned by inactive users"
 msgstr "Gehört inaktiven Benutzern"
 
-#: workbench/activities/forms.py:32 workbench/invoices/forms.py:47
-#: workbench/projects/forms.py:36 workbench/tools/forms.py:64
+#: workbench/activities/forms.py:32 workbench/awt/forms.py:24
+#: workbench/invoices/forms.py:47 workbench/projects/forms.py:36
+#: workbench/tools/forms.py:64
 msgid "Active"
 msgstr "Aktiv"
 
@@ -202,6 +205,149 @@ msgstr "aufgezeichnete Aktion"
 msgid "logged actions"
 msgstr "aufgezeichnete Aktionen"
 
+#: workbench/awt/__init__.py:10
+msgid "annual working time"
+msgstr "Jahresarbeitszeit"
+
+#: workbench/awt/forms.py:25
+msgid "Inactive"
+msgstr "Inaktiv"
+
+#: workbench/awt/models.py:28 workbench/awt/models.py:45
+msgid "year"
+msgstr "Jahr"
+
+#: workbench/awt/models.py:29
+msgid "january"
+msgstr "Januar"
+
+#: workbench/awt/models.py:30
+msgid "february"
+msgstr "Februar"
+
+#: workbench/awt/models.py:31
+msgid "march"
+msgstr "März"
+
+#: workbench/awt/models.py:32
+msgid "april"
+msgstr "April"
+
+#: workbench/awt/models.py:33
+msgid "may"
+msgstr "Mai"
+
+#: workbench/awt/models.py:34
+msgid "june"
+msgstr "Juni"
+
+#: workbench/awt/models.py:35
+msgid "july"
+msgstr "Juli"
+
+#: workbench/awt/models.py:36
+msgid "august"
+msgstr "August"
+
+#: workbench/awt/models.py:37
+msgid "september"
+msgstr "September"
+
+#: workbench/awt/models.py:38
+msgid "october"
+msgstr "Oktober"
+
+#: workbench/awt/models.py:39
+msgid "november"
+msgstr "November"
+
+#: workbench/awt/models.py:40
+msgid "december"
+msgstr "Dezember"
+
+#: workbench/awt/models.py:41
+msgid "working time per day"
+msgstr "Arbeitszeit pro Tag"
+
+#: workbench/awt/models.py:46
+msgid "years"
+msgstr "Jahre"
+
+#: workbench/awt/models.py:63
+msgid "date from"
+msgstr "Datum von"
+
+#: workbench/awt/models.py:64
+msgid "date until"
+msgstr "Datum bis"
+
+#: workbench/awt/models.py:65
+msgid "percentage"
+msgstr "Prozent"
+
+#: workbench/awt/models.py:67
+msgid "vacation days"
+msgstr "Ferientage"
+
+#: workbench/awt/models.py:70
+msgid "Vacation days if percentage was active for a full year."
+msgstr "Ferientage für ein Jahr, falls Prozent gültig wären über das ganze Jahr hinweg."
+
+#: workbench/awt/models.py:72 workbench/contacts/models.py:27
+#: workbench/contacts/models.py:55
+#: workbench/templates/contacts/organization_detail.html:31
+#: workbench/templates/contacts/person_detail.html:45
+msgid "notes"
+msgstr "Bemerkungen"
+
+#: workbench/awt/models.py:77
+msgid "employment"
+msgstr "Anstellungsverhältnis"
+
+#: workbench/awt/models.py:78
+msgid "employments"
+msgstr "Anstellungsverhältnisse"
+
+#: workbench/awt/models.py:81
+msgid "ongoing"
+msgstr "aktuell"
+
+#: workbench/awt/models.py:103
+msgid "starts on"
+msgstr "startet am"
+
+#: workbench/awt/models.py:104
+msgid "days"
+msgstr "Tage"
+
+#: workbench/awt/models.py:105 workbench/deals/models.py:63
+#: workbench/invoices/models.py:86 workbench/logbook/models.py:36
+#: workbench/logbook/models.py:100 workbench/offers/models.py:49
+#: workbench/projects/models.py:53 workbench/projects/models.py:160
+#: workbench/templates/invoices/invoice_detail.html:33
+#: workbench/templates/logbook/loggedhours_detail.html:39
+#: workbench/templates/logbook/loggedhours_list.html:13
+#: workbench/templates/projects/project_detail.html:27
+#: workbench/templates/projects/project_detail.html:167
+msgid "description"
+msgstr "Beschreibung"
+
+#: workbench/awt/models.py:106
+msgid "is vacation"
+msgstr "sind Ferien"
+
+#: workbench/awt/models.py:110
+msgid "absence"
+msgstr "Abwesenheit"
+
+#: workbench/awt/models.py:111 workbench/templates/base.html:46
+msgid "absences"
+msgstr "Abwesenheiten"
+
+#: workbench/awt/models.py:119
+msgid "Absences of past years are locked."
+msgstr "Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."
+
 #: workbench/contacts/__init__.py:10
 msgid "contacts"
 msgstr "Kontakte"
@@ -246,12 +392,6 @@ msgstr "Gruppen"
 #: workbench/contacts/models.py:26
 msgid "name"
 msgstr "Name"
-
-#: workbench/contacts/models.py:27 workbench/contacts/models.py:55
-#: workbench/templates/contacts/organization_detail.html:31
-#: workbench/templates/contacts/person_detail.html:45
-msgid "notes"
-msgstr "Bemerkungen"
 
 #: workbench/contacts/models.py:31 workbench/contacts/models.py:67
 msgid "primary contact"
@@ -313,7 +453,7 @@ msgid "postal addresses"
 msgstr "Postadressen"
 
 #: workbench/deals/__init__.py:10 workbench/deals/models.py:81
-#: workbench/templates/base.html:47
+#: workbench/templates/base.html:48
 #: workbench/templates/deals/deal_detail.html:5
 msgid "deals"
 msgstr "Geschäfte"
@@ -352,18 +492,6 @@ msgstr "Abgelehnt"
 #: workbench/templates/projects/project_detail.html:41
 msgid "customer"
 msgstr "Kunde"
-
-#: workbench/deals/models.py:63 workbench/invoices/models.py:86
-#: workbench/logbook/models.py:36 workbench/logbook/models.py:100
-#: workbench/offers/models.py:49 workbench/projects/models.py:53
-#: workbench/projects/models.py:160
-#: workbench/templates/invoices/invoice_detail.html:33
-#: workbench/templates/logbook/loggedhours_detail.html:39
-#: workbench/templates/logbook/loggedhours_list.html:13
-#: workbench/templates/projects/project_detail.html:27
-#: workbench/templates/projects/project_detail.html:167
-msgid "description"
-msgstr "Beschreibung"
 
 #: workbench/deals/models.py:67 workbench/templates/deals/deal_detail.html:18
 #: workbench/templates/deals/deal_list.html:12
@@ -709,7 +837,7 @@ msgid "logged cost"
 msgstr "Erfasste Kosten"
 
 #: workbench/offers/__init__.py:10 workbench/offers/models.py:66
-#: workbench/templates/base.html:48
+#: workbench/templates/base.html:49
 #: workbench/templates/projects/project_detail.html:59
 msgid "offers"
 msgstr "Offerten"
@@ -952,7 +1080,7 @@ msgstr "Einstellungen"
 msgid "Admin panel"
 msgstr "Verwaltung"
 
-#: workbench/templates/base.html:50
+#: workbench/templates/base.html:51
 msgid "Sign out"
 msgstr "Abmelden"
 
@@ -1318,9 +1446,6 @@ msgstr "Suchanfrage fehlt."
 
 #~ msgid "comment"
 #~ msgstr "Kommentar"
-
-#~ msgid "comments"
-#~ msgstr "Kommentare"
 
 #~ msgid "edit approved hours"
 #~ msgstr "freigegebene Stunden bearbeiten"

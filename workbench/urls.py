@@ -15,6 +15,7 @@ urlpatterns = [
     url(r"^contacts/", include("workbench.contacts.urls")),
     url(r"^deals/", include("workbench.deals.urls")),
     url(r"^logbook/", include("workbench.logbook.urls")),
+    url(r"^absences/", include("workbench.awt.urls")),
     url(r"^offers/", include("workbench.offers.urls")),
     url(r"^projects/", include("workbench.projects.urls")),
     url(r"^invoices/", include("workbench.invoices.urls")),
