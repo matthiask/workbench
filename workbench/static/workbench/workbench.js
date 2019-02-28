@@ -12,14 +12,14 @@ $(function() {
 
     $(data).modal();
 
-    if (!('ontouchstart' in document.documentElement)) {
-      setTimeout(function() {
-        var fields = $('.modal').find('input, select');
-        if (fields.filter("[autofocus]").length == 0) {
-          fields.filter(':visible').first().focus();
-        }
-      }, 500);
-    }
+    setTimeout(function() {
+      var fields = $('.modal').find('input, select');
+      if (fields.filter("[autofocus]").length) {
+        fields.filter("[autofocus]").focus();
+      } else {
+        fields.filter(':visible').first().focus();
+      }
+    }, 500);
 
     initWidgets();
   };
