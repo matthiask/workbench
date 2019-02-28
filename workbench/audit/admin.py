@@ -6,7 +6,6 @@ from workbench.audit.models import LoggedAction
 
 
 class LoggedActionAdmin(admin.ModelAdmin):
-    date_hierarchy = "created_at"
     list_display = ("__str__", "data", "user_name", "created_at")
     ordering = ("-created_at",)
 
