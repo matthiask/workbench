@@ -1,7 +1,4 @@
 from datetime import date
-from markdown2 import markdown
-import lxml.html
-import lxml.html.clean
 
 from django.utils.formats import date_format
 from django.utils.html import mark_safe
@@ -27,17 +24,3 @@ def pretty_due(day):
         return _("due today")
     else:
         return _("overdue!")
-
-
-def markdownify(text):
-    html = markdown(
-        text, extras=["code-friendly", "fenced-code-blocks", "cuddled-lists"]
-    )
-    html = html.replace("<img", '<img class="img-responsive"')
-    doc = lxml.html.fromstring(html)
-    cleaner = lxml.html.clean.Cleaner(
-        scripts=False, style=False, remove_tags=("script", "style")
-    )
-    cleaner(doc)
-    html = lxml.html.tostring(doc, method="xml").decode("utf-8")
-    return mark_safe(html)

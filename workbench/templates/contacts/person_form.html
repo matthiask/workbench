@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load bootstrap4 formset i18n %}
+{% load bootstrap4 fineforms formset i18n %}
 
 {% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
@@ -17,7 +17,9 @@
 
     <form method="POST" action="." class="form-horizontal">
       {% csrf_token %}
-      {% bootstrap_form form layout='horizontal' %}
+      {% ff_errors form %}
+      {% ff_fields form %}
+
       {% if form.formsets %}
         <div class="row">
           <label class="col-md-3 control-label">

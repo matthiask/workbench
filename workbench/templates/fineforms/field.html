@@ -1,0 +1,23 @@
+<div class="form-group row {{ css_classes }}">
+  {% if widget_then_label %}
+    <div class="col-lg-4"></div>
+    <div class="col-lg-8">
+      <div class="form-check">
+        {{ field }} {{ label_tag }}
+        {{ field.errors }}
+        {% if field.field.help_text %}
+          <small class="form-text text-muted">{{ field.field.help_text }}</small>
+        {% endif %}
+      </div>
+    </div>
+  {% else %}
+    <label class="col-lg-4 text-lg-right col-form-label" for="{{ field.auto_id }}">{{ field.label }}</label>
+    <div class="col-lg-8">
+      {{ field }}
+      {{ field.errors }}
+      {% if field.field.help_text %}
+        <small class="form-text text-muted">{{ field.field.help_text }}</small>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>

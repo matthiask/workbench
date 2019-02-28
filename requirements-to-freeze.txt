@@ -1,14 +1,14 @@
 coverage
-Django<2
+Django
 django-bootstrap4
 django-debug-toolbar
+django-fineforms
 django-vanilla-views
 dj-database-url
 factory-boy
 flake8
 gunicorn
 lxml
-markdown2
 oauth2client
 pdfdocument
 Pillow

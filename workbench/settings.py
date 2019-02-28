@@ -36,6 +36,8 @@ INSTALLED_APPS = [
         "django.contrib.staticfiles",
         "django.contrib.postgres",
         "bootstrap4",
+        "fineforms",
+        "django.forms",
         "workbench.accounts",
         "workbench.activities",
         "workbench.audit",
@@ -63,7 +65,6 @@ MIDDLEWARE = [
         "django.middleware.common.CommonMiddleware",
         "django.middleware.csrf.CsrfViewMiddleware",
         "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "django.contrib.auth.middleware.SessionAuthenticationMiddleware",
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "workbench.accounts.middleware.login_required",
@@ -135,6 +136,11 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 86400
 
 MESSAGE_STORAGE = "django.contrib.messages.storage.cookie.CookieStorage"
+
+FINEFORMS_WRAPPERS = {
+    "field": "workbench.wrappers.BootstrapFieldWrapper",
+}
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 BOOTSTRAP4 = {
     "horizontal_label_class": "col-lg-4 text-lg-right",

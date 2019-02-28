@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load bootstrap4 i18n %}
+{% load bootstrap4 fineforms i18n %}
 
 {% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
@@ -33,22 +33,22 @@
         </div>
       {% endif %}
 
-      {% bootstrap_form form layout='horizontal' %}
+      {% ff_errors form %}
+      {% ff_fields form %}
+
       {% for formset in view.formsets.values %}
         {% bootstrap_formset formset layout='horizontal' %}
       {% endfor %}
 
-      {% buttons %}
-        <div class="col-md-9 offset-lg-4">
-          <button type="submit" class="btn btn-primary">
-            {% trans 'save' %}</button>
+      <div class="col-lg-8 offset-lg-4">
+        <button type="submit" class="btn btn-primary">
+          {% trans 'save' %}</button>
 
-          {% if object.get_absolute_url %}
-          <a href="{{ object.get_absolute_url }}" class="btn pull-right btn-danger btn-inverse">
-            {% trans 'cancel' %}</a>
-          {% endif %}
-        </div>
-      {% endbuttons %}
+        {% if object.get_absolute_url %}
+        <a href="{{ object.get_absolute_url }}" class="btn pull-right btn-danger btn-inverse">
+          {% trans 'cancel' %}</a>
+        {% endif %}
+      </div>
 
     </form>
 
