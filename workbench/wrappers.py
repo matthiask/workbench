@@ -43,9 +43,7 @@ class BootstrapFieldWrapper(FieldWrapper):
                 ),
                 "label_tag": self.field.label_tag(
                     label_suffix=self.label_suffix,
-                    attrs=(
-                        {"class": " ".join(extra_classes + extra_label_classes)}
-                    ),
+                    attrs=({"class": " ".join(extra_classes + extra_label_classes)}),
                 ),
                 "css_classes": self.field.css_classes(
                     extra_classes=extra_classes
@@ -58,13 +56,9 @@ class BootstrapFieldWrapper(FieldWrapper):
         )
 
         if isinstance(widget, forms.RadioSelect):
-            html = html.replace(
-                'type="radio"',
-                'class="form-check-input" type="radio"',
-            )
+            html = html.replace('type="radio"', 'class="form-check-input" type="radio"')
         elif isinstance(widget, forms.CheckboxSelectMultiple):
             html = html.replace(
-                'type="checkbox"',
-                'class="form-check-input" type="checkbox"',
+                'type="checkbox"', 'class="form-check-input" type="checkbox"'
             )
         return html

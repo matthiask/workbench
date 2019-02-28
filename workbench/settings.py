@@ -137,9 +137,7 @@ SESSION_COOKIE_AGE = 86400
 
 MESSAGE_STORAGE = "django.contrib.messages.storage.cookie.CookieStorage"
 
-FINEFORMS_WRAPPERS = {
-    "field": "workbench.wrappers.BootstrapFieldWrapper",
-}
+FINEFORMS_WRAPPERS = {"field": "workbench.wrappers.BootstrapFieldWrapper"}
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 BOOTSTRAP4 = {

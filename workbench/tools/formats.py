@@ -1,7 +1,6 @@
 from datetime import date
 
 from django.utils.formats import date_format
-from django.utils.html import mark_safe
 from django.utils.timezone import localtime
 from django.utils.translation import ugettext as _
 
