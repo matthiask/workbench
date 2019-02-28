@@ -84,7 +84,12 @@ class Project(Model):
         return self.title
 
     def __html__(self):
-        return format_html("<small>{}</small> {}", self.code, self.title)
+        return format_html(
+            "<small>{}</small> {} - {}",
+            self.code,
+            self.title,
+            self.owned_by.get_short_name(),
+        )
 
     @property
     def code(self):
