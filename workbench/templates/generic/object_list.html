@@ -26,14 +26,15 @@
             <label class="sr-only">{{ f.label }}</label>
             {{ f }}
           {% endfor %}
+
+          {% if view.show_create_button %}
+            <a href="{{ view.model.urls.create }}" class="btn btn-secondary">
+              {% include "svg/plus.svg" %}
+              {{ view.meta.verbose_name }}
+            </a>
+          {% endif %}
         </form>
 
-        {% if view.show_create_button %}
-          <a href="{{ view.model.urls.create }}" class="btn btn-secondary">
-            {% include "svg/plus.svg" %}
-            {{ view.meta.verbose_name }}
-          </a>
-        {% endif %}
       </div>
     </div>
 

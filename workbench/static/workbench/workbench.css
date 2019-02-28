@@ -79,11 +79,8 @@ th.number {
     padding-top: 21px;
   }
   .right-head {
-    text-align: right;
-    padding-top: 21px;
-  }
-  .right-head>* {
-    display: inline-block;
+    display: flex;
+    justify-content: flex-end;
   }
 }
 
@@ -159,4 +156,12 @@ tbody th > a {
 
 .help-block {
   font-size: 13px;
+}
+
+.form-search input,
+.form-search select {
+  max-width: 10em;
+}
+.form-search > * {
+  margin-left: 0.5rem;
 }
