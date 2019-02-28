@@ -1,10 +1,26 @@
 from django.contrib import admin
 
-from workbench.services.models import ServiceType
+from . import models
 
 
-admin.site.register(
-    ServiceType,
-    list_display=("title", "billing_per_hour", "position"),
-    list_editable=("position",),
-)
+@admin.register(models.Year)
+class YearAdmin(admin.ModelAdmin):
+    list_display = ["year", "working_time_per_day", *models.Year.MONTHS]
+
+
+@admin.register(models.Employment)
+class EmploymentAdmin(admin.ModelAdmin):
+    list_display = [
+        "user",
+        "date_from",
+        "date_until",
+        "percentage",
+        "vacation_days",
+        "notes",
+    ]
+    list_filter = ["user", "date_from"]
+
+
+@admin.register(models.Absence)
+class AbsenceAdmin(admin.ModelAdmin):
+    list_display = ["user", "starts_on", "days", "description", "is_vacation"]
