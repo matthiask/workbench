@@ -3,15 +3,10 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">{{ view.meta.verbose_name_plural }}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
-        <form method="get" action="{{ view.request.path }}" class="form form-inline">
-          <input type="hidden" name="id" value="{{ view.request.GET.id }}">
-          <input type="text" name="q" placeholder="{% trans 'Search' %}" class="form-control"
-            value="{{ view.request.GET.q }}">
-        </form>
         <div class="list-group">
           {% for object in object_list %}
           <a
@@ -23,20 +18,31 @@
             </a>
           {% endfor %}
         </div>
-        <ul class="pagination clearfix" style="display:block">
+      </div>
+      <div class="modal-footer justify-content-between">
+        <form method="get" action="{{ view.request.path }}" class="form form-inline">
+          <input type="hidden" name="id" value="{{ view.request.GET.id }}">
+          <input type="text" name="q" placeholder="{% trans 'Search' %}" class="form-control"
+            value="{{ view.request.GET.q }}">
+        </form>
+        <ul class="pagination" style="margin-top:0">
           {% if page_obj.has_previous %}
-            <li class="prev">
-              <a href="{{ view.request.path }}?{{ view.request.GET|querystring:'page' }}&amp;page={{ page_obj.previous_page_number }}"
-                 class="btn btn-secondary pull-left"
+            <li class="page-item">
+              <a class="page-link" href="{{ view.request.path }}?{{ view.request.GET|querystring:'page' }}&amp;page={{ page_obj.previous_page_number }}"
+                 class="btn btn-secondary"
                  data-toggle="ajaxmodal">&laquo;</a>
             </li>
+          {% else %}
+            <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
           {% endif %}
           {% if page_obj.has_next %}
-            <li class="next pull-right">
-              <a href="{{ view.request.path }}?{{ view.request.GET|querystring:'page' }}&amp;page={{ page_obj.next_page_number }}"
-                 class="btn btn-secondary pull-right"
+            <li class="page-item">
+              <a class="page-link" href="{{ view.request.path }}?{{ view.request.GET|querystring:'page' }}&amp;page={{ page_obj.next_page_number }}"
+                 class="btn btn-secondary"
                  data-toggle="ajaxmodal">&raquo;</a>
             </li>
+          {% else %}
+            <li class="page-item disabled"><a class="page-link" href="#">&raquo;</a></li>
           {% endif %}
         </ul>
       </div>
