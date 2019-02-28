@@ -273,7 +273,7 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
                     _(
                         "You are attempting to change %(fields)s."
                         " I am trying to prevent unintentional changes to"
-                        " anything but the status field."
+                        " anything but the status and closed on fields."
                         " Are you sure?"
                     )
                     % {
