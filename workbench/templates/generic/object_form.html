@@ -36,9 +36,7 @@
       {% ff_errors form %}
       {% ff_fields form %}
 
-      {% for formset in view.formsets.values %}
-        {% bootstrap_formset formset layout='horizontal' %}
-      {% endfor %}
+      {% for formset in view.formsets.values %}{{ formset }}{% endfor %}
 
       <div class="col-lg-8 offset-lg-4">
         <button type="submit" class="btn btn-primary">

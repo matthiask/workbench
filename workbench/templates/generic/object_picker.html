@@ -7,13 +7,15 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
-        <div class="list-group">
+        <div class="list-group list-group-flush">
           {% for object in object_list %}
           <a
             data-id="{{ view.request.GET.id }}"
             data-key="{{ object.pk }}"
             data-pretty="{{ object }}"
-            data-toggle="picker" class="list-group-item">
+            data-toggle="picker"
+            href="#"
+            class="list-group-item list-group-item-action text-truncate">
               {{ object }}
             </a>
           {% endfor %}
@@ -25,7 +27,7 @@
           <input type="text" name="q" placeholder="{% trans 'Search' %}" class="form-control"
             value="{{ view.request.GET.q }}">
         </form>
-        <ul class="pagination" style="margin-top:0">
+        <ul class="pagination">
           {% if page_obj.has_previous %}
             <li class="page-item">
               <a class="page-link" href="{{ view.request.path }}?{{ view.request.GET|querystring:'page' }}&amp;page={{ page_obj.previous_page_number }}"

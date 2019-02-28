@@ -94,11 +94,29 @@ class PersonForm(ModelForm):
 
 
 PhoneNumberFormset = inlineformset_factory(
-    Person, PhoneNumber, fields=("type", "phone_number"), extra=0
+    Person,
+    PhoneNumber,
+    fields=("type", "phone_number"),
+    extra=0,
+    widgets={
+        "type": forms.TextInput(
+            attrs={"class": "form-control short", "placeholder": _("type")}
+        ),
+        "phone_number": forms.TextInput(attrs={"class": "form-control"}),
+    },
 )
 
 EmailAddressFormset = inlineformset_factory(
-    Person, EmailAddress, fields=("type", "email"), extra=0
+    Person,
+    EmailAddress,
+    fields=("type", "email"),
+    extra=0,
+    widgets={
+        "type": forms.TextInput(
+            attrs={"class": "form-control short", "placeholder": _("type")}
+        ),
+        "email": forms.TextInput(attrs={"class": "form-control"}),
+    },
 )
 
 
@@ -106,7 +124,12 @@ class PostalAddressForm(forms.ModelForm):
     class Meta:
         model = PostalAddress
         fields = ("type", "postal_address")
-        widgets = {"postal_address": Textarea(attrs={"rows": 6})}
+        widgets = {
+            "type": forms.TextInput(
+                attrs={"class": "form-control short", "placeholder": _("type")}
+            ),
+            "postal_address": Textarea(attrs={"class": "form-control", "rows": 6}),
+        }
 
 
 PostalAddressFormset = inlineformset_factory(

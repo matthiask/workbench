@@ -5,8 +5,8 @@
 {% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-md-8 offset-md-2">
+<div class="row justify-content-center">
+  <div class="col-md-10 col-lg-8">
     {% if object %}
       <h2><a href="{{ object.project.get_absolute_url }}">
           <small>{% include 'svg/chevron-left.svg' %}</small>
@@ -28,79 +28,61 @@
 
       {% if form.formsets %}
         <div class="row">
-          <label class="col-md-3 control-label">
-            {% trans 'efforts' %}
-            <a href="#"
-              onclick="return addInlineForm('efforts')">
-              {% include "svg/plus.svg" %}
-            </a>
-          </label>
-          <div class="col-md-9 form-inline fieldset">
-            <div class="row">
-              <div class="col-md-4 nopad">{% trans 'hours' %}</div>
-              <div class="col-md-7 nopad">{% trans 'service type' %}</div>
-              <div class="col-md-1 nopad">{% trans 'delete' %}</div>
-            </div>
+          <div class="col-lg-8 offset-lg-4">
+            <h4>{% trans 'efforts' %}</h4>
             {% formset form.formsets.efforts "efforts" %}
-              <div class="row" id="{{ form_id }}">
-                <div class="col-md-4">
-                  {{ form.id }}
-                  {% bootstrap_field form.hours layout='inline' %}
-                </div>
-                <div class="col-md-7">
-                  {% bootstrap_field form.service_type layout='inline' %}
-                </div>
-                <div class="col-md-1">
-                  {{ form.DELETE }}
+            <div id="{{ form_id }}" class="mb-1">
+              {{ form.id }}
+              <div class="input-group">
+                {{ form.hours }}
+                {{ form.service_type }}
+                <div class="input-group-append">
+                  <span class="input-group-text bg-warning">
+                    {{ form.DELETE }}
+                  </span>
                 </div>
               </div>
-            {% endformset %}
-          </div>
-        </div>
-
-        <div class="row">
-          <label class="col-md-3 control-label">
-            {% trans 'costs' %}
-            <a href="#"
-              onclick="return addInlineForm('costs')">
-              {% include "svg/plus.svg" %}
-            </a>
-          </label>
-          <div class="col-md-9 form-inline fieldset">
-            <div class="row">
-              <div class="col-md-4 nopad">{% trans 'cost' %}</div>
-              <div class="col-md-7 nopad">{% trans 'title' %}</div>
-              <div class="col-md-1 nopad">{% trans 'delete' %}</div>
             </div>
+            {% endformset %}
+            <a href="#" class="btn btn-secondary"
+              onclick="return addInlineForm('efforts')">
+              {% include 'svg/plus.svg' %}
+            </a>
+
+            <h4 class="mt-3">{% trans 'costs' %}</h4>
             {% formset form.formsets.costs "costs" %}
-              <div class="row" id="{{ form_id }}">
-                <div class="col-md-4">
-                  {{ form.id }}
-                  {% bootstrap_field form.cost layout='inline' %}
-                </div>
-                <div class="col-md-7">
-                  {% bootstrap_field form.title layout='inline' %}
-                </div>
-                <div class="col-md-1">
-                  {{ form.DELETE }}
+            <div id="{{ form_id }}" class="mb-1">
+              {{ form.id }}
+              <div class="input-group">
+                {{ form.cost }}
+                {{ form.title }}
+                <div class="input-group-append">
+                  <span class="input-group-text bg-warning">
+                    {{ form.DELETE }}
+                  </span>
                 </div>
               </div>
+            </div>
             {% endformset %}
+            <a href="#" class="btn btn-secondary"
+              onclick="return addInlineForm('costs')">
+              {% include 'svg/plus.svg' %}
+            </a>
           </div>
         </div>
       {% endif %}
 
-      {% buttons %}
-      <div class="col-md-9 offset-lg-4">
-        <button type="submit" class="btn btn-primary">
-          {% trans 'submit' %}</button>
+      <div class="row mt-3">
+        <div class="col-lg-8 offset-lg-4">
+          <button type="submit" class="btn btn-primary">
+            {% trans 'save' %}</button>
 
-        {% if object.get_absolute_url %}
-        <a href="{{ object.urls.delete }}" class="btn pull-right btn-danger btn-inverse">
-          {% trans 'delete' %}</a>
-        {% endif %}
+          {% if object.get_absolute_url %}
+          <a href="{{ object.urls.delete }}" class="btn pull-right btn-danger btn-inverse">
+            {% trans 'delete' %}</a>
+          {% endif %}
+        </div>
       </div>
-      {% endbuttons %}
 
     </form>
 

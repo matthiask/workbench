@@ -120,7 +120,29 @@ class ServiceForm(ModelForm):
 
 
 EffortFormset = inlineformset_factory(
-    Service, Effort, fields=("service_type", "hours"), extra=0
+    Service,
+    Effort,
+    fields=("service_type", "hours"),
+    extra=0,
+    widgets={
+        "service_type": forms.Select(attrs={"class": "custom-select"}),
+        "hours": forms.NumberInput(
+            attrs={"class": "form-control short", "placeholder": _("hours")}
+        ),
+    },
 )
 
-CostFormset = inlineformset_factory(Service, Cost, fields=("title", "cost"), extra=0)
+CostFormset = inlineformset_factory(
+    Service,
+    Cost,
+    fields=("title", "cost"),
+    extra=0,
+    widgets={
+        "title": forms.TextInput(
+            attrs={"class": "form-control", "placeholder": _("title")}
+        ),
+        "cost": forms.NumberInput(
+            attrs={"class": "form-control short", "placeholder": _("cost")}
+        ),
+    },
+)

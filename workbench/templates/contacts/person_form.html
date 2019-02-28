@@ -5,8 +5,8 @@
 {% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-md-8 offset-md-2">
+<div class="row justify-content-center">
+  <div class="col-md-10 col-lg-8">
     <h1>
       {% if object %}
         {% blocktrans with object=object.full_name %}Update {{ object }}{% endblocktrans %}
@@ -22,86 +22,77 @@
 
       {% if form.formsets %}
         <div class="row">
-          <label class="col-md-3 control-label">
-            {% trans 'phone numbers' %}
-            <a href="#"
+          <div class="col-lg-8 offset-lg-4">
+            <h4>{% trans 'phone numbers' %}</h4>
+            {% formset form.formsets.phonenumbers "phonenumbers" %}
+            <div id="{{ form_id }}" class="mb-1">
+              {{ form.id }}
+              <div class="input-group">
+                {{ form.type }}
+                {{ form.phone_number }}
+                <div class="input-group-append">
+                  <span class="input-group-text bg-warning">
+                    {{ form.DELETE }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            {% endformset %}
+            <a href="#" class="btn btn-secondary"
               onclick="return addInlineForm('phonenumbers')">
               {% include 'svg/plus.svg' %}
             </a>
-          </label>
-          <div class="col-md-9 form-inline fieldset">
-            {% formset form.formsets.phonenumbers "phonenumbers" %}
-              <div class="row" id="{{ form_id }}">
-                <div class="col-md-4">
-                  {{ form.id }}
-                  {% bootstrap_field form.type layout='inline' %}
-                </div>
-                <div class="col-md-7">
-                  {% bootstrap_field form.phone_number layout='inline' %}
-                </div>
-                <div class="col-md-1">
-                  {{ form.DELETE }}
+
+            <h4 class="mt-3">{% trans 'email addresses' %}</h4>
+            {% formset form.formsets.emailaddresses "emailaddresses" %}
+            <div id="{{ form_id }}" class="mb-1">
+              {{ form.id }}
+              <div class="input-group">
+                {{ form.type }}
+                {{ form.email }}
+                <div class="input-group-append">
+                  <span class="input-group-text bg-warning">
+                    {{ form.DELETE }}
+                  </span>
                 </div>
               </div>
+            </div>
             {% endformset %}
-          </div>
-        </div>
-
-        <div class="row">
-          <label class="col-md-3 control-label">
-            {% trans 'email addresses' %}
-            <a href="#"
+            <a href="#" class="btn btn-secondary"
               onclick="return addInlineForm('emailaddresses')">
               {% include 'svg/plus.svg' %}
             </a>
-          </label>
-          <div class="col-md-9 form-inline fieldset">
-            {% formset form.formsets.emailaddresses "emailaddresses" %}
-              <div class="row" id="{{ form_id }}">
-                <div class="col-md-4">
-                  {{ form.id }}
-                  {% bootstrap_field form.type layout='inline' %}
-                </div>
-                <div class="col-md-7">
-                  {% bootstrap_field form.email layout='inline' %}
-                </div>
-                <div class="col-md-1">
-                  {{ form.DELETE }}
+
+            <h4 class="mt-3">{% trans 'postal addresses' %}</h4>
+            {% formset form.formsets.postaladdresses "postaladdresses" %}
+            <div id="{{ form_id }}" class="mb-1">
+              {{ form.id }}
+              <div class="input-group">
+                {{ form.type }}
+                {{ form.postal_address }}
+                <div class="input-group-append">
+                  <span class="input-group-text bg-warning">
+                    {{ form.DELETE }}
+                  </span>
                 </div>
               </div>
+            </div>
             {% endformset %}
-          </div>
-        </div>
-
-        <div class="row">
-          <label class="col-md-3 control-label">
-            {% trans 'postal addresses' %}
-            <a href="#"
+            <a href="#" class="btn btn-secondary"
               onclick="return addInlineForm('postaladdresses')">
               {% include 'svg/plus.svg' %}
             </a>
-          </label>
-          <div class="col-md-9 form-inline fieldset">
-            {% formset form.formsets.postaladdresses "postaladdresses" %}
-              <div class="row" id="{{ form_id }}">
-                <div class="col-md-4">
-                  {{ form.id }}
-                  {% bootstrap_field form.type layout='inline' %}
-                </div>
-                <div class="col-md-7">
-                  {% bootstrap_field form.postal_address layout='inline' %}
-                </div>
-                <div class="col-md-1">
-                  {{ form.DELETE }}
-                </div>
-              </div>
-            {% endformset %}
+
           </div>
         </div>
       {% endif %}
 
-      <button type="submit" class="btn btn-primary offset-lg-4">
-        {% trans 'submit' %}</button>
+      <div class="row mt-3">
+        <div class="col-lg-8 offset-lg-4">
+          <button type="submit" class="btn btn-primary">
+            {% trans 'submit' %}</button>
+        </div>
+      </div>
     </form>
 
   </div>
