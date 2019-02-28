@@ -63,6 +63,7 @@ class LoggedHoursForm(ModelForm):
         self.fields["service"].choices = [("", "----------")] + [
             (service.id, service.__str__()) for service in self.project.services.all()
         ]
+        self.fields["service"].widget.attrs["autofocus"] = True
 
     def save(self):
         instance = super().save(commit=False)

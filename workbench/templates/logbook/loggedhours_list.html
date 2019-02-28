@@ -24,7 +24,7 @@
         <tr>
           <td>{{ hours.created_at|date:'H:i' }}</td>
           <td>
-            <a href="{{ hours.service.get_absolute_url }}">
+            <a href="{{ hours.get_absolute_url }}" data-toggle="ajaxmodal">
               {{ hours.service.project }}:<br>
               {{ hours.service }}
             </a>

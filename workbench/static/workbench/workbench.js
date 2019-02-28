@@ -14,7 +14,10 @@ $(function() {
 
     if (!('ontouchstart' in document.documentElement)) {
       setTimeout(function() {
-        $('.modal').find('input, select').filter(':visible').first().focus();
+        var fields = $('.modal').find('input, select');
+        if (fields.filter("[autofocus]").length == 0) {
+          fields.filter(':visible').first().focus();
+        }
       }, 500);
     }
 
