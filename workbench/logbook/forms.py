@@ -67,7 +67,8 @@ class LoggedHoursForm(ModelForm):
                     .order_by("-created_at")
                     .first()
                 )
-                initial.setdefault("service", latest_on_project.service_id)
+                if latest_on_project:
+                    initial.setdefault("service", latest_on_project.service_id)
         else:
             self.project = kwargs["instance"].service.project
 
