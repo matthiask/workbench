@@ -46,6 +46,7 @@ class LoggedHours(Model):
     objects = SearchManager()
 
     class Meta:
+        indexes = [models.Index(fields=["-rendered_on"])]
         ordering = ("-rendered_on", "-created_at")
         verbose_name = _("logged hours")
         verbose_name_plural = _("logged hours")
