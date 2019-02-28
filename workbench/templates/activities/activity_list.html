@@ -1,79 +1,52 @@
-{% extends "base.html" %}
+{% extends "generic/object_list.html" %}
 
 {% load bootstrap4 i18n querystring workbench %}
 
 {% block title %}{{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
-{% block content %}
-<div class="row">
+{% block create_button %}
+  <a href="{{ view.model.urls.create }}" class="btn btn-secondary"
+    data-toggle="ajaxmodal">
+    {% include "svg/plus.svg" %}
+    {{ view.meta.verbose_name }}
+  </a>
+{% endblock %}
 
-  <div class="col-sm-12">
-    <div class="row">
-      <div class="col-md-3">
-        <h1>{{ view.meta.verbose_name_plural }}</h1>
-      </div>
-      <div class="col-md-9 right-head">
-        <form method="GET" action="." class="form-inline form-search">
-          <label class="sr-only">{% trans 'search' %}</label>
-          <input
-            class="form-control"
-            type="search"
-            name="q"
-            placeholder="{% trans 'search' %}"
-            value="{{ view.request.GET.q|default:'' }}">
-
-          {% for f in view.search_form %}
-            <label class="sr-only">{{ f.label }}</label>
-            {{ f }}
+{% block objects %}
+<table class="table table-hover table-striped">
+  <thead>
+    <tr>
+      <th>{{ view.meta.verbose_name }}</th>
+      <th>{% trans 'context' %}</th>
+      <th>{% trans 'owned by' %}</th>
+      <th>{% trans 'status' %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for object in object_list|select_related:'project,deal,contact__organization,owned_by' %}
+      <tr>
+        <th><a href="{{ object.urls.detail }}" data-toggle="ajaxmodal">
+            {{ object }}
+        </a></th>
+        <td>
+          {% for c in object.context %}
+            {{ c.snippet }}
           {% endfor %}
-        </form>
-
-        <a href="{{ view.model.urls.create }}" class="btn btn-secondary"
-          data-toggle="ajaxmodal">
-          {% include "svg/plus.svg" %}
-          {{ view.meta.verbose_name }}
-        </a>
-      </div>
-    </div>
-
-    <table class="table table-hover table-striped">
-      <thead>
-        <tr>
-          <th>{{ view.meta.verbose_name }}</th>
-          <th>{% trans 'context' %}</th>
-          <th>{% trans 'owned by' %}</th>
-          <th>{% trans 'status' %}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for object in object_list|select_related:'project,deal,contact__organization,owned_by' %}
-          <tr>
-            <th><a href="{{ object.urls.detail }}" data-toggle="ajaxmodal">
-                {{ object }}
-            </a></th>
-            <td>
-              {% for c in object.context %}
-                {{ c.snippet }}
-              {% endfor %}
-            </td>
-            <td>{{ object.owned_by.get_full_name }}</td>
-            <td>{{ object.pretty_status }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="4">
-            {{ paginator.count }} {{ view.meta.verbose_name_plural }}
-            {% if view.root_queryset_count != paginator.count %}
-            (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
-            {% endif %}
-          </td>
-        </tr>
-      </tfoot>
-    </table>
-
-    {% bootstrap_pagination page=page_obj extra=request.GET|querystring:'page' %}
-  </div>
-</div>
+        </td>
+        <td>{{ object.owned_by.get_full_name }}</td>
+        <td>{{ object.pretty_status }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="4">
+        {{ paginator.count }} {{ view.meta.verbose_name_plural }}
+        {% if view.root_queryset_count != paginator.count %}
+        (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
+        {% endif %}
+      </td>
+    </tr>
+  </tfoot>
+</table>
 {% endblock %}

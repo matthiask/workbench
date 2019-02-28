@@ -27,12 +27,14 @@
             {{ f }}
           {% endfor %}
 
+          {% block create_button %}
           {% if view.show_create_button %}
             <a href="{{ view.model.urls.create }}" class="btn btn-secondary">
               {% include "svg/plus.svg" %}
               {{ view.meta.verbose_name }}
             </a>
           {% endif %}
+          {% endblock %}
         </form>
 
       </div>
