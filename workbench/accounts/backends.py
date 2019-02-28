@@ -8,7 +8,7 @@ class AuthBackend(object):
         except User.DoesNotExist:
             return None
 
-    def authenticate(self, **kwargs):
+    def authenticate(self, request, **kwargs):
         try:
             return User.objects.get(email=kwargs.get("email"))
         except User.DoesNotExist:
