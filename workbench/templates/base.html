@@ -12,6 +12,16 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <form class="form-inline my-2 my-lg-0">
+            <div class="input-group">
+              <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">{% include 'svg/search.svg' %}</button>
+              </div>
+            </div>
+          </form>
+        </li>
         {% mark_current request.path %}
         <li class="nav-item"><a class="nav-link" href="{% url 'contacts_organization_list' %}">{% trans 'organizations' %}</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'contacts_person_list' %}">{% trans 'people' %}</a></li>
@@ -21,12 +31,6 @@
       </ul>
 
       <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-          </form>
-        </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Hi, {{ user.get_short_name }}!
