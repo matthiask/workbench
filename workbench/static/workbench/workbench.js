@@ -129,12 +129,21 @@ function initWidgets() {
     zIndex: 1500,
   });
 
+  function addZero(num) {
+    return num < 10 ? "0" + num : "" + num;
+  }
+
   var invoicedOn = $('#id_invoiced_on');
   var dueOn = $('#id_due_on');
   if (invoicedOn.length && dueOn.length) {
-      invoicedOn.on('dp.change', function(e) {
-          dueOn.val(e.date.add(14, 'days').calendar());
-      });
+    invoicedOn.on('change', function(e) {
+      var due = new Date(invoicedOn.datepicker("getDate").getTime() + 14 * 86400 * 1000);
+      dueOn.val(
+        addZero(due.getDate()) + "." +
+        addZero(1 + due.getMonth()) + "." +
+        addZero(due.getFullYear())
+      );
+    });
   }
 }
 
