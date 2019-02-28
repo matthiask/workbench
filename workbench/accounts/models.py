@@ -92,8 +92,8 @@ class User(Model, AbstractBaseUser):
         }
 
         return {
-            "today": per_day.get(today, Decimal("0.00")),
-            "week": sum(per_day.values(), Decimal("0.00")),
+            "today": per_day.get(today, Decimal("0.0")),
+            "week": sum(per_day.values(), Decimal("0.0")),
         }
 
     @property

@@ -14,11 +14,19 @@
           <table class="table table-condensed">
             <tr>
               <td class="text-right">{{ user.hours.today }}h</td>
-              <th>{% trans 'Hours today' %}</th>
+              <th>
+                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
+                  {% trans 'Hours today' %}
+                </a>
+              </th>
             </tr>
             <tr>
               <td class="text-right">{{ user.hours.week }}h</td>
-              <th>{% trans 'Hours this week' %}</th>
+              <th>
+                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
+                  {% trans 'Hours this week' %}
+                </a>
+              </th>
             </tr>
           </table>
 
@@ -32,27 +40,26 @@
       </h3></div>
       <div class="card-body">
         <div class="card-text">
-          <table class="table table-condensed">
-            {% for project in user.active_projects %}
-              <tr>
-                <th><a href="{{ project.urls.detail }}">
-                  {{ project|h }}
-                </a></th>
-                <td>
-                  <span class="badge badge-{{ project.status_css }}">
-                    {{ project.pretty_status }}
-                  </span>
-                </td>
-                <td style="white-space:nowrap">
+
+          <div class="list-group list-group-flush">
+            {% for project in user.active_projects|select_related:'customer,contact__organization,owned_by' %}
+            <div class="list-group-item">
+              <span style="float:right" class="badge badge-{{ project.status_css }}">{{ project.pretty_status }}</span>
+              <h5 class="mb-1">
+                <a href="{{ project.urls.overview }}">{{ project|h }}</a>
+              </h5>
+              <div class="d-flex w-100 justify-content-between">
+                <p class="mb-1">{{ project.contact|default:project.customer }}</p>
+                <small>
                   <a href="{{ project.urls.createhours }}" data-toggle="ajaxmodal">
-                    {% include 'svg/plus.svg' %} {% trans 'hours' %}
+                    +{% trans 'hours' %}
                   </a>
-                </td>
-              </tr>
-            {% empty %}
-              <tr><th>{% trans 'no active projects!' %}</th></tr>
+                </small>
+
+              </div>
+            </div>
             {% endfor %}
-          </table>
+          </div>
         </div>
       </div>
     </div>
