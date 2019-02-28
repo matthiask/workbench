@@ -83,7 +83,7 @@ class Employment(Model):
         next = None
         for employment in self.user.employments.reverse():
             if next is None:
-                employment = next
+                next = employment
             else:
                 if employment.date_until >= next.date_from:
                     employment.date_until = next.date_from - timedelta(days=1)

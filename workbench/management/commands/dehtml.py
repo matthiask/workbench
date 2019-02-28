@@ -3,6 +3,7 @@ import re
 
 from django.core.management.base import BaseCommand
 
+from workbench.accounts.models import User
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
@@ -74,3 +75,10 @@ class Command(BaseCommand):
             if idx % 250 == 0:
                 print("processed %s services" % idx)
             service.save()
+        self.stdout.write("updating employments' until dates...")
+        for user in User.objects.all():
+            employment = user.employments.last()
+            if employment:
+                employment.save()
+                if not employment.percentage:
+                    employment.delete()
