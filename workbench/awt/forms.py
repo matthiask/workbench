@@ -17,7 +17,7 @@ class AbsenceSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["u"].choices = [
-            ("", _("All users")),
+            (0, _("All users")),
             (
                 _("Active"),
                 [
