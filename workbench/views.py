@@ -33,6 +33,9 @@ def search(request):
 
 
 HISTORY = {
+    "awt.year": "",
+    "awt.employment": "",
+    "awt.absence": "",
     "contacts.organization": "",
     "contacts.person": "",
     "deals.deal": "title, description, owned_by, stage, status, estimated_value",
