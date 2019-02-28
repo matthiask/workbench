@@ -65,6 +65,10 @@ th.number {
   vertical-align: top;
 }
 
+.btn-secondary svg {
+  fill: white;
+}
+
 .btn-danger.btn-inverse {
   background: #fff;
   color: #e74c3c;
