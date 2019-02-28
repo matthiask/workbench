@@ -1,4 +1,5 @@
 from decimal import Decimal
+from datetime import date
 
 from django.contrib import messages
 from django.db import models
@@ -114,6 +115,14 @@ class Project(Model):
             self.DECLINED: "warning",
         }[self.status]
 
+    def pretty_status(self):
+        parts = [self.get_status_display()]
+        if not self.invoicing:
+            parts.append(ugettext("no invoicing"))
+        if self.maintenance:
+            parts.append(ugettext("maintenance"))
+        return ", ".join(parts)
+
     @cached_property
     def overview(self):
         # Avoid circular imports
@@ -129,13 +138,39 @@ class Project(Model):
             ),
         }
 
-    def pretty_status(self):
-        parts = [self.get_status_display()]
-        if not self.invoicing:
-            parts.append(ugettext("no invoicing"))
-        if self.maintenance:
-            parts.append(ugettext("maintenance"))
-        return ", ".join(parts)
+    @cached_property
+    def grouped_services(self):
+        # Avoid circular imports
+        from workbench.logbook.models import LoggedHours
+
+        offers = {}
+        logged_hours_per_service = {
+            row["service"]: row["hours__sum"]
+            for row in LoggedHours.objects.order_by()
+            .filter(service__project=self)
+            .values("service")
+            .annotate(Sum("hours"))
+        }
+
+        for service in self.services.select_related("offer").prefetch_related(
+            "efforts__service_type", "costs"
+        ):
+            service.effort_hours = sum(
+                (effort.hours for effort in service.efforts.all()), 0
+            )
+            service.logged_hours = logged_hours_per_service.get(service.id, 0)
+
+            if service.offer not in offers:
+                offers[service.offer] = []
+            offers[service.offer].append(service)
+
+        return sorted(
+            offers.items(),
+            key=lambda item: (
+                item[0] and item[0].offered_on or date.max,
+                item[0] and item[0].pk or 1e100,
+            ),
+        )
 
 
 @model_urls()

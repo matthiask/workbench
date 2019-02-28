@@ -29,9 +29,7 @@ urlpatterns = [
     ),
     url(
         r"^picker/$",
-        ListView.as_view(
-            model=Project, template_name_suffix="_picker", paginate_by=10
-        ),
+        ListView.as_view(model=Project, template_name_suffix="_picker", paginate_by=10),
         name="projects_project_picker",
     ),
     url(

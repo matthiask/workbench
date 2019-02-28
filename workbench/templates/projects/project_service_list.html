@@ -11,58 +11,58 @@
     <h1>{{ view.project|h }} {% history_link view.project %}</h1>
     <ul class="nav nav-tabs">
       <li class="nav-item"><a class="nav-link" href="{{ view.project.urls.overview }}">{% trans 'overview' %}</a></li>
-      <li class="nav-item active"><a class="nav-link" href="{{ view.project.urls.services }}">{% trans 'services' %}</a></li>
+      <li class="nav-item"><a class="nav-link active" href="{{ view.project.urls.services }}">{% trans 'services' %}</a></li>
       <li class="nav-item"><a class="nav-link" href="{{ view.project.urls.costs }}">{% trans 'costs' %}</a></li>
     </ul>
 
 {% block objects %}
+{% for offer, services in view.project.grouped_services %}
+<div class="list-group list-group-flush mb-3">
+  <h5>
+    {% if offer %}
+      {{ offer|h }}
+      <span class="badge badge-{{ service.offer.status_css }}">{{ service.offer.pretty_status }}</span>
+    {% else %}
+      {% trans 'Not offered yet' %}
+    {% endif %}
+  </h5>
+  {% for service in services %}
+  <div class="list-group-item">
+    <div class="dropdown float-right">
+      <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown">{% trans 'actions' %}</button>
+      <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" href="{{ service.urls.update }}">{% trans 'update' %}</a>
+        <a class="dropdown-item" href="{{ service.urls.update }}">{% trans 'merge into' %}</a>
+      </div>
+    </div>
 
-<table class="table table-hover table-striped table-linearize">
-  <tbody>
-    {% for service in object_list|select_related:'offer'|prefetch_related:'efforts__service_type,costs'|services_info:view.project %}
-      {% ifchanged service.offer %}
-      <tr>
-        <th colspan="3">
-          {% if service.offer %}
-            <a href="{{ service.offer.get_absolute_url }}">
-              {{ service.offer|h }}
-              <span class="badge badge-{{ service.offer.status_css }}">{{ service.offer.pretty_status }}</span>
-            </a>
-          {% else %}Noch nicht offeriert
-          {% endif %}
-        </th>
-      </tr>
-      {% endifchanged %}
-      <tr>
-        <td style="padding-left:4rem">
-          {% if not service.offer or not service.offer.is_locked %}
-            <a href="{{ service.urls.update }}"><strong>{{ service }}</strong></a>
-          {% else %}
-            <strong>{{ service }}</strong>
-          {% endif %}
-          <br>
-          {{ service.description|linebreaksbr }}<br><br>
-          {% for effort in service.efforts.all %}
-            {{ effort.hours }}h {{ effort.service_type }}{% if not forloop.last %},{% endif %}
-          {% endfor %}
-          {% for cost in service.costs.all %}
-            {{ cost.title }} ({{ cost.cost|currency }}){% if not forloop.last %},{% endif %}
-          {% endfor %}
-        </td>
-        <th class="text-right">{{ service.logged_hours }}h / {{ service.effort_hours }}h</th>
-        <th style="white-space:nowrap">
-          <a href="{{ view.project.urls.createhours }}?service={{ service.pk }}"
-            data-toggle="ajaxmodal">
-            {% include "svg/plus.svg" %} {% trans 'hours' %}</a>
-          <a href="{{ view.project.urls.createcost }}?service={{ service.pk }}"
-            data-toggle="ajaxmodal">
-            {% include "svg/plus.svg" %} {% trans 'cost' %}</a>
-        </th>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
+    <h5 class="mb-1">{{ service.title }}</h5>
+    <p>
+      {{ service.description|linebreaksbr }}
+    </p>
+    <small class="row justify-content-between">
+      <span class="col-md-8">
+        {% for effort in service.efforts.all %}
+          {{ effort.hours }}h {{ effort.service_type }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+        {% for cost in service.costs.all %}
+          {{ cost.title }} ({{ cost.cost|currency }}){% if not forloop.last %},{% endif %}
+        {% endfor %}
+      </span>
+      <span class="col-md-2">{{ service.logged_hours }}h / {{ service.effort_hours }}h</span>
+      <span class="col-md-2">
+        <a href="{{ view.project.urls.createhours }}?service={{ service.pk }}"
+          data-toggle="ajaxmodal">
+          {% include "svg/plus.svg" %} {% trans 'hours' %}</a>
+        <a href="{{ view.project.urls.createcost }}?service={{ service.pk }}"
+          data-toggle="ajaxmodal">
+          {% include "svg/plus.svg" %} {% trans 'cost' %}</a>
+      </span>
+    </small>
+  </div>
+  {% endfor %}
+</div>
+{% endfor %}
 {% endblock %}
 
     {% comment %}

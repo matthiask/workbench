@@ -84,8 +84,8 @@ class ProjectForm(ModelForm):
 class ServiceForm(ModelForm):
     class Meta:
         model = Service
-        fields = ("title", "description")
-        widgets = {"description": Textarea()}
+        fields = ("project", "title", "description")
+        widgets = {"description": Textarea(), "project": Picker(model=Project)}
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project", None)
