@@ -113,7 +113,7 @@ _PICKER_TEMPLATE = """
     value="%(pretty)s" disabled>
   %(field)s
 </div>
-"""
+"""  # noqa
 
 
 class Picker(forms.TextInput):
