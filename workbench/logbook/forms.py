@@ -59,9 +59,14 @@ class LoggedHoursForm(ModelForm):
                     ),
                 )
                 if "service" not in initial:
-                    latest_on_project = LoggedHours.objects.filter(
-                        rendered_by=kwargs["request"].user, service__project=self.project,
-                    ).order_by("-created_at").first()
+                    latest_on_project = (
+                        LoggedHours.objects.filter(
+                            rendered_by=kwargs["request"].user,
+                            service__project=self.project,
+                        )
+                        .order_by("-created_at")
+                        .first()
+                    )
                     initial.setdefault("service", latest_on_project.service_id)
         else:
             self.project = kwargs["instance"].service.project

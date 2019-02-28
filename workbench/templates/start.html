@@ -64,9 +64,14 @@
       <div class="card-body">
         <div class="card-text">
           <table class="table table-condensed">
-            {% for hours in user.recent_hours|slice:':5' reversed %}
+            {% for hours in user.recent_hours %}
               <tr class="{{ hours.css }}">
                 <td>{{ hours.created_at|date:'H:i' }}</td>
+                <td>
+                  <a href="{{ hours.service.project.urls.detail }}">
+                    {{ hours.service.project|h }}
+                  </a>
+                </td>
                 <td>
                   <a href="{{ hours.urls.detail }}" data-toggle="ajaxmodal">
                     {{ hours }}
