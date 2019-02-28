@@ -11,24 +11,10 @@
       <div class="card-body">
         <div class="card-text">
 
-          <table class="table table-condensed">
-            <tr>
-              <td class="text-right">{{ user.hours.today }}h</td>
-              <th>
-                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
-                  {% trans 'Hours today' %}
-                </a>
-              </th>
-            </tr>
-            <tr>
-              <td class="text-right">{{ user.hours.week }}h</td>
-              <th>
-                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
-                  {% trans 'Hours this week' %}
-                </a>
-              </th>
-            </tr>
-          </table>
+          <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
+            {{ user.hours.today }}h {% trans 'today' %}</a> /
+          <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
+            {{ user.hours.week }}h {% trans 'this week' %}</a>
 
         </div>
       </div>

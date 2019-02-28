@@ -14,13 +14,13 @@ class ActivitySearchForm(forms.Form):
     s = forms.ChoiceField(
         choices=(("", _("All")), ("open", _("Open"))),
         required=False,
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.Select(attrs={"class": "custom-select"}),
     )
     owned_by = forms.TypedChoiceField(
         label=_("owned by"),
         coerce=int,
         required=False,
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.Select(attrs={"class": "custom-select"}),
     )
 
     def __init__(self, *args, **kwargs):

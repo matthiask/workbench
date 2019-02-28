@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
+from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import Invoice
@@ -23,13 +24,33 @@ class InvoiceSearchForm(forms.Form):
             (_("Exact"), Invoice.STATUS_CHOICES),
         ),
         required=False,
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.Select(attrs={"class": "custom-select"}),
     )
     org = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
         required=False,
         widget=Picker(model=Organization),
     )
+    owned_by = forms.TypedChoiceField(
+        label=_("owned by"),
+        coerce=int,
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["owned_by"].choices = [
+            ("", _("All users")),
+            (0, _("Owned by inactive users")),
+            (
+                _("Active"),
+                [
+                    (u.id, u.get_full_name())
+                    for u in User.objects.filter(is_active=True)
+                ],
+            ),
+        ]
 
     def filter(self, queryset):
         data = self.cleaned_data
@@ -41,6 +62,10 @@ class InvoiceSearchForm(forms.Form):
             queryset = queryset.filter(status=data.get("s"))
         if data.get("org"):
             queryset = queryset.filter(customer=data.get("org"))
+        if data.get("owned_by") == 0:
+            queryset = queryset.filter(owned_by__is_active=False)
+        elif data.get("owned_by"):
+            queryset = queryset.filter(owned_by=data.get("owned_by"))
 
         return queryset
 

@@ -22,7 +22,7 @@ class OrganizationSearchForm(forms.Form):
         required=False,
         empty_label=_("All groups"),
         label=_("Group"),
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.Select(attrs={"class": "custom-select"}),
     )
 
     def filter(self, queryset):

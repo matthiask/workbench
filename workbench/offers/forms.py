@@ -15,7 +15,7 @@ class OfferSearchForm(forms.Form):
     s = forms.ChoiceField(
         choices=(("", _("All states")),) + Offer.STATUS_CHOICES,
         required=False,
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.Select(attrs={"class": "custom-select"}),
     )
 
     def filter(self, queryset):

@@ -22,19 +22,14 @@
       <td class="text-right">{% trans 'groups' %}</td>
       <td>
         {% for group in organization.groups.all %}
-          <a href="{% url 'contacts_organization_list' %}?g={{ group.id }}">
-            {{ group }}
-          </a>
-          <br>
+          <a href="{% url 'contacts_organization_list' %}?g={{ group.id }}">{{ group }}</a>{% if not forloop.last %},{% endif %}
         {% empty %}&ndash;
         {% endfor %}
       </td>
     </tr>
     <tr>
       <td class="text-right">{% trans 'notes' %}</td>
-      <td>
-        {{ organization.notes|linebreaksbr|default:"&ndash;" }}
-      </td>
+      <td>{{ organization.notes|linebreaksbr|default:"&ndash;" }}</td>
     </tr>
   </table>
 

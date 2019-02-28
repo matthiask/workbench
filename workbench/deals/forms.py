@@ -10,7 +10,7 @@ class DealSearchForm(forms.Form):
     s = forms.ChoiceField(
         choices=(("", _("All states")),) + Deal.STATUS_CHOICES,
         required=False,
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.Select(attrs={"class": "custom-select"}),
     )
 
     def filter(self, queryset):
