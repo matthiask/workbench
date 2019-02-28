@@ -46,7 +46,7 @@ class ToolsMixin(object):
 
 
 class ListView(ToolsMixin, vanilla.ListView):
-    paginate_by = 50
+    paginate_by = 100
     search_form_class = None
     show_create_button = True
 
