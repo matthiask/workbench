@@ -28,6 +28,13 @@ urlpatterns = [
         name="projects_project_list",
     ),
     url(
+        r"^picker/$",
+        ListView.as_view(
+            model=Project, template_name_suffix="_picker", paginate_by=10
+        ),
+        name="projects_project_picker",
+    ),
+    url(
         r"^(?P<pk>\d+)/$",
         lambda request, pk: redirect("overview/"),
         name="projects_project_detail",
