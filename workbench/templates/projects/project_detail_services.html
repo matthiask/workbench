@@ -34,6 +34,10 @@
     {% for service in services %}
     <div class="list-group-item">
       <div class="float-right">
+        <a class="btn btn-secondary btn-sm" href="{{ service.urls.move }}?up" title="{% trans 'Move up' %}">
+          {% include 'svg/triangle-up.svg' %}</a>
+        <a class="btn btn-secondary btn-sm" href="{{ service.urls.move }}?down" title="{% trans 'Move down' %}">
+          {% include 'svg/triangle-down.svg' %}</a>
         <a class="btn btn-secondary btn-sm" href="{{ service.urls.update }}">{% trans 'Update' %}</a>
         <a class="btn btn-secondary btn-sm" href="{{ service.urls.update }}">{% trans 'Merge into' %}</a>
       </div>

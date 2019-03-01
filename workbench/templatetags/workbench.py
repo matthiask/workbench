@@ -84,11 +84,6 @@ def percentage_to_css(value):
 
 
 @register.filter
-def prefetch_related(queryset, rel):
-    return queryset.prefetch_related(*rel.split(","))
-
-
-@register.filter
 def group_hours_by_day(iterable):
     for day, instances in itertools.groupby(
         iterable, lambda logged: logged.rendered_on

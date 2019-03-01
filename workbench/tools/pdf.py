@@ -292,7 +292,9 @@ class PDFDocument(_PDFDocument):
         self.p(offer.description)
         self.spacer()
 
-        self.table_services(offer.services.prefetch_related("efforts", "costs"))
+        self.table_services(
+            offer.services.prefetch_related("efforts__service_type", "costs")
+        )
         self.table_total(offer)
 
     def process_invoice(self, invoice):
