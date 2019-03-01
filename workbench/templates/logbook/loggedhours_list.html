@@ -10,12 +10,12 @@
   <span class="text-right">{{ sum }}h</span>
 </h5>
 {% for hours in instances %}
-<a class="list-group-item list-group-item-action" href="{{ hours.get_absolute_url }}" data-toggle="ajaxmodal">
+<a class="list-group-item list-group-item-action px-0" href="{{ hours.get_absolute_url }}" data-toggle="ajaxmodal">
   <small class="d-flex justify-content-between">
     <span>{{ hours.service.project }}: {{ hours.service }}</span>
     <span>{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
   </small>
-  <p><strong>{{ hours.hours }}h</strong> {{ hours.description }}</p>
+  <p class="mb-0"><strong>{{ hours.hours }}h</strong> {{ hours.description }}</p>
 </a>
 {% endfor %}
 {% endfor %}

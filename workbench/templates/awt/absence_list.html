@@ -8,7 +8,7 @@
 {% ifchanged object.starts_on.year object.starts_on.month %}
 <h5 class="mt-3 mb-3">{{ object.starts_on|date:'F Y' }}</h5>
 {% endifchanged %}
-<a href="{{ object.urls.detail }}" class="list-group-item list-group-item-action {% if object.is_vacation %}list-group-item-success{% endif %}">
+<a href="{{ object.urls.detail }}" class="list-group-item list-group-item-action px-0">
   <span style="float:right" class="badge badge-{{ object.status_css }}">{{ object.pretty_status }}</span>
   <h5 class="mb-1">{{ object|h }}</h5>
   <div class="row">

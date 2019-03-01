@@ -5,7 +5,7 @@
 {% block objects %}
 <div class="list-group list-group-flush">
   {% for project in object_list|select_related:'customer,contact__organization,owned_by' %}
-  <div class="list-group-item">
+  <div class="list-group-item px-0">
     <span style="float:right" class="badge badge-{{ project.status_css }}">{{ project.pretty_status }}</span>
     <h5 class="mb-1">
       <a href="{{ project.urls.overview }}">{{ project|h }}</a>
