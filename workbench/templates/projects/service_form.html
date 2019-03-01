@@ -8,9 +8,11 @@
 <div class="row justify-content-center">
   <div class="col-md-10 col-lg-8">
     {% if object %}
-      <h2><a href="{{ object.project.get_absolute_url }}">
-          <small>{% include 'svg/chevron-left.svg' %}</small>
-          {{ object.project|h }}</a></h2>
+      <h2>
+        <a href="{{ object.project.urls.services }}">
+          <small>{% include 'svg/chevron-left.svg' %}</small> {{ object.project|h }}
+        </a>
+      </h2>
     {% endif %}
 
     <h1>

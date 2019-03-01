@@ -38,8 +38,10 @@
           {% include 'svg/triangle-up.svg' %}</a>
         <a class="btn btn-secondary btn-sm" href="{{ service.urls.move }}?down" title="{% trans 'Move down' %}">
           {% include 'svg/triangle-down.svg' %}</a>
-        <a class="btn btn-secondary btn-sm" href="{{ service.urls.update }}">{% trans 'Update' %}</a>
-        <a class="btn btn-secondary btn-sm" href="{{ service.urls.update }}">{% trans 'Merge into' %}</a>
+        <a class="btn btn-secondary btn-sm" href="{{ service.urls.update }}" title="{% trans 'Update' %}">
+          {% include 'svg/pencil.svg' %}</a>
+        <a class="btn btn-secondary btn-sm" href="{{ service.urls.update }}" title="{% trans 'Merge into' %}">
+          {% include 'svg/git-merge.svg' %}</a>
       </div>
 
       <h5 class="mb-1">{{ service.title }}</h5>
