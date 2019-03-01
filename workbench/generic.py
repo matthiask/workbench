@@ -58,7 +58,7 @@ class ListView(ToolsMixin, vanilla.ListView):
                 return HttpResponseRedirect(".")
 
             if hasattr(self.search_form, "response"):
-                response = self.search_form.response(request)
+                response = self.search_form.response(request, self.get_queryset())
                 if response:
                     return response
         return super().get(request, *args, **kwargs)

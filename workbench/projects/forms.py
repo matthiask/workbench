@@ -55,7 +55,7 @@ class ProjectSearchForm(forms.Form):
 
         return queryset
 
-    def response(self, request):
+    def response(self, request, queryset):
         if "s" not in request.GET:
             return http.HttpResponseRedirect("?s=open")
 

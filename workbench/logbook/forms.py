@@ -5,8 +5,11 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
 from workbench.accounts.models import User
+from workbench.contacts.models import Organization
 from workbench.logbook.models import LoggedHours, LoggedCost
-from workbench.tools.forms import ModelForm, Textarea
+from workbench.projects.models import Project
+from workbench.tools.forms import ModelForm, Picker, Textarea
+from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
 class LoggedHoursSearchForm(forms.Form):
@@ -17,13 +20,35 @@ class LoggedHoursSearchForm(forms.Form):
         widget=forms.Select(attrs={"class": "custom-select"}),
         empty_label=_("All users"),
     )
+    project = forms.ModelChoiceField(
+        queryset=Project.objects.all(),
+        label=_("project"),
+        required=False,
+        widget=Picker(model=Project),
+    )
+    organization = forms.ModelChoiceField(
+        queryset=Organization.objects.all(),
+        label=_("organization"),
+        required=False,
+        widget=Picker(model=Organization),
+    )
 
     def filter(self, queryset):
         data = self.cleaned_data
         if data.get("rendered_by"):
             queryset = queryset.filter(rendered_by=data.get("rendered_by"))
+        if data.get("project"):
+            queryset = queryset.filter(service__project=data.get("project"))
+        if data.get("organization"):
+            queryset = queryset.filter(service__project__customer=data.get("organization"))
 
         return queryset
+
+    def response(self, response, queryset):
+        if response.GET.get("xlsx"):
+            xlsx = WorkbenchXLSXDocument()
+            xlsx.logged_hours(queryset)
+            return xlsx.to_response("hours.xlsx")
 
 
 class LoggedHoursForm(ModelForm):

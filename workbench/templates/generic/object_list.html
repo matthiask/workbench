@@ -24,7 +24,7 @@
           {{ f }}
         {% endfor %}
 
-        {% block create_button %}
+        {% block search-form-buttons %}
         {% if view.show_create_button %}
           <a href="{{ view.model.urls.create }}" class="btn btn-secondary">
             {% include "svg/plus.svg" %}

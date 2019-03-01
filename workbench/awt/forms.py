@@ -33,7 +33,7 @@ class AbsenceSearchForm(forms.Form):
             queryset = queryset.filter(user=data.get("u"))
         return queryset
 
-    def response(self, request):
+    def response(self, request, queryset):
         if "u" not in request.GET:
             return http.HttpResponseRedirect("?u={}".format(request.user.id))
 
