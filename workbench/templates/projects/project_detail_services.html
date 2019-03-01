@@ -21,7 +21,7 @@
 
     <div>
       {% if offer %}
-        <a href="{{ offer.urls.pdf }}" class="btn btn-secondary btn-sm">PDF</a>
+        <a href="{{ offer.urls.pdf }}" class="btn btn-secondary btn-sm" target="_blank">PDF</a>
         <a href="{{ offer.urls.update }}" class="btn btn-secondary btn-sm">{% trans 'Update' %}</a>
         <a href="{{ offer.urls.delete }}" class="btn btn-outline-danger btn-sm">{% trans 'Delete' %}</a>
       {% else %}

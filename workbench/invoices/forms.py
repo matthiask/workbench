@@ -68,7 +68,7 @@ class InvoiceSearchForm(forms.Form):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
 
         return queryset.select_related(
-            "customer,contact__organization,owned_by,project__owned_by"
+            "customer", "contact__organization", "owned_by", "project__owned_by"
         )
 
 
