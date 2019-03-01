@@ -4,7 +4,7 @@
 
 {% block objects %}
 <div class="list-group list-group-flush">
-{% for day, sum, instances in object_list|select_related:'service__project,rendered_by'|group_hours_by_day %}
+{% for day, sum, instances in object_list|select_related:'service__project__owned_by,rendered_by'|group_hours_by_day %}
 <h5 class="mt-3 mb-3 d-flex justify-content-between">
   <span>{{ day|date:'d.m.Y' }}</span>
   <span class="text-right">{{ sum }}h</span>
