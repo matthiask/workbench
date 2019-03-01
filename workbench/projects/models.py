@@ -9,6 +9,7 @@ from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.html import format_html
+from django.utils.text import Truncator
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from workbench.accounts.models import User
@@ -205,11 +206,16 @@ class Service(Model):
         verbose_name_plural = _("services")
 
     def __str__(self):
-        return self.title
+        return " - ".join(
+            filter(None, (self.title, Truncator(self.description).chars(50)))
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._orig_offer = self.offer_id
+
+    def get_absolute_url(self):
+        return self.project.urls.url("services")
 
     def save(self, *args, **kwargs):
         if not self.position:

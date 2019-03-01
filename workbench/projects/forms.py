@@ -159,3 +159,24 @@ CostFormset = inlineformset_factory(
         ),
     },
 )
+
+
+class DeleteServiceForm(ModelForm):
+    class Meta:
+        model = Service
+        fields = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.loggedhours.exists() or self.instance.loggedcosts.exists():
+            self.fields["merge_into"] = forms.ModelChoiceField(
+                queryset=self.instance.project.services.exclude(pk=self.instance.pk),
+                label=_("Merge log into"),
+            )
+
+    def save(self):
+        into = self.cleaned_data["merge_into"]
+        self.instance.loggedhours.update(service=into)
+        self.instance.loggedcosts.update(service=into)
+        self.instance.delete()
+        return into

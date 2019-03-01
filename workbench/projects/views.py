@@ -98,13 +98,6 @@ class UpdateServiceView(generic.UpdateView):
         return self.object.project.get_absolute_url() + "services/"
 
 
-class DeleteServiceView(generic.DeleteView):
-    model = Service
-
-    def get_success_url(self):
-        return self.object.offer.get_absolute_url()
-
-
 class MoveServiceView(generic.DetailView):
     model = Service
 

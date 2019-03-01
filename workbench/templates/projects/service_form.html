@@ -80,8 +80,8 @@
             {% trans 'save' %}</button>
 
           {% if object.get_absolute_url %}
-          <a href="{{ object.urls.delete }}" class="btn float-right btn-outline-danger">
-            {% trans 'delete' %}</a>
+          <a href="{{ object.get_absolute_url }}" class="btn float-right btn-outline-danger">
+            {% trans 'cancel' %}</a>
           {% endif %}
         </div>
       </div>

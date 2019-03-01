@@ -7,14 +7,13 @@ from workbench.logbook.forms import LoggedHoursForm, LoggedCostForm
 from workbench.logbook.models import LoggedHours, LoggedCost
 from workbench.offers.forms import CreateOfferForm
 from workbench.offers.models import Offer
-from workbench.projects.forms import ProjectSearchForm, ProjectForm
+from workbench.projects.forms import ProjectSearchForm, ProjectForm, DeleteServiceForm
 from workbench.projects.models import Project, Service
 from workbench.projects.views import (
     ProjectDetailView,
     CreateRelatedView,
     CreateServiceView,
     UpdateServiceView,
-    DeleteServiceView,
     MoveServiceView,
 )
 from workbench.generic import ListView, CreateView, UpdateView, DeleteView
@@ -119,7 +118,9 @@ urlpatterns = [
     ),
     url(
         r"^service/(?P<pk>\d+)/$",
-        lambda request, pk: redirect(get_object_or_404(Service, pk=pk).project),
+        lambda request, pk: redirect(
+            get_object_or_404(Service, pk=pk).project.urls.url("services")
+        ),
         name="projects_service_detail",
     ),
     url(
@@ -129,7 +130,7 @@ urlpatterns = [
     ),
     url(
         r"^service/(?P<pk>\d+)/delete/$",
-        DeleteServiceView.as_view(),
+        UpdateServiceView.as_view(form_class=DeleteServiceForm),
         name="projects_service_delete",
     ),
     url(
