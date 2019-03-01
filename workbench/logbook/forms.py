@@ -7,7 +7,7 @@ from django.utils import timezone
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.logbook.models import LoggedHours, LoggedCost
-from workbench.projects.models import Project
+from workbench.projects.models import Project, Service
 from workbench.tools.forms import ModelForm, Picker, Textarea
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -32,6 +32,11 @@ class LoggedHoursSearchForm(forms.Form):
         required=False,
         widget=Picker(model=Organization),
     )
+    service = forms.ModelChoiceField(
+        queryset=Service.objects.all(),
+        required=False,
+        widget=forms.HiddenInput,
+    )
 
     def filter(self, queryset):
         data = self.cleaned_data
@@ -43,6 +48,10 @@ class LoggedHoursSearchForm(forms.Form):
             queryset = queryset.filter(
                 service__project__customer=data.get("organization")
             )
+
+        # "hidden" filters
+        if data.get("service"):
+            queryset = queryset.filter(service=data.get("service"))
 
         return queryset.select_related("service__project__owned_by", "rendered_by")
 

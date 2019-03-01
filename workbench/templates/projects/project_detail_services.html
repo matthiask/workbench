@@ -57,7 +57,11 @@
             {{ cost.title }} ({{ cost.cost|currency }}){% if not forloop.last %},{% endif %}
           {% endfor %}
         </span>
-        <span class="col-md-2">{{ service.logged_hours }}h / {{ service.effort_hours }}h</span>
+        <span class="col-md-2">
+          <a href="{% url 'logbook_loggedhours_list' %}?service={{ service.pk }}" target="_blank">
+            {{ service.logged_hours }}h / {{ service.effort_hours }}h
+          </a>
+        </span>
         <span class="col-md-2 text-right">
           <a href="{{ project.urls.createhours }}?service={{ service.pk }}"
             data-toggle="ajaxmodal">
