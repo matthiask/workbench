@@ -145,6 +145,9 @@ $(function() {
       } else {
         alert("Bitte zuerst Projekt auswählen");
       }
+    } else if (e.keyCode === 81) {
+      // q
+      $(".navbar input[type=search]").focus();
     } else if (e.keyCode === 13) {
       $(e.target)
         .parents("form")
