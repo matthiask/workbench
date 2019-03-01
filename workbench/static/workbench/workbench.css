@@ -2,6 +2,12 @@
   max-width: 10em;
 }
 
+@media screen and (max-width: 575px) {
+  .navbar.sticky-top {
+    position: static;
+  }
+}
+
 .container-fluid[role="main"] {
   padding-top: 15px;
   padding-bottom: 30px;

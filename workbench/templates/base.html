@@ -4,7 +4,7 @@
 
 {% block body %}
   <!-- Fixed navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light" style="background-color:#e3f2fd">
+  <nav class="navbar navbar-expand-lg navbar-light sticky-top" style="background-color:#e3f2fd">
     <a class="navbar-brand" href="/">Workbench</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -17,7 +17,7 @@
             <div class="input-group">
               <input class="form-control" type="search" placeholder="{% trans 'Search' %}" aria-label="{% trans 'Search' %}" name="q" value="{{ request.GET.q }}">
               <div class="input-group-append">
-                <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">{% include 'svg/search.svg' %}</button>
+                <button class="btn btn-outline-secondary" type="submit">{% include 'svg/search.svg' %}</button>
               </div>
             </div>
           </form>
