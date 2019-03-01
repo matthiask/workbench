@@ -31,13 +31,7 @@ class BootstrapFieldWrapper(FieldWrapper):
             extra_label_classes.append("form-check-label")
         elif isinstance(widget, (forms.RadioSelect, forms.CheckboxSelectMultiple)):
             widget.attrs["class"] = " ".join(
-                filter(
-                    None,
-                    (
-                        widget.attrs.get("class", ""),
-                        "my-2",
-                    ),
-                ),
+                filter(None, (widget.attrs.get("class", ""), "my-2"))
             )
         else:
             widget.attrs["class"] = " ".join(

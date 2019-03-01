@@ -40,9 +40,11 @@ class LoggedHoursSearchForm(forms.Form):
         if data.get("project"):
             queryset = queryset.filter(service__project=data.get("project"))
         if data.get("organization"):
-            queryset = queryset.filter(service__project__customer=data.get("organization"))
+            queryset = queryset.filter(
+                service__project__customer=data.get("organization")
+            )
 
-        return queryset
+        return queryset.select_related("service__project__owned_by", "rendered_by")
 
     def response(self, response, queryset):
         if response.GET.get("xlsx"):
