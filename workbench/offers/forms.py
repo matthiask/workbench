@@ -47,6 +47,24 @@ class CreateOfferForm(PostalAddressSelectionForm):
             organization=self.project.customer, person=self.project.contact
         )
 
+        self.service_candidates = Service.objects.filter(
+            Q(project=self.instance.project), Q(offer__isnull=True)
+        )
+
+        self.fields["services"] = forms.ModelMultipleChoiceField(
+            queryset=self.service_candidates,
+            label=_("services"),
+            widget=forms.CheckboxSelectMultiple,
+            required=False,
+            initial=self.service_candidates.values_list("pk", flat=True),
+        )
+
+    def save(self):
+        instance = super().save()
+        self.cleaned_data["services"].update(offer=instance)
+        instance.save()
+        return instance
+
 
 class OfferForm(WarningsForm, ModelForm):
     user_fields = default_to_current_user = ("owned_by",)
@@ -66,19 +84,18 @@ class OfferForm(WarningsForm, ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance.pk:
-            self.service_candidates = Service.objects.filter(
-                Q(project=self.instance.project),
-                Q(offer__isnull=True) | Q(offer=self.instance),
-            )
+        self.service_candidates = Service.objects.filter(
+            Q(project=self.instance.project),
+            Q(offer__isnull=True) | Q(offer=self.instance),
+        )
 
-            self.fields["services"] = forms.ModelMultipleChoiceField(
-                queryset=self.service_candidates,
-                label=_("services"),
-                widget=forms.CheckboxSelectMultiple,
-                required=False,
-                initial=self.instance.services.values_list("pk", flat=True),
-            )
+        self.fields["services"] = forms.ModelMultipleChoiceField(
+            queryset=self.service_candidates,
+            label=_("services"),
+            widget=forms.CheckboxSelectMultiple,
+            required=False,
+            initial=self.instance.services.values_list("pk", flat=True),
+        )
 
     def clean(self):
         data = super().clean()

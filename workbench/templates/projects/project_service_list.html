@@ -24,7 +24,7 @@
       &nbsp;
       <span class="badge badge-{{ offer.status_css }}">{{ offer.pretty_status }}</span>
     {% else %}
-      <h5><a href="{{ view.project.createoffer }}">{% trans 'Not offered yet' %}</a></h5>
+      <h5><a href="{{ view.project.urls.createoffer }}">{% trans 'Not offered yet' %}</a></h5>
     {% endif %}
   </div>
   <div class="list-group list-group-flush">
