@@ -549,6 +549,7 @@ dblink(
 ) AS p(created timestamp, date date, hours numeric, notes text, created_by_id int, worker_id int, job_id int, activitygroup varchar(200))
 WHERE s.project_id=p.job_id AND s.title=CONCAT('Import:', activitygroup);
 
+UPDATE logbook_loggedhours SET fts_document=logbook_loggedhours_fts_document(id);
 
 
 --
