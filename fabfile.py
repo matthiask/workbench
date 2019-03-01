@@ -1,4 +1,4 @@
-from fabric.api import cd, env, local, run, task
+from fabric.api import cd, env, execute, local, run, task
 
 
 env.forward_agent = True
@@ -64,4 +64,9 @@ def update_requirements():
     local("python3 -m venv venv")
     local("venv/bin/pip install -U pip wheel")
     local("venv/bin/pip install -U -r requirements-to-freeze.txt")
+    execute("freeze")
+
+
+@task
+def freeze():
     local("venv/bin/pip freeze -l > requirements.txt")

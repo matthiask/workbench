@@ -35,6 +35,7 @@ INSTALLED_APPS = [
         "django.contrib.messages",
         "django.contrib.staticfiles",
         "django.contrib.postgres",
+        "admin_ordering",
         "bootstrap4",
         "fineforms",
         "django.forms",

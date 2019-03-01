@@ -1,8 +1,11 @@
 from django.contrib import admin
 
+from admin_ordering.admin import OrderableAdmin
+
 from workbench.deals.models import Deal, Stage
 
 
+@admin.register(Deal)
 class DealAdmin(admin.ModelAdmin):
     list_display = ("title", "owned_by", "estimated_value", "status", "created_at")
     list_display_links = ("title",)
@@ -11,7 +14,8 @@ class DealAdmin(admin.ModelAdmin):
     search_fields = ("title", "description")
 
 
-admin.site.register(Deal, DealAdmin)
-admin.site.register(
-    Stage, list_display=("title", "position"), list_editable=("position",)
-)
+@admin.register(Stage)
+class StageAdmin(OrderableAdmin, admin.ModelAdmin):
+    list_display = ["title", "position"]
+    list_editable = ["position"]
+    ordering_field = "position"

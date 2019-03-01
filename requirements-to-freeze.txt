@@ -1,5 +1,6 @@
 coverage
 Django
+django-admin-ordering
 django-bootstrap4
 django-debug-toolbar
 django-fineforms
@@ -15,3 +16,4 @@ Pillow
 psycopg2-binary
 reportlab
 speckenv
+xlsxdocument
