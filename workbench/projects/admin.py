@@ -25,16 +25,11 @@ class ServiceAdmin(admin.ModelAdmin):
         "cost",
     )
     inlines = [EffortInline, CostInline]
-
-
-class ServiceInline(admin.TabularInline):
-    model = models.Service
-    extra = 0
+    raw_id_fields = ["project", "offer"]
 
 
 @admin.register(models.Project)
 class ProjectAdmin(admin.ModelAdmin):
-    inlines = [ServiceInline]
     list_display = ("title", "customer", "owned_by", "status")
     list_filter = ("status",)
     raw_id_fields = ("customer", "contact", "owned_by")

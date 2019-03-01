@@ -46,7 +46,7 @@ class Year(Model):
         verbose_name_plural = _("years")
 
     def __str__(self):
-        return self.year
+        return str(self.year)
 
     @property
     def days(self):
