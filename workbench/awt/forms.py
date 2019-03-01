@@ -31,7 +31,7 @@ class AbsenceSearchForm(forms.Form):
         data = self.cleaned_data
         if data.get("u"):
             queryset = queryset.filter(user=data.get("u"))
-        return queryset
+        return queryset.select_related("user")
 
     def response(self, request, queryset):
         if "u" not in request.GET:

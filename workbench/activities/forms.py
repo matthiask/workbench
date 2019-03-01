@@ -46,7 +46,9 @@ class ActivitySearchForm(forms.Form):
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
 
-        return queryset
+        return queryset.select_related(
+            "project", "deal", "contact__organization", "owned_by"
+        )
 
 
 class ActivityForm(ModelForm):

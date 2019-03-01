@@ -23,7 +23,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for object in object_list|select_related:'project,deal,contact__organization,owned_by' %}
+    {% for object in object_list %}
       <tr>
         <th><a href="{{ object.urls.detail }}" data-toggle="ajaxmodal">
             {{ object }}

@@ -53,7 +53,7 @@ class ProjectSearchForm(forms.Form):
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
 
-        return queryset
+        return queryset.select_related("customer", "contact__organization", "owned_by")
 
     def response(self, request, queryset):
         if "s" not in request.GET:

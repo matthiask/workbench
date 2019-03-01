@@ -4,7 +4,7 @@
 
 {% block objects %}
 <div class="list-group list-group-flush">
-{% for object in object_list|select_related:'user' %}
+{% for object in object_list %}
 {% ifchanged object.starts_on.year object.starts_on.month %}
 <h5 class="mt-3 mb-3">{{ object.starts_on|date:'F Y' }}</h5>
 {% endifchanged %}

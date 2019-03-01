@@ -18,7 +18,7 @@ class DealSearchForm(forms.Form):
         if data.get("s"):
             queryset = queryset.filter(status=data.get("s"))
 
-        return queryset
+        return queryset.select_related("stage", "owned_by")
 
 
 class DealForm(ModelForm):

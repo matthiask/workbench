@@ -15,7 +15,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for deal in object_list|select_related:'stage,owned_by' %}
+    {% for deal in object_list %}
       <tr>
         <th><a href="{{ deal.urls.detail }}">{{ deal }}</a></th>
         <td>{{ deal.owned_by.get_short_name }}</td>

@@ -84,11 +84,6 @@ def percentage_to_css(value):
 
 
 @register.filter
-def select_related(queryset, rel):
-    return queryset.select_related(*rel.split(","))
-
-
-@register.filter
 def prefetch_related(queryset, rel):
     return queryset.prefetch_related(*rel.split(","))
 
