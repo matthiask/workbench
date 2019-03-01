@@ -17,7 +17,7 @@
   <tbody>
     {% for offer in object_list|select_related:'project__customer,project__contact__organization' %}
       <tr>
-        <th><a href="{{ offer.urls.detail }}">
+        <th><a href="{{ offer.get_absolute_url }}">
           {{ offer|h }}
         </a></th>
         <td>{{ offer.project.contact|default:offer.project.customer }}</td>

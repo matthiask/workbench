@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
+from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service, Effort, Cost
 from workbench.tools.forms import ModelForm, Textarea, Picker
 
@@ -84,14 +85,20 @@ class ProjectForm(ModelForm):
 class ServiceForm(ModelForm):
     class Meta:
         model = Service
-        fields = ("project", "title", "description")
-        widgets = {"description": Textarea(), "project": Picker(model=Project)}
+        fields = ["offer", "title", "description"]
+        widgets = {"description": Textarea()}
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project", None)
-        if self.project:
-            kwargs.setdefault("initial", {}).setdefault("project", self.project)
+        if not self.project:
+            self.project = kwargs["instance"].project
+
+        offer = kwargs["request"].GET.get("offer")
+        if offer:
+            kwargs.setdefault("initial", {}).setdefault("offer", offer)
+
         super().__init__(*args, **kwargs)
+
         kwargs.pop("request")
         self.formsets = (
             OrderedDict(
@@ -105,7 +112,9 @@ class ServiceForm(ModelForm):
         )
 
         if self.project:
-            self.instance.project = self.project
+            self.fields["offer"].queryset = self.project.offers.all()
+        else:
+            self.fields["offer"].queryset = Offer.objects.none()
 
     def is_valid(self):
         return all(
@@ -115,6 +124,8 @@ class ServiceForm(ModelForm):
 
     def save(self):
         instance = super().save(commit=False)
+        if not instance.project:
+            instance.project = self.project
         for formset in self.formsets.values():
             formset.save()
         instance.save()

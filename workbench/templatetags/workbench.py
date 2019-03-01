@@ -12,7 +12,7 @@ from django.utils.html import format_html, mark_safe
 from django.utils.translation import ugettext as _
 
 from workbench.logbook.models import LoggedHours
-from workbench.offers.models import Effort
+from workbench.projects.models import Effort
 from workbench.tools.formats import local_date_format
 
 

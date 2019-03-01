@@ -1,0 +1,32 @@
+{% extends "projects/project_detail.html" %}
+
+{% load bootstrap4 history i18n querystring workbench %}
+
+{% block title %}{% trans 'services' %} - {{ block.super }}{% endblock %}
+
+{% block project-content %}
+<table class="table">
+  {% for activity in project.activities.all %}
+    <tr class="{{ activity.css }}">
+      <th>
+        <a href="{{ activity.urls.detail }}" data-toggle="ajaxmodal">
+          {{ activity }}
+        </a>
+      </th>
+      <td>
+        {{ activity.owned_by.get_full_name }}
+      </td>
+      <td>
+        {{ activity.pretty_status }}
+      </td>
+    </tr>
+  {% empty %}
+    <tr><th class="nopad">{% trans 'No activities' %}</th></tr>
+  {% endfor %}
+</table>
+<a href="{% url 'activities_activity_create' %}?project={{ project.pk }}"
+  class="btn btn-secondary"
+  data-toggle="ajaxmodal">
+  {% include "svg/plus.svg" %} {% trans 'activity' %}
+</a>
+{% endblock %}

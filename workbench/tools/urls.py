@@ -49,7 +49,8 @@ def model_urls(reverse_kwargs_fn=lambda object: {"pk": object.pk}, default="deta
                 return helper
 
         cls.urls = _descriptor()
-        cls.get_absolute_url = lambda self: self.urls.url(default)
+        if not hasattr(cls, "get_absolute_url"):
+            cls.get_absolute_url = lambda self: self.urls.url(default)
         return cls
 
     return _dec

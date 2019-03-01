@@ -1,5 +1,6 @@
 from decimal import Decimal
 from datetime import date
+from itertools import chain
 
 from django.contrib import messages
 from django.db import models
@@ -184,7 +185,7 @@ class Service(Model):
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     offer = models.ForeignKey(
         "offers.Offer",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="services",
         verbose_name=_("offer"),
         blank=True,
@@ -206,6 +207,10 @@ class Service(Model):
     def __str__(self):
         return self.title
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._orig_offer = self.offer_id
+
     def save(self, *args, **kwargs):
         if not self.position:
             max_pos = self.__class__._default_manager.aggregate(m=Max("position"))["m"]
@@ -213,9 +218,29 @@ class Service(Model):
         if self.pk:
             efforts = self.efforts.all()
             self.effort_hours = sum((e.hours for e in efforts), Decimal())
-            self.cost += sum((e.cost for e in efforts), Decimal())
-            self.cost += sum((c.cost for c in self.costs.all()), Decimal())
+            self.cost = sum((i.cost for i in chain(efforts, self.costs.all())), 0)
         super().save(*args, **kwargs)
+
+        # Circular imports
+        from workbench.offers.models import Offer
+
+        ids = filter(None, [self._orig_offer, self.offer_id])
+        for offer in Offer.objects.filter(id__in=ids):
+            offer.save()
+
+    save.alters_data = True
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        if self._orig_offer:
+            # Circular imports
+            from workbench.offers.models import Offer
+
+            ids = filter(None, [self._orig_offer, self.offer_id])
+            for offer in Offer.objects.filter(id__in=ids):
+                offer.save()
+
+    delete.alters_data = True
 
     @classmethod
     def allow_update(cls, instance, request):

@@ -1,5 +1,4 @@
 from decimal import Decimal
-import itertools
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -8,7 +7,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.projects.models import Project, Effort, Cost
+from workbench.projects.models import Project
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import ModelWithTotal, SearchQuerySet
 from workbench.tools.urls import model_urls
@@ -68,6 +67,9 @@ class Offer(ModelWithTotal):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        return self.project.urls.url("services")
+
     def save(self, *args, **kwargs):
         new = False
         if not self.pk:
@@ -89,16 +91,7 @@ class Offer(ModelWithTotal):
 
     def _calculate_total(self):
         self.subtotal = sum(
-            (
-                item.cost
-                for item in itertools.chain(
-                    Effort.objects.filter(service__offer=self).select_related(
-                        "service_type"
-                    ),
-                    Cost.objects.filter(service__offer=self),
-                )
-            ),
-            Decimal(),
+            (service.cost for service in self.services.all()), Decimal()
         )
         super()._calculate_total()
 

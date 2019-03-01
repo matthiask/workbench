@@ -5,13 +5,13 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 
+from workbench import generic
 from workbench.offers.models import Offer
 from workbench.projects.forms import ServiceForm
 from workbench.projects.models import Project, Service
-from workbench.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 
-class CreateRelatedView(CreateView):
+class CreateRelatedView(generic.CreateView):
     def get_form(self, data=None, files=None, **kwargs):
         self.project = get_object_or_404(Project, pk=self.kwargs.pop("pk"))
         return super().get_form(data, files, project=self.project, **kwargs)
@@ -53,7 +53,7 @@ class CostView(object):
                 )
 
 
-class ProjectDetailView(DetailView):
+class ProjectDetailView(generic.DetailView):
     model = Project
     project_view = None
 
@@ -63,17 +63,11 @@ class ProjectDetailView(DetailView):
 
         return super().get_context_data(**kwargs)
 
-
-class ServiceListView(ListView):
-    template_name = "projects/project_service_list.html"
-    paginate_by = None
-
-    def get_root_queryset(self):
-        self.project = get_object_or_404(Project, pk=self.kwargs["pk"])
-        return self.model.objects.filter(project=self.project)
+    def get_template_names(self):
+        return "projects/project_detail_%s.html" % self.project_view
 
 
-class CreateServiceView(CreateView):
+class CreateServiceView(generic.CreateView):
     model = Service
 
     def get(self, request, *args, **kwargs):
@@ -96,7 +90,7 @@ class CreateServiceView(CreateView):
         return self.object.urls.url("update")
 
 
-class UpdateServiceView(UpdateView):
+class UpdateServiceView(generic.UpdateView):
     model = Service
     form_class = ServiceForm
 
@@ -104,14 +98,14 @@ class UpdateServiceView(UpdateView):
         return self.object.project.get_absolute_url() + "services/"
 
 
-class DeleteServiceView(DeleteView):
+class DeleteServiceView(generic.DeleteView):
     model = Service
 
     def get_success_url(self):
         return self.object.offer.get_absolute_url()
 
 
-class MoveServiceView(DetailView):
+class MoveServiceView(generic.DetailView):
     model = Service
 
     def get(self, request, *args, **kwargs):

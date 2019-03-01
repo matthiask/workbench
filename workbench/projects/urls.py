@@ -12,7 +12,6 @@ from workbench.projects.models import Project, Service
 from workbench.projects.views import (
     ProjectDetailView,
     CreateRelatedView,
-    ServiceListView,
     CreateServiceView,
     UpdateServiceView,
     DeleteServiceView,
@@ -43,9 +42,19 @@ urlpatterns = [
         name="projects_project_overview",
     ),
     url(
+        r"^(?P<pk>\d+)/services/$",
+        ProjectDetailView.as_view(project_view="services"),
+        name="projects_project_services",
+    ),
+    url(
         r"^(?P<pk>\d+)/costs/$",
         ProjectDetailView.as_view(project_view="costs"),
         name="projects_project_costs",
+    ),
+    url(
+        r"^(?P<pk>\d+)/activities/$",
+        ProjectDetailView.as_view(project_view="activities"),
+        name="projects_project_activities",
     ),
     url(
         r"^create/$",
@@ -80,11 +89,6 @@ urlpatterns = [
     #     r'^(?P<pk>\d+)/planning/$',
     #     views.PlanningView.as_view(),
     #     name='projects_project_planning'),
-    url(
-        r"^(?P<pk>\d+)/services/$",
-        ServiceListView.as_view(model=Service, show_create_button=False),
-        name="projects_project_services",
-    ),
     # HOURS
     url(
         r"^(?P<pk>\d+)/createhours/$",
