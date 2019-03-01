@@ -89,6 +89,8 @@ class ServiceForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project", None)
+        if self.project:
+            kwargs.setdefault("initial", {}).setdefault("project", self.project)
         super().__init__(*args, **kwargs)
         kwargs.pop("request")
         self.formsets = (
