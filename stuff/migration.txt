@@ -551,6 +551,30 @@ WHERE s.project_id=p.job_id AND s.title=CONCAT('Import:', activitygroup);
 
 UPDATE logbook_loggedhours SET fts_document=logbook_loggedhours_fts_document(id);
 
+--
+-- Update services
+--
+
+UPDATE projects_service SET position=pk, cost=0;
+
+UPDATE projects_service s SET effort_hours=subquery.effort_hours_sum
+FROM (
+  SELECT SUM(hours) AS effort_hours_sum, service_id FROM projects_effort GROUP BY service_id
+) AS subquery
+WHERE s.id=subquery.service_id;
+
+UPDATE projects_service s SET cost=cost + subquery.cost_sum
+FROM (
+  SELECT SUM(hours * st.billing_per_hour) AS cost_sum, service_id FROM projects_effort e LEFT JOIN services_servicetype st ON e.service_type_id=st.id GROUP BY service_id
+) AS subquery
+WHERE s.id=subquery.service_id;
+
+UPDATE projects_service s SET cost=cost + subquery.cost_sum
+FROM (
+  SELECT SUM(cost) AS cost_sum, service_id FROM projects_cost GROUP BY service_id
+) AS subquery
+WHERE s.id=subquery.service_id;
+
 
 --
 --

@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from workbench.accounts.models import User
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
-from workbench.projects.models import Project, Service
+from workbench.projects.models import Project
 
 
 class _DeHTMLParser(HTMLParser):
@@ -68,13 +68,6 @@ class Command(BaseCommand):
         for instance in Project.objects.all():
             instance.description = dehtml(instance.description)
             instance.save(update_fields=("description",))
-        self.stdout.write("refreshing services...")
-        for idx, service in enumerate(
-            Service.objects.prefetch_related("efforts__service_type", "costs")
-        ):
-            if idx % 250 == 0:
-                print("processed %s services" % idx)
-            service.save()
         self.stdout.write("updating employments' until dates...")
         for user in User.objects.all():
             employment = user.employments.last()
