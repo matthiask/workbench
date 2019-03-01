@@ -12,4 +12,4 @@ class FactoriesTestCase(TestCase):
         types = factories.service_types()
         self.assertAlmostEqual(types.production.billing_per_hour, 180)
 
-        self.assertEqual(LoggedAction.objects.count(), 17)
+        self.assertEqual(LoggedAction.objects.count(), 13)

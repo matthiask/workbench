@@ -5,8 +5,8 @@ import types
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import Invoice
-from workbench.offers.models import Offer, Service
-from workbench.projects.models import Project
+from workbench.offers.models import Offer
+from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 
 
@@ -54,6 +54,14 @@ class ProjectFactory(factory.DjangoModelFactory):
         model = Project
 
 
+class ServiceFactory(factory.DjangoModelFactory):
+    project = factory.SubFactory(ProjectFactory)
+    effort_hours = 0
+
+    class Meta:
+        model = Service
+
+
 # OFFERS ######################################################################
 class OfferFactory(factory.DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
@@ -61,14 +69,6 @@ class OfferFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Offer
-
-
-class ServiceFactory(factory.DjangoModelFactory):
-    offer = factory.SubFactory(OfferFactory)
-    effort_hours = 0
-
-    class Meta:
-        model = Service
 
 
 # INVOICES ####################################################################
