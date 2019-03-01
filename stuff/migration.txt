@@ -25,7 +25,8 @@ VALUES
 (3, 'Grafik', 160, 30),
 (4, 'Multimedia & Film', 180, 40),
 (5, 'Programmierung & IT', 180, 50),
-(6, 'Projektorganisation', 130, 60);
+(6, 'Projektorganisation', 130, 60),
+(7, 'Administration', 100, 70);
 
 INSERT INTO deals_stage
 (id, title, position)
@@ -411,23 +412,27 @@ dblink(
 
 UPDATE projects_effort SET service_type_id=2
 FROM projects_service s
-WHERE projects_effort.service_id=s.id AND s.description ~ '^(Konzept:|Online Marketing:|User Experience:)';
+WHERE projects_effort.service_id=s.id AND s.title ~ '^(Konzept:|Online Marketing:|User Experience:)';
 
 UPDATE projects_effort SET service_type_id=3
 FROM projects_service s
-WHERE projects_effort.service_id=s.id AND s.description ~'^(Grafik)';
+WHERE projects_effort.service_id=s.id AND s.title ~'^(Grafik)';
 
 UPDATE projects_effort SET service_type_id=4
 FROM projects_service s
-WHERE projects_effort.service_id=s.id AND s.description ~'^(Multimedia|3D)';
+WHERE projects_effort.service_id=s.id AND s.title ~'^(Multimedia|3D)';
 
 UPDATE projects_effort SET service_type_id=5
 FROM projects_service s
-WHERE projects_effort.service_id=s.id AND s.description ~ '^(Programmierung|IT-Dienstleistungen)';
+WHERE projects_effort.service_id=s.id AND s.title ~ '^(Programmierung|IT-Dienstleistungen)';
 
 UPDATE projects_effort SET service_type_id=6
 FROM projects_service s
-WHERE projects_effort.service_id=s.id AND s.description ~ '^(Projektorganisation|Administration|Intern|Marketing)';
+WHERE projects_effort.service_id=s.id AND s.title ~ '^(Projektorganisation|Intern|Marketing)';
+
+UPDATE projects_effort SET service_type_id=7
+FROM projects_service s
+WHERE projects_effort.service_id=s.id AND s.title ~ '^(Administration)';
 
 
 --
