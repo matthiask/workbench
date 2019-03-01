@@ -5,14 +5,11 @@ import itertools
 
 from django import template
 from django.db import models
-from django.db.models import Sum
 from django.template.defaultfilters import linebreaksbr
 from django.utils import timezone
 from django.utils.html import format_html, mark_safe
 from django.utils.translation import ugettext as _
 
-from workbench.logbook.models import LoggedHours
-from workbench.projects.models import Effort
 from workbench.tools.formats import local_date_format
 
 
@@ -106,29 +103,3 @@ def timesince_short(dttm):
     if delta > 120:
         return _("%s minutes ago") % (delta // 60)
     return _("%s seconds ago") % delta
-
-
-@register.filter
-def services_info(services, project):
-    services = list(services)
-
-    logged_hours_per_service = {
-        row["service"]: row["hours__sum"]
-        for row in LoggedHours.objects.order_by()
-        .filter(service__in=services)
-        .values("service")
-        .annotate(Sum("hours"))
-    }
-    effort_hours_per_service = {
-        row["service"]: row["hours__sum"]
-        for row in Effort.objects.order_by()
-        .filter(service__in=services)
-        .values("service")
-        .annotate(Sum("hours"))
-    }
-
-    for service in services:
-        service.logged_hours = logged_hours_per_service.get(service.id, 0)
-        service.effort_hours = effort_hours_per_service.get(service.id, 0)
-
-    return services
