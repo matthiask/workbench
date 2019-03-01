@@ -59,10 +59,12 @@ class Command(BaseCommand):
         self.stdout.write("dehtmling invoices...")
         for instance in Invoice.objects.all():
             instance.description = dehtml(instance.description)
+            instance.postal_address = instance.postal_address.strip()
             instance.save(update_fields=("description",))
         self.stdout.write("dehtmling offers...")
         for instance in Offer.objects.all():
             instance.description = dehtml(instance.description)
+            instance.postal_address = instance.postal_address.strip()
             instance.save(update_fields=("description",))
         self.stdout.write("dehtmling projects...")
         for instance in Project.objects.all():

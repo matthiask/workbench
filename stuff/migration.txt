@@ -128,16 +128,6 @@ dblink(
 ) AS p(person_id int, type int, employer_name varchar(300), first_name varchar(100), name varchar(300), function text, address text, zip_code varchar(20), city varchar(100), country varchar(100));
 
 
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^\n+', '');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^\n+', '');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^\n+', '');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n+$', '');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n+$', '');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n+$', '');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n');
-
 INSERT INTO contacts_postaladdress
 (person_id, type, postal_address, weight)
 SELECT person_id, 'override', full_override, 0 FROM
@@ -146,6 +136,16 @@ dblink(
     'SELECT a.person_id, a.full_override FROM addressbook_address a LEFT JOIN addressbook_person p ON a.person_id=p.id WHERE company=FALSE AND full_override!='''' AND active=TRUE'
 ) AS p(person_id int, full_override text);
 
+
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^[\n\r]+', '', 'g');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^[\n\r]+', '', 'g');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^[\n\r]+', '', 'g');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '[\n\r]$', '', 'g');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '[\n\r]$', '', 'g');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '[\n\r]$', '', 'g');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n', 'g');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n', 'g');
+UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n', 'g');
 
 --
 -- Assign persons to organizations
