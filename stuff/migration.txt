@@ -376,7 +376,7 @@ SELECT
 FROM projects_project,
 dblink(
 	'dbname=fineware_feinheit',
-	'SELECT id, created, name, notes, offer_company, offer_last_name, offer_first_name, offer_address, offer_zip_code, offer_city, offer_country, offer_date, _offer_id, customer_id, contact_id, job_id, manager_id, description, closed_date, state, subtotal, discount, tax, total FROM offers_joboffer'
+	'SELECT jo.id, jo.created, jo.name, jo.notes, jo.offer_company, jo.offer_last_name, jo.offer_first_name, jo.offer_address, jo.offer_zip_code, jo.offer_city, jo.offer_country, COALESCE(jo.offer_date, po.offer_date, jo.closed_date), jo._offer_id, jo.customer_id, jo.contact_id, jo.job_id, jo.manager_id, jo.description, jo.closed_date, jo.state, jo.subtotal, jo.discount, jo.tax, jo.total FROM offers_joboffer jo LEFT JOIN offers_projectoffer po ON jo.projectoffer_id=po.id'
 ) AS p(id int, created timestamp, name varchar(100), notes text, offer_company text, offer_last_name text, offer_first_name text, offer_address text, offer_zip_code text, offer_city text, offer_country text, offer_date date, _offer_id text, customer_id int, contact_id int, job_id int, manager_id int, description text, closed_date date, state int, subtotal numeric(10,2), discount numeric(10,2), tax numeric(10,2), total numeric(10,2))
 WHERE p.job_id IS NOT NULL AND p.job_id=projects_project.id;
 
