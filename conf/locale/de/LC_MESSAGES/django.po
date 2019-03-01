@@ -23,7 +23,7 @@ msgstr "Konten"
 
 #: workbench/accounts/middleware.py:27
 msgid "Please authenticate."
-msgstr "Bitte authentifizieren."
+msgstr "Bitte anmelden."
 
 #: workbench/accounts/models.py:42 workbench/contacts/models.py:142
 msgid "email"
