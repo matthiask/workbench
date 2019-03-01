@@ -112,7 +112,7 @@ _PICKER_TEMPLATE = """
   </a>
   </div>
   <input type="text" class="form-control" id="%(id)s_pretty"
-    value="%(pretty)s" disabled>
+    value="%(pretty)s" placeholder="%(placeholder)s" disabled>
 </div>
 %(field)s
 """  # noqa
@@ -151,6 +151,7 @@ class Picker(forms.TextInput):
                 ),
                 "field": format_html("<input{} />", flatatt(final_attrs)),
                 "pretty": escape(pretty),
+                "placeholder": opts.verbose_name,
             }
         )
 
