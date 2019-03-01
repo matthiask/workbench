@@ -21,7 +21,7 @@
       {% csrf_token %}
 
       {% if form.warnings %}
-        <div class="alert alert-warning alert-dismissable alert-link">
+        <div class="alert alert-warning alert-dismissable">
           <button class="close" type="button" data-dismiss="alert" aria-hidden="true">&#215;</button>
           {% for warning in form.warnings %}
             {{ warning }}<br>

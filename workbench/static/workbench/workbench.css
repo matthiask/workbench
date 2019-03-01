@@ -54,6 +54,10 @@ tbody th > a {
   display: inline !important;
 }
 
+.invalid-feedback {
+  display: block !important;
+}
+
 .form-search input,
 .form-search select {
   max-width: 10em;
