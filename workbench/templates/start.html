@@ -56,26 +56,21 @@
       </h3></div>
       <div class="card-body">
         <div class="card-text">
-          <table class="table table-condensed">
+
+          <div class="list-group list-group-flush">
             {% for hours in user.recent_hours %}
-              <tr class="{{ hours.css }}">
-                <td>{{ hours.created_at|date:'H:i' }}</td>
-                <td>
-                  <a href="{{ hours.service.project.urls.detail }}">
-                    {{ hours.service.project|h }}
-                  </a>
-                </td>
-                <td>
-                  <a href="{{ hours.urls.detail }}" data-toggle="ajaxmodal">
-                    {{ hours }}
-                  </a>
-                </td>
-                <td class="text-right">{{ hours.hours }}h</td>
-              </tr>
+            <a class="list-group-item list-group-item-action" href="{{ hours.get_absolute_url }}" data-toggle="ajaxmodal">
+              <small class="d-flex justify-content-between">
+                <span>{{ hours.service.project }}: {{ hours.service }}</span>
+                <span>{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
+              </small>
+              <p><strong>{{ hours.hours }}h</strong> {{ hours.description }}</p>
+            </a>
             {% empty %}
-              <tr><th>{% trans 'no recent hours!' %}</th></tr>
+              {% trans 'no recent hours!' %}
             {% endfor %}
-          </table>
+          </div>
+
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@
 {% load bootstrap4 i18n querystring workbench %}
 
 {% block objects %}
+<div class="list-group list-group-flush">
 {% for object in object_list|select_related:'user' %}
 {% ifchanged object.starts_on.year object.starts_on.month %}
 <h5 class="mt-3 mb-3">{{ object.starts_on|date:'F Y' }}</h5>
@@ -23,6 +24,7 @@
   </div>
 </a>
 {% endfor %}
+</div>
 
 <p>
   {{ paginator.count }} {{ view.meta.verbose_name_plural }}
