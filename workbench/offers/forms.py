@@ -23,7 +23,11 @@ class OfferSearchForm(forms.Form):
         if data.get("s"):
             queryset = queryset.filter(status=data.get("s"))
 
-        return queryset
+        return queryset.select_related(
+            "project__owned_by",
+            "project__customer",
+            "project__contact__organization",
+        )
 
 
 class CreateOfferForm(PostalAddressSelectionForm):

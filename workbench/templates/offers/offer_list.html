@@ -3,40 +3,27 @@
 {% load bootstrap4 i18n querystring workbench %}
 
 {% block objects %}
+<div class="list-group list-group-flush">
+  {% for offer in object_list %}
+  <a href="{{ offer.get_absolute_url }}" class="list-group-item list-group-item-action px-0">
+    <span style="float:right" class="badge badge-{{ offer.status_css }}">{{ offer.pretty_status }}</span>
+    <h5 class="mb-1">{{ offer|h }}</h5>
+    <div class="row">
+      <div class="col-md-5 text-truncate">{{ offer.project|h }}</div>
+      <div class="col-md-4 text-truncate">{{ offer.project.contact|default:offer.project.customer }}</div>
+      <div class="col-md-3 text-truncate text-md-right">
+        {{ offer.total_excl_tax|currency }} exkl. /
+        {{ offer.total|currency }}
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
 
-<table class="table table-hover table-striped table-linearize">
-  <thead>
-    <tr>
-      <th>{% trans 'offer' %}</th>
-      <th>{% trans 'customer' %}</th>
-      <th>{% trans 'project' %}</th>
-      <th>{% trans 'status' %}</th>
-      <th class="text-right">{% trans 'total excl. tax' %}</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for offer in object_list|select_related:'project__customer,project__contact__organization' %}
-      <tr>
-        <th><a href="{{ offer.get_absolute_url }}">
-          {{ offer|h }}
-        </a></th>
-        <td>{{ offer.project.contact|default:offer.project.customer }}</td>
-        <td>{{ offer.project }}</td>
-        <td><span class="badge badge-{{ offer.status_css }}">{{ offer.pretty_status }}</span></td>
-        <td class="text-right">{{ offer.total_excl_tax|currency }}</td>
-      </tr>
-    {% endfor %}
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="5">
-        {{ paginator.count }} {{ view.meta.verbose_name_plural }}
-        {% if view.root_queryset_count != paginator.count %}
-        (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
-        {% endif %}
-      </td>
-    </tr>
-  </tfoot>
-</table>
-
+<p>
+  {{ paginator.count }} {{ view.meta.verbose_name_plural }}
+  {% if view.root_queryset_count != paginator.count %}
+  (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
+  {% endif %}
+</p>
 {% endblock %}
