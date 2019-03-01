@@ -25,6 +25,16 @@ VALUES
 (4, 'Programmierung', 180, 40),
 (5, 'Projektorganisation', 130, 50);
 
+INSERT INTO deals_stage
+(id, title, position)
+VALUES
+(1, 'Sammelbecken', 10),
+(2, 'Erstkontakt', 20),
+(3, 'Auftragsschärfung', 30),
+(4, 'unter 80% ', 40),
+(5, '80% später', 50),
+(6, '80% jetzt', 60);
+
 
 --
 -- User accounts
