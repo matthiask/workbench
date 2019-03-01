@@ -110,6 +110,15 @@ $(function() {
       window.location.href = '/invoices/';
     } else if (e.keyCode === 65) {  // a
       window.location.href = '/activities/';
+    } else if (e.keyCode === 76) {
+      var el = document.querySelector("[data-createhours]");
+      if (el) {
+        $.get(el.href, function(data) {
+          initModal(data);
+        });
+      } else {
+        alert("Bitte zuerst Projekt auswählen");
+      }
     } else if (e.keyCode === 13) {
       $(e.target).parents('form').submit();
     } else {
