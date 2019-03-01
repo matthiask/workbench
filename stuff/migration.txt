@@ -324,13 +324,66 @@ FROM dblink(
 ) AS p(paid_on date, notes text, invoice_id int)
 WHERE invoices_invoice.id=p.invoice_id;
 
+--
+-- Import offers
+--
+
+INSERT INTO offers_offer (
+	id,
+	subtotal,
+	discount,
+	tax_rate,
+	total,
+	offered_on,
+	title,
+	description,
+	status,
+	postal_address,
+	owned_by_id,
+	project_id,
+	created_at,
+	liable_to_vat,
+	_code,
+	closed_on
+)
+SELECT
+	p.id,
+	p.subtotal,
+	p.discount,
+	p.tax,
+	p.total,
+	p.offer_date,
+	p.name,
+	p.description,
+	p.state,
+	CONCAT(
+		offer_company, E'\n',
+		offer_first_name, ' ', offer_last_name, E'\n',
+		offer_address, E'\n',
+		offer_zip_code, ' ', offer_city, E'\n',
+		CASE WHEN offer_country = 'CH' THEN '' ELSE offer_country END
+	),
+	p.manager_id,
+	p.job_id,
+	p.created,
+	p.tax > 0,
+	p._offer_id::int,
+	p.closed_date
+
+FROM projects_project,
+dblink(
+	'dbname=fineware_feinheit',
+	'SELECT id, created, name, notes, offer_company, offer_last_name, offer_first_name, offer_address, offer_zip_code, offer_city, offer_country, offer_date, _offer_id, customer_id, contact_id, job_id, manager_id, description, closed_date, state, subtotal, discount, tax, total FROM offers_joboffer'
+) AS p(id int, created timestamp, name varchar(100), notes text, offer_company text, offer_last_name text, offer_first_name text, offer_address text, offer_zip_code text, offer_city text, offer_country text, offer_date date, _offer_id text, customer_id int, contact_id int, job_id int, manager_id int, description text, closed_date date, state int, subtotal numeric(10,2), discount numeric(10,2), tax numeric(10,2), total numeric(10,2))
+WHERE p.job_id IS NOT NULL AND p.job_id=projects_project.id;
+
 
 --
 -- Import services / stories
 --
 
 INSERT INTO projects_service
-(id, created_at, title, position, description, project_id, cost, effort_hours)
+(id, created_at, title, position, description, project_id, cost, effort_hours, offer_id)
 SELECT
   id,
   NOW(),
@@ -338,13 +391,13 @@ SELECT
   0,
   notes,
   job_id,
-  0.0, -- FIXME calculate cost
-  0.0 -- FIXME calculate effort hours
-FROM
-dblink(
+  0.0,
+  0.0,
+  p.offer_id
+FROM dblink(
     'dbname=fineware_feinheit',
-    'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
-) AS p(id int, activity_name text, notes text, job_id int);
+    'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
+) AS p(id int, activity_name text, notes text, job_id int, offer_id int);
 
 INSERT INTO projects_effort
 (service_id, service_type_id, hours)
