@@ -25,26 +25,29 @@
         <a href="{% url 'projects_project_list' %}">{% trans 'active projects' %}</a>
       </h3></div>
 
-      <div class="list-group list-group-flush">
-        {% for project in user.active_projects|select_related:'customer,contact__organization,owned_by' %}
-        <div class="list-group-item">
-          <span style="float:right" class="badge badge-{{ project.status_css }}">{{ project.pretty_status }}</span>
-          <h5 class="mb-1">
-            <a href="{{ project.urls.overview }}">{{ project|h }}</a>
-          </h5>
-          <div class="d-flex w-100 justify-content-between">
-            <p class="mb-1">{{ project.contact|default:project.customer }}</p>
-            <small>
-              <a href="{{ project.urls.createhours }}" data-toggle="ajaxmodal">
-                +{% trans 'hours' %}
-              </a>
-            </small>
+      {% if user.active_projects %}
+        <div class="list-group list-group-flush">
+          {% for project in user.active_projects %}
+          <div class="list-group-item">
+            <span style="float:right" class="badge badge-{{ project.status_css }}">{{ project.pretty_status }}</span>
+            <h5 class="mb-1">
+              <a href="{{ project.urls.overview }}">{{ project|h }}</a>
+            </h5>
+            <div class="d-flex w-100 justify-content-between">
+              <p class="mb-1">{{ project.contact|default:project.customer }}</p>
+              <small>
+                <a href="{{ project.urls.createhours }}" data-toggle="ajaxmodal">
+                  +{% trans 'hours' %}
+                </a>
+              </small>
 
+            </div>
           </div>
+          {% endfor %}
         </div>
-        {% endfor %}
-
-      </div>
+      {% else %}
+        <div class="card-body">{% trans 'no active projects' %}</div>
+      {% endif %}
     </div>
 
     <div class="card mb-3">
@@ -52,30 +55,31 @@
         <a href="{% url 'logbook_loggedhours_list' %}">{% trans 'recent hours' %}</a>
       </h3></div>
 
-      <div class="list-group list-group-flush">
-        {% for hours in user.recent_hours %}
-        <a class="list-group-item list-group-item-action" href="{{ hours.get_absolute_url }}" data-toggle="ajaxmodal">
-          <small class="d-flex justify-content-between">
-            <span>{{ hours.service.project }}: {{ hours.service }}</span>
-            <span>{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
-          </small>
-          <p class="card-text"><strong>{{ hours.hours }}h</strong> {{ hours.description }}</p>
-        </a>
-        {% empty %}
-          {% trans 'no recent hours!' %}
-        {% endfor %}
-      </div>
-
+      {% if user.recent_hours %}
+        <div class="list-group list-group-flush">
+          {% for hours in user.recent_hours %}
+          <a class="list-group-item list-group-item-action" href="{{ hours.get_absolute_url }}" data-toggle="ajaxmodal">
+            <small class="d-flex justify-content-between">
+              <span>{{ hours.service.project }}: {{ hours.service }}</span>
+              <span>{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
+            </small>
+            <p class="card-text"><strong>{{ hours.hours }}h</strong> {{ hours.description }}</p>
+          </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="card-body">{% trans 'no recent hours' %}</div>
+      {% endif %}
     </div>
 
     <div class="card mb-3">
       <div class="card-header"><h3>
         <a href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a>
       </h3></div>
-      <div class="card-body">
-        <div class="card-text">
+      {% if user.important_activities %}
+        <div class="card-body">
           <table class="table table-condensed">
-            {% for activity in user.activities.open %}
+            {% for activity in user.important_activities %}
             <tr class="{{ activity.css }}">
                 <th><a href="{{ activity.urls.detail }}" data-toggle="ajaxmodal">
                     {{ activity }}
@@ -87,12 +91,12 @@
                 </td>
                 <td>{{ activity.pretty_status }}</td>
               </tr>
-            {% empty %}
-              <tr><th>{% trans 'no activities!' %}</th></tr>
             {% endfor %}
           </table>
         </div>
-      </div>
+      {% else %}
+        <div class="card-body">{% trans 'no important activities' %}</div>
+      {% endif %}
     </div>
 
   </div>

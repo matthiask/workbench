@@ -118,4 +118,8 @@ class User(Model, AbstractBaseUser):
             id__in=self.loggedhours.filter(
                 rendered_on__gte=date.today() - timedelta(days=7)
             ).values("service__project")
-        ).select_related("owned_by")
+        ).select_related("customer", "contact__organization", "owned_by")
+
+    @cached_property
+    def important_activities(self):
+        return self.activities.open()

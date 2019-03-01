@@ -21,7 +21,7 @@ def login_required(get_response):
 
         set_user_name("user-0-anonymous")
 
-        if request.path.startswith("/accounts/"):
+        if request.path.startswith(("/accounts/", "/favicon", "/robots", "/sitemap")):
             return get_response(request)
 
         messages.info(request, _("Please authenticate."))
