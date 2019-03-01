@@ -12,3 +12,4 @@
 /htmlcov
 /static
 .tox
+node_modules
