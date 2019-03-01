@@ -18,12 +18,12 @@ def search(request):
         results = [
             (queryset.model._meta.verbose_name_plural, queryset.search(q)[:101])
             for queryset in (
+                Project.objects.select_related("owned_by"),
                 Organization.objects.all(),
                 Person.objects.all(),
-                Project.objects.select_related("owned_by"),
                 Invoice.objects.select_related("project"),
-                Deal.objects.all(),
                 Offer.objects.all(),
+                Deal.objects.all(),
             )
         ]
     else:

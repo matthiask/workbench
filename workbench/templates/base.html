@@ -23,9 +23,9 @@
           </form>
         </li>
         {% mark_current request.path %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'projects_project_list' %}">{% trans 'projects' %}</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'contacts_organization_list' %}">{% trans 'organizations' %}</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'contacts_person_list' %}">{% trans 'people' %}</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'projects_project_list' %}">{% trans 'projects' %}</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'invoices_invoice_list' %}">{% trans 'invoices' %}</a></li>
         {% endmark_current %}
       </ul>
