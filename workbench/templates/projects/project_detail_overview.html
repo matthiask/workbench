@@ -58,7 +58,9 @@
                 {% for offer in offers %}
                   <tr>
                     <th><a href="{{ offer.get_absolute_url }}">{{ offer }}</a></th>
-                    <td>{{ offer.pretty_status }}</td>
+                    <td>
+                      <span class="badge badge-{{ offer.status_css }}">{{ offer.pretty_status }}</span>
+                    </td>
                     <td class="text-right">{{ offer.total_excl_tax|currency }}</td>
                   </tr>
                 {% endfor %}
@@ -85,9 +87,11 @@
               <tbody>
                 {% for invoice in invoices %}
                   <tr>
-                    <th><a href="{{ invoice.get_absolute_url }}">{{ invoice }}</a></th>
+                    <th><a href="{{ invoice.get_absolute_url }}">{{ invoice|h }}</a></th>
                     <td>{{ invoice.get_type_display }}</td>
-                    <td>{{ invoice.pretty_status }}</td>
+                    <td>
+                      <span class="badge badge-{{ invoice.status_css }}">{{ invoice.pretty_status }}</span>
+                    </td>
                     <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
                   </tr>
                 {% endfor %}
