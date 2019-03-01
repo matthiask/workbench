@@ -555,7 +555,7 @@ UPDATE logbook_loggedhours SET fts_document=logbook_loggedhours_fts_document(id)
 -- Update services
 --
 
-UPDATE projects_service SET position=pk, cost=0;
+UPDATE projects_service SET position=id, cost=0;
 
 UPDATE projects_service s SET effort_hours=subquery.effort_hours_sum
 FROM (
