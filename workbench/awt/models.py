@@ -74,20 +74,17 @@ class Year(Model):
 
         users = User.objects.filter(is_active=True)
         user_dict = {u.id: u for u in users}
-        target_hours = [self.working_time_per_day * days for days in self.months]
+        target_days = list(self.months)
 
         months = defaultdict(
-            lambda: [
-                {
-                    "percentage": 0,
-                    "available_vacation_days": 0,
-                    "vacation_days": 0,
-                    "other_absences": 0,
-                    "target": 0,
-                    "hours": 0,
-                }
-                for i in range(12)
-            ]
+            lambda: {
+                "percentage": [0] * 12,
+                "available_vacation_days": [0] * 12,
+                "vacation_days": [0] * 12,
+                "other_absences": [0] * 12,
+                "target": [0] * 12,
+                "hours": [0] * 12,
+            }
         )
         dpm = days_per_month(self.year)
 
@@ -98,6 +95,7 @@ class Year(Model):
             base_vacation_days = (
                 Decimal(employment.vacation_weeks) * 5 / 12 * base_percentage / 100
             )
+            user = months[user_dict[employment.user_id]]
             for month, days in monthly_days(
                 employment.date_from, employment.date_until
             ):
@@ -105,11 +103,12 @@ class Year(Model):
                     continue
                 elif month.year > self.year:
                     break
-                record = months[user_dict[employment.user_id]][month.month - 1]
                 factor = Decimal(days) / dpm[month.month - 1]
-                record["target"] += target_hours[month.month - 1] * factor
-                record["percentage"] += base_percentage * factor
-                record["available_vacation_days"] += base_vacation_days * factor
+                user["target"][month.month - 1] += target_days[month.month - 1] * factor
+                user["percentage"][month.month - 1] += base_percentage * factor
+                user["available_vacation_days"][month.month - 1] += (
+                    base_vacation_days * factor
+                )
 
         for row in (
             LoggedHours.objects.order_by()
@@ -119,16 +118,16 @@ class Year(Model):
             .values("rendered_by", "month")
             .annotate(Sum("hours"))
         ):
-            record = months[user_dict[row["rendered_by"]]][row["month"] - 1]
-            record["hours"] += row["hours__sum"]
+            months[user_dict[row["rendered_by"]]]["hours"][row["month"] - 1] += row[
+                "hours__sum"
+            ]
 
         for absence in Absence.objects.filter(
             user__in=users, starts_on__year=self.year
         ):
-            record = months[user_dict[absence.user_id]][absence.starts_on.month - 1]
-            record[
+            months[user_dict[absence.user_id]][
                 "vacation_days" if absence.is_vacation else "other_absences"
-            ] += absence.days
+            ][absence.starts_on.month - 1] += absence.days
 
         pprint(dict(months))
         return months
