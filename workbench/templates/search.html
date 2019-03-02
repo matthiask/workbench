@@ -18,7 +18,10 @@
           <li>{% trans 'Only showing 100 items. Additional results have been omitted.' %}</li>
         {% else %}
           <li>
-            <a href="{{ result.get_absolute_url }}">{% firstof result.html result|h %}</a>
+            <a href="{{ result.get_absolute_url }}">
+              {{ result|h }}
+              <span class="badge badge-{{ result.status_css }}">{{ result.pretty_status }}</span>
+            </a>
           </li>
         {% endif %}
         {% if forloop.last %}

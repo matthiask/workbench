@@ -21,8 +21,8 @@ def search(request):
                 Project.objects.select_related("owned_by"),
                 Organization.objects.all(),
                 Person.objects.all(),
-                Invoice.objects.select_related("project"),
-                Offer.objects.all(),
+                Invoice.objects.select_related("project", "owned_by"),
+                Offer.objects.select_related("project"),
                 Deal.objects.all(),
             )
         ]
