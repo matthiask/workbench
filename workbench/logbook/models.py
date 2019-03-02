@@ -114,7 +114,7 @@ class LoggedCost(Model):
     class Meta:
         ordering = ("-rendered_on", "-created_at")
         verbose_name = _("logged cost")
-        verbose_name_plural = _("logged cost")
+        verbose_name_plural = _("logged costs")
 
     def __str__(self):
         return self.description

@@ -12,7 +12,7 @@ from workbench.generic import ListView, DetailView, CreateView, UpdateView, Dele
 
 
 urlpatterns = [
-    url(r"^$", lambda request: redirect("contacts_organization_list"), name="contacts"),
+    url(r"^$", lambda request: redirect("contacts_person_list"), name="contacts"),
     url(
         r"^organizations/$",
         OrganizationListView.as_view(),

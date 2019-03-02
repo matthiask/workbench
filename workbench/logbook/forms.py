@@ -62,6 +62,56 @@ class LoggedHoursSearchForm(forms.Form):
             return xlsx.to_response("hours.xlsx")
 
 
+class LoggedCostSearchForm(forms.Form):
+    created_by = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        label=_("created by"),
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+        empty_label=_("All users"),
+    )
+    project = forms.ModelChoiceField(
+        queryset=Project.objects.all(),
+        label=_("project"),
+        required=False,
+        widget=Picker(model=Project),
+    )
+    organization = forms.ModelChoiceField(
+        queryset=Organization.objects.all(),
+        label=_("organization"),
+        required=False,
+        widget=Picker(model=Organization),
+    )
+    service = forms.ModelChoiceField(
+        queryset=Service.objects.all(),
+        required=False,
+        widget=forms.HiddenInput,
+    )
+
+    def filter(self, queryset):
+        data = self.cleaned_data
+        if data.get("created_by"):
+            queryset = queryset.filter(created_by=data.get("created_by"))
+        if data.get("project"):
+            queryset = queryset.filter(service__project=data.get("project"))
+        if data.get("organization"):
+            queryset = queryset.filter(
+                service__project__customer=data.get("organization")
+            )
+
+        # "hidden" filters
+        if data.get("service"):
+            queryset = queryset.filter(service=data.get("service"))
+
+        return queryset.select_related("service__project__owned_by", "created_by")
+
+    def response(self, response, queryset):
+        if response.GET.get("xlsx"):
+            xlsx = WorkbenchXLSXDocument()
+            xlsx.logged_costs(queryset)
+            return xlsx.to_response("costs.xlsx")
+
+
 class LoggedHoursForm(ModelForm):
     user_fields = default_to_current_user = ("rendered_by",)
 
