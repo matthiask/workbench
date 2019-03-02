@@ -24,10 +24,48 @@
         </li>
         {% mark_current request.path %}
         <li class="nav-item"><a class="nav-link" href="{% url 'projects_project_list' %}">{% trans 'projects' %}</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'contacts_organization_list' %}">{% trans 'organizations' %}</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'contacts_person_list' %}">{% trans 'people' %}</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'offers_offer_list' %}">{% trans 'offers' %}</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'invoices_invoice_list' %}">{% trans 'invoices' %}</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {% trans 'contacts' %}
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{% url 'contacts_person_list' %}">{% trans 'people' %}</a>
+            <a class="dropdown-item" href="{% url 'contacts_organization_list' %}">{% trans 'organizations' %}</a>
+            {# <div class="dropdown-divider"></div> #}
+          </div>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {% trans 'logbook' %}
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{% url 'logbook_loggedhours_list' %}">{% trans 'logged hours' %}</a>
+            <a class="dropdown-item" href="{% url 'awt_absence_list' %}">{% trans 'absences' %}</a>
+            {# <div class="dropdown-divider"></div> #}
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {% trans 'reports' %}
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="#">{% trans 'annual working time' %}</a>
+            <a class="dropdown-item" href="#">{% trans 'not invoiced work' %}</a>
+            {# <div class="dropdown-divider"></div> #}
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {% trans 'admin' %}
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="#">{% trans 'payment lists' %}</a>
+            {# <div class="dropdown-divider"></div> #}
+          </div>
+        </li>
         {% endmark_current %}
       </ul>
 
@@ -41,9 +79,6 @@
             {% if request.user.is_admin %}
             <a class="dropdown-item" href="{% url 'admin:index' %}">{% trans 'Admin panel' %}</a>
             {% endif %}
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'logbook_loggedhours_list' %}">{% trans 'logged hours' %}</a>
-            <a class="dropdown-item" href="{% url 'awt_absence_list' %}">{% trans 'absences' %}</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'deals_deal_list' %}">{% trans 'deals' %}</a>
             <a class="dropdown-item" href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a>
