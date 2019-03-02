@@ -15,7 +15,7 @@ class EmploymentAdmin(admin.ModelAdmin):
         "date_from",
         "date_until",
         "percentage",
-        "vacation_days",
+        "vacation_weeks",
         "notes",
     ]
     list_filter = ["user", "date_from"]

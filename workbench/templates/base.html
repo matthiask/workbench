@@ -53,7 +53,7 @@
             {% trans 'reports' %}
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="#">{% trans 'annual working time' %}</a>
+            <a class="dropdown-item" href="{% url 'awt_year_current' %}">{% trans 'annual working time' %}</a>
             <a class="dropdown-item" href="#">{% trans 'not invoiced work' %}</a>
             <a class="dropdown-item" href="#">{% trans 'overdrawn projects' %}</a>
             <a class="dropdown-item" href="#">{% trans 'invoicing statistics' %}</a>

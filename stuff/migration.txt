@@ -546,7 +546,7 @@ INSERT INTO awt_employment (
   date_from,
   date_until,
   percentage,
-  vacation_days,
+  vacation_weeks,
   notes
 )
 SELECT
@@ -554,7 +554,7 @@ SELECT
   date,
   date '9999-12-31',
   percent,
-  vacation_days,
+  vacation_days * 20 / percent,
   notes
 FROM
 dblink(
