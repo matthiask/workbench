@@ -25,15 +25,15 @@ def deploy():
         run("venv/bin/python manage.py collectstatic --noinput")
         run("sudo systemctl restart workbench.service")
 
-    with cd("www/dbpag-workbench/"):
-        run("git checkout master")
-        run("git fetch origin")
-        run("git merge --ff-only origin/master")
-        run('find . -name "*.pyc" -delete')
-        run("venv/bin/pip install -r requirements.txt")
-        run("venv/bin/python manage.py migrate")
-        run("venv/bin/python manage.py collectstatic --noinput")
-        run("sudo systemctl restart dbpag-workbench.service")
+    # with cd("www/dbpag-workbench/"):
+    #     run("git checkout master")
+    #     run("git fetch origin")
+    #     run("git merge --ff-only origin/master")
+    #     run('find . -name "*.pyc" -delete')
+    #     run("venv/bin/pip install -r requirements.txt")
+    #     run("venv/bin/python manage.py migrate")
+    #     run("venv/bin/python manage.py collectstatic --noinput")
+    #     run("sudo systemctl restart dbpag-workbench.service")
 
 
 @task
