@@ -95,7 +95,9 @@ class Year(Model):
             "-date_from"
         ):
             base_percentage = Decimal(employment.percentage)
-            base_vacation_days = Decimal(employment.vacation_weeks) * 5 / 12
+            base_vacation_days = (
+                Decimal(employment.vacation_weeks) * 5 / 12 * base_percentage / 100
+            )
             for month, days in monthly_days(
                 employment.date_from, employment.date_until
             ):
