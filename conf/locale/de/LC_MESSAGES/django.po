@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-01 22:52+0100\n"
+"POT-Creation-Date: 2019-03-02 09:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,7 +72,7 @@ msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
 #: workbench/activities/__init__.py:10 workbench/activities/models.py:73
-#: workbench/templates/base.html:49
+#: workbench/templates/base.html:84
 #: workbench/templates/deals/deal_detail.html:32
 #: workbench/templates/projects/project_detail.html:17
 #: workbench/templates/start.html:77
@@ -205,7 +205,7 @@ msgstr "aufgezeichnete Aktion"
 msgid "logged actions"
 msgstr "aufgezeichnete Aktionen"
 
-#: workbench/awt/__init__.py:10
+#: workbench/awt/__init__.py:10 workbench/templates/base.html:55
 msgid "annual working time"
 msgstr "Jahresarbeitszeit"
 
@@ -345,7 +345,7 @@ msgstr "Abwesenheiten"
 msgid "Absences of past years are locked."
 msgstr "Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."
 
-#: workbench/contacts/__init__.py:10
+#: workbench/contacts/__init__.py:10 workbench/templates/base.html:31
 msgid "contacts"
 msgstr "Kontakte"
 
@@ -399,7 +399,7 @@ msgstr "Hauptkontakt"
 msgid "organization"
 msgstr "Organisation"
 
-#: workbench/contacts/models.py:43 workbench/templates/base.html:27
+#: workbench/contacts/models.py:43 workbench/templates/base.html:35
 #: workbench/templates/contacts/organization_detail.html:5
 msgid "organizations"
 msgstr "Organisationen"
@@ -417,7 +417,7 @@ msgstr "Z.B. Lieber Hans."
 msgid "person"
 msgstr "Person"
 
-#: workbench/contacts/models.py:79 workbench/templates/base.html:28
+#: workbench/contacts/models.py:79 workbench/templates/base.html:34
 #: workbench/templates/contacts/organization_detail.html:14
 msgid "people"
 msgstr "Personen"
@@ -450,7 +450,7 @@ msgid "postal addresses"
 msgstr "Postadressen"
 
 #: workbench/deals/__init__.py:10 workbench/deals/models.py:81
-#: workbench/templates/base.html:48
+#: workbench/templates/base.html:83
 #: workbench/templates/deals/deal_detail.html:5
 msgid "deals"
 msgstr "Geschäfte"
@@ -557,7 +557,7 @@ msgid "Delete %s"
 msgstr "%s löschen"
 
 #: workbench/invoices/__init__.py:10 workbench/invoices/models.py:116
-#: workbench/templates/base.html:30
+#: workbench/templates/base.html:28
 #: workbench/templates/contacts/organization_detail.html:37
 #: workbench/templates/projects/project_detail_overview.html:74
 msgid "invoices"
@@ -761,6 +761,10 @@ msgstr "Total CHF inkl. MwSt"
 msgid "total CHF"
 msgstr "Total CHF"
 
+#: workbench/logbook/__init__.py:10 workbench/templates/base.html:42
+msgid "logbook"
+msgstr "Logbuch"
+
 #: workbench/logbook/forms.py:18 workbench/logbook/models.py:33
 msgid "rendered by"
 msgstr "Erbracht von"
@@ -769,7 +773,7 @@ msgstr "Erbracht von"
 #: workbench/projects/models.py:205 workbench/projects/models.py:283
 #: workbench/projects/models.py:319
 #: workbench/templates/logbook/loggedhours_detail.html:17
-#: workbench/templates/projects/project_detail_services.html:81
+#: workbench/templates/projects/project_detail_services.html:85
 msgid "service"
 msgstr "Leistung"
 
@@ -787,8 +791,8 @@ msgstr "Erbracht am"
 #: workbench/projects/models.py:291
 #: workbench/templates/logbook/loggedhours_detail.html:35
 #: workbench/templates/projects/project_detail_overview.html:111
-#: workbench/templates/projects/project_detail_services.html:64
-#: workbench/templates/projects/project_detail_services.html:84
+#: workbench/templates/projects/project_detail_services.html:68
+#: workbench/templates/projects/project_detail_services.html:88
 #: workbench/templates/projects/project_list.html:17
 #: workbench/templates/start.html:40
 msgid "hours"
@@ -816,7 +820,7 @@ msgstr "Tut mir leid, zu früh."
 #: workbench/projects/models.py:327
 #: workbench/templates/projects/project_detail_costs.html:17
 #: workbench/templates/projects/project_detail_costs.html:63
-#: workbench/templates/projects/project_detail_services.html:67
+#: workbench/templates/projects/project_detail_services.html:71
 msgid "cost"
 msgstr "Kosten"
 
@@ -829,7 +833,7 @@ msgid "logged cost"
 msgstr "Erfasste Kosten"
 
 #: workbench/offers/__init__.py:10 workbench/offers/models.py:65
-#: workbench/templates/base.html:29
+#: workbench/templates/base.html:27
 #: workbench/templates/projects/project_detail_overview.html:45
 msgid "offers"
 msgstr "Offerten"
@@ -1000,6 +1004,7 @@ msgstr "%(object)s löschen"
 #: workbench/templates/generic/object_form.html:47
 #: workbench/templates/modal_confirm_delete.html:14
 #: workbench/templates/projects/comment_confirm_delete.html:14
+#: workbench/templates/projects/service_form.html:84
 msgid "cancel"
 msgstr "Abbruch"
 
@@ -1009,7 +1014,6 @@ msgstr "Abbruch"
 #: workbench/templates/logbook/loggedhours_form.html:13
 #: workbench/templates/modal_confirm_delete.html:16
 #: workbench/templates/projects/comment_confirm_delete.html:16
-#: workbench/templates/projects/service_form.html:84
 msgid "delete"
 msgstr "Löschen"
 
@@ -1069,15 +1073,31 @@ msgstr "%(days)s Tag(e), ab %(start)s"
 msgid "Search"
 msgstr "Suche"
 
-#: workbench/templates/base.html:40
+#: workbench/templates/base.html:52
+msgid "reports"
+msgstr "Berichte"
+
+#: workbench/templates/base.html:56
+msgid "not invoiced work"
+msgstr "Nicht verrechnete Arbeit"
+
+#: workbench/templates/base.html:62
+msgid "admin"
+msgstr "Admin"
+
+#: workbench/templates/base.html:65
+msgid "payment lists"
+msgstr "Zahlungslisten"
+
+#: workbench/templates/base.html:78
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: workbench/templates/base.html:42
+#: workbench/templates/base.html:80
 msgid "Admin panel"
 msgstr "Verwaltung"
 
-#: workbench/templates/base.html:51
+#: workbench/templates/base.html:86
 msgid "Sign out"
 msgstr "Abmelden"
 
