@@ -33,9 +33,7 @@ class LoggedHoursSearchForm(forms.Form):
         widget=Picker(model=Organization),
     )
     service = forms.ModelChoiceField(
-        queryset=Service.objects.all(),
-        required=False,
-        widget=forms.HiddenInput,
+        queryset=Service.objects.all(), required=False, widget=forms.HiddenInput
     )
 
     def filter(self, queryset):
@@ -83,9 +81,7 @@ class LoggedCostSearchForm(forms.Form):
         widget=Picker(model=Organization),
     )
     service = forms.ModelChoiceField(
-        queryset=Service.objects.all(),
-        required=False,
-        widget=forms.HiddenInput,
+        queryset=Service.objects.all(), required=False, widget=forms.HiddenInput
     )
 
     def filter(self, queryset):
