@@ -11,7 +11,11 @@
       <a href="{{ project.urls.overview }}">{{ project|h }}</a>
     </h5>
     <div class="d-flex w-100 justify-content-between">
-      <p class="mb-1">{{ project.contact|default:project.customer }}</p>
+      <p class="mb-1">
+        {% if project.contact %}<a href="{{ project.contact.get_absolute_url }}">{{ project.contact }}</a>
+        {% else %}<a href="{{ project.customer.get_absolute_url }}">{{ project.customer }}</a>
+        {% endif %}
+      </p>
       <small>
         <a href="{{ project.urls.createhours }}" data-toggle="ajaxmodal">
           +{% trans 'hours' %}
