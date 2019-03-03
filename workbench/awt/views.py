@@ -8,6 +8,8 @@ from workbench import generic
 
 
 class ReportView(generic.DetailView):
+    model = Year
+
     def get_object(self):
         return get_object_or_404(
             Year, year=self.request.GET.get("year", date.today().year)

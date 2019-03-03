@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.shortcuts import render
 
 from workbench import views
+from workbench.awt.views import ReportView
 
 
 urlpatterns = [
@@ -15,12 +16,15 @@ urlpatterns = [
     url(r"^contacts/", include("workbench.contacts.urls")),
     url(r"^deals/", include("workbench.deals.urls")),
     url(r"^logbook/", include("workbench.logbook.urls")),
-    url(r"", include("workbench.awt.urls")),
+    url(r"^absences/", include("workbench.awt.urls")),
     url(r"^offers/", include("workbench.offers.urls")),
     url(r"^projects/", include("workbench.projects.urls")),
     url(r"^invoices/", include("workbench.invoices.urls")),
     url(r"^search/$", views.search, name="search"),
     url(r"^history/(\w+\.\w+)/([0-9]+)/$", views.history, name="history"),
+    #
+    # Reports
+    url(r"^report/annual-working-time/$", ReportView.as_view(), name="awt_year_report"),
 ]
 
 if settings.DEBUG:

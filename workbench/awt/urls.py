@@ -2,13 +2,12 @@ from django.conf.urls import url
 
 from workbench import generic
 from workbench.awt.forms import AbsenceSearchForm, AbsenceForm
-from workbench.awt.models import Absence, Year
-from workbench.awt.views import ReportView
+from workbench.awt.models import Absence
 
 
 urlpatterns = [
     url(
-        r"^absences/$",
+        r"^$",
         generic.ListView.as_view(
             model=Absence,
             search_form_class=AbsenceSearchForm,
@@ -17,30 +16,25 @@ urlpatterns = [
         name="awt_absence_list",
     ),
     url(
-        r"^absences/(?P<pk>\d+)/$",
+        r"^(?P<pk>\d+)/$",
         generic.DetailView.as_view(model=Absence),
         name="awt_absence_detail",
     ),
     url(
-        r"^absences/create/$",
+        r"^create/$",
         generic.CreateView.as_view(model=Absence, form_class=AbsenceForm),
         name="awt_absence_create",
     ),
     url(
-        r"^absences/(?P<pk>\d+)/update/$",
+        r"^(?P<pk>\d+)/update/$",
         generic.UpdateView.as_view(model=Absence, form_class=AbsenceForm),
         name="awt_absence_update",
     ),
     url(
-        r"^absences/(?P<pk>\d+)/delete/$",
+        r"^(?P<pk>\d+)/delete/$",
         generic.MessageView.as_view(
             redirect_to="awt_absence_list", message="Not implemented yet."
         ),
         name="awt_absence_delete",
-    ),
-    url(
-        r"^report/annual-working-time/$",
-        ReportView.as_view(model=Year),
-        name="awt_year_report",
     ),
 ]
