@@ -2,7 +2,7 @@ from datetime import date
 
 from django.shortcuts import redirect, render
 
-from . import invoicing_statistics
+from . import invoicing_statistics, project_statistics
 
 
 def monthly_invoicing(request):
@@ -22,4 +22,12 @@ def monthly_invoicing(request):
             "year": year,
             "monthly_invoicing": invoicing_statistics.monthly_invoicing(year),
         },
+    )
+
+
+def overdrawn_projects(request):
+    return render(
+        request,
+        "reporting/overdrawn_projects.html",
+        {"overdrawn_projects": project_statistics.overdrawn_projects()},
     )

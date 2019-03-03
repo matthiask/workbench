@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% load history i18n workbench %}
+
+{% block title %}{% trans 'overdrawn projects' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+<div class="col-sm-12">
+  <h1>{% trans 'overdrawn projects' %}</h1>
+
+  <table class="table table-sm table-responsive-lg">
+    <thead>
+      <tr>
+        <th class="w-100">{% trans 'project' %}</th>
+        <th class="w-100">{% trans 'customer' %}</th>
+        <th class="text-nowrap text-right">{% trans 'effort hours' %}</th>
+        <th class="text-nowrap text-right">{% trans 'logged hours' %}</th>
+        <th class="text-nowrap text-right">{% trans 'delta' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in overdrawn_projects %}
+      <tr>
+        <td>
+          <a href="{{ row.project.get_absolute_url }}">
+            {{ row.project|h }}
+            <span class="badge badge-{{ row.project.status_css }}">{{ row.project.pretty_status }}</span>
+          </a>
+        </td>
+        <td>
+          <a href="{{ row.project.customer.get_absolute_url }}" class="d-block text-truncate">
+            {{ row.project.customer }}
+          </a>
+        </td>
+        <td class="text-right">{{ row.effort_hours|stringformat:'.1f' }}h</td>
+        <td class="text-right">{{ row.logged_hours|stringformat:'.1f' }}h</td>
+        <td class="text-right">{{ row.delta|stringformat:'.1f' }}h</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+</div>
+{% endblock %}

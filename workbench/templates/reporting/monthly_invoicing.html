@@ -43,7 +43,7 @@
         <tr>
           <td>
             <a href="{{ invoice.get_absolute_url }}">
-              {{ invoice }}
+              {{ invoice|h }}
               <span class="badge badge-{{ invoice.status_css }}">{{ invoice.pretty_status }}</span>
             </a>
           </td>

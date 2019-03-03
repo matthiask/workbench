@@ -5,7 +5,7 @@ from django.shortcuts import render
 
 from workbench import views
 from workbench.awt.views import ReportView
-from workbench.reporting.views import monthly_invoicing
+from workbench.reporting.views import monthly_invoicing, overdrawn_projects
 
 
 urlpatterns = [
@@ -30,6 +30,11 @@ urlpatterns = [
         r"^report/monthly-invoicing/$",
         monthly_invoicing,
         name="report_monthly_invoicing",
+    ),
+    url(
+        r"^report/overdrawn-projects/$",
+        overdrawn_projects,
+        name="report_overdrawn_projects",
     ),
 ]
 

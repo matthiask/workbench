@@ -20,7 +20,8 @@ from workbench.tools.urls import model_urls
 
 
 class ProjectQuerySet(SearchQuerySet):
-    pass
+    def open(self):
+        return self.filter(status__in=(Project.ACQUISITION, Project.WORK_IN_PROGRESS))
 
 
 @model_urls()
