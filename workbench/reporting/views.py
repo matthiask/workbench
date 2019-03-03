@@ -1,15 +1,25 @@
 from datetime import date
 
-import vanilla
+from django.shortcuts import redirect, render
 
-from .invoicing_statistics import monthly_invoicing
+from . import invoicing_statistics
 
 
-class MonthlyInvoicingView(vanilla.TemplateView):
-    template_name = "reporting/monthly_invoicing.html"
+def monthly_invoicing(request):
+    year = None
+    if "year" in request.GET:
+        try:
+            year = int(request.GET["year"])
+        except Exception:
+            return redirect(".")
+    if not year:
+        year = date.today().year
 
-    def get_context_data(self, **kwargs):
-        self.year = int(self.request.GET.get("year", date.today().year))  # XXX error
-        return super().get_context_data(
-            monthly_invoicing=monthly_invoicing(self.year), **kwargs
-        )
+    return render(
+        request,
+        "reporting/monthly_invoicing.html",
+        {
+            "year": year,
+            "monthly_invoicing": invoicing_statistics.monthly_invoicing(year),
+        },
+    )
