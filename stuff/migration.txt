@@ -554,7 +554,7 @@ SELECT
   date,
   date '9999-12-31',
   percent,
-  vacation_days * 20 / percent,
+  CASE WHEN percent > 0 THEN vacation_days * 20 / percent ELSE 0 END,
   notes
 FROM
 dblink(
@@ -612,7 +612,7 @@ SELECT created, date, hours, notes, created_by_id, worker_id, s.id, invoice_id, 
 FROM projects_service s,
 dblink(
     'dbname=fineware_feinheit',
-    'SELECT created, date, hours, w.notes, created_by_id, worker_id, job_id, aa.name, invoice_id, archived FROM worklog_worklogentry w LEFT JOIN articles_activity a ON w.activity_id=a.id LEFT JOIN articles_activity aa ON a.parent_id=aa.id'
+    'SELECT created, date, hours, w.notes, created_by_id, worker_id, job_id, aa.name, invoice_id, w.archived FROM worklog_worklogentry w LEFT JOIN articles_activity a ON w.activity_id=a.id LEFT JOIN articles_activity aa ON a.parent_id=aa.id'
 ) AS p(created timestamp, date date, hours numeric, notes text, created_by_id int, worker_id int, job_id int, activitygroup varchar(200), invoice_id int, archived bool)
 WHERE s.project_id=p.job_id AND s.title=CONCAT('Import:', activitygroup);
 

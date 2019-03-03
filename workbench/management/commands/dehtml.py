@@ -56,6 +56,13 @@ class Command(BaseCommand):
     help = "De-htmlizes description fields"
 
     def handle(self, **options):
+        self.stdout.write("updating employments' until dates...")
+        for user in User.objects.all():
+            employment = user.employments.last()
+            if employment:
+                employment.save()
+                if not employment.percentage:
+                    employment.delete()
         self.stdout.write("dehtmling invoices...")
         for instance in Invoice.objects.all():
             instance.description = dehtml(instance.description)
@@ -70,10 +77,3 @@ class Command(BaseCommand):
         for instance in Project.objects.all():
             instance.description = dehtml(instance.description)
             instance.save(update_fields=("description",))
-        self.stdout.write("updating employments' until dates...")
-        for user in User.objects.all():
-            employment = user.employments.last()
-            if employment:
-                employment.save()
-                if not employment.percentage:
-                    employment.delete()
