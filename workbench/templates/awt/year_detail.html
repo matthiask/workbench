@@ -5,11 +5,107 @@
 {% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="row">
-<div class="col-md-6 offset-md-3">
+<div class="row justify-content-center">
+<div class="col-sm-12">
   <h1>{{ object|h }} {% history_link object %}</h1>
 
-  {{ object.statistics }}
+  <table class="table">
+  {% for data in object.statistics %}
+    {% with user=data.user stats=data.months totals=data.totals monthly_sums=data.monthly_sums %}
+    <tr><th colspan="14">
+      <h5 class="mt-3 mb-0">{{ user }}</h5>
+    </th></tr>
+
+    <tr>
+      <th></th>
+      {% for month in stats.months %}<th class="text-right">{{ month|date:'M' }}</th>{% endfor %}
+      <th class="text-right">{% trans 'Total' %}</th>
+    </tr>
+
+    <tr>
+      <th>{% trans 'working days' %}</th>
+      {% for value in stats.target_days %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.2f' }}d</td>{% endfor %}
+      <th class="text-right">{{ totals.target_days|stringformat:'.2f' }}d</th>
+    </tr>
+
+    <tr>
+      <th>{% trans 'percentage' %}</th>
+      {% for value in stats.percentage %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.0f' }}%</td>{% endfor %}
+      <th class="text-right">{{ totals.percentage|stringformat:'.0f' }}%</th>
+    </tr>
+
+    <tr>
+      <th>{% trans 'available vacation days' %}</th>
+      {% for value in stats.available_vacation_days %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.2f' }}d</td>{% endfor %}
+      <th class="text-right">{{ totals.available_vacation_days|stringformat:'.2f' }}d</th>
+    </tr>
+
+    <tr>
+      <th>{% trans 'hours' %}</th>
+      {% for value in stats.hours %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.1f' }}h</td>{% endfor %}
+      <th class="text-right">{{ totals.hours|stringformat:'.1f' }}h</th>
+    </tr>
+
+    <tr>
+      <th>{% trans 'vacation days' %}</th>
+      {% for value in stats.vacation_days %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.2f' }}d</td>{% endfor %}
+      <th class="text-right">{{ totals.vacation_days|stringformat:'.2f' }}d</th>
+    </tr>
+
+    {% if totals.vacation_days_correction %}
+      <tr>
+        <th>{% trans 'correction' %}</th>
+        {% for value in stats.vacation_days_correction %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.2f' }}d</td>{% endfor %}
+        <th class="text-right">{{ totals.vacation_days_correction|stringformat:'.2f' }}d</th>
+      </tr>
+    {% endif %}
+
+    <tr>
+      <th>{% trans 'other absences' %}</th>
+      {% for value in stats.other_absences %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.2f' }}d</td>{% endfor %}
+      <th class="text-right">{{ totals.other_absences|stringformat:'.2f' }}d</th>
+    </tr>
+
+    <tr>
+      <th>{% trans 'working time' %}</th>
+      {% for value in data.working_time %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.2f' }}d</td>{% endfor %}
+      <th class="text-right">{{ totals.working_time|stringformat:'.2f' }}d</th>
+    </tr>
+
+    <tr>
+      <th>{% trans 'target' %}</th>
+      {% for value in stats.target %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.2f' }}d</td>{% endfor %}
+      <th class="text-right">{{ totals.target|stringformat:'.2f' }}d</th>
+    </tr>
+
+    <tr>
+      <th>{% trans 'monthly sums' %}</th>
+      {% for value in monthly_sums %}<td class="text-right">{% if value is not None %}{{ value|stringformat:'.1f' }}h{% endif %}</td>{% endfor %}
+      <th class="text-right">{{ totals.running_sum|stringformat:'.1f' }}h</th>
+    </tr>
+
+    <tr>
+      <th>{% trans 'absences' %}</th>
+      <td colspan="6">
+        <strong>{% trans 'vacation days' %}</strong><br>
+        {% for absence in data.absences.vacation_days %}
+        {{ absence.days|stringformat:'.02f' }}d ab {{ absence.starts_on|date:'d.m.' }}: {{ absence.description }}<br>
+        {% empty %}&ndash;
+        {% endfor %}
+      </td>
+      <td colspan="6">
+        <strong>{% trans 'other absences' %}</strong><br>
+        {% for absence in data.absences.other_absences %}
+        {{ absence.days|stringformat:'.02f' }}d ab {{ absence.starts_on|date:'d.m.' }}: {{ absence.description }}<br>
+        {% empty %}&ndash;
+        {% endfor %}
+      </td>
+      <td></td>
+    </tr>
+
+    {% endwith %}
+  {% endfor %}
+  </table>
 
   <table class="table table-striped">
     {% for name, value in object|field_value_pairs %}
