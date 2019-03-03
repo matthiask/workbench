@@ -1107,7 +1107,7 @@ msgstr "Ziel"
 
 #: workbench/templates/awt/year_detail.html:82
 msgid "monthly sums"
-msgstr "Monatliche Summen"
+msgstr "Monatssummen"
 
 #: workbench/templates/base.html:18
 #: workbench/templates/generic/object_picker.html:27
