@@ -107,21 +107,6 @@
   {% endfor %}
   </table>
 
-  <table class="table table-striped">
-    {% for name, value in object|field_value_pairs %}
-    <tr>
-      <th class="text-right">{{ name }}</th>
-      <td>{% link_or_none value %}</td>
-    </tr>
-    {% endfor %}
-  </table>
-
-  <a href="{{ object.urls.update }}" class="btn btn-secondary">
-    {% trans 'Update' %}
-  </a>
-  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
-    {% trans 'Delete' %}
-  </a>
 </div>
 </div>
 {% endblock %}
