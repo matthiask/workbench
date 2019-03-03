@@ -1,7 +1,7 @@
 from datetime import date
 from decimal import Decimal
 
-from django import forms
+from django import forms, http
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.html import format_html
@@ -70,6 +70,10 @@ class InvoiceSearchForm(forms.Form):
         return queryset.select_related(
             "customer", "contact__organization", "owned_by", "project__owned_by"
         )
+
+    def response(self, request, queryset):
+        if "s" not in request.GET:
+            return http.HttpResponseRedirect("?s=open")
 
 
 class CreateInvoiceForm(WarningsForm, PostalAddressSelectionForm):

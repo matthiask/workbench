@@ -1,6 +1,6 @@
 from datetime import date
 
-from django import forms
+from django import forms, http
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
@@ -13,19 +13,29 @@ from workbench.tools.forms import ModelForm, WarningsForm
 
 class OfferSearchForm(forms.Form):
     s = forms.ChoiceField(
-        choices=(("", _("All states")),) + Offer.STATUS_CHOICES,
+        choices=(
+            ("", _("All states")),
+            ("open", _("Open")),
+            (_("Exact"), Offer.STATUS_CHOICES),
+        ),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
     )
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get("s"):
+        if data.get("s") == "open":
+            queryset = queryset.filter(status__lte=Offer.OFFERED)
+        elif data.get("s"):
             queryset = queryset.filter(status=data.get("s"))
 
         return queryset.select_related(
             "project__owned_by", "project__customer", "project__contact__organization"
         )
+
+    def response(self, request, queryset):
+        if "s" not in request.GET:
+            return http.HttpResponseRedirect("?s=open")
 
 
 class CreateOfferForm(PostalAddressSelectionForm):
