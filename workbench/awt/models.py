@@ -63,7 +63,7 @@ class Year(Model):
         return str(self.year)
 
     def get_absolute_url(self):
-        return reverse("awt_year_detail", kwargs={"pk": self.pk})
+        return reverse("awt_year_report") + "?year={}".format(self.year)
 
     @property
     def months(self):

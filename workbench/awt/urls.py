@@ -1,9 +1,9 @@
 from django.conf.urls import url
-from django.shortcuts import redirect
 
 from workbench import generic
 from workbench.awt.forms import AbsenceSearchForm, AbsenceForm
 from workbench.awt.models import Absence, Year
+from workbench.awt.views import ReportView
 
 
 urlpatterns = [
@@ -38,14 +38,5 @@ urlpatterns = [
         ),
         name="awt_absence_delete",
     ),
-    url(
-        r"^overview/$",
-        lambda request: redirect(Year.objects.current()),
-        name="awt_year_current",
-    ),
-    url(
-        r"^overview/(?P<pk>\d+)/$",
-        generic.DetailView.as_view(model=Year),
-        name="awt_year_detail",
-    ),
+    url(r"^report/$", ReportView.as_view(model=Year), name="awt_year_report"),
 ]

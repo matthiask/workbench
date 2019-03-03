@@ -10,7 +10,7 @@
   <h1>{{ object|h }} {% history_link object %}</h1>
 
   <table class="table">
-  {% for data in object.statistics %}
+  {% for data in statistics %}
     {% with user=data.user stats=data.months totals=data.totals monthly_sums=data.monthly_sums %}
     <tr><th colspan="14">
       <h5 class="mt-3 mb-0">{{ user }}</h5>
