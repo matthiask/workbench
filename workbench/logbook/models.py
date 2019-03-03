@@ -93,10 +93,14 @@ class LoggedCost(Model):
         User, on_delete=models.PROTECT, related_name="+", verbose_name=_("created by")
     )
     rendered_on = models.DateField(_("rendered on"), default=date.today)
-    cost = MoneyField(
-        _("cost"), default=None, help_text=_("Total incl. tax for third-party costs.")
+    cost = MoneyField(_("cost"), default=None)
+    third_party_costs = MoneyField(
+        _("third party costs"),
+        default=None,
+        blank=True,
+        null=True,
+        help_text=_("Total incl. tax for third-party services."),
     )
-    # TODO what we paid vs. what we invoice
     description = models.TextField(_("description"))
 
     invoice = models.ForeignKey(

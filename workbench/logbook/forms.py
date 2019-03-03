@@ -171,7 +171,7 @@ class LoggedHoursForm(ModelForm):
 class LoggedCostForm(ModelForm):
     class Meta:
         model = LoggedCost
-        fields = ("service", "rendered_on", "cost", "description")
+        fields = ("service", "rendered_on", "cost", "third_party_costs", "description")
         widgets = {"description": Textarea()}
 
     def __init__(self, *args, **kwargs):

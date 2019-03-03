@@ -124,8 +124,7 @@ class ServiceForm(ModelForm):
 
     def save(self):
         instance = super().save(commit=False)
-        if not instance.project:
-            instance.project = self.project
+        instance.project = self.project
         for formset in self.formsets.values():
             formset.save()
         instance.save()
@@ -148,7 +147,7 @@ EffortFormset = inlineformset_factory(
 CostFormset = inlineformset_factory(
     Service,
     Cost,
-    fields=("title", "cost"),
+    fields=("title", "cost", "third_party_costs"),
     extra=0,
     widgets={
         "title": forms.TextInput(
@@ -156,6 +155,9 @@ CostFormset = inlineformset_factory(
         ),
         "cost": forms.NumberInput(
             attrs={"class": "form-control short", "placeholder": _("cost")}
+        ),
+        "third_party_costs": forms.NumberInput(
+            attrs={"class": "form-control", "placeholder": _("third party costs")}
         ),
     },
 )

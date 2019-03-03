@@ -15,6 +15,7 @@
           <th>{% trans 'rendered on' %}</th>
           <th>{% trans 'description' %}</th>
           <th class="text-right">{% trans 'cost' %}</th>
+          <th class="text-right">{% trans 'third party costs' %}</th>
         </tr>
       </thead>
       <tbody>
@@ -33,6 +34,7 @@
             <th class="text-right">
               {{ logged|currency }} / {{ offered|currency }}
             </th>
+            <th class="text-right"></th>
           </tr>
 
           {% for cost in service.costs.all %}
@@ -40,6 +42,7 @@
               <td colspan="2"></td>
               <td>{{ cost.title }}</td>
               <td class="text-right">{{ cost.cost|currency }}</td>
+              <td class="text-right">{{ cost.third_party_costs|currency }}</td>
             </tr>
           {% endfor %}
 
@@ -51,6 +54,7 @@
                 <a href="{{ cost.urls.update }}" data-toggle="ajaxmodal">{{ cost.description }}</a>
               </th>
               <td class="text-right">{{ cost.cost|currency }}</td>
+              <td class="text-right">{{ cost.third_party_costs|currency }}</td>
             </tr>
           {% endfor %}
 

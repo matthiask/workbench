@@ -320,6 +320,13 @@ class Cost(Model):
     )
     title = models.CharField(_("title"), max_length=200)
     cost = MoneyField(_("cost"), default=None)
+    third_party_costs = MoneyField(
+        _("third party costs"),
+        default=None,
+        blank=True,
+        null=True,
+        help_text=_("Total incl. tax for third-party services."),
+    )
     position = models.PositiveIntegerField(_("position"), default=0)
 
     class Meta:
