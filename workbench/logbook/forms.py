@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from decimal import Decimal, ROUND_UP
 
 from django import forms
@@ -159,6 +160,26 @@ class LoggedHoursForm(ModelForm):
             (service.id, service.__str__()) for service in self.project.services.all()
         ]
         self.fields["service"].widget.attrs["autofocus"] = True
+
+        today = date.today()
+        if self.instance.pk and self.instance.rendered_on < date.today() - timedelta(
+            days=today.weekday()
+        ):
+            self.fields["hours"].disabled = True
+            self.fields["rendered_by"].disabled = True
+            self.fields["rendered_on"].disabled = True
+
+    def clean_rendered_on(self):
+        rendered_on = self.cleaned_data.get("rendered_on")
+        if rendered_on:
+            today = date.today()
+            if not self.instance.pk and self.cleaned_data[
+                "rendered_on"
+            ] < date.today() - timedelta(days=today.weekday()):
+                raise forms.ValidationError(
+                    _("Sorry, hours have to be logged in the same week.")
+                )
+        return rendered_on
 
     def save(self):
         instance = super().save(commit=False)
