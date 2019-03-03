@@ -16,7 +16,15 @@ from workbench.tools.urls import model_urls
 
 
 class InvoiceQuerySet(SearchQuerySet):
-    pass
+    def valid(self):
+        return self.filter(
+            status__in=(
+                Invoice.IN_PREPARATION,
+                Invoice.SENT,
+                Invoice.REMINDED,
+                Invoice.PAID,
+            )
+        )
 
 
 @model_urls()
@@ -108,7 +116,7 @@ class Invoice(ModelWithTotal):
 
     payment_notice = models.TextField(_("payment notice"), blank=True)
 
-    objects = models.Manager.from_queryset(InvoiceQuerySet)()
+    objects = InvoiceQuerySet.as_manager()
 
     class Meta:
         ordering = ("-id",)
