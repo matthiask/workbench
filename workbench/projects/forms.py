@@ -100,15 +100,13 @@ class ServiceForm(ModelForm):
         super().__init__(*args, **kwargs)
 
         kwargs.pop("request")
-        self.formsets = (
-            OrderedDict(
-                (
-                    ("efforts", EffortFormset(*args, **kwargs)),
-                    ("costs", CostFormset(*args, **kwargs)),
-                )
+        # This makes saving formsets for just created services work:
+        kwargs["instance"] = self.instance
+        self.formsets = OrderedDict(
+            (
+                ("efforts", EffortFormset(*args, **kwargs)),
+                ("costs", CostFormset(*args, **kwargs)),
             )
-            if self.instance.pk
-            else OrderedDict()
         )
 
         if self.project:
@@ -125,6 +123,8 @@ class ServiceForm(ModelForm):
     def save(self):
         instance = super().save(commit=False)
         instance.project = self.project
+        if not instance.pk:
+            instance.save()
         for formset in self.formsets.values():
             formset.save()
         instance.save()

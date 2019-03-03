@@ -35,42 +35,38 @@
             {% formset form.formsets.efforts "efforts" %}
             <div id="{{ form_id }}" class="mb-1">
               {{ form.id }}
-              <div class="input-group">
-                {{ form.hours }}
-                {{ form.service_type }}
-                <div class="input-group-append">
-                  <span class="input-group-text bg-warning">
-                    {{ form.DELETE }}
-                  </span>
-                </div>
-              </div>
+              {% ff_field form.hours %}
+              {% ff_field form.service_type %}
+              {% ff_field form.DELETE %}
             </div>
             {% endformset %}
-            <a href="#" class="btn btn-secondary"
-              onclick="return addInlineForm('efforts')">
-              {% include 'svg/plus.svg' %}
-            </a>
+            <div class="row">
+              <div class="col-lg-8 offset-lg-4">
+                <a href="#" class="btn btn-secondary"
+                  onclick="return addInlineForm('efforts')">
+                  {% include 'svg/plus.svg' %}
+                </a>
+              </div>
+            </div>
 
             <h4 class="mt-3">{% trans 'costs' %}</h4>
             {% formset form.formsets.costs "costs" %}
             <div id="{{ form_id }}" class="mb-1">
               {{ form.id }}
-              <div class="input-group">
-                {{ form.title }}
-                {{ form.cost }}
-                {{ form.third_party_costs }}
-                <div class="input-group-append">
-                  <span class="input-group-text bg-warning">
-                    {{ form.DELETE }}
-                  </span>
-                </div>
-              </div>
+              {% ff_field form.title %}
+              {% ff_field form.cost %}
+              {% ff_field form.third_party_costs %}
+              {% ff_field form.DELETE %}
             </div>
             {% endformset %}
-            <a href="#" class="btn btn-secondary"
-              onclick="return addInlineForm('costs')">
-              {% include 'svg/plus.svg' %}
-            </a>
+            <div class="row">
+              <div class="col-lg-8 offset-lg-4">
+                <a href="#" class="btn btn-secondary"
+                  onclick="return addInlineForm('costs')">
+                  {% include 'svg/plus.svg' %}
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       {% endif %}

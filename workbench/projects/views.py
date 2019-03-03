@@ -86,9 +86,6 @@ class CreateServiceView(generic.CreateView):
             data, files, project=self.project, request=self.request, **kwargs
         )
 
-    def get_success_url(self):
-        return self.object.urls.url("update")
-
 
 class UpdateServiceView(generic.UpdateView):
     model = Service
