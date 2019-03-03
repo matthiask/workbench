@@ -151,9 +151,9 @@ class Year(Model):
                     0, remaining[absence.user_id] - absence.days
                 )
 
-                for user_id, vacation_days in remaining.items():
-                    if vacation_days > 0:
-                        months[user_id]["vacation_days_correction"][11] = vacation_days
+        for user_id, vacation_days in remaining.items():
+            if vacation_days > 0:
+                months[user_id]["vacation_days_correction"][11] = vacation_days
 
         today = date.today()
         this_month = (today.year, today.month - 1)
