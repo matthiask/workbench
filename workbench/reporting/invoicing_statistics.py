@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 
 from django.db.models import Sum
@@ -29,17 +30,18 @@ def monthly_invoicing(year):
     }
 
     month_data = {"total": Z, "total_excl_tax": Z, "third_party_costs": Z}
-    month = dict(month_data, month=1, invoices=[])
+    month = dict(month_data, month=date(year, 1, 1), invoices=[])
 
     for invoice in invoices.select_related(
         "customer", "contact__organization", "project__owned_by", "owned_by"
     ).order_by("invoiced_on"):
 
-        if month["month"] != invoice.invoiced_on.month:
+        if month["month"].month != invoice.invoiced_on.month:
             add_month(month)
             month.update(month_data)
-            month.update({"month": invoice.invoiced_on.month, "invoices": []})
+            month.update({"month": invoice.invoiced_on, "invoices": []})
 
+        # FIXME double counting
         third_party_costs = third_party_costs_by_project.get(invoice.project_id, Z)
 
         month["total"] += invoice.total

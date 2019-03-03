@@ -5,6 +5,7 @@ from django.shortcuts import render
 
 from workbench import views
 from workbench.awt.views import ReportView
+from workbench.reporting.views import MonthlyInvoicingView
 
 
 urlpatterns = [
@@ -25,6 +26,11 @@ urlpatterns = [
     #
     # Reports
     url(r"^report/annual-working-time/$", ReportView.as_view(), name="awt_year_report"),
+    url(
+        r"^report/monthly-invoicing/$",
+        MonthlyInvoicingView.as_view(),
+        name="report_monthly_invoicing",
+    ),
 ]
 
 if settings.DEBUG:
