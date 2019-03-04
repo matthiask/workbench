@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name="billing_per_hour",
             field=models.DecimalField(
                 decimal_places=2,
-                default=None,
+                default=Decimal("0.00"),
                 max_digits=10,
                 validators=[django.core.validators.MinValueValidator(0)],
                 verbose_name="billing per hour",
