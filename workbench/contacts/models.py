@@ -198,6 +198,7 @@ class PostalAddress(PersonDetail):
     def urls(self):
         return self.person.urls
 
+    @property
     def postal_address(self):
         if self.postal_address_override:
             return self.postal_address_override
