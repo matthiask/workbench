@@ -2,10 +2,12 @@
 
 from django.db import migrations
 
+from workbench.tools.search import migration_sql
+
 
 class Migration(migrations.Migration):
 
-    dependencies = [("logbook", "0002_auto_20190304_2239")]
+    dependencies = [("logbook", "0002_auto_20190304_2239"), ("audit", "0001_initial")]
 
     operations = [
         migrations.RunSQL("SELECT audit_audit_table('logbook_loggedhours');"),

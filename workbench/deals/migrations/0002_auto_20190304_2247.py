@@ -2,10 +2,12 @@
 
 from django.db import migrations
 
+from workbench.tools.search import migration_sql
+
 
 class Migration(migrations.Migration):
 
-    dependencies = [("deals", "0001_initial")]
+    dependencies = [("deals", "0001_initial"), ("audit", "0001_initial")]
 
     operations = [
         migrations.RunSQL(
