@@ -313,7 +313,7 @@ class PDFDocument(_PDFDocument):
                     (
                         local_date_format(invoice.invoiced_on, "d.m.Y")
                         if invoice.invoiced_on
-                        else _("NO DATE YET")
+                        else MarkupParagraph("<b>%s</b>" % _("NO DATE YET"), style=self.style.bold)
                     ),
                 ),
                 ("MwSt.-Nr.", settings.WORKBENCH.PDF_VAT_NO),
