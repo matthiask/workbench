@@ -179,6 +179,8 @@ class PDFDocument(_PDFDocument):
 
             canvas.restoreState()
 
+            pdf.draw_watermark(canvas)
+
         return _fn
 
     def invoice_stationery(self):
@@ -203,6 +205,8 @@ class PDFDocument(_PDFDocument):
             )
 
             canvas.restoreState()
+
+            pdf.draw_watermark(canvas)
 
         return _fn
 
@@ -282,6 +286,9 @@ class PDFDocument(_PDFDocument):
         )
 
     def process_offer(self, offer):
+        if offer.status not in {offer.OFFERED, offer.ACCEPTED}:
+            self.watermark(offer.get_status_display())
+
         self.postal_address(offer.postal_address)
         self.date_line(offer.offered_on, offer.owned_by.get_short_name(), offer.code)
 
@@ -297,6 +304,9 @@ class PDFDocument(_PDFDocument):
         self.table_total(offer)
 
     def process_invoice(self, invoice):
+        if invoice.status not in {invoice.SENT, invoice.REMINDED, invoice.PAID}:
+            self.watermark(invoice.get_status_display())
+
         self.postal_address(invoice.postal_address)
 
         self.h1(invoice.title)
