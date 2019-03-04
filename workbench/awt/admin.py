@@ -1,11 +1,17 @@
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
 
 from . import models
 
 
 @admin.register(models.Year)
 class YearAdmin(admin.ModelAdmin):
-    list_display = ["year", "working_time_per_day", *models.Year.MONTHS]
+    list_display = ["year", "working_time_per_day", *models.Year.MONTHS, "days"]
+
+    def days(self, instance):
+        return sum(instance.months)
+
+    days.short_description = _("days")
 
 
 @admin.register(models.Employment)
