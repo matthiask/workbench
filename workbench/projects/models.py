@@ -145,7 +145,7 @@ class Project(Model):
     @cached_property
     def grouped_services(self):
         # Avoid circular imports
-        from workbench.logbook.models import LoggedHours
+        from workbench.logbook.models import LoggedHours, LoggedCost
 
         offers = {}
         logged_hours_per_service = {
@@ -155,14 +155,20 @@ class Project(Model):
             .values("service")
             .annotate(Sum("hours"))
         }
+        logged_cost_per_service = {
+            row["service"]: row["cost__sum"]
+            for row in LoggedCost.objects.order_by()
+            .filter(service__project=self)
+            .values("service")
+            .annotate(Sum("cost"))
+        }
 
         for service in self.services.select_related("offer").prefetch_related(
             "efforts__service_type", "costs"
         ):
-            service.effort_hours = sum(
-                (effort.hours for effort in service.efforts.all()), 0
-            )
             service.logged_hours = logged_hours_per_service.get(service.id, 0)
+            service.logged_cost = logged_cost_per_service.get(service.id, 0)
+            service.planned_cost = sum((cost.cost for cost in service.costs.all()), 0)
 
             if service.offer not in offers:
                 offers[service.offer] = []

@@ -49,7 +49,7 @@
         {{ service.description|linebreaksbr }}
       </p>
       <small class="row justify-content-between">
-        <span class="col-md-8">
+        <span class="col-md-6">
           {% for effort in service.efforts.all %}
             {{ effort.hours }}h {{ effort.service_type }}{% if not forloop.last %},{% endif %}
           {% endfor %}
@@ -60,6 +60,11 @@
         <span class="col-md-2">
           <a href="{% url 'logbook_loggedhours_list' %}?service={{ service.pk }}" target="_blank">
             {{ service.logged_hours }}h / {{ service.effort_hours }}h
+          </a>
+        </span>
+        <span class="col-md-2">
+          <a href="{% url 'logbook_loggedcost_list' %}?service={{ service.pk }}" target="_blank">
+            {{ service.logged_cost|stringformat:'.2f' }} / {{ service.planned_cost|stringformat:'.2f' }}
           </a>
         </span>
         <span class="col-md-2 text-right">
