@@ -1,3 +1,4 @@
+from collections import defaultdict
 from decimal import Decimal
 from datetime import date
 from itertools import chain
@@ -176,6 +177,23 @@ class Project(Model):
         )
 
 
+class ServiceQuerySet(models.QuerySet):
+    def choices(self):
+        offers = defaultdict(list)
+        for service in self.select_related("offer"):
+            offers[service.offer].append((service.id, str(service)))
+        return [("", "----------")] + [
+            (offer or _("Not offered yet"), services)
+            for offer, services in sorted(
+                offers.items(),
+                key=lambda item: (
+                    item[0] and item[0].offered_on or date.max,
+                    item[0] and item[0].pk or 1e100,
+                ),
+            )
+        ]
+
+
 @model_urls()
 class Service(Model):
     project = models.ForeignKey(
@@ -200,6 +218,8 @@ class Service(Model):
 
     effort_hours = HoursField(_("effort hours"), default=0)
     cost = MoneyField(_("cost"), default=0)
+
+    objects = ServiceQuerySet.as_manager()
 
     class Meta:
         ordering = ("position", "created_at")

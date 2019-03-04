@@ -156,9 +156,7 @@ class LoggedHoursForm(ModelForm):
             self.project = kwargs["instance"].service.project
 
         super().__init__(*args, **kwargs)
-        self.fields["service"].choices = [("", "----------")] + [
-            (service.id, service.__str__()) for service in self.project.services.all()
-        ]
+        self.fields["service"].choices = self.project.services.choices()
         self.fields["service"].widget.attrs["autofocus"] = True
 
         today = date.today()
@@ -208,9 +206,7 @@ class LoggedCostForm(ModelForm):
             self.project = self.instance.project
 
         super().__init__(*args, **kwargs)
-        self.fields["service"].queryset = self.fields["service"].queryset.filter(
-            project=self.project
-        )
+        self.fields["service"].choices = self.project.services.choices()
 
     def save(self):
         instance = super().save(commit=False)
