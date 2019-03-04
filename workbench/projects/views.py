@@ -6,6 +6,7 @@ from workbench import generic
 from workbench.offers.models import Offer
 from workbench.projects.forms import ServiceForm
 from workbench.projects.models import Project, Service
+from workbench.services.models import ServiceType
 
 
 class CreateRelatedView(generic.CreateView):
@@ -41,6 +42,12 @@ class CreateServiceView(generic.CreateView):
             data, files, project=self.project, request=self.request, **kwargs
         )
 
+    def default_service_types(self):
+        return {
+            type.id: {"title": type.title, "billing_per_hour": type.billing_per_hour}
+            for type in ServiceType.objects.all()
+        }
+
 
 class UpdateServiceView(generic.UpdateView):
     model = Service
@@ -48,6 +55,12 @@ class UpdateServiceView(generic.UpdateView):
 
     def get_success_url(self):
         return self.object.project.get_absolute_url() + "services/"
+
+    def default_service_types(self):
+        return {
+            type.id: {"title": type.title, "billing_per_hour": type.billing_per_hour}
+            for type in ServiceType.objects.all()
+        }
 
 
 class MoveServiceView(generic.DetailView):

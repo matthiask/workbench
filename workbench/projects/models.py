@@ -310,13 +310,17 @@ class Effort(Model):
         related_name="efforts",
         verbose_name=_("service"),
     )
+    title = models.CharField(_("title"), max_length=200)
+    billing_per_hour = MoneyField(_("billing per hour"), default=None)
+    hours = HoursField(_("hours"))
     service_type = models.ForeignKey(
         ServiceType,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         verbose_name=_("service type"),
         related_name="+",
+        blank=True,
+        null=True,
     )
-    hours = HoursField(_("hours"))
 
     class Meta:
         ordering = ("service_type",)
@@ -336,7 +340,7 @@ class Effort(Model):
 
     @property
     def cost(self):
-        return self.service_type.billing_per_hour * self.hours
+        return self.billing_per_hour * self.hours
 
 
 class Cost(Model):

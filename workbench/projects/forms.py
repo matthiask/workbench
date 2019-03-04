@@ -134,7 +134,7 @@ class ServiceForm(ModelForm):
 EffortFormset = inlineformset_factory(
     Service,
     Effort,
-    fields=("service_type", "hours"),
+    fields=("title", "billing_per_hour", "hours", "service_type"),
     extra=0,
     widgets={
         "service_type": forms.Select(attrs={"class": "custom-select"}),

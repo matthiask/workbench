@@ -33,10 +33,12 @@
           <div class="col-lg-8 offset-lg-4">
             <h4>{% trans 'efforts' %}</h4>
             {% formset form.formsets.efforts "efforts" %}
-            <div id="{{ form_id }}" class="mb-1">
+            <div id="{{ form_id }}" class="mb-1" data-part>
               {{ form.id }}
-              {% ff_field form.hours %}
               {% ff_field form.service_type %}
+              {% ff_field form.title %}
+              {% ff_field form.billing_per_hour %}
+              {% ff_field form.hours %}
               {% ff_field form.DELETE %}
             </div>
             {% endformset %}
@@ -87,4 +89,23 @@
 
   </div>
 </div>
+{% endblock %}
+
+{% block js %}{{ block.super }}
+  {{ view.default_service_types|json_script:"service-types" }}
+  <script>
+jQuery(function($) {
+  var serviceTypes = JSON.parse(document.querySelector("#service-types").textContent);
+
+  $(document.body).on("change", "select", function() {
+    var thing = this.closest("[data-part]"),
+      data = serviceTypes[parseInt(this.value, 10)];
+    console.log(this, serviceTypes, data);
+    if (data) {
+      $("input[name$='title']", thing).val(data.title);
+      $("input[name$='billing_per_hour']", thing).val(data.billing_per_hour);
+    }
+  });
+});
+  </script>
 {% endblock %}

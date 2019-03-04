@@ -1,14 +1,12 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from workbench.tools.models import Model, HoursField
+from workbench.tools.models import Model, MoneyField
 
 
 class ServiceType(Model):
     title = models.CharField(_("title"), max_length=40)
-
-    billing_per_hour = HoursField(_("billing per hour"))
-
+    billing_per_hour = MoneyField(_("billing per hour"))
     position = models.PositiveIntegerField(_("position"), default=0)
 
     class Meta:

@@ -51,7 +51,7 @@
       <small class="row justify-content-between">
         <span class="col-md-6">
           {% for effort in service.efforts.all %}
-            {{ effort.hours }}h {{ effort.service_type }}{% if not forloop.last %},{% endif %}
+            {{ effort.hours }}h {{ effort.title }}{% if not forloop.last %},{% endif %}
           {% endfor %}
           {% for cost in service.costs.all %}
             {{ cost.title }} ({{ cost.cost|currency }}){% if not forloop.last %},{% endif %}
