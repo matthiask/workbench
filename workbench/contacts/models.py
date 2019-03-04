@@ -176,7 +176,7 @@ class PostalAddress(PersonDetail):
     address_suffix = models.CharField(_("address suffix"), max_length=100, blank=True)
     postal_code = models.CharField(_("postal code"), max_length=20)
     city = models.CharField(_("city"), max_length=100)
-    country = CountryField(default="CH")
+    country = CountryField(_("country"), default="CH")
     postal_address_override = models.TextField(
         _("override"),
         blank=True,

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
         "django.contrib.postgres",
         "admin_ordering",
         "bootstrap4",
+        "django_countries",
         "fineforms",
         "django.forms",
         "workbench.accounts",
