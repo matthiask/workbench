@@ -46,11 +46,6 @@ urlpatterns = [
         name="projects_project_services",
     ),
     url(
-        r"^(?P<pk>\d+)/costs/$",
-        ProjectDetailView.as_view(project_view="costs"),
-        name="projects_project_costs",
-    ),
-    url(
         r"^(?P<pk>\d+)/activities/$",
         ProjectDetailView.as_view(project_view="activities"),
         name="projects_project_activities",
