@@ -403,36 +403,39 @@ FROM dblink(
 ) AS p(id int, activity_name text, notes text, job_id int, offer_id int, ordering int);
 
 INSERT INTO projects_effort
-(service_id, service_type_id, hours)
-SELECT service_id, service_type_id, effort FROM
+(service_id, service_type_id, hours, title, billing_per_hour)
+SELECT service_id, service_type_id, effort, title, billing_per_hour FROM
 dblink(
     'dbname=fineware_feinheit',
-    'SELECT a.id, 1, a.hours FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id WHERE jo.job_id IS NOT NULL AND a.included'
-) p(service_id int, service_type_id int, effort numeric(5,2));
+    'SELECT a.id, 1, a.hours, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, invoicing_hourly_rate FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
+) p(service_id int, service_type_id int, effort numeric(5,2), title text, billing_per_hour numeric(10,2));
 
-UPDATE projects_effort SET service_type_id=2
-FROM projects_service s
-WHERE projects_effort.service_id=s.id AND s.title ~ '^(Konzept:|Online Marketing:|User Experience:)';
-
-UPDATE projects_effort SET service_type_id=3
-FROM projects_service s
-WHERE projects_effort.service_id=s.id AND s.title ~'^(Grafik)';
-
-UPDATE projects_effort SET service_type_id=4
-FROM projects_service s
-WHERE projects_effort.service_id=s.id AND s.title ~'^(Multimedia|3D)';
-
-UPDATE projects_effort SET service_type_id=5
-FROM projects_service s
-WHERE projects_effort.service_id=s.id AND s.title ~ '^(Programmierung|IT-Dienstleistungen)';
-
-UPDATE projects_effort SET service_type_id=6
-FROM projects_service s
-WHERE projects_effort.service_id=s.id AND s.title ~ '^(Projektorganisation|Intern|Marketing)';
-
-UPDATE projects_effort SET service_type_id=7
-FROM projects_service s
-WHERE projects_effort.service_id=s.id AND s.title ~ '^(Administration)';
+--
+-- Not necessary anymore.
+--
+-- UPDATE projects_effort SET service_type_id=2
+-- FROM projects_service s
+-- WHERE projects_effort.service_id=s.id AND s.title ~ '^(Konzept:|Online Marketing:|User Experience:)';
+--
+-- UPDATE projects_effort SET service_type_id=3
+-- FROM projects_service s
+-- WHERE projects_effort.service_id=s.id AND s.title ~'^(Grafik)';
+--
+-- UPDATE projects_effort SET service_type_id=4
+-- FROM projects_service s
+-- WHERE projects_effort.service_id=s.id AND s.title ~'^(Multimedia|3D)';
+--
+-- UPDATE projects_effort SET service_type_id=5
+-- FROM projects_service s
+-- WHERE projects_effort.service_id=s.id AND s.title ~ '^(Programmierung|IT-Dienstleistungen)';
+--
+-- UPDATE projects_effort SET service_type_id=6
+-- FROM projects_service s
+-- WHERE projects_effort.service_id=s.id AND s.title ~ '^(Projektorganisation|Intern|Marketing)';
+--
+-- UPDATE projects_effort SET service_type_id=7
+-- FROM projects_service s
+-- WHERE projects_effort.service_id=s.id AND s.title ~ '^(Administration)';
 
 
 --
