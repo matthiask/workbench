@@ -3,13 +3,6 @@
 from django.db import migrations, models
 import django_countries.fields
 
-from workbench.tools.search import migration_sql
-
-
-FORWARD, BACKWARD = migration_sql(
-    "contacts_person", "given_name, family_name, address, notes"
-)
-
 
 class Migration(migrations.Migration):
 
@@ -100,5 +93,4 @@ class Migration(migrations.Migration):
                 verbose_name="address",
             ),
         ),
-        migrations.RunSQL(FORWARD, BACKWARD),
     ]
