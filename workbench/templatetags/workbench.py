@@ -1,6 +1,5 @@
 from collections import OrderedDict
 from datetime import date, datetime
-from decimal import Decimal
 from itertools import groupby
 
 from django import template
@@ -11,6 +10,7 @@ from django.utils.html import format_html, mark_safe
 from django.utils.translation import ugettext as _
 
 from workbench.tools.formats import local_date_format
+from workbench.tools.models import Z
 
 
 register = template.Library()
@@ -84,7 +84,7 @@ def percentage_to_css(value):
 def group_hours_by_day(iterable):
     for day, instances in groupby(iterable, lambda logged: logged.rendered_on):
         instances = list(instances)
-        yield (day, sum((item.hours for item in instances), Decimal()), instances)
+        yield (day, sum((item.hours for item in instances), Z), instances)
 
 
 @register.filter

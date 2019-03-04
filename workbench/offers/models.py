@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.expressions import RawSQL
@@ -9,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from workbench.accounts.models import User
 from workbench.projects.models import Project
 from workbench.tools.formats import local_date_format
-from workbench.tools.models import ModelWithTotal, SearchQuerySet
+from workbench.tools.models import ModelWithTotal, SearchQuerySet, Z
 from workbench.tools.urls import model_urls
 
 
@@ -90,9 +88,7 @@ class Offer(ModelWithTotal):
         return "%s-o%02d" % (self.project.code, self._code)
 
     def _calculate_total(self):
-        self.subtotal = sum(
-            (service.cost for service in self.services.all()), Decimal()
-        )
+        self.subtotal = sum((service.cost for service in self.services.all()), Z)
         super()._calculate_total()
 
     def clean(self):

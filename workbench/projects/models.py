@@ -1,5 +1,4 @@
 from collections import defaultdict
-from decimal import Decimal
 from datetime import date
 from itertools import chain
 
@@ -16,7 +15,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.services.models import ServiceType
-from workbench.tools.models import SearchQuerySet, Model, MoneyField, HoursField
+from workbench.tools.models import SearchQuerySet, Model, MoneyField, HoursField, Z
 from workbench.tools.urls import model_urls
 
 
@@ -136,10 +135,8 @@ class Project(Model):
             "logged": LoggedHours.objects.filter(service__project=self)
             .order_by()
             .aggregate(h=Sum("hours"))["h"]
-            or Decimal(),
-            "effort": sum(
-                (service.effort_hours for service in self.services.all()), Decimal()
-            ),
+            or Z,
+            "effort": sum((service.effort_hours for service in self.services.all()), Z),
         }
 
     @cached_property
@@ -250,7 +247,7 @@ class Service(Model):
             self.position = 10 + (max_pos or 0)
         if self.pk:
             efforts = self.efforts.all()
-            self.effort_hours = sum((e.hours for e in efforts), Decimal())
+            self.effort_hours = sum((e.hours for e in efforts), Z)
             self.cost = sum((i.cost for i in chain(efforts, self.costs.all())), 0)
         super().save(*args, **kwargs)
 

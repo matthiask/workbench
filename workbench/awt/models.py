@@ -12,7 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 from workbench.accounts.models import User
 from workbench.awt.utils import days_per_month, monthly_days
 from workbench.logbook.models import LoggedHours
-from workbench.tools.models import Model, HoursField
+from workbench.tools.models import Model, HoursField, Z
 from workbench.tools.urls import model_urls
 
 
@@ -80,13 +80,13 @@ class Year(Model):
             lambda: {
                 "months": [None] * 12,
                 "target_days": target_days,
-                "percentage": [Decimal("0") for i in range(12)],
-                "available_vacation_days": [Decimal("0.00") for i in range(12)],
-                "vacation_days": [Decimal("0.00") for i in range(12)],
-                "vacation_days_correction": [Decimal("0.00") for i in range(12)],
-                "other_absences": [Decimal("0.00") for i in range(12)],
-                "target": [Decimal("0.00") for i in range(12)],
-                "hours": [Decimal("0.0") for i in range(12)],
+                "percentage": [Z for i in range(12)],
+                "available_vacation_days": [Z for i in range(12)],
+                "vacation_days": [Z for i in range(12)],
+                "vacation_days_correction": [Z for i in range(12)],
+                "other_absences": [Z for i in range(12)],
+                "target": [Z for i in range(12)],
+                "hours": [Z for i in range(12)],
             }
         )
         dpm = days_per_month(self.year)
@@ -167,7 +167,7 @@ class Year(Model):
                         data["vacation_days_correction"][i],
                         data["other_absences"][i],
                     ),
-                    Decimal("0.00"),
+                    Z,
                 )
                 for i in range(12)
             ]
@@ -213,7 +213,7 @@ class Year(Model):
                         "target": sum(user_data["target"]),
                         "hours": sum(user_data["hours"]),
                         "working_time": sum(wt),
-                        "running_sum": sum(filter(None, sums), Decimal()),
+                        "running_sum": sum(filter(None, sums), Z),
                     },
                 }
             )

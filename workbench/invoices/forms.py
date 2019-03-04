@@ -1,5 +1,4 @@
 from datetime import date
-from decimal import Decimal
 
 from django import forms, http
 from django.db.models import Q
@@ -13,6 +12,7 @@ from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import Invoice
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import Picker, Textarea, WarningsForm
+from workbench.tools.models import Z
 from workbench.templatetags.workbench import currency
 
 
@@ -327,7 +327,7 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
 
         if instance.type in (instance.FIXED, instance.DOWN_PAYMENT):
             instance.subtotal = self.cleaned_data["subtotal"]
-            instance.down_payment_total = Decimal()
+            instance.down_payment_total = Z
 
         if "apply_down_payment" in self.cleaned_data:
             instance.down_payment_invoices.set(
@@ -338,7 +338,7 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
                     invoice.total_excl_tax
                     for invoice in self.cleaned_data.get("apply_down_payment")
                 ),
-                Decimal(),
+                Z,
             )
 
         instance.save()

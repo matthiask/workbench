@@ -83,11 +83,14 @@ class Model(models.Model):
         )
 
 
+Z = Decimal("0.00")
+
+
 MoneyField = partial(
     models.DecimalField,
     max_digits=10,
     decimal_places=2,
-    default=Decimal("0"),
+    default=Z,
     validators=[MinValueValidator(0)],
 )
 
@@ -133,11 +136,7 @@ class ModelWithTotal(Model):
 
     @property
     def tax_amount(self):
-        return (
-            self.total_excl_tax * self.tax_rate / 100
-            if self.liable_to_vat
-            else Decimal()
-        )
+        return self.total_excl_tax * self.tax_rate / 100 if self.liable_to_vat else Z
 
     @property
     def total_excl_tax(self):

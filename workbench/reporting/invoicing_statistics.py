@@ -1,13 +1,10 @@
 from datetime import date
-from decimal import Decimal
 
 from django.db.models import Sum
 
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost
-
-
-Z = Decimal("0.00")
+from workbench.tools.models import Z
 
 
 def monthly_invoicing(year):
