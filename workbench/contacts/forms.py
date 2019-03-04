@@ -52,8 +52,9 @@ class PersonForm(ModelForm):
     class Meta:
         model = Person
         fields = (
-            "full_name",
             "address",
+            "given_name",
+            "family_name",
             "notes",
             "organization",
             "primary_contact",
@@ -123,12 +124,23 @@ EmailAddressFormset = inlineformset_factory(
 class PostalAddressForm(forms.ModelForm):
     class Meta:
         model = PostalAddress
-        fields = ("type", "postal_address")
+        fields = (
+            "type",
+            "street",
+            "house_number",
+            "address_suffix",
+            "postal_code",
+            "city",
+            "country",
+            "postal_address_override",
+        )
         widgets = {
             "type": forms.TextInput(
                 attrs={"class": "form-control short", "placeholder": _("type")}
             ),
-            "postal_address": Textarea(attrs={"class": "form-control", "rows": 6}),
+            "postal_address_override": Textarea(
+                attrs={"class": "form-control", "rows": 3}
+            ),
         }
 
 
