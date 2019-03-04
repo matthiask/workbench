@@ -100,13 +100,17 @@ class Project(Model):
         return "%s-%04d" % (self.created_at.year, self._code)
 
     def save(self, *args, **kwargs):
+        new = False
         if not self.pk:
             self._code = RawSQL(
                 "SELECT COALESCE(MAX(_code), 0) + 1 FROM projects_project"
                 " WHERE EXTRACT(year FROM created_at) = %s",
                 (timezone.now().year,),
             )
+            new = True
         super().save(*args, **kwargs)
+        if new:
+            self.refresh_from_db()
 
     save.alters_data = True
 
