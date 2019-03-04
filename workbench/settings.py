@@ -167,9 +167,8 @@ WORKBENCH = {
         ],
         PDF_INVOICE_PAYMENT=(
             "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
-            " der Referenznummer %(code)s innerhalb von %(days)s Tagen"
-            " (%(due)s) auf unser ZKB Konto"
-            " IBAN CH52 0070 0114 8022 0855 1."
+            " der Referenznummer %(code)s bis zum %(due)s"
+            " auf ZKB Konto IBAN CH52 0070 0114 8022 0855 1."
         ),
         FONTS={
             "regular": font("ZuricBTLig.ttf"),
@@ -193,8 +192,8 @@ WORKBENCH = {
         ],
         PDF_INVOICE_PAYMENT=(
             "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
-            " der Referenznummer %(code)s innerhalb von %(days)s Tagen"
-            " (%(due)s) auf IBAN CH78 0070 0110 0070 4877 9."
+            " der Referenznummer %(code)s bis zum %(due)s"
+            " auf ZKB Konto IBAN CH78 0070 0110 0070 4877 9."
         ),
         FONTS={
             "regular": font("HelveticaNeueLight.ttf"),

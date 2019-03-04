@@ -1,6 +1,5 @@
 from copy import deepcopy
 from decimal import Decimal as D
-from datetime import timedelta
 from functools import partial
 
 from django.conf import settings
@@ -335,12 +334,11 @@ class PDFDocument(_PDFDocument):
             settings.WORKBENCH.PDF_INVOICE_PAYMENT
             % {
                 "code": invoice.code,
-                "days": 15,
-                "due": local_date_format(
-                    invoice.invoiced_on + timedelta(days=15), "d.m.Y"
-                )
-                if invoice.invoiced_on
-                else _("NO DATE YET"),
+                "due": (
+                    local_date_format(invoice.due_on, "d.m.Y")
+                    if invoice.due_on
+                    else _("NO DATE YET")
+                ),
             }
         )
 
