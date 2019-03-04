@@ -202,7 +202,7 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
                         format_html(
                             "{}<br/>{}, {}",
                             invoice.__html__(),
-                            currency(invoice.total),
+                            _("%s excl. tax") % currency(invoice.total_excl_tax),
                             invoice.pretty_status(),
                         ),
                     )
