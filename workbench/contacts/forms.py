@@ -13,7 +13,7 @@ from workbench.contacts.models import (
     EmailAddress,
     PostalAddress,
 )
-from workbench.tools.forms import ModelForm, Picker, Textarea
+from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm
 
 
 class OrganizationSearchForm(forms.Form):
@@ -46,7 +46,7 @@ class OrganizationForm(ModelForm):
         }
 
 
-class PersonForm(ModelForm):
+class PersonForm(WarningsForm, ModelForm):
     user_fields = default_to_current_user = ("primary_contact",)
 
     class Meta:
@@ -55,6 +55,7 @@ class PersonForm(ModelForm):
             "address",
             "given_name",
             "family_name",
+            "salutation",
             "notes",
             "organization",
             "primary_contact",
@@ -80,6 +81,12 @@ class PersonForm(ModelForm):
             if self.instance.pk
             else OrderedDict()
         )
+
+    def clean(self):
+        data = super().clean()
+        if not data.get("salutation"):
+            self.add_warning(_("No salutation set. This will make newsletters ugly."))
+        return data
 
     def is_valid(self):
         return all(
