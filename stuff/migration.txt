@@ -123,7 +123,7 @@ dblink(
 ) AS m(
   id int, first_name text, name text, gender varchar(1)
 )
-WHERE p.id=m.id AND salutation='';
+WHERE p.id=m.id;
 
 INSERT INTO contacts_person_groups
 (person_id, group_id)
