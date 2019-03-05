@@ -4,6 +4,7 @@ import re
 from django.core.management.base import BaseCommand
 
 from workbench.accounts.models import User
+from workbench.contacts.models import PostalAddress
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
@@ -56,6 +57,17 @@ class Command(BaseCommand):
     help = "De-htmlizes description fields"
 
     def handle(self, **options):
+        self.stdout.write("updating street and house numbers...")
+        for postal_address in PostalAddress.objects.order_by("street"):
+            if (
+                re.search(r"\b[0-9]+$", postal_address.street)
+                and not postal_address.house_number
+            ):
+                two = postal_address.street.rsplit(" ", 1)
+                if len(two) == 2:
+                    postal_address.street, postal_address.house_number = two
+                    postal_address.save()
+
         self.stdout.write("updating employments' until dates...")
         for user in User.objects.all():
             employment = user.employments.last()
@@ -63,16 +75,19 @@ class Command(BaseCommand):
                 employment.save()
                 if not employment.percentage:
                     employment.delete()
+
         self.stdout.write("dehtmling invoices...")
         for instance in Invoice.objects.all():
             instance.description = dehtml(instance.description)
             instance.postal_address = instance.postal_address.strip()
             instance.save(update_fields=("description",))
+
         self.stdout.write("dehtmling offers...")
         for instance in Offer.objects.all():
             instance.description = dehtml(instance.description)
             instance.postal_address = instance.postal_address.strip()
             instance.save(update_fields=("description",))
+
         self.stdout.write("dehtmling projects...")
         for instance in Project.objects.all():
             instance.description = dehtml(instance.description)

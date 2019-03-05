@@ -3,6 +3,8 @@ import re
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from django_countries.fields import CountryField
+
 from workbench.accounts.models import User
 from workbench.tools.models import SearchManager, Model
 from workbench.tools.urls import model_urls
@@ -48,9 +50,10 @@ class Organization(Model):
 
 @model_urls()
 class Person(Model):
-    full_name = models.CharField(_("full name"), max_length=100)
+    given_name = models.CharField(_("given name"), max_length=100)
+    family_name = models.CharField(_("family name"), max_length=100)
     address = models.CharField(
-        _("address"), max_length=100, blank=True, help_text=_("E.g. Dear John.")
+        _("address"), max_length=100, blank=True, help_text=_("E.g. Sir/Madam")
     )
     notes = models.TextField(_("notes"), blank=True)
     organization = models.ForeignKey(
@@ -74,7 +77,7 @@ class Person(Model):
     objects = SearchManager()
 
     class Meta:
-        ordering = ("full_name",)
+        ordering = ["given_name", "family_name"]
         verbose_name = _("person")
         verbose_name_plural = _("people")
 
@@ -82,6 +85,10 @@ class Person(Model):
         if self.organization_id:
             return "%s / %s" % (self.full_name, self.organization)
         return self.full_name
+
+    @property
+    def full_name(self):
+        return " ".join(filter(None, (self.given_name, self.family_name)))
 
 
 class PersonDetail(Model):
@@ -164,7 +171,17 @@ class PostalAddress(PersonDetail):
         verbose_name=_("person"),
         related_name="postaladdresses",
     )
-    postal_address = models.TextField(_("postal address"))
+    street = models.CharField(_("street"), max_length=100)
+    house_number = models.CharField(_("house number"), max_length=20, blank=True)
+    address_suffix = models.CharField(_("address suffix"), max_length=100, blank=True)
+    postal_code = models.CharField(_("postal code"), max_length=20)
+    city = models.CharField(_("city"), max_length=100)
+    country = CountryField(_("country"), default="CH")
+    postal_address_override = models.TextField(
+        _("override"),
+        blank=True,
+        help_text=_("Completely overrides the postal address if set."),
+    )
 
     class Meta:
         ordering = ("-weight", "id")
@@ -180,3 +197,17 @@ class PostalAddress(PersonDetail):
     @property
     def urls(self):
         return self.person.urls
+
+    @property
+    def postal_address(self):
+        if self.postal_address_override:
+            return self.postal_address_override
+        lines = [
+            self.person.organization.name if self.person.organization else "",
+            self.person.full_name,
+            " ".join(filter(None, (self.street, self.house_number))),
+            self.address_suffix,
+            " ".join(filter(None, (self.postal_code, self.city))),
+            self.country.name if self.country.code != "CH" else "",
+        ]
+        return "\n".join(filter(None, lines))

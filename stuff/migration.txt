@@ -88,12 +88,12 @@ dblink(
 --
 
 INSERT INTO contacts_person
-(id, full_name, address, notes, organization_id, primary_contact_id)
-SELECT id, concat(first_name, ' ', name), '', CASE WHEN title!='' THEN CONCAT('Titel: ', title, E'\n', notes) ELSE notes END, organization_id, primary_contact_id FROM
+(id, address, given_name, family_name, notes, organization_id, primary_contact_id)
+SELECT id, CASE WHEN gender='f' THEN 'Frau' ELSE 'Herr' END, first_name, name, CASE WHEN title!='' THEN CONCAT('Titel: ', title, E'\n', notes) ELSE notes END, organization_id, primary_contact_id FROM
 dblink(
     'dbname=fineware_feinheit',
-    'SELECT id, first_name, name, title, notes, NULL, contact_id FROM addressbook_person WHERE company=FALSE'
-) AS p(id int, first_name varchar(100), name text, title text, notes text, organization_id int, primary_contact_id int);
+    'SELECT id, gender, first_name, name, title, notes, NULL, contact_id FROM addressbook_person WHERE company=FALSE'
+) AS p(id int, gender varchar(10), first_name varchar(100), name text, title text, notes text, organization_id int, primary_contact_id int);
 
 INSERT INTO contacts_person_groups
 (person_id, group_id)
@@ -120,32 +120,24 @@ dblink(
 ) AS p(person_id int, type varchar(20), phone_number varchar(300));
 
 INSERT INTO contacts_postaladdress
-(person_id, type, postal_address, weight)
-SELECT person_id, CASE WHEN type=1 THEN 'work' ELSE 'home' END, CONCAT(COALESCE(employer_name, ''), E'\n', first_name, ' ', name, E'\n', function, E'\n', address, E'\n', zip_code, ' ', city, E'\n', CASE WHEN country = 'CH' THEN '' ELSE country END), 0 FROM
+(person_id, type, weight, street, house_number, address_suffix, postal_code, city, country, postal_address_override)
+SELECT person_id, CASE WHEN type=1 THEN 'work' ELSE 'home' END, 0, p.address, '', substring(p.function for 100), p.zip_code, p.city, p.country, p.full_override
+FROM
 dblink(
     'dbname=fineware_feinheit',
-    'SELECT p.id, a.type, e.name, p.first_name, p.name, a.function, a.address, a.zip_code, a.city, a.country FROM addressbook_address a LEFT JOIN addressbook_person p ON a.person_id=p.id LEFT OUTER JOIN addressbook_person e ON a.employer_id=e.id WHERE p.company=FALSE AND a.active=TRUE'
-) AS p(person_id int, type int, employer_name varchar(300), first_name varchar(100), name varchar(300), function text, address text, zip_code varchar(20), city varchar(100), country varchar(100));
+    'SELECT p.id, a.type, e.name, p.first_name, p.name, a.function, a.address, a.zip_code, a.city, a.country, a.full_override FROM addressbook_address a LEFT JOIN addressbook_person p ON a.person_id=p.id LEFT OUTER JOIN addressbook_person e ON a.employer_id=e.id WHERE p.company=FALSE AND a.active=TRUE'
+) AS p(person_id int, type int, employer_name varchar(300), first_name varchar(100), name varchar(300), function text, address text, zip_code varchar(20), city varchar(100), country varchar(100), full_override text);
 
 
-INSERT INTO contacts_postaladdress
-(person_id, type, postal_address, weight)
-SELECT person_id, 'override', full_override, 0 FROM
-dblink(
-    'dbname=fineware_feinheit',
-    'SELECT a.person_id, a.full_override FROM addressbook_address a LEFT JOIN addressbook_person p ON a.person_id=p.id WHERE company=FALSE AND full_override!='''' AND active=TRUE'
-) AS p(person_id int, full_override text);
-
-
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^[\n\r]+', '', 'g');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^[\n\r]+', '', 'g');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^[\n\r]+', '', 'g');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '[\n\r]$', '', 'g');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '[\n\r]$', '', 'g');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '[\n\r]$', '', 'g');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n', 'g');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n', 'g');
-UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n', 'g');
+-- UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^[\n\r]+', '', 'g');
+-- UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^[\n\r]+', '', 'g');
+-- UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '^[\n\r]+', '', 'g');
+-- UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '[\n\r]$', '', 'g');
+-- UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '[\n\r]$', '', 'g');
+-- UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '[\n\r]$', '', 'g');
+-- UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n', 'g');
+-- UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n', 'g');
+-- UPDATE contacts_postaladdress SET postal_address=regexp_replace(postal_address, '\n\n', E'\n', 'g');
 
 --
 -- Assign persons to organizations
@@ -164,15 +156,16 @@ WHERE contacts_person.id=p.person_id;
 -- Distribute information from organizations to all employees
 --
 
-INSERT INTO contacts_postaladdress
-(person_id, type, postal_address, weight)
-SELECT person.id, CONCAT('organization ', CASE WHEN type=1 THEN 'work' ELSE 'home' END), value, 0 FROM
-contacts_person person,
-dblink(
-    'dbname=fineware_feinheit',
-    'SELECT a.person_id, a.type, a.full_override FROM addressbook_address a LEFT JOIN addressbook_person p ON a.person_id=p.id WHERE company=TRUE AND full_override!='''' AND active=TRUE'
-) AS p(employer_person_id int, type int, value text)
-WHERE person.organization_id=employer_person_id;
+-- INSERT INTO contacts_postaladdress
+-- (person_id, type, weight, street, house_number, address_suffix, postal_code, city, country, postal_address_override)
+-- SELECT person.id, CONCAT('organization ', CASE WHEN type=1 THEN 'work' ELSE 'home' END), 0, p.address, '', p.function, p.zip_code, p.city, p.country, p.full_override
+--  FROM
+-- contacts_person person,
+-- dblink(
+--     'dbname=fineware_feinheit',
+--     'SELECT a.person_id, a.type, a.full_override FROM addressbook_address a LEFT JOIN addressbook_person p ON a.person_id=p.id WHERE company=TRUE AND full_override!='''' AND active=TRUE'
+-- ) AS p(employer_person_id int, type int, value text)
+-- WHERE person.organization_id=employer_person_id;
 
 INSERT INTO contacts_emailaddress
 (person_id, type, email, weight)

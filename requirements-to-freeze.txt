@@ -2,6 +2,7 @@ coverage
 Django
 django-admin-ordering
 django-bootstrap4
+django-countries
 django-debug-toolbar
 django-fineforms
 django-vanilla-views
