@@ -238,13 +238,14 @@ class PDFDocument(_PDFDocument):
                         % (sanitize(service.title), sanitize(service.description)),
                         self.style.normal,
                     ),
-                    "",
+                    service.cost.quantize(Z),
                 )
             )
-            for effort in service.efforts.all():
-                table.append((effort.service_type.title, effort.cost.quantize(Z)))
-            for cost in service.costs.all():
-                table.append((cost.title, cost.cost.quantize(Z)))
+            # FIXME Show a thing, but maybe not everything
+            # for effort in service.efforts.all():
+            #     table.append((effort.title, effort.cost.quantize(Z)))
+            # for cost in service.costs.all():
+            #     table.append((cost.title, cost.cost.quantize(Z)))
 
         self.table(table, self.style.tableColumns, self.style.tableHead)
 
@@ -323,7 +324,9 @@ class PDFDocument(_PDFDocument):
                     (
                         local_date_format(invoice.invoiced_on, "d.m.Y")
                         if invoice.invoiced_on
-                        else MarkupParagraph("<b>%s</b>" % _("NO DATE YET"), style=self.style.bold)
+                        else MarkupParagraph(
+                            "<b>%s</b>" % _("NO DATE YET"), style=self.style.bold
+                        )
                     ),
                 ),
                 ("MwSt.-Nr.", settings.WORKBENCH.PDF_VAT_NO),
