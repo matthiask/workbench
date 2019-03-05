@@ -53,7 +53,13 @@ class Person(Model):
     given_name = models.CharField(_("given name"), max_length=100)
     family_name = models.CharField(_("family name"), max_length=100)
     address = models.CharField(
-        _("address"), max_length=100, blank=True, help_text=_("E.g. Sir/Madam")
+        _("address"), max_length=100, blank=True, help_text=_("Mr./Ms.")
+    )
+    salutation = models.CharField(
+        _("salutation"),
+        max_length=100,
+        blank=True,
+        help_text=_("Dear John/Dear Ms Smith"),
     )
     notes = models.TextField(_("notes"), blank=True)
     organization = models.ForeignKey(

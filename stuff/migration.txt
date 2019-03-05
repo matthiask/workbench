@@ -88,12 +88,42 @@ dblink(
 --
 
 INSERT INTO contacts_person
-(id, address, given_name, family_name, notes, organization_id, primary_contact_id)
-SELECT id, CASE WHEN gender='f' THEN 'Frau' ELSE 'Herr' END, first_name, name, CASE WHEN title!='' THEN CONCAT('Titel: ', title, E'\n', notes) ELSE notes END, organization_id, primary_contact_id FROM
+(id, address, salutation, given_name, family_name, notes, organization_id, primary_contact_id)
+SELECT id, CASE WHEN gender='f' THEN 'Frau' ELSE 'Herr' END, '', first_name, name, CASE WHEN title!='' THEN CONCAT('Titel: ', title, E'\n', notes) ELSE notes END, organization_id, primary_contact_id FROM
 dblink(
     'dbname=fineware_feinheit',
     'SELECT id, gender, first_name, name, title, notes, NULL, contact_id FROM addressbook_person WHERE company=FALSE'
 ) AS p(id int, gender varchar(10), first_name varchar(100), name text, title text, notes text, organization_id int, primary_contact_id int);
+
+UPDATE contacts_person p
+SET salutation=CASE
+WHEN m.gender='m' THEN CONCAT('Sehr geehrter Herr ', m.name)
+WHEN m.gender='f' THEN CONCAT('Sehr geehrte Frau ', m.name)
+ELSE CONCAT('Sehr geehrte/r ', m.first_name, ' ', m.name)
+END
+FROM
+dblink(
+  'dbname=fineware_feinheit',
+  'SELECT id, first_name, name, gender FROM addressbook_person'
+) AS m(
+  id int, first_name text, name text, gender varchar(1)
+)
+WHERE p.id=m.id;
+
+UPDATE contacts_person p
+SET salutation=CASE
+WHEN m.gender='m' THEN CONCAT('Lieber ', m.first_name)
+WHEN m.gender='f' THEN CONCAT('Liebe ', m.first_name)
+ELSE CONCAT('Hallo ', m.first_name)
+END
+FROM
+dblink(
+  'dbname=fineware_feinheit',
+  'SELECT p.id, first_name, name, gender FROM addressbook_address a LEFT JOIN addressbook_person p ON a.person_id=p.id WHERE first_name_terms=TRUE'
+) AS m(
+  id int, first_name text, name text, gender varchar(1)
+)
+WHERE p.id=m.id AND salutation='';
 
 INSERT INTO contacts_person_groups
 (person_id, group_id)
