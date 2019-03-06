@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
-from workbench.invoices.models import Invoice
+from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import Picker, Textarea, WarningsForm
 from workbench.tools.models import Z
@@ -428,3 +428,48 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
 
         if person:
             self.add_postal_address_selection(person=person)
+
+
+class RecurringInvoiceForm(WarningsForm, PostalAddressSelectionForm):
+    user_fields = default_to_current_user = ("owned_by",)
+
+    class Meta:
+        model = RecurringInvoice
+        fields = (
+            "customer",
+            "contact",
+            "title",
+            "description",
+            "owned_by",
+            "postal_address",
+            "starts_on",
+            "ends_on",
+            "periodicity",
+            "next_period_starts_on",
+            "subtotal",
+            "discount",
+            "liable_to_vat",
+        )
+        widgets = {
+            "customer": Picker(model=Organization),
+            "contact": Picker(model=Person),
+            "description": Textarea,
+            "postal_address": Textarea,
+            "periodicity": forms.RadioSelect,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["periodicity"].choices = RecurringInvoice.PERIODICITY_CHOICES
+        self.fields["next_period_starts_on"].disabled = True
+
+        if not self.instance.postal_address:
+            self.add_postal_address_selection(person=self.instance.contact)
+
+    def clean(self):
+        data = super().clean()
+
+        if not data.get("contact"):
+            self.add_warning(_("No contact selected."))
+        return data

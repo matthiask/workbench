@@ -66,6 +66,7 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a class="dropdown-item" href="#">{% trans 'payment lists' %}</a>
+            <a class="dropdown-item" href="{% url 'invoices_recurringinvoice_list' %}">{% trans 'recurring invoices'|capfirst %}</a>
             {# <div class="dropdown-divider"></div> #}
           </div>
         </li>

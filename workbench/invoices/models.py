@@ -252,6 +252,13 @@ class Invoice(ModelWithTotal):
 
 @model_urls()
 class RecurringInvoice(ModelWithTotal):
+    PERIODICITY_CHOICES = [
+        ("yearly", _("yearly")),
+        ("quarterly", _("quarterly")),
+        ("monthly", _("monthly")),
+        ("weekly", _("weekly")),
+    ]
+
     customer = models.ForeignKey(
         Organization,
         on_delete=models.PROTECT,
@@ -280,14 +287,7 @@ class RecurringInvoice(ModelWithTotal):
     starts_on = models.DateField(_("starts on"), default=date.today)
     ends_on = models.DateField(_("ends on"), blank=True, null=True)
     periodicity = models.CharField(
-        _("periodicity"),
-        max_length=20,
-        choices=[
-            ("yearly", _("yearly")),
-            ("quarterly", _("quarterly")),
-            ("monthly", _("monthly")),
-            ("weekly", _("weekly")),
-        ],
+        _("periodicity"), max_length=20, choices=PERIODICITY_CHOICES
     )
     next_period_starts_on = models.DateField(
         _("next period starts on"), blank=True, null=True
