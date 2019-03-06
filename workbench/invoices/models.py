@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
+from workbench.invoices.utils import recurring
 from workbench.projects.models import Project
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import ModelWithTotal, SearchQuerySet, MoneyField
@@ -247,3 +248,109 @@ class Invoice(ModelWithTotal):
             )
         else:
             return _("total CHF incl. tax") if self.liable_to_vat else _("total CHF")
+
+
+@model_urls()
+class RecurringInvoice(ModelWithTotal):
+    customer = models.ForeignKey(
+        Organization,
+        on_delete=models.PROTECT,
+        verbose_name=_("customer"),
+        related_name="+",
+    )
+    contact = models.ForeignKey(
+        Person,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_("contact"),
+        related_name="+",
+    )
+
+    title = models.CharField(_("title"), max_length=200)
+    description = models.TextField(_("description"), blank=True)
+    owned_by = models.ForeignKey(
+        User, on_delete=models.PROTECT, verbose_name=_("owned by"), related_name="+"
+    )
+
+    created_at = models.DateTimeField(_("created at"), default=timezone.now)
+
+    postal_address = models.TextField(_("postal address"), blank=True)
+
+    starts_on = models.DateField(_("starts on"), default=date.today)
+    ends_on = models.DateField(_("ends on"), blank=True, null=True)
+    periodicity = models.CharField(
+        _("periodicity"),
+        max_length=20,
+        choices=[
+            ("yearly", _("yearly")),
+            ("quarterly", _("quarterly")),
+            ("monthly", _("monthly")),
+            ("weekly", _("weekly")),
+            ("manually", _("manually")),
+        ],
+    )
+    next_period_starts_on = models.DateField(
+        _("next period starts on"), blank=True, null=True
+    )
+
+    objects = SearchQuerySet.as_manager()
+
+    class Meta:
+        ordering = ["customer__name", "title"]
+        verbose_name = _("recurring invoice")
+        verbose_name_plural = _("recurring invoices")
+
+    def __str__(self):
+        return self.title
+
+    def create_single_invoice(self, *, period_starts_on, period_ends_on):
+        return Invoice.objects.create(
+            customer=self.customer,
+            contact=self.contact,
+            project=None,
+            invoiced_on=period_starts_on,
+            due_on=period_starts_on + timedelta(days=15),
+            title=self.title,
+            description="\n\n".join(
+                filter(
+                    None,
+                    (
+                        self.description,
+                        "{}: {} - {}".format(
+                            _("Period"),
+                            local_date_format(period_starts_on, "d.m.Y"),
+                            local_date_format(period_ends_on, "d.m.Y"),
+                        ),
+                    ),
+                )
+            ),
+            owned_by=self.owned_by,
+            status=Invoice.IN_PREPARATION,
+            type=Invoice.FIXED,
+            postal_address=self.postal_address,
+            subtotal=self.subtotal,
+            discount=self.discount,
+            liable_to_vat=self.liable_to_vat,
+            tax_rate=self.tax_rate,
+            total=self.total,
+        )
+
+    def create_invoices(self):
+        days = recurring(
+            max(filter(None, (self.next_period_starts_on, self.starts_on))),
+            self.periodicity,
+        )
+        today = date.today()
+        this_period = next(days)
+        while True:
+            if this_period > today:
+                break
+            next_period = next(days)
+            self.create_single_invoice(
+                period_starts_on=this_period,
+                period_ends_on=next_period - timedelta(days=1),
+            )
+            self.next_period_starts_on = next_period
+            this_period = next_period
+        self.save()
