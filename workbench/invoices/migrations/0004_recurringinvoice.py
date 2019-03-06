@@ -113,7 +113,6 @@ class Migration(migrations.Migration):
                             ("quarterly", "quarterly"),
                             ("monthly", "monthly"),
                             ("weekly", "weekly"),
-                            ("manually", "manually"),
                         ],
                         max_length=20,
                         verbose_name="periodicity",

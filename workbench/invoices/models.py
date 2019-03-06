@@ -287,7 +287,6 @@ class RecurringInvoice(ModelWithTotal):
             ("quarterly", _("quarterly")),
             ("monthly", _("monthly")),
             ("weekly", _("weekly")),
-            ("manually", _("manually")),
         ],
     )
     next_period_starts_on = models.DateField(
