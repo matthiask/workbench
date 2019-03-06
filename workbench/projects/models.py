@@ -165,7 +165,7 @@ class Project(Model):
         }
 
         for service in self.services.select_related("offer").prefetch_related(
-            "efforts__service_type", "costs"
+            "efforts", "costs"
         ):
             service.logged_hours = logged_hours_per_service.get(service.id, 0)
             service.logged_cost = logged_cost_per_service.get(service.id, 0)
@@ -323,13 +323,12 @@ class Effort(Model):
     )
 
     class Meta:
-        ordering = ("service_type",)
-        unique_together = (("service", "service_type"),)
+        ordering = ["pk"]
         verbose_name = _("effort")
         verbose_name_plural = _("efforts")
 
     def __str__(self):
-        return "%s" % self.service_type
+        return "%s" % self.title
 
     @property
     def urls(self):
@@ -359,10 +358,9 @@ class Cost(Model):
         null=True,
         help_text=_("Total incl. tax for third-party services."),
     )
-    position = models.PositiveIntegerField(_("position"), default=0)
 
     class Meta:
-        ordering = ("position", "pk")
+        ordering = ["pk"]
         verbose_name = _("cost")
         verbose_name_plural = _("costs")
 
