@@ -48,7 +48,9 @@ urlpatterns = [
     url(r"^people/$", PersonListView.as_view(), name="contacts_person_list"),
     url(
         r"^people/picker/$",
-        PersonListView.as_view(template_name_suffix="_picker", paginate_by=10),
+        PersonListView.as_view(
+            person_picker=True, template_name_suffix="_picker", paginate_by=10
+        ),
         name="contacts_person_picker",
     ),
     url(

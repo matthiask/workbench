@@ -54,6 +54,9 @@ class ModelForm(forms.ModelForm):
         )
         if self.customer_and_contact:
             self.fields["customer"].required = False
+            self.fields["customer"].help_text = self.fields["customer"].help_text or _(
+                "Is automatically filled using the organization's contact."
+            )
 
     def _only_active_and_initial_users(self, formfield, pk):
         d = defaultdict(list)

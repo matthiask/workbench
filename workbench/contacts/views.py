@@ -14,26 +14,25 @@ class OrganizationListView(ListView):
 class PersonListView(ListView):
     model = Person
     search_form_class = OrganizationSearchForm
+    person_picker = False
 
     def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .select_related("organization")
-            .extra(
-                select={
-                    "email": (
-                        "(SELECT email FROM contacts_emailaddress"
-                        " WHERE contacts_emailaddress.person_id=contacts_person.id"
-                        " ORDER BY weight DESC LIMIT 1)"
-                    ),
-                    "phone_number": (
-                        "(SELECT phone_number FROM contacts_phonenumber"
-                        " WHERE contacts_phonenumber.person_id=contacts_person.id"
-                        " ORDER BY weight DESC LIMIT 1)"
-                    ),
-                }
-            )
+        queryset = super().get_queryset().select_related("organization")
+        if self.person_picker:
+            return queryset.filter(organization__isnull=False)
+        return queryset.extra(
+            select={
+                "email": (
+                    "(SELECT email FROM contacts_emailaddress"
+                    " WHERE contacts_emailaddress.person_id=contacts_person.id"
+                    " ORDER BY weight DESC LIMIT 1)"
+                ),
+                "phone_number": (
+                    "(SELECT phone_number FROM contacts_phonenumber"
+                    " WHERE contacts_phonenumber.person_id=contacts_person.id"
+                    " ORDER BY weight DESC LIMIT 1)"
+                ),
+            }
         )
 
 
