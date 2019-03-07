@@ -89,6 +89,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "workbench.context_processors.workbench",
             ],
             "loaders": [
                 "django.template.loaders.filesystem.Loader",
@@ -177,6 +178,7 @@ WORKBENCH = {
             "italic": font("ZuricBTLigIta.ttf"),
             "bolditalic": font("ZuricBTBolIta.ttf"),
         },
+        BACKGROUND="#e3f2fd",
     ),
     "dbpag": types.SimpleNamespace(
         SSO_DOMAIN="diebruchpiloten.com",
@@ -202,6 +204,7 @@ WORKBENCH = {
             "italic": font("HelveticaNeueLightItalic.ttf"),
             "bolditalic": font("HelveticaNeueBoldItalic.ttf"),
         },
+        BACKGROUND="#dadcab",
     ),
 }[env("NAMESPACE", required=True)]
 

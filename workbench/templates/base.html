@@ -4,8 +4,8 @@
 
 {% block body %}
   <!-- Fixed navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light sticky-top" style="background-color:#e3f2fd">
-    <a class="navbar-brand" href="/">Workbench</a>
+  <nav class="navbar navbar-expand-lg navbar-light sticky-top" style="background-color:{{ WORKBENCH.BACKGROUND }}">
+    <a class="navbar-brand" href="/">{% include 'svg/rocket.svg' %}</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -13,7 +13,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <form class="form-inline mt-1 mb-0 mr-2" method="GET" action="{% url 'search' %}">
+          <form class="form-inline my-0 mr-2" method="GET" action="{% url 'search' %}">
             <div class="input-group">
               <input class="form-control" type="search" placeholder="{% trans 'Search' %}" aria-label="{% trans 'Search' %}" name="q" value="{{ request.GET.q }}">
               <div class="input-group-append">
