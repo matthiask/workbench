@@ -90,17 +90,15 @@ class LoggedCostSearchForm(forms.Form):
         if data.get("created_by"):
             queryset = queryset.filter(created_by=data.get("created_by"))
         if data.get("project"):
-            queryset = queryset.filter(service__project=data.get("project"))
+            queryset = queryset.filter(project=data.get("project"))
         if data.get("organization"):
-            queryset = queryset.filter(
-                service__project__customer=data.get("organization")
-            )
+            queryset = queryset.filter(project__customer=data.get("organization"))
 
         # "hidden" filters
         if data.get("service"):
             queryset = queryset.filter(service=data.get("service"))
 
-        return queryset.select_related("service__project__owned_by", "created_by")
+        return queryset.select_related("project__owned_by", "service", "created_by")
 
     def response(self, response, queryset):
         if response.GET.get("xlsx"):
@@ -203,7 +201,7 @@ class LoggedCostForm(ModelForm):
                 initial["service"] = request.GET.get("service")
 
         else:
-            self.project = self.instance.project
+            self.project = kwargs["instance"].project
 
         super().__init__(*args, **kwargs)
         self.fields["service"].choices = self.project.services.choices()

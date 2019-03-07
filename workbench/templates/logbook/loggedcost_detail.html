@@ -1,0 +1,68 @@
+{% extends "modal.html" %}
+
+{% load history i18n workbench %}
+
+{% block title %}
+  {{ object|h }}
+  {% history_link object %}
+{% endblock %}
+
+{% block body %}
+  <table class="table table-striped">
+    <tr>
+      <th class="text-right">{% trans 'project' %}</th>
+      <td>{% link_or_none object.project %}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'service' %}</th>
+      <td>{% link_or_none object.service %}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'created' %}</th>
+      <td>
+        {{ object.created_at|date:'SHORT_DATETIME_FORMAT' }} {% trans 'by' %}
+        {{ object.created_by.get_short_name }}
+      </td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'rendered' %}</th>
+      <td>
+        {{ object.rendered_on|date:'SHORT_DATE_FORMAT' }}
+      </td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'cost' %}</th>
+      <td>
+        {{ object.cost|currency }}
+        {% if object.third_party_costs %} / {% trans 'third party costs' %}: {{ object.third_party_costs|currency }}{% endif %}
+      </td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'description' %}</th>
+      <td>{{ object.description|linebreaksbr }}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'invoicing' %}</th>
+      <td>
+        {% if object.invoice %}{% link_or_none object.invoice %}
+        {% elif object.archived_at %}
+          {% blocktrans with archived_at=object.archived_at|date:'SHORT_DATETIME_FORMAT' trimmed %}
+            Archived at {{ archived_at }}
+          {% endblocktrans %}
+        {% else %}&ndash;
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+{% endblock %}
+
+{% block footer %}
+  <a href="{{ object.urls.update }}" class="btn btn-secondary float-left"
+    data-toggle="ajaxmodal">
+    {% trans 'Update' %}
+  </a>
+  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger"
+    {# data-toggle="ajaxmodal" #}
+    >{% trans 'Delete' %}
+  </a>
+{% endblock %}

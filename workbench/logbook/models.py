@@ -67,7 +67,7 @@ class LoggedHours(Model):
         raise_if_errors(errors, exclude or ())
 
 
-@model_urls(default="update")
+@model_urls()
 class LoggedCost(Model):
     project = models.ForeignKey(
         Project,
