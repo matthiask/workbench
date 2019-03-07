@@ -108,6 +108,18 @@
 
     {% bootstrap_messages %}
 
+    {% block breadcrumbs %}
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            {% block breadcrumb-items %}
+            <li class="breadcrumb-item {% if request.path == '/' %}active{% endif %}"><a href="/">Home</a></li>
+            {% endblock %}
+            {# <li class="breadcrumb-item"><a href="#">Library</a></li> #}
+            {# <li class="breadcrumb-item active" aria-current="page">Data</li> #}
+          </ol>
+        </nav>
+    {% endblock %}
+
     {% block content %}{% endblock %}
 
   </div> <!-- /container -->

@@ -1,8 +1,16 @@
 {% extends "base.html" %}
 
-{% load bootstrap4 fineforms i18n %}
+{% load bootstrap4 fineforms i18n workbench %}
 
 {% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
+
+{% block breadcrumb-items %}
+{{ block.super }}
+<li class="breadcrumb-item"><a href="{{ view.model.urls.list }}">{{ view.meta.verbose_name_plural|capfirst }}</a></li>
+{% if object %}<li class="breadcrumb-item active"><a href="{{ object.get_absolute_url }}">{{ object|h }}</a></li>
+{% else %}<li class="breadcrumb-item active">{{ title }}</li>
+{% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
