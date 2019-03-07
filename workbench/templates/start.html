@@ -7,7 +7,7 @@
   <div class="col-md-10 col-lg-8">
 
     <div class="card mt-3 mb-3">
-      <div class="card-header"><h3>Hi, {{ user }}</h3></div>
+      <div class="card-header"><h3 class="my-0">Hi, {{ user }}</h3></div>
       <div class="card-body">
         <p class="card-text">
 
@@ -21,7 +21,7 @@
     </div>
 
     <div class="card mb-3">
-      <div class="card-header"><h3>
+      <div class="card-header"><h3 class="my-0">
         <a href="{% url 'projects_project_list' %}">{% trans 'active projects' %}</a>
       </h3></div>
 
@@ -51,7 +51,7 @@
     </div>
 
     <div class="card mb-3">
-      <div class="card-header"><h3>
+      <div class="card-header"><h3 class="my-0">
         <a href="{% url 'logbook_loggedhours_list' %}">{% trans 'recent hours' %}</a>
       </h3></div>
 
@@ -73,7 +73,7 @@
     </div>
 
     <div class="card mb-3">
-      <div class="card-header"><h3>
+      <div class="card-header"><h3 class="my-0">
         <a href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a>
       </h3></div>
       {% if user.important_activities %}
