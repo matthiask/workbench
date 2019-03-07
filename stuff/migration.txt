@@ -419,7 +419,7 @@ SET subtotal=p.subtotal, third_party_costs=p.third_party_costs, description=CONC
 FROM
 dblink(
   'dbname=fineware_feinheit',
-  'SELECT productlease_id, SUM(count * cost), SUM(count * cost * (1 + commission / 100)), string_agg(CONCAT(agroup.name, '' - '', article.name, CASE WHEN pl.notes!='''' THEN '' - '' ELSE '' '' END, pl.notes, '': '', count, '' * '', to_char(cost * (1 + commission / 100), ''FM9999.99'')), ''\n'') FROM products_productleasearticle pl LEFT JOIN articles_article article ON pl.article_id=article.id LEFT JOIN articles_article agroup ON article.parent_id=agroup.id GROUP BY productlease_id'
+  'SELECT productlease_id, SUM(count * cost), SUM(count * cost * (1 + commission / 100)), string_agg(CONCAT(agroup.name, '' - '', article.name, CASE WHEN pl.notes!='''' THEN '' - '' ELSE '' '' END, pl.notes, '': '', count, '' * CHF '', to_char(cost * (1 + commission / 100), ''FM9999.99'')), ''\n'') FROM products_productleasearticle pl LEFT JOIN articles_article article ON pl.article_id=article.id LEFT JOIN articles_article agroup ON article.parent_id=agroup.id GROUP BY productlease_id'
 ) AS p(
   id int,
   third_party_costs numeric(10,2),
