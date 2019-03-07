@@ -1,0 +1,28 @@
+{% extends "generic/object_list.html" %}
+
+{% load bootstrap4 i18n querystring workbench %}
+
+{% block objects %}
+<div class="list-group list-group-flush">
+  {% for invoice in object_list %}
+  <a href="{{ invoice.urls.detail }}" class="list-group-item list-group-item-action px-0">
+    <span style="float:right" class="badge badge-{{ invoice.status_css }}">{{ invoice.pretty_status }}</span>
+    <h5 class="mb-1">{{ invoice|h }}</h5>
+    <div class="row">
+      <div class="col-md-7">{{ invoice.contact|default:invoice.customer }}</div>
+      <div class="col-md-2">{{ invoice.pretty_periodicity }}</div>
+      <div class="col-md-3 text-md-right">
+        {{ invoice.total_excl_tax|currency }} exkl.
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+
+<p>
+  {{ paginator.count }} {{ view.meta.verbose_name_plural }}
+  {% if view.root_queryset_count != paginator.count %}
+  (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
+  {% endif %}
+</p>
+{% endblock %}

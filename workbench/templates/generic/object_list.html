@@ -2,14 +2,14 @@
 
 {% load bootstrap4 i18n querystring workbench %}
 
-{% block title %}{{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
+{% block title %}{{ view.meta.verbose_name_plural|capfirst }} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row">
   <div class="col-sm-12">
 
     <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between">
-      <h1>{{ view.meta.verbose_name_plural }}</h1>
+      <h1><a class="text-reset text-decoration-none" href="{{ view.model.urls.list }}">{{ view.meta.verbose_name_plural|capfirst }}</a></h1>
       <form method="GET" action="." class="form-inline form-search mb-3 mb-lg-0">
         <label class="sr-only">{% trans 'search' %}</label>
         <input

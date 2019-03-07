@@ -305,6 +305,19 @@ class RecurringInvoice(ModelWithTotal):
     def __str__(self):
         return self.title
 
+    @property
+    def pretty_periodicity(self):
+        if self.ends_on:
+            return _("%(periodicity)s from %(from)s until %(until)s") % {
+                "periodicity": self.get_periodicity_display(),
+                "from": local_date_format(self.starts_on, "d.m.Y"),
+                "until": local_date_format(self.ends_on, "d.m.Y"),
+            }
+        return _("%(periodicity)s from %(from)s") % {
+            "periodicity": self.get_periodicity_display(),
+            "from": local_date_format(self.starts_on, "d.m.Y"),
+        }
+
     def create_single_invoice(self, *, period_starts_on, period_ends_on):
         return Invoice.objects.create(
             customer=self.customer,

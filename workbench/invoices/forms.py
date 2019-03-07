@@ -433,6 +433,62 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
             self.add_postal_address_selection(person=person)
 
 
+class RecurringInvoiceSearchForm(forms.Form):
+    s = forms.ChoiceField(
+        choices=(("", _("All states")), ("open", _("Open")), ("closed", _("Closed"))),
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+    )
+    org = forms.ModelChoiceField(
+        queryset=Organization.objects.all(),
+        required=False,
+        widget=Picker(model=Organization),
+    )
+    owned_by = forms.TypedChoiceField(
+        label=_("owned by"),
+        coerce=int,
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["owned_by"].choices = [
+            ("", _("All users")),
+            (0, _("Owned by inactive users")),
+            (
+                _("Active"),
+                [
+                    (u.id, u.get_full_name())
+                    for u in User.objects.filter(is_active=True)
+                ],
+            ),
+        ]
+
+    def filter(self, queryset):
+        data = self.cleaned_data
+        if data.get("s") == "open":
+            queryset = queryset.filter(
+                Q(ends_on__isnull=True) | Q(ends_on__gte=date.today())
+            )
+        elif data.get("s") == "closed":
+            queryset = queryset.filter(
+                Q(ends_on__isnull=False) & Q(ends_on__lt=date.today())
+            )
+        if data.get("org"):
+            queryset = queryset.filter(customer=data.get("org"))
+        if data.get("owned_by") == 0:
+            queryset = queryset.filter(owned_by__is_active=False)
+        elif data.get("owned_by"):
+            queryset = queryset.filter(owned_by=data.get("owned_by"))
+
+        return queryset.select_related("customer", "contact__organization", "owned_by")
+
+    def response(self, request, queryset):
+        if "s" not in request.GET:
+            return http.HttpResponseRedirect("?s=open")
+
+
 class RecurringInvoiceForm(WarningsForm, PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
 
