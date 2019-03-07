@@ -16,6 +16,7 @@ class Migration(migrations.Migration):
             field=models.DecimalField(
                 decimal_places=2,
                 default=Decimal("0.00"),
+                help_text="Only used for statistical purposes.",
                 max_digits=10,
                 validators=[django.core.validators.MinValueValidator(0)],
                 verbose_name="third party costs",
@@ -27,6 +28,7 @@ class Migration(migrations.Migration):
             field=models.DecimalField(
                 decimal_places=2,
                 default=Decimal("0.00"),
+                help_text="Only used for statistical purposes.",
                 max_digits=10,
                 validators=[django.core.validators.MinValueValidator(0)],
                 verbose_name="third party costs",

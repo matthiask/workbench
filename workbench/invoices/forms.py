@@ -503,9 +503,9 @@ class CreateRecurringInvoiceForm(ModelForm):
             "starts_on",
             "periodicity",
             "subtotal",
-            "third_party_costs",
             "discount",
             "liable_to_vat",
+            "third_party_costs",
         )
         widgets = {
             "customer": Picker(model=Organization),
@@ -544,9 +544,9 @@ class RecurringInvoiceForm(WarningsForm, PostalAddressSelectionForm):
             "periodicity",
             "next_period_starts_on",
             "subtotal",
-            "third_party_costs",
             "discount",
             "liable_to_vat",
+            "third_party_costs",
         )
         widgets = {
             "customer": Picker(model=Organization),
