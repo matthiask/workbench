@@ -78,6 +78,7 @@ class ProjectForm(ModelForm):
         widgets = {
             "customer": Picker(model=Organization),
             "contact": Picker(model=Person),
+            "description": Textarea,
             "status": forms.RadioSelect,
         }
 

@@ -14,7 +14,7 @@ from workbench.accounts.models import User
 
 class Textarea(forms.Textarea):
     def __init__(self, attrs=None):
-        default_attrs = {"cols": 40, "rows": 4}
+        default_attrs = {"cols": 40, "rows": 5}
         if attrs:
             default_attrs.update(attrs)
         super().__init__(default_attrs)

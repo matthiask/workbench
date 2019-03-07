@@ -75,3 +75,7 @@ tbody th > a {
 .modal-footer .pagination {
   margin-bottom: 0;
 }
+
+.form-group.required > label {
+  font-weight: bold;
+}

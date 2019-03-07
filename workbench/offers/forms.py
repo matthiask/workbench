@@ -8,7 +8,7 @@ from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.offers.models import Offer
 from workbench.projects.models import Service
 from workbench.tools.formats import local_date_format
-from workbench.tools.forms import ModelForm, WarningsForm
+from workbench.tools.forms import ModelForm, Textarea, WarningsForm
 
 
 class OfferSearchForm(forms.Form):
@@ -92,7 +92,11 @@ class OfferForm(WarningsForm, ModelForm):
             "postal_address",
             "liable_to_vat",
         )
-        widgets = {"status": forms.RadioSelect}
+        widgets = {
+            "description": Textarea,
+            "status": forms.RadioSelect,
+            "postal_address": Textarea,
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
