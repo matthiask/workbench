@@ -4,12 +4,6 @@
 
 {% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
-{% block breadcrumb-items %}
-{{ block.super }}
-<li class="breadcrumb-item"><a href="{{ view.model.urls.list }}">{{ view.meta.verbose_name_plural|capfirst }}</a></li>
-<li class="breadcrumb-item active"><a href="{{ object.get_absolute_url }}">{{ object|h }}</a></li>
-{% endblock %}
-
 {% block content %}
 <div class="row">
   <div class="col-md-6 offset-md-3">

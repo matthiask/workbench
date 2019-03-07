@@ -4,11 +4,6 @@
 
 {% block title %}{{ view.meta.verbose_name_plural|capfirst }} - {{ block.super }}{% endblock %}
 
-{% block breadcrumb-items %}
-{{ block.super }}
-<li class="breadcrumb-item active"><a href="">{{ view.meta.verbose_name_plural|capfirst }}</a></li>
-{% endblock %}
-
 {% block content %}
 <div class="row">
   <div class="col-sm-12">
