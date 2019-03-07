@@ -43,6 +43,7 @@ HISTORY = {
         "invoiced_on, due_on, title, description, postal_address, owned_by,"
         " status, closed_on, subtotal, discount, tax_rate, total"
     ),
+    "invoices.recurringinvoice": "",
     "logbook.loggedhours": "",
     "logbook.loggedcosts": "",
     "offers.offer": (

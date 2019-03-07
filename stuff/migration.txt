@@ -351,6 +351,86 @@ FROM dblink(
 WHERE invoices_invoice.id=p.invoice_id;
 
 --
+-- Import recurring invoices
+--
+
+TRUNCATE invoices_recurringinvoice RESTART IDENTITY CASCADE;
+
+INSERT INTO invoices_recurringinvoice (
+  id,
+  subtotal,
+  discount,
+  liable_to_vat,
+  tax_rate,
+  total,
+  third_party_costs,
+  title,
+  description,
+  created_at,
+  postal_address,
+  starts_on,
+  ends_on,
+  periodicity,
+  next_period_starts_on,
+  contact_id,
+  customer_id,
+  owned_by_id
+)
+SELECT DISTINCT ON (id)
+  id,
+  0,
+  0,
+  TRUE,
+  7.7,
+  0,
+  0,
+  CONCAT(product_name, ': ', name),
+  notes,
+  created,
+  '',
+  start_date,
+  end_date,
+  period,
+  NULL,
+  contact_id,
+  customer_id,
+  manager_id
+FROM
+dblink(
+  'dbname=fineware_feinheit',
+  'SELECT lease.id, lease.created, lease.name, lease.notes, CASE WHEN customer.company=TRUE THEN customer.id ELSE 1 END, manager_id, start_date, period, end_date, CASE WHEN cap.company=FALSE THEN ca.person_id ELSE NULL END, p.name FROM products_productlease lease LEFT JOIN products_product p ON lease.product_id=p.id LEFT JOIN addressbook_person customer ON customer.id=lease.customer_id LEFT OUTER JOIN addressbook_address ca ON lease.contact_id=ca.id LEFT OUTER JOIN addressbook_person cap ON ca.person_id=cap.id WHERE end_date IS NULL'
+) AS p(
+  id int,
+  created timestamp,
+  name text,
+  notes text,
+  customer_id int,
+  manager_id int,
+  start_date date,
+  period text,
+  end_date date,
+  contact_id int,
+  product_name text
+)
+ORDER BY id;
+
+UPDATE invoices_recurringinvoice
+SET subtotal=p.subtotal, third_party_costs=p.third_party_costs, description=CONCAT(description, E'\n', p.notes)
+FROM
+dblink(
+  'dbname=fineware_feinheit',
+  'SELECT productlease_id, SUM(count * cost), SUM(count * cost * (1 + commission / 100)), string_agg(CONCAT(agroup.name, '' - '', article.name, CASE WHEN pl.notes!='''' THEN '' - '' ELSE '' '' END, pl.notes, '': '', count, '' * '', to_char(cost * (1 + commission / 100), ''FM9999.99'')), ''\n'') FROM products_productleasearticle pl LEFT JOIN articles_article article ON pl.article_id=article.id LEFT JOIN articles_article agroup ON article.parent_id=agroup.id GROUP BY productlease_id'
+) AS p(
+  id int,
+  third_party_costs numeric(10,2),
+  subtotal numeric(10,2),
+  notes text
+)
+WHERE invoices_recurringinvoice.id=p.id;
+
+
+
+--
 -- Import offers
 --
 

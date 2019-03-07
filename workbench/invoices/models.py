@@ -111,6 +111,7 @@ class Invoice(ModelWithTotal):
         related_name="down_payment_invoices",
     )
     down_payment_total = MoneyField(_("down payment total"))
+    third_party_costs = MoneyField(_("third party costs"))
 
     postal_address = models.TextField(_("postal address"), blank=True)
     _code = models.IntegerField(_("code"))
@@ -282,6 +283,7 @@ class RecurringInvoice(ModelWithTotal):
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
 
+    third_party_costs = MoneyField(_("third party costs"))
     postal_address = models.TextField(_("postal address"), blank=True)
 
     starts_on = models.DateField(_("starts on"), default=date.today)
@@ -333,6 +335,7 @@ class RecurringInvoice(ModelWithTotal):
             liable_to_vat=self.liable_to_vat,
             # tax_rate=self.tax_rate,
             # total=self.total,
+            third_party_costs=self.third_party_costs,
         )
 
     def create_invoices(self):

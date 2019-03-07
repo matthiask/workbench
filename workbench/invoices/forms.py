@@ -178,6 +178,9 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
                 decimal_places=2,
                 initial=self.instance.subtotal,
             )
+            self.fields["third_party_costs"] = Invoice._meta.get_field(
+                "third_party_costs"
+            ).formfield()
 
         if self.instance.type != Invoice.DOWN_PAYMENT and self.instance.project_id:
             eligible_down_payment_invoices = Invoice.objects.filter(
@@ -447,6 +450,7 @@ class RecurringInvoiceForm(WarningsForm, PostalAddressSelectionForm):
             "periodicity",
             "next_period_starts_on",
             "subtotal",
+            "third_party_costs",
             "discount",
             "liable_to_vat",
         )
