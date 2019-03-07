@@ -3,9 +3,11 @@ import re
 
 from django.core.management.base import BaseCommand
 
+from workbench.accounts.middleware import set_user_name
 from workbench.accounts.models import User
 from workbench.contacts.models import PostalAddress
-from workbench.invoices.models import Invoice
+from workbench.invoices.models import Invoice, RecurringInvoice
+from workbench.invoices.utils import recurring
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
 
@@ -57,6 +59,8 @@ class Command(BaseCommand):
     help = "De-htmlizes description fields"
 
     def handle(self, **options):
+        set_user_name("Spring cleaner")
+
         self.stdout.write("updating street and house numbers...")
         for postal_address in PostalAddress.objects.order_by("street"):
             if (
@@ -75,6 +79,15 @@ class Command(BaseCommand):
                 employment.save()
                 if not employment.percentage:
                     employment.delete()
+
+        self.stdout.write("updating recurring invoices' next_period_starts_on dates...")
+        for invoice in RecurringInvoice.objects.filter(
+            next_period_starts_on__isnull=False
+        ):
+            dates = recurring(invoice.next_period_starts_on, invoice.periodicity)
+            next(dates)
+            invoice.next_period_starts_on = next(dates)
+            invoice.save()
 
         self.stdout.write("dehtmling invoices...")
         for instance in Invoice.objects.all():

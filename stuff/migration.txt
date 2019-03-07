@@ -1,5 +1,5 @@
 -- cat migration.txt | ssh root@metronom.feinheit.ch 'sudo -u postgres psql workbench'
--- ssh deploy@metronom.feinheit.ch 'cd www/workbench && venv/bin/python -u manage.py dehtml'
+-- ssh deploy@metronom.feinheit.ch 'cd www/workbench && venv/bin/python -u manage.py spring_cleaner'
 
 CREATE EXTENSION dblink;
 
@@ -428,6 +428,14 @@ dblink(
 )
 WHERE invoices_recurringinvoice.id=p.id;
 
+UPDATE invoices_recurringinvoice
+SET next_period_starts_on=p.next_period_starts_on
+FROM
+dblink(
+  'dbname=fineware_feinheit',
+  'SELECT DISTINCT ON (productlease_id) productlease_id, date FROM products_productleaseentry WHERE pending=FALSE GROUP BY productlease_id, date ORDER BY productlease_id, date DESC'
+) AS p(id int, next_period_starts_on date)
+WHERE p.id=invoices_recurringinvoice.id;
 
 
 --
