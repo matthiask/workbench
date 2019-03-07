@@ -70,15 +70,6 @@
             {# <div class="dropdown-divider"></div> #}
           </div>
         </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {% trans 'admin' %}
-          </a>
-          <div class="dropdown-menu" aria-labelledby="adminDropdown">
-            <a class="dropdown-item" href="#">{% trans 'payment lists' %}</a>
-            {# <div class="dropdown-divider"></div> #}
-          </div>
-        </li>
         {% endmark_current %}
       </ul>
 
@@ -92,6 +83,8 @@
             {% if request.user.is_admin %}
             <a class="dropdown-item" href="{% url 'admin:index' %}">{% trans 'Admin panel' %}</a>
             {% endif %}
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">{% trans 'payment lists' %}</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'deals_deal_list' %}">{% trans 'deals' %}</a>
             <a class="dropdown-item" href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a>
