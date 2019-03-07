@@ -15,6 +15,7 @@ class Command(BaseCommand):
         today = date.today()
 
         for ri in RecurringInvoice.objects.filter(
+            Q(starts_on__lte=today),
             Q(ends_on__isnull=True) | Q(ends_on__gte=F("next_period_starts_on")),
             Q(next_period_starts_on__isnull=True) | Q(next_period_starts_on__lte=today),
         ):
