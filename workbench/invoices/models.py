@@ -331,8 +331,8 @@ class RecurringInvoice(ModelWithTotal):
             subtotal=self.subtotal,
             discount=self.discount,
             liable_to_vat=self.liable_to_vat,
-            tax_rate=self.tax_rate,
-            total=self.total,
+            # tax_rate=self.tax_rate,
+            # total=self.total,
         )
 
     def create_invoices(self):
