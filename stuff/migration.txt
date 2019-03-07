@@ -384,7 +384,7 @@ SELECT DISTINCT ON (id)
   7.7,
   0,
   0,
-  CONCAT(product_name, ': ', name),
+  name,
   notes,
   created,
   '',
@@ -398,7 +398,7 @@ SELECT DISTINCT ON (id)
 FROM
 dblink(
   'dbname=fineware_feinheit',
-  'SELECT lease.id, lease.created, lease.name, lease.notes, CASE WHEN customer.company=TRUE THEN customer.id ELSE 1 END, manager_id, start_date, period, end_date, CASE WHEN cap.company=FALSE THEN ca.person_id ELSE NULL END, p.name FROM products_productlease lease LEFT JOIN products_product p ON lease.product_id=p.id LEFT JOIN addressbook_person customer ON customer.id=lease.customer_id LEFT OUTER JOIN addressbook_address ca ON lease.contact_id=ca.id LEFT OUTER JOIN addressbook_person cap ON ca.person_id=cap.id WHERE end_date IS NULL'
+  'SELECT lease.id, lease.created, lease.name, lease.notes, CASE WHEN customer.company=TRUE THEN customer.id ELSE 1 END, manager_id, start_date, period, end_date, CASE WHEN cap.company=FALSE THEN ca.person_id ELSE NULL END FROM products_productlease lease LEFT JOIN addressbook_person customer ON customer.id=lease.customer_id LEFT OUTER JOIN addressbook_address ca ON lease.contact_id=ca.id LEFT OUTER JOIN addressbook_person cap ON ca.person_id=cap.id WHERE end_date IS NULL'
 ) AS p(
   id int,
   created timestamp,
@@ -409,8 +409,7 @@ dblink(
   start_date date,
   period text,
   end_date date,
-  contact_id int,
-  product_name text
+  contact_id int
 )
 ORDER BY id;
 
