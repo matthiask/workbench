@@ -1,9 +1,13 @@
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.utils.translation import ngettext
+
+from workbench import generic
 from workbench.invoices.models import Invoice
 from workbench.tools.pdf import pdf_response
-from workbench.generic import DetailView
 
 
-class InvoicePDFView(DetailView):
+class InvoicePDFView(generic.DetailView):
     model = Invoice
 
     def get(self, request, *args, **kwargs):
@@ -16,3 +20,23 @@ class InvoicePDFView(DetailView):
         pdf.generate()
 
         return response
+
+
+class RecurringInvoiceDetailView(generic.DetailView):
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if request.GET.get("create_invoices"):
+            invoices = self.object.create_invoices()
+            messages.info(
+                request,
+                ngettext("Created %s invoice", "Created %s invoices", len(invoices))
+                % len(invoices),
+            )
+            return redirect("invoices_invoice_list" if len(invoices) else self.object)
+        context = self.get_context_data()
+        return self.render_to_response(context)
+
+
+class RecurringInvoiceCreateView(generic.CreateView):
+    def get_success_url(self):
+        return self.object.urls.url("update")

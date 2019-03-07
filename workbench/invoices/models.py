@@ -366,6 +366,7 @@ class RecurringInvoice(ModelWithTotal):
         )
 
     def create_invoices(self):
+        invoices = []
         days = recurring(
             max(filter(None, (self.next_period_starts_on, self.starts_on))),
             self.periodicity,
@@ -376,10 +377,13 @@ class RecurringInvoice(ModelWithTotal):
             if this_period > today:
                 break
             next_period = next(days)
-            self.create_single_invoice(
-                period_starts_on=this_period,
-                period_ends_on=next_period - timedelta(days=1),
+            invoices.append(
+                self.create_single_invoice(
+                    period_starts_on=this_period,
+                    period_ends_on=next_period - timedelta(days=1),
+                )
             )
             self.next_period_starts_on = next_period
             this_period = next_period
         self.save()
+        return invoices

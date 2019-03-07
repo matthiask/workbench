@@ -11,7 +11,7 @@ from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.tools.formats import local_date_format
-from workbench.tools.forms import Picker, Textarea, WarningsForm
+from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm
 from workbench.tools.models import Z
 from workbench.templatetags.workbench import currency
 
@@ -487,6 +487,44 @@ class RecurringInvoiceSearchForm(forms.Form):
     def response(self, request, queryset):
         if "s" not in request.GET:
             return http.HttpResponseRedirect("?s=open")
+
+
+class CreateRecurringInvoiceForm(ModelForm):
+    user_fields = default_to_current_user = ("owned_by",)
+
+    class Meta:
+        model = RecurringInvoice
+        fields = (
+            "customer",
+            "contact",
+            "title",
+            "description",
+            "owned_by",
+            "starts_on",
+            "periodicity",
+            "subtotal",
+            "third_party_costs",
+            "discount",
+            "liable_to_vat",
+        )
+        widgets = {
+            "customer": Picker(model=Organization),
+            "contact": Picker(model=Person),
+            "description": Textarea,
+            "periodicity": forms.RadioSelect,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["periodicity"].choices = RecurringInvoice.PERIODICITY_CHOICES
+
+    def save(self):
+        instance = super().save(commit=False)
+        if self.cleaned_data.get("pa"):
+            instance.postal_address = self.cleaned_data["pa"].postal_address
+        instance.save()
+        return instance
 
 
 class RecurringInvoiceForm(WarningsForm, PostalAddressSelectionForm):
