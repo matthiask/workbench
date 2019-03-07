@@ -2,6 +2,7 @@ from datetime import date, timedelta
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import F, Q
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.html import format_html
@@ -251,6 +252,19 @@ class Invoice(ModelWithTotal):
             return _("total CHF incl. tax") if self.liable_to_vat else _("total CHF")
 
 
+class RecurringInvoiceQuerySet(SearchQuerySet):
+    def create_invoices(self):
+        today = date.today()
+        invoices = []
+        for ri in self.filter(
+            Q(starts_on__lte=today),
+            Q(ends_on__isnull=True) | Q(ends_on__gte=F("next_period_starts_on")),
+            Q(next_period_starts_on__isnull=True) | Q(next_period_starts_on__lte=today),
+        ):
+            invoices.extend(ri.create_invoices())
+        return invoices
+
+
 @model_urls()
 class RecurringInvoice(ModelWithTotal):
     PERIODICITY_CHOICES = [
@@ -295,7 +309,7 @@ class RecurringInvoice(ModelWithTotal):
         _("next period starts on"), blank=True, null=True
     )
 
-    objects = SearchQuerySet.as_manager()
+    objects = RecurringInvoiceQuerySet.as_manager()
 
     class Meta:
         ordering = ["customer__name", "title"]
