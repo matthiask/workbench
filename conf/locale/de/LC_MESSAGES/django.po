@@ -871,11 +871,11 @@ msgstr "nächste Periode beginnt am"
 
 #: workbench/invoices/models.py:302
 msgid "recurring invoice"
-msgstr "wiederkehrende Rechnung"
+msgstr "Stapelrechnung"
 
 #: workbench/invoices/models.py:303 workbench/templates/base.html:35
 msgid "recurring invoices"
-msgstr "wiederkehrende Rechnungen"
+msgstr "Stapelrechnungen"
 
 #: workbench/invoices/models.py:311
 #, python-format
