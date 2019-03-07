@@ -351,6 +351,16 @@ FROM dblink(
 ) AS p(paid_on date, notes text, invoice_id int)
 WHERE invoices_invoice.id=p.invoice_id;
 
+UPDATE invoices_invoice
+SET third_party_costs=p.third_party_costs
+FROM
+dblink(
+  'dbname=fineware_feinheit',
+  'SELECT invoice_id, SUM(count*cost) FROM worklog_articleentry WHERE down_payment=FALSE GROUP BY invoice_id'
+) AS p(invoice_id int, third_party_costs numeric(10,2))
+WHERE invoices_invoice.id=p.invoice_id;
+
+
 --
 -- Import recurring invoices
 --
