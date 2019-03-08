@@ -139,7 +139,13 @@ class AssignCreditEntriesForm(forms.Form):
                         ),
                     )
                     for invoice in Invoice.objects.filter(
-                        total=entry.total
+                        # TODO
+                        # status__in=(
+                        #     Invoice.IN_PREPARATION,
+                        #     Invoice.SENT,
+                        #     Invoice.REMINDED,
+                        # ),
+                        total=entry.total,
                     ).select_related("owned_by", "project")[:100]
                 ],
                 coerce=int,
