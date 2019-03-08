@@ -17,6 +17,11 @@ urlpatterns = [
         name="invoices_invoice_list",
     ),
     url(
+        r"^picker/$",
+        ListView.as_view(model=Invoice, template_name_suffix="_picker", paginate_by=10),
+        name="invoices_invoice_picker",
+    ),
+    url(
         r"^(?P<pk>\d+)/$",
         DetailView.as_view(model=Invoice),
         name="invoices_invoice_detail",

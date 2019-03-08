@@ -2,10 +2,11 @@ from django.conf.urls import url
 
 from workbench import generic
 from workbench.credit_control.forms import (
-    AccountStatementSearchForm,
-    AccountStatementForm,
+    CreditEntrySearchForm,
+    CreditEntryForm,
+    AccountStatementUploadForm,
 )
-from workbench.credit_control.models import AccountStatement, CreditEntry
+from workbench.credit_control.models import CreditEntry
 from workbench.credit_control.views import AssignCreditEntriesView
 
 
@@ -13,33 +14,33 @@ urlpatterns = [
     url(
         r"^$",
         generic.ListView.as_view(
-            model=AccountStatement, search_form_class=AccountStatementSearchForm
+            model=CreditEntry, search_form_class=CreditEntrySearchForm
         ),
-        name="credit_control_accountstatement_list",
+        name="credit_control_creditentry_list",
     ),
     url(
         r"^(?P<pk>\d+)/$",
-        generic.DetailView.as_view(model=AccountStatement),
-        name="credit_control_accountstatement_detail",
+        generic.DetailView.as_view(model=CreditEntry),
+        name="credit_control_creditentry_detail",
     ),
     url(
         r"^create/$",
         generic.CreateView.as_view(
-            model=AccountStatement, form_class=AccountStatementForm
+            model=CreditEntry,
+            form_class=AccountStatementUploadForm,
+            success_url="credit_control_creditentry_list",
         ),
-        name="credit_control_accountstatement_create",
+        name="credit_control_creditentry_create",
     ),
     url(
         r"^(?P<pk>\d+)/update/$",
-        generic.UpdateView.as_view(
-            model=AccountStatement, form_class=AccountStatementForm
-        ),
-        name="credit_control_accountstatement_update",
+        generic.UpdateView.as_view(model=CreditEntry, form_class=CreditEntryForm),
+        name="credit_control_creditentry_update",
     ),
     url(
         r"^(?P<pk>\d+)/delete/$",
-        generic.DeleteView.as_view(model=AccountStatement),
-        name="credit_control_accountstatement_delete",
+        generic.DeleteView.as_view(model=CreditEntry),
+        name="credit_control_creditentry_delete",
     ),
     url(
         r"^assign/$",

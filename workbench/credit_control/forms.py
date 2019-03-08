@@ -8,15 +8,15 @@ from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from workbench.credit_control.models import AccountStatement, CreditEntry
+from workbench.credit_control.models import CreditEntry
 from workbench.invoices.models import Invoice
 from workbench.templatetags.workbench import currency
 from workbench.tools.formats import local_date_format
-from workbench.tools.forms import ModelForm, Textarea
+from workbench.tools.forms import ModelForm, Picker, Textarea
+from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
-class AccountStatementSearchForm(forms.Form):
-    """
+class CreditEntrySearchForm(forms.Form):
     s = forms.ChoiceField(
         choices=(
             ("", _("All states")),
@@ -26,11 +26,8 @@ class AccountStatementSearchForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
     )
-    """
 
     def filter(self, queryset):
-        return queryset
-
         data = self.cleaned_data
         if data.get("s") == "pending":
             queryset = queryset.filter(invoice__isnull=True, notes="")
@@ -45,24 +42,32 @@ class AccountStatementSearchForm(forms.Form):
             return xlsx.to_response("credit-entries.xlsx")
 
 
-class AccountStatementForm(ModelForm):
-    user_fields = default_to_current_user = ("created_by",)
-
-    statement_file = forms.FileField(label=_("statement"))
-
+class CreditEntryForm(ModelForm):
     class Meta:
-        model = AccountStatement
-        fields = ("title", "created_by")
+        model = CreditEntry
+        fields = [
+            "reference_number",
+            "value_date",
+            "total",
+            "payment_notice",
+            "invoice",
+            "notes",
+        ]
+        widgets = {"invoice": Picker(model=Invoice), "notes": Textarea}
+
+
+class AccountStatementUploadForm(forms.Form):
+    statement = forms.FileField(label=_("account statement"))
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+        super().__init__(*args, **kwargs)
 
     def save(self):
-        instance = super().save(commit=False)
-
         f = io.StringIO()
         f.write(
             force_text(
-                self.cleaned_data["statement_file"].read(),
-                encoding="utf-8",
-                errors="ignore",
+                self.cleaned_data["statement"].read(), encoding="utf-8", errors="ignore"
             )
         )
         f.seek(0)
@@ -90,7 +95,6 @@ class AccountStatementForm(ModelForm):
                     [
                         reference,
                         {
-                            "account_statement": instance,
                             "value_date": day,
                             "total": amount,
                             "payment_notice": "; ".join(
@@ -100,15 +104,12 @@ class AccountStatementForm(ModelForm):
                     ]
                 )
 
-        instance.statement = b""
-        instance.save()
-
         for reference, defaults in entries:
             CreditEntry.objects.get_or_create(
                 reference_number=reference, defaults=defaults
             )
 
-        return instance
+        return CreditEntry()
 
 
 class AssignCreditEntriesForm(forms.Form):

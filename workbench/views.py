@@ -38,6 +38,7 @@ HISTORY = {
     "awt.absence": "",
     "contacts.organization": "",
     "contacts.person": "",
+    "credit_control.creditentry": "",
     "deals.deal": "title, description, owned_by, stage, status, estimated_value",
     "invoices.invoice": (
         "invoiced_on, due_on, title, description, postal_address, owned_by,"

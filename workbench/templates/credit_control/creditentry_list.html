@@ -1,0 +1,38 @@
+{% extends "generic/object_list.html" %}
+
+{% load i18n workbench %}
+
+{% block objects %}
+<table class="table table-hover table-striped">
+  <thead>
+    <tr>
+      <th>{% trans 'value date' %}</th>
+      <th>{% trans 'payment notice' %}</th>
+      <th class="text-right">{% trans 'total' %}</th>
+      <th>{% trans 'invoice' %}</th>
+      <th>{% trans 'notes' %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for entry in object_list %}
+      <tr>
+        <th><a href="{{ entry.urls.detail }}">{{ entry.value_date|date:'d.m.Y' }}</a></th>
+        <td>{{ entry.payment_notice }}</td>
+        <td class="text-right">{{ entry.total|currency }}</td>
+        <td>{% link_or_none entry.invoice %}</td>
+        <td>{{ entry.notes }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="5">
+        {{ paginator.count }} {{ view.meta.verbose_name_plural }}
+        {% if view.root_queryset_count != paginator.count %}
+        (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
+        {% endif %}
+      </td>
+    </tr>
+  </tfoot>
+</table>
+{% endblock %}
