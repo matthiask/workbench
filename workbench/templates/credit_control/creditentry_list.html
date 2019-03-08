@@ -9,6 +9,9 @@
   <a href="{{ view.model.urls.assign }}" class="btn btn-secondary">
     {% trans 'assign credit entries' %}
   </a>
+  <a href="{{ request.get_full_path }}&amp;xlsx=1" class="btn btn-secondary">
+    {% include 'svg/desktop-download.svg' %} XLSX
+  </a>
 {% endblock %}
 
 {% block objects %}
