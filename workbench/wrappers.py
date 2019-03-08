@@ -34,14 +34,17 @@ class BootstrapFieldWrapper(FieldWrapper):
                 filter(None, (widget.attrs.get("class", ""), "my-2"))
             )
         else:
+            cls = "form-control"
+            if isinstance(widget, forms.Select):
+                cls = "custom-select"
+            elif isinstance(widget, forms.FileInput):
+                cls = "form-control-file"
             widget.attrs["class"] = " ".join(
                 filter(
                     None,
                     (
                         widget.attrs.get("class", ""),
-                        "custom-select"
-                        if isinstance(widget, forms.Select)
-                        else "form-control",
+                        cls,
                         " is-invalid" if self.field.errors else "",
                     ),
                 )

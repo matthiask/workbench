@@ -1,8 +1,6 @@
-{% extends "base.html" %}
+{% extends "generic/object_form.html" %}
 
 {% load bootstrap4 fineforms i18n workbench %}
-
-{% block title %}{% if object %}{{ object }} - {% endif %} {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -17,7 +15,8 @@
       {% endif %}
     </h1>
 
-    <form method="POST" action="{{ request.get_full_path }}" class="form-horizontal">
+    <form method="POST" action="{{ request.get_full_path }}" class="form-horizontal"
+        enctype="multipart/form-data">
       {% csrf_token %}
 
       {% if form.warnings %}
