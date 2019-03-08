@@ -119,7 +119,9 @@ class AssignCreditEntriesForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         self.entries = []
-        for entry in CreditEntry.objects.filter(invoice__isnull=True, notes="")[:20]:
+        for entry in CreditEntry.objects.reverse().filter(
+            invoice__isnull=True, notes=""
+        )[:20]:
             self.fields["entry_{}_invoice".format(entry.pk)] = forms.TypedChoiceField(
                 label=format_html(
                     "{}, {}", entry.total, local_date_format(entry.value_date, "d.m.Y")
@@ -145,7 +147,7 @@ class AssignCreditEntriesForm(forms.Form):
                         #     Invoice.SENT,
                         #     Invoice.REMINDED,
                         # ),
-                        total=entry.total,
+                        total=entry.total
                     ).select_related("owned_by", "project")[:100]
                 ],
                 coerce=int,

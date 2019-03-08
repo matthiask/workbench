@@ -64,7 +64,7 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "credit entry",
                 "verbose_name_plural": "credit entries",
-                "ordering": ["value_date", "pk"],
+                "ordering": ["-value_date", "-pk"],
             },
         )
     ]

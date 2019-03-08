@@ -32,7 +32,7 @@ class CreditEntry(Model):
     objects = CreditEntryQuerySet.as_manager()
 
     class Meta:
-        ordering = ["value_date", "pk"]
+        ordering = ["-value_date", "-pk"]
         verbose_name = _("credit entry")
         verbose_name_plural = _("credit entries")
 
