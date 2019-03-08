@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-08 21:26+0100\n"
+"POT-Creation-Date: 2019-03-08 21:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -307,7 +307,7 @@ msgstr "Ferienwochen für ein volles Anstellungsjahr."
 #: workbench/credit_control/models.py:30
 #: workbench/templates/contacts/organization_detail.html:29
 #: workbench/templates/contacts/person_detail.html:43
-#: workbench/templates/credit_control/creditentry_list.html:20
+#: workbench/templates/credit_control/creditentry_list.html:22
 msgid "notes"
 msgstr "Bemerkungen"
 
@@ -329,7 +329,7 @@ msgstr "startet am"
 
 #: workbench/awt/models.py:273 workbench/deals/models.py:63
 #: workbench/invoices/models.py:96 workbench/invoices/models.py:295
-#: workbench/logbook/forms.py:116 workbench/logbook/models.py:35
+#: workbench/logbook/forms.py:117 workbench/logbook/models.py:35
 #: workbench/logbook/models.py:100 workbench/offers/models.py:46
 #: workbench/projects/models.py:57 workbench/projects/models.py:229
 #: workbench/templates/invoices/invoice_detail.html:31
@@ -538,26 +538,26 @@ msgid "reference number"
 msgstr "Referenz-Nr."
 
 #: workbench/credit_control/models.py:18
-#: workbench/templates/credit_control/creditentry_list.html:16
+#: workbench/templates/credit_control/creditentry_list.html:18
 msgid "value date"
 msgstr "Valuta"
 
 #: workbench/credit_control/models.py:19
-#: workbench/templates/credit_control/creditentry_list.html:18
+#: workbench/templates/credit_control/creditentry_list.html:20
 #: workbench/templates/reporting/monthly_invoicing.html:17
 #: workbench/tools/models.py:117
 msgid "total"
 msgstr "Total"
 
 #: workbench/credit_control/models.py:20 workbench/invoices/models.py:122
-#: workbench/templates/credit_control/creditentry_list.html:17
+#: workbench/templates/credit_control/creditentry_list.html:19
 msgid "payment notice"
 msgstr "Zahlungsnotiz"
 
 #: workbench/credit_control/models.py:28 workbench/invoices/models.py:128
 #: workbench/logbook/models.py:42 workbench/logbook/models.py:107
 #: workbench/templates/contacts/person_detail.html:52
-#: workbench/templates/credit_control/creditentry_list.html:19
+#: workbench/templates/credit_control/creditentry_list.html:21
 #: workbench/templates/projects/project_detail_overview.html:83
 #: workbench/templates/projects/project_detail_overview.html:110
 #: workbench/templates/reporting/monthly_invoicing.html:15
@@ -579,7 +579,7 @@ msgid "%(class)s have been successfully updated."
 msgstr "%(class)s wurden erfolgreich geändert."
 
 #: workbench/credit_control/views.py:41
-#: workbench/templates/credit_control/creditentry_list.html:8
+#: workbench/templates/credit_control/creditentry_list.html:10
 msgid "assign credit entries"
 msgstr "Gutschriften zuweisen"
 
@@ -976,14 +976,17 @@ msgstr "Erstellt von"
 #: workbench/projects/models.py:317 workbench/projects/models.py:356
 #: workbench/templates/logbook/loggedcost_detail.html:17
 #: workbench/templates/logbook/loggedhours_detail.html:17
-#: workbench/templates/logbook/loggedhours_form.html:31
 #: workbench/templates/projects/project_detail_services.html:102
 msgid "service"
 msgstr "Leistung"
 
-#: workbench/logbook/forms.py:182
+#: workbench/logbook/forms.py:184
 msgid "Sorry, hours have to be logged in the same week."
 msgstr "Tut mir leid, Stunden müssen in der gleichen Woche erfasst werden."
+
+#: workbench/logbook/forms.py:194
+msgid "This field is required unless you create a new service."
+msgstr ""
 
 #: workbench/logbook/models.py:27 workbench/logbook/models.py:91
 msgid "rendered on"
@@ -1220,7 +1223,7 @@ msgstr "Abbruch"
 #: workbench/templates/activities/activity_confirm_delete.html:16
 #: workbench/templates/generic/object_confirm_delete.html:20
 #: workbench/templates/logbook/loggedcost_form.html:13
-#: workbench/templates/logbook/loggedhours_form.html:27
+#: workbench/templates/logbook/loggedhours_form.html:28
 #: workbench/templates/modal_confirm_delete.html:16
 #: workbench/templates/projects/comment_confirm_delete.html:16
 msgid "delete"
@@ -1265,7 +1268,7 @@ msgstr "Löschen"
 #: workbench/templates/awt/absence_list.html:32
 #: workbench/templates/contacts/organization_list.html:22
 #: workbench/templates/contacts/person_list.html:36
-#: workbench/templates/credit_control/creditentry_list.html:39
+#: workbench/templates/credit_control/creditentry_list.html:41
 #: workbench/templates/deals/deal_list.html:33
 #: workbench/templates/generic/object_list.html:49
 #: workbench/templates/invoices/invoice_list.html:26
@@ -1386,6 +1389,10 @@ msgstr "Ja, ich bin sicher."
 msgid "submit"
 msgstr "absenden"
 
+#: workbench/templates/credit_control/creditentry_list.html:7
+msgid "upload account statement"
+msgstr "Kontoauszug hochladen"
+
 #: workbench/templates/deals/deal_detail.html:48
 #: workbench/templates/projects/project_detail_activities.html:24
 msgid "No activities"
@@ -1398,7 +1405,7 @@ msgstr "Bitte korrigiere die folgenden Fehler:"
 #: workbench/templates/fineforms/submit.html:4
 #: workbench/templates/generic/object_form.html:45
 #: workbench/templates/logbook/loggedcost_form.html:16
-#: workbench/templates/logbook/loggedhours_form.html:34
+#: workbench/templates/logbook/loggedhours_form.html:35
 #: workbench/templates/modalform.html:23
 #: workbench/templates/projects/service_form.html:77
 msgid "save"
@@ -1456,7 +1463,8 @@ msgstr "Erbracht"
 msgid "Archived at %(archived_at)s"
 msgstr "Archiviert um %(archived_at)s"
 
-#: workbench/templates/logbook/loggedhours_form.html:17
+#: workbench/templates/logbook/loggedhours_form.html:12
+#: workbench/templates/logbook/loggedhours_form.html:32
 msgid "new service"
 msgstr "Neue Leistung"
 

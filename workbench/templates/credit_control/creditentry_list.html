@@ -3,10 +3,12 @@
 {% load i18n workbench %}
 
 {% block search-form-buttons %}
-{{ block.super }}
-<a href="{{ view.model.urls.assign }}" class="btn btn-secondary">
-  {% trans 'assign credit entries' %}
-</a>
+  <a href="{{ view.model.urls.create }}" class="btn btn-secondary">
+    {% trans 'upload account statement' %}
+  </a>
+  <a href="{{ view.model.urls.assign }}" class="btn btn-secondary">
+    {% trans 'assign credit entries' %}
+  </a>
 {% endblock %}
 
 {% block objects %}
