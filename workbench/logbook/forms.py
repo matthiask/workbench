@@ -82,9 +82,7 @@ class LoggedCostSearchForm(forms.Form):
         widget=Picker(model=Organization),
     )
     service = forms.IntegerField(
-        label=_("service"),
-        required=False,
-        widget=forms.HiddenInput,
+        label=_("service"), required=False, widget=forms.HiddenInput
     )
 
     def filter(self, queryset):
