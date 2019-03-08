@@ -159,7 +159,7 @@ class Project(Model):
         logged_cost_per_service = {
             row["service"]: row["cost__sum"]
             for row in LoggedCost.objects.order_by()
-            .filter(service__project=self)
+            .filter(project=self)
             .values("service")
             .annotate(Sum("cost"))
         }
@@ -174,6 +174,12 @@ class Project(Model):
             if service.offer not in offers:
                 offers[service.offer] = []
             offers[service.offer].append(service)
+
+        if None in logged_cost_per_service:
+            s = Service(title=_("Not bound to a particular service."))
+            s.logged_cost = logged_cost_per_service[None]
+            s.planned_cost = Z
+            offers.setdefault(None, []).append(s)
 
         return sorted(
             offers.items(),

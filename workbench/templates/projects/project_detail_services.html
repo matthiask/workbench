@@ -33,16 +33,18 @@
   <div class="list-group list-group-flush">
     {% for service in services %}
     <div class="list-group-item">
-      <div class="float-right">
-        <a class="btn btn-secondary btn-sm" href="{{ service.urls.move }}?up" title="{% trans 'Move up' %}">
-          {% include 'svg/triangle-up.svg' %}</a>
-        <a class="btn btn-secondary btn-sm" href="{{ service.urls.move }}?down" title="{% trans 'Move down' %}">
-          {% include 'svg/triangle-down.svg' %}</a>
-        <a class="btn btn-secondary btn-sm" href="{{ service.urls.update }}" title="{% trans 'Update' %}">
-          {% include 'svg/pencil.svg' %}</a>
-        <a class="btn btn-secondary btn-sm" href="{{ service.urls.delete }}" title="{% trans 'Delete' %}">
-          {% include 'svg/trashcan.svg' %}</a>
-      </div>
+      {% if service.pk %}
+        <div class="float-right">
+          <a class="btn btn-secondary btn-sm" href="{{ service.urls.move }}?up" title="{% trans 'Move up' %}">
+            {% include 'svg/triangle-up.svg' %}</a>
+          <a class="btn btn-secondary btn-sm" href="{{ service.urls.move }}?down" title="{% trans 'Move down' %}">
+            {% include 'svg/triangle-down.svg' %}</a>
+          <a class="btn btn-secondary btn-sm" href="{{ service.urls.update }}" title="{% trans 'Update' %}">
+            {% include 'svg/pencil.svg' %}</a>
+          <a class="btn btn-secondary btn-sm" href="{{ service.urls.delete }}" title="{% trans 'Delete' %}">
+            {% include 'svg/trashcan.svg' %}</a>
+        </div>
+      {% endif %}
 
       <h5 class="mb-1">{{ service.title }}</h5>
       <p>
@@ -58,20 +60,30 @@
           {% endfor %}
         </span>
         <span class="col-md-2">
-          <a href="{% url 'logbook_loggedhours_list' %}?service={{ service.pk }}" target="_blank">
-            {{ service.logged_hours }}h / {{ service.effort_hours }}h
-          </a>
+          {% if service.pk %}
+            <a href="{% url 'logbook_loggedhours_list' %}?service={{ service.pk }}" target="_blank">
+              {{ service.logged_hours }}h / {{ service.effort_hours }}h
+            </a>
+          {% endif %}
         </span>
         <span class="col-md-2">
-          <a href="{% url 'logbook_loggedcost_list' %}?service={{ service.pk }}" target="_blank">
-            {{ service.logged_cost|stringformat:'.2f' }} / {{ service.planned_cost|stringformat:'.2f' }}
-          </a>
+          {% if service.pk %}
+            <a href="{% url 'logbook_loggedcost_list' %}?service={{ service.pk }}" target="_blank">
+              {{ service.logged_cost|stringformat:'.2f' }} / {{ service.planned_cost|stringformat:'.2f' }}
+            </a>
+          {% else %}
+            <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;service=0" target="_blank">
+              {{ service.logged_cost|stringformat:'.2f' }} / {{ service.planned_cost|stringformat:'.2f' }}
+            </a>
+          {% endif %}
         </span>
         <span class="col-md-2 text-right">
-          <a href="{{ project.urls.createhours }}?service={{ service.pk }}"
-            data-toggle="ajaxmodal">
-            {% include "svg/plus.svg" %} {% trans 'hours' %}</a>
-          <a href="{{ project.urls.createcost }}?service={{ service.pk }}"
+          {% if service.pk %}
+            <a href="{{ project.urls.createhours }}?service={{ service.pk }}"
+              data-toggle="ajaxmodal">
+              {% include "svg/plus.svg" %} {% trans 'hours' %}</a>
+          {% endif %}
+          <a href="{{ project.urls.createcost }}?service={{ service.pk|default:'' }}"
             data-toggle="ajaxmodal">
             {% include "svg/plus.svg" %} {% trans 'cost' %}</a>
         </span>
