@@ -1,17 +1,36 @@
 {% extends "modalform.html" %}
 
-{% load i18n %}
+{% load fineforms i18n %}
 
 {% block title %}
 {% if view.project %}{{ view.project.title }}{% else %}{{ block.super }}{% endif %}
 {% endblock %}
 
+{% block body %}
+  {% ff_errors form %}
+  <div class="d-none" id="new-service">
+    <h5>{% trans 'new service' %}</h5>
+    {% ff_field form.service_title %}
+    {% ff_field form.service_description %}
+    <hr>
+  </div>
+  {% ff_field form.rendered_by %}
+  {% ff_field form.rendered_on %}
+  {% ff_field form.service %}
+  {% ff_field form.hours %}
+  {% ff_field form.description %}
+{% endblock %}
+
 {% block footer %}
   {% if object %}
-  <a href="{{ object.urls.delete }}" data-toggle="ajaxmodal"
-    class="float-left btn btn-outline-danger">
-    {% trans 'delete' %}
-  </a>
+    <a href="{{ object.urls.delete }}" data-toggle="ajaxmodal"
+      class="float-left btn btn-outline-danger">
+      {% trans 'delete' %}
+    </a>
+  {% else %}
+    <button type="button" class="btn btn-secondary" onclick="this.classList.add('d-none');document.querySelector('#new-service').classList.remove('d-none')">
+      {% trans 'new service' %}
+    </button>
   {% endif %}
   <button type="submit" class="btn btn-primary">{% trans 'save' %}</button>
 {% endblock %}

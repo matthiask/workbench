@@ -112,6 +112,11 @@ class LoggedCostSearchForm(forms.Form):
 class LoggedHoursForm(ModelForm):
     user_fields = default_to_current_user = ("rendered_by",)
 
+    service_title = forms.CharField(label=_("title"), required=False, max_length=200)
+    service_description = forms.CharField(
+        label=_("description"), required=False, widget=Textarea({"rows": 2})
+    )
+
     class Meta:
         model = LoggedHours
         fields = ("rendered_by", "rendered_on", "service", "hours", "description")
@@ -157,6 +162,7 @@ class LoggedHoursForm(ModelForm):
 
         super().__init__(*args, **kwargs)
         self.fields["service"].choices = self.project.services.choices()
+        self.fields["service"].required = False
         self.fields["service"].widget.attrs["autofocus"] = True
 
         today = date.today()
@@ -179,10 +185,30 @@ class LoggedHoursForm(ModelForm):
                 )
         return rendered_on
 
+    def clean(self):
+        data = super().clean()
+        if not data.get("service") and not data.get("service_title"):
+            raise forms.ValidationError(
+                {
+                    "service": _(
+                        "This field is required unless you create a new service."
+                    )
+                }
+            )
+        return data
+
     def save(self):
         instance = super().save(commit=False)
         if not instance.pk:
             instance.created_by = self.request.user
+        if not self.cleaned_data.get("service") and self.cleaned_data.get(
+            "service_title"
+        ):
+            instance.service = Service.objects.create(
+                project=self.project,
+                title=self.cleaned_data["service_title"],
+                description=self.cleaned_data["service_description"],
+            )
         instance.save()
         return instance
 
