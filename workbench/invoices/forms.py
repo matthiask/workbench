@@ -77,7 +77,6 @@ class InvoiceSearchForm(forms.Form):
         )
 
     def response(self, request, queryset):
-        print(request.GET, bool(request.GET))
         if not request.GET:
             return http.HttpResponseRedirect("?s=open")
 
