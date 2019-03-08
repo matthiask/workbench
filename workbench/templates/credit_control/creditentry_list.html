@@ -2,6 +2,13 @@
 
 {% load i18n workbench %}
 
+{% block search-form-buttons %}
+{{ block.super }}
+<a href="{{ view.model.urls.assign }}" class="btn btn-secondary">
+  {% trans 'assign credit entries' %}
+</a>
+{% endblock %}
+
 {% block objects %}
 <table class="table table-hover table-striped">
   <thead>
