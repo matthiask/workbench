@@ -81,8 +81,10 @@ class LoggedCostSearchForm(forms.Form):
         required=False,
         widget=Picker(model=Organization),
     )
-    service = forms.ModelChoiceField(
-        queryset=Service.objects.all(), required=False, widget=forms.HiddenInput
+    service = forms.IntegerField(
+        label=_("service"),
+        required=False,
+        widget=forms.HiddenInput,
     )
 
     def filter(self, queryset):
@@ -95,7 +97,9 @@ class LoggedCostSearchForm(forms.Form):
             queryset = queryset.filter(project__customer=data.get("organization"))
 
         # "hidden" filters
-        if data.get("service"):
+        if data.get("service") == 0:
+            queryset = queryset.filter(service=None)
+        elif data.get("service"):
             queryset = queryset.filter(service=data.get("service"))
 
         return queryset.select_related("project__owned_by", "service", "created_by")
