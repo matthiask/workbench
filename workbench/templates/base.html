@@ -32,6 +32,7 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="invoicesDropdown">
             <a class="dropdown-item" href="{% url 'invoices_invoice_list' %}">{% trans 'invoices' %}</a>
+            <a class="dropdown-item" href="{% url 'invoices_invoice_list' %}?dunning=1">{% trans 'dunning' %}</a>
             <a class="dropdown-item" href="{% url 'invoices_recurringinvoice_list' %}">{% trans 'recurring invoices'|capfirst %}</a>
           </div>
         </li>

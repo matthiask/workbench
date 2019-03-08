@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-08 08:13+0100\n"
+"POT-Creation-Date: 2019-03-08 08:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,21 +58,21 @@ msgstr "Benutzer"
 msgid "OAuth2 error: Credential exchange failed"
 msgstr "OAuth2 Fehler: Anmeldedaten-Tausch fehlgeschlagen"
 
-#: workbench/accounts/views.py:84
-msgid "Welcome! Please fill in your details."
-msgstr "Willkommen! Bitte fülle das folgende Formular aus."
-
-#: workbench/accounts/views.py:91
+#: workbench/accounts/views.py:89
 #, python-format
 msgid "No user with email address %s found."
 msgstr "Keinen Benutzer mit Emailadresse %s gefunden."
 
-#: workbench/accounts/views.py:104
+#: workbench/accounts/views.py:92
+msgid "Welcome! Please fill in your details."
+msgstr "Willkommen! Bitte fülle das folgende Formular aus."
+
+#: workbench/accounts/views.py:103
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
 #: workbench/activities/__init__.py:10 workbench/activities/models.py:73
-#: workbench/templates/base.html:90
+#: workbench/templates/base.html:91
 #: workbench/templates/deals/deal_detail.html:30
 #: workbench/templates/projects/project_detail.html:16
 #: workbench/templates/projects/project_detail_activities.html:5
@@ -214,7 +214,7 @@ msgstr "aufgezeichnete Aktion"
 msgid "logged actions"
 msgstr "aufgezeichnete Aktionen"
 
-#: workbench/awt/__init__.py:10 workbench/templates/base.html:66
+#: workbench/awt/__init__.py:10 workbench/templates/base.html:67
 msgid "annual working time"
 msgstr "Jahresarbeitszeit"
 
@@ -346,7 +346,7 @@ msgid "absence"
 msgstr "Abwesenheit"
 
 #: workbench/awt/models.py:279 workbench/templates/awt/year_detail.html:86
-#: workbench/templates/base.html:57
+#: workbench/templates/base.html:58
 msgid "absences"
 msgstr "Abwesenheiten"
 
@@ -354,7 +354,7 @@ msgstr "Abwesenheiten"
 msgid "Absences of past years are locked."
 msgstr "Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."
 
-#: workbench/contacts/__init__.py:10 workbench/templates/base.html:41
+#: workbench/contacts/__init__.py:10 workbench/templates/base.html:42
 msgid "contacts"
 msgstr "Kontakte"
 
@@ -412,7 +412,7 @@ msgstr "Hauptkontakt"
 msgid "organization"
 msgstr "Organisation"
 
-#: workbench/contacts/models.py:45 workbench/templates/base.html:45
+#: workbench/contacts/models.py:45 workbench/templates/base.html:46
 msgid "organizations"
 msgstr "Organisationen"
 
@@ -445,7 +445,7 @@ msgstr "Lieber Hans/Sehr geehrte Frau Muster"
 msgid "person"
 msgstr "Person"
 
-#: workbench/contacts/models.py:88 workbench/templates/base.html:44
+#: workbench/contacts/models.py:88 workbench/templates/base.html:45
 #: workbench/templates/contacts/organization_detail.html:12
 msgid "people"
 msgstr "Personen"
@@ -510,7 +510,7 @@ msgid "postal addresses"
 msgstr "Postadressen"
 
 #: workbench/deals/__init__.py:10 workbench/deals/models.py:81
-#: workbench/templates/base.html:89
+#: workbench/templates/base.html:90
 msgid "deals"
 msgstr "Geschäfte"
 
@@ -583,36 +583,36 @@ msgstr "Offen seit %(created_at)s"
 msgid "%(status)s on %(closed_on)s"
 msgstr "%(status)s am %(closed_on)s"
 
-#: workbench/generic.py:58
+#: workbench/generic.py:57
 msgid "Search form was invalid."
 msgstr "Suchformular war ungültig."
 
-#: workbench/generic.py:112
+#: workbench/generic.py:111
 #, python-format
 msgid "%(class)s '%(object)s' has been successfully created."
 msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
 
-#: workbench/generic.py:124
+#: workbench/generic.py:123
 #, python-format
 msgid "Create %s"
 msgstr "%s erstellen"
 
-#: workbench/generic.py:154
+#: workbench/generic.py:153
 #, python-format
 msgid "%(class)s '%(object)s' has been successfully updated."
 msgstr "%(class)s '%(object)s' wurde erfolgreich geändert."
 
-#: workbench/generic.py:162
+#: workbench/generic.py:161
 #, python-format
 msgid "Update %s"
 msgstr "%s bearbeiten"
 
-#: workbench/generic.py:183
+#: workbench/generic.py:182
 #, python-format
 msgid "%(class)s '%(object)s' has been successfully deleted."
 msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
 
-#: workbench/generic.py:194
+#: workbench/generic.py:193
 #, python-format
 msgid "Delete %s"
 msgstr "%s löschen"
@@ -879,7 +879,7 @@ msgstr "nächste Periode beginnt am"
 msgid "recurring invoice"
 msgstr "Stapelrechnung"
 
-#: workbench/invoices/models.py:321 workbench/templates/base.html:35
+#: workbench/invoices/models.py:321 workbench/templates/base.html:36
 msgid "recurring invoices"
 msgstr "Stapelrechnungen"
 
@@ -904,7 +904,7 @@ msgid_plural "Created %s invoices"
 msgstr[0] "%s Rechnung erstellt"
 msgstr[1] "%s Rechnungen erstellt"
 
-#: workbench/logbook/__init__.py:10 workbench/templates/base.html:52
+#: workbench/logbook/__init__.py:10 workbench/templates/base.html:53
 msgid "logbook"
 msgstr "Logbuch"
 
@@ -926,7 +926,7 @@ msgstr "Erstellt von"
 msgid "service"
 msgstr "Leistung"
 
-#: workbench/logbook/forms.py:180
+#: workbench/logbook/forms.py:178
 msgid "Sorry, hours have to be logged in the same week."
 msgstr "Tut mir leid, Stunden müssen in der gleichen Woche erfasst werden."
 
@@ -950,7 +950,7 @@ msgid "archived at"
 msgstr "Archiviert um"
 
 #: workbench/logbook/models.py:52 workbench/logbook/models.py:53
-#: workbench/templates/base.html:55
+#: workbench/templates/base.html:56
 #: workbench/templates/reporting/overdrawn_projects.html:18
 msgid "logged hours"
 msgstr "Erfasste Stunden"
@@ -975,7 +975,7 @@ msgstr "Total inkl. MwSt bei Fremdleistungen."
 msgid "logged cost"
 msgstr "Erfasste Kosten"
 
-#: workbench/logbook/models.py:117 workbench/templates/base.html:56
+#: workbench/logbook/models.py:117 workbench/templates/base.html:57
 msgid "logged costs"
 msgstr "Erfasste Kosten"
 
@@ -1271,39 +1271,43 @@ msgstr "Monatssummen"
 msgid "Search"
 msgstr "Suche"
 
-#: workbench/templates/base.html:63
+#: workbench/templates/base.html:35
+msgid "dunning"
+msgstr "Mahnwesen"
+
+#: workbench/templates/base.html:64
 msgid "reports"
 msgstr "Berichte"
 
-#: workbench/templates/base.html:67
+#: workbench/templates/base.html:68
 msgid "not invoiced work"
 msgstr "Nicht verrechnete Arbeit"
 
-#: workbench/templates/base.html:68
+#: workbench/templates/base.html:69
 #: workbench/templates/reporting/overdrawn_projects.html:5
 #: workbench/templates/reporting/overdrawn_projects.html:10
 msgid "overdrawn projects"
 msgstr "Überzogene Projekte"
 
-#: workbench/templates/base.html:69
+#: workbench/templates/base.html:70
 #: workbench/templates/reporting/monthly_invoicing.html:5
 #: workbench/templates/reporting/monthly_invoicing.html:10
 msgid "monthly invoicing"
 msgstr "Monatliche Verrechnung"
 
-#: workbench/templates/base.html:82
+#: workbench/templates/base.html:83
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: workbench/templates/base.html:84
+#: workbench/templates/base.html:85
 msgid "Admin panel"
 msgstr "Verwaltung"
 
-#: workbench/templates/base.html:87
+#: workbench/templates/base.html:88
 msgid "payment lists"
 msgstr "Zahlungslisten"
 
-#: workbench/templates/base.html:92
+#: workbench/templates/base.html:93
 msgid "Sign out"
 msgstr "Abmelden"
 

@@ -37,6 +37,7 @@ class InvoiceSearchForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
     )
+    dunning = forms.BooleanField(widget=forms.HiddenInput)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -66,13 +67,18 @@ class InvoiceSearchForm(forms.Form):
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
+        if data.get("dunning"):
+            queryset = queryset.filter(
+                status__in=(Invoice.SENT, Invoice.REMINDED),
+                due_on__lte=date.today(),
+            ).order_by("due_on")
 
         return queryset.select_related(
             "customer", "contact__organization", "owned_by", "project__owned_by"
         )
 
     def response(self, request, queryset):
-        if "s" not in request.GET:
+        if not request.GET:
             return http.HttpResponseRedirect("?s=open")
 
 
