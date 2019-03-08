@@ -16,10 +16,33 @@ from workbench.tools.forms import ModelForm, Textarea
 
 
 class AccountStatementSearchForm(forms.Form):
-    pass
+    """
+    s = forms.ChoiceField(
+        choices=(
+            ("", _("All states")),
+            ("pending", _("Pending")),
+            ("processed", _("Processed")),
+        ),
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+    )
+    """
 
     def filter(self, queryset):
         return queryset
+
+        data = self.cleaned_data
+        if data.get("s") == "pending":
+            queryset = queryset.filter(invoice__isnull=True, notes="")
+        elif data.get("s") == "processed":
+            queryset = queryset.filter(invoice__isnull=False).exclude(notes="")
+        return queryset.select_related("invoice__project", "invoice__owned_by")
+
+    def response(self, request, queryset):
+        if request.GET.get("xlsx"):
+            xlsx = WorkbenchXLSXDocument()
+            xlsx.table_from_queryset(queryset)
+            return xlsx.to_response("credit-entries.xlsx")
 
 
 class AccountStatementForm(ModelForm):

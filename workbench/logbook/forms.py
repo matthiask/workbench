@@ -54,8 +54,8 @@ class LoggedHoursSearchForm(forms.Form):
 
         return queryset.select_related("service__project__owned_by", "rendered_by")
 
-    def response(self, response, queryset):
-        if response.GET.get("xlsx"):
+    def response(self, request, queryset):
+        if request.GET.get("xlsx"):
             xlsx = WorkbenchXLSXDocument()
             xlsx.logged_hours(queryset)
             return xlsx.to_response("hours.xlsx")
@@ -102,8 +102,8 @@ class LoggedCostSearchForm(forms.Form):
 
         return queryset.select_related("project__owned_by", "service", "created_by")
 
-    def response(self, response, queryset):
-        if response.GET.get("xlsx"):
+    def response(self, request, queryset):
+        if request.GET.get("xlsx"):
             xlsx = WorkbenchXLSXDocument()
             xlsx.logged_costs(queryset)
             return xlsx.to_response("costs.xlsx")
