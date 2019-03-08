@@ -4,6 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from django import forms
+from django.db.models import Q
 from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -30,9 +31,9 @@ class CreditEntrySearchForm(forms.Form):
     def filter(self, queryset):
         data = self.cleaned_data
         if data.get("s") == "pending":
-            queryset = queryset.filter(invoice__isnull=True, notes="")
+            queryset = queryset.filter(Q(invoice__isnull=True) & Q(notes=""))
         elif data.get("s") == "processed":
-            queryset = queryset.filter(invoice__isnull=False).exclude(notes="")
+            queryset = queryset.filter(~Q(invoice__isnull=True) | ~Q(notes=""))
         return queryset.select_related("invoice__project", "invoice__owned_by")
 
     def response(self, request, queryset):
