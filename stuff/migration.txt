@@ -284,12 +284,36 @@ UPDATE contacts_postaladdress SET weight=weight - 100 WHERE type ILIKE '%organiz
 --
 
 INSERT INTO projects_project
-(id, title, description, status, created_at, invoicing, maintenance, customer_id, contact_id, owned_by_id, _code)
-SELECT id, title, description, status, created, NOT no_profit, ongoing, customer_id, contact_id, owned_by_id, _code % 10000 FROM
+(id, title, description, type, created_at, closed_on, customer_id, contact_id, owned_by_id, _code)
+SELECT
+id,
+title,
+description,
+CASE
+WHEN no_profit THEN 'internal'
+WHEN ongoing THEN 'maintenance'
+ELSE 'order'
+END,
+created,
+CASE WHEN status=30 THEN now() ELSE NULL END,
+customer_id,
+contact_id,
+owned_by_id,
+_code % 10000
+FROM
 dblink(
     'dbname=fineware_feinheit',
     'SELECT j.id, j.name, j.description, CASE WHEN state=30 THEN 30 ELSE 20 END, j.created, no_profit, ongoing, CASE WHEN p.company=TRUE THEN customer_id ELSE 1 END, CASE WHEN cp.company=FALSE THEN contact.person_id ELSE NULL END, manager_id, replace(job_id, ''-'', '''')::integer FROM jobs_job j LEFT JOIN addressbook_person p ON j.customer_id=p.id LEFT OUTER JOIN addressbook_address contact ON j.contact_id=contact.id LEFT OUTER JOIN addressbook_person cp ON contact.person_id=cp.id'
 ) AS p(id int, title varchar(100), description text, status int, created timestamp, no_profit bool, ongoing bool, customer_id int, contact_id int, owned_by_id int, _code int);
+
+UPDATE projects_project
+SET closed_on=p.created
+FROM
+dblink(
+  'dbname=fineware_feinheit',
+  'SELECT DISTINCT ON (job_id) job_id, created FROM jobs_jobupdate WHERE state=30 ORDER BY job_id, created DESC'
+) AS p(job_id int, created timestamp)
+WHERE projects_project.id=p.job_id;
 
 
 --

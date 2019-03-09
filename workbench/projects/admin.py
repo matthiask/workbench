@@ -30,6 +30,6 @@ class ServiceAdmin(admin.ModelAdmin):
 
 @admin.register(models.Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ("title", "customer", "owned_by", "status")
-    list_filter = ("status",)
+    list_display = ("title", "customer", "owned_by", "type", "closed_on")
+    list_filter = ["type", "closed_on"]
     raw_id_fields = ("customer", "contact", "owned_by")

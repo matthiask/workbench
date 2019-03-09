@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from datetime import date
 
 from django import forms, http
 from django.forms.models import inlineformset_factory
@@ -16,8 +17,14 @@ class ProjectSearchForm(forms.Form):
         choices=(
             ("", _("All states")),
             ("open", _("Open")),
-            (_("Exact"), Project.STATUS_CHOICES),
+            ("closed", _("Closed")),
+            # (_("Exact"), Project.STATUS_CHOICES),
         ),
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+    )
+    type = forms.ChoiceField(
+        choices=[("", _("All types"))] + Project.TYPE_CHOICES,
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
     )
@@ -45,9 +52,11 @@ class ProjectSearchForm(forms.Form):
     def filter(self, queryset):
         data = self.cleaned_data
         if data.get("s") == "open":
-            queryset = queryset.filter(status__lte=Project.WORK_IN_PROGRESS)
-        elif data.get("s"):
-            queryset = queryset.filter(status=data.get("s"))
+            queryset = queryset.filter(closed_on__isnull=True)
+        elif data.get("s") == "closed":
+            queryset = queryset.filter(closed_on__isnull=False)
+        if data.get("type"):
+            queryset = queryset.filter(type=data.get("type"))
         if data.get("owned_by") == 0:
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get("owned_by"):
@@ -65,22 +74,32 @@ class ProjectForm(ModelForm):
 
     class Meta:
         model = Project
-        fields = (
-            "customer",
-            "contact",
-            "title",
-            "description",
-            "owned_by",
-            "status",
-            "invoicing",
-            "maintenance",
-        )
+        fields = ("customer", "contact", "title", "description", "owned_by", "type")
         widgets = {
             "customer": Picker(model=Organization),
             "contact": Picker(model=Person),
             "description": Textarea,
-            "status": forms.RadioSelect,
+            "type": forms.RadioSelect,
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["type"].choices = Project.TYPE_CHOICES
+        if self.instance.pk:
+            self.fields["is_closed"] = forms.BooleanField(
+                label=_("is closed"),
+                required=False,
+                initial=bool(self.instance.closed_on),
+            )
+
+    def save(self):
+        instance = super().save(commit=False)
+        if not instance.closed_on and self.cleaned_data.get("is_closed"):
+            instance.closed_on = date.today()
+        if instance.closed_on and not self.cleaned_data.get("is_closed"):
+            instance.closed_on = None
+        instance.save()
+        return instance
 
 
 class ServiceForm(ModelForm):

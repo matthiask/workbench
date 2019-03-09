@@ -15,28 +15,29 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.services.models import ServiceType
+from workbench.tools.formats import local_date_format
 from workbench.tools.models import SearchQuerySet, Model, MoneyField, HoursField, Z
 from workbench.tools.urls import model_urls
 
 
 class ProjectQuerySet(SearchQuerySet):
     def open(self):
-        return self.filter(status__in=(Project.ACQUISITION, Project.WORK_IN_PROGRESS))
+        return self.filter(closed_on__isnull=True)
 
 
 @model_urls()
 class Project(Model):
-    ACQUISITION = 10
-    WORK_IN_PROGRESS = 20
-    FINISHED = 30
-    DECLINED = 40
+    ACQUISITION = "acquisition"
+    MAINTENANCE = "maintenance"
+    ORDER = "order"
+    INTERNAL = "internal"
 
-    STATUS_CHOICES = (
+    TYPE_CHOICES = [
         (ACQUISITION, _("Acquisition")),
-        (WORK_IN_PROGRESS, _("Work in progress")),
-        (FINISHED, _("Finished")),
-        (DECLINED, _("Declined")),
-    )
+        (MAINTENANCE, _("Maintenance")),
+        (ORDER, _("Order")),
+        (INTERNAL, _("Internal")),
+    ]
 
     customer = models.ForeignKey(
         Organization,
@@ -59,21 +60,9 @@ class Project(Model):
         User, on_delete=models.PROTECT, verbose_name=_("owned by"), related_name="+"
     )
 
-    status = models.PositiveIntegerField(
-        _("status"), choices=STATUS_CHOICES, default=ACQUISITION
-    )
-
+    type = models.CharField(_("type"), choices=TYPE_CHOICES, max_length=20)
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
-    invoicing = models.BooleanField(
-        _("invoicing"),
-        default=True,
-        help_text=_("This project is eligible for invoicing."),
-    )
-    maintenance = models.BooleanField(
-        _("maintenance"),
-        default=False,
-        help_text=_("This project is used for maintenance work."),
-    )
+    closed_on = models.DateField(_("closed on"), blank=True, null=True)
 
     _code = models.IntegerField(_("code"))
 
@@ -115,19 +104,22 @@ class Project(Model):
     save.alters_data = True
 
     def status_css(self):
+        if self.closed_on:
+            return "secondary"
+
         return {
             self.ACQUISITION: "info",
-            self.WORK_IN_PROGRESS: "success",
-            self.FINISHED: "default",
-            self.DECLINED: "warning",
-        }[self.status]
+            self.MAINTENANCE: "info",
+            self.ORDER: "success",
+            self.INTERNAL: "warning",
+        }[self.type]
 
     def pretty_status(self):
-        parts = [self.get_status_display()]
-        if not self.invoicing:
-            parts.append(ugettext("no invoicing"))
-        if self.maintenance:
-            parts.append(ugettext("maintenance"))
+        parts = [self.get_type_display()]
+        if self.closed_on:
+            parts.append(
+                ugettext("closed on %s") % local_date_format(self.closed_on, "d.m.Y")
+            )
         return ", ".join(parts)
 
     @cached_property
