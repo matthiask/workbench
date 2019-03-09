@@ -34,6 +34,8 @@
             <a class="dropdown-item" href="{% url 'invoices_invoice_list' %}">{% trans 'invoices' %}</a>
             <a class="dropdown-item" href="{% url 'invoices_invoice_list' %}?dunning=1">{% trans 'dunning' %}</a>
             <a class="dropdown-item" href="{% url 'invoices_recurringinvoice_list' %}">{% trans 'recurring invoices'|capfirst %}</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'credit_control_creditentry_list' %}">{% trans 'credit entries' %}</a>
           </div>
         </li>
 
@@ -84,8 +86,6 @@
             {% if request.user.is_admin %}
             <a class="dropdown-item" href="{% url 'admin:index' %}">{% trans 'Admin panel' %}</a>
             {% endif %}
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'credit_control_creditentry_list' %}">{% trans 'credit control' %}</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'deals_deal_list' %}">{% trans 'deals' %}</a>
             <a class="dropdown-item" href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a>
