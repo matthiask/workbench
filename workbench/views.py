@@ -52,8 +52,7 @@ HISTORY = {
         "subtotal, discount, tax_rate, total"
     ),
     "projects.project": (
-        "customer, contact, title, description, owned_by, status,"
-        "invoicing, maintenance"
+        "customer, contact, title, description, owned_by, type, closed_on"
     ),
     "projects.task": "",
 }
