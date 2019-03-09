@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 
+from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F, Q
@@ -12,6 +13,7 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.utils import recurring
 from workbench.projects.models import Project
+from workbench.services.models import ServiceBase, EffortBase, CostBase
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import ModelWithTotal, SearchQuerySet, MoneyField
 from workbench.tools.urls import model_urls
@@ -252,6 +254,59 @@ class Invoice(ModelWithTotal):
             )
         else:
             return _("total CHF incl. tax") if self.liable_to_vat else _("total CHF")
+
+
+@model_urls()
+class Service(ServiceBase):
+    RELATED_MODEL_FIELD = "invoice"
+
+    invoice = models.ForeignKey(
+        Invoice,
+        on_delete=models.CASCADE,
+        related_name="services",
+        verbose_name=_("invoice"),
+    )
+    project_service = models.ForeignKey(
+        "projects.Service",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="invoice_services",
+        verbose_name=_("project service"),
+    )
+
+    @classmethod
+    def allow_update(cls, instance, request):
+        if instance.invoice.status > instance.invoice.IN_PREPARATION:
+            messages.error(
+                request,
+                _(
+                    "Cannot modify a service bound to an invoice"
+                    " which is not in preparation anymore."
+                ),
+            )
+            return False
+        return True
+
+    allow_delete = allow_update
+
+
+class Effort(EffortBase):
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        related_name="efforts",
+        verbose_name=_("service"),
+    )
+
+
+class Cost(CostBase):
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        related_name="costs",
+        verbose_name=_("service"),
+    )
 
 
 class RecurringInvoiceQuerySet(SearchQuerySet):

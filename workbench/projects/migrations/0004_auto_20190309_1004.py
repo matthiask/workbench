@@ -32,4 +32,12 @@ class Migration(migrations.Migration):
             ),
             preserve_default=False,
         ),
+        migrations.AlterModelOptions(
+            name="service",
+            options={
+                "ordering": ["position", "created_at"],
+                "verbose_name": "service",
+                "verbose_name_plural": "services",
+            },
+        ),
     ]
