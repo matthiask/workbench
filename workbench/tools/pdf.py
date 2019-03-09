@@ -338,6 +338,7 @@ class PDFDocument(_PDFDocument):
             self.p(invoice.description)
 
         self.spacer()
+        self.table_services(invoice.services.prefetch_related("efforts", "costs"))
         self.table_total(invoice)
 
         self.spacer()

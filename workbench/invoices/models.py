@@ -15,7 +15,7 @@ from workbench.invoices.utils import recurring
 from workbench.projects.models import Project
 from workbench.services.models import ServiceBase, EffortBase, CostBase
 from workbench.tools.formats import local_date_format
-from workbench.tools.models import ModelWithTotal, SearchQuerySet, MoneyField
+from workbench.tools.models import ModelWithTotal, SearchQuerySet, MoneyField, Z
 from workbench.tools.urls import model_urls
 
 
@@ -160,6 +160,11 @@ class Invoice(ModelWithTotal):
 
     save.alters_data = True
 
+    def _calculate_total(self):
+        if self.type == self.SERVICES:
+            self.subtotal = sum((service.cost for service in self.services.all()), Z)
+        super()._calculate_total()
+
     @property
     def code(self):
         return (
@@ -174,9 +179,6 @@ class Invoice(ModelWithTotal):
 
     def clean(self):
         super().clean()
-
-        if self.type == self.SERVICES:
-            raise ValidationError({"type": _("Not implemented yet.")})
 
         if self.status >= self.SENT:
             if not self.invoiced_on or not self.due_on:

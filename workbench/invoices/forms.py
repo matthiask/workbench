@@ -2,7 +2,6 @@ from datetime import date
 
 from django import forms, http
 from django.db.models import Q
-from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
@@ -187,6 +186,16 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
                 "third_party_costs"
             ).formfield()
 
+        elif self.instance.type in (self.instance.SERVICES,):
+            self.fields["services"] = forms.ModelMultipleChoiceField(
+                queryset=self.instance.project.services.all(),
+                widget=forms.CheckboxSelectMultiple,
+                initial=self.instance.services.values_list(
+                    "project_service", flat=True
+                ),
+                label=_("services"),
+            )
+
         if self.instance.type != Invoice.DOWN_PAYMENT and self.instance.project_id:
             eligible_down_payment_invoices = Invoice.objects.filter(
                 Q(project=self.instance.project),
@@ -217,27 +226,11 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
                     for invoice in eligible_down_payment_invoices
                 ]
 
-        elif self.instance.type in (self.instance.SERVICES,):
-            pass
-            """
-            self.fields['services'] = forms.ModelMultipleChoiceField(
-                queryset=Service.objects.filter(
-                    Q(story__project=self.instance.project),
-                    Q(
-                        invoice=None,
-                        archived_at__isnull=False,
-                    ) | Q(invoice=self.instance),
-                ),
-                widget=forms.CheckboxSelectMultiple,
-                initial=RenderedService.objects.filter(invoice=self.instance),
-                label=_('rendered services'),
-            )
-            """
-
-        self.fields.move_to_end("discount")
-        if "apply_down_payment" in self.fields:
-            self.fields.move_to_end("apply_down_payment")
-        self.fields.move_to_end("liable_to_vat")
+        self.order_fields(
+            field
+            for field in list(self.fields)
+            if field not in {"discount", "apply_down_payment", "liable_to_vat"}
+        )
 
         if not self.instance.postal_address:
             self.add_postal_address_selection(person=self.instance.contact)
@@ -352,13 +345,33 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
         instance.save()
 
         if instance.type in (self.instance.SERVICES,):
-            # Leave out save_m2m by purpose.
-            instance.clear_stories(save=False)
-            instance.add_stories(self.cleaned_data.get("stories"), save=True)
+            # FIXME Update, not just create over and over
+            for service in self.cleaned_data["services"]:
+                new = instance.services.create(
+                    title=service.title,
+                    description=service.description,
+                    position=service.position,
+                    effort_hours=service.effort_hours,
+                    cost=service.cost,
+                    project_service=service,
+                )
+                for effort in service.efforts.all():
+                    new.efforts.create(
+                        title=effort.title,
+                        billing_per_hour=effort.billing_per_hour,
+                        hours=effort.hours,
+                        service_type=effort.service_type,
+                    )
+                for cost in service.costs.all():
+                    new.costs.create(
+                        title=cost.title,
+                        cost=cost.cost,
+                        third_party_costs=cost.third_party_costs,
+                    )
 
-            self.cleaned_data.get("services").update(
-                invoice=instance, archived_at=timezone.now()
-            )
+                service.save()
+
+            instance.save()
 
         return instance
 
