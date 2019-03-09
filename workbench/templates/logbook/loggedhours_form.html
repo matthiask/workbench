@@ -8,7 +8,7 @@
 
 {% block body %}
   {% ff_errors form %}
-  <div class="d-none" id="new-service">
+  <div class="{% if form.hide_new_service %}d-none{% endif %}" id="new-service">
     <h5>{% trans 'new service' %}</h5>
     {% ff_field form.service_title %}
     {% ff_field form.service_description %}
@@ -27,7 +27,7 @@
       class="float-left btn btn-outline-danger">
       {% trans 'delete' %}
     </a>
-  {% else %}
+  {% elif form.hide_new_service %}
     <button type="button" class="btn btn-secondary" onclick="this.classList.add('d-none');document.querySelector('#new-service').classList.remove('d-none')">
       {% trans 'new service' %}
     </button>

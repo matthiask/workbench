@@ -163,7 +163,11 @@ class LoggedHoursForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["service"].choices = self.project.services.choices()
         self.fields["service"].required = False
-        self.fields["service"].widget.attrs["autofocus"] = True
+        if len(self.fields["service"].choices) > 1:
+            self.hide_new_service = True
+            self.fields["service"].widget.attrs["autofocus"] = True
+        else:
+            self.fields["service_title"].widget.attrs["autofocus"] = True
 
         today = date.today()
         if self.instance.pk and self.instance.rendered_on < date.today() - timedelta(
