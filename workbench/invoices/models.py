@@ -148,11 +148,17 @@ class Invoice(ModelWithTotal):
     def save(self, *args, **kwargs):
         new = False
         if not self.pk:
-            self._code = RawSQL(
-                "SELECT COALESCE(MAX(_code), 0) + 1 FROM invoices_invoice"
-                " WHERE project_id = %s",
-                (self.project_id,),
-            )
+            if self.project_id:
+                self._code = RawSQL(
+                    "SELECT COALESCE(MAX(_code), 0) + 1 FROM invoices_invoice"
+                    " WHERE project_id = %s",
+                    (self.project_id,),
+                )
+            else:
+                self._code = RawSQL(
+                    "SELECT COALESCE(MAX(_code), 0) + 1 FROM invoices_invoice"
+                    " WHERE project_id IS NULL"
+                )
             new = True
         super().save(*args, **kwargs)
         if new:
@@ -170,7 +176,7 @@ class Invoice(ModelWithTotal):
         return (
             "%s-%04d" % (self.project.code, self._code)
             if self.project
-            else "%05d" % self.pk
+            else "%05d" % self._code
         )
 
     @property

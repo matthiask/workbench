@@ -26,7 +26,8 @@ class UserFactory(factory.DjangoModelFactory):
 
 # CONTACTS ####################################################################
 class PersonFactory(factory.DjangoModelFactory):
-    full_name = "Vorname Nachname"
+    given_name = "Vorname"
+    family_name = "Nachname"
     primary_contact = factory.SubFactory(UserFactory)
 
     class Meta:
@@ -48,7 +49,7 @@ class ProjectFactory(factory.DjangoModelFactory):
     )
     owned_by = factory.SubFactory(UserFactory)
     title = factory.Sequence(lambda n: "Project %d" % n)
-    status = Project.WORK_IN_PROGRESS
+    type = Project.ORDER
 
     class Meta:
         model = Project
