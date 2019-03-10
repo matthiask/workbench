@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
-from workbench.invoices.models import Invoice, RecurringInvoice
+from workbench.invoices.models import Invoice, Service, RecurringInvoice
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm
 from workbench.tools.models import Z
@@ -347,7 +347,7 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
         if instance.type in (self.instance.SERVICES,):
             # FIXME Update, not just create over and over
             for service in self.cleaned_data["services"]:
-                new = instance.services.model.from_service(service, invoice=instance)
+                new = Service.from_project_service(service, invoice=instance)
                 new.save()
                 new.copy_efforts()
                 new.copy_costs()

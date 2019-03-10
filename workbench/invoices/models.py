@@ -293,7 +293,7 @@ class Service(ServiceBase):
     allow_delete = allow_update
 
     @classmethod
-    def from_service(cls, service, **kwargs):
+    def from_project_service(cls, service, **kwargs):
         return cls(
             title=service.title,
             description=service.description,
