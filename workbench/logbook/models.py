@@ -104,7 +104,7 @@ class LoggedCost(Model):
         on_delete=models.PROTECT,
         blank=True,
         null=True,
-        verbose_name=_("invoice"),
+        verbose_name=_("invoice service"),
         related_name="+",
     )
     archived_at = models.DateTimeField(_("archived at"), blank=True, null=True)
