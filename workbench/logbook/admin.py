@@ -13,7 +13,7 @@ class LoggedHoursAdmin(admin.ModelAdmin):
         "hours",
         "description",
     )
-    raw_id_fields = ("service", "invoice")
+    raw_id_fields = ("service", "invoice_service")
 
 
 class LoggedCostAdmin(admin.ModelAdmin):
@@ -25,7 +25,7 @@ class LoggedCostAdmin(admin.ModelAdmin):
         "cost",
         "description",
     )
-    raw_id_fields = ("project", "service", "invoice")
+    raw_id_fields = ("project", "service", "invoice_service")
 
 
 admin.site.register(models.LoggedHours, LoggedHoursAdmin)

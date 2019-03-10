@@ -44,7 +44,7 @@
     <tr>
       <th class="text-right">{% trans 'invoicing' %}</th>
       <td>
-        {% if object.invoice %}{% link_or_none object.invoice %}
+        {% if object.invoice_service %}{% link_or_none object.invoice_service %}
         {% elif object.archived_at %}
           {% blocktrans with archived_at=object.archived_at|date:'SHORT_DATETIME_FORMAT' trimmed %}
             Archived at {{ archived_at }}

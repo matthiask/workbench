@@ -34,12 +34,12 @@ class LoggedHours(Model):
     hours = HoursField(_("hours"))
     description = models.TextField(_("description"))
 
-    invoice = models.ForeignKey(
-        "invoices.Invoice",
+    invoice_service = models.ForeignKey(
+        "invoices.Service",
         on_delete=models.PROTECT,
         blank=True,
         null=True,
-        verbose_name=_("invoice"),
+        verbose_name=_("invoice service"),
         related_name="+",
     )
     archived_at = models.DateTimeField(_("archived at"), blank=True, null=True)
@@ -99,8 +99,8 @@ class LoggedCost(Model):
     )
     description = models.TextField(_("description"))
 
-    invoice = models.ForeignKey(
-        "invoices.Invoice",
+    invoice_service = models.ForeignKey(
+        "invoices.Service",
         on_delete=models.PROTECT,
         blank=True,
         null=True,
