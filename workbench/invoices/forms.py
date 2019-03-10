@@ -347,29 +347,11 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
         if instance.type in (self.instance.SERVICES,):
             # FIXME Update, not just create over and over
             for service in self.cleaned_data["services"]:
-                new = instance.services.create(
-                    title=service.title,
-                    description=service.description,
-                    position=service.position,
-                    effort_hours=service.effort_hours,
-                    cost=service.cost,
-                    project_service=service,
-                )
-                for effort in service.efforts.all():
-                    new.efforts.create(
-                        title=effort.title,
-                        billing_per_hour=effort.billing_per_hour,
-                        hours=effort.hours,
-                        service_type=effort.service_type,
-                    )
-                for cost in service.costs.all():
-                    new.costs.create(
-                        title=cost.title,
-                        cost=cost.cost,
-                        third_party_costs=cost.third_party_costs,
-                    )
-
-                service.save()
+                new = instance.services.model.from_service(service, invoice=instance)
+                new.save()
+                new.copy_efforts()
+                new.copy_costs()
+                new.save()
 
             instance.save()
 

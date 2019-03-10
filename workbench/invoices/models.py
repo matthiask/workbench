@@ -292,6 +292,35 @@ class Service(ServiceBase):
 
     allow_delete = allow_update
 
+    @classmethod
+    def from_service(cls, service, **kwargs):
+        return cls(
+            title=service.title,
+            description=service.description,
+            position=service.position,
+            effort_hours=service.effort_hours,
+            cost=service.cost,
+            project_service=service,
+            **kwargs
+        )
+
+    def copy_efforts(self, service):
+        for effort in service.efforts.all():
+            self.efforts.create(
+                title=effort.title,
+                billing_per_hour=effort.billing_per_hour,
+                hours=effort.hours,
+                service_type=effort.service_type,
+            )
+
+    def copy_costs(self, service):
+        for cost in service.costs.all():
+            self.costs.create(
+                title=cost.title,
+                cost=cost.cost,
+                third_party_costs=cost.third_party_costs,
+            )
+
 
 class Effort(EffortBase):
     service = models.ForeignKey(
