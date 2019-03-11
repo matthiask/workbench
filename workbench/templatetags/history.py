@@ -27,6 +27,9 @@ def history(instance, fields=None):
 
 @register.simple_tag
 def history_link(instance):
+    if not instance.pk:
+        return ""
+
     return format_html(
         """
         <a href="{}"
