@@ -1,5 +1,7 @@
+from decimal import Decimal
 from datetime import date, timedelta
 
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.html import format_html
@@ -31,7 +33,7 @@ class LoggedHours(Model):
         related_name="loggedhours",
         verbose_name=_("rendered by"),
     )
-    hours = HoursField(_("hours"))
+    hours = HoursField(_("hours"), validators=[MinValueValidator(Decimal("0.1"))])
     description = models.TextField(_("description"))
 
     invoice_service = models.ForeignKey(
@@ -89,10 +91,9 @@ class LoggedCost(Model):
         User, on_delete=models.PROTECT, related_name="+", verbose_name=_("created by")
     )
     rendered_on = models.DateField(_("rendered on"), default=date.today)
-    cost = MoneyField(_("cost"), default=None)
+    cost = MoneyField(_("cost"))
     third_party_costs = MoneyField(
         _("third party costs"),
-        default=None,
         blank=True,
         null=True,
         help_text=_("Total incl. tax for third-party services."),

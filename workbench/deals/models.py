@@ -64,7 +64,7 @@ class Deal(Model):
     owned_by = models.ForeignKey(
         User, on_delete=models.PROTECT, verbose_name=_("owned by"), related_name="+"
     )
-    estimated_value = MoneyField(_("estimated value"), default=None)
+    estimated_value = MoneyField(_("estimated value"))
 
     status = models.PositiveIntegerField(
         _("status"), choices=STATUS_CHOICES, default=OPEN

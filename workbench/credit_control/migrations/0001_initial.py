@@ -36,7 +36,6 @@ class Migration(migrations.Migration):
                     "total",
                     models.DecimalField(
                         decimal_places=2,
-                        default=Decimal("0.00"),
                         max_digits=10,
                         validators=[django.core.validators.MinValueValidator(0)],
                         verbose_name="total",

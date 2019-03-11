@@ -196,9 +196,7 @@ class Migration(migrations.Migration):
                     models.DecimalField(
                         decimal_places=1,
                         max_digits=4,
-                        validators=[
-                            django.core.validators.MinValueValidator(Decimal("0.1"))
-                        ],
+                        validators=[django.core.validators.MinValueValidator(0)],
                         verbose_name="working time per day",
                     ),
                 ),

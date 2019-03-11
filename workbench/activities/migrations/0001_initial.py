@@ -45,9 +45,7 @@ class Migration(migrations.Migration):
                         help_text="Duration in hours (if applicable).",
                         max_digits=4,
                         null=True,
-                        validators=[
-                            django.core.validators.MinValueValidator(Decimal("0.1"))
-                        ],
+                        validators=[django.core.validators.MinValueValidator(0)],
                         verbose_name="duration",
                     ),
                 ),

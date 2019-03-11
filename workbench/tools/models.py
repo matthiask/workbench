@@ -90,7 +90,6 @@ MoneyField = partial(
     models.DecimalField,
     max_digits=10,
     decimal_places=2,
-    default=Z,
     validators=[MinValueValidator(0)],
 )
 
@@ -99,22 +98,22 @@ HoursField = partial(
     models.DecimalField,
     max_digits=4,
     decimal_places=1,
-    validators=[MinValueValidator(Decimal("0.1"))],
+    validators=[MinValueValidator(0)],
 )
 
 
 class ModelWithTotal(Model):
-    subtotal = MoneyField(_("subtotal"))
-    discount = MoneyField(_("discount"))
+    subtotal = MoneyField(_("subtotal"), default=Z)
+    discount = MoneyField(_("discount"), default=Z)
     liable_to_vat = models.BooleanField(
         _("liable to VAT"),
         default=True,
         help_text=_(
-            "For example invoices to foreign institutions are not" " liable to VAT."
+            "For example invoices to foreign institutions are not liable to VAT."
         ),
     )
     tax_rate = MoneyField(_("tax rate"), default=Decimal("7.7"))
-    total = MoneyField(_("total"))
+    total = MoneyField(_("total"), default=Z)
 
     class Meta:
         abstract = True

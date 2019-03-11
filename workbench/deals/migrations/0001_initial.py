@@ -38,7 +38,6 @@ class Migration(migrations.Migration):
                     "estimated_value",
                     models.DecimalField(
                         decimal_places=2,
-                        default=None,
                         max_digits=10,
                         validators=[django.core.validators.MinValueValidator(0)],
                         verbose_name="estimated value",

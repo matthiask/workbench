@@ -47,7 +47,6 @@ class Migration(migrations.Migration):
                     "cost",
                     models.DecimalField(
                         decimal_places=2,
-                        default=None,
                         max_digits=10,
                         validators=[django.core.validators.MinValueValidator(0)],
                         verbose_name="cost",
@@ -58,7 +57,6 @@ class Migration(migrations.Migration):
                     models.DecimalField(
                         blank=True,
                         decimal_places=2,
-                        default=None,
                         help_text="Total incl. tax for third-party services.",
                         max_digits=10,
                         null=True,
