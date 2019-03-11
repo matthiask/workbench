@@ -84,13 +84,16 @@ $(function() {
     return false;
   });
 
-  $(document.body).on("click", "[data-toggle=picker]", function() {
+  $(document.body).on("click", "[data-toggle=picker]", function(e) {
+    e.preventDefault();
+
     var el = $(this),
       id = el.data("id"),
       key = el.data("key"),
       pretty = el.data("pretty");
 
     $("#" + id + "_pretty").val(pretty);
+    $("#" + id + "_clear").toggleClass("d-none", !key);
     $("#" + id)
       .val(key)
       .trigger("change");

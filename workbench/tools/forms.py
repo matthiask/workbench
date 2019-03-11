@@ -109,10 +109,13 @@ class ModelForm(forms.ModelForm):
 _PICKER_TEMPLATE = """
 <div class="input-group">
   <div class="input-group-prepend">
-  <a href="%(url)s" class="btn btn-secondary"
-      data-toggle="ajaxmodal">
+    <a href="%(url)s" class="btn btn-secondary" data-toggle="ajaxmodal">
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15.7 13.3l-3.81-3.83A5.93 5.93 0 0 0 13 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 0 0 0-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z"/></svg>
-  </a>
+    </a>
+    <button type="button" class="btn btn-secondary %(clear_css)s"
+      id="%(id)s_clear"
+      data-toggle="picker" data-id="%(id)s" data-key="" data-pretty=""
+      >&times;</button>
   </div>
   <input type="text" class="form-control" id="%(id)s_pretty"
     value="%(pretty)s" placeholder="%(placeholder)s" disabled>
@@ -155,6 +158,7 @@ class Picker(forms.TextInput):
                 "field": format_html("<input{} />", flatatt(final_attrs)),
                 "pretty": escape(pretty),
                 "placeholder": opts.verbose_name,
+                "clear_css": "" if value else "d-none",
             }
         )
 
