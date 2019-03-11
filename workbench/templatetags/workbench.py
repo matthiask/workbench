@@ -6,7 +6,7 @@ from django import template
 from django.db import models
 from django.template.defaultfilters import linebreaksbr
 from django.utils import timezone
-from django.utils.html import format_html, mark_safe
+from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.translation import ugettext as _
 
 from workbench.tools.formats import local_date_format
@@ -72,15 +72,6 @@ def h(object):
 
 
 @register.filter
-def percentage_to_css(value):
-    if value < 80:
-        return "info"
-    elif value < 100:
-        return "warning"
-    return "danger"
-
-
-@register.filter
 def group_hours_by_day(iterable):
     for day, instances in groupby(iterable, lambda logged: logged.rendered_on):
         instances = list(instances)
@@ -101,3 +92,34 @@ def timesince_short(dttm):
     if delta > 120:
         return _("%s minutes ago") % (delta // 60)
     return _("%s seconds ago") % delta
+
+
+@register.simple_tag
+def bar(value, one):
+    if not one:
+        return ""
+
+    percentage = int(100 * value / one)
+
+    bars = []
+
+    if percentage < 75:
+        bars.append(("bg-info", percentage))
+    elif percentage <= 100:
+        bars.append(("bg-warning", percentage))
+    else:
+        bars.extend(
+            [
+                ("bg-warning", int(10000 / percentage)),
+                ("bg-danger", 100 - int(10000 / percentage)),
+            ]
+        )
+
+    return format_html(
+        '<div class="progress progress-line">{bars}</div>',
+        bars=format_html_join(
+            "",
+            '<div class="progress-bar {}" role="progressbar" style="width:{}%"></div>',
+            bars,
+        ),
+    )

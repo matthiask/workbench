@@ -83,3 +83,7 @@ tbody th > a {
 .navbar-brand svg {
   transform: scale(1.7) translateY(-1px);
 }
+
+.progress-line {
+  height: 3px;
+}

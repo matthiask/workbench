@@ -64,6 +64,7 @@
             <a href="{% url 'logbook_loggedhours_list' %}?service={{ service.pk }}" target="_blank">
               {{ service.logged_hours }}h / {{ service.effort_hours }}h
             </a>
+            {% bar service.logged_hours service.effort_hours %}
           {% endif %}
         </span>
         <span class="col-md-2">
@@ -71,6 +72,7 @@
             <a href="{% url 'logbook_loggedcost_list' %}?service={{ service.pk }}" target="_blank">
               {{ service.logged_cost|stringformat:'.2f' }} / {{ service.planned_cost|stringformat:'.2f' }}
             </a>
+            {% bar service.logged_cost service.planned_cost %}
           {% else %}
             <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;service=0" target="_blank">
               {{ service.logged_cost|stringformat:'.2f' }} / {{ service.planned_cost|stringformat:'.2f' }}
