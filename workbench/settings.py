@@ -180,6 +180,7 @@ WORKBENCH = {
             "bolditalic": font("ZuricBTBolIta.ttf"),
         },
         BACKGROUND="#e3f2fd",
+        URL="https://workbench.feinheit.ch",
     ),
     "dbpag": types.SimpleNamespace(
         SSO_DOMAIN="diebruchpiloten.com",
@@ -206,6 +207,7 @@ WORKBENCH = {
             "bolditalic": font("HelveticaNeueBoldItalic.ttf"),
         },
         BACKGROUND="#dadcab",
+        URL="https://dbpag.feinheit.ch",
     ),
 }[env("NAMESPACE", required=True)]
 

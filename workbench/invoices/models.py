@@ -330,7 +330,7 @@ class RecurringInvoiceQuerySet(SearchQuerySet):
             Q(ends_on__isnull=True) | Q(ends_on__gte=F("next_period_starts_on")),
             Q(next_period_starts_on__isnull=True)
             | Q(next_period_starts_on__lte=generate_until),
-        ):
+        ).select_related("customer", "contact", "owned_by"):
             invoices.extend(ri.create_invoices(generate_until=generate_until))
         return invoices
 
