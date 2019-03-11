@@ -85,6 +85,9 @@ class Project(Model):
     def code(self):
         return "%s-%04d" % (self.created_at.year, self._code)
 
+    def get_absolute_url(self):
+        return self.urls.url("overview" if self.closed_on else "services")
+
     def save(self, *args, **kwargs):
         new = False
         if not self.pk:
