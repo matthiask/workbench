@@ -57,7 +57,7 @@ class ProjectFactory(factory.DjangoModelFactory):
 
 class ServiceFactory(factory.DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
-    effort_hours = 0
+    service_hours = 0
 
     class Meta:
         model = Service

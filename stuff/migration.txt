@@ -531,7 +531,7 @@ WHERE p.job_id IS NOT NULL AND p.job_id=projects_project.id;
 --
 
 INSERT INTO projects_service
-(id, created_at, title, position, description, project_id, cost, effort_hours, offer_id)
+(id, created_at, title, position, description, project_id, service_hours, service_cost, offer_id, effort_type, effort_hours, effort_rate, cost, third_party_costs)
 SELECT
   p.id,
   NOW(),
@@ -541,46 +541,53 @@ SELECT
   p.job_id,
   0.0,
   0.0,
-  p.offer_id
+  p.offer_id,
+  p.activity_name,
+  p.hours,
+  p.invoicing_hourly_rate,
+  NULL,
+  NULL
 FROM dblink(
     'dbname=fineware_feinheit',
-    'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id, a.ordering FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
-) AS p(id int, activity_name text, notes text, job_id int, offer_id int, ordering int);
+    'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id, a.ordering, a.invoicing_hourly_rate, a.hours FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
+) AS p(id int, activity_name text, notes text, job_id int, offer_id int, ordering int, invoicing_hourly_rate numeric(10,2), hours numeric(5, 2));
 
-INSERT INTO projects_effort
-(service_id, service_type_id, hours, title, billing_per_hour)
-SELECT service_id, service_type_id, effort, title, billing_per_hour FROM
-dblink(
+INSERT INTO projects_service
+(
+  id,
+  created_at,
+  title,
+  position,
+  description,
+  project_id,
+  service_hours,
+  service_cost,
+  offer_id,
+  effort_type,
+  effort_hours,
+  effort_rate,
+  cost,
+  third_party_costs
+)
+SELECT
+  p.id + 100000,
+  NOW(),
+  p.article_name,
+  p.ordering,
+  p.notes,
+  p.job_id,
+  0.0,
+  0.0,
+  p.offer_id,
+  '',
+  NULL,
+  NULL,
+  count * cost * (1 + commission / 100),
+  count * cost
+FROM dblink(
     'dbname=fineware_feinheit',
-    'SELECT a.id, 1, a.hours, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, invoicing_hourly_rate FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
-) p(service_id int, service_type_id int, effort numeric(5,2), title text, billing_per_hour numeric(10,2));
-
---
--- Not necessary anymore.
---
--- UPDATE projects_effort SET service_type_id=2
--- FROM projects_service s
--- WHERE projects_effort.service_id=s.id AND s.title ~ '^(Konzept:|Online Marketing:|User Experience:)';
---
--- UPDATE projects_effort SET service_type_id=3
--- FROM projects_service s
--- WHERE projects_effort.service_id=s.id AND s.title ~'^(Grafik)';
---
--- UPDATE projects_effort SET service_type_id=4
--- FROM projects_service s
--- WHERE projects_effort.service_id=s.id AND s.title ~'^(Multimedia|3D)';
---
--- UPDATE projects_effort SET service_type_id=5
--- FROM projects_service s
--- WHERE projects_effort.service_id=s.id AND s.title ~ '^(Programmierung|IT-Dienstleistungen)';
---
--- UPDATE projects_effort SET service_type_id=6
--- FROM projects_service s
--- WHERE projects_effort.service_id=s.id AND s.title ~ '^(Projektorganisation|Intern|Marketing)';
---
--- UPDATE projects_effort SET service_type_id=7
--- FROM projects_service s
--- WHERE projects_effort.service_id=s.id AND s.title ~ '^(Administration)';
+    'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id, a.ordering, cost, commission, count FROM offers_offeredarticle a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_article aa ON a.article_id=aa.id LEFT OUTER JOIN articles_article ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
+) AS p(id int, article_name text, notes text, job_id int, offer_id int, ordering int, cost numeric(10,2), commission numeric(10,2), count int);
 
 
 --
@@ -619,11 +626,10 @@ SELECT SETVAL('public.django_admin_log_id_seq', COALESCE(MAX(id), 1) ) FROM publ
 SELECT SETVAL('public.django_content_type_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_content_type;
 SELECT SETVAL('public.django_migrations_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_migrations;
 SELECT SETVAL('public.invoices_invoice_id_seq', COALESCE(MAX(id), 1) ) FROM public.invoices_invoice;
+SELECT SETVAL('public.invoices_service_id_seq', COALESCE(MAX(id), 1) ) FROM public.invoices_service;
 SELECT SETVAL('public.logbook_loggedcost_id_seq', COALESCE(MAX(id), 1) ) FROM public.logbook_loggedcost;
 SELECT SETVAL('public.logbook_loggedhours_id_seq', COALESCE(MAX(id), 1) ) FROM public.logbook_loggedhours;
 SELECT SETVAL('public.offers_offer_id_seq', COALESCE(MAX(id), 1) ) FROM public.offers_offer;
-SELECT SETVAL('public.projects_cost_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_cost;
-SELECT SETVAL('public.projects_effort_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_effort;
 SELECT SETVAL('public.projects_project_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_project;
 SELECT SETVAL('public.projects_service_id_seq', COALESCE(MAX(id), 1) ) FROM public.projects_service;
 SELECT SETVAL('public.services_servicetype_id_seq', COALESCE(MAX(id), 1) ) FROM public.services_servicetype;
@@ -747,8 +753,8 @@ dblink(
 --
 
 INSERT INTO projects_service
-(created_at, title, position, description, project_id, cost, effort_hours)
-SELECT DISTINCT NOW(), CONCAT('Logbuch:', activitygroup), 0, '', p.job_id, 0.0, 0.0 FROM
+(created_at, title, position, description, project_id, service_hours, service_cost, effort_type)
+SELECT DISTINCT NOW(), CONCAT('Logbuch:', activitygroup), 0, '', p.job_id, 0.0, 0.0, '' FROM
 dblink(
     'dbname=fineware_feinheit',
     'SELECT created, date, hours, w.notes, created_by_id, worker_id, job_id, aa.name FROM worklog_worklogentry w LEFT JOIN articles_activity a ON w.activity_id=a.id LEFT JOIN articles_activity aa ON a.parent_id=aa.id'
@@ -804,28 +810,11 @@ dblink(
 UPDATE logbook_loggedhours SET fts_document=logbook_loggedhours_fts_document(id);
 UPDATE logbook_loggedcost SET fts_document=logbook_loggedcost_fts_document(id);
 
+UPDATE projects_service
+SET
+  service_hours=COALESCE(effort_hours, 0),
+  service_cost=COALESCE(cost, 0) + COALESCE(effort_hours, 0) * COALESCE(effort_rate, 0);
 
---
--- Update services
---
-
-UPDATE projects_service s SET effort_hours=subquery.effort_hours_sum
-FROM (
-  SELECT SUM(hours) AS effort_hours_sum, service_id FROM projects_effort GROUP BY service_id
-) AS subquery
-WHERE s.id=subquery.service_id;
-
-UPDATE projects_service s SET cost=subquery.cost_sum
-FROM (
-  SELECT SUM(hours * st.billing_per_hour) AS cost_sum, service_id FROM projects_effort e LEFT JOIN services_servicetype st ON e.service_type_id=st.id GROUP BY service_id
-) AS subquery
-WHERE s.id=subquery.service_id;
-
-UPDATE projects_service s SET cost=cost + subquery.cost_sum
-FROM (
-  SELECT SUM(cost) AS cost_sum, service_id FROM projects_cost GROUP BY service_id
-) AS subquery
-WHERE s.id=subquery.service_id;
 
 
 --

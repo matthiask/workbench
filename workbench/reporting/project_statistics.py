@@ -24,20 +24,20 @@ def overdrawn_projects():
         .annotate(Sum("hours"))
     }
 
-    effort_hours = {
-        row["project"]: row["effort_hours__sum"]
+    service_hours = {
+        row["project"]: row["service_hours__sum"]
         for row in Service.objects.order_by()
         .filter(project__in=projects)
         .values("project")
-        .annotate(Sum("effort_hours"))
+        .annotate(Sum("service_hours"))
     }
 
     projects = [
         {
             "project": project,
             "logged_hours": logged_hours.get(project.id, Z),
-            "effort_hours": effort_hours.get(project.id, Z),
-            "delta": logged_hours.get(project.id, Z) - effort_hours.get(project.id, Z),
+            "service_hours": service_hours.get(project.id, Z),
+            "delta": logged_hours.get(project.id, Z) - service_hours.get(project.id, Z),
         }
         for project in projects
     ]
@@ -46,7 +46,7 @@ def overdrawn_projects():
         (
             project
             for project in projects
-            if project["logged_hours"] > project["effort_hours"]
+            if project["logged_hours"] > project["service_hours"]
         ),
         key=lambda row: row["delta"],
         reverse=True,

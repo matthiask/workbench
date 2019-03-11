@@ -54,7 +54,7 @@ class UpdateServiceView(generic.UpdateView):
     form_class = ServiceForm
 
     def get_success_url(self):
-        return self.object.project.get_absolute_url() + "services/"
+        return self.object.project.urls.url("services")
 
     def default_service_types(self):
         return {
@@ -70,14 +70,21 @@ class MoveServiceView(generic.DetailView):
         self.object = self.get_object()
         if not self.model.allow_update(self.object, request):
             return redirect(self.object.offer)
-        if self.object.offer.status > Offer.IN_PREPARATION:
+        if self.object.offer and self.object.offer.status > Offer.IN_PREPARATION:
             messages.error(
                 request,
                 _("Cannot modify an offer which is not in preparation anymore."),
             )
             return redirect(self.object.offer)
 
-        pks = list(self.object.offer.services.values_list("id", flat=True))
+        if self.object.offer:
+            pks = list(self.object.offer.services.values_list("id", flat=True))
+        else:
+            pks = list(
+                self.object.project.services.filter(offer=None).values_list(
+                    "id", flat=True
+                )
+            )
         index = pks.index(self.object.pk)
         if "up" in request.GET and index > 0:
             pks[index], pks[index - 1] = pks[index - 1], pks[index]
@@ -87,4 +94,4 @@ class MoveServiceView(generic.DetailView):
         for index, pk in enumerate(pks):
             Service.objects.filter(pk=pk).update(position=(index + 1) * 10)
 
-        return redirect(self.object.offer)
+        return redirect(self.object.project.urls.url("services"))

@@ -238,7 +238,7 @@ class PDFDocument(_PDFDocument):
                         % (sanitize(service.title), sanitize(service.description)),
                         self.style.normal,
                     ),
-                    service.cost.quantize(Z),
+                    service.service_cost.quantize(Z),
                 )
             )
             # FIXME Show a thing, but maybe not everything
@@ -299,7 +299,7 @@ class PDFDocument(_PDFDocument):
         self.p(offer.description)
         self.spacer()
 
-        self.table_services(offer.services.prefetch_related("efforts", "costs"))
+        self.table_services(offer.services.all())
         self.table_total(offer)
 
     def process_invoice(self, invoice):
@@ -338,7 +338,7 @@ class PDFDocument(_PDFDocument):
             self.p(invoice.description)
 
         self.spacer()
-        self.table_services(invoice.services.prefetch_related("efforts", "costs"))
+        self.table_services(invoice.services.all())
         self.table_total(invoice)
 
         self.spacer()

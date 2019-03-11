@@ -13,7 +13,7 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.utils import recurring
 from workbench.projects.models import Project
-from workbench.services.models import ServiceBase, EffortBase, CostBase
+from workbench.services.models import ServiceBase
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import ModelWithTotal, SearchQuerySet, MoneyField, Z
 from workbench.tools.urls import model_urls
@@ -171,7 +171,9 @@ class Invoice(ModelWithTotal):
 
     def _calculate_total(self):
         if self.type == self.SERVICES:
-            self.subtotal = sum((service.cost for service in self.services.all()), Z)
+            self.subtotal = sum(
+                (service.service_cost for service in self.services.all()), Z
+            )
         super()._calculate_total()
 
     @property
@@ -307,46 +309,16 @@ class Service(ServiceBase):
             title=service.title,
             description=service.description,
             position=service.position,
-            effort_hours=service.effort_hours,
-            cost=service.cost,
+            service_hours=service.service_hours,
+            service_cost=service.service_cost,
             project_service=service,
+            effort_type=service.effort_type,
+            effort_hours=service.effort_hours,
+            effort_rate=service.effort_rate,
+            cost=service.cost,
+            third_party_costs=service.third_party_costs,
             **kwargs
         )
-
-    def copy_efforts(self, service):
-        for effort in service.efforts.all():
-            self.efforts.create(
-                title=effort.title,
-                billing_per_hour=effort.billing_per_hour,
-                hours=effort.hours,
-                service_type=effort.service_type,
-            )
-
-    def copy_costs(self, service):
-        for cost in service.costs.all():
-            self.costs.create(
-                title=cost.title,
-                cost=cost.cost,
-                third_party_costs=cost.third_party_costs,
-            )
-
-
-class Effort(EffortBase):
-    service = models.ForeignKey(
-        Service,
-        on_delete=models.CASCADE,
-        related_name="efforts",
-        verbose_name=_("service"),
-    )
-
-
-class Cost(CostBase):
-    service = models.ForeignKey(
-        Service,
-        on_delete=models.CASCADE,
-        related_name="costs",
-        verbose_name=_("service"),
-    )
 
 
 class RecurringInvoiceQuerySet(SearchQuerySet):

@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
-from workbench.services.models import ServiceBase, EffortBase, CostBase
+from workbench.services.models import ServiceBase
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import SearchQuerySet, Model, Z
 from workbench.tools.urls import model_urls
@@ -132,7 +132,9 @@ class Project(Model):
             .order_by()
             .aggregate(h=Sum("hours"))["h"]
             or Z,
-            "effort": sum((service.effort_hours for service in self.services.all()), Z),
+            "effort": sum(
+                (service.service_hours for service in self.services.all()), Z
+            ),
         }
 
     @cached_property
@@ -156,21 +158,17 @@ class Project(Model):
             .annotate(Sum("cost"))
         }
 
-        for service in self.services.select_related("offer").prefetch_related(
-            "efforts", "costs"
-        ):
+        for service in self.services.select_related("offer"):
             service.logged_hours = logged_hours_per_service.get(service.id, 0)
             service.logged_cost = logged_cost_per_service.get(service.id, 0)
-            service.planned_cost = sum((cost.cost for cost in service.costs.all()), 0)
 
             if service.offer not in offers:
                 offers[service.offer] = []
             offers[service.offer].append(service)
 
         if None in logged_cost_per_service:
-            s = Service(title=_("Not bound to a particular service."))
+            s = Service(title=_("Not bound to a particular service."), service_cost=Z)
             s.logged_cost = logged_cost_per_service[None]
-            s.planned_cost = Z
             offers.setdefault(None, []).append(s)
 
         return sorted(
@@ -215,21 +213,3 @@ class Service(ServiceBase):
         return True
 
     allow_delete = allow_update
-
-
-class Effort(EffortBase):
-    service = models.ForeignKey(
-        Service,
-        on_delete=models.CASCADE,
-        related_name="efforts",
-        verbose_name=_("service"),
-    )
-
-
-class Cost(CostBase):
-    service = models.ForeignKey(
-        Service,
-        on_delete=models.CASCADE,
-        related_name="costs",
-        verbose_name=_("service"),
-    )

@@ -88,7 +88,9 @@ class Offer(ModelWithTotal):
         return "%s-o%02d" % (self.project.code, self._code)
 
     def _calculate_total(self):
-        self.subtotal = sum((service.cost for service in self.services.all()), Z)
+        self.subtotal = sum(
+            (service.service_cost for service in self.services.all()), Z
+        )
         super()._calculate_total()
 
     def clean(self):

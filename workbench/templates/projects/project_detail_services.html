@@ -46,36 +46,31 @@
         </div>
       {% endif %}
 
-      <h5 class="mb-1">{{ service.title }}</h5>
+      <h5 class="mb-1">{{ service.title }} {% history_link service %}</h5>
       <p>
         {{ service.description|linebreaksbr }}
       </p>
       <small class="row justify-content-between">
         <span class="col-md-6">
-          {% for effort in service.efforts.all %}
-            {{ effort.hours }}h {{ effort.title }}{% if not forloop.last %},{% endif %}
-          {% endfor %}
-          {% for cost in service.costs.all %}
-            {{ cost.title }} ({{ cost.cost|currency }}){% if not forloop.last %},{% endif %}
-          {% endfor %}
+          {% if service.effort_hours %}{{ service.effort_hours|stringformat:'.1f' }}h {{ service.effort_type }}{% endif %}{% if service.cost %}{% if service.effort_hours %}, {% endif %}{{ service.cost_title }} ({{ service.cost|currency }}){% endif %}
         </span>
         <span class="col-md-2">
           {% if service.pk %}
             <a href="{% url 'logbook_loggedhours_list' %}?service={{ service.pk }}" target="_blank">
-              {{ service.logged_hours }}h / {{ service.effort_hours }}h
+              {{ service.logged_hours|stringformat:'.1f' }}h / {{ service.service_hours|stringformat:'.1f' }}h
             </a>
-            {% bar service.logged_hours service.effort_hours %}
+            {% bar service.logged_hours service.service_hours %}
           {% endif %}
         </span>
         <span class="col-md-2">
           {% if service.pk %}
             <a href="{% url 'logbook_loggedcost_list' %}?service={{ service.pk }}" target="_blank">
-              {{ service.logged_cost|stringformat:'.2f' }} / {{ service.planned_cost|stringformat:'.2f' }}
+              {{ service.logged_cost|stringformat:'.2f' }} / {{ service.cost|default:0|stringformat:'.2f' }}
             </a>
-            {% bar service.logged_cost service.planned_cost %}
+            {% bar service.logged_cost service.service_cost %}
           {% else %}
             <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;service=0" target="_blank">
-              {{ service.logged_cost|stringformat:'.2f' }} / {{ service.planned_cost|stringformat:'.2f' }}
+              {{ service.logged_cost|stringformat:'.2f' }} / {{ service.cost|default:0|stringformat:'.2f' }}
             </a>
           {% endif %}
         </span>

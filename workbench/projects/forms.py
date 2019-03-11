@@ -1,14 +1,13 @@
-from collections import OrderedDict
 from datetime import date
 
 from django import forms, http
-from django.forms.models import inlineformset_factory
 from django.utils.translation import ugettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.offers.models import Offer
-from workbench.projects.models import Project, Service, Effort, Cost
+from workbench.projects.models import Project, Service
+from workbench.services.models import ServiceType
 from workbench.tools.forms import ModelForm, Textarea, Picker
 
 
@@ -103,9 +102,25 @@ class ProjectForm(ModelForm):
 
 
 class ServiceForm(ModelForm):
+    service_type = forms.ModelChoiceField(
+        ServiceType.objects.all(),
+        label=ServiceType._meta.verbose_name,
+        required=False,
+        help_text=_("Optional, but useful for quickly filling the fields below."),
+    )
+
     class Meta:
         model = Service
-        fields = ["offer", "title", "description"]
+        fields = [
+            "offer",
+            "title",
+            "description",
+            "effort_type",
+            "effort_hours",
+            "effort_rate",
+            "cost",
+            "third_party_costs",
+        ]
         widgets = {"description": Textarea()}
 
     def __init__(self, *args, **kwargs):
@@ -119,68 +134,16 @@ class ServiceForm(ModelForm):
 
         super().__init__(*args, **kwargs)
 
-        kwargs.pop("request")
-        # This makes saving formsets for just created services work:
-        kwargs["instance"] = self.instance
-        self.formsets = OrderedDict(
-            (
-                ("efforts", EffortFormset(*args, **kwargs)),
-                ("costs", CostFormset(*args, **kwargs)),
-            )
-        )
-
         if self.project:
             self.fields["offer"].queryset = self.project.offers.all()
         else:
             self.fields["offer"].queryset = Offer.objects.none()
 
-    def is_valid(self):
-        return all(
-            [super().is_valid()]
-            + [formset.is_valid() for formset in self.formsets.values()]
-        )
-
     def save(self):
         instance = super().save(commit=False)
         instance.project = self.project
-        if not instance.pk:
-            instance.save()
-        for formset in self.formsets.values():
-            formset.save()
         instance.save()
         return instance
-
-
-EffortFormset = inlineformset_factory(
-    Service,
-    Effort,
-    fields=("title", "billing_per_hour", "hours", "service_type"),
-    extra=0,
-    widgets={
-        "service_type": forms.Select(attrs={"class": "custom-select"}),
-        "hours": forms.NumberInput(
-            attrs={"class": "form-control short", "placeholder": _("hours")}
-        ),
-    },
-)
-
-CostFormset = inlineformset_factory(
-    Service,
-    Cost,
-    fields=("title", "cost", "third_party_costs"),
-    extra=0,
-    widgets={
-        "title": forms.TextInput(
-            attrs={"class": "form-control", "placeholder": _("title")}
-        ),
-        "cost": forms.NumberInput(
-            attrs={"class": "form-control short", "placeholder": _("cost")}
-        ),
-        "third_party_costs": forms.NumberInput(
-            attrs={"class": "form-control", "placeholder": _("third party costs")}
-        ),
-    },
-)
 
 
 class DeleteServiceForm(ModelForm):

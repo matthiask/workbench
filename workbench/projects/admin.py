@@ -3,16 +3,6 @@ from django.contrib import admin
 from . import models
 
 
-class EffortInline(admin.TabularInline):
-    model = models.Effort
-    extra = 0
-
-
-class CostInline(admin.TabularInline):
-    model = models.Cost
-    extra = 0
-
-
 @admin.register(models.Service)
 class ServiceAdmin(admin.ModelAdmin):
     list_display = (
@@ -21,10 +11,9 @@ class ServiceAdmin(admin.ModelAdmin):
         "title",
         "description",
         "position",
-        "effort_hours",
-        "cost",
+        "service_hours",
+        "service_cost",
     )
-    inlines = [EffortInline, CostInline]
     raw_id_fields = ["project", "offer"]
 
 
