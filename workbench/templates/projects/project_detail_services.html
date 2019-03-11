@@ -51,18 +51,16 @@
         {{ service.description|linebreaksbr }}
       </p>
       <small class="row justify-content-between">
-        <span class="col-md-6">
-          {% if service.effort_hours %}{{ service.effort_hours|stringformat:'.1f' }}h {{ service.effort_type }}{% endif %}{% if service.cost %}{% if service.effort_hours %}, {% endif %}{{ service.cost_title }} ({{ service.cost|currency }}){% endif %}
-        </span>
-        <span class="col-md-2">
+        <span class="col-md-4">
           {% if service.pk %}
             <a href="{% url 'logbook_loggedhours_list' %}?service={{ service.pk }}" target="_blank">
               {{ service.logged_hours|stringformat:'.1f' }}h / {{ service.service_hours|stringformat:'.1f' }}h
+              {{ service.effort_type }}
             </a>
             {% bar service.logged_hours service.service_hours %}
           {% endif %}
         </span>
-        <span class="col-md-2">
+        <span class="col-md-4">
           {% if service.pk %}
             <a href="{% url 'logbook_loggedcost_list' %}?service={{ service.pk }}" target="_blank">
               {{ service.logged_cost|stringformat:'.2f' }} / {{ service.cost|default:0|stringformat:'.2f' }}
@@ -74,7 +72,7 @@
             </a>
           {% endif %}
         </span>
-        <span class="col-md-2 text-right">
+        <span class="col-md-4 text-right">
           {% if service.pk %}
             <a href="{{ project.urls.createhours }}?service={{ service.pk }}"
               data-toggle="ajaxmodal">
@@ -100,5 +98,8 @@
 <a href="{{ project.urls.createhours }}" class="btn btn-secondary"
   data-toggle="ajaxmodal" data-createhours>
   {% include "svg/plus.svg" %} {% trans 'hours' %}</a>
+<a href="{{ project.urls.createcost }}" class="btn btn-secondary"
+  data-toggle="ajaxmodal">
+  {% include "svg/plus.svg" %} {% trans 'cost' %}</a>
 
 {% endblock %}
