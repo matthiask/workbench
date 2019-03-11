@@ -755,8 +755,17 @@ dblink(
 ) AS p(created timestamp, date date, hours numeric, notes text, created_by_id int, worker_id int, job_id int, activitygroup varchar(200));
 
 INSERT INTO logbook_loggedhours
-(created_at, rendered_on, hours, description, created_by_id, rendered_by_id, service_id, invoice_id, archived_at)
-SELECT created, date, hours, notes, created_by_id, worker_id, s.id, invoice_id, CASE WHEN archived THEN NOW() ELSE NULL END
+(created_at, rendered_on, hours, description, created_by_id, rendered_by_id, service_id, invoice_service_id, archived_at)
+SELECT
+  created,
+  date,
+  hours,
+  notes,
+  created_by_id,
+  worker_id,
+  s.id,
+  NULL,
+  CASE WHEN archived THEN NOW() ELSE NULL END
 FROM projects_service s,
 dblink(
     'dbname=fineware_feinheit',
@@ -765,7 +774,7 @@ dblink(
 WHERE s.project_id=p.job_id AND s.title=CONCAT('Logbuch:', activitygroup);
 
 INSERT INTO logbook_loggedcost
-(created_at, rendered_on, cost, third_party_costs, description, created_by_id, invoice_id, project_id, service_id)
+(created_at, rendered_on, cost, third_party_costs, description, created_by_id, invoice_service_id, project_id, service_id)
 SELECT
   created,
   date,
@@ -773,7 +782,7 @@ SELECT
   count * cost,
   notes,
   created_by_id,
-  invoice_id,
+  NULL,
   job_id,
   NULL
 FROM
