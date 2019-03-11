@@ -313,7 +313,7 @@ dblink(
   'dbname=fineware_feinheit',
   'SELECT DISTINCT ON (job_id) job_id, created FROM jobs_jobupdate WHERE state=30 ORDER BY job_id, created DESC'
 ) AS p(job_id int, created timestamp)
-WHERE projects_project.id=p.job_id;
+WHERE projects_project.id=p.job_id AND projects_project.closed_on IS NOT NULL;
 
 
 --
