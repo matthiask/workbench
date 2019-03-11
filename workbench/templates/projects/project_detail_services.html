@@ -5,6 +5,22 @@
 {% block title %}{% trans 'services' %} - {{ block.super }}{% endblock %}
 
 {% block project-content %}
+<div class="card my-3">
+  <div class="card-body">
+    <h5>{% trans 'overview' %}</h5>
+
+    <small class="row justify-content-between">
+      <span class="col-md-8">
+        <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}" class="inline" target="_blank">
+          {{ project.overview.logged|stringformat:'.1f' }}h
+        </a> / {{ project.overview.effort|stringformat:'.1f' }}h
+        {% bar project.overview.logged project.overview.effort %}
+      </span>
+      <span class="col-md-4"></span>
+    </small>
+  </div>
+</div>
+
 {% for offer, services in project.grouped_services %}
 <div class="card my-3">
   <div class="card-header d-flex align-items-center justify-content-between">

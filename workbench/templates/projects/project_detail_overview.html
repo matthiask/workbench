@@ -18,11 +18,10 @@
           {% trans 'Overall' %}
         </th>
         <td>
-          {% with overview=project.overview %}
           <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}" class="inline" target="_blank">
-            {{ overview.logged }}h
-          </a> / {{ overview.effort }}h
-          {% endwith %}
+            {{ project.overview.logged }}h
+          </a> / {{ project.overview.effort }}h
+          {% bar project.overview.logged project.overview.effort %}
         </td>
       </tr>
       <tr>
