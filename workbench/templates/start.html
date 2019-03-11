@@ -31,7 +31,7 @@
           <div class="list-group-item">
             <span style="float:right" class="badge badge-{{ project.status_css }}">{{ project.pretty_status }}</span>
             <h5 class="mb-1">
-              <a href="{{ project.urls.overview }}">{{ project|h }}</a>
+              <a href="{{ project.get_absolute_url }}">{{ project|h }}</a>
             </h5>
             <div class="d-flex w-100 justify-content-between">
               <p class="mb-1">{{ project.contact|default:project.customer }}</p>
