@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils.translation import ngettext
@@ -26,7 +28,9 @@ class RecurringInvoiceDetailView(generic.DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if request.GET.get("create_invoices"):
-            invoices = self.object.create_invoices()
+            invoices = self.object.create_invoices(
+                generate_until=date.today() + timedelta(days=20)
+            )
             messages.info(
                 request,
                 ngettext("Created %s invoice", "Created %s invoices", len(invoices))
