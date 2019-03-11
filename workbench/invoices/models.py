@@ -157,7 +157,8 @@ class Invoice(ModelWithTotal):
             else:
                 self._code = RawSQL(
                     "SELECT COALESCE(MAX(_code), 0) + 1 FROM invoices_invoice"
-                    " WHERE project_id IS NULL"
+                    " WHERE project_id IS NULL",
+                    (),
                 )
             new = True
         super().save(*args, **kwargs)
@@ -348,14 +349,15 @@ class Cost(CostBase):
 
 class RecurringInvoiceQuerySet(SearchQuerySet):
     def create_invoices(self):
-        today = date.today()
+        generate_until = date.today() + timedelta(days=20)
         invoices = []
         for ri in self.filter(
-            Q(starts_on__lte=today),
+            Q(starts_on__lte=generate_until),
             Q(ends_on__isnull=True) | Q(ends_on__gte=F("next_period_starts_on")),
-            Q(next_period_starts_on__isnull=True) | Q(next_period_starts_on__lte=today),
+            Q(next_period_starts_on__isnull=True)
+            | Q(next_period_starts_on__lte=generate_until),
         ):
-            invoices.extend(ri.create_invoices())
+            invoices.extend(ri.create_invoices(generate_until=generate_until))
         return invoices
 
 
@@ -461,16 +463,15 @@ class RecurringInvoice(ModelWithTotal):
             third_party_costs=self.third_party_costs,
         )
 
-    def create_invoices(self):
+    def create_invoices(self, *, generate_until):
         invoices = []
         days = recurring(
             max(filter(None, (self.next_period_starts_on, self.starts_on))),
             self.periodicity,
         )
-        today = date.today()
         this_period = next(days)
         while True:
-            if this_period > today:
+            if this_period > generate_until:
                 break
             next_period = next(days)
             invoices.append(
