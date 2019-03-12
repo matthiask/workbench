@@ -199,6 +199,9 @@ class Service(ServiceBase):
         null=True,
     )
 
+    def get_absolute_url(self):
+        return self.project.urls.url("services")
+
     @classmethod
     def allow_update(cls, instance, request):
         if instance.offer and instance.offer.status > instance.offer.IN_PREPARATION:
