@@ -196,6 +196,20 @@ function initWidgets() {
       );
     });
   }
+
+  $('[data-autofill]:not(.initialized)').each(function() {
+    var self = $(this),
+      data = self.data("autofill"),
+      sel = self.find("select");
+
+    sel.on("change", function() {
+      if (data["" + this.value]) {
+        $.each(data["" + this.value], function(key, value) {
+          self.find("[name$='" + key + "']").val(value);
+        });
+      }
+    });
+  });
 }
 
 window.addInlineForm = function addInlineForm(slug, onComplete) {

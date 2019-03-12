@@ -1,3 +1,5 @@
+import json
+
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import gettext as _
@@ -9,10 +11,25 @@ from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 
 
+def default_service_types():
+    return json.dumps(
+        {
+            str(type.id): {
+                "effort_type": type.title,
+                "effort_rate": int(type.billing_per_hour),
+            }
+            for type in ServiceType.objects.all()
+        }
+    )
+
+
 class CreateRelatedView(generic.CreateView):
     def get_form(self, data=None, files=None, **kwargs):
         self.project = get_object_or_404(Project, pk=self.kwargs.pop("pk"))
         return super().get_form(data, files, project=self.project, **kwargs)
+
+    def default_service_types(self):
+        return default_service_types()
 
 
 class ProjectDetailView(generic.DetailView):
@@ -23,32 +40,6 @@ class ProjectDetailView(generic.DetailView):
         return "projects/project_detail_%s.html" % self.project_view
 
 
-class CreateServiceView(generic.CreateView):
-    model = Service
-
-    def get(self, request, *args, **kwargs):
-        if not self.model.allow_create(request):
-            return redirect("../")
-
-        self.project = get_object_or_404(Project, pk=self.kwargs["pk"])
-        form = self.get_form()
-        context = self.get_context_data(form=form)
-        return self.render_to_response(context)
-
-    def get_form(self, data=None, files=None, **kwargs):
-        if not hasattr(self, "project"):
-            self.project = get_object_or_404(Project, pk=self.kwargs["pk"])
-        return ServiceForm(
-            data, files, project=self.project, request=self.request, **kwargs
-        )
-
-    def default_service_types(self):
-        return {
-            type.id: {"title": type.title, "billing_per_hour": type.billing_per_hour}
-            for type in ServiceType.objects.all()
-        }
-
-
 class UpdateServiceView(generic.UpdateView):
     model = Service
     form_class = ServiceForm
@@ -57,10 +48,7 @@ class UpdateServiceView(generic.UpdateView):
         return self.object.project.urls.url("services")
 
     def default_service_types(self):
-        return {
-            type.id: {"title": type.title, "billing_per_hour": type.billing_per_hour}
-            for type in ServiceType.objects.all()
-        }
+        return default_service_types()
 
 
 class MoveServiceView(generic.DetailView):

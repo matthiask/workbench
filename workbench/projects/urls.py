@@ -7,12 +7,16 @@ from workbench.logbook.forms import LoggedHoursForm, LoggedCostForm
 from workbench.logbook.models import LoggedHours, LoggedCost
 from workbench.offers.forms import CreateOfferForm
 from workbench.offers.models import Offer
-from workbench.projects.forms import ProjectSearchForm, ProjectForm, DeleteServiceForm
+from workbench.projects.forms import (
+    ProjectSearchForm,
+    ProjectForm,
+    ServiceForm,
+    DeleteServiceForm,
+)
 from workbench.projects.models import Project, Service
 from workbench.projects.views import (
     ProjectDetailView,
     CreateRelatedView,
-    CreateServiceView,
     UpdateServiceView,
     MoveServiceView,
 )
@@ -98,7 +102,7 @@ urlpatterns = [
     # Services
     url(
         r"^(?P<pk>\d+)/createservice/$",
-        CreateServiceView.as_view(),
+        CreateRelatedView.as_view(model=Service, form_class=ServiceForm),
         name="projects_project_createservice",
     ),
     url(

@@ -1,89 +1,45 @@
-{% extends "generic/object_form.html" %}
+{% extends "modalform.html" %}
 
 {% load bootstrap4 fineforms i18n workbench %}
 
-{% block uplink %}
-<a href="{{ view.project.urls.services }}" class="btn btn-secondary btn-sm uplink">
-  {% include 'svg/chevron-left.svg' %} {% trans 'project' %}
-</a>
+{% block size %}modal-lg{% endblock %}
+
+{% block title %}
+{% if view.project %}{{ view.project.title }}{% else %}{{ block.super }}{% endif %}
 {% endblock %}
 
-{% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-10 col-lg-8">
-    {% if object %}
-      <h2>
-        <a href="{{ object.project.urls.services }}">
-          <small>{% include 'svg/chevron-left.svg' %}</small> {{ object.project|h }}
-        </a>
-      </h2>
-    {% endif %}
+{% block body %}
+  {% include 'fineforms/warnings.html' %}
+  {% ff_errors form %}
+  {% ff_fields form fields='offer,title,description' %}
 
-    <h1>
-      {% if object %}
-        {% blocktrans with object=object %}Update {{ object }}{% endblocktrans %}
-      {% else %}
-        {% blocktrans with class=view.meta.verbose_name %}Create {{ class }}{% endblocktrans %}
-      {% endif %}
-    </h1>
-
-    <form method="POST" action="." class="form-horizontal">
-      {% csrf_token %}
-      {% include 'fineforms/warnings.html' %}
-      {% ff_errors form form.effort_form form.cost_form %}
-      {% ff_fields form fields='offer,title,description' %}
-
-      <div data-part>
-        <div class="row mt-3">
-          <div class="col-lg-8 offset-lg-4">
-            <h4>{% trans 'effort' %}</h4>
-          </div>
-        </div>
-        {% ff_fields form fields='service_type,effort_type,effort_rate,effort_hours' %}
+  <div data-part data-autofill="{{ view.default_service_types }}">
+    <div class="row mt-3">
+      <div class="col-lg-8 offset-lg-4">
+        <h5>{% trans 'effort' %}</h5>
       </div>
-
-      <div data-part>
-        <div class="row mt-3">
-          <div class="col-lg-8 offset-lg-4">
-            <h4>{% trans 'cost' %}</h4>
-          </div>
-        </div>
-        {% ff_fields form fields='cost,third_party_costs' %}
-      </div>
-
-      <div class="row mt-3">
-        <div class="col-lg-8 offset-lg-4">
-          <button type="submit" class="btn btn-primary">
-            {% trans 'save' %}</button>
-
-          {% if object.get_absolute_url %}
-          <a href="{{ object.get_absolute_url }}" class="btn float-right btn-outline-danger">
-            {% trans 'cancel' %}</a>
-          {% endif %}
-        </div>
-      </div>
-
-    </form>
-
+    </div>
+    {% ff_fields form fields='service_type,effort_type,effort_rate,effort_hours' %}
   </div>
-</div>
+
+  <div data-part>
+    <div class="row mt-3">
+      <div class="col-lg-8 offset-lg-4">
+        <h5>{% trans 'cost' %}</h5>
+      </div>
+    </div>
+    {% ff_fields form fields='cost,third_party_costs' %}
+  </div>
 {% endblock %}
 
-{% block js %}{{ block.super }}
-  {{ view.default_service_types|json_script:"service-types" }}
-  <script>
-jQuery(function($) {
-  var serviceTypes = JSON.parse(document.querySelector("#service-types").textContent);
-
-  $(document.body).on("change", "select", function() {
-    var thing = this.closest("[data-part]"),
-      data = serviceTypes[parseInt(this.value, 10)];
-    console.log(this, serviceTypes, data);
-    if (data) {
-      $("input[name$='type']", thing).val(data.title);
-      $("input[name$='rate']", thing).val(data.billing_per_hour);
-    }
-  });
-});
-  </script>
+{% block footer %}
+<div class="d-flex w-100 justify-content-between">
+  {% if object %}
+    <a href="{{ object.urls.delete }}" data-toggle="ajaxmodal"
+      class="float-left btn btn-outline-danger">
+      {% trans 'delete' %}
+    </a>
+  {% endif %}
+  <button type="submit" class="btn btn-primary">{% trans 'save' %}</button>
+</div>
 {% endblock %}

@@ -55,9 +55,9 @@
             {% include 'svg/triangle-up.svg' %}</a>
           <a class="btn btn-secondary btn-sm" href="{{ service.urls.move }}?down" title="{% trans 'Move down' %}">
             {% include 'svg/triangle-down.svg' %}</a>
-          <a class="btn btn-secondary btn-sm" href="{{ service.urls.update }}" title="{% trans 'Update' %}">
+          <a class="btn btn-secondary btn-sm" href="{{ service.urls.update }}" data-toggle="ajaxmodal" title="{% trans 'Update' %}">
             {% include 'svg/pencil.svg' %}</a>
-          <a class="btn btn-secondary btn-sm" href="{{ service.urls.delete }}" title="{% trans 'Delete' %}">
+          <a class="btn btn-secondary btn-sm" href="{{ service.urls.delete }}" data-toggle="ajaxmodal" title="{% trans 'Delete' %}">
             {% include 'svg/trashcan.svg' %}</a>
         </div>
       {% endif %}
@@ -109,7 +109,8 @@
 <a href="{{ project.urls.createtask }}" class="btn btn-secondary">
   {% include "svg/plus.svg" %} {% trans 'task' %}</a>
 {% endcomment %}
-<a href="{{ project.urls.createservice }}" class="btn btn-secondary">
+<a href="{{ project.urls.createservice }}" class="btn btn-secondary"
+  data-toggle="ajaxmodal">
   {% include "svg/plus.svg" %} {% trans 'service' %}</a>
 <a href="{{ project.urls.createhours }}" class="btn btn-secondary"
   data-toggle="ajaxmodal" data-createhours>
