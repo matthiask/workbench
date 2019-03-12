@@ -96,7 +96,7 @@ MoneyField = partial(
 
 HoursField = partial(
     models.DecimalField,
-    max_digits=4,
+    max_digits=10,
     decimal_places=1,
     validators=[MinValueValidator(0)],
 )

@@ -79,14 +79,6 @@ urlpatterns = [
         CreateRelatedView.as_view(model=Invoice, form_class=CreateInvoiceForm),
         name="projects_project_createinvoice",
     ),
-    # url(
-    #     r'^(?P<pk>\d+)/estimation/$',
-    #     EstimationView.as_view(),
-    #     name='projects_project_estimation'),
-    # url(
-    #     r'^(?P<pk>\d+)/planning/$',
-    #     views.PlanningView.as_view(),
-    #     name='projects_project_planning'),
     # HOURS
     url(
         r"^(?P<pk>\d+)/createhours/$",

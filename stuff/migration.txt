@@ -816,6 +816,53 @@ SET
   service_cost=COALESCE(cost, 0) + COALESCE(effort_hours, 0) * COALESCE(effort_rate, 0);
 
 
+--
+-- Import scheduled hours
+--
+
+INSERT INTO projects_service (
+created_at,
+title,
+position,
+description,
+project_id,
+service_hours,
+service_cost,
+effort_type,
+effort_hours,
+effort_rate
+)
+SELECT
+NOW(),
+'Eingeplante Stunden',
+0,
+'',
+p.project_id,
+p.scheduled_hours,
+p.scheduled_hours * COALESCE(p.invoicing_rate_override, 180),
+'Eingeplante Stunden',
+p.scheduled_hours,
+COALESCE(p.invoicing_rate_override, 180)
+FROM
+dblink(
+'dbname=fineware_feinheit',
+'SELECT id, scheduled_hours, invoicing_rate_override FROM jobs_job WHERE scheduled_hours IS NOT NULL AND id NOT IN (SELECT job_id FROM offers_joboffer WHERE job_id IS NOT NULL)'
+) AS p(project_id int, scheduled_hours numeric(10,1), invoicing_rate_override numeric(5,2));
+
+
+--
+-- Import invoicing rate overrides
+--
+
+UPDATE projects_service
+SET effort_rate=p.invoicing_rate_override
+FROM
+dblink(
+'dbname=fineware_feinheit',
+'SELECT id, invoicing_rate_override FROM jobs_job WHERE invoicing_rate_override IS NOT NULL'
+) AS p(project_id int, invoicing_rate_override numeric(5,2))
+WHERE effort_rate IS NOT NULL AND projects_service.project_id=p.project_id;
+
 
 --
 --
