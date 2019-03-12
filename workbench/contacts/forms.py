@@ -219,7 +219,9 @@ class PostalAddressSelectionForm(ModelForm):
         if person:
             postal_addresses.extend(
                 (pa.id, linebreaksbr(pa.postal_address))
-                for pa in PostalAddress.objects.filter(person=person)
+                for pa in PostalAddress.objects.filter(person=person).select_related(
+                    "person__organization"
+                )
             )
 
         if organization:
@@ -227,7 +229,9 @@ class PostalAddressSelectionForm(ModelForm):
                 (pa.id, linebreaksbr(pa.postal_address))
                 for pa in PostalAddress.objects.filter(
                     person__organization=organization
-                ).exclude(person=person)
+                )
+                .exclude(person=person)
+                .select_related("person__organization")
             )
 
         if postal_addresses:
