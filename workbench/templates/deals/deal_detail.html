@@ -33,7 +33,7 @@
       {% for activity in deal.activities.all %}
         <tr class="{{ activity.css }}">
           <th>
-            <a href="{{ activity.urls.detail }}" data-toggle="ajaxmodal">
+            <a href="{{ activity.get_absolute_url }}" data-toggle="ajaxmodal">
               {{ activity }}
             </a>
           </th>

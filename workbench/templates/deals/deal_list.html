@@ -17,7 +17,7 @@
   <tbody>
     {% for deal in object_list %}
       <tr>
-        <th><a href="{{ deal.urls.detail }}">{{ deal }}</a></th>
+        <th><a href="{{ deal.get_absolute_url }}">{{ deal }}</a></th>
         <td>{{ deal.owned_by.get_short_name }}</td>
         <td class="text-right">{{ deal.estimated_value|currency }}</td>
         <td>{{ deal.stage }}</td>

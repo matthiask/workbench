@@ -6,11 +6,11 @@
 <div class="list-group list-group-flush">
   {% for person in object_list %}
   <div class="list-group-item px-0">
-    <h5 class="mb-1"><a href="{{ person.urls.detail }}">{{ person.full_name }}</a></h5>
+    <h5 class="mb-1"><a href="{{ person.get_absolute_url }}">{{ person.full_name }}</a></h5>
     <div class="row">
       <div class="col-md-5 text-truncate">
         {% if person.organization %}
-        <a href="{{ person.organization.urls.detail }}">{{ person.organization }}</a>
+        <a href="{{ person.organization.get_absolute_url }}">{{ person.organization }}</a>
         {% endif %}
       </div>
       <div class="col-md-4 text-truncate">

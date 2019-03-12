@@ -28,7 +28,7 @@
   <tbody>
     {% for entry in object_list %}
       <tr>
-        <th><a href="{{ entry.urls.detail }}">{{ entry.value_date|date:'d.m.Y' }}</a></th>
+        <th><a href="{{ entry.get_absolute_url }}">{{ entry.value_date|date:'d.m.Y' }}</a></th>
         <td>{{ entry.payment_notice }}</td>
         <td class="text-right">{{ entry.total|currency }}</td>
         <td>{% link_or_none entry.invoice %}</td>

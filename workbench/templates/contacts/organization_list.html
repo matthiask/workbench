@@ -6,7 +6,7 @@
 <div class="list-group list-group-flush">
   {% for organization in object_list %}
   <div class="list-group-item px-0">
-    <h5 class="mb-1"><a href="{{ organization.urls.detail }}">{{ organization }}</a></h5>
+    <h5 class="mb-1"><a href="{{ organization.get_absolute_url }}">{{ organization }}</a></h5>
     <p class="mb-0">
       {% for person in organization.people.all %}
         <a class="inline" href="{{ person.get_absolute_url }}">{{ person.full_name }}</a>{% if not forloop.last %},{% endif %}

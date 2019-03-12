@@ -37,7 +37,7 @@
 
     {% block objects %}
     {% for object in object_list %}
-    <a href="{{ object.urls.detail }}" class="list-group-item list-group-item-action">
+    <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action">
       <span style="float:right" class="badge badge-{{ object.status_css }}">{{ object.pretty_status }}</span>
       <h5 class="mb-0">{{ object|h }}</h5>
     </a>
