@@ -167,7 +167,10 @@ class Project(Model):
             offers[service.offer].append(service)
 
         if None in logged_cost_per_service:
-            s = Service(title=_("Not bound to a particular service."), service_cost=Z)
+            s = Service(
+                title=gettext("Not bound to a particular service."), service_cost=Z
+            )
+            s.logged_hours = Z
             s.logged_cost = logged_cost_per_service[None]
             offers.setdefault(None, []).append(s)
 

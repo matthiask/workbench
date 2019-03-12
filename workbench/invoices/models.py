@@ -280,16 +280,16 @@ class Invoice(ModelWithTotal):
 
         offers_list = []
         offers = {}
+        seen_project_service_ids = set()
         for offer, project_services in self.project.grouped_services:
             offers[offer] = []
             offers_list.append((offer, offers[offer]))
-            print(offer)
             for p_s in project_services:
                 offers[offer].append(
                     {
                         "project_service": p_s,
-                        "invoice_service": invoice_services_by_project_service.pop(
-                            p_s.id, None
+                        "invoice_service": invoice_services_by_project_service.get(
+                            p_s.id
                         ),
                         "service_cost": p_s.service_cost,
                         "logged_hours": p_s.logged_hours,
@@ -300,6 +300,24 @@ class Invoice(ModelWithTotal):
                         ),
                     }
                 )
+                if p_s.id:
+                    seen_project_service_ids.add(p_s.id)
+
+        for i_s in invoice_services:
+            if i_s.project_service_id in seen_project_service_ids:
+                continue
+            if None not in offers:
+                offers[None] = []
+                offers_list.append((None, offers[None]))
+            offers[None].append(
+                {
+                    "project_service": None,
+                    "invoice_service": i_s,
+                    "service_cost": Z,
+                    "logged_hours": Z,
+                    "logged_cost": Z,
+                }
+            )
 
         return offers_list
 
