@@ -1,0 +1,35 @@
+from decimal import Decimal
+
+from django.test import TestCase
+
+from workbench import factories
+from workbench.reporting import project_statistics
+
+
+class StatisticsTest(TestCase):
+    def test_stats(self):
+        service1 = factories.ServiceFactory.create(service_hours=2)
+        factories.ServiceFactory.create(service_hours=2)
+
+        user = factories.UserFactory.create()
+
+        op = list(project_statistics.overdrawn_projects())
+        self.assertEqual(op, [])
+
+        factories.LoggedHoursFactory.create(
+            service=service1, created_by=user, rendered_by=user, hours=10
+        )
+
+        op = list(project_statistics.overdrawn_projects())
+        self.assertEqual(len(op), 1)
+        self.assertEqual(
+            op,
+            [
+                {
+                    "project": service1.project,
+                    "logged_hours": Decimal("10.0"),
+                    "service_hours": Decimal("2.0"),
+                    "delta": Decimal("8.0"),
+                }
+            ],
+        )

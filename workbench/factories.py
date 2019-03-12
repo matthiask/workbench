@@ -5,6 +5,7 @@ import types
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import Invoice
+from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
@@ -93,3 +94,21 @@ def service_types():
             for idx, row in enumerate(SERVICE_TYPES)
         }
     )
+
+
+# LOGBOOK #####################################################################
+class LoggedHoursFactory(factory.DjangoModelFactory):
+    service = factory.SubFactory(ServiceFactory)
+    created_by = factory.SubFactory(UserFactory)
+    rendered_by = factory.SubFactory(UserFactory)
+
+    class Meta:
+        model = LoggedHours
+
+
+class LoggedCostFactory(factory.DjangoModelFactory):
+    service = factory.SubFactory(ServiceFactory)
+    created_by = factory.SubFactory(UserFactory)
+
+    class Meta:
+        model = LoggedCost
