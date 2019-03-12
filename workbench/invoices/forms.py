@@ -349,9 +349,6 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
             for service in self.cleaned_data["services"]:
                 new = Service.from_project_service(service, invoice=instance)
                 new.save()
-                new.copy_efforts()
-                new.copy_costs()
-                new.save()
 
             instance.save()
 
