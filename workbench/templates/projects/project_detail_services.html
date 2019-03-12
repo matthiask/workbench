@@ -12,8 +12,8 @@
     <small class="row justify-content-between">
       <span class="col-md-8">
         <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}" class="inline" target="_blank">
-          {{ project.overview.logged|stringformat:'.1f' }}h
-        </a> / {{ project.overview.effort|stringformat:'.1f' }}h
+          {{ project.overview.logged|hours }}
+        </a> / {{ project.overview.effort|hours }}
         {% bar project.overview.logged project.overview.effort %}
       </span>
       <span class="col-md-4"></span>
@@ -70,7 +70,7 @@
         <span class="col-md-4">
           {% if service.pk %}
             <a href="{% url 'logbook_loggedhours_list' %}?service={{ service.pk }}" target="_blank">
-              {{ service.logged_hours|stringformat:'.1f' }}h / {{ service.service_hours|stringformat:'.1f' }}h
+              {{ service.logged_hours|hours }} / {{ service.service_hours|hours }}
               {{ service.effort_type }}
             </a>
             {% bar service.logged_hours service.service_hours %}

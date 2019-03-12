@@ -22,8 +22,8 @@
 
     <tr>
       <th>{% trans 'working days' %}</th>
-      {% for value in stats.target_days %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.2f' }}d</td>{% endfor %}
-      <th class="text-right">{{ totals.target_days|stringformat:'.2f' }}d</th>
+      {% for value in stats.target_days %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|days }}</td>{% endfor %}
+      <th class="text-right">{{ totals.target_days|days }}</th>
     </tr>
 
     <tr>
@@ -34,52 +34,52 @@
 
     <tr>
       <th>{% trans 'available vacation days' %}</th>
-      {% for value in stats.available_vacation_days %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.2f' }}d</td>{% endfor %}
-      <th class="text-right">{{ totals.available_vacation_days|stringformat:'.2f' }}d</th>
+      {% for value in stats.available_vacation_days %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|days }}</td>{% endfor %}
+      <th class="text-right">{{ totals.available_vacation_days|days }}</th>
     </tr>
 
     <tr>
       <th>{% trans 'hours' %}</th>
-      {% for value in stats.hours %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.1f' }}h</td>{% endfor %}
-      <th class="text-right">{{ totals.hours|stringformat:'.1f' }}h</th>
+      {% for value in stats.hours %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|hours }}</td>{% endfor %}
+      <th class="text-right">{{ totals.hours|hours }}</th>
     </tr>
 
     <tr>
       <th>{% trans 'vacation days' %}</th>
-      {% for value in stats.vacation_days %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.2f' }}d</td>{% endfor %}
-      <th class="text-right">{{ totals.vacation_days|stringformat:'.2f' }}d</th>
+      {% for value in stats.vacation_days %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|days }}</td>{% endfor %}
+      <th class="text-right">{{ totals.vacation_days|days }}</th>
     </tr>
 
     {% if totals.vacation_days_correction %}
       <tr>
         <th>{% trans 'correction' %}</th>
-        {% for value in stats.vacation_days_correction %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.2f' }}d</td>{% endfor %}
-        <th class="text-right">{{ totals.vacation_days_correction|stringformat:'.2f' }}d</th>
+        {% for value in stats.vacation_days_correction %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|days }}</td>{% endfor %}
+        <th class="text-right">{{ totals.vacation_days_correction|days }}</th>
       </tr>
     {% endif %}
 
     <tr>
       <th>{% trans 'other absences' %}</th>
-      {% for value in stats.other_absences %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.2f' }}d</td>{% endfor %}
-      <th class="text-right">{{ totals.other_absences|stringformat:'.2f' }}d</th>
+      {% for value in stats.other_absences %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|days }}</td>{% endfor %}
+      <th class="text-right">{{ totals.other_absences|days }}</th>
     </tr>
 
     <tr>
       <th>{% trans 'working time' %}</th>
-      {% for value in data.working_time %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.2f' }}d</td>{% endfor %}
-      <th class="text-right">{{ totals.working_time|stringformat:'.2f' }}d</th>
+      {% for value in data.working_time %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|days }}</td>{% endfor %}
+      <th class="text-right">{{ totals.working_time|days }}</th>
     </tr>
 
     <tr>
       <th>{% trans 'target' %}</th>
-      {% for value in stats.target %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|stringformat:'.2f' }}d</td>{% endfor %}
-      <th class="text-right">{{ totals.target|stringformat:'.2f' }}d</th>
+      {% for value in stats.target %}<td class="text-right {% if not value %}text-black-50{% endif %}">{{ value|days }}</td>{% endfor %}
+      <th class="text-right">{{ totals.target|days }}</th>
     </tr>
 
     <tr>
       <th>{% trans 'monthly sums' %}</th>
-      {% for value in monthly_sums %}<td class="text-right">{% if value is not None %}{{ value|stringformat:'.1f' }}h{% endif %}</td>{% endfor %}
-      <th class="text-right">{{ totals.running_sum|stringformat:'.1f' }}h</th>
+      {% for value in monthly_sums %}<td class="text-right">{% if value is not None %}{{ value|hours }}{% endif %}</td>{% endfor %}
+      <th class="text-right">{{ totals.running_sum|hours }}</th>
     </tr>
 
     <tr>

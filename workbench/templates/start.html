@@ -12,9 +12,9 @@
         <p class="card-text">
 
           <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
-            {{ user.hours.today }}h {% trans 'today' %}</a> /
+            {{ user.hours.today|hours }} {% trans 'today' %}</a> /
           <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
-            {{ user.hours.week }}h {% trans 'this week' %}</a>
+            {{ user.hours.week|hours }} {% trans 'this week' %}</a>
 
         </p>
       </div>
@@ -63,7 +63,7 @@
               <span>{{ hours.service.project }}: {{ hours.service }}</span>
               <span>{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
             </small>
-            <p class="card-text"><strong>{{ hours.hours }}h</strong> {{ hours.description }}</p>
+            <p class="card-text"><strong>{{ hours.hours|hours }}</strong> {{ hours.description }}</p>
           </a>
           {% endfor %}
         </div>

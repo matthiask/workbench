@@ -19,7 +19,7 @@
       <tr>
         <th><a href="{{ deal.urls.detail }}">{{ deal }}</a></th>
         <td>{{ deal.owned_by.get_short_name }}</td>
-        <td class="text-right">{{ deal.estimated_value }}</td>
+        <td class="text-right">{{ deal.estimated_value|currency }}</td>
         <td>{{ deal.stage }}</td>
         <td>{{ deal.get_status_display }}</td>
       </tr>
