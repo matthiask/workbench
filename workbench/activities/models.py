@@ -7,7 +7,7 @@ from workbench.contacts.models import Person
 from workbench.deals.models import Deal
 from workbench.projects.models import Project
 from workbench.tools.formats import local_date_format, pretty_due
-from workbench.tools.models import SearchQuerySet, Model, HoursField
+from workbench.tools.models import SearchQuerySet, Model
 from workbench.tools.urls import model_urls
 
 
@@ -48,6 +48,7 @@ class Activity(Model):
         related_name="activities",
     )
     title = models.CharField(_("title"), max_length=200)
+    notes = models.TextField(_("notes"), blank=True)
     owned_by = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
@@ -55,13 +56,6 @@ class Activity(Model):
         related_name="activities",
     )
     due_on = models.DateField(_("due on"), blank=True, null=True)
-    time = models.TimeField(_("time"), blank=True, null=True)
-    duration = HoursField(
-        _("duration"),
-        blank=True,
-        null=True,
-        help_text=_("Duration in hours (if applicable)."),
-    )
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     completed_at = models.DateTimeField(_("completed at"), blank=True, null=True)
 

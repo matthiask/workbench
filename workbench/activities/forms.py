@@ -7,7 +7,7 @@ from workbench.activities.models import Activity
 from workbench.contacts.models import Person
 from workbench.deals.models import Deal
 from workbench.projects.models import Project
-from workbench.tools.forms import ModelForm
+from workbench.tools.forms import ModelForm, Textarea
 
 
 class ActivitySearchForm(forms.Form):
@@ -56,7 +56,8 @@ class ActivityForm(ModelForm):
 
     class Meta:
         model = Activity
-        fields = ("title", "owned_by", "due_on", "time", "duration")
+        fields = ["title", "notes", "owned_by", "due_on"]
+        widgets = {"notes": Textarea}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
