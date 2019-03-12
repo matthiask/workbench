@@ -5,15 +5,25 @@ from itertools import groupby
 from django import template
 from django.db import models
 from django.template.defaultfilters import linebreaksbr
-from django.utils import timezone
 from django.utils.html import format_html, format_html_join, mark_safe
-from django.utils.translation import ugettext as _
 
-from workbench.tools.formats import local_date_format
+from workbench.tools.formats import (
+    currency,
+    days,
+    hours,
+    local_date_format,
+    timesince_short,
+)
 from workbench.tools.models import Z
 
 
 register = template.Library()
+
+
+register.filter(currency)
+register.filter(days)
+register.filter(hours)
+register.filter(timesince_short)
 
 
 @register.simple_tag
@@ -25,11 +35,6 @@ def link_or_none(object, pretty=None):
             '<a href="{}">{}</a>', object.get_absolute_url(), h(pretty or object)
         )
     return pretty or object
-
-
-@register.filter
-def currency(value):
-    return "{:,.2f}".format(value).replace(",", "’")
 
 
 @register.filter
@@ -76,22 +81,6 @@ def group_hours_by_day(iterable):
     for day, instances in groupby(iterable, lambda logged: logged.rendered_on):
         instances = list(instances)
         yield (day, sum((item.hours for item in instances), Z), instances)
-
-
-@register.filter
-def timesince_short(dttm):
-    delta = int((timezone.now() - dttm).total_seconds())
-    if delta > 86400 * 180:
-        return _("%s months ago") % int(delta // (86400 * 365 / 12))
-    if delta > 86400 * 14:
-        return _("%s weeks ago") % (delta // (86400 * 7))
-    if delta > 86400 * 2:
-        return _("%s days ago") % (delta // 86400)
-    if delta > 7200:
-        return _("%s hours ago") % (delta // 3600)
-    if delta > 120:
-        return _("%s minutes ago") % (delta // 60)
-    return _("%s seconds ago") % delta
 
 
 @register.simple_tag
