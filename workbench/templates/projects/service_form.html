@@ -2,6 +2,12 @@
 
 {% load bootstrap4 fineforms i18n workbench %}
 
+{% block uplink %}
+<a href="{{ view.project.urls.services }}" class="btn btn-secondary btn-sm uplink">
+  {% include 'svg/chevron-left.svg' %} {% trans 'project' %}
+</a>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-md-10 col-lg-8">
