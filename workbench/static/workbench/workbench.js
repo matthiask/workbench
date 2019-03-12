@@ -197,7 +197,7 @@ function initWidgets() {
     });
   }
 
-  $('[data-autofill]:not(.initialized)').each(function() {
+  $("[data-autofill]:not(.initialized)").each(function() {
     var self = $(this),
       data = self.data("autofill"),
       sel = self.find("select");
