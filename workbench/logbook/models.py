@@ -1,5 +1,5 @@
 from decimal import Decimal
-from datetime import date, timedelta
+from datetime import date
 
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -11,7 +11,6 @@ from workbench.accounts.models import User
 from workbench.projects.models import Project, Service
 from workbench.tools.models import SearchManager, Model, MoneyField, HoursField
 from workbench.tools.urls import model_urls
-from workbench.tools.validation import raise_if_errors
 
 
 @model_urls()
@@ -59,14 +58,6 @@ class LoggedHours(Model):
 
     def __html__(self):
         return format_html("{}:<br>{}", self.service.title, self.description)
-
-    def clean_fields(self, exclude=None):
-        super().clean_fields(exclude)
-        errors = {}
-        today = date.today()
-        if self.rendered_on > today + timedelta(days=7):
-            errors["rendered_on"] = _("Sorry, too early.")
-        raise_if_errors(errors, exclude or ())
 
 
 @model_urls()

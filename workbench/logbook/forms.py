@@ -180,14 +180,14 @@ class LoggedHoursForm(WarningsForm, ModelForm):
 
     def clean_rendered_on(self):
         rendered_on = self.cleaned_data.get("rendered_on")
-        if rendered_on:
+        if rendered_on and not self.instance.pk:
             today = date.today()
-            if not self.instance.pk and self.cleaned_data[
-                "rendered_on"
-            ] < date.today() - timedelta(days=today.weekday()):
+            if rendered_on < date.today() - timedelta(days=today.weekday()):
                 raise forms.ValidationError(
                     _("Sorry, hours have to be logged in the same week.")
                 )
+            elif rendered_on > date.today() + timedelta(days=7):
+                raise forms.ValidationError(_("Sorry, too early."))
         return rendered_on
 
     def clean(self):
