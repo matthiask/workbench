@@ -88,12 +88,12 @@ dblink(
 --
 
 INSERT INTO contacts_person
-(id, address, salutation, given_name, family_name, notes, organization_id, primary_contact_id)
-SELECT id, CASE WHEN gender='f' THEN 'Frau' ELSE 'Herr' END, '', first_name, name, CASE WHEN title!='' THEN CONCAT('Titel: ', title, E'\n', notes) ELSE notes END, organization_id, primary_contact_id FROM
+(id, address, salutation, given_name, family_name, notes, organization_id, primary_contact_id, is_archived)
+SELECT id, CASE WHEN gender='f' THEN 'Frau' ELSE 'Herr' END, '', first_name, name, CASE WHEN title!='' THEN CONCAT('Titel: ', title, E'\n', notes) ELSE notes END, organization_id, primary_contact_id, is_archived FROM
 dblink(
     'dbname=fineware_feinheit',
-    'SELECT id, gender, first_name, name, title, notes, NULL, contact_id FROM addressbook_person WHERE company=FALSE'
-) AS p(id int, gender varchar(10), first_name varchar(100), name text, title text, notes text, organization_id int, primary_contact_id int);
+    'SELECT id, gender, first_name, name, title, notes, NULL, contact_id, archived FROM addressbook_person WHERE company=FALSE'
+) AS p(id int, gender varchar(10), first_name varchar(100), name text, title text, notes text, organization_id int, primary_contact_id int, is_archived bool);
 
 UPDATE contacts_person p
 SET salutation=CASE

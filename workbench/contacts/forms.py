@@ -3,7 +3,7 @@ from collections import OrderedDict
 from django import forms
 from django.forms.models import inlineformset_factory
 from django.template.defaultfilters import linebreaksbr
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext
 
 from workbench.contacts.models import (
     Group,
@@ -17,6 +17,23 @@ from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm
 
 
 class OrganizationSearchForm(forms.Form):
+    g = forms.ModelChoiceField(
+        queryset=Group.objects.all(),
+        required=False,
+        empty_label=_("All groups"),
+        label=_("Group"),
+        widget=forms.Select(attrs={"class": "custom-select"}),
+    )
+
+    def filter(self, queryset):
+        data = self.cleaned_data
+
+        if data.get("g"):
+            queryset = queryset.filter(groups=data.get("g"))
+        return queryset
+
+
+class PersonSearchForm(forms.Form):
     g = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         required=False,
@@ -47,7 +64,7 @@ class OrganizationForm(ModelForm):
 
 
 class PersonForm(WarningsForm, ModelForm):
-    user_fields = default_to_current_user = ("primary_contact",)
+    user_fields = default_to_current_user = ["primary_contact"]
 
     class Meta:
         model = Person
@@ -60,6 +77,7 @@ class PersonForm(WarningsForm, ModelForm):
             "organization",
             "primary_contact",
             "groups",
+            "is_archived",
         )
         widgets = {
             "notes": Textarea(),
@@ -86,6 +104,44 @@ class PersonForm(WarningsForm, ModelForm):
         data = super().clean()
         if not data.get("salutation"):
             self.add_warning(_("No salutation set. This will make newsletters ugly."))
+        if self.instance.pk and "organization" in self.changed_data:
+            from workbench.deals.models import Deal
+            from workbench.invoices.models import Invoice
+            from workbench.projects.models import Project
+
+            related = []
+            deals = Deal.objects.filter(contact=self.instance).count()
+            invoices = Invoice.objects.filter(contact=self.instance).count()
+            projects = Project.objects.filter(contact=self.instance).count()
+
+            for model, count in [
+                (Deal, deals),
+                (Invoice, invoices),
+                (Project, projects),
+            ]:
+                if count:
+                    related.append(
+                        "%s %s"
+                        % (
+                            count,
+                            ngettext(
+                                model._meta.verbose_name,
+                                model._meta.verbose_name_plural,
+                                count,
+                            ),
+                        )
+                    )
+
+            if related:
+                self.add_warning(
+                    _(
+                        "This person is the contact of the following related objects:"
+                        " %s. Modifying this record may be more confusing than"
+                        " archiving this one and creating a new record instead."
+                    )
+                    % ", ".join(related)
+                )
+
         return data
 
     def is_valid(self):

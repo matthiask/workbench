@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 
 from workbench.accounts.models import User
-from workbench.tools.models import SearchManager, Model
+from workbench.tools.models import SearchManager, SearchQuerySet, Model
 from workbench.tools.urls import model_urls
 
 
@@ -48,8 +48,18 @@ class Organization(Model):
         return self.name
 
 
+class PersonQuerySet(SearchQuerySet):
+    def active(self):
+        return self.filter(is_archived=False)
+
+
 @model_urls()
 class Person(Model):
+    is_archived = models.BooleanField(
+        _("is archived"),
+        default=False,
+        help_text=_("It is preferrable to archive records instead of deleting them."),
+    )
     given_name = models.CharField(_("given name"), max_length=100)
     family_name = models.CharField(_("family name"), max_length=100)
     address = models.CharField(
@@ -80,7 +90,7 @@ class Person(Model):
         Group, verbose_name=_("groups"), related_name="+", blank=True
     )
 
-    objects = SearchManager()
+    objects = PersonQuerySet.as_manager()
 
     class Meta:
         ordering = ["given_name", "family_name"]

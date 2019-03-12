@@ -1,4 +1,8 @@
-from workbench.contacts.forms import OrganizationSearchForm, PersonForm
+from workbench.contacts.forms import (
+    OrganizationSearchForm,
+    PersonForm,
+    PersonSearchForm,
+)
 from workbench.contacts.models import Organization, Person
 from workbench.generic import ListView, CreateView
 
@@ -13,8 +17,11 @@ class OrganizationListView(ListView):
 
 class PersonListView(ListView):
     model = Person
-    search_form_class = OrganizationSearchForm
+    search_form_class = PersonSearchForm
     person_picker = False
+
+    def get_root_queryset(self):
+        return Person.objects.active()
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related("organization")
