@@ -32,6 +32,11 @@ class CreateRelatedView(generic.CreateView):
         return default_service_types()
 
 
+class CreateAndUpdateView(CreateRelatedView):
+    def get_success_url(self):
+        return self.object.urls.url("update")
+
+
 class ProjectDetailView(generic.DetailView):
     model = Project
     project_view = None

@@ -17,6 +17,7 @@ from workbench.projects.models import Project, Service
 from workbench.projects.views import (
     ProjectDetailView,
     CreateRelatedView,
+    CreateAndUpdateView,
     UpdateServiceView,
     MoveServiceView,
 )
@@ -76,7 +77,7 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/createinvoice/$",
-        CreateRelatedView.as_view(model=Invoice, form_class=CreateInvoiceForm),
+        CreateAndUpdateView.as_view(model=Invoice, form_class=CreateInvoiceForm),
         name="projects_project_createinvoice",
     ),
     # HOURS
