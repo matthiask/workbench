@@ -1,11 +1,13 @@
 from datetime import date, timedelta
 
 from django.contrib import messages
+from django.db.models import Sum
 from django.shortcuts import redirect
 from django.utils.translation import ngettext
 
 from workbench import generic
-from workbench.invoices.models import Invoice
+from workbench.invoices.models import Invoice, Service
+from workbench.tools.models import Z
 from workbench.tools.pdf import pdf_response
 
 
@@ -22,6 +24,28 @@ class InvoicePDFView(generic.DetailView):
         pdf.generate()
 
         return response
+
+
+class ServicesInvoiceUpdateView(generic.DetailView):
+    model = Invoice
+    template_name_suffix = "_services"
+
+    def post(self, request, *args, **kwargs):
+        print(request.POST)
+
+        self.object = self.get_object()
+
+        service = self.object.project.services.get(pk=request.POST["service"])
+        Service.objects.filter(invoice=self.object, project_service=service).delete()
+
+        invoice_service = Service.from_project_service(service, invoice=self.object)
+        if request.POST["mode"] == "logbook":
+            invoice_service.effort_hours = (
+                service.loggedhours.order_by().aggregate(Sum("hours"))["hours__sum"]
+                or Z
+            )
+        invoice_service.save()
+        return redirect(".")
 
 
 class RecurringInvoiceDetailView(generic.DetailView):

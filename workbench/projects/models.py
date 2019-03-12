@@ -158,7 +158,7 @@ class Project(Model):
             .annotate(Sum("cost"))
         }
 
-        for service in self.services.select_related("offer"):
+        for service in self.services.select_related("offer__project"):
             service.logged_hours = logged_hours_per_service.get(service.id, 0)
             service.logged_cost = logged_cost_per_service.get(service.id, 0)
 

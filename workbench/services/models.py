@@ -83,9 +83,6 @@ class ServiceBase(Model):
         self._related_model = self._meta.get_field(self.RELATED_MODEL_FIELD)
         self._orig_related_id = getattr(self, self._related_model.attname)
 
-    def get_absolute_url(self):
-        return self.project.urls.url("services")
-
     def save(self, *args, **kwargs):
         if not self.position:
             max_pos = self.__class__._default_manager.aggregate(m=Max("position"))["m"]

@@ -1,0 +1,129 @@
+{% extends "generic/object_detail.html" %}
+
+{% load history i18n workbench %}
+
+{% block uplink %}
+<a href="{{ invoice.get_absolute_url }}" class="btn btn-secondary btn-sm uplink">
+  {% include 'svg/chevron-left.svg' %} {% trans 'invoice' %}
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-sm-12">
+  <h1>{{ object|h }} {% history_link object %}</h1>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th></th>
+        <th colspan="4">{% trans 'project service' %}</th>
+        <th class="bg-light" colspan="3">{% trans 'logbook' %}</th>
+        <th colspan="4">{% trans 'invoice service' %}</th>
+        <th class="text-right">{% trans 'total excl. tax' %}</th>
+        <th class="text-right">{% trans 'discount' %}</th>
+      </tr>
+    </thead>
+    {% for offer, services in invoice.grouped_services %}
+      <thead>
+        <tr>
+          <th colspan="12">
+            {% link_or_none offer %}
+            <span class="badge badge-{{ offer.status_css }}">{{ offer.pretty_status }}</span>
+          </th>
+          <td class="text-right">{{ offer.total_excl_tax|currency }}</td>
+          <td class="text-right">{{ offer.discount|currency }}</td>
+        </tr>
+      </thead>
+      {% for service in services %}
+      <tr>
+        <td>
+          <a href="{{ service.project_service.get_absolute_url }}" class="text-ellipsis">
+            {{ service.project_service }}
+          </a>
+        </td>
+        <td class="text-right text-nowrap">
+          {{ service.project_service.service_hours|hours }} à
+          {{ service.project_service.effort_rate|currency }}/h
+        </td>
+        <td class="text-right">
+          {{ service.project_service.cost|currency }}
+        </td>
+        <td class="text-right">
+          {{ service.project_service.service_cost|currency }}
+        </td>
+        <td class="text-nowrap">
+          {% if service.project_service.pk %}
+            <a href="{{ service.project_service.urls.update }}"
+              class="btn btn-secondary btn-sm"
+              data-toggle="ajaxmodal">
+              {% include 'svg/pencil.svg' %}
+            </a>
+            <form method="post" class="inline">
+              {% csrf_token %}
+              <input type="hidden" name="service" value="{{ service.project_service.pk }}">
+              <input type="hidden" name="mode" value="service">
+              <button type="submit" class="btn btn-secondary btn-sm">
+                {% include 'svg/chevron-right.svg' %}
+              </button>
+            </form>
+          {% endif %}
+        </td>
+
+        <td class="text-right text-nowrap bg-light">
+          {{ service.logged_hours|hours }}
+          {% if service.project_service.effort_rate is not None %}
+            à {{ service.project_service.effort_rate|currency }}/h
+          {% endif %}
+        </td>
+        <td class="text-right text-nowrap bg-light">
+          {% if service.project_service.effort_rate is None %}
+            ?
+          {% else %}
+            {{ service.logged_cost|currency }}
+          {% endif %}
+        </td>
+        <td class="bg-light">
+          {% if service.can_invoice_logbook %}
+            <form method="post" class="inline">
+              {% csrf_token %}
+              <input type="hidden" name="service" value="{{ service.project_service.pk }}">
+              <input type="hidden" name="mode" value="logbook">
+              <button type="submit" class="btn btn-secondary btn-sm">
+                {% include 'svg/chevron-right.svg' %}
+              </button>
+            </form>
+          {% endif %}
+        </td>
+
+        <td>
+          <a href="{{ service.invoice_service.get_absolute_url }}">
+            {{ service.invoice_service.title }}
+          </a>
+        </td>
+        <td class="text-right text-nowrap">
+          {{ service.invoice_service.service_hours|hours }} à
+          {{ service.invoice_service.effort_rate|currency }}/h
+        </td>
+        <td class="text-right">
+          {{ service.invoice_service.cost|currency }}
+        </td>
+        <td class="text-right">
+          {{ service.invoice_service.service_cost|currency }}
+        </td>
+
+        <td></td>
+        <td></td>
+
+      </tr>
+      {% endfor %}
+    {% endfor %}
+  </table>
+
+
+  <a href="{{ object.urls.pdf }}" class="btn btn-secondary" target="_blank">
+    PDF
+  </a>
+</div>
+</div>
+{% endblock %}

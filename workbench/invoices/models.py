@@ -291,13 +291,14 @@ class Invoice(ModelWithTotal):
                         "invoice_service": invoice_services_by_project_service.get(
                             p_s.id
                         ),
-                        "service_cost": p_s.service_cost,
                         "logged_hours": p_s.logged_hours,
                         "logged_cost": (
                             p_s.logged_cost + p_s.effort_rate * p_s.logged_hours
                             if p_s.effort_rate is not None
                             else None
                         ),
+                        "can_invoice_logbook": bool(p_s.logged_hours is None)
+                        == bool(p_s.effort_rate is None),
                     }
                 )
                 if p_s.id:
@@ -313,7 +314,6 @@ class Invoice(ModelWithTotal):
                 {
                     "project_service": None,
                     "invoice_service": i_s,
-                    "service_cost": Z,
                     "logged_hours": Z,
                     "logged_cost": Z,
                 }
@@ -340,6 +340,9 @@ class Service(ServiceBase):
         related_name="invoice_services",
         verbose_name=_("project service"),
     )
+
+    def get_absolute_url(self):
+        return self.invoice.get_absolute_url()
 
     @classmethod
     def allow_update(cls, instance, request):

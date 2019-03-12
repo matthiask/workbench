@@ -27,14 +27,20 @@ def pretty_due(day):
 
 
 def currency(value):
+    if not value:
+        return "0.00"
     return "{:,.2f}".format(value).replace(",", "’")
 
 
 def days(value):
+    if not value:
+        return "0.00d"
     return "%.2fd" % value
 
 
 def hours(value):
+    if not value:
+        return "0.0h"
     return "%.1fh" % value
 
 
