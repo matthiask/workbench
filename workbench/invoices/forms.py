@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
-from workbench.invoices.models import Invoice, Service, RecurringInvoice
+from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm
 from workbench.tools.models import Z
@@ -187,6 +187,8 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
             ).formfield()
 
         elif self.instance.type in (self.instance.SERVICES,):
+            pass
+            """
             self.fields["services"] = forms.ModelMultipleChoiceField(
                 queryset=self.instance.project.services.all(),
                 widget=forms.CheckboxSelectMultiple,
@@ -195,6 +197,7 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
                 ),
                 label=_("services"),
             )
+            """
 
         if self.instance.type != Invoice.DOWN_PAYMENT and self.instance.project_id:
             eligible_down_payment_invoices = Invoice.objects.filter(
@@ -343,15 +346,6 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
             )
 
         instance.save()
-
-        if instance.type in (self.instance.SERVICES,):
-            # FIXME Update, not just create over and over
-            for service in self.cleaned_data["services"]:
-                new = Service.from_project_service(service, invoice=instance)
-                new.save()
-
-            instance.save()
-
         return instance
 
 

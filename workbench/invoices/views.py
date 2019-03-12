@@ -30,21 +30,54 @@ class ServicesInvoiceUpdateView(generic.DetailView):
     model = Invoice
     template_name_suffix = "_services"
 
-    def post(self, request, *args, **kwargs):
-        print(request.POST)
+    def get(self, request, *args, **kwargs):
+        # TODO allow_update etc.
+        if not request.GET:
+            return super().get(request, *args, **kwargs)
 
         self.object = self.get_object()
+        service = self.object.project.services.get(pk=request.GET["service"])
+        invoice_service = Service.objects.filter(
+            invoice=self.object, project_service=service
+        ).first()
+        if not invoice_service:
+            invoice_service = Service(
+                invoice=self.object,
+                project_service=service,
+                title=service.title,
+                description=service.description,
+                position=service.position,
+            )
 
-        service = self.object.project.services.get(pk=request.POST["service"])
-        Service.objects.filter(invoice=self.object, project_service=service).delete()
-
-        invoice_service = Service.from_project_service(service, invoice=self.object)
-        if request.POST["mode"] == "logbook":
+        mode = request.GET.get("mode")
+        if mode == "description":
+            invoice_service.title = service.title
+            invoice_service.description = service.description
+            invoice_service.position = service.position
+        elif mode == "service_hours":
+            invoice_service.effort_type = service.effort_type
+            invoice_service.effort_rate = service.effort_rate
+            invoice_service.effort_hours = service.effort_hours
+        elif mode == "logged_hours":
+            invoice_service.effort_type = service.effort_type
+            invoice_service.effort_rate = service.effort_rate
             invoice_service.effort_hours = (
                 service.loggedhours.order_by().aggregate(Sum("hours"))["hours__sum"]
                 or Z
             )
+        elif mode == "service_cost":
+            invoice_service.cost = service.cost
+            invoice_service.third_party_costs = service.third_party_costs
+        elif mode == "logged_cost":
+            logged = service.loggedcosts.all()
+            invoice_service.cost = sum((log.cost for log in logged), Z)
+            invoice_service.third_party_costs = sum(
+                (log.third_party_costs or Z for log in logged), Z
+            )
+
         invoice_service.save()
+        self.object.save()
+
         return redirect(".")
 
 

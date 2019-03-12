@@ -87,11 +87,10 @@ class ServiceBase(Model):
         if not self.position:
             max_pos = self.__class__._default_manager.aggregate(m=Max("position"))["m"]
             self.position = 10 + (max_pos or 0)
-        if self.pk:
-            self.service_hours = self.effort_hours or Z
-            self.service_cost = self.cost or Z
-            if all((self.effort_hours, self.effort_rate)):
-                self.service_cost += self.effort_hours * self.effort_rate
+        self.service_hours = self.effort_hours or Z
+        self.service_cost = self.cost or Z
+        if all((self.effort_hours, self.effort_rate)):
+            self.service_cost += self.effort_hours * self.effort_rate
         super().save(*args, **kwargs)
 
         ids = filter(

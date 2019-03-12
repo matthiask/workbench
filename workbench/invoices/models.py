@@ -292,11 +292,7 @@ class Invoice(ModelWithTotal):
                             p_s.id
                         ),
                         "logged_hours": p_s.logged_hours,
-                        "logged_cost": (
-                            p_s.logged_cost + p_s.effort_rate * p_s.logged_hours
-                            if p_s.effort_rate is not None
-                            else None
-                        ),
+                        "logged_cost": p_s.logged_cost,
                         "can_invoice_logbook": bool(p_s.logged_hours is None)
                         == bool(p_s.effort_rate is None),
                     }
@@ -358,23 +354,6 @@ class Service(ServiceBase):
         return True
 
     allow_delete = allow_update
-
-    @classmethod
-    def from_project_service(cls, service, **kwargs):
-        return cls(
-            title=service.title,
-            description=service.description,
-            position=service.position,
-            service_hours=service.service_hours,
-            service_cost=service.service_cost,
-            project_service=service,
-            effort_type=service.effort_type,
-            effort_hours=service.effort_hours,
-            effort_rate=service.effort_rate,
-            cost=service.cost,
-            third_party_costs=service.third_party_costs,
-            **kwargs
-        )
 
 
 class RecurringInvoiceQuerySet(SearchQuerySet):

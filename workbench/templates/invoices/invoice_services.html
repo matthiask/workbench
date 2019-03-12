@@ -11,14 +11,15 @@
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12">
-  <h1>{{ object|h }} {% history_link object %}</h1>
+  <h1>{% link_or_none object %} {% history_link object %}</h1>
 
   <table class="table">
     <thead>
       <tr>
-        <th></th>
-        <th colspan="4">{% trans 'project service' %}</th>
-        <th class="bg-light" colspan="3">{% trans 'logbook' %}</th>
+        <th colspan="2"></th>
+        <th>{% trans 'hourly rate' %}</th>
+        <th>{% trans 'effort' %}</th>
+        <th>{% trans 'cost' %}</th>
         <th colspan="4">{% trans 'invoice service' %}</th>
         <th class="text-right">{% trans 'total excl. tax' %}</th>
         <th class="text-right">{% trans 'discount' %}</th>
@@ -27,7 +28,7 @@
     {% for offer, services in invoice.grouped_services %}
       <thead>
         <tr>
-          <th colspan="12">
+          <th colspan="8">
             {% link_or_none offer %}
             <span class="badge badge-{{ offer.status_css }}">{{ offer.pretty_status }}</span>
           </th>
@@ -38,61 +39,63 @@
       {% for service in services %}
       <tr>
         <td>
-          <a href="{{ service.project_service.get_absolute_url }}" class="text-ellipsis">
-            {{ service.project_service }}
-          </a>
+          <strong>{{ service.project_service.title }}</strong><br>
+          {{ service.project_service.description|linebreaksbr }}
         </td>
-        <td class="text-right text-nowrap">
-          {{ service.project_service.service_hours|hours }} à
-          {{ service.project_service.effort_rate|currency }}/h
-        </td>
-        <td class="text-right">
-          {{ service.project_service.cost|currency }}
-        </td>
-        <td class="text-right">
-          {{ service.project_service.service_cost|currency }}
-        </td>
-        <td class="text-nowrap">
+        <td>
           {% if service.project_service.pk %}
             <a href="{{ service.project_service.urls.update }}"
-              class="btn btn-secondary btn-sm"
+              class="btn btn-outline-secondary btn-sm"
               data-toggle="ajaxmodal">
               {% include 'svg/pencil.svg' %}
             </a>
-            <form method="post" class="inline">
-              {% csrf_token %}
-              <input type="hidden" name="service" value="{{ service.project_service.pk }}">
-              <input type="hidden" name="mode" value="service">
-              <button type="submit" class="btn btn-secondary btn-sm">
-                {% include 'svg/chevron-right.svg' %}
-              </button>
-            </form>
+            <br>
+            <a href="?service={{ service.project_service.pk }}&amp;mode=description"
+              class="btn btn-outline-secondary btn-sm">
+              {% include 'svg/chevron-right.svg' %}
+            </a>
           {% endif %}
         </td>
 
-        <td class="text-right text-nowrap bg-light">
-          {{ service.logged_hours|hours }}
-          {% if service.project_service.effort_rate is not None %}
-            à {{ service.project_service.effort_rate|currency }}/h
+        <td>
+          {% if service.project_service.effort_rate is None %}?
+          {% else %}{{ service.project_service.effort_rate|currency }}h
           {% endif %}
         </td>
-        <td class="text-right text-nowrap bg-light">
+
+        <td>
           {% if service.project_service.effort_rate is None %}
-            ?
+            {{ service.logged_hours|hours }}
           {% else %}
-            {{ service.logged_cost|currency }}
+            <strong>{% trans 'service' %}</strong><br>
+            <a href="?service={{ service.project_service.pk }}&amp;mode=service_hours" class="btn btn-outline-secondary btn-sm text-nowrap">
+              {{ service.project_service.service_hours|hours }}
+              {% include 'svg/chevron-right.svg' %}
+            </a>
+            <br>
+            <strong>{% trans 'logbook' %}</strong><br>
+            <a href="?service={{ service.project_service.pk }}&amp;mode=logged_hours" class="btn btn-outline-secondary btn-sm text-nowrap">
+              {{ service.logged_hours|hours }}
+              {% include 'svg/chevron-right.svg' %}
+            </a>
           {% endif %}
         </td>
-        <td class="bg-light">
-          {% if service.can_invoice_logbook %}
-            <form method="post" class="inline">
-              {% csrf_token %}
-              <input type="hidden" name="service" value="{{ service.project_service.pk }}">
-              <input type="hidden" name="mode" value="logbook">
-              <button type="submit" class="btn btn-secondary btn-sm">
-                {% include 'svg/chevron-right.svg' %}
-              </button>
-            </form>
+
+        <td>
+          {% if not service.project_service.pk %}
+            {{ service.cost|currency }}
+          {% else %}
+            <strong>{% trans 'service' %}</strong><br>
+            <a href="?service={{ service.project_service.pk }}&amp;mode=service_cost" class="btn btn-outline-secondary btn-sm text-nowrap">
+              {{ service.project_service.cost|currency }}
+              {% include 'svg/chevron-right.svg' %}
+            </a>
+            <br>
+            <strong>{% trans 'logbook' %}</strong><br>
+            <a href="?service={{ service.project_service.pk }}&amp;mode=logged_cost" class="btn btn-outline-secondary btn-sm text-nowrap">
+              {{ service.logged_cost|currency }}
+              {% include 'svg/chevron-right.svg' %}
+            </a>
           {% endif %}
         </td>
 
@@ -111,9 +114,6 @@
         <td class="text-right">
           {{ service.invoice_service.service_cost|currency }}
         </td>
-
-        <td></td>
-        <td></td>
 
       </tr>
       {% endfor %}
