@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-12 14:29+0100\n"
+"POT-Creation-Date: 2019-03-12 15:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -89,15 +89,15 @@ msgid "All"
 msgstr "Alle"
 
 #: workbench/activities/forms.py:15 workbench/invoices/forms.py:22
-#: workbench/invoices/forms.py:438 workbench/offers/forms.py:18
+#: workbench/invoices/forms.py:435 workbench/offers/forms.py:18
 #: workbench/projects/forms.py:18
 msgid "Open"
 msgstr "Offen"
 
 #: workbench/activities/forms.py:20 workbench/activities/models.py:55
 #: workbench/deals/models.py:65 workbench/invoices/forms.py:34
-#: workbench/invoices/forms.py:448 workbench/invoices/models.py:100
-#: workbench/invoices/models.py:365 workbench/offers/models.py:48
+#: workbench/invoices/forms.py:445 workbench/invoices/models.py:101
+#: workbench/invoices/models.py:400 workbench/offers/models.py:48
 #: workbench/projects/forms.py:31 workbench/projects/models.py:57
 #: workbench/templates/activities/activity_detail.html:10
 #: workbench/templates/activities/activity_list.html:21
@@ -107,19 +107,19 @@ msgid "owned by"
 msgstr "Gehört"
 
 #: workbench/activities/forms.py:29 workbench/awt/forms.py:20
-#: workbench/invoices/forms.py:44 workbench/invoices/forms.py:457
+#: workbench/invoices/forms.py:44 workbench/invoices/forms.py:454
 #: workbench/logbook/forms.py:23 workbench/logbook/forms.py:71
 #: workbench/projects/forms.py:40
 msgid "All users"
 msgstr "Alle Benutzer"
 
 #: workbench/activities/forms.py:30 workbench/invoices/forms.py:45
-#: workbench/invoices/forms.py:458 workbench/projects/forms.py:41
+#: workbench/invoices/forms.py:455 workbench/projects/forms.py:41
 msgid "Owned by inactive users"
 msgstr "Gehört inaktiven Benutzern"
 
 #: workbench/activities/forms.py:32 workbench/awt/forms.py:22
-#: workbench/invoices/forms.py:47 workbench/invoices/forms.py:460
+#: workbench/invoices/forms.py:47 workbench/invoices/forms.py:457
 #: workbench/projects/forms.py:43 workbench/tools/forms.py:67
 msgid "Active"
 msgstr "Aktiv"
@@ -129,14 +129,14 @@ msgid "is completed"
 msgstr "ist erledigt"
 
 #: workbench/activities/models.py:31 workbench/deals/models.py:55
-#: workbench/invoices/models.py:73 workbench/invoices/models.py:358
+#: workbench/invoices/models.py:74 workbench/invoices/models.py:393
 #: workbench/projects/models.py:50
 #: workbench/templates/invoices/invoice_detail.html:16
 #: workbench/templates/projects/project_detail_overview.html:32
 msgid "contact"
 msgstr "Kontakt"
 
-#: workbench/activities/models.py:39 workbench/invoices/models.py:81
+#: workbench/activities/models.py:39 workbench/invoices/models.py:82
 #: workbench/logbook/forms.py:27 workbench/logbook/forms.py:75
 #: workbench/logbook/models.py:69 workbench/offers/models.py:38
 #: workbench/projects/models.py:70 workbench/projects/models.py:191
@@ -154,7 +154,7 @@ msgstr "Geschäft"
 
 #: workbench/activities/models.py:50 workbench/contacts/models.py:15
 #: workbench/deals/models.py:15 workbench/deals/models.py:62
-#: workbench/invoices/models.py:97 workbench/invoices/models.py:362
+#: workbench/invoices/models.py:98 workbench/invoices/models.py:397
 #: workbench/logbook/forms.py:116 workbench/offers/models.py:45
 #: workbench/projects/models.py:54 workbench/services/models.py:15
 #: workbench/services/models.py:48
@@ -170,12 +170,12 @@ msgstr "Titel"
 msgid "notes"
 msgstr "Bemerkungen"
 
-#: workbench/activities/models.py:58 workbench/invoices/models.py:86
+#: workbench/activities/models.py:58 workbench/invoices/models.py:87
 msgid "due on"
 msgstr "Fällig am"
 
 #: workbench/activities/models.py:59 workbench/deals/models.py:73
-#: workbench/invoices/models.py:103 workbench/invoices/models.py:368
+#: workbench/invoices/models.py:104 workbench/invoices/models.py:403
 #: workbench/logbook/models.py:24 workbench/logbook/models.py:80
 #: workbench/offers/models.py:34 workbench/projects/models.py:61
 #: workbench/services/models.py:46
@@ -314,12 +314,12 @@ msgstr "Anstellungsverhältnisse"
 msgid "ongoing"
 msgstr "aktuell"
 
-#: workbench/awt/models.py:271 workbench/invoices/models.py:377
+#: workbench/awt/models.py:271 workbench/invoices/models.py:412
 msgid "starts on"
 msgstr "startet am"
 
 #: workbench/awt/models.py:273 workbench/deals/models.py:63
-#: workbench/invoices/models.py:98 workbench/invoices/models.py:363
+#: workbench/invoices/models.py:99 workbench/invoices/models.py:398
 #: workbench/logbook/forms.py:118 workbench/logbook/models.py:36
 #: workbench/logbook/models.py:92 workbench/offers/models.py:46
 #: workbench/projects/models.py:55 workbench/services/models.py:49
@@ -376,14 +376,14 @@ msgstr ""
 
 #: workbench/contacts/forms.py:167 workbench/contacts/forms.py:180
 #: workbench/contacts/forms.py:202 workbench/contacts/models.py:118
-#: workbench/invoices/forms.py:364 workbench/invoices/models.py:107
+#: workbench/invoices/forms.py:361 workbench/invoices/models.py:108
 #: workbench/projects/models.py:60
 #: workbench/templates/projects/project_detail_overview.html:83
 msgid "type"
 msgstr "Typ"
 
 #: workbench/contacts/forms.py:236 workbench/contacts/models.py:204
-#: workbench/invoices/models.py:123 workbench/invoices/models.py:375
+#: workbench/invoices/models.py:124 workbench/invoices/models.py:410
 #: workbench/offers/models.py:55
 #: workbench/templates/invoices/invoice_detail.html:35
 msgid "postal address"
@@ -527,7 +527,7 @@ msgid "credit control"
 msgstr "Debitorenmanagement"
 
 #: workbench/credit_control/forms.py:23 workbench/deals/forms.py:11
-#: workbench/invoices/forms.py:21 workbench/invoices/forms.py:438
+#: workbench/invoices/forms.py:21 workbench/invoices/forms.py:435
 #: workbench/offers/forms.py:17 workbench/projects/forms.py:17
 msgid "All states"
 msgstr "Alle Stati"
@@ -560,13 +560,13 @@ msgstr "Valuta"
 msgid "total"
 msgstr "Total"
 
-#: workbench/credit_control/models.py:20 workbench/invoices/models.py:126
+#: workbench/credit_control/models.py:20 workbench/invoices/models.py:127
 #: workbench/templates/credit_control/creditentry_list.html:22
 msgid "payment notice"
 msgstr "Zahlungsnotiz"
 
-#: workbench/credit_control/models.py:28 workbench/invoices/models.py:132
-#: workbench/invoices/models.py:280
+#: workbench/credit_control/models.py:28 workbench/invoices/models.py:133
+#: workbench/invoices/models.py:315
 #: workbench/templates/contacts/person_detail.html:52
 #: workbench/templates/credit_control/creditentry_list.html:24
 #: workbench/templates/projects/project_detail_overview.html:82
@@ -621,8 +621,8 @@ msgstr "Akzeptiert"
 msgid "declined"
 msgstr "Abgelehnt"
 
-#: workbench/deals/models.py:47 workbench/invoices/models.py:65
-#: workbench/invoices/models.py:350 workbench/projects/models.py:42
+#: workbench/deals/models.py:47 workbench/invoices/models.py:66
+#: workbench/invoices/models.py:385 workbench/projects/models.py:42
 #: workbench/templates/invoices/invoice_detail.html:12
 #: workbench/templates/projects/project_detail_overview.html:28
 #: workbench/templates/reporting/overdrawn_projects.html:16
@@ -634,7 +634,7 @@ msgstr "Kunde"
 msgid "estimated value"
 msgstr "Geschätzter Wert"
 
-#: workbench/deals/models.py:70 workbench/invoices/models.py:105
+#: workbench/deals/models.py:70 workbench/invoices/models.py:106
 #: workbench/offers/models.py:52
 #: workbench/templates/activities/activity_detail.html:14
 #: workbench/templates/activities/activity_list.html:22
@@ -647,7 +647,7 @@ msgstr "Geschätzter Wert"
 msgid "status"
 msgstr "Status"
 
-#: workbench/deals/models.py:74 workbench/invoices/models.py:88
+#: workbench/deals/models.py:74 workbench/invoices/models.py:89
 #: workbench/offers/models.py:43 workbench/projects/models.py:62
 msgid "closed on"
 msgstr "Geschlossen am"
@@ -696,7 +696,7 @@ msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
 msgid "Delete %s"
 msgstr "%s löschen"
 
-#: workbench/invoices/__init__.py:10 workbench/invoices/models.py:133
+#: workbench/invoices/__init__.py:10 workbench/invoices/models.py:134
 #: workbench/templates/base.html:31 workbench/templates/base.html:34
 #: workbench/templates/contacts/organization_detail.html:35
 #: workbench/templates/projects/project_detail_overview.html:75
@@ -716,11 +716,11 @@ msgstr ""
 "%(organization)s."
 
 #: workbench/invoices/forms.py:125 workbench/invoices/forms.py:323
-#: workbench/invoices/forms.py:572
+#: workbench/invoices/forms.py:569
 msgid "No contact selected."
 msgstr "Kein Kontakt ausgewählt."
 
-#: workbench/invoices/forms.py:177 workbench/invoices/models.py:58
+#: workbench/invoices/forms.py:177 workbench/invoices/models.py:59
 #: workbench/tools/pdf.py:262
 msgid "Down payment"
 msgstr "Anzahlung"
@@ -781,52 +781,52 @@ msgstr ""
 "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Rechnung wurde "
 "schon am %(closed)s geschlossen. Bist Du sicher?"
 
-#: workbench/invoices/forms.py:369
+#: workbench/invoices/forms.py:366
 msgid "Other invoice types must be created directly on a project."
 msgstr "Andere Rechnungstypen müssen direkt auf einem Projekt erstellt werden."
 
-#: workbench/invoices/forms.py:438 workbench/projects/forms.py:19
+#: workbench/invoices/forms.py:435 workbench/projects/forms.py:19
 msgid "Closed"
 msgstr "Abgeschlossen"
 
-#: workbench/invoices/models.py:44 workbench/offers/models.py:27
+#: workbench/invoices/models.py:45 workbench/offers/models.py:27
 msgid "In preparation"
 msgstr "In Vorbereitung"
 
-#: workbench/invoices/models.py:45
+#: workbench/invoices/models.py:46
 msgid "Sent"
 msgstr "Versendet"
 
-#: workbench/invoices/models.py:46
+#: workbench/invoices/models.py:47
 msgid "Reminded"
 msgstr "Gemahnt"
 
-#: workbench/invoices/models.py:47
+#: workbench/invoices/models.py:48
 msgid "Paid"
 msgstr "Bezahlt"
 
-#: workbench/invoices/models.py:48
+#: workbench/invoices/models.py:49
 msgid "Canceled"
 msgstr "Storniert"
 
-#: workbench/invoices/models.py:49 workbench/offers/models.py:31
+#: workbench/invoices/models.py:50 workbench/offers/models.py:31
 msgid "Replaced"
 msgstr "Ersetzt"
 
-#: workbench/invoices/models.py:57
+#: workbench/invoices/models.py:58
 msgid "Fixed amount"
 msgstr "Fixbetrag"
 
-#: workbench/invoices/models.py:59 workbench/tools/pdf.py:232
+#: workbench/invoices/models.py:60 workbench/tools/pdf.py:232
 msgid "Services"
 msgstr "Leistungen"
 
-#: workbench/invoices/models.py:85
+#: workbench/invoices/models.py:86
 #: workbench/templates/reporting/monthly_invoicing.html:16
 msgid "invoiced on"
 msgstr "Verrechnet am"
 
-#: workbench/invoices/models.py:92
+#: workbench/invoices/models.py:93
 msgid ""
 "Payment date for paid invoices, date of replacement or cancellation "
 "otherwise."
@@ -834,91 +834,91 @@ msgstr ""
 "Zahlungsdatum für bezahlte Rechnungen, andernfalls Datum der Ersetzung oder "
 "Stornierung."
 
-#: workbench/invoices/models.py:113
+#: workbench/invoices/models.py:114
 msgid "down payment applied to"
 msgstr "Anzahlung angewendet auf"
 
-#: workbench/invoices/models.py:116
+#: workbench/invoices/models.py:117
 #: workbench/templates/invoices/invoice_detail.html:50
 msgid "down payment total"
 msgstr "Anzahlungstotal"
 
-#: workbench/invoices/models.py:118 workbench/invoices/models.py:371
+#: workbench/invoices/models.py:119 workbench/invoices/models.py:406
 #: workbench/logbook/models.py:87 workbench/services/models.py:61
 #: workbench/templates/logbook/loggedcost_detail.html:37
 #: workbench/templates/reporting/monthly_invoicing.html:19
 msgid "third party costs"
 msgstr "Fremdkosten"
 
-#: workbench/invoices/models.py:120 workbench/invoices/models.py:373
+#: workbench/invoices/models.py:121 workbench/invoices/models.py:408
 msgid "Only used for statistical purposes."
 msgstr "Wird nur für statistische Auswertungen verwendet."
 
-#: workbench/invoices/models.py:124 workbench/offers/models.py:56
+#: workbench/invoices/models.py:125 workbench/offers/models.py:56
 #: workbench/projects/models.py:64
 msgid "code"
 msgstr "Code"
 
-#: workbench/invoices/models.py:197
+#: workbench/invoices/models.py:198
 msgid "Invoice and/or due date missing for selected state."
 msgstr ""
 "Rechnungs- und/oder Fälligkeitsdatum fehlen für den augewählten Status."
 
-#: workbench/invoices/models.py:203
+#: workbench/invoices/models.py:204
 msgid "Due date has to be after invoice date."
 msgstr "Fälligkeitsdatum muss später als Rechnungsdatum sein."
 
-#: workbench/invoices/models.py:209
+#: workbench/invoices/models.py:210
 #, python-format
 msgid "Invoices of type %(type)s require a project."
 msgstr "Rechnungen vom Typ %(type)s benötigen zwingend ein Projekt."
 
-#: workbench/invoices/models.py:233 workbench/offers/models.py:107
+#: workbench/invoices/models.py:234 workbench/offers/models.py:107
 #, python-format
 msgid "In preparation since %(created_at)s"
 msgstr "In Vorbereitung seit %(created_at)s"
 
-#: workbench/invoices/models.py:236
+#: workbench/invoices/models.py:237
 #, python-format
 msgid "Sent on %(invoiced_on)s, but overdue"
 msgstr "Versendet am %(invoiced_on)s, aber überfällig"
 
-#: workbench/invoices/models.py:238
+#: workbench/invoices/models.py:239
 #, python-format
 msgid "Sent on %(invoiced_on)s"
 msgstr "Versendet am %(invoiced_on)s"
 
-#: workbench/invoices/models.py:240
+#: workbench/invoices/models.py:241
 #, python-format
 msgid "Sent on %(invoiced_on)s, reminded on %(reminded_on)s"
 msgstr "Versendet am %(invoiced_on)s, gemahnt am %(reminded_on)s"
 
-#: workbench/invoices/models.py:242
+#: workbench/invoices/models.py:243
 #, python-format
 msgid "Paid on %(closed_on)s"
 msgstr "Bezahlt am %(closed_on)s"
 
-#: workbench/invoices/models.py:264
+#: workbench/invoices/models.py:265
 msgid "down payment total CHF incl. tax"
 msgstr "Total CHF inkl. MwSt Akonto"
 
-#: workbench/invoices/models.py:266
+#: workbench/invoices/models.py:267
 msgid "down payment total CHF"
 msgstr "Total CHF Akonto"
 
-#: workbench/invoices/models.py:269 workbench/offers/models.py:132
+#: workbench/invoices/models.py:270 workbench/offers/models.py:132
 msgid "total CHF incl. tax"
 msgstr "Total CHF inkl. MwSt"
 
-#: workbench/invoices/models.py:269 workbench/offers/models.py:132
+#: workbench/invoices/models.py:270 workbench/offers/models.py:132
 msgid "total CHF"
 msgstr "Total CHF"
 
-#: workbench/invoices/models.py:288
+#: workbench/invoices/models.py:323
 msgid "project service"
 msgstr "Projektleistung"
 
-#: workbench/invoices/models.py:297
+#: workbench/invoices/models.py:332
 msgid ""
 "Cannot modify a service bound to an invoice which is not in preparation "
 "anymore."
@@ -926,55 +926,55 @@ msgstr ""
 "Kann Leistung von Rechnung, welche nicht mehr in Vorbereitung ist, nicht "
 "mehr bearbeiten."
 
-#: workbench/invoices/models.py:341
+#: workbench/invoices/models.py:376
 msgid "yearly"
 msgstr "jährlich"
 
-#: workbench/invoices/models.py:342
+#: workbench/invoices/models.py:377
 msgid "quarterly"
 msgstr "quartalsweise"
 
-#: workbench/invoices/models.py:343
+#: workbench/invoices/models.py:378
 msgid "monthly"
 msgstr "monatlich"
 
-#: workbench/invoices/models.py:344
+#: workbench/invoices/models.py:379
 msgid "weekly"
 msgstr "wöchentlich"
 
-#: workbench/invoices/models.py:378
+#: workbench/invoices/models.py:413
 msgid "ends on"
 msgstr "endet am"
 
-#: workbench/invoices/models.py:380
+#: workbench/invoices/models.py:415
 msgid "periodicity"
 msgstr "Periodizität"
 
-#: workbench/invoices/models.py:383
+#: workbench/invoices/models.py:418
 msgid "next period starts on"
 msgstr "nächste Periode beginnt am"
 
-#: workbench/invoices/models.py:390
+#: workbench/invoices/models.py:425
 msgid "recurring invoice"
 msgstr "Stapelrechnung"
 
-#: workbench/invoices/models.py:391
+#: workbench/invoices/models.py:426
 #: workbench/management/commands/fairy_tasks.py:37
 #: workbench/templates/base.html:36
 msgid "recurring invoices"
 msgstr "Stapelrechnungen"
 
-#: workbench/invoices/models.py:399
+#: workbench/invoices/models.py:434
 #, python-format
 msgid "%(periodicity)s from %(from)s until %(until)s"
 msgstr "%(periodicity)s von %(from)s bis %(until)s"
 
-#: workbench/invoices/models.py:404
+#: workbench/invoices/models.py:439
 #, python-format
 msgid "%(periodicity)s from %(from)s"
 msgstr "%(periodicity)s seit %(from)s"
 
-#: workbench/invoices/models.py:423
+#: workbench/invoices/models.py:458
 msgid "Period"
 msgstr "Zeitraum"
 
@@ -1185,13 +1185,13 @@ msgstr ""
 "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht mehr "
 "bearbeiten."
 
-#: workbench/projects/views.py:64
+#: workbench/projects/views.py:69
 msgid "Cannot modify an offer which is not in preparation anymore."
 msgstr "Kann Offerte, welche nicht in Vorbereitung ist, nicht mehr bearbeiten."
 
-#: workbench/services/models.py:16
-msgid "billing per hour"
-msgstr "Verrechnung pro Stunde"
+#: workbench/services/models.py:16 workbench/services/models.py:57
+msgid "hourly rate"
+msgstr "Stundensatz"
 
 #: workbench/services/models.py:21
 msgid "service type"
@@ -1218,16 +1218,11 @@ msgstr "Leistungskosten"
 msgid "effort type"
 msgstr "Aufwandtyp"
 
-#: workbench/services/models.py:57
-msgid "hourly rate"
-msgstr "Stundensatz"
-
 #: workbench/services/models.py:140 workbench/services/models.py:142
-#: workbench/services/models.py:144
 msgid "Either fill in all fields or none."
 msgstr "Entweder alle Felder einfüllen oder keine."
 
-#: workbench/services/models.py:146
+#: workbench/services/models.py:144
 msgid "Cannot be empty if third party costs is set."
 msgstr "Kann nicht leer sein wenn Fremdkosten gesetzt sind."
 
@@ -1698,200 +1693,3 @@ msgstr "Datum"
 #: workbench/views.py:30
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
-
-#~ msgid "time"
-#~ msgstr "Zeit"
-
-#~ msgid "duration"
-#~ msgstr "Dauer"
-
-#~ msgid "Duration in hours (if applicable)."
-#~ msgstr "Dauer in Stunden (falls zutreffend)."
-
-#~ msgid "Yes, I am sure."
-#~ msgstr "Ja, ich bin sicher."
-
-#~ msgid "efforts"
-#~ msgstr "Aufwände"
-
-#~ msgid "costs"
-#~ msgstr "Kosten"
-
-#~ msgid "no invoicing"
-#~ msgstr "keine Verrechnung"
-
-#~ msgid "maintenance"
-#~ msgstr "Wartung"
-
-#~ msgid "Work in progress"
-#~ msgstr "In Arbeit"
-
-#~ msgid "Finished"
-#~ msgstr "Erledigt"
-
-#~ msgid "Declined"
-#~ msgstr "Abgelehnt"
-
-#~ msgid "This project is eligible for invoicing."
-#~ msgstr "Dieses Projekt soll verrechnet werden."
-
-#~ msgid "statement"
-#~ msgstr "Auszug"
-
-#~ msgid "account statements"
-#~ msgstr "Kontoauszüge"
-
-#~ msgid "payment lists"
-#~ msgstr "Zahlungslisten"
-
-#~ msgid "admin"
-#~ msgstr "Admin"
-
-#~ msgid "persons"
-#~ msgstr "Personen"
-
-#~ msgid "manually"
-#~ msgstr "manuell"
-
-#~ msgid "E.g. Sir/Madam"
-#~ msgstr "zB. Herr/Frau"
-
-#~ msgid "E.g. Dear John."
-#~ msgstr "Z.B. Lieber Hans."
-
-#~ msgid "Not offered services"
-#~ msgstr "Nicht offerierte Leistungen"
-
-#~ msgid "invoicing statistics"
-#~ msgstr "Verrechnungsstatistik"
-
-#~ msgid "Sorry, too late."
-#~ msgstr "Tut mir leid, zu spät."
-
-#~ msgid "actions"
-#~ msgstr "Aktionen"
-
-#~ msgid "update"
-#~ msgstr "Bearbeiten"
-
-#~ msgid "no activities"
-#~ msgstr "Keine Aktivitäten"
-
-#~ msgid "Inactive"
-#~ msgstr "Inaktiv"
-
-#~ msgid "Hours today"
-#~ msgstr "Stunden heute"
-
-#~ msgid "%(status)s on %(closed_at)s"
-#~ msgstr "%(status)s am %(closed_at)s"
-
-#~ msgid "task"
-#~ msgstr "Aufgabe"
-
-#~ msgid "approved hours"
-#~ msgstr "freigegebene Stunden"
-
-#~ msgid "The sum of all offered efforts amount to %.1f hours."
-#~ msgstr "Die Summe aller offerierten Aufwände beträgt %.1f Stunden."
-
-#~ msgid "All priorities"
-#~ msgstr "Alle Prioritäten"
-
-#~ msgid "High and higher"
-#~ msgstr "Hoch und höher"
-
-#~ msgid "Owned by nobody"
-#~ msgstr "Gehört niemandem"
-
-#~ msgid "Inbox"
-#~ msgstr "Inbox"
-
-#~ msgid "Backlog"
-#~ msgstr "Backlog"
-
-#~ msgid "In progress"
-#~ msgstr "In Arbeit"
-
-#~ msgid "Ready for test"
-#~ msgstr "Bereit zum Testen"
-
-#~ msgid "Done"
-#~ msgstr "Fertig"
-
-#~ msgid "Task"
-#~ msgstr "Aufgabe"
-
-#~ msgid "Bug"
-#~ msgstr "Fehler"
-
-#~ msgid "Enhancement"
-#~ msgstr "Verbesserung"
-
-#~ msgid "Question"
-#~ msgstr "Frage"
-
-#~ msgid "Blocker"
-#~ msgstr "Blocker"
-
-#~ msgid "High"
-#~ msgstr "Hoch"
-
-#~ msgid "Normal"
-#~ msgstr "Normal"
-
-#~ msgid "Low"
-#~ msgstr "Tief"
-
-#~ msgid "priority"
-#~ msgstr "Priorität"
-
-#~ msgid "This field should be left empty most of the time."
-#~ msgstr "Dieses Feld sollte meistens leer gelassen werden."
-
-#~ msgid "tasks"
-#~ msgstr "Aufgaben"
-
-#~ msgid "Done since %(closed_on)s"
-#~ msgstr "Erledigt am %(closed_on)s"
-
-#~ msgid "%(status)s (%(pretty_due)s)"
-#~ msgstr "%(status)s (%(pretty_due)s)"
-
-#~ msgid "file"
-#~ msgstr "Datei"
-
-#~ msgid "comment"
-#~ msgstr "Kommentar"
-
-#~ msgid "edit approved hours"
-#~ msgstr "freigegebene Stunden bearbeiten"
-
-#~ msgid ""
-#~ "%(logged_tasks)sh / %(approved)sh on service. This task accounts for "
-#~ "%(logged_this)sh."
-#~ msgstr ""
-#~ "%(logged_tasks)sh / %(approved)sh auf Leistung. Diese Aufgabe macht "
-#~ "%(logged_this)sh aus."
-
-#~ msgid "change"
-#~ msgstr "Änderung"
-
-#~ msgid "Unknown update"
-#~ msgstr "Unbekannte Änderung"
-
-#~ msgid "add comment"
-#~ msgstr "Kommentar hinzufügen"
-
-#~ msgid "Important tasks"
-#~ msgstr "Wichtige Aufgaben"
-
-#~ msgid "no important tasks! (how can this be?)"
-#~ msgstr "Keine wichtigen Aufgaben! (Wie kann das sein?)"
-
-#~ msgid "The amount we did have to pay."
-#~ msgstr "Der Rechnungsbetrag, welchen wir bezahlt haben."
-
-#~| msgid "services"
-#~ msgid "by services"
-#~ msgstr "nach Leistungen"

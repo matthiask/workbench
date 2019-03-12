@@ -18,7 +18,7 @@ SET application_name TO 'Import';
 --
 
 INSERT INTO services_servicetype
-(id, title, billing_per_hour, position)
+(id, title, hourly_rate, position)
 VALUES
 (1, 'Beratung', 200, 10),
 (2, 'Konzept', 200, 20),

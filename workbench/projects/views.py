@@ -16,7 +16,7 @@ def default_service_types():
         {
             str(type.id): {
                 "effort_type": type.title,
-                "effort_rate": int(type.billing_per_hour),
+                "effort_rate": int(type.hourly_rate),
             }
             for type in ServiceType.objects.all()
         }

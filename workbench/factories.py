@@ -89,7 +89,7 @@ def service_types():
     return types.SimpleNamespace(
         **{
             row[0]: ServiceType.objects.create(
-                title=row[0], billing_per_hour=row[1], position=idx
+                title=row[0], hourly_rate=row[1], position=idx
             )
             for idx, row in enumerate(SERVICE_TYPES)
         }

@@ -13,7 +13,7 @@ from workbench.tools.validation import raise_if_errors
 
 class ServiceType(Model):
     title = models.CharField(_("title"), max_length=40)
-    billing_per_hour = MoneyField(_("billing per hour"))
+    hourly_rate = MoneyField(_("hourly rate"))
     position = models.PositiveIntegerField(_("position"), default=0)
 
     class Meta:
