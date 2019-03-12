@@ -95,16 +95,6 @@ urlpatterns = [
         CreateRelatedView.as_view(model=LoggedCost, form_class=LoggedCostForm),
         name="projects_project_createcost",
     ),
-    url(
-        r"^cost/(?P<pk>\d+)/update/$",
-        UpdateView.as_view(model=LoggedCost, form_class=LoggedCostForm),
-        name="logbook_loggedcost_update",
-    ),
-    url(
-        r"^cost/(?P<pk>\d+)/delete/$",
-        DeleteView.as_view(model=LoggedCost, template_name="modal_confirm_delete.html"),
-        name="logbook_loggedcost_delete",
-    ),
     # Services
     url(
         r"^(?P<pk>\d+)/createservice/$",
