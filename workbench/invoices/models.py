@@ -6,6 +6,7 @@ from django.db import models
 from django.db.models import F, Q
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
@@ -267,6 +268,40 @@ class Invoice(ModelWithTotal):
             )
         else:
             return _("total CHF incl. tax") if self.liable_to_vat else _("total CHF")
+
+    @cached_property
+    def grouped_services(self):
+        invoice_services = list(self.services.all())
+        invoice_services_by_project_service = {
+            service.project_service_id: service
+            for service in invoice_services
+            if service.project_service_id
+        }
+
+        offers_list = []
+        offers = {}
+        for offer, project_services in self.project.grouped_services:
+            offers[offer] = []
+            offers_list.append((offer, offers[offer]))
+            print(offer)
+            for p_s in project_services:
+                offers[offer].append(
+                    {
+                        "project_service": p_s,
+                        "invoice_service": invoice_services_by_project_service.pop(
+                            p_s.id, None
+                        ),
+                        "service_cost": p_s.service_cost,
+                        "logged_hours": p_s.logged_hours,
+                        "logged_cost": (
+                            p_s.logged_cost + p_s.effort_rate * p_s.logged_hours
+                            if p_s.effort_rate is not None
+                            else None
+                        ),
+                    }
+                )
+
+        return offers_list
 
 
 @model_urls()
