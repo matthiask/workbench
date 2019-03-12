@@ -29,6 +29,7 @@
 
     <form method="POST" action="." class="form-horizontal">
       {% csrf_token %}
+      {% include 'fineforms/warnings.html' %}
       {% ff_errors form form.effort_form form.cost_form %}
       {% ff_fields form fields='offer,title,description' %}
 

@@ -16,19 +16,7 @@
     <form method="POST" action="." class="form-horizontal">
       {% csrf_token %}
 
-      {% if form.warnings %}
-        <div class="alert alert-warning alert-dismissable">
-          <button class="close" type="button" data-dismiss="alert" aria-hidden="true">&#215;</button>
-          {% for warning in form.warnings %}
-            {{ warning }}<br>
-          {% endfor %}
-
-          <br>
-          <input type="checkbox" name="ignore_warnings" id="id_ignore_warnings">
-          <label for="id_ignore_warnings">{% trans 'Yes, I am sure.' %}</label>
-        </div>
-      {% endif %}
-
+      {% include 'fineforms/warnings.html' %}
       {% ff_errors form %}
       {% ff_fields form %}
 
