@@ -178,18 +178,6 @@ class LoggedHoursForm(WarningsForm, ModelForm):
             self.fields["rendered_by"].disabled = True
             self.fields["rendered_on"].disabled = True
 
-    def clean_rendered_on(self):
-        rendered_on = self.cleaned_data.get("rendered_on")
-        if rendered_on and not self.instance.pk:
-            today = date.today()
-            if rendered_on < date.today() - timedelta(days=today.weekday()):
-                raise forms.ValidationError(
-                    _("Sorry, hours have to be logged in the same week.")
-                )
-            elif rendered_on > date.today() + timedelta(days=7):
-                raise forms.ValidationError(_("Sorry, too early."))
-        return rendered_on
-
     def clean(self):
         data = super().clean()
         errors = {}
@@ -199,6 +187,21 @@ class LoggedHoursForm(WarningsForm, ModelForm):
             )
         if self.project.closed_on:
             self.add_warning(_("This project is already closed."))
+
+        if all(
+            (not self.instance.pk, data.get("rendered_by"), data.get("rendered_on"))
+        ):
+            today = date.today()
+            if not data["rendered_by"].enforce_same_week_logging:
+                # Fine
+                pass
+            elif data["rendered_on"] < date.today() - timedelta(days=today.weekday()):
+                errors["rendered_on"] = _(
+                    "Sorry, hours have to be logged in the same week."
+                )
+            elif data["rendered_on"] > date.today() + timedelta(days=7):
+                errors["rendered_on"] = _("Sorry, too early.")
+
         raise_if_errors(errors)
         return data
 

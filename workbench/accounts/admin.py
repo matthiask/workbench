@@ -18,11 +18,18 @@ class UserAdmin(UserAdmin):
 
     list_display = ("email", "_short_name", "_full_name", "is_active", "is_admin")
     list_filter = ("is_active", "is_admin")
-    fieldsets = (
-        (None, {"fields": ("email", ("is_active", "is_admin"))}),
-        ("Personal info", {"fields": ("_short_name", "_full_name")}),
-    )
-    add_fieldsets = fieldsets
+    fieldsets = add_fieldsets = [
+        (
+            None,
+            {
+                "fields": [
+                    field.name
+                    for field in User._meta.get_fields()
+                    if field.editable and field.name not in {"password", "id"}
+                ]
+            },
+        )
+    ]
     search_fields = ("email", "_short_name", "_full_name")
     ordering = ("email",)
     filter_horizontal = ()

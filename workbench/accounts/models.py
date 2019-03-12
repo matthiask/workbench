@@ -45,6 +45,10 @@ class User(Model, AbstractBaseUser):
     _short_name = models.CharField(_("short name"), blank=True, max_length=30)
     _full_name = models.CharField(_("full name"), blank=True, max_length=200)
 
+    enforce_same_week_logging = models.BooleanField(
+        _("enforce same week logging"), default=True
+    )
+
     objects = UserManager()
 
     class Meta:
