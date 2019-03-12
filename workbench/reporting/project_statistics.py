@@ -12,7 +12,7 @@ Z = Decimal("0.0")
 def overdrawn_projects():
     projects = (
         Project.objects.open()
-        .filter(maintenance=False)
+        .filter(type=Project.ORDER)
         .select_related("customer", "owned_by")
     )
 
