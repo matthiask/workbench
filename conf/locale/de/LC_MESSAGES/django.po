@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-12 10:07+0100\n"
+"POT-Creation-Date: 2019-03-12 14:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,12 +45,16 @@ msgstr "Kurzer Name"
 msgid "full name"
 msgstr "Voller Name"
 
-#: workbench/accounts/models.py:52 workbench/awt/forms.py:11
+#: workbench/accounts/models.py:49
+msgid "enforce same week logging"
+msgstr "Stundenerfassung in der gleichen Woche erzwingen"
+
+#: workbench/accounts/models.py:56 workbench/awt/forms.py:11
 #: workbench/awt/models.py:228 workbench/awt/models.py:269
 msgid "user"
 msgstr "Benutzer"
 
-#: workbench/accounts/models.py:53
+#: workbench/accounts/models.py:57
 msgid "users"
 msgstr "Benutzer"
 
@@ -134,12 +138,11 @@ msgstr "Kontakt"
 
 #: workbench/activities/models.py:39 workbench/invoices/models.py:81
 #: workbench/logbook/forms.py:27 workbench/logbook/forms.py:75
-#: workbench/logbook/models.py:78 workbench/offers/models.py:38
+#: workbench/logbook/models.py:69 workbench/offers/models.py:38
 #: workbench/projects/models.py:70 workbench/projects/models.py:191
 #: workbench/templates/invoices/invoice_detail.html:20
 #: workbench/templates/logbook/loggedcost_detail.html:13
 #: workbench/templates/logbook/loggedhours_detail.html:13
-#: workbench/templates/projects/service_form.html:7
 #: workbench/templates/reporting/overdrawn_projects.html:15
 msgid "project"
 msgstr "Projekt"
@@ -173,7 +176,7 @@ msgstr "Fällig am"
 
 #: workbench/activities/models.py:59 workbench/deals/models.py:73
 #: workbench/invoices/models.py:103 workbench/invoices/models.py:368
-#: workbench/logbook/models.py:25 workbench/logbook/models.py:89
+#: workbench/logbook/models.py:24 workbench/logbook/models.py:80
 #: workbench/offers/models.py:34 workbench/projects/models.py:61
 #: workbench/services/models.py:46
 msgid "created at"
@@ -317,8 +320,8 @@ msgstr "startet am"
 
 #: workbench/awt/models.py:273 workbench/deals/models.py:63
 #: workbench/invoices/models.py:98 workbench/invoices/models.py:363
-#: workbench/logbook/forms.py:118 workbench/logbook/models.py:37
-#: workbench/logbook/models.py:101 workbench/offers/models.py:46
+#: workbench/logbook/forms.py:118 workbench/logbook/models.py:36
+#: workbench/logbook/models.py:92 workbench/offers/models.py:46
 #: workbench/projects/models.py:55 workbench/services/models.py:49
 #: workbench/templates/invoices/invoice_detail.html:31
 #: workbench/templates/logbook/loggedcost_detail.html:41
@@ -367,9 +370,9 @@ msgid ""
 "this record may be more confusing than archiving this one and creating a new "
 "record instead."
 msgstr ""
-"Diese Person ist der Kontakt der folgenden zugehörigen Objekte: %s."
-" Vielleicht ist es weniger verwirrend, diesen Eintrag zu archivieren"
-" und einen neuen zu erstellen als die Organisation zu ändern."
+"Diese Person ist der Kontakt der folgenden zugehörigen Objekte: %s. "
+"Vielleicht ist es weniger verwirrend, diesen Eintrag zu archivieren und "
+"einen neuen zu erstellen als die Organisation zu ändern."
 
 #: workbench/contacts/forms.py:167 workbench/contacts/forms.py:180
 #: workbench/contacts/forms.py:202 workbench/contacts/models.py:118
@@ -841,7 +844,7 @@ msgid "down payment total"
 msgstr "Anzahlungstotal"
 
 #: workbench/invoices/models.py:118 workbench/invoices/models.py:371
-#: workbench/logbook/models.py:96 workbench/services/models.py:61
+#: workbench/logbook/models.py:87 workbench/services/models.py:61
 #: workbench/templates/logbook/loggedcost_detail.html:37
 #: workbench/templates/reporting/monthly_invoicing.html:19
 msgid "third party costs"
@@ -986,86 +989,86 @@ msgstr[1] "%s Rechnungen erstellt"
 msgid "logbook"
 msgstr "Logbuch"
 
-#: workbench/logbook/forms.py:20 workbench/logbook/models.py:34
+#: workbench/logbook/forms.py:20 workbench/logbook/models.py:33
 msgid "rendered by"
 msgstr "Erbracht von"
 
-#: workbench/logbook/forms.py:68 workbench/logbook/models.py:27
-#: workbench/logbook/models.py:91
+#: workbench/logbook/forms.py:68 workbench/logbook/models.py:26
+#: workbench/logbook/models.py:82
 msgid "created by"
 msgstr "Erstellt von"
 
-#: workbench/logbook/forms.py:86 workbench/logbook/models.py:23
-#: workbench/logbook/models.py:84 workbench/services/models.py:73
+#: workbench/logbook/forms.py:86 workbench/logbook/models.py:22
+#: workbench/logbook/models.py:75 workbench/services/models.py:73
 #: workbench/templates/logbook/loggedcost_detail.html:17
 #: workbench/templates/logbook/loggedhours_detail.html:17
-#: workbench/templates/projects/project_detail_services.html:113
+#: workbench/templates/projects/project_detail_services.html:114
 msgid "service"
 msgstr "Leistung"
 
-#: workbench/logbook/forms.py:189
-msgid "Sorry, hours have to be logged in the same week."
-msgstr "Tut mir leid, Stunden müssen in der gleichen Woche erfasst werden."
-
-#: workbench/logbook/forms.py:198
+#: workbench/logbook/forms.py:186
 msgid "This field is required unless you create a new service."
 msgstr "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung."
 
-#: workbench/logbook/forms.py:201 workbench/logbook/forms.py:245
+#: workbench/logbook/forms.py:189 workbench/logbook/forms.py:248
 msgid "This project is already closed."
 msgstr "Dieses Projekt wurde schon geschlossen."
 
-#: workbench/logbook/models.py:29 workbench/logbook/models.py:93
+#: workbench/logbook/forms.py:200
+msgid "Sorry, hours have to be logged in the same week."
+msgstr "Tut mir leid, Stunden müssen in der gleichen Woche erfasst werden."
+
+#: workbench/logbook/forms.py:203
+msgid "Sorry, too early."
+msgstr "Tut mir leid, zu früh."
+
+#: workbench/logbook/models.py:28 workbench/logbook/models.py:84
 msgid "rendered on"
 msgstr "Erbracht am"
 
-#: workbench/logbook/models.py:36 workbench/services/models.py:56
+#: workbench/logbook/models.py:35 workbench/services/models.py:56
 #: workbench/templates/awt/year_detail.html:42
 #: workbench/templates/logbook/loggedhours_detail.html:35
 #: workbench/templates/projects/project_detail_overview.html:112
 #: workbench/templates/projects/project_detail_services.html:95
-#: workbench/templates/projects/project_detail_services.html:116
+#: workbench/templates/projects/project_detail_services.html:117
 #: workbench/templates/projects/project_list.html:21
 #: workbench/templates/start.html:40
 msgid "hours"
 msgstr "Stunden"
 
-#: workbench/logbook/models.py:44 workbench/logbook/models.py:108
+#: workbench/logbook/models.py:43 workbench/logbook/models.py:99
 msgid "invoice service"
 msgstr "Rechnungsleistung"
 
-#: workbench/logbook/models.py:47 workbench/logbook/models.py:111
+#: workbench/logbook/models.py:46 workbench/logbook/models.py:102
 msgid "archived at"
 msgstr "Archiviert um"
 
-#: workbench/logbook/models.py:54 workbench/logbook/models.py:55
+#: workbench/logbook/models.py:53 workbench/logbook/models.py:54
 #: workbench/templates/base.html:58
 #: workbench/templates/reporting/overdrawn_projects.html:18
 msgid "logged hours"
 msgstr "Erfasste Stunden"
 
-#: workbench/logbook/models.py:68
-msgid "Sorry, too early."
-msgstr "Tut mir leid, zu früh."
-
-#: workbench/logbook/models.py:94 workbench/services/models.py:59
+#: workbench/logbook/models.py:85 workbench/services/models.py:59
 #: workbench/templates/logbook/loggedcost_detail.html:34
 #: workbench/templates/projects/project_detail_overview.html:115
 #: workbench/templates/projects/project_detail_services.html:99
-#: workbench/templates/projects/project_detail_services.html:119
-#: workbench/templates/projects/service_form.html:48
+#: workbench/templates/projects/project_detail_services.html:120
+#: workbench/templates/projects/service_form.html:28
 msgid "cost"
 msgstr "Kosten"
 
-#: workbench/logbook/models.py:99 workbench/services/models.py:65
+#: workbench/logbook/models.py:90 workbench/services/models.py:65
 msgid "Total incl. tax for third-party services."
 msgstr "Total inkl. MwSt bei Fremdleistungen."
 
-#: workbench/logbook/models.py:117
+#: workbench/logbook/models.py:108
 msgid "logged cost"
 msgstr "Erfasste Kosten"
 
-#: workbench/logbook/models.py:118 workbench/templates/base.html:59
+#: workbench/logbook/models.py:109 workbench/templates/base.html:59
 msgid "logged costs"
 msgstr "Erfasste Kosten"
 
@@ -1174,7 +1177,7 @@ msgstr "geschlossen am %s"
 msgid "Not bound to a particular service."
 msgstr "Nicht mit einer bestimmten Leistung verbunden."
 
-#: workbench/projects/models.py:208
+#: workbench/projects/models.py:211
 msgid ""
 "Cannot modify a service bound to an offer which is not in preparation "
 "anymore."
@@ -1182,7 +1185,7 @@ msgstr ""
 "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht mehr "
 "bearbeiten."
 
-#: workbench/projects/views.py:76
+#: workbench/projects/views.py:64
 msgid "Cannot modify an offer which is not in preparation anymore."
 msgstr "Kann Offerte, welche nicht in Vorbereitung ist, nicht mehr bearbeiten."
 
@@ -1246,8 +1249,6 @@ msgstr "%(object)s löschen"
 #: workbench/templates/generic/object_form.html:37
 #: workbench/templates/modal_confirm_delete.html:14
 #: workbench/templates/projects/comment_confirm_delete.html:14
-#: workbench/templates/projects/service_form.html:61
-#: workbench/templates/projects/service_merge.html:37
 msgid "cancel"
 msgstr "Abbruch"
 
@@ -1257,6 +1258,7 @@ msgstr "Abbruch"
 #: workbench/templates/logbook/loggedhours_form.html:30
 #: workbench/templates/modal_confirm_delete.html:16
 #: workbench/templates/projects/comment_confirm_delete.html:16
+#: workbench/templates/projects/service_form.html:40
 msgid "delete"
 msgstr "Löschen"
 
@@ -1399,16 +1401,12 @@ msgstr "Abmelden"
 
 #: workbench/templates/contacts/person_form.html:10
 #: workbench/templates/generic/object_form.html:13
-#: workbench/templates/projects/service_form.html:24
-#: workbench/templates/projects/service_merge.html:18
 #, python-format
 msgid "Update %(object)s"
 msgstr "%(object)s bearbeiten"
 
 #: workbench/templates/contacts/person_form.html:12
 #: workbench/templates/generic/object_form.html:16
-#: workbench/templates/projects/service_form.html:26
-#: workbench/templates/projects/service_merge.html:20
 #, python-format
 msgid "Create %(class)s"
 msgstr "%(class)s erstellen"
@@ -1435,8 +1433,7 @@ msgstr "Bitte korrigiere die folgenden Fehler:"
 #: workbench/templates/logbook/loggedcost_form.html:16
 #: workbench/templates/logbook/loggedhours_form.html:37
 #: workbench/templates/modalform.html:24
-#: workbench/templates/projects/service_form.html:57
-#: workbench/templates/projects/service_merge.html:33
+#: workbench/templates/projects/service_form.html:43
 msgid "save"
 msgstr "Sichern"
 
@@ -1528,7 +1525,7 @@ msgstr "Nach oben"
 msgid "Move down"
 msgstr "Nach unten"
 
-#: workbench/templates/projects/service_form.html:39
+#: workbench/templates/projects/service_form.html:19
 msgid "effort"
 msgstr "Aufwand"
 
