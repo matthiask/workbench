@@ -110,6 +110,9 @@
     <a href="{{ project.urls.createhours }}" class="btn btn-secondary" data-toggle="ajaxmodal" data-createhours>
       {% include "svg/plus.svg" %}
       {% trans 'hours' %}</a>
+    <a href="{{ project.urls.createcost }}" class="btn btn-secondary" data-toggle="ajaxmodal">
+      {% include "svg/plus.svg" %}
+      {% trans 'cost' %}</a>
     <a href="{{ project.urls.update }}" class="btn btn-secondary">
       {% trans 'Update' %}</a>
     <a href="{{ project.urls.delete }}" class="btn btn-outline-danger float-right">

@@ -9,7 +9,8 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.logbook.models import LoggedHours, LoggedCost
 from workbench.projects.models import Project, Service
-from workbench.tools.forms import ModelForm, Picker, Textarea
+from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm
+from workbench.tools.validation import raise_if_errors
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -109,7 +110,7 @@ class LoggedCostSearchForm(forms.Form):
             return xlsx.to_response("costs.xlsx")
 
 
-class LoggedHoursForm(ModelForm):
+class LoggedHoursForm(WarningsForm, ModelForm):
     user_fields = default_to_current_user = ("rendered_by",)
 
     service_title = forms.CharField(label=_("title"), required=False, max_length=200)
@@ -191,14 +192,14 @@ class LoggedHoursForm(ModelForm):
 
     def clean(self):
         data = super().clean()
+        errors = {}
         if not data.get("service") and not data.get("service_title"):
-            raise forms.ValidationError(
-                {
-                    "service": _(
-                        "This field is required unless you create a new service."
-                    )
-                }
+            errors["service"] = _(
+                "This field is required unless you create a new service."
             )
+        if self.project.closed_on:
+            self.add_warning(_("This project is already closed."))
+        raise_if_errors(errors)
         return data
 
     def save(self):
@@ -217,7 +218,7 @@ class LoggedHoursForm(ModelForm):
         return instance
 
 
-class LoggedCostForm(ModelForm):
+class LoggedCostForm(WarningsForm, ModelForm):
     class Meta:
         model = LoggedCost
         fields = ("service", "rendered_on", "cost", "third_party_costs", "description")
@@ -237,6 +238,12 @@ class LoggedCostForm(ModelForm):
 
         super().__init__(*args, **kwargs)
         self.fields["service"].choices = self.project.services.choices()
+
+    def clean(self):
+        data = super().clean()
+        if self.project.closed_on:
+            self.add_warning(_("This project is already closed."))
+        return data
 
     def save(self):
         instance = super().save(commit=False)
