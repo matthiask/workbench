@@ -96,12 +96,6 @@ class User(Model, AbstractBaseUser):
             "week": sum(per_day.values(), Decimal("0.0")),
         }
 
-    @property
-    def avatar(self):
-        return "https://www.gravatar.com/avatar/%s" % (
-            hashlib.md5(self.email.lower().encode("utf-8")).hexdigest(),
-        )
-
     @cached_property
     def recent_hours(self):
         return (
