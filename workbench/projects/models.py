@@ -7,7 +7,7 @@ from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import gettext_lazy as _, gettext
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
@@ -118,7 +118,7 @@ class Project(Model):
         parts = [self.get_type_display()]
         if self.closed_on:
             parts.append(
-                ugettext("closed on %s") % local_date_format(self.closed_on, "d.m.Y")
+                gettext("closed on %s") % local_date_format(self.closed_on, "d.m.Y")
             )
         return ", ".join(parts)
 

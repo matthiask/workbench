@@ -1,5 +1,5 @@
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from workbench.contacts.models import Organization, Person
 from workbench.deals.models import Deal, Stage

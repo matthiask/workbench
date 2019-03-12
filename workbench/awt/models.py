@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models import Sum
 from django.db.models.functions import ExtractMonth
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.awt.utils import days_per_month, monthly_days

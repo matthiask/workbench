@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
 
@@ -82,7 +82,7 @@ class ModelForm(forms.ModelForm):
                 if data.get("customer") != data.get("contact").organization:
                     raise forms.ValidationError(
                         {
-                            "contact": ugettext(
+                            "contact": gettext(
                                 "The contact %(person)s does not belong to"
                                 "  %(organization)s."
                             )

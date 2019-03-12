@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from workbench import generic
 from workbench.credit_control.forms import AssignCreditEntriesForm

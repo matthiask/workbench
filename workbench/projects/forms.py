@@ -1,7 +1,7 @@
 from datetime import date
 
 from django import forms, http
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person

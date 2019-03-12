@@ -3,7 +3,7 @@ from datetime import date
 from django import forms, http
 from django.db.models import Q
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm

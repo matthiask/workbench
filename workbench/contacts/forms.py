@@ -3,7 +3,7 @@ from collections import OrderedDict
 from django import forms
 from django.forms.models import inlineformset_factory
 from django.template.defaultfilters import linebreaksbr
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from workbench.contacts.models import (
     Group,

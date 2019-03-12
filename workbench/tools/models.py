@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models import ProtectedError
 from django.db.models.deletion import Collector
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import gettext_lazy as _, gettext
 
 from workbench.tools.search import search
 
@@ -45,7 +45,7 @@ class Model(models.Model):
         except ProtectedError as exc:
             messages.error(
                 request,
-                ugettext(
+                gettext(
                     "Cannot delete '%(object)s'"
                     " because of related objects (%(related)s)."
                 )

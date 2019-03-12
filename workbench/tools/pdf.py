@@ -3,7 +3,7 @@ from decimal import Decimal as D
 from functools import partial
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from pdfdocument.document import (
     Frame,

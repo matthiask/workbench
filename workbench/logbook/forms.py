@@ -2,7 +2,7 @@ from datetime import date, timedelta
 from decimal import Decimal, ROUND_UP
 
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 from workbench.accounts.models import User
