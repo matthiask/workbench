@@ -22,7 +22,9 @@ DEBUG = any(arg in ("runserver",) for arg in sys.argv)
 TESTING = any(arg in ("test",) for arg in sys.argv)
 LIVE = env("LIVE", default=False)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
-ADMINS = (("Matthias Kestenholz", "mk@feinheit.ch"),)
+ADMINS = [("Matthias Kestenholz", "mk@feinheit.ch")]
+MANAGERS = ADMINS
+DEFAULT_FROM_EMAIL = SERVER_EMAIL = "metronom@metronom.feinheit.ch"
 
 INSTALLED_APPS = [
     a

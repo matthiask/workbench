@@ -34,6 +34,9 @@ class Command(BaseCommand):
                 for invoice in invoices
             )
             mail = EmailMultiAlternatives(
-                _("recurring invoices"), invoices, to=[owner.email]
+                _("recurring invoices"),
+                invoices,
+                to=[owner.email],
+                bcc=[row[1] for row in settings.MANAGERS],
             )
             mail.send()

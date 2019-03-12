@@ -1,6 +1,5 @@
 from datetime import date, timedelta
 from decimal import Decimal
-import hashlib
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
