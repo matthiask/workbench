@@ -7,7 +7,11 @@ from workbench.invoices.forms import (
     ServiceForm,
 )
 from workbench.invoices.models import Invoice, Service
-from workbench.invoices.views import InvoicePDFView, ServicesInvoiceUpdateView
+from workbench.invoices.views import (
+    InvoicePDFView,
+    CreateRelatedView,
+    ServicesInvoiceUpdateView,
+)
 from workbench.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
 
@@ -49,6 +53,11 @@ urlpatterns = [
     ),
     url(r"^(?P<pk>\d+)/pdf/$", InvoicePDFView.as_view(), name="invoices_invoice_pdf"),
     # Services
+    url(
+        r"^(?P<pk>\d+)/createservice/$",
+        CreateRelatedView.as_view(model=Service, form_class=ServiceForm),
+        name="invoices_invoice_createservice",
+    ),
     url(
         r"^services/(?P<pk>[0-9]+)/update/$",
         UpdateView.as_view(model=Service, form_class=ServiceForm),

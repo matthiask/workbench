@@ -432,6 +432,18 @@ class ServiceForm(ModelForm):
         ]
         widgets = {"description": Textarea}
 
+    def __init__(self, *args, **kwargs):
+        self.invoice = kwargs.pop("invoice", None)
+        if not self.invoice:
+            self.invoice = kwargs["instance"].invoice
+        super().__init__(*args, **kwargs)
+
+    def save(self):
+        instance = super().save(commit=False)
+        instance.invoice = self.invoice
+        instance.save()
+        return instance
+
 
 class RecurringInvoiceSearchForm(forms.Form):
     s = forms.ChoiceField(

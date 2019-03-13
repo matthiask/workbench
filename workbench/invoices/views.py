@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from django.contrib import messages
 from django.db.models import Sum
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ngettext
 
 from workbench import generic
@@ -24,6 +24,12 @@ class InvoicePDFView(generic.DetailView):
         pdf.generate()
 
         return response
+
+
+class CreateRelatedView(generic.CreateView):
+    def get_form(self, data=None, files=None, **kwargs):
+        self.invoice = get_object_or_404(Invoice, pk=self.kwargs.pop("pk"))
+        return super().get_form(data, files, invoice=self.invoice, **kwargs)
 
 
 class ServicesInvoiceUpdateView(generic.DetailView):

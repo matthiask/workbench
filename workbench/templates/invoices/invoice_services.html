@@ -56,44 +56,50 @@
         </td>
 
         <td>
-          {% if service.project_service.effort_rate is None %}?
-          {% else %}{{ service.project_service.effort_rate|currency }}h
+          {% if service.project_service %}
+            {% if service.project_service.effort_rate is None %}?
+            {% else %}{{ service.project_service.effort_rate|currency }}h
+            {% endif %}
           {% endif %}
         </td>
 
         <td>
-          {% if service.project_service.effort_rate is None %}
-            {{ service.logged_hours|hours }}
-          {% else %}
-            <strong>{% trans 'service' %}</strong><br>
-            <a href="?service={{ service.project_service.pk }}&amp;mode=service_hours" class="btn btn-outline-secondary btn-sm text-nowrap">
-              {{ service.project_service.service_hours|hours }}
-              {% include 'svg/chevron-right.svg' %}
-            </a>
-            <br>
-            <strong>{% trans 'logbook' %}</strong><br>
-            <a href="?service={{ service.project_service.pk }}&amp;mode=logged_hours" class="btn btn-outline-secondary btn-sm text-nowrap">
+          {% if service.project_service %}
+            {% if service.project_service.effort_rate is None %}
               {{ service.logged_hours|hours }}
-              {% include 'svg/chevron-right.svg' %}
-            </a>
+            {% else %}
+              <strong>{% trans 'service' %}</strong><br>
+              <a href="?service={{ service.project_service.pk }}&amp;mode=service_hours" class="btn btn-outline-secondary btn-sm text-nowrap">
+                {{ service.project_service.service_hours|hours }}
+                {% include 'svg/chevron-right.svg' %}
+              </a>
+              <br>
+              <strong>{% trans 'logbook' %}</strong><br>
+              <a href="?service={{ service.project_service.pk }}&amp;mode=logged_hours" class="btn btn-outline-secondary btn-sm text-nowrap">
+                {{ service.logged_hours|hours }}
+                {% include 'svg/chevron-right.svg' %}
+              </a>
+            {% endif %}
           {% endif %}
         </td>
 
         <td>
-          {% if not service.project_service.pk %}
-            {{ service.cost|currency }}
-          {% else %}
-            <strong>{% trans 'service' %}</strong><br>
-            <a href="?service={{ service.project_service.pk }}&amp;mode=service_cost" class="btn btn-outline-secondary btn-sm text-nowrap">
-              {{ service.project_service.cost|currency }}
-              {% include 'svg/chevron-right.svg' %}
-            </a>
-            <br>
-            <strong>{% trans 'logbook' %}</strong><br>
-            <a href="?service={{ service.project_service.pk }}&amp;mode=logged_cost" class="btn btn-outline-secondary btn-sm text-nowrap">
+          {% if service.project_service %}
+            {% if not service.project_service.pk %}
               {{ service.logged_cost|currency }}
-              {% include 'svg/chevron-right.svg' %}
-            </a>
+            {% else %}
+              <strong>{% trans 'service' %}</strong><br>
+              <a href="?service={{ service.project_service.pk }}&amp;mode=service_cost" class="btn btn-outline-secondary btn-sm text-nowrap">
+                {{ service.project_service.cost|currency }}
+                {% include 'svg/chevron-right.svg' %}
+              </a>
+              <br>
+              <strong>{% trans 'logbook' %}</strong><br>
+              <a href="?service={{ service.project_service.pk }}&amp;mode=logged_cost" class="btn btn-outline-secondary btn-sm text-nowrap">
+                {{ service.logged_cost|currency }}
+                {% include 'svg/chevron-right.svg' %}
+              </a>
+            {% endif %}
           {% endif %}
         </td>
 
@@ -129,6 +135,16 @@
       </tr>
       {% endfor %}
     {% endfor %}
+    <tr>
+      <td colspan="5"></td>
+      <td class="text-right" colspan="4">
+        <a href="{{ invoice.urls.createservice }}" class="btn btn-secondary btn-sm"
+                                                   data-toggle="ajaxmodal">
+          {% include 'svg/plus.svg' %} {% trans 'service' %}
+        </a>
+      </td>
+      <td></td>
+    </tr>
     <tfoot class="bg-light">
       <tr>
         <th colspan="8">{% trans 'subtotal' %}</th>
