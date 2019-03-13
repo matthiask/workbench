@@ -20,23 +20,23 @@
         <th>{% trans 'hourly rate' %}</th>
         <th>{% trans 'effort' %}</th>
         <th>{% trans 'cost' %}</th>
-        <th colspan="4">{% trans 'invoice service' %}</th>
+        <th class="bg-light" colspan="5">{% trans 'invoice service' %}</th>
       </tr>
     </thead>
     {% for offer, services in invoice.grouped_services %}
       <thead>
         <tr>
-          <th colspan="9">
+          <th colspan="5">
             {% link_or_none offer %}
             <span class="badge badge-{{ offer.status_css }}">{{ offer.pretty_status }}</span>
-
             {{ offer.short_total_excl }}
           </th>
+          <th class="bg-light" colspan="5"></th>
         </tr>
       </thead>
       {% for service in services %}
       <tr>
-        <td>
+        <td style="max-width:20em">
           <strong>{{ service.project_service.title }}</strong><br>
           {{ service.project_service.description|linebreaksbr }}
         </td>
@@ -97,51 +97,69 @@
           {% endif %}
         </td>
 
-        <td>
-          <a href="{{ service.invoice_service.get_absolute_url }}">
-            {{ service.invoice_service.title }}
-          </a>
+        <td class="bg-light" style="max-width:20em">
+          <strong>{{ service.invoice_service.title }}</strong><br>
+          {{ service.invoice_service.description|linebreaksbr }}
         </td>
-        <td class="text-right text-nowrap">
+        <td class="bg-light text-right text-nowrap">
           {{ service.invoice_service.service_hours|hours }} à
           {{ service.invoice_service.effort_rate|currency }}/h
         </td>
-        <td class="text-right">
+        <td class="bg-light text-right">
           {{ service.invoice_service.cost|currency }}
         </td>
-        <td class="text-right">
+        <td class="bg-light text-right">
           {{ service.invoice_service.service_cost|currency }}
+        </td>
+        <td class="bg-light">
+          {% if service.invoice_service.pk %}
+            <a href="{# { service.invoice_service.urls.update } #}"
+              class="btn btn-outline-secondary btn-sm"
+              data-toggle="ajaxmodal">
+              {% include 'svg/pencil.svg' %}
+            </a>
+            <br>
+            <a href="?invoice_service={{ service.invoice_service.pk }}&amp;mode=remove"
+              class="btn btn-outline-secondary btn-sm">
+              {% include 'svg/trashcan.svg' %}
+            </a>
+          {% endif %}
         </td>
 
       </tr>
       {% endfor %}
     {% endfor %}
-    <tfoot>
+    <tfoot class="bg-light">
       <tr>
         <th colspan="8">{% trans 'subtotal' %}</th>
         <th class="text-right">{{ invoice.subtotal|currency }}</th>
+        <th></th>
       </tr>
       {% if invoice.discount %}
       <tr>
         <th colspan="8">{% trans 'discount' %}</th>
         <th class="text-right">{{ invoice.discount|currency }}</th>
+        <th></th>
       </tr>
       {% endif %}
       {% if invoice.down_payment_total %}
       <tr>
         <th colspan="8">{% trans 'down payment total' %}</th>
         <th class="text-right">{{ invoice.down_payment_total|currency }}</th>
+        <th></th>
       </tr>
       {% endif %}
       {% if invoice.liable_to_vat and invoice.subtotal != invoice.total_excl_tax %}
         <tr>
           <th colspan="8">{% trans 'total excl. tax' %}</th>
           <th class="text-right">{{ invoice.total_excl_tax|currency }}</th>
+          <th></th>
         </tr>
       {% endif %}
       <tr>
         <th colspan="8">{{ invoice.total_title }}</th>
         <th class="text-right">{{ invoice.total|currency }}</th>
+        <th></th>
       </tr>
     </tfoot>
   </table>

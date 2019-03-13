@@ -285,6 +285,7 @@ class Invoice(ModelWithTotal):
             offers[offer] = []
             offers_list.append((offer, offers[offer]))
             for p_s in project_services:
+                # FIXME only not archived services!
                 offers[offer].append(
                     {
                         "project_service": p_s,

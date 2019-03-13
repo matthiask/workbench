@@ -36,46 +36,57 @@ class ServicesInvoiceUpdateView(generic.DetailView):
             return super().get(request, *args, **kwargs)
 
         self.object = self.get_object()
-        service = self.object.project.services.get(pk=request.GET["service"])
-        invoice_service = Service.objects.filter(
-            invoice=self.object, project_service=service
-        ).first()
-        if not invoice_service:
-            invoice_service = Service(
-                invoice=self.object,
-                project_service=service,
-                title=service.title,
-                description=service.description,
-                position=service.position,
-            )
-
         mode = request.GET.get("mode")
-        if mode == "description":
-            invoice_service.title = service.title
-            invoice_service.description = service.description
-            invoice_service.position = service.position
-        elif mode == "service_hours":
-            invoice_service.effort_type = service.effort_type
-            invoice_service.effort_rate = service.effort_rate
-            invoice_service.effort_hours = service.effort_hours
-        elif mode == "logged_hours":
-            invoice_service.effort_type = service.effort_type
-            invoice_service.effort_rate = service.effort_rate
-            invoice_service.effort_hours = (
-                service.loggedhours.order_by().aggregate(Sum("hours"))["hours__sum"]
-                or Z
-            )
-        elif mode == "service_cost":
-            invoice_service.cost = service.cost
-            invoice_service.third_party_costs = service.third_party_costs
-        elif mode == "logged_cost":
-            logged = service.loggedcosts.all()
-            invoice_service.cost = sum((log.cost for log in logged), Z)
-            invoice_service.third_party_costs = sum(
-                (log.third_party_costs or Z for log in logged), Z
-            )
 
-        invoice_service.save()
+        if "service" in request.GET:
+            service = self.object.project.services.get(pk=request.GET["service"])
+            invoice_service = Service.objects.filter(
+                invoice=self.object, project_service=service
+            ).first()
+            if not invoice_service:
+                invoice_service = Service(
+                    invoice=self.object,
+                    project_service=service,
+                    title=service.title,
+                    description=service.description,
+                    position=service.position,
+                )
+
+            if mode == "description":
+                invoice_service.title = service.title
+                invoice_service.description = service.description
+                invoice_service.position = service.position
+            elif mode == "service_hours":
+                invoice_service.effort_type = service.effort_type
+                invoice_service.effort_rate = service.effort_rate
+                invoice_service.effort_hours = service.effort_hours
+            elif mode == "logged_hours":
+                invoice_service.effort_type = service.effort_type
+                invoice_service.effort_rate = service.effort_rate
+                invoice_service.effort_hours = (
+                    service.loggedhours.order_by().aggregate(Sum("hours"))["hours__sum"]
+                    or Z
+                )
+            elif mode == "service_cost":
+                invoice_service.cost = service.cost
+                invoice_service.third_party_costs = service.third_party_costs
+            elif mode == "logged_cost":
+                logged = service.loggedcosts.all()
+                invoice_service.cost = sum((log.cost for log in logged), Z)
+                invoice_service.third_party_costs = sum(
+                    (log.third_party_costs or Z for log in logged), Z
+                )
+
+            invoice_service.save()
+
+            # FIXME archival / assignment of services
+
+        elif "invoice_service" in request.GET:
+            service = self.object.services.get(pk=request.GET["invoice_service"])
+
+            if mode == "remove":
+                service.delete()
+
         self.object.save()
 
         return redirect(".")
