@@ -20,8 +20,7 @@ from pdfdocument.document import (
 )
 from pdfdocument.utils import pdf_response as _pdf_response
 
-from workbench.tools.formats import local_date_format
-from workbench.templatetags.workbench import currency
+from workbench.tools.formats import currency, local_date_format
 
 
 register_fonts_from_paths(font_name="Rep", **settings.WORKBENCH.FONTS)

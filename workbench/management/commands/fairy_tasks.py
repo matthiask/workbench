@@ -7,8 +7,7 @@ from django.utils.translation import activate, gettext as _
 
 from workbench.accounts.middleware import set_user_name
 from workbench.invoices.models import RecurringInvoice
-from workbench.templatetags.workbench import currency
-from workbench.tools.formats import local_date_format
+from workbench.tools.formats import currency, local_date_format
 
 
 class Command(BaseCommand):

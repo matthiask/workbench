@@ -21,19 +21,17 @@
         <th>{% trans 'effort' %}</th>
         <th>{% trans 'cost' %}</th>
         <th colspan="4">{% trans 'invoice service' %}</th>
-        <th class="text-right">{% trans 'total excl. tax' %}</th>
-        <th class="text-right">{% trans 'discount' %}</th>
       </tr>
     </thead>
     {% for offer, services in invoice.grouped_services %}
       <thead>
         <tr>
-          <th colspan="8">
+          <th colspan="9">
             {% link_or_none offer %}
             <span class="badge badge-{{ offer.status_css }}">{{ offer.pretty_status }}</span>
+
+            {{ offer.short_total_excl }}
           </th>
-          <td class="text-right">{{ offer.total_excl_tax|currency }}</td>
-          <td class="text-right">{{ offer.discount|currency }}</td>
         </tr>
       </thead>
       {% for service in services %}
@@ -118,6 +116,34 @@
       </tr>
       {% endfor %}
     {% endfor %}
+    <tfoot>
+      <tr>
+        <th colspan="8">{% trans 'subtotal' %}</th>
+        <th class="text-right">{{ invoice.subtotal|currency }}</th>
+      </tr>
+      {% if invoice.discount %}
+      <tr>
+        <th colspan="8">{% trans 'discount' %}</th>
+        <th class="text-right">{{ invoice.discount|currency }}</th>
+      </tr>
+      {% endif %}
+      {% if invoice.down_payment_total %}
+      <tr>
+        <th colspan="8">{% trans 'down payment total' %}</th>
+        <th class="text-right">{{ invoice.down_payment_total|currency }}</th>
+      </tr>
+      {% endif %}
+      {% if invoice.liable_to_vat and invoice.subtotal != invoice.total_excl_tax %}
+        <tr>
+          <th colspan="8">{% trans 'total excl. tax' %}</th>
+          <th class="text-right">{{ invoice.total_excl_tax|currency }}</th>
+        </tr>
+      {% endif %}
+      <tr>
+        <th colspan="8">{{ invoice.total_title }}</th>
+        <th class="text-right">{{ invoice.total|currency }}</th>
+      </tr>
+    </tfoot>
   </table>
 
 

@@ -9,10 +9,9 @@ from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import Invoice, RecurringInvoice
-from workbench.tools.formats import local_date_format
+from workbench.tools.formats import currency, local_date_format
 from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm
 from workbench.tools.models import Z
-from workbench.templatetags.workbench import currency
 
 
 class InvoiceSearchForm(forms.Form):
@@ -183,7 +182,7 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
             self.fields["subtotal"].help_text = format_html(
                 '<a href="../update-services/" target="_blank"'
                 ' class="btn btn-secondary btn-sm float-right">{}</a>',
-                _("Update invoice services")
+                _("Update invoice services"),
             )
 
         if self.instance.type != Invoice.DOWN_PAYMENT and self.instance.project_id:

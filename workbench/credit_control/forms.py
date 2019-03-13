@@ -11,8 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.credit_control.models import CreditEntry
 from workbench.invoices.models import Invoice
-from workbench.templatetags.workbench import currency
-from workbench.tools.formats import local_date_format
+from workbench.tools.formats import currency, local_date_format
 from workbench.tools.forms import ModelForm, Picker, Textarea
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
