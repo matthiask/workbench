@@ -181,7 +181,8 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
             self.fields["third_party_costs"].disabled = True
 
             self.fields["subtotal"].help_text = format_html(
-                '<a href="../update-services/" target="_blank">{}</a>',
+                '<a href="../update-services/" target="_blank"'
+                ' class="btn btn-secondary btn-sm float-right">{}</a>',
                 _("Update invoice services")
             )
 
