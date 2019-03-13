@@ -9,6 +9,9 @@ TRUNCATE projects_project RESTART IDENTITY CASCADE;
 TRUNCATE services_servicetype RESTART IDENTITY CASCADE;
 TRUNCATE audit_logged_actions RESTART IDENTITY CASCADE;
 TRUNCATE deals_stage RESTART IDENTITY CASCADE;
+TRUNCATE invoices_recurringinvoice RESTART IDENTITY CASCADE;
+TRUNCATE awt_year RESTART IDENTITY CASCADE;
+
 
 SET application_name TO 'Import';
 
@@ -389,8 +392,6 @@ WHERE invoices_invoice.id=p.invoice_id;
 -- Import recurring invoices
 --
 
-TRUNCATE invoices_recurringinvoice RESTART IDENTITY CASCADE;
-
 INSERT INTO invoices_recurringinvoice (
   id,
   subtotal,
@@ -638,10 +639,6 @@ SELECT SETVAL('public.services_servicetype_id_seq', COALESCE(MAX(id), 1) ) FROM 
 --
 -- Import annual working time data
 --
-
-TRUNCATE awt_year RESTART IDENTITY CASCADE;
-TRUNCATE awt_employment RESTART IDENTITY CASCADE;
-TRUNCATE awt_absence RESTART IDENTITY CASCADE;
 
 INSERT INTO awt_year (
   year,
