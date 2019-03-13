@@ -8,7 +8,8 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
-from workbench.invoices.models import Invoice, RecurringInvoice
+from workbench.invoices.models import Invoice, Service, RecurringInvoice
+from workbench.services.models import ServiceType
 from workbench.tools.formats import currency, local_date_format
 from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm
 from workbench.tools.models import Z
@@ -408,6 +409,28 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
 
         if person:
             self.add_postal_address_selection(person=person)
+
+
+class ServiceForm(ModelForm):
+    service_type = forms.ModelChoiceField(
+        ServiceType.objects.all(),
+        label=ServiceType._meta.verbose_name,
+        required=False,
+        help_text=_("Optional, but useful for quickly filling the fields below."),
+    )
+
+    class Meta:
+        model = Service
+        fields = [
+            "title",
+            "description",
+            "effort_type",
+            "effort_hours",
+            "effort_rate",
+            "cost",
+            "third_party_costs",
+        ]
+        widgets = {"description": Textarea}
 
 
 class RecurringInvoiceSearchForm(forms.Form):

@@ -1,5 +1,3 @@
-import json
-
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import gettext as _
@@ -8,28 +6,12 @@ from workbench import generic
 from workbench.offers.models import Offer
 from workbench.projects.forms import ServiceForm
 from workbench.projects.models import Project, Service
-from workbench.services.models import ServiceType
-
-
-def default_service_types():
-    return json.dumps(
-        {
-            str(type.id): {
-                "effort_type": type.title,
-                "effort_rate": int(type.hourly_rate),
-            }
-            for type in ServiceType.objects.all()
-        }
-    )
 
 
 class CreateRelatedView(generic.CreateView):
     def get_form(self, data=None, files=None, **kwargs):
         self.project = get_object_or_404(Project, pk=self.kwargs.pop("pk"))
         return super().get_form(data, files, project=self.project, **kwargs)
-
-    def default_service_types(self):
-        return default_service_types()
 
 
 class CreateAndUpdateView(CreateRelatedView):
@@ -51,9 +33,6 @@ class UpdateServiceView(generic.UpdateView):
 
     def get_success_url(self):
         return self.object.project.urls.url("services")
-
-    def default_service_types(self):
-        return default_service_types()
 
 
 class MoveServiceView(generic.DetailView):

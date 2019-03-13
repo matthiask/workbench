@@ -1,3 +1,5 @@
+import json
+
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse, HttpResponseRedirect
@@ -7,8 +9,25 @@ from django.utils.translation import gettext as _
 
 import vanilla
 
+from workbench.services.models import ServiceType
+
+
+def default_service_types():
+    return json.dumps(
+        {
+            str(type.id): {
+                "effort_type": type.title,
+                "effort_rate": int(type.hourly_rate),
+            }
+            for type in ServiceType.objects.all()
+        }
+    )
+
 
 class ToolsMixin(object):
+    def default_service_types(self):
+        return default_service_types()
+
     def get_template_names(self):
         """
         Returns a list of template names to use when rendering the response.

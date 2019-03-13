@@ -113,7 +113,7 @@
         </td>
         <td class="bg-light">
           {% if service.invoice_service.pk %}
-            <a href="{# { service.invoice_service.urls.update } #}"
+            <a href="{{ service.invoice_service.urls.update }}"
               class="btn btn-outline-secondary btn-sm"
               data-toggle="ajaxmodal">
               {% include 'svg/pencil.svg' %}
