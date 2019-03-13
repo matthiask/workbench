@@ -45,11 +45,11 @@ VALUES
 
 INSERT INTO accounts_user
 (id, password, last_login, email, is_active, is_admin, _short_name, _full_name)
-SELECT id, '', last_login, email, is_active, is_superuser, username, concat(first_name, ' ', last_name) FROM
+SELECT id, '', NULL, email, is_active, is_superuser, username, concat(first_name, ' ', last_name) FROM
 dblink(
     'dbname=fineware_feinheit',
-    'SELECT u.id, u.last_login, u.email, u.is_active, u.is_superuser, u.username, u.first_name, u.last_name, a.dob FROM auth_user u LEFT JOIN accounts_profile p ON p.user_id=u.id LEFT JOIN addressbook_person a ON p.person_id=a.id'
-) AS p(id int, last_login timestamp with time zone, email varchar(255), is_active bool, is_superuser bool, username varchar(255), first_name varchar(100), last_name varchar(100), dob date);
+    'SELECT u.id, u.email, u.is_active, u.is_superuser, u.username, u.first_name, u.last_name, a.dob FROM auth_user u LEFT JOIN accounts_profile p ON p.user_id=u.id LEFT JOIN addressbook_person a ON p.person_id=a.id'
+) AS p(id int, email varchar(255), is_active bool, is_superuser bool, username varchar(255), first_name varchar(100), last_name varchar(100), dob date);
 
 --
 -- Contact groups
