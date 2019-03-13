@@ -1,6 +1,8 @@
 from datetime import date
 
-from django.shortcuts import get_object_or_404
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
 from workbench.awt.models import Employment, Year
@@ -10,10 +12,14 @@ from workbench import generic
 class ReportView(generic.DetailView):
     model = Year
 
-    def get_object(self):
-        return get_object_or_404(
-            Year, year=self.request.GET.get("year", date.today().year)
-        )
+    def get(self, request, *args, **kwargs):
+        year = request.GET.get("year", date.today().year)
+        try:
+            self.object = Year.objects.get(year=year)
+        except Year.DoesNotExist:
+            messages.error(request, _("Annual working time for %s not found.") % year)
+            return redirect("/")
+        return self.render_to_response(self.get_context_data())
 
     def get_context_data(self, **kwargs):
         param = self.request.GET.get("user")
