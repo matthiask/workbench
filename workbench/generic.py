@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
@@ -89,6 +89,8 @@ class DetailView(ToolsMixin, vanilla.DetailView):
 class CreateView(ToolsMixin, vanilla.CreateView):
     def get(self, request, *args, **kwargs):
         if not self.model.allow_create(request):
+            if request.is_ajax():
+                return render(request, "modal.html")
             return redirect("../")
 
         form = self.get_form()
@@ -128,6 +130,8 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if not self.object.allow_update(self.object, request):
+            if request.is_ajax():
+                return render(request, "modal.html")
             return redirect(self.object)
 
         form = self.get_form(instance=self.object)
@@ -166,6 +170,8 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if not self.object.allow_delete(self.object, request):
+            if request.is_ajax():
+                return render(request, "modal.html")
             return redirect(self.object)
 
         context = self.get_context_data()
