@@ -150,6 +150,8 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
             "closed_on",
             "postal_address",
             "type",
+            "subtotal",
+            "third_party_costs",
             "discount",
             "liable_to_vat",
         )
@@ -171,33 +173,17 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
         if self.instance.project:
             del self.fields["customer"]
 
-        if self.instance.type in (self.instance.FIXED, self.instance.DOWN_PAYMENT):
-            self.fields["subtotal"] = forms.DecimalField(
-                label=(
-                    _("Down payment")
-                    if self.instance.type == Invoice.DOWN_PAYMENT
-                    else _("subtotal")
-                ),
-                max_digits=10,
-                decimal_places=2,
-                initial=self.instance.subtotal,
-            )
-            self.fields["third_party_costs"] = Invoice._meta.get_field(
-                "third_party_costs"
-            ).formfield()
+        if self.instance.type == self.instance.DOWN_PAYMENT:
+            self.fields["subtotal"].label = _("Down payment")
 
-        elif self.instance.type in (self.instance.SERVICES,):
-            pass
-            """
-            self.fields["services"] = forms.ModelMultipleChoiceField(
-                queryset=self.instance.project.services.all(),
-                widget=forms.CheckboxSelectMultiple,
-                initial=self.instance.services.values_list(
-                    "project_service", flat=True
-                ),
-                label=_("services"),
+        elif self.instance.type == self.instance.SERVICES:
+            self.fields["subtotal"].disabled = True
+            self.fields["third_party_costs"].disabled = True
+
+            self.fields["subtotal"].help_text = format_html(
+                '<a href="../update-services/" target="_blank">{}</a>',
+                _("Update invoice services")
             )
-            """
 
         if self.instance.type != Invoice.DOWN_PAYMENT and self.instance.project_id:
             eligible_down_payment_invoices = Invoice.objects.filter(
