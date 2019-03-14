@@ -1,6 +1,6 @@
 from datetime import date
 
-from django import forms, http
+from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -14,8 +14,8 @@ from workbench.tools.forms import ModelForm, Textarea, Picker
 class ProjectSearchForm(forms.Form):
     s = forms.ChoiceField(
         choices=(
-            ("", _("All states")),
-            ("open", _("Open")),
+            ("all", _("All states")),
+            ("", _("Open")),
             ("closed", _("Closed")),
             # (_("Exact"), Project.STATUS_CHOICES),
         ),
@@ -55,7 +55,7 @@ class ProjectSearchForm(forms.Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get("s") == "open":
+        if data.get("s") == "":
             queryset = queryset.filter(closed_on__isnull=True)
         elif data.get("s") == "closed":
             queryset = queryset.filter(closed_on__isnull=False)
@@ -69,10 +69,6 @@ class ProjectSearchForm(forms.Form):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
 
         return queryset.select_related("customer", "contact__organization", "owned_by")
-
-    def response(self, request, queryset):
-        if "s" not in request.GET:
-            return http.HttpResponseRedirect("?s=open")
 
 
 class ProjectForm(ModelForm):

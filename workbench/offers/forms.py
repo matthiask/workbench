@@ -1,6 +1,6 @@
 from datetime import date
 
-from django import forms, http
+from django import forms
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
@@ -14,8 +14,8 @@ from workbench.tools.forms import ModelForm, Textarea, WarningsForm
 class OfferSearchForm(forms.Form):
     s = forms.ChoiceField(
         choices=(
-            ("", _("All states")),
-            ("open", _("Open")),
+            ("all", _("All states")),
+            ("", _("Open")),
             (_("Exact"), Offer.STATUS_CHOICES),
         ),
         required=False,
@@ -24,7 +24,9 @@ class OfferSearchForm(forms.Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get("s") == "open":
+        if data.get("s") == "all":
+            pass
+        elif data.get("s") == "":
             queryset = queryset.filter(status__lte=Offer.OFFERED)
         elif data.get("s"):
             queryset = queryset.filter(status=data.get("s"))
@@ -32,10 +34,6 @@ class OfferSearchForm(forms.Form):
         return queryset.select_related(
             "project__owned_by", "project__customer", "project__contact__organization"
         )
-
-    def response(self, request, queryset):
-        if "s" not in request.GET:
-            return http.HttpResponseRedirect("?s=open")
 
 
 class CreateOfferForm(PostalAddressSelectionForm):

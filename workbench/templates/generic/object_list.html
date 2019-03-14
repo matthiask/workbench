@@ -55,7 +55,7 @@
         {% endif %}
 
         <li class="pl-3">
-          {{ page_obj.start_index }} &ndash; {{ page_obj.end_index }} {% trans 'of' %} {{ page_obj.paginator.count }} {{ view.meta.verbose_name_plural }}
+          {{ page_obj.start_index }} &ndash; {{ page_obj.end_index }} {% trans 'of' %} {{ page_obj.paginator.count }}
           {% if view.root_queryset_count != paginator.count %}
           (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
           {% endif %}

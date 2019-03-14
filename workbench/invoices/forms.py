@@ -1,6 +1,6 @@
 from datetime import date
 
-from django import forms, http
+from django import forms
 from django.db.models import Q
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -18,8 +18,8 @@ from workbench.tools.models import Z
 class InvoiceSearchForm(forms.Form):
     s = forms.ChoiceField(
         choices=(
-            ("", _("All states")),
-            ("open", _("Open")),
+            ("all", _("All states")),
+            ("", _("Open")),
             (_("Exact"), Invoice.STATUS_CHOICES),
         ),
         required=False,
@@ -54,7 +54,9 @@ class InvoiceSearchForm(forms.Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get("s") == "open":
+        if data.get("s") == "all":
+            pass
+        elif data.get("s") == "":
             queryset = queryset.filter(
                 status__in=(Invoice.IN_PREPARATION, Invoice.SENT, Invoice.REMINDED)
             )
@@ -74,10 +76,6 @@ class InvoiceSearchForm(forms.Form):
         return queryset.select_related(
             "customer", "contact__organization", "owned_by", "project__owned_by"
         )
-
-    def response(self, request, queryset):
-        if not request.GET:
-            return http.HttpResponseRedirect("?s=open")
 
 
 class CreateInvoiceForm(WarningsForm, PostalAddressSelectionForm):
@@ -447,7 +445,7 @@ class ServiceForm(ModelForm):
 
 class RecurringInvoiceSearchForm(forms.Form):
     s = forms.ChoiceField(
-        choices=(("", _("All states")), ("open", _("Open")), ("closed", _("Closed"))),
+        choices=(("all", _("All states")), ("", _("Open")), ("closed", _("Closed"))),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
     )
@@ -479,7 +477,7 @@ class RecurringInvoiceSearchForm(forms.Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get("s") == "open":
+        if data.get("s") == "":
             queryset = queryset.filter(
                 Q(ends_on__isnull=True) | Q(ends_on__gte=date.today())
             )
@@ -495,10 +493,6 @@ class RecurringInvoiceSearchForm(forms.Form):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
 
         return queryset.select_related("customer", "contact__organization", "owned_by")
-
-    def response(self, request, queryset):
-        if "s" not in request.GET:
-            return http.HttpResponseRedirect("?s=open")
 
 
 class CreateRecurringInvoiceForm(ModelForm):
