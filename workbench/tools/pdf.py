@@ -236,11 +236,6 @@ class PDFDocument(_PDFDocument):
                     service.service_cost.quantize(Z),
                 )
             )
-            # FIXME Show a thing, but maybe not everything
-            # for effort in service.efforts.all():
-            #     table.append((effort.title, effort.cost.quantize(Z)))
-            # for cost in service.costs.all():
-            #     table.append((cost.title, cost.cost.quantize(Z)))
 
         self.table(table, self.style.tableColumns, self.style.tableHead)
 
