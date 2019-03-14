@@ -1,6 +1,6 @@
 {% extends "generic/object_list.html" %}
 
-{% load bootstrap4 i18n querystring %}
+{% load bootstrap4 i18n %}
 
 {% block objects %}
 <div class="list-group list-group-flush">
@@ -29,11 +29,4 @@
   </div>
   {% endfor %}
 </div>
-
-<p>
-  {{ paginator.count }} {{ view.meta.verbose_name_plural }}
-  {% if view.root_queryset_count != paginator.count %}
-  (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
-  {% endif %}
-</p>
 {% endblock %}

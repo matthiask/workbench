@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from datetime import date, datetime
 from itertools import groupby
+from urllib.parse import urlencode
 
 from django import template
 from django.db import models
@@ -112,3 +113,15 @@ def bar(value, one):
             bars,
         ),
     )
+
+
+@register.simple_tag(takes_context=True)
+def querystring(context, **kwargs):
+    query = urlencode(
+        sorted(
+            (key, value)
+            for key, value in dict(context["request"].GET.items(), **kwargs).items()
+            if value
+        )
+    )
+    return "?%s" % query if query else ""

@@ -9,7 +9,7 @@
   <a href="{{ view.model.urls.assign }}" class="btn btn-secondary">
     {% trans 'assign credit entries' %}
   </a>
-  <a href="{{ request.get_full_path }}{% if request.GET %}&amp;{% else %}?{% endif %}xlsx=1" class="btn btn-secondary">
+  <a href="{% querystring xlsx=1 %}" class="btn btn-secondary">
     {% include 'svg/desktop-download.svg' %} XLSX
   </a>
 {% endblock %}
@@ -36,15 +36,5 @@
       </tr>
     {% endfor %}
   </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="5">
-        {{ paginator.count }} {{ view.meta.verbose_name_plural }}
-        {% if view.root_queryset_count != paginator.count %}
-        (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
-        {% endif %}
-      </td>
-    </tr>
-  </tfoot>
 </table>
 {% endblock %}

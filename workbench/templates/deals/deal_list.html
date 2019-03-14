@@ -25,16 +25,5 @@
       </tr>
     {% endfor %}
   </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="5">
-        {{ paginator.count }} {{ view.meta.verbose_name_plural }}
-        {% if view.root_queryset_count != paginator.count %}
-        (<a href=".">{% blocktrans with total=view.root_queryset_count %}{{ total }} total{% endblocktrans %}</a>)
-        {% endif %}
-      </td>
-    </tr>
-  </tfoot>
 </table>
-
 {% endblock %}
