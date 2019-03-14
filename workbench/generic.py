@@ -136,7 +136,6 @@ class CreateView(ToolsMixin, vanilla.CreateView):
         if "_continue" in self.request.POST:
             return redirect(".")
         if self.request.is_ajax():
-            # TODO Show messages in the popup?
             return HttpResponse("Thanks", status=201)  # Created
         return redirect(self.get_success_url())
 
