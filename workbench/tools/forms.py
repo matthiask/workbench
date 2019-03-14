@@ -1,3 +1,4 @@
+import time
 from collections import defaultdict
 
 from django import forms
@@ -180,6 +181,8 @@ class WarningsForm(forms.BaseForm):
       field should only be displayed if ``WarningsForm.warnings`` is non-emtpy.
     """
 
+    ignore_warnings_id = "ignore_warnings_%s" % int(time.time())
+
     def __init__(self, *args, **kwargs):
         super(WarningsForm, self).__init__(*args, **kwargs)
 
@@ -199,7 +202,10 @@ class WarningsForm(forms.BaseForm):
         if not super(WarningsForm, self).is_valid():
             return False
 
-        if self.warnings and not self.request.POST.get("ignore_warnings"):
+        if self.warnings and not self.should_ignore_warnings():
             return False
 
         return True
+
+    def should_ignore_warnings(self):
+        return self.data.get(self.ignore_warnings_id)

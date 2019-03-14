@@ -7,7 +7,7 @@
     {% endfor %}
 
     <br>
-    <input type="checkbox" name="ignore_warnings" id="id_ignore_warnings">
-    <label for="id_ignore_warnings">{% trans 'Ignore warnings' %}</label>
+    <input type="checkbox" name="{{ form.ignore_warnings_id }}" id="id_{{ form.ignore_warnings_id }}">
+    <label for="id_{{ form.ignore_warnings_id }}">{% trans 'Ignore warnings' %}</label>
   </div>
 {% endif %}

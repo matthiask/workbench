@@ -120,7 +120,7 @@ class OfferForm(WarningsForm, ModelForm):
                 self.instance.closed_on = date.today()
 
         if self.instance.closed_on and data.get("status", 99) < Offer.ACCEPTED:
-            if self.request.POST.get("ignore_warnings"):
+            if self.should_ignore_warnings():
                 self.instance.closed_on = None
             else:
                 self.add_warning(

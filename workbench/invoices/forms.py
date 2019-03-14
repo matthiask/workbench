@@ -292,7 +292,7 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
             data["closed_on"] = date.today()
 
         if self.instance.closed_on and data.get("status", 99) < Invoice.PAID:
-            if self.request.POST.get("ignore_warnings"):
+            if self.should_ignore_warnings():
                 self.instance.closed_on = None
             else:
                 self.add_warning(
