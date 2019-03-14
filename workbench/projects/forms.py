@@ -82,6 +82,27 @@ class ProjectForm(ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        initial = kwargs.setdefault("initial", {})
+        request = kwargs["request"]
+
+        if request.GET.get("copy_project"):
+            try:
+                project = Project.objects.get(pk=request.GET["copy_project"])
+            except (Project.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update(
+                    {
+                        "customer": project.customer_id,
+                        "contact": project.contact_id,
+                        "title": project.title,
+                        "description": project.description,
+                        "type": project.type,
+                    }
+                )
+                if project.owned_by.is_active:
+                    initial["owned_by"] = project.owned_by_id
+
         super().__init__(*args, **kwargs)
         self.fields["type"].choices = Project.TYPE_CHOICES
         if self.instance.pk:
