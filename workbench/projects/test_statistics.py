@@ -8,8 +8,8 @@ from workbench.reporting import project_statistics
 
 class StatisticsTest(TestCase):
     def test_stats(self):
-        service1 = factories.ServiceFactory.create(service_hours=2)
-        factories.ServiceFactory.create(service_hours=2)
+        service1 = factories.ServiceFactory.create(effort_hours=2)
+        factories.ServiceFactory.create(effort_hours=4)
 
         user = factories.UserFactory.create()
 
