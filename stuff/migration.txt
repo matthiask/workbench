@@ -357,7 +357,7 @@ SELECT
     manager_id,
     job_id,
     NULL,
-    0, -- TODO down payment applied to
+    0,
     due_date,
     invoice_date,
     _invoice_id,
