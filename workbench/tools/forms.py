@@ -181,8 +181,6 @@ class WarningsForm(forms.BaseForm):
       field should only be displayed if ``WarningsForm.warnings`` is non-emtpy.
     """
 
-    ignore_warnings_id = "ignore_warnings_%s" % int(time.time())
-
     def __init__(self, *args, **kwargs):
         super(WarningsForm, self).__init__(*args, **kwargs)
 
@@ -209,3 +207,7 @@ class WarningsForm(forms.BaseForm):
 
     def should_ignore_warnings(self):
         return self.data.get(self.ignore_warnings_id)
+
+    @property
+    def ignore_warnings_id(self):
+        return "__ig_{}".format(int(time.time() / 10800))
