@@ -22,6 +22,11 @@ class ProjectSearchForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
     )
+    org = forms.ModelChoiceField(
+        queryset=Organization.objects.all(),
+        required=False,
+        widget=Picker(model=Organization),
+    )
     type = forms.ChoiceField(
         choices=[("", _("All types"))] + Project.TYPE_CHOICES,
         required=False,
@@ -54,6 +59,8 @@ class ProjectSearchForm(forms.Form):
             queryset = queryset.filter(closed_on__isnull=True)
         elif data.get("s") == "closed":
             queryset = queryset.filter(closed_on__isnull=False)
+        if data.get("org"):
+            queryset = queryset.filter(customer=data.get("org"))
         if data.get("type"):
             queryset = queryset.filter(type=data.get("type"))
         if data.get("owned_by") == 0:
