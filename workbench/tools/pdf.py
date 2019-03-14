@@ -1,4 +1,5 @@
 from copy import deepcopy
+from datetime import timedelta
 from decimal import Decimal as D
 from functools import partial
 
@@ -219,11 +220,6 @@ class PDFDocument(_PDFDocument):
         self.p(postal_address)
         self.next_frame()
 
-    def date_line(self, date, *args):
-        elements = [local_date_format(date, "l, d.m.Y") if date else _("NO DATE YET")]
-        elements.extend(args)
-        self.smaller(" / ".join(e for e in elements))
-
     def table_services(self, services):
         if not services:
             return
@@ -290,14 +286,45 @@ class PDFDocument(_PDFDocument):
             self.watermark(offer.get_status_display())
 
         self.postal_address(offer.postal_address)
-        self.date_line(offer.offered_on, offer.owned_by.get_short_name(), offer.code)
 
         self.h1(offer.title)
         self.spacer(2 * mm)
 
-        self.p(offer.description)
-        self.spacer()
+        self.table(
+            [
+                (_("offer"), "%s/%s" % (offer.code, offer.owned_by.get_short_name())),
+                (
+                    _("date"),
+                    (
+                        local_date_format(offer.offered_on, "d.m.Y")
+                        if offer.offered_on
+                        else MarkupParagraph(
+                            "<b>%s</b>" % _("NO DATE YET"), style=self.style.bold
+                        )
+                    ),
+                ),
+                (
+                    _("valid until"),
+                    (
+                        local_date_format(
+                            offer.offered_on + timedelta(days=60), "d.m.Y"
+                        )
+                        if offer.offered_on
+                        else MarkupParagraph(
+                            "<b>%s</b>" % _("NO DATE YET"), style=self.style.bold
+                        )
+                    ),
+                ),
+            ],
+            self.style.tableColumnsLeft,
+            self.style.table,
+        )
 
+        if offer.description:
+            self.spacer(5 * mm)
+            self.p(offer.description)
+
+        self.spacer()
         self.table_services(offer.services.all())
         self.table_total(offer)
 
