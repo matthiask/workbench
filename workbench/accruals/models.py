@@ -56,7 +56,7 @@ class AccrualQuerySet(models.QuerySet):
             type=Invoice.DOWN_PAYMENT,
             subtotal__gt=0,
         ):
-            accrual = logged[invoice.project_id] / invoice.total_excl_tax
+            accrual = 100 * logged[invoice.project_id] / invoice.total_excl_tax
             self.get_or_create(
                 invoice=invoice, month=month, defaults={"accrual": accrual}
             )
