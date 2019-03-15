@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from workbench import generic
-from workbench.accruals.forms import AccrualForm
+from workbench.accruals.forms import AccrualSearchForm, AccrualForm
 from workbench.accruals.models import Accrual
 
 
@@ -10,6 +10,7 @@ urlpatterns = [
         r"^$",
         generic.ListView.as_view(
             model=Accrual,
+            search_form_class=AccrualSearchForm,
             # show_create_button=False,
         ),
         name="accruals_accrual_list",
