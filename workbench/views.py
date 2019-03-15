@@ -47,8 +47,8 @@ HISTORY = {
 
 def history(request, label, pk):
     model = apps.get_model(label)
-    configuration = HISTORY.get(label)
-    exclude = configuration.get("exclude", set())
+    cfg = HISTORY.get(label, {})
+    exclude = cfg.get("exclude", set())
 
     fields = [
         f.name
