@@ -125,11 +125,12 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
             self.fields["subtotal"].disabled = True
             self.fields["third_party_costs"].disabled = True
 
-            self.fields["subtotal"].help_text = format_html(
-                '<a href="../update-services/" target="_blank"'
-                ' class="btn btn-secondary btn-sm float-right">{}</a>',
-                _("Update invoice services"),
-            )
+            if self.instance.pk:
+                self.fields["subtotal"].help_text = format_html(
+                    '<a href="../update-services/" target="_blank"'
+                    ' class="btn btn-secondary btn-sm float-right">{}</a>',
+                    _("Update invoice services"),
+                )
 
         if self.instance.type != Invoice.DOWN_PAYMENT and self.instance.project_id:
             eligible_down_payment_invoices = Invoice.objects.valid().filter(
@@ -289,18 +290,17 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
 class CreateProjectInvoiceForm(InvoiceForm):
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project", None)
-        if not kwargs.get("instance") and self.project:
-            kwargs["initial"] = {
-                "title": self.project.title,
-                "description": self.project.description,
-                "contact": self.project.contact_id,
-            }
+        if not kwargs.get("instance"):
+            kwargs["instance"] = Invoice(
+                customer=self.project.customer,
+                contact=self.project.contact,
+                project=self.project,
+                title=self.project.title,
+                description=self.project.description,
+                type=kwargs["request"].GET.get("type"),
+            )
 
         super().__init__(*args, **kwargs)
-
-        self.instance.project = self.project
-        self.instance.customer = self.project.customer
-        self.instance.contact = self.project.contact
 
         if not self.instance.pk:
             # Hide those fields when creating invoices
@@ -309,6 +309,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
 
             invoice_type = self.request.GET.get("type")
             self.fields["type"].initial = self.instance.type = invoice_type
+
             if invoice_type == "services":
                 source = self.request.GET.get("source")
                 if source == "logbook":
@@ -345,21 +346,20 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     choices.append(
                         (
                             format_html(
-                                '<u>{}</u><br>'
+                                "<u>{}</u><br>"
                                 '<div class="form-check">'
                                 '<input type="checkbox" data-toggle-following>'
-                                '{}'
-                                '</div>',
+                                "{}"
+                                "</div>",
                                 offer if offer else _("Not offered yet"),
                                 _("Choose all"),
-
                             ),
                             [
                                 (
                                     service.id,
                                     format_html(
                                         '<div class="mb-2"><strong>{}</strong>'
-                                        '<br>{}{}</div>',
+                                        "<br>{}{}</div>",
                                         service.title,
                                         format_html("{}<br>", service.description)
                                         if service.description
@@ -376,6 +376,11 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     label=_("services"),
                     widget=forms.CheckboxSelectMultiple(attrs={"size": 30}),
                 )
+
+    def save(self):
+        instance = super().save()
+        print(self.cleaned_data["selected_services"])
+        return instance
 
 
 class CreatePersonInvoiceForm(PostalAddressSelectionForm):
