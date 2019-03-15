@@ -10,7 +10,7 @@ from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import Invoice, Service, RecurringInvoice
 from workbench.services.models import ServiceType
-from workbench.tools.formats import currency, local_date_format
+from workbench.tools.formats import currency, hours, local_date_format
 from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm
 from workbench.tools.models import Z
 
@@ -78,93 +78,6 @@ class InvoiceSearchForm(forms.Form):
         )
 
 
-class CreateProjectInvoiceForm(WarningsForm, PostalAddressSelectionForm):
-    user_fields = default_to_current_user = ("owned_by",)
-
-    class Meta:
-        model = Invoice
-        fields = ["contact", "title", "description", "owned_by"]
-        widgets = {"contact": Picker(model=Person)}
-
-    def __init__(self, *args, **kwargs):
-        self.project = kwargs.pop("project")
-        kwargs["initial"] = {
-            "title": self.project.title,
-            "description": self.project.description,
-            "contact": self.project.contact_id,
-        }
-
-        super().__init__(*args, **kwargs)
-
-        self.instance.project = self.project
-        self.instance.customer = self.project.customer
-        self.instance.contact = self.project.contact
-
-        self.fields["invoice_type"] = forms.ChoiceField(
-            label=_("type"),
-            choices=(
-                [row for row in Invoice.TYPE_CHOICES if row[0] != Invoice.SERVICES]
-                + [
-                    (
-                        "offer_{}".format(offer.pk),
-                        format_html(
-                            "{} {} {}<br><small>{}, {}</small>",
-                            _("Services from offer"),
-                            offer.code,
-                            offer,
-                            offer.pretty_status(),
-                            offer.short_total_excl(),
-                        ),
-                    )
-                    for offer in self.project.offers.all()
-                ]
-                + [("logbook", _("Services from logbook"))]
-            ),
-            widget=forms.RadioSelect,
-            help_text=_("Individual invoice services can be edited later."),
-        )
-
-        self.add_postal_address_selection(
-            organization=self.project.customer, person=self.project.contact
-        )
-
-    def clean(self):
-        data = super().clean()
-        if data.get("contact"):
-            if data["contact"].organization != self.project.customer:
-                raise forms.ValidationError(
-                    {
-                        "contact": _(
-                            "Selected contact does not belong to project's"
-                            " organization, %(organization)s."
-                        )
-                        % {"organization": self.project.customer}
-                    }
-                )
-        else:
-            self.add_warning(_("No contact selected."))
-        return data
-
-    def save(self):
-        instance = super().save(commit=False)
-        if self.cleaned_data.get("pa"):
-            instance.postal_address = self.cleaned_data["pa"].postal_address
-        type = self.cleaned_data["invoice_type"]
-        if type in {Invoice.FIXED, Invoice.DOWN_PAYMENT}:
-            instance.type = type
-            instance.save()
-        elif type == "logbook":
-            instance.type = Invoice.SERVICES
-            instance.create_services_from_logbook()
-        else:
-            instance.type = Invoice.SERVICES
-            for offer in self.project.offers.all():
-                if "offer_{}".format(offer.pk) == type:
-                    instance.create_services_from_offer(offer)
-
-        return instance
-
-
 class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
 
@@ -219,7 +132,7 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
             )
 
         if self.instance.type != Invoice.DOWN_PAYMENT and self.instance.project_id:
-            eligible_down_payment_invoices = Invoice.objects.filter(
+            eligible_down_payment_invoices = Invoice.objects.valid().filter(
                 Q(project=self.instance.project),
                 Q(type=Invoice.DOWN_PAYMENT),
                 Q(down_payment_applied_to__isnull=True)
@@ -233,7 +146,9 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
                     required=False,
                     initial=Invoice.objects.filter(
                         down_payment_applied_to=self.instance
-                    ).values_list("id", flat=True),
+                    ).values_list("id", flat=True)
+                    if self.instance.pk
+                    else [],
                 )
                 self.fields["apply_down_payment"].choices = [
                     (
@@ -273,17 +188,20 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
         data = super().clean()
         s_dict = dict(Invoice.STATUS_CHOICES)
 
-        if self.instance.project and data.get("contact"):
-            if data["contact"].organization != self.instance.project.customer:
-                raise forms.ValidationError(
-                    {
-                        "contact": _(
-                            "Selected contact does not belong to project's"
-                            " organization, %(organization)s."
-                        )
-                        % {"organization": self.instance.project.customer}
-                    }
-                )
+        if self.instance.project:
+            if data.get("contact"):
+                if data["contact"].organization != self.instance.project.customer:
+                    raise forms.ValidationError(
+                        {
+                            "contact": _(
+                                "Selected contact does not belong to project's"
+                                " organization, %(organization)s."
+                            )
+                            % {"organization": self.instance.project.customer}
+                        }
+                    )
+            else:
+                self.add_warning(_("No contact selected."))
 
         if self.instance._orig_status < self.instance.SENT:
             invoiced_on = data.get("invoiced_on")
@@ -366,6 +284,98 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
 
         instance.save()
         return instance
+
+
+class CreateProjectInvoiceForm(InvoiceForm):
+    def __init__(self, *args, **kwargs):
+        self.project = kwargs.pop("project", None)
+        if not kwargs.get("instance") and self.project:
+            kwargs["initial"] = {
+                "title": self.project.title,
+                "description": self.project.description,
+                "contact": self.project.contact_id,
+            }
+
+        super().__init__(*args, **kwargs)
+
+        self.instance.project = self.project
+        self.instance.customer = self.project.customer
+        self.instance.contact = self.project.contact
+
+        if not self.instance.pk:
+            # Hide those fields when creating invoices
+            del self.fields["status"]
+            del self.fields["closed_on"]
+
+            invoice_type = self.request.GET.get("type")
+            self.fields["type"].initial = self.instance.type = invoice_type
+            if invoice_type == "services":
+                source = self.request.GET.get("source")
+                if source == "logbook":
+
+                    def amount(service):
+                        if not service.pk:
+                            return format_html(
+                                '{} <small class="bg-warning px-1">{}</small>',
+                                currency(service.service_cost),
+                                _("%s logged but not bound to a service.")
+                                % currency(service.logged_cost),
+                            )
+                        elif service.effort_rate is not None:
+                            return currency(
+                                service.effort_rate * service.logged_hours
+                                + service.logged_cost
+                            )
+                        elif service.logged_hours:
+                            return format_html(
+                                '{} <small class="bg-warning px-1">{}</small>',
+                                currency(service.service_cost),
+                                _("%s logged but no hourly rate defined.")
+                                % hours(service.logged_hours),
+                            )
+                        return currency(service.logged_cost)
+
+                else:
+
+                    def amount(service):
+                        return currency(service.service_cost)
+
+                choices = []
+                for offer, services in self.project.grouped_services:
+                    choices.append(
+                        (
+                            format_html(
+                                '<u>{}</u><br>'
+                                '<div class="form-check">'
+                                '<input type="checkbox" data-toggle-following>'
+                                '{}'
+                                '</div>',
+                                offer if offer else _("Not offered yet"),
+                                _("Choose all"),
+
+                            ),
+                            [
+                                (
+                                    service.id,
+                                    format_html(
+                                        '<div class="mb-2"><strong>{}</strong>'
+                                        '<br>{}{}</div>',
+                                        service.title,
+                                        format_html("{}<br>", service.description)
+                                        if service.description
+                                        else "",
+                                        amount(service),
+                                    ),
+                                )
+                                for service in services
+                            ],
+                        )
+                    )
+                self.fields["selected_services"] = forms.MultipleChoiceField(
+                    choices=choices,
+                    label=_("services"),
+                    widget=forms.CheckboxSelectMultiple(attrs={"size": 30}),
+                )
 
 
 class CreatePersonInvoiceForm(PostalAddressSelectionForm):

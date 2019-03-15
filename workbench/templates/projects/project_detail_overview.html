@@ -104,6 +104,21 @@
       </tr>
     </table>
 
+    <span class="dropdown">
+      <button class="btn btn-secondary dropdown-toggle" type="button"
+        id="invoice-dropdown-button" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false">
+        {% include "svg/plus.svg" %}
+        {% trans 'invoice' %}</a>
+      </button>
+      <div class="dropdown-menu" aria-labelledby="invoice-dropdown-button">
+        <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=fixed">{% trans 'Fixed amount' %}</a>
+        <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=down-payment">{% trans 'Down payment' %}</a>
+        <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=logbook">{% trans 'Services from logbook' %}</a>
+        <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=offer">{% trans 'Services from offer' %}</a>
+      </div>
+    </span>
+
     <a href="{{ project.urls.createinvoice }}" class="btn btn-secondary">
       {% include "svg/plus.svg" %}
       {% trans 'invoice' %}</a>
