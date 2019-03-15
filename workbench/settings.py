@@ -43,6 +43,7 @@ INSTALLED_APPS = [
         "fineforms",
         "django.forms",
         "workbench.accounts",
+        "workbench.accruals",
         "workbench.activities",
         "workbench.audit",
         "workbench.awt",

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-15 09:18+0100\n"
+"POT-Creation-Date: 2019-03-15 14:49+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,7 +50,7 @@ msgid "enforce same week logging"
 msgstr "Stundenerfassung in der gleichen Woche erzwingen"
 
 #: workbench/accounts/models.py:56 workbench/awt/forms.py:11
-#: workbench/awt/models.py:228 workbench/awt/models.py:269
+#: workbench/awt/models.py:71 workbench/awt/models.py:112
 msgid "user"
 msgstr "Benutzer"
 
@@ -75,8 +75,44 @@ msgstr "Willkommen! Bitte fülle das folgende Formular aus."
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
+#: workbench/accruals/__init__.py:10 workbench/accruals/models.py:26
+#: workbench/templates/base.html:74
+msgid "accruals"
+msgstr "Abgrenzungen"
+
+#: workbench/accruals/models.py:12 workbench/credit_control/models.py:28
+#: workbench/invoices/models.py:133 workbench/invoices/models.py:397
+#: workbench/templates/contacts/person_detail.html:52
+#: workbench/templates/credit_control/creditentry_list.html:24
+#: workbench/templates/invoices/invoice_services.html:7
+#: workbench/templates/projects/project_detail_overview.html:82
+#: workbench/templates/projects/project_detail_overview.html:109
+#: workbench/templates/reporting/monthly_invoicing.html:15
+#: workbench/tools/pdf.py:338
+msgid "invoice"
+msgstr "Rechnung"
+
+#: workbench/accruals/models.py:14
+msgid "month"
+msgstr "Monat"
+
+#: workbench/accruals/models.py:16 workbench/accruals/models.py:25
+msgid "accrual"
+msgstr "Abgrenzung"
+
+#: workbench/accruals/models.py:18
+msgid ""
+"Percentage of down payment invoice for which the work has already been done."
+msgstr ""
+"Anteil der schon geleisteten Arbeit, welcher durch die Anzahlungsrechnung abgegolten wird."
+
+#: workbench/accruals/views.py:21 workbench/awt/views.py:21
+#, python-format
+msgid "Annual working time for %s not found."
+msgstr "Jahresarbeitszeit für %s nicht gefunden."
+
 #: workbench/activities/__init__.py:10 workbench/activities/models.py:67
-#: workbench/templates/base.html:91
+#: workbench/templates/base.html:92
 #: workbench/templates/deals/deal_detail.html:30
 #: workbench/templates/projects/project_detail.html:16
 #: workbench/templates/projects/project_detail_activities.html:5
@@ -161,7 +197,7 @@ msgstr "Geschäft"
 msgid "title"
 msgstr "Titel"
 
-#: workbench/activities/models.py:51 workbench/awt/models.py:240
+#: workbench/activities/models.py:51 workbench/awt/models.py:83
 #: workbench/contacts/models.py:29 workbench/contacts/models.py:74
 #: workbench/credit_control/forms.py:159 workbench/credit_control/models.py:30
 #: workbench/templates/contacts/organization_detail.html:29
@@ -218,107 +254,107 @@ msgstr "aufgezeichnete Aktionen"
 msgid "annual working time"
 msgstr "Jahresarbeitszeit"
 
-#: workbench/awt/admin.py:14 workbench/awt/models.py:272
+#: workbench/awt/admin.py:14 workbench/awt/models.py:115
 msgid "days"
 msgstr "Tage"
 
-#: workbench/awt/models.py:40 workbench/awt/models.py:59
+#: workbench/awt/models.py:34 workbench/awt/models.py:53
 msgid "year"
 msgstr "Jahr"
 
-#: workbench/awt/models.py:41
+#: workbench/awt/models.py:35
 msgid "january"
 msgstr "Januar"
 
-#: workbench/awt/models.py:42
+#: workbench/awt/models.py:36
 msgid "february"
 msgstr "Februar"
 
-#: workbench/awt/models.py:43
+#: workbench/awt/models.py:37
 msgid "march"
 msgstr "März"
 
-#: workbench/awt/models.py:44
+#: workbench/awt/models.py:38
 msgid "april"
 msgstr "April"
 
-#: workbench/awt/models.py:45
+#: workbench/awt/models.py:39
 msgid "may"
 msgstr "Mai"
 
-#: workbench/awt/models.py:46
+#: workbench/awt/models.py:40
 msgid "june"
 msgstr "Juni"
 
-#: workbench/awt/models.py:47
+#: workbench/awt/models.py:41
 msgid "july"
 msgstr "Juli"
 
-#: workbench/awt/models.py:48
+#: workbench/awt/models.py:42
 msgid "august"
 msgstr "August"
 
-#: workbench/awt/models.py:49
+#: workbench/awt/models.py:43
 msgid "september"
 msgstr "September"
 
-#: workbench/awt/models.py:50
+#: workbench/awt/models.py:44
 msgid "october"
 msgstr "Oktober"
 
-#: workbench/awt/models.py:51
+#: workbench/awt/models.py:45
 msgid "november"
 msgstr "November"
 
-#: workbench/awt/models.py:52
+#: workbench/awt/models.py:46
 msgid "december"
 msgstr "Dezember"
 
-#: workbench/awt/models.py:53
+#: workbench/awt/models.py:47
 msgid "working time per day"
 msgstr "Arbeitszeit pro Tag"
 
-#: workbench/awt/models.py:60
+#: workbench/awt/models.py:54
 msgid "years"
 msgstr "Jahre"
 
-#: workbench/awt/models.py:231
+#: workbench/awt/models.py:74
 msgid "date from"
 msgstr "Datum von"
 
-#: workbench/awt/models.py:232
+#: workbench/awt/models.py:75
 msgid "date until"
 msgstr "Datum bis"
 
-#: workbench/awt/models.py:233 workbench/templates/awt/year_detail.html:30
+#: workbench/awt/models.py:76 workbench/templates/awt/year_detail.html:30
 msgid "percentage"
 msgstr "Prozent"
 
-#: workbench/awt/models.py:235
+#: workbench/awt/models.py:78
 msgid "vacation weeks"
 msgstr "Ferienwochen"
 
-#: workbench/awt/models.py:238
+#: workbench/awt/models.py:81
 msgid "Vacation weeks for a full year."
 msgstr "Ferienwochen für ein volles Anstellungsjahr."
 
-#: workbench/awt/models.py:245
+#: workbench/awt/models.py:88
 msgid "employment"
 msgstr "Anstellungsverhältnis"
 
-#: workbench/awt/models.py:246
+#: workbench/awt/models.py:89
 msgid "employments"
 msgstr "Anstellungsverhältnisse"
 
-#: workbench/awt/models.py:249
+#: workbench/awt/models.py:92
 msgid "ongoing"
 msgstr "aktuell"
 
-#: workbench/awt/models.py:271 workbench/invoices/models.py:480
+#: workbench/awt/models.py:114 workbench/invoices/models.py:480
 msgid "starts on"
 msgstr "startet am"
 
-#: workbench/awt/models.py:273 workbench/deals/models.py:63
+#: workbench/awt/models.py:116 workbench/deals/models.py:63
 #: workbench/invoices/models.py:99 workbench/invoices/models.py:466
 #: workbench/logbook/forms.py:118 workbench/logbook/models.py:36
 #: workbench/logbook/models.py:92 workbench/offers/models.py:46
@@ -330,27 +366,22 @@ msgstr "startet am"
 msgid "description"
 msgstr "Beschreibung"
 
-#: workbench/awt/models.py:274 workbench/templates/awt/absence_list.html:22
+#: workbench/awt/models.py:117 workbench/templates/awt/absence_list.html:22
 msgid "is vacation"
 msgstr "sind Ferien"
 
-#: workbench/awt/models.py:278
+#: workbench/awt/models.py:121
 msgid "absence"
 msgstr "Abwesenheit"
 
-#: workbench/awt/models.py:279 workbench/templates/awt/year_detail.html:86
+#: workbench/awt/models.py:122 workbench/templates/awt/year_detail.html:86
 #: workbench/templates/base.html:60
 msgid "absences"
 msgstr "Abwesenheiten"
 
-#: workbench/awt/models.py:287
+#: workbench/awt/models.py:130
 msgid "Absences of past years are locked."
 msgstr "Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."
-
-#: workbench/awt/views.py:20
-#, python-format
-msgid "Annual working time for %s not found."
-msgstr "Jahresarbeitszeit für %s nicht gefunden."
 
 #: workbench/contacts/__init__.py:10 workbench/templates/base.html:44
 msgid "contacts"
@@ -570,18 +601,6 @@ msgstr "Total"
 msgid "payment notice"
 msgstr "Zahlungsnotiz"
 
-#: workbench/credit_control/models.py:28 workbench/invoices/models.py:133
-#: workbench/invoices/models.py:397
-#: workbench/templates/contacts/person_detail.html:52
-#: workbench/templates/credit_control/creditentry_list.html:24
-#: workbench/templates/invoices/invoice_services.html:7
-#: workbench/templates/projects/project_detail_overview.html:82
-#: workbench/templates/projects/project_detail_overview.html:109
-#: workbench/templates/reporting/monthly_invoicing.html:15
-#: workbench/tools/pdf.py:338
-msgid "invoice"
-msgstr "Rechnung"
-
 #: workbench/credit_control/models.py:36
 msgid "credit entry"
 msgstr "Gutschrift"
@@ -601,7 +620,7 @@ msgid "assign credit entries"
 msgstr "Gutschriften zuweisen"
 
 #: workbench/deals/__init__.py:10 workbench/deals/models.py:81
-#: workbench/templates/base.html:90
+#: workbench/templates/base.html:91
 msgid "deals"
 msgstr "Geschäfte"
 
@@ -1379,8 +1398,8 @@ msgid "dunning"
 msgstr "Mahnwesen"
 
 #: workbench/templates/base.html:66
-msgid "reports"
-msgstr "Berichte"
+msgid "reporting"
+msgstr "Berichtswesen"
 
 #: workbench/templates/base.html:70
 msgid "not invoiced work"
@@ -1398,15 +1417,15 @@ msgstr "Überzogene Projekte"
 msgid "monthly invoicing"
 msgstr "Monatliche Verrechnung"
 
-#: workbench/templates/base.html:85
+#: workbench/templates/base.html:86
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: workbench/templates/base.html:87
+#: workbench/templates/base.html:88
 msgid "Admin panel"
 msgstr "Verwaltung"
 
-#: workbench/templates/base.html:93
+#: workbench/templates/base.html:94
 msgid "Sign out"
 msgstr "Abmelden"
 

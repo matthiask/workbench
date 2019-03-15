@@ -63,14 +63,15 @@
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {% trans 'reports' %}
+            {% trans 'reporting' %}
           </a>
           <div class="dropdown-menu" aria-labelledby="reportsDropdown">
             <a class="dropdown-item" href="{% url 'awt_year_report' %}">{% trans 'annual working time' %}</a>
             <a class="dropdown-item" href="#">{% trans 'not invoiced work' %}</a>
             <a class="dropdown-item" href="{% url 'report_overdrawn_projects' %}">{% trans 'overdrawn projects' %}</a>
             <a class="dropdown-item" href="{% url 'report_monthly_invoicing' %}">{% trans 'monthly invoicing' %}</a>
-            {# <div class="dropdown-divider"></div> #}
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'accruals_accrual_list' %}">{% trans 'accruals' %}</a>
           </div>
         </li>
         {% endmark_current %}
