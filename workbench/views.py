@@ -36,42 +36,25 @@ def search(request):
 
 
 HISTORY = {
-    "awt.year": "",
-    "awt.employment": "",
-    "awt.absence": "",
-    "contacts.organization": "",
-    "contacts.person": "",
-    "credit_control.creditentry": "",
-    "deals.deal": "title, description, owned_by, stage, status, estimated_value",
-    "invoices.invoice": (
-        "invoiced_on, due_on, title, description, postal_address, owned_by,"
-        " status, closed_on, subtotal, discount, tax_rate, total"
-    ),
-    "invoices.recurringinvoice": "",
-    "logbook.loggedhours": "",
-    "logbook.loggedcosts": "",
-    "offers.offer": (
-        "offered_on, closed_on, title, description, owned_by, status,"
-        "subtotal, discount, tax_rate, total"
-    ),
-    "projects.project": (
-        "customer, contact, title, description, owned_by, type, closed_on"
-    ),
-    "projects.service": "",
+    "projects.service": {
+        "exclude": {"position"},
+    },
+    "invoices.service": {
+        "exclude": {"position"},
+    },
 }
 
 
 def history(request, label, pk):
     model = apps.get_model(label)
-    fields = HISTORY.get(label)
-    if not fields:
-        fields = [
-            f.name
-            for f in model._meta.get_fields()
-            if hasattr(f, "attname") and not f.primary_key
-        ]
-    else:
-        fields = re.split(r"[\s,]+", fields)
+    configuration = HISTORY.get(label)
+    exclude = configuration.get("exclude", set())
+
+    fields = [
+        f.name
+        for f in model._meta.get_fields()
+        if hasattr(f, "attname") and not f.primary_key and not f.name in exclude
+    ]
 
     return render(
         request,

@@ -15,5 +15,7 @@
         <li>{{ pretty }}</li>
       {% endfor %}
     </ul>
+  {% empty %}
+    <h4>{% trans 'No history found' %}</h4>
   {% endfor %}
 {% endblock %}

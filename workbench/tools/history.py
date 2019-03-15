@@ -74,6 +74,9 @@ def formatter(field):
 def changes(model, fields, versions):
     changes = []
 
+    if not versions:
+        return changes
+
     users = {str(u.pk): u.get_full_name() for u in User.objects.all()}
     for version in versions:
         match = re.search(r"^user-([0-9]+)-", version.user_name)
