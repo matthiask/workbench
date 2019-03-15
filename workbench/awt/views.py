@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
 from workbench.awt.models import Employment, Year
+from workbench.reporting.annual_working_time import annual_working_time
 from workbench import generic
 
 
@@ -36,5 +37,5 @@ class ReportView(generic.DetailView):
         if not users:
             users = [self.request.user]
         return super().get_context_data(
-            statistics=self.object.statistics(users=users), **kwargs
+            statistics=annual_working_time(self.object, users=users), **kwargs
         )

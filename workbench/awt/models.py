@@ -1,18 +1,12 @@
-from collections import defaultdict
 from datetime import date, timedelta
-from decimal import Decimal
 
 from django.contrib import messages
 from django.db import models
-from django.db.models import Sum
-from django.db.models.functions import ExtractMonth
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.awt.utils import days_per_month, monthly_days
-from workbench.logbook.models import LoggedHours
-from workbench.tools.models import Model, HoursField, Z
+from workbench.tools.models import Model, HoursField
 from workbench.tools.urls import model_urls
 
 
@@ -68,157 +62,6 @@ class Year(Model):
     @property
     def months(self):
         return [getattr(self, field) for field in self.MONTHS]
-
-    def statistics(self, *, users=None):
-        if users is None:
-            users = User.objects.filter(is_active=True)
-
-        target_days = list(self.months)
-
-        absences = defaultdict(lambda: {"vacation_days": [], "other_absences": []})
-        months = defaultdict(
-            lambda: {
-                "months": [None] * 12,
-                "target_days": target_days,
-                "percentage": [Z for i in range(12)],
-                "available_vacation_days": [Z for i in range(12)],
-                "vacation_days": [Z for i in range(12)],
-                "vacation_days_correction": [Z for i in range(12)],
-                "other_absences": [Z for i in range(12)],
-                "target": [Z for i in range(12)],
-                "hours": [Z for i in range(12)],
-            }
-        )
-        dpm = days_per_month(self.year)
-
-        for employment in Employment.objects.filter(user__in=users).order_by(
-            "-date_from"
-        ):
-            percentage_factor = Decimal(employment.percentage) / 100
-            available_vacation_days_per_month = (
-                Decimal(employment.vacation_weeks) * 5 / 12 * percentage_factor
-            )
-            month_data = months[employment.user_id]
-            for month, days in monthly_days(
-                employment.date_from, employment.date_until
-            ):
-                if month.year < self.year:
-                    continue
-                elif month.year > self.year:
-                    break
-                partial_month_factor = Decimal(days) / dpm[month.month - 1]
-                month_data["target"][month.month - 1] -= (
-                    target_days[month.month - 1]
-                    * percentage_factor
-                    * partial_month_factor
-                )
-                month_data["percentage"][month.month - 1] += (
-                    100 * percentage_factor * partial_month_factor
-                )
-                month_data["available_vacation_days"][month.month - 1] += (
-                    available_vacation_days_per_month * partial_month_factor
-                )
-                month_data["months"][month.month - 1] = month
-
-        for row in (
-            LoggedHours.objects.order_by()
-            .filter(rendered_by__in=users, rendered_on__year=self.year)
-            .values("rendered_by")
-            .annotate(month=ExtractMonth("rendered_on"))
-            .values("rendered_by", "month")
-            .annotate(Sum("hours"))
-        ):
-            months[row["rendered_by"]]["hours"][row["month"] - 1] += row["hours__sum"]
-
-        remaining = {
-            user: sum(month_data["available_vacation_days"])
-            for user, month_data in months.items()
-        }
-        for absence in Absence.objects.filter(
-            user__in=users, starts_on__year=self.year
-        ).order_by("starts_on"):
-            key = "vacation_days" if absence.is_vacation else "other_absences"
-            absences[absence.user_id][key].append(absence)
-            month_data = months[absence.user_id]
-            month_data[key][absence.starts_on.month - 1] += absence.days
-
-            if absence.is_vacation:
-                if absence.days > remaining[absence.user_id]:
-                    month_data["vacation_days_correction"][
-                        absence.starts_on.month - 1
-                    ] += (remaining[absence.user_id] - absence.days)
-                remaining[absence.user_id] = max(
-                    0, remaining[absence.user_id] - absence.days
-                )
-
-        for user_id, vacation_days in remaining.items():
-            if vacation_days > 0:
-                months[user_id]["vacation_days_correction"][11] = vacation_days
-
-        today = date.today()
-        this_month = (today.year, today.month - 1)
-
-        def working_time(data):
-            return [
-                sum(
-                    (
-                        data["hours"][i] / self.working_time_per_day,
-                        data["vacation_days"][i],
-                        data["vacation_days_correction"][i],
-                        data["other_absences"][i],
-                    ),
-                    Z,
-                )
-                for i in range(12)
-            ]
-
-        def monthly_sums(data):
-            sums = [None] * 12
-            for i in range(12):
-                if (self.year, i) >= this_month:
-                    break
-                sums[i] = data["hours"][i] + self.working_time_per_day * sum(
-                    (
-                        data["vacation_days"][i],
-                        data["vacation_days_correction"][i],
-                        data["other_absences"][i],
-                        data["target"][i],
-                    )
-                )
-            return sums
-
-        statistics = []
-        for user in users:
-            user_data = months[user.id]
-            sums = monthly_sums(user_data)
-            wt = working_time(user_data)
-            statistics.append(
-                {
-                    "user": user,
-                    "months": user_data,
-                    "absences": absences[user.id],
-                    "working_time": wt,
-                    "monthly_sums": sums,
-                    "totals": {
-                        "target_days": sum(user_data["target_days"]),
-                        "percentage": sum(user_data["percentage"]) / 12,
-                        "available_vacation_days": sum(
-                            user_data["available_vacation_days"]
-                        ),
-                        "vacation_days": sum(user_data["vacation_days"]),
-                        "vacation_days_correction": sum(
-                            user_data["vacation_days_correction"]
-                        ),
-                        "other_absences": sum(user_data["other_absences"]),
-                        "target": sum(user_data["target"]),
-                        "hours": sum(user_data["hours"]),
-                        "working_time": sum(wt),
-                        "running_sum": sum(filter(None, sums), Z),
-                    },
-                }
-            )
-
-        return statistics
 
 
 class Employment(Model):
