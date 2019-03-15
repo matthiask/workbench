@@ -500,7 +500,7 @@ SELECT
 	p.subtotal,
 	p.discount,
 	p.tax,
-	p.total,
+  CASE WHEN p.tax > 0 THEN (subtotal - discount) * (1 + p.tax / 100) ELSE p.total END,
 	p.offer_date,
 	p.name,
 	p.description,
