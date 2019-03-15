@@ -272,6 +272,9 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
             instance.down_payment_total = Z
 
         if "apply_down_payment" in self.cleaned_data:
+            if not instance.pk:
+                instance.save()
+
             instance.down_payment_invoices.set(
                 self.cleaned_data.get("apply_down_payment")
             )
@@ -311,75 +314,83 @@ class CreateProjectInvoiceForm(InvoiceForm):
             self.fields["type"].initial = self.instance.type = invoice_type
 
             if invoice_type == "services":
-                source = self.request.GET.get("source")
-                if source == "logbook":
+                self.add_services_field()
 
-                    def amount(service):
-                        if not service.pk:
-                            return format_html(
-                                '{} <small class="bg-warning px-1">{}</small>',
-                                currency(service.service_cost),
-                                _("%s logged but not bound to a service.")
-                                % currency(service.logged_cost),
-                            )
-                        elif service.effort_rate is not None:
-                            return currency(
-                                service.effort_rate * service.logged_hours
-                                + service.logged_cost
-                            )
-                        elif service.logged_hours:
-                            return format_html(
-                                '{} <small class="bg-warning px-1">{}</small>',
-                                currency(service.service_cost),
-                                _("%s logged but no hourly rate defined.")
-                                % hours(service.logged_hours),
-                            )
-                        return currency(service.logged_cost)
+    def add_services_field(self):
+        source = self.request.GET.get("source")
+        if source == "logbook":
 
-                else:
-
-                    def amount(service):
-                        return currency(service.service_cost)
-
-                choices = []
-                for offer, services in self.project.grouped_services:
-                    choices.append(
-                        (
-                            format_html(
-                                "<u>{}</u><br>"
-                                '<div class="form-check">'
-                                '<input type="checkbox" data-toggle-following>'
-                                "{}"
-                                "</div>",
-                                offer if offer else _("Not offered yet"),
-                                _("Choose all"),
-                            ),
-                            [
-                                (
-                                    service.id,
-                                    format_html(
-                                        '<div class="mb-2"><strong>{}</strong>'
-                                        "<br>{}{}</div>",
-                                        service.title,
-                                        format_html("{}<br>", service.description)
-                                        if service.description
-                                        else "",
-                                        amount(service),
-                                    ),
-                                )
-                                for service in services
-                            ],
-                        )
+            def amount(service):
+                if not service.pk:
+                    return format_html(
+                        '{} <small class="bg-warning px-1">{}</small>',
+                        currency(service.service_cost),
+                        _("%s logged but not bound to a service.")
+                        % currency(service.logged_cost),
                     )
-                self.fields["selected_services"] = forms.MultipleChoiceField(
-                    choices=choices,
-                    label=_("services"),
-                    widget=forms.CheckboxSelectMultiple(attrs={"size": 30}),
+                elif service.effort_rate is not None:
+                    return currency(
+                        service.effort_rate * service.logged_hours + service.logged_cost
+                    )
+                elif service.logged_hours:
+                    return format_html(
+                        '{} <small class="bg-warning px-1">{}</small>',
+                        currency(service.service_cost),
+                        _("%s logged but no hourly rate defined.")
+                        % hours(service.logged_hours),
+                    )
+                return currency(service.logged_cost)
+
+        else:
+
+            def amount(service):
+                return currency(service.service_cost)
+
+        choices = []
+        for offer, services in self.project.grouped_services:
+            choices.append(
+                (
+                    format_html(
+                        "<u>{}</u><br>"
+                        '<div class="form-check">'
+                        '<input type="checkbox" data-toggle-following>'
+                        "{}"
+                        "</div>",
+                        offer if offer else _("Not offered yet"),
+                        _("Choose all"),
+                    ),
+                    [
+                        (
+                            service.id,
+                            format_html(
+                                '<div class="mb-2"><strong>{}</strong>'
+                                "<br>{}{}</div>",
+                                service.title,
+                                format_html("{}<br>", service.description)
+                                if service.description
+                                else "",
+                                amount(service),
+                            ),
+                        )
+                        for service in services
+                    ],
                 )
+            )
+        self.fields["selected_services"] = forms.MultipleChoiceField(
+            choices=choices,
+            label=_("services"),
+            widget=forms.CheckboxSelectMultiple(attrs={"size": 30}),
+        )
 
     def save(self):
         instance = super().save()
-        print(self.cleaned_data["selected_services"])
+        services = self.project.services.filter(
+            id__in=self.cleaned_data["selected_services"]
+        )
+        if self.request.GET.get("source") == "logbook":
+            instance.create_services_from_logbook(services)
+        else:
+            instance.create_services_from_offer(services)
         return instance
 
 

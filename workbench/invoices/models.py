@@ -318,12 +318,12 @@ class Invoice(ModelWithTotal):
 
         return offers_list
 
-    def create_services_from_logbook(self):
+    def create_services_from_logbook(self, project_services):
         assert self.project
         if not self.pk:
             self.save()
 
-        for ps in self.project.services.all():
+        for ps in project_services:
             not_archived_effort = ps.loggedhours.filter(
                 archived_at__isnull=True
             ).order_by()
@@ -358,12 +358,12 @@ class Invoice(ModelWithTotal):
 
         self.save()
 
-    def create_services_from_offer(self, offer):
+    def create_services_from_offer(self, project_services):
         assert self.project
         if not self.pk:
             self.save()
 
-        for ps in offer.services.all():
+        for ps in project_services:
             service = Service.objects.create(
                 invoice=self,
                 project_service=ps,
