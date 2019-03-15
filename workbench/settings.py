@@ -118,6 +118,7 @@ LOCALE_PATHS = (os.path.join(BASE_DIR, "conf", "locale"),)
 AUTHENTICATION_BACKENDS = ("workbench.accounts.backends.AuthBackend",)
 
 DATABASES = {"default": dj_database_url.config(default="sqlite:///db.sqlite3")}
+ATOMIC_REQUESTS = True
 
 LANGUAGE_CODE = "de-ch"
 TIME_ZONE = "Europe/Zurich"

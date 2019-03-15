@@ -3,7 +3,7 @@ from datetime import date, timedelta
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import F, Q
+from django.db.models import F, Q, Sum
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -317,6 +317,73 @@ class Invoice(ModelWithTotal):
             )
 
         return offers_list
+
+    def create_services_from_logbook(self):
+        assert self.project
+        if not self.pk:
+            self.save()
+
+        for ps in self.project.services.all():
+            not_archived_effort = ps.loggedhours.filter(
+                archived_at__isnull=True
+            ).order_by()
+            not_archived_costs = ps.loggedcosts.filter(
+                archived_at__isnull=True
+            ).order_by()
+
+            hours = not_archived_effort.aggregate(Sum("hours"))["hours__sum"] or Z
+            cost = not_archived_costs.aggregate(Sum("cost"))["cost__sum"] or Z
+
+            if hours or cost:
+                service = Service.objects.create(
+                    invoice=self,
+                    project_service=ps,
+                    title=ps.title,
+                    description=ps.description,
+                    position=ps.position,
+                    effort_rate=ps.effort_rate,
+                    effort_type=ps.effort_type,
+                    effort_hours=hours,
+                    cost=cost,
+                    third_party_costs=not_archived_costs.filter(
+                        third_party_costs__isnull=False
+                    ).aggregate(Sum("third_party_costs"))["third_party_costs__sum"],
+                )
+                not_archived_effort.update(
+                    invoice_service=service, archived_at=timezone.now()
+                )
+                not_archived_costs.update(
+                    invoice_service=service, archived_at=timezone.now()
+                )
+
+        self.save()
+
+    def create_services_from_offer(self, offer):
+        assert self.project
+        if not self.pk:
+            self.save()
+
+        for ps in offer.services.all():
+            service = Service.objects.create(
+                invoice=self,
+                project_service=ps,
+                title=ps.title,
+                description=ps.description,
+                position=ps.position,
+                effort_rate=ps.effort_rate,
+                effort_type=ps.effort_type,
+                effort_hours=ps.effort_hours,
+                cost=ps.cost,
+                third_party_costs=ps.third_party_costs,
+            )
+            ps.loggedhours.filter(archived_at__isnull=True).update(
+                invoice_service=service, archived_at=timezone.now()
+            )
+            ps.loggedcosts.filter(archived_at__isnull=True).update(
+                invoice_service=service, archived_at=timezone.now()
+            )
+
+        self.save()
 
 
 @model_urls()

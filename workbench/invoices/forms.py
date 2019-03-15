@@ -83,8 +83,8 @@ class CreateProjectInvoiceForm(WarningsForm, PostalAddressSelectionForm):
 
     class Meta:
         model = Invoice
-        fields = ("contact", "title", "description", "owned_by", "type")
-        widgets = {"contact": Picker(model=Person), "type": forms.RadioSelect}
+        fields = ["contact", "title", "description", "owned_by"]
+        widgets = {"contact": Picker(model=Person)}
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project")
@@ -100,7 +100,29 @@ class CreateProjectInvoiceForm(WarningsForm, PostalAddressSelectionForm):
         self.instance.customer = self.project.customer
         self.instance.contact = self.project.contact
 
-        self.fields["type"].choices = Invoice.TYPE_CHOICES
+        self.fields["invoice_type"] = forms.ChoiceField(
+            label=_("type"),
+            choices=(
+                [row for row in Invoice.TYPE_CHOICES if row[0] != Invoice.SERVICES]
+                + [
+                    (
+                        "offer_{}".format(offer.pk),
+                        format_html(
+                            "{} {} {}<br><small>{}, {}</small>",
+                            _("Services from offer"),
+                            offer.code,
+                            offer,
+                            offer.pretty_status(),
+                            offer.short_total_excl(),
+                        ),
+                    )
+                    for offer in self.project.offers.all()
+                ]
+                + [("logbook", _("Services from logbook"))]
+            ),
+            widget=forms.RadioSelect,
+            help_text=_("Individual invoice services can be edited later."),
+        )
 
         self.add_postal_address_selection(
             organization=self.project.customer, person=self.project.contact
@@ -127,7 +149,19 @@ class CreateProjectInvoiceForm(WarningsForm, PostalAddressSelectionForm):
         instance = super().save(commit=False)
         if self.cleaned_data.get("pa"):
             instance.postal_address = self.cleaned_data["pa"].postal_address
-        instance.save()
+        type = self.cleaned_data["invoice_type"]
+        if type in {Invoice.FIXED, Invoice.DOWN_PAYMENT}:
+            instance.type = type
+            instance.save()
+        elif type == "logbook":
+            instance.type = Invoice.SERVICES
+            instance.create_services_from_logbook()
+        else:
+            instance.type = Invoice.SERVICES
+            for offer in self.project.offers.all():
+                if "offer_{}".format(offer.pk) == type:
+                    instance.create_services_from_offer(offer)
+
         return instance
 
 
