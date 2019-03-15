@@ -1,5 +1,3 @@
-import re
-
 from django.apps import apps
 from django.contrib import messages
 from django.shortcuts import render
@@ -36,12 +34,8 @@ def search(request):
 
 
 HISTORY = {
-    "projects.service": {
-        "exclude": {"position"},
-    },
-    "invoices.service": {
-        "exclude": {"position"},
-    },
+    "projects.service": {"exclude": {"position"}},
+    "invoices.service": {"exclude": {"position"}},
 }
 
 
@@ -53,7 +47,7 @@ def history(request, label, pk):
     fields = [
         f.name
         for f in model._meta.get_fields()
-        if hasattr(f, "attname") and not f.primary_key and not f.name in exclude
+        if hasattr(f, "attname") and not f.primary_key and f.name not in exclude
     ]
 
     return render(
