@@ -1,10 +1,19 @@
 {% extends "modal.html" %}
-{% load history i18n %}
+{% load i18n %}
 
 {% block size %}modal-lg{% endblock %}
 
 {% block title %}{% trans 'History' %}{% endblock %}
 
 {% block body %}
-{% history instance fields %}
+  {% for change in changes reversed %}
+    <h4>
+      Version {{ change.number }} / {{ change.version.pretty_user_name }} / {{ change.version.created_at }}
+    </h4>
+    <ul>
+      {% for pretty in change.changes %}
+        <li>{{ pretty }}</li>
+      {% endfor %}
+    </ul>
+  {% endfor %}
 {% endblock %}

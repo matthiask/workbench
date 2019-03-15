@@ -8,7 +8,6 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
-from workbench.audit.models import LoggedAction
 from workbench.tools.formats import local_date_format
 
 
@@ -72,8 +71,7 @@ def formatter(field):
     return lambda value: default_if_none(value, _("<no value>"))
 
 
-def changes(instance, fields):
-    versions = LoggedAction.objects.for_instance(instance)
+def changes(model, fields, versions):
     changes = []
 
     users = {str(u.pk): u.get_full_name() for u in User.objects.all()}
@@ -85,7 +83,7 @@ def changes(instance, fields):
         else:
             version.pretty_user_name = version.user_name
 
-    field_instances = [instance._meta.get_field(f) for f in fields]
+    field_instances = [model._meta.get_field(f) for f in fields]
 
     values = versions[0].row_data
     version_changes = [

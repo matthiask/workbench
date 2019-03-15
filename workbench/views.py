@@ -1,14 +1,17 @@
+import re
+
 from django.apps import apps
 from django.contrib import messages
-from django.http import Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.utils.translation import gettext as _
 
+from workbench.audit.models import LoggedAction
 from workbench.contacts.models import Organization, Person
 from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
+from workbench.tools.history import changes
 
 
 def search(request):
@@ -59,13 +62,23 @@ HISTORY = {
 
 
 def history(request, label, pk):
-    try:
-        fields = HISTORY[label]
-    except KeyError:
-        raise Http404("No or disallowed history: %s" % label)
-
-    instance = get_object_or_404(apps.get_model(label), pk=pk)
+    model = apps.get_model(label)
+    fields = HISTORY.get(label)
+    if not fields:
+        fields = [
+            f.name
+            for f in model._meta.get_fields()
+            if hasattr(f, "attname") and not f.primary_key
+        ]
+    else:
+        fields = re.split(r"[\s,]+", fields)
 
     return render(
-        request, "history_modal.html", {"instance": instance, "fields": fields}
+        request,
+        "history_modal.html",
+        {
+            "changes": changes(
+                model, fields, LoggedAction.objects.for_model_id(model, pk)
+            )
+        },
     )
