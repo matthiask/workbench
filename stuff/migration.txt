@@ -339,13 +339,13 @@ SELECT
     END,
     CASE WHEN down_payment THEN 'down-payment' ELSE 'fixed' END,
     CASE WHEN invoices.invoice_full_override!='' THEN invoices.invoice_full_override ELSE
-        CONCAT(
+        regexp_replace(regexp_replace(CONCAT(
             invoice_company, E'\n',
             invoice_first_name, ' ', invoice_last_name, E'\n',
             invoice_address, E'\n',
             invoice_zip_code, ' ', invoice_city, E'\n',
             CASE WHEN invoice_country = 'CH' THEN '' ELSE invoice_country END
-        )
+        ), '^\s+', ''), '\s+$', '')
     END,
     subtotal,
     discount,
@@ -505,13 +505,13 @@ SELECT
 	p.name,
 	p.description,
 	p.state,
-	CONCAT(
+  regexp_replace(regexp_replace(CONCAT(
 		offer_company, E'\n',
 		offer_first_name, ' ', offer_last_name, E'\n',
 		offer_address, E'\n',
 		offer_zip_code, ' ', offer_city, E'\n',
 		CASE WHEN offer_country = 'CH' THEN '' ELSE offer_country END
-	),
+  ), '^\s+', ''), '\s+$', ''),
 	p.manager_id,
 	p.job_id,
 	p.created,
