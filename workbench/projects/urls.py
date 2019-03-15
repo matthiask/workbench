@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.shortcuts import get_object_or_404, redirect
 
-from workbench.invoices.forms import CreateInvoiceForm
+from workbench.invoices.forms import CreateProjectInvoiceForm
 from workbench.invoices.models import Invoice
 from workbench.logbook.forms import LoggedHoursForm, LoggedCostForm
 from workbench.logbook.models import LoggedHours, LoggedCost
@@ -77,7 +77,7 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/createinvoice/$",
-        CreateAndUpdateView.as_view(model=Invoice, form_class=CreateInvoiceForm),
+        CreateAndUpdateView.as_view(model=Invoice, form_class=CreateProjectInvoiceForm),
         name="projects_project_createinvoice",
     ),
     # HOURS

@@ -78,7 +78,7 @@ class InvoiceSearchForm(forms.Form):
         )
 
 
-class CreateInvoiceForm(WarningsForm, PostalAddressSelectionForm):
+class CreateProjectInvoiceForm(WarningsForm, PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
 
     class Meta:
