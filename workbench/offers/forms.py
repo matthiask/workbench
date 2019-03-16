@@ -41,7 +41,7 @@ class CreateOfferForm(PostalAddressSelectionForm):
 
     class Meta:
         model = Offer
-        fields = ("title", "description", "owned_by")
+        fields = ("title", "description", "owned_by", "postal_address")
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project")

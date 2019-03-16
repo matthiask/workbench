@@ -242,6 +242,7 @@ class PostalAddressSelectionForm(ModelForm):
                 widget=forms.RadioSelect,
             )
             self.fields["pa"].choices = postal_addresses
+            self.fields.pop("postal_address", None)
 
     def save(self, commit=True):
         instance = super().save(commit=False)
