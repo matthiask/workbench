@@ -422,6 +422,7 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
         widgets = {
             "customer": Picker(model=Organization),
             "contact": Picker(model=Person),
+            "description": Textarea,
         }
 
     def __init__(self, *args, **kwargs):
