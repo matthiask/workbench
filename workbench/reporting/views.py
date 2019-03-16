@@ -1,8 +1,15 @@
 from datetime import date
 
+from django import forms
+from django.contrib import messages
 from django.shortcuts import redirect, render
+from django.utils.translation import gettext_lazy as _
 
-from . import invoicing_statistics, project_statistics
+from workbench.invoices.models import Invoice
+from workbench.reporting import invoicing_statistics, project_statistics
+from workbench.tools.formats import local_date_format
+from workbench.tools.models import Z
+from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
 def monthly_invoicing(request):
@@ -30,4 +37,59 @@ def overdrawn_projects(request):
         request,
         "reporting/overdrawn_projects.html",
         {"overdrawn_projects": project_statistics.overdrawn_projects()},
+    )
+
+
+class OpenItemsForm(forms.Form):
+    cutoff_date = forms.DateField(
+        label=_("cutoff date"),
+        required=False,
+        widget=forms.TextInput(attrs={"class": "datepicker"}),
+    )
+
+    def open_items_list(self):
+        open_items = (
+            Invoice.objects.filter(
+                invoiced_on__lt=self.cleaned_data["cutoff_date"],
+                closed_on__gte=self.cleaned_data["cutoff_date"],
+            )
+            .order_by("invoiced_on")
+            .select_related("owned_by", "project")
+        )
+
+        return {
+            "list": open_items,
+            "total_excl_tax": sum((i.total_excl_tax for i in open_items), Z),
+            "total": sum((i.total for i in open_items), Z),
+        }
+
+
+def open_items_list(request):
+    if not request.GET:
+        return redirect(
+            ".?cutoff_date={}".format(local_date_format(date.today().replace(day=1)))
+        )
+
+    form = OpenItemsForm(request.GET)
+    if not form.is_valid():
+        messages.warning(request, _("Form was invalid."))
+        return redirect(".")
+
+    if request.GET.get("xlsx"):
+        xlsx = WorkbenchXLSXDocument()
+        xlsx.table_from_queryset(
+            form.open_items_list()["list"].select_related(
+                "customer", "contact__organization", "owned_by", "project__owned_by"
+            )
+        )
+        return xlsx.to_response(
+            "open-items-list-{}.xlsx".format(
+                form.cleaned_data["cutoff_date"].isoformat()
+            )
+        )
+
+    return render(
+        request,
+        "reporting/open_items_list.html",
+        {"form": form, "open_items_list": form.open_items_list()},
     )

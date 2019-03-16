@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% load fineforms i18n workbench %}
+
+{% block title %}{% trans 'open items list' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+<div class="col-sm-12">
+  <h1>{% trans 'open items list' %}</h1>
+
+  <form method="get" class="mb-3">
+    {% ff_fields form %}
+    {% ff_submit _('show') %}
+  </form>
+
+  <table class="table table-sm table-responsive-lg">
+    <thead>
+      <tr>
+        <th class="w-100">{% trans 'invoice' %}</th>
+        <th class="text-nowrap text-right">{% trans 'invoiced on' %}</th>
+        <th class="text-nowrap text-right">{% trans 'total excl. tax' %}</th>
+        <th class="text-nowrap text-right">{% trans 'total' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for invoice in open_items_list.list %}
+      <tr>
+        <td>
+          <a href="{{ invoice.get_absolute_url }}">
+            {{ invoice|h }}
+            <span class="badge badge-{{ invoice.status_css }}">{{ invoice.pretty_status }}</span>
+          </a>
+        </td>
+        <td class="text-right">{{ invoice.invoiced_on|date:'d.m.Y' }}</td>
+        <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
+        <td class="text-right">{{ invoice.total|currency }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+    <tfoot>
+      <th>{% trans 'total' %}</th>
+      <th></th>
+      <th class="text-right">{{ open_items_list.total_excl_tax|currency }}</th>
+      <th class="text-right">{{ open_items_list.total|currency }}</th>
+    </tfoot>
+  </table>
+
+  <a href="{% querystring xlsx=1 %}" class="btn btn-secondary">
+    {% include 'svg/desktop-download.svg' %} XLSX
+  </a>
+</div>
+</div>
+{% endblock %}

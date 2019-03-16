@@ -5,7 +5,11 @@ from django.shortcuts import render
 
 from workbench import views
 from workbench.awt.views import ReportView
-from workbench.reporting.views import monthly_invoicing, overdrawn_projects
+from workbench.reporting.views import (
+    monthly_invoicing,
+    overdrawn_projects,
+    open_items_list,
+)
 
 
 urlpatterns = [
@@ -39,6 +43,7 @@ urlpatterns = [
         overdrawn_projects,
         name="report_overdrawn_projects",
     ),
+    url(r"^report/open-items-list/$", open_items_list, name="report_open_items_list"),
 ]
 
 if settings.DEBUG:
