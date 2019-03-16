@@ -2,6 +2,7 @@ from datetime import date
 
 from django import forms
 from django.contrib import messages
+from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext_lazy as _
 
@@ -55,8 +56,10 @@ class OpenItemsForm(forms.Form):
     def open_items_list(self):
         open_items = (
             Invoice.objects.filter(
-                invoiced_on__lt=self.cleaned_data["cutoff_date"],
-                closed_on__gte=self.cleaned_data["cutoff_date"],
+                ~Q(status__in=[Invoice.IN_PREPARATION, Invoice.REPLACED]),
+                Q(invoiced_on__lt=self.cleaned_data["cutoff_date"]),
+                Q(closed_on__gte=self.cleaned_data["cutoff_date"])
+                | Q(closed_on__isnull=True),
             )
             .order_by("invoiced_on")
             .select_related("owned_by", "project")
