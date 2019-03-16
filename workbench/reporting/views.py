@@ -47,6 +47,11 @@ class OpenItemsForm(forms.Form):
         widget=forms.TextInput(attrs={"class": "datepicker"}),
     )
 
+    def __init__(self, data, *args, **kwargs):
+        data = data.copy()
+        data.setdefault("cutoff_date", local_date_format(date.today()))
+        super().__init__(data, *args, **kwargs)
+
     def open_items_list(self):
         open_items = (
             Invoice.objects.filter(
@@ -65,11 +70,6 @@ class OpenItemsForm(forms.Form):
 
 
 def open_items_list(request):
-    if not request.GET:
-        return redirect(
-            ".?cutoff_date={}".format(local_date_format(date.today().replace(day=1)))
-        )
-
     form = OpenItemsForm(request.GET)
     if not form.is_valid():
         messages.warning(request, _("Form was invalid."))
