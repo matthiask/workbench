@@ -93,13 +93,17 @@ class ServiceBase(Model):
             self.service_cost += self.effort_hours * self.effort_rate
         super().save(*args, **kwargs)
 
-        ids = filter(
-            None, [self._orig_related_id, getattr(self, self._related_model.attname)]
-        )
-        for instance in self._related_model.remote_field.model._default_manager.filter(
-            id__in=ids
-        ):
-            instance.save()
+        if not kwargs.get("skip_related_model"):
+            ids = filter(
+                None,
+                [self._orig_related_id, getattr(self, self._related_model.attname)],
+            )
+            for (
+                instance
+            ) in self._related_model.remote_field.model._default_manager.filter(
+                id__in=ids
+            ):
+                instance.save()
 
     save.alters_data = True
 

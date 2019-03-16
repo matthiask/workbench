@@ -335,7 +335,7 @@ class Invoice(ModelWithTotal):
             cost = not_archived_costs.aggregate(Sum("cost"))["cost__sum"] or Z
 
             if hours or cost:
-                service = Service.objects.create(
+                service = Service(
                     invoice=self,
                     project_service=ps,
                     title=ps.title,
@@ -349,6 +349,7 @@ class Invoice(ModelWithTotal):
                         third_party_costs__isnull=False
                     ).aggregate(Sum("third_party_costs"))["third_party_costs__sum"],
                 )
+                service.save(skip_related_model=True)
                 not_archived_effort.update(
                     invoice_service=service, archived_at=timezone.now()
                 )
@@ -364,7 +365,7 @@ class Invoice(ModelWithTotal):
             self.save()
 
         for ps in project_services:
-            service = Service.objects.create(
+            service = Service(
                 invoice=self,
                 project_service=ps,
                 title=ps.title,
@@ -376,6 +377,7 @@ class Invoice(ModelWithTotal):
                 cost=ps.cost,
                 third_party_costs=ps.third_party_costs,
             )
+            service.save(skip_related_model=True)
             ps.loggedhours.filter(archived_at__isnull=True).update(
                 invoice_service=service, archived_at=timezone.now()
             )
