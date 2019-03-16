@@ -371,11 +371,11 @@ WHERE
     p.id=invoices.job_id;
 
 UPDATE invoices_invoice
-SET closed_on=paid_on, payment_notice=notes
+SET closed_on=p.closed_on, payment_notice=notes
 FROM dblink(
     'dbname=fineware_feinheit',
-    'SELECT DISTINCT ON (invoice_id) date, notes, invoice_id FROM invoicing_jobinvoiceupdate WHERE state=30 ORDER BY invoice_id, date DESC, id DESC'
-) AS p(paid_on date, notes text, invoice_id int)
+    'SELECT DISTINCT ON (invoice_id) date, notes, invoice_id FROM invoicing_jobinvoiceupdate WHERE state=30 OR state=35 OR state=40 ORDER BY invoice_id, date DESC, id DESC'
+) AS p(closed_on date, notes text, invoice_id int)
 WHERE invoices_invoice.id=p.invoice_id;
 
 UPDATE invoices_invoice
