@@ -16,15 +16,15 @@ class InvoicesTest(TestCase):
             response, invoice.urls.url("list"), fetch_redirect_response=False
         )
 
-    def test_create_service_invoice_from_offer(self):
+    def create_service_invoice(self, params):
         service = factories.ServiceFactory.create(cost=100)
+        url = service.project.urls.url("createinvoice") + params
 
         self.client.force_login(service.project.owned_by)
-        url = service.project.urls.url("createinvoice") + "?type=services&source=offer"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(
+        return self.client.post(
             url,
             {
                 "contact": service.project.contact_id,
@@ -37,6 +37,14 @@ class InvoicesTest(TestCase):
             },
         )
 
+    def test_create_service_invoice_from_offer(self):
+        response = self.create_service_invoice("?type=services&source=offer")
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls.url("update"))
         self.assertEqual(invoice.subtotal, 100)
+
+    def test_create_service_invoice_from_logbook(self):
+        response = self.create_service_invoice("?type=services&source=logbook")
+        invoice = Invoice.objects.get()
+        self.assertRedirects(response, invoice.urls.url("update"))
+        self.assertEqual(invoice.subtotal, 0)
