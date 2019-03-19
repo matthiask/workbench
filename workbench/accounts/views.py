@@ -103,4 +103,6 @@ def oauth2(request):
 def logout(request):
     auth_logout(request)
     messages.success(request, _("You have been signed out."))
-    return http.HttpResponseRedirect(reverse("login"))
+    response = http.HttpResponseRedirect(reverse("login"))
+    response.delete_cookie("login_hint")
+    return response
