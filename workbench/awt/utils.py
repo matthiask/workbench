@@ -23,7 +23,7 @@ def monthly_days(date_from, date_until):
         month = next_month
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     from pprint import pprint
 
     examples = [

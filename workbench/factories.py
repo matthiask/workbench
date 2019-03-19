@@ -116,7 +116,6 @@ class LoggedCostFactory(factory.DjangoModelFactory):
         model = LoggedCost
 
 
-
 # AWT #########################################################################
 class YearFactory(factory.DjangoModelFactory):
     year = date.today().year
