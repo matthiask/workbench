@@ -84,6 +84,8 @@ class ServiceBase(Model):
         self._orig_related_id = getattr(self, self._related_model.attname)
 
     def save(self, *args, **kwargs):
+        skip_related_model = kwargs.pop("skip_related_model", False)
+
         if not self.position:
             max_pos = self.__class__._default_manager.aggregate(m=Max("position"))["m"]
             self.position = 10 + (max_pos or 0)
@@ -91,9 +93,10 @@ class ServiceBase(Model):
         self.service_cost = self.cost or Z
         if all((self.effort_hours, self.effort_rate)):
             self.service_cost += self.effort_hours * self.effort_rate
+
         super().save(*args, **kwargs)
 
-        if not kwargs.get("skip_related_model"):
+        if not skip_related_model:
             ids = filter(
                 None,
                 [self._orig_related_id, getattr(self, self._related_model.attname)],
