@@ -31,7 +31,7 @@ class UserUpdateView(UpdateView):
         return self.request.user
 
 
-def oauth2_flow(request):
+def oauth2_flow(request, **kwargs):
     flow_kwargs = {
         "client_id": settings.OAUTH2_CLIENT_ID,
         "client_secret": settings.OAUTH2_CLIENT_SECRET,
@@ -42,6 +42,7 @@ def oauth2_flow(request):
         "revoke_uri": "https://accounts.google.com/o/oauth2/revoke",
         "redirect_uri": request.build_absolute_uri(reverse("accounts_oauth2")),
     }
+    flow_kwargs.update(kwargs)
 
     return OAuth2WebServerFlow(**flow_kwargs)
 
@@ -55,7 +56,7 @@ def login(request):
 
 @never_cache
 def oauth2(request):
-    flow = oauth2_flow(request)
+    flow = oauth2_flow(request, login_hint=request.COOKIES.get("login_hint", ""))
 
     code = request.GET.get("code")
     if not code:
@@ -95,6 +96,7 @@ def oauth2(request):
     next = request.get_signed_cookie("next", default=None, salt="next")
     response = http.HttpResponseRedirect(next if next else "/")
     response.delete_cookie("next")
+    response.set_cookie("login_hint", user.email, expires=30 * 86400)
     return response
 
 
