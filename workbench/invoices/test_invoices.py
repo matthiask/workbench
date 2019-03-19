@@ -4,12 +4,6 @@ from workbench import factories
 
 
 class InvoicesTest(TestCase):
-    def test_invoices_redirect(self):
-        user = factories.UserFactory.create()
-        self.client.force_login(user)
-        response = self.client.get("/invoices/")
-        self.assertRedirects(response, "/invoices/?s=open")
-
     def test_factories(self):
         invoice = factories.InvoiceFactory.create()
 
