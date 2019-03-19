@@ -1,10 +1,12 @@
 from datetime import date
+from decimal import Decimal
 
 from django.test import TestCase
 
 from workbench import factories
 from workbench.awt.models import Year
 from workbench.awt.utils import monthly_days
+from workbench.reporting.annual_working_time import annual_working_time
 
 
 class AWTTest(TestCase):
@@ -60,3 +62,52 @@ class AWTTest(TestCase):
         ]:
             with self.subTest(locals()):
                 self.assertEqual(list(monthly_days(from_, until_)), dates)
+
+    def test_working_time(self):
+        year = factories.YearFactory.create(year=2018)
+        service = factories.ServiceFactory.create()
+        user = service.project.owned_by
+        user.loggedhours.create(
+            service=service,
+            created_by=user,
+            hours=1000,
+            description="anything",
+            rendered_on=date(2018, 1, 1),
+        )
+        user.absences.create(starts_on=date(2018, 1, 1), days=50, is_vacation=True)
+        user.employments.create(
+            date_from=date(2017, 1, 1), percentage=80, vacation_weeks=5
+        )
+        user.employments.create(
+            date_from=date(2018, 10, 1), percentage=100, vacation_weeks=5
+        )
+
+        employments = list(user.employments.all())
+        self.assertEqual(employments[0].date_until, date(2018, 9, 30))
+        self.assertEqual(employments[1].date_until, date(9999, 12, 31))
+
+        awt = annual_working_time(year, users=[user])[0]
+
+        self.assertAlmostEqual(awt["totals"]["target_days"], Decimal("360"))
+        self.assertAlmostEqual(awt["totals"]["percentage"], Decimal("85"))
+        # 3/4 * 20 + 1/4 * 25 = 21.25
+        self.assertAlmostEqual(
+            awt["totals"]["available_vacation_days"], Decimal("21.25")
+        )
+
+        self.assertAlmostEqual(awt["totals"]["hours"], Decimal("1000"))
+        self.assertAlmostEqual(awt["totals"]["vacation_days"], Decimal("50"))
+        # 21.25 - 50 = -28.75
+        self.assertAlmostEqual(
+            awt["totals"]["vacation_days_correction"], Decimal("-28.75")
+        )
+        self.assertAlmostEqual(awt["totals"]["other_absences"], Decimal("0"))
+
+        # 3/4 * 80% * 360 + 1/4 * 100% * 360 = 306
+        self.assertAlmostEqual(awt["totals"]["target"], Decimal("-306"))
+
+        # 1000 / 8 + 21.25 = 125 + 21.25 = 146.25
+        self.assertAlmostEqual(awt["totals"]["working_time"], Decimal("146.25"))
+
+        # 306 * 8 - 1000 - 21.25 * 8 = 1278
+        self.assertAlmostEqual(awt["totals"]["running_sum"], Decimal("-1278"))
