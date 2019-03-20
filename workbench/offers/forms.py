@@ -8,7 +8,7 @@ from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.offers.models import Offer
 from workbench.projects.models import Service
 from workbench.tools.formats import local_date_format
-from workbench.tools.forms import ModelForm, Textarea, WarningsForm
+from workbench.tools.forms import Textarea, WarningsForm
 
 
 class OfferSearchForm(forms.Form):
@@ -77,7 +77,7 @@ class CreateOfferForm(PostalAddressSelectionForm):
         return instance
 
 
-class OfferForm(WarningsForm, ModelForm):
+class OfferForm(WarningsForm, PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
 
     class Meta:
@@ -111,6 +111,13 @@ class OfferForm(WarningsForm, ModelForm):
             required=False,
             initial=self.instance.services.values_list("pk", flat=True),
         )
+
+        if not self.instance.postal_address:
+            project = self.instance.project
+            self.add_postal_address_selection(
+                organization=project.organization if not project.contact else None,
+                person=project.contact,
+            )
 
     def clean(self):
         data = super().clean()
