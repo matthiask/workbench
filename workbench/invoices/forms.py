@@ -415,6 +415,7 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
             "title",
             "description",
             "owned_by",
+            "postal_address",
             "subtotal",
             "discount",
             "liable_to_vat",
@@ -423,6 +424,7 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
             "customer": Picker(model=Organization),
             "contact": Picker(model=Person),
             "description": Textarea,
+            "postal_address": Textarea,
         }
 
     def __init__(self, *args, **kwargs):
@@ -453,6 +455,7 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
                         "contact": invoice.contact_id,
                         "title": invoice.title,
                         "description": invoice.description,
+                        "postal_address": invoice.postal_address,
                         "type": invoice.type,
                         "subtotal": invoice.subtotal,
                         "discount": invoice.discount,

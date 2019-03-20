@@ -2,10 +2,11 @@ import factory
 import types
 from datetime import date
 from faker import Factory
+from faker.providers import address
 
 from workbench.accounts.models import User
 from workbench.awt.models import Year
-from workbench.contacts.models import Organization, Person
+from workbench.contacts.models import Organization, Person, PostalAddress
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
@@ -14,6 +15,7 @@ from workbench.services.models import ServiceType
 
 
 faker = Factory.create("de")
+faker.add_provider(address)
 
 
 # ACCOUNTS ####################################################################
@@ -42,6 +44,17 @@ class OrganizationFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Organization
+
+
+class PostalAddressFactory(factory.DjangoModelFactory):
+    person = factory.SubFactory(PersonFactory)
+    street = factory.LazyFunction(faker.street_name)
+    house_number = factory.LazyFunction(faker.random_digit_not_null_or_empty)
+    postal_code = factory.LazyFunction(faker.postcode)
+    city = factory.LazyFunction(faker.city)
+
+    class Meta:
+        model = PostalAddress
 
 
 # PROJECTS ####################################################################

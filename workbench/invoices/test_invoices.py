@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.test import TestCase
 
 from workbench import factories
@@ -48,3 +50,33 @@ class InvoicesTest(TestCase):
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls.url("update"))
         self.assertEqual(invoice.subtotal, 0)
+
+    def test_create_person_invoice(self):
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        self.client.force_login(person.primary_contact)
+        url = Invoice().urls.url("create") + "?person={}".format(person.pk)
+        response = self.client.get(url)
+        self.assertContains(response, 'id="id_postal_address"')
+        postal_address = factories.PostalAddressFactory.create(person=person)
+        response = self.client.get(url)
+        self.assertNotContains(response, 'id="id_postal_address"')
+
+        response = self.client.post(
+            url,
+            {
+                "customer": person.organization_id,
+                "contact": person.id,
+                "title": "Stuff",
+                "owned_by": person.primary_contact_id,
+                "subtotal": "110",
+                "discount": "10",
+                "liable_to_vat": "1",
+                "pa": postal_address.id,
+            },
+        )
+        invoice = Invoice.objects.get()
+        self.assertRedirects(response, invoice.urls.url("detail"))
+        self.assertAlmostEqual(invoice.total_excl_tax, Decimal("100"))
+        self.assertAlmostEqual(invoice.total, Decimal("107.7"))
