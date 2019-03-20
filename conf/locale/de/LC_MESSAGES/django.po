@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-20 08:39+0100\n"
+"POT-Creation-Date: 2019-03-20 14:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -511,6 +511,10 @@ msgstr "Person"
 msgid "people"
 msgstr "Personen"
 
+#: workbench/contacts/models.py:118
+msgid "work"
+msgstr "Arbeit"
+
 #: workbench/contacts/models.py:119
 msgid "weight"
 msgstr "Gewichtung"
@@ -566,7 +570,7 @@ msgid "Completely overrides the postal address if set."
 msgstr "Überschreibt die Postadresse komplett falls gesetzt."
 
 #: workbench/contacts/models.py:205
-#: workbench/templates/contacts/person_form.html:66
+#: workbench/templates/contacts/person_form.html:67
 msgid "postal addresses"
 msgstr "Postadressen"
 
@@ -830,8 +834,8 @@ msgstr "Noch nicht offeriert"
 msgid "Choose all"
 msgstr "Alles auswählen"
 
-#: workbench/invoices/forms.py:381 workbench/offers/forms.py:67
-#: workbench/offers/forms.py:109 workbench/services/__init__.py:10
+#: workbench/invoices/forms.py:381 workbench/offers/forms.py:66
+#: workbench/offers/forms.py:108 workbench/services/__init__.py:10
 #: workbench/services/models.py:74
 #: workbench/templates/projects/project_detail.html:15
 #: workbench/templates/projects/project_detail_services.html:5
@@ -1154,7 +1158,7 @@ msgstr "Noch nicht implementiert."
 msgid "offers"
 msgstr "Offerten"
 
-#: workbench/offers/forms.py:129
+#: workbench/offers/forms.py:134
 #, python-format
 msgid ""
 "You are attempting to set status to '%(to)s', but the offer has already been "
@@ -1475,7 +1479,7 @@ msgstr "%(object)s bearbeiten"
 msgid "Create %(class)s"
 msgstr "%(class)s erstellen"
 
-#: workbench/templates/contacts/person_form.html:85
+#: workbench/templates/contacts/person_form.html:86
 msgid "submit"
 msgstr "absenden"
 

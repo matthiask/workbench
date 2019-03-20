@@ -27,15 +27,8 @@
             {% formset form.formsets.phonenumbers "phonenumbers" %}
             <div id="{{ form_id }}" class="mb-1">
               {{ form.id }}
-              <div class="input-group">
-                {{ form.type }}
-                {{ form.phone_number }}
-                <div class="input-group-append">
-                  <span class="input-group-text bg-warning">
-                    {{ form.DELETE }}
-                  </span>
-                </div>
-              </div>
+              {% ff_errors form %}
+              {% ff_fields form %}
             </div>
             {% endformset %}
             <a href="#" class="btn btn-secondary"
@@ -47,15 +40,8 @@
             {% formset form.formsets.emailaddresses "emailaddresses" %}
             <div id="{{ form_id }}" class="mb-1">
               {{ form.id }}
-              <div class="input-group">
-                {{ form.type }}
-                {{ form.email }}
-                <div class="input-group-append">
-                  <span class="input-group-text bg-warning">
-                    {{ form.DELETE }}
-                  </span>
-                </div>
-              </div>
+              {% ff_errors form %}
+              {% ff_fields form %}
             </div>
             {% endformset %}
             <a href="#" class="btn btn-secondary"
@@ -67,6 +53,7 @@
             {% formset form.formsets.postaladdresses "postaladdresses" %}
             <div id="{{ form_id }}" class="mb-1">
               {{ form.id }}
+              {% ff_errors form %}
               {% ff_fields form %}
             </div>
             {% endformset %}

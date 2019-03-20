@@ -25,7 +25,12 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("type", models.CharField(max_length=40, verbose_name="type")),
+                (
+                    "type",
+                    models.CharField(
+                        max_length=40, verbose_name="type", default="work"
+                    ),
+                ),
                 (
                     "weight",
                     models.SmallIntegerField(
@@ -177,7 +182,12 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("type", models.CharField(max_length=40, verbose_name="type")),
+                (
+                    "type",
+                    models.CharField(
+                        max_length=40, verbose_name="type", default="work"
+                    ),
+                ),
                 (
                     "weight",
                     models.SmallIntegerField(
@@ -216,7 +226,12 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("type", models.CharField(max_length=40, verbose_name="type")),
+                (
+                    "type",
+                    models.CharField(
+                        max_length=40, verbose_name="type", default="work"
+                    ),
+                ),
                 (
                     "weight",
                     models.SmallIntegerField(

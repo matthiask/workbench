@@ -115,7 +115,7 @@ class PersonDetail(Model):
         (re.compile(r"organization", re.I), -100),
     )
 
-    type = models.CharField(_("type"), max_length=40)
+    type = models.CharField(_("type"), max_length=40, default=_("work"))
     weight = models.SmallIntegerField(_("weight"), default=0, editable=False)
 
     class Meta:
@@ -123,7 +123,8 @@ class PersonDetail(Model):
 
     def save(self, *args, **kwargs):
         self.weight = sum(
-            (weight for regex, weight in self.WEIGHTS if regex.search(self.type)), 0
+            (weight for regex, weight in self.WEIGHTS if regex.search(str(self.type))),
+            0,
         )
         super().save(*args, **kwargs)
 
