@@ -54,8 +54,7 @@ class CreateOfferForm(PostalAddressSelectionForm):
 
         self.instance.project = self.project
         self.add_postal_address_selection(
-            person=self.project.contact,
-            organization=None if self.project.contact else self.project.customer,
+            person=self.project.contact, organization=self.project.customer
         )
 
         self.service_candidates = Service.objects.filter(
@@ -115,8 +114,7 @@ class OfferForm(WarningsForm, PostalAddressSelectionForm):
         if not self.instance.postal_address:
             project = self.instance.project
             self.add_postal_address_selection(
-                organization=project.organization if not project.contact else None,
-                person=project.contact,
+                person=project.contact, organization=project.organization
             )
 
     def clean(self):

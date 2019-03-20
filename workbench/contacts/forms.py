@@ -224,7 +224,7 @@ class PostalAddressSelectionForm(ModelForm):
                 )
             )
 
-        if organization:
+        if organization and (not person or not postal_addresses):
             postal_addresses.extend(
                 (pa.id, linebreaksbr(pa.postal_address))
                 for pa in PostalAddress.objects.filter(
