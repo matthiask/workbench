@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-16 08:48+0100\n"
+"POT-Creation-Date: 2019-03-20 08:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,20 +58,24 @@ msgstr "Benutzer"
 msgid "users"
 msgstr "Benutzer"
 
-#: workbench/accounts/views.py:67
+#: workbench/accounts/views.py:68
 msgid "OAuth2 error: Credential exchange failed"
 msgstr "OAuth2 Fehler: Anmeldedaten-Tausch fehlgeschlagen"
 
-#: workbench/accounts/views.py:89
+#: workbench/accounts/views.py:72
+msgid "Unable to determine your email address."
+msgstr "Konnte Emailadresse nicht bestimmen."
+
+#: workbench/accounts/views.py:93
 #, python-format
 msgid "No user with email address %s found."
 msgstr "Keinen Benutzer mit Emailadresse %s gefunden."
 
-#: workbench/accounts/views.py:92
+#: workbench/accounts/views.py:99
 msgid "Welcome! Please fill in your details."
 msgstr "Willkommen! Bitte fülle das folgende Formular aus."
 
-#: workbench/accounts/views.py:103
+#: workbench/accounts/views.py:113
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
@@ -127,14 +131,14 @@ msgid "All"
 msgstr "Alle"
 
 #: workbench/activities/forms.py:15 workbench/invoices/forms.py:22
-#: workbench/invoices/forms.py:509 workbench/offers/forms.py:18
+#: workbench/invoices/forms.py:511 workbench/offers/forms.py:18
 #: workbench/projects/forms.py:18
 msgid "Open"
 msgstr "Offen"
 
 #: workbench/activities/forms.py:20 workbench/activities/models.py:55
 #: workbench/deals/models.py:65 workbench/invoices/forms.py:34
-#: workbench/invoices/forms.py:519 workbench/invoices/models.py:101
+#: workbench/invoices/forms.py:521 workbench/invoices/models.py:101
 #: workbench/invoices/models.py:470 workbench/offers/models.py:48
 #: workbench/projects/forms.py:36 workbench/projects/models.py:57
 #: workbench/templates/activities/activity_detail.html:10
@@ -145,19 +149,19 @@ msgid "owned by"
 msgstr "Gehört"
 
 #: workbench/activities/forms.py:29 workbench/awt/forms.py:20
-#: workbench/invoices/forms.py:44 workbench/invoices/forms.py:528
+#: workbench/invoices/forms.py:44 workbench/invoices/forms.py:530
 #: workbench/logbook/forms.py:23 workbench/logbook/forms.py:71
 #: workbench/projects/forms.py:45
 msgid "All users"
 msgstr "Alle Benutzer"
 
 #: workbench/activities/forms.py:30 workbench/invoices/forms.py:45
-#: workbench/invoices/forms.py:529 workbench/projects/forms.py:46
+#: workbench/invoices/forms.py:531 workbench/projects/forms.py:46
 msgid "Owned by inactive users"
 msgstr "Gehört inaktiven Benutzern"
 
 #: workbench/activities/forms.py:32 workbench/awt/forms.py:22
-#: workbench/invoices/forms.py:47 workbench/invoices/forms.py:531
+#: workbench/invoices/forms.py:47 workbench/invoices/forms.py:533
 #: workbench/projects/forms.py:48 workbench/tools/forms.py:68
 msgid "Active"
 msgstr "Aktiv"
@@ -565,7 +569,7 @@ msgid "credit control"
 msgstr "Debitorenmanagement"
 
 #: workbench/credit_control/forms.py:22 workbench/deals/forms.py:11
-#: workbench/invoices/forms.py:21 workbench/invoices/forms.py:509
+#: workbench/invoices/forms.py:21 workbench/invoices/forms.py:511
 #: workbench/offers/forms.py:17 workbench/projects/forms.py:17
 msgid "All states"
 msgstr "Alle Stati"
@@ -764,7 +768,7 @@ msgstr ""
 "%(organization)s."
 
 #: workbench/invoices/forms.py:205 workbench/invoices/forms.py:264
-#: workbench/invoices/forms.py:639
+#: workbench/invoices/forms.py:641
 msgid "No contact selected."
 msgstr "Kein Kontakt ausgewählt."
 
@@ -832,11 +836,11 @@ msgstr "Leistungen"
 msgid "Other invoice types must be created directly on a project."
 msgstr "Andere Rechnungstypen müssen direkt auf einem Projekt erstellt werden."
 
-#: workbench/invoices/forms.py:478 workbench/projects/forms.py:133
+#: workbench/invoices/forms.py:480 workbench/projects/forms.py:133
 msgid "Optional, but useful for quickly filling the fields below."
 msgstr "Optional, aber nützlich um Felder unten rasch zu füllen."
 
-#: workbench/invoices/forms.py:509 workbench/projects/forms.py:19
+#: workbench/invoices/forms.py:511 workbench/projects/forms.py:19
 msgid "Closed"
 msgstr "Abgeschlossen"
 
@@ -1255,11 +1259,11 @@ msgstr ""
 msgid "Cannot modify an offer which is not in preparation anymore."
 msgstr "Kann Offerte, welche nicht in Vorbereitung ist, nicht mehr bearbeiten."
 
-#: workbench/reporting/views.py:44
+#: workbench/reporting/views.py:46
 msgid "cutoff date"
 msgstr "Stichtag"
 
-#: workbench/reporting/views.py:57
+#: workbench/reporting/views.py:78
 msgid "Form was invalid."
 msgstr "Formular war ungültig."
 
@@ -1288,11 +1292,11 @@ msgstr "Leistungskosten"
 msgid "effort type"
 msgstr "Aufwandtyp"
 
-#: workbench/services/models.py:140 workbench/services/models.py:142
+#: workbench/services/models.py:143 workbench/services/models.py:145
 msgid "Either fill in all fields or none."
 msgstr "Entweder alle Felder einfüllen oder keine."
 
-#: workbench/services/models.py:144
+#: workbench/services/models.py:147
 msgid "Cannot be empty if third party costs is set."
 msgstr "Kann nicht leer sein wenn Fremdkosten gesetzt sind."
 

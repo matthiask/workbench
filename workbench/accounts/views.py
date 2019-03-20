@@ -68,33 +68,38 @@ def oauth2(request):
         messages.error(request, _("OAuth2 error: Credential exchange failed"))
         return http.HttpResponseRedirect("/")
 
-    if credentials.id_token["email_verified"]:
-        email = credentials.id_token["email"]
-        new_user = False
+    if not credentials.id_token["email_verified"]:
+        messages.error(request, _("Unable to determine your email address."))
+        return http.HttpResponseRedirect(reverse("login"))
 
-        if email.endswith("@%s" % settings.WORKBENCH.SSO_DOMAIN):
-            user, new_user = User.objects.get_or_create(
-                email=email,
-                defaults={
-                    "is_active": True,
-                    "is_admin": False,
-                    "_short_name": "",
-                    "_full_name": "",
-                },
-            )
+    email = credentials.id_token["email"]
+    new_user = False
 
-        user = authenticate(email=email)
-        if user and user.is_active:
-            auth_login(request, user)
-        else:
-            messages.error(request, _("No user with email address %s found.") % email)
-            response = http.HttpResponseRedirect(reverse("login"))
-            response.delete_cookie("login_hint")
-            return response
+    if email.endswith("@%s" % settings.WORKBENCH.SSO_DOMAIN):
+        user, new_user = User.objects.get_or_create(
+            email=email,
+            defaults={
+                "is_active": True,
+                "is_admin": False,
+                "_short_name": "",
+                "_full_name": "",
+            },
+        )
 
-        if new_user:
-            messages.success(request, _("Welcome! Please fill in your details."))
-            return http.HttpResponseRedirect(reverse("accounts_update"))
+    user = authenticate(email=email)
+    if user and user.is_active:
+        auth_login(request, user)
+    else:
+        messages.error(request, _("No user with email address %s found.") % email)
+        response = http.HttpResponseRedirect(reverse("login"))
+        response.delete_cookie("login_hint")
+        return response
+
+    if new_user:
+        messages.success(request, _("Welcome! Please fill in your details."))
+        response = http.HttpResponseRedirect(reverse("accounts_update"))
+        response.set_cookie("login_hint", user.email, expires=30 * 86400)
+        return response
 
     next = request.get_signed_cookie("next", default=None, salt="next")
     response = http.HttpResponseRedirect(next if next else "/")
