@@ -445,7 +445,6 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
         elif request.GET.get("copy_invoice"):
             try:
                 invoice = Invoice.objects.get(pk=request.GET.get("copy_invoice"))
-                person = invoice.contact
             except (Invoice.DoesNotExist, TypeError, ValueError):
                 pass
             else:
