@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.projects.models import Project, Service
-from workbench.tools.models import SearchManager, Model, MoneyField, HoursField
+from workbench.tools.models import Model, MoneyField, HoursField
 from workbench.tools.urls import model_urls
 
 
@@ -44,8 +44,6 @@ class LoggedHours(Model):
         related_name="+",
     )
     archived_at = models.DateTimeField(_("archived at"), blank=True, null=True)
-
-    objects = SearchManager()
 
     class Meta:
         indexes = [models.Index(fields=["-rendered_on"])]
@@ -100,8 +98,6 @@ class LoggedCost(Model):
         related_name="+",
     )
     archived_at = models.DateTimeField(_("archived at"), blank=True, null=True)
-
-    objects = SearchManager()
 
     class Meta:
         ordering = ("-rendered_on", "-created_at")

@@ -17,15 +17,14 @@ class SearchQuerySet(models.QuerySet):
         return search(self, terms)
 
 
-SearchManager = models.Manager.from_queryset(SearchQuerySet)
-
-
 class SlowCollector(Collector):
     def can_fast_delete(self, *args, **kwargs):
         return False
 
 
 class Model(models.Model):
+    objects = SearchQuerySet.as_manager()
+
     class Meta:
         abstract = True
 

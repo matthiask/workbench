@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 
 from workbench.accounts.models import User
-from workbench.tools.models import SearchManager, SearchQuerySet, Model
+from workbench.tools.models import SearchQuerySet, Model
 from workbench.tools.urls import model_urls
 
 
@@ -36,8 +36,6 @@ class Organization(Model):
     groups = models.ManyToManyField(
         Group, verbose_name=_("groups"), related_name="+", blank=True
     )
-
-    objects = SearchManager()
 
     class Meta:
         ordering = ("name",)
