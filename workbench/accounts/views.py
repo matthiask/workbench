@@ -88,6 +88,9 @@ def oauth2(request):
             auth_login(request, user)
         else:
             messages.error(request, _("No user with email address %s found.") % email)
+            response = http.HttpResponseRedirect(reverse("login"))
+            response.delete_cookie("login_hint")
+            return response
 
         if new_user:
             messages.success(request, _("Welcome! Please fill in your details."))
