@@ -171,7 +171,7 @@ WORKBENCH = {
             "Bestandteil dieser Offerte sind die zum Zeitpunkt"
             " des Vertragsabschlusses aktuellen Allgemeinen"
             " Geschäftsbedingungen der Feinheit AG.",
-            "Die jeweils aktuelle Version" " finden Sie auf www.feinheit.ch/agb/.",
+            "Die jeweils aktuelle Version finden Sie auf www.feinheit.ch/agb/.",
         ],
         PDF_INVOICE_PAYMENT=(
             "Wir bedanken uns für die Überweisung des Betrags mit Angabe"

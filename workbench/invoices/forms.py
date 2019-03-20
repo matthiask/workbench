@@ -231,7 +231,7 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
 
         if self._is_status_unexpected(data.get("status")):
             self.add_warning(
-                _("Moving status from '%(from)s' to '%(to)s'." " Are you sure?")
+                _("Moving status from '%(from)s' to '%(to)s'. Are you sure?")
                 % {
                     "from": s_dict[self.instance._orig_status],
                     "to": s_dict[data["status"]],

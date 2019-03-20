@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 
 from django.test import TestCase
@@ -118,8 +119,6 @@ class InvoicesTest(TestCase):
         )
         self.assertRedirects(response, invoice.urls["detail"])
 
-        # print(response, response.content.decode("utf-8"))
-
         response = self.client.post(
             invoice.urls["update"], invoice_to_dict(invoice, status=Invoice.SENT)
         )
@@ -127,3 +126,37 @@ class InvoicesTest(TestCase):
             response,
             "Rechnungs- und/oder Fälligkeitsdatum fehlen für den augewählten Status.",
         )
+
+        person = factories.PersonFactory.create(organization=invoice.customer)
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(
+                invoice,
+                contact=person.id,
+                status=Invoice.SENT,
+                invoiced_on=local_date_format(date.today()),
+                due_on=local_date_format(date.today()),
+            ),
+        )
+        self.assertRedirects(response, invoice.urls["detail"])
+
+        invoice.refresh_from_db()
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(invoice, postal_address=invoice.postal_address + " hello"),
+        )
+        self.assertContains(
+            response,
+            "Du hast &#39;Postadresse&#39; geändert. Ich versuche,"
+            " unabsichtliche Änderungen an Feldern",
+        )
+
+        response = self.client.post(
+            invoice.urls["update"], invoice_to_dict(invoice, status=Invoice.PAID)
+        )
+        self.assertRedirects(response, invoice.urls["detail"])
+
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.closed_on, date.today())
+
+        # print(response, response.content.decode("utf-8"))
