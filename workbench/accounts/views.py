@@ -31,7 +31,7 @@ class UserUpdateView(UpdateView):
         return self.request.user
 
 
-def oauth2_flow(request, **kwargs):
+def oauth2_flow(request, **kwargs):  # pragma: no cover
     flow_kwargs = {
         "client_id": settings.OAUTH2_CLIENT_ID,
         "client_secret": settings.OAUTH2_CLIENT_SECRET,
