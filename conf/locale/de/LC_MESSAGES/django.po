@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-20 08:32+0100\n"
+"POT-Creation-Date: 2019-03-20 08:39+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,6 +20,12 @@ msgstr ""
 #: workbench/accounts/__init__.py:10
 msgid "accounts"
 msgstr "Konten"
+
+#: workbench/accounts/forms.py:16
+msgid "Managed automatically. Contact your administrator to change this."
+msgstr ""
+"Automatisch verwaltet. Kontaktiere den Administrator, falls Du diesen Wert "
+"ändern willst."
 
 #: workbench/accounts/middleware.py:27
 msgid "Please authenticate."
