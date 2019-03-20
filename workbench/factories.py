@@ -92,6 +92,8 @@ class OfferFactory(factory.DjangoModelFactory):
 class InvoiceFactory(factory.DjangoModelFactory):
     customer = factory.SubFactory(OrganizationFactory)
     owned_by = factory.SubFactory(UserFactory)
+    title = factory.Sequence(lambda n: "Invoice %d" % n)
+    type = Invoice.FIXED
 
     class Meta:
         model = Invoice

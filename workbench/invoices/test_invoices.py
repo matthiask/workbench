@@ -4,6 +4,31 @@ from django.test import TestCase
 
 from workbench import factories
 from workbench.invoices.models import Invoice
+from workbench.tools.forms import WarningsForm
+from workbench.tools.formats import local_date_format
+
+
+def invoice_to_dict(invoice, **kwargs):
+    return {
+        "customer": invoice.customer_id or "",
+        "contact": invoice.contact_id or "",
+        "title": invoice.title,
+        "description": invoice.description,
+        "owned_by": invoice.owned_by_id,
+        "subtotal": invoice.subtotal,
+        "discount": invoice.discount,
+        "third_party_costs": invoice.third_party_costs,
+        "liable_to_vat": invoice.liable_to_vat,
+        "postal_address": invoice.postal_address,
+        "status": invoice.status,
+        "type": invoice.type,
+        "closed_on": invoice.closed_on and local_date_format(invoice.closed_on) or "",
+        "invoiced_on": invoice.invoiced_on
+        and local_date_format(invoice.invoiced_on)
+        or "",
+        "due_on": invoice.due_on and local_date_format(invoice.due_on) or "",
+        **kwargs,
+    }
 
 
 class InvoicesTest(TestCase):
@@ -80,3 +105,25 @@ class InvoicesTest(TestCase):
         self.assertRedirects(response, invoice.urls.url("detail"))
         self.assertAlmostEqual(invoice.total_excl_tax, Decimal("100"))
         self.assertAlmostEqual(invoice.total, Decimal("107.7"))
+
+    def test_update_invoice(self):
+        invoice = factories.InvoiceFactory.create()
+        self.client.force_login(invoice.owned_by)
+        response = self.client.post(invoice.urls["update"], invoice_to_dict(invoice))
+        self.assertContains(response, "Kein Kontakt ausgewählt.")
+
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(invoice, **{WarningsForm.ignore_warnings_id: "on"}),
+        )
+        self.assertRedirects(response, invoice.urls["detail"])
+
+        # print(response, response.content.decode("utf-8"))
+
+        response = self.client.post(
+            invoice.urls["update"], invoice_to_dict(invoice, status=Invoice.SENT)
+        )
+        self.assertContains(
+            response,
+            "Rechnungs- und/oder Fälligkeitsdatum fehlen für den augewählten Status.",
+        )

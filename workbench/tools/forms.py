@@ -208,6 +208,4 @@ class WarningsForm(forms.BaseForm):
     def should_ignore_warnings(self):
         return self.data.get(self.ignore_warnings_id)
 
-    @property
-    def ignore_warnings_id(self):
-        return "__ig_{}".format(int(time.time() / 10800))
+    ignore_warnings_id = "__ig_{}".format(int(time.time() / 10800))
