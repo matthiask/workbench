@@ -189,20 +189,17 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
         data = super().clean()
         s_dict = dict(Invoice.STATUS_CHOICES)
 
-        if self.instance.project:
-            if data.get("contact"):
-                if data["contact"].organization != self.instance.project.customer:
-                    raise forms.ValidationError(
-                        {
-                            "contact": _(
-                                "Selected contact does not belong to project's"
-                                " organization, %(organization)s."
-                            )
-                            % {"organization": self.instance.project.customer}
-                        }
-                    )
-            else:
-                self.add_warning(_("No contact selected."))
+        if self.instance.project and data.get("contact"):
+            if data["contact"].organization != self.instance.project.customer:
+                raise forms.ValidationError(
+                    {
+                        "contact": _(
+                            "Selected contact does not belong to project's"
+                            " organization, %(organization)s."
+                        )
+                        % {"organization": self.instance.project.customer}
+                    }
+                )
 
         if self.instance._orig_status < self.instance.SENT:
             invoiced_on = data.get("invoiced_on")
