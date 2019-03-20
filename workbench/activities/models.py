@@ -59,7 +59,7 @@ class Activity(Model):
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     completed_at = models.DateTimeField(_("completed at"), blank=True, null=True)
 
-    objects = models.Manager.from_queryset(ActivityQuerySet)()
+    objects = ActivityQuerySet.as_manager()
 
     class Meta:
         ordering = ("due_on",)

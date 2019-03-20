@@ -73,7 +73,7 @@ class Deal(Model):
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     closed_on = models.DateField(_("closed on"), blank=True, null=True)
 
-    objects = models.Manager.from_queryset(DealQuerySet)()
+    objects = DealQuerySet.as_manager()
 
     class Meta:
         ordering = ["-created_at"]

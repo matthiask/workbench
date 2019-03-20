@@ -55,7 +55,7 @@ class Offer(ModelWithTotal):
     postal_address = models.TextField(_("postal address"), blank=True)
     _code = models.IntegerField(_("code"))
 
-    objects = models.Manager.from_queryset(OfferQuerySet)()
+    objects = OfferQuerySet.as_manager()
 
     class Meta:
         ordering = ("-offered_on",)

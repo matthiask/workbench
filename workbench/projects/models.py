@@ -63,7 +63,7 @@ class Project(Model):
 
     _code = models.IntegerField(_("code"))
 
-    objects = models.Manager.from_queryset(ProjectQuerySet)()
+    objects = ProjectQuerySet.as_manager()
 
     class Meta:
         ordering = ("-id",)
