@@ -37,8 +37,10 @@ class OffersTest(TestCase):
                 "liable_to_vat": "1",
                 "pa": postal_address.id,
                 "services": [service.id],
+                "status": Offer.IN_PREPARATION,
             },
         )
+        self.assertEqual(response.status_code, 302)
 
         offer = Offer.objects.get()
         self.assertRedirects(response, offer.get_absolute_url())

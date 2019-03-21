@@ -5,7 +5,7 @@ from workbench.invoices.forms import CreateProjectInvoiceForm
 from workbench.invoices.models import Invoice
 from workbench.logbook.forms import LoggedHoursForm, LoggedCostForm
 from workbench.logbook.models import LoggedHours, LoggedCost
-from workbench.offers.forms import CreateOfferForm
+from workbench.offers.forms import OfferForm
 from workbench.offers.models import Offer
 from workbench.projects.forms import (
     ProjectSearchForm,
@@ -71,7 +71,7 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/createoffer/$",
-        CreateRelatedView.as_view(model=Offer, form_class=CreateOfferForm),
+        CreateRelatedView.as_view(model=Offer, form_class=OfferForm),
         name="projects_project_createoffer",
     ),
     url(

@@ -36,46 +36,6 @@ class OfferSearchForm(forms.Form):
         )
 
 
-class CreateOfferForm(PostalAddressSelectionForm):
-    user_fields = default_to_current_user = ("owned_by",)
-
-    class Meta:
-        model = Offer
-        fields = ("title", "description", "owned_by", "postal_address")
-
-    def __init__(self, *args, **kwargs):
-        self.project = kwargs.pop("project")
-        kwargs["initial"] = {
-            "title": self.project.title,
-            "description": self.project.description,
-        }
-
-        super().__init__(*args, **kwargs)
-
-        self.instance.project = self.project
-        self.add_postal_address_selection(
-            person=self.project.contact, organization=self.project.customer
-        )
-
-        self.service_candidates = Service.objects.filter(
-            Q(project=self.instance.project), Q(offer__isnull=True)
-        )
-
-        self.fields["services"] = forms.ModelMultipleChoiceField(
-            queryset=self.service_candidates,
-            label=_("services"),
-            widget=forms.CheckboxSelectMultiple,
-            required=False,
-            initial=self.service_candidates.values_list("pk", flat=True),
-        )
-
-    def save(self):
-        instance = super().save()
-        self.cleaned_data["services"].update(offer=instance)
-        instance.save()
-        return instance
-
-
 class OfferForm(WarningsForm, PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
 
@@ -97,10 +57,17 @@ class OfferForm(WarningsForm, PostalAddressSelectionForm):
         }
 
     def __init__(self, *args, **kwargs):
+        self.project = kwargs.pop("project", None)
+        if not self.project:  # Creating a new offer
+            self.project = kwargs["instance"].project
+            kwargs.setdefault("initial", {}).update(
+                {"title": self.project.title, "description": self.project.description}
+            )
+
         super().__init__(*args, **kwargs)
+        self.instance.project = self.project
         self.service_candidates = Service.objects.filter(
-            Q(project=self.instance.project),
-            Q(offer__isnull=True) | Q(offer=self.instance),
+            Q(project=self.project), Q(offer__isnull=True) | Q(offer=self.instance)
         )
 
         self.fields["services"] = forms.ModelMultipleChoiceField(
@@ -112,9 +79,8 @@ class OfferForm(WarningsForm, PostalAddressSelectionForm):
         )
 
         if not self.instance.postal_address:
-            project = self.instance.project
             self.add_postal_address_selection(
-                person=project.contact, organization=project.organization
+                person=self.project.contact, organization=self.project.customer
             )
 
     def clean(self):
@@ -145,10 +111,11 @@ class OfferForm(WarningsForm, PostalAddressSelectionForm):
 
     def save(self):
         instance = super().save(commit=False)
-        if instance.pk:
-            self.cleaned_data["services"].update(offer=instance)
-            self.service_candidates.exclude(
-                id__in=self.cleaned_data["services"]
-            ).update(offer=None)
+        if not instance.pk:
+            instance.save()
+        self.cleaned_data["services"].update(offer=instance)
+        self.service_candidates.exclude(id__in=self.cleaned_data["services"]).update(
+            offer=None
+        )
         instance.save()
         return instance
