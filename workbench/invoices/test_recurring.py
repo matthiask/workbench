@@ -3,7 +3,7 @@ from datetime import date
 from django.test import TestCase
 
 from workbench import factories
-from workbench.invoices.models import Invoice, RecurringInvoice
+from workbench.invoices.models import RecurringInvoice
 
 
 class RecurringTest(TestCase):
@@ -27,10 +27,10 @@ class RecurringTest(TestCase):
 
         self.assertEqual(ri.next_period_starts_on, None)
 
-        ri.create_invoices(generate_until=date(2019, 1, 1))
-        self.assertEqual(Invoice.objects.count(), 12)
+        self.assertEqual(len(ri.create_invoices(generate_until=date(2019, 1, 1))), 12)
 
         ri.ends_on = None
         ri.save()
-        ri.create_invoices(generate_until=date(2019, 1, 1))
-        self.assertEqual(Invoice.objects.count(), 13)
+        self.assertEqual(len(ri.create_invoices(generate_until=date(2019, 1, 1))), 1)
+
+        self.assertTrue(len(RecurringInvoice.objects.create_invoices()) > 1)
