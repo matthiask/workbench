@@ -1,9 +1,6 @@
-from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
-from django.utils.translation import gettext as _
 
 from workbench import generic
-from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 
 
@@ -19,12 +16,6 @@ class MoveServiceView(generic.DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if not self.model.allow_update(self.object, request):
-            return redirect(self.object.offer)
-        if self.object.offer and self.object.offer.status > Offer.IN_PREPARATION:
-            messages.error(
-                request,
-                _("Cannot modify an offer which is not in preparation anymore."),
-            )
             return redirect(self.object.offer)
 
         if self.object.offer:
