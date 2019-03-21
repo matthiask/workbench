@@ -87,3 +87,19 @@ class LogbookTest(TestCase):
 
         entry = LoggedHours.objects.get()
         self.assertEqual(entry.service.title, "service title")
+
+    def test_create_logged_cost(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            project.urls["createcost"],
+            {
+                "rendered_on": local_date_format(date.today()),
+                "cost": "10",
+                "third_party_costs": "9",
+                "description": "Anything",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)

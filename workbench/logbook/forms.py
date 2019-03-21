@@ -256,16 +256,12 @@ class LoggedCostForm(WarningsForm, ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["service"].choices = self.project.services.choices()
 
+        if not self.instance.pk:
+            self.instance.created_by = self.request.user
+            self.instance.project = self.project
+
     def clean(self):
         data = super().clean()
         if self.project.closed_on:
             self.add_warning(_("This project is already closed."))
         return data
-
-    def save(self):
-        instance = super().save(commit=False)
-        if not instance.pk:
-            instance.project = self.project
-            instance.created_by = self.request.user
-        instance.save()
-        return instance
