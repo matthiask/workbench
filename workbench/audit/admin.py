@@ -22,10 +22,9 @@ class LoggedActionAdmin(admin.ModelAdmin):
         return []
 
     def data(self, instance):
-        if instance.action == "U":
-            instance.changed_fields.pop("fts_document", None)
-            return json.dumps(instance.changed_fields)
-        return json.dumps(instance.row_data)
+        return json.dumps(
+            instance.changed_fields if instance.action == "U" else instance.row_data
+        )
 
 
 admin.site.register(LoggedAction, LoggedActionAdmin)
