@@ -2,16 +2,11 @@
 
 from django.db import migrations
 
-from workbench.tools.search import migration_sql
-
 
 class Migration(migrations.Migration):
 
     dependencies = [("invoices", "0002_invoice_project"), ("audit", "0001_initial")]
 
     operations = [
-        migrations.RunSQL("SELECT audit_audit_table('invoices_invoice');", ""),
-        migrations.RunSQL(
-            *migration_sql("invoices_invoice", "title, description, postal_address")
-        ),
+        migrations.RunSQL("SELECT audit_audit_table('invoices_invoice');", "")
     ]

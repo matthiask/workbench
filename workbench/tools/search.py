@@ -7,7 +7,7 @@ look like this::
     # -*- coding: utf-8 -*-
     from __future__ import unicode_literals
     from django.db import models, migrations
-    from workbench.tools.search import migration_sql
+    from workbench.tools import search
 
     class Migration(migrations.Migration):
         dependencies = [
@@ -15,57 +15,60 @@ look like this::
         ]
 
         operations = [
-            migrations.RunSQL(*migration_sql(
-                'database_table',
-                'field1, field2, field3'
-            )),
+            migrations.RunSQL(
+                search.create_structure("database_table")
+            ),
+            migrations.RunSQL(
+                search.fts("database_table", ["field1", "field"])
+            ),
         ]
 """
 
 
-def migration_sql(table, fields):
-    FORWARD_SQL = """
-CREATE FUNCTION {table}_fts_document(integer) RETURNS tsvector AS $$
-DECLARE
- {table}_document TEXT;
-BEGIN
- SELECT regexp_replace(
-  unaccent(concat_ws(' ', {fields})),
-  '[^0-9A-Za-z]+', ' ')
- INTO {table}_document
- FROM {table} WHERE id=$1;
- RETURN to_tsvector('pg_catalog.german', {table}_document);
-END;
-$$ LANGUAGE plpgsql;
+def drop_old_shit(table):
+    return """\
+DROP TRIGGER IF EXISTS {table}_fts_update_trigger ON {table};
+DROP TRIGGER IF EXISTS {table}_fts_insert_trigger ON {table};
+DROP FUNCTION IF EXISTS {table}_fts_document (integer);
+DROP FUNCTION IF EXISTS {table}_fts_document_trigger ();
+""".format(
+        table=table
+    )
 
-CREATE FUNCTION {table}_fts_document_trigger() RETURNS TRIGGER AS $$
-BEGIN
- NEW.fts_document={table}_fts_document(NEW.id);
- RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+
+def create_structure(table):
+    return """\
+ALTER TABLE {table} DROP COLUMN IF EXISTS fts_document;
+DROP INDEX IF EXISTS {table}_fts_index;
 
 ALTER TABLE {table} ADD COLUMN fts_document tsvector;
-UPDATE {table} SET fts_document={table}_fts_document(id);
-CREATE TRIGGER {table}_fts_update_trigger BEFORE UPDATE ON {table}
- FOR EACH ROW EXECUTE PROCEDURE {table}_fts_document_trigger();
-CREATE TRIGGER {table}_fts_insert_trigger BEFORE INSERT ON {table}
- FOR EACH ROW EXECUTE PROCEDURE {table}_fts_document_trigger();
 CREATE INDEX {table}_fts_index ON {table} USING gin(fts_document);
-    """
+""".format(
+        table=table
+    )
 
-    BACKWARD_SQL = """
-DROP INDEX {table}_fts_index;
-ALTER TABLE {table} DROP COLUMN fts_document;
-DROP TRIGGER {table}_fts_update_trigger ON {table};
-DROP TRIGGER {table}_fts_insert_trigger ON {table};
-DROP FUNCTION {table}_fts_document (integer);
-DROP FUNCTION {table}_fts_document_trigger ();
-    """
 
-    return (
-        FORWARD_SQL.format(table=table, fields=fields),
-        BACKWARD_SQL.format(table=table),
+def fts(table, fields):
+    return """\
+CREATE OR REPLACE FUNCTION {table}_fts() RETURNS trigger AS $$
+begin
+  new.fts_document:=to_tsvector(
+    'pg_catalog.german',
+    regexp_replace(
+      unaccent(concat_ws(' ', {fields})),
+      '[^0-9A-Za-z]+',
+      ' '
+    )
+  );
+  return new;
+end
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS {table}_fts_trigger ON {table};
+CREATE TRIGGER {table}_fts_trigger BEFORE INSERT OR UPDATE
+  ON {table} FOR EACH ROW EXECUTE PROCEDURE {table}_fts();
+""".format(
+        table=table, fields=", ".join("new.{}".format(field) for field in fields)
     )
 
 

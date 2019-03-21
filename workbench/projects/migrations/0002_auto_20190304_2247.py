@@ -2,8 +2,6 @@
 
 from django.db import migrations
 
-from workbench.tools.search import migration_sql
-
 
 class Migration(migrations.Migration):
 
@@ -16,6 +14,5 @@ class Migration(migrations.Migration):
             "SELECT audit_audit_table('projects_effort');"
             "SELECT audit_audit_table('projects_cost');",
             "",
-        ),
-        migrations.RunSQL(*migration_sql("projects_project", "title, description")),
+        )
     ]

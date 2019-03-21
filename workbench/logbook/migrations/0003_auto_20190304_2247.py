@@ -2,8 +2,6 @@
 
 from django.db import migrations
 
-from workbench.tools.search import migration_sql
-
 
 class Migration(migrations.Migration):
 
@@ -12,6 +10,4 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL("SELECT audit_audit_table('logbook_loggedhours');"),
         migrations.RunSQL("SELECT audit_audit_table('logbook_loggedcost');"),
-        migrations.RunSQL(*migration_sql("logbook_loggedhours", "description")),
-        migrations.RunSQL(*migration_sql("logbook_loggedcost", "description")),
     ]

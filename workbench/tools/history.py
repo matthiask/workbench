@@ -110,7 +110,7 @@ def changes(model, fields, versions):
                 "previous": formatter(f)(change.row_data.get(f.attname)),
             }
             for f in field_instances
-            if f.attname in change.changed_fields
+            if change.changed_fields and f.attname in change.changed_fields
         ]
 
         if version_changes:

@@ -8,8 +8,6 @@ from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
 
-from workbench.tools.search import migration_sql
-
 
 class Migration(migrations.Migration):
 
@@ -161,9 +159,4 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.RunSQL("SELECT audit_audit_table('invoices_recurringinvoice');", ""),
-        migrations.RunSQL(
-            *migration_sql(
-                "invoices_recurringinvoice", "title, description, postal_address"
-            )
-        ),
     ]
