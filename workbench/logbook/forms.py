@@ -187,6 +187,8 @@ class LoggedHoursForm(WarningsForm, ModelForm):
             )
         if self.project.closed_on:
             self.add_warning(_("This project is already closed."))
+        if self.instance.invoice_service:
+            self.add_warning(_("This entry is already part of an invoice."))
 
         if all(
             (not self.instance.pk, data.get("rendered_by"), data.get("rendered_on"))
@@ -264,4 +266,6 @@ class LoggedCostForm(WarningsForm, ModelForm):
         data = super().clean()
         if self.project.closed_on:
             self.add_warning(_("This project is already closed."))
+        if self.instance.invoice_service:
+            self.add_warning(_("This entry is already part of an invoice."))
         return data
