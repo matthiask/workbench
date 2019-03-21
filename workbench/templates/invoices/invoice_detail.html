@@ -35,6 +35,34 @@
       <th class="text-right">{% trans 'postal address' %}</th>
       <td>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</td>
     </tr>
+    {% if object.type == object.SERVICES %}
+      <tr>
+        <th class="text-right">{% trans 'services' %}</th>
+        <td>
+          <table>
+            {% for service in object.services.all %}
+            <tr>
+              <td>
+                <strong>
+                  {{ service.title }} {% history_link service %}
+                </strong>
+                <br>
+                {{ service.description|linebreaksbr }}
+              </td>
+              <td class="text-right">
+                {{ service.service_cost|currency }}
+              </td>
+              <td>
+                <a href="{{ service.urls.update }}" data-toggle="ajaxmodal">
+                  {% include 'svg/pencil.svg' %}
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+        </td>
+      </tr>
+    {% endif %}
     <tr>
       <th class="text-right">{% trans 'subtotal' %}</th>
       <td>{{ object.subtotal|currency }}</td>

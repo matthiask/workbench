@@ -124,13 +124,10 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
         elif self.instance.type == self.instance.SERVICES:
             self.fields["subtotal"].disabled = True
             self.fields["third_party_costs"].disabled = True
-
-            if self.instance.pk:
-                self.fields["subtotal"].help_text = format_html(
-                    '<a href="../update-services/" target="_blank"'
-                    ' class="btn btn-secondary btn-sm float-right">{}</a>',
-                    _("Update invoice services"),
-                )
+            self.fields["subtotal"].help_text = _("Calculated from invoice services.")
+            self.fields["third_party_costs"].help_text = _(
+                "Calculated from invoice services."
+            )
 
         if self.instance.type != Invoice.DOWN_PAYMENT and self.instance.project_id:
             eligible_down_payment_invoices = Invoice.objects.valid().filter(

@@ -68,13 +68,13 @@ class InvoicesTest(TestCase):
     def test_create_service_invoice_from_offer(self):
         response = self.create_service_invoice("?type=services&source=offer")
         invoice = Invoice.objects.get()
-        self.assertRedirects(response, invoice.urls.url("update"))
+        self.assertRedirects(response, invoice.urls.url("detail"))
         self.assertEqual(invoice.subtotal, 100)
 
     def test_create_service_invoice_from_logbook(self):
         response = self.create_service_invoice("?type=services&source=logbook")
         invoice = Invoice.objects.get()
-        self.assertRedirects(response, invoice.urls.url("update"))
+        self.assertRedirects(response, invoice.urls.url("detail"))
         self.assertEqual(invoice.subtotal, 0)
 
     def test_create_person_invoice(self):
