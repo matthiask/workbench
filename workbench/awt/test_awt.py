@@ -76,6 +76,12 @@ class AWTTest(TestCase):
         )
         user.absences.create(starts_on=date(2018, 1, 1), days=50, is_vacation=True)
         user.employments.create(
+            date_from=date(2014, 1, 1),
+            date_until=date(2014, 3, 31),
+            percentage=80,
+            vacation_weeks=5,
+        )
+        user.employments.create(
             date_from=date(2017, 1, 1), percentage=80, vacation_weeks=5
         )
         user.employments.create(
@@ -83,8 +89,9 @@ class AWTTest(TestCase):
         )
 
         employments = list(user.employments.all())
-        self.assertEqual(employments[0].date_until, date(2018, 9, 30))
-        self.assertEqual(employments[1].date_until, date(9999, 12, 31))
+        self.assertEqual(employments[0].date_until, date(2014, 3, 31))
+        self.assertEqual(employments[1].date_until, date(2018, 9, 30))
+        self.assertEqual(employments[2].date_until, date(9999, 12, 31))
 
         awt = annual_working_time(year, users=[user])[0]
 
