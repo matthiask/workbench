@@ -4,7 +4,6 @@ from django.utils.translation import gettext as _
 
 from workbench import generic
 from workbench.offers.models import Offer
-from workbench.projects.forms import ServiceForm
 from workbench.projects.models import Project, Service
 
 
@@ -20,14 +19,6 @@ class ProjectDetailView(generic.DetailView):
 
     def get_template_names(self):
         return "projects/project_detail_%s.html" % self.project_view
-
-
-class UpdateServiceView(generic.UpdateView):
-    model = Service
-    form_class = ServiceForm
-
-    def get_success_url(self):
-        return self.object.project.urls.url("services")
 
 
 class MoveServiceView(generic.DetailView):

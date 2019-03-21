@@ -17,7 +17,6 @@ from workbench.projects.models import Project, Service
 from workbench.projects.views import (
     ProjectDetailView,
     CreateRelatedView,
-    UpdateServiceView,
     MoveServiceView,
 )
 from workbench.generic import ListView, CreateView, UpdateView, DeleteView
@@ -106,13 +105,13 @@ urlpatterns = [
     ),
     url(
         r"^service/(?P<pk>\d+)/update/$",
-        UpdateServiceView.as_view(),
+        UpdateView.as_view(model=Service, form_class=ServiceForm),
         name="projects_service_update",
     ),
     url(
         r"^service/(?P<pk>\d+)/delete/$",
-        UpdateServiceView.as_view(
-            form_class=DeleteServiceForm, template_name_suffix="_merge"
+        UpdateView.as_view(
+            model=Service, form_class=DeleteServiceForm, template_name_suffix="_merge"
         ),
         name="projects_service_delete",
     ),

@@ -5,7 +5,6 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
-from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 from workbench.tools.forms import ModelForm, Textarea, Picker
@@ -158,16 +157,8 @@ class ServiceForm(ModelForm):
 
         super().__init__(*args, **kwargs)
 
-        if self.project:
-            self.fields["offer"].queryset = self.project.offers.all()
-        else:
-            self.fields["offer"].queryset = Offer.objects.none()
-
-    def save(self):
-        instance = super().save(commit=False)
-        instance.project = self.project
-        instance.save()
-        return instance
+        self.fields["offer"].queryset = self.project.offers.all()
+        self.instance.project = self.project
 
 
 class DeleteServiceForm(ModelForm):
@@ -184,8 +175,9 @@ class DeleteServiceForm(ModelForm):
             )
 
     def save(self):
-        into = self.cleaned_data["merge_into"]
-        self.instance.loggedhours.update(service=into)
-        self.instance.loggedcosts.update(service=into)
+        if "merge_into" in self.cleaned_data:
+            into = self.cleaned_data["merge_into"]
+            self.instance.loggedhours.update(service=into)
+            self.instance.loggedcosts.update(service=into)
         self.instance.delete()
         return into
