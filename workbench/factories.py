@@ -41,6 +41,7 @@ class PersonFactory(factory.DjangoModelFactory):
 
 class OrganizationFactory(factory.DjangoModelFactory):
     primary_contact = factory.SubFactory(UserFactory)
+    name = "The Organization Ltd"
 
     class Meta:
         model = Organization
