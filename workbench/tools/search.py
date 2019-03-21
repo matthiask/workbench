@@ -73,13 +73,15 @@ CREATE TRIGGER {table}_fts_trigger BEFORE INSERT OR UPDATE
 
 
 def search(queryset, terms):
-    if not terms:
-        return queryset
-    return queryset.extra(
-        where=[
-            "%s.fts_document"
-            " @@ plainto_tsquery('pg_catalog.german', unaccent(%%s))"
-            % (queryset.model._meta.db_table,)
-        ],
-        params=[terms],
+    return (
+        queryset.extra(
+            where=[
+                "%s.fts_document"
+                " @@ plainto_tsquery('pg_catalog.german', unaccent(%%s))"
+                % (queryset.model._meta.db_table,)
+            ],
+            params=[terms],
+        )
+        if terms
+        else queryset
     )
