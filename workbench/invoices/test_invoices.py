@@ -107,6 +107,9 @@ class InvoicesTest(TestCase):
         self.assertAlmostEqual(invoice.total_excl_tax, Decimal("100"))
         self.assertAlmostEqual(invoice.total, Decimal("107.7"))
 
+        pdf = self.client.get(invoice.urls["pdf"])
+        self.assertEqual(pdf.status_code, 200)  # No crash
+
     def test_update_invoice(self):
         invoice = factories.InvoiceFactory.create()
         self.client.force_login(invoice.owned_by)

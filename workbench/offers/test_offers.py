@@ -44,3 +44,6 @@ class OffersTest(TestCase):
         self.assertRedirects(response, offer.get_absolute_url())
         self.assertAlmostEqual(offer.total_excl_tax, Decimal("2000"))
         self.assertAlmostEqual(offer.total, Decimal("2154"))
+
+        pdf = self.client.get(offer.urls["pdf"])
+        self.assertEqual(pdf.status_code, 200)  # No crash
