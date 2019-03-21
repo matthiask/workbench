@@ -13,14 +13,6 @@ class CreateRelatedView(generic.CreateView):
         return super().get_form(data, files, project=self.project, **kwargs)
 
 
-class ProjectDetailView(generic.DetailView):
-    model = Project
-    project_view = None
-
-    def get_template_names(self):
-        return "projects/project_detail_%s.html" % self.project_view
-
-
 class MoveServiceView(generic.DetailView):
     model = Service
 

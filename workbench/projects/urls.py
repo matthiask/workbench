@@ -15,11 +15,7 @@ from workbench.projects.forms import (
     DeleteServiceForm,
 )
 from workbench.projects.models import Project, Service
-from workbench.projects.views import (
-    ProjectDetailView,
-    CreateRelatedView,
-    MoveServiceView,
-)
+from workbench.projects.views import CreateRelatedView, MoveServiceView
 
 
 urlpatterns = [
@@ -42,17 +38,23 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/overview/$",
-        ProjectDetailView.as_view(project_view="overview"),
+        generic.DetailView.as_view(
+            model=Project, template_name_suffix="_detail_overview"
+        ),
         name="projects_project_overview",
     ),
     url(
         r"^(?P<pk>\d+)/services/$",
-        ProjectDetailView.as_view(project_view="services"),
+        generic.DetailView.as_view(
+            model=Project, template_name_suffix="_detail_services"
+        ),
         name="projects_project_services",
     ),
     url(
         r"^(?P<pk>\d+)/activities/$",
-        ProjectDetailView.as_view(project_view="activities"),
+        generic.DetailView.as_view(
+            model=Project, template_name_suffix="_detail_activities"
+        ),
         name="projects_project_activities",
     ),
     url(
