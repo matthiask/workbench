@@ -3,8 +3,9 @@ from datetime import date, timedelta
 from django.test import TestCase
 
 from workbench import factories
-from workbench.logbook.models import LoggedHours
+from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.tools.formats import local_date_format
+from workbench.tools.forms import WarningsForm
 
 
 class LogbookTest(TestCase):
@@ -88,7 +89,7 @@ class LogbookTest(TestCase):
         entry = LoggedHours.objects.get()
         self.assertEqual(entry.service.title, "service title")
 
-    def test_create_logged_cost(self):
+    def test_create_and_update_logged_cost(self):
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -103,3 +104,32 @@ class LogbookTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 201)
+
+        cost = LoggedCost.objects.get()
+        project.closed_on = date.today()
+        project.save()
+
+        response = self.client.post(
+            cost.urls["update"],
+            {
+                "rendered_on": local_date_format(date.today()),
+                "cost": "10",
+                "third_party_costs": "9",
+                "description": "Anything",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "Dieses Projekt wurde schon geschlossen.")
+
+        response = self.client.post(
+            cost.urls["update"],
+            {
+                "rendered_on": local_date_format(date.today()),
+                "cost": "10",
+                "third_party_costs": "9",
+                "description": "Anything",
+                WarningsForm.ignore_warnings_id: "on",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
