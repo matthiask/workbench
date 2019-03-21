@@ -50,7 +50,9 @@ class OrganizationFactory(factory.DjangoModelFactory):
 class PostalAddressFactory(factory.DjangoModelFactory):
     person = factory.SubFactory(PersonFactory)
     street = factory.LazyFunction(faker.street_name)
-    house_number = factory.LazyFunction(faker.random_digit_not_null_or_empty)
+    house_number = factory.LazyFunction(
+        lambda: str(faker.random_digit_not_null_or_empty())
+    )
     postal_code = factory.LazyFunction(faker.postcode)
     city = factory.LazyFunction(faker.city)
 

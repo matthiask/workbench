@@ -550,6 +550,7 @@ class RecurringInvoice(ModelWithTotal):
             max(filter(None, (self.next_period_starts_on, self.starts_on))),
             self.periodicity,
         )
+        generate_until = min(filter(None, (generate_until, self.ends_on)))
         this_period = next(days)
         while True:
             if this_period > generate_until:
