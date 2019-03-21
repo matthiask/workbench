@@ -58,11 +58,12 @@ class OfferForm(WarningsForm, PostalAddressSelectionForm):
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project", None)
-        if not self.project:  # Creating a new offer
-            self.project = kwargs["instance"].project
+        if self.project:  # Creating a new offer
             kwargs.setdefault("initial", {}).update(
                 {"title": self.project.title, "description": self.project.description}
             )
+        else:
+            self.project = kwargs["instance"].project
 
         super().__init__(*args, **kwargs)
         self.instance.project = self.project
