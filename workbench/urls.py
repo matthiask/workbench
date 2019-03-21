@@ -46,7 +46,7 @@ urlpatterns = [
     url(r"^report/open-items-list/$", open_items_list, name="report_open_items_list"),
 ]
 
-if settings.DEBUG:
+if settings.DEBUG:  # pragma: no cover
     import debug_toolbar
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
