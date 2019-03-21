@@ -72,6 +72,7 @@ class PersonForm(WarningsForm, ModelForm):
             "address",
             "given_name",
             "family_name",
+            "address_on_first_name_terms",
             "salutation",
             "notes",
             "organization",
