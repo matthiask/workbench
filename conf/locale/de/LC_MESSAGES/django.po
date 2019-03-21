@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-21 13:12+0100\n"
+"POT-Creation-Date: 2019-03-21 13:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,7 @@ msgstr ""
 msgid "Please authenticate."
 msgstr "Bitte anmelden."
 
-#: workbench/accounts/models.py:41 workbench/contacts/models.py:168
+#: workbench/accounts/models.py:41 workbench/contacts/models.py:167
 msgid "email"
 msgstr "Email"
 
@@ -209,7 +209,7 @@ msgid "title"
 msgstr "Titel"
 
 #: workbench/activities/models.py:51 workbench/awt/models.py:83
-#: workbench/contacts/models.py:29 workbench/contacts/models.py:76
+#: workbench/contacts/models.py:29 workbench/contacts/models.py:75
 #: workbench/credit_control/forms.py:159 workbench/credit_control/models.py:30
 #: workbench/templates/contacts/organization_detail.html:29
 #: workbench/templates/contacts/person_detail.html:43
@@ -422,14 +422,14 @@ msgstr ""
 "einen neuen zu erstellen als die Organisation zu ändern."
 
 #: workbench/contacts/forms.py:168 workbench/contacts/forms.py:181
-#: workbench/contacts/forms.py:203 workbench/contacts/models.py:120
+#: workbench/contacts/forms.py:203 workbench/contacts/models.py:119
 #: workbench/invoices/forms.py:394 workbench/invoices/models.py:108
 #: workbench/projects/models.py:60
 #: workbench/templates/projects/project_detail_overview.html:83
 msgid "type"
 msgstr "Typ"
 
-#: workbench/contacts/forms.py:241 workbench/contacts/models.py:207
+#: workbench/contacts/forms.py:241 workbench/contacts/models.py:206
 #: workbench/invoices/models.py:124 workbench/invoices/models.py:480
 #: workbench/offers/models.py:55
 #: workbench/templates/invoices/invoice_detail.html:35
@@ -445,7 +445,7 @@ msgid "group"
 msgstr "Gruppe"
 
 #: workbench/contacts/models.py:20 workbench/contacts/models.py:37
-#: workbench/contacts/models.py:92
+#: workbench/contacts/models.py:91
 #: workbench/templates/contacts/organization_detail.html:20
 msgid "groups"
 msgstr "Gruppen"
@@ -454,11 +454,11 @@ msgstr "Gruppen"
 msgid "name"
 msgstr "Name"
 
-#: workbench/contacts/models.py:33 workbench/contacts/models.py:88
+#: workbench/contacts/models.py:33 workbench/contacts/models.py:87
 msgid "primary contact"
 msgstr "Hauptkontakt"
 
-#: workbench/contacts/models.py:42 workbench/contacts/models.py:82
+#: workbench/contacts/models.py:42 workbench/contacts/models.py:81
 #: workbench/logbook/forms.py:33 workbench/logbook/forms.py:81
 #: workbench/templates/contacts/person_detail.html:11
 msgid "organization"
@@ -496,83 +496,83 @@ msgstr "Herr/Frau/..."
 msgid "address on first-name terms"
 msgstr "Anrede per Du"
 
-#: workbench/contacts/models.py:71
+#: workbench/contacts/models.py:70
 msgid "salutation"
 msgstr "Begrüssung"
 
-#: workbench/contacts/models.py:74
+#: workbench/contacts/models.py:73
 msgid "Dear John/Dear Ms Smith"
 msgstr "Lieber Hans/Sehr geehrte Frau Muster"
 
-#: workbench/contacts/models.py:99 workbench/contacts/models.py:140
-#: workbench/contacts/models.py:165 workbench/contacts/models.py:190
+#: workbench/contacts/models.py:98 workbench/contacts/models.py:139
+#: workbench/contacts/models.py:164 workbench/contacts/models.py:189
 msgid "person"
 msgstr "Person"
 
-#: workbench/contacts/models.py:100 workbench/templates/base.html:47
+#: workbench/contacts/models.py:99 workbench/templates/base.html:47
 #: workbench/templates/contacts/organization_detail.html:12
 msgid "people"
 msgstr "Personen"
 
-#: workbench/contacts/models.py:120
+#: workbench/contacts/models.py:119
 msgid "work"
 msgstr "Arbeit"
 
-#: workbench/contacts/models.py:121
+#: workbench/contacts/models.py:120
 msgid "weight"
 msgstr "Gewichtung"
 
-#: workbench/contacts/models.py:143 workbench/contacts/models.py:147
+#: workbench/contacts/models.py:142 workbench/contacts/models.py:146
 msgid "phone number"
 msgstr "Telefonnummer"
 
-#: workbench/contacts/models.py:148
+#: workbench/contacts/models.py:147
 #: workbench/templates/contacts/person_form.html:26
 msgid "phone numbers"
 msgstr "Telefonnummern"
 
-#: workbench/contacts/models.py:172
+#: workbench/contacts/models.py:171
 msgid "email address"
 msgstr "Emailadresse"
 
-#: workbench/contacts/models.py:173
+#: workbench/contacts/models.py:172
 #: workbench/templates/contacts/person_form.html:39
 msgid "email addresses"
 msgstr "Emailadressen"
 
-#: workbench/contacts/models.py:193
+#: workbench/contacts/models.py:192
 msgid "street"
 msgstr "Strasse"
 
-#: workbench/contacts/models.py:194
+#: workbench/contacts/models.py:193
 msgid "house number"
 msgstr "Hausnummer"
 
-#: workbench/contacts/models.py:195
+#: workbench/contacts/models.py:194
 msgid "address suffix"
 msgstr "Adresszusatz"
 
-#: workbench/contacts/models.py:196
+#: workbench/contacts/models.py:195
 msgid "postal code"
 msgstr "PLZ"
 
-#: workbench/contacts/models.py:197
+#: workbench/contacts/models.py:196
 msgid "city"
 msgstr "Ort"
 
-#: workbench/contacts/models.py:198
+#: workbench/contacts/models.py:197
 msgid "country"
 msgstr "Land"
 
-#: workbench/contacts/models.py:200
+#: workbench/contacts/models.py:199
 msgid "override"
 msgstr "Übersteuern"
 
-#: workbench/contacts/models.py:202
+#: workbench/contacts/models.py:201
 msgid "Completely overrides the postal address if set."
 msgstr "Überschreibt die Postadresse komplett falls gesetzt."
 
-#: workbench/contacts/models.py:208
+#: workbench/contacts/models.py:207
 #: workbench/templates/contacts/person_form.html:52
 msgid "postal addresses"
 msgstr "Postadressen"
@@ -1080,19 +1080,23 @@ msgstr "Leistung"
 msgid "This field is required unless you create a new service."
 msgstr "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung."
 
-#: workbench/logbook/forms.py:189 workbench/logbook/forms.py:260
+#: workbench/logbook/forms.py:189 workbench/logbook/forms.py:268
 msgid "This project is already closed."
 msgstr "Dieses Projekt wurde schon geschlossen."
 
-#: workbench/logbook/forms.py:200
+#: workbench/logbook/forms.py:191 workbench/logbook/forms.py:270
+msgid "This entry is already part of an invoice."
+msgstr "Dieser Eintrag ist schon Teil einer Rechnung."
+
+#: workbench/logbook/forms.py:202
 msgid "Sorry, hours have to be logged in the same week."
 msgstr "Tut mir leid, Stunden müssen in der gleichen Woche erfasst werden."
 
-#: workbench/logbook/forms.py:203
+#: workbench/logbook/forms.py:205
 msgid "Sorry, too early."
 msgstr "Tut mir leid, zu früh."
 
-#: workbench/logbook/forms.py:215
+#: workbench/logbook/forms.py:219
 msgid "This seems to be a duplicate. Is it?"
 msgstr "Scheint ein Duplikat zu sein. Oder nicht?"
 
@@ -1204,13 +1208,13 @@ msgstr "Offeriert am %(offered_on)s"
 msgid "discount"
 msgstr "Rabatt"
 
-#: workbench/offers/urls.py:22
+#: workbench/offers/urls.py:23
 msgid ""
-"Create a project, add and estimate services, and put those services into an "
-"offer."
+"Offers can only be created from projects. Go to the project and add services "
+"first, then you'll be able to create the offer itself."
 msgstr ""
-"Erstelle ein Projekt, erstelle und schätze Leistungen und füge diese zu "
-"einer Offerte hinzu."
+"Offerten können nur aus Projekten erstellt werden. Gehe zuerst zum Projekt, "
+"füge Leistungen hinzu, und dann kannst Du die eigentliche Offerte erstellen."
 
 #: workbench/projects/__init__.py:10 workbench/projects/models.py:71
 #: workbench/templates/base.html:26
@@ -1796,6 +1800,13 @@ msgstr "Gültig bis"
 #: workbench/views.py:31
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
+
+#~ msgid ""
+#~ "Create a project, add and estimate services, and put those services into "
+#~ "an offer."
+#~ msgstr ""
+#~ "Erstelle ein Projekt, erstelle und schätze Leistungen und füge diese zu "
+#~ "einer Offerte hinzu."
 
 #~ msgid "Individual invoice services can be edited later."
 #~ msgstr "Einzelne Rechnungsleistungen können später bearbeitet werden."
