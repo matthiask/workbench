@@ -64,7 +64,7 @@ def oauth2(request):
 
     try:
         credentials = flow.step2_exchange(code)
-    except FlowExchangeError:
+    except FlowExchangeError:  # pragma: no cover
         messages.error(request, _("OAuth2 error: Credential exchange failed"))
         return http.HttpResponseRedirect("/")
 

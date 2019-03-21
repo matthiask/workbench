@@ -33,12 +33,15 @@ class LoginTestCase(TestCase):
         user = factories.UserFactory.create()
 
         self.assertRedirects(self.client.get("/"), "/accounts/login/")
+        self.assertRedirects(self.client.get("/accounts/"), "/accounts/login/")
 
         self.client.login(email=user.email)
 
         self.assertContains(
             self.client.get("/"), 'href="/accounts/logout/"', 1, status_code=200
         )
+        self.assertRedirects(self.client.get("/accounts/"), "/accounts/update/")
+        self.assertRedirects(self.client.get("/accounts/login/"), "/")
 
     def test_login_hint_removal_on_logout(self):
         user = factories.UserFactory.create()
