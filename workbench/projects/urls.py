@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from django.shortcuts import get_object_or_404, redirect
 
+from workbench import generic
 from workbench.invoices.forms import CreateProjectInvoiceForm
 from workbench.invoices.models import Invoice
 from workbench.logbook.forms import LoggedHoursForm, LoggedCostForm
@@ -19,18 +20,19 @@ from workbench.projects.views import (
     CreateRelatedView,
     MoveServiceView,
 )
-from workbench.generic import ListView, CreateView, UpdateView, DeleteView
 
 
 urlpatterns = [
     url(
         r"^$",
-        ListView.as_view(model=Project, search_form_class=ProjectSearchForm),
+        generic.ListView.as_view(model=Project, search_form_class=ProjectSearchForm),
         name="projects_project_list",
     ),
     url(
         r"^picker/$",
-        ListView.as_view(model=Project, template_name_suffix="_picker", paginate_by=10),
+        generic.ListView.as_view(
+            model=Project, template_name_suffix="_picker", paginate_by=10
+        ),
         name="projects_project_picker",
     ),
     url(
@@ -55,17 +57,17 @@ urlpatterns = [
     ),
     url(
         r"^create/$",
-        CreateView.as_view(form_class=ProjectForm, model=Project),
+        generic.CreateView.as_view(form_class=ProjectForm, model=Project),
         name="projects_project_create",
     ),
     url(
         r"^(?P<pk>\d+)/update/$",
-        UpdateView.as_view(form_class=ProjectForm, model=Project),
+        generic.UpdateView.as_view(form_class=ProjectForm, model=Project),
         name="projects_project_update",
     ),
     url(
         r"^(?P<pk>\d+)/delete/$",
-        DeleteView.as_view(model=Project),
+        generic.DeleteView.as_view(model=Project),
         name="projects_project_delete",
     ),
     url(
@@ -105,12 +107,12 @@ urlpatterns = [
     ),
     url(
         r"^service/(?P<pk>\d+)/update/$",
-        UpdateView.as_view(model=Service, form_class=ServiceForm),
+        generic.UpdateView.as_view(model=Service, form_class=ServiceForm),
         name="projects_service_update",
     ),
     url(
         r"^service/(?P<pk>\d+)/delete/$",
-        UpdateView.as_view(
+        generic.UpdateView.as_view(
             model=Service, form_class=DeleteServiceForm, template_name_suffix="_merge"
         ),
         name="projects_service_delete",
