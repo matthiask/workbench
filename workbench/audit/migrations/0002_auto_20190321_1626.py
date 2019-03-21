@@ -23,5 +23,15 @@ class Migration(migrations.Migration):
             "SELECT audit_audit_table('logbook_loggedcost', ARRAY['fts_document']);"
             "SELECT audit_audit_table('offers_offer', ARRAY['fts_document']);"
             "SELECT audit_audit_table('projects_project', ARRAY['fts_document']);"
+            "UPDATE contacts_organization SET id=id;"
+            "UPDATE contacts_person SET id=id;"
+            "UPDATE credit_control_creditentry SET id=id;"
+            "UPDATE deals_deal SET id=id;"
+            "UPDATE invoices_invoice SET id=id;"
+            "UPDATE invoices_recurringinvoice SET id=id;"
+            "UPDATE logbook_loggedhours SET id=id;"
+            "UPDATE logbook_loggedcost SET id=id;"
+            "UPDATE offers_offer SET id=id;"
+            "UPDATE projects_project SET id=id;"
         ),
     ]
