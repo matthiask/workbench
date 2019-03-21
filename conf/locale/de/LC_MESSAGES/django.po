@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-21 10:25+0100\n"
+"POT-Creation-Date: 2019-03-21 13:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1080,7 +1080,7 @@ msgstr "Leistung"
 msgid "This field is required unless you create a new service."
 msgstr "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung."
 
-#: workbench/logbook/forms.py:189 workbench/logbook/forms.py:248
+#: workbench/logbook/forms.py:189 workbench/logbook/forms.py:260
 msgid "This project is already closed."
 msgstr "Dieses Projekt wurde schon geschlossen."
 
@@ -1091,6 +1091,10 @@ msgstr "Tut mir leid, Stunden müssen in der gleichen Woche erfasst werden."
 #: workbench/logbook/forms.py:203
 msgid "Sorry, too early."
 msgstr "Tut mir leid, zu früh."
+
+#: workbench/logbook/forms.py:215
+msgid "This seems to be a duplicate. Is it?"
+msgstr "Scheint ein Duplikat zu sein. Oder nicht?"
 
 #: workbench/logbook/models.py:28 workbench/logbook/models.py:82
 msgid "rendered on"

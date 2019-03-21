@@ -5,19 +5,24 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('contacts', '0004_person_is_archived'),
-    ]
+    dependencies = [("contacts", "0004_person_is_archived")]
 
     operations = [
         migrations.AddField(
-            model_name='person',
-            name='address_on_first_name_terms',
-            field=models.BooleanField(default=False, verbose_name='address on first-name terms'),
+            model_name="person",
+            name="address_on_first_name_terms",
+            field=models.BooleanField(
+                default=False, verbose_name="address on first-name terms"
+            ),
         ),
         migrations.AlterField(
-            model_name='person',
-            name='address',
-            field=models.CharField(blank=True, help_text='Mr./Ms./...', max_length=100, verbose_name='address'),
+            model_name="person",
+            name="address",
+            field=models.CharField(
+                blank=True,
+                help_text="Mr./Ms./...",
+                max_length=100,
+                verbose_name="address",
+            ),
         ),
     ]

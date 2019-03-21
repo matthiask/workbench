@@ -64,8 +64,7 @@ class Person(Model):
         _("address"), max_length=100, blank=True, help_text=_("Mr./Ms./...")
     )
     address_on_first_name_terms = models.BooleanField(
-        _("address on first-name terms"),
-        default=False,
+        _("address on first-name terms"), default=False
     )
     salutation = models.CharField(
         _("salutation"),

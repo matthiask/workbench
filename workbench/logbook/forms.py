@@ -202,6 +202,20 @@ class LoggedHoursForm(WarningsForm, ModelForm):
             elif data["rendered_on"] > date.today() + timedelta(days=7):
                 errors["rendered_on"] = _("Sorry, too early.")
 
+        try:
+            latest = LoggedHours.objects.filter(rendered_by=self.request.user).latest(
+                "pk"
+            )
+        except LoggedHours.DoesNotExist:
+            pass
+        else:
+            fields = ["rendered_by", "rendered_on", "service", "hours", "description"]
+            for field in fields:
+                if data.get(field) != getattr(latest, field):
+                    break
+            else:
+                self.add_warning(_("This seems to be a duplicate. Is it?"))
+
         raise_if_errors(errors)
         return data
 
