@@ -133,3 +133,22 @@ class LogbookTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 202)
+
+    def test_update_old_disabled_fields(self):
+        hours = factories.LoggedHoursFactory.create(
+            rendered_on=date.today() - timedelta(days=10)
+        )
+        self.client.force_login(hours.rendered_by)
+        response = self.client.get(hours.urls["update"])
+        self.assertContains(
+            response,
+            '<input type="number" name="hours" value="1.0" step="0.1"'
+            ' class="form-control" required disabled id="id_hours">',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<input type="text" name="rendered_on" value="12.03.2019"'
+            ' class=" datepicker form-control" required disabled id="id_rendered_on">',
+            html=True,
+        )

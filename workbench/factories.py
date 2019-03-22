@@ -121,6 +121,7 @@ class LoggedHoursFactory(factory.DjangoModelFactory):
     service = factory.SubFactory(ServiceFactory)
     created_by = factory.SubFactory(UserFactory)
     rendered_by = factory.SubFactory(UserFactory)
+    hours = 1
 
     class Meta:
         model = LoggedHours
