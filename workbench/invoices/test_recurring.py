@@ -3,7 +3,9 @@ from datetime import date
 from django.test import TestCase
 
 from workbench import factories
-from workbench.invoices.models import RecurringInvoice
+from workbench.invoices.models import Invoice, RecurringInvoice
+from workbench.tools.formats import local_date_format
+from workbench.tools.testing import messages
 
 
 class RecurringTest(TestCase):
@@ -34,3 +36,44 @@ class RecurringTest(TestCase):
         self.assertEqual(len(ri.create_invoices(generate_until=date(2019, 1, 1))), 1)
 
         self.assertTrue(len(RecurringInvoice.objects.create_invoices()) > 1)
+
+    def test_creation(self):
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+
+        self.client.force_login(person.primary_contact)
+        response = self.client.post(
+            "/recurring-invoices/create/",
+            {
+                "customer": person.organization_id,
+                "contact": person.id,
+                "title": "recur",
+                "owned_by": person.primary_contact_id,
+                "starts_on": local_date_format(date.today()),
+                "periodicity": "yearly",
+                "subtotal": 500,
+                "discount": 0,
+                "liable_to_vat": "on",
+                "third_party_costs": 0,
+            },
+        )
+
+        ri = RecurringInvoice.objects.get()
+        self.assertRedirects(response, ri.urls["update"])
+
+        factories.PostalAddressFactory.create(person=person)
+        response = self.client.get(ri.urls["update"])
+        self.assertContains(response, 'name="pa"')
+        self.assertNotContains(response, 'name="postal_address"')
+
+        response = self.client.get(ri.urls["detail"])
+        self.assertContains(response, "?create_invoices=1")
+
+        response = self.client.get(ri.urls["detail"] + "?create_invoices=1")
+        self.assertRedirects(response, Invoice().urls["list"])
+        self.assertEqual(messages(response), ["1 Rechnung erstellt."])
+
+        response = self.client.get(ri.urls["detail"] + "?create_invoices=1")
+        self.assertRedirects(response, ri.urls["detail"])
+        self.assertEqual(messages(response), ["0 Rechnungen erstellt."])

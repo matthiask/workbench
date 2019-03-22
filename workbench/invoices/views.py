@@ -39,7 +39,7 @@ class RecurringInvoiceDetailView(generic.DetailView):
             )
             messages.info(
                 request,
-                ngettext("Created %s invoice", "Created %s invoices", len(invoices))
+                ngettext("Created %s invoice.", "Created %s invoices.", len(invoices))
                 % len(invoices),
             )
             return redirect("invoices_invoice_list" if len(invoices) else self.object)
