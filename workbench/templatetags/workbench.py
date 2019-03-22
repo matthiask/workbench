@@ -10,13 +10,7 @@ from django.urls import reverse
 from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.translation import gettext as _
 
-from workbench.tools.formats import (
-    currency,
-    days,
-    hours,
-    local_date_format,
-    timesince_short,
-)
+from workbench.tools.formats import currency, days, hours, local_date_format
 from workbench.tools.models import Z
 
 
@@ -26,7 +20,6 @@ register = template.Library()
 register.filter(currency)
 register.filter(days)
 register.filter(hours)
-register.filter(timesince_short)
 
 
 @register.simple_tag
