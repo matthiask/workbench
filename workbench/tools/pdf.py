@@ -278,7 +278,7 @@ class PDFDocument(_PDFDocument):
 
     def process_offer(self, offer):
         if offer.status not in {offer.OFFERED, offer.ACCEPTED}:
-            self.watermark(offer.get_status_display())
+            self.watermark(str(offer.get_status_display()))
 
         self.postal_address(offer.postal_address)
 
@@ -325,7 +325,7 @@ class PDFDocument(_PDFDocument):
 
     def process_invoice(self, invoice):
         if invoice.status not in {invoice.SENT, invoice.REMINDED, invoice.PAID}:
-            self.watermark(invoice.get_status_display())
+            self.watermark(str(invoice.get_status_display()))
 
         self.postal_address(invoice.postal_address)
 
