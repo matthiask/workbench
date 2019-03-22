@@ -618,13 +618,6 @@ class CreateRecurringInvoiceForm(ModelForm):
 
         self.fields["periodicity"].choices = RecurringInvoice.PERIODICITY_CHOICES
 
-    def save(self):
-        instance = super().save(commit=False)
-        if self.cleaned_data.get("pa"):
-            instance.postal_address = self.cleaned_data["pa"].postal_address
-        instance.save()
-        return instance
-
 
 class RecurringInvoiceForm(WarningsForm, PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
