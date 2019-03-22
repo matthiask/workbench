@@ -1,6 +1,6 @@
 {% load bootstrap4 i18n workbench %}
 <div class="modal">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">{{ view.meta.verbose_name_plural }}</h4>
@@ -17,6 +17,9 @@
             href="#"
             class="list-group-item list-group-item-action text-truncate">
               {{ object }}
+              {% if object.status_css %}
+                <span class="badge badge-{{ object.status_css }}">{{ object.pretty_status }}</span>
+              {% endif %}
             </a>
           {% endfor %}
         </div>
