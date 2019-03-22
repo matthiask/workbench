@@ -98,6 +98,21 @@ class InvoicesTest(TestCase):
         self.assertRedirects(response, invoice.urls.url("detail"))
         self.assertEqual(invoice.subtotal, 100)
 
+        service = invoice.services.get()
+        response = self.client.post(
+            service.urls["update"],
+            {
+                "title": service.title,
+                "description": service.description,
+                "effort_type": service.effort_type,
+                "effort_rate": service.effort_rate or "",
+                "effort_hours": service.effort_hours or "",
+                "cost": service.cost or "",
+                "third_party_costs": service.third_party_costs or "",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+
         self.assertRedirects(
             self.client.post(invoice.urls["delete"]), invoice.urls["list"]
         )

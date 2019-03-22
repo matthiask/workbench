@@ -550,12 +550,7 @@ class ServiceForm(ModelForm):
         if not self.invoice:
             self.invoice = kwargs["instance"].invoice
         super().__init__(*args, **kwargs)
-
-    def save(self):
-        instance = super().save(commit=False)
-        instance.invoice = self.invoice
-        instance.save()
-        return instance
+        self.instance.invoice = self.invoice
 
 
 class RecurringInvoiceSearchForm(forms.Form):

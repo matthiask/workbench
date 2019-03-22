@@ -76,6 +76,7 @@ class ProjectFactory(factory.DjangoModelFactory):
 
 class ServiceFactory(factory.DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
+    title = "Any service"
     service_hours = 0
 
     class Meta:
