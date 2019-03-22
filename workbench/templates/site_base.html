@@ -3,7 +3,7 @@
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
   <title>{% block title %}{{ WORKBENCH.PDF_COMPANY }}{% endblock %}</title>
-  <script src="{% static 'workbench/lib/bundle.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'workbench/lib/main.css' %}">
   <link rel="stylesheet" href="{% static 'workbench/lib/datepicker.min.css' %}">
   <link rel="stylesheet" href="{% static 'workbench/workbench.css' %}">
   <link rel="shortcut icon" href="{% static 'workbench/lib/favicon.png' %}">
@@ -14,6 +14,7 @@
 
   {% block body %}{% endblock body %}
 
+  <script src="{% static 'workbench/lib/main.js' %}"></script>
   <script src="{% static 'workbench/lib/datepicker.min.js' %}"></script>
   <script src="{% static 'workbench/lib/datepicker.de-DE.js' %}"></script>
   <script src="{% static 'workbench/workbench.js' %}"></script>
