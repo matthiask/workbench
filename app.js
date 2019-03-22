@@ -1,4 +1,4 @@
-window.$ = window.jQuery  = require("jquery");
+window.$ = window.jQuery = require("jquery");
 
 import "bootstrap";
 import "./app.scss";

@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "prettier": "prettier --write .*js workbench/static/workbench/*",
+    "prettier": "prettier --write .*js *js *.scss workbench/static/workbench/*",
     "eslint": "eslint workbench/static/workbench/",
     "build": "webpack -p",
     "watch": "webpack -w"

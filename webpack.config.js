@@ -1,17 +1,17 @@
-const path = require('path');
+const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
-  entry: './app.js',
-  mode: 'production',
+  entry: "./app.js",
+  mode: "production",
   output: {
-    filename: '[name].js',
-    path: path.resolve(__dirname, 'workbench', 'static', 'workbench', 'lib')
+    filename: "[name].js",
+    path: path.resolve(__dirname, "workbench", "static", "workbench", "lib")
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: "[name].css",
-    }),
+      filename: "[name].css"
+    })
   ],
   module: {
     rules: [
@@ -21,28 +21,26 @@ module.exports = {
           {
             // Adds CSS to the DOM by injecting a `<style>` tag
             // loader: 'style-loader'
-            loader: MiniCssExtractPlugin.loader,
+            loader: MiniCssExtractPlugin.loader
           },
           {
             // Interprets `@import` and `url()` like `import/require()` and will resolve them
-            loader: 'css-loader'
+            loader: "css-loader"
           },
           {
             // Loader for webpack to process CSS with PostCSS
-            loader: 'postcss-loader',
+            loader: "postcss-loader",
             options: {
-              plugins: function () {
-                return [
-                  require('autoprefixer')
-                ];
+              plugins: function() {
+                return [require("autoprefixer")];
               }
             }
           },
           {
             // Loads a SASS/SCSS file and compiles it to CSS
-            loader: 'sass-loader',
+            loader: "sass-loader",
             options: {
-              includePaths: [path.resolve(path.join(__dirname, "node_modules"))],
+              includePaths: [path.resolve(path.join(__dirname, "node_modules"))]
             }
           }
         ]
