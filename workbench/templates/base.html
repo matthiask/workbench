@@ -13,7 +13,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <form class="form-inline my-0 mr-2" method="GET" action="{% url 'search' %}">
+          <form class="form-inline mt-2 mb-0 mr-2" method="GET" action="{% url 'search' %}">
             <div class="input-group">
               <input class="form-control" type="search" placeholder="{% trans 'Search' %}" aria-label="{% trans 'Search' %}" name="q" value="{{ request.GET.q }}">
               <div class="input-group-append">
