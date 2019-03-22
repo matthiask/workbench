@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from django.test import TestCase
 
 from workbench import factories
+from workbench.tools.testing import messages
 
 
 class ActivitiesTest(TestCase):
@@ -42,3 +43,19 @@ class ActivitiesTest(TestCase):
         response = self.client.get(activity.urls["list"])
         self.assertContains(response, "1 &ndash; 20 von 20")
         self.assertContains(response, "21 insgesamt")
+
+        response = self.client.get(activity.urls["list"] + "?s=all")
+        self.assertContains(response, "1 &ndash; 21 von 21")
+
+        response = self.client.get(activity.urls["list"] + "?owned_by=0")
+        self.assertContains(response, "0 &ndash; 0 von 0")
+
+        response = self.client.get(
+            activity.urls["list"] + "?owned_by={}".format(activity.owned_by_id)
+        )
+        self.assertContains(response, "1 &ndash; 20 von 20")
+
+        response = self.client.get(
+            activity.urls["list"] + "?owned_by={}".format(activity.owned_by_id + 1)
+        )
+        self.assertEqual(messages(response), ["Suchformular war ungültig."])
