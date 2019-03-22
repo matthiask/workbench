@@ -144,6 +144,11 @@ class CreateView(ToolsMixin, vanilla.CreateView):
         return super().get_context_data(**kwargs)
 
 
+class CreateAndUpdateView(CreateView):
+    def get_success_url(self):
+        return self.object.urls.url("update")
+
+
 class UpdateView(ToolsMixin, vanilla.UpdateView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()

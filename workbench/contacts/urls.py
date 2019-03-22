@@ -4,11 +4,7 @@ from django.shortcuts import redirect
 from workbench import generic
 from workbench.contacts.forms import OrganizationForm, PersonForm
 from workbench.contacts.models import Organization, Person
-from workbench.contacts.views import (
-    OrganizationListView,
-    PersonListView,
-    PersonCreateView,
-)
+from workbench.contacts.views import OrganizationListView, PersonListView
 
 
 urlpatterns = [
@@ -58,7 +54,11 @@ urlpatterns = [
         generic.DetailView.as_view(model=Person),
         name="contacts_person_detail",
     ),
-    url(r"^people/create/$", PersonCreateView.as_view(), name="contacts_person_create"),
+    url(
+        r"^people/create/$",
+        generic.CreateAndUpdateView.as_view(model=Person, form_class=PersonForm),
+        name="contacts_person_create",
+    ),
     url(
         r"^people/(?P<pk>\d+)/update/$",
         generic.UpdateView.as_view(form_class=PersonForm, model=Person),

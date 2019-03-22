@@ -1,10 +1,6 @@
-from workbench.contacts.forms import (
-    OrganizationSearchForm,
-    PersonForm,
-    PersonSearchForm,
-)
+from workbench.contacts.forms import OrganizationSearchForm, PersonSearchForm
 from workbench.contacts.models import Organization, Person
-from workbench.generic import ListView, CreateView
+from workbench.generic import ListView
 
 
 class OrganizationListView(ListView):
@@ -41,11 +37,3 @@ class PersonListView(ListView):
                 ),
             }
         )
-
-
-class PersonCreateView(CreateView):
-    form_class = PersonForm
-    model = Person
-
-    def get_success_url(self):
-        return self.object.urls.url("update")

@@ -45,8 +45,3 @@ class RecurringInvoiceDetailView(generic.DetailView):
             return redirect("invoices_invoice_list" if len(invoices) else self.object)
         context = self.get_context_data()
         return self.render_to_response(context)
-
-
-class RecurringInvoiceCreateView(generic.CreateView):
-    def get_success_url(self):
-        return self.object.urls.url("update")

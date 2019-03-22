@@ -7,10 +7,7 @@ from workbench.invoices.forms import (
     RecurringInvoiceForm,
 )
 from workbench.invoices.models import RecurringInvoice
-from workbench.invoices.views import (
-    RecurringInvoiceDetailView,
-    RecurringInvoiceCreateView,
-)
+from workbench.invoices.views import RecurringInvoiceDetailView
 
 
 urlpatterns = [
@@ -28,7 +25,7 @@ urlpatterns = [
     ),
     url(
         r"^create/$",
-        RecurringInvoiceCreateView.as_view(
+        generic.CreateAndUpdateView.as_view(
             model=RecurringInvoice, form_class=CreateRecurringInvoiceForm
         ),
         name="invoices_recurringinvoice_create",
