@@ -185,6 +185,8 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
 
 
 class DeleteView(ToolsMixin, vanilla.DeleteView):
+    form_class = None
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if not self.object.allow_delete(self.object, request):
@@ -193,6 +195,8 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
             return redirect(self.object)
 
         context = self.get_context_data()
+        if self.form_class:
+            context["form"] = self.form_class(instance=self.object, request=request)
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -200,7 +204,17 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
         if not self.object.allow_delete(self.object, request):
             return redirect(self.object)
 
-        self.object.delete()
+        if self.form_class:
+            form = self.form_class(request.POST, instance=self.object, request=request)
+            if form.is_valid():
+                form.delete()
+            else:
+                context = self.get_context_data()
+                context["form"] = form
+                return self.render_to_response(context)
+        else:
+            self.object.delete()
+
         messages.success(
             self.request,
             _("%(class)s '%(object)s' has been successfully deleted.")

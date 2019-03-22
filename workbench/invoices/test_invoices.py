@@ -7,6 +7,7 @@ from workbench import factories
 from workbench.invoices.models import Invoice
 from workbench.tools.forms import WarningsForm
 from workbench.tools.formats import local_date_format
+from workbench.tools.testing import messages
 
 
 def invoice_to_dict(invoice, **kwargs):
@@ -71,11 +72,87 @@ class InvoicesTest(TestCase):
         self.assertRedirects(response, invoice.urls.url("detail"))
         self.assertEqual(invoice.subtotal, 100)
 
+        self.assertRedirects(
+            self.client.post(invoice.urls["delete"]), invoice.urls["list"]
+        )
+        self.assertEqual(Invoice.objects.count(), 0)
+
     def test_create_service_invoice_from_logbook(self):
         response = self.create_service_invoice("?type=services&source=logbook")
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls.url("detail"))
         self.assertEqual(invoice.subtotal, 0)
+
+        self.assertRedirects(
+            self.client.post(invoice.urls["delete"]), invoice.urls["list"]
+        )
+        self.assertEqual(Invoice.objects.count(), 0)
+
+    def test_delete_service_invoice_with_logs(self):
+        service = factories.ServiceFactory.create()
+        cost = factories.LoggedCostFactory.create(
+            cost=150, project=service.project, service=service, description="this"
+        )
+
+        url = (
+            service.project.urls.url("createinvoice") + "?type=services&source=logbook"
+        )
+        self.client.force_login(service.project.owned_by)
+        response = self.client.post(
+            url,
+            {
+                "contact": service.project.contact_id,
+                "title": service.project.title,
+                "owned_by": service.project.owned_by_id,
+                "discount": "0",
+                "liable_to_vat": "1",
+                "postal_address": "Anything",
+                "selected_services": [service.pk],
+            },
+        )
+
+        invoice = Invoice.objects.get()
+        self.assertRedirects(response, invoice.urls["detail"])
+        self.assertAlmostEqual(invoice.subtotal, Decimal(150))
+
+        cost.refresh_from_db()
+        self.assertEqual(cost.invoice_service.invoice, invoice)
+        self.assertEqual(cost.invoice_service.project_service, service)
+
+        response = self.client.post(invoice.urls["delete"])
+        self.assertContains(response, "Logged services are linked with this invoice.")
+        self.assertEqual(Invoice.objects.count(), 1)
+        cost.refresh_from_db()
+        self.assertTrue(cost.invoice_service)
+
+        response = self.client.post(
+            invoice.urls["delete"], {WarningsForm.ignore_warnings_id: "on"}
+        )
+        self.assertRedirects(response, invoice.urls["list"])
+        self.assertEqual(
+            messages(response),
+            ["Rechnung '{}' wurde erfolgreich gelöscht.".format(invoice)],
+        )
+
+        cost.refresh_from_db()
+        self.assertEqual(cost.invoice_service, None)
+
+        # Creating the invoice again succeeds.
+        response = self.client.post(
+            url,
+            {
+                "contact": service.project.contact_id,
+                "title": service.project.title,
+                "owned_by": service.project.owned_by_id,
+                "discount": "0",
+                "liable_to_vat": "1",
+                "postal_address": "Anything",
+                "selected_services": [service.pk],
+            },
+        )
+        invoice = Invoice.objects.get()
+        self.assertRedirects(response, invoice.urls["detail"])
+        self.assertAlmostEqual(invoice.subtotal, Decimal(150))
 
     def test_create_person_invoice(self):
         person = factories.PersonFactory.create(

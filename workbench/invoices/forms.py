@@ -9,6 +9,7 @@ from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import Invoice, Service, RecurringInvoice
+from workbench.logbook.models import LoggedHours, LoggedCost
 from workbench.services.models import ServiceType
 from workbench.tools.formats import currency, hours, local_date_format
 from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm
@@ -464,6 +465,41 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
 
         if person:
             self.add_postal_address_selection(person=person)
+
+
+class InvoiceDeleteForm(ModelForm, WarningsForm):
+    class Meta:
+        model = Invoice
+        fields = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.status > Invoice.IN_PREPARATION:
+            # Should not happen but if it does, fail validation here
+            self.fields["_block"] = forms.BooleanField(disabled=True, required=True)
+            return
+
+        if (
+            LoggedHours.objects.filter(invoice_service__invoice=self.instance).exists()
+            or LoggedCost.objects.filter(
+                invoice_service__invoice=self.instance
+            ).exists()
+        ):
+            self.add_warning(
+                _(
+                    "Logged services are linked with this invoice."
+                    " They will be released when deleting this invoice."
+                )
+            )
+
+    def delete(self):
+        LoggedHours.objects.filter(invoice_service__invoice=self.instance).update(
+            invoice_service=None, archived_at=None
+        )
+        LoggedCost.objects.filter(invoice_service__invoice=self.instance).update(
+            invoice_service=None, archived_at=None
+        )
+        self.instance.delete()
 
 
 class ServiceForm(ModelForm):

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load bootstrap4 i18n workbench %}
+{% load bootstrap4 fineforms i18n workbench %}
 
 {% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
@@ -13,6 +13,9 @@
 
     <form method="POST" action="." class="form">
       {% csrf_token %}
+      {% include 'fineforms/warnings.html' %}
+      {% ff_errors form %}
+      {% ff_fields form %}
       {% buttons %}
         <a href="{{ object.get_absolute_url }}" class="btn btn-primary">
           {% trans 'cancel' %}</a>

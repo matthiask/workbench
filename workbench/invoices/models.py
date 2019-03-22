@@ -1,7 +1,6 @@
 from datetime import date, timedelta
 
 from django.contrib import messages
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F, Q, Sum
 from django.db.models.expressions import RawSQL
@@ -18,6 +17,7 @@ from workbench.services.models import ServiceBase
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import ModelWithTotal, SearchQuerySet, MoneyField, Z
 from workbench.tools.urls import model_urls
+from workbench.tools.validation import raise_if_errors
 
 
 class InvoiceQuerySet(SearchQuerySet):
@@ -189,28 +189,25 @@ class Invoice(ModelWithTotal):
     def total_excl_tax(self):
         return self.subtotal - self.discount - self.down_payment_total
 
-    def clean(self):
-        super().clean()
+    def clean_fields(self, exclude=None):
+        super().clean_fields(exclude=exclude)
+        errors = {}
 
         if self.status >= self.SENT:
             if not self.invoiced_on or not self.due_on:
-                raise ValidationError(
-                    {"status": _("Invoice and/or due date missing for selected state.")}
+                errors["status"] = _(
+                    "Invoice and/or due date missing for selected state."
                 )
 
         if self.invoiced_on and self.due_on:
             if self.invoiced_on > self.due_on:
-                raise ValidationError(
-                    {"due_on": _("Due date has to be after invoice date.")}
-                )
+                errors["due_on"] = _("Due date has to be after invoice date.")
 
         if self.type in (self.SERVICES, self.DOWN_PAYMENT) and not self.project:
-            raise ValidationError(
-                {
-                    _("Invoices of type %(type)s require a project.")
-                    % {"type": self.get_type_display()}
-                }
-            )
+            errors["__all__"] = _("Invoices of type %(type)s require a project.") % {
+                "type": self.get_type_display()
+            }
+        raise_if_errors(errors, exclude)
 
     def pretty_status(self):
         d = {
@@ -386,6 +383,12 @@ class Invoice(ModelWithTotal):
             )
 
         self.save()
+
+    @classmethod
+    def allow_delete(cls, instance, request):
+        return instance.status <= instance.IN_PREPARATION or super().allow_delete(
+            instance, request
+        )
 
 
 @model_urls()
