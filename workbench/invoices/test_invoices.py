@@ -45,6 +45,29 @@ class InvoicesTest(TestCase):
             response, invoice.urls.url("list"), fetch_redirect_response=False
         )
 
+    def test_down_payment_invoice(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        url = project.urls["createinvoice"] + "?type=down-payment"
+        response = self.client.get(url)
+        self.assertContains(response, "Anzahlung")
+
+        response = self.client.post(url, {
+            "contact": project.contact_id,
+            "title": project.title,
+            "owned_by": project.owned_by_id,
+            "discount": 0,
+            "liable_to_vat": 1,
+            "postal_address": "Anything",
+            "subtotal": 2500,
+            "third_party_costs": 0,
+        })
+
+        invoice = Invoice.objects.get()
+        self.assertRedirects(response, invoice.urls["detail"])
+        self.assertAlmostEqual(invoice.subtotal, Decimal("2500"))
+
     def create_service_invoice(self, params):
         service = factories.ServiceFactory.create(cost=100)
         url = service.project.urls.url("createinvoice") + params
