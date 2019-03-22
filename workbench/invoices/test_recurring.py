@@ -1,9 +1,11 @@
 from datetime import date
+from decimal import Decimal
 
 from django.test import TestCase
 
 from workbench import factories
 from workbench.invoices.models import Invoice, RecurringInvoice
+from workbench.reporting.invoicing_statistics import monthly_invoicing
 from workbench.tools.formats import local_date_format
 from workbench.tools.testing import messages
 
@@ -25,6 +27,7 @@ class RecurringTest(TestCase):
             starts_on=date(2018, 1, 1),
             ends_on=date(2018, 12, 31),
             periodicity="monthly",
+            subtotal=200,
         )
 
         self.assertEqual(ri.next_period_starts_on, None)
@@ -36,6 +39,17 @@ class RecurringTest(TestCase):
         self.assertEqual(len(ri.create_invoices(generate_until=date(2019, 1, 1))), 1)
 
         self.assertTrue(len(RecurringInvoice.objects.create_invoices()) > 1)
+
+        # Not so clean, but we have a few invoices here...
+        mi = monthly_invoicing(2018)
+        self.assertAlmostEqual(mi["third_party_costs"], Decimal(0))
+        self.assertAlmostEqual(mi["total"], Decimal(200 * 12) * Decimal("1.077"))
+        self.assertAlmostEqual(mi["total_excl_tax"], Decimal(200 * 12))
+
+        self.assertEqual(
+            [month["total_excl_tax"] for month in mi["months"]],
+            [Decimal("200.00") for i in range(12)],
+        )
 
     def test_creation(self):
         person = factories.PersonFactory.create(
