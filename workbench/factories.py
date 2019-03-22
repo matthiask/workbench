@@ -127,7 +127,7 @@ class LoggedHoursFactory(factory.DjangoModelFactory):
 
 
 class LoggedCostFactory(factory.DjangoModelFactory):
-    service = factory.SubFactory(ServiceFactory)
+    project = factory.SubFactory(ProjectFactory)
     created_by = factory.SubFactory(UserFactory)
 
     class Meta:
