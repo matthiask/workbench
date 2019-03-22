@@ -2,8 +2,9 @@ from datetime import date, timedelta
 from decimal import Decimal, ROUND_UP
 
 from django import forms
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.html import mark_safe
+from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization
@@ -240,7 +241,7 @@ class LoggedHoursForm(WarningsForm, ModelForm):
 class LoggedCostForm(WarningsForm, ModelForm):
     class Meta:
         model = LoggedCost
-        fields = ("service", "rendered_on", "cost", "third_party_costs", "description")
+        fields = ("service", "rendered_on", "third_party_costs", "cost", "description")
         widgets = {"description": Textarea()}
 
     def __init__(self, *args, **kwargs):
@@ -256,11 +257,17 @@ class LoggedCostForm(WarningsForm, ModelForm):
             self.project = kwargs["instance"].project
 
         super().__init__(*args, **kwargs)
-        self.fields["service"].choices = self.project.services.choices()
-
         if not self.instance.pk:
             self.instance.created_by = self.request.user
             self.instance.project = self.project
+
+        self.fields["service"].choices = self.project.services.choices()
+        self.fields["third_party_costs"].help_text = mark_safe(
+            '{}'
+            ' <button type="button" class="btn btn-secondary btn-sm">1:1</button>'
+            ' <button type="button" class="btn btn-secondary btn-sm">+15%</button>'
+            ''.format(self.fields["third_party_costs"].help_text)
+        )
 
     def clean(self):
         data = super().clean()
