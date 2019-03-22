@@ -1,15 +1,11 @@
 import types
 
 from django.conf import settings
-from django.contrib.messages import get_messages
 from django.test import Client, TestCase
 
 from workbench import factories
 from workbench.accounts import views
-
-
-def messages(response):
-    return [m.message for m in get_messages(response.wsgi_request)]
+from workbench.tools.testing import messages
 
 
 class FakeFlow:
