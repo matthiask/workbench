@@ -259,7 +259,7 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
             self.add_warning(_("No contact selected."))
         return data
 
-    def save(self):
+    def save(self, commit=True):
         instance = super().save(commit=False)
 
         if instance.type in (instance.FIXED, instance.DOWN_PAYMENT):
@@ -281,7 +281,8 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
                 Z,
             )
 
-        instance.save()
+        if commit:
+            instance.save()
         return instance
 
 
@@ -378,7 +379,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
         )
 
     def save(self):
-        instance = super().save()
+        instance = super().save(commit=False)
         services = self.project.services.filter(
             id__in=self.cleaned_data["selected_services"]
         )
