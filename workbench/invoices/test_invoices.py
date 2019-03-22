@@ -120,7 +120,9 @@ class InvoicesTest(TestCase):
         self.assertEqual(cost.invoice_service.project_service, service)
 
         response = self.client.post(invoice.urls["delete"])
-        self.assertContains(response, "Logbuch-Einträge sind mit dieser Rechnung verbunden.")
+        self.assertContains(
+            response, "Logbuch-Einträge sind mit dieser Rechnung verbunden."
+        )
         self.assertEqual(Invoice.objects.count(), 1)
         cost.refresh_from_db()
         self.assertTrue(cost.invoice_service)

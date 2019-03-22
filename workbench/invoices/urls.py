@@ -9,7 +9,7 @@ from workbench.invoices.forms import (
     ServiceForm,
 )
 from workbench.invoices.models import Invoice, Service
-from workbench.invoices.views import InvoicePDFView, CreateRelatedView
+from workbench.invoices.views import InvoicePDFView
 
 
 urlpatterns = [
@@ -49,7 +49,9 @@ urlpatterns = [
     # Services
     url(
         r"^(?P<pk>\d+)/createservice/$",
-        CreateRelatedView.as_view(model=Service, form_class=ServiceForm),
+        generic.CreateRelatedView.as_view(
+            model=Service, form_class=ServiceForm, related_model=Invoice
+        ),
         name="invoices_invoice_createservice",
     ),
     url(

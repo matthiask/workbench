@@ -15,7 +15,7 @@ from workbench.projects.forms import (
     DeleteServiceForm,
 )
 from workbench.projects.models import Project, Service
-from workbench.projects.views import CreateRelatedView, MoveServiceView
+from workbench.projects.views import MoveServiceView
 
 
 urlpatterns = [
@@ -74,30 +74,40 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/createoffer/$",
-        CreateRelatedView.as_view(model=Offer, form_class=OfferForm),
+        generic.CreateRelatedView.as_view(
+            model=Offer, form_class=OfferForm, related_model=Project
+        ),
         name="projects_project_createoffer",
     ),
     url(
         r"^(?P<pk>\d+)/createinvoice/$",
-        CreateRelatedView.as_view(model=Invoice, form_class=CreateProjectInvoiceForm),
+        generic.CreateRelatedView.as_view(
+            model=Invoice, form_class=CreateProjectInvoiceForm, related_model=Project
+        ),
         name="projects_project_createinvoice",
     ),
     # HOURS
     url(
         r"^(?P<pk>\d+)/createhours/$",
-        CreateRelatedView.as_view(model=LoggedHours, form_class=LoggedHoursForm),
+        generic.CreateRelatedView.as_view(
+            model=LoggedHours, form_class=LoggedHoursForm, related_model=Project
+        ),
         name="projects_project_createhours",
     ),
     # COSTS
     url(
         r"^(?P<pk>\d+)/createcost/$",
-        CreateRelatedView.as_view(model=LoggedCost, form_class=LoggedCostForm),
+        generic.CreateRelatedView.as_view(
+            model=LoggedCost, form_class=LoggedCostForm, related_model=Project
+        ),
         name="projects_project_createcost",
     ),
     # Services
     url(
         r"^(?P<pk>\d+)/createservice/$",
-        CreateRelatedView.as_view(model=Service, form_class=ServiceForm),
+        generic.CreateRelatedView.as_view(
+            model=Service, form_class=ServiceForm, related_model=Project
+        ),
         name="projects_project_createservice",
     ),
     url(

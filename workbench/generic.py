@@ -3,7 +3,7 @@ import json
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
@@ -147,6 +147,17 @@ class CreateView(ToolsMixin, vanilla.CreateView):
 class CreateAndUpdateView(CreateView):
     def get_success_url(self):
         return self.object.urls.url("update")
+
+
+class CreateRelatedView(CreateView):
+    related_model = None
+
+    def get_form(self, *args, **kwargs):
+        instance = get_object_or_404(self.related_model, pk=self.kwargs.pop("pk"))
+        attribute = self.related_model.__name__.lower()
+        setattr(self, attribute, instance)
+        kwargs[attribute] = instance
+        return super().get_form(*args, **kwargs)
 
 
 class UpdateView(ToolsMixin, vanilla.UpdateView):

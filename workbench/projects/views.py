@@ -1,13 +1,7 @@
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 
 from workbench import generic
-from workbench.projects.models import Project, Service
-
-
-class CreateRelatedView(generic.CreateView):
-    def get_form(self, data=None, files=None, **kwargs):
-        self.project = get_object_or_404(Project, pk=self.kwargs.pop("pk"))
-        return super().get_form(data, files, project=self.project, **kwargs)
+from workbench.projects.models import Service
 
 
 class MoveServiceView(generic.DetailView):
