@@ -16,6 +16,7 @@ class HistoryTest(TestCase):
 
         self.client.force_login(project.owned_by)
         response = self.client.get("/history/projects.project/{}/".format(project.pk))
+        # print(response, response.content.decode("utf-8"))
         self.assertContains(
             response,
             "Anfangswert von &#39;Kunde&#39; war &#39;The Organization Ltd&#39;.",

@@ -59,3 +59,28 @@ class ProjectsTest(TestCase):
         )
         self.assertEqual(response.status_code, 202)
         self.assertEqual(list(project.services.all()), [service2])
+
+    def test_autofill(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.urls["createservice"])
+        self.assertContains(response, 'data-autofill="{}"')
+
+        factories.service_types()
+
+        response = self.client.get(project.urls["createservice"])
+        self.assertContains(response, "&quot;effort_type&quot;: &quot;consulting&quot;")
+        self.assertContains(response, "&quot;effort_rate&quot;: 250")
+
+    def test_delete(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.urls["delete"])
+        self.assertEqual(response.status_code, 200)
+
+        factories.LoggedCostFactory.create(project=project)
+
+        response = self.client.get(project.urls["delete"])
+        self.assertRedirects(response, project.urls["services"])

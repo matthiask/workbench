@@ -13,9 +13,11 @@
 
     <form method="POST" action="." class="form">
       {% csrf_token %}
-      {% include 'fineforms/warnings.html' %}
-      {% ff_errors form %}
-      {% ff_fields form %}
+      {% if form %}
+        {% include 'fineforms/warnings.html' %}
+        {% ff_errors form %}
+        {% ff_fields form %}
+      {% endif %}
       {% buttons %}
         <a href="{{ object.get_absolute_url }}" class="btn btn-primary">
           {% trans 'cancel' %}</a>
