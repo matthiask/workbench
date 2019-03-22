@@ -21,7 +21,7 @@ urlpatterns = [
     url(
         r"^organizations/picker/$",
         ListView.as_view(
-            model=Organization, template_name_suffix="_picker", paginate_by=10
+            model=Organization, template_name_suffix="_picker", paginate_by=15
         ),
         name="contacts_organization_picker",
     ),
@@ -49,7 +49,7 @@ urlpatterns = [
     url(
         r"^people/picker/$",
         PersonListView.as_view(
-            person_picker=True, template_name_suffix="_picker", paginate_by=10
+            person_picker=True, template_name_suffix="_picker", paginate_by=15
         ),
         name="contacts_person_picker",
     ),

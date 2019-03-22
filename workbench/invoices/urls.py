@@ -19,7 +19,7 @@ urlpatterns = [
     ),
     url(
         r"^picker/$",
-        ListView.as_view(model=Invoice, template_name_suffix="_picker", paginate_by=10),
+        ListView.as_view(model=Invoice, template_name_suffix="_picker", paginate_by=15),
         name="invoices_invoice_picker",
     ),
     url(

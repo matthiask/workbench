@@ -27,7 +27,7 @@ urlpatterns = [
     url(
         r"^picker/$",
         generic.ListView.as_view(
-            model=Project, template_name_suffix="_picker", paginate_by=10
+            model=Project, template_name_suffix="_picker", paginate_by=15
         ),
         name="projects_project_picker",
     ),
