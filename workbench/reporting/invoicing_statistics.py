@@ -46,7 +46,5 @@ def monthly_invoicing(year):
         month["third_party_costs"] += third_party_costs
         month["invoices"].append(invoice)
 
-    if month["invoices"]:
-        add_month(month)
-
+    add_month(month)
     return overall

@@ -38,8 +38,6 @@ class RecurringTest(TestCase):
         ri.save()
         self.assertEqual(len(ri.create_invoices(generate_until=date(2019, 1, 1))), 1)
 
-        self.assertTrue(len(RecurringInvoice.objects.create_invoices()) > 1)
-
         # Not so clean, but we have a few invoices here...
         mi = monthly_invoicing(2018)
         self.assertAlmostEqual(mi["third_party_costs"], Decimal(0))
@@ -50,6 +48,18 @@ class RecurringTest(TestCase):
             [month["total_excl_tax"] for month in mi["months"]],
             [Decimal("200.00") for i in range(12)],
         )
+
+        mi = monthly_invoicing(2019)
+        self.assertAlmostEqual(mi["third_party_costs"], Decimal(0))
+        self.assertAlmostEqual(mi["total"], Decimal(200) * Decimal("1.077"))
+        self.assertAlmostEqual(mi["total_excl_tax"], Decimal(200))
+
+        self.assertEqual(
+            [month["total_excl_tax"] for month in mi["months"]], [Decimal("200.00")]
+        )
+
+        # Continue generating invoices after January '19
+        self.assertTrue(len(RecurringInvoice.objects.create_invoices()) > 1)
 
     def test_creation(self):
         person = factories.PersonFactory.create(
