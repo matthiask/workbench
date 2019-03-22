@@ -5,6 +5,7 @@ from faker import Factory
 from faker.providers import address
 
 from workbench.accounts.models import User
+from workbench.activities.models import Activity
 from workbench.awt.models import Year
 from workbench.contacts.models import Organization, Person, PostalAddress
 from workbench.invoices.models import Invoice
@@ -156,3 +157,12 @@ class YearFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Year
+
+
+# ACTIVITY ####################################################################
+class ActivityFactory(factory.DjangoModelFactory):
+    title = factory.Sequence(lambda n: "Activity %d" % n)
+    owned_by = factory.SubFactory(UserFactory)
+
+    class Meta:
+        model = Activity

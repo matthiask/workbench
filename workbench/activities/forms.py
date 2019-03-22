@@ -12,7 +12,7 @@ from workbench.tools.forms import ModelForm, Textarea
 
 class ActivitySearchForm(forms.Form):
     s = forms.ChoiceField(
-        choices=(("", _("All")), ("open", _("Open"))),
+        choices=[("", _("Open")), ("all", _("All"))],
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
     )
@@ -39,7 +39,7 @@ class ActivitySearchForm(forms.Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get("s") == "open":
+        if data.get("s") != "all":
             queryset = queryset.filter(completed_at__isnull=True)
         if data.get("owned_by") == 0:
             queryset = queryset.filter(owned_by__is_active=False)
