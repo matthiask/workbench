@@ -431,15 +431,25 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
         initial = kwargs.setdefault("initial", {})
         initial.update({"subtotal": None})  # Invalid -- force input.
 
-        person = None
+        contact = None
+        customer = None
+        self.pre_form = False
 
-        if request.GET.get("person"):
+        if request.GET.get("contact"):
             try:
-                person = Person.objects.get(pk=request.GET.get("person"))
+                contact = Person.objects.get(pk=request.GET.get("contact"))
             except (Person.DoesNotExist, TypeError, ValueError):
                 pass
             else:
-                initial.update({"customer": person.organization, "contact": person})
+                initial.update({"customer": contact.organization, "contact": contact})
+
+        elif request.GET.get("customer"):
+            try:
+                customer = Organization.objects.get(pk=request.GET.get("customer"))
+            except (Organization.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update({"customer": customer})
 
         elif request.GET.get("copy_invoice"):
             try:
@@ -462,13 +472,21 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
                         "total": invoice.total,
                     }
                 )
+        else:
+            self.pre_form = True
 
         super().__init__(*args, **kwargs)
 
         self.instance.type = Invoice.FIXED
 
-        if person:
-            self.add_postal_address_selection(person=person)
+        if self.pre_form:
+            for field in list(self.fields):
+                if field not in {"customer", "contact"}:
+                    self.fields.pop(field)
+        elif contact:
+            self.add_postal_address_selection(person=contact)
+        elif customer:
+            self.add_postal_address_selection(organization=customer)
 
 
 class InvoiceDeleteForm(ModelForm, WarningsForm):

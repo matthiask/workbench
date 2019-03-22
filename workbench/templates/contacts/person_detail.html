@@ -47,7 +47,7 @@
     </tr>
   </table>
 
-<a href="{% url 'invoices_invoice_create' %}?person={{ object.pk }}" class="btn btn-secondary">
+<a href="{% url 'invoices_invoice_create' %}?contact={{ object.pk }}" class="btn btn-secondary">
   {% include "svg/plus.svg" %}
   {% trans 'invoice' %}
 </a>

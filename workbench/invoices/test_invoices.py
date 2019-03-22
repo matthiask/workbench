@@ -53,16 +53,19 @@ class InvoicesTest(TestCase):
         response = self.client.get(url)
         self.assertContains(response, "Anzahlung")
 
-        response = self.client.post(url, {
-            "contact": project.contact_id,
-            "title": project.title,
-            "owned_by": project.owned_by_id,
-            "discount": 0,
-            "liable_to_vat": 1,
-            "postal_address": "Anything",
-            "subtotal": 2500,
-            "third_party_costs": 0,
-        })
+        response = self.client.post(
+            url,
+            {
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "discount": 0,
+                "liable_to_vat": 1,
+                "postal_address": "Anything",
+                "subtotal": 2500,
+                "third_party_costs": 0,
+            },
+        )
 
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls["detail"])
@@ -184,8 +187,16 @@ class InvoicesTest(TestCase):
             organization=factories.OrganizationFactory.create()
         )
         self.client.force_login(person.primary_contact)
-        url = Invoice().urls.url("create") + "?person={}".format(person.pk)
+
+        # pre_form does not have these fields
+        response = self.client.get(Invoice().urls["create"])
+        self.assertContains(response, 'method="GET"')
+        self.assertNotContains(response, 'id="id_title"')
+        self.assertNotContains(response, 'id="id_description"')
+
+        url = Invoice().urls.url("create") + "?contact={}".format(person.pk)
         response = self.client.get(url)
+        self.assertContains(response, 'method="POST"')
         self.assertContains(response, 'id="id_postal_address"')
         postal_address = factories.PostalAddressFactory.create(person=person)
         response = self.client.get(url)
