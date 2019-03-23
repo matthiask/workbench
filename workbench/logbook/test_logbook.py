@@ -148,7 +148,8 @@ class LogbookTest(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="text" name="rendered_on" value="12.03.2019"'
-            ' class=" datepicker form-control" required disabled id="id_rendered_on">',
+            '<input type="text" name="rendered_on" value="{}"'
+            ' class=" datepicker form-control" required disabled id="id_rendered_on">'
+            "".format(local_date_format(hours.rendered_on)),
             html=True,
         )
