@@ -7,8 +7,8 @@ from workbench import views
 from workbench.awt.views import ReportView
 from workbench.reporting.views import (
     monthly_invoicing,
-    overdrawn_projects,
     open_items_list,
+    overdrawn_projects,
 )
 
 

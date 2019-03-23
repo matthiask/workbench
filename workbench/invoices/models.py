@@ -14,7 +14,7 @@ from workbench.invoices.utils import recurring
 from workbench.projects.models import Project
 from workbench.services.models import ServiceBase
 from workbench.tools.formats import local_date_format
-from workbench.tools.models import ModelWithTotal, SearchQuerySet, MoneyField, Z
+from workbench.tools.models import ModelWithTotal, MoneyField, SearchQuerySet, Z
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
 

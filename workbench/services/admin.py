@@ -1,7 +1,6 @@
 from django.contrib import admin
 
 from admin_ordering.admin import OrderableAdmin
-
 from workbench.services.models import ServiceType
 
 

@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 
 from workbench.accounts.models import User
-from workbench.tools.models import SearchQuerySet, Model
+from workbench.tools.models import Model, SearchQuerySet
 from workbench.tools.urls import model_urls
 
 

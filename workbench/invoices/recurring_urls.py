@@ -2,9 +2,9 @@ from django.conf.urls import url
 
 from workbench import generic
 from workbench.invoices.forms import (
-    RecurringInvoiceSearchForm,
     CreateRecurringInvoiceForm,
     RecurringInvoiceForm,
+    RecurringInvoiceSearchForm,
 )
 from workbench.invoices.models import RecurringInvoice
 from workbench.invoices.views import RecurringInvoiceDetailView

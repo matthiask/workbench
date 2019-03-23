@@ -1,5 +1,5 @@
-from decimal import Decimal
 from datetime import date
+from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.projects.models import Project, Service
-from workbench.tools.models import Model, MoneyField, HoursField
+from workbench.tools.models import HoursField, Model, MoneyField
 from workbench.tools.urls import model_urls
 
 

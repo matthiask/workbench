@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.tools.formats import local_date_format
-from workbench.tools.models import SearchQuerySet, Model, MoneyField
+from workbench.tools.models import Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 
 

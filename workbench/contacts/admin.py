@@ -1,10 +1,10 @@
 from django.contrib import admin
 
 from workbench.contacts.models import (
+    EmailAddress,
     Group,
     Organization,
     Person,
-    EmailAddress,
     PhoneNumber,
     PostalAddress,
 )

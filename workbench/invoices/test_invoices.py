@@ -5,8 +5,8 @@ from django.test import TestCase
 
 from workbench import factories
 from workbench.invoices.models import Invoice
-from workbench.tools.forms import WarningsForm
 from workbench.tools.formats import local_date_format
+from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import messages
 
 

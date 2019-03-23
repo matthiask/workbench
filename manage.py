@@ -2,6 +2,7 @@
 import os
 import sys
 
+
 if __name__ == "__main__":  # pragma: no branch
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "workbench.settings")
 

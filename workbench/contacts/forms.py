@@ -6,11 +6,11 @@ from django.template.defaultfilters import linebreaksbr
 from django.utils.translation import gettext_lazy as _, ngettext
 
 from workbench.contacts.models import (
+    EmailAddress,
     Group,
     Organization,
     Person,
     PhoneNumber,
-    EmailAddress,
     PostalAddress,
 )
 from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm

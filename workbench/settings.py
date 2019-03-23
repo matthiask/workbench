@@ -8,11 +8,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
-import dj_database_url
 import os
 import sys
 import types
-from speckenv import read_speckenv, env
+
+import dj_database_url
+from speckenv import env, read_speckenv
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 read_speckenv(os.path.join(BASE_DIR, ".env"))

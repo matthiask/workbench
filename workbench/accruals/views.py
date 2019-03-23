@@ -4,10 +4,10 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 
+from workbench import generic
 from workbench.accounts.models import User
 from workbench.accruals.models import Employment, Year
 from workbench.reporting.annual_working_time import annual_working_time
-from workbench import generic
 
 
 class ReportView(generic.DetailView):

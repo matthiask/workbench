@@ -123,3 +123,6 @@ class RecurringTest(TestCase):
         create_recurring_invoices_and_notify()
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "Stapelrechnungen")
+
+        create_recurring_invoices_and_notify()
+        self.assertEqual(len(mail.outbox), 1)

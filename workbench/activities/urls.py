@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from workbench import generic
-from workbench.activities.forms import ActivitySearchForm, ActivityForm
+from workbench.activities.forms import ActivityForm, ActivitySearchForm
 from workbench.activities.models import Activity
 
 

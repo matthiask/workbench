@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
-from workbench.offers.forms import OfferSearchForm, OfferForm
+from workbench.offers.forms import OfferForm, OfferSearchForm
 from workbench.offers.models import Offer
 from workbench.offers.views import OfferPDFView
 

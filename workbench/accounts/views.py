@@ -7,7 +7,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import never_cache
 
-from oauth2client.client import OAuth2WebServerFlow, FlowExchangeError
+from oauth2client.client import FlowExchangeError, OAuth2WebServerFlow
 
 from workbench.accounts.forms import UserForm
 from workbench.accounts.models import User

@@ -1,6 +1,6 @@
+from workbench.generic import DetailView
 from workbench.offers.models import Offer
 from workbench.tools.pdf import pdf_response
-from workbench.generic import DetailView
 
 
 class OfferPDFView(DetailView):

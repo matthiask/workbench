@@ -8,16 +8,16 @@ from django.utils.translation import gettext as _
 
 from pdfdocument.document import (
     Frame,
-    PageTemplate,
-    NextPageTemplate,
     MarkupParagraph,
-    sanitize,
+    NextPageTemplate,
+    PageTemplate,
     PDFDocument as _PDFDocument,
     cm,
-    mm,
     colors,
     getSampleStyleSheet,
+    mm,
     register_fonts_from_paths,
+    sanitize,
 )
 from pdfdocument.utils import pdf_response as _pdf_response
 

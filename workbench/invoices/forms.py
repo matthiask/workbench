@@ -8,8 +8,8 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
-from workbench.invoices.models import Invoice, Service, RecurringInvoice
-from workbench.logbook.models import LoggedHours, LoggedCost
+from workbench.invoices.models import Invoice, RecurringInvoice, Service
+from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.services.models import ServiceType
 from workbench.tools.formats import currency, hours, local_date_format
 from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm

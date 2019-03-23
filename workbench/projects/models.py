@@ -7,13 +7,13 @@ from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.html import format_html
-from django.utils.translation import gettext_lazy as _, gettext
+from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.services.models import ServiceBase
 from workbench.tools.formats import local_date_format
-from workbench.tools.models import SearchQuerySet, Model, Z
+from workbench.tools.models import Model, SearchQuerySet, Z
 from workbench.tools.urls import model_urls
 
 

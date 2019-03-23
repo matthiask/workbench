@@ -1,5 +1,5 @@
 from datetime import date, timedelta
-from decimal import Decimal, ROUND_UP
+from decimal import ROUND_UP, Decimal
 
 from django import forms
 from django.utils import timezone
@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization
-from workbench.logbook.models import LoggedHours, LoggedCost
+from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
 from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm
 from workbench.tools.validation import raise_if_errors

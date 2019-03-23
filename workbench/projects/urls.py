@@ -4,15 +4,15 @@ from django.shortcuts import get_object_or_404, redirect
 from workbench import generic
 from workbench.invoices.forms import CreateProjectInvoiceForm
 from workbench.invoices.models import Invoice
-from workbench.logbook.forms import LoggedHoursForm, LoggedCostForm
-from workbench.logbook.models import LoggedHours, LoggedCost
+from workbench.logbook.forms import LoggedCostForm, LoggedHoursForm
+from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.forms import OfferForm
 from workbench.offers.models import Offer
 from workbench.projects.forms import (
-    ProjectSearchForm,
-    ProjectForm,
-    ServiceForm,
     DeleteServiceForm,
+    ProjectForm,
+    ProjectSearchForm,
+    ServiceForm,
 )
 from workbench.projects.models import Project, Service
 from workbench.projects.views import MoveServiceView

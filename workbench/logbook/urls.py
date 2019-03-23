@@ -4,12 +4,12 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
 from workbench.logbook.forms import (
-    LoggedHoursSearchForm,
-    LoggedHoursForm,
-    LoggedCostSearchForm,
     LoggedCostForm,
+    LoggedCostSearchForm,
+    LoggedHoursForm,
+    LoggedHoursSearchForm,
 )
-from workbench.logbook.models import LoggedHours, LoggedCost
+from workbench.logbook.models import LoggedCost, LoggedHours
 
 
 urlpatterns = [

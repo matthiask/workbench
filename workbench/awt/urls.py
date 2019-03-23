@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from workbench import generic
-from workbench.awt.forms import AbsenceSearchForm, AbsenceForm
+from workbench.awt.forms import AbsenceForm, AbsenceSearchForm
 from workbench.awt.models import Absence
 
 

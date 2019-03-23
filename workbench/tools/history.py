@@ -1,6 +1,6 @@
+import re
 from collections import namedtuple
 from functools import lru_cache
-import re
 
 from django.db import models
 from django.utils import dateparse

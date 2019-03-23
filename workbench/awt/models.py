@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.tools.models import Model, HoursField
+from workbench.tools.models import HoursField, Model
 from workbench.tools.urls import model_urls
 
 

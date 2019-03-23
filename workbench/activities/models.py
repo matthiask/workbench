@@ -7,7 +7,7 @@ from workbench.contacts.models import Person
 from workbench.deals.models import Deal
 from workbench.projects.models import Project
 from workbench.tools.formats import local_date_format, pretty_due
-from workbench.tools.models import SearchQuerySet, Model
+from workbench.tools.models import Model, SearchQuerySet
 from workbench.tools.urls import model_urls
 
 

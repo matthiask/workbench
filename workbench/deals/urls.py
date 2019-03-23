@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from workbench import generic
-from workbench.deals.forms import DealSearchForm, DealForm
+from workbench.deals.forms import DealForm, DealSearchForm
 from workbench.deals.models import Deal
 
 

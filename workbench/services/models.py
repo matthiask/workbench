@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 
-from workbench.tools.models import Model, MoneyField, HoursField, Z
+from workbench.tools.models import HoursField, Model, MoneyField, Z
 from workbench.tools.validation import raise_if_errors
 
 

@@ -2,9 +2,9 @@ from django.conf.urls import url
 
 from workbench import generic
 from workbench.credit_control.forms import (
-    CreditEntrySearchForm,
-    CreditEntryForm,
     AccountStatementUploadForm,
+    CreditEntryForm,
+    CreditEntrySearchForm,
 )
 from workbench.credit_control.models import CreditEntry
 from workbench.credit_control.views import AssignCreditEntriesView

@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from workbench import generic
-from workbench.accruals.forms import AccrualSearchForm, AccrualForm
+from workbench.accruals.forms import AccrualForm, AccrualSearchForm
 from workbench.accruals.models import Accrual
 
 

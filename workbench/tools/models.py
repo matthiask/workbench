@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models import ProtectedError
 from django.db.models.deletion import Collector
 from django.template.loader import render_to_string
-from django.utils.translation import gettext_lazy as _, gettext
+from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.tools.search import search
 

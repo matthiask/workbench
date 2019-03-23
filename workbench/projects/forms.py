@@ -7,7 +7,7 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
-from workbench.tools.forms import ModelForm, Textarea, Picker
+from workbench.tools.forms import ModelForm, Picker, Textarea
 
 
 class ProjectSearchForm(forms.Form):

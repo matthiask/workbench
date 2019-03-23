@@ -2,10 +2,10 @@ from django.conf.urls import url
 
 from workbench import generic
 from workbench.invoices.forms import (
-    InvoiceSearchForm,
-    InvoiceForm,
     CreatePersonInvoiceForm,
     InvoiceDeleteForm,
+    InvoiceForm,
+    InvoiceSearchForm,
     ServiceForm,
 )
 from workbench.invoices.models import Invoice, Service
