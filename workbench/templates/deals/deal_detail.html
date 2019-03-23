@@ -8,7 +8,7 @@
     <h1>{{ deal }} {% history_link deal %}</h1>
 
     <table class="table table-striped">
-      {% for name, value in object|field_value_pairs:'description, owned_by, stage' %}
+      {% for name, value in object|field_value_pairs:'customer, contact, description, owned_by, stage' %}
       <tr><th class="text-right">{{ name }}</th><td>{% link_or_none value %}</td></tr>
       {% endfor %}
 

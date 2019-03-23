@@ -8,17 +8,25 @@ from workbench.tools.forms import ModelForm, Picker
 
 class DealSearchForm(forms.Form):
     s = forms.ChoiceField(
-        choices=(("", _("All states")),) + Deal.STATUS_CHOICES,
+        choices=(
+            ("all", _("All states")),
+            ("", _("Open")),
+            (_("Exact"), Deal.STATUS_CHOICES),
+        ),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
     )
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get("s"):
+        if data.get("s") == "":
+            queryset = queryset.filter(status=Deal.OPEN)
+        elif data.get("s") != "all":
             queryset = queryset.filter(status=data.get("s"))
 
-        return queryset.select_related("stage", "owned_by")
+        return queryset.select_related(
+            "stage", "owned_by", "customer", "contact__organization"
+        )
 
 
 class DealForm(ModelForm):

@@ -9,6 +9,7 @@
     <tr>
       <th>{% trans 'deal' %}</th>
       <th>{% trans 'owned by' %}</th>
+      <th>{% trans 'customer' %}</th>
       <th class="text-right">{% trans 'estimated value' %}</th>
       <th>{% trans 'stage' %}</th>
       <th>{% trans 'status' %}</th>
@@ -19,6 +20,9 @@
       <tr>
         <th><a href="{{ deal.get_absolute_url }}">{{ deal }}</a></th>
         <td>{{ deal.owned_by.get_short_name }}</td>
+        <td>
+          {{ deal.contact|default:deal.customer }}
+        </td>
         <td class="text-right">{{ deal.estimated_value|currency }}</td>
         <td>{{ deal.stage }}</td>
         <td>{{ deal.get_status_display }}</td>
