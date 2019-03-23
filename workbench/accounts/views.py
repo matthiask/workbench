@@ -1,7 +1,6 @@
 from django import http
 from django.conf import settings
-from django.contrib import messages
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib import auth, messages
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
@@ -86,9 +85,9 @@ def oauth2(request):
             },
         )
 
-    user = authenticate(email=email)
+    user = auth.authenticate(email=email)
     if user and user.is_active:
-        auth_login(request, user)
+        auth.login(request, user)
     else:
         messages.error(request, _("No user with email address %s found.") % email)
         response = http.HttpResponseRedirect(reverse("login"))
@@ -109,7 +108,7 @@ def oauth2(request):
 
 
 def logout(request):
-    auth_logout(request)
+    auth.logout(request)
     messages.success(request, _("You have been signed out."))
     response = http.HttpResponseRedirect(reverse("login"))
     response.delete_cookie("login_hint")
