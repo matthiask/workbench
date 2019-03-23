@@ -385,7 +385,9 @@ class RecurringInvoiceQuerySet(SearchQuerySet):
         invoices = []
         for ri in self.filter(
             Q(starts_on__lte=generate_until),
-            Q(ends_on__isnull=True) | Q(ends_on__gte=F("next_period_starts_on")),
+            Q(ends_on__isnull=True)
+            | Q(next_period_starts_on__isnull=True)
+            | Q(ends_on__gte=F("next_period_starts_on")),
             Q(next_period_starts_on__isnull=True)
             | Q(next_period_starts_on__lte=generate_until),
         ).select_related("customer", "contact", "owned_by"):
