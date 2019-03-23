@@ -51,3 +51,14 @@ class ContactsTest(TestCase):
             "Diese Person ist der Kontakt der folgenden zugehörigen Objekte:"
             " 1 Projekt.",
         )
+
+    def test_list(self):
+        factories.PersonFactory.create()
+        factories.PersonFactory.create()
+        person = factories.PersonFactory.create(is_archived=True)
+
+        self.client.force_login(person.primary_contact)
+        response = self.client.get(person.urls["list"])
+        self.assertContains(response, "1 &ndash; 2 von 2")
+        self.assertContains(response, "Vorname Nachname", 2)
+        # print(response, response.content.decode("utf-8"))
