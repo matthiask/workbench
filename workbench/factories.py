@@ -9,6 +9,7 @@ from workbench.accounts.models import User
 from workbench.activities.models import Activity
 from workbench.awt.models import Year
 from workbench.contacts.models import Organization, Person, PostalAddress
+from workbench.deals.models import Deal, Stage
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
@@ -167,3 +168,27 @@ class ActivityFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Activity
+
+
+# DEALS #######################################################################
+class StageFactory(factory.DjangoModelFactory):
+    title = "Initial"
+    position = 10
+
+    class Meta:
+        model = Stage
+
+
+class DealFactory(factory.DjangoModelFactory):
+    customer = factory.SubFactory(OrganizationFactory)
+    contact = factory.LazyAttribute(
+        lambda obj: PersonFactory.create(organization=obj.customer)
+    )
+    stage = factory.SubFactory(StageFactory)
+    title = factory.Sequence(lambda n: "Activity %d" % n)
+    owned_by = factory.SubFactory(UserFactory)
+    estimated_value = 42
+    status = Deal.OPEN
+
+    class Meta:
+        model = Deal
