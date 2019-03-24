@@ -3,6 +3,11 @@ from django.contrib import admin
 from workbench.credit_control import models
 
 
+@admin.register(models.Ledger)
+class LedgerAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(models.CreditEntry)
 class CreditEntryAdmin(admin.ModelAdmin):
     list_display = [

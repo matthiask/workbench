@@ -46,6 +46,7 @@ class CreditEntryForm(ModelForm):
     class Meta:
         model = CreditEntry
         fields = [
+            "ledger",
             "reference_number",
             "value_date",
             "total",
@@ -66,6 +67,7 @@ class CreditEntryForm(ModelForm):
 
 
 class AccountStatementUploadForm(forms.Form):
+    ledger = CreditEntry._meta.get_field("ledger").formfield()
     statement = forms.FileField(label=_("account statement"))
 
     def __init__(self, *args, **kwargs):
@@ -115,7 +117,9 @@ class AccountStatementUploadForm(forms.Form):
 
         for reference, defaults in entries:
             CreditEntry.objects.get_or_create(
-                reference_number=reference, defaults=defaults
+                ledger=self.cleaned_data["ledger"],
+                reference_number=reference,
+                defaults=defaults,
             )
 
         return CreditEntry()

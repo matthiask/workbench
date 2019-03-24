@@ -48,7 +48,7 @@ class CreditEntriesTest(TestCase):
             messages(response),
             [
                 "Gutschriften wurden erfolgreich geändert.",
-                "All credit entries have already been assigned.",
+                "Alle Gutschriften wurden zugewiesen.",
             ],
         )
 
@@ -60,7 +60,10 @@ class CreditEntriesTest(TestCase):
                 settings.BASE_DIR, "workbench", "test", "account-statement.csv"
             )
         ) as f:
-            response = self.client.post("/credit-control/upload/", {"statement": f})
+            response = self.client.post(
+                "/credit-control/upload/",
+                {"statement": f, "ledger": factories.LedgerFactory.create().pk},
+            )
 
         self.assertRedirects(response, "/credit-control/")
 
@@ -75,6 +78,7 @@ class CreditEntriesTest(TestCase):
         response = self.client.post(
             entry.urls["update"],
             {
+                "ledger": entry.ledger_id,
                 "reference_number": entry.reference_number,
                 "value_date": entry.value_date,
                 "total": entry.total,

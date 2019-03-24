@@ -6,12 +6,31 @@ from workbench.tools.models import Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 
 
+# @model_urls()
+class Ledger(Model):
+    name = models.CharField(_("name"), max_length=100)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = _("ledger")
+        verbose_name_plural = _("ledgers")
+
+    def __str__(self):
+        return self.name
+
+
 class CreditEntryQuerySet(SearchQuerySet):
     pass
 
 
 @model_urls()
 class CreditEntry(Model):
+    ledger = models.ForeignKey(
+        Ledger,
+        on_delete=models.PROTECT,
+        related_name="transactions",
+        verbose_name=_("ledger"),
+    )
     reference_number = models.CharField(
         _("reference number"), max_length=40, unique=True
     )

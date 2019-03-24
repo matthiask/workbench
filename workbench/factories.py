@@ -9,7 +9,7 @@ from workbench.accounts.models import User
 from workbench.activities.models import Activity
 from workbench.awt.models import Year
 from workbench.contacts.models import Organization, Person, PostalAddress
-from workbench.credit_control.models import CreditEntry
+from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.deals.models import Deal, Stage
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
@@ -196,7 +196,15 @@ class DealFactory(factory.DjangoModelFactory):
 
 
 # CREDIT CONTROL ##############################################################
+class LedgerFactory(factory.DjangoModelFactory):
+    name = "bank account"
+
+    class Meta:
+        model = Ledger
+
+
 class CreditEntryFactory(factory.DjangoModelFactory):
+    ledger = factory.SubFactory(LedgerFactory)
     reference_number = factory.Sequence(lambda n: "payment{}".format(n))
     value_date = date.today()
     total = 1
