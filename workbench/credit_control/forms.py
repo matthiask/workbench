@@ -1,15 +1,13 @@
-import csv
-import io
+import json
 from datetime import datetime
-from decimal import Decimal
 
 from django import forms
 from django.db.models import Q
-from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from workbench.credit_control.models import CreditEntry
+from workbench.credit_control.models import CreditEntry, Ledger
+from workbench.credit_control.parsers import parse_zkb
 from workbench.invoices.models import Invoice
 from workbench.tools.formats import currency, local_date_format
 from workbench.tools.forms import ModelForm, Picker, Textarea
@@ -67,62 +65,54 @@ class CreditEntryForm(ModelForm):
 
 
 class AccountStatementUploadForm(forms.Form):
-    ledger = CreditEntry._meta.get_field("ledger").formfield()
+    ledger = CreditEntry._meta.get_field("ledger").formfield(widget=forms.RadioSelect)
     statement = forms.FileField(label=_("account statement"))
+    statement_data = forms.CharField(
+        label=_("statement data"),
+        help_text=_(
+            "Automatically filled in when submitting a parseable account statement."
+        ),
+    )
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
+        self.fields["ledger"].choices = [
+            (ledger.id, str(ledger)) for ledger in Ledger.objects.all()
+        ]
+
+        if self.request.POST.get("statement_data") or self.request.FILES:
+            self.fields["statement"].required = False
+        else:
+            self.fields["statement_data"].required = False
+
+    def clean(self):
+        data = super().clean()
+        if data.get("statement"):
+            self.data = self.data.copy()
+            self.statement_list = parse_zkb(data["statement"].read())
+            self.data["statement_data"] = json.dumps(
+                self.statement_list, sort_keys=True
+            )
+        return data
 
     def save(self):
-        f = io.StringIO()
-        f.write(
-            force_text(
-                self.cleaned_data["statement"].read(), encoding="utf-8", errors="ignore"
-            )
-        )
-        f.seek(0)
-        dialect = csv.Sniffer().sniff(f.read(4096))
-        f.seek(0)
-        reader = csv.reader(f, dialect)
-        next(reader)  # Skip first line
-        entries = []
-        while True:
-            try:
-                row = next(reader)
-            except StopIteration:
-                break
-            if not row:
-                continue
-            try:
-                day = datetime.strptime(row[8], "%d.%m.%Y").date()
-                amount = row[7] and Decimal(row[7])
-                reference = row[4]
-            except (AttributeError, IndexError, ValueError):
-                continue
-            if day and amount:
-                details = next(reader)
-                entries.append(
-                    [
-                        reference,
-                        {
-                            "value_date": day,
-                            "total": amount,
-                            "payment_notice": "; ".join(
-                                filter(None, (details[1], details[10], row[4]))
-                            ),
-                        },
-                    ]
-                )
+        entries = json.loads(self.cleaned_data["statement_data"])
 
-        for reference, defaults in entries:
-            CreditEntry.objects.get_or_create(
+        created_entries = []
+        for data in entries:
+            reference_number = data.pop("reference_number")
+            data["value_date"] = datetime.strptime(
+                data["value_date"], "%Y-%m-%d"
+            ).date()
+            c, created = CreditEntry.objects.get_or_create(
                 ledger=self.cleaned_data["ledger"],
-                reference_number=reference,
-                defaults=defaults,
+                reference_number=reference_number,
+                defaults=data,
             )
-
-        return CreditEntry()
+            if created:
+                created_entries.append(c)
+        return created_entries
 
 
 class AssignCreditEntriesForm(forms.Form):

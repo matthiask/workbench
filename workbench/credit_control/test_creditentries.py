@@ -54,6 +54,7 @@ class CreditEntriesTest(TestCase):
 
     def test_account_statement_upload(self):
         self.client.force_login(factories.UserFactory.create())
+        ledger = factories.LedgerFactory.create()
 
         with io.open(
             os.path.join(
@@ -61,9 +62,16 @@ class CreditEntriesTest(TestCase):
             )
         ) as f:
             response = self.client.post(
-                "/credit-control/upload/",
-                {"statement": f, "ledger": factories.LedgerFactory.create().pk},
+                "/credit-control/upload/", {"statement": f, "ledger": ledger.pk}
             )
+
+        self.assertContains(response, "reference_number")
+        statement_data = response.context_data["form"].data["statement_data"]
+
+        response = self.client.post(
+            "/credit-control/upload/",
+            {"statement_data": statement_data, "ledger": ledger.pk},
+        )
 
         self.assertRedirects(response, "/credit-control/")
 

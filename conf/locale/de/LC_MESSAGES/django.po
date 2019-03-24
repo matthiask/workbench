@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-24 18:21+0100\n"
+"POT-Creation-Date: 2019-03-24 21:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -211,7 +211,7 @@ msgstr "Titel"
 
 #: workbench/activities/models.py:51 workbench/awt/models.py:83
 #: workbench/contacts/models.py:29 workbench/contacts/models.py:75
-#: workbench/credit_control/forms.py:178 workbench/credit_control/models.py:49
+#: workbench/credit_control/forms.py:169 workbench/credit_control/models.py:49
 #: workbench/templates/contacts/organization_detail.html:29
 #: workbench/templates/contacts/person_detail.html:43
 #: workbench/templates/credit_control/creditentry_list.html:25
@@ -582,23 +582,32 @@ msgstr "Postadressen"
 msgid "credit control"
 msgstr "Debitorenmanagement"
 
-#: workbench/credit_control/forms.py:22 workbench/deals/forms.py:12
+#: workbench/credit_control/forms.py:20 workbench/deals/forms.py:12
 #: workbench/invoices/forms.py:22 workbench/invoices/forms.py:558
 #: workbench/offers/forms.py:17 workbench/projects/forms.py:16
 msgid "All states"
 msgstr "Alle Stati"
 
-#: workbench/credit_control/forms.py:23
+#: workbench/credit_control/forms.py:21
 msgid "Pending"
 msgstr "Pendent"
 
-#: workbench/credit_control/forms.py:24
+#: workbench/credit_control/forms.py:22
 msgid "Processed"
 msgstr "Verarbeitet"
 
-#: workbench/credit_control/forms.py:71
+#: workbench/credit_control/forms.py:69
 msgid "account statement"
 msgstr "Kontoauszug"
+
+#: workbench/credit_control/forms.py:71
+msgid "statement data"
+msgstr "Auszugsdaten"
+
+#: workbench/credit_control/forms.py:74
+msgid "Automatically filled in when submitting a parseable account statement."
+msgstr ""
+"Wird automatisch gefüllt wenn ein einlesbarer Kontoauszug hochgeladen wird."
 
 #: workbench/credit_control/models.py:15 workbench/credit_control/models.py:32
 msgid "ledger"
@@ -639,16 +648,28 @@ msgstr "Gutschrift"
 msgid "credit entries"
 msgstr "Gutschriften"
 
-#: workbench/credit_control/views.py:16
+#: workbench/credit_control/views.py:13
+#: workbench/templates/credit_control/creditentry_list.html:7
+msgid "upload account statement"
+msgstr "Kontoauszug hochladen"
+
+#: workbench/credit_control/views.py:21
+#, python-format
+msgid "Created %s credit entry."
+msgid_plural "Created %s credit entries."
+msgstr[0] "%s Gutschrift erstellt."
+msgstr[1] "%s Gutschriften erstellt."
+
+#: workbench/credit_control/views.py:35
 msgid "All credit entries have already been assigned."
 msgstr "Alle Gutschriften wurden zugewiesen."
 
-#: workbench/credit_control/views.py:32
+#: workbench/credit_control/views.py:51
 #, python-format
 msgid "%(class)s have been successfully updated."
 msgstr "%(class)s wurden erfolgreich geändert."
 
-#: workbench/credit_control/views.py:38
+#: workbench/credit_control/views.py:57
 #: workbench/templates/credit_control/creditentry_list.html:10
 msgid "assign credit entries"
 msgstr "Gutschriften zuweisen"
@@ -1486,12 +1507,14 @@ msgid "Sign out"
 msgstr "Abmelden"
 
 #: workbench/templates/contacts/person_form.html:10
+#: workbench/templates/credit_control/creditentry_upload.html:13
 #: workbench/templates/generic/object_form.html:15
 #, python-format
 msgid "Update %(object)s"
 msgstr "%(object)s bearbeiten"
 
 #: workbench/templates/contacts/person_form.html:12
+#: workbench/templates/credit_control/creditentry_upload.html:16
 #: workbench/templates/generic/object_form.html:18
 #, python-format
 msgid "Create %(class)s"
@@ -1501,9 +1524,20 @@ msgstr "%(class)s erstellen"
 msgid "submit"
 msgstr "absenden"
 
-#: workbench/templates/credit_control/creditentry_list.html:7
-msgid "upload account statement"
-msgstr "Kontoauszug hochladen"
+#: workbench/templates/credit_control/creditentry_upload.html:41
+#: workbench/templates/fineforms/submit.html:4
+#: workbench/templates/generic/object_form.html:41
+#: workbench/templates/logbook/loggedcost_form.html:16
+#: workbench/templates/logbook/loggedhours_form.html:37
+#: workbench/templates/modalform.html:24
+#: workbench/templates/projects/service_form.html:43
+msgid "save"
+msgstr "Sichern"
+
+#: workbench/templates/credit_control/creditentry_upload.html:44
+#: workbench/templates/generic/object_form.html:25
+msgid "continue"
+msgstr "Weiter"
 
 #: workbench/templates/deals/deal_detail.html:48
 #: workbench/templates/projects/project_detail_activities.html:24
@@ -1514,22 +1548,9 @@ msgstr "Keine Aktivitäten"
 msgid "Please correct the following errors:"
 msgstr "Bitte korrigiere die folgenden Fehler:"
 
-#: workbench/templates/fineforms/submit.html:4
-#: workbench/templates/generic/object_form.html:41
-#: workbench/templates/logbook/loggedcost_form.html:16
-#: workbench/templates/logbook/loggedhours_form.html:37
-#: workbench/templates/modalform.html:24
-#: workbench/templates/projects/service_form.html:43
-msgid "save"
-msgstr "Sichern"
-
 #: workbench/templates/fineforms/warnings.html:11
 msgid "Ignore warnings"
 msgstr "Warnungen ignorieren"
-
-#: workbench/templates/generic/object_form.html:25
-msgid "continue"
-msgstr "Weiter"
 
 #: workbench/templates/generic/object_list.html:14
 #: workbench/templates/generic/object_list.html:19

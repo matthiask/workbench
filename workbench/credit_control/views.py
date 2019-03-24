@@ -1,15 +1,28 @@
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, ngettext
 
 from workbench import generic
 from workbench.credit_control.forms import AssignCreditEntriesForm
 
 
 class AccountStatementUploadView(generic.CreateView):
+    template_name_suffix = "_upload"
+
     def get_context_data(self, **kwargs):
         kwargs.setdefault("override_title", _("upload account statement"))
         return super().get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        entries = form.save()
+        messages.success(
+            self.request,
+            ngettext(
+                "Created %s credit entry.", "Created %s credit entries.", len(entries)
+            )
+            % len(entries),
+        )
+        return redirect("credit_control_creditentry_list")
 
 
 class AssignCreditEntriesView(generic.CreateView):

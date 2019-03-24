@@ -1,0 +1,56 @@
+{% extends "generic/object_form.html" %}
+
+{% load bootstrap4 fineforms i18n workbench %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-10 col-lg-8">
+    <h1>
+      {% if override_title %}
+        {{ override_title }}
+      {% elif object %}
+        <a href="{{ object.get_absolute_url }}">
+        {% blocktrans %}Update {{ object }}{% endblocktrans %}
+        </a>
+      {% else %}
+        {% blocktrans with class=view.meta.verbose_name %}Create {{ class }}{% endblocktrans %}
+      {% endif %}
+    </h1>
+
+    <form method="POST" action="{{ request.get_full_path }}"
+        {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+      {% csrf_token %}
+
+      {% include 'fineforms/warnings.html' %}
+      {% ff_errors form %}
+      {% ff_fields form %}
+
+      {% if form.statement_list %}
+      <p>
+        {% for row in form.statement_list %}
+        <strong>{{ row.payment_notice }}</strong><br>
+        {{ row.value_date }} / {{ row.total }} / {{ row.reference_number }}<br>
+        {% endfor %}
+      </p>
+      {% endif %}
+
+      <div class="row">
+        <div class="col-sm-12">
+          {% if form.statement_list %}
+            <button type="submit" class="btn btn-primary">
+              {% trans 'save' %}</button>
+          {% else %}
+            <button type="submit" class="btn btn-primary">
+              {% trans 'continue' %}</button>
+          {% endif %}
+
+          <a href="../" class="btn float-right btn-outline-danger">
+            {% trans 'cancel' %}</a>
+        </div>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}
