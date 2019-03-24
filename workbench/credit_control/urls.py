@@ -7,7 +7,10 @@ from workbench.credit_control.forms import (
     CreditEntrySearchForm,
 )
 from workbench.credit_control.models import CreditEntry
-from workbench.credit_control.views import AssignCreditEntriesView
+from workbench.credit_control.views import (
+    AccountStatementUploadView,
+    AssignCreditEntriesView,
+)
 
 
 urlpatterns = [
@@ -34,7 +37,7 @@ urlpatterns = [
     ),
     url(
         r"^upload/$",
-        generic.CreateView.as_view(
+        AccountStatementUploadView.as_view(
             model=CreditEntry,
             form_class=AccountStatementUploadForm,
             success_url="credit_control_creditentry_list",

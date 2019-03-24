@@ -6,6 +6,12 @@ from workbench import generic
 from workbench.credit_control.forms import AssignCreditEntriesForm
 
 
+class AccountStatementUploadView(generic.CreateView):
+    def get_context_data(self, **kwargs):
+        kwargs.setdefault("override_title", _("upload account statement"))
+        return super().get_context_data(**kwargs)
+
+
 class AssignCreditEntriesView(generic.CreateView):
     form_class = AssignCreditEntriesForm
 
