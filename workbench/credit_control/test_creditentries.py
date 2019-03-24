@@ -1,3 +1,7 @@
+import io
+import os
+
+from django.conf import settings
 from django.test import TestCase
 
 from workbench import factories
@@ -45,3 +49,15 @@ class CreditEntriesTest(TestCase):
                 "All credit entries have already been assigned.",
             ],
         )
+
+    def test_account_statement_upload(self):
+        self.client.force_login(factories.UserFactory.create())
+
+        with io.open(
+            os.path.join(
+                settings.BASE_DIR, "workbench", "test", "account-statement.csv"
+            )
+        ) as f:
+            response = self.client.post("/credit-control/create/", {"statement": f})
+
+        self.assertRedirects(response, "/credit-control/")
