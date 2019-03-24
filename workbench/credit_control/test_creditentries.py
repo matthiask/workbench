@@ -1,5 +1,6 @@
 import io
 import os
+from decimal import Decimal
 
 from django.conf import settings
 from django.test import TestCase
@@ -61,3 +62,10 @@ class CreditEntriesTest(TestCase):
             response = self.client.post("/credit-control/create/", {"statement": f})
 
         self.assertRedirects(response, "/credit-control/")
+
+        invoice = factories.InvoiceFactory.create(
+            subtotal=Decimal("4000"), _code="00001"
+        )
+        self.assertAlmostEqual(invoice.total, Decimal("4308.00"))
+        response = self.client.get("/credit-control/assign/")
+        self.assertContains(response, "<strong><small>00001</small>")
