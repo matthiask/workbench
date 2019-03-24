@@ -149,7 +149,11 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
         if not self.object.allow_update(self.object, request):
-            return render(request, "modal.html") if request.is_ajax() else redirect(self.object)
+            return (
+                render(request, "modal.html")
+                if request.is_ajax()
+                else redirect(self.object)
+            )
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -174,15 +178,17 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
         if not self.object.allow_delete(self.object, request):
-            return render(request, "modal.html") if request.is_ajax() else redirect(self.object)
+            return (
+                render(request, "modal.html")
+                if request.is_ajax()
+                else redirect(self.object)
+            )
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs.setdefault("title", _("Delete %s") % (self.model._meta.verbose_name,))
         if self.form_class and self.request.method == "GET":
-            kwargs["form"] = self.form_class(
-                instance=self.object, request=self.request,
-            )
+            kwargs["form"] = self.form_class(instance=self.object, request=self.request)
         return super().get_context_data(**kwargs)
 
     def post(self, request, *args, **kwargs):

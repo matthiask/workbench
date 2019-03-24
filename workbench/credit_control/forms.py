@@ -124,18 +124,24 @@ class AssignCreditEntriesForm(forms.Form):
         )[:20]:
             self.fields["entry_{}_invoice".format(entry.pk)] = forms.TypedChoiceField(
                 label=format_html(
-                    "{}, {}", entry.total, local_date_format(entry.value_date, "d.m.Y")
+                    "{}, {}: {}",
+                    entry.total,
+                    local_date_format(entry.value_date, "d.m.Y"),
+                    entry.payment_notice,
                 ),
-                help_text=entry.payment_notice,
                 choices=[(None, "----------")]
                 + [
                     (
                         invoice.id,
                         format_html(
-                            "<strong>{}, {}, {}</strong>"
-                            if invoice.code in entry.payment_notice
-                            else "{}, {}, {}",
-                            invoice,
+                            '{} <span class="badge badge-{}">{}</span>, {}',
+                            format_html(
+                                "<strong>{}</strong>"
+                                if invoice.code in entry.payment_notice
+                                else "{}",
+                                invoice,
+                            ),
+                            invoice.status_css(),
                             invoice.pretty_status(),
                             currency(invoice.total),
                         ),
