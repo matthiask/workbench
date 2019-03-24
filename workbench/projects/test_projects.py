@@ -37,6 +37,17 @@ class ProjectsTest(TestCase):
             {
                 "title": "Production service",
                 "effort_type": "Production",
+                # "effort_rate": "180",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "Entweder alle Felder einfüllen oder keine.")
+
+        response = self.client.post(
+            project.urls["createservice"],
+            {
+                "title": "Production service",
+                "effort_type": "Production",
                 "effort_rate": "180",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",

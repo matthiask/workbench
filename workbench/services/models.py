@@ -128,11 +128,11 @@ class ServiceBase(Model):
 
     @classmethod
     def allow_update(cls, instance, request):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @classmethod
     def allow_delete(cls, instance, request):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def clean_fields(self, exclude):
         super().clean_fields(exclude)
