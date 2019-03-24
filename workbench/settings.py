@@ -21,7 +21,6 @@ read_speckenv(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("SECRET_KEY", required=True)
 DEBUG = any(arg in ("runserver",) for arg in sys.argv)
-TESTING = any(arg in ("test",) for arg in sys.argv)
 LIVE = env("LIVE", default=False)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
 ADMINS = [("Matthias Kestenholz", "mk@feinheit.ch")]
@@ -131,10 +130,6 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-if not TESTING:
-    STATICFILES_STORAGE = (
-        "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
-    )
 
 OAUTH2_CLIENT_ID = env("OAUTH2_CLIENT_ID", default="")
 OAUTH2_CLIENT_SECRET = env("OAUTH2_CLIENT_SECRET", default=None)
@@ -224,7 +219,7 @@ SILENCED_SYSTEM_CHECKS = [
 
 INTERNAL_IPS = ["127.0.0.1"]
 
-if LIVE:
+if LIVE:  # pragma: no cover
     CSRF_COOKIE_SECURE = True
     CSRF_COOKIE_HTTPONLY = True
     X_FRAME_OPTIONS = "DENY"
