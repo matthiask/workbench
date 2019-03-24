@@ -105,24 +105,10 @@ class DetailView(ToolsMixin, vanilla.DetailView):
 
 
 class CreateView(ToolsMixin, vanilla.CreateView):
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         if not self.model.allow_create(request):
-            if request.is_ajax():
-                return render(request, "modal.html")
-            return redirect("../")
-
-        form = self.get_form()
-        context = self.get_context_data(form=form)
-        return self.render_to_response(context)
-
-    def post(self, request, *args, **kwargs):
-        if not self.model.allow_create(request):
-            return redirect("../")
-
-        form = self.get_form(data=request.POST, files=request.FILES)
-        if form.is_valid():
-            return self.form_valid(form)
-        return self.form_invalid(form)
+            return render(request, "modal.html") if request.is_ajax else redirect("../")
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         self.object = form.save()
@@ -160,28 +146,11 @@ class CreateRelatedView(CreateView):
 
 
 class UpdateView(ToolsMixin, vanilla.UpdateView):
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
         if not self.object.allow_update(self.object, request):
-            if request.is_ajax():
-                return render(request, "modal.html")
-            return redirect(self.object)
-
-        form = self.get_form(instance=self.object)
-        context = self.get_context_data(form=form)
-        return self.render_to_response(context)
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if not self.object.allow_update(self.object, request):
-            return redirect(self.object)
-
-        form = self.get_form(
-            data=request.POST, files=request.FILES, instance=self.object
-        )
-        if form.is_valid():
-            return self.form_valid(form)
-        return self.form_invalid(form)
+            return render(request, "modal.html") if request.is_ajax() else redirect(self.object)
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         self.object = form.save()
@@ -202,23 +171,21 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
 class DeleteView(ToolsMixin, vanilla.DeleteView):
     form_class = None
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
         if not self.object.allow_delete(self.object, request):
-            if request.is_ajax():
-                return render(request, "modal.html")
-            return redirect(self.object)
+            return render(request, "modal.html") if request.is_ajax() else redirect(self.object)
+        return super().dispatch(request, *args, **kwargs)
 
-        context = self.get_context_data()
-        if self.form_class:
-            context["form"] = self.form_class(instance=self.object, request=request)
-        return self.render_to_response(context)
+    def get_context_data(self, **kwargs):
+        kwargs.setdefault("title", _("Delete %s") % (self.model._meta.verbose_name,))
+        if self.form_class and self.request.method == "GET":
+            kwargs["form"] = self.form_class(
+                instance=self.object, request=self.request,
+            )
+        return super().get_context_data(**kwargs)
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if not self.object.allow_delete(self.object, request):
-            return redirect(self.object)
-
         if self.form_class:
             form = self.form_class(request.POST, instance=self.object, request=request)
             if form.is_valid():
@@ -241,10 +208,6 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
 
     def get_success_url(self):
         return self.model().urls.url("list")
-
-    def get_context_data(self, **kwargs):
-        kwargs.setdefault("title", _("Delete %s") % (self.model._meta.verbose_name,))
-        return super().get_context_data(**kwargs)
 
 
 class MessageView(vanilla.View):
