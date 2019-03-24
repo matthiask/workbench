@@ -27,10 +27,19 @@ urlpatterns = [
         r"^create/$",
         generic.CreateView.as_view(
             model=CreditEntry,
-            form_class=AccountStatementUploadForm,
+            form_class=CreditEntryForm,
             success_url="credit_control_creditentry_list",
         ),
         name="credit_control_creditentry_create",
+    ),
+    url(
+        r"^upload/$",
+        generic.CreateView.as_view(
+            model=CreditEntry,
+            form_class=AccountStatementUploadForm,
+            success_url="credit_control_creditentry_list",
+        ),
+        name="credit_control_creditentry_upload",
     ),
     url(
         r"^(?P<pk>\d+)/update/$",

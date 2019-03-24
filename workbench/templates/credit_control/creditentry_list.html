@@ -3,12 +3,13 @@
 {% load i18n workbench %}
 
 {% block search-form-buttons %}
-  <a href="{{ view.model.urls.create }}" class="btn btn-secondary">
+  <a href="{{ view.model.urls.upload }}" class="btn btn-secondary">
     {% trans 'upload account statement' %}
   </a>
   <a href="{{ view.model.urls.assign }}" class="btn btn-secondary">
     {% trans 'assign credit entries' %}
   </a>
+  {{ block.super }}
   <a href="{% querystring xlsx=1 %}" class="btn btn-secondary">
     {% include 'svg/desktop-download.svg' %} XLSX
   </a>

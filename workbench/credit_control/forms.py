@@ -55,6 +55,15 @@ class CreditEntryForm(ModelForm):
         ]
         widgets = {"invoice": Picker(model=Invoice), "notes": Textarea}
 
+    def save(self):
+        instance = super().save()
+        if instance.invoice and instance.invoice.status != instance.invoice.PAID:
+            instance.invoice.status = instance.invoice.PAID
+            instance.invoice.closed_on = instance.value_date
+            instance.invoice.payment_notice = instance.payment_notice
+            instance.invoice.save()
+        return instance
+
 
 class AccountStatementUploadForm(forms.Form):
     statement = forms.FileField(label=_("account statement"))

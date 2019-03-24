@@ -6,6 +6,7 @@ from django.conf import settings
 from django.test import TestCase
 
 from workbench import factories
+from workbench.credit_control.models import CreditEntry
 from workbench.tools.testing import messages
 
 
@@ -59,7 +60,7 @@ class CreditEntriesTest(TestCase):
                 settings.BASE_DIR, "workbench", "test", "account-statement.csv"
             )
         ) as f:
-            response = self.client.post("/credit-control/create/", {"statement": f})
+            response = self.client.post("/credit-control/upload/", {"statement": f})
 
         self.assertRedirects(response, "/credit-control/")
 
@@ -69,3 +70,21 @@ class CreditEntriesTest(TestCase):
         self.assertAlmostEqual(invoice.total, Decimal("4308.00"))
         response = self.client.get("/credit-control/assign/")
         self.assertContains(response, "<strong><small>00001</small>")
+
+        entry = CreditEntry.objects.get(reference_number="xxxx03130CF54579")
+        response = self.client.post(
+            entry.urls["update"],
+            {
+                "reference_number": entry.reference_number,
+                "value_date": entry.value_date,
+                "total": entry.total,
+                "payment_notice": entry.payment_notice,
+                "invoice": invoice.id,
+                "notes": "",
+            },
+        )
+        self.assertRedirects(response, entry.urls["detail"])
+
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, invoice.PAID)
+        self.assertEqual(invoice.closed_on, entry.value_date)
