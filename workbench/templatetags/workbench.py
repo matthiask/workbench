@@ -23,9 +23,9 @@ register.filter(hours)
 
 
 @register.simple_tag
-def link_or_none(object, pretty=None):
+def link_or_none(object, pretty=None, none=mark_safe("&ndash;")):
     if not object:
-        return mark_safe("&ndash;")
+        return none
     elif hasattr(object, "get_absolute_url"):
         return format_html(
             '<a href="{}">{}</a>', object.get_absolute_url(), h(pretty or object)

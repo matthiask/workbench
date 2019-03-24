@@ -21,8 +21,7 @@
       <th>{% trans 'value date' %}</th>
       <th>{% trans 'payment notice' %}</th>
       <th class="text-right">{% trans 'total' %}</th>
-      <th>{% trans 'invoice' %}</th>
-      <th>{% trans 'notes' %}</th>
+      <th>{% trans 'invoice' %}, {% trans 'notes' %}</th>
     </tr>
   </thead>
   <tbody>
@@ -31,8 +30,10 @@
         <th><a href="{{ entry.get_absolute_url }}">{{ entry.value_date|date:'d.m.Y' }}</a></th>
         <td>{{ entry.payment_notice }}</td>
         <td class="text-right">{{ entry.total|currency }}</td>
-        <td>{% link_or_none entry.invoice %}</td>
-        <td>{{ entry.notes }}</td>
+        <td>
+          {% link_or_none entry.invoice none='' %}{% if entry.invoice and entry.notes %},{% endif %}
+          {{ entry.notes }}
+        </td>
       </tr>
     {% endfor %}
   </tbody>
