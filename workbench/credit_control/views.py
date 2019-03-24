@@ -10,10 +10,6 @@ class AssignCreditEntriesView(generic.CreateView):
     form_class = AssignCreditEntriesForm
 
     def get(self, request, *args, **kwargs):
-        # self.object = self.get_object()
-        # if not self.object.allow_update(self.object, request):
-        #     return redirect(self.object)
-
         form = self.get_form()
         if not form.entries:
             messages.success(
@@ -24,10 +20,6 @@ class AssignCreditEntriesView(generic.CreateView):
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
-        # self.object = self.get_object()
-        # if not self.object.allow_update(self.object, request):
-        #     return redirect(self.object)
-
         form = self.get_form(data=request.POST, files=request.FILES)
         if form.is_valid():
             return self.form_valid(form)
