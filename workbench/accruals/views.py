@@ -49,6 +49,6 @@ class CutoffDateDetailView(generic.DetailView):
 
     def post(self, request, *args, **kwargs):
         accrual = Accrual.objects.get(pk=request.POST["id"])
-        accrual.accrual = request.POST["accrual"]
+        accrual.work_progress = request.POST["work_progress"]
         accrual.save()
         return http.HttpResponse(status=202)

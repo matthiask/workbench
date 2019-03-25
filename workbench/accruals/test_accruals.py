@@ -39,6 +39,11 @@ class AccrualsTest(TestCase):
         response = self.client.post("/accruals/create/", {"day": "01.01.2019"})
         day = CutoffDate.objects.get()
         self.assertRedirects(response, day.urls["detail"])
+
+        response = self.client.get(day.urls["update"])
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(messages(response), [])
+
         response = self.client.get(day.urls["detail"] + "?create_accruals=1")
         self.assertRedirects(response, day.urls["detail"])
         self.assertEqual(messages(response), ["Abgrenzungen erstellt."])
@@ -52,5 +57,34 @@ class AccrualsTest(TestCase):
             ["Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."],
         )
 
+        response = self.client.get(day.urls["update"])
+        self.assertRedirects(response, day.urls["detail"])
+        self.assertEqual(
+            messages(response),
+            ["Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."],
+        )
+
         response = self.client.get(day.urls["detail"] + "?xlsx=1")
         self.assertEqual(response.status_code, 200)
+
+        accrual = Accrual.objects.get()
+        self.assertEqual(accrual.work_progress, 0)
+        response = self.client.post(
+            day.urls["detail"], {"id": accrual.id, "work_progress": 50}
+        )
+        self.assertEqual(response.status_code, 202)
+        accrual.refresh_from_db()
+        self.assertEqual(accrual.work_progress, 50)
+
+    def test_future_cutoff_dates(self):
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.post("/accruals/create/", {"day": "01.01.2099"})
+        day = CutoffDate.objects.get()
+        self.assertRedirects(response, day.urls["detail"])
+
+        response = self.client.get(day.urls["detail"] + "?create_accruals=1")
+        self.assertRedirects(response, day.urls["detail"])
+        self.assertEqual(
+            messages(response),
+            ["Kann Abgrenzungen für zukünftige Stichtage nicht generieren."],
+        )

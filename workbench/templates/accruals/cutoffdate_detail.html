@@ -49,7 +49,7 @@
             {% csrf_token %}
             <input type="hidden" name="id" value="{{ accrual.id }}">
             <div class="input-group flex-nowrap">
-              <input class="form-control" style="width:5rem" type="number" step="1" min="0" max="100" name="accrual" value="{{ accrual.work_progress }}">
+              <input class="form-control" style="width:5rem" type="number" step="1" min="0" max="100" name="work_progress" value="{{ accrual.work_progress }}">
               <div class="input-group-append">
                 <button type="submit" class="btn btn-outline-secondary">{% trans 'save' %}</button>
               </div>
