@@ -135,3 +135,20 @@ class ProjectsTest(TestCase):
                 ]
             },
         )
+
+    def test_list(self):
+        project = factories.ProjectFactory.create()
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        def valid(p):
+            self.assertEqual(self.client.get("/projects/?" + p).status_code, 200)
+
+        valid("")
+        valid("s=all")
+        valid("s=closed")
+        valid("org={}".format(project.customer_id))
+        valid("type=internal")
+        valid("type=maintenance")
+        valid("owned_by={}".format(user.id))
+        valid("owned_by=0")  # only inactive

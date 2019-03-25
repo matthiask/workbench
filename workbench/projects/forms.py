@@ -12,12 +12,7 @@ from workbench.tools.forms import ModelForm, Picker, Textarea
 
 class ProjectSearchForm(forms.Form):
     s = forms.ChoiceField(
-        choices=(
-            ("all", _("All states")),
-            ("", _("Open")),
-            ("closed", _("Closed")),
-            # (_("Exact"), Project.STATUS_CHOICES),
-        ),
+        choices=(("all", _("All states")), ("", _("Open")), ("closed", _("Closed"))),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
     )
@@ -40,7 +35,7 @@ class ProjectSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["owned_by"].choices = User.objects.choices(collapse_inactive=False)
+        self.fields["owned_by"].choices = User.objects.choices(collapse_inactive=True)
 
     def filter(self, queryset):
         data = self.cleaned_data
