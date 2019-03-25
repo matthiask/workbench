@@ -69,6 +69,24 @@ class RecurringTest(TestCase):
         )
 
         self.client.force_login(person.primary_contact)
+
+        response = self.client.post(
+            "/recurring-invoices/create/",
+            {
+                "customer": person.organization_id,
+                # "contact": person.id,
+                "title": "recur",
+                "owned_by": person.primary_contact_id,
+                "starts_on": local_date_format(date.today()),
+                "periodicity": "yearly",
+                "subtotal": 500,
+                "discount": 0,
+                "liable_to_vat": "on",
+                "third_party_costs": 0,
+            },
+        )
+        self.assertContains(response, "Kein Kontakt ausgewählt.")
+
         response = self.client.post(
             "/recurring-invoices/create/",
             {
