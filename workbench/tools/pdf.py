@@ -104,10 +104,11 @@ class PDFDocument(_PDFDocument):
         )
 
         self.bounds = Empty()
-        self.bounds.N = 280 * mm
+        self.bounds.N = 275 * mm
         self.bounds.E = 190 * mm
         self.bounds.S = 18 * mm
         self.bounds.W = 20 * mm
+        self.bounds.outsideN = self.bounds.N + 5 * mm
         self.bounds.outsideS = self.bounds.S - 5 * mm
         self.style.tableColumns = (self.bounds.E - self.bounds.W - 20 * mm, 20 * mm)
         self.style.tableColumnsLeft = list(reversed(self.style.tableColumns))
@@ -165,7 +166,7 @@ class PDFDocument(_PDFDocument):
 
             canvas.setFont(pdf.style.fontName + "-Bold", 10)
             canvas.drawString(
-                pdf.bounds.W, pdf.bounds.N, settings.WORKBENCH.PDF_COMPANY
+                pdf.bounds.W, pdf.bounds.outsideN, settings.WORKBENCH.PDF_COMPANY
             )
 
             canvas.setFont(pdf.style.fontName, 6)
@@ -191,7 +192,7 @@ class PDFDocument(_PDFDocument):
 
             canvas.setFont(pdf.style.fontName + "-Bold", 10)
             canvas.drawString(
-                pdf.bounds.W, pdf.bounds.N, settings.WORKBENCH.PDF_COMPANY
+                pdf.bounds.W, pdf.bounds.outsideN, settings.WORKBENCH.PDF_COMPANY
             )
 
             canvas.setFont(pdf.style.fontName, 6)
