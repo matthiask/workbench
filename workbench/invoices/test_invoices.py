@@ -289,3 +289,19 @@ class InvoicesTest(TestCase):
         self.assertEqual(invoice.closed_on, date.today())
 
         # print(response, response.content.decode("utf-8"))
+
+    def test_list(self):
+        factories.InvoiceFactory.create()
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        def valid(p):
+            self.assertEqual(self.client.get("/invoices/?" + p).status_code, 200)
+
+        valid("")
+        valid("s=all")
+        valid("s=40")  # PAID
+        valid("org={}".format(factories.OrganizationFactory.create().pk))
+        valid("owned_by={}".format(user.id))
+        valid("owned_by=0")  # only inactive
+        valid("dunning=1")

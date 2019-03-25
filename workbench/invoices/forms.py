@@ -47,12 +47,12 @@ class InvoiceSearchForm(forms.Form):
         data = self.cleaned_data
         if data.get("s") == "all":
             pass
-        elif data.get("s") == "":
+        elif data.get("s"):
+            queryset = queryset.filter(status=data.get("s"))
+        else:
             queryset = queryset.filter(
                 status__in=(Invoice.IN_PREPARATION, Invoice.SENT, Invoice.REMINDED)
             )
-        elif data.get("s"):
-            queryset = queryset.filter(status=data.get("s"))
         if data.get("org"):
             queryset = queryset.filter(customer=data.get("org"))
         if data.get("owned_by") == 0:
