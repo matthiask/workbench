@@ -95,3 +95,43 @@ class ProjectsTest(TestCase):
 
         response = self.client.get(project.urls["delete"])
         self.assertRedirects(response, project.urls["services"])
+
+    def test_create_validation(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        response = self.client.post(
+            "/projects/create/",
+            {"title": "Test project", "owned_by": user.pk, "type": Project.INTERNAL},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            dict(response.context_data["form"].errors),
+            {"customer": ["Dieses Feld ist zwingend erforderlich."]},
+        )
+
+        org = factories.OrganizationFactory.create()
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+
+        response = self.client.post(
+            "/projects/create/",
+            {
+                "customer": org.pk,
+                "contact": person.pk,
+                "title": "Test project",
+                "owned_by": user.pk,
+                "type": Project.INTERNAL,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            dict(response.context_data["form"].errors),
+            {
+                "contact": [
+                    "Der Kontakt Vorname Nachname / The Organization Ltd"
+                    " gehört nicht zu The Organization Ltd."
+                ]
+            },
+        )
