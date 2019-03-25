@@ -11,6 +11,9 @@ TRUNCATE audit_logged_actions RESTART IDENTITY CASCADE;
 TRUNCATE deals_stage RESTART IDENTITY CASCADE;
 TRUNCATE invoices_recurringinvoice RESTART IDENTITY CASCADE;
 TRUNCATE awt_year RESTART IDENTITY CASCADE;
+TRUNCATE accruals_cutoffdate RESTART IDENTITY CASCADE;
+TRUNCATE accruals_accrual RESTART IDENTITY CASCADE;
+TRUNCATE credit_control_ledger RESTART IDENTITY CASCADE;
 
 
 SET application_name TO 'Import';
@@ -596,11 +599,16 @@ FROM dblink(
 --
 
 SELECT SETVAL('public.accounts_user_id_seq', COALESCE(MAX(id), 1) ) FROM public.accounts_user;
+SELECT SETVAL('public.accruals_accrual_id_seq', COALESCE(MAX(id), 1) ) FROM public.accruals_accrual;
+SELECT SETVAL('public.accruals_cutoffdate_id_seq', COALESCE(MAX(id), 1) ) FROM public.accruals_cutoffdate;
 SELECT SETVAL('public.activities_activity_id_seq', COALESCE(MAX(id), 1) ) FROM public.activities_activity;
 SELECT SETVAL('public.audit_logged_actions_event_id_seq', COALESCE(MAX(event_id), 1) ) FROM public.audit_logged_actions;
 SELECT SETVAL('public.auth_group_id_seq', COALESCE(MAX(id), 1) ) FROM public.auth_group;
 SELECT SETVAL('public.auth_group_permissions_id_seq', COALESCE(MAX(id), 1) ) FROM public.auth_group_permissions;
 SELECT SETVAL('public.auth_permission_id_seq', COALESCE(MAX(id), 1) ) FROM public.auth_permission;
+SELECT SETVAL('public.awt_absence_id_seq', COALESCE(MAX(id), 1) ) FROM public.awt_absence;
+SELECT SETVAL('public.awt_employment_id_seq', COALESCE(MAX(id), 1) ) FROM public.awt_employment;
+SELECT SETVAL('public.awt_year_id_seq', COALESCE(MAX(id), 1) ) FROM public.awt_year;
 SELECT SETVAL('public.contacts_emailaddress_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_emailaddress;
 SELECT SETVAL('public.contacts_group_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_group;
 SELECT SETVAL('public.contacts_organization_groups_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_organization_groups;
@@ -609,12 +617,15 @@ SELECT SETVAL('public.contacts_person_groups_id_seq', COALESCE(MAX(id), 1) ) FRO
 SELECT SETVAL('public.contacts_person_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_person;
 SELECT SETVAL('public.contacts_phonenumber_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_phonenumber;
 SELECT SETVAL('public.contacts_postaladdress_id_seq', COALESCE(MAX(id), 1) ) FROM public.contacts_postaladdress;
+SELECT SETVAL('public.credit_control_creditentry_id_seq', COALESCE(MAX(id), 1) ) FROM public.credit_control_creditentry;
+SELECT SETVAL('public.credit_control_ledger_id_seq', COALESCE(MAX(id), 1) ) FROM public.credit_control_ledger;
 SELECT SETVAL('public.deals_deal_id_seq', COALESCE(MAX(id), 1) ) FROM public.deals_deal;
 SELECT SETVAL('public.deals_stage_id_seq', COALESCE(MAX(id), 1) ) FROM public.deals_stage;
 SELECT SETVAL('public.django_admin_log_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_admin_log;
 SELECT SETVAL('public.django_content_type_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_content_type;
 SELECT SETVAL('public.django_migrations_id_seq', COALESCE(MAX(id), 1) ) FROM public.django_migrations;
 SELECT SETVAL('public.invoices_invoice_id_seq', COALESCE(MAX(id), 1) ) FROM public.invoices_invoice;
+SELECT SETVAL('public.invoices_recurringinvoice_id_seq', COALESCE(MAX(id), 1) ) FROM public.invoices_recurringinvoice;
 SELECT SETVAL('public.invoices_service_id_seq', COALESCE(MAX(id), 1) ) FROM public.invoices_service;
 SELECT SETVAL('public.logbook_loggedcost_id_seq', COALESCE(MAX(id), 1) ) FROM public.logbook_loggedcost;
 SELECT SETVAL('public.logbook_loggedhours_id_seq', COALESCE(MAX(id), 1) ) FROM public.logbook_loggedhours;
