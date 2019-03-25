@@ -1,5 +1,4 @@
 import time
-from collections import defaultdict
 
 from django import forms
 from django.db.models import Q
@@ -60,14 +59,14 @@ class ModelForm(forms.ModelForm):
             )
 
     def _only_active_and_initial_users(self, formfield, pk):
-        d = defaultdict(list)
+        users = {False: [], True: []}
         for user in User.objects.filter(Q(is_active=True) | Q(pk=pk)):
-            d[user.is_active].append(
+            users[user.is_active].append(
                 (formfield.prepare_value(user), formfield.label_from_instance(user))
             )
-        choices = [(_("Active"), d.get(True, []))]
-        if d.get(False):
-            choices[0:0] = d.get(False)
+        choices = [(_("Active"), users[True])]
+        if users[False]:
+            choices[0:0] = users[False]
         if not formfield.required:
             choices.insert(0, ("", "----------"))
         formfield.choices = choices
@@ -96,11 +95,7 @@ class ModelForm(forms.ModelForm):
 
             if not data.get("customer") and "customer" in self.fields:
                 raise forms.ValidationError(
-                    {
-                        "customer": self.fields["customer"].error_messages[
-                            "required"
-                        ]  # noqa
-                    },
+                    {"customer": self.fields["customer"].error_messages["required"]},
                     code="required",
                 )
 
