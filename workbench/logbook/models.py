@@ -19,7 +19,7 @@ def monday(day=None):
     return day - timedelta(days=day.weekday())
 
 
-@model_urls()
+@model_urls
 class LoggedHours(Model):
     service = models.ForeignKey(
         Service,
@@ -74,7 +74,7 @@ class LoggedHours(Model):
         return super().allow_delete(instance, request)
 
 
-@model_urls()
+@model_urls
 class LoggedCost(Model):
     project = models.ForeignKey(
         Project,

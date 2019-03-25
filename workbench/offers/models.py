@@ -15,7 +15,7 @@ class OfferQuerySet(SearchQuerySet):
     pass
 
 
-@model_urls()
+@model_urls
 class Offer(ModelWithTotal):
     IN_PREPARATION = 10
     OFFERED = 20
@@ -66,7 +66,7 @@ class Offer(ModelWithTotal):
         return self.title
 
     def get_absolute_url(self):
-        return self.project.urls.url("services")
+        return self.project.urls["services"]
 
     def save(self, *args, **kwargs):
         new = False

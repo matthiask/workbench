@@ -38,11 +38,11 @@ class InvoicesTest(TestCase):
         invoice = factories.InvoiceFactory.create()
 
         self.client.force_login(invoice.owned_by)
-        self.client.get(invoice.urls.url("detail"))
+        self.client.get(invoice.urls["detail"])
 
-        response = self.client.post(invoice.urls.url("delete"))
+        response = self.client.post(invoice.urls["delete"])
         self.assertRedirects(
-            response, invoice.urls.url("list"), fetch_redirect_response=False
+            response, invoice.urls["list"], fetch_redirect_response=False
         )
 
     def test_down_payment_invoice(self):
@@ -73,7 +73,7 @@ class InvoicesTest(TestCase):
 
     def create_service_invoice(self, params):
         service = factories.ServiceFactory.create(cost=100)
-        url = service.project.urls.url("createinvoice") + params
+        url = service.project.urls["createinvoice"] + params
 
         self.client.force_login(service.project.owned_by)
         response = self.client.get(url)
@@ -95,7 +95,7 @@ class InvoicesTest(TestCase):
     def test_create_service_invoice_from_offer(self):
         response = self.create_service_invoice("?type=services&source=offer")
         invoice = Invoice.objects.get()
-        self.assertRedirects(response, invoice.urls.url("detail"))
+        self.assertRedirects(response, invoice.urls["detail"])
         self.assertEqual(invoice.subtotal, 100)
 
         service = invoice.services.get()
@@ -121,7 +121,7 @@ class InvoicesTest(TestCase):
     def test_create_service_invoice_from_logbook(self):
         response = self.create_service_invoice("?type=services&source=logbook")
         invoice = Invoice.objects.get()
-        self.assertRedirects(response, invoice.urls.url("detail"))
+        self.assertRedirects(response, invoice.urls["detail"])
         self.assertEqual(invoice.subtotal, 0)
 
         self.assertRedirects(
@@ -135,9 +135,7 @@ class InvoicesTest(TestCase):
             cost=150, project=service.project, service=service, description="this"
         )
 
-        url = (
-            service.project.urls.url("createinvoice") + "?type=services&source=logbook"
-        )
+        url = service.project.urls["createinvoice"] + "?type=services&source=logbook"
         self.client.force_login(service.project.owned_by)
         response = self.client.post(
             url,
@@ -209,7 +207,7 @@ class InvoicesTest(TestCase):
         self.assertNotContains(response, 'id="id_title"')
         self.assertNotContains(response, 'id="id_description"')
 
-        url = Invoice().urls.url("create") + "?contact={}".format(person.pk)
+        url = Invoice().urls["create"] + "?contact={}".format(person.pk)
         response = self.client.get(url)
         self.assertContains(response, 'method="POST"')
         self.assertContains(response, 'id="id_postal_address"')
@@ -231,7 +229,7 @@ class InvoicesTest(TestCase):
             },
         )
         invoice = Invoice.objects.get()
-        self.assertRedirects(response, invoice.urls.url("detail"))
+        self.assertRedirects(response, invoice.urls["detail"])
         self.assertAlmostEqual(invoice.total_excl_tax, Decimal("100"))
         self.assertAlmostEqual(invoice.total, Decimal("107.7"))
 

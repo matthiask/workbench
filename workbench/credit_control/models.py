@@ -6,7 +6,7 @@ from workbench.tools.models import Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 
 
-# @model_urls()
+# @model_urls
 class Ledger(Model):
     name = models.CharField(_("name"), max_length=100)
 
@@ -23,7 +23,7 @@ class CreditEntryQuerySet(SearchQuerySet):
     pass
 
 
-@model_urls()
+@model_urls
 class CreditEntry(Model):
     ledger = models.ForeignKey(
         Ledger,

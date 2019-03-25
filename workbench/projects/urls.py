@@ -113,7 +113,7 @@ urlpatterns = [
     url(
         r"^service/(?P<pk>\d+)/$",
         lambda request, pk: redirect(
-            get_object_or_404(Service, pk=pk).project.urls.url("services")
+            get_object_or_404(Service, pk=pk).project.urls["services"]
         ),
         name="projects_service_detail",
     ),

@@ -10,7 +10,7 @@ from workbench.tools.models import Model, SearchQuerySet
 from workbench.tools.urls import model_urls
 
 
-@model_urls()
+@model_urls
 class Group(Model):
     title = models.CharField(_("title"), max_length=100)
 
@@ -23,7 +23,7 @@ class Group(Model):
         return self.title
 
 
-@model_urls()
+@model_urls
 class Organization(Model):
     name = models.TextField(_("name"))
     notes = models.TextField(_("notes"), blank=True)
@@ -51,7 +51,7 @@ class PersonQuerySet(SearchQuerySet):
         return self.filter(is_archived=False)
 
 
-@model_urls()
+@model_urls
 class Person(Model):
     is_archived = models.BooleanField(
         _("is archived"),
@@ -150,7 +150,7 @@ class PhoneNumber(PersonDetail):
         return self.phone_number
 
     def get_absolute_url(self):
-        return self.person.urls.url("detail")
+        return self.person.urls["detail"]
 
     @property
     def urls(self):
@@ -175,7 +175,7 @@ class EmailAddress(PersonDetail):
         return self.email
 
     def get_absolute_url(self):
-        return self.person.urls.url("detail")
+        return self.person.urls["detail"]
 
     @property
     def urls(self):
@@ -210,7 +210,7 @@ class PostalAddress(PersonDetail):
         return self.postal_address
 
     def get_absolute_url(self):
-        return self.person.urls.url("detail")
+        return self.person.urls["detail"]
 
     @property
     def urls(self):

@@ -22,7 +22,7 @@ class ProjectQuerySet(SearchQuerySet):
         return self.filter(closed_on__isnull=True)
 
 
-@model_urls()
+@model_urls
 class Project(Model):
     ACQUISITION = "acquisition"
     MAINTENANCE = "maintenance"
@@ -86,7 +86,7 @@ class Project(Model):
         return "%s-%04d" % (self.created_at.year, self._code)
 
     def get_absolute_url(self):
-        return self.urls.url("overview" if self.closed_on else "services")
+        return self.urls["overview" if self.closed_on else "services"]
 
     def save(self, *args, **kwargs):
         new = False
@@ -183,7 +183,7 @@ class Project(Model):
         )
 
 
-@model_urls()
+@model_urls
 class Service(ServiceBase):
     RELATED_MODEL_FIELD = "offer"
 
@@ -203,7 +203,7 @@ class Service(ServiceBase):
     )
 
     def get_absolute_url(self):
-        return self.project.urls.url("services")
+        return self.project.urls["services"]
 
     @classmethod
     def allow_update(cls, instance, request):

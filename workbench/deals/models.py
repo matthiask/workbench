@@ -29,7 +29,7 @@ class DealQuerySet(SearchQuerySet):
         return self.filter(closed_on__isnull=True)
 
 
-@model_urls()
+@model_urls
 class Deal(Model):
     OPEN = 10
     ACCEPTED = 20

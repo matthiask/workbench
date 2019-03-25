@@ -11,7 +11,7 @@ class OffersTest(TestCase):
         offer = factories.OfferFactory.create()
 
         self.client.force_login(offer.owned_by)
-        self.client.get(offer.project.urls.url("services"))
+        self.client.get(offer.project.urls["services"])
 
     def test_create_offer(self):
         project = factories.ProjectFactory.create()
@@ -21,7 +21,7 @@ class OffersTest(TestCase):
             project=project, effort_type="Programming", effort_rate=200, effort_hours=10
         )
 
-        url = project.urls.url("createoffer")
+        url = project.urls["createoffer"]
         response = self.client.get(url)
         self.assertContains(response, 'id="id_postal_address"')
         postal_address = factories.PostalAddressFactory.create(person=project.contact)

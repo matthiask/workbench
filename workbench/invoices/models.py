@@ -31,7 +31,7 @@ class InvoiceQuerySet(SearchQuerySet):
         )
 
 
-@model_urls()
+@model_urls
 class Invoice(ModelWithTotal):
     IN_PREPARATION = 10
     SENT = 20
@@ -341,7 +341,7 @@ class Invoice(ModelWithTotal):
         )
 
 
-@model_urls()
+@model_urls
 class Service(ServiceBase):
     RELATED_MODEL_FIELD = "invoice"
 
@@ -395,7 +395,7 @@ class RecurringInvoiceQuerySet(SearchQuerySet):
         return invoices
 
 
-@model_urls()
+@model_urls
 class RecurringInvoice(ModelWithTotal):
     PERIODICITY_CHOICES = [
         ("yearly", _("yearly")),

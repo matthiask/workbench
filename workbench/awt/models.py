@@ -106,7 +106,7 @@ class Employment(Model):
     save.alters_data = True
 
 
-@model_urls()
+@model_urls
 class Absence(Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name=_("user"), related_name="absences"

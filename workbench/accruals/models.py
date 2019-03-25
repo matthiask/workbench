@@ -11,7 +11,7 @@ from workbench.tools.models import Model, MoneyField, Z
 from workbench.tools.urls import model_urls
 
 
-@model_urls()
+@model_urls
 class CutoffDate(Model):
     day = models.DateField(_("cutoff date"), unique=True)
 
@@ -100,7 +100,7 @@ class AccrualQuerySet(models.QuerySet):
             )
 
 
-@model_urls()
+@model_urls
 class Accrual(Model):
     invoice = models.ForeignKey(
         Invoice, on_delete=models.CASCADE, related_name="+", verbose_name=_("invoice")

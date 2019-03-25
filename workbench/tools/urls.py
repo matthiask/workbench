@@ -1,7 +1,7 @@
 from django.urls import NoReverseMatch, reverse
 
 
-class _MUHelper(object):
+class _MUHelper:
     def __init__(self, viewname_pattern, kwargs):
         self.viewname_pattern = viewname_pattern
         self.kwargs = kwargs
@@ -9,38 +9,33 @@ class _MUHelper(object):
     def url(self, item):
         try:
             return reverse(self.viewname_pattern % item)
-        except NoReverseMatch as e:
+        except NoReverseMatch:
             return reverse(self.viewname_pattern % item, **self.kwargs)
 
     __getitem__ = url
 
 
-def model_urls(reverse_kwargs_fn=lambda object: {"pk": object.pk}, default="detail"):
+class _Descriptor:
+    def __get__(self, obj, objtype=None):
+        viewname_pattern = "%s_%s_%%s" % (obj._meta.app_label, obj._meta.model_name)
+        kwargs = {"kwargs": {"pk": obj.pk}}
+        helper = obj.__dict__["urls"] = _MUHelper(viewname_pattern, kwargs)
+        return helper
+
+
+def model_urls(cls):
     """
     Usage::
 
-        @model_urls()
+        @model_urls
         class MyModel(models.Model):
             pass
 
         instance = MyModel.objects.get(...)
-        instance.urls.url('detail') == instance.get_absolute_url()
+        instance.urls["detail"] == instance.get_absolute_url()
     """
 
-    def _dec(cls):
-        class _descriptor(object):
-            def __get__(self, obj, objtype=None):
-                viewname_pattern = "%s_%s_%%s" % (
-                    obj._meta.app_label,
-                    obj._meta.model_name,
-                )
-                kwargs = {"kwargs": reverse_kwargs_fn(obj)}
-                helper = obj.__dict__["urls"] = _MUHelper(viewname_pattern, kwargs)
-                return helper
-
-        cls.urls = _descriptor()
-        if not hasattr(cls, "get_absolute_url"):
-            cls.get_absolute_url = lambda self: self.urls.url(default)
-        return cls
-
-    return _dec
+    cls.urls = _Descriptor()
+    if not hasattr(cls, "get_absolute_url"):
+        cls.get_absolute_url = lambda self: self.urls["detail"]
+    return cls

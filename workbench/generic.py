@@ -131,7 +131,7 @@ class CreateView(ToolsMixin, vanilla.CreateView):
 
 class CreateAndUpdateView(CreateView):
     def get_success_url(self):
-        return self.object.urls.url("update")
+        return self.object.urls["update"]
 
 
 class CreateRelatedView(CreateView):
@@ -213,7 +213,7 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
         return redirect(self.get_success_url())
 
     def get_success_url(self):
-        return self.model().urls.url("list")
+        return self.model().urls["list"]
 
 
 class MessageView(vanilla.View):

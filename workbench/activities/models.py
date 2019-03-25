@@ -21,7 +21,7 @@ class ActivityQuerySet(SearchQuerySet):
         return self.filter(completed_at__isnull=False)
 
 
-@model_urls()
+@model_urls
 class Activity(Model):
     contact = models.ForeignKey(
         Person,
