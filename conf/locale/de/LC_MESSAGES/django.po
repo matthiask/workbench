@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-25 10:03+0100\n"
+"POT-Creation-Date: 2019-03-25 10:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -99,31 +99,31 @@ msgstr "Willkommen! Bitte fülle das folgende Formular aus."
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
-#: workbench/accruals/__init__.py:10 workbench/accruals/models.py:123
+#: workbench/accruals/__init__.py:10 workbench/accruals/models.py:124
 #: workbench/templates/base.html:75
 msgid "accruals"
 msgstr "Abgrenzungen"
 
-#: workbench/accruals/forms.py:24
-msgid "Cannot create a cutoff date in the future."
-msgstr "Kann nicht Stichtag in Zukunft erstellen."
+#: workbench/accruals/forms.py:22
+msgid "Unusual cutoff date (not first of the month)."
+msgstr "Ungewöhnlicher Stichtag (nicht erster Tag des Monats)."
 
-#: workbench/accruals/models.py:16 workbench/accruals/models.py:19
-#: workbench/accruals/models.py:107 workbench/reporting/views.py:46
+#: workbench/accruals/models.py:16 workbench/accruals/models.py:20
+#: workbench/accruals/models.py:108 workbench/reporting/views.py:46
 msgid "cutoff date"
 msgstr "Stichtag"
 
-#: workbench/accruals/models.py:20
+#: workbench/accruals/models.py:21
 msgid "cutoff dates"
 msgstr "Stichtage"
 
-#: workbench/accruals/models.py:30 workbench/accruals/models.py:40
+#: workbench/accruals/models.py:31 workbench/accruals/models.py:41
 msgid "Cannot modify a cutoff date where accrual records already exist."
 msgstr "Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."
 
-#: workbench/accruals/models.py:105 workbench/credit_control/models.py:47
+#: workbench/accruals/models.py:106 workbench/credit_control/models.py:47
 #: workbench/invoices/models.py:132 workbench/invoices/models.py:352
-#: workbench/templates/accruals/cutoffdate_detail.html:32
+#: workbench/templates/accruals/cutoffdate_detail.html:35
 #: workbench/templates/contacts/organization_detail.html:36
 #: workbench/templates/contacts/person_detail.html:52
 #: workbench/templates/credit_control/creditentry_list.html:25
@@ -135,29 +135,33 @@ msgstr "Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."
 msgid "invoice"
 msgstr "Rechnung"
 
-#: workbench/accruals/models.py:109
-#: workbench/templates/accruals/cutoffdate_detail.html:35
+#: workbench/accruals/models.py:110
+#: workbench/templates/accruals/cutoffdate_detail.html:38
 msgid "work progress"
 msgstr "Arbeitsfortschritt"
 
-#: workbench/accruals/models.py:111
+#: workbench/accruals/models.py:112
 msgid ""
 "Percentage of down payment invoice for which the work has already been done."
 msgstr ""
 "Anteil der schon geleisteten Arbeit, welcher durch die Anzahlungsrechnung "
 "abgegolten wird."
 
-#: workbench/accruals/models.py:115 workbench/logbook/__init__.py:10
-#: workbench/templates/accruals/cutoffdate_detail.html:34
+#: workbench/accruals/models.py:116 workbench/logbook/__init__.py:10
+#: workbench/templates/accruals/cutoffdate_detail.html:37
 #: workbench/templates/base.html:55
 msgid "logbook"
 msgstr "Logbuch"
 
-#: workbench/accruals/models.py:122
+#: workbench/accruals/models.py:123 workbench/accruals/views.py:37
 msgid "accrual"
 msgstr "Abgrenzung"
 
-#: workbench/accruals/views.py:15
+#: workbench/accruals/views.py:20
+msgid "Cannot generate accruals for future cutoff dates."
+msgstr "Kann Abgrenzungen für zukünftige Stichtage nicht generieren."
+
+#: workbench/accruals/views.py:24
 msgid "Generated accruals."
 msgstr "Abgrenzungen erstellt."
 
@@ -1404,7 +1408,7 @@ msgstr "Bearbeiten"
 msgid "Create accruals"
 msgstr "Abgrenzungen erstellen"
 
-#: workbench/templates/accruals/cutoffdate_detail.html:26
+#: workbench/templates/accruals/cutoffdate_detail.html:29
 #: workbench/templates/activities/activity_detail.html:33
 #: workbench/templates/contacts/organization_detail.html:43
 #: workbench/templates/contacts/person_detail.html:60
@@ -1420,7 +1424,7 @@ msgstr "Abgrenzungen erstellen"
 msgid "Delete"
 msgstr "Löschen"
 
-#: workbench/templates/accruals/cutoffdate_detail.html:33
+#: workbench/templates/accruals/cutoffdate_detail.html:36
 #: workbench/templates/invoices/invoice_detail.html:84
 #: workbench/templates/projects/project_detail_overview.html:55
 #: workbench/templates/projects/project_detail_overview.html:85
@@ -1429,7 +1433,7 @@ msgstr "Löschen"
 msgid "total excl. tax"
 msgstr "Total exkl. MwSt"
 
-#: workbench/templates/accruals/cutoffdate_detail.html:51
+#: workbench/templates/accruals/cutoffdate_detail.html:54
 #: workbench/templates/credit_control/creditentry_upload.html:41
 #: workbench/templates/fineforms/submit.html:4
 #: workbench/templates/generic/object_form.html:41
@@ -1845,6 +1849,9 @@ msgstr "Gültig bis"
 #: workbench/views.py:31
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
+
+#~ msgid "Cannot create a cutoff date in the future."
+#~ msgstr "Kann nicht Stichtag in Zukunft erstellen."
 
 #~ msgid "month"
 #~ msgstr "Monat"

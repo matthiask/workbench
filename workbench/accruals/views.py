@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 
 from django import http
@@ -14,8 +15,13 @@ class CutoffDateDetailView(generic.DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if request.GET.get("create_accruals"):
-            Accrual.objects.generate_accruals(cutoff_date=self.object.day)
-            messages.success(request, _("Generated accruals."))
+            if self.object.day > date.today():
+                messages.warning(
+                    request, _("Cannot generate accruals for future cutoff dates.")
+                )
+            else:
+                Accrual.objects.generate_accruals(cutoff_date=self.object.day)
+                messages.success(request, _("Generated accruals."))
             return redirect(self.object)
 
         accruals = Accrual.objects.filter(cutoff_date=self.object.day).select_related(
