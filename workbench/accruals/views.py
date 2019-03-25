@@ -1,41 +1,48 @@
-from datetime import date
+from decimal import Decimal
 
+from django import http
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 
 from workbench import generic
-from workbench.accounts.models import User
-from workbench.accruals.models import Employment, Year
-from workbench.reporting.annual_working_time import annual_working_time
+from workbench.accruals.models import Accrual
+from workbench.tools.xlsx import XLSXDocument
 
 
-class ReportView(generic.DetailView):
-    model = Year
-
+class CutoffDateDetailView(generic.DetailView):
     def get(self, request, *args, **kwargs):
-        year = request.GET.get("year", date.today().year)
-        try:
-            self.object = Year.objects.get(year=year)
-        except Year.DoesNotExist:
-            messages.error(request, _("Annual working time for %s not found.") % year)
-            return redirect("/")
-        return self.render_to_response(self.get_context_data())
+        self.object = self.get_object()
+        if request.GET.get("create_accruals"):
+            Accrual.objects.generate_accruals(cutoff_date=self.object.day)
+            messages.success(request, _("Generated accruals."))
+            return redirect(self.object)
 
-    def get_context_data(self, **kwargs):
-        param = self.request.GET.get("user")
-        users = None
-        if param == "active":
-            users = User.objects.filter(
-                id__in=Employment.objects.filter(
-                    date_from__lte=date(self.object.year, 12, 31),
-                    date_until__gte=date(self.object.year, 1, 1),
-                ).values("user")
-            )
-        elif param:
-            users = User.objects.filter(id=param)
-        if not users:
-            users = [self.request.user]
-        return super().get_context_data(
-            statistics=annual_working_time(self.object, users=users), **kwargs
+        accruals = Accrual.objects.filter(cutoff_date=self.object.day).select_related(
+            "invoice__project", "invoice__owned_by"
         )
+
+        if request.GET.get("xlsx"):
+            xlsx = XLSXDocument()
+            xlsx.table_from_queryset(
+                accruals,
+                additional=[
+                    (
+                        _("accrual"),
+                        lambda item: item.invoice.total_excl_tax
+                        * (Decimal(100) - item.work_progress)
+                        / 100,
+                    )
+                ],
+            )
+            return xlsx.to_response(
+                "accruals-{}.xlsx".format(self.object.day.isoformat())
+            )
+
+        return self.render_to_response(self.get_context_data(accruals=accruals))
+
+    def post(self, request, *args, **kwargs):
+        accrual = Accrual.objects.get(pk=request.POST["id"])
+        accrual.accrual = request.POST["accrual"]
+        accrual.save()
+        return http.HttpResponse(status=202)

@@ -1,5 +1,4 @@
-from datetime import date
-
+from django.contrib import messages
 from django.db import models
 from django.db.models import F, Q, Sum
 from django.utils.translation import gettext_lazy as _
@@ -7,20 +6,54 @@ from django.utils.translation import gettext_lazy as _
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project
-from workbench.tools.models import Model, Z
+from workbench.tools.formats import local_date_format
+from workbench.tools.models import Model, MoneyField, Z
 from workbench.tools.urls import model_urls
 
 
+@model_urls()
+class CutoffDate(Model):
+    day = models.DateField(_("cutoff date"), unique=True)
+
+    class Meta:
+        ordering = ["-day"]
+        verbose_name = _("cutoff date")
+        verbose_name_plural = _("cutoff dates")
+
+    def __str__(self):
+        return local_date_format(self.day)
+
+    @classmethod
+    def allow_update(cls, instance, request):
+        if Accrual.objects.filter(cutoff_date=instance.day).exists():
+            messages.error(
+                request,
+                _("Cannot modify a cutoff date where accrual records already exist."),
+            )
+            return False
+        return True
+
+    @classmethod
+    def allow_delete(cls, instance, request):
+        if Accrual.objects.filter(cutoff_date=instance.day).exists():
+            messages.error(
+                request,
+                _("Cannot modify a cutoff date where accrual records already exist."),
+            )
+            return False
+        return super().allow_delete(instance, request)
+
+
 class AccrualQuerySet(models.QuerySet):
-    def generate_accruals(self):
-        month = date.today().replace(day=1)
+    def generate_accruals(self, *, cutoff_date):
+        # month = date.today().replace(day=1)
 
         down_payment_invoices = Invoice.objects.valid().filter(
             project__isnull=False,
             project__in=Project.objects.filter(
-                Q(closed_on__isnull=True) | Q(closed_on__gte=month)
+                Q(closed_on__isnull=True) | Q(closed_on__gte=cutoff_date)
             ),
-            invoiced_on__lt=month,
+            invoiced_on__lt=cutoff_date,
             type=Invoice.DOWN_PAYMENT,
         )
         projects = {invoice.project_id for invoice in down_payment_invoices}
@@ -50,15 +83,20 @@ class AccrualQuerySet(models.QuerySet):
         for invoice in Invoice.objects.valid().filter(
             project__isnull=False,
             project__in=Project.objects.filter(
-                Q(closed_on__isnull=True) | Q(closed_on__gte=month)
+                Q(closed_on__isnull=True) | Q(closed_on__gte=cutoff_date)
             ),
-            invoiced_on__lt=month,
+            invoiced_on__lt=cutoff_date,
             type=Invoice.DOWN_PAYMENT,
             subtotal__gt=0,
         ):
-            accrual = 100 * logged[invoice.project_id] / invoice.total_excl_tax
+            work_progress = 100 * logged[invoice.project_id] / invoice.total_excl_tax
             self.get_or_create(
-                invoice=invoice, month=month, defaults={"accrual": accrual}
+                invoice=invoice,
+                cutoff_date=cutoff_date,
+                defaults={
+                    "work_progress": work_progress,
+                    "logbook": logged[invoice.project_id],
+                },
             )
 
 
@@ -67,27 +105,23 @@ class Accrual(Model):
     invoice = models.ForeignKey(
         Invoice, on_delete=models.CASCADE, related_name="+", verbose_name=_("invoice")
     )
-    month = models.DateField(_("month"))
-    accrual = models.IntegerField(
-        _("accrual"),
+    cutoff_date = models.DateField(_("cutoff date"))
+    work_progress = models.IntegerField(
+        _("work progress"),
         help_text=_(
             "Percentage of down payment invoice for which the work has"
             " already been done."
         ),
     )
+    logbook = MoneyField(_("logbook"))
 
     objects = AccrualQuerySet.as_manager()
 
     class Meta:
-        ordering = ["-month", "-invoice_id"]
+        ordering = ["-cutoff_date", "-invoice_id"]
+        unique_together = [("invoice", "cutoff_date")]
         verbose_name = _("accrual")
         verbose_name_plural = _("accruals")
 
     def __str__(self):
         return str(self.invoice)
-
-    def save(self, *args, **kwargs):
-        self.month = self.month.replace(day=1)
-        super().save(*args, **kwargs)
-
-    save.alters_data = True

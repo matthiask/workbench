@@ -1,17 +1,26 @@
+from datetime import date
+
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
-from workbench.accruals.models import Accrual
-from workbench.invoices.models import Invoice
-from workbench.tools.forms import ModelForm, Picker
+from workbench.accruals.models import CutoffDate
+from workbench.tools.forms import ModelForm
 
 
-class AccrualSearchForm(forms.Form):
+class CutoffDateSearchForm(forms.Form):
     def filter(self, queryset):
-        return queryset.select_related("invoice__owned_by", "invoice__project")
+        return queryset
 
 
-class AccrualForm(ModelForm):
+class CutoffDateForm(ModelForm):
     class Meta:
-        model = Accrual
-        fields = ["invoice", "month", "accrual"]
-        widgets = {"invoice": Picker(model=Invoice)}
+        model = CutoffDate
+        fields = ["day"]
+
+    def clean(self):
+        data = super().clean()
+        if data.get("day") and data["day"] > date.today():
+            raise forms.ValidationError(
+                {"day": _("Cannot create a cutoff date in the future.")}
+            )
+        return data

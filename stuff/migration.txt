@@ -848,6 +848,32 @@ WHERE effort_rate IS NOT NULL AND projects_service.project_id=p.project_id;
 
 
 --
+-- Import accruals
+--
+
+INSERT INTO
+accruals_cutoffdate
+("day")
+SELECT "day"
+FROM
+dblink(
+'dbname=fineware_feinheit',
+'SELECT DISTINCT month+1 FROM cashflow_periodicaladjustment ORDER BY month+1'
+) AS p(day date);
+
+
+INSERT INTO
+accruals_accrual
+(invoice_id, cutoff_date, work_progress, logbook)
+SELECT invoice_id, month, adjustment, 0
+FROM
+dblink(
+'dbname=fineware_feinheit',
+'SELECT month+1, adjustment, invoice_id FROM cashflow_periodicaladjustment ORDER BY month+1, invoice_id'
+) AS p(month date, adjustment int, invoice_id int);
+
+
+--
 --
 --
 -- fineware_feinheit=# select sorting_field, a.person_id, count(*) from addressbook_address a left join addressbook_person p on a.person_id=p.id where employer_id is not null and active group by sorting_field, a.person_id having count(*)>1 order by sorting_field;
