@@ -9,7 +9,7 @@ class _MUHelper(object):
     def __getitem__(self, item):
         return self.url(item)
 
-    def url(self, item, *args, **kwargs):
+    def url(self, item, **kwargs):
         kw = self.kwargs
         if kwargs:
             kw = kw.copy()
@@ -54,14 +54,3 @@ def model_urls(reverse_kwargs_fn=lambda object: {"pk": object.pk}, default="deta
         return cls
 
     return _dec
-
-
-def tryreverse(*args, **kwargs):
-    """
-    Calls ``django.urls.reverse``, and returns ``None`` on
-    failure instead of raising an exception.
-    """
-    try:
-        return reverse(*args, **kwargs)
-    except NoReverseMatch:
-        return None
