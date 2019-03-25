@@ -207,64 +207,30 @@ class LogbookTest(TestCase):
         hours = factories.LoggedHoursFactory.create()
         user = factories.UserFactory.create()
         self.client.force_login(user)
-        self.assertEqual(self.client.get("/logbook/hours/").status_code, 200)
-        self.assertEqual(
-            self.client.get(
-                "/logbook/hours/?rendered_by={}".format(user.pk)
-            ).status_code,
-            200,
-        )
-        self.assertEqual(
-            self.client.get(
-                "/logbook/hours/?project={}".format(hours.service.project.pk)
-            ).status_code,
-            200,
-        )
-        self.assertEqual(
-            self.client.get(
-                "/logbook/hours/?service={}".format(hours.service.pk)
-            ).status_code,
-            200,
-        )
-        self.assertEqual(
-            self.client.get(
-                "/logbook/hours/?organization={}".format(
-                    hours.service.project.customer_id
-                )
-            ).status_code,
-            200,
-        )
-        self.assertEqual(self.client.get("/logbook/hours/?xlsx=1").status_code, 200)
+
+        def valid(p):
+            self.assertEqual(self.client.get("/logbook/hours/?" + p).status_code, 200)
+
+        valid("")
+        valid("rendered_by=" + str(user.pk))
+        valid("project=" + str(hours.service.project.pk))
+        valid("service=" + str(hours.service.pk))
+        valid("organization=" + str(hours.service.project.customer.pk))
+        valid("xlsx=1")
 
     def test_logged_cost_list(self):
         cost = factories.LoggedCostFactory.create()
         service = factories.ServiceFactory.create()
         user = factories.UserFactory.create()
         self.client.force_login(user)
-        self.assertEqual(self.client.get("/logbook/costs/").status_code, 200)
-        self.assertEqual(
-            self.client.get(
-                "/logbook/costs/?created_by={}".format(user.pk)
-            ).status_code,
-            200,
-        )
-        self.assertEqual(
-            self.client.get(
-                "/logbook/costs/?project={}".format(cost.project_id)
-            ).status_code,
-            200,
-        )
-        self.assertEqual(
-            self.client.get(
-                "/logbook/costs/?organization={}".format(cost.project.customer_id)
-            ).status_code,
-            200,
-        )
-        self.assertEqual(self.client.get("/logbook/costs/?service=0").status_code, 200)
-        self.assertEqual(
-            self.client.get(
-                "/logbook/costs/?service={}".format(service.pk)
-            ).status_code,
-            200,
-        )
-        self.assertEqual(self.client.get("/logbook/costs/?xlsx=1").status_code, 200)
+
+        def valid(p):
+            self.assertEqual(self.client.get("/logbook/costs/?" + p).status_code, 200)
+
+        valid("")
+        valid("created_by=" + str(user.pk))
+        valid("project=" + str(cost.project.pk))
+        valid("organization=" + str(cost.project.customer.pk))
+        valid("service=0")
+        valid("service=" + str(service.pk))
+        valid("xlsx=1")
