@@ -201,3 +201,70 @@ class LogbookTest(TestCase):
             costs.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertEqual(response.status_code, 204)
+
+    def test_logged_hours_list(self):
+        factories.LoggedHoursFactory.create()
+        hours = factories.LoggedHoursFactory.create()
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        self.assertEqual(self.client.get("/logbook/hours/").status_code, 200)
+        self.assertEqual(
+            self.client.get(
+                "/logbook/hours/?rendered_by={}".format(user.pk)
+            ).status_code,
+            200,
+        )
+        self.assertEqual(
+            self.client.get(
+                "/logbook/hours/?project={}".format(hours.service.project.pk)
+            ).status_code,
+            200,
+        )
+        self.assertEqual(
+            self.client.get(
+                "/logbook/hours/?service={}".format(hours.service.pk)
+            ).status_code,
+            200,
+        )
+        self.assertEqual(
+            self.client.get(
+                "/logbook/hours/?organization={}".format(
+                    hours.service.project.customer_id
+                )
+            ).status_code,
+            200,
+        )
+        self.assertEqual(self.client.get("/logbook/hours/?xlsx=1").status_code, 200)
+
+    def test_logged_cost_list(self):
+        cost = factories.LoggedCostFactory.create()
+        service = factories.ServiceFactory.create()
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        self.assertEqual(self.client.get("/logbook/costs/").status_code, 200)
+        self.assertEqual(
+            self.client.get(
+                "/logbook/costs/?created_by={}".format(user.pk)
+            ).status_code,
+            200,
+        )
+        self.assertEqual(
+            self.client.get(
+                "/logbook/costs/?project={}".format(cost.project_id)
+            ).status_code,
+            200,
+        )
+        self.assertEqual(
+            self.client.get(
+                "/logbook/costs/?organization={}".format(cost.project.customer_id)
+            ).status_code,
+            200,
+        )
+        self.assertEqual(self.client.get("/logbook/costs/?service=0").status_code, 200)
+        self.assertEqual(
+            self.client.get(
+                "/logbook/costs/?service={}".format(service.pk)
+            ).status_code,
+            200,
+        )
+        self.assertEqual(self.client.get("/logbook/costs/?xlsx=1").status_code, 200)
