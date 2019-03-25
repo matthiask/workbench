@@ -2,7 +2,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accruals.models import CutoffDate
-from workbench.tools.forms import ModelForm, WarningsForm
+from workbench.tools.forms import ModelForm
 
 
 class CutoffDateSearchForm(forms.Form):
@@ -10,7 +10,7 @@ class CutoffDateSearchForm(forms.Form):
         return queryset
 
 
-class CutoffDateForm(ModelForm, WarningsForm):
+class CutoffDateForm(ModelForm):
     class Meta:
         model = CutoffDate
         fields = ["day"]

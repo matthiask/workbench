@@ -10,7 +10,7 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
-from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm
+from workbench.tools.forms import ModelForm, Picker, Textarea
 from workbench.tools.validation import raise_if_errors
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -117,7 +117,7 @@ class LoggedCostSearchForm(forms.Form):
             return xlsx.to_response("costs.xlsx")
 
 
-class LoggedHoursForm(WarningsForm, ModelForm):
+class LoggedHoursForm(ModelForm):
     user_fields = default_to_current_user = ("rendered_by",)
 
     service_title = forms.CharField(label=_("title"), required=False, max_length=200)
@@ -244,7 +244,7 @@ class LoggedHoursForm(WarningsForm, ModelForm):
         return instance
 
 
-class LoggedCostForm(WarningsForm, ModelForm):
+class LoggedCostForm(ModelForm):
     class Meta:
         model = LoggedCost
         fields = ("service", "rendered_on", "third_party_costs", "cost", "description")

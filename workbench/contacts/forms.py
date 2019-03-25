@@ -13,7 +13,7 @@ from workbench.contacts.models import (
     PhoneNumber,
     PostalAddress,
 )
-from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm
+from workbench.tools.forms import ModelForm, Picker, Textarea
 
 
 class OrganizationSearchForm(forms.Form):
@@ -63,7 +63,7 @@ class OrganizationForm(ModelForm):
         }
 
 
-class PersonForm(WarningsForm, ModelForm):
+class PersonForm(ModelForm):
     user_fields = default_to_current_user = ["primary_contact"]
 
     class Meta:

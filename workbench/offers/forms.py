@@ -8,7 +8,7 @@ from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.offers.models import Offer
 from workbench.projects.models import Service
 from workbench.tools.formats import local_date_format
-from workbench.tools.forms import Textarea, WarningsForm
+from workbench.tools.forms import Textarea
 
 
 class OfferSearchForm(forms.Form):
@@ -36,7 +36,7 @@ class OfferSearchForm(forms.Form):
         )
 
 
-class OfferForm(WarningsForm, PostalAddressSelectionForm):
+class OfferForm(PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
 
     class Meta:

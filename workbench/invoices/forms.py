@@ -12,7 +12,7 @@ from workbench.invoices.models import Invoice, RecurringInvoice, Service
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.services.models import ServiceType
 from workbench.tools.formats import currency, hours, local_date_format
-from workbench.tools.forms import ModelForm, Picker, Textarea, WarningsForm
+from workbench.tools.forms import ModelForm, Picker, Textarea
 from workbench.tools.models import Z
 
 
@@ -69,7 +69,7 @@ class InvoiceSearchForm(forms.Form):
         )
 
 
-class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
+class InvoiceForm(PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
 
     class Meta:
@@ -245,8 +245,6 @@ class InvoiceForm(WarningsForm, PostalAddressSelectionForm):
                     }
                 )
 
-        if not data.get("contact"):
-            self.add_warning(_("No contact selected."))
         return data
 
     def save(self, commit=True):
@@ -479,7 +477,7 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
             self.add_postal_address_selection(organization=customer)
 
 
-class InvoiceDeleteForm(ModelForm, WarningsForm):
+class InvoiceDeleteForm(ModelForm):
     class Meta:
         model = Invoice
         fields = []
@@ -616,7 +614,7 @@ class CreateRecurringInvoiceForm(ModelForm):
         self.fields["periodicity"].choices = RecurringInvoice.PERIODICITY_CHOICES
 
 
-class RecurringInvoiceForm(WarningsForm, PostalAddressSelectionForm):
+class RecurringInvoiceForm(PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
 
     class Meta:
@@ -653,10 +651,3 @@ class RecurringInvoiceForm(WarningsForm, PostalAddressSelectionForm):
 
         if not self.instance.postal_address:
             self.add_postal_address_selection(person=self.instance.contact)
-
-    def clean(self):
-        data = super().clean()
-
-        if not data.get("contact"):
-            self.add_warning(_("No contact selected."))
-        return data

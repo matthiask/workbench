@@ -19,75 +19,6 @@ class Textarea(forms.Textarea):
         super().__init__(default_attrs)
 
 
-class ModelForm(forms.ModelForm):
-    user_fields = ()
-    default_to_current_user = ()
-    required_css_class = "required"
-    error_css_class = "is-invalid"
-
-    def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop("request")
-
-        if self.default_to_current_user:
-            instance = kwargs.get("instance")
-            if not instance or not instance.pk:
-                initial = kwargs.setdefault("initial", {})
-                for field in self.default_to_current_user:
-                    initial.setdefault(field, self.request.user.pk)
-
-        super().__init__(*args, **kwargs)
-
-        for name, field in self.fields.items():
-            if isinstance(field, forms.DateField):
-                css = field.widget.attrs.get("class", "")
-                field.widget.attrs["class"] = css + " datepicker"
-
-            elif name in self.user_fields:
-                field.choices = User.objects.active_choices(
-                    include=self.instance
-                    and getattr(self.instance, "%s_id" % name, None)
-                )
-
-        self.customer_and_contact = all(
-            f in self.fields for f in ("customer", "contact")
-        )
-        if self.customer_and_contact:
-            self.fields["customer"].required = False
-            self.fields["customer"].help_text = self.fields["customer"].help_text or _(
-                "Is automatically filled using the organization's contact."
-            )
-
-    def clean(self):
-        data = super().clean()
-
-        if self.customer_and_contact:
-            if data.get("contact") and not data.get("customer"):
-                data["customer"] = data["contact"].organization
-
-            if data.get("customer") and data.get("contact"):
-                if data.get("customer") != data.get("contact").organization:
-                    raise forms.ValidationError(
-                        {
-                            "contact": gettext(
-                                "The contact %(person)s does not belong to"
-                                "  %(organization)s."
-                            )
-                            % {
-                                "person": data.get("contact"),
-                                "organization": data.get("customer"),
-                            }
-                        }
-                    )
-
-            if not data.get("customer") and "customer" in self.fields:
-                raise forms.ValidationError(
-                    {"customer": self.fields["customer"].error_messages["required"]},
-                    code="required",
-                )
-
-        return data
-
-
 _PICKER_TEMPLATE = """
 <div class="input-group">
   <div class="input-group-prepend">
@@ -190,3 +121,75 @@ class WarningsForm(forms.BaseForm):
         return self.data.get(self.ignore_warnings_id)
 
     ignore_warnings_id = "__ig_{}".format(int(time.time() / 10800))
+
+
+class ModelForm(WarningsForm, forms.ModelForm):
+    user_fields = ()
+    default_to_current_user = ()
+    required_css_class = "required"
+    error_css_class = "is-invalid"
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+
+        if self.default_to_current_user:
+            instance = kwargs.get("instance")
+            if not instance or not instance.pk:
+                initial = kwargs.setdefault("initial", {})
+                for field in self.default_to_current_user:
+                    initial.setdefault(field, self.request.user.pk)
+
+        super().__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            if isinstance(field, forms.DateField):
+                css = field.widget.attrs.get("class", "")
+                field.widget.attrs["class"] = css + " datepicker"
+
+            elif name in self.user_fields:
+                field.choices = User.objects.active_choices(
+                    include=self.instance
+                    and getattr(self.instance, "%s_id" % name, None)
+                )
+
+        self.customer_and_contact = all(
+            f in self.fields for f in ("customer", "contact")
+        )
+        if self.customer_and_contact:
+            self.fields["customer"].required = False
+            self.fields["customer"].help_text = self.fields["customer"].help_text or _(
+                "Is automatically filled using the organization's contact."
+            )
+
+    def clean(self):
+        data = super().clean()
+
+        if self.customer_and_contact:
+            if data.get("contact") and not data.get("customer"):
+                data["customer"] = data["contact"].organization
+
+            if data.get("customer") and data.get("contact"):
+                if data.get("customer") != data.get("contact").organization:
+                    raise forms.ValidationError(
+                        {
+                            "contact": gettext(
+                                "The contact %(person)s does not belong to"
+                                "  %(organization)s."
+                            )
+                            % {
+                                "person": data.get("contact"),
+                                "organization": data.get("customer"),
+                            }
+                        }
+                    )
+
+            if not data.get("customer") and "customer" in self.fields:
+                raise forms.ValidationError(
+                    {"customer": self.fields["customer"].error_messages["required"]},
+                    code="required",
+                )
+
+            if not data.get("contact"):
+                self.add_warning(_("No contact selected."))
+
+        return data
