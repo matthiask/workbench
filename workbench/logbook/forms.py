@@ -39,6 +39,10 @@ class LoggedHoursSearchForm(forms.Form):
         queryset=Service.objects.all(), required=False, widget=forms.HiddenInput
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["rendered_by"].choices = User.objects.choices()
+
     def filter(self, queryset):
         data = self.cleaned_data
         if data.get("rendered_by"):

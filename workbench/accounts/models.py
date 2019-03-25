@@ -33,6 +33,19 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    def choices(self, *, inactive_users_title=None):
+        users = {True: [], False: []}
+        for user in self.all():
+            users[user.is_active].append((user.id, user.get_full_name()))
+        choices = [("", _("All users"))]
+        if inactive_users_title:
+            choices.append((0, inactive_users_title))
+        if users[True]:
+            choices.append((_("Active"), users[True]))
+        if users[False] and not inactive_users_title:
+            choices.append((_("Inactive"), users[False]))
+        return choices
+
 
 class User(Model, AbstractBaseUser):
     USERNAME_FIELD = "email"

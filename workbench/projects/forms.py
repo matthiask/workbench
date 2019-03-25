@@ -40,17 +40,9 @@ class ProjectSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["owned_by"].choices = [
-            ("", _("All users")),
-            (0, _("Owned by inactive users")),
-            (
-                _("Active"),
-                [
-                    (u.id, u.get_full_name())
-                    for u in User.objects.filter(is_active=True)
-                ],
-            ),
-        ]
+        self.fields["owned_by"].choices = User.objects.choices(
+            inactive_users_title=_("Owned by inactive users")
+        )
 
     def filter(self, queryset):
         data = self.cleaned_data

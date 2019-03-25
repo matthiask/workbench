@@ -16,16 +16,7 @@ class AbsenceSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["u"].choices = [
-            (0, _("All users")),
-            (
-                _("Active"),
-                [
-                    (u.id, u.get_full_name())
-                    for u in User.objects.filter(is_active=True)
-                ],
-            ),
-        ]
+        self.fields["u"].choices = User.objects.choices()
 
     def filter(self, queryset):
         data = self.cleaned_data
