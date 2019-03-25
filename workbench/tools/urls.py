@@ -6,23 +6,13 @@ class _MUHelper(object):
         self.viewname_pattern = viewname_pattern
         self.kwargs = kwargs
 
-    def __getitem__(self, item):
-        return self.url(item)
-
-    def url(self, item, **kwargs):
-        kw = self.kwargs
-        if kwargs:
-            kw = kw.copy()
-            kw["kwargs"].update(kwargs)
-
+    def url(self, item):
         try:
-            return reverse(self.viewname_pattern % item, **kw)
+            return reverse(self.viewname_pattern % item)
         except NoReverseMatch as e:
-            try:
-                return reverse(self.viewname_pattern % item)
-            except NoReverseMatch:
-                # Re-raise exception with kwargs; it's more informative
-                raise e
+            return reverse(self.viewname_pattern % item, **self.kwargs)
+
+    __getitem__ = url
 
 
 def model_urls(reverse_kwargs_fn=lambda object: {"pk": object.pk}, default="detail"):
