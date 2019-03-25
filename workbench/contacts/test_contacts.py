@@ -62,3 +62,20 @@ class ContactsTest(TestCase):
         self.assertContains(response, "1 &ndash; 2 von 2")
         self.assertContains(response, "Vorname Nachname", 2)
         # print(response, response.content.decode("utf-8"))
+
+    def test_formset(self):
+        person = factories.PersonFactory.create()
+        person.emailaddresses.create(type="E1", email="e1@example.com")
+        person.emailaddresses.create(type="E2", email="e2@example.com")
+        person.emailaddresses.create(type="E3", email="e3@example.com")
+
+        self.client.force_login(person.primary_contact)
+        response = self.client.get(person.urls["update"])
+        # print(response, response.content.decode("utf-8"))
+
+        self.assertContains(response, "id_emailaddresses-0-email")
+        self.assertContains(response, "id_emailaddresses-1-email")
+        self.assertContains(response, "id_emailaddresses-2-email")
+        self.assertContains(response, "e1@example.com")
+        self.assertContains(response, "e2@example.com")
+        self.assertContains(response, "e3@example.com")

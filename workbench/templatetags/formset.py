@@ -41,8 +41,7 @@ class DynamicFormsetNode(template.Node):
         context.pop()
 
         for idx, form in enumerate(formset.forms):
-            context.update({"form_id": "%s-%s" % (slug, idx), "form": form})
-            result.append(self.nodelist.render(context))
-            context.pop()
+            with context.push(form_id="%s-%s" % (slug, idx), form=form):
+                result.append(self.nodelist.render(context))
 
         return "".join(result)

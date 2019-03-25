@@ -33,3 +33,8 @@ class StatisticsTest(TestCase):
                 }
             ],
         )
+
+    def test_view(self):
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.get("/report/overdrawn-projects/")
+        self.assertContains(response, "Überzogene Projekte")
