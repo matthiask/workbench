@@ -1,6 +1,5 @@
 from django.conf.urls import url
 from django.shortcuts import redirect
-from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
 from workbench.logbook.forms import (
@@ -39,8 +38,8 @@ urlpatterns = [
     ),
     url(
         r"^hours/(?P<pk>\d+)/delete/$",
-        generic.MessageView.as_view(
-            redirect_to="logbook_loggedhours_list", message=_("Not implemented yet.")
+        generic.DeleteView.as_view(
+            model=LoggedHours, template_name="modal_confirm_delete.html"
         ),
         name="logbook_loggedhours_delete",
     ),
@@ -67,8 +66,8 @@ urlpatterns = [
     ),
     url(
         r"^costs/(?P<pk>\d+)/delete/$",
-        generic.MessageView.as_view(
-            redirect_to="logbook_loggedcost_list", message=_("Not implemented yet.")
+        generic.DeleteView.as_view(
+            model=LoggedCost, template_name="modal_confirm_delete.html"
         ),
         name="logbook_loggedcost_delete",
     ),

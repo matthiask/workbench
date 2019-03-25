@@ -1,6 +1,7 @@
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
+from django.contrib import messages
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
@@ -11,6 +12,11 @@ from workbench.accounts.models import User
 from workbench.projects.models import Project, Service
 from workbench.tools.models import HoursField, Model, MoneyField
 from workbench.tools.urls import model_urls
+
+
+def monday(day=None):
+    day = day or date.today()
+    return day - timedelta(days=day.weekday())
 
 
 @model_urls()
@@ -56,6 +62,16 @@ class LoggedHours(Model):
 
     def __html__(self):
         return format_html("{}:<br>{}", self.service.title, self.description)
+
+    @classmethod
+    def allow_delete(cls, instance, request):
+        if instance.invoice_service_id or instance.archived_at:
+            messages.error(request, _("Cannot delete archived logged hours."))
+            return False
+        if instance.rendered_on < monday():
+            messages.error(request, _("Cannot delete logged hours from past weeks."))
+            return False
+        return super().allow_delete(instance, request)
 
 
 @model_urls()
@@ -106,3 +122,10 @@ class LoggedCost(Model):
 
     def __str__(self):
         return self.description
+
+    @classmethod
+    def allow_delete(cls, instance, request):
+        if instance.invoice_service_id or instance.archived_at:
+            messages.error(request, _("Cannot delete archived logged cost entries."))
+            return False
+        return super().allow_delete(instance, request)

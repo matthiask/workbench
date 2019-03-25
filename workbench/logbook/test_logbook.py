@@ -1,11 +1,13 @@
 from datetime import date, timedelta
 
 from django.test import TestCase
+from django.utils import timezone
 
 from workbench import factories
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
+from workbench.tools.testing import messages
 
 
 class LogbookTest(TestCase):
@@ -153,3 +155,49 @@ class LogbookTest(TestCase):
             "".format(local_date_format(hours.rendered_on)),
             html=True,
         )
+
+    def test_logged_hours_deletion(self):
+        hours = factories.LoggedHoursFactory.create(
+            rendered_on=date.today() - timedelta(days=10)
+        )
+        self.client.force_login(hours.rendered_by)
+        response = self.client.post(
+            hours.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            messages(response), ["Kann Stunden vergangener Wochen nicht löschen."]
+        )
+
+        hours.archived_at = timezone.now()
+        hours.save()
+
+        response = self.client.post(
+            hours.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            messages(response), ["Kann archivierte Stunden nicht löschen."]
+        )
+
+        hours = factories.LoggedHoursFactory.create()
+        response = self.client.post(
+            hours.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 204)
+
+    def test_logged_cost_deletion(self):
+        costs = factories.LoggedCostFactory.create(archived_at=timezone.now())
+        self.client.force_login(costs.created_by)
+
+        response = self.client.post(
+            costs.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(messages(response), ["Kann archivierte Kosten nicht löschen."])
+
+        costs = factories.LoggedCostFactory.create()
+        response = self.client.post(
+            costs.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 204)

@@ -32,7 +32,9 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/delete/$",
-        generic.DeleteView.as_view(model=Activity),
+        generic.DeleteView.as_view(
+            model=Activity, template_name="modal_confirm_delete.html"
+        ),
         name="activities_activity_delete",
     ),
 ]
