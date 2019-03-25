@@ -8,11 +8,15 @@ class ProjectsTest(TestCase):
     def test_create(self):
         user = factories.UserFactory.create()
         self.client.force_login(user)
+        person = factories.PersonFactory(
+            organization=factories.OrganizationFactory.create()
+        )
 
         response = self.client.post(
             "/projects/create/",
             {
-                "customer": factories.OrganizationFactory.create().pk,
+                "customer": person.organization.pk,
+                "contact": person.pk,
                 "title": "Test project",
                 "owned_by": user.pk,
                 "type": Project.INTERNAL,
