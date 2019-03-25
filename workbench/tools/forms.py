@@ -1,7 +1,6 @@
 import time
 
 from django import forms
-from django.db.models import Q
 from django.forms.utils import flatatt
 from django.urls import reverse
 from django.utils.encoding import force_text
@@ -44,9 +43,9 @@ class ModelForm(forms.ModelForm):
                 field.widget.attrs["class"] = css + " datepicker"
 
             elif name in self.user_fields:
-                self._only_active_and_initial_users(
-                    field,
-                    self.instance and getattr(self.instance, "%s_id" % name, None),
+                field.choices = User.objects.active_choices(
+                    include=self.instance
+                    and getattr(self.instance, "%s_id" % name, None)
                 )
 
         self.customer_and_contact = all(
@@ -57,19 +56,6 @@ class ModelForm(forms.ModelForm):
             self.fields["customer"].help_text = self.fields["customer"].help_text or _(
                 "Is automatically filled using the organization's contact."
             )
-
-    def _only_active_and_initial_users(self, formfield, pk):
-        users = {False: [], True: []}
-        for user in User.objects.filter(Q(is_active=True) | Q(pk=pk)):
-            users[user.is_active].append(
-                (formfield.prepare_value(user), formfield.label_from_instance(user))
-            )
-        choices = [(_("Active"), users[True])]
-        if users[False]:
-            choices[0:0] = users[False]
-        if not formfield.required:
-            choices.insert(0, ("", "----------"))
-        formfield.choices = choices
 
     def clean(self):
         data = super().clean()

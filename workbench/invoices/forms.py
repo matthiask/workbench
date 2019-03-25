@@ -41,9 +41,7 @@ class InvoiceSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["owned_by"].choices = User.objects.choices(
-            inactive_users_title=_("Owned by inactive users")
-        )
+        self.fields["owned_by"].choices = User.objects.choices(collapse_inactive=True)
 
     def filter(self, queryset):
         data = self.cleaned_data
@@ -565,9 +563,7 @@ class RecurringInvoiceSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["owned_by"].choices = User.objects.choices(
-            inactive_users_title=_("Owned by inactive users")
-        )
+        self.fields["owned_by"].choices = User.objects.choices(collapse_inactive=True)
 
     def filter(self, queryset):
         data = self.cleaned_data

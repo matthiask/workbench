@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -33,18 +33,23 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def choices(self, *, inactive_users_title=None):
+    def choices(self, *, collapse_inactive):
         users = {True: [], False: []}
         for user in self.all():
             users[user.is_active].append((user.id, user.get_full_name()))
         choices = [("", _("All users"))]
-        if inactive_users_title:
-            choices.append((0, inactive_users_title))
-        if users[True]:
-            choices.append((_("Active"), users[True]))
-        if users[False] and not inactive_users_title:
+        if collapse_inactive:
+            choices.append((0, _("Inactive users")))
+        choices.append((_("Active"), users[True]))
+        if users[False] and not collapse_inactive:
             choices.append((_("Inactive"), users[False]))
         return choices
+
+    def active_choices(self, *, include=None):
+        users = {True: [], False: []}
+        for user in self.filter(Q(is_active=True) | Q(pk=include)):
+            users[user.is_active].append((user.id, user.get_full_name()))
+        return users[False] + [(_("Active"), users[True])]
 
 
 class User(Model, AbstractBaseUser):

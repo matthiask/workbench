@@ -1,5 +1,6 @@
 from django.test import TestCase
 
+from workbench import factories
 from workbench.accounts.models import User
 
 
@@ -20,3 +21,25 @@ class AccountsTest(TestCase):
         self.assertTrue(user.has_perm("stuff"))
         self.assertTrue(user.has_module_perms("stuff"))
         self.assertTrue(user.is_staff)
+
+    def test_choices(self):
+        u1 = factories.UserFactory.create(_full_name="M A", is_active=True)
+        u2 = factories.UserFactory.create(_full_name="M I", is_active=False)
+
+        self.assertEqual(
+            list(User.objects.choices(collapse_inactive=False)),
+            [
+                ("", "Alle Benutzer"),
+                ("Aktiv", [(u1.pk, "M A")]),
+                ("Inaktiv", [(u2.pk, "M I")]),
+            ],
+        )
+
+        self.assertEqual(
+            list(User.objects.choices(collapse_inactive=True)),
+            [
+                ("", "Alle Benutzer"),
+                (0, "Inaktive Benutzer"),
+                ("Aktiv", [(u1.pk, "M A")]),
+            ],
+        )

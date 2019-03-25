@@ -41,7 +41,9 @@ class LoggedHoursSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["rendered_by"].choices = User.objects.choices()
+        self.fields["rendered_by"].choices = User.objects.choices(
+            collapse_inactive=False
+        )
 
     def filter(self, queryset):
         data = self.cleaned_data
