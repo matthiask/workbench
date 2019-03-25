@@ -144,3 +144,19 @@ class RecurringTest(TestCase):
 
         create_recurring_invoices_and_notify()
         self.assertEqual(len(mail.outbox), 1)
+
+    def test_list(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        def valid(p):
+            self.assertEqual(
+                self.client.get("/recurring-invoices/?" + p).status_code, 200
+            )
+
+        valid("")
+        valid("s=all")
+        valid("s=closed")
+        valid("org={}".format(factories.OrganizationFactory.create().pk))
+        valid("owned_by={}".format(user.id))
+        valid("owned_by=0")  # only inactive
