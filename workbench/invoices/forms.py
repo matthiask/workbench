@@ -471,10 +471,8 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
             for field in list(self.fields):
                 if field not in {"customer", "contact"}:
                     self.fields.pop(field)
-        elif contact:
-            self.add_postal_address_selection(person=contact)
-        elif customer:
-            self.add_postal_address_selection(organization=customer)
+        else:
+            self.add_postal_address_selection(person=contact, organization=customer)
 
 
 class InvoiceDeleteForm(ModelForm):
