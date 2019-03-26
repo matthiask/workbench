@@ -26,10 +26,10 @@ class OfferSearchForm(forms.Form):
         data = self.cleaned_data
         if data.get("s") == "all":
             pass
-        elif data.get("s") == "":
-            queryset = queryset.filter(status__lte=Offer.OFFERED)
         elif data.get("s"):
             queryset = queryset.filter(status=data.get("s"))
+        else:
+            queryset = queryset.filter(status__lte=Offer.OFFERED)
 
         return queryset.select_related(
             "project__owned_by", "project__customer", "project__contact__organization"
@@ -89,8 +89,7 @@ class OfferForm(PostalAddressSelectionForm):
         s_dict = dict(Offer.STATUS_CHOICES)
 
         if data.get("status", 0) >= Offer.ACCEPTED:
-            if not self.instance.closed_on:
-                self.instance.closed_on = date.today()
+            self.instance.closed_on = self.instance.closed_on or date.today()
 
         if self.instance.closed_on and data.get("status", 99) < Offer.ACCEPTED:
             if self.should_ignore_warnings():

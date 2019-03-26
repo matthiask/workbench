@@ -1,9 +1,12 @@
 from decimal import Decimal
+from datetime import date
 
 from django.test import TestCase
 
 from workbench import factories
 from workbench.offers.models import Offer
+from workbench.tools.formats import local_date_format
+from workbench.tools.forms import WarningsForm
 
 
 class OffersTest(TestCase):
@@ -49,3 +52,75 @@ class OffersTest(TestCase):
 
         pdf = self.client.get(offer.urls["pdf"])
         self.assertEqual(pdf.status_code, 200)  # No crash
+
+    def test_update_offer(self):
+        offer = factories.OfferFactory.create(
+            title="Test",
+        )
+        self.client.force_login(offer.owned_by)
+        response = self.client.post(
+            offer.urls["update"],
+            {
+                "title": "Stuff",
+                "owned_by": offer.owned_by_id,
+                "discount": "10",
+                "liable_to_vat": "1",
+                "postal_address": "Anything",
+                # "pa": postal_address.id,
+                # "services": [service.id],
+                "offered_on": local_date_format(date.today()),
+                "status": Offer.ACCEPTED,
+            },
+        )
+        self.assertRedirects(response, offer.project.urls["services"])
+
+        offer.refresh_from_db()
+        self.assertEqual(offer.closed_on, date.today())
+
+        response = self.client.post(
+            offer.urls["update"],
+            {
+                "title": "Stuff",
+                "owned_by": offer.owned_by_id,
+                "discount": "10",
+                "liable_to_vat": "1",
+                "postal_address": "Anything",
+                # "pa": postal_address.id,
+                # "services": [service.id],
+                "offered_on": local_date_format(date.today()),
+                "status": Offer.IN_PREPARATION,
+            },
+        )
+        self.assertContains(response, "aber die Offerte")
+
+        response = self.client.post(
+            offer.urls["update"],
+            {
+                "title": "Stuff",
+                "owned_by": offer.owned_by_id,
+                "discount": "10",
+                "liable_to_vat": "1",
+                "postal_address": "Anything",
+                # "pa": postal_address.id,
+                # "services": [service.id],
+                "offered_on": local_date_format(date.today()),
+                "status": Offer.IN_PREPARATION,
+                WarningsForm.ignore_warnings_id: "on",
+            },
+        )
+        self.assertRedirects(response, offer.project.urls["services"])
+
+        offer.refresh_from_db()
+        self.assertIsNone(offer.closed_on)
+
+    def test_list(self):
+        factories.OfferFactory.create()
+        self.client.force_login(factories.UserFactory.create())
+
+        def valid(p):
+            self.assertEqual(self.client.get("/offers/?" + p).status_code, 200)
+
+        valid("")
+        valid("s=all")
+        valid("s=10")
+        valid("s=20")
