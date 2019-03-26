@@ -17,17 +17,10 @@ class HistoryTest(TestCase):
         self.client.force_login(project.owned_by)
         response = self.client.get("/history/projects.project/{}/".format(project.pk))
         # print(response, response.content.decode("utf-8"))
+        self.assertContains(response, "Version 2")
         self.assertContains(
             response,
             "Anfangswert von &#39;Kunde&#39; war &#39;The Organization Ltd&#39;.",
-        )
-        self.assertContains(
-            response, "&#39;Typ&#39; änderte von &#39;Auftrag&#39; zu &#39;Intern&#39;."
-        )
-        self.assertContains(
-            response,
-            "Geschlossen am&#39; änderte von &#39;&lt;kein Wert&gt;&#39;"
-            " zu &#39;01.01.2019&#39;.",
         )
 
     def test_contact_history(self):
@@ -37,6 +30,7 @@ class HistoryTest(TestCase):
         self.client.force_login(person.primary_contact)
         response = self.client.get("/history/contacts.person/{}/".format(person.pk))
         # print(response, response.content.decode("utf-8"))
+        self.assertContains(response, "Version 2")
         self.assertContains(
             response,
             "&#39;Ist archiviert&#39; änderte von &#39;nein&#39; zu &#39;ja&#39;.",
