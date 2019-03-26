@@ -85,7 +85,7 @@ def oauth2(request):
             },
         )
 
-    user = auth.authenticate(email=email)
+    user = auth.authenticate(request, email=email)
     if user and user.is_active:
         auth.login(request, user)
     else:
