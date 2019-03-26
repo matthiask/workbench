@@ -120,7 +120,7 @@
             <th>{{ employment }}</th>
             <td>{{ employment.percentage }}%</td>
             <td>{{ employment.vacation_weeks|stringformat:'.0f' }}</td>
-            <td>{{ employment.notes }}</td>
+            <td>{{ employment.notes|default:'&ndash;' }}</td>
           </tr>
           {% endfor %}
         </table>

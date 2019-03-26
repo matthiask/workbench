@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
+from workbench.tools.formats import local_date_format
 from workbench.tools.models import HoursField, Model
 from workbench.tools.urls import model_urls
 
@@ -89,7 +90,12 @@ class Employment(Model):
         verbose_name_plural = _("employments")
 
     def __str__(self):
-        return "%s - %s" % (self.date_from, self.date_until or _("ongoing"))
+        if self.date_until.year > 3000:
+            return _("since %s") % local_date_format(self.date_from)
+        return "%s - %s" % (
+            local_date_format(self.date_from),
+            local_date_format(self.date_until),
+        )
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.test import TestCase
 
 from workbench import factories
-from workbench.awt.models import Absence, Year
+from workbench.awt.models import Absence, Employment, Year
 from workbench.awt.utils import monthly_days
 from workbench.reporting.annual_working_time import annual_working_time
 from workbench.tools.formats import local_date_format
@@ -154,3 +154,15 @@ class AWTTest(TestCase):
             messages(response),
             ["Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."],
         )
+
+    def test_employment_model(self):
+        employment = Employment(
+            user=factories.UserFactory.create(),
+            percentage=100,
+            vacation_weeks=5,
+            date_from=date(2018, 1, 1),
+        )
+        self.assertEqual(str(employment), "Seit 01.01.2018")
+
+        employment.date_until = date(2018, 6, 30)
+        self.assertEqual(str(employment), "01.01.2018 - 30.06.2018")
