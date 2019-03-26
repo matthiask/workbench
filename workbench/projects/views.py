@@ -10,7 +10,7 @@ class MoveServiceView(generic.DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if not self.model.allow_update(self.object, request):
-            return redirect(self.object.offer)
+            return redirect(self.object)
 
         if self.object.offer:
             pks = list(self.object.offer.services.values_list("id", flat=True))
