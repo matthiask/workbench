@@ -10,6 +10,8 @@ from workbench.tools.testing import messages
 class AccrualsTest(TestCase):
     def test_cutoff_days(self):
         self.client.force_login(factories.UserFactory.create())
+        response = self.client.post("/accruals/create/", {"day": ""})
+        self.assertContains(response, "Dieses Feld ist zwingend erforderlich.")
         response = self.client.post("/accruals/create/", {"day": "01.01.2019"})
         day = CutoffDate.objects.get()
         self.assertRedirects(response, day.urls["detail"])
