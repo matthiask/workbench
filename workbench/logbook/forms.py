@@ -268,12 +268,13 @@ class LoggedCostForm(ModelForm):
             self.instance.project = self.project
 
         self.fields["service"].choices = self.project.services.choices()
-        self.fields["third_party_costs"].help_text = mark_safe(
-            "{}"
-            ' <button type="button" class="btn btn-secondary btn-sm">1:1</button>'
-            ' <button type="button" class="btn btn-secondary btn-sm">+15%</button>'
-            "".format(self.fields["third_party_costs"].help_text)
-        )
+        # TODO add JS for those buttons
+        # self.fields["third_party_costs"].help_text = mark_safe(
+        #     "{}"
+        #     ' <button type="button" class="btn btn-secondary btn-sm">1:1</button>'
+        #     ' <button type="button" class="btn btn-secondary btn-sm">+15%</button>'
+        #     "".format(self.fields["third_party_costs"].help_text)
+        # )
 
     def clean(self):
         data = super().clean()
