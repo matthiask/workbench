@@ -99,6 +99,9 @@ class OfferFactory(factory.DjangoModelFactory):
 # INVOICES ####################################################################
 class InvoiceFactory(factory.DjangoModelFactory):
     customer = factory.SubFactory(OrganizationFactory)
+    contact = factory.LazyAttribute(
+        lambda obj: PersonFactory.create(organization=obj.customer)
+    )
     owned_by = factory.SubFactory(UserFactory)
     title = factory.Sequence(lambda n: "Invoice %d" % n)
     type = Invoice.FIXED

@@ -238,7 +238,7 @@ class InvoicesTest(TestCase):
         self.assertEqual(pdf.status_code, 200)  # No crash
 
     def test_update_invoice(self):
-        invoice = factories.InvoiceFactory.create()
+        invoice = factories.InvoiceFactory.create(contact=None)
         self.client.force_login(invoice.owned_by)
         response = self.client.post(invoice.urls["update"], invoice_to_dict(invoice))
         self.assertContains(response, "Kein Kontakt ausgewählt.")
