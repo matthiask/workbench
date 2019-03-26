@@ -108,6 +108,7 @@ class InvoiceForm(PostalAddressSelectionForm):
 
         if self.instance.project:
             self.fields["customer"].disabled = True
+            self.fields["customer"].help_text = _("Determined by project.")
 
         if self.instance.type == self.instance.DOWN_PAYMENT:
             self.fields["subtotal"].label = _("Down payment")
