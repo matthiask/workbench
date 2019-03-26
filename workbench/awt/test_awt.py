@@ -144,15 +144,19 @@ class AWTTest(TestCase):
         self.assertEqual(response.status_code, 201)
         absence = Absence.objects.get()
 
-        response = self.client.get(absence.urls["update"])
+        response = self.client.get(
+            absence.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
         self.assertEqual(response.status_code, 200)
 
         Absence.objects.update(starts_on=date(2018, 1, 1))
-        response = self.client.get(absence.urls["update"])
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(
-            messages(response),
-            ["Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."],
+        response = self.client.get(
+            absence.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt.",
         )
 
     def test_employment_model(self):
@@ -200,3 +204,10 @@ class AWTTest(TestCase):
         self.assertEqual(
             messages(response), ["Jahresarbeitszeit für 2018 nicht gefunden."]
         )
+
+    def test_non_ajax_redirect(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        absence = Absence.objects.create(user=user, starts_on=date.today(), days=1)
+        response = self.client.get(absence.urls["detail"])
+        self.assertRedirects(response, "/absences/?u=" + str(user.pk))

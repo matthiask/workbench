@@ -101,13 +101,25 @@ class ListView(ToolsMixin, vanilla.ListView):
 
 
 class DetailView(ToolsMixin, vanilla.DetailView):
-    pass
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        url = self.model.get_redirect_url(self.object, request)
+        if url:
+            return redirect(url)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data()
+        return self.render_to_response(context)
 
 
 class CreateView(ToolsMixin, vanilla.CreateView):
     def dispatch(self, request, *args, **kwargs):
         if not self.model.allow_create(request):
             return render(request, "modal.html") if request.is_ajax else redirect("../")
+        url = self.model.get_redirect_url(None, request)
+        if url:
+            return redirect(url)
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -154,6 +166,9 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
                 if request.is_ajax()
                 else redirect(self.object)
             )
+        url = self.model.get_redirect_url(self.object, request)
+        if url:
+            return redirect(url)
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -196,6 +211,9 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
                 if request.is_ajax()
                 else redirect(self.object)
             )
+        url = self.model.get_redirect_url(self.object, request)
+        if url:
+            return redirect(url)
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):

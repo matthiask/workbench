@@ -58,6 +58,10 @@ class Model(models.Model):
         else:
             return True
 
+    @classmethod
+    def get_redirect_url(cls, instance, request):
+        return None
+
     @property
     def code(self):
         return "%05d" % self.pk if self.pk else ""

@@ -141,7 +141,9 @@ class LogbookTest(TestCase):
             rendered_on=date.today() - timedelta(days=10)
         )
         self.client.force_login(hours.rendered_by)
-        response = self.client.get(hours.urls["update"])
+        response = self.client.get(
+            hours.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
         self.assertContains(
             response,
             '<input type="number" name="hours" value="1.0" step="0.1"'

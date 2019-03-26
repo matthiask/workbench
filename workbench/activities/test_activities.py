@@ -27,7 +27,7 @@ class ActivitiesTest(TestCase):
         self.assertContains(response, "fällig in 2 Wochen")
         self.assertContains(response, "1 &ndash; 21 von 21")
 
-        self.client.post(
+        response = self.client.post(
             activity.urls["update"],
             {
                 "title": activity.title,
@@ -36,7 +36,9 @@ class ActivitiesTest(TestCase):
                 "due_on": "",
                 "is_completed": "on",
             },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
+        self.assertEqual(response.status_code, 202)
 
         activity.refresh_from_db()
         self.assertEqual(activity.completed_at.date(), date.today())

@@ -73,6 +73,13 @@ class LoggedHours(Model):
             return False
         return super().allow_delete(instance, request)
 
+    @classmethod
+    def get_redirect_url(cls, instance, request):
+        if not request.is_ajax():
+            return cls().urls["list"] + "?project={}".format(
+                instance.service.project_id if instance else ""
+            )
+
 
 @model_urls
 class LoggedCost(Model):
@@ -129,3 +136,10 @@ class LoggedCost(Model):
             messages.error(request, _("Cannot delete archived logged cost entries."))
             return False
         return super().allow_delete(instance, request)
+
+    @classmethod
+    def get_redirect_url(cls, instance, request):
+        if not request.is_ajax():
+            return cls().urls["list"] + "?project={}".format(
+                instance.project_id if instance else ""
+            )

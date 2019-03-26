@@ -96,3 +96,8 @@ class Activity(Model):
             elif self.due_on < date.today() + timedelta(days=3):
                 return "warning"
         return ""
+
+    @classmethod
+    def get_redirect_url(cls, instance, request):
+        if not request.is_ajax():
+            return cls().urls["list"]

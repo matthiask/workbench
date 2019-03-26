@@ -83,6 +83,9 @@ class User(Model, AbstractBaseUser):
     def __str__(self):
         return self.get_full_name()
 
+    def get_absolute_url(self):
+        return "/"
+
     def has_perm(self, perm, obj=None):
         """Does the user have a specific permission?"""
         # Simplest possible answer: Yes, always
