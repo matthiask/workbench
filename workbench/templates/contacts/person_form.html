@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="row justify-content-center">
-  <div class="col-md-10 col-lg-8">
+  <div class="col-md-8 col-lg-6">
     <h1>
       {% if object %}
         {% blocktrans with object=object.full_name %}Update {{ object }}{% endblocktrans %}
@@ -21,49 +21,44 @@
       {% ff_fields form %}
 
       {% if form.formsets %}
-        <div class="row">
-          <div class="col-lg-8 offset-lg-4">
-            <h4>{% trans 'phone numbers' %}</h4>
-            {% formset form.formsets.phonenumbers "phonenumbers" %}
-            <div id="{{ form_id }}" class="mb-1">
-              {{ form.id }}
-              {% ff_errors form %}
-              {% ff_fields form %}
-            </div>
-            {% endformset %}
-            <a href="#" class="btn btn-secondary"
-              onclick="return addInlineForm('phonenumbers')">
-              {% include 'svg/plus.svg' %}
-            </a>
-
-            <h4 class="mt-3">{% trans 'email addresses' %}</h4>
-            {% formset form.formsets.emailaddresses "emailaddresses" %}
-            <div id="{{ form_id }}" class="mb-1">
-              {{ form.id }}
-              {% ff_errors form %}
-              {% ff_fields form %}
-            </div>
-            {% endformset %}
-            <a href="#" class="btn btn-secondary"
-              onclick="return addInlineForm('emailaddresses')">
-              {% include 'svg/plus.svg' %}
-            </a>
-
-            <h4 class="mt-3">{% trans 'postal addresses' %}</h4>
-            {% formset form.formsets.postaladdresses "postaladdresses" %}
-            <div id="{{ form_id }}" class="mb-1">
-              {{ form.id }}
-              {% ff_errors form %}
-              {% ff_fields form %}
-            </div>
-            {% endformset %}
-            <a href="#" class="btn btn-secondary"
-              onclick="return addInlineForm('postaladdresses')">
-              {% include 'svg/plus.svg' %}
-            </a>
-
-          </div>
+        <h4>{% trans 'phone numbers' %}</h4>
+        {% formset form.formsets.phonenumbers "phonenumbers" %}
+        <div id="{{ form_id }}" class="mb-1">
+          {{ form.id }}
+          {% ff_errors form %}
+          {% ff_fields form %}
         </div>
+        {% endformset %}
+        <a href="#" class="btn btn-secondary"
+          onclick="return addInlineForm('phonenumbers')">
+          {% include 'svg/plus.svg' %}
+        </a>
+
+        <h4 class="mt-3">{% trans 'email addresses' %}</h4>
+        {% formset form.formsets.emailaddresses "emailaddresses" %}
+        <div id="{{ form_id }}" class="mb-1">
+          {{ form.id }}
+          {% ff_errors form %}
+          {% ff_fields form %}
+        </div>
+        {% endformset %}
+        <a href="#" class="btn btn-secondary"
+          onclick="return addInlineForm('emailaddresses')">
+          {% include 'svg/plus.svg' %}
+        </a>
+
+        <h4 class="mt-3">{% trans 'postal addresses' %}</h4>
+        {% formset form.formsets.postaladdresses "postaladdresses" %}
+        <div id="{{ form_id }}" class="mb-1">
+          {{ form.id }}
+          {% ff_errors form %}
+          {% ff_fields form %}
+        </div>
+        {% endformset %}
+        <a href="#" class="btn btn-secondary"
+          onclick="return addInlineForm('postaladdresses')">
+          {% include 'svg/plus.svg' %}
+        </a>
       {% endif %}
 
       <div class="row mt-3">
