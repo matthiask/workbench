@@ -85,10 +85,11 @@ class ProjectForm(ModelForm):
                         "title": project.title,
                         "description": project.description,
                         "type": project.type,
+                        "owned_by": (
+                            project.owned_by_id if project.owned_by.is_active else None
+                        ),
                     }
                 )
-                if project.owned_by.is_active:
-                    initial["owned_by"] = project.owned_by_id
 
         super().__init__(*args, **kwargs)
         self.fields["type"].choices = Project.TYPE_CHOICES

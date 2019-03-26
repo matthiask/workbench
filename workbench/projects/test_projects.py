@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.test import TestCase
 
 from workbench import factories
@@ -183,3 +185,53 @@ class ProjectsTest(TestCase):
         self.assertRedirects(
             self.client.get(project.urls["detail"]), project.urls["overview"]
         )
+
+    def test_update(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.urls["create"])
+        self.assertNotContains(response, "is_closed")
+
+        response = self.client.get(project.urls["update"])
+        self.assertContains(response, "is_closed")
+
+        response = self.client.post(
+            project.urls["update"],
+            {
+                "customer": project.customer_id,
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "type": project.type,
+                "is_closed": "on",
+            },
+        )
+        self.assertRedirects(response, project.urls["overview"])
+        project.refresh_from_db()
+        self.assertEqual(project.closed_on, date.today())
+
+        response = self.client.post(
+            project.urls["update"],
+            {
+                "customer": project.customer_id,
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "type": project.type,
+                "is_closed": "",
+            },
+        )
+        self.assertRedirects(response, project.urls["services"])
+        project.refresh_from_db()
+        self.assertIsNone(project.closed_on)
+
+    def test_copy(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(
+            project.urls["create"] + "?copy_project=" + str(project.pk)
+        )
+        self.assertContains(response, 'value="{}"'.format(project.title))
+        # print(response, response.content.decode("utf-8"))
