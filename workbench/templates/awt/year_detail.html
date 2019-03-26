@@ -98,15 +98,32 @@
         <strong>{% trans 'vacation days' %}</strong><br>
         {% for absence in data.absences.vacation_days %}
         {{ absence.days|stringformat:'.02f' }}d ab {{ absence.starts_on|date:'d.m.' }}: {{ absence.description }}<br>
-        {% empty %}&ndash;
+        {% empty %}&ndash;<br>
         {% endfor %}
-      </td>
-      <td colspan="6">
+
         <strong>{% trans 'other absences' %}</strong><br>
         {% for absence in data.absences.other_absences %}
         {{ absence.days|stringformat:'.02f' }}d ab {{ absence.starts_on|date:'d.m.' }}: {{ absence.description }}<br>
-        {% empty %}&ndash;
+        {% empty %}&ndash;<br>
         {% endfor %}
+      </td>
+      <td colspan="6">
+        <table class="table table-condensed">
+          <tr>
+            <th>{% trans 'employment' %}</th>
+            <th>{% trans 'percentage' %}</th>
+            <th>{% trans 'vacation weeks' %}</th>
+            <th>{% trans 'notes' %}</th>
+          </tr>
+          {% for employment in data.employments %}
+          <tr>
+            <th>{{ employment }}</th>
+            <td>{{ employment.percentage }}%</td>
+            <td>{{ employment.vacation_weeks|stringformat:'.0f' }}</td>
+            <td>{{ employment.notes }}</td>
+          </tr>
+          {% endfor %}
+        </table>
       </td>
       <td></td>
     </tr>

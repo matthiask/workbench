@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from django.db.models import Sum
 from django.db.models.functions import ExtractMonth
+from django.utils.datastructures import OrderedSet
 
 from workbench.accounts.models import User
 from workbench.awt.models import Absence, Employment
@@ -30,6 +31,7 @@ def annual_working_time(year, *, users=None):
             "other_absences": [Z for i in range(12)],
             "target": [Z for i in range(12)],
             "hours": [Z for i in range(12)],
+            "employments": OrderedSet(),
         }
     )
     dpm = days_per_month(year.year)
@@ -56,6 +58,7 @@ def annual_working_time(year, *, users=None):
                 available_vacation_days_per_month * partial_month_factor
             )
             month_data["months"][month.month - 1] = month
+            month_data["employments"].add(employment)
 
     for row in (
         LoggedHours.objects.order_by()
@@ -134,6 +137,7 @@ def annual_working_time(year, *, users=None):
                 "user": user,
                 "months": user_data,
                 "absences": absences[user.id],
+                "employments": user_data["employments"],
                 "working_time": wt,
                 "monthly_sums": sums,
                 "totals": {
