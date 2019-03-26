@@ -170,7 +170,9 @@ class LoggedHoursForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["service"].choices = self.project.services.choices()
         self.fields["service"].required = False
-        if len(self.fields["service"].choices) > 1:
+        if len(self.fields["service"].choices) > 1 and not self.request.POST.get(
+            "service_title"
+        ):
             self.hide_new_service = True
             self.fields["service"].widget.attrs["autofocus"] = True
         else:
