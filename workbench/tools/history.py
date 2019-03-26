@@ -119,7 +119,9 @@ def changes(model, fields, versions):
                     _("Final value of '%(field)s' was '%(current)s'.")
                     % {
                         "field": conditional_escape(capfirst(f.verbose_name)),
-                        "current": conditional_escape(formatter(f)(values.get(f.attname))),
+                        "current": conditional_escape(
+                            formatter(f)(values.get(f.attname))
+                        ),
                     }
                 )
                 for f in field_instances

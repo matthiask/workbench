@@ -18,14 +18,8 @@ class HistoryTest(TestCase):
         response = self.client.get("/history/projects.project/{}/".format(project.pk))
         # print(response, response.content.decode("utf-8"))
         self.assertContains(response, "Version 2")
-        self.assertContains(
-            response,
-            "Anfangswert von 'Kunde' war",
-        )
-        self.assertContains(
-            response,
-            "The Organization Ltd",
-        )
+        self.assertContains(response, "Anfangswert von 'Kunde' war")
+        self.assertContains(response, "The Organization Ltd")
 
     def test_contact_history(self):
         person = factories.PersonFactory.create()
@@ -35,10 +29,7 @@ class HistoryTest(TestCase):
         response = self.client.get("/history/contacts.person/{}/".format(person.pk))
         # print(response, response.content.decode("utf-8"))
         self.assertContains(response, "Version 2")
-        self.assertContains(
-            response,
-            "'Ist archiviert' änderte von 'nein' zu 'ja'.",
-        )
+        self.assertContains(response, "'Ist archiviert' änderte von 'nein' zu 'ja'.")
 
     def test_nothing(self):
         self.client.force_login(factories.UserFactory.create())
@@ -59,7 +50,7 @@ class HistoryTest(TestCase):
         self.assertContains(
             response,
             '<a href="/history/contacts.organization/{}/" data-toggle="ajaxmodal">'
-            'Gelöschte Organisation-Instanz</a>'.format(pk)
+            "Gelöschte Organisation-Instanz</a>".format(pk),
         )
 
         response = self.client.get("/history/contacts.organization/{}/".format(pk))

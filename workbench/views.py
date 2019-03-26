@@ -63,6 +63,6 @@ def history(request, label, pk):
             "instance": instance,
             "changes": changes(
                 model, fields, LoggedAction.objects.for_model_id(model, pk)
-            )
+            ),
         },
     )
