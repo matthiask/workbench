@@ -20,7 +20,11 @@ class HistoryTest(TestCase):
         self.assertContains(response, "Version 2")
         self.assertContains(
             response,
-            "Anfangswert von &#39;Kunde&#39; war &#39;The Organization Ltd&#39;.",
+            "Anfangswert von 'Kunde' war",
+        )
+        self.assertContains(
+            response,
+            "The Organization Ltd",
         )
 
     def test_contact_history(self):
@@ -33,7 +37,7 @@ class HistoryTest(TestCase):
         self.assertContains(response, "Version 2")
         self.assertContains(
             response,
-            "&#39;Ist archiviert&#39; änderte von &#39;nein&#39; zu &#39;ja&#39;.",
+            "'Ist archiviert' änderte von 'nein' zu 'ja'.",
         )
 
     def test_nothing(self):

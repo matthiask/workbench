@@ -3,7 +3,9 @@ from collections import namedtuple
 from functools import lru_cache
 
 from django.db import models
+from django.urls import reverse
 from django.utils import dateparse
+from django.utils.html import conditional_escape, format_html, mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
@@ -56,9 +58,15 @@ def formatter(field):
                 return _("<no value>")
 
             try:
-                return str(queryset.get(pk=value))
+                pretty = str(queryset.get(pk=value))
             except model.DoesNotExist:
-                return _("Deleted %s instance") % model._meta.verbose_name
+                pretty = _("Deleted %s instance") % model._meta.verbose_name
+
+            return format_html(
+                '<a href="{}" data-toggle="ajaxmodal">{}</a>',
+                reverse("history", args=(model._meta.label_lower, value)),
+                pretty,
+            )
 
         return _fn
 
@@ -90,11 +98,13 @@ def changes(model, fields, versions):
 
     values = versions[0].row_data
     version_changes = [
-        _("Initial value of '%(field)s' was '%(current)s'.")
-        % {
-            "field": capfirst(f.verbose_name),
-            "current": formatter(f)(values.get(f.attname)),
-        }
+        mark_safe(
+            _("Initial value of '%(field)s' was '%(current)s'.")
+            % {
+                "field": conditional_escape(capfirst(f.verbose_name)),
+                "current": conditional_escape(formatter(f)(values.get(f.attname))),
+            }
+        )
         for f in field_instances
         if not (f.many_to_many or f.one_to_many)  # Avoid those relation types.
     ]
@@ -103,12 +113,18 @@ def changes(model, fields, versions):
 
     for change in versions[1:]:
         version_changes = [
-            _("'%(field)s' changed from '%(previous)s' to '%(current)s'.")
-            % {
-                "field": capfirst(f.verbose_name),
-                "current": formatter(f)(change.changed_fields.get(f.attname)),
-                "previous": formatter(f)(change.row_data.get(f.attname)),
-            }
+            mark_safe(
+                _("'%(field)s' changed from '%(previous)s' to '%(current)s'.")
+                % {
+                    "field": conditional_escape(capfirst(f.verbose_name)),
+                    "current": conditional_escape(
+                        formatter(f)(change.changed_fields.get(f.attname))
+                    ),
+                    "previous": conditional_escape(
+                        formatter(f)(change.row_data.get(f.attname))
+                    ),
+                }
+            )
             for f in field_instances
             if change.changed_fields and f.attname in change.changed_fields
         ]

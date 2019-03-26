@@ -1,9 +1,12 @@
 {% extends "modal.html" %}
-{% load i18n %}
+{% load i18n workbench %}
 
 {% block size %}modal-xl{% endblock %}
 
-{% block title %}{% trans 'History' %}{% endblock %}
+{% block title %}
+  {# TODO data-toggle="ajaxmodal" for some #}
+  {% trans 'History' %}{% if instance %}: <a href="{{ instance.get_absolute_url }}">{{ instance|h }}</a>{% endif %}
+{% endblock %}
 
 {% block body %}
   {% for change in changes reversed %}

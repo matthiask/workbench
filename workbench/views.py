@@ -34,8 +34,9 @@ def search(request):
 
 
 HISTORY = {
-    "projects.service": {"exclude": {"position"}},
+    "accounts.user": {"exclude": {"last_login", "password"}},
     "invoices.service": {"exclude": {"position"}},
+    "projects.service": {"exclude": {"position"}},
 }
 
 
@@ -50,10 +51,16 @@ def history(request, label, pk):
         if hasattr(f, "attname") and not f.primary_key and f.name not in exclude
     ]
 
+    try:
+        instance = model._base_manager.get(pk=pk)
+    except (model.DoesNotExist, TypeError, ValueError):
+        instance = None
+
     return render(
         request,
         "history_modal.html",
         {
+            "instance": instance,
             "changes": changes(
                 model, fields, LoggedAction.objects.for_model_id(model, pk)
             )
