@@ -418,7 +418,7 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
             try:
                 contact = Person.objects.get(pk=request.GET.get("contact"))
             except (Person.DoesNotExist, TypeError, ValueError):
-                pass
+                self.pre_form = True
             else:
                 initial.update({"customer": contact.organization, "contact": contact})
 
@@ -426,7 +426,7 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
             try:
                 customer = Organization.objects.get(pk=request.GET.get("customer"))
             except (Organization.DoesNotExist, TypeError, ValueError):
-                pass
+                self.pre_form = True
             else:
                 initial.update({"customer": customer})
 
@@ -434,7 +434,7 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
             try:
                 invoice = Invoice.objects.get(pk=request.GET.get("copy_invoice"))
             except (Invoice.DoesNotExist, TypeError, ValueError):
-                pass
+                self.pre_form = True
             else:
                 initial.update(
                     {

@@ -246,17 +246,36 @@ class InvoicesTest(TestCase):
         self.assertRedirects(response, invoice.urls["detail"])
         self.assertAlmostEqual(invoice.subtotal, Decimal(150))
 
-    def test_create_person_invoice(self):
-        person = factories.PersonFactory.create(
-            organization=factories.OrganizationFactory.create()
-        )
-        self.client.force_login(person.primary_contact)
+    def test_pre_form(self):
+        self.client.force_login(factories.UserFactory.create())
 
         # pre_form does not have these fields
         response = self.client.get(Invoice().urls["create"])
         self.assertContains(response, 'method="GET"')
         self.assertNotContains(response, 'id="id_title"')
         self.assertNotContains(response, 'id="id_description"')
+
+        # Nonexistant entries
+        response = self.client.get(Invoice().urls["create"] + "?contact=0")
+        self.assertContains(response, 'method="GET"')
+        self.assertNotContains(response, 'id="id_title"')
+        self.assertNotContains(response, 'id="id_description"')
+
+        response = self.client.get(Invoice().urls["create"] + "?customer=0")
+        self.assertContains(response, 'method="GET"')
+        self.assertNotContains(response, 'id="id_title"')
+        self.assertNotContains(response, 'id="id_description"')
+
+        response = self.client.get(Invoice().urls["create"] + "?copy_invoice=0")
+        self.assertContains(response, 'method="GET"')
+        self.assertNotContains(response, 'id="id_title"')
+        self.assertNotContains(response, 'id="id_description"')
+
+    def test_create_person_invoice(self):
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        self.client.force_login(person.primary_contact)
 
         url = Invoice().urls["create"] + "?contact={}".format(person.pk)
         response = self.client.get(url)
