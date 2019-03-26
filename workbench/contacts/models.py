@@ -110,10 +110,10 @@ class Person(Model):
 
 class PersonDetail(Model):
     WEIGHTS = (
-        (re.compile(r"mobile", re.I), 30),
-        (re.compile(r"work", re.I), 20),
-        (re.compile(r"home", re.I), 10),
-        (re.compile(r"organization", re.I), -100),
+        (re.compile(r"mobil", re.I), 30),
+        (re.compile(r"(work|arbeit)", re.I), 20),
+        (re.compile(r"(home|hause)", re.I), 10),
+        (re.compile(r"(organization|firm)", re.I), -100),
     )
 
     type = models.CharField(_("type"), max_length=40, default=_("work"))

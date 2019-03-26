@@ -1,6 +1,7 @@
 from django.test import TestCase
 
 from workbench import factories
+from workbench.contacts.models import Group
 from workbench.tools.testing import messages
 
 
@@ -73,6 +74,9 @@ class ContactsTest(TestCase):
     def test_list(self):
         factories.PersonFactory.create()
         factories.PersonFactory.create()
+        Group.objects.create(title="A")
+        Group.objects.create(title="B")
+
         person = factories.PersonFactory.create(is_archived=True)
 
         self.client.force_login(person.primary_contact)
@@ -97,3 +101,41 @@ class ContactsTest(TestCase):
         self.assertContains(response, "e1@example.com")
         self.assertContains(response, "e2@example.com")
         self.assertContains(response, "e3@example.com")
+
+    def test_details(self):
+        person = factories.PersonFactory.create()
+        email = person.emailaddresses.create(email="test@example.com")
+        phone = person.phonenumbers.create(phone_number="012 345 678")
+        address = person.postaladdresses.create(postal_address_override="A\nB")
+
+        self.assertEqual(str(email), "test@example.com")
+        self.assertEqual(str(phone), "012 345 678")
+        self.assertEqual(str(address), "A\nB")
+
+        for detail in [email, phone, address]:
+            self.assertEqual(detail.get_absolute_url(), person.get_absolute_url())
+            self.assertEqual(detail.urls["detail"], person.urls["detail"])
+
+    def test_weights(self):
+        person = factories.PersonFactory.create()
+        email = person.emailaddresses.create(email="test@example.com")
+
+        email.type = "mobil"
+        email.save()
+        self.assertEqual(email.weight, 30)
+
+        email.type = "office"
+        email.save()
+        self.assertEqual(email.weight, 0)
+
+        email.type = "zuhause"
+        email.save()
+        self.assertEqual(email.weight, 10)
+
+        email.type = "Arbeit"
+        email.save()
+        self.assertEqual(email.weight, 20)
+
+        email.type = "Firmenadresse"
+        email.save()
+        self.assertEqual(email.weight, -100)
