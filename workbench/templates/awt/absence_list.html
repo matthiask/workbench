@@ -2,13 +2,22 @@
 
 {% load bootstrap4 i18n workbench %}
 
+{% block search-form-buttons %}
+  <a href="{{ view.model.urls.create }}" class="btn btn-secondary"
+    data-toggle="ajaxmodal">
+    {% include "svg/plus.svg" %}
+    {{ view.meta.verbose_name }}
+  </a>
+{% endblock %}
+
 {% block objects %}
 <div class="list-group list-group-flush">
 {% for object in object_list %}
 {% ifchanged object.starts_on.year object.starts_on.month %}
 <h5 class="mt-3 mb-3">{{ object.starts_on|date:'F Y' }}</h5>
 {% endifchanged %}
-<a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action px-0">
+<a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action px-0"
+  data-toggle="ajaxmodal">
   <span style="float:right" class="badge badge-{{ object.status_css }}">{{ object.pretty_status }}</span>
   <h5 class="mb-1">{{ object|h }}</h5>
   <div class="row">

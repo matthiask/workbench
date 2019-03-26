@@ -22,12 +22,16 @@ urlpatterns = [
     ),
     url(
         r"^create/$",
-        generic.CreateView.as_view(model=Absence, form_class=AbsenceForm),
+        generic.CreateView.as_view(
+            model=Absence, form_class=AbsenceForm, template_name="modalform.html"
+        ),
         name="awt_absence_create",
     ),
     url(
         r"^(?P<pk>\d+)/update/$",
-        generic.UpdateView.as_view(model=Absence, form_class=AbsenceForm),
+        generic.UpdateView.as_view(
+            model=Absence, form_class=AbsenceForm, template_name="modalform.html"
+        ),
         name="awt_absence_update",
     ),
     url(
