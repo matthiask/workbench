@@ -1,5 +1,5 @@
-from decimal import Decimal
 from datetime import date
+from decimal import Decimal
 
 from django.test import TestCase
 
@@ -54,9 +54,7 @@ class OffersTest(TestCase):
         self.assertEqual(pdf.status_code, 200)  # No crash
 
     def test_update_offer(self):
-        offer = factories.OfferFactory.create(
-            title="Test",
-        )
+        offer = factories.OfferFactory.create(title="Test")
         self.client.force_login(offer.owned_by)
         response = self.client.post(
             offer.urls["update"],

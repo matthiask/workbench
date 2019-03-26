@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
@@ -237,6 +237,24 @@ class InvoicesTest(TestCase):
         pdf = self.client.get(invoice.urls["pdf"])
         self.assertEqual(pdf.status_code, 200)  # No crash
 
+    def test_contact_check_with_project_invoice(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        url = project.urls["createinvoice"] + "?type=fixed"
+        response = self.client.post(
+            url,
+            {
+                "contact": factories.PersonFactory.create().pk,
+                "title": "Stuff",
+                "owned_by": project.owned_by_id,
+                "subtotal": 100,
+                "discount": 0,
+                "liable_to_vat": 1,
+                "postal_address": "Anything",
+            },
+        )
+        self.assertContains(response, "gehört nicht zu")
+
     def test_update_invoice(self):
         invoice = factories.InvoiceFactory.create(contact=None)
         self.client.force_login(invoice.owned_by)
@@ -327,3 +345,66 @@ class InvoicesTest(TestCase):
         with self.assertRaises(ValidationError) as cm:
             invoice.clean_fields()
         self.assertEqual(list(cm.exception), [("status", msg)])
+
+    def test_send_past_invoice(self):
+        invoice = factories.InvoiceFactory.create(
+            title="Test",
+            subtotal=20,
+            invoiced_on=date.today() - timedelta(days=1),
+            due_on=date.today(),
+        )
+        self.client.force_login(invoice.owned_by)
+
+        response = self.client.post(
+            invoice.urls["update"], invoice_to_dict(invoice, status=Invoice.SENT)
+        )
+        self.assertContains(response, "Rechnungsdatum liegt in der Vergangenheit, aber")
+
+    def test_unlock_sent_invoice(self):
+        invoice = factories.InvoiceFactory.create(
+            title="Test",
+            subtotal=20,
+            invoiced_on=date.today() - timedelta(days=1),
+            due_on=date.today(),
+            status=Invoice.SENT,
+        )
+        self.client.force_login(invoice.owned_by)
+
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(invoice, status=Invoice.IN_PREPARATION),
+        )
+        self.assertContains(
+            response,
+            "Status von &#39;Versendet&#39; zu &#39;In Vorbereitung&#39; ändern."
+            " Bist Du sicher?",
+        )
+
+    def test_change_paid_invoice(self):
+        invoice = factories.InvoiceFactory.create(
+            title="Test",
+            subtotal=20,
+            invoiced_on=date.today() - timedelta(days=1),
+            due_on=date.today(),
+            closed_on=date.today(),
+            status=Invoice.PAID,
+        )
+        self.client.force_login(invoice.owned_by)
+
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(invoice, status=Invoice.IN_PREPARATION),
+        )
+        self.assertContains(
+            response,
+            "Status von &#39;Bezahlt&#39; zu &#39;In Vorbereitung&#39; ändern."
+            " Bist Du sicher?",
+        )
+        self.assertContains(
+            response,
+            "Du versuchst, den Status auf &#39;In Vorbereitung&#39; zu setzen,"
+            " aber die Rechnung wurde schon am {} geschlossen."
+            " Bist Du sicher?".format(local_date_format(date.today())),
+        )
+
+        # print(response, response.content.decode("utf-8"))
