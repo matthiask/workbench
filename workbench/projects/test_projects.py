@@ -67,6 +67,23 @@ class ProjectsTest(TestCase):
         )
         self.assertEqual(list(project.services.all()), [service2, service1])
 
+        self.assertRedirects(
+            self.client.get(service1.urls["detail"]), project.urls["services"]
+        )
+        response = self.client.post(
+            service1.urls["update"],
+            {
+                "title": "Production service",
+                "effort_type": "Consulting",
+                "effort_rate": "200",
+                "effort_hours": 20,
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
+        service1.refresh_from_db()
+        self.assertAlmostEqual(service1.service_cost, 4000)
+
         response = self.client.post(
             service1.urls["delete"],
             {"merge_into": service2.pk},
@@ -156,3 +173,11 @@ class ProjectsTest(TestCase):
         valid("type=maintenance")
         valid("owned_by={}".format(user.id))
         valid("owned_by=0")  # only inactive
+
+    def test_project_detail_redirect(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        self.assertRedirects(
+            self.client.get(project.urls["detail"]), project.urls["overview"]
+        )
