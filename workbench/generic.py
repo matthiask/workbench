@@ -1,9 +1,9 @@
 import json
 
 from django.contrib import messages
-from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.decorators import classonlymethod
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
@@ -24,6 +24,11 @@ def default_service_types():
 
 
 class ToolsMixin(object):
+    @classonlymethod
+    def as_view(cls, **initkwargs):
+        assert cls.model or initkwargs.get("model")
+        return super().as_view(**initkwargs)
+
     def default_service_types(self):
         return default_service_types()
 
@@ -35,23 +40,15 @@ class ToolsMixin(object):
         """
         if self.template_name is not None:
             return [self.template_name]
-
-        if self.model is not None and self.template_name_suffix is not None:
-            return [
-                "%s/%s%s.html"
-                % (
-                    self.model._meta.app_label,
-                    self.model._meta.object_name.lower(),
-                    self.template_name_suffix,
-                ),
-                "generic/object%s.html" % self.template_name_suffix,
-            ]
-
-        msg = (
-            "'%s' must either define 'template_name' or 'model' and "
-            "'template_name_suffix', or override 'get_template_names()'"
-        )
-        raise ImproperlyConfigured(msg % self.__class__.__name__)
+        return [
+            "%s/%s%s.html"
+            % (
+                self.model._meta.app_label,
+                self.model._meta.object_name.lower(),
+                self.template_name_suffix,
+            ),
+            "generic/object%s.html" % self.template_name_suffix,
+        ]
 
     @property
     def meta(self):
