@@ -52,7 +52,7 @@
 
     <div class="card mb-3">
       <div class="card-header"><h3 class="my-0">
-        <a href="{% url 'logbook_loggedhours_list' %}">{% trans 'recent hours' %}</a>
+        <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{% trans 'recent hours' %}</a>
       </h3></div>
 
       {% if user.recent_hours %}
