@@ -4,9 +4,11 @@ from decimal import Decimal
 from django.test import TestCase
 
 from workbench import factories
-from workbench.awt.models import Year
+from workbench.awt.models import Absence, Year
 from workbench.awt.utils import monthly_days
 from workbench.reporting.annual_working_time import annual_working_time
+from workbench.tools.formats import local_date_format
+from workbench.tools.testing import messages
 
 
 class AWTTest(TestCase):
@@ -124,3 +126,31 @@ class AWTTest(TestCase):
         factories.YearFactory.create()
         response = self.client.get("/admin/awt/year/")
         self.assertContains(response, '<td class="field-days">360,00</td>')
+
+    def test_absence_editing(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        response = self.client.post(
+            "/absences/create/",
+            {
+                "user": user.pk,
+                "starts_on": local_date_format(date.today()),
+                "days": 3,
+                "description": "Sick",
+                "is_vacation": "",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
+        absence = Absence.objects.get()
+
+        response = self.client.get(absence.urls["update"])
+        self.assertEqual(response.status_code, 200)
+
+        Absence.objects.update(starts_on=date(2018, 1, 1))
+        response = self.client.get(absence.urls["update"])
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            messages(response),
+            ["Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."],
+        )
