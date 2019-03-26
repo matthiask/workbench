@@ -7,6 +7,7 @@ from workbench import factories
 from workbench.offers.models import Offer
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
+from workbench.tools.testing import messages
 
 
 class OffersTest(TestCase):
@@ -122,3 +123,16 @@ class OffersTest(TestCase):
         valid("s=all")
         valid("s=10")
         valid("s=20")
+
+    def test_create_message(self):
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.get("/offers/create/")
+        self.assertRedirects(response, "/projects/")
+        self.assertEqual(
+            messages(response),
+            [
+                "Offerten können nur aus Projekten erstellt werden. Gehe"
+                " zuerst zum Projekt, füge Leistungen hinzu, und dann kannst"
+                " Du die eigentliche Offerte erstellen."
+            ],
+        )

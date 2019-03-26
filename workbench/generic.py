@@ -257,7 +257,5 @@ class MessageView(vanilla.View):
     level = messages.INFO
 
     def get(self, request, *args, **kwargs):
-        if self.message:
-            messages.add_message(request, self.level, self.message)
-
+        messages.add_message(request, self.level, self.message)
         return redirect(self.redirect_to)

@@ -159,6 +159,9 @@ class InvoicesTest(TestCase):
         self.assertEqual(cost.invoice_service.invoice, invoice)
         self.assertEqual(cost.invoice_service.project_service, service)
 
+        response = self.client.get(invoice.urls["delete"])
+        self.assertContains(response, WarningsForm.ignore_warnings_id)
+
         response = self.client.post(invoice.urls["delete"])
         self.assertContains(
             response, "Logbuch-Einträge sind mit dieser Rechnung verbunden."

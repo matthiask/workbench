@@ -91,6 +91,15 @@ class LogbookTest(TestCase):
         entry = LoggedHours.objects.get()
         self.assertEqual(entry.service.title, "service title")
 
+        response = self.client.get(
+            entry.urls["detail"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertContains(
+            response,
+            '<a href="/projects/{}/services/">service title - service description'
+            "</a>".format(project.id),
+        )
+
     def test_create_and_update_logged_cost(self):
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
@@ -249,6 +258,14 @@ class LogbookTest(TestCase):
         cost = factories.LoggedCostFactory.create()
         self.client.force_login(cost.created_by)
         response = self.client.get(cost.urls["detail"])
+        self.assertRedirects(
+            response, cost.urls["list"] + "?project=" + str(cost.project_id)
+        )
+        response = self.client.get(cost.urls["update"])
+        self.assertRedirects(
+            response, cost.urls["list"] + "?project=" + str(cost.project_id)
+        )
+        response = self.client.get(cost.urls["delete"])
         self.assertRedirects(
             response, cost.urls["list"] + "?project=" + str(cost.project_id)
         )
