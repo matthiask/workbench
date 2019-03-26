@@ -156,6 +156,17 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
             )
         return super().dispatch(request, *args, **kwargs)
 
+    def get(self, request, *args, **kwargs):
+        form = self.get_form(instance=self.object)
+        context = self.get_context_data(form=form)
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form(data=request.POST, files=request.FILES, instance=self.object)
+        if form.is_valid():
+            return self.form_valid(form)
+        return self.form_invalid(form)
+
     def form_valid(self, form):
         self.object = form.save()
         messages.success(
@@ -184,6 +195,10 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
                 else redirect(self.object)
             )
         return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data()
+        return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
         kwargs.setdefault("title", _("Delete %s") % (self.model._meta.verbose_name,))
