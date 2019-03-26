@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.tools.formats import local_date_format
-from workbench.tools.models import Model, MoneyField, SearchQuerySet
+from workbench.tools.models import Model, MoneyField
 from workbench.tools.urls import model_urls
 
 
@@ -22,11 +22,6 @@ class Stage(Model):
 
     def __str__(self):
         return self.title
-
-
-class DealQuerySet(SearchQuerySet):
-    def open(self):
-        return self.filter(closed_on__isnull=True)
 
 
 @model_urls
@@ -72,8 +67,6 @@ class Deal(Model):
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     closed_on = models.DateField(_("closed on"), blank=True, null=True)
-
-    objects = DealQuerySet.as_manager()
 
     class Meta:
         ordering = ["-created_at"]
