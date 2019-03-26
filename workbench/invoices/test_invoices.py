@@ -443,3 +443,40 @@ class InvoicesTest(TestCase):
         )
 
         # print(response, response.content.decode("utf-8"))
+
+    def test_down_payment(self):
+        project = factories.ProjectFactory.create()
+        down_payment = factories.InvoiceFactory.create(
+            project=project, type=Invoice.DOWN_PAYMENT, subtotal=100
+        )
+
+        self.client.force_login(project.owned_by)
+        url = project.urls["createinvoice"] + "?type=fixed"
+        response  = self.client.get(url)
+        # print(response, response.content.decode("utf-8"))
+        self.assertContains(response, down_payment.code)
+        self.assertContains(response, down_payment.pretty_total_excl)
+        self.assertContains(response, down_payment.pretty_status())
+
+        response = self.client.post(
+            url,
+            {
+                "contact": project.contact_id,
+                "title": project.title,
+                "description": "bla",
+                "owned_by": project.owned_by_id,
+                "discount": 0,
+                "liable_to_vat": 1,
+                "postal_address": "Anything",
+                "subtotal": 2500,
+                "third_party_costs": 0,
+                "apply_down_payment": [down_payment.pk],
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        invoice = project.invoices.latest("pk")
+        self.assertRedirects(response, invoice.urls["detail"])
+
+        self.assertAlmostEqual(invoice.subtotal, 2500)
+        self.assertAlmostEqual(invoice.total_excl_tax, 2400)
+        self.assertEqual(self.client.get(invoice.urls["pdf"]).status_code, 200)

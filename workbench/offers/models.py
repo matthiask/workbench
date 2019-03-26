@@ -6,7 +6,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.projects.models import Project
-from workbench.tools.formats import currency, local_date_format
+from workbench.tools.formats import local_date_format
 from workbench.tools.models import ModelWithTotal, SearchQuerySet, Z
 from workbench.tools.urls import model_urls
 
@@ -130,9 +130,3 @@ class Offer(ModelWithTotal):
     @property
     def total_title(self):
         return _("total CHF incl. tax") if self.liable_to_vat else _("total CHF")
-
-    def short_total_excl(self):
-        parts = [gettext("%s excl. tax") % currency(self.total_excl_tax)]
-        if self.discount:
-            parts.append(" - %s %s" % (currency(self.discount), gettext("discount")))
-        return "".join(parts)

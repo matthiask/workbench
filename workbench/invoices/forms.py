@@ -146,7 +146,7 @@ class InvoiceForm(PostalAddressSelectionForm):
                         format_html(
                             "{}<br/>{}, {}",
                             invoice.__html__(),
-                            _("%s excl. tax") % currency(invoice.total_excl_tax),
+                            invoice.pretty_total_excl,
                             invoice.pretty_status(),
                         ),
                     )
@@ -163,9 +163,6 @@ class InvoiceForm(PostalAddressSelectionForm):
             self.add_postal_address_selection(person=self.instance.contact)
 
     def _is_status_unexpected(self, to_status):
-        if not to_status:
-            return False
-
         from_status = self.instance._orig_status
 
         if from_status == to_status:

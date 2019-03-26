@@ -9,6 +9,7 @@ from django.db.models.deletion import Collector
 from django.template.loader import render_to_string
 from django.utils.translation import gettext, gettext_lazy as _
 
+from workbench.tools.formats import currency
 from workbench.tools.search import search
 
 
@@ -139,3 +140,10 @@ class ModelWithTotal(Model):
     @property
     def total_excl_tax(self):
         return self.subtotal - self.discount
+
+    @property
+    def pretty_total_excl(self):
+        parts = [gettext("%s excl. tax") % currency(self.total_excl_tax)]
+        if self.discount:
+            parts.append(" - %s %s" % (currency(self.discount), gettext("discount")))
+        return "".join(parts)

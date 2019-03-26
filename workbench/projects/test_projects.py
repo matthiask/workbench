@@ -15,7 +15,7 @@ class ProjectsTest(TestCase):
         response = self.client.post(
             "/projects/create/",
             {
-                "customer": person.organization.pk,
+                # "customer": person.organization.pk,  automatic
                 "contact": person.pk,
                 "title": "Test project",
                 "owned_by": user.pk,
@@ -23,6 +23,8 @@ class ProjectsTest(TestCase):
             },
         )
         project = Project.objects.get()
+        self.assertEqual(project.customer, person.organization)
+        self.assertEqual(project.contact, person)
         self.assertRedirects(response, project.urls["services"])
 
         response = self.client.post(
