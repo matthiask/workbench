@@ -4,6 +4,7 @@ from django.test import TestCase
 
 from workbench import factories
 from workbench.projects.models import Project
+from workbench.tools.forms import WarningsForm
 
 
 class ProjectsTest(TestCase):
@@ -225,6 +226,48 @@ class ProjectsTest(TestCase):
         self.assertRedirects(response, project.urls["services"])
         project.refresh_from_db()
         self.assertIsNone(project.closed_on)
+
+    def test_customer_update(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        invoice = factories.InvoiceFactory.create(
+            project=project, customer=project.customer, contact=project.contact
+        )
+        new_org = factories.OrganizationFactory.create()
+        new_person = factories.PersonFactory.create(organization=new_org)
+
+        response = self.client.post(
+            project.urls["update"],
+            {
+                "customer": new_org.id,
+                "contact": new_person.pk,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "type": project.type,
+            },
+        )
+        self.assertContains(
+            response,
+            "Dieses Projekt hat schon Rechnungen."
+            " Der Rechnungskunde wird auch angepasst.",
+        )
+        response = self.client.post(
+            project.urls["update"],
+            {
+                "customer": new_org.id,
+                "contact": new_person.pk,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "type": project.type,
+                WarningsForm.ignore_warnings_id: "on",
+            },
+        )
+        self.assertRedirects(response, project.urls["services"])
+
+        project.refresh_from_db()
+        invoice.refresh_from_db()
+        self.assertEqual(project.customer, new_org)
+        self.assertEqual(invoice.customer, new_org)
 
     def test_copy(self):
         project = factories.ProjectFactory.create()

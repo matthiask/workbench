@@ -100,6 +100,19 @@ class ProjectForm(ModelForm):
                 initial=bool(self.instance.closed_on),
             )
 
+    def clean(self):
+        data = super().clean()
+
+        if set(self.changed_data) & {"customer"} and self.instance.invoices.exists():
+            self.add_warning(
+                _(
+                    "This project already has invoices. The invoices'"
+                    " customer record will be changed too."
+                )
+            )
+
+        return data
+
     def save(self):
         instance = super().save(commit=False)
         if not instance.closed_on and self.cleaned_data.get("is_closed"):
@@ -107,6 +120,8 @@ class ProjectForm(ModelForm):
         if instance.closed_on and not self.cleaned_data.get("is_closed"):
             instance.closed_on = None
         instance.save()
+        if "customer" in self.changed_data:
+            instance.invoices.update(customer=instance.customer)
         return instance
 
 
