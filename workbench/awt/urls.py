@@ -32,8 +32,8 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/delete/$",
-        generic.MessageView.as_view(
-            redirect_to="awt_absence_list", message="Not implemented yet."
+        generic.DeleteView.as_view(
+            model=Absence, template_name="modal_confirm_delete.html"
         ),
         name="awt_absence_delete",
     ),
