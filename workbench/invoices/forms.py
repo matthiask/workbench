@@ -217,7 +217,7 @@ class InvoiceForm(PostalAddressSelectionForm):
 
         if self.instance.closed_on and data["status"] < Invoice.PAID:
             if self.should_ignore_warnings():
-                self.instance.closed_on = None
+                data["closed_on"] = None
             else:
                 self.add_warning(
                     _(

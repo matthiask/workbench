@@ -445,6 +445,18 @@ class InvoicesTest(TestCase):
             " Bist Du sicher?".format(local_date_format(date.today())),
         )
 
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(
+                invoice,
+                status=Invoice.IN_PREPARATION,
+                **{WarningsForm.ignore_warnings_id: "on"}
+            ),
+        )
+        self.assertRedirects(response, invoice.urls["detail"])
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.IN_PREPARATION)
+        self.assertIsNone(invoice.closed_on)
         # print(response, response.content.decode("utf-8"))
 
     def test_down_payment(self):
