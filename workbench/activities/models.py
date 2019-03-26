@@ -17,9 +17,6 @@ class ActivityQuerySet(SearchQuerySet):
             "contact__organization", "project", "deal", "owned_by"
         )
 
-    def completed(self):
-        return self.filter(completed_at__isnull=False)
-
 
 @model_urls
 class Activity(Model):

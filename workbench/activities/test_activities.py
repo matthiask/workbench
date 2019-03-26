@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 from django.test import TestCase
+from django.utils import timezone
 
 from workbench import factories
 from workbench.tools.testing import messages
@@ -59,3 +60,58 @@ class ActivitiesTest(TestCase):
             activity.urls["list"] + "?owned_by={}".format(activity.owned_by_id + 1)
         )
         self.assertEqual(messages(response), ["Suchformular war ungültig."])
+
+    def test_activity_creation(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(factories.UserFactory.create())
+
+        url = "/activities/create/?project={}".format(project.pk)
+        response = self.client.post(
+            url,
+            {
+                "title": "Call back",
+                "notes": "",
+                "owned_by": project.owned_by_id,
+                "due_on": "",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
+        activity = factories.Activity.objects.get()
+        self.assertIsNone(activity.contact)
+        self.assertIsNone(activity.deal)
+        self.assertEqual(activity.project, project)
+        self.assertEqual(activity.owned_by, project.owned_by)
+
+        url = "/activities/create/?deal=234"  # Deal does not exist.
+        response = self.client.post(
+            url,
+            {
+                "title": "Stuff",
+                "notes": "",
+                "owned_by": project.owned_by_id,
+                "due_on": "",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        activity = factories.Activity.objects.latest("pk")
+        self.assertIsNone(activity.deal)
+        self.assertEqual(activity.title, "Stuff")
+
+    def test_activity_uncomplete(self):
+        activity = factories.ActivityFactory.create(completed_at=timezone.now())
+        self.client.force_login(activity.owned_by)
+        response = self.client.post(
+            activity.urls["update"],
+            {
+                "title": "Stuff",
+                "notes": "",
+                "owned_by": activity.owned_by_id,
+                "due_on": "",
+                "is_completed": "",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
+        activity.refresh_from_db()
+        self.assertIsNone(activity.completed_at)
