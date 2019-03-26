@@ -24,6 +24,3 @@ class WorkbenchXLSXDocument(XLSXDocument):
 
     def logged_costs(self, queryset):
         self.table_from_queryset(queryset)
-
-    def invoices(self, queryset):
-        self.table_from_queryset(queryset)
