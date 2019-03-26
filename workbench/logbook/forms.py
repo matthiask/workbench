@@ -187,7 +187,7 @@ class LoggedHoursForm(ModelForm):
     def clean(self):
         data = super().clean()
         errors = {}
-        if not data.get("service") and not data.get("service_title"):
+        if not data["service"] and not data["service_title"]:
             errors["service"] = _(
                 "This field is required unless you create a new service."
             )
@@ -196,9 +196,7 @@ class LoggedHoursForm(ModelForm):
         if self.instance.invoice_service:
             self.add_warning(_("This entry is already part of an invoice."))
 
-        if all(
-            (not self.instance.pk, data.get("rendered_by"), data.get("rendered_on"))
-        ):
+        if all((not self.instance.pk, data["rendered_by"], data["rendered_on"])):
             today = date.today()
             if not data["rendered_by"].enforce_same_week_logging:
                 # Fine
@@ -219,7 +217,7 @@ class LoggedHoursForm(ModelForm):
         else:
             fields = ["rendered_by", "rendered_on", "service", "hours", "description"]
             for field in fields:
-                if data.get(field) != getattr(latest, field):
+                if data[field] != getattr(latest, field):
                     break
             else:
                 self.add_warning(_("This seems to be a duplicate. Is it?"))

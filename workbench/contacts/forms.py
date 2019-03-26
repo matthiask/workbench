@@ -103,7 +103,7 @@ class PersonForm(ModelForm):
 
     def clean(self):
         data = super().clean()
-        if not data.get("salutation"):
+        if not data["salutation"]:
             self.add_warning(_("No salutation set. This will make newsletters ugly."))
         if self.instance.pk and "organization" in self.changed_data:
             from workbench.deals.models import Deal

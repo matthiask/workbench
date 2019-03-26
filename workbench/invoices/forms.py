@@ -107,7 +107,7 @@ class InvoiceForm(PostalAddressSelectionForm):
         self.fields["type"].disabled = True
 
         if self.instance.project:
-            del self.fields["customer"]
+            self.fields["customer"].disabled = True
 
         if self.instance.type == self.instance.DOWN_PAYMENT:
             self.fields["subtotal"].label = _("Down payment")
@@ -177,7 +177,7 @@ class InvoiceForm(PostalAddressSelectionForm):
         data = super().clean()
         s_dict = dict(Invoice.STATUS_CHOICES)
 
-        if self.instance.project and data.get("contact"):
+        if self.instance.project and data["contact"]:
             if data["contact"].organization != self.instance.project.customer:
                 raise forms.ValidationError(
                     {
@@ -190,7 +190,7 @@ class InvoiceForm(PostalAddressSelectionForm):
                 )
 
         if self.instance._orig_status < self.instance.SENT:
-            invoiced_on = data.get("invoiced_on")
+            invoiced_on = data["invoiced_on"]
             if invoiced_on and invoiced_on < date.today():
                 self.add_warning(
                     _(
@@ -217,7 +217,7 @@ class InvoiceForm(PostalAddressSelectionForm):
                     }
                 )
 
-        if self._is_status_unexpected(data.get("status")):
+        if self._is_status_unexpected(data["status"]):
             self.add_warning(
                 _("Moving status from '%(from)s' to '%(to)s'. Are you sure?")
                 % {
@@ -226,10 +226,10 @@ class InvoiceForm(PostalAddressSelectionForm):
                 }
             )
 
-        if data.get("status", 0) >= Invoice.PAID and not data.get("closed_on"):
+        if data["status"] >= Invoice.PAID and not data["closed_on"]:
             data["closed_on"] = date.today()
 
-        if self.instance.closed_on and data.get("status", 99) < Invoice.PAID:
+        if self.instance.closed_on and data["status"] < Invoice.PAID:
             if self.should_ignore_warnings():
                 self.instance.closed_on = None
             else:
@@ -291,8 +291,8 @@ class CreateProjectInvoiceForm(InvoiceForm):
 
         if not self.instance.pk:
             # Hide those fields when creating invoices
-            del self.fields["status"]
-            del self.fields["closed_on"]
+            self.fields["status"].disabled = True
+            self.fields["closed_on"].disabled = True
 
             invoice_type = self.request.GET.get("type")
             self.fields["type"].initial = self.instance.type = invoice_type
