@@ -136,9 +136,9 @@ class ServiceForm(ModelForm):
         if not self.project:
             self.project = kwargs["instance"].project
 
-        offer = kwargs["request"].GET.get("offer")
-        if offer:
-            kwargs.setdefault("initial", {}).setdefault("offer", offer)
+        kwargs.setdefault("initial", {}).setdefault(
+            "offer", kwargs["request"].GET.get("offer")
+        )
 
         super().__init__(*args, **kwargs)
 
