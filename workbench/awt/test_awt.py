@@ -118,3 +118,9 @@ class AWTTest(TestCase):
 
         # 306 * 8 - 1000 - 21.25 * 8 = 1278
         self.assertAlmostEqual(awt["totals"]["running_sum"], Decimal("-1278"))
+
+    def test_admin_list(self):
+        self.client.force_login(factories.UserFactory.create(is_admin=True))
+        factories.YearFactory.create()
+        response = self.client.get("/admin/awt/year/")
+        self.assertContains(response, '<td class="field-days">360,00</td>')
