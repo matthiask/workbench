@@ -298,6 +298,11 @@ class CreateProjectInvoiceForm(InvoiceForm):
             if invoice_type == "services":
                 self.add_services_field()
 
+            if self.project.invoices.filter(status=Invoice.IN_PREPARATION).exists():
+                self.add_warning(
+                    _("This project already has an invoice in preparation.")
+                )
+
     def add_services_field(self):
         source = self.request.GET.get("source")
         if source == "logbook":

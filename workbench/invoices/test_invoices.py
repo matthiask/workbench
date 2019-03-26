@@ -461,6 +461,11 @@ class InvoicesTest(TestCase):
         self.assertContains(response, down_payment.pretty_total_excl)
         self.assertContains(response, down_payment.pretty_status)
 
+        response = self.client.get(url)
+        self.assertContains(
+            response, "Dieses Projekt hat schon eine Rechnung in Vorbereitung."
+        )
+
         response = self.client.post(
             url,
             {
@@ -474,6 +479,7 @@ class InvoicesTest(TestCase):
                 "subtotal": 2500,
                 "third_party_costs": 0,
                 "apply_down_payment": [down_payment.pk],
+                WarningsForm.ignore_warnings_id: "on",
             },
         )
         self.assertEqual(response.status_code, 302)
