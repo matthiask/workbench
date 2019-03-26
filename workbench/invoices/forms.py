@@ -147,7 +147,7 @@ class InvoiceForm(PostalAddressSelectionForm):
                             "{}<br/>{}, {}",
                             invoice.__html__(),
                             invoice.pretty_total_excl,
-                            invoice.pretty_status(),
+                            invoice.pretty_status,
                         ),
                     )
                     for invoice in eligible_down_payment_invoices

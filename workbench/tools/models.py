@@ -58,13 +58,11 @@ class Model(models.Model):
         else:
             return True
 
-    def css(self):
-        return ""
-
     @property
     def code(self):
         return "%05d" % self.pk if self.pk else ""
 
+    @property
     def pretty_status(self):
         return self.get_status_display() if hasattr(self, "get_status_display") else ""
 

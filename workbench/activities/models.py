@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -69,6 +71,7 @@ class Activity(Model):
     def context(self):
         return [c for c in [self.contact, self.deal, self.project] if c]
 
+    @property
     def pretty_status(self):
         if self.completed_at:
             return _("completed on %(completed_on)s") % {
@@ -82,3 +85,14 @@ class Activity(Model):
             )
 
         return _("open")
+
+    @property
+    def status_css(self):
+        if self.completed_at:
+            return "default"
+        if self.due_on:
+            if self.due_on < date.today():
+                return "danger"
+            elif self.due_on < date.today() + timedelta(days=3):
+                return "warning"
+        return ""

@@ -103,6 +103,7 @@ class Project(Model):
 
     save.alters_data = True
 
+    @property
     def status_css(self):
         if self.closed_on:
             return "secondary"
@@ -114,6 +115,7 @@ class Project(Model):
             self.INTERNAL: "warning",
         }[self.type]
 
+    @property
     def pretty_status(self):
         parts = [str(self.get_type_display())]
         if self.closed_on:

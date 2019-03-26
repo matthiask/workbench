@@ -208,6 +208,7 @@ class Invoice(ModelWithTotal):
             }
         raise_if_errors(errors, exclude)
 
+    @property
     def pretty_status(self):
         d = {
             "invoiced_on": (
@@ -240,6 +241,7 @@ class Invoice(ModelWithTotal):
         else:
             return self.get_status_display()
 
+    @property
     def status_css(self):
         if self.status == self.SENT:
             if self.due_on and date.today() > self.due_on:

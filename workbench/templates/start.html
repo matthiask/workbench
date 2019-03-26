@@ -80,7 +80,7 @@
         <div class="card-body">
           <table class="table table-condensed">
             {% for activity in user.important_activities %}
-            <tr class="{{ activity.css }}">
+            <tr class="bg-{{ activity.status_css }}">
                 <th><a href="{{ activity.get_absolute_url }}" data-toggle="ajaxmodal">
                     {{ activity }}
                 </a></th>

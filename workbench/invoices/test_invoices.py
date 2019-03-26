@@ -452,11 +452,11 @@ class InvoicesTest(TestCase):
 
         self.client.force_login(project.owned_by)
         url = project.urls["createinvoice"] + "?type=fixed"
-        response  = self.client.get(url)
+        response = self.client.get(url)
         # print(response, response.content.decode("utf-8"))
         self.assertContains(response, down_payment.code)
         self.assertContains(response, down_payment.pretty_total_excl)
-        self.assertContains(response, down_payment.pretty_status())
+        self.assertContains(response, down_payment.pretty_status)
 
         response = self.client.post(
             url,

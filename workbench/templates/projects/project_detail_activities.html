@@ -7,7 +7,7 @@
 {% block project-content %}
 <table class="table">
   {% for activity in project.activities.all %}
-    <tr class="{{ activity.css }}">
+    <tr class="bg-{{ activity.status_css }}">
       <th>
         <a href="{{ activity.get_absolute_url }}" data-toggle="ajaxmodal">
           {{ activity }}

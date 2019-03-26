@@ -92,6 +92,7 @@ class Deal(Model):
 
     save.alters_data = True
 
+    @property
     def pretty_status(self):
         d = {
             "created_at": local_date_format(self.created_at, "d.m.Y"),

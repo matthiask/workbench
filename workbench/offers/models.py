@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.projects.models import Project
@@ -102,6 +102,7 @@ class Offer(ModelWithTotal):
                     {"status": _("Offered on date missing for selected state.")}
                 )
 
+    @property
     def pretty_status(self):
         if self.status == self.IN_PREPARATION:
             return _("In preparation since %(created_at)s") % {
@@ -118,6 +119,7 @@ class Offer(ModelWithTotal):
             }
         return self.get_status_display()
 
+    @property
     def status_css(self):
         return {
             self.IN_PREPARATION: "info",

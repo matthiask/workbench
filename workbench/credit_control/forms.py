@@ -144,8 +144,8 @@ class AssignCreditEntriesForm(forms.Form):
                                 else "{}",
                                 invoice,
                             ),
-                            invoice.status_css(),
-                            invoice.pretty_status(),
+                            invoice.status_css,
+                            invoice.pretty_status,
                             currency(invoice.total),
                         ),
                     )
