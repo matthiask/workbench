@@ -1,6 +1,7 @@
 from datetime import date
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from workbench import factories
@@ -305,3 +306,24 @@ class InvoicesTest(TestCase):
         valid("owned_by={}".format(user.id))
         valid("owned_by=0")  # only inactive
         valid("dunning=1")
+
+    def test_model_validation(self):
+        invoice = Invoice(
+            title="Test",
+            customer=factories.OrganizationFactory.create(),
+            owned_by=factories.UserFactory.create(),
+            type=Invoice.FIXED,
+            _code=0,
+            status=Invoice.SENT,
+        )
+        msg = [
+            "Rechnungs- und/oder Fälligkeitsdatum fehlen für den augewählten Status."
+        ]
+
+        with self.assertRaises(ValidationError) as cm:
+            invoice.clean_fields(exclude=["status"])
+        self.assertEqual(list(cm.exception), msg)
+
+        with self.assertRaises(ValidationError) as cm:
+            invoice.clean_fields()
+        self.assertEqual(list(cm.exception), [("status", msg)])
