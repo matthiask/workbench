@@ -174,3 +174,29 @@ class AWTTest(TestCase):
         self.assertEqual(str(employment), "01.01.2018 - 30.06.2018")
 
         self.assertEqual(list(year.active_users()), [])
+
+    def test_report_view(self):
+        factories.YearFactory.create()
+        user = factories.UserFactory.create()
+        inactive = factories.UserFactory.create()
+        Employment.objects.create(user=user, percentage=50, vacation_weeks=5)
+
+        self.client.force_login(factories.UserFactory.create())
+
+        url = "/report/annual-working-time/"
+        response = self.client.get(url)
+        self.assertNotContains(response, str(user))
+        self.assertNotContains(response, str(inactive))
+
+        response = self.client.get(url + "?user=active")
+        self.assertContains(response, str(user))
+        self.assertNotContains(response, str(inactive))
+
+        response = self.client.get(url + "?user=" + str(inactive.pk))
+        self.assertContains(response, str(inactive))
+
+        response = self.client.get(url + "?year=2018")
+        self.assertRedirects(response, "/")
+        self.assertEqual(
+            messages(response), ["Jahresarbeitszeit für 2018 nicht gefunden."]
+        )
