@@ -162,7 +162,9 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
-        form = self.get_form(data=request.POST, files=request.FILES, instance=self.object)
+        form = self.get_form(
+            data=request.POST, files=request.FILES, instance=self.object
+        )
         if form.is_valid():
             return self.form_valid(form)
         return self.form_invalid(form)
@@ -200,12 +202,6 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
         context = self.get_context_data()
         return self.render_to_response(context)
 
-    def get_context_data(self, **kwargs):
-        kwargs.setdefault("title", _("Delete %s") % (self.model._meta.verbose_name,))
-        if self.form_class and self.request.method == "GET":
-            kwargs["form"] = self.form_class(instance=self.object, request=self.request)
-        return super().get_context_data(**kwargs)
-
     def post(self, request, *args, **kwargs):
         if self.form_class:
             form = self.form_class(request.POST, instance=self.object, request=request)
@@ -226,6 +222,12 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
         if request.is_ajax():
             return HttpResponse("Thanks", status=204)  # No content
         return redirect(self.get_success_url())
+
+    def get_context_data(self, **kwargs):
+        kwargs.setdefault("title", _("Delete %s") % (self.model._meta.verbose_name,))
+        if self.form_class and self.request.method == "GET":
+            kwargs["form"] = self.form_class(instance=self.object, request=self.request)
+        return super().get_context_data(**kwargs)
 
     def get_success_url(self):
         return self.model().urls["list"]
