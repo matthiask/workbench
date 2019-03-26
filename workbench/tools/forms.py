@@ -57,8 +57,10 @@ class Picker(forms.TextInput):
         except (self.model.DoesNotExist, TypeError, ValueError):
             pass
 
-        opts = self.model._meta
+        if final_attrs.get("disabled"):
+            return super().render(name, pretty or value, attrs, renderer=renderer)
 
+        opts = self.model._meta
         return mark_safe(
             _PICKER_TEMPLATE
             % {
