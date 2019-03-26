@@ -1,6 +1,7 @@
 from django.test import TestCase
 
 from workbench import factories
+from workbench.tools.testing import messages
 
 
 def person_to_dict(person, **kwargs):
@@ -30,9 +31,16 @@ def person_to_dict(person, **kwargs):
 
 class ContactsTest(TestCase):
     def test_update(self):
-        person = factories.PersonFactory.create(salutation="Dear")
+        person = factories.PersonFactory.create()
         self.client.force_login(person.primary_contact)
         response = self.client.post(person.urls["update"], person_to_dict(person))
+        self.assertContains(
+            response, "Keine Begrüssung gesetzt. Das macht Newsletter hässlich."
+        )
+
+        response = self.client.post(
+            person.urls["update"], person_to_dict(person, salutation="Dear")
+        )
         self.assertRedirects(response, person.urls["detail"])
 
     def test_warning(self):
@@ -50,6 +58,16 @@ class ContactsTest(TestCase):
             response,
             "Diese Person ist der Kontakt der folgenden zugehörigen Objekte:"
             " 1 Projekt.",
+        )
+
+        factories.Project.objects.all().delete()
+        response = self.client.post(
+            person.urls["update"], person_to_dict(person, organization="")
+        )
+        self.assertRedirects(response, person.urls["detail"])
+        self.assertEqual(
+            messages(response),
+            ["Person 'Vorname Nachname' wurde erfolgreich geändert."],
         )
 
     def test_list(self):
