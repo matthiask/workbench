@@ -489,3 +489,16 @@ class InvoicesTest(TestCase):
         self.assertAlmostEqual(invoice.subtotal, 2500)
         self.assertAlmostEqual(invoice.total_excl_tax, 2400)
         self.assertEqual(self.client.get(invoice.urls["pdf"]).status_code, 200)
+
+    def test_change_contact(self):
+        invoice = factories.InvoiceFactory.create(title="Test", subtotal=20)
+        self.client.force_login(invoice.owned_by)
+
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(invoice, contact=factories.PersonFactory.create().pk),
+        )
+        self.assertContains(
+            response,
+            "Der Kontakt Vorname Nachname gehört nicht zu The Organization Ltd.",
+        )

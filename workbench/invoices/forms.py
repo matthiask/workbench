@@ -175,18 +175,6 @@ class InvoiceForm(PostalAddressSelectionForm):
         data = super().clean()
         s_dict = dict(Invoice.STATUS_CHOICES)
 
-        if self.instance.project and data["contact"]:
-            if data["contact"].organization != self.instance.project.customer:
-                raise forms.ValidationError(
-                    {
-                        "contact": _(
-                            "Selected contact does not belong to project's"
-                            " organization, %(organization)s."
-                        )
-                        % {"organization": self.instance.project.customer}
-                    }
-                )
-
         if self.instance._orig_status < self.instance.SENT:
             invoiced_on = data["invoiced_on"]
             if invoiced_on and invoiced_on < date.today():
