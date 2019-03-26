@@ -55,6 +55,8 @@ def field_value_pairs(object, fields=""):
                 value = local_date_format(value, "d.m.Y H:i")
             elif isinstance(value, date):
                 value = local_date_format(value, "d.m.Y")
+            elif isinstance(value, bool):
+                value = _("yes") if value else _("no")
 
             pairs[field.name] = (field.verbose_name, value)
 
