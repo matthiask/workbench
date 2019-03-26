@@ -13,21 +13,18 @@
   {% ff_errors form %}
   {% ff_fields form fields='title,description' %}
 
-  <div data-part data-autofill="{{ view.default_service_types }}">
-    <div class="row mt-3">
-      <div class="col-lg-8 offset-lg-4">
+  <div class="row">
+    <div class="col-md-6">
+      <div data-part data-autofill="{{ view.default_service_types }}">
         <h5>{% trans 'effort' %}</h5>
+        {% ff_fields form fields='service_type,effort_type,effort_rate,effort_hours' %}
       </div>
     </div>
-    {% ff_fields form fields='service_type,effort_type,effort_rate,effort_hours' %}
-  </div>
-
-  <div data-part>
-    <div class="row mt-3">
-      <div class="col-lg-8 offset-lg-4">
+    <div class="col-md-6">
+      <div data-part>
         <h5>{% trans 'cost' %}</h5>
+        {% ff_fields form fields='cost,third_party_costs' %}
       </div>
     </div>
-    {% ff_fields form fields='cost,third_party_costs' %}
   </div>
 {% endblock %}
