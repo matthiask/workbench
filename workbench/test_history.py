@@ -45,3 +45,25 @@ class HistoryTest(TestCase):
         response = self.client.get("/history/contacts.person/0/")
         # print(response, response.content.decode("utf-8"))
         self.assertContains(response, "Keine Geschichte gefunden")
+
+    def test_deleted(self):
+        organization = factories.OrganizationFactory.create()
+        person = factories.PersonFactory.create(organization=organization)
+        person.organization = None
+        person.save()
+        pk = organization.pk
+        organization.delete()
+
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.get("/history/contacts.person/{}/".format(person.pk))
+        self.assertContains(
+            response,
+            '<a href="/history/contacts.organization/{}/" data-toggle="ajaxmodal">'
+            'Gelöschte Organisation-Instanz</a>'.format(pk)
+        )
+
+        response = self.client.get("/history/contacts.organization/{}/".format(pk))
+        self.assertContains(
+            response, "Finaler Wert von 'Name' war 'The Organization Ltd'."
+        )
+        # print(response, response.content.decode("utf-8"))

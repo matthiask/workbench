@@ -29,7 +29,7 @@ class LoggedAction(models.Model):
     class Meta:
         managed = False
         db_table = "audit_logged_actions"
-        ordering = ("created_at",)
+        ordering = ["event_id"]
         verbose_name = _("logged action")
         verbose_name_plural = _("logged actions")
 

@@ -112,22 +112,37 @@ def changes(model, fields, versions):
     changes.append(Change(changes=version_changes, version=versions[0], number=1))
 
     for change in versions[1:]:
-        version_changes = [
-            mark_safe(
-                _("'%(field)s' changed from '%(previous)s' to '%(current)s'.")
-                % {
-                    "field": conditional_escape(capfirst(f.verbose_name)),
-                    "current": conditional_escape(
-                        formatter(f)(change.changed_fields.get(f.attname))
-                    ),
-                    "previous": conditional_escape(
-                        formatter(f)(change.row_data.get(f.attname))
-                    ),
-                }
-            )
-            for f in field_instances
-            if change.changed_fields and f.attname in change.changed_fields
-        ]
+        if change.action == "D":
+            values = change.row_data
+            version_changes = [
+                mark_safe(
+                    _("Final value of '%(field)s' was '%(current)s'.")
+                    % {
+                        "field": conditional_escape(capfirst(f.verbose_name)),
+                        "current": conditional_escape(formatter(f)(values.get(f.attname))),
+                    }
+                )
+                for f in field_instances
+                if not (f.many_to_many or f.one_to_many)  # Avoid those relation types.
+            ]
+
+        else:
+            version_changes = [
+                mark_safe(
+                    _("'%(field)s' changed from '%(previous)s' to '%(current)s'.")
+                    % {
+                        "field": conditional_escape(capfirst(f.verbose_name)),
+                        "current": conditional_escape(
+                            formatter(f)(change.changed_fields.get(f.attname))
+                        ),
+                        "previous": conditional_escape(
+                            formatter(f)(change.row_data.get(f.attname))
+                        ),
+                    }
+                )
+                for f in field_instances
+                if change.changed_fields and f.attname in change.changed_fields
+            ]
 
         if version_changes:
             changes.append(

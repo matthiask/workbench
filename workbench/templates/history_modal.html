@@ -11,7 +11,7 @@
 {% block body %}
   {% for change in changes reversed %}
     <h4>
-      Version {{ change.number }} / {{ change.version.pretty_user_name }} / {{ change.version.created_at }}
+      Version {{ change.number }} / {{ change.version.get_action_display }} / {{ change.version.pretty_user_name }} / {{ change.version.created_at }}
     </h4>
     <ul>
       {% for pretty in change.changes %}

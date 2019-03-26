@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "verbose_name_plural": "logged actions",
-                "ordering": ("created_at",),
+                "ordering": ["event_id"],
                 "verbose_name": "logged action",
                 "managed": False,
                 "db_table": "audit_logged_actions",
