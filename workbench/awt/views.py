@@ -37,5 +37,7 @@ class ReportView(generic.DetailView):
         if not users:
             users = [self.request.user]
         return super().get_context_data(
-            statistics=annual_working_time(self.object, users=users), **kwargs
+            statistics=annual_working_time(self.object, users=users),
+            years=Year.objects.all(),
+            **kwargs
         )

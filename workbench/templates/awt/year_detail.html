@@ -5,6 +5,16 @@
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12">
+
+  <ul class="nav nav-tabs mb-3">
+    {% for year in years %}
+    <li class="nav-item">
+      <a class="nav-link {% if year == object %}active{% endif %}"
+        href="{{ year.get_absolute_url }}">{{ year }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+
   <h1>{{ object|h }} {% history_link object %}</h1>
 
   <table class="table table-sm table-responsive-lg">
