@@ -72,15 +72,14 @@ class InvoicesTest(TestCase):
         self.assertRedirects(response, invoice.urls["detail"])
         self.assertAlmostEqual(invoice.subtotal, Decimal("2500"))
 
-    def create_service_invoice(self, params):
+    def test_create_service_invoice_from_offer(self):
         service = factories.ServiceFactory.create(cost=100)
-        url = service.project.urls["createinvoice"] + params
-
+        url = service.project.urls["createinvoice"] + "?type=services&source=offer"
         self.client.force_login(service.project.owned_by)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        return self.client.post(
+        response = self.client.post(
             url,
             {
                 "contact": service.project.contact_id,
@@ -93,8 +92,6 @@ class InvoicesTest(TestCase):
             },
         )
 
-    def test_create_service_invoice_from_offer(self):
-        response = self.create_service_invoice("?type=services&source=offer")
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls["detail"])
         self.assertEqual(invoice.subtotal, 100)
@@ -120,13 +117,63 @@ class InvoicesTest(TestCase):
         self.assertEqual(Invoice.objects.count(), 0)
 
     def test_create_service_invoice_from_logbook(self):
-        response = self.create_service_invoice("?type=services&source=logbook")
+        project = factories.ProjectFactory.create()
+        service1 = factories.ServiceFactory.create(
+            project=project, title="cost-only", cost=100
+        )
+        service2 = factories.ServiceFactory.create(project=project, title="no-rate")
+        service3 = factories.ServiceFactory.create(
+            project=project,
+            title="with-rate",
+            effort_type="Consulting",
+            effort_rate=200,
+        )
+
+        factories.LoggedCostFactory.create(project=project, cost=10)
+        factories.LoggedHoursFactory.create(service=service1, hours=1)
+        factories.LoggedHoursFactory.create(service=service2, hours=2)
+        factories.LoggedHoursFactory.create(service=service3, hours=3)
+
+        url = project.urls["createinvoice"] + "?type=services&source=logbook"
+        self.client.force_login(project.owned_by)
+        response = self.client.get(url)
+        # print(response, response.content.decode("utf-8"))
+
+        self.assertContains(response, "<strong>cost-only</strong><br>100.00")
+        self.assertContains(response, "1.0h erfasst aber kein Stundensatz definiert.")
+        self.assertContains(response, "<strong>no-rate</strong><br>0.00")
+        self.assertContains(response, "2.0h erfasst aber kein Stundensatz definiert.")
+        self.assertContains(response, "<strong>with-rate</strong><br>600.00")
+        self.assertContains(
+            response,
+            "<strong>Nicht mit einer bestimmten Leistung verbunden.</strong><br>0.00",
+        )
+        self.assertContains(
+            response,
+            "10.00 erfasst aber nicht mit einer bestimmten Leistung verbunden.",
+        )
+
+        response = self.client.post(
+            url,
+            {
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "discount": "0",
+                "liable_to_vat": "1",
+                "postal_address": "Anything",
+                "selected_services": [service1.pk, service2.pk, service3.pk],
+            },
+        )
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls["detail"])
-        self.assertEqual(invoice.subtotal, 0)
+        self.assertEqual(invoice.subtotal, 600)
 
         self.assertRedirects(
-            self.client.post(invoice.urls["delete"]), invoice.urls["list"]
+            self.client.post(
+                invoice.urls["delete"], {WarningsForm.ignore_warnings_id: "on"}
+            ),
+            invoice.urls["list"],
         )
         self.assertEqual(Invoice.objects.count(), 0)
 
