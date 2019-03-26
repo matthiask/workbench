@@ -236,3 +236,19 @@ class LogbookTest(TestCase):
         valid("service=0")
         valid("service=" + str(service.pk))
         valid("xlsx=1")
+
+    def test_non_ajax_redirect_hours(self):
+        hours = factories.LoggedHoursFactory.create()
+        self.client.force_login(hours.rendered_by)
+        response = self.client.get(hours.urls["detail"])
+        self.assertRedirects(
+            response, hours.urls["list"] + "?project=" + str(hours.service.project_id)
+        )
+
+    def test_non_ajax_redirect_cost(self):
+        cost = factories.LoggedCostFactory.create()
+        self.client.force_login(cost.created_by)
+        response = self.client.get(cost.urls["detail"])
+        self.assertRedirects(
+            response, cost.urls["list"] + "?project=" + str(cost.project_id)
+        )
