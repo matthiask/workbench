@@ -100,3 +100,14 @@ class CreditEntriesTest(TestCase):
         invoice.refresh_from_db()
         self.assertEqual(invoice.status, invoice.PAID)
         self.assertEqual(invoice.closed_on, entry.value_date)
+
+    def test_list(self):
+        self.client.force_login(factories.UserFactory.create())
+
+        def valid(p):
+            self.assertEqual(self.client.get("/credit-control/?" + p).status_code, 200)
+
+        valid("")
+        valid("s=pending")
+        valid("s=processed")
+        valid("xlsx=1")

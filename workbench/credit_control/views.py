@@ -38,12 +38,6 @@ class AssignCreditEntriesView(generic.CreateView):
         context = self.get_context_data(form=form)
         return self.render_to_response(context)
 
-    def post(self, request, *args, **kwargs):
-        form = self.get_form(data=request.POST, files=request.FILES)
-        if form.is_valid():
-            return self.form_valid(form)
-        return self.form_invalid(form)
-
     def form_valid(self, form):
         form.save()
         messages.success(
