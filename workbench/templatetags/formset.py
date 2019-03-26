@@ -34,11 +34,10 @@ class DynamicFormsetNode(template.Node):
 
         result = [str(formset.management_form)]
 
-        context.update({"form_id": "%s-empty" % slug, "form": formset.empty_form})
-        result.append('<script type="text/template" id="%s-empty">' % slug)
-        result.append(self.nodelist.render(context))
-        result.append("</script>")
-        context.pop()
+        with context.push(form_id="%s-empty" % slug, form=formset.empty_form):
+            result.append('<script type="text/template" id="%s-empty">' % slug)
+            result.append(self.nodelist.render(context))
+            result.append("</script>")
 
         for idx, form in enumerate(formset.forms):
             with context.push(form_id="%s-%s" % (slug, idx), form=form):
