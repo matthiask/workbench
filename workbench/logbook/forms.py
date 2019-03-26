@@ -3,7 +3,6 @@ from decimal import ROUND_UP, Decimal
 
 from django import forms
 from django.utils import timezone
-from django.utils.html import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
