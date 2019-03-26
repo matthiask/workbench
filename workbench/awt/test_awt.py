@@ -156,13 +156,21 @@ class AWTTest(TestCase):
         )
 
     def test_employment_model(self):
-        employment = Employment(
-            user=factories.UserFactory.create(),
-            percentage=100,
-            vacation_weeks=5,
-            date_from=date(2018, 1, 1),
+        factories.UserFactory.create()  # Additional instance for active_users()
+
+        year = factories.YearFactory.create()
+        user = factories.UserFactory.create()
+
+        employment = Employment.objects.create(
+            user=user, percentage=100, vacation_weeks=5, date_from=date(2018, 1, 1)
         )
+        self.assertEqual(employment.date_until, date.max)
         self.assertEqual(str(employment), "Seit 01.01.2018")
 
+        self.assertEqual(list(year.active_users()), [user])
+
         employment.date_until = date(2018, 6, 30)
+        employment.save()
         self.assertEqual(str(employment), "01.01.2018 - 30.06.2018")
+
+        self.assertEqual(list(year.active_users()), [])

@@ -64,6 +64,14 @@ class Year(Model):
     def months(self):
         return [getattr(self, field) for field in self.MONTHS]
 
+    def active_users(self):
+        return User.objects.filter(
+            id__in=Employment.objects.filter(
+                date_from__lte=date(self.year, 12, 31),
+                date_until__gte=date(self.year, 1, 1),
+            ).values("user")
+        )
+
 
 class Employment(Model):
     user = models.ForeignKey(

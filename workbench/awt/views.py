@@ -6,7 +6,7 @@ from django.utils.translation import gettext as _
 
 from workbench import generic
 from workbench.accounts.models import User
-from workbench.awt.models import Employment, Year
+from workbench.awt.models import Year
 from workbench.reporting.annual_working_time import annual_working_time
 
 
@@ -26,12 +26,7 @@ class ReportView(generic.DetailView):
         param = self.request.GET.get("user")
         users = None
         if param == "active":
-            users = User.objects.filter(
-                id__in=Employment.objects.filter(
-                    date_from__lte=date(self.object.year, 12, 31),
-                    date_until__gte=date(self.object.year, 1, 1),
-                ).values("user")
-            )
+            users = self.object.active_users()
         elif param:
             users = User.objects.filter(id=param)
         if not users:
