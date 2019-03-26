@@ -48,6 +48,18 @@ class LogbookTest(TestCase):
         )
         self.assertContains(response, "Tut mir leid, zu früh.")
 
+        response = send(service="")
+        self.assertContains(
+            response,
+            "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung.",
+        )
+
+        project.closed_on = date.today()
+        project.save()
+
+        response = send()
+        self.assertContains(response, "Dieses Projekt wurde schon geschlossen.")
+
     def test_no_same_week_logging(self):
         service = factories.ServiceFactory.create()
         project = service.project
@@ -269,3 +281,19 @@ class LogbookTest(TestCase):
         self.assertRedirects(
             response, cost.urls["list"] + "?project=" + str(cost.project_id)
         )
+
+    def test_autofill_field(self):
+        hours = factories.LoggedHoursFactory.create(
+            created_at=timezone.now() - timedelta(hours=2)
+        )
+        self.client.force_login(hours.rendered_by)
+
+        response = self.client.get(
+            hours.service.project.urls["createhours"],
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(
+            response,
+            '<option value="{}" selected>Any service</option>'.format(hours.service_id),
+        )
+        self.assertContains(response, 'value="2.0"')  # hours

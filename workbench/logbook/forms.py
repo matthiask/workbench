@@ -143,7 +143,7 @@ class LoggedHoursForm(ModelForm):
             timesince = latest and int(
                 (timezone.now() - latest.created_at).total_seconds()
             )
-            if timesince and timesince < 3 * 3600:
+            if timesince and timesince < 4 * 3600:
                 initial.setdefault(
                     "hours",
                     (timesince / Decimal(3600)).quantize(
@@ -250,12 +250,9 @@ class LoggedCostForm(ModelForm):
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project", None)
         if self.project:
-            initial = kwargs.setdefault("initial", {})
-            request = kwargs["request"]
-
-            if request.GET.get("service"):
-                initial["service"] = request.GET.get("service")
-
+            kwargs.setdefault("initial", {}).setdefault(
+                "service", kwargs["request"].GET.get("service")
+            )
         else:
             self.project = kwargs["instance"].project
 
