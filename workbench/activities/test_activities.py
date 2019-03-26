@@ -117,3 +117,9 @@ class ActivitiesTest(TestCase):
         self.assertEqual(response.status_code, 202)
         activity.refresh_from_db()
         self.assertIsNone(activity.completed_at)
+
+    def test_non_ajax_redirect(self):
+        activity = factories.ActivityFactory.create()
+        self.client.force_login(activity.owned_by)
+        response = self.client.get(activity.urls["detail"])
+        self.assertRedirects(response, activity.urls["list"])

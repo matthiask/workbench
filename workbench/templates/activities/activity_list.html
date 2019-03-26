@@ -24,7 +24,7 @@
   </thead>
   <tbody>
     {% for object in object_list %}
-      <tr>
+      <tr class="bg-{{ object.status_css }}">
         <th><a href="{{ object.get_absolute_url }}" data-toggle="ajaxmodal">
             {{ object }}
         </a></th>
