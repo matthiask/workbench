@@ -346,6 +346,41 @@ class InvoicesTest(TestCase):
             invoice.clean_fields()
         self.assertEqual(list(cm.exception), [("status", msg)])
 
+        with self.assertRaises(ValidationError) as cm:
+            Invoice(
+                title="Test",
+                customer=factories.OrganizationFactory.create(),
+                owned_by=factories.UserFactory.create(),
+                type=Invoice.FIXED,
+                _code=0,
+                status=Invoice.SENT,
+                invoiced_on=date.today(),
+                due_on=date.today() - timedelta(days=1),
+            ).full_clean()
+        self.assertEqual(
+            list(cm.exception),
+            [("due_on", ["Fälligkeitsdatum muss später als Rechnungsdatum sein."])],
+        )
+
+        with self.assertRaises(ValidationError) as cm:
+            Invoice(
+                title="Test",
+                customer=factories.OrganizationFactory.create(),
+                owned_by=factories.UserFactory.create(),
+                type=Invoice.DOWN_PAYMENT,
+                _code=0,
+                status=Invoice.IN_PREPARATION,
+            ).full_clean()
+        self.assertEqual(
+            list(cm.exception),
+            [
+                (
+                    "__all__",
+                    ["Rechnungen vom Typ Anzahlung benötigen zwingend ein Projekt."],
+                )
+            ],
+        )
+
     def test_send_past_invoice(self):
         invoice = factories.InvoiceFactory.create(
             title="Test",
