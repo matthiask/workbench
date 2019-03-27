@@ -73,9 +73,10 @@ class ContactsTest(TestCase):
 
     def test_lists(self):
         factories.PersonFactory.create()
-        factories.PersonFactory.create()
-        Group.objects.create(title="A")
-        Group.objects.create(title="B")
+        person = factories.PersonFactory.create()
+        group1 = Group.objects.create(title="A")
+        group2 = Group.objects.create(title="B")
+        person.groups.set([group1])
 
         person = factories.PersonFactory.create(is_archived=True)
 
@@ -87,6 +88,30 @@ class ContactsTest(TestCase):
         response = self.client.get(person.urls["picker"])
         self.assertNotContains(response, "Vorname Nachname")  # No organization
         # print(response, response.content.decode("utf-8"))
+
+        response = self.client.get("/contacts/people/?g=" + str(group1.pk))
+        self.assertContains(response, person.full_name)
+
+        response = self.client.get("/contacts/people/?g=" + str(group2.pk))
+        self.assertNotContains(response, person.full_name)
+
+    def test_organization_list(self):
+        group1 = Group.objects.create(title="A")
+        group2 = Group.objects.create(title="B")
+        organization = factories.OrganizationFactory.create()
+        organization.groups.set([group1])
+        person = factories.PersonFactory.create(organization=organization)
+
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.get("/contacts/organizations/")
+        self.assertContains(response, str(organization))
+        self.assertContains(response, person.full_name)
+
+        response = self.client.get("/contacts/organizations/?g=" + str(group1.pk))
+        self.assertContains(response, str(organization))
+
+        response = self.client.get("/contacts/organizations/?g=" + str(group2.pk))
+        self.assertNotContains(response, str(organization))
 
     def test_formset(self):
         person = factories.PersonFactory.create()
