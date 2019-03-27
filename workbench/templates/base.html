@@ -102,7 +102,6 @@
 
   <div class="container-fluid" role="main">
 
-    {% bootstrap_messages %}
     {% block uplink %}
       {% if view.model.urls.list and view.model.urls.list != request.path %}
         <a href="{{ view.model.urls.list }}" class="btn btn-secondary btn-sm uplink">
@@ -110,6 +109,7 @@
         </a>
       {% endif %}
     {% endblock %}
+    {% bootstrap_messages %}
     {% block content %}{% endblock %}
 
   </div> <!-- /container -->
