@@ -141,7 +141,8 @@ class Project(Model):
         # Avoid circular imports
         from workbench.logbook.models import LoggedHours, LoggedCost
 
-        offers = {}
+        offers = {offer: [] for offer in self.offers.all()}
+
         logged_hours_per_service = {
             row["service"]: row["hours__sum"]
             for row in LoggedHours.objects.order_by()
@@ -160,10 +161,7 @@ class Project(Model):
         for service in self.services.select_related("offer__project"):
             service.logged_hours = logged_hours_per_service.get(service.id, 0)
             service.logged_cost = logged_cost_per_service.get(service.id, 0)
-
-            if service.offer not in offers:
-                offers[service.offer] = []
-            offers[service.offer].append(service)
+            offers.setdefault(service.offer, []).append(service)
 
         if None in logged_cost_per_service:
             s = Service(
