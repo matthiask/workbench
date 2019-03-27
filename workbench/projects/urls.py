@@ -33,29 +33,8 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/$",
-        lambda request, pk: redirect("overview/"),
+        generic.DetailView.as_view(model=Project),
         name="projects_project_detail",
-    ),
-    url(
-        r"^(?P<pk>\d+)/overview/$",
-        generic.DetailView.as_view(
-            model=Project, template_name_suffix="_detail_overview"
-        ),
-        name="projects_project_overview",
-    ),
-    url(
-        r"^(?P<pk>\d+)/services/$",
-        generic.DetailView.as_view(
-            model=Project, template_name_suffix="_detail_services"
-        ),
-        name="projects_project_services",
-    ),
-    url(
-        r"^(?P<pk>\d+)/activities/$",
-        generic.DetailView.as_view(
-            model=Project, template_name_suffix="_detail_activities"
-        ),
-        name="projects_project_activities",
     ),
     url(
         r"^create/$",
@@ -112,9 +91,7 @@ urlpatterns = [
     ),
     url(
         r"^service/(?P<pk>\d+)/$",
-        lambda request, pk: redirect(
-            get_object_or_404(Service, pk=pk).project.urls["services"]
-        ),
+        lambda request, pk: redirect(get_object_or_404(Service, pk=pk)),
         name="projects_service_detail",
     ),
     url(

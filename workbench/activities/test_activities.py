@@ -85,6 +85,16 @@ class ActivitiesTest(TestCase):
         self.assertEqual(activity.project, project)
         self.assertEqual(activity.owned_by, project.owned_by)
 
+        response = self.client.get("/activities/")
+        self.assertContains(
+            response, "Aktivität &#39;Call back&#39; wurde erfolgreich erstellt."
+        )
+
+        response = self.client.get("/activities/?project=" + str(project.pk + 1))
+        self.assertNotContains(response, activity.title)
+        response = self.client.get("/activities/?project=" + str(project.pk))
+        self.assertContains(response, activity.title)
+
         url = "/activities/create/?deal=234"  # Deal does not exist.
         response = self.client.post(
             url,

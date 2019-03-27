@@ -29,4 +29,4 @@ class MoveServiceView(generic.DetailView):
         for index, pk in enumerate(pks):
             Service.objects.filter(pk=pk).update(position=(index + 1) * 10)
 
-        return redirect(self.object.project.urls["services"])
+        return redirect(self.object)

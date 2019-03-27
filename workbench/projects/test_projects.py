@@ -28,7 +28,7 @@ class ProjectsTest(TestCase):
         project = Project.objects.get()
         self.assertEqual(project.customer, person.organization)
         self.assertEqual(project.contact, person)
-        self.assertRedirects(response, project.urls["services"])
+        self.assertRedirects(response, project.urls["detail"])
 
         response = self.client.post(
             project.urls["createservice"],
@@ -68,12 +68,12 @@ class ProjectsTest(TestCase):
         service1.loggedcosts.create(created_by=user, cost=10, project=project)
 
         self.assertRedirects(
-            self.client.get(service1.urls["move"] + "?down"), project.urls["services"]
+            self.client.get(service1.urls["move"] + "?down"), project.urls["detail"]
         )
         self.assertEqual(list(project.services.all()), [service2, service1])
 
         self.assertRedirects(
-            self.client.get(service1.urls["detail"]), project.urls["services"]
+            self.client.get(service1.urls["detail"]), project.urls["detail"]
         )
         response = self.client.post(
             service1.urls["update"],
@@ -101,12 +101,16 @@ class ProjectsTest(TestCase):
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
-        response = self.client.get(project.urls["createservice"])
+        response = self.client.get(
+            project.urls["createservice"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
         self.assertContains(response, 'data-autofill="{}"')
 
         factories.service_types()
 
-        response = self.client.get(project.urls["createservice"])
+        response = self.client.get(
+            project.urls["createservice"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
         self.assertContains(response, "&quot;effort_type&quot;: &quot;consulting&quot;")
         self.assertContains(response, "&quot;effort_rate&quot;: 250")
 
@@ -120,7 +124,7 @@ class ProjectsTest(TestCase):
         factories.LoggedCostFactory.create(project=project)
 
         response = self.client.get(project.urls["delete"])
-        self.assertRedirects(response, project.urls["services"])
+        self.assertRedirects(response, project.urls["detail"])
 
     def test_create_validation(self):
         user = factories.UserFactory.create()
@@ -179,14 +183,6 @@ class ProjectsTest(TestCase):
         valid("owned_by={}".format(user.id))
         valid("owned_by=0")  # only inactive
 
-    def test_project_detail_redirect(self):
-        project = factories.ProjectFactory.create()
-        self.client.force_login(project.owned_by)
-
-        self.assertRedirects(
-            self.client.get(project.urls["detail"]), project.urls["overview"]
-        )
-
     def test_update(self):
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
@@ -208,7 +204,7 @@ class ProjectsTest(TestCase):
                 "is_closed": "on",
             },
         )
-        self.assertRedirects(response, project.urls["overview"])
+        self.assertRedirects(response, project.urls["detail"])
         project.refresh_from_db()
         self.assertEqual(project.closed_on, date.today())
 
@@ -223,7 +219,7 @@ class ProjectsTest(TestCase):
                 "is_closed": "",
             },
         )
-        self.assertRedirects(response, project.urls["services"])
+        self.assertRedirects(response, project.urls["detail"])
         project.refresh_from_db()
         self.assertIsNone(project.closed_on)
 
@@ -262,7 +258,7 @@ class ProjectsTest(TestCase):
                 WarningsForm.ignore_warnings_id: "on",
             },
         )
-        self.assertRedirects(response, project.urls["services"])
+        self.assertRedirects(response, project.urls["detail"])
 
         project.refresh_from_db()
         invoice.refresh_from_db()

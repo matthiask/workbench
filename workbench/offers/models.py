@@ -66,7 +66,7 @@ class Offer(ModelWithTotal):
         return self.title
 
     def get_absolute_url(self):
-        return self.project.urls["services"]
+        return self.project.get_absolute_url()
 
     def save(self, *args, **kwargs):
         new = False

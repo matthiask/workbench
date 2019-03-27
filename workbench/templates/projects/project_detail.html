@@ -8,16 +8,144 @@
 <div class="row">
   <div class="col-md-12">
 
-    <h1>{{ project|h }} {% history_link project %}</h1>
-    <ul class="nav nav-tabs">
-      {% mark_current request.path %}
-      <li class="nav-item"><a class="nav-link" href="{{ project.urls.overview }}">{% trans 'overview' %}</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{ project.urls.services }}">{% trans 'services' %}</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{ project.urls.activities }}">{% trans 'activities' %}</a></li>
-      {% endmark_current %}
-    </ul>
+    <h1>
+      {{ project|h }} {% history_link project %}
+    </h1>
+    <p>
+      {% if project.contact %}{% link_or_none project.contact %}
+      {% else %}{% link_or_none project.customer %}
+      {% endif %}
+      <br>
+      <span class="badge badge-{{ object.status_css }}">{{ object.pretty_status }}</span>
+    </p>
 
-    {% block project-content %}{% endblock %}
+
+    <div class="card my-3">
+      <div class="card-body">
+        <h5>{% trans 'overview' %}</h5>
+
+        <p>{{ object.description|linebreaksbr|default:_('No description.') }}</p>
+
+        <small class="row justify-content-between">
+          <span class="col-md-8">
+            <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}" class="inline" target="_blank">
+              {{ project.overview.logged|hours }}
+            </a> / {{ project.overview.effort|hours }}
+            {% bar project.overview.logged project.overview.effort %}
+          </span>
+          <span class="col-md-4"></span>
+        </small>
+      </div>
+    </div>
+
+    {% for offer, services in project.grouped_services %}
+    <div class="card my-3">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        {% if offer %}
+          <div>
+            <h5 class="d-inline my-0">{{ offer|h }}</h5>
+            {% history_link offer %}
+            &nbsp;
+            <span class="badge badge-{{ offer.status_css }}">{{ offer.pretty_status }}</span>
+          </div>
+        {% else %}
+          <h5 class="d-inline my-0">{% trans 'Not offered yet' %}</h5>
+        {% endif %}
+
+        <div>
+          {% if offer %}
+            <a href="{{ offer.urls.pdf }}" class="btn btn-secondary btn-sm" target="_blank">PDF</a>
+            <a href="{{ offer.urls.update }}" class="btn btn-secondary btn-sm">{% trans 'Update' %}</a>
+            <a href="{{ offer.urls.delete }}" class="btn btn-outline-danger btn-sm">{% trans 'Delete' %}</a>
+          {% else %}
+            <a href="{{ project.urls.createoffer }}" class="btn btn-secondary btn-sm">
+              {% include 'svg/plus.svg' %} {% trans 'offer' %}</a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="list-group list-group-flush">
+        {% for service in services %}
+        <div class="list-group-item">
+          {% if service.pk %}
+            <div class="float-right">
+              <a class="btn btn-secondary btn-sm" href="{{ service.urls.move }}?up" title="{% trans 'Move up' %}">
+                {% include 'svg/triangle-up.svg' %}</a>
+              <a class="btn btn-secondary btn-sm" href="{{ service.urls.move }}?down" title="{% trans 'Move down' %}">
+                {% include 'svg/triangle-down.svg' %}</a>
+              <a class="btn btn-secondary btn-sm" href="{{ service.urls.update }}" data-toggle="ajaxmodal" title="{% trans 'Update' %}">
+                {% include 'svg/pencil.svg' %}</a>
+              <a class="btn btn-secondary btn-sm" href="{{ service.urls.delete }}" data-toggle="ajaxmodal" title="{% trans 'Delete' %}">
+                {% include 'svg/trashcan.svg' %}</a>
+            </div>
+          {% endif %}
+
+          <h5 class="mb-1">{{ service.title }} {% history_link service %}</h5>
+          <p>
+            {{ service.description|linebreaksbr|default:'&nbsp;' }}
+          </p>
+          <small class="row justify-content-between">
+            <span class="col-md-4">
+              {% if service.pk %}
+                <a href="{% url 'logbook_loggedhours_list' %}?service={{ service.pk }}" target="_blank">
+                  {{ service.logged_hours|hours }} / {{ service.service_hours|hours }}
+                  {{ service.effort_type }}
+                </a>
+                {% bar service.logged_hours service.service_hours %}
+              {% endif %}
+            </span>
+            <span class="col-md-4">
+              {% if service.pk %}
+                <a href="{% url 'logbook_loggedcost_list' %}?service={{ service.pk }}" target="_blank">
+                  {{ service.logged_cost|stringformat:'.2f' }} / {{ service.cost|default:0|stringformat:'.2f' }}
+                </a>
+                {% bar service.logged_cost service.service_cost %}
+              {% else %}
+                <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;service=0" target="_blank">
+                  {{ service.logged_cost|stringformat:'.2f' }} / {{ service.cost|default:0|stringformat:'.2f' }}
+                </a>
+              {% endif %}
+            </span>
+            <span class="col-md-4 text-right">
+              {% if service.pk %}
+                <a href="{{ project.urls.createhours }}?service={{ service.pk }}"
+                  data-toggle="ajaxmodal">
+                  {% include "svg/plus.svg" %} {% trans 'hours' %}</a>
+              {% endif %}
+              <a href="{{ project.urls.createcost }}?service={{ service.pk|default:'' }}"
+                data-toggle="ajaxmodal">
+                {% include "svg/plus.svg" %} {% trans 'cost' %}</a>
+            </span>
+          </small>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+
+    {% if object.project_invoices %}
+    <div class="card my-3">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="d-inline my-0">{% trans 'invoices' %}</h5>
+      </div>
+      <div class="list-group list-group-flush">
+        {% for invoice in object.project_invoices %}
+          <a href="{{ invoice.get_absolute_url }}" class="list-group-item list-group-item-action">
+            <span style="float:right" class="badge badge-{{ invoice.status_css }}">{{ invoice.pretty_status }}</span>
+            <h5 class="mb-1">{{ invoice|h }}</h5>
+            <div class="row">
+              <div class="col-md-7">{{ invoice.contact|default:invoice.customer }}</div>
+              <div class="col-md-2">{{ invoice.get_type_display }}</div>
+              <div class="col-md-3 text-md-right">
+                {{ invoice.total_excl_tax|currency }} exkl. /
+                {{ invoice.total|currency }}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
 
     <span class="dropdown">
       <button class="btn btn-secondary dropdown-toggle" type="button"
@@ -47,6 +175,9 @@
       {% trans 'Update' %}</a>
     <a href="{{ object.urls.create }}?copy_project={{ object.pk }}" class="btn btn-secondary">
       {% trans 'Copy' %}
+    </a>
+    <a href="{% url 'activities_activity_list' %}?project={{ object.pk }}" class="btn btn-secondary">
+      {% trans 'activities' %}
     </a>
     <a href="{{ project.urls.delete }}" class="btn btn-outline-danger float-right">
       {% trans 'Delete' %}</a>

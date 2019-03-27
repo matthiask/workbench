@@ -15,7 +15,7 @@ class OffersTest(TestCase):
         offer = factories.OfferFactory.create()
 
         self.client.force_login(offer.owned_by)
-        self.client.get(offer.project.urls["services"])
+        self.client.get(offer.project.urls["detail"])
 
     def test_create_offer(self):
         project = factories.ProjectFactory.create()
@@ -71,7 +71,7 @@ class OffersTest(TestCase):
                 "status": Offer.ACCEPTED,
             },
         )
-        self.assertRedirects(response, offer.project.urls["services"])
+        self.assertRedirects(response, offer.project.urls["detail"])
 
         offer.refresh_from_db()
         self.assertEqual(offer.closed_on, date.today())
@@ -107,7 +107,7 @@ class OffersTest(TestCase):
                 WarningsForm.ignore_warnings_id: "on",
             },
         )
-        self.assertRedirects(response, offer.project.urls["services"])
+        self.assertRedirects(response, offer.project.urls["detail"])
 
         offer.refresh_from_db()
         self.assertIsNone(offer.closed_on)

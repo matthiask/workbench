@@ -22,6 +22,9 @@ class ActivitySearchForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
     )
+    project = forms.IntegerField(
+        label=_("project"), required=False, widget=forms.HiddenInput
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -45,6 +48,8 @@ class ActivitySearchForm(forms.Form):
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
+        if data.get("project"):
+            queryset = queryset.filter(project=data.get("project"))
 
         return queryset.select_related(
             "project", "deal", "contact__organization", "owned_by"

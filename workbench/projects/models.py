@@ -85,9 +85,6 @@ class Project(Model):
     def code(self):
         return "%s-%04d" % (self.created_at.year, self._code)
 
-    def get_absolute_url(self):
-        return self.urls["overview" if self.closed_on else "services"]
-
     def save(self, *args, **kwargs):
         new = False
         if not self.pk:
@@ -184,6 +181,10 @@ class Project(Model):
             ),
         )
 
+    @cached_property
+    def project_invoices(self):
+        return self.invoices.select_related("contact__organization")
+
 
 @model_urls
 class Service(ServiceBase):
@@ -205,7 +206,7 @@ class Service(ServiceBase):
     )
 
     def get_absolute_url(self):
-        return self.project.urls["services"]
+        return self.project.get_absolute_url()
 
     @classmethod
     def allow_update(cls, instance, request):
@@ -221,3 +222,8 @@ class Service(ServiceBase):
         return True
 
     allow_delete = allow_update
+
+    @classmethod
+    def get_redirect_url(cls, instance, request):
+        if not request.is_ajax() and "/move/" not in request.path:  # XXX ugly
+            return instance.get_absolute_url() if instance else "projects_project_list"
