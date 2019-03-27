@@ -13,30 +13,22 @@
 {% endblock %}
 
 {% block objects %}
-<table class="table table-hover table-striped">
-  <thead>
-    <tr>
-      <th>{{ view.meta.verbose_name }}</th>
-      <th>{% trans 'context' %}</th>
-      <th>{% trans 'owned by' %}</th>
-      <th>{% trans 'status' %}</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for object in object_list %}
-      <tr class="bg-{{ object.status_css }}">
-        <th><a href="{{ object.get_absolute_url }}" data-toggle="ajaxmodal">
-            {{ object }}
-        </a></th>
-        <td>
-          {% for c in object.context %}
-            {{ c.snippet }}
-          {% endfor %}
-        </td>
-        <td>{{ object.owned_by.get_full_name }}</td>
-        <td>{{ object.pretty_status }}</td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="list-group list-group-flush">
+  {% for object in object_list %}
+  <div class="list-group-item px-0">
+    <span style="float:right" class="badge badge-{{ object.status_css }}">{{ object.pretty_status }}</span>
+    <h5 class="mb-1">
+      <a href="{{ object.get_absolute_url }}" data-toggle="ajaxmodal">{{ object|h }}</a>
+    </h5>
+    <div class="d-flex w-100 justify-content-between">
+      <p>
+        {% for c in object.context %}
+          <a href="{{ c.get_absolute_url }}">{{ c }}</a>{% if not forloop.last %},{% endif %}
+        {% endfor %}
+      </p>
+      <p>{{ object.owned_by }}</p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
 {% endblock %}
