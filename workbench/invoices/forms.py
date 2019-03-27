@@ -1,6 +1,7 @@
 from datetime import date
 
 from django import forms
+from django.contrib import messages
 from django.db.models import Q
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -286,9 +287,13 @@ class CreateProjectInvoiceForm(InvoiceForm):
             if invoice_type == "services":
                 self.add_services_field()
 
-            if self.project.invoices.filter(status=Invoice.IN_PREPARATION).exists():
-                self.add_warning(
-                    _("This project already has an invoice in preparation.")
+            if (
+                self.request.method == "GET"
+                and self.project.invoices.filter(status=Invoice.IN_PREPARATION).exists()
+            ):
+                messages.warning(
+                    self.request,
+                    _("This project already has an invoice in preparation."),
                 )
 
     def add_services_field(self):
