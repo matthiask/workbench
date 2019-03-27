@@ -127,8 +127,6 @@ class CreateView(ToolsMixin, vanilla.CreateView):
             % {"class": self.object._meta.verbose_name, "object": self.object},
         )
 
-        if "_continue" in self.request.POST:
-            return redirect(".")
         if self.request.is_ajax():
             return HttpResponse("Thanks", status=201)  # Created
         return redirect(self.get_success_url())
