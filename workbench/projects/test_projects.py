@@ -166,7 +166,7 @@ class ProjectsTest(TestCase):
             },
         )
 
-    def test_list(self):
+    def test_lists(self):
         project = factories.ProjectFactory.create()
         user = factories.UserFactory.create()
         self.client.force_login(user)
@@ -182,6 +182,10 @@ class ProjectsTest(TestCase):
         valid("type=maintenance")
         valid("owned_by={}".format(user.id))
         valid("owned_by=0")  # only inactive
+
+        response = self.client.get(project.urls["picker"])
+        self.assertContains(response, 'data-toggle="picker"')
+        self.assertContains(response, 'data-key="{}"'.format(project.pk))
 
     def test_update(self):
         project = factories.ProjectFactory.create()

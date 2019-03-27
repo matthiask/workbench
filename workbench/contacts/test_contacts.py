@@ -71,7 +71,7 @@ class ContactsTest(TestCase):
             ["Person 'Vorname Nachname' wurde erfolgreich geändert."],
         )
 
-    def test_list(self):
+    def test_lists(self):
         factories.PersonFactory.create()
         factories.PersonFactory.create()
         Group.objects.create(title="A")
@@ -83,6 +83,9 @@ class ContactsTest(TestCase):
         response = self.client.get(person.urls["list"])
         self.assertContains(response, "1 &ndash; 2 von 2")
         self.assertContains(response, "Vorname Nachname", 2)
+
+        response = self.client.get(person.urls["picker"])
+        self.assertNotContains(response, "Vorname Nachname")  # No organization
         # print(response, response.content.decode("utf-8"))
 
     def test_formset(self):
