@@ -95,7 +95,7 @@ class Activity(Model):
                 return "danger"
             elif self.due_on < date.today() + timedelta(days=3):
                 return "warning"
-        return ""
+        return "info"
 
     @classmethod
     def get_redirect_url(cls, instance, request):

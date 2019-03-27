@@ -77,22 +77,22 @@
         <a href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a>
       </h3></div>
       {% if user.important_activities %}
-        <div class="card-body">
-          <table class="table table-condensed">
-            {% for activity in user.important_activities %}
-            <tr class="bg-{{ activity.status_css }}">
-                <th><a href="{{ activity.get_absolute_url }}" data-toggle="ajaxmodal">
-                    {{ activity }}
-                </a></th>
-                <td>
-                  {% for c in activity.context %}
-                    <a href="{{ c.get_absolute_url }}">{{ c }}</a>{% if not forloop.last %},{% endif %}
-                  {% endfor %}
-                </td>
-                <td>{{ activity.pretty_status }}</td>
-              </tr>
-            {% endfor %}
-          </table>
+        <div class="list-group list-group-flush">
+          {% for activity in user.important_activities %}
+          <div class="list-group-item">
+            <span style="float:right" class="badge badge-{{ activity.status_css }}">{{ activity.pretty_status }}</span>
+            <h5 class="mb-1">
+              <a href="{{ activity.get_absolute_url }}" data-toggle="ajaxmodal">{{ activity.title }}</a>
+            </h5>
+            <div class="d-flex w-100 justify-content-between">
+              <p>
+                {% for c in activity.context %}
+                  <a href="{{ c.get_absolute_url }}">{{ c }}</a>{% if not forloop.last %},{% endif %}
+                {% endfor %}
+              </p>
+            </div>
+          </div>
+          {% endfor %}
         </div>
       {% else %}
         <div class="card-body">{% trans 'no important activities' %}</div>
