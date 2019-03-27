@@ -171,13 +171,12 @@
     <a href="{{ project.urls.createcost }}" class="btn btn-secondary" data-toggle="ajaxmodal">
       {% include "svg/plus.svg" %}
       {% trans 'cost' %}</a>
+    <a href="{% url 'activities_activity_create' %}?project={{ object.pk }}" class="btn btn-secondary" data-toggle="ajaxmodal">
+      {% include "svg/plus.svg" %} {% trans 'activity' %} </a>
     <a href="{{ project.urls.update }}" class="btn btn-secondary">
       {% trans 'Update' %}</a>
     <a href="{{ object.urls.create }}?copy_project={{ object.pk }}" class="btn btn-secondary">
       {% trans 'Copy' %}
-    </a>
-    <a href="{% url 'activities_activity_list' %}?project={{ object.pk }}" class="btn btn-secondary">
-      {% trans 'activities' %}
     </a>
     <a href="{{ project.urls.delete }}" class="btn btn-outline-danger float-right">
       {% trans 'Delete' %}</a>
