@@ -127,7 +127,7 @@ class LoggedHoursForm(ModelForm):
     class Meta:
         model = LoggedHours
         fields = ("rendered_by", "rendered_on", "service", "hours", "description")
-        widgets = {"description": Textarea()}
+        widgets = {"description": Textarea({"rows": 2})}
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project", None)
@@ -247,7 +247,7 @@ class LoggedCostForm(ModelForm):
     class Meta:
         model = LoggedCost
         fields = ("service", "rendered_on", "third_party_costs", "cost", "description")
-        widgets = {"description": Textarea()}
+        widgets = {"description": Textarea({"rows": 2})}
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project", None)
