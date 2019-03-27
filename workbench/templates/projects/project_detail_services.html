@@ -64,7 +64,7 @@
 
       <h5 class="mb-1">{{ service.title }} {% history_link service %}</h5>
       <p>
-        {{ service.description|linebreaksbr }}
+        {{ service.description|linebreaksbr|default:'&nbsp;' }}
       </p>
       <small class="row justify-content-between">
         <span class="col-md-4">
@@ -104,19 +104,5 @@
   </div>
 </div>
 {% endfor %}
-
-{% comment %}
-<a href="{{ project.urls.createtask }}" class="btn btn-secondary">
-  {% include "svg/plus.svg" %} {% trans 'task' %}</a>
-{% endcomment %}
-<a href="{{ project.urls.createservice }}" class="btn btn-secondary"
-  data-toggle="ajaxmodal">
-  {% include "svg/plus.svg" %} {% trans 'service' %}</a>
-<a href="{{ project.urls.createhours }}" class="btn btn-secondary"
-  data-toggle="ajaxmodal" data-createhours>
-  {% include "svg/plus.svg" %} {% trans 'hours' %}</a>
-<a href="{{ project.urls.createcost }}" class="btn btn-secondary"
-  data-toggle="ajaxmodal">
-  {% include "svg/plus.svg" %} {% trans 'cost' %}</a>
 
 {% endblock %}

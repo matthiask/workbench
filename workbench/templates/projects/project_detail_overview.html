@@ -104,34 +104,6 @@
       </tr>
     </table>
 
-    <span class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle" type="button"
-        id="invoice-dropdown-button" data-toggle="dropdown"
-        aria-haspopup="true" aria-expanded="false">
-        {% include "svg/plus.svg" %}
-        {% trans 'invoice' %}</a>
-      </button>
-      <div class="dropdown-menu" aria-labelledby="invoice-dropdown-button">
-        <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=fixed">{% trans 'Fixed amount' %}</a>
-        <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=down-payment">{% trans 'Down payment' %}</a>
-        <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=logbook">{% trans 'Services from logbook' %}</a>
-        <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=offer">{% trans 'Services from offer' %}</a>
-      </div>
-    </span>
-
-    <a href="{{ project.urls.createhours }}" class="btn btn-secondary" data-toggle="ajaxmodal" data-createhours>
-      {% include "svg/plus.svg" %}
-      {% trans 'hours' %}</a>
-    <a href="{{ project.urls.createcost }}" class="btn btn-secondary" data-toggle="ajaxmodal">
-      {% include "svg/plus.svg" %}
-      {% trans 'cost' %}</a>
-    <a href="{{ project.urls.update }}" class="btn btn-secondary">
-      {% trans 'Update' %}</a>
-    <a href="{{ object.urls.create }}?copy_project={{ object.pk }}" class="btn btn-secondary">
-      {% trans 'Copy' %}
-    </a>
-    <a href="{{ project.urls.delete }}" class="btn btn-outline-danger float-right">
-      {% trans 'Delete' %}</a>
   </div>
 </div>
 {% endblock %}
