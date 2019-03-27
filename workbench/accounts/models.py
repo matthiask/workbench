@@ -141,3 +141,17 @@ class User(Model, AbstractBaseUser):
     @cached_property
     def important_activities(self):
         return self.activities.open()
+
+    @cached_property
+    def in_preparation(self):
+        from workbench.invoices.models import Invoice
+        from workbench.offers.models import Offer
+
+        invoices = Invoice.objects.filter(
+            owned_by=self, status=Invoice.IN_PREPARATION
+        ).select_related("project", "owned_by")
+        offers = Offer.objects.filter(
+            owned_by=self, status=Offer.IN_PREPARATION
+        ).select_related("project", "owned_by")
+
+        return list(offers) + list(invoices)

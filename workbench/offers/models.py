@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -64,6 +65,14 @@ class Offer(ModelWithTotal):
 
     def __str__(self):
         return self.title
+
+    def __html__(self):
+        return format_html(
+            "<small>{}</small> {} - {}",
+            self.code,
+            self.title,
+            self.owned_by.get_short_name(),
+        )
 
     def get_absolute_url(self):
         return self.project.get_absolute_url()
