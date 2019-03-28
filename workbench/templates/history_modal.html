@@ -4,7 +4,6 @@
 {% block size %}modal-xl{% endblock %}
 
 {% block title %}
-  {# TODO data-toggle="ajaxmodal" for some #}
   {% trans 'History' %}{% if instance %}: <a href="{{ instance.get_absolute_url }}">{{ instance|h }}</a>{% endif %}
 {% endblock %}
 
