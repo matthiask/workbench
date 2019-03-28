@@ -17,9 +17,9 @@ Change = namedtuple("Change", "changes version number")
 
 
 def boolean_formatter(value):
-    if value in (True, "t"):
+    if value in {True, "t"}:
         return _("yes")
-    elif value in (False, "f"):
+    elif value in {False, "f"}:
         return _("no")
     return value
 

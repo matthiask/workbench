@@ -3,10 +3,30 @@ from datetime import date
 from django.test import TestCase
 
 from workbench import factories
+from workbench.accounts.middleware import set_user_name
 from workbench.projects.models import Project
 
 
 class HistoryTest(TestCase):
+    def test_header(self):
+        set_user_name("ballabla")
+        user1 = factories.UserFactory.create(_full_name="foo")
+        set_user_name("user-%d-%s" % (user1.id, user1.get_short_name()))
+        user2 = factories.UserFactory.create(_full_name="bar")
+        set_user_name("user-%d-%s" % (user2.id, user2.get_short_name()))
+        user3 = factories.UserFactory.create()
+
+        self.client.force_login(user1)
+
+        response = self.client.get("/history/accounts.user/{}/".format(user1.pk))
+        self.assertContains(response, "Version 1 / INSERT / ballabla /")
+
+        response = self.client.get("/history/accounts.user/{}/".format(user2.pk))
+        self.assertContains(response, "Version 1 / INSERT / foo /")
+
+        response = self.client.get("/history/accounts.user/{}/".format(user3.pk))
+        self.assertContains(response, "Version 1 / INSERT / bar /")
+
     def test_history(self):
         project = factories.ProjectFactory.create()
         project.owned_by = factories.UserFactory.create()
