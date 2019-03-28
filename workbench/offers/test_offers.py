@@ -54,6 +54,11 @@ class OffersTest(TestCase):
         pdf = self.client.get(offer.urls["pdf"])
         self.assertEqual(pdf.status_code, 200)  # No crash
 
+        # Deleting the service automagically updates the offer
+        offer.services.get().delete()
+        offer.refresh_from_db()
+        self.assertAlmostEqual(offer.total_excl_tax, Decimal("0"))
+
     def test_update_offer(self):
         offer = factories.OfferFactory.create(title="Test")
         self.client.force_login(offer.owned_by)
