@@ -78,3 +78,19 @@ class HistoryTest(TestCase):
             response, "Finaler Wert von 'Name' war 'The Organization Ltd'."
         )
         # print(response, response.content.decode("utf-8"))
+
+    def test_exclusion(self):
+        service = factories.ServiceFactory.create()
+        service.position += 1
+        service.save()
+        service.position += 1
+        service.save()
+        service.title += " test"
+        service.save()
+
+        self.client.force_login(service.project.owned_by)
+        response = self.client.get("/history/projects.service/{}/".format(service.id))
+        self.assertContains(response, "Version 1 / INSERT")
+        self.assertContains(response, "Version 2 / UPDATE")
+        # Only two versions -- position changes are excluded
+        self.assertNotContains(response, "Version 3 / UPDATE")
