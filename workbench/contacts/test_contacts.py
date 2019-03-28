@@ -167,3 +167,7 @@ class ContactsTest(TestCase):
         email.type = "Firmenadresse"
         email.save()
         self.assertEqual(email.weight, -100)
+
+    def test_contacts_redirect(self):
+        self.client.force_login(factories.UserFactory.create())
+        self.assertRedirects(self.client.get("/contacts/"), "/contacts/people/")
