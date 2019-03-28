@@ -72,6 +72,22 @@ class OffersTest(TestCase):
                 "postal_address": "Anything",
                 # "pa": postal_address.id,
                 # "services": [service.id],
+                # "offered_on": local_date_format(date.today()),
+                "status": Offer.ACCEPTED,
+            },
+        )
+        self.assertContains(response, "Offertdatum fehlt für den ausgewählten Status.")
+
+        response = self.client.post(
+            offer.urls["update"],
+            {
+                "title": "Stuff",
+                "owned_by": offer.owned_by_id,
+                "discount": "10",
+                "liable_to_vat": "1",
+                "postal_address": "Anything",
+                # "pa": postal_address.id,
+                # "services": [service.id],
                 "offered_on": local_date_format(date.today()),
                 "status": Offer.ACCEPTED,
             },
