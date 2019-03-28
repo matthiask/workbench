@@ -5,6 +5,7 @@ from django.test import TestCase
 from workbench import factories
 from workbench.accounts.middleware import set_user_name
 from workbench.projects.models import Project
+from workbench.tools import history
 
 
 class HistoryTest(TestCase):
@@ -94,3 +95,8 @@ class HistoryTest(TestCase):
         self.assertContains(response, "Version 2 / UPDATE")
         # Only two versions -- position changes are excluded
         self.assertNotContains(response, "Version 3 / UPDATE")
+
+    def test_nocrash(self):
+        # Do not crash when encountering invalid values.
+        self.assertEqual(history.boolean_formatter("stuff"), "stuff")
+        self.assertEqual(history.date_formatter("stuff"), "stuff")
