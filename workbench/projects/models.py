@@ -128,7 +128,10 @@ class Project(Model):
 
         service_hours = Z
         logged_hours = Z
-        offers = {offer: [] for offer in self.offers.all()}
+        offers = {
+            offer.pk: (offer, []) for offer in self.offers.select_related("owned_by")
+        }
+        offers[None] = (None, [])
 
         logged_hours_per_service = {
             row["service"]: row["hours__sum"]
@@ -145,25 +148,25 @@ class Project(Model):
             .annotate(Sum("cost"))
         }
 
-        for service in self.services.select_related("offer__project"):
+        for service in self.services.all():
             service.logged_hours = logged_hours_per_service.get(service.id, 0)
             service.logged_cost = logged_cost_per_service.get(service.id, 0)
-            offers.setdefault(service.offer, []).append(service)
+            offers[service.offer_id][1].append(service)
 
             service_hours += service.service_hours
             logged_hours += service.logged_hours
 
         if None in logged_cost_per_service:
-            s = Service(
+            service = Service(
                 title=gettext("Not bound to a particular service."), service_cost=Z
             )
-            s.logged_hours = Z
-            s.logged_cost = logged_cost_per_service[None]
-            offers.setdefault(None, []).append(s)
+            service.logged_hours = Z
+            service.logged_cost = logged_cost_per_service[None]
+            offers[None][1].append(service)
 
         return {
             "offers": sorted(
-                offers.items(),
+                (value for value in offers.values() if value[1]),
                 key=lambda item: (
                     item[0] and item[0].offered_on or date.max,
                     item[0] and item[0].pk or 1e100,

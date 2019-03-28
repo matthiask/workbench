@@ -33,7 +33,12 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/$",
-        generic.DetailView.as_view(model=Project),
+        generic.DetailView.as_view(
+            model=Project,
+            queryset=Project.objects.select_related(
+                "owned_by", "customer", "contact__organization"
+            ),
+        ),
         name="projects_project_detail",
     ),
     url(
