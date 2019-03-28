@@ -25,6 +25,8 @@ class MoveServiceView(generic.DetailView):
             pks[index], pks[index - 1] = pks[index - 1], pks[index]
         elif "down" in request.GET and index < len(pks) - 1:
             pks[index], pks[index + 1] = pks[index + 1], pks[index]
+        else:
+            return redirect(self.object)
 
         for index, pk in enumerate(pks):
             Service.objects.filter(pk=pk).update(position=(index + 1) * 10)
