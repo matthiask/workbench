@@ -29,16 +29,16 @@
         <small class="row justify-content-between">
           <span class="col-md-8">
             <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}" class="inline" target="_blank">
-              {{ project.overview.logged|hours }}
-            </a> / {{ project.overview.effort|hours }}
-            {% bar project.overview.logged project.overview.effort %}
+              {{ project.grouped_services.logged_hours|hours }}
+            </a> / {{ project.grouped_services.service_hours|hours }}
+            {% bar project.grouped_services.logged_hours project.grouped_services.service_hours %}
           </span>
           <span class="col-md-4"></span>
         </small>
       </div>
     </div>
 
-    {% for offer, services in project.grouped_services %}
+    {% for offer, services in project.grouped_services.offers %}
     <div class="card my-3">
       <div class="card-header d-flex align-items-center justify-content-between">
         {% if offer %}

@@ -122,25 +122,12 @@ class Project(Model):
         return ", ".join(parts)
 
     @cached_property
-    def overview(self):
-        # Avoid circular imports
-        from workbench.logbook.models import LoggedHours
-
-        return {
-            "logged": LoggedHours.objects.filter(service__project=self)
-            .order_by()
-            .aggregate(h=Sum("hours"))["h"]
-            or Z,
-            "effort": sum(
-                (service.service_hours for service in self.services.all()), Z
-            ),
-        }
-
-    @cached_property
     def grouped_services(self):
         # Avoid circular imports
         from workbench.logbook.models import LoggedHours, LoggedCost
 
+        service_hours = Z
+        logged_hours = Z
         offers = {offer: [] for offer in self.offers.all()}
 
         logged_hours_per_service = {
@@ -163,6 +150,9 @@ class Project(Model):
             service.logged_cost = logged_cost_per_service.get(service.id, 0)
             offers.setdefault(service.offer, []).append(service)
 
+            service_hours += service.service_hours
+            logged_hours += service.logged_hours
+
         if None in logged_cost_per_service:
             s = Service(
                 title=gettext("Not bound to a particular service."), service_cost=Z
@@ -171,13 +161,17 @@ class Project(Model):
             s.logged_cost = logged_cost_per_service[None]
             offers.setdefault(None, []).append(s)
 
-        return sorted(
-            offers.items(),
-            key=lambda item: (
-                item[0] and item[0].offered_on or date.max,
-                item[0] and item[0].pk or 1e100,
+        return {
+            "offers": sorted(
+                offers.items(),
+                key=lambda item: (
+                    item[0] and item[0].offered_on or date.max,
+                    item[0] and item[0].pk or 1e100,
+                ),
             ),
-        )
+            "logged_hours": logged_hours,
+            "service_hours": service_hours,
+        }
 
     @cached_property
     def project_invoices(self):
