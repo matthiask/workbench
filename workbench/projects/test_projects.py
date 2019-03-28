@@ -51,6 +51,20 @@ class ProjectsTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertContains(response, "Entweder alle Felder einfüllen oder keine.")
+        response = self.client.post(
+            project.urls["createservice"],
+            {
+                "title": "Production service",
+                # "effort_type": "Production",
+                "effort_rate": "180",
+                "third_party_costs": "20",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "Entweder alle Felder einfüllen oder keine.")
+        self.assertContains(
+            response, "Kann nicht leer sein wenn Fremdkosten gesetzt sind."
+        )
 
         response = self.client.post(
             project.urls["createservice"],
