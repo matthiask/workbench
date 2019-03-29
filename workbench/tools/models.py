@@ -147,5 +147,5 @@ class ModelWithTotal(Model):
     def pretty_total_excl(self):
         parts = [gettext("%s excl. tax") % currency(self.total_excl_tax)]
         if self.discount:
-            parts.append(" - %s %s" % (currency(self.discount), gettext("discount")))
+            parts.append(" (%s %s)" % (currency(self.discount), gettext("discount")))
         return "".join(parts)
