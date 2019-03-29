@@ -61,7 +61,17 @@ class OffersTest(TestCase):
 
     def test_update_offer(self):
         offer = factories.OfferFactory.create(title="Test")
+        service = factories.ServiceFactory.create(
+            project=offer.project,
+            effort_type="Programming",
+            effort_rate=200,
+            effort_hours=10,
+        )
         self.client.force_login(offer.owned_by)
+
+        response = self.client.get(service.urls["update"])
+        self.assertRedirects(response, offer.project.urls["detail"])
+
         response = self.client.post(
             offer.urls["update"],
             {
@@ -71,7 +81,7 @@ class OffersTest(TestCase):
                 "liable_to_vat": "1",
                 "postal_address": "Anything",
                 # "pa": postal_address.id,
-                # "services": [service.id],
+                "services": [service.id],
                 # "offered_on": local_date_format(date.today()),
                 "status": Offer.ACCEPTED,
             },
@@ -87,7 +97,7 @@ class OffersTest(TestCase):
                 "liable_to_vat": "1",
                 "postal_address": "Anything",
                 # "pa": postal_address.id,
-                # "services": [service.id],
+                "services": [service.id],
                 "offered_on": local_date_format(date.today()),
                 "status": Offer.ACCEPTED,
             },
@@ -96,6 +106,18 @@ class OffersTest(TestCase):
 
         offer.refresh_from_db()
         self.assertEqual(offer.closed_on, date.today())
+
+        response = self.client.get(service.urls["detail"])
+        self.assertRedirects(response, offer.project.urls["detail"])
+
+        response = self.client.get(
+            service.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertContains(
+            response,
+            "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist,"
+            " nicht mehr bearbeiten.",
+        )
 
         response = self.client.post(
             offer.urls["update"],
@@ -106,7 +128,7 @@ class OffersTest(TestCase):
                 "liable_to_vat": "1",
                 "postal_address": "Anything",
                 # "pa": postal_address.id,
-                # "services": [service.id],
+                "services": [service.id],
                 "offered_on": local_date_format(date.today()),
                 "status": Offer.IN_PREPARATION,
             },
@@ -122,7 +144,7 @@ class OffersTest(TestCase):
                 "liable_to_vat": "1",
                 "postal_address": "Anything",
                 # "pa": postal_address.id,
-                # "services": [service.id],
+                "services": [service.id],
                 "offered_on": local_date_format(date.today()),
                 "status": Offer.IN_PREPARATION,
                 WarningsForm.ignore_warnings_id: "on",
