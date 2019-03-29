@@ -1,6 +1,6 @@
 {% extends "generic/object_detail.html" %}
 
-{% load i18n mark_current workbench %}
+{% load i18n mark_current static workbench %}
 
 {% block title %}{{ project }} - {% trans "projects" %} - {{ block.super }}{% endblock %}
 
@@ -63,17 +63,15 @@
           {% endif %}
         </div>
       </div>
-      <div class="list-group list-group-flush">
+      <div class="list-group list-group-flush" data-sortable-container>
         {% for service in services %}
-        <div class="list-group-item">
+        <div class="list-group-item" {% if service.pk %}data-sortable-item="{{ service.pk }}"{% endif %}>
           {% if service.pk %}
             <div class="float-right">
-              <a class="btn btn-secondary btn-sm" href="{{ service.urls.move }}?up" title="{% trans 'Move up' %}">
-                {% include 'svg/triangle-up.svg' %}</a>
-              <a class="btn btn-secondary btn-sm" href="{{ service.urls.move }}?down" title="{% trans 'Move down' %}">
-                {% include 'svg/triangle-down.svg' %}</a>
               <a class="btn btn-secondary btn-sm" href="{{ service.urls.update }}" data-toggle="ajaxmodal" title="{% trans 'Update' %}">
                 {% include 'svg/pencil.svg' %}</a>
+              <a href="" class="btn btn-secondary btn-sm" title="{% trans 'Move' %}" data-sortable-grabber>
+                {% include 'svg/grabber.svg' %}</a>
               <a class="btn btn-secondary btn-sm" href="{{ service.urls.delete }}" data-toggle="ajaxmodal" title="{% trans 'Delete' %}">
                 {% include 'svg/trashcan.svg' %}</a>
             </div>
@@ -185,4 +183,29 @@
 
   </div>
 </div>
+{% endblock %}
+
+{% block js %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'workbench/lib/jquery-ui.min.css' %}">
+<script src="{% static 'workbench/lib/jquery-ui.min.js' %}"></script>
+<script>
+jQuery(function($) {
+  $("[data-sortable-container]").sortable({
+    cursor: "move",
+    items: "[data-sortable-item]",
+    handle: "[data-sortable-grabber]",
+    stop: function(event, ui) {
+      var ids = [];
+      $("[data-sortable-item]", this).each(function() {
+        ids.push(this.getAttribute("data-sortable-item"));
+      });
+      $.post("{% url 'projects_service_set_order' %}", {
+        ids: ids,
+        csrfmiddlewaretoken: document.cookie.match(/\bcsrftoken=(.+?)\b/)[1],
+        function() { window.location.reload(); },
+      });
+    },
+  });
+});
+</script>
 {% endblock %}

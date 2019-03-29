@@ -15,7 +15,7 @@ from workbench.projects.forms import (
     ServiceForm,
 )
 from workbench.projects.models import Project, Service
-from workbench.projects.views import MoveServiceView
+from workbench.projects.views import set_order
 
 
 urlpatterns = [
@@ -111,9 +111,5 @@ urlpatterns = [
         ),
         name="projects_service_delete",
     ),
-    url(
-        r"^service/(?P<pk>\d+)/move/$",
-        MoveServiceView.as_view(),
-        name="projects_service_move",
-    ),
+    url(r"^service/set-order/$", set_order, name="projects_service_set_order"),
 ]

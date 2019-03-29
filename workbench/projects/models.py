@@ -220,5 +220,5 @@ class Service(ServiceBase):
 
     @classmethod
     def get_redirect_url(cls, instance, request):
-        if not request.is_ajax() and "/move/" not in request.path:  # XXX ugly
+        if not request.is_ajax():
             return instance.get_absolute_url() if instance else "projects_project_list"

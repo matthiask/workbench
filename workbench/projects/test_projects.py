@@ -81,9 +81,10 @@ class ProjectsTest(TestCase):
 
         service1.loggedcosts.create(created_by=user, cost=10, project=project)
 
-        self.assertRedirects(
-            self.client.get(service1.urls["move"] + "?down"), project.urls["detail"]
-        )
+        response = self.client.post("/projects/service/set-order/", {
+            "ids[]": [service2.id, service1.id],
+        })
+        self.assertEqual(response.status_code, 202)
         self.assertEqual(list(project.services.all()), [service2, service1])
 
         self.assertRedirects(
