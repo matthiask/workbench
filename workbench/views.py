@@ -1,6 +1,7 @@
 from django.apps import apps
 from django.contrib import messages
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from workbench.audit.models import LoggedAction
@@ -17,20 +18,27 @@ def search(request):
     q = request.GET.get("q", "")
     if q:
         results = [
-            (queryset.model._meta.verbose_name_plural, queryset.search(q)[:101])
+            {
+                "verbose_name_plural": queryset.model._meta.verbose_name_plural,
+                "url": reverse(
+                    "%s_%s_list"
+                    % (queryset.model._meta.app_label, queryset.model._meta.model_name)
+                ),
+                "results": queryset.search(q)[:101],
+            }
             for queryset in (
                 Project.objects.select_related("owned_by"),
                 Organization.objects.all(),
                 Person.objects.all(),
                 Invoice.objects.select_related("project", "owned_by"),
-                Offer.objects.select_related("project"),
+                Offer.objects.select_related("project", "owned_by"),
                 Deal.objects.all(),
             )
         ]
     else:
         messages.error(request, _("Search query missing."))
 
-    return render(request, "search.html", {"search": {"query": q, "results": results}})
+    return render(request, "search.html", {"query": q, "results": results})
 
 
 HISTORY = {

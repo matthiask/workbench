@@ -8,12 +8,11 @@
 <div class="row">
   <div class="col-md-12">
     <h1>{% trans 'Search' %}</h1>
-    {% for verbose_name_plural, results in search.results %}
-      {% for result in results %}
-        {% if forloop.first %}
-          <h2>{{ verbose_name_plural }}</h2>
-          <ul>
-        {% endif %}
+    {% for result in results %}
+      <h3><a href="{{ result.url }}?q={{ query }}">{{ result.verbose_name_plural }}</a></h3>
+      {% for result in result.results %}
+        {% if forloop.first %}<ul>{% endif %}
+
         {% if forloop.counter == 101 %}
           <li>{% trans 'Only showing 100 items. Additional results have been omitted.' %}</li>
         {% else %}
@@ -24,9 +23,10 @@
             </a>
           </li>
         {% endif %}
-        {% if forloop.last %}
-          </ul>
-        {% endif %}
+
+        {% if forloop.last %}</ul>{% endif %}
+      {% empty %}
+        <p>{% trans 'No results found.' %}</p>
       {% endfor %}
     {% endfor %}
   </div>

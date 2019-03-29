@@ -81,9 +81,9 @@ class ProjectsTest(TestCase):
 
         service1.loggedcosts.create(created_by=user, cost=10, project=project)
 
-        response = self.client.post("/projects/service/set-order/", {
-            "ids[]": [service2.id, service1.id],
-        })
+        response = self.client.post(
+            "/projects/service/set-order/", {"ids[]": [service2.id, service1.id]}
+        )
         self.assertEqual(response.status_code, 202)
         self.assertEqual(list(project.services.all()), [service2, service1])
 
