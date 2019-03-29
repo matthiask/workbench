@@ -158,33 +158,7 @@ class PDFDocument(_PDFDocument):
         )
         self.story.append(NextPageTemplate("Later"))
 
-    def offer_stationery(self):
-        pdf = self
-
-        def _fn(canvas, doc):
-            canvas.saveState()
-
-            canvas.setFont(pdf.style.fontName + "-Bold", 10)
-            canvas.drawString(
-                pdf.bounds.W, pdf.bounds.outsideN, settings.WORKBENCH.PDF_COMPANY
-            )
-
-            canvas.setFont(pdf.style.fontName, 6)
-            for i, text in enumerate(reversed(settings.WORKBENCH.PDF_OFFER_TERMS)):
-                canvas.drawString(pdf.bounds.W, pdf.bounds.outsideS + 3 * i * mm, text)
-
-            canvas.setFont(pdf.style.fontName, 6)
-            canvas.drawRightString(
-                pdf.bounds.E, pdf.bounds.outsideS, _("page %d") % doc.page
-            )
-
-            canvas.restoreState()
-
-            pdf.draw_watermark(canvas)
-
-        return _fn
-
-    def invoice_stationery(self):
+    def stationery(self):
         pdf = self
 
         def _fn(canvas, doc):
@@ -212,10 +186,10 @@ class PDFDocument(_PDFDocument):
         return _fn
 
     def init_offer(self):
-        self.init_letter(page_fn=self.offer_stationery())
+        self.init_letter(page_fn=self.stationery())
 
     def init_invoice(self):
-        self.init_letter(page_fn=self.invoice_stationery())
+        self.init_letter(page_fn=self.stationery())
 
     def postal_address(self, postal_address):
         self.p(postal_address)
@@ -323,6 +297,9 @@ class PDFDocument(_PDFDocument):
         self.spacer()
         self.table_services(offer.services.all())
         self.table_total(offer)
+
+        self.spacer()
+        self.p(settings.WORKBENCH.PDF_OFFER_TERMS)
 
     def process_invoice(self, invoice):
         if invoice.status not in {invoice.SENT, invoice.REMINDED, invoice.PAID}:

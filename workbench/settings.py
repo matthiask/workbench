@@ -162,14 +162,14 @@ WORKBENCH = {
     "feinheit": types.SimpleNamespace(
         SSO_DOMAIN="feinheit.ch",
         PDF_COMPANY="Feinheit AG",
-        PDF_ADDRESS="Feinheit AG · Fabrikstrasse 54 · 8005 Zürich",
+        PDF_ADDRESS="Feinheit AG · Fabrikstrasse 54 · 8005 Zürich · www.feinheit.ch",
         PDF_VAT_NO="CHE-113.948.417 MWST",
-        PDF_OFFER_TERMS=[
+        PDF_OFFER_TERMS=(
             "Bestandteil dieser Offerte sind die zum Zeitpunkt"
             " des Vertragsabschlusses aktuellen Allgemeinen"
-            " Geschäftsbedingungen der Feinheit AG.",
-            "Die jeweils aktuelle Version finden Sie auf www.feinheit.ch/agb/.",
-        ],
+            " Geschäftsbedingungen der Feinheit AG."
+            " Die jeweils aktuelle Version finden Sie auf www.feinheit.ch/agb/."
+        ),
         PDF_INVOICE_PAYMENT=(
             "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
             " der Referenznummer %(code)s bis zum %(due)s"
@@ -192,11 +192,11 @@ WORKBENCH = {
             " · diebruchpiloten.com"
         ),
         PDF_VAT_NO="CHE-239.647.366 MWST",
-        PDF_OFFER_TERMS=[
+        PDF_OFFER_TERMS=(
             "Bestandteil dieser Offerte sind die zum Zeitpunkt"
             " des Vertragsabschlusses aktuellen Allgemeinen"
             " Geschäftsbedingungen der Die Bruchpiloten AG."
-        ],
+        ),
         PDF_INVOICE_PAYMENT=(
             "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
             " der Referenznummer %(code)s bis zum %(due)s"
