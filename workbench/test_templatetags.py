@@ -47,3 +47,26 @@ class TemplateTagsTest(TestCase):
     def test_invalid(self):
         with self.assertRaises(TemplateSyntaxError):
             Template("{% load mark_current %}{% mark_current %}")
+
+    def test_bar(self):
+        t = Template("{% load workbench %}{% bar value one %}")
+        self.assertEqual(
+            t.render(Context({"value": 10, "one": 100})),
+            '<div class="progress progress-line">'
+            '<div class="progress-bar bg-info" role="progressbar"'
+            ' style="width:10%"></div></div>',
+        )
+        self.assertEqual(
+            t.render(Context({"value": 80, "one": 100})),
+            '<div class="progress progress-line">'
+            '<div class="progress-bar bg-warning" role="progressbar"'
+            ' style="width:80%"></div></div>',
+        )
+        self.assertEqual(
+            t.render(Context({"value": 100, "one": 60})),
+            '<div class="progress progress-line">'
+            '<div class="progress-bar bg-warning" role="progressbar"'
+            ' style="width:60%"></div>'
+            '<div class="progress-bar bg-danger" role="progressbar"'
+            ' style="width:40%"></div></div>',
+        )
