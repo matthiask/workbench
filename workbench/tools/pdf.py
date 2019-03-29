@@ -185,12 +185,6 @@ class PDFDocument(_PDFDocument):
 
         return _fn
 
-    def init_offer(self):
-        self.init_letter(page_fn=self.stationery())
-
-    def init_invoice(self):
-        self.init_letter(page_fn=self.stationery())
-
     def postal_address(self, postal_address):
         self.p(postal_address)
         self.next_frame()
@@ -251,17 +245,28 @@ class PDFDocument(_PDFDocument):
             self.style.tableHeadLine,
         )
 
-    def process_offer(self, offer):
-        if offer.status not in {offer.OFFERED, offer.ACCEPTED}:
-            self.watermark(str(offer.get_status_display()))
-
-        self.postal_address(offer.postal_address)
-
-        self.h1(offer.title)
+    def process_services_letter(self, instance, *, watermark, details, footer):
+        self.watermark(watermark)
+        self.postal_address(instance.postal_address)
+        self.h1(instance.title)
         self.spacer(2 * mm)
+        self.table(details, self.style.tableColumnsLeft, self.style.table)
+        if instance.description:
+            self.spacer(5 * mm)
+            self.p(instance.description)
+        self.spacer()
+        self.table_services(instance.services.all())
+        self.table_total(instance)
+        self.spacer()
+        self.p(footer)
 
-        self.table(
-            [
+    def process_offer(self, offer):
+        self.process_services_letter(
+            offer,
+            watermark=""
+            if offer.status in {offer.OFFERED, offer.ACCEPTED}
+            else str(offer.get_status_display()),
+            details=[
                 (_("offer"), "%s/%s" % (offer.code, offer.owned_by.get_short_name())),
                 (
                     _("date"),
@@ -286,32 +291,16 @@ class PDFDocument(_PDFDocument):
                     ),
                 ),
             ],
-            self.style.tableColumnsLeft,
-            self.style.table,
+            footer=settings.WORKBENCH.PDF_OFFER_TERMS,
         )
 
-        if offer.description:
-            self.spacer(5 * mm)
-            self.p(offer.description)
-
-        self.spacer()
-        self.table_services(offer.services.all())
-        self.table_total(offer)
-
-        self.spacer()
-        self.p(settings.WORKBENCH.PDF_OFFER_TERMS)
-
     def process_invoice(self, invoice):
-        if invoice.status not in {invoice.SENT, invoice.REMINDED, invoice.PAID}:
-            self.watermark(str(invoice.get_status_display()))
-
-        self.postal_address(invoice.postal_address)
-
-        self.h1(invoice.title)
-        self.spacer(2 * mm)
-
-        self.table(
-            [
+        self.process_services_letter(
+            invoice,
+            watermark=""
+            if invoice.status in {invoice.SENT, invoice.REMINDED, invoice.PAID}
+            else str(invoice.get_status_display()),
+            details=[
                 (
                     _("invoice"),
                     "%s/%s" % (invoice.code, invoice.owned_by.get_short_name()),
@@ -328,21 +317,7 @@ class PDFDocument(_PDFDocument):
                 ),
                 ("MwSt.-Nr.", settings.WORKBENCH.PDF_VAT_NO),
             ],
-            self.style.tableColumnsLeft,
-            self.style.table,
-        )
-
-        if invoice.description:
-            self.spacer(5 * mm)
-            self.p(invoice.description)
-
-        self.spacer()
-        self.table_services(invoice.services.all())
-        self.table_total(invoice)
-
-        self.spacer()
-        self.p(
-            settings.WORKBENCH.PDF_INVOICE_PAYMENT
+            footer=settings.WORKBENCH.PDF_INVOICE_PAYMENT
             % {
                 "code": invoice.code,
                 "due": (
@@ -350,7 +325,7 @@ class PDFDocument(_PDFDocument):
                     if invoice.due_on
                     else _("NO DATE YET")
                 ),
-            }
+            },
         )
 
 

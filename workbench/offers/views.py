@@ -11,7 +11,7 @@ class OfferPDFView(DetailView):
 
         pdf, response = pdf_response(self.object.code, as_attachment=False)
 
-        pdf.init_offer()
+        pdf.init_letter(page_fn=pdf.stationery())
         pdf.process_offer(self.object)
         pdf.generate()
 
