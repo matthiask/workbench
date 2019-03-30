@@ -62,9 +62,14 @@
       {% endif %}
 
       <div class="row mt-3">
-        <div class="col-lg-8 offset-lg-4">
+        <div class="col-sm-12">
           <button type="submit" class="btn btn-primary">
-            {% trans 'submit' %}</button>
+            {% trans 'save' %}</button>
+
+          {% if object.get_absolute_url %}
+          <a href="{{ object.get_absolute_url }}" class="btn float-right btn-outline-danger">
+            {% trans 'cancel' %}</a>
+          {% endif %}
         </div>
       </div>
     </form>

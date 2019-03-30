@@ -4,48 +4,44 @@
 
 {% block content %}
 <div class="row justify-content-center">
-<div class="col-md-10 col-lg-8">
-  <h1>{{ person.full_name }} {% history_link person %}</h1>
-  <table class="table table-striped">
-    <tr>
-      <td class="text-right">{% trans 'organization' %}</td>
-      <td>
-        {% if person.organization %}
-          <a href="{{ person.organization.get_absolute_url }}">
-            {{ person.organization }}
-          </a>
-        {% else %}&ndash;{% endif %}
-      </td>
-    </tr>
+  <div class="col-sm-12">
+    <h1>{{ person.full_name }} {% history_link person %}</h1>
+    {% if person.organization %}
+      <h2>{% link_or_none person.organization %}</h2>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-4">
     {% for phone in person.phonenumbers.all %}
-      <tr>
-        <td class="text-right">{{ phone.type }}</td>
-        <td><a href="tel:{{ phone.phone_number }}">
-          {{ phone.phone_number }}
-        </a></td>
-      </tr>
+      <strong>{{ phone.type|capfirst }}:</strong><br>
+      <a href="tel:{{ phone.phone_number }}">{{ phone.phone_number }}</a>
+      <br>
     {% endfor %}
     {% for email in person.emailaddresses.all %}
-      <tr>
-        <td class="text-right">{{ email.type }}</td>
-        <td><a href="mailto:{{ email.email }}">
-          {{ email.email }}
-        </a></td>
-      </tr>
+    <strong>{{ email.type|capfirst }}:</strong><br>
+      <a href="mailto:{{ email.email }}">{{ email.email }}</a>
+      <br>
     {% endfor %}
+  </div>
+  <div class="col-lg-4">
     {% for address in person.postaladdresses.all %}
-      <tr>
-        <td class="text-right">{{ address.type }}</td>
-        <td>{{ address.postal_address|linebreaksbr }}</td>
-      </tr>
+      <strong>{{ address.type|capfirst }}:</strong><br>
+      {{ address.postal_address|linebreaksbr }}
+      <br>
     {% endfor %}
-    <tr>
-      <td class="text-right">{% trans 'notes' %}</td>
-      <td>
-        {{ person.notes|linebreaksbr|default:"&ndash;" }}
-      </td>
-    </tr>
-  </table>
+  </div>
+  <div class="col-lg-4">
+    <strong>{% trans 'notes' %}:</strong><br>
+    {{ person.notes|linebreaksbr|default:'&ndash;' }}
+    <br>
+    <strong>{% trans 'groups' %}:</strong><br>
+    {% for group in person.groups.all %}
+      <a href="{% url 'contacts_person_list' %}?g={{ group.id }}">{{ group }}</a><br>
+    {% empty %}&ndash;
+    {% endfor %}
+  </div>
+
+</div>
 
 <a href="{% url 'invoices_invoice_create' %}?contact={{ object.pk }}" class="btn btn-secondary">
   {% include "svg/plus.svg" %}
@@ -58,6 +54,4 @@
   {% trans 'Update' %}</a>
 <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
   {% trans 'Delete' %}</a>
-</div>
-</div>
 {% endblock %}
