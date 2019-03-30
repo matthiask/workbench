@@ -158,7 +158,9 @@ class ServiceForm(ModelForm):
 
         super().__init__(*args, **kwargs)
 
-        self.fields["offer"].queryset = self.project.offers.all()
+        self.fields["offer"].choices = self.project.offers.in_preparation_choices(
+            include=getattr(self.instance, "offer_id", None)
+        )
         self.instance.project = self.project
 
 

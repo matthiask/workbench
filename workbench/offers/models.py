@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.html import format_html
@@ -13,7 +14,13 @@ from workbench.tools.urls import model_urls
 
 
 class OfferQuerySet(SearchQuerySet):
-    pass
+    def in_preparation_choices(self, *, include=None):
+        offers = {True: [], False: []}
+        for offer in self.filter(Q(status=Offer.IN_PREPARATION) | Q(pk=include)):
+            offers[offer.id == include].append((offer.pk, offer))
+        return (
+            [("", "----------")] + offers[True] + [(_("In preparation"), offers[False])]
+        )
 
 
 @model_urls
