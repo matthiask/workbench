@@ -41,6 +41,9 @@ class ServiceQuerySet(models.QuerySet):
             )
         ]
 
+    def logging(self):
+        return self.filter(is_logging_prohibited=False)
+
 
 class ServiceBase(Model):
     created_at = models.DateTimeField(_("created at"), default=timezone.now)

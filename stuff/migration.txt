@@ -535,7 +535,7 @@ WHERE p.job_id IS NOT NULL AND p.job_id=projects_project.id;
 --
 
 INSERT INTO projects_service
-(id, created_at, title, position, description, project_id, service_hours, service_cost, offer_id, effort_type, effort_hours, effort_rate, cost, third_party_costs)
+(id, created_at, title, position, description, project_id, service_hours, service_cost, offer_id, effort_type, effort_hours, effort_rate, cost, third_party_costs, is_logging_prohibited)
 SELECT
   p.id,
   NOW(),
@@ -550,7 +550,8 @@ SELECT
   p.hours,
   p.invoicing_hourly_rate,
   NULL,
-  NULL
+  NULL,
+  FALSE
 FROM dblink(
     'dbname=fineware_feinheit',
     'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id, a.ordering, a.invoicing_hourly_rate, a.hours FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
@@ -571,7 +572,8 @@ INSERT INTO projects_service
   effort_hours,
   effort_rate,
   cost,
-  third_party_costs
+  third_party_costs,
+  is_logging_prohibited
 )
 SELECT
   p.id + 100000,
@@ -587,7 +589,8 @@ SELECT
   NULL,
   NULL,
   count * cost * (1 + commission / 100),
-  count * cost
+  count * cost,
+  FALSE
 FROM dblink(
     'dbname=fineware_feinheit',
     'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id, a.ordering, cost, commission, count FROM offers_offeredarticle a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_article aa ON a.article_id=aa.id LEFT OUTER JOIN articles_article ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
@@ -749,8 +752,8 @@ dblink(
 --
 
 INSERT INTO projects_service
-(created_at, title, position, description, project_id, service_hours, service_cost, effort_type, effort_rate)
-SELECT DISTINCT ON (p.job_id, activitygroup) NOW(), CONCAT('Logbuch:', activitygroup), 0, '', p.job_id, 0.0, 0.0, activitygroup, rate FROM
+(created_at, title, position, description, project_id, service_hours, service_cost, effort_type, effort_rate, is_logging_prohibited)
+SELECT DISTINCT ON (p.job_id, activitygroup) NOW(), CONCAT('Logbuch:', activitygroup), 0, '', p.job_id, 0.0, 0.0, activitygroup, rate, FALSE FROM
 dblink(
     'dbname=fineware_feinheit',
     'SELECT created, date, hours, w.notes, created_by_id, worker_id, job_id, aa.name, w.invoicing_hourly_rate FROM worklog_worklogentry w LEFT JOIN articles_activity a ON w.activity_id=a.id LEFT JOIN articles_activity aa ON a.parent_id=aa.id'
@@ -824,7 +827,8 @@ service_hours,
 service_cost,
 effort_type,
 effort_hours,
-effort_rate
+effort_rate,
+is_logging_prohibited
 )
 SELECT
 NOW(),
@@ -836,7 +840,8 @@ p.scheduled_hours,
 p.scheduled_hours * COALESCE(p.invoicing_rate_override, 180),
 'Eingeplante Stunden',
 p.scheduled_hours,
-COALESCE(p.invoicing_rate_override, 180)
+COALESCE(p.invoicing_rate_override, 180),
+TRUE
 FROM
 dblink(
 'dbname=fineware_feinheit',

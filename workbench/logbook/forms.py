@@ -168,7 +168,7 @@ class LoggedHoursForm(ModelForm):
             self.project = kwargs["instance"].service.project
 
         super().__init__(*args, **kwargs)
-        self.fields["service"].choices = self.project.services.choices()
+        self.fields["service"].choices = self.project.services.logging().choices()
         self.fields["service"].required = False
         if len(self.fields["service"].choices) > 1 and not self.request.POST.get(
             "service_title"
@@ -263,7 +263,7 @@ class LoggedCostForm(ModelForm):
             self.instance.created_by = self.request.user
             self.instance.project = self.project
 
-        self.fields["service"].choices = self.project.services.choices()
+        self.fields["service"].choices = self.project.services.logging().choices()
         # TODO add JS for those buttons
         # self.fields["third_party_costs"].help_text = mark_safe(
         #     "{}"

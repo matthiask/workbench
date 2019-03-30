@@ -11,7 +11,7 @@
 {% block body %}
   {% include 'fineforms/warnings.html' %}
   {% ff_errors form %}
-  {% ff_fields form fields='offer,title,description' %}
+  {% ff_fields form fields='offer,title,description,is_logging_prohibited' %}
 
   <div class="row">
     <div class="col-md-6">

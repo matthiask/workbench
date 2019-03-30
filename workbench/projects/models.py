@@ -199,6 +199,11 @@ class Service(ServiceBase):
         blank=True,
         null=True,
     )
+    is_logging_prohibited = models.BooleanField(
+        _("is logging prohibited"),
+        default=False,
+        help_text=_("Use this for service entries which are only used for budgeting."),
+    )
 
     def get_absolute_url(self):
         return self.project.get_absolute_url()

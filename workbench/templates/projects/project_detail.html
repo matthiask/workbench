@@ -104,14 +104,16 @@
               {% endif %}
             </span>
             <span class="col-md-4 text-right">
-              {% if service.pk %}
-                <a href="{{ project.urls.createhours }}?service={{ service.pk }}"
+              {% if not service.is_logging_prohibited %}
+                {% if service.pk %}
+                  <a href="{{ project.urls.createhours }}?service={{ service.pk }}"
+                    data-toggle="ajaxmodal">
+                    {% include "svg/plus.svg" %} {% trans 'hours' %}</a>
+                {% endif %}
+                <a href="{{ project.urls.createcost }}?service={{ service.pk|default:'' }}"
                   data-toggle="ajaxmodal">
-                  {% include "svg/plus.svg" %} {% trans 'hours' %}</a>
+                  {% include "svg/plus.svg" %} {% trans 'cost' %}</a>
               {% endif %}
-              <a href="{{ project.urls.createcost }}?service={{ service.pk|default:'' }}"
-                data-toggle="ajaxmodal">
-                {% include "svg/plus.svg" %} {% trans 'cost' %}</a>
             </span>
           </small>
         </div>

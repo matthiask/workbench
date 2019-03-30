@@ -139,6 +139,7 @@ class ServiceForm(ModelForm):
             "offer",
             "title",
             "description",
+            "is_logging_prohibited",
             "effort_type",
             "effort_hours",
             "effort_rate",
@@ -173,7 +174,9 @@ class DeleteServiceForm(ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance.loggedhours.exists() or self.instance.loggedcosts.exists():
             self.fields["merge_into"] = forms.ModelChoiceField(
-                queryset=self.instance.project.services.exclude(pk=self.instance.pk),
+                queryset=self.instance.project.services.logging().exclude(
+                    pk=self.instance.pk
+                ),
                 label=_("Merge log into"),
             )
 
