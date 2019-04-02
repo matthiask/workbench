@@ -71,7 +71,9 @@ class Offer(ModelWithTotal):
         verbose_name_plural = _("offers")
 
     def __str__(self):
-        return self.title
+        return "{} {} - {}".format(
+            self.code, self.title, self.owned_by.get_short_name()
+        )
 
     def __html__(self):
         return format_html(
