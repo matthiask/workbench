@@ -76,7 +76,10 @@ class AWTTest(TestCase):
             description="anything",
             rendered_on=date(2018, 1, 1),
         )
-        user.absences.create(starts_on=date(2018, 1, 1), days=50, is_vacation=True)
+        user.absences.create(starts_on=date(2018, 1, 1), days=5, is_vacation=True)
+        user.absences.create(starts_on=date(2018, 4, 1), days=45, is_vacation=True)
+        user.absences.create(starts_on=date(2018, 7, 1), days=10, is_vacation=False)
+        user.absences.create(starts_on=date(2018, 10, 1), days=10, is_vacation=True)
         user.employments.create(
             date_from=date(2014, 1, 1),
             date_until=date(2014, 3, 31),
@@ -105,21 +108,21 @@ class AWTTest(TestCase):
         )
 
         self.assertAlmostEqual(awt["totals"]["hours"], Decimal("1000"))
-        self.assertAlmostEqual(awt["totals"]["vacation_days"], Decimal("50"))
-        # 21.25 - 50 = -28.75
+        self.assertAlmostEqual(awt["totals"]["vacation_days"], Decimal("60"))
+        # 21.25 - 50 - 10 = -38.75
         self.assertAlmostEqual(
-            awt["totals"]["vacation_days_correction"], Decimal("-28.75")
+            awt["totals"]["vacation_days_correction"], Decimal("-38.75")
         )
-        self.assertAlmostEqual(awt["totals"]["other_absences"], Decimal("0"))
+        self.assertAlmostEqual(awt["totals"]["other_absences"], Decimal("10"))
 
         # 3/4 * 80% * 360 + 1/4 * 100% * 360 = 306
         self.assertAlmostEqual(awt["totals"]["target"], Decimal("-306"))
 
-        # 1000 / 8 + 21.25 = 125 + 21.25 = 146.25
-        self.assertAlmostEqual(awt["totals"]["working_time"], Decimal("146.25"))
+        # 1000 / 8 + 21.25 + 10 = 125 + 21.25 + 10 = 156.25
+        self.assertAlmostEqual(awt["totals"]["working_time"], Decimal("156.25"))
 
-        # 306 * 8 - 1000 - 21.25 * 8 = 1278
-        self.assertAlmostEqual(awt["totals"]["running_sum"], Decimal("-1278"))
+        # 306 * 8 - 1000 - 21.25 * 8 - 10 * 8 = 1198
+        self.assertAlmostEqual(awt["totals"]["running_sum"], Decimal("-1198"))
 
     def test_admin_list(self):
         self.client.force_login(factories.UserFactory.create(is_admin=True))
