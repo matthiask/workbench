@@ -268,7 +268,8 @@ class Invoice(ModelWithTotal):
             return _("total CHF incl. tax") if self.liable_to_vat else _("total CHF")
 
     def create_services_from_logbook(self, project_services):
-        assert self.project
+        assert self.project, "cannot call create_services_from_logbook without project"
+
         if not self.pk:
             self.save()
 
@@ -309,7 +310,8 @@ class Invoice(ModelWithTotal):
         self.save()
 
     def create_services_from_offer(self, project_services):
-        assert self.project
+        assert self.project, "cannot call create_services_from_offer without project"
+
         if not self.pk:
             self.save()
 
@@ -338,9 +340,12 @@ class Invoice(ModelWithTotal):
 
     @classmethod
     def allow_delete(cls, instance, request):
-        return instance.status <= instance.IN_PREPARATION or super().allow_delete(
-            instance, request
-        )
+        if instance.status > instance.IN_PREPARATION:
+            messages.error(
+                request, _("Invoices in preparation may be deleted, others not.")
+            )
+            return False
+        return None
 
 
 @model_urls

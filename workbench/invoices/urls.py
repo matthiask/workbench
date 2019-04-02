@@ -42,7 +42,7 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/delete/$",
-        generic.DeleteView.as_view(model=Invoice, form_class=InvoiceDeleteForm),
+        generic.DeleteView.as_view(model=Invoice, delete_form_class=InvoiceDeleteForm),
         name="invoices_invoice_delete",
     ),
     url(r"^(?P<pk>\d+)/pdf/$", InvoicePDFView.as_view(), name="invoices_invoice_pdf"),

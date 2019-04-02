@@ -181,7 +181,7 @@ class ServiceForm(ModelForm):
                 )
 
 
-class DeleteServiceForm(ModelForm):
+class ServiceDeleteForm(ModelForm):
     class Meta:
         model = Service
         fields = []

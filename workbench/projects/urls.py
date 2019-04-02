@@ -9,9 +9,9 @@ from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.forms import OfferForm
 from workbench.offers.models import Offer
 from workbench.projects.forms import (
-    DeleteServiceForm,
     ProjectForm,
     ProjectSearchForm,
+    ServiceDeleteForm,
     ServiceForm,
 )
 from workbench.projects.models import Project, Service
@@ -107,7 +107,9 @@ urlpatterns = [
     url(
         r"^service/(?P<pk>\d+)/delete/$",
         generic.DeleteView.as_view(
-            model=Service, form_class=DeleteServiceForm, template_name_suffix="_merge"
+            model=Service,
+            delete_form_class=ServiceDeleteForm,
+            template_name_suffix="_merge",
         ),
         name="projects_service_delete",
     ),

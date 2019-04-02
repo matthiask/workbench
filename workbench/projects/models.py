@@ -227,7 +227,7 @@ class Service(ServiceBase):
                 ),
             )
             return False
-        return True
+        return None
 
     @classmethod
     def get_redirect_url(cls, instance, request):

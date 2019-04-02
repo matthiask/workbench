@@ -26,7 +26,7 @@ def default_service_types():
 class ToolsMixin(object):
     @classonlymethod
     def as_view(cls, **initkwargs):
-        assert cls.model or initkwargs.get("model")
+        assert cls.model or initkwargs.get("model"), "model is required for view"
         return super().as_view(**initkwargs)
 
     def default_service_types(self):
@@ -196,16 +196,24 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
 
 
 class DeleteView(ToolsMixin, vanilla.DeleteView):
-    form_class = None
+    delete_form_class = None
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if not self.object.allow_delete(self.object, request):
+        allow_delete = self.object.allow_delete(self.object, request)
+        if allow_delete is True:
+            pass  # Fine!
+        elif allow_delete is None:
+            assert (
+                self.delete_form_class
+            ), "delete_form_class must be set if allow_delete returns None"
+        else:
             return (
                 render(request, "modal.html")
                 if request.is_ajax()
                 else redirect(self.object)
             )
+
         url = self.model.get_redirect_url(self.object, request)
         if url:
             return redirect(url)
@@ -216,8 +224,10 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
-        if self.form_class:
-            form = self.form_class(request.POST, instance=self.object, request=request)
+        if self.delete_form_class:
+            form = self.delete_form_class(
+                request.POST, instance=self.object, request=request
+            )
             if form.is_valid():
                 form.delete()
             else:
@@ -238,8 +248,10 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
 
     def get_context_data(self, **kwargs):
         kwargs.setdefault("title", _("Delete %s") % (self.model._meta.verbose_name,))
-        if self.form_class and self.request.method == "GET":
-            kwargs["form"] = self.form_class(instance=self.object, request=self.request)
+        if self.delete_form_class and self.request.method == "GET":
+            kwargs["form"] = self.delete_form_class(
+                instance=self.object, request=self.request
+            )
         return super().get_context_data(**kwargs)
 
     def get_success_url(self):

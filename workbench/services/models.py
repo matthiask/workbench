@@ -129,14 +129,6 @@ class ServiceBase(Model):
 
     delete.alters_data = True
 
-    @classmethod
-    def allow_update(cls, instance, request):
-        raise NotImplementedError  # pragma: no cover
-
-    @classmethod
-    def allow_delete(cls, instance, request):
-        raise NotImplementedError  # pragma: no cover
-
     def clean_fields(self, exclude):
         super().clean_fields(exclude)
         errors = {}

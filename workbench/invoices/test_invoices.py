@@ -169,13 +169,15 @@ class InvoicesTest(TestCase):
         self.assertRedirects(response, invoice.urls["detail"])
         self.assertEqual(invoice.subtotal, 600)
 
-        self.assertRedirects(
-            self.client.post(
-                invoice.urls["delete"], {WarningsForm.ignore_warnings_id: "on"}
-            ),
-            invoice.urls["list"],
+        response = self.client.post(
+            invoice.urls["delete"], {WarningsForm.ignore_warnings_id: "on"}
         )
+        self.assertRedirects(response, invoice.urls["list"])
         self.assertEqual(Invoice.objects.count(), 0)
+        self.assertEqual(
+            messages(response),
+            ["Rechnung '{}' wurde erfolgreich gelöscht.".format(invoice)],
+        )
 
     def test_delete_service_invoice_with_logs(self):
         service = factories.ServiceFactory.create()
