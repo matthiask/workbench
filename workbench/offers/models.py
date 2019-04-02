@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
@@ -150,3 +151,12 @@ class Offer(ModelWithTotal):
     @property
     def total_title(self):
         return _("total CHF incl. tax") if self.liable_to_vat else _("total CHF")
+
+    @classmethod
+    def allow_delete(cls, instance, request):
+        if instance.status > instance.IN_PREPARATION:
+            messages.error(
+                request, _("Offers in preparation may be deleted, others not.")
+            )
+            return False
+        return super().allow_delete(instance, request)
