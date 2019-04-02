@@ -47,6 +47,8 @@
             {% history_link offer %}
             &nbsp;
             <span class="badge badge-{{ offer.status_css }}">{{ offer.pretty_status }}</span>
+
+            <p>{{ offer.description|truncatewords:20|linebreaksbr }}</p>
           </div>
         {% else %}
           <h5 class="d-inline my-0">{% trans 'Not offered yet' %}</h5>
