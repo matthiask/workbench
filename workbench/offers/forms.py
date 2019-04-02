@@ -32,7 +32,10 @@ class OfferSearchForm(forms.Form):
             queryset = queryset.filter(status__lte=Offer.OFFERED)
 
         return queryset.select_related(
-            "project__owned_by", "project__customer", "project__contact__organization"
+            "owned_by",
+            "project__owned_by",
+            "project__customer",
+            "project__contact__organization",
         )
 
 
