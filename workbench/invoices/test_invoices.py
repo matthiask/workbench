@@ -338,6 +338,9 @@ class InvoicesTest(TestCase):
         )
         self.assertRedirects(response, invoice.urls["detail"])
 
+        response = self.client.get(invoice.urls["delete"])
+        self.assertEqual(response.status_code, 200)
+
         response = self.client.post(
             invoice.urls["update"], invoice_to_dict(invoice, status=Invoice.SENT)
         )
@@ -358,6 +361,13 @@ class InvoicesTest(TestCase):
             ),
         )
         self.assertRedirects(response, invoice.urls["detail"])
+
+        response = self.client.get(invoice.urls["delete"])
+        self.assertRedirects(response, invoice.urls["detail"])
+        self.assertEqual(
+            messages(response),
+            ["Rechnungen in Vorbereitung können gelöscht werden, andere nicht."],
+        )
 
         invoice.refresh_from_db()
         response = self.client.post(
