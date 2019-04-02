@@ -166,7 +166,11 @@ class Project(Model):
 
         return {
             "offers": sorted(
-                (value for value in offers.values() if value[1]),
+                (
+                    value
+                    for value in offers.values()
+                    if value[1] or value[0] is not None
+                ),
                 key=lambda item: (
                     item[0] and item[0].offered_on or date.max,
                     item[0] and item[0].pk or 1e100,
