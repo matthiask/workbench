@@ -214,7 +214,10 @@ PostalAddressFormset = inlineformset_factory(
 
 
 class PostalAddressSelectionForm(ModelForm):
-    def add_postal_address_selection(self, *, organization=None, person=None):
+    def add_postal_address_selection_if_empty(self, *, organization=None, person=None):
+        if self.instance.postal_address:
+            return
+
         postal_addresses = []
 
         if person:

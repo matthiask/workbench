@@ -82,10 +82,9 @@ class OfferForm(PostalAddressSelectionForm):
             initial=self.instance.services.values_list("pk", flat=True),
         )
 
-        if not self.instance.postal_address:
-            self.add_postal_address_selection(
-                person=self.project.contact, organization=self.project.customer
-            )
+        self.add_postal_address_selection_if_empty(
+            person=self.project.contact, organization=self.project.customer
+        )
 
     def clean(self):
         data = super().clean()

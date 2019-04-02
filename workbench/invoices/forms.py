@@ -160,8 +160,7 @@ class InvoiceForm(PostalAddressSelectionForm):
             if field not in {"discount", "apply_down_payment", "liable_to_vat"}
         )
 
-        if not self.instance.postal_address:
-            self.add_postal_address_selection(person=self.instance.contact)
+        self.add_postal_address_selection_if_empty(person=self.instance.contact)
 
     def _is_status_unexpected(self, to_status):
         from_status = self.instance._orig_status
@@ -468,7 +467,9 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
                 if field not in {"customer", "contact"}:
                     self.fields.pop(field)
         else:
-            self.add_postal_address_selection(person=contact, organization=customer)
+            self.add_postal_address_selection_if_empty(
+                person=contact, organization=customer
+            )
 
 
 class InvoiceDeleteForm(ModelForm):
@@ -643,5 +644,4 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
         self.fields["periodicity"].choices = RecurringInvoice.PERIODICITY_CHOICES
         self.fields["next_period_starts_on"].disabled = True
 
-        if not self.instance.postal_address:
-            self.add_postal_address_selection(person=self.instance.contact)
+        self.add_postal_address_selection_if_empty(person=self.instance.contact)
