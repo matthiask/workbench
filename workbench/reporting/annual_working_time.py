@@ -6,17 +6,13 @@ from django.db.models import Sum
 from django.db.models.functions import ExtractMonth
 from django.utils.datastructures import OrderedSet
 
-from workbench.accounts.models import User
 from workbench.awt.models import Absence, Employment
 from workbench.awt.utils import days_per_month, monthly_days
 from workbench.logbook.models import LoggedHours
 from workbench.tools.models import Z
 
 
-def annual_working_time(year, *, users=None):
-    if users is None:
-        users = User.objects.filter(is_active=True)
-
+def annual_working_time(year, *, users):
     target_days = list(year.months)
 
     absences = defaultdict(lambda: {"vacation_days": [], "other_absences": []})
