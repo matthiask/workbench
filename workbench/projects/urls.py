@@ -106,7 +106,7 @@ urlpatterns = [
     ),
     url(
         r"^service/(?P<pk>\d+)/delete/$",
-        generic.UpdateView.as_view(
+        generic.DeleteView.as_view(
             model=Service, form_class=DeleteServiceForm, template_name_suffix="_merge"
         ),
         name="projects_service_delete",

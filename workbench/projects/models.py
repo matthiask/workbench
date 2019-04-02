@@ -210,6 +210,10 @@ class Service(ServiceBase):
 
     @classmethod
     def allow_update(cls, instance, request):
+        return True
+
+    @classmethod
+    def allow_delete(cls, instance, request):
         if instance.offer and instance.offer.status > instance.offer.IN_PREPARATION:
             messages.error(
                 request,
@@ -220,8 +224,6 @@ class Service(ServiceBase):
             )
             return False
         return True
-
-    allow_delete = allow_update
 
     @classmethod
     def get_redirect_url(cls, instance, request):

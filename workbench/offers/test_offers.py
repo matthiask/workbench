@@ -115,8 +115,8 @@ class OffersTest(TestCase):
         )
         self.assertContains(
             response,
-            "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist,"
-            " nicht mehr bearbeiten.",
+            "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte"
+            " verbunden ist, welche sich nicht mehr in Vorbereitung befindet.",
         )
 
         response = self.client.post(

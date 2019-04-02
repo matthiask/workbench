@@ -1,6 +1,7 @@
 from datetime import date
 
 from django import forms
+from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -164,6 +165,21 @@ class ServiceForm(ModelForm):
         )
         self.instance.project = self.project
 
+        offer = self.instance.offer
+        if offer and offer.status > offer.IN_PREPARATION:
+            for field in self.fields:
+                if field not in {"is_logging_prohibited"}:
+                    self.fields[field].disabled = True
+
+            if self.request.method == "GET":
+                messages.warning(
+                    self.request,
+                    _(
+                        "Most fields are disabled because service is bound"
+                        " to an offer which is not in preparation anymore."
+                    ),
+                )
+
 
 class DeleteServiceForm(ModelForm):
     class Meta:
@@ -180,7 +196,7 @@ class DeleteServiceForm(ModelForm):
                 label=_("Merge log into"),
             )
 
-    def save(self):
+    def delete(self):
         if "merge_into" in self.cleaned_data:
             into = self.cleaned_data["merge_into"]
             self.instance.loggedhours.update(service=into)

@@ -109,7 +109,7 @@ class ProjectsTest(TestCase):
             {"merge_into": service2.pk},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.status_code, 204)
         self.assertEqual(list(project.services.all()), [service2])
 
     def test_autofill(self):
