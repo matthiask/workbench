@@ -203,16 +203,16 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
         allow_delete = self.object.allow_delete(self.object, request)
         if allow_delete is True:
             pass  # Fine!
-        elif allow_delete is None:
-            assert (
-                self.delete_form_class
-            ), "delete_form_class must be set if allow_delete returns None"
-        else:
+        elif allow_delete is False:
             return (
                 render(request, "modal.html")
                 if request.is_ajax()
                 else redirect(self.object)
             )
+        else:
+            assert (
+                self.delete_form_class
+            ), "delete_form_class must be set if allow_delete returns None"
 
         url = self.model.get_redirect_url(self.object, request)
         if url:
