@@ -273,7 +273,7 @@ class InvoicesTest(TestCase):
         self.assertNotContains(response, 'id="id_title"')
         self.assertNotContains(response, 'id="id_description"')
 
-    def test_create_person_invoice(self):
+    def test_create_update_person_invoice(self):
         person = factories.PersonFactory.create(
             organization=factories.OrganizationFactory.create()
         )
@@ -307,6 +307,17 @@ class InvoicesTest(TestCase):
 
         pdf = self.client.get(invoice.urls["pdf"])
         self.assertEqual(pdf.status_code, 200)  # No crash
+
+        response = self.client.get(invoice.urls["update"])
+        self.assertContains(response, 'id="id_postal_address"')
+        self.assertNotContains(response, 'id="id_pa_0"')
+
+        invoice.postal_address = ""
+        invoice.save()
+
+        response = self.client.get(invoice.urls["update"])
+        self.assertNotContains(response, 'id="id_postal_address"')
+        self.assertContains(response, 'id="id_pa_0"')
 
     def test_contact_check_with_project_invoice(self):
         project = factories.ProjectFactory.create()
