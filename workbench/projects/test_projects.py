@@ -293,3 +293,6 @@ class ProjectsTest(TestCase):
         )
         self.assertContains(response, 'value="{}"'.format(project.title))
         # print(response, response.content.decode("utf-8"))
+
+        response = self.client.get(project.urls["create"] + "?copy_project=blub")
+        self.assertEqual(response.status_code, 200)  # No crash
