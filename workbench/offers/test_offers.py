@@ -198,3 +198,19 @@ class OffersTest(TestCase):
                 " Du die eigentliche Offerte erstellen."
             ],
         )
+
+    def test_status(self):
+        today = date.today()
+        self.assertEqual(
+            Offer(status=Offer.IN_PREPARATION).pretty_status,
+            "In Vorbereitung seit {}".format(local_date_format(today)),
+        )
+        self.assertEqual(
+            Offer(status=Offer.OFFERED, offered_on=today).pretty_status,
+            "Offeriert am {}".format(local_date_format(today)),
+        )
+        self.assertEqual(
+            Offer(status=Offer.REJECTED, closed_on=today).pretty_status,
+            "Abgelehnt am {}".format(local_date_format(today)),
+        )
+        self.assertEqual(Offer(status=Offer.REPLACED).pretty_status, "Ersetzt")

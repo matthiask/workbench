@@ -1242,7 +1242,7 @@ msgstr "Akzeptiert"
 
 #: workbench/offers/models.py:39
 msgid "Rejected"
-msgstr "Abgewiesen"
+msgstr "Abgelehnt"
 
 #: workbench/offers/models.py:51
 msgid "offered on"
@@ -1870,9 +1870,3 @@ msgstr "Gültig bis"
 #: workbench/views.py:39
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
-
-#~ msgid "OAuth2 error: Credential exchange failed"
-#~ msgstr "OAuth2 Fehler: Anmeldedaten-Tausch fehlgeschlagen"
-
-#~ msgid "Unable to determine your email address."
-#~ msgstr "Konnte Emailadresse nicht bestimmen."
