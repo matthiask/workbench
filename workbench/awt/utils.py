@@ -1,5 +1,5 @@
 from calendar import isleap
-from datetime import date, timedelta
+from datetime import timedelta
 
 
 def days_per_month(year):
@@ -21,18 +21,3 @@ def monthly_days(date_from, date_until):
         else:
             yield (month, (next_month - month).days)
         month = next_month
-
-
-if __name__ == "__main__":  # pragma: no cover
-    from pprint import pprint
-
-    examples = [
-        (date(2018, 2, 1), date(2018, 7, 31)),
-        (date(2018, 2, 2), date(2018, 7, 30)),
-        (date(2018, 2, 10), date(2018, 2, 19)),
-    ]
-
-    for example in examples:
-        print("#" * 50)
-        print(example)
-        pprint(list(monthly_days(*example)))

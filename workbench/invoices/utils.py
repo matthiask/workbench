@@ -60,20 +60,3 @@ def recurring(start, periodicity):
 
     else:
         raise ValueError("Unknown periodicity %r" % periodicity)
-
-
-if __name__ == "__main__":  # pragma: no cover
-    from pprint import pprint
-
-    def twenty(start, periodicity):
-        pprint(list(itertools.islice(recurring(start, periodicity), 20)))
-        print()
-
-    twenty(date.today(), "yearly")
-    twenty(date(2016, 2, 29), "yearly")
-
-    twenty(date.today(), "monthly")
-    twenty(date(2016, 2, 29), "monthly")
-    twenty(date(2015, 7, 31), "monthly")
-
-    twenty(date.today(), "weekly")
