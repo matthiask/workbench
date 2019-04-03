@@ -3,6 +3,7 @@ from decimal import Decimal
 from django import forms
 from django.test import TestCase
 
+from workbench import factories
 from workbench.awt.models import Year  # any tools.Model()
 from workbench.contacts.models import Organization
 from workbench.projects.models import Project
@@ -43,3 +44,8 @@ class ToolsTest(TestCase):
         self.assertAlmostEqual(m.total, Decimal("16.20"))
 
         self.assertEqual(m.pretty_total_excl, "15.00 exkl. MwSt (5.00 Rabatt)")
+
+    def test_create_absence_redirect(self):
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.get("/absences/create/")
+        self.assertRedirects(response, "/absences/")
