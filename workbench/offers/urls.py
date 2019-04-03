@@ -1,6 +1,4 @@
 from django.conf.urls import url
-from django.contrib import messages
-from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
 from workbench.offers.forms import OfferForm, OfferSearchForm
@@ -21,15 +19,7 @@ urlpatterns = [
     ),
     url(
         r"^create/$",
-        generic.MessageView.as_view(
-            redirect_to="projects_project_list",
-            message=_(
-                "Offers can only be created from projects. Go to the project"
-                " and add services first, then you'll be able to create the"
-                " offer itself."
-            ),
-            level=messages.ERROR,
-        ),
+        generic.CreateView.as_view(model=Offer, form_class=OfferForm),
         name="offers_offer_create",
     ),
     url(

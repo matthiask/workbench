@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.db.models.expressions import RawSQL
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -151,6 +152,20 @@ class Offer(ModelWithTotal):
     @property
     def total_title(self):
         return _("total CHF incl. tax") if self.liable_to_vat else _("total CHF")
+
+    @classmethod
+    def allow_create(cls, request):
+        if request.path == reverse("offers_offer_create"):
+            messages.error(
+                request,
+                _(
+                    "Offers can only be created from projects. Go to the project"
+                    " and add services first, then you'll be able to create the"
+                    " offer itself."
+                ),
+            )
+            return False
+        return True
 
     @classmethod
     def allow_delete(cls, instance, request):

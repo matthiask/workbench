@@ -179,7 +179,7 @@ class OffersTest(TestCase):
     def test_create_message(self):
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/offers/create/")
-        self.assertRedirects(response, "/projects/")
+        self.assertRedirects(response, "/offers/")
         self.assertEqual(
             messages(response),
             [

@@ -113,7 +113,9 @@ class DetailView(ToolsMixin, vanilla.DetailView):
 class CreateView(ToolsMixin, vanilla.CreateView):
     def dispatch(self, request, *args, **kwargs):
         if not self.model.allow_create(request):
-            return render(request, "modal.html") if request.is_ajax else redirect("../")
+            return (
+                render(request, "modal.html") if request.is_ajax() else redirect("../")
+            )
         url = self.model.get_redirect_url(None, request)
         if url:
             return redirect(url)
@@ -256,13 +258,3 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
 
     def get_success_url(self):
         return self.model().urls["list"]
-
-
-class MessageView(vanilla.View):
-    redirect_to = None
-    message = None
-    level = messages.INFO
-
-    def get(self, request, *args, **kwargs):
-        messages.add_message(request, self.level, self.message)
-        return redirect(self.redirect_to)
