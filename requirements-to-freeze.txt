@@ -1,6 +1,7 @@
 coverage
 Django
 django-admin-ordering
+django-authlib
 django-bootstrap4
 django-countries
 django-debug-toolbar
@@ -11,7 +12,6 @@ factory-boy
 flake8
 gunicorn
 lxml
-oauth2client
 pdfdocument
 Pillow
 psycopg2-binary

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
         "admin_ordering",
         "bootstrap4",
         "django_countries",
+        "authlib",
         "fineforms",
         "django.forms",
         "workbench.accounts",
@@ -117,7 +118,7 @@ TEMPLATES = [
 
 LOCALE_PATHS = (os.path.join(BASE_DIR, "conf", "locale"),)
 
-AUTHENTICATION_BACKENDS = ("workbench.accounts.backends.AuthBackend",)
+AUTHENTICATION_BACKENDS = ["authlib.backends.EmailBackend"]
 
 DATABASES = {"default": dj_database_url.config(default="sqlite:///db.sqlite3")}
 ATOMIC_REQUESTS = True
@@ -131,8 +132,8 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
-OAUTH2_CLIENT_ID = env("OAUTH2_CLIENT_ID", default="")
-OAUTH2_CLIENT_SECRET = env("OAUTH2_CLIENT_SECRET", default=None)
+GOOGLE_CLIENT_ID = env("OAUTH2_CLIENT_ID", default="")
+GOOGLE_CLIENT_SECRET = env("OAUTH2_CLIENT_SECRET", default=None)
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
 
@@ -228,3 +229,5 @@ if LIVE:  # pragma: no cover
     SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 604800  # One week
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+else:
+    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"

@@ -1,5 +1,3 @@
-import types
-
 from django.conf import settings
 from django.test import Client, TestCase
 
@@ -10,18 +8,18 @@ from workbench.tools.testing import messages
 
 class FakeFlow:
     EMAIL = "user@example.com"
-    EMAIL_VERIFIED = True
+    RAISE_EXCEPTION = False
 
-    def step1_get_authorize_url(self):
+    def get_authentication_url(self):
         return "http://example.com/auth/"
 
-    def step2_exchange(self, code):
-        return types.SimpleNamespace(
-            id_token={"email_verified": self.EMAIL_VERIFIED, "email": self.EMAIL}
-        )
+    def get_user_data(self):
+        if self.RAISE_EXCEPTION:
+            raise Exception("Email not verified")
+        return {"email": self.EMAIL}
 
 
-views.oauth2_flow = lambda *a, **kw: FakeFlow()
+views.GoogleOAuth2Client = lambda *a, **kw: FakeFlow()
 
 
 class LoginTestCase(TestCase):
@@ -54,7 +52,7 @@ class LoginTestCase(TestCase):
 
     def test_server_flow(self):
         FakeFlow.EMAIL = "user@example.com"
-        FakeFlow.EMAIL_VERIFIED = True
+        FakeFlow.RAISE_EXCEPTION = False
 
         client = Client()
         response = client.get("/accounts/oauth2/")
@@ -96,10 +94,13 @@ class LoginTestCase(TestCase):
         # Login hint cookie has been removed when login fails
         self.assertEqual(client.cookies.get("login_hint").value, "")
 
-    def test_server_flow_email_not_verified(self):
+    def test_server_flow_user_data_failure(self):
         FakeFlow.EMAIL = "user@example.com"
-        FakeFlow.EMAIL_VERIFIED = False
+        FakeFlow.RAISE_EXCEPTION = True
 
         response = self.client.get("/accounts/oauth2/?code=x")
         self.assertRedirects(response, "/accounts/login/")
-        self.assertEqual(messages(response), ["Konnte Emailadresse nicht bestimmen."])
+        self.assertEqual(
+            messages(response),
+            ["Fehler während Abholen der Nutzerdaten. Bitte nochmals versuchen."],
+        )
