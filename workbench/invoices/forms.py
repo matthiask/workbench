@@ -233,7 +233,7 @@ class InvoiceForm(PostalAddressSelectionForm):
 
         return data
 
-    def save(self, commit=True):
+    def save(self):
         instance = super().save(commit=False)
 
         if instance.type in (instance.FIXED, instance.DOWN_PAYMENT):
@@ -255,8 +255,7 @@ class InvoiceForm(PostalAddressSelectionForm):
                 Z,
             )
 
-        if commit:
-            instance.save()
+        instance.save()
         return instance
 
 
