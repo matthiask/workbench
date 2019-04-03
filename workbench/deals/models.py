@@ -79,8 +79,8 @@ class Deal(Model):
     def save(self, *args, **kwargs):
         if self.status == self.OPEN:
             self.closed_on = None
-        elif not self.closed_on:
-            self.closed_on = date.today()
+        else:
+            self.closed_on = self.closed_on or date.today()
         super().save(*args, **kwargs)
 
     save.alters_data = True
