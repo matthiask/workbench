@@ -270,9 +270,6 @@ class Invoice(ModelWithTotal):
     def create_services_from_logbook(self, project_services):
         assert self.project, "cannot call create_services_from_logbook without project"
 
-        if not self.pk:
-            self.save()
-
         for ps in project_services:
             not_archived_effort = ps.loggedhours.filter(
                 archived_at__isnull=True
@@ -311,9 +308,6 @@ class Invoice(ModelWithTotal):
 
     def create_services_from_offer(self, project_services):
         assert self.project, "cannot call create_services_from_offer without project"
-
-        if not self.pk:
-            self.save()
 
         for ps in project_services:
             service = Service(

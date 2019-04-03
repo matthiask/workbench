@@ -365,7 +365,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
         if self.request.GET.get("type") != "services":
             return super().save()
 
-        instance = super().save(commit=False)
+        instance = super().save()
         services = self.project.services.filter(
             id__in=self.cleaned_data["selected_services"]
         )
