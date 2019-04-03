@@ -119,6 +119,15 @@ class OffersTest(TestCase):
             " verbunden ist, welche sich nicht mehr in Vorbereitung befindet.",
         )
 
+        response = self.client.get(
+            service.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertContains(
+            response,
+            "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist,"
+            " nicht mehr bearbeiten.",
+        )
+
         response = self.client.post(
             offer.urls["update"],
             {
