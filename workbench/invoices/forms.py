@@ -261,38 +261,36 @@ class InvoiceForm(PostalAddressSelectionForm):
 
 class CreateProjectInvoiceForm(InvoiceForm):
     def __init__(self, *args, **kwargs):
-        self.project = kwargs.pop("project", None)
-        if not kwargs.get("instance"):
-            kwargs["instance"] = Invoice(
-                customer=self.project.customer,
-                contact=self.project.contact,
-                project=self.project,
-                title=self.project.title,
-                description=self.project.description,
-                type=kwargs["request"].GET.get("type"),
-            )
+        self.project = kwargs.pop("project")
+        kwargs["instance"] = Invoice(
+            customer=self.project.customer,
+            contact=self.project.contact,
+            project=self.project,
+            title=self.project.title,
+            description=self.project.description,
+            type=kwargs["request"].GET.get("type"),
+        )
 
         super().__init__(*args, **kwargs)
 
-        if not self.instance.pk:
-            # Hide those fields when creating invoices
-            self.fields["status"].disabled = True
-            self.fields["closed_on"].disabled = True
+        # Hide those fields when creating invoices
+        self.fields["status"].disabled = True
+        self.fields["closed_on"].disabled = True
 
-            invoice_type = self.request.GET.get("type")
-            self.fields["type"].initial = self.instance.type = invoice_type
+        invoice_type = self.request.GET.get("type")
+        self.fields["type"].initial = self.instance.type = invoice_type
 
-            if invoice_type == "services":
-                self.add_services_field()
+        if invoice_type == "services":
+            self.add_services_field()
 
-            if (
-                self.request.method == "GET"
-                and self.project.invoices.filter(status=Invoice.IN_PREPARATION).exists()
-            ):
-                messages.warning(
-                    self.request,
-                    _("This project already has an invoice in preparation."),
-                )
+        if (
+            self.request.method == "GET"
+            and self.project.invoices.filter(status=Invoice.IN_PREPARATION).exists()
+        ):
+            messages.warning(
+                self.request,
+                _("This project already has an invoice in preparation."),
+            )
 
     def add_services_field(self):
         source = self.request.GET.get("source")
