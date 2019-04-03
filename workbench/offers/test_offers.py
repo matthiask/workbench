@@ -72,6 +72,9 @@ class OffersTest(TestCase):
         response = self.client.get(service.urls["update"])
         self.assertRedirects(response, offer.project.urls["detail"])
 
+        response = self.client.get(offer.urls["delete"])
+        self.assertEqual(response.status_code, 200)
+
         response = self.client.post(
             offer.urls["update"],
             {
@@ -106,6 +109,13 @@ class OffersTest(TestCase):
 
         offer.refresh_from_db()
         self.assertEqual(offer.closed_on, date.today())
+
+        response = self.client.get(offer.urls["delete"])
+        self.assertRedirects(response, offer.project.urls["detail"])
+        self.assertEqual(
+            messages(response),
+            ["Offerten in Vorbereitung können gelöscht werden, andere nicht."],
+        )
 
         response = self.client.get(service.urls["detail"])
         self.assertRedirects(response, offer.project.urls["detail"])
