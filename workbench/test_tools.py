@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django import forms
+from django.db.models import ProtectedError
 from django.test import TestCase
 
 from workbench import factories
@@ -9,6 +10,7 @@ from workbench.contacts.models import Organization
 from workbench.projects.models import Project
 from workbench.tools.forms import Picker
 from workbench.tools.models import ModelWithTotal
+from workbench.tools.testing import messages
 
 
 class ToolsTest(TestCase):
@@ -49,3 +51,21 @@ class ToolsTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/absences/create/")
         self.assertRedirects(response, "/absences/")
+
+    def test_deletion(self):
+        hours = factories.LoggedHoursFactory.create(description="Bla")
+        project = hours.service.project
+
+        with self.assertRaises(ProtectedError):
+            project.delete()
+
+        self.client.force_login(hours.rendered_by)
+        response = self.client.get(project.urls["delete"])
+        self.assertRedirects(response, project.urls["detail"])
+        self.assertEqual(
+            messages(response),
+            [
+                "Kann '{}' wegen Abhängigkeiten nicht löschen (Any service: Bla)."
+                "".format(project)
+            ],
+        )
