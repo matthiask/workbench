@@ -28,7 +28,7 @@ class ServiceType(Model):
 class ServiceQuerySet(models.QuerySet):
     def choices(self):
         offers = defaultdict(list)
-        for service in self.select_related("offer"):
+        for service in self.select_related("offer__project", "offer__owned_by"):
             offers[service.offer].append((service.id, str(service)))
         return [("", "----------")] + [
             (offer or _("Not offered yet"), services)
