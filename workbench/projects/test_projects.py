@@ -292,7 +292,7 @@ class ProjectsTest(TestCase):
                 "title": project.title,
                 "owned_by": project.owned_by_id,
                 "type": project.type,
-                WarningsForm.ignore_warnings_id: "on",
+                WarningsForm.ignore_warnings_id: "customer-update-but-already-invoices",
             },
         )
         self.assertRedirects(response, project.urls["detail"])

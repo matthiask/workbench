@@ -98,13 +98,13 @@ class WarningsForm(forms.BaseForm):
     def __init__(self, *args, **kwargs):
         super(WarningsForm, self).__init__(*args, **kwargs)
 
-        self.warnings = []
+        self.warnings = {}
 
-    def add_warning(self, warning):
+    def add_warning(self, warning, *, code):
         """
         Adds a new warning, should be called while cleaning the data
         """
-        self.warnings.append(warning)
+        self.warnings[code] = warning
 
     def is_valid(self, ignore_warnings=False):
         """
@@ -120,7 +120,14 @@ class WarningsForm(forms.BaseForm):
         return True
 
     def should_ignore_warnings(self):
-        return self.data.get(self.ignore_warnings_id)
+        ignore = set(self.data.get(self.ignore_warnings_id, "").split())
+        current = set(self.warnings)
+        # print("IGNORE", ignore, "CURRENT", current)
+        return current <= ignore
+
+    @property
+    def ignore_warnings_value(self):
+        return " ".join(sorted(self.warnings))
 
     ignore_warnings_id = "__ig_{}".format(int(time.time() / 10800))
 
@@ -192,6 +199,6 @@ class ModelForm(WarningsForm, forms.ModelForm):
                 )
 
             if not data.get("contact"):
-                self.add_warning(_("No contact selected."))
+                self.add_warning(_("No contact selected."), code="no-contact")
 
         return data

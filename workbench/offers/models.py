@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -121,6 +123,11 @@ class Offer(ModelWithTotal):
                 raise ValidationError(
                     {"status": _("Offered on date missing for selected state.")}
                 )
+
+        if self.status >= self.ACCEPTED and not self.closed_on:
+            self.closed_on = date.today()
+        elif self.status < self.ACCEPTED and self.closed_on:
+            self.closed_on = None
 
     @property
     def pretty_status(self):

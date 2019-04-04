@@ -183,7 +183,8 @@ class InvoiceForm(PostalAddressSelectionForm):
                         "Invoice date is in the past, but invoice is still"
                         " in preparation. Are you sure you do not want to"
                         " set the invoice date to today?"
-                    )
+                    ),
+                    code="invoice-date-past",
                 )
 
         if self.instance.status > self.instance.IN_PREPARATION:
@@ -200,7 +201,8 @@ class InvoiceForm(PostalAddressSelectionForm):
                             "'%s'" % self.fields[field].label
                             for field in self.changed_data
                         )
-                    }
+                    },
+                    code="maybe-unintentional-invoice-change",
                 )
 
         if self._is_status_unexpected(data["status"]):
@@ -209,7 +211,8 @@ class InvoiceForm(PostalAddressSelectionForm):
                 % {
                     "from": s_dict[self.instance._orig_status],
                     "to": s_dict[data["status"]],
-                }
+                },
+                code="status-unexpected",
             )
 
         if data["status"] >= Invoice.PAID and not data["closed_on"]:
@@ -228,7 +231,8 @@ class InvoiceForm(PostalAddressSelectionForm):
                     % {
                         "to": s_dict[data["status"]],
                         "closed": local_date_format(self.instance.closed_on, "d.m.Y"),
-                    }
+                    },
+                    code="status-change-but-already-closed",
                 )
 
         return data
@@ -488,7 +492,8 @@ class InvoiceDeleteForm(ModelForm):
                 _(
                     "Logged services are linked with this invoice."
                     " They will be released when deleting this invoice."
-                )
+                ),
+                code="release-logged-services",
             )
 
     def delete(self):
@@ -523,9 +528,7 @@ class ServiceForm(ModelForm):
         widgets = {"description": Textarea}
 
     def __init__(self, *args, **kwargs):
-        self.invoice = kwargs.pop("invoice", None)
-        if not self.invoice:
-            self.invoice = kwargs["instance"].invoice
+        self.invoice = kwargs.pop("invoice", None) or kwargs["instance"].invoice
         super().__init__(*args, **kwargs)
         self.instance.invoice = self.invoice
 

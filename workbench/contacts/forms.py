@@ -104,7 +104,10 @@ class PersonForm(ModelForm):
     def clean(self):
         data = super().clean()
         if not data["salutation"]:
-            self.add_warning(_("No salutation set. This will make newsletters ugly."))
+            self.add_warning(
+                _("No salutation set. This will make newsletters ugly."),
+                code="no-salutation",
+            )
         if self.instance.pk and "organization" in self.changed_data:
             from workbench.deals.models import Deal
             from workbench.invoices.models import Invoice
@@ -140,7 +143,8 @@ class PersonForm(ModelForm):
                         " %s. Modifying this record may be more confusing than"
                         " archiving this one and creating a new record instead."
                     )
-                    % ", ".join(related)
+                    % ", ".join(related),
+                    code="organization-update",
                 )
 
         return data

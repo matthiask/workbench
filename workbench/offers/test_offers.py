@@ -181,7 +181,7 @@ class OffersTest(TestCase):
                 "services": [service.id],
                 "offered_on": local_date_format(date.today()),
                 "status": Offer.IN_PREPARATION,
-                WarningsForm.ignore_warnings_id: "on",
+                WarningsForm.ignore_warnings_id: "status-change-but-already-closed",
             },
         )
         self.assertRedirects(response, offer.project.urls["detail"])

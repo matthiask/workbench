@@ -109,7 +109,8 @@ class ProjectForm(ModelForm):
                 _(
                     "This project already has invoices. The invoices'"
                     " customer record will be changed too."
-                )
+                ),
+                code="customer-update-but-already-invoices",
             )
 
         return data

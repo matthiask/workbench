@@ -197,9 +197,13 @@ class LoggedHoursForm(ModelForm):
                 "This field is required unless you create a new service."
             )
         if self.project.closed_on:
-            self.add_warning(_("This project is already closed."))
+            self.add_warning(
+                _("This project is already closed."), code="project-closed"
+            )
         if self.instance.invoice_service:
-            self.add_warning(_("This entry is already part of an invoice."))
+            self.add_warning(
+                _("This entry is already part of an invoice."), code="part-of-invoice"
+            )
 
         if all((not self.instance.pk, data["rendered_by"], data["rendered_on"])):
             today = date.today()
@@ -225,7 +229,9 @@ class LoggedHoursForm(ModelForm):
                 if data[field] != getattr(latest, field):
                     break
             else:
-                self.add_warning(_("This seems to be a duplicate. Is it?"))
+                self.add_warning(
+                    _("This seems to be a duplicate. Is it?"), code="maybe-duplicate"
+                )
 
         raise_if_errors(errors)
         return data
@@ -278,7 +284,11 @@ class LoggedCostForm(ModelForm):
     def clean(self):
         data = super().clean()
         if self.project.closed_on:
-            self.add_warning(_("This project is already closed."))
+            self.add_warning(
+                _("This project is already closed."), code="project-closed"
+            )
         if self.instance.invoice_service:
-            self.add_warning(_("This entry is already part of an invoice."))
+            self.add_warning(
+                _("This entry is already part of an invoice."), code="part-of-invoice"
+            )
         return data

@@ -19,5 +19,8 @@ class CutoffDateForm(ModelForm):
         data = super().clean()
         if data.get("day"):
             if data["day"].day != 1:
-                self.add_warning(_("Unusual cutoff date (not first of the month)."))
+                self.add_warning(
+                    _("Unusual cutoff date (not first of the month)."),
+                    code="unusual-cutoff",
+                )
         return data

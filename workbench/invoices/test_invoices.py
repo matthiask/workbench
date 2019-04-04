@@ -228,7 +228,7 @@ class InvoicesTest(TestCase):
                 "third_party_costs": cost.third_party_costs or "",
                 "cost": 2 * cost.cost,
                 "description": cost.description,
-                WarningsForm.ignore_warnings_id: "on",
+                WarningsForm.ignore_warnings_id: "part-of-invoice",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -245,7 +245,8 @@ class InvoicesTest(TestCase):
         self.assertAlmostEqual(invoice.subtotal, 610)  # unchanged
 
         response = self.client.post(
-            invoice.urls["delete"], {WarningsForm.ignore_warnings_id: "on"}
+            invoice.urls["delete"],
+            {WarningsForm.ignore_warnings_id: "release-logged-services"},
         )
         self.assertRedirects(response, invoice.urls["list"])
         self.assertEqual(Invoice.objects.count(), 0)
@@ -295,7 +296,8 @@ class InvoicesTest(TestCase):
         self.assertTrue(cost.invoice_service)
 
         response = self.client.post(
-            invoice.urls["delete"], {WarningsForm.ignore_warnings_id: "on"}
+            invoice.urls["delete"],
+            {WarningsForm.ignore_warnings_id: "release-logged-services"},
         )
         self.assertRedirects(response, invoice.urls["list"])
         self.assertEqual(
@@ -420,7 +422,7 @@ class InvoicesTest(TestCase):
 
         response = self.client.post(
             invoice.urls["update"],
-            invoice_to_dict(invoice, **{WarningsForm.ignore_warnings_id: "on"}),
+            invoice_to_dict(invoice, **{WarningsForm.ignore_warnings_id: "no-contact"}),
         )
         self.assertRedirects(response, invoice.urls["detail"])
 
@@ -614,7 +616,11 @@ class InvoicesTest(TestCase):
             invoice_to_dict(
                 invoice,
                 status=Invoice.IN_PREPARATION,
-                **{WarningsForm.ignore_warnings_id: "on"}
+                **{
+                    WarningsForm.ignore_warnings_id: (
+                        "status-unexpected status-change-but-already-closed"
+                    )
+                }
             ),
         )
         self.assertRedirects(response, invoice.urls["detail"])
@@ -655,6 +661,7 @@ class InvoicesTest(TestCase):
                 "subtotal": 2500,
                 "third_party_costs": 0,
                 "apply_down_payment": [down_payment.pk],
+                WarningsForm.ignore_warnings_id: "on",
             },
         )
         self.assertEqual(response.status_code, 302)

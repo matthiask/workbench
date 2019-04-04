@@ -159,7 +159,7 @@ class LogbookTest(TestCase):
                 "cost": "10",
                 "third_party_costs": "9",
                 "description": "Anything",
-                WarningsForm.ignore_warnings_id: "on",
+                WarningsForm.ignore_warnings_id: "project-closed",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
