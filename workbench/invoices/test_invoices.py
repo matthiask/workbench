@@ -655,7 +655,6 @@ class InvoicesTest(TestCase):
                 "subtotal": 2500,
                 "third_party_costs": 0,
                 "apply_down_payment": [down_payment.pk],
-                WarningsForm.ignore_warnings_id: "on",
             },
         )
         self.assertEqual(response.status_code, 302)
