@@ -90,9 +90,6 @@ class OfferForm(PostalAddressSelectionForm):
         data = super().clean()
         s_dict = dict(Offer.STATUS_CHOICES)
 
-        if data["status"] >= Offer.ACCEPTED:
-            self.instance.closed_on = self.instance.closed_on or date.today()
-
         if self.instance.closed_on and data["status"] < Offer.ACCEPTED:
             self.add_warning(
                 _(
