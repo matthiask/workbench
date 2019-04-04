@@ -154,7 +154,6 @@ class AssignCreditEntriesForm(forms.Form):
                         # status__in=(
                         #     Invoice.IN_PREPARATION,
                         #     Invoice.SENT,
-                        #     Invoice.REMINDED,
                         # ),
                         total=entry.total
                     ).select_related("owned_by", "project")[:100]

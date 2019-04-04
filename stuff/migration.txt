@@ -327,7 +327,7 @@ WHERE projects_project.id=p.job_id AND projects_project.closed_on IS NOT NULL;
 --
 
 INSERT INTO invoices_invoice
-(id, title, description, created_at, status, type, postal_address, subtotal, discount, tax_rate, liable_to_vat, total, contact_id, customer_id, owned_by_id, project_id, down_payment_applied_to_id, down_payment_total, due_on, invoiced_on, _code, payment_notice, third_party_costs)
+(id, title, description, created_at, status, type, postal_address, subtotal, discount, tax_rate, liable_to_vat, total, contact_id, customer_id, owned_by_id, project_id, down_payment_applied_to_id, down_payment_total, due_on, invoiced_on, _code, payment_notice, third_party_costs, last_reminded_on)
 SELECT
     invoices.id,
     invoices.name,
@@ -335,7 +335,7 @@ SELECT
     invoices.created,
     CASE
         WHEN state IN (10, 20) THEN state
-        WHEN state=25 THEN 30
+        WHEN state=25 THEN 20
         WHEN state=30 THEN 40
         WHEN state=35 THEN 50
         WHEN state=40 THEN 60
@@ -365,11 +365,12 @@ SELECT
     invoice_date,
     _invoice_id,
     '',
-    0
+    0,
+    CASE WHEN state=25 THEN reminder_date ELSE NULL END
 FROM projects_project p, dblink(
     'dbname=fineware_feinheit',
-    'SELECT id, name, description, created, state, down_payment, subtotal, discount, tax, total, manager_id, job_id, due_date, invoice_date, invoice_full_override, invoice_company, invoice_first_name, invoice_last_name, invoice_address, invoice_zip_code, invoice_city, invoice_country, _invoice_id FROM invoicing_jobinvoice'
-) AS invoices(id int, name text, description text, created timestamp, state int, down_payment bool, subtotal numeric(10,2), discount numeric(10, 2), tax numeric(10,2), total numeric(10,2), manager_id int, job_id int, due_date date, invoice_date date, invoice_full_override text, invoice_company text, invoice_first_name text, invoice_last_name text, invoice_address text, invoice_zip_code text, invoice_city text, invoice_country text, _invoice_id int)
+    'SELECT id, name, description, created, state, down_payment, subtotal, discount, tax, total, manager_id, job_id, due_date, invoice_date, invoice_full_override, invoice_company, invoice_first_name, invoice_last_name, invoice_address, invoice_zip_code, invoice_city, invoice_country, _invoice_id, reminder_date FROM invoicing_jobinvoice'
+) AS invoices(id int, name text, description text, created timestamp, state int, down_payment bool, subtotal numeric(10,2), discount numeric(10, 2), tax numeric(10,2), total numeric(10,2), manager_id int, job_id int, due_date date, invoice_date date, invoice_full_override text, invoice_company text, invoice_first_name text, invoice_last_name text, invoice_address text, invoice_zip_code text, invoice_city text, invoice_country text, _invoice_id int, reminder_date date)
 WHERE
     p.id=invoices.job_id;
 

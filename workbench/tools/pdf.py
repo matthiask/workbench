@@ -298,7 +298,7 @@ class PDFDocument(_PDFDocument):
         self.process_services_letter(
             invoice,
             watermark=""
-            if invoice.status in {invoice.SENT, invoice.REMINDED, invoice.PAID}
+            if invoice.status in {invoice.SENT, invoice.PAID}
             else str(invoice.get_status_display()),
             details=[
                 (

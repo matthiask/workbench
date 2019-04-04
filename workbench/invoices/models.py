@@ -22,12 +22,7 @@ from workbench.tools.validation import raise_if_errors
 class InvoiceQuerySet(SearchQuerySet):
     def valid(self):
         return self.filter(
-            status__in=(
-                Invoice.IN_PREPARATION,
-                Invoice.SENT,
-                Invoice.REMINDED,
-                Invoice.PAID,
-            )
+            status__in=(Invoice.IN_PREPARATION, Invoice.SENT, Invoice.PAID)
         )
 
 
@@ -35,7 +30,6 @@ class InvoiceQuerySet(SearchQuerySet):
 class Invoice(ModelWithTotal):
     IN_PREPARATION = 10
     SENT = 20
-    REMINDED = 30
     PAID = 40
     CANCELED = 50
     REPLACED = 60
@@ -43,7 +37,6 @@ class Invoice(ModelWithTotal):
     STATUS_CHOICES = (
         (IN_PREPARATION, _("In preparation")),
         (SENT, _("Sent")),
-        (REMINDED, _("Reminded")),
         (PAID, _("Paid")),
         (CANCELED, _("Canceled")),
         (REPLACED, _("Replaced")),
@@ -93,6 +86,7 @@ class Invoice(ModelWithTotal):
             " replacement or cancellation otherwise."
         ),
     )
+    last_reminded_on = models.DateField(_("last reminded on"), blank=True, null=True)
 
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
@@ -217,8 +211,8 @@ class Invoice(ModelWithTotal):
                 else None
             ),
             "reminded_on": (
-                local_date_format(self.invoiced_on, "d.m.Y")
-                if self.invoiced_on
+                local_date_format(self.last_reminded_on, "d.m.Y")
+                if self.last_reminded_on
                 else None
             ),
             "created_at": local_date_format(self.created_at, "d.m.Y"),
@@ -230,12 +224,13 @@ class Invoice(ModelWithTotal):
         if self.status == self.IN_PREPARATION:
             return _("In preparation since %(created_at)s") % d
         elif self.status == self.SENT:
+            if self.last_reminded_on:
+                return _("Sent on %(invoiced_on)s, reminded on %(reminded_on)s") % d
+
             if self.due_on and date.today() > self.due_on:
-                return _("Sent on %(invoiced_on)s, but overdue") % d
+                return _("Sent on %(invoiced_on)s but overdue") % d
 
             return _("Sent on %(invoiced_on)s") % d
-        elif self.status == self.REMINDED:
-            return _("Sent on %(invoiced_on)s, reminded on %(reminded_on)s") % d
         elif self.status == self.PAID:
             return _("Paid on %(closed_on)s") % d
         else:
@@ -244,13 +239,12 @@ class Invoice(ModelWithTotal):
     @property
     def status_css(self):
         if self.status == self.SENT:
-            if self.due_on and date.today() > self.due_on:
+            if self.last_reminded_on or (self.due_on and date.today() > self.due_on):
                 return "warning"
 
         return {
             self.IN_PREPARATION: "info",
             self.SENT: "success",
-            self.REMINDED: "warning",
             self.PAID: "default",
             self.CANCELED: "danger",
             self.REPLACED: "",

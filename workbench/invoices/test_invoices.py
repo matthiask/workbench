@@ -708,6 +708,12 @@ class InvoicesTest(TestCase):
             "warning",
         )
         self.assertEqual(
+            Invoice(
+                status=Invoice.SENT, invoiced_on=yesterday, last_reminded_on=today
+            ).pretty_status,
+            "Versendet am {}, gemahnt am {}".format(local_date_format(yesterday), fmt),
+        )
+        self.assertEqual(
             Invoice(status=Invoice.PAID, closed_on=today).pretty_status,
             "Bezahlt am {}".format(fmt),
         )

@@ -52,7 +52,7 @@ class InvoiceSearchForm(forms.Form):
             queryset = queryset.filter(status=data.get("s"))
         else:
             queryset = queryset.filter(
-                status__in=(Invoice.IN_PREPARATION, Invoice.SENT, Invoice.REMINDED)
+                status__in=(Invoice.IN_PREPARATION, Invoice.SENT)
             )
         if data.get("org"):
             queryset = queryset.filter(customer=data.get("org"))
@@ -62,7 +62,7 @@ class InvoiceSearchForm(forms.Form):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
         if data.get("dunning"):
             queryset = queryset.filter(
-                status__in=(Invoice.SENT, Invoice.REMINDED), due_on__lte=date.today()
+                status=Invoice.SENT, due_on__lte=date.today()
             ).order_by("due_on")
 
         return queryset.select_related(
