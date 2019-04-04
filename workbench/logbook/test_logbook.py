@@ -323,3 +323,12 @@ class LogbookTest(TestCase):
     def test_redirect(self):
         self.client.force_login(factories.UserFactory.create())
         self.assertRedirects(self.client.get("/logbook/"), "/logbook/hours/")
+
+    def test_initialize_hours(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        response = self.client.get(
+            project.urls["createhours"] + "?hours=1.5",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, 'value="1.5"')

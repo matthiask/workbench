@@ -135,21 +135,25 @@ class LoggedHoursForm(ModelForm):
             initial = kwargs.setdefault("initial", {})
             request = kwargs["request"]
 
-            latest = (
-                LoggedHours.objects.filter(rendered_by=request.user)
-                .order_by("-created_at")
-                .first()
-            )
-            timesince = latest and int(
-                (timezone.now() - latest.created_at).total_seconds()
-            )
-            if timesince and timesince < 4 * 3600:
-                initial.setdefault(
-                    "hours",
-                    (timesince / Decimal(3600)).quantize(
-                        Decimal("0.0"), rounding=ROUND_UP
-                    ),
+            if request.GET.get("hours"):
+                initial["hours"] = request.GET["hours"]
+
+            else:
+                latest = (
+                    LoggedHours.objects.filter(rendered_by=request.user)
+                    .order_by("-created_at")
+                    .first()
                 )
+                timesince = latest and int(
+                    (timezone.now() - latest.created_at).total_seconds()
+                )
+                if timesince and timesince < 4 * 3600:
+                    initial.setdefault(
+                        "hours",
+                        (timesince / Decimal(3600)).quantize(
+                            Decimal("0.0"), rounding=ROUND_UP
+                        ),
+                    )
 
             if request.GET.get("service"):
                 initial["service"] = request.GET.get("service")
