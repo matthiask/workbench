@@ -128,7 +128,8 @@ class App extends Component {
       h(AddProject, {
         addProject: (id, title) => {
           if (!state.projects.find(p => p.id === id)) {
-            let projects = Array.concat(state.projects, [{id, title}]);
+            let projects = Array.from(state.projects);
+            projects.push({id, title});
             projects.sort((a, b) => b.id - a.id);
             this.setState({projects});
           }
