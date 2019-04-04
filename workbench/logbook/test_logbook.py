@@ -16,9 +16,9 @@ class LogbookTest(TestCase):
         project = service.project
         self.client.force_login(project.owned_by)
 
-        def send(**kwargs):
+        def send(url=project.urls["createhours"], **kwargs):
             return self.client.post(
-                project.urls["createhours"],
+                url,
                 {
                     "rendered_by": project.owned_by_id,
                     "rendered_on": local_date_format(date.today()),
@@ -32,6 +32,9 @@ class LogbookTest(TestCase):
 
         response = send()
         self.assertEqual(response.status_code, 201)
+
+        hours = LoggedHours.objects.get()
+        self.assertEqual(hours.description, "Test")
 
         response = send()
         self.assertContains(response, "Scheint ein Duplikat zu sein.")
@@ -53,6 +56,11 @@ class LogbookTest(TestCase):
             response,
             "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung.",
         )
+
+        response = send(hours.urls["update"], description="Test 2")
+        self.assertEqual(response.status_code, 202)
+        hours.refresh_from_db()
+        self.assertEqual(hours.description, "Test 2")
 
         project.closed_on = date.today()
         project.save()
@@ -295,5 +303,19 @@ class LogbookTest(TestCase):
         self.assertContains(
             response,
             '<option value="{}" selected>Any service</option>'.format(hours.service_id),
+        )
+        self.assertContains(response, 'value="2.0"')  # hours
+
+        service = factories.ServiceFactory.create(
+            project=hours.service.project, title="Bla"
+        )
+        response = self.client.get(
+            hours.service.project.urls["createhours"]
+            + "?service={}".format(service.id),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertContains(
+            response, '<option value="{}" selected>Bla</option>'.format(service.id)
         )
         self.assertContains(response, 'value="2.0"')  # hours

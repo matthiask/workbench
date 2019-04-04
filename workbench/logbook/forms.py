@@ -154,7 +154,7 @@ class LoggedHoursForm(ModelForm):
             if request.GET.get("service"):
                 initial["service"] = request.GET.get("service")
 
-            elif "service" not in initial:
+            else:
                 latest_on_project = (
                     LoggedHours.objects.filter(
                         rendered_by=request.user, service__project=self.project
