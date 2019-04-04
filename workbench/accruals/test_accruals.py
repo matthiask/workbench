@@ -4,6 +4,7 @@ from django.test import TestCase
 
 from workbench import factories
 from workbench.accruals.models import Accrual, CutoffDate
+from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import messages
 
 
@@ -27,6 +28,12 @@ class AccrualsTest(TestCase):
         self.assertContains(
             response, "Ungewöhnlicher Stichtag (nicht erster Tag des Monats)."
         )
+
+        response = self.client.post(
+            "/accruals/create/",
+            {"day": "31.01.2019", WarningsForm.ignore_warnings_id: "unusual-cutoff"},
+        )
+        self.assertEqual(response.status_code, 302)
 
     def test_cutoff_days_with_accruals(self):
         factories.InvoiceFactory.create(
