@@ -529,6 +529,13 @@ dblink(
 ) AS p(id int, created timestamp, name varchar(100), notes text, offer_company text, offer_last_name text, offer_first_name text, offer_address text, offer_zip_code text, offer_city text, offer_country text, offer_date date, _offer_id text, customer_id int, contact_id int, job_id int, manager_id int, description text, closed_date date, state int, subtotal numeric(10,2), discount numeric(10,2), tax numeric(10,2), total numeric(10,2))
 WHERE p.job_id IS NOT NULL AND p.job_id=projects_project.id;
 
+UPDATE projects_project
+SET description=''
+FROM offers_offer
+WHERE
+  projects_project.id=offers_offer.project_id
+  AND projects_project.description=offers_offer.description;
+
 
 --
 -- Import services / stories
