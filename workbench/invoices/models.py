@@ -381,6 +381,11 @@ class Service(ServiceBase):
 
     allow_delete = allow_update
 
+    @classmethod
+    def get_redirect_url(cls, instance, request):
+        if not request.is_ajax():
+            return instance.get_absolute_url() if instance else "invoices_invoice_list"
+
 
 class RecurringInvoiceQuerySet(SearchQuerySet):
     def create_invoices(self):

@@ -108,8 +108,9 @@ class InvoicesTest(TestCase):
                 "cost": service.cost or "",
                 "third_party_costs": service.third_party_costs or "",
             },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 202)
 
         self.assertRedirects(
             self.client.post(invoice.urls["delete"]), invoice.urls["list"]
@@ -695,6 +696,28 @@ class InvoicesTest(TestCase):
         self.assertAlmostEqual(invoice.total_excl_tax, 2400)
         self.assertEqual(self.client.get(invoice.urls["pdf"]).status_code, 200)
 
+        response = self.client.post(
+            invoice.urls["update"],
+            {
+                "contact": project.contact_id,
+                "title": project.title,
+                "description": "bla",
+                "owned_by": project.owned_by_id,
+                "discount": 0,
+                "liable_to_vat": 1,
+                "postal_address": "Anything",
+                "subtotal": 2500,
+                "third_party_costs": 0,
+                "apply_down_payment": [],
+                "status": Invoice.IN_PREPARATION,
+            },
+        )
+        self.assertRedirects(response, invoice.urls["detail"])
+
+        invoice.refresh_from_db()
+        self.assertAlmostEqual(invoice.subtotal, 2500)
+        self.assertAlmostEqual(invoice.total_excl_tax, 2500)
+
     def test_change_contact(self):
         invoice = factories.InvoiceFactory.create(title="Test", subtotal=20)
         self.client.force_login(invoice.owned_by)
@@ -747,3 +770,44 @@ class InvoicesTest(TestCase):
             "Bezahlt am {}".format(fmt),
         )
         self.assertEqual(Invoice(status=Invoice.REPLACED).pretty_status, "Ersetzt")
+
+    def test_service_update(self):
+        project = factories.ProjectFactory.create()
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+
+        service = invoice.services.create(title="Test", cost=50)
+
+        self.client.force_login(project.owned_by)
+        response = self.client.get(service.urls["update"])
+        self.assertRedirects(response, invoice.urls["detail"])
+
+        response = self.client.get(
+            service.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 200)
+
+        invoice.status = Invoice.SENT
+        invoice.save()
+
+        response = self.client.get(
+            service.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "Kann Leistung von Rechnung, welche nicht mehr in Vorbereitung ist,"
+            " nicht mehr bearbeiten.",
+        )
+
+    def test_person_invoice_without_vat(self):
+        # Test another branch in workbench/tools/pdf.py
+
+        invoice = factories.InvoiceFactory.create(liable_to_vat=False)
+        self.client.force_login(invoice.owned_by)
+        response = self.client.get(invoice.urls["pdf"])
+        self.assertEqual(response.status_code, 200)

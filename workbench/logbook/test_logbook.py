@@ -319,3 +319,7 @@ class LogbookTest(TestCase):
             response, '<option value="{}" selected>Bla</option>'.format(service.id)
         )
         self.assertContains(response, 'value="2.0"')  # hours
+
+    def test_redirect(self):
+        self.client.force_login(factories.UserFactory.create())
+        self.assertRedirects(self.client.get("/logbook/"), "/logbook/hours/")
