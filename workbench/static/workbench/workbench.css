@@ -87,3 +87,30 @@ tbody th > a {
 .progress-line {
   height: 4px;
 }
+
+/* Timer */
+body {
+  padding-bottom: 1rem;
+}
+
+.timer-panel {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  transition: 0.2s ease-in-out;
+  transform: translateY(100%);
+}
+
+.timer-panel:hover {
+  transform: translateY(0);
+}
+
+.timer-panel-tab {
+  position: absolute;
+  width: 100%;
+  top: -2.5em;
+  height: 2.5em;
+  line-height: 2.5;
+  padding: 0 2rem;
+  text-align: center;
+}
