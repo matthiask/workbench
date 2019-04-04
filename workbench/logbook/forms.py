@@ -178,13 +178,16 @@ class LoggedHoursForm(ModelForm):
         else:
             self.fields["service_title"].widget.attrs["autofocus"] = True
 
-        today = date.today()
-        if self.instance.pk and self.instance.rendered_on < date.today() - timedelta(
-            days=today.weekday()
-        ):
-            self.fields["hours"].disabled = True
-            self.fields["rendered_by"].disabled = True
-            self.fields["rendered_on"].disabled = True
+        if self.instance.pk:
+            self.fields.pop("service_title")
+            self.fields.pop("service_description")
+            today = date.today()
+            if self.instance.rendered_on < date.today() - timedelta(
+                days=today.weekday()
+            ):
+                self.fields["hours"].disabled = True
+                self.fields["rendered_by"].disabled = True
+                self.fields["rendered_on"].disabled = True
 
     def clean(self):
         data = super().clean()
