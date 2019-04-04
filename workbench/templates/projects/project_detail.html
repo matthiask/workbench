@@ -24,7 +24,7 @@
       <div class="card-body">
         <h5>{% trans 'overview' %}</h5>
 
-        <p>{{ object.description|linebreaksbr|default:_('No description.') }}</p>
+        <p>{{ object.description|linebreaksbr }}</p>
 
         <small class="row justify-content-between">
           <span class="col-md-8">
@@ -48,7 +48,7 @@
             &nbsp;
             <span class="badge badge-{{ offer.status_css }}">{{ offer.pretty_status }}</span>
 
-            <p>{{ offer.description|truncatewords:20|linebreaksbr }}</p>
+            <p>{{ offer.description|linebreaksbr }}</p>
           </div>
         {% else %}
           <h5 class="d-inline my-0">{% trans 'Not offered yet' %}</h5>
