@@ -288,8 +288,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
             and self.project.invoices.filter(status=Invoice.IN_PREPARATION).exists()
         ):
             messages.warning(
-                self.request,
-                _("This project already has an invoice in preparation."),
+                self.request, _("This project already has an invoice in preparation.")
             )
 
     def add_services_field(self):
