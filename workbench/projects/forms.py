@@ -189,17 +189,21 @@ class ServiceDeleteForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance.loggedhours.exists() or self.instance.loggedcosts.exists():
-            self.fields["merge_into"] = forms.ModelChoiceField(
-                queryset=self.instance.project.services.logging().exclude(
-                    pk=self.instance.pk
-                ),
-                label=_("Merge log into"),
+            queryset = self.instance.project.services.logging().exclude(
+                pk=self.instance.pk
             )
+            self.fields["merge_into"] = forms.ModelChoiceField(
+                queryset=queryset, label=_("Merge log into")
+            )
+            self.fields["merge_into"].choices = queryset.choices()
 
     def delete(self):
-        if "merge_into" in self.cleaned_data:
-            into = self.cleaned_data["merge_into"]
-            self.instance.loggedhours.update(service=into)
-            self.instance.loggedcosts.update(service=into)
+        if "merge_into" not in self.cleaned_data:
+            self.instance.delete()
+            return self.instance
+
+        into = self.cleaned_data["merge_into"]
+        self.instance.loggedhours.update(service=into)
+        self.instance.loggedcosts.update(service=into)
         self.instance.delete()
         return into

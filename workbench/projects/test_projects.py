@@ -3,8 +3,9 @@ from datetime import date
 from django.test import TestCase
 
 from workbench import factories
-from workbench.projects.models import Project
+from workbench.projects.models import Project, Service
 from workbench.tools.forms import WarningsForm
+from workbench.tools.testing import messages
 
 
 class ProjectsTest(TestCase):
@@ -111,6 +112,23 @@ class ProjectsTest(TestCase):
         )
         self.assertEqual(response.status_code, 204)
         self.assertEqual(list(project.services.all()), [service2])
+
+    def test_service_deletion_without_merge(self):
+        service = factories.ServiceFactory.create()
+        self.client.force_login(service.project.owned_by)
+        response = self.client.get(
+            service.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertNotContains(response, "merge_into")
+
+        response = self.client.post(
+            service.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(
+            messages(response), ["Leistung 'Any service' wurde erfolgreich gelöscht."]
+        )
+        self.assertEqual(Service.objects.count(), 0)
 
     def test_autofill(self):
         project = factories.ProjectFactory.create()
