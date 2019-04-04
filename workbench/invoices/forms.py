@@ -475,11 +475,9 @@ class InvoiceDeleteForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance.status > Invoice.IN_PREPARATION:
-            # Should not happen but if it does, fail validation here
-            self.fields["_block"] = forms.BooleanField(disabled=True, required=True)
-            return
-
+        assert (
+            self.instance.status <= self.instance.IN_PREPARATION
+        ), "Trying to delete an invoice not in preparation"
         if (
             LoggedHours.objects.filter(invoice_service__invoice=self.instance).exists()
             or LoggedCost.objects.filter(
