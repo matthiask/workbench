@@ -128,6 +128,7 @@ class InvoicesTest(TestCase):
             effort_type="Consulting",
             effort_rate=200,
         )
+        service4 = factories.ServiceFactory.create(project=project, title="nothing")
 
         cost = factories.LoggedCostFactory.create(
             project=project, cost=10, description="Test"
@@ -169,7 +170,12 @@ class InvoicesTest(TestCase):
                 "discount": "0",
                 "liable_to_vat": "1",
                 "postal_address": "Anything",
-                "selected_services": [service1.pk, service2.pk, service3.pk],
+                "selected_services": [
+                    service1.pk,
+                    service2.pk,
+                    service3.pk,
+                    service4.pk,
+                ],
             },
         )
         invoice = Invoice.objects.get()
@@ -180,6 +186,11 @@ class InvoicesTest(TestCase):
         self.assertEqual(cost.invoice_service.invoice, invoice)
         hours.refresh_from_db()
         self.assertEqual(hours.invoice_service.invoice, invoice)
+
+        self.assertEqual(service1.invoice_services.get().invoice, invoice)
+        self.assertEqual(service2.invoice_services.get().invoice, invoice)
+        self.assertEqual(service3.invoice_services.get().invoice, invoice)
+        self.assertEqual(service4.invoice_services.count(), 0)
 
         response = self.client.post(
             cost.urls["update"],
@@ -667,3 +678,37 @@ class InvoicesTest(TestCase):
             response,
             "Der Kontakt Vorname Nachname gehört nicht zu The Organization Ltd.",
         )
+
+    def test_status(self):
+        today = date.today()
+        yesterday = date.today() - timedelta(days=1)
+        fmt = local_date_format(today)
+        self.assertEqual(
+            Invoice(status=Invoice.IN_PREPARATION).pretty_status,
+            "In Vorbereitung seit {}".format(fmt),
+        )
+        self.assertEqual(
+            Invoice(status=Invoice.SENT, invoiced_on=today).pretty_status,
+            "Versendet am {}".format(fmt),
+        )
+        self.assertEqual(
+            Invoice(
+                status=Invoice.SENT,
+                invoiced_on=yesterday,
+                due_on=today - timedelta(days=5),
+            ).pretty_status,
+            "Versendet am {}, aber überfällig".format(local_date_format(yesterday)),
+        )
+        self.assertEqual(
+            Invoice(
+                status=Invoice.SENT,
+                invoiced_on=yesterday,
+                due_on=today - timedelta(days=5),
+            ).status_css,
+            "warning",
+        )
+        self.assertEqual(
+            Invoice(status=Invoice.PAID, closed_on=today).pretty_status,
+            "Bezahlt am {}".format(fmt),
+        )
+        self.assertEqual(Invoice(status=Invoice.REPLACED).pretty_status, "Ersetzt")
