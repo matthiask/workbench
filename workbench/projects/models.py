@@ -222,7 +222,7 @@ class Service(ServiceBase):
             messages.error(
                 request,
                 _(
-                    "Cannot modify a service bound to an offer"
+                    "Cannot delete a service bound to an offer"
                     " which is not in preparation anymore."
                 ),
             )

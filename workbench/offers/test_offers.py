@@ -109,6 +109,7 @@ class OffersTest(TestCase):
 
         offer.refresh_from_db()
         self.assertEqual(offer.closed_on, date.today())
+        self.assertAlmostEqual(offer.subtotal, Decimal("2000"))
 
         response = self.client.get(offer.urls["delete"])
         self.assertRedirects(response, offer.project.urls["detail"])
@@ -129,13 +130,27 @@ class OffersTest(TestCase):
             " verbunden ist, welche sich nicht mehr in Vorbereitung befindet.",
         )
 
+        self.assertFalse(service.is_logging_prohibited)
+        response = self.client.post(
+            service.urls["update"],
+            {"is_logging_prohibited": True},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
+        service.refresh_from_db()
+        self.assertTrue(service.is_logging_prohibited)
+        self.assertEqual(
+            messages(response), ["Leistung 'Any service' wurde erfolgreich geändert."]
+        )
+        self.assertEqual(service.offer, offer)
+
         response = self.client.get(
             service.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertContains(
             response,
             "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist,"
-            " nicht mehr bearbeiten.",
+            " nicht löschen.",
         )
 
         response = self.client.post(

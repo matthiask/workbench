@@ -154,10 +154,6 @@ class ServiceForm(ModelForm):
         if not self.project:
             self.project = kwargs["instance"].project
 
-        kwargs.setdefault("initial", {}).setdefault(
-            "offer", kwargs["request"].GET.get("offer")
-        )
-
         super().__init__(*args, **kwargs)
 
         self.fields["offer"].choices = self.project.offers.in_preparation_choices(
