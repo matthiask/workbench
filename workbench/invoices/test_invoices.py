@@ -129,8 +129,12 @@ class InvoicesTest(TestCase):
             effort_rate=200,
         )
 
-        factories.LoggedCostFactory.create(project=project, cost=10)
-        factories.LoggedHoursFactory.create(service=service1, hours=1)
+        cost = factories.LoggedCostFactory.create(
+            project=project, cost=10, description="Test"
+        )
+        hours = factories.LoggedHoursFactory.create(
+            service=service1, hours=1, description="Test"
+        )
         factories.LoggedHoursFactory.create(service=service2, hours=2)
         factories.LoggedHoursFactory.create(service=service3, hours=3)
 
@@ -153,6 +157,9 @@ class InvoicesTest(TestCase):
             "10.00 erfasst aber nicht mit einer bestimmten Leistung verbunden.",
         )
 
+        cost.service = service1
+        cost.save()
+
         response = self.client.post(
             url,
             {
@@ -167,7 +174,64 @@ class InvoicesTest(TestCase):
         )
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls["detail"])
-        self.assertEqual(invoice.subtotal, 600)
+        self.assertEqual(invoice.subtotal, 610)
+
+        cost.refresh_from_db()
+        self.assertEqual(cost.invoice_service.invoice, invoice)
+        hours.refresh_from_db()
+        self.assertEqual(hours.invoice_service.invoice, invoice)
+
+        response = self.client.post(
+            cost.urls["update"],
+            {
+                "service": cost.service_id,
+                "rendered_on": local_date_format(cost.rendered_on),
+                "third_party_costs": cost.third_party_costs or "",
+                "cost": 2 * cost.cost,
+                "description": cost.description,
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Dieser Eintrag ist schon Teil einer Rechnung.")
+
+        response = self.client.post(
+            hours.urls["update"],
+            {
+                "service": hours.service_id,
+                "rendered_on": local_date_format(hours.rendered_on),
+                "rendered_by": hours.rendered_by_id,
+                "hours": hours.hours,
+                "description": hours.description,
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Dieser Eintrag ist schon Teil einer Rechnung.")
+
+        response = self.client.post(
+            cost.urls["update"],
+            {
+                # "service": cost.service_id,
+                "rendered_on": local_date_format(cost.rendered_on),
+                "third_party_costs": cost.third_party_costs or "",
+                "cost": 2 * cost.cost,
+                "description": cost.description,
+                WarningsForm.ignore_warnings_id: "on",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
+
+        self.assertContains(
+            self.client.get("/"),
+            "Erfasste Kosten &#39;Test&#39; wurde erfolgreich geändert.",
+        )
+
+        cost.refresh_from_db()
+        self.assertAlmostEqual(cost.cost, Decimal("20"))
+        invoice.refresh_from_db()
+        self.assertAlmostEqual(invoice.subtotal, 610)  # unchanged
 
         response = self.client.post(
             invoice.urls["delete"], {WarningsForm.ignore_warnings_id: "on"}
