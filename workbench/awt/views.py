@@ -7,7 +7,7 @@ from django.utils.translation import gettext as _
 from workbench import generic
 from workbench.accounts.models import User
 from workbench.awt.models import Year
-from workbench.reporting.annual_working_time import annual_working_time
+from workbench.awt.reporting import annual_working_time
 
 
 class ReportView(generic.DetailView):

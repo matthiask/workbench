@@ -6,8 +6,8 @@ from django.test import TestCase
 
 from workbench import factories
 from workbench.invoices.models import Invoice, RecurringInvoice
+from workbench.invoices.reporting import monthly_invoicing
 from workbench.invoices.tasks import create_recurring_invoices_and_notify
-from workbench.reporting.invoicing_statistics import monthly_invoicing
 from workbench.tools.formats import local_date_format
 from workbench.tools.testing import messages
 

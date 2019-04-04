@@ -7,13 +7,14 @@ from django.shortcuts import redirect, render
 from django.utils.translation import gettext_lazy as _
 
 from workbench.invoices.models import Invoice
-from workbench.reporting import invoicing_statistics, project_statistics
+from workbench.invoices.reporting import monthly_invoicing
+from workbench.projects.reporting import overdrawn_projects
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import Z
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
-def monthly_invoicing(request):
+def monthly_invoicing_view(request):
     year = None
     if "year" in request.GET:
         try:
@@ -26,18 +27,15 @@ def monthly_invoicing(request):
     return render(
         request,
         "reporting/monthly_invoicing.html",
-        {
-            "year": year,
-            "monthly_invoicing": invoicing_statistics.monthly_invoicing(year),
-        },
+        {"year": year, "monthly_invoicing": monthly_invoicing(year)},
     )
 
 
-def overdrawn_projects(request):
+def overdrawn_projects_view(request):
     return render(
         request,
         "reporting/overdrawn_projects.html",
-        {"overdrawn_projects": project_statistics.overdrawn_projects()},
+        {"overdrawn_projects": overdrawn_projects()},
     )
 
 

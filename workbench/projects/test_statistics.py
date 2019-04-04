@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.test import TestCase
 
 from workbench import factories
-from workbench.reporting import project_statistics
+from workbench.projects.reporting import overdrawn_projects
 
 
 class StatisticsTest(TestCase):
@@ -13,14 +13,14 @@ class StatisticsTest(TestCase):
 
         user = factories.UserFactory.create()
 
-        op = list(project_statistics.overdrawn_projects())
+        op = list(overdrawn_projects())
         self.assertEqual(op, [])
 
         factories.LoggedHoursFactory.create(
             service=service1, created_by=user, rendered_by=user, hours=10
         )
 
-        op = list(project_statistics.overdrawn_projects())
+        op = list(overdrawn_projects())
         self.assertEqual(len(op), 1)
         self.assertEqual(
             op,

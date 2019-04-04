@@ -6,9 +6,9 @@ from django.shortcuts import render
 from workbench import views
 from workbench.awt.views import ReportView
 from workbench.reporting.views import (
-    monthly_invoicing,
+    monthly_invoicing_view,
     open_items_list,
-    overdrawn_projects,
+    overdrawn_projects_view,
 )
 
 
@@ -35,12 +35,12 @@ urlpatterns = [
     url(r"^report/annual-working-time/$", ReportView.as_view(), name="awt_year_report"),
     url(
         r"^report/monthly-invoicing/$",
-        monthly_invoicing,
+        monthly_invoicing_view,
         name="report_monthly_invoicing",
     ),
     url(
         r"^report/overdrawn-projects/$",
-        overdrawn_projects,
+        overdrawn_projects_view,
         name="report_overdrawn_projects",
     ),
     url(r"^report/open-items-list/$", open_items_list, name="report_open_items_list"),

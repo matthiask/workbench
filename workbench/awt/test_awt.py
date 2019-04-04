@@ -5,8 +5,8 @@ from django.test import TestCase
 
 from workbench import factories
 from workbench.awt.models import Absence, Employment, Year
+from workbench.awt.reporting import annual_working_time
 from workbench.awt.utils import monthly_days
-from workbench.reporting.annual_working_time import annual_working_time
 from workbench.tools.formats import local_date_format
 from workbench.tools.testing import messages
 
