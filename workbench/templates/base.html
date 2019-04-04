@@ -1,6 +1,6 @@
 {% extends "site_base.html" %}
 
-{% load bootstrap4 i18n mark_current %}
+{% load bootstrap4 i18n mark_current static %}
 
 {% block body %}
   <!-- Fixed navbar -->
@@ -113,4 +113,13 @@
     {% block content %}{% endblock %}
 
   </div> <!-- /container -->
+
+  {% block timer %}
+    <div class="bg-light px-3 py-3">
+      <script src="{% static 'workbench/lib/preact.min.js' %}"></script>
+      <script src="{% static 'workbench/timer.js' %}"></script>
+      <div data-timer></div>
+    </div>
+  {% endblock %}
+
 {% endblock body %}

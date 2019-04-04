@@ -14,7 +14,7 @@ module.exports = {
     "linebreak-style": ["error", "unix"],
     quotes: ["error", "double"],
     semi: ["error", "always"],
-    "no-unused-vars": ["error", { argsIgnorePattern: "^_|event" }],
+    "no-unused-vars": ["error", {argsIgnorePattern: "^_|event"}],
     "prettier/prettier": "error",
     quotes: 0
   }
