@@ -124,7 +124,10 @@ class App(Model):
             "year": year,
             "users": sorted(
                 rows,
-                key=lambda row: 1e9 if row["reached"] is None else row["reached"],
+                key=lambda row: (
+                    row["handled"],
+                    -1e9 if row["reached"] is None else -row["reached"]
+                ),
                 reverse=True,
             ),
         }
