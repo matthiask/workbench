@@ -25,19 +25,7 @@
         {% mark_current request.path %}
         <li class="nav-item"><a class="nav-link" href="{% url 'projects_project_list' %}">{% trans 'projects' %}</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'offers_offer_list' %}">{% trans 'offers' %}</a></li>
-
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="invoicesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {% trans 'invoices' %}
-          </a>
-          <div class="dropdown-menu" aria-labelledby="invoicesDropdown">
-            <a class="dropdown-item" href="{% url 'invoices_invoice_list' %}">{% trans 'invoices' %}</a>
-            <a class="dropdown-item" href="{% url 'invoices_invoice_list' %}?dunning=1">{% trans 'dunning' %}</a>
-            <a class="dropdown-item" href="{% url 'invoices_recurringinvoice_list' %}">{% trans 'recurring invoices'|capfirst %}</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'credit_control_creditentry_list' %}">{% trans 'credit entries' %}</a>
-          </div>
-        </li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'invoices_invoice_list' %}">{% trans 'invoices' %}</a></li>
 
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="contactsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -61,9 +49,22 @@
             {# <div class="dropdown-divider"></div> #}
           </div>
         </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="bookkeepingDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {% trans 'book keeping' %}
+          </a>
+          <div class="dropdown-menu" aria-labelledby="bookkeepingDropdown">
+            <a class="dropdown-item" href="{% url 'invoices_invoice_list' %}?dunning=1">{% trans 'dunning' %}</a>
+            <a class="dropdown-item" href="{% url 'invoices_recurringinvoice_list' %}">{% trans 'recurring invoices'|capfirst %}</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'credit_control_creditentry_list' %}">{% trans 'credit entries' %}</a>
+          </div>
+        </li>
+
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {% trans 'reporting' %}
+            {% trans 'reports' %}
           </a>
           <div class="dropdown-menu" aria-labelledby="reportsDropdown">
             <a class="dropdown-item" href="{% url 'awt_year_report' %}">{% trans 'annual working time' %}</a>
