@@ -141,7 +141,9 @@ class App extends Component {
       content.push(
         h(Reset, {
           reset: () => {
-            this.setState(this.defaultState());
+            if (confirm("Really reset?")) {
+              this.setState(this.defaultState());
+            }
           }
         })
       );
