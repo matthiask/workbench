@@ -124,8 +124,12 @@ class App extends Component {
       });
     }
 
+    let headerButtons = ["div", null];
+
     if (!this.props.standalone) {
-      content.push(
+      headerButtons.push(h(StandAlone));
+      headerButtons.push(" ");
+      headerButtons.push(
         h(AddProject, {
           addProject: (id, title) => {
             if (!state.projects.find(p => p.id === id)) {
@@ -137,8 +141,8 @@ class App extends Component {
           }
         })
       );
-      content.push(" ");
-      content.push(
+      headerButtons.push(" ");
+      headerButtons.push(
         h(Reset, {
           reset: () => {
             if (confirm("Really reset?")) {
@@ -147,8 +151,6 @@ class App extends Component {
           }
         })
       );
-      content.push(" ");
-      content.push(h(StandAlone));
     }
 
     return h(
@@ -156,8 +158,12 @@ class App extends Component {
       {className: "timer-panel"},
       h(
         "div",
-        {className: "bg-info text-light timer-panel-tab px-4 py-2"},
-        "Timer"
+        {
+          className:
+            "timer-panel-tab bg-info text-light px-4 py-2 d-flex align-items-center justify-content-between"
+        },
+        "Timer",
+        h.apply(null, headerButtons)
       ),
       h("div", {className: "px-4 pb-4"}, h.apply(null, content))
     );
@@ -249,7 +255,7 @@ function StandAlone() {
   return h(
     "button",
     {
-      className: "btn btn-sm btn-info",
+      className: "btn btn-sm btn-secondary",
       onClick: () => {
         window.open(
           "/timer/",
@@ -258,7 +264,7 @@ function StandAlone() {
         );
       }
     },
-    "window"
+    "open in popup"
   );
 }
 
