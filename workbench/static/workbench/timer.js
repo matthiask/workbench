@@ -52,8 +52,8 @@ class App extends Component {
     };
   }
 
-  activateProject(projectId) {
-    let seconds = Object.assign({}, this.state.seconds);
+  activateProject(projectId, additionalSecondsState) {
+    let seconds = Object.assign({}, this.state.seconds, additionalSecondsState || {});
     if (this.state.activeProject && this.state.lastStart) {
       seconds[this.state.activeProject] =
         (seconds[this.state.activeProject] || 0) +
@@ -100,17 +100,11 @@ class App extends Component {
                 }
               },
               logHours: () => {
+                this.activateProject(null, {[project.id]: 0})
+
                 window.openModalFromUrl(
                   `/projects/${project.id}/createhours/?hours=${hours}`
                 );
-
-                this.setState({
-                  seconds: Object.assign({}, state.seconds, {
-                    [project.id]: 0
-                  }),
-                  activeProject: null,
-                  lastStart: null
-                });
               },
               removeProject: () => {
                 this.setState({
