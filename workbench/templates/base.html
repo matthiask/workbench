@@ -101,7 +101,7 @@
     </div>
   </nav>
 
-  <div class="container-fluid" role="main">
+  <div class="container-fluid flex-grow-1" role="main">
 
     {% block uplink %}
       {% if view.model.urls.list and view.model.urls.list != request.path %}
@@ -116,12 +116,9 @@
   </div> <!-- /container -->
 
   {% block timer %}
-    <div class="bg-light timer-panel">
-      <div class="bg-info text-light timer-panel-tab">{% trans 'Timer' %}</div>
-      <script src="{% static 'workbench/lib/preact.min.js' %}"></script>
-      <script src="{% static 'workbench/timer.js' %}"></script>
-      <div class="px-4 py-4" data-timer></div>
-    </div>
+    <script src="{% static 'workbench/lib/preact.min.js' %}"></script>
+    <script src="{% static 'workbench/timer.js' %}"></script>
+    <div data-timer="footer"></div>
   {% endblock %}
 
 {% endblock body %}

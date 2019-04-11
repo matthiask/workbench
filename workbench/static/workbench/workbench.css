@@ -9,8 +9,8 @@
 }
 
 .container-fluid[role="main"] {
-  padding-top: 15px;
-  padding-bottom: 30px;
+  padding-top: 1rem;
+  padding-bottom: 2.5rem;
 }
 
 .input-group .short {
@@ -90,27 +90,25 @@ tbody th > a {
 
 /* Timer */
 body {
-  padding-bottom: 1rem;
+  min-height: 100vh;
 }
 
-.timer-panel {
+[data-timer="footer"] .timer-panel {
   position: fixed;
   bottom: 0;
   width: 100%;
+  background: white;
   transition: 0.2s ease-in-out;
   transform: translateY(100%);
 }
 
-.timer-panel:hover {
+[data-timer="footer"] .timer-panel:hover {
   transform: translateY(0);
 }
 
-.timer-panel-tab {
+[data-timer="footer"] .timer-panel-tab {
   position: absolute;
-  width: 100%;
-  top: -2.5em;
-  height: 2.5em;
-  line-height: 2.5;
-  padding: 0 2rem;
-  text-align: center;
+  top: -29px;
+  left: 0;
+  right: 0;
 }
