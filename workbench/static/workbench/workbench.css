@@ -10,7 +10,7 @@
 
 .container-fluid[role="main"] {
   padding-top: 1rem;
-  padding-bottom: 2.5rem;
+  padding-bottom: 3rem;
 }
 
 .input-group .short {
@@ -89,6 +89,10 @@ tbody th > a {
 }
 
 /* Timer */
+[data-timer="standalone"] .timer-panel-tab {
+  min-height: 36px;
+}
+
 @media screen and (min-width: 768px) {
   body {
     min-height: 100vh;
@@ -109,7 +113,8 @@ tbody th > a {
 
   [data-timer="footer"] .timer-panel-tab {
     position: absolute;
-    top: -29px;
+    min-height: 36px;
+    top: -36px;
     left: 0;
     right: 0;
   }

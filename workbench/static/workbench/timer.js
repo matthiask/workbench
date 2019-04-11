@@ -53,7 +53,7 @@ class App extends Component {
   }
 
   activateProject(projectId, additionalSecondsState) {
-    this.setState(function(prevState) {
+    this.setState(prevState => {
       let seconds = Object.assign(
         {},
         prevState.seconds,
@@ -80,21 +80,27 @@ class App extends Component {
   }
 
   render(props, state) {
+    window.console && window.console.log("RENDERING", new Date());
     let content = ["div", {className: ""}];
     if (state.projects) {
-      state.projects.forEach(project => {
-        const isActiveProject = state.activeProject === project.id;
+      content = content.concat(
+        state.projects.map(project => {
+          const isActiveProject = state.activeProject === project.id;
 
-        let seconds = state.seconds[project.id] || 0;
-        if (isActiveProject && state.lastStart) {
-          seconds += timestamp() - state.lastStart;
-        }
-        const hours = Math.ceil(seconds / 360) / 10;
+          let seconds = state.seconds[project.id] || 0;
+          if (isActiveProject && state.lastStart) {
+            seconds += timestamp() - state.lastStart;
+          }
 
-        content.push(
-          h(Project, {
+          const minutes = Math.ceil(seconds / 60);
+          const deciHours = Math.ceil(seconds / 360) / 10;
+
+          return h(Project, {
             project,
-            hours,
+            deciHours,
+            elapsed: `${Math.floor(minutes / 60)}:${(minutes % 60)
+              .toString()
+              .padStart(2, "0")}`,
             isActiveProject,
             target: this.props.standalone ? "_blank" : "",
             toggleTimerState: () => {
@@ -108,20 +114,20 @@ class App extends Component {
               this.activateProject(null, {[project.id]: 0});
 
               window.openModalFromUrl(
-                `/projects/${project.id}/createhours/?hours=${hours}`
+                `/projects/${project.id}/createhours/?hours=${deciHours}`
               );
             },
             removeProject: () => {
               let seconds = Object.assign({}, state.seconds);
               delete seconds[project.id];
-              this.setState({
+              this.setState(prevState => ({
                 seconds,
-                projects: state.projects.filter(p => p.id !== project.id)
-              });
+                projects: prevState.projects.filter(p => p.id !== project.id)
+              }));
             }
-          })
-        );
-      });
+          });
+        })
+      );
     }
 
     let headerButtons = ["div", null];
@@ -133,10 +139,15 @@ class App extends Component {
         h(AddProject, {
           addProject: (id, title) => {
             if (!state.projects.find(p => p.id === id)) {
-              let projects = Array.from(state.projects);
-              projects.push({id, title});
-              projects.sort((a, b) => b.id - a.id);
-              this.setState({projects});
+              this.setState(prevState => {
+                let projects = Array.from(prevState.projects);
+                projects.push({id, title});
+                projects.sort((a, b) => b.id - a.id);
+                return {
+                  projects,
+                  seconds: Object.assign({}, prevState.seconds, {[id]: 0})
+                };
+              });
             }
           }
         })
@@ -165,7 +176,7 @@ class App extends Component {
         "Timer",
         h.apply(null, headerButtons)
       ),
-      h("div", {className: "px-4 pb-4"}, h.apply(null, content))
+      h("div", {className: "list-group"}, h.apply(null, content))
     );
   }
 }
@@ -173,7 +184,10 @@ class App extends Component {
 function Project(props) {
   return h(
     "div",
-    {className: "my-3"},
+    {
+      className:
+        "list-group-item d-flex align-items-center justify-content-between"
+    },
     h(
       "a",
       {
@@ -186,7 +200,7 @@ function Project(props) {
     " ",
     h(
       "div",
-      null,
+      {className: "text-nowrap"},
       h(
         "button",
         {
@@ -204,9 +218,9 @@ function Project(props) {
         {
           className: "btn btn-outline-secondary btn-sm",
           onClick: () => props.logHours(),
-          title: "Log hours"
+          title: `${props.deciHours}h`
         },
-        `+${props.hours.toFixed(1)}h`
+        `+${props.elapsed}`
       ),
       " ",
       h(
