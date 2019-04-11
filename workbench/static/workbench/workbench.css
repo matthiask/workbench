@@ -89,26 +89,28 @@ tbody th > a {
 }
 
 /* Timer */
-body {
-  min-height: 100vh;
-}
+@media screen and (min-width: 768px) {
+  body {
+    min-height: 100vh;
+  }
 
-[data-timer="footer"] .timer-panel {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: white;
-  transition: 0.2s ease-in-out;
-  transform: translateY(100%);
-}
+  [data-timer="footer"] .timer-panel {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: white;
+    transition: 0.2s ease-in-out;
+    transform: translateY(100%);
+  }
 
-[data-timer="footer"] .timer-panel:hover {
-  transform: translateY(0);
-}
+  [data-timer="footer"] .timer-panel:hover {
+    transform: translateY(0);
+  }
 
-[data-timer="footer"] .timer-panel-tab {
-  position: absolute;
-  top: -29px;
-  left: 0;
-  right: 0;
+  [data-timer="footer"] .timer-panel-tab {
+    position: absolute;
+    top: -29px;
+    left: 0;
+    right: 0;
+  }
 }
