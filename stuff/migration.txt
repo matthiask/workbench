@@ -543,7 +543,7 @@ WHERE
 --
 
 INSERT INTO projects_service
-(id, created_at, title, position, description, project_id, service_hours, service_cost, offer_id, effort_type, effort_hours, effort_rate, cost, third_party_costs, is_logging_prohibited)
+(id, created_at, title, position, description, project_id, service_hours, service_cost, offer_id, effort_type, effort_hours, effort_rate, cost, third_party_costs, is_logging_prohibited, is_optional)
 SELECT
   p.id,
   NOW(),
@@ -559,6 +559,7 @@ SELECT
   p.invoicing_hourly_rate,
   NULL,
   NULL,
+  FALSE,
   FALSE
 FROM dblink(
     'dbname=fineware_feinheit',
@@ -581,7 +582,8 @@ INSERT INTO projects_service
   effort_rate,
   cost,
   third_party_costs,
-  is_logging_prohibited
+  is_logging_prohibited,
+  is_optional
 )
 SELECT
   p.id + 100000,
@@ -598,6 +600,7 @@ SELECT
   NULL,
   count * cost * (1 + commission / 100),
   count * cost,
+  FALSE,
   FALSE
 FROM dblink(
     'dbname=fineware_feinheit',
@@ -760,8 +763,8 @@ dblink(
 --
 
 INSERT INTO projects_service
-(created_at, title, position, description, project_id, service_hours, service_cost, effort_type, effort_rate, is_logging_prohibited)
-SELECT DISTINCT ON (p.job_id, activitygroup) NOW(), CONCAT('Logbuch:', activitygroup), 0, '', p.job_id, 0.0, 0.0, activitygroup, rate, FALSE FROM
+(created_at, title, position, description, project_id, service_hours, service_cost, effort_type, effort_rate, is_logging_prohibited, is_optional)
+SELECT DISTINCT ON (p.job_id, activitygroup) NOW(), CONCAT('Logbuch:', activitygroup), 0, '', p.job_id, 0.0, 0.0, activitygroup, rate, FALSE, FALSE FROM
 dblink(
     'dbname=fineware_feinheit',
     'SELECT created, date, hours, w.notes, created_by_id, worker_id, job_id, aa.name, w.invoicing_hourly_rate FROM worklog_worklogentry w LEFT JOIN articles_activity a ON w.activity_id=a.id LEFT JOIN articles_activity aa ON a.parent_id=aa.id'
@@ -836,7 +839,8 @@ service_cost,
 effort_type,
 effort_hours,
 effort_rate,
-is_logging_prohibited
+is_logging_prohibited,
+is_optional
 )
 SELECT
 NOW(),
@@ -849,7 +853,8 @@ p.scheduled_hours * COALESCE(p.invoicing_rate_override, 180),
 'Eingeplante Stunden',
 p.scheduled_hours,
 COALESCE(p.invoicing_rate_override, 180),
-TRUE
+TRUE,
+FALSE
 FROM
 dblink(
 'dbname=fineware_feinheit',

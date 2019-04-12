@@ -7,6 +7,7 @@ from django.conf import settings
 from django.utils.translation import gettext as _
 
 from pdfdocument.document import (
+    TA_RIGHT,
     Frame,
     MarkupParagraph,
     NextPageTemplate,
@@ -72,6 +73,8 @@ class PDFDocument(_PDFDocument):
             leading=1.2 * self.style.fontSize,
         )
 
+        self.style.right = style(self.style.normal, alignment=TA_RIGHT)
+
         self.style.small = style(self.style.normal, fontSize=self.style.fontSize * 0.9)
         self.style.smaller = style(
             self.style.normal, fontSize=self.style.fontSize * 0.75
@@ -90,7 +93,7 @@ class PDFDocument(_PDFDocument):
         )
 
         self.style.tableHeadLine = self.style.table + (
-            ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+            ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
             ("RIGHTPADDING", (0, 0), (0, -1), 2 * mm),
             ("LINEABOVE", (0, 0), (-1, 0), 0.2, colors.black),
             ("LINEBELOW", (0, 0), (-1, 0), 0.2, colors.black),
@@ -110,8 +113,13 @@ class PDFDocument(_PDFDocument):
         self.bounds.W = 20 * mm
         self.bounds.outsideN = self.bounds.N + 5 * mm
         self.bounds.outsideS = self.bounds.S - 5 * mm
-        self.style.tableColumns = (self.bounds.E - self.bounds.W - 20 * mm, 20 * mm)
+        self.style.tableColumns = (self.bounds.E - self.bounds.W - 15 * mm, 15 * mm)
         self.style.tableColumnsLeft = list(reversed(self.style.tableColumns))
+        self.style.tableThreeColumns = (
+            self.bounds.E - self.bounds.W - 30 * mm,
+            15 * mm,
+            15 * mm,
+        )
 
     def init_letter(self, page_fn, page_fn_later=None, address_y=None, address_x=None):
         self.generate_style()
@@ -193,20 +201,31 @@ class PDFDocument(_PDFDocument):
         if not services:
             return
 
-        table = [(_("Services"), "")]
+        table = [(_("Services"), "", "")]
         for service in services:
+            is_optional = getattr(service, "is_optional", False)
             table.append(
                 (
                     MarkupParagraph(
-                        "<b>%s</b><br/>%s"
-                        % (sanitize(service.title), sanitize(service.description)),
+                        "<b>%s</b> %s<br/>%s"
+                        % (
+                            sanitize(service.title),
+                            _("(optional)") if is_optional else "",
+                            sanitize(service.description),
+                        ),
                         self.style.normal,
                     ),
-                    service.service_cost.quantize(Z),
+                    MarkupParagraph(
+                        "<i>%s</i>" % currency(service.service_cost.quantize(Z)),
+                        self.style.right,
+                    )
+                    if is_optional
+                    else "",
+                    "" if is_optional else currency(service.service_cost.quantize(Z)),
                 )
             )
 
-        self.table(table, self.style.tableColumns, self.style.tableHead)
+        self.table(table, self.style.tableThreeColumns, self.style.tableHead)
 
     def table_total(self, instance):
         total = [(_("subtotal"), currency(instance.subtotal.quantize(Z)))]

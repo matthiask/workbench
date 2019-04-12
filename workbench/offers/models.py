@@ -111,7 +111,12 @@ class Offer(ModelWithTotal):
 
     def _calculate_total(self):
         self.subtotal = sum(
-            (service.service_cost for service in self.services.all()), Z
+            (
+                service.service_cost
+                for service in self.services.all()
+                if not service.is_optional
+            ),
+            Z,
         )
         super()._calculate_total()
 

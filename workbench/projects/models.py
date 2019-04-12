@@ -208,6 +208,11 @@ class Service(ServiceBase):
         default=False,
         help_text=_("Use this for service entries which are only used for budgeting."),
     )
+    is_optional = models.BooleanField(
+        _("is optional"),
+        default=False,
+        help_text=_("Optional services to not count towards the offer total."),
+    )
 
     def get_absolute_url(self):
         return self.project.get_absolute_url()

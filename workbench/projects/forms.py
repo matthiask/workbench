@@ -141,6 +141,7 @@ class ServiceForm(ModelForm):
             "offer",
             "title",
             "description",
+            "is_optional",
             "is_logging_prohibited",
             "effort_type",
             "effort_hours",

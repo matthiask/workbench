@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-09 11:11+0200\n"
+"POT-Creation-Date: 2019-04-12 18:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -130,7 +130,7 @@ msgstr "Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."
 #: workbench/templates/projects/project_detail.html:159
 #: workbench/templates/reporting/monthly_invoicing.html:15
 #: workbench/templates/reporting/open_items_list.html:20
-#: workbench/tools/pdf.py:305
+#: workbench/tools/pdf.py:318
 msgid "invoice"
 msgstr "Rechnung"
 
@@ -768,7 +768,7 @@ msgstr "Geschlossen am"
 msgid "Open since %(created_at)s"
 msgstr "Offen seit %(created_at)s"
 
-#: workbench/deals/models.py:98 workbench/offers/models.py:143
+#: workbench/deals/models.py:98 workbench/offers/models.py:148
 #, python-format
 msgid "%(status)s on %(closed_on)s"
 msgstr "%(status)s am %(closed_on)s"
@@ -820,7 +820,7 @@ msgstr "Durch Projekt bestimmt."
 
 #: workbench/invoices/forms.py:115 workbench/invoices/models.py:51
 #: workbench/templates/projects/project_detail.html:163
-#: workbench/tools/pdf.py:221
+#: workbench/tools/pdf.py:234
 msgid "Down payment"
 msgstr "Anzahlung"
 
@@ -940,7 +940,7 @@ msgstr "Ersetzt"
 msgid "Fixed amount"
 msgstr "Fixbetrag"
 
-#: workbench/invoices/models.py:52 workbench/tools/pdf.py:196
+#: workbench/invoices/models.py:52 workbench/tools/pdf.py:199
 msgid "Services"
 msgstr "Leistungen"
 
@@ -1001,7 +1001,7 @@ msgstr "Fälligkeitsdatum muss später als Rechnungsdatum sein."
 msgid "Invoices of type %(type)s require a project."
 msgstr "Rechnungen vom Typ %(type)s benötigen zwingend ein Projekt."
 
-#: workbench/invoices/models.py:233 workbench/offers/models.py:135
+#: workbench/invoices/models.py:233 workbench/offers/models.py:140
 #, python-format
 msgid "In preparation since %(created_at)s"
 msgstr "In Vorbereitung seit %(created_at)s"
@@ -1034,11 +1034,11 @@ msgstr "Total CHF inkl. MwSt Akonto"
 msgid "down payment total CHF"
 msgstr "Total CHF Akonto"
 
-#: workbench/invoices/models.py:270 workbench/offers/models.py:161
+#: workbench/invoices/models.py:270 workbench/offers/models.py:166
 msgid "total CHF incl. tax"
 msgstr "Total CHF inkl. MwSt"
 
-#: workbench/invoices/models.py:270 workbench/offers/models.py:161
+#: workbench/invoices/models.py:270 workbench/offers/models.py:166
 msgid "total CHF"
 msgstr "Total CHF"
 
@@ -1251,20 +1251,20 @@ msgstr "offeriert am"
 #: workbench/offers/models.py:74 workbench/projects/models.py:202
 #: workbench/templates/projects/project_detail.html:64
 #: workbench/templates/projects/project_detail.html:169
-#: workbench/tools/pdf.py:270
+#: workbench/tools/pdf.py:283
 msgid "offer"
 msgstr "Offerte"
 
-#: workbench/offers/models.py:124
+#: workbench/offers/models.py:129
 msgid "Offered on date missing for selected state."
 msgstr "Offertdatum fehlt für den ausgewählten Status."
 
-#: workbench/offers/models.py:139
+#: workbench/offers/models.py:144
 #, python-format
 msgid "Offered on %(offered_on)s"
 msgstr "Offeriert am %(offered_on)s"
 
-#: workbench/offers/models.py:169
+#: workbench/offers/models.py:174
 msgid ""
 "Offers can only be created from projects. Go to the project and add services "
 "first, then you'll be able to create the offer itself."
@@ -1272,7 +1272,7 @@ msgstr ""
 "Offerten können nur aus Projekten erstellt werden. Gehe zuerst zum Projekt, "
 "füge Leistungen hinzu, und dann kannst Du die eigentliche Offerte erstellen."
 
-#: workbench/offers/models.py:181
+#: workbench/offers/models.py:186
 msgid "Offers in preparation may be deleted, others not."
 msgstr "Offerten in Vorbereitung können gelöscht werden, andere nicht."
 
@@ -1297,7 +1297,7 @@ msgid ""
 msgstr ""
 "Dieses Projekt hat schon Rechnungen. Der Rechnungskunde wird auch angepasst."
 
-#: workbench/projects/forms.py:175
+#: workbench/projects/forms.py:176
 msgid ""
 "Most fields are disabled because service is bound to an offer which is not "
 "in preparation anymore."
@@ -1305,7 +1305,7 @@ msgstr ""
 "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte "
 "verbunden ist, welche sich nicht mehr in Vorbereitung befindet."
 
-#: workbench/projects/forms.py:193
+#: workbench/projects/forms.py:194
 msgid "Merge log into"
 msgstr "Erfasste Leistungen zuweisen"
 
@@ -1342,7 +1342,15 @@ msgstr "Leistungserfassung verbieten"
 msgid "Use this for service entries which are only used for budgeting."
 msgstr "Dies erlaubt, Leistungen nur für die Bugdetierung zu verwenden."
 
-#: workbench/projects/models.py:225
+#: workbench/projects/models.py:212
+msgid "is optional"
+msgstr "ist optional"
+
+#: workbench/projects/models.py:214
+msgid "Optional services to not count towards the offer total."
+msgstr "Optionale Leistungen werden nicht zum Offertentotal hinzugerechnet."
+
+#: workbench/projects/models.py:230
 msgid ""
 "Cannot delete a service bound to an offer which is not in preparation "
 "anymore."
@@ -1547,10 +1555,6 @@ msgstr "Verwaltung"
 msgid "Sign out"
 msgstr "Abmelden"
 
-#: workbench/templates/base.html:120
-msgid "Timer"
-msgstr "Timer"
-
 #: workbench/templates/contacts/person_form.html:10
 #: workbench/templates/credit_control/creditentry_upload.html:13
 #: workbench/templates/generic/object_form.html:15
@@ -1630,13 +1634,13 @@ msgid "No history found"
 msgstr "Keine Geschichte gefunden"
 
 #: workbench/templates/invoices/invoice_detail.html:67
-#: workbench/tools/models.py:108 workbench/tools/pdf.py:212
+#: workbench/tools/models.py:108 workbench/tools/pdf.py:225
 msgid "subtotal"
 msgstr "Zwischentotal"
 
 #: workbench/templates/invoices/invoice_detail.html:72
 #: workbench/tools/models.py:109 workbench/tools/models.py:150
-#: workbench/tools/pdf.py:214
+#: workbench/tools/pdf.py:227
 msgid "discount"
 msgstr "Rabatt"
 
@@ -1850,32 +1854,39 @@ msgstr "MwSt-Satz"
 msgid "%s excl. tax"
 msgstr "%s exkl. MwSt"
 
-#: workbench/tools/pdf.py:179
+#: workbench/tools/pdf.py:182
 #, python-format
 msgid "page %d"
 msgstr "Seite %d"
 
-#: workbench/tools/pdf.py:225 workbench/tools/pdf.py:277
-#: workbench/tools/pdf.py:289 workbench/tools/pdf.py:314
-#: workbench/tools/pdf.py:326
+#: workbench/tools/pdf.py:208
+msgid "(optional)"
+msgstr "(optional)"
+
+#: workbench/tools/pdf.py:238 workbench/tools/pdf.py:290
+#: workbench/tools/pdf.py:302 workbench/tools/pdf.py:327
+#: workbench/tools/pdf.py:339
 msgid "NO DATE YET"
 msgstr "NOCH KEIN DATUM"
 
-#: workbench/tools/pdf.py:233
+#: workbench/tools/pdf.py:246
 msgid "tax"
 msgstr "MwSt"
 
-#: workbench/tools/pdf.py:272 workbench/tools/pdf.py:309
+#: workbench/tools/pdf.py:285 workbench/tools/pdf.py:322
 msgid "date"
 msgstr "Datum"
 
-#: workbench/tools/pdf.py:282
+#: workbench/tools/pdf.py:295
 msgid "valid until"
 msgstr "Gültig bis"
 
 #: workbench/views.py:39
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
+
+#~ msgid "Timer"
+#~ msgstr "Timer"
 
 #~ msgid "Reminded"
 #~ msgstr "Gemahnt"
