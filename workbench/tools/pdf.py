@@ -113,7 +113,7 @@ class PDFDocument(_PDFDocument):
         self.bounds.W = 20 * mm
         self.bounds.outsideN = self.bounds.N + 5 * mm
         self.bounds.outsideS = self.bounds.S - 5 * mm
-        self.style.tableColumns = (self.bounds.E - self.bounds.W - 15 * mm, 15 * mm)
+        self.style.tableColumns = (self.bounds.E - self.bounds.W - 30 * mm, 30 * mm)
         self.style.tableColumnsLeft = list(reversed(self.style.tableColumns))
         self.style.tableThreeColumns = (
             self.bounds.E - self.bounds.W - 30 * mm,
@@ -235,13 +235,16 @@ class PDFDocument(_PDFDocument):
             for invoice in instance.down_payment_invoices.all():
                 total.append(
                     (
-                        "%s: %s (%s)"
-                        % (
-                            _("Down payment"),
-                            invoice,
-                            invoice.invoiced_on.strftime("%d.%m.%Y")
-                            if invoice.invoiced_on
-                            else _("NO DATE YET"),
+                        MarkupParagraph(
+                            "%s: %s (%s)"
+                            % (
+                                _("Down payment"),
+                                invoice,
+                                invoice.invoiced_on.strftime("%d.%m.%Y")
+                                if invoice.invoiced_on
+                                else _("NO DATE YET"),
+                            ),
+                            self.style.normal,
                         ),
                         currency(-invoice.total_excl_tax.quantize(Z)),
                     )
