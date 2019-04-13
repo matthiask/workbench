@@ -24,6 +24,8 @@ look like this::
         ]
 """
 
+import re
+
 
 def drop_old_shit(table):
     return """\
@@ -72,15 +74,31 @@ CREATE TRIGGER {table}_fts_trigger BEFORE INSERT OR UPDATE
     )
 
 
+def process_query(s):
+    """
+    Converts the user's search string into something suitable for passing to
+    to_tsquery.
+    """
+    # noqa Thanks https://www.fusionbox.com/blog/detail/partial-word-search-with-postgres-full-text-search-in-django/632/
+    query = re.sub(r"[!\'()|&]", " ", s).strip()
+    if query:
+        query = re.sub(r"\s+", " & ", query)
+        # Support prefix search on the last word. A tsquery of 'toda:*' will
+        # match against any words that start with 'toda', which is good for
+        # search-as-you-type.
+        query += ":*"
+    return query
+
+
 def search(queryset, terms):
     return (
         queryset.extra(
             where=[
                 "%s.fts_document"
-                " @@ plainto_tsquery('pg_catalog.german', unaccent(%%s))"
+                " @@ to_tsquery('pg_catalog.german', unaccent(%%s))"
                 % (queryset.model._meta.db_table,)
             ],
-            params=[terms],
+            params=[process_query(terms)],
         )
         if terms
         else queryset
