@@ -14,15 +14,12 @@ class OrganizationListView(ListView):
 class PersonListView(ListView):
     model = Person
     search_form_class = PersonSearchForm
-    person_picker = False
 
     def get_root_queryset(self):
         return Person.objects.active()
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related("organization")
-        if self.person_picker:
-            return queryset.filter(organization__isnull=False)
         return queryset.extra(
             select={
                 "email": (

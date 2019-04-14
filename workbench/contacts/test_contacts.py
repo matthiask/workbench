@@ -85,10 +85,6 @@ class ContactsTest(TestCase):
         self.assertContains(response, "1 &ndash; 2 von 2")
         self.assertContains(response, "Vorname Nachname", 2)
 
-        response = self.client.get(person.urls["picker"])
-        self.assertNotContains(response, "Vorname Nachname")  # No organization
-        # print(response, response.content.decode("utf-8"))
-
         response = self.client.get("/contacts/people/?g=" + str(group1.pk))
         self.assertContains(response, person.full_name)
 

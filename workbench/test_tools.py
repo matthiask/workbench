@@ -8,7 +8,7 @@ from workbench import factories
 from workbench.awt.models import Year  # any tools.Model()
 from workbench.contacts.models import Organization
 from workbench.projects.models import Project
-from workbench.tools.forms import Picker
+from workbench.tools.forms import Autocomplete
 from workbench.tools.models import ModelWithTotal
 from workbench.tools.testing import messages
 
@@ -23,15 +23,15 @@ class ToolsTest(TestCase):
             '\n<a href="/report/annual-working-time/?year=2012">\n  Jahr: 2012\n</a>\n',
         )
 
-    def test_invalid_picker(self):
+    def test_invalid_autocomplete(self):
         class ProjectForm(forms.ModelForm):
             class Meta:
                 model = Project
                 fields = ["customer"]
-                widgets = {"customer": Picker(model=Organization)}
+                widgets = {"customer": Autocomplete(model=Organization)}
 
         form = ProjectForm(initial={"customer": "test"})
-        self.assertIn('data-pretty=""', str(form))
+        self.assertIn('value=""', str(form))
 
     def test_model_with_total(self):
         m = ModelWithTotal(

@@ -19,24 +19,6 @@ class Textarea(forms.Textarea):
         super().__init__(default_attrs)
 
 
-_PICKER_TEMPLATE = """
-<div class="input-group">
-  <div class="input-group-prepend">
-    <a href="%(url)s" class="btn btn-secondary" data-toggle="ajaxmodal">
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15.7 13.3l-3.81-3.83A5.93 5.93 0 0 0 13 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 0 0 0-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z"/></svg>
-    </a>
-    <button type="button" class="btn btn-secondary %(clear_css)s"
-      id="%(id)s_clear"
-      data-toggle="picker" data-id="%(id)s" data-key="" data-pretty=""
-      >&times;</button>
-  </div>
-  <input type="text" class="form-control" id="%(id)s_pretty"
-    value="%(pretty)s" placeholder="%(placeholder)s" disabled>
-</div>
-%(field)s
-"""  # noqa
-
-
 _AUTOCOMPLETE_TEMPLATE = """
 <div class="input-group">
   <input type="text" class="form-control" id="%(id)s_pretty"
@@ -50,47 +32,6 @@ _AUTOCOMPLETE_TEMPLATE = """
 </div>
 %(field)s
 """  # noqa
-
-
-class Picker(forms.TextInput):
-    def __init__(self, model, attrs=None):
-        super().__init__(attrs)
-        self.model = model
-
-    def render(self, name, value, attrs=None, choices=(), renderer=None):
-        if value is None:
-            value = ""
-        final_attrs = self.build_attrs(attrs, {"type": "hidden", "name": name})
-        if value != "":
-            # Only add the 'value' attribute if a value is non-empty.
-            final_attrs["value"] = force_text(self.format_value(value))
-
-        pretty = ""
-        try:
-            if value:
-                pretty = str(self.model.objects.get(pk=value))
-        except (self.model.DoesNotExist, TypeError, ValueError):
-            pass
-
-        if final_attrs.get("disabled"):
-            return super().render(name, pretty or value, attrs, renderer=renderer)
-
-        opts = self.model._meta
-        return mark_safe(
-            _PICKER_TEMPLATE
-            % {
-                "id": final_attrs["id"],
-                "url": "%s?id=%s"
-                % (
-                    reverse("%s_%s_picker" % (opts.app_label, opts.model_name)),
-                    final_attrs["id"],
-                ),
-                "field": format_html("<input{} />", flatatt(final_attrs)),
-                "pretty": escape(pretty),
-                "placeholder": opts.verbose_name,
-                "clear_css": "" if value else "d-none",
-            }
-        )
 
 
 class Autocomplete(forms.TextInput):

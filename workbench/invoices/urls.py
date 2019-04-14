@@ -19,13 +19,6 @@ urlpatterns = [
         name="invoices_invoice_list",
     ),
     url(
-        r"^picker/$",
-        generic.ListView.as_view(
-            model=Invoice, template_name_suffix="_picker", paginate_by=15
-        ),
-        name="invoices_invoice_picker",
-    ),
-    url(
         r"^autocomplete/$",
         generic.AutocompleteView.as_view(
             model=Invoice,

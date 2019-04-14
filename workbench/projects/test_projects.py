@@ -216,10 +216,6 @@ class ProjectsTest(TestCase):
         valid("owned_by={}".format(user.id))
         valid("owned_by=0")  # only inactive
 
-        response = self.client.get(project.urls["picker"])
-        self.assertContains(response, 'data-toggle="picker"')
-        self.assertContains(response, 'data-key="{}"'.format(project.pk))
-
     def test_autocomplete(self):
         project = factories.ProjectFactory.create()
         user = factories.UserFactory.create()

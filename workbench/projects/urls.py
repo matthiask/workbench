@@ -25,13 +25,6 @@ urlpatterns = [
         name="projects_project_list",
     ),
     url(
-        r"^picker/$",
-        generic.ListView.as_view(
-            model=Project, template_name_suffix="_picker", paginate_by=15
-        ),
-        name="projects_project_picker",
-    ),
-    url(
         r"^autocomplete/$",
         generic.AutocompleteView.as_view(
             model=Project, queryset=Project.objects.select_related("owned_by")

@@ -15,13 +15,6 @@ urlpatterns = [
         name="contacts_organization_list",
     ),
     url(
-        r"^organizations/picker/$",
-        generic.ListView.as_view(
-            model=Organization, template_name_suffix="_picker", paginate_by=15
-        ),
-        name="contacts_organization_picker",
-    ),
-    url(
         r"^organizations/autocomplete/$",
         generic.AutocompleteView.as_view(model=Organization),
         name="contacts_organization_autocomplete",
@@ -47,13 +40,6 @@ urlpatterns = [
         name="contacts_organization_delete",
     ),
     url(r"^people/$", PersonListView.as_view(), name="contacts_person_list"),
-    url(
-        r"^people/picker/$",
-        PersonListView.as_view(
-            person_picker=True, template_name_suffix="_picker", paginate_by=15
-        ),
-        name="contacts_person_picker",
-    ),
     url(
         r"^people/autocomplete/$",
         generic.AutocompleteView.as_view(
