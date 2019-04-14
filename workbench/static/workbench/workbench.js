@@ -222,6 +222,7 @@ function initWidgets() {
       data = self.data("autofill"),
       sel = self.find("select");
 
+    self.addClass("initialized");
     sel.on("change", function() {
       if (data["" + this.value]) {
         $.each(data["" + this.value], function(key, value) {
@@ -238,6 +239,7 @@ function initWidgets() {
       input = $("#" + id);
 
     self
+      .addClass("initialized")
       .autocomplete({
         minLength: 3,
         source: function(request, response) {
@@ -258,6 +260,12 @@ function initWidgets() {
       .on("focus", function() {
         this.select();
       });
+  });
+
+  $(document.body).on("click", "[data-clear]", function() {
+    $(this.dataset.clear)
+      .val("")
+      .trigger("change");
   });
 }
 

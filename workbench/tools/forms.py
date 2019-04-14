@@ -45,9 +45,7 @@ _AUTOCOMPLETE_TEMPLATE = """
     data-autocomplete-url="%(url)s" data-autocomplete-id="%(id)s">
   <div class="input-group-append">
     <button type="button" class="btn btn-secondary" %(btn_attrs)s
-      id="%(id)s_clear"
-      data-toggle="picker" data-id="%(id)s" data-key="" data-pretty=""
-      >&times;</button>
+      data-clear="#%(id)s,#%(id)s_pretty">&times;</button>
   </div>
 </div>
 %(field)s
