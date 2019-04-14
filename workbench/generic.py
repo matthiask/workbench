@@ -263,9 +263,10 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
 class AutocompleteView(ToolsMixin, vanilla.ListView):
     def get(self, request, *args, **kwargs):
         return JsonResponse(
-            [
-                {"label": str(instance), "value": instance.pk}
-                for instance in self.model.objects.search(request.GET.get("q"))
-            ],
-            safe=False,
+            {
+                "results": [
+                    {"label": str(instance), "value": instance.pk}
+                    for instance in self.get_queryset().search(request.GET.get("q"))
+                ]
+            }
         )

@@ -244,7 +244,7 @@ function initWidgets() {
         minLength: 3,
         source: function(request, response) {
           $.get(url, {q: request.term}, function(data) {
-            response(data);
+            response(data.results);
           });
         },
         focus: function(event, ui) {
