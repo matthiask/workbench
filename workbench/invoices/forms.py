@@ -13,7 +13,7 @@ from workbench.invoices.models import Invoice, RecurringInvoice, Service
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.services.models import ServiceType
 from workbench.tools.formats import currency, hours, local_date_format
-from workbench.tools.forms import ModelForm, Picker, Textarea
+from workbench.tools.forms import Autocomplete, ModelForm, Picker, Textarea
 from workbench.tools.models import Z
 
 
@@ -403,8 +403,8 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
             "liable_to_vat",
         )
         widgets = {
-            "customer": Picker(model=Organization),
-            "contact": Picker(model=Person),
+            "customer": Autocomplete(model=Organization),
+            "contact": Autocomplete(model=Person),
             "description": Textarea,
             "postal_address": Textarea,
         }

@@ -8,7 +8,7 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
-from workbench.tools.forms import Autocomplete, ModelForm, Picker, Textarea
+from workbench.tools.forms import Autocomplete, ModelForm, Textarea
 
 
 class ProjectSearchForm(forms.Form):
@@ -20,7 +20,6 @@ class ProjectSearchForm(forms.Form):
     org = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
         required=False,
-        # widget=Picker(model=Organization),
         widget=Autocomplete(model=Organization),
     )
     type = forms.ChoiceField(
@@ -64,8 +63,8 @@ class ProjectForm(ModelForm):
         model = Project
         fields = ("customer", "contact", "title", "description", "owned_by", "type")
         widgets = {
-            "customer": Picker(model=Organization),
-            "contact": Picker(model=Person),
+            "customer": Autocomplete(model=Organization),
+            "contact": Autocomplete(model=Person),
             "description": Textarea,
             "type": forms.RadioSelect,
         }

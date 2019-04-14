@@ -220,6 +220,23 @@ class ProjectsTest(TestCase):
         self.assertContains(response, 'data-toggle="picker"')
         self.assertContains(response, 'data-key="{}"'.format(project.pk))
 
+    def test_autocomplete(self):
+        project = factories.ProjectFactory.create()
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        response = self.client.get("/contacts/organizations/autocomplete/")
+        self.assertEqual(response.json(), {"results": []})
+        response = self.client.get("/contacts/organizations/autocomplete/?q=Orga")
+        self.assertEqual(
+            response.json(),
+            {
+                "results": [
+                    {"label": "The Organization Ltd", "value": project.customer_id}
+                ]
+            },
+        )
+
     def test_update(self):
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
