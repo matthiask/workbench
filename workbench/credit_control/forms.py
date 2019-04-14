@@ -10,7 +10,7 @@ from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.credit_control.parsers import parse_zkb
 from workbench.invoices.models import Invoice
 from workbench.tools.formats import currency, local_date_format
-from workbench.tools.forms import ModelForm, Picker, Textarea
+from workbench.tools.forms import Autocomplete, ModelForm, Textarea
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -52,7 +52,7 @@ class CreditEntryForm(ModelForm):
             "invoice",
             "notes",
         ]
-        widgets = {"invoice": Picker(model=Invoice), "notes": Textarea}
+        widgets = {"invoice": Autocomplete(model=Invoice), "notes": Textarea}
 
     def save(self):
         instance = super().save()

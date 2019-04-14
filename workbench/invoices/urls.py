@@ -26,6 +26,14 @@ urlpatterns = [
         name="invoices_invoice_picker",
     ),
     url(
+        r"^autocomplete/$",
+        generic.AutocompleteView.as_view(
+            model=Invoice,
+            queryset=Invoice.objects.select_related("project", "owned_by"),
+        ),
+        name="invoices_invoice_autocomplete",
+    ),
+    url(
         r"^(?P<pk>\d+)/$",
         generic.DetailView.as_view(model=Invoice),
         name="invoices_invoice_detail",
