@@ -22,6 +22,11 @@ urlpatterns = [
         name="contacts_organization_picker",
     ),
     url(
+        r"^organizations/autocomplete/$",
+        generic.AutocompleteView.as_view(model=Organization),
+        name="contacts_organization_autocomplete",
+    ),
+    url(
         r"^organizations/(?P<pk>\d+)/$",
         generic.DetailView.as_view(model=Organization),
         name="contacts_organization_detail",

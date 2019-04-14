@@ -1,7 +1,7 @@
 import json
 
 from django.contrib import messages
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import classonlymethod
 from django.utils.functional import cached_property
@@ -258,3 +258,14 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
 
     def get_success_url(self):
         return self.model().urls["list"]
+
+
+class AutocompleteView(ToolsMixin, vanilla.ListView):
+    def get(self, request, *args, **kwargs):
+        return JsonResponse(
+            [
+                {"label": str(instance), "value": instance.pk}
+                for instance in self.model.objects.search(request.GET.get("q"))
+            ],
+            safe=False,
+        )

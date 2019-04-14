@@ -192,8 +192,6 @@
 {% endblock %}
 
 {% block js %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static 'workbench/lib/jquery-ui.min.css' %}">
-<script src="{% static 'workbench/lib/jquery-ui.min.js' %}"></script>
 <script>
 jQuery(function($) {
   $("[data-sortable-container]").sortable({

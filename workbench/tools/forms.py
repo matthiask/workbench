@@ -37,6 +37,23 @@ _PICKER_TEMPLATE = """
 """  # noqa
 
 
+_AUTOCOMPLETE_TEMPLATE = """
+<div class="input-group">
+  <input type="text" class="form-control" id="%(id)s_pretty"
+    value="%(pretty)s" placeholder="%(placeholder)s"
+    autocomplete="off"
+    data-autocomplete-url="%(url)s" data-autocomplete-id="%(id)s">
+  <div class="input-group-append">
+    <button type="button" class="btn btn-secondary" %(btn_attrs)s
+      id="%(id)s_clear"
+      data-toggle="picker" data-id="%(id)s" data-key="" data-pretty=""
+      >&times;</button>
+  </div>
+</div>
+%(field)s
+"""  # noqa
+
+
 class Picker(forms.TextInput):
     def __init__(self, model, attrs=None):
         super().__init__(attrs)
@@ -74,6 +91,45 @@ class Picker(forms.TextInput):
                 "pretty": escape(pretty),
                 "placeholder": opts.verbose_name,
                 "clear_css": "" if value else "d-none",
+            }
+        )
+
+
+class Autocomplete(forms.TextInput):
+    def __init__(self, model, attrs=None):
+        super().__init__(attrs)
+        self.model = model
+
+    def render(self, name, value, attrs=None, choices=(), renderer=None):
+        if value is None:
+            value = ""
+        final_attrs = self.build_attrs(attrs, {"type": "hidden", "name": name})
+        if value != "":
+            # Only add the 'value' attribute if a value is non-empty.
+            final_attrs["value"] = force_text(self.format_value(value))
+
+        pretty = ""
+        try:
+            if value:
+                pretty = str(self.model.objects.get(pk=value))
+        except (self.model.DoesNotExist, TypeError, ValueError):
+            pass
+
+        if final_attrs.get("disabled"):
+            return super().render(name, pretty or value, attrs, renderer=renderer)
+
+        opts = self.model._meta
+        return mark_safe(
+            _AUTOCOMPLETE_TEMPLATE
+            % {
+                "id": final_attrs["id"],
+                "url": reverse(
+                    "%s_%s_autocomplete" % (opts.app_label, opts.model_name)
+                ),
+                "field": format_html("<input{} />", flatatt(final_attrs)),
+                "pretty": escape(pretty),
+                "placeholder": opts.verbose_name,
+                "btn_attrs": "" if value else "disabled",
             }
         )
 

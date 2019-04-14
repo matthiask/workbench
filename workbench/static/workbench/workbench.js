@@ -230,6 +230,35 @@ function initWidgets() {
       }
     });
   });
+
+  $("[data-autocomplete-id]:not(.initialized)").each(function() {
+    var self = $(this),
+      url = self.data("autocomplete-url"),
+      id = self.data("autocomplete-id"),
+      input = $("#" + id);
+
+    self
+      .autocomplete({
+        minLength: 3,
+        source: function(request, response) {
+          $.get(url, {q: request.term}, function(data) {
+            response(data);
+          });
+        },
+        focus: function(event, ui) {
+          self.val(ui.item.label);
+          return false;
+        },
+        select: function(event, ui) {
+          self.val(ui.item.label);
+          input.val(ui.item.value).trigger("change");
+          return false;
+        }
+      })
+      .on("focus", function() {
+        this.select();
+      });
+  });
 }
 
 window.addInlineForm = function addInlineForm(slug, onComplete) {
