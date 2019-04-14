@@ -9,7 +9,7 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
-from workbench.tools.forms import ModelForm, Picker, Textarea
+from workbench.tools.forms import Autocomplete, ModelForm, Textarea
 from workbench.tools.validation import raise_if_errors
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -26,13 +26,13 @@ class LoggedHoursSearchForm(forms.Form):
         queryset=Project.objects.all(),
         label=_("project"),
         required=False,
-        widget=Picker(model=Project),
+        widget=Autocomplete(model=Project),
     )
     organization = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
         label=_("organization"),
         required=False,
-        widget=Picker(model=Organization),
+        widget=Autocomplete(model=Organization),
     )
     service = forms.ModelChoiceField(
         queryset=Service.objects.all(), required=False, widget=forms.HiddenInput
@@ -80,13 +80,13 @@ class LoggedCostSearchForm(forms.Form):
         queryset=Project.objects.all(),
         label=_("project"),
         required=False,
-        widget=Picker(model=Project),
+        widget=Autocomplete(model=Project),
     )
     organization = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
         label=_("organization"),
         required=False,
-        widget=Picker(model=Organization),
+        widget=Autocomplete(model=Organization),
     )
     service = forms.IntegerField(
         label=_("service"), required=False, widget=forms.HiddenInput

@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.contacts.models import Organization, Person
 from workbench.deals.models import Deal, Stage
-from workbench.tools.forms import ModelForm, Picker
+from workbench.tools.forms import Autocomplete, ModelForm
 
 
 class DealSearchForm(forms.Form):
@@ -52,7 +52,7 @@ class DealForm(ModelForm):
             "status",
         )
         widgets = {
-            "customer": Picker(model=Organization),
-            "contact": Picker(model=Person),
+            "customer": Autocomplete(model=Organization),
+            "contact": Autocomplete(model=Person),
             "status": forms.RadioSelect,
         }

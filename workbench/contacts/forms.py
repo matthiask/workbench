@@ -13,7 +13,7 @@ from workbench.contacts.models import (
     PhoneNumber,
     PostalAddress,
 )
-from workbench.tools.forms import ModelForm, Picker, Textarea
+from workbench.tools.forms import Autocomplete, ModelForm, Textarea
 
 
 class OrganizationSearchForm(forms.Form):
@@ -82,7 +82,7 @@ class PersonForm(ModelForm):
         )
         widgets = {
             "notes": Textarea(),
-            "organization": Picker(model=Organization),
+            "organization": Autocomplete(model=Organization),
             "groups": forms.CheckboxSelectMultiple(),
         }
 

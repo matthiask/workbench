@@ -227,6 +227,8 @@ class ProjectsTest(TestCase):
 
         response = self.client.get("/contacts/organizations/autocomplete/")
         self.assertEqual(response.json(), {"results": []})
+        response = self.client.get("/contacts/organizations/autocomplete/?q=")
+        self.assertEqual(response.json(), {"results": []})
         response = self.client.get("/contacts/organizations/autocomplete/?q=Orga")
         self.assertEqual(
             response.json(),

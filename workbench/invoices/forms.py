@@ -13,7 +13,7 @@ from workbench.invoices.models import Invoice, RecurringInvoice, Service
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.services.models import ServiceType
 from workbench.tools.formats import currency, hours, local_date_format
-from workbench.tools.forms import Autocomplete, ModelForm, Picker, Textarea
+from workbench.tools.forms import Autocomplete, ModelForm, Textarea
 from workbench.tools.models import Z
 
 
@@ -30,7 +30,7 @@ class InvoiceSearchForm(forms.Form):
     org = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
         required=False,
-        widget=Picker(model=Organization),
+        widget=Autocomplete(model=Organization),
     )
     owned_by = forms.TypedChoiceField(
         label=_("owned by"),
@@ -93,8 +93,8 @@ class InvoiceForm(PostalAddressSelectionForm):
             "liable_to_vat",
         )
         widgets = {
-            "customer": Picker(model=Organization),
-            "contact": Picker(model=Person),
+            "customer": Autocomplete(model=Organization),
+            "contact": Autocomplete(model=Person),
             "status": forms.RadioSelect,
             "description": Textarea,
             "postal_address": Textarea,
@@ -542,7 +542,7 @@ class RecurringInvoiceSearchForm(forms.Form):
     org = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
         required=False,
-        widget=Picker(model=Organization),
+        widget=Autocomplete(model=Organization),
     )
     owned_by = forms.TypedChoiceField(
         label=_("owned by"),
@@ -594,8 +594,8 @@ class CreateRecurringInvoiceForm(ModelForm):
             "third_party_costs",
         )
         widgets = {
-            "customer": Picker(model=Organization),
-            "contact": Picker(model=Person),
+            "customer": Autocomplete(model=Organization),
+            "contact": Autocomplete(model=Person),
             "description": Textarea,
             "periodicity": forms.RadioSelect,
         }
@@ -628,8 +628,8 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             "third_party_costs",
         )
         widgets = {
-            "customer": Picker(model=Organization),
-            "contact": Picker(model=Person),
+            "customer": Autocomplete(model=Organization),
+            "contact": Autocomplete(model=Person),
             "description": Textarea,
             "postal_address": Textarea,
             "periodicity": forms.RadioSelect,

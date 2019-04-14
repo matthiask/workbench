@@ -32,6 +32,13 @@ urlpatterns = [
         name="projects_project_picker",
     ),
     url(
+        r"^autocomplete/$",
+        generic.AutocompleteView.as_view(
+            model=Project, queryset=Project.objects.select_related("owned_by")
+        ),
+        name="projects_project_autocomplete",
+    ),
+    url(
         r"^(?P<pk>\d+)/$",
         generic.DetailView.as_view(
             model=Project,
