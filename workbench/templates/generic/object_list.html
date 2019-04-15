@@ -11,13 +11,15 @@
     <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between">
       <h1><a class="text-reset text-decoration-none" href="{{ view.model.urls.list }}">{{ view.meta.verbose_name_plural|capfirst }}</a></h1>
       <form method="GET" action="." class="form-inline form-search mb-3 mb-lg-0">
-        <label class="sr-only">{% trans 'search' %}</label>
-        <input
-          class="form-control"
-          type="search"
-          name="q"
-          placeholder="{% trans 'search' %}"
-          value="{{ view.request.GET.q|default:'' }}">
+        {% if view.search_form %}
+          <label class="sr-only">{% trans 'search' %}</label>
+          <input
+            class="form-control"
+            type="search"
+            name="q"
+            placeholder="{% trans 'search' %}"
+            value="{{ view.request.GET.q|default:'' }}">
+        {% endif %}
 
         {% for f in view.search_form %}
           <label class="sr-only">{{ f.label }}</label>

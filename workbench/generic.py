@@ -83,12 +83,11 @@ class ListView(ToolsMixin, vanilla.ListView):
 
     def get_queryset(self):
         self.root_queryset = self.get_root_queryset()
-
-        q = self.request.GET.get("q")
-        queryset = self.root_queryset.search(q) if q else self.root_queryset.all()
+        queryset = self.root_queryset.all()
 
         if self.search_form_class:
-            queryset = self.search_form.filter(queryset)
+            q = self.request.GET.get("q")
+            queryset = self.search_form.filter(queryset.search(q) if q else queryset)
 
         return queryset
 

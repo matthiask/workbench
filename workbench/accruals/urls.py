@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from workbench import generic
-from workbench.accruals.forms import CutoffDateForm, CutoffDateSearchForm
+from workbench.accruals.forms import CutoffDateForm
 from workbench.accruals.models import CutoffDate
 from workbench.accruals.views import CutoffDateDetailView
 
@@ -9,11 +9,7 @@ from workbench.accruals.views import CutoffDateDetailView
 urlpatterns = [
     url(
         r"^$",
-        generic.ListView.as_view(
-            model=CutoffDate,
-            search_form_class=CutoffDateSearchForm,
-            # show_create_button=False,
-        ),
+        generic.ListView.as_view(model=CutoffDate),
         name="accruals_cutoffdate_list",
     ),
     url(

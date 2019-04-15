@@ -97,3 +97,8 @@ class AccrualsTest(TestCase):
             messages(response),
             ["Kann Abgrenzungen für zukünftige Stichtage nicht generieren."],
         )
+
+    def test_list(self):
+        self.client.force_login(factories.UserFactory.create())
+        self.assertEqual(self.client.get("/accruals/").status_code, 200)
+        self.assertEqual(self.client.get("/accruals/?q=foo").status_code, 200)

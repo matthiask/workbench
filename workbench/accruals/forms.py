@@ -1,13 +1,7 @@
-from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accruals.models import CutoffDate
 from workbench.tools.forms import ModelForm
-
-
-class CutoffDateSearchForm(forms.Form):
-    def filter(self, queryset):
-        return queryset
 
 
 class CutoffDateForm(ModelForm):
