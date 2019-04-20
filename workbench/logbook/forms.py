@@ -3,6 +3,7 @@ from decimal import ROUND_UP, Decimal
 
 from django import forms
 from django.utils import timezone
+from django.utils.html import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -277,13 +278,14 @@ class LoggedCostForm(ModelForm):
             self.instance.project = self.project
 
         self.fields["service"].choices = self.project.services.logging().choices()
-        # TODO add JS for those buttons
-        # self.fields["third_party_costs"].help_text = mark_safe(
-        #     "{}"
-        #     ' <button type="button" class="btn btn-secondary btn-sm">1:1</button>'
-        #     ' <button type="button" class="btn btn-secondary btn-sm">+15%</button>'
-        #     "".format(self.fields["third_party_costs"].help_text)
-        # )
+        self.fields["third_party_costs"].help_text = mark_safe(
+            '<button type="button" data-multiply-cost="1.15"'
+            ' class="btn btn-secondary btn-sm float-right ml-1">+15%</button> '
+            '<button type="button" data-multiply-cost="1"'
+            ' class="btn btn-secondary btn-sm float-right">1:1</button> '
+            "{}"
+            "".format(self.fields["third_party_costs"].help_text)
+        )
 
     def clean(self):
         data = super().clean()

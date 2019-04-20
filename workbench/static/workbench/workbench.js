@@ -175,7 +175,19 @@ $(function() {
     this.blur();
     var value = prompt(this.dataset.hoursButton);
     if (parseFloat(value)) {
-      $('#id_days').val((parseFloat(value) / 8).toFixed(2)).focus();
+      $("#id_days")
+        .val((parseFloat(value) / 8).toFixed(2))
+        .focus();
+    }
+  });
+
+  $(document.body).on("click", "[data-multiply-cost]", function() {
+    var factor = parseFloat(this.dataset.multiplyCost),
+      tpc = parseFloat($("#id_third_party_costs").val()),
+      cost = $("#id_cost");
+
+    if (tpc && factor) {
+      cost.val(factor * tpc).focus();
     }
   });
 });
