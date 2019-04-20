@@ -169,6 +169,15 @@ $(function() {
 
   // Widgets
   initWidgets();
+
+  // Some special cases...
+  $(document.body).on("click", "[data-hours-button]", function() {
+    this.blur();
+    var value = prompt(this.dataset.hoursButton);
+    if (parseFloat(value)) {
+      $('#id_days').val((parseFloat(value) / 8).toFixed(2)).focus();
+    }
+  });
 });
 
 function initWidgets() {

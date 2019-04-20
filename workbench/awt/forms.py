@@ -1,4 +1,5 @@
 from django import forms, http
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -35,4 +36,12 @@ class AbsenceForm(ModelForm):
     class Meta:
         model = Absence
         fields = ["user", "starts_on", "days", "description", "is_vacation"]
-        widgets = {"description": Textarea}
+        widgets = {"description": Textarea({"rows": 2})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["days"].help_text = format_html(
+            '<button type="button" data-hours-button="{hours}"'
+            ' class="btn btn-secondary btn-sm float-right">{hours}</button>',
+            hours=_("Enter hours"),
+        )

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-20 17:05+0200\n"
+"POT-Creation-Date: 2019-04-20 17:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -73,7 +73,7 @@ msgstr "Voller Name"
 msgid "enforce same week logging"
 msgstr "Stundenerfassung in der gleichen Woche erzwingen"
 
-#: workbench/accounts/models.py:74 workbench/awt/forms.py:11
+#: workbench/accounts/models.py:74 workbench/awt/forms.py:12
 #: workbench/awt/models.py:80 workbench/awt/models.py:126
 msgid "user"
 msgstr "Benutzer"
@@ -294,6 +294,10 @@ msgstr "Jahresarbeitszeit"
 #: workbench/awt/admin.py:14 workbench/awt/models.py:129
 msgid "days"
 msgstr "Tage"
+
+#: workbench/awt/forms.py:46 workbench/awt/forms.py:47
+msgid "Enter hours"
+msgstr "Stunden eingeben"
 
 #: workbench/awt/models.py:35 workbench/awt/models.py:54
 msgid "year"
