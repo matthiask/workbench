@@ -35,7 +35,7 @@ class App extends Component {
 
   ensureUpdates() {
     this.stopUpdates();
-    this.timer = setInterval(() => this.forceUpdate(), 10000);
+    this.timer = setInterval(() => this.forceUpdate(), 30000);
   }
 
   stopUpdates() {
