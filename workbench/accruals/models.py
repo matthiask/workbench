@@ -51,9 +51,9 @@ class AccrualQuerySet(models.QuerySet):
         down_payment_invoices = Invoice.objects.valid().filter(
             project__isnull=False,
             project__in=Project.objects.filter(
-                Q(closed_on__isnull=True) | Q(closed_on__gte=cutoff_date)
+                Q(closed_on__isnull=True) | Q(closed_on__gt=cutoff_date)
             ),
-            invoiced_on__lt=cutoff_date,
+            invoiced_on__lte=cutoff_date,
             type=Invoice.DOWN_PAYMENT,
         )
         projects = {invoice.project_id for invoice in down_payment_invoices}
@@ -83,9 +83,9 @@ class AccrualQuerySet(models.QuerySet):
         for invoice in Invoice.objects.valid().filter(
             project__isnull=False,
             project__in=Project.objects.filter(
-                Q(closed_on__isnull=True) | Q(closed_on__gte=cutoff_date)
+                Q(closed_on__isnull=True) | Q(closed_on__gt=cutoff_date)
             ),
-            invoiced_on__lt=cutoff_date,
+            invoiced_on__lte=cutoff_date,
             type=Invoice.DOWN_PAYMENT,
             subtotal__gt=0,
         ):

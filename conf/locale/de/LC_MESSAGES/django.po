@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-12 18:04+0200\n"
+"POT-Creation-Date: 2019-04-20 17:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -100,13 +100,13 @@ msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
 #: workbench/accruals/__init__.py:10 workbench/accruals/models.py:124
-#: workbench/templates/base.html:76
+#: workbench/templates/base.html:63
 msgid "accruals"
 msgstr "Abgrenzungen"
 
-#: workbench/accruals/forms.py:23
-msgid "Unusual cutoff date (not first of the month)."
-msgstr "Ungewöhnlicher Stichtag (nicht erster Tag des Monats)."
+#: workbench/accruals/forms.py:19
+msgid "Unusual cutoff date (not last of the month)."
+msgstr "Ungewöhnlicher Stichtag (nicht letzter Tag des Monats)."
 
 #: workbench/accruals/models.py:16 workbench/accruals/models.py:20
 #: workbench/accruals/models.py:108 workbench/reporting/views.py:44
@@ -130,7 +130,7 @@ msgstr "Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."
 #: workbench/templates/projects/project_detail.html:159
 #: workbench/templates/reporting/monthly_invoicing.html:15
 #: workbench/templates/reporting/open_items_list.html:20
-#: workbench/tools/pdf.py:318
+#: workbench/tools/pdf.py:327
 msgid "invoice"
 msgstr "Rechnung"
 
@@ -287,7 +287,7 @@ msgstr "aufgezeichnete Aktion"
 msgid "logged actions"
 msgstr "aufgezeichnete Aktionen"
 
-#: workbench/awt/__init__.py:10 workbench/templates/base.html:70
+#: workbench/awt/__init__.py:10 workbench/templates/base.html:72
 msgid "annual working time"
 msgstr "Jahresarbeitszeit"
 
@@ -777,32 +777,32 @@ msgstr "%(status)s am %(closed_on)s"
 msgid "Search form was invalid."
 msgstr "Suchformular war ungültig."
 
-#: workbench/generic.py:128
+#: workbench/generic.py:127
 #, python-format
 msgid "%(class)s '%(object)s' has been successfully created."
 msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
 
-#: workbench/generic.py:137
+#: workbench/generic.py:136
 #, python-format
 msgid "Create %s"
 msgstr "%s erstellen"
 
-#: workbench/generic.py:188
+#: workbench/generic.py:187
 #, python-format
 msgid "%(class)s '%(object)s' has been successfully updated."
 msgstr "%(class)s '%(object)s' wurde erfolgreich geändert."
 
-#: workbench/generic.py:196
+#: workbench/generic.py:195
 #, python-format
 msgid "Update %s"
 msgstr "%s bearbeiten"
 
-#: workbench/generic.py:244
+#: workbench/generic.py:243
 #, python-format
 msgid "%(class)s '%(object)s' has been successfully deleted."
 msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
 
-#: workbench/generic.py:252
+#: workbench/generic.py:251
 #, python-format
 msgid "Delete %s"
 msgstr "%s löschen"
@@ -820,7 +820,7 @@ msgstr "Durch Projekt bestimmt."
 
 #: workbench/invoices/forms.py:115 workbench/invoices/models.py:51
 #: workbench/templates/projects/project_detail.html:163
-#: workbench/tools/pdf.py:234
+#: workbench/tools/pdf.py:241
 msgid "Down payment"
 msgstr "Anzahlung"
 
@@ -940,7 +940,7 @@ msgstr "Ersetzt"
 msgid "Fixed amount"
 msgstr "Fixbetrag"
 
-#: workbench/invoices/models.py:52 workbench/tools/pdf.py:199
+#: workbench/invoices/models.py:52 workbench/tools/pdf.py:204
 msgid "Services"
 msgstr "Leistungen"
 
@@ -1251,7 +1251,7 @@ msgstr "offeriert am"
 #: workbench/offers/models.py:74 workbench/projects/models.py:202
 #: workbench/templates/projects/project_detail.html:64
 #: workbench/templates/projects/project_detail.html:169
-#: workbench/tools/pdf.py:283
+#: workbench/tools/pdf.py:292
 msgid "offer"
 msgstr "Offerte"
 
@@ -1503,9 +1503,8 @@ msgstr "Ziel"
 msgid "monthly sums"
 msgstr "Monatssummen"
 
-#: workbench/templates/base.html:18
-#: workbench/templates/generic/object_picker.html:30
-#: workbench/templates/search.html:5 workbench/templates/search.html:10
+#: workbench/templates/base.html:18 workbench/templates/search.html:5
+#: workbench/templates/search.html:10
 msgid "Search"
 msgstr "Suche"
 
@@ -1517,27 +1516,27 @@ msgstr "Buchhaltung"
 msgid "dunning"
 msgstr "Mahnwesen"
 
-#: workbench/templates/base.html:67
+#: workbench/templates/base.html:69
 msgid "reports"
 msgstr "Berichte"
 
-#: workbench/templates/base.html:71
+#: workbench/templates/base.html:73
 msgid "not invoiced work"
 msgstr "Nicht verrechnete Arbeit"
 
-#: workbench/templates/base.html:72
+#: workbench/templates/base.html:74
 #: workbench/templates/reporting/overdrawn_projects.html:5
 #: workbench/templates/reporting/overdrawn_projects.html:10
 msgid "overdrawn projects"
 msgstr "Überzogene Projekte"
 
-#: workbench/templates/base.html:73
+#: workbench/templates/base.html:75
 #: workbench/templates/reporting/monthly_invoicing.html:5
 #: workbench/templates/reporting/monthly_invoicing.html:10
 msgid "monthly invoicing"
 msgstr "Monatliche Verrechnung"
 
-#: workbench/templates/base.html:74
+#: workbench/templates/base.html:76
 #: workbench/templates/reporting/open_items_list.html:5
 #: workbench/templates/reporting/open_items_list.html:10
 msgid "open items list"
@@ -1610,16 +1609,16 @@ msgstr "%(object)s löschen"
 msgid "delete"
 msgstr "Löschen"
 
-#: workbench/templates/generic/object_list.html:14
-#: workbench/templates/generic/object_list.html:19
+#: workbench/templates/generic/object_list.html:15
+#: workbench/templates/generic/object_list.html:20
 msgid "search"
 msgstr "Suche"
 
-#: workbench/templates/generic/object_list.html:58
+#: workbench/templates/generic/object_list.html:60
 msgid "of"
 msgstr "von"
 
-#: workbench/templates/generic/object_list.html:60
+#: workbench/templates/generic/object_list.html:62
 #, python-format
 msgid "%(total)s total"
 msgstr "%(total)s insgesamt"
@@ -1634,13 +1633,13 @@ msgid "No history found"
 msgstr "Keine Geschichte gefunden"
 
 #: workbench/templates/invoices/invoice_detail.html:67
-#: workbench/tools/models.py:108 workbench/tools/pdf.py:225
+#: workbench/tools/models.py:108 workbench/tools/pdf.py:231
 msgid "subtotal"
 msgstr "Zwischentotal"
 
 #: workbench/templates/invoices/invoice_detail.html:72
 #: workbench/tools/models.py:109 workbench/tools/models.py:150
-#: workbench/tools/pdf.py:227
+#: workbench/tools/pdf.py:233
 msgid "discount"
 msgstr "Rabatt"
 
@@ -1792,16 +1791,16 @@ msgstr "heute fällig"
 msgid "overdue!"
 msgstr "überfällig!"
 
-#: workbench/tools/forms.py:170
+#: workbench/tools/forms.py:165
 msgid "Is automatically filled using the organization's contact."
 msgstr "Kann automatisch mit der Organisation des Kontaktes gefüllt werden."
 
-#: workbench/tools/forms.py:185
+#: workbench/tools/forms.py:180
 #, python-format
 msgid "The contact %(person)s does not belong to  %(organization)s."
 msgstr "Der Kontakt %(person)s gehört nicht zu %(organization)s."
 
-#: workbench/tools/forms.py:202
+#: workbench/tools/forms.py:197
 msgid "No contact selected."
 msgstr "Kein Kontakt ausgewählt."
 
@@ -1854,30 +1853,30 @@ msgstr "MwSt-Satz"
 msgid "%s excl. tax"
 msgstr "%s exkl. MwSt"
 
-#: workbench/tools/pdf.py:182
+#: workbench/tools/pdf.py:187
 #, python-format
 msgid "page %d"
 msgstr "Seite %d"
 
-#: workbench/tools/pdf.py:208
+#: workbench/tools/pdf.py:213
 msgid "(optional)"
 msgstr "(optional)"
 
-#: workbench/tools/pdf.py:238 workbench/tools/pdf.py:290
-#: workbench/tools/pdf.py:302 workbench/tools/pdf.py:327
-#: workbench/tools/pdf.py:339
+#: workbench/tools/pdf.py:245 workbench/tools/pdf.py:299
+#: workbench/tools/pdf.py:311 workbench/tools/pdf.py:336
+#: workbench/tools/pdf.py:348
 msgid "NO DATE YET"
 msgstr "NOCH KEIN DATUM"
 
-#: workbench/tools/pdf.py:246
+#: workbench/tools/pdf.py:255
 msgid "tax"
 msgstr "MwSt"
 
-#: workbench/tools/pdf.py:285 workbench/tools/pdf.py:322
+#: workbench/tools/pdf.py:294 workbench/tools/pdf.py:331
 msgid "date"
 msgstr "Datum"
 
-#: workbench/tools/pdf.py:295
+#: workbench/tools/pdf.py:304
 msgid "valid until"
 msgstr "Gültig bis"
 

@@ -13,25 +13,25 @@ class AccrualsTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
         response = self.client.post("/accruals/create/", {"day": ""})
         self.assertContains(response, "Dieses Feld ist zwingend erforderlich.")
-        response = self.client.post("/accruals/create/", {"day": "01.01.2019"})
+        response = self.client.post("/accruals/create/", {"day": "31.01.2019"})
         day = CutoffDate.objects.get()
         self.assertRedirects(response, day.urls["detail"])
         response = self.client.post(day.urls["delete"])
         self.assertRedirects(response, day.urls["list"])
         self.assertEqual(
-            messages(response), ["Stichtag '01.01.2019' wurde erfolgreich gelöscht."]
+            messages(response), ["Stichtag '31.01.2019' wurde erfolgreich gelöscht."]
         )
 
     def test_cutoff_day_warning(self):
         self.client.force_login(factories.UserFactory.create())
-        response = self.client.post("/accruals/create/", {"day": "31.01.2019"})
+        response = self.client.post("/accruals/create/", {"day": "01.01.2019"})
         self.assertContains(
-            response, "Ungewöhnlicher Stichtag (nicht erster Tag des Monats)."
+            response, "Ungewöhnlicher Stichtag (nicht letzter Tag des Monats)."
         )
 
         response = self.client.post(
             "/accruals/create/",
-            {"day": "31.01.2019", WarningsForm.ignore_warnings_id: "unusual-cutoff"},
+            {"day": "01.01.2019", WarningsForm.ignore_warnings_id: "unusual-cutoff"},
         )
         self.assertEqual(response.status_code, 302)
 
@@ -45,7 +45,7 @@ class AccrualsTest(TestCase):
         )
 
         self.client.force_login(factories.UserFactory.create())
-        response = self.client.post("/accruals/create/", {"day": "01.01.2019"})
+        response = self.client.post("/accruals/create/", {"day": "31.12.2018"})
         day = CutoffDate.objects.get()
         self.assertRedirects(response, day.urls["detail"])
 
@@ -87,7 +87,7 @@ class AccrualsTest(TestCase):
 
     def test_future_cutoff_dates(self):
         self.client.force_login(factories.UserFactory.create())
-        response = self.client.post("/accruals/create/", {"day": "01.01.2099"})
+        response = self.client.post("/accruals/create/", {"day": "31.01.2099"})
         day = CutoffDate.objects.get()
         self.assertRedirects(response, day.urls["detail"])
 

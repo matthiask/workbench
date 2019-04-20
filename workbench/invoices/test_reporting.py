@@ -22,14 +22,14 @@ class ReportingTest(TestCase):
         self.assertRedirects(response, "/report/open-items-list/")
         self.assertEqual(messages(response), ["Formular war ungültig."])
         response = self.client.get("/report/open-items-list/")
-        self.assertContains(response, '<th class="text-right">0.00</th>')
+        self.assertContains(response, '<th class="text-right">1’000.00</th>')
 
         response = self.client.get(
             "/report/open-items-list/?cutoff_date={}".format(
-                local_date_format(date.today() + timedelta(days=1))
+                local_date_format(date.today() - timedelta(days=1))
             )
         )
-        self.assertContains(response, '<th class="text-right">1’000.00</th>')
+        self.assertContains(response, '<th class="text-right">0.00</th>')
 
         self.assertEqual(
             self.client.get("/report/open-items-list/?xlsx=1").status_code, 200

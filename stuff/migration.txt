@@ -887,7 +887,7 @@ SELECT "day"
 FROM
 dblink(
 'dbname=fineware_feinheit',
-'SELECT DISTINCT month+1 FROM cashflow_periodicaladjustment ORDER BY month+1'
+'SELECT DISTINCT month FROM cashflow_periodicaladjustment ORDER BY month'
 ) AS p(day date);
 
 
@@ -898,7 +898,7 @@ SELECT invoice_id, month, adjustment, 0
 FROM
 dblink(
 'dbname=fineware_feinheit',
-'SELECT month+1, adjustment, invoice_id FROM cashflow_periodicaladjustment ORDER BY month+1, invoice_id'
+'SELECT month, adjustment, invoice_id FROM cashflow_periodicaladjustment ORDER BY month, invoice_id'
 ) AS p(month date, adjustment int, invoice_id int);
 
 

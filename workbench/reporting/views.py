@@ -55,8 +55,8 @@ class OpenItemsForm(forms.Form):
         open_items = (
             Invoice.objects.filter(
                 ~Q(status__in=[Invoice.IN_PREPARATION, Invoice.REPLACED]),
-                Q(invoiced_on__lt=self.cleaned_data["cutoff_date"]),
-                Q(closed_on__gte=self.cleaned_data["cutoff_date"])
+                Q(invoiced_on__lte=self.cleaned_data["cutoff_date"]),
+                Q(closed_on__gt=self.cleaned_data["cutoff_date"])
                 | Q(closed_on__isnull=True),
             )
             .order_by("invoiced_on", "pk")
