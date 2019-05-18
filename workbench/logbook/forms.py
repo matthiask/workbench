@@ -70,9 +70,9 @@ class LoggedHoursSearchForm(forms.Form):
 
 
 class LoggedCostSearchForm(forms.Form):
-    created_by = forms.ModelChoiceField(
+    rendered_by = forms.ModelChoiceField(
         queryset=User.objects.all(),
-        label=_("created by"),
+        label=_("rendered by"),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
         empty_label=_("All users"),
@@ -95,8 +95,8 @@ class LoggedCostSearchForm(forms.Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get("created_by"):
-            queryset = queryset.filter(created_by=data.get("created_by"))
+        if data.get("rendered_by"):
+            queryset = queryset.filter(rendered_by=data.get("rendered_by"))
         if data.get("project"):
             queryset = queryset.filter(project=data.get("project"))
         if data.get("organization"):
@@ -108,7 +108,7 @@ class LoggedCostSearchForm(forms.Form):
         elif data.get("service"):
             queryset = queryset.filter(service=data.get("service"))
 
-        return queryset.select_related("project__owned_by", "service", "created_by")
+        return queryset.select_related("project__owned_by", "service", "rendered_by")
 
     def response(self, request, queryset):
         if request.GET.get("xlsx"):
@@ -260,7 +260,15 @@ class LoggedHoursForm(ModelForm):
 class LoggedCostForm(ModelForm):
     class Meta:
         model = LoggedCost
-        fields = ("service", "rendered_on", "third_party_costs", "cost", "description")
+        fields = (
+            "service",
+            "rendered_by",
+            "rendered_on",
+            "third_party_costs",
+            "are_expenses",
+            "cost",
+            "description",
+        )
         widgets = {"description": Textarea({"rows": 2})}
 
     def __init__(self, *args, **kwargs):

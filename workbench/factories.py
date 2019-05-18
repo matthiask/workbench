@@ -138,6 +138,7 @@ class LoggedHoursFactory(factory.DjangoModelFactory):
 class LoggedCostFactory(factory.DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     created_by = factory.SubFactory(UserFactory)
+    rendered_by = factory.LazyAttribute(lambda obj: obj.created_by)
     cost = 10
 
     class Meta:

@@ -127,6 +127,7 @@ class LogbookTest(TestCase):
         response = self.client.post(
             project.urls["createcost"],
             {
+                "rendered_by": project.owned_by_id,
                 "rendered_on": local_date_format(date.today()),
                 "cost": "10",
                 "third_party_costs": "9",
@@ -143,6 +144,7 @@ class LogbookTest(TestCase):
         response = self.client.post(
             cost.urls["update"],
             {
+                "rendered_by": project.owned_by_id,
                 "rendered_on": local_date_format(date.today()),
                 "cost": "10",
                 "third_party_costs": "9",
@@ -155,6 +157,7 @@ class LogbookTest(TestCase):
         response = self.client.post(
             cost.urls["update"],
             {
+                "rendered_by": project.owned_by_id,
                 "rendered_on": local_date_format(date.today()),
                 "cost": "10",
                 "third_party_costs": "9",

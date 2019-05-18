@@ -103,6 +103,12 @@ class LoggedCost(Model):
         User, on_delete=models.PROTECT, related_name="+", verbose_name=_("created by")
     )
     rendered_on = models.DateField(_("rendered on"), default=date.today)
+    rendered_by = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        related_name="loggedcosts",
+        verbose_name=_("rendered by"),
+    )
     cost = MoneyField(_("cost"))
     third_party_costs = MoneyField(
         _("third party costs"),
@@ -121,6 +127,11 @@ class LoggedCost(Model):
         related_name="+",
     )
     archived_at = models.DateTimeField(_("archived at"), blank=True, null=True)
+
+    are_expenses = models.BooleanField(_("are expenses"), default=True)
+    expenses_reimbursed_at = models.DateTimeField(
+        _("expenses reimbursed at"), blank=True, null=True
+    )
 
     class Meta:
         ordering = ("-rendered_on", "-created_at")

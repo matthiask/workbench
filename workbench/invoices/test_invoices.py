@@ -225,6 +225,7 @@ class InvoicesTest(TestCase):
             cost.urls["update"],
             {
                 # "service": cost.service_id,
+                "rendered_by": cost.rendered_by_id,
                 "rendered_on": local_date_format(cost.rendered_on),
                 "third_party_costs": cost.third_party_costs or "",
                 "cost": 2 * cost.cost,

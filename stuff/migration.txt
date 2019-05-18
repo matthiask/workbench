@@ -791,7 +791,7 @@ dblink(
 WHERE s.project_id=p.job_id AND s.title=CONCAT('Logbuch:', activitygroup);
 
 INSERT INTO logbook_loggedcost
-(created_at, rendered_on, cost, third_party_costs, description, created_by_id, invoice_service_id, project_id, service_id)
+(created_at, rendered_on, cost, third_party_costs, description, created_by_id, rendered_by_id, invoice_service_id, project_id, service_id, are_expenses)
 SELECT
   created,
   date,
@@ -799,9 +799,11 @@ SELECT
   count * cost,
   notes,
   created_by_id,
+  created_by_id,
   NULL,
   job_id,
-  NULL
+  NULL,
+  FALSE
 FROM
 dblink(
   'dbname=fineware_feinheit',
