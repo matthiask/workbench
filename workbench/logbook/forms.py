@@ -307,4 +307,9 @@ class LoggedCostForm(ModelForm):
             self.add_warning(
                 _("This entry is already part of an invoice."), code="part-of-invoice"
             )
+        if data.get("are_expenses") and not data.get("third_party_costs"):
+            self.add_error(
+                "third_party_costs",
+                _("Providing third party costs is necessary for expenses."),
+            )
         return data

@@ -262,7 +262,7 @@ class LogbookTest(TestCase):
             self.assertEqual(self.client.get("/logbook/costs/?" + p).status_code, 200)
 
         valid("")
-        valid("created_by=" + str(user.pk))
+        valid("rendered_by=" + str(user.pk))
         valid("project=" + str(cost.project.pk))
         valid("organization=" + str(cost.project.customer.pk))
         valid("service=0")
@@ -335,3 +335,35 @@ class LogbookTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertContains(response, 'value="1.5"')
+
+    def test_expenses(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            project.urls["createcost"],
+            {
+                "rendered_by": project.owned_by_id,
+                "rendered_on": local_date_format(date.today()),
+                "cost": "10",
+                "description": "Anything",
+                "are_expenses": "on",
+                # "third_party_costs": "9",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "Fremdkosten müssen für Spesen angegeben werden.")
+
+        response = self.client.post(
+            project.urls["createcost"],
+            {
+                "rendered_by": project.owned_by_id,
+                "rendered_on": local_date_format(date.today()),
+                "cost": "10",
+                "description": "Anything",
+                "are_expenses": "on",
+                "third_party_costs": "9",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)

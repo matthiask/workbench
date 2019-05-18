@@ -128,7 +128,7 @@ class LoggedCost(Model):
     )
     archived_at = models.DateTimeField(_("archived at"), blank=True, null=True)
 
-    are_expenses = models.BooleanField(_("are expenses"), default=True)
+    are_expenses = models.BooleanField(_("are expenses"), default=False)
     expenses_reimbursed_at = models.DateTimeField(
         _("expenses reimbursed at"), blank=True, null=True
     )

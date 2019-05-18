@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-18 14:26+0200\n"
+"POT-Creation-Date: 2019-05-18 14:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1134,11 +1134,11 @@ msgstr "Leistung"
 msgid "This field is required unless you create a new service."
 msgstr "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung."
 
-#: workbench/logbook/forms.py:206 workbench/logbook/forms.py:302
+#: workbench/logbook/forms.py:206 workbench/logbook/forms.py:304
 msgid "This project is already closed."
 msgstr "Dieses Projekt wurde schon geschlossen."
 
-#: workbench/logbook/forms.py:210 workbench/logbook/forms.py:306
+#: workbench/logbook/forms.py:210 workbench/logbook/forms.py:308
 msgid "This entry is already part of an invoice."
 msgstr "Dieser Eintrag ist schon Teil einer Rechnung."
 
@@ -1153,6 +1153,10 @@ msgstr "Tut mir leid, zu früh."
 #: workbench/logbook/forms.py:238
 msgid "This seems to be a duplicate. Is it?"
 msgstr "Scheint ein Duplikat zu sein. Oder nicht?"
+
+#: workbench/logbook/forms.py:313
+msgid "Providing third party costs is necessary for expenses."
+msgstr "Fremdkosten müssen für Spesen angegeben werden."
 
 #: workbench/logbook/models.py:32 workbench/logbook/models.py:103
 msgid "created by"

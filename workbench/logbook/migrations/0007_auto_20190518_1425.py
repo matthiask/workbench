@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="loggedcost",
             name="are_expenses",
-            field=models.BooleanField(default=True, verbose_name="are expenses"),
+            field=models.BooleanField(default=False, verbose_name="are expenses"),
         ),
         migrations.AddField(
             model_name="loggedcost",
