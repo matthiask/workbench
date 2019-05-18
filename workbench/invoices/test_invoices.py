@@ -575,20 +575,6 @@ class InvoicesTest(TestCase):
             ],
         )
 
-    def test_send_past_invoice(self):
-        invoice = factories.InvoiceFactory.create(
-            title="Test",
-            subtotal=20,
-            invoiced_on=date.today() - timedelta(days=1),
-            due_on=date.today(),
-        )
-        self.client.force_login(invoice.owned_by)
-
-        response = self.client.post(
-            invoice.urls["update"], invoice_to_dict(invoice, status=Invoice.SENT)
-        )
-        self.assertContains(response, "Rechnungsdatum liegt in der Vergangenheit, aber")
-
     def test_unlock_sent_invoice(self):
         invoice = factories.InvoiceFactory.create(
             title="Test",

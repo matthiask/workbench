@@ -175,18 +175,6 @@ class InvoiceForm(PostalAddressSelectionForm):
         data = super().clean()
         s_dict = dict(Invoice.STATUS_CHOICES)
 
-        if self.instance._orig_status < self.instance.SENT:
-            invoiced_on = data["invoiced_on"]
-            if invoiced_on and invoiced_on < date.today():
-                self.add_warning(
-                    _(
-                        "Invoice date is in the past, but invoice is still"
-                        " in preparation. Are you sure you do not want to"
-                        " set the invoice date to today?"
-                    ),
-                    code="invoice-date-past",
-                )
-
         if self.instance.status > self.instance.IN_PREPARATION:
             if set(self.changed_data) - {"status", "closed_on"}:
                 self.add_warning(
