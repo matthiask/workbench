@@ -4,7 +4,7 @@ from datetime import datetime
 from django import forms
 from django.db.models import Q
 from django.utils.html import format_html, mark_safe
-from django.utils.translation import gettext_lazy as _, gettext
+from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.credit_control.parsers import parse_zkb
@@ -140,6 +140,9 @@ class AssignCreditEntriesForm(forms.Form):
                             " ".join(
                                 (
                                     format_html(
+                                        '<span title="{}">', invoice.description
+                                    ),
+                                    format_html(
                                         "<strong>{}</strong>"
                                         if invoice.code in entry.payment_notice
                                         else "{}",
@@ -164,6 +167,7 @@ class AssignCreditEntriesForm(forms.Form):
                                     else gettext("NO DATE YET"),
                                     "<br>",
                                     currency(invoice.total),
+                                    "</span>",
                                 )
                             )
                         ),
