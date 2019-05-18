@@ -139,10 +139,11 @@ class AssignCreditEntriesForm(forms.Form):
                         format_html(
                             '{} <span class="badge badge-{}">{}</span>, {}',
                             format_html(
-                                "<strong>{}</strong>"
+                                "<strong>{}</strong>, {}"
                                 if invoice.code in entry.payment_notice
-                                else "{}",
+                                else "{}, {}",
                                 invoice,
+                                invoice.contact or invoice.customer,
                             ),
                             invoice.status_css,
                             invoice.pretty_status,
@@ -156,7 +157,11 @@ class AssignCreditEntriesForm(forms.Form):
                         #     Invoice.SENT,
                         # ),
                         total=entry.total
-                    ).select_related("owned_by", "project")[:100]
+                    ).select_related(
+                        "contact__organization", "customer", "owned_by", "project"
+                    )[
+                        :100
+                    ]
                 ],
                 coerce=int,
                 required=False,
