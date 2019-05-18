@@ -3,8 +3,8 @@ from datetime import datetime
 
 from django import forms
 from django.db.models import Q
-from django.utils.html import format_html
-from django.utils.translation import gettext_lazy as _
+from django.utils.html import format_html, mark_safe
+from django.utils.translation import gettext_lazy as _, gettext
 
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.credit_control.parsers import parse_zkb
@@ -136,18 +136,36 @@ class AssignCreditEntriesForm(forms.Form):
                 + [
                     (
                         invoice.id,
-                        format_html(
-                            '{} <span class="badge badge-{}">{}</span>, {}',
-                            format_html(
-                                "<strong>{}</strong>, {}"
-                                if invoice.code in entry.payment_notice
-                                else "{}, {}",
-                                invoice,
-                                invoice.contact or invoice.customer,
-                            ),
-                            invoice.status_css,
-                            invoice.pretty_status,
-                            currency(invoice.total),
+                        mark_safe(
+                            " ".join(
+                                (
+                                    format_html(
+                                        "<strong>{}</strong>"
+                                        if invoice.code in entry.payment_notice
+                                        else "{}",
+                                        invoice,
+                                    ),
+                                    format_html(
+                                        '<span class="badge badge-{}">{}</span>',
+                                        invoice.status_css,
+                                        invoice.pretty_status,
+                                    ),
+                                    "<br>",
+                                    format_html(
+                                        "{}", invoice.contact or invoice.customer
+                                    ),
+                                    "<br>",
+                                    format_html(
+                                        "{} {}",
+                                        _("invoiced on"),
+                                        local_date_format(invoice.invoiced_on),
+                                    )
+                                    if invoice.invoiced_on
+                                    else gettext("NO DATE YET"),
+                                    "<br>",
+                                    currency(invoice.total),
+                                )
+                            )
                         ),
                     )
                     for invoice in Invoice.objects.filter(
