@@ -37,5 +37,4 @@ class Migration(migrations.Migration):
             ),
             preserve_default=False,
         ),
-        migrations.RunSQL("UPDATE logbook_loggedcost SET rendered_by_id=created_by_id"),
     ]
