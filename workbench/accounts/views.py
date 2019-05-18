@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.cache import never_cache
 
 from authlib.google import GoogleOAuth2Client
+
 from workbench.accounts.forms import UserForm
 from workbench.accounts.models import User
 from workbench.generic import UpdateView

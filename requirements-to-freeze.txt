@@ -4,7 +4,7 @@ django-admin-ordering
 django-authlib
 django-bootstrap4
 django-countries
-django-debug-toolbar
+django-debug-toolbar==2.0a1
 django-fineforms
 django-vanilla-views
 dj-database-url

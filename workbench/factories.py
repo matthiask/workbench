@@ -1,10 +1,10 @@
 import types
 from datetime import date
 
+import factory
 from faker import Factory
 from faker.providers import address
 
-import factory
 from workbench.accounts.models import User
 from workbench.activities.models import Activity
 from workbench.awt.models import Year
