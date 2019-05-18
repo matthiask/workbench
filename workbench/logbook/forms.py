@@ -258,6 +258,8 @@ class LoggedHoursForm(ModelForm):
 
 
 class LoggedCostForm(ModelForm):
+    user_fields = default_to_current_user = ("rendered_by",)
+
     class Meta:
         model = LoggedCost
         fields = (
