@@ -27,14 +27,20 @@
     <tr>
       <th class="text-right">{% trans 'rendered' %}</th>
       <td>
-        {{ object.rendered_on|date:'SHORT_DATE_FORMAT' }}
+        {{ object.rendered_on|date:'SHORT_DATE_FORMAT' }} {% trans 'by' %}
+        {{ object.rendered_by.get_short_name }}
       </td>
     </tr>
     <tr>
       <th class="text-right">{% trans 'cost' %}</th>
       <td>
         {{ object.cost|currency }}
-        {% if object.third_party_costs %} / {% trans 'third party costs' %}: {{ object.third_party_costs|currency }}{% endif %}
+        {% if object.third_party_costs %}
+          /
+          {% if object.are_expenses %}{% trans 'expenses' %}{% else %}{% trans 'third party costs' %}{% endif %}:
+          {{ object.third_party_costs|currency }}
+          {% if object.expenses_reimbursed_at %}({% trans 'reimbursed' %}){% endif %}
+        {% endif %}
       </td>
     </tr>
     <tr>
