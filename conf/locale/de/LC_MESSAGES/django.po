@@ -758,7 +758,7 @@ msgstr "Abgelehnt"
 #: workbench/templates/invoices/invoice_detail.html:12
 #: workbench/templates/reporting/overdrawn_projects.html:16
 msgid "customer"
-msgstr "Kunde"
+msgstr "Kundschaft"
 
 #: workbench/deals/models.py:62 workbench/templates/deals/deal_detail.html:16
 #: workbench/templates/deals/deal_list.html:13
