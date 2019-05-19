@@ -235,3 +235,14 @@ if LIVE:  # pragma: no cover
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 else:
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
+
+if env("SQL", default=False):
+    from django.utils.log import DEFAULT_LOGGING as LOGGING
+
+    LOGGING["handlers"]["console"]["level"] = "DEBUG"
+    LOGGING["loggers"]["django.db.backends"] = {
+        "level": "DEBUG",
+        "handlers": ["console"],
+        "propagate": False,
+    }
