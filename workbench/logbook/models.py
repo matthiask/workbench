@@ -146,6 +146,11 @@ class LoggedCost(Model):
         if instance.invoice_service_id or instance.archived_at:
             messages.error(request, _("Cannot delete archived logged cost entries."))
             return False
+        if instance.expenses_reimbursed_at:
+            messages.error(
+                request,
+                _("Expenses have already been reimbursed, cannot delete entry."),
+            )
         return super().allow_delete(instance, request)
 
     @classmethod

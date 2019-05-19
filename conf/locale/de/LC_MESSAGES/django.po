@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-18 14:47+0200\n"
+"POT-Creation-Date: 2019-05-19 10:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1230,6 +1230,10 @@ msgstr "Erfasste Kosten"
 #: workbench/logbook/models.py:147
 msgid "Cannot delete archived logged cost entries."
 msgstr "Kann archivierte Kosten nicht löschen."
+
+#: workbench/logbook/models.py:152
+msgid "Expenses have already been reimbursed, cannot delete entry."
+msgstr "Spesen wurden schon erstattet, kann Eintrag nicht löschen."
 
 #: workbench/offers/__init__.py:10 workbench/offers/models.py:75
 #: workbench/templates/base.html:27
