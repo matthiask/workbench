@@ -8,6 +8,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from workbench.tools.models import Model
+from workbench.tools.validation import monday
 
 
 class UserManager(BaseUserManager):
@@ -104,19 +105,16 @@ class User(Model, AbstractBaseUser):
 
     @cached_property
     def hours(self):
-        today = date.today()
-        monday = today - timedelta(days=today.weekday())
-
         per_day = {
             row["rendered_on"]: row["hours__sum"]
-            for row in self.loggedhours.filter(rendered_on__gte=monday)
+            for row in self.loggedhours.filter(rendered_on__gte=monday())
             .order_by()
             .values("rendered_on")
             .annotate(Sum("hours"))
         }
 
         return {
-            "today": per_day.get(today, Decimal("0.0")),
+            "today": per_day.get(date.today(), Decimal("0.0")),
             "week": sum(per_day.values(), Decimal("0.0")),
         }
 

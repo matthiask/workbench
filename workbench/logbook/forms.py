@@ -11,7 +11,7 @@ from workbench.contacts.models import Organization
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
 from workbench.tools.forms import Autocomplete, ModelForm, Textarea
-from workbench.tools.validation import raise_if_errors
+from workbench.tools.validation import monday, raise_if_errors
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -186,10 +186,7 @@ class LoggedHoursForm(ModelForm):
         if self.instance.pk:
             self.fields.pop("service_title")
             self.fields.pop("service_description")
-            today = date.today()
-            if self.instance.rendered_on < date.today() - timedelta(
-                days=today.weekday()
-            ):
+            if self.instance.rendered_on < monday():
                 self.fields["hours"].disabled = True
                 self.fields["rendered_by"].disabled = True
                 self.fields["rendered_on"].disabled = True
@@ -211,11 +208,10 @@ class LoggedHoursForm(ModelForm):
             )
 
         if all((not self.instance.pk, data["rendered_by"], data["rendered_on"])):
-            today = date.today()
             if not data["rendered_by"].enforce_same_week_logging:
                 # Fine
                 pass
-            elif data["rendered_on"] < date.today() - timedelta(days=today.weekday()):
+            elif data["rendered_on"] < monday():
                 errors["rendered_on"] = _(
                     "Sorry, hours have to be logged in the same week."
                 )

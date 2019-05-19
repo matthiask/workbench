@@ -1,4 +1,11 @@
+from datetime import date, timedelta
+
 from django.core.exceptions import ValidationError
+
+
+def monday(day=None):
+    day = day or date.today()
+    return day - timedelta(days=day.weekday())
 
 
 def raise_if_errors(errors, exclude=None):

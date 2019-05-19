@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date
 from decimal import Decimal
 
 from django.contrib import messages
@@ -12,11 +12,7 @@ from workbench.accounts.models import User
 from workbench.projects.models import Project, Service
 from workbench.tools.models import HoursField, Model, MoneyField
 from workbench.tools.urls import model_urls
-
-
-def monday(day=None):
-    day = day or date.today()
-    return day - timedelta(days=day.weekday())
+from workbench.tools.validation import monday
 
 
 @model_urls
