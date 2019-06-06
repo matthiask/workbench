@@ -98,9 +98,9 @@ class App extends Component {
           return h(Project, {
             project,
             deciHours,
-            elapsed: `${Math.floor(minutes / 60)}:${(minutes % 60)
+            elapsed: `${Math.floor(minutes / 60)}h ${(minutes % 60)
               .toString()
-              .padStart(2, "0")}`,
+              .padStart(2, "0")}'`,
             isActiveProject,
             target: this.props.standalone ? "_blank" : "",
             toggleTimerState: () => {
