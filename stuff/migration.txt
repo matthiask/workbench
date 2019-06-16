@@ -796,7 +796,7 @@ SELECT
   created,
   date,
   count * cost * (1 + commission / 100),
-  count * cost,
+  CASE WHEN articlegroup SIMILAR TO '(52|53|54|55|56|57|58)%' THEN count * cost ELSE NULL END,
   notes,
   created_by_id,
   created_by_id,
@@ -807,7 +807,7 @@ SELECT
 FROM
 dblink(
   'dbname=fineware_feinheit',
-  'SELECT created, date, count, cost, commission, notes, created_by_id, invoice_id, job_id FROM worklog_articleentry WHERE down_payment=FALSE'
+  'SELECT created, date, count, cost, commission, CONCAT(aa.name, '' - '', a.name, '': '', wa.notes), wa.created_by_id, invoice_id, job_id, aa.article_id FROM worklog_articleentry wa LEFT JOIN articles_article a ON wa.article_id=a.id LEFT JOIN articles_article aa ON a.parent_id=aa.id WHERE down_payment=FALSE'
 ) AS p(
   created timestamp with time zone,
   date date,
@@ -817,7 +817,8 @@ dblink(
   notes text,
   created_by_id int,
   invoice_id int,
-  job_id int
+  job_id int,
+  articlegroup text
 );
 
 UPDATE projects_service
