@@ -103,7 +103,6 @@ class Migration(migrations.Migration):
                             (20, "Offered"),
                             (30, "Accepted"),
                             (40, "Rejected"),
-                            (50, "Replaced"),
                         ],
                         default=10,
                         verbose_name="status",

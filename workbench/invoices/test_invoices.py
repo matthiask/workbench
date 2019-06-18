@@ -756,7 +756,6 @@ class InvoicesTest(TestCase):
             Invoice(status=Invoice.PAID, closed_on=today).pretty_status,
             "Bezahlt am {}".format(fmt),
         )
-        self.assertEqual(Invoice(status=Invoice.REPLACED).pretty_status, "Ersetzt")
 
     def test_service_update(self):
         project = factories.ProjectFactory.create()

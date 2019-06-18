@@ -24,7 +24,6 @@ class Migration(migrations.Migration):
                     (20, "Sent"),
                     (40, "Paid"),
                     (50, "Canceled"),
-                    (60, "Replaced"),
                 ],
                 default=10,
                 verbose_name="status",

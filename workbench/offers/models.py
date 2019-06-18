@@ -33,14 +33,12 @@ class Offer(ModelWithTotal):
     OFFERED = 20
     ACCEPTED = 30
     REJECTED = 40
-    REPLACED = 50
 
     STATUS_CHOICES = (
         (IN_PREPARATION, _("In preparation")),
         (OFFERED, _("Offered")),
         (ACCEPTED, _("Accepted")),
         (REJECTED, _("Rejected")),
-        (REPLACED, _("Replaced")),
     )
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
@@ -158,7 +156,6 @@ class Offer(ModelWithTotal):
             self.OFFERED: "success",
             self.ACCEPTED: "default",
             self.REJECTED: "danger",
-            self.REPLACED: "",
         }[self.status]
 
     @property

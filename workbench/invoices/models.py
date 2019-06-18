@@ -32,14 +32,12 @@ class Invoice(ModelWithTotal):
     SENT = 20
     PAID = 40
     CANCELED = 50
-    REPLACED = 60
 
     STATUS_CHOICES = (
         (IN_PREPARATION, _("In preparation")),
         (SENT, _("Sent")),
         (PAID, _("Paid")),
         (CANCELED, _("Canceled")),
-        (REPLACED, _("Replaced")),
     )
 
     FIXED = "fixed"
@@ -255,7 +253,6 @@ class Invoice(ModelWithTotal):
             self.SENT: "success",
             self.PAID: "default",
             self.CANCELED: "danger",
-            self.REPLACED: "",
         }[self.status]
 
     @property
