@@ -563,7 +563,7 @@ SELECT
   FALSE
 FROM dblink(
     'dbname=fineware_feinheit',
-    'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id, a.ordering, a.invoicing_hourly_rate, a.hours FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
+    'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id, a.ordering, a.invoicing_hourly_rate, a.hours FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included AND jo.state!=50'
 ) AS p(id int, activity_name text, notes text, job_id int, offer_id int, ordering int, invoicing_hourly_rate numeric(10,2), hours numeric(5, 2));
 
 INSERT INTO projects_service
@@ -604,7 +604,7 @@ SELECT
   FALSE
 FROM dblink(
     'dbname=fineware_feinheit',
-    'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id, a.ordering, cost, commission, count FROM offers_offeredarticle a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_article aa ON a.article_id=aa.id LEFT OUTER JOIN articles_article ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included'
+    'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id, a.ordering, cost, commission, count FROM offers_offeredarticle a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_article aa ON a.article_id=aa.id LEFT OUTER JOIN articles_article ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included AND jo.state!=50'
 ) AS p(id int, article_name text, notes text, job_id int, offer_id int, ordering int, cost numeric(10,2), commission numeric(10,2), count int);
 
 
@@ -774,7 +774,7 @@ ORDER BY p.job_id, activitygroup;
 INSERT INTO logbook_loggedhours
 (id, created_at, rendered_on, hours, description, created_by_id, rendered_by_id, service_id, invoice_service_id, archived_at)
 SELECT
-  id,
+  wl_id,
   created,
   date,
   hours,
@@ -788,7 +788,7 @@ FROM projects_service s,
 dblink(
     'dbname=fineware_feinheit',
     'SELECT w.id, created, date, hours, w.notes, created_by_id, worker_id, job_id, aa.name, invoice_id, w.archived FROM worklog_worklogentry w LEFT JOIN articles_activity a ON w.activity_id=a.id LEFT JOIN articles_activity aa ON a.parent_id=aa.id'
-) AS p(id int, created timestamp with time zone, date date, hours numeric, notes text, created_by_id int, worker_id int, job_id int, activitygroup varchar(200), invoice_id int, archived bool)
+) AS p(wl_id int, created timestamp with time zone, date date, hours numeric, notes text, created_by_id int, worker_id int, job_id int, activitygroup varchar(200), invoice_id int, archived bool)
 WHERE s.project_id=p.job_id AND s.title=CONCAT('Logbuch:', activitygroup);
 
 INSERT INTO logbook_loggedcost
@@ -907,7 +907,7 @@ SELECT invoice_id, month, adjustment, 0
 FROM
 dblink(
 'dbname=fineware_feinheit',
-'SELECT month, adjustment, invoice_id FROM cashflow_periodicaladjustment ORDER BY month, invoice_id'
+'SELECT month, adjustment, invoice_id FROM cashflow_periodicaladjustment pa LEFT JOIN invoicing_jobinvoice ji ON pa.invoice_id=ji.id WHERE ji.state!=40 ORDER BY month, invoice_id'
 ) AS p(month date, adjustment int, invoice_id int);
 
 
