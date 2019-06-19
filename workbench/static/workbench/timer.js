@@ -23,14 +23,21 @@ class App extends Component {
     });
   }
 
-  componentDidUpdate() {
-    window.localStorage.setItem("workbench-timer", JSON.stringify(this.state));
-
+  ensureUpdatesIfActive() {
     if (this.state.activeProject) {
       this.ensureUpdates();
     } else {
       this.stopUpdates();
     }
+  }
+
+  componentDidMount() {
+    this.ensureUpdatesIfActive()
+  }
+
+  componentDidUpdate() {
+    window.localStorage.setItem("workbench-timer", JSON.stringify(this.state));
+    this.ensureUpdatesIfActive()
   }
 
   ensureUpdates() {
