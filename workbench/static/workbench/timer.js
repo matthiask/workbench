@@ -32,17 +32,17 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.ensureUpdatesIfActive()
+    this.ensureUpdatesIfActive();
   }
 
   componentDidUpdate() {
     window.localStorage.setItem("workbench-timer", JSON.stringify(this.state));
-    this.ensureUpdatesIfActive()
+    this.ensureUpdatesIfActive();
   }
 
   ensureUpdates() {
     this.stopUpdates();
-    this.timer = setInterval(() => this.forceUpdate(), 30000);
+    this.timer = setInterval(() => this.forceUpdate(), 1000);
   }
 
   stopUpdates() {
@@ -99,15 +99,17 @@ class App extends Component {
             seconds += timestamp() - state.lastStart;
           }
 
-          const minutes = Math.ceil(seconds / 60);
           const deciHours = Math.ceil(seconds / 360) / 10;
+          const minutes = Math.floor(seconds / 60);
+          const displayHours =
+            minutes >= 60 ? `${Math.floor(minutes / 60)}h ` : "";
+          const displayMinutes = minutes % 60;
+          const displaySeconds = (seconds % 60).toString().padStart(2, "0");
 
           return h(Project, {
             project,
             deciHours,
-            elapsed: `${Math.floor(minutes / 60)}h ${(minutes % 60)
-              .toString()
-              .padStart(2, "0")}'`,
+            elapsed: `${displayHours}${displayMinutes}:${displaySeconds}`,
             isActiveProject,
             target: this.props.standalone ? "_blank" : "",
             toggleTimerState: () => {
