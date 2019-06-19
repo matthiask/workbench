@@ -764,7 +764,7 @@ dblink(
 
 INSERT INTO projects_service
 (created_at, title, position, description, project_id, service_hours, service_cost, effort_type, effort_rate, is_logging_prohibited, is_optional)
-SELECT DISTINCT ON (p.job_id, activitygroup) NOW(), CONCAT('Logbuch:', activitygroup), 0, '', p.job_id, 0.0, 0.0, activitygroup, rate, FALSE, FALSE FROM
+SELECT DISTINCT ON (p.job_id, activitygroup) NOW(), CONCAT('Logbuch:', activitygroup), 0, '', p.job_id, 0.0, 0.0, activitygroup, rate, TRUE, FALSE FROM
 dblink(
     'dbname=fineware_feinheit',
     'SELECT created, date, hours, w.notes, created_by_id, worker_id, job_id, aa.name, w.invoicing_hourly_rate FROM worklog_worklogentry w LEFT JOIN articles_activity a ON w.activity_id=a.id LEFT JOIN articles_activity aa ON a.parent_id=aa.id'
