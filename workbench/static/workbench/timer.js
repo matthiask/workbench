@@ -89,7 +89,7 @@ class App extends Component {
   render(props, state) {
     window.console && window.console.log("RENDERING", new Date());
     let content = ["div", {className: ""}];
-    if (state.projects) {
+    if (state.projects.length) {
       content = content.concat(
         state.projects.map(project => {
           const isActiveProject = state.activeProject === project.id;
@@ -136,6 +136,17 @@ class App extends Component {
             }
           });
         })
+      );
+    } else {
+      content.push(
+        h(
+          "div",
+          {
+            className:
+              "list-group-item d-flex align-items-center justify-content-center"
+          },
+          "Noch keine Projekte hinzugefügt."
+        )
       );
     }
 
