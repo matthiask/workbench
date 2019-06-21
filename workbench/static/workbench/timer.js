@@ -267,7 +267,7 @@ function openPopup() {
   window.open(
     "/timer/",
     "timer",
-    "innerHeight=550,innerWidth=500,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no"
+    "innerHeight=750,innerWidth=500,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no"
   )
 }
 
