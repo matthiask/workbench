@@ -158,7 +158,7 @@ class App extends Component {
         <div
           class="timer-panel-tab bg-info text-light px-4 py-2 d-flex align-items-center justify-content-between"
         >
-          Timer
+          ${this.props.standalone && "Timer"}
           <div class=${this.props.standalone && "d-none"}>
             <${StandAlone} />
             ${" "}

@@ -112,7 +112,6 @@ tbody th > a {
     position: absolute;
     min-height: 36px;
     top: -36px;
-    left: 0;
     right: 0;
   }
 }
