@@ -4,7 +4,7 @@ django-admin-ordering
 django-authlib
 django-bootstrap4
 django-countries
-django-debug-toolbar==2.0a1
+django-debug-toolbar
 django-fineforms
 django-vanilla-views
 dj-database-url
@@ -12,6 +12,7 @@ factory-boy
 flake8
 gunicorn
 lxml
+mailchimp3
 pdfdocument
 Pillow
 psycopg2-binary

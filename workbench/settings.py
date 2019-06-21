@@ -237,6 +237,10 @@ else:
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 
+MAILCHIMP_API_KEY = env("MAILCHIMP_API_KEY")
+MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID")
+
+
 if env("SQL", default=False):
     from django.utils.log import DEFAULT_LOGGING as LOGGING
 
