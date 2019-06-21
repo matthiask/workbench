@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block body %}
-  <script src="{% static 'workbench/lib/preact.min.js' %}"></script>
-  <script src="{% static 'workbench/timer.js' %}"></script>
+  {# <script src="{% static 'workbench/lib/preact.min.js' %}"></script> #}
+  <script type="module" src="{% static 'workbench/timer.js' %}"></script>
   <div data-timer="standalone"></div>
 {% endblock %}

@@ -116,8 +116,7 @@
   </div> <!-- /container -->
 
   {% block timer %}
-    <script src="{% static 'workbench/lib/preact.min.js' %}"></script>
-    <script src="{% static 'workbench/timer.js' %}"></script>
+    <script type="module" src="{% static 'workbench/timer.js' %}"></script>
     <div data-timer="footer"></div>
   {% endblock %}
 

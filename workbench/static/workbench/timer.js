@@ -1,6 +1,11 @@
-"use strict";
+import {
+  Component,
+  h,
+  render,
+  html
+} from "/static/workbench/lib/preact-htm.min.js";
 
-const {Component, h, render} = window.preact;
+// const {Component, h, render} = window.preact;
 
 function timestamp() {
   return Math.floor(new Date().getTime() / 1000);
@@ -88,7 +93,7 @@ class App extends Component {
 
   render(props, state) {
     window.console && window.console.log("RENDERING", new Date());
-    let content = ["div", {className: ""}];
+    let content = [];
     if (state.projects.length) {
       content = content.concat(
         state.projects.map(project => {
@@ -141,18 +146,17 @@ class App extends Component {
       );
     } else {
       content.push(
-        h(
-          "div",
-          {
-            className:
-              "list-group-item d-flex align-items-center justify-content-center"
-          },
-          "Noch keine Projekte hinzugefügt."
-        )
+        html`
+          <div
+            class="list-group-item d-flex align-items-center justify-content-center"
+          >
+            Noch keine Projekte hinzugefügt.
+          </div>
+        `
       );
     }
 
-    let headerButtons = ["div", null];
+    let headerButtons = [];
 
     if (!this.props.standalone) {
       headerButtons.push(h(StandAlone));
@@ -186,122 +190,104 @@ class App extends Component {
       );
     }
 
-    return h(
-      "div",
-      {className: "timer-panel"},
-      h(
-        "div",
-        {
-          className:
-            "timer-panel-tab bg-info text-light px-4 py-2 d-flex align-items-center justify-content-between"
-        },
-        "Timer",
-        h.apply(null, headerButtons)
-      ),
-      h("div", {className: "list-group"}, h.apply(null, content))
-    );
+    return html`
+      <div class="timer-panel">
+        <div
+          class="timer-panel-tab bg-info text-light px-4 py-2 d-flex align-items-center justify-content-between"
+        >
+          Timer
+          <div>${headerButtons}</div>
+        </div>
+        <div class="list-group">${content}</div>
+      </div>
+    `;
   }
 }
 
 function Project(props) {
-  return h(
-    "div",
-    {
-      className:
-        "list-group-item d-flex align-items-center justify-content-between"
-    },
-    h(
-      "a",
-      {
-        className: "d-block text-truncate",
-        href: `/projects/${props.project.id}/`,
-        target: props.target
-      },
-      props.project.title
-    ),
-    " ",
-    h(
-      "div",
-      {className: "text-nowrap"},
-      h(
-        "button",
-        {
-          className: `btn btn-sm ${
+  return html`
+    <div
+      class="list-group-item d-flex align-items-center justify-content-between"
+    >
+      <a
+        class="d-block text-truncate"
+        href=${`/projects/${props.project.id}/`}
+        target=${props.target}
+      >
+        ${props.project.title}
+      </a>
+
+      <div class="text-nowrap">
+        <button
+          class=${`btn btn-sm ${
             props.isActiveProject ? "btn-success" : "btn-outline-secondary"
-          }`,
-          onClick: () => props.toggleTimerState(),
-          title: props.isActiveProject ? "Timer stoppen" : "Timer starten"
-        },
-        props.isActiveProject ? "pause" : "start"
-      ),
-      " ",
-      h(
-        "button",
-        {
-          className: "btn btn-outline-secondary btn-sm",
-          onClick: () => props.logHours(),
-          title: `${props.deciHours}h aufschreiben`
-        },
-        `+${props.elapsed}`
-      ),
-      " ",
-      h(
-        "button",
-        {
-          className: "btn btn-outline-danger btn-sm",
-          onClick: () => props.removeProject(),
-          title: "Projekt entfernen"
-        },
-        "x"
-      )
-    )
-  );
+          }`}
+          onClick=${() => props.toggleTimerState()}
+          title=${props.isActiveProject ? "Timer stoppen" : "Timer starten"}
+        >
+          ${props.isActiveProject ? "pause" : "start"}
+        </button>
+        ${" "}
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          onClick=${() => props.logHours()}
+          title=${`${props.deciHours}h aufschreiben`}
+        >
+          +${props.elapsed}
+        </button>
+        ${" "}
+        <button
+          class="btn btn-outline-danger btn-sm"
+          onClick=${() => props.removeProject()}
+          title="Projekt entfernen"
+        >
+          x
+        </button>
+      </div>
+    </div>
+  `;
 }
 
 function AddProject(props) {
   const match = window.location.href.match(/\/projects\/([0-9]+)\//);
   if (!match || !match[1]) return null;
 
-  return h(
-    "button",
-    {
-      className: "btn btn-secondary btn-sm",
-      onClick: () =>
+  return html`
+    <button
+      class="btn btn-secondary btn-sm"
+      onClick=${() =>
         props.addProject(
           parseInt(match[1]),
           document.querySelector("h1").textContent
-        )
-    },
-    "+Projekt"
-  );
+        )}
+    >
+      +Projekt
+    </button>
+  `;
 }
 
 function Reset(props) {
-  return h(
-    "button",
-    {
-      className: "btn btn-sm btn-danger",
-      onClick: () => props.reset()
-    },
-    "Reset"
+  return html`
+    <button class="btn btn-sm btn-danger" onClick=${() => props.reset()}>
+      Reset
+    </button>
+  `;
+}
+
+function openPopup() {
+  window.open(
+    "/timer/",
+    "timer",
+    "innerHeight=550,innerWidth=500,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no"
   );
 }
 
 function StandAlone() {
-  return h(
-    "button",
-    {
-      className: "btn btn-sm btn-secondary",
-      onClick: () => {
-        window.open(
-          "/timer/",
-          "timer",
-          "innerHeight=550,innerWidth=500,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no"
-        );
-      }
-    },
-    "In Popup öffnen"
-  );
+  return html`
+    <button class="btn btn-sm btn-secondary" onClick=${openPopup}>
+      In Popup öffnen
+    </button>
+  `;
 }
 
 window.addEventListener("load", function() {
