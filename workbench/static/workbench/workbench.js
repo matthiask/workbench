@@ -2,60 +2,60 @@ $(function() {
   // AJAX modals
   var dismissModals = function() {
     // LOL, dismiss.
-    $(".modal, .modal-backdrop").remove();
+    $(".modal, .modal-backdrop").remove()
     $(document.body)
       .removeClass("modal-open")
-      .removeAttr("style");
-  };
+      .removeAttr("style")
+  }
 
   var initModal = function(data) {
-    dismissModals();
+    dismissModals()
 
-    $(data).modal();
+    $(data).modal()
 
     setTimeout(function() {
-      var fields = $(".modal").find("input, select");
+      var fields = $(".modal").find("input, select")
       if (fields.filter("[autofocus]").length) {
-        fields.filter("[autofocus]").focus();
+        fields.filter("[autofocus]").focus()
       } else {
         fields
           .filter(":visible")
           .first()
-          .focus();
+          .focus()
       }
-    }, 500);
+    }, 500)
 
-    initWidgets();
-  };
+    initWidgets()
+  }
 
   window.openModalFromUrl = function(url) {
     $.get(url, function(data) {
-      initModal(data);
-    });
-  };
+      initModal(data)
+    })
+  }
 
   $(document.body).on("click", "[data-toggle]", function(event) {
     if (this.dataset.toggle == "ajaxmodal") {
-      event.preventDefault();
-      window.openModalFromUrl(this.href);
+      event.preventDefault()
+      window.openModalFromUrl(this.href)
     }
-  });
+  })
 
   // Include the name and value of the submit button
   $(document.body).on("click", ":submit", function(event) {
     var el = $(this),
-      form = el.parents("form");
-    form.find(".hidden-submit-value").remove();
+      form = el.parents("form")
+    form.find(".hidden-submit-value").remove()
     if (!form.length || !el.attr("name")) {
-      return;
+      return
     }
     form.append(
       $('<input type="hidden" class="hidden-submit-value">').attr({
         name: el.attr("name"),
-        value: el.attr("value")
+        value: el.attr("value"),
       })
-    );
-  });
+    )
+  })
 
   $(document.body).on("submit", ".modal-dialog form", function(event) {
     if (this.method.toLowerCase() == "post") {
@@ -66,12 +66,12 @@ $(function() {
           jqXHR.status === 202 ||
           jqXHR.status === 204
         ) {
-          dismissModals();
-          window.location.reload();
+          dismissModals()
+          window.location.reload()
         } else {
-          initModal(data);
+          initModal(data)
         }
-      });
+      })
     } else {
       $.get(this.action + "?" + $(this).serialize(), function(
         data /*,
@@ -79,15 +79,15 @@ $(function() {
         jqXHR
         */
       ) {
-        initModal(data);
-      });
+        initModal(data)
+      })
     }
-    return false;
-  });
+    return false
+  })
 
   $(document.body).on("submit", "form[data-ajaxform]", function(event) {
-    event.preventDefault();
-    var form = this;
+    event.preventDefault()
+    var form = this
 
     $.post(form.action, $(form).serialize(), function(data, status, jqXHR) {
       // 201 CREATED, 202 ACCEPTED or 204 NO CONTENT
@@ -97,100 +97,100 @@ $(function() {
         jqXHR.status === 204
       ) {
         // Fine!
-        $("button", form).text("OK!");
+        $("button", form).text("OK!")
       } else {
-        alert("Saving failed!");
+        alert("Saving failed!")
       }
-    });
-  });
+    })
+  })
 
   // Search forms
   $(".form-search").on("change", "select, input", function() {
     $(this)
       .closest("form")
-      .submit();
-  });
+      .submit()
+  })
 
   // Hotkeys
   $(document.body).on("keydown", function(e) {
     if (/Mac/.test(navigator.platform) ? !e.ctrlKey : !e.altKey) {
-      return;
+      return
     }
 
     if (e.keyCode === 70) {
       // f
       $(".navbar-form input[name=q]")
         .focus()
-        .select();
+        .select()
     } else if (e.keyCode === 72) {
       // h
-      window.location.href = "/";
+      window.location.href = "/"
     } else if (e.keyCode === 67 && !e.shiftKey) {
       // c
-      window.location.href = "/contacts/people/";
+      window.location.href = "/contacts/people/"
     } else if (e.keyCode === 67 && e.shiftKey) {
       // C
-      window.location.href = "/contacts/organizations/";
+      window.location.href = "/contacts/organizations/"
     } else if (e.keyCode === 80) {
       // p
-      window.location.href = "/projects/";
+      window.location.href = "/projects/"
     } else if (e.keyCode === 79) {
       // o
-      window.location.href = "/offers/";
+      window.location.href = "/offers/"
     } else if (e.keyCode === 82) {
       // r
-      window.location.href = "/invoices/";
+      window.location.href = "/invoices/"
     } else if (e.keyCode === 65) {
       // a
-      window.location.href = "/activities/";
+      window.location.href = "/activities/"
     } else if (e.keyCode === 76) {
-      var el = document.querySelector("[data-createhours]");
+      var el = document.querySelector("[data-createhours]")
       if (el) {
         $.get(el.href, function(data) {
-          initModal(data);
-        });
+          initModal(data)
+        })
       } else {
-        alert("Bitte zuerst Projekt auswählen");
+        alert("Bitte zuerst Projekt auswählen")
       }
     } else if (e.keyCode === 81) {
       // q
-      $(".navbar input[type=search]").focus();
+      $(".navbar input[type=search]").focus()
     } else if (e.keyCode === 13) {
       $(e.target)
         .parents("form")
-        .submit();
+        .submit()
     } else {
-      window.console && window.console.log(e, e.keyCode);
-      return;
+      window.console && window.console.log(e, e.keyCode)
+      return
     }
 
-    return false;
-  });
+    return false
+  })
 
   // Widgets
-  initWidgets();
+  initWidgets()
 
   // Some special cases...
   $(document.body).on("click", "[data-hours-button]", function() {
-    this.blur();
-    var value = prompt(this.dataset.hoursButton);
+    this.blur()
+    var value = prompt(this.dataset.hoursButton)
     if (parseFloat(value)) {
       $("#id_days")
         .val((parseFloat(value) / 8).toFixed(2))
-        .focus();
+        .focus()
     }
-  });
+  })
 
   $(document.body).on("click", "[data-multiply-cost]", function() {
     var factor = parseFloat(this.dataset.multiplyCost),
       tpc = parseFloat($("#id_third_party_costs").val()),
-      cost = $("#id_cost");
+      cost = $("#id_cost")
 
     if (tpc && factor) {
-      cost.val(factor * tpc).focus();
+      cost.val(factor * tpc).focus()
     }
-  });
-});
+  })
+})
 
 function initWidgets() {
   $(".datepicker:not(.has-datepicker)")
@@ -198,50 +198,50 @@ function initWidgets() {
     .datepicker({
       language: "de-DE",
       autoHide: true,
-      zIndex: 1500
-    });
+      zIndex: 1500,
+    })
 
   function addZero(num) {
-    return num < 10 ? "0" + num : "" + num;
+    return num < 10 ? "0" + num : "" + num
   }
 
-  var invoicedOn = $("#id_invoiced_on");
-  var dueOn = $("#id_due_on");
+  var invoicedOn = $("#id_invoiced_on")
+  var dueOn = $("#id_due_on")
   if (invoicedOn.length && dueOn.length) {
     invoicedOn.on("change", function(event) {
       var due = new Date(
         invoicedOn.datepicker("getDate").getTime() + 14 * 86400 * 1000
-      );
+      )
       dueOn.val(
         addZero(due.getDate()) +
           "." +
           addZero(1 + due.getMonth()) +
           "." +
           addZero(due.getFullYear())
-      );
-    });
+      )
+    })
   }
 
   $("[data-autofill]:not(.initialized)").each(function() {
     var self = $(this),
       data = self.data("autofill"),
-      sel = self.find("select");
+      sel = self.find("select")
 
-    self.addClass("initialized");
+    self.addClass("initialized")
     sel.on("change", function() {
       if (data["" + this.value]) {
         $.each(data["" + this.value], function(key, value) {
-          self.find("[name$='" + key + "']").val(value);
-        });
+          self.find("[name$='" + key + "']").val(value)
+        })
       }
-    });
-  });
+    })
+  })
 
   $("[data-autocomplete-id]:not(.initialized)").each(function() {
     var self = $(this),
       url = self.data("autocomplete-url"),
       id = self.data("autocomplete-id"),
-      input = $("#" + id);
+      input = $("#" + id)
 
     self
       .addClass("initialized")
@@ -249,49 +249,49 @@ function initWidgets() {
         minLength: 3,
         source: function(request, response) {
           $.get(url, {q: request.term}, function(data) {
-            response(data.results);
-          });
+            response(data.results)
+          })
         },
         focus: function(event, ui) {
-          self.val(ui.item.label);
-          return false;
+          self.val(ui.item.label)
+          return false
         },
         select: function(event, ui) {
-          self.val(ui.item.label);
-          input.val(ui.item.value).trigger("change");
-          return false;
-        }
+          self.val(ui.item.label)
+          input.val(ui.item.value).trigger("change")
+          return false
+        },
       })
       .on("focus", function() {
-        this.select();
-      });
-  });
+        this.select()
+      })
+  })
 
   $(document.body).on("click", "[data-clear]", function() {
     $(this.dataset.clear)
       .val("")
-      .trigger("change");
-  });
+      .trigger("change")
+  })
 }
 
 window.addInlineForm = function addInlineForm(slug, onComplete) {
   var totalForms = $("#id_" + slug + "-TOTAL_FORMS"),
-    newId = parseInt(totalForms.val());
+    newId = parseInt(totalForms.val())
 
-  totalForms.val(newId + 1);
+  totalForms.val(newId + 1)
   var empty = $("#" + slug + "-empty"),
     attributes = ["id", "name", "for"],
-    form = $(empty.html());
+    form = $(empty.html())
 
-  form.removeClass("empty").attr("id", slug + "-" + newId);
+  form.removeClass("empty").attr("id", slug + "-" + newId)
 
   for (var i = 0; i < attributes.length; ++i) {
-    var attr = attributes[i];
+    var attr = attributes[i]
 
     form.find("*[" + attr + "*=__prefix__]").each(function() {
-      var el = $(this);
-      el.attr(attr, el.attr(attr).replace(/__prefix__/, newId));
-    });
+      var el = $(this)
+      el.attr(attr, el.attr(attr).replace(/__prefix__/, newId))
+    })
   }
 
   // insert the form after the last sibling with the same tagName
@@ -300,9 +300,9 @@ window.addInlineForm = function addInlineForm(slug, onComplete) {
   form
     .insertAfter(empty.parent().children("[id|=" + slug + "]:last"))
     .hide()
-    .fadeIn();
+    .fadeIn()
 
-  if (onComplete) onComplete(form);
+  if (onComplete) onComplete(form)
 
-  return false;
-};
+  return false
+}

@@ -1,58 +1,51 @@
-import {
-  Component,
-  h,
-  render,
-  html
-} from "/static/workbench/lib/preact-htm.min.js";
-
-// const {Component, h, render} = window.preact;
+import {Component, render, html} from "/static/workbench/lib/preact-htm.min.js"
 
 function timestamp() {
-  return Math.floor(new Date().getTime() / 1000);
+  return Math.floor(new Date().getTime() / 1000)
 }
 
 class App extends Component {
   constructor() {
-    super();
-    const state = window.localStorage.getItem("workbench-timer");
+    super()
+    const state = window.localStorage.getItem("workbench-timer")
     if (state) {
-      this.state = JSON.parse(state);
+      this.state = JSON.parse(state)
     } else {
-      this.state = this.defaultState();
+      this.state = this.defaultState()
     }
 
     window.addEventListener("storage", e => {
       if (e.key === "workbench-timer") {
-        this.setState(JSON.parse(e.newValue));
+        this.setState(JSON.parse(e.newValue))
       }
-    });
+    })
   }
 
   ensureUpdatesIfActive() {
     if (this.state.activeProject) {
-      this.ensureUpdates();
+      this.ensureUpdates()
     } else {
-      this.stopUpdates();
+      this.stopUpdates()
     }
   }
 
   componentDidMount() {
-    this.ensureUpdatesIfActive();
+    this.ensureUpdatesIfActive()
   }
 
   componentDidUpdate() {
-    window.localStorage.setItem("workbench-timer", JSON.stringify(this.state));
-    this.ensureUpdatesIfActive();
+    window.localStorage.setItem("workbench-timer", JSON.stringify(this.state))
+    this.ensureUpdatesIfActive()
   }
 
   ensureUpdates() {
-    this.stopUpdates();
-    this.timer = setInterval(() => this.forceUpdate(), 1000);
+    this.stopUpdates()
+    this.timer = setInterval(() => this.forceUpdate(), 1000)
   }
 
   stopUpdates() {
-    clearInterval(this.timer);
-    this.timer = null;
+    clearInterval(this.timer)
+    this.timer = null
   }
 
   defaultState() {
@@ -60,8 +53,8 @@ class App extends Component {
       projects: [],
       seconds: {},
       activeProject: null,
-      lastStart: null
-    };
+      lastStart: null,
+    }
   }
 
   activateProject(projectId, additionalSecondsState) {
@@ -70,80 +63,84 @@ class App extends Component {
         {},
         prevState.seconds,
         additionalSecondsState || {}
-      );
+      )
       if (prevState.activeProject && prevState.lastStart) {
         seconds[prevState.activeProject] =
           (seconds[prevState.activeProject] || 0) +
           timestamp() -
-          prevState.lastStart;
+          prevState.lastStart
       }
       return {
         seconds,
         activeProject: projectId,
-        lastStart: projectId === null ? null : timestamp() - 1
-      };
-    });
+        lastStart: projectId === null ? null : timestamp() - 1,
+      }
+    })
 
     if (projectId && !this.timer) {
-      this.ensureUpdates();
+      this.ensureUpdates()
     } else if (!projectId) {
-      this.stopUpdates();
+      this.stopUpdates()
     }
   }
 
   render(props, state) {
-    window.console && window.console.log("RENDERING", new Date());
-    let content = [];
+    window.console && window.console.log("RENDERING", new Date())
+    let content = []
     if (state.projects.length) {
       content = content.concat(
         state.projects.map(project => {
-          const isActiveProject = state.activeProject === project.id;
+          const isActiveProject = state.activeProject === project.id
 
-          let seconds = state.seconds[project.id] || 0;
+          let seconds = state.seconds[project.id] || 0
           if (isActiveProject && state.lastStart) {
-            seconds += timestamp() - state.lastStart;
+            seconds += timestamp() - state.lastStart
           }
 
-          const deciHours = Math.ceil(seconds / 360) / 10;
-          const minutes = Math.floor(seconds / 60);
+          const deciHours = Math.ceil(seconds / 360) / 10
+          const minutes = Math.floor(seconds / 60)
           const displayHours =
-            minutes >= 60 ? `${Math.floor(minutes / 60)}h ` : "";
-          const displayMinutes = minutes % 60;
-          const displaySeconds = (seconds % 60).toString().padStart(2, "0");
+            minutes >= 60 ? `${Math.floor(minutes / 60)}h ` : ""
+          const displayMinutes = minutes % 60
+          const displaySeconds = (seconds % 60).toString().padStart(2, "0")
 
-          return h(Project, {
-            project,
-            deciHours,
-            elapsed: `${displayHours}${displayMinutes}:${displaySeconds}`,
-            isActiveProject,
-            target: this.props.standalone ? "_blank" : "",
-            toggleTimerState: () => {
-              if (isActiveProject) {
-                this.activateProject(null);
-              } else {
-                this.activateProject(project.id);
-              }
-            },
-            logHours: () => {
-              this.activateProject(null, {[project.id]: 0});
+          return html`
+            <${Project}
+              project=${project}
+              deciHours=${deciHours}
+              elapsed=${`${displayHours}${displayMinutes}:${displaySeconds}`}
+              isActiveProject=${isActiveProject}
+              target=${this.props.standalone ? "_blank" : ""}
+              toggleTimerState=${() => {
+                if (isActiveProject) {
+                  this.activateProject(null)
+                } else {
+                  this.activateProject(project.id)
+                }
+              }}
+              logHours=${() => {
+                this.activateProject(null, {[project.id]: 0})
 
-              window.openModalFromUrl(
-                `/projects/${project.id}/createhours/?hours=${deciHours}`
-              );
-            },
-            removeProject: () => {
-              if (confirm("Wirklich entfernen?")) {
-                let seconds = Object.assign({}, state.seconds);
-                delete seconds[project.id];
-                this.setState(prevState => ({
-                  seconds,
-                  projects: prevState.projects.filter(p => p.id !== project.id)
-                }));
-              }
-            }
-          });
+                window.openModalFromUrl(
+                  `/projects/${project.id}/createhours/?hours=${deciHours}`
+                )
+              }}
+              removeProject=${() => {
+                if (confirm("Wirklich entfernen?")) {
+                  let seconds = Object.assign({}, state.seconds)
+                  delete seconds[project.id]
+                  this.setState(prevState => ({
+                    seconds,
+                    projects: prevState.projects.filter(
+                      p => p.id !== project.id
+                    ),
+                  }))
+                }
+              }}
+            />
+          `
         })
-      );
+      )
     } else {
       content.push(
         html`
@@ -153,41 +150,7 @@ class App extends Component {
             Noch keine Projekte hinzugefügt.
           </div>
         `
-      );
-    }
-
-    let headerButtons = [];
-
-    if (!this.props.standalone) {
-      headerButtons.push(h(StandAlone));
-      headerButtons.push(" ");
-      headerButtons.push(
-        h(AddProject, {
-          addProject: (id, title) => {
-            if (!state.projects.find(p => p.id === id)) {
-              this.setState(prevState => {
-                let projects = Array.from(prevState.projects);
-                projects.push({id, title});
-                projects.sort((a, b) => b.id - a.id);
-                return {
-                  projects,
-                  seconds: Object.assign({}, prevState.seconds, {[id]: 0})
-                };
-              });
-            }
-          }
-        })
-      );
-      headerButtons.push(" ");
-      headerButtons.push(
-        h(Reset, {
-          reset: () => {
-            if (confirm("Wirklich zurücksetzen?")) {
-              this.setState(this.defaultState());
-            }
-          }
-        })
-      );
+      )
     }
 
     return html`
@@ -196,11 +159,37 @@ class App extends Component {
           class="timer-panel-tab bg-info text-light px-4 py-2 d-flex align-items-center justify-content-between"
         >
           Timer
-          <div>${headerButtons}</div>
+          <div class=${this.props.standalone && "d-none"}>
+            <${StandAlone} />
+            ${" "}
+            <${AddProject}
+              addProject=${(id, title) => {
+                if (!state.projects.find(p => p.id === id)) {
+                  this.setState(prevState => {
+                    let projects = Array.from(prevState.projects)
+                    projects.push({id, title})
+                    projects.sort((a, b) => b.id - a.id)
+                    return {
+                      projects,
+                      seconds: Object.assign({}, prevState.seconds, {[id]: 0}),
+                    }
+                  })
+                }
+              }}
+            />
+            ${" "}
+            <${Reset}
+              reset=${() => {
+                if (confirm("Wirklich zurücksetzen?")) {
+                  this.setState(this.defaultState())
+                }
+              }}
+            />
+          </div>
         </div>
         <div class="list-group">${content}</div>
       </div>
-    `;
+    `
   }
 }
 
@@ -245,12 +234,12 @@ function Project(props) {
         </button>
       </div>
     </div>
-  `;
+  `
 }
 
 function AddProject(props) {
-  const match = window.location.href.match(/\/projects\/([0-9]+)\//);
-  if (!match || !match[1]) return null;
+  const match = window.location.href.match(/\/projects\/([0-9]+)\//)
+  if (!match || !match[1]) return null
 
   return html`
     <button
@@ -263,7 +252,7 @@ function AddProject(props) {
     >
       +Projekt
     </button>
-  `;
+  `
 }
 
 function Reset(props) {
@@ -271,7 +260,7 @@ function Reset(props) {
     <button class="btn btn-sm btn-danger" onClick=${() => props.reset()}>
       Reset
     </button>
-  `;
+  `
 }
 
 function openPopup() {
@@ -279,7 +268,7 @@ function openPopup() {
     "/timer/",
     "timer",
     "innerHeight=550,innerWidth=500,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no"
-  );
+  )
 }
 
 function StandAlone() {
@@ -287,12 +276,17 @@ function StandAlone() {
     <button class="btn btn-sm btn-secondary" onClick=${openPopup}>
       In Popup öffnen
     </button>
-  `;
+  `
 }
 
 window.addEventListener("load", function() {
-  let timer = document.querySelector("[data-timer]");
+  let timer = document.querySelector("[data-timer]")
   if (timer) {
-    render(h(App, {standalone: timer.dataset.timer == "standalone"}), timer);
+    render(
+      html`
+        <${App} standalone=${timer.dataset.timer == "standalone"} />
+      `,
+      timer
+    )
   }
-});
+})

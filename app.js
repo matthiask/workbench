@@ -1,7 +1,7 @@
-window.$ = window.jQuery = require("jquery");
+window.$ = window.jQuery = require("jquery")
 
-import "bootstrap";
-import "./app.scss";
+import "bootstrap"
+import "./app.scss"
 
 // import "custom.scss";
 // import "node_modules/bootstrap/scss/bootstrap.scss";

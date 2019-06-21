@@ -26,6 +26,8 @@
     "webpack-cli": "^3.3.0"
   },
   "prettier": {
-    "bracketSpacing": false
+    "trailingComma": "es5",
+    "bracketSpacing": false,
+    "semi": false
   }
 }

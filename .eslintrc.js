@@ -2,12 +2,12 @@ module.exports = {
   env: {
     browser: true,
     es6: true,
-    jquery: true
+    jquery: true,
   },
   extends: "eslint:recommended",
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: "module"
+    sourceType: "module",
   },
   plugins: ["prettier"],
   rules: {
@@ -17,6 +17,6 @@ module.exports = {
     semi: ["error", "always"],
     "no-unused-vars": ["error", {argsIgnorePattern: "^_|event"}],
     "prettier/prettier": "error",
-    quotes: 0
-  }
-};
+    quotes: 0,
+  },
+}
