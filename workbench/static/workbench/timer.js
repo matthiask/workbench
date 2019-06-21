@@ -127,12 +127,14 @@ class App extends Component {
               );
             },
             removeProject: () => {
-              let seconds = Object.assign({}, state.seconds);
-              delete seconds[project.id];
-              this.setState(prevState => ({
-                seconds,
-                projects: prevState.projects.filter(p => p.id !== project.id)
-              }));
+              if (confirm("Wirklich entfernen?")) {
+                let seconds = Object.assign({}, state.seconds);
+                delete seconds[project.id];
+                this.setState(prevState => ({
+                  seconds,
+                  projects: prevState.projects.filter(p => p.id !== project.id)
+                }));
+              }
             }
           });
         })
@@ -176,7 +178,7 @@ class App extends Component {
       headerButtons.push(
         h(Reset, {
           reset: () => {
-            if (confirm("Really reset?")) {
+            if (confirm("Wirklich zurücksetzen?")) {
               this.setState(this.defaultState());
             }
           }
@@ -228,7 +230,7 @@ function Project(props) {
             props.isActiveProject ? "btn-success" : "btn-outline-secondary"
           }`,
           onClick: () => props.toggleTimerState(),
-          title: props.isActiveProject ? "Pause work" : "Resume work"
+          title: props.isActiveProject ? "Timer stoppen" : "Timer starten"
         },
         props.isActiveProject ? "pause" : "start"
       ),
@@ -238,7 +240,7 @@ function Project(props) {
         {
           className: "btn btn-outline-secondary btn-sm",
           onClick: () => props.logHours(),
-          title: `${props.deciHours}h`
+          title: `${props.deciHours}h aufschreiben`
         },
         `+${props.elapsed}`
       ),
@@ -248,7 +250,7 @@ function Project(props) {
         {
           className: "btn btn-outline-danger btn-sm",
           onClick: () => props.removeProject(),
-          title: "Remove project"
+          title: "Projekt entfernen"
         },
         "x"
       )
@@ -270,7 +272,7 @@ function AddProject(props) {
           document.querySelector("h1").textContent
         )
     },
-    "+project"
+    "+Projekt"
   );
 }
 
@@ -281,7 +283,7 @@ function Reset(props) {
       className: "btn btn-sm btn-danger",
       onClick: () => props.reset()
     },
-    "reset"
+    "Reset"
   );
 }
 
@@ -298,7 +300,7 @@ function StandAlone() {
         );
       }
     },
-    "open in popup"
+    "In Popup öffnen"
   );
 }
 

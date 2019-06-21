@@ -100,15 +100,12 @@ tbody th > a {
 
   [data-timer="footer"] .timer-panel {
     position: fixed;
+    z-index: 9999;
     bottom: 0;
     width: 100%;
     background: white;
     transition: 0.2s ease-in-out;
     transform: translateY(100%);
-  }
-
-  [data-timer="footer"] .timer-panel:hover {
-    transform: translateY(0);
   }
 
   [data-timer="footer"] .timer-panel-tab {
