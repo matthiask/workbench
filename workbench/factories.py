@@ -202,6 +202,7 @@ class DealFactory(factory.DjangoModelFactory):
 # CREDIT CONTROL ##############################################################
 class LedgerFactory(factory.DjangoModelFactory):
     name = "bank account"
+    parser = "zkb-csv"
 
     class Meta:
         model = Ledger

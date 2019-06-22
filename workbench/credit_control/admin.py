@@ -5,7 +5,7 @@ from workbench.credit_control import models
 
 @admin.register(models.Ledger)
 class LedgerAdmin(admin.ModelAdmin):
-    pass
+    radio_fields = {"parser": admin.VERTICAL}
 
 
 @admin.register(models.CreditEntry)

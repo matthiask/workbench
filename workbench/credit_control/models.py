@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from workbench.credit_control import parsers
 from workbench.invoices.models import Invoice
 from workbench.tools.models import Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
@@ -8,7 +9,13 @@ from workbench.tools.urls import model_urls
 
 # @model_urls
 class Ledger(Model):
+    PARSER_CHOICES = [
+        ("zkb-csv", _("ZKB CSV")),
+        ("postfinance-csv", _("PostFinance CSV")),
+    ]
+
     name = models.CharField(_("name"), max_length=100)
+    parser = models.CharField(_("parser"), max_length=20, choices=PARSER_CHOICES)
 
     class Meta:
         ordering = ["name"]
@@ -17,6 +24,13 @@ class Ledger(Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def parse_fn(self):
+        return {
+            "zkb-csv": parsers.parse_zkb_csv,
+            "postfinance-csv": parsers.parse_postfinance_csv,
+        }[self.parser]
 
 
 class CreditEntryQuerySet(SearchQuerySet):

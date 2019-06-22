@@ -1,12 +1,16 @@
 import csv
+import hashlib
 import io
+import re
 from datetime import datetime
 from decimal import Decimal
 
+from django.utils.dateparse import parse_date
 from django.utils.encoding import force_text
+from django.utils.text import slugify
 
 
-def parse_zkb(data):
+def parse_zkb_csv(data):
     f = io.StringIO()
     f.write(force_text(data, encoding="utf-8", errors="ignore"))
     f.seek(0)
@@ -40,4 +44,56 @@ def parse_zkb(data):
                     ),
                 }
             )
+    return entries
+
+
+def postfinance_preprocess_notice(payment_notice):
+    """Remove spaces from potential invoice numbers"""
+    return re.sub(
+        r"\b([0-9]{4}\s*-\s*[0-9]{4}\s*-\s*[0-9]{4})\b",
+        lambda match: re.sub(r"\s+", "", match.group(0)),
+        payment_notice,
+    )
+
+
+def postfinance_reference_number(payment_notice, day):
+    """Either pull out the bank reference or create a hash from the notice"""
+    match = re.search(r"\b([0-9]{6}[A-Z]{2}[0-9A-Z]{6,10})$", payment_notice)
+    return "pf-{}".format(
+        match.group(1)
+        if match
+        else hashlib.md5(
+            slugify(payment_notice + day.isoformat()).encode("utf-8")
+        ).hexdigest()
+    )
+
+
+def parse_postfinance_csv(data):
+    f = io.StringIO()
+    f.write(force_text(data, encoding="latin-1", errors="ignore"))
+    f.seek(0)
+    dialect = csv.Sniffer().sniff(f.read(4096))
+    f.seek(0)
+    reader = csv.reader(f, dialect)
+    next(reader)  # Skip first line
+    entries = []
+    for row in reader:
+        if not row:
+            continue
+        try:
+            day = parse_date(row[4])
+        except (IndexError, ValueError):
+            continue
+        if day is None or not row[2]:  # Only credit
+            continue
+
+        payment_notice = postfinance_preprocess_notice(row[1])
+        entries.append(
+            {
+                "reference_number": postfinance_reference_number(payment_notice, day),
+                "value_date": day.isoformat(),
+                "total": row[2],
+                "payment_notice": payment_notice,
+            }
+        )
     return entries

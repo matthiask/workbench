@@ -7,7 +7,6 @@ from django.utils.html import format_html, mark_safe
 from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.credit_control.models import CreditEntry, Ledger
-from workbench.credit_control.parsers import parse_zkb
 from workbench.invoices.models import Invoice
 from workbench.tools.formats import currency, local_date_format
 from workbench.tools.forms import Autocomplete, ModelForm, Textarea
@@ -88,9 +87,9 @@ class AccountStatementUploadForm(forms.Form):
 
     def clean(self):
         data = super().clean()
-        if data.get("statement"):
+        if data.get("statement") and data.get("ledger"):
             self.data = self.data.copy()
-            self.statement_list = parse_zkb(data["statement"].read())
+            self.statement_list = data["ledger"].parse_fn(data["statement"].read())
             self.data["statement_data"] = json.dumps(
                 self.statement_list, sort_keys=True
             )
