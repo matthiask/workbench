@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-22 14:25+0200\n"
+"POT-Creation-Date: 2019-06-22 15:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -109,7 +109,7 @@ msgid "Unusual cutoff date (not last of the month)."
 msgstr "Ungewöhnlicher Stichtag (nicht letzter Tag des Monats)."
 
 #: workbench/accruals/models.py:16 workbench/accruals/models.py:20
-#: workbench/accruals/models.py:108 workbench/reporting/views.py:44
+#: workbench/accruals/models.py:108 workbench/reporting/views.py:45
 msgid "cutoff date"
 msgstr "Stichtag"
 
@@ -165,7 +165,7 @@ msgid "Generated accruals."
 msgstr "Abgrenzungen erstellt."
 
 #: workbench/activities/__init__.py:10 workbench/activities/models.py:66
-#: workbench/templates/base.html:94
+#: workbench/templates/base.html:95
 #: workbench/templates/deals/deal_detail.html:30
 #: workbench/templates/start.html:77
 msgid "activities"
@@ -447,7 +447,7 @@ msgstr "Kreise"
 msgid "is removed"
 msgstr "ist entfernt"
 
-#: workbench/circles/models.py:41
+#: workbench/circles/models.py:41 workbench/projects/models.py:220
 msgid "role"
 msgstr "Rolle"
 
@@ -758,7 +758,7 @@ msgid "assign credit entries"
 msgstr "Gutschriften zuweisen"
 
 #: workbench/deals/__init__.py:10 workbench/deals/models.py:74
-#: workbench/templates/base.html:93
+#: workbench/templates/base.html:94
 msgid "deals"
 msgstr "Geschäfte"
 
@@ -1232,7 +1232,7 @@ msgid "Cannot delete logged hours from past weeks."
 msgstr "Kann Stunden vergangener Wochen nicht löschen."
 
 #: workbench/logbook/models.py:108 workbench/services/models.py:62
-#: workbench/templates/invoices/service_form.html:25
+#: workbench/templates/invoices/service_form.html:30
 #: workbench/templates/logbook/loggedcost_detail.html:35
 #: workbench/templates/projects/project_detail.html:117
 #: workbench/templates/projects/project_detail.html:179
@@ -1347,7 +1347,7 @@ msgid ""
 msgstr ""
 "Dieses Projekt hat schon Rechnungen. Der Rechnungskunde wird auch angepasst."
 
-#: workbench/projects/forms.py:183
+#: workbench/projects/forms.py:179
 msgid ""
 "Most fields are disabled because service is bound to an offer which is not "
 "in preparation anymore."
@@ -1355,7 +1355,7 @@ msgstr ""
 "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte "
 "verbunden ist, welche sich nicht mehr in Vorbereitung befindet."
 
-#: workbench/projects/forms.py:201
+#: workbench/projects/forms.py:197
 msgid "Merge log into"
 msgstr "Erfasste Leistungen zuweisen"
 
@@ -1400,7 +1400,7 @@ msgstr "ist optional"
 msgid "Optional services to not count towards the offer total."
 msgstr "Optionale Leistungen werden nicht zum Offertentotal hinzugerechnet."
 
-#: workbench/projects/models.py:230
+#: workbench/projects/models.py:238
 msgid ""
 "Cannot delete a service bound to an offer which is not in preparation "
 "anymore."
@@ -1408,7 +1408,7 @@ msgstr ""
 "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht "
 "löschen."
 
-#: workbench/reporting/views.py:76
+#: workbench/reporting/views.py:77
 msgid "Form was invalid."
 msgstr "Formular war ungültig."
 
@@ -1592,15 +1592,21 @@ msgstr "Monatliche Verrechnung"
 msgid "open items list"
 msgstr "Offene-Posten-Liste"
 
-#: workbench/templates/base.html:88
+#: workbench/templates/base.html:77
+#: workbench/templates/reporting/logged_hours_by_circle.html:5
+#: workbench/templates/reporting/logged_hours_by_circle.html:10
+msgid "logged hours by circle"
+msgstr "Erfasste Stunden pro Kreis"
+
+#: workbench/templates/base.html:89
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: workbench/templates/base.html:90
+#: workbench/templates/base.html:91
 msgid "Admin panel"
 msgstr "Verwaltung"
 
-#: workbench/templates/base.html:96
+#: workbench/templates/base.html:97
 msgid "Sign out"
 msgstr "Abmelden"
 
@@ -1702,7 +1708,7 @@ msgstr "Kopieren"
 msgid "Create invoices"
 msgstr "Rechnungen erstellen"
 
-#: workbench/templates/invoices/service_form.html:19
+#: workbench/templates/invoices/service_form.html:21
 #: workbench/templates/projects/service_form.html:21
 msgid "effort"
 msgstr "Aufwand"
@@ -1771,6 +1777,10 @@ msgstr "Leistungen aus dem Logbuch"
 #: workbench/templates/projects/project_detail.html:165
 msgid "Services from offer"
 msgstr "Leistungen aus Offerte"
+
+#: workbench/templates/reporting/logged_hours_by_circle.html:23
+msgid "No circle"
+msgstr "Kein Kreis"
 
 #: workbench/templates/reporting/open_items_list.html:14
 msgid "show"
