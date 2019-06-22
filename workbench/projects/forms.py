@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
+from workbench.circles.models import Role
 from workbench.contacts.models import Organization, Person
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
@@ -138,11 +139,12 @@ class ServiceForm(ModelForm):
     class Meta:
         model = Service
         fields = [
-            "offer",
             "title",
             "description",
-            "is_optional",
+            "role",
             "is_logging_prohibited",
+            "offer",
+            "is_optional",
             "effort_type",
             "effort_hours",
             "effort_rate",
@@ -158,6 +160,7 @@ class ServiceForm(ModelForm):
 
         super().__init__(*args, **kwargs)
 
+        self.fields["role"].choices = Role.objects.choices()
         self.fields["offer"].choices = self.project.offers.in_preparation_choices(
             include=getattr(self.instance, "offer_id", None)
         )

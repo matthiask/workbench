@@ -213,6 +213,14 @@ class Service(ServiceBase):
         default=False,
         help_text=_("Optional services to not count towards the offer total."),
     )
+    role = models.ForeignKey(
+        "circles.Role",
+        on_delete=models.SET_NULL,
+        related_name="services",
+        verbose_name=_("role"),
+        blank=True,
+        null=True,
+    )
 
     def get_absolute_url(self):
         return self.project.get_absolute_url()

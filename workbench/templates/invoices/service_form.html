@@ -2,7 +2,7 @@
 
 {% load bootstrap4 fineforms i18n workbench %}
 
-{% block size %}modal-lg{% endblock %}
+{% block size %}modal-xl{% endblock %}
 
 {% block title %}
 {% if view.project %}{{ view.project.title }}{% else %}{{ block.super }}{% endif %}
@@ -11,19 +11,26 @@
 {% block body %}
   {% include 'fineforms/warnings.html' %}
   {% ff_errors form %}
-  {% ff_fields form fields='title,description' %}
 
   <div class="row">
-    <div class="col-md-6">
-      <div data-part data-autofill="{{ view.default_service_types }}">
-        <h5>{% trans 'effort' %}</h5>
-        {% ff_fields form fields='service_type,effort_type,effort_rate,effort_hours' %}
-      </div>
+    <div class="col-md-7">
+      {% ff_fields form fields='title,description' %}
     </div>
-    <div class="col-md-6">
-      <div data-part>
-        <h5>{% trans 'cost' %}</h5>
-        {% ff_fields form fields='cost,third_party_costs' %}
+    <div class="col-md-5">
+      <div data-autofill="{{ view.default_service_types }}">
+        <h5>{% trans 'effort' %}</h5>
+        {% ff_fields form fields='service_type' %}
+        <div class="row">
+          <div class="col-md-12">{% ff_fields form fields='effort_type' %}</div>
+          <div class="col-md-6">{% ff_fields form fields='effort_rate' %}</div>
+          <div class="col-md-6">{% ff_fields form fields='effort_hours' %}</div>
+        </div>
+      </div>
+
+      <h5>{% trans 'cost' %}</h5>
+      <div class="row">
+        <div class="col-md-6">{% ff_fields form fields='cost' %}</div>
+        <div class="col-md-6">{% ff_fields form fields='third_party_costs' %}</div>
       </div>
     </div>
   </div>
