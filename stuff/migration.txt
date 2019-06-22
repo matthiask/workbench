@@ -3,6 +3,8 @@
 
 CREATE EXTENSION dblink;
 
+UPDATE projects_service SET role_id=NULL;
+
 TRUNCATE accounts_user RESTART IDENTITY CASCADE;
 TRUNCATE contacts_group RESTART IDENTITY CASCADE;
 TRUNCATE projects_project RESTART IDENTITY CASCADE;
@@ -543,7 +545,7 @@ WHERE
 --
 
 INSERT INTO projects_service
-(id, created_at, title, position, description, project_id, service_hours, service_cost, offer_id, effort_type, effort_hours, effort_rate, cost, third_party_costs, is_logging_prohibited, is_optional)
+(id, created_at, title, position, description, project_id, service_hours, service_cost, offer_id, effort_type, effort_hours, effort_rate, cost, third_party_costs, is_logging_prohibited, is_optional, role_id)
 SELECT
   p.id,
   NOW(),
@@ -560,11 +562,24 @@ SELECT
   NULL,
   NULL,
   FALSE,
-  FALSE
+  FALSE,
+  CASE
+    WHEN p.activity_id SIMILAR TO '(01|02)%' THEN NULL
+    WHEN p.activity_id SIMILAR TO '(03)%' THEN 11086026
+    WHEN p.activity_id SIMILAR TO '(04)%' THEN 11086057
+    WHEN p.activity_id SIMILAR TO '(06)%' THEN 11705230
+    WHEN p.activity_id SIMILAR TO '(07030)' THEN 11618183
+    WHEN p.activity_id SIMILAR TO '(08)%' THEN 11221455
+    WHEN p.activity_id SIMILAR TO '(09)%' THEN 11154544
+    WHEN p.activity_id SIMILAR TO '(12)%' THEN 11086363
+    WHEN p.activity_id SIMILAR TO '(15)%' THEN 11719571
+    WHEN p.activity_id SIMILAR TO '(16)%' THEN 11087626
+    ELSE NULL
+  END
 FROM dblink(
     'dbname=fineware_feinheit',
-    'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id, a.ordering, a.invoicing_hourly_rate, a.hours FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included AND jo.state!=50'
-) AS p(id int, activity_name text, notes text, job_id int, offer_id int, ordering int, invoicing_hourly_rate numeric(10,2), hours numeric(5, 2));
+    'SELECT a.id, CASE WHEN ag.level=1 THEN ag.name ELSE aa.name END, a.notes, jo.job_id, jo.id, a.ordering, a.invoicing_hourly_rate, a.hours, aa.activity_id FROM offers_offeredactivity a LEFT JOIN offers_joboffer jo ON a.joboffer_id=jo.id LEFT JOIN articles_activity aa ON a.activity_id=aa.id LEFT OUTER JOIN articles_activity ag ON aa.parent_id=ag.id WHERE jo.job_id IS NOT NULL AND a.included AND jo.state!=50'
+) AS p(id int, activity_name text, notes text, job_id int, offer_id int, ordering int, invoicing_hourly_rate numeric(10,2), hours numeric(5, 2), activity_id text);
 
 INSERT INTO projects_service
 (
@@ -763,12 +778,27 @@ dblink(
 --
 
 INSERT INTO projects_service
-(created_at, title, position, description, project_id, service_hours, service_cost, effort_type, effort_rate, is_logging_prohibited, is_optional)
-SELECT DISTINCT ON (p.job_id, activitygroup) NOW(), CONCAT('Logbuch:', activitygroup), 0, '', p.job_id, 0.0, 0.0, activitygroup, rate, TRUE, FALSE FROM
+(created_at, title, position, description, project_id, service_hours, service_cost, effort_type, effort_rate, is_logging_prohibited, is_optional, role_id)
+SELECT DISTINCT ON (p.job_id, activitygroup) NOW(), CONCAT('Logbuch:', activitygroup), 0, '', p.job_id, 0.0, 0.0, activitygroup, rate, TRUE, FALSE,
+  CASE
+    WHEN p.activity_id SIMILAR TO '(01|02)%' THEN NULL
+    WHEN p.activity_id SIMILAR TO '(03)%' THEN 11086026
+    WHEN p.activity_id SIMILAR TO '(04)%' THEN 11086057
+    WHEN p.activity_id SIMILAR TO '(06)%' THEN 11705230
+    WHEN p.activity_id SIMILAR TO '(07030)' THEN 11618183
+    WHEN p.activity_id SIMILAR TO '(08)%' THEN 11221455
+    WHEN p.activity_id SIMILAR TO '(09)%' THEN 11154544
+    WHEN p.activity_id SIMILAR TO '(12)%' THEN 11086363
+    WHEN p.activity_id SIMILAR TO '(15)%' THEN 11719571
+    WHEN p.activity_id SIMILAR TO '(16)%' THEN 11087626
+    ELSE NULL
+  END
+
+FROM
 dblink(
     'dbname=fineware_feinheit',
-    'SELECT created, date, hours, w.notes, created_by_id, worker_id, job_id, aa.name, w.invoicing_hourly_rate FROM worklog_worklogentry w LEFT JOIN articles_activity a ON w.activity_id=a.id LEFT JOIN articles_activity aa ON a.parent_id=aa.id'
-) AS p(created timestamp with time zone, date date, hours numeric, notes text, created_by_id int, worker_id int, job_id int, activitygroup varchar(200), rate numeric)
+    'SELECT created, date, hours, w.notes, created_by_id, worker_id, job_id, aa.name, w.invoicing_hourly_rate, a.activity_id FROM worklog_worklogentry w LEFT JOIN articles_activity a ON w.activity_id=a.id LEFT JOIN articles_activity aa ON a.parent_id=aa.id'
+) AS p(created timestamp with time zone, date date, hours numeric, notes text, created_by_id int, worker_id int, job_id int, activitygroup varchar(200), rate numeric, activity_id text)
 ORDER BY p.job_id, activitygroup;
 
 INSERT INTO logbook_loggedhours
