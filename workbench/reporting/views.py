@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext_lazy as _
 
+from workbench.circles.reporting import logged_hours_by_circle
 from workbench.invoices.models import Invoice
 from workbench.invoices.reporting import monthly_invoicing
 from workbench.projects.reporting import overdrawn_projects
@@ -93,4 +94,12 @@ def open_items_list(request):
         request,
         "reporting/open_items_list.html",
         {"form": form, "open_items_list": form.open_items_list()},
+    )
+
+
+def logged_hours_by_circle_view(request):
+    return render(
+        request,
+        "reporting/logged_hours_by_circle.html",
+        {"circles": logged_hours_by_circle()},
     )

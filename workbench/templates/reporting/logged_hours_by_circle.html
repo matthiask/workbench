@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% load fineforms i18n workbench %}
+
+{% block title %}{% trans 'logged hours by circle' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+<div class="col-sm-12">
+  <h1>{% trans 'logged hours by circle' %}</h1>
+
+  <table class="table table-sm table-responsive-lg table-hover">
+    <thead>
+      <tr>
+        <th></th>
+        {% for user in circles.0.users %}<th>{{ user.get_short_name }}</th>{% endfor %}
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for circle in circles %}
+      <tr>
+        <th>{{ circle.circle|default:_("No circle") }}</th>
+        {% for user in circle.by_user %}<th class="text-right">{% if user %}{{ user|hours }}{% else %}-{% endif %}</th>{% endfor %}
+        <th class="text-right">{{ circle.total|hours }}</th>
+      </tr>
+      {% for role in circle.roles %}
+      <tr>
+        <td>{{ role.role }}</td>
+        {% for user in role.by_user %}<td class="text-right">{% if user %}{{ user|hours }}{% else %}-{% endif %}</td>{% endfor %}
+        <td class="text-right">{{ role.total|hours }}</td>
+      </tr>
+      {% endfor %}
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+</div>
+{% endblock %}

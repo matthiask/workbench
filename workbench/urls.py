@@ -6,6 +6,7 @@ from django.shortcuts import render
 from workbench import views
 from workbench.awt.views import ReportView
 from workbench.reporting.views import (
+    logged_hours_by_circle_view,
     monthly_invoicing_view,
     open_items_list,
     overdrawn_projects_view,
@@ -45,6 +46,11 @@ urlpatterns = [
         name="report_overdrawn_projects",
     ),
     url(r"^report/open-items-list/$", open_items_list, name="report_open_items_list"),
+    url(
+        r"^report/logged-hours-by-circle/$",
+        logged_hours_by_circle_view,
+        name="report_logged_hours_by_circle",
+    ),
 ]
 
 if settings.DEBUG:  # pragma: no cover
