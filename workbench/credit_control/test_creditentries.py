@@ -8,6 +8,10 @@ from django.test import TestCase
 
 from workbench import factories
 from workbench.credit_control.models import CreditEntry
+from workbench.credit_control.parsers import (
+    postfinance_preprocess_notice,
+    postfinance_reference_number,
+)
 from workbench.tools.formats import local_date_format
 from workbench.tools.testing import messages
 
@@ -147,3 +151,17 @@ class CreditEntriesTest(TestCase):
         self.assertEqual(response.status_code, 302)
         entry = CreditEntry.objects.get()
         self.assertRedirects(response, entry.urls["list"])
+
+    def test_postfinance_utilities(self):
+        self.assertEqual(
+            postfinance_preprocess_notice("bla 2019 -0001-0001 test"),
+            "bla 2019-0001-0001 test",
+        )
+        self.assertEqual(
+            postfinance_reference_number("bla bla 190630CH12345678", date(2019, 6, 30)),
+            "pf-190630CH12345678",
+        )
+        self.assertEqual(
+            postfinance_reference_number("bla 2019-0001-0001 test", date(2019, 6, 30)),
+            "pf-ef8792bffe6303d32130377399828a3f",
+        )

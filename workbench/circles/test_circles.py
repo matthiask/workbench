@@ -21,7 +21,7 @@ class CirclesTest(TestCase):
                 ("", "----------"),
                 ("A circle", [(r4.id, "Role 1"), (r5.id, "Role 2")]),
                 ("B circle", [(r1.id, "Role 1"), (r3.id, "(entfernt) Role 2")]),
-            ]
+            ],
         )
 
     def test_reporting(self):
