@@ -39,7 +39,7 @@ class HistoryTest(TestCase):
         response = self.client.get("/history/projects.project/{}/".format(project.pk))
         # print(response, response.content.decode("utf-8"))
         self.assertContains(response, "Version 2")
-        self.assertContains(response, "Anfangswert von 'Kunde' war")
+        self.assertContains(response, "Anfangswert von 'Kundschaft' war")
         self.assertContains(response, "The Organization Ltd")
 
     def test_contact_history(self):
