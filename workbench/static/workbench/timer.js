@@ -134,6 +134,14 @@ class App extends Component {
                     projects: prevState.projects.filter(
                       p => p.id !== project.id
                     ),
+                    activeProject:
+                      prevState.activeProject === project.id
+                        ? null
+                        : prevState.activeProject,
+                    lastStart:
+                      prevState.activeProject === project.id
+                        ? null
+                        : prevState.lastStart,
                   }))
                 }
               }}
