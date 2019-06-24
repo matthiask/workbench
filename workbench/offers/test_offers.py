@@ -228,3 +228,4 @@ class OffersTest(TestCase):
             Offer(status=Offer.REJECTED, closed_on=today).pretty_status,
             "Abgelehnt am {}".format(local_date_format(today)),
         )
+        self.assertEqual(Offer(status="42").pretty_status, "42")
