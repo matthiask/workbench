@@ -242,7 +242,7 @@ MAILCHIMP_API_KEY = env("MAILCHIMP_API_KEY")
 MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID")
 
 
-if env("SQL", default=False):
+if env("SQL", default=False):  # pragma: no cover
     from django.utils.log import DEFAULT_LOGGING as LOGGING
 
     LOGGING["handlers"]["console"]["level"] = "DEBUG"
