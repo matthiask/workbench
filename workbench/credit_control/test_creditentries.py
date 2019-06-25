@@ -9,6 +9,7 @@ from django.test import TestCase
 from workbench import factories
 from workbench.credit_control.models import CreditEntry
 from workbench.credit_control.parsers import (
+    parse_postfinance_csv,
     postfinance_preprocess_notice,
     postfinance_reference_number,
 )
@@ -158,6 +159,10 @@ class CreditEntriesTest(TestCase):
             "bla 2019-0001-0001 test",
         )
         self.assertEqual(
+            postfinance_preprocess_notice("bla 2019-0001-0001 test"),
+            "bla 2019-0001-0001 test",
+        )
+        self.assertEqual(
             postfinance_reference_number("bla bla 190630CH12345678", date(2019, 6, 30)),
             "pf-190630CH12345678",
         )
@@ -165,3 +170,27 @@ class CreditEntriesTest(TestCase):
             postfinance_reference_number("bla 2019-0001-0001 test", date(2019, 6, 30)),
             "pf-ef8792bffe6303d32130377399828a3f",
         )
+
+    def test_postfinance_parse_csv(self):
+        with io.open(
+            os.path.join(
+                settings.BASE_DIR, "workbench", "test", "postfinance-export.csv"
+            ),
+            "rb",
+        ) as f:
+            entries = parse_postfinance_csv(f.read())
+
+        self.assertEqual(len(entries), 3)
+        self.assertEqual(entries[0]["total"], "1193.30")
+        self.assertEqual(entries[0]["reference_number"], "pf-190618CH04D10XYZ")
+        self.assertEqual(entries[0]["value_date"], "2019-06-18")
+
+        self.assertEqual(
+            entries[1]["reference_number"], "pf-bad7372a51d085b97f7b0e782841490b"
+        )
+        self.assertIn("2019-0015-0002", entries[1]["payment_notice"])
+
+        self.assertEqual(
+            entries[2]["reference_number"], "pf-d0436a6497bf533d2ae49809169f5481"
+        )
+        self.assertIn("2019-0214-0001", entries[2]["payment_notice"])
