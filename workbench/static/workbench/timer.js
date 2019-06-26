@@ -21,31 +21,8 @@ class App extends Component {
     })
   }
 
-  ensureUpdatesIfActive() {
-    if (this.state.activeProject) {
-      this.ensureUpdates()
-    } else {
-      this.stopUpdates()
-    }
-  }
-
-  componentDidMount() {
-    this.ensureUpdatesIfActive()
-  }
-
   componentDidUpdate() {
     window.localStorage.setItem("workbench-timer", JSON.stringify(this.state))
-    this.ensureUpdatesIfActive()
-  }
-
-  ensureUpdates() {
-    this.stopUpdates()
-    this.timer = setInterval(() => this.forceUpdate(), 1000)
-  }
-
-  stopUpdates() {
-    clearInterval(this.timer)
-    this.timer = null
   }
 
   defaultState() {
@@ -76,40 +53,20 @@ class App extends Component {
         lastStart: projectId === null ? null : timestamp() - 1,
       }
     })
-
-    if (projectId && !this.timer) {
-      this.ensureUpdates()
-    } else if (!projectId) {
-      this.stopUpdates()
-    }
   }
 
   render(props, state) {
-    window.console && window.console.log("RENDERING", new Date())
     let content = []
     if (state.projects.length) {
       content = content.concat(
         state.projects.map(project => {
           const isActiveProject = state.activeProject === project.id
-
-          let seconds = state.seconds[project.id] || 0
-          if (isActiveProject && state.lastStart) {
-            seconds += timestamp() - state.lastStart
-          }
-
-          const deciHours = Math.ceil(seconds / 360) / 10
-          const minutes = Math.floor(seconds / 60)
-          const displayHours =
-            minutes >= 60 ? `${Math.floor(minutes / 60)}h ` : ""
-          const displayMinutes = minutes % 60
-          const displaySeconds = (seconds % 60).toString().padStart(2, "0")
-
           return html`
             <${Project}
               project=${project}
-              deciHours=${deciHours}
-              elapsed=${`${displayHours}${displayMinutes}:${displaySeconds}`}
               isActiveProject=${isActiveProject}
+              lastStart=${isActiveProject ? state.lastStart : null}
+              seconds=${state.seconds[project.id] || 0}
               target=${this.props.standalone ? "_blank" : ""}
               toggleTimerState=${() => {
                 if (isActiveProject) {
@@ -120,6 +77,12 @@ class App extends Component {
               }}
               logHours=${() => {
                 this.activateProject(null, {[project.id]: 0})
+
+                let seconds = state.seconds[project.id] || 0
+                if (isActiveProject && state.lastStart) {
+                  seconds += timestamp() - state.lastStart
+                }
+                const deciHours = Math.ceil(seconds / 360) / 10
 
                 window.openModalFromUrl(
                   `/projects/${project.id}/createhours/?hours=${deciHours}`
@@ -201,48 +164,77 @@ class App extends Component {
   }
 }
 
-function Project(props) {
-  return html`
-    <div
-      class="list-group-item d-flex align-items-center justify-content-between"
-    >
-      <a
-        class="d-block text-truncate"
-        href=${`/projects/${props.project.id}/`}
-        target=${props.target}
-      >
-        ${props.project.title}
-      </a>
+class Project extends Component {
+  updateHoursButton() {
+    if (!this.hoursButton) return
 
-      <div class="text-nowrap">
-        <button
-          class=${`btn btn-sm ${
-            props.isActiveProject ? "btn-success" : "btn-outline-secondary"
-          }`}
-          onClick=${() => props.toggleTimerState()}
-          title=${props.isActiveProject ? "Timer stoppen" : "Timer starten"}
+    const seconds =
+      this.props.seconds +
+      (this.props.isActiveProject ? timestamp() - this.props.lastStart : 0)
+
+    const hours = Math.floor(seconds / 3600)
+    const displayHours = hours ? `${hours}h ` : ""
+    const displayMinutes = Math.floor(seconds / 60) % 60
+    const displaySeconds = (seconds % 60).toString().padStart(2, "0")
+
+    const deciHours = Math.ceil(seconds / 360) / 10
+
+    this.hoursButton.textContent = `+${displayHours}${displayMinutes}:${displaySeconds}`
+    this.hoursButton.title = `${deciHours}h aufschreiben`
+  }
+
+  render(props) {
+    setTimeout(this.updateHoursButton.bind(this), 0)
+
+    if (props.isActiveProject) {
+      this.timer = setInterval(this.updateHoursButton.bind(this), 1000)
+    } else if (this.timer) {
+      clearInterval(this.timer)
+      this.timer = null
+    }
+
+    return html`
+      <div
+        class="list-group-item d-flex align-items-center justify-content-between"
+      >
+        <a
+          class="d-block text-truncate"
+          href=${`/projects/${props.project.id}/`}
+          target=${props.target}
         >
-          ${props.isActiveProject ? "pause" : "start"}
-        </button>
-        ${" "}
-        <button
-          class="btn btn-outline-secondary btn-sm"
-          onClick=${() => props.logHours()}
-          title=${`${props.deciHours}h aufschreiben`}
-        >
-          +${props.elapsed}
-        </button>
-        ${" "}
-        <button
-          class="btn btn-outline-danger btn-sm"
-          onClick=${() => props.removeProject()}
-          title="Projekt entfernen"
-        >
-          x
-        </button>
+          ${props.project.title}
+        </a>
+
+        <div class="text-nowrap">
+          <button
+            class=${`btn btn-sm ${
+              props.isActiveProject ? "btn-success" : "btn-outline-secondary"
+            }`}
+            onClick=${() => props.toggleTimerState()}
+            title=${props.isActiveProject ? "Timer stoppen" : "Timer starten"}
+          >
+            ${props.isActiveProject ? "pause" : "start"}
+          </button>
+          ${" "}
+          <button
+            class="btn btn-outline-secondary btn-sm"
+            onClick=${() => props.logHours()}
+            ref=${button => (this.hoursButton = button)}
+          >
+            +
+          </button>
+          ${" "}
+          <button
+            class="btn btn-outline-danger btn-sm"
+            onClick=${() => props.removeProject()}
+            title="Projekt entfernen"
+          >
+            x
+          </button>
+        </div>
       </div>
-    </div>
-  `
+    `
+  }
 }
 
 function AddProject(props) {
