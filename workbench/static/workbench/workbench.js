@@ -95,6 +95,16 @@ $(function() {
       .submit()
   })
 
+  $(".form-search").each(function() {
+    const key = `search-${window.location.pathname}`
+    if (window.location.search) {
+      window.localStorage.setItem(key, window.location.search)
+    } else {
+      const search = window.localStorage.getItem(key)
+      if (search) window.location.href = search
+    }
+  })
+
   // Hotkeys
   $(document.body).on("keydown", function(e) {
     if (/Mac/.test(navigator.platform) ? !e.ctrlKey : !e.altKey) {
