@@ -16,7 +16,15 @@ class UserAdmin(UserAdmin):
     form = UserChangeForm
     add_form = UserChangeForm
 
-    list_display = ("email", "_short_name", "_full_name", "is_active", "is_admin")
+    list_display = (
+        "email",
+        "_short_name",
+        "_full_name",
+        "is_active",
+        "is_admin",
+        "enforce_same_week_logging",
+        "last_login",
+    )
     list_filter = ("is_active", "is_admin")
     fieldsets = add_fieldsets = [
         (
