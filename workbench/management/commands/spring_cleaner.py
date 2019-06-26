@@ -59,7 +59,7 @@ class Command(BaseCommand):
     help = "De-htmlizes description fields"
 
     def handle(self, **options):
-        set_user_name("Spring cleaner")
+        set_user_name("Frühlingsputz")
 
         self.stdout.write("updating street and house numbers...")
         for postal_address in PostalAddress.objects.order_by("street"):
