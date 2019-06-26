@@ -289,7 +289,7 @@ class PDFDocument(_PDFDocument):
             if offer.status in {offer.OFFERED, offer.ACCEPTED}
             else str(offer.get_status_display()),
             details=[
-                (_("offer"), "%s/%s" % (offer.code, offer.owned_by.get_short_name())),
+                (_("offer"), offer.code),
                 (
                     _("date"),
                     (
@@ -300,6 +300,7 @@ class PDFDocument(_PDFDocument):
                         )
                     ),
                 ),
+                (_("our reference"), offer.owned_by.get_full_name()),
                 (
                     _("valid until"),
                     (
@@ -323,10 +324,7 @@ class PDFDocument(_PDFDocument):
             if invoice.status in {invoice.SENT, invoice.PAID}
             else str(invoice.get_status_display()),
             details=[
-                (
-                    _("invoice"),
-                    "%s/%s" % (invoice.code, invoice.owned_by.get_short_name()),
-                ),
+                (_("invoice"), invoice.code),
                 (
                     _("date"),
                     (
@@ -337,6 +335,7 @@ class PDFDocument(_PDFDocument):
                         )
                     ),
                 ),
+                (_("our reference"), invoice.owned_by.get_full_name()),
                 ("MwSt.-Nr.", settings.WORKBENCH.PDF_VAT_NO),
             ],
             footer=settings.WORKBENCH.PDF_INVOICE_PAYMENT

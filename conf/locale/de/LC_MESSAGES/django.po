@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-22 15:22+0200\n"
+"POT-Creation-Date: 2019-06-26 10:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -675,8 +675,8 @@ msgid "invoiced on"
 msgstr "Verrechnet am"
 
 #: workbench/credit_control/forms.py:166 workbench/tools/pdf.py:245
-#: workbench/tools/pdf.py:299 workbench/tools/pdf.py:311
-#: workbench/tools/pdf.py:336 workbench/tools/pdf.py:348
+#: workbench/tools/pdf.py:299 workbench/tools/pdf.py:312
+#: workbench/tools/pdf.py:334 workbench/tools/pdf.py:347
 msgid "NO DATE YET"
 msgstr "NOCH KEIN DATUM"
 
@@ -1935,11 +1935,15 @@ msgstr "(optional)"
 msgid "tax"
 msgstr "MwSt"
 
-#: workbench/tools/pdf.py:294 workbench/tools/pdf.py:331
+#: workbench/tools/pdf.py:294 workbench/tools/pdf.py:329
 msgid "date"
 msgstr "Datum"
 
-#: workbench/tools/pdf.py:304
+#: workbench/tools/pdf.py:303 workbench/tools/pdf.py:338
+msgid "our reference"
+msgstr "Unsere Referenz"
+
+#: workbench/tools/pdf.py:305
 msgid "valid until"
 msgstr "Gültig bis"
 
