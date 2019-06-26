@@ -15,11 +15,8 @@ class PersonListView(ListView):
     model = Person
     search_form_class = PersonSearchForm
 
-    def get_root_queryset(self):
-        return Person.objects.active()
-
     def get_queryset(self):
-        queryset = super().get_queryset().select_related("organization")
+        queryset = super().get_queryset().active().select_related("organization")
         return queryset.extra(
             select={
                 "email": (

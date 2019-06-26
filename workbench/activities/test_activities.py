@@ -45,7 +45,6 @@ class ActivitiesTest(TestCase):
 
         response = self.client.get(activity.urls["list"])
         self.assertContains(response, "1 &ndash; 20 von 20")
-        self.assertContains(response, "21 insgesamt")
 
         response = self.client.get(activity.urls["list"] + "?s=all")
         self.assertContains(response, "1 &ndash; 21 von 21")

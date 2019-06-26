@@ -79,22 +79,14 @@ class ListView(ToolsMixin, vanilla.ListView):
                     return response
         return super().get(request, *args, **kwargs)
 
-    def get_root_queryset(self):
-        return self.model.objects.all()
-
     def get_queryset(self):
-        self.root_queryset = self.get_root_queryset()
-        queryset = self.root_queryset.all()
+        queryset = self.model.objects.all()
 
         if self.search_form_class:
             q = self.request.GET.get("q")
             queryset = self.search_form.filter(queryset.search(q) if q else queryset)
 
         return queryset
-
-    @cached_property
-    def root_queryset_count(self):
-        return self.root_queryset.count()
 
 
 class DetailView(ToolsMixin, vanilla.DetailView):
