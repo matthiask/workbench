@@ -3,20 +3,41 @@ module.exports = {
     browser: true,
     es6: true,
     jquery: true,
+    node: true,
   },
-  extends: "eslint:recommended",
+  extends: [
+    "eslint:recommended",
+    "prettier",
+    // "prettier/react",
+    // "plugin:react/recommended",
+  ],
+  parser: "babel-eslint",
   parserOptions: {
     ecmaVersion: 2018,
+    ecmaFeatures: {
+      jsx: true,
+    },
     sourceType: "module",
   },
-  plugins: ["prettier"],
+  plugins: [
+    "prettier",
+    // "react",
+    // "react-hooks",
+  ],
   rules: {
-    indent: ["error", 2],
-    "linebreak-style": ["error", "unix"],
-    quotes: ["error", "double"],
-    semi: ["error", "always"],
-    "no-unused-vars": ["error", {argsIgnorePattern: "^_|event"}],
-    "prettier/prettier": "error",
-    quotes: 0,
+    "no-unused-vars": [
+      "error",
+      {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "React",
+      },
+    ],
+    "react/prop-types": "off",
+    "react/display-name": "off",
+  },
+  settings: {
+    react: {
+      version: "16.6",
+    },
   },
 }

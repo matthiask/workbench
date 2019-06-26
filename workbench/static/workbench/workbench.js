@@ -42,7 +42,7 @@ $(function() {
   })
 
   // Include the name and value of the submit button
-  $(document.body).on("click", ":submit", function(event) {
+  $(document.body).on("click", ":submit", function(_event) {
     var el = $(this),
       form = el.parents("form")
     form.find(".hidden-submit-value").remove()
@@ -57,7 +57,7 @@ $(function() {
     )
   })
 
-  $(document.body).on("submit", ".modal-dialog form", function(event) {
+  $(document.body).on("submit", ".modal-dialog form", function(_event) {
     if (this.method.toLowerCase() == "post") {
       $.post(this.action, $(this).serialize(), function(data, status, jqXHR) {
         // 201 CREATED, 202 ACCEPTED or 204 NO CONTENT
@@ -208,7 +208,7 @@ function initWidgets() {
   var invoicedOn = $("#id_invoiced_on")
   var dueOn = $("#id_due_on")
   if (invoicedOn.length && dueOn.length) {
-    invoicedOn.on("change", function(event) {
+    invoicedOn.on("change", function(_event) {
       var due = new Date(
         invoicedOn.datepicker("getDate").getTime() + 14 * 86400 * 1000
       )
