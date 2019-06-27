@@ -19,7 +19,6 @@
       <span class="badge badge-{{ object.status_css }}">{{ object.pretty_status }}</span>
     </p>
 
-
     <div class="card my-3">
       <div class="card-body">
         <h5>{% trans 'overview' %}</h5>
@@ -37,6 +36,13 @@
         </small>
       </div>
     </div>
+
+    <a href="{{ project.urls.update }}" class="btn btn-secondary">
+      {% trans 'Update' %}</a>
+    <a href="{{ object.urls.create }}?copy_project={{ object.pk }}" class="btn btn-secondary">
+      {% trans 'Copy' %}</a>
+    <a href="{{ project.urls.delete }}" class="btn btn-outline-danger float-right">
+      {% trans 'Delete' %}</a>
 
     {% for offer, services in project.grouped_services.offers %}
     <div class="card my-3">
@@ -179,13 +185,6 @@
       {% trans 'cost' %}</a>
     <a href="{% url 'activities_activity_create' %}?project={{ object.pk }}" class="btn btn-secondary" data-toggle="ajaxmodal">
       {% include "svg/plus.svg" %} {% trans 'activity' %} </a>
-    <a href="{{ project.urls.update }}" class="btn btn-secondary">
-      {% trans 'Update' %}</a>
-    <a href="{{ object.urls.create }}?copy_project={{ object.pk }}" class="btn btn-secondary">
-      {% trans 'Copy' %}
-    </a>
-    <a href="{{ project.urls.delete }}" class="btn btn-outline-danger float-right">
-      {% trans 'Delete' %}</a>
 
   </div>
 </div>
