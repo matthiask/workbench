@@ -128,6 +128,11 @@ class Project(Model):
 
         service_hours = Z
         logged_hours = Z
+        total_service_cost = Z
+        total_logged_cost = Z
+        total_service_hours_rate_undefined = Z
+        total_logged_hours_rate_undefined = Z
+
         offers = {
             offer.pk: (offer, []) for offer in self.offers.select_related("owned_by")
         }
@@ -156,6 +161,14 @@ class Project(Model):
             service_hours += service.service_hours
             logged_hours += service.logged_hours
 
+            total_service_cost += service.service_cost
+            total_logged_cost += service.logged_cost
+            if service.effort_rate:
+                total_logged_cost += service.effort_rate * service.logged_hours
+            else:
+                total_service_hours_rate_undefined += service.service_hours
+                total_logged_hours_rate_undefined += service.logged_hours
+
         if None in logged_cost_per_service:
             service = Service(
                 title=gettext("Not bound to a particular service."), service_cost=Z
@@ -163,6 +176,8 @@ class Project(Model):
             service.logged_hours = Z
             service.logged_cost = logged_cost_per_service[None]
             offers[None][1].append(service)
+
+            total_logged_cost += service.logged_cost
 
         return {
             "offers": sorted(
@@ -178,11 +193,19 @@ class Project(Model):
             ),
             "logged_hours": logged_hours,
             "service_hours": service_hours,
+            "total_service_cost": total_service_cost,
+            "total_logged_cost": total_logged_cost,
+            "total_service_hours_rate_undefined": total_service_hours_rate_undefined,
+            "total_logged_hours_rate_undefined": total_logged_hours_rate_undefined,
         }
 
     @cached_property
     def project_invoices(self):
         return self.invoices.select_related("contact__organization").reverse()
+
+    @cached_property
+    def project_invoices_subtotal(self):
+        return sum((invoice.subtotal for invoice in self.project_invoices), Z)
 
 
 @model_urls

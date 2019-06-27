@@ -150,6 +150,23 @@
     </div>
     {% endif %}
 
+    <div class="card my-3">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="d-inline my-0">{% trans 'administration' %}</h5>
+      </div>
+      <div class="card-body">
+
+        service_hours: {{ project.grouped_services.service_hours }}<br>
+        logged_hours: {{ project.grouped_services.logged_hours }}<br>
+        total_service_cost: {{ project.grouped_services.total_service_cost }}<br>
+        total_logged_cost: {{ project.grouped_services.total_logged_cost }}<br>
+        total_service_hours_rate_undefined: {{ project.grouped_services.total_service_hours_rate_undefined }}<br>
+        total_logged_hours_rate_undefined: {{ project.grouped_services.total_logged_hours_rate_undefined }}<br>
+        project_invoices_subtotal: {{ project.project_invoices_subtotal }}
+
+      </div>
+    </div>
+
     <span class="dropdown">
       <button class="btn btn-secondary dropdown-toggle" type="button"
         id="invoice-dropdown-button" data-toggle="dropdown"

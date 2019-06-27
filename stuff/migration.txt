@@ -888,10 +888,10 @@ NOW(),
 '',
 p.project_id,
 p.scheduled_hours,
-p.scheduled_hours * COALESCE(p.invoicing_rate_override, 180),
-'Eingeplante Stunden',
+CASE WHEN p.invoicing_rate_override IS NULL THEN 0 ELSE p.scheduled_hours * p.invoicing_rate_override END,
+CASE WHEN p.invoicing_rate_override IS NULL THEN '' ELSE 'Eingeplante Stunden' END,
 p.scheduled_hours,
-COALESCE(p.invoicing_rate_override, 180),
+p.invoicing_rate_override,
 TRUE,
 FALSE
 FROM
