@@ -779,7 +779,7 @@ dblink(
 
 INSERT INTO projects_service
 (created_at, title, position, description, project_id, service_hours, service_cost, effort_type, effort_rate, is_logging_prohibited, is_optional, role_id)
-SELECT DISTINCT ON (p.job_id, activitygroup) NOW(), CONCAT('Logbuch:', activitygroup), 0, '', p.job_id, 0.0, 0.0, activitygroup, rate, TRUE, FALSE,
+SELECT DISTINCT ON (p.job_id, activitygroup) NOW(), CONCAT('Import:', activitygroup), 0, '', p.job_id, 0.0, 0.0, activitygroup, rate, TRUE, FALSE,
   CASE
     WHEN p.activity_id SIMILAR TO '(01|02)%' THEN NULL
     WHEN p.activity_id SIMILAR TO '(03)%' THEN 11086026
@@ -819,7 +819,7 @@ dblink(
     'dbname=fineware_feinheit',
     'SELECT w.id, created, date, hours, w.notes, created_by_id, worker_id, job_id, aa.name, invoice_id, w.archived FROM worklog_worklogentry w LEFT JOIN articles_activity a ON w.activity_id=a.id LEFT JOIN articles_activity aa ON a.parent_id=aa.id'
 ) AS p(wl_id int, created timestamp with time zone, date date, hours numeric, notes text, created_by_id int, worker_id int, job_id int, activitygroup varchar(200), invoice_id int, archived bool)
-WHERE s.project_id=p.job_id AND s.title=CONCAT('Logbuch:', activitygroup);
+WHERE s.project_id=p.job_id AND s.title=CONCAT('Import:', activitygroup);
 
 INSERT INTO logbook_loggedcost
 (id, created_at, rendered_on, cost, third_party_costs, description, created_by_id, rendered_by_id, invoice_service_id, project_id, service_id, are_expenses)
