@@ -94,22 +94,16 @@
               {% if service.pk %}
                 <a href="{% url 'logbook_loggedhours_list' %}?service={{ service.pk }}" target="_blank">
                   {{ service.logged_hours|hours }} / {{ service.service_hours|hours }}
-                  {{ service.effort_type }}
+                  {{ service.effort_type|default:_("(effort type undefined)") }}
                 </a>
                 {% bar service.logged_hours service.service_hours %}
               {% endif %}
             </span>
             <span class="col-md-4">
-              {% if service.pk %}
-                <a href="{% url 'logbook_loggedcost_list' %}?service={{ service.pk }}" target="_blank">
-                  {{ service.logged_cost|stringformat:'.2f' }} / {{ service.cost|default:0|stringformat:'.2f' }}
-                </a>
-                {% bar service.logged_cost service.service_cost %}
-              {% else %}
-                <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;service=0" target="_blank">
-                  {{ service.logged_cost|stringformat:'.2f' }} / {{ service.cost|default:0|stringformat:'.2f' }}
-                </a>
-              {% endif %}
+              <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;service={{ service.pk|default:0 }}" target="_blank">
+                {{ service.logged_cost|stringformat:'.2f' }} / {{ service.cost|default:0|stringformat:'.2f' }}
+              </a>
+              {% if service.pk %}{% bar service.logged_cost service.service_cost %}{% endif %}
             </span>
             <span class="col-md-4 text-right">
               {% if not service.is_logging_prohibited %}
@@ -155,7 +149,6 @@
       </div>
     </div>
     {% endif %}
-
 
     <span class="dropdown">
       <button class="btn btn-secondary dropdown-toggle" type="button"
