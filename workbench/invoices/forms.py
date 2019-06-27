@@ -422,27 +422,6 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
             else:
                 initial.update({"customer": customer})
 
-        elif request.GET.get("copy_invoice"):
-            try:
-                invoice = Invoice.objects.get(pk=request.GET.get("copy_invoice"))
-            except (Invoice.DoesNotExist, TypeError, ValueError):
-                self.pre_form = True
-            else:
-                initial.update(
-                    {
-                        "customer": invoice.customer_id,
-                        "contact": invoice.contact_id,
-                        "title": invoice.title,
-                        "description": invoice.description,
-                        "postal_address": invoice.postal_address,
-                        "type": invoice.type,
-                        "subtotal": invoice.subtotal,
-                        "discount": invoice.discount,
-                        "liable_to_vat": invoice.liable_to_vat,
-                        "tax_rate": invoice.tax_rate,
-                        "total": invoice.total,
-                    }
-                )
         else:
             self.pre_form = True
 

@@ -347,11 +347,6 @@ class InvoicesTest(TestCase):
         self.assertNotContains(response, 'id="id_title"')
         self.assertNotContains(response, 'id="id_description"')
 
-        response = self.client.get(Invoice().urls["create"] + "?copy_invoice=0")
-        self.assertContains(response, 'method="GET"')
-        self.assertNotContains(response, 'id="id_title"')
-        self.assertNotContains(response, 'id="id_description"')
-
     def test_create_update_person_invoice(self):
         person = factories.PersonFactory.create(
             organization=factories.OrganizationFactory.create()
@@ -405,17 +400,6 @@ class InvoicesTest(TestCase):
         self.client.force_login(person.primary_contact)
         response = self.client.get(
             "/invoices/create/?customer={}".format(person.organization.id)
-        )
-        self.assertContains(
-            response, 'value="The Organization Ltd" placeholder="Organisation"'
-        )
-        self.assertContains(response, 'id="id_postal_address"')
-
-    def test_copy_invoice(self):
-        invoice = factories.InvoiceFactory.create()
-        self.client.force_login(invoice.owned_by)
-        response = self.client.get(
-            "/invoices/create/?copy_invoice={}".format(invoice.id)
         )
         self.assertContains(
             response, 'value="The Organization Ltd" placeholder="Organisation"'
