@@ -119,7 +119,7 @@ class User(Model, AbstractBaseUser):
         }
 
     @cached_property
-    def recent_hours(self):
+    def todays_hours(self):
         return (
             self.loggedhours.filter(rendered_on=date.today())
             .select_related("service__project__owned_by")

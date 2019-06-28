@@ -52,12 +52,12 @@
 
     <div class="card mb-3">
       <div class="card-header"><h3 class="my-0">
-        <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{% trans 'recent hours' %}</a>
+        <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{% trans 'today\'s hours' %}</a>
       </h3></div>
 
-      {% if user.recent_hours %}
+      {% if user.todays_hours %}
         <div class="list-group list-group-flush">
-          {% for hours in user.recent_hours %}
+          {% for hours in user.todays_hours %}
           <a class="list-group-item list-group-item-action" href="{{ hours.get_absolute_url }}" data-toggle="ajaxmodal">
             <small class="d-flex justify-content-between">
               <span>{{ hours.service.project }}: {{ hours.service }}</span>
@@ -68,7 +68,7 @@
           {% endfor %}
         </div>
       {% else %}
-        <div class="card-body">{% trans 'no recent hours' %}</div>
+        <div class="card-body">{% trans 'no hours today' %}</div>
       {% endif %}
     </div>
 
