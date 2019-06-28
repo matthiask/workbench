@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-28 08:55+0200\n"
+"POT-Creation-Date: 2019-06-28 09:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1579,10 +1579,6 @@ msgstr "Mahnwesen"
 msgid "reports"
 msgstr "Berichte"
 
-#: workbench/templates/base.html:73
-msgid "not invoiced work"
-msgstr "Nicht verrechnete Arbeit"
-
 #: workbench/templates/base.html:74
 #: workbench/templates/reporting/overdrawn_projects.html:5
 #: workbench/templates/reporting/overdrawn_projects.html:10
@@ -1802,8 +1798,8 @@ msgid "effort hours"
 msgstr "Aufwände in Stunden"
 
 #: workbench/templates/reporting/overdrawn_projects.html:19
-msgid "delta"
-msgstr "Delta"
+msgid "overdrawn"
+msgstr "Überzogen"
 
 #: workbench/templates/search.html:17
 msgid "Only showing 100 items. Additional results have been omitted."
@@ -1961,3 +1957,9 @@ msgstr "Gültig bis"
 #: workbench/views.py:39
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
+
+#~ msgid "not invoiced work"
+#~ msgstr "Nicht verrechnete Arbeit"
+
+#~ msgid "delta"
+#~ msgstr "Delta"
