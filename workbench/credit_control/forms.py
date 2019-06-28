@@ -177,12 +177,8 @@ class AssignCreditEntriesForm(forms.Form):
                         ),
                     )
                     for invoice in Invoice.objects.filter(
-                        # TODO
-                        # status__in=(
-                        #     Invoice.IN_PREPARATION,
-                        #     Invoice.SENT,
-                        # ),
-                        total=entry.total
+                        status__in=(Invoice.IN_PREPARATION, Invoice.SENT),
+                        total=entry.total,
                     ).select_related(
                         "contact__organization", "customer", "owned_by", "project"
                     )[
