@@ -107,7 +107,7 @@ class Project(Model):
 
         return {
             self.ACQUISITION: "info",
-            self.MAINTENANCE: "info",
+            self.MAINTENANCE: "light",
             self.ORDER: "success",
             self.INTERNAL: "warning",
         }[self.type]

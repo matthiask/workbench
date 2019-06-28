@@ -42,12 +42,13 @@ def overdrawn_projects():
         for project in projects
     ]
 
+    TYPE_ORDERING = {Project.ORDER: 1, Project.ACQUISITION: 1, Project.MAINTENANCE: 2}
+
     return sorted(
         (
             project
             for project in projects
             if project["logged_hours"] > project["service_hours"]
         ),
-        key=lambda row: (row["project"].type, row["delta"]),
-        reverse=True,
+        key=lambda row: (TYPE_ORDERING.get(row["project"].type, 9), -row["delta"]),
     )
