@@ -70,7 +70,7 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="reportsDropdown">
             <a class="dropdown-item" href="{% url 'awt_year_report' %}">{% trans 'annual working time' %}</a>
-            <a class="dropdown-item" href="#">{% trans 'not invoiced work' %}</a>
+            {# <a class="dropdown-item" href="#">{% trans 'not invoiced work' %}</a> #}
             <a class="dropdown-item" href="{% url 'report_overdrawn_projects' %}">{% trans 'overdrawn projects' %}</a>
             <a class="dropdown-item" href="{% url 'report_monthly_invoicing' %}">{% trans 'monthly invoicing' %}</a>
             <a class="dropdown-item" href="{% url 'report_open_items_list' %}">{% trans 'open items list' %}</a>
