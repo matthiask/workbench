@@ -1,6 +1,4 @@
-from collections import defaultdict
 from datetime import date, timedelta
-from decimal import Decimal
 
 from django import forms
 from django.contrib import messages
@@ -113,11 +111,7 @@ def cockpit_view(request):
     last_month = today - timedelta(days=today.day + 1)
     date_range = [date(last_month.year - 2, 1, 1), last_month]
 
-    factors = defaultdict(
-        lambda: 1, [(last_month.year, Decimal(12) / last_month.month)]
-    )
-
-    green_hours = cockpit.green_hours(date_range)
+    green_hours = sorted(cockpit.green_hours(date_range).items())
 
     return render(
         request,
@@ -132,28 +126,31 @@ def cockpit_view(request):
             ],
             "green_hours": [
                 (year, [month_data["months"][i] for i in range(1, 13)])
-                for year, month_data in sorted(green_hours.items())
+                for year, month_data in green_hours
             ],
             "hours_distribution": {
                 "labels": [
-                    _("profitable"),
-                    _("overdrawn"),
-                    _("maintenance"),
-                    _("internal"),
+                    year
+                    if year < last_month.year
+                    else ("%s (%s)" % (year, _("projection")))
+                    for year, month_data in (green_hours)
                 ],
                 "datasets": [
                     {
-                        "year": year
-                        if year < last_month.year
-                        else ("%s (%s)" % (year, _("projection"))),
+                        "label": label,
                         "data": [
-                            factors[year] * month_data["year"].profitable,
-                            factors[year] * month_data["year"].overdrawn,
-                            factors[year] * month_data["year"].maintenance,
-                            factors[year] * month_data["year"].internal,
+                            100
+                            * getattr(month_data["year"], attribute)
+                            / month_data["year"].total
+                            for year, month_data in green_hours
                         ],
                     }
-                    for year, month_data in sorted(green_hours.items())
+                    for label, attribute in [
+                        (_("profitable"), "profitable"),
+                        (_("maintenance"), "maintenance"),
+                        (_("overdrawn"), "overdrawn"),
+                        (_("internal"), "internal"),
+                    ]
                 ],
             },
         },

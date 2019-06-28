@@ -26,7 +26,7 @@
           {
             label: "{{ year }}",
             data: [{% for value in month_data %}{{ value|stringformat:"d" }}, {% endfor %}],
-            backgroundColor: "rgba(0, 0, 150, 0.3)",
+            backgroundColor: "{% cycle 'rgba(100, 30, 50, 0.3)' 'rgba(0, 150, 0, 0.3)' 'rgba(0, 0, 150, 0.3)' %}",
             borderColor: "{% cycle 'rgba(100, 30, 50, 0.4)' 'rgba(0, 150, 0, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
             type: "{% cycle 'line' 'line' 'bar' %}",
           },
@@ -63,7 +63,7 @@
           {
             label: "{{ year }}",
             data: [{% for value in month_data %}{{ value.green|stringformat:"d" }}, {% endfor %}],
-            backgroundColor: "rgba(0, 0, 150, 0.3)",
+            backgroundColor: "{% cycle 'rgba(100, 30, 50, 0.3)' 'rgba(0, 150, 0, 0.3)' 'rgba(0, 0, 150, 0.3)' %}",
             borderColor: "{% cycle 'rgba(100, 30, 50, 0.4)' 'rgba(0, 150, 0, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
             type: "{% cycle 'line' 'line' 'bar' %}",
           },
@@ -98,12 +98,18 @@
         datasets: [
           {% for dataset in hours_distribution.datasets %}
           {
-            label: "{{ dataset.year }}",
-            data: [{% for value in dataset.data %}{{ value|stringformat:"d" }}, {% endfor %}],
-            backgroundColor: "{% cycle 'rgba(100, 30, 50, 0.4)' 'rgba(0, 150, 0, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
+            label: "{{ dataset.label }}",
+            data: [{% for value in dataset.data %}{{ value|stringformat:".2f" }}, {% endfor %}],
+            backgroundColor: "{% cycle 'rgba(100, 30, 50, 0.4)' 'rgba(0, 150, 0, 0.4)' 'rgba(0, 0, 150, 0.4)' 'rgba(50, 40, 30, 0.4)' %}",
           },
           {% endfor %}
         ],
+      },
+      options: {
+        scales: {
+          xAxes: [{stacked: true}],
+          yAxes: [{stacked: true, ticks: {min: 0, max: 100}}],
+        },
       },
     });
   </script>
