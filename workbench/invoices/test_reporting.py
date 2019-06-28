@@ -36,6 +36,8 @@ class ReportingTest(TestCase):
         )
         # print(response, response.content.decode("utf-8"))
 
+        self.assertEqual(self.client.get("/report/cockpit/").status_code, 200)
+
     def test_monthly_invoicing_form(self):
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/report/monthly-invoicing/")
