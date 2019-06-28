@@ -1,4 +1,6 @@
-from datetime import date
+from collections import defaultdict
+from datetime import date, timedelta
+from decimal import Decimal
 
 from django import forms
 from django.contrib import messages
@@ -10,6 +12,7 @@ from workbench.circles.reporting import logged_hours_by_circle
 from workbench.invoices.models import Invoice
 from workbench.invoices.reporting import monthly_invoicing
 from workbench.projects.reporting import overdrawn_projects
+from workbench.reporting import cockpit
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import Z
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -102,4 +105,56 @@ def logged_hours_by_circle_view(request):
         request,
         "reporting/logged_hours_by_circle.html",
         {"circles": logged_hours_by_circle()},
+    )
+
+
+def cockpit_view(request):
+    today = date.today()
+    last_month = today - timedelta(days=today.day + 1)
+    date_range = [date(last_month.year - 2, 1, 1), last_month]
+
+    factors = defaultdict(
+        lambda: 1, [(last_month.year, Decimal(12) / last_month.month)]
+    )
+
+    green_hours = cockpit.green_hours(date_range)
+
+    return render(
+        request,
+        "reporting/cockpit.html",
+        {
+            "date_range": date_range,
+            "invoiced_corrected": [
+                (year, [month_data[i] for i in range(1, 13)])
+                for year, month_data in sorted(
+                    cockpit.invoiced_corrected(date_range).items()
+                )
+            ],
+            "green_hours": [
+                (year, [month_data["months"][i] for i in range(1, 13)])
+                for year, month_data in sorted(green_hours.items())
+            ],
+            "hours_distribution": {
+                "labels": [
+                    _("profitable"),
+                    _("overdrawn"),
+                    _("maintenance"),
+                    _("internal"),
+                ],
+                "datasets": [
+                    {
+                        "year": year
+                        if year < last_month.year
+                        else ("%s (%s)" % (year, _("projection"))),
+                        "data": [
+                            factors[year] * month_data["year"].profitable,
+                            factors[year] * month_data["year"].overdrawn,
+                            factors[year] * month_data["year"].maintenance,
+                            factors[year] * month_data["year"].internal,
+                        ],
+                    }
+                    for year, month_data in sorted(green_hours.items())
+                ],
+            },
+        },
     )

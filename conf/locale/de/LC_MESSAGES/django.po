@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-28 10:47+0200\n"
+"POT-Creation-Date: 2019-06-28 13:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -99,7 +99,7 @@ msgstr "Willkommen! Bitte fülle das folgende Formular aus."
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
-#: workbench/accruals/__init__.py:10 workbench/accruals/models.py:124
+#: workbench/accruals/__init__.py:10 workbench/accruals/models.py:138
 #: workbench/templates/base.html:63
 msgid "accruals"
 msgstr "Abgrenzungen"
@@ -108,20 +108,20 @@ msgstr "Abgrenzungen"
 msgid "Unusual cutoff date (not last of the month)."
 msgstr "Ungewöhnlicher Stichtag (nicht letzter Tag des Monats)."
 
-#: workbench/accruals/models.py:16 workbench/accruals/models.py:20
-#: workbench/accruals/models.py:108 workbench/reporting/views.py:45
+#: workbench/accruals/models.py:18 workbench/accruals/models.py:22
+#: workbench/accruals/models.py:122 workbench/reporting/views.py:48
 msgid "cutoff date"
 msgstr "Stichtag"
 
-#: workbench/accruals/models.py:21
+#: workbench/accruals/models.py:23
 msgid "cutoff dates"
 msgstr "Stichtage"
 
-#: workbench/accruals/models.py:31 workbench/accruals/models.py:41
+#: workbench/accruals/models.py:33 workbench/accruals/models.py:43
 msgid "Cannot modify a cutoff date where accrual records already exist."
 msgstr "Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."
 
-#: workbench/accruals/models.py:106 workbench/credit_control/models.py:61
+#: workbench/accruals/models.py:120 workbench/credit_control/models.py:61
 #: workbench/invoices/models.py:124 workbench/invoices/models.py:352
 #: workbench/templates/accruals/cutoffdate_detail.html:35
 #: workbench/templates/contacts/organization_detail.html:36
@@ -134,33 +134,33 @@ msgstr "Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."
 msgid "invoice"
 msgstr "Rechnung"
 
-#: workbench/accruals/models.py:110
+#: workbench/accruals/models.py:124
 #: workbench/templates/accruals/cutoffdate_detail.html:38
 msgid "work progress"
 msgstr "Arbeitsfortschritt"
 
-#: workbench/accruals/models.py:112
+#: workbench/accruals/models.py:126
 msgid ""
 "Percentage of down payment invoice for which the work has already been done."
 msgstr ""
 "Anteil der schon geleisteten Arbeit, welcher durch die Anzahlungsrechnung "
 "abgegolten wird."
 
-#: workbench/accruals/models.py:116 workbench/logbook/__init__.py:10
+#: workbench/accruals/models.py:130 workbench/logbook/__init__.py:10
 #: workbench/templates/accruals/cutoffdate_detail.html:37
 #: workbench/templates/base.html:43
 msgid "logbook"
 msgstr "Logbuch"
 
-#: workbench/accruals/models.py:123 workbench/accruals/views.py:37
+#: workbench/accruals/models.py:137 workbench/accruals/views.py:33
 msgid "accrual"
 msgstr "Abgrenzung"
 
-#: workbench/accruals/views.py:20
+#: workbench/accruals/views.py:19
 msgid "Cannot generate accruals for future cutoff dates."
 msgstr "Kann Abgrenzungen für zukünftige Stichtage nicht generieren."
 
-#: workbench/accruals/views.py:24
+#: workbench/accruals/views.py:23
 msgid "Generated accruals."
 msgstr "Abgrenzungen erstellt."
 
@@ -1409,9 +1409,30 @@ msgstr ""
 "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht "
 "löschen."
 
-#: workbench/reporting/views.py:77
+#: workbench/reporting/views.py:80
 msgid "Form was invalid."
 msgstr "Formular war ungültig."
+
+#: workbench/reporting/views.py:134
+msgid "profitable"
+msgstr "Profitabel"
+
+#: workbench/reporting/views.py:135
+#: workbench/templates/reporting/overdrawn_projects.html:19
+msgid "overdrawn"
+msgstr "Überzogen"
+
+#: workbench/reporting/views.py:136
+msgid "maintenance"
+msgstr "Wartung"
+
+#: workbench/reporting/views.py:137
+msgid "internal"
+msgstr "Intern"
+
+#: workbench/reporting/views.py:141
+msgid "projection"
+msgstr "Hochrechnung"
 
 #: workbench/services/models.py:16 workbench/services/models.py:60
 msgid "hourly rate"
@@ -1785,6 +1806,23 @@ msgstr "Leistungen aus dem Logbuch"
 msgid "Services from offer"
 msgstr "Leistungen aus Offerte"
 
+#: workbench/templates/reporting/cockpit.html:5
+#: workbench/templates/reporting/cockpit.html:10
+msgid "cockpit"
+msgstr "Cockpit"
+
+#: workbench/templates/reporting/cockpit.html:14
+msgid "revenue minus third party costs and accruals"
+msgstr "Umsatz minus Fremdkosten minus Abgrenzungen"
+
+#: workbench/templates/reporting/cockpit.html:51
+msgid "green hours"
+msgstr "Grüne Stunden"
+
+#: workbench/templates/reporting/cockpit.html:88
+msgid "hours distribution"
+msgstr "Stundenverteilung"
+
 #: workbench/templates/reporting/logged_hours_by_circle.html:23
 msgid "No circle"
 msgstr "Kein Kreis"
@@ -1796,10 +1834,6 @@ msgstr "Anzeigen"
 #: workbench/templates/reporting/overdrawn_projects.html:17
 msgid "effort hours"
 msgstr "Aufwände in Stunden"
-
-#: workbench/templates/reporting/overdrawn_projects.html:19
-msgid "overdrawn"
-msgstr "Überzogen"
 
 #: workbench/templates/search.html:17
 msgid "Only showing 100 items. Additional results have been omitted."

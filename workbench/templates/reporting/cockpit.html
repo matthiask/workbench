@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% load fineforms i18n static workbench %}
+
+{% block title %}{% trans 'cockpit' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-sm-12 col-md-8">
+  <h1>
+    {% trans 'cockpit' %}
+    <small>{{ date_range.0|date:'SHORT_DATE_FORMAT' }} &ndash; {{ date_range.1|date:'SHORT_DATE_FORMAT' }}</small>
+  </h1>
+
+  <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
+
+  <h2 class="mt-5">{% trans 'revenue minus third party costs and accruals' %}</h2>
+  <canvas id="invoiced-corrected" width="800" height="400"></canvas>
+  <script>
+    new Chart("invoiced-corrected", {
+      type: "bar",
+      data: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
+        datasets: [
+          {% for year, month_data in invoiced_corrected %}
+          {
+            label: "{{ year }}",
+            data: [{% for value in month_data %}{{ value|stringformat:"d" }}, {% endfor %}],
+            backgroundColor: "rgba(0, 0, 150, 0.3)",
+            borderColor: "{% cycle 'rgba(100, 30, 50, 0.4)' 'rgba(0, 150, 0, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
+            type: "{% cycle 'line' 'line' 'bar' %}",
+          },
+          {% endfor %}
+        ],
+      },
+      options: {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        },
+        elements: {
+          line: {
+            tension: 0,
+            fill: "none",
+          }
+        },
+      }
+    });
+  </script>
+
+  <h2 class="mt-5">{% trans 'green hours' %}</h2>
+  <canvas id="green-hours" width="800" height="400"></canvas>
+  <script>
+    new Chart("green-hours", {
+      type: "bar",
+      data: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
+        datasets: [
+          {% for year, month_data in green_hours %}
+          {
+            label: "{{ year }}",
+            data: [{% for value in month_data %}{{ value.green|stringformat:"d" }}, {% endfor %}],
+            backgroundColor: "rgba(0, 0, 150, 0.3)",
+            borderColor: "{% cycle 'rgba(100, 30, 50, 0.4)' 'rgba(0, 150, 0, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
+            type: "{% cycle 'line' 'line' 'bar' %}",
+          },
+          {% endfor %}
+        ],
+      },
+      options: {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        },
+        elements: {
+          line: {
+            tension: 0,
+            fill: "none",
+          }
+        },
+      }
+    });
+  </script>
+
+  <h2 class="mt-5">{% trans 'hours distribution' %}</h2>
+  <canvas id="hours-distribution" width="800" height="400"></canvas>
+  <script>
+    new Chart("hours-distribution", {
+      type: "bar",
+      data: {
+        labels: [{% for label in hours_distribution.labels %}"{{ label }}", {% endfor %}],
+        datasets: [
+          {% for dataset in hours_distribution.datasets %}
+          {
+            label: "{{ dataset.year }}",
+            data: [{% for value in dataset.data %}{{ value|stringformat:"d" }}, {% endfor %}],
+            backgroundColor: "{% cycle 'rgba(100, 30, 50, 0.4)' 'rgba(0, 150, 0, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
+          },
+          {% endfor %}
+        ],
+      },
+    });
+  </script>
+
+</div>
+</div>
+{% endblock %}
