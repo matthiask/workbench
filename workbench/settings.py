@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 read_speckenv(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("SECRET_KEY", required=True)
-DEBUG = any(arg in ("runserver",) for arg in sys.argv)
+DEBUG = env("DEBUG", default=any(arg in {"runserver"} for arg in sys.argv))
 LIVE = env("LIVE", default=False)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
 ADMINS = [("Matthias Kestenholz", "mk@feinheit.ch")]
@@ -241,6 +241,9 @@ else:
 MAILCHIMP_API_KEY = env("MAILCHIMP_API_KEY")
 MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID")
 
+
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 if env("SQL", default=False):  # pragma: no cover
     from django.utils.log import DEFAULT_LOGGING as LOGGING
