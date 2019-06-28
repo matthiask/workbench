@@ -1062,7 +1062,7 @@ msgstr "Bezahlt am %(closed_on)s"
 
 #: workbench/invoices/models.py:262
 msgid "down payment total CHF incl. tax"
-msgstr "Total CHF inkl. MwSt Akonto"
+msgstr "Total CHF inkl. MwSt. Akonto"
 
 #: workbench/invoices/models.py:264
 msgid "down payment total CHF"
@@ -1070,7 +1070,7 @@ msgstr "Total CHF Akonto"
 
 #: workbench/invoices/models.py:267 workbench/offers/models.py:163
 msgid "total CHF incl. tax"
-msgstr "Total CHF inkl. MwSt"
+msgstr "Total CHF inkl. MwSt."
 
 #: workbench/invoices/models.py:267 workbench/offers/models.py:163
 msgid "total CHF"
@@ -1243,7 +1243,7 @@ msgstr "Kosten"
 
 #: workbench/logbook/models.py:113 workbench/services/models.py:68
 msgid "Total incl. tax for third-party services."
-msgstr "Total inkl. MwSt bei Fremdleistungen."
+msgstr "Total inkl. MwSt. bei Fremdleistungen."
 
 #: workbench/logbook/models.py:127
 msgid "are expenses"
@@ -1501,7 +1501,7 @@ msgstr "Löschen"
 #: workbench/templates/reporting/monthly_invoicing.html:18
 #: workbench/templates/reporting/open_items_list.html:22
 msgid "total excl. tax"
-msgstr "Total exkl. MwSt"
+msgstr "Total exkl. MwSt."
 
 #: workbench/templates/accruals/cutoffdate_detail.html:54
 #: workbench/templates/contacts/person_form.html:67
@@ -1922,12 +1922,12 @@ msgstr ""
 
 #: workbench/tools/models.py:117
 msgid "tax rate"
-msgstr "MwSt-Satz"
+msgstr "MwSt.-Satz"
 
 #: workbench/tools/models.py:148
 #, python-format
 msgid "%s excl. tax"
-msgstr "%s exkl. MwSt"
+msgstr "%s exkl. MwSt."
 
 #: workbench/tools/pdf.py:187
 #, python-format
@@ -1940,7 +1940,7 @@ msgstr "(optional)"
 
 #: workbench/tools/pdf.py:255
 msgid "tax"
-msgstr "MwSt"
+msgstr "MwSt."
 
 #: workbench/tools/pdf.py:294 workbench/tools/pdf.py:334
 msgid "date"
