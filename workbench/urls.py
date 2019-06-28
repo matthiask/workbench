@@ -6,7 +6,7 @@ from django.shortcuts import render
 from workbench import views
 from workbench.awt.views import ReportView
 from workbench.reporting.views import (
-    cockpit_view,
+    key_data_view,
     logged_hours_by_circle_view,
     monthly_invoicing_view,
     open_items_list,
@@ -52,7 +52,7 @@ urlpatterns = [
         logged_hours_by_circle_view,
         name="report_logged_hours_by_circle",
     ),
-    url(r"^report/cockpit/$", cockpit_view, name="report_cockpit"),
+    url(r"^report/key-data/$", key_data_view, name="report_key_data"),
 ]
 
 if settings.DEBUG:  # pragma: no cover

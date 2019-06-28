@@ -2,13 +2,13 @@
 
 {% load fineforms i18n static workbench %}
 
-{% block title %}{% trans 'cockpit' %} - {{ block.super }}{% endblock %}
+{% block title %}{% trans 'key data' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12 col-md-8">
   <h1>
-    {% trans 'cockpit' %}
+    {% trans 'key data' %}
     <small>{{ date_range.0|date:'SHORT_DATE_FORMAT' }} &ndash; {{ date_range.1|date:'SHORT_DATE_FORMAT' }}</small>
   </h1>
 

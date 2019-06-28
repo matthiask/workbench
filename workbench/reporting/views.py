@@ -10,7 +10,7 @@ from workbench.circles.reporting import logged_hours_by_circle
 from workbench.invoices.models import Invoice
 from workbench.invoices.reporting import monthly_invoicing
 from workbench.projects.reporting import overdrawn_projects
-from workbench.reporting import cockpit
+from workbench.reporting import key_data
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import Z
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -106,22 +106,22 @@ def logged_hours_by_circle_view(request):
     )
 
 
-def cockpit_view(request):
+def key_data_view(request):
     today = date.today()
     last_month = today - timedelta(days=today.day + 1)
     date_range = [date(last_month.year - 2, 1, 1), last_month]
 
-    green_hours = sorted(cockpit.green_hours(date_range).items())
+    green_hours = sorted(key_data.green_hours(date_range).items())
 
     return render(
         request,
-        "reporting/cockpit.html",
+        "reporting/key_data.html",
         {
             "date_range": date_range,
             "invoiced_corrected": [
                 (year, [month_data[i] for i in range(1, 13)])
                 for year, month_data in sorted(
-                    cockpit.invoiced_corrected(date_range).items()
+                    key_data.invoiced_corrected(date_range).items()
                 )
             ],
             "green_hours": [
