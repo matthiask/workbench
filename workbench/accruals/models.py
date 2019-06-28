@@ -62,7 +62,9 @@ class AccrualQuerySet(models.QuerySet):
         logged_costs_effort = {
             row["service__project"]: row["_cost"]
             for row in LoggedHours.objects.filter(
-                service__project__in=projects, service__effort_rate__isnull=False
+                service__project__in=projects,
+                service__effort_rate__isnull=False,
+                rendered_on__lte=cutoff_date,
             )
             .order_by()
             .values("service__project")
@@ -70,7 +72,9 @@ class AccrualQuerySet(models.QuerySet):
         }
         logged_costs_cost = {
             row["project"]: row["cost__sum"]
-            for row in LoggedCost.objects.filter(project__in=projects)
+            for row in LoggedCost.objects.filter(
+                project__in=projects, rendered_on__lte=cutoff_date
+            )
             .order_by()
             .values("project")
             .annotate(Sum("cost"))
@@ -81,25 +85,33 @@ class AccrualQuerySet(models.QuerySet):
             + logged_costs_cost.get(project, Z)
             for project in projects
         }
+        remaining = dict(logged)
 
-        for invoice in Invoice.objects.valid().filter(
-            project__isnull=False,
-            project__in=Project.objects.filter(
-                Q(closed_on__isnull=True) | Q(closed_on__gt=cutoff_date)
-            ),
-            invoiced_on__lte=cutoff_date,
-            type=Invoice.DOWN_PAYMENT,
-            subtotal__gt=0,
-        ):
-            work_progress = 100 * logged[invoice.project_id] / invoice.total_excl_tax
-            self.get_or_create(
-                invoice=invoice,
-                cutoff_date=cutoff_date,
-                defaults={
-                    "work_progress": work_progress,
-                    "logbook": logged[invoice.project_id],
-                },
+        for invoice in (
+            Invoice.objects.valid()
+            .filter(
+                project__isnull=False,
+                project__in=projects,
+                invoiced_on__lte=cutoff_date,
+                subtotal__gt=0,
             )
+            .order_by("invoiced_on")
+        ):
+            if invoice.type == invoice.DOWN_PAYMENT:
+                work_progress = (
+                    100 * remaining[invoice.project_id] / invoice.total_excl_tax
+                )
+                work_progress = min(100, max(0, work_progress))
+                self.get_or_create(
+                    invoice=invoice,
+                    cutoff_date=cutoff_date,
+                    defaults={
+                        "work_progress": work_progress,
+                        "logbook": logged[invoice.project_id],
+                    },
+                )
+
+            remaining[invoice.project_id] -= invoice.total_excl_tax
 
 
 @model_urls
