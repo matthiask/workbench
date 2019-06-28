@@ -23,7 +23,9 @@ class LoggedHours(Model):
         related_name="loggedhours",
         verbose_name=_("service"),
     )
-    created_at = models.DateTimeField(_("created at"), default=timezone.now)
+    created_at = models.DateTimeField(
+        _("created at"), default=timezone.now, db_index=True
+    )
     created_by = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name="+", verbose_name=_("created by")
     )
