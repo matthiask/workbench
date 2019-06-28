@@ -98,7 +98,10 @@ $(function() {
   $(".form-search").each(function() {
     const key = `search-${window.location.pathname}`
     if (window.location.search) {
-      window.localStorage.setItem(key, window.location.search)
+      window.localStorage.setItem(
+        key,
+        /\be=1\b/.test(window.location.search) ? "" : window.location.search
+      )
     } else {
       const search = window.localStorage.getItem(key)
       if (search) window.location.href = search
