@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-28 09:36+0200\n"
+"POT-Creation-Date: 2019-06-28 10:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -130,7 +130,7 @@ msgstr "Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."
 #: workbench/templates/projects/project_detail.html:184
 #: workbench/templates/reporting/monthly_invoicing.html:15
 #: workbench/templates/reporting/open_items_list.html:20
-#: workbench/tools/pdf.py:327
+#: workbench/tools/pdf.py:330
 msgid "invoice"
 msgstr "Rechnung"
 
@@ -676,7 +676,7 @@ msgstr "Verrechnet am"
 
 #: workbench/credit_control/forms.py:166 workbench/tools/pdf.py:245
 #: workbench/tools/pdf.py:299 workbench/tools/pdf.py:312
-#: workbench/tools/pdf.py:334 workbench/tools/pdf.py:347
+#: workbench/tools/pdf.py:339 workbench/tools/pdf.py:352
 msgid "NO DATE YET"
 msgstr "NOCH KEIN DATUM"
 
@@ -1942,17 +1942,21 @@ msgstr "(optional)"
 msgid "tax"
 msgstr "MwSt"
 
-#: workbench/tools/pdf.py:294 workbench/tools/pdf.py:329
+#: workbench/tools/pdf.py:294 workbench/tools/pdf.py:334
 msgid "date"
 msgstr "Datum"
 
-#: workbench/tools/pdf.py:303 workbench/tools/pdf.py:338
+#: workbench/tools/pdf.py:303 workbench/tools/pdf.py:343
 msgid "our reference"
 msgstr "Unsere Referenz"
 
 #: workbench/tools/pdf.py:305
 msgid "valid until"
 msgstr "Gültig bis"
+
+#: workbench/tools/pdf.py:328
+msgid "down payment invoice"
+msgstr "Anzahlungsrechnung"
 
 #: workbench/views.py:39
 msgid "Search query missing."

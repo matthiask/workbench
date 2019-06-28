@@ -113,12 +113,12 @@ class PDFDocument(_PDFDocument):
         self.bounds.W = 20 * mm
         self.bounds.outsideN = self.bounds.N + 5 * mm
         self.bounds.outsideS = self.bounds.S - 5 * mm
-        self.style.tableColumns = (self.bounds.E - self.bounds.W - 30 * mm, 30 * mm)
+        self.style.tableColumns = (self.bounds.E - self.bounds.W - 32 * mm, 32 * mm)
         self.style.tableColumnsLeft = list(reversed(self.style.tableColumns))
         self.style.tableThreeColumns = (
-            self.bounds.E - self.bounds.W - 30 * mm,
-            15 * mm,
-            15 * mm,
+            self.bounds.E - self.bounds.W - 32 * mm,
+            16 * mm,
+            16 * mm,
         )
 
     def init_letter(self, page_fn, page_fn_later=None, address_y=None, address_x=None):
@@ -325,7 +325,7 @@ class PDFDocument(_PDFDocument):
             else str(invoice.get_status_display()),
             details=[
                 (
-                    _("Down payment")
+                    _("down payment invoice")
                     if invoice.type == invoice.DOWN_PAYMENT
                     else _("invoice"),
                     invoice.code,
