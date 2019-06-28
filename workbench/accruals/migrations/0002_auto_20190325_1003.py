@@ -35,7 +35,11 @@ class Migration(migrations.Migration):
         migrations.AlterModelOptions(
             name="accrual",
             options={
-                "ordering": ["-cutoff_date", "-invoice_id"],
+                "ordering": [
+                    "-cutoff_date",
+                    "-invoice__project__code",
+                    "-invoice__code",
+                ],
                 "verbose_name": "accrual",
                 "verbose_name_plural": "accruals",
             },
