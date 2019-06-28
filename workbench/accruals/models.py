@@ -66,7 +66,7 @@ class AccrualQuerySet(models.QuerySet):
             )
             .order_by()
             .values("service__project")
-            .annotate(_cost=F("hours") * F("service__effort_rate"))
+            .annotate(_cost=Sum(F("hours") * F("service__effort_rate")))
         }
         logged_costs_cost = {
             row["project"]: row["cost__sum"]
