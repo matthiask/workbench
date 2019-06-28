@@ -45,7 +45,7 @@ class ToolsTest(TestCase):
         self.assertAlmostEqual(m.total_excl_tax, Decimal("15"))
         self.assertAlmostEqual(m.total, Decimal("16.20"))
 
-        self.assertEqual(m.pretty_total_excl, "15.00 exkl. MwSt (5.00 Rabatt)")
+        self.assertEqual(m.pretty_total_excl, "15.00 exkl. MwSt. (5.00 Rabatt)")
 
     def test_create_absence_redirect(self):
         self.client.force_login(factories.UserFactory.create())
