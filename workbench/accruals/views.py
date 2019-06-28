@@ -1,5 +1,4 @@
 from datetime import date
-from decimal import Decimal
 
 from django import http
 from django.contrib import messages
@@ -31,15 +30,7 @@ class CutoffDateDetailView(generic.DetailView):
         if request.GET.get("xlsx"):
             xlsx = XLSXDocument()
             xlsx.table_from_queryset(
-                accruals,
-                additional=[
-                    (
-                        _("accrual"),
-                        lambda item: item.invoice.total_excl_tax
-                        * (Decimal(100) - item.work_progress)
-                        / 100,
-                    )
-                ],
+                accruals, additional=[(_("accrual"), lambda item: item.accrual)]
             )
             return xlsx.to_response(
                 "accruals-{}.xlsx".format(self.object.day.isoformat())

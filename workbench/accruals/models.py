@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib import messages
 from django.db import models
 from django.db.models import F, Q, Sum
@@ -125,3 +127,7 @@ class Accrual(Model):
 
     def __str__(self):
         return str(self.invoice)
+
+    @property
+    def accrual(self):
+        return self.invoice.total_excl_tax * (Decimal(100) - self.work_progress) / 100
