@@ -324,7 +324,12 @@ class PDFDocument(_PDFDocument):
             if invoice.status in {invoice.SENT, invoice.PAID}
             else str(invoice.get_status_display()),
             details=[
-                (_("invoice"), invoice.code),
+                (
+                    _("Down payment")
+                    if invoice.type == invoice.DOWN_PAYMENT
+                    else _("invoice"),
+                    invoice.code,
+                ),
                 (
                     _("date"),
                     (
