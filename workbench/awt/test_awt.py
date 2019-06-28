@@ -204,9 +204,7 @@ class AWTTest(TestCase):
 
         response = self.client.get(url + "?year=2018")
         self.assertRedirects(response, "/")
-        self.assertEqual(
-            messages(response), ["Jahresarbeitszeit für 2018 nicht gefunden."]
-        )
+        self.assertEqual(messages(response), ["Sollzeit für 2018 nicht gefunden."])
 
     def test_non_ajax_redirect(self):
         user = factories.UserFactory.create()

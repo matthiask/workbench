@@ -19,9 +19,7 @@ class ReportView(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         if not self.object:
-            messages.error(
-                request, _("Annual working time for %s not found.") % self.year
-            )
+            messages.error(request, _("Target time for %s not found.") % self.year)
             return redirect("/")
         return self.render_to_response(self.get_context_data())
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-28 13:32+0200\n"
+"POT-Creation-Date: 2019-06-28 14:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -109,7 +109,7 @@ msgid "Unusual cutoff date (not last of the month)."
 msgstr "Ungewöhnlicher Stichtag (nicht letzter Tag des Monats)."
 
 #: workbench/accruals/models.py:18 workbench/accruals/models.py:22
-#: workbench/accruals/models.py:122 workbench/reporting/views.py:48
+#: workbench/accruals/models.py:122 workbench/reporting/views.py:46
 msgid "cutoff date"
 msgstr "Stichtag"
 
@@ -165,7 +165,7 @@ msgid "Generated accruals."
 msgstr "Abgrenzungen erstellt."
 
 #: workbench/activities/__init__.py:10 workbench/activities/models.py:66
-#: workbench/templates/base.html:95
+#: workbench/templates/base.html:96
 #: workbench/templates/deals/deal_detail.html:30
 #: workbench/templates/start.html:77
 msgid "activities"
@@ -287,7 +287,7 @@ msgstr "aufgezeichnete Aktion"
 msgid "logged actions"
 msgstr "aufgezeichnete Aktionen"
 
-#: workbench/awt/__init__.py:10 workbench/templates/base.html:72
+#: workbench/awt/__init__.py:10 workbench/templates/base.html:73
 msgid "annual working time"
 msgstr "Jahresarbeitszeit"
 
@@ -427,8 +427,8 @@ msgstr "Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."
 
 #: workbench/awt/views.py:23
 #, python-format
-msgid "Annual working time for %s not found."
-msgstr "Jahresarbeitszeit für %s nicht gefunden."
+msgid "Target time for %s not found."
+msgstr "Sollzeit für %s nicht gefunden."
 
 #: workbench/circles/models.py:8 workbench/circles/models.py:34
 #: workbench/contacts/models.py:28 workbench/credit_control/models.py:17
@@ -758,7 +758,7 @@ msgid "assign credit entries"
 msgstr "Gutschriften zuweisen"
 
 #: workbench/deals/__init__.py:10 workbench/deals/models.py:74
-#: workbench/templates/base.html:94
+#: workbench/templates/base.html:95
 msgid "deals"
 msgstr "Geschäfte"
 
@@ -1409,30 +1409,30 @@ msgstr ""
 "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht "
 "löschen."
 
-#: workbench/reporting/views.py:80
+#: workbench/reporting/views.py:78
 msgid "Form was invalid."
 msgstr "Formular war ungültig."
 
-#: workbench/reporting/views.py:134
+#: workbench/reporting/views.py:135
+msgid "projection"
+msgstr "Hochrechnung"
+
+#: workbench/reporting/views.py:149
 msgid "profitable"
 msgstr "Profitabel"
 
-#: workbench/reporting/views.py:135
+#: workbench/reporting/views.py:150
+msgid "maintenance"
+msgstr "Wartung"
+
+#: workbench/reporting/views.py:151
 #: workbench/templates/reporting/overdrawn_projects.html:19
 msgid "overdrawn"
 msgstr "Überzogen"
 
-#: workbench/reporting/views.py:136
-msgid "maintenance"
-msgstr "Wartung"
-
-#: workbench/reporting/views.py:137
+#: workbench/reporting/views.py:152
 msgid "internal"
 msgstr "Intern"
-
-#: workbench/reporting/views.py:141
-msgid "projection"
-msgstr "Hochrechnung"
 
 #: workbench/services/models.py:16 workbench/services/models.py:60
 msgid "hourly rate"
@@ -1600,39 +1600,45 @@ msgstr "Mahnwesen"
 msgid "reports"
 msgstr "Berichte"
 
-#: workbench/templates/base.html:74
+#: workbench/templates/base.html:72
+#: workbench/templates/reporting/cockpit.html:5
+#: workbench/templates/reporting/cockpit.html:11
+msgid "cockpit"
+msgstr "Cockpit"
+
+#: workbench/templates/base.html:75
 #: workbench/templates/reporting/overdrawn_projects.html:5
 #: workbench/templates/reporting/overdrawn_projects.html:10
 msgid "overdrawn projects"
 msgstr "Überzogene Projekte"
 
-#: workbench/templates/base.html:75
+#: workbench/templates/base.html:76
 #: workbench/templates/reporting/monthly_invoicing.html:5
 #: workbench/templates/reporting/monthly_invoicing.html:10
 msgid "monthly invoicing"
 msgstr "Monatliche Verrechnung"
 
-#: workbench/templates/base.html:76
+#: workbench/templates/base.html:77
 #: workbench/templates/reporting/open_items_list.html:5
 #: workbench/templates/reporting/open_items_list.html:10
 msgid "open items list"
 msgstr "Offene-Posten-Liste"
 
-#: workbench/templates/base.html:77
+#: workbench/templates/base.html:78
 #: workbench/templates/reporting/logged_hours_by_circle.html:5
 #: workbench/templates/reporting/logged_hours_by_circle.html:10
 msgid "logged hours by circle"
 msgstr "Erfasste Stunden pro Kreis"
 
-#: workbench/templates/base.html:89
+#: workbench/templates/base.html:90
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: workbench/templates/base.html:91
+#: workbench/templates/base.html:92
 msgid "Admin panel"
 msgstr "Verwaltung"
 
-#: workbench/templates/base.html:97
+#: workbench/templates/base.html:98
 msgid "Sign out"
 msgstr "Abmelden"
 
@@ -1806,20 +1812,15 @@ msgstr "Leistungen aus dem Logbuch"
 msgid "Services from offer"
 msgstr "Leistungen aus Offerte"
 
-#: workbench/templates/reporting/cockpit.html:5
-#: workbench/templates/reporting/cockpit.html:10
-msgid "cockpit"
-msgstr "Cockpit"
-
-#: workbench/templates/reporting/cockpit.html:14
+#: workbench/templates/reporting/cockpit.html:17
 msgid "revenue minus third party costs and accruals"
 msgstr "Umsatz minus Fremdkosten minus Abgrenzungen"
 
-#: workbench/templates/reporting/cockpit.html:51
+#: workbench/templates/reporting/cockpit.html:54
 msgid "green hours"
 msgstr "Grüne Stunden"
 
-#: workbench/templates/reporting/cockpit.html:88
+#: workbench/templates/reporting/cockpit.html:91
 msgid "hours distribution"
 msgstr "Stundenverteilung"
 
