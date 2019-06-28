@@ -10,13 +10,13 @@
 
     <h1>
       {{ project|h }} {% history_link project %}
+      <span style="font-size:10.5px" class="badge badge-{{ object.status_css }}">{{ object.pretty_status }}</span>
     </h1>
+
     <p>
       {% if project.contact %}{% link_or_none project.contact %}
       {% else %}{% link_or_none project.customer %}
       {% endif %}
-      <br>
-      <span class="badge badge-{{ object.status_css }}">{{ object.pretty_status }}</span>
     </p>
 
     <div class="card my-3">
@@ -32,11 +32,6 @@
           </span>
           <span class="col-md-4">
             <table class="table table-borderless table-sm">
-              <tr>
-                <th class="text-right">{% trans 'hours' %}</th>
-                <td>{{ project.grouped_services.logged_hours|hours }} / {{ project.grouped_services.service_hours|hours }}</td>
-              </tr>
-
               <tr>
                 <th class="text-right">{% trans 'total costs' %}</th>
                 <td>
