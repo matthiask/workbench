@@ -18,7 +18,7 @@ TRUNCATE accruals_accrual RESTART IDENTITY CASCADE;
 TRUNCATE credit_control_ledger RESTART IDENTITY CASCADE;
 
 
-SET application_name TO 'Import';
+SET application_name TO 'Metronom-Import';
 
 
 --
