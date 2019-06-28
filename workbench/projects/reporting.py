@@ -12,7 +12,7 @@ Z = Decimal("0.0")
 def overdrawn_projects():
     projects = (
         Project.objects.open()
-        .filter(type=Project.ORDER)
+        .exclude(type=Project.INTERNAL)
         .select_related("customer", "owned_by")
     )
 
@@ -48,6 +48,6 @@ def overdrawn_projects():
             for project in projects
             if project["logged_hours"] > project["service_hours"]
         ),
-        key=lambda row: row["delta"],
+        key=lambda row: (row["project"].type, row["delta"]),
         reverse=True,
     )
