@@ -122,9 +122,15 @@ class User(Model, AbstractBaseUser):
     def todays_hours(self):
         return (
             self.loggedhours.filter(rendered_on=date.today())
-            .select_related("service__project__owned_by")
+            .select_related("service__project__owned_by", "rendered_by")
             .order_by("-created_at")[:5]
         )
+
+    @cached_property
+    def all_users_hours(self):
+        return self.loggedhours.model.objects.select_related(
+            "service__project__owned_by", "rendered_by"
+        ).order_by("-created_at")[:20]
 
     @cached_property
     def active_projects(self):
@@ -145,6 +151,8 @@ class User(Model, AbstractBaseUser):
         from workbench.invoices.models import Invoice
         from workbench.offers.models import Offer
 
+        in_preparation = {}
+
         invoices = Invoice.objects.filter(
             owned_by=self, status=Invoice.IN_PREPARATION
         ).select_related("project", "owned_by")
@@ -152,4 +160,9 @@ class User(Model, AbstractBaseUser):
             owned_by=self, status=Offer.IN_PREPARATION
         ).select_related("project", "owned_by")
 
-        return list(offers) + list(invoices)
+        if invoices:
+            in_preparation["invoices"] = invoices
+        if offers:
+            in_preparation["offers"] = offers
+
+        return in_preparation

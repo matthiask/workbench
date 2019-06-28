@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-28 14:08+0200\n"
+"POT-Creation-Date: 2019-06-28 16:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -127,7 +127,7 @@ msgstr "Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."
 #: workbench/templates/contacts/organization_detail.html:36
 #: workbench/templates/contacts/person_detail.html:48
 #: workbench/templates/credit_control/creditentry_list.html:25
-#: workbench/templates/projects/project_detail.html:184
+#: workbench/templates/projects/project_detail.html:179
 #: workbench/templates/reporting/monthly_invoicing.html:15
 #: workbench/templates/reporting/open_items_list.html:20
 #: workbench/tools/pdf.py:330
@@ -167,7 +167,7 @@ msgstr "Abgrenzungen erstellt."
 #: workbench/activities/__init__.py:10 workbench/activities/models.py:66
 #: workbench/templates/base.html:96
 #: workbench/templates/deals/deal_detail.html:30
-#: workbench/templates/start.html:77
+#: workbench/templates/start.html:55
 msgid "activities"
 msgstr "Aktivitäten"
 
@@ -262,7 +262,7 @@ msgstr "Erledigt um"
 #: workbench/activities/models.py:65
 #: workbench/templates/contacts/person_detail.html:52
 #: workbench/templates/deals/deal_detail.html:54
-#: workbench/templates/projects/project_detail.html:206
+#: workbench/templates/projects/project_detail.html:201
 msgid "activity"
 msgstr "Aktivität"
 
@@ -425,7 +425,7 @@ msgstr "Abwesenheiten"
 msgid "Absences of past years are locked."
 msgstr "Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."
 
-#: workbench/awt/views.py:23
+#: workbench/awt/views.py:22
 #, python-format
 msgid "Target time for %s not found."
 msgstr "Sollzeit für %s nicht gefunden."
@@ -863,7 +863,7 @@ msgstr "%s löschen"
 #: workbench/invoices/__init__.py:10 workbench/invoices/models.py:125
 #: workbench/templates/base.html:28
 #: workbench/templates/contacts/organization_detail.html:39
-#: workbench/templates/projects/project_detail.html:158
+#: workbench/templates/projects/project_detail.html:153
 msgid "invoices"
 msgstr "Rechnungen"
 
@@ -872,7 +872,7 @@ msgid "Determined by project."
 msgstr "Durch Projekt bestimmt."
 
 #: workbench/invoices/forms.py:115 workbench/invoices/models.py:49
-#: workbench/templates/projects/project_detail.html:188
+#: workbench/templates/projects/project_detail.html:183
 #: workbench/tools/pdf.py:241
 msgid "Down payment"
 msgstr "Anzahlung"
@@ -924,7 +924,7 @@ msgid "%s logged but no hourly rate defined."
 msgstr "%s erfasst aber kein Stundensatz definiert."
 
 #: workbench/invoices/forms.py:326 workbench/services/models.py:34
-#: workbench/templates/projects/project_detail.html:81
+#: workbench/templates/projects/project_detail.html:76
 msgid "Not offered yet"
 msgstr "Noch nicht offeriert"
 
@@ -959,7 +959,7 @@ msgid "Closed"
 msgstr "Abgeschlossen"
 
 #: workbench/invoices/models.py:37 workbench/offers/models.py:26
-#: workbench/offers/models.py:38 workbench/templates/start.html:105
+#: workbench/offers/models.py:38 workbench/templates/start.html:131
 msgid "In preparation"
 msgstr "In Vorbereitung"
 
@@ -976,7 +976,7 @@ msgid "Canceled"
 msgstr "Storniert"
 
 #: workbench/invoices/models.py:48
-#: workbench/templates/projects/project_detail.html:187
+#: workbench/templates/projects/project_detail.html:182
 msgid "Fixed amount"
 msgstr "Fixbetrag"
 
@@ -1159,7 +1159,7 @@ msgstr "Erbracht von"
 #: workbench/logbook/models.py:92 workbench/services/models.py:76
 #: workbench/templates/logbook/loggedcost_detail.html:17
 #: workbench/templates/logbook/loggedhours_detail.html:17
-#: workbench/templates/projects/project_detail.html:198
+#: workbench/templates/projects/project_detail.html:193
 msgid "service"
 msgstr "Leistung"
 
@@ -1202,9 +1202,8 @@ msgstr "Erbracht am"
 #: workbench/logbook/models.py:37 workbench/services/models.py:59
 #: workbench/templates/awt/year_detail.html:52
 #: workbench/templates/logbook/loggedhours_detail.html:35
-#: workbench/templates/projects/project_detail.html:36
-#: workbench/templates/projects/project_detail.html:139
-#: workbench/templates/projects/project_detail.html:201
+#: workbench/templates/projects/project_detail.html:134
+#: workbench/templates/projects/project_detail.html:196
 #: workbench/templates/projects/project_list.html:21
 #: workbench/templates/start.html:40
 msgid "hours"
@@ -1235,8 +1234,8 @@ msgstr "Kann Stunden vergangener Wochen nicht löschen."
 #: workbench/logbook/models.py:108 workbench/services/models.py:62
 #: workbench/templates/invoices/service_form.html:30
 #: workbench/templates/logbook/loggedcost_detail.html:35
-#: workbench/templates/projects/project_detail.html:143
-#: workbench/templates/projects/project_detail.html:204
+#: workbench/templates/projects/project_detail.html:138
+#: workbench/templates/projects/project_detail.html:199
 #: workbench/templates/projects/service_form.html:30
 msgid "cost"
 msgstr "Kosten"
@@ -1300,8 +1299,8 @@ msgid "offered on"
 msgstr "offeriert am"
 
 #: workbench/offers/models.py:72 workbench/projects/models.py:225
-#: workbench/templates/projects/project_detail.html:91
-#: workbench/templates/projects/project_detail.html:194
+#: workbench/templates/projects/project_detail.html:86
+#: workbench/templates/projects/project_detail.html:189
 #: workbench/templates/projects/service_form.html:36 workbench/tools/pdf.py:292
 msgid "offer"
 msgstr "Offerte"
@@ -1490,9 +1489,9 @@ msgstr "Anmelden"
 #: workbench/templates/invoices/recurringinvoice_detail.html:20
 #: workbench/templates/logbook/loggedcost_detail.html:68
 #: workbench/templates/logbook/loggedhours_detail.html:60
-#: workbench/templates/projects/project_detail.html:62
-#: workbench/templates/projects/project_detail.html:87
-#: workbench/templates/projects/project_detail.html:100
+#: workbench/templates/projects/project_detail.html:57
+#: workbench/templates/projects/project_detail.html:82
+#: workbench/templates/projects/project_detail.html:95
 msgid "Update"
 msgstr "Bearbeiten"
 
@@ -1511,9 +1510,9 @@ msgstr "Abgrenzungen erstellen"
 #: workbench/templates/invoices/recurringinvoice_detail.html:26
 #: workbench/templates/logbook/loggedcost_detail.html:72
 #: workbench/templates/logbook/loggedhours_detail.html:64
-#: workbench/templates/projects/project_detail.html:66
-#: workbench/templates/projects/project_detail.html:88
-#: workbench/templates/projects/project_detail.html:104
+#: workbench/templates/projects/project_detail.html:61
+#: workbench/templates/projects/project_detail.html:83
+#: workbench/templates/projects/project_detail.html:99
 msgid "Delete"
 msgstr "Löschen"
 
@@ -1716,7 +1715,7 @@ msgid "No history found"
 msgstr "Keine Geschichte gefunden"
 
 #: workbench/templates/invoices/invoice_detail.html:67
-#: workbench/templates/projects/project_detail.html:52
+#: workbench/templates/projects/project_detail.html:47
 #: workbench/tools/models.py:108 workbench/tools/pdf.py:231
 msgid "subtotal"
 msgstr "Zwischentotal"
@@ -1781,34 +1780,34 @@ msgstr "Neue Leistung"
 msgid "Close"
 msgstr "Schliessen"
 
-#: workbench/templates/projects/project_detail.html:41
+#: workbench/templates/projects/project_detail.html:36
 msgid "total costs"
 msgstr "Gesamtkosten"
 
-#: workbench/templates/projects/project_detail.html:44
-#: workbench/templates/projects/project_detail.html:47
-#: workbench/templates/projects/project_detail.html:122
+#: workbench/templates/projects/project_detail.html:39
+#: workbench/templates/projects/project_detail.html:42
+#: workbench/templates/projects/project_detail.html:117
 #, python-format
 msgid "%(hours)s with undefined rate)"
 msgstr "%(hours)s ohne Stundensatz"
 
-#: workbench/templates/projects/project_detail.html:64
+#: workbench/templates/projects/project_detail.html:59
 msgid "Copy"
 msgstr "Kopieren"
 
-#: workbench/templates/projects/project_detail.html:102
+#: workbench/templates/projects/project_detail.html:97
 msgid "Move"
 msgstr "Verschieben"
 
-#: workbench/templates/projects/project_detail.html:149
+#: workbench/templates/projects/project_detail.html:144
 msgid "No services yet."
 msgstr "Noch keine Leistungen."
 
-#: workbench/templates/projects/project_detail.html:189
+#: workbench/templates/projects/project_detail.html:184
 msgid "Services from logbook"
 msgstr "Leistungen aus dem Logbuch"
 
-#: workbench/templates/projects/project_detail.html:190
+#: workbench/templates/projects/project_detail.html:185
 msgid "Services from offer"
 msgstr "Leistungen aus Offerte"
 
@@ -1860,17 +1859,21 @@ msgstr "Aktive Projekte"
 msgid "no active projects"
 msgstr "Keine aktiven Projekte"
 
-#: workbench/templates/start.html:55
+#: workbench/templates/start.html:76
+msgid "no important activities"
+msgstr "Keine wichtigen Aktivitäten"
+
+#: workbench/templates/start.html:86
 msgid "today's hours"
 msgstr "Stunden von heute"
 
-#: workbench/templates/start.html:71
+#: workbench/templates/start.html:102 workbench/templates/start.html:124
 msgid "no hours today"
 msgstr "keine Stunden heute"
 
-#: workbench/templates/start.html:98
-msgid "no important activities"
-msgstr "Keine wichtigen Aktivitäten"
+#: workbench/templates/start.html:108
+msgid "all users' hours"
+msgstr "Stunden von allen"
 
 #: workbench/templatetags/workbench.py:59 workbench/tools/history.py:21
 msgid "yes"
