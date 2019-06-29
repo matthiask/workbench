@@ -242,7 +242,7 @@ MAILCHIMP_API_KEY = env("MAILCHIMP_API_KEY")
 MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID")
 
 
-if DEBUG:
+if DEBUG:  # pragma: no cover
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 if env("SQL", default=False):  # pragma: no cover
