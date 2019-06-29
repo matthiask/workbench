@@ -226,10 +226,12 @@ class Service(ServiceBase):
         blank=True,
         null=True,
     )
-    is_logging_prohibited = models.BooleanField(
-        _("is logging prohibited"),
-        default=False,
-        help_text=_("Use this for service entries which are only used for budgeting."),
+    allow_logging = models.BooleanField(
+        _("allow logging"),
+        default=True,
+        help_text=_(
+            "Deactivate this for service entries which are only used for budgeting."
+        ),
     )
     is_optional = models.BooleanField(
         _("is optional"),

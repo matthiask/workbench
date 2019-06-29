@@ -130,15 +130,15 @@ class OffersTest(TestCase):
             " verbunden ist, welche sich nicht mehr in Vorbereitung befindet.",
         )
 
-        self.assertFalse(service.is_logging_prohibited)
+        self.assertTrue(service.allow_logging)
         response = self.client.post(
             service.urls["update"],
-            {"is_logging_prohibited": True},
+            {"allow_logging": False},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 202)
         service.refresh_from_db()
-        self.assertTrue(service.is_logging_prohibited)
+        self.assertFalse(service.allow_logging)
         self.assertEqual(
             messages(response), ["Leistung 'Any service' wurde erfolgreich geändert."]
         )

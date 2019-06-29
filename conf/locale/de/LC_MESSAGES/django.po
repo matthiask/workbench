@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-28 17:11+0200\n"
+"POT-Creation-Date: 2019-06-29 09:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -447,7 +447,7 @@ msgstr "Kreise"
 msgid "is removed"
 msgstr "ist entfernt"
 
-#: workbench/circles/models.py:41 workbench/projects/models.py:243
+#: workbench/circles/models.py:41 workbench/projects/models.py:245
 msgid "role"
 msgstr "Rolle"
 
@@ -1385,22 +1385,22 @@ msgid "Not bound to a particular service."
 msgstr "Nicht mit einer bestimmten Leistung verbunden."
 
 #: workbench/projects/models.py:230
-msgid "is logging prohibited"
-msgstr "Leistungserfassung verbieten"
+msgid "allow logging"
+msgstr "Leistungserfassung erlauben"
 
-#: workbench/projects/models.py:232
-msgid "Use this for service entries which are only used for budgeting."
-msgstr "Dies erlaubt, Leistungen nur für die Bugdetierung zu verwenden."
+#: workbench/projects/models.py:233
+msgid "Deactivate this for service entries which are only used for budgeting."
+msgstr "Deaktiviere dies, wenn die Leistung nur zur Budgetierung dient."
 
-#: workbench/projects/models.py:235
+#: workbench/projects/models.py:237
 msgid "is optional"
 msgstr "ist optional"
 
-#: workbench/projects/models.py:237
+#: workbench/projects/models.py:239
 msgid "Optional services to not count towards the offer total."
 msgstr "Optionale Leistungen werden nicht zum Offertentotal hinzugerechnet."
 
-#: workbench/projects/models.py:261
+#: workbench/projects/models.py:263
 msgid ""
 "Cannot delete a service bound to an offer which is not in preparation "
 "anymore."

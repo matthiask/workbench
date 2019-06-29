@@ -37,6 +37,7 @@ class ProjectsTest(TestCase):
                 "title": "Consulting service",
                 "effort_type": "Consulting",
                 "effort_rate": "180",
+                "allow_logging": True,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -48,6 +49,7 @@ class ProjectsTest(TestCase):
                 "title": "Production service",
                 "effort_type": "Production",
                 # "effort_rate": "180",
+                "allow_logging": True,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -59,6 +61,7 @@ class ProjectsTest(TestCase):
                 # "effort_type": "Production",
                 "effort_rate": "180",
                 "third_party_costs": "20",
+                "allow_logging": True,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -73,6 +76,7 @@ class ProjectsTest(TestCase):
                 "title": "Production service",
                 "effort_type": "Production",
                 "effort_rate": "180",
+                "allow_logging": True,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )

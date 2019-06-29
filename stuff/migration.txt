@@ -545,7 +545,7 @@ WHERE
 --
 
 INSERT INTO projects_service
-(id, created_at, title, position, description, project_id, service_hours, service_cost, offer_id, effort_type, effort_hours, effort_rate, cost, third_party_costs, is_logging_prohibited, is_optional, role_id)
+(id, created_at, title, position, description, project_id, service_hours, service_cost, offer_id, effort_type, effort_hours, effort_rate, cost, third_party_costs, allow_logging, is_optional, role_id)
 SELECT
   p.id,
   NOW(),
@@ -561,7 +561,7 @@ SELECT
   p.invoicing_hourly_rate,
   NULL,
   NULL,
-  FALSE,
+  TRUE,
   FALSE,
   CASE
     WHEN p.activity_id SIMILAR TO '(01|02)%' THEN NULL
@@ -597,7 +597,7 @@ INSERT INTO projects_service
   effort_rate,
   cost,
   third_party_costs,
-  is_logging_prohibited,
+  allow_logging,
   is_optional
 )
 SELECT
@@ -615,7 +615,7 @@ SELECT
   NULL,
   count * cost * (1 + commission / 100),
   count * cost,
-  FALSE,
+  TRUE,
   FALSE
 FROM dblink(
     'dbname=fineware_feinheit',
@@ -778,8 +778,8 @@ dblink(
 --
 
 INSERT INTO projects_service
-(created_at, title, position, description, project_id, service_hours, service_cost, effort_type, effort_rate, is_logging_prohibited, is_optional, role_id)
-SELECT DISTINCT ON (p.job_id, activitygroup) NOW(), CONCAT('Import:', activitygroup), 0, '', p.job_id, 0.0, 0.0, activitygroup, rate, TRUE, FALSE,
+(created_at, title, position, description, project_id, service_hours, service_cost, effort_type, effort_rate, allow_logging, is_optional, role_id)
+SELECT DISTINCT ON (p.job_id, activitygroup) NOW(), CONCAT('Import:', activitygroup), 0, '', p.job_id, 0.0, 0.0, activitygroup, rate, FALSE, FALSE,
   CASE
     WHEN p.activity_id SIMILAR TO '(01|02)%' THEN NULL
     WHEN p.activity_id SIMILAR TO '(03)%' THEN 11086026
@@ -878,7 +878,7 @@ service_cost,
 effort_type,
 effort_hours,
 effort_rate,
-is_logging_prohibited,
+allow_logging,
 is_optional
 )
 SELECT
@@ -892,7 +892,7 @@ CASE WHEN p.invoicing_rate_override IS NULL THEN 0 ELSE p.scheduled_hours * p.in
 CASE WHEN p.invoicing_rate_override IS NULL THEN '' ELSE 'Eingeplante Stunden' END,
 p.scheduled_hours,
 p.invoicing_rate_override,
-TRUE,
+FALSE,
 FALSE
 FROM
 dblink(

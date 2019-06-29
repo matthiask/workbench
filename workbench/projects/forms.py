@@ -142,7 +142,7 @@ class ServiceForm(ModelForm):
             "title",
             "description",
             "role",
-            "is_logging_prohibited",
+            "allow_logging",
             "offer",
             "is_optional",
             "effort_type",
@@ -169,7 +169,7 @@ class ServiceForm(ModelForm):
         offer = self.instance.offer
         if offer and offer.status > offer.IN_PREPARATION:
             for field in self.fields:
-                if field not in {"role", "is_logging_prohibited"}:
+                if field not in {"role", "allow_logging"}:
                     self.fields[field].disabled = True
 
             if self.request.method == "GET":

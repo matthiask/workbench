@@ -127,7 +127,7 @@
               {% if service.pk %}{% bar service.logged_cost service.service_cost %}{% endif %}
             </span>
             <span class="col-md-4 text-right">
-              {% if not service.is_logging_prohibited %}
+              {% if service.allow_logging %}
                 {% if service.pk %}
                   <a href="{{ project.urls.createhours }}?service={{ service.pk }}"
                     data-toggle="ajaxmodal">

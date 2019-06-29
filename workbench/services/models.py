@@ -42,7 +42,7 @@ class ServiceQuerySet(models.QuerySet):
         ]
 
     def logging(self):
-        return self.filter(is_logging_prohibited=False)
+        return self.filter(allow_logging=True)
 
 
 class ServiceBase(Model):
