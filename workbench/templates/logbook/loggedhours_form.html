@@ -23,17 +23,11 @@
 {% endblock %}
 
 {% block footer %}
-<div class="d-flex w-100 justify-content-between">
-  {% if object %}
-    <a href="{{ object.urls.delete }}" data-toggle="ajaxmodal"
-      class="float-left btn btn-outline-danger">
-      {% trans 'delete' %}
-    </a>
-  {% elif form.hide_new_service %}
-    <button type="button" class="btn btn-secondary" onclick="this.classList.add('invisible');document.querySelector('#new-service').classList.remove('d-none')">
+  {% if form.hide_new_service %}
+    <button type="button" class="btn btn-secondary mr-auto"
+      onclick="this.classList.add('invisible');document.querySelector('#new-service').classList.remove('d-none')">
       {% trans 'new service' %}
     </button>
   {% endif %}
   <button type="submit" class="btn btn-primary">{% trans 'save' %}</button>
-</div>
 {% endblock %}

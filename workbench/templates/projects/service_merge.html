@@ -7,7 +7,7 @@
 {% block footer %}
 {% if form.merge_into %}{{ block.super }}{% else %}
   <button type="button" data-dismiss="modal" aria-label="Close"
-    class="btn btn-primary float-left">{% trans 'cancel' %}</button>
+    class="btn btn-primary mr-auto">{% trans 'cancel' %}</button>
   <button type="submit" class="btn btn-danger">
     {% trans 'delete' %}</button>
 {% endif %}
