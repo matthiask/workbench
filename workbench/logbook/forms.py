@@ -10,6 +10,7 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
+from workbench.tools.formats import local_date_format
 from workbench.tools.forms import Autocomplete, ModelForm, Textarea
 from workbench.tools.validation import monday, raise_if_errors
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -136,10 +137,22 @@ class LoggedHoursForm(ModelForm):
             initial = kwargs.setdefault("initial", {})
             request = kwargs["request"]
 
+            if request.GET.get("copy"):
+                hours = LoggedHours.objects.filter(pk=request.GET["copy"]).first()
+                if hours:
+                    initial.update(
+                        {
+                            "service": hours.service_id,
+                            "rendered_on": local_date_format(hours.rendered_on),
+                            "hours": hours.hours,
+                            "description": hours.description,
+                        }
+                    )
+
             if request.GET.get("hours"):
                 initial["hours"] = request.GET["hours"]
 
-            else:
+            elif not initial.get("hours"):
                 latest = (
                     LoggedHours.objects.filter(rendered_by=request.user)
                     .order_by("-created_at")
@@ -159,7 +172,7 @@ class LoggedHoursForm(ModelForm):
             if request.GET.get("service"):
                 initial["service"] = request.GET.get("service")
 
-            else:
+            elif not initial.get("service"):
                 latest_on_project = (
                     LoggedHours.objects.filter(
                         rendered_by=request.user, service__project=self.project
