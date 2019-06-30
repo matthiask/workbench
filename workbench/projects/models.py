@@ -62,6 +62,7 @@ class Project(Model):
     closed_on = models.DateField(_("closed on"), blank=True, null=True)
 
     _code = models.IntegerField(_("code"))
+    _fts = models.TextField(editable=False, blank=True)
 
     objects = ProjectQuerySet.as_manager()
 
@@ -86,17 +87,28 @@ class Project(Model):
         return "%s-%04d" % (self.created_at.year, self._code)
 
     def save(self, *args, **kwargs):
-        new = False
-        if not self.pk:
+        new = not self.pk
+        if new:
             self._code = RawSQL(
                 "SELECT COALESCE(MAX(_code), 0) + 1 FROM projects_project"
                 " WHERE EXTRACT(year FROM created_at) = %s",
                 (timezone.now().year,),
             )
-            new = True
-        super().save(*args, **kwargs)
-        if new:
+            super().save(*args, **kwargs)
             self.refresh_from_db()
+
+        self._fts = " ".join(
+            str(part)
+            for part in [
+                self.code,
+                self.customer.name,
+                self.contact.full_name if self.contact else "",
+            ]
+        )
+        if new:
+            super().save()
+        else:
+            super().save(*args, **kwargs)
 
     save.alters_data = True
 

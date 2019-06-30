@@ -12,4 +12,5 @@ class FactoriesTestCase(TestCase):
         types = factories.service_types()
         self.assertAlmostEqual(types.production.hourly_rate, 180)
 
-        self.assertEqual(LoggedAction.objects.count(), 16)
+        # The exact count does not matter
+        self.assertEqual(LoggedAction.objects.count(), 18)

@@ -114,6 +114,7 @@ class Invoice(ModelWithTotal):
 
     postal_address = models.TextField(_("postal address"), blank=True)
     _code = models.IntegerField(_("code"))
+    _fts = models.TextField(editable=False, blank=True)
 
     payment_notice = models.TextField(_("payment notice"), blank=True)
 
@@ -140,8 +141,8 @@ class Invoice(ModelWithTotal):
         )
 
     def save(self, *args, **kwargs):
-        new = False
-        if not self.pk:
+        new = not self.pk
+        if new:
             if self.project_id:
                 self._code = RawSQL(
                     "SELECT COALESCE(MAX(_code), 0) + 1 FROM invoices_invoice"
@@ -154,10 +155,22 @@ class Invoice(ModelWithTotal):
                     " WHERE project_id IS NULL",
                     (),
                 )
-            new = True
-        super().save(*args, **kwargs)
-        if new:
+            super().save(*args, **kwargs)
             self.refresh_from_db()
+
+        self._fts = " ".join(
+            str(part)
+            for part in [
+                self.code,
+                self.customer.name,
+                self.contact.full_name if self.contact else "",
+                self.project.title if self.project else "",
+            ]
+        )
+        if new:
+            super().save()
+        else:
+            super().save(*args, **kwargs)
 
     save.alters_data = True
 
