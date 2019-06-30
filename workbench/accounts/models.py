@@ -151,8 +151,6 @@ class User(Model, AbstractBaseUser):
         from workbench.invoices.models import Invoice
         from workbench.offers.models import Offer
 
-        in_preparation = {}
-
         invoices = Invoice.objects.filter(
             owned_by=self, status=Invoice.IN_PREPARATION
         ).select_related("project", "owned_by")
@@ -160,9 +158,8 @@ class User(Model, AbstractBaseUser):
             owned_by=self, status=Offer.IN_PREPARATION
         ).select_related("project", "owned_by")
 
-        if invoices:
-            in_preparation["invoices"] = invoices
-        if offers:
-            in_preparation["offers"] = offers
-
-        return in_preparation
+        return {
+            key: value
+            for key, value in [("invoices", invoices), ("offers", offers)]
+            if value
+        }
