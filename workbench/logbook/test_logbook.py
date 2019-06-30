@@ -388,7 +388,7 @@ class LogbookTest(TestCase):
             hours.service.project.urls["createhours"] + "?copy=" + str(hours.pk),
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assertContains(response, ' selected>Any service</option>')
+        self.assertContains(response, " selected>Any service</option>")
 
         response = self.client.get(
             hours.service.project.urls["createhours"] + "?copy=bla",

@@ -36,12 +36,28 @@ class AccrualsTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_cutoff_days_with_accruals(self):
+        project = factories.ProjectFactory.create()
+
         factories.InvoiceFactory.create(
-            project=factories.ProjectFactory.create(),
-            type=factories.Invoice.DOWN_PAYMENT,
+            project=project,
+            type=factories.Invoice.FIXED,
             invoiced_on=date(2018, 12, 1),
             status=factories.Invoice.SENT,
             subtotal=100,
+        )
+        factories.InvoiceFactory.create(
+            project=project,
+            type=factories.Invoice.DOWN_PAYMENT,
+            invoiced_on=date(2018, 12, 2),
+            status=factories.Invoice.SENT,
+            subtotal=100,
+        )
+
+        service = factories.ServiceFactory.create(
+            project=project, effort_type="Programmierung", effort_rate=150
+        )
+        factories.LoggedHoursFactory.create(
+            service=service, hours=1, rendered_on=date(2018, 12, 15)
         )
 
         self.client.force_login(factories.UserFactory.create())
@@ -77,13 +93,13 @@ class AccrualsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         accrual = Accrual.objects.get()
-        self.assertEqual(accrual.work_progress, 0)
+        self.assertEqual(accrual.work_progress, 50)  # 100 of fixed, 50 of down payment
         response = self.client.post(
-            day.urls["detail"], {"id": accrual.id, "work_progress": 50}
+            day.urls["detail"], {"id": accrual.id, "work_progress": 60}
         )
         self.assertEqual(response.status_code, 202)
         accrual.refresh_from_db()
-        self.assertEqual(accrual.work_progress, 50)
+        self.assertEqual(accrual.work_progress, 60)
 
     def test_future_cutoff_dates(self):
         self.client.force_login(factories.UserFactory.create())

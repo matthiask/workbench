@@ -327,9 +327,7 @@ class ProjectsTest(TestCase):
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
-        response = self.client.get(
-            project.urls["create"] + "?copy=" + str(project.pk)
-        )
+        response = self.client.get(project.urls["create"] + "?copy=" + str(project.pk))
         self.assertContains(response, 'value="{}"'.format(project.title))
         # print(response, response.content.decode("utf-8"))
 
