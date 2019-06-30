@@ -82,10 +82,11 @@ class App extends Component {
                 if (isActiveProject && state.lastStart) {
                   seconds += timestamp() - state.lastStart
                 }
-                const deciHours = Math.ceil(seconds / 360) / 10
+                const hoursParam =
+                  seconds > 0 ? `?hours=${Math.ceil(seconds / 360) / 10}` : ""
 
                 window.openModalFromUrl(
-                  `/projects/${project.id}/createhours/?hours=${deciHours}`
+                  `/projects/${project.id}/createhours/${hoursParam}`
                 )
               }}
               removeProject=${() => {
