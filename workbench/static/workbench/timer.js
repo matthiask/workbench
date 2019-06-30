@@ -248,7 +248,7 @@ function AddProject(props) {
       onClick=${() =>
         props.addProject(
           parseInt(match[1]),
-          document.querySelector("h1").textContent
+          document.querySelector("h1").dataset.timerTitle
         )}
     >
       +Projekt
