@@ -20,7 +20,7 @@ def forwards(apps, schema_editor):
                 instance.customer.name,
                 instance.contact.given_name if instance.contact else "",
                 instance.contact.family_name if instance.contact else "",
-                instance.project.title,
+                instance.project.title if instance.project else "",
             ]
         )
         instance.save()
