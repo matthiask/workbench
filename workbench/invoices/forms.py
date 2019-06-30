@@ -38,7 +38,14 @@ class InvoiceSearchForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
     )
-    dunning = forms.BooleanField(widget=forms.HiddenInput, required=False)
+    o = forms.ChoiceField(
+        choices=(
+            ("", _("newest first")),
+            ("dunning", _("dunning")),
+        ),
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -60,7 +67,7 @@ class InvoiceSearchForm(forms.Form):
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
-        if data.get("dunning"):
+        if data.get("o") == "dunning":
             queryset = queryset.filter(
                 status=Invoice.SENT, due_on__lte=date.today()
             ).order_by("due_on")

@@ -55,7 +55,6 @@
             {% trans 'book keeping' %}
           </a>
           <div class="dropdown-menu" aria-labelledby="bookkeepingDropdown">
-            <a class="dropdown-item" href="{% url 'invoices_invoice_list' %}?dunning=1">{% trans 'dunning' %}</a>
             <a class="dropdown-item" href="{% url 'invoices_recurringinvoice_list' %}">{% trans 'recurring invoices'|capfirst %}</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'credit_control_creditentry_list' %}">{% trans 'credit entries' %}</a>
