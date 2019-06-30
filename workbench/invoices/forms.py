@@ -39,10 +39,7 @@ class InvoiceSearchForm(forms.Form):
         widget=forms.Select(attrs={"class": "custom-select"}),
     )
     o = forms.ChoiceField(
-        choices=(
-            ("", _("newest first")),
-            ("dunning", _("dunning")),
-        ),
+        choices=(("", _("newest first")), ("dunning", _("dunning"))),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
     )

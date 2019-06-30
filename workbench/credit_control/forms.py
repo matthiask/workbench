@@ -1,4 +1,5 @@
 import json
+import re
 from datetime import datetime
 
 from django import forms
@@ -126,7 +127,8 @@ class AssignCreditEntriesForm(forms.Form):
         )[:20]:
             self.fields["entry_{}_invoice".format(entry.pk)] = forms.TypedChoiceField(
                 label=format_html(
-                    "{}, {}: {}",
+                    '<a href="{}" target="_blank">{}, {}: {}</a>',
+                    entry.get_absolute_url(),
                     entry.total,
                     local_date_format(entry.value_date, "d.m.Y"),
                     entry.payment_notice,
@@ -143,7 +145,10 @@ class AssignCreditEntriesForm(forms.Form):
                                     ),
                                     format_html(
                                         "<strong>{}</strong>"
-                                        if invoice.code in entry.payment_notice
+                                        if re.search(
+                                            r"\b" + invoice.code + r"\b",
+                                            entry.payment_notice,
+                                        )
                                         else "{}",
                                         invoice,
                                     ),

@@ -686,7 +686,7 @@ msgstr "ZKB CSV"
 
 #: workbench/credit_control/models.py:14
 msgid "PostFinance CSV"
-msgstr "ZKB CSV"
+msgstr "PostFinance CSV"
 
 #: workbench/credit_control/models.py:18
 msgid "parser"
