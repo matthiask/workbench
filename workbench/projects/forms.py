@@ -74,9 +74,9 @@ class ProjectForm(ModelForm):
         initial = kwargs.setdefault("initial", {})
         request = kwargs["request"]
 
-        if request.GET.get("copy_project"):
+        if request.GET.get("copy"):
             try:
-                project = Project.objects.get(pk=request.GET["copy_project"])
+                project = Project.objects.get(pk=request.GET["copy"])
             except (Project.DoesNotExist, TypeError, ValueError):
                 pass
             else:

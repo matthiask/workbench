@@ -328,10 +328,10 @@ class ProjectsTest(TestCase):
         self.client.force_login(project.owned_by)
 
         response = self.client.get(
-            project.urls["create"] + "?copy_project=" + str(project.pk)
+            project.urls["create"] + "?copy=" + str(project.pk)
         )
         self.assertContains(response, 'value="{}"'.format(project.title))
         # print(response, response.content.decode("utf-8"))
 
-        response = self.client.get(project.urls["create"] + "?copy_project=blub")
+        response = self.client.get(project.urls["create"] + "?copy=blub")
         self.assertEqual(response.status_code, 200)  # No crash
