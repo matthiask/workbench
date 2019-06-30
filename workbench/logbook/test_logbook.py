@@ -379,3 +379,19 @@ class LogbookTest(TestCase):
         self.assertContains(
             response, "Spesen wurden schon erstattet, kann Eintrag nicht löschen."
         )
+
+    def test_copy(self):
+        hours = factories.LoggedHoursFactory.create()
+        self.client.force_login(factories.UserFactory.create())
+
+        response = self.client.get(
+            hours.service.project.urls["createhours"] + "?copy=" + str(hours.pk),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, ' selected>Any service</option>')
+
+        response = self.client.get(
+            hours.service.project.urls["createhours"] + "?copy=bla",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)  # No crash

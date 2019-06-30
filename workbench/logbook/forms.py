@@ -138,8 +138,11 @@ class LoggedHoursForm(ModelForm):
             request = kwargs["request"]
 
             if request.GET.get("copy"):
-                hours = LoggedHours.objects.filter(pk=request.GET["copy"]).first()
-                if hours:
+                try:
+                    hours = LoggedHours.objects.get(pk=request.GET["copy"])
+                except (LoggedHours.DoesNotExist, TypeError, ValueError):
+                    pass
+                else:
                     initial.update(
                         {
                             "service": hours.service_id,
