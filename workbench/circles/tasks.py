@@ -12,8 +12,6 @@ def update_circles():
         },
     ).json()
 
-    Circle.objects.all().delete()
-
     for circle in data["circles"]:
         Circle.objects.update_or_create(
             id=circle["id"], defaults={"name": circle["name"]}
