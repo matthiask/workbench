@@ -96,11 +96,15 @@ def green_hours(date_range):
         lambda: {"year": GreenHours(), "months": defaultdict(GreenHours)}
     )
 
+    until = (date_range[1].year, date_range[1].month)
+
     for project in projects:
         for year, month_data in sorted(logged_hours[project.id].items()):
             for month, hours in sorted(month_data.items()):
                 if year < date_range[0].year:
                     service_hours[project.id] -= hours
+                    continue
+                elif (year, month) > until:
                     continue
 
                 remaining = service_hours[project.id] - hours
