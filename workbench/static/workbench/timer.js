@@ -34,13 +34,9 @@ class App extends Component {
     }
   }
 
-  activateProject(projectId, additionalSecondsState) {
+  activateProject(projectId) {
     this.setState(prevState => {
-      let seconds = Object.assign(
-        {},
-        prevState.seconds,
-        additionalSecondsState || {}
-      )
+      let seconds = Object.assign({}, prevState.seconds)
       if (prevState.activeProject && prevState.lastStart) {
         seconds[prevState.activeProject] =
           (seconds[prevState.activeProject] || 0) +
@@ -76,7 +72,7 @@ class App extends Component {
                 }
               }}
               logHours=${() => {
-                this.activateProject(null, {[project.id]: 0})
+                this.activateProject(null)
 
                 let seconds = state.seconds[project.id] || 0
                 if (isActiveProject && state.lastStart) {
@@ -88,6 +84,17 @@ class App extends Component {
                 window.openModalFromUrl(
                   `/projects/${project.id}/createhours/${hoursParam}`
                 )
+              }}
+              resetHours=${() => {
+                this.setState(prevState => ({
+                  seconds: Object.assign({}, prevState.seconds, {
+                    [project.id]: 0,
+                  }),
+                  lastStart:
+                    prevState.activeProject === project.id
+                      ? timestamp()
+                      : prevState.lastStart,
+                }))
               }}
               removeProject=${() => {
                 if (confirm("Wirklich entfernen?")) {
@@ -130,7 +137,7 @@ class App extends Component {
         <div
           class="timer-panel-tab bg-info text-light px-4 py-2 d-flex align-items-center justify-content-between"
         >
-          ${this.props.standalone && "Timer"}
+          Timer
           <div class=${this.props.standalone && "d-none"}>
             <${StandAlone} />
             ${" "}
@@ -159,7 +166,7 @@ class App extends Component {
             />
           </div>
         </div>
-        <div class="list-group">${content}</div>
+        <div class="timer-panel-projects list-group">${content}</div>
       </div>
     `
   }
@@ -205,8 +212,9 @@ class Project extends Component {
         >
           ${props.project.title}
         </a>
-
         <div class="text-nowrap">
+          <span ref=${button => (this.hoursButton = button)}></span>
+          ${" "}
           <button
             class=${`btn btn-sm ${
               props.isActiveProject ? "btn-success" : "btn-outline-secondary"
@@ -214,15 +222,23 @@ class Project extends Component {
             onClick=${() => props.toggleTimerState()}
             title=${props.isActiveProject ? "Timer stoppen" : "Timer starten"}
           >
-            ${props.isActiveProject ? "pause" : "start"}
+            ${props.isActiveProject ? "stop" : "start"}
           </button>
           ${" "}
           <button
             class="btn btn-outline-secondary btn-sm"
             onClick=${() => props.logHours()}
-            ref=${button => (this.hoursButton = button)}
+            title="Stunden erfassen"
           >
-            +
+            log
+          </button>
+          ${" "}
+          <button
+            class="btn btn-outline-secondary btn-sm"
+            onClick=${() => props.resetHours()}
+            title="Timer zurücksetzen"
+          >
+            reset
           </button>
           ${" "}
           <button
@@ -268,7 +284,7 @@ function openPopup() {
   window.open(
     "/timer/",
     "timer",
-    "innerHeight=750,innerWidth=500,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no"
+    "innerHeight=750,innerWidth=650,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no"
   )
 }
 

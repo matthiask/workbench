@@ -98,20 +98,25 @@ tbody th > a {
     min-height: 100vh;
   }
 
-  [data-timer="footer"] .timer-panel {
+  [data-timer="footer"] .timer-panel-tab {
     position: fixed;
     z-index: 9999;
     bottom: 0;
-    width: 100%;
-    background: white;
+    left: 0;
+    right: 0;
+    height: 36px;
+  }
+
+  [data-timer="footer"] .timer-panel-projects {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     transition: 0.2s ease-in-out;
     transform: translateY(100%);
   }
 
-  [data-timer="footer"] .timer-panel-tab {
-    position: absolute;
-    min-height: 36px;
-    top: -36px;
-    right: 0;
+  [data-timer="footer"]:hover .timer-panel-projects {
+    transform: translateY(-36px);
   }
 }
