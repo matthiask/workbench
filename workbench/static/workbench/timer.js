@@ -34,7 +34,7 @@ class App extends Component {
     }
   }
 
-  activateProject(projectId) {
+  activateProject(projectId, callback) {
     this.setState(prevState => {
       let seconds = Object.assign({}, prevState.seconds)
       if (prevState.activeProject && prevState.lastStart) {
@@ -48,7 +48,7 @@ class App extends Component {
         activeProject: projectId,
         lastStart: projectId === null ? null : timestamp() - 1,
       }
-    })
+    }, callback)
   }
 
   render(props, state) {
@@ -72,18 +72,15 @@ class App extends Component {
                 }
               }}
               logHours=${() => {
-                this.activateProject(null)
+                this.activateProject(null, () => {
+                  const seconds = this.state.seconds[project.id] || 0
+                  const hoursParam =
+                    seconds > 0 ? `?hours=${Math.ceil(seconds / 360) / 10}` : ""
 
-                let seconds = state.seconds[project.id] || 0
-                if (isActiveProject && state.lastStart) {
-                  seconds += timestamp() - state.lastStart
-                }
-                const hoursParam =
-                  seconds > 0 ? `?hours=${Math.ceil(seconds / 360) / 10}` : ""
-
-                window.openModalFromUrl(
-                  `/projects/${project.id}/createhours/${hoursParam}`
-                )
+                  window.openModalFromUrl(
+                    `/projects/${project.id}/createhours/${hoursParam}`
+                  )
+                })
               }}
               resetHours=${() => {
                 this.setState(prevState => ({
