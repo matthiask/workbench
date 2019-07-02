@@ -89,6 +89,7 @@ class InvoiceForm(PostalAddressSelectionForm):
             "owned_by",
             "status",
             "closed_on",
+            "payment_notice",
             "postal_address",
             "type",
             "subtotal",
@@ -101,6 +102,7 @@ class InvoiceForm(PostalAddressSelectionForm):
             "contact": Autocomplete(model=Person),
             "status": forms.RadioSelect,
             "description": Textarea,
+            "payment_notice": Textarea({"rows": 2}),
             "postal_address": Textarea,
             "type": forms.RadioSelect,
         }
