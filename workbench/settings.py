@@ -25,7 +25,7 @@ LIVE = env("LIVE", default=False)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
 ADMINS = [("Matthias Kestenholz", "mk@feinheit.ch")]
 MANAGERS = ADMINS
-DEFAULT_FROM_EMAIL = SERVER_EMAIL = "metronom@metronom.feinheit.ch"
+DEFAULT_FROM_EMAIL = SERVER_EMAIL = "workbench@workbench.feinheit.ch"
 
 INSTALLED_APPS = [
     a
