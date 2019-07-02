@@ -120,6 +120,23 @@ class LogbookTest(TestCase):
             "</a>".format(project.id),
         )
 
+    def test_invalid_date(self):
+        service = factories.ServiceFactory.create()
+        self.client.force_login(service.project.owned_by)
+        response = self.client.post(
+            service.project.urls["createhours"],
+            {
+                "rendered_by": service.project.owned_by_id,
+                "rendered_on": "20.14.2019",
+                "service": service.id,
+                "hours": "0.1",
+                "description": "Test",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Bitte ein gültiges Datum eingeben.")
+
     def test_create_and_update_logged_cost(self):
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)

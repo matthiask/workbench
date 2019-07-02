@@ -223,7 +223,9 @@ class LoggedHoursForm(ModelForm):
                 _("This entry is already part of an invoice."), code="part-of-invoice"
             )
 
-        if all((not self.instance.pk, data["rendered_by"], data["rendered_on"])):
+        if all(
+            (not self.instance.pk, data.get("rendered_by"), data.get("rendered_on"))
+        ):
             if not data["rendered_by"].enforce_same_week_logging:
                 # Fine
                 pass
