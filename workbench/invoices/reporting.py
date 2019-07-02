@@ -21,7 +21,10 @@ def monthly_invoicing(year):
     third_party_costs_by_project = {
         row["service__project"]: row["third_party_costs__sum"]
         for row in LoggedCost.objects.order_by()
-        .filter(service__project__in=invoices.values("project"))
+        .filter(
+            service__project__in=invoices.values("project"),
+            third_party_costs__isnull=False,
+        )
         .values("service__project")
         .annotate(Sum("third_party_costs"))
     }
