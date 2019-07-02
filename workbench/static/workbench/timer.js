@@ -19,9 +19,11 @@ class App extends Component {
         this.setState(JSON.parse(e.newValue))
       }
     })
+
+    this.serialize = this.serialize.bind(this)
   }
 
-  componentDidUpdate() {
+  serialize() {
     window.localStorage.setItem("workbench-timer", JSON.stringify(this.state))
   }
 
@@ -35,20 +37,26 @@ class App extends Component {
   }
 
   activateProject(projectId, callback) {
-    this.setState(prevState => {
-      let seconds = Object.assign({}, prevState.seconds)
-      if (prevState.activeProject && prevState.lastStart) {
-        seconds[prevState.activeProject] =
-          (seconds[prevState.activeProject] || 0) +
-          timestamp() -
-          prevState.lastStart
+    this.setState(
+      prevState => {
+        let seconds = Object.assign({}, prevState.seconds)
+        if (prevState.activeProject && prevState.lastStart) {
+          seconds[prevState.activeProject] =
+            (seconds[prevState.activeProject] || 0) +
+            timestamp() -
+            prevState.lastStart
+        }
+        return {
+          seconds,
+          activeProject: projectId,
+          lastStart: projectId === null ? null : timestamp() - 1,
+        }
+      },
+      () => {
+        callback && callback()
+        this.serialize()
       }
-      return {
-        seconds,
-        activeProject: projectId,
-        lastStart: projectId === null ? null : timestamp() - 1,
-      }
-    }, callback)
+    )
   }
 
   render(props, state) {
@@ -83,34 +91,40 @@ class App extends Component {
                 })
               }}
               resetHours=${() => {
-                this.setState(prevState => ({
-                  seconds: Object.assign({}, prevState.seconds, {
-                    [project.id]: 0,
+                this.setState(
+                  prevState => ({
+                    seconds: Object.assign({}, prevState.seconds, {
+                      [project.id]: 0,
+                    }),
+                    lastStart:
+                      prevState.activeProject === project.id
+                        ? timestamp()
+                        : prevState.lastStart,
                   }),
-                  lastStart:
-                    prevState.activeProject === project.id
-                      ? timestamp()
-                      : prevState.lastStart,
-                }))
+                  this.serialize
+                )
               }}
               removeProject=${() => {
                 if (confirm("Wirklich entfernen?")) {
                   let seconds = Object.assign({}, state.seconds)
                   delete seconds[project.id]
-                  this.setState(prevState => ({
-                    seconds,
-                    projects: prevState.projects.filter(
-                      p => p.id !== project.id
-                    ),
-                    activeProject:
-                      prevState.activeProject === project.id
-                        ? null
-                        : prevState.activeProject,
-                    lastStart:
-                      prevState.activeProject === project.id
-                        ? null
-                        : prevState.lastStart,
-                  }))
+                  this.setState(
+                    prevState => ({
+                      seconds,
+                      projects: prevState.projects.filter(
+                        p => p.id !== project.id
+                      ),
+                      activeProject:
+                        prevState.activeProject === project.id
+                          ? null
+                          : prevState.activeProject,
+                      lastStart:
+                        prevState.activeProject === project.id
+                          ? null
+                          : prevState.lastStart,
+                    }),
+                    this.serialize
+                  )
                 }
               }}
             />
@@ -149,7 +163,7 @@ class App extends Component {
                       projects,
                       seconds: Object.assign({}, prevState.seconds, {[id]: 0}),
                     }
-                  })
+                  }, this.serialize)
                 }
               }}
             />
@@ -157,7 +171,7 @@ class App extends Component {
             <${Reset}
               reset=${() => {
                 if (confirm("Wirklich zurücksetzen?")) {
-                  this.setState(this.defaultState())
+                  this.setState(this.defaultState(), this.serialize)
                 }
               }}
             />
