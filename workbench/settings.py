@@ -1,13 +1,3 @@
-"""
-Django settings for workbench project.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/1.7/topics/settings/
-
-For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.7/ref/settings/
-"""
-
 import os
 import sys
 import types
@@ -152,11 +142,6 @@ MESSAGE_STORAGE = "django.contrib.messages.storage.cookie.CookieStorage"
 
 FINEFORMS_WRAPPERS = {"field": "workbench.wrappers.BootstrapFieldWrapper"}
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
-
-BOOTSTRAP4 = {
-    "horizontal_label_class": "col-lg-4 text-lg-right",
-    "horizontal_field_class": "col-lg-8",
-}
 
 
 def font(name):
