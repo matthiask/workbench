@@ -90,6 +90,7 @@ class Person(Model):
     groups = models.ManyToManyField(
         Group, verbose_name=_("groups"), related_name="+", blank=True
     )
+    _fts = models.TextField(editable=False, blank=True)
 
     objects = PersonQuerySet.as_manager()
 
@@ -106,6 +107,14 @@ class Person(Model):
     @property
     def full_name(self):
         return " ".join(filter(None, (self.given_name, self.family_name)))
+
+    def save(self, *args, **kwargs):
+        self._fts = " ".join(
+            str(part) for part in [self.organization.name if self.organization else ""]
+        )
+        super().save(*args, **kwargs)
+
+    save.alters_data = True
 
 
 class PersonDetail(Model):
