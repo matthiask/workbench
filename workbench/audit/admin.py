@@ -7,6 +7,7 @@ from workbench.audit.models import LoggedAction
 
 class LoggedActionAdmin(admin.ModelAdmin):
     list_display = ("__str__", "data", "user_name", "created_at")
+    list_filter = ["action", "table_name"]
     ordering = ("-created_at",)
 
     def has_add_permission(self, request, obj=None):
