@@ -7,7 +7,7 @@ from django.utils.translation import gettext as _
 from workbench.audit.models import LoggedAction
 from workbench.contacts.models import Organization, Person
 from workbench.deals.models import Deal
-from workbench.invoices.models import Invoice
+from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.tools.history import changes
@@ -31,6 +31,7 @@ def search(request):
                 Organization.objects.all(),
                 Person.objects.all(),
                 Invoice.objects.select_related("project", "owned_by"),
+                RecurringInvoice.objects.all(),
                 Offer.objects.select_related("project", "owned_by"),
                 Deal.objects.all(),
             )
