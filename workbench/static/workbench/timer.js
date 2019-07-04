@@ -9,7 +9,7 @@ function prettyDuration(seconds) {
   const displayHours = hours ? `${hours}h ` : ""
   const displayMinutes = Math.floor(seconds / 60) % 60
   const displaySeconds = (seconds % 60).toString().padStart(2, "0")
-  return `+${displayHours}${displayMinutes}:${displaySeconds}`
+  return `${displayHours}${displayMinutes}:${displaySeconds}`
 }
 
 class App extends Component {
@@ -21,6 +21,7 @@ class App extends Component {
     } else {
       this.state = this.defaultState()
     }
+    this.manageTimer()
 
     window.addEventListener("storage", e => {
       if (e.key === "workbench-timer") {
@@ -29,6 +30,15 @@ class App extends Component {
     })
 
     this.serialize = this.serialize.bind(this)
+  }
+
+  manageTimer() {
+    if (this.state.activeProject && !this.timer) {
+      this.timer = setInterval(() => this.forceUpdate(), 1000)
+    } else if (!this.state.activeProject && this.timer) {
+      clearInterval(this.timer)
+      this.timer = null
+    }
   }
 
   serialize() {
@@ -63,22 +73,31 @@ class App extends Component {
       () => {
         callback && callback()
         this.serialize()
+        this.manageTimer()
       }
     )
   }
 
   render(props, state) {
     let content = []
+    let totalSeconds = 0
     if (state.projects.length) {
       content = content.concat(
         state.projects.map(project => {
           const isActiveProject = state.activeProject === project.id
+          const seconds =
+            state.seconds[project.id] +
+            (isActiveProject && state.lastStart
+              ? timestamp() - state.lastStart
+              : 0)
+          totalSeconds += seconds
+
           return html`
             <${Project}
+              key=${project.id}
               project=${project}
               isActiveProject=${isActiveProject}
-              lastStart=${isActiveProject ? state.lastStart : null}
-              seconds=${state.seconds[project.id] || 0}
+              seconds=${seconds}
               target=${this.props.standalone ? "_blank" : ""}
               toggleTimerState=${() => {
                 if (isActiveProject) {
@@ -156,7 +175,7 @@ class App extends Component {
         <div
           class="timer-panel-tab bg-info text-light px-4 py-2 d-flex align-items-center justify-content-between"
         >
-          Timer
+          Timer ${" "} ${prettyDuration(totalSeconds)}
           <div class=${this.props.standalone && "d-none"}>
             <${StandAlone} />
             ${" "}
@@ -192,28 +211,7 @@ class App extends Component {
 }
 
 class Project extends Component {
-  updateHoursButton() {
-    if (!this.hoursButton) return
-
-    const seconds =
-      this.props.seconds +
-      (this.props.isActiveProject ? timestamp() - this.props.lastStart : 0)
-    const deciHours = Math.ceil(seconds / 360) / 10
-
-    this.hoursButton.textContent = prettyDuration(seconds)
-    this.hoursButton.title = `${deciHours}h aufschreiben`
-  }
-
   render(props) {
-    setTimeout(this.updateHoursButton.bind(this), 0)
-
-    if (props.isActiveProject) {
-      this.timer = setInterval(this.updateHoursButton.bind(this), 1000)
-    } else if (this.timer) {
-      clearInterval(this.timer)
-      this.timer = null
-    }
-
     return html`
       <div
         class="list-group-item d-flex align-items-center justify-content-between"
@@ -226,8 +224,7 @@ class Project extends Component {
           ${props.project.title}
         </a>
         <div class="text-nowrap">
-          <span ref=${button => (this.hoursButton = button)}></span>
-          ${" "}
+          ${prettyDuration(props.seconds)} ${" "}
           <button
             class=${`btn btn-sm ${
               props.isActiveProject ? "btn-success" : "btn-outline-secondary"
