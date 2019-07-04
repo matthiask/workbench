@@ -161,7 +161,7 @@ class RecurringTest(TestCase):
         valid("owned_by={}".format(user.id))
         valid("owned_by=0")  # only inactive
 
-    def test_pretty_periodicity(self):
+    def test_pretty_status(self):
         person = factories.PersonFactory.create(
             organization=factories.OrganizationFactory.create()
         )
@@ -176,9 +176,7 @@ class RecurringTest(TestCase):
             periodicity="monthly",
             subtotal=200,
         )
-        self.assertEqual(
-            ri.pretty_periodicity, "monatlich von 01.01.2018 bis 31.12.2050"
-        )
+        self.assertEqual(ri.pretty_status, "monatlich von 01.01.2018 bis 31.12.2050")
 
         ri = RecurringInvoice.objects.create(
             customer=person.organization,
@@ -190,4 +188,4 @@ class RecurringTest(TestCase):
             periodicity="monthly",
             subtotal=200,
         )
-        self.assertEqual(ri.pretty_periodicity, "monatlich seit 01.01.2018")
+        self.assertEqual(ri.pretty_status, "monatlich seit 01.01.2018")

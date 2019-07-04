@@ -10,7 +10,7 @@
     <h5 class="mb-1">{{ invoice|h }}</h5>
     <div class="row">
       <div class="col-md-7">{{ invoice.contact|default:invoice.customer }}</div>
-      <div class="col-md-2">{{ invoice.pretty_periodicity }}</div>
+      <div class="col-md-2">{{ invoice.pretty_status }}</div>
       <div class="col-md-3 text-md-right">
         {{ invoice.total_excl_tax|currency }} exkl.
       </div>
