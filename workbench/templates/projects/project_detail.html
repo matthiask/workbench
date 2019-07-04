@@ -94,10 +94,10 @@
             <div class="float-right">
               <a class="btn btn-secondary btn-sm" href="{{ service.urls.update }}" data-toggle="ajaxmodal" title="{% trans 'Update' %}">
                 {% include 'svg/pencil.svg' %}</a>
-              <a href="" class="btn btn-secondary btn-sm" title="{% trans 'Move' %}" data-sortable-grabber>
+              <a class="btn btn-secondary btn-sm" href="{{ service.urls.delete }}" data-toggle="ajaxmodal" title="{% trans 'Merge' %}">
+                {% include 'svg/git-merge.svg' %}</a>
+              <a href="" class="btn btn-secondary btn-sm" title="{% trans 'Sort' %}" data-sortable-grabber>
                 {% include 'svg/grabber.svg' %}</a>
-              <a class="btn btn-secondary btn-sm" href="{{ service.urls.delete }}" data-toggle="ajaxmodal" title="{% trans 'Delete' %}">
-                {% include 'svg/trashcan.svg' %}</a>
             </div>
           {% endif %}
 
