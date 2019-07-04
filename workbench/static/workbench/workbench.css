@@ -116,7 +116,7 @@ tbody th > a {
     transform: translateY(100%);
   }
 
-  [data-timer="footer"]:hover .timer-panel-projects {
+  [data-timer="footer"].hover-with-intent .timer-panel-projects {
     transform: translateY(-36px);
   }
 }

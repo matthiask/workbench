@@ -316,5 +316,15 @@ window.addEventListener("load", function() {
       `,
       timer
     )
+
+    if (timer.dataset.timer == "footer" && window.hoverintent) {
+      window
+        .hoverintent(
+          timer,
+          () => timer.classList.add("hover-with-intent"),
+          () => timer.classList.remove("hover-with-intent")
+        )
+        .options({timeout: 50})
+    }
   }
 })
