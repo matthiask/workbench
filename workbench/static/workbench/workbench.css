@@ -1,3 +1,9 @@
+.navbar {
+  /* hacky fix for some bootstrap modal oddity */
+  padding-right: 8px !important;
+  margin-right: 0 !important;
+}
+
 .navbar .form-inline input {
   max-width: 10em;
 }
