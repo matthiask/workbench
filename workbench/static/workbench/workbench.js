@@ -96,16 +96,29 @@ $(function() {
   })
 
   $(".form-search").each(function() {
-    const key = `search-${window.location.pathname}`
     if (window.location.search) {
+      const key = `search-${window.location.pathname}`
       window.localStorage.setItem(
         key,
         /\be=1\b/.test(window.location.search) ? "" : window.location.search
       )
-    } else {
-      const search = window.localStorage.getItem(key)
-      if (search) window.location.href = search
     }
+  })
+
+  // Restore the search params when going through the main menu...
+  $(".navbar").on("click", "a", function(e) {
+    const key = `search-${this.getAttribute("href")}`
+    const search = window.localStorage.getItem(key)
+    if (search) {
+      e.preventDefault()
+      window.location.href = this.getAttribute("href") + search
+    }
+  })
+
+  // ... and always remove the saved search params when clicking on an h1
+  $("h1").on("click", "a", function() {
+    const key = `search-${this.getAttribute("href")}`
+    window.localStorage.removeItem(key)
   })
 
   // Hotkeys
