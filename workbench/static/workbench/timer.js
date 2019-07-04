@@ -4,6 +4,14 @@ function timestamp() {
   return Math.floor(new Date().getTime() / 1000)
 }
 
+function prettyDuration(seconds) {
+  const hours = Math.floor(seconds / 3600)
+  const displayHours = hours ? `${hours}h ` : ""
+  const displayMinutes = Math.floor(seconds / 60) % 60
+  const displaySeconds = (seconds % 60).toString().padStart(2, "0")
+  return `+${displayHours}${displayMinutes}:${displaySeconds}`
+}
+
 class App extends Component {
   constructor() {
     super()
@@ -190,15 +198,9 @@ class Project extends Component {
     const seconds =
       this.props.seconds +
       (this.props.isActiveProject ? timestamp() - this.props.lastStart : 0)
-
-    const hours = Math.floor(seconds / 3600)
-    const displayHours = hours ? `${hours}h ` : ""
-    const displayMinutes = Math.floor(seconds / 60) % 60
-    const displaySeconds = (seconds % 60).toString().padStart(2, "0")
-
     const deciHours = Math.ceil(seconds / 360) / 10
 
-    this.hoursButton.textContent = `+${displayHours}${displayMinutes}:${displaySeconds}`
+    this.hoursButton.textContent = prettyDuration(seconds)
     this.hoursButton.title = `${deciHours}h aufschreiben`
   }
 
