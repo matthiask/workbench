@@ -123,20 +123,7 @@ class RecurringTest(TestCase):
         self.assertEqual(messages(response), ["0 Rechnungen erstellt."])
 
     def test_create_and_notify(self):
-        person = factories.PersonFactory.create(
-            organization=factories.OrganizationFactory.create()
-        )
-        RecurringInvoice.objects.create(
-            customer=person.organization,
-            contact=person,
-            title="Recurring invoice",
-            description="",
-            owned_by=person.primary_contact,
-            starts_on=date(2018, 1, 1),
-            ends_on=date(2018, 12, 31),
-            periodicity="monthly",
-            subtotal=200,
-        )
+        factories.RecurringInvoiceFactory.create()
 
         create_recurring_invoices_and_notify()
         self.assertEqual(len(mail.outbox), 1)
@@ -146,6 +133,8 @@ class RecurringTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_list(self):
+        factories.RecurringInvoiceFactory.create()
+
         user = factories.UserFactory.create()
         self.client.force_login(user)
 

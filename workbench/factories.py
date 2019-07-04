@@ -11,7 +11,7 @@ from workbench.awt.models import Year
 from workbench.contacts.models import Organization, Person, PostalAddress
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.deals.models import Deal, Stage
-from workbench.invoices.models import Invoice
+from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
@@ -108,6 +108,19 @@ class InvoiceFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Invoice
+
+
+class RecurringInvoiceFactory(factory.DjangoModelFactory):
+    customer = factory.SubFactory(OrganizationFactory)
+    contact = factory.LazyAttribute(
+        lambda obj: PersonFactory.create(organization=obj.customer)
+    )
+    owned_by = factory.SubFactory(UserFactory)
+    title = factory.Sequence(lambda n: "Invoice %d" % n)
+    periodicity = "yearly"
+
+    class Meta:
+        model = RecurringInvoice
 
 
 # SERVICES ####################################################################
