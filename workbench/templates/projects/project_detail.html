@@ -96,6 +96,10 @@
                 {% include 'svg/pencil.svg' %}</a>
               <a class="btn btn-secondary btn-sm" href="{{ service.urls.delete }}" data-toggle="ajaxmodal" title="{% trans 'Merge' %}">
                 {% include 'svg/git-merge.svg' %}</a>
+              {% if not offer %}
+                <a class="btn btn-secondary btn-sm" href="{{ service.urls.move }}" data-toggle="ajaxmodal" title="{% trans 'Move to other project' %}">
+                  {% include 'svg/link-external.svg' %}</a>
+              {% endif %}
               <a href="" class="btn btn-secondary btn-sm" title="{% trans 'Sort' %}" data-sortable-grabber>
                 {% include 'svg/grabber.svg' %}</a>
             </div>

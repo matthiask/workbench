@@ -13,6 +13,7 @@ from workbench.projects.forms import (
     ProjectSearchForm,
     ServiceDeleteForm,
     ServiceForm,
+    ServiceMoveForm,
 )
 from workbench.projects.models import Project, Service
 from workbench.projects.views import set_order
@@ -112,6 +113,13 @@ urlpatterns = [
             template_name_suffix="_merge",
         ),
         name="projects_service_delete",
+    ),
+    url(
+        r"^service/(?P<pk>\d+)/move/$",
+        generic.UpdateView.as_view(
+            model=Service, form_class=ServiceMoveForm, template_name="modalform.html"
+        ),
+        name="projects_service_move",
     ),
     url(r"^service/set-order/$", set_order, name="projects_service_set_order"),
 ]

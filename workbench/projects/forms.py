@@ -208,3 +208,18 @@ class ServiceDeleteForm(ModelForm):
         self.instance.loggedcosts.update(service=into)
         self.instance.delete()
         return into
+
+
+class ServiceMoveForm(ModelForm):
+    class Meta:
+        model = Service
+        fields = ["project"]
+        widgets = {"project": Autocomplete(model=Project)}
+
+    def clean(self):
+        data = super().clean()
+        if data.get("project") and data.get("project").closed_on:
+            raise forms.ValidationError(
+                {"project": _("This project is already closed.")}
+            )
+        return data

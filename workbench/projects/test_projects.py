@@ -333,3 +333,26 @@ class ProjectsTest(TestCase):
 
         response = self.client.get(project.urls["create"] + "?copy=blub")
         self.assertEqual(response.status_code, 200)  # No crash
+
+    def test_move(self):
+        project = factories.ProjectFactory.create()
+        closed = factories.ProjectFactory.create(closed_on=date.today())
+        service = factories.ServiceFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            service.urls["move"],
+            {"project": closed.pk},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "Dieses Projekt wurde schon geschlossen.")
+
+        response = self.client.post(
+            service.urls["move"],
+            {"project": project.pk},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
+
+        service.refresh_from_db()
+        self.assertEqual(service.project, project)
