@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 
 from django.test import TestCase
@@ -5,6 +6,7 @@ from django.test import TestCase
 from workbench import factories
 from workbench.projects.models import Project
 from workbench.projects.reporting import overdrawn_projects
+from workbench.reporting import key_data
 from workbench.tools.models import Z
 
 
@@ -41,7 +43,7 @@ class StatisticsTest(TestCase):
         response = self.client.get("/report/overdrawn-projects/")
         self.assertContains(response, "Überzogene Projekte")
 
-    def test_not_archived_hours(self):
+    def test_not_archived_hours_grouped_services_green_hours(self):
         service1 = factories.ServiceFactory.create(effort_rate=180, effort_type="Any")
         service2 = factories.ServiceFactory.create(project=service1.project)
 
@@ -78,3 +80,27 @@ class StatisticsTest(TestCase):
             project.not_archived_total,
             {"total": Decimal("1800.00"), "hours_rate_undefined": Z},
         )
+
+        self.assertEqual(project.project_invoices_subtotal, Decimal("1800.00"))
+
+        grouped = project.grouped_services
+        self.assertEqual(len(grouped["offers"]), 1)
+        self.assertIs(grouped["offers"][0][0], None)
+        self.assertEqual(grouped["logged_hours"], Decimal(40))
+        self.assertEqual(grouped["service_hours"], 0)
+        self.assertEqual(grouped["total_logged_cost"], Decimal(3600))
+        self.assertEqual(grouped["total_service_cost"], 0)
+        self.assertEqual(grouped["total_logged_hours_rate_undefined"], Decimal(20))
+        self.assertEqual(grouped["total_service_hours_rate_undefined"], 0)
+
+        today = date.today()
+        date_range = [date(today.year, 1, 1), date(today.year, 12, 31)]
+
+        green_hours = key_data.green_hours(date_range)
+        gh = green_hours[today.year]["year"]
+        self.assertEqual(gh.profitable, 0)
+        self.assertEqual(gh.overdrawn, Decimal(40))
+        self.assertEqual(gh.maintenance, 0)
+        self.assertEqual(gh.internal, 0)
+        self.assertEqual(gh.total, Decimal(40))
+        self.assertEqual(gh.green, 0)

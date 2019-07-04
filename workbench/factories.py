@@ -105,6 +105,7 @@ class InvoiceFactory(factory.DjangoModelFactory):
     owned_by = factory.SubFactory(UserFactory)
     title = factory.Sequence(lambda n: "Invoice %d" % n)
     type = Invoice.FIXED
+    invoiced_on = date.today()
 
     class Meta:
         model = Invoice
@@ -142,6 +143,7 @@ class LoggedHoursFactory(factory.DjangoModelFactory):
     service = factory.SubFactory(ServiceFactory)
     created_by = factory.SubFactory(UserFactory)
     rendered_by = factory.SubFactory(UserFactory)
+    rendered_on = date.today()
     hours = 1
 
     class Meta:
@@ -152,6 +154,7 @@ class LoggedCostFactory(factory.DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     created_by = factory.SubFactory(UserFactory)
     rendered_by = factory.LazyAttribute(lambda obj: obj.created_by)
+    rendered_on = date.today()
     cost = 10
 
     class Meta:
