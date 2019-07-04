@@ -219,6 +219,28 @@ class Project(Model):
     def project_invoices_subtotal(self):
         return sum((invoice.subtotal for invoice in self.project_invoices), Z)
 
+    @cached_property
+    def not_archived_total(self):
+        # Avoid circular imports
+        from workbench.logbook.models import LoggedHours
+
+        total = Z
+        hours_rate_undefined = Z
+
+        for row in (
+            LoggedHours.objects.order_by()
+            .filter(service__project=self, archived_at__isnull=True)
+            .values("service__effort_rate")
+            .annotate(Sum("hours"))
+        ):
+            if row["service__effort_rate"] is None:
+                hours_rate_undefined += row["hours__sum"]
+            else:
+                total += row["hours__sum"] * row["service__effort_rate"]
+
+        total += self.loggedcosts.order_by().aggregate(Sum("cost"))["cost__sum"] or Z
+        return {"total": total, "hours_rate_undefined": hours_rate_undefined}
+
 
 @model_urls
 class Service(ServiceBase):

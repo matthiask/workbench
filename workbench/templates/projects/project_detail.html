@@ -47,6 +47,14 @@
                 <th class="text-right">{% trans 'subtotal' %}</th>
                 <td>{{ project.project_invoices_subtotal|currency }}</td>
               </tr>
+
+              <tr>
+                <th class="text-right">{% trans 'not archived' %}</th>
+                <td>
+                  {{ project.not_archived_total.total|currency }}
+                  {% if project.not_archived_total.hours_rate_undefined %}(+{% blocktrans with hours=project.not_archived_total.hours_rate_undefined|hours %}{{ hours }} with undefined rate){% endblocktrans %}){% endif %}
+                </td>
+              </tr>
             </table>
           </span>
         </div>
