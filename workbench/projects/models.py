@@ -115,7 +115,7 @@ class Project(Model):
     @property
     def status_css(self):
         if self.closed_on:
-            return ""
+            return "light"
 
         return {
             self.ACQUISITION: "info",
