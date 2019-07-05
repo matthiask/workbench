@@ -219,7 +219,9 @@ class App extends Component {
             />
           </div>
         </div>
-        <div class="timer-panel-projects list-group">${content}</div>
+        <div class="timer-panel-projects list-group list-group-flush">
+          ${content}
+        </div>
       </div>
     `
   }
@@ -229,7 +231,8 @@ class Project extends Component {
   render(props) {
     return html`
       <div
-        class="list-group-item d-flex align-items-center justify-content-between"
+        class=${`list-group-item d-flex align-items-center justify-content-between ${props.isActiveProject &&
+          "active"}`}
       >
         <a
           class="d-block text-truncate"

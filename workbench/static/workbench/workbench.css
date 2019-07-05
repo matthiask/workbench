@@ -99,10 +99,6 @@ tbody th > a {
   min-height: 36px;
 }
 
-.timer-panel-projects .list-group-item {
-  border-radius: 0 !important;
-}
-
 @media screen and (min-width: 768px) {
   body {
     min-height: 100vh;
