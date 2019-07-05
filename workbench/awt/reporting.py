@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import date
 from decimal import Decimal
 
 from django.db.models import Sum
@@ -17,7 +18,7 @@ def annual_working_time(year, *, users):
     absences = defaultdict(lambda: {"vacation_days": [], "other_absences": []})
     months = defaultdict(
         lambda: {
-            "months": [None] * 12,
+            "months": [date(year.year, i, 1) for i in range(1, 13)],
             "target_days": target_days,
             "percentage": [Z for i in range(12)],
             "available_vacation_days": [Z for i in range(12)],
@@ -52,7 +53,6 @@ def annual_working_time(year, *, users):
             month_data["available_vacation_days"][month.month - 1] += (
                 available_vacation_days_per_month * partial_month_factor
             )
-            month_data["months"][month.month - 1] = month
             month_data["employments"].add(employment)
 
     for row in (
