@@ -54,6 +54,7 @@ class ProjectsTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertContains(response, "Entweder alle Felder einfüllen oder keine.")
+
         response = self.client.post(
             project.urls["createservice"],
             {
@@ -118,6 +119,14 @@ class ProjectsTest(TestCase):
         )
         self.assertEqual(response.status_code, 204)
         self.assertEqual(list(project.services.all()), [service2])
+
+    def test_service_with_rate_zero(self):
+        Service(
+            project=factories.ProjectFactory.create(),
+            title="Any",
+            effort_type="Any",
+            effort_rate=0,
+        ).full_clean()
 
     def test_service_deletion_without_merge(self):
         service = factories.ServiceFactory.create()

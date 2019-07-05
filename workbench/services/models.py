@@ -132,11 +132,11 @@ class ServiceBase(Model):
     def clean_fields(self, exclude):
         super().clean_fields(exclude)
         errors = {}
-        effort = (self.effort_type, self.effort_rate)
+        effort = (self.effort_type != "", self.effort_rate is not None)
         if any(effort) and not all(effort):
-            if not self.effort_type:
+            if self.effort_type == "":
                 errors["effort_type"] = _("Either fill in all fields or none.")
-            if not self.effort_rate:
+            if self.effort_rate is None:
                 errors["effort_rate"] = _("Either fill in all fields or none.")
         if self.third_party_costs is not None and self.cost is None:
             errors["cost"] = _("Cannot be empty if third party costs is set.")

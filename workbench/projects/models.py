@@ -175,7 +175,7 @@ class Project(Model):
 
             total_service_cost += service.service_cost
             total_logged_cost += service.logged_cost
-            if service.effort_rate:
+            if service.effort_rate is not None:
                 total_logged_cost += service.effort_rate * service.logged_hours
             else:
                 total_service_hours_rate_undefined += service.service_hours
