@@ -99,6 +99,10 @@ tbody th > a {
   min-height: 36px;
 }
 
+.timer-panel-projects .list-group-item {
+  border-radius: 0 !important;
+}
+
 @media screen and (min-width: 768px) {
   body {
     min-height: 100vh;
@@ -120,6 +124,7 @@ tbody th > a {
     right: 0;
     transition: 0.2s ease-in-out;
     transform: translateY(100%);
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
   }
 
   [data-timer="footer"].hover-with-intent .timer-panel-projects {
