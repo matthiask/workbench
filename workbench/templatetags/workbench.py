@@ -91,7 +91,7 @@ def bar(value, one):
     bars = []
 
     if percentage < 75:
-        bars.append(("bg-info", percentage))
+        bars.append(("bg-info", max(0, percentage)))
     elif percentage <= 100:
         bars.append(("bg-warning", percentage))
     else:

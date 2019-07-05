@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 
-from workbench.tools.models import HoursField, Model, MoneyField, Z
+from workbench.tools.models import HoursFieldAllowNegatives, Model, MoneyField, Z
 from workbench.tools.validation import raise_if_errors
 
 
@@ -52,11 +52,11 @@ class ServiceBase(Model):
     description = models.TextField(_("description"), blank=True)
     position = models.PositiveIntegerField(_("position"), default=0)
 
-    service_hours = HoursField(_("service hours"), default=0)
+    service_hours = HoursFieldAllowNegatives(_("service hours"), default=0)
     service_cost = MoneyField(_("service cost"), default=0)
 
     effort_type = models.CharField(_("effort type"), max_length=50, blank=True)
-    effort_hours = HoursField(_("hours"), blank=True, null=True)
+    effort_hours = HoursFieldAllowNegatives(_("hours"), blank=True, null=True)
     effort_rate = MoneyField(_("hourly rate"), blank=True, null=True)
 
     cost = MoneyField(_("cost"), blank=True, null=True)

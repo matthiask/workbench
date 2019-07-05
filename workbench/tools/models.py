@@ -104,6 +104,9 @@ HoursField = partial(
 )
 
 
+HoursFieldAllowNegatives = partial(models.DecimalField, max_digits=10, decimal_places=1)
+
+
 class ModelWithTotal(Model):
     subtotal = MoneyField(_("subtotal"), default=Z)
     discount = MoneyField(_("discount"), default=Z)
