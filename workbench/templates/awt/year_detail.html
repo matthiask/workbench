@@ -24,7 +24,7 @@
 
   <table class="table table-sm table-responsive-lg">
   {% for data in statistics %}
-    {% with user=data.user stats=data.months totals=data.totals monthly_sums=data.monthly_sums %}
+    {% with user=data.user stats=data.months totals=data.totals monthly_sums=data.monthly_sums running_sums=data.running_sums %}
     <tr><th colspan="14">
       <h5 class="mt-3 mb-0">{{ user }}</h5>
     </th></tr>
@@ -94,6 +94,11 @@
     <tr>
       <th>{% trans 'monthly sums' %}</th>
       {% for value in monthly_sums %}<td class="text-right">{% if value is not None %}{{ value|hours }}{% endif %}</td>{% endfor %}
+      <th></th>
+    </tr>
+    <tr>
+      <th>{% trans 'running sums' %}</th>
+      {% for value in running_sums %}<td class="text-right">{% if value is not None %}{{ value|hours }}{% endif %}</td>{% endfor %}
       <th class="text-right">{{ totals.running_sum|hours }}</th>
     </tr>
 

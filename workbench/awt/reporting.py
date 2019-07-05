@@ -136,6 +136,10 @@ def annual_working_time(year, *, users):
                 "employments": user_data["employments"],
                 "working_time": wt,
                 "monthly_sums": sums,
+                "running_sums": [
+                    sum(filter(None, sums[: i + 1]), Z) if sums[i] else None
+                    for i in range(12)
+                ],
                 "totals": {
                     "target_days": sum(user_data["target_days"]),
                     "percentage": sum(user_data["percentage"]) / 12,

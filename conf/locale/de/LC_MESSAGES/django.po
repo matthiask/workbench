@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-05 08:12+0200\n"
+"POT-Creation-Date: 2019-07-05 10:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -236,7 +236,7 @@ msgstr "Titel"
 #: workbench/activities/models.py:50 workbench/awt/models.py:92
 #: workbench/contacts/models.py:29 workbench/contacts/models.py:75
 #: workbench/credit_control/forms.py:194 workbench/credit_control/models.py:63
-#: workbench/templates/awt/year_detail.html:119
+#: workbench/templates/awt/year_detail.html:126
 #: workbench/templates/contacts/organization_detail.html:29
 #: workbench/templates/contacts/person_detail.html:34
 #: workbench/templates/credit_control/creditentry_list.html:25
@@ -367,12 +367,12 @@ msgstr "Datum von"
 msgid "date until"
 msgstr "Datum bis"
 
-#: workbench/awt/models.py:85 workbench/templates/awt/year_detail.html:43
-#: workbench/templates/awt/year_detail.html:117
+#: workbench/awt/models.py:85 workbench/templates/awt/year_detail.html:45
+#: workbench/templates/awt/year_detail.html:124
 msgid "percentage"
 msgstr "Prozent"
 
-#: workbench/awt/models.py:87 workbench/templates/awt/year_detail.html:118
+#: workbench/awt/models.py:87 workbench/templates/awt/year_detail.html:125
 msgid "vacation weeks"
 msgstr "Ferienwochen"
 
@@ -380,7 +380,7 @@ msgstr "Ferienwochen"
 msgid "Vacation weeks for a full year."
 msgstr "Ferienwochen für ein volles Anstellungsjahr."
 
-#: workbench/awt/models.py:97 workbench/templates/awt/year_detail.html:116
+#: workbench/awt/models.py:97 workbench/templates/awt/year_detail.html:123
 msgid "employment"
 msgstr "Anstellungsverhältnis"
 
@@ -416,7 +416,7 @@ msgstr "sind Ferien"
 msgid "absence"
 msgstr "Abwesenheit"
 
-#: workbench/awt/models.py:136 workbench/templates/awt/year_detail.html:99
+#: workbench/awt/models.py:136 workbench/templates/awt/year_detail.html:106
 #: workbench/templates/base.html:48
 msgid "absences"
 msgstr "Abwesenheiten"
@@ -1209,7 +1209,7 @@ msgid "rendered on"
 msgstr "Erbracht am"
 
 #: workbench/logbook/models.py:39 workbench/services/models.py:59
-#: workbench/templates/awt/year_detail.html:55
+#: workbench/templates/awt/year_detail.html:57
 #: workbench/templates/logbook/loggedhours_detail.html:35
 #: workbench/templates/projects/project_detail.html:146
 #: workbench/templates/projects/project_detail.html:208
@@ -1550,47 +1550,51 @@ msgstr "Kontext"
 msgid "%(days)s day(s) starting on %(start)s"
 msgstr "%(days)s Tag(e), ab %(start)s"
 
-#: workbench/templates/awt/year_detail.html:17
+#: workbench/templates/awt/year_detail.html:18
 msgid "active users"
 msgstr "Aktive Benutzer"
 
-#: workbench/templates/awt/year_detail.html:33
+#: workbench/templates/awt/year_detail.html:35
 msgid "Total"
 msgstr "Total"
 
-#: workbench/templates/awt/year_detail.html:37
+#: workbench/templates/awt/year_detail.html:39
 msgid "working days"
 msgstr "Arbeitstage"
 
-#: workbench/templates/awt/year_detail.html:49
+#: workbench/templates/awt/year_detail.html:51
 msgid "available vacation days"
 msgstr "Verfügbare Ferientage"
 
-#: workbench/templates/awt/year_detail.html:61
-#: workbench/templates/awt/year_detail.html:101
+#: workbench/templates/awt/year_detail.html:63
+#: workbench/templates/awt/year_detail.html:108
 msgid "vacation days"
 msgstr "Ferientage"
 
-#: workbench/templates/awt/year_detail.html:68
+#: workbench/templates/awt/year_detail.html:70
 msgid "correction"
 msgstr "Korrektur"
 
-#: workbench/templates/awt/year_detail.html:75
-#: workbench/templates/awt/year_detail.html:107
+#: workbench/templates/awt/year_detail.html:77
+#: workbench/templates/awt/year_detail.html:114
 msgid "other absences"
 msgstr "Andere Abwesenheiten"
 
-#: workbench/templates/awt/year_detail.html:81
+#: workbench/templates/awt/year_detail.html:83
 msgid "working time"
 msgstr "Arbeitszeit"
 
-#: workbench/templates/awt/year_detail.html:87
+#: workbench/templates/awt/year_detail.html:89
 msgid "target"
 msgstr "Ziel"
 
-#: workbench/templates/awt/year_detail.html:93
+#: workbench/templates/awt/year_detail.html:95
 msgid "monthly sums"
 msgstr "Monatssummen"
+
+#: workbench/templates/awt/year_detail.html:100
+msgid "running sums"
+msgstr "Laufende Summen"
 
 #: workbench/templates/base.html:18 workbench/templates/search.html:5
 #: workbench/templates/search.html:10
