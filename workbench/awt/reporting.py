@@ -1,5 +1,4 @@
 from collections import defaultdict
-from datetime import date
 from decimal import Decimal
 
 from django.db.models import Sum
@@ -91,9 +90,6 @@ def annual_working_time(year, *, users):
         if vacation_days > 0:
             months[user_id]["vacation_days_correction"][11] = vacation_days
 
-    today = date.today()
-    this_month = (today.year, today.month - 1)
-
     def working_time(data):
         return [
             sum(
@@ -111,8 +107,6 @@ def annual_working_time(year, *, users):
     def monthly_sums(data):
         sums = [None] * 12
         for i in range(12):
-            if (year.year, i) >= this_month:
-                break
             sums[i] = data["hours"][i] + year.working_time_per_day * sum(
                 (
                     data["vacation_days"][i],
@@ -136,10 +130,7 @@ def annual_working_time(year, *, users):
                 "employments": user_data["employments"],
                 "working_time": wt,
                 "monthly_sums": sums,
-                "running_sums": [
-                    sum(filter(None, sums[: i + 1]), Z) if sums[i] else None
-                    for i in range(12)
-                ],
+                "running_sums": [sum(sums[:i], Z) for i in range(1, 13)],
                 "totals": {
                     "target_days": sum(user_data["target_days"]),
                     "percentage": sum(user_data["percentage"]) / 12,
@@ -154,7 +145,7 @@ def annual_working_time(year, *, users):
                     "target": sum(user_data["target"]),
                     "hours": sum(user_data["hours"]),
                     "working_time": sum(wt),
-                    "running_sum": sum(filter(None, sums), Z),
+                    "running_sum": sum(sums),
                 },
             }
         )
