@@ -29,16 +29,14 @@ class App extends Component {
       }
     })
 
-    this.serialize = this.serialize.bind(this)
-  }
+    $(document).on("modalform", (e, xhrStatus, action) => {
+      const match = action.match(/projects\/([0-9]+)\/createhours/)
+      if (xhrStatus == 201 && match && match[1]) {
+        this.setHoursToZero(parseInt(match[1], 10))
+      }
+    })
 
-  manageTimer() {
-    if (this.state.activeProject && !this.timer) {
-      this.timer = setInterval(() => this.forceUpdate(), 1000)
-    } else if (!this.state.activeProject && this.timer) {
-      clearInterval(this.timer)
-      this.timer = null
-    }
+    this.serialize = this.serialize.bind(this)
   }
 
   serialize() {
@@ -54,15 +52,23 @@ class App extends Component {
     }
   }
 
+  manageTimer() {
+    if (this.state.activeProject && !this.timer) {
+      this.timer = setInterval(() => this.forceUpdate(), 1000)
+    } else if (!this.state.activeProject && this.timer) {
+      clearInterval(this.timer)
+      this.timer = null
+    }
+  }
+
   activateProject(projectId, callback) {
     this.setState(
       prevState => {
         let seconds = Object.assign({}, prevState.seconds)
         if (prevState.activeProject && prevState.lastStart) {
-          seconds[prevState.activeProject] =
-            (seconds[prevState.activeProject] || 0) +
-            timestamp() -
-            prevState.lastStart
+          seconds[prevState.activeProject] = this.projectSeconds(
+            prevState.activeProject
+          )
         }
         return {
           seconds,
@@ -78,6 +84,56 @@ class App extends Component {
     )
   }
 
+  setHoursToZero(projectId) {
+    this.setState(
+      prevState => ({
+        seconds: Object.assign({}, prevState.seconds, {
+          [projectId]: 0,
+        }),
+        lastStart:
+          prevState.activeProject === projectId
+            ? timestamp()
+            : prevState.lastStart,
+      }),
+      this.serialize
+    )
+  }
+
+  removeProject(projectId) {
+    let seconds = Object.assign({}, this.state.seconds)
+    delete seconds[projectId]
+    this.setState(
+      prevState => ({
+        seconds,
+        projects: prevState.projects.filter(p => p.id !== projectId),
+        activeProject:
+          prevState.activeProject === projectId
+            ? null
+            : prevState.activeProject,
+        lastStart:
+          prevState.activeProject === projectId ? null : prevState.lastStart,
+      }),
+      this.serialize
+    )
+  }
+
+  logHours(projectId) {
+    const seconds = this.projectSeconds(projectId)
+    const hoursParam =
+      seconds > 0 ? `?hours=${Math.ceil(seconds / 360) / 10}` : ""
+
+    window.openModalFromUrl(`/projects/${projectId}/createhours/${hoursParam}`)
+  }
+
+  projectSeconds(projectId) {
+    return (
+      this.state.seconds[projectId] +
+      (this.state.activeProject == projectId
+        ? timestamp() - this.state.lastStart
+        : 0)
+    )
+  }
+
   render(props, state) {
     let content = []
     let totalSeconds = 0
@@ -85,11 +141,7 @@ class App extends Component {
       content = content.concat(
         state.projects.map(project => {
           const isActiveProject = state.activeProject === project.id
-          const seconds =
-            state.seconds[project.id] +
-            (isActiveProject && state.lastStart
-              ? timestamp() - state.lastStart
-              : 0)
+          const seconds = this.projectSeconds(project.id)
           totalSeconds += seconds
 
           return html`
@@ -107,51 +159,14 @@ class App extends Component {
                 }
               }}
               logHours=${() => {
-                this.activateProject(null, () => {
-                  const seconds = this.state.seconds[project.id] || 0
-                  const hoursParam =
-                    seconds > 0 ? `?hours=${Math.ceil(seconds / 360) / 10}` : ""
-
-                  window.openModalFromUrl(
-                    `/projects/${project.id}/createhours/${hoursParam}`
-                  )
-                })
+                this.logHours(project.id)
               }}
               resetHours=${() => {
-                this.setState(
-                  prevState => ({
-                    seconds: Object.assign({}, prevState.seconds, {
-                      [project.id]: 0,
-                    }),
-                    lastStart:
-                      prevState.activeProject === project.id
-                        ? timestamp()
-                        : prevState.lastStart,
-                  }),
-                  this.serialize
-                )
+                this.setHoursToZero(project.id)
               }}
               removeProject=${() => {
                 if (confirm("Wirklich entfernen?")) {
-                  let seconds = Object.assign({}, state.seconds)
-                  delete seconds[project.id]
-                  this.setState(
-                    prevState => ({
-                      seconds,
-                      projects: prevState.projects.filter(
-                        p => p.id !== project.id
-                      ),
-                      activeProject:
-                        prevState.activeProject === project.id
-                          ? null
-                          : prevState.activeProject,
-                      lastStart:
-                        prevState.activeProject === project.id
-                          ? null
-                          : prevState.lastStart,
-                    }),
-                    this.serialize
-                  )
+                  this.removeProject(project.id)
                 }
               }}
             />

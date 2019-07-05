@@ -43,13 +43,15 @@ $(function() {
 
   $(document.body).on("submit", ".modal-dialog form", function(_event) {
     if (this.method.toLowerCase() == "post") {
-      $.post(this.action, $(this).serialize(), function(data, status, jqXHR) {
+      const action = this.action
+      $.post(action, $(this).serialize(), function(data, status, jqXHR) {
         // 201 CREATED, 202 ACCEPTED or 204 NO CONTENT
         if (
           jqXHR.status === 201 ||
           jqXHR.status === 202 ||
           jqXHR.status === 204
         ) {
+          $(document).trigger("modalform", [jqXHR.status, action])
           dismissModals()
           window.location.reload()
         } else {
