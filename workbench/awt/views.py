@@ -34,6 +34,8 @@ class ReportView(generic.DetailView):
             users = [self.request.user]
         return super().get_context_data(
             statistics=annual_working_time(self.object, users=users),
-            years=Year.objects.all(),
+            years=[
+                year for year in Year.objects.all() if year.year <= date.today().year
+            ],
             **kwargs
         )

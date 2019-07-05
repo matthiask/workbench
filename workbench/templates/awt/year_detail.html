@@ -13,6 +13,11 @@
         href="{{ year.get_absolute_url }}">{{ year }}</a>
     </li>
     {% endfor %}
+    {% if request.user.is_staff %}
+    <li class="nav-item ml-auto">
+      <a class="nav-link" href="{% querystring user='active' %}">{% trans 'active users' %}</a>
+    </li>
+    {% endif %}
   </ul>
 
   <h1>{{ object|h }} {% history_link object %}</h1>
