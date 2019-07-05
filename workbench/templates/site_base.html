@@ -21,12 +21,8 @@
   <script src="{% static 'workbench/lib/jquery-ui.min.js' %}"></script>
   <script src="{% static 'workbench/lib/hoverintent.min.js' %}"></script>
   <script src="{% static 'workbench/workbench.js' %}"></script>
+  <script type="module" src="{% static 'workbench/timer.js' %}"></script>
   {% block js %}{% endblock %}
-
-  {% block timer %}
-    <script type="module" src="{% static 'workbench/timer.js' %}"></script>
-    <div data-timer="footer"></div>
-  {% endblock %}
 
 </body>
 </html>
