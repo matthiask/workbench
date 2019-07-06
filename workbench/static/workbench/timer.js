@@ -85,18 +85,20 @@ class App extends Component {
   }
 
   setHoursToZero(projectId) {
-    this.setState(
-      prevState => ({
-        seconds: Object.assign({}, prevState.seconds, {
-          [projectId]: 0,
+    if (this.state.seconds[projectId]) {
+      this.setState(
+        prevState => ({
+          seconds: Object.assign({}, prevState.seconds, {
+            [projectId]: 0,
+          }),
+          lastStart:
+            prevState.activeProject === projectId
+              ? timestamp()
+              : prevState.lastStart,
         }),
-        lastStart:
-          prevState.activeProject === projectId
-            ? timestamp()
-            : prevState.lastStart,
-      }),
-      this.serialize
-    )
+        this.serialize
+      )
+    }
   }
 
   removeProject(projectId) {
