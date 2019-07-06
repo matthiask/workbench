@@ -20,6 +20,24 @@
       </div>
     </div>
 
+    {% if user.in_preparation %}
+    <div class="card mb-3">
+      <div class="card-header"><h3 class="my-0">
+        {% trans 'In preparation' %}
+      </h3></div>
+      <div class="card-body">
+        {% for thing in user.in_preparation.offers %}
+          {% if forloop.first %}<strong>{% trans 'offers' %}:</strong>{% endif %}
+          {% link_or_none thing %}
+        {% endfor %}
+        {% for thing in user.in_preparation.invoices %}
+          {% if forloop.first %}<strong>{% trans 'invoices' %}:</strong>{% endif %}
+          {% link_or_none thing %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
     <div class="card mb-3">
       <div class="card-header"><h3 class="my-0">
         <a href="{% url 'projects_project_list' %}">{% trans 'active projects' %}</a>
@@ -124,17 +142,6 @@
         <div class="card-body">{% trans 'no hours today' %}</div>
       {% endif %}
     </div>
-
-    {% if user.in_preparation %}
-    <div class="card mb-3">
-      <div class="card-header"><h3 class="my-0">
-        {% trans 'In preparation' %}
-      </h3></div>
-      <div class="card-body">
-        {% for thing in user.in_preparation %}{% link_or_none thing %} {% endfor %}
-      </div>
-    </div>
-    {% endif %}
 
   </div>
 </div>
