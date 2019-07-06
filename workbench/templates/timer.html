@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
-{% load static %}
+{% load bootstrap4 static %}
 
 {% block body %}
   {# <script src="{% static 'workbench/lib/preact.min.js' %}"></script> #}
   <script type="module" src="{% static 'workbench/timer.js' %}"></script>
+  {% bootstrap_messages %}
   <div data-timer="standalone"></div>
 {% endblock %}
