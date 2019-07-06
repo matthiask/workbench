@@ -4,14 +4,6 @@ from django.contrib import admin
 from django.shortcuts import render
 
 from workbench import views
-from workbench.awt.views import ReportView
-from workbench.reporting.views import (
-    key_data_view,
-    logged_hours_by_circle_view,
-    monthly_invoicing_view,
-    open_items_list,
-    overdrawn_projects_view,
-)
 
 
 urlpatterns = [
@@ -33,26 +25,7 @@ urlpatterns = [
     url(r"^accruals/", include("workbench.accruals.urls")),
     url(r"^search/$", views.search, name="search"),
     url(r"^history/(\w+\.\w+)/([0-9]+)/$", views.history, name="history"),
-    #
-    # Reports
-    url(r"^report/annual-working-time/$", ReportView.as_view(), name="awt_year_report"),
-    url(
-        r"^report/monthly-invoicing/$",
-        monthly_invoicing_view,
-        name="report_monthly_invoicing",
-    ),
-    url(
-        r"^report/overdrawn-projects/$",
-        overdrawn_projects_view,
-        name="report_overdrawn_projects",
-    ),
-    url(r"^report/open-items-list/$", open_items_list, name="report_open_items_list"),
-    url(
-        r"^report/logged-hours-by-circle/$",
-        logged_hours_by_circle_view,
-        name="report_logged_hours_by_circle",
-    ),
-    url(r"^report/key-data/$", key_data_view, name="report_key_data"),
+    url(r"^report/", include("workbench.reporting.urls")),
 ]
 
 if settings.DEBUG:  # pragma: no cover

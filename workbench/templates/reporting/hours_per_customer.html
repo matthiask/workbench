@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% load fineforms i18n static workbench %}
+
+{% block title %}{% trans 'hours per customer' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-sm-12 col-md-8">
+  <h1>
+    {% trans 'hours per customer' %}
+    <small>{{ date_range.0|date:'SHORT_DATE_FORMAT' }} &ndash; {{ date_range.1|date:'SHORT_DATE_FORMAT' }}</small>
+  </h1>
+
+  <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
+
+  <div class="row">
+    {% for user, user_data in users %}
+    <div class="col-md-4">
+      <h2>{{ user }}</h2>
+      <canvas id="user-{{ user.id }}" width="400" height="600"></canvas>
+      <script>
+        new Chart("user-{{ user.id }}", {
+          type: "pie",
+          data: {
+            labels: [{% for org, hours in user_data %}`{{ org }}`, {% endfor %}],
+            datasets: [
+              {
+                label: "",
+                data: [
+                  {% for org, hours in user_data %}{{ hours|stringformat:"1f" }}, {% endfor %}
+                ],
+                backgroundColor: "#ccc",
+              }
+            ],
+          },
+        });
+      </script>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+</div>
+{% endblock %}

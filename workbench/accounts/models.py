@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 from decimal import Decimal
+from functools import total_ordering
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
@@ -53,6 +54,7 @@ class UserManager(BaseUserManager):
         return users[False] + [(_("Active"), users[True])]
 
 
+@total_ordering
 class User(Model, AbstractBaseUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -83,6 +85,9 @@ class User(Model, AbstractBaseUser):
 
     def __str__(self):
         return self.get_full_name()
+
+    def __lt__(self, other):
+        return self.get_full_name() < other.get_full_name()
 
     def get_absolute_url(self):
         return "/"

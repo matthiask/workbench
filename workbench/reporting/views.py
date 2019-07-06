@@ -9,10 +9,11 @@ from django.utils.translation import gettext_lazy as _
 from workbench.circles.reporting import logged_hours_by_circle
 from workbench.invoices.models import Invoice
 from workbench.invoices.reporting import monthly_invoicing
-from workbench.projects.reporting import overdrawn_projects
+from workbench.projects.reporting import hours_per_customer, overdrawn_projects
 from workbench.reporting import key_data
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import Z
+from workbench.tools.validation import monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -154,4 +155,13 @@ def key_data_view(request):
                 ],
             },
         },
+    )
+
+
+def hours_per_customer_view(request):
+    date_range = [monday() - timedelta(days=7), monday() + timedelta(days=6)]
+    return render(
+        request,
+        "reporting/hours_per_customer.html",
+        {"date_range": date_range, "users": hours_per_customer(date_range)},
     )

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-05 10:31+0200\n"
+"POT-Creation-Date: 2019-07-06 10:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,54 +31,54 @@ msgstr ""
 msgid "Please authenticate."
 msgstr "Bitte anmelden."
 
-#: workbench/accounts/models.py:41 workbench/activities/forms.py:32
+#: workbench/accounts/models.py:42 workbench/activities/forms.py:32
 #: workbench/logbook/forms.py:25 workbench/logbook/forms.py:79
 msgid "All users"
 msgstr "Alle Benutzer"
 
-#: workbench/accounts/models.py:43
+#: workbench/accounts/models.py:44
 msgid "Inactive users"
 msgstr "Inaktive Benutzer"
 
-#: workbench/accounts/models.py:44 workbench/accounts/models.py:53
+#: workbench/accounts/models.py:45 workbench/accounts/models.py:54
 #: workbench/activities/forms.py:35
 msgid "Active"
 msgstr "Aktiv"
 
-#: workbench/accounts/models.py:46
+#: workbench/accounts/models.py:47
 msgid "Inactive"
 msgstr "Inaktiv"
 
-#: workbench/accounts/models.py:60 workbench/contacts/models.py:176
+#: workbench/accounts/models.py:62 workbench/contacts/models.py:176
 msgid "email"
 msgstr "Email"
 
-#: workbench/accounts/models.py:61
+#: workbench/accounts/models.py:63
 msgid "is active"
 msgstr "ist aktiv"
 
-#: workbench/accounts/models.py:62
+#: workbench/accounts/models.py:64
 msgid "is admin"
 msgstr "ist Admin"
 
-#: workbench/accounts/models.py:64
+#: workbench/accounts/models.py:66
 msgid "short name"
 msgstr "Kurzer Name"
 
-#: workbench/accounts/models.py:65
+#: workbench/accounts/models.py:67
 msgid "full name"
 msgstr "Voller Name"
 
-#: workbench/accounts/models.py:68
+#: workbench/accounts/models.py:70
 msgid "enforce same week logging"
 msgstr "Stundenerfassung in der gleichen Woche erzwingen"
 
-#: workbench/accounts/models.py:75 workbench/awt/forms.py:12
+#: workbench/accounts/models.py:77 workbench/awt/forms.py:12
 #: workbench/awt/models.py:80 workbench/awt/models.py:126
 msgid "user"
 msgstr "Benutzer"
 
-#: workbench/accounts/models.py:76
+#: workbench/accounts/models.py:78
 msgid "users"
 msgstr "Benutzer"
 
@@ -109,7 +109,7 @@ msgid "Unusual cutoff date (not last of the month)."
 msgstr "Ungewöhnlicher Stichtag (nicht letzter Tag des Monats)."
 
 #: workbench/accruals/models.py:18 workbench/accruals/models.py:22
-#: workbench/accruals/models.py:122 workbench/reporting/views.py:46
+#: workbench/accruals/models.py:122 workbench/reporting/views.py:47
 msgid "cutoff date"
 msgstr "Stichtag"
 
@@ -167,7 +167,7 @@ msgstr "Abgrenzungen erstellt."
 #: workbench/activities/__init__.py:10 workbench/activities/models.py:66
 #: workbench/templates/base.html:95
 #: workbench/templates/deals/deal_detail.html:30
-#: workbench/templates/start.html:55
+#: workbench/templates/start.html:73
 msgid "activities"
 msgstr "Aktivitäten"
 
@@ -714,7 +714,7 @@ msgstr "Valuta"
 #: workbench/templates/reporting/monthly_invoicing.html:17
 #: workbench/templates/reporting/open_items_list.html:23
 #: workbench/templates/reporting/open_items_list.html:42
-#: workbench/tools/models.py:118
+#: workbench/tools/models.py:121
 msgid "total"
 msgstr "Total"
 
@@ -864,6 +864,7 @@ msgstr "%s löschen"
 #: workbench/templates/base.html:28
 #: workbench/templates/contacts/organization_detail.html:39
 #: workbench/templates/projects/project_detail.html:165
+#: workbench/templates/start.html:34
 msgid "invoices"
 msgstr "Rechnungen"
 
@@ -967,7 +968,7 @@ msgid "Closed"
 msgstr "Abgeschlossen"
 
 #: workbench/invoices/models.py:37 workbench/offers/models.py:26
-#: workbench/offers/models.py:38 workbench/templates/start.html:131
+#: workbench/offers/models.py:38 workbench/templates/start.html:26
 msgid "In preparation"
 msgstr "In Vorbereitung"
 
@@ -1214,7 +1215,7 @@ msgstr "Erbracht am"
 #: workbench/templates/projects/project_detail.html:146
 #: workbench/templates/projects/project_detail.html:208
 #: workbench/templates/projects/project_list.html:21
-#: workbench/templates/start.html:40
+#: workbench/templates/start.html:58
 msgid "hours"
 msgstr "Stunden"
 
@@ -1278,7 +1279,7 @@ msgid "Expenses have already been reimbursed, cannot delete entry."
 msgstr "Spesen wurden schon erstattet, kann Eintrag nicht löschen."
 
 #: workbench/offers/__init__.py:10 workbench/offers/models.py:73
-#: workbench/templates/base.html:27
+#: workbench/templates/base.html:27 workbench/templates/start.html:30
 msgid "offers"
 msgstr "Offerten"
 
@@ -1417,28 +1418,28 @@ msgstr ""
 "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht "
 "löschen."
 
-#: workbench/reporting/views.py:78
+#: workbench/reporting/views.py:79
 msgid "Form was invalid."
 msgstr "Formular war ungültig."
 
-#: workbench/reporting/views.py:135
+#: workbench/reporting/views.py:136
 msgid "projection"
 msgstr "Hochrechnung"
 
-#: workbench/reporting/views.py:149
+#: workbench/reporting/views.py:150
 msgid "profitable"
 msgstr "Profitabel"
 
-#: workbench/reporting/views.py:150
+#: workbench/reporting/views.py:151
 msgid "maintenance"
 msgstr "Wartung"
 
-#: workbench/reporting/views.py:151
+#: workbench/reporting/views.py:152
 #: workbench/templates/reporting/overdrawn_projects.html:19
 msgid "overdrawn"
 msgstr "Überzogen"
 
-#: workbench/reporting/views.py:152
+#: workbench/reporting/views.py:153
 msgid "internal"
 msgstr "Intern"
 
@@ -1723,12 +1724,12 @@ msgstr "Keine Geschichte gefunden"
 
 #: workbench/templates/invoices/invoice_detail.html:67
 #: workbench/templates/projects/project_detail.html:47
-#: workbench/tools/models.py:108 workbench/tools/pdf.py:231
+#: workbench/tools/models.py:111 workbench/tools/pdf.py:231
 msgid "subtotal"
 msgstr "Zwischentotal"
 
 #: workbench/templates/invoices/invoice_detail.html:72
-#: workbench/tools/models.py:109 workbench/tools/models.py:150
+#: workbench/tools/models.py:112 workbench/tools/models.py:153
 #: workbench/tools/pdf.py:233
 msgid "discount"
 msgstr "Rabatt"
@@ -1832,6 +1833,11 @@ msgstr "Leistungen aus dem Logbuch"
 msgid "Services from offer"
 msgstr "Leistungen aus Offerte"
 
+#: workbench/templates/reporting/hours_per_customer.html:5
+#: workbench/templates/reporting/hours_per_customer.html:11
+msgid "hours per customer"
+msgstr "Stunden pro Kundschaft"
+
 #: workbench/templates/reporting/key_data.html:17
 msgid "revenue minus third party costs and accruals"
 msgstr "Umsatz minus Fremdkosten minus Abgrenzungen"
@@ -1872,27 +1878,27 @@ msgstr "heute"
 msgid "this week"
 msgstr "diese Woche"
 
-#: workbench/templates/start.html:25
+#: workbench/templates/start.html:43
 msgid "active projects"
 msgstr "Aktive Projekte"
 
-#: workbench/templates/start.html:49
+#: workbench/templates/start.html:67
 msgid "no active projects"
 msgstr "Keine aktiven Projekte"
 
-#: workbench/templates/start.html:76
+#: workbench/templates/start.html:94
 msgid "no important activities"
 msgstr "Keine wichtigen Aktivitäten"
 
-#: workbench/templates/start.html:86
+#: workbench/templates/start.html:104
 msgid "today's hours"
 msgstr "Stunden von heute"
 
-#: workbench/templates/start.html:102 workbench/templates/start.html:124
+#: workbench/templates/start.html:120 workbench/templates/start.html:142
 msgid "no hours today"
 msgstr "keine Stunden heute"
 
-#: workbench/templates/start.html:108
+#: workbench/templates/start.html:126
 msgid "all users' hours"
 msgstr "Stunden von allen"
 
@@ -1969,21 +1975,21 @@ msgstr "'%(field)s' änderte von '%(previous)s' zu '%(current)s'."
 msgid "Cannot delete '%(object)s' because of related objects (%(related)s)."
 msgstr "Kann '%(object)s' wegen Abhängigkeiten nicht löschen (%(related)s)."
 
-#: workbench/tools/models.py:111
+#: workbench/tools/models.py:114
 msgid "liable to VAT"
 msgstr "Mehrwertsteuerpflichtig"
 
-#: workbench/tools/models.py:114
+#: workbench/tools/models.py:117
 msgid "For example invoices to foreign institutions are not liable to VAT."
 msgstr ""
 "zB Rechnungen für ausländische Institutionen sind nicht "
 "mehrwertsteuerpflichtig."
 
-#: workbench/tools/models.py:117
+#: workbench/tools/models.py:120
 msgid "tax rate"
 msgstr "MwSt.-Satz"
 
-#: workbench/tools/models.py:148
+#: workbench/tools/models.py:151
 #, python-format
 msgid "%s excl. tax"
 msgstr "%s exkl. MwSt."
