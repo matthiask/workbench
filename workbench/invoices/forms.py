@@ -469,6 +469,16 @@ class InvoiceDeleteForm(ModelForm):
                 code="release-logged-services",
             )
 
+        if self.instance.down_payment_invoices.exists():
+            self.add_warning(
+                _(
+                    "Down payment invoices are subtracted from this invoice."
+                    " Those down payments will be released when deleting this"
+                    " invoice."
+                ),
+                code="release-down-payments",
+            )
+
     def delete(self):
         LoggedHours.objects.filter(invoice_service__invoice=self.instance).update(
             invoice_service=None, archived_at=None
@@ -476,6 +486,7 @@ class InvoiceDeleteForm(ModelForm):
         LoggedCost.objects.filter(invoice_service__invoice=self.instance).update(
             invoice_service=None, archived_at=None
         )
+        self.instance.down_payment_invoices.update(down_payment_applied_to=None)
         self.instance.delete()
 
 

@@ -688,6 +688,20 @@ class InvoicesTest(TestCase):
         invoice.refresh_from_db()
         self.assertAlmostEqual(invoice.subtotal, 2500)
         self.assertAlmostEqual(invoice.total_excl_tax, 2500)
+        self.assertEqual(invoice.down_payment_applied_to, None)
+
+        down_payment.down_payment_applied_to = invoice
+        down_payment.save(update_fields=["down_payment_applied_to"])
+        invoice.save()
+
+        response = self.client.post(invoice.urls["delete"])
+        self.assertContains(response, "release-down-payments")
+
+        response = self.client.post(
+            invoice.urls["delete"],
+            {WarningsForm.ignore_warnings_id: "release-down-payments"},
+        )
+        self.assertRedirects(response, invoice.urls["list"])
 
     def test_change_contact(self):
         invoice = factories.InvoiceFactory.create(title="Test", subtotal=20)

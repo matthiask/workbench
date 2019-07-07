@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-06 10:46+0200\n"
+"POT-Creation-Date: 2019-07-07 21:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -172,7 +172,7 @@ msgid "activities"
 msgstr "Aktivitäten"
 
 #: workbench/activities/forms.py:15 workbench/deals/forms.py:13
-#: workbench/invoices/forms.py:24 workbench/invoices/forms.py:511
+#: workbench/invoices/forms.py:24 workbench/invoices/forms.py:522
 #: workbench/offers/forms.py:16 workbench/projects/forms.py:17
 msgid "Open"
 msgstr "Offen"
@@ -183,7 +183,7 @@ msgstr "Alle"
 
 #: workbench/activities/forms.py:20 workbench/activities/models.py:54
 #: workbench/deals/models.py:60 workbench/invoices/forms.py:36
-#: workbench/invoices/forms.py:521 workbench/invoices/models.py:92
+#: workbench/invoices/forms.py:532 workbench/invoices/models.py:92
 #: workbench/invoices/models.py:443 workbench/offers/models.py:58
 #: workbench/projects/forms.py:32 workbench/projects/models.py:57
 #: workbench/templates/activities/activity_detail.html:10
@@ -642,7 +642,7 @@ msgid "credit control"
 msgstr "Debitorenmanagement"
 
 #: workbench/credit_control/forms.py:20 workbench/deals/forms.py:12
-#: workbench/invoices/forms.py:23 workbench/invoices/forms.py:511
+#: workbench/invoices/forms.py:23 workbench/invoices/forms.py:522
 #: workbench/offers/forms.py:15 workbench/projects/forms.py:17
 msgid "All states"
 msgstr "Alle Stati"
@@ -959,11 +959,19 @@ msgstr ""
 "Logbuch-Einträge sind mit dieser Rechnung verbunden. Die Verbindung wird "
 "aufgelöst, wenn diese Rechnung gelöscht wird."
 
-#: workbench/invoices/forms.py:487 workbench/projects/forms.py:136
+#: workbench/invoices/forms.py:475
+msgid ""
+"Down payment invoices are subtracted from this invoice. Those down payments "
+"will be released when deleting this invoice."
+msgstr ""
+"Anzahlungsrechnungen wurden von dieser Rechnung abgezogen. Diese Anzahlungen "
+"stehen wieder zur Verfügung für andere Rechnungen, wenn diese gelöscht wird."
+
+#: workbench/invoices/forms.py:498 workbench/projects/forms.py:136
 msgid "Optional, but useful for quickly filling the fields below."
 msgstr "Optional, aber nützlich um Felder unten rasch zu füllen."
 
-#: workbench/invoices/forms.py:511 workbench/projects/forms.py:17
+#: workbench/invoices/forms.py:522 workbench/projects/forms.py:17
 msgid "Closed"
 msgstr "Abgeschlossen"
 
