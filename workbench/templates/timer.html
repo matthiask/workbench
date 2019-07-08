@@ -2,6 +2,8 @@
 
 {% load bootstrap4 static %}
 
+{% block title %}Timer - {{ block.super }}{% endblock %}
+
 {% block body %}
   {# <script src="{% static 'workbench/lib/preact.min.js' %}"></script> #}
   <script type="module" src="{% static 'workbench/timer.js' %}"></script>
