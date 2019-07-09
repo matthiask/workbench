@@ -211,6 +211,9 @@ class Invoice(ModelWithTotal):
                     "Invoice and/or due date missing for selected state."
                 )
 
+        if self.status <= self.SENT and self.closed_on:
+            errors["status"] = _("Invalid status when closed on is already set.")
+
         if self.invoiced_on and self.due_on:
             if self.invoiced_on > self.due_on:
                 errors["due_on"] = _("Due date has to be after invoice date.")
@@ -219,6 +222,7 @@ class Invoice(ModelWithTotal):
             errors["__all__"] = _("Invoices of type %(type)s require a project.") % {
                 "type": self.get_type_display()
             }
+
         raise_if_errors(errors, exclude)
 
     @property

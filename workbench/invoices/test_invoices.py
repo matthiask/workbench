@@ -460,6 +460,16 @@ class InvoicesTest(TestCase):
         )
         self.assertRedirects(response, invoice.urls["detail"])
 
+        invoice.refresh_from_db()
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(invoice, closed_on=local_date_format(date.today())),
+        )
+        self.assertContains(
+            response,
+            "Ungültiger Status wenn &quot;Geschlossen am&quot;-Feld schon gesetzt ist.",
+        )
+
         response = self.client.get(invoice.urls["delete"])
         self.assertRedirects(response, invoice.urls["detail"])
         self.assertEqual(
