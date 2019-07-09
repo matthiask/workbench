@@ -44,6 +44,7 @@ def search(request):
 
 HISTORY = {
     "accounts.user": {"exclude": {"is_admin", "last_login", "password"}},
+    "contacts.person": {"exclude": {"_fts"}},
     "invoices.invoice": {"exclude": {"_code", "_fts"}},
     "invoices.service": {"exclude": {"position"}},
     "offers.offer": {"exclude": {"_code"}},
