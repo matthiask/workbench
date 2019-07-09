@@ -43,3 +43,6 @@ class AccountsTest(TestCase):
                 ("Aktiv", [(u1.pk, "M A")]),
             ],
         )
+
+    def test_ordering(self):
+        self.assertTrue(User(_short_name="a") < User(_full_name="b"))
