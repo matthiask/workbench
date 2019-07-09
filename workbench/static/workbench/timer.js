@@ -192,34 +192,45 @@ class App extends Component {
         <div
           class="timer-panel-tab bg-info text-light px-4 py-2 d-flex align-items-center justify-content-between"
         >
-          Timer ${" "} ${prettyDuration(totalSeconds)}
-          <div class=${this.props.standalone && "d-none"}>
-            <${StandAlone} />
-            ${" "}
-            <${AddProject}
-              addProject=${(id, title) => {
-                if (!state.projects.find(p => p.id === id)) {
-                  this.setState(prevState => {
-                    let projects = Array.from(prevState.projects)
-                    projects.push({id, title})
-                    projects.sort((a, b) => b.id - a.id)
-                    return {
-                      projects,
-                      seconds: Object.assign({}, prevState.seconds, {[id]: 0}),
-                    }
-                  }, this.serialize)
-                }
-              }}
-            />
-            ${" "}
-            <${Reset}
-              reset=${() => {
-                if (confirm("Wirklich zurücksetzen?")) {
-                  this.setState(this.defaultState(), this.serialize)
-                }
-              }}
-            />
-          </div>
+          Timer
+          ${this.props.standalone
+            ? html`
+                <div>
+                  ${totalSeconds > 0 && prettyDuration(totalSeconds)}
+                </div>
+              `
+            : html`
+                <div>
+                  ${totalSeconds > 0 && prettyDuration(totalSeconds)} ${" "}
+                  <${StandAlone} />
+                  ${" "}
+                  <${AddProject}
+                    addProject=${(id, title) => {
+                      if (!state.projects.find(p => p.id === id)) {
+                        this.setState(prevState => {
+                          let projects = Array.from(prevState.projects)
+                          projects.push({id, title})
+                          projects.sort((a, b) => b.id - a.id)
+                          return {
+                            projects,
+                            seconds: Object.assign({}, prevState.seconds, {
+                              [id]: 0,
+                            }),
+                          }
+                        }, this.serialize)
+                      }
+                    }}
+                  />
+                  ${" "}
+                  <${Reset}
+                    reset=${() => {
+                      if (confirm("Wirklich zurücksetzen?")) {
+                        this.setState(this.defaultState(), this.serialize)
+                      }
+                    }}
+                  />
+                </div>
+              `}
         </div>
         <div class="timer-panel-projects list-group list-group-flush">
           ${content}
