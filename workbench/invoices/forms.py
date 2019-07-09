@@ -182,13 +182,13 @@ class InvoiceForm(PostalAddressSelectionForm):
         s_dict = dict(Invoice.STATUS_CHOICES)
 
         if self.instance.status > self.instance.IN_PREPARATION:
-            if set(self.changed_data) - {"status", "closed_on"}:
+            if set(self.changed_data) - {"status", "closed_on", "payment_notice"}:
                 self.add_warning(
                     _(
                         "You are attempting to change %(fields)s."
                         " I am trying to prevent unintentional changes to"
-                        " anything but the status and closed on fields."
-                        " Are you sure?"
+                        " anything but the status, closed on and payment notice"
+                        " fields. Are you sure?"
                     )
                     % {
                         "fields": ", ".join(
