@@ -24,6 +24,7 @@ urlpatterns = [
     url(r"^recurring-invoices/", include("workbench.invoices.recurring_urls")),
     url(r"^credit-control/", include("workbench.credit_control.urls")),
     url(r"^accruals/", include("workbench.accruals.urls")),
+    url(r"^expenses/", include("workbench.expenses.urls")),
     url(r"^search/$", views.search, name="search"),
     url(r"^history/(\w+)/(\w+)/([0-9]+)/$", views.history, name="history"),
     url(r"^report/", include("workbench.reporting.urls")),

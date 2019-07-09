@@ -127,8 +127,13 @@ class LoggedCost(Model):
     archived_at = models.DateTimeField(_("archived at"), blank=True, null=True)
 
     are_expenses = models.BooleanField(_("are expenses"), default=False)
-    expenses_reimbursed_at = models.DateTimeField(
-        _("expenses reimbursed at"), blank=True, null=True
+    expense_report = models.ForeignKey(
+        "expenses.ExpenseReport",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        verbose_name=_("expense report"),
+        related_name="expenses",
     )
 
     class Meta:
@@ -144,10 +149,10 @@ class LoggedCost(Model):
         if instance.invoice_service_id or instance.archived_at:
             messages.error(request, _("Cannot delete archived logged cost entries."))
             return False
-        if instance.expenses_reimbursed_at:
+        if instance.expense_report:
             messages.error(
                 request,
-                _("Expenses have already been reimbursed, cannot delete entry."),
+                _("Expenses are part of an expense report, cannot delete entry."),
             )
         return super().allow_delete(instance, request)
 

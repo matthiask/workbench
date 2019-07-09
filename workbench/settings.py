@@ -43,6 +43,7 @@ INSTALLED_APPS = [
         "workbench.contacts",
         "workbench.credit_control",
         "workbench.deals",
+        "workbench.expenses",
         "workbench.invoices",
         "workbench.logbook",
         "workbench.offers",
