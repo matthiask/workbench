@@ -72,6 +72,7 @@ class Command(BaseCommand):
                 "FNAME": person.given_name,
                 "LNAME": person.family_name,
                 "ANREDE": person.salutation,
+                "DUODERSIE": "Du" if person.address_on_first_name_terms else "Sie",
             }
 
             # get address
