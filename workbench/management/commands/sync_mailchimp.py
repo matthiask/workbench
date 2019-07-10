@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from django.utils.translation import override
 
 from mailchimp3 import MailChimp
 
@@ -78,23 +79,15 @@ class Command(BaseCommand):
             # get address
             address = addresses.get(person.id)
             if address:
-                if address.postal_address_override:
-                    merge_fields["ADDRESS"] = address.postal_address_override
-                else:
-                    merge_fields["ADDRESS"] = "\n".join(
-                        (
-                            f
-                            for f in (
-                                "%s %s" % (address.street, address.house_number),
-                                address.address_suffix,
-                                "%s %s" % (address.postal_code, address.city),
-                                address.country.name
-                                if address.country.code != "CH"
-                                else "",
-                            )
-                            if f
-                        )
-                    )
+                with override(None):
+                    merge_fields["ADDRESS"] = "  ".join([
+                        "%s %s" % (address.street, address.house_number),
+                        address.address_suffix,
+                        address.city,
+                        "",  # Region
+                        address.postal_code,
+                        address.country.code,
+                    ])
 
             # save to mailchimp
             client.lists.members.create_or_update(
