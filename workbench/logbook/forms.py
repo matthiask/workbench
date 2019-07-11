@@ -245,7 +245,7 @@ class LoggedHoursForm(ModelForm):
         else:
             fields = ["rendered_by", "rendered_on", "service", "hours", "description"]
             for field in fields:
-                if data[field] != getattr(latest, field):
+                if data.get(field) != getattr(latest, field):
                     break
             else:
                 self.add_warning(
