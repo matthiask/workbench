@@ -188,6 +188,8 @@ class ContactsTest(TestCase):
             PhoneNumber(phone_number="+41 555 11 11 41 41", **kw).full_clean()
         with self.assertRaises(ValidationError):
             PhoneNumber(phone_number="+41 555 11 11 4", **kw).full_clean()
+        with self.assertRaises(ValidationError):
+            PhoneNumber(phone_number="just some stuff", **kw).full_clean()
 
         nr = PhoneNumber(phone_number="+41 555 11 11 41", **kw)
         nr.full_clean()
