@@ -1,3 +1,4 @@
+import itertools
 import re
 
 from django.db import models
@@ -112,7 +113,12 @@ class Person(Model):
 
     def save(self, *args, **kwargs):
         self._fts = " ".join(
-            str(part) for part in [self.organization.name if self.organization else ""]
+            itertools.chain(
+                [self.organization.name if self.organization else ""],
+                (detail.phone_number for detail in self.phonenumbers.all()),
+                (detail.email for detail in self.emailaddresses.all()),
+                (detail.postal_address for detail in self.postaladdresses.all()),
+            )
         )
         super().save(*args, **kwargs)
 
