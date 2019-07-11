@@ -163,7 +163,8 @@ class InvoiceForm(PostalAddressSelectionForm):
         self.order_fields(
             field
             for field in list(self.fields)
-            if field not in {"discount", "apply_down_payment", "liable_to_vat"}
+            if field
+            not in {"subtotal", "discount", "apply_down_payment", "liable_to_vat"}
         )
 
         self.add_postal_address_selection_if_empty(person=self.instance.contact)

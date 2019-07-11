@@ -86,6 +86,12 @@ class OfferForm(PostalAddressSelectionForm):
             ),
         )
 
+        self.order_fields(
+            field
+            for field in list(self.fields)
+            if field not in {"subtotal", "discount", "liable_to_vat"}
+        )
+
         self.add_postal_address_selection_if_empty(
             person=self.project.contact, organization=self.project.customer
         )
