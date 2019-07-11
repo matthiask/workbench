@@ -33,10 +33,10 @@
       {% endfor %}
       <td class="text-right">{{ row.total_hours|hours }}</td>
     </tr>
-    {% if forloop.counter|divisibleby:10 %}
+    {% if forloop.counter|divisibleby:10 and not forloop.last %}
       <tr>
         <th></th>
-        {% for user in stats.users %}<th>{{ user.get_short_name }}</th>{% endfor %}
+        {% for user in stats.users %}<th class="text-right">{{ user.get_short_name }}</th>{% endfor %}
         <th></th>
       </tr>
     {% endif %}
