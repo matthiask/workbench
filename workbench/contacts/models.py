@@ -3,11 +3,13 @@ import re
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+import phonenumbers
 from django_countries.fields import CountryField
 
 from workbench.accounts.models import User
 from workbench.tools.models import Model, SearchQuerySet
 from workbench.tools.urls import model_urls
+from workbench.tools.validation import raise_if_errors
 
 
 @model_urls
@@ -164,6 +166,22 @@ class PhoneNumber(PersonDetail):
     @property
     def urls(self):
         return self.person.urls
+
+    def clean_fields(self, exclude):
+        super().clean_fields(exclude)
+        errors = {}
+        try:
+            number = phonenumbers.parse(self.phone_number, "CH")
+        except phonenumbers.NumberParseException as exc:
+            errors["phone_number"] = str(exc)
+        else:
+            if phonenumbers.is_valid_number(number):
+                self.phone_number = phonenumbers.format_number(
+                    number, phonenumbers.PhoneNumberFormat.E164
+                )
+            else:
+                errors["phone_number"] = _("Phone number invalid.")
+        raise_if_errors(errors, exclude)
 
 
 class EmailAddress(PersonDetail):

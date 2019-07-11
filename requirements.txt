@@ -27,6 +27,7 @@ mccabe==0.6.1
 oauthlib==3.0.2
 openpyxl==2.6.2
 pdfdocument==3.3
+phonenumbers==8.10.14
 Pillow==6.1.0
 psycopg2-binary==2.8.3
 pycodestyle==2.5.0

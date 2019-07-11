@@ -14,6 +14,7 @@ gunicorn
 lxml
 mailchimp3
 pdfdocument
+phonenumbers
 Pillow
 psycopg2-binary
 reportlab
