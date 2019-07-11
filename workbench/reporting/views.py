@@ -177,8 +177,8 @@ class HoursPerCustomerForm(forms.Form):
         data.setdefault("from_date", local_date_format(monday()))
         data.setdefault("until_date", local_date_format(monday() + timedelta(days=6)))
         super().__init__(data, *args, **kwargs)
-        # self.fields["users"].choices = User.objects.choices(collapse_inactive=False)
-        # self.fields["users"].widget.attrs = {"size": 10}
+        self.fields["users"].choices = User.objects.choices(collapse_inactive=False)
+        self.fields["users"].widget.attrs = {"size": 10}
 
 
 def hours_per_customer_view(request):
@@ -186,7 +186,6 @@ def hours_per_customer_view(request):
     if not form.is_valid():
         messages.warning(request, _("Form was invalid."))
         return redirect(".")
-    print(form.cleaned_data)
     return render(
         request,
         "reporting/hours_per_customer.html",
