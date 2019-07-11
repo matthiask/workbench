@@ -127,3 +127,10 @@ tbody th > a {
     transform: translateY(-36px);
   }
 }
+
+@media print {
+  .tiny-icons,
+  [data-timer] {
+    display: none;
+  }
+}
