@@ -7,38 +7,42 @@
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12 col-md-8">
-  <h1>
-    {% trans 'hours per customer' %}
-    <small>{{ date_range.0|date:'SHORT_DATE_FORMAT' }} &ndash; {{ date_range.1|date:'SHORT_DATE_FORMAT' }}</small>
-  </h1>
+  <h1>{% trans 'hours per customer' %}</h1>
 
-  <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
+  <form method="get" class="mb-3">
+    {% ff_fields form %}
+    {% ff_submit _('show') %}
+  </form>
 
-  <div class="row">
-    {% for user, user_data in users %}
-    <div class="col-md-4">
-      <h2>{{ user }}</h2>
-      <canvas id="user-{{ user.id }}" width="400" height="600"></canvas>
-      <script>
-        new Chart("user-{{ user.id }}", {
-          type: "pie",
-          data: {
-            labels: [{% for org, hours in user_data %}`{{ org }}`, {% endfor %}],
-            datasets: [
-              {
-                label: "",
-                data: [
-                  {% for org, hours in user_data %}{{ hours|stringformat:"1f" }}, {% endfor %}
-                ],
-                backgroundColor: "#ccc",
-              }
-            ],
-          },
-        });
-      </script>
-    </div>
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th></th>
+        {% for user in stats.users %}<th>{{ user.get_short_name }}</th>{% endfor %}
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in stats.organizations %}
+    <tr>
+      <th>{% link_or_none row.organization %}</th>
+      {% for hours in row.user_hours %}
+        {% if hours %}<td class="text-right">{{ hours|hours }}</td>
+        {% else %}<td></td>
+        {% endif %}
+      {% endfor %}
+      <td class="text-right">{{ row.total_hours|hours }}</td>
+    </tr>
+    {% if forloop.counter|divisibleby:10 %}
+      <tr>
+        <th></th>
+        {% for user in stats.users %}<th>{{ user.get_short_name }}</th>{% endfor %}
+        <th></th>
+      </tr>
+    {% endif %}
     {% endfor %}
-  </div>
+    </tbody>
+  </table>
 
 </div>
 </div>

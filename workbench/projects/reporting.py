@@ -54,34 +54,37 @@ def overdrawn_projects():
     )
 
 
-def hours_per_customer(date_range):
+def hours_per_customer(date_range, *, users):
     hours = defaultdict(lambda: defaultdict(lambda: Z))
     seen_organizations = set()
-    users = {user.id: user for user in User.objects.all()}
+    seen_users = set()
 
-    for row in (
-        LoggedHours.objects.order_by()
-        .filter(rendered_on__range=date_range)
-        .values("rendered_by", "service__project__customer")
-        .annotate(Sum("hours"))
+    queryset = LoggedHours.objects.order_by().filter(rendered_on__range=date_range)
+    if users:
+        queryset = queryset.filter(rendered_by__in=users)
+
+    for row in queryset.values("rendered_by", "service__project__customer").annotate(
+        Sum("hours")
     ):
-        hours[users[row["rendered_by"]]][row["service__project__customer"]] = row[
-            "hours__sum"
-        ]
+        hours[row["service__project__customer"]][row["rendered_by"]] = row["hours__sum"]
         seen_organizations.add(row["service__project__customer"])
+        seen_users.add(row["rendered_by"])
 
-    organizations = {
-        org.id: org for org in Organization.objects.filter(id__in=seen_organizations)
-    }
-    users = []
-    for user, user_hours in sorted(hours.items()):
-        user_data = [
-            (organizations[org_id], hours)
-            for org_id, hours in sorted(
-                user_hours.items(), key=lambda row: row[1], reverse=True
-            )
-        ]
-        users.append(
-            (user, user_data[:6] + [("Rest", sum(row[1] for row in user_data[6:]))])
+    organizations = []
+    user_list = User.objects.filter(id__in=seen_users)
+
+    for org in Organization.objects.filter(id__in=seen_organizations):
+        organizations.append(
+            {
+                "organization": org,
+                "user_hours": [hours[org.id][user.id] for user in user_list],
+                "total_hours": sum(hours[org.id].values(), Z),
+            }
         )
-    return users
+
+    return {
+        "organizations": sorted(
+            organizations, key=lambda row: row["total_hours"], reverse=True
+        ),
+        "users": user_list,
+    }

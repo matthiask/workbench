@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext_lazy as _
 
+from workbench.accounts.models import User
 from workbench.circles.reporting import logged_hours_by_circle
 from workbench.invoices.models import Invoice
 from workbench.invoices.reporting import monthly_invoicing
@@ -158,10 +159,42 @@ def key_data_view(request):
     )
 
 
+class HoursPerCustomerForm(forms.Form):
+    from_date = forms.DateField(
+        label=_("from"),
+        required=False,
+        widget=forms.TextInput(attrs={"class": "datepicker"}),
+    )
+    until_date = forms.DateField(
+        label=_("until"),
+        required=False,
+        widget=forms.TextInput(attrs={"class": "datepicker"}),
+    )
+    users = forms.ModelMultipleChoiceField(User.objects.all(), required=False)
+
+    def __init__(self, data, *args, **kwargs):
+        data = data.copy()
+        data.setdefault("from_date", local_date_format(monday()))
+        data.setdefault("until_date", local_date_format(monday() + timedelta(days=6)))
+        super().__init__(data, *args, **kwargs)
+        # self.fields["users"].choices = User.objects.choices(collapse_inactive=False)
+        # self.fields["users"].widget.attrs = {"size": 10}
+
+
 def hours_per_customer_view(request):
-    date_range = [monday() - timedelta(days=7), monday() + timedelta(days=6)]
+    form = HoursPerCustomerForm(request.GET)
+    if not form.is_valid():
+        messages.warning(request, _("Form was invalid."))
+        return redirect(".")
+    print(form.cleaned_data)
     return render(
         request,
         "reporting/hours_per_customer.html",
-        {"date_range": date_range, "users": hours_per_customer(date_range)},
+        {
+            "form": form,
+            "stats": hours_per_customer(
+                [form.cleaned_data["from_date"], form.cleaned_data["until_date"]],
+                users=form.cleaned_data["users"],
+            ),
+        },
     )
