@@ -63,6 +63,8 @@
       {% trans 'Update' %}</a>
     <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-secondary">
       {% trans 'Copy' %}</a>
+    <a href="{{ object.urls.statistics }}" class="btn btn-secondary" data-toggle="ajaxmodal">
+      {% trans 'statistics' %}</a>
     <a href="{{ project.urls.delete }}" class="btn btn-outline-danger float-right">
       {% trans 'Delete' %}</a>
 

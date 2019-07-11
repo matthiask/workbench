@@ -1,0 +1,37 @@
+{% extends 'modal.html' %}
+
+{% load bootstrap4 i18n workbench %}
+
+{% block size %}modal-xl{% endblock %}
+
+{% block title %}{% trans 'statistics' %}{% endblock %}
+
+{% block body %}
+
+<h2>{% trans 'logged hours per effort rate' %}</h2>
+{% for rate, hours in object.grouped_services.logged_hours_per_effort_rate %}
+{{ hours|hours }} à {{ rate|default_if_none:'?' }}<br>
+{% endfor %}
+
+<h2>{% trans 'logged hours per user' %}</h2>
+{% trans 'project' %}:
+{% for user, hours in object.grouped_services.logged_hours_per_user %}
+  {{ hours|hours }} {{ user.get_short_name }}
+  {% if not forloop.last %} / {% endif %}
+{% endfor %}
+<br>
+
+{% for offer, services in object.grouped_services.offers %}
+  {% for row in services %}
+    {% for user, hours in row.logged_hours_per_user %}
+      {% if forloop.first %}
+      {{ row.service.title }}:
+      {% endif %}
+      {{ hours|hours }} {{ user.get_short_name }}
+      {% if not forloop.last %} / {% endif %}
+      {% if forloop.last %}</br>{% endif %}
+    {% endfor %}
+  {% endfor %}
+{% endfor %}
+
+{% endblock %}

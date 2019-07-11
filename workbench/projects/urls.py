@@ -43,6 +43,11 @@ urlpatterns = [
         name="projects_project_detail",
     ),
     url(
+        r"^(?P<pk>\d+)/statistics/$",
+        generic.DetailView.as_view(model=Project, template_name_suffix="_statistics"),
+        name="projects_project_statistics",
+    ),
+    url(
         r"^create/$",
         generic.CreateView.as_view(form_class=ProjectForm, model=Project),
         name="projects_project_create",

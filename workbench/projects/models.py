@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import date
+from decimal import Decimal
 
 from django.contrib import messages
 from django.db import models
@@ -153,6 +154,7 @@ class Project(Model):
 
         logged_hours_per_service_and_user = defaultdict(dict)
         logged_hours_per_user = defaultdict(lambda: Z)
+        logged_hours_per_effort_rate = defaultdict(lambda: Z)
 
         for row in (
             LoggedHours.objects.order_by()
@@ -183,9 +185,11 @@ class Project(Model):
             row = {
                 "service": service,
                 "logged_hours": sum(logged.values(), Z),
-                "logged_hours_per_user": {
-                    users[user]: hours for user, hours in logged.items()
-                },
+                "logged_hours_per_user": sorted(
+                    ((users[user], hours) for user, hours in logged.items()),
+                    key=lambda row: row[1],
+                    reverse=True,
+                ),
                 "logged_cost": logged_cost_per_service.get(service.id, Z),
             }
 
@@ -194,6 +198,7 @@ class Project(Model):
 
             total_service_cost += service.service_cost
             total_logged_cost += row["logged_cost"]
+            logged_hours_per_effort_rate[service.effort_rate] += row["logged_hours"]
 
             if service.effort_rate is not None:
                 total_logged_cost += service.effort_rate * row["logged_hours"]
@@ -230,9 +235,19 @@ class Project(Model):
                 ),
             ),
             "logged_hours": logged_hours,
-            "logged_hours_per_user": {
-                users[user]: hours for user, hours in logged_hours_per_user.items()
-            },
+            "logged_hours_per_user": sorted(
+                ((users[user], hours) for user, hours in logged_hours_per_user.items()),
+                key=lambda row: row[1],
+                reverse=True,
+            ),
+            "logged_hours_per_effort_rate": sorted(
+                (
+                    (rate, hours)
+                    for rate, hours in logged_hours_per_effort_rate.items()
+                    if hours
+                ),
+                key=lambda row: row[0] or Decimal("9999999"),
+            ),
             "service_hours": service_hours,
             "total_service_cost": total_service_cost,
             "total_logged_cost": total_logged_cost,
