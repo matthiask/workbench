@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-11 16:59+0200\n"
+"POT-Creation-Date: 2019-07-11 17:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -481,7 +481,8 @@ msgstr "Keine Begrüssung gesetzt. Das macht Newsletter hässlich."
 
 #: workbench/contacts/forms.py:120
 msgid "This does not look right. Please add a full salutation."
-msgstr "Das sieht nicht korrekt aus. Bitte definiere eine vollständige Begrüssung."
+msgstr ""
+"Das sieht nicht korrekt aus. Bitte definiere eine vollständige Begrüssung."
 
 #: workbench/contacts/forms.py:154
 #, python-format
@@ -565,8 +566,8 @@ msgid "address on first-name terms"
 msgstr "Anrede per Du"
 
 #: workbench/contacts/models.py:73
-msgid "salutation"
-msgstr "Begrüssung"
+msgid "complete salutation"
+msgstr "vollständige Begrüssung"
 
 #: workbench/contacts/models.py:76
 msgid "Dear John/Dear Ms Smith"

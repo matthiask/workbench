@@ -70,7 +70,7 @@ class Person(Model):
         _("address on first-name terms"), default=False
     )
     salutation = models.CharField(
-        _("salutation"),
+        _("complete salutation"),
         max_length=100,
         blank=True,
         help_text=_("Dear John/Dear Ms Smith"),

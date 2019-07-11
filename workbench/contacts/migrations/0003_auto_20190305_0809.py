@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 help_text="Dear John/Dear Ms Smith",
                 max_length=100,
-                verbose_name="salutation",
+                verbose_name="complete salutation",
             ),
         ),
         migrations.AlterField(
