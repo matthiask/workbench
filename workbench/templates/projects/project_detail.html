@@ -94,16 +94,16 @@
         </div>
       </div>
       <div class="list-group list-group-flush" data-sortable-container>
-        {% for service in services %}
-        <div class="list-group-item" {% if service.pk %}data-sortable-item="{{ service.pk }}"{% endif %}>
-          {% if service.pk %}
+        {% for row in services %}
+        <div class="list-group-item" {% if row.service.pk %}data-sortable-item="{{ row.service.pk }}"{% endif %}>
+          {% if row.service.pk %}
             <div class="float-right">
-              <a class="btn btn-secondary btn-sm" href="{{ service.urls.update }}" data-toggle="ajaxmodal" title="{% trans 'Update' %}">
+              <a class="btn btn-secondary btn-sm" href="{{ row.service.urls.update }}" data-toggle="ajaxmodal" title="{% trans 'Update' %}">
                 {% include 'svg/pencil.svg' %}</a>
-              <a class="btn btn-secondary btn-sm" href="{{ service.urls.delete }}" data-toggle="ajaxmodal" title="{% trans 'Merge' %}">
+              <a class="btn btn-secondary btn-sm" href="{{ row.service.urls.delete }}" data-toggle="ajaxmodal" title="{% trans 'Merge' %}">
                 {% include 'svg/git-merge.svg' %}</a>
               {% if not offer %}
-                <a class="btn btn-secondary btn-sm" href="{{ service.urls.move }}" data-toggle="ajaxmodal" title="{% trans 'Move to other project' %}">
+                <a class="btn btn-secondary btn-sm" href="{{ row.service.urls.move }}" data-toggle="ajaxmodal" title="{% trans 'Move to other project' %}">
                   {% include 'svg/link-external.svg' %}</a>
               {% endif %}
               <a href="" class="btn btn-secondary btn-sm" title="{% trans 'Sort' %}" data-sortable-grabber>
@@ -111,39 +111,39 @@
             </div>
           {% endif %}
 
-          <h5 class="mb-1">{{ service.title }} {% history_link service %}</h5>
+          <h5 class="mb-1">{{ row.service.title }} {% history_link row.service %}</h5>
           <p>
-            {{ service.description|linebreaksbr|default:'&nbsp;' }}
+            {{ row.service.description|linebreaksbr|default:'&nbsp;' }}
           </p>
           <small class="row justify-content-between">
             <span class="col-md-4">
-              {% if service.pk %}
-                <a href="{% url 'logbook_loggedhours_list' %}?service={{ service.pk }}" target="_blank">
-                  {{ service.logged_hours|hours }}
+              {% if row.service.pk %}
+                <a href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}" target="_blank">
+                  {{ row.logged_hours|hours }}
                   /
-                  {% if service.effort_type %}
-                    {{ service.service_hours|hours }} {{ service.effort_type }}
+                  {% if row.service.effort_type %}
+                    {{ row.service.service_hours|hours }} {{ row.service.effort_type }}
                   {% else %}
-                    {% blocktrans with hours=service.service_hours|hours %}{{ hours }} with undefined rate){% endblocktrans %}
+                    {% blocktrans with hours=row.service.service_hours|hours %}{{ hours }} with undefined rate){% endblocktrans %}
                   {% endif %}
                 </a>
-                {% bar service.logged_hours service.service_hours %}
+                {% bar row.logged_hours row.service.service_hours %}
               {% endif %}
             </span>
             <span class="col-md-4">
-              <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;service={{ service.pk|default:0 }}" target="_blank">
-                {{ service.logged_cost|stringformat:'.2f' }} / {{ service.cost|default:0|stringformat:'.2f' }}
+              <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;service={{ row.service.pk|default:0 }}" target="_blank">
+                {{ row.logged_cost|stringformat:'.2f' }} / {{ row.service.cost|default:0|stringformat:'.2f' }}
               </a>
-              {% if service.pk %}{% bar service.logged_cost service.service_cost %}{% endif %}
+              {% if row.service.pk %}{% bar row.logged_cost row.service.service_cost %}{% endif %}
             </span>
             <span class="col-md-4 text-right">
-              {% if service.allow_logging %}
-                {% if service.pk %}
-                  <a href="{{ project.urls.createhours }}?service={{ service.pk }}"
+              {% if row.service.allow_logging %}
+                {% if row.service.pk %}
+                  <a href="{{ project.urls.createhours }}?service={{ row.service.pk }}"
                     data-toggle="ajaxmodal">
                     {% include "svg/plus.svg" %} {% trans 'hours' %}</a>
                 {% endif %}
-                <a href="{{ project.urls.createcost }}?service={{ service.pk|default:'' }}"
+                <a href="{{ project.urls.createcost }}?service={{ row.service.pk|default:'' }}"
                   data-toggle="ajaxmodal">
                   {% include "svg/plus.svg" %} {% trans 'cost' %}</a>
               {% endif %}

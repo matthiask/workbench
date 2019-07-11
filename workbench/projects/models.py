@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import date
 
 from django.contrib import messages
@@ -150,13 +151,20 @@ class Project(Model):
         }
         offers[None] = (None, [])
 
-        logged_hours_per_service = {
-            row["service"]: row["hours__sum"]
-            for row in LoggedHours.objects.order_by()
+        logged_hours_per_service_and_user = defaultdict(dict)
+        logged_hours_per_user = defaultdict(lambda: Z)
+
+        for row in (
+            LoggedHours.objects.order_by()
             .filter(service__project=self)
-            .values("service")
+            .values("service", "rendered_by")
             .annotate(Sum("hours"))
-        }
+        ):
+            logged_hours_per_user[row["rendered_by"]] += row["hours__sum"]
+            logged_hours_per_service_and_user[row["service"]][row["rendered_by"]] = row[
+                "hours__sum"
+            ]
+
         logged_cost_per_service = {
             row["service"]: row["cost__sum"]
             for row in LoggedCost.objects.order_by()
@@ -165,31 +173,49 @@ class Project(Model):
             .annotate(Sum("cost"))
         }
 
+        users = {
+            user.id: user
+            for user in User.objects.filter(id__in=logged_hours_per_user.keys())
+        }
+
         for service in self.services.all():
-            service.logged_hours = logged_hours_per_service.get(service.id, 0)
-            service.logged_cost = logged_cost_per_service.get(service.id, 0)
-            offers[service.offer_id][1].append(service)
+            logged = logged_hours_per_service_and_user.get(service.id, {})
+            row = {
+                "service": service,
+                "logged_hours": sum(logged.values(), Z),
+                "logged_hours_per_user": {
+                    users[user]: hours for user, hours in logged.items()
+                },
+                "logged_cost": logged_cost_per_service.get(service.id, Z),
+            }
 
             service_hours += service.service_hours
-            logged_hours += service.logged_hours
+            logged_hours += row["logged_hours"]
 
             total_service_cost += service.service_cost
-            total_logged_cost += service.logged_cost
+            total_logged_cost += row["logged_cost"]
+
             if service.effort_rate is not None:
-                total_logged_cost += service.effort_rate * service.logged_hours
+                total_logged_cost += service.effort_rate * row["logged_hours"]
             else:
                 total_service_hours_rate_undefined += service.service_hours
-                total_logged_hours_rate_undefined += service.logged_hours
+                total_logged_hours_rate_undefined += row["logged_hours"]
+
+            offers[service.offer_id][1].append(row)
 
         if None in logged_cost_per_service:
-            service = Service(
-                title=gettext("Not bound to a particular service."), service_cost=Z
+            offers[None][1].append(
+                {
+                    "service": Service(
+                        title=gettext("Not bound to a particular service."),
+                        service_cost=Z,
+                    ),
+                    "logged_hours": Z,
+                    "logged_cost": logged_cost_per_service[None],
+                }
             )
-            service.logged_hours = Z
-            service.logged_cost = logged_cost_per_service[None]
-            offers[None][1].append(service)
 
-            total_logged_cost += service.logged_cost
+            total_logged_cost += logged_cost_per_service[None]
 
         return {
             "offers": sorted(
@@ -204,6 +230,9 @@ class Project(Model):
                 ),
             ),
             "logged_hours": logged_hours,
+            "logged_hours_per_user": {
+                users[user]: hours for user, hours in logged_hours_per_user.items()
+            },
             "service_hours": service_hours,
             "total_service_cost": total_service_cost,
             "total_logged_cost": total_logged_cost,

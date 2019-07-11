@@ -85,7 +85,7 @@ class StatisticsTest(TestCase):
 
         grouped = project.grouped_services
         self.assertEqual(len(grouped["offers"]), 1)
-        self.assertIs(grouped["offers"][0][0], None)
+        self.assertIs(grouped["offers"][0][0], None)  # Offer is None
         self.assertEqual(grouped["logged_hours"], Decimal(40))
         self.assertEqual(grouped["service_hours"], 0)
         self.assertEqual(grouped["total_logged_cost"], Decimal(3600))

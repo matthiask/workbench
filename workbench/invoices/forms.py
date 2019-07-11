@@ -294,31 +294,32 @@ class CreateProjectInvoiceForm(InvoiceForm):
         source = self.request.GET.get("source")
         if source == "logbook":
 
-            def amount(service):
-                if not service.pk:
+            def amount(row):
+                if not row["service"].pk:
                     return format_html(
                         '{} <small class="bg-warning px-1">{}</small>',
-                        currency(service.service_cost),
+                        currency(row["service"].service_cost),
                         _("%s logged but not bound to a service.")
-                        % currency(service.logged_cost),
+                        % currency(row["logged_cost"]),
                     )
-                elif service.effort_rate is not None:
+                elif row["service"].effort_rate is not None:
                     return currency(
-                        service.effort_rate * service.logged_hours + service.logged_cost
+                        row["service"].effort_rate * row["logged_hours"]
+                        + row["logged_cost"]
                     )
-                elif service.logged_hours:
+                elif row["logged_hours"]:
                     return format_html(
                         '{} <small class="bg-warning px-1">{}</small>',
-                        currency(service.service_cost),
+                        currency(row["service"].service_cost),
                         _("%s logged but no hourly rate defined.")
-                        % hours(service.logged_hours),
+                        % hours(row["logged_hours"]),
                     )
-                return currency(service.logged_cost)
+                return currency(row["logged_cost"])
 
         else:
 
-            def amount(service):
-                return currency(service.service_cost)
+            def amount(row):
+                return currency(row["service"].service_cost)
 
         choices = []
         for offer, services in self.project.grouped_services["offers"]:
@@ -335,18 +336,18 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     ),
                     [
                         (
-                            service.id,
+                            row["service"].id,
                             format_html(
                                 '<div class="mb-2"><strong>{}</strong>'
                                 "<br>{}{}</div>",
-                                service.title,
-                                format_html("{}<br>", service.description)
-                                if service.description
+                                row["service"].title,
+                                format_html("{}<br>", row["service"].description)
+                                if row["service"].description
                                 else "",
-                                amount(service),
+                                amount(row),
                             ),
                         )
-                        for service in services
+                        for row in services
                     ],
                 )
             )
