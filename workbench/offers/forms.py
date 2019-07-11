@@ -49,6 +49,8 @@ class OfferForm(PostalAddressSelectionForm):
             "owned_by",
             "status",
             "postal_address",
+            "subtotal",
+            "discount",
             "liable_to_vat",
         )
         widgets = {
@@ -87,6 +89,7 @@ class OfferForm(PostalAddressSelectionForm):
         self.add_postal_address_selection_if_empty(
             person=self.project.contact, organization=self.project.customer
         )
+        self.fields["subtotal"].disabled = True
 
     def clean(self):
         data = super().clean()

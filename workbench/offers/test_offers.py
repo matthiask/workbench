@@ -48,8 +48,8 @@ class OffersTest(TestCase):
 
         offer = Offer.objects.get()
         self.assertRedirects(response, offer.get_absolute_url())
-        self.assertAlmostEqual(offer.total_excl_tax, Decimal("2000"))
-        self.assertAlmostEqual(offer.total, Decimal("2154"))
+        self.assertAlmostEqual(offer.total_excl_tax, Decimal("1990"))
+        self.assertAlmostEqual(offer.total, Decimal("2143.25"))
 
         pdf = self.client.get(offer.urls["pdf"])
         self.assertEqual(pdf.status_code, 200)  # No crash
@@ -57,7 +57,7 @@ class OffersTest(TestCase):
         # Deleting the service automagically updates the offer
         offer.services.get().delete()
         offer.refresh_from_db()
-        self.assertAlmostEqual(offer.total_excl_tax, Decimal("0"))
+        self.assertAlmostEqual(offer.total_excl_tax, Decimal("-10"))
 
     def test_update_offer(self):
         offer = factories.OfferFactory.create(title="Test")
