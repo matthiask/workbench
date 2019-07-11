@@ -80,14 +80,16 @@ class Command(BaseCommand):
             address = addresses.get(person.id)
             if address:
                 with override(None):
-                    merge_fields["ADDRESS"] = "  ".join([
-                        "%s %s" % (address.street, address.house_number),
-                        address.address_suffix,
-                        address.city,
-                        "",  # Region
-                        address.postal_code,
-                        address.country.code,
-                    ])
+                    merge_fields["ADDRESS"] = "  ".join(
+                        [
+                            "%s %s" % (address.street, address.house_number),
+                            address.address_suffix,
+                            address.city,
+                            "",  # Region
+                            address.postal_code,
+                            address.country.code,
+                        ]
+                    )
 
             # save to mailchimp
             client.lists.members.create_or_update(

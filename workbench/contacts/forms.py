@@ -14,6 +14,7 @@ from workbench.contacts.models import (
     PostalAddress,
 )
 from workbench.tools.forms import Autocomplete, ModelForm, Textarea
+from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
 class OrganizationSearchForm(forms.Form):
@@ -48,6 +49,12 @@ class PersonSearchForm(forms.Form):
         if data.get("g"):
             queryset = queryset.filter(groups=data.get("g"))
         return queryset
+
+    def response(self, request, queryset):
+        if request.GET.get("xlsx"):
+            xlsx = WorkbenchXLSXDocument()
+            xlsx.people(queryset)
+            return xlsx.to_response("people.xlsx")
 
 
 class OrganizationForm(ModelForm):

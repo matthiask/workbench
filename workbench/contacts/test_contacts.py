@@ -91,6 +91,9 @@ class ContactsTest(TestCase):
         response = self.client.get("/contacts/people/?g=" + str(group2.pk))
         self.assertNotContains(response, person.full_name)
 
+        response = self.client.get("/contacts/people/?xlsx=1")
+        self.assertEqual(response.status_code, 200)
+
     def test_organization_list(self):
         group1 = Group.objects.create(title="A")
         group2 = Group.objects.create(title="B")
