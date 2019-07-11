@@ -41,6 +41,15 @@ class ContactsTest(TestCase):
         )
 
         response = self.client.post(
+            person.urls["update"], person_to_dict(person, salutation="Dear")
+        )
+        self.assertContains(
+            response,
+            "Das sieht nicht korrekt aus."
+            " Bitte definiere eine vollständige Begrüssung.",
+        )
+
+        response = self.client.post(
             person.urls["update"], person_to_dict(person, salutation="Dear John")
         )
         self.assertRedirects(response, person.urls["detail"])
