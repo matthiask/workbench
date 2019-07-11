@@ -161,16 +161,18 @@ def key_data_view(request):
 
 class HoursPerCustomerForm(forms.Form):
     from_date = forms.DateField(
-        label=_("from"),
+        label=_("date from"),
         required=False,
         widget=forms.TextInput(attrs={"class": "datepicker"}),
     )
     until_date = forms.DateField(
-        label=_("until"),
+        label=_("date until"),
         required=False,
         widget=forms.TextInput(attrs={"class": "datepicker"}),
     )
-    users = forms.ModelMultipleChoiceField(User.objects.all(), required=False)
+    users = forms.ModelMultipleChoiceField(
+        User.objects.all(), label=_("users"), required=False
+    )
 
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
