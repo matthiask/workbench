@@ -1,7 +1,8 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from workbench import factories
-from workbench.contacts.models import Group
+from workbench.contacts.models import Group, PhoneNumber
 from workbench.tools.testing import messages
 
 
@@ -170,3 +171,19 @@ class ContactsTest(TestCase):
     def test_contacts_redirect(self):
         self.client.force_login(factories.UserFactory.create())
         self.assertRedirects(self.client.get("/contacts/"), "/contacts/people/")
+
+    def test_phone_numbers(self):
+        person = factories.PersonFactory.create()
+        kw = {"person": person, "type": "work"}
+        with self.assertRaises(ValidationError):
+            PhoneNumber(phone_number="+41 555 11 11 41 41", **kw).full_clean()
+        with self.assertRaises(ValidationError):
+            PhoneNumber(phone_number="+41 555 11 11 4", **kw).full_clean()
+
+        nr = PhoneNumber(phone_number="+41 555 11 11 41", **kw)
+        nr.full_clean()
+        self.assertEqual(nr.phone_number, "+41555111141")
+
+        nr = PhoneNumber(phone_number="055 511 11 41", **kw)
+        nr.full_clean()
+        self.assertEqual(nr.phone_number, "+41555111141")
