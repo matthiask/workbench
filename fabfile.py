@@ -78,3 +78,11 @@ def freeze():
         ' | grep -vE "(^pkg-resources)"'
         ") > requirements.txt"
     )
+
+
+@task
+def setup():
+    local("python3 -m venv venv")
+    local("venv/bin/pip install -U pip wheel")
+    local("venv/bin/pip install -r requirements.txt")
+    local("yarn")
