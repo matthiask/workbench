@@ -40,13 +40,13 @@ class ContactsTest(TestCase):
         )
 
         response = self.client.post(
-            person.urls["update"], person_to_dict(person, salutation="Dear")
+            person.urls["update"], person_to_dict(person, salutation="Dear John")
         )
         self.assertRedirects(response, person.urls["detail"])
 
     def test_warning(self):
         person = factories.PersonFactory.create(
-            organization=factories.OrganizationFactory.create(), salutation="Dear"
+            organization=factories.OrganizationFactory.create(), salutation="Dear John"
         )
         factories.ProjectFactory.create(customer=person.organization, contact=person)
 
