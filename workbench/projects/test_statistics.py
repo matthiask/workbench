@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from workbench import factories
 from workbench.projects.models import Project
-from workbench.projects.reporting import overdrawn_projects
+from workbench.projects.reporting import hours_per_customer, overdrawn_projects
 from workbench.reporting import key_data
 from workbench.tools.models import Z
 
@@ -104,3 +104,8 @@ class StatisticsTest(TestCase):
         self.assertEqual(gh.internal, 0)
         self.assertEqual(gh.total, Decimal(40))
         self.assertEqual(gh.green, 0)
+
+        hpc = hours_per_customer(date_range)
+        self.assertEqual(hpc["organizations"][0]["total_hours"], Decimal(40))
+        self.assertEqual(len(hpc["organizations"]), 1)
+        self.assertEqual(len(hpc["users"]), 3)

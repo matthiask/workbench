@@ -54,7 +54,7 @@ def overdrawn_projects():
     )
 
 
-def hours_per_customer(date_range, *, users):
+def hours_per_customer(date_range, *, users=None):
     hours = defaultdict(lambda: defaultdict(lambda: Z))
     seen_organizations = set()
     seen_users = set()
