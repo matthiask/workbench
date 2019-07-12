@@ -121,10 +121,25 @@ class AccrualsTest(TestCase):
         self.assertEqual(accruals[(2019, 1)]["accrual"], Decimal(20))
         self.assertEqual(accruals[(2019, 1)]["delta"], Decimal(-20))
 
+        invoiced = key_data.invoiced_by_month([date(2018, 1, 1), date(2019, 2, 28)])
+        self.assertEqual(len(invoiced), 1)
+        self.assertEqual(len(invoiced[2018]), 1)
+        self.assertEqual(invoiced[2018][12], Decimal(200))
+
         invoiced = key_data.invoiced_corrected([date(2018, 1, 1), date(2019, 2, 28)])
         self.assertEqual(len(invoiced), 1)
         self.assertEqual(len(invoiced[2018]), 1)
         self.assertEqual(invoiced[2018][12], Decimal(160))
+
+        factories.LoggedCostFactory.create(
+            rendered_on=date(2018, 12, 25),
+            third_party_costs=10,
+        )
+
+        invoiced = key_data.invoiced_corrected([date(2018, 1, 1), date(2019, 2, 28)])
+        self.assertEqual(len(invoiced), 1)
+        self.assertEqual(len(invoiced[2018]), 1)
+        self.assertEqual(invoiced[2018][12], Decimal(150))
 
     def test_future_cutoff_dates(self):
         self.client.force_login(factories.UserFactory.create())
