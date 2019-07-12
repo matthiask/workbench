@@ -65,7 +65,7 @@ class Command(BaseCommand):
             if not email:
                 continue
 
-            print(u"{0} {1}".format(person, email.email).encode("utf-8"))
+            print(u"{0} {1}".format(person.full_name, email.email).encode("utf-8"))
 
             # construct merge fields (will be extendend below)
             merge_fields = {
