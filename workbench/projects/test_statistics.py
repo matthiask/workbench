@@ -74,7 +74,7 @@ class StatisticsTest(TestCase):
             project.not_archived_total, {"total": Z, "hours_rate_undefined": Z}
         )
 
-        factories.LoggedHoursFactory.create(service=service1, hours=10)
+        hours = factories.LoggedHoursFactory.create(service=service1, hours=10)
         project = Project.objects.get()
         self.assertEqual(
             project.not_archived_total,
@@ -109,3 +109,8 @@ class StatisticsTest(TestCase):
         self.assertEqual(hpc["organizations"][0]["total_hours"], Decimal(40))
         self.assertEqual(len(hpc["organizations"]), 1)
         self.assertEqual(len(hpc["users"]), 3)
+
+        hpc = hours_per_customer(date_range, users=[hours.rendered_by])
+        self.assertEqual(hpc["organizations"][0]["total_hours"], Decimal(10))
+        self.assertEqual(len(hpc["organizations"]), 1)
+        self.assertEqual(len(hpc["users"]), 1)
