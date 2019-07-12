@@ -120,6 +120,31 @@ class LogbookTest(TestCase):
             "</a>".format(project.id),
         )
 
+    def test_log_and_both_service_create(self):
+        service = factories.ServiceFactory.create()
+
+        self.client.force_login(service.project.owned_by)
+
+        response = self.client.post(
+            service.project.urls["createhours"],
+            {
+                "rendered_by": service.project.owned_by_id,
+                "rendered_on": local_date_format(date.today()),
+                "service": service.id,
+                "hours": "0.1",
+                "description": "Test",
+                "service_title": "service title",
+                "service_description": "service description",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "Falls Du eine neue Leistung erstellen willst, darfst Du keine"
+            " existierende Leistung wählen.",
+        )
+
     def test_invalid_date(self):
         service = factories.ServiceFactory.create()
         self.client.force_login(service.project.owned_by)

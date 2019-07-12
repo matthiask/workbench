@@ -214,6 +214,10 @@ class LoggedHoursForm(ModelForm):
             errors["service"] = _(
                 "This field is required unless you create a new service."
             )
+        elif data["service"] and data.get("service_title"):
+            errors["service"] = _(
+                "Deselect the existing service if you want to create a new service."
+            )
         if self.project.closed_on:
             self.add_warning(
                 _("This project is already closed."), code="project-closed"

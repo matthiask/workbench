@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-11 17:01+0200\n"
+"POT-Creation-Date: 2019-07-12 15:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1208,28 +1208,32 @@ msgstr "Leistung"
 msgid "This field is required unless you create a new service."
 msgstr "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung."
 
-#: workbench/logbook/forms.py:219 workbench/logbook/forms.py:318
+#: workbench/logbook/forms.py:219
+msgid "Deselect the existing service if you want to create a new service."
+msgstr "Falls Du eine neue Leistung erstellen willst, darfst Du keine existierende Leistung wählen."
+
+#: workbench/logbook/forms.py:223 workbench/logbook/forms.py:322
 #: workbench/projects/forms.py:223
 msgid "This project is already closed."
 msgstr "Dieses Projekt wurde schon geschlossen."
 
-#: workbench/logbook/forms.py:223 workbench/logbook/forms.py:322
+#: workbench/logbook/forms.py:227 workbench/logbook/forms.py:326
 msgid "This entry is already part of an invoice."
 msgstr "Dieser Eintrag ist schon Teil einer Rechnung."
 
-#: workbench/logbook/forms.py:234
+#: workbench/logbook/forms.py:238
 msgid "Sorry, hours have to be logged in the same week."
 msgstr "Tut mir leid, Stunden müssen in der gleichen Woche erfasst werden."
 
-#: workbench/logbook/forms.py:237
+#: workbench/logbook/forms.py:241
 msgid "Sorry, too early."
 msgstr "Tut mir leid, zu früh."
 
-#: workbench/logbook/forms.py:252
+#: workbench/logbook/forms.py:256
 msgid "This seems to be a duplicate. Is it?"
 msgstr "Scheint ein Duplikat zu sein. Oder nicht?"
 
-#: workbench/logbook/forms.py:327
+#: workbench/logbook/forms.py:331
 msgid "Providing third party costs is necessary for expenses."
 msgstr "Fremdkosten müssen für Spesen angegeben werden."
 
@@ -1558,6 +1562,7 @@ msgstr "Löschen"
 
 #: workbench/templates/accruals/cutoffdate_detail.html:36
 #: workbench/templates/invoices/invoice_detail.html:84
+#: workbench/templates/projects/project_detail.html:53
 #: workbench/templates/reporting/monthly_invoicing.html:18
 #: workbench/templates/reporting/open_items_list.html:22
 msgid "total excl. tax"
@@ -1751,7 +1756,7 @@ msgid "of"
 msgstr "von"
 
 #: workbench/templates/history_modal.html:7
-#: workbench/templatetags/workbench.py:142
+#: workbench/templatetags/workbench.py:137
 msgid "History"
 msgstr "Geschichte"
 
@@ -1760,7 +1765,6 @@ msgid "No history found"
 msgstr "Keine Geschichte gefunden"
 
 #: workbench/templates/invoices/invoice_detail.html:67
-#: workbench/templates/projects/project_detail.html:45
 #: workbench/tools/models.py:111 workbench/tools/pdf.py:231
 msgid "subtotal"
 msgstr "Zwischentotal"
@@ -1836,13 +1840,13 @@ msgstr "Gesamtkosten"
 
 #: workbench/templates/projects/project_detail.html:37
 #: workbench/templates/projects/project_detail.html:40
-#: workbench/templates/projects/project_detail.html:53
+#: workbench/templates/projects/project_detail.html:48
 #: workbench/templates/projects/project_detail.html:129
 #, python-format
 msgid "%(hours)s with undefined rate)"
 msgstr "%(hours)s ohne Stundensatz"
 
-#: workbench/templates/projects/project_detail.html:50
+#: workbench/templates/projects/project_detail.html:45
 msgid "not archived"
 msgstr "Nicht archiviert"
 
