@@ -29,7 +29,7 @@ def search(request):
             for queryset in (
                 Project.objects.select_related("owned_by"),
                 Organization.objects.all(),
-                Person.objects.all(),
+                Person.objects.active(),
                 Invoice.objects.select_related("project", "owned_by"),
                 RecurringInvoice.objects.all(),
                 Offer.objects.select_related("project", "owned_by"),
