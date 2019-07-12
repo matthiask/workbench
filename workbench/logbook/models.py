@@ -29,7 +29,7 @@ class LoggedHours(Model):
     created_by = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name="+", verbose_name=_("created by")
     )
-    rendered_on = models.DateField(_("rendered on"), default=date.today)
+    rendered_on = models.DateField(_("rendered on"), default=date.today, db_index=True)
     rendered_by = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
@@ -100,7 +100,7 @@ class LoggedCost(Model):
     created_by = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name="+", verbose_name=_("created by")
     )
-    rendered_on = models.DateField(_("rendered on"), default=date.today)
+    rendered_on = models.DateField(_("rendered on"), default=date.today, db_index=True)
     rendered_by = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
