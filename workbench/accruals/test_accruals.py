@@ -132,8 +132,7 @@ class AccrualsTest(TestCase):
         self.assertEqual(invoiced[2018][12], Decimal(160))
 
         factories.LoggedCostFactory.create(
-            rendered_on=date(2018, 12, 25),
-            third_party_costs=10,
+            rendered_on=date(2018, 12, 25), third_party_costs=10
         )
 
         invoiced = key_data.invoiced_corrected([date(2018, 1, 1), date(2019, 2, 28)])

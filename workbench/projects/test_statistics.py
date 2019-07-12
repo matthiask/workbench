@@ -49,7 +49,7 @@ class StatisticsTest(TestCase):
         response = self.client.get("/report/hours-per-customer/?date_from=bla")
         self.assertRedirects(response, "/report/hours-per-customer/")
 
-    def test_not_archived_hours_grouped_services_green_hours(self):
+    def test_not_archived_hours_grouped_services_green_hours_hpc(self):
         service1 = factories.ServiceFactory.create(effort_rate=180, effort_type="Any")
         service2 = factories.ServiceFactory.create(project=service1.project)
 
@@ -120,3 +120,62 @@ class StatisticsTest(TestCase):
         self.assertEqual(hpc["organizations"][0]["total_hours"], Decimal(10))
         self.assertEqual(len(hpc["organizations"]), 1)
         self.assertEqual(len(hpc["users"]), 1)
+
+    def test_green_hours(self):
+        p_internal = factories.ProjectFactory.create(type=Project.INTERNAL)
+        p_maintenance = factories.ProjectFactory.create(type=Project.MAINTENANCE)
+        p_order = factories.ProjectFactory.create(type=Project.ORDER)
+
+        s_internal = factories.ServiceFactory.create(
+            project=p_internal
+        )
+        s_maintenance = factories.ServiceFactory.create(project=p_maintenance)
+        s_order = factories.ServiceFactory.create(project=p_order, effort_hours=20)
+
+        factories.LoggedHoursFactory.create(
+            service=s_internal, hours=10, rendered_on=date(2019, 1, 1)
+        )
+        factories.LoggedHoursFactory.create(
+            service=s_maintenance, hours=20, rendered_on=date(2019, 1, 1)
+        )
+        factories.LoggedHoursFactory.create(
+            service=s_order, hours=5, rendered_on=date(2019, 1, 1)
+        )
+        factories.LoggedHoursFactory.create(
+            service=s_order, hours=25, rendered_on=date(2019, 2, 1)
+        )
+        factories.LoggedHoursFactory.create(
+            service=s_order, hours=10, rendered_on=date(2019, 3, 1)
+        )
+
+        factories.LoggedHoursFactory.create(
+            service=s_order, hours=10, rendered_on=date(2018, 12, 1)
+        )
+        factories.LoggedHoursFactory.create(
+            service=s_order, hours=10, rendered_on=date(2019, 4, 1)
+        )
+
+        gh = key_data.green_hours([date(2019, 1, 1), date(2019, 3, 31)])
+
+        self.assertEqual(len(gh), 1)
+        self.assertEqual(
+            repr(gh[2019]["year"]),
+            "<GreenHours profitable=10.00 overdrawn=30.00 maintenance=20.00"
+            " internal=10.00 total=70.00 green=42%>",
+        )
+
+        self.assertEqual(
+            repr(gh[2019]["months"][1]),
+            "<GreenHours profitable=5.00 overdrawn=0.00 maintenance=20.00"
+            " internal=10.00 total=35.00 green=71%>",
+        )
+        self.assertEqual(
+            repr(gh[2019]["months"][2]),
+            "<GreenHours profitable=5.00 overdrawn=20.00 maintenance=0.00"
+            " internal=0.00 total=25.00 green=20%>",
+        )
+        self.assertEqual(
+            repr(gh[2019]["months"][3]),
+            "<GreenHours profitable=0.00 overdrawn=10.00 maintenance=0.00"
+            " internal=0.00 total=10.00 green=0%>",
+        )

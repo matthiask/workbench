@@ -10,25 +10,25 @@ from workbench.projects.models import Project, Service
 from workbench.tools.models import Z
 
 
-def projects_with_service_hours(project_ids):
-    projects = Project.objects.filter(id__in=project_ids)
-    service_hours = defaultdict(lambda: Z)
-
-    service_hours.update(
-        (row["project"], row["service_hours__sum"])
-        for row in Service.objects.order_by()
-        .filter(project__in=project_ids)
-        .values("project")
-        .annotate(Sum("service_hours"))
+def project_service_hours(project_ids):
+    hours = dict.fromkeys(project_ids, Z)
+    hours.update(
+        {
+            row["project"]: row["service_hours__sum"]
+            for row in Service.objects.order_by()
+            .filter(project__in=project_ids)
+            .values("project")
+            .annotate(Sum("service_hours"))
+        }
     )
+    return hours
 
-    return projects, service_hours
 
-
-def logged_hours_by_project_month(project_ids):
+def project_logged_hours(project_ids):
     hours = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: Z)))
     for row in (
         LoggedHours.objects.order_by()
+        .filter(service__project__in=project_ids)
         .values("service__project")
         .annotate(
             year=ExtractYear("rendered_on"),
@@ -77,7 +77,7 @@ class GreenHours:
         return (
             100 * (self.profitable + self.maintenance) // self.total
             if self.total
-            else None
+            else 0
         )
 
 
@@ -89,8 +89,8 @@ def green_hours(date_range):
         .distinct()
     )
 
-    projects, service_hours = projects_with_service_hours(project_ids)
-    logged_hours = logged_hours_by_project_month(project_ids)
+    service_hours = project_service_hours(project_ids)
+    logged_hours = project_logged_hours(project_ids)
 
     data = defaultdict(
         lambda: {"year": GreenHours(), "months": defaultdict(GreenHours)}
@@ -98,7 +98,7 @@ def green_hours(date_range):
 
     until = (date_range[1].year, date_range[1].month)
 
-    for project in projects:
+    for project in Project.objects.filter(id__in=project_ids):
         for year, month_data in sorted(logged_hours[project.id].items()):
             for month, hours in sorted(month_data.items()):
                 if year < date_range[0].year:
@@ -184,15 +184,12 @@ ORDER BY cutoff_date
 def invoiced_corrected(date_range):
     accruals = accruals_by_date()
     margin = invoiced_by_month(date_range)
+    # XXX Accruals migth be lost if a month has no invoices at all (unlikely,
+    # but might happen)
     for year in margin:
         for month in margin[year]:
             accrual = accruals.get((year, month))
             if accrual and accrual["delta"]:
                 margin[year][month] -= accrual["delta"]
-
-    # from pprint import pprint
-
-    # pprint(accruals)
-    # pprint(margin)
 
     return margin
