@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-12 15:38+0200\n"
+"POT-Creation-Date: 2019-07-12 16:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -128,7 +128,7 @@ msgstr "Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."
 #: workbench/templates/accruals/cutoffdate_detail.html:35
 #: workbench/templates/contacts/organization_detail.html:36
 #: workbench/templates/contacts/person_detail.html:48
-#: workbench/templates/credit_control/creditentry_list.html:25
+#: workbench/templates/credit_control/creditentry_list.html:26
 #: workbench/templates/projects/project_detail.html:191
 #: workbench/templates/reporting/monthly_invoicing.html:15
 #: workbench/templates/reporting/open_items_list.html:20
@@ -238,12 +238,12 @@ msgstr "Titel"
 
 #: workbench/activities/models.py:50 workbench/awt/models.py:92
 #: workbench/contacts/models.py:32 workbench/contacts/models.py:78
-#: workbench/credit_control/forms.py:194 workbench/credit_control/models.py:63
+#: workbench/credit_control/forms.py:205 workbench/credit_control/models.py:63
 #: workbench/management/commands/export_debtors.py:72
 #: workbench/templates/awt/year_detail.html:126
 #: workbench/templates/contacts/organization_detail.html:29
 #: workbench/templates/contacts/person_detail.html:34
-#: workbench/templates/credit_control/creditentry_list.html:25
+#: workbench/templates/credit_control/creditentry_list.html:26
 msgid "notes"
 msgstr "Bemerkungen"
 
@@ -668,26 +668,36 @@ msgstr "Pendent"
 msgid "Processed"
 msgstr "Verarbeitet"
 
-#: workbench/credit_control/forms.py:69
+#: workbench/credit_control/forms.py:30
+msgid "all ledgers"
+msgstr "Alle Konten"
+
+#: workbench/credit_control/forms.py:31 workbench/credit_control/models.py:22
+#: workbench/credit_control/models.py:46
+#: workbench/templates/credit_control/creditentry_list.html:22
+msgid "ledger"
+msgstr "Konto"
+
+#: workbench/credit_control/forms.py:80
 msgid "account statement"
 msgstr "Kontoauszug"
 
-#: workbench/credit_control/forms.py:71
+#: workbench/credit_control/forms.py:82
 msgid "statement data"
 msgstr "Auszugsdaten"
 
-#: workbench/credit_control/forms.py:73
+#: workbench/credit_control/forms.py:84
 msgid "Automatically filled in when submitting a parseable account statement."
 msgstr ""
 "Wird automatisch gefüllt wenn ein einlesbarer Kontoauszug hochgeladen wird."
 
-#: workbench/credit_control/forms.py:167 workbench/invoices/models.py:76
+#: workbench/credit_control/forms.py:178 workbench/invoices/models.py:76
 #: workbench/templates/reporting/monthly_invoicing.html:16
 #: workbench/templates/reporting/open_items_list.html:21
 msgid "invoiced on"
 msgstr "Verrechnet am"
 
-#: workbench/credit_control/forms.py:171 workbench/tools/pdf.py:245
+#: workbench/credit_control/forms.py:182 workbench/tools/pdf.py:245
 #: workbench/tools/pdf.py:299 workbench/tools/pdf.py:312
 #: workbench/tools/pdf.py:339 workbench/tools/pdf.py:352
 msgid "NO DATE YET"
@@ -705,10 +715,6 @@ msgstr "PostFinance CSV"
 msgid "parser"
 msgstr "Parser"
 
-#: workbench/credit_control/models.py:22 workbench/credit_control/models.py:46
-msgid "ledger"
-msgstr "Konto"
-
 #: workbench/credit_control/models.py:23
 msgid "ledgers"
 msgstr "Konten"
@@ -719,14 +725,14 @@ msgstr "Referenz-Nr."
 
 #: workbench/credit_control/models.py:51
 #: workbench/management/commands/export_debtors.py:68
-#: workbench/templates/credit_control/creditentry_list.html:22
+#: workbench/templates/credit_control/creditentry_list.html:23
 msgid "value date"
 msgstr "Valuta"
 
 #: workbench/credit_control/models.py:52
 #: workbench/management/commands/export_debtors.py:69
 #: workbench/management/commands/export_debtors.py:96
-#: workbench/templates/credit_control/creditentry_list.html:24
+#: workbench/templates/credit_control/creditentry_list.html:25
 #: workbench/templates/reporting/monthly_invoicing.html:17
 #: workbench/templates/reporting/open_items_list.html:23
 #: workbench/templates/reporting/open_items_list.html:42
@@ -737,7 +743,7 @@ msgstr "Total"
 #: workbench/credit_control/models.py:53 workbench/invoices/models.py:119
 #: workbench/management/commands/export_debtors.py:70
 #: workbench/management/commands/export_debtors.py:96
-#: workbench/templates/credit_control/creditentry_list.html:23
+#: workbench/templates/credit_control/creditentry_list.html:24
 msgid "payment notice"
 msgstr "Zahlungsnotiz"
 
@@ -1210,7 +1216,9 @@ msgstr "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung."
 
 #: workbench/logbook/forms.py:219
 msgid "Deselect the existing service if you want to create a new service."
-msgstr "Falls Du eine neue Leistung erstellen willst, darfst Du keine existierende Leistung wählen."
+msgstr ""
+"Falls Du eine neue Leistung erstellen willst, darfst Du keine existierende "
+"Leistung wählen."
 
 #: workbench/logbook/forms.py:223 workbench/logbook/forms.py:322
 #: workbench/projects/forms.py:223

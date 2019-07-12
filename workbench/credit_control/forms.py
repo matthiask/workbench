@@ -24,6 +24,13 @@ class CreditEntrySearchForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
     )
+    ledger = forms.ModelChoiceField(
+        Ledger.objects.all(),
+        required=False,
+        empty_label=_("all ledgers"),
+        label=_("ledger"),
+        widget=forms.Select(attrs={"class": "custom-select"}),
+    )
 
     def filter(self, queryset):
         data = self.cleaned_data
@@ -31,7 +38,11 @@ class CreditEntrySearchForm(forms.Form):
             queryset = queryset.filter(Q(invoice__isnull=True) & Q(notes=""))
         elif data.get("s") == "processed":
             queryset = queryset.filter(~Q(invoice__isnull=True) | ~Q(notes=""))
-        return queryset.select_related("invoice__project", "invoice__owned_by")
+        if data.get("ledger"):
+            queryset = queryset.filter(ledger=data["ledger"])
+        return queryset.select_related(
+            "invoice__project", "invoice__owned_by", "ledger"
+        )
 
     def response(self, request, queryset):
         if request.GET.get("xlsx"):

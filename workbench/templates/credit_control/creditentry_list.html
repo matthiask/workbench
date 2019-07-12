@@ -19,6 +19,7 @@
 <table class="table table-hover table-striped">
   <thead>
     <tr>
+      <th>{% trans 'ledger' %}</th>
       <th>{% trans 'value date' %}</th>
       <th>{% trans 'payment notice' %}</th>
       <th class="text-right">{% trans 'total' %}</th>
@@ -28,6 +29,7 @@
   <tbody>
     {% for entry in object_list %}
       <tr>
+        <td>{{ entry.ledger }}</td>
         <th><a href="{{ entry.get_absolute_url }}">{{ entry.value_date|date:'d.m.Y' }}</a></th>
         <td>{{ entry.payment_notice }}</td>
         <td class="text-right">{{ entry.total|currency }}</td>
