@@ -88,22 +88,17 @@ def bar(value, one):
 
     percentage = int(100 * value / one)
 
-    bars = []
+    bars = [("bg-success", max(0, percentage))]
 
-    if percentage < 75:
-        bars.append(("bg-info", max(0, percentage)))
-    elif percentage <= 100:
-        bars.append(("bg-warning", percentage))
-    else:
-        bars.extend(
-            [
-                ("bg-warning", int(10000 / percentage)),
-                ("bg-danger", 100 - int(10000 / percentage)),
-            ]
-        )
+    if percentage >= 75:
+        bars.append(("bg-caveat", min(25, percentage - 75)))
+    if percentage > 100:
+        bars.append(("bg-danger", percentage - 100))
+        bars = [(cls, part * 100 / percentage) for cls, part in bars]
 
     return format_html(
-        '<div class="progress progress-line">{bars}</div>',
+        '<div class="progress progress-line" title="{percentage}%">{bars}</div>',
+        percentage=percentage,
         bars=format_html_join(
             "",
             '<div class="progress-bar {}" role="progressbar" style="width:{}%"></div>',
