@@ -156,7 +156,7 @@ def invoiced_by_month(date_range):
 
 
 def accruals_by_date():
-    accruals = {}
+    accruals = {(0, 0): {"accrual": Z, "delta": None}}
     with connections["default"].cursor() as cursor:
         cursor.execute(
             """\
@@ -178,7 +178,7 @@ ORDER BY cutoff_date
     for this, next in zip(dates, dates[1:]):
         accruals[next]["delta"] = accruals[next]["accrual"] - accruals[this]["accrual"]
 
-    return accruals
+    return {date: accrual for date, accrual in accruals.items() if date != (0, 0)}
 
 
 def invoiced_corrected(date_range):

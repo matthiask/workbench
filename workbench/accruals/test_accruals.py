@@ -1,9 +1,11 @@
 from datetime import date
+from decimal import Decimal
 
 from django.test import TestCase
 
 from workbench import factories
 from workbench.accruals.models import Accrual, CutoffDate
+from workbench.reporting import key_data
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import messages
 
@@ -45,7 +47,7 @@ class AccrualsTest(TestCase):
             status=factories.Invoice.SENT,
             subtotal=100,
         )
-        factories.InvoiceFactory.create(
+        down_payment = factories.InvoiceFactory.create(
             project=project,
             type=factories.Invoice.DOWN_PAYMENT,
             invoiced_on=date(2018, 12, 2),
@@ -93,6 +95,7 @@ class AccrualsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         accrual = Accrual.objects.get()
+        self.assertEqual(accrual.cutoff_date, date(2018, 12, 31))
         self.assertEqual(accrual.work_progress, 50)  # 100 of fixed, 50 of down payment
         response = self.client.post(
             day.urls["detail"], {"id": accrual.id, "work_progress": 60}
@@ -100,6 +103,28 @@ class AccrualsTest(TestCase):
         self.assertEqual(response.status_code, 202)
         accrual.refresh_from_db()
         self.assertEqual(accrual.work_progress, 60)
+
+        Accrual.objects.create(
+            invoice=down_payment,
+            cutoff_date=date(2019, 1, 31),
+            work_progress=80,
+            logbook=0,
+        )
+
+        # print(key_data.accruals_by_date())
+        accruals = key_data.accruals_by_date()
+        self.assertEqual(len(accruals), 2)
+
+        self.assertEqual(accruals[(2018, 12)]["accrual"], Decimal(40))
+        self.assertEqual(accruals[(2018, 12)]["delta"], Decimal(40))
+
+        self.assertEqual(accruals[(2019, 1)]["accrual"], Decimal(20))
+        self.assertEqual(accruals[(2019, 1)]["delta"], Decimal(-20))
+
+        invoiced = key_data.invoiced_corrected([date(2018, 1, 1), date(2019, 2, 28)])
+        self.assertEqual(len(invoiced), 1)
+        self.assertEqual(len(invoiced[2018]), 1)
+        self.assertEqual(invoiced[2018][12], Decimal(160))
 
     def test_future_cutoff_dates(self):
         self.client.force_login(factories.UserFactory.create())
