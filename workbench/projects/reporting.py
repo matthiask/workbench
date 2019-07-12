@@ -56,6 +56,7 @@ def overdrawn_projects():
 
 def hours_per_customer(date_range, *, users=None):
     hours = defaultdict(lambda: defaultdict(lambda: Z))
+    user_hours = defaultdict(lambda: Z)
     seen_organizations = set()
     seen_users = set()
 
@@ -67,6 +68,7 @@ def hours_per_customer(date_range, *, users=None):
         Sum("hours")
     ):
         hours[row["service__project__customer"]][row["rendered_by"]] = row["hours__sum"]
+        user_hours[row["rendered_by"]] += row["hours__sum"]
         seen_organizations.add(row["service__project__customer"])
         seen_users.add(row["rendered_by"])
 
@@ -77,7 +79,7 @@ def hours_per_customer(date_range, *, users=None):
         organizations.append(
             {
                 "organization": org,
-                "user_hours": [hours[org.id][user.id] for user in user_list],
+                "user_hours": [(user, hours[org.id][user.id]) for user in user_list],
                 "total_hours": sum(hours[org.id].values(), Z),
             }
         )
@@ -87,4 +89,5 @@ def hours_per_customer(date_range, *, users=None):
             organizations, key=lambda row: row["total_hours"], reverse=True
         ),
         "users": user_list,
+        "user_hours": [(user, user_hours[user.id]) for user in user_list],
     }

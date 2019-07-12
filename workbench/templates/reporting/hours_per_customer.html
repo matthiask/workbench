@@ -21,17 +21,29 @@
         {% for user in stats.users %}<th class="text-right">{{ user.get_short_name }}</th>{% endfor %}
         <th></th>
       </tr>
+      <tr>
+        <th></th>
+        {% for user, hours in stats.user_hours %}
+          <th class="text-right">
+            <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}" target="_blank">{{ hours|hours }}</a>
+          </th>
+        {% endfor %}
+        <th></th>
+      </tr>
     </thead>
     <tbody>
     {% for row in stats.organizations %}
     <tr>
       <th><a href="{% url 'logbook_loggedhours_list' %}?organization={{ row.organization.id }}" target="_blank">{{ row.organization }}</a></th>
-      {% for hours in row.user_hours %}
-        {% if hours %}<td class="text-right">{{ hours|hours }}</td>
+      {% for user, hours in row.user_hours %}
+        {% if hours %}
+          <td class="text-right">
+            <a href="{% url 'logbook_loggedhours_list' %}?organization={{ row.organization.id }}&amp;rendered_by={{ user.pk }}" target="_blank">{{ hours|hours }}</a>
+          </td>
         {% else %}<td></td>
         {% endif %}
       {% endfor %}
-      <td class="text-right">{{ row.total_hours|hours }}</td>
+      <th class="text-right">{{ row.total_hours|hours }}</th>
     </tr>
     {% if forloop.counter|divisibleby:10 and not forloop.last %}
       <tr>
