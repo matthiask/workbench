@@ -260,8 +260,8 @@ class Project(Model):
         return self.invoices.select_related("contact__organization").reverse()
 
     @cached_property
-    def project_invoices_subtotal(self):
-        return sum((invoice.subtotal for invoice in self.project_invoices), Z)
+    def project_invoices_total_excl_tax(self):
+        return sum((invoice.total_excl_tax for invoice in self.project_invoices), Z)
 
     @cached_property
     def not_archived_total(self):

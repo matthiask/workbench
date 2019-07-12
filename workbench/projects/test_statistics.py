@@ -87,7 +87,7 @@ class StatisticsTest(TestCase):
             {"total": Decimal("1800.00"), "hours_rate_undefined": Z},
         )
 
-        self.assertEqual(project.project_invoices_subtotal, Decimal("1800.00"))
+        self.assertEqual(project.project_invoices_total_excl_tax, Decimal("1800.00"))
 
         grouped = project.grouped_services
         self.assertEqual(len(grouped["offers"]), 1)
@@ -126,9 +126,7 @@ class StatisticsTest(TestCase):
         p_maintenance = factories.ProjectFactory.create(type=Project.MAINTENANCE)
         p_order = factories.ProjectFactory.create(type=Project.ORDER)
 
-        s_internal = factories.ServiceFactory.create(
-            project=p_internal
-        )
+        s_internal = factories.ServiceFactory.create(project=p_internal)
         s_maintenance = factories.ServiceFactory.create(project=p_maintenance)
         s_order = factories.ServiceFactory.create(project=p_order, effort_hours=20)
 
