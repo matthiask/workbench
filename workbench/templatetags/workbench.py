@@ -94,7 +94,7 @@ def bar(value, one):
         bars.append(("bg-caveat", min(25, percentage - 75)))
     if percentage > 100:
         bars.append(("bg-danger", percentage - 100))
-        bars = [(cls, part * 100 / percentage) for cls, part in bars]
+        bars = [(cls, part * 100 // percentage) for cls, part in bars]
 
     return format_html(
         '<div class="progress progress-line" title="{percentage}%">{bars}</div>',

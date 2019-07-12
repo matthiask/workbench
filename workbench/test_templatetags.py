@@ -52,21 +52,15 @@ class TemplateTagsTest(TestCase):
         t = Template("{% load workbench %}{% bar value one %}")
         self.assertEqual(
             t.render(Context({"value": 10, "one": 100})),
-            '<div class="progress progress-line">'
-            '<div class="progress-bar bg-info" role="progressbar"'
-            ' style="width:10%"></div></div>',
+            '<div class="progress progress-line" title="10%">'
+            '<div class="progress-bar bg-success" role="progressbar"'
+            ' style="width:10%"></div></div>',  # noqa
         )
         self.assertEqual(
             t.render(Context({"value": 80, "one": 100})),
-            '<div class="progress progress-line">'
-            '<div class="progress-bar bg-warning" role="progressbar"'
-            ' style="width:80%"></div></div>',
+            '<div class="progress progress-line" title="80%"><div class="progress-bar bg-success" role="progressbar" style="width:80%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:5%"></div></div>',  # noqa
         )
         self.assertEqual(
             t.render(Context({"value": 100, "one": 60})),
-            '<div class="progress progress-line">'
-            '<div class="progress-bar bg-warning" role="progressbar"'
-            ' style="width:60%"></div>'
-            '<div class="progress-bar bg-danger" role="progressbar"'
-            ' style="width:40%"></div></div>',
+            '<div class="progress progress-line" title="166%"><div class="progress-bar bg-success" role="progressbar" style="width:100%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:15%"></div><div class="progress-bar bg-danger" role="progressbar" style="width:39%"></div></div>',  # noqa
         )
