@@ -160,12 +160,12 @@ def key_data_view(request):
 
 
 class HoursPerCustomerForm(forms.Form):
-    from_date = forms.DateField(
+    date_from = forms.DateField(
         label=_("date from"),
         required=False,
         widget=forms.TextInput(attrs={"class": "datepicker"}),
     )
-    until_date = forms.DateField(
+    date_until = forms.DateField(
         label=_("date until"),
         required=False,
         widget=forms.TextInput(attrs={"class": "datepicker"}),
@@ -176,8 +176,8 @@ class HoursPerCustomerForm(forms.Form):
 
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
-        data.setdefault("from_date", local_date_format(monday()))
-        data.setdefault("until_date", local_date_format(monday() + timedelta(days=6)))
+        data.setdefault("date_from", local_date_format(monday()))
+        data.setdefault("date_until", local_date_format(monday() + timedelta(days=6)))
         super().__init__(data, *args, **kwargs)
         self.fields["users"].choices = User.objects.choices(collapse_inactive=False)
         self.fields["users"].widget.attrs = {"size": 10}
@@ -194,7 +194,7 @@ def hours_per_customer_view(request):
         {
             "form": form,
             "stats": hours_per_customer(
-                [form.cleaned_data["from_date"], form.cleaned_data["until_date"]],
+                [form.cleaned_data["date_from"], form.cleaned_data["date_until"]],
                 users=form.cleaned_data["users"],
             ),
         },

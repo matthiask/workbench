@@ -43,6 +43,12 @@ class StatisticsTest(TestCase):
         response = self.client.get("/report/overdrawn-projects/")
         self.assertContains(response, "Überzogene Projekte")
 
+        response = self.client.get("/report/hours-per-customer/")
+        self.assertContains(response, "Stunden pro Kundschaft")
+
+        response = self.client.get("/report/hours-per-customer/?date_from=bla")
+        self.assertRedirects(response, "/report/hours-per-customer/")
+
     def test_not_archived_hours_grouped_services_green_hours(self):
         service1 = factories.ServiceFactory.create(effort_rate=180, effort_type="Any")
         service2 = factories.ServiceFactory.create(project=service1.project)
