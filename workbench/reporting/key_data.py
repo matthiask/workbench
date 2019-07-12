@@ -176,7 +176,7 @@ ORDER BY cutoff_date
 
     dates = list(sorted(accruals))
     for this, next in zip(dates, dates[1:]):
-        accruals[next]["delta"] = accruals[next]["accrual"] - accruals[this]["accrual"]
+        accruals[next]["delta"] = accruals[this]["accrual"] - accruals[next]["accrual"]
 
     return {date: accrual for date, accrual in accruals.items() if date != (0, 0)}
 
@@ -184,12 +184,7 @@ ORDER BY cutoff_date
 def invoiced_corrected(date_range):
     accruals = accruals_by_date()
     margin = invoiced_by_month(date_range)
-    # XXX Accruals migth be lost if a month has no invoices at all (unlikely,
-    # but might happen)
-    for year in margin:
-        for month in margin[year]:
-            accrual = accruals.get((year, month))
-            if accrual and accrual["delta"]:
-                margin[year][month] -= accrual["delta"]
+    for month, accrual in accruals.items():
+        margin[month[0]][month[1]] += accrual["delta"]
 
     return margin

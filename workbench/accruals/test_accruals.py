@@ -111,15 +111,25 @@ class AccrualsTest(TestCase):
             logbook=0,
         )
 
+        Accrual.objects.create(
+            invoice=down_payment,
+            cutoff_date=date(2019, 3, 31),
+            work_progress=100,
+            logbook=0,
+        )
+
         # print(key_data.accruals_by_date())
         accruals = key_data.accruals_by_date()
-        self.assertEqual(len(accruals), 2)
+        self.assertEqual(len(accruals), 3)
 
         self.assertEqual(accruals[(2018, 12)]["accrual"], Decimal(40))
-        self.assertEqual(accruals[(2018, 12)]["delta"], Decimal(40))
+        self.assertEqual(accruals[(2018, 12)]["delta"], Decimal(-40))
 
         self.assertEqual(accruals[(2019, 1)]["accrual"], Decimal(20))
-        self.assertEqual(accruals[(2019, 1)]["delta"], Decimal(-20))
+        self.assertEqual(accruals[(2019, 1)]["delta"], Decimal(20))
+
+        self.assertEqual(accruals[(2019, 3)]["accrual"], Decimal(0))
+        self.assertEqual(accruals[(2019, 3)]["delta"], Decimal(20))
 
         invoiced = key_data.invoiced_by_month([date(2018, 1, 1), date(2019, 2, 28)])
         self.assertEqual(len(invoiced), 1)
@@ -127,7 +137,7 @@ class AccrualsTest(TestCase):
         self.assertEqual(invoiced[2018][12], Decimal(200))
 
         invoiced = key_data.invoiced_corrected([date(2018, 1, 1), date(2019, 2, 28)])
-        self.assertEqual(len(invoiced), 1)
+        self.assertEqual(len(invoiced), 2)
         self.assertEqual(len(invoiced[2018]), 1)
         self.assertEqual(invoiced[2018][12], Decimal(160))
 
@@ -135,10 +145,13 @@ class AccrualsTest(TestCase):
             rendered_on=date(2018, 12, 25), third_party_costs=10
         )
 
-        invoiced = key_data.invoiced_corrected([date(2018, 1, 1), date(2019, 2, 28)])
-        self.assertEqual(len(invoiced), 1)
+        invoiced = key_data.invoiced_corrected([date(2018, 1, 1), date(2019, 3, 31)])
+        self.assertEqual(len(invoiced), 2)
         self.assertEqual(len(invoiced[2018]), 1)
-        self.assertEqual(invoiced[2018][12], Decimal(150))
+        self.assertEqual(len(invoiced[2019]), 2)
+        self.assertEqual(invoiced[2018][12], Decimal(150))  # 160 - 10 logged cost
+        self.assertEqual(invoiced[2019][1], Decimal(20))
+        self.assertEqual(invoiced[2019][3], Decimal(20))
 
     def test_future_cutoff_dates(self):
         self.client.force_login(factories.UserFactory.create())
