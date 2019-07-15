@@ -126,6 +126,7 @@ class CreditEntriesTest(TestCase):
 
     def test_list(self):
         self.client.force_login(factories.UserFactory.create())
+        ledger = factories.LedgerFactory.create()
 
         def valid(p):
             self.assertEqual(self.client.get("/credit-control/?" + p).status_code, 200)
@@ -134,6 +135,7 @@ class CreditEntriesTest(TestCase):
         valid("s=pending")
         valid("s=processed")
         valid("xlsx=1")
+        valid("ledger={}".format(ledger.pk))
 
     def test_create_entry(self):
         self.client.force_login(factories.UserFactory.create())
