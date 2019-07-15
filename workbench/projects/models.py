@@ -247,6 +247,7 @@ class Project(Model):
                     if hours
                 ),
                 key=lambda row: row[0] or Decimal("9999999"),
+                reverse=True,
             ),
             "service_hours": service_hours,
             "total_service_cost": total_service_cost,
