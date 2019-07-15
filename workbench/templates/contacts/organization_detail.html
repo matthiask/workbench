@@ -26,6 +26,10 @@
       </td>
     </tr>
     <tr>
+      <td class="text-right">{% trans 'is private person' %}</td>
+      <td>{{ organization.is_private_person|yesno:_("yes,no") }}</td>
+    </tr>
+    <tr>
       <td class="text-right">{% trans 'notes' %}</td>
       <td>{{ organization.notes|linebreaksbr|default:"&ndash;" }}</td>
     </tr>

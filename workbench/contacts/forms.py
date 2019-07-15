@@ -62,7 +62,7 @@ class OrganizationForm(ModelForm):
 
     class Meta:
         model = Organization
-        fields = ("name", "notes", "primary_contact", "groups")
+        fields = ("name", "is_private_person", "notes", "primary_contact", "groups")
         widgets = {
             "name": Textarea(),
             "notes": Textarea(),

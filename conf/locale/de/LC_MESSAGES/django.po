@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-12 16:03+0200\n"
+"POT-Creation-Date: 2019-07-15 17:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -49,7 +49,7 @@ msgstr "Aktiv"
 msgid "Inactive"
 msgstr "Inaktiv"
 
-#: workbench/accounts/models.py:62 workbench/contacts/models.py:200
+#: workbench/accounts/models.py:62 workbench/contacts/models.py:201
 msgid "email"
 msgstr "Email"
 
@@ -126,7 +126,7 @@ msgstr "Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."
 #: workbench/management/commands/export_debtors.py:71
 #: workbench/management/commands/export_debtors.py:96
 #: workbench/templates/accruals/cutoffdate_detail.html:35
-#: workbench/templates/contacts/organization_detail.html:36
+#: workbench/templates/contacts/organization_detail.html:40
 #: workbench/templates/contacts/person_detail.html:48
 #: workbench/templates/credit_control/creditentry_list.html:26
 #: workbench/templates/projects/project_detail.html:191
@@ -197,7 +197,7 @@ msgstr "Gehört"
 #: workbench/invoices/models.py:72 workbench/logbook/forms.py:29
 #: workbench/logbook/forms.py:83 workbench/logbook/models.py:88
 #: workbench/offers/models.py:48 workbench/projects/models.py:73
-#: workbench/projects/models.py:297
+#: workbench/projects/models.py:298
 #: workbench/templates/invoices/invoice_detail.html:20
 #: workbench/templates/invoices/invoice_form.html:8
 #: workbench/templates/logbook/loggedcost_detail.html:13
@@ -237,11 +237,11 @@ msgid "title"
 msgstr "Titel"
 
 #: workbench/activities/models.py:50 workbench/awt/models.py:92
-#: workbench/contacts/models.py:32 workbench/contacts/models.py:78
+#: workbench/contacts/models.py:33 workbench/contacts/models.py:79
 #: workbench/credit_control/forms.py:205 workbench/credit_control/models.py:63
 #: workbench/management/commands/export_debtors.py:72
 #: workbench/templates/awt/year_detail.html:126
-#: workbench/templates/contacts/organization_detail.html:29
+#: workbench/templates/contacts/organization_detail.html:33
 #: workbench/templates/contacts/person_detail.html:34
 #: workbench/templates/credit_control/creditentry_list.html:26
 msgid "notes"
@@ -451,7 +451,7 @@ msgstr "Kreise"
 msgid "is removed"
 msgstr "ist entfernt"
 
-#: workbench/circles/models.py:41 workbench/projects/models.py:323
+#: workbench/circles/models.py:41 workbench/projects/models.py:324
 msgid "role"
 msgstr "Rolle"
 
@@ -496,13 +496,13 @@ msgstr ""
 "einen neuen zu erstellen als die Organisation zu ändern."
 
 #: workbench/contacts/forms.py:184 workbench/contacts/forms.py:197
-#: workbench/contacts/forms.py:219 workbench/contacts/models.py:136
+#: workbench/contacts/forms.py:219 workbench/contacts/models.py:137
 #: workbench/invoices/forms.py:378 workbench/invoices/models.py:99
 #: workbench/projects/models.py:62
 msgid "type"
 msgstr "Typ"
 
-#: workbench/contacts/forms.py:260 workbench/contacts/models.py:239
+#: workbench/contacts/forms.py:260 workbench/contacts/models.py:240
 #: workbench/invoices/models.py:115 workbench/invoices/models.py:457
 #: workbench/offers/models.py:65
 #: workbench/templates/invoices/invoice_detail.html:35
@@ -517,135 +517,140 @@ msgstr "Die exakte Adresse kann später bearbeitet werden."
 msgid "group"
 msgstr "Gruppe"
 
-#: workbench/contacts/models.py:23 workbench/contacts/models.py:40
-#: workbench/contacts/models.py:94
+#: workbench/contacts/models.py:23 workbench/contacts/models.py:41
+#: workbench/contacts/models.py:95
 #: workbench/templates/contacts/organization_detail.html:20
 #: workbench/templates/contacts/person_detail.html:37
 msgid "groups"
 msgstr "Gruppen"
 
-#: workbench/contacts/models.py:36 workbench/contacts/models.py:90
+#: workbench/contacts/models.py:32
+#: workbench/templates/contacts/organization_detail.html:29
+msgid "is private person"
+msgstr "ist Privatperson"
+
+#: workbench/contacts/models.py:37 workbench/contacts/models.py:91
 msgid "primary contact"
 msgstr "Hauptkontakt"
 
-#: workbench/contacts/models.py:45 workbench/contacts/models.py:84
+#: workbench/contacts/models.py:46 workbench/contacts/models.py:85
 #: workbench/logbook/forms.py:35 workbench/logbook/forms.py:89
 msgid "organization"
 msgstr "Organisation"
 
-#: workbench/contacts/models.py:46 workbench/templates/base.html:36
+#: workbench/contacts/models.py:47 workbench/templates/base.html:36
 msgid "organizations"
 msgstr "Organisationen"
 
-#: workbench/contacts/models.py:60
+#: workbench/contacts/models.py:61
 msgid "is archived"
 msgstr "ist archiviert"
 
-#: workbench/contacts/models.py:62
+#: workbench/contacts/models.py:63
 msgid "It is preferrable to archive records instead of deleting them."
 msgstr "Es ist bevorzugt, Einträge zu archivieren statt zu löschen."
 
-#: workbench/contacts/models.py:64
+#: workbench/contacts/models.py:65
 msgid "given name"
 msgstr "Vorname"
 
-#: workbench/contacts/models.py:65
+#: workbench/contacts/models.py:66
 msgid "family name"
 msgstr "Nachname"
 
-#: workbench/contacts/models.py:67
+#: workbench/contacts/models.py:68
 msgid "address"
 msgstr "Anrede"
 
-#: workbench/contacts/models.py:67
+#: workbench/contacts/models.py:68
 msgid "Mr./Ms./..."
 msgstr "Herr/Frau/..."
 
-#: workbench/contacts/models.py:70
+#: workbench/contacts/models.py:71
 msgid "address on first-name terms"
 msgstr "Anrede per Du"
 
-#: workbench/contacts/models.py:73
+#: workbench/contacts/models.py:74
 msgid "complete salutation"
 msgstr "vollständige Begrüssung"
 
-#: workbench/contacts/models.py:76
+#: workbench/contacts/models.py:77
 msgid "Dear John/Dear Ms Smith"
 msgstr "Lieber Hans/Sehr geehrte Frau Muster"
 
-#: workbench/contacts/models.py:102 workbench/contacts/models.py:156
-#: workbench/contacts/models.py:197 workbench/contacts/models.py:222
+#: workbench/contacts/models.py:103 workbench/contacts/models.py:157
+#: workbench/contacts/models.py:198 workbench/contacts/models.py:223
 msgid "person"
 msgstr "Person"
 
-#: workbench/contacts/models.py:103 workbench/templates/base.html:35
+#: workbench/contacts/models.py:104 workbench/templates/base.html:35
 #: workbench/templates/contacts/organization_detail.html:12
 msgid "people"
 msgstr "Personen"
 
-#: workbench/contacts/models.py:136
+#: workbench/contacts/models.py:137
 msgid "work"
 msgstr "Arbeit"
 
-#: workbench/contacts/models.py:137
+#: workbench/contacts/models.py:138
 msgid "weight"
 msgstr "Gewichtung"
 
-#: workbench/contacts/models.py:159 workbench/contacts/models.py:163
+#: workbench/contacts/models.py:160 workbench/contacts/models.py:164
 msgid "phone number"
 msgstr "Telefonnummer"
 
-#: workbench/contacts/models.py:164
+#: workbench/contacts/models.py:165
 #: workbench/templates/contacts/person_form.html:24
 msgid "phone numbers"
 msgstr "Telefonnummern"
 
-#: workbench/contacts/models.py:189
+#: workbench/contacts/models.py:190
 msgid "Phone number invalid."
 msgstr "Telefonnummer ungültig."
 
-#: workbench/contacts/models.py:204
+#: workbench/contacts/models.py:205
 msgid "email address"
 msgstr "Emailadresse"
 
-#: workbench/contacts/models.py:205
+#: workbench/contacts/models.py:206
 #: workbench/templates/contacts/person_form.html:37
 msgid "email addresses"
 msgstr "Emailadressen"
 
-#: workbench/contacts/models.py:225
+#: workbench/contacts/models.py:226
 msgid "street"
 msgstr "Strasse"
 
-#: workbench/contacts/models.py:226
+#: workbench/contacts/models.py:227
 msgid "house number"
 msgstr "Hausnummer"
 
-#: workbench/contacts/models.py:227
+#: workbench/contacts/models.py:228
 msgid "address suffix"
 msgstr "Adresszusatz"
 
-#: workbench/contacts/models.py:228
+#: workbench/contacts/models.py:229
 msgid "postal code"
 msgstr "PLZ"
 
-#: workbench/contacts/models.py:229
+#: workbench/contacts/models.py:230
 msgid "city"
 msgstr "Ort"
 
-#: workbench/contacts/models.py:230
+#: workbench/contacts/models.py:231
 msgid "country"
 msgstr "Land"
 
-#: workbench/contacts/models.py:232
+#: workbench/contacts/models.py:233
 msgid "override"
 msgstr "Übersteuern"
 
-#: workbench/contacts/models.py:234
+#: workbench/contacts/models.py:235
 msgid "Completely overrides the postal address if set."
 msgstr "Überschreibt die Postadresse komplett falls gesetzt."
 
-#: workbench/contacts/models.py:240
+#: workbench/contacts/models.py:241
 #: workbench/templates/contacts/person_form.html:50
 msgid "postal addresses"
 msgstr "Postadressen"
@@ -887,7 +892,7 @@ msgstr "%s löschen"
 
 #: workbench/invoices/__init__.py:10 workbench/invoices/models.py:126
 #: workbench/templates/base.html:28
-#: workbench/templates/contacts/organization_detail.html:39
+#: workbench/templates/contacts/organization_detail.html:43
 #: workbench/templates/projects/project_detail.html:165
 #: workbench/templates/start.html:34
 msgid "invoices"
@@ -1352,7 +1357,7 @@ msgstr "Abgelehnt"
 msgid "offered on"
 msgstr "offeriert am"
 
-#: workbench/offers/models.py:72 workbench/projects/models.py:303
+#: workbench/offers/models.py:72 workbench/projects/models.py:304
 #: workbench/templates/projects/project_detail.html:94
 #: workbench/templates/projects/project_detail.html:201
 #: workbench/templates/projects/service_form.html:36 workbench/tools/pdf.py:292
@@ -1437,23 +1442,23 @@ msgstr "geschlossen am %s"
 msgid "Not bound to a particular service."
 msgstr "Nicht mit einer bestimmten Leistung verbunden."
 
-#: workbench/projects/models.py:308
+#: workbench/projects/models.py:309
 msgid "allow logging"
 msgstr "Leistungserfassung erlauben"
 
-#: workbench/projects/models.py:311
+#: workbench/projects/models.py:312
 msgid "Deactivate this for service entries which are only used for budgeting."
 msgstr "Deaktiviere dies, wenn die Leistung nur zur Budgetierung dient."
 
-#: workbench/projects/models.py:315
+#: workbench/projects/models.py:316
 msgid "is optional"
 msgstr "ist optional"
 
-#: workbench/projects/models.py:317
+#: workbench/projects/models.py:318
 msgid "Optional services to not count towards the offer total."
 msgstr "Optionale Leistungen werden nicht zum Offertentotal hinzugerechnet."
 
-#: workbench/projects/models.py:341
+#: workbench/projects/models.py:342
 msgid ""
 "Cannot delete a service bound to an offer which is not in preparation "
 "anymore."
@@ -1534,7 +1539,7 @@ msgstr "Anmelden"
 #: workbench/templates/accruals/cutoffdate_detail.html:20
 #: workbench/templates/activities/activity_detail.html:30
 #: workbench/templates/awt/absence_detail.html:20
-#: workbench/templates/contacts/organization_detail.html:41
+#: workbench/templates/contacts/organization_detail.html:45
 #: workbench/templates/contacts/person_detail.html:54
 #: workbench/templates/deals/deal_detail.html:26
 #: workbench/templates/generic/object_detail.html:22
@@ -1555,7 +1560,7 @@ msgstr "Abgrenzungen erstellen"
 #: workbench/templates/accruals/cutoffdate_detail.html:29
 #: workbench/templates/activities/activity_detail.html:33
 #: workbench/templates/awt/absence_detail.html:23
-#: workbench/templates/contacts/organization_detail.html:43
+#: workbench/templates/contacts/organization_detail.html:47
 #: workbench/templates/contacts/person_detail.html:56
 #: workbench/templates/deals/deal_detail.html:28
 #: workbench/templates/generic/object_detail.html:25
@@ -1701,6 +1706,10 @@ msgstr "Verwaltung"
 #: workbench/templates/base.html:98
 msgid "Sign out"
 msgstr "Abmelden"
+
+#: workbench/templates/contacts/organization_detail.html:30
+msgid "yes,no"
+msgstr "ja,nein"
 
 #: workbench/templates/contacts/person_form.html:10
 #: workbench/templates/credit_control/creditentry_upload.html:13

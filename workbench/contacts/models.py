@@ -29,6 +29,7 @@ class Group(Model):
 @model_urls
 class Organization(Model):
     name = models.TextField(_("name"))
+    is_private_person = models.BooleanField(_("is private person"), default=False)
     notes = models.TextField(_("notes"), blank=True)
     primary_contact = models.ForeignKey(
         User,
@@ -103,7 +104,7 @@ class Person(Model):
         verbose_name_plural = _("people")
 
     def __str__(self):
-        if self.organization_id:
+        if self.organization_id and not self.organization.is_private_person:
             return "%s / %s" % (self.full_name, self.organization)
         return self.full_name
 
@@ -254,7 +255,10 @@ class PostalAddress(PersonDetail):
         if self.postal_address_override:
             return self.postal_address_override
         lines = [
-            self.person.organization.name if self.person.organization else "",
+            self.person.organization.name
+            if self.person.organization
+            and not self.person.organization.is_private_person
+            else "",
             self.person.full_name,
             " ".join(filter(None, (self.street, self.house_number))),
             self.address_suffix,
