@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from decimal import ROUND_UP, Decimal
 
 from django import forms
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.html import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -241,9 +242,9 @@ class LoggedHoursForm(ModelForm):
                 errors["rendered_on"] = _("Sorry, too early.")
 
         try:
-            latest = LoggedHours.objects.filter(rendered_by=self.request.user).latest(
-                "pk"
-            )
+            latest = LoggedHours.objects.filter(
+                Q(rendered_by=self.request.user), ~Q(id=self.instance.id)
+            ).latest("pk")
         except LoggedHours.DoesNotExist:
             pass
         else:
