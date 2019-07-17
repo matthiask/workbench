@@ -131,7 +131,7 @@ $(function() {
 
     if (e.keyCode === 70) {
       // f
-      $(".navbar-form input[name=q]")
+      $(".form-search input[name=q]")
         .focus()
         .select()
     } else if (e.keyCode === 72) {
