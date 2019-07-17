@@ -155,6 +155,8 @@ $(function() {
     } else if (e.keyCode === 65) {
       // a
       window.location.href = "/activities/"
+    } else if (e.keyCode === 76 && e.shiftKey) {
+      openModalFromUrl("/logbook/create/")
     } else if (e.keyCode === 76) {
       // l
       var el = document.querySelector("[data-createhours]")
