@@ -223,3 +223,11 @@ class ServiceMoveForm(ModelForm):
                 {"project": _("This project is already closed.")}
             )
         return data
+
+
+class ProjectAutocompleteForm(forms.Form):
+    project = forms.ModelChoiceField(
+        queryset=Project.objects.all(),
+        widget=Autocomplete(model=Project),
+        label=_("project"),
+    )
