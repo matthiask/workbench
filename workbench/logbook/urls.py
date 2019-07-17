@@ -9,10 +9,12 @@ from workbench.logbook.forms import (
     LoggedHoursSearchForm,
 )
 from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.logbook.views import createhours
 
 
 urlpatterns = [
     url(r"^$", lambda request: redirect("logbook_loggedhours_list"), name="logbook"),
+    url(r"^create/$", createhours, name="logbook_loggedhours_create"),
     url(
         r"^hours/$",
         generic.ListView.as_view(

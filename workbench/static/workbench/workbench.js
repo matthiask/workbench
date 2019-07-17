@@ -156,13 +156,12 @@ $(function() {
       // a
       window.location.href = "/activities/"
     } else if (e.keyCode === 76) {
+      // l
       var el = document.querySelector("[data-createhours]")
       if (el) {
-        $.get(el.href, function(data) {
-          initModal(data)
-        })
+        openModalFromUrl(el.href)
       } else {
-        alert("Bitte zuerst Projekt auswählen")
+        openModalFromUrl("/logbook/create/")
       }
     } else if (e.keyCode === 81) {
       // q

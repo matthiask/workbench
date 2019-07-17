@@ -461,3 +461,23 @@ class LogbookTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 200)  # No crash
+
+    def test_pre_form(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(
+            "/logbook/create/", HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertContains(response, "Wähle ein Projekt")
+
+        response = self.client.post(
+            "/logbook/create/",
+            {"project": project.pk},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        # Do not fetch the redirect response because the X-Requested-With
+        # header value will be missing on the second request.
+        self.assertRedirects(
+            response, project.urls["createhours"], fetch_redirect_response=False
+        )

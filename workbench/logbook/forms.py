@@ -119,6 +119,14 @@ class LoggedCostSearchForm(forms.Form):
             return xlsx.to_response("costs.xlsx")
 
 
+class LoggedHoursPreForm(forms.Form):
+    project = forms.ModelChoiceField(
+        queryset=Project.objects.all(),
+        widget=Autocomplete(model=Project),
+        label=_("project"),
+    )
+
+
 class LoggedHoursForm(ModelForm):
     user_fields = default_to_current_user = ("rendered_by",)
 

@@ -2,7 +2,7 @@
 
 <div class="modal">
   <div class="modal-dialog {% block size %}{% endblock %}">
-    <form method="post" action="{{ view.request.get_full_path }}">
+    <form method="post" action="{{ request.get_full_path }}">
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">
