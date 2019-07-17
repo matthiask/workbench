@@ -5,12 +5,17 @@
 
 {% block title %}
   {% trans 'History' %}{% if instance %}: <a href="{{ instance.get_absolute_url }}">{{ instance|h }}</a>{% endif %}
+  <small class="d-block">
+    {% for verbose_name_plural, url in related %}
+    <a href="{{ url }}" data-toggle="ajaxmodal">{{ verbose_name_plural }}</a>
+    {% endfor %}
+  </small>
 {% endblock %}
 
 {% block body %}
   {% for change in changes reversed %}
     <h4>
-      Version {{ change.number }} / {{ change.version.get_action_display }} / {{ change.version.pretty_user_name }} / {{ change.version.created_at }}
+      {{ change.version.get_action_display }} id:{{ change.version.row_data.id }} / {{ change.version.pretty_user_name }} / {{ change.version.created_at }}
     </h4>
     <ul>
       {% for pretty in change.changes %}

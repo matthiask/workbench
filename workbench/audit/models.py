@@ -4,8 +4,11 @@ from django.utils.translation import gettext_lazy as _
 
 
 class LoggedActionManager(models.Manager):
-    def for_model_id(self, model, id):
-        return self.filter(table_name=model._meta.db_table, row_data__id=id)
+    def for_model_id(self, model, **kwargs):
+        return self.filter(
+            table_name=model._meta.db_table,
+            **{"row_data__%s" % key: value for key, value in kwargs.items()}
+        )
 
 
 class LoggedAction(models.Model):

@@ -64,7 +64,7 @@ def formatter(field):
 
             return format_html(
                 '<a href="{}" data-toggle="ajaxmodal">{}</a>',
-                reverse("history", args=(model._meta.label_lower, value)),
+                reverse("history", args=(model._meta.label_lower, "id", value)),
                 pretty,
             )
 
