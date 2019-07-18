@@ -365,3 +365,14 @@ class ProjectsTest(TestCase):
 
         service.refresh_from_db()
         self.assertEqual(service.project, project)
+
+    def test_select(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.urls["select"])
+        self.assertContains(response, 'data-autocomplete-url="/projects/autocomplete/"')
+
+        response = self.client.post(project.urls["select"], {"project": project.pk})
+        self.assertEqual(response.status_code, 299)
+        self.assertEqual(response.json(), {"redirect": project.get_absolute_url()})

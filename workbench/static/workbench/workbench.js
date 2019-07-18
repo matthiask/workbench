@@ -54,6 +54,9 @@ $(function() {
           $(document).trigger("modalform", [jqXHR.status, action])
           dismissModals()
           window.location.reload()
+        } else if (jqXHR.status === 299) {
+          console.log(data, jqXHR)
+          window.location.href = data.redirect
         } else {
           initModal(data)
         }
@@ -143,6 +146,9 @@ $(function() {
     } else if (e.keyCode === 67 && e.shiftKey) {
       // C
       window.location.href = "/contacts/organizations/"
+    } else if (e.keyCode === 80 && e.shiftKey) {
+      // Shift-p
+      window.openModalFromUrl("/projects/select/")
     } else if (e.keyCode === 80) {
       // p
       window.location.href = "/projects/"
@@ -156,14 +162,15 @@ $(function() {
       // a
       window.location.href = "/activities/"
     } else if (e.keyCode === 76 && e.shiftKey) {
-      openModalFromUrl("/logbook/create/")
+      // Shift-l
+      window.openModalFromUrl("/logbook/create/")
     } else if (e.keyCode === 76) {
       // l
       var el = document.querySelector("[data-createhours]")
       if (el) {
-        openModalFromUrl(el.href)
+        window.openModalFromUrl(el.href)
       } else {
-        openModalFromUrl("/logbook/create/")
+        window.openModalFromUrl("/logbook/create/")
       }
     } else if (e.keyCode === 81) {
       // q

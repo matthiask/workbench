@@ -16,7 +16,7 @@ from workbench.projects.forms import (
     ServiceMoveForm,
 )
 from workbench.projects.models import Project, Service
-from workbench.projects.views import set_order
+from workbench.projects.views import select, set_order
 
 
 urlpatterns = [
@@ -32,6 +32,7 @@ urlpatterns = [
         ),
         name="projects_project_autocomplete",
     ),
+    url(r"^select/$", select, name="projects_project_select"),
     url(
         r"^(?P<pk>\d+)/$",
         generic.DetailView.as_view(
