@@ -4,7 +4,7 @@ from functools import total_ordering
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
-from django.db.models import Q, Sum
+from django.db.models import Count, Q, Sum
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -144,7 +144,11 @@ class User(Model, AbstractBaseUser):
         return Project.objects.filter(
             id__in=self.loggedhours.filter(
                 rendered_on__gte=date.today() - timedelta(days=7)
-            ).values("service__project")
+            )
+            .values("service__project")
+            .annotate(Count("id"))
+            .filter(id__count__gt=1)
+            .values("service__project")
         ).select_related("customer", "contact__organization", "owned_by")
 
     @cached_property
