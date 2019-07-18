@@ -1,0 +1,18 @@
+{% load bootstrap4 fineforms i18n %}
+<div class="modal">
+  <div class="modal-dialog">
+    <form method="post" action="{{ request.get_full_path }}">
+      <div class="modal-content">
+        <div class="modal-body clearfix">
+          {% bootstrap_messages %}
+          {% csrf_token %}
+          {% block body %}
+            {% include 'fineforms/warnings.html' %}
+            {% ff_errors form %}
+            {% ff_fields form %}
+          {% endblock %}
+        </div>
+      </div><!-- /.modal-content -->
+    </form>
+  </div><!-- /.modal-dialog -->
+</div>
