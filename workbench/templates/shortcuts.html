@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans 'keyboard shortcuts' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <h1>{% trans 'keyboard shortcuts' %}</h1>
+
+    <table class="table">
+      <tr>
+        <th class="text-right text-nowrap">Ctrl-Q</th>
+        <td>{% trans 'Search everything' %}</td>
+      </tr>
+
+      <tr>
+        <th class="text-right text-nowrap">Ctrl-F</th>
+        <td>{% trans 'Focus the search form in list views' %}</td>
+      </tr>
+
+      <tr>
+        <th class="text-right text-nowrap">Ctrl-Return</th>
+        <td>{% trans 'Submit the current form' %}</td>
+      </tr>
+
+      <tr>
+        <th class="text-right text-nowrap">Ctrl-H</th>
+        <td>{% trans 'Home' %}</td>
+      </tr>
+
+      <tr>
+        <th class="text-right text-nowrap">Ctrl-C</th>
+        <td>{% trans 'people' %}</td>
+      </tr>
+
+      <tr>
+        <th class="text-right text-nowrap">Ctrl-Shift-C</th>
+        <td>{% trans 'organizations' %}</td>
+      </tr>
+
+      <tr>
+        <th class="text-right text-nowrap">Ctrl-P</th>
+        <td>{% trans 'projects' %}</td>
+      </tr>
+
+      <tr>
+        <th class="text-right text-nowrap">Ctrl-Shift-P</th>
+        <td>{% trans 'Jump to project' %}</td>
+      </tr>
+
+      <tr>
+        <th class="text-right text-nowrap">Ctrl-O</th>
+        <td>{% trans 'offers' %}</td>
+      </tr>
+
+      <tr>
+        <th class="text-right text-nowrap">Ctrl-R</th>
+        <td>{% trans 'invoices' %}</td>
+      </tr>
+
+      <tr>
+        <th class="text-right text-nowrap">Ctrl-A</th>
+        <td>{% trans 'activities' %}</td>
+      </tr>
+
+      <tr>
+        <th class="text-right text-nowrap">Ctrl-L</th>
+        <td>{% trans 'log hours in active project or in any project if none is active' %}</td>
+      </tr>
+
+      <tr>
+        <th class="text-right text-nowrap">Ctrl-Shift-L</th>
+        <td>{% trans 'log hours in any project' %}</td>
+      </tr>
+
+    </table>
+
+    <p>{% trans 'Replace Ctrl- with Alt- on PC operating systems.' %}</p>
+  </div>
+</div>
+{% endblock %}
