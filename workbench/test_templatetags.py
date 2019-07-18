@@ -58,9 +58,9 @@ class TemplateTagsTest(TestCase):
         )
         self.assertEqual(
             t.render(Context({"value": 80, "one": 100})),
-            '<div class="progress progress-line" title="80%"><div class="progress-bar bg-success" role="progressbar" style="width:80%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:5%"></div></div>',  # noqa
+            '<div class="progress progress-line" title="80%"><div class="progress-bar bg-success" role="progressbar" style="width:75%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:5%"></div></div>',  # noqa
         )
         self.assertEqual(
-            t.render(Context({"value": 100, "one": 60})),
-            '<div class="progress progress-line" title="166%"><div class="progress-bar bg-success" role="progressbar" style="width:100%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:15%"></div><div class="progress-bar bg-danger" role="progressbar" style="width:39%"></div></div>',  # noqa
+            t.render(Context({"value": 150, "one": 100})),
+            '<div class="progress progress-line" title="150%"><div class="progress-bar bg-success" role="progressbar" style="width:50.0%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:16.67%"></div><div class="progress-bar bg-danger" role="progressbar" style="width:33.33%"></div></div>',  # noqa
         )
