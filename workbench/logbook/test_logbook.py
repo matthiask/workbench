@@ -469,7 +469,7 @@ class LogbookTest(TestCase):
         response = self.client.get(
             "/logbook/create/", HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
-        self.assertContains(response, "Wähle ein Projekt")
+        self.assertContains(response, 'data-autocomplete-url="/projects/autocomplete/"')
 
         response = self.client.post(
             "/logbook/create/",
