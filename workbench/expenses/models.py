@@ -66,3 +66,13 @@ class ExpenseReport(Model):
         super().save(*args, **kwargs)
 
     save.alters_data = True
+
+    def delete(self, *args, **kwargs):
+        self.expenses.update(expense_report=None)
+        super().delete(*args, **kwargs)
+
+    delete.alters_data = True
+
+    @classmethod
+    def allow_delete(cls, instance, request):
+        return True
