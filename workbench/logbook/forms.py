@@ -94,6 +94,12 @@ class LoggedCostSearchForm(forms.Form):
         label=_("service"), required=False, widget=forms.HiddenInput
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["rendered_by"].choices = User.objects.choices(
+            collapse_inactive=False
+        )
+
     def filter(self, queryset):
         data = self.cleaned_data
         if data.get("rendered_by"):

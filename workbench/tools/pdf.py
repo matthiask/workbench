@@ -166,6 +166,29 @@ class PDFDocument(_PDFDocument):
         )
         self.story.append(NextPageTemplate("Later"))
 
+    def init_report(self, page_fn):
+        self.generate_style()
+
+        frame_kwargs = {
+            "showBoundary": self.show_boundaries,
+            "leftPadding": 0,
+            "rightPadding": 0,
+            "topPadding": 0,
+            "bottomPadding": 0,
+        }
+
+        full_frame = Frame(
+            self.bounds.W,
+            self.bounds.S,
+            self.bounds.E - self.bounds.W,
+            self.bounds.N - self.bounds.S,
+            **frame_kwargs
+        )
+
+        self.doc.addPageTemplates(
+            [PageTemplate(id="Page", frames=[full_frame], onPage=page_fn)]
+        )
+
     def stationery(self):
         pdf = self
 

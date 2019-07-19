@@ -3,6 +3,7 @@ from django.conf.urls import url
 from workbench import generic
 from workbench.expenses.forms import ExpenseReportForm
 from workbench.expenses.models import ExpenseReport
+from workbench.expenses.views import ExpenseReportPDFView
 
 
 urlpatterns = [
@@ -15,6 +16,11 @@ urlpatterns = [
         r"^(?P<pk>\d+)/$",
         generic.DetailView.as_view(model=ExpenseReport),
         name="expenses_expensereport_detail",
+    ),
+    url(
+        r"^(?P<pk>\d+)/pdf/$",
+        ExpenseReportPDFView.as_view(),
+        name="expenses_expensereport_pdf",
     ),
     url(
         r"^create/$",
