@@ -12,7 +12,7 @@ from workbench.invoices.models import Invoice
 from workbench.invoices.reporting import monthly_invoicing
 from workbench.projects.reporting import hours_per_customer, overdrawn_projects
 from workbench.reporting import key_data
-from workbench.tools.formats import local_date_format
+from workbench.tools.forms import DateInput
 from workbench.tools.models import Z
 from workbench.tools.validation import monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -45,14 +45,12 @@ def overdrawn_projects_view(request):
 
 class OpenItemsForm(forms.Form):
     cutoff_date = forms.DateField(
-        label=_("cutoff date"),
-        required=False,
-        widget=forms.TextInput(attrs={"class": "datepicker"}),
+        label=_("cutoff date"), required=False, widget=DateInput()
     )
 
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
-        data.setdefault("cutoff_date", local_date_format(date.today()))
+        data.setdefault("cutoff_date", date.today().isoformat())
         super().__init__(data, *args, **kwargs)
 
     def open_items_list(self):
@@ -161,14 +159,10 @@ def key_data_view(request):
 
 class HoursPerCustomerForm(forms.Form):
     date_from = forms.DateField(
-        label=_("date from"),
-        required=False,
-        widget=forms.TextInput(attrs={"class": "datepicker"}),
+        label=_("date from"), required=False, widget=DateInput()
     )
     date_until = forms.DateField(
-        label=_("date until"),
-        required=False,
-        widget=forms.TextInput(attrs={"class": "datepicker"}),
+        label=_("date until"), required=False, widget=DateInput()
     )
     users = forms.ModelMultipleChoiceField(
         User.objects.all(), label=_("users"), required=False
@@ -176,8 +170,8 @@ class HoursPerCustomerForm(forms.Form):
 
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
-        data.setdefault("date_from", local_date_format(monday()))
-        data.setdefault("date_until", local_date_format(monday() + timedelta(days=6)))
+        data.setdefault("date_from", monday().isoformat())
+        data.setdefault("date_until", (monday() + timedelta(days=6)).isoformat())
         super().__init__(data, *args, **kwargs)
         self.fields["users"].choices = User.objects.choices(collapse_inactive=False)
         self.fields["users"].widget.attrs = {"size": 10}

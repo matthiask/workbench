@@ -127,6 +127,10 @@ class WarningsForm(forms.BaseForm):
     ignore_warnings_id = "__ig_{}".format(int(time.time() / 10800))
 
 
+class DateInput(forms.TextInput):
+    input_type = "date"
+
+
 class ModelForm(WarningsForm, forms.ModelForm):
     user_fields = ()
     default_to_current_user = ()
@@ -147,8 +151,7 @@ class ModelForm(WarningsForm, forms.ModelForm):
 
         for name, field in self.fields.items():
             if isinstance(field, forms.DateField):
-                css = field.widget.attrs.get("class", "")
-                field.widget.attrs["class"] = css + " datepicker"
+                field.widget = DateInput()
 
             elif name in self.user_fields:
                 field.choices = User.objects.active_choices(

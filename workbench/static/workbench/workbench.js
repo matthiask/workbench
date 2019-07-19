@@ -213,14 +213,6 @@ $(function() {
 })
 
 function initWidgets() {
-  $(".datepicker:not(.has-datepicker)")
-    .addClass("has-datepicker")
-    .datepicker({
-      language: "de-DE",
-      autoHide: true,
-      zIndex: 1500,
-    })
-
   function addZero(num) {
     return num < 10 ? "0" + num : "" + num
   }
@@ -230,14 +222,14 @@ function initWidgets() {
   if (invoicedOn.length && dueOn.length) {
     invoicedOn.on("change", function(_event) {
       var due = new Date(
-        invoicedOn.datepicker("getDate").getTime() + 14 * 86400 * 1000
+        new Date(invoicedOn.val()).getTime() + 14 * 86400 * 1000
       )
       dueOn.val(
-        addZero(due.getDate()) +
-          "." +
+        addZero(due.getFullYear()) +
+          "-" +
           addZero(1 + due.getMonth()) +
-          "." +
-          addZero(due.getFullYear())
+          "-" +
+          addZero(due.getDate())
       )
     })
   }

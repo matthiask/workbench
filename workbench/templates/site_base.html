@@ -4,7 +4,6 @@
 <head>
   <title>{% block title %}{{ WORKBENCH.PDF_COMPANY }}{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'workbench/lib/main.css' %}">
-  <link rel="stylesheet" href="{% static 'workbench/lib/datepicker.min.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'workbench/lib/jquery-ui.min.css' %}">
   <link rel="stylesheet" href="{% static 'workbench/workbench.css' %}">
   <link rel="shortcut icon" href="{% static 'workbench/lib/favicon.png' %}">
@@ -16,12 +15,11 @@
   {% block body %}{% endblock body %}
 
   <script src="{% static 'workbench/lib/main.js' %}"></script>
-  <script src="{% static 'workbench/lib/datepicker.min.js' %}"></script>
-  <script src="{% static 'workbench/lib/datepicker.de-DE.js' %}"></script>
   <script src="{% static 'workbench/lib/jquery-ui.min.js' %}"></script>
   <script src="{% static 'workbench/lib/hoverintent.min.js' %}"></script>
   <script src="{% static 'workbench/workbench.js' %}"></script>
   <script type="module" src="{% static 'workbench/timer.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/date-input-polyfill@2.14.0/date-input-polyfill.dist.js" integrity="sha256-FcR3bJqClBNWiJqgW1E9yEgSRoAqRNcjOfgRfaH0LVw=" crossorigin="anonymous" async></script>
   {% block js %}{% endblock %}
 
 </body>

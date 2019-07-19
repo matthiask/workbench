@@ -11,7 +11,6 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
-from workbench.tools.formats import local_date_format
 from workbench.tools.forms import Autocomplete, ModelForm, Textarea
 from workbench.tools.validation import monday, raise_if_errors
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -147,7 +146,7 @@ class LoggedHoursForm(ModelForm):
                     initial.update(
                         {
                             "service": hours.service_id,
-                            "rendered_on": local_date_format(hours.rendered_on),
+                            "rendered_on": hours.rendered_on.isoformat(),
                             "hours": hours.hours,
                             "description": hours.description,
                         }
