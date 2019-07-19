@@ -15,6 +15,7 @@ from workbench.services.models import ServiceType
 from workbench.tools.formats import currency, hours, local_date_format
 from workbench.tools.forms import Autocomplete, ModelForm, Textarea
 from workbench.tools.models import Z
+from workbench.tools.pdf import pdf_response
 
 
 class InvoiceSearchForm(forms.Form):
@@ -65,13 +66,23 @@ class InvoiceSearchForm(forms.Form):
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
         if data.get("o") == "dunning":
-            queryset = queryset.filter(
-                status=Invoice.SENT, due_on__lte=date.today()
-            ).order_by("due_on")
+            queryset = queryset.overdue().order_by("due_on")
 
         return queryset.select_related(
             "customer", "contact__organization", "owned_by", "project__owned_by"
         )
+
+    def response(self, request, queryset):
+        if request.GET.get("pdf"):
+            pdf, response = pdf_response("invoices", as_attachment=False)
+
+            for invoice in queryset:
+                pdf.init_letter(page_fn=pdf.stationery())
+                pdf.process_invoice(invoice)
+                pdf.restart()
+
+            pdf.generate()
+            return response
 
 
 class InvoiceForm(PostalAddressSelectionForm):

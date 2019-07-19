@@ -25,6 +25,13 @@ class InvoiceQuerySet(SearchQuerySet):
             status__in=(Invoice.IN_PREPARATION, Invoice.SENT, Invoice.PAID)
         )
 
+    def overdue(self):
+        return self.filter(
+            status=Invoice.SENT,
+            due_on__isnull=False,
+            due_on__lte=date.today() - timedelta(days=30),
+        )
+
 
 @model_urls
 class Invoice(ModelWithTotal):

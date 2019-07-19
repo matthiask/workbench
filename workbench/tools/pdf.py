@@ -207,7 +207,14 @@ class PDFDocument(_PDFDocument):
 
             canvas.setFont(pdf.style.fontName, 6)
             canvas.drawRightString(
-                pdf.bounds.E, pdf.bounds.outsideS, _("page %d") % doc.page
+                pdf.bounds.E,
+                pdf.bounds.outsideS,
+                _("page %d")
+                % (
+                    doc.page - doc.restartDocPageNumbers[doc.restartDocIndex - 1]
+                    if doc.restartDocIndex
+                    else doc.page
+                ),
             )
 
             canvas.restoreState()

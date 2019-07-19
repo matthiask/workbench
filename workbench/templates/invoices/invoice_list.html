@@ -2,6 +2,12 @@
 
 {% load bootstrap4 i18n workbench %}
 
+{% block search-form-buttons %}
+{{ block.super }}
+<a href="{% querystring pdf=1 %}" class="btn btn-secondary">
+  {% include 'svg/desktop-download.svg' %} PDF</a>
+{% endblock %}
+
 {% block objects %}
 <div class="list-group list-group-flush">
   {% for invoice in object_list %}
