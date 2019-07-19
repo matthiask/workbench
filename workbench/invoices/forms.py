@@ -1,3 +1,4 @@
+import itertools
 from datetime import date
 
 from django import forms
@@ -66,7 +67,7 @@ class InvoiceSearchForm(forms.Form):
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
         if data.get("o") == "dunning":
-            queryset = queryset.overdue().order_by("due_on")
+            queryset = queryset.overdue().order_by("due_on", "id")
 
         return queryset.select_related(
             "customer", "contact__organization", "owned_by", "project__owned_by"
@@ -76,10 +77,38 @@ class InvoiceSearchForm(forms.Form):
         if request.GET.get("pdf"):
             pdf, response = pdf_response("invoices", as_attachment=False)
 
-            for invoice in queryset:
-                pdf.init_letter(page_fn=pdf.stationery())
-                pdf.process_invoice(invoice)
-                pdf.restart()
+            if self.cleaned_data.get("o") == "dunning":
+                for organization, invoices in itertools.groupby(
+                    queryset.order_by("customer", "due_on", "id"),
+                    lambda invoice: invoice.customer,
+                ):
+                    invoices = list(invoices)
+                    pdf.init_letter(page_fn=pdf.stationery())
+                    pdf.p(invoices[0].postal_address)
+                    pdf.next_frame()
+                    pdf.h1("Überfällige Rechnungen")
+                    pdf.spacer()
+                    pdf.p(
+                        "Gemäss unserer Buchhaltung sind folgende Rechnungen"
+                        " überfällig:"
+                    )
+                    pdf.spacer()
+                    for invoice in invoices:
+                        pdf.p(invoice)
+                    pdf.spacer()
+                    pdf.p(
+                        "Wir bedanken uns für die Begleichung in den nächsten Tagen."
+                    )
+                    pdf.restart()
+                    for invoice in invoices:
+                        pdf.init_letter(page_fn=pdf.stationery())
+                        pdf.process_invoice(invoice)
+                        pdf.restart()
+            else:
+                for invoice in queryset:
+                    pdf.init_letter(page_fn=pdf.stationery())
+                    pdf.process_invoice(invoice)
+                    pdf.restart()
 
             pdf.generate()
             return response
