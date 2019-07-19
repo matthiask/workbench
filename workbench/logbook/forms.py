@@ -336,4 +336,10 @@ class LoggedCostForm(ModelForm):
                 "third_party_costs",
                 _("Providing third party costs is necessary for expenses."),
             )
+        if data.get("cost") and data.get("third_party_costs") is not None:
+            if data["cost"] < data["third_party_costs"]:
+                self.add_warning(
+                    _("Third party costs shouldn't be higher than costs."),
+                    code="third-party-costs-higher",
+                )
         return data
