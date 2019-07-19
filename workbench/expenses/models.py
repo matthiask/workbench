@@ -80,7 +80,7 @@ class ExpenseReport(Model):
 
     @classmethod
     def allow_delete(cls, instance, request):
-        return True
+        return not instance.closed_on
 
     @property
     def status_css(self):
