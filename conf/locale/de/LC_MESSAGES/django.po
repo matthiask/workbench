@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-18 09:25+0200\n"
+"POT-Creation-Date: 2019-07-19 07:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1785,7 +1785,7 @@ msgstr "von"
 msgid "History"
 msgstr "Geschichte"
 
-#: workbench/templates/history_modal.html:26
+#: workbench/templates/history_modal.html:31
 msgid "No history found"
 msgstr "Keine Geschichte gefunden"
 
@@ -2132,9 +2132,14 @@ msgstr "Gültig bis"
 msgid "down payment invoice"
 msgstr "Anzahlungsrechnung"
 
-#: workbench/views.py:46
+#: workbench/views.py:47
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
+
+#: workbench/views.py:109
+#, python-format
+msgid "%(model)s with %(attribute)s=%(id)s"
+msgstr "%(model)s mit %(attribute)s=%(id)s"
 
 #~ msgid "select a project"
 #~ msgstr "Wähle ein Projekt"
