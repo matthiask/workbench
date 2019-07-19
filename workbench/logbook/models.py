@@ -79,6 +79,11 @@ class LoggedHours(Model):
             )
 
 
+class LoggedCostQuerySet(models.QuerySet):
+    def expenses(self, *, user):
+        return self.filter(are_expenses=True, rendered_by=user)
+
+
 @model_urls
 class LoggedCost(Model):
     project = models.ForeignKey(
@@ -135,6 +140,8 @@ class LoggedCost(Model):
         verbose_name=_("expense report"),
         related_name="expenses",
     )
+
+    objects = LoggedCostQuerySet.as_manager()
 
     class Meta:
         ordering = ("-rendered_on", "-created_at")

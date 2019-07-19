@@ -1,3 +1,4 @@
+from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
 from workbench import generic
@@ -14,6 +15,8 @@ class ExpenseReportPDFView(generic.DetailView):
 
         pdf, response = pdf_response(self.object.code, as_attachment=False)
         pdf.init_report(page_fn=pdf.stationery())
+        if not self.object.closed_on:
+            pdf.watermark(_("In preparation"))
 
         pdf.h1(_("expense report"))
         pdf.spacer(2 * mm)
@@ -21,6 +24,7 @@ class ExpenseReportPDFView(generic.DetailView):
             [
                 (_("owned by"), self.object.owned_by.get_full_name()),
                 (_("created at"), local_date_format(self.object.created_at)),
+                (_("status"), capfirst(self.object.pretty_status)),
             ],
             pdf.style.tableColumnsLeft,
             pdf.style.table,
@@ -36,7 +40,7 @@ class ExpenseReportPDFView(generic.DetailView):
                         "%s<br />%s%s<br />%s<br />&nbsp;"
                         % (
                             local_date_format(cost.rendered_on),
-                            cost.project.title,
+                            cost.project,
                             (": %s" % cost.service) if cost.service else "",
                             cost.description,
                         ),
@@ -45,9 +49,9 @@ class ExpenseReportPDFView(generic.DetailView):
                     currency(cost.third_party_costs),
                 )
                 for index, cost in enumerate(
-                    self.object.expenses.select_related("service__project").order_by(
-                        "rendered_on", "pk"
-                    )
+                    self.object.expenses.select_related(
+                        "service", "project__owned_by"
+                    ).order_by("rendered_on", "pk")
                 )
             ],
             (10 * mm, pdf.bounds.E - pdf.bounds.W - 10 * mm - 16 * mm, 16 * mm),

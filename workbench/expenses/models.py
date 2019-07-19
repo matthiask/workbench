@@ -32,6 +32,7 @@ class ExpenseReport(Model):
     created_by = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name="+", verbose_name=_("created by")
     )
+    closed_on = models.DateField(_("closed on"), blank=True, null=True)
     owned_by = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
@@ -74,5 +75,21 @@ class ExpenseReport(Model):
     delete.alters_data = True
 
     @classmethod
+    def allow_update(cls, instance, request):
+        return not instance.closed_on
+
+    @classmethod
     def allow_delete(cls, instance, request):
         return True
+
+    @property
+    def status_css(self):
+        return "light" if self.closed_on else "info"
+
+    @property
+    def pretty_status(self):
+        return (
+            (_("closed on %s") % local_date_format(self.closed_on))
+            if self.closed_on
+            else _("In preparation")
+        )

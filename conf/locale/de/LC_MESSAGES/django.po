@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-19 11:40+0200\n"
+"POT-Creation-Date: 2019-07-19 12:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -184,8 +184,8 @@ msgid "All"
 msgstr "Alle"
 
 #: workbench/activities/forms.py:20 workbench/activities/models.py:54
-#: workbench/deals/models.py:60 workbench/expenses/models.py:39
-#: workbench/expenses/views.py:22 workbench/invoices/forms.py:36
+#: workbench/deals/models.py:60 workbench/expenses/models.py:40
+#: workbench/expenses/views.py:24 workbench/invoices/forms.py:36
 #: workbench/invoices/forms.py:534 workbench/invoices/models.py:92
 #: workbench/invoices/models.py:447 workbench/offers/models.py:58
 #: workbench/projects/forms.py:32 workbench/projects/models.py:59
@@ -253,7 +253,7 @@ msgid "due on"
 msgstr "Fällig am"
 
 #: workbench/activities/models.py:58 workbench/deals/models.py:68
-#: workbench/expenses/models.py:31 workbench/expenses/views.py:23
+#: workbench/expenses/models.py:31 workbench/expenses/views.py:25
 #: workbench/invoices/models.py:95 workbench/invoices/models.py:450
 #: workbench/logbook/models.py:27 workbench/logbook/models.py:104
 #: workbench/offers/models.py:44 workbench/projects/models.py:63
@@ -738,8 +738,8 @@ msgstr "Referenz-Nr."
 msgid "value date"
 msgstr "Valuta"
 
-#: workbench/credit_control/models.py:52 workbench/expenses/models.py:42
-#: workbench/expenses/views.py:31 workbench/expenses/views.py:59
+#: workbench/credit_control/models.py:52 workbench/expenses/models.py:43
+#: workbench/expenses/views.py:34 workbench/expenses/views.py:62
 #: workbench/management/commands/export_debtors.py:69
 #: workbench/management/commands/export_debtors.py:96
 #: workbench/templates/credit_control/creditentry_list.html:25
@@ -836,8 +836,8 @@ msgstr "Kundschaft"
 msgid "estimated value"
 msgstr "Geschätzter Wert"
 
-#: workbench/deals/models.py:65 workbench/invoices/models.py:97
-#: workbench/offers/models.py:62
+#: workbench/deals/models.py:65 workbench/expenses/views.py:26
+#: workbench/invoices/models.py:97 workbench/offers/models.py:62
 #: workbench/templates/activities/activity_detail.html:14
 #: workbench/templates/deals/deal_detail.html:20
 #: workbench/templates/deals/deal_list.html:15
@@ -845,7 +845,8 @@ msgstr "Geschätzter Wert"
 msgid "status"
 msgstr "Status"
 
-#: workbench/deals/models.py:69 workbench/invoices/models.py:79
+#: workbench/deals/models.py:69 workbench/expenses/models.py:35
+#: workbench/invoices/models.py:79
 #: workbench/management/commands/export_debtors.py:96
 #: workbench/offers/models.py:53 workbench/projects/models.py:64
 msgid "closed on"
@@ -861,36 +862,51 @@ msgstr "Offen seit %(created_at)s"
 msgid "%(status)s on %(closed_on)s"
 msgstr "%(status)s am %(closed_on)s"
 
-#: workbench/expenses/__init__.py:10 workbench/expenses/forms.py:24
-#: workbench/expenses/forms.py:32
+#: workbench/expenses/__init__.py:10 workbench/expenses/forms.py:35
+#: workbench/expenses/forms.py:48
 #: workbench/templates/logbook/loggedcost_detail.html:40
 msgid "expenses"
 msgstr "Spesen"
 
-#: workbench/expenses/forms.py:43
-msgid "All expenses are bound to an expense report already."
-msgstr "Alle Spesen sind schon Teil einer Spesenabrechnung."
+#: workbench/expenses/forms.py:24 workbench/projects/forms.py:100
+msgid "is closed"
+msgstr "Ist geschlossen"
+
+#: workbench/expenses/forms.py:25
+msgid "Once an expense report is closed it stays that way."
+msgstr "Eine geschlossene Spesenabrechnung bleibt geschlossen."
 
 #: workbench/expenses/models.py:33 workbench/logbook/models.py:30
 #: workbench/logbook/models.py:106
 msgid "created by"
 msgstr "Erstellt von"
 
-#: workbench/expenses/models.py:46 workbench/logbook/models.py:120
+#: workbench/expenses/models.py:47 workbench/logbook/models.py:120
 #: workbench/services/models.py:68
 msgid "Total incl. tax for third-party services."
 msgstr "Total inkl. MwSt. bei Fremdleistungen."
 
-#: workbench/expenses/models.py:53 workbench/expenses/views.py:18
+#: workbench/expenses/models.py:54 workbench/expenses/views.py:20
 #: workbench/logbook/models.py:140
 msgid "expense report"
 msgstr "Spesenabrechnung"
 
-#: workbench/expenses/models.py:54 workbench/templates/base.html:64
+#: workbench/expenses/models.py:55 workbench/templates/base.html:64
 msgid "expense reports"
 msgstr "Spesenabrechnungen"
 
-#: workbench/expenses/views.py:31
+#: workbench/expenses/models.py:91 workbench/projects/models.py:134
+#, python-format
+msgid "closed on %s"
+msgstr "geschlossen am %s"
+
+#: workbench/expenses/models.py:91 workbench/expenses/views.py:18
+#: workbench/invoices/models.py:37 workbench/offers/models.py:26
+#: workbench/offers/models.py:38 workbench/templates/start.html:26
+msgid "In preparation"
+msgstr "In Vorbereitung"
+
+#: workbench/expenses/views.py:34
 msgid "receipt"
 msgstr "Beleg"
 
@@ -1043,11 +1059,6 @@ msgstr "Optional, aber nützlich um Felder unten rasch zu füllen."
 #: workbench/invoices/forms.py:524 workbench/projects/forms.py:17
 msgid "Closed"
 msgstr "Abgeschlossen"
-
-#: workbench/invoices/models.py:37 workbench/offers/models.py:26
-#: workbench/offers/models.py:38 workbench/templates/start.html:26
-msgid "In preparation"
-msgstr "In Vorbereitung"
 
 #: workbench/invoices/models.py:38
 msgid "Sent"
@@ -1288,7 +1299,7 @@ msgstr "Scheint ein Duplikat zu sein. Oder nicht?"
 msgid "Providing third party costs is necessary for expenses."
 msgstr "Fremdkosten müssen für Spesen angegeben werden."
 
-#: workbench/logbook/forms.py:343
+#: workbench/logbook/forms.py:342
 msgid "Third party costs shouldn't be higher than costs."
 msgstr "Fremdkosten sollten nicht höher sein als die Kosten."
 
@@ -1425,10 +1436,6 @@ msgstr "Projekte"
 msgid "All types"
 msgstr "Alle Typen"
 
-#: workbench/projects/forms.py:100
-msgid "is closed"
-msgstr "Ist geschlossen"
-
 #: workbench/projects/forms.py:111
 msgid ""
 "This project already has invoices. The invoices' customer record will be "
@@ -1463,11 +1470,6 @@ msgstr "Auftrag"
 #: workbench/projects/models.py:38
 msgid "Internal"
 msgstr "Intern"
-
-#: workbench/projects/models.py:134
-#, python-format
-msgid "closed on %s"
-msgstr "geschlossen am %s"
 
 #: workbench/projects/models.py:215
 msgid "Not bound to a particular service."
@@ -2166,9 +2168,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "expense"
-#~ msgstr "Spesen"
-
-#~ msgid "select a project"
-#~ msgstr "Wähle ein Projekt"
