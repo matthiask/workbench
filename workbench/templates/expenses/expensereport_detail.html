@@ -16,6 +16,18 @@
       <td>{% link_or_none value %}</td>
     </tr>
     {% endfor %}
+    <tr>
+      <th class="text-right">{% trans 'expenses' %}</th>
+      <td>
+        {% for cost in object.expenses.all %}
+          {{ cost.rendered_on|date:'SHORT_DATE_FORMAT' }}<br>
+          {% link_or_none cost.project %}
+          {{ cost.description }}<br>
+          {{ cost.third_party_costs|currency }}<br>
+          <br>
+        {% endfor %}
+      </td>
+    </tr>
   </table>
 
   <a href="{{ object.urls.update }}" class="btn btn-secondary">
