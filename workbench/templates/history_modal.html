@@ -4,7 +4,7 @@
 {% block size %}modal-xl{% endblock %}
 
 {% block title %}
-  {% trans 'History' %}{% if instance %}: <a href="{{ instance.get_absolute_url }}">{{ instance|h }}</a>{% endif %}
+  {% trans 'History' %}: {% if instance %}<a href="{{ instance.get_absolute_url }}">{{ instance|h }}</a>{% else %}{{ title }}{% endif %}
   <small class="d-block">
     {% for verbose_name_plural, url in related %}
     <a href="{{ url }}" data-toggle="ajaxmodal">{{ verbose_name_plural }}</a>
@@ -15,7 +15,12 @@
 {% block body %}
   {% for change in changes reversed %}
     <h4>
-      {{ change.version.get_action_display }} id:{{ change.version.row_data.id }} / {{ change.version.pretty_user_name }} / {{ change.version.created_at }}
+      <a href="{% url 'history' change.version.table_name 'id' change.version.row_data.id %}" data-toggle="ajaxmodal">
+
+        {{ change.version.get_action_display }} {{ change.version.table_name }} id:{{ change.version.row_data.id }}
+
+      </a>
+      / {{ change.version.pretty_user_name }} / {{ change.version.created_at }}
     </h4>
     <ul>
       {% for pretty in change.changes %}

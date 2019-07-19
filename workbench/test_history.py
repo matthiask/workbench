@@ -19,14 +19,14 @@ class HistoryTest(TestCase):
 
         self.client.force_login(user1)
 
-        response = self.client.get("/history/accounts.user/id/{}/".format(user1.pk))
-        self.assertContains(response, "INSERT id:{} / ballabla /".format(user1.pk))
+        response = self.client.get("/history/accounts_user/id/{}/".format(user1.pk))
+        self.assertContains(response, "INSERT accounts_user id:{}".format(user1.pk))
 
-        response = self.client.get("/history/accounts.user/id/{}/".format(user2.pk))
-        self.assertContains(response, "INSERT id:{} / foo /".format(user2.pk))
+        response = self.client.get("/history/accounts_user/id/{}/".format(user2.pk))
+        self.assertContains(response, "INSERT accounts_user id:{}".format(user2.pk))
 
-        response = self.client.get("/history/accounts.user/id/{}/".format(user3.pk))
-        self.assertContains(response, "INSERT id:{} / bar /".format(user3.pk))
+        response = self.client.get("/history/accounts_user/id/{}/".format(user3.pk))
+        self.assertContains(response, "INSERT accounts_user id:{}".format(user3.pk))
 
     def test_history(self):
         project = factories.ProjectFactory.create()
@@ -37,7 +37,7 @@ class HistoryTest(TestCase):
 
         self.client.force_login(project.owned_by)
         response = self.client.get(
-            "/history/projects.project/id/{}/".format(project.pk)
+            "/history/projects_project/id/{}/".format(project.pk)
         )
         # print(response, response.content.decode("utf-8"))
         self.assertContains(response, "Anfangswert von 'Kundschaft' war")
@@ -48,7 +48,7 @@ class HistoryTest(TestCase):
         person.is_archived = True
         person.save()
         self.client.force_login(person.primary_contact)
-        response = self.client.get("/history/contacts.person/id/{}/".format(person.pk))
+        response = self.client.get("/history/contacts_person/id/{}/".format(person.pk))
         # print(response, response.content.decode("utf-8"))
         self.assertContains(response, "'Ist archiviert' änderte von 'nein' zu 'ja'.")
 
@@ -56,14 +56,16 @@ class HistoryTest(TestCase):
         pa = factories.PostalAddressFactory.create()
         self.client.force_login(pa.person.primary_contact)
         response = self.client.get(
-            "/history/contacts.postaladdress/person_id/{}/".format(pa.person_id)
+            "/history/contacts_postaladdress/person_id/{}/".format(pa.person_id)
         )
         # print(response, response.content.decode("utf-8"))
-        self.assertContains(response, "INSERT id:{} /".format(pa.pk))
+        self.assertContains(
+            response, "INSERT contacts_postaladdress id:{}".format(pa.pk)
+        )
 
     def test_nothing(self):
         self.client.force_login(factories.UserFactory.create())
-        response = self.client.get("/history/contacts.person/id/0/")
+        response = self.client.get("/history/contacts_person/id/0/")
         # print(response, response.content.decode("utf-8"))
         self.assertContains(response, "Keine Geschichte gefunden")
 
@@ -76,14 +78,14 @@ class HistoryTest(TestCase):
         organization.delete()
 
         self.client.force_login(factories.UserFactory.create())
-        response = self.client.get("/history/contacts.person/id/{}/".format(person.pk))
+        response = self.client.get("/history/contacts_person/id/{}/".format(person.pk))
         self.assertContains(
             response,
-            '<a href="/history/contacts.organization/id/{}/" data-toggle="ajaxmodal">'
+            '<a href="/history/contacts_organization/id/{}/" data-toggle="ajaxmodal">'
             "Gelöschte Organisation-Instanz</a>".format(pk),
         )
 
-        response = self.client.get("/history/contacts.organization/id/{}/".format(pk))
+        response = self.client.get("/history/contacts_organization/id/{}/".format(pk))
         self.assertContains(
             response, "Finaler Wert von 'Name' war 'The Organization Ltd'."
         )
@@ -100,7 +102,7 @@ class HistoryTest(TestCase):
 
         self.client.force_login(service.project.owned_by)
         response = self.client.get(
-            "/history/projects.service/id/{}/".format(service.id)
+            "/history/projects_service/id/{}/".format(service.id)
         )
         self.assertContains(response, "INSERT")
         # Only two versions -- position changes are excluded
@@ -110,3 +112,8 @@ class HistoryTest(TestCase):
         # Do not crash when encountering invalid values.
         self.assertEqual(history.boolean_formatter("stuff"), "stuff")
         self.assertEqual(history.date_formatter("stuff"), "stuff")
+
+    def test_404(self):
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.get("/history/not_exists/id/3/")
+        self.assertEqual(response.status_code, 404)

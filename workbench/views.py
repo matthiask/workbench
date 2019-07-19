@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.contrib import messages
+from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -49,8 +50,8 @@ def search(request):
 
 
 HISTORY = {
-    "accounts.user": {"exclude": {"is_admin", "last_login", "password"}},
-    "contacts.person": {
+    "accounts_user": {"exclude": {"is_admin", "last_login", "password"}},
+    "contacts_person": {
         "exclude": {"_fts"},
         "related": [
             (PhoneNumber, "person_id"),
@@ -58,20 +59,26 @@ HISTORY = {
             (PostalAddress, "person_id"),
         ],
     },
-    "invoices.invoice": {"exclude": {"_code", "_fts"}},
-    "invoices.service": {"exclude": {"position"}},
-    "offers.offer": {"exclude": {"_code"}},
-    "projects.project": {
+    "invoices_invoice": {"exclude": {"_code", "_fts"}},
+    "invoices_service": {"exclude": {"position"}},
+    "offers_offer": {"exclude": {"_code"}},
+    "projects_project": {
         "exclude": {"_code", "_fts"},
         "related": [(Offer, "project_id"), (Service, "project_id")],
     },
-    "projects.service": {"exclude": {"position"}},
+    "projects_service": {"exclude": {"position"}},
 }
 
+DB_TABLE_TO_MODEL = {model._meta.db_table: model for model in apps.get_models()}
 
-def history(request, label, attribute, id):
-    model = apps.get_model(label)
-    cfg = HISTORY.get(label, {})
+
+def history(request, db_table, attribute, id):
+    try:
+        model = DB_TABLE_TO_MODEL[db_table]
+    except KeyError:
+        raise Http404
+
+    cfg = HISTORY.get(db_table, {})
     exclude = cfg.get("exclude", set())
 
     fields = [
@@ -81,11 +88,29 @@ def history(request, label, attribute, id):
     ]
 
     instance = None
+    title = None
+    related = []
+
     if attribute == "id":
         try:
             instance = model._base_manager.get(**{attribute: id})
         except Exception:
             instance = None
+            title = model._meta.verbose_name
+
+        related = [
+            (
+                model._meta.verbose_name_plural,
+                reverse("history", args=(model._meta.db_table, attribute, id)),
+            )
+            for model, attribute in cfg.get("related", [])
+        ]
+    else:
+        title = _("%(model)s with %(attribute)s=%(id)s") % {
+            "model": model._meta.verbose_name_plural,
+            "attribute": attribute,
+            "id": id,
+        }
 
     actions = LoggedAction.objects.for_model_id(model, **{attribute: id})
 
@@ -94,18 +119,8 @@ def history(request, label, attribute, id):
         "history_modal.html",
         {
             "instance": instance,
+            "title": title,
             "changes": changes(model, fields, actions),
-            "related": [
-                (
-                    model._meta.verbose_name_plural,
-                    reverse(
-                        "history",
-                        args=(model._meta.label_lower, attribute, instance.pk),
-                    ),
-                )
-                for model, attribute in cfg.get("related", [])
-            ]
-            if instance
-            else [],
+            "related": related,
         },
     )

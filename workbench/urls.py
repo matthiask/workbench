@@ -25,7 +25,7 @@ urlpatterns = [
     url(r"^credit-control/", include("workbench.credit_control.urls")),
     url(r"^accruals/", include("workbench.accruals.urls")),
     url(r"^search/$", views.search, name="search"),
-    url(r"^history/(\w+\.\w+)/(\w+)/([0-9]+)/$", views.history, name="history"),
+    url(r"^history/(\w+)/(\w+)/([0-9]+)/$", views.history, name="history"),
     url(r"^report/", include("workbench.reporting.urls")),
 ]
 
