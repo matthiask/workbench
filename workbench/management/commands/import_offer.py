@@ -1,6 +1,8 @@
 import io
 import json
+import re
 from decimal import Decimal
+from html.parser import HTMLParser
 
 from django.core.management import BaseCommand
 from django.utils.dateparse import parse_date, parse_datetime
@@ -9,6 +11,49 @@ from django.utils.translation import activate
 from workbench.accounts.middleware import set_user_name
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
+
+
+class _DeHTMLParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.__text = []
+
+    def handle_data(self, data):
+        text = data.strip()
+        if len(text) > 0:
+            text = re.sub("[ \t\r\n]+", " ", text)
+            self.__text.append(text + " ")
+
+    def handle_entityref(self, name):
+        self.__text.append(self.unescape("&%s;" % name))
+
+    def handle_charref(self, name):
+        self.__text.append(self.unescape("&#%s;" % name))
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "p":
+            self.__text.append("\n\n")
+        elif tag == "br":
+            self.__text.append("\n")
+        elif tag == "li":
+            self.__text.append("\n- ")
+
+    def handle_startendtag(self, tag, attrs):
+        if tag == "br":
+            self.__text.append("\n\n")
+
+    def text(self):
+        return "".join(self.__text).strip()
+
+
+def dehtml(text):
+    try:
+        parser = _DeHTMLParser()
+        parser.feed(text)
+        parser.close()
+        return parser.text()
+    except Exception:
+        return text
 
 
 class Command(BaseCommand):
@@ -66,7 +111,7 @@ class Command(BaseCommand):
                         ),
                         "offer": Offer(
                             title=row["fields"]["name"],
-                            description=row["fields"]["description"],  # TODO dehtml
+                            description=dehtml(row["fields"]["description"]),
                             owned_by_id=row["fields"]["manager"],
                             created_at=parse_datetime(row["fields"]["created"]),
                             offered_on=parse_date(row["fields"]["offer_date"]),
