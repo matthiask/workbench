@@ -4,6 +4,7 @@ from datetime import date
 from django import forms
 from django.contrib import messages
 from django.db.models import Q
+from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
@@ -73,6 +74,10 @@ class InvoiceSearchForm(forms.Form):
 
     def response(self, request, queryset):
         if request.GET.get("pdf"):
+            if not queryset.exists():
+                messages.warning(request, _("No invoices found."))
+                return HttpResponseRedirect("?e=1")
+
             pdf, response = pdf_response("invoices", as_attachment=False)
 
             if self.cleaned_data.get("reminders"):

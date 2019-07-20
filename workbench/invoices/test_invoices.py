@@ -514,6 +514,27 @@ class InvoicesTest(TestCase):
         valid("owned_by=0")  # only inactive
         valid("reminders=on")
 
+    def test_list_pdfs(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        response = self.client.get("/invoices/?pdf=1")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(messages(response), ["Keine Rechnungen gefunden."])
+
+        factories.InvoiceFactory.create(
+            invoiced_on=date.today() - timedelta(days=60),
+            due_on=date.today() - timedelta(days=45),
+            status=Invoice.SENT,
+        )
+        response = self.client.get("/invoices/?pdf=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["content-type"], "application/pdf")
+
+        response = self.client.get("/invoices/?pdf=1&reminders=on")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["content-type"], "application/pdf")
+
     def test_model_validation(self):
         invoice = Invoice(
             title="Test",
