@@ -434,18 +434,6 @@ class LogbookTest(TestCase):
         )
         self.assertEqual(response.status_code, 201)
 
-    def test_delete_reimbursed(self):
-        costs = factories.LoggedCostFactory.create(
-            are_expenses=True, expenses_reimbursed_at=timezone.now()
-        )
-        self.client.force_login(costs.created_by)
-        response = self.client.get(
-            costs.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
-        )
-        self.assertContains(
-            response, "Spesen wurden schon erstattet, kann Eintrag nicht löschen."
-        )
-
     def test_copy(self):
         hours = factories.LoggedHoursFactory.create()
         self.client.force_login(factories.UserFactory.create())
