@@ -41,8 +41,8 @@ def monthly_invoicing(year):
             month.update(month_data)
             month.update({"month": invoice.invoiced_on, "invoices": []})
 
-        # FIXME double counting (project's third party costs, not invoice's)
-        third_party_costs = third_party_costs_by_project.get(invoice.project_id, Z)
+        # pop - only applies third party costs reduction to first invoice per project
+        third_party_costs = third_party_costs_by_project.pop(invoice.project_id, Z)
 
         month["total"] += invoice.total
         month["total_excl_tax"] += invoice.total_excl_tax
