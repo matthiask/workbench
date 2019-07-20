@@ -112,6 +112,9 @@ $(function() {
 
   // Restore the search params when going through the main menu...
   $(".navbar").on("click", "a", function(e) {
+    const orig = e.originalEvent
+    if (orig.altKey || orig.ctrlKey || orig.metakey || orig.shiftKey) return
+
     const key = `search-${this.getAttribute("href")}`
     const search = window.localStorage.getItem(key)
     if (search) {
