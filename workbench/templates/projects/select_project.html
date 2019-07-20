@@ -1,7 +1,7 @@
 {% load bootstrap4 fineforms i18n %}
 <div class="modal">
   <div class="modal-dialog">
-    <form method="post" action="{{ request.get_full_path }}">
+    <form method="post" action="{{ request.get_full_path }}" data-autosubmit>
       <div class="modal-content">
         <div class="modal-body clearfix">
           {% bootstrap_messages %}

@@ -93,13 +93,18 @@ $(function() {
     })
   })
 
-  // Search forms
-  $(".form-search").on("change", "select, input", function() {
-    $(this)
-      .closest("form")
-      .submit()
-  })
+  // Autosubmit forms
+  $(document.body).on(
+    "change",
+    "form[data-autosubmit] select, form[data-autosubmit] input",
+    function() {
+      $(this)
+        .closest("form")
+        .submit()
+    }
+  )
 
+  // Search form restoration
   $(".form-search").each(function() {
     if (window.location.search) {
       const key = `search-${window.location.pathname}`
