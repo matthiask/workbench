@@ -1,29 +1,13 @@
+from django.contrib import messages
 from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.logbook.models import LoggedCost
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import Model, MoneyField, Z
 from workbench.tools.urls import model_urls
-
-
-class ExpenseReportQuerySet(models.QuerySet):
-    def create_report(self, *, user):
-        expenses = self.expenses_for(user=user)
-        if expenses.exists():
-            report = self.create(created_by=user, owned_by=user)
-            expenses.update(expense_report=report)
-            report.save()
-            return report
-        return None
-
-    def expenses_for(self, *, user):
-        return LoggedCost.objects.filter(
-            rendered_by=user, are_expenses=True, expense_report__isnull=True
-        )
 
 
 @model_urls
@@ -46,8 +30,6 @@ class ExpenseReport(Model):
         null=True,
         help_text=_("Total incl. tax for third-party services."),
     )
-
-    objects = ExpenseReportQuerySet.as_manager()
 
     class Meta:
         ordering = ("-created_at",)
@@ -76,10 +58,14 @@ class ExpenseReport(Model):
 
     @classmethod
     def allow_update(cls, instance, request):
+        if instance.closed_on:
+            messages.error(request, _("Cannot update a closed expense report."))
         return not instance.closed_on
 
     @classmethod
     def allow_delete(cls, instance, request):
+        if instance.closed_on:
+            messages.error(request, _("Cannot delete a closed expense report."))
         return not instance.closed_on
 
     @property

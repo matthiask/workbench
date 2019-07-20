@@ -322,6 +322,12 @@ class LoggedCostForm(ModelForm):
             "".format(self.fields["third_party_costs"].help_text)
         )
 
+        if self.instance.expense_report:
+            self.fields["rendered_by"].disabled = True
+            self.fields["rendered_on"].disabled = True
+            self.fields["are_expenses"].disabled = True
+            self.fields["third_party_costs"].disabled = True
+
     def clean(self):
         data = super().clean()
         if self.project.closed_on:

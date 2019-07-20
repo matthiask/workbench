@@ -15,8 +15,7 @@ class ExpenseReportPDFView(generic.DetailView):
 
         pdf, response = pdf_response(self.object.code, as_attachment=False)
         pdf.init_report(page_fn=pdf.stationery())
-        if not self.object.closed_on:
-            pdf.watermark(_("In preparation"))
+        pdf.watermark("" if self.object.closed_on else _("In preparation"))
 
         pdf.h1(_("expense report"))
         pdf.spacer(2 * mm)

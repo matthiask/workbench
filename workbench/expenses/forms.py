@@ -21,12 +21,12 @@ class ExpenseReportForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if not self.instance.closed_on:
-            self.fields["is_closed"] = forms.BooleanField(
-                label=_("is closed"),
-                help_text=_("Once an expense report is closed it stays that way."),
-                required=False,
-            )
+        assert not self.instance.closed_on, "Must be in preparation"
+        self.fields["is_closed"] = forms.BooleanField(
+            label=_("is closed"),
+            help_text=_("Once an expense report is closed it stays that way."),
+            required=False,
+        )
 
         expenses = LoggedCost.objects.expenses(user=self.request.user)
         if self.instance.pk:
@@ -72,7 +72,7 @@ class ExpenseReportForm(ModelForm):
     def save(self):
         instance = super().save()
         instance.expenses.set(self.cleaned_data["expenses"])
-        if self.cleaned_data.get("is_closed") and not instance.closed_on:
+        if self.cleaned_data.get("is_closed"):
             instance.closed_on = date.today()
         instance.save()
         return instance
