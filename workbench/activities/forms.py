@@ -7,7 +7,7 @@ from workbench.activities.models import Activity
 from workbench.contacts.models import Person
 from workbench.deals.models import Deal
 from workbench.projects.models import Project
-from workbench.tools.forms import ModelForm, Textarea
+from workbench.tools.forms import Autocomplete, ModelForm, Textarea
 
 
 class ActivitySearchForm(forms.Form):
@@ -15,15 +15,19 @@ class ActivitySearchForm(forms.Form):
         choices=[("", _("Open")), ("all", _("All"))],
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
     owned_by = forms.TypedChoiceField(
-        label=_("owned by"),
         coerce=int,
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
-    project = forms.IntegerField(
-        label=_("project"), required=False, widget=forms.HiddenInput
+    project = forms.ModelChoiceField(
+        queryset=Project.objects.all(),
+        widget=Autocomplete(model=Project),
+        required=False,
+        label="",
     )
 
     def __init__(self, *args, **kwargs):

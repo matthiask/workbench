@@ -19,25 +19,28 @@ from workbench.tools.xlsx import WorkbenchXLSXDocument
 class LoggedHoursSearchForm(forms.Form):
     rendered_by = forms.ModelChoiceField(
         queryset=User.objects.all(),
-        label=_("rendered by"),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
         empty_label=_("All users"),
+        label="",
     )
     project = forms.ModelChoiceField(
         queryset=Project.objects.all(),
-        label=_("project"),
         required=False,
         widget=Autocomplete(model=Project),
+        label="",
     )
     organization = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
-        label=_("organization"),
         required=False,
         widget=Autocomplete(model=Organization),
+        label="",
     )
     service = forms.ModelChoiceField(
-        queryset=Service.objects.all(), required=False, widget=forms.HiddenInput
+        queryset=Service.objects.all(),
+        required=False,
+        widget=forms.HiddenInput,
+        label="",
     )
 
     def __init__(self, *args, **kwargs):
@@ -73,26 +76,24 @@ class LoggedHoursSearchForm(forms.Form):
 class LoggedCostSearchForm(forms.Form):
     rendered_by = forms.ModelChoiceField(
         queryset=User.objects.all(),
-        label=_("rendered by"),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
         empty_label=_("All users"),
+        label="",
     )
     project = forms.ModelChoiceField(
         queryset=Project.objects.all(),
-        label=_("project"),
         required=False,
         widget=Autocomplete(model=Project),
+        label="",
     )
     organization = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
-        label=_("organization"),
         required=False,
         widget=Autocomplete(model=Organization),
+        label="",
     )
-    service = forms.IntegerField(
-        label=_("service"), required=False, widget=forms.HiddenInput
-    )
+    service = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

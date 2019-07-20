@@ -15,6 +15,7 @@ class DealSearchForm(forms.Form):
         ),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
 
     def filter(self, queryset):

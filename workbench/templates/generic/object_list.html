@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n workbench %}
+{% load fineforms i18n workbench %}
 
 {% block title %}{{ view.meta.verbose_name_plural|capfirst }} - {{ block.super }}{% endblock %}
 
@@ -22,8 +22,7 @@
         {% endif %}
 
         {% for f in view.search_form %}
-          <label class="sr-only">{{ f.label }}</label>
-          {{ f }}
+          {% ff_field f %}
         {% endfor %}
 
         {% block search-form-buttons %}

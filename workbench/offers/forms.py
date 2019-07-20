@@ -3,10 +3,11 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from workbench.contacts.forms import PostalAddressSelectionForm
+from workbench.contacts.models import Organization
 from workbench.offers.models import Offer
 from workbench.projects.models import Service
 from workbench.tools.formats import local_date_format
-from workbench.tools.forms import Textarea
+from workbench.tools.forms import Autocomplete, Textarea
 
 
 class OfferSearchForm(forms.Form):
@@ -18,6 +19,13 @@ class OfferSearchForm(forms.Form):
         ),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
+    )
+    org = forms.ModelChoiceField(
+        queryset=Organization.objects.all(),
+        required=False,
+        widget=Autocomplete(model=Organization),
+        label="",
     )
 
     def filter(self, queryset):

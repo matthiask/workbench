@@ -17,22 +17,25 @@ class ProjectSearchForm(forms.Form):
         choices=(("all", _("All states")), ("", _("Open")), ("closed", _("Closed"))),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
     org = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
         required=False,
         widget=Autocomplete(model=Organization),
+        label="",
     )
     type = forms.ChoiceField(
         choices=[("", _("All types"))] + Project.TYPE_CHOICES,
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
     owned_by = forms.TypedChoiceField(
-        label=_("owned by"),
         coerce=int,
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
 
     def __init__(self, *args, **kwargs):

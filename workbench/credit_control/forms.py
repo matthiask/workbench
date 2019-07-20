@@ -23,13 +23,14 @@ class CreditEntrySearchForm(forms.Form):
         ),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
     ledger = forms.ModelChoiceField(
         Ledger.objects.all(),
         required=False,
         empty_label=_("all ledgers"),
-        label=_("ledger"),
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
 
     def filter(self, queryset):

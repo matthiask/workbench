@@ -9,10 +9,10 @@ from workbench.tools.forms import ModelForm, Textarea
 
 class AbsenceSearchForm(forms.Form):
     u = forms.TypedChoiceField(
-        label=_("user"),
         coerce=int,
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
 
     def __init__(self, *args, **kwargs):

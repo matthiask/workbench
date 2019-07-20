@@ -22,8 +22,8 @@ class OrganizationSearchForm(forms.Form):
         queryset=Group.objects.all(),
         required=False,
         empty_label=_("All groups"),
-        label=_("Group"),
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
 
     def filter(self, queryset):
@@ -39,8 +39,8 @@ class PersonSearchForm(forms.Form):
         queryset=Group.objects.all(),
         required=False,
         empty_label=_("All groups"),
-        label=_("Group"),
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
 
     def filter(self, queryset):

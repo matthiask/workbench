@@ -28,23 +28,21 @@ class InvoiceSearchForm(forms.Form):
         ),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
     org = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
         required=False,
         widget=Autocomplete(model=Organization),
+        label="",
     )
     owned_by = forms.TypedChoiceField(
-        label=_("owned by"),
         coerce=int,
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
-    o = forms.ChoiceField(
-        choices=(("", _("newest first")), ("dunning", _("dunning"))),
-        required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
-    )
+    dunning = forms.BooleanField(label=_("dunning"), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -66,7 +64,7 @@ class InvoiceSearchForm(forms.Form):
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
-        if data.get("o") == "dunning":
+        if data.get("dunning"):
             queryset = queryset.overdue().order_by("due_on", "id")
 
         return queryset.select_related(
@@ -77,7 +75,7 @@ class InvoiceSearchForm(forms.Form):
         if request.GET.get("pdf"):
             pdf, response = pdf_response("invoices", as_attachment=False)
 
-            if self.cleaned_data.get("o") == "dunning":
+            if self.cleaned_data.get("dunning"):
                 for organization, invoices in itertools.groupby(
                     queryset.order_by("customer", "due_on", "id"),
                     lambda invoice: invoice.customer,
