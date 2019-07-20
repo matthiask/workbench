@@ -2,6 +2,7 @@ import itertools
 from datetime import date
 
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
 from django.utils.html import format_html
@@ -98,10 +99,11 @@ Setzen Sie sich bitte bei Unstimmigkeiten mit uns in Verbindung. Andernfalls
 bitten wir Sie, die offenen Posten innerhalb von 10 Tagen auf das angegebene
 Konto zu überweisen.</p>
 <p>Sollte sich Ihre Zahlung mit diesem Schreiben kreuzen, bitten wir Sie,
-dieses als gegenstandslos zu betrachten.</p>
-<p>Vielen Dank für Ihr Verständnis</p>
+dieses als gegenstandslos zu betrachten. Vielen Dank für Ihr Verständnis</p>
 <p>Freundliche Grüsse</p>
+<p>%s</p>
                         """
+                        % settings.WORKBENCH.PDF_COMPANY
                     )
                     pdf.spacer()
                     pdf.table(
