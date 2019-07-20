@@ -1,3 +1,4 @@
+beauifulsoup4
 coverage
 Django
 django-admin-ordering

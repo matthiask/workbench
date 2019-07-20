@@ -16,7 +16,7 @@ from workbench.services.models import ServiceType
 from workbench.tools.formats import currency, hours, local_date_format
 from workbench.tools.forms import Autocomplete, ModelForm, Textarea
 from workbench.tools.models import Z
-from workbench.tools.pdf import pdf_response
+from workbench.tools.pdf import MarkupParagraph, mm, pdf_response
 
 
 class InvoiceSearchForm(forms.Form):
@@ -84,20 +84,38 @@ class InvoiceSearchForm(forms.Form):
                 ):
                     invoices = list(invoices)
                     pdf.init_letter(page_fn=pdf.stationery())
-                    pdf.p(invoices[0].postal_address)
+                    pdf.p(invoices[-1].postal_address)
                     pdf.next_frame()
-                    pdf.h1("Überfällige Rechnungen")
+                    pdf.p("Zürich, %s" % local_date_format(date.today()))
                     pdf.spacer()
-                    pdf.p(
-                        "Gemäss unserer Buchhaltung sind folgende Rechnungen"
-                        " überfällig:"
+                    pdf.h1("Mahnung")
+                    pdf.spacer()
+                    pdf.mini_html(
+                        """
+<p>Sehr geehrte Damen und Herren</p>
+<p>Beiliegend senden wir Ihnen einen Kontoauszug über die noch offenen Posten.
+Setzen Sie sich bitte bei Unstimmigkeiten mit uns in Verbindung. Andernfalls
+bitten wir Sie, die offenen Posten innerhalb von 10 Tagen auf das angegebene
+Konto zu überweisen.</p>
+<p>Sollte sich Ihre Zahlung mit diesem Schreiben kreuzen, bitten wir Sie,
+dieses als gegenstandslos zu betrachten.</p>
+<p>Vielen Dank für Ihr Verständnis</p>
+<p>Freundliche Grüsse</p>
+                        """
                     )
                     pdf.spacer()
-                    for invoice in invoices:
-                        pdf.p(invoice)
-                    pdf.spacer()
-                    pdf.p(
-                        "Wir bedanken uns für die Begleichung in den nächsten Tagen."
+                    pdf.table(
+                        [(_("invoice"), _("invoiced on"), _("total"))]
+                        + [
+                            (
+                                MarkupParagraph(invoice.title, pdf.style.normal),
+                                local_date_format(invoice.invoiced_on),
+                                currency(invoice.total),
+                            )
+                            for invoice in invoices
+                        ],
+                        (pdf.bounds.E - pdf.bounds.W - 40 * mm, 24 * mm, 16 * mm),
+                        pdf.style.tableHead + (("ALIGN", (1, 0), (1, -1), "LEFT"),),
                     )
                     pdf.restart()
                     for invoice in invoices:
