@@ -121,9 +121,6 @@ class PDFDocument(_PDFDocument):
             16 * mm,
         )
 
-    def init_letter(self, page_fn, page_fn_later=None, address_y=None, address_x=None):
-        self.generate_style()
-
         frame_kwargs = {
             "showBoundary": self.show_boundaries,
             "leftPadding": 0,
@@ -132,21 +129,21 @@ class PDFDocument(_PDFDocument):
             "bottomPadding": 0,
         }
 
-        address_frame = Frame(
+        self.address_frame = Frame(
             self.bounds.W,
-            address_y or 20.2 * cm,
+            20.2 * cm,
             self.bounds.E - self.bounds.W,
             40 * mm,
             **frame_kwargs
         )
-        rest_frame = Frame(
+        self.rest_frame = Frame(
             self.bounds.W,
             self.bounds.S,
             self.bounds.E - self.bounds.W,
             18.2 * cm,
             **frame_kwargs
         )
-        full_frame = Frame(
+        self.full_frame = Frame(
             self.bounds.W,
             self.bounds.S,
             self.bounds.E - self.bounds.W,
@@ -154,13 +151,19 @@ class PDFDocument(_PDFDocument):
             **frame_kwargs
         )
 
+    def init_letter(self, page_fn, page_fn_later=None):
+        self.generate_style()
         self.doc.addPageTemplates(
             [
                 PageTemplate(
-                    id="First", frames=[address_frame, rest_frame], onPage=page_fn
+                    id="First",
+                    frames=[self.address_frame, self.rest_frame],
+                    onPage=page_fn,
                 ),
                 PageTemplate(
-                    id="Later", frames=[full_frame], onPage=page_fn_later or page_fn
+                    id="Later",
+                    frames=[self.full_frame],
+                    onPage=page_fn_later or page_fn,
                 ),
             ]
         )
@@ -168,25 +171,8 @@ class PDFDocument(_PDFDocument):
 
     def init_report(self, page_fn):
         self.generate_style()
-
-        frame_kwargs = {
-            "showBoundary": self.show_boundaries,
-            "leftPadding": 0,
-            "rightPadding": 0,
-            "topPadding": 0,
-            "bottomPadding": 0,
-        }
-
-        full_frame = Frame(
-            self.bounds.W,
-            self.bounds.S,
-            self.bounds.E - self.bounds.W,
-            self.bounds.N - self.bounds.S,
-            **frame_kwargs
-        )
-
         self.doc.addPageTemplates(
-            [PageTemplate(id="Page", frames=[full_frame], onPage=page_fn)]
+            [PageTemplate(id="Page", frames=[self.full_frame], onPage=page_fn)]
         )
 
     def stationery(self):
