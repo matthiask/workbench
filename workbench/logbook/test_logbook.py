@@ -402,38 +402,6 @@ class LogbookTest(TestCase):
         )
         self.assertContains(response, 'value="1.5"')
 
-    def test_expenses(self):
-        project = factories.ProjectFactory.create()
-        self.client.force_login(project.owned_by)
-
-        response = self.client.post(
-            project.urls["createcost"],
-            {
-                "rendered_by": project.owned_by_id,
-                "rendered_on": local_date_format(date.today()),
-                "cost": "10",
-                "description": "Anything",
-                "are_expenses": "on",
-                # "third_party_costs": "9",
-            },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
-        self.assertContains(response, "Fremdkosten müssen für Spesen angegeben werden.")
-
-        response = self.client.post(
-            project.urls["createcost"],
-            {
-                "rendered_by": project.owned_by_id,
-                "rendered_on": local_date_format(date.today()),
-                "cost": "10",
-                "description": "Anything",
-                "are_expenses": "on",
-                "third_party_costs": "9",
-            },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
-        self.assertEqual(response.status_code, 201)
-
     def test_copy(self):
         hours = factories.LoggedHoursFactory.create()
         self.client.force_login(factories.UserFactory.create())
@@ -469,3 +437,37 @@ class LogbookTest(TestCase):
         self.assertRedirects(
             response, project.urls["createhours"], fetch_redirect_response=False
         )
+
+    def test_cost_gte_third_party_costs(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            project.urls["createcost"],
+            {
+                "rendered_by": project.owned_by_id,
+                "rendered_on": local_date_format(date.today()),
+                "cost": "10",
+                "third_party_costs": "11",
+                "description": "Anything",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response, "Fremdkosten sollten nicht höher sein als die Kosten."
+        )
+
+        response = self.client.post(
+            project.urls["createcost"],
+            {
+                "rendered_by": project.owned_by_id,
+                "rendered_on": local_date_format(date.today()),
+                "cost": "10",
+                "third_party_costs": "11",
+                "description": "Anything",
+                WarningsForm.ignore_warnings_id: "third-party-costs-higher",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
