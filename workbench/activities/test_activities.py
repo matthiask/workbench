@@ -90,7 +90,7 @@ class ActivitiesTest(TestCase):
         )
 
         response = self.client.get("/activities/?project=" + str(project.pk + 1))
-        self.assertNotContains(response, activity.title)
+        self.assertRedirects(response, "/activities/?e=1")
         response = self.client.get("/activities/?project=" + str(project.pk))
         self.assertContains(response, activity.title)
 
