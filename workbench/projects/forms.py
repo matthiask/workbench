@@ -65,7 +65,7 @@ class ProjectForm(ModelForm):
 
     class Meta:
         model = Project
-        fields = ("customer", "contact", "title", "description", "owned_by", "type")
+        fields = ("contact", "customer", "title", "description", "owned_by", "type")
         widgets = {
             "customer": Autocomplete(model=Organization),
             "contact": Autocomplete(model=Person),

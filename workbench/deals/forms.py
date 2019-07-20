@@ -43,8 +43,8 @@ class DealForm(ModelForm):
     class Meta:
         model = Deal
         fields = (
-            "customer",
             "contact",
+            "customer",
             "title",
             "description",
             "stage",

@@ -102,8 +102,8 @@ class InvoiceForm(PostalAddressSelectionForm):
     class Meta:
         model = Invoice
         fields = (
-            "customer",
             "contact",
+            "customer",
             "invoiced_on",
             "due_on",
             "title",
@@ -408,8 +408,8 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
     class Meta:
         model = Invoice
         fields = (
-            "customer",
             "contact",
+            "customer",
             "invoiced_on",
             "due_on",
             "title",
@@ -589,8 +589,8 @@ class CreateRecurringInvoiceForm(ModelForm):
     class Meta:
         model = RecurringInvoice
         fields = (
-            "customer",
             "contact",
+            "customer",
             "title",
             "description",
             "owned_by",
@@ -620,8 +620,8 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
     class Meta:
         model = RecurringInvoice
         fields = (
-            "customer",
             "contact",
+            "customer",
             "title",
             "description",
             "owned_by",
