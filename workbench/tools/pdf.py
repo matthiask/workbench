@@ -1,5 +1,5 @@
 from copy import deepcopy
-from datetime import timedelta
+from datetime import date, timedelta
 from decimal import Decimal as D
 from functools import partial
 
@@ -369,6 +369,48 @@ class PDFDocument(_PDFDocument):
                 ),
             },
         )
+
+    def dunning_letter(self, *, invoices):
+        self.init_letter(page_fn=self.stationery())
+        self.p(invoices[-1].postal_address)
+        self.next_frame()
+        self.p("Zürich, %s" % local_date_format(date.today()))
+        self.spacer()
+        self.h1("Mahnung")
+        self.spacer()
+        self.mini_html(
+            """
+<p>Sehr geehrte Damen und Herren</p>
+<p>Beiliegend senden wir Ihnen einen Kontoauszug über die noch offenen Posten.
+Setzen Sie sich bitte bei Unstimmigkeiten mit uns in Verbindung. Andernfalls
+bitten wir Sie, die offenen Posten innerhalb von 10 Tagen auf das angegebene
+Konto zu überweisen.</p>
+<p>Sollte sich Ihre Zahlung mit diesem Schreiben kreuzen, bitten wir Sie,
+dieses als gegenstandslos zu betrachten. Vielen Dank für Ihr Verständnis</p>
+<p>Freundliche Grüsse</p>
+<p>%s</p>
+            """
+            % settings.WORKBENCH.PDF_COMPANY
+        )
+        self.spacer()
+        self.table(
+            [(_("invoice"), _("invoiced on"), _("total"))]
+            + [
+                (
+                    MarkupParagraph(invoice.title, self.style.normal),
+                    local_date_format(invoice.invoiced_on),
+                    currency(invoice.total),
+                )
+                for invoice in invoices
+            ],
+            (self.bounds.E - self.bounds.W - 40 * mm, 24 * mm, 16 * mm),
+            self.style.tableHead + (("ALIGN", (1, 0), (1, -1), "LEFT"),),
+        )
+        self.restart()
+        for invoice in invoices:
+            self.init_letter(page_fn=self.stationery())
+            self.process_invoice(invoice)
+            self.restart()
 
 
 pdf_response = partial(_pdf_response, pdfdocument=PDFDocument)
