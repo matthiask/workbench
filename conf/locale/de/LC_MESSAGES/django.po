@@ -957,8 +957,8 @@ msgid "newest first"
 msgstr "Neueste zuerst"
 
 #: workbench/invoices/forms.py:42
-msgid "dunning"
-msgstr "Mahnwesen"
+msgid "reminders"
+msgstr "Mahnungen"
 
 #: workbench/invoices/forms.py:118
 msgid "Determined by project."

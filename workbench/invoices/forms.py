@@ -42,7 +42,7 @@ class InvoiceSearchForm(forms.Form):
         widget=forms.Select(attrs={"class": "custom-select"}),
         label="",
     )
-    dunning = forms.BooleanField(label=_("dunning"), required=False)
+    reminders = forms.BooleanField(label=_("reminders"), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -64,7 +64,7 @@ class InvoiceSearchForm(forms.Form):
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
-        if data.get("dunning"):
+        if data.get("reminders"):
             queryset = queryset.overdue().order_by("due_on", "id")
 
         return queryset.select_related(
@@ -75,7 +75,7 @@ class InvoiceSearchForm(forms.Form):
         if request.GET.get("pdf"):
             pdf, response = pdf_response("invoices", as_attachment=False)
 
-            if self.cleaned_data.get("dunning"):
+            if self.cleaned_data.get("reminders"):
                 for organization, invoices in itertools.groupby(
                     queryset.order_by("customer", "due_on", "id"),
                     lambda invoice: invoice.customer,

@@ -512,7 +512,7 @@ class InvoicesTest(TestCase):
         valid("org={}".format(factories.OrganizationFactory.create().pk))
         valid("owned_by={}".format(user.id))
         valid("owned_by=0")  # only inactive
-        valid("o=dunning")
+        valid("reminders=on")
 
     def test_model_validation(self):
         invoice = Invoice(
