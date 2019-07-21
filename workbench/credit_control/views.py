@@ -42,7 +42,7 @@ class AssignCreditEntriesView(generic.CreateView):
         form.save()
         messages.success(
             self.request,
-            _("%(class)s have been successfully updated.")
+            _("%(class)s have been updated successfully.")
             % {"class": self.model._meta.verbose_name_plural},
         )
         return redirect(".")

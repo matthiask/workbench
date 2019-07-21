@@ -27,7 +27,7 @@
     <tr>
       <th class="text-right">{% trans 'rendered' %}</th>
       <td>
-        {{ object.rendered_on|date:'SHORT_DATE_FORMAT' }} {% trans 'by' %}
+        {{ object.rendered_on|date:'d.m.Y' }} {% trans 'by' %}
         {{ object.rendered_by.get_short_name }}
       </td>
     </tr>

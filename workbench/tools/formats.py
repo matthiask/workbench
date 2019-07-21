@@ -5,10 +5,14 @@ from django.utils.timezone import localtime
 from django.utils.translation import gettext as _
 
 
-def local_date_format(dttm, fmt="d.m.Y"):
+def local_date_format(dttm, fmt=None):
+    if fmt:
+        import warnings
+
+        warnings.warn("fmt provided", stacklevel=2)
     if hasattr(dttm, "astimezone"):
         dttm = localtime(dttm)
-    return date_format(dttm, fmt)
+    return date_format(dttm, "d.m.Y")
 
 
 def pretty_due(day):

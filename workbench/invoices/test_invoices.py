@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.invoices.models import Invoice
@@ -25,16 +26,17 @@ def invoice_to_dict(invoice, **kwargs):
         "postal_address": invoice.postal_address,
         "status": invoice.status,
         "type": invoice.type,
-        "closed_on": invoice.closed_on and local_date_format(invoice.closed_on) or "",
-        "invoiced_on": invoice.invoiced_on
-        and local_date_format(invoice.invoiced_on)
-        or "",
-        "due_on": invoice.due_on and local_date_format(invoice.due_on) or "",
+        "closed_on": invoice.closed_on and invoice.closed_on.isoformat() or "",
+        "invoiced_on": invoice.invoiced_on and invoice.invoiced_on.isoformat() or "",
+        "due_on": invoice.due_on and invoice.due_on.isoformat() or "",
         **kwargs,
     }
 
 
 class InvoicesTest(TestCase):
+    def tearDown(self):
+        deactivate_all()
+
     def test_factories(self):
         invoice = factories.InvoiceFactory.create()
 
@@ -52,7 +54,7 @@ class InvoicesTest(TestCase):
 
         url = project.urls["createinvoice"] + "?type=down-payment"
         response = self.client.get(url)
-        self.assertContains(response, "Anzahlung")
+        self.assertContains(response, "Down payment")
 
         response = self.client.post(
             url,
@@ -146,18 +148,14 @@ class InvoicesTest(TestCase):
         # print(response, response.content.decode("utf-8"))
 
         self.assertContains(response, "<strong>cost-only</strong><br>100.00")
-        self.assertContains(response, "1.0h erfasst aber kein Stundensatz definiert.")
+        self.assertContains(response, "1.0h logged but no hourly rate defined.")
         self.assertContains(response, "<strong>no-rate</strong><br>0.00")
-        self.assertContains(response, "2.0h erfasst aber kein Stundensatz definiert.")
+        self.assertContains(response, "2.0h logged but no hourly rate defined.")
         self.assertContains(response, "<strong>with-rate</strong><br>600.00")
         self.assertContains(
-            response,
-            "<strong>Nicht mit einer bestimmten Leistung verbunden.</strong><br>0.00",
+            response, "<strong>Not bound to a particular service.</strong><br>0.00"
         )
-        self.assertContains(
-            response,
-            "10.00 erfasst aber nicht mit einer bestimmten Leistung verbunden.",
-        )
+        self.assertContains(response, "10.00 logged but not bound to a service.")
 
         cost.service = service1
         cost.save()
@@ -197,7 +195,7 @@ class InvoicesTest(TestCase):
             cost.urls["update"],
             {
                 "service": cost.service_id,
-                "rendered_on": local_date_format(cost.rendered_on),
+                "rendered_on": cost.rendered_on.isoformat(),
                 "third_party_costs": cost.third_party_costs or "",
                 "cost": 2 * cost.cost,
                 "description": cost.description,
@@ -205,13 +203,13 @@ class InvoicesTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Dieser Eintrag ist schon Teil einer Rechnung.")
+        self.assertContains(response, "This entry is already part of an invoice.")
 
         response = self.client.post(
             hours.urls["update"],
             {
                 "service": hours.service_id,
-                "rendered_on": local_date_format(hours.rendered_on),
+                "rendered_on": hours.rendered_on.isoformat(),
                 "rendered_by": hours.rendered_by_id,
                 "hours": hours.hours,
                 "description": hours.description,
@@ -219,14 +217,14 @@ class InvoicesTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Dieser Eintrag ist schon Teil einer Rechnung.")
+        self.assertContains(response, "This entry is already part of an invoice.")
 
         response = self.client.post(
             cost.urls["update"],
             {
                 # "service": cost.service_id,
                 "rendered_by": cost.rendered_by_id,
-                "rendered_on": local_date_format(cost.rendered_on),
+                "rendered_on": cost.rendered_on.isoformat(),
                 "third_party_costs": cost.third_party_costs or "",
                 "cost": 2 * cost.cost,
                 "description": cost.description,
@@ -238,7 +236,7 @@ class InvoicesTest(TestCase):
 
         self.assertContains(
             self.client.get("/"),
-            "Erfasste Kosten &#39;Test&#39; wurde erfolgreich geändert.",
+            "logged cost &#39;Test&#39; has been updated successfully.",
         )
 
         cost.refresh_from_db()
@@ -254,7 +252,7 @@ class InvoicesTest(TestCase):
         self.assertEqual(Invoice.objects.count(), 0)
         self.assertEqual(
             messages(response),
-            ["Rechnung '{}' wurde erfolgreich gelöscht.".format(invoice)],
+            ["invoice '{}' has been deleted successfully.".format(invoice)],
         )
 
     def test_delete_service_invoice_with_logs(self):
@@ -290,9 +288,7 @@ class InvoicesTest(TestCase):
         self.assertContains(response, WarningsForm.ignore_warnings_id)
 
         response = self.client.post(invoice.urls["delete"])
-        self.assertContains(
-            response, "Logbuch-Einträge sind mit dieser Rechnung verbunden."
-        )
+        self.assertContains(response, "Logged services are linked with this invoice.")
         self.assertEqual(Invoice.objects.count(), 1)
         cost.refresh_from_db()
         self.assertTrue(cost.invoice_service)
@@ -304,7 +300,7 @@ class InvoicesTest(TestCase):
         self.assertRedirects(response, invoice.urls["list"])
         self.assertEqual(
             messages(response),
-            ["Rechnung '{}' wurde erfolgreich gelöscht.".format(invoice)],
+            ["invoice '{}' has been deleted successfully.".format(invoice)],
         )
 
         cost.refresh_from_db()
@@ -402,7 +398,7 @@ class InvoicesTest(TestCase):
             "/invoices/create/?customer={}".format(person.organization.id)
         )
         self.assertContains(
-            response, 'value="The Organization Ltd" placeholder="Organisation"'
+            response, 'value="The Organization Ltd" placeholder="organization"'
         )
         self.assertContains(response, 'id="id_postal_address"')
 
@@ -422,13 +418,13 @@ class InvoicesTest(TestCase):
                 "postal_address": "Anything",
             },
         )
-        self.assertContains(response, "gehört nicht zu")
+        self.assertContains(response, "does not belong to")
 
     def test_update_invoice(self):
         invoice = factories.InvoiceFactory.create(contact=None)
         self.client.force_login(invoice.owned_by)
         response = self.client.post(invoice.urls["update"], invoice_to_dict(invoice))
-        self.assertContains(response, "Kein Kontakt ausgewählt.")
+        self.assertContains(response, "No contact selected.")
 
         response = self.client.post(
             invoice.urls["update"],
@@ -443,8 +439,7 @@ class InvoicesTest(TestCase):
             invoice.urls["update"], invoice_to_dict(invoice, status=Invoice.SENT)
         )
         self.assertContains(
-            response,
-            "Rechnungs- und/oder Fälligkeitsdatum fehlen für den augewählten Status.",
+            response, "Invoice and/or due date missing for selected state."
         )
 
         person = factories.PersonFactory.create(organization=invoice.customer)
@@ -454,8 +449,8 @@ class InvoicesTest(TestCase):
                 invoice,
                 contact=person.id,
                 status=Invoice.SENT,
-                invoiced_on=local_date_format(date.today()),
-                due_on=local_date_format(date.today()),
+                invoiced_on=date.today().isoformat(),
+                due_on=date.today().isoformat(),
             ),
         )
         self.assertRedirects(response, invoice.urls["detail"])
@@ -463,18 +458,14 @@ class InvoicesTest(TestCase):
         invoice.refresh_from_db()
         response = self.client.post(
             invoice.urls["update"],
-            invoice_to_dict(invoice, closed_on=local_date_format(date.today())),
+            invoice_to_dict(invoice, closed_on=date.today().isoformat()),
         )
-        self.assertContains(
-            response,
-            "Ungültiger Status wenn &quot;Geschlossen am&quot;-Feld schon gesetzt ist.",
-        )
+        self.assertContains(response, "Invalid status when closed on is already set.")
 
         response = self.client.get(invoice.urls["delete"])
         self.assertRedirects(response, invoice.urls["detail"])
         self.assertEqual(
-            messages(response),
-            ["Rechnungen in Vorbereitung können gelöscht werden, andere nicht."],
+            messages(response), ["Invoices in preparation may be deleted, others not."]
         )
 
         invoice.refresh_from_db()
@@ -482,10 +473,11 @@ class InvoicesTest(TestCase):
             invoice.urls["update"],
             invoice_to_dict(invoice, postal_address=invoice.postal_address + " hello"),
         )
+        # print(response, response.content.decode("utf-8"))
         self.assertContains(
             response,
-            "Du hast &#39;Postadresse&#39; geändert. Ich versuche,"
-            " unabsichtliche Änderungen an Feldern",
+            "You are attempting to change &#39;Postal address&#39;."
+            " I am trying to prevent unintentional changes to",
         )
 
         response = self.client.post(
@@ -495,8 +487,6 @@ class InvoicesTest(TestCase):
 
         invoice.refresh_from_db()
         self.assertEqual(invoice.closed_on, date.today())
-
-        # print(response, response.content.decode("utf-8"))
 
     def test_list(self):
         factories.InvoiceFactory.create()
@@ -520,7 +510,7 @@ class InvoicesTest(TestCase):
 
         response = self.client.get("/invoices/?pdf=1")
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(messages(response), ["Keine Rechnungen gefunden."])
+        self.assertEqual(messages(response), ["No invoices found."])
 
         factories.InvoiceFactory.create(
             invoiced_on=date.today() - timedelta(days=60),
@@ -544,9 +534,7 @@ class InvoicesTest(TestCase):
             _code=0,
             status=Invoice.SENT,
         )
-        msg = [
-            "Rechnungs- und/oder Fälligkeitsdatum fehlen für den augewählten Status."
-        ]
+        msg = ["Invoice and/or due date missing for selected state."]
 
         with self.assertRaises(ValidationError) as cm:
             invoice.clean_fields(exclude=["status"])
@@ -568,8 +556,7 @@ class InvoicesTest(TestCase):
                 due_on=date.today() - timedelta(days=1),
             ).full_clean()
         self.assertEqual(
-            list(cm.exception),
-            [("due_on", ["Fälligkeitsdatum muss später als Rechnungsdatum sein."])],
+            list(cm.exception), [("due_on", ["Due date has to be after invoice date."])]
         )
 
         with self.assertRaises(ValidationError) as cm:
@@ -583,12 +570,7 @@ class InvoicesTest(TestCase):
             ).full_clean()
         self.assertEqual(
             list(cm.exception),
-            [
-                (
-                    "__all__",
-                    ["Rechnungen vom Typ Anzahlung benötigen zwingend ein Projekt."],
-                )
-            ],
+            [("__all__", ["Invoices of type Down payment require a project."])],
         )
 
     def test_unlock_sent_invoice(self):
@@ -607,8 +589,8 @@ class InvoicesTest(TestCase):
         )
         self.assertContains(
             response,
-            "Status von &#39;Versendet&#39; zu &#39;In Vorbereitung&#39; ändern."
-            " Bist Du sicher?",
+            "Moving status from &#39;Sent&#39; to &#39;In preparation&#39;."
+            " Are you sure?",
         )
 
     def test_change_paid_invoice(self):
@@ -628,14 +610,14 @@ class InvoicesTest(TestCase):
         )
         self.assertContains(
             response,
-            "Status von &#39;Bezahlt&#39; zu &#39;In Vorbereitung&#39; ändern."
-            " Bist Du sicher?",
+            "Moving status from &#39;Paid&#39; to &#39;In preparation&#39;."
+            " Are you sure?",
         )
         self.assertContains(
             response,
-            "Du versuchst, den Status auf &#39;In Vorbereitung&#39; zu setzen,"
-            " aber die Rechnung wurde schon am {} geschlossen."
-            " Bist Du sicher?".format(local_date_format(date.today())),
+            "You are attempting to set status to &#39;In preparation&#39;,"
+            " but the invoice has already been closed on {}."
+            " Are you sure?".format(local_date_format(date.today())),
         )
 
         response = self.client.post(
@@ -672,7 +654,7 @@ class InvoicesTest(TestCase):
 
         response = self.client.get(url)
         self.assertContains(
-            response, "Dieses Projekt hat schon eine Rechnung in Vorbereitung."
+            response, "This project already has an invoice in preparation."
         )
 
         response = self.client.post(
@@ -742,9 +724,10 @@ class InvoicesTest(TestCase):
             invoice.urls["update"],
             invoice_to_dict(invoice, contact=factories.PersonFactory.create().pk),
         )
+        # print(response.content.decode("utf-8"))
         self.assertContains(
             response,
-            "Der Kontakt Vorname Nachname gehört nicht zu The Organization Ltd.",
+            "The contact Vorname Nachname does not belong to The Organization Ltd.",
         )
 
     def test_status(self):
@@ -753,11 +736,11 @@ class InvoicesTest(TestCase):
         fmt = local_date_format(today)
         self.assertEqual(
             Invoice(status=Invoice.IN_PREPARATION).pretty_status,
-            "In Vorbereitung seit {}".format(fmt),
+            "In preparation since {}".format(fmt),
         )
         self.assertEqual(
             Invoice(status=Invoice.SENT, invoiced_on=today).pretty_status,
-            "Versendet am {}".format(fmt),
+            "Sent on {}".format(fmt),
         )
         self.assertEqual(
             Invoice(
@@ -765,7 +748,7 @@ class InvoicesTest(TestCase):
                 invoiced_on=yesterday,
                 due_on=today - timedelta(days=5),
             ).pretty_status,
-            "Versendet am {}, aber überfällig".format(local_date_format(yesterday)),
+            "Sent on {} but overdue".format(local_date_format(yesterday)),
         )
         self.assertEqual(
             Invoice(
@@ -779,13 +762,13 @@ class InvoicesTest(TestCase):
             Invoice(
                 status=Invoice.SENT, invoiced_on=yesterday, last_reminded_on=today
             ).pretty_status,
-            "Versendet am {}, gemahnt am {}".format(local_date_format(yesterday), fmt),
+            "Sent on {}, reminded on {}".format(local_date_format(yesterday), fmt),
         )
         self.assertEqual(
             Invoice(status=Invoice.PAID, closed_on=today).pretty_status,
-            "Bezahlt am {}".format(fmt),
+            "Paid on {}".format(fmt),
         )
-        self.assertEqual(Invoice(status=Invoice.CANCELED).pretty_status, "Storniert")
+        self.assertEqual(Invoice(status=Invoice.CANCELED).pretty_status, "Canceled")
 
     def test_service_update(self):
         project = factories.ProjectFactory.create()
@@ -816,8 +799,8 @@ class InvoicesTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(
             response,
-            "Kann Leistung von Rechnung, welche nicht mehr in Vorbereitung ist,"
-            " nicht mehr bearbeiten.",
+            "Cannot modify a service bound to an invoice which is not in"
+            " preparation anymore.",
         )
 
     def test_person_invoice_without_vat(self):

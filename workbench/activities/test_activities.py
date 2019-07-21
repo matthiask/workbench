@@ -19,13 +19,13 @@ class ActivitiesTest(TestCase):
         response = self.client.get("/")
 
         response = self.client.get(activity.urls["list"])
-        self.assertContains(response, "überfällig")
-        self.assertContains(response, "heute fällig")
-        self.assertContains(response, "morgen fällig")
-        self.assertContains(response, "fällig in 2 Tagen")
-        self.assertContains(response, "fällig in 14 Tagen")
-        self.assertContains(response, "fällig in 2 Wochen")
-        self.assertContains(response, "1 &ndash; 21 von 21")
+        self.assertContains(response, "overdue")
+        self.assertContains(response, "due today")
+        self.assertContains(response, "due tomorrow")
+        self.assertContains(response, "due in 2 days")
+        self.assertContains(response, "due in 14 days")
+        self.assertContains(response, "due in 2 weeks")
+        self.assertContains(response, "1 &ndash; 21 of 21")
 
         response = self.client.post(
             activity.urls["update"],
@@ -44,23 +44,23 @@ class ActivitiesTest(TestCase):
         self.assertEqual(activity.completed_at.date(), date.today())
 
         response = self.client.get(activity.urls["list"])
-        self.assertContains(response, "1 &ndash; 20 von 20")
+        self.assertContains(response, "1 &ndash; 20 of 20")
 
         response = self.client.get(activity.urls["list"] + "?s=all")
-        self.assertContains(response, "1 &ndash; 21 von 21")
+        self.assertContains(response, "1 &ndash; 21 of 21")
 
         response = self.client.get(activity.urls["list"] + "?owned_by=0")
-        self.assertContains(response, "0 &ndash; 0 von 0")
+        self.assertContains(response, "0 &ndash; 0 of 0")
 
         response = self.client.get(
             activity.urls["list"] + "?owned_by={}".format(activity.owned_by_id)
         )
-        self.assertContains(response, "1 &ndash; 20 von 20")
+        self.assertContains(response, "1 &ndash; 20 of 20")
 
         response = self.client.get(
             activity.urls["list"] + "?owned_by={}".format(activity.owned_by_id + 1)
         )
-        self.assertEqual(messages(response), ["Suchformular war ungültig."])
+        self.assertEqual(messages(response), ["Search form was invalid."])
 
     def test_activity_creation(self):
         project = factories.ProjectFactory.create()
@@ -86,7 +86,7 @@ class ActivitiesTest(TestCase):
 
         response = self.client.get("/activities/")
         self.assertContains(
-            response, "Aktivität &#39;Call back&#39; wurde erfolgreich erstellt."
+            response, "activity &#39;Call back&#39; has been created successfully."
         )
 
         response = self.client.get("/activities/?project=" + str(project.pk + 1))

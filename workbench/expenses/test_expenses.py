@@ -19,7 +19,9 @@ class ExpensesTest(TestCase):
             costs.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(messages(response), ["Kann archivierte Kosten nicht löschen."])
+        self.assertEqual(
+            messages(response), ["Cannot delete archived logged cost entries."]
+        )
 
         costs = factories.LoggedCostFactory.create()
         response = self.client.post(
@@ -61,13 +63,15 @@ class ExpensesTest(TestCase):
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assertContains(response, "Fremdkosten müssen für Spesen angegeben werden.")
+        self.assertContains(
+            response, "Providing third party costs is necessary for expenses."
+        )
 
         response = self.client.post(
             project.urls["createcost"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": local_date_format(date.today()),
+                "rendered_on": date.today().isoformat(),
                 "cost": "10",
                 "description": "Anything",
                 "are_expenses": "on",
@@ -111,8 +115,7 @@ class ExpensesTest(TestCase):
             cost1.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertContains(
-            response,
-            "Spesen sind Teil einer Spesenabrechnung, kann Eintrag nicht löschen.",
+            response, "Expenses are part of an expense report, cannot delete entry."
         )
 
         # More expenses of same user
@@ -138,15 +141,9 @@ class ExpensesTest(TestCase):
 
         response = self.client.post(report.urls["update"])
         self.assertRedirects(response, report.urls["detail"])
-        self.assertEqual(
-            messages(response),
-            ["Kann eine geschlossene Spesenabrechnung nicht mehr bearbeiten."],
-        )
+        self.assertEqual(messages(response), ["Cannot update a closed expense report."])
 
         response = self.client.post(report.urls["delete"])
         self.assertRedirects(response, report.urls["detail"])
-        self.assertEqual(
-            messages(response),
-            ["Kann eine geschlossene Spesenabrechnung nicht mehr löschen."],
-        )
+        self.assertEqual(messages(response), ["Cannot delete a closed expense report."])
         # print(response, response.content.decode("utf-8"))

@@ -9,7 +9,7 @@
 <div class="col-sm-12 col-md-8">
   <h1>
     {% trans 'key data' %}
-    <small>{{ date_range.0|date:'SHORT_DATE_FORMAT' }} &ndash; {{ date_range.1|date:'SHORT_DATE_FORMAT' }}</small>
+    <small>{{ date_range.0|date:'d.m.Y' }} &ndash; {{ date_range.1|date:'d.m.Y' }}</small>
   </h1>
 
   <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>

@@ -116,7 +116,7 @@ class CreateView(ToolsMixin, vanilla.CreateView):
         self.object = form.save()
         messages.success(
             self.request,
-            _("%(class)s '%(object)s' has been successfully created.")
+            _("%(class)s '%(object)s' has been created successfully.")
             % {"class": self.object._meta.verbose_name, "object": self.object},
         )
 
@@ -176,7 +176,7 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
         self.object = form.save()
         messages.success(
             self.request,
-            _("%(class)s '%(object)s' has been successfully updated.")
+            _("%(class)s '%(object)s' has been updated successfully.")
             % {"class": self.object._meta.verbose_name, "object": self.object},
         )
         if self.request.is_ajax():
@@ -232,7 +232,7 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
 
         messages.success(
             self.request,
-            _("%(class)s '%(object)s' has been successfully deleted.")
+            _("%(class)s '%(object)s' has been deleted successfully.")
             % {"class": self.model._meta.verbose_name, "object": self.object},
         )
         if request.is_ajax():

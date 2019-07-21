@@ -2,6 +2,7 @@ from datetime import date
 from decimal import Decimal
 
 from django.test import TestCase
+from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.offers.models import Offer
@@ -11,6 +12,9 @@ from workbench.tools.testing import messages
 
 
 class OffersTest(TestCase):
+    def tearDown(self):
+        deactivate_all()
+
     def test_factories(self):
         offer = factories.OfferFactory.create()
 
@@ -85,11 +89,11 @@ class OffersTest(TestCase):
                 "postal_address": "Anything",
                 # "pa": postal_address.id,
                 "services": [service.id],
-                # "offered_on": local_date_format(date.today()),
+                # "offered_on": date.today().isoformat(),
                 "status": Offer.ACCEPTED,
             },
         )
-        self.assertContains(response, "Offertdatum fehlt für den ausgewählten Status.")
+        self.assertContains(response, "Offered on date missing for selected state.")
 
         response = self.client.post(
             offer.urls["update"],
@@ -101,7 +105,7 @@ class OffersTest(TestCase):
                 "postal_address": "Anything",
                 # "pa": postal_address.id,
                 "services": [service.id],
-                "offered_on": local_date_format(date.today()),
+                "offered_on": date.today().isoformat(),
                 "status": Offer.ACCEPTED,
             },
         )
@@ -114,8 +118,7 @@ class OffersTest(TestCase):
         response = self.client.get(offer.urls["delete"])
         self.assertRedirects(response, offer.project.urls["detail"])
         self.assertEqual(
-            messages(response),
-            ["Offerten in Vorbereitung können gelöscht werden, andere nicht."],
+            messages(response), ["Offers in preparation may be deleted, others not."]
         )
 
         response = self.client.get(service.urls["detail"])
@@ -126,8 +129,8 @@ class OffersTest(TestCase):
         )
         self.assertContains(
             response,
-            "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte"
-            " verbunden ist, welche sich nicht mehr in Vorbereitung befindet.",
+            "Most fields are disabled because service is bound"
+            " to an offer which is not in preparation anymore.",
         )
 
         self.assertTrue(service.allow_logging)
@@ -140,7 +143,7 @@ class OffersTest(TestCase):
         service.refresh_from_db()
         self.assertFalse(service.allow_logging)
         self.assertEqual(
-            messages(response), ["Leistung 'Any service' wurde erfolgreich geändert."]
+            messages(response), ["service 'Any service' has been updated successfully."]
         )
         self.assertEqual(service.offer, offer)
 
@@ -149,8 +152,8 @@ class OffersTest(TestCase):
         )
         self.assertContains(
             response,
-            "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist,"
-            " nicht löschen.",
+            "Cannot delete a service bound to an offer"
+            " which is not in preparation anymore.",
         )
 
         response = self.client.post(
@@ -163,11 +166,11 @@ class OffersTest(TestCase):
                 "postal_address": "Anything",
                 # "pa": postal_address.id,
                 "services": [service.id],
-                "offered_on": local_date_format(date.today()),
+                "offered_on": date.today().isoformat(),
                 "status": Offer.IN_PREPARATION,
             },
         )
-        self.assertContains(response, "aber die Offerte")
+        self.assertContains(response, "but the offer")
 
         response = self.client.post(
             offer.urls["update"],
@@ -179,7 +182,7 @@ class OffersTest(TestCase):
                 "postal_address": "Anything",
                 # "pa": postal_address.id,
                 "services": [service.id],
-                "offered_on": local_date_format(date.today()),
+                "offered_on": date.today().isoformat(),
                 "status": Offer.IN_PREPARATION,
                 WarningsForm.ignore_warnings_id: "status-change-but-already-closed",
             },
@@ -208,9 +211,9 @@ class OffersTest(TestCase):
         self.assertEqual(
             messages(response),
             [
-                "Offerten können nur aus Projekten erstellt werden. Gehe"
-                " zuerst zum Projekt, füge Leistungen hinzu, und dann kannst"
-                " Du die eigentliche Offerte erstellen."
+                "Offers can only be created from projects. Go to the project"
+                " and add services first, then you'll be able to create the offer"
+                " itself."
             ],
         )
 
@@ -218,14 +221,14 @@ class OffersTest(TestCase):
         today = date.today()
         self.assertEqual(
             Offer(status=Offer.IN_PREPARATION).pretty_status,
-            "In Vorbereitung seit {}".format(local_date_format(today)),
+            "In preparation since {}".format(local_date_format(today)),
         )
         self.assertEqual(
             Offer(status=Offer.OFFERED, offered_on=today).pretty_status,
-            "Offeriert am {}".format(local_date_format(today)),
+            "Offered on {}".format(local_date_format(today)),
         )
         self.assertEqual(
             Offer(status=Offer.REJECTED, closed_on=today).pretty_status,
-            "Abgelehnt am {}".format(local_date_format(today)),
+            "Rejected on {}".format(local_date_format(today)),
         )
         self.assertEqual(Offer(status="42").pretty_status, "42")

@@ -14,26 +14,25 @@ class AccrualsTest(TestCase):
     def test_cutoff_days(self):
         self.client.force_login(factories.UserFactory.create())
         response = self.client.post("/accruals/create/", {"day": ""})
-        self.assertContains(response, "Dieses Feld ist zwingend erforderlich.")
-        response = self.client.post("/accruals/create/", {"day": "31.01.2019"})
+        self.assertContains(response, "This field is required.")
+        response = self.client.post("/accruals/create/", {"day": "2019-01-31"})
         day = CutoffDate.objects.get()
         self.assertRedirects(response, day.urls["detail"])
         response = self.client.post(day.urls["delete"])
         self.assertRedirects(response, day.urls["list"])
         self.assertEqual(
-            messages(response), ["Stichtag '31.01.2019' wurde erfolgreich gelöscht."]
+            messages(response),
+            ["cutoff date '31.01.2019' has been deleted successfully."],
         )
 
     def test_cutoff_day_warning(self):
         self.client.force_login(factories.UserFactory.create())
-        response = self.client.post("/accruals/create/", {"day": "01.01.2019"})
-        self.assertContains(
-            response, "Ungewöhnlicher Stichtag (nicht letzter Tag des Monats)."
-        )
+        response = self.client.post("/accruals/create/", {"day": "2019-01-01"})
+        self.assertContains(response, "Unusual cutoff date (not last of the month).")
 
         response = self.client.post(
             "/accruals/create/",
-            {"day": "01.01.2019", WarningsForm.ignore_warnings_id: "unusual-cutoff"},
+            {"day": "2019-01-01", WarningsForm.ignore_warnings_id: "unusual-cutoff"},
         )
         self.assertEqual(response.status_code, 302)
 
@@ -63,7 +62,7 @@ class AccrualsTest(TestCase):
         )
 
         self.client.force_login(factories.UserFactory.create())
-        response = self.client.post("/accruals/create/", {"day": "31.12.2018"})
+        response = self.client.post("/accruals/create/", {"day": "2018-12-31"})
         day = CutoffDate.objects.get()
         self.assertRedirects(response, day.urls["detail"])
 
@@ -73,7 +72,7 @@ class AccrualsTest(TestCase):
 
         response = self.client.get(day.urls["detail"] + "?create_accruals=1")
         self.assertRedirects(response, day.urls["detail"])
-        self.assertEqual(messages(response), ["Abgrenzungen erstellt."])
+        self.assertEqual(messages(response), ["Generated accruals."])
 
         self.assertEqual(Accrual.objects.count(), 1)
 
@@ -81,14 +80,14 @@ class AccrualsTest(TestCase):
         self.assertRedirects(response, day.urls["detail"])
         self.assertEqual(
             messages(response),
-            ["Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."],
+            ["Cannot modify a cutoff date where accrual records already exist."],
         )
 
         response = self.client.get(day.urls["update"])
         self.assertRedirects(response, day.urls["detail"])
         self.assertEqual(
             messages(response),
-            ["Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."],
+            ["Cannot modify a cutoff date where accrual records already exist."],
         )
 
         response = self.client.get(day.urls["detail"] + "?xlsx=1")
@@ -155,15 +154,14 @@ class AccrualsTest(TestCase):
 
     def test_future_cutoff_dates(self):
         self.client.force_login(factories.UserFactory.create())
-        response = self.client.post("/accruals/create/", {"day": "31.01.2099"})
+        response = self.client.post("/accruals/create/", {"day": "2099-01-31"})
         day = CutoffDate.objects.get()
         self.assertRedirects(response, day.urls["detail"])
 
         response = self.client.get(day.urls["detail"] + "?create_accruals=1")
         self.assertRedirects(response, day.urls["detail"])
         self.assertEqual(
-            messages(response),
-            ["Kann Abgrenzungen für zukünftige Stichtage nicht generieren."],
+            messages(response), ["Cannot generate accruals for future cutoff dates."]
         )
 
     def test_list(self):

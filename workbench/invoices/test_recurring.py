@@ -8,7 +8,6 @@ from workbench import factories
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.invoices.reporting import monthly_invoicing
 from workbench.invoices.tasks import create_recurring_invoices_and_notify
-from workbench.tools.formats import local_date_format
 from workbench.tools.testing import messages
 
 
@@ -77,7 +76,7 @@ class RecurringTest(TestCase):
                 # "contact": person.id,
                 "title": "recur",
                 "owned_by": person.primary_contact_id,
-                "starts_on": local_date_format(date.today()),
+                "starts_on": date.today().isoformat(),
                 "periodicity": "yearly",
                 "subtotal": 500,
                 "discount": 0,
@@ -85,7 +84,7 @@ class RecurringTest(TestCase):
                 "third_party_costs": 0,
             },
         )
-        self.assertContains(response, "Kein Kontakt ausgewählt.")
+        self.assertContains(response, "No contact selected.")
 
         response = self.client.post(
             "/recurring-invoices/create/",
@@ -94,7 +93,7 @@ class RecurringTest(TestCase):
                 "contact": person.id,
                 "title": "recur",
                 "owned_by": person.primary_contact_id,
-                "starts_on": local_date_format(date.today()),
+                "starts_on": date.today().isoformat(),
                 "periodicity": "yearly",
                 "subtotal": 500,
                 "discount": 0,
@@ -116,18 +115,18 @@ class RecurringTest(TestCase):
 
         response = self.client.get(ri.urls["detail"] + "?create_invoices=1")
         self.assertRedirects(response, Invoice().urls["list"])
-        self.assertEqual(messages(response), ["1 Rechnung erstellt."])
+        self.assertEqual(messages(response), ["Created 1 invoice."])
 
         response = self.client.get(ri.urls["detail"] + "?create_invoices=1")
         self.assertRedirects(response, ri.urls["detail"])
-        self.assertEqual(messages(response), ["0 Rechnungen erstellt."])
+        self.assertEqual(messages(response), ["Created 0 invoices."])
 
     def test_create_and_notify(self):
         factories.RecurringInvoiceFactory.create()
 
         create_recurring_invoices_and_notify()
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, "Stapelrechnungen")
+        self.assertEqual(mail.outbox[0].subject, "recurring invoices")
 
         create_recurring_invoices_and_notify()
         self.assertEqual(len(mail.outbox), 1)
@@ -165,7 +164,7 @@ class RecurringTest(TestCase):
             periodicity="monthly",
             subtotal=200,
         )
-        self.assertEqual(ri.pretty_status, "monatlich von 01.01.2018 bis 31.12.2050")
+        self.assertEqual(ri.pretty_status, "monthly from 01.01.2018 until 31.12.2050")
 
         ri = RecurringInvoice.objects.create(
             customer=person.organization,
@@ -177,4 +176,4 @@ class RecurringTest(TestCase):
             periodicity="monthly",
             subtotal=200,
         )
-        self.assertEqual(ri.pretty_status, "monatlich seit 01.01.2018")
+        self.assertEqual(ri.pretty_status, "monthly from 01.01.2018")

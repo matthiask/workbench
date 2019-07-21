@@ -37,16 +37,14 @@ class ContactsTest(TestCase):
         self.client.force_login(person.primary_contact)
         response = self.client.post(person.urls["update"], person_to_dict(person))
         self.assertContains(
-            response, "Keine Begrüssung gesetzt. Das macht Newsletter hässlich."
+            response, "No salutation set. This will make newsletters ugly."
         )
 
         response = self.client.post(
             person.urls["update"], person_to_dict(person, salutation="Dear")
         )
         self.assertContains(
-            response,
-            "Das sieht nicht korrekt aus."
-            " Bitte definiere eine vollständige Begrüssung.",
+            response, "This does not look right. Please add a full salutation."
         )
 
         response = self.client.post(
@@ -67,8 +65,8 @@ class ContactsTest(TestCase):
         # print(response, response.content.decode("utf-8"))
         self.assertContains(
             response,
-            "Diese Person ist der Kontakt der folgenden zugehörigen Objekte:"
-            " 1 Projekt.",
+            "This person is the contact of the following related objects:"
+            " 1 project.",
         )
 
         factories.Project.objects.all().delete()
@@ -78,7 +76,7 @@ class ContactsTest(TestCase):
         self.assertRedirects(response, person.urls["detail"])
         self.assertEqual(
             messages(response),
-            ["Person 'Vorname Nachname' wurde erfolgreich geändert."],
+            ["person 'Vorname Nachname' has been updated successfully."],
         )
 
     def test_lists(self):
@@ -92,7 +90,7 @@ class ContactsTest(TestCase):
 
         self.client.force_login(person.primary_contact)
         response = self.client.get(person.urls["list"])
-        self.assertContains(response, "1 &ndash; 2 von 2")
+        self.assertContains(response, "1 &ndash; 2 of 2")
         self.assertContains(response, "Vorname Nachname", 2)
 
         response = self.client.get("/contacts/people/?g=" + str(group1.pk))

@@ -13,7 +13,6 @@ from workbench.credit_control.parsers import (
     postfinance_preprocess_notice,
     postfinance_reference_number,
 )
-from workbench.tools.formats import local_date_format
 from workbench.tools.testing import messages
 
 
@@ -54,8 +53,8 @@ class CreditEntriesTest(TestCase):
         self.assertEqual(
             messages(response),
             [
-                "Gutschriften wurden erfolgreich geändert.",
-                "Alle Gutschriften wurden zugewiesen.",
+                "credit entries have been updated successfully.",
+                "All credit entries have already been assigned.",
             ],
         )
 
@@ -89,14 +88,14 @@ class CreditEntriesTest(TestCase):
         )
 
         self.assertRedirects(response, "/credit-control/")
-        self.assertEqual(messages(response), ["2 Gutschriften erstellt."])
+        self.assertEqual(messages(response), ["Created 2 credit entries."])
 
         response = self.client.post(
             "/credit-control/upload/",
             {"statement_data": statement_data, "ledger": ledger.pk},
         )
         self.assertRedirects(response, "/credit-control/")
-        self.assertEqual(messages(response), ["0 Gutschriften erstellt."])
+        self.assertEqual(messages(response), ["Created 0 credit entries."])
 
         invoice = factories.InvoiceFactory.create(
             subtotal=Decimal("4000"), _code="00001"
@@ -145,7 +144,7 @@ class CreditEntriesTest(TestCase):
             {
                 "ledger": factories.LedgerFactory.create().pk,
                 "reference_number": "unique",
-                "value_date": local_date_format(date.today()),
+                "value_date": date.today().isoformat(),
                 "total": "20.55",
                 "payment_notice": "nothing",
                 "notes": "bla",

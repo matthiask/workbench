@@ -41,10 +41,10 @@ class StatisticsTest(TestCase):
     def test_view(self):
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/report/overdrawn-projects/")
-        self.assertContains(response, "Überzogene Projekte")
+        self.assertContains(response, "overdrawn projects")
 
         response = self.client.get("/report/hours-per-customer/")
-        self.assertContains(response, "Stunden pro Kundschaft")
+        self.assertContains(response, "hours per customer")
 
         response = self.client.get("/report/hours-per-customer/?date_from=bla")
         self.assertRedirects(response, "/report/hours-per-customer/")

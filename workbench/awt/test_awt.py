@@ -7,7 +7,6 @@ from workbench import factories
 from workbench.awt.models import Absence, Employment, Year
 from workbench.awt.reporting import annual_working_time
 from workbench.awt.utils import monthly_days
-from workbench.tools.formats import local_date_format
 from workbench.tools.testing import messages
 
 
@@ -128,7 +127,7 @@ class AWTTest(TestCase):
         self.client.force_login(factories.UserFactory.create(is_admin=True))
         factories.YearFactory.create()
         response = self.client.get("/admin/awt/year/")
-        self.assertContains(response, '<td class="field-days">360,00</td>')
+        self.assertContains(response, '<td class="field-days">360.00</td>')
 
     def test_absence_editing(self):
         user = factories.UserFactory.create()
@@ -137,7 +136,7 @@ class AWTTest(TestCase):
             "/absences/create/",
             {
                 "user": user.pk,
-                "starts_on": local_date_format(date.today()),
+                "starts_on": date.today().isoformat(),
                 "days": 3,
                 "description": "Sick",
                 "is_vacation": "",
@@ -157,9 +156,24 @@ class AWTTest(TestCase):
             absence.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Absences of past years are locked.")
+
+    def test_only_this_year(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        response = self.client.post(
+            "/absences/create/",
+            {
+                "user": user.pk,
+                "starts_on": "2018-01-01",
+                "days": 3,
+                "description": "Sick",
+                "is_vacation": "",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
         self.assertContains(
-            response,
-            "Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt.",
+            response, "Creating absences for past years is not allowed."
         )
 
     def test_employment_model(self):
@@ -172,7 +186,7 @@ class AWTTest(TestCase):
             user=user, percentage=100, vacation_weeks=5, date_from=date(2018, 1, 1)
         )
         self.assertEqual(employment.date_until, date.max)
-        self.assertEqual(str(employment), "Seit 01.01.2018")
+        self.assertEqual(str(employment), "since 01.01.2018")
 
         self.assertEqual(list(year.active_users()), [user])
 
@@ -204,7 +218,7 @@ class AWTTest(TestCase):
 
         response = self.client.get(url + "?year=2018")
         self.assertRedirects(response, "/")
-        self.assertEqual(messages(response), ["Sollzeit für 2018 nicht gefunden."])
+        self.assertEqual(messages(response), ["Target time for 2018 not found."])
 
     def test_non_ajax_redirect(self):
         user = factories.UserFactory.create()

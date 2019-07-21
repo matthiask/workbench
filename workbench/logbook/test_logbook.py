@@ -5,7 +5,6 @@ from django.utils import timezone
 
 from workbench import factories
 from workbench.logbook.models import LoggedCost, LoggedHours
-from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import messages
 
@@ -21,7 +20,7 @@ class LogbookTest(TestCase):
                 url,
                 {
                     "rendered_by": project.owned_by_id,
-                    "rendered_on": local_date_format(date.today()),
+                    "rendered_on": date.today().isoformat(),
                     "service": service.id,
                     "hours": "0.1",
                     "description": "Test",
@@ -37,24 +36,19 @@ class LogbookTest(TestCase):
         self.assertEqual(hours.description, "Test")
 
         response = send()
-        self.assertContains(response, "Scheint ein Duplikat zu sein.")
+        self.assertContains(response, "This seems to be a duplicate.")
 
-        response = send(
-            rendered_on=local_date_format(date.today() - timedelta(days=10))
-        )
+        response = send(rendered_on=(date.today() - timedelta(days=10)).isoformat())
         self.assertContains(
-            response, "Stunden müssen in der gleichen Woche erfasst werden."
+            response, "Sorry, hours have to be logged in the same week."
         )
 
-        response = send(
-            rendered_on=local_date_format(date.today() + timedelta(days=10))
-        )
-        self.assertContains(response, "Tut mir leid, zu früh.")
+        response = send(rendered_on=(date.today() + timedelta(days=10)).isoformat())
+        self.assertContains(response, "Sorry, too early.")
 
         response = send(service="")
         self.assertContains(
-            response,
-            "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung.",
+            response, "This field is required unless you create a new service."
         )
 
         response = send(hours.urls["update"], description="Test 2")
@@ -66,7 +60,7 @@ class LogbookTest(TestCase):
         project.save()
 
         response = send()
-        self.assertContains(response, "Dieses Projekt wurde schon geschlossen.")
+        self.assertContains(response, "This project is already closed.")
 
     def test_no_same_week_logging(self):
         service = factories.ServiceFactory.create()
@@ -79,7 +73,7 @@ class LogbookTest(TestCase):
             project.urls["createhours"],
             {
                 "rendered_by": user.id,
-                "rendered_on": local_date_format(date.today() - timedelta(days=10)),
+                "rendered_on": (date.today() - timedelta(days=10)).isoformat(),
                 "service": service.id,
                 "hours": "0.1",
                 "description": "Test",
@@ -97,7 +91,7 @@ class LogbookTest(TestCase):
             project.urls["createhours"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": local_date_format(date.today()),
+                "rendered_on": date.today().isoformat(),
                 # "service": service.id,
                 "hours": "0.1",
                 "description": "Test",
@@ -129,7 +123,7 @@ class LogbookTest(TestCase):
             service.project.urls["createhours"],
             {
                 "rendered_by": service.project.owned_by_id,
-                "rendered_on": local_date_format(date.today()),
+                "rendered_on": date.today().isoformat(),
                 "service": service.id,
                 "hours": "0.1",
                 "description": "Test",
@@ -141,8 +135,7 @@ class LogbookTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(
             response,
-            "Falls Du eine neue Leistung erstellen willst, darfst Du keine"
-            " existierende Leistung wählen.",
+            "Deselect the existing service if you want to create a new service.",
         )
 
     def test_invalid_date(self):
@@ -161,7 +154,7 @@ class LogbookTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Bitte ein gültiges Datum eingeben.")
+        self.assertContains(response, "Enter a valid date.")
 
     def test_duplicate_detection_with_invalid_date(self):
         service = factories.ServiceFactory.create()
@@ -184,7 +177,7 @@ class LogbookTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Bitte ein gültiges Datum eingeben.")
+        self.assertContains(response, "Enter a valid date.")
 
     def test_create_and_update_logged_cost(self):
         project = factories.ProjectFactory.create()
@@ -194,7 +187,7 @@ class LogbookTest(TestCase):
             project.urls["createcost"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": local_date_format(date.today()),
+                "rendered_on": date.today().isoformat(),
                 "cost": "10",
                 "third_party_costs": "9",
                 "description": "Anything",
@@ -211,20 +204,20 @@ class LogbookTest(TestCase):
             cost.urls["update"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": local_date_format(date.today()),
+                "rendered_on": date.today().isoformat(),
                 "cost": "10",
                 "third_party_costs": "9",
                 "description": "Anything",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assertContains(response, "Dieses Projekt wurde schon geschlossen.")
+        self.assertContains(response, "This project is already closed.")
 
         response = self.client.post(
             cost.urls["update"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": local_date_format(date.today()),
+                "rendered_on": date.today().isoformat(),
                 "cost": "10",
                 "third_party_costs": "9",
                 "description": "Anything",
@@ -266,7 +259,7 @@ class LogbookTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            messages(response), ["Kann Stunden vergangener Wochen nicht löschen."]
+            messages(response), ["Cannot delete logged hours from past weeks."]
         )
 
         hours.archived_at = timezone.now()
@@ -276,9 +269,7 @@ class LogbookTest(TestCase):
             hours.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            messages(response), ["Kann archivierte Stunden nicht löschen."]
-        )
+        self.assertEqual(messages(response), ["Cannot delete archived logged hours."])
 
         hours = factories.LoggedHoursFactory.create()
         response = self.client.post(
@@ -294,7 +285,9 @@ class LogbookTest(TestCase):
             costs.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(messages(response), ["Kann archivierte Kosten nicht löschen."])
+        self.assertEqual(
+            messages(response), ["Cannot delete archived logged cost entries."]
+        )
 
         costs = factories.LoggedCostFactory.create()
         response = self.client.post(
@@ -446,7 +439,7 @@ class LogbookTest(TestCase):
             project.urls["createcost"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": local_date_format(date.today()),
+                "rendered_on": date.today().isoformat(),
                 "cost": "10",
                 "third_party_costs": "11",
                 "description": "Anything",
@@ -455,14 +448,14 @@ class LogbookTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(
-            response, "Fremdkosten sollten nicht höher sein als die Kosten."
+            response, "Third party costs shouldn&#39;t be higher than costs."
         )
 
         response = self.client.post(
             project.urls["createcost"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": local_date_format(date.today()),
+                "rendered_on": date.today().isoformat(),
                 "cost": "10",
                 "third_party_costs": "11",
                 "description": "Anything",

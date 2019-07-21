@@ -25,7 +25,7 @@ class DealsTest(TestCase):
         response = self.client.get(deal.urls["detail"])
         # print(response, response.content.decode("utf-8"))
 
-        self.assertContains(response, "Keine Aktivitäten")
+        self.assertContains(response, "No activities")
         self.assertContains(response, "<td>42.00</td>")
 
     def test_crud(self):
@@ -50,7 +50,7 @@ class DealsTest(TestCase):
         deal = factories.Deal.objects.get()
         self.assertIsNone(deal.closed_on)
         self.assertEqual(
-            deal.pretty_status, "Offen seit {}".format(local_date_format(date.today()))
+            deal.pretty_status, "Open since {}".format(local_date_format(date.today()))
         )
 
         response = self.client.post(
@@ -69,8 +69,7 @@ class DealsTest(TestCase):
         deal.refresh_from_db()
         self.assertEqual(deal.closed_on, date.today())
         self.assertEqual(
-            deal.pretty_status,
-            "Abgelehnt am {}".format(local_date_format(date.today())),
+            deal.pretty_status, "declined on {}".format(local_date_format(date.today()))
         )
 
         response = self.client.post(
@@ -89,5 +88,5 @@ class DealsTest(TestCase):
         deal.refresh_from_db()
         self.assertIsNone(deal.closed_on)
         self.assertEqual(
-            deal.pretty_status, "Offen seit {}".format(local_date_format(date.today()))
+            deal.pretty_status, "Open since {}".format(local_date_format(date.today()))
         )

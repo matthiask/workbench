@@ -20,7 +20,7 @@ class ToolsTest(TestCase):
         self.assertEqual(Year().pretty_status, "")
         self.assertEqual(
             Year(year=2012).snippet(),
-            '\n<a href="/report/annual-working-time/?year=2012">\n  Jahr: 2012\n</a>\n',
+            '\n<a href="/report/annual-working-time/?year=2012">\n  year: 2012\n</a>\n',
         )
 
     def test_invalid_autocomplete(self):
@@ -45,7 +45,7 @@ class ToolsTest(TestCase):
         self.assertAlmostEqual(m.total_excl_tax, Decimal("15"))
         self.assertAlmostEqual(m.total, Decimal("16.20"))
 
-        self.assertEqual(m.pretty_total_excl, "15.00 exkl. MwSt. (5.00 Rabatt)")
+        self.assertEqual(m.pretty_total_excl, "15.00 excl. tax (5.00 discount)")
 
     def test_create_absence_redirect(self):
         self.client.force_login(factories.UserFactory.create())
@@ -65,7 +65,7 @@ class ToolsTest(TestCase):
         self.assertEqual(
             messages(response),
             [
-                "Kann '{}' wegen Abhängigkeiten nicht löschen (Any service: Bla)."
+                "Cannot delete '{}' because of related objects (Any service: Bla)."
                 "".format(project)
             ],
         )

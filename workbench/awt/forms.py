@@ -1,3 +1,5 @@
+from datetime import date
+
 from django import forms, http
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -45,3 +47,11 @@ class AbsenceForm(ModelForm):
             ' class="btn btn-secondary btn-sm float-right">{hours}</button>',
             hours=_("Enter hours"),
         )
+
+    def clean(self):
+        data = super().clean()
+        if data.get("starts_on") and data["starts_on"].year < date.today().year:
+            raise forms.ValidationError(
+                {"starts_on": _("Creating absences for past years is not allowed.")}
+            )
+        return data

@@ -36,7 +36,7 @@ def date_formatter(value):
         return local_date_format(dt, "SHORT_DATETIME_FORMAT")
     dt = dateparse.parse_date(value)
     if dt:
-        return local_date_format(dt, "SHORT_DATE_FORMAT")
+        return local_date_format(dt, "d.m.Y")
     return value
 
 

@@ -53,7 +53,7 @@ class ProjectsTest(TestCase):
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assertContains(response, "Entweder alle Felder einfüllen oder keine.")
+        self.assertContains(response, "Either fill in all fields or none.")
 
         response = self.client.post(
             project.urls["createservice"],
@@ -66,10 +66,8 @@ class ProjectsTest(TestCase):
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assertContains(response, "Entweder alle Felder einfüllen oder keine.")
-        self.assertContains(
-            response, "Kann nicht leer sein wenn Fremdkosten gesetzt sind."
-        )
+        self.assertContains(response, "Either fill in all fields or none.")
+        self.assertContains(response, "Cannot be empty if third party costs is set.")
 
         response = self.client.post(
             project.urls["createservice"],
@@ -141,7 +139,7 @@ class ProjectsTest(TestCase):
         )
         self.assertEqual(response.status_code, 204)
         self.assertEqual(
-            messages(response), ["Leistung 'Any service' wurde erfolgreich gelöscht."]
+            messages(response), ["service 'Any service' has been deleted successfully."]
         )
         self.assertEqual(Service.objects.count(), 0)
 
@@ -185,7 +183,7 @@ class ProjectsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             dict(response.context_data["form"].errors),
-            {"customer": ["Dieses Feld ist zwingend erforderlich."]},
+            {"customer": ["This field is required."]},
         )
 
         org = factories.OrganizationFactory.create()
@@ -208,8 +206,8 @@ class ProjectsTest(TestCase):
             dict(response.context_data["form"].errors),
             {
                 "contact": [
-                    "Der Kontakt Vorname Nachname / The Organization Ltd"
-                    " gehört nicht zu The Organization Ltd."
+                    "The contact Vorname Nachname / The Organization Ltd"
+                    " does not belong to The Organization Ltd."
                 ]
             },
         )
@@ -311,8 +309,8 @@ class ProjectsTest(TestCase):
         )
         self.assertContains(
             response,
-            "Dieses Projekt hat schon Rechnungen."
-            " Der Rechnungskunde wird auch angepasst.",
+            "This project already has invoices. The invoices&#39;"
+            " customer record will be changed too.",
         )
         response = self.client.post(
             project.urls["update"],
@@ -354,7 +352,7 @@ class ProjectsTest(TestCase):
             {"project": closed.pk},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assertContains(response, "Dieses Projekt wurde schon geschlossen.")
+        self.assertContains(response, "This project is already closed.")
 
         response = self.client.post(
             service.urls["move"],

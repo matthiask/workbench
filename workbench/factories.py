@@ -28,7 +28,7 @@ class UserFactory(factory.DjangoModelFactory):
     _full_name = factory.LazyFunction(faker.name)
     _short_name = factory.Sequence(lambda n: "user%d" % n)
     email = factory.LazyAttribute(lambda obj: "%s@example.com" % obj._short_name)
-    language = "de"
+    language = "en"
 
     class Meta:
         model = User

@@ -3,7 +3,6 @@ from datetime import date, timedelta
 from django.test import TestCase
 
 from workbench import factories
-from workbench.tools.formats import local_date_format
 from workbench.tools.testing import messages
 
 
@@ -20,13 +19,13 @@ class ReportingTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/report/open-items-list/?cutoff_date=bla")
         self.assertRedirects(response, "/report/open-items-list/")
-        self.assertEqual(messages(response), ["Formular war ungültig."])
+        self.assertEqual(messages(response), ["Form was invalid."])
         response = self.client.get("/report/open-items-list/")
         self.assertContains(response, '<th class="text-right">1’000.00</th>')
 
         response = self.client.get(
             "/report/open-items-list/?cutoff_date={}".format(
-                local_date_format(date.today() - timedelta(days=1))
+                (date.today() - timedelta(days=1)).isoformat()
             )
         )
         self.assertContains(response, '<th class="text-right">0.00</th>')
@@ -41,10 +40,10 @@ class ReportingTest(TestCase):
     def test_monthly_invoicing_form(self):
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/report/monthly-invoicing/")
-        self.assertContains(response, "Monatliche Verrechnung")
+        self.assertContains(response, "monthly invoicing")
 
         response = self.client.get("/report/monthly-invoicing/?year=2018")
-        self.assertContains(response, "Monatliche Verrechnung")
+        self.assertContains(response, "monthly invoicing")
 
         response = self.client.get("/report/monthly-invoicing/?year=bla")
         self.assertRedirects(response, "/report/monthly-invoicing/")

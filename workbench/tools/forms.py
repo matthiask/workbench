@@ -181,7 +181,7 @@ class ModelForm(WarningsForm, forms.ModelForm):
                         {
                             "contact": gettext(
                                 "The contact %(person)s does not belong to"
-                                "  %(organization)s."
+                                " %(organization)s."
                             )
                             % {
                                 "person": data.get("contact"),
