@@ -13,7 +13,7 @@ from workbench.accounts.models import User
 from workbench.tools.formats import local_date_format
 
 
-Change = namedtuple("Change", "changes version number")
+Change = namedtuple("Change", "changes version")
 
 
 def boolean_formatter(value):
@@ -79,41 +79,58 @@ def formatter(field):
     return lambda value: default_if_none(value, _("<no value>"))
 
 
-def changes(model, fields, versions):
+def changes(model, fields, actions):
     changes = []
 
-    if not versions:
+    if not actions:
         return changes
 
     users = {str(u.pk): u.get_full_name() for u in User.objects.all()}
-    for version in versions:
-        match = re.search(r"^user-([0-9]+)-", version.user_name)
+    for action in actions:
+        match = re.search(r"^user-([0-9]+)-", action.user_name)
         if match:
             pk = match.groups()[0]
-            version.pretty_user_name = users.get(pk) or version.user_name
+            action.pretty_user_name = users.get(pk) or action.user_name
         else:
-            version.pretty_user_name = version.user_name
+            action.pretty_user_name = action.user_name
 
     field_instances = [model._meta.get_field(f) for f in fields]
 
-    values = versions[0].row_data
-    version_changes = [
-        mark_safe(
-            _("Initial value of '%(field)s' was '%(current)s'.")
-            % {
-                "field": conditional_escape(capfirst(f.verbose_name)),
-                "current": conditional_escape(formatter(f)(values.get(f.attname))),
-            }
-        )
-        for f in field_instances
-        if not (f.many_to_many or f.one_to_many)  # Avoid those relation types.
-    ]
+    for action in actions:
+        if action.action == "I":
+            values = action.row_data
+            version_changes = [
+                mark_safe(
+                    _("Initial value of '%(field)s' was '%(current)s'.")
+                    % {
+                        "field": conditional_escape(capfirst(f.verbose_name)),
+                        "current": conditional_escape(
+                            formatter(f)(values.get(f.attname))
+                        ),
+                    }
+                )
+                for f in field_instances
+                if not (f.many_to_many or f.one_to_many)  # Avoid those relation types.
+            ]
 
-    changes.append(Change(changes=version_changes, version=versions[0], number=1))
+        elif action.action == "U":
+            values = action.changed_fields or {}
+            version_changes = [
+                mark_safe(
+                    _("New value of '%(field)s' was '%(current)s'.")
+                    % {
+                        "field": conditional_escape(capfirst(f.verbose_name)),
+                        "current": conditional_escape(
+                            formatter(f)(values.get(f.attname))
+                        ),
+                    }
+                )
+                for f in field_instances
+                if f.attname in values
+            ]
 
-    for change in versions[1:]:
-        if change.action == "D":
-            values = change.row_data
+        else:  # Deletion or truncation
+            values = action.row_data
             version_changes = [
                 mark_safe(
                     _("Final value of '%(field)s' was '%(current)s'.")
@@ -128,31 +145,7 @@ def changes(model, fields, versions):
                 if not (f.many_to_many or f.one_to_many)  # Avoid those relation types.
             ]
 
-        else:
-            version_changes = [
-                mark_safe(
-                    _("'%(field)s' changed from '%(previous)s' to '%(current)s'.")
-                    % {
-                        "field": conditional_escape(capfirst(f.verbose_name)),
-                        "current": conditional_escape(
-                            formatter(f)(change.changed_fields.get(f.attname))
-                        ),
-                        "previous": conditional_escape(
-                            formatter(f)(change.row_data.get(f.attname))
-                        ),
-                    }
-                )
-                for f in field_instances
-                if change.changed_fields and f.attname in change.changed_fields
-            ]
-
         if version_changes:
-            changes.append(
-                Change(
-                    changes=version_changes,
-                    version=change,
-                    number=changes[-1].number + 1,
-                )
-            )
+            changes.append(Change(changes=version_changes, version=action))
 
     return changes
