@@ -73,6 +73,7 @@ class User(Model, AbstractBaseUser):
     language = models.CharField(
         _("language"),
         max_length=10,
+        blank=True,
         choices=settings.LANGUAGES,
         default=settings.LANGUAGES[0][0],
     )

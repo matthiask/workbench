@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
@@ -17,3 +18,4 @@ class UserForm(ModelForm):
         self.fields["email"].help_text = _(
             "Managed automatically. Contact your administrator to change this."
         )
+        self.fields["language"].choices = settings.LANGUAGES
