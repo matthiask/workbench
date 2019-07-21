@@ -88,8 +88,8 @@ class Deal(Model):
     @property
     def pretty_status(self):
         d = {
-            "created_at": local_date_format(self.created_at, "d.m.Y"),
-            "closed_on": self.closed_on and local_date_format(self.closed_on, "d.m.Y"),
+            "created_at": local_date_format(self.created_at.date()),
+            "closed_on": self.closed_on and local_date_format(self.closed_on),
             "status": self.get_status_display(),
         }
 

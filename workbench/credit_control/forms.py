@@ -142,7 +142,7 @@ class AssignCreditEntriesForm(forms.Form):
                     '<a href="{}" target="_blank">{}, {}: {}</a>',
                     entry.get_absolute_url(),
                     entry.total,
-                    local_date_format(entry.value_date, "d.m.Y"),
+                    local_date_format(entry.value_date),
                     entry.payment_notice,
                 ),
                 choices=[(None, "----------")]

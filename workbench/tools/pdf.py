@@ -308,7 +308,7 @@ class PDFDocument(_PDFDocument):
                 (
                     _("date"),
                     (
-                        local_date_format(offer.offered_on, "d.m.Y")
+                        local_date_format(offer.offered_on)
                         if offer.offered_on
                         else MarkupParagraph(
                             "<b>%s</b>" % _("NO DATE YET"), style=self.style.bold
@@ -319,9 +319,7 @@ class PDFDocument(_PDFDocument):
                 (
                     _("valid until"),
                     (
-                        local_date_format(
-                            offer.offered_on + timedelta(days=60), "d.m.Y"
-                        )
+                        local_date_format(offer.offered_on + timedelta(days=60))
                         if offer.offered_on
                         else MarkupParagraph(
                             "<b>%s</b>" % _("NO DATE YET"), style=self.style.bold
@@ -348,7 +346,7 @@ class PDFDocument(_PDFDocument):
                 (
                     _("date"),
                     (
-                        local_date_format(invoice.invoiced_on, "d.m.Y")
+                        local_date_format(invoice.invoiced_on)
                         if invoice.invoiced_on
                         else MarkupParagraph(
                             "<b>%s</b>" % _("NO DATE YET"), style=self.style.bold
@@ -362,7 +360,7 @@ class PDFDocument(_PDFDocument):
             % {
                 "code": invoice.code,
                 "due": (
-                    local_date_format(invoice.due_on, "d.m.Y")
+                    local_date_format(invoice.due_on)
                     if invoice.due_on
                     else _("NO DATE YET")
                 ),

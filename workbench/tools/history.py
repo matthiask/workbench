@@ -31,13 +31,8 @@ def default_if_none(value, default):
 def date_formatter(value):
     if value is None:
         return _("<no value>")
-    dt = dateparse.parse_datetime(value)
-    if dt:
-        return local_date_format(dt, "SHORT_DATETIME_FORMAT")
-    dt = dateparse.parse_date(value)
-    if dt:
-        return local_date_format(dt, "d.m.Y")
-    return value
+    dt = dateparse.parse_datetime(value) or dateparse.parse_date(value)
+    return local_date_format(dt) if dt else value
 
 
 @lru_cache()

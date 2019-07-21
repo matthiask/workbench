@@ -136,16 +136,16 @@ class Offer(ModelWithTotal):
     def pretty_status(self):
         if self.status == self.IN_PREPARATION:
             return _("In preparation since %(created_at)s") % {
-                "created_at": local_date_format(self.created_at, "d.m.Y")
+                "created_at": local_date_format(self.created_at.date())
             }
         elif self.status == self.OFFERED:
             return _("Offered on %(offered_on)s") % {
-                "offered_on": local_date_format(self.offered_on, "d.m.Y")
+                "offered_on": local_date_format(self.offered_on)
             }
         elif self.status in (self.ACCEPTED, self.REJECTED):
             return _("%(status)s on %(closed_on)s") % {
                 "status": self.get_status_display(),
-                "closed_on": local_date_format(self.closed_on, "d.m.Y"),
+                "closed_on": local_date_format(self.closed_on),
             }
         return self.get_status_display()
 

@@ -130,9 +130,7 @@ class Project(Model):
     def pretty_status(self):
         parts = [str(self.get_type_display())]
         if self.closed_on:
-            parts.append(
-                gettext("closed on %s") % local_date_format(self.closed_on, "d.m.Y")
-            )
+            parts.append(gettext("closed on %s") % local_date_format(self.closed_on))
         return ", ".join(parts)
 
     @cached_property

@@ -18,7 +18,7 @@ def create_recurring_invoices_and_notify():
             "{} {} {}\n{}{}\n".format(
                 invoice,
                 currency(invoice.total),
-                local_date_format(invoice.invoiced_on, "d.m.Y"),
+                local_date_format(invoice.invoiced_on),
                 settings.WORKBENCH.URL,
                 invoice.get_absolute_url(),
             )

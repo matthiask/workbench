@@ -75,14 +75,11 @@ class Activity(Model):
     def pretty_status(self):
         if self.completed_at:
             return _("completed on %(completed_on)s") % {
-                "completed_on": local_date_format(self.completed_at, "d.m.Y")
+                "completed_on": local_date_format(self.completed_at.date())
             }
 
         if self.due_on:
-            return "%s (%s)" % (
-                pretty_due(self.due_on),
-                local_date_format(self.due_on, "d.m.Y"),
-            )
+            return "%s (%s)" % (pretty_due(self.due_on), local_date_format(self.due_on))
 
         return _("open")
 

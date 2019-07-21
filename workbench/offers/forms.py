@@ -118,7 +118,7 @@ class OfferForm(PostalAddressSelectionForm):
                 )
                 % {
                     "to": s_dict[data["status"]],
-                    "closed": local_date_format(self.instance.closed_on, "d.m.Y"),
+                    "closed": local_date_format(self.instance.closed_on),
                 },
                 code="status-change-but-already-closed",
             )

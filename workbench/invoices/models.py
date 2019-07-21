@@ -236,18 +236,16 @@ class Invoice(ModelWithTotal):
     def pretty_status(self):
         d = {
             "invoiced_on": (
-                local_date_format(self.invoiced_on, "d.m.Y")
-                if self.invoiced_on
-                else None
+                local_date_format(self.invoiced_on) if self.invoiced_on else None
             ),
             "reminded_on": (
-                local_date_format(self.last_reminded_on, "d.m.Y")
+                local_date_format(self.last_reminded_on)
                 if self.last_reminded_on
                 else None
             ),
-            "created_at": local_date_format(self.created_at, "d.m.Y"),
+            "created_at": local_date_format(self.created_at.date()),
             "closed_on": (
-                local_date_format(self.closed_on, "d.m.Y") if self.closed_on else None
+                local_date_format(self.closed_on) if self.closed_on else None
             ),
         }
 
@@ -491,12 +489,12 @@ class RecurringInvoice(ModelWithTotal):
         if self.ends_on:
             return _("%(periodicity)s from %(from)s until %(until)s") % {
                 "periodicity": self.get_periodicity_display(),
-                "from": local_date_format(self.starts_on, "d.m.Y"),
-                "until": local_date_format(self.ends_on, "d.m.Y"),
+                "from": local_date_format(self.starts_on),
+                "until": local_date_format(self.ends_on),
             }
         return _("%(periodicity)s from %(from)s") % {
             "periodicity": self.get_periodicity_display(),
-            "from": local_date_format(self.starts_on, "d.m.Y"),
+            "from": local_date_format(self.starts_on),
         }
 
     def create_single_invoice(self, *, period_starts_on, period_ends_on):
@@ -514,8 +512,8 @@ class RecurringInvoice(ModelWithTotal):
                         self.description,
                         "{}: {} - {}".format(
                             _("Period"),
-                            local_date_format(period_starts_on, "d.m.Y"),
-                            local_date_format(period_ends_on, "d.m.Y"),
+                            local_date_format(period_starts_on),
+                            local_date_format(period_ends_on),
                         ),
                     ),
                 )
