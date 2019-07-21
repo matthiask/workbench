@@ -21,7 +21,7 @@ class ExpenseReportPDFView(generic.DetailView):
         pdf.spacer(2 * mm)
         pdf.table(
             [
-                (_("owned by"), self.object.owned_by.get_full_name()),
+                (_("responsible"), self.object.owned_by.get_full_name()),
                 (_("created at"), local_date_format(self.object.created_at)),
                 (_("status"), capfirst(self.object.pretty_status)),
             ],

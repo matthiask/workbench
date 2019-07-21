@@ -553,7 +553,7 @@ class RecurringInvoiceSearchForm(forms.Form):
         widget=Autocomplete(model=Organization),
     )
     owned_by = forms.TypedChoiceField(
-        label=_("owned by"),
+        label=_("responsible"),
         coerce=int,
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),

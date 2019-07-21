@@ -51,7 +51,7 @@ class Activity(Model):
     owned_by = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
-        verbose_name=_("owned by"),
+        verbose_name=_("responsible"),
         related_name="activities",
     )
     due_on = models.DateField(_("due on"), blank=True, null=True)

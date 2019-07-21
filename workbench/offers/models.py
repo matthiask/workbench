@@ -55,7 +55,7 @@ class Offer(ModelWithTotal):
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
     owned_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, verbose_name=_("owned by"), related_name="+"
+        User, on_delete=models.PROTECT, verbose_name=_("responsible"), related_name="+"
     )
 
     status = models.PositiveIntegerField(

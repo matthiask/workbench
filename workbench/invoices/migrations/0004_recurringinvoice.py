@@ -149,7 +149,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="+",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="owned by",
+                        verbose_name="responsible",
                     ),
                 ),
             ],

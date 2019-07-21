@@ -243,8 +243,8 @@ msgstr "Bemerkungen"
 #: workbench/projects/models.py:59
 #: workbench/templates/activities/activity_detail.html:10
 #: workbench/templates/deals/deal_list.html:11
-msgid "owned by"
-msgstr "Gehört"
+msgid "responsible"
+msgstr "verantwortlich"
 
 #: workbench/activities/models.py:57 workbench/invoices/models.py:84
 msgid "due on"

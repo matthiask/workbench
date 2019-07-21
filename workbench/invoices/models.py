@@ -96,7 +96,7 @@ class Invoice(ModelWithTotal):
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
     owned_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, verbose_name=_("owned by"), related_name="+"
+        User, on_delete=models.PROTECT, verbose_name=_("responsible"), related_name="+"
     )
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
@@ -451,7 +451,7 @@ class RecurringInvoice(ModelWithTotal):
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
     owned_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, verbose_name=_("owned by"), related_name="+"
+        User, on_delete=models.PROTECT, verbose_name=_("responsible"), related_name="+"
     )
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
