@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from decimal import Decimal
 from functools import total_ordering
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.db.models import Count, Q, Sum
@@ -68,6 +69,12 @@ class User(Model, AbstractBaseUser):
 
     enforce_same_week_logging = models.BooleanField(
         _("enforce same week logging"), default=True
+    )
+    language = models.CharField(
+        _("language"),
+        max_length=10,
+        choices=settings.LANGUAGES,
+        default=settings.LANGUAGES[0][0],
     )
 
     objects = UserManager()

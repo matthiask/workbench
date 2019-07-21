@@ -2,6 +2,8 @@ import os
 import sys
 import types
 
+from django.utils.translation import gettext_lazy as _
+
 import dj_database_url
 from speckenv import env, read_speckenv
 
@@ -64,8 +66,10 @@ MIDDLEWARE = [
         "debug_toolbar.middleware.DebugToolbarMiddleware" if DEBUG else "",
         "django.contrib.sessions.middleware.SessionMiddleware",
         "django.middleware.common.CommonMiddleware",
+        "django.middleware.locale.LocaleMiddleware",
         "django.middleware.csrf.CsrfViewMiddleware",
         "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "workbench.accounts.middleware.user_language",
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "workbench.accounts.middleware.login_required",
@@ -116,6 +120,7 @@ DATABASES = {"default": dj_database_url.config(default="sqlite:///db.sqlite3")}
 ATOMIC_REQUESTS = True
 
 LANGUAGE_CODE = "de-ch"
+LANGUAGES = [("en", _("english")), ("de", _("german"))]
 TIME_ZONE = "Europe/Zurich"
 USE_I18N = True
 USE_L10N = True
@@ -153,6 +158,7 @@ NAMESPACE = env("NAMESPACE", required=True)
 WORKBENCH = {
     "feinheit": types.SimpleNamespace(
         SSO_DOMAIN="feinheit.ch",
+        PDF_LANGUAGE="de",
         PDF_COMPANY="Feinheit AG",
         PDF_ADDRESS="Feinheit AG · Fabrikstrasse 54 · 8005 Zürich · www.feinheit.ch",
         PDF_VAT_NO="CHE-113.948.417 MWST",
@@ -178,6 +184,7 @@ WORKBENCH = {
     ),
     "dbpag": types.SimpleNamespace(
         SSO_DOMAIN="diebruchpiloten.com",
+        PDF_LANGUAGE="de",
         PDF_COMPANY="Die Bruchpiloten AG",
         PDF_ADDRESS=(
             "Die Bruchpiloten AG · Fabrikstrasse 54 · 8005 Zürich"

@@ -1,10 +1,9 @@
 from copy import deepcopy
 from datetime import date, timedelta
 from decimal import Decimal as D
-from functools import partial
 
 from django.conf import settings
-from django.utils.translation import gettext as _
+from django.utils.translation import activate, gettext as _
 
 from pdfdocument.document import (
     TA_RIGHT,
@@ -413,4 +412,7 @@ dieses als gegenstandslos zu betrachten. Vielen Dank für Ihr Verständnis</p>
             self.restart()
 
 
-pdf_response = partial(_pdf_response, pdfdocument=PDFDocument)
+def pdf_response(*args, **kwargs):
+    activate(settings.WORKBENCH.PDF_LANGUAGE)
+    kwargs["pdfdocument"] = PDFDocument
+    return _pdf_response(*args, **kwargs)

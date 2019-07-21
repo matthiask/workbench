@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.db import connections
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.utils.translation import gettext as _
+from django.utils.translation import activate, gettext as _
 
 
 def set_user_name(username):
@@ -29,5 +29,14 @@ def login_required(get_response):
         response = HttpResponseRedirect(reverse("login"))
         response.set_signed_cookie("next", request.get_full_path(), salt="next")
         return response
+
+    return middleware
+
+
+def user_language(get_response):
+    def middleware(request):
+        if request.user.is_authenticated and request.user.language:
+            activate(request.user.language)
+        return get_response(request)
 
     return middleware

@@ -15,7 +15,7 @@
         <li class="nav-item">
           <form class="form-inline mt-2 mb-0 mr-2" method="GET" action="{% url 'search' %}">
             <div class="input-group">
-              <input class="form-control" type="search" placeholder="{% trans 'Search' %}" aria-label="{% trans 'Search' %}" name="q" value="{{ request.GET.q }}">
+              <input class="form-control" type="search" placeholder="{% trans 'Search'|capfirst %}" aria-label="{% trans 'Search'|capfirst %}" name="q" value="{{ request.GET.q }}">
               <div class="input-group-append">
                 <button class="btn btn-outline-secondary" type="submit">{% include 'svg/search.svg' %}</button>
               </div>
@@ -23,61 +23,61 @@
           </form>
         </li>
         {% mark_current request.path %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'projects_project_list' %}">{% trans 'projects' %}</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'offers_offer_list' %}">{% trans 'offers' %}</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'invoices_invoice_list' %}">{% trans 'invoices' %}</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'projects_project_list' %}">{% trans 'projects'|capfirst %}</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'offers_offer_list' %}">{% trans 'offers'|capfirst %}</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'invoices_invoice_list' %}">{% trans 'invoices'|capfirst %}</a></li>
 
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="contactsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {% trans 'contacts' %}
+            {% trans 'contacts'|capfirst %}
           </a>
           <div class="dropdown-menu" aria-labelledby="contactsDropdown">
-            <a class="dropdown-item" href="{% url 'contacts_person_list' %}">{% trans 'people' %}</a>
-            <a class="dropdown-item" href="{% url 'contacts_organization_list' %}">{% trans 'organizations' %}</a>
+            <a class="dropdown-item" href="{% url 'contacts_person_list' %}">{% trans 'people'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'contacts_organization_list' %}">{% trans 'organizations'|capfirst %}</a>
             {# <div class="dropdown-divider"></div> #}
           </div>
         </li>
 
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="logbookDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {% trans 'logbook' %}
+            {% trans 'logbook'|capfirst %}
           </a>
           <div class="dropdown-menu" aria-labelledby="logbookDropdown">
-            <a class="dropdown-item" href="{% url 'logbook_loggedhours_list' %}">{% trans 'logged hours' %}</a>
-            <a class="dropdown-item" href="{% url 'logbook_loggedcost_list' %}">{% trans 'logged costs' %}</a>
-            <a class="dropdown-item" href="{% url 'awt_absence_list' %}">{% trans 'absences' %}</a>
+            <a class="dropdown-item" href="{% url 'logbook_loggedhours_list' %}">{% trans 'logged hours'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'logbook_loggedcost_list' %}">{% trans 'logged costs'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'awt_absence_list' %}">{% trans 'absences'|capfirst %}</a>
             {# <div class="dropdown-divider"></div> #}
           </div>
         </li>
 
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="bookkeepingDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {% trans 'book keeping' %}
+            {% trans 'book keeping'|capfirst %}
           </a>
           <div class="dropdown-menu" aria-labelledby="bookkeepingDropdown">
             <a class="dropdown-item" href="{% url 'invoices_recurringinvoice_list' %}">{% trans 'recurring invoices'|capfirst %}</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'credit_control_creditentry_list' %}">{% trans 'credit entries' %}</a>
+            <a class="dropdown-item" href="{% url 'credit_control_creditentry_list' %}">{% trans 'credit entries'|capfirst %}</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'accruals_cutoffdate_list' %}">{% trans 'accruals' %}</a>
+            <a class="dropdown-item" href="{% url 'accruals_cutoffdate_list' %}">{% trans 'accruals'|capfirst %}</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'expenses_expensereport_list' %}">{% trans 'expense reports' %}</a>
+            <a class="dropdown-item" href="{% url 'expenses_expensereport_list' %}">{% trans 'expense reports'|capfirst %}</a>
           </div>
         </li>
 
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {% trans 'reports' %}
+            {% trans 'reports'|capfirst %}
           </a>
           <div class="dropdown-menu" aria-labelledby="reportsDropdown">
-            <a class="dropdown-item" href="{% url 'report_key_data' %}">{% trans 'key data' %}</a>
-            <a class="dropdown-item" href="{% url 'awt_year_report' %}">{% trans 'annual working time' %}</a>
-            {# <a class="dropdown-item" href="#">{% trans 'not invoiced work' %}</a> #}
-            <a class="dropdown-item" href="{% url 'report_overdrawn_projects' %}">{% trans 'overdrawn projects' %}</a>
-            <a class="dropdown-item" href="{% url 'report_monthly_invoicing' %}">{% trans 'monthly invoicing' %}</a>
-            <a class="dropdown-item" href="{% url 'report_open_items_list' %}">{% trans 'open items list' %}</a>
-            <a class="dropdown-item" href="{% url 'report_logged_hours_by_circle' %}">{% trans 'logged hours by circle' %}</a>
-            <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">{% trans 'hours per customer' %}</a>
+            <a class="dropdown-item" href="{% url 'report_key_data' %}">{% trans 'key data'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'awt_year_report' %}">{% trans 'annual working time'|capfirst %}</a>
+            {# <a class="dropdown-item" href="#">{% trans 'not invoiced work'|capfirst %}</a> #}
+            <a class="dropdown-item" href="{% url 'report_overdrawn_projects' %}">{% trans 'overdrawn projects'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'report_monthly_invoicing' %}">{% trans 'monthly invoicing'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'report_open_items_list' %}">{% trans 'open items list'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'report_logged_hours_by_circle' %}">{% trans 'logged hours by circle'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">{% trans 'hours per customer'|capfirst %}</a>
           </div>
         </li>
         {% endmark_current %}
@@ -89,16 +89,16 @@
             Hi, {{ user.get_short_name }}!
           </a>
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-            <a class="dropdown-item" href="{% url 'accounts_update' %}">{% trans 'Settings' %}</a>
-            <a class="dropdown-item" href="{% url 'shortcuts' %}">{% trans 'keyboard shortcuts' %}</a>
+            <a class="dropdown-item" href="{% url 'accounts_update' %}">{% trans 'Settings'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'shortcuts' %}">{% trans 'keyboard shortcuts'|capfirst %}</a>
             {% if request.user.is_admin %}
-            <a class="dropdown-item" href="{% url 'admin:index' %}">{% trans 'Admin panel' %}</a>
+            <a class="dropdown-item" href="{% url 'admin:index' %}">{% trans 'Admin panel'|capfirst %}</a>
             {% endif %}
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'deals_deal_list' %}">{% trans 'deals' %}</a>
-            <a class="dropdown-item" href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a>
+            <a class="dropdown-item" href="{% url 'deals_deal_list' %}">{% trans 'deals'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'activities_activity_list' %}">{% trans 'activities'|capfirst %}</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'logout' %}">{% trans 'Sign out' %}</a>
+            <a class="dropdown-item" href="{% url 'logout' %}">{% trans 'Sign out'|capfirst %}</a>
           </div>
         </li>
       </ul>
