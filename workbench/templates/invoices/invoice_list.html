@@ -4,7 +4,7 @@
 
 {% block search-form-buttons %}
 {{ block.super }}
-<a href="{% querystring pdf=1 %}" class="btn btn-secondary">
+<a href="{% querystring pdf=1 %}" class="btn btn-secondary" target="_blank">
   {% include 'svg/desktop-download.svg' %} PDF</a>
 {% endblock %}
 
