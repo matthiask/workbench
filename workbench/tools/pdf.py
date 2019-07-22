@@ -376,13 +376,20 @@ class PDFDocument(_PDFDocument):
         self.p("Zürich, %s" % local_date_format(date.today()))
         self.spacer()
         self.h1(offers[-1].project.title)
-        self.spacer()
+        self.spacer(2 * mm)
+        if offers[-1].project.description:
+            self.p(offers[-1].project.description)
+            self.spacer()
         self.table(
             [(_("offer"), _("offered on"), _("total"))]
             + [
                 (
                     MarkupParagraph(offer.title, self.style.normal),
-                    local_date_format(offer.offered_on),
+                    local_date_format(offer.offered_on)
+                    if offer.offered_on
+                    else MarkupParagraph(
+                        "<b>%s</b>" % _("NO DATE YET"), style=self.style.bold
+                    ),
                     currency(offer.total_excl_tax),
                 )
                 for offer in offers
