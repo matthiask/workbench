@@ -11,7 +11,7 @@
 <div class="list-group list-group-flush">
 {% for day, sum, instances in object_list|group_hours_by_day %}
 <h5 class="mt-3 mb-3 d-flex justify-content-between">
-  <span>{{ day|date:'d.m.Y' }}</span>
+  <span>{{ day|local_date_format }}</span>
   <span class="text-right">{{ sum }}h</span>
 </h5>
 {% for hours in instances %}

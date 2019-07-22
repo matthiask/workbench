@@ -47,7 +47,7 @@
               <span class="badge badge-{{ invoice.status_css }}">{{ invoice.pretty_status }}</span>
             </a>
           </td>
-          <td>{{ invoice.invoiced_on|date:'d.m.Y' }}</td>
+          <td>{{ invoice.invoiced_on|local_date_format }}</td>
           <td class="text-right">{{ invoice.total|currency }}</td>
           <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
           <td></td>

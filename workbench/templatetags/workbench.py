@@ -20,6 +20,7 @@ register = template.Library()
 register.filter(currency)
 register.filter(days)
 register.filter(hours)
+register.filter(local_date_format)
 
 
 @register.simple_tag
