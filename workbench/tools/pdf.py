@@ -404,25 +404,37 @@ class PDFDocument(_PDFDocument):
         self.next_frame()
         self.p("Zürich, %s" % local_date_format(date.today()))
         self.spacer()
-        self.h1("Mahnung")
+        self.h1("Zahlungserinnerung")
         self.spacer()
         self.mini_html(
-            """
+            (
+                """\
 <p>Sehr geehrte Damen und Herren</p>
-<p>Beiliegend senden wir Ihnen einen Kontoauszug über die noch offenen Posten.
-Setzen Sie sich bitte bei Unstimmigkeiten mit uns in Verbindung. Andernfalls
-bitten wir Sie, die offenen Posten innerhalb von 10 Tagen auf das angegebene
-Konto zu überweisen.</p>
-<p>Sollte sich Ihre Zahlung mit diesem Schreiben kreuzen, bitten wir Sie,
-dieses als gegenstandslos zu betrachten. Vielen Dank für Ihr Verständnis</p>
+<p>Bei der beiliegenden Rechnung konnten wir leider noch keinen Zahlungseingang
+verzeichnen. Wir bitten Sie, den ausstehenden Betrag innerhalb von 10 Tagen auf
+das angegebene Konto zu überweisen. Bei allfälligen Unstimmigkeiten setzen Sie
+sich bitte mit uns in Verbindung.</p>
+<p>Falls sich Ihre Zahlung mit diesem Schreiben kreuzt, bitten wir Sie, dieses
+als gegenstandslos zu betrachten.</p>
 <p>Freundliche Grüsse</p>
-<p>%s</p>
-            """
+<p>%s</p>"""
+                if len(invoices) == 1
+                else """\
+<p>Sehr geehrte Damen und Herren</p>
+<p>Bei den beiliegenden Rechnungen konnten wir leider noch keinen Zahlungseingang
+verzeichnen. Wir bitten Sie, die ausstehenden Beträge innerhalb von 10 Tagen auf
+das angegebene Konto zu überweisen. Bei allfälligen Unstimmigkeiten setzen Sie
+sich bitte mit uns in Verbindung.</p>
+<p>Falls sich Ihre Zahlung mit diesem Schreiben kreuzt, bitten wir Sie, dieses
+als gegenstandslos zu betrachten.</p>
+<p>Freundliche Grüsse</p>
+<p>%s</p>"""
+            )
             % settings.WORKBENCH.PDF_COMPANY
         )
         self.spacer()
         self.table(
-            [(_("invoice"), _("invoiced on"), _("total"))]
+            [(_("invoice"), _("date"), _("total"))]
             + [
                 (
                     MarkupParagraph(invoice.title, self.style.normal),
