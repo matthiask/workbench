@@ -369,8 +369,37 @@ class PDFDocument(_PDFDocument):
             },
         )
 
+    def offers_pdf(self, *, offers):
+        self.init_letter()
+        self.p(offers[-1].postal_address)
+        self.next_frame()
+        self.p("Zürich, %s" % local_date_format(date.today()))
+        self.spacer()
+        self.h1(offers[-1].project.title)
+        self.spacer()
+        self.table(
+            [(_("offer"), _("offered on"), _("total"))]
+            + [
+                (
+                    MarkupParagraph(offer.title, self.style.normal),
+                    local_date_format(offer.offered_on),
+                    currency(offer.total_excl_tax),
+                )
+                for offer in offers
+            ],
+            (self.bounds.E - self.bounds.W - 40 * mm, 24 * mm, 16 * mm),
+            self.style.tableHead + (("ALIGN", (1, 0), (1, -1), "LEFT"),),
+        )
+        self.restart()
+        for offer in offers:
+            self.init_letter()
+            self.process_offer(offer)
+            self.restart()
+
+        self.generate()
+
     def dunning_letter(self, *, invoices):
-        self.init_letter(page_fn=self.stationery())
+        self.init_letter()
         self.p(invoices[-1].postal_address)
         self.next_frame()
         self.p("Zürich, %s" % local_date_format(date.today()))

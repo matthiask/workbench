@@ -8,6 +8,7 @@ from workbench.logbook.forms import LoggedCostForm, LoggedHoursForm
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.forms import OfferForm
 from workbench.offers.models import Offer
+from workbench.offers.views import ProjectOfferPDFView
 from workbench.projects.forms import (
     ProjectForm,
     ProjectSearchForm,
@@ -47,6 +48,11 @@ urlpatterns = [
         r"^(?P<pk>\d+)/statistics/$",
         generic.DetailView.as_view(model=Project, template_name_suffix="_statistics"),
         name="projects_project_statistics",
+    ),
+    url(
+        r"^(?P<pk>\d+)/offers-pdf/$",
+        ProjectOfferPDFView.as_view(),
+        name="projects_project_offers_pdf",
     ),
     url(
         r"^create/$",
