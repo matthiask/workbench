@@ -17,7 +17,7 @@ class InvoicePDFView(generic.DetailView):
 
         pdf, response = pdf_response(self.object.code, as_attachment=False)
 
-        pdf.init_letter(page_fn=pdf.stationery())
+        pdf.init_letter()
         pdf.process_invoice(self.object)
         pdf.generate()
 

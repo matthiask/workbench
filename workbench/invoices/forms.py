@@ -88,7 +88,7 @@ class InvoiceSearchForm(forms.Form):
                     pdf.dunning_letter(invoices=list(invoices))
             else:
                 for invoice in queryset:
-                    pdf.init_letter(page_fn=pdf.stationery())
+                    pdf.init_letter()
                     pdf.process_invoice(invoice)
                     pdf.restart()
 

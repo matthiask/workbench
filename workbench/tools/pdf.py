@@ -150,7 +150,8 @@ class PDFDocument(_PDFDocument):
             **frame_kwargs
         )
 
-    def init_letter(self, page_fn, page_fn_later=None):
+    def init_letter(self, *, page_fn=None, page_fn_later=None):
+        page_fn = page_fn or self.stationery()
         self.generate_style()
         self.doc.addPageTemplates(
             [
@@ -168,7 +169,8 @@ class PDFDocument(_PDFDocument):
         )
         self.story.append(NextPageTemplate("Later"))
 
-    def init_report(self, page_fn):
+    def init_report(self, *, page_fn=None):
+        page_fn = page_fn or self.stationery()
         self.generate_style()
         self.doc.addPageTemplates(
             [PageTemplate(id="Page", frames=[self.full_frame], onPage=page_fn)]
