@@ -71,11 +71,7 @@ class User(Model, AbstractBaseUser):
         _("enforce same week logging"), default=True
     )
     language = models.CharField(
-        _("language"),
-        max_length=10,
-        blank=True,
-        choices=settings.LANGUAGES,
-        default=settings.LANGUAGES[0][0],
+        _("language"), max_length=10, blank=True, choices=settings.LANGUAGES
     )
 
     objects = UserManager()
