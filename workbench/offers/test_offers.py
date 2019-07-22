@@ -57,11 +57,35 @@ class OffersTest(TestCase):
 
         pdf = self.client.get(offer.urls["pdf"])
         self.assertEqual(pdf.status_code, 200)  # No crash
+        self.assertEqual(pdf["content-type"], "application/pdf")
 
         # Deleting the service automagically updates the offer
         offer.services.get().delete()
         offer.refresh_from_db()
         self.assertAlmostEqual(offer.total_excl_tax, Decimal("-10"))
+
+    def test_offers_pdf(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.urls["offers_pdf"])
+        self.assertRedirects(response, project.get_absolute_url())
+        self.assertEqual(messages(response), ["No offers in project."])
+
+        offer = factories.OfferFactory.create(project=project)
+
+        response = self.client.get(project.urls["offers_pdf"])
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["content-type"], "application/pdf")
+
+        offer.offered_on = date.today()
+        offer.save()
+        project.description = "Test"
+        project.save()
+
+        response = self.client.get(project.urls["offers_pdf"])
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["content-type"], "application/pdf")
 
     def test_update_offer(self):
         offer = factories.OfferFactory.create(title="Test")

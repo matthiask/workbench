@@ -35,6 +35,6 @@ class ProjectOfferPDFView(DetailView):
             return redirect(self.object)
 
         pdf, response = pdf_response(self.object.code, as_attachment=False)
-        pdf.offers_pdf(offers=offers)
+        pdf.offers_pdf(project=self.object, offers=offers)
 
         return response

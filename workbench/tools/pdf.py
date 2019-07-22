@@ -369,17 +369,17 @@ class PDFDocument(_PDFDocument):
             },
         )
 
-    def offers_pdf(self, *, offers):
+    def offers_pdf(self, *, project, offers):
         self.init_letter()
         self.p(offers[-1].postal_address)
         self.next_frame()
         self.p("Zürich, %s" % local_date_format(date.today()))
         self.spacer()
-        self.h1(offers[-1].project.title)
-        self.spacer(2 * mm)
-        if offers[-1].project.description:
-            self.p(offers[-1].project.description)
-            self.spacer()
+        self.h1(project.title)
+        if project.description:
+            self.spacer(2 * mm)
+            self.p(project.description)
+        self.spacer()
         self.table(
             [(_("offer"), _("offered on"), _("total"))]
             + [
