@@ -266,7 +266,7 @@ function initWidgets() {
     self
       .addClass("initialized")
       .autocomplete({
-        minLength: 3,
+        minLength: 2,
         source: function(request, response) {
           $.get(url, {q: request.term}, function(data) {
             response(data.results)
