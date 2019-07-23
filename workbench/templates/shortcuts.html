@@ -9,7 +9,7 @@
   <div class="col-md-8 col-lg-6">
     <h1>{% trans 'keyboard shortcuts' %}</h1>
 
-    <table class="table">
+    <table class="table" data-shortcuts>
       <tr>
         <th class="text-right text-nowrap">Ctrl-Q</th>
         <td>{% trans 'Search everything' %}</td>
@@ -76,8 +76,15 @@
       </tr>
 
     </table>
-
-    <p>{% trans 'Replace Ctrl- with Alt- on PC operating systems.' %}</p>
   </div>
 </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      if (!/Mac/.test(navigator.platform)) {
+        var el = $("[data-shortcuts]")
+        el.html(el.html().replace(/Ctrl-/g, "Alt-"))
+      }
+  })
+  </script>
 {% endblock %}
