@@ -4,6 +4,7 @@
     <form method="post" action="{{ request.get_full_path }}" data-autosubmit>
       <div class="modal-content">
         <div class="modal-body clearfix">
+          <h4>{{ title }}</h4>
           {% bootstrap_messages %}
           {% csrf_token %}
           {% block body %}

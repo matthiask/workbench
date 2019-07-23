@@ -232,5 +232,5 @@ class ProjectAutocompleteForm(forms.Form):
     project = forms.ModelChoiceField(
         queryset=Project.objects.all(),
         widget=Autocomplete(model=Project, params={"only_open": "on"}),
-        label=_("project"),
+        label="",
     )

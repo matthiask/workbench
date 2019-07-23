@@ -1,5 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.utils.translation import gettext as _
 
 from workbench.projects.forms import ProjectAutocompleteForm
 from workbench.projects.models import Service
@@ -11,7 +12,11 @@ def select(request):
         return JsonResponse(
             {"redirect": form.cleaned_data["project"].get_absolute_url()}, status=299
         )
-    return render(request, "projects/select_project.html", {"form": form})
+    return render(
+        request,
+        "projects/select_project.html",
+        {"form": form, "title": _("Jump to project")},
+    )
 
 
 def set_order(request):

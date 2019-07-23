@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-22 16:20+0200\n"
+"POT-Creation-Date: 2019-07-23 15:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -136,8 +136,7 @@ msgstr "Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."
 #: workbench/templates/projects/project_detail.html:193
 #: workbench/templates/reporting/monthly_invoicing.html:15
 #: workbench/templates/reporting/open_items_list.html:20
-#: workbench/tools/pdf.py:345 workbench/tools/pdf.py:379
-#: workbench/tools/pdf.py:423
+#: workbench/tools/pdf.py:347 workbench/tools/pdf.py:462
 msgid "invoice"
 msgstr "Rechnung"
 
@@ -699,13 +698,13 @@ msgstr ""
 #: workbench/credit_control/forms.py:179 workbench/invoices/models.py:83
 #: workbench/templates/reporting/monthly_invoicing.html:16
 #: workbench/templates/reporting/open_items_list.html:21
-#: workbench/tools/pdf.py:379 workbench/tools/pdf.py:423
 msgid "invoiced on"
 msgstr "Verrechnet am"
 
-#: workbench/credit_control/forms.py:183 workbench/tools/pdf.py:262
-#: workbench/tools/pdf.py:316 workbench/tools/pdf.py:327
-#: workbench/tools/pdf.py:354 workbench/tools/pdf.py:367
+#: workbench/credit_control/forms.py:183 workbench/tools/pdf.py:264
+#: workbench/tools/pdf.py:318 workbench/tools/pdf.py:329
+#: workbench/tools/pdf.py:356 workbench/tools/pdf.py:369
+#: workbench/tools/pdf.py:398
 msgid "NO DATE YET"
 msgstr "NOCH KEIN DATUM"
 
@@ -748,8 +747,8 @@ msgstr "Valuta"
 #: workbench/templates/reporting/monthly_invoicing.html:17
 #: workbench/templates/reporting/open_items_list.html:23
 #: workbench/templates/reporting/open_items_list.html:42
-#: workbench/tools/models.py:121 workbench/tools/pdf.py:379
-#: workbench/tools/pdf.py:423
+#: workbench/tools/models.py:121 workbench/tools/pdf.py:389
+#: workbench/tools/pdf.py:462
 msgid "total"
 msgstr "Total"
 
@@ -978,7 +977,7 @@ msgstr "Durch Projekt bestimmt."
 
 #: workbench/invoices/forms.py:143 workbench/invoices/models.py:56
 #: workbench/templates/projects/project_detail.html:197
-#: workbench/tools/pdf.py:258
+#: workbench/tools/pdf.py:260
 msgid "Down payment"
 msgstr "Anzahlung"
 
@@ -1089,7 +1088,7 @@ msgstr "Storniert"
 msgid "Fixed amount"
 msgstr "Fixbetrag"
 
-#: workbench/invoices/models.py:57 workbench/tools/pdf.py:221
+#: workbench/invoices/models.py:57 workbench/tools/pdf.py:223
 msgid "Services"
 msgstr "Leistungen"
 
@@ -1379,6 +1378,10 @@ msgstr "Kann archivierte Kosten nicht löschen."
 msgid "Expenses are part of an expense report, cannot delete entry."
 msgstr "Spesen sind Teil einer Spesenabrechnung, kann Eintrag nicht löschen."
 
+#: workbench/logbook/views.py:11
+msgid "Select project for logging"
+msgstr "Projekt für Erfassung auswählen"
+
 #: workbench/offers/__init__.py:10 workbench/offers/models.py:73
 #: workbench/templates/base.html:27 workbench/templates/shortcuts.html:55
 #: workbench/templates/start.html:30
@@ -1406,14 +1409,15 @@ msgstr "Akzeptiert"
 msgid "Rejected"
 msgstr "Abgelehnt"
 
-#: workbench/offers/models.py:52
+#: workbench/offers/models.py:52 workbench/tools/pdf.py:389
 msgid "offered on"
 msgstr "offeriert am"
 
 #: workbench/offers/models.py:72 workbench/projects/models.py:302
 #: workbench/templates/projects/project_detail.html:96
 #: workbench/templates/projects/project_detail.html:203
-#: workbench/templates/projects/service_form.html:36 workbench/tools/pdf.py:309
+#: workbench/templates/projects/service_form.html:36 workbench/tools/pdf.py:311
+#: workbench/tools/pdf.py:389
 msgid "offer"
 msgstr "Offerte"
 
@@ -1513,6 +1517,10 @@ msgid ""
 msgstr ""
 "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht "
 "löschen."
+
+#: workbench/projects/views.py:15 workbench/templates/shortcuts.html:50
+msgid "Jump to project"
+msgstr "Zu Projekt springen"
 
 #: workbench/reporting/views.py:78 workbench/reporting/views.py:183
 msgid "Form was invalid."
@@ -1845,13 +1853,13 @@ msgid "No history found"
 msgstr "Keine Geschichte gefunden"
 
 #: workbench/templates/invoices/invoice_detail.html:67
-#: workbench/tools/models.py:111 workbench/tools/pdf.py:248
+#: workbench/tools/models.py:111 workbench/tools/pdf.py:250
 msgid "subtotal"
 msgstr "Zwischentotal"
 
 #: workbench/templates/invoices/invoice_detail.html:72
 #: workbench/tools/models.py:112 workbench/tools/models.py:153
-#: workbench/tools/pdf.py:250
+#: workbench/tools/pdf.py:252
 msgid "discount"
 msgstr "Rabatt"
 
@@ -2016,10 +2024,6 @@ msgstr "Aktuelles Formular abschicken"
 msgid "Home"
 msgstr "Start"
 
-#: workbench/templates/shortcuts.html:50
-msgid "Jump to project"
-msgstr "Zu Projekt springen"
-
 #: workbench/templates/shortcuts.html:70
 msgid "log hours in active project or in any project if none is active"
 msgstr ""
@@ -2096,16 +2100,16 @@ msgstr "heute fällig"
 msgid "overdue!"
 msgstr "überfällig!"
 
-#: workbench/tools/forms.py:168
+#: workbench/tools/forms.py:169
 msgid "Is automatically filled using the organization's contact."
 msgstr "Kann automatisch mit der Organisation des Kontaktes gefüllt werden."
 
-#: workbench/tools/forms.py:183
+#: workbench/tools/forms.py:184
 #, python-format
 msgid "The contact %(person)s does not belong to %(organization)s."
 msgstr "Der Kontakt %(person)s gehört nicht zu %(organization)s."
 
-#: workbench/tools/forms.py:200
+#: workbench/tools/forms.py:201
 msgid "No contact selected."
 msgstr "Kein Kontakt ausgewählt."
 
@@ -2158,32 +2162,33 @@ msgstr "MwSt.-Satz"
 msgid "%s excl. tax"
 msgstr "%s exkl. MwSt."
 
-#: workbench/tools/pdf.py:199
+#: workbench/tools/pdf.py:201
 #, python-format
 msgid "page %d"
 msgstr "Seite %d"
 
-#: workbench/tools/pdf.py:230
+#: workbench/tools/pdf.py:232
 msgid "(optional)"
 msgstr "(optional)"
 
-#: workbench/tools/pdf.py:272
+#: workbench/tools/pdf.py:274
 msgid "tax"
 msgstr "MwSt."
 
-#: workbench/tools/pdf.py:311 workbench/tools/pdf.py:349
+#: workbench/tools/pdf.py:313 workbench/tools/pdf.py:351
+#: workbench/tools/pdf.py:462
 msgid "date"
 msgstr "Datum"
 
-#: workbench/tools/pdf.py:320 workbench/tools/pdf.py:358
+#: workbench/tools/pdf.py:322 workbench/tools/pdf.py:360
 msgid "our reference"
 msgstr "Unsere Referenz"
 
-#: workbench/tools/pdf.py:322
+#: workbench/tools/pdf.py:324
 msgid "valid until"
 msgstr "Gültig bis"
 
-#: workbench/tools/pdf.py:343
+#: workbench/tools/pdf.py:345
 msgid "down payment invoice"
 msgstr "Anzahlungsrechnung"
 
