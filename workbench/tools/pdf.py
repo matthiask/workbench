@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from decimal import Decimal as D
 
 from django.conf import settings
+from django.utils.text import capfirst
 from django.utils.translation import activate, gettext as _
 
 from pdfdocument.document import (
@@ -381,7 +382,12 @@ class PDFDocument(_PDFDocument):
             self.p(project.description)
         self.spacer()
         self.table(
-            [(_("offer"), _("offered on"), _("total"))]
+            [
+                tuple(
+                    capfirst(title)
+                    for title in (_("offer"), _("offered on"), _("total"))
+                )
+            ]
             + [
                 (
                     MarkupParagraph(offer.title, self.style.normal),
@@ -441,7 +447,7 @@ als gegenstandslos zu betrachten.</p>
         )
         self.spacer()
         self.table(
-            [(_("invoice"), _("date"), _("total"))]
+            [tuple(capfirst(title) for title in (_("invoice"), _("date"), _("total")))]
             + [
                 (
                     MarkupParagraph(invoice.title, self.style.normal),
