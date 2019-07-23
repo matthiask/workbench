@@ -23,6 +23,7 @@ from pdfdocument.document import (
 from pdfdocument.utils import pdf_response as _pdf_response
 
 from workbench.tools.formats import currency, local_date_format
+from workbench.tools.models import ModelWithTotal
 
 
 register_fonts_from_paths(font_name="Rep", **settings.WORKBENCH.FONTS)
@@ -403,6 +404,17 @@ class PDFDocument(_PDFDocument):
             (self.bounds.E - self.bounds.W - 40 * mm, 24 * mm, 16 * mm),
             self.style.tableHead + (("ALIGN", (1, 0), (1, -1), "LEFT"),),
         )
+
+        total = ModelWithTotal(
+            subtotal=sum((offer.total_excl_tax for offer in offers), Z),
+            discount=Z,
+            liable_to_vat=offers[0].liable_to_vat,
+            tax_rate=offers[0].tax_rate,
+        )
+        total._calculate_total()
+        total.total_title = offers[0].total_title
+        self.table_total(total)
+
         self.restart()
         for offer in offers:
             self.init_letter()
