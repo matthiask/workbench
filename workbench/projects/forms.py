@@ -231,6 +231,6 @@ class ServiceMoveForm(ModelForm):
 class ProjectAutocompleteForm(forms.Form):
     project = forms.ModelChoiceField(
         queryset=Project.objects.all(),
-        widget=Autocomplete(model=Project),
+        widget=Autocomplete(model=Project, params={"only_open": "on"}),
         label=_("project"),
     )

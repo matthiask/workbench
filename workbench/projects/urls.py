@@ -20,6 +20,14 @@ from workbench.projects.models import Project, Service
 from workbench.projects.views import select, set_order
 
 
+def autocomplete_filter(*, request, queryset):
+    return (
+        queryset.filter(closed_on__isnull=True)
+        if request.GET.get("only_open")
+        else queryset
+    )
+
+
 urlpatterns = [
     url(
         r"^$",
@@ -29,7 +37,9 @@ urlpatterns = [
     url(
         r"^autocomplete/$",
         generic.AutocompleteView.as_view(
-            model=Project, queryset=Project.objects.select_related("owned_by")
+            model=Project,
+            queryset=Project.objects.select_related("owned_by"),
+            filter=autocomplete_filter,
         ),
         name="projects_project_autocomplete",
     ),

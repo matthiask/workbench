@@ -1,4 +1,5 @@
 import time
+from urllib.parse import urlencode
 
 from django import forms
 from django.forms.utils import flatatt
@@ -35,9 +36,10 @@ _AUTOCOMPLETE_TEMPLATE = """
 
 
 class Autocomplete(forms.TextInput):
-    def __init__(self, model, attrs=None):
+    def __init__(self, model, attrs=None, *, params=None):
         super().__init__(attrs)
         self.model = model
+        self.params = ("?" + urlencode(params)) if params else ""
 
     def render(self, name, value, attrs=None, choices=(), renderer=None):
         if value is None:
@@ -62,9 +64,8 @@ class Autocomplete(forms.TextInput):
             _AUTOCOMPLETE_TEMPLATE
             % {
                 "id": final_attrs["id"],
-                "url": reverse(
-                    "%s_%s_autocomplete" % (opts.app_label, opts.model_name)
-                ),
+                "url": reverse("%s_%s_autocomplete" % (opts.app_label, opts.model_name))
+                + self.params,
                 "field": format_html("<input{} />", flatatt(final_attrs)),
                 "pretty": escape(pretty),
                 "placeholder": opts.verbose_name,

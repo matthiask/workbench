@@ -369,7 +369,9 @@ class ProjectsTest(TestCase):
         self.client.force_login(project.owned_by)
 
         response = self.client.get(project.urls["select"])
-        self.assertContains(response, 'data-autocomplete-url="/projects/autocomplete/"')
+        self.assertContains(
+            response, 'data-autocomplete-url="/projects/autocomplete/?only_open=on"'
+        )
 
         response = self.client.post(project.urls["select"], {"project": project.pk})
         self.assertEqual(response.status_code, 299)
