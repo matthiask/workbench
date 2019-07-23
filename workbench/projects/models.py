@@ -74,7 +74,7 @@ class Project(Model):
         verbose_name_plural = _("projects")
 
     def __str__(self):
-        return "%s %s %s" % (self.code, self.title, self.owned_by.get_short_name())
+        return "%s %s - %s" % (self.code, self.title, self.owned_by.get_short_name())
 
     def __html__(self):
         return format_html(
