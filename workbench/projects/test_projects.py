@@ -230,7 +230,7 @@ class ProjectsTest(TestCase):
         valid("owned_by=0")  # only inactive
 
     def test_autocomplete(self):
-        project = factories.ProjectFactory.create()
+        project = factories.ProjectFactory.create(closed_on=date.today())
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -246,6 +246,16 @@ class ProjectsTest(TestCase):
                     {"label": "The Organization Ltd", "value": project.customer_id}
                 ]
             },
+        )
+
+        self.assertEqual(
+            self.client.get("/projects/autocomplete/?q=proj").json(),
+            {"results": [{"label": str(project), "value": project.id}]},
+        )
+
+        self.assertEqual(
+            self.client.get("/projects/autocomplete/?q=proj&only_open=on").json(),
+            {"results": []},
         )
 
     def test_update(self):
