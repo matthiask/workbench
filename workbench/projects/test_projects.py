@@ -373,6 +373,8 @@ class ProjectsTest(TestCase):
             response, 'data-autocomplete-url="/projects/autocomplete/?only_open=on"'
         )
 
-        response = self.client.post(project.urls["select"], {"project": project.pk})
+        response = self.client.post(
+            project.urls["select"], {"project-project": project.pk}
+        )
         self.assertEqual(response.status_code, 299)
         self.assertEqual(response.json(), {"redirect": project.get_absolute_url()})

@@ -234,3 +234,7 @@ class ProjectAutocompleteForm(forms.Form):
         widget=Autocomplete(model=Project, params={"only_open": "on"}),
         label="",
     )
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("prefix", "project")
+        super().__init__(*args, **kwargs)

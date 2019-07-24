@@ -424,7 +424,7 @@ class LogbookTest(TestCase):
 
         response = self.client.post(
             "/logbook/create/",
-            {"project": project.pk},
+            {"project-project": project.pk},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         # Do not fetch the redirect response because the X-Requested-With
