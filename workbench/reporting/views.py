@@ -123,6 +123,7 @@ def key_data_view(request):
                 for year, month_data in sorted(
                     key_data.invoiced_corrected(date_range).items()
                 )
+                if year >= last_month.year - 2
             ],
             "green_hours": [
                 (year, [month_data["months"][i] for i in range(1, 13)])
