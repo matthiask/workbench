@@ -118,7 +118,7 @@ class AccrualsTest(TestCase):
         )
 
         # print(key_data.accruals_by_date())
-        accruals = key_data.accruals_by_date()
+        accruals = key_data.accruals_by_date([date(2010, 1, 1), date(2020, 1, 1)])
         self.assertEqual(len(accruals), 3)
 
         self.assertEqual(accruals[(2018, 12)]["accrual"], Decimal(40))

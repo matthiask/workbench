@@ -156,7 +156,7 @@ def invoiced_by_month(date_range):
     return invoiced
 
 
-def accruals_by_date():
+def accruals_by_date(date_range):
     accruals = {(0, 0): {"accrual": Z, "delta": None}}
     with connections["default"].cursor() as cursor:
         cursor.execute(
@@ -179,14 +179,18 @@ ORDER BY cutoff_date
     for this, next in zip(dates, dates[1:]):
         accruals[next]["delta"] = accruals[this]["accrual"] - accruals[next]["accrual"]
 
-    return {date: accrual for date, accrual in accruals.items() if date != (0, 0)}
+    return {
+        month: accrual
+        for month, accrual in accruals.items()
+        if month != (0, 0)
+        and date_range[0] <= date(month[0], month[1], 1) <= date_range[1]
+    }
 
 
 def invoiced_corrected(date_range):
-    accruals = accruals_by_date()
+    accruals = accruals_by_date(date_range)
     margin = invoiced_by_month(date_range)
     for month, accrual in accruals.items():
-        if date_range[0] <= date(month[0], month[1], 1) <= date_range[1]:
-            margin[month[0]][month[1]] += accrual["delta"]
+        margin[month[0]][month[1]] += accrual["delta"]
 
     return margin
