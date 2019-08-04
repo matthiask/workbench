@@ -388,3 +388,10 @@ class ProjectsTest(TestCase):
         )
         self.assertEqual(response.status_code, 299)
         self.assertEqual(response.json(), {"redirect": project.get_absolute_url()})
+
+    def test_services_api(self):
+        service = factories.ServiceFactory.create()
+        self.client.force_login(service.project.owned_by)
+
+        response = self.client.get(service.project.urls["services"])
+        self.assertEqual(response["content-type"], "application/json")

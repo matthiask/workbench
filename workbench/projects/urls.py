@@ -17,7 +17,7 @@ from workbench.projects.forms import (
     ServiceMoveForm,
 )
 from workbench.projects.models import Project, Service
-from workbench.projects.views import select, set_order
+from workbench.projects.views import select, services, set_order
 
 
 def autocomplete_filter(*, request, queryset):
@@ -144,4 +144,5 @@ urlpatterns = [
         name="projects_service_move",
     ),
     url(r"^service/set-order/$", set_order, name="projects_service_set_order"),
+    url(r"^(?P<pk>[0-9]+)/services/$", services, name="projects_project_services"),
 ]
