@@ -546,17 +546,19 @@ class RecurringInvoiceSearchForm(forms.Form):
         choices=(("all", _("All states")), ("", _("Open")), ("closed", _("Closed"))),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
     org = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
         required=False,
         widget=Autocomplete(model=Organization),
+        label="",
     )
     owned_by = forms.TypedChoiceField(
-        label=_("responsible"),
         coerce=int,
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
     )
 
     def __init__(self, *args, **kwargs):
