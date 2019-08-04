@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import date
 
 from django.db import connections
 from django.db.models import Sum
@@ -185,6 +186,7 @@ def invoiced_corrected(date_range):
     accruals = accruals_by_date()
     margin = invoiced_by_month(date_range)
     for month, accrual in accruals.items():
-        margin[month[0]][month[1]] += accrual["delta"]
+        if date_range[0] <= date(month[0], month[1], 1) <= date_range[1]:
+            margin[month[0]][month[1]] += accrual["delta"]
 
     return margin
