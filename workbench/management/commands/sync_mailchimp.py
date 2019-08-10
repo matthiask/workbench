@@ -53,7 +53,7 @@ class Command(BaseCommand):
             ).order_by("weight", "id")
         }
 
-        print(person_ids)
+        # print(person_ids)
 
         client = MailChimp(API_KEY)
 

@@ -29,7 +29,7 @@ def update_circles():
             # Skip core roles
             continue
 
-        print(role)
+        # print(role)
         Role.objects.update_or_create(
             id=role["id"],
             defaults={
