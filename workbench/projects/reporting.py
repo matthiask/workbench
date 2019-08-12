@@ -90,4 +90,5 @@ def hours_per_customer(date_range, *, users=None):
         ),
         "users": user_list,
         "user_hours": [(user, user_hours[user.id]) for user in user_list],
+        "total_hours": sum(user_hours.values(), Z),
     }

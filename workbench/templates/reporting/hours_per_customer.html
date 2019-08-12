@@ -28,7 +28,7 @@
             <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}" target="_blank">{{ hours|hours }}</a>
           </th>
         {% endfor %}
-        <th></th>
+        <th class="text-right">{{ stats.total_hours|hours }}</th>
       </tr>
     </thead>
     <tbody>
