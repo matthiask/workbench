@@ -22,7 +22,7 @@ from pdfdocument.document import (
 )
 from pdfdocument.utils import pdf_response as _pdf_response
 
-from workbench.tools.formats import currency, local_date_format
+from workbench.tools.formats import currency, hours, local_date_format
 from workbench.tools.models import ModelWithTotal
 
 
@@ -246,6 +246,68 @@ class PDFDocument(_PDFDocument):
 
         self.table(table, self.style.tableThreeColumns, self.style.tableHead)
 
+    def table_services_with_details(self, services):
+        if not services:
+            return
+
+        table = [(_("Services"), "", "")]
+        for service in services:
+            is_optional = getattr(service, "is_optional", False)
+            table.extend(
+                [
+                    (
+                        MarkupParagraph(
+                            "<b>%s</b> %s<br/>%s"
+                            % (
+                                sanitize(service.title),
+                                _("(optional)") if is_optional else "",
+                                sanitize(service.description),
+                            ),
+                            self.style.normal,
+                        ),
+                        "",
+                        "",
+                    ),
+                    (
+                        ", ".join(
+                            filter(
+                                None,
+                                [
+                                    (
+                                        "%s %s à %s/h"
+                                        % (
+                                            hours(service.effort_hours),
+                                            service.effort_type,
+                                            currency(service.effort_rate),
+                                        )
+                                    )
+                                    if service.effort_hours and service.effort_rate
+                                    else "",
+                                    (
+                                        "%s %s"
+                                        % (currency(service.cost), _("fixed costs"))
+                                    )
+                                    if service.cost
+                                    else "",
+                                ],
+                            )
+                        ),
+                        MarkupParagraph(
+                            "<i>%s</i>" % currency(service.service_cost.quantize(Z)),
+                            self.style.right,
+                        )
+                        if is_optional
+                        else "",
+                        ""
+                        if is_optional
+                        else currency(service.service_cost.quantize(Z)),
+                    ),
+                    ("", "", ""),
+                ]
+            )
+
+        self.table(table, self.style.tableThreeColumns, self.style.tableHead)
+
     def table_total(self, instance):
         total = [(_("subtotal"), currency(instance.subtotal.quantize(Z)))]
         if instance.discount:
@@ -297,6 +359,7 @@ class PDFDocument(_PDFDocument):
             self.p(instance.description)
         self.spacer()
         self.table_services(instance.services.all())
+        # self.table_services_with_details(instance.services.all())
         self.table_total(instance)
         self.spacer()
         self.p(footer)
