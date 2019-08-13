@@ -21,7 +21,7 @@
       <div class="card-body">
         <div class="row justify-content-between">
           <span class="col-md-8">
-            <p>{{ object.description|linebreaksbr }}</p>
+            <p>{{ object.description|linebreaksbr|urlize }}</p>
 
             <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}" class="inline" target="_blank">
               {{ project.grouped_services.logged_hours|hours }}
@@ -82,7 +82,7 @@
             &nbsp;
             <span class="badge badge-{{ offer.status_css }}">{{ offer.pretty_status }}</span>
 
-            <p>{{ offer.description|linebreaksbr }}</p>
+            <p>{{ offer.description|linebreaksbr|urlize }}</p>
           </div>
         {% else %}
           <h5 class="d-inline my-0">{% trans 'Not offered yet' %}</h5>
@@ -119,7 +119,7 @@
 
           <h5 class="mb-1">{{ row.service.title }} {% history_link row.service %}</h5>
           <p>
-            {{ row.service.description|linebreaksbr|default:'&nbsp;' }}
+            {{ row.service.description|linebreaksbr|default:'&nbsp;'|urlize }}
           </p>
           <small class="row justify-content-between">
             <span class="col-md-4">
