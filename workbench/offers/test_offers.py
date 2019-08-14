@@ -59,10 +59,21 @@ class OffersTest(TestCase):
         self.assertEqual(pdf.status_code, 200)  # No crash
         self.assertEqual(pdf["content-type"], "application/pdf")
 
+        offer.show_service_details = True
+        offer.save()
+
+        pdf = self.client.get(offer.urls["pdf"])
+        self.assertEqual(pdf.status_code, 200)  # No crash
+        self.assertEqual(pdf["content-type"], "application/pdf")
+
         # Deleting the service automagically updates the offer
         offer.services.get().delete()
         offer.refresh_from_db()
         self.assertAlmostEqual(offer.total_excl_tax, Decimal("-10"))
+
+        pdf = self.client.get(offer.urls["pdf"])
+        self.assertEqual(pdf.status_code, 200)  # No crash
+        self.assertEqual(pdf["content-type"], "application/pdf")
 
     def test_offers_pdf(self):
         project = factories.ProjectFactory.create()

@@ -118,6 +118,7 @@ class InvoiceForm(PostalAddressSelectionForm):
             "third_party_costs",
             "discount",
             "liable_to_vat",
+            "show_service_details",
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
@@ -186,7 +187,13 @@ class InvoiceForm(PostalAddressSelectionForm):
             field
             for field in list(self.fields)
             if field
-            not in {"subtotal", "discount", "apply_down_payment", "liable_to_vat"}
+            not in {
+                "subtotal",
+                "discount",
+                "apply_down_payment",
+                "liable_to_vat",
+                "show_service_details",
+            }
         )
 
         self.add_postal_address_selection_if_empty(person=self.instance.contact)

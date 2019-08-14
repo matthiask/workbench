@@ -358,8 +358,10 @@ class PDFDocument(_PDFDocument):
             self.spacer(5 * mm)
             self.p(instance.description)
         self.spacer()
-        self.table_services(instance.services.all())
-        # self.table_services_with_details(instance.services.all())
+        if getattr(instance, "show_service_details", False):
+            self.table_services_with_details(instance.services.all())
+        else:
+            self.table_services(instance.services.all())
         self.table_total(instance)
         self.spacer()
         self.p(footer)

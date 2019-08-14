@@ -60,6 +60,7 @@ class OfferForm(PostalAddressSelectionForm):
             "subtotal",
             "discount",
             "liable_to_vat",
+            "show_service_details",
         )
         widgets = {
             "description": Textarea,
@@ -97,7 +98,8 @@ class OfferForm(PostalAddressSelectionForm):
         self.order_fields(
             field
             for field in list(self.fields)
-            if field not in {"subtotal", "discount", "liable_to_vat"}
+            if field
+            not in {"subtotal", "discount", "liable_to_vat", "show_service_details"}
         )
 
         self.add_postal_address_selection_if_empty(
