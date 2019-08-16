@@ -140,6 +140,8 @@ class Project(Model):
 
         service_hours = Z
         logged_hours = Z
+        service_cost = Z
+        logged_cost = Z
         total_service_cost = Z
         total_logged_cost = Z
         total_service_hours_rate_undefined = Z
@@ -193,6 +195,8 @@ class Project(Model):
 
             service_hours += service.service_hours
             logged_hours += row["logged_hours"]
+            service_cost += service.cost or Z
+            logged_cost += row["logged_cost"]
 
             total_service_cost += service.service_cost
             total_logged_cost += row["logged_cost"]
@@ -247,7 +251,9 @@ class Project(Model):
                 key=lambda row: row[0] or Decimal("9999999"),
                 reverse=True,
             ),
+            "logged_cost": logged_cost,
             "service_hours": service_hours,
+            "service_cost": service_cost,
             "total_service_cost": total_service_cost,
             "total_logged_cost": total_logged_cost,
             "total_service_hours_rate_undefined": total_service_hours_rate_undefined,

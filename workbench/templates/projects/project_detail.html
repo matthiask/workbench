@@ -23,10 +23,23 @@
           <span class="col-md-8">
             <p>{{ object.description|linebreaksbr|urlize }}</p>
 
-            <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}" class="inline" target="_blank">
-              {{ project.grouped_services.logged_hours|hours }}
-            </a> / {{ project.grouped_services.service_hours|hours }}
-            {% bar project.grouped_services.logged_hours project.grouped_services.service_hours %}
+            <div class="row">
+              <div class="col-md-6">
+                {% trans 'hours' %}:
+                <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}" class="inline" target="_blank">
+                  {{ project.grouped_services.logged_hours|hours }}</a>
+                / {{ project.grouped_services.service_hours|hours }}
+                {% bar project.grouped_services.logged_hours project.grouped_services.service_hours %}
+              </div>
+
+              <div class="col-md-6">
+                {% trans 'cost' %}:
+                <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}" class="inline" target="_blank">
+                  {{ project.grouped_services.logged_cost|currency }}</a>
+                / {{ project.grouped_services.service_cost|currency }}
+                {% bar project.grouped_services.logged_cost project.grouped_services.service_cost %}
+              </div>
+            </div>
           </span>
           <span class="col-md-4">
             <table class="table table-borderless table-sm">
