@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.tools.formats import local_date_format
+from workbench.tools.formats import currency, local_date_format
 from workbench.tools.models import Model, MoneyField, Z
 from workbench.tools.urls import model_urls
 
@@ -37,10 +37,10 @@ class ExpenseReport(Model):
         verbose_name_plural = _("expense reports")
 
     def __str__(self):
-        return "%s: %s %s" % (
-            self._meta.verbose_name,
+        return "%s, %s, %s" % (
             self.owned_by.get_full_name(),
-            local_date_format(self.created_at),
+            local_date_format(self.created_at.date()),
+            currency(self.total),
         )
 
     def save(self, *args, **kwargs):
