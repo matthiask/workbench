@@ -100,7 +100,7 @@
           {
             label: "{{ dataset.label }}",
             data: [{% for value in dataset.data %}{{ value|stringformat:".2f" }}, {% endfor %}],
-            backgroundColor: "{% cycle 'rgba(100, 30, 50, 0.4)' 'rgba(0, 150, 0, 0.4)' 'rgba(0, 0, 150, 0.4)' 'rgba(50, 40, 30, 0.4)' %}",
+            backgroundColor: "{% cycle 'rgba(0, 150, 0, 0.4)' 'rgba(150, 50, 30, 0.4)' 'rgba(50, 40, 30, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
           },
           {% endfor %}
         ],

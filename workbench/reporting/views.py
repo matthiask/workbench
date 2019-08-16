@@ -147,8 +147,8 @@ def key_data_view(request):
                     }
                     for label, attribute in [
                         (_("profitable"), "profitable"),
-                        (_("maintenance"), "maintenance"),
                         (_("overdrawn"), "overdrawn"),
+                        (_("maintenance"), "maintenance"),
                         (_("internal"), "internal"),
                     ]
                 ],
