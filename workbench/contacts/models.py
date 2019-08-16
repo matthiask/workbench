@@ -37,6 +37,14 @@ class Organization(Model):
         verbose_name=_("primary contact"),
         related_name="+",
     )
+    default_billing_address = models.TextField(
+        _("default billing address"),
+        blank=True,
+        help_text=_(
+            "Mainly useful for organizations with a centralized"
+            " accounts payable departement."
+        ),
+    )
     groups = models.ManyToManyField(
         Group, verbose_name=_("groups"), related_name="+", blank=True
     )

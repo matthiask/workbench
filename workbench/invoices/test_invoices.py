@@ -352,10 +352,15 @@ class InvoicesTest(TestCase):
         url = Invoice().urls["create"] + "?contact={}".format(person.pk)
         response = self.client.get(url)
         self.assertContains(response, 'method="POST"')
-        self.assertContains(response, 'id="id_postal_address"')
+        self.assertNotContains(response, 'data-field-value="')
         postal_address = factories.PostalAddressFactory.create(person=person)
         response = self.client.get(url)
-        self.assertNotContains(response, 'id="id_postal_address"')
+        self.assertContains(response, 'data-field-value="', 1)
+
+        person.organization.default_billing_address = "Default"
+        person.organization.save()
+        response = self.client.get(url)
+        self.assertContains(response, 'data-field-value="', 2)
 
         response = self.client.post(
             url,
@@ -367,7 +372,7 @@ class InvoicesTest(TestCase):
                 "subtotal": "110",
                 "discount": "10",
                 "liable_to_vat": "1",
-                "pa": postal_address.id,
+                "postal_address": postal_address.postal_address,
             },
         )
         invoice = Invoice.objects.get()
@@ -377,17 +382,6 @@ class InvoicesTest(TestCase):
 
         pdf = self.client.get(invoice.urls["pdf"])
         self.assertEqual(pdf.status_code, 200)  # No crash
-
-        response = self.client.get(invoice.urls["update"])
-        self.assertContains(response, 'id="id_postal_address"')
-        self.assertNotContains(response, 'id="id_pa_0"')
-
-        invoice.postal_address = ""
-        invoice.save()
-
-        response = self.client.get(invoice.urls["update"])
-        self.assertNotContains(response, 'id="id_postal_address"')
-        self.assertContains(response, 'id="id_pa_0"')
 
     def test_customer_create_invoice(self):
         person = factories.PersonFactory.create(
@@ -401,6 +395,16 @@ class InvoicesTest(TestCase):
             response, 'value="The Organization Ltd" placeholder="organization"'
         )
         self.assertContains(response, 'id="id_postal_address"')
+        self.assertNotContains(response, 'data-field-value="')
+
+        person.organization.default_billing_address = "Default"
+        person.organization.save()
+
+        response = self.client.get(
+            "/invoices/create/?customer={}".format(person.organization.id)
+        )
+        self.assertContains(response, 'id="id_postal_address"')
+        self.assertContains(response, 'data-field-value="')
 
     def test_contact_check_with_project_invoice(self):
         project = factories.ProjectFactory.create()

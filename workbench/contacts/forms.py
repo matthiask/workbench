@@ -3,6 +3,7 @@ from collections import OrderedDict
 from django import forms
 from django.forms.models import inlineformset_factory
 from django.template.defaultfilters import linebreaksbr
+from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _, ngettext
 
 from workbench.contacts.models import (
@@ -62,10 +63,18 @@ class OrganizationForm(ModelForm):
 
     class Meta:
         model = Organization
-        fields = ("name", "is_private_person", "notes", "primary_contact", "groups")
+        fields = (
+            "name",
+            "is_private_person",
+            "notes",
+            "primary_contact",
+            "default_billing_address",
+            "groups",
+        )
         widgets = {
             "name": Textarea(),
             "notes": Textarea(),
+            "default_billing_address": Textarea(),
             "groups": forms.CheckboxSelectMultiple(),
         }
 
@@ -230,23 +239,37 @@ PostalAddressFormset = inlineformset_factory(
 
 
 class PostalAddressSelectionForm(ModelForm):
-    def add_postal_address_selection_if_empty(self, *, organization=None, person=None):
-        if self.instance.postal_address:
-            return
-
+    def add_postal_address_selection_if_empty(
+        self, *, organization=None, person=None, for_billing=False
+    ):
         postal_addresses = []
 
         if person:
+            if (
+                for_billing
+                and person.organization
+                and person.organization.default_billing_address
+            ):
+                postal_addresses.append(
+                    (
+                        _("default billing address"),
+                        person.organization.default_billing_address,
+                    )
+                )
             postal_addresses.extend(
-                (pa.id, linebreaksbr(pa.postal_address))
+                (pa.type, pa.postal_address)
                 for pa in PostalAddress.objects.filter(person=person).select_related(
                     "person__organization"
                 )
             )
 
         if organization and (not person or not postal_addresses):
+            if for_billing and organization.default_billing_address:
+                postal_addresses.append(
+                    (_("default billing address"), organization.default_billing_address)
+                )
             postal_addresses.extend(
-                (pa.id, linebreaksbr(pa.postal_address))
+                (pa.type, pa.postal_address)
                 for pa in PostalAddress.objects.filter(
                     person__organization=organization
                 )
@@ -255,19 +278,15 @@ class PostalAddressSelectionForm(ModelForm):
             )
 
         if postal_addresses:
-            self.fields["pa"] = forms.ModelChoiceField(
-                PostalAddress.objects.all(),
-                label=_("postal address"),
-                help_text=_("The exact address can be edited later."),
-                widget=forms.RadioSelect,
+            self.fields["postal_address"].help_text = format_html(
+                '<strong>{}</strong><br><div class="'
+                ' list-group list-group-horizontal flex-wrap">{}</div>',
+                _("Select one of the following addresses:"),
+                format_html_join(
+                    "",
+                    '<span class="list-group-item list-group-item-action w-auto"'
+                    ' data-field-value="{}"><strong>{}</strong><br>{}</span>',
+                    [(pa, type, linebreaksbr(pa)) for type, pa in postal_addresses],
+                ),
             )
-            self.fields["pa"].choices = postal_addresses
-            self.fields.pop("postal_address", None)
-
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        if self.cleaned_data.get("pa"):
-            instance.postal_address = self.cleaned_data["pa"].postal_address
-        if commit:
-            instance.save()
-        return instance
+            # repr(postal_addresses)

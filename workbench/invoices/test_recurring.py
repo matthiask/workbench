@@ -107,8 +107,8 @@ class RecurringTest(TestCase):
 
         factories.PostalAddressFactory.create(person=person)
         response = self.client.get(ri.urls["update"])
-        self.assertContains(response, 'name="pa"')
-        self.assertNotContains(response, 'name="postal_address"')
+        self.assertContains(response, 'name="postal_address"')
+        self.assertContains(response, 'data-field-value="')
 
         response = self.client.get(ri.urls["detail"])
         self.assertContains(response, "?create_invoices=1")

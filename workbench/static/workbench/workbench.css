@@ -94,6 +94,10 @@ tbody th > a {
   height: 6px;
 }
 
+[data-field-value] {
+  cursor: pointer;
+}
+
 /* Timer */
 [data-timer="standalone"] .timer-panel-tab {
   min-height: 36px;

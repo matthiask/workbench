@@ -32,9 +32,11 @@ class OffersTest(TestCase):
         url = project.urls["createoffer"]
         response = self.client.get(url)
         self.assertContains(response, 'id="id_postal_address"')
+        self.assertNotContains(response, 'data-field-value="')
         postal_address = factories.PostalAddressFactory.create(person=project.contact)
         response = self.client.get(url)
-        self.assertNotContains(response, 'id="id_postal_address"')
+        self.assertContains(response, 'id="id_postal_address"')
+        self.assertContains(response, 'data-field-value="')
 
         response = self.client.post(
             url,
@@ -43,7 +45,7 @@ class OffersTest(TestCase):
                 "owned_by": project.owned_by_id,
                 "discount": "10",
                 "liable_to_vat": "1",
-                "pa": postal_address.id,
+                "postal_address": postal_address.postal_address,
                 "services": [service.id],
                 "status": Offer.IN_PREPARATION,
             },
@@ -122,7 +124,6 @@ class OffersTest(TestCase):
                 "discount": "10",
                 "liable_to_vat": "1",
                 "postal_address": "Anything",
-                # "pa": postal_address.id,
                 "services": [service.id],
                 # "offered_on": date.today().isoformat(),
                 "status": Offer.ACCEPTED,
@@ -138,7 +139,6 @@ class OffersTest(TestCase):
                 "discount": "10",
                 "liable_to_vat": "1",
                 "postal_address": "Anything",
-                # "pa": postal_address.id,
                 "services": [service.id],
                 "offered_on": date.today().isoformat(),
                 "status": Offer.ACCEPTED,
@@ -199,7 +199,6 @@ class OffersTest(TestCase):
                 "discount": "10",
                 "liable_to_vat": "1",
                 "postal_address": "Anything",
-                # "pa": postal_address.id,
                 "services": [service.id],
                 "offered_on": date.today().isoformat(),
                 "status": Offer.IN_PREPARATION,
@@ -215,7 +214,6 @@ class OffersTest(TestCase):
                 "discount": "10",
                 "liable_to_vat": "1",
                 "postal_address": "Anything",
-                # "pa": postal_address.id,
                 "services": [service.id],
                 "offered_on": date.today().isoformat(),
                 "status": Offer.IN_PREPARATION,

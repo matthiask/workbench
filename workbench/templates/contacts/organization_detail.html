@@ -30,6 +30,10 @@
       <td>{{ organization.is_private_person|yesno:_("yes,no") }}</td>
     </tr>
     <tr>
+      <td class="text-right">{% trans 'default billing address' %}</td>
+      <td>{{ organization.default_billing_address|linebreaksbr|default:"&ndash;" }}</td>
+    </tr>
+    <tr>
       <td class="text-right">{% trans 'notes' %}</td>
       <td>{{ organization.notes|linebreaksbr|default:"&ndash;" }}</td>
     </tr>

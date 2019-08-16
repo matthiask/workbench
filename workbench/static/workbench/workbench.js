@@ -218,6 +218,13 @@ $(function() {
       cost.val(factor * tpc).focus()
     }
   })
+
+  $(document.body).on("click", "[data-field-value]", function() {
+    var field = $(this)
+      .closest(".form-group")
+      .find("input, textarea, select")
+    field.val(this.dataset.fieldValue)
+  })
 })
 
 function initWidgets() {
