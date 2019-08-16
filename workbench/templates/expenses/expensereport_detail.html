@@ -19,7 +19,7 @@
     <tr>
       <th class="text-right">{% trans 'expenses' %}</th>
       <td>
-        {% for cost in object.expenses.all %}
+        {% for cost in object.expenses.all reversed %}
           {{ cost.rendered_on|local_date_format }}<br>
           {% link_or_none cost.project %}
           {{ cost.description }}<br>
