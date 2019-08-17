@@ -265,3 +265,19 @@ class OffersTest(TestCase):
             "Rejected on {}".format(local_date_format(today)),
         )
         self.assertEqual(Offer(status="42").pretty_status, "42")
+
+    def test_offer_rejection(self):
+        project = factories.ProjectFactory.create()
+
+        offer1 = factories.OfferFactory.create(project=project, status=Offer.REJECTED)
+        offer2 = factories.OfferFactory.create(project=project)
+
+        factories.ServiceFactory.create(project=project, offer=offer1, effort_hours=10)
+        factories.ServiceFactory.create(project=project, offer=offer2, effort_hours=20)
+        factories.ServiceFactory.create(project=project, effort_hours=40)
+
+        gs = project.grouped_services
+        self.assertEqual([offer2, None, offer1], [row[0] for row in gs["offers"]])
+        self.assertEqual(gs["service_hours"], Decimal("60.00"))  # Not 70
+
+        self.assertEqual(project.services.logging().count(), 2)
