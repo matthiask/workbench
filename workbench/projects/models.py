@@ -197,7 +197,7 @@ class Project(Model):
             total_logged_cost += row["logged_cost"]
             logged_hours_per_effort_rate[service.effort_rate] += row["logged_hours"]
 
-            if service.not_rejected:
+            if not service.is_rejected:
                 service_hours += service.service_hours
                 service_cost += service.cost or Z
                 total_service_cost += service.service_cost
@@ -206,7 +206,7 @@ class Project(Model):
                 total_logged_cost += service.effort_rate * row["logged_hours"]
             else:
                 total_logged_hours_rate_undefined += row["logged_hours"]
-                if service.not_rejected:
+                if not service.is_rejected:
                     total_service_hours_rate_undefined += service.service_hours
 
             offers[service.offer_id][1].append(row)
@@ -234,7 +234,7 @@ class Project(Model):
                 ),
                 key=lambda item: (
                     # Rejected offers are at the end
-                    not item[0].not_rejected if item[0] else False,
+                    item[0].is_rejected if item[0] else False,
                     # None is between rejected offers and other offers
                     item[0] is None,
                     # Else order by code
@@ -361,5 +361,5 @@ class Service(ServiceBase):
             return instance.get_absolute_url() if instance else "projects_project_list"
 
     @property
-    def not_rejected(self):
-        return not self.offer or self.offer.not_rejected
+    def is_rejected(self):
+        return self.offer.is_rejected if self.offer else False
