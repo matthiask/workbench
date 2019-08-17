@@ -9,7 +9,7 @@ from workbench.invoices.forms import (
     ServiceForm,
 )
 from workbench.invoices.models import Invoice, Service
-from workbench.invoices.views import InvoicePDFView
+from workbench.invoices.views import InvoicePDFView, InvoiceXLSXView
 
 
 urlpatterns = [
@@ -47,6 +47,9 @@ urlpatterns = [
         name="invoices_invoice_delete",
     ),
     url(r"^(?P<pk>\d+)/pdf/$", InvoicePDFView.as_view(), name="invoices_invoice_pdf"),
+    url(
+        r"^(?P<pk>\d+)/xlsx/$", InvoiceXLSXView.as_view(), name="invoices_invoice_xlsx"
+    ),
     # Services
     url(
         r"^(?P<pk>\d+)/createservice/$",

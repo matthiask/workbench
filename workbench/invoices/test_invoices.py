@@ -244,6 +244,12 @@ class InvoicesTest(TestCase):
         invoice.refresh_from_db()
         self.assertAlmostEqual(invoice.subtotal, 610)  # unchanged
 
+        response = self.client.get(invoice.urls["pdf"])
+        self.assertEqual(response.status_code, 200)  # No crash
+
+        response = self.client.get(invoice.urls["xlsx"])
+        self.assertEqual(response.status_code, 200)  # No crash
+
         response = self.client.post(
             invoice.urls["delete"],
             {WarningsForm.ignore_warnings_id: "release-logged-services"},
@@ -379,9 +385,6 @@ class InvoicesTest(TestCase):
         self.assertRedirects(response, invoice.urls["detail"])
         self.assertAlmostEqual(invoice.total_excl_tax, Decimal("100"))
         self.assertAlmostEqual(invoice.total, Decimal("107.7"))
-
-        pdf = self.client.get(invoice.urls["pdf"])
-        self.assertEqual(pdf.status_code, 200)  # No crash
 
     def test_customer_create_invoice(self):
         person = factories.PersonFactory.create(
