@@ -132,7 +132,7 @@
           <a class="list-group-item list-group-item-action" href="{{ hours.get_absolute_url }}" data-toggle="ajaxmodal">
             <small class="d-flex justify-content-between">
               <span>{{ hours.service.project }}: {{ hours.service }}</span>
-              <span>{{ hours.rendered_by.get_short_name }} / vor {{ hours.created_at|date:'H:i' }}</span>
+              <span>{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
             </small>
             <p class="card-text"><strong>{{ hours.hours|hours }}</strong> {{ hours.description }}</p>
           </a>
