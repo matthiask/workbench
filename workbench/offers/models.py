@@ -184,3 +184,7 @@ class Offer(ModelWithTotal):
             )
             return False
         return super().allow_delete(instance, request)
+
+    @property
+    def not_rejected(self):
+        return self.status != self.REJECTED

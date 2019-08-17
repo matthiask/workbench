@@ -1,5 +1,4 @@
 from collections import defaultdict
-from datetime import date
 from decimal import Decimal
 
 from django.contrib import messages
@@ -193,20 +192,22 @@ class Project(Model):
                 "logged_cost": logged_cost_per_service.get(service.id, Z),
             }
 
-            service_hours += service.service_hours
             logged_hours += row["logged_hours"]
-            service_cost += service.cost or Z
             logged_cost += row["logged_cost"]
-
-            total_service_cost += service.service_cost
             total_logged_cost += row["logged_cost"]
             logged_hours_per_effort_rate[service.effort_rate] += row["logged_hours"]
+
+            if service.not_rejected:
+                service_hours += service.service_hours
+                service_cost += service.cost or Z
+                total_service_cost += service.service_cost
 
             if service.effort_rate is not None:
                 total_logged_cost += service.effort_rate * row["logged_hours"]
             else:
-                total_service_hours_rate_undefined += service.service_hours
                 total_logged_hours_rate_undefined += row["logged_hours"]
+                if service.not_rejected:
+                    total_service_hours_rate_undefined += service.service_hours
 
             offers[service.offer_id][1].append(row)
 
@@ -232,8 +233,12 @@ class Project(Model):
                     if value[1] or value[0] is not None
                 ),
                 key=lambda item: (
-                    item[0] and item[0].offered_on or date.max,
-                    item[0] and item[0].pk or 1e100,
+                    # Rejected offers are at the end
+                    not item[0].not_rejected if item[0] else False,
+                    # None is between rejected offers and other offers
+                    item[0] is None,
+                    # Else order by code
+                    item[0]._code if item[0] else 1e100,
                 ),
             ),
             "logged_hours": logged_hours,
@@ -354,3 +359,7 @@ class Service(ServiceBase):
     def get_redirect_url(cls, instance, request):
         if not request.is_ajax():
             return instance.get_absolute_url() if instance else "projects_project_list"
+
+    @property
+    def not_rejected(self):
+        return not self.offer or self.offer.not_rejected

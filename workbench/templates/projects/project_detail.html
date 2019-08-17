@@ -86,7 +86,7 @@
     </div>
 
     {% for offer, services in project.grouped_services.offers %}
-    <div class="card my-3">
+    <div class="card my-3 {% if offer and not offer.not_rejected %}border border-danger opacity-60{% endif %}">
       <div class="card-header d-flex align-items-center justify-content-between">
         {% if offer %}
           <div>
@@ -156,7 +156,7 @@
               {% if row.service.pk %}{% bar row.logged_cost row.service.service_cost %}{% endif %}
             </span>
             <span class="col-md-4 text-right">
-              {% if row.service.allow_logging %}
+              {% if row.service.allow_logging and row.service.not_rejected %}
                 {% if row.service.pk %}
                   <a href="{{ project.urls.createhours }}?service={{ row.service.pk }}"
                     data-toggle="ajaxmodal">
