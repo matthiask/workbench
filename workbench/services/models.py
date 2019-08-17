@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import date
 
 from django.db import models
-from django.db.models import Max
+from django.db.models import Max, Q
 from django.utils import timezone
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
@@ -42,7 +42,12 @@ class ServiceQuerySet(models.QuerySet):
         ]
 
     def logging(self):
-        return self.filter(allow_logging=True)
+        from workbench.offers.models import Offer
+
+        return self.filter(
+            Q(allow_logging=True),
+            Q(offer__isnull=True) | ~Q(offer__status=Offer.REJECTED),
+        )
 
 
 class ServiceBase(Model):
