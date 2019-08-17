@@ -94,9 +94,11 @@
   <a href="{{ object.urls.pdf }}" class="btn btn-secondary" target="_blank">
     PDF
   </a>
-  <a href="{{ object.urls.xlsx }}" class="btn btn-secondary">
-    {% trans 'logbook' %} (XLSX)
-  </a>
+  {% if object.type == object.SERVICES %}
+    <a href="{{ object.urls.xlsx }}" class="btn btn-secondary">
+      {% trans 'logbook' %} (XLSX)
+    </a>
+  {% endif %}
   <a href="{{ object.urls.update }}" class="btn btn-secondary">
     {% trans 'Update' %}
   </a>
