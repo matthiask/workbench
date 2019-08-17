@@ -1,3 +1,5 @@
+from django.conf import settings
+
 import requests
 
 from workbench.circles.models import Circle, Role
@@ -7,7 +9,7 @@ def update_circles():
     data = requests.get(
         "https://api.glassfrog.com/api/v3/circles",
         headers={
-            "X-Auth-Token": "c0bf9e17fdcdab3467361e3a4f5858d839251d25",
+            "X-Auth-Token": settings.GLASSFROG_TOKEN,
             "Content-Type": "application/json",
         },
     ).json()
