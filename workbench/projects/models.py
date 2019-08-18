@@ -22,6 +22,18 @@ class ProjectQuerySet(SearchQuerySet):
     def open(self):
         return self.filter(closed_on__isnull=True)
 
+    def orders(self):
+        return self.filter(type=Project.ORDER)
+
+    def without_invoices(self):
+        from workbench.invoices.models import Invoice
+
+        return self.exclude(
+            id__in=Invoice.objects.valid()
+            .filter(project__isnull=False)
+            .values("project")
+        )
+
 
 @model_urls
 class Project(Model):

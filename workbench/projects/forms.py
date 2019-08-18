@@ -14,7 +14,11 @@ from workbench.tools.forms import Autocomplete, ModelForm, Textarea
 
 class ProjectSearchForm(forms.Form):
     s = forms.ChoiceField(
-        choices=(("all", _("All states")), ("", _("Open")), ("closed", _("Closed"))),
+        choices=[
+            ("all", _("All")),
+            (_("status"), [("", _("Open")), ("closed", _("Closed"))]),
+            (_("defined search"), [("no-invoices", _("No invoices"))]),
+        ],
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
         label="",
@@ -48,6 +52,8 @@ class ProjectSearchForm(forms.Form):
             queryset = queryset.filter(closed_on__isnull=True)
         elif data.get("s") == "closed":
             queryset = queryset.filter(closed_on__isnull=False)
+        elif data.get("s") == "no-invoices":
+            queryset = queryset.orders().without_invoices()
         if data.get("org"):
             queryset = queryset.filter(customer=data.get("org"))
         if data.get("type"):

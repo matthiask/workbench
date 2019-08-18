@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-18 16:03+0200\n"
+"POT-Creation-Date: 2019-08-18 16:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -181,11 +181,11 @@ msgstr "Aktivitäten"
 
 #: workbench/activities/forms.py:15 workbench/deals/forms.py:13
 #: workbench/invoices/forms.py:27 workbench/invoices/forms.py:555
-#: workbench/offers/forms.py:17 workbench/projects/forms.py:17
+#: workbench/offers/forms.py:17 workbench/projects/forms.py:19
 msgid "Open"
 msgstr "Offen"
 
-#: workbench/activities/forms.py:15
+#: workbench/activities/forms.py:15 workbench/projects/forms.py:18
 msgid "All"
 msgstr "Alle"
 
@@ -680,7 +680,7 @@ msgstr "Debitorenmanagement"
 
 #: workbench/credit_control/forms.py:20 workbench/deals/forms.py:12
 #: workbench/invoices/forms.py:26 workbench/invoices/forms.py:555
-#: workbench/offers/forms.py:16 workbench/projects/forms.py:17
+#: workbench/offers/forms.py:16
 msgid "All states"
 msgstr "Alle Stati"
 
@@ -854,6 +854,7 @@ msgstr "Geschätzter Wert"
 
 #: workbench/deals/models.py:65 workbench/expenses/views.py:26
 #: workbench/invoices/models.py:104 workbench/offers/models.py:62
+#: workbench/projects/forms.py:19
 #: workbench/templates/activities/activity_detail.html:14
 #: workbench/templates/deals/deal_detail.html:20
 #: workbench/templates/deals/deal_list.html:15
@@ -885,7 +886,7 @@ msgstr "%(status)s am %(closed_on)s"
 msgid "expenses"
 msgstr "Spesen"
 
-#: workbench/expenses/forms.py:26 workbench/projects/forms.py:103
+#: workbench/expenses/forms.py:26 workbench/projects/forms.py:109
 msgid "is closed"
 msgstr "Ist geschlossen"
 
@@ -1077,11 +1078,11 @@ msgstr ""
 "Anzahlungsrechnungen wurden von dieser Rechnung abgezogen. Diese Anzahlungen "
 "stehen wieder zur Verfügung für andere Rechnungen, wenn diese gelöscht wird."
 
-#: workbench/invoices/forms.py:531 workbench/projects/forms.py:139
+#: workbench/invoices/forms.py:531 workbench/projects/forms.py:145
 msgid "Optional, but useful for quickly filling the fields below."
 msgstr "Optional, aber nützlich um Felder unten rasch zu füllen."
 
-#: workbench/invoices/forms.py:555 workbench/projects/forms.py:17
+#: workbench/invoices/forms.py:555 workbench/projects/forms.py:19
 msgid "Closed"
 msgstr "Abgeschlossen"
 
@@ -1332,7 +1333,7 @@ msgstr ""
 "Leistung wählen."
 
 #: workbench/logbook/forms.py:230 workbench/logbook/forms.py:335
-#: workbench/projects/forms.py:226
+#: workbench/projects/forms.py:232
 msgid "This project is already closed."
 msgstr "Dieses Projekt wurde schon geschlossen."
 
@@ -1479,18 +1480,26 @@ msgstr "Keine Offerten im Projekt."
 msgid "projects"
 msgstr "Projekte"
 
-#: workbench/projects/forms.py:29
+#: workbench/projects/forms.py:20
+msgid "defined search"
+msgstr "Definierte Suche"
+
+#: workbench/projects/forms.py:20
+msgid "No invoices"
+msgstr "Keine Rechnungen"
+
+#: workbench/projects/forms.py:33
 msgid "All types"
 msgstr "Alle Typen"
 
-#: workbench/projects/forms.py:114
+#: workbench/projects/forms.py:120
 msgid ""
 "This project already has invoices. The invoices' customer record will be "
 "changed too."
 msgstr ""
 "Dieses Projekt hat schon Rechnungen. Der Rechnungskunde wird auch angepasst."
 
-#: workbench/projects/forms.py:182
+#: workbench/projects/forms.py:188
 msgid ""
 "Most fields are disabled because service is bound to an offer which is not "
 "in preparation anymore."
@@ -1498,7 +1507,7 @@ msgstr ""
 "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte "
 "verbunden ist, welche sich nicht mehr in Vorbereitung befindet."
 
-#: workbench/projects/forms.py:200
+#: workbench/projects/forms.py:206
 msgid "Merge log into"
 msgstr "Erfasste Leistungen zuweisen"
 
