@@ -164,11 +164,7 @@ class AssignCreditEntriesForm(forms.Form):
                                         else "{}",
                                         invoice,
                                     ),
-                                    format_html(
-                                        '<span class="badge badge-{}">{}</span>',
-                                        invoice.status_css,
-                                        invoice.pretty_status,
-                                    ),
+                                    invoice.status_badge,
                                     "<br>",
                                     format_html(
                                         "{}", invoice.contact or invoice.customer

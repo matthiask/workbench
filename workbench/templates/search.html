@@ -19,7 +19,7 @@
           <li>
             <a href="{{ result.get_absolute_url }}">
               {{ result|h }}
-              <span class="badge badge-{{ result.status_css }}">{{ result.pretty_status }}</span>
+              {{ result.status_badge }}
             </a>
           </li>
         {% endif %}

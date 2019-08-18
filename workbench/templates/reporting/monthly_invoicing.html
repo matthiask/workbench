@@ -44,7 +44,7 @@
           <td>
             <a href="{{ invoice.get_absolute_url }}">
               {{ invoice|h }}
-              <span class="badge badge-{{ invoice.status_css }}">{{ invoice.pretty_status }}</span>
+              {{ invoice.status_badge }}
             </a>
           </td>
           <td>{{ invoice.invoiced_on|local_date_format }}</td>

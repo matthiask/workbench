@@ -757,13 +757,13 @@ class InvoicesTest(TestCase):
             ).pretty_status,
             "Sent on {} but overdue".format(local_date_format(yesterday)),
         )
-        self.assertEqual(
+        self.assertIn(
+            "badge-warning",
             Invoice(
                 status=Invoice.SENT,
                 invoiced_on=yesterday,
                 due_on=today - timedelta(days=5),
-            ).status_css,
-            "warning",
+            ).status_badge,
         )
         self.assertEqual(
             Invoice(

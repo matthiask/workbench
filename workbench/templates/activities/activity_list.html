@@ -16,10 +16,12 @@
 <div class="list-group list-group-flush">
   {% for object in object_list %}
   <div class="list-group-item px-0">
-    <span style="float:right" class="badge badge-{{ object.status_css }}">{{ object.pretty_status }}</span>
-    <h5 class="mb-1">
-      <a href="{{ object.get_absolute_url }}" data-toggle="ajaxmodal">{{ object|h }}</a>
-    </h5>
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">
+        <a href="{{ object.get_absolute_url }}" data-toggle="ajaxmodal">{{ object|h }}</a>
+      </h5>
+      {{ object.status_badge }}
+    </div>
     <div class="d-flex w-100 justify-content-between">
       <p>
         {% for c in object.context %}

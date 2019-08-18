@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -69,13 +70,17 @@ class ExpenseReport(Model):
         return not instance.closed_on
 
     @property
-    def status_css(self):
-        return "light" if self.closed_on else "info"
-
-    @property
     def pretty_status(self):
         return (
             (_("closed on %s") % local_date_format(self.closed_on))
             if self.closed_on
             else _("In preparation")
+        )
+
+    @property
+    def status_badge(self):
+        return format_html(
+            '<span class="badge badge-{}">{}</span>',
+            "light" if self.closed_on else "info",
+            self.pretty_status,
         )

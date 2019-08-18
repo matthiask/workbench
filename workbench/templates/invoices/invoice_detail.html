@@ -23,7 +23,7 @@
     <tr>
       <th class="text-right">{% trans 'status' %}</th>
       <td>
-        <span class="badge badge-{{ object.status_css }}">{{ object.pretty_status }}</span>
+        {{ object.status_badge }}
         {{ object.payment_notice|linebreaksbr }}
       </td>
     </tr>

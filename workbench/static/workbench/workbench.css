@@ -98,6 +98,10 @@ tbody th > a {
   cursor: pointer;
 }
 
+.badge {
+  align-self: flex-start;
+}
+
 .opacity-60 {
   opacity: 0.6;
 }

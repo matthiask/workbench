@@ -18,8 +18,10 @@
 {% endifchanged %}
 <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action px-0"
   data-toggle="ajaxmodal">
-  <span style="float:right" class="badge badge-{{ object.status_css }}">{{ object.pretty_status }}</span>
-  <h5 class="mb-1">{{ object|h }}</h5>
+  <div class="d-flex w-100 justify-content-between">
+    <h5 class="mb-1">{{ object|h }}</h5>
+    {{ object.status_badge }}
+  </div>
   <div class="row">
     <div class="col-md-4">{{ object.user.get_full_name }}</div>
     <div class="col-md-4 text-right">

@@ -6,8 +6,10 @@
 <div class="list-group list-group-flush">
   {% for invoice in object_list %}
   <a href="{{ invoice.get_absolute_url }}" class="list-group-item list-group-item-action px-0">
-    <span style="float:right" class="badge badge-{{ invoice.status_css }}">{{ invoice.pretty_status }}</span>
-    <h5 class="mb-1">{{ invoice|h }}</h5>
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">{{ invoice|h }}</h5>
+      {{ invoice.status_badge }}
+    </div>
     <div class="row">
       <div class="col-md-7">{{ invoice.contact|default:invoice.customer }}</div>
       <div class="col-md-2">{{ invoice.pretty_status }}</div>

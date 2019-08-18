@@ -8,7 +8,7 @@
 
     <h1 data-timer-title="{{ project.code }} {{ project.title }}">
       {{ project|h }} {% history_link project %}
-      <span style="font-size:10.5px" class="badge badge-{{ object.status_css }}">{{ object.pretty_status }}</span>
+      <span style="font-size:14px">{{ object.status_badge }}</span>
     </h1>
 
     <p>
@@ -93,7 +93,7 @@
             <h5 class="d-inline my-0">{{ offer|h }}</h5>
             {% history_link offer %}
             &nbsp;
-            <span class="badge badge-{{ offer.status_css }}">{{ offer.pretty_status }}</span>
+            {{ offer.status_badge }}
 
             <p>{{ offer.description|linebreaksbr|urlize }}</p>
           </div>
@@ -184,8 +184,10 @@
       <div class="list-group list-group-flush">
         {% for invoice in object.project_invoices %}
           <a href="{{ invoice.get_absolute_url }}" class="list-group-item list-group-item-action">
-            <span style="float:right" class="badge badge-{{ invoice.status_css }}">{{ invoice.pretty_status }}</span>
-            <h5 class="mb-1">{{ invoice|h }}</h5>
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">{{ invoice|h }}</h5>
+              {{ invoice.status_badge }}
+            </div>
             <div class="row">
               <div class="col-md-7">{{ invoice.contact|default:invoice.customer }}</div>
               <div class="col-md-2">{{ invoice.get_type_display }}</div>

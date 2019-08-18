@@ -2,6 +2,7 @@ from datetime import date, timedelta
 
 from django.db import models
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -84,15 +85,18 @@ class Activity(Model):
         return _("open")
 
     @property
-    def status_css(self):
+    def status_badge(self):
+        css = "info"
         if self.completed_at:
-            return "default"
+            css = "default"
         if self.due_on:
             if self.due_on < date.today():
-                return "danger"
+                css = "danger"
             elif self.due_on < date.today() + timedelta(days=3):
-                return "warning"
-        return "info"
+                css = "warning"
+        return format_html(
+            '<span class="badge badge-{}">{}</span>', css, self.pretty_status
+        )
 
     @classmethod
     def get_redirect_url(cls, instance, request):

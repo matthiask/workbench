@@ -265,17 +265,21 @@ class Invoice(ModelWithTotal):
             return self.get_status_display()
 
     @property
-    def status_css(self):
-        if self.status == self.SENT:
-            if self.last_reminded_on or (self.due_on and date.today() > self.due_on):
-                return "warning"
-
-        return {
+    def status_badge(self):
+        css = {
             self.IN_PREPARATION: "info",
             self.SENT: "success",
             self.PAID: "default",
             self.CANCELED: "danger",
         }[self.status]
+
+        if self.status == self.SENT:
+            if self.last_reminded_on or (self.due_on and date.today() > self.due_on):
+                css = "warning"
+
+        return format_html(
+            '<span class="badge badge-{}">{}</span>', css, self.pretty_status
+        )
 
     @property
     def total_title(self):
@@ -481,10 +485,6 @@ class RecurringInvoice(ModelWithTotal):
         return self.title
 
     @property
-    def status_css(self):
-        return "light" if self.ends_on else "secondary"
-
-    @property
     def pretty_status(self):
         if self.ends_on:
             return _("%(periodicity)s from %(from)s until %(until)s") % {
@@ -496,6 +496,14 @@ class RecurringInvoice(ModelWithTotal):
             "periodicity": self.get_periodicity_display(),
             "from": local_date_format(self.starts_on),
         }
+
+    @property
+    def status_badge(self):
+        return format_html(
+            '<span class="badge badge-{}">{}</span>',
+            "light" if self.ends_on else "secondary",
+            self.pretty_status,
+        )
 
     def create_single_invoice(self, *, period_starts_on, period_ends_on):
         return Invoice.objects.create(

@@ -112,15 +112,18 @@ class Project(Model):
     save.alters_data = True
 
     @property
-    def status_css(self):
-        if self.closed_on:
-            return "light"
-
-        return {
+    def status_badge(self):
+        css = {
             self.MAINTENANCE: "secondary",
             self.ORDER: "success",
             self.INTERNAL: "warning",
         }[self.type]
+
+        if self.closed_on:
+            css = "light"
+        return format_html(
+            '<span class="badge badge-{}">{}</span>', css, self.pretty_status
+        )
 
     @property
     def pretty_status(self):

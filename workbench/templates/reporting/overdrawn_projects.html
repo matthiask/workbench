@@ -25,7 +25,7 @@
         <td>
           <a href="{{ row.project.get_absolute_url }}">
             {{ row.project|h }}
-            <span class="badge badge-{{ row.project.status_css }}">{{ row.project.pretty_status }}</span>
+            {{ row.project.status_badge }}
           </a>
         </td>
         <td>

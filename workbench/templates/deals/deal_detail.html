@@ -31,10 +31,11 @@
 
     <table class="table">
       {% for activity in deal.activities.all %}
-        <tr class="bg-{{ activity.status_css }}">
+        <tr>
           <th>
             <a href="{{ activity.get_absolute_url }}" data-toggle="ajaxmodal">
               {{ activity }}
+              {{ activity.status_badge }}
             </a>
           </th>
           <td>

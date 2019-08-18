@@ -150,13 +150,17 @@ class Offer(ModelWithTotal):
         return self.get_status_display()
 
     @property
-    def status_css(self):
-        return {
+    def status_badge(self):
+        css = {
             self.IN_PREPARATION: "info",
             self.OFFERED: "success",
             self.ACCEPTED: "default",
             self.REJECTED: "danger",
         }[self.status]
+
+        return format_html(
+            '<span class="badge badge-{}">{}</span>', css, self.pretty_status
+        )
 
     @property
     def total_title(self):

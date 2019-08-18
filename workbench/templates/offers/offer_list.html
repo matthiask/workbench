@@ -4,16 +4,18 @@
 
 {% block objects %}
 <div class="list-group list-group-flush">
-  {% for offer in object_list %}
-  <a href="{{ offer.get_absolute_url }}" class="list-group-item list-group-item-action px-0">
-    <span style="float:right" class="badge badge-{{ offer.status_css }}">{{ offer.pretty_status }}</span>
-    <h5 class="mb-1">{{ offer|h }}</h5>
+  {% for object in object_list %}
+  <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action px-0">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">{{ object|h }}</h5>
+      {{ object.status_badge }}
+    </div>
     <div class="row">
-      <div class="col-md-5 text-truncate">{{ offer.project|h }}</div>
-      <div class="col-md-4 text-truncate">{{ offer.project.contact|default:offer.project.customer }}</div>
+      <div class="col-md-5 text-truncate">{{ object.project|h }}</div>
+      <div class="col-md-4 text-truncate">{{ object.project.contact|default:object.project.customer }}</div>
       <div class="col-md-3 text-truncate text-md-right">
-        {{ offer.total_excl_tax|currency }} exkl. /
-        {{ offer.total|currency }}
+        {{ object.total_excl_tax|currency }} exkl. /
+        {{ object.total|currency }}
       </div>
     </div>
   </a>
