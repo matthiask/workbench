@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-17 16:42+0200\n"
+"POT-Creation-Date: 2019-08-18 16:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -126,14 +126,14 @@ msgid "Cannot modify a cutoff date where accrual records already exist."
 msgstr "Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."
 
 #: workbench/accruals/models.py:120 workbench/credit_control/models.py:61
-#: workbench/invoices/models.py:132 workbench/invoices/models.py:374
+#: workbench/invoices/models.py:132 workbench/invoices/models.py:378
 #: workbench/management/commands/export_debtors.py:71
 #: workbench/management/commands/export_debtors.py:96
 #: workbench/templates/accruals/cutoffdate_detail.html:35
 #: workbench/templates/contacts/organization_detail.html:44
 #: workbench/templates/contacts/person_detail.html:48
 #: workbench/templates/credit_control/creditentry_list.html:26
-#: workbench/templates/projects/project_detail.html:208
+#: workbench/templates/projects/project_detail.html:210
 #: workbench/templates/reporting/monthly_invoicing.html:15
 #: workbench/templates/reporting/open_items_list.html:20
 #: workbench/tools/pdf.py:412 workbench/tools/pdf.py:527
@@ -156,6 +156,7 @@ msgstr ""
 #: workbench/logbook/__init__.py:10
 #: workbench/templates/accruals/cutoffdate_detail.html:37
 #: workbench/templates/base.html:43
+#: workbench/templates/invoices/invoice_detail.html:99
 msgid "logbook"
 msgstr "Logbuch"
 
@@ -171,10 +172,10 @@ msgstr "Kann Abgrenzungen für zukünftige Stichtage nicht generieren."
 msgid "Generated accruals."
 msgstr "Abgrenzungen erstellt."
 
-#: workbench/activities/__init__.py:10 workbench/activities/models.py:66
+#: workbench/activities/__init__.py:10 workbench/activities/models.py:67
 #: workbench/templates/base.html:99
 #: workbench/templates/deals/deal_detail.html:30
-#: workbench/templates/shortcuts.html:65 workbench/templates/start.html:73
+#: workbench/templates/shortcuts.html:65 workbench/templates/start.html:75
 msgid "activities"
 msgstr "Aktivitäten"
 
@@ -196,16 +197,16 @@ msgstr "Gehört inaktiven Benutzern"
 msgid "is completed"
 msgstr "ist erledigt"
 
-#: workbench/activities/models.py:30 workbench/deals/models.py:50
-#: workbench/invoices/models.py:71 workbench/invoices/models.py:445
-#: workbench/projects/models.py:51
+#: workbench/activities/models.py:31 workbench/deals/models.py:50
+#: workbench/invoices/models.py:71 workbench/invoices/models.py:449
+#: workbench/projects/models.py:61
 #: workbench/templates/invoices/invoice_detail.html:16
 msgid "contact"
 msgstr "Kontakt"
 
-#: workbench/activities/models.py:38 workbench/invoices/models.py:79
+#: workbench/activities/models.py:39 workbench/invoices/models.py:79
 #: workbench/logbook/models.py:93 workbench/offers/models.py:48
-#: workbench/projects/models.py:72 workbench/projects/models.py:307
+#: workbench/projects/models.py:82 workbench/projects/models.py:319
 #: workbench/templates/invoices/invoice_detail.html:20
 #: workbench/templates/invoices/invoice_form.html:8
 #: workbench/templates/logbook/loggedcost_detail.html:13
@@ -215,23 +216,23 @@ msgstr "Kontakt"
 msgid "project"
 msgstr "Projekt"
 
-#: workbench/activities/models.py:44 workbench/deals/models.py:73
+#: workbench/activities/models.py:45 workbench/deals/models.py:73
 #: workbench/templates/deals/deal_list.html:10
 msgid "deal"
 msgstr "Geschäft"
 
-#: workbench/activities/models.py:49 workbench/contacts/models.py:18
+#: workbench/activities/models.py:50 workbench/contacts/models.py:18
 #: workbench/deals/models.py:15 workbench/deals/models.py:57
-#: workbench/invoices/models.py:96 workbench/invoices/models.py:449
+#: workbench/invoices/models.py:96 workbench/invoices/models.py:453
 #: workbench/logbook/forms.py:131 workbench/offers/models.py:55
-#: workbench/projects/models.py:55 workbench/services/models.py:15
+#: workbench/projects/models.py:65 workbench/services/models.py:15
 #: workbench/services/models.py:56
 msgid "title"
 msgstr "Titel"
 
-#: workbench/activities/models.py:50 workbench/awt/models.py:92
+#: workbench/activities/models.py:51 workbench/awt/models.py:92
 #: workbench/contacts/models.py:33 workbench/contacts/models.py:87
-#: workbench/credit_control/forms.py:206 workbench/credit_control/models.py:63
+#: workbench/credit_control/forms.py:202 workbench/credit_control/models.py:63
 #: workbench/management/commands/export_debtors.py:72
 #: workbench/templates/awt/year_detail.html:126
 #: workbench/templates/contacts/organization_detail.html:37
@@ -240,45 +241,45 @@ msgstr "Titel"
 msgid "notes"
 msgstr "Bemerkungen"
 
-#: workbench/activities/models.py:54 workbench/deals/models.py:60
-#: workbench/expenses/models.py:24 workbench/expenses/views.py:24
-#: workbench/invoices/models.py:99 workbench/invoices/models.py:452
-#: workbench/offers/models.py:58 workbench/projects/models.py:58
+#: workbench/activities/models.py:55 workbench/deals/models.py:60
+#: workbench/expenses/models.py:25 workbench/expenses/views.py:24
+#: workbench/invoices/models.py:99 workbench/invoices/models.py:456
+#: workbench/offers/models.py:58 workbench/projects/models.py:68
 #: workbench/templates/activities/activity_detail.html:10
 #: workbench/templates/deals/deal_list.html:11
 msgid "responsible"
 msgstr "verantwortlich"
 
-#: workbench/activities/models.py:57 workbench/invoices/models.py:84
+#: workbench/activities/models.py:58 workbench/invoices/models.py:84
 msgid "due on"
 msgstr "Fällig am"
 
-#: workbench/activities/models.py:58 workbench/deals/models.py:68
-#: workbench/expenses/models.py:15 workbench/expenses/views.py:25
-#: workbench/invoices/models.py:102 workbench/invoices/models.py:455
+#: workbench/activities/models.py:59 workbench/deals/models.py:68
+#: workbench/expenses/models.py:16 workbench/expenses/views.py:25
+#: workbench/invoices/models.py:102 workbench/invoices/models.py:459
 #: workbench/logbook/models.py:27 workbench/logbook/models.py:104
-#: workbench/offers/models.py:44 workbench/projects/models.py:62
+#: workbench/offers/models.py:44 workbench/projects/models.py:72
 #: workbench/services/models.py:54
 msgid "created at"
 msgstr "Erstellt um"
 
-#: workbench/activities/models.py:59
+#: workbench/activities/models.py:60
 msgid "completed at"
 msgstr "Erledigt um"
 
-#: workbench/activities/models.py:65
+#: workbench/activities/models.py:66
 #: workbench/templates/contacts/person_detail.html:52
-#: workbench/templates/deals/deal_detail.html:54
-#: workbench/templates/projects/project_detail.html:230
+#: workbench/templates/deals/deal_detail.html:55
+#: workbench/templates/projects/project_detail.html:232
 msgid "activity"
 msgstr "Aktivität"
 
-#: workbench/activities/models.py:77
+#: workbench/activities/models.py:78
 #, python-format
 msgid "completed on %(completed_on)s"
 msgstr "Geschlossen am %(completed_on)s"
 
-#: workbench/activities/models.py:84 workbench/deals/models.py:34
+#: workbench/activities/models.py:85 workbench/deals/models.py:34
 msgid "open"
 msgstr "Offen"
 
@@ -404,15 +405,15 @@ msgstr "Anstellungsverhältnisse"
 msgid "since %s"
 msgstr "Seit %s"
 
-#: workbench/awt/models.py:128 workbench/invoices/models.py:464
+#: workbench/awt/models.py:128 workbench/invoices/models.py:468
 msgid "starts on"
 msgstr "startet am"
 
 #: workbench/awt/models.py:130 workbench/deals/models.py:58
-#: workbench/invoices/models.py:97 workbench/invoices/models.py:450
+#: workbench/invoices/models.py:97 workbench/invoices/models.py:454
 #: workbench/invoices/views.py:39 workbench/logbook/forms.py:133
 #: workbench/logbook/models.py:40 workbench/logbook/models.py:122
-#: workbench/offers/models.py:56 workbench/projects/models.py:56
+#: workbench/offers/models.py:56 workbench/projects/models.py:66
 #: workbench/services/models.py:57
 #: workbench/templates/invoices/invoice_detail.html:31
 #: workbench/templates/logbook/loggedcost_detail.html:47
@@ -420,7 +421,7 @@ msgstr "startet am"
 msgid "description"
 msgstr "Beschreibung"
 
-#: workbench/awt/models.py:131 workbench/templates/awt/absence_list.html:31
+#: workbench/awt/models.py:131 workbench/templates/awt/absence_list.html:33
 msgid "is vacation"
 msgstr "sind Ferien"
 
@@ -459,7 +460,7 @@ msgstr "Kreise"
 msgid "is removed"
 msgstr "ist entfernt"
 
-#: workbench/circles/models.py:41 workbench/projects/models.py:333
+#: workbench/circles/models.py:41 workbench/projects/models.py:345
 msgid "role"
 msgstr "Rolle"
 
@@ -502,7 +503,7 @@ msgstr ""
 #: workbench/contacts/forms.py:193 workbench/contacts/forms.py:206
 #: workbench/contacts/forms.py:228 workbench/contacts/models.py:145
 #: workbench/invoices/forms.py:409 workbench/invoices/models.py:106
-#: workbench/projects/models.py:61
+#: workbench/projects/models.py:71
 msgid "type"
 msgstr "Typ"
 
@@ -663,7 +664,7 @@ msgid "Completely overrides the postal address if set."
 msgstr "Überschreibt die Postadresse komplett falls gesetzt."
 
 #: workbench/contacts/models.py:248 workbench/invoices/models.py:122
-#: workbench/invoices/models.py:462 workbench/offers/models.py:65
+#: workbench/invoices/models.py:466 workbench/offers/models.py:65
 #: workbench/templates/invoices/invoice_detail.html:35
 msgid "postal address"
 msgstr "Postadresse"
@@ -708,13 +709,13 @@ msgid "Automatically filled in when submitting a parseable account statement."
 msgstr ""
 "Wird automatisch gefüllt wenn ein einlesbarer Kontoauszug hochgeladen wird."
 
-#: workbench/credit_control/forms.py:179 workbench/invoices/models.py:83
+#: workbench/credit_control/forms.py:175 workbench/invoices/models.py:83
 #: workbench/templates/reporting/monthly_invoicing.html:16
 #: workbench/templates/reporting/open_items_list.html:21
 msgid "invoiced on"
 msgstr "Verrechnet am"
 
-#: workbench/credit_control/forms.py:183 workbench/tools/pdf.py:326
+#: workbench/credit_control/forms.py:179 workbench/tools/pdf.py:326
 #: workbench/tools/pdf.py:383 workbench/tools/pdf.py:394
 #: workbench/tools/pdf.py:421 workbench/tools/pdf.py:434
 #: workbench/tools/pdf.py:463
@@ -752,7 +753,7 @@ msgstr "Referenz-Nr."
 msgid "value date"
 msgstr "Valuta"
 
-#: workbench/credit_control/models.py:52 workbench/expenses/models.py:27
+#: workbench/credit_control/models.py:52 workbench/expenses/models.py:28
 #: workbench/expenses/views.py:34 workbench/expenses/views.py:62
 #: workbench/management/commands/export_debtors.py:69
 #: workbench/management/commands/export_debtors.py:96
@@ -839,7 +840,7 @@ msgid "declined"
 msgstr "Abgelehnt"
 
 #: workbench/deals/models.py:42 workbench/invoices/models.py:63
-#: workbench/invoices/models.py:437 workbench/projects/models.py:43
+#: workbench/invoices/models.py:441 workbench/projects/models.py:53
 #: workbench/templates/deals/deal_list.html:12
 #: workbench/templates/invoices/invoice_detail.html:12
 #: workbench/templates/reporting/overdrawn_projects.html:16
@@ -860,10 +861,10 @@ msgstr "Geschätzter Wert"
 msgid "status"
 msgstr "Status"
 
-#: workbench/deals/models.py:69 workbench/expenses/models.py:19
+#: workbench/deals/models.py:69 workbench/expenses/models.py:20
 #: workbench/invoices/models.py:86
 #: workbench/management/commands/export_debtors.py:96
-#: workbench/offers/models.py:53 workbench/projects/models.py:63
+#: workbench/offers/models.py:53 workbench/projects/models.py:73
 msgid "closed on"
 msgstr "Geschlossen am"
 
@@ -892,39 +893,39 @@ msgstr "Ist geschlossen"
 msgid "Once an expense report is closed it stays that way."
 msgstr "Eine geschlossene Spesenabrechnung bleibt geschlossen."
 
-#: workbench/expenses/models.py:17 workbench/logbook/models.py:30
+#: workbench/expenses/models.py:18 workbench/logbook/models.py:30
 #: workbench/logbook/models.py:106
 msgid "created by"
 msgstr "Erstellt von"
 
-#: workbench/expenses/models.py:31 workbench/logbook/models.py:120
+#: workbench/expenses/models.py:32 workbench/logbook/models.py:120
 #: workbench/services/models.py:73
 msgid "Total incl. tax for third-party services."
 msgstr "Total inkl. MwSt. bei Fremdleistungen."
 
-#: workbench/expenses/models.py:36 workbench/expenses/views.py:20
+#: workbench/expenses/models.py:37 workbench/expenses/views.py:20
 #: workbench/logbook/models.py:140
 msgid "expense report"
 msgstr "Spesenabrechnung"
 
-#: workbench/expenses/models.py:37 workbench/templates/base.html:64
+#: workbench/expenses/models.py:38 workbench/templates/base.html:64
 msgid "expense reports"
 msgstr "Spesenabrechnungen"
 
-#: workbench/expenses/models.py:62
+#: workbench/expenses/models.py:63
 msgid "Cannot update a closed expense report."
 msgstr "Kann eine geschlossene Spesenabrechnung nicht mehr bearbeiten."
 
-#: workbench/expenses/models.py:68
+#: workbench/expenses/models.py:69
 msgid "Cannot delete a closed expense report."
 msgstr "Kann eine geschlossene Spesenabrechnung nicht mehr löschen."
 
-#: workbench/expenses/models.py:78 workbench/projects/models.py:132
+#: workbench/expenses/models.py:75 workbench/projects/models.py:144
 #, python-format
 msgid "closed on %s"
 msgstr "geschlossen am %s"
 
-#: workbench/expenses/models.py:80 workbench/expenses/views.py:18
+#: workbench/expenses/models.py:77 workbench/expenses/views.py:18
 #: workbench/invoices/models.py:44 workbench/offers/models.py:26
 #: workbench/offers/models.py:38 workbench/templates/start.html:26
 msgid "In preparation"
@@ -989,7 +990,7 @@ msgid "Determined by project."
 msgstr "Durch Projekt bestimmt."
 
 #: workbench/invoices/forms.py:144 workbench/invoices/models.py:56
-#: workbench/templates/projects/project_detail.html:212
+#: workbench/templates/projects/project_detail.html:214
 #: workbench/tools/pdf.py:322
 msgid "Down payment"
 msgstr "Anzahlung"
@@ -1097,7 +1098,7 @@ msgid "Canceled"
 msgstr "Storniert"
 
 #: workbench/invoices/models.py:55
-#: workbench/templates/projects/project_detail.html:211
+#: workbench/templates/projects/project_detail.html:213
 msgid "Fixed amount"
 msgstr "Fixbetrag"
 
@@ -1127,19 +1128,19 @@ msgstr "Anzahlung angewendet auf"
 msgid "down payment total"
 msgstr "Anzahlungstotal"
 
-#: workbench/invoices/models.py:117 workbench/invoices/models.py:458
+#: workbench/invoices/models.py:117 workbench/invoices/models.py:462
 #: workbench/logbook/models.py:117 workbench/services/models.py:69
 #: workbench/templates/logbook/loggedcost_detail.html:40
 #: workbench/templates/reporting/monthly_invoicing.html:19
 msgid "third party costs"
 msgstr "Fremdkosten"
 
-#: workbench/invoices/models.py:119 workbench/invoices/models.py:460
+#: workbench/invoices/models.py:119 workbench/invoices/models.py:464
 msgid "Only used for statistical purposes."
 msgstr "Wird nur für statistische Auswertungen verwendet."
 
 #: workbench/invoices/models.py:123 workbench/offers/models.py:66
-#: workbench/projects/models.py:65
+#: workbench/projects/models.py:75
 msgid "code"
 msgstr "Code"
 
@@ -1186,31 +1187,31 @@ msgstr "Versendet am %(invoiced_on)s"
 msgid "Paid on %(closed_on)s"
 msgstr "Bezahlt am %(closed_on)s"
 
-#: workbench/invoices/models.py:284
+#: workbench/invoices/models.py:288
 msgid "down payment total CHF incl. tax"
 msgstr "Total CHF inkl. MwSt. Akonto"
 
-#: workbench/invoices/models.py:286
+#: workbench/invoices/models.py:290
 msgid "down payment total CHF"
 msgstr "Total CHF Akonto"
 
-#: workbench/invoices/models.py:289 workbench/offers/models.py:163
+#: workbench/invoices/models.py:293 workbench/offers/models.py:167
 msgid "total CHF incl. tax"
 msgstr "Total CHF inkl. MwSt."
 
-#: workbench/invoices/models.py:289 workbench/offers/models.py:163
+#: workbench/invoices/models.py:293 workbench/offers/models.py:167
 msgid "total CHF"
 msgstr "Total CHF"
 
-#: workbench/invoices/models.py:360
+#: workbench/invoices/models.py:364
 msgid "Invoices in preparation may be deleted, others not."
 msgstr "Rechnungen in Vorbereitung können gelöscht werden, andere nicht."
 
-#: workbench/invoices/models.py:382
+#: workbench/invoices/models.py:386
 msgid "project service"
 msgstr "Projektleistung"
 
-#: workbench/invoices/models.py:394
+#: workbench/invoices/models.py:398
 msgid ""
 "Cannot modify a service bound to an invoice which is not in preparation "
 "anymore."
@@ -1218,39 +1219,39 @@ msgstr ""
 "Kann Leistung von Rechnung, welche nicht mehr in Vorbereitung ist, nicht "
 "mehr bearbeiten."
 
-#: workbench/invoices/models.py:428
+#: workbench/invoices/models.py:432
 msgid "yearly"
 msgstr "jährlich"
 
-#: workbench/invoices/models.py:429
+#: workbench/invoices/models.py:433
 msgid "quarterly"
 msgstr "quartalsweise"
 
-#: workbench/invoices/models.py:430
+#: workbench/invoices/models.py:434
 msgid "monthly"
 msgstr "monatlich"
 
-#: workbench/invoices/models.py:431
+#: workbench/invoices/models.py:435
 msgid "weekly"
 msgstr "wöchentlich"
 
-#: workbench/invoices/models.py:465
+#: workbench/invoices/models.py:469
 msgid "ends on"
 msgstr "endet am"
 
-#: workbench/invoices/models.py:467
+#: workbench/invoices/models.py:471
 msgid "periodicity"
 msgstr "Periodizität"
 
-#: workbench/invoices/models.py:470
+#: workbench/invoices/models.py:474
 msgid "next period starts on"
 msgstr "nächste Periode beginnt am"
 
-#: workbench/invoices/models.py:477
+#: workbench/invoices/models.py:481
 msgid "recurring invoice"
 msgstr "Stapelrechnung"
 
-#: workbench/invoices/models.py:478 workbench/invoices/tasks.py:28
+#: workbench/invoices/models.py:482 workbench/invoices/tasks.py:28
 #: workbench/templates/base.html:58
 msgid "recurring invoices"
 msgstr "Stapelrechnungen"
@@ -1265,7 +1266,7 @@ msgstr "%(periodicity)s von %(from)s bis %(until)s"
 msgid "%(periodicity)s from %(from)s"
 msgstr "%(periodicity)s seit %(from)s"
 
-#: workbench/invoices/models.py:514
+#: workbench/invoices/models.py:522
 msgid "Period"
 msgstr "Zeitraum"
 
@@ -1273,7 +1274,7 @@ msgstr "Zeitraum"
 #: workbench/logbook/models.py:99 workbench/services/models.py:81
 #: workbench/templates/logbook/loggedcost_detail.html:17
 #: workbench/templates/logbook/loggedhours_detail.html:17
-#: workbench/templates/projects/project_detail.html:222
+#: workbench/templates/projects/project_detail.html:224
 msgid "service"
 msgstr "Leistung"
 
@@ -1296,9 +1297,9 @@ msgstr "Stundensatz"
 #: workbench/templates/logbook/loggedhours_detail.html:35
 #: workbench/templates/projects/project_detail.html:28
 #: workbench/templates/projects/project_detail.html:163
-#: workbench/templates/projects/project_detail.html:225
-#: workbench/templates/projects/project_list.html:21
-#: workbench/templates/start.html:58
+#: workbench/templates/projects/project_detail.html:227
+#: workbench/templates/projects/project_list.html:23
+#: workbench/templates/start.html:60
 msgid "hours"
 msgstr "Stunden"
 
@@ -1308,7 +1309,7 @@ msgstr "Stunden"
 #: workbench/templates/logbook/loggedcost_detail.html:35
 #: workbench/templates/projects/project_detail.html:36
 #: workbench/templates/projects/project_detail.html:167
-#: workbench/templates/projects/project_detail.html:228
+#: workbench/templates/projects/project_detail.html:230
 #: workbench/templates/projects/service_form.html:30
 msgid "cost"
 msgstr "Kosten"
@@ -1440,9 +1441,9 @@ msgstr "Abgelehnt"
 msgid "offered on"
 msgstr "offeriert am"
 
-#: workbench/offers/models.py:72 workbench/projects/models.py:313
+#: workbench/offers/models.py:72 workbench/projects/models.py:325
 #: workbench/templates/projects/project_detail.html:111
-#: workbench/templates/projects/project_detail.html:218
+#: workbench/templates/projects/project_detail.html:220
 #: workbench/templates/projects/service_form.html:36 workbench/tools/pdf.py:376
 #: workbench/tools/pdf.py:454
 msgid "offer"
@@ -1457,7 +1458,7 @@ msgstr "Offertdatum fehlt für den ausgewählten Status."
 msgid "Offered on %(offered_on)s"
 msgstr "Offeriert am %(offered_on)s"
 
-#: workbench/offers/models.py:171
+#: workbench/offers/models.py:175
 msgid ""
 "Offers can only be created from projects. Go to the project and add services "
 "first, then you'll be able to create the offer itself."
@@ -1465,7 +1466,7 @@ msgstr ""
 "Offerten können nur aus Projekten erstellt werden. Gehe zuerst zum Projekt, "
 "füge Leistungen hinzu, und dann kannst Du die eigentliche Offerte erstellen."
 
-#: workbench/offers/models.py:183
+#: workbench/offers/models.py:187
 msgid "Offers in preparation may be deleted, others not."
 msgstr "Offerten in Vorbereitung können gelöscht werden, andere nicht."
 
@@ -1473,7 +1474,7 @@ msgstr "Offerten in Vorbereitung können gelöscht werden, andere nicht."
 msgid "No offers in project."
 msgstr "Keine Offerten im Projekt."
 
-#: workbench/projects/__init__.py:10 workbench/projects/models.py:73
+#: workbench/projects/__init__.py:10 workbench/projects/models.py:83
 #: workbench/templates/base.html:26 workbench/templates/shortcuts.html:45
 msgid "projects"
 msgstr "Projekte"
@@ -1501,43 +1502,39 @@ msgstr ""
 msgid "Merge log into"
 msgstr "Erfasste Leistungen zuweisen"
 
-#: workbench/projects/models.py:34
-msgid "Acquisition"
-msgstr "Akquise"
-
-#: workbench/projects/models.py:35
-msgid "Maintenance"
-msgstr "Wartung"
-
-#: workbench/projects/models.py:36
+#: workbench/projects/models.py:45
 msgid "Order"
 msgstr "Auftrag"
 
-#: workbench/projects/models.py:37
+#: workbench/projects/models.py:46
+msgid "Maintenance"
+msgstr "Wartung"
+
+#: workbench/projects/models.py:47
 msgid "Internal"
 msgstr "Intern"
 
-#: workbench/projects/models.py:218
+#: workbench/projects/models.py:230
 msgid "Not bound to a particular service."
 msgstr "Nicht mit einer bestimmten Leistung verbunden."
 
-#: workbench/projects/models.py:318
+#: workbench/projects/models.py:330
 msgid "allow logging"
 msgstr "Leistungserfassung erlauben"
 
-#: workbench/projects/models.py:321
+#: workbench/projects/models.py:333
 msgid "Deactivate this for service entries which are only used for budgeting."
 msgstr "Deaktiviere dies, wenn die Leistung nur zur Budgetierung dient."
 
-#: workbench/projects/models.py:325
+#: workbench/projects/models.py:337
 msgid "is optional"
 msgstr "ist optional"
 
-#: workbench/projects/models.py:327
+#: workbench/projects/models.py:339
 msgid "Optional services to not count towards the offer total."
 msgstr "Optionale Leistungen werden nicht zum Offertentotal hinzugerechnet."
 
-#: workbench/projects/models.py:351
+#: workbench/projects/models.py:363
 msgid ""
 "Cannot delete a service bound to an offer which is not in preparation "
 "anymore."
@@ -1627,7 +1624,7 @@ msgstr "Anmelden"
 #: workbench/templates/deals/deal_detail.html:26
 #: workbench/templates/expenses/expensereport_detail.html:34
 #: workbench/templates/generic/object_detail.html:22
-#: workbench/templates/invoices/invoice_detail.html:101
+#: workbench/templates/invoices/invoice_detail.html:103
 #: workbench/templates/invoices/recurringinvoice_detail.html:20
 #: workbench/templates/logbook/loggedcost_detail.html:68
 #: workbench/templates/logbook/loggedhours_detail.html:60
@@ -1649,7 +1646,7 @@ msgstr "Abgrenzungen erstellen"
 #: workbench/templates/deals/deal_detail.html:28
 #: workbench/templates/expenses/expensereport_detail.html:40
 #: workbench/templates/generic/object_detail.html:25
-#: workbench/templates/invoices/invoice_detail.html:104
+#: workbench/templates/invoices/invoice_detail.html:106
 #: workbench/templates/invoices/recurringinvoice_detail.html:26
 #: workbench/templates/logbook/loggedcost_detail.html:72
 #: workbench/templates/logbook/loggedhours_detail.html:68
@@ -1680,7 +1677,7 @@ msgstr "Sichern"
 msgid "context"
 msgstr "Kontext"
 
-#: workbench/templates/awt/absence_list.html:26
+#: workbench/templates/awt/absence_list.html:28
 #, python-format
 msgid "%(days)s day(s) starting on %(start)s"
 msgstr "%(days)s Tag(e), ab %(start)s"
@@ -1829,7 +1826,7 @@ msgstr "Abbruch"
 msgid "continue"
 msgstr "Weiter"
 
-#: workbench/templates/deals/deal_detail.html:48
+#: workbench/templates/deals/deal_detail.html:49
 msgid "No activities"
 msgstr "Keine Aktivitäten"
 
@@ -1854,11 +1851,15 @@ msgid "delete"
 msgstr "Löschen"
 
 #: workbench/templates/generic/object_list.html:15
-#: workbench/templates/generic/object_list.html:20
+msgid "Reset the filter form"
+msgstr "Suchformular zurücksetzen"
+
+#: workbench/templates/generic/object_list.html:18
+#: workbench/templates/generic/object_list.html:23
 msgid "search"
 msgstr "Suche"
 
-#: workbench/templates/generic/object_list.html:59
+#: workbench/templates/generic/object_list.html:64
 msgid "of"
 msgstr "von"
 
@@ -1881,10 +1882,6 @@ msgstr "Zwischentotal"
 #: workbench/tools/pdf.py:314
 msgid "discount"
 msgstr "Rabatt"
-
-#: workbench/templates/invoices/invoice_detail.html:98
-msgid "report"
-msgstr "Bericht"
 
 #: workbench/templates/invoices/recurringinvoice_detail.html:23
 msgid "Create invoices"
@@ -1982,11 +1979,11 @@ msgstr "Sortieren"
 msgid "No services yet."
 msgstr "Noch keine Leistungen."
 
-#: workbench/templates/projects/project_detail.html:213
+#: workbench/templates/projects/project_detail.html:215
 msgid "Services from logbook"
 msgstr "Leistungen aus dem Logbuch"
 
-#: workbench/templates/projects/project_detail.html:214
+#: workbench/templates/projects/project_detail.html:216
 msgid "Services from offer"
 msgstr "Leistungen aus Offerte"
 
@@ -2069,23 +2066,23 @@ msgstr "diese Woche"
 msgid "active projects"
 msgstr "Aktive Projekte"
 
-#: workbench/templates/start.html:67
+#: workbench/templates/start.html:69
 msgid "no active projects"
 msgstr "Keine aktiven Projekte"
 
-#: workbench/templates/start.html:94
+#: workbench/templates/start.html:98
 msgid "no important activities"
 msgstr "Keine wichtigen Aktivitäten"
 
-#: workbench/templates/start.html:104
+#: workbench/templates/start.html:108
 msgid "today's hours"
 msgstr "Stunden von heute"
 
-#: workbench/templates/start.html:120 workbench/templates/start.html:142
+#: workbench/templates/start.html:124 workbench/templates/start.html:146
 msgid "no hours today"
 msgstr "keine Stunden heute"
 
-#: workbench/templates/start.html:126
+#: workbench/templates/start.html:130
 msgid "all users' hours"
 msgstr "Stunden von allen"
 
@@ -2227,3 +2224,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Acquisition"
+#~ msgstr "Akquise"
+
+#~ msgid "report"
+#~ msgstr "Bericht"

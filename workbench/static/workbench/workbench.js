@@ -128,9 +128,8 @@ $(function() {
     }
   })
 
-  // ... and always remove the saved search params when clicking on an h1
-  $("h1").on("click", "a", function() {
-    const key = `search-${this.getAttribute("href")}`
+  $("h1, [data-reset-filter]").on("click", function() {
+    const key = `search-${window.location.pathname}`
     window.localStorage.removeItem(key)
   })
 
