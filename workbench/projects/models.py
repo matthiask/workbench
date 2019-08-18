@@ -25,15 +25,13 @@ class ProjectQuerySet(SearchQuerySet):
 
 @model_urls
 class Project(Model):
-    ACQUISITION = "acquisition"
-    MAINTENANCE = "maintenance"
     ORDER = "order"
+    MAINTENANCE = "maintenance"
     INTERNAL = "internal"
 
     TYPE_CHOICES = [
-        (ACQUISITION, _("Acquisition")),
-        (MAINTENANCE, _("Maintenance")),
         (ORDER, _("Order")),
+        (MAINTENANCE, _("Maintenance")),
         (INTERNAL, _("Internal")),
     ]
 
@@ -119,7 +117,6 @@ class Project(Model):
             return "light"
 
         return {
-            self.ACQUISITION: "info",
             self.MAINTENANCE: "secondary",
             self.ORDER: "success",
             self.INTERNAL: "warning",

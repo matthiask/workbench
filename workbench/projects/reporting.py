@@ -42,7 +42,7 @@ def overdrawn_projects():
         for project in projects
     ]
 
-    TYPE_ORDERING = {Project.ORDER: 1, Project.ACQUISITION: 1, Project.MAINTENANCE: 2}
+    TYPE_ORDERING = {Project.ORDER: 1, Project.MAINTENANCE: 2}
 
     return sorted(
         (

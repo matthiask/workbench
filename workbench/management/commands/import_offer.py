@@ -105,7 +105,7 @@ class Command(BaseCommand):
                             title=row["fields"]["name"],
                             description="",
                             owned_by_id=row["fields"]["manager"],
-                            type=Project.ACQUISITION,
+                            type=Project.ORDER,
                             created_at=parse_datetime(row["fields"]["created"]),
                             **contacts[row["fields"]["contact"]]
                         ),
