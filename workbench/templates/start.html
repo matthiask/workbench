@@ -127,7 +127,7 @@
 
     <div class="card mb-3">
       <div class="card-header"><h3 class="my-0">
-        <a href="{% url 'logbook_loggedhours_list' %}?rendered_by=">{% trans "all users' hours" %}</a>
+        <a href="{% url 'logbook_loggedhours_list' %}">{% trans "all users' hours" %}</a>
       </h3></div>
 
       {% if user.all_users_hours %}
