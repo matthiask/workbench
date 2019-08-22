@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-22 08:27+0200\n"
+"POT-Creation-Date: 2019-08-22 14:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1342,8 +1342,8 @@ msgid "Cannot delete logged hours from past weeks."
 msgstr "Kann Stunden vergangener Wochen nicht löschen."
 
 #: workbench/logbook/models.py
-msgid "are expenses"
-msgstr "sind Spesen"
+msgid "paid from my own pocket"
+msgstr "mit eigenem Geld bezahlt"
 
 #: workbench/logbook/models.py
 msgid "logged cost"
@@ -2159,6 +2159,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "are expenses"
+#~ msgstr "sind Spesen"
 
 #~ msgid "Acquisition"
 #~ msgstr "Akquise"

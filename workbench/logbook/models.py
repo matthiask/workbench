@@ -131,7 +131,7 @@ class LoggedCost(Model):
     )
     archived_at = models.DateTimeField(_("archived at"), blank=True, null=True)
 
-    are_expenses = models.BooleanField(_("are expenses"), default=False)
+    are_expenses = models.BooleanField(_("paid from my own pocket"), default=False)
     expense_report = models.ForeignKey(
         "expenses.ExpenseReport",
         on_delete=models.PROTECT,
