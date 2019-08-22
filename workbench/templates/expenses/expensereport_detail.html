@@ -20,10 +20,12 @@
       <th class="text-right">{% trans 'expenses' %}</th>
       <td>
         {% for cost in object.expenses.all reversed %}
-          {{ cost.rendered_on|local_date_format }}<br>
-          {% link_or_none cost.project %}
-          {{ cost.description }}<br>
-          {{ cost.third_party_costs|currency }}<br>
+          <a href="{{ cost.urls.detail }}" data-toggle="ajaxmodal">
+            {{ cost.rendered_on|local_date_format }}<br>
+            {{ cost.project|h }}<br>
+            {{ cost.description }}<br>
+            {{ cost.third_party_costs|currency }}<br>
+          </a>
           <br>
         {% endfor %}
       </td>
