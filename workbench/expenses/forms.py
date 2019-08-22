@@ -28,11 +28,11 @@ class ExpenseReportForm(ModelForm):
             required=False,
         )
 
-        expenses = LoggedCost.objects.expenses(user=self.request.user)
+        expenses = LoggedCost.objects.expenses(user=self.instance.owned_by)
         if self.instance.pk:
             self.fields["expenses"] = forms.ModelMultipleChoiceField(
                 queryset=expenses.filter(
-                    Q(expense_report=self.instance.pk) | Q(expense_report__isnull=True)
+                    Q(expense_report=self.instance) | Q(expense_report__isnull=True)
                 ),
                 label=_("expenses"),
                 widget=forms.CheckboxSelectMultiple,
