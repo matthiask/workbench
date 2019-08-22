@@ -52,7 +52,10 @@ def pull_database(namespace):
 
 @task(alias="mm")
 def makemessages():
-    local("venv/bin/python manage.py makemessages -a -i venv -i htmlcov")
+    local(
+        "venv/bin/python manage.py makemessages -a -i venv -i htmlcov"
+        " --add-location file"
+    )
 
 
 @task(alias="cm")
