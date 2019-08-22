@@ -28,10 +28,11 @@ class ExpenseReportForm(ModelForm):
             required=False,
         )
 
-        expenses = LoggedCost.objects.expenses(user=self.instance.owned_by)
         if self.instance.pk:
             self.fields["expenses"] = forms.ModelMultipleChoiceField(
-                queryset=expenses.filter(
+                queryset=LoggedCost.objects.expenses(
+                    user=self.instance.owned_by
+                ).filter(
                     Q(expense_report=self.instance) | Q(expense_report__isnull=True)
                 ),
                 label=_("expenses"),
@@ -44,7 +45,9 @@ class ExpenseReportForm(ModelForm):
             self.instance.created_by = self.request.user
             self.instance.owned_by = self.request.user
 
-            expenses = expenses.filter(expense_report__isnull=True)
+            expenses = LoggedCost.objects.expenses(user=self.request.user).filter(
+                expense_report__isnull=True
+            )
             self.fields["expenses"] = forms.ModelMultipleChoiceField(
                 queryset=expenses,
                 label=_("expenses"),
