@@ -281,3 +281,21 @@ class OffersTest(TestCase):
         self.assertEqual(gs["service_hours"], Decimal("60.00"))  # Not 70
 
         self.assertEqual(project.services.logging().count(), 2)
+
+    def test_offer_copying(self):
+        offer = factories.OfferFactory.create()
+        factories.ServiceFactory.create(project=offer.project, offer=offer)
+
+        self.client.force_login(offer.owned_by)
+        response = self.client.get(offer.urls["copy"])
+        self.assertContains(
+            response, 'data-autocomplete-url="/projects/autocomplete/?only_open=on"'
+        )
+
+        project = factories.ProjectFactory.create()
+        response = self.client.post(offer.urls["copy"], {"project-project": project.pk})
+        self.assertEqual(response.status_code, 299)
+        self.assertEqual(response.json(), {"redirect": project.get_absolute_url()})
+
+        self.assertEqual(project.offers.count(), 1)
+        self.assertEqual(project.services.count(), 1)

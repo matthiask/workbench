@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-30 14:59+0200\n"
+"POT-Creation-Date: 2019-08-30 16:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1429,6 +1429,11 @@ msgstr "Offerten in Vorbereitung können gelöscht werden, andere nicht."
 #: workbench/offers/views.py
 msgid "No offers in project."
 msgstr "Keine Offerten im Projekt."
+
+#: workbench/offers/views.py
+#, python-format
+msgid "Copy %s to project"
+msgstr "%s zu Projekt kopieren"
 
 #: workbench/projects/__init__.py workbench/projects/models.py
 #: workbench/templates/base.html workbench/templates/shortcuts.html
