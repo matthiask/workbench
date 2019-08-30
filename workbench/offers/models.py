@@ -199,6 +199,9 @@ class Offer(ModelWithTotal):
             title=self.title,
             description=self.description,
             owned_by=owned_by,
+            discount=self.discount,
+            liable_to_vat=self.liable_to_vat,
+            show_service_details=self.show_service_details,
         )
         for service in self.services.all():
             new = Service(
