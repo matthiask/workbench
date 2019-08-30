@@ -3,7 +3,7 @@ from django.conf.urls import url
 from workbench import generic
 from workbench.offers.forms import OfferForm, OfferSearchForm
 from workbench.offers.models import Offer
-from workbench.offers.views import OfferPDFView
+from workbench.offers.views import OfferPDFView, copy_offer
 
 
 urlpatterns = [
@@ -33,4 +33,5 @@ urlpatterns = [
         name="offers_offer_delete",
     ),
     url(r"^(?P<pk>\d+)/pdf/$", OfferPDFView.as_view(), name="offers_offer_pdf"),
+    url(r"^(?P<pk>\d+)/copy/$", copy_offer, name="offers_offer_copy"),
 ]

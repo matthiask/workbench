@@ -11,7 +11,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.projects.models import Project
+from workbench.projects.models import Project, Service
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import ModelWithTotal, SearchQuerySet, Z
 from workbench.tools.urls import model_urls
@@ -192,3 +192,30 @@ class Offer(ModelWithTotal):
     @property
     def is_rejected(self):
         return self.status == self.REJECTED
+
+    def copy_to(self, *, project, owned_by):
+        offer = Offer.objects.create(
+            project=project,
+            title=self.title,
+            description=self.description,
+            owned_by=owned_by,
+        )
+        for service in self.services.all():
+            new = Service(
+                project=project,
+                offer=offer,
+                allow_logging=service.allow_logging,
+                is_optional=service.is_optional,
+                role=service.role,
+                title=service.title,
+                description=service.description,
+                position=service.position,
+                effort_type=service.effort_type,
+                effort_hours=service.effort_hours,
+                effort_rate=service.effort_rate,
+                cost=service.cost,
+                third_party_costs=service.third_party_costs,
+            )
+            new.save(skip_related_model=True)
+        offer.save()
+        return offer
