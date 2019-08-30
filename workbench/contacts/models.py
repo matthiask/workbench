@@ -198,6 +198,15 @@ class PhoneNumber(PersonDetail):
                 errors["phone_number"] = _("Phone number invalid.")
         raise_if_errors(errors, exclude)
 
+    def pretty_number(self):
+        try:
+            return phonenumbers.format_number(
+                phonenumbers.parse(self.phone_number),
+                phonenumbers.PhoneNumberFormat.INTERNATIONAL,
+            )
+        except Exception:
+            return self.phone_number
+
 
 class EmailAddress(PersonDetail):
     person = models.ForeignKey(

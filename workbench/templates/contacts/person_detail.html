@@ -14,7 +14,7 @@
   <div class="col-lg-4">
     {% for phone in person.phonenumbers.all %}
       <strong>{{ phone.type|capfirst }}:</strong><br>
-      <a href="tel:{{ phone.phone_number }}">{{ phone.phone_number }}</a>
+      <a href="tel:{{ phone.phone_number }}">{{ phone.pretty_number }}</a>
       <br>
     {% endfor %}
     {% for email in person.emailaddresses.all %}
