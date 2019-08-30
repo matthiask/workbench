@@ -196,3 +196,23 @@ class ContactsTest(TestCase):
         nr = PhoneNumber(phone_number="055 511 11 41", **kw)
         nr.full_clean()
         self.assertEqual(nr.phone_number, "+41555111141")
+
+    def test_select(self):
+        person = factories.PersonFactory.create()
+        self.client.force_login(person.primary_contact)
+
+        response = self.client.get(person.urls["select"])
+        self.assertContains(
+            response, 'data-autocomplete-url="/contacts/people/autocomplete/"'
+        )
+
+        response = self.client.post(person.urls["select"], {"person-person": person.pk})
+        self.assertEqual(response.status_code, 299)
+        self.assertEqual(response.json(), {"redirect": person.get_absolute_url()})
+
+    def test_phone_number_formatting(self):
+        pn = PhoneNumber()
+        pn.phone_number = "+41791234567"
+        self.assertEqual(pn.pretty_number, "+41 79 123 45 67")
+        pn.phone_number = "abcd"  # Completely bogus
+        self.assertEqual(pn.pretty_number, "abcd")

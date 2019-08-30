@@ -290,3 +290,13 @@ class PostalAddressSelectionForm(ModelForm):
                 ),
             )
             # repr(postal_addresses)
+
+
+class PersonAutocompleteForm(forms.Form):
+    person = forms.ModelChoiceField(
+        queryset=Person.objects.all(), widget=Autocomplete(model=Person), label=""
+    )
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("prefix", "person")
+        super().__init__(*args, **kwargs)

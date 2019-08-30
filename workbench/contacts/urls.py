@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from workbench import generic
 from workbench.contacts.forms import OrganizationForm, PersonForm
 from workbench.contacts.models import Organization, Person
-from workbench.contacts.views import OrganizationListView, PersonListView
+from workbench.contacts.views import OrganizationListView, PersonListView, select
 
 
 urlpatterns = [
@@ -47,6 +47,7 @@ urlpatterns = [
         ),
         name="contacts_person_autocomplete",
     ),
+    url(r"^people/select/$", select, name="contacts_person_select"),
     url(
         r"^people/(?P<pk>\d+)/$",
         generic.DetailView.as_view(model=Person),

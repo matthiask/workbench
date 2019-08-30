@@ -198,6 +198,7 @@ class PhoneNumber(PersonDetail):
                 errors["phone_number"] = _("Phone number invalid.")
         raise_if_errors(errors, exclude)
 
+    @property
     def pretty_number(self):
         try:
             return phonenumbers.format_number(

@@ -147,12 +147,12 @@ $(function() {
     } else if (e.keyCode === 72) {
       // h
       window.location.href = "/"
-    } else if (e.keyCode === 67 && !e.shiftKey) {
+    } else if (e.keyCode === 67 && e.shiftKey) {
+      // Shift-c
+      window.openModalFromUrl("/contacts/people/select/")
+    } else if (e.keyCode === 67) {
       // c
       window.location.href = "/contacts/people/"
-    } else if (e.keyCode === 67 && e.shiftKey) {
-      // C
-      window.location.href = "/contacts/organizations/"
     } else if (e.keyCode === 80 && e.shiftKey) {
       // Shift-p
       window.openModalFromUrl("/projects/select/")

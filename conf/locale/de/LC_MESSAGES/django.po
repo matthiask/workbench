@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-22 14:56+0200\n"
+"POT-Creation-Date: 2019-08-30 14:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -534,7 +534,6 @@ msgid "organization"
 msgstr "Organisation"
 
 #: workbench/contacts/models.py workbench/templates/base.html
-#: workbench/templates/shortcuts.html
 msgid "organizations"
 msgstr "Organisationen"
 
@@ -652,6 +651,10 @@ msgstr "Postadresse"
 #: workbench/contacts/models.py workbench/templates/contacts/person_form.html
 msgid "postal addresses"
 msgstr "Postadressen"
+
+#: workbench/contacts/views.py workbench/templates/shortcuts.html
+msgid "Jump to person"
+msgstr "Zu Person springen"
 
 #: workbench/credit_control/__init__.py
 msgid "credit control"
