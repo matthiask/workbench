@@ -209,7 +209,10 @@ class LoggedHoursForm(ModelForm):
         if self.instance.pk:
             self.fields.pop("service_title")
             self.fields.pop("service_description")
-            if self.instance.rendered_on < monday():
+            if (
+                self.instance.rendered_by.enforce_same_week_logging
+                and self.instance.rendered_on < monday()
+            ):
                 self.fields["hours"].disabled = True
                 self.fields["rendered_by"].disabled = True
                 self.fields["rendered_on"].disabled = True

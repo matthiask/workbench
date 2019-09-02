@@ -62,7 +62,7 @@ class LogbookTest(TestCase):
         response = send()
         self.assertContains(response, "This project is already closed.")
 
-    def test_no_same_week_logging(self):
+    def test_past_week_logging(self):
         service = factories.ServiceFactory.create()
         project = service.project
         user = factories.UserFactory.create(enforce_same_week_logging=False)
@@ -81,6 +81,28 @@ class LogbookTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 201)
+
+        entry = LoggedHours.objects.get()
+        response = self.client.get(
+            entry.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertContains(
+            response,
+            '<input type="number" name="hours" value="0.1" step="0.1" class="form-control" required id="id_hours">',  # noqa
+            html=True,
+        )
+
+        user.enforce_same_week_logging = True
+        user.save()
+
+        response = self.client.get(
+            entry.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertContains(
+            response,
+            '<input type="number" name="hours" value="0.1" step="0.1" class="form-control" required disabled id="id_hours">',  # noqa
+            html=True,
+        )
 
     def test_log_and_create_service(self):
         project = factories.ProjectFactory.create()
