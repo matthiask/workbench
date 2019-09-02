@@ -50,6 +50,6 @@ def copy_offer(request, pk):
         return JsonResponse({"redirect": new.get_absolute_url()}, status=299)
     return render(
         request,
-        "projects/select_project.html",
+        "generic/select_object.html",
         {"form": form, "title": _("Copy %s to project") % offer},
     )

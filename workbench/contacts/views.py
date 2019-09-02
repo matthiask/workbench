@@ -49,6 +49,6 @@ def select(request):
         )
     return render(
         request,
-        "contacts/select_person.html",
+        "generic/select_object.html",
         {"form": form, "title": _("Jump to person")},
     )

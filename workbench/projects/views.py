@@ -14,7 +14,7 @@ def select(request):
         )
     return render(
         request,
-        "projects/select_project.html",
+        "generic/select_object.html",
         {"form": form, "title": _("Jump to project")},
     )
 

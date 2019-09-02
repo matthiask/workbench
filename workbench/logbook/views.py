@@ -10,6 +10,6 @@ def createhours(request):
         return redirect(form.cleaned_data["project"].urls["createhours"])
     return render(
         request,
-        "projects/select_project.html",
+        "generic/select_object.html",
         {"form": form, "title": _("Select project for logging")},
     )
