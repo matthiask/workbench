@@ -144,10 +144,7 @@ class Migration(migrations.Migration):
                         verbose_name="down payment total",
                     ),
                 ),
-                (
-                    "postal_address",
-                    models.TextField(blank=True, verbose_name="postal address"),
-                ),
+                ("postal_address", models.TextField(verbose_name="postal address")),
                 ("_code", models.IntegerField(verbose_name="code")),
                 (
                     "payment_notice",

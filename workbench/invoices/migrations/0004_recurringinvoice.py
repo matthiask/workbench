@@ -90,10 +90,7 @@ class Migration(migrations.Migration):
                         default=django.utils.timezone.now, verbose_name="created at"
                     ),
                 ),
-                (
-                    "postal_address",
-                    models.TextField(blank=True, verbose_name="postal address"),
-                ),
+                ("postal_address", models.TextField(verbose_name="postal address")),
                 (
                     "starts_on",
                     models.DateField(

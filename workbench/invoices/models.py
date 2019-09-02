@@ -119,7 +119,7 @@ class Invoice(ModelWithTotal):
         help_text=_("Only used for statistical purposes."),
     )
 
-    postal_address = models.TextField(_("postal address"), blank=True)
+    postal_address = models.TextField(_("postal address"))
     _code = models.IntegerField(_("code"))
     _fts = models.TextField(editable=False, blank=True)
 
@@ -463,7 +463,7 @@ class RecurringInvoice(ModelWithTotal):
         default=Z,
         help_text=_("Only used for statistical purposes."),
     )
-    postal_address = models.TextField(_("postal address"), blank=True)
+    postal_address = models.TextField(_("postal address"))
 
     starts_on = models.DateField(_("starts on"), default=date.today)
     ends_on = models.DateField(_("ends on"), blank=True, null=True)

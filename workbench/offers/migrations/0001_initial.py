@@ -108,10 +108,7 @@ class Migration(migrations.Migration):
                         verbose_name="status",
                     ),
                 ),
-                (
-                    "postal_address",
-                    models.TextField(blank=True, verbose_name="postal address"),
-                ),
+                ("postal_address", models.TextField(verbose_name="postal address")),
                 ("_code", models.IntegerField(verbose_name="code")),
                 (
                     "owned_by",

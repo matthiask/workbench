@@ -62,7 +62,7 @@ class Offer(ModelWithTotal):
         _("status"), choices=STATUS_CHOICES, default=IN_PREPARATION
     )
 
-    postal_address = models.TextField(_("postal address"), blank=True)
+    postal_address = models.TextField(_("postal address"))
     _code = models.IntegerField(_("code"))
 
     objects = OfferQuerySet.as_manager()

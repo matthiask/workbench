@@ -428,7 +428,7 @@ class InvoicesTest(TestCase):
         self.assertContains(response, "does not belong to")
 
     def test_update_invoice(self):
-        invoice = factories.InvoiceFactory.create(contact=None)
+        invoice = factories.InvoiceFactory.create(contact=None, postal_address="Test")
         self.client.force_login(invoice.owned_by)
         response = self.client.post(invoice.urls["update"], invoice_to_dict(invoice))
         self.assertContains(response, "No contact selected.")
@@ -540,6 +540,7 @@ class InvoicesTest(TestCase):
             type=Invoice.FIXED,
             _code=0,
             status=Invoice.SENT,
+            postal_address="Test",
         )
         msg = ["Invoice and/or due date missing for selected state."]
 
@@ -559,6 +560,7 @@ class InvoicesTest(TestCase):
                 type=Invoice.FIXED,
                 _code=0,
                 status=Invoice.SENT,
+                postal_address="Test",
                 invoiced_on=date.today(),
                 due_on=date.today() - timedelta(days=1),
             ).full_clean()
@@ -574,6 +576,7 @@ class InvoicesTest(TestCase):
                 type=Invoice.DOWN_PAYMENT,
                 _code=0,
                 status=Invoice.IN_PREPARATION,
+                postal_address="Test",
             ).full_clean()
         self.assertEqual(
             list(cm.exception),
@@ -608,6 +611,7 @@ class InvoicesTest(TestCase):
             due_on=date.today(),
             closed_on=date.today(),
             status=Invoice.PAID,
+            postal_address="Test",
         )
         self.client.force_login(invoice.owned_by)
 
