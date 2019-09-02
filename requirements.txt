@@ -5,10 +5,10 @@ certifi==2019.6.16
 chardet==3.0.4
 coverage==4.5.4
 dj-database-url==0.5.0
-Django==2.2.4
+Django==2.2.5
 django-admin-ordering==0.11.0
 django-authlib==0.9.1
-django-bootstrap4==0.0.8
+django-bootstrap4==1.0.1
 django-countries==5.4
 django-debug-toolbar==2.0
 django-fineforms==0.5.0
@@ -17,7 +17,7 @@ django-vanilla-views==1.0.6
 entrypoints==0.3
 et-xmlfile==1.0.1
 factory-boy==2.12.0
-Faker==2.0.0
+Faker==2.0.1
 flake8==3.7.8
 gunicorn==19.9.0
 idna==2.8
@@ -26,7 +26,7 @@ lxml==4.4.1
 mailchimp3==3.0.7
 mccabe==0.6.1
 oauthlib==3.1.0
-openpyxl==2.6.2
+openpyxl==2.6.3
 pdfdocument==3.3
 phonenumbers==8.10.17
 Pillow==6.1.0

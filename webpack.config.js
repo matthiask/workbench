@@ -40,9 +40,11 @@ module.exports = {
             // Loads a SASS/SCSS file and compiles it to CSS
             loader: "sass-loader",
             options: {
-              includePaths: [
-                path.resolve(path.join(__dirname, "node_modules")),
-              ],
+              sassOptions: {
+                includePaths: [
+                  path.resolve(path.join(__dirname, "node_modules")),
+                ],
+              },
             },
           },
         ],

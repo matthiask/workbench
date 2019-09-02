@@ -10,11 +10,11 @@
   ],
   "dependencies": {
     "autoprefixer": "^9.6.1",
-    "babel-eslint": "^10.0.2",
+    "babel-eslint": "^10.0.3",
     "bootstrap": "^4.3.1",
     "css-loader": "^3.2.0",
-    "eslint": "^6.1.0",
-    "eslint-config-prettier": "^6.0.0",
+    "eslint": "^6.3.0",
+    "eslint-config-prettier": "^6.1.0",
     "eslint-plugin-prettier": "^3.1.0",
     "jquery": "^3.4.1",
     "mini-css-extract-plugin": "^0.8.0",
@@ -22,9 +22,9 @@
     "popper.js": "^1.14.7",
     "postcss-loader": "^3.0.0",
     "prettier": "^1.18.2",
-    "sass-loader": "^7.2.0",
+    "sass-loader": "^8.0.0",
     "style-loader": "^1.0.0",
-    "webpack": "^4.39.2",
+    "webpack": "^4.39.3",
     "webpack-cli": "^3.3.7"
   },
   "prettier": {
