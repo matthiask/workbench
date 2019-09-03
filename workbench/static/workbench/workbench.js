@@ -181,7 +181,9 @@ $(function() {
       }
     } else if (e.keyCode === 81) {
       // q
-      $(".navbar input[type=search]").focus()
+      $(".navbar input[type=search]")
+        .focus()
+        .select()
     } else if (e.keyCode === 13) {
       $(e.target)
         .parents("form")
