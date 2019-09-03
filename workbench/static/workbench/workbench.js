@@ -23,7 +23,7 @@ $(function() {
           .first()
           .focus()
       }
-    }, 500)
+    }, 100)
 
     initWidgets()
   }
