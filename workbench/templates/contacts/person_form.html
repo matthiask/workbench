@@ -23,10 +23,16 @@
       {% if form.formsets %}
         <h4>{% trans 'phone numbers' %}</h4>
         {% formset form.formsets.phonenumbers "phonenumbers" %}
-        <div id="{{ form_id }}" class="mb-1">
-          {{ form.id }}
-          {% ff_errors form %}
-          {% ff_fields form %}
+        <div id="{{ form_id }}" class="card mb-3">
+          <div class="card-body">
+            {{ form.id }}
+            {% ff_errors form %}
+            <div class="row">
+              <div class="col-4">{% ff_field form.type %}</div>
+              <div class="col-8">{% ff_field form.phone_number %}</div>
+            </div>
+            {% ff_fields form exclude='type,phone_number' %}
+          </div>
         </div>
         {% endformset %}
         <a href="#" class="btn btn-secondary"
@@ -36,10 +42,16 @@
 
         <h4 class="mt-3">{% trans 'email addresses' %}</h4>
         {% formset form.formsets.emailaddresses "emailaddresses" %}
-        <div id="{{ form_id }}" class="mb-1">
-          {{ form.id }}
-          {% ff_errors form %}
-          {% ff_fields form %}
+        <div id="{{ form_id }}" class="card mb-3">
+          <div class="card-body">
+            {{ form.id }}
+            {% ff_errors form %}
+            <div class="row">
+              <div class="col-4">{% ff_field form.type %}</div>
+              <div class="col-8">{% ff_field form.email %}</div>
+            </div>
+            {% ff_fields form exclude='type,email' %}
+          </div>
         </div>
         {% endformset %}
         <a href="#" class="btn btn-secondary"
@@ -49,10 +61,23 @@
 
         <h4 class="mt-3">{% trans 'postal addresses' %}</h4>
         {% formset form.formsets.postaladdresses "postaladdresses" %}
-        <div id="{{ form_id }}" class="mb-1">
-          {{ form.id }}
-          {% ff_errors form %}
-          {% ff_fields form %}
+        <div id="{{ form_id }}" class="card mb-3">
+          <div class="card-body">
+            {{ form.id }}
+            {% ff_errors form %}
+            {% ff_field form.type %}
+            <div class="row">
+              <div class="col-8">{% ff_field form.street %}</div>
+              <div class="col-4">{% ff_field form.house_number %}</div>
+            </div>
+            {% ff_field form.address_suffix %}
+            <div class="row">
+              <div class="col-3">{% ff_field form.postal_code %}</div>
+              <div class="col-6">{% ff_field form.city %}</div>
+              <div class="col-3">{% ff_field form.country %}</div>
+            </div>
+            {% ff_fields form exclude='type,street,house_number,address_suffix,postal_code,city,country' %}
+          </div>
         </div>
         {% endformset %}
         <a href="#" class="btn btn-secondary"
