@@ -93,6 +93,7 @@ class LoggedCostSearchForm(forms.Form):
         widget=Autocomplete(model=Organization),
         label="",
     )
+    expenses = forms.BooleanField(required=False, label=_("expenses"))
     service = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
 
     def __init__(self, *args, **kwargs):
@@ -109,6 +110,8 @@ class LoggedCostSearchForm(forms.Form):
             queryset = queryset.filter(project=data.get("project"))
         if data.get("organization"):
             queryset = queryset.filter(project__customer=data.get("organization"))
+        if data.get("expenses"):
+            queryset = queryset.filter(are_expenses=True)
 
         # "hidden" filters
         if data.get("service") == 0:

@@ -346,6 +346,7 @@ class LogbookTest(TestCase):
         valid("rendered_by=" + str(user.pk))
         valid("project=" + str(cost.project.pk))
         valid("organization=" + str(cost.project.customer.pk))
+        valid("expenses=on")
         valid("service=0")
         valid("service=" + str(service.pk))
         valid("xlsx=1")

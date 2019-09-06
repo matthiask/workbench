@@ -39,10 +39,15 @@
           /
           {% if object.are_expenses %}{% trans 'expenses' %}{% else %}{% trans 'third party costs' %}{% endif %}:
           {{ object.third_party_costs|currency }}
-          {% if object.expenses_reimbursed_at %}({% trans 'reimbursed' %}){% endif %}
         {% endif %}
       </td>
     </tr>
+    {% if object.are_expenses %}
+      <tr>
+        <th class="text-right">{% trans 'expense report' %}</th>
+        <td>{% link_or_none object.expense_report%}</td>
+      </tr>
+    {% endif %}
     <tr>
       <th class="text-right">{% trans 'description' %}</th>
       <td>{{ object.description|linebreaksbr }}</td>
