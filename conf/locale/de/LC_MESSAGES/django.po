@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-30 16:49+0200\n"
+"POT-Creation-Date: 2019-09-06 13:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -850,6 +850,7 @@ msgid "%(status)s on %(closed_on)s"
 msgstr "%(status)s am %(closed_on)s"
 
 #: workbench/expenses/__init__.py workbench/expenses/forms.py
+#: workbench/logbook/forms.py
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 msgid "expenses"
@@ -874,6 +875,7 @@ msgstr "Total inkl. MwSt. bei Fremdleistungen."
 
 #: workbench/expenses/models.py workbench/expenses/views.py
 #: workbench/logbook/models.py
+#: workbench/templates/logbook/loggedcost_detail.html
 msgid "expense report"
 msgstr "Spesenabrechnung"
 
@@ -1859,10 +1861,6 @@ msgid "rendered"
 msgstr "Erbracht"
 
 #: workbench/templates/logbook/loggedcost_detail.html
-msgid "reimbursed"
-msgstr "zurückerstattet"
-
-#: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 msgid "invoicing"
 msgstr "Verrechnung"
@@ -1909,16 +1907,16 @@ msgid "offers PDF"
 msgstr "Offerten-PDF"
 
 #: workbench/templates/projects/project_detail.html
-msgid "Merge"
-msgstr "Zusammenführen"
+msgid "Sort"
+msgstr "Sortieren"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Merge or delete"
+msgstr "Zusammenführen oder löschen"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Move to other project"
 msgstr "Zu anderem Projekt verschieben"
-
-#: workbench/templates/projects/project_detail.html
-msgid "Sort"
-msgstr "Sortieren"
 
 #: workbench/templates/projects/project_detail.html
 msgid "No services yet."
@@ -2167,6 +2165,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "reimbursed"
+#~ msgstr "zurückerstattet"
+
+#~ msgid "Merge"
+#~ msgstr "Zusammenführen"
 
 #~ msgid "are expenses"
 #~ msgstr "sind Spesen"
