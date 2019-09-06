@@ -146,7 +146,7 @@ class CreateRelatedView(CreateView):
 
 
 class UpdateView(ToolsMixin, vanilla.UpdateView):
-    title = _("Update %(model)s")
+    title = _("Update %(object)s")
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -189,7 +189,7 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
         kwargs.setdefault(
             "title",
             self.title
-            % {"model": self.model._meta.verbose_name, "instance": self.object},
+            % {"object": self.model._meta.verbose_name, "instance": self.object},
         )
         return super().get_context_data(**kwargs)
 
