@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import classonlymethod
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, gettext_lazy
 
 import vanilla
 
@@ -24,6 +24,8 @@ def default_service_types():
 
 
 class ToolsMixin(object):
+    title = None
+
     @classonlymethod
     def as_view(cls, **initkwargs):
         assert cls.model or initkwargs.get("model"), "model is required for view"
@@ -58,6 +60,18 @@ class ToolsMixin(object):
         kwargs["request"] = self.request
         cls = self.get_form_class()
         return cls(data=data, files=files, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        if self.title:
+            kwargs.setdefault(
+                "title",
+                self.title
+                % {
+                    "object": self.model._meta.verbose_name,
+                    "instance": getattr(self, "object", None),
+                },
+            )
+        return super().get_context_data(**kwargs)
 
 
 class ListView(ToolsMixin, vanilla.ListView):
@@ -102,6 +116,8 @@ class DetailView(ToolsMixin, vanilla.DetailView):
 
 
 class CreateView(ToolsMixin, vanilla.CreateView):
+    title = gettext_lazy("Create %(object)s")
+
     def dispatch(self, request, *args, **kwargs):
         if not self.model.allow_create(request):
             return (
@@ -124,10 +140,6 @@ class CreateView(ToolsMixin, vanilla.CreateView):
             return HttpResponse("Thanks", status=201)  # Created
         return redirect(self.get_success_url())
 
-    def get_context_data(self, **kwargs):
-        kwargs.setdefault("title", _("Create %s") % (self.model._meta.verbose_name,))
-        return super().get_context_data(**kwargs)
-
 
 class CreateAndUpdateView(CreateView):
     def get_success_url(self):
@@ -146,7 +158,7 @@ class CreateRelatedView(CreateView):
 
 
 class UpdateView(ToolsMixin, vanilla.UpdateView):
-    title = _("Update %(object)s")
+    title = gettext_lazy("Update %(object)s")
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -185,17 +197,10 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
             return HttpResponse("Thanks", status=202)  # Accepted
         return redirect(self.get_success_url())
 
-    def get_context_data(self, **kwargs):
-        kwargs.setdefault(
-            "title",
-            self.title
-            % {"object": self.model._meta.verbose_name, "instance": self.object},
-        )
-        return super().get_context_data(**kwargs)
-
 
 class DeleteView(ToolsMixin, vanilla.DeleteView):
     delete_form_class = None
+    title = gettext_lazy("Delete %(object)s")
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -246,7 +251,6 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
         return redirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
-        kwargs.setdefault("title", _("Delete %s") % (self.model._meta.verbose_name,))
         if self.delete_form_class and self.request.method == "GET":
             kwargs["form"] = self.delete_form_class(
                 instance=self.object, request=self.request
