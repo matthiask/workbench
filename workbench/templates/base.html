@@ -56,11 +56,8 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="bookkeepingDropdown">
             <a class="dropdown-item" href="{% url 'invoices_recurringinvoice_list' %}">{% trans 'recurring invoices'|capfirst %}</a>
-            <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'credit_control_creditentry_list' %}">{% trans 'credit entries'|capfirst %}</a>
-            <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'accruals_cutoffdate_list' %}">{% trans 'accruals'|capfirst %}</a>
-            <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'expenses_expensereport_list' %}">{% trans 'expense reports'|capfirst %}</a>
           </div>
         </li>
