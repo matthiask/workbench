@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
 from workbench.invoices.forms import CreateProjectInvoiceForm
@@ -12,7 +13,7 @@ from workbench.offers.views import ProjectOfferPDFView
 from workbench.projects.forms import (
     ProjectForm,
     ProjectSearchForm,
-    ServiceDeleteForm,
+    ReassignLogbookForm,
     ServiceForm,
     ServiceMoveForm,
 )
@@ -128,11 +129,19 @@ urlpatterns = [
         name="projects_service_update",
     ),
     url(
+        r"^service/(?P<pk>\d+)/reassign-logbook/$",
+        generic.UpdateView.as_view(
+            model=Service,
+            form_class=ReassignLogbookForm,
+            template_name="modalform.html",
+            title=_("Reassign logbook entries of %(instance)s"),
+        ),
+        name="projects_service_reassign_logbook",
+    ),
+    url(
         r"^service/(?P<pk>\d+)/delete/$",
         generic.DeleteView.as_view(
-            model=Service,
-            delete_form_class=ServiceDeleteForm,
-            template_name_suffix="_merge",
+            model=Service, template_name="modal_confirm_delete.html"
         ),
         name="projects_service_delete",
     ),

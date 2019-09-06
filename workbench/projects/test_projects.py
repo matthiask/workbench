@@ -111,12 +111,28 @@ class ProjectsTest(TestCase):
         self.assertAlmostEqual(service1.service_cost, 4000)
 
         response = self.client.post(
-            service1.urls["delete"],
-            {"merge_into": service2.pk},
+            service1.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(set(project.services.all()), {service1, service2})
+
+        self.assertEqual(service1.loggedcosts.count(), 1)
+        self.assertEqual(service2.loggedcosts.count(), 0)
+        response = self.client.post(
+            service1.urls["reassign_logbook"],
+            {"service": service2.pk},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
+        self.assertEqual(response.status_code, 202)
+
+        self.assertEqual(service1.loggedcosts.count(), 0)
+        self.assertEqual(service2.loggedcosts.count(), 1)
+
+        response = self.client.post(
+            service1.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(list(project.services.all()), [service2])
+        self.assertEqual(set(project.services.all()), {service2})
 
     def test_service_with_rate_zero(self):
         Service(

@@ -365,7 +365,7 @@ class Service(ServiceBase):
                 ),
             )
             return False
-        return None
+        return super().allow_delete(instance, request)
 
     @classmethod
     def get_redirect_url(cls, instance, request):

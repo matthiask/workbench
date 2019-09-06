@@ -149,8 +149,10 @@
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="service-dropdown-{{ row.service.pk }}">
                   <a class="dropdown-item" href="{{ row.service.urls.update }}" data-toggle="ajaxmodal">
                     {% trans 'Update' %}</a>
+                  <a class="dropdown-item" href="{{ row.service.urls.reassign_logbook }}" data-toggle="ajaxmodal">
+                    {% trans 'Reassign logbook entries' %}</a>
                   <a class="dropdown-item" href="{{ row.service.urls.delete }}" data-toggle="ajaxmodal">
-                    {% trans 'Merge or delete' %}</a>
+                    {% trans 'Delete' %}</a>
                   <a class="dropdown-item" href="{{ row.service.urls.move }}" data-toggle="ajaxmodal">
                     {% trans 'Move to other project' %}</a>
                 </div>

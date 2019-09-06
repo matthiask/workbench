@@ -9,7 +9,7 @@ from workbench.circles.models import Role
 from workbench.contacts.models import Organization, Person
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
-from workbench.tools.forms import Autocomplete, ModelForm, Textarea
+from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
 
 
 class ProjectSearchForm(forms.Form):
@@ -191,32 +191,25 @@ class ServiceForm(ModelForm):
                 )
 
 
-class ServiceDeleteForm(ModelForm):
-    class Meta:
-        model = Service
-        fields = []
+class ReassignLogbookForm(Form):
+    service = forms.ModelChoiceField(
+        Service.objects.all(), label=Service._meta.verbose_name
+    )
 
     def __init__(self, *args, **kwargs):
+        self.from_service = kwargs.pop("instance")
         super().__init__(*args, **kwargs)
-        if self.instance.loggedhours.exists() or self.instance.loggedcosts.exists():
-            queryset = self.instance.project.services.logging().exclude(
-                pk=self.instance.pk
-            )
-            self.fields["merge_into"] = forms.ModelChoiceField(
-                queryset=queryset, label=_("Merge log into")
-            )
-            self.fields["merge_into"].choices = queryset.choices()
+        self.fields[
+            "service"
+        ].queryset = self.from_service.project.services.logging().exclude(
+            pk=self.from_service.pk
+        )
 
-    def delete(self):
-        if "merge_into" not in self.cleaned_data:
-            self.instance.delete()
-            return self.instance
-
-        into = self.cleaned_data["merge_into"]
-        self.instance.loggedhours.update(service=into)
-        self.instance.loggedcosts.update(service=into)
-        self.instance.delete()
-        return into
+    def save(self):
+        service = self.cleaned_data["service"]
+        self.from_service.loggedhours.update(service=service)
+        self.from_service.loggedcosts.update(service=service)
+        return service
 
 
 class ServiceMoveForm(ModelForm):

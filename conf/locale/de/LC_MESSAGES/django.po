@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-06 13:48+0200\n"
+"POT-Creation-Date: 2019-09-06 15:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -922,13 +922,13 @@ msgstr "%s erstellen"
 
 #: workbench/generic.py
 #, python-format
-msgid "%(class)s '%(object)s' has been updated successfully."
-msgstr "%(class)s '%(object)s' wurde erfolgreich geändert."
+msgid "Update %(model)s"
+msgstr "%(model)s bearbeiten"
 
 #: workbench/generic.py
 #, python-format
-msgid "Update %s"
-msgstr "%s bearbeiten"
+msgid "%(class)s '%(object)s' has been updated successfully."
+msgstr "%(class)s '%(object)s' wurde erfolgreich geändert."
 
 #: workbench/generic.py
 #, python-format
@@ -1469,10 +1469,6 @@ msgstr ""
 "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte "
 "verbunden ist, welche sich nicht mehr in Vorbereitung befindet."
 
-#: workbench/projects/forms.py
-msgid "Merge log into"
-msgstr "Erfasste Leistungen zuweisen"
-
 #: workbench/projects/models.py
 msgid "Order"
 msgstr "Auftrag"
@@ -1512,6 +1508,11 @@ msgid ""
 msgstr ""
 "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht "
 "löschen."
+
+#: workbench/projects/urls.py
+#, python-format
+msgid "Reassign logbook entries of %(instance)s"
+msgstr "Logbucheinträge von %(instance)s neu zuweisen"
 
 #: workbench/projects/views.py workbench/templates/shortcuts.html
 msgid "Jump to project"
@@ -1773,7 +1774,6 @@ msgstr "%(class)s erstellen"
 #: workbench/templates/generic/object_confirm_delete.html
 #: workbench/templates/generic/object_form.html
 #: workbench/templates/modal_confirm_delete.html
-#: workbench/templates/projects/service_merge.html
 msgid "cancel"
 msgstr "Abbruch"
 
@@ -1802,7 +1802,6 @@ msgstr "%(object)s löschen"
 
 #: workbench/templates/generic/object_confirm_delete.html
 #: workbench/templates/modal_confirm_delete.html
-#: workbench/templates/projects/service_merge.html
 msgid "delete"
 msgstr "Löschen"
 
@@ -1911,8 +1910,8 @@ msgid "Sort"
 msgstr "Sortieren"
 
 #: workbench/templates/projects/project_detail.html
-msgid "Merge or delete"
-msgstr "Zusammenführen oder löschen"
+msgid "Reassign logbook entries"
+msgstr "Logbucheinträge neu zuweisen"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Move to other project"
@@ -2165,6 +2164,15 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Update %s"
+#~ msgstr "%s bearbeiten"
+
+#~ msgid "Merge log into"
+#~ msgstr "Erfasste Leistungen zuweisen"
+
+#~ msgid "Merge or delete"
+#~ msgstr "Zusammenführen oder löschen"
 
 #~ msgid "reimbursed"
 #~ msgstr "zurückerstattet"

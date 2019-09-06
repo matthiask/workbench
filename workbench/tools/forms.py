@@ -132,6 +132,15 @@ class DateInput(forms.TextInput):
     input_type = "date"
 
 
+class Form(forms.Form):
+    required_css_class = "required"
+    error_css_class = "is-invalid"
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+        super().__init__(*args, **kwargs)
+
+
 class ModelForm(WarningsForm, forms.ModelForm):
     user_fields = ()
     default_to_current_user = ()

@@ -146,6 +146,8 @@ class CreateRelatedView(CreateView):
 
 
 class UpdateView(ToolsMixin, vanilla.UpdateView):
+    title = _("Update %(model)s")
+
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
         if not self.object.allow_update(self.object, request):
@@ -184,7 +186,11 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
         return redirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
-        kwargs.setdefault("title", _("Update %s") % (self.model._meta.verbose_name,))
+        kwargs.setdefault(
+            "title",
+            self.title
+            % {"model": self.model._meta.verbose_name, "instance": self.object},
+        )
         return super().get_context_data(**kwargs)
 
 
