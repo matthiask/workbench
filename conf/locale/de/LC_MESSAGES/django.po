@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-06 16:50+0200\n"
+"POT-Creation-Date: 2019-09-07 07:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -912,13 +912,13 @@ msgstr "Suchformular war ungültig."
 
 #: workbench/generic.py
 #, python-format
-msgid "%(class)s '%(object)s' has been created successfully."
-msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
+msgid "Create %(object)s"
+msgstr "%(object)s erstellen"
 
 #: workbench/generic.py
 #, python-format
-msgid "Create %s"
-msgstr "%s erstellen"
+msgid "%(class)s '%(object)s' has been created successfully."
+msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
 
 #: workbench/generic.py workbench/templates/contacts/person_form.html
 #: workbench/templates/credit_control/creditentry_upload.html
@@ -932,15 +932,16 @@ msgstr "%(object)s bearbeiten"
 msgid "%(class)s '%(object)s' has been updated successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich geändert."
 
+#: workbench/generic.py workbench/templates/generic/object_confirm_delete.html
+#: workbench/templates/modal_confirm_delete.html
+#, python-format
+msgid "Delete %(object)s"
+msgstr "%(object)s löschen"
+
 #: workbench/generic.py
 #, python-format
 msgid "%(class)s '%(object)s' has been deleted successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
-
-#: workbench/generic.py
-#, python-format
-msgid "Delete %s"
-msgstr "%s löschen"
 
 #: workbench/invoices/__init__.py workbench/invoices/models.py
 #: workbench/templates/base.html
@@ -1453,6 +1454,14 @@ msgid "No invoices"
 msgstr "Keine Rechnungen"
 
 #: workbench/projects/forms.py
+msgid "Accepted offers"
+msgstr "Akzeptierte Offerten"
+
+#: workbench/projects/forms.py
+msgid "Accepted offers but no invoices"
+msgstr "Akzeptierte Offerten aber keine Rechnungen"
+
+#: workbench/projects/forms.py
 msgid "All types"
 msgstr "Alle Typen"
 
@@ -1788,12 +1797,6 @@ msgstr "Bitte korrigiere die folgenden Fehler:"
 #: workbench/templates/fineforms/warnings.html
 msgid "Ignore warnings"
 msgstr "Warnungen ignorieren"
-
-#: workbench/templates/generic/object_confirm_delete.html
-#: workbench/templates/modal_confirm_delete.html
-#, python-format
-msgid "Delete %(object)s"
-msgstr "%(object)s löschen"
 
 #: workbench/templates/generic/object_confirm_delete.html
 #: workbench/templates/modal_confirm_delete.html
@@ -2159,3 +2162,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Create %s"
+#~ msgstr "%s erstellen"
+
+#~ msgid "Delete %s"
+#~ msgstr "%s löschen"

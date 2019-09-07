@@ -17,7 +17,17 @@ class ProjectSearchForm(forms.Form):
         choices=[
             ("all", _("All")),
             (_("status"), [("", _("Open")), ("closed", _("Closed"))]),
-            (_("defined search"), [("no-invoices", _("No invoices"))]),
+            (
+                _("defined search"),
+                [
+                    ("no-invoices", _("No invoices")),
+                    ("accepted-offers", _("Accepted offers")),
+                    (
+                        "accepted-offers-no-invoices",
+                        _("Accepted offers but no invoices"),
+                    ),
+                ],
+            ),
         ],
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
@@ -54,6 +64,10 @@ class ProjectSearchForm(forms.Form):
             queryset = queryset.filter(closed_on__isnull=False)
         elif data.get("s") == "no-invoices":
             queryset = queryset.orders().without_invoices()
+        elif data.get("s") == "accepted-offers":
+            queryset = queryset.with_accepted_offers()
+        elif data.get("s") == "accepted-offers-no-invoices":
+            queryset = queryset.with_accepted_offers().without_invoices()
         if data.get("org"):
             queryset = queryset.filter(customer=data.get("org"))
         if data.get("type"):

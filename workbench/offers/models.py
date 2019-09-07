@@ -26,6 +26,9 @@ class OfferQuerySet(SearchQuerySet):
             [("", "----------")] + offers[True] + [(_("In preparation"), offers[False])]
         )
 
+    def accepted(self):
+        return self.filter(status=Offer.ACCEPTED)
+
 
 @model_urls
 class Offer(ModelWithTotal):

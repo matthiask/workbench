@@ -34,6 +34,11 @@ class ProjectQuerySet(SearchQuerySet):
             .values("project")
         )
 
+    def with_accepted_offers(self):
+        from workbench.offers.models import Offer
+
+        return self.filter(id__in=Offer.objects.accepted().values("project"))
+
 
 @model_urls
 class Project(Model):
