@@ -8,6 +8,7 @@ from workbench.reporting.views import (
     monthly_invoicing_view,
     open_items_list,
     overdrawn_projects_view,
+    project_budget_statistics_view,
 )
 
 
@@ -32,5 +33,10 @@ urlpatterns = [
         r"^hours-per-customer/$",
         hours_per_customer_view,
         name="report_hours_per_customer",
+    ),
+    url(
+        r"^project-budget-statistics/$",
+        project_budget_statistics_view,
+        name="report_project_budget_statistics",
     ),
 ]

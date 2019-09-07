@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% load fineforms i18n static workbench %}
+
+{% block title %}{% trans 'project budget statistics' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-sm-12 col-md-8">
+  <h1>{% trans 'project budget statistics' %}</h1>
+
+  {% comment %}
+  <form method="get" class="mb-3">
+    {% ff_fields form %}
+    {% ff_submit _('show') %}
+  </form>
+  {% endcomment %}
+
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>{% trans 'project' %}</th>
+        <th class="text-right">{% trans 'offered' %}</th>
+        <th class="text-right">{% trans 'logbook' %}</th>
+        <th class="text-right">{% trans '... with undefined rate' %}</th>
+        <th class="text-right">{% trans 'third party costs' %}</th>
+        <th class="text-right">{% trans 'invoiced' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for project in projects %}
+        <tr>
+          <td>{% link_or_none project.project %}</td>
+          <td class="text-right">{{ project.offered|currency }}</td>
+          <td class="text-right">{{ project.logbook|currency }}</td>
+          <td class="text-right">{{ project.effort_hours_with_rate_undefined|hours }}</td>
+          <td class="text-right">{{ project.third_party_costs|currency }}</td>
+          <td class="text-right">{{ project.invoiced|currency }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+</div>
+{% endblock %}

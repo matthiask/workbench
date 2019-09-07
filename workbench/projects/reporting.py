@@ -4,7 +4,9 @@ from django.db.models import Sum
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization
-from workbench.logbook.models import LoggedHours
+from workbench.invoices.models import Invoice
+from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.tools.models import Z
 
@@ -92,3 +94,69 @@ def hours_per_customer(date_range, *, users=None):
         "user_hours": [(user, user_hours[user.id]) for user in user_list],
         "total_hours": sum(user_hours.values(), Z),
     }
+
+
+def project_budget_statistics(projects):
+    costs = LoggedCost.objects.filter(project__in=projects).order_by().values("project")
+
+    cost_per_project = {
+        row["project"]: row["cost__sum"] for row in costs.annotate(Sum("cost"))
+    }
+    third_party_costs_per_project = {
+        row["project"]: row["third_party_costs__sum"]
+        for row in costs.filter(third_party_costs__isnull=False).annotate(
+            Sum("third_party_costs")
+        )
+    }
+
+    hours = (
+        LoggedHours.objects.filter(service__project__in=projects)
+        .order_by()
+        .values("service__project", "service__effort_rate")
+        .annotate(Sum("hours"))
+    )
+    effort_cost_per_project = defaultdict(lambda: Z)
+    effort_hours_with_rate_undefined_per_project = defaultdict(lambda: Z)
+    for row in hours:
+        if row["service__effort_rate"] is None:
+            effort_hours_with_rate_undefined_per_project[
+                row["service__project"]
+            ] += row["hours__sum"]
+        else:
+            effort_cost_per_project[row["service__project"]] += (
+                row["service__effort_rate"] * row["hours__sum"]
+            )
+
+    offered_per_project = {
+        row["project"]: row["subtotal__sum"] - row["discount__sum"]
+        for row in Offer.objects.accepted()
+        .filter(project__in=projects)
+        .order_by()
+        .values("project")
+        .annotate(Sum("subtotal"), Sum("discount"))
+    }
+    invoiced_per_project = {
+        row["project"]: row["subtotal__sum"] - row["discount__sum"]
+        for row in Invoice.objects.valid()
+        .filter(project__in=projects)
+        .order_by()
+        .values("project")
+        .annotate(Sum("subtotal"), Sum("discount"))
+    }
+
+    return [
+        {
+            "project": project,
+            "logbook": cost_per_project.get(project.id, Z)
+            + effort_cost_per_project[project.id],
+            "cost": cost_per_project.get(project.id, Z),
+            "effort_cost": effort_cost_per_project[project.id],
+            "effort_hours_with_rate_undefined": effort_hours_with_rate_undefined_per_project[  # noqa
+                project.id
+            ],
+            "third_party_costs": third_party_costs_per_project.get(project.id, Z),
+            "offered": offered_per_project.get(project.id, Z),
+            "invoiced": invoiced_per_project.get(project.id, Z),
+        }
+        for project in projects
+    ]

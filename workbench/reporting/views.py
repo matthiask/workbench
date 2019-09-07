@@ -10,7 +10,12 @@ from workbench.accounts.models import User
 from workbench.circles.reporting import logged_hours_by_circle
 from workbench.invoices.models import Invoice
 from workbench.invoices.reporting import monthly_invoicing
-from workbench.projects.reporting import hours_per_customer, overdrawn_projects
+from workbench.projects.models import Project
+from workbench.projects.reporting import (
+    hours_per_customer,
+    overdrawn_projects,
+    project_budget_statistics,
+)
 from workbench.reporting import key_data
 from workbench.tools.forms import DateInput
 from workbench.tools.models import Z
@@ -191,5 +196,22 @@ def hours_per_customer_view(request):
                 [form.cleaned_data["date_from"], form.cleaned_data["date_until"]],
                 users=form.cleaned_data["users"],
             ),
+        },
+    )
+
+
+def project_budget_statistics_view(request):
+    return render(
+        request,
+        "reporting/project_budget_statistics.html",
+        {
+            "projects": sorted(
+                project_budget_statistics(
+                    Project.objects.open()
+                    .exclude(type=Project.INTERNAL)
+                    .select_related("owned_by")
+                ),
+                key=lambda project: project["invoiced"] - project["logbook"],
+            )
         },
     )

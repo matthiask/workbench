@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-07 07:57+0200\n"
+"POT-Creation-Date: 2019-09-07 16:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -151,6 +151,7 @@ msgstr ""
 #: workbench/templates/accruals/cutoffdate_detail.html
 #: workbench/templates/base.html
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/reporting/project_budget_statistics.html
 msgid "logbook"
 msgstr "Logbuch"
 
@@ -205,6 +206,7 @@ msgstr "Kontakt"
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/projects/project_statistics.html
 #: workbench/templates/reporting/overdrawn_projects.html
+#: workbench/templates/reporting/project_budget_statistics.html
 msgid "project"
 msgstr "Projekt"
 
@@ -1104,6 +1106,7 @@ msgstr "Anzahlungstotal"
 #: workbench/services/models.py
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/reporting/monthly_invoicing.html
+#: workbench/templates/reporting/project_budget_statistics.html
 msgid "third party costs"
 msgstr "Fremdkosten"
 
@@ -1959,6 +1962,22 @@ msgstr "Kein Kreis"
 #: workbench/templates/reporting/overdrawn_projects.html
 msgid "effort hours"
 msgstr "Aufwände in Stunden"
+
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "project budget statistics"
+msgstr "Projekt-Budgetstatistiken"
+
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "offered"
+msgstr "Offeriert"
+
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "... with undefined rate"
+msgstr "... ohne Stundensatz"
+
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "invoiced"
+msgstr "Verrechnet"
 
 #: workbench/templates/search.html
 msgid "Only showing 100 items. Additional results have been omitted."
