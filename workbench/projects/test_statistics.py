@@ -5,7 +5,11 @@ from django.test import TestCase
 
 from workbench import factories
 from workbench.projects.models import Project
-from workbench.projects.reporting import hours_per_customer, overdrawn_projects
+from workbench.projects.reporting import (
+    hours_per_customer,
+    overdrawn_projects,
+    project_budget_statistics,
+)
 from workbench.reporting import key_data
 from workbench.tools.models import Z
 
@@ -123,6 +127,23 @@ class StatisticsTest(TestCase):
         self.assertEqual(hpc["organizations"][0]["total_hours"], Decimal(10))
         self.assertEqual(len(hpc["organizations"]), 1)
         self.assertEqual(len(hpc["users"]), 1)
+
+        stats = project_budget_statistics(Project.objects.all())
+        self.assertEqual(
+            stats,
+            [
+                {
+                    "cost": Decimal("0.00"),
+                    "effort_cost": Decimal("3600.000"),
+                    "effort_hours_with_rate_undefined": Decimal("20.00"),
+                    "invoiced": Decimal("1800.00"),
+                    "logbook": Decimal("3600.000"),
+                    "offered": Decimal("0.00"),
+                    "project": project,
+                    "third_party_costs": Decimal("0.00"),
+                }
+            ],
+        )
 
     def test_green_hours(self):
         p_internal = factories.ProjectFactory.create(type=Project.INTERNAL)
