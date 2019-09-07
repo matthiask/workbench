@@ -24,12 +24,17 @@ register.filter(local_date_format)
 
 
 @register.simple_tag
-def link_or_none(object, pretty=None, none=mark_safe("&ndash;")):
+def link_or_none(object, pretty=None, none=mark_safe("&ndash;"), with_badge=False):
     if not object:
         return none
     elif hasattr(object, "get_absolute_url"):
         return format_html(
-            '<a href="{}">{}</a>', object.get_absolute_url(), h(pretty or object)
+            '<a href="{}">{}{}</a>',
+            object.get_absolute_url(),
+            h(pretty or object),
+            format_html(" {}", object.status_badge)
+            if with_badge and hasattr(object, "status_badge")
+            else "",
         )
     return pretty or object
 

@@ -30,7 +30,7 @@
     <tbody>
       {% for project in projects %}
         <tr>
-          <td>{% link_or_none project.project %}</td>
+          <td>{% link_or_none project.project with_badge=True %}</td>
           <td class="text-right">{{ project.offered|currency }}</td>
           <td class="text-right">{{ project.logbook|currency }}</td>
           <td class="text-right">{{ project.effort_hours_with_rate_undefined|hours }}</td>
