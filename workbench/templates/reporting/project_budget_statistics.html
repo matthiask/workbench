@@ -17,7 +17,7 @@
   {% endcomment %}
 
   <table class="table table-sm table-striped">
-    <thead>
+    <thead class="sticky">
       <tr>
         <th>{% trans 'project' %}</th>
         <th class="text-right">{% trans 'offered' %}</th>
@@ -39,7 +39,6 @@
             {% endwith %}
             {% endif %}
           </td>
-          <td class="text-right">{{ project.effort_hours_with_rate_undefined|hours }}</td>
           <td class="text-right">{{ project.third_party_costs|currency }}</td>
           <td class="text-right">{{ project.invoiced|currency }}</td>
         </tr>

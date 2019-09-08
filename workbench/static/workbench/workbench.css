@@ -62,6 +62,12 @@ tbody th > a {
   text-decoration: none;
 }
 
+.table .sticky {
+  position: sticky;
+  top: 47px;
+  background: white;
+}
+
 .inline {
   display: inline !important;
 }
