@@ -22,7 +22,6 @@
         <th>{% trans 'project' %}</th>
         <th class="text-right">{% trans 'offered' %}</th>
         <th class="text-right">{% trans 'logbook' %}</th>
-        <th class="text-right">{% trans '... with undefined rate' %}</th>
         <th class="text-right">{% trans 'third party costs' %}</th>
         <th class="text-right">{% trans 'invoiced' %}</th>
       </tr>
@@ -32,7 +31,14 @@
         <tr>
           <td>{% link_or_none project.project with_badge=True %}</td>
           <td class="text-right">{{ project.offered|currency }}</td>
-          <td class="text-right">{{ project.logbook|currency }}</td>
+          <td class="text-right text-nowrap">
+            {{ project.logbook|currency }}
+            {% if project.effort_hours_with_rate_undefined %}
+            {% with hours=project.effort_hours_with_rate_undefined|hours %}
+            <span class="text-warning" title="{% blocktrans %}{{ hours }} with undefined rate{% endblocktrans %}">(+{{ hours }})</span>
+            {% endwith %}
+            {% endif %}
+          </td>
           <td class="text-right">{{ project.effort_hours_with_rate_undefined|hours }}</td>
           <td class="text-right">{{ project.third_party_costs|currency }}</td>
           <td class="text-right">{{ project.invoiced|currency }}</td>

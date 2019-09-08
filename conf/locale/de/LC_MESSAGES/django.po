@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-07 16:51+0200\n"
+"POT-Creation-Date: 2019-09-08 09:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1750,6 +1750,11 @@ msgid "hours per customer"
 msgstr "Stunden pro Kundschaft"
 
 #: workbench/templates/base.html
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "project budget statistics"
+msgstr "Projekt-Budgetstatistiken"
+
+#: workbench/templates/base.html
 msgid "Settings"
 msgstr "Einstellungen"
 
@@ -1889,13 +1894,19 @@ msgid "total costs"
 msgstr "Gesamtkosten"
 
 #: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/project_budget_statistics.html
 #, python-format
-msgid "%(hours)s with undefined rate)"
+msgid "%(hours)s with undefined rate"
 msgstr "%(hours)s ohne Stundensatz"
 
 #: workbench/templates/projects/project_detail.html
 msgid "not archived"
 msgstr "Nicht archiviert"
+
+#: workbench/templates/projects/project_detail.html
+#, python-format
+msgid "%(hours)s with undefined rate)"
+msgstr "%(hours)s ohne Stundensatz"
 
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_statistics.html
@@ -1964,16 +1975,8 @@ msgid "effort hours"
 msgstr "Aufwände in Stunden"
 
 #: workbench/templates/reporting/project_budget_statistics.html
-msgid "project budget statistics"
-msgstr "Projekt-Budgetstatistiken"
-
-#: workbench/templates/reporting/project_budget_statistics.html
 msgid "offered"
 msgstr "Offeriert"
-
-#: workbench/templates/reporting/project_budget_statistics.html
-msgid "... with undefined rate"
-msgstr "... ohne Stundensatz"
 
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "invoiced"
@@ -2181,6 +2184,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "... with undefined rate"
+#~ msgstr "... ohne Stundensatz"
 
 #~ msgid "Create %s"
 #~ msgstr "%s erstellen"

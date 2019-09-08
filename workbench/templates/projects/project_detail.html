@@ -47,10 +47,10 @@
                 <th class="text-right">{% trans 'total costs' %}</th>
                 <td>
                   {{ project.grouped_services.total_logged_cost|currency }}
-                  {% if project.grouped_services.total_logged_hours_rate_undefined %}(+{% blocktrans with hours=project.grouped_services.total_logged_hours_rate_undefined|hours %}{{ hours }} with undefined rate){% endblocktrans %}){% endif %}
+                  {% if project.grouped_services.total_logged_hours_rate_undefined %}(+{% blocktrans with hours=project.grouped_services.total_logged_hours_rate_undefined|hours %}{{ hours }} with undefined rate{% endblocktrans %}){% endif %}
                   /
                   {{ project.grouped_services.total_service_cost|currency }}
-                  {% if project.grouped_services.total_service_hours_rate_undefined %}(+{% blocktrans with hours=project.grouped_services.total_service_hours_rate_undefined|hours %}{{ hours }} with undefined rate){% endblocktrans %}){% endif %}
+                  {% if project.grouped_services.total_service_hours_rate_undefined %}(+{% blocktrans with hours=project.grouped_services.total_service_hours_rate_undefined|hours %}{{ hours }} with undefined rate{% endblocktrans %}){% endif %}
                 </td>
               </tr>
 
