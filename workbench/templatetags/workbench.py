@@ -1,3 +1,4 @@
+import math
 from collections import OrderedDict
 from datetime import date
 from itertools import groupby
@@ -108,6 +109,33 @@ def bar(value, one):
             '<div class="progress-bar {}" role="progressbar" style="width:{}%"></div>',
             bars,
         ),
+    )
+
+
+@register.simple_tag
+def pie(value, one):
+    if not one:
+        angle = 0
+    else:
+        angle = 2 * math.pi * min(0.999, float(value / one))
+
+    size = 20
+    hsize = size // 2
+
+    return format_html(
+        """
+        <svg width="{size}" height="{size}" class="chart"
+            style="display: inline-block; transform: scaleX(-1)">
+          <circle r="{hsize}" cx="{hsize}" cy="{hsize}" style="fill: #ced4da" />
+          <path d="M {hsize} 0 A {hsize} {hsize} 0 {large_arc} 1 {x} {y} L {hsize} {hsize} z"
+            style="fill: #ffc107aa" />
+        </svg>
+        """,  # noqa
+        large_arc=1 if angle > math.pi else 0,
+        x=hsize + math.sin(angle) * hsize,
+        y=hsize - math.cos(angle) * hsize,
+        size=size,
+        hsize=hsize,
     )
 
 

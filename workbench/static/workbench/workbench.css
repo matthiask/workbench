@@ -64,6 +64,7 @@ tbody th > a {
 
 .table .sticky {
   position: sticky;
+  z-index: 1;
   top: 47px;
   background: white;
 }

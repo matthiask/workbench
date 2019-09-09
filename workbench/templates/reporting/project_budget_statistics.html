@@ -24,6 +24,7 @@
         <th class="text-right">{% trans 'logbook' %}</th>
         <th class="text-right">{% trans 'third party costs' %}</th>
         <th class="text-right">{% trans 'invoiced' %}</th>
+        <th class="text-right">{% trans 'not archived' %}</th>
       </tr>
     </thead>
     <tbody>
@@ -41,6 +42,10 @@
           </td>
           <td class="text-right">{{ project.third_party_costs|currency }}</td>
           <td class="text-right">{{ project.invoiced|currency }}</td>
+          <td class="text-right text-nowrap">
+            {{ project.not_archived|hours }} / {{ project.hours|hours }}
+            {% pie project.not_archived project.hours %}
+          </td>
         </tr>
       {% endfor %}
     </tbody>

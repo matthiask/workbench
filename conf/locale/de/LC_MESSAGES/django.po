@@ -1752,7 +1752,7 @@ msgstr "Stunden pro Kundschaft"
 #: workbench/templates/base.html
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "project budget statistics"
-msgstr "Projekt-Budgetstatistiken"
+msgstr "Projekt-Budgetstatistik"
 
 #: workbench/templates/base.html
 msgid "Settings"
