@@ -204,6 +204,12 @@ class ServiceForm(ModelForm):
                     ),
                 )
 
+    def clean(self):
+        data = super().clean()
+        if not data.get("role"):
+            self.add_warning(_("No role selected."), code="no-role-selected")
+        return data
+
 
 class ReassignLogbookForm(Form):
     service = forms.ModelChoiceField(

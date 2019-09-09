@@ -171,7 +171,7 @@ class OffersTest(TestCase):
         self.assertTrue(service.allow_logging)
         response = self.client.post(
             service.urls["update"],
-            {"allow_logging": False},
+            {"allow_logging": False, WarningsForm.ignore_warnings_id: "no-role-selected"},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 202)
