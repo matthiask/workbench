@@ -327,6 +327,7 @@ class LogbookTest(TestCase):
             self.assertEqual(self.client.get("/logbook/hours/?" + p).status_code, 200)
 
         valid("")
+        valid("q=test")
         valid("rendered_by=" + str(user.pk))
         valid("project=" + str(hours.service.project.pk))
         valid("service=" + str(hours.service.pk))
@@ -343,6 +344,7 @@ class LogbookTest(TestCase):
             self.assertEqual(self.client.get("/logbook/costs/?" + p).status_code, 200)
 
         valid("")
+        valid("q=test")
         valid("rendered_by=" + str(user.pk))
         valid("project=" + str(cost.project.pk))
         valid("organization=" + str(cost.project.customer.pk))

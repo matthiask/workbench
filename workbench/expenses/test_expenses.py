@@ -46,6 +46,7 @@ class ExpensesTest(TestCase):
             self.assertEqual(self.client.get("/expenses/?" + p).status_code, 200)
 
         valid("")
+        valid("q=test")
 
     def test_expenses(self):
         project = factories.ProjectFactory.create()

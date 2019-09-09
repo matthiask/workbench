@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.projects.models import Project, Service
-from workbench.tools.models import HoursField, Model, MoneyField
+from workbench.tools.models import HoursField, Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import monday
 
@@ -79,7 +79,7 @@ class LoggedHours(Model):
             )
 
 
-class LoggedCostQuerySet(models.QuerySet):
+class LoggedCostQuerySet(SearchQuerySet):
     def expenses(self, *, user):
         return self.filter(are_expenses=True, rendered_by=user)
 

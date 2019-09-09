@@ -504,6 +504,7 @@ class InvoicesTest(TestCase):
             self.assertEqual(self.client.get("/invoices/?" + p).status_code, 200)
 
         valid("")
+        valid("q=test")
         valid("s=all")
         valid("s=40")  # PAID
         valid("org={}".format(factories.OrganizationFactory.create().pk))

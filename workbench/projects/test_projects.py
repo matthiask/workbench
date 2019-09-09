@@ -242,6 +242,7 @@ class ProjectsTest(TestCase):
             self.assertEqual(self.client.get("/projects/?" + p).status_code, 200)
 
         valid("")
+        valid("q=test")
         valid("s=all")
         valid("s=closed")
         valid("s=no-invoices")

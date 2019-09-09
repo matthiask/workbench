@@ -143,6 +143,7 @@ class RecurringTest(TestCase):
             )
 
         valid("")
+        valid("q=test")
         valid("s=all")
         valid("s=closed")
         valid("org={}".format(factories.OrganizationFactory.create().pk))

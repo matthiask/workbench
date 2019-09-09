@@ -131,6 +131,7 @@ class CreditEntriesTest(TestCase):
             self.assertEqual(self.client.get("/credit-control/?" + p).status_code, 200)
 
         valid("")
+        valid("q=test")
         valid("s=pending")
         valid("s=processed")
         valid("xlsx=1")

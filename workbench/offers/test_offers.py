@@ -236,6 +236,7 @@ class OffersTest(TestCase):
             self.assertEqual(self.client.get("/offers/?" + p).status_code, 200)
 
         valid("")
+        valid("q=test")
         valid("s=all")
         valid("s=10")
         valid("s=20")
