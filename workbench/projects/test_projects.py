@@ -454,3 +454,57 @@ class ProjectsTest(TestCase):
         service.refresh_from_db()
         self.assertEqual(service.effort_type, "consulting")
         self.assertEqual(service.effort_rate, 250)
+
+    def test_create_services_with_flat_rates(self):
+        project = factories.ProjectFactory.create(flat_rate=250)
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(
+            project.urls["createservice"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        # print(response.content.decode("utf-8"))
+
+        self.assertContains(
+            response,
+            '<input type="number" name="effort_rate" value="250.00" step="0.01" class="form-control" disabled id="id_effort_rate">',  # noqa
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<input type="text" name="effort_type" value="flat rate" maxlength="50" class="form-control" disabled id="id_effort_type">',  # noqa
+            html=True,
+        )
+
+    def test_add_flat_rate_to_existing_project(self):
+        project = factories.ServiceFactory.create().project
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            project.urls["update"],
+            {
+                "customer": project.customer_id,
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "type": project.type,
+                "flat_rate": 250,
+            },
+        )
+        self.assertContains(response, 'value="flat-rate-but-already-services"')
+
+        response = self.client.post(
+            project.urls["update"],
+            {
+                "customer": project.customer_id,
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "type": project.type,
+                "flat_rate": 250,
+                WarningsForm.ignore_warnings_id: "flat-rate-but-already-services",
+            },
+        )
+        self.assertRedirects(response, project.urls["detail"])
+
+        service = project.services.get()
+        self.assertEqual(service.effort_rate, 250)
