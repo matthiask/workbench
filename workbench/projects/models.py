@@ -240,6 +240,7 @@ class Project(Model):
                 }
             )
 
+            logged_cost += logged_cost_per_service[None]
             total_logged_cost += logged_cost_per_service[None]
 
         return {
