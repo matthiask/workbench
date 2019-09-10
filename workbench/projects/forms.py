@@ -85,7 +85,15 @@ class ProjectForm(ModelForm):
 
     class Meta:
         model = Project
-        fields = ("contact", "customer", "title", "description", "owned_by", "type")
+        fields = (
+            "contact",
+            "customer",
+            "title",
+            "description",
+            "owned_by",
+            "type",
+            "flat_rate",
+        )
         widgets = {
             "customer": Autocomplete(model=Organization),
             "contact": Autocomplete(model=Person),
@@ -137,6 +145,20 @@ class ProjectForm(ModelForm):
                 code="customer-update-but-already-invoices",
             )
 
+        if (
+            set(self.changed_data) & {"flat_rate"}
+            and data.get("flat_rate")
+            and self.instance.services.exists()
+        ):
+            self.add_warning(
+                _(
+                    "You are adding a flat rate to a project which already"
+                    " has services. Those services' effort types and rates"
+                    " will be overwritten."
+                ),
+                code="flat-rate-but-already-services",
+            )
+
         return data
 
     def save(self):
@@ -145,6 +167,10 @@ class ProjectForm(ModelForm):
             instance.closed_on = date.today()
         if instance.closed_on and not self.cleaned_data.get("is_closed"):
             instance.closed_on = None
+        if self.instance.flat_rate:
+            self.instance.services.editable().update(
+                effort_type=_("flat rate"), effort_rate=self.instance.flat_rate
+            )
         instance.save()
         if "customer" in self.changed_data:
             instance.invoices.update(customer=instance.customer)
@@ -180,6 +206,10 @@ class ServiceForm(ModelForm):
         self.project = kwargs.pop("project", None)
         if not self.project:
             self.project = kwargs["instance"].project
+        elif self.project.flat_rate:
+            kwargs["instance"] = Service(
+                effort_type=_("flat rate"), effort_rate=self.project.flat_rate
+            )
 
         super().__init__(*args, **kwargs)
 
@@ -203,6 +233,10 @@ class ServiceForm(ModelForm):
                         " to an offer which is not in preparation anymore."
                     ),
                 )
+
+        if self.project.flat_rate:
+            self.fields["effort_type"].disabled = True
+            self.fields["effort_rate"].disabled = True
 
     def clean(self):
         data = super().clean()

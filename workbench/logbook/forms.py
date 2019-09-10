@@ -279,11 +279,16 @@ class LoggedHoursForm(ModelForm):
         if not self.cleaned_data.get("service") and self.cleaned_data.get(
             "service_title"
         ):
-            instance.service = Service.objects.create(
+            service = Service(
                 project=self.project,
                 title=self.cleaned_data["service_title"],
                 description=self.cleaned_data["service_description"],
             )
+            if self.project.flat_rate:
+                service.effort_type = _("flat rate")
+                service.effort_rate = self.project.flat_rate
+            service.save()
+            instance.service = service
         instance.save()
         return instance
 

@@ -49,6 +49,13 @@ class ServiceQuerySet(models.QuerySet):
             Q(offer__isnull=True) | ~Q(offer__status=Offer.REJECTED),
         )
 
+    def editable(self):
+        from workbench.offers.models import Offer
+
+        return self.filter(
+            Q(offer__isnull=True) | Q(offer__status=Offer.IN_PREPARATION)
+        )
+
 
 class ServiceBase(Model):
     created_at = models.DateTimeField(_("created at"), default=timezone.now)

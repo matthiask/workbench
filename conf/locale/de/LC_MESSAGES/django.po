@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-10 11:23+0200\n"
+"POT-Creation-Date: 2019-09-10 13:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1477,6 +1477,18 @@ msgstr ""
 
 #: workbench/projects/forms.py
 msgid ""
+"You are adding a flat rate to a project which already has services. Those "
+"services' effort types and rates will be overwritten."
+msgstr ""
+"Du setzst einen Pauschalsatz bei einem Projekt, welches schon Leistungen "
+"hat. Der Aufwandtyp und Stundensatz dieser Leistungen wird überschrieben."
+
+#: workbench/projects/forms.py workbench/projects/models.py
+msgid "flat rate"
+msgstr "Pauschalsatz"
+
+#: workbench/projects/forms.py
+msgid ""
 "Most fields are disabled because service is bound to an offer which is not "
 "in preparation anymore."
 msgstr ""
@@ -1489,7 +1501,8 @@ msgstr "Keine Rolle ausgewählt."
 
 #: workbench/projects/forms.py
 msgid "Try deleting the service after reassigning logbook entries"
-msgstr "Versuche, die Leistung nach der Zuweisung der Logbucheinträge zu löschen"
+msgstr ""
+"Versuche, die Leistung nach der Zuweisung der Logbucheinträge zu löschen"
 
 #: workbench/projects/models.py
 msgid "Order"
@@ -1502,6 +1515,10 @@ msgstr "Wartung"
 #: workbench/projects/models.py
 msgid "Internal"
 msgstr "Intern"
+
+#: workbench/projects/models.py
+msgid "Set this if you want all services to have the same hourly rate."
+msgstr "Setze dies, falls alle Leistungen den gleichen Stundensatz haben sollen."
 
 #: workbench/projects/models.py
 msgid "Not bound to a particular service."

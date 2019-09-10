@@ -14,7 +14,7 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.services.models import ServiceBase
 from workbench.tools.formats import local_date_format
-from workbench.tools.models import Model, SearchQuerySet, Z
+from workbench.tools.models import Model, MoneyField, SearchQuerySet, Z
 from workbench.tools.urls import model_urls
 
 
@@ -74,6 +74,12 @@ class Project(Model):
     )
 
     type = models.CharField(_("type"), choices=TYPE_CHOICES, max_length=20)
+    flat_rate = MoneyField(
+        _("flat rate"),
+        blank=True,
+        null=True,
+        help_text=_("Set this if you want all services to have the same hourly rate."),
+    )
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     closed_on = models.DateField(_("closed on"), blank=True, null=True)
 
