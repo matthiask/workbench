@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-10 10:27+0200\n"
+"POT-Creation-Date: 2019-09-10 11:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -940,7 +940,7 @@ msgstr "%(class)s '%(object)s' wurde erfolgreich geändert."
 msgid "Delete %(object)s"
 msgstr "%(object)s löschen"
 
-#: workbench/generic.py
+#: workbench/generic.py workbench/projects/forms.py
 #, python-format
 msgid "%(class)s '%(object)s' has been deleted successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
@@ -1486,6 +1486,10 @@ msgstr ""
 #: workbench/projects/forms.py
 msgid "No role selected."
 msgstr "Keine Rolle ausgewählt."
+
+#: workbench/projects/forms.py
+msgid "Try deleting the service after reassigning logbook entries"
+msgstr "Versuche, die Leistung nach der Zuweisung der Logbucheinträge zu löschen"
 
 #: workbench/projects/models.py
 msgid "Order"

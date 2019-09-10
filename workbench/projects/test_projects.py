@@ -134,9 +134,11 @@ class ProjectsTest(TestCase):
         self.assertEqual(service2.loggedcosts.count(), 1)
 
         response = self.client.post(
-            service1.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            service1.urls["reassign_logbook"],
+            {"service": service2.pk, "try_delete": "on"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 202)
         self.assertEqual(set(project.services.all()), {service2})
 
     def test_service_with_rate_zero(self):
@@ -147,14 +149,12 @@ class ProjectsTest(TestCase):
             effort_rate=0,
         ).full_clean()
 
-    def test_service_deletion_without_merge(self):
+    def test_service_deletion(self):
         service = factories.ServiceFactory.create()
         self.client.force_login(service.project.owned_by)
         response = self.client.get(
             service.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
-        self.assertNotContains(response, "merge_into")
-
         response = self.client.post(
             service.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )

@@ -225,10 +225,29 @@ class ReassignLogbookForm(Form):
             pk=self.from_service.pk
         )
 
+        offer = self.from_service.offer
+        if not offer or offer.status <= offer.IN_PREPARATION:
+            self.fields["try_delete"] = forms.BooleanField(
+                label=_("Try deleting the service after reassigning logbook entries"),
+                required=False,
+            )
+
     def save(self):
         service = self.cleaned_data["service"]
         self.from_service.loggedhours.update(service=service)
         self.from_service.loggedcosts.update(service=service)
+
+        if self.cleaned_data.get("try_delete"):
+            if self.from_service.allow_delete(self.from_service, self.request):
+                self.from_service.delete()
+                messages.success(
+                    self.request,
+                    _("%(class)s '%(object)s' has been deleted successfully.")
+                    % {
+                        "class": self.from_service._meta.verbose_name,
+                        "object": self.from_service,
+                    },
+                )
         return service
 
 
