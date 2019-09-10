@@ -1,9 +1,11 @@
+from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 
 from workbench.projects.forms import ProjectAutocompleteForm
 from workbench.projects.models import Project, Service
+from workbench.services.models import ServiceType
 
 
 def select(request):
@@ -17,6 +19,21 @@ def select(request):
         "generic/select_object.html",
         {"form": form, "title": _("Jump to project")},
     )
+
+
+def assign_service_type(request, pk):
+    service = Service.objects.get(pk=pk)
+    service_type = ServiceType.objects.get(pk=request.GET.get("service_type"))
+
+    service.effort_type = service_type.title
+    service.effort_rate = service_type.hourly_rate
+    service.save()
+    messages.success(
+        request,
+        _("%(class)s '%(object)s' has been updated successfully.")
+        % {"class": service._meta.verbose_name, "object": service},
+    )
+    return redirect(service)
 
 
 def set_order(request):

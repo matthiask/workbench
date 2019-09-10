@@ -155,6 +155,18 @@
                     {% trans 'Delete' %}</a>
                   <a class="dropdown-item" href="{{ row.service.urls.move }}" data-toggle="ajaxmodal">
                     {% trans 'Move to other project' %}</a>
+                  {% if row.service.pk and not row.service.effort_rate %}
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">{% trans 'Assign service type' %}:</h6>
+                    {% for service_type in view.default_service_types %}
+                    <a class="dropdown-item" href="{{ row.service.urls.assign_service_type }}?service_type={{ service_type.pk }}">
+                      <div class="d-flex w-100 justify-content-between">
+                        <span>{{ service_type.title }}</span>
+                        <span>{{ service_type.hourly_rate|currency }}</span>
+                      </div>
+                    </a>
+                    {% endfor %}
+                  {% endif %}
                 </div>
               </span>
             </div>

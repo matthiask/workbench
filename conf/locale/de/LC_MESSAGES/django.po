@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-09 11:52+0200\n"
+"POT-Creation-Date: 2019-09-10 10:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -929,7 +929,7 @@ msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
 msgid "Update %(object)s"
 msgstr "%(object)s bearbeiten"
 
-#: workbench/generic.py
+#: workbench/generic.py workbench/projects/views.py
 #, python-format
 msgid "%(class)s '%(object)s' has been updated successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich geändert."
@@ -1933,6 +1933,10 @@ msgstr "Logbucheinträge neu zuweisen"
 #: workbench/templates/projects/project_detail.html
 msgid "Move to other project"
 msgstr "Zu anderem Projekt verschieben"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Assign service type"
+msgstr "Leistungstyp zuweisen"
 
 #: workbench/templates/projects/project_detail.html
 msgid "No services yet."

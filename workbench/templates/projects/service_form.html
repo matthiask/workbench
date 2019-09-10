@@ -17,7 +17,7 @@
       {% ff_fields form fields='title,description,role,allow_logging' %}
     </div>
     <div class="col-md-5">
-      <div data-autofill="{{ view.default_service_types }}">
+      <div data-autofill="{{ view.default_service_types_json }}">
         <h5>{% trans 'effort' %}</h5>
         {% ff_fields form fields='service_type' %}
         <div class="row">

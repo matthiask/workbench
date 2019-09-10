@@ -11,18 +11,6 @@ import vanilla
 from workbench.services.models import ServiceType
 
 
-def default_service_types():
-    return json.dumps(
-        {
-            str(type.id): {
-                "effort_type": type.title,
-                "effort_rate": int(type.hourly_rate),
-            }
-            for type in ServiceType.objects.all()
-        }
-    )
-
-
 class ToolsMixin(object):
     title = None
 
@@ -32,7 +20,18 @@ class ToolsMixin(object):
         return super().as_view(**initkwargs)
 
     def default_service_types(self):
-        return default_service_types()
+        return ServiceType.objects.all()
+
+    def default_service_types_json(self):
+        return json.dumps(
+            {
+                str(type.id): {
+                    "effort_type": type.title,
+                    "effort_rate": int(type.hourly_rate),
+                }
+                for type in self.default_service_types()
+            }
+        )
 
     def get_template_names(self):
         """
