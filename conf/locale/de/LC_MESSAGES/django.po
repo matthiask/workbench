@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-10 10:15+0200\n"
+"POT-Creation-Date: 2019-09-10 10:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1899,19 +1899,13 @@ msgstr "Gesamtkosten"
 
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html
-#, python-format
-msgid "%(hours)s with undefined rate"
-msgstr "%(hours)s ohne Stundensatz"
+msgid "undefined rate"
+msgstr "ohne Stundensatz"
 
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "not archived"
 msgstr "Nicht archiviert"
-
-#: workbench/templates/projects/project_detail.html
-#, python-format
-msgid "%(hours)s with undefined rate)"
-msgstr "%(hours)s ohne Stundensatz"
 
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_statistics.html
@@ -2193,12 +2187,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "... with undefined rate"
-#~ msgstr "... ohne Stundensatz"
-
-#~ msgid "Create %s"
-#~ msgstr "%s erstellen"
-
-#~ msgid "Delete %s"
-#~ msgstr "%s löschen"

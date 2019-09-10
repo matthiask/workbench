@@ -47,10 +47,14 @@
                 <th class="text-right">{% trans 'total costs' %}</th>
                 <td>
                   {{ project.grouped_services.total_logged_cost|currency }}
-                  {% if project.grouped_services.total_logged_hours_rate_undefined %}(+{% blocktrans with hours=project.grouped_services.total_logged_hours_rate_undefined|hours %}{{ hours }} with undefined rate{% endblocktrans %}){% endif %}
+                  {% if project.grouped_services.total_logged_hours_rate_undefined %}
+                    <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.grouped_services.total_logged_hours_rate_undefined|hours }})</span>
+                  {% endif %}
                   /
                   {{ project.grouped_services.total_service_cost|currency }}
-                  {% if project.grouped_services.total_service_hours_rate_undefined %}(+{% blocktrans with hours=project.grouped_services.total_service_hours_rate_undefined|hours %}{{ hours }} with undefined rate{% endblocktrans %}){% endif %}
+                  {% if project.grouped_services.total_service_hours_rate_undefined %}
+                    <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.grouped_services.total_service_hours_rate_undefined|hours }})</span>
+                  {% endif %}
                 </td>
               </tr>
 
@@ -58,7 +62,9 @@
                 <th class="text-right">{% trans 'not archived' %}</th>
                 <td>
                   {{ project.not_archived_total.total|currency }}
-                  {% if project.not_archived_total.hours_rate_undefined %}(+{% blocktrans with hours=project.not_archived_total.hours_rate_undefined|hours %}{{ hours }} with undefined rate){% endblocktrans %}){% endif %}
+                  {% if project.not_archived_total.hours_rate_undefined %}
+                  <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.not_archived_total.hours_rate_undefined|hours }}){% endif %}
+                  </span>
                 </td>
               </tr>
 
@@ -185,7 +191,8 @@
                   {% if row.service.effort_type %}
                     {{ row.service.service_hours|hours }} {{ row.service.effort_type }}
                   {% else %}
-                    {% blocktrans with hours=row.service.service_hours|hours %}{{ hours }} with undefined rate){% endblocktrans %}
+                    {{ row.service.service_hours|hours }}
+                    <span class="text-warning">{% trans 'undefined rate' %}</span>
                   {% endif %}
                 </a>
                 {% bar row.logged_hours row.service.service_hours %}

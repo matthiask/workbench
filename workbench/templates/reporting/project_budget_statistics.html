@@ -32,9 +32,7 @@
           <td class="text-right text-nowrap">
             {{ project.logbook|currency }}
             {% if project.effort_hours_with_rate_undefined %}
-            {% with hours=project.effort_hours_with_rate_undefined|hours %}
-            <span class="text-warning" title="{% blocktrans %}{{ hours }} with undefined rate{% endblocktrans %}">(+{{ hours }})</span>
-            {% endwith %}
+            <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.effort_hours_with_rate_undefined|hours }})</span>
             {% endif %}
           </td>
           <td class="text-right">{{ project.third_party_costs|currency }}</td>
