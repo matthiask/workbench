@@ -12,14 +12,14 @@ class Migration(migrations.Migration):
             model_name="invoice",
             name="show_service_details",
             field=models.BooleanField(
-                default=False, verbose_name="show service details"
+                default=True, verbose_name="show service details"
             ),
         ),
         migrations.AddField(
             model_name="recurringinvoice",
             name="show_service_details",
             field=models.BooleanField(
-                default=False, verbose_name="show service details"
+                default=True, verbose_name="show service details"
             ),
         ),
     ]

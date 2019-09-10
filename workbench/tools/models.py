@@ -119,7 +119,7 @@ class ModelWithTotal(Model):
     )
     tax_rate = MoneyField(_("tax rate"), default=Decimal("7.7"))
     total = MoneyField(_("total"), default=Z)
-    show_service_details = models.BooleanField(_("show service details"), default=False)
+    show_service_details = models.BooleanField(_("show service details"), default=True)
 
     class Meta:
         abstract = True
