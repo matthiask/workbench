@@ -17,7 +17,7 @@ from workbench.projects.reporting import (
     project_budget_statistics,
 )
 from workbench.reporting import key_data
-from workbench.tools.forms import DateInput
+from workbench.tools.forms import DateInput, Form
 from workbench.tools.models import Z
 from workbench.tools.validation import monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -200,18 +200,37 @@ def hours_per_customer_view(request):
     )
 
 
+class ProjectBudgetStatisticsForm(Form):
+    owned_by = forms.ChoiceField(label="", required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["owned_by"].choices = User.objects.choices(collapse_inactive=True)
+
+    def queryset(self):
+        data = self.cleaned_data
+        queryset = Project.objects.open().exclude(type=Project.INTERNAL)
+        if data.get("owned_by") == 0:
+            queryset = queryset.filter(owned_by__is_active=False)
+        elif data.get("owned_by"):
+            queryset = queryset.filter(owned_by=data.get("owned_by"))
+        return queryset.select_related("owned_by")
+
+
 def project_budget_statistics_view(request):
+    form = ProjectBudgetStatisticsForm(request.GET, request=request)
+    if not form.is_valid():
+        messages.warning(request, _("Form was invalid."))
+        return redirect(".")
+
     return render(
         request,
         "reporting/project_budget_statistics.html",
         {
+            "form": form,
             "projects": sorted(
-                project_budget_statistics(
-                    Project.objects.open()
-                    .exclude(type=Project.INTERNAL)
-                    .select_related("owned_by")
-                ),
+                project_budget_statistics(form.queryset()),
                 key=lambda project: project["invoiced"] - project["logbook"],
-            )
+            ),
         },
     )

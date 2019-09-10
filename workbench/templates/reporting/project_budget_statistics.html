@@ -9,12 +9,9 @@
 <div class="col-sm-12 col-lg-10">
   <h1>{% trans 'project budget statistics' %}</h1>
 
-  {% comment %}
-  <form method="get" class="mb-3">
+  <form method="get" class="form-inline mb-3" data-autosubmit>
     {% ff_fields form %}
-    {% ff_submit _('show') %}
   </form>
-  {% endcomment %}
 
   <table class="table table-sm table-striped">
     <thead class="sticky">
