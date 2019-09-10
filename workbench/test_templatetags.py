@@ -64,3 +64,13 @@ class TemplateTagsTest(TestCase):
             t.render(Context({"value": 150, "one": 100})),
             '<div class="progress progress-line" title="150%"><div class="progress-bar bg-success" role="progressbar" style="width:50.0%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:16.67%"></div><div class="progress-bar bg-danger" role="progressbar" style="width:33.33%"></div></div>',  # noqa
         )
+
+    def test_pie(self):
+        t = Template("{% load workbench %}{% pie 1 3 %}")
+        self.assertEqual(
+            t.render(Context()),
+            """<svg width="20" height="20" class="pie" style="display: inline-block; transform: scaleX(-1)">
+  <circle r="10" cx="10" cy="10" class="pie-circle" />
+  <path d="M 10 0 A 10 10 0 0 1 18.66025403784439 14.999999999999998 L 10 10 z" class="pie-arc" />
+</svg>""",  # noqa
+        )

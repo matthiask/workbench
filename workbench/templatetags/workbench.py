@@ -113,24 +113,20 @@ def bar(value, one):
 
 
 @register.simple_tag
-def pie(value, one):
+def pie(value, one, size=20):
     if not one:
         angle = 0
     else:
         angle = 2 * math.pi * min(0.999, float(value / one))
 
-    size = 20
     hsize = size // 2
 
     return format_html(
-        """
-        <svg width="{size}" height="{size}" class="chart"
-            style="display: inline-block; transform: scaleX(-1)">
-          <circle r="{hsize}" cx="{hsize}" cy="{hsize}" style="fill: #ced4da" />
-          <path d="M {hsize} 0 A {hsize} {hsize} 0 {large_arc} 1 {x} {y} L {hsize} {hsize} z"
-            style="fill: #ffc107aa" />
-        </svg>
-        """,  # noqa
+        """\
+<svg width="{size}" height="{size}" class="pie" style="display: inline-block; transform: scaleX(-1)">
+  <circle r="{hsize}" cx="{hsize}" cy="{hsize}" class="pie-circle" />
+  <path d="M {hsize} 0 A {hsize} {hsize} 0 {large_arc} 1 {x} {y} L {hsize} {hsize} z" class="pie-arc" />
+</svg>""",  # noqa
         large_arc=1 if angle > math.pi else 0,
         x=hsize + math.sin(angle) * hsize,
         y=hsize - math.cos(angle) * hsize,

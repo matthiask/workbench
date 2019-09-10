@@ -153,3 +153,11 @@ tbody th > a {
     display: none;
   }
 }
+
+.pie .pie-circle {
+  fill: #ced4da;
+}
+
+.pie .pie-arc {
+  fill: #ffc107aa;
+}
