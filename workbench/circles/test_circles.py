@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.circles.models import Circle, Role
@@ -6,6 +7,9 @@ from workbench.circles.reporting import logged_hours_by_circle
 
 
 class CirclesTest(TestCase):
+    def setUp(self):
+        deactivate_all()
+
     def test_choices(self):
         c = Circle.objects.create(name="B circle")
         r1 = c.roles.create(name="Role 1")
@@ -46,3 +50,34 @@ class CirclesTest(TestCase):
         self.client.force_login(s1.project.owned_by)
         response = self.client.get("/report/logged-hours-by-circle/")
         self.assertEqual(response.status_code, 200)
+
+    def test_role_warning(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            project.urls["createservice"],
+            {
+                "title": "Consulting service",
+                "effort_type": "Consulting",
+                "effort_rate": "180",
+                "allow_logging": True,
+                # WarningsForm.ignore_warnings_id: "no-role-selected",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "No role selected.")
+
+        r1 = Role.objects.create(name="Role 1", circle=Circle.objects.create(name="C1"))
+        response = self.client.post(
+            project.urls["createservice"],
+            {
+                "title": "Consulting service",
+                "effort_type": "Consulting",
+                "effort_rate": "180",
+                "allow_logging": True,
+                "role": r1.pk,
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
