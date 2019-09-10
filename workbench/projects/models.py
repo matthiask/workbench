@@ -1,9 +1,10 @@
 from collections import defaultdict
+from datetime import date
 from decimal import Decimal
 
 from django.contrib import messages
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -351,6 +352,38 @@ class Project(Model):
         return {"total": total, "hours_rate_undefined": hours_rate_undefined}
 
 
+class ServiceQuerySet(models.QuerySet):
+    def choices(self):
+        offers = defaultdict(list)
+        for service in self.select_related("offer__project", "offer__owned_by"):
+            offers[service.offer].append((service.id, str(service)))
+        return [("", "----------")] + [
+            (offer or _("Not offered yet"), services)
+            for offer, services in sorted(
+                offers.items(),
+                key=lambda item: (
+                    item[0] and item[0].offered_on or date.max,
+                    item[0] and item[0].pk or 1e100,
+                ),
+            )
+        ]
+
+    def logging(self):
+        from workbench.offers.models import Offer
+
+        return self.filter(
+            Q(allow_logging=True),
+            Q(offer__isnull=True) | ~Q(offer__status=Offer.REJECTED),
+        )
+
+    def editable(self):
+        from workbench.offers.models import Offer
+
+        return self.filter(
+            Q(offer__isnull=True) | Q(offer__status=Offer.IN_PREPARATION)
+        )
+
+
 @model_urls
 class Service(ServiceBase):
     RELATED_MODEL_FIELD = "offer"
@@ -389,6 +422,8 @@ class Service(ServiceBase):
         blank=True,
         null=True,
     )
+
+    objects = ServiceQuerySet.as_manager()
 
     def get_absolute_url(self):
         return self.project.get_absolute_url()

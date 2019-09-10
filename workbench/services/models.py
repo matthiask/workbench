@@ -1,8 +1,5 @@
-from collections import defaultdict
-from datetime import date
-
 from django.db import models
-from django.db.models import Max, Q
+from django.db.models import Max
 from django.utils import timezone
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
@@ -23,38 +20,6 @@ class ServiceType(Model):
 
     def __str__(self):
         return self.title
-
-
-class ServiceQuerySet(models.QuerySet):
-    def choices(self):
-        offers = defaultdict(list)
-        for service in self.select_related("offer__project", "offer__owned_by"):
-            offers[service.offer].append((service.id, str(service)))
-        return [("", "----------")] + [
-            (offer or _("Not offered yet"), services)
-            for offer, services in sorted(
-                offers.items(),
-                key=lambda item: (
-                    item[0] and item[0].offered_on or date.max,
-                    item[0] and item[0].pk or 1e100,
-                ),
-            )
-        ]
-
-    def logging(self):
-        from workbench.offers.models import Offer
-
-        return self.filter(
-            Q(allow_logging=True),
-            Q(offer__isnull=True) | ~Q(offer__status=Offer.REJECTED),
-        )
-
-    def editable(self):
-        from workbench.offers.models import Offer
-
-        return self.filter(
-            Q(offer__isnull=True) | Q(offer__status=Offer.IN_PREPARATION)
-        )
 
 
 class ServiceBase(Model):
@@ -79,8 +44,6 @@ class ServiceBase(Model):
         null=True,
         help_text=_("Total incl. tax for third-party services."),
     )
-
-    objects = ServiceQuerySet.as_manager()
 
     class Meta:
         abstract = True
