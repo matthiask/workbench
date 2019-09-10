@@ -139,9 +139,11 @@ def invoiced_by_month(date_range):
         .filter(invoiced_on__range=date_range)
         .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))
         .values("year", "month")
-        .annotate(subtotal_sum=Sum("subtotal"), discount_sum=Sum("discount"))
+        .annotate(Sum("subtotal"), Sum("discount"), Sum("down_payment_total"))
     ):
-        invoiced[row["year"]][row["month"]] += row["subtotal_sum"] - row["discount_sum"]
+        invoiced[row["year"]][row["month"]] += (
+            row["subtotal__sum"] - row["discount__sum"] - row["down_payment_total__sum"]
+        )
 
     for row in (
         LoggedCost.objects.order_by()

@@ -146,12 +146,14 @@ def project_budget_statistics(projects):
         .annotate(Sum("subtotal"), Sum("discount"))
     }
     invoiced_per_project = {
-        row["project"]: row["subtotal__sum"] - row["discount__sum"]
+        row["project"]: row["subtotal__sum"]
+        - row["discount__sum"]
+        - row["down_payment_total__sum"]
         for row in Invoice.objects.valid()
         .filter(project__in=projects)
         .order_by()
         .values("project")
-        .annotate(Sum("subtotal"), Sum("discount"))
+        .annotate(Sum("subtotal"), Sum("discount"), Sum("down_payment_total"))
     }
 
     return [
