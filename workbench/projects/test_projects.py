@@ -3,6 +3,7 @@ from datetime import date
 from django.test import TestCase
 
 from workbench import factories
+from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import messages
@@ -140,6 +141,22 @@ class ProjectsTest(TestCase):
         )
         self.assertEqual(response.status_code, 202)
         self.assertEqual(set(project.services.all()), {service2})
+
+    def test_try_delete_available(self):
+        service = factories.ServiceFactory.create()
+        self.client.force_login(service.project.owned_by)
+
+        response = self.client.get(
+            service.urls["reassign_logbook"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertContains(response, "try_delete")
+        offer = factories.OfferFactory.create(project=service.project, status=Offer.ACCEPTED)
+        service.offer = offer
+        service.save()
+        response = self.client.get(
+            service.urls["reassign_logbook"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertNotContains(response, "try_delete")
 
     def test_service_with_rate_zero(self):
         Service(
