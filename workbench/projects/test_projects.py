@@ -150,7 +150,9 @@ class ProjectsTest(TestCase):
             service.urls["reassign_logbook"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertContains(response, "try_delete")
-        offer = factories.OfferFactory.create(project=service.project, status=Offer.ACCEPTED)
+        offer = factories.OfferFactory.create(
+            project=service.project, status=Offer.ACCEPTED
+        )
         service.offer = offer
         service.save()
         response = self.client.get(

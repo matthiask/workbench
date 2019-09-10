@@ -237,17 +237,18 @@ class ReassignLogbookForm(Form):
         self.from_service.loggedhours.update(service=service)
         self.from_service.loggedcosts.update(service=service)
 
-        if self.cleaned_data.get("try_delete"):
-            if self.from_service.allow_delete(self.from_service, self.request):
-                self.from_service.delete()
-                messages.success(
-                    self.request,
-                    _("%(class)s '%(object)s' has been deleted successfully.")
-                    % {
-                        "class": self.from_service._meta.verbose_name,
-                        "object": self.from_service,
-                    },
-                )
+        if self.cleaned_data.get("try_delete") and self.from_service.allow_delete(
+            self.from_service, self.request
+        ):
+            self.from_service.delete()
+            messages.success(
+                self.request,
+                _("%(class)s '%(object)s' has been deleted successfully.")
+                % {
+                    "class": self.from_service._meta.verbose_name,
+                    "object": self.from_service,
+                },
+            )
         return service
 
 
