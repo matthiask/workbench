@@ -201,7 +201,7 @@ def hours_per_customer_view(request):
 
 
 class ProjectBudgetStatisticsForm(Form):
-    owned_by = forms.ChoiceField(label="", required=False)
+    owned_by = forms.TypedChoiceField(label="", coerce=int, required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
