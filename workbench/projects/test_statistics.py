@@ -44,6 +44,7 @@ class StatisticsTest(TestCase):
 
     def test_view(self):
         self.client.force_login(factories.UserFactory.create())
+
         response = self.client.get("/report/overdrawn-projects/")
         self.assertContains(response, "overdrawn projects")
 
@@ -53,8 +54,33 @@ class StatisticsTest(TestCase):
         response = self.client.get("/report/hours-per-customer/?date_from=bla")
         self.assertRedirects(response, "/report/hours-per-customer/")
 
+    def test_some_project_budget_statistics_view(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        factories.ProjectFactory.create()
+
         response = self.client.get("/report/project-budget-statistics/")
         self.assertContains(response, "project budget statistics")
+
+        self.assertEqual(
+            self.client.get(
+                "/report/project-budget-statistics/?owned_by=0"
+            ).status_code,
+            200,
+        )
+        self.assertEqual(
+            self.client.get(
+                "/report/project-budget-statistics/?owned_by={}".format(user.pk)
+            ).status_code,
+            200,
+        )
+        self.assertEqual(
+            self.client.get(
+                "/report/project-budget-statistics/?owned_by=bla"
+            ).status_code,
+            302,
+        )
 
     def test_not_archived_hours_grouped_services_green_hours_hpc(self):
         service1 = factories.ServiceFactory.create(effort_rate=180, effort_type="Any")
