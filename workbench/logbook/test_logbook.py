@@ -106,7 +106,6 @@ class LogbookTest(TestCase):
 
     def test_log_and_create_service(self):
         project = factories.ProjectFactory.create()
-
         self.client.force_login(project.owned_by)
 
         response = self.client.post(
@@ -126,6 +125,7 @@ class LogbookTest(TestCase):
 
         entry = LoggedHours.objects.get()
         self.assertEqual(entry.service.title, "service title")
+        self.assertIsNone(entry.service.effort_rate)
 
         response = self.client.get(
             entry.urls["detail"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
@@ -135,6 +135,29 @@ class LogbookTest(TestCase):
             '<a href="/projects/{}/">service title - service description'
             "</a>".format(project.id),
         )
+
+    def test_log_and_create_service_with_flat_rate(self):
+        project = factories.ProjectFactory.create(flat_rate=250)
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            project.urls["createhours"],
+            {
+                "rendered_by": project.owned_by_id,
+                "rendered_on": date.today().isoformat(),
+                # "service": service.id,
+                "hours": "0.1",
+                "description": "Test",
+                "service_title": "service title",
+                "service_description": "service description",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        entry = LoggedHours.objects.get()
+        self.assertEqual(entry.service.title, "service title")
+        self.assertEqual(entry.service.effort_rate, 250)
 
     def test_log_and_both_service_create(self):
         service = factories.ServiceFactory.create()
