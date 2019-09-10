@@ -74,3 +74,12 @@ class TemplateTagsTest(TestCase):
   <path d="M 10 0 A 10 10 0 0 1 18.66025403784439 14.999999999999998 L 10 10 z" class="pie-arc" />
 </svg>""",  # noqa
         )
+
+        t = Template("{% load workbench %}{% pie 1 0 %}")
+        self.assertEqual(
+            t.render(Context()),
+            """<svg width="20" height="20" class="pie" style="display: inline-block; transform: scaleX(-1)">
+  <circle r="10" cx="10" cy="10" class="pie-circle" />
+  <path d="M 10 0 A 10 10 0 0 1 10.0 0.0 L 10 10 z" class="pie-arc" />
+</svg>""",  # noqa
+        )
