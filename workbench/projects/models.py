@@ -154,10 +154,13 @@ class Project(Model):
         # Avoid circular imports
         from workbench.logbook.models import LoggedHours, LoggedCost
 
+        # Logged vs. service hours
         service_hours = Z
         logged_hours = Z
+        # Logged vs. service cost
         service_cost = Z
         logged_cost = Z
+        # Project logbook vs. project service cost (hours and cost)
         total_service_cost = Z
         total_logged_cost = Z
         total_service_hours_rate_undefined = Z
@@ -191,6 +194,25 @@ class Project(Model):
             .annotate(Sum("cost"))
         }
 
+        not_archived_logged_hours_per_service = {
+            row["service"]: row["hours__sum"]
+            for row in LoggedHours.objects.order_by()
+            .filter(
+                service__project=self,
+                archived_at__isnull=True,
+                service__effort_rate__isnull=False,
+            )
+            .values("service")
+            .annotate(Sum("hours"))
+        }
+        not_archived_logged_cost_per_service = {
+            row["service"]: row["cost__sum"]
+            for row in LoggedCost.objects.order_by()
+            .filter(project=self, archived_at__isnull=False)
+            .values("service")
+            .annotate(Sum("cost"))
+        }
+
         users = {
             user.id: user
             for user in User.objects.filter(id__in=logged_hours_per_user.keys())
@@ -207,7 +229,16 @@ class Project(Model):
                     reverse=True,
                 ),
                 "logged_cost": logged_cost_per_service.get(service.id, Z),
+                "not_archived_logged_hours": not_archived_logged_hours_per_service.get(
+                    service.id, Z
+                ),
+                "not_archived_logged_cost": not_archived_logged_cost_per_service.get(
+                    service.id, Z
+                ),
             }
+            row["not_archived"] = (service.effort_rate or Z) * row[
+                "not_archived_logged_hours"
+            ] + row["not_archived_logged_cost"]
 
             logged_hours += row["logged_hours"]
             logged_cost += row["logged_cost"]

@@ -334,14 +334,11 @@ class CreateProjectInvoiceForm(InvoiceForm):
                         % currency(row["logged_cost"]),
                     )
                 elif row["service"].effort_rate is not None:
-                    return currency(
-                        row["service"].effort_rate * row["logged_hours"]
-                        + row["logged_cost"]
-                    )
+                    return currency(row["not_archived"])
                 elif row["logged_hours"]:
                     return format_html(
                         '{} <small class="bg-warning px-1">{}</small>',
-                        currency(row["service"].service_cost),
+                        currency(row["not_archived"]),
                         _("%s logged but no hourly rate defined.")
                         % hours(row["logged_hours"]),
                     )

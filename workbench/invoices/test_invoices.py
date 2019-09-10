@@ -147,7 +147,7 @@ class InvoicesTest(TestCase):
         response = self.client.get(url)
         # print(response, response.content.decode("utf-8"))
 
-        self.assertContains(response, "<strong>cost-only</strong><br>100.00")
+        self.assertContains(response, "<strong>cost-only</strong><br>0.00")
         self.assertContains(response, "1.0h logged but no hourly rate defined.")
         self.assertContains(response, "<strong>no-rate</strong><br>0.00")
         self.assertContains(response, "2.0h logged but no hourly rate defined.")
