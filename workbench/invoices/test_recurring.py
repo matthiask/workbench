@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.core import mail
 from django.test import TestCase
+from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.invoices.models import Invoice, RecurringInvoice
@@ -12,6 +13,9 @@ from workbench.tools.testing import messages
 
 
 class RecurringTest(TestCase):
+    def setUp(self):
+        deactivate_all()
+
     def test_recurring_invoice(self):
         person = factories.PersonFactory.create(
             organization=factories.OrganizationFactory.create()
@@ -68,6 +72,15 @@ class RecurringTest(TestCase):
         )
 
         self.client.force_login(person.primary_contact)
+
+        response = self.client.get("/recurring-invoices/create/")
+        self.assertContains(
+            response,
+            # No value!
+            '<input type="number" name="third_party_costs" step="0.01" class="form-control" required id="id_third_party_costs">',  # noqa
+            html=True,
+        )
+        # print(response, response.content.decode("utf-8"))
 
         response = self.client.post(
             "/recurring-invoices/create/",

@@ -29,6 +29,7 @@ def invoice_to_dict(invoice, **kwargs):
         "closed_on": invoice.closed_on and invoice.closed_on.isoformat() or "",
         "invoiced_on": invoice.invoiced_on and invoice.invoiced_on.isoformat() or "",
         "due_on": invoice.due_on and invoice.due_on.isoformat() or "",
+        "show_service_details": invoice.show_service_details,
         **kwargs,
     }
 
@@ -93,6 +94,7 @@ class InvoicesTest(TestCase):
                 "selected_services": [service.pk],
             },
         )
+        # print(response, response.content.decode("utf-8"))
 
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls["detail"])
@@ -379,6 +381,7 @@ class InvoicesTest(TestCase):
                 "discount": "10",
                 "liable_to_vat": "1",
                 "postal_address": postal_address.postal_address,
+                "third_party_costs": 0,
             },
         )
         invoice = Invoice.objects.get()
@@ -423,6 +426,7 @@ class InvoicesTest(TestCase):
                 "discount": 0,
                 "liable_to_vat": 1,
                 "postal_address": "Anything",
+                "third_party_costs": 0,
             },
         )
         self.assertContains(response, "does not belong to")
@@ -644,11 +648,11 @@ class InvoicesTest(TestCase):
                 }
             ),
         )
+        # print(response, response.content.decode("utf-8"))
         self.assertRedirects(response, invoice.urls["detail"])
         invoice.refresh_from_db()
         self.assertEqual(invoice.status, Invoice.IN_PREPARATION)
         self.assertIsNone(invoice.closed_on)
-        # print(response, response.content.decode("utf-8"))
 
     def test_down_payment(self):
         project = factories.ProjectFactory.create()

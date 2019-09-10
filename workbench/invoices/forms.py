@@ -292,13 +292,15 @@ class InvoiceForm(PostalAddressSelectionForm):
 class CreateProjectInvoiceForm(InvoiceForm):
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project")
+        type = kwargs["request"].GET.get("type")
         kwargs["instance"] = Invoice(
             customer=self.project.customer,
             contact=self.project.contact,
             project=self.project,
             title=self.project.title,
             description=self.project.description,
-            type=kwargs["request"].GET.get("type"),
+            type=type,
+            third_party_costs=Z if type == Invoice.SERVICES else None,
         )
 
         super().__init__(*args, **kwargs)
@@ -617,6 +619,8 @@ class CreateRecurringInvoiceForm(ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        kwargs["instance"] = RecurringInvoice(third_party_costs=None)
+
         super().__init__(*args, **kwargs)
 
         self.fields["periodicity"].choices = RecurringInvoice.PERIODICITY_CHOICES
