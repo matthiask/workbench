@@ -26,6 +26,7 @@ class ProjectSearchForm(forms.Form):
                         "accepted-offers-no-invoices",
                         _("Accepted offers but no invoices"),
                     ),
+                    ("old-projects", _("Old projects (60 days inactivity)")),
                 ],
             ),
         ],
@@ -68,6 +69,8 @@ class ProjectSearchForm(forms.Form):
             queryset = queryset.with_accepted_offers()
         elif data.get("s") == "accepted-offers-no-invoices":
             queryset = queryset.with_accepted_offers().without_invoices()
+        elif data.get("s") == "old-projects":
+            queryset = queryset.old_projects()
         if data.get("org"):
             queryset = queryset.filter(customer=data.get("org"))
         if data.get("type"):

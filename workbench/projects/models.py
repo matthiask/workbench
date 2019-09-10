@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 from django.contrib import messages
@@ -39,6 +39,15 @@ class ProjectQuerySet(SearchQuerySet):
         from workbench.offers.models import Offer
 
         return self.filter(id__in=Offer.objects.accepted().values("project"))
+
+    def old_projects(self):
+        from workbench.logbook.models import LoggedHours
+
+        return self.open().exclude(
+            id__in=LoggedHours.objects.order_by()
+            .filter(rendered_on__gte=date.today() - timedelta(days=60))
+            .values("service__project")
+        )
 
 
 @model_urls

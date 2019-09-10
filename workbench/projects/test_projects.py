@@ -267,6 +267,7 @@ class ProjectsTest(TestCase):
         valid("s=no-invoices")
         valid("s=accepted-offers")
         valid("s=accepted-offers-no-invoices")
+        valid("s=old-projects")
         valid("org={}".format(project.customer_id))
         valid("type=internal")
         valid("type=maintenance")

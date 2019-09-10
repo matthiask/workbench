@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-10 13:13+0200\n"
+"POT-Creation-Date: 2019-09-10 17:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,6 +77,7 @@ msgid "language"
 msgstr "Sprache"
 
 #: workbench/accounts/models.py workbench/awt/models.py
+#: workbench/management/commands/profitability.py
 msgid "user"
 msgstr "Benutzer"
 
@@ -814,7 +815,8 @@ msgid "declined"
 msgstr "Abgelehnt"
 
 #: workbench/deals/models.py workbench/invoices/models.py
-#: workbench/projects/models.py workbench/templates/deals/deal_list.html
+#: workbench/management/commands/profitability.py workbench/projects/models.py
+#: workbench/templates/deals/deal_list.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/reporting/overdrawn_projects.html
 msgid "customer"
@@ -1017,7 +1019,7 @@ msgstr "%s erfasst aber nicht mit einer bestimmten Leistung verbunden."
 msgid "%s logged but no hourly rate defined."
 msgstr "%s erfasst aber kein Stundensatz definiert."
 
-#: workbench/invoices/forms.py workbench/services/models.py
+#: workbench/invoices/forms.py workbench/projects/models.py
 #: workbench/templates/projects/project_detail.html
 msgid "Not offered yet"
 msgstr "Noch nicht offeriert"
@@ -1266,7 +1268,8 @@ msgid "hourly rate"
 msgstr "Stundensatz"
 
 #: workbench/invoices/views.py workbench/logbook/models.py
-#: workbench/services/models.py workbench/templates/awt/year_detail.html
+#: workbench/management/commands/profitability.py workbench/services/models.py
+#: workbench/templates/awt/year_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_list.html
@@ -1318,6 +1321,11 @@ msgstr "Tut mir leid, zu früh."
 #: workbench/logbook/forms.py
 msgid "This seems to be a duplicate. Is it?"
 msgstr "Scheint ein Duplikat zu sein. Oder nicht?"
+
+#: workbench/logbook/forms.py workbench/projects/forms.py
+#: workbench/projects/models.py
+msgid "flat rate"
+msgstr "Pauschalsatz"
 
 #: workbench/logbook/forms.py
 msgid "Providing third party costs is necessary for expenses."
@@ -1375,6 +1383,19 @@ msgstr "Spesen sind Teil einer Spesenabrechnung, kann Eintrag nicht löschen."
 #: workbench/logbook/views.py
 msgid "Select project for logging"
 msgstr "Projekt für Erfassung auswählen"
+
+#: workbench/management/commands/profitability.py
+msgid "earned"
+msgstr "Verdient"
+
+#: workbench/management/commands/profitability.py
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "invoiced"
+msgstr "Verrechnet"
+
+#: workbench/management/commands/profitability.py
+msgid "rate"
+msgstr "Ansatz"
 
 #: workbench/offers/__init__.py workbench/offers/models.py
 #: workbench/templates/base.html workbench/templates/shortcuts.html
@@ -1465,6 +1486,10 @@ msgid "Accepted offers but no invoices"
 msgstr "Akzeptierte Offerten aber keine Rechnungen"
 
 #: workbench/projects/forms.py
+msgid "Old projects (60 days inactivity)"
+msgstr "Alte Projekte (60 Tage Inaktivität)"
+
+#: workbench/projects/forms.py
 msgid "All types"
 msgstr "Alle Typen"
 
@@ -1482,10 +1507,6 @@ msgid ""
 msgstr ""
 "Du setzst einen Pauschalsatz bei einem Projekt, welches schon Leistungen "
 "hat. Der Aufwandtyp und Stundensatz dieser Leistungen wird überschrieben."
-
-#: workbench/projects/forms.py workbench/projects/models.py
-msgid "flat rate"
-msgstr "Pauschalsatz"
 
 #: workbench/projects/forms.py
 msgid ""
@@ -1518,7 +1539,8 @@ msgstr "Intern"
 
 #: workbench/projects/models.py
 msgid "Set this if you want all services to have the same hourly rate."
-msgstr "Setze dies, falls alle Leistungen den gleichen Stundensatz haben sollen."
+msgstr ""
+"Setze dies, falls alle Leistungen den gleichen Stundensatz haben sollen."
 
 #: workbench/projects/models.py
 msgid "Not bound to a particular service."
@@ -2001,10 +2023,6 @@ msgstr "Aufwände in Stunden"
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "offered"
 msgstr "Offeriert"
-
-#: workbench/templates/reporting/project_budget_statistics.html
-msgid "invoiced"
-msgstr "Verrechnet"
 
 #: workbench/templates/search.html
 msgid "Only showing 100 items. Additional results have been omitted."
