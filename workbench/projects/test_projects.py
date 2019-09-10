@@ -439,3 +439,18 @@ class ProjectsTest(TestCase):
 
         response = self.client.get(service.project.urls["services"])
         self.assertEqual(response["content-type"], "application/json")
+
+    def test_assign_service_types(self):
+        service = factories.ServiceFactory.create()
+        self.client.force_login(service.project.owned_by)
+
+        service_types = factories.service_types()
+        response = self.client.get(
+            service.urls["assign_service_type"]
+            + "?service_type={}".format(service_types.consulting.pk)
+        )
+        self.assertRedirects(response, service.get_absolute_url())
+
+        service.refresh_from_db()
+        self.assertEqual(service.effort_type, "consulting")
+        self.assertEqual(service.effort_rate, 250)
