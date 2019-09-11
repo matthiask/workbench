@@ -141,13 +141,16 @@ class InvoiceForm(PostalAddressSelectionForm):
         if self.instance.type == self.instance.DOWN_PAYMENT:
             self.fields["subtotal"].label = _("Down payment")
 
-        elif self.instance.type == self.instance.SERVICES:
+        if self.instance.type == self.instance.SERVICES:
             self.fields["subtotal"].disabled = True
             self.fields["third_party_costs"].disabled = True
             self.fields["subtotal"].help_text = _("Calculated from invoice services.")
             self.fields["third_party_costs"].help_text = _(
                 "Calculated from invoice services."
             )
+
+        else:
+            self.fields.pop("show_service_details")
 
         if self.instance.type != Invoice.DOWN_PAYMENT and self.instance.project_id:
             eligible_down_payment_invoices = Invoice.objects.valid().filter(

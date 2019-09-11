@@ -35,7 +35,7 @@ def invoice_to_dict(invoice, **kwargs):
 
 
 class InvoicesTest(TestCase):
-    def tearDown(self):
+    def setUp(self):
         deactivate_all()
 
     def test_factories(self):
@@ -56,6 +56,7 @@ class InvoicesTest(TestCase):
         url = project.urls["createinvoice"] + "?type=down-payment"
         response = self.client.get(url)
         self.assertContains(response, "Down payment")
+        self.assertNotContains(response, "id_show_service_details")
 
         response = self.client.post(
             url,
@@ -81,6 +82,7 @@ class InvoicesTest(TestCase):
         self.client.force_login(service.project.owned_by)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "id_show_service_details")
 
         response = self.client.post(
             url,
@@ -158,6 +160,7 @@ class InvoicesTest(TestCase):
             response, "<strong>Not bound to a particular service.</strong><br>0.00"
         )
         self.assertContains(response, "10.00 logged but not bound to a service.")
+        self.assertContains(response, "id_show_service_details")
 
         cost.service = service1
         cost.save()
@@ -402,6 +405,7 @@ class InvoicesTest(TestCase):
         )
         self.assertContains(response, 'id="id_postal_address"')
         self.assertNotContains(response, 'data-field-value="')
+        self.assertNotContains(response, "id_show_service_details")
 
         person.organization.default_billing_address = "Default"
         person.organization.save()
