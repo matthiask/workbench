@@ -488,7 +488,7 @@ class InvoicesTest(TestCase):
         self.assertContains(
             response,
             "You are attempting to change &#39;Postal address&#39;."
-            " I am trying to prevent unintentional changes to",
+            " I am trying to prevent unintentional changes. Are you sure?",
         )
 
         response = self.client.post(
