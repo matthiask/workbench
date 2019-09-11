@@ -230,6 +230,11 @@ class Invoice(ModelWithTotal):
                 "type": self.get_type_display()
             }
 
+        if self.status == Invoice.CANCELED and not self.payment_notice:
+            errors["payment_notice"] = _(
+                "Please provide a short reason for the invoice cancellation."
+            )
+
         raise_if_errors(errors, exclude)
 
     @property

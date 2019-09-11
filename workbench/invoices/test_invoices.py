@@ -826,3 +826,22 @@ class InvoicesTest(TestCase):
         self.client.force_login(invoice.owned_by)
         response = self.client.get(invoice.urls["pdf"])
         self.assertEqual(response.status_code, 200)
+
+    def test_cancellation_with_payment_notice(self):
+        invoice = factories.InvoiceFactory.create(
+            invoiced_on=date.today(),
+            due_on=date.today(),
+            postal_address="Test",
+            status=Invoice.CANCELED,
+        )
+
+        msg = [
+            (
+                "payment_notice",
+                ["Please provide a short reason for the invoice cancellation."],
+            )
+        ]
+
+        with self.assertRaises(ValidationError) as cm:
+            invoice.clean_fields()
+        self.assertEqual(list(cm.exception), msg)
