@@ -23,8 +23,8 @@ from workbench.tools.pdf import pdf_response
 class InvoiceSearchForm(forms.Form):
     s = forms.ChoiceField(
         choices=(
-            ("all", _("All states")),
-            ("", _("Open")),
+            ("", _("All states")),
+            ("open", _("Open")),
             (_("Exact"), Invoice.STATUS_CHOICES),
         ),
         required=False,
@@ -51,14 +51,12 @@ class InvoiceSearchForm(forms.Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get("s") == "all":
-            pass
-        elif data.get("s"):
-            queryset = queryset.filter(status=data.get("s"))
-        else:
+        if data.get("s") == "open":
             queryset = queryset.filter(
                 status__in=(Invoice.IN_PREPARATION, Invoice.SENT)
             )
+        elif data.get("s"):
+            queryset = queryset.filter(status=data.get("s"))
         if data.get("org"):
             queryset = queryset.filter(customer=data.get("org"))
         if data.get("owned_by") == 0:

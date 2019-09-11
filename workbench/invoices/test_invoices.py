@@ -509,7 +509,7 @@ class InvoicesTest(TestCase):
 
         valid("")
         valid("q=test")
-        valid("s=all")
+        valid("s=open")
         valid("s=40")  # PAID
         valid("org={}".format(factories.OrganizationFactory.create().pk))
         valid("owned_by={}".format(user.id))
