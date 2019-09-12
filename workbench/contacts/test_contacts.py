@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from workbench import factories
-from workbench.contacts.models import Group, PhoneNumber
+from workbench.contacts.models import Group, Person, PhoneNumber
 from workbench.tools.testing import messages
 
 
@@ -216,3 +216,21 @@ class ContactsTest(TestCase):
         self.assertEqual(pn.pretty_number, "+41 79 123 45 67")
         pn.phone_number = "abcd"  # Completely bogus
         self.assertEqual(pn.pretty_number, "abcd")
+
+    def test_person_create_redirect(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        response = self.client.post(
+            "/contacts/people/create/",
+            {
+                "given_name": "Test",
+                "family_name": "Jones",
+                "salutation": "Hi Mr. Jones",
+                "primary_contact": user.pk,
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+
+        person = Person.objects.get()
+        self.assertRedirects(response, person.urls["update"])
