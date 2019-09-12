@@ -291,6 +291,21 @@ class PostalAddressSelectionForm(ModelForm):
             )
             # repr(postal_addresses)
 
+    def clean(self):
+        data = super().clean()
+
+        postal_address = data.get("postal_address", "")
+        if len(postal_address.strip().splitlines()) < 3:
+            self.add_warning(
+                _(
+                    "The postal address should probably be at least three"
+                    " lines long."
+                ),
+                code="short-postal-address",
+            )
+
+        return data
+
 
 class PersonAutocompleteForm(forms.Form):
     person = forms.ModelChoiceField(
