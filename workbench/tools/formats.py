@@ -1,8 +1,13 @@
 import datetime as dt
+from decimal import Decimal
 
 from django.utils.formats import date_format
 from django.utils.timezone import localtime
 from django.utils.translation import gettext as _
+
+
+H1 = Decimal("0.0")
+H2 = Decimal("0.00")
 
 
 def local_date_format(dttm):
@@ -26,18 +31,18 @@ def pretty_due(day):
 
 
 def currency(value):
-    if not value:
-        return "0.00"
-    return "{:,.2f}".format(value).replace(",", "’")
+    if value:
+        value = value.quantize(H2)
+    return "{:,.2f}".format(value).replace(",", "’") if value else "0.00"
 
 
 def days(value):
-    if not value:
-        return "0.00d"
-    return "%.2fd" % value
+    if value:
+        value = value.quantize(H2)
+    return ("%.2fd" % value) if value else "0.00d"
 
 
 def hours(value):
-    if not value:
-        return "0.0h"
-    return "%.1fh" % value
+    if value:
+        value = value.quantize(H1)
+    return ("%.1fh" % value) if value else "0.0h"

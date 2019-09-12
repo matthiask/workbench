@@ -8,6 +8,7 @@ from workbench import factories
 from workbench.awt.models import Year  # any tools.Model()
 from workbench.contacts.models import Organization
 from workbench.projects.models import Project
+from workbench.tools import formats
 from workbench.tools.forms import Autocomplete
 from workbench.tools.models import ModelWithTotal
 from workbench.tools.testing import messages
@@ -69,3 +70,16 @@ class ToolsTest(TestCase):
                 "".format(project)
             ],
         )
+
+    def test_formats_hours(self):
+        for value, result in [
+            (Decimal("42.22"), "42.2h"),
+            (Decimal("42.27"), "42.3h"),
+            (Decimal("3"), "3.0h"),
+            (Decimal("-123"), "-123.0h"),
+            (Decimal("0.003"), "0.0h"),
+            (Decimal("-0.003"), "0.0h"),
+            (None, "0.0h"),
+        ]:
+            with self.subTest(value=value, result=result):
+                self.assertEqual(formats.hours(value), result)
