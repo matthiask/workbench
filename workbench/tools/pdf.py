@@ -1,6 +1,7 @@
 from copy import deepcopy
 from datetime import date, timedelta
 from decimal import Decimal as D
+from itertools import chain
 
 from django.conf import settings
 from django.utils.text import capfirst
@@ -216,97 +217,88 @@ class PDFDocument(_PDFDocument):
         self.p(postal_address)
         self.next_frame()
 
-    def table_services(self, services):
-        if not services:
-            return
-
-        table = [(_("Services"), "", "")]
-        for service in services:
-            is_optional = getattr(service, "is_optional", False)
-            table.append(
-                (
-                    MarkupParagraph(
-                        "<b>%s</b> %s<br/>%s"
-                        % (
-                            sanitize(service.title),
-                            _("(optional)") if is_optional else "",
-                            sanitize(service.description),
-                        ),
-                        self.style.normal,
+    def services_row(self, service):
+        is_optional = getattr(service, "is_optional", False)
+        return [
+            (
+                MarkupParagraph(
+                    "<b>%s</b> %s<br/>%s"
+                    % (
+                        sanitize(service.title),
+                        _("(optional)") if is_optional else "",
+                        sanitize(service.description),
                     ),
-                    MarkupParagraph(
-                        "<i>%s</i>" % currency(service.service_cost.quantize(Z)),
-                        self.style.right,
-                    )
-                    if is_optional
-                    else "",
-                    "" if is_optional else currency(service.service_cost.quantize(Z)),
+                    self.style.normal,
+                ),
+                MarkupParagraph(
+                    "<i>%s</i>" % currency(service.service_cost.quantize(Z)),
+                    self.style.right,
                 )
+                if is_optional
+                else "",
+                "" if is_optional else currency(service.service_cost.quantize(Z)),
             )
+        ]
 
-        self.table(table, self.style.tableThreeColumns, self.style.tableHead)
+    def services_row_with_details(self, service):
+        is_optional = getattr(service, "is_optional", False)
+        return [
+            (
+                MarkupParagraph(
+                    "<b>%s</b> %s<br/>%s"
+                    % (
+                        sanitize(service.title),
+                        _("(optional)") if is_optional else "",
+                        sanitize(service.description),
+                    ),
+                    self.style.normal,
+                ),
+                "",
+                "",
+            ),
+            (
+                ", ".join(
+                    filter(
+                        None,
+                        [
+                            (
+                                "%s %s à %s/h"
+                                % (
+                                    hours(service.effort_hours),
+                                    service.effort_type,
+                                    currency(service.effort_rate),
+                                )
+                            )
+                            if service.effort_hours and service.effort_rate
+                            else "",
+                            ("%s %s" % (currency(service.cost), _("fixed costs")))
+                            if service.cost
+                            else "",
+                        ],
+                    )
+                ),
+                MarkupParagraph(
+                    "<i>%s</i>" % currency(service.service_cost.quantize(Z)),
+                    self.style.right,
+                )
+                if is_optional
+                else "",
+                "" if is_optional else currency(service.service_cost.quantize(Z)),
+            ),
+            ("", "", ""),
+        ]
 
-    def table_services_with_details(self, services):
+    def table_services(self, services, *, show_details=False):
         if not services:
             return
 
-        table = [(_("Services"), "", "")]
-        for service in services:
-            is_optional = getattr(service, "is_optional", False)
-            table.extend(
-                [
-                    (
-                        MarkupParagraph(
-                            "<b>%s</b> %s<br/>%s"
-                            % (
-                                sanitize(service.title),
-                                _("(optional)") if is_optional else "",
-                                sanitize(service.description),
-                            ),
-                            self.style.normal,
-                        ),
-                        "",
-                        "",
-                    ),
-                    (
-                        ", ".join(
-                            filter(
-                                None,
-                                [
-                                    (
-                                        "%s %s à %s/h"
-                                        % (
-                                            hours(service.effort_hours),
-                                            service.effort_type,
-                                            currency(service.effort_rate),
-                                        )
-                                    )
-                                    if service.effort_hours and service.effort_rate
-                                    else "",
-                                    (
-                                        "%s %s"
-                                        % (currency(service.cost), _("fixed costs"))
-                                    )
-                                    if service.cost
-                                    else "",
-                                ],
-                            )
-                        ),
-                        MarkupParagraph(
-                            "<i>%s</i>" % currency(service.service_cost.quantize(Z)),
-                            self.style.right,
-                        )
-                        if is_optional
-                        else "",
-                        ""
-                        if is_optional
-                        else currency(service.service_cost.quantize(Z)),
-                    ),
-                    ("", "", ""),
-                ]
-            )
-
-        self.table(table, self.style.tableThreeColumns, self.style.tableHead)
+        fn = self.services_row_with_details if show_details else self.services_row
+        self.table(
+            [(_("Services"), "", "")]
+            + list(chain.from_iterable(fn(service) for service in services)),
+            self.style.tableThreeColumns,
+            self.style.tableHead,
+        )
 
     def table_total(self, instance):
         total = [(_("subtotal"), currency(instance.subtotal.quantize(Z)))]
@@ -358,10 +350,10 @@ class PDFDocument(_PDFDocument):
             self.spacer(5 * mm)
             self.p(instance.description)
         self.spacer()
-        if getattr(instance, "show_service_details", False):
-            self.table_services_with_details(instance.services.all())
-        else:
-            self.table_services(instance.services.all())
+        self.table_services(
+            instance.services.all(),
+            show_details=getattr(instance, "show_service_details", False),
+        )
         self.table_total(instance)
         self.spacer()
         self.p(footer)
