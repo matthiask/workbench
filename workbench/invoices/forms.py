@@ -440,6 +440,7 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
             "owned_by",
             "postal_address",
             "subtotal",
+            "third_party_costs",
             "discount",
             "liable_to_vat",
         )
@@ -453,7 +454,9 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
     def __init__(self, *args, **kwargs):
         request = kwargs["request"]
         initial = kwargs.setdefault("initial", {})
-        initial.update({"subtotal": None})  # Invalid -- force input.
+        initial.update(
+            {"subtotal": None, "third_party_costs": None}  # Invalid -- force input.
+        )
 
         contact = None
         customer = None
