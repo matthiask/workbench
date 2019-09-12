@@ -123,7 +123,7 @@ class OffersTest(TestCase):
                 "owned_by": offer.owned_by_id,
                 "discount": "10",
                 "liable_to_vat": "1",
-                "postal_address": "Anything",
+                "postal_address": "Anything\nStreet\nCity",
                 "services": [service.id],
                 # "offered_on": date.today().isoformat(),
                 "status": Offer.ACCEPTED,
@@ -138,7 +138,7 @@ class OffersTest(TestCase):
                 "owned_by": offer.owned_by_id,
                 "discount": "10",
                 "liable_to_vat": "1",
-                "postal_address": "Anything",
+                "postal_address": "Anything\nStreet\nCity",
                 "services": [service.id],
                 "offered_on": date.today().isoformat(),
                 "status": Offer.ACCEPTED,
@@ -201,7 +201,7 @@ class OffersTest(TestCase):
                 "owned_by": offer.owned_by_id,
                 "discount": "10",
                 "liable_to_vat": "1",
-                "postal_address": "Anything",
+                "postal_address": "Anything\nStreet\nCity",
                 "services": [service.id],
                 "offered_on": date.today().isoformat(),
                 "status": Offer.IN_PREPARATION,
@@ -216,7 +216,7 @@ class OffersTest(TestCase):
                 "owned_by": offer.owned_by_id,
                 "discount": "10",
                 "liable_to_vat": "1",
-                "postal_address": "Anything",
+                "postal_address": "Anything\nStreet\nCity",
                 "services": [service.id],
                 "offered_on": date.today().isoformat(),
                 "status": Offer.IN_PREPARATION,
@@ -303,3 +303,21 @@ class OffersTest(TestCase):
 
         self.assertEqual(project.offers.count(), 1)
         self.assertEqual(project.services.count(), 1)
+
+    def test_postal_address_validation(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        url = project.urls["createoffer"]
+        response = self.client.post(
+            url,
+            {
+                "title": "Stuff",
+                "owned_by": project.owned_by_id,
+                "discount": "10",
+                "liable_to_vat": "1",
+                "postal_address": "Anything",
+                "status": Offer.IN_PREPARATION,
+            },
+        )
+        self.assertContains(response, 'value="short-postal-address"')

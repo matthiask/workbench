@@ -66,7 +66,22 @@ class InvoicesTest(TestCase):
                 "owned_by": project.owned_by_id,
                 "discount": 0,
                 "liable_to_vat": 1,
-                "postal_address": "Anything",
+                "postal_address": "Street\nCity",
+                "subtotal": 2500,
+                "third_party_costs": 0,
+            },
+        )
+        self.assertContains(response, 'value="short-postal-address"')
+
+        response = self.client.post(
+            url,
+            {
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "discount": 0,
+                "liable_to_vat": 1,
+                "postal_address": "Anything\nStreet\nCity",
                 "subtotal": 2500,
                 "third_party_costs": 0,
             },
@@ -92,7 +107,7 @@ class InvoicesTest(TestCase):
                 "owned_by": service.project.owned_by_id,
                 "discount": "0",
                 "liable_to_vat": "1",
-                "postal_address": "Anything",
+                "postal_address": "Anything\nStreet\nCity",
                 "selected_services": [service.pk],
             },
         )
@@ -173,7 +188,7 @@ class InvoicesTest(TestCase):
                 "owned_by": project.owned_by_id,
                 "discount": "0",
                 "liable_to_vat": "1",
-                "postal_address": "Anything",
+                "postal_address": "Anything\nStreet\nCity",
                 "selected_services": [
                     service1.pk,
                     service2.pk,
@@ -282,7 +297,7 @@ class InvoicesTest(TestCase):
                 "owned_by": service.project.owned_by_id,
                 "discount": "0",
                 "liable_to_vat": "1",
-                "postal_address": "Anything",
+                "postal_address": "Anything\nStreet\nCity",
                 "selected_services": [service.pk],
             },
         )
@@ -326,7 +341,7 @@ class InvoicesTest(TestCase):
                 "owned_by": service.project.owned_by_id,
                 "discount": "0",
                 "liable_to_vat": "1",
-                "postal_address": "Anything",
+                "postal_address": "Anything\nStreet\nCity",
                 "selected_services": [service.pk],
             },
         )
@@ -429,14 +444,16 @@ class InvoicesTest(TestCase):
                 "subtotal": 100,
                 "discount": 0,
                 "liable_to_vat": 1,
-                "postal_address": "Anything",
+                "postal_address": "Anything\nStreet\nCity",
                 "third_party_costs": 0,
             },
         )
         self.assertContains(response, "does not belong to")
 
     def test_update_invoice(self):
-        invoice = factories.InvoiceFactory.create(contact=None, postal_address="Test")
+        invoice = factories.InvoiceFactory.create(
+            contact=None, postal_address="Test\nStreet\nCity"
+        )
         self.client.force_login(invoice.owned_by)
         response = self.client.post(invoice.urls["update"], invoice_to_dict(invoice))
         self.assertContains(response, "No contact selected.")
@@ -549,7 +566,7 @@ class InvoicesTest(TestCase):
             type=Invoice.FIXED,
             _code=0,
             status=Invoice.SENT,
-            postal_address="Test",
+            postal_address="Test\nStreet\nCity",
         )
         msg = ["Invoice and/or due date missing for selected state."]
 
@@ -569,7 +586,7 @@ class InvoicesTest(TestCase):
                 type=Invoice.FIXED,
                 _code=0,
                 status=Invoice.SENT,
-                postal_address="Test",
+                postal_address="Test\nStreet\nCity",
                 invoiced_on=date.today(),
                 due_on=date.today() - timedelta(days=1),
             ).full_clean()
@@ -585,7 +602,7 @@ class InvoicesTest(TestCase):
                 type=Invoice.DOWN_PAYMENT,
                 _code=0,
                 status=Invoice.IN_PREPARATION,
-                postal_address="Test",
+                postal_address="Test\nStreet\nCity",
             ).full_clean()
         self.assertEqual(
             list(cm.exception),
@@ -620,7 +637,7 @@ class InvoicesTest(TestCase):
             due_on=date.today(),
             closed_on=date.today(),
             status=Invoice.PAID,
-            postal_address="Test",
+            postal_address="Test\nStreet\nCity",
         )
         self.client.force_login(invoice.owned_by)
 
@@ -686,7 +703,7 @@ class InvoicesTest(TestCase):
                 "owned_by": project.owned_by_id,
                 "discount": 0,
                 "liable_to_vat": 1,
-                "postal_address": "Anything",
+                "postal_address": "Anything\nStreet\nCity",
                 "subtotal": 2500,
                 "third_party_costs": 0,
                 "apply_down_payment": [down_payment.pk],
@@ -709,7 +726,7 @@ class InvoicesTest(TestCase):
                 "owned_by": project.owned_by_id,
                 "discount": 0,
                 "liable_to_vat": 1,
-                "postal_address": "Anything",
+                "postal_address": "Anything\nStreet\nCity",
                 "subtotal": 2500,
                 "third_party_costs": 0,
                 "apply_down_payment": [],
@@ -835,7 +852,7 @@ class InvoicesTest(TestCase):
         invoice = factories.InvoiceFactory.create(
             invoiced_on=date.today(),
             due_on=date.today(),
-            postal_address="Test",
+            postal_address="Test\nStreet\nCity",
             status=Invoice.CANCELED,
         )
 
