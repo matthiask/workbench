@@ -1,11 +1,7 @@
 from django.conf.urls import url
 
 from workbench import generic
-from workbench.invoices.forms import (
-    CreateRecurringInvoiceForm,
-    RecurringInvoiceForm,
-    RecurringInvoiceSearchForm,
-)
+from workbench.invoices.forms import RecurringInvoiceForm, RecurringInvoiceSearchForm
 from workbench.invoices.models import RecurringInvoice
 from workbench.invoices.views import RecurringInvoiceDetailView
 
@@ -25,8 +21,8 @@ urlpatterns = [
     ),
     url(
         r"^create/$",
-        generic.CreateAndUpdateView.as_view(
-            model=RecurringInvoice, form_class=CreateRecurringInvoiceForm
+        generic.CreateView.as_view(
+            model=RecurringInvoice, form_class=RecurringInvoiceForm
         ),
         name="invoices_recurringinvoice_create",
     ),

@@ -611,39 +611,6 @@ class RecurringInvoiceSearchForm(forms.Form):
         return queryset.select_related("customer", "contact__organization", "owned_by")
 
 
-class CreateRecurringInvoiceForm(ModelForm):
-    user_fields = default_to_current_user = ("owned_by",)
-
-    class Meta:
-        model = RecurringInvoice
-        fields = (
-            "contact",
-            "customer",
-            "title",
-            "description",
-            "owned_by",
-            "starts_on",
-            "periodicity",
-            "subtotal",
-            "discount",
-            "liable_to_vat",
-            "third_party_costs",
-        )
-        widgets = {
-            "customer": Autocomplete(model=Organization),
-            "contact": Autocomplete(model=Person),
-            "description": Textarea,
-            "periodicity": forms.RadioSelect,
-        }
-
-    def __init__(self, *args, **kwargs):
-        kwargs["instance"] = RecurringInvoice(third_party_costs=None)
-
-        super().__init__(*args, **kwargs)
-
-        self.fields["periodicity"].choices = RecurringInvoice.PERIODICITY_CHOICES
-
-
 class RecurringInvoiceForm(PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
 
@@ -661,9 +628,9 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             "periodicity",
             "next_period_starts_on",
             "subtotal",
+            "third_party_costs",
             "discount",
             "liable_to_vat",
-            "third_party_costs",
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
@@ -674,14 +641,51 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
         }
 
     def __init__(self, *args, **kwargs):
+        instance = kwargs.get("instance")
+        contact = None
+        customer = None
+        self.pre_form = False
+        request = kwargs["request"]
+        initial = kwargs.setdefault("initial", {})
+
+        if request.GET.get("contact"):
+            try:
+                contact = Person.objects.get(pk=request.GET.get("contact"))
+            except (Person.DoesNotExist, TypeError, ValueError):
+                self.pre_form = True
+            else:
+                initial.update({"customer": contact.organization, "contact": contact})
+
+        elif request.GET.get("customer"):
+            try:
+                customer = Organization.objects.get(pk=request.GET.get("customer"))
+            except (Organization.DoesNotExist, TypeError, ValueError):
+                self.pre_form = True
+            else:
+                initial.update({"customer": customer})
+
+        elif not instance:
+            self.pre_form = True
+
+        if not self.pre_form and not instance:
+            kwargs["instance"] = RecurringInvoice(subtotal=None, third_party_costs=None)
+
         super().__init__(*args, **kwargs)
 
-        self.fields["periodicity"].choices = RecurringInvoice.PERIODICITY_CHOICES
-        self.fields["next_period_starts_on"].disabled = True
+        if self.pre_form:
+            for field in list(self.fields):
+                if field not in {"customer", "contact"}:
+                    self.fields.pop(field)
 
-        self.add_postal_address_selection_if_empty(
-            person=self.instance.contact, for_billing=True
-        )
+        else:
+            self.fields["periodicity"].choices = RecurringInvoice.PERIODICITY_CHOICES
+            self.fields["next_period_starts_on"].disabled = True
+
+            self.add_postal_address_selection_if_empty(
+                person=self.instance.contact or contact,
+                organization=customer,
+                for_billing=True,
+            )
 
     def clean(self):
         data = super().clean()

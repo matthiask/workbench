@@ -74,6 +74,11 @@ class RecurringTest(TestCase):
         self.client.force_login(person.primary_contact)
 
         response = self.client.get("/recurring-invoices/create/")
+        self.assertNotContains(response, 'name="title"')
+
+        response = self.client.get(
+            "/recurring-invoices/create/?contact={}".format(person.pk)
+        )
         self.assertContains(
             response,
             # No value!
@@ -83,7 +88,7 @@ class RecurringTest(TestCase):
         # print(response, response.content.decode("utf-8"))
 
         response = self.client.post(
-            "/recurring-invoices/create/",
+            "/recurring-invoices/create/?contact={}".format(person.pk),
             {
                 "customer": person.organization_id,
                 # "contact": person.id,
@@ -100,7 +105,7 @@ class RecurringTest(TestCase):
         self.assertContains(response, "No contact selected.")
 
         response = self.client.post(
-            "/recurring-invoices/create/",
+            "/recurring-invoices/create/?contact={}".format(person.pk),
             {
                 "customer": person.organization_id,
                 "contact": person.id,
@@ -112,11 +117,30 @@ class RecurringTest(TestCase):
                 "discount": 0,
                 "liable_to_vat": "on",
                 "third_party_costs": 0,
+                "postal_address": "Anything",
+            },
+        )
+        self.assertContains(response, 'value="short-postal-address"')
+
+        response = self.client.post(
+            "/recurring-invoices/create/?contact={}".format(person.pk),
+            {
+                "customer": person.organization_id,
+                "contact": person.id,
+                "title": "recur",
+                "owned_by": person.primary_contact_id,
+                "starts_on": date.today().isoformat(),
+                "periodicity": "yearly",
+                "subtotal": 500,
+                "discount": 0,
+                "liable_to_vat": "on",
+                "third_party_costs": 0,
+                "postal_address": "Anything\nStreet\nCity",
             },
         )
 
         ri = RecurringInvoice.objects.get()
-        self.assertRedirects(response, ri.urls["update"])
+        self.assertRedirects(response, ri.urls["detail"])
 
         factories.PostalAddressFactory.create(person=person)
         response = self.client.get(ri.urls["update"])
@@ -191,3 +215,36 @@ class RecurringTest(TestCase):
             subtotal=200,
         )
         self.assertEqual(ri.pretty_status, "monthly from 01.01.2018")
+
+    def test_pre_form(self):
+        self.client.force_login(factories.UserFactory.create())
+
+        # pre_form does not have these fields
+        response = self.client.get(RecurringInvoice().urls["create"])
+        self.assertContains(response, 'method="GET"')
+        self.assertNotContains(response, 'id="id_title"')
+        self.assertNotContains(response, 'id="id_description"')
+
+        # Nonexistant entries
+        response = self.client.get(RecurringInvoice().urls["create"] + "?contact=0")
+        self.assertContains(response, 'method="GET"')
+        self.assertNotContains(response, 'id="id_title"')
+        self.assertNotContains(response, 'id="id_description"')
+
+        response = self.client.get(RecurringInvoice().urls["create"] + "?customer=0")
+        self.assertContains(response, 'method="GET"')
+        self.assertNotContains(response, 'id="id_title"')
+        self.assertNotContains(response, 'id="id_description"')
+
+        # Existing
+        organization = factories.OrganizationFactory.create()
+        response = self.client.get(
+            RecurringInvoice().urls["create"] + "?customer={}".format(organization.pk)
+        )
+        self.assertContains(response, 'method="POST"')
+
+        person = factories.PersonFactory.create()
+        response = self.client.get(
+            RecurringInvoice().urls["create"] + "?contact={}".format(person.pk)
+        )
+        self.assertContains(response, 'method="POST"')
