@@ -1,7 +1,7 @@
 from workbench.accounts.models import User
 
 
-class AuthBackend(object):
+class AuthBackend:
     def get_user(self, user_id):
         return User.objects.filter(pk=user_id).first()
 
