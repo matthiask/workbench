@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+import datetime as dt
 from decimal import Decimal
 from functools import total_ordering
 
@@ -123,14 +123,14 @@ class User(Model, AbstractBaseUser):
         }
 
         return {
-            "today": per_day.get(date.today(), Decimal("0.0")),
+            "today": per_day.get(dt.date.today(), Decimal("0.0")),
             "week": sum(per_day.values(), Decimal("0.0")),
         }
 
     @cached_property
     def todays_hours(self):
         return (
-            self.loggedhours.filter(rendered_on=date.today())
+            self.loggedhours.filter(rendered_on=dt.date.today())
             .select_related("service__project__owned_by", "rendered_by")
             .order_by("-created_at")[:5]
         )
@@ -147,7 +147,7 @@ class User(Model, AbstractBaseUser):
 
         return Project.objects.filter(
             id__in=self.loggedhours.filter(
-                rendered_on__gte=date.today() - timedelta(days=7)
+                rendered_on__gte=dt.date.today() - dt.timedelta(days=7)
             )
             .values("service__project")
             .annotate(Count("id"))

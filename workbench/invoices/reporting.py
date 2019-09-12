@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 
 from django.db.models import Sum
 
@@ -30,7 +30,7 @@ def monthly_invoicing(year):
     }
 
     month_data = {"total": Z, "total_excl_tax": Z, "third_party_costs": Z}
-    month = dict(month_data, month=date(year, 1, 1), invoices=[])
+    month = dict(month_data, month=dt.date(year, 1, 1), invoices=[])
 
     for invoice in invoices.select_related(
         "customer", "contact__organization", "project__owned_by", "owned_by"

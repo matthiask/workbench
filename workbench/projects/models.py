@@ -1,5 +1,5 @@
+import datetime as dt
 from collections import defaultdict
-from datetime import date, timedelta
 from decimal import Decimal
 
 from django.contrib import messages
@@ -45,7 +45,7 @@ class ProjectQuerySet(SearchQuerySet):
 
         return self.open().exclude(
             id__in=LoggedHours.objects.order_by()
-            .filter(rendered_on__gte=date.today() - timedelta(days=60))
+            .filter(rendered_on__gte=dt.date.today() - dt.timedelta(days=60))
             .values("service__project")
         )
 
@@ -371,7 +371,7 @@ class ServiceQuerySet(models.QuerySet):
             for offer, services in sorted(
                 offers.items(),
                 key=lambda item: (
-                    item[0] and item[0].offered_on or date.max,
+                    item[0] and item[0].offered_on or dt.date.max,
                     item[0] and item[0].pk or 1e100,
                 ),
             )

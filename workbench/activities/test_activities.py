@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+import datetime as dt
 
 from django.test import TestCase
 from django.utils import timezone
@@ -12,7 +12,8 @@ class ActivitiesTest(TestCase):
         activity = factories.ActivityFactory.create()
         for i in range(-1, 19):
             factories.ActivityFactory.create(
-                owned_by=activity.owned_by, due_on=date.today() + timedelta(days=i)
+                owned_by=activity.owned_by,
+                due_on=dt.date.today() + dt.timedelta(days=i),
             )
 
         self.client.force_login(activity.owned_by)
@@ -41,7 +42,7 @@ class ActivitiesTest(TestCase):
         self.assertEqual(response.status_code, 202)
 
         activity.refresh_from_db()
-        self.assertEqual(activity.completed_at.date(), date.today())
+        self.assertEqual(activity.completed_at.date(), dt.date.today())
 
         response = self.client.get(activity.urls["list"])
         self.assertContains(response, "1 &ndash; 20 of 20")

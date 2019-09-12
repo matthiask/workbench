@@ -1,5 +1,5 @@
+import datetime as dt
 from collections import defaultdict
-from datetime import date
 from decimal import Decimal
 
 from django.db.models import Sum
@@ -11,7 +11,7 @@ from workbench.logbook.models import LoggedHours
 
 def logged_hours_by_circle():
     queryset = (
-        LoggedHours.objects.filter(rendered_on__year=date.today().year)
+        LoggedHours.objects.filter(rendered_on__year=dt.date.today().year)
         .order_by()
         .values("service__role", "rendered_by")
         .annotate(Sum("hours"))

@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 
 from django.test import TestCase
 from django.utils import timezone
@@ -56,7 +56,7 @@ class ExpensesTest(TestCase):
             project.urls["createcost"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": local_date_format(date.today()),
+                "rendered_on": local_date_format(dt.date.today()),
                 "cost": "10",
                 "description": "Anything",
                 "are_expenses": "on",
@@ -72,7 +72,7 @@ class ExpensesTest(TestCase):
             project.urls["createcost"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": date.today().isoformat(),
+                "rendered_on": dt.date.today().isoformat(),
                 "cost": "10",
                 "description": "Anything",
                 "are_expenses": "on",

@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+import datetime as dt
 
 from django.contrib import messages
 from django.db import models
@@ -29,7 +29,7 @@ class InvoiceQuerySet(SearchQuerySet):
         return self.filter(
             status=Invoice.SENT,
             due_on__isnull=False,
-            due_on__lte=date.today() - timedelta(days=30),
+            due_on__lte=dt.date.today() - dt.timedelta(days=30),
         )
 
 
@@ -260,7 +260,7 @@ class Invoice(ModelWithTotal):
             if self.last_reminded_on:
                 return _("Sent on %(invoiced_on)s, reminded on %(reminded_on)s") % d
 
-            if self.due_on and date.today() > self.due_on:
+            if self.due_on and dt.date.today() > self.due_on:
                 return _("Sent on %(invoiced_on)s but overdue") % d
 
             return _("Sent on %(invoiced_on)s") % d
@@ -279,7 +279,7 @@ class Invoice(ModelWithTotal):
         }[self.status]
 
         if self.status == self.SENT:
-            if self.last_reminded_on or (self.due_on and date.today() > self.due_on):
+            if self.last_reminded_on or (self.due_on and dt.date.today() > self.due_on):
                 css = "warning"
 
         return format_html(
@@ -417,7 +417,7 @@ class Service(ServiceBase):
 
 class RecurringInvoiceQuerySet(SearchQuerySet):
     def create_invoices(self):
-        generate_until = date.today() + timedelta(days=20)
+        generate_until = dt.date.today() + dt.timedelta(days=20)
         invoices = []
         for ri in self.filter(
             Q(starts_on__lte=generate_until),
@@ -470,7 +470,7 @@ class RecurringInvoice(ModelWithTotal):
     )
     postal_address = models.TextField(_("postal address"))
 
-    starts_on = models.DateField(_("starts on"), default=date.today)
+    starts_on = models.DateField(_("starts on"), default=dt.date.today)
     ends_on = models.DateField(_("ends on"), blank=True, null=True)
     periodicity = models.CharField(
         _("periodicity"), max_length=20, choices=PERIODICITY_CHOICES
@@ -516,7 +516,7 @@ class RecurringInvoice(ModelWithTotal):
             contact=self.contact,
             project=None,
             invoiced_on=period_starts_on,
-            due_on=period_starts_on + timedelta(days=15),
+            due_on=period_starts_on + dt.timedelta(days=15),
             title=self.title,
             description="\n\n".join(
                 filter(
@@ -558,7 +558,7 @@ class RecurringInvoice(ModelWithTotal):
             invoices.append(
                 self.create_single_invoice(
                     period_starts_on=this_period,
-                    period_ends_on=next_period - timedelta(days=1),
+                    period_ends_on=next_period - dt.timedelta(days=1),
                 )
             )
             self.next_period_starts_on = next_period

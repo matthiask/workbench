@@ -1,7 +1,7 @@
 # Copied 1:1 from django-user-payments
 
+import datetime as dt
 import itertools
-from datetime import date, timedelta
 
 
 def next_valid_day(year, month, day):
@@ -12,7 +12,7 @@ def next_valid_day(year, month, day):
     """
     while True:
         try:
-            return date(year, month, day)
+            return dt.date(year, month, day)
         except ValueError:
             if month > 12:
                 month -= 12
@@ -55,7 +55,7 @@ def recurring(start, periodicity):
 
     elif periodicity == "weekly":
         return (  # pragma: no branch
-            start + timedelta(days=i * 7) for i in itertools.count()
+            start + dt.timedelta(days=i * 7) for i in itertools.count()
         )
 
     else:

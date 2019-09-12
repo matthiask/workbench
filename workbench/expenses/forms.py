@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 
 from django import forms
 from django.db.models import Q
@@ -76,6 +76,6 @@ class ExpenseReportForm(ModelForm):
         instance = super().save()
         instance.expenses.set(self.cleaned_data["expenses"])
         if self.cleaned_data.get("is_closed"):
-            instance.closed_on = date.today()
+            instance.closed_on = dt.date.today()
         instance.save()
         return instance

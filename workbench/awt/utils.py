@@ -1,5 +1,5 @@
+import datetime as dt
 from calendar import isleap
-from datetime import timedelta
 
 
 def days_per_month(year):
@@ -9,7 +9,9 @@ def days_per_month(year):
 def monthly_days(date_from, date_until):
     month = date_from.replace(day=1)
     while True:
-        next_month = month + timedelta(days=days_per_month(month.year)[month.month - 1])
+        next_month = month + dt.timedelta(
+            days=days_per_month(month.year)[month.month - 1]
+        )
         if month < date_from and next_month > date_until:
             yield (month, (date_until - date_from).days + 1)
             break

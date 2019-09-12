@@ -1,5 +1,5 @@
+import datetime as dt
 from collections import defaultdict
-from datetime import date, timedelta
 
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -97,7 +97,7 @@ class RecurringInvoiceDetailView(generic.DetailView):
         self.object = self.get_object()
         if request.GET.get("create_invoices"):
             invoices = self.object.create_invoices(
-                generate_until=date.today() + timedelta(days=20)
+                generate_until=dt.date.today() + dt.timedelta(days=20)
             )
             messages.info(
                 request,

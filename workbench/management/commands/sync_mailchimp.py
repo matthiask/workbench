@@ -1,4 +1,4 @@
-from datetime import timedelta
+import datetime as dt
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -22,7 +22,7 @@ class Command(BaseCommand):
         # Determine persons that need to be updated. Get machting emails
         # and addresses
         since = timezone.now().replace(hour=0, minute=0, second=0)
-        since -= timedelta(days=1)
+        since -= dt.timedelta(days=1)
 
         person_ids = {
             int(row.row_data["id"])

@@ -1,5 +1,5 @@
+import datetime as dt
 import itertools
-from datetime import date
 
 from django import forms
 from django.contrib import messages
@@ -247,7 +247,7 @@ class InvoiceForm(PostalAddressSelectionForm):
             )
 
         if data["status"] >= Invoice.PAID and not data["closed_on"]:
-            data["closed_on"] = date.today()
+            data["closed_on"] = dt.date.today()
 
         if self.instance.closed_on and data["status"] < Invoice.PAID:
             if self.should_ignore_warnings():
@@ -585,11 +585,11 @@ class RecurringInvoiceSearchForm(forms.Form):
         data = self.cleaned_data
         if data.get("s") == "":
             queryset = queryset.filter(
-                Q(ends_on__isnull=True) | Q(ends_on__gte=date.today())
+                Q(ends_on__isnull=True) | Q(ends_on__gte=dt.date.today())
             )
         elif data.get("s") == "closed":
             queryset = queryset.filter(
-                Q(ends_on__isnull=False) & Q(ends_on__lt=date.today())
+                Q(ends_on__isnull=False) & Q(ends_on__lt=dt.date.today())
             )
         if data.get("org"):
             queryset = queryset.filter(customer=data.get("org"))

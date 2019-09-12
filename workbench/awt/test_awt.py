@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 from decimal import Decimal
 
 from django.test import TestCase
@@ -36,30 +36,30 @@ class AWTTest(TestCase):
     def test_monthly_days(self):
         for from_, until_, dates in [
             (
-                date(2018, 2, 1),
-                date(2018, 7, 31),
+                dt.date(2018, 2, 1),
+                dt.date(2018, 7, 31),
                 [
-                    (date(2018, 2, 1), 28),
-                    (date(2018, 3, 1), 31),
-                    (date(2018, 4, 1), 30),
-                    (date(2018, 5, 1), 31),
-                    (date(2018, 6, 1), 30),
-                    (date(2018, 7, 1), 31),
+                    (dt.date(2018, 2, 1), 28),
+                    (dt.date(2018, 3, 1), 31),
+                    (dt.date(2018, 4, 1), 30),
+                    (dt.date(2018, 5, 1), 31),
+                    (dt.date(2018, 6, 1), 30),
+                    (dt.date(2018, 7, 1), 31),
                 ],
             ),
             (
-                date(2018, 2, 2),
-                date(2018, 7, 30),
+                dt.date(2018, 2, 2),
+                dt.date(2018, 7, 30),
                 [
-                    (date(2018, 2, 1), 27),
-                    (date(2018, 3, 1), 31),
-                    (date(2018, 4, 1), 30),
-                    (date(2018, 5, 1), 31),
-                    (date(2018, 6, 1), 30),
-                    (date(2018, 7, 1), 30),
+                    (dt.date(2018, 2, 1), 27),
+                    (dt.date(2018, 3, 1), 31),
+                    (dt.date(2018, 4, 1), 30),
+                    (dt.date(2018, 5, 1), 31),
+                    (dt.date(2018, 6, 1), 30),
+                    (dt.date(2018, 7, 1), 30),
                 ],
             ),
-            (date(2018, 2, 10), date(2018, 2, 19), [(date(2018, 2, 1), 10)]),
+            (dt.date(2018, 2, 10), dt.date(2018, 2, 19), [(dt.date(2018, 2, 1), 10)]),
         ]:
             with self.subTest(locals()):
                 self.assertEqual(list(monthly_days(from_, until_)), dates)
@@ -73,29 +73,29 @@ class AWTTest(TestCase):
             created_by=user,
             hours=1000,
             description="anything",
-            rendered_on=date(2018, 1, 1),
+            rendered_on=dt.date(2018, 1, 1),
         )
-        user.absences.create(starts_on=date(2018, 1, 1), days=5, is_vacation=True)
-        user.absences.create(starts_on=date(2018, 4, 1), days=45, is_vacation=True)
-        user.absences.create(starts_on=date(2018, 7, 1), days=10, is_vacation=False)
-        user.absences.create(starts_on=date(2018, 10, 1), days=10, is_vacation=True)
+        user.absences.create(starts_on=dt.date(2018, 1, 1), days=5, is_vacation=True)
+        user.absences.create(starts_on=dt.date(2018, 4, 1), days=45, is_vacation=True)
+        user.absences.create(starts_on=dt.date(2018, 7, 1), days=10, is_vacation=False)
+        user.absences.create(starts_on=dt.date(2018, 10, 1), days=10, is_vacation=True)
         user.employments.create(
-            date_from=date(2014, 1, 1),
-            date_until=date(2014, 3, 31),
+            date_from=dt.date(2014, 1, 1),
+            date_until=dt.date(2014, 3, 31),
             percentage=80,
             vacation_weeks=5,
         )
         user.employments.create(
-            date_from=date(2017, 1, 1), percentage=80, vacation_weeks=5
+            date_from=dt.date(2017, 1, 1), percentage=80, vacation_weeks=5
         )
         user.employments.create(
-            date_from=date(2018, 10, 1), percentage=100, vacation_weeks=5
+            date_from=dt.date(2018, 10, 1), percentage=100, vacation_weeks=5
         )
 
         employments = list(user.employments.all())
-        self.assertEqual(employments[0].date_until, date(2014, 3, 31))
-        self.assertEqual(employments[1].date_until, date(2018, 9, 30))
-        self.assertEqual(employments[2].date_until, date(9999, 12, 31))
+        self.assertEqual(employments[0].date_until, dt.date(2014, 3, 31))
+        self.assertEqual(employments[1].date_until, dt.date(2018, 9, 30))
+        self.assertEqual(employments[2].date_until, dt.date(9999, 12, 31))
 
         awt = annual_working_time(year, users=[user])[0]
 
@@ -136,7 +136,7 @@ class AWTTest(TestCase):
             "/absences/create/",
             {
                 "user": user.pk,
-                "starts_on": date.today().isoformat(),
+                "starts_on": dt.date.today().isoformat(),
                 "days": 3,
                 "description": "Sick",
                 "is_vacation": "",
@@ -151,7 +151,7 @@ class AWTTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-        Absence.objects.update(starts_on=date(2018, 1, 1))
+        Absence.objects.update(starts_on=dt.date(2018, 1, 1))
         response = self.client.get(
             absence.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
@@ -183,14 +183,14 @@ class AWTTest(TestCase):
         user = factories.UserFactory.create()
 
         employment = Employment.objects.create(
-            user=user, percentage=100, vacation_weeks=5, date_from=date(2018, 1, 1)
+            user=user, percentage=100, vacation_weeks=5, date_from=dt.date(2018, 1, 1)
         )
-        self.assertEqual(employment.date_until, date.max)
+        self.assertEqual(employment.date_until, dt.date.max)
         self.assertEqual(str(employment), "since 01.01.2018")
 
         self.assertEqual(list(year.active_users()), [user])
 
-        employment.date_until = date(2018, 6, 30)
+        employment.date_until = dt.date(2018, 6, 30)
         employment.save()
         self.assertEqual(str(employment), "01.01.2018 - 30.06.2018")
 
@@ -223,6 +223,6 @@ class AWTTest(TestCase):
     def test_non_ajax_redirect(self):
         user = factories.UserFactory.create()
         self.client.force_login(user)
-        absence = Absence.objects.create(user=user, starts_on=date.today(), days=1)
+        absence = Absence.objects.create(user=user, starts_on=dt.date.today(), days=1)
         response = self.client.get(absence.urls["detail"])
         self.assertRedirects(response, "/absences/?u=" + str(user.pk))

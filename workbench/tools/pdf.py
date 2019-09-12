@@ -1,5 +1,5 @@
+import datetime as dt
 from copy import deepcopy
-from datetime import date, timedelta
 from decimal import Decimal as D
 from itertools import chain
 
@@ -380,7 +380,7 @@ class PDFDocument(_PDFDocument):
                 (
                     _("valid until"),
                     (
-                        local_date_format(offer.offered_on + timedelta(days=60))
+                        local_date_format(offer.offered_on + dt.timedelta(days=60))
                         if offer.offered_on
                         else MarkupParagraph(
                             "<b>%s</b>" % _("NO DATE YET"), style=self.style.bold
@@ -432,7 +432,7 @@ class PDFDocument(_PDFDocument):
         self.init_letter()
         self.p(offers[-1].postal_address)
         self.next_frame()
-        self.p("Zürich, %s" % local_date_format(date.today()))
+        self.p("Zürich, %s" % local_date_format(dt.date.today()))
         self.spacer()
         self.h1(project.title)
         if project.description:
@@ -484,7 +484,7 @@ class PDFDocument(_PDFDocument):
         self.init_letter()
         self.p(invoices[-1].postal_address)
         self.next_frame()
-        self.p("Zürich, %s" % local_date_format(date.today()))
+        self.p("Zürich, %s" % local_date_format(dt.date.today()))
         self.spacer()
         self.h1("Zahlungserinnerung")
         self.spacer()

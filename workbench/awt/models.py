@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+import datetime as dt
 
 from django.contrib import messages
 from django.db import models
@@ -13,7 +13,7 @@ from workbench.tools.urls import model_urls
 
 class YearQuerySet(models.QuerySet):
     def current(self):
-        return self.filter(year=date.today().year).first()
+        return self.filter(year=dt.date.today().year).first()
 
 
 class Year(Model):
@@ -67,8 +67,8 @@ class Year(Model):
     def active_users(self):
         return User.objects.filter(
             id__in=Employment.objects.filter(
-                date_from__lte=date(self.year, 12, 31),
-                date_until__gte=date(self.year, 1, 1),
+                date_from__lte=dt.date(self.year, 12, 31),
+                date_until__gte=dt.date(self.year, 1, 1),
             ).values("user")
         )
 
@@ -80,8 +80,8 @@ class Employment(Model):
         verbose_name=_("user"),
         related_name="employments",
     )
-    date_from = models.DateField(_("date from"), default=date.today)
-    date_until = models.DateField(_("date until"), default=date.max)
+    date_from = models.DateField(_("date from"), default=dt.date.today)
+    date_until = models.DateField(_("date until"), default=dt.date.max)
     percentage = models.IntegerField(_("percentage"))
     vacation_weeks = models.DecimalField(
         _("vacation weeks"),
@@ -113,7 +113,7 @@ class Employment(Model):
                 next = employment
             else:
                 if employment.date_until >= next.date_from:
-                    employment.date_until = next.date_from - timedelta(days=1)
+                    employment.date_until = next.date_from - dt.timedelta(days=1)
                     super(Employment, employment).save()
                 next = employment
 
@@ -140,7 +140,7 @@ class Absence(Model):
 
     @classmethod
     def allow_update(cls, instance, request):
-        if instance.starts_on.year < date.today().year:
+        if instance.starts_on.year < dt.date.today().year:
             messages.error(request, _("Absences of past years are locked."))
             return False
         return True

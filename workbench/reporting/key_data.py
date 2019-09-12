@@ -1,5 +1,5 @@
+import datetime as dt
 from collections import defaultdict
-from datetime import date
 
 from django.db import connections
 from django.db.models import Sum
@@ -185,7 +185,7 @@ ORDER BY cutoff_date
         month: accrual
         for month, accrual in accruals.items()
         if month != (0, 0)
-        and date_range[0] <= date(month[0], month[1], 1) <= date_range[1]
+        and date_range[0] <= dt.date(month[0], month[1], 1) <= date_range[1]
     }
 
 

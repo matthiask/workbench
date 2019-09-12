@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+import datetime as dt
 
 from django.test import TestCase
 from django.utils import timezone
@@ -20,7 +20,7 @@ class LogbookTest(TestCase):
                 url,
                 {
                     "rendered_by": project.owned_by_id,
-                    "rendered_on": date.today().isoformat(),
+                    "rendered_on": dt.date.today().isoformat(),
                     "service": service.id,
                     "hours": "0.1",
                     "description": "Test",
@@ -38,12 +38,16 @@ class LogbookTest(TestCase):
         response = send()
         self.assertContains(response, "This seems to be a duplicate.")
 
-        response = send(rendered_on=(date.today() - timedelta(days=10)).isoformat())
+        response = send(
+            rendered_on=(dt.date.today() - dt.timedelta(days=10)).isoformat()
+        )
         self.assertContains(
             response, "Sorry, hours have to be logged in the same week."
         )
 
-        response = send(rendered_on=(date.today() + timedelta(days=10)).isoformat())
+        response = send(
+            rendered_on=(dt.date.today() + dt.timedelta(days=10)).isoformat()
+        )
         self.assertContains(response, "Sorry, too early.")
 
         response = send(service="")
@@ -56,7 +60,7 @@ class LogbookTest(TestCase):
         hours.refresh_from_db()
         self.assertEqual(hours.description, "Test 2")
 
-        project.closed_on = date.today()
+        project.closed_on = dt.date.today()
         project.save()
 
         response = send()
@@ -73,7 +77,7 @@ class LogbookTest(TestCase):
             project.urls["createhours"],
             {
                 "rendered_by": user.id,
-                "rendered_on": (date.today() - timedelta(days=10)).isoformat(),
+                "rendered_on": (dt.date.today() - dt.timedelta(days=10)).isoformat(),
                 "service": service.id,
                 "hours": "0.1",
                 "description": "Test",
@@ -112,7 +116,7 @@ class LogbookTest(TestCase):
             project.urls["createhours"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": date.today().isoformat(),
+                "rendered_on": dt.date.today().isoformat(),
                 # "service": service.id,
                 "hours": "0.1",
                 "description": "Test",
@@ -144,7 +148,7 @@ class LogbookTest(TestCase):
             project.urls["createhours"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": date.today().isoformat(),
+                "rendered_on": dt.date.today().isoformat(),
                 # "service": service.id,
                 "hours": "0.1",
                 "description": "Test",
@@ -168,7 +172,7 @@ class LogbookTest(TestCase):
             service.project.urls["createhours"],
             {
                 "rendered_by": service.project.owned_by_id,
-                "rendered_on": date.today().isoformat(),
+                "rendered_on": dt.date.today().isoformat(),
                 "service": service.id,
                 "hours": "0.1",
                 "description": "Test",
@@ -232,7 +236,7 @@ class LogbookTest(TestCase):
             project.urls["createcost"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": date.today().isoformat(),
+                "rendered_on": dt.date.today().isoformat(),
                 "cost": "10",
                 "third_party_costs": "9",
                 "description": "Anything",
@@ -242,14 +246,14 @@ class LogbookTest(TestCase):
         self.assertEqual(response.status_code, 201)
 
         cost = LoggedCost.objects.get()
-        project.closed_on = date.today()
+        project.closed_on = dt.date.today()
         project.save()
 
         response = self.client.post(
             cost.urls["update"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": date.today().isoformat(),
+                "rendered_on": dt.date.today().isoformat(),
                 "cost": "10",
                 "third_party_costs": "9",
                 "description": "Anything",
@@ -262,7 +266,7 @@ class LogbookTest(TestCase):
             cost.urls["update"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": date.today().isoformat(),
+                "rendered_on": dt.date.today().isoformat(),
                 "cost": "10",
                 "third_party_costs": "9",
                 "description": "Anything",
@@ -274,7 +278,7 @@ class LogbookTest(TestCase):
 
     def test_update_old_disabled_fields(self):
         hours = factories.LoggedHoursFactory.create(
-            rendered_on=date.today() - timedelta(days=10)
+            rendered_on=dt.date.today() - dt.timedelta(days=10)
         )
         self.client.force_login(hours.rendered_by)
         response = self.client.get(
@@ -296,7 +300,7 @@ class LogbookTest(TestCase):
 
     def test_logged_hours_deletion(self):
         hours = factories.LoggedHoursFactory.create(
-            rendered_on=date.today() - timedelta(days=10)
+            rendered_on=dt.date.today() - dt.timedelta(days=10)
         )
         self.client.force_login(hours.rendered_by)
         response = self.client.post(
@@ -402,7 +406,7 @@ class LogbookTest(TestCase):
 
     def test_autofill_field(self):
         hours = factories.LoggedHoursFactory.create(
-            created_at=timezone.now() - timedelta(hours=2)
+            created_at=timezone.now() - dt.timedelta(hours=2)
         )
         self.client.force_login(hours.rendered_by)
 
@@ -489,7 +493,7 @@ class LogbookTest(TestCase):
             project.urls["createcost"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": date.today().isoformat(),
+                "rendered_on": dt.date.today().isoformat(),
                 "cost": "10",
                 "third_party_costs": "11",
                 "description": "Anything",
@@ -505,7 +509,7 @@ class LogbookTest(TestCase):
             project.urls["createcost"],
             {
                 "rendered_by": project.owned_by_id,
-                "rendered_on": date.today().isoformat(),
+                "rendered_on": dt.date.today().isoformat(),
                 "cost": "10",
                 "third_party_costs": "11",
                 "description": "Anything",

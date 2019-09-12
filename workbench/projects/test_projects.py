@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 
 from django.test import TestCase
 
@@ -275,7 +275,7 @@ class ProjectsTest(TestCase):
         valid("owned_by=0")  # only inactive
 
     def test_autocomplete(self):
-        project = factories.ProjectFactory.create(closed_on=date.today())
+        project = factories.ProjectFactory.create(closed_on=dt.date.today())
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -326,7 +326,7 @@ class ProjectsTest(TestCase):
         )
         self.assertRedirects(response, project.urls["detail"])
         project.refresh_from_db()
-        self.assertEqual(project.closed_on, date.today())
+        self.assertEqual(project.closed_on, dt.date.today())
 
         response = self.client.post(
             project.urls["update"],
@@ -398,7 +398,7 @@ class ProjectsTest(TestCase):
 
     def test_move(self):
         project = factories.ProjectFactory.create()
-        closed = factories.ProjectFactory.create(closed_on=date.today())
+        closed = factories.ProjectFactory.create(closed_on=dt.date.today())
         service = factories.ServiceFactory.create()
         self.client.force_login(project.owned_by)
 

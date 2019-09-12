@@ -1,8 +1,8 @@
 import csv
+import datetime as dt
 import hashlib
 import io
 import re
-from datetime import datetime
 from decimal import Decimal
 
 from django.utils.dateparse import parse_date
@@ -27,7 +27,7 @@ def parse_zkb_csv(data):
         if not row:
             continue
         try:
-            day = datetime.strptime(row[8], "%d.%m.%Y").date()
+            day = dt.datetime.strptime(row[8], "%d.%m.%Y").date()
             amount = row[7] and Decimal(row[7])
             reference = row[4]
         except (AttributeError, IndexError, ValueError):

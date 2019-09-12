@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 
 from django.test import TestCase
 
@@ -32,7 +32,7 @@ class HistoryTest(TestCase):
         project = factories.ProjectFactory.create()
         project.owned_by = factories.UserFactory.create()
         project.type = Project.INTERNAL
-        project.closed_on = date(2019, 1, 1)
+        project.closed_on = dt.date(2019, 1, 1)
         project.save()
 
         self.client.force_login(project.owned_by)

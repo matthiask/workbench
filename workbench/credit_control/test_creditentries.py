@@ -1,6 +1,6 @@
+import datetime as dt
 import io
 import os
-from datetime import date
 from decimal import Decimal
 
 from django.conf import settings
@@ -145,7 +145,7 @@ class CreditEntriesTest(TestCase):
             {
                 "ledger": factories.LedgerFactory.create().pk,
                 "reference_number": "unique",
-                "value_date": date.today().isoformat(),
+                "value_date": dt.date.today().isoformat(),
                 "total": "20.55",
                 "payment_notice": "nothing",
                 "notes": "bla",
@@ -165,11 +165,15 @@ class CreditEntriesTest(TestCase):
             "bla 2019-0001-0001 test",
         )
         self.assertEqual(
-            postfinance_reference_number("bla bla 190630CH12345678", date(2019, 6, 30)),
+            postfinance_reference_number(
+                "bla bla 190630CH12345678", dt.date(2019, 6, 30)
+            ),
             "pf-190630CH12345678",
         )
         self.assertEqual(
-            postfinance_reference_number("bla 2019-0001-0001 test", date(2019, 6, 30)),
+            postfinance_reference_number(
+                "bla 2019-0001-0001 test", dt.date(2019, 6, 30)
+            ),
             "pf-ef8792bffe6303d32130377399828a3f",
         )
 

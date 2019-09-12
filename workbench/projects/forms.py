@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 
 from django import forms
 from django.contrib import messages
@@ -167,7 +167,7 @@ class ProjectForm(ModelForm):
     def save(self):
         instance = super().save(commit=False)
         if not instance.closed_on and self.cleaned_data.get("is_closed"):
-            instance.closed_on = date.today()
+            instance.closed_on = dt.date.today()
         if instance.closed_on and not self.cleaned_data.get("is_closed"):
             instance.closed_on = None
         if self.instance.flat_rate:

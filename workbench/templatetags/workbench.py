@@ -1,6 +1,6 @@
+import datetime as dt
 import math
 from collections import OrderedDict
-from datetime import date
 from itertools import groupby
 from urllib.parse import urlencode
 
@@ -58,7 +58,7 @@ def field_value_pairs(object, fields=""):
 
         else:
             value = getattr(object, field.name)
-            if isinstance(value, date):
+            if isinstance(value, dt.date):
                 value = local_date_format(value)
             elif isinstance(value, bool):
                 value = _("yes") if value else _("no")

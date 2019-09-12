@@ -1,4 +1,4 @@
-from datetime import timedelta
+import datetime as dt
 
 from django.utils.translation import gettext_lazy as _
 
@@ -14,7 +14,7 @@ class CutoffDateForm(ModelForm):
     def clean(self):
         data = super().clean()
         if data.get("day"):
-            if (data["day"] + timedelta(days=1)).day != 1:
+            if (data["day"] + dt.timedelta(days=1)).day != 1:
                 self.add_warning(
                     _("Unusual cutoff date (not last of the month)."),
                     code="unusual-cutoff",

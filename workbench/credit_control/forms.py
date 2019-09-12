@@ -1,6 +1,6 @@
+import datetime as dt
 import json
 import re
-from datetime import datetime
 
 from django import forms
 from django.db.models import Q
@@ -114,7 +114,7 @@ class AccountStatementUploadForm(forms.Form):
         created_entries = []
         for data in entries:
             reference_number = data.pop("reference_number")
-            data["value_date"] = datetime.strptime(
+            data["value_date"] = dt.datetime.strptime(
                 data["value_date"], "%Y-%m-%d"
             ).date()
             c, created = CreditEntry.objects.get_or_create(

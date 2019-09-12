@@ -48,7 +48,7 @@ class CutoffDate(Model):
 
 class AccrualQuerySet(models.QuerySet):
     def generate_accruals(self, *, cutoff_date):
-        # month = date.today().replace(day=1)
+        # month = dt.date.today().replace(day=1)
 
         down_payment_invoices = Invoice.objects.valid().filter(
             project__isnull=False,

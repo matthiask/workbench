@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -14,7 +14,7 @@ class ReportView(generic.DetailView):
     model = Year
 
     def get_object(self):
-        self.year = self.request.GET.get("year", date.today().year)
+        self.year = self.request.GET.get("year", dt.date.today().year)
         return self.model._default_manager.filter(year=self.year).first()
 
     def get(self, request, *args, **kwargs):
@@ -35,7 +35,7 @@ class ReportView(generic.DetailView):
         return super().get_context_data(
             statistics=annual_working_time(self.object, users=users),
             years=[
-                year for year in Year.objects.all() if year.year <= date.today().year
+                year for year in Year.objects.all() if year.year <= dt.date.today().year
             ],
             **kwargs
         )

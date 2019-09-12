@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 
 from django import http
 from django.contrib import messages
@@ -14,7 +14,7 @@ class CutoffDateDetailView(generic.DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if request.GET.get("create_accruals"):
-            if self.object.day > date.today():
+            if self.object.day > dt.date.today():
                 messages.warning(
                     request, _("Cannot generate accruals for future cutoff dates.")
                 )

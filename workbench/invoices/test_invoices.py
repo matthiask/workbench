@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+import datetime as dt
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
@@ -481,8 +481,8 @@ class InvoicesTest(TestCase):
                 invoice,
                 contact=person.id,
                 status=Invoice.SENT,
-                invoiced_on=date.today().isoformat(),
-                due_on=date.today().isoformat(),
+                invoiced_on=dt.date.today().isoformat(),
+                due_on=dt.date.today().isoformat(),
             ),
         )
         self.assertRedirects(response, invoice.urls["detail"])
@@ -490,7 +490,7 @@ class InvoicesTest(TestCase):
         invoice.refresh_from_db()
         response = self.client.post(
             invoice.urls["update"],
-            invoice_to_dict(invoice, closed_on=date.today().isoformat()),
+            invoice_to_dict(invoice, closed_on=dt.date.today().isoformat()),
         )
         self.assertContains(response, "Invalid status when closed on is already set.")
 
@@ -518,7 +518,7 @@ class InvoicesTest(TestCase):
         self.assertRedirects(response, invoice.urls["detail"])
 
         invoice.refresh_from_db()
-        self.assertEqual(invoice.closed_on, date.today())
+        self.assertEqual(invoice.closed_on, dt.date.today())
 
     def test_list(self):
         factories.InvoiceFactory.create()
@@ -546,8 +546,8 @@ class InvoicesTest(TestCase):
         self.assertEqual(messages(response), ["No invoices found."])
 
         factories.InvoiceFactory.create(
-            invoiced_on=date.today() - timedelta(days=60),
-            due_on=date.today() - timedelta(days=45),
+            invoiced_on=dt.date.today() - dt.timedelta(days=60),
+            due_on=dt.date.today() - dt.timedelta(days=45),
             status=Invoice.SENT,
         )
         response = self.client.get("/invoices/?pdf=1")
@@ -587,8 +587,8 @@ class InvoicesTest(TestCase):
                 _code=0,
                 status=Invoice.SENT,
                 postal_address="Test\nStreet\nCity",
-                invoiced_on=date.today(),
-                due_on=date.today() - timedelta(days=1),
+                invoiced_on=dt.date.today(),
+                due_on=dt.date.today() - dt.timedelta(days=1),
             ).full_clean()
         self.assertEqual(
             list(cm.exception), [("due_on", ["Due date has to be after invoice date."])]
@@ -613,8 +613,8 @@ class InvoicesTest(TestCase):
         invoice = factories.InvoiceFactory.create(
             title="Test",
             subtotal=20,
-            invoiced_on=date.today() - timedelta(days=1),
-            due_on=date.today(),
+            invoiced_on=dt.date.today() - dt.timedelta(days=1),
+            due_on=dt.date.today(),
             status=Invoice.SENT,
         )
         self.client.force_login(invoice.owned_by)
@@ -633,9 +633,9 @@ class InvoicesTest(TestCase):
         invoice = factories.InvoiceFactory.create(
             title="Test",
             subtotal=20,
-            invoiced_on=date.today() - timedelta(days=1),
-            due_on=date.today(),
-            closed_on=date.today(),
+            invoiced_on=dt.date.today() - dt.timedelta(days=1),
+            due_on=dt.date.today(),
+            closed_on=dt.date.today(),
             status=Invoice.PAID,
             postal_address="Test\nStreet\nCity",
         )
@@ -654,7 +654,7 @@ class InvoicesTest(TestCase):
             response,
             "You are attempting to set status to &#39;In preparation&#39;,"
             " but the invoice has already been closed on {}."
-            " Are you sure?".format(local_date_format(date.today())),
+            " Are you sure?".format(local_date_format(dt.date.today())),
         )
 
         response = self.client.post(
@@ -768,8 +768,8 @@ class InvoicesTest(TestCase):
         )
 
     def test_status(self):
-        today = date.today()
-        yesterday = date.today() - timedelta(days=1)
+        today = dt.date.today()
+        yesterday = dt.date.today() - dt.timedelta(days=1)
         fmt = local_date_format(today)
         self.assertEqual(
             Invoice(status=Invoice.IN_PREPARATION).pretty_status,
@@ -783,7 +783,7 @@ class InvoicesTest(TestCase):
             Invoice(
                 status=Invoice.SENT,
                 invoiced_on=yesterday,
-                due_on=today - timedelta(days=5),
+                due_on=today - dt.timedelta(days=5),
             ).pretty_status,
             "Sent on {} but overdue".format(local_date_format(yesterday)),
         )
@@ -792,7 +792,7 @@ class InvoicesTest(TestCase):
             Invoice(
                 status=Invoice.SENT,
                 invoiced_on=yesterday,
-                due_on=today - timedelta(days=5),
+                due_on=today - dt.timedelta(days=5),
             ).status_badge,
         )
         self.assertEqual(
@@ -850,8 +850,8 @@ class InvoicesTest(TestCase):
 
     def test_cancellation_with_payment_notice(self):
         invoice = factories.InvoiceFactory.create(
-            invoiced_on=date.today(),
-            due_on=date.today(),
+            invoiced_on=dt.date.today(),
+            due_on=dt.date.today(),
             postal_address="Test\nStreet\nCity",
             status=Invoice.CANCELED,
         )

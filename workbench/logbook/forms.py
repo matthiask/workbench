@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+import datetime as dt
 from decimal import ROUND_UP, Decimal
 
 from django import forms
@@ -250,7 +250,7 @@ class LoggedHoursForm(ModelForm):
                 errors["rendered_on"] = _(
                     "Sorry, hours have to be logged in the same week."
                 )
-            elif data["rendered_on"] > date.today() + timedelta(days=7):
+            elif data["rendered_on"] > dt.date.today() + dt.timedelta(days=7):
                 errors["rendered_on"] = _("Sorry, too early.")
 
         try:

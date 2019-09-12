@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 from decimal import Decimal
 
 from django.test import TestCase
@@ -132,8 +132,8 @@ class StatisticsTest(TestCase):
         self.assertEqual(grouped["total_logged_hours_rate_undefined"], Decimal(20))
         self.assertEqual(grouped["total_service_hours_rate_undefined"], 0)
 
-        today = date.today()
-        date_range = [date(today.year, 1, 1), date(today.year, 12, 31)]
+        today = dt.date.today()
+        date_range = [dt.date(today.year, 1, 1), dt.date(today.year, 12, 31)]
 
         green_hours = key_data.green_hours(date_range)
         gh = green_hours[today.year]["year"]
@@ -183,29 +183,29 @@ class StatisticsTest(TestCase):
         s_order = factories.ServiceFactory.create(project=p_order, effort_hours=20)
 
         factories.LoggedHoursFactory.create(
-            service=s_internal, hours=10, rendered_on=date(2019, 1, 1)
+            service=s_internal, hours=10, rendered_on=dt.date(2019, 1, 1)
         )
         factories.LoggedHoursFactory.create(
-            service=s_maintenance, hours=20, rendered_on=date(2019, 1, 1)
+            service=s_maintenance, hours=20, rendered_on=dt.date(2019, 1, 1)
         )
         factories.LoggedHoursFactory.create(
-            service=s_order, hours=5, rendered_on=date(2019, 1, 1)
+            service=s_order, hours=5, rendered_on=dt.date(2019, 1, 1)
         )
         factories.LoggedHoursFactory.create(
-            service=s_order, hours=25, rendered_on=date(2019, 2, 1)
+            service=s_order, hours=25, rendered_on=dt.date(2019, 2, 1)
         )
         factories.LoggedHoursFactory.create(
-            service=s_order, hours=10, rendered_on=date(2019, 3, 1)
+            service=s_order, hours=10, rendered_on=dt.date(2019, 3, 1)
         )
 
         factories.LoggedHoursFactory.create(
-            service=s_order, hours=10, rendered_on=date(2018, 12, 1)
+            service=s_order, hours=10, rendered_on=dt.date(2018, 12, 1)
         )
         factories.LoggedHoursFactory.create(
-            service=s_order, hours=10, rendered_on=date(2019, 4, 1)
+            service=s_order, hours=10, rendered_on=dt.date(2019, 4, 1)
         )
 
-        gh = key_data.green_hours([date(2019, 1, 1), date(2019, 3, 31)])
+        gh = key_data.green_hours([dt.date(2019, 1, 1), dt.date(2019, 3, 31)])
 
         self.assertEqual(len(gh), 1)
         self.assertEqual(

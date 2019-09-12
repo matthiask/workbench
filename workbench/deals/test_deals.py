@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 
 from django.test import TestCase
 
@@ -50,7 +50,8 @@ class DealsTest(TestCase):
         deal = factories.Deal.objects.get()
         self.assertIsNone(deal.closed_on)
         self.assertEqual(
-            deal.pretty_status, "Open since {}".format(local_date_format(date.today()))
+            deal.pretty_status,
+            "Open since {}".format(local_date_format(dt.date.today())),
         )
 
         response = self.client.post(
@@ -67,9 +68,10 @@ class DealsTest(TestCase):
         )
 
         deal.refresh_from_db()
-        self.assertEqual(deal.closed_on, date.today())
+        self.assertEqual(deal.closed_on, dt.date.today())
         self.assertEqual(
-            deal.pretty_status, "declined on {}".format(local_date_format(date.today()))
+            deal.pretty_status,
+            "declined on {}".format(local_date_format(dt.date.today())),
         )
 
         response = self.client.post(
@@ -88,5 +90,6 @@ class DealsTest(TestCase):
         deal.refresh_from_db()
         self.assertIsNone(deal.closed_on)
         self.assertEqual(
-            deal.pretty_status, "Open since {}".format(local_date_format(date.today()))
+            deal.pretty_status,
+            "Open since {}".format(local_date_format(dt.date.today())),
         )

@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 
 from django.contrib import messages
 from django.core.exceptions import ValidationError
@@ -131,7 +131,7 @@ class Offer(ModelWithTotal):
                 )
 
         if self.status >= self.ACCEPTED and not self.closed_on:
-            self.closed_on = date.today()
+            self.closed_on = dt.date.today()
         elif self.status < self.ACCEPTED and self.closed_on:
             self.closed_on = None
 

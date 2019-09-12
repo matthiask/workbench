@@ -1,4 +1,4 @@
-from datetime import date, datetime
+import datetime as dt
 
 from django.utils.formats import date_format
 from django.utils.timezone import localtime
@@ -8,11 +8,11 @@ from django.utils.translation import gettext as _
 def local_date_format(dttm):
     if hasattr(dttm, "astimezone"):
         dttm = localtime(dttm)
-    return date_format(dttm, "d.m.Y H:i" if isinstance(dttm, datetime) else "d.m.Y")
+    return date_format(dttm, "d.m.Y H:i" if isinstance(dttm, dt.datetime) else "d.m.Y")
 
 
 def pretty_due(day):
-    days = (day - date.today()).days
+    days = (day - dt.date.today()).days
     if days > 14:
         return _("due in %s weeks") % (days // 7)
     elif days > 1:

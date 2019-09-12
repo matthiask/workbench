@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 from decimal import Decimal
 
 from django.core import mail
@@ -29,19 +29,21 @@ class RecurringTest(TestCase):
             description="",
             owned_by=person.primary_contact,
             postal_address=pa.postal_address,
-            starts_on=date(2018, 1, 1),
-            ends_on=date(2018, 12, 31),
+            starts_on=dt.date(2018, 1, 1),
+            ends_on=dt.date(2018, 12, 31),
             periodicity="monthly",
             subtotal=200,
         )
 
         self.assertEqual(ri.next_period_starts_on, None)
 
-        self.assertEqual(len(ri.create_invoices(generate_until=date(2019, 1, 1))), 12)
+        self.assertEqual(
+            len(ri.create_invoices(generate_until=dt.date(2019, 1, 1))), 12
+        )
 
         ri.ends_on = None
         ri.save()
-        self.assertEqual(len(ri.create_invoices(generate_until=date(2019, 1, 1))), 1)
+        self.assertEqual(len(ri.create_invoices(generate_until=dt.date(2019, 1, 1))), 1)
 
         # Not so clean, but we have a few invoices here...
         mi = monthly_invoicing(2018)
@@ -94,7 +96,7 @@ class RecurringTest(TestCase):
                 # "contact": person.id,
                 "title": "recur",
                 "owned_by": person.primary_contact_id,
-                "starts_on": date.today().isoformat(),
+                "starts_on": dt.date.today().isoformat(),
                 "periodicity": "yearly",
                 "subtotal": 500,
                 "discount": 0,
@@ -111,7 +113,7 @@ class RecurringTest(TestCase):
                 "contact": person.id,
                 "title": "recur",
                 "owned_by": person.primary_contact_id,
-                "starts_on": date.today().isoformat(),
+                "starts_on": dt.date.today().isoformat(),
                 "periodicity": "yearly",
                 "subtotal": 500,
                 "discount": 0,
@@ -129,7 +131,7 @@ class RecurringTest(TestCase):
                 "contact": person.id,
                 "title": "recur",
                 "owned_by": person.primary_contact_id,
-                "starts_on": date.today().isoformat(),
+                "starts_on": dt.date.today().isoformat(),
                 "periodicity": "yearly",
                 "subtotal": 500,
                 "discount": 0,
@@ -197,8 +199,8 @@ class RecurringTest(TestCase):
             contact=person,
             title="Recurring invoice",
             owned_by=person.primary_contact,
-            starts_on=date(2018, 1, 1),
-            ends_on=date(2050, 12, 31),
+            starts_on=dt.date(2018, 1, 1),
+            ends_on=dt.date(2050, 12, 31),
             periodicity="monthly",
             subtotal=200,
         )
@@ -209,7 +211,7 @@ class RecurringTest(TestCase):
             contact=person,
             title="Recurring invoice",
             owned_by=person.primary_contact,
-            starts_on=date(2018, 1, 1),
+            starts_on=dt.date(2018, 1, 1),
             ends_on=None,
             periodicity="monthly",
             subtotal=200,

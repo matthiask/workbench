@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+import datetime as dt
 
 from django.db import models
 from django.utils import timezone
@@ -90,9 +90,9 @@ class Activity(Model):
         if self.completed_at:
             css = "default"
         if self.due_on:
-            if self.due_on < date.today():
+            if self.due_on < dt.date.today():
                 css = "danger"
-            elif self.due_on < date.today() + timedelta(days=3):
+            elif self.due_on < dt.date.today() + dt.timedelta(days=3):
                 css = "warning"
         return format_html(
             '<span class="badge badge-{}">{}</span>', css, self.pretty_status

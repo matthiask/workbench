@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 
 from django.db import models
 from django.utils import timezone
@@ -80,7 +80,7 @@ class Deal(Model):
         if self.status == self.OPEN:
             self.closed_on = None
         else:
-            self.closed_on = self.closed_on or date.today()
+            self.closed_on = self.closed_on or dt.date.today()
         super().save(*args, **kwargs)
 
     save.alters_data = True

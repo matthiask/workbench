@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+import datetime as dt
 
 from django import forms
 from django.contrib import messages
@@ -31,7 +31,7 @@ def monthly_invoicing_view(request):
         except Exception:
             return redirect(".")
     if not year:
-        year = date.today().year
+        year = dt.date.today().year
 
     return render(
         request,
@@ -55,7 +55,7 @@ class OpenItemsForm(forms.Form):
 
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
-        data.setdefault("cutoff_date", date.today().isoformat())
+        data.setdefault("cutoff_date", dt.date.today().isoformat())
         super().__init__(data, *args, **kwargs)
 
     def open_items_list(self):
@@ -112,9 +112,9 @@ def logged_hours_by_circle_view(request):
 
 
 def key_data_view(request):
-    today = date.today()
-    last_month = today - timedelta(days=today.day + 1)
-    date_range = [date(last_month.year - 2, 1, 1), last_month]
+    today = dt.date.today()
+    last_month = today - dt.timedelta(days=today.day + 1)
+    date_range = [dt.date(last_month.year - 2, 1, 1), last_month]
 
     green_hours = sorted(key_data.green_hours(date_range).items())
 
@@ -176,7 +176,7 @@ class HoursPerCustomerForm(forms.Form):
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
         data.setdefault("date_from", monday().isoformat())
-        data.setdefault("date_until", (monday() + timedelta(days=6)).isoformat())
+        data.setdefault("date_until", (monday() + dt.timedelta(days=6)).isoformat())
         super().__init__(data, *args, **kwargs)
         self.fields["users"].choices = User.objects.choices(collapse_inactive=False)
         self.fields["users"].widget.attrs = {"size": 10}

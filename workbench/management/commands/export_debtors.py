@@ -1,6 +1,6 @@
+import datetime as dt
 import io
 import zipfile
-from datetime import date
 
 from django.core.management import BaseCommand
 from django.utils.text import slugify
@@ -28,8 +28,8 @@ def append_invoice(*, zf, ledger_slug, invoice):
 
 class Command(BaseCommand):
     def handle(self, **options):
-        today = date.today()
-        date_range = [date(today.year, 1, 1), date(today.year, 12, 31)]
+        today = dt.date.today()
+        date_range = [dt.date(today.year, 1, 1), dt.date(today.year, 12, 31)]
         activate("de")
 
         xlsx = WorkbenchXLSXDocument()

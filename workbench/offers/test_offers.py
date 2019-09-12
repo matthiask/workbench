@@ -1,4 +1,4 @@
-from datetime import date
+import datetime as dt
 from decimal import Decimal
 
 from django.test import TestCase
@@ -91,7 +91,7 @@ class OffersTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/pdf")
 
-        offer.offered_on = date.today()
+        offer.offered_on = dt.date.today()
         offer.save()
         project.description = "Test"
         project.save()
@@ -125,7 +125,7 @@ class OffersTest(TestCase):
                 "liable_to_vat": "1",
                 "postal_address": "Anything\nStreet\nCity",
                 "services": [service.id],
-                # "offered_on": date.today().isoformat(),
+                # "offered_on": dt.date.today().isoformat(),
                 "status": Offer.ACCEPTED,
             },
         )
@@ -140,14 +140,14 @@ class OffersTest(TestCase):
                 "liable_to_vat": "1",
                 "postal_address": "Anything\nStreet\nCity",
                 "services": [service.id],
-                "offered_on": date.today().isoformat(),
+                "offered_on": dt.date.today().isoformat(),
                 "status": Offer.ACCEPTED,
             },
         )
         self.assertRedirects(response, offer.project.urls["detail"])
 
         offer.refresh_from_db()
-        self.assertEqual(offer.closed_on, date.today())
+        self.assertEqual(offer.closed_on, dt.date.today())
         self.assertAlmostEqual(offer.subtotal, Decimal("2000"))
 
         response = self.client.get(offer.urls["delete"])
@@ -203,7 +203,7 @@ class OffersTest(TestCase):
                 "liable_to_vat": "1",
                 "postal_address": "Anything\nStreet\nCity",
                 "services": [service.id],
-                "offered_on": date.today().isoformat(),
+                "offered_on": dt.date.today().isoformat(),
                 "status": Offer.IN_PREPARATION,
             },
         )
@@ -218,7 +218,7 @@ class OffersTest(TestCase):
                 "liable_to_vat": "1",
                 "postal_address": "Anything\nStreet\nCity",
                 "services": [service.id],
-                "offered_on": date.today().isoformat(),
+                "offered_on": dt.date.today().isoformat(),
                 "status": Offer.IN_PREPARATION,
                 WarningsForm.ignore_warnings_id: "status-change-but-already-closed",
             },
@@ -255,7 +255,7 @@ class OffersTest(TestCase):
         )
 
     def test_status(self):
-        today = date.today()
+        today = dt.date.today()
         self.assertEqual(
             Offer(status=Offer.IN_PREPARATION).pretty_status,
             "In preparation since {}".format(local_date_format(today)),
