@@ -208,7 +208,7 @@ def gross_margin_by_month(date_range):
             "date": dt.date(month[0], month[1], 1),
             "gross_profit": gross.get(month, Z),
             "third_party_costs": -third.get(month, Z),
-            "accruals": accruals.get(month, Z),
+            "accruals": accruals.get(month) or {"accrual": None, "delta": Z},
         }
         row["gross_margin"] = (
             row["gross_profit"] + row["third_party_costs"] + row["accruals"]["delta"]

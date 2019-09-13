@@ -10,6 +10,7 @@ from workbench.accounts.models import User
 from workbench.circles.reporting import logged_hours_by_circle
 from workbench.invoices.models import Invoice
 from workbench.invoices.reporting import monthly_invoicing
+from workbench.invoices.utils import next_valid_day
 from workbench.projects.models import Project
 from workbench.projects.reporting import (
     hours_per_customer,
@@ -105,7 +106,7 @@ def open_items_list(request):
 
 def key_data_view(request):
     today = dt.date.today()
-    last_month = today - dt.timedelta(days=today.day + 1)
+    last_month = next_valid_day(today.year, today.month + 1, 1) - dt.timedelta(days=1)
     date_range = [dt.date(last_month.year - 2, 1, 1), last_month]
 
     green_hours = sorted(key_data.green_hours(date_range).items())
