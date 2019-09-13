@@ -2,11 +2,12 @@ import datetime as dt
 from collections import defaultdict
 from decimal import Decimal
 
+from django.db import connections
 from django.db.models import Sum
 
 from workbench.accounts.models import User
 from workbench.logbook.models import LoggedHours
-from workbench.projects.models import Project, Service
+from workbench.projects.models import Project
 from workbench.tools.models import Z
 
 
@@ -14,51 +15,27 @@ ONE = Decimal("1")
 
 
 def green_hours(date_range):
-    """
-    Alternative for determining green_hours_factor:
-    SELECT * FROM (
-        SELECT id,
-        (
-            SELECT SUM(service_hours) FROM projects_service s
-            WHERE p.id=s.project_id
-        ) / (
-            SELECT SUM(hours) FROM logbook_loggedhours lh
-            LEFT JOIN projects_service s ON lh.service_id=s.id
-            WHERE p.id=s.project_id
-        ) AS factor
-        FROM projects_project p
-    ) subquery
-    WHERE factor IS NOT NULL and factor < 1;
-    """
-
-    service_hours = defaultdict(
-        lambda: Z,
-        {
-            row["project"]: row["service_hours__sum"]
-            for row in Service.objects.budgeted()
-            .order_by()
-            .values("project")
-            .annotate(Sum("service_hours"))
-        },
-    )
-    logged_hours = defaultdict(
-        lambda: Z,
-        {
-            row["service__project"]: row["hours__sum"]
-            for row in LoggedHours.objects.order_by()
-            .values("service__project")
-            .annotate(Sum("hours"))
-        },
-    )
-    green_hours_factor = {
-        project_id: min(
-            ONE,
-            service_hours[project_id] / logged_hours[project_id]
-            if logged_hours[project_id]
-            else ONE,
+    with connections["default"].cursor() as cursor:
+        cursor.execute(
+            """\
+WITH
+service AS (
+  SELECT project_id, SUM(service_hours) AS hours
+  FROM projects_service
+  GROUP BY project_id
+),
+logged AS (
+  SELECT project_id, SUM(hours) AS hours FROM logbook_loggedhours lh
+  LEFT JOIN projects_service ps ON lh.service_id=ps.id
+  GROUP BY project_id
+)
+SELECT logged.project_id, service.hours / logged.hours
+FROM logged
+LEFT JOIN service ON logged.project_id=service.project_id
+WHERE service.hours / logged.hours < 1;
+            """
         )
-        for project_id in set(service_hours) | set(logged_hours)
-    }
+        green_hours_factor = defaultdict(lambda: ONE, cursor)
 
     within = defaultdict(lambda: defaultdict(lambda: Z))
     project_ids = set()
