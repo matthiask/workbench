@@ -43,19 +43,6 @@ def green_hours(date_range):
         for project_id in set(service_hours) | set(logged_hours)
     }
 
-    """
-    before = defaultdict(
-        lambda: Z,
-        {
-            row["service__project"]: row["hours__sum"]
-            for row in LoggedHours.objects.filter(rendered_on__lt=date_range[0])
-            .order_by()
-            .values("service__project")
-            .annotate(Sum("hours"))
-        },
-    )
-    """
-
     within = defaultdict(lambda: defaultdict(lambda: Z))
     project_ids = set()
     user_ids = set()
