@@ -229,3 +229,7 @@ class StatisticsTest(TestCase):
             "<GreenHours profitable=0.00 overdrawn=10.00 maintenance=0.00"
             " internal=0.00 total=10.00 green=0%>",
         )
+
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.get("/report/green-hours/")
+        self.assertEqual(response.status_code, 200)
