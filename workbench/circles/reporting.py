@@ -8,7 +8,7 @@ from workbench.circles.models import Circle, Role
 from workbench.logbook.models import LoggedHours
 
 
-def logged_hours_by_circle(date_range, *, users=None):
+def hours_by_circle(date_range, *, users=None):
     queryset = LoggedHours.objects.order_by().filter(rendered_on__range=date_range)
     if users:
         queryset = queryset.filter(rendered_by__in=users)

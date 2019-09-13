@@ -7,7 +7,7 @@ from django.shortcuts import redirect, render
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.circles.reporting import logged_hours_by_circle
+from workbench.circles.reporting import hours_by_circle
 from workbench.invoices.models import Invoice
 from workbench.invoices.reporting import monthly_invoicing
 from workbench.invoices.utils import next_valid_day
@@ -196,17 +196,17 @@ def hours_per_customer_view(request):
     )
 
 
-def logged_hours_by_circle_view(request):
+def hours_by_circle_view(request):
     form = LoggedHoursFilterForm(request.GET)
     if not form.is_valid():
         messages.warning(request, _("Form was invalid."))
         return redirect(".")
     return render(
         request,
-        "reporting/logged_hours_by_circle.html",
+        "reporting/hours_by_circle.html",
         {
             "form": form,
-            "stats": logged_hours_by_circle(
+            "stats": hours_by_circle(
                 [form.cleaned_data["date_from"], form.cleaned_data["date_until"]],
                 users=form.cleaned_data["users"],
             ),

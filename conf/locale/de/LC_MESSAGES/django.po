@@ -1810,7 +1810,7 @@ msgid "open items list"
 msgstr "Offene-Posten-Liste"
 
 #: workbench/templates/base.html
-#: workbench/templates/reporting/logged_hours_by_circle.html
+#: workbench/templates/reporting/hours_by_circle.html
 msgid "hours by circle"
 msgstr "Stunden pro Kreis"
 
@@ -2020,7 +2020,7 @@ msgstr "Erfasste Stunden pro Benutzer"
 
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/hours_per_customer.html
-#: workbench/templates/reporting/logged_hours_by_circle.html
+#: workbench/templates/reporting/hours_by_circle.html
 #: workbench/templates/reporting/open_items_list.html
 msgid "show"
 msgstr "Anzeigen"
@@ -2057,7 +2057,7 @@ msgstr "Gewinn ohne Fixkosten"
 msgid "hours distribution"
 msgstr "Stundenverteilung"
 
-#: workbench/templates/reporting/logged_hours_by_circle.html
+#: workbench/templates/reporting/hours_by_circle.html
 msgid "No circle"
 msgstr "Kein Kreis"
 

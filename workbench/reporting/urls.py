@@ -3,9 +3,9 @@ from django.conf.urls import url
 from workbench.awt.views import ReportView
 from workbench.reporting.views import (
     green_hours_view,
+    hours_by_circle_view,
     hours_per_customer_view,
     key_data_view,
-    logged_hours_by_circle_view,
     monthly_invoicing_view,
     open_items_list,
     overdrawn_projects_view,
@@ -24,11 +24,7 @@ urlpatterns = [
         name="report_overdrawn_projects",
     ),
     url(r"^open-items-list/$", open_items_list, name="report_open_items_list"),
-    url(
-        r"^logged-hours-by-circle/$",
-        logged_hours_by_circle_view,
-        name="report_logged_hours_by_circle",
-    ),
+    url(r"^hours-by-circle/$", hours_by_circle_view, name="report_hours_by_circle"),
     url(r"^key-data/$", key_data_view, name="report_key_data"),
     url(
         r"^hours-per-customer/$",

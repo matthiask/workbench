@@ -5,7 +5,7 @@ from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.circles.models import Circle, Role
-from workbench.circles.reporting import logged_hours_by_circle
+from workbench.circles.reporting import hours_by_circle
 
 
 class CirclesTest(TestCase):
@@ -41,7 +41,7 @@ class CirclesTest(TestCase):
         factories.LoggedHoursFactory.create(service=s2, hours=6)
 
         today = dt.date.today()
-        circles = logged_hours_by_circle(
+        circles = hours_by_circle(
             [dt.date(today.year, 1, 1), dt.date(today.year, 12, 31)]
         )["circles"]
 
@@ -50,10 +50,10 @@ class CirclesTest(TestCase):
         self.assertEqual(circles[1]["total"], 4)
         self.assertEqual(circles[2]["total"], 6)
         # from pprint import pprint
-        # pprint(logged_hours_by_circle())
+        # pprint(hours_by_circle())
 
         self.client.force_login(s1.project.owned_by)
-        response = self.client.get("/report/logged-hours-by-circle/")
+        response = self.client.get("/report/hours-by-circle/")
         self.assertEqual(response.status_code, 200)
 
     def test_role_warning(self):
