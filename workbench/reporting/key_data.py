@@ -181,11 +181,11 @@ ORDER BY cutoff_date
 
         for row in cursor:
             # Overwrite earlier accruals if a month has more than one cutoff date
-            accruals[(row[0].year, row[0].month)] = {"accrual": row[1], "delta": None}
+            accruals[(row[0].year, row[0].month)] = {"accrual": -row[1], "delta": None}
 
     dates = list(sorted(accruals))
     for this, next in zip(dates, dates[1:]):
-        accruals[next]["delta"] = accruals[this]["accrual"] - accruals[next]["accrual"]
+        accruals[next]["delta"] = accruals[next]["accrual"] - accruals[this]["accrual"]
 
     return {
         month: accrual

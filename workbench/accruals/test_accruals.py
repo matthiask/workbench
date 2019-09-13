@@ -123,10 +123,10 @@ class AccrualsTest(TestCase):
         )
         self.assertEqual(len(accruals), 3)
 
-        self.assertEqual(accruals[(2018, 12)]["accrual"], Decimal(40))
+        self.assertEqual(accruals[(2018, 12)]["accrual"], Decimal(-40))
         self.assertEqual(accruals[(2018, 12)]["delta"], Decimal(-40))
 
-        self.assertEqual(accruals[(2019, 1)]["accrual"], Decimal(20))
+        self.assertEqual(accruals[(2019, 1)]["accrual"], Decimal(-20))
         self.assertEqual(accruals[(2019, 1)]["delta"], Decimal(20))
 
         self.assertEqual(accruals[(2019, 3)]["accrual"], Decimal(0))
