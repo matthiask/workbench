@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-13 13:41+0200\n"
+"POT-Creation-Date: 2019-09-13 18:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -78,6 +78,7 @@ msgstr "Sprache"
 
 #: workbench/accounts/models.py workbench/awt/models.py
 #: workbench/management/commands/profitability.py
+#: workbench/templates/reporting/green_hours.html
 msgid "user"
 msgstr "Benutzer"
 
@@ -372,6 +373,7 @@ msgid "date until"
 msgstr "Datum bis"
 
 #: workbench/awt/models.py workbench/templates/awt/year_detail.html
+#: workbench/templates/reporting/green_hours.html
 msgid "percentage"
 msgstr "Prozent"
 
@@ -745,7 +747,7 @@ msgstr "Valuta"
 #: workbench/credit_control/models.py workbench/expenses/models.py
 #: workbench/expenses/views.py workbench/management/commands/export_debtors.py
 #: workbench/templates/credit_control/creditentry_list.html
-#: workbench/templates/reporting/key_data.html
+#: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/monthly_invoicing.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
 #: workbench/tools/pdf.py
@@ -1612,11 +1614,11 @@ msgstr "Profitabel"
 msgid "overdrawn"
 msgstr "Überzogen"
 
-#: workbench/reporting/views.py
+#: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
 msgid "maintenance"
 msgstr "Wartung"
 
-#: workbench/reporting/views.py
+#: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
 msgid "internal"
 msgstr "Intern"
 
@@ -1817,6 +1819,11 @@ msgstr "Stunden pro Kreis"
 msgid "hours per customer"
 msgstr "Stunden pro Kundschaft"
 
+#: workbench/templates/base.html workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
+msgid "green hours"
+msgstr "Grüne Stunden"
+
 #: workbench/templates/base.html
 msgid "Settings"
 msgstr "Einstellungen"
@@ -2011,11 +2018,24 @@ msgstr "Erfasste Stunden pro Stundensatz"
 msgid "logged hours per user"
 msgstr "Erfasste Stunden pro Benutzer"
 
+#: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/hours_per_customer.html
 #: workbench/templates/reporting/logged_hours_by_circle.html
 #: workbench/templates/reporting/open_items_list.html
 msgid "show"
 msgstr "Anzeigen"
+
+#: workbench/templates/reporting/green_hours.html
+msgid "green"
+msgstr "Grün"
+
+#: workbench/templates/reporting/green_hours.html
+msgid "red"
+msgstr "Rot"
+
+#: workbench/templates/reporting/green_hours.html
+msgid "green and maintenance"
+msgstr "Grün und Wartung"
 
 #: workbench/templates/reporting/key_data.html
 msgid "revenue minus third party costs and accruals"
@@ -2032,10 +2052,6 @@ msgstr "Umsatz"
 #: workbench/templates/reporting/key_data.html
 msgid "gross margin"
 msgstr "Gewinn ohne Fixkosten"
-
-#: workbench/templates/reporting/key_data.html
-msgid "green hours"
-msgstr "Grüne Stunden"
 
 #: workbench/templates/reporting/key_data.html
 msgid "hours distribution"
