@@ -32,10 +32,7 @@ class Organization(Model):
     is_private_person = models.BooleanField(_("is private person"), default=False)
     notes = models.TextField(_("notes"), blank=True)
     primary_contact = models.ForeignKey(
-        User,
-        on_delete=models.PROTECT,
-        verbose_name=_("primary contact"),
-        related_name="+",
+        User, on_delete=models.PROTECT, verbose_name=_("primary contact")
     )
     default_billing_address = models.TextField(
         _("default billing address"),
@@ -45,9 +42,7 @@ class Organization(Model):
             " accounts payable departement."
         ),
     )
-    groups = models.ManyToManyField(
-        Group, verbose_name=_("groups"), related_name="+", blank=True
-    )
+    groups = models.ManyToManyField(Group, verbose_name=_("groups"), blank=True)
 
     class Meta:
         ordering = ("name",)
@@ -94,14 +89,9 @@ class Person(Model):
         related_name="people",
     )
     primary_contact = models.ForeignKey(
-        User,
-        on_delete=models.PROTECT,
-        verbose_name=_("primary contact"),
-        related_name="+",
+        User, on_delete=models.PROTECT, verbose_name=_("primary contact")
     )
-    groups = models.ManyToManyField(
-        Group, verbose_name=_("groups"), related_name="+", blank=True
-    )
+    groups = models.ManyToManyField(Group, verbose_name=_("groups"), blank=True)
     _fts = models.TextField(editable=False, blank=True)
 
     objects = PersonQuerySet.as_manager()

@@ -35,7 +35,6 @@ class Migration(migrations.Migration):
                     "invoice",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="+",
                         to="invoices.Invoice",
                         verbose_name="invoice",
                     ),

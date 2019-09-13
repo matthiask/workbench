@@ -58,10 +58,7 @@ class Invoice(ModelWithTotal):
     )
 
     customer = models.ForeignKey(
-        Organization,
-        on_delete=models.PROTECT,
-        verbose_name=_("customer"),
-        related_name="+",
+        Organization, on_delete=models.PROTECT, verbose_name=_("customer")
     )
     contact = models.ForeignKey(
         Person,
@@ -69,7 +66,6 @@ class Invoice(ModelWithTotal):
         blank=True,
         null=True,
         verbose_name=_("contact"),
-        related_name="+",
     )
     project = models.ForeignKey(
         Project,
@@ -96,7 +92,7 @@ class Invoice(ModelWithTotal):
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
     owned_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, verbose_name=_("responsible"), related_name="+"
+        User, on_delete=models.PROTECT, verbose_name=_("responsible")
     )
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
@@ -441,10 +437,7 @@ class RecurringInvoice(ModelWithTotal):
     ]
 
     customer = models.ForeignKey(
-        Organization,
-        on_delete=models.PROTECT,
-        verbose_name=_("customer"),
-        related_name="+",
+        Organization, on_delete=models.PROTECT, verbose_name=_("customer")
     )
     contact = models.ForeignKey(
         Person,
@@ -452,13 +445,12 @@ class RecurringInvoice(ModelWithTotal):
         blank=True,
         null=True,
         verbose_name=_("contact"),
-        related_name="+",
     )
 
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
     owned_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, verbose_name=_("responsible"), related_name="+"
+        User, on_delete=models.PROTECT, verbose_name=_("responsible")
     )
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)

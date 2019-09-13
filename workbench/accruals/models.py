@@ -117,7 +117,7 @@ class AccrualQuerySet(models.QuerySet):
 @model_urls
 class Accrual(Model):
     invoice = models.ForeignKey(
-        Invoice, on_delete=models.CASCADE, related_name="+", verbose_name=_("invoice")
+        Invoice, on_delete=models.CASCADE, verbose_name=_("invoice")
     )
     cutoff_date = models.DateField(_("cutoff date"))
     work_progress = models.IntegerField(

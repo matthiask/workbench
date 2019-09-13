@@ -15,7 +15,7 @@ from workbench.tools.urls import model_urls
 class ExpenseReport(Model):
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     created_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, related_name="+", verbose_name=_("created by")
+        User, on_delete=models.PROTECT, verbose_name=_("created by")
     )
     closed_on = models.DateField(_("closed on"), blank=True, null=True)
     owned_by = models.ForeignKey(

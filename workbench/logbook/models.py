@@ -27,7 +27,10 @@ class LoggedHours(Model):
         _("created at"), default=timezone.now, db_index=True
     )
     created_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, related_name="+", verbose_name=_("created by")
+        User,
+        on_delete=models.PROTECT,
+        verbose_name=_("created by"),
+        related_name="loggedhours_set",
     )
     rendered_on = models.DateField(
         _("rendered on"), default=dt.date.today, db_index=True
@@ -47,7 +50,6 @@ class LoggedHours(Model):
         blank=True,
         null=True,
         verbose_name=_("invoice service"),
-        related_name="+",
     )
     archived_at = models.DateTimeField(_("archived at"), blank=True, null=True)
 
@@ -105,7 +107,7 @@ class LoggedCost(Model):
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     created_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, related_name="+", verbose_name=_("created by")
+        User, on_delete=models.PROTECT, verbose_name=_("created by")
     )
     rendered_on = models.DateField(
         _("rendered on"), default=dt.date.today, db_index=True
@@ -131,7 +133,6 @@ class LoggedCost(Model):
         blank=True,
         null=True,
         verbose_name=_("invoice service"),
-        related_name="+",
     )
     archived_at = models.DateTimeField(_("archived at"), blank=True, null=True)
 

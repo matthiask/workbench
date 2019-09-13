@@ -2,6 +2,7 @@ import datetime as dt
 
 from django import forms
 from django.contrib import messages
+from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -27,6 +28,10 @@ class ProjectSearchForm(forms.Form):
                         _("Accepted offers but no invoices"),
                     ),
                     ("old-projects", _("Old projects (60 days inactivity)")),
+                    (
+                        "invalid-customer-contact-combination",
+                        _("Invalid customer/contact combination"),
+                    ),
                 ],
             ),
         ],
@@ -71,6 +76,8 @@ class ProjectSearchForm(forms.Form):
             queryset = queryset.with_accepted_offers().without_invoices()
         elif data.get("s") == "old-projects":
             queryset = queryset.old_projects()
+        elif data.get("s") == "invalid-customer-contact-combination":
+            queryset = queryset.exclude(customer=F("contact__organization"))
         if data.get("org"):
             queryset = queryset.filter(customer=data.get("org"))
         if data.get("type"):

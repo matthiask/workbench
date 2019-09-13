@@ -57,7 +57,6 @@ class CreditEntry(Model):
         on_delete=models.PROTECT,
         blank=True,
         null=True,
-        related_name="+",
         verbose_name=_("invoice"),
     )
     notes = models.TextField(_("notes"), blank=True)

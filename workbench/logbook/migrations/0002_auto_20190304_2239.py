@@ -32,7 +32,6 @@ class Migration(migrations.Migration):
             name="created_by",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.PROTECT,
-                related_name="+",
                 to=settings.AUTH_USER_MODEL,
                 verbose_name="created by",
             ),
@@ -44,7 +43,6 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.PROTECT,
-                related_name="+",
                 to="invoices.Invoice",
                 verbose_name="invoice",
             ),
