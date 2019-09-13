@@ -14,6 +14,23 @@ ONE = Decimal("1")
 
 
 def green_hours(date_range):
+    """
+    Alternative for determining green_hours_factor:
+    SELECT * FROM (
+        SELECT id,
+        (
+            SELECT SUM(service_hours) FROM projects_service s
+            WHERE p.id=s.project_id
+        ) / (
+            SELECT SUM(hours) FROM logbook_loggedhours lh
+            LEFT JOIN projects_service s ON lh.service_id=s.id
+            WHERE p.id=s.project_id
+        ) AS factor
+        FROM projects_project p
+    ) subquery
+    WHERE factor IS NOT NULL and factor < 1;
+    """
+
     service_hours = defaultdict(
         lambda: Z,
         {
