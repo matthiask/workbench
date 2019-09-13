@@ -89,23 +89,19 @@ class OrganizationDeleteForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         collector = SlowCollector(using=self.instance._state.db)
-        add_merge_field = False
         try:
             collector.collect([self.instance])
         except ProtectedError:
-            add_merge_field = True
-
-        if add_merge_field:
-            self.fields["merge_into"] = forms.ModelChoiceField(
+            self.fields["substitute_with"] = forms.ModelChoiceField(
                 Organization.objects.exclude(pk=self.instance.pk),
                 widget=Autocomplete(model=Organization),
-                label=_("merge into"),
+                label=_("substitute with"),
             )
 
     def delete(self):
-        if "merge_into" in self.fields:
+        if "substitute_with" in self.fields:
             substitute_with(
-                to_delete=self.instance, instance=self.cleaned_data["merge_into"]
+                to_delete=self.instance, instance=self.cleaned_data["substitute_with"]
             )
         else:
             self.instance.delete()

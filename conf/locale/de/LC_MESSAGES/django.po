@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-12 08:51+0200\n"
+"POT-Creation-Date: 2019-09-13 08:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -471,6 +471,10 @@ msgid "All groups"
 msgstr "Alle Gruppen"
 
 #: workbench/contacts/forms.py
+msgid "substitute with"
+msgstr "ersetzen durch"
+
+#: workbench/contacts/forms.py
 msgid "No salutation set. This will make newsletters ugly."
 msgstr "Keine Begrüssung gesetzt. Das macht Newsletter hässlich."
 
@@ -504,6 +508,10 @@ msgstr "Standard-Rechnungsadresse"
 #: workbench/contacts/forms.py
 msgid "Select one of the following addresses:"
 msgstr "Wähle eine der folgenden Adressen:"
+
+#: workbench/contacts/forms.py
+msgid "The postal address should probably be at least three lines long."
+msgstr "Die Postadresse müsste vermutlich mindestens drei Zeilen lang sein."
 
 #: workbench/contacts/models.py
 msgid "group"
@@ -1004,10 +1012,6 @@ msgstr ""
 "schon am %(closed)s geschlossen. Bist Du sicher?"
 
 #: workbench/invoices/forms.py
-msgid "The postal address should probably be at least three lines long."
-msgstr "Die Postadresse müsste vermutlich mindestens drei Zeilen lang sein."
-
-#: workbench/invoices/forms.py
 msgid "This project already has an invoice in preparation."
 msgstr "Dieses Projekt hat schon eine Rechnung in Vorbereitung."
 
@@ -1494,6 +1498,10 @@ msgstr "Akzeptierte Offerten aber keine Rechnungen"
 #: workbench/projects/forms.py
 msgid "Old projects (60 days inactivity)"
 msgstr "Alte Projekte (60 Tage Inaktivität)"
+
+#: workbench/projects/forms.py
+msgid "Invalid customer/contact combination"
+msgstr "Ungültige Kunde/Kontakt-Kombination"
 
 #: workbench/projects/forms.py
 msgid "All types"
