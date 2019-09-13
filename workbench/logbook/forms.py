@@ -11,7 +11,7 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
-from workbench.tools.forms import Autocomplete, ModelForm, Textarea
+from workbench.tools.forms import Autocomplete, DateInput, ModelForm, Textarea
 from workbench.tools.validation import monday, raise_if_errors
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -36,6 +36,7 @@ class LoggedHoursSearchForm(forms.Form):
         widget=Autocomplete(model=Organization),
         label="",
     )
+    until = forms.DateField(widget=DateInput, required=False, label="")
     service = forms.ModelChoiceField(
         queryset=Service.objects.all(),
         required=False,
@@ -59,6 +60,8 @@ class LoggedHoursSearchForm(forms.Form):
             queryset = queryset.filter(
                 service__project__customer=data.get("organization")
             )
+        if data.get("until"):
+            queryset = queryset.filter(rendered_on__lte=data.get("until"))
 
         # "hidden" filters
         if data.get("service"):
@@ -94,6 +97,7 @@ class LoggedCostSearchForm(forms.Form):
         label="",
     )
     expenses = forms.BooleanField(required=False, label=_("expenses"))
+    until = forms.DateField(widget=DateInput, required=False, label="")
     service = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
 
     def __init__(self, *args, **kwargs):
@@ -112,6 +116,8 @@ class LoggedCostSearchForm(forms.Form):
             queryset = queryset.filter(project__customer=data.get("organization"))
         if data.get("expenses"):
             queryset = queryset.filter(are_expenses=True)
+        if data.get("until"):
+            queryset = queryset.filter(rendered_on__lte=data.get("until"))
 
         # "hidden" filters
         if data.get("service") == 0:
