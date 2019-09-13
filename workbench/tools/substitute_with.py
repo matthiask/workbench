@@ -13,12 +13,7 @@ def substitute_with(to_delete, instance):
     ]
 
     for related_object in fields:
-        try:
-            model = related_object.related_model
-        except AttributeError:
-            model = related_object.model
-
-        queryset = model._base_manager.complex_filter(
+        queryset = related_object.related_model._base_manager.complex_filter(
             {related_object.field.name: to_delete.pk}
         )
 

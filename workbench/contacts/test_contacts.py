@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from workbench import factories
-from workbench.contacts.models import Group, Person, PhoneNumber
+from workbench.contacts.models import Group, Organization, Person, PhoneNumber
 from workbench.tools.testing import messages
 
 
@@ -234,3 +234,41 @@ class ContactsTest(TestCase):
 
         person = Person.objects.get()
         self.assertRedirects(response, person.urls["update"])
+
+    def test_organization_delete_without_relations(self):
+        organization = factories.OrganizationFactory.create()
+        self.client.force_login(organization.primary_contact)
+
+        response = self.client.get(organization.urls["delete"])
+        self.assertNotContains(response, "substitute_with")
+
+        response = self.client.post(organization.urls["delete"])
+        self.assertRedirects(response, organization.urls["list"])
+
+        self.assertEqual(Organization.objects.count(), 0)
+
+    def test_organization_delete_with_relations(self):
+        organization = factories.OrganizationFactory.create()
+        person = factories.PersonFactory.create(organization=organization)
+        self.client.force_login(organization.primary_contact)
+
+        group = Group.objects.create(title="A")
+        organization.groups.set([group])
+
+        response = self.client.get(organization.urls["delete"])
+        self.assertContains(response, "substitute_with")
+
+        response = self.client.post(organization.urls["delete"])
+        self.assertEqual(response.status_code, 200)
+
+        new = factories.OrganizationFactory.create()
+        response = self.client.post(
+            organization.urls["delete"], {"substitute_with": new.pk}
+        )
+        self.assertRedirects(response, organization.urls["list"])
+
+        self.assertEqual(Organization.objects.count(), 1)
+
+        person.refresh_from_db()
+        self.assertEqual(person.organization, new)
+        self.assertEqual(new.groups.count(), 0)  # Group (m2m) not assigned
