@@ -73,9 +73,11 @@
             <a class="dropdown-item" href="{% url 'report_overdrawn_projects' %}">{% trans 'overdrawn projects'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'report_monthly_invoicing' %}">{% trans 'monthly invoicing'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'report_open_items_list' %}">{% trans 'open items list'|capfirst %}</a>
-            <a class="dropdown-item" href="{% url 'report_logged_hours_by_circle' %}">{% trans 'logged hours by circle'|capfirst %}</a>
-            <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">{% trans 'hours per customer'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'report_project_budget_statistics' %}">{% trans 'project budget statistics'|capfirst %}</a>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-header">{% trans 'logged hours' %}</div>
+            <a class="dropdown-item" href="{% url 'report_logged_hours_by_circle' %}">{% trans 'hours by circle'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">{% trans 'hours per customer'|capfirst %}</a>
           </div>
         </li>
         {% endmark_current %}

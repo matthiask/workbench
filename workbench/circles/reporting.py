@@ -58,4 +58,7 @@ def logged_hours_by_circle(date_range, *, users=None):
                 )
         if row["total"]:
             circles.append(row)
-    return circles
+    return {
+        "circles": circles,
+        "total_hours": sum((circle["total"] for circle in circles), Decimal()),
+    }

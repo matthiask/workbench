@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-13 08:54+0200\n"
+"POT-Creation-Date: 2019-09-13 12:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1802,8 +1802,8 @@ msgstr "Offene-Posten-Liste"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/logged_hours_by_circle.html
-msgid "logged hours by circle"
-msgstr "Erfasste Stunden pro Kreis"
+msgid "hours by circle"
+msgstr "Stunden pro Kreis"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/hours_per_customer.html
@@ -2010,6 +2010,7 @@ msgid "logged hours per user"
 msgstr "Erfasste Stunden pro Benutzer"
 
 #: workbench/templates/reporting/hours_per_customer.html
+#: workbench/templates/reporting/logged_hours_by_circle.html
 #: workbench/templates/reporting/open_items_list.html
 msgid "show"
 msgstr "Anzeigen"

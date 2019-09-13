@@ -202,7 +202,7 @@ def logged_hours_by_circle_view(request):
         "reporting/logged_hours_by_circle.html",
         {
             "form": form,
-            "circles": logged_hours_by_circle(
+            "stats": logged_hours_by_circle(
                 [form.cleaned_data["date_from"], form.cleaned_data["date_until"]],
                 users=form.cleaned_data["users"],
             ),

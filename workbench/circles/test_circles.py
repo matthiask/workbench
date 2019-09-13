@@ -38,7 +38,7 @@ class CirclesTest(TestCase):
         factories.LoggedHoursFactory.create(service=s1, hours=4)
         factories.LoggedHoursFactory.create(service=s2, hours=6)
 
-        circles = logged_hours_by_circle()
+        circles = logged_hours_by_circle()["circles"]
 
         self.assertEqual(len(circles), 3)  # 2 circles and None
         self.assertEqual(circles[0]["total"], 0)
