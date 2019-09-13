@@ -1,4 +1,3 @@
-import datetime as dt
 from collections import defaultdict
 from decimal import Decimal
 
@@ -9,14 +8,12 @@ from workbench.circles.models import Circle, Role
 from workbench.logbook.models import LoggedHours
 
 
-def logged_hours_by_circle():
-    queryset = (
-        LoggedHours.objects.filter(rendered_on__year=dt.date.today().year)
-        .order_by()
-        .values("service__role", "rendered_by")
-        .annotate(Sum("hours"))
-    )
+def logged_hours_by_circle(date_range, *, users=None):
+    queryset = LoggedHours.objects.order_by().filter(rendered_on__range=date_range)
+    if users:
+        queryset = queryset.filter(rendered_by__in=users)
 
+    queryset = queryset.values("service__role", "rendered_by").annotate(Sum("hours"))
     seen_users = set()
 
     hours_by_role = defaultdict(lambda: defaultdict(Decimal))
@@ -50,12 +47,15 @@ def logged_hours_by_circle():
         }
 
         for role in circle.roles.all():
-            row["roles"].append(
-                {
-                    "role": role,
-                    "by_user": [hours_by_role[role.id][user.id] for user in users],
-                    "total": sum(hours_by_role[role.id].values(), Decimal()),
-                }
-            )
-        circles.append(row)
+            role_total = sum(hours_by_role[role.id].values(), Decimal())
+            if role_total:
+                row["roles"].append(
+                    {
+                        "role": role,
+                        "by_user": [hours_by_role[role.id][user.id] for user in users],
+                        "total": role_total,
+                    }
+                )
+        if row["total"]:
+            circles.append(row)
     return circles

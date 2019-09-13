@@ -103,14 +103,6 @@ def open_items_list(request):
     )
 
 
-def logged_hours_by_circle_view(request):
-    return render(
-        request,
-        "reporting/logged_hours_by_circle.html",
-        {"circles": logged_hours_by_circle()},
-    )
-
-
 def key_data_view(request):
     today = dt.date.today()
     last_month = today - dt.timedelta(days=today.day + 1)
@@ -162,7 +154,7 @@ def key_data_view(request):
     )
 
 
-class HoursPerCustomerForm(forms.Form):
+class LoggedHoursFilterForm(forms.Form):
     date_from = forms.DateField(
         label=_("date from"), required=False, widget=DateInput()
     )
@@ -183,7 +175,7 @@ class HoursPerCustomerForm(forms.Form):
 
 
 def hours_per_customer_view(request):
-    form = HoursPerCustomerForm(request.GET)
+    form = LoggedHoursFilterForm(request.GET)
     if not form.is_valid():
         messages.warning(request, _("Form was invalid."))
         return redirect(".")
@@ -193,6 +185,24 @@ def hours_per_customer_view(request):
         {
             "form": form,
             "stats": hours_per_customer(
+                [form.cleaned_data["date_from"], form.cleaned_data["date_until"]],
+                users=form.cleaned_data["users"],
+            ),
+        },
+    )
+
+
+def logged_hours_by_circle_view(request):
+    form = LoggedHoursFilterForm(request.GET)
+    if not form.is_valid():
+        messages.warning(request, _("Form was invalid."))
+        return redirect(".")
+    return render(
+        request,
+        "reporting/logged_hours_by_circle.html",
+        {
+            "form": form,
+            "circles": logged_hours_by_circle(
                 [form.cleaned_data["date_from"], form.cleaned_data["date_until"]],
                 users=form.cleaned_data["users"],
             ),
