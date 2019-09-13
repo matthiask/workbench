@@ -130,7 +130,7 @@ def key_data_view(request):
                     year
                     if year < last_month.year
                     else ("%s (%s)" % (year, _("projection")))
-                    for year, month_data in (green_hours)
+                    for year, month_data in green_hours
                 ],
                 "datasets": [
                     {
