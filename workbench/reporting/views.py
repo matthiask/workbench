@@ -17,7 +17,7 @@ from workbench.projects.reporting import (
     overdrawn_projects,
     project_budget_statistics,
 )
-from workbench.reporting import key_data
+from workbench.reporting import green_hours, key_data
 from workbench.tools.forms import DateInput, Form
 from workbench.tools.models import Z
 from workbench.tools.validation import monday
@@ -245,6 +245,40 @@ def project_budget_statistics_view(request):
             "projects": sorted(
                 project_budget_statistics(form.queryset()),
                 key=lambda project: project["invoiced"] - project["logbook"],
+            ),
+        },
+    )
+
+
+class DateRangeFilterForm(forms.Form):
+    date_from = forms.DateField(
+        label=_("date from"), required=False, widget=DateInput()
+    )
+    date_until = forms.DateField(
+        label=_("date until"), required=False, widget=DateInput()
+    )
+
+    def __init__(self, data, *args, **kwargs):
+        today = dt.date.today()
+        data = data.copy()
+        data.setdefault("date_from", dt.date(today.year, 1, 1).isoformat())
+        data.setdefault("date_until", dt.date(today.year, 12, 31).isoformat())
+        super().__init__(data, *args, **kwargs)
+
+
+def green_hours_view(request):
+    form = DateRangeFilterForm(request.GET)
+    if not form.is_valid():
+        messages.warning(request, _("Form was invalid."))
+        return redirect(".")
+
+    return render(
+        request,
+        "reporting/green_hours.html",
+        {
+            "form": form,
+            "green_hours": green_hours.green_hours(
+                [form.cleaned_data["date_from"], form.cleaned_data["date_until"]]
             ),
         },
     )

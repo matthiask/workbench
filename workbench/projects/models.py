@@ -373,13 +373,13 @@ class ServiceQuerySet(models.QuerySet):
             )
         ]
 
-    def logging(self):
+    def budgeted(self):
         from workbench.offers.models import Offer
 
-        return self.filter(
-            Q(allow_logging=True),
-            Q(offer__isnull=True) | ~Q(offer__status=Offer.REJECTED),
-        )
+        return self.filter(Q(offer__isnull=True) | ~Q(offer__status=Offer.REJECTED))
+
+    def logging(self):
+        return self.budgeted().filter(allow_logging=True)
 
     def editable(self):
         from workbench.offers.models import Offer

@@ -81,6 +81,7 @@
             <div class="dropdown-header">{% trans 'logged hours' %}</div>
             <a class="dropdown-item" href="{% url 'report_logged_hours_by_circle' %}">{% trans 'hours by circle'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">{% trans 'hours per customer'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'report_green_hours' %}">{% trans 'green hours'|capfirst %}</a>
           </div>
         </li>
         {% endmark_current %}

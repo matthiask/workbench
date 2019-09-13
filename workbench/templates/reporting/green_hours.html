@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% load fineforms i18n static workbench %}
+
+{% block title %}{% trans 'green hours' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-sm-12 col-md-8">
+  <h1>{% trans 'green hours' %}</h1>
+
+  <form method="get" class="mb-3">
+    {% ff_fields form %}
+    {% ff_submit _('show') %}
+  </form>
+
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>{% trans 'user' %}</th>
+        <th class="text-right">{% trans 'green' %}</th>
+        <th class="text-right">{% trans 'red' %}</th>
+        <th class="text-right">{% trans 'maintenance' %}</th>
+        <th class="text-right">{% trans 'internal' %}</th>
+        <th class="text-right">{% trans 'total' %}</th>
+        <th class="text-right">{% trans 'percentage' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for user, stats in green_hours %}
+    <tr>
+      {% if user %}
+        <td>{{ user }}</td>
+      {% else %}
+        <th>{% trans 'total' %}</th>
+      {% endif %}
+      <td class="text-right">{{ stats.green|hours }}</td>
+      <td class="text-right">{{ stats.red|hours }}</td>
+      <td class="text-right">{{ stats.maintenance|hours }}</td>
+      <td class="text-right">{{ stats.internal|hours }}</td>
+      <td class="text-right">{{ stats.total|hours }}</td>
+      <td class="text-right">{{ stats.percentage|stringformat:'d' }}%</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+</div>
+{% endblock %}

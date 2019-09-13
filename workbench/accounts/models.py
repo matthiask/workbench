@@ -91,7 +91,11 @@ class User(Model, AbstractBaseUser):
         return self.get_full_name()
 
     def __lt__(self, other):
-        return self.get_full_name() < other.get_full_name()
+        return (
+            self.get_full_name() < other.get_full_name()
+            if isinstance(other, User)
+            else 1
+        )
 
     def get_absolute_url(self):
         return "/"

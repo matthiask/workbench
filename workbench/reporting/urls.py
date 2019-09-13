@@ -2,6 +2,7 @@ from django.conf.urls import url
 
 from workbench.awt.views import ReportView
 from workbench.reporting.views import (
+    green_hours_view,
     hours_per_customer_view,
     key_data_view,
     logged_hours_by_circle_view,
@@ -39,4 +40,5 @@ urlpatterns = [
         project_budget_statistics_view,
         name="report_project_budget_statistics",
     ),
+    url(r"^green-hours/$", green_hours_view, name="report_green_hours"),
 ]
