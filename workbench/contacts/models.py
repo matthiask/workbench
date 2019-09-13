@@ -52,6 +52,10 @@ class Organization(Model):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def allow_delete(cls, instance, request):
+        return None
+
 
 class PersonQuerySet(SearchQuerySet):
     def active(self):

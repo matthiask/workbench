@@ -2,7 +2,11 @@ from django.conf.urls import url
 from django.shortcuts import redirect
 
 from workbench import generic
-from workbench.contacts.forms import OrganizationForm, PersonForm
+from workbench.contacts.forms import (
+    OrganizationDeleteForm,
+    OrganizationForm,
+    PersonForm,
+)
 from workbench.contacts.models import Organization, Person
 from workbench.contacts.views import OrganizationListView, PersonListView, select
 
@@ -36,7 +40,9 @@ urlpatterns = [
     ),
     url(
         r"^organizations/(?P<pk>\d+)/delete/$",
-        generic.DeleteView.as_view(model=Organization),
+        generic.DeleteView.as_view(
+            model=Organization, delete_form_class=OrganizationDeleteForm
+        ),
         name="contacts_organization_delete",
     ),
     url(r"^people/$", PersonListView.as_view(), name="contacts_person_list"),

@@ -15,6 +15,8 @@ from workbench.contacts.models import (
     PostalAddress,
 )
 from workbench.tools.forms import Autocomplete, ModelForm, Textarea
+from workbench.tools.models import ProtectedError, SlowCollector
+from workbench.tools.substitute_with import substitute_with
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -77,6 +79,36 @@ class OrganizationForm(ModelForm):
             "default_billing_address": Textarea(),
             "groups": forms.CheckboxSelectMultiple(),
         }
+
+
+class OrganizationDeleteForm(ModelForm):
+    class Meta:
+        model = Organization
+        fields = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        collector = SlowCollector(using=self.instance._state.db)
+        add_merge_field = False
+        try:
+            collector.collect([self.instance])
+        except ProtectedError:
+            add_merge_field = True
+
+        if add_merge_field:
+            self.fields["merge_into"] = forms.ModelChoiceField(
+                Organization.objects.exclude(pk=self.instance.pk),
+                widget=Autocomplete(model=Organization),
+                label=_("merge into"),
+            )
+
+    def delete(self):
+        if "merge_into" in self.fields:
+            substitute_with(
+                to_delete=self.instance, instance=self.cleaned_data["merge_into"]
+            )
+        else:
+            self.instance.delete()
 
 
 class PersonForm(ModelForm):
