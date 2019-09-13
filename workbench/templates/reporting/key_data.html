@@ -58,6 +58,7 @@
         <th class="text-right">{% trans 'gross profit' %}</th>
         <th class="text-right">{% trans 'third party costs' %}</th>
         <th class="text-right">{% trans 'accruals' %}</th>
+        <th class="text-right"></th>
         <th class="text-right">{% trans 'gross margin' %}</th>
       </tr>
     </thead>
@@ -67,9 +68,8 @@
         <td>{{ month.date|date:'F Y' }}</td>
         <td class="text-right">{{ month.gross_profit|currency }}</td>
         <td class="text-right">{{ month.third_party_costs|currency:1 }}</td>
-        <td class="text-right text-nowrap" title="{{ month.accruals.accrual|currency }} {% trans 'total' %}">
-          {{ month.accruals.delta|currency:1 }}
-        </td>
+        <td class="text-right text-muted">{{ month.accruals.accrual|currency }}</td>
+        <td class="text-right">{{ month.accruals.delta|currency:1 }}</td>
         <td class="text-right">{{ month.gross_margin|currency }}</td>
       </tr>
       {% endfor %}
