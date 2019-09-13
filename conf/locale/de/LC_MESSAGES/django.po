@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-13 12:53+0200\n"
+"POT-Creation-Date: 2019-09-13 13:41+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -103,7 +103,7 @@ msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
 #: workbench/accruals/__init__.py workbench/accruals/models.py
-#: workbench/templates/base.html
+#: workbench/templates/base.html workbench/templates/reporting/key_data.html
 msgid "accruals"
 msgstr "Abgrenzungen"
 
@@ -745,6 +745,7 @@ msgstr "Valuta"
 #: workbench/credit_control/models.py workbench/expenses/models.py
 #: workbench/expenses/views.py workbench/management/commands/export_debtors.py
 #: workbench/templates/credit_control/creditentry_list.html
+#: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/monthly_invoicing.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
 #: workbench/tools/pdf.py
@@ -1113,6 +1114,7 @@ msgstr "Anzahlungstotal"
 #: workbench/invoices/models.py workbench/logbook/models.py
 #: workbench/services/models.py
 #: workbench/templates/logbook/loggedcost_detail.html
+#: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/monthly_invoicing.html
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "third party costs"
@@ -1791,6 +1793,11 @@ msgid "overdrawn projects"
 msgstr "Überzogene Projekte"
 
 #: workbench/templates/base.html
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "project budget statistics"
+msgstr "Projekt-Budgetstatistik"
+
+#: workbench/templates/base.html
 #: workbench/templates/reporting/monthly_invoicing.html
 msgid "monthly invoicing"
 msgstr "Monatliche Verrechnung"
@@ -1809,11 +1816,6 @@ msgstr "Stunden pro Kreis"
 #: workbench/templates/reporting/hours_per_customer.html
 msgid "hours per customer"
 msgstr "Stunden pro Kundschaft"
-
-#: workbench/templates/base.html
-#: workbench/templates/reporting/project_budget_statistics.html
-msgid "project budget statistics"
-msgstr "Projekt-Budgetstatistik"
 
 #: workbench/templates/base.html
 msgid "Settings"
@@ -2018,6 +2020,18 @@ msgstr "Anzeigen"
 #: workbench/templates/reporting/key_data.html
 msgid "revenue minus third party costs and accruals"
 msgstr "Umsatz minus Fremdkosten minus Abgrenzungen"
+
+#: workbench/templates/reporting/key_data.html
+msgid "month"
+msgstr "Monat"
+
+#: workbench/templates/reporting/key_data.html
+msgid "gross profit"
+msgstr "Umsatz"
+
+#: workbench/templates/reporting/key_data.html
+msgid "gross margin"
+msgstr "Gewinn ohne Fixkosten"
 
 #: workbench/templates/reporting/key_data.html
 msgid "green hours"

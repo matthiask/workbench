@@ -115,6 +115,7 @@ def key_data_view(request):
         "reporting/key_data.html",
         {
             "date_range": date_range,
+            "gross_margin_by_month": key_data.gross_margin_by_month(date_range),
             "invoiced_corrected": [
                 (year, [month_data[i] for i in range(1, 13)])
                 for year, month_data in sorted(

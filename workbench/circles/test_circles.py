@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django.test import TestCase
 from django.utils.translation import deactivate_all
 
@@ -38,7 +40,10 @@ class CirclesTest(TestCase):
         factories.LoggedHoursFactory.create(service=s1, hours=4)
         factories.LoggedHoursFactory.create(service=s2, hours=6)
 
-        circles = logged_hours_by_circle()["circles"]
+        today = dt.date.today()
+        circles = logged_hours_by_circle(
+            [dt.date(today.year, 1, 1), dt.date(today.year, 12, 31)]
+        )["circles"]
 
         self.assertEqual(len(circles), 3)  # 2 circles and None
         self.assertEqual(circles[0]["total"], 0)

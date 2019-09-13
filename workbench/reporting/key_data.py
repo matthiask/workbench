@@ -1,5 +1,6 @@
 import datetime as dt
 from collections import defaultdict
+from itertools import chain
 
 from django.db import connections
 from django.db.models import Sum
@@ -158,7 +159,39 @@ def invoiced_by_month(date_range):
     return invoiced
 
 
-def accruals_by_date(date_range):
+def gross_profit_by_month(date_range):
+    profit = defaultdict(lambda: Z)
+    for row in (
+        Invoice.objects.valid()
+        .order_by()
+        .filter(invoiced_on__range=date_range)
+        .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))
+        .values("year", "month")
+        .annotate(Sum("subtotal"), Sum("discount"), Sum("down_payment_total"))
+    ):
+        profit[(row["year"], row["month"])] += (
+            row["subtotal__sum"] - row["discount__sum"] - row["down_payment_total__sum"]
+        )
+    return profit
+
+
+def third_party_costs_by_month(date_range):
+    costs = defaultdict(lambda: Z)
+
+    for row in (
+        LoggedCost.objects.order_by()
+        .filter(rendered_on__range=date_range)
+        .filter(third_party_costs__isnull=False)
+        .annotate(year=ExtractYear("rendered_on"), month=ExtractMonth("rendered_on"))
+        .values("year", "month")
+        .annotate(Sum("third_party_costs"))
+    ):
+        costs[(row["year"], row["month"])] += row["third_party_costs__sum"]
+
+    return costs
+
+
+def accruals_by_month(date_range):
     accruals = {(0, 0): {"accrual": Z, "delta": None}}
     with connections["default"].cursor() as cursor:
         cursor.execute(
@@ -190,9 +223,31 @@ ORDER BY cutoff_date
 
 
 def invoiced_corrected(date_range):
-    accruals = accruals_by_date(date_range)
+    accruals = accruals_by_month(date_range)
     margin = invoiced_by_month(date_range)
     for month, accrual in accruals.items():
         margin[month[0]][month[1]] += accrual["delta"]
 
     return margin
+
+
+def gross_margin_by_month(date_range):
+    gross = gross_profit_by_month(date_range)
+    third = third_party_costs_by_month(date_range)
+    accruals = accruals_by_month(date_range)
+
+    months = sorted(set(chain.from_iterable([gross, third, accruals])))
+    profit = []
+    for month in months:
+        row = {
+            "date": dt.date(month[0], month[1], 1),
+            "gross_profit": gross.get(month, Z),
+            "third_party_costs": third.get(month, Z),
+            "accruals": accruals.get(month, Z),
+        }
+        row["gross_margin"] = (
+            row["gross_profit"] - row["third_party_costs"] + row["accruals"]["delta"]
+        )
+        profit.append(row)
+
+    return profit

@@ -51,6 +51,31 @@
     });
   </script>
 
+  <table class="table">
+    <thead>
+      <tr>
+        <th>{% trans 'month' %}</th>
+        <th class="text-right">{% trans 'gross profit' %}</th>
+        <th class="text-right">{% trans 'third party costs' %}</th>
+        <th class="text-right">{% trans 'accruals' %}</th>
+        <th class="text-right">{% trans 'gross margin' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for month in gross_margin_by_month reversed %}
+      <tr>
+        <td>{{ month.date|date:'F Y' }}</td>
+        <td class="text-right">{{ month.gross_profit|currency }}</td>
+        <td class="text-right">{{ month.third_party_costs|currency }}</td>
+        <td class="text-right text-nowrap" title="{{ month.accruals.accrual|currency }} {% trans 'total' %}">
+          {% if month.accruals.delta > 0 %}+{% endif %}{{ month.accruals.delta|currency }}
+        </td>
+        <td class="text-right">{{ month.gross_margin|currency }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
   <h2 class="mt-5">{% trans 'green hours' %}</h2>
   <canvas id="green-hours" width="800" height="350"></canvas>
   <script>
