@@ -1,8 +1,6 @@
 import datetime as dt
-from functools import wraps
 
 from django import forms
-from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext_lazy as _
@@ -16,7 +14,7 @@ from workbench.projects.reporting import overdrawn_projects, project_budget_stat
 from workbench.reporting import green_hours, key_data
 from workbench.tools.forms import DateInput
 from workbench.tools.models import Z
-from workbench.tools.validation import monday
+from workbench.tools.validation import filter_form, monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -72,21 +70,6 @@ class OpenItemsForm(forms.Form):
             "total_excl_tax": sum((i.total_excl_tax for i in open_items), Z),
             "total": sum((i.total for i in open_items), Z),
         }
-
-
-def filter_form(form_class):
-    def decorator(view):
-        @wraps(view)
-        def inner(request, *args, **kwargs):
-            form = form_class(request.GET)
-            if not form.is_valid():
-                messages.warning(request, _("Form was invalid."))
-                return redirect(".")
-            return view(request, form, *args, **kwargs)
-
-        return inner
-
-    return decorator
 
 
 @filter_form(OpenItemsForm)
