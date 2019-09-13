@@ -132,33 +132,6 @@ def green_hours(date_range):
     return data
 
 
-def invoiced_by_month(date_range):
-    invoiced = defaultdict(lambda: defaultdict(lambda: Z))
-    for row in (
-        Invoice.objects.valid()
-        .order_by()
-        .filter(invoiced_on__range=date_range)
-        .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))
-        .values("year", "month")
-        .annotate(Sum("subtotal"), Sum("discount"), Sum("down_payment_total"))
-    ):
-        invoiced[row["year"]][row["month"]] += (
-            row["subtotal__sum"] - row["discount__sum"] - row["down_payment_total__sum"]
-        )
-
-    for row in (
-        LoggedCost.objects.order_by()
-        .filter(rendered_on__range=date_range)
-        .filter(third_party_costs__isnull=False)
-        .annotate(year=ExtractYear("rendered_on"), month=ExtractMonth("rendered_on"))
-        .values("year", "month")
-        .annotate(Sum("third_party_costs"))
-    ):
-        invoiced[row["year"]][row["month"]] -= row["third_party_costs__sum"]
-
-    return invoiced
-
-
 def gross_profit_by_month(date_range):
     profit = defaultdict(lambda: Z)
     for row in (
@@ -222,15 +195,6 @@ ORDER BY cutoff_date
     }
 
 
-def invoiced_corrected(date_range):
-    accruals = accruals_by_month(date_range)
-    margin = invoiced_by_month(date_range)
-    for month, accrual in accruals.items():
-        margin[month[0]][month[1]] += accrual["delta"]
-
-    return margin
-
-
 def gross_margin_by_month(date_range):
     gross = gross_profit_by_month(date_range)
     third = third_party_costs_by_month(date_range)
@@ -240,6 +204,7 @@ def gross_margin_by_month(date_range):
     profit = []
     for month in months:
         row = {
+            "month": month,
             "date": dt.date(month[0], month[1], 1),
             "gross_profit": gross.get(month, Z),
             "third_party_costs": third.get(month, Z),

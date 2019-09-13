@@ -132,33 +132,34 @@ class AccrualsTest(TestCase):
         self.assertEqual(accruals[(2019, 3)]["accrual"], Decimal(0))
         self.assertEqual(accruals[(2019, 3)]["delta"], Decimal(20))
 
-        invoiced = key_data.invoiced_by_month(
+        invoiced = key_data.gross_profit_by_month(
             [dt.date(2018, 1, 1), dt.date(2019, 2, 28)]
         )
         self.assertEqual(len(invoiced), 1)
-        self.assertEqual(len(invoiced[2018]), 1)
-        self.assertEqual(invoiced[2018][12], Decimal(200))
+        self.assertEqual(invoiced[(2018, 12)], Decimal(200))
 
-        invoiced = key_data.invoiced_corrected(
+        invoiced = key_data.gross_margin_by_month(
             [dt.date(2018, 1, 1), dt.date(2019, 2, 28)]
         )
         self.assertEqual(len(invoiced), 2)
-        self.assertEqual(len(invoiced[2018]), 1)
-        self.assertEqual(invoiced[2018][12], Decimal(160))
+        self.assertEqual(invoiced[0]["gross_margin"], Decimal(160))
 
         factories.LoggedCostFactory.create(
             rendered_on=dt.date(2018, 12, 25), third_party_costs=10
         )
 
-        invoiced = key_data.invoiced_corrected(
+        invoiced = key_data.gross_margin_by_month(
             [dt.date(2018, 1, 1), dt.date(2019, 3, 31)]
         )
-        self.assertEqual(len(invoiced), 2)
-        self.assertEqual(len(invoiced[2018]), 1)
-        self.assertEqual(len(invoiced[2019]), 2)
-        self.assertEqual(invoiced[2018][12], Decimal(150))  # 160 - 10 logged cost
-        self.assertEqual(invoiced[2019][1], Decimal(20))
-        self.assertEqual(invoiced[2019][3], Decimal(20))
+        self.assertEqual(len(invoiced), 3)
+        self.assertEqual(invoiced[0]["month"], (2018, 12))
+        self.assertEqual(
+            invoiced[0]["gross_margin"], Decimal(150)
+        )  # 160 - 10 logged cost
+        self.assertEqual(invoiced[1]["month"], (2019, 1))
+        self.assertEqual(invoiced[1]["gross_margin"], Decimal(20))
+        self.assertEqual(invoiced[2]["month"], (2019, 3))
+        self.assertEqual(invoiced[2]["gross_margin"], Decimal(20))
 
     def test_future_cutoff_dates(self):
         self.client.force_login(factories.UserFactory.create())

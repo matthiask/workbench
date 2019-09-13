@@ -109,18 +109,20 @@ def key_data_view(request):
     date_range = [dt.date(last_month.year - 2, 1, 1), last_month]
 
     green_hours = sorted(key_data.green_hours(date_range).items())
+    gross_margin_by_month = key_data.gross_margin_by_month(date_range)
+    gross_margin_months = {
+        row["month"]: row["gross_margin"] for row in gross_margin_by_month
+    }
 
     return render(
         request,
         "reporting/key_data.html",
         {
             "date_range": date_range,
-            "gross_margin_by_month": key_data.gross_margin_by_month(date_range),
+            "gross_margin_by_month": gross_margin_by_month,
             "invoiced_corrected": [
-                (year, [month_data[i] for i in range(1, 13)])
-                for year, month_data in sorted(
-                    key_data.invoiced_corrected(date_range).items()
-                )
+                (year, [gross_margin_months.get((year, i), Z) for i in range(1, 13)])
+                for year in range(last_month.year - 2, last_month.year + 1)
             ],
             "green_hours": [
                 (year, [month_data["months"][i] for i in range(1, 13)])
