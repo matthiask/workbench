@@ -11,7 +11,7 @@
     <tr>
       <td class="text-right">{% trans 'people' %}</td>
       <td>
-        {% for person in organization.people.all %}
+        {% for person in organization.people.active %}
           <a class="inline" href="{{ person.get_absolute_url }}">{{ person.full_name }}</a>{% if not forloop.last %},{% endif %}
         {% endfor %}
       </td>

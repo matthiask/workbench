@@ -1,3 +1,4 @@
+from django.db.models import Prefetch
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.translation import gettext as _
@@ -16,7 +17,11 @@ class OrganizationListView(ListView):
     search_form_class = OrganizationSearchForm
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related("people")
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related(Prefetch("people", queryset=Person.objects.active()))
+        )
 
 
 class PersonListView(ListView):
