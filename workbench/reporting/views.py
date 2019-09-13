@@ -1,4 +1,5 @@
 import datetime as dt
+from functools import wraps
 
 from django import forms
 from django.contrib import messages
@@ -13,7 +14,7 @@ from workbench.invoices.utils import next_valid_day
 from workbench.projects.models import Project
 from workbench.projects.reporting import overdrawn_projects, project_budget_statistics
 from workbench.reporting import green_hours, key_data
-from workbench.tools.forms import DateInput, Form
+from workbench.tools.forms import DateInput
 from workbench.tools.models import Z
 from workbench.tools.validation import monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -73,12 +74,23 @@ class OpenItemsForm(forms.Form):
         }
 
 
-def open_items_list(request):
-    form = OpenItemsForm(request.GET)
-    if not form.is_valid():
-        messages.warning(request, _("Form was invalid."))
-        return redirect(".")
+def filter_form(form_class):
+    def decorator(view):
+        @wraps(view)
+        def inner(request, *args, **kwargs):
+            form = form_class(request.GET)
+            if not form.is_valid():
+                messages.warning(request, _("Form was invalid."))
+                return redirect(".")
+            return view(request, form, *args, **kwargs)
 
+        return inner
+
+    return decorator
+
+
+@filter_form(OpenItemsForm)
+def open_items_list(request, form):
     if request.GET.get("xlsx"):
         xlsx = WorkbenchXLSXDocument()
         xlsx.table_from_queryset(
@@ -173,11 +185,8 @@ class HoursFilterForm(forms.Form):
         self.fields["users"].widget.attrs = {"size": 10}
 
 
-def hours_filter_view(request, *, template_name, stats_fn):
-    form = HoursFilterForm(request.GET)
-    if not form.is_valid():
-        messages.warning(request, _("Form was invalid."))
-        return redirect(".")
+@filter_form(HoursFilterForm)
+def hours_filter_view(request, form, *, template_name, stats_fn):
     return render(
         request,
         template_name,
@@ -191,7 +200,7 @@ def hours_filter_view(request, *, template_name, stats_fn):
     )
 
 
-class ProjectBudgetStatisticsForm(Form):
+class ProjectBudgetStatisticsForm(forms.Form):
     owned_by = forms.TypedChoiceField(label="", coerce=int, required=False)
 
     def __init__(self, *args, **kwargs):
@@ -208,12 +217,8 @@ class ProjectBudgetStatisticsForm(Form):
         return queryset.select_related("owned_by")
 
 
-def project_budget_statistics_view(request):
-    form = ProjectBudgetStatisticsForm(request.GET, request=request)
-    if not form.is_valid():
-        messages.warning(request, _("Form was invalid."))
-        return redirect(".")
-
+@filter_form(ProjectBudgetStatisticsForm)
+def project_budget_statistics_view(request, form):
     return render(
         request,
         "reporting/project_budget_statistics.html",
@@ -243,12 +248,8 @@ class DateRangeFilterForm(forms.Form):
         super().__init__(data, *args, **kwargs)
 
 
-def green_hours_view(request):
-    form = DateRangeFilterForm(request.GET)
-    if not form.is_valid():
-        messages.warning(request, _("Form was invalid."))
-        return redirect(".")
-
+@filter_form(DateRangeFilterForm)
+def green_hours_view(request, form):
     return render(
         request,
         "reporting/green_hours.html",
