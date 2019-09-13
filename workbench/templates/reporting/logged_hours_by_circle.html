@@ -25,13 +25,19 @@
     <tbody>
     {% for circle in stats.circles %}
       <tr>
-        <th>{{ circle.circle|default:_("No circle") }}</th>
+        <th>
+          {% if circle.circle %}
+            <a href="https://app.glassfrog.com/circles/{{ circle.circle.pk }}" target="_blank">{{ circle.circle }}</a>
+          {% else %}{% trans 'No circle' %}{% endif %}
+        </th>
         {% for user in circle.by_user %}<th class="text-right">{% if user %}{{ user|hours }}{% else %}-{% endif %}</th>{% endfor %}
         <th class="text-right">{{ circle.total|hours }}</th>
       </tr>
       {% for role in circle.roles %}
       <tr>
-        <td>{{ role.role }}</td>
+        <td>
+          <a href="https://app.glassfrog.com/roles/{{ role.role.pk }}" target="_blank">{{ role.role }}</a>
+        </td>
         {% for user in role.by_user %}<td class="text-right">{% if user %}{{ user|hours }}{% else %}-{% endif %}</td>{% endfor %}
         <td class="text-right">{{ role.total|hours }}</td>
       </tr>
