@@ -30,10 +30,16 @@ def pretty_due(day):
         return _("overdue!")
 
 
-def currency(value):
+def currency(value, show_plus_sign=False):
     if value:
         value = value.quantize(H2)
-    return "{:,.2f}".format(value).replace(",", "’") if value else "0.00"
+    return (
+        "{}{:,.2f}".format("+" if show_plus_sign and value > 0 else "", value).replace(
+            ",", "’"
+        )
+        if value
+        else "0.00"
+    )
 
 
 def days(value):

@@ -66,9 +66,9 @@
       <tr>
         <td>{{ month.date|date:'F Y' }}</td>
         <td class="text-right">{{ month.gross_profit|currency }}</td>
-        <td class="text-right">{{ month.third_party_costs|currency }}</td>
+        <td class="text-right">{{ month.third_party_costs|currency:1 }}</td>
         <td class="text-right text-nowrap" title="{{ month.accruals.accrual|currency }} {% trans 'total' %}">
-          {% if month.accruals.delta > 0 %}+{% endif %}{{ month.accruals.delta|currency }}
+          {{ month.accruals.delta|currency:1 }}
         </td>
         <td class="text-right">{{ month.gross_margin|currency }}</td>
       </tr>
