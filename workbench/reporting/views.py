@@ -7,16 +7,11 @@ from django.shortcuts import redirect, render
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.circles.reporting import hours_by_circle
 from workbench.invoices.models import Invoice
 from workbench.invoices.reporting import monthly_invoicing
 from workbench.invoices.utils import next_valid_day
 from workbench.projects.models import Project
-from workbench.projects.reporting import (
-    hours_per_customer,
-    overdrawn_projects,
-    project_budget_statistics,
-)
+from workbench.projects.reporting import overdrawn_projects, project_budget_statistics
 from workbench.reporting import green_hours, key_data
 from workbench.tools.forms import DateInput, Form
 from workbench.tools.models import Z
@@ -158,7 +153,7 @@ def key_data_view(request):
     )
 
 
-class LoggedHoursFilterForm(forms.Form):
+class HoursFilterForm(forms.Form):
     date_from = forms.DateField(
         label=_("date from"), required=False, widget=DateInput()
     )
@@ -178,35 +173,17 @@ class LoggedHoursFilterForm(forms.Form):
         self.fields["users"].widget.attrs = {"size": 10}
 
 
-def hours_per_customer_view(request):
-    form = LoggedHoursFilterForm(request.GET)
+def hours_filter_view(request, *, template_name, stats_fn):
+    form = HoursFilterForm(request.GET)
     if not form.is_valid():
         messages.warning(request, _("Form was invalid."))
         return redirect(".")
     return render(
         request,
-        "reporting/hours_per_customer.html",
+        template_name,
         {
             "form": form,
-            "stats": hours_per_customer(
-                [form.cleaned_data["date_from"], form.cleaned_data["date_until"]],
-                users=form.cleaned_data["users"],
-            ),
-        },
-    )
-
-
-def hours_by_circle_view(request):
-    form = LoggedHoursFilterForm(request.GET)
-    if not form.is_valid():
-        messages.warning(request, _("Form was invalid."))
-        return redirect(".")
-    return render(
-        request,
-        "reporting/hours_by_circle.html",
-        {
-            "form": form,
-            "stats": hours_by_circle(
+            "stats": stats_fn(
                 [form.cleaned_data["date_from"], form.cleaned_data["date_until"]],
                 users=form.cleaned_data["users"],
             ),
