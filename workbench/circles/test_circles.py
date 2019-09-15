@@ -55,6 +55,10 @@ class CirclesTest(TestCase):
         self.client.force_login(s1.project.owned_by)
         response = self.client.get("/report/hours-by-circle/")
         self.assertEqual(response.status_code, 200)
+        response = self.client.get(
+            "/report/hours-by-circle/?users={}".format(s1.project.owned_by.id)
+        )
+        self.assertEqual(response.status_code, 200)
 
     def test_role_warning(self):
         project = factories.ProjectFactory.create()

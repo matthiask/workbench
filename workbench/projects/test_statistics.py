@@ -10,7 +10,7 @@ from workbench.projects.reporting import (
     overdrawn_projects,
     project_budget_statistics,
 )
-from workbench.reporting import key_data
+from workbench.reporting import green_hours, key_data
 from workbench.tools.models import Z
 
 
@@ -173,7 +173,7 @@ class StatisticsTest(TestCase):
             ],
         )
 
-    def test_green_hours(self):
+    def create_projects(self):
         p_internal = factories.ProjectFactory.create(type=Project.INTERNAL)
         p_maintenance = factories.ProjectFactory.create(type=Project.MAINTENANCE)
         p_order = factories.ProjectFactory.create(type=Project.ORDER)
@@ -205,6 +205,30 @@ class StatisticsTest(TestCase):
             service=s_order, hours=10, rendered_on=dt.date(2019, 4, 1)
         )
 
+    def test_green_hours(self):
+        self.create_projects()
+        p_green = factories.ProjectFactory.create(type=Project.ORDER)
+        s_green = factories.ServiceFactory.create(project=p_green, effort_hours=20)
+        factories.LoggedHoursFactory.create(
+            service=s_green, hours=10, rendered_on=dt.date(2019, 1, 1)
+        )
+
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.get("/report/green-hours/")
+        self.assertEqual(response.status_code, 200)
+
+        gh = green_hours.green_hours([dt.date(2019, 1, 1), dt.date(2019, 3, 31)])
+        overall = gh[-1]
+        self.assertEqual(overall[0], 0)
+        self.assertEqual(overall[1]["total"], Decimal("80"))
+        self.assertEqual(overall[1]["maintenance"], Decimal("20"))
+        self.assertAlmostEqual(overall[1]["green"], Decimal("23.33333333"))
+        self.assertAlmostEqual(overall[1]["red"], Decimal("26.66666666"))
+        self.assertAlmostEqual(overall[1]["percentage"], Decimal("54.16666666"))
+
+    def test_key_data_green_hours(self):
+        self.create_projects()
+
         gh = key_data.green_hours([dt.date(2019, 1, 1), dt.date(2019, 3, 31)])
 
         self.assertEqual(len(gh), 1)
@@ -229,7 +253,3 @@ class StatisticsTest(TestCase):
             "<GreenHours profitable=0.00 overdrawn=10.00 maintenance=0.00"
             " internal=0.00 total=10.00 green=0%>",
         )
-
-        self.client.force_login(factories.UserFactory.create())
-        response = self.client.get("/report/green-hours/")
-        self.assertEqual(response.status_code, 200)
