@@ -142,6 +142,13 @@ class PersonDetail(Model):
     class Meta:
         abstract = True
 
+    @property
+    def urls(self):
+        return self.person.urls
+
+    def get_absolute_url(self):
+        return self.person.urls["detail"]
+
     def save(self, *args, **kwargs):
         self.weight = sum(
             (weight for regex, weight in self.WEIGHTS if regex.search(str(self.type))),
@@ -168,13 +175,6 @@ class PhoneNumber(PersonDetail):
 
     def __str__(self):
         return self.phone_number
-
-    def get_absolute_url(self):
-        return self.person.urls["detail"]
-
-    @property
-    def urls(self):
-        return self.person.urls
 
     def clean_fields(self, exclude):
         super().clean_fields(exclude)
@@ -220,13 +220,6 @@ class EmailAddress(PersonDetail):
     def __str__(self):
         return self.email
 
-    def get_absolute_url(self):
-        return self.person.urls["detail"]
-
-    @property
-    def urls(self):
-        return self.person.urls
-
 
 class PostalAddress(PersonDetail):
     person = models.ForeignKey(
@@ -254,13 +247,6 @@ class PostalAddress(PersonDetail):
 
     def __str__(self):
         return self.postal_address
-
-    def get_absolute_url(self):
-        return self.person.urls["detail"]
-
-    @property
-    def urls(self):
-        return self.person.urls
 
     @property
     def postal_address(self):
