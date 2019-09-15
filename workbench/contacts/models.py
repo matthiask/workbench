@@ -256,6 +256,7 @@ class PostalAddress(PersonDetail):
             self.person.organization.name
             if self.person.organization
             and not self.person.organization.is_private_person
+            and not any(type in self.type.lower() for type in ["home"])
             else "",
             self.person.full_name,
             " ".join(filter(None, (self.street, self.house_number))),
