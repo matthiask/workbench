@@ -153,7 +153,7 @@ class InvoicesTest(TestCase):
         service4 = factories.ServiceFactory.create(project=project, title="nothing")
 
         cost = factories.LoggedCostFactory.create(
-            project=project, service=service1, cost=10, description="Test"
+            service=service1, cost=10, description="Test"
         )
         hours = factories.LoggedHoursFactory.create(
             service=service1, hours=1, description="Test"
@@ -280,7 +280,7 @@ class InvoicesTest(TestCase):
     def test_delete_service_invoice_with_logs(self):
         service = factories.ServiceFactory.create()
         cost = factories.LoggedCostFactory.create(
-            cost=150, project=service.project, service=service, description="this"
+            cost=150, service=service, description="this"
         )
 
         url = service.project.urls["createinvoice"] + "?type=services&source=logbook"

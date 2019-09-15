@@ -17,15 +17,8 @@ class LoggedHoursAdmin(admin.ModelAdmin):
 
 
 class LoggedCostAdmin(admin.ModelAdmin):
-    list_display = (
-        "project",
-        "service",
-        "created_by",
-        "rendered_on",
-        "cost",
-        "description",
-    )
-    raw_id_fields = ("project", "service", "invoice_service")
+    list_display = ("service", "created_by", "rendered_on", "cost", "description")
+    raw_id_fields = ("service", "invoice_service")
 
 
 admin.site.register(models.LoggedHours, LoggedHoursAdmin)

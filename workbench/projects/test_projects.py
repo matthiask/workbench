@@ -88,9 +88,7 @@ class ProjectsTest(TestCase):
 
         service1, service2 = project.services.all()
 
-        service1.loggedcosts.create(
-            created_by=user, rendered_by=user, cost=10, project=project
-        )
+        service1.loggedcosts.create(created_by=user, rendered_by=user, cost=10)
 
         response = self.client.post(
             "/projects/service/set-order/", {"ids[]": [service2.id, service1.id]}
@@ -207,7 +205,9 @@ class ProjectsTest(TestCase):
         response = self.client.get(project.urls["delete"])
         self.assertEqual(response.status_code, 200)
 
-        factories.LoggedCostFactory.create(project=project)
+        factories.LoggedCostFactory.create(
+            service=factories.ServiceFactory.create(project=project)
+        )
 
         response = self.client.get(project.urls["delete"])
         self.assertRedirects(response, project.urls["detail"])

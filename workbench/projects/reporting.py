@@ -97,7 +97,11 @@ def hours_per_customer(date_range, *, users=None):
 
 
 def project_budget_statistics(projects):
-    costs = LoggedCost.objects.filter(project__in=projects).order_by().values("project")
+    costs = (
+        LoggedCost.objects.filter(service__project__in=projects)
+        .order_by()
+        .values("service__project")
+    )
 
     cost_per_project = {
         row["project"]: row["cost__sum"] for row in costs.annotate(Sum("cost"))

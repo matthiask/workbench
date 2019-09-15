@@ -7,6 +7,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
     def logged_hours(self, queryset):
         self.table_from_queryset(
             queryset.select_related(
+                "created_by",
                 "rendered_by",
                 "service__project__owned_by",
                 "invoice_service__invoice__owned_by",
@@ -25,7 +26,25 @@ class WorkbenchXLSXDocument(XLSXDocument):
         )
 
     def logged_costs(self, queryset):
-        self.table_from_queryset(queryset)
+        self.table_from_queryset(
+            queryset.select_related(
+                "created_by",
+                "rendered_by",
+                "service__project__owned_by",
+                "invoice_service__invoice__owned_by",
+                "invoice_service__invoice__project",
+            ),
+            additional=[
+                ("service", lambda cost: cost.service),
+                ("project", lambda cost: cost.service.project),
+                (
+                    "invoice",
+                    lambda cost: cost.invoice_service.invoice
+                    if cost.invoice_service
+                    else None,
+                ),
+            ],
+        )
 
     def people(self, queryset):
         addresses = {

@@ -73,10 +73,10 @@ class AccrualQuerySet(models.QuerySet):
         logged_costs_cost = {
             row["project"]: row["cost__sum"]
             for row in LoggedCost.objects.filter(
-                project__in=projects, rendered_on__lte=cutoff_date
+                service__project__in=projects, rendered_on__lte=cutoff_date
             )
             .order_by()
-            .values("project")
+            .values("service__project")
             .annotate(Sum("cost"))
         }
 

@@ -9,7 +9,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.projects.models import Project, Service
+from workbench.projects.models import Service
 from workbench.tools.models import HoursField, Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import monday
@@ -90,12 +90,6 @@ class LoggedCostQuerySet(SearchQuerySet):
 
 @model_urls
 class LoggedCost(Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.PROTECT,
-        related_name="loggedcosts",
-        verbose_name=_("project"),
-    )
     service = models.ForeignKey(
         Service,
         on_delete=models.PROTECT,
@@ -170,5 +164,5 @@ class LoggedCost(Model):
     def get_redirect_url(cls, instance, request):
         if not request.is_ajax():
             return cls().urls["list"] + "?project={}".format(
-                instance.project_id if instance else ""
+                instance.service.project_id if instance else ""
             )

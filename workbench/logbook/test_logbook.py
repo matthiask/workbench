@@ -378,8 +378,8 @@ class LogbookTest(TestCase):
         valid("")
         valid("q=test")
         valid("rendered_by=" + str(user.pk))
-        valid("project=" + str(cost.project.pk))
-        valid("organization=" + str(cost.project.customer.pk))
+        valid("project=" + str(cost.service.project.pk))
+        valid("organization=" + str(cost.service.project.customer.pk))
         valid("expenses=on")
         valid("until=2018-01-01")
         valid("service=0")
@@ -399,15 +399,15 @@ class LogbookTest(TestCase):
         self.client.force_login(cost.created_by)
         response = self.client.get(cost.urls["detail"])
         self.assertRedirects(
-            response, cost.urls["list"] + "?project=" + str(cost.project_id)
+            response, cost.urls["list"] + "?project=" + str(cost.service.project_id)
         )
         response = self.client.get(cost.urls["update"])
         self.assertRedirects(
-            response, cost.urls["list"] + "?project=" + str(cost.project_id)
+            response, cost.urls["list"] + "?project=" + str(cost.service.project_id)
         )
         response = self.client.get(cost.urls["delete"])
         self.assertRedirects(
-            response, cost.urls["list"] + "?project=" + str(cost.project_id)
+            response, cost.urls["list"] + "?project=" + str(cost.service.project_id)
         )
 
     def test_autofill_field(self):

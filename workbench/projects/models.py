@@ -201,7 +201,7 @@ class Project(Model):
         logged_cost_per_service = {
             row["service"]: row["cost__sum"]
             for row in LoggedCost.objects.order_by()
-            .filter(project=self)
+            .filter(service__project=self)
             .values("service")
             .annotate(Sum("cost"))
         }
@@ -220,7 +220,7 @@ class Project(Model):
         not_archived_logged_cost_per_service = {
             row["service"]: row["cost__sum"]
             for row in LoggedCost.objects.order_by()
-            .filter(project=self, archived_at__isnull=False)
+            .filter(service__project=self, archived_at__isnull=False)
             .values("service")
             .annotate(Sum("cost"))
         }
@@ -270,21 +270,6 @@ class Project(Model):
                     total_service_hours_rate_undefined += service.service_hours
 
             offers[service.offer_id][1].append(row)
-
-        if None in logged_cost_per_service:
-            offers[None][1].append(
-                {
-                    "service": Service(
-                        title=gettext("Not bound to a particular service."),
-                        service_cost=Z,
-                    ),
-                    "logged_hours": Z,
-                    "logged_cost": logged_cost_per_service[None],
-                }
-            )
-
-            logged_cost += logged_cost_per_service[None]
-            total_logged_cost += logged_cost_per_service[None]
 
         return {
             "offers": sorted(
@@ -337,7 +322,7 @@ class Project(Model):
     @cached_property
     def not_archived_total(self):
         # Avoid circular imports
-        from workbench.logbook.models import LoggedHours
+        from workbench.logbook.models import LoggedCost, LoggedHours
 
         total = Z
         hours_rate_undefined = Z
@@ -353,7 +338,12 @@ class Project(Model):
             else:
                 total += row["hours__sum"] * row["service__effort_rate"]
 
-        total += self.loggedcosts.order_by().aggregate(Sum("cost"))["cost__sum"] or Z
+        total += (
+            LoggedCost.objects.order_by()
+            .filter(service__project=self, archived_at__isnull=True)
+            .aggregate(Sum("cost"))["cost__sum"]
+            or Z
+        )
         return {"total": total, "hours_rate_undefined": hours_rate_undefined}
 
 

@@ -59,16 +59,16 @@ class ExpenseReportForm(ModelForm):
             (
                 cost.id,
                 format_html(
-                    "{}<br>{}{}<br>{}<br>{}",
+                    "{}<br>{}: {}<br>{}<br>{}",
                     local_date_format(cost.rendered_on),
-                    cost.project,
-                    (": %s" % cost.service) if cost.service else "",
+                    cost.service.project,
+                    cost.service,
                     cost.description,
                     currency(cost.third_party_costs),
                 ),
             )
             for cost in self.fields["expenses"]
-            .queryset.select_related("service", "project__owned_by")
+            .queryset.select_related("service__project__owned_by")
             .order_by("rendered_on", "pk")
         ]
 

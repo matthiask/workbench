@@ -111,9 +111,11 @@ class LoggedCostSearchForm(forms.Form):
         if data.get("rendered_by"):
             queryset = queryset.filter(rendered_by=data.get("rendered_by"))
         if data.get("project"):
-            queryset = queryset.filter(project=data.get("project"))
+            queryset = queryset.filter(service__project=data.get("project"))
         if data.get("organization"):
-            queryset = queryset.filter(project__customer=data.get("organization"))
+            queryset = queryset.filter(
+                service__project__customer=data.get("organization")
+            )
         if data.get("expenses"):
             queryset = queryset.filter(are_expenses=True)
         if data.get("until"):
@@ -125,7 +127,7 @@ class LoggedCostSearchForm(forms.Form):
         elif data.get("service"):
             queryset = queryset.filter(service=data.get("service"))
 
-        return queryset.select_related("project__owned_by", "service", "rendered_by")
+        return queryset.select_related("service__project__owned_by", "rendered_by")
 
     def response(self, request, queryset):
         if request.GET.get("xlsx"):
@@ -322,12 +324,11 @@ class LoggedCostForm(ModelForm):
                 "service", kwargs["request"].GET.get("service")
             )
         else:
-            self.project = kwargs["instance"].project
+            self.project = kwargs["instance"].service.project
 
         super().__init__(*args, **kwargs)
         if not self.instance.pk:
             self.instance.created_by = self.request.user
-            self.instance.project = self.project
 
         self.fields["service"].choices = self.project.services.logging().choices()
         self.fields["third_party_costs"].help_text = mark_safe(

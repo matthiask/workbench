@@ -12,7 +12,7 @@
 {% for cost in object_list %}
 <a class="list-group-item list-group-item-action px-0" href="{{ cost.get_absolute_url }}" data-toggle="ajaxmodal">
   <small class="d-flex justify-content-between">
-    <span>{{ cost.project }}{% if cost.service %}: {{ cost.service }}{% endif %}</span>
+    <span>{{ cost.service.project }}: {{ cost.service }}</span>
     <span>{{ cost.rendered_by.get_short_name }} / {{ cost.created_at|local_date_format }}</span>
   </small>
   <p class="mb-0"><strong>{{ cost.cost|currency }}</strong> {{ cost.description }}</p>

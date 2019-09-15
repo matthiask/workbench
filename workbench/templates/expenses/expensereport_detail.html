@@ -22,7 +22,7 @@
         {% for cost in object.expenses.all reversed %}
           <a href="{{ cost.urls.detail }}" data-toggle="ajaxmodal">
             {{ cost.rendered_on|local_date_format }}<br>
-            {{ cost.project|h }}<br>
+            {{ cost.service.project|h }}: {{ cost.service|h }}<br>
             {{ cost.description }}<br>
             {{ cost.third_party_costs|currency }}<br>
           </a>

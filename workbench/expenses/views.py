@@ -36,11 +36,11 @@ class ExpenseReportPDFView(generic.DetailView):
                 (
                     "%d." % (index + 1),
                     MarkupParagraph(
-                        "%s<br />%s%s<br />%s<br />&nbsp;"
+                        "%s<br />%s: %s<br />%s<br />&nbsp;"
                         % (
                             local_date_format(cost.rendered_on),
-                            cost.project,
-                            (": %s" % cost.service) if cost.service else "",
+                            cost.service.project,
+                            cost.service,
                             cost.description,
                         ),
                         pdf.style.normal,
@@ -49,7 +49,7 @@ class ExpenseReportPDFView(generic.DetailView):
                 )
                 for index, cost in enumerate(
                     self.object.expenses.select_related(
-                        "service", "project__owned_by"
+                        "service__project__owned_by"
                     ).order_by("rendered_on", "pk")
                 )
             ],
