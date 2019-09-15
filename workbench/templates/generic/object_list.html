@@ -9,7 +9,7 @@
   <div class="col-sm-12">
 
     <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between">
-      <h1><a class="text-reset text-decoration-none" href="{{ view.model.urls.list }}">{{ view.meta.verbose_name_plural|capfirst }}</a></h1>
+      {% block content-title %}<h1><a class="text-reset text-decoration-none" href="{{ view.model.urls.list }}">{{ view.meta.verbose_name_plural|capfirst }}</a></h1>{% endblock %}
       <form method="GET" action="." class="form-inline form-search mb-3 mb-lg-0" data-autosubmit>
         {% if request.GET %}
           <a class="btn btn-outline-info" href="." title="{% trans 'Reset the filter form' %}"  data-reset-filter>&times;</a>

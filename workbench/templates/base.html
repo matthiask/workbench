@@ -26,17 +26,7 @@
         <li class="nav-item"><a class="nav-link" href="{% url 'projects_project_list' %}">{% trans 'projects'|capfirst %}</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'offers_offer_list' %}">{% trans 'offers'|capfirst %}</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'invoices_invoice_list' %}">{% trans 'invoices'|capfirst %}</a></li>
-
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="contactsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {% trans 'contacts'|capfirst %}
-          </a>
-          <div class="dropdown-menu" aria-labelledby="contactsDropdown">
-            <a class="dropdown-item" href="{% url 'contacts_person_list' %}">{% trans 'people'|capfirst %}</a>
-            <a class="dropdown-item" href="{% url 'contacts_organization_list' %}">{% trans 'organizations'|capfirst %}</a>
-            {# <div class="dropdown-divider"></div> #}
-          </div>
-        </li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'contacts' %}">{% trans 'contacts'|capfirst %}</a></li>
 
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="logbookDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
