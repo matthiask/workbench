@@ -153,7 +153,7 @@ class InvoicesTest(TestCase):
         service4 = factories.ServiceFactory.create(project=project, title="nothing")
 
         cost = factories.LoggedCostFactory.create(
-            project=project, cost=10, description="Test"
+            project=project, service=service1, cost=10, description="Test"
         )
         hours = factories.LoggedHoursFactory.create(
             service=service1, hours=1, description="Test"
@@ -171,10 +171,6 @@ class InvoicesTest(TestCase):
         self.assertContains(response, "<strong>no-rate</strong><br>0.00")
         self.assertContains(response, "2.0h logged but no hourly rate defined.")
         self.assertContains(response, "<strong>with-rate</strong><br>600.00")
-        self.assertContains(
-            response, "<strong>Not bound to a particular service.</strong><br>0.00"
-        )
-        self.assertContains(response, "10.00 logged but not bound to a service.")
         self.assertContains(response, "id_show_service_details")
 
         cost.service = service1
@@ -242,7 +238,7 @@ class InvoicesTest(TestCase):
         response = self.client.post(
             cost.urls["update"],
             {
-                # "service": cost.service_id,
+                "service": cost.service_id,
                 "rendered_by": cost.rendered_by_id,
                 "rendered_on": cost.rendered_on.isoformat(),
                 "third_party_costs": cost.third_party_costs or "",

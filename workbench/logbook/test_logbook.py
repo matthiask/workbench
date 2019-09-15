@@ -229,12 +229,14 @@ class LogbookTest(TestCase):
         self.assertContains(response, "Enter a valid date.")
 
     def test_create_and_update_logged_cost(self):
-        project = factories.ProjectFactory.create()
+        service = factories.ServiceFactory.create()
+        project = service.project
         self.client.force_login(project.owned_by)
 
         response = self.client.post(
             project.urls["createcost"],
             {
+                "service": service.id,
                 "rendered_by": project.owned_by_id,
                 "rendered_on": dt.date.today().isoformat(),
                 "cost": "10",
@@ -252,6 +254,7 @@ class LogbookTest(TestCase):
         response = self.client.post(
             cost.urls["update"],
             {
+                "service": service.id,
                 "rendered_by": project.owned_by_id,
                 "rendered_on": dt.date.today().isoformat(),
                 "cost": "10",
@@ -265,6 +268,7 @@ class LogbookTest(TestCase):
         response = self.client.post(
             cost.urls["update"],
             {
+                "service": service.id,
                 "rendered_by": project.owned_by_id,
                 "rendered_on": dt.date.today().isoformat(),
                 "cost": "10",
@@ -488,12 +492,14 @@ class LogbookTest(TestCase):
         )
 
     def test_cost_gte_third_party_costs(self):
-        project = factories.ProjectFactory.create()
+        service = factories.ServiceFactory.create()
+        project = service.project
         self.client.force_login(project.owned_by)
 
         response = self.client.post(
             project.urls["createcost"],
             {
+                "service": service.id,
                 "rendered_by": project.owned_by_id,
                 "rendered_on": dt.date.today().isoformat(),
                 "cost": "10",
@@ -510,6 +516,7 @@ class LogbookTest(TestCase):
         response = self.client.post(
             project.urls["createcost"],
             {
+                "service": service.id,
                 "rendered_by": project.owned_by_id,
                 "rendered_on": dt.date.today().isoformat(),
                 "cost": "10",

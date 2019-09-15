@@ -11,7 +11,7 @@ from workbench.tools.validation import raise_if_errors
 class ServiceType(Model):
     title = models.CharField(_("title"), max_length=40)
     hourly_rate = MoneyField(_("hourly rate"))
-    position = models.PositiveIntegerField(_("position"), default=0)
+    position = models.IntegerField(_("position"), default=0)
 
     class Meta:
         ordering = ("position", "id")
@@ -27,7 +27,7 @@ class ServiceBase(Model):
 
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
-    position = models.PositiveIntegerField(_("position"), default=0)
+    position = models.IntegerField(_("position"), default=0)
 
     service_hours = HoursFieldAllowNegatives(_("service hours"), default=0)
     service_cost = MoneyField(_("service cost"), default=0)

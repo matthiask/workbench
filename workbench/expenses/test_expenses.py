@@ -52,9 +52,12 @@ class ExpensesTest(TestCase):
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
+        service = factories.ServiceFactory.create(project=project)
+
         response = self.client.post(
             project.urls["createcost"],
             {
+                "service": service.id,
                 "rendered_by": project.owned_by_id,
                 "rendered_on": local_date_format(dt.date.today()),
                 "cost": "10",
@@ -71,6 +74,7 @@ class ExpensesTest(TestCase):
         response = self.client.post(
             project.urls["createcost"],
             {
+                "service": service.id,
                 "rendered_by": project.owned_by_id,
                 "rendered_on": dt.date.today().isoformat(),
                 "cost": "10",
