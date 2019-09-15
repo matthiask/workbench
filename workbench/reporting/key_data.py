@@ -17,7 +17,8 @@ def project_service_hours(project_ids):
     hours.update(
         {
             row["project"]: row["service_hours__sum"]
-            for row in Service.objects.order_by()
+            for row in Service.objects.budgeted()
+            .order_by()
             .filter(project__in=project_ids)
             .values("project")
             .annotate(Sum("service_hours"))
