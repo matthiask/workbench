@@ -153,7 +153,7 @@ class RecurringTest(TestCase):
         self.assertContains(response, "?create_invoices=1")
 
         response = self.client.get(ri.urls["detail"] + "?create_invoices=1")
-        self.assertRedirects(response, Invoice().urls["list"])
+        self.assertRedirects(response, Invoice.urls["list"])
         self.assertEqual(messages(response), ["Created 1 invoice."])
 
         response = self.client.get(ri.urls["detail"] + "?create_invoices=1")
@@ -222,18 +222,18 @@ class RecurringTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
 
         # pre_form does not have these fields
-        response = self.client.get(RecurringInvoice().urls["create"])
+        response = self.client.get(RecurringInvoice.urls["create"])
         self.assertContains(response, 'method="GET"')
         self.assertNotContains(response, 'id="id_title"')
         self.assertNotContains(response, 'id="id_description"')
 
         # Nonexistant entries
-        response = self.client.get(RecurringInvoice().urls["create"] + "?contact=0")
+        response = self.client.get(RecurringInvoice.urls["create"] + "?contact=0")
         self.assertContains(response, 'method="GET"')
         self.assertNotContains(response, 'id="id_title"')
         self.assertNotContains(response, 'id="id_description"')
 
-        response = self.client.get(RecurringInvoice().urls["create"] + "?customer=0")
+        response = self.client.get(RecurringInvoice.urls["create"] + "?customer=0")
         self.assertContains(response, 'method="GET"')
         self.assertNotContains(response, 'id="id_title"')
         self.assertNotContains(response, 'id="id_description"')
@@ -241,12 +241,12 @@ class RecurringTest(TestCase):
         # Existing
         organization = factories.OrganizationFactory.create()
         response = self.client.get(
-            RecurringInvoice().urls["create"] + "?customer={}".format(organization.pk)
+            RecurringInvoice.urls["create"] + "?customer={}".format(organization.pk)
         )
         self.assertContains(response, 'method="POST"')
 
         person = factories.PersonFactory.create()
         response = self.client.get(
-            RecurringInvoice().urls["create"] + "?contact={}".format(person.pk)
+            RecurringInvoice.urls["create"] + "?contact={}".format(person.pk)
         )
         self.assertContains(response, 'method="POST"')

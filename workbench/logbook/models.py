@@ -78,7 +78,7 @@ class LoggedHours(Model):
     @classmethod
     def get_redirect_url(cls, instance, request):
         if not request.is_ajax():
-            return cls().urls["list"] + "?project={}".format(
+            return cls.urls["list"] + "?project={}".format(
                 instance.service.project_id if instance else ""
             )
 
@@ -163,6 +163,6 @@ class LoggedCost(Model):
     @classmethod
     def get_redirect_url(cls, instance, request):
         if not request.is_ajax():
-            return cls().urls["list"] + "?project={}".format(
+            return cls.urls["list"] + "?project={}".format(
                 instance.service.project_id if instance else ""
             )

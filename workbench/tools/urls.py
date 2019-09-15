@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from django.urls import NoReverseMatch, reverse
 
 
@@ -6,18 +8,19 @@ class _MUHelper:
         self.viewname_pattern = viewname_pattern
         self.kwargs = kwargs
 
-    def url(self, item):
-        try:
-            return reverse(self.viewname_pattern % item)
-        except NoReverseMatch:
-            return reverse(self.viewname_pattern % item, **self.kwargs)
-
-    __getitem__ = url
+    def __getitem__(self, item):
+        if self.kwargs:
+            with suppress(NoReverseMatch):
+                return reverse(self.viewname_pattern % item, **self.kwargs)
+        return reverse(self.viewname_pattern % item)
 
 
 class _Descriptor:
     def __get__(self, obj, objtype=None):
-        viewname_pattern = "%s_%s_%%s" % (obj._meta.app_label, obj._meta.model_name)
+        info = obj._meta if obj else objtype._meta
+        viewname_pattern = "%s_%s_%%s" % (info.app_label, info.model_name)
+        if not obj:
+            return _MUHelper(viewname_pattern, {})
         kwargs = {"kwargs": {"pk": obj.pk}}
         helper = obj.__dict__["urls"] = _MUHelper(viewname_pattern, kwargs)
         return helper

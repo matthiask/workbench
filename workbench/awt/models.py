@@ -150,6 +150,6 @@ class Absence(Model):
     @classmethod
     def get_redirect_url(cls, instance, request):
         if not request.is_ajax():
-            return cls().urls["list"] + "?u={}".format(
+            return cls.urls["list"] + "?u={}".format(
                 instance.user_id if instance else ""
             )

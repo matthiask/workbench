@@ -257,7 +257,7 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
         return super().get_context_data(**kwargs)
 
     def get_success_url(self):
-        return self.model().urls["list"]
+        return self.model.urls["list"]
 
 
 class AutocompleteView(ToolsMixin, vanilla.ListView):

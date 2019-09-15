@@ -101,4 +101,4 @@ class Activity(Model):
     @classmethod
     def get_redirect_url(cls, instance, request):
         if not request.is_ajax():
-            return cls().urls["list"]
+            return cls.urls["list"]
