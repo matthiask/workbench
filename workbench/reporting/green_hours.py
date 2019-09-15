@@ -7,6 +7,7 @@ from django.db.models import Sum
 
 from workbench.accounts.models import User
 from workbench.logbook.models import LoggedHours
+from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.tools.models import Z
 
@@ -20,9 +21,11 @@ def green_hours(date_range):
             """\
 WITH
 service AS (
-  SELECT project_id, SUM(service_hours) AS hours
-  FROM projects_service
-  GROUP BY project_id
+  SELECT ps.project_id, SUM(service_hours) AS hours
+  FROM projects_service ps
+  LEFT OUTER JOIN offers_offer o ON ps.offer_id=o.id
+  WHERE ps.offer_id IS NULL OR o.status != %s
+  GROUP BY ps.project_id
 ),
 logged AS (
   SELECT project_id, SUM(hours) AS hours FROM logbook_loggedhours lh
@@ -33,7 +36,8 @@ SELECT logged.project_id, service.hours / logged.hours
 FROM logged
 LEFT JOIN service ON logged.project_id=service.project_id
 WHERE service.hours / logged.hours < 1;
-            """
+            """,
+            [Offer.REJECTED],
         )
         green_hours_factor = defaultdict(lambda: ONE, cursor)
 
