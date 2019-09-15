@@ -333,14 +333,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
         if source == "logbook":
 
             def amount(row):
-                if not row["service"].pk:
-                    return format_html(
-                        '{} <small class="bg-warning px-1">{}</small>',
-                        currency(row["service"].service_cost),
-                        _("%s logged but not bound to a service.")
-                        % currency(row["logged_cost"]),
-                    )
-                elif row["service"].effort_rate is not None:
+                if row["service"].effort_rate is not None:
                     return currency(row["not_archived"])
                 elif row["logged_hours"]:
                     return format_html(
