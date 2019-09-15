@@ -32,7 +32,7 @@ class ToolsMixin(object):
                     "effort_type": type.title,
                     "effort_rate": int(type.hourly_rate),
                 }
-                for type in self.default_service_types()
+                for type in self.default_service_types
             }
         )
 
