@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import classonlymethod
+from django.utils.functional import cached_property
 from django.utils.translation import gettext as _, gettext_lazy
 
 import vanilla
@@ -19,9 +20,11 @@ class ToolsMixin(object):
         assert cls.model or initkwargs.get("model"), "model is required for view"
         return super().as_view(**initkwargs)
 
+    @cached_property
     def default_service_types(self):
         return ServiceType.objects.all()
 
+    @cached_property
     def default_service_types_json(self):
         return json.dumps(
             {
