@@ -216,3 +216,12 @@ class StatisticsTest(TestCase):
         self.assertAlmostEqual(overall[1]["green"], Decimal("23.33333333"))
         self.assertAlmostEqual(overall[1]["red"], Decimal("26.66666666"))
         self.assertAlmostEqual(overall[1]["percentage"], Decimal("54.16666666"))
+
+        gh = green_hours.green_hours_by_month()
+        self.assertEqual(len(gh), 5)
+        self.assertAlmostEqual(gh[-1]["green"], Decimal(10) / 3)
+        self.assertAlmostEqual(gh[-1]["red"], Decimal(10) * 2 / 3)
+        self.assertEqual(gh[-1]["internal"], Decimal(0))
+        self.assertEqual(gh[-1]["maintenance"], Decimal(0))
+        self.assertEqual(gh[-1]["total"], Decimal(10))
+        self.assertAlmostEqual(gh[-1]["percentage"], Decimal(33))

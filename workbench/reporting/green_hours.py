@@ -167,12 +167,10 @@ GROUP BY month;
 
 SELECT
   th.month,
-  green_hours,
-  total_hours - green_hours - maintenance_hours - internal_hours,
-  maintenance_hours,
-  internal_hours,
-  total_hours,
-  COALESCE((green_hours + maintenance_hours) / total_hours, 0)
+  COALESCE(green_hours, 0),
+  COALESCE(maintenance_hours, 0),
+  COALESCE(internal_hours, 0),
+  COALESCE(total_hours, 0)
 FROM total_hours th
 LEFT OUTER JOIN green_hours gh ON th.month=gh.month
 LEFT OUTER JOIN maintenance_hours mh ON th.month=mh.month
@@ -185,11 +183,11 @@ ORDER BY th.month
             {
                 "month": row[0].date(),
                 "green": row[1],
-                "red": row[2],
-                "maintenance": row[3],
-                "internal": row[4],
-                "total": row[5],
-                "percentage": (100 * row[6]).quantize(ONE),
+                "maintenance": row[2],
+                "internal": row[3],
+                "total": row[4],
+                "red": row[4] - row[1] - row[2] - row[3],
+                "percentage": (100 * (row[1] + row[2]) / row[4]).quantize(ONE),
             }
             for row in cursor
         ]
