@@ -10,10 +10,12 @@ H1 = Decimal("0.0")
 H2 = Decimal("0.00")
 
 
-def local_date_format(dttm):
+def local_date_format(dttm, fmt=None):
     if hasattr(dttm, "astimezone"):
         dttm = localtime(dttm)
-    return date_format(dttm, "d.m.Y H:i" if isinstance(dttm, dt.datetime) else "d.m.Y")
+    return date_format(
+        dttm, fmt or ("d.m.Y H:i" if isinstance(dttm, dt.datetime) else "d.m.Y")
+    )
 
 
 def pretty_due(day):

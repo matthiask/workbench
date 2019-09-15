@@ -1,4 +1,5 @@
 import datetime as dt
+from itertools import groupby
 
 from django import forms
 from django.db.models import Q
@@ -12,8 +13,9 @@ from workbench.invoices.utils import next_valid_day
 from workbench.projects.models import Project
 from workbench.projects.reporting import overdrawn_projects, project_budget_statistics
 from workbench.reporting import green_hours, key_data
+from workbench.tools.formats import local_date_format
 from workbench.tools.forms import DateInput
-from workbench.tools.models import Z
+from workbench.tools.models import ONE, Z
 from workbench.tools.validation import filter_form, monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -99,11 +101,33 @@ def key_data_view(request):
     last_month = next_valid_day(today.year, today.month + 1, 1) - dt.timedelta(days=1)
     date_range = [dt.date(last_month.year - 2, 1, 1), last_month]
 
-    green_hours = sorted(key_data.green_hours(date_range).items())
     gross_margin_by_month = key_data.gross_margin_by_month(date_range)
     gross_margin_months = {
         row["month"]: row["gross_margin"] for row in gross_margin_by_month
     }
+
+    gh = [
+        row
+        for row in green_hours.green_hours_by_month()
+        if date_range[0] <= row["month"] <= date_range[1]
+    ]
+
+    def yearly_headline(gh):
+        zero = {"green": Z, "red": Z, "maintenance": Z, "internal": Z, "total": Z}
+
+        for key, months in groupby(gh, key=lambda row: row["month"].year):
+            this = zero.copy()
+            months = list(months)
+            for month in months:
+                this["green"] += month["green"]
+                this["red"] += month["red"]
+                this["maintenance"] += month["maintenance"]
+                this["internal"] += month["internal"]
+                this["total"] += month["total"]
+            this["percentage"] = (
+                100 * (this["green"] + this["maintenance"]) / this["total"]
+            ).quantize(ONE)
+            yield key, this, months
 
     return render(
         request,
@@ -115,30 +139,17 @@ def key_data_view(request):
                 (year, [gross_margin_months.get((year, i), Z) for i in range(1, 13)])
                 for year in range(last_month.year - 2, last_month.year + 1)
             ],
-            "green_hours": [
-                (year, [month_data["months"][i] for i in range(1, 13)])
-                for year, month_data in green_hours
-            ],
+            "green_hours": yearly_headline(gh),
             "hours_distribution": {
-                "labels": [
-                    year
-                    if year < last_month.year
-                    else ("%s (%s)" % (year, _("projection")))
-                    for year, month_data in green_hours
-                ],
+                "labels": [local_date_format(row["month"], "F Y") for row in gh],
                 "datasets": [
                     {
                         "label": label,
-                        "data": [
-                            100
-                            * getattr(month_data["year"], attribute)
-                            / month_data["year"].total
-                            for year, month_data in green_hours
-                        ],
+                        "data": [100 * row[attribute] / row["total"] for row in gh],
                     }
                     for label, attribute in [
-                        (_("profitable"), "profitable"),
-                        (_("overdrawn"), "overdrawn"),
+                        (_("profitable"), "green"),
+                        (_("overdrawn"), "red"),
                         (_("maintenance"), "maintenance"),
                         (_("internal"), "internal"),
                     ]

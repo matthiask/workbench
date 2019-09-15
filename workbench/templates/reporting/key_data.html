@@ -52,7 +52,7 @@
   </script>
 
   <table class="table">
-    <thead>
+    <thead class="sticky">
       <tr>
         <th>{% trans 'month' %}</th>
         <th class="text-right">{% trans 'gross profit' %}</th>
@@ -75,43 +75,6 @@
       {% endfor %}
     </tbody>
   </table>
-
-  <h2 class="mt-5">{% trans 'green hours' %}</h2>
-  <canvas id="green-hours" width="800" height="350"></canvas>
-  <script>
-    new Chart("green-hours", {
-      type: "bar",
-      data: {
-        labels: ["Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
-        datasets: [
-          {% for year, month_data in green_hours %}
-          {
-            label: "{{ year }}",
-            data: [{% for value in month_data %}{{ value.green|stringformat:"d" }}, {% endfor %}],
-            backgroundColor: "{% cycle 'rgba(100, 30, 50, 0.3)' 'rgba(0, 150, 0, 0.3)' 'rgba(0, 0, 150, 0.3)' %}",
-            borderColor: "{% cycle 'rgba(100, 30, 50, 0.4)' 'rgba(0, 150, 0, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
-            type: "{% cycle 'line' 'line' 'bar' %}",
-          },
-          {% endfor %}
-        ],
-      },
-      options: {
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true
-            }
-          }]
-        },
-        elements: {
-          line: {
-            tension: 0,
-            fill: "none",
-          }
-        },
-      }
-    });
-  </script>
 
   <h2 class="mt-5">{% trans 'hours distribution' %}</h2>
   <canvas id="hours-distribution" width="800" height="300"></canvas>
@@ -138,6 +101,41 @@
       },
     });
   </script>
+
+  <table class="table">
+    <thead class="sticky">
+      <tr>
+        <th>{% trans 'month' %}</th>
+        <th class="text-right">{% trans 'profitable' %}</th>
+        <th class="text-right">{% trans 'overdrawn' %}</th>
+        <th class="text-right">{% trans 'maintenance' %}</th>
+        <th class="text-right">{% trans 'internal' %}</th>
+        <th class="text-right">{% trans 'percentage' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for year, year_stats, months in green_hours reversed %}
+        <tr>
+          <th>{{ year }}</th>
+          <th class="text-right">{{ year_stats.green|hours }}</th>
+          <th class="text-right">{{ year_stats.red|hours }}</th>
+          <th class="text-right">{{ year_stats.maintenance|hours }}</th>
+          <th class="text-right">{{ year_stats.internal|hours }}</th>
+          <th class="text-right">{{ year_stats.percentage }}%</th>
+        </tr>
+        {% for month in months reversed %}
+        <tr>
+          <td>{{ month.month|date:'F Y' }}</td>
+          <td class="text-right">{{ month.green|hours }}</td>
+          <td class="text-right">{{ month.red|hours }}</td>
+          <td class="text-right">{{ month.maintenance|hours }}</td>
+          <td class="text-right">{{ month.internal|hours }}</td>
+          <td class="text-right">{{ month.percentage }}%</td>
+        </tr>
+        {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
 
 </div>
 </div>

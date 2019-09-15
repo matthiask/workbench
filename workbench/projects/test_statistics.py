@@ -10,7 +10,7 @@ from workbench.projects.reporting import (
     overdrawn_projects,
     project_budget_statistics,
 )
-from workbench.reporting import green_hours, key_data
+from workbench.reporting import green_hours
 from workbench.tools.models import Z
 
 
@@ -135,15 +135,6 @@ class StatisticsTest(TestCase):
         today = dt.date.today()
         date_range = [dt.date(today.year, 1, 1), dt.date(today.year, 12, 31)]
 
-        green_hours = key_data.green_hours(date_range)
-        gh = green_hours[today.year]["year"]
-        self.assertEqual(gh.profitable, 0)
-        self.assertEqual(gh.overdrawn, Decimal(40))
-        self.assertEqual(gh.maintenance, 0)
-        self.assertEqual(gh.internal, 0)
-        self.assertEqual(gh.total, Decimal(40))
-        self.assertEqual(gh.green, 0)
-
         hpc = hours_per_customer(date_range)
         self.assertEqual(hpc["organizations"][0]["total_hours"], Decimal(40))
         self.assertEqual(len(hpc["organizations"]), 1)
@@ -225,31 +216,3 @@ class StatisticsTest(TestCase):
         self.assertAlmostEqual(overall[1]["green"], Decimal("23.33333333"))
         self.assertAlmostEqual(overall[1]["red"], Decimal("26.66666666"))
         self.assertAlmostEqual(overall[1]["percentage"], Decimal("54.16666666"))
-
-    def test_key_data_green_hours(self):
-        self.create_projects()
-
-        gh = key_data.green_hours([dt.date(2019, 1, 1), dt.date(2019, 3, 31)])
-
-        self.assertEqual(len(gh), 1)
-        self.assertEqual(
-            repr(gh[2019]["year"]),
-            "<GreenHours profitable=10.00 overdrawn=30.00 maintenance=20.00"
-            " internal=10.00 total=70.00 green=42%>",
-        )
-
-        self.assertEqual(
-            repr(gh[2019]["months"][1]),
-            "<GreenHours profitable=5.00 overdrawn=0.00 maintenance=20.00"
-            " internal=10.00 total=35.00 green=71%>",
-        )
-        self.assertEqual(
-            repr(gh[2019]["months"][2]),
-            "<GreenHours profitable=5.00 overdrawn=20.00 maintenance=0.00"
-            " internal=0.00 total=25.00 green=20%>",
-        )
-        self.assertEqual(
-            repr(gh[2019]["months"][3]),
-            "<GreenHours profitable=0.00 overdrawn=10.00 maintenance=0.00"
-            " internal=0.00 total=10.00 green=0%>",
-        )

@@ -85,6 +85,7 @@ class Model(models.Model):
         )
 
 
+ONE = Decimal("1")
 Z = Decimal("0.00")
 
 

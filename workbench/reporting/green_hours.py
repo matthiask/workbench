@@ -1,6 +1,4 @@
-import datetime as dt
 from collections import defaultdict
-from decimal import Decimal
 
 from django.db import connections
 from django.db.models import Sum
@@ -9,10 +7,7 @@ from workbench.accounts.models import User
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
-from workbench.tools.models import Z
-
-
-ONE = Decimal("1")
+from workbench.tools.models import ONE, Z
 
 
 def green_hours(date_range):
@@ -97,7 +92,112 @@ WHERE service.hours / logged.hours < 1;
     return sorted(ret.items())
 
 
+def green_hours_by_month():
+    with connections["default"].cursor() as cursor:
+        cursor.execute(
+            """\
+CREATE TEMPORARY TABLE green_hours_factor AS
+WITH
+service AS (
+  SELECT ps.project_id, SUM(service_hours) AS hours
+  FROM projects_service ps
+  LEFT OUTER JOIN offers_offer o ON ps.offer_id=o.id
+  WHERE ps.offer_id IS NULL OR o.status!=40 -- Rejected
+  GROUP BY ps.project_id
+),
+logged AS (
+  SELECT project_id, SUM(hours) AS hours FROM logbook_loggedhours lh
+  LEFT JOIN projects_service ps ON lh.service_id=ps.id
+  GROUP BY project_id
+)
+SELECT
+  logged.project_id,
+  service.hours / logged.hours AS factor
+FROM logged
+LEFT JOIN service ON logged.project_id=service.project_id
+WHERE service.hours / logged.hours < 1;
+
+CREATE TEMPORARY TABLE total_hours AS
+SELECT
+  date_trunc('month', rendered_on) AS month,
+  SUM(hours) AS total_hours
+FROM logbook_loggedhours lh
+LEFT JOIN projects_service ps ON lh.service_id=ps.id
+GROUP BY month;
+
+CREATE TEMPORARY TABLE green_hours AS
+SELECT
+  month,
+  SUM(hours) AS green_hours
+FROM (
+  SELECT
+    ps.project_id,
+    date_trunc('month', rendered_on) AS month,
+    hours * COALESCE(ghf.factor, 1) AS hours
+  FROM logbook_loggedhours lh
+  LEFT JOIN projects_service ps ON lh.service_id=ps.id
+  LEFT JOIN projects_project p ON ps.project_id=p.id
+  LEFT OUTER JOIN green_hours_factor ghf ON ghf.project_id=p.id
+  WHERE
+    p.type='order'
+) subquery
+GROUP BY month;
+
+CREATE TEMPORARY TABLE maintenance_hours AS
+SELECT
+  date_trunc('month', rendered_on) AS month,
+  SUM(hours) AS maintenance_hours
+FROM logbook_loggedhours lh
+LEFT JOIN projects_service ps ON lh.service_id=ps.id
+LEFT JOIN projects_project p ON ps.project_id=p.id
+WHERE
+  p.type='maintenance'
+GROUP BY month;
+
+CREATE TEMPORARY TABLE internal_hours AS
+SELECT
+  date_trunc('month', rendered_on) AS month,
+  SUM(hours) AS internal_hours
+FROM logbook_loggedhours lh
+LEFT JOIN projects_service ps ON lh.service_id=ps.id
+LEFT JOIN projects_project p ON ps.project_id=p.id
+WHERE
+  p.type='internal'
+GROUP BY month;
+
+SELECT
+  th.month,
+  green_hours,
+  total_hours - green_hours - maintenance_hours - internal_hours,
+  maintenance_hours,
+  internal_hours,
+  total_hours,
+  COALESCE((green_hours + maintenance_hours) / total_hours, 0)
+FROM total_hours th
+LEFT OUTER JOIN green_hours gh ON th.month=gh.month
+LEFT OUTER JOIN maintenance_hours mh ON th.month=mh.month
+LEFT OUTER JOIN internal_hours ih ON th.month=ih.month
+ORDER BY th.month
+        """
+        )
+
+        return [
+            {
+                "month": row[0].date(),
+                "green": row[1],
+                "red": row[2],
+                "maintenance": row[3],
+                "internal": row[4],
+                "total": row[5],
+                "percentage": (100 * row[6]).quantize(ONE),
+            }
+            for row in cursor
+        ]
+
+
 def test():  # pragma: no cover
+    import datetime as dt
     from pprint import pprint
 
     pprint(green_hours([dt.date(2019, 1, 1), dt.date(2019, 12, 31)]))
+    pprint(green_hours_by_month())
