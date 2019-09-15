@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-13 18:34+0200\n"
+"POT-Creation-Date: 2019-09-15 21:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -200,8 +200,7 @@ msgid "contact"
 msgstr "Kontakt"
 
 #: workbench/activities/models.py workbench/invoices/models.py
-#: workbench/logbook/models.py workbench/offers/models.py
-#: workbench/projects/models.py
+#: workbench/offers/models.py workbench/projects/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -374,6 +373,7 @@ msgstr "Datum bis"
 
 #: workbench/awt/models.py workbench/templates/awt/year_detail.html
 #: workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
 msgid "percentage"
 msgstr "Prozent"
 
@@ -465,6 +465,7 @@ msgid "removed"
 msgstr "entfernt"
 
 #: workbench/contacts/__init__.py workbench/templates/base.html
+#: workbench/templates/contacts/object_list.html
 msgid "contacts"
 msgstr "Kontakte"
 
@@ -546,7 +547,7 @@ msgstr ""
 msgid "organization"
 msgstr "Organisation"
 
-#: workbench/contacts/models.py workbench/templates/base.html
+#: workbench/contacts/models.py workbench/templates/contacts/object_list.html
 msgid "organizations"
 msgstr "Organisationen"
 
@@ -590,7 +591,7 @@ msgstr "Lieber Hans/Sehr geehrte Frau Muster"
 msgid "person"
 msgstr "Person"
 
-#: workbench/contacts/models.py workbench/templates/base.html
+#: workbench/contacts/models.py workbench/templates/contacts/object_list.html
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/shortcuts.html
 msgid "people"
@@ -1017,11 +1018,6 @@ msgstr ""
 #: workbench/invoices/forms.py
 msgid "This project already has an invoice in preparation."
 msgstr "Dieses Projekt hat schon eine Rechnung in Vorbereitung."
-
-#: workbench/invoices/forms.py
-#, python-format
-msgid "%s logged but not bound to a service."
-msgstr "%s erfasst aber nicht mit einer bestimmten Leistung verbunden."
 
 #: workbench/invoices/forms.py
 #, python-format
@@ -1561,10 +1557,6 @@ msgstr ""
 "Setze dies, falls alle Leistungen den gleichen Stundensatz haben sollen."
 
 #: workbench/projects/models.py
-msgid "Not bound to a particular service."
-msgstr "Nicht mit einer bestimmten Leistung verbunden."
-
-#: workbench/projects/models.py
 msgid "allow logging"
 msgstr "Leistungserfassung erlauben"
 
@@ -1597,28 +1589,22 @@ msgstr "Logbucheinträge von %(instance)s neu zuweisen"
 msgid "Jump to project"
 msgstr "Zu Projekt springen"
 
-#: workbench/reporting/views.py
-msgid "Form was invalid."
-msgstr "Formular war ungültig."
-
-#: workbench/reporting/views.py
-msgid "projection"
-msgstr "Hochrechnung"
-
-#: workbench/reporting/views.py
+#: workbench/reporting/views.py workbench/templates/reporting/key_data.html
 msgid "profitable"
 msgstr "Profitabel"
 
-#: workbench/reporting/views.py
+#: workbench/reporting/views.py workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/overdrawn_projects.html
 msgid "overdrawn"
 msgstr "Überzogen"
 
 #: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
 msgid "maintenance"
 msgstr "Wartung"
 
 #: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
 msgid "internal"
 msgstr "Intern"
 
@@ -1820,7 +1806,6 @@ msgid "hours per customer"
 msgstr "Stunden pro Kundschaft"
 
 #: workbench/templates/base.html workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/key_data.html
 msgid "green hours"
 msgstr "Grüne Stunden"
 
@@ -2019,8 +2004,8 @@ msgid "logged hours per user"
 msgstr "Erfasste Stunden pro Benutzer"
 
 #: workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/hours_per_customer.html
 #: workbench/templates/reporting/hours_by_circle.html
+#: workbench/templates/reporting/hours_per_customer.html
 #: workbench/templates/reporting/open_items_list.html
 msgid "show"
 msgstr "Anzeigen"
@@ -2036,6 +2021,10 @@ msgstr "Rot"
 #: workbench/templates/reporting/green_hours.html
 msgid "green and maintenance"
 msgstr "Grün und Wartung"
+
+#: workbench/templates/reporting/hours_by_circle.html
+msgid "No circle"
+msgstr "Kein Kreis"
 
 #: workbench/templates/reporting/key_data.html
 msgid "revenue minus third party costs and accruals"
@@ -2056,10 +2045,6 @@ msgstr "Gewinn ohne Fixkosten"
 #: workbench/templates/reporting/key_data.html
 msgid "hours distribution"
 msgstr "Stundenverteilung"
-
-#: workbench/templates/reporting/hours_by_circle.html
-msgid "No circle"
-msgstr "Kein Kreis"
 
 #: workbench/templates/reporting/overdrawn_projects.html
 msgid "effort hours"
@@ -2102,6 +2087,16 @@ msgstr ""
 #: workbench/templates/shortcuts.html
 msgid "log hours in any project"
 msgstr "Stunden in irgendeinem Projekt eintragen"
+
+#: workbench/templates/shortcuts.html
+msgid "log costs in active project or in any project if none is active"
+msgstr ""
+"Kosten in aktuellem Projekt eintragen, oder in irgendeinem Projekt falls "
+"keins aktiv ist"
+
+#: workbench/templates/shortcuts.html
+msgid "log costs in any project"
+msgstr "Kosten in irgendeinem Projekt eintragen"
 
 #: workbench/templates/start.html
 msgid "today"
@@ -2262,6 +2257,10 @@ msgstr "Gültig bis"
 #: workbench/tools/pdf.py
 msgid "down payment invoice"
 msgstr "Anzahlungsrechnung"
+
+#: workbench/tools/validation.py
+msgid "Form was invalid."
+msgstr "Formular war ungültig."
 
 #: workbench/views.py
 msgid "Search query missing."

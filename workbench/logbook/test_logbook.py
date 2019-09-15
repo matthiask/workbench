@@ -474,14 +474,14 @@ class LogbookTest(TestCase):
         self.client.force_login(project.owned_by)
 
         response = self.client.get(
-            "/logbook/create/", HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            "/logbook/hours/create/", HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertContains(
             response, 'data-autocomplete-url="/projects/autocomplete/?only_open=on"'
         )
 
         response = self.client.post(
-            "/logbook/create/",
+            "/logbook/hours/create/",
             {"project-project": project.pk},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )

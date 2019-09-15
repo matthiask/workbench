@@ -9,12 +9,17 @@ from workbench.logbook.forms import (
     LoggedHoursSearchForm,
 )
 from workbench.logbook.models import LoggedCost, LoggedHours
-from workbench.logbook.views import createhours
+from workbench.logbook.views import create
 
 
 urlpatterns = [
     url(r"^$", lambda request: redirect("logbook_loggedhours_list"), name="logbook"),
-    url(r"^create/$", createhours, name="logbook_loggedhours_create"),
+    url(
+        r"^hours/create/$",
+        create,
+        {"viewname": "createhours"},
+        name="logbook_loggedhours_create",
+    ),
     url(
         r"^hours/$",
         generic.ListView.as_view(
@@ -44,6 +49,12 @@ urlpatterns = [
             model=LoggedHours, template_name="modal_confirm_delete.html"
         ),
         name="logbook_loggedhours_delete",
+    ),
+    url(
+        r"^costs/create/$",
+        create,
+        {"viewname": "createcost"},
+        name="logbook_loggedcost_create",
     ),
     url(
         r"^costs/$",

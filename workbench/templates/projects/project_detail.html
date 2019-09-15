@@ -274,7 +274,7 @@
     <a href="{{ project.urls.createhours }}" class="btn btn-secondary" data-toggle="ajaxmodal" data-createhours>
       {% include "svg/plus.svg" %}
       {% trans 'hours' %}</a>
-    <a href="{{ project.urls.createcost }}" class="btn btn-secondary" data-toggle="ajaxmodal">
+    <a href="{{ project.urls.createcost }}" class="btn btn-secondary" data-toggle="ajaxmodal" data-createcost>
       {% include "svg/plus.svg" %}
       {% trans 'cost' %}</a>
     <a href="{% url 'activities_activity_create' %}?project={{ object.pk }}" class="btn btn-secondary" data-toggle="ajaxmodal">

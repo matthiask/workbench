@@ -168,16 +168,21 @@ $(function() {
     } else if (e.keyCode === 65) {
       // a
       window.location.href = "/activities/"
-    } else if (e.keyCode === 76 && e.shiftKey) {
-      // Shift-l
-      window.openModalFromUrl("/logbook/create/")
     } else if (e.keyCode === 76) {
       // l
       var el = document.querySelector("[data-createhours]")
-      if (el) {
-        window.openModalFromUrl(el.href)
+      if (e.shiftKey || !el) {
+        window.openModalFromUrl("/logbook/hours/create/")
       } else {
-        window.openModalFromUrl("/logbook/create/")
+        window.openModalFromUrl(el.href)
+      }
+    } else if (e.keyCode === 75) {
+      // k
+      var el = document.querySelector("[data-createcost]")
+      if (e.shiftKey || !el) {
+        window.openModalFromUrl("/logbook/costs/create/")
+      } else {
+        window.openModalFromUrl(el.href)
       }
     } else if (e.keyCode === 81) {
       // q
