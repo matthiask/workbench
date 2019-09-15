@@ -225,3 +225,6 @@ class StatisticsTest(TestCase):
         self.assertEqual(gh[-1]["maintenance"], Decimal(0))
         self.assertEqual(gh[-1]["total"], Decimal(10))
         self.assertAlmostEqual(gh[-1]["percentage"], Decimal(33))
+
+        self.client.force_login(p_green.owned_by)
+        self.assertEqual(self.client.get("/report/key-data/").status_code, 200)

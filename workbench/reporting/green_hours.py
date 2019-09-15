@@ -96,6 +96,7 @@ def green_hours_by_month():
     with connections["default"].cursor() as cursor:
         cursor.execute(
             """\
+DROP TABLE IF EXISTS green_hours_factor;
 CREATE TEMPORARY TABLE green_hours_factor AS
 WITH
 service AS (
@@ -117,6 +118,7 @@ FROM logged
 LEFT JOIN service ON logged.project_id=service.project_id
 WHERE service.hours / logged.hours < 1;
 
+DROP TABLE IF EXISTS total_hours;
 CREATE TEMPORARY TABLE total_hours AS
 SELECT
   date_trunc('month', rendered_on) AS month,
@@ -125,6 +127,7 @@ FROM logbook_loggedhours lh
 LEFT JOIN projects_service ps ON lh.service_id=ps.id
 GROUP BY month;
 
+DROP TABLE IF EXISTS green_hours;
 CREATE TEMPORARY TABLE green_hours AS
 SELECT
   month,
@@ -143,6 +146,7 @@ FROM (
 ) subquery
 GROUP BY month;
 
+DROP TABLE IF EXISTS maintenance_hours;
 CREATE TEMPORARY TABLE maintenance_hours AS
 SELECT
   date_trunc('month', rendered_on) AS month,
@@ -154,6 +158,7 @@ WHERE
   p.type='maintenance'
 GROUP BY month;
 
+DROP TABLE IF EXISTS internal_hours;
 CREATE TEMPORARY TABLE internal_hours AS
 SELECT
   date_trunc('month', rendered_on) AS month,
