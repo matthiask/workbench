@@ -60,6 +60,9 @@ class AccrualsTest(TestCase):
         factories.LoggedHoursFactory.create(
             service=service, hours=1, rendered_on=dt.date(2018, 12, 15)
         )
+        factories.LoggedCostFactory.create(
+            service=service, cost=0, rendered_on=dt.date(2018, 12, 15)
+        )
 
         self.client.force_login(factories.UserFactory.create())
         response = self.client.post("/accruals/create/", {"day": "2018-12-31"})

@@ -71,7 +71,7 @@ class AccrualQuerySet(models.QuerySet):
             .annotate(_cost=Sum(F("hours") * F("service__effort_rate")))
         }
         logged_costs_cost = {
-            row["project"]: row["cost__sum"]
+            row["service__project"]: row["cost__sum"]
             for row in LoggedCost.objects.filter(
                 service__project__in=projects, rendered_on__lte=cutoff_date
             )
