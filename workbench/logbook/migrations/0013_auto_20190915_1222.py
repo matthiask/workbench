@@ -10,9 +10,11 @@ def forwards(apps, schema_editor):
     LoggedCost = apps.get_model("logbook", "LoggedCost")
     Service = apps.get_model("projects", "Service")
 
-    project_ids_with_costs_without_services = LoggedCost.objects.filter(
-        service_id__isnull=True
-    ).values_list("project_id", flat=True)
+    project_ids_with_costs_without_services = set(
+        LoggedCost.objects.filter(service_id__isnull=True).values_list(
+            "project_id", flat=True
+        )
+    )
 
     for project_id in project_ids_with_costs_without_services:
         service = Service.objects.create(
