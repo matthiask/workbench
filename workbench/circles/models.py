@@ -1,7 +1,8 @@
 from collections import defaultdict
 
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.text import capfirst
+from django.utils.translation import gettext, gettext_lazy as _
 
 
 class Circle(models.Model):
@@ -32,14 +33,26 @@ class Role(models.Model):
         Circle, on_delete=models.CASCADE, related_name="roles", verbose_name=_("circle")
     )
     name = models.CharField(_("name"), max_length=100)
+    for_circle = models.BooleanField(_("for the circle"), default=False)
     is_removed = models.BooleanField(_("is removed"), default=False)
 
     objects = RoleQuerySet.as_manager()
 
     class Meta:
-        ordering = ["is_removed", "name"]
+        ordering = ["is_removed", "-for_circle", "name"]
         verbose_name = _("role")
         verbose_name_plural = _("roles")
 
     def __str__(self):
-        return "(%s) %s" % (_("removed"), self.name) if self.is_removed else self.name
+        return " ".join(
+            filter(
+                None,
+                [
+                    ("(%s)" % gettext("removed")) if self.is_removed else None,
+                    ("%s:" % capfirst(gettext("for the circle")))
+                    if self.for_circle
+                    else None,
+                    self.name,
+                ],
+            )
+        )

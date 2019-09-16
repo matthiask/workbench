@@ -26,7 +26,8 @@ def update_circles():
             continue
         if role["links"]["supporting_circle"]:
             # No roles of type circle
-            continue
+            pass
+            # continue
         if role["is_core"]:
             # Skip core roles
             continue
@@ -36,7 +37,10 @@ def update_circles():
             id=role["id"],
             defaults={
                 "name": role["name_with_circle_for_core_roles"],
-                "circle_id": role["links"]["circle"],
+                "circle_id": role["links"]["supporting_circle"]
+                or role["links"]["circle"],
+                "for_circle": bool(role["links"]["supporting_circle"]),
+                "is_removed": False,
             },
         )
         seen_roles.add(role["id"])
