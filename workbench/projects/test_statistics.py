@@ -93,6 +93,9 @@ class StatisticsTest(TestCase):
 
         factories.LoggedHoursFactory.create(service=service1, hours=10)
         factories.LoggedHoursFactory.create(service=service2, hours=20)
+        factories.LoggedCostFactory.create(
+            service=service1, cost=0, third_party_costs=0
+        )
 
         project = Project.objects.get()
         self.assertEqual(

@@ -104,10 +104,10 @@ def project_budget_statistics(projects):
     )
 
     cost_per_project = {
-        row["project"]: row["cost__sum"] for row in costs.annotate(Sum("cost"))
+        row["service__project"]: row["cost__sum"] for row in costs.annotate(Sum("cost"))
     }
     third_party_costs_per_project = {
-        row["project"]: row["third_party_costs__sum"]
+        row["service__project"]: row["third_party_costs__sum"]
         for row in costs.filter(third_party_costs__isnull=False).annotate(
             Sum("third_party_costs")
         )
