@@ -22,20 +22,12 @@ class Command(BaseCommand):
         activate("de")
 
         invoiced_per_customer = {
-            row["customer"]: row["subtotal__sum"]
-            - row["discount__sum"]
-            - row["down_payment_total__sum"]
-            - row["third_party_costs__sum"]
+            row["customer"]: row["total_excl_tax__sum"] - row["third_party_costs__sum"]
             for row in Invoice.objects.valid()
             .filter(project__isnull=False)
             .order_by()
             .values("customer")
-            .annotate(
-                Sum("subtotal"),
-                Sum("discount"),
-                Sum("down_payment_total"),
-                Sum("third_party_costs"),
-            )
+            .annotate(Sum("total_excl_tax"), Sum("third_party_costs"))
         }
         hours = defaultdict(lambda: defaultdict(lambda: Z))
         earned = defaultdict(lambda: defaultdict(lambda: Z))

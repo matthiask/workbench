@@ -142,22 +142,20 @@ def project_budget_statistics(projects):
     }
 
     offered_per_project = {
-        row["project"]: row["subtotal__sum"] - row["discount__sum"]
+        row["project"]: row["total_excl_tax__sum"]
         for row in Offer.objects.accepted()
         .filter(project__in=projects)
         .order_by()
         .values("project")
-        .annotate(Sum("subtotal"), Sum("discount"))
+        .annotate(Sum("total_excl_tax"))
     }
     invoiced_per_project = {
-        row["project"]: row["subtotal__sum"]
-        - row["discount__sum"]
-        - row["down_payment_total__sum"]
+        row["project"]: row["total_excl_tax__sum"]
         for row in Invoice.objects.valid()
         .filter(project__in=projects)
         .order_by()
         .values("project")
-        .annotate(Sum("subtotal"), Sum("discount"), Sum("down_payment_total"))
+        .annotate(Sum("total_excl_tax"))
     }
 
     return [

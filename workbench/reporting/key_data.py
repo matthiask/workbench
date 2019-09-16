@@ -19,11 +19,9 @@ def gross_profit_by_month(date_range):
         .filter(invoiced_on__range=date_range)
         .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))
         .values("year", "month")
-        .annotate(Sum("subtotal"), Sum("discount"), Sum("down_payment_total"))
+        .annotate(Sum("total_excl_tax"))
     ):
-        profit[(row["year"], row["month"])] += (
-            row["subtotal__sum"] - row["discount__sum"] - row["down_payment_total__sum"]
-        )
+        profit[(row["year"], row["month"])] += row["total_excl_tax__sum"]
     return profit
 
 
@@ -50,7 +48,7 @@ def accruals_by_month(date_range):
             """\
 SELECT
     cutoff_date,
-    SUM((i.subtotal - i.discount - i.down_payment_total) * (100 - a.work_progress) / 100)
+    SUM(i.total_excl_tax * (100 - a.work_progress) / 100)
 FROM accruals_accrual a
 LEFT JOIN invoices_invoice i ON i.id=a.invoice_id
 GROUP BY cutoff_date

@@ -200,10 +200,6 @@ class Invoice(ModelWithTotal):
             else "%05d" % self._code
         )
 
-    @property
-    def total_excl_tax(self):
-        return self.subtotal - self.discount - self.down_payment_total
-
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
         errors = {}

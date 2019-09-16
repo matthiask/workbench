@@ -118,6 +118,7 @@ class ModelWithTotal(Model):
             "For example invoices to foreign institutions are not liable to VAT."
         ),
     )
+    total_excl_tax = MoneyField(_("total excl tax"), default=Z)
     tax_rate = MoneyField(_("tax rate"), default=Decimal("7.7"))
     total = MoneyField(_("total"), default=Z)
     show_service_details = models.BooleanField(_("show service details"), default=True)
@@ -132,10 +133,14 @@ class ModelWithTotal(Model):
     save.alters_data = True
 
     def _calculate_total(self):
-        self.total = self.total_excl_tax
-        if self.liable_to_vat:
-            self.total *= 1 + self.tax_rate / 100
-        self.total = self._round_5cents(self.total)
+        self.total_excl_tax = (
+            self.subtotal - self.discount - getattr(self, "down_payment_total", Z)
+        )
+        self.total = self._round_5cents(
+            (self.total_excl_tax * (1 + self.tax_rate / 100))
+            if self.liable_to_vat
+            else self.total_excl_tax
+        )
 
     def _round_5cents(self, value):
         return (value / 5).quantize(Decimal("0.00")) * 5
@@ -143,10 +148,6 @@ class ModelWithTotal(Model):
     @property
     def tax_amount(self):
         return self.total_excl_tax * self.tax_rate / 100 if self.liable_to_vat else Z
-
-    @property
-    def total_excl_tax(self):
-        return self.subtotal - self.discount
 
     @property
     def pretty_total_excl(self):
