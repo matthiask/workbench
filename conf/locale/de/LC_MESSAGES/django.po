@@ -2068,7 +2068,7 @@ msgstr "Keine Resultate gefunden."
 
 #: workbench/templates/shortcuts.html
 msgid "Search everything"
-msgstr "Suchanfrage fehlt."
+msgstr "Alles durchsuchen"
 
 #: workbench/templates/shortcuts.html
 msgid "Focus the search form in list views"
