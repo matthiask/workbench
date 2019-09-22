@@ -24,6 +24,7 @@ def monthly_invoicing(year):
         .filter(
             service__project__in=invoices.values("project"),
             third_party_costs__isnull=False,
+            invoice_service__isnull=True,
         )
         .values("service__project")
         .annotate(Sum("third_party_costs"))

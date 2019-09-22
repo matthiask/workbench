@@ -30,8 +30,11 @@ def third_party_costs_by_month(date_range):
 
     for row in (
         LoggedCost.objects.order_by()
-        .filter(rendered_on__range=date_range)
-        .filter(third_party_costs__isnull=False)
+        .filter(
+            rendered_on__range=date_range,
+            third_party_costs__isnull=False,
+            invoice_service__isnull=True,
+        )
         .annotate(year=ExtractYear("rendered_on"), month=ExtractMonth("rendered_on"))
         .values("year", "month")
         .annotate(Sum("third_party_costs"))

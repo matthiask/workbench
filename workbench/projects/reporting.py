@@ -108,9 +108,9 @@ def project_budget_statistics(projects):
     }
     third_party_costs_per_project = {
         row["service__project"]: row["third_party_costs__sum"]
-        for row in costs.filter(third_party_costs__isnull=False).annotate(
-            Sum("third_party_costs")
-        )
+        for row in costs.filter(
+            third_party_costs__isnull=False, invoice_service__isnull=True
+        ).annotate(Sum("third_party_costs"))
     }
 
     hours = (
