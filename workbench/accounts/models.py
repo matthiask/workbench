@@ -155,7 +155,7 @@ class User(Model, AbstractBaseUser):
             )
             .values("service__project")
             .annotate(Count("id"))
-            .filter(id__count__gt=1)
+            .filter(id__count__gte=3)
             .values("service__project")
         ).select_related("customer", "contact__organization", "owned_by")
 
