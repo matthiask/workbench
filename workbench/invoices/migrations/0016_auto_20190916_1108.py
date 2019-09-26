@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 max_digits=10,
                 null=True,
                 validators=[django.core.validators.MinValueValidator(0)],
-                verbose_name="total excl tax",
+                verbose_name="total excl. tax",
             ),
         ),
         migrations.AddField(
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 max_digits=10,
                 null=True,
                 validators=[django.core.validators.MinValueValidator(0)],
-                verbose_name="total excl tax",
+                verbose_name="total excl. tax",
             ),
         ),
     ]

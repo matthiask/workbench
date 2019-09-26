@@ -118,7 +118,7 @@ class ModelWithTotal(Model):
             "For example invoices to foreign institutions are not liable to VAT."
         ),
     )
-    total_excl_tax = MoneyField(_("total excl tax"), default=Z)
+    total_excl_tax = MoneyField(_("total excl. tax"), default=Z)
     tax_rate = MoneyField(_("tax rate"), default=Decimal("7.7"))
     total = MoneyField(_("total"), default=Z)
     show_service_details = models.BooleanField(_("show service details"), default=True)
