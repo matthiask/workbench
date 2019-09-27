@@ -9,6 +9,8 @@ from workbench.services.models import ServiceType
 
 
 def select(request):
+    if not request.is_ajax():
+        return redirect("/")
     form = ProjectAutocompleteForm(request.POST if request.method == "POST" else None)
     if form.is_valid():
         return JsonResponse(

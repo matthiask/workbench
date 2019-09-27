@@ -473,6 +473,9 @@ class LogbookTest(TestCase):
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
+        response = self.client.get("/logbook/hours/create/")
+        self.assertRedirects(response, "/")
+
         response = self.client.get(
             "/logbook/hours/create/", HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )

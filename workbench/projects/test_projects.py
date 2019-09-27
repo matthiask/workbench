@@ -425,12 +425,19 @@ class ProjectsTest(TestCase):
         self.client.force_login(project.owned_by)
 
         response = self.client.get(project.urls["select"])
+        self.assertRedirects(response, "/")
+
+        response = self.client.get(
+            project.urls["select"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
         self.assertContains(
             response, 'data-autocomplete-url="/projects/autocomplete/?only_open=on"'
         )
 
         response = self.client.post(
-            project.urls["select"], {"project-project": project.pk}
+            project.urls["select"],
+            {"project-project": project.pk},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 299)
         self.assertEqual(response.json(), {"redirect": project.get_absolute_url()})
