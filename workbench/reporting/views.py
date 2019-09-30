@@ -4,6 +4,7 @@ from itertools import groupby
 from django import forms
 from django.db.models import Q
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -196,6 +197,18 @@ def hours_filter_view(request, form, *, template_name, stats_fn):
 
 class ProjectBudgetStatisticsForm(forms.Form):
     owned_by = forms.TypedChoiceField(label="", coerce=int, required=False)
+    s = forms.ChoiceField(
+        choices=[
+            ("all", _("All")),
+            (
+                _("status"),
+                [("", _("Open")), ("closed", _("Closed during the last year"))],
+            ),
+        ],
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -203,7 +216,15 @@ class ProjectBudgetStatisticsForm(forms.Form):
 
     def queryset(self):
         data = self.cleaned_data
-        queryset = Project.objects.open().exclude(type=Project.INTERNAL)
+        if data.get("s") == "closed":
+            queryset = Project.objects.closed().filter(
+                closed_on__gte=timezone.now() - dt.timedelta(days=366)
+            )
+        elif data.get("s") == "all":
+            queryset = Project.objects.all()
+        else:
+            queryset = Project.objects.open()
+        queryset = queryset.exclude(type=Project.INTERNAL)
         if data.get("owned_by") == 0:
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get("owned_by"):

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-26 08:40+0200\n"
+"POT-Creation-Date: 2019-09-30 14:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -177,11 +177,12 @@ msgstr "Aktivitäten"
 
 #: workbench/activities/forms.py workbench/deals/forms.py
 #: workbench/invoices/forms.py workbench/offers/forms.py
-#: workbench/projects/forms.py
+#: workbench/projects/forms.py workbench/reporting/views.py
 msgid "Open"
 msgstr "Offen"
 
 #: workbench/activities/forms.py workbench/projects/forms.py
+#: workbench/reporting/views.py
 msgid "All"
 msgstr "Alle"
 
@@ -845,7 +846,7 @@ msgstr "Geschätzter Wert"
 
 #: workbench/deals/models.py workbench/expenses/views.py
 #: workbench/invoices/models.py workbench/offers/models.py
-#: workbench/projects/forms.py
+#: workbench/projects/forms.py workbench/reporting/views.py
 #: workbench/templates/activities/activity_detail.html
 #: workbench/templates/deals/deal_detail.html
 #: workbench/templates/deals/deal_list.html
@@ -1611,6 +1612,10 @@ msgstr "Wartung"
 #: workbench/templates/reporting/key_data.html
 msgid "internal"
 msgstr "Intern"
+
+#: workbench/reporting/views.py
+msgid "Closed during the last year"
+msgstr "Geschlossen während dem letzten Jahr"
 
 #: workbench/services/models.py
 msgid "service type"

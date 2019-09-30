@@ -82,6 +82,17 @@ class StatisticsTest(TestCase):
             302,
         )
 
+        self.assertEqual(
+            self.client.get("/report/project-budget-statistics/?s=").status_code, 200
+        )
+        self.assertEqual(
+            self.client.get("/report/project-budget-statistics/?s=all").status_code, 200
+        )
+        self.assertEqual(
+            self.client.get("/report/project-budget-statistics/?s=closed").status_code,
+            200,
+        )
+
     def test_not_archived_hours_grouped_services_green_hours_hpc(self):
         service1 = factories.ServiceFactory.create(effort_rate=180, effort_type="Any")
         service2 = factories.ServiceFactory.create(project=service1.project)

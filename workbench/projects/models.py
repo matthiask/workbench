@@ -23,6 +23,9 @@ class ProjectQuerySet(SearchQuerySet):
     def open(self):
         return self.filter(closed_on__isnull=True)
 
+    def closed(self):
+        return self.filter(closed_on__isnull=False)
+
     def orders(self):
         return self.filter(type=Project.ORDER)
 
