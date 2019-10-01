@@ -150,13 +150,20 @@ class User(Model, AbstractBaseUser):
         from workbench.projects.models import Project
 
         return Project.objects.filter(
-            id__in=self.loggedhours.filter(
-                rendered_on__gte=dt.date.today() - dt.timedelta(days=7)
+            Q(
+                id__in=self.loggedhours.filter(
+                    rendered_on__gte=dt.date.today() - dt.timedelta(days=7)
+                )
+                .values("service__project")
+                .annotate(Count("id"))
+                .filter(id__count__gte=3)
+                .values("service__project")
             )
-            .values("service__project")
-            .annotate(Count("id"))
-            .filter(id__count__gte=3)
-            .values("service__project")
+            | Q(
+                id__in=self.loggedhours.filter(rendered_on__gte=dt.date.today()).values(
+                    "service__project"
+                )
+            )
         ).select_related("customer", "contact__organization", "owned_by")
 
     @cached_property
