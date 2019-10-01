@@ -22,6 +22,7 @@
             </div>
           </form>
         </li>
+        <li class="nav-item"><a class="nav-link" href="/">{% trans 'dashboard'|capfirst %}</a></li>
         {% mark_current request.path %}
         <li class="nav-item"><a class="nav-link" href="{% url 'projects_project_list' %}">{% trans 'projects'|capfirst %}</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'offers_offer_list' %}">{% trans 'offers'|capfirst %}</a></li>
