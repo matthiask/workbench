@@ -41,6 +41,16 @@ def third_party_costs_by_month(date_range):
     ):
         costs[(row["year"], row["month"])] += row["third_party_costs__sum"]
 
+    for row in (
+        Invoice.objects.valid()
+        .order_by()
+        .filter(invoiced_on__range=date_range)
+        .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))
+        .values("year", "month")
+        .annotate(Sum("third_party_costs"))
+    ):
+        costs[(row["year"], row["month"])] += row["third_party_costs__sum"]
+
     return costs
 
 

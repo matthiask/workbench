@@ -89,6 +89,10 @@
       <th class="text-right">{{ object.total_title }}</th>
       <td>{{ object.total|currency }}</td>
     </tr>
+    <tr>
+      <th class="text-right">{% trans 'third party costs' %}</th>
+      <td>{{ object.third_party_costs|currency }}</td>
+    </tr>
   </table>
 
   <a href="{{ object.urls.pdf }}" class="btn btn-secondary" target="_blank">

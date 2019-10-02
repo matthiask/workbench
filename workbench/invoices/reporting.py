@@ -13,11 +13,14 @@ def monthly_invoicing(year):
     overall = {"total": Z, "total_excl_tax": Z, "third_party_costs": Z, "months": []}
 
     def add_month(month):
+        if not month["invoices"]:
+            return
         overall["total"] += month["total"]
         overall["total_excl_tax"] += month["total_excl_tax"]
         overall["third_party_costs"] += month["third_party_costs"]
         overall["months"].append(month.copy())
 
+    # TODO do this per month, not just once for all
     third_party_costs_by_project = {
         row["service__project"]: row["third_party_costs__sum"]
         for row in LoggedCost.objects.order_by()
@@ -35,20 +38,24 @@ def monthly_invoicing(year):
 
     for invoice in invoices.select_related(
         "customer", "contact__organization", "project__owned_by", "owned_by"
-    ).order_by("invoiced_on"):
+    ).order_by("-invoiced_on"):
 
         if month["month"].month != invoice.invoiced_on.month:
             add_month(month)
             month.update(month_data)
             month.update({"month": invoice.invoiced_on, "invoices": []})
 
-        # pop - only applies third party costs reduction to first invoice per project
-        third_party_costs = third_party_costs_by_project.pop(invoice.project_id, Z)
+        # pop - only applies third party costs reduction to last invoice per project
+        invoice.third_party_costs += third_party_costs_by_project.pop(
+            invoice.project_id, Z
+        )
 
         month["total"] += invoice.total
         month["total_excl_tax"] += invoice.total_excl_tax
-        month["third_party_costs"] += third_party_costs
+        month["third_party_costs"] += invoice.third_party_costs
         month["invoices"].append(invoice)
 
     add_month(month)
+
+    # print(third_party_costs_by_project)
     return overall

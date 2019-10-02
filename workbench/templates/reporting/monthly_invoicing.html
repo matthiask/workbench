@@ -25,7 +25,7 @@
         <th class="text-right">{{ monthly_invoicing.third_party_costs|currency }}</th>
       </tr>
     </thead>
-    {% for month in monthly_invoicing.months %}
+    {% for month in monthly_invoicing.months reversed %}
       <thead>
         <tr>
           <th colspan="2">
@@ -50,7 +50,7 @@
           <td>{{ invoice.invoiced_on|local_date_format }}</td>
           <td class="text-right">{{ invoice.total|currency }}</td>
           <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
-          <td></td>
+          <td class="text-right">{% if invoice.third_party_costs %}{{ invoice.third_party_costs|currency }}{% endif %}</td>
         </tr>
       {% endfor %}
       </tbody>
