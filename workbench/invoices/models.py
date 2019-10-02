@@ -188,8 +188,15 @@ class Invoice(ModelWithTotal):
     def _calculate_total(self):
         if self.type == self.SERVICES:
             services = self.services.all()
-            self.subtotal = sum((s.service_cost for s in services), Z)
-            self.third_party_costs = sum((s.third_party_costs for s in services), Z)
+            self.subtotal = sum((service.service_cost for service in services), Z)
+            self.third_party_costs = sum(
+                (
+                    service.third_party_costs
+                    for service in services
+                    if service.third_party_costs
+                ),
+                Z,
+            )
         super()._calculate_total()
 
     @property
