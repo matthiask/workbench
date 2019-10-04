@@ -181,7 +181,9 @@ class Project(Model):
         total_service_hours_rate_undefined = Z
         total_logged_hours_rate_undefined = Z
 
-        services_by_offer = defaultdict(list)
+        offers = self.offers.select_related("owned_by")
+        offers_map = {offer.id: offer for offer in offers}
+        services_by_offer = defaultdict(list, {offer: [] for offer in offers})
 
         logged_hours_per_service_and_user = defaultdict(dict)
         logged_hours_per_user = defaultdict(lambda: Z)
@@ -230,7 +232,7 @@ class Project(Model):
             for user in User.objects.filter(id__in=logged_hours_per_user.keys())
         }
 
-        for service in self.services.select_related("offer__owned_by"):
+        for service in self.services.all():
             logged = logged_hours_per_service_and_user.get(service.id, {})
             row = {
                 "service": service,
@@ -269,7 +271,7 @@ class Project(Model):
                 if not service.is_rejected:
                     total_service_hours_rate_undefined += service.service_hours
 
-            services_by_offer[service.offer].append(row)
+            services_by_offer[offers_map.get(service.offer_id)].append(row)
 
         return {
             "offers": sorted(
