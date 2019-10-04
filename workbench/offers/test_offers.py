@@ -321,3 +321,9 @@ class OffersTest(TestCase):
             },
         )
         self.assertContains(response, 'value="short-postal-address"')
+
+    def test_grouped_services_empty_offers(self):
+        offer = factories.OfferFactory.create()
+        gs = offer.project.grouped_services
+
+        self.assertEqual(gs["offers"], [(offer, [])])
