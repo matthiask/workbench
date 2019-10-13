@@ -513,7 +513,7 @@ class RecurringInvoice(ModelWithTotal):
             invoiced_on=period_starts_on,
             due_on=period_starts_on + dt.timedelta(days=15),
             title=self.title,
-            description="\n\n".join(
+            description="\r\n\r\n".join(
                 filter(
                     None,
                     (
