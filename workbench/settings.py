@@ -15,9 +15,9 @@ SECRET_KEY = env("SECRET_KEY", required=True)
 DEBUG = env("DEBUG", default=any(arg in {"runserver"} for arg in sys.argv))
 LIVE = env("LIVE", default=False)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
-ADMINS = [("Matthias Kestenholz", "mk@feinheit.ch")]
-MANAGERS = ADMINS
+ADMINS = MANAGERS = [("Matthias Kestenholz", "mk@feinheit.ch")]
 DEFAULT_FROM_EMAIL = SERVER_EMAIL = "workbench@workbench.feinheit.ch"
+BCC = env("BCC", default=[row[1] for row in MANAGERS])
 
 INSTALLED_APPS = [
     a
