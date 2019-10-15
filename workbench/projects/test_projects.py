@@ -365,7 +365,7 @@ class ProjectsTest(TestCase):
         )
         self.assertContains(
             response,
-            "This project already has invoices. The invoices&#39;"
+            "This project already has invoices. The invoices&#x27;"
             " customer record will be changed too.",
         )
         response = self.client.post(

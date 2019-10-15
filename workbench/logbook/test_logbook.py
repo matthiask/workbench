@@ -513,7 +513,7 @@ class LogbookTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(
-            response, "Third party costs shouldn&#39;t be higher than costs."
+            response, "Third party costs shouldn&#x27;t be higher than costs."
         )
 
         response = self.client.post(

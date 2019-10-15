@@ -252,7 +252,7 @@ class InvoicesTest(TestCase):
 
         self.assertContains(
             self.client.get("/"),
-            "logged cost &#39;Test&#39; has been updated successfully.",
+            "logged cost &#x27;Test&#x27; has been updated successfully.",
         )
 
         cost.refresh_from_db()
@@ -504,7 +504,7 @@ class InvoicesTest(TestCase):
         # print(response, response.content.decode("utf-8"))
         self.assertContains(
             response,
-            "You are attempting to change &#39;Postal address&#39;."
+            "You are attempting to change &#x27;Postal address&#x27;."
             " I am trying to prevent unintentional changes. Are you sure?",
         )
 
@@ -621,7 +621,7 @@ class InvoicesTest(TestCase):
         )
         self.assertContains(
             response,
-            "Moving status from &#39;Sent&#39; to &#39;In preparation&#39;."
+            "Moving status from &#x27;Sent&#x27; to &#x27;In preparation&#x27;."
             " Are you sure?",
         )
 
@@ -643,12 +643,12 @@ class InvoicesTest(TestCase):
         )
         self.assertContains(
             response,
-            "Moving status from &#39;Paid&#39; to &#39;In preparation&#39;."
+            "Moving status from &#x27;Paid&#x27; to &#x27;In preparation&#x27;."
             " Are you sure?",
         )
         self.assertContains(
             response,
-            "You are attempting to set status to &#39;In preparation&#39;,"
+            "You are attempting to set status to &#x27;In preparation&#x27;,"
             " but the invoice has already been closed on {}."
             " Are you sure?".format(local_date_format(dt.date.today())),
         )

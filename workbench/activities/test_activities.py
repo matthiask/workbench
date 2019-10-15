@@ -87,7 +87,7 @@ class ActivitiesTest(TestCase):
 
         response = self.client.get("/activities/")
         self.assertContains(
-            response, "activity &#39;Call back&#39; has been created successfully."
+            response, "activity &#x27;Call back&#x27; has been created successfully."
         )
 
         response = self.client.get("/activities/?project=" + str(project.pk + 1))
