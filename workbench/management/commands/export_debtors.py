@@ -96,4 +96,6 @@ class Command(BaseCommand):
                 (_("closed on"), _("total"), _("payment notice"), _("invoice")), rows
             )
 
-        xlsx.workbook.save("debtors.xlsx")
+            with io.BytesIO() as buf:
+                xlsx.workbook.save(buf)
+                zf.writestr("debtors.xlsx", buf.getvalue())
