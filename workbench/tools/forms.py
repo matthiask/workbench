@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 from django import forms
 from django.forms.utils import flatatt
 from django.urls import reverse
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext, gettext_lazy as _
@@ -47,7 +47,7 @@ class Autocomplete(forms.TextInput):
         final_attrs = self.build_attrs(attrs, {"type": "hidden", "name": name})
         if value != "":
             # Only add the 'value' attribute if a value is non-empty.
-            final_attrs["value"] = force_text(self.format_value(value))
+            final_attrs["value"] = force_str(self.format_value(value))
 
         pretty = ""
         try:

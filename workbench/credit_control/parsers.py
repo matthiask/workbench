@@ -6,13 +6,13 @@ import re
 from decimal import Decimal
 
 from django.utils.dateparse import parse_date
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.text import slugify
 
 
 def parse_zkb_csv(data):
     f = io.StringIO()
-    f.write(force_text(data, encoding="utf-8", errors="ignore"))
+    f.write(force_str(data, encoding="utf-8", errors="ignore"))
     f.seek(0)
     dialect = csv.Sniffer().sniff(f.read(4096))
     f.seek(0)
@@ -70,7 +70,7 @@ def postfinance_reference_number(payment_notice, day):
 
 def parse_postfinance_csv(data):
     f = io.StringIO()
-    f.write(force_text(data, encoding="latin-1", errors="ignore"))
+    f.write(force_str(data, encoding="latin-1", errors="ignore"))
     f.seek(0)
     dialect = csv.Sniffer().sniff(f.read(4096))
     f.seek(0)
