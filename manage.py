@@ -1,7 +1,14 @@
 #!/usr/bin/env python
 import os
 import sys
+import warnings
 
+from django.utils.deprecation import RemovedInDjango40Warning
+
+
+warnings.filterwarnings(
+    "ignore", category=RemovedInDjango40Warning, module="django_countries(.*)"
+)
 
 if __name__ == "__main__":  # pragma: no branch
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "workbench.settings")
