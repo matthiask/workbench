@@ -37,8 +37,8 @@ class Migration(migrations.Migration):
             options={
                 "ordering": [
                     "-cutoff_date",
-                    "-invoice__project__code",
-                    "-invoice__code",
+                    "-invoice__project___code",
+                    "-invoice___code",
                 ],
                 "verbose_name": "accrual",
                 "verbose_name_plural": "accruals",
