@@ -119,7 +119,7 @@ AUTHENTICATION_BACKENDS = ["authlib.backends.EmailBackend"]
 DATABASES = {"default": dj_database_url.config(default="sqlite:///db.sqlite3")}
 ATOMIC_REQUESTS = True
 
-LANGUAGE_CODE = "de-ch"
+LANGUAGE_CODE = "de"
 LANGUAGES = [("en", _("english")), ("de", _("german"))]
 TIME_ZONE = "Europe/Zurich"
 USE_I18N = True
