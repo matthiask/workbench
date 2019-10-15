@@ -1,6 +1,6 @@
 $(function() {
   // AJAX modals
-  var dismissModals = function() {
+  const dismissModals = function() {
     // LOL, dismiss.
     $(".modal, .modal-backdrop").remove()
     $(document.body)
@@ -8,13 +8,13 @@ $(function() {
       .removeAttr("style")
   }
 
-  var initModal = function(data) {
+  const initModal = function(data) {
     dismissModals()
 
     $(data).modal()
 
     setTimeout(function() {
-      var fields = $(".modal").find("input, select")
+      const fields = $(".modal").find("input, select")
       if (fields.filter("[autofocus]").length) {
         fields.filter("[autofocus]").focus()
       } else {
@@ -76,7 +76,7 @@ $(function() {
 
   $(document.body).on("submit", "form[data-ajaxform]", function(event) {
     event.preventDefault()
-    var form = this
+    const form = this
 
     $.post(form.action, $(form).serialize(), function(data, status, jqXHR) {
       // 201 CREATED, 202 ACCEPTED or 204 NO CONTENT
@@ -170,7 +170,7 @@ $(function() {
       window.location.href = "/activities/"
     } else if (e.keyCode === 76) {
       // l
-      var el = document.querySelector("[data-createhours]")
+      const el = document.querySelector("[data-createhours]")
       if (e.shiftKey || !el) {
         window.openModalFromUrl("/logbook/hours/create/")
       } else {
@@ -178,7 +178,7 @@ $(function() {
       }
     } else if (e.keyCode === 75) {
       // k
-      var el = document.querySelector("[data-createcost]")
+      const el = document.querySelector("[data-createcost]")
       if (e.shiftKey || !el) {
         window.openModalFromUrl("/logbook/costs/create/")
       } else {
@@ -207,7 +207,7 @@ $(function() {
   // Some special cases...
   $(document.body).on("click", "[data-hours-button]", function() {
     this.blur()
-    var value = prompt(this.dataset.hoursButton)
+    const value = prompt(this.dataset.hoursButton)
     if (parseFloat(value)) {
       $("#id_days")
         .val((parseFloat(value) / 8).toFixed(2))
@@ -216,7 +216,7 @@ $(function() {
   })
 
   $(document.body).on("click", "[data-multiply-cost]", function() {
-    var factor = parseFloat(this.dataset.multiplyCost),
+    const factor = parseFloat(this.dataset.multiplyCost),
       tpc = parseFloat($("#id_third_party_costs").val()),
       cost = $("#id_cost")
 
@@ -226,7 +226,7 @@ $(function() {
   })
 
   $(document.body).on("click", "[data-field-value]", function() {
-    var field = $(this)
+    const field = $(this)
       .closest(".form-group")
       .find("input, textarea, select")
     field.val(this.dataset.fieldValue)
@@ -238,11 +238,11 @@ function initWidgets() {
     return num < 10 ? "0" + num : "" + num
   }
 
-  var invoicedOn = $("#id_invoiced_on")
-  var dueOn = $("#id_due_on")
+  const invoicedOn = $("#id_invoiced_on")
+  const dueOn = $("#id_due_on")
   if (invoicedOn.length && dueOn.length) {
     invoicedOn.on("change", function(_event) {
-      var due = new Date(
+      const due = new Date(
         new Date(invoicedOn.val()).getTime() + 14 * 86400 * 1000
       )
       dueOn.val(
@@ -256,7 +256,7 @@ function initWidgets() {
   }
 
   $("[data-autofill]:not(.initialized)").each(function() {
-    var self = $(this),
+    const self = $(this),
       data = self.data("autofill"),
       sel = self.find("select")
 
@@ -271,7 +271,7 @@ function initWidgets() {
   })
 
   $("[data-autocomplete-id]:not(.initialized)").each(function() {
-    var self = $(this),
+    const self = $(this),
       url = self.data("autocomplete-url"),
       id = self.data("autocomplete-id"),
       input = $("#" + id)
@@ -308,21 +308,21 @@ function initWidgets() {
 }
 
 window.addInlineForm = function addInlineForm(slug, onComplete) {
-  var totalForms = $("#id_" + slug + "-TOTAL_FORMS"),
+  const totalForms = $("#id_" + slug + "-TOTAL_FORMS"),
     newId = parseInt(totalForms.val())
 
   totalForms.val(newId + 1)
-  var empty = $("#" + slug + "-empty"),
+  const empty = $("#" + slug + "-empty"),
     attributes = ["id", "name", "for"],
     form = $(empty.html())
 
   form.removeClass("empty").attr("id", slug + "-" + newId)
 
-  for (var i = 0; i < attributes.length; ++i) {
-    var attr = attributes[i]
+  for (let i = 0; i < attributes.length; ++i) {
+    const attr = attributes[i]
 
     form.find("*[" + attr + "*=__prefix__]").each(function() {
-      var el = $(this)
+      const el = $(this)
       el.attr(attr, el.attr(attr).replace(/__prefix__/, newId))
     })
   }
