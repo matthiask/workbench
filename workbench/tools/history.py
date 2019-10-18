@@ -89,8 +89,6 @@ def changes(model, fields, actions):
         else:
             action.pretty_user_name = action.user_name
 
-    field_instances = [model._meta.get_field(f) for f in fields]
-
     for action in actions:
         if action.action == "I":
             values = action.row_data
@@ -104,7 +102,7 @@ def changes(model, fields, actions):
                         ),
                     }
                 )
-                for f in field_instances
+                for f in fields
                 if not (f.many_to_many or f.one_to_many)  # Avoid those relation types.
             ]
 
@@ -120,7 +118,7 @@ def changes(model, fields, actions):
                         ),
                     }
                 )
-                for f in field_instances
+                for f in fields
                 if f.attname in values
             ]
 
@@ -136,7 +134,7 @@ def changes(model, fields, actions):
                         ),
                     }
                 )
-                for f in field_instances
+                for f in fields
                 if not (f.many_to_many or f.one_to_many)  # Avoid those relation types.
             ]
 

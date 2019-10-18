@@ -82,7 +82,7 @@ def history(request, db_table, attribute, id):
     exclude = cfg.get("exclude", set())
 
     fields = [
-        f.name
+        f
         for f in model._meta.get_fields()
         if hasattr(f, "attname") and not f.primary_key and f.name not in exclude
     ]
