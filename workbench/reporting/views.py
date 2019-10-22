@@ -65,7 +65,7 @@ class OpenItemsForm(forms.Form):
                 | Q(closed_on__isnull=True),
             )
             .order_by("invoiced_on", "pk")
-            .select_related("owned_by", "contact__organization", "customer", "project")
+            .select_related("owned_by", "customer", "project")
         )
 
         return {

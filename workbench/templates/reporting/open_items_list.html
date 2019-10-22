@@ -28,7 +28,7 @@
       <tr>
         <td>
           <a href="{{ invoice.get_absolute_url }}">
-            {% firstof invoice.contact invoice.customer %}<br>
+            {{ invoice.customer }}<br>
             {{ invoice|h }}
             {{ invoice.status_badge }}
           </a>
