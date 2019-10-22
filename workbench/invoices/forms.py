@@ -25,6 +25,7 @@ class InvoiceSearchForm(forms.Form):
         choices=(
             ("", _("All states")),
             ("open", _("Open")),
+            ("overdue", _("More than 30 days overdue")),
             (_("Exact"), Invoice.STATUS_CHOICES),
         ),
         required=False,
@@ -43,7 +44,6 @@ class InvoiceSearchForm(forms.Form):
         widget=forms.Select(attrs={"class": "custom-select"}),
         label="",
     )
-    reminders = forms.BooleanField(label=_("reminders"), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -55,6 +55,8 @@ class InvoiceSearchForm(forms.Form):
             queryset = queryset.filter(
                 status__in=(Invoice.IN_PREPARATION, Invoice.SENT)
             )
+        elif data.get("s") == "overdue":
+            queryset = queryset.overdue().order_by("due_on", "id")
         elif data.get("s"):
             queryset = queryset.filter(status=data.get("s"))
         if data.get("org"):
@@ -63,8 +65,6 @@ class InvoiceSearchForm(forms.Form):
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
-        if data.get("reminders"):
-            queryset = queryset.overdue().order_by("due_on", "id")
 
         return queryset.select_related(
             "customer", "contact__organization", "owned_by", "project__owned_by"
@@ -78,7 +78,7 @@ class InvoiceSearchForm(forms.Form):
 
             pdf, response = pdf_response("invoices", as_attachment=False)
 
-            if self.cleaned_data.get("reminders"):
+            if self.cleaned_data.get("s") == "overdue":
                 for organization, invoices in itertools.groupby(
                     queryset.order_by("customer", "due_on", "id"),
                     lambda invoice: invoice.customer,

@@ -527,11 +527,11 @@ class InvoicesTest(TestCase):
         valid("")
         valid("q=test")
         valid("s=open")
+        valid("s=overdue")
         valid("s=40")  # PAID
         valid("org={}".format(factories.OrganizationFactory.create().pk))
         valid("owned_by={}".format(user.id))
         valid("owned_by=0")  # only inactive
-        valid("reminders=on")
 
     def test_list_pdfs(self):
         user = factories.UserFactory.create()
@@ -550,7 +550,7 @@ class InvoicesTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/pdf")
 
-        response = self.client.get("/invoices/?pdf=1&reminders=on")
+        response = self.client.get("/invoices/?pdf=1&s=overdue")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/pdf")
 

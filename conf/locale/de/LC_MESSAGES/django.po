@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-30 14:11+0200\n"
+"POT-Creation-Date: 2019-10-22 08:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -973,8 +973,8 @@ msgid "invoices"
 msgstr "Rechnungen"
 
 #: workbench/invoices/forms.py
-msgid "reminders"
-msgstr "Mahnungen"
+msgid "More than 30 days overdue"
+msgstr "Seit mehr als 30 Tagen überfällig"
 
 #: workbench/invoices/forms.py
 msgid "No invoices found."
@@ -1116,6 +1116,7 @@ msgstr "Anzahlungstotal"
 
 #: workbench/invoices/models.py workbench/logbook/models.py
 #: workbench/services/models.py
+#: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/monthly_invoicing.html
@@ -1773,6 +1774,10 @@ msgid "Search"
 msgstr "Suche"
 
 #: workbench/templates/base.html
+msgid "dashboard"
+msgstr ""
+
+#: workbench/templates/base.html
 msgid "book keeping"
 msgstr "Buchhaltung"
 
@@ -2279,3 +2284,6 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "reminders"
+#~ msgstr "Mahnungen"
