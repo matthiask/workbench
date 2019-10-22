@@ -165,6 +165,7 @@ class StatisticsTest(TestCase):
             [
                 {
                     "cost": Decimal("0.00"),
+                    "delta": Decimal("1800.000"),
                     "effort_cost": Decimal("3600.000"),
                     "effort_hours_with_rate_undefined": Decimal("20.00"),
                     "hours": Decimal("40.00"),

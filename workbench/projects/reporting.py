@@ -173,6 +173,9 @@ def project_budget_statistics(projects):
             "invoiced": invoiced_per_project.get(project.id, Z),
             "hours": hours_per_project[project.id],
             "not_archived": not_archived_hours.get(project.id, Z),
+            "delta": cost_per_project.get(project.id, Z)
+            + effort_cost_per_project[project.id]
+            - invoiced_per_project.get(project.id, Z),
         }
         for project in projects
     ]

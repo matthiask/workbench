@@ -241,7 +241,8 @@ def project_budget_statistics_view(request, form):
             "form": form,
             "projects": sorted(
                 project_budget_statistics(form.queryset()),
-                key=lambda project: project["invoiced"] - project["logbook"],
+                key=lambda project: project["delta"],
+                reverse=True,
             ),
         },
     )

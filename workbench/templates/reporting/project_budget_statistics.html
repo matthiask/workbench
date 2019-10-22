@@ -22,6 +22,7 @@
         <th class="text-right">{% trans 'third party costs' %}</th>
         <th class="text-right">{% trans 'invoiced' %}</th>
         <th class="text-right">{% trans 'not archived' %}</th>
+        <th class="text-right">&Delta;</th>
       </tr>
     </thead>
     <tbody>
@@ -41,6 +42,7 @@
             {{ project.not_archived|hours }} / {{ project.hours|hours }}
             {% pie project.not_archived project.hours %}
           </td>
+          <td class="text-right">{{ project.delta|currency:True }}</td>
         </tr>
       {% endfor %}
     </tbody>
