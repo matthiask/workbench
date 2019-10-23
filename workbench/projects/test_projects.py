@@ -483,6 +483,7 @@ class ProjectsTest(TestCase):
             '<input type="text" name="effort_type" value="flat rate" maxlength="50" class="form-control" disabled id="id_effort_type">',  # noqa
             html=True,
         )
+        self.assertNotContains(response, 'id="id_service_type"')
 
     def test_add_flat_rate_to_existing_project(self):
         project = factories.ServiceFactory.create().project

@@ -247,6 +247,7 @@ class ServiceForm(ModelForm):
         if self.project.flat_rate:
             self.fields["effort_type"].disabled = True
             self.fields["effort_rate"].disabled = True
+            self.fields.pop("service_type")
 
     def clean(self):
         data = super().clean()
