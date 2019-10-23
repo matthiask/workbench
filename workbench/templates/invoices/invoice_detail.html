@@ -28,6 +28,10 @@
       </td>
     </tr>
     <tr>
+      <th class="text-right">{% trans 'invoiced on' %}</th>
+      <td>{{ object.invoiced_on|local_date_format }}</td>
+    </tr>
+    <tr>
       <th class="text-right">{% trans 'description' %}</th>
       <td>{{ object.description|linebreaksbr|default:"&ndash;" }}</td>
     </tr>
