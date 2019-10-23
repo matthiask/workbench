@@ -11,6 +11,8 @@ H2 = Decimal("0.00")
 
 
 def local_date_format(dttm, fmt=None):
+    if not dttm:
+        return ""
     if hasattr(dttm, "astimezone"):
         dttm = localtime(dttm)
     return date_format(
