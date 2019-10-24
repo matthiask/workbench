@@ -152,3 +152,11 @@ class ExpensesTest(TestCase):
         self.assertRedirects(response, report.urls["detail"])
         self.assertEqual(messages(response), ["Cannot delete a closed expense report."])
         # print(response, response.content.decode("utf-8"))
+
+    def test_no_expenses(self):
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.get("/expenses/create/")
+        self.assertRedirects(response, "/expenses/")
+        self.assertEqual(
+            messages(response), ["Could not find any expenses with pending reimbursal."]
+        )

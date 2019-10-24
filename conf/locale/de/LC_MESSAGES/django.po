@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-22 08:50+0200\n"
+"POT-Creation-Date: 2019-10-24 11:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -710,6 +710,7 @@ msgstr ""
 "Wird automatisch gefüllt wenn ein einlesbarer Kontoauszug hochgeladen wird."
 
 #: workbench/credit_control/forms.py workbench/invoices/models.py
+#: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/reporting/monthly_invoicing.html
 #: workbench/templates/reporting/open_items_list.html
 msgid "invoiced on"
@@ -903,6 +904,10 @@ msgstr "Spesenabrechnung"
 #: workbench/expenses/models.py workbench/templates/base.html
 msgid "expense reports"
 msgstr "Spesenabrechnungen"
+
+#: workbench/expenses/models.py
+msgid "Could not find any expenses with pending reimbursal."
+msgstr "Konnte keine Spesen finden für die Rückerstattung."
 
 #: workbench/expenses/models.py
 msgid "Cannot update a closed expense report."
@@ -2284,6 +2289,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "You do not have any expenses yet."
+#~ msgstr "Du hast noch keine Spesen."
 
 #~ msgid "reminders"
 #~ msgstr "Mahnungen"

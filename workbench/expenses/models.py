@@ -6,6 +6,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
+from workbench.logbook.models import LoggedCost
 from workbench.tools.formats import currency, local_date_format
 from workbench.tools.models import Model, MoneyField, Z
 from workbench.tools.urls import model_urls
@@ -56,6 +57,19 @@ class ExpenseReport(Model):
         super().delete(*args, **kwargs)
 
     delete.alters_data = True
+
+    @classmethod
+    def allow_create(cls, request):
+        if (
+            LoggedCost.objects.expenses(user=request.user)
+            .filter(expense_report__isnull=True)
+            .exists()
+        ):
+            return True
+        messages.error(
+            request, _("Could not find any expenses with pending reimbursal.")
+        )
+        return False
 
     @classmethod
     def allow_update(cls, instance, request):
