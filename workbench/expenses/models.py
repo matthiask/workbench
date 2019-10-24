@@ -66,9 +66,7 @@ class ExpenseReport(Model):
             .exists()
         ):
             return True
-        messages.error(
-            request, _("Could not find any expenses with pending reimbursal.")
-        )
+        messages.error(request, _("Could not find any expenses to reimburse."))
         return False
 
     @classmethod
