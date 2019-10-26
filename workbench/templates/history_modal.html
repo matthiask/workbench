@@ -16,11 +16,8 @@
   {% for change in changes reversed %}
     <h4>
       <a href="{% url 'history' change.version.table_name 'id' change.version.row_data.id %}" data-toggle="ajaxmodal">
-
-        {{ change.version.get_action_display }} {{ change.version.table_name }} {{ change.version.row_data.id }}
-
-      </a>
-      / {{ change.version.pretty_user_name }} / {{ change.version.created_at }}
+        {{ change.version.get_action_display }} {{ change.version.table_name }} {{ change.version.row_data.id }}</a>
+      / {{ change.version.pretty_user_name }} / {{ change.version.created_at|local_date_format }}
     </h4>
     <ul>
       {% for pretty in change.changes %}
