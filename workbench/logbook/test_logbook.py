@@ -66,6 +66,25 @@ class LogbookTest(TestCase):
         response = send()
         self.assertContains(response, "This project is already closed.")
 
+    def test_move_to_past_week_forbidden(self):
+        hours = factories.LoggedHoursFactory.create()
+        self.client.force_login(hours.rendered_by)
+
+        response = self.client.post(
+            hours.urls["update"],
+            {
+                "rendered_by": hours.rendered_by_id,
+                "rendered_on": (dt.date.today() - dt.timedelta(days=7)).isoformat(),
+                "service": hours.service_id,
+                "hours": "0.1",
+                "description": "Test",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(
+            response, "Sorry, hours have to be logged in the same week."
+        )
+
     def test_past_week_logging(self):
         service = factories.ServiceFactory.create()
         project = service.project
