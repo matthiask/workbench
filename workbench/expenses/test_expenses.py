@@ -158,5 +158,5 @@ class ExpensesTest(TestCase):
         response = self.client.get("/expenses/create/")
         self.assertRedirects(response, "/expenses/")
         self.assertEqual(
-            messages(response), ["Could not find any expenses with pending reimbursal."]
+            messages(response), ["Could not find any expenses to reimburse."]
         )
