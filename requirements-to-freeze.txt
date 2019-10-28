@@ -11,6 +11,7 @@ django-vanilla-views
 dj-database-url
 factory-boy
 flake8
+freezegun
 gunicorn
 lxml
 mailchimp3

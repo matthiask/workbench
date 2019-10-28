@@ -3,8 +3,11 @@ from decimal import Decimal
 
 from django.test import TestCase
 
+from freezegun import freeze_time
+
 from workbench import factories
 from workbench.accruals.models import Accrual, CutoffDate
+from workbench.accruals.tasks import create_accruals_for_last_month
 from workbench.reporting import key_data
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import messages
@@ -180,3 +183,13 @@ class AccrualsTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
         self.assertEqual(self.client.get("/accruals/").status_code, 200)
         self.assertEqual(self.client.get("/accruals/?q=foo").status_code, 200)
+
+    @freeze_time("2019-10-01")
+    def test_task_on_first(self):
+        create_accruals_for_last_month()
+        self.assertEqual(CutoffDate.objects.get().day, dt.date(2019, 9, 30))
+
+    @freeze_time("2019-10-02")
+    def test_task_on_other(self):
+        create_accruals_for_last_month()
+        self.assertEqual(CutoffDate.objects.count(), 0)
