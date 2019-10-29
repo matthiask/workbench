@@ -221,7 +221,7 @@ $(function() {
       cost = $("#id_cost")
 
     if (tpc && factor) {
-      cost.val(factor * tpc).focus()
+      cost.val((factor * tpc).toFixed(2)).focus()
     }
   })
 
