@@ -331,13 +331,14 @@ class LoggedCostForm(ModelForm):
             self.instance.created_by = self.request.user
 
         self.fields["service"].choices = self.project.services.logging().choices()
-        self.fields["third_party_costs"].help_text = mark_safe(
-            '<button type="button" data-multiply-cost="1.15"'
-            ' class="btn btn-secondary btn-sm float-right ml-1">+15%</button> '
-            '<button type="button" data-multiply-cost="1"'
-            ' class="btn btn-secondary btn-sm float-right">1:1</button> '
+        self.fields["cost"].help_text = mark_safe(
+            "{} "
+            '<a href="#" data-multiply-cost="1" class="">100%</a> '
+            '<a href="#" data-multiply-cost="1.15" class="">115%</a> '
             "{}"
-            "".format(self.fields["third_party_costs"].help_text)
+            "".format(
+                _("Copy value from third party costs"), self.fields["cost"].help_text
+            )
         )
 
         if self.instance.expense_report:
