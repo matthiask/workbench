@@ -93,6 +93,15 @@ tbody th > a {
   font-weight: bold;
 }
 
+.form-text {
+  margin: 0;
+}
+
+.form-help-text {
+  display: block;
+  margin: -10px 0 8px;
+}
+
 .navbar-brand svg {
   transform: scale(1.7) translateY(-1px);
 }

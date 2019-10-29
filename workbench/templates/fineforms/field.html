@@ -14,14 +14,14 @@
   {% else %}
     {{ label_tag }}
     <div class="">
+      {% if field.field.help_text %}
+        <small class="form-text text-muted form-help-text">{{ field.field.help_text }}</small>
+      {% endif %}
       {{ field }}
       {% if field.errors %}
       <div class="invalid-feedback">
         {% for error in field.errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
       </div>
-      {% endif %}
-      {% if field.field.help_text %}
-        <small class="form-text text-muted">{{ field.field.help_text }}</small>
       {% endif %}
     </div>
   {% endif %}
