@@ -164,3 +164,9 @@ def history_link(instance):
         if instance.pk
         else ""
     )
+
+
+@register.simple_tag
+def project_statistics_row(project_logged_hours, service_logged_hours):
+    service = dict(service_logged_hours)
+    return [(user, service.get(user)) for user, _ in project_logged_hours]
