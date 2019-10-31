@@ -33,18 +33,18 @@
     {% endfor %}
   </tr>
   <tr>
-    <th>{% trans 'project' %}</th>
+    <th></th>
     <th class="text-right">
       <a href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}" target="_blank">
         {{ object.grouped_services.logged_hours|hours }}
       </a>
     </th>
     {% for user, hours in object.grouped_services.logged_hours_per_user %}
-      <td class="text-right">
+      <th class="text-right">
         <a href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}&amp;rendered_by={{ user.pk }}" target="_blank">
           {{ hours|hours }}
         </a>
-      </td>
+      </th>
     {% endfor %}
   </tr>
   {% for offer, services in object.grouped_services.offers %}
