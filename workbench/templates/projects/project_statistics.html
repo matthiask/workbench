@@ -61,7 +61,7 @@
           <td class="text-right">
             {% if hours %}
             <a href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}&amp;rendered_by={{ user.pk }}" target="_blank">
-              {{ hours|hours }} {{ user.get_short_name }}
+              {{ hours|hours }}
             </a>
             {% endif %}
           </td>
