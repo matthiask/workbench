@@ -43,8 +43,7 @@ class AbsenceForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["days"].help_text = format_html(
-            '<button type="button" data-hours-button="{hours}"'
-            ' class="btn btn-secondary btn-sm float-right">{hours}</button>',
+            '<a href="#" data-hours-button="{hours}">{hours}</a>',
             hours=_("Enter hours"),
         )
 
