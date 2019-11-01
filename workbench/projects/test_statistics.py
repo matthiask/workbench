@@ -243,3 +243,9 @@ class StatisticsTest(TestCase):
 
         self.client.force_login(p_green.owned_by)
         self.assertEqual(self.client.get("/report/key-data/").status_code, 200)
+
+    def test_statistics(self):
+        hours = factories.LoggedHoursFactory.create()
+        self.client.force_login(hours.rendered_by)
+        response = self.client.get(hours.service.project.urls["statistics"])
+        self.assertEqual(response.status_code, 200)
