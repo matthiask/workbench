@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-29 15:00+0100\n"
+"POT-Creation-Date: 2019-11-02 14:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -206,7 +206,6 @@ msgstr "Kontakt"
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
-#: workbench/templates/projects/project_statistics.html
 #: workbench/templates/reporting/overdrawn_projects.html
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "project"
@@ -1972,6 +1971,7 @@ msgid "total costs"
 msgstr "Gesamtkosten"
 
 #: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_statistics.html
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "undefined rate"
 msgstr "ohne Stundensatz"
@@ -2048,6 +2048,22 @@ msgstr "Grün und Wartung"
 #: workbench/templates/reporting/hours_by_circle.html
 msgid "No circle"
 msgstr "Kein Kreis"
+
+#: workbench/templates/reporting/key_data.html
+msgid "facts"
+msgstr "Fakten"
+
+#: workbench/templates/reporting/key_data.html
+msgid "service hours in open orders"
+msgstr "Leistungsstunden in offenen Aufträgen"
+
+#: workbench/templates/reporting/key_data.html
+msgid "logged hours in open orders"
+msgstr "Erfasste Stunden in offenen Aufträgen"
+
+#: workbench/templates/reporting/key_data.html
+msgid "sent invoices total excl. tax"
+msgstr "Total exkl. MwSt. aller offenen Rechnungen"
 
 #: workbench/templates/reporting/key_data.html
 msgid "revenue minus third party costs and accruals"

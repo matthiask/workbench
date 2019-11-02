@@ -7,7 +7,8 @@ from django.db.models import Sum
 from django.db.models.functions import ExtractMonth, ExtractYear
 
 from workbench.invoices.models import Invoice
-from workbench.logbook.models import LoggedCost
+from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.projects.models import Project, Service
 from workbench.tools.models import Z
 
 
@@ -106,3 +107,35 @@ def gross_margin_by_month(date_range):
         profit.append(row)
 
     return profit
+
+
+def service_hours_in_open_orders():
+    return (
+        Service.objects.filter(
+            project__type=Project.ORDER, project__closed_on__isnull=True,
+        )
+        .order_by()
+        .aggregate(h=Sum("service_hours"))["h"]
+        or Z
+    )
+
+
+def logged_hours_in_open_orders():
+    return (
+        LoggedHours.objects.filter(
+            service__project__type=Project.ORDER,
+            service__project__closed_on__isnull=True,
+        )
+        .order_by()
+        .aggregate(h=Sum("hours"))["h"]
+        or Z
+    )
+
+
+def sent_invoices_total():
+    return (
+        Invoice.objects.filter(status=Invoice.SENT)
+        .order_by()
+        .aggregate(t=Sum("total_excl_tax"))["t"]
+        or Z
+    )
