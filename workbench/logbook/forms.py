@@ -250,7 +250,7 @@ class LoggedHoursForm(ModelForm):
 
         if all(
             f in self.fields and data.get(f) for f in ["rendered_by", "rendered_on"]
-        ):
+        ) and (not self.instance.pk or ("rendered_on" in self.changed_data)):
             if not data["rendered_by"].enforce_same_week_logging:
                 # Fine
                 pass

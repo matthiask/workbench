@@ -85,6 +85,24 @@ class LogbookTest(TestCase):
             response, "Sorry, hours have to be logged in the same week."
         )
 
+    def test_update_past_week_allowed(self):
+        day = dt.date.today() - dt.timedelta(days=7)
+        hours = factories.LoggedHoursFactory.create(rendered_on=day)
+        self.client.force_login(hours.rendered_by)
+
+        response = self.client.post(
+            hours.urls["update"],
+            {
+                "rendered_by": hours.rendered_by_id,
+                "rendered_on": day.isoformat(),
+                "service": hours.service_id,
+                "hours": "0.1",
+                "description": "Test 2",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
+
     def test_past_week_logging(self):
         service = factories.ServiceFactory.create()
         project = service.project
