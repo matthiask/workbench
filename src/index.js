@@ -2,16 +2,20 @@ import "./scss/index.scss"
 
 import ReactDOM from "react-dom"
 import React from "react"
+import {Provider as ReduxProvider} from "react-redux"
+
+import {configureStore} from "./store/store.js"
 
 import {Activity} from "./activity.js"
 
-const HelloWorld = () => {
+const store = configureStore()
+
+export const App = () => {
   return (
-    <div>
-      Hello world
+    <ReduxProvider store={store}>
       <Activity />
-    </div>
+    </ReduxProvider>
   )
 }
 
-ReactDOM.render(<HelloWorld />, document.getElementById("root"))
+ReactDOM.render(<App />, document.getElementById("root"))
