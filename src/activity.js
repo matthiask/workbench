@@ -30,6 +30,8 @@ export const Activity = connect((state, ownProps) => ({
     color,
     project,
     projectLabel,
+    service,
+    serviceLabel,
   } = activity
   const [showSettings, setShowSettings] = useState(false)
 
@@ -134,6 +136,7 @@ export const Activity = connect((state, ownProps) => ({
                 onChange={row => {
                   update({project: row.value, projectLabel: row.label})
                 }}
+                placeholder={projectLabel}
               />
             </div>
             <div className="form-group">
@@ -179,7 +182,19 @@ export const Activity = connect((state, ownProps) => ({
             >
               {isActive ? "Pause" : "Start"}
             </button>
-            <button className="btn btn-primary" type="button">
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => {
+                console.log({
+                  project,
+                  service,
+                  description,
+                  hours: Math.ceil(mySeconds / 360) / 10,
+                  date: new Date().toISOString().replace(/T.*/, ""),
+                })
+              }}
+            >
               Send
             </button>
           </div>
