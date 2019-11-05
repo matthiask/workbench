@@ -9,7 +9,7 @@ module.exports = merge(common, {
   mode: "production",
   output: {
     path: paths.build,
-    publicPath: "/",
+    publicPath: "/timerr/",
     filename: "[name].[contenthash].bundle.js",
   },
   devtool: "source-map",
