@@ -59,6 +59,7 @@ module.exports = {
       // favicon: paths.src + '/images/favicon.png',
       template: paths.src + "/template.html", // template file
       filename: "index.html", // output file
+      inject: "body",
     }),
   ],
 
