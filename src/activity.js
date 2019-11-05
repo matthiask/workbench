@@ -68,7 +68,9 @@ export const Activity = connect((state, ownProps) => ({
     })
 
   const isActive = current && current.activity == id
-  const mySeconds = seconds + (isActive ? timestamp() - current.startedAt : 0)
+  const mySeconds = Math.ceil(
+    seconds + (isActive ? timestamp() - current.startedAt : 0)
+  )
 
   const [, updateState] = useState()
   useEffect(() => {

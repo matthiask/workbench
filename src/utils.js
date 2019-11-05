@@ -3,7 +3,7 @@ export function createIdentifier() {
 }
 
 export function timestamp() {
-  return Math.floor(new Date().getTime() / 1000)
+  return new Date().getTime() / 1000
 }
 
 export function clamp(value, min, max) {
@@ -11,7 +11,7 @@ export function clamp(value, min, max) {
 }
 
 export function prettyDuration(secondsArgument) {
-  const seconds = Math.floor(secondsArgument) || 0
+  const seconds = Math.ceil(secondsArgument) || 0
   const hours = Math.floor(seconds / 3600)
   const displayHours = hours ? `${hours}h ` : ""
   const displayMinutes = Math.floor(seconds / 60) % 60
