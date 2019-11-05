@@ -28,5 +28,12 @@ module.exports = {
     "prettier/prettier": "error",
     "react/display-name": 0,
     "react/prop-types": 0,
+    "no-unused-vars": [
+      "error",
+      {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^React$",
+      },
+    ],
   }
 }
