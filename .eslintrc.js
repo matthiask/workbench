@@ -1,30 +1,27 @@
 module.exports = {
-  "env": {
-    "browser": true,
-    "es6": true,
-    "node": true,
+  env: {
+    browser: true,
+    es6: true,
+    node: true,
   },
-  "extends": [
+  extends: [
     "eslint:recommended",
     "plugin:prettier/recommended",
     "plugin:react/recommended",
   ],
-  "globals": {
-    "Atomics": "readonly",
-    "SharedArrayBuffer": "readonly"
+  globals: {
+    Atomics: "readonly",
+    SharedArrayBuffer: "readonly",
   },
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
     },
-    "ecmaVersion": 2018,
-    "sourceType": "module"
+    ecmaVersion: 2018,
+    sourceType: "module",
   },
-  "plugins": [
-    "react",
-    "prettier"
-  ],
-  "rules": {
+  plugins: ["react", "prettier"],
+  rules: {
     "prettier/prettier": "error",
     "react/display-name": 0,
     "react/prop-types": 0,
@@ -35,5 +32,10 @@ module.exports = {
         varsIgnorePattern: "^React$",
       },
     ],
-  }
+  },
+  settings: {
+    react: {
+      version: "16",
+    },
+  },
 }
