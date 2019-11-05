@@ -19,10 +19,29 @@ html {
 .activity {
   width: 20rem;
   position: absolute;
+
+  .card-body {
+    position: relative;
+  }
 }
 
 .activity:focus-within {
   z-index: 1;
+}
+
+.activity-duration {
+  text-align: center;
+  font-size: 2rem;
+}
+
+.activity-settings {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  padding: 1rem;
+  background: #fff;
+  box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.7);
 }
 
 .js-drag-handle {

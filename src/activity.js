@@ -29,12 +29,18 @@ export const Activity = ({description, seconds, top, left}) => {
           </div>
           <div className="card-body" style={style}>
             {showSettings ? (
-              <div className="activity-settings">
+              <div className="activity-settings d-flex align-items-center justify-content-between">
                 <input
                   type="color"
                   value={color}
                   onChange={e => setColor(e.target.value)}
                 />
+                <button className="btn btn-secondary" type="button">
+                  Duplicate
+                </button>
+                <button className="btn btn-danger" type="button">
+                  Remove
+                </button>
               </div>
             ) : null}
             <div className="form-group">

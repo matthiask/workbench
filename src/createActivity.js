@@ -6,9 +6,6 @@ export const CreateActivity = connect()(({dispatch}) => {
   return (
     <form className="create-activity">
       <div className="card">
-        <div className="card-header">
-          <h5>Aktivität</h5>
-        </div>
         <div className="card-body">
           <div className="form-group">
             <label>Tätigkeit</label>
@@ -19,8 +16,6 @@ export const CreateActivity = connect()(({dispatch}) => {
               onChange={e => setDescription(e.target.value)}
             />
           </div>
-        </div>
-        <div className="card-footer d-flex justify-content-between">
           <button
             className="btn btn-primary"
             onClick={e => {
