@@ -6,8 +6,8 @@ import {Activity} from "./activity.js"
 export const Activities = connect(({activities}) => ({activities}))(
   ({activities}) => (
     <div className="activity-list">
-      {activities.map((activity, idx) => (
-        <Activity key={idx} {...activity} />
+      {activities.map(activity => (
+        <Activity key={activity.id} {...activity} />
       ))}
     </div>
   )

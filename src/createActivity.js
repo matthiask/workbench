@@ -1,6 +1,8 @@
 import React, {useState} from "react"
 import {connect} from "react-redux"
 
+import {createIdentifier} from "./utils.js"
+
 export const CreateActivity = connect()(({dispatch}) => {
   const [description, setDescription] = useState("")
   return (
@@ -22,7 +24,7 @@ export const CreateActivity = connect()(({dispatch}) => {
               e.preventDefault()
               dispatch({
                 type: "ADD_ACTIVITY",
-                activity: {description, seconds: 0},
+                activity: {description, seconds: 0, id: createIdentifier()},
               })
             }}
           >

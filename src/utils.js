@@ -1,3 +1,7 @@
+export function createIdentifier() {
+  return `${new Date().getTime()}.${Math.floor(Math.random() * 10000)}`
+}
+
 export function timestamp() {
   return Math.floor(new Date().getTime() / 1000)
 }
