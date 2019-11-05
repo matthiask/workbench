@@ -39,7 +39,7 @@ module.exports = merge(common, {
      */
     new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
-      __API_HOST: JSON.stringify("http://127.0.0.1:8000"),
+      __API_HOST: JSON.stringify("http://127.0.0.1:8000/"),
     }),
   ],
 })
