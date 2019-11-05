@@ -2,7 +2,7 @@ import React, {useState} from "react"
 import Draggable from "react-draggable"
 import {connect} from "react-redux"
 
-import {prettyDuration} from "./utils.js"
+import {clamp, prettyDuration} from "./utils.js"
 
 export const Activity = connect()(
   ({description, seconds, id, top, left, dispatch}) => {
@@ -13,8 +13,23 @@ export const Activity = connect()(
     return (
       <Draggable
         handle=".js-drag-handle"
+        defaultPosition={{
+          x: clamp(
+            left,
+            0,
+            500
+          ) /* TODO use innerWidth / innerHeight of window */,
+          y: clamp(top, 0, 500),
+        }}
         onStop={(e, data) => {
-          console.log(e, data)
+          dispatch({
+            type: "UPDATE_ACTIVITY",
+            activity: id,
+            fields: {
+              left: data.x,
+              top: data.y,
+            },
+          })
         }}
       >
         <form className="activity">
@@ -67,6 +82,13 @@ export const Activity = connect()(
                   className="form-control"
                   rows="3"
                   value={description}
+                  onChange={e =>
+                    dispatch({
+                      type: "UPDATE_ACTIVITY",
+                      activity: id,
+                      fields: {description: e.target.value},
+                    })
+                  }
                 />
               </div>
               <div className="activity-duration">{prettyDuration(seconds)}</div>

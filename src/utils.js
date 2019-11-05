@@ -6,6 +6,10 @@ export function timestamp() {
   return Math.floor(new Date().getTime() / 1000)
 }
 
+export function clamp(value, min, max) {
+  return Math.max(Math.min(value, max), min)
+}
+
 export function prettyDuration(secondsArgument) {
   const seconds = Math.floor(secondsArgument) || 0
   const hours = Math.floor(seconds / 3600)

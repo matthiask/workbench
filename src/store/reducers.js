@@ -6,6 +6,12 @@ function activities(state = [], action) {
       return state.concat([action.activity])
     case "REMOVE_ACTIVITY":
       return state.filter(activity => activity.id != action.activity)
+    case "UPDATE_ACTIVITY":
+      return state.map(activity =>
+        activity.id == action.activity
+          ? {...activity, ...action.fields}
+          : activity
+      )
     default:
       return state
   }
