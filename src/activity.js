@@ -186,13 +186,34 @@ export const Activity = connect((state, ownProps) => ({
               className="btn btn-primary"
               type="button"
               onClick={() => {
-                console.log({
-                  project,
-                  service,
-                  description,
-                  hours: Math.ceil(mySeconds / 360) / 10,
-                  date: new Date().toISOString().replace(/T.*/, ""),
+                const url = endpointUrl({
+                  name: "createHours",
+                  urlParams: [project],
                 })
+                const fd = new URLSearchParams()
+                fd.append("project", project)
+                fd.append("service", service)
+                fd.append("description", description)
+                fd.append("hours", Math.ceil(mySeconds / 360) / 10)
+                fd.append("date", new Date().toISOString().replace(/T.*/, ""))
+
+                const finalUrl = `${url}?${fd.toString()}`
+                console.log(finalUrl)
+                window.openModalFromUrl(finalUrl)
+
+                /*
+                if (response.status == 200) {
+                  window.initModal(await response.text())
+                } else if (response.status == 201) {
+                  // created!
+                  update({
+                    description: "",
+                    seconds: "",
+                  })
+                } else {
+                  alert("WTF!")
+                }
+                */
               }}
             >
               Send
