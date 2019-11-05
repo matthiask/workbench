@@ -6,8 +6,6 @@ import thunk from "redux-thunk"
 import logger from "redux-logger"
 import persistState from "redux-localstorage"
 
-// import {fetchProjects} from "./actions.js"
-
 export function configureStore(initialState = undefined) {
   let store = createStore(
     reducer,
@@ -24,9 +22,6 @@ export function configureStore(initialState = undefined) {
       store.replaceReducer(reducer)
     })
   }
-
-  // dispatch action to fetch initial data
-  // store.dispatch(fetchProjects("kal"))
 
   return store
 }

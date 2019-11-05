@@ -11,18 +11,8 @@ function activities(state = [], action) {
   }
 }
 
-function projects(state = [], action) {
-  switch (action.type) {
-    case "ADD_PROJECTS":
-      return action.projects
-    default:
-      return state
-  }
-}
-
 const reducer = combineReducers({
   activities,
-  projects,
 })
 
 export default reducer
