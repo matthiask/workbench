@@ -6,7 +6,8 @@
     "start": "cross-env NODE_ENV=development webpack-dev-server --config config/webpack.dev.js",
     "build": "cross-env NODE_ENV=production webpack --config config/webpack.prod.js",
     "deploy": "gh-pages -d dist",
-    "prettier": "prettier --write 'src/**/*.{js,scss}' 'config/**/*.js'"
+    "prettier": "prettier --write 'src/**/*.{js,scss}' 'config/**/*.js'",
+    "check": "eslint src/**/*.js && prettier --list-different 'src/**/*.{js,scss}' 'config/**/*.js'"
   },
   "author": "Dan Büschlen <danbueschlen@gmail.com>",
   "license": "MIT",
