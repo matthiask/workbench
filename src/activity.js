@@ -1,101 +1,135 @@
-import React, {useState} from "react"
+import React, {useEffect, useState} from "react"
 import Draggable from "react-draggable"
 import {connect} from "react-redux"
 
-import {clamp, prettyDuration} from "./utils.js"
+import {clamp, prettyDuration, timestamp} from "./utils.js"
 
-export const Activity = connect()(
-  ({description, seconds, id, top, left, color, dispatch}) => {
-    const [showSettings, setShowSettings] = useState(false)
+export const Activity = connect((state, ownProps) => ({
+  ...ownProps,
+  current: state.current,
+}))(({description, seconds, id, top, left, color, current, dispatch}) => {
+  const [showSettings, setShowSettings] = useState(false)
 
-    const update = fields =>
-      dispatch({
-        type: "UPDATE_ACTIVITY",
-        activity: id,
-        fields,
-      })
+  const update = fields =>
+    dispatch({
+      type: "UPDATE_ACTIVITY",
+      activity: id,
+      fields,
+    })
 
-    const style = {backgroundColor: color || "#e3f2fd"}
-    return (
-      <Draggable
-        handle=".js-drag-handle"
-        defaultPosition={{
-          x: clamp(
-            left,
-            0,
-            500
-          ) /* TODO use innerWidth / innerHeight of window */,
-          y: clamp(top, 0, 500),
-        }}
-        onStop={(e, data) =>
-          update({
-            left: data.x,
-            top: data.y,
-          })
-        }
-      >
-        <form className="activity">
-          <div className="card">
-            <div className="card-header d-flex w-100 align-items-center justify-content-between js-drag-handle">
-              <h5>Aktivität</h5>
-              <button
-                className="btn btn-outline-secondary"
-                type="button"
-                onClick={() => setShowSettings(!showSettings)}
-              >
-                &#x2056;
-              </button>
-            </div>
-            <div className="card-body" style={style}>
-              {showSettings ? (
-                <div className="activity-settings d-flex align-items-center justify-content-between">
-                  <input
-                    type="color"
-                    value={color || "#e3f2fd"}
-                    onChange={e => update({color: e.target.value})}
-                  />
-                  {/*
+  const isActive = current && current.activity == id
+  const mySeconds = seconds + (isActive ? timestamp() - current.startedAt : 0)
+
+  const [, updateState] = useState()
+  useEffect(() => {
+    if (!isActive) return
+    const interval = setInterval(() => updateState({}), 1000)
+    return () => clearInterval(interval)
+  }, [isActive])
+
+  const style = {backgroundColor: color || "#e3f2fd"}
+
+  return (
+    <Draggable
+      handle=".js-drag-handle"
+      defaultPosition={{
+        x: clamp(
+          left,
+          0,
+          500
+        ) /* TODO use innerWidth / innerHeight of window */,
+        y: clamp(top, 0, 500),
+      }}
+      onStop={(e, data) =>
+        update({
+          left: data.x,
+          top: data.y,
+        })
+      }
+    >
+      <form className="activity">
+        <div className="card">
+          <div className="card-header d-flex w-100 align-items-center justify-content-between js-drag-handle">
+            <h5>Aktivität</h5>
+            <button
+              className="btn btn-outline-secondary"
+              type="button"
+              onClick={() => setShowSettings(!showSettings)}
+            >
+              &#x2056;
+            </button>
+          </div>
+          <div className="card-body" style={style}>
+            {showSettings ? (
+              <div className="activity-settings d-flex align-items-center justify-content-between">
+                <input
+                  type="color"
+                  value={color || "#e3f2fd"}
+                  onChange={e => update({color: e.target.value})}
+                />
+                {/*
                   <button className="btn btn-secondary" type="button">
                     Duplicate
                   </button>
                   */}
-                  <button
-                    className="btn btn-danger"
-                    type="button"
-                    onClick={() => {
-                      dispatch({type: "REMOVE_ACTIVITY", activity: id})
-                    }}
-                  >
-                    Remove
-                  </button>
-                </div>
-              ) : null}
-              <div className="form-group">
-                <label>Projekt</label>
-                <input type="text" className="form-control" />
+                <button
+                  className="btn btn-danger"
+                  type="button"
+                  onClick={() => {
+                    dispatch({type: "REMOVE_ACTIVITY", activity: id})
+                  }}
+                >
+                  Remove
+                </button>
               </div>
-              <div className="form-group">
-                <label>Leistung</label>
-                <input type="text" className="form-control" />
-              </div>
-              <div className="form-group">
-                <label>Tätigkeit</label>
-                <textarea
-                  className="form-control"
-                  rows="3"
-                  value={description}
-                  onChange={e => update({description: e.target.value})}
-                />
-              </div>
-              <div className="activity-duration">{prettyDuration(seconds)}</div>
+            ) : null}
+            <div className="form-group">
+              <label>Projekt</label>
+              <input type="text" className="form-control" />
             </div>
-            <div className="card-footer d-flex justify-content-between">
-              <button className="btn btn-success">Pause</button>
-              <button className="btn btn-primary">Send</button>
+            <div className="form-group">
+              <label>Leistung</label>
+              <input type="text" className="form-control" />
             </div>
+            <div className="form-group">
+              <label>Tätigkeit</label>
+              <textarea
+                className="form-control"
+                rows="3"
+                value={description}
+                onChange={e => update({description: e.target.value})}
+              />
+            </div>
+            <div className="activity-duration">{prettyDuration(mySeconds)}</div>
           </div>
-        </form>
-      </Draggable>
-    )
-  }
-)
+          <div className="card-footer d-flex justify-content-between">
+            <button
+              className="btn btn-success"
+              type="button"
+              onClick={e => {
+                e.preventDefault()
+                if (isActive) {
+                  dispatch({
+                    type: "STOP",
+                    current: current,
+                  })
+                } else {
+                  dispatch({
+                    type: "START",
+                    activity: id,
+                    current: current,
+                  })
+                }
+              }}
+            >
+              {isActive ? "Pause" : "Start"}
+            </button>
+            <button className="btn btn-primary" type="button">
+              Send
+            </button>
+          </div>
+        </div>
+      </form>
+    </Draggable>
+  )
+})
