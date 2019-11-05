@@ -21,6 +21,10 @@ html {
   position: absolute;
 }
 
+.activity:focus-within {
+  z-index: 1;
+}
+
 .js-drag-handle {
   cursor: move;
 }
