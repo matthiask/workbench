@@ -5,11 +5,17 @@ import {connect} from "react-redux"
 import {clamp, prettyDuration} from "./utils.js"
 
 export const Activity = connect()(
-  ({description, seconds, id, top, left, dispatch}) => {
+  ({description, seconds, id, top, left, color, dispatch}) => {
     const [showSettings, setShowSettings] = useState(false)
-    const [color, setColor] = useState("#e3f2fd")
 
-    const style = {backgroundColor: color}
+    const update = fields =>
+      dispatch({
+        type: "UPDATE_ACTIVITY",
+        activity: id,
+        fields,
+      })
+
+    const style = {backgroundColor: color || "#e3f2fd"}
     return (
       <Draggable
         handle=".js-drag-handle"
@@ -21,16 +27,12 @@ export const Activity = connect()(
           ) /* TODO use innerWidth / innerHeight of window */,
           y: clamp(top, 0, 500),
         }}
-        onStop={(e, data) => {
-          dispatch({
-            type: "UPDATE_ACTIVITY",
-            activity: id,
-            fields: {
-              left: data.x,
-              top: data.y,
-            },
+        onStop={(e, data) =>
+          update({
+            left: data.x,
+            top: data.y,
           })
-        }}
+        }
       >
         <form className="activity">
           <div className="card">
@@ -49,8 +51,8 @@ export const Activity = connect()(
                 <div className="activity-settings d-flex align-items-center justify-content-between">
                   <input
                     type="color"
-                    value={color}
-                    onChange={e => setColor(e.target.value)}
+                    value={color || "#e3f2fd"}
+                    onChange={e => update({color: e.target.value})}
                   />
                   {/*
                   <button className="btn btn-secondary" type="button">
@@ -82,13 +84,7 @@ export const Activity = connect()(
                   className="form-control"
                   rows="3"
                   value={description}
-                  onChange={e =>
-                    dispatch({
-                      type: "UPDATE_ACTIVITY",
-                      activity: id,
-                      fields: {description: e.target.value},
-                    })
-                  }
+                  onChange={e => update({description: e.target.value})}
                 />
               </div>
               <div className="activity-duration">{prettyDuration(seconds)}</div>
