@@ -7,7 +7,7 @@ export const Activities = connect(({activities}) => ({activities}))(
   ({activities}) => (
     <div className="activity-list">
       {activities.map(activity => (
-        <Activity key={activity.id} {...activity} />
+        <Activity key={activity.id} activity={activity} />
       ))}
     </div>
   )
