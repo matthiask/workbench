@@ -34,6 +34,7 @@ INSTALLED_APPS = [
         "bootstrap4",
         "django_countries",
         "authlib",
+        "corsheaders",
         "fineforms",
         "django.forms",
         "workbench.accounts",
@@ -64,6 +65,7 @@ MIDDLEWARE = [
     for m in [
         "django.middleware.security.SecurityMiddleware" if LIVE else "",
         "debug_toolbar.middleware.DebugToolbarMiddleware" if DEBUG else "",
+        "corsheaders.middleware.CorsMiddleware",
         "django.contrib.sessions.middleware.SessionMiddleware",
         "django.middleware.common.CommonMiddleware",
         "django.middleware.locale.LocaleMiddleware",
@@ -234,6 +236,8 @@ else:
 MAILCHIMP_API_KEY = env("MAILCHIMP_API_KEY", warn=True)
 MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID", warn=True)
 GLASSFROG_TOKEN = env("GLASSFROG_TOKEN", warn=True)
+CORS_ORIGIN_WHITELIST = env("CORS_ORIGIN_WHITELIST")
+CORS_ALLOW_CREDENTIALS = True
 
 
 if DEBUG:  # pragma: no cover
