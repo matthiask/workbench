@@ -38,5 +38,8 @@ module.exports = merge(common, {
      * Only update what has changed.
      */
     new webpack.HotModuleReplacementPlugin(),
+    new webpack.DefinePlugin({
+      __API_HOST: JSON.stringify("http://127.0.0.1:8000"),
+    }),
   ],
 })
