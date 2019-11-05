@@ -37,9 +37,11 @@ export const Activity = connect()(
                     value={color}
                     onChange={e => setColor(e.target.value)}
                   />
+                  {/*
                   <button className="btn btn-secondary" type="button">
                     Duplicate
                   </button>
+                  */}
                   <button
                     className="btn btn-danger"
                     type="button"
