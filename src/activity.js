@@ -1,10 +1,17 @@
 import React from "react"
 
 export const Activity = _props => {
+  const style = {
+    left: `${Math.floor(Math.random() * 500)}px`,
+    top: `${Math.floor(Math.random() * 100)}px`,
+  }
   return (
-    <form>
+    <form className="activity" style={style}>
       <div className="card">
-        <div className="card-header"></div>
+        <div className="card-header d-flex w-100 align-items-center justify-content-between">
+          <h5>Aktivität</h5>
+          <button className="btn btn-primary">&#x2056;</button>
+        </div>
         <div className="card-body">
           <div className="form-group">
             <label>Projekt</label>
@@ -20,9 +27,9 @@ export const Activity = _props => {
           </div>
           <span>0:13:29</span>
         </div>
-        <div className="card-footer">
-          <button className="btn">Pause</button>
-          <button className="btn">Send</button>
+        <div className="card-footer d-flex justify-content-between">
+          <button className="btn btn-success">Pause</button>
+          <button className="btn btn-primary">Send</button>
         </div>
       </div>
     </form>

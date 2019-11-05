@@ -13,7 +13,13 @@ const store = configureStore()
 export const App = () => {
   return (
     <ReduxProvider store={store}>
-      <Activity />
+      <header className="timer-header">
+        <h1>Timer</h1>
+      </header>
+      <div className="activity-list">
+        <Activity />
+        <Activity />
+      </div>
     </ReduxProvider>
   )
 }

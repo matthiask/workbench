@@ -2,4 +2,21 @@
 
 html {
   font-size: $root-font-size;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.activity-list {
+  flex: 1 0 auto;
+  position: relative;
+}
+
+.activity {
+  max-width: 20rem;
+  position: absolute;
 }
