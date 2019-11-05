@@ -1,6 +1,8 @@
 import React, {useState, useRef, useEffect} from "react"
 import Draggable from "react-draggable"
 import {connect} from "react-redux"
+import Select from "react-select"
+import AsyncSelect from "react-select/async"
 
 import {clamp, prettyDuration, timestamp, containsJSON} from "./utils.js"
 import {endpointUrl} from "./endpoints.js"
@@ -30,64 +32,21 @@ export const Activity = connect((state, ownProps) => ({
     projectLabel,
   } = activity
   const [showSettings, setShowSettings] = useState(false)
-  const projectInput = useRef(null)
-  const serviceInput = useRef(null)
+
+  const [services, setServices] = useState([])
 
   useEffect(() => {
-    if (projectInput) {
-      const $projectInput = window.$(projectInput.current)
-      $projectInput.autocomplete({
-        minLength: 2,
-        source: async function(request, response) {
-          try {
-            const res = await fetchProjects(request.term)
-            if (res.ok && containsJSON(res)) {
-              const data = await res.json()
-              response(data.results)
-            } else {
-              console.error(res.status, res.statusText)
-            }
-          } catch (err) {
-            console.error(err)
-          }
-        },
-        focus: function(event, ui) {
-          $projectInput.val(ui.item.label)
-          return false
-        },
-        select: function(event, ui) {
-          $projectInput.val(ui.item.label)
-          update({projectLabel: ui.item.label, project: ui.item.value})
-          // input.val(ui.item.value).trigger("change")
-          return false
-        },
+    const servicesRequest = fetchServices(project)
+      .then(response => response.json())
+      .then(data => {
+        setServices(
+          data.services.map(row => ({
+            label: row[1],
+            value: row[0],
+          }))
+        )
       })
-    }
-
-    return () =>
-      projectInput.current &&
-      window.$(projectInput.current).autocomplete("destroy")
-  }, [projectInput])
-
-  useEffect(() => {
-    if (project && serviceInput) {
-      const $serviceInput = window.$(serviceInput.current).autocomplete()
-      const services = fetchServices(project)
-        .then(response => response.json())
-        .then(data => {
-          $serviceInput.autocomplete({
-            source: data.services.map(row => ({
-              label: row[1],
-              value: row[0],
-            })),
-          })
-        })
-    }
-
-    return () =>
-      serviceInput.current &&
-      window.$(serviceInput.current).autocomplete("destroy")
-  }, [project, serviceInput])
+  }, [project])
 
   const update = fields =>
     dispatch({
@@ -166,16 +125,25 @@ export const Activity = connect((state, ownProps) => ({
             ) : null}
             <div className="form-group">
               <label>Projekt</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder={projectLabel}
-                ref={projectInput}
+              <AsyncSelect
+                loadOptions={async (inputValue, callback) => {
+                  const projects = await fetchProjects(inputValue)
+                  const data = await projects.json()
+                  callback(data.results)
+                }}
+                onChange={row => {
+                  update({project: row.value, projectLabel: row.label})
+                }}
               />
             </div>
             <div className="form-group">
               <label>Leistung</label>
-              <input type="text" className="form-control" ref={serviceInput} />
+              <Select
+                options={services}
+                onChange={row => {
+                  update({service: row.value, serviceLabel: row.label})
+                }}
+              />
             </div>
             <div className="form-group">
               <label>Tätigkeit</label>
