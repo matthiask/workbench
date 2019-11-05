@@ -10,6 +10,11 @@ const fetchProjects = q => {
   return fetch(url, {credentials: "include"})
 }
 
+const fetchServices = project => {
+  const url = endpointUrl({name: "services", urlParams: [project]})
+  return fetch(url, {credentials: "include"})
+}
+
 export const Activity = connect((state, ownProps) => ({
   ...ownProps,
   current: state.current,
@@ -21,6 +26,7 @@ export const Activity = connect((state, ownProps) => ({
     top,
     left,
     color,
+    project,
     projectLabel,
     current,
     dispatch,
@@ -60,15 +66,30 @@ export const Activity = connect((state, ownProps) => ({
         })
       }
 
-      if (serviceInput) {
-        window.$(serviceInput.current).autocomplete()
+      return () =>
+        projectInput.current &&
+        window.$(projectInput.current).autocomplete("destroy")
+    }, [projectInput])
+
+    useEffect(() => {
+      if (project && serviceInput) {
+        const $serviceInput = window.$(serviceInput.current).autocomplete()
+        const services = fetchServices(project)
+          .then(response => response.json())
+          .then(data => {
+            $serviceInput.autocomplete({
+              source: data.services.map(row => ({
+                label: row[1],
+                value: row[0],
+              })),
+            })
+          })
       }
 
-      return () => {
-        window.$(projectInput.current).autocomplete("destroy")
+      return () =>
+        serviceInput.current &&
         window.$(serviceInput.current).autocomplete("destroy")
-      }
-    }, [projectInput, serviceInput])
+    }, [project, serviceInput])
 
     const update = fields =>
       dispatch({
