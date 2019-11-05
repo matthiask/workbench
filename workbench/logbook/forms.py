@@ -203,6 +203,9 @@ class LoggedHoursForm(ModelForm):
                 )
                 if latest_on_project:
                     initial.setdefault("service", latest_on_project.service_id)
+
+            if request.GET.get("description"):
+                initial["description"] = request.GET.get("description")
         else:
             self.project = kwargs["instance"].service.project
 
