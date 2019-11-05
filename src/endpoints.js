@@ -1,7 +1,7 @@
 const API = {
   host: __API_HOST,
   endpoints: {
-    projects: q => `projects/autocomplete/?q=${q}/`,
+    projects: q => `projects/autocomplete/?q=${q}&only_open=1`,
     services: id => `projects/${id}/services/`,
     createHours: id => `projects/${id}/createhours/`,
   },
