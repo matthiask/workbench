@@ -1,16 +1,16 @@
 import {combineReducers} from "redux"
 
-function timers(state = [], action) {
+function activities(state = [], action) {
   switch (action.type) {
-    case "ADD_TIMER":
-      return state.concat([action.timer])
+    case "ADD_ACTIVITY":
+      return state.concat([action.activity])
     default:
       return state
   }
 }
 
 const reducer = combineReducers({
-  timers,
+  activities,
 })
 
 export default reducer

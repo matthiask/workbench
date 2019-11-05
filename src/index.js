@@ -6,7 +6,8 @@ import {Provider as ReduxProvider} from "react-redux"
 
 import {configureStore} from "./store/store.js"
 
-import {Activity} from "./activity.js"
+import {Activities} from "./activities.js"
+import {CreateActivity} from "./createActivity.js"
 
 const store = configureStore()
 
@@ -16,10 +17,8 @@ export const App = () => {
       <header className="timer-header">
         <h1>Timer</h1>
       </header>
-      <div className="activity-list">
-        <Activity />
-        <Activity />
-      </div>
+      <Activities />
+      <CreateActivity />
     </ReduxProvider>
   )
 }

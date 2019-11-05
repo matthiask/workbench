@@ -2,7 +2,8 @@ export function timestamp() {
   return Math.floor(new Date().getTime() / 1000)
 }
 
-export function prettyDuration(seconds) {
+export function prettyDuration(secondsArgument) {
+  const seconds = Math.floor(secondsArgument) || 0
   const hours = Math.floor(seconds / 3600)
   const displayHours = hours ? `${hours}h ` : ""
   const displayMinutes = Math.floor(seconds / 60) % 60
