@@ -1,13 +1,63 @@
-import React, {useState} from "react"
+import React, {useState, useRef, useEffect} from "react"
 import Draggable from "react-draggable"
 import {connect} from "react-redux"
 
-import {prettyDuration} from "./utils.js"
+import {prettyDuration, containsJSON} from "./utils.js"
+import {endpointUrl} from "./endpoints.js"
+
+const fetchProjects = q => {
+  const url = endpointUrl({name: "projects", urlParams: [q]})
+  return fetch(url, {credentials: "include"})
+}
 
 export const Activity = connect()(
   ({description, seconds, id, top, left, dispatch}) => {
     const [showSettings, setShowSettings] = useState(false)
     const [color, setColor] = useState("#e3f2fd")
+    const [_project, setProject] = useState(null)
+    const projectInput = useRef(null)
+    const serviceInput = useRef(null)
+
+    useEffect(() => {
+      if (projectInput) {
+        const $projectInput = window.$(projectInput.current)
+        $projectInput.autocomplete({
+          minLength: 2,
+          source: async function(request, response) {
+            try {
+              const res = await fetchProjects(request.term)
+              if (res.ok && containsJSON(res)) {
+                const data = await res.json()
+                response(data.results)
+              } else {
+                console.error(res.status, res.statusText)
+              }
+            } catch (err) {
+              console.error(err)
+            }
+          },
+          focus: function(event, ui) {
+            $projectInput.val(ui.item.label)
+            return false
+          },
+          select: function(event, ui) {
+            $projectInput.val(ui.item.label)
+            setProject(ui.item.value)
+            // input.val(ui.item.value).trigger("change")
+            return false
+          },
+        })
+      }
+
+      if (serviceInput) {
+        window.$(serviceInput.current).autocomplete()
+      }
+
+      return () => {
+        window.$(projectInput.current).autocomplete("destroy")
+        window.$(serviceInput.current).autocomplete("destroy")
+      }
+    }, [projectInput, serviceInput])
 
     const style = {backgroundColor: color}
     return (
@@ -55,11 +105,19 @@ export const Activity = connect()(
               ) : null}
               <div className="form-group">
                 <label>Projekt</label>
-                <input type="text" className="form-control" />
+                <input
+                  type="text"
+                  className="form-control"
+                  ref={projectInput}
+                />
               </div>
               <div className="form-group">
                 <label>Leistung</label>
-                <input type="text" className="form-control" />
+                <input
+                  type="text"
+                  className="form-control"
+                  ref={serviceInput}
+                />
               </div>
               <div className="form-group">
                 <label>Tätigkeit</label>
