@@ -29,8 +29,14 @@ $(function() {
   }
 
   window.openModalFromUrl = function(url) {
-    $.get(url, function(data) {
-      initModal(data)
+    $.ajax({
+      url: url,
+      success: function(data) {
+        initModal(data)
+      },
+      xhrFields: {
+        withCredentials: true,
+      },
     })
   }
 
