@@ -98,6 +98,7 @@ export const Activity = connect((state, ownProps) => ({
                 rows="3"
                 value={description}
                 onChange={e => update({description: e.target.value})}
+                placeholder="Was willst Du erreichen?"
               />
             </div>
             <div className="activity-duration">{prettyDuration(mySeconds)}</div>
