@@ -1,6 +1,8 @@
 import React from "react"
 import Draggable from "react-draggable"
 
+import {prettyDuration} from "./utils.js"
+
 export const Activity = _props => {
   const style = {
     left: `${Math.floor(Math.random() * 500)}px`,
@@ -27,7 +29,7 @@ export const Activity = _props => {
               <label>Tätigkeit</label>
               <textarea className="form-control" rows="3" />
             </div>
-            <span>0:13:29</span>
+            <span>{prettyDuration(Math.floor(Math.random() * 10800))}</span>
           </div>
           <div className="card-footer d-flex justify-content-between">
             <button className="btn btn-success">Pause</button>
