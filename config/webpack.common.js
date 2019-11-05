@@ -1,7 +1,7 @@
-const paths = require('./paths')
-const { CleanWebpackPlugin } = require('clean-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const paths = require("./paths")
+const {CleanWebpackPlugin} = require("clean-webpack-plugin")
+const CopyWebpackPlugin = require("copy-webpack-plugin")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 module.exports = {
   /**
@@ -10,7 +10,7 @@ module.exports = {
    * The first place Webpack looks to start building the bundle.
    */
   entry: {
-    main: paths.src + '/index.js',
+    main: paths.src + "/index.js",
   },
 
   /**
@@ -20,7 +20,7 @@ module.exports = {
    */
   output: {
     path: paths.build,
-    filename: '[name].bundle.js',
+    filename: "[name].bundle.js",
   },
 
   /**
@@ -44,8 +44,8 @@ module.exports = {
     new CopyWebpackPlugin([
       {
         from: paths.static,
-        to: 'assets',
-        ignore: ['*.DS_Store'],
+        to: "assets",
+        ignore: ["*.DS_Store"],
       },
     ]),
 
@@ -55,10 +55,10 @@ module.exports = {
      * Generates an HTML file from a template.
      */
     new HtmlWebpackPlugin({
-      title: 'Webpack Boilerplate',
+      title: "Webpack Boilerplate",
       // favicon: paths.src + '/images/favicon.png',
-      template: paths.src + '/template.html', // template file
-      filename: 'index.html', // output file
+      template: paths.src + "/template.html", // template file
+      filename: "index.html", // output file
     }),
   ],
 
@@ -77,7 +77,7 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: ['babel-loader'],
+        use: ["babel-loader"],
       },
 
       /**
@@ -88,10 +88,10 @@ module.exports = {
       {
         test: /\.(scss|css)$/,
         use: [
-          'style-loader',
-          { loader: 'css-loader', options: { sourceMap: true, importLoaders: 1 } },
-          { loader: 'postcss-loader', options: { sourceMap: true } },
-          { loader: 'sass-loader', options: { sourceMap: true } },
+          "style-loader",
+          {loader: "css-loader", options: {sourceMap: true, importLoaders: 1}},
+          {loader: "postcss-loader", options: {sourceMap: true}},
+          {loader: "sass-loader", options: {sourceMap: true}},
         ],
       },
 
@@ -102,10 +102,10 @@ module.exports = {
        */
       {
         test: /\.(?:ico|gif|png|jpg|jpeg|webp|svg)$/i,
-        loader: 'file-loader',
+        loader: "file-loader",
         options: {
-          name: '[path][name].[ext]',
-          context: 'src', // prevent display of src/ in filename
+          name: "[path][name].[ext]",
+          context: "src", // prevent display of src/ in filename
         },
       },
 
@@ -116,11 +116,11 @@ module.exports = {
        */
       {
         test: /\.(woff(2)?|eot|ttf|otf|)$/,
-        loader: 'url-loader',
+        loader: "url-loader",
         options: {
           limit: 8192,
-          name: '[path][name].[ext]',
-          context: 'src', // prevent display of src/ in filename
+          name: "[path][name].[ext]",
+          context: "src", // prevent display of src/ in filename
         },
       },
     ],
