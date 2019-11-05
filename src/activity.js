@@ -22,7 +22,7 @@ export const Activity = connect()(
             <div className="card-header d-flex w-100 align-items-center justify-content-between js-drag-handle">
               <h5>Aktivität</h5>
               <button
-                className="btn btn-primary"
+                className="btn btn-outline-secondary"
                 type="button"
                 onClick={() => setShowSettings(!showSettings)}
               >

@@ -14,11 +14,11 @@ const store = configureStore()
 export const App = () => {
   return (
     <ReduxProvider store={store}>
-      <header className="timer-header">
-        <h1>Timer</h1>
-      </header>
+      <nav className="navbar navbar-light bg-light">
+        <span className="navbar-brand">Timer</span>
+        <CreateActivity />
+      </nav>
       <Activities />
-      <CreateActivity />
     </ReduxProvider>
   )
 }

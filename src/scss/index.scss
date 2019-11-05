@@ -11,6 +11,10 @@ html {
   flex-flow: column nowrap;
 }
 
+.navbar {
+  margin-bottom: 0.5rem;
+}
+
 .activity-list {
   flex: 1 0 auto;
   position: relative;
@@ -46,4 +50,8 @@ html {
 
 .js-drag-handle {
   cursor: move;
+}
+
+.create-activity input {
+  max-width: none !important;
 }
