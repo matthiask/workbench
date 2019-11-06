@@ -9,6 +9,7 @@ import {configureStore} from "./store/store.js"
 
 import {Activities} from "./activities.js"
 import {CreateActivity} from "./createActivity.js"
+import {initOneWindow} from "./oneWindow.js"
 
 const store = configureStore()
 
@@ -25,3 +26,4 @@ export const App = () => {
 }
 
 ReactDOM.render(<App />, document.getElementById("root"))
+initOneWindow()
