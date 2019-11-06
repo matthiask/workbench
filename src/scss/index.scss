@@ -24,6 +24,8 @@ html {
   width: 20rem;
   position: absolute;
 
+  transition: background-color 0.2s ease-in-out;
+
   .activity-body {
     position: relative;
   }
@@ -59,6 +61,7 @@ html {
     margin: 0 0.5rem 0 0;
     border-radius: 50%;
     border: 1px solid #ccc;
+    cursor: pointer;
   }
 
   input {
@@ -76,6 +79,11 @@ html {
 
 .form-group {
   margin: 0.25rem 0;
+}
+
+.form-group textarea,
+.select .select__control {
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 .select__placeholder {
