@@ -17,6 +17,21 @@ const fetchServices = project => {
   return fetch(url, {credentials: "include"})
 }
 
+const COLORS = [
+  "#ffffff", // white
+  "#f28b82", // red
+  "#fbbc04", // orange
+  "#fff475", // yellow
+  "#ccff90", // green
+  "#a7ffeb", // teal
+  "#cbf0f8", // blue
+  "#aecbfa", // dark blue
+  "#d7aefb", // purple
+  "#fdcfe8", // pink
+  "#e6c9a8", // brown
+  "#e8eaed", // gray
+]
+
 export const Activity = connect((state, ownProps) => ({
   ...ownProps,
   current: state.current,
@@ -69,20 +84,25 @@ export const Activity = connect((state, ownProps) => ({
     return () => clearInterval(interval)
   }, [isActive])
 
-  const style = {backgroundColor: color || "#e3f2fd"}
+  if (COLORS.indexOf(color) === -1) {
+    update({color: COLORS[0]})
+  }
 
   const settingsPanel = showSettings ? (
-    <div className="activity-settings d-flex align-items-center justify-content-between">
-      <input
-        type="color"
-        value={color || "#e3f2fd"}
-        onChange={e => update({color: e.target.value})}
-      />
-      {/*
-                  <button className="btn btn-secondary" type="button">
-                    Duplicate
-                  </button>
-                  */}
+    <div className="activity-settings">
+      <div className="activity-color-chooser">
+        {COLORS.map(c => (
+          <label key={c} style={{backgroundColor: c}}>
+            <input
+              type="radio"
+              name="color"
+              value={c}
+              selected={c == color}
+              onClick={() => update({color: c})}
+            />
+          </label>
+        ))}
+      </div>
       <button
         className="btn btn-danger"
         type="button"
@@ -113,7 +133,10 @@ export const Activity = connect((state, ownProps) => ({
         })
       }
     >
-      <form className="activity card px-2 py-2" style={style}>
+      <form
+        className="activity card px-2 py-2"
+        style={{backgroundColor: color}}
+      >
         <div className="py-2 px-2 d-flex align-items-center justify-content-between js-drag-handle">
           <h5>Aktivität</h5>
           <button
@@ -124,7 +147,7 @@ export const Activity = connect((state, ownProps) => ({
             &#x2056;
           </button>
         </div>
-        <div className="activity-body" style={style}>
+        <div className="activity-body">
           {settingsPanel}
           <div className="form-group">
             <AsyncSelect
