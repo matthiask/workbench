@@ -71,6 +71,30 @@ export const Activity = connect((state, ownProps) => ({
 
   const style = {backgroundColor: color || "#e3f2fd"}
 
+  const settingsPanel = showSettings ? (
+    <div className="activity-settings d-flex align-items-center justify-content-between">
+      <input
+        type="color"
+        value={color || "#e3f2fd"}
+        onChange={e => update({color: e.target.value})}
+      />
+      {/*
+                  <button className="btn btn-secondary" type="button">
+                    Duplicate
+                  </button>
+                  */}
+      <button
+        className="btn btn-danger"
+        type="button"
+        onClick={() => {
+          dispatch({type: "REMOVE_ACTIVITY", activity: id})
+        }}
+      >
+        Remove
+      </button>
+    </div>
+  ) : null
+
   return (
     <Draggable
       handle=".js-drag-handle"
@@ -89,78 +113,57 @@ export const Activity = connect((state, ownProps) => ({
         })
       }
     >
-      <form className="activity">
-        <div className="card">
-          <div className="card-header d-flex w-100 align-items-center justify-content-between js-drag-handle">
-            <h5>Aktivität</h5>
-            <button
-              className="btn btn-outline-secondary"
-              type="button"
-              onClick={() => setShowSettings(!showSettings)}
-            >
-              &#x2056;
-            </button>
+      <form className="activity card px-2 py-2" style={style}>
+        <div className="py-2 px-2 d-flex align-items-center justify-content-between js-drag-handle">
+          <h5>Aktivität</h5>
+          <button
+            className="btn btn-outline-secondary btn-sm"
+            type="button"
+            onClick={() => setShowSettings(!showSettings)}
+          >
+            &#x2056;
+          </button>
+        </div>
+        <div className="activity-body" style={style}>
+          {settingsPanel}
+          <div className="form-group">
+            <AsyncSelect
+              className="select"
+              classNamePrefix="select"
+              loadOptions={async (inputValue, callback) => {
+                const projects = await fetchProjects(inputValue)
+                const data = await projects.json()
+                callback(data.results)
+              }}
+              onChange={row => {
+                update({project: row.value, projectLabel: row.label})
+              }}
+              placeholder={projectLabel}
+            />
           </div>
-          <div className="card-body" style={style}>
-            {showSettings ? (
-              <div className="activity-settings d-flex align-items-center justify-content-between">
-                <input
-                  type="color"
-                  value={color || "#e3f2fd"}
-                  onChange={e => update({color: e.target.value})}
-                />
-                {/*
-                  <button className="btn btn-secondary" type="button">
-                    Duplicate
-                  </button>
-                  */}
-                <button
-                  className="btn btn-danger"
-                  type="button"
-                  onClick={() => {
-                    dispatch({type: "REMOVE_ACTIVITY", activity: id})
-                  }}
-                >
-                  Remove
-                </button>
-              </div>
-            ) : null}
-            <div className="form-group">
-              <label>Projekt</label>
-              <AsyncSelect
-                loadOptions={async (inputValue, callback) => {
-                  const projects = await fetchProjects(inputValue)
-                  const data = await projects.json()
-                  callback(data.results)
-                }}
-                onChange={row => {
-                  update({project: row.value, projectLabel: row.label})
-                }}
-                placeholder={projectLabel}
-              />
-            </div>
-            <div className="form-group">
-              <label>Leistung</label>
-              <Select
-                options={services}
-                onChange={row => {
-                  update({service: row.value, serviceLabel: row.label})
-                }}
-              />
-            </div>
-            <div className="form-group">
-              <label>Tätigkeit</label>
-              <textarea
-                className="form-control"
-                rows="3"
-                value={description}
-                onChange={e => update({description: e.target.value})}
-                placeholder="Was willst Du erreichen?"
-              />
-            </div>
-            <div className="activity-duration">{prettyDuration(mySeconds)}</div>
+          <div className="form-group">
+            <Select
+              className="select"
+              classNamePrefix="select"
+              options={services}
+              onChange={row => {
+                update({service: row.value, serviceLabel: row.label})
+              }}
+            />
           </div>
-          <div className="card-footer d-flex justify-content-between">
+          <div className="form-group">
+            <textarea
+              className="form-control"
+              rows="2"
+              value={description}
+              onChange={e => update({description: e.target.value})}
+              placeholder="Was willst Du erreichen?"
+            />
+          </div>
+          <div className="activity-duration mb-2">
+            {prettyDuration(mySeconds)}
+          </div>
+          <div className="d-flex justify-content-between">
             <button
               className="btn btn-success"
               type="button"

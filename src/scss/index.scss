@@ -24,7 +24,7 @@ html {
   width: 20rem;
   position: absolute;
 
-  .card-body {
+  .activity-body {
     position: relative;
   }
 }
@@ -35,7 +35,7 @@ html {
 
 .activity-duration {
   text-align: center;
-  font-size: 2rem;
+  font-size: 1.5rem;
 }
 
 .activity-settings {
@@ -43,6 +43,7 @@ html {
   top: 0;
   right: 0;
   left: 0;
+  z-index: 1;
   padding: 1rem;
   background: #fff;
   box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.7);
@@ -54,4 +55,14 @@ html {
 
 .create-activity input {
   max-width: none !important;
+}
+
+.form-group {
+  margin: 0.25rem 0;
+}
+
+.select__placeholder {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
