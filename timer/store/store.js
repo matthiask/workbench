@@ -15,8 +15,7 @@ export function configureStore(initialState = undefined) {
     compose(
       persistState(null, {
         serialize: data => {
-          data._v = VERSION
-          return JSON.stringify(data)
+          return JSON.stringify({...data, _v: VERSION})
         },
         deserialize: blob => {
           let parsed = JSON.parse(blob)
