@@ -58,3 +58,14 @@ def services(request, pk):
             ],
         }
     )
+
+
+def projects(request):
+    return JsonResponse(
+        {
+            "projects": [
+                {"label": str(project), "value": project.pk}
+                for project in request.user.active_projects
+            ],
+        }
+    )

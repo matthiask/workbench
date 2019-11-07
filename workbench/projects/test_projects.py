@@ -449,6 +449,13 @@ class ProjectsTest(TestCase):
         response = self.client.get(service.project.urls["services"])
         self.assertEqual(response["content-type"], "application/json")
 
+    def test_projects_api(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        response = self.client.get(Project.urls["projects"])
+        self.assertEqual(response["content-type"], "application/json")
+
     def test_assign_service_types(self):
         service = factories.ServiceFactory.create()
         self.client.force_login(service.project.owned_by)
