@@ -188,7 +188,7 @@ export const Activity = connect((state, ownProps) => ({
               onChange={row => {
                 update({service: row})
               }}
-              placeholder={service.label}
+              placeholder={service && service.label}
             />
           </div>
           <div className="form-group">
