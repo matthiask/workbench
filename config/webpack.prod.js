@@ -2,7 +2,6 @@ const paths = require("./paths")
 const webpack = require("webpack")
 const merge = require("webpack-merge")
 const common = require("./webpack.common.js")
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const TerserJSPlugin = require("terser-webpack-plugin")
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin")
 
@@ -11,41 +10,14 @@ module.exports = merge(common, {
   output: {
     path: paths.build,
     publicPath: "/timerr/",
-    filename: "[name].[contenthash].bundle.js",
+    filename: "[name].bundle.js",
   },
-  devtool: "source-map",
+  // devtool: "source-map",
   plugins: [
-    /**
-     * MiniCssExtractPlugin
-     *
-     * Extracts CSS into separate files.
-     *
-     * Note: style-loader is for development, MiniCssExtractPlugin is for production.
-     * They cannot be used together in the same config.
-     */
-    new MiniCssExtractPlugin({
-      filename: "styles/[name].[contenthash].css",
-      chunkFilename: "[id].css",
-    }),
     new webpack.DefinePlugin({
       __API_HOST: JSON.stringify("/"),
     }),
   ],
-  module: {
-    rules: [
-      {
-        test: /\.(scss|css)$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-          },
-          "css-loader",
-          "postcss-loader",
-          "sass-loader",
-        ],
-      },
-    ],
-  },
   /**
    * Optimization
    *
