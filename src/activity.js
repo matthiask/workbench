@@ -160,6 +160,7 @@ export const Activity = connect((state, ownProps) => ({
               }}
               onChange={row => {
                 update({project: row.value, projectLabel: row.label})
+                setServices([])
               }}
               placeholder={projectLabel}
             />
