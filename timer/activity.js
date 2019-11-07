@@ -111,15 +111,28 @@ export const Activity = connect((state, ownProps) => ({
           </label>
         ))}
       </div>
-      <button
-        className="btn btn-danger"
-        type="button"
-        onClick={() => {
-          dispatch({type: "REMOVE_ACTIVITY", activity: id})
-        }}
-      >
-        Remove
-      </button>
+      <div className="d-flex justify-content-between">
+        <button
+          className="btn btn-danger"
+          type="button"
+          onClick={() => {
+            dispatch({type: "REMOVE_ACTIVITY", activity: id})
+          }}
+        >
+          Remove
+        </button>
+        <button
+          className="btn btn-warning"
+          type="button"
+          onClick={() => {
+            dispatch({type: "STOP"})
+            update({seconds: 0})
+            setShowSettings(false)
+          }}
+        >
+          Reset
+        </button>
+      </div>
     </div>
   ) : null
 
