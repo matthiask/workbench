@@ -11,15 +11,11 @@ export const CreateActivity = connect()(({dispatch}) => {
       className="form-inline create-activity"
       onSubmit={e => {
         e.preventDefault()
-        if (description.length) {
-          dispatch({
-            type: "ADD_ACTIVITY",
-            activity: {description, seconds: 0, id: createIdentifier()},
-          })
-          setDescription("")
-        } else {
-          descriptionField.current.focus()
-        }
+        dispatch({
+          type: "ADD_ACTIVITY",
+          activity: {description, seconds: 0, id: createIdentifier()},
+        })
+        setDescription("")
       }}
     >
       <div className="input-group">
