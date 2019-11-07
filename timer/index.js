@@ -40,5 +40,7 @@ export const App = () => {
   )
 }
 
-ReactDOM.render(<App />, document.getElementById("root"))
-initOneWindow()
+document.addEventListener("DOMContentLoaded", () => {
+  ReactDOM.render(<App />, document.getElementById("root"))
+  initOneWindow()
+})

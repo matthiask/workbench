@@ -9,6 +9,7 @@ django-countries
 django-debug-toolbar
 django-fineforms
 django-vanilla-views
+django-webpack-loader
 dj-database-url
 factory-boy
 flake8

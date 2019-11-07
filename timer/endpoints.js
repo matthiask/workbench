@@ -1,5 +1,5 @@
 const API = {
-  host: __API_HOST,
+  host: "/",
   endpoints: {
     activeProjects: () => "projects/projects/",
     projects: q => `projects/autocomplete/?q=${q}&only_open=1`,

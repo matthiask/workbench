@@ -13,3 +13,4 @@
 /static
 .tox
 node_modules
+tmp

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
         "authlib",
         "corsheaders",
         "fineforms",
+        "webpack_loader",
         "django.forms",
         "workbench.accounts",
         "workbench.accruals",
@@ -81,6 +82,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "workbench.urls"
 WSGI_APPLICATION = "wsgi.application"
+WEBPACK_LOADER = {
+    "DEFAULT": {
+        "STATS_FILE": os.path.join(
+            BASE_DIR, "static", "webpack-stats-%s.json" % ("dev" if DEBUG else "prod")
+        )
+    }
+}
 
 TEMPLATES = [
     {

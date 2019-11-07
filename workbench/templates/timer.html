@@ -1,11 +1,11 @@
 {% extends "site_base.html" %}
 
-{% load bootstrap4 static %}
+{% load bootstrap4 static webpack_loader %}
 
 {% block title %}Timer - {{ block.super }}{% endblock %}
 
 {% block js %}
   <div id="root"></div>
-  <script src="{% static 'workbench/lib/timer/main.bundle.js' %}"></script>
+  {% render_bundle "main" %}
   {% bootstrap_messages %}
 {% endblock %}

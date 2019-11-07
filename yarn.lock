@@ -8200,6 +8200,15 @@ wbuf@^1.1.0, wbuf@^1.7.3:
   dependencies:
     minimalistic-assert "^1.0.0"
 
+webpack-bundle-tracker@^0.4.3:
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/webpack-bundle-tracker/-/webpack-bundle-tracker-0.4.3.tgz#48a3e2226ddb9d24d704640ab4168c2d120f4526"
+  integrity sha512-Sl/+OsNhFAH3/c6XADupRu8jLvGojfXX0pZIIm3O5ZcJqkHHqlY4nLG+NVRcbDgM/jOeWimKDGQMVEa8FBeJ2g==
+  dependencies:
+    deep-extend "^0.6.0"
+    mkdirp "^0.5.1"
+    strip-ansi "^5.2.0"
+
 webpack-cli@^3.3.10:
   version "3.3.10"
   resolved "https://registry.yarnpkg.com/webpack-cli/-/webpack-cli-3.3.10.tgz#17b279267e9b4fb549023fae170da8e6e766da13"
