@@ -46,9 +46,19 @@ function current(state = null, action) {
   }
 }
 
+function projects(state = [], action) {
+  switch (action.type) {
+    case "PROJECTS":
+      return action.projects
+    default:
+      return state
+  }
+}
+
 const reducer = combineReducers({
   activities,
   current,
+  projects,
 })
 
 export default reducer

@@ -35,7 +35,8 @@ const COLORS = [
 export const Activity = connect((state, ownProps) => ({
   ...ownProps,
   current: state.current,
-}))(({activity, current, dispatch}) => {
+  projects: state.projects,
+}))(({activity, current, projects, dispatch}) => {
   const {
     description,
     seconds,
@@ -44,17 +45,21 @@ export const Activity = connect((state, ownProps) => ({
     left,
     color,
     project,
-    projectLabel,
     service,
-    serviceLabel,
   } = activity
   const [showSettings, setShowSettings] = useState(false)
 
   const [services, setServices] = useState([])
 
   useEffect(() => {
-    const servicesRequest = fetchServices(project)
-      .then(response => response.json())
+    if (!project) return
+
+    const servicesRequest = fetchServices(project.value)
+      .then(response => {
+        if (containsJSON(response)) return response.json()
+
+        throw Error("Unable to load services for project")
+      })
       .then(data => {
         setServices(
           data.services.map(row => ({
@@ -98,7 +103,10 @@ export const Activity = connect((state, ownProps) => ({
               name="color"
               value={c}
               selected={c == color}
-              onClick={() => update({color: c})}
+              onClick={() => {
+                update({color: c})
+                setShowSettings(false)
+              }}
             />
           </label>
         ))}
@@ -114,6 +122,8 @@ export const Activity = connect((state, ownProps) => ({
       </button>
     </div>
   ) : null
+
+  const isReady = description.length && mySeconds > 0 && project && service
 
   return (
     <Draggable
@@ -153,16 +163,21 @@ export const Activity = connect((state, ownProps) => ({
             <AsyncSelect
               className="select"
               classNamePrefix="select"
+              defaultOptions={projects}
               loadOptions={async (inputValue, callback) => {
                 const projects = await fetchProjects(inputValue)
-                const data = await projects.json()
-                callback(data.results)
+                if (containsJSON(projects)) {
+                  const data = await projects.json()
+                  callback(data.results)
+                } else {
+                  callback([])
+                }
               }}
-              onChange={row => {
-                update({project: row.value, projectLabel: row.label})
+              onChange={value => {
+                update({project: value})
                 setServices([])
               }}
-              placeholder={projectLabel}
+              placeholder={project ? project.label : ""}
             />
           </div>
           <div className="form-group">
@@ -171,8 +186,9 @@ export const Activity = connect((state, ownProps) => ({
               classNamePrefix="select"
               options={services}
               onChange={row => {
-                update({service: row.value, serviceLabel: row.label})
+                update({service: row})
               }}
+              placeholder={service.label}
             />
           </div>
           <div className="form-group">
@@ -184,67 +200,75 @@ export const Activity = connect((state, ownProps) => ({
               placeholder="Was willst Du erreichen?"
             />
           </div>
-          <div className="activity-duration mb-2">
-            {prettyDuration(mySeconds)}
-          </div>
-          <div className="d-flex justify-content-between">
-            <button
-              className="btn btn-success"
-              type="button"
-              onClick={e => {
-                e.preventDefault()
-                if (isActive) {
-                  dispatch({
-                    type: "STOP",
-                    current: current,
-                  })
-                } else {
-                  dispatch({
-                    type: "START",
-                    activity: id,
-                    current: current,
-                  })
-                }
-              }}
-            >
-              {isActive ? "Pause" : "Start"}
-            </button>
-            <button
-              className="btn btn-primary"
-              type="button"
-              onClick={() => {
-                const url = endpointUrl({
-                  name: "createHours",
-                  urlParams: [project],
-                })
-                const fd = new URLSearchParams()
-                fd.append("project", project)
-                fd.append("service", service)
-                fd.append("description", description)
-                fd.append("hours", Math.ceil(mySeconds / 360) / 10)
-                fd.append("date", new Date().toISOString().replace(/T.*/, ""))
+          <div className="d-flex align-items-center justify-content-between">
+            <div className="activity-duration pl-2">
+              {prettyDuration(mySeconds)}
+            </div>
+            <div>
+              <button
+                className={`btn ${
+                  isActive ? "btn-warning" : "btn-outline-secondary"
+                }`}
+                type="button"
+                onClick={e => {
+                  e.preventDefault()
+                  if (isActive) {
+                    dispatch({
+                      type: "STOP",
+                      current,
+                    })
+                  } else {
+                    dispatch({
+                      type: "START",
+                      activity: id,
+                      current,
+                    })
+                  }
+                }}
+              >
+                {isActive ? "Pause" : "Start"}
+              </button>
+              <button
+                className={`btn ${
+                  isReady ? "btn-success" : "btn-outline-success"
+                } ml-2`}
+                type="button"
+                onClick={() => {
+                  dispatch({type: "STOP", current})
 
-                const finalUrl = `${url}?${fd.toString()}`
-                console.log(finalUrl)
-                window.openModalFromUrl(finalUrl)
-
-                /*
-                if (response.status == 200) {
-                  window.initModal(await response.text())
-                } else if (response.status == 201) {
-                  // created!
-                  update({
-                    description: "",
-                    seconds: "",
+                  const url = endpointUrl({
+                    name: "createHours",
+                    urlParams: [project.value],
                   })
-                } else {
-                  alert("WTF!")
-                }
-                */
-              }}
-            >
-              Send
-            </button>
+                  const fd = new URLSearchParams()
+                  fd.append("project", project.value)
+                  fd.append("service", service.value)
+                  fd.append("description", description)
+                  fd.append("hours", Math.ceil(mySeconds / 360) / 10)
+                  fd.append("date", new Date().toISOString().replace(/T.*/, ""))
+
+                  const finalUrl = `${url}?${fd.toString()}`
+                  console.log(finalUrl)
+                  window.openModalFromUrl(finalUrl)
+
+                  /*
+                  if (response.status == 200) {
+                    window.initModal(await response.text())
+                  } else if (response.status == 201) {
+                    // created!
+                    update({
+                      description: "",
+                      seconds: "",
+                    })
+                  } else {
+                    alert("WTF!")
+                  }
+                  */
+                }}
+              >
+                Open
+              </button>
+            </div>
           </div>
         </div>
       </form>
