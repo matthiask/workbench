@@ -46,6 +46,17 @@ function current(state = null, action) {
   }
 }
 
+function modalActivity(state = null, action) {
+  switch (action.type) {
+    case "MODAL_ACTIVITY":
+      return action.activity
+    case "UPDATE_ACTIVITY":
+      return null
+    default:
+      return state
+  }
+}
+
 function projects(state = [], action) {
   switch (action.type) {
     case "PROJECTS":
@@ -58,6 +69,7 @@ function projects(state = [], action) {
 const reducer = combineReducers({
   activities,
   current,
+  modalActivity,
   projects,
 })
 

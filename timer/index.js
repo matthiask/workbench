@@ -43,4 +43,13 @@ export const App = () => {
 document.addEventListener("DOMContentLoaded", () => {
   ReactDOM.render(<App />, document.getElementById("root"))
   initOneWindow()
+
+  // window.jQuery(document).on("modalform", (e, xhrStatus, action) => {
+  window.jQuery(document).on("modalform", () => {
+    store.dispatch({
+      type: "UPDATE_ACTIVITY",
+      activity: store.getState().modalActivity,
+      fields: {seconds: 0},
+    })
+  })
 })

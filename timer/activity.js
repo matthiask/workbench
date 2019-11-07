@@ -263,6 +263,8 @@ export const Activity = connect((state, ownProps) => ({
 
                     const finalUrl = `${url}?${fd.toString()}`
                     console.log(finalUrl)
+
+                    dispatch({type: "MODAL_ACTIVITY", activity: id})
                     window.openModalFromUrl(finalUrl)
 
                     /*
