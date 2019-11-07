@@ -227,8 +227,9 @@ export const Activity = connect((state, ownProps) => ({
               </button>
               <button
                 className={`btn ${
-                  isReady ? "btn-success" : "btn-outline-success"
+                  isReady ? "btn-success" : "btn-secondary"
                 } ml-2`}
+                disabled={!project}
                 type="button"
                 onClick={() => {
                   dispatch({type: "STOP", current})
@@ -239,7 +240,7 @@ export const Activity = connect((state, ownProps) => ({
                   })
                   const fd = new URLSearchParams()
                   fd.append("project", project.value)
-                  fd.append("service", service.value)
+                  if (service) fd.append("service", service.value)
                   fd.append("description", description)
                   fd.append("hours", Math.ceil(mySeconds / 360) / 10)
                   fd.append("date", new Date().toISOString().replace(/T.*/, ""))
