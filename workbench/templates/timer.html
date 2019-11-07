@@ -5,7 +5,7 @@
 {% block title %}Timer - {{ block.super }}{% endblock %}
 
 {% block js %}
+  {% bootstrap_messages %}
   <div id="root"></div>
   {% render_bundle "main" %}
-  {% bootstrap_messages %}
 {% endblock %}
