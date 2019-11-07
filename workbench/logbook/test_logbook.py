@@ -468,7 +468,7 @@ class LogbookTest(TestCase):
         )
         response = self.client.get(
             hours.service.project.urls["createhours"]
-            + "?service={}".format(service.id),
+            + "?service={}&description=blub".format(service.id),
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
 
@@ -476,6 +476,7 @@ class LogbookTest(TestCase):
             response, '<option value="{}" selected>Bla</option>'.format(service.id)
         )
         self.assertContains(response, 'value="2.0"')  # hours
+        self.assertContains(response, "blub")
 
     def test_redirect(self):
         self.client.force_login(factories.UserFactory.create())
