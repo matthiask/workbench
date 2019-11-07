@@ -1,4 +1,3 @@
-import "babel-polyfill"
 import "./scss/index.scss"
 
 import ReactDOM from "react-dom"
