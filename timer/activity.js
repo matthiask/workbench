@@ -245,8 +245,6 @@ export const Activity = connect((state, ownProps) => ({
                   } ml-2`}
                   type="button"
                   onClick={() => {
-                    dispatch({type: "STOP", current})
-
                     const url = endpointUrl({
                       name: "createHours",
                       urlParams: [project.value],
@@ -264,6 +262,7 @@ export const Activity = connect((state, ownProps) => ({
                     const finalUrl = `${url}?${fd.toString()}`
                     console.log(finalUrl)
 
+                    dispatch({type: "STOP", current})
                     dispatch({type: "MODAL_ACTIVITY", activity: id})
                     window.openModalFromUrl(finalUrl)
 
