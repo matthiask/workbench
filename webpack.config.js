@@ -41,7 +41,7 @@ module.exports = {
     path: path.resolve("./static/workbench/timer/"),
     publicPath: DEBUG
       ? "http" + (HTTPS ? "s" : "") + "://" + HOST + ":4000/"
-      : (process.env.STATIC_URL || "/static/") + "workbench/",
+      : (process.env.STATIC_URL || "/static/") + "workbench/timer/",
     filename: DEBUG ? "[name].js" : "[name]-[contenthash].js",
   },
   module: {
