@@ -1,4 +1,3 @@
-import {localStorage} from "./storage.js"
 import {createIdentifier} from "./utils.js"
 
 const STORAGE_KEY = "one-window"
