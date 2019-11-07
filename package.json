@@ -1,7 +1,7 @@
 {
   "scripts": {
     "prettier": "prettier --write .*js *js *.scss workbench/static/workbench/* 'timer/**/*.{js,scss}'",
-    "check": "eslint src/**/*.js && prettier --list-different 'src/**/*.{js,scss}' 'config/**/*.js'",
+    "check": "eslint timer/**/*.js && prettier --list-different 'timer/**/*.{js,scss}' 'config/**/*.js'",
     "eslint": "eslint workbench/static/workbench/ timer/**/*.js",
     "build-bootstrap": "webpack -p --config webpack.config.bootstrap.js",
     "start": "cross-env NODE_ENV=development webpack-dev-server --config config/webpack.dev.js",

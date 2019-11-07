@@ -1,3 +1,5 @@
+import tempfile
+
 from fabric.api import cd, env, execute, local, run, task
 from fabric.contrib.project import rsync_project
 
@@ -9,6 +11,28 @@ env.hosts = ["deploy@workbench.feinheit.ch"]
 @task
 def check():
     local("venv/bin/flake8 .")
+    local("yarn run check")
+
+
+@task
+def dev():
+    with tempfile.NamedTemporaryFile() as f:
+        # https://gist.github.com/jiaaro/b2e1b7c705022c2cf56888152a999f65
+        f.write(
+            """\
+trap "exit" INT TERM
+trap "kill 0" EXIT
+
+PYTHONWARNINGS=always venv/bin/python manage.py runserver 0.0.0.0:%(port)s &
+HOST=%(host)s yarn run dev &
+
+for job in $(jobs -p); do wait $job; done
+"""
+            % {"port": 8000, "host": "127.0.0.1"}
+        )
+        f.flush()
+
+        local("bash %s" % f.name)
 
 
 @task
