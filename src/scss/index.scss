@@ -18,6 +18,7 @@ html {
 .activity-list {
   flex: 1 0 auto;
   position: relative;
+  overflow: hidden;
 }
 
 .activity {

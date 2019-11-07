@@ -128,13 +128,10 @@ export const Activity = connect((state, ownProps) => ({
   return (
     <Draggable
       handle=".js-drag-handle"
+      bounds="parent"
       defaultPosition={{
-        x: clamp(
-          left,
-          0,
-          500
-        ) /* TODO use innerWidth / innerHeight of window */,
-        y: clamp(top, 0, 500),
+        x: clamp(left, 0, window.innerWidth - 300),
+        y: clamp(top, 0, window.innerHeight - 300),
       }}
       onStop={(e, data) =>
         update({
@@ -144,7 +141,7 @@ export const Activity = connect((state, ownProps) => ({
       }
     >
       <form
-        className="activity card px-2 py-2"
+        className={`activity ${isActive ? "is-active" : ""} card px-2 py-2`}
         style={{backgroundColor: color}}
       >
         <div className="py-2 px-2 d-flex align-items-center justify-content-between js-drag-handle">
