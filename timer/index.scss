@@ -29,6 +29,7 @@ html {
 
   &.is-active {
     /* Add some styling */
+    z-index: 1;
   }
 
   .activity-body {
@@ -36,6 +37,7 @@ html {
   }
 }
 
+.activity:hover,
 .activity:focus-within {
   z-index: 1;
 }
