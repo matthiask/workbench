@@ -225,31 +225,34 @@ export const Activity = connect((state, ownProps) => ({
               >
                 {isActive ? "Pause" : "Start"}
               </button>
-              <button
-                className={`btn ${
-                  isReady ? "btn-success" : "btn-secondary"
-                } ml-2`}
-                disabled={!project}
-                type="button"
-                onClick={() => {
-                  dispatch({type: "STOP", current})
+              {project ? (
+                <button
+                  className={`btn ${
+                    isReady ? "btn-success" : "btn-secondary"
+                  } ml-2`}
+                  type="button"
+                  onClick={() => {
+                    dispatch({type: "STOP", current})
 
-                  const url = endpointUrl({
-                    name: "createHours",
-                    urlParams: [project.value],
-                  })
-                  const fd = new URLSearchParams()
-                  fd.append("project", project.value)
-                  if (service) fd.append("service", service.value)
-                  fd.append("description", description)
-                  fd.append("hours", Math.ceil(mySeconds / 360) / 10)
-                  fd.append("date", new Date().toISOString().replace(/T.*/, ""))
+                    const url = endpointUrl({
+                      name: "createHours",
+                      urlParams: [project.value],
+                    })
+                    const fd = new URLSearchParams()
+                    fd.append("project", project.value)
+                    if (service) fd.append("service", service.value)
+                    fd.append("description", description)
+                    fd.append("hours", Math.ceil(mySeconds / 360) / 10)
+                    fd.append(
+                      "date",
+                      new Date().toISOString().replace(/T.*/, "")
+                    )
 
-                  const finalUrl = `${url}?${fd.toString()}`
-                  console.log(finalUrl)
-                  window.openModalFromUrl(finalUrl)
+                    const finalUrl = `${url}?${fd.toString()}`
+                    console.log(finalUrl)
+                    window.openModalFromUrl(finalUrl)
 
-                  /*
+                    /*
                   if (response.status == 200) {
                     window.initModal(await response.text())
                   } else if (response.status == 201) {
@@ -262,10 +265,11 @@ export const Activity = connect((state, ownProps) => ({
                     alert("WTF!")
                   }
                   */
-                }}
-              >
-                Open
-              </button>
+                  }}
+                >
+                  Open
+                </button>
+              ) : null}
             </div>
           </div>
         </div>
