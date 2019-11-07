@@ -38,7 +38,7 @@ module.exports = {
     main: "./index.js",
   },
   output: {
-    path: path.resolve("./static/workbench/"),
+    path: path.resolve("./static/workbench/timer/"),
     publicPath: DEBUG
       ? "http" + (HTTPS ? "s" : "") + "://" + HOST + ":4000/"
       : (process.env.STATIC_URL || "/static/") + "workbench/",

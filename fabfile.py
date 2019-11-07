@@ -1,4 +1,5 @@
 from fabric.api import cd, env, execute, local, run, task
+from fabric.contrib.project import rsync_project
 
 
 env.forward_agent = True
@@ -14,6 +15,7 @@ def check():
 def deploy():
     check()
     local("git push origin master")
+    local("yarn run prod")
 
     with cd("www/workbench/"):
         run("git checkout master")
@@ -24,7 +26,10 @@ def deploy():
         run("venv/bin/pip install -r requirements.txt")
         run("venv/bin/python manage.py migrate")
         run("venv/bin/python manage.py collectstatic --noinput")
-        run("sudo systemctl restart workbench.service")
+    rsync_project(
+        local_dir="static/", remote_dir="www/workbench/static/",
+    )
+    run("sudo systemctl restart workbench.service")
 
     with cd("www/dbpag-workbench/"):
         run("git checkout master")
@@ -35,7 +40,10 @@ def deploy():
         run("venv/bin/pip install -r requirements.txt")
         run("venv/bin/python manage.py migrate")
         run("venv/bin/python manage.py collectstatic --noinput")
-        run("sudo systemctl restart dbpag-workbench.service")
+    rsync_project(
+        local_dir="static/", remote_dir="www/workbench/static/",
+    )
+    run("sudo systemctl restart dbpag-workbench.service")
 
 
 @task
