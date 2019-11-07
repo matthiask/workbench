@@ -7,24 +7,26 @@ module.exports = {
   },
   extends: [
     "eslint:recommended",
-    "prettier",
-    // "prettier/react",
-    // "plugin:react/recommended",
+    "plugin:prettier/recommended",
+    "plugin:react/recommended",
   ],
-  parser: "babel-eslint",
+  globals: {
+    Atomics: "readonly",
+    SharedArrayBuffer: "readonly",
+    __API_HOST: "readonly",
+  },
   parserOptions: {
-    ecmaVersion: 2018,
     ecmaFeatures: {
       jsx: true,
     },
+    ecmaVersion: 2018,
     sourceType: "module",
   },
-  plugins: [
-    "prettier",
-    // "react",
-    // "react-hooks",
-  ],
+  plugins: ["react", "prettier"],
   rules: {
+    "prettier/prettier": "error",
+    "react/display-name": 0,
+    "react/prop-types": 0,
     "no-unused-vars": [
       "error",
       {
