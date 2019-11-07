@@ -90,7 +90,7 @@ export const Activity = connect((state, ownProps) => ({
   }, [isActive])
 
   if (COLORS.indexOf(color) === -1) {
-    update({color: COLORS[0]})
+    update({color: COLORS[Math.floor(Math.random() * COLORS.length)]})
   }
 
   const settingsPanel = showSettings ? (
