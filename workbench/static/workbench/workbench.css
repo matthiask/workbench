@@ -4,6 +4,11 @@
   margin-right: 0 !important;
 }
 
+.navbar-brand {
+  margin-left: 0.5rem;
+  margin-right: 1rem;
+}
+
 .navbar .form-inline input {
   max-width: 10em;
 }
@@ -169,4 +174,8 @@ tbody th > a {
 
 .pie .pie-arc {
   fill: #f47c3c;
+}
+
+.bg-caveat {
+  background-color: $yellow;
 }
