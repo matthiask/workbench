@@ -13,7 +13,13 @@ export const CreateActivity = connect()(({dispatch}) => {
         e.preventDefault()
         dispatch({
           type: "ADD_ACTIVITY",
-          activity: {description, seconds: 0, id: createIdentifier()},
+          activity: {
+            description,
+            seconds: 0,
+            id: createIdentifier(),
+            left: Math.floor(Math.random() * (window.innerWidth - 300)),
+            top: Math.floor(Math.random() * (window.innerHeight - 300)),
+          },
         })
         setDescription("")
       }}
