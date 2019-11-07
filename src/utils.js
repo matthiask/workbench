@@ -13,8 +13,10 @@ export function clamp(value, min, max) {
 export function prettyDuration(secondsArgument) {
   const seconds = Math.ceil(secondsArgument) || 0
   const hours = Math.floor(seconds / 3600)
-  const displayHours = hours ? `${hours}h ` : ""
-  const displayMinutes = Math.floor(seconds / 60) % 60
+  const displayHours = hours ? `${hours}:` : ""
+  const displayMinutes = (Math.floor(seconds / 60) % 60)
+    .toString()
+    .padStart(hours ? 2 : 1, "0")
   const displaySeconds = (seconds % 60).toString().padStart(2, "0")
   return `${displayHours}${displayMinutes}:${displaySeconds}`
 }
