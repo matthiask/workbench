@@ -127,43 +127,8 @@ tbody th > a {
   opacity: 0.6;
 }
 
-/* Timer */
-[data-timer="standalone"] .timer-panel-tab {
-  min-height: 36px;
-}
-
-@media screen and (min-width: 768px) {
-  body {
-    min-height: 100vh;
-  }
-
-  [data-timer="footer"] .timer-panel-tab {
-    position: fixed;
-    z-index: 9999;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 36px;
-  }
-
-  [data-timer="footer"] .timer-panel-projects {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    transition: 0.2s ease-in-out;
-    transform: translateY(100%);
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
-  }
-
-  [data-timer="footer"].hover-with-intent .timer-panel-projects {
-    transform: translateY(-36px);
-  }
-}
-
 @media print {
-  .tiny-icons,
-  [data-timer] {
+  .tiny-icons {
     display: none;
   }
 }

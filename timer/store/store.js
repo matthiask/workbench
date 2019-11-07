@@ -20,7 +20,7 @@ export function configureStore(initialState = undefined) {
         },
         deserialize: blob => {
           let parsed = JSON.parse(blob)
-          if (!parsed._v || parsed._v !== VERSION) return {}
+          if (!parsed || !parsed._v || parsed._v !== VERSION) return {}
           // eslint-disable-next-line no-unused-vars
           const {_v, ...data} = parsed
           return data

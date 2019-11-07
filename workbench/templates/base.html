@@ -93,6 +93,8 @@
             <a class="dropdown-item" href="{% url 'deals_deal_list' %}">{% trans 'deals'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'activities_activity_list' %}">{% trans 'activities'|capfirst %}</a>
             <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/timer/">{% trans 'timer'|capfirst %}</a>
+            <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'logout' %}">{% trans 'Sign out'|capfirst %}</a>
           </div>
         </li>
@@ -114,9 +116,5 @@
     {% block content %}{% endblock %}
 
   </div> <!-- /container -->
-
-  {% block timer %}
-    <div data-timer="footer"></div>
-  {% endblock %}
 
 {% endblock body %}
