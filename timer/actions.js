@@ -2,8 +2,8 @@ import {containsJSON, createIdentifier} from "./utils.js"
 
 const ACTIVE_PROJECTS = () => "/projects/projects/"
 const PROJECT_SEARCH = q => `/projects/autocomplete/?only_open=1&q=${q}`
-const SERVICES = id => `projects/${id}/services/`
-const CREATE_HOURS = id => `projects/${id}/createhours/`
+const SERVICES = id => `/projects/${id}/services/`
+const CREATE_HOURS = id => `/projects/${id}/createhours/`
 const endpoint = (fn, ...args) => fn(...args)
 
 export function createActivity(dispatch, fields = {}) {
