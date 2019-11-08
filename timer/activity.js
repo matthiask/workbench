@@ -4,31 +4,12 @@ import {connect} from "react-redux"
 import Select from "react-select"
 import AsyncSelect from "react-select/async"
 
+import {fetchProjects, fetchServices} from "./actions.js"
 import {ActivitySettings} from "./activitySettings.js"
 import {COLORS} from "./colors.js"
 import {endpointUrl} from "./endpoints.js"
 import {gettext} from "./i18n.js"
-import {clamp, prettyDuration, timestamp, containsJSON} from "./utils.js"
-
-const fetchProjects = async q => {
-  const url = endpointUrl({name: "projects", urlParams: [q]})
-  const response = await fetch(url, {credentials: "include"})
-  if (containsJSON(response)) {
-    const data = await response.json()
-    return data.results
-  }
-  return []
-}
-
-const fetchServices = async project => {
-  const url = endpointUrl({name: "services", urlParams: [project]})
-  const response = await fetch(url, {credentials: "include"})
-  if (containsJSON(response)) {
-    const data = await response.json()
-    return data.services.map(row => ({label: row[1], value: row[0]}))
-  }
-  return []
-}
+import {clamp, prettyDuration, timestamp} from "./utils.js"
 
 const createUpdater = ({activity, dispatch}) => fields =>
   dispatch({
@@ -42,27 +23,21 @@ export const Activity = connect((state, ownProps) => ({
   current: state.current,
   projects: state.projects,
 }))(({activity, current, projects, dispatch}) => {
-  const {
-    description,
-    seconds,
-    id,
-    top,
-    left,
-    color,
-    project,
-    service,
-  } = activity
   const [showSettings, setShowSettings] = useState(false)
   const [services, setServices] = useState([])
 
-  const dispatchUpdate = createUpdater({activity: id, dispatch})
+  const dispatchUpdate = createUpdater({activity: activity.id, dispatch})
 
-  const isActive = current && current.activity == id
+  const isActive = current && current.activity == activity.id
   const mySeconds = Math.ceil(
-    seconds + (isActive ? timestamp() - current.startedAt : 0)
+    activity.seconds + (isActive ? timestamp() - current.startedAt : 0)
   )
   const isReady =
-    description && description.length && mySeconds > 0 && project && service
+    activity.description &&
+    activity.description.length &&
+    mySeconds > 0 &&
+    activity.project &&
+    activity.service
 
   const [, updateState] = useState()
   useEffect(() => {
@@ -71,24 +46,24 @@ export const Activity = connect((state, ownProps) => ({
     return () => clearInterval(interval)
   }, [isActive])
 
-  if (COLORS.indexOf(color) === -1) {
+  if (COLORS.indexOf(activity.color) === -1) {
     dispatchUpdate({color: COLORS[Math.floor(Math.random() * COLORS.length)]})
   }
 
   useEffect(() => {
-    if (!project) return
+    if (!activity.project) return
     ;(async function doFetch() {
-      setServices(await fetchServices(project.value))
+      setServices(await fetchServices(activity.project.value))
     })()
-  }, [project])
+  }, [activity.project])
 
   return (
     <Draggable
       handle=".js-drag-handle"
       bounds="parent"
       defaultPosition={{
-        x: clamp(left, 0, window.innerWidth - 300),
-        y: clamp(top, 0, window.innerHeight - 300),
+        x: clamp(activity.left, 0, window.innerWidth - 300),
+        y: clamp(activity.top, 0, window.innerHeight - 300),
       }}
       onStop={(e, data) =>
         dispatchUpdate({
@@ -99,7 +74,7 @@ export const Activity = connect((state, ownProps) => ({
     >
       <form
         className={`activity ${isActive ? "is-active" : ""} card px-2 py-2`}
-        style={{backgroundColor: color}}
+        style={{backgroundColor: activity.color}}
       >
         <div className="py-2 px-2 d-flex align-items-center justify-content-between js-drag-handle">
           <h5>{gettext("Activity")}</h5>
@@ -115,13 +90,13 @@ export const Activity = connect((state, ownProps) => ({
         <div className="activity-body">
           {showSettings ? (
             <ActivitySettings
-              color={color}
+              color={activity.color}
               setColor={color => {
                 dispatchUpdate({color})
                 setShowSettings(false)
               }}
               removeActivity={() => {
-                dispatch({type: "REMOVE_ACTIVITY", activity: id})
+                dispatch({type: "REMOVE_ACTIVITY", activity: activity.id})
               }}
               resetActivity={() => {
                 dispatch({type: "STOP"})
@@ -142,7 +117,7 @@ export const Activity = connect((state, ownProps) => ({
                 dispatchUpdate({project: value})
                 setServices([])
               }}
-              placeholder={project ? project.label : ""}
+              placeholder={activity.project ? activity.project.label : ""}
             />
           </div>
           <div className="form-group">
@@ -153,14 +128,14 @@ export const Activity = connect((state, ownProps) => ({
               onChange={row => {
                 dispatchUpdate({service: row})
               }}
-              placeholder={service && service.label}
+              placeholder={activity.service && activity.service.label}
             />
           </div>
           <div className="form-group">
             <textarea
               className="form-control"
               rows="2"
-              value={description}
+              value={activity.description}
               onChange={e => dispatchUpdate({description: e.target.value})}
               placeholder={gettext("What do you want to achieve?")}
             />
@@ -185,7 +160,7 @@ export const Activity = connect((state, ownProps) => ({
                   } else {
                     dispatch({
                       type: "START",
-                      activity: id,
+                      activity: activity.id,
                       current,
                     })
                   }
@@ -193,7 +168,7 @@ export const Activity = connect((state, ownProps) => ({
               >
                 {isActive ? gettext("Pause") : gettext("Start")}
               </button>
-              {project ? (
+              {activity.project ? (
                 <button
                   className={`btn ${
                     isReady ? "btn-success" : "btn-secondary"
@@ -202,11 +177,12 @@ export const Activity = connect((state, ownProps) => ({
                   onClick={() => {
                     const url = endpointUrl({
                       name: "createHours",
-                      urlParams: [project.value],
+                      urlParams: [activity.project.value],
                     })
                     const fd = new URLSearchParams()
-                    if (service) fd.append("service", service.value)
-                    fd.append("description", description)
+                    if (activity.service)
+                      fd.append("service", activity.service.value)
+                    fd.append("description", activity.description)
                     fd.append("hours", Math.ceil(mySeconds / 360) / 10)
                     fd.append(
                       "date",
@@ -217,7 +193,7 @@ export const Activity = connect((state, ownProps) => ({
                     console.log(finalUrl)
 
                     dispatch({type: "STOP", current})
-                    dispatch({type: "MODAL_ACTIVITY", activity: id})
+                    dispatch({type: "MODAL_ACTIVITY", activity: activity.id})
                     window.openModalFromUrl(finalUrl)
                   }}
                 >

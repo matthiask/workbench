@@ -23,7 +23,7 @@ export function prettyDuration(secondsArgument) {
 
 export function containsJSON(response) {
   const contentType = response.headers.get("content-type")
-  return (contentType && contentType.includes("application/json"))
+  return contentType && contentType.includes("application/json")
 }
 
 export function debounce(func, wait, immediate) {
