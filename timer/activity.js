@@ -4,6 +4,7 @@ import {connect} from "react-redux"
 import Select from "react-select"
 import AsyncSelect from "react-select/async"
 
+import {ActivitySettings} from "./activitySettings.js"
 import {COLORS} from "./colors.js"
 import {endpointUrl} from "./endpoints.js"
 import {clamp, prettyDuration, timestamp, containsJSON} from "./utils.js"
@@ -80,49 +81,6 @@ export const Activity = connect((state, ownProps) => ({
     })()
   }, [project])
 
-  const settingsPanel = showSettings ? (
-    <div className="activity-settings">
-      <div className="activity-color-chooser">
-        {COLORS.map(c => (
-          <label key={c} style={{backgroundColor: c}}>
-            <input
-              type="radio"
-              name="color"
-              value={c}
-              selected={c == color}
-              onClick={() => {
-                dispatchUpdate({color: c})
-                setShowSettings(false)
-              }}
-            />
-          </label>
-        ))}
-      </div>
-      <div className="d-flex justify-content-between">
-        <button
-          className="btn btn-danger"
-          type="button"
-          onClick={() => {
-            dispatch({type: "REMOVE_ACTIVITY", activity: id})
-          }}
-        >
-          Remove
-        </button>
-        <button
-          className="btn btn-warning"
-          type="button"
-          onClick={() => {
-            dispatch({type: "STOP"})
-            dispatchUpdate({seconds: 0})
-            setShowSettings(false)
-          }}
-        >
-          Reset
-        </button>
-      </div>
-    </div>
-  ) : null
-
   return (
     <Draggable
       handle=".js-drag-handle"
@@ -153,7 +111,23 @@ export const Activity = connect((state, ownProps) => ({
           </button>
         </div>
         <div className="activity-body">
-          {settingsPanel}
+          {showSettings ? (
+            <ActivitySettings
+              color={color}
+              setColor={color => {
+                dispatchUpdate({color})
+                setShowSettings(false)
+              }}
+              removeActivity={() => {
+                dispatch({type: "REMOVE_ACTIVITY", activity: id})
+              }}
+              resetActivity={() => {
+                dispatch({type: "STOP"})
+                dispatchUpdate({seconds: 0})
+                setShowSettings(false)
+              }}
+            />
+          ) : null}
           <div className="form-group">
             <AsyncSelect
               className="select"
