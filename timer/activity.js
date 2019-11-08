@@ -7,12 +7,17 @@ import AsyncSelect from "react-select/async"
 import {clamp, prettyDuration, timestamp, containsJSON} from "./utils.js"
 import {endpointUrl} from "./endpoints.js"
 
-const fetchProjects = q => {
+const fetchProjects = async q => {
   const url = endpointUrl({name: "projects", urlParams: [q]})
-  return fetch(url, {credentials: "include"})
+  const response = await fetch(url, {credentials: "include"})
+  if (containsJSON(response)) {
+    const data = await response.json()
+    return data.results
+  }
+  return []
 }
 
-const fetchServices = project => {
+const fetchServices = async project => {
   const url = endpointUrl({name: "services", urlParams: [project]})
   return fetch(url, {credentials: "include"})
 }
@@ -32,6 +37,13 @@ const COLORS = [
   "#e8eaed", // gray
 ]
 
+const createUpdater = ({activity, dispatch}) => fields =>
+  dispatch({
+    type: "UPDATE_ACTIVITY",
+    activity,
+    fields,
+  })
+
 export const Activity = connect((state, ownProps) => ({
   ...ownProps,
   current: state.current,
@@ -48,7 +60,6 @@ export const Activity = connect((state, ownProps) => ({
     service,
   } = activity
   const [showSettings, setShowSettings] = useState(false)
-
   const [services, setServices] = useState([])
 
   useEffect(() => {
@@ -70,12 +81,7 @@ export const Activity = connect((state, ownProps) => ({
       })
   }, [project])
 
-  const update = fields =>
-    dispatch({
-      type: "UPDATE_ACTIVITY",
-      activity: id,
-      fields,
-    })
+  const update = createUpdater({activity: id, dispatch})
 
   const isActive = current && current.activity == id
   const mySeconds = Math.ceil(
@@ -176,13 +182,7 @@ export const Activity = connect((state, ownProps) => ({
               classNamePrefix="select"
               defaultOptions={projects}
               loadOptions={async (inputValue, callback) => {
-                const projects = await fetchProjects(inputValue)
-                if (containsJSON(projects)) {
-                  const data = await projects.json()
-                  callback(data.results)
-                } else {
-                  callback([])
-                }
+                callback(await fetchProjects(inputValue))
               }}
               onChange={value => {
                 update({project: value})
