@@ -19,7 +19,12 @@ const fetchProjects = async q => {
 
 const fetchServices = async project => {
   const url = endpointUrl({name: "services", urlParams: [project]})
-  return fetch(url, {credentials: "include"})
+  const response = await fetch(url, {credentials: "include"})
+  if (containsJSON(response)) {
+    const data = await response.json()
+    return data.services.map(row => ({label: row[1], value: row[0]}))
+  }
+  return []
 }
 
 const COLORS = [
@@ -62,31 +67,14 @@ export const Activity = connect((state, ownProps) => ({
   const [showSettings, setShowSettings] = useState(false)
   const [services, setServices] = useState([])
 
-  useEffect(() => {
-    if (!project) return
-
-    fetchServices(project.value)
-      .then(response => {
-        if (containsJSON(response)) return response.json()
-
-        throw Error("Unable to load services for project")
-      })
-      .then(data => {
-        setServices(
-          data.services.map(row => ({
-            label: row[1],
-            value: row[0],
-          }))
-        )
-      })
-  }, [project])
-
   const update = createUpdater({activity: id, dispatch})
 
   const isActive = current && current.activity == id
   const mySeconds = Math.ceil(
     seconds + (isActive ? timestamp() - current.startedAt : 0)
   )
+  const isReady =
+    description && description.length && mySeconds > 0 && project && service
 
   const [, updateState] = useState()
   useEffect(() => {
@@ -98,6 +86,13 @@ export const Activity = connect((state, ownProps) => ({
   if (COLORS.indexOf(color) === -1) {
     update({color: COLORS[Math.floor(Math.random() * COLORS.length)]})
   }
+
+  useEffect(() => {
+    if (!project) return
+    ;(async function doFetch() {
+      setServices(await fetchServices(project.value))
+    })()
+  }, [project])
 
   const settingsPanel = showSettings ? (
     <div className="activity-settings">
@@ -141,9 +136,6 @@ export const Activity = connect((state, ownProps) => ({
       </div>
     </div>
   ) : null
-
-  const isReady =
-    description && description.length && mySeconds > 0 && project && service
 
   return (
     <Draggable
