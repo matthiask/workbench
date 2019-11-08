@@ -10,6 +10,7 @@ import {Activities} from "./activities.js"
 import {CreateActivity} from "./createActivity.js"
 import {endpointUrl} from "./endpoints.js"
 import {initOneWindow} from "./oneWindow.js"
+import {createActivity} from "./store/actions.js"
 import {containsJSON} from "./utils.js"
 
 const store = configureStore()
@@ -52,4 +53,21 @@ document.addEventListener("DOMContentLoaded", () => {
       fields: {seconds: 0},
     })
   })
+
+  // Migrate old data
+  try {
+    const data = JSON.parse(localStorage.getItem("workbench-timer"))
+    console.log(data)
+
+    data.projects.forEach(project => {
+      createActivity(store.dispatch, {
+        project: {label: project.title, value: project.id},
+        seconds: data.seconds[project.id] || 0,
+      })
+    })
+
+    localStorage.removeItem("workbench-timer")
+  } catch (e) {
+    /* Do nothing */
+  }
 })
