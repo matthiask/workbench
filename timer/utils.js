@@ -21,25 +21,30 @@ export function prettyDuration(secondsArgument) {
   return `${displayHours}${displayMinutes}:${displaySeconds}`
 }
 
-const snakeToCamel = string =>
-  string.replace(/(_\w)/g, match => match[1].toUpperCase())
-
-export function mapSnakeCaseToCamelCase(object) {
-  const camelCaseObject = {}
-
-  for (let key in object) {
-    camelCaseObject[snakeToCamel(key)] = object[key]
-  }
-
-  return camelCaseObject
+export function containsJSON(response) {
+  const contentType = response.headers.get("content-type")
+  return (contentType && contentType.includes("application/json"))
 }
 
-export const containsJSON = response => {
-  const contentType = response.headers.get("content-type")
+export function debounce(func, wait, immediate) {
+  let timeout
 
-  if (contentType && contentType.includes("application/json")) {
-    return true
-  } else {
-    return false
+  return function() {
+    let context = this
+    let args = arguments
+
+    clearTimeout(timeout)
+
+    timeout = setTimeout(function() {
+      timeout = null
+
+      if (!immediate) {
+        func.apply(context, args)
+      }
+    }, wait)
+
+    if (immediate && !timeout) {
+      func.apply(context, args)
+    }
   }
 }
