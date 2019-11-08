@@ -4,10 +4,9 @@ import {connect} from "react-redux"
 import Select from "react-select"
 import AsyncSelect from "react-select/async"
 
-import {fetchProjects, fetchServices} from "./actions.js"
+import {fetchProjects, fetchServices, openLogbookForm} from "./actions.js"
 import {ActivitySettings} from "./activitySettings.js"
 import {COLORS} from "./colors.js"
-import {endpointUrl} from "./endpoints.js"
 import {gettext} from "./i18n.js"
 import {clamp, prettyDuration, timestamp} from "./utils.js"
 
@@ -150,21 +149,13 @@ export const Activity = connect((state, ownProps) => ({
                   isActive ? "btn-warning" : "btn-outline-secondary"
                 }`}
                 type="button"
-                onClick={e => {
-                  e.preventDefault()
-                  if (isActive) {
-                    dispatch({
-                      type: "STOP",
-                      current,
-                    })
-                  } else {
-                    dispatch({
-                      type: "START",
-                      activity: activity.id,
-                      current,
-                    })
-                  }
-                }}
+                onClick={() =>
+                  dispatch({
+                    type: isActive ? "STOP" : "START",
+                    activity: activity.id,
+                    current,
+                  })
+                }
               >
                 {isActive ? gettext("Pause") : gettext("Start")}
               </button>
@@ -174,28 +165,13 @@ export const Activity = connect((state, ownProps) => ({
                     isReady ? "btn-success" : "btn-secondary"
                   } ml-2`}
                   type="button"
-                  onClick={() => {
-                    const url = endpointUrl({
-                      name: "createHours",
-                      urlParams: [activity.project.value],
+                  onClick={() =>
+                    openLogbookForm(dispatch, {
+                      activity,
+                      current,
+                      seconds: mySeconds,
                     })
-                    const fd = new URLSearchParams()
-                    if (activity.service)
-                      fd.append("service", activity.service.value)
-                    fd.append("description", activity.description)
-                    fd.append("hours", Math.ceil(mySeconds / 360) / 10)
-                    fd.append(
-                      "date",
-                      new Date().toISOString().replace(/T.*/, "")
-                    )
-
-                    const finalUrl = `${url}?${fd.toString()}`
-                    console.log(finalUrl)
-
-                    dispatch({type: "STOP", current})
-                    dispatch({type: "MODAL_ACTIVITY", activity: activity.id})
-                    window.openModalFromUrl(finalUrl)
-                  }}
+                  }
                 >
                   {gettext("Form")}
                 </button>

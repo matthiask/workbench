@@ -47,3 +47,21 @@ export async function loadProjects(dispatch) {
     })
   }
 }
+
+export function openLogbookForm(dispatch, {activity, current, seconds}) {
+  const url = endpointUrl({
+    name: "createHours",
+    urlParams: [activity.project.value],
+  })
+  const fd = new URLSearchParams()
+  if (activity.service) fd.append("service", activity.service.value)
+  fd.append("description", activity.description)
+  fd.append("hours", Math.ceil(seconds / 360) / 10)
+  fd.append("date", new Date().toISOString().replace(/T.*/, ""))
+
+  const finalUrl = `${url}?${fd.toString()}`
+  console.log(finalUrl)
+  dispatch({type: "STOP", current})
+  dispatch({type: "MODAL_ACTIVITY", activity: activity.id})
+  window.openModalFromUrl(finalUrl)
+}
