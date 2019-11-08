@@ -136,7 +136,8 @@ export const Activity = connect((state, ownProps) => ({
     </div>
   ) : null
 
-  const isReady = description.length && mySeconds > 0 && project && service
+  const isReady =
+    description && description.length && mySeconds > 0 && project && service
 
   return (
     <Draggable
