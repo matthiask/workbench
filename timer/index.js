@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.jQuery(document).on("modalform", () => {
     store.dispatch({
       type: "UPDATE_ACTIVITY",
-      activity: store.getState().modalActivity,
+      id: store.getState().modalActivity,
       fields: {seconds: 0},
     })
   })
