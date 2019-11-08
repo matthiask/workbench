@@ -2,48 +2,18 @@ import "./index.scss"
 
 import ReactDOM from "react-dom"
 import React from "react"
-import {Provider as ReduxProvider} from "react-redux"
 
-import {configureStore} from "./store.js"
-
-import {Activities} from "./activities.js"
-import {CreateActivity} from "./createActivity.js"
-import {endpointUrl} from "./endpoints.js"
+import {createActivity, loadProjects} from "./actions.js"
 import {initOneWindow} from "./oneWindow.js"
-import {createActivity} from "./actions.js"
-import {containsJSON} from "./utils.js"
+import {configureStore} from "./store.js"
+import {Timer} from "./timer.js"
 
 const store = configureStore()
 
-async function loadProjects(dispatch) {
-  const response = await fetch(endpointUrl({name: "activeProjects"}), {
-    credentials: "include",
-  })
-  if (containsJSON(response)) {
-    const data = await response.json()
-    dispatch({
-      type: "PROJECTS",
-      projects: data.projects,
-    })
-  }
-}
-
-export const App = () => {
-  loadProjects(store.dispatch)
-  return (
-    <ReduxProvider store={store}>
-      <nav className="navbar navbar-light bg-light">
-        <span className="navbar-brand">Timer</span>
-        <CreateActivity />
-      </nav>
-      <Activities />
-    </ReduxProvider>
-  )
-}
-
 document.addEventListener("DOMContentLoaded", () => {
-  ReactDOM.render(<App />, document.getElementById("root"))
+  ReactDOM.render(<Timer store={store} />, document.getElementById("root"))
   initOneWindow()
+  loadProjects(store.dispatch)
 
   // window.jQuery(document).on("modalform", (e, xhrStatus, action) => {
   window.jQuery(document).on("modalform", () => {

@@ -1,4 +1,5 @@
-import {createIdentifier} from "./utils.js"
+import {endpointUrl} from "./endpoints.js"
+import {containsJSON, createIdentifier} from "./utils.js"
 
 export function createActivity(dispatch, fields = {}) {
   dispatch({
@@ -12,4 +13,17 @@ export function createActivity(dispatch, fields = {}) {
       ...fields,
     },
   })
+}
+
+export async function loadProjects(dispatch) {
+  const response = await fetch(endpointUrl({name: "activeProjects"}), {
+    credentials: "include",
+  })
+  if (containsJSON(response)) {
+    const data = await response.json()
+    dispatch({
+      type: "PROJECTS",
+      projects: data.projects,
+    })
+  }
 }
