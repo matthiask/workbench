@@ -10,16 +10,18 @@ import {COLORS} from "./colors.js"
 import {gettext} from "./i18n.js"
 import {clamp, prettyDuration, timestamp} from "./utils.js"
 
-const createUpdater = ({activity, dispatch}) => fields =>
+const createUpdater = ({id, dispatch}) => fields =>
   dispatch({
     type: "UPDATE_ACTIVITY",
-    activity,
+    id,
     fields,
   })
 
 const analyze = (activity, current) => {
-  const isActive = current && current.activity == activity.id
-  const seconds = Math.ceil(activity.seconds + (isActive ? timestamp() - current.startedAt : 0))
+  const isActive = current && current.id == activity.id
+  const seconds = Math.ceil(
+    activity.seconds + (isActive ? timestamp() - current.startedAt : 0)
+  )
   const isReady =
     activity.description &&
     activity.description.length &&
@@ -35,7 +37,7 @@ export const Activity = connect((state, ownProps) => ({
   current: state.current,
   projects: state.projects,
 }))(({activity, current, projects, dispatch}) => {
-  const dispatchUpdate = createUpdater({activity: activity.id, dispatch})
+  const dispatchUpdate = createUpdater({id: activity.id, dispatch})
 
   // Precondition check
   if (COLORS.indexOf(activity.color) === -1) {
@@ -104,7 +106,7 @@ export const Activity = connect((state, ownProps) => ({
                 setShowSettings(false)
               }}
               removeActivity={() => {
-                dispatch({type: "REMOVE_ACTIVITY", activity: activity.id})
+                dispatch({type: "REMOVE_ACTIVITY", id: activity.id})
               }}
               resetActivity={() => {
                 dispatch({type: "STOP"})
@@ -161,7 +163,7 @@ export const Activity = connect((state, ownProps) => ({
                 onClick={() =>
                   dispatch({
                     type: isActive ? "STOP" : "START",
-                    activity: activity.id,
+                    id: activity.id,
                     current,
                   })
                 }

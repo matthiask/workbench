@@ -62,6 +62,6 @@ export function openLogbookForm(dispatch, {activity, current, seconds}) {
   const finalUrl = `${url}?${fd.toString()}`
   console.log(finalUrl)
   dispatch({type: "STOP", current})
-  dispatch({type: "MODAL_ACTIVITY", activity: activity.id})
+  dispatch({type: "MODAL_ACTIVITY", id: activity.id})
   window.openModalFromUrl(finalUrl)
 }

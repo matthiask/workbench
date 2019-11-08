@@ -7,18 +7,16 @@ function activities(state = [], action) {
     case "ADD_ACTIVITY":
       return state.concat([action.activity])
     case "REMOVE_ACTIVITY":
-      return state.filter(activity => activity.id != action.activity)
+      return state.filter(activity => activity.id != action.id)
     case "UPDATE_ACTIVITY":
       return state.map(activity =>
-        activity.id == action.activity
-          ? {...activity, ...action.fields}
-          : activity
+        activity.id == action.id ? {...activity, ...action.fields} : activity
       )
     case "START":
     case "STOP":
       return action.current
         ? state.map(activity =>
-            activity.id == action.current.activity
+            activity.id == action.current.id
               ? {
                   ...activity,
                   seconds:
@@ -36,7 +34,7 @@ function current(state = null, action) {
   switch (action.type) {
     case "START":
       return {
-        activity: action.activity,
+        id: action.id,
         startedAt: timestamp(),
       }
     case "STOP":
@@ -49,7 +47,7 @@ function current(state = null, action) {
 function modalActivity(state = null, action) {
   switch (action.type) {
     case "MODAL_ACTIVITY":
-      return action.activity
+      return action.id
     case "UPDATE_ACTIVITY":
       return null
     default:
