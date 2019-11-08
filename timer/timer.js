@@ -13,7 +13,7 @@ export const Timer = connect(({activities}) => ({activities}))(
         <CreateActivity />
       </nav>
       <div className="activity-list">
-        {activities.map(activity => (
+        {Object.values(activities).map(activity => (
           <Activity key={activity.id} activity={activity} />
         ))}
       </div>

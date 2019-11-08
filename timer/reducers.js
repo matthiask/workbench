@@ -2,29 +2,34 @@ import {combineReducers} from "redux"
 
 import {timestamp} from "./utils.js"
 
-function activities(state = [], action) {
+function activities(state = {}, action) {
   switch (action.type) {
     case "ADD_ACTIVITY":
-      return state.concat([action.activity])
+      return {...state, [action.activity.id]: action.activity}
     case "REMOVE_ACTIVITY":
-      return state.filter(activity => activity.id != action.id)
-    case "UPDATE_ACTIVITY":
-      return state.map(activity =>
-        activity.id == action.id ? {...activity, ...action.fields} : activity
+      return Object.fromEntries(
+        Object.entries(state).filter(([id]) => id != action.id)
       )
+    case "UPDATE_ACTIVITY":
+      return {
+        ...state,
+        [action.id]: {
+          ...state[action.id],
+          ...action.fields,
+        },
+      }
     case "START":
-    case "STOP":
-      return action.current
-        ? state.map(activity =>
-            activity.id == action.current.id
-              ? {
-                  ...activity,
-                  seconds:
-                    activity.seconds + (timestamp() - action.current.startedAt),
-                }
-              : activity
-          )
-        : state
+    case "STOP": {
+      if (!action.current) return state
+      const activity = state[action.current.id]
+      return {
+        ...state,
+        [activity.id]: {
+          ...activity,
+          seconds: activity.seconds + (timestamp() - action.current.startedAt),
+        },
+      }
+    }
     default:
       return state
   }

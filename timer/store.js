@@ -6,7 +6,7 @@ import reducer from "./reducers"
 import logger from "redux-logger"
 import persistState from "redux-localstorage"
 
-const VERSION = 1
+const VERSION = 2
 
 const serialize = data => {
   return JSON.stringify({...data, _v: VERSION})
@@ -14,10 +14,19 @@ const serialize = data => {
 
 const deserialize = blob => {
   let parsed = JSON.parse(blob)
-  if (!parsed || !parsed._v || parsed._v !== VERSION) return {}
-  // eslint-disable-next-line no-unused-vars
+  if (!parsed || !parsed._v) return {}
   const {_v, ...data} = parsed
-  return data
+  if (_v == VERSION) {
+    return data
+  } else if (_v == 1) {
+    return {
+      ...data,
+      activities: Object.fromEntries(
+        data.activities.map(activity => [activity.id, activity])
+      ),
+    }
+  }
+  return {}
 }
 
 export function configureStore(initialState = undefined) {
