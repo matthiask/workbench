@@ -62,9 +62,7 @@ export const Activity = connect((state, ownProps) => ({
   // Fill services dropdown
   useEffect(() => {
     if (!activity.project) return
-    ;(async function doFetch() {
-      setServices(await fetchServices(activity.project.value))
-    })()
+    fetchServices(activity.project.value).then(data => setServices(data))
   }, [activity.project])
 
   return (
