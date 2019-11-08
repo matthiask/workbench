@@ -229,7 +229,6 @@ export const Activity = connect((state, ownProps) => ({
                       urlParams: [project.value],
                     })
                     const fd = new URLSearchParams()
-                    fd.append("project", project.value)
                     if (service) fd.append("service", service.value)
                     fd.append("description", description)
                     fd.append("hours", Math.ceil(mySeconds / 360) / 10)
@@ -244,20 +243,6 @@ export const Activity = connect((state, ownProps) => ({
                     dispatch({type: "STOP", current})
                     dispatch({type: "MODAL_ACTIVITY", activity: id})
                     window.openModalFromUrl(finalUrl)
-
-                    /*
-                  if (response.status == 200) {
-                    window.initModal(await response.text())
-                  } else if (response.status == 201) {
-                    // created!
-                    dispatchUpdate({
-                      description: "",
-                      seconds: "",
-                    })
-                  } else {
-                    alert("WTF!")
-                  }
-                  */
                   }}
                 >
                   Open
