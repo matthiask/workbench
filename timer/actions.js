@@ -1,5 +1,10 @@
-import {endpointUrl} from "./endpoints.js"
 import {containsJSON, createIdentifier} from "./utils.js"
+
+const ACTIVE_PROJECTS = () => "/projects/projects/"
+const PROJECT_SEARCH = q => `/projects/autocomplete/?only_open=1&q=${q}`
+const SERVICES = id => `projects/${id}/services/`
+const CREATE_HOURS = id => `projects/${id}/createhours/`
+const endpoint = (fn, ...args) => fn(...args)
 
 export function createActivity(dispatch, fields = {}) {
   dispatch({
@@ -16,8 +21,9 @@ export function createActivity(dispatch, fields = {}) {
 }
 
 export async function fetchProjects(q) {
-  const url = endpointUrl({name: "projects", urlParams: [q]})
-  const response = await fetch(url, {credentials: "include"})
+  const response = await fetch(endpoint(PROJECT_SEARCH, q), {
+    credentials: "include",
+  })
   if (containsJSON(response)) {
     const data = await response.json()
     return data.results
@@ -26,8 +32,9 @@ export async function fetchProjects(q) {
 }
 
 export async function fetchServices(project) {
-  const url = endpointUrl({name: "services", urlParams: [project]})
-  const response = await fetch(url, {credentials: "include"})
+  const response = await fetch(endpoint(SERVICES, project), {
+    credentials: "include",
+  })
   if (containsJSON(response)) {
     const data = await response.json()
     return data.services.map(row => ({label: row[1], value: row[0]}))
@@ -36,7 +43,7 @@ export async function fetchServices(project) {
 }
 
 export async function loadProjects(dispatch) {
-  const response = await fetch(endpointUrl({name: "activeProjects"}), {
+  const response = await fetch(endpoint(ACTIVE_PROJECTS), {
     credentials: "include",
   })
   if (containsJSON(response)) {
@@ -49,10 +56,7 @@ export async function loadProjects(dispatch) {
 }
 
 export async function sendLogbook(dispatch, {activity, current, seconds}) {
-  const url = endpointUrl({
-    name: "createHours",
-    urlParams: [activity.project.value],
-  })
+  const url = endpoint(CREATE_HOURS, activity.project.value)
 
   if (
     !activity.description ||
