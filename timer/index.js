@@ -2,6 +2,7 @@ import "./index.scss"
 
 import ReactDOM from "react-dom"
 import React from "react"
+import {Provider} from "react-redux"
 
 import {createActivity, loadProjects} from "./actions.js"
 import {initOneWindow} from "./oneWindow.js"
@@ -15,7 +16,12 @@ document.addEventListener("DOMContentLoaded", () => {
   initOneWindow()
   loadProjects(store.dispatch)
   migrateOldData(store.dispatch)
-  ReactDOM.render(<Timer store={store} />, document.getElementById("root"))
+  ReactDOM.render(
+    <Provider store={store}>
+      <Timer />
+    </Provider>,
+    document.getElementById("root")
+  )
 })
 
 function addModalActivityListener(store) {
