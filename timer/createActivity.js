@@ -1,7 +1,7 @@
 import React, {useRef, useState} from "react"
 import {connect} from "react-redux"
 
-import {createIdentifier} from "./utils.js"
+import {createActivity} from "./store/actions.js"
 
 export const CreateActivity = connect()(({dispatch}) => {
   const [description, setDescription] = useState("")
@@ -11,16 +11,7 @@ export const CreateActivity = connect()(({dispatch}) => {
       className="form-inline create-activity"
       onSubmit={e => {
         e.preventDefault()
-        dispatch({
-          type: "ADD_ACTIVITY",
-          activity: {
-            description,
-            seconds: 0,
-            id: createIdentifier(),
-            left: Math.floor(Math.random() * (window.innerWidth - 300)),
-            top: Math.floor(Math.random() * (window.innerHeight - 300)),
-          },
-        })
+        createActivity(dispatch, {description})
         setDescription("")
       }}
     >
