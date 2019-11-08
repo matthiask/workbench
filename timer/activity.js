@@ -92,7 +92,19 @@ export const Activity = connect((state, ownProps) => ({
             onClick={() => setShowSettings(!showSettings)}
             title={gettext("Settings")}
           >
-            &#x2056;
+            <svg
+              viewBox="0 0 30 30"
+              style={{
+                width: "1.5em",
+                height: "1.5em",
+                margin: "-0.25rem -0.25rem",
+                fill: "#888",
+              }}
+            >
+              <circle cx="15" cy="3" r="2.5" />
+              <circle cx="15" cy="13" r="2.5" />
+              <circle cx="15" cy="23" r="2.5" />
+            </svg>
           </button>
         </div>
         <div className="activity-body">
