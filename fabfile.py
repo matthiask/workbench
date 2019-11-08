@@ -88,6 +88,12 @@ def makemessages():
         "venv/bin/python manage.py makemessages -a -i venv -i htmlcov"
         " --add-location file"
     )
+    local(
+        "venv/bin/python manage.py makemessages -a -i venv -i htmlcov"
+        " --add-location file"
+        " -i node_modules -i lib"
+        " -d djangojs"
+    )
 
 
 @task(alias="cm")

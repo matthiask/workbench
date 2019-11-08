@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-02 14:19+0100\n"
+"POT-Creation-Date: 2019-11-08 10:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1842,6 +1842,10 @@ msgstr "Tastaturkürzel"
 #: workbench/templates/base.html
 msgid "Admin panel"
 msgstr "Verwaltung"
+
+#: workbench/templates/base.html
+msgid "timer"
+msgstr "Timer"
 
 #: workbench/templates/base.html
 msgid "Sign out"

@@ -1,6 +1,7 @@
 import React from "react"
 
 import {COLORS} from "./colors.js"
+import {gettext} from "./i18n.js"
 
 export const ActivitySettings = ({
   color,
@@ -28,14 +29,14 @@ export const ActivitySettings = ({
         type="button"
         onClick={() => removeActivity()}
       >
-        Remove
+        {gettext("Remove")}
       </button>
       <button
         className="btn btn-warning"
         type="button"
         onClick={() => resetActivity()}
       >
-        Reset
+        {gettext("Reset")}
       </button>
     </div>
   </div>

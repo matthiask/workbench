@@ -7,5 +7,6 @@
 {% block js %}
   {% bootstrap_messages %}
   <div id="root"></div>
+  <script src="{% url 'javascript-catalog' %}"></script>
   {% render_bundle "main" %}
 {% endblock %}

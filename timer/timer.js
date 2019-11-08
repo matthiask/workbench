@@ -3,6 +3,7 @@ import {Provider, connect} from "react-redux"
 
 import {Activity} from "./activity.js"
 import {CreateActivity} from "./createActivity.js"
+import {gettext} from "./i18n.js"
 
 const ActivityList = connect(({activities}) => ({activities}))(
   ({activities}) => (
@@ -18,7 +19,7 @@ export const Timer = ({store}) => {
   return (
     <Provider store={store}>
       <nav className="navbar navbar-light bg-light">
-        <span className="navbar-brand">Timer</span>
+        <span className="navbar-brand">{gettext("Timer")}</span>
         <CreateActivity />
       </nav>
       <ActivityList />

@@ -1,7 +1,10 @@
 from django.conf import settings
 from django.conf.urls import include, url
+from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 from django.shortcuts import render
+from django.urls import path
+from django.views.i18n import JavaScriptCatalog
 
 from workbench import views
 
@@ -29,6 +32,10 @@ urlpatterns = [
     url(r"^history/(\w+)/(\w+)/([0-9]+)/$", views.history, name="history"),
     url(r"^report/", include("workbench.reporting.urls")),
 ]
+
+urlpatterns += i18n_patterns(
+    path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
+)
 
 if settings.DEBUG:  # pragma: no cover
     import debug_toolbar

@@ -7,6 +7,7 @@ import AsyncSelect from "react-select/async"
 import {ActivitySettings} from "./activitySettings.js"
 import {COLORS} from "./colors.js"
 import {endpointUrl} from "./endpoints.js"
+import {gettext} from "./i18n.js"
 import {clamp, prettyDuration, timestamp, containsJSON} from "./utils.js"
 
 const fetchProjects = async q => {
@@ -101,11 +102,12 @@ export const Activity = connect((state, ownProps) => ({
         style={{backgroundColor: color}}
       >
         <div className="py-2 px-2 d-flex align-items-center justify-content-between js-drag-handle">
-          <h5>Aktivität</h5>
+          <h5>{gettext("Activity")}</h5>
           <button
             className="btn btn-outline-secondary btn-sm"
             type="button"
             onClick={() => setShowSettings(!showSettings)}
+            title={gettext("Settings")}
           >
             &#x2056;
           </button>
@@ -160,7 +162,7 @@ export const Activity = connect((state, ownProps) => ({
               rows="2"
               value={description}
               onChange={e => dispatchUpdate({description: e.target.value})}
-              placeholder="Was willst Du erreichen?"
+              placeholder={gettext("What do you want to achieve?")}
             />
           </div>
           <div className="d-flex align-items-center justify-content-between">
@@ -189,7 +191,7 @@ export const Activity = connect((state, ownProps) => ({
                   }
                 }}
               >
-                {isActive ? "Pause" : "Start"}
+                {isActive ? gettext("Pause") : gettext("Start")}
               </button>
               {project ? (
                 <button
@@ -219,7 +221,7 @@ export const Activity = connect((state, ownProps) => ({
                     window.openModalFromUrl(finalUrl)
                   }}
                 >
-                  Open
+                  {gettext("Form")}
                 </button>
               ) : null}
             </div>

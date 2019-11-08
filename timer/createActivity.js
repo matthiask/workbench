@@ -2,6 +2,7 @@ import React, {useRef, useState} from "react"
 import {connect} from "react-redux"
 
 import {createActivity} from "./actions.js"
+import {gettext} from "./i18n.js"
 
 export const CreateActivity = connect()(({dispatch}) => {
   const [description, setDescription] = useState("")
@@ -21,12 +22,12 @@ export const CreateActivity = connect()(({dispatch}) => {
           className="form-control"
           value={description}
           onChange={e => setDescription(e.target.value)}
-          placeholder="Was willst Du erreichen?"
+          placeholder={gettext("What do you want to achieve?")}
           ref={descriptionField}
         />
         <div className="input-group-append">
           <button className="btn btn-primary" type="submit">
-            Start!
+            {gettext("Start")}!
           </button>
         </div>
       </div>
