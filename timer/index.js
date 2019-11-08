@@ -11,11 +11,14 @@ import {Timer} from "./timer.js"
 const store = configureStore()
 
 document.addEventListener("DOMContentLoaded", () => {
-  ReactDOM.render(<Timer store={store} />, document.getElementById("root"))
+  addModalActivityListener()
   initOneWindow()
   loadProjects(store.dispatch)
+  migrateOldData(store.dispatch)
+  ReactDOM.render(<Timer store={store} />, document.getElementById("root"))
+})
 
-  // window.jQuery(document).on("modalform", (e, xhrStatus, action) => {
+function addModalActivityListener(store) {
   window.jQuery(document).on("modalform", () => {
     store.dispatch({
       type: "UPDATE_ACTIVITY",
@@ -23,14 +26,15 @@ document.addEventListener("DOMContentLoaded", () => {
       fields: {seconds: 0},
     })
   })
+}
 
-  // Migrate old data
+function migrateOldData(dispatch) {
   try {
     const data = JSON.parse(localStorage.getItem("workbench-timer"))
     console.log(data)
 
     data.projects.forEach(project => {
-      createActivity(store.dispatch, {
+      createActivity(dispatch, {
         project: {label: project.title, value: project.id},
         seconds: data.seconds[project.id] || 0,
       })
@@ -40,4 +44,4 @@ document.addEventListener("DOMContentLoaded", () => {
   } catch (e) {
     /* Do nothing */
   }
-})
+}
