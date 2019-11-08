@@ -67,7 +67,7 @@ export const Activity = connect((state, ownProps) => ({
   const [showSettings, setShowSettings] = useState(false)
   const [services, setServices] = useState([])
 
-  const update = createUpdater({activity: id, dispatch})
+  const dispatchUpdate = createUpdater({activity: id, dispatch})
 
   const isActive = current && current.activity == id
   const mySeconds = Math.ceil(
@@ -84,7 +84,7 @@ export const Activity = connect((state, ownProps) => ({
   }, [isActive])
 
   if (COLORS.indexOf(color) === -1) {
-    update({color: COLORS[Math.floor(Math.random() * COLORS.length)]})
+    dispatchUpdate({color: COLORS[Math.floor(Math.random() * COLORS.length)]})
   }
 
   useEffect(() => {
@@ -105,7 +105,7 @@ export const Activity = connect((state, ownProps) => ({
               value={c}
               selected={c == color}
               onClick={() => {
-                update({color: c})
+                dispatchUpdate({color: c})
                 setShowSettings(false)
               }}
             />
@@ -127,7 +127,7 @@ export const Activity = connect((state, ownProps) => ({
           type="button"
           onClick={() => {
             dispatch({type: "STOP"})
-            update({seconds: 0})
+            dispatchUpdate({seconds: 0})
             setShowSettings(false)
           }}
         >
@@ -146,7 +146,7 @@ export const Activity = connect((state, ownProps) => ({
         y: clamp(top, 0, window.innerHeight - 300),
       }}
       onStop={(e, data) =>
-        update({
+        dispatchUpdate({
           left: data.x,
           top: data.y,
         })
@@ -177,7 +177,7 @@ export const Activity = connect((state, ownProps) => ({
                 callback(await fetchProjects(inputValue))
               }}
               onChange={value => {
-                update({project: value})
+                dispatchUpdate({project: value})
                 setServices([])
               }}
               placeholder={project ? project.label : ""}
@@ -189,7 +189,7 @@ export const Activity = connect((state, ownProps) => ({
               classNamePrefix="select"
               options={services}
               onChange={row => {
-                update({service: row})
+                dispatchUpdate({service: row})
               }}
               placeholder={service && service.label}
             />
@@ -199,7 +199,7 @@ export const Activity = connect((state, ownProps) => ({
               className="form-control"
               rows="2"
               value={description}
-              onChange={e => update({description: e.target.value})}
+              onChange={e => dispatchUpdate({description: e.target.value})}
               placeholder="Was willst Du erreichen?"
             />
           </div>
@@ -264,7 +264,7 @@ export const Activity = connect((state, ownProps) => ({
                     window.initModal(await response.text())
                   } else if (response.status == 201) {
                     // created!
-                    update({
+                    dispatchUpdate({
                       description: "",
                       seconds: "",
                     })
