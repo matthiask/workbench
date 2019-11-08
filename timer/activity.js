@@ -4,8 +4,9 @@ import {connect} from "react-redux"
 import Select from "react-select"
 import AsyncSelect from "react-select/async"
 
-import {clamp, prettyDuration, timestamp, containsJSON} from "./utils.js"
+import {COLORS} from "./colors.js"
 import {endpointUrl} from "./endpoints.js"
+import {clamp, prettyDuration, timestamp, containsJSON} from "./utils.js"
 
 const fetchProjects = async q => {
   const url = endpointUrl({name: "projects", urlParams: [q]})
@@ -26,21 +27,6 @@ const fetchServices = async project => {
   }
   return []
 }
-
-const COLORS = [
-  "#ffffff", // white
-  "#f28b82", // red
-  "#fbbc04", // orange
-  "#fff475", // yellow
-  "#ccff90", // green
-  "#a7ffeb", // teal
-  "#cbf0f8", // blue
-  "#aecbfa", // dark blue
-  "#d7aefb", // purple
-  "#fdcfe8", // pink
-  "#e6c9a8", // brown
-  "#e8eaed", // gray
-]
 
 const createUpdater = ({activity, dispatch}) => fields =>
   dispatch({
