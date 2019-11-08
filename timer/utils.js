@@ -25,26 +25,3 @@ export function containsJSON(response) {
   const contentType = response.headers.get("content-type")
   return contentType && contentType.includes("application/json")
 }
-
-export function debounce(func, wait, immediate) {
-  let timeout
-
-  return function() {
-    let context = this
-    let args = arguments
-
-    clearTimeout(timeout)
-
-    timeout = setTimeout(function() {
-      timeout = null
-
-      if (!immediate) {
-        func.apply(context, args)
-      }
-    }, wait)
-
-    if (immediate && !timeout) {
-      func.apply(context, args)
-    }
-  }
-}
