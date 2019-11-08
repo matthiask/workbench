@@ -28,6 +28,7 @@ $(function() {
     initWidgets()
   }
 
+  window.initModal = initModal
   window.openModalFromUrl = function(url) {
     $.ajax({
       url: url,

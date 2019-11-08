@@ -48,20 +48,56 @@ export async function loadProjects(dispatch) {
   }
 }
 
-export function openLogbookForm(dispatch, {activity, current, seconds}) {
+export async function sendLogbook(dispatch, {activity, current, seconds}) {
   const url = endpointUrl({
     name: "createHours",
     urlParams: [activity.project.value],
   })
-  const fd = new URLSearchParams()
-  if (activity.service) fd.append("service", activity.service.value)
-  fd.append("description", activity.description)
-  fd.append("hours", Math.ceil(seconds / 360) / 10)
-  fd.append("date", new Date().toISOString().replace(/T.*/, ""))
 
-  const finalUrl = `${url}?${fd.toString()}`
-  console.log(finalUrl)
-  dispatch({type: "STOP", current})
-  dispatch({type: "MODAL_ACTIVITY", id: activity.id})
-  window.openModalFromUrl(finalUrl)
+  if (
+    !activity.description ||
+    !activity.description.length ||
+    !activity.service ||
+    !seconds
+  ) {
+    const params = new URLSearchParams()
+    if (activity.service) params.append("service", activity.service.value)
+    params.append("description", activity.description)
+    params.append("hours", Math.ceil(seconds / 360) / 10)
+
+    dispatch({type: "STOP", current})
+    dispatch({type: "MODAL_ACTIVITY", id: activity.id})
+    const finalUrl = `${url}?${params.toString()}`
+    console.log(finalUrl)
+    window.openModalFromUrl(finalUrl)
+    return
+  }
+
+  const body = new FormData()
+  if (activity.service) body.append("service", activity.service.value)
+  body.append("description", activity.description)
+  body.append("hours", Math.ceil(seconds / 360) / 10)
+  body.append(
+    "rendered_by",
+    document.getElementById("root").dataset.currentUser
+  )
+  body.append("rendered_on", new Date().toISOString().replace(/T.*/, ""))
+
+  const headers = new Headers()
+  headers.append("X-Requested-With", "XMLHttpRequest")
+  headers.append("X-CSRFToken", document.cookie.match(/\bcsrftoken=(.+?)\b/)[1])
+
+  const response = await fetch(url, {
+    credentials: "include",
+    method: "POST",
+    body,
+    headers,
+  })
+  if (response.status == 200) {
+    window.initModal(await response.text())
+  } else {
+    dispatch({type: "STOP", current})
+    dispatch({type: "UPDATE_ACTIVITY", id: activity.id, fields: {seconds: 0}})
+    window.location.reload()
+  }
 }

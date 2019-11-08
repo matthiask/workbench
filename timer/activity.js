@@ -4,7 +4,7 @@ import {connect} from "react-redux"
 import Select from "react-select"
 import AsyncSelect from "react-select/async"
 
-import {fetchProjects, fetchServices, openLogbookForm} from "./actions.js"
+import {fetchProjects, fetchServices, sendLogbook} from "./actions.js"
 import {ActivitySettings} from "./activitySettings.js"
 import {COLORS} from "./colors.js"
 import {gettext} from "./i18n.js"
@@ -177,14 +177,14 @@ export const Activity = connect((state, ownProps) => ({
                   } ml-2`}
                   type="button"
                   onClick={() =>
-                    openLogbookForm(dispatch, {
+                    sendLogbook(dispatch, {
                       activity,
                       current,
                       seconds,
                     })
                   }
                 >
-                  {gettext("Form")}
+                  {gettext("Send")}
                 </button>
               ) : null}
             </div>

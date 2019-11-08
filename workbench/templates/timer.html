@@ -6,7 +6,7 @@
 
 {% block js %}
   {% bootstrap_messages %}
-  <div id="root"></div>
+  <div id="root" data-current-user="{{ request.user.id }}"></div>
   <script src="{% url 'javascript-catalog' %}"></script>
   {% render_bundle "main" %}
 {% endblock %}
