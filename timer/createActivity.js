@@ -1,7 +1,7 @@
 import React, {useRef, useState} from "react"
 import {connect} from "react-redux"
 
-import {createActivity} from "./store/actions.js"
+import {createActivity} from "./actions.js"
 
 export const CreateActivity = connect()(({dispatch}) => {
   const [description, setDescription] = useState("")

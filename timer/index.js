@@ -4,13 +4,13 @@ import ReactDOM from "react-dom"
 import React from "react"
 import {Provider as ReduxProvider} from "react-redux"
 
-import {configureStore} from "./store/store.js"
+import {configureStore} from "./store.js"
 
 import {Activities} from "./activities.js"
 import {CreateActivity} from "./createActivity.js"
 import {endpointUrl} from "./endpoints.js"
 import {initOneWindow} from "./oneWindow.js"
-import {createActivity} from "./store/actions.js"
+import {createActivity} from "./actions.js"
 import {containsJSON} from "./utils.js"
 
 const store = configureStore()

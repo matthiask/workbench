@@ -46,7 +46,6 @@
     "redux-localstorage": "^0.4.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
-    "reselect": "^4.0.0",
     "sass-loader": "^8.0.0",
     "style-loader": "^1.0.0",
     "terser-webpack-plugin": "^2.2.1",

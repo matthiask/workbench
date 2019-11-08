@@ -1,6 +1,6 @@
 import {combineReducers} from "redux"
 
-import {timestamp} from "../utils.js"
+import {timestamp} from "./utils.js"
 
 function activities(state = [], action) {
   switch (action.type) {

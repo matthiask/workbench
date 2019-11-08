@@ -2,7 +2,7 @@ import React from "react"
 
 import {createStore, applyMiddleware, compose} from "redux"
 import reducer from "./reducers"
-import thunk from "redux-thunk"
+// import thunk from "redux-thunk"
 import logger from "redux-logger"
 import persistState from "redux-localstorage"
 
@@ -25,7 +25,10 @@ export function configureStore(initialState = undefined) {
           return data
         },
       }),
-      applyMiddleware(thunk, logger)
+      applyMiddleware(
+        // thunk,
+        logger
+      )
     )
   )
 

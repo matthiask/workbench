@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from "react"
+import React, {useState, useEffect} from "react"
 import Draggable from "react-draggable"
 import {connect} from "react-redux"
 import Select from "react-select"
@@ -54,7 +54,7 @@ export const Activity = connect((state, ownProps) => ({
   useEffect(() => {
     if (!project) return
 
-    const servicesRequest = fetchServices(project.value)
+    fetchServices(project.value)
       .then(response => {
         if (containsJSON(response)) return response.json()
 
