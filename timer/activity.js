@@ -17,27 +17,39 @@ const createUpdater = ({activity, dispatch}) => fields =>
     fields,
   })
 
+const analyze = (activity, current) => {
+  const isActive = current && current.activity == activity.id
+  const seconds = Math.ceil(activity.seconds + (isActive ? timestamp() - current.startedAt : 0))
+  const isReady =
+    activity.description &&
+    activity.description.length &&
+    activity.project &&
+    activity.service &&
+    seconds > 0
+
+  return {isActive, seconds, isReady}
+}
+
 export const Activity = connect((state, ownProps) => ({
   ...ownProps,
   current: state.current,
   projects: state.projects,
 }))(({activity, current, projects, dispatch}) => {
+  const dispatchUpdate = createUpdater({activity: activity.id, dispatch})
+
+  // Precondition check
+  if (COLORS.indexOf(activity.color) === -1) {
+    dispatchUpdate({color: COLORS[Math.floor(Math.random() * COLORS.length)]})
+  }
+
+  // State vars
   const [showSettings, setShowSettings] = useState(false)
   const [services, setServices] = useState([])
 
-  const dispatchUpdate = createUpdater({activity: activity.id, dispatch})
+  // Analyze
+  const {isActive, isReady, seconds} = analyze(activity, current)
 
-  const isActive = current && current.activity == activity.id
-  const mySeconds = Math.ceil(
-    activity.seconds + (isActive ? timestamp() - current.startedAt : 0)
-  )
-  const isReady =
-    activity.description &&
-    activity.description.length &&
-    mySeconds > 0 &&
-    activity.project &&
-    activity.service
-
+  // Update each second if active
   const [, updateState] = useState()
   useEffect(() => {
     if (!isActive) return
@@ -45,10 +57,7 @@ export const Activity = connect((state, ownProps) => ({
     return () => clearInterval(interval)
   }, [isActive])
 
-  if (COLORS.indexOf(activity.color) === -1) {
-    dispatchUpdate({color: COLORS[Math.floor(Math.random() * COLORS.length)]})
-  }
-
+  // Fill services dropdown
   useEffect(() => {
     if (!activity.project) return
     ;(async function doFetch() {
@@ -141,7 +150,7 @@ export const Activity = connect((state, ownProps) => ({
           </div>
           <div className="d-flex align-items-center justify-content-between">
             <div className="activity-duration pl-2">
-              {prettyDuration(mySeconds)}
+              {prettyDuration(seconds)}
             </div>
             <div>
               <button
@@ -169,7 +178,7 @@ export const Activity = connect((state, ownProps) => ({
                     openLogbookForm(dispatch, {
                       activity,
                       current,
-                      seconds: mySeconds,
+                      seconds,
                     })
                   }
                 >
