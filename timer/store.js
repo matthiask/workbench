@@ -8,22 +8,26 @@ import persistState from "redux-localstorage"
 
 const VERSION = 1
 
+const serialize = data => {
+  return JSON.stringify({...data, _v: VERSION})
+}
+
+const deserialize = blob => {
+  let parsed = JSON.parse(blob)
+  if (!parsed || !parsed._v || parsed._v !== VERSION) return {}
+  // eslint-disable-next-line no-unused-vars
+  const {_v, ...data} = parsed
+  return data
+}
+
 export function configureStore(initialState = undefined) {
   let store = createStore(
     reducer,
     initialState,
     compose(
       persistState(null, {
-        serialize: data => {
-          return JSON.stringify({...data, _v: VERSION})
-        },
-        deserialize: blob => {
-          let parsed = JSON.parse(blob)
-          if (!parsed || !parsed._v || parsed._v !== VERSION) return {}
-          // eslint-disable-next-line no-unused-vars
-          const {_v, ...data} = parsed
-          return data
-        },
+        serialize,
+        deserialize,
       }),
       applyMiddleware(
         // thunk,
