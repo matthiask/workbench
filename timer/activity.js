@@ -166,9 +166,7 @@ export const Activity = connect((state, ownProps) => ({
             </div>
             <div>
               <button
-                className={`btn ${
-                  isActive ? "btn-warning" : "btn-outline-secondary"
-                }`}
+                className={`btn ${isActive ? "btn-warning" : "btn-light"}`}
                 type="button"
                 onClick={() =>
                   dispatch({
@@ -183,7 +181,7 @@ export const Activity = connect((state, ownProps) => ({
               {activity.project ? (
                 <button
                   className={`btn ${
-                    isReady ? "btn-success" : "btn-secondary"
+                    isReady ? "btn-success" : "btn-light"
                   } ml-2`}
                   type="button"
                   onClick={() =>
