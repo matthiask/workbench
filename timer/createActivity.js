@@ -22,6 +22,7 @@ export const CreateActivity = connect()(({dispatch}) => {
           value={description}
           onChange={e => setDescription(e.target.value)}
           placeholder={OUTCOME}
+          style={{minWidth: "15rem"}}
         />
         <div className="input-group-append">
           <button className="btn btn-primary" type="submit">
