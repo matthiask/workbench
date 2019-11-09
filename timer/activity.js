@@ -192,7 +192,7 @@ export const Activity = connect((state, ownProps) => ({
                     })
                   }
                 >
-                  {gettext("Send")}
+                  {isReady ? gettext("Send") : gettext("Open")}
                 </button>
               ) : null}
             </div>
