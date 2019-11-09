@@ -7,7 +7,7 @@ import AsyncSelect from "react-select/async"
 import {fetchProjects, fetchServices, sendLogbook} from "./actions.js"
 import {ActivitySettings} from "./activitySettings.js"
 import {COLORS} from "./colors.js"
-import {gettext} from "./i18n.js"
+import {gettext, OUTCOME} from "./i18n.js"
 import {clamp, prettyDuration, timestamp} from "./utils.js"
 
 const createUpdater = ({id, dispatch}) => fields =>
@@ -157,7 +157,7 @@ export const Activity = connect((state, ownProps) => ({
               rows="2"
               value={activity.description}
               onChange={e => dispatchUpdate({description: e.target.value})}
-              placeholder={gettext("What do you want to achieve?")}
+              placeholder={OUTCOME}
             />
           </div>
           <div className="d-flex align-items-center justify-content-between">

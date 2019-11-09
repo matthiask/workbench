@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-09 10:17+0100\n"
+"POT-Creation-Date: 2019-11-09 11:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,10 +24,6 @@ msgstr "Aktivität"
 #: timer/activity.js
 msgid "Settings"
 msgstr "Einstellungen"
-
-#: timer/activity.js timer/createActivity.js
-msgid "What do you want to achieve?"
-msgstr "Was willst Du erreichen?"
 
 #: timer/activity.js
 msgid "Pause"
@@ -52,6 +48,10 @@ msgstr "Entfernen"
 #: timer/activitySettings.js
 msgid "Reset"
 msgstr "Zurücksetzen"
+
+#: timer/i18n.js
+msgid "What outcome do you seek?"
+msgstr "Welches Ergebnis strebst Du an?"
 
 #: timer/timer.js
 msgid "Timer"

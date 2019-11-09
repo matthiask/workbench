@@ -2,7 +2,7 @@ import React, {useState} from "react"
 import {connect} from "react-redux"
 
 import {createActivity} from "./actions.js"
-import {gettext} from "./i18n.js"
+import {gettext, OUTCOME} from "./i18n.js"
 
 export const CreateActivity = connect()(({dispatch}) => {
   const [description, setDescription] = useState("")
@@ -21,7 +21,7 @@ export const CreateActivity = connect()(({dispatch}) => {
           className="form-control"
           value={description}
           onChange={e => setDescription(e.target.value)}
-          placeholder={gettext("What do you want to achieve?")}
+          placeholder={OUTCOME}
         />
         <div className="input-group-append">
           <button className="btn btn-primary" type="submit">
