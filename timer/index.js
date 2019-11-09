@@ -29,7 +29,7 @@ function addModalActivityListener(store) {
     store.dispatch({
       type: "UPDATE_ACTIVITY",
       id: store.getState().modalActivity,
-      fields: {seconds: 0},
+      fields: {description: "", seconds: 0},
     })
   })
 }

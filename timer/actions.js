@@ -101,7 +101,11 @@ export async function sendLogbook(dispatch, {activity, current, seconds}) {
     window.initModal(await response.text())
   } else {
     dispatch({type: "STOP", current})
-    dispatch({type: "UPDATE_ACTIVITY", id: activity.id, fields: {seconds: 0}})
+    dispatch({
+      type: "UPDATE_ACTIVITY",
+      id: activity.id,
+      fields: {description: "", seconds: 0},
+    })
     window.location.reload()
   }
 }

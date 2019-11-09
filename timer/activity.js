@@ -137,7 +137,7 @@ export const Activity = connect((state, ownProps) => ({
                 dispatchUpdate({project: value})
                 setServices([])
               }}
-              placeholder={activity.project ? activity.project.label : ""}
+              value={activity.project}
             />
           </div>
           <div className="form-group">
@@ -148,7 +148,7 @@ export const Activity = connect((state, ownProps) => ({
               onChange={row => {
                 dispatchUpdate({service: row})
               }}
-              placeholder={activity.service && activity.service.label}
+              value={activity.service}
             />
           </div>
           <div className="form-group">
