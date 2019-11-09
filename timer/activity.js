@@ -119,7 +119,7 @@ export const Activity = connect((state, ownProps) => ({
                 dispatch({type: "REMOVE_ACTIVITY", id: activity.id})
               }}
               resetActivity={() => {
-                dispatch({type: "STOP"})
+                if (isActive) dispatch({type: "STOP", current})
                 dispatchUpdate({seconds: 0})
                 setShowSettings(false)
               }}
