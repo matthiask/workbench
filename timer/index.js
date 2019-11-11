@@ -9,15 +9,15 @@ import {initOneWindow} from "./oneWindow.js"
 import {configureStore} from "./store.js"
 import {Timer} from "./timer.js"
 
-const store = configureStore()
+const storeInstance = configureStore()
 
 document.addEventListener("DOMContentLoaded", () => {
-  addModalActivityListener(store)
+  addModalActivityListener(storeInstance)
   initOneWindow()
-  loadProjects(store.dispatch)
-  migrateOldData(store.dispatch)
+  loadProjects(storeInstance.dispatch)
+  migrateOldData(storeInstance.dispatch)
   ReactDOM.render(
-    <Provider store={store}>
+    <Provider store={storeInstance}>
       <Timer />
     </Provider>,
     document.getElementById("root")
