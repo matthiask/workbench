@@ -12,7 +12,7 @@ import {Timer} from "./timer.js"
 const store = configureStore()
 
 document.addEventListener("DOMContentLoaded", () => {
-  addModalActivityListener()
+  addModalActivityListener(store)
   initOneWindow()
   loadProjects(store.dispatch)
   migrateOldData(store.dispatch)
