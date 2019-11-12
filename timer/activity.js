@@ -85,7 +85,11 @@ export const Activity = connect((state, ownProps) => ({
         style={{backgroundColor: activity.color}}
       >
         <div className="py-2 px-2 d-flex align-items-center justify-content-between js-drag-handle">
-          <h5>{gettext("Activity")}</h5>
+          <h5 className="text-truncate" style={{padding: "0.1em 0"}}>
+            {activity.project
+              ? activity.project.label.replace(/^[-0-9\s]+/, "")
+              : gettext("Activity")}
+          </h5>
           <button
             className="btn btn-outline-secondary btn-sm"
             type="button"
