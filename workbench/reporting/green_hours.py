@@ -89,9 +89,9 @@ WHERE service.hours / logged.hours < 1;
     for user in users:
         ret[user] = data(user.id)
         green[0] += green[user.id]
-        red[0] += green[user.id]
-        maintenance[0] += green[user.id]
-        internal[0] += green[user.id]
+        red[0] += red[user.id]
+        maintenance[0] += maintenance[user.id]
+        internal[0] += internal[user.id]
     ret[0] = data(0)
     return sorted(ret.items())
 
