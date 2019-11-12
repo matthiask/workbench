@@ -10,7 +10,7 @@ from workbench.projects.models import Project
 from workbench.tools.models import ONE, Z
 
 
-def green_hours(date_range):
+def green_hours(date_range, *, users=None):
     with connections["default"].cursor() as cursor:
         cursor.execute(
             """\
@@ -60,15 +60,11 @@ WHERE service.hours / logged.hours < 1;
     ):
         for user_id, hours in within[project_id].items():
             if type == Project.INTERNAL:
-                internal[0] += hours
                 internal[user_id] += hours
             elif type == Project.MAINTENANCE:
-                maintenance[0] += hours
                 maintenance[user_id] += hours
             else:
-                green[0] += green_hours_factor[project_id] * hours
                 green[user_id] += green_hours_factor[project_id] * hours
-                red[0] += (ONE - green_hours_factor[project_id]) * hours
                 red[user_id] += (ONE - green_hours_factor[project_id]) * hours
 
     def data(user_id):
@@ -86,9 +82,17 @@ WHERE service.hours / logged.hours < 1;
         )
         return ret
 
-    ret = {0: data(0)}
-    for user in User.objects.filter(id__in=user_ids):
+    if not users:
+        users = User.objects.filter(id__in=user_ids)
+
+    ret = {}
+    for user in users:
         ret[user] = data(user.id)
+        green[0] += green[user.id]
+        red[0] += green[user.id]
+        maintenance[0] += green[user.id]
+        internal[0] += green[user.id]
+    ret[0] = data(0)
     return sorted(ret.items())
 
 

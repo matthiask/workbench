@@ -258,6 +258,9 @@ class DateRangeFilterForm(forms.Form):
     date_until = forms.DateField(
         label=_("date until"), required=False, widget=DateInput()
     )
+    users = forms.ModelMultipleChoiceField(
+        User.objects.all(), label=_("users"), required=False
+    )
 
     def __init__(self, data, *args, **kwargs):
         today = dt.date.today()
@@ -265,6 +268,8 @@ class DateRangeFilterForm(forms.Form):
         data.setdefault("date_from", dt.date(today.year, 1, 1).isoformat())
         data.setdefault("date_until", dt.date(today.year, 12, 31).isoformat())
         super().__init__(data, *args, **kwargs)
+        self.fields["users"].choices = User.objects.choices(collapse_inactive=False)
+        self.fields["users"].widget.attrs = {"size": 10}
 
 
 @filter_form(DateRangeFilterForm)
@@ -275,7 +280,8 @@ def green_hours_view(request, form):
         {
             "form": form,
             "green_hours": green_hours.green_hours(
-                [form.cleaned_data["date_from"], form.cleaned_data["date_until"]]
+                [form.cleaned_data["date_from"], form.cleaned_data["date_until"]],
+                users=form.cleaned_data["users"],
             ),
         },
     )
