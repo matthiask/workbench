@@ -138,7 +138,7 @@ export const Activity = connect((state, ownProps) => ({
                 callback(await fetchProjects(inputValue))
               }}
               onChange={value => {
-                dispatchUpdate({project: value})
+                dispatchUpdate({project: value, service: null})
                 setServices([])
               }}
               placeholder={gettext("Select / search...")}
@@ -149,12 +149,18 @@ export const Activity = connect((state, ownProps) => ({
             <Select
               className="select"
               classNamePrefix="select"
-              isDisabled={!activity.project}
+              isDisabled={!services.length}
               options={services}
               onChange={row => {
                 dispatchUpdate({service: row})
               }}
-              placeholder={gettext("Select...")}
+              placeholder={
+                services.length
+                  ? gettext("Select...")
+                  : activity.project
+                  ? gettext("No services available")
+                  : gettext("No project selected")
+              }
               value={activity.service}
             />
           </div>

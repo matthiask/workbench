@@ -1,3 +1,4 @@
+import {gettext} from "./i18n.js"
 import {containsJSON, createIdentifier} from "./utils.js"
 
 const ACTIVE_PROJECTS = () => "/projects/projects/"
@@ -99,7 +100,7 @@ export async function sendLogbook(dispatch, {activity, current, seconds}) {
   })
   if (response.status == 200) {
     window.initModal(await response.text())
-  } else {
+  } else if (response.status == 201) {
     dispatch({type: "STOP", current})
     dispatch({
       type: "UPDATE_ACTIVITY",
@@ -107,5 +108,7 @@ export async function sendLogbook(dispatch, {activity, current, seconds}) {
       fields: {description: "", seconds: 0},
     })
     window.location.reload()
+  } else {
+    alert(gettext("Unable to submit the logbook entry"))
   }
 }

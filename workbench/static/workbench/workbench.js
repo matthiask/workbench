@@ -1,4 +1,10 @@
 $(function() {
+  const gettext =
+    window.gettext ||
+    function(t) {
+      return t
+    }
+
   // AJAX modals
   const dismissModals = function() {
     // LOL, dismiss.
@@ -34,6 +40,9 @@ $(function() {
       url: url,
       success: function(data) {
         initModal(data)
+      },
+      error: function() {
+        alert(gettext("Unable to open the form"))
       },
       xhrFields: {
         withCredentials: true,
