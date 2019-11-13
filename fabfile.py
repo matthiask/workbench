@@ -124,6 +124,11 @@ def freeze():
 @task
 def setup():
     local("python3 -m venv venv")
+    execute("update")
+
+
+@task
+def update():
     local("venv/bin/pip install -U pip wheel")
     local("venv/bin/pip install -r requirements.txt")
     local("yarn")
