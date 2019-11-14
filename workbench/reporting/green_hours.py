@@ -82,9 +82,7 @@ WHERE service.hours / logged.hours < 1;
         )
         return ret
 
-    if not users:
-        users = User.objects.filter(id__in=user_ids)
-
+    users = users or User.objects.filter(id__in=user_ids)
     ret = {}
     for user in users:
         ret[user] = data(user.id)
