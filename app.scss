@@ -25,7 +25,7 @@ $h6-font-size: $font-size-base;
 //
 // $alert-margin-bottom: 0.25rem;
 
-// Sandstone 4.3.1
+// Cosmo 4.3.1
 // Bootswatch
 
 //
@@ -34,37 +34,41 @@ $h6-font-size: $font-size-base;
 
 $white: #fff !default;
 $gray-100: #f8f9fa !default;
-$gray-200: #f8f5f0 !default;
-$gray-300: #dfd7ca !default;
+$gray-200: #e9ecef !default;
+$gray-300: #dee2e6 !default;
 $gray-400: #ced4da !default;
-$gray-500: #98978b !default;
-$gray-600: #8e8c84 !default;
+$gray-500: #adb5bd !default;
+$gray-600: #868e96 !default;
 $gray-700: #495057 !default;
-$gray-800: #3e3f3a !default;
+$gray-800: #373a3c !default;
 $gray-900: #212529 !default;
 $black: #000 !default;
 
-$blue: #325d88 !default;
+$blue: #2780e3 !default;
 $indigo: #6610f2 !default;
-$purple: #6f42c1 !default;
+$purple: #613d7c !default;
 $pink: #e83e8c !default;
-$red: #d9534f !default;
-$orange: #f47c3c !default;
-$yellow: #ffc107 !default;
-$green: #93c54b !default;
+$red: #ff0039 !default;
+$orange: #f0ad4e !default;
+$yellow: #ff7518 !default;
+$green: #3fb618 !default;
 $teal: #20c997 !default;
-$cyan: #29abe0 !default;
+$cyan: #9954bb !default;
 
 $primary: $blue !default;
-$secondary: $gray-600 !default;
+$secondary: $gray-800 !default;
 $success: $green !default;
 $info: $cyan !default;
-$warning: $orange !default;
+$warning: $yellow !default;
 $danger: $red !default;
-$light: $gray-200 !default;
+$light: $gray-100 !default;
 $dark: $gray-800 !default;
 
 $yiq-contrasted-threshold: 170 !default;
+
+// Options
+
+$enable-rounded: false !default;
 
 // Body
 
@@ -76,9 +80,8 @@ $link-color: $primary !default;
 
 // Fonts
 
-$font-family-sans-serif: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI",
-  Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji",
-  "Segoe UI Emoji", "Segoe UI Symbol" !default;
+$font-family-sans-serif: "Segoe UI", "Source Sans Pro", Calibri, Candara, Arial,
+  sans-serif !default;
 
 $font-size-base: 0.875rem !default;
 
@@ -107,10 +110,11 @@ $nav-pills-link-active-bg: $gray-200 !default;
 
 // Navbar
 
-$navbar-dark-hover-color: $white !default;
+$navbar-dark-color: rgba($white, 0.75) !default;
+$navbar-dark-hover-color: rgba($white, 1) !default;
 
-$navbar-light-hover-color: $black !default;
-$navbar-light-active-color: $black !default;
+$navbar-light-hover-color: rgba($black, 0.9) !default;
+$navbar-light-active-color: rgba($black, 0.9) !default;
 
 // Pagination
 
@@ -145,6 +149,7 @@ $modal-header-border-color: $modal-content-border-color !default;
 
 // Progress bars
 
+$progress-height: 0.5rem !default;
 $progress-bg: $gray-300 !default;
 $progress-border-radius: 10px !default;
 $progress-bar-color: $primary !default;
@@ -170,6 +175,10 @@ $list-group-action-active-bg: $gray-300 !default;
 
 $close-text-shadow: none !default;
 
-// END Sandstone
+// Alerts
+
+$alert-border-width: 0 !default;
+
+// END Cosmo
 
 @import "~bootstrap/scss/bootstrap";
