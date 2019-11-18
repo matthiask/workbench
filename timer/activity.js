@@ -65,6 +65,10 @@ export const Activity = connect((state, ownProps) => ({
     fetchServices(activity.project.value).then(data => setServices(data))
   }, [activity.project])
 
+  const activityTitle = activity.project
+    ? activity.project.label.replace(/^[-0-9\s]+/, "")
+    : gettext("Activity")
+
   return (
     <Draggable
       handle=".js-drag-handle"
@@ -85,31 +89,13 @@ export const Activity = connect((state, ownProps) => ({
         style={{backgroundColor: activity.color}}
       >
         <div className="py-2 px-2 d-flex align-items-center justify-content-between js-drag-handle">
-          <h5 className="text-truncate" style={{padding: "0.1em 0"}}>
-            {activity.project
-              ? activity.project.label.replace(/^[-0-9\s]+/, "")
-              : gettext("Activity")}
-          </h5>
-          <button
-            className="btn btn-outline-secondary btn-sm"
-            type="button"
-            onClick={() => setShowSettings(!showSettings)}
-            title={gettext("Settings")}
+          <span
+            className="text-truncate"
+            style={{fontSize: "inherit", padding: "0.1em 0"}}
+            title={activityTitle}
           >
-            <svg
-              viewBox="0 0 30 30"
-              style={{
-                width: "1.5em",
-                height: "1.5em",
-                margin: "-0.25rem -0.25rem",
-                fill: "#888",
-              }}
-            >
-              <circle cx="15" cy="3" r="2.5" />
-              <circle cx="15" cy="13" r="2.5" />
-              <circle cx="15" cy="23" r="2.5" />
-            </svg>
-          </button>
+            {activityTitle}
+          </span>
         </div>
         <div className="activity-body">
           {showSettings ? (
@@ -179,7 +165,29 @@ export const Activity = connect((state, ownProps) => ({
             </div>
             <div>
               <button
-                className={`btn ${isActive ? "btn-warning" : "btn-light"}`}
+                className="btn btn-light btn-sm"
+                type="button"
+                onClick={() => setShowSettings(!showSettings)}
+                title={gettext("Settings")}
+              >
+                <svg
+                  viewBox="0 0 30 30"
+                  style={{
+                    width: "1.5em",
+                    height: "1.5em",
+                    margin: "-0.25rem -0.25rem",
+                    fill: "#888",
+                  }}
+                >
+                  <circle cx="15" cy="3" r="2.5" />
+                  <circle cx="15" cy="13" r="2.5" />
+                  <circle cx="15" cy="23" r="2.5" />
+                </svg>
+              </button>
+              <button
+                className={`btn btn-sm ml-2 ${
+                  isActive ? "btn-warning" : "btn-light"
+                }`}
                 type="button"
                 onClick={() =>
                   dispatch({
@@ -193,9 +201,9 @@ export const Activity = connect((state, ownProps) => ({
               </button>
               {activity.project ? (
                 <button
-                  className={`btn ${
+                  className={`btn btn-sm ml-2 ${
                     isReady ? "btn-success" : "btn-light"
-                  } ml-2`}
+                  }`}
                   type="button"
                   onClick={() =>
                     sendLogbook(dispatch, {
