@@ -275,6 +275,13 @@ class ProjectsTest(TestCase):
         valid("owned_by={}".format(user.id))
         valid("owned_by=0")  # only inactive
 
+    def test_invalid_search_form(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        response = self.client.get("/projects/?org=0")
+        self.assertRedirects(response, "/projects/?e=1")
+        self.assertEqual(messages(response), ["Search form was invalid."])
+
     def test_autocomplete(self):
         project = factories.ProjectFactory.create(closed_on=dt.date.today())
         user = factories.UserFactory.create()
