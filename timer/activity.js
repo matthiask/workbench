@@ -199,23 +199,22 @@ export const Activity = connect((state, ownProps) => ({
               >
                 {isActive ? gettext("Pause") : gettext("Start")}
               </button>
-              {activity.project ? (
-                <button
-                  className={`btn btn-sm ml-2 ${
-                    isReady ? "btn-success" : "btn-light"
-                  }`}
-                  type="button"
-                  onClick={() =>
-                    sendLogbook(dispatch, {
-                      activity,
-                      current,
-                      seconds,
-                    })
-                  }
-                >
-                  {isReady ? gettext("Send") : gettext("Open")}
-                </button>
-              ) : null}
+              <button
+                className={`btn btn-sm ml-2 ${
+                  isReady ? "btn-success" : "btn-light"
+                }`}
+                disabled={!activity.project}
+                type="button"
+                onClick={() =>
+                  sendLogbook(dispatch, {
+                    activity,
+                    current,
+                    seconds,
+                  })
+                }
+              >
+                {isReady ? gettext("Send") : gettext("Open")}
+              </button>
             </div>
           </div>
         </div>
