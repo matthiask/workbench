@@ -13,7 +13,6 @@ from workbench.contacts.models import (
     PhoneNumber,
     PostalAddress,
 )
-from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
@@ -40,7 +39,6 @@ def search(request):
                 Invoice.objects.select_related("project", "owned_by"),
                 RecurringInvoice.objects.all(),
                 Offer.objects.select_related("project", "owned_by"),
-                Deal.objects.all(),
             )
         ]
     else:
