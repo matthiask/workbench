@@ -25,7 +25,7 @@
         <th></th>
         {% for user, hours in stats.user_hours %}
           <th class="text-right">
-            <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}" target="_blank">{{ hours|hours }}</a>
+            <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">{{ hours|hours }}</a>
           </th>
         {% endfor %}
         <th class="text-right">{{ stats.total_hours|hours }}</th>
@@ -34,11 +34,11 @@
     <tbody>
     {% for row in stats.organizations %}
     <tr>
-      <th><a href="{% url 'logbook_loggedhours_list' %}?organization={{ row.organization.id }}" target="_blank">{{ row.organization }}</a></th>
+      <th><a href="{% url 'logbook_loggedhours_list' %}?organization={{ row.organization.id }}">{{ row.organization }}</a></th>
       {% for user, hours in row.user_hours %}
         {% if hours %}
           <td class="text-right">
-            <a href="{% url 'logbook_loggedhours_list' %}?organization={{ row.organization.id }}&amp;rendered_by={{ user.pk }}" target="_blank">{{ hours|hours }}</a>
+            <a href="{% url 'logbook_loggedhours_list' %}?organization={{ row.organization.id }}&amp;rendered_by={{ user.pk }}">{{ hours|hours }}</a>
           </td>
         {% else %}<td></td>
         {% endif %}
