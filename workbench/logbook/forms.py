@@ -36,7 +36,10 @@ class LoggedHoursSearchForm(forms.Form):
         widget=Autocomplete(model=Organization),
         label="",
     )
-    until = forms.DateField(widget=DateInput, required=False, label="")
+    date_from = forms.DateField(widget=DateInput, required=False, label="")
+    date_until = forms.DateField(
+        widget=DateInput, required=False, label=mark_safe("&ndash;&nbsp;")
+    )
     service = forms.ModelChoiceField(
         queryset=Service.objects.all(),
         required=False,
@@ -60,8 +63,10 @@ class LoggedHoursSearchForm(forms.Form):
             queryset = queryset.filter(
                 service__project__customer=data.get("organization")
             )
-        if data.get("until"):
-            queryset = queryset.filter(rendered_on__lte=data.get("until"))
+        if data.get("date_from"):
+            queryset = queryset.filter(rendered_on__gte=data.get("date_from"))
+        if data.get("date_until"):
+            queryset = queryset.filter(rendered_on__lte=data.get("date_until"))
 
         # "hidden" filters
         if data.get("service"):
@@ -97,7 +102,10 @@ class LoggedCostSearchForm(forms.Form):
         label="",
     )
     expenses = forms.BooleanField(required=False, label=_("expenses"))
-    until = forms.DateField(widget=DateInput, required=False, label="")
+    date_from = forms.DateField(widget=DateInput, required=False, label="")
+    date_until = forms.DateField(
+        widget=DateInput, required=False, label=mark_safe("&ndash;&nbsp;")
+    )
     service = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
 
     def __init__(self, *args, **kwargs):
@@ -118,8 +126,10 @@ class LoggedCostSearchForm(forms.Form):
             )
         if data.get("expenses"):
             queryset = queryset.filter(are_expenses=True)
-        if data.get("until"):
-            queryset = queryset.filter(rendered_on__lte=data.get("until"))
+        if data.get("date_from"):
+            queryset = queryset.filter(rendered_on__gte=data.get("date_from"))
+        if data.get("date_until"):
+            queryset = queryset.filter(rendered_on__lte=data.get("date_until"))
 
         # "hidden" filters
         if data.get("service") == 0:
