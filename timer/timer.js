@@ -8,7 +8,7 @@ import {gettext} from "./i18n.js"
 export const Timer = connect(({activities}) => ({activities}))(
   ({activities}) => (
     <>
-      <nav className="navbar navbar-light bg-light">
+      <nav className="navbar navbar-dark bg-primary">
         <span className="navbar-brand">{gettext("Timer")}</span>
         <CreateActivity />
       </nav>
