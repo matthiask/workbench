@@ -72,35 +72,6 @@
       {% endif %}
     </div>
 
-    <div class="card mb-3">
-      <div class="card-header"><h3 class="my-0">
-        <a href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a>
-      </h3></div>
-      {% if user.important_activities %}
-        <div class="list-group list-group-flush">
-          {% for activity in user.important_activities %}
-          <div class="list-group-item">
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">
-                <a href="{{ activity.get_absolute_url }}" data-toggle="ajaxmodal">{{ activity|h }}</a>
-              </h5>
-              {{ activity.status_badge }}
-            </div>
-            <div class="d-flex w-100 justify-content-between">
-              <p>
-                {% for c in activity.context %}
-                  <a href="{{ c.get_absolute_url }}">{{ c }}</a>{% if not forloop.last %},{% endif %}
-                {% endfor %}
-              </p>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="card-body">{% trans 'no important activities' %}</div>
-      {% endif %}
-    </div>
-
   </div>
 
   <div class="col-lg-6">
