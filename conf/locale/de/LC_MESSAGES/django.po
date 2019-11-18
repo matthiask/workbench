@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-18 22:19+0100\n"
+"POT-Creation-Date: 2019-11-18 22:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1660,6 +1660,11 @@ msgstr "Pensum"
 #: workbench/templates/awt/year_detail.html
 msgid "target time"
 msgstr "Sollstunden"
+
+#: workbench/templates/awt/year_detail.html
+#, python-format
+msgid "calculated with %(hours)s per day"
+msgstr "berechnet mit %(hours)s pro Tag"
 
 #: workbench/templates/awt/year_detail.html
 msgid "available vacation days"
