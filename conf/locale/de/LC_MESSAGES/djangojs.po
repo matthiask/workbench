@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-18 11:27+0100\n"
+"POT-Creation-Date: 2019-11-18 22:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,10 +24,6 @@ msgstr "Konnte Logbucheintrag nicht abschicken"
 #: timer/activity.js
 msgid "Activity"
 msgstr "Aktivität"
-
-#: timer/activity.js
-msgid "Settings"
-msgstr "Einstellungen"
 
 #: timer/activity.js
 msgid "Select or search project..."
@@ -46,10 +42,14 @@ msgid "No project selected"
 msgstr "Kein Projekt ausgewählt"
 
 #: timer/activity.js
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: timer/activity.js
 msgid "Pause"
 msgstr "Pause"
 
-#: timer/activity.js timer/createActivity.js
+#: timer/activity.js
 msgid "Start"
 msgstr "Start"
 
@@ -69,13 +69,13 @@ msgstr "Entfernen"
 msgid "Reset"
 msgstr "Zurücksetzen"
 
+#: timer/createActivity.js timer/timer.js
+msgid "Timer"
+msgstr "Timer"
+
 #: timer/i18n.js
 msgid "What outcome do you seek?"
 msgstr "Welches Ergebnis strebst Du an?"
-
-#: timer/timer.js
-msgid "Timer"
-msgstr "Timer"
 
 #: workbench/static/workbench/workbench.js
 msgid "Unable to open the form"

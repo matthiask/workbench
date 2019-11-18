@@ -144,3 +144,7 @@ tbody th > a {
 .bg-caveat {
   background-color: #ff7518;
 }
+
+.text-black-30 {
+  color: rgba(0, 0, 0, 0.3) !important;
+}

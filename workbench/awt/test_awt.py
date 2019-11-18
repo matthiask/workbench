@@ -115,10 +115,10 @@ class AWTTest(TestCase):
         self.assertAlmostEqual(awt["totals"]["other_absences"], Decimal("10"))
 
         # 3/4 * 80% * 360 + 1/4 * 100% * 360 = 306
-        self.assertAlmostEqual(awt["totals"]["target"], Decimal("-306"))
+        self.assertAlmostEqual(awt["totals"]["target"], Decimal("306") * 8)
 
         # 1000 / 8 + 21.25 + 10 = 125 + 21.25 + 10 = 156.25
-        self.assertAlmostEqual(awt["totals"]["working_time"], Decimal("156.25"))
+        self.assertAlmostEqual(awt["totals"]["working_time"], Decimal("156.25") * 8)
 
         # 306 * 8 - 1000 - 21.25 * 8 - 10 * 8 = 1198
         self.assertAlmostEqual(awt["totals"]["running_sum"], Decimal("-1198"))
