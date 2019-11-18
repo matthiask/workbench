@@ -141,7 +141,7 @@ export const Activity = connect((state, ownProps) => ({
                 dispatchUpdate({project: value, service: null})
                 setServices([])
               }}
-              placeholder={gettext("Select / search...")}
+              placeholder={gettext("Select or search project...")}
               value={activity.project}
             />
           </div>
@@ -156,7 +156,7 @@ export const Activity = connect((state, ownProps) => ({
               }}
               placeholder={
                 services.length
-                  ? gettext("Select...")
+                  ? gettext("Select service...")
                   : activity.project
                   ? gettext("No services available")
                   : gettext("No project selected")

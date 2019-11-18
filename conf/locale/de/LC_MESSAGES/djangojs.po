@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-13 09:53+0100\n"
+"POT-Creation-Date: 2019-11-18 11:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,12 +30,12 @@ msgid "Settings"
 msgstr "Einstellungen"
 
 #: timer/activity.js
-msgid "Select / search..."
-msgstr "Auswählen / suchen..."
+msgid "Select or search project..."
+msgstr "Projekt auswählen oder suchen..."
 
 #: timer/activity.js
-msgid "Select..."
-msgstr "Auswählen..."
+msgid "Select service..."
+msgstr "Leistung auswählen..."
 
 #: timer/activity.js
 msgid "No services available"
