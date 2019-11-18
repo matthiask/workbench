@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-18 22:33+0100\n"
+"POT-Creation-Date: 2019-11-18 22:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1192,7 +1192,6 @@ msgstr "Stundensatz"
 
 #: workbench/invoices/views.py workbench/logbook/models.py
 #: workbench/management/commands/profitability.py workbench/services/models.py
-#: workbench/templates/awt/year_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_list.html
@@ -1274,7 +1273,8 @@ msgstr "Rechnungsleistung"
 msgid "archived at"
 msgstr "Archiviert um"
 
-#: workbench/logbook/models.py workbench/templates/base.html
+#: workbench/logbook/models.py workbench/templates/awt/year_detail.html
+#: workbench/templates/base.html
 #: workbench/templates/reporting/overdrawn_projects.html
 msgid "logged hours"
 msgstr "Erfasste Stunden"
@@ -1691,8 +1691,8 @@ msgid "working time"
 msgstr "Arbeitszeit"
 
 #: workbench/templates/awt/year_detail.html
-msgid "net work hours"
-msgstr "Stundensaldo"
+msgid "net work hours per month"
+msgstr "Stundensaldo pro Monat"
 
 #: workbench/templates/awt/year_detail.html
 msgid "running net work hours"
