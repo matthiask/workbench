@@ -21,6 +21,8 @@
   <h1>{{ object|h }} {% history_link object %}</h1>
 
   {% for data in statistics %}
+  <div style="break-before:page">
+
     {% with user=data.user stats=data.months totals=data.totals monthly_sums=data.monthly_sums running_sums=data.running_sums %}
     <h5>{{ user }}</h5>
     <table class="table table-sm table-bordered table-responsive-lg">
@@ -50,26 +52,26 @@
 
       <tr>
         <th class="text-nowrap">{% trans 'available vacation days' %}</th>
-        {% for value in stats.available_vacation_days %}<td class="text-right pr-5 {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
+        {% for value in stats.available_vacation_days %}<td class="text-right pr-4 {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
         <th class="text-right">{{ totals.available_vacation_days|days }}</th>
       </tr>
 
       <tr>
         <th class="text-nowrap">{% trans 'vacation days' %}</th>
-        {% for value in stats.vacation_days %}<td class="text-right pr-5 {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
+        {% for value in stats.vacation_days %}<td class="text-right pr-4 {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
         <th class="text-right">{{ totals.vacation_days|days }}</th>
       </tr>
 
       <tr>
         <th class="text-nowrap">{% trans 'other absences' %}</th>
-        {% for value in stats.other_absences %}<td class="text-right pr-5 {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
+        {% for value in stats.other_absences %}<td class="text-right pr-4 {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
         <th class="text-right">{{ totals.other_absences|days }}</th>
       </tr>
 
       {% if totals.vacation_days_correction %}
         <tr>
           <th class="text-nowrap">{% trans 'vacation days correction' %}</th>
-          {% for value in stats.vacation_days_correction %}<td class="text-right pr-5 {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
+          {% for value in stats.vacation_days_correction %}<td class="text-right pr-4 {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
           <th class="text-right">{{ totals.vacation_days_correction|days }}</th>
         </tr>
       {% endif %}
@@ -149,6 +151,8 @@
     </table>
 
     {% endwith %}
+
+  </div>
   {% endfor %}
 
 </div>
