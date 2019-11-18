@@ -49,10 +49,10 @@ def currency(value, show_plus_sign=False):
 def days(value):
     if value:
         value = value.quantize(H2)
-    return ("%.2fd" % value) if value else "0.00d"
+    return "{:,.2f}d".format(value).replace(",", "’") if value else "0.00d"
 
 
 def hours(value):
     if value:
         value = value.quantize(H1)
-    return ("%.1fh" % value) if value else "0.0h"
+    return "{:,.1f}h".format(value).replace(",", "’") if value else "0.0h"

@@ -79,6 +79,7 @@ class ToolsTest(TestCase):
             (Decimal("-123"), "-123.0h"),
             (Decimal("0.003"), "0.0h"),
             (Decimal("-0.003"), "0.0h"),
+            (Decimal("12345"), "12’345.0h"),
             (None, "0.0h"),
         ]:
             with self.subTest(value=value, result=result):
