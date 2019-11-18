@@ -86,7 +86,7 @@
       </tr>
 
       <tr>
-        <th class="text-nowrap">{% trans 'hours' %}</th>
+        <th class="text-nowrap">{% trans 'logged hours' %}</th>
         {% for value in stats.hours %}<td class="text-right {% if not value %}text-black-30{% endif %}">{{ value|hours }}</td>{% endfor %}
         <th class="text-right">{{ totals.hours|hours }}</th>
       </tr>
