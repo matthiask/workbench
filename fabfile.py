@@ -65,7 +65,7 @@ def deploy():
         run("venv/bin/python manage.py migrate")
         run("venv/bin/python manage.py collectstatic --noinput")
     rsync_project(
-        local_dir="static/", remote_dir="www/workbench/static/",
+        local_dir="static/", remote_dir="www/dbpag-workbench/static/",
     )
     run("sudo systemctl restart dbpag-workbench.service")
 
