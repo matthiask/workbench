@@ -79,13 +79,13 @@
     </div>
 
     <div class="clearfix">
-      <a href="{{ project.urls.update }}" class="btn btn-secondary">
+      <a href="{{ project.urls.update }}" class="btn btn-primary">
         {% trans 'Update' %}</a>
-      <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-secondary">
+      <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-primary">
         {% trans 'Copy' %}</a>
-      <a href="{{ object.urls.statistics }}" class="btn btn-secondary" data-toggle="ajaxmodal">
+      <a href="{{ object.urls.statistics }}" class="btn btn-primary" data-toggle="ajaxmodal">
         {% trans 'statistics' %}</a>
-      <a href="{{ object.urls.offers_pdf }}" class="btn btn-secondary" target="_blank">
+      <a href="{{ object.urls.offers_pdf }}" class="btn btn-primary" target="_blank">
         {% trans 'offers PDF' %}</a>
       <a href="{{ project.urls.delete }}" class="btn btn-outline-danger float-right">
         {% trans 'Delete' %}</a>
@@ -104,10 +104,10 @@
             </div>
 
             <div>
-              <a href="{{ offer.urls.pdf }}" class="btn btn-secondary btn-sm" target="_blank">PDF</a>
+              <a href="{{ offer.urls.pdf }}" class="btn btn-primary btn-sm" target="_blank">PDF</a>
 
               <span class="dropdown">
-                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button"
+                <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
                   id="offer-dropdown-{{ offer.pk }}"
                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {% trans 'offer' %}
@@ -131,7 +131,7 @@
           <div class="d-flex w-100 justify-content-between">
             <h5 class="d-inline my-0">{% trans 'Not offered yet' %}</h5>
 
-            <a href="{{ project.urls.createoffer }}" class="btn btn-secondary btn-sm">
+            <a href="{{ project.urls.createoffer }}" class="btn btn-primary btn-sm">
               {% include 'svg/plus.svg' %} {% trans 'offer' %}</a>
           </div>
 
@@ -143,11 +143,11 @@
         <div class="list-group-item" {% if row.service.pk %}data-sortable-item="{{ row.service.pk }}"{% endif %}>
           {% if row.service.pk %}
             <div class="float-right">
-              <a href="" class="btn btn-secondary btn-sm" title="{% trans 'Sort' %}" data-sortable-grabber>
+              <a href="" class="btn btn-primary btn-sm" title="{% trans 'Sort' %}" data-sortable-grabber>
                 {% include 'svg/grabber.svg' %}</a>
 
               <span class="dropdown">
-                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button"
+                <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
                   id="service-dropdown-{{ row.service.pk }}"
                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {% trans 'service' %}
@@ -252,7 +252,7 @@
     {% endif %}
 
     <span class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle" type="button"
+      <button class="btn btn-primary dropdown-toggle" type="button"
         id="invoice-dropdown-button" data-toggle="dropdown"
         aria-haspopup="true" aria-expanded="false">
         {% include "svg/plus.svg" %}
@@ -265,19 +265,19 @@
         <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=offer">{% trans 'Services from offer' %}</a>
       </div>
     </span>
-    <a href="{{ project.urls.createoffer }}" class="btn btn-secondary">
+    <a href="{{ project.urls.createoffer }}" class="btn btn-primary">
       {% include 'svg/plus.svg' %} {% trans 'offer' %}</a>
 
-    <a href="{{ project.urls.createservice }}" class="btn btn-secondary"
+    <a href="{{ project.urls.createservice }}" class="btn btn-primary"
       data-toggle="ajaxmodal">
       {% include "svg/plus.svg" %} {% trans 'service' %}</a>
-    <a href="{{ project.urls.createhours }}" class="btn btn-secondary" data-toggle="ajaxmodal" data-createhours>
+    <a href="{{ project.urls.createhours }}" class="btn btn-primary" data-toggle="ajaxmodal" data-createhours>
       {% include "svg/plus.svg" %}
       {% trans 'hours' %}</a>
-    <a href="{{ project.urls.createcost }}" class="btn btn-secondary" data-toggle="ajaxmodal" data-createcost>
+    <a href="{{ project.urls.createcost }}" class="btn btn-primary" data-toggle="ajaxmodal" data-createcost>
       {% include "svg/plus.svg" %}
       {% trans 'cost' %}</a>
-    <a href="{% url 'activities_activity_create' %}?project={{ object.pk }}" class="btn btn-secondary" data-toggle="ajaxmodal">
+    <a href="{% url 'activities_activity_create' %}?project={{ object.pk }}" class="btn btn-primary" data-toggle="ajaxmodal">
       {% include "svg/plus.svg" %} {% trans 'activity' %} </a>
 
   </div>

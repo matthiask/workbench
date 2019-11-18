@@ -99,15 +99,15 @@
     </tr>
   </table>
 
-  <a href="{{ object.urls.pdf }}" class="btn btn-secondary" target="_blank">
+  <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank">
     PDF
   </a>
   {% if object.type == object.SERVICES %}
-    <a href="{{ object.urls.xlsx }}" class="btn btn-secondary">
+    <a href="{{ object.urls.xlsx }}" class="btn btn-primary">
       {% trans 'logbook' %} (XLSX)
     </a>
   {% endif %}
-  <a href="{{ object.urls.update }}" class="btn btn-secondary">
+  <a href="{{ object.urls.update }}" class="btn btn-primary">
     {% trans 'Update' %}
   </a>
   <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">

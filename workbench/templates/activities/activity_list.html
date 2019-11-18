@@ -5,7 +5,7 @@
 {% block title %}{{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 
 {% block search-form-buttons %}
-  <a href="{{ view.model.urls.create }}" class="btn btn-secondary"
+  <a href="{{ view.model.urls.create }}" class="btn btn-primary"
     data-toggle="ajaxmodal">
     {% include "svg/plus.svg" %}
     {{ view.meta.verbose_name }}

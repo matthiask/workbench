@@ -182,3 +182,7 @@ $alert-border-width: 0 !default;
 // END Cosmo
 
 @import "~bootstrap/scss/bootstrap";
+
+.btn {
+  fill: currentColor;
+}

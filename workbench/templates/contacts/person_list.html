@@ -4,7 +4,7 @@
 
 {% block search-form-buttons %}
 {{ block.super }}
-{% if request.GET %}<a href="{% querystring xlsx=1 %}" class="btn btn-secondary">
+{% if request.GET %}<a href="{% querystring xlsx=1 %}" class="btn btn-primary">
   {% include 'svg/desktop-download.svg' %} XLSX</a>{% endif %}
 {% endblock %}
 

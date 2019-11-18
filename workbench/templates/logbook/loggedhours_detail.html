@@ -55,11 +55,11 @@
 {% endblock %}
 
 {% block footer %}
-  <a href="{{ object.urls.update }}" class="btn btn-secondary"
+  <a href="{{ object.urls.update }}" class="btn btn-primary"
     data-toggle="ajaxmodal">
     {% trans 'Update' %}
   </a>
-  <a href="{{ object.service.project.urls.createhours }}?copy={{ object.pk }}" class="btn btn-secondary mr-auto"
+  <a href="{{ object.service.project.urls.createhours }}?copy={{ object.pk }}" class="btn btn-primary mr-auto"
     data-toggle="ajaxmodal">
     {% trans 'Copy' %}
   </a>

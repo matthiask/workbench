@@ -39,13 +39,13 @@
     </tr>
   </table>
 
-<a href="{% url 'invoices_invoice_create' %}?customer={{ object.pk }}" class="btn btn-secondary">
+<a href="{% url 'invoices_invoice_create' %}?customer={{ object.pk }}" class="btn btn-primary">
   {% include "svg/plus.svg" %}
   {% trans 'invoice' %}
 </a>
 <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}"
-  class="btn btn-secondary">{% trans 'invoices' %}</a>
-<a href="{{ object.urls.update }}" class="btn btn-secondary">
+  class="btn btn-primary">{% trans 'invoices' %}</a>
+<a href="{{ object.urls.update }}" class="btn btn-primary">
   {% trans 'Update' %}</a>
 <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
   {% trans 'Delete' %}</a>

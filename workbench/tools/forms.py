@@ -27,7 +27,7 @@ _AUTOCOMPLETE_TEMPLATE = """
     autocomplete="off"
     data-autocomplete-url="%(url)s" data-autocomplete-id="%(id)s">
   <div class="input-group-append">
-    <button type="button" class="btn btn-secondary" %(btn_attrs)s
+    <button type="button" class="btn btn-primary" %(btn_attrs)s
       data-clear="#%(id)s,#%(id)s_pretty">&times;</button>
   </div>
 </div>

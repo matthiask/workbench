@@ -22,7 +22,7 @@
       </tr>
     </table>
 
-    <a href="{{ deal.urls.update }}" class="btn btn-secondary">
+    <a href="{{ deal.urls.update }}" class="btn btn-primary">
       {% trans 'Update' %}</a>
     <a href="{{ deal.urls.delete }}" class="btn btn-outline-danger float-right">
       {% trans 'Delete' %}</a>
@@ -50,7 +50,7 @@
       {% endfor %}
     </table>
     <a href="{% url 'activities_activity_create' %}?deal={{ deal.pk }}"
-      class="btn btn-secondary"
+      class="btn btn-primary"
       data-toggle="ajaxmodal">
       {% include "svg/plus.svg" %} {% trans 'activity' %}
     </a>

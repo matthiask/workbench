@@ -30,7 +30,7 @@
 
         {% block search-form-buttons %}
         {% if view.show_create_button %}
-          <a href="{{ view.model.urls.create }}" class="btn btn-secondary">
+          <a href="{{ view.model.urls.create }}" class="btn btn-primary">
             {% include "svg/plus.svg" %}
             {{ view.meta.verbose_name }}
           </a>
