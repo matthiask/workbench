@@ -1,6 +1,5 @@
 import datetime as dt
 import math
-from collections import OrderedDict
 from itertools import groupby
 from urllib.parse import urlencode
 
@@ -41,17 +40,16 @@ def link_or_none(object, pretty=None, none=mark_safe("&ndash;"), with_badge=Fals
 
 
 @register.filter
-def field_value_pairs(object, fields=""):
-    pairs = OrderedDict()
+def field_value_pairs(object):
     for field in object._meta.get_fields():
         if field.one_to_many or field.many_to_many or field.primary_key:
             continue
 
         if field.choices:
-            pairs[field.name] = (field.verbose_name, object._get_FIELD_display(field))
+            yield (field.verbose_name, object._get_FIELD_display(field))
 
         elif isinstance(field, models.TextField):
-            pairs[field.name] = (
+            yield (
                 field.verbose_name,
                 linebreaksbr(getattr(object, field.name)),
             )
@@ -63,13 +61,7 @@ def field_value_pairs(object, fields=""):
             elif isinstance(value, bool):
                 value = _("yes") if value else _("no")
 
-            pairs[field.name] = (field.verbose_name, value)
-
-    if fields:
-        for f in fields.split(","):
-            yield pairs[f.strip()]
-    else:
-        yield from pairs.values()
+            yield (field.verbose_name, value)
 
 
 @register.filter

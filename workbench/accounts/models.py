@@ -167,10 +167,6 @@ class User(Model, AbstractBaseUser):
         ).select_related("customer", "contact__organization", "owned_by")
 
     @cached_property
-    def important_activities(self):
-        return self.activities.open()
-
-    @cached_property
     def in_preparation(self):
         from workbench.invoices.models import Invoice
         from workbench.offers.models import Offer
