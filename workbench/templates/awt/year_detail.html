@@ -6,7 +6,9 @@
 <div class="row justify-content-center">
 <div class="col-sm-12">
 
-  <ul class="nav nav-tabs mb-3">
+  <h1>{% trans 'annual working time' %}</h1>
+
+  <ul class="nav nav-tabs my-3">
     {% for year in years %}
     <li class="nav-item">
       <a class="nav-link {% if year == object %}active{% endif %}"
@@ -18,13 +20,11 @@
     </li>
   </ul>
 
-  <h1>{{ object|h }} {% history_link object %}</h1>
-
   {% for data in statistics %}
   <div style="break-before:page">
 
     {% with user=data.user stats=data.months totals=data.totals monthly_sums=data.monthly_sums running_sums=data.running_sums %}
-    <h3 class="mt-5">{{ user }}</h3>
+    <h2 class="mt-5">{{ user }}</h2>
     <table class="table table-sm table-bordered table-responsive-lg">
       <tr>
         <th></th>
