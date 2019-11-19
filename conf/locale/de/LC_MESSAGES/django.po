@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-18 22:37+0100\n"
+"POT-Creation-Date: 2019-11-19 08:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1658,6 +1658,10 @@ msgid "pensum"
 msgstr "Pensum"
 
 #: workbench/templates/awt/year_detail.html
+msgid "vacation days available"
+msgstr "Verfügbare Ferientage"
+
+#: workbench/templates/awt/year_detail.html
 msgid "target time"
 msgstr "Sollstunden"
 
@@ -1667,12 +1671,8 @@ msgid "calculated with %(hours)s per day"
 msgstr "berechnet mit %(hours)s pro Tag"
 
 #: workbench/templates/awt/year_detail.html
-msgid "available vacation days"
-msgstr "Verfügbare Ferientage"
-
-#: workbench/templates/awt/year_detail.html
-msgid "vacation days"
-msgstr "Ferientage"
+msgid "vacation days taken"
+msgstr "Bezogene Ferientage"
 
 #: workbench/templates/awt/year_detail.html
 msgid "other absences"
@@ -2218,6 +2218,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "target days"
-#~ msgstr "Soll-Arbeitstage"
