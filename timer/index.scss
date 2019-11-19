@@ -49,9 +49,9 @@ html {
 
 .activity-settings {
   position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
+  top: 8px;
+  right: 8px;
+  left: 8px;
   z-index: 1;
   padding: 1rem;
   background: #fff;
@@ -60,19 +60,24 @@ html {
 
 .activity-color-chooser {
   font-size: 2rem;
+  text-align: center;
+
+  input {
+    display: none;
+  }
 
   label {
     display: inline-block;
-    width: 1em;
-    height: 1em;
-    margin: 0 0.5rem 0 0;
+    width: 0.9em;
+    height: 0.9em;
+    margin: 0 0.25rem;
     border-radius: 50%;
     border: 1px solid #ccc;
     cursor: pointer;
-  }
 
-  input {
-    opacity: 0;
+    &.checked {
+      box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+    }
   }
 }
 

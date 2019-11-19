@@ -88,33 +88,13 @@ export const Activity = connect((state, ownProps) => ({
         className={`activity ${isActive ? "is-active" : ""} card px-2 py-2`}
         style={{backgroundColor: activity.color}}
       >
-        <div className="py-2 px-2 d-flex align-items-center justify-content-between js-drag-handle">
-          <span
-            className="text-truncate"
-            style={{fontSize: "inherit", padding: "0.1em 0"}}
-            title={activityTitle}
-          >
-            {activityTitle}
-          </span>
+        <div
+          className="py-2 px-2 text-truncate js-drag-handle"
+          title={activityTitle}
+        >
+          {activityTitle}
         </div>
         <div className="activity-body">
-          {showSettings ? (
-            <ActivitySettings
-              color={activity.color}
-              setColor={color => {
-                dispatchUpdate({color})
-                setShowSettings(false)
-              }}
-              removeActivity={() => {
-                dispatch({type: "REMOVE_ACTIVITY", id: activity.id})
-              }}
-              resetActivity={() => {
-                if (isActive) dispatch({type: "STOP", current})
-                dispatchUpdate({seconds: 0})
-                setShowSettings(false)
-              }}
-            />
-          ) : null}
           <div className="form-group">
             <AsyncSelect
               className="select"
@@ -218,6 +198,23 @@ export const Activity = connect((state, ownProps) => ({
             </div>
           </div>
         </div>
+        {showSettings ? (
+          <ActivitySettings
+            color={activity.color}
+            setColor={color => {
+              dispatchUpdate({color})
+              setShowSettings(false)
+            }}
+            removeActivity={() => {
+              dispatch({type: "REMOVE_ACTIVITY", id: activity.id})
+            }}
+            resetActivity={() => {
+              if (isActive) dispatch({type: "STOP", current})
+              dispatchUpdate({seconds: 0})
+              setShowSettings(false)
+            }}
+          />
+        ) : null}
       </form>
     </Draggable>
   )

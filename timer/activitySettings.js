@@ -12,18 +12,21 @@ export const ActivitySettings = ({
   <div className="activity-settings">
     <div className="activity-color-chooser">
       {COLORS.map(c => (
-        <label key={c} style={{backgroundColor: c}}>
+        <label
+          key={c}
+          className={c == color ? "checked" : ""}
+          style={{backgroundColor: c}}
+        >
           <input
             type="radio"
             name="color"
             value={c}
-            selected={c == color}
             onClick={() => setColor(c)}
           />
         </label>
       ))}
     </div>
-    <div className="d-flex justify-content-between">
+    <div className="d-flex mt-3 justify-content-between">
       <button
         className="btn btn-danger"
         type="button"
