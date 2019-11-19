@@ -28,7 +28,7 @@
     {% with user=data.user stats=data.months totals=data.totals monthly_sums=data.monthly_sums running_sums=data.running_sums %}
     <h2 class="mt-5">{{ user }}</h2>
     <table class="table table-sm table-bordered table-responsive-lg">
-      <tr>
+      <tr class="thead-light">
         <th>{{ year.year }}</th>
         {% for month in stats.months %}<th>{{ month|date:'M' }}</th>{% endfor %}
         <th class="text-right">{% trans 'Total' %}</th>
@@ -121,7 +121,7 @@
     </table>
 
     <table class="table table-sm table-bordered table-responsive-lg">
-      <tr>
+      <tr class="thead-light">
         <th>{% trans 'employment' %}</th>
         <th>{% trans 'percentage' %}</th>
         <th>{% trans 'vacation weeks' %}</th>
@@ -141,7 +141,7 @@
       <div class="col-md-6 col-12">
 
         <table class="table table-sm table-bordered table-responsive-lg">
-          <tr>
+          <tr class="thead-light">
             <th colspan="3">{% trans 'vacation days' %}</th>
           </tr>
           {% for absence in data.absences.vacation_days %}
@@ -160,7 +160,7 @@
       <div class="col-md-6 col-12">
 
         <table class="table table-sm table-bordered table-responsive-lg">
-          <tr>
+          <tr class="thead-light">
             <th colspan="3">{% trans 'other absences' %}</th>
           </tr>
           {% for absence in data.absences.other_absences %}
