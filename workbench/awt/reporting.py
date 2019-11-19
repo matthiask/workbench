@@ -15,7 +15,7 @@ from workbench.tools.models import Z
 def annual_working_time(year, *, users):
     target_days = list(year.months)
 
-    absences = defaultdict(list)
+    absences = defaultdict(lambda: {"vacation_days": [], "other_absences": []})
     months = defaultdict(
         lambda: {
             "months": [dt.date(year.year, i, 1) for i in range(1, 13)],
@@ -76,10 +76,10 @@ def annual_working_time(year, *, users):
     for absence in Absence.objects.filter(
         user__in=users, starts_on__year=year.year
     ).order_by("starts_on"):
-        absences[absence.user_id].append(absence)
         month_data = months[absence.user_id]
         key = "vacation_days" if absence.is_vacation else "other_absences"
         month_data[key][absence.starts_on.month - 1] += absence.days
+        absences[absence.user_id][key].append(absence)
 
         if absence.is_vacation:
             if absence.days > remaining[absence.user_id]:

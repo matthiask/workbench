@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-19 08:36+0100\n"
+"POT-Creation-Date: 2019-11-19 08:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -180,12 +180,12 @@ msgstr "aufgezeichnete Aktion"
 msgid "logged actions"
 msgstr "aufgezeichnete Aktionen"
 
-#: workbench/awt/__init__.py workbench/templates/base.html
+#: workbench/awt/__init__.py workbench/templates/awt/year_detail.html
+#: workbench/templates/base.html
 msgid "annual working time"
 msgstr "Jahresarbeitszeit"
 
 #: workbench/awt/admin.py workbench/awt/models.py
-#: workbench/templates/awt/year_detail.html
 msgid "days"
 msgstr "Tage"
 
@@ -310,7 +310,6 @@ msgstr "startet am"
 #: workbench/invoices/views.py workbench/logbook/forms.py
 #: workbench/logbook/models.py workbench/offers/models.py
 #: workbench/projects/models.py workbench/services/models.py
-#: workbench/templates/awt/year_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
@@ -318,7 +317,6 @@ msgid "description"
 msgstr "Beschreibung"
 
 #: workbench/awt/models.py workbench/templates/awt/absence_list.html
-#: workbench/templates/awt/year_detail.html
 msgid "is vacation"
 msgstr "sind Ferien"
 
@@ -326,8 +324,7 @@ msgstr "sind Ferien"
 msgid "absence"
 msgstr "Abwesenheit"
 
-#: workbench/awt/models.py workbench/templates/awt/year_detail.html
-#: workbench/templates/base.html
+#: workbench/awt/models.py workbench/templates/base.html
 msgid "absences"
 msgstr "Abwesenheiten"
 
@@ -1703,14 +1700,13 @@ msgid "vacation days credit"
 msgstr "Guthaben an Ferientagen"
 
 #: workbench/templates/awt/year_detail.html
+msgid "vacation days"
+msgstr "Ferientage"
+
+#: workbench/templates/awt/year_detail.html
 #, python-format
 msgid "from %(date)s"
 msgstr "Ab %(date)s"
-
-#: workbench/templates/awt/year_detail.html
-#: workbench/templates/contacts/organization_detail.html
-msgid "yes,no"
-msgstr "ja,nein"
 
 #: workbench/templates/base.html workbench/templates/search.html
 msgid "Search"
@@ -1785,6 +1781,10 @@ msgstr "Timer"
 #: workbench/templates/base.html
 msgid "Sign out"
 msgstr "Abmelden"
+
+#: workbench/templates/contacts/organization_detail.html
+msgid "yes,no"
+msgstr "ja,nein"
 
 #: workbench/templates/contacts/person_form.html
 #: workbench/templates/credit_control/creditentry_upload.html

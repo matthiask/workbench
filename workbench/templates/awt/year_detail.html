@@ -6,28 +6,30 @@
 <div class="row justify-content-center">
 <div class="col-sm-12">
 
-  <h1>{% trans 'annual working time' %}</h1>
+  <div class="d-print-none">
+    <h1>{% trans 'annual working time' %}</h1>
 
-  <ul class="nav nav-tabs my-3">
-    {% for year in years %}
-    <li class="nav-item">
-      <a class="nav-link {% if year == object %}active{% endif %}"
-        href="{{ year.get_absolute_url }}">{{ year }}</a>
-    </li>
-    {% endfor %}
-    <li class="nav-item ml-auto">
-      <a class="nav-link" href="{% querystring user='active' %}">{% trans 'active users' %}</a>
-    </li>
-  </ul>
+    <ul class="nav nav-tabs my-3">
+      {% for year in years %}
+      <li class="nav-item">
+        <a class="nav-link {% if year == object %}active{% endif %}"
+          href="{{ year.get_absolute_url }}">{{ year }}</a>
+      </li>
+      {% endfor %}
+      <li class="nav-item ml-auto">
+        <a class="nav-link" href="{% querystring user='active' %}">{% trans 'active users' %}</a>
+      </li>
+    </ul>
+  </div>
 
   {% for data in statistics %}
-  <div style="break-before:page">
+  <div style="break-after:page">
 
     {% with user=data.user stats=data.months totals=data.totals monthly_sums=data.monthly_sums running_sums=data.running_sums %}
     <h2 class="mt-5">{{ user }}</h2>
     <table class="table table-sm table-bordered table-responsive-lg">
       <tr>
-        <th></th>
+        <th>{{ year.year }}</th>
         {% for month in stats.months %}<th>{{ month|date:'M' }}</th>{% endfor %}
         <th class="text-right">{% trans 'Total' %}</th>
       </tr>
@@ -134,24 +136,46 @@
       </tr>
       {% endfor %}
     </table>
-    <table class="table table-sm table-bordered table-responsive-lg">
-      <tr>
-        <th>{% trans 'absences' %}</th>
-        <th>{% trans 'days' %}</th>
-        <th>{% trans 'is vacation' %}</th>
-        <th>{% trans 'description' %}</th>
-      </tr>
-      {% for absence in data.absences %}
-        <tr>
-          <td>
-            {% blocktrans with date=absence.starts_on|local_date_format %}from {{ date }}{% endblocktrans %}
-          </td>
-          <td>{{ absence.days|days }}</td>
-          <td>{{ absence.is_vacation|yesno:_('yes,no') }}</td>
-          <td>{{ absence.description }}</td>
-        </tr>
-      {% endfor %}
-    </table>
+
+    <div class="row">
+      <div class="col-md-6 col-12">
+
+        <table class="table table-sm table-bordered table-responsive-lg">
+          <tr>
+            <th colspan="3">{% trans 'vacation days' %}</th>
+          </tr>
+          {% for absence in data.absences.vacation_days %}
+            <tr>
+              <td>
+                {% blocktrans with date=absence.starts_on|local_date_format %}from {{ date }}{% endblocktrans %}
+              </td>
+              <td>{{ absence.days|days }}</td>
+              <td>{{ absence.description }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+
+      </div>
+
+      <div class="col-md-6 col-12">
+
+        <table class="table table-sm table-bordered table-responsive-lg">
+          <tr>
+            <th colspan="3">{% trans 'other absences' %}</th>
+          </tr>
+          {% for absence in data.absences.other_absences %}
+            <tr>
+              <td>
+                {% blocktrans with date=absence.starts_on|local_date_format %}from {{ date }}{% endblocktrans %}
+              </td>
+              <td>{{ absence.days|days }}</td>
+              <td>{{ absence.description }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+
+      </div>
+    </div>
 
     {% endwith %}
 
