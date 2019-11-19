@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -46,6 +48,16 @@ def set_order(request):
 
 def services(request, pk):
     project = get_object_or_404(Project, pk=pk)
+    offers = OrderedDict(
+        (offer.id, {"label": str(offer), "options": []})
+        for offer in project.offers.select_related("owned_by")
+    )
+    offers[None] = {"label": _("Not offered yet"), "options": []}
+    for service in project.services.logging():
+        offers[service.offer_id]["options"].append(
+            {"label": str(service), "value": service.id}
+        )
+
     return JsonResponse(
         {
             "id": project.id,
@@ -53,9 +65,7 @@ def services(request, pk):
             "title": project.title,
             "owned_by": project.owned_by.get_short_name(),
             "customer_id": project.customer_id,
-            "services": [
-                (service.id, str(service)) for service in project.services.logging()
-            ],
+            "services": [data for data in offers.values() if data["options"]],
         }
     )
 

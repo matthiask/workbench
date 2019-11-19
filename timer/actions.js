@@ -38,7 +38,7 @@ export async function fetchServices(project) {
   })
   if (containsJSON(response)) {
     const data = await response.json()
-    return data.services.map(row => ({label: row[1], value: row[0]}))
+    return data.services
   }
   return []
 }
