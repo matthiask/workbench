@@ -148,7 +148,7 @@ class Project(Model):
         css = {
             self.MAINTENANCE: "secondary",
             self.ORDER: "success",
-            self.INTERNAL: "warning",
+            self.INTERNAL: "info",
         }[self.type]
 
         if self.closed_on:
