@@ -97,7 +97,8 @@ class ProjectsTest(TestCase):
         self.assertEqual(list(project.services.all()), [service2, service1])
 
         self.assertRedirects(
-            self.client.get(service1.urls["detail"]), project.urls["detail"]
+            self.client.get(service1.urls["detail"]),
+            "%s#service%s" % (project.urls["detail"], service1.pk),
         )
         response = self.client.post(
             service1.urls["update"],

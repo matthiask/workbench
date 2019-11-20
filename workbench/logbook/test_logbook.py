@@ -173,8 +173,8 @@ class LogbookTest(TestCase):
         )
         self.assertContains(
             response,
-            '<a href="/projects/{}/">service title - service description'
-            "</a>".format(project.id),
+            '<a href="/projects/{}/#service{}">service title - service description'
+            "</a>".format(project.id, entry.service.id),
         )
 
     def test_log_and_create_service_with_flat_rate(self):

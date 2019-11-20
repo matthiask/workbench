@@ -111,7 +111,7 @@ class OffersTest(TestCase):
         self.client.force_login(offer.owned_by)
 
         response = self.client.get(service.urls["update"])
-        self.assertRedirects(response, offer.project.urls["detail"])
+        self.assertRedirects(response, service.get_absolute_url())
 
         response = self.client.get(offer.urls["delete"])
         self.assertEqual(response.status_code, 200)
@@ -144,20 +144,22 @@ class OffersTest(TestCase):
                 "status": Offer.ACCEPTED,
             },
         )
-        self.assertRedirects(response, offer.project.urls["detail"])
+        self.assertRedirects(response, offer.get_absolute_url())
 
         offer.refresh_from_db()
         self.assertEqual(offer.closed_on, dt.date.today())
         self.assertAlmostEqual(offer.subtotal, Decimal("2000"))
 
         response = self.client.get(offer.urls["delete"])
-        self.assertRedirects(response, offer.project.urls["detail"])
+        self.assertRedirects(response, offer.get_absolute_url())
         self.assertEqual(
             messages(response), ["Offers in preparation may be deleted, others not."]
         )
 
         response = self.client.get(service.urls["detail"])
-        self.assertRedirects(response, offer.project.urls["detail"])
+        self.assertRedirects(
+            response, "%s#service%s" % (offer.project.urls["detail"], service.pk)
+        )
 
         response = self.client.get(
             service.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
@@ -223,7 +225,7 @@ class OffersTest(TestCase):
                 WarningsForm.ignore_warnings_id: "status-change-but-already-closed",
             },
         )
-        self.assertRedirects(response, offer.project.urls["detail"])
+        self.assertRedirects(response, offer.get_absolute_url())
 
         offer.refresh_from_db()
         self.assertIsNone(offer.closed_on)
@@ -299,7 +301,11 @@ class OffersTest(TestCase):
         project = factories.ProjectFactory.create()
         response = self.client.post(offer.urls["copy"], {"project-project": project.pk})
         self.assertEqual(response.status_code, 299)
-        self.assertEqual(response.json(), {"redirect": project.get_absolute_url()})
+        offer = project.offers.first()
+        self.assertEqual(
+            response.json(),
+            {"redirect": "%s#offer%s" % (project.get_absolute_url(), offer.pk)},
+        )
 
         self.assertEqual(project.offers.count(), 1)
         self.assertEqual(project.services.count(), 1)

@@ -96,7 +96,9 @@
       <div class="card-header">
         {% if offer %}
           <div class="d-flex w-100 justify-content-between">
+
             <div>
+              <div class="anchor-container"><a name="offer{{ offer.pk }}" class="anchor"></a></div>
               <h5 class="d-inline my-0">{{ offer|h }}</h5>
               {% history_link offer %}
               &nbsp;
@@ -142,6 +144,8 @@
         {% for row in services %}
         <div class="list-group-item" {% if row.service.pk %}data-sortable-item="{{ row.service.pk }}"{% endif %}>
           {% if row.service.pk %}
+            <div class="anchor-container"><a name="service{{ row.service.pk }}" class="anchor"></a></div>
+
             <div class="float-right">
               <a href="" class="btn btn-primary btn-sm" title="{% trans 'Sort' %}" data-sortable-grabber>
                 {% include 'svg/grabber.svg' %}</a>

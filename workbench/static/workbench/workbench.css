@@ -148,3 +148,12 @@ tbody th > a {
 .text-black-30 {
   color: rgba(0, 0, 0, 0.3) !important;
 }
+
+.anchor-container {
+  position: relative;
+}
+
+.anchor {
+  position: relative;
+  top: -50px;
+}

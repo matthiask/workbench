@@ -423,7 +423,7 @@ class Service(ServiceBase):
     objects = ServiceQuerySet.as_manager()
 
     def get_absolute_url(self):
-        return self.project.get_absolute_url()
+        return "%s#service%s" % (self.project.get_absolute_url(), self.pk)
 
     @classmethod
     def allow_update(cls, instance, request):
