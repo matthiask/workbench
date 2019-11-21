@@ -39,7 +39,7 @@
       <td class="text-right">{{ stats.maintenance|hours }}</td>
       <td class="text-right">{{ stats.internal|hours }}</td>
       <td class="text-right">{{ stats.total|hours }}</td>
-      <td class="text-right">{{ stats.percentage|stringformat:'d' }}%</td>
+      <td class="text-right">{{ stats.percentage|stringformat:'d' }}% {% pie stats.percentage 100 type="good" %}</td>
     </tr>
     {% endfor %}
     </tbody>

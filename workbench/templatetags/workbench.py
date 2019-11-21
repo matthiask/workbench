@@ -105,7 +105,7 @@ def bar(value, one):
 
 
 @register.simple_tag
-def pie(value, one, size=20):
+def pie(value, one, size=20, type="bad"):
     if not one:
         angle = 0
     else:
@@ -115,7 +115,7 @@ def pie(value, one, size=20):
 
     return format_html(
         """\
-<svg width="{size}" height="{size}" class="pie" style="display: inline-block; transform: scaleX(-1)">
+<svg width="{size}" height="{size}" class="pie {type}" style="display: inline-block">
   <circle r="{hsize}" cx="{hsize}" cy="{hsize}" class="pie-circle" />
   <path d="M {hsize} 0 A {hsize} {hsize} 0 {large_arc} 1 {x} {y} L {hsize} {hsize} z" class="pie-arc" />
 </svg>""",  # noqa
@@ -124,6 +124,7 @@ def pie(value, one, size=20):
         y=hsize - math.cos(angle) * hsize,
         size=size,
         hsize=hsize,
+        type=type,
     )
 
 

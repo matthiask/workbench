@@ -140,6 +140,9 @@ tbody th > a {
 .pie .pie-arc {
   fill: #f47c3c;
 }
+.pie.good .pie-arc {
+  fill: lightgreen;
+}
 
 .bg-caveat {
   background-color: #ff7518;
