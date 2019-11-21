@@ -163,3 +163,15 @@ def history_link(instance):
 def project_statistics_row(project_logged_hours, service_logged_hours):
     service = dict(service_logged_hours)
     return [(user, service.get(user)) for user, _ in project_logged_hours]
+
+
+@register.simple_tag
+def percentage(value, one):
+    return (
+        format_html(
+            '<span class="font-weight-normal text-black-30">{}%</span>',
+            round(100 * value / one),
+        )
+        if one
+        else ""
+    )

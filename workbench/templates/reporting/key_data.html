@@ -123,10 +123,14 @@
       <tr>
         <th>{% trans 'month' %}</th>
         <th class="text-right">{% trans 'profitable' %}</th>
+        <th></th>
         <th class="text-right">{% trans 'overdrawn' %}</th>
+        <th></th>
         <th class="text-right">{% trans 'maintenance' %}</th>
+        <th></th>
         <th class="text-right">{% trans 'internal' %}</th>
-        <th class="text-right">{% trans 'percentage' %}</th>
+        <th></th>
+        <th class="text-right">{% trans 'green' %}</th>
       </tr>
     </thead>
     <tbody>
@@ -134,19 +138,27 @@
         <tr>
           <th>{{ year }}</th>
           <th class="text-right">{{ year_stats.green|hours }}</th>
+          <th>{% percentage year_stats.green year_stats.total %}</th>
           <th class="text-right">{{ year_stats.red|hours }}</th>
+          <th>{% percentage year_stats.red year_stats.total %}</th>
           <th class="text-right">{{ year_stats.maintenance|hours }}</th>
+          <th>{% percentage year_stats.maintenance year_stats.total %}</th>
           <th class="text-right">{{ year_stats.internal|hours }}</th>
+          <th>{% percentage year_stats.internal year_stats.total %}</th>
           <th class="text-right">{{ year_stats.percentage }}%</th>
         </tr>
         {% for month in months reversed %}
         <tr>
           <td>{{ month.month|date:'F Y' }}</td>
           <td class="text-right">{{ month.green|hours }}</td>
+          <th>{% percentage month.green month.total %}</th>
           <td class="text-right">{{ month.red|hours }}</td>
+          <th>{% percentage month.red month.total %}</th>
           <td class="text-right">{{ month.maintenance|hours }}</td>
+          <th>{% percentage month.maintenance month.total %}</th>
           <td class="text-right">{{ month.internal|hours }}</td>
-          <td class="text-right">{{ month.percentage }}%</td>
+          <th>{% percentage month.internal month.total %}</th>
+          <td class="text-right">{{ month.percentage|stringformat:'d' }}%</td>
         </tr>
         {% endfor %}
       {% endfor %}

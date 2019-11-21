@@ -18,12 +18,16 @@
     <thead>
       <tr>
         <th>{% trans 'user' %}</th>
-        <th class="text-right">{% trans 'green' %}</th>
-        <th class="text-right">{% trans 'red' %}</th>
+        <th class="text-right">{% trans 'profitable' %}</th>
+        <th></th>
+        <th class="text-right">{% trans 'overdrawn' %}</th>
+        <th></th>
         <th class="text-right">{% trans 'maintenance' %}</th>
+        <th></th>
         <th class="text-right">{% trans 'internal' %}</th>
+        <th></th>
         <th class="text-right">{% trans 'total' %}</th>
-        <th class="text-right" title="{% trans 'green and maintenance' %}">{% trans 'percentage' %}</th>
+        <th class="text-right">{% trans 'green' %}</th>
       </tr>
     </thead>
     <tbody>
@@ -35,9 +39,13 @@
         <th>{% trans 'total' %}</th>
       {% endif %}
       <td class="text-right">{{ stats.green|hours }}</td>
+      <td>{% percentage stats.green stats.total %}</td>
       <td class="text-right">{{ stats.red|hours }}</td>
+      <td>{% percentage stats.red stats.total %}</td>
       <td class="text-right">{{ stats.maintenance|hours }}</td>
+      <td>{% percentage stats.maintenance stats.total %}</td>
       <td class="text-right">{{ stats.internal|hours }}</td>
+      <td>{% percentage stats.internal stats.total %}</td>
       <td class="text-right">{{ stats.total|hours }}</td>
       <td class="text-right">{{ stats.percentage|stringformat:'d' }}% {% pie stats.percentage 100 type="good" %}</td>
     </tr>
