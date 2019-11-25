@@ -401,6 +401,9 @@ class LogbookTest(TestCase):
         valid("date_from=2018-01-01")
         valid("date_until=2018-01-01")
         valid("service=" + str(hours.service.pk))
+        valid("circle=0")
+        valid("circle=1")
+        valid("role=1")
         valid("organization=" + str(hours.service.project.customer.pk))
         valid("xlsx=1")
 

@@ -34,7 +34,7 @@ def hours_by_circle(date_range, *, users=None):
         {
             "users": users,
             "circle": None,
-            "by_user": [hours_by_circle[None][user.id] for user in users],
+            "by_user": [(user, hours_by_circle[None][user.id]) for user in users],
             "total": sum(hours_by_circle[None].values(), Decimal()),
         }
     ]
@@ -42,7 +42,7 @@ def hours_by_circle(date_range, *, users=None):
         row = {
             "circle": circle,
             "roles": [],
-            "by_user": [hours_by_circle[circle.id][user.id] for user in users],
+            "by_user": [(user, hours_by_circle[circle.id][user.id]) for user in users],
             "total": sum(hours_by_circle[circle.id].values(), Decimal()),
         }
 
@@ -52,7 +52,9 @@ def hours_by_circle(date_range, *, users=None):
                 row["roles"].append(
                     {
                         "role": role,
-                        "by_user": [hours_by_role[role.id][user.id] for user in users],
+                        "by_user": [
+                            (user, hours_by_role[role.id][user.id]) for user in users
+                        ],
                         "total": role_total,
                     }
                 )

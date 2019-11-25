@@ -46,6 +46,8 @@ class LoggedHoursSearchForm(forms.Form):
         widget=forms.HiddenInput,
         label="",
     )
+    circle = forms.IntegerField(required=False, widget=forms.HiddenInput, label="",)
+    role = forms.IntegerField(required=False, widget=forms.HiddenInput, label="",)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -71,6 +73,12 @@ class LoggedHoursSearchForm(forms.Form):
         # "hidden" filters
         if data.get("service"):
             queryset = queryset.filter(service=data.get("service"))
+        if data.get("circle") == 0:
+            queryset = queryset.filter(service__role__isnull=True)
+        elif data.get("circle"):
+            queryset = queryset.filter(service__role__circle=data.get("circle"))
+        if data.get("role"):
+            queryset = queryset.filter(service__role=data.get("role"))
 
         return queryset.select_related("service__project__owned_by", "rendered_by")
 
