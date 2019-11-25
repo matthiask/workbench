@@ -131,22 +131,25 @@ $(function() {
     }
   })
 
+  function localStorageKeyFor(href) {
+    return `search-${href}`
+  }
+
+  function restoreSearch(href) {
+    return href + (window.localStorage.getItem(localStorageKeyFor(href)) || "")
+  }
+
   // Restore the search params when going through the main menu...
   $(".navbar").on("click", "a", function(e) {
     const orig = e.originalEvent
     if (orig.altKey || orig.ctrlKey || orig.metakey || orig.shiftKey) return
 
-    const key = `search-${this.getAttribute("href")}`
-    const search = window.localStorage.getItem(key)
-    if (search) {
-      e.preventDefault()
-      window.location.href = this.getAttribute("href") + search
-    }
+    e.preventDefault()
+    window.location.href = restoreSearch(this.getAttribute("href"))
   })
 
   $("h1, [data-reset-filter]").on("click", function() {
-    const key = `search-${window.location.pathname}`
-    window.localStorage.removeItem(key)
+    window.localStorage.removeItem(localStorageKeyFor(window.location.pathname))
   })
 
   // Hotkeys
@@ -168,22 +171,19 @@ $(function() {
       window.openModalFromUrl("/contacts/people/select/")
     } else if (e.keyCode === 67) {
       // c
-      window.location.href = "/contacts/people/"
+      window.location.href = restoreSearch("/contacts/people/")
     } else if (e.keyCode === 80 && e.shiftKey) {
       // Shift-p
       window.openModalFromUrl("/projects/select/")
     } else if (e.keyCode === 80) {
       // p
-      window.location.href = "/projects/"
+      window.location.href = restoreSearch("/projects/")
     } else if (e.keyCode === 79) {
       // o
-      window.location.href = "/offers/"
+      window.location.href = restoreSearch("/offers/")
     } else if (e.keyCode === 82) {
       // r
-      window.location.href = "/invoices/"
-    } else if (e.keyCode === 65) {
-      // a
-      window.location.href = "/activities/"
+      window.location.href = restoreSearch("/invoices/")
     } else if (e.keyCode === 76) {
       // l
       const el = document.querySelector("[data-createhours]")
