@@ -134,7 +134,6 @@ class CreditEntriesTest(TestCase):
         valid("q=test")
         valid("s=pending")
         valid("s=processed")
-        valid("xlsx=1")
         valid("ledger={}".format(ledger.pk))
 
     def test_create_entry(self):

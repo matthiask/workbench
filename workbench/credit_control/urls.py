@@ -1,6 +1,7 @@
 from django.conf.urls import url
 
 from workbench import generic
+from workbench.accounts.permissions import book_keeping_only
 from workbench.credit_control.forms import (
     AccountStatementUploadForm,
     CreditEntryForm,
@@ -28,35 +29,41 @@ urlpatterns = [
     ),
     url(
         r"^create/$",
-        generic.CreateView.as_view(
-            model=CreditEntry,
-            form_class=CreditEntryForm,
-            success_url="credit_control_creditentry_list",
+        book_keeping_only(
+            generic.CreateView.as_view(
+                model=CreditEntry,
+                form_class=CreditEntryForm,
+                success_url="credit_control_creditentry_list",
+            )
         ),
         name="credit_control_creditentry_create",
     ),
     url(
         r"^upload/$",
-        AccountStatementUploadView.as_view(
-            model=CreditEntry,
-            form_class=AccountStatementUploadForm,
-            success_url="credit_control_creditentry_list",
+        book_keeping_only(
+            AccountStatementUploadView.as_view(
+                model=CreditEntry,
+                form_class=AccountStatementUploadForm,
+                success_url="credit_control_creditentry_list",
+            )
         ),
         name="credit_control_creditentry_upload",
     ),
     url(
         r"^(?P<pk>\d+)/update/$",
-        generic.UpdateView.as_view(model=CreditEntry, form_class=CreditEntryForm),
+        book_keeping_only(
+            generic.UpdateView.as_view(model=CreditEntry, form_class=CreditEntryForm)
+        ),
         name="credit_control_creditentry_update",
     ),
     url(
         r"^(?P<pk>\d+)/delete/$",
-        generic.DeleteView.as_view(model=CreditEntry),
+        book_keeping_only(generic.DeleteView.as_view(model=CreditEntry)),
         name="credit_control_creditentry_delete",
     ),
     url(
         r"^assign/$",
-        AssignCreditEntriesView.as_view(model=CreditEntry),
+        book_keeping_only(AssignCreditEntriesView.as_view(model=CreditEntry)),
         name="credit_control_creditentry_assign",
     ),
 ]

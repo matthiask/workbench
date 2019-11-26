@@ -202,3 +202,20 @@ class User(Model, AbstractBaseUser):
             for key, value in [("invoices", invoices), ("offers", offers)]
             if value
         }
+
+    @cached_property
+    def permissions(self):
+        return UserPermissions(email=self.email)
+
+
+class UserPermissions:
+    def __init__(self, *, email):
+        self.email = email
+
+    def __getattr__(self, key):
+        try:
+            return self.email in settings.PERMISSIONS[key]
+        except KeyError:
+            return False
+
+    __getitem__ = __getattr__

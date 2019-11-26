@@ -11,7 +11,6 @@ from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.invoices.models import Invoice
 from workbench.tools.formats import currency, local_date_format
 from workbench.tools.forms import Autocomplete, ModelForm, Textarea
-from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
 class CreditEntrySearchForm(forms.Form):
@@ -44,12 +43,6 @@ class CreditEntrySearchForm(forms.Form):
         return queryset.select_related(
             "invoice__project", "invoice__owned_by", "ledger"
         )
-
-    def response(self, request, queryset):
-        if request.GET.get("xlsx"):
-            xlsx = WorkbenchXLSXDocument()
-            xlsx.table_from_queryset(queryset)
-            return xlsx.to_response("credit-entries.xlsx")
 
 
 class CreditEntryForm(ModelForm):

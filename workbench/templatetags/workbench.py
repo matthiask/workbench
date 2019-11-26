@@ -205,3 +205,8 @@ ORDER BY extract(month from date_of_birth), extract(day from date_of_birth)
             }
             for row in cursor
         ]
+
+
+@register.filter
+def has(user, permission):
+    return user.permissions[permission]

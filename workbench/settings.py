@@ -1,6 +1,7 @@
 import os
 import sys
 import types
+from collections import defaultdict
 
 from django.utils.translation import gettext_lazy as _
 
@@ -13,6 +14,7 @@ read_speckenv(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("SECRET_KEY", required=True)
 DEBUG = env("DEBUG", default=any(arg in {"runserver"} for arg in sys.argv))
+TESTING = env("TESTING", default=any(arg in {"test"} for arg in sys.argv))
 LIVE = env("LIVE", default=False)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
 ADMINS = MANAGERS = [("Matthias Kestenholz", "mk@feinheit.ch")]
@@ -268,6 +270,13 @@ else:
 MAILCHIMP_API_KEY = env("MAILCHIMP_API_KEY", warn=True)
 MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID", warn=True)
 GLASSFROG_TOKEN = env("GLASSFROG_TOKEN", warn=True)
+
+contains_everything = type(str("c"), (), {"__contains__": lambda *a: True})()
+PERMISSIONS = env(
+    "PERMISSIONS",
+    default=defaultdict(lambda: contains_everything) if TESTING else {},
+    warn=True,
+)
 
 if DEBUG:  # pragma: no cover
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
