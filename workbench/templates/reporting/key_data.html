@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="row justify-content-center">
-<div class="col-sm-12 col-md-8">
+<div class="col-sm-12">
   <h1>
     {% trans 'key data' %}
     {# <small>{{ date_range.0|local_date_format }} &ndash; {{ date_range.1|local_date_format }}</small> #}
@@ -31,7 +31,7 @@
   <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
 
   <h2 class="mt-5">{% trans 'revenue minus third party costs and accruals' %}</h2>
-  <canvas id="invoiced-corrected" width="800" height="350"></canvas>
+  <canvas id="invoiced-corrected" width="800" height="300"></canvas>
   <script>
     new Chart("invoiced-corrected", {
       type: "bar",
@@ -82,11 +82,90 @@
       {% for month in gross_margin_by_month reversed %}
       <tr>
         <td>{{ month.date|date:'F Y' }}</td>
-        <td class="text-right">{{ month.gross_profit|currency }}</td>
-        <td class="text-right">{{ month.third_party_costs|currency:1 }}</td>
+        <td class="text-right">
+          <a href="#gp{{ month.key }}" data-toggle="collapse">
+            {{ month.gross_profit.total_excl_tax|currency }}
+          </a>
+        </td>
+        <td class="text-right">
+          <a href="#tpc{{ month.key }}" data-toggle="collapse">
+            {{ month.third_party_costs.third_party_costs|currency:1 }}
+          </a>
+        </td>
         <td class="text-right text-muted">{{ month.accruals.accrual|currency }}</td>
         <td class="text-right">{{ month.accruals.delta|currency:1 }}</td>
         <td class="text-right">{{ month.gross_margin|currency }}</td>
+      </tr>
+
+      <tr>
+        <td colspan="6" class="collapse bg-dark" id="gp{{ month.key }}">
+          <table class="table table-sm bg-light">
+            <tr>
+              <th class="w-100">{% trans 'invoice' %}</th>
+              <th class="text-nowrap">{% trans 'invoiced on' %}</th>
+              <th class="text-nowrap text-right">{% trans 'total' %}</th>
+              <th class="text-nowrap text-right">{% trans 'total excl. tax' %}</th>
+            </tr>
+            {% for invoice in month.gross_profit.invoices %}
+              <tr>
+                <td>
+                  <a href="{{ invoice.get_absolute_url }}">
+                    {{ invoice|h }}
+                    {{ invoice.status_badge }}
+                  </a>
+                </td>
+                <td>{{ invoice.invoiced_on|local_date_format }}</td>
+                <td class="text-right">{{ invoice.total|currency }}</td>
+                <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
+              </tr>
+            {% endfor %}
+          </table>
+        </td>
+      </tr>
+
+      <tr>
+        <td colspan="6" class="collapse bg-dark" id="tpc{{ month.key }}">
+          <table class="table table-sm bg-light">
+            {% for cost in month.third_party_costs.logged_costs %}
+              {% if forloop.first %}
+                <tr>
+                  <th class="w-100">{% trans 'logged cost' %}</th>
+                  <th class="text-nowrap">{% trans 'date' %}</th>
+                  <th class="text-nowrap text-right">{% trans 'third party costs' %}</th>
+                </tr>
+              {% endif %}
+              <tr>
+                <td>
+                  <a data-toggle="ajaxmodal" href="{{ cost.get_absolute_url }}">
+                    {{ cost.service }}: {{ cost }}
+                  </a>
+                </td>
+                <td>{{ cost.rendered_on|local_date_format }}</td>
+                <td class="text-right">{{ cost.third_party_costs|currency }}</td>
+              </tr>
+            {% endfor %}
+
+            {% for invoice in month.third_party_costs.invoices %}
+              {% if forloop.first %}
+                <tr>
+                  <th class="w-100">{% trans 'invoice' %}</th>
+                  <th class="text-nowrap">{% trans 'date' %}</th>
+                  <th class="text-nowrap text-right">{% trans 'third party costs' %}</th>
+                </tr>
+              {% endif %}
+              <tr>
+                <td>
+                  <a href="{{ invoice.get_absolute_url }}">
+                    {{ invoice|h }}
+                    {{ invoice.status_badge }}
+                  </a>
+                </td>
+                <td>{{ invoice.invoiced_on|local_date_format }}</td>
+                <td class="text-right">{{ invoice.third_party_costs|currency }}</td>
+              </tr>
+            {% endfor %}
+          </table>
+        </td>
       </tr>
       {% endfor %}
     </tbody>

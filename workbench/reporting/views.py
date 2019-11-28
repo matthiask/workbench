@@ -3,13 +3,12 @@ from itertools import groupby
 
 from django import forms
 from django.db.models import Q
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.utils import timezone
 from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.invoices.models import Invoice
-from workbench.invoices.reporting import monthly_invoicing
 from workbench.invoices.utils import next_valid_day
 from workbench.projects.models import Project
 from workbench.projects.reporting import overdrawn_projects, project_budget_statistics
@@ -19,23 +18,6 @@ from workbench.tools.forms import DateInput
 from workbench.tools.models import ONE, Z
 from workbench.tools.validation import filter_form, monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
-
-
-def monthly_invoicing_view(request):
-    year = None
-    if "year" in request.GET:
-        try:
-            year = int(request.GET["year"])
-        except Exception:
-            return redirect(".")
-    if not year:
-        year = dt.date.today().year
-
-    return render(
-        request,
-        "reporting/monthly_invoicing.html",
-        {"year": year, "monthly_invoicing": monthly_invoicing(year)},
-    )
 
 
 def overdrawn_projects_view(request):

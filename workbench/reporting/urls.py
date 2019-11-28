@@ -7,7 +7,6 @@ from workbench.reporting.views import (
     green_hours_view,
     hours_filter_view,
     key_data_view,
-    monthly_invoicing_view,
     open_items_list,
     overdrawn_projects_view,
     project_budget_statistics_view,
@@ -16,9 +15,6 @@ from workbench.reporting.views import (
 
 urlpatterns = [
     url(r"^annual-working-time/$", ReportView.as_view(), name="awt_year_report"),
-    url(
-        r"^monthly-invoicing/$", monthly_invoicing_view, name="report_monthly_invoicing"
-    ),
     url(
         r"^overdrawn-projects/$",
         overdrawn_projects_view,

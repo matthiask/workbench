@@ -3,8 +3,7 @@ from collections import defaultdict
 from itertools import chain
 
 from django.db import connections
-from django.db.models import Sum
-from django.db.models.functions import ExtractMonth, ExtractYear
+from django.db.models import Q, Sum
 
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
@@ -13,44 +12,46 @@ from workbench.tools.models import Z
 
 
 def gross_profit_by_month(date_range):
-    profit = defaultdict(lambda: Z)
-    for row in (
+    profit = defaultdict(lambda: {"total_excl_tax": Z, "invoices": []})
+    for invoice in (
         Invoice.objects.valid()
-        .order_by()
         .filter(invoiced_on__range=date_range)
-        .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))
-        .values("year", "month")
-        .annotate(Sum("total_excl_tax"))
+        .order_by("invoiced_on", "id")
+        .select_related("project", "owned_by")
     ):
-        profit[(row["year"], row["month"])] += row["total_excl_tax__sum"]
+        row = profit[(invoice.invoiced_on.year, invoice.invoiced_on.month)]
+        row["total_excl_tax"] += invoice.total_excl_tax
+        row["invoices"].append(invoice)
     return profit
 
 
 def third_party_costs_by_month(date_range):
-    costs = defaultdict(lambda: Z)
+    costs = defaultdict(
+        lambda: {"third_party_costs": Z, "invoices": [], "logged_costs": []}
+    )
 
-    for row in (
-        LoggedCost.objects.order_by()
-        .filter(
+    for cost in (
+        LoggedCost.objects.filter(
             rendered_on__range=date_range,
             third_party_costs__isnull=False,
             invoice_service__isnull=True,
         )
-        .annotate(year=ExtractYear("rendered_on"), month=ExtractMonth("rendered_on"))
-        .values("year", "month")
-        .annotate(Sum("third_party_costs"))
+        .order_by("rendered_on", "id")
+        .select_related("service")
     ):
-        costs[(row["year"], row["month"])] += row["third_party_costs__sum"]
+        row = costs[(cost.rendered_on.year, cost.rendered_on.month)]
+        row["third_party_costs"] -= cost.third_party_costs
+        row["logged_costs"].append(cost)
 
-    for row in (
+    for invoice in (
         Invoice.objects.valid()
-        .order_by()
-        .filter(invoiced_on__range=date_range)
-        .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))
-        .values("year", "month")
-        .annotate(Sum("third_party_costs"))
+        .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z))
+        .order_by("invoiced_on", "id")
+        .select_related("project", "owned_by")
     ):
-        costs[(row["year"], row["month"])] += row["third_party_costs__sum"]
+        row = costs[(invoice.invoiced_on.year, invoice.invoiced_on.month)]
+        row["third_party_costs"] -= invoice.third_party_costs
+        row["invoices"].append(invoice)
 
     return costs
 
@@ -96,13 +97,16 @@ def gross_margin_by_month(date_range):
     for month in months:
         row = {
             "month": month,
+            "key": "%s-%s" % month,
             "date": dt.date(month[0], month[1], 1),
-            "gross_profit": gross.get(month, Z),
-            "third_party_costs": -third.get(month, Z),
+            "gross_profit": gross[month],
+            "third_party_costs": third[month],
             "accruals": accruals.get(month) or {"accrual": None, "delta": Z},
         }
         row["gross_margin"] = (
-            row["gross_profit"] + row["third_party_costs"] + row["accruals"]["delta"]
+            row["gross_profit"]["total_excl_tax"]
+            + row["third_party_costs"]["third_party_costs"]
+            + row["accruals"]["delta"]
         )
         profit.append(row)
 

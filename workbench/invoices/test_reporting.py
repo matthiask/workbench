@@ -36,15 +36,3 @@ class ReportingTest(TestCase):
         # print(response, response.content.decode("utf-8"))
 
         self.assertEqual(self.client.get("/report/key-data/").status_code, 200)
-
-    def test_monthly_invoicing_form(self):
-        self.client.force_login(factories.UserFactory.create())
-        response = self.client.get("/report/monthly-invoicing/")
-        self.assertContains(response, "monthly invoicing")
-
-        response = self.client.get("/report/monthly-invoicing/?year=2018")
-        self.assertContains(response, "monthly invoicing")
-
-        response = self.client.get("/report/monthly-invoicing/?year=bla")
-        self.assertRedirects(response, "/report/monthly-invoicing/")
-        self.assertEqual(messages(response), [])

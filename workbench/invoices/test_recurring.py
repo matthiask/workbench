@@ -1,5 +1,4 @@
 import datetime as dt
-from decimal import Decimal
 
 from django.core import mail
 from django.test import TestCase
@@ -7,7 +6,6 @@ from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.invoices.models import Invoice, RecurringInvoice
-from workbench.invoices.reporting import monthly_invoicing
 from workbench.invoices.tasks import create_recurring_invoices_and_notify
 from workbench.tools.testing import messages
 
@@ -44,26 +42,6 @@ class RecurringTest(TestCase):
         ri.ends_on = None
         ri.save()
         self.assertEqual(len(ri.create_invoices(generate_until=dt.date(2019, 1, 1))), 1)
-
-        # Not so clean, but we have a few invoices here...
-        mi = monthly_invoicing(2018)
-        self.assertAlmostEqual(mi["third_party_costs"], Decimal(0))
-        self.assertAlmostEqual(mi["total"], Decimal(200 * 12) * Decimal("1.077"))
-        self.assertAlmostEqual(mi["total_excl_tax"], Decimal(200 * 12))
-
-        self.assertEqual(
-            [month["total_excl_tax"] for month in mi["months"]],
-            [Decimal("200.00") for i in range(12)],
-        )
-
-        mi = monthly_invoicing(2019)
-        self.assertAlmostEqual(mi["third_party_costs"], Decimal(0))
-        self.assertAlmostEqual(mi["total"], Decimal(200) * Decimal("1.077"))
-        self.assertAlmostEqual(mi["total_excl_tax"], Decimal(200))
-
-        self.assertEqual(
-            [month["total_excl_tax"] for month in mi["months"]], [Decimal("200.00")]
-        )
 
         # Continue generating invoices after January '19
         self.assertTrue(len(RecurringInvoice.objects.create_invoices()) > 1)

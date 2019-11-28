@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-28 14:17+0100\n"
+"POT-Creation-Date: 2019-11-28 15:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -130,7 +130,7 @@ msgstr "Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/monthly_invoicing.html
+#: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/pdf.py
 msgid "invoice"
 msgstr "Rechnung"
@@ -616,7 +616,7 @@ msgstr ""
 
 #: workbench/credit_control/forms.py workbench/invoices/models.py
 #: workbench/templates/invoices/invoice_detail.html
-#: workbench/templates/reporting/monthly_invoicing.html
+#: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/open_items_list.html
 msgid "invoiced on"
 msgstr "Verrechnet am"
@@ -660,7 +660,7 @@ msgstr "Valuta"
 #: workbench/expenses/views.py workbench/management/commands/export_debtors.py
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/monthly_invoicing.html
+#: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
 #: workbench/tools/pdf.py
 msgid "total"
@@ -1021,7 +1021,6 @@ msgstr "Anzahlungstotal"
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/reporting/key_data.html
-#: workbench/templates/reporting/monthly_invoicing.html
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "third party costs"
 msgstr "Fremdkosten"
@@ -1290,7 +1289,7 @@ msgstr "Kann Stunden vergangener Wochen nicht löschen."
 msgid "paid from my own pocket"
 msgstr "mit eigenem Geld bezahlt"
 
-#: workbench/logbook/models.py
+#: workbench/logbook/models.py workbench/templates/reporting/key_data.html
 msgid "logged cost"
 msgstr "Erfasste Kosten"
 
@@ -1652,7 +1651,7 @@ msgstr "Löschen"
 #: workbench/templates/accruals/cutoffdate_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/monthly_invoicing.html
+#: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
 msgid "total excl. tax"
 msgstr "Total exkl. MwSt."
@@ -1771,11 +1770,6 @@ msgstr "Überzogene Projekte"
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "project budget statistics"
 msgstr "Projekt-Budgetstatistik"
-
-#: workbench/templates/base.html
-#: workbench/templates/reporting/monthly_invoicing.html
-msgid "monthly invoicing"
-msgstr "Monatliche Verrechnung"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/open_items_list.html
@@ -2028,6 +2022,10 @@ msgstr "Umsatz"
 msgid "gross margin"
 msgstr "Gewinn ohne Fixkosten"
 
+#: workbench/templates/reporting/key_data.html workbench/tools/pdf.py
+msgid "date"
+msgstr "Datum"
+
 #: workbench/templates/reporting/key_data.html
 msgid "hours distribution"
 msgstr "Stundenverteilung"
@@ -2199,10 +2197,6 @@ msgid "tax"
 msgstr "MwSt."
 
 #: workbench/tools/pdf.py
-msgid "date"
-msgstr "Datum"
-
-#: workbench/tools/pdf.py
 msgid "our reference"
 msgstr "Unsere Referenz"
 
@@ -2226,12 +2220,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "red"
-#~ msgstr "Rot"
-
-#~ msgid "green and maintenance"
-#~ msgstr "Grün und Wartung"
-
-#~ msgid "activities"
-#~ msgstr "Aktivitäten"
