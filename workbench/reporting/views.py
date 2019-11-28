@@ -237,11 +237,12 @@ class ProjectBudgetStatisticsForm(forms.Form):
 
 @filter_form(ProjectBudgetStatisticsForm)
 def project_budget_statistics_view(request, form):
-    stats = sorted(
-        project_budget_statistics(form.queryset()),
-        key=lambda project: project["delta"],
-        reverse=True,
+    key = (
+        (lambda project: project["project"].closed_on)
+        if request.GET.get("s") == "closed"
+        else (lambda project: project["delta"])
     )
+    stats = sorted(project_budget_statistics(form.queryset()), key=key, reverse=True)
     if request.GET.get("xlsx"):
         xlsx = WorkbenchXLSXDocument()
         xlsx.add_sheet(str(Project._meta.verbose_name_plural))
