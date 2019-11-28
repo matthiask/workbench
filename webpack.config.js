@@ -59,7 +59,7 @@ module.exports = {
                   {
                     modules: false,
                     // debug: true,
-                    targets: packageJson.browserslist,
+                    // targets: packageJson.browserslist,
                     useBuiltIns: "usage",
                     corejs: "3",
                   },
