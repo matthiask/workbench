@@ -5,7 +5,7 @@ from django import forms
 from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.invoices.models import Invoice
@@ -248,18 +248,15 @@ def project_budget_statistics_view(request, form):
         xlsx.add_sheet(str(Project._meta.verbose_name_plural))
         xlsx.table(
             [
-                str(title)
-                for title in [
-                    _("project"),
-                    _("offered"),
-                    _("logbook"),
-                    _("undefined rate"),
-                    _("third party costs"),
-                    _("invoiced"),
-                    _("not archived"),
-                    _("total hours"),
-                    _("delta"),
-                ]
+                gettext("project"),
+                gettext("offered"),
+                gettext("logbook"),
+                gettext("undefined rate"),
+                gettext("third party costs"),
+                gettext("invoiced"),
+                gettext("not archived"),
+                gettext("total hours"),
+                gettext("delta"),
             ],
             [
                 (
