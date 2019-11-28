@@ -237,17 +237,50 @@ class ProjectBudgetStatisticsForm(forms.Form):
 
 @filter_form(ProjectBudgetStatisticsForm)
 def project_budget_statistics_view(request, form):
+    stats = sorted(
+        project_budget_statistics(form.queryset()),
+        key=lambda project: project["delta"],
+        reverse=True,
+    )
+    if request.GET.get("xlsx"):
+        xlsx = WorkbenchXLSXDocument()
+        xlsx.add_sheet(str(Project._meta.verbose_name_plural))
+        xlsx.table(
+            [
+                str(title)
+                for title in [
+                    _("project"),
+                    _("offered"),
+                    _("logbook"),
+                    _("undefined rate"),
+                    _("third party costs"),
+                    _("invoiced"),
+                    _("not archived"),
+                    _("total hours"),
+                    _("delta"),
+                ]
+            ],
+            [
+                (
+                    project["project"],
+                    project["offered"],
+                    project["logbook"],
+                    project["effort_hours_with_rate_undefined"],
+                    project["third_party_costs"],
+                    project["invoiced"],
+                    project["not_archived"],
+                    project["hours"],
+                    project["delta"],
+                )
+                for project in stats
+            ],
+        )
+        return xlsx.to_response("project-budget-statistics.xlsx")
+
     return render(
         request,
         "reporting/project_budget_statistics.html",
-        {
-            "form": form,
-            "projects": sorted(
-                project_budget_statistics(form.queryset()),
-                key=lambda project: project["delta"],
-                reverse=True,
-            ),
-        },
+        {"form": form, "projects": stats},
     )
 
 
