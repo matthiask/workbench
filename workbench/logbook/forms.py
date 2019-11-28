@@ -261,9 +261,12 @@ class LoggedHoursForm(ModelForm):
                 "Deselect the existing service if you want to create a new service."
             )
         if self.project.closed_on:
-            self.add_warning(
-                _("This project is already closed."), code="project-closed"
-            )
+            if self.project.closed_on < dt.date.today() - dt.timedelta(days=15):
+                errors["__all__"] = _("This project has been closed too long ago.")
+            else:
+                self.add_warning(
+                    _("This project has been closed recently."), code="project-closed"
+                )
         if self.instance.invoice_service:
             self.add_warning(
                 _("This entry is already part of an invoice."), code="part-of-invoice"
@@ -370,17 +373,20 @@ class LoggedCostForm(ModelForm):
 
     def clean(self):
         data = super().clean()
+        errors = {}
         if self.project.closed_on:
-            self.add_warning(
-                _("This project is already closed."), code="project-closed"
-            )
+            if self.project.closed_on < dt.date.today() - dt.timedelta(days=15):
+                errors["__all__"] = _("This project has been closed too long ago.")
+            else:
+                self.add_warning(
+                    _("This project has been closed recently."), code="project-closed"
+                )
         if self.instance.invoice_service:
             self.add_warning(
                 _("This entry is already part of an invoice."), code="part-of-invoice"
             )
         if data.get("are_expenses") and not data.get("third_party_costs"):
-            self.add_error(
-                "third_party_costs",
+            errors["third_party_costs"] = (
                 _("Providing third party costs is necessary for expenses."),
             )
         if data.get("cost") and data.get("third_party_costs") is not None:
@@ -389,4 +395,5 @@ class LoggedCostForm(ModelForm):
                     _("Third party costs shouldn't be higher than costs."),
                     code="third-party-costs-higher",
                 )
+        raise_if_errors(errors)
         return data

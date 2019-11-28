@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-19 08:48+0100\n"
+"POT-Creation-Date: 2019-11-28 14:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -148,7 +148,7 @@ msgstr ""
 "abgegolten wird."
 
 #: workbench/accruals/models.py workbench/invoices/views.py
-#: workbench/logbook/__init__.py
+#: workbench/logbook/__init__.py workbench/reporting/views.py
 #: workbench/templates/accruals/cutoffdate_detail.html
 #: workbench/templates/base.html
 #: workbench/templates/invoices/invoice_detail.html
@@ -266,8 +266,6 @@ msgid "date until"
 msgstr "Datum bis"
 
 #: workbench/awt/models.py workbench/templates/awt/year_detail.html
-#: workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/key_data.html
 msgid "percentage"
 msgstr "Prozent"
 
@@ -907,7 +905,7 @@ msgid "%s logged but no hourly rate defined."
 msgstr "%s erfasst aber kein Stundensatz definiert."
 
 #: workbench/invoices/forms.py workbench/projects/models.py
-#: workbench/templates/projects/project_detail.html
+#: workbench/projects/views.py workbench/templates/projects/project_detail.html
 msgid "Not offered yet"
 msgstr "Noch nicht offeriert"
 
@@ -983,7 +981,7 @@ msgid "contact"
 msgstr "Kontakt"
 
 #: workbench/invoices/models.py workbench/offers/models.py
-#: workbench/projects/models.py
+#: workbench/projects/models.py workbench/reporting/views.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -1019,7 +1017,7 @@ msgid "down payment total"
 msgstr "Anzahlungstotal"
 
 #: workbench/invoices/models.py workbench/logbook/models.py
-#: workbench/services/models.py
+#: workbench/reporting/views.py workbench/services/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/reporting/key_data.html
@@ -1221,9 +1219,13 @@ msgstr ""
 "Falls Du eine neue Leistung erstellen willst, darfst Du keine existierende "
 "Leistung wählen."
 
-#: workbench/logbook/forms.py workbench/projects/forms.py
-msgid "This project is already closed."
-msgstr "Dieses Projekt wurde schon geschlossen."
+#: workbench/logbook/forms.py
+msgid "This project has been closed too long ago."
+msgstr "Dieses Projekt ist schon zu lange geschlossen."
+
+#: workbench/logbook/forms.py
+msgid "This project has been closed recently."
+msgstr "Dieses Projekt wurde kürzlich geschlossen."
 
 #: workbench/logbook/forms.py
 msgid "This entry is already part of an invoice."
@@ -1312,7 +1314,7 @@ msgstr "Projekt für Erfassung auswählen"
 msgid "earned"
 msgstr "Verdient"
 
-#: workbench/management/commands/profitability.py
+#: workbench/management/commands/profitability.py workbench/reporting/views.py
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "invoiced"
 msgstr "Verrechnet"
@@ -1462,6 +1464,10 @@ msgid "Try deleting the service after reassigning logbook entries"
 msgstr ""
 "Versuche, die Leistung nach der Zuweisung der Logbucheinträge zu löschen"
 
+#: workbench/projects/forms.py
+msgid "This project is already closed."
+msgstr "Dieses Projekt wurde schon geschlossen."
+
 #: workbench/projects/models.py
 msgid "Order"
 msgstr "Auftrag"
@@ -1512,11 +1518,13 @@ msgstr "Logbucheinträge von %(instance)s neu zuweisen"
 msgid "Jump to project"
 msgstr "Zu Projekt springen"
 
-#: workbench/reporting/views.py workbench/templates/reporting/key_data.html
+#: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
 msgid "profitable"
 msgstr "Profitabel"
 
-#: workbench/reporting/views.py workbench/templates/reporting/key_data.html
+#: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/overdrawn_projects.html
 msgid "overdrawn"
 msgstr "Überzogen"
@@ -1534,6 +1542,32 @@ msgstr "Intern"
 #: workbench/reporting/views.py
 msgid "Closed during the last year"
 msgstr "Geschlossen während dem letzten Jahr"
+
+#: workbench/reporting/views.py
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "offered"
+msgstr "Offeriert"
+
+#: workbench/reporting/views.py
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_statistics.html
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "undefined rate"
+msgstr "ohne Stundensatz"
+
+#: workbench/reporting/views.py
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "not archived"
+msgstr "Nicht archiviert"
+
+#: workbench/reporting/views.py
+msgid "total hours"
+msgstr "Stunden insgesamt"
+
+#: workbench/reporting/views.py
+msgid "delta"
+msgstr "Delta"
 
 #: workbench/services/models.py
 msgid "position"
@@ -1903,17 +1937,6 @@ msgstr "Gesamtkosten"
 
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_statistics.html
-#: workbench/templates/reporting/project_budget_statistics.html
-msgid "undefined rate"
-msgstr "ohne Stundensatz"
-
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/project_budget_statistics.html
-msgid "not archived"
-msgstr "Nicht archiviert"
-
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/projects/project_statistics.html
 msgid "statistics"
 msgstr "Statistik"
 
@@ -1965,16 +1988,9 @@ msgid "show"
 msgstr "Anzeigen"
 
 #: workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
 msgid "green"
 msgstr "Grün"
-
-#: workbench/templates/reporting/green_hours.html
-msgid "red"
-msgstr "Rot"
-
-#: workbench/templates/reporting/green_hours.html
-msgid "green and maintenance"
-msgstr "Grün und Wartung"
 
 #: workbench/templates/reporting/hours_by_circle.html
 msgid "No circle"
@@ -2020,10 +2036,6 @@ msgstr "Stundenverteilung"
 msgid "effort hours"
 msgstr "Aufwände in Stunden"
 
-#: workbench/templates/reporting/project_budget_statistics.html
-msgid "offered"
-msgstr "Offeriert"
-
 #: workbench/templates/search.html
 msgid "Only showing 100 items. Additional results have been omitted."
 msgstr "Zeige nur 100 Elemente an. Weitere Resultate wurden weggelassen."
@@ -2047,10 +2059,6 @@ msgstr "Aktuelles Formular abschicken"
 #: workbench/templates/shortcuts.html
 msgid "Home"
 msgstr "Start"
-
-#: workbench/templates/shortcuts.html
-msgid "activities"
-msgstr "Aktivitäten"
 
 #: workbench/templates/shortcuts.html
 msgid "log hours in active project or in any project if none is active"
@@ -2218,3 +2226,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "red"
+#~ msgstr "Rot"
+
+#~ msgid "green and maintenance"
+#~ msgstr "Grün und Wartung"
+
+#~ msgid "activities"
+#~ msgstr "Aktivitäten"

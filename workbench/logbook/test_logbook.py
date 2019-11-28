@@ -64,7 +64,12 @@ class LogbookTest(TestCase):
         project.save()
 
         response = send()
-        self.assertContains(response, "This project is already closed.")
+        self.assertContains(response, "This project has been closed recently.")
+
+        project.closed_on = dt.date.today() - dt.timedelta(days=20)
+        project.save()
+        response = send()
+        self.assertContains(response, "This project has been closed too long ago.")
 
     def test_move_to_past_week_forbidden(self):
         hours = factories.LoggedHoursFactory.create()
@@ -300,7 +305,7 @@ class LogbookTest(TestCase):
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assertContains(response, "This project is already closed.")
+        self.assertContains(response, "This project has been closed recently.")
 
         response = self.client.post(
             cost.urls["update"],
@@ -316,6 +321,22 @@ class LogbookTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 202)
+
+        project.closed_on = dt.date.today() - dt.timedelta(days=20)
+        project.save()
+        response = self.client.post(
+            cost.urls["update"],
+            {
+                "service": service.id,
+                "rendered_by": project.owned_by_id,
+                "rendered_on": dt.date.today().isoformat(),
+                "cost": "10",
+                "third_party_costs": "9",
+                "description": "Anything",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "This project has been closed too long ago.")
 
     def test_update_old_disabled_fields(self):
         hours = factories.LoggedHoursFactory.create(
