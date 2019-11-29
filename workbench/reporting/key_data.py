@@ -5,6 +5,7 @@ from itertools import chain
 from django.db import connections
 from django.db.models import Q, Sum
 
+from workbench.accruals.models import Accrual
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
@@ -74,6 +75,12 @@ ORDER BY cutoff_date
         for row in cursor:
             # Overwrite earlier accruals if a month has more than one cutoff date
             accruals[(row[0].year, row[0].month)] = {"accrual": -row[1], "delta": None}
+
+    today = dt.date.today()
+    accruals[(today.year, today.month)] = {
+        "accrual": -Accrual.objects.generate_accruals(cutoff_date=today, save=False),
+        "delta": None,
+    }
 
     dates = list(sorted(accruals))
     for this, next in zip(dates, dates[1:]):

@@ -81,8 +81,10 @@ def open_items_list(request, form):
 
 def key_data_view(request):
     today = dt.date.today()
-    last_month = next_valid_day(today.year, today.month + 1, 1) - dt.timedelta(days=1)
-    date_range = [dt.date(last_month.year - 2, 1, 1), last_month]
+    this_months_end = next_valid_day(today.year, today.month + 1, 1) - dt.timedelta(
+        days=1
+    )
+    date_range = [dt.date(this_months_end.year - 2, 1, 1), this_months_end]
 
     gross_margin_by_month = key_data.gross_margin_by_month(date_range)
     gross_margin_months = {
@@ -120,7 +122,7 @@ def key_data_view(request):
             "gross_margin_by_month": gross_margin_by_month,
             "invoiced_corrected": [
                 (year, [gross_margin_months.get((year, i), Z) for i in range(1, 13)])
-                for year in range(last_month.year - 2, last_month.year + 1)
+                for year in range(this_months_end.year - 2, this_months_end.year + 1)
             ],
             "green_hours": yearly_headline(gh),
             "hours_distribution": {

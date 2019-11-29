@@ -19,7 +19,9 @@ class CutoffDateDetailView(generic.DetailView):
                     request, _("Cannot generate accruals for future cutoff dates.")
                 )
             else:
-                Accrual.objects.generate_accruals(cutoff_date=self.object.day)
+                Accrual.objects.generate_accruals(
+                    cutoff_date=self.object.day, save=True
+                )
                 messages.success(request, _("Generated accruals."))
             return redirect(self.object)
 

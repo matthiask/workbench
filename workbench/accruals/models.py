@@ -47,8 +47,10 @@ class CutoffDate(Model):
 
 
 class AccrualQuerySet(models.QuerySet):
-    def generate_accruals(self, *, cutoff_date):
+    def generate_accruals(self, *, cutoff_date, save):
         # month = dt.date.today().replace(day=1)
+
+        total = Z
 
         down_payment_invoices = Invoice.objects.valid().filter(
             project__isnull=False,
@@ -102,16 +104,28 @@ class AccrualQuerySet(models.QuerySet):
                     100 * remaining[invoice.project_id] / invoice.total_excl_tax
                 )
                 work_progress = min(100, max(0, work_progress))
-                self.get_or_create(
-                    invoice=invoice,
-                    cutoff_date=cutoff_date,
-                    defaults={
-                        "work_progress": work_progress,
-                        "logbook": logged[invoice.project_id],
-                    },
-                )
+                if save:
+                    obj, created = self.get_or_create(
+                        invoice=invoice,
+                        cutoff_date=cutoff_date,
+                        defaults={
+                            "work_progress": work_progress,
+                            "logbook": logged[invoice.project_id],
+                        },
+                    )
+                else:
+                    obj = Accrual(
+                        invoice=invoice,
+                        cutoff_date=cutoff_date,
+                        work_progress=work_progress,
+                        logbook=logged[invoice.project_id],
+                    )
 
             remaining[invoice.project_id] -= invoice.total_excl_tax
+
+            total += obj.accrual
+
+        return total
 
 
 @model_urls
