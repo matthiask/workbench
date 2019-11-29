@@ -102,6 +102,7 @@
           <table class="table table-sm bg-light">
             <tr>
               <th class="w-100">{% trans 'invoice' %}</th>
+              <th class="text-nowrap">{% trans 'type' %}</th>
               <th class="text-nowrap">{% trans 'invoiced on' %}</th>
               <th class="text-nowrap text-right">{% trans 'total' %}</th>
               <th class="text-nowrap text-right">{% trans 'total excl. tax' %}</th>
@@ -114,6 +115,7 @@
                     {{ invoice.status_badge }}
                   </a>
                 </td>
+                <td>{{ invoice.get_type_display }}</td>
                 <td>{{ invoice.invoiced_on|local_date_format }}</td>
                 <td class="text-right">{{ invoice.total|currency }}</td>
                 <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
@@ -130,7 +132,9 @@
               {% if forloop.first %}
                 <tr>
                   <th class="w-100">{% trans 'logged cost' %}</th>
+                  <th></th>
                   <th class="text-nowrap">{% trans 'date' %}</th>
+                  <th></th>
                   <th class="text-nowrap text-right">{% trans 'third party costs' %}</th>
                 </tr>
               {% endif %}
@@ -140,7 +144,9 @@
                     {{ cost.service }}: {{ cost }}
                   </a>
                 </td>
+                <td></td>
                 <td>{{ cost.rendered_on|local_date_format }}</td>
+                <td></td>
                 <td class="text-right">{{ cost.third_party_costs|currency }}</td>
               </tr>
             {% endfor %}
@@ -149,7 +155,9 @@
               {% if forloop.first %}
                 <tr>
                   <th class="w-100">{% trans 'invoice' %}</th>
+                  <th class="text-nowrap">{% trans 'type' %}</th>
                   <th class="text-nowrap">{% trans 'date' %}</th>
+                  <th class="text-nowrap">{% trans 'total excl. tax' %}</th>
                   <th class="text-nowrap text-right">{% trans 'third party costs' %}</th>
                 </tr>
               {% endif %}
@@ -160,7 +168,9 @@
                     {{ invoice.status_badge }}
                   </a>
                 </td>
+                <td>{{ invoice.get_type_display }}</td>
                 <td>{{ invoice.invoiced_on|local_date_format }}</td>
+                <td class="text-right">{{ invoice.total_excl_tax|currency }}</td></td>
                 <td class="text-right">{{ invoice.third_party_costs|currency }}</td>
               </tr>
             {% endfor %}
