@@ -35,39 +35,30 @@ for job in $(jobs -p); do wait $job; done
         local("bash %s" % f.name)
 
 
+def _do_deploy(folder, service):
+    with cd(folder):
+        run("git checkout master")
+        run("git fetch origin")
+        run("git merge --ff-only origin/master")
+        run('find . -name "*.pyc" -delete')
+        run("venv/bin/pip install -U pip wheel setuptools")
+        run("venv/bin/pip install -r requirements.txt")
+        run("venv/bin/python manage.py migrate")
+        run("venv/bin/python manage.py collectstatic --noinput")
+    rsync_project(
+        local_dir="static/", remote_dir="%sstatic/" % folder,
+    )
+    run("sudo systemctl restart %s.service" % service)
+
+
 @task
 def deploy():
     check()
     local("git push origin master")
     local("yarn run prod")
 
-    with cd("www/workbench/"):
-        run("git checkout master")
-        run("git fetch origin")
-        run("git merge --ff-only origin/master")
-        run('find . -name "*.pyc" -delete')
-        run("venv/bin/pip install -U pip wheel setuptools")
-        run("venv/bin/pip install -r requirements.txt")
-        run("venv/bin/python manage.py migrate")
-        run("venv/bin/python manage.py collectstatic --noinput")
-    rsync_project(
-        local_dir="static/", remote_dir="www/workbench/static/",
-    )
-    run("sudo systemctl restart workbench.service")
-
-    with cd("www/dbpag-workbench/"):
-        run("git checkout master")
-        run("git fetch origin")
-        run("git merge --ff-only origin/master")
-        run('find . -name "*.pyc" -delete')
-        run("venv/bin/pip install -U pip wheel setuptools")
-        run("venv/bin/pip install -r requirements.txt")
-        run("venv/bin/python manage.py migrate")
-        run("venv/bin/python manage.py collectstatic --noinput")
-    rsync_project(
-        local_dir="static/", remote_dir="www/dbpag-workbench/static/",
-    )
-    run("sudo systemctl restart dbpag-workbench.service")
+    _do_deploy("www/workbench/", "workbench")
+    _do_deploy("www/dbpag-workbench/", "dbpag-workbench")
 
 
 @task
