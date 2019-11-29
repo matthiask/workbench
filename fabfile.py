@@ -35,7 +35,7 @@ for job in $(jobs -p); do wait $job; done
         local("bash %s" % f.name)
 
 
-def _do_deploy(folder, service):
+def _do_deploy(folder, service, rsync=True):
     with cd(folder):
         run("git checkout master")
         run("git fetch origin")
@@ -45,9 +45,10 @@ def _do_deploy(folder, service):
         run("venv/bin/pip install -r requirements.txt")
         run("venv/bin/python manage.py migrate")
         run("venv/bin/python manage.py collectstatic --noinput")
-    rsync_project(
-        local_dir="static/", remote_dir="%sstatic/" % folder,
-    )
+    if rsync:
+        rsync_project(
+            local_dir="static/", remote_dir="%sstatic/" % folder,
+        )
     run("sudo systemctl restart %s.service" % service)
 
 
@@ -59,6 +60,15 @@ def deploy():
 
     _do_deploy("www/workbench/", "workbench")
     _do_deploy("www/dbpag-workbench/", "dbpag-workbench")
+
+
+@task
+def deploy_code():
+    check()
+    local("git push origin master")
+
+    _do_deploy("www/workbench/", "workbench", rsync=False)
+    _do_deploy("www/dbpag-workbench/", "dbpag-workbench", rsync=False)
 
 
 @task
