@@ -30,7 +30,11 @@ class CutoffDateDetailView(generic.DetailView):
         if request.GET.get("xlsx"):
             xlsx = XLSXDocument()
             xlsx.table_from_queryset(
-                accruals, additional=[(_("accrual"), lambda item: item.accrual)]
+                accruals,
+                additional=[
+                    (_("total excl. tax"), lambda item: item.invoice.total_excl_tax),
+                    (_("accrual"), lambda item: item.accrual),
+                ],
             )
             return xlsx.to_response(
                 "accruals-{}.xlsx".format(self.object.day.isoformat())
