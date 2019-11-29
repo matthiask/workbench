@@ -35,7 +35,9 @@ class OfferSearchForm(forms.Form):
         elif data.get("s"):
             queryset = queryset.filter(status=data.get("s"))
         else:
-            queryset = queryset.filter(status__lte=Offer.OFFERED)
+            queryset = queryset.filter(
+                status__lte=Offer.OFFERED, project__closed_on__isnull=True
+            )
 
         return queryset.select_related(
             "owned_by",
