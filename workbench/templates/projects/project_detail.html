@@ -65,6 +65,8 @@
                   {% if project.not_archived_total.hours_rate_undefined %}
                   <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.not_archived_total.hours_rate_undefined|hours }}){% endif %}
                   </span>
+                  (<a class="inline" href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}&amp;not_archived=1">{% trans "hours" %}</a> /
+                  <a class="inline" href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;not_archived=1">{% trans "cost" %}</a>)
                 </td>
               </tr>
 

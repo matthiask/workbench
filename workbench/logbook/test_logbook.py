@@ -426,6 +426,7 @@ class LogbookTest(TestCase):
         valid("circle=1")
         valid("role=1")
         valid("organization=" + str(hours.service.project.customer.pk))
+        valid("not_archived=1")
         valid("xlsx=1")
 
     def test_logged_cost_list(self):
@@ -447,6 +448,7 @@ class LogbookTest(TestCase):
         valid("date_until=2018-01-01")
         valid("service=0")
         valid("service=" + str(service.pk))
+        valid("not_archived=1")
         valid("xlsx=1")
 
     def test_non_ajax_redirect_hours(self):

@@ -48,6 +48,9 @@ class LoggedHoursSearchForm(forms.Form):
     )
     circle = forms.IntegerField(required=False, widget=forms.HiddenInput, label="",)
     role = forms.IntegerField(required=False, widget=forms.HiddenInput, label="",)
+    not_archived = forms.BooleanField(
+        required=False, widget=forms.HiddenInput, label=""
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -79,6 +82,8 @@ class LoggedHoursSearchForm(forms.Form):
             queryset = queryset.filter(service__role__circle=data.get("circle"))
         if data.get("role"):
             queryset = queryset.filter(service__role=data.get("role"))
+        if data.get("not_archived"):
+            queryset = queryset.filter(archived_at__isnull=True)
 
         return queryset.select_related("service__project__owned_by", "rendered_by")
 
@@ -115,6 +120,9 @@ class LoggedCostSearchForm(forms.Form):
         widget=DateInput, required=False, label=mark_safe("&ndash;&nbsp;")
     )
     service = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
+    not_archived = forms.BooleanField(
+        required=False, widget=forms.HiddenInput, label=""
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -144,6 +152,8 @@ class LoggedCostSearchForm(forms.Form):
             queryset = queryset.filter(service=None)
         elif data.get("service"):
             queryset = queryset.filter(service=data.get("service"))
+        if data.get("not_archived"):
+            queryset = queryset.filter(archived_at__isnull=True)
 
         return queryset.select_related("service__project__owned_by", "rendered_by")
 
