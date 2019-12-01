@@ -31,7 +31,7 @@
   <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
 
   <h2 class="mt-5">{% trans 'revenue minus third party costs and accruals' %}</h2>
-  <canvas id="invoiced-corrected" width="800" height="300"></canvas>
+  <canvas id="invoiced-corrected" width="1200" height="450"></canvas>
   <script>
     new Chart("invoiced-corrected", {
       type: "bar",
@@ -182,7 +182,7 @@
   </table>
 
   <h2 class="mt-5">{% trans 'hours distribution' %}</h2>
-  <canvas id="hours-distribution" width="800" height="300"></canvas>
+  <canvas id="hours-distribution" width="1200" height="450"></canvas>
   <script>
     new Chart("hours-distribution", {
       type: "bar",
