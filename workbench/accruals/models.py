@@ -146,7 +146,11 @@ class Accrual(Model):
     objects = AccrualQuerySet.as_manager()
 
     class Meta:
-        ordering = ["-cutoff_date", "-invoice__project___code", "-invoice___code"]
+        ordering = [
+            "invoice__project__created_at__year",
+            "invoice__project___code",
+            "invoice___code",
+        ]
         unique_together = [("invoice", "cutoff_date")]
         verbose_name = _("accrual")
         verbose_name_plural = _("accruals")
