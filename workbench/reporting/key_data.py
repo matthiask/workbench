@@ -64,7 +64,7 @@ def accruals_by_month(date_range):
             """\
 SELECT
     cutoff_date,
-    SUM(i.total_excl_tax * (100 - a.work_progress) / 100)
+    COALESCE(SUM(i.total_excl_tax * (100 - a.work_progress) / 100), 0)
 FROM accruals_accrual a
 LEFT JOIN invoices_invoice i ON i.id=a.invoice_id
 GROUP BY cutoff_date
