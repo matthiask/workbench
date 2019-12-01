@@ -121,9 +121,9 @@ class AccrualQuerySet(models.QuerySet):
                         logbook=logged[invoice.project_id],
                     )
 
-            remaining[invoice.project_id] -= invoice.total_excl_tax
+                total += obj.accrual
 
-            total += obj.accrual
+            remaining[invoice.project_id] -= invoice.total_excl_tax
 
         return total
 
