@@ -125,7 +125,7 @@ class AccrualsTest(TestCase):
 
         # print(key_data.accruals_by_month())
         accruals = key_data.accruals_by_month(
-            [dt.date(2010, 1, 1), dt.date(2020, 1, 1)]
+            [dt.date(2010, 1, 1), dt.date(2019, 11, 1)]
         )
         self.assertEqual(len(accruals), 3)
 
