@@ -193,3 +193,16 @@ class AccrualsTest(TestCase):
     def test_task_on_other(self):
         create_accruals_for_last_month()
         self.assertEqual(CutoffDate.objects.count(), 0)
+
+    def test_accruals_list(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        accrual = CutoffDate.objects.create(day=dt.date.today())
+
+        def valid(p):
+            response = self.client.get(accrual.urls["detail"] + p)
+            self.assertEqual(response.status_code, 200)
+
+        valid("")
+        valid("?owned_by=0")
+        valid("?owned_by=%s" % user.pk)

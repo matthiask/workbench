@@ -1,6 +1,6 @@
 {% extends "generic/object_detail.html" %}
 
-{% load i18n workbench %}
+{% load fineforms i18n workbench %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -29,11 +29,15 @@
     {% trans 'Delete' %}
   </a>
 
+  <form method="get" class="form-inline mt-3" data-autosubmit>
+    {% ff_fields form %}
+  </form>
+
   <table class="table mt-3">
     <thead>
       <tr>
         <th>{% trans 'invoice' %}</th>
-        <th>{% trans 'total excl. tax' %}</th>
+        <th class="text-nowrap">{% trans 'total excl. tax' %}</th>
         <th>{% trans 'logbook' %}</th>
         <th>{% trans 'work progress' %}</th>
       </tr>
