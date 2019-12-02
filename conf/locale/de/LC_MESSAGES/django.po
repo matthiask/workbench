@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-02 21:38+0100\n"
+"POT-Creation-Date: 2019-12-02 21:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2098,6 +2098,10 @@ msgstr "Aktive Projekte"
 #: workbench/templates/start.html
 msgid "no active projects"
 msgstr "Keine aktiven Projekte"
+
+#: workbench/templates/start.html
+msgid "birthdays"
+msgstr "Geburtstage"
 
 #: workbench/templates/start.html
 msgid "today's hours"

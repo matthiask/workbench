@@ -4,7 +4,7 @@ from itertools import groupby
 from urllib.parse import urlencode
 
 from django import template
-from django.db import models
+from django.db import connections, models
 from django.template.defaultfilters import linebreaksbr
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join, mark_safe
@@ -175,3 +175,33 @@ def percentage(value, one):
         if one
         else ""
     )
+
+
+@register.simple_tag
+def birthdays():
+    with connections["default"].cursor() as cursor:
+        cursor.execute(
+            """
+SELECT id, given_name, family_name, date_of_birth FROM (
+    SELECT
+        id,
+        given_name,
+        family_name,
+        date_of_birth,
+        (current_date - date_of_birth) % 365.24 AS diff
+    FROM contacts_person
+    WHERE date_of_birth is not null
+) AS subquery
+WHERE diff < 7 or diff > 350
+ORDER BY extract(month from date_of_birth), extract(day from date_of_birth)
+            """
+        )
+        return [
+            {
+                "id": row[0],
+                "given_name": row[1],
+                "family_name": row[2],
+                "date_of_birth": row[3],
+            }
+            for row in cursor
+        ]
