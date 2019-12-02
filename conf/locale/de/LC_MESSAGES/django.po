@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-28 15:19+0100\n"
+"POT-Creation-Date: 2019-12-02 21:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -167,6 +167,15 @@ msgstr "Kann Abgrenzungen für zukünftige Stichtage nicht generieren."
 #: workbench/accruals/views.py
 msgid "Generated accruals."
 msgstr "Abgrenzungen erstellt."
+
+#: workbench/accruals/views.py
+#: workbench/templates/accruals/cutoffdate_detail.html
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/key_data.html
+#: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
+msgid "total excl. tax"
+msgstr "Total exkl. MwSt."
 
 #: workbench/audit/__init__.py
 msgid "audit"
@@ -403,7 +412,7 @@ msgstr ""
 
 #: workbench/contacts/forms.py workbench/contacts/models.py
 #: workbench/invoices/forms.py workbench/invoices/models.py
-#: workbench/projects/models.py
+#: workbench/projects/models.py workbench/templates/reporting/key_data.html
 msgid "type"
 msgstr "Typ"
 
@@ -496,6 +505,10 @@ msgstr "vollständige Begrüssung"
 #: workbench/contacts/models.py
 msgid "Dear John/Dear Ms Smith"
 msgstr "Lieber Hans/Sehr geehrte Frau Muster"
+
+#: workbench/contacts/models.py workbench/templates/contacts/person_detail.html
+msgid "date of birth"
+msgstr "Geburtstag"
 
 #: workbench/contacts/models.py
 msgid "person"
@@ -1647,14 +1660,6 @@ msgstr "Abgrenzungen erstellen"
 #: workbench/templates/projects/project_detail.html
 msgid "Delete"
 msgstr "Löschen"
-
-#: workbench/templates/accruals/cutoffdate_detail.html
-#: workbench/templates/invoices/invoice_detail.html
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/key_data.html
-#: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
-msgid "total excl. tax"
-msgstr "Total exkl. MwSt."
 
 #: workbench/templates/accruals/cutoffdate_detail.html
 #: workbench/templates/contacts/person_form.html
