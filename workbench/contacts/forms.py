@@ -118,6 +118,7 @@ class PersonForm(ModelForm):
             "family_name",
             "address_on_first_name_terms",
             "salutation",
+            "date_of_birth",
             "notes",
             "organization",
             "primary_contact",

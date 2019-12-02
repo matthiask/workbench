@@ -83,6 +83,7 @@ class Person(Model):
         blank=True,
         help_text=_("Dear John/Dear Ms Smith"),
     )
+    date_of_birth = models.DateField(_("date of birth"), blank=True, null=True)
     notes = models.TextField(_("notes"), blank=True)
     organization = models.ForeignKey(
         Organization,
