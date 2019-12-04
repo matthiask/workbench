@@ -35,7 +35,7 @@
     </tr>
     <tr>
       <td class="text-right">{% trans 'notes' %}</td>
-      <td>{{ organization.notes|linebreaksbr|default:"&ndash;" }}</td>
+      <td>{{ organization.notes|urlize|linebreaksbr|default:"&ndash;" }}</td>
     </tr>
   </table>
 

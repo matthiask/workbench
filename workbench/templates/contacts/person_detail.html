@@ -34,7 +34,7 @@
     <strong>{% trans 'date of birth' %}:</strong><br>
     {{ person.date_of_birth|local_date_format|default:'&ndash;' }}<br>
     <strong>{% trans 'notes' %}:</strong><br>
-    {{ person.notes|linebreaksbr|default:'&ndash;' }}
+    {{ person.notes|urlize|linebreaksbr|default:'&ndash;' }}
     <br>
     <strong>{% trans 'groups' %}:</strong><br>
     {% for group in person.groups.all %}
