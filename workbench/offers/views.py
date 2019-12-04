@@ -16,7 +16,10 @@ class OfferPDFView(DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        pdf, response = pdf_response(self.object.code, as_attachment=False)
+        pdf, response = pdf_response(
+            self.object.code,
+            as_attachment=request.GET.get("disposition") == "attachment",
+        )
 
         pdf.init_letter()
         pdf.process_offer(self.object)
@@ -36,7 +39,10 @@ class ProjectOfferPDFView(DetailView):
             messages.error(request, _("No offers in project."))
             return redirect(self.object)
 
-        pdf, response = pdf_response(self.object.code, as_attachment=False)
+        pdf, response = pdf_response(
+            self.object.code,
+            as_attachment=request.GET.get("disposition") == "attachment",
+        )
         pdf.offers_pdf(project=self.object, offers=offers)
 
         return response

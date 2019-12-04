@@ -76,7 +76,10 @@ class InvoiceSearchForm(forms.Form):
                 messages.warning(request, _("No invoices found."))
                 return HttpResponseRedirect("?e=1")
 
-            pdf, response = pdf_response("invoices", as_attachment=False)
+            pdf, response = pdf_response(
+                "invoices",
+                as_attachment=request.GET.get("disposition") == "attachment",
+            )
 
             if self.cleaned_data.get("s") == "overdue":
                 for organization, invoices in itertools.groupby(

@@ -99,9 +99,16 @@
     </tr>
   </table>
 
-  <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank">
-    PDF
-  </a>
+  <span class="btn-group">
+    <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank">PDF</a>
+    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+      <a class="dropdown-item" href="{{ object.urls.pdf }}?disposition=attachment">
+        {% trans 'Download' %}</a>
+    </div>
+  </span>
   {% if object.type == object.SERVICES %}
     <a href="{{ object.urls.xlsx }}" class="btn btn-primary">
       {% trans 'logbook' %} (XLSX)
