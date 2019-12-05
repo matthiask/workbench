@@ -129,11 +129,14 @@ class Person(Model):
     save.alters_data = True
 
 
+_home_re = re.compile(r"(home|hause|privat)", re.I)
+
+
 class PersonDetail(Model):
     WEIGHTS = (
         (re.compile(r"mobil", re.I), 30),
         (re.compile(r"(work|arbeit)", re.I), 20),
-        (re.compile(r"(home|hause)", re.I), 10),
+        (_home_re, 10),
         (re.compile(r"(organization|firm)", re.I), -100),
     )
 
@@ -257,7 +260,7 @@ class PostalAddress(PersonDetail):
             self.person.organization.name
             if self.person.organization
             and not self.person.organization.is_private_person
-            and not any(type in self.type.lower() for type in ["home"])
+            and not _home_re.search(self.type)
             else "",
             self.person.full_name,
             " ".join(filter(None, (self.street, self.house_number))),
