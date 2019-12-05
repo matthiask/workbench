@@ -51,6 +51,7 @@ class OrganizationFactory(factory.DjangoModelFactory):
 
 
 class PostalAddressFactory(factory.DjangoModelFactory):
+    type = "work"
     person = factory.SubFactory(PersonFactory)
     street = factory.LazyFunction(faker.street_name)
     house_number = factory.LazyFunction(
