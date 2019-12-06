@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib import auth, messages
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
-from django.utils.translation import gettext as _
+from django.utils.translation import get_language, gettext as _
 from django.views.decorators.cache import never_cache
 
 from authlib.google import GoogleOAuth2Client
@@ -52,13 +52,7 @@ def oauth2(request):
 
     if email.endswith("@%s" % settings.WORKBENCH.SSO_DOMAIN):
         user, new_user = User.objects.get_or_create(
-            email=email,
-            defaults={
-                "is_active": True,
-                "is_admin": False,
-                "_short_name": "",
-                "_full_name": "",
-            },
+            email=email, defaults={"language": get_language()},
         )
 
     user = auth.authenticate(request, email=email)
