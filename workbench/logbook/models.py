@@ -12,7 +12,7 @@ from workbench.accounts.models import User
 from workbench.projects.models import Service
 from workbench.tools.models import HoursField, Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
-from workbench.tools.validation import monday
+from workbench.tools.validation import monday, raise_if_errors
 
 
 @model_urls
@@ -138,6 +138,11 @@ class LoggedCost(Model):
         related_name="expenses",
     )
 
+    expense_currency = models.CharField(
+        _("currency"), max_length=3, blank=True
+    )
+    expense_cost = MoneyField(_("original cost"), blank=True, null=True)
+
     objects = LoggedCostQuerySet.as_manager()
 
     class Meta:
@@ -166,3 +171,20 @@ class LoggedCost(Model):
             return cls.urls["list"] + "?project={}".format(
                 instance.service.project_id if instance else ""
             )
+
+    def clean_fields(self, exclude):
+        super().clean_fields(exclude)
+        errors = {}
+        expense = (self.expense_currency != "", self.expense_cost is not None)
+        if any(expense) and not all(expense):
+            if self.expense_currency == "":
+                errors["expense_currency"] = _("Either fill in all fields or none.")
+            if self.expense_cost is None:
+                errors["expense_cost"] = _("Either fill in all fields or none.")
+        if self.expense_cost:
+            from decimal import Decimal
+            from workbench.expenses.models import ExchangeRates
+
+            rates = ExchangeRates.objects.for_day(self.rendered_on)
+            self.third_party_costs = self.expense_cost * Decimal(str(rates.rates["rates"][self.expense_currency]))
+        raise_if_errors(errors, exclude)

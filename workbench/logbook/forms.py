@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization
+from workbench.expenses.models import ExchangeRates
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
 from workbench.tools.forms import Autocomplete, DateInput, ModelForm, Textarea
@@ -344,6 +345,8 @@ class LoggedCostForm(ModelForm):
             "service",
             "rendered_by",
             "rendered_on",
+            "expense_currency",
+            "expense_cost",
             "third_party_costs",
             "are_expenses",
             "cost",
@@ -380,10 +383,25 @@ class LoggedCostForm(ModelForm):
             self.fields["rendered_on"].disabled = True
             self.fields["are_expenses"].disabled = True
             self.fields["third_party_costs"].disabled = True
+            self.fields["expense_currency"].disabled = True
+            self.fields["expense_cost"].disabled = True
+
+        rates = ExchangeRates.objects.first()
+        self.fields["expense_currency"] = forms.ChoiceField(
+            choices=[(currency, currency) for currency in rates.rates["rates"]],
+            widget=forms.Select(attrs={"class": "custom-select"}),
+            required=False,
+            initial=self.instance.expense_currency or "CHF",
+            label=self.instance._meta.get_field("expense_currency").verbose_name,
+        )
 
     def clean(self):
         data = super().clean()
         errors = {}
+
+        if data.get("expense_currency") != "CHF":
+            data["expense_cost"] = data["third_party_costs"]
+
         if self.project.closed_on:
             if self.project.closed_on < dt.date.today() - dt.timedelta(days=15):
                 errors["__all__"] = _("This project has been closed too long ago.")

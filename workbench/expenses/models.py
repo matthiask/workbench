@@ -1,4 +1,7 @@
+import datetime as dt
+
 from django.contrib import messages
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
@@ -6,6 +9,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
+from workbench.expenses.rates import exchange_rates
 from workbench.logbook.models import LoggedCost
 from workbench.tools.formats import currency, local_date_format
 from workbench.tools.models import Model, MoneyField, Z
@@ -96,3 +100,34 @@ class ExpenseReport(Model):
             "light" if self.closed_on else "info",
             self.pretty_status,
         )
+
+
+class ExchangeRatesQuerySet(models.QuerySet):
+    def for_today(self):
+        return self.for_day(dt.date.today())
+
+    def for_day(self, day):
+        try:
+            return self.get(day=day)
+
+        except self.model.DoesNotExist:
+            instance, created = self.update_or_create(
+                day=day, defaults={"rates": exchange_rates(day)}
+            )
+            return instance
+
+
+class ExchangeRates(models.Model):
+    day = models.DateField(_("day"), unique=True)
+    rates = JSONField()
+
+    objects = ExchangeRatesQuerySet.as_manager()
+
+    class Meta:
+        get_latest_by = "day"
+        ordering = ["-day"]
+        verbose_name = _("exchange rate")
+        verbose_name_plural = _("exchange rates")
+
+    def __str__(self):
+        return str(self.day)

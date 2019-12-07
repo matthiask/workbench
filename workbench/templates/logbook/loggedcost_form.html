@@ -14,8 +14,19 @@
     <div class="col-6">{% ff_field form.rendered_on %}</div>
   </div>
 
-  {% ff_field form.third_party_costs %}
+  <div class="form-row align-items-end">
+    <div class="col-6">{% ff_field form.expense_currency %}</div>
+    <div class="col-6">{% ff_field form.third_party_costs %}</div>
+  </div>
   {% ff_field form.are_expenses %}
+
   {% ff_field form.cost %}
   {% ff_field form.description %}
+{% endblock %}
+
+{% block footer %}
+<button type="button" class="btn btn-primary mr-auto"
+onclick="_cl(this, 'invisible', true);_cl(_sel('#section-fc'), 'd-none', false);_cl(_sel('#section-tpc'), 'd-none', true);_sel('#id_are_expenses').checked=true"
+>{% trans 'expenses in foreign currency' %}</button>
+  <button type="submit" class="btn btn-primary">{% trans 'save' %}</button>
 {% endblock %}
