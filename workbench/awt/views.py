@@ -36,7 +36,10 @@ class ReportView(generic.DetailView):
             statistics=annual_working_time(self.object.year, users=users),
             year=self.year,
             years=sorted(
-                Year.objects.order_by().values_list("year", flat=True).distinct(),
+                Year.objects.filter(year__lte=dt.date.today().year)
+                .order_by()
+                .values_list("year", flat=True)
+                .distinct(),
                 reverse=True,
             ),
             **kwargs
