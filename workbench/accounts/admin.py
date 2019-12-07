@@ -4,12 +4,18 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 
 from workbench.accounts.models import User
+from workbench.awt.models import Employment
 
 
 class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ("email", "_short_name", "_full_name", "is_active", "is_admin")
+
+
+class EmploymentInline(admin.TabularInline):
+    model = Employment
+    extra = 0
 
 
 class UserAdmin(UserAdmin):
@@ -41,6 +47,7 @@ class UserAdmin(UserAdmin):
     search_fields = ("email", "_short_name", "_full_name")
     ordering = ("email",)
     filter_horizontal = ()
+    inlines = [EmploymentInline]
 
 
 admin.site.register(User, UserAdmin)
