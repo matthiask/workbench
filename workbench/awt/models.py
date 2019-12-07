@@ -11,11 +11,6 @@ from workbench.tools.models import HoursField, Model
 from workbench.tools.urls import model_urls
 
 
-class YearQuerySet(models.QuerySet):
-    def current(self):
-        return self.filter(year=dt.date.today().year).first()
-
-
 class Year(Model):
     MONTHS = [
         "january",
@@ -46,8 +41,6 @@ class Year(Model):
     november = models.DecimalField(_("november"), max_digits=4, decimal_places=2)
     december = models.DecimalField(_("december"), max_digits=4, decimal_places=2)
     working_time_per_day = HoursField(_("working time per day"))
-
-    objects = YearQuerySet.as_manager()
 
     class Meta:
         ordering = ["-year"]

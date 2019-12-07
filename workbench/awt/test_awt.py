@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.test import TestCase
 
 from workbench import factories
-from workbench.awt.models import Absence, Employment, Year
+from workbench.awt.models import Absence, Employment
 from workbench.awt.reporting import annual_working_time
 from workbench.awt.utils import monthly_days
 from workbench.tools.testing import messages
@@ -16,12 +16,10 @@ class AWTTest(TestCase):
         self.client.force_login(user)
         response = self.client.get("/report/annual-working-time/")
         self.assertRedirects(response, "/")
-        self.assertEqual(Year.objects.current(), None)
 
-        year = factories.YearFactory.create()
+        factories.YearFactory.create()
         response = self.client.get("/report/annual-working-time/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Year.objects.current(), year)
 
     def test_absences_list(self):
         user = factories.UserFactory.create()
