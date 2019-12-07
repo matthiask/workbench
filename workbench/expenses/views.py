@@ -62,7 +62,7 @@ class ExpenseReportPDFView(generic.DetailView):
 
         pdf.spacer(0.7 * mm)
         pdf.table(
-            [(_("total"), currency(self.object.total))],
+            [(_("total CHF"), currency(self.object.total))],
             pdf.style.tableColumns,
             pdf.style.tableHeadLine,
         )
