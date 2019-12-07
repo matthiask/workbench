@@ -6,7 +6,7 @@ from faker import Factory
 from faker.providers import address
 
 from workbench.accounts.models import User
-from workbench.awt.models import Year
+from workbench.awt.models import WorkingTimeModel, Year
 from workbench.contacts.models import Organization, Person, PostalAddress
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.invoices.models import Invoice, RecurringInvoice
@@ -20,6 +20,35 @@ faker = Factory.create("de")
 faker.add_provider(address)
 
 
+# AWT #########################################################################
+class WorkingTimeModelFactory(factory.DjangoModelFactory):
+    name = "Test"
+
+    class Meta:
+        model = WorkingTimeModel
+
+
+class YearFactory(factory.DjangoModelFactory):
+    working_time_model = factory.SubFactory(WorkingTimeModelFactory)
+    year = dt.date.today().year
+    january = 30
+    february = 30
+    march = 30
+    april = 30
+    may = 30
+    june = 30
+    july = 30
+    august = 30
+    september = 30
+    october = 30
+    november = 30
+    december = 30
+    working_time_per_day = 8
+
+    class Meta:
+        model = Year
+
+
 # ACCOUNTS ####################################################################
 class UserFactory(factory.DjangoModelFactory):
     is_active = True
@@ -27,6 +56,7 @@ class UserFactory(factory.DjangoModelFactory):
     _short_name = factory.Sequence(lambda n: "user%d" % n)
     email = factory.LazyAttribute(lambda obj: "%s@example.com" % obj._short_name)
     language = "en"
+    working_time_model = factory.SubFactory(WorkingTimeModelFactory)
 
     class Meta:
         model = User
@@ -159,27 +189,6 @@ class LoggedCostFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = LoggedCost
-
-
-# AWT #########################################################################
-class YearFactory(factory.DjangoModelFactory):
-    year = dt.date.today().year
-    january = 30
-    february = 30
-    march = 30
-    april = 30
-    may = 30
-    june = 30
-    july = 30
-    august = 30
-    september = 30
-    october = 30
-    november = 30
-    december = 30
-    working_time_per_day = 8
-
-    class Meta:
-        model = Year
 
 
 # CREDIT CONTROL ##############################################################

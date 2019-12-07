@@ -13,9 +13,10 @@ from workbench.tools.urls import model_urls
 
 class WorkingTimeModel(models.Model):
     name = models.CharField(_("name"), max_length=100)
+    position = models.IntegerField(_("position"), default=0)
 
     class Meta:
-        ordering = ["name"]
+        ordering = ["position", "id"]
         verbose_name = _("working time model")
         verbose_name_plural = _("working time models")
 
@@ -66,7 +67,7 @@ class Year(Model):
         verbose_name_plural = _("years")
 
     def __str__(self):
-        return str(self.year)
+        return "%s %s" % (self.year, self.working_time_model)
 
     def get_absolute_url(self):
         return reverse("awt_year_report") + "?year={}".format(self.year)

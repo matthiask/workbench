@@ -10,10 +10,10 @@
     <h1>{% trans 'annual working time' %}</h1>
 
     <ul class="nav nav-tabs my-3">
-      {% for year in years %}
+      {% for y in years %}
       <li class="nav-item">
-        <a class="nav-link {% if year == object %}active{% endif %}"
-          href="{{ year.get_absolute_url }}">{{ year }}</a>
+        <a class="nav-link {% if y == year %}active{% endif %}"
+          href="?year={{ y }}">{{ y }}</a>
       </li>
       {% endfor %}
       <li class="nav-item ml-auto">
@@ -35,7 +35,10 @@
       </tr>
 
       <tr>
-        <th class="text-nowrap">{% trans 'target days for full time employment' %}</th>
+        <th class="text-nowrap">
+          {% trans 'target days for full time employment' %}
+          <small>({{ stats.year }})</small>
+        </th>
         {% for value in stats.target_days %}<td class="text-right {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
         <th class="text-right">{{ totals.target_days|days }}</th>
       </tr>

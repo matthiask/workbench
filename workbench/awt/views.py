@@ -14,7 +14,7 @@ class ReportView(generic.DetailView):
     model = Year
 
     def get_object(self):
-        self.year = self.request.GET.get("year", dt.date.today().year)
+        self.year = int(self.request.GET.get("year", dt.date.today().year))
         return self.model._default_manager.filter(year=self.year).first()
 
     def get(self, request, *args, **kwargs):
@@ -33,9 +33,11 @@ class ReportView(generic.DetailView):
         if not users:
             users = [self.request.user]
         return super().get_context_data(
-            statistics=annual_working_time(self.object, users=users),
-            years=[
-                year for year in Year.objects.all() if year.year <= dt.date.today().year
-            ],
+            statistics=annual_working_time(self.object.year, users=users),
+            year=self.year,
+            years=sorted(
+                Year.objects.order_by().values_list("year", flat=True).distinct(),
+                reverse=True,
+            ),
             **kwargs
         )

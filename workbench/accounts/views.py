@@ -9,6 +9,7 @@ from authlib.google import GoogleOAuth2Client
 
 from workbench.accounts.forms import UserForm
 from workbench.accounts.models import User
+from workbench.awt.models import WorkingTimeModel
 from workbench.generic import UpdateView
 
 
@@ -52,7 +53,11 @@ def oauth2(request):
 
     if email.endswith("@%s" % settings.WORKBENCH.SSO_DOMAIN):
         user, new_user = User.objects.get_or_create(
-            email=email, defaults={"language": get_language()},
+            email=email,
+            defaults={
+                "language": get_language(),
+                "working_time_model": WorkingTimeModel.objects.first(),
+            },
         )
 
     user = auth.authenticate(request, email=email)

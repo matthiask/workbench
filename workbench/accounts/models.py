@@ -21,7 +21,12 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError("Users must have an email address")
 
-        user = self.model(email=self.normalize_email(email))
+        from workbench.awt.models import WorkingTimeModel
+
+        user = self.model(
+            email=self.normalize_email(email),
+            working_time_model=WorkingTimeModel.objects.first(),
+        )
         user.set_unusable_password()
         user.save(using=self._db)
         return user
@@ -30,7 +35,12 @@ class UserManager(BaseUserManager):
         """
         Creates and saves a superuser with the given email, date of birth.
         """
-        user = self.model(email=self.normalize_email(email))
+        from workbench.awt.models import WorkingTimeModel
+
+        user = self.model(
+            email=self.normalize_email(email),
+            working_time_model=WorkingTimeModel.objects.first(),
+        )
         user.set_unusable_password()
         user.is_admin = True
         user.save(using=self._db)
@@ -58,7 +68,7 @@ class UserManager(BaseUserManager):
 @total_ordering
 class User(Model, AbstractBaseUser):
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["working_time_model"]
 
     email = models.EmailField(_("email"), max_length=254, unique=True)
     is_active = models.BooleanField(_("is active"), default=True)

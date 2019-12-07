@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-02 21:58+0100\n"
+"POT-Creation-Date: 2019-12-07 13:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -74,6 +74,10 @@ msgstr "Stundenerfassung in der gleichen Woche erzwingen"
 #: workbench/accounts/models.py
 msgid "language"
 msgstr "Sprache"
+
+#: workbench/accounts/models.py workbench/awt/models.py
+msgid "working time model"
+msgstr "Arbeitszeitmodell"
 
 #: workbench/accounts/models.py workbench/awt/models.py
 #: workbench/management/commands/profitability.py
@@ -205,6 +209,15 @@ msgstr "Stunden eingeben"
 #: workbench/awt/forms.py
 msgid "Creating absences for past years is not allowed."
 msgstr "Abwesenheiten in vergangenen Jahren erstellen ist nicht erlaubt."
+
+#: workbench/awt/models.py workbench/circles/models.py
+#: workbench/contacts/models.py workbench/credit_control/models.py
+msgid "name"
+msgstr "Name"
+
+#: workbench/awt/models.py
+msgid "working time models"
+msgstr "Arbeitszeitmodelle"
 
 #: workbench/awt/models.py
 msgid "year"
@@ -343,11 +356,6 @@ msgstr "Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."
 #, python-format
 msgid "Target time for %s not found."
 msgstr "Sollzeit für %s nicht gefunden."
-
-#: workbench/circles/models.py workbench/contacts/models.py
-#: workbench/credit_control/models.py
-msgid "name"
-msgstr "Name"
 
 #: workbench/circles/models.py
 msgid "circle"
@@ -1838,6 +1846,13 @@ msgstr "Abbruch"
 #: workbench/templates/generic/object_form.html
 msgid "continue"
 msgstr "Weiter"
+
+#: workbench/templates/expenses/expensereport_detail.html
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/invoice_list.html
+#: workbench/templates/projects/project_detail.html
+msgid "Download"
+msgstr "Herunterladen"
 
 #: workbench/templates/fineforms/errors.html
 msgid "Please correct the following errors:"

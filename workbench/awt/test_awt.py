@@ -17,7 +17,7 @@ class AWTTest(TestCase):
         response = self.client.get("/report/annual-working-time/")
         self.assertRedirects(response, "/")
 
-        factories.YearFactory.create()
+        factories.YearFactory.create(working_time_model=user.working_time_model)
         response = self.client.get("/report/annual-working-time/")
         self.assertEqual(response.status_code, 200)
 
@@ -63,9 +63,11 @@ class AWTTest(TestCase):
                 self.assertEqual(list(monthly_days(from_, until_)), dates)
 
     def test_working_time(self):
-        year = factories.YearFactory.create(year=2018)
         service = factories.ServiceFactory.create()
         user = service.project.owned_by
+        year = factories.YearFactory.create(
+            year=2018, working_time_model=user.working_time_model
+        )
         user.loggedhours.create(
             service=service,
             created_by=user,
@@ -95,7 +97,7 @@ class AWTTest(TestCase):
         self.assertEqual(employments[1].date_until, dt.date(2018, 9, 30))
         self.assertEqual(employments[2].date_until, dt.date(9999, 12, 31))
 
-        awt = annual_working_time(year, users=[user])[0]
+        awt = annual_working_time(year.year, users=[user])[0]
 
         self.assertAlmostEqual(awt["totals"]["target_days"], Decimal("360"))
         self.assertAlmostEqual(awt["totals"]["percentage"], Decimal("85"))
@@ -195,11 +197,14 @@ class AWTTest(TestCase):
         self.assertEqual(list(year.active_users()), [])
 
     def test_report_view(self):
-        factories.YearFactory.create()
-        user = factories.UserFactory.create()
-        inactive = factories.UserFactory.create()
+        year = factories.YearFactory.create()
+        user = factories.UserFactory.create(working_time_model=year.working_time_model)
+        inactive = factories.UserFactory.create(
+            working_time_model=year.working_time_model
+        )
         Employment.objects.create(user=user, percentage=50, vacation_weeks=5)
 
+        # New user has a different working time model...
         self.client.force_login(factories.UserFactory.create())
 
         url = "/report/annual-working-time/"

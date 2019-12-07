@@ -20,8 +20,10 @@ class ToolsTest(TestCase):
         self.assertEqual(Year(pk=3).code, "00003")
         self.assertEqual(Year().pretty_status, "")
         self.assertEqual(
-            Year(year=2012).snippet(),
-            '\n<a href="/report/annual-working-time/?year=2012">\n  year: 2012\n</a>\n',
+            Year(
+                year=2012, working_time_model=factories.WorkingTimeModelFactory.create()
+            ).snippet(),
+            '\n<a href="/report/annual-working-time/?year=2012">\n  year: 2012 Test\n</a>\n',  # noqa
         )
 
     def test_invalid_autocomplete(self):

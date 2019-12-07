@@ -1,12 +1,16 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
+from admin_ordering.admin import OrderableAdmin
+
 from . import models
 
 
 @admin.register(models.WorkingTimeModel)
-class WorkingTimeModelAdmin(admin.ModelAdmin):
-    pass
+class WorkingTimeModelAdmin(OrderableAdmin, admin.ModelAdmin):
+    list_display = ["name", "position"]
+    list_editable = ["position"]
+    ordering_field = "position"
 
 
 @admin.register(models.Year)
