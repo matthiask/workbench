@@ -34,7 +34,7 @@ class ExpenseReportPDFView(generic.DetailView):
         pdf.spacer(5 * mm)
 
         pdf.table(
-            [(_("receipt"), "", _("total"))]
+            [(_("receipt"), "", "")]
             + [
                 (
                     "%d." % (index + 1),
