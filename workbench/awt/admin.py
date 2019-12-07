@@ -4,9 +4,20 @@ from django.utils.translation import gettext_lazy as _
 from . import models
 
 
+@admin.register(models.WorkingTimeModel)
+class WorkingTimeModelAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(models.Year)
 class YearAdmin(admin.ModelAdmin):
-    list_display = ["year", "working_time_per_day", *models.Year.MONTHS, "days"]
+    list_display = [
+        "year",
+        "working_time_model",
+        "working_time_per_day",
+        *models.Year.MONTHS,
+        "days",
+    ]
 
     def days(self, instance):
         return sum(instance.months)

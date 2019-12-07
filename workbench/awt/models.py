@@ -11,6 +11,18 @@ from workbench.tools.models import HoursField, Model
 from workbench.tools.urls import model_urls
 
 
+class WorkingTimeModel(models.Model):
+    name = models.CharField(_("name"), max_length=100)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = _("working time model")
+        verbose_name_plural = _("working time models")
+
+    def __str__(self):
+        return self.name
+
+
 class Year(Model):
     MONTHS = [
         "january",
@@ -27,7 +39,12 @@ class Year(Model):
         "december",
     ]
 
-    year = models.IntegerField(_("year"), unique=True)
+    working_time_model = models.ForeignKey(
+        WorkingTimeModel,
+        on_delete=models.CASCADE,
+        verbose_name=_("working time model"),
+    )
+    year = models.IntegerField(_("year"))
     january = models.DecimalField(_("january"), max_digits=4, decimal_places=2)
     february = models.DecimalField(_("february"), max_digits=4, decimal_places=2)
     march = models.DecimalField(_("march"), max_digits=4, decimal_places=2)
@@ -44,6 +61,7 @@ class Year(Model):
 
     class Meta:
         ordering = ["-year"]
+        unique_together = (("working_time_model", "year"),)
         verbose_name = _("year")
         verbose_name_plural = _("years")
 

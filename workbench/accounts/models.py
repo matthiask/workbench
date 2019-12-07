@@ -73,6 +73,11 @@ class User(Model, AbstractBaseUser):
     language = models.CharField(
         _("language"), max_length=10, blank=True, choices=settings.LANGUAGES
     )
+    working_time_model = models.ForeignKey(
+        "awt.WorkingTimeModel",
+        on_delete=models.CASCADE,
+        verbose_name=_("working time model"),
+    )
 
     objects = UserManager()
 
