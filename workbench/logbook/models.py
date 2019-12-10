@@ -181,12 +181,4 @@ class LoggedCost(Model):
                 errors["expense_currency"] = _("Either fill in all fields or none.")
             if self.expense_cost is None:
                 errors["expense_cost"] = _("Either fill in all fields or none.")
-        if self.expense_cost:
-            from decimal import Decimal
-            from workbench.expenses.models import ExchangeRates
-
-            rates = ExchangeRates.objects.for_day(self.rendered_on)
-            self.third_party_costs = self.expense_cost / Decimal(
-                str(rates.rates["rates"][self.expense_currency])
-            )
         raise_if_errors(errors, exclude)

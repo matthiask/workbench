@@ -399,10 +399,6 @@ class LoggedCostForm(ModelForm):
     def clean(self):
         data = super().clean()
         errors = {}
-
-        if data.get("expense_currency") != "CHF":
-            data["expense_cost"] = data["third_party_costs"]
-
         if self.project.closed_on:
             if self.project.closed_on < dt.date.today() - dt.timedelta(days=15):
                 errors["__all__"] = _("This project has been closed too long ago.")
