@@ -330,6 +330,19 @@ function initWidgets() {
       .val("")
       .trigger("change")
   })
+
+  $(document.body).on("click", "[data-convert]", function() {
+    const params = new URLSearchParams()
+    params.append("day", $("#id_rendered_on").val())
+    params.append("currency", $("#id_expense_currency").val())
+    params.append("cost", $("#id_expense_cost").val())
+    console.log(params)
+    console.log(params.toString())
+
+    $.getJSON("/expenses/convert/?" + params.toString(), function(data) {
+      $("#id_third_party_costs").val(data.cost)
+    })
+  })
 }
 
 window.addInlineForm = function addInlineForm(slug, onComplete) {

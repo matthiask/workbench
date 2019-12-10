@@ -9,24 +9,32 @@
 {% block body %}
   {% include 'fineforms/warnings.html' %}
   {% ff_errors form %}
+
   <div class="form-row">
     <div class="col-6">{% ff_field form.rendered_by %}</div>
     <div class="col-6">{% ff_field form.rendered_on %}</div>
   </div>
+  {% ff_field form.service %}
 
-  <div class="form-row align-items-end">
-    <div class="col-6">{% ff_field form.expense_currency %}</div>
-    <div class="col-6">{% ff_field form.third_party_costs %}</div>
-  </div>
   {% ff_field form.are_expenses %}
+  <div class="form-row align-items-end {% if not form.instance.expense_cost %}d-none{% endif %}" id="foreign-currency">
+    <div class="col-3">{% ff_field form.expense_currency %}</div>
+    <div class="col-6">{% ff_field form.expense_cost %}</div>
+    <div class="col-3" style="margin-bottom:1rem">
+      <button type="button" class="btn btn-primary" data-convert>{% trans 'convert' %}</button>
+    </div>
+  </div>
+  {% ff_field form.third_party_costs %}
 
   {% ff_field form.cost %}
   {% ff_field form.description %}
 {% endblock %}
 
 {% block footer %}
-<button type="button" class="btn btn-primary mr-auto"
-onclick="_cl(this, 'invisible', true);_cl(_sel('#section-fc'), 'd-none', false);_cl(_sel('#section-tpc'), 'd-none', true);_sel('#id_are_expenses').checked=true"
->{% trans 'expenses in foreign currency' %}</button>
+  {% if not form.instance.expense_cost %}
+    <button type="button" class="btn btn-primary mr-auto"
+      onclick="_cl(this, 'invisible', true);_cl(_sel('#foreign-currency'), 'd-none', false);_sel('#id_are_expenses').checked=true"
+      >{% trans 'expenses in foreign currency' %}</button>
+  {% endif %}
   <button type="submit" class="btn btn-primary">{% trans 'save' %}</button>
 {% endblock %}

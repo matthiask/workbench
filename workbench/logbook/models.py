@@ -139,7 +139,7 @@ class LoggedCost(Model):
     )
 
     expense_currency = models.CharField(
-        _("currency"), max_length=3, blank=True
+        _("original currency"), max_length=3, blank=True
     )
     expense_cost = MoneyField(_("original cost"), blank=True, null=True)
 
@@ -186,5 +186,7 @@ class LoggedCost(Model):
             from workbench.expenses.models import ExchangeRates
 
             rates = ExchangeRates.objects.for_day(self.rendered_on)
-            self.third_party_costs = self.expense_cost * Decimal(str(rates.rates["rates"][self.expense_currency]))
+            self.third_party_costs = self.expense_cost / Decimal(
+                str(rates.rates["rates"][self.expense_currency])
+            )
         raise_if_errors(errors, exclude)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-10 10:54+0100\n"
+"POT-Creation-Date: 2019-12-10 17:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -828,6 +828,18 @@ msgstr "geschlossen am %s"
 msgid "In preparation"
 msgstr "In Vorbereitung"
 
+#: workbench/expenses/models.py
+msgid "day"
+msgstr "Tag"
+
+#: workbench/expenses/models.py
+msgid "exchange rate"
+msgstr "Wechselkurse"
+
+#: workbench/expenses/models.py
+msgid "exchange rates"
+msgstr "Wechselkurse"
+
 #: workbench/expenses/views.py workbench/templates/generic/object_list.html
 msgid "of"
 msgstr "von"
@@ -1340,6 +1352,14 @@ msgstr "Kann Stunden vergangener Wochen nicht löschen."
 msgid "paid from my own pocket"
 msgstr "mit eigenem Geld bezahlt"
 
+#: workbench/logbook/models.py
+msgid "original currency"
+msgstr "Originalwährung"
+
+#: workbench/logbook/models.py
+msgid "original cost"
+msgstr "Originalbetrag"
+
 #: workbench/logbook/models.py workbench/templates/reporting/key_data.html
 msgid "logged cost"
 msgstr "Erfasste Kosten"
@@ -1355,6 +1375,10 @@ msgstr "Kann archivierte Kosten nicht löschen."
 #: workbench/logbook/models.py
 msgid "Expenses are part of an expense report, cannot delete entry."
 msgstr "Spesen sind Teil einer Spesenabrechnung, kann Eintrag nicht löschen."
+
+#: workbench/logbook/models.py workbench/services/models.py
+msgid "Either fill in all fields or none."
+msgstr "Entweder alle Felder einfüllen oder keine."
 
 #: workbench/logbook/views.py
 msgid "Select project for logging"
@@ -1636,10 +1660,6 @@ msgid "service cost"
 msgstr "Leistungskosten"
 
 #: workbench/services/models.py
-msgid "Either fill in all fields or none."
-msgstr "Entweder alle Felder einfüllen oder keine."
-
-#: workbench/services/models.py
 msgid "Cannot be empty if third party costs is set."
 msgstr "Kann nicht leer sein wenn Fremdkosten gesetzt sind."
 
@@ -1700,6 +1720,7 @@ msgstr "Löschen"
 #: workbench/templates/credit_control/creditentry_upload.html
 #: workbench/templates/fineforms/submit.html
 #: workbench/templates/generic/object_form.html
+#: workbench/templates/logbook/loggedcost_form.html
 #: workbench/templates/logbook/loggedhours_form.html
 #: workbench/templates/modalform.html
 msgid "save"
@@ -1953,6 +1974,14 @@ msgstr "Verrechnung"
 #, python-format
 msgid "Archived at %(archived_at)s"
 msgstr "Archiviert um %(archived_at)s"
+
+#: workbench/templates/logbook/loggedcost_form.html
+msgid "convert"
+msgstr "umrechnen"
+
+#: workbench/templates/logbook/loggedcost_form.html
+msgid "expenses in foreign currency"
+msgstr "Spesen in Fremdwährung"
 
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/projects/project_detail.html

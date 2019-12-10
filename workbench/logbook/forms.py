@@ -386,12 +386,13 @@ class LoggedCostForm(ModelForm):
             self.fields["expense_currency"].disabled = True
             self.fields["expense_cost"].disabled = True
 
-        rates = ExchangeRates.objects.first()
+        rates = ExchangeRates.objects.newest()
         self.fields["expense_currency"] = forms.ChoiceField(
-            choices=[(currency, currency) for currency in rates.rates["rates"]],
+            choices=[("", "----------")]
+            + [(currency, currency) for currency in rates.rates["rates"]],
             widget=forms.Select(attrs={"class": "custom-select"}),
             required=False,
-            initial=self.instance.expense_currency or "CHF",
+            initial=self.instance.expense_currency,
             label=self.instance._meta.get_field("expense_currency").verbose_name,
         )
 

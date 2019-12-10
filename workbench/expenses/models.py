@@ -109,12 +109,17 @@ class ExchangeRatesQuerySet(models.QuerySet):
     def for_day(self, day):
         try:
             return self.get(day=day)
-
         except self.model.DoesNotExist:
             instance, created = self.update_or_create(
                 day=day, defaults={"rates": exchange_rates(day)}
             )
             return instance
+
+    def newest(self):
+        try:
+            return self.latest()
+        except self.model.DoesNotExist:
+            return self.for_today()
 
 
 class ExchangeRates(models.Model):

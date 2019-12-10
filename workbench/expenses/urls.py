@@ -3,7 +3,7 @@ from django.conf.urls import url
 from workbench import generic
 from workbench.expenses.forms import ExpenseReportForm
 from workbench.expenses.models import ExpenseReport
-from workbench.expenses.views import ExpenseReportPDFView
+from workbench.expenses.views import ExpenseReportPDFView, convert
 
 
 urlpatterns = [
@@ -37,4 +37,5 @@ urlpatterns = [
         generic.DeleteView.as_view(model=ExpenseReport),
         name="expenses_expensereport_delete",
     ),
+    url(r"^convert/$", convert, name="expenses_convert"),
 ]

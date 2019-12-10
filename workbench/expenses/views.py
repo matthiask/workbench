@@ -1,9 +1,14 @@
+from decimal import Decimal
+
+from django import forms
+from django.http import JsonResponse
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
 from workbench import generic
-from workbench.expenses.models import ExpenseReport
+from workbench.expenses.models import ExchangeRates, ExpenseReport
 from workbench.tools.formats import currency, local_date_format
+from workbench.tools.models import Z
 from workbench.tools.pdf import MarkupParagraph, mm, pdf_response
 
 
@@ -70,3 +75,20 @@ class ExpenseReportPDFView(generic.DetailView):
         pdf.generate()
 
         return response
+
+
+class ConvertForm(forms.Form):
+    day = forms.DateField()
+    currency = forms.CharField()
+    cost = forms.DecimalField(max_digits=10, decimal_places=2)
+
+
+def convert(request):
+    form = ConvertForm(request.GET)
+    if not form.is_valid():
+        return JsonResponse({"cost": ""}, status=400)
+    rates = ExchangeRates.objects.for_day(form.cleaned_data["day"])
+    cost = form.cleaned_data["cost"] / Decimal(
+        str(rates.rates["rates"][form.cleaned_data["currency"]])
+    )
+    return JsonResponse({"cost": cost.quantize(Z)})
