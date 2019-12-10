@@ -59,12 +59,15 @@ class ExpenseReportForm(ModelForm):
             (
                 cost.id,
                 format_html(
-                    "{}<br>{}: {}<br>{}<br>{}",
+                    "{}<br>{}: {}<br>{}<br>{}{}",
                     local_date_format(cost.rendered_on),
                     cost.service.project,
                     cost.service,
                     cost.description,
                     currency(cost.third_party_costs),
+                    " ({} {})".format(cost.expense_currency, cost.expense_cost)
+                    if cost.expense_cost
+                    else "",
                 ),
             )
             for cost in self.fields["expenses"]

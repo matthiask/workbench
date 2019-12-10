@@ -24,7 +24,9 @@
             {{ cost.rendered_on|local_date_format }}<br>
             {{ cost.service.project|h }}: {{ cost.service|h }}<br>
             {{ cost.description }}<br>
-            {{ cost.third_party_costs|currency }}<br>
+            {{ cost.third_party_costs|currency }}
+            {% if cost.expense_cost %}({{ cost.expense_currency }} {{ cost.expense_cost }}){% endif %}
+            <br>
           </a>
           <br>
         {% endfor %}
