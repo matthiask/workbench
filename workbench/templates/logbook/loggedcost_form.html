@@ -1,7 +1,21 @@
 {% extends "modalform.html" %}
 
-{% load i18n %}
+{% load fineforms i18n %}
 
 {% block title %}
 {% if view.project %}{{ view.project.title }}{% else %}{{ block.super }}{% endif %}
+{% endblock %}
+
+{% block body %}
+  {% include 'fineforms/warnings.html' %}
+  {% ff_errors form %}
+  <div class="form-row">
+    <div class="col-6">{% ff_field form.rendered_by %}</div>
+    <div class="col-6">{% ff_field form.rendered_on %}</div>
+  </div>
+
+  {% ff_field form.third_party_costs %}
+  {% ff_field form.are_expenses %}
+  {% ff_field form.cost %}
+  {% ff_field form.description %}
 {% endblock %}

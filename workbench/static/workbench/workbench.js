@@ -1,3 +1,12 @@
+function _sel(sel) {
+  return document.querySelector(sel)
+}
+
+/* eslint-disable-next-line */
+function _cl(el, cl, add) {
+  el.classList[add ? "add" : "remove"](cl)
+}
+
 $(function() {
   const gettext =
     window.gettext ||
@@ -186,7 +195,7 @@ $(function() {
       window.location.href = restoreSearch("/invoices/")
     } else if (e.keyCode === 76) {
       // l
-      const el = document.querySelector("[data-createhours]")
+      const el = _sel("[data-createhours]")
       if (e.shiftKey || !el) {
         window.openModalFromUrl("/logbook/hours/create/")
       } else {
@@ -194,7 +203,7 @@ $(function() {
       }
     } else if (e.keyCode === 75) {
       // k
-      const el = document.querySelector("[data-createcost]")
+      const el = _sel("[data-createcost]")
       if (e.shiftKey || !el) {
         window.openModalFromUrl("/logbook/costs/create/")
       } else {

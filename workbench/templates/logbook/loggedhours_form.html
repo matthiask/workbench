@@ -15,8 +15,10 @@
     {% ff_field form.service_description %}
     <hr>
   </div>
-  {% ff_field form.rendered_by %}
-  {% ff_field form.rendered_on %}
+  <div class="form-row">
+    <div class="col-6">{% ff_field form.rendered_by %}</div>
+    <div class="col-6">{% ff_field form.rendered_on %}</div>
+  </div>
   {% ff_field form.service %}
   {% ff_field form.hours %}
   {% ff_field form.description %}
@@ -25,7 +27,7 @@
 {% block footer %}
   {% if form.hide_new_service %}
     <button type="button" class="btn btn-primary mr-auto"
-      onclick="this.classList.add('invisible');document.querySelector('#new-service').classList.remove('d-none')">
+      onclick="_cl(this, 'invisible', true);_cl(_sel('#new-service'), 'd-none', false)">
       {% trans 'new service' %}
     </button>
   {% endif %}
