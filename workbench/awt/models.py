@@ -1,13 +1,15 @@
 import datetime as dt
 
 from django.contrib import messages
+from django.core import validators
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.tools.formats import local_date_format
-from workbench.tools.models import HoursField, Model
+from workbench.tools.models import HoursField, Model, MoneyField
 from workbench.tools.urls import model_urls
 
 
@@ -101,7 +103,17 @@ class Employment(Model):
         decimal_places=2,
         help_text=_("Vacation weeks for a full year."),
     )
-    notes = models.TextField(_("notes"), blank=True)
+    notes = models.CharField(_("notes"), blank=True, max_length=500)
+    hourly_labor_costs = MoneyField(_("hourly labor costs"), blank=True, null=True)
+    green_hours_target = models.SmallIntegerField(
+        _("green hours target"),
+        blank=True,
+        null=True,
+        validators=[
+            validators.MinValueValidator(0),
+            validators.MaxLengthValidator(100),
+        ],
+    )
 
     class Meta:
         ordering = ["date_from"]
@@ -130,6 +142,16 @@ class Employment(Model):
                 next = employment
 
     save.alters_data = True
+
+    def clean_fields(self, exclude):
+        super().clean_fields(exclude)
+        if (self.hourly_labor_costs is None) != (self.green_hours_target is None):
+            raise ValidationError(
+                _(
+                    "Either provide both hourly labor costs"
+                    " and green hours target or none."
+                )
+            )
 
 
 @model_urls

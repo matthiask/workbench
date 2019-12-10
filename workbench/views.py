@@ -49,6 +49,7 @@ def search(request):
 
 HISTORY = {
     "accounts_user": {"exclude": {"is_admin", "last_login", "password"}},
+    "awt_employment": {"exclude": {"hourly_labor_costs", "green_hours_target"}},
     "contacts_person": {
         "exclude": {"_fts"},
         "related": [
