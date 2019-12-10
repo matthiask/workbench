@@ -272,8 +272,8 @@ MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID", warn=True)
 GLASSFROG_TOKEN = env("GLASSFROG_TOKEN", warn=True)
 
 contains_everything = type(str("c"), (), {"__contains__": lambda *a: True})()
-PERMISSIONS = env(
-    "PERMISSIONS",
+FEATURES = env(
+    "FEATURES",
     default=defaultdict(lambda: contains_everything) if TESTING else {},
     warn=True,
 )

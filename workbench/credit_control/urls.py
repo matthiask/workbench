@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from workbench import generic
-from workbench.accounts.permissions import book_keeping_only
+from workbench.accounts.features import book_keeping_only
 from workbench.credit_control.forms import (
     AccountStatementUploadForm,
     CreditEntryForm,

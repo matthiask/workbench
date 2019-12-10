@@ -208,5 +208,5 @@ ORDER BY extract(month from date_of_birth), extract(day from date_of_birth)
 
 
 @register.filter
-def has(user, permission):
-    return user.permissions[permission]
+def has(user, feature):
+    return user.features[feature]

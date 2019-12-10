@@ -5,24 +5,24 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import gettext_lazy as _
 
 
-def permission_required(permission, message=_("Access denied, sorry.")):
+def feature_required(feature, message=_("Access denied, sorry.")):
     def decorator(view):
         @wraps(view)
-        def require_permission(request, *args, **kwargs):
-            if request.user.permissions[permission]:
+        def require_feature(request, *args, **kwargs):
+            if request.user.feature[feature]:
                 return view(request, *args, **kwargs)
             messages.warning(request, message)
             return HttpResponseRedirect(request.META.get("HTTP_REFERER") or "/")
 
-        return require_permission
+        return require_feature
 
     return decorator
 
 
-class Permissions:
+class Features:
     BOOK_KEEPING = "book_keeping"
 
 
-book_keeping_only = permission_required(
-    Permissions.BOOK_KEEPING, _("Only book keeping may access this, sorry.")
+book_keeping_only = feature_required(
+    Features.BOOK_KEEPING, _("Only book keeping may access this, sorry.")
 )

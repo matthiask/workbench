@@ -204,17 +204,17 @@ class User(Model, AbstractBaseUser):
         }
 
     @cached_property
-    def permissions(self):
-        return UserPermissions(email=self.email)
+    def features(self):
+        return UserFeatures(email=self.email)
 
 
-class UserPermissions:
+class UserFeatures:
     def __init__(self, *, email):
         self.email = email
 
     def __getattr__(self, key):
         try:
-            return self.email in settings.PERMISSIONS[key]
+            return self.email in settings.FEATURES[key]
         except KeyError:
             return False
 

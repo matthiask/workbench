@@ -3,7 +3,7 @@
 {% load i18n workbench %}
 
 {% block search-form-buttons %}
-  {% if request.user|has:PERMISSIONS.BOOK_KEEPING %}
+  {% if request.user|has:FEATURES.BOOK_KEEPING %}
     <a href="{{ view.model.urls.upload }}" class="btn btn-primary">
       {% trans 'upload account statement' %}
     </a>

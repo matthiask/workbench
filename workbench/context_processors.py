@@ -1,7 +1,7 @@
 from django.conf import settings
 
-from workbench.accounts.permissions import Permissions
+from workbench.accounts.features import Features
 
 
 def workbench(request):
-    return {"WORKBENCH": settings.WORKBENCH, "PERMISSIONS": Permissions}
+    return {"WORKBENCH": settings.WORKBENCH, "FEATURES": Features}
