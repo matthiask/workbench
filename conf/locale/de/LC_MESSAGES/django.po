@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-07 13:12+0100\n"
+"POT-Creation-Date: 2019-12-10 10:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,6 +20,14 @@ msgstr ""
 #: workbench/accounts/__init__.py
 msgid "accounts"
 msgstr "Konten"
+
+#: workbench/accounts/features.py
+msgid "Access denied, sorry."
+msgstr "Zugriff verweigert :-("
+
+#: workbench/accounts/features.py
+msgid "Only book keeping may access this, sorry."
+msgstr "Nur Buchhaltung kann auf diesen Bereich zugreifen."
 
 #: workbench/accounts/forms.py
 msgid "Managed automatically. Contact your administrator to change this."
@@ -215,6 +223,10 @@ msgstr "Abwesenheiten in vergangenen Jahren erstellen ist nicht erlaubt."
 msgid "name"
 msgstr "Name"
 
+#: workbench/awt/models.py workbench/services/models.py
+msgid "position"
+msgstr "Position"
+
 #: workbench/awt/models.py
 msgid "working time models"
 msgstr "Arbeitszeitmodelle"
@@ -309,6 +321,14 @@ msgstr "Ferienwochen für ein volles Anstellungsjahr."
 msgid "notes"
 msgstr "Bemerkungen"
 
+#: workbench/awt/models.py
+msgid "hourly labor costs"
+msgstr "Lohnkosten pro Stunde"
+
+#: workbench/awt/models.py
+msgid "green hours target"
+msgstr "Grüne Stunden-Zielwert"
+
 #: workbench/awt/models.py workbench/templates/awt/year_detail.html
 msgid "employment"
 msgstr "Anstellungsverhältnis"
@@ -321,6 +341,12 @@ msgstr "Anstellungsverhältnisse"
 #, python-format
 msgid "since %s"
 msgstr "Seit %s"
+
+#: workbench/awt/models.py
+msgid "Either provide both hourly labor costs and green hours target or none."
+msgstr ""
+"Entweder Lohnkosten pro Stunde UND Grüne Stunden-Zielwert angeben oder "
+"nichts von beidem."
 
 #: workbench/awt/models.py workbench/invoices/models.py
 msgid "starts on"
@@ -678,7 +704,7 @@ msgid "value date"
 msgstr "Valuta"
 
 #: workbench/credit_control/models.py workbench/expenses/models.py
-#: workbench/expenses/views.py workbench/management/commands/export_debtors.py
+#: workbench/management/commands/export_debtors.py
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data.html
@@ -759,9 +785,8 @@ msgstr "Erstellt von"
 msgid "closed on"
 msgstr "Geschlossen am"
 
-#: workbench/expenses/models.py workbench/expenses/views.py
-#: workbench/invoices/models.py workbench/offers/models.py
-#: workbench/projects/models.py
+#: workbench/expenses/models.py workbench/invoices/models.py
+#: workbench/offers/models.py workbench/projects/models.py
 msgid "responsible"
 msgstr "verantwortlich"
 
@@ -803,6 +828,10 @@ msgstr "geschlossen am %s"
 msgid "In preparation"
 msgstr "In Vorbereitung"
 
+#: workbench/expenses/views.py workbench/templates/generic/object_list.html
+msgid "of"
+msgstr "von"
+
 #: workbench/expenses/views.py workbench/invoices/models.py
 #: workbench/offers/models.py workbench/projects/forms.py
 #: workbench/reporting/views.py
@@ -813,6 +842,11 @@ msgstr "Status"
 #: workbench/expenses/views.py
 msgid "receipt"
 msgstr "Beleg"
+
+#: workbench/expenses/views.py workbench/invoices/models.py
+#: workbench/offers/models.py
+msgid "total CHF"
+msgstr "Total CHF"
 
 #: workbench/generic.py
 msgid "Search form was invalid."
@@ -1113,10 +1147,6 @@ msgstr "Total CHF Akonto"
 #: workbench/invoices/models.py workbench/offers/models.py
 msgid "total CHF incl. tax"
 msgstr "Total CHF inkl. MwSt."
-
-#: workbench/invoices/models.py workbench/offers/models.py
-msgid "total CHF"
-msgstr "Total CHF"
 
 #: workbench/invoices/models.py
 msgid "Invoices in preparation may be deleted, others not."
@@ -1590,10 +1620,6 @@ msgid "delta"
 msgstr "Delta"
 
 #: workbench/services/models.py
-msgid "position"
-msgstr "Position"
-
-#: workbench/services/models.py
 msgid "service type"
 msgstr "Leistungstyp"
 
@@ -1874,10 +1900,6 @@ msgstr "Suchformular zurücksetzen"
 #: workbench/templates/generic/object_list.html
 msgid "search"
 msgstr "Suche"
-
-#: workbench/templates/generic/object_list.html
-msgid "of"
-msgstr "von"
 
 #: workbench/templates/history_modal.html workbench/templatetags/workbench.py
 msgid "History"
