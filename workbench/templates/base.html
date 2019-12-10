@@ -1,6 +1,6 @@
 {% extends "site_base.html" %}
 
-{% load bootstrap4 i18n mark_current static %}
+{% load bootstrap4 i18n mark_current static workbench %}
 
 {% block body %}
   <!-- Fixed navbar -->
@@ -69,7 +69,9 @@
             <a class="dropdown-item" href="{% url 'report_open_items_list' %}">{% trans 'open items list'|capfirst %}</a>
             <div class="dropdown-divider"></div>
             <div class="dropdown-header">{% trans 'logged hours' %}</div>
-            <a class="dropdown-item" href="{% url 'report_hours_by_circle' %}">{% trans 'hours by circle'|capfirst %}</a>
+            {% if request.user|has:FEATURES.GLASSFROG %}
+              <a class="dropdown-item" href="{% url 'report_hours_by_circle' %}">{% trans 'hours by circle'|capfirst %}</a>
+            {% endif %}
             <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">{% trans 'hours per customer'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'report_green_hours' %}">{% trans 'green hours'|capfirst %}</a>
           </div>

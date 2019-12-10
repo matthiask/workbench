@@ -9,7 +9,7 @@ def feature_required(feature, message=_("Access denied, sorry.")):
     def decorator(view):
         @wraps(view)
         def require_feature(request, *args, **kwargs):
-            if request.user.feature[feature]:
+            if request.user.features[feature]:
                 return view(request, *args, **kwargs)
             messages.warning(request, message)
             return HttpResponseRedirect(request.META.get("HTTP_REFERER") or "/")
@@ -21,6 +21,7 @@ def feature_required(feature, message=_("Access denied, sorry.")):
 
 class Features:
     BOOK_KEEPING = "book_keeping"
+    GLASSFROG = "glassfrog"
 
 
 book_keeping_only = feature_required(

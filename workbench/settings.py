@@ -271,12 +271,7 @@ MAILCHIMP_API_KEY = env("MAILCHIMP_API_KEY", warn=True)
 MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID", warn=True)
 GLASSFROG_TOKEN = env("GLASSFROG_TOKEN", warn=True)
 
-contains_everything = type(str("c"), (), {"__contains__": lambda *a: True})()
-FEATURES = env(
-    "FEATURES",
-    default=defaultdict(lambda: contains_everything) if TESTING else {},
-    warn=True,
-)
+FEATURES = defaultdict(lambda: True) if TESTING else env("FEATURES", warn=True)
 
 if DEBUG:  # pragma: no cover
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

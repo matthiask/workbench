@@ -214,8 +214,11 @@ class UserFeatures:
 
     def __getattr__(self, key):
         try:
-            return self.email in settings.FEATURES[key]
+            setting = settings.FEATURES[key]
         except KeyError:
             return False
+        if setting is True or setting is False:
+            return setting
+        return self.email in setting
 
     __getitem__ = __getattr__
