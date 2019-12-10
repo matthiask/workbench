@@ -38,6 +38,8 @@ class OfferSearchForm(forms.Form):
             queryset = queryset.filter(
                 status__lte=Offer.OFFERED, project__closed_on__isnull=True
             )
+        if data.get("org"):
+            queryset = queryset.filter(project__customer=data.get("org"))
 
         return queryset.select_related(
             "owned_by",
