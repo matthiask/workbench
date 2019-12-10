@@ -4,4 +4,8 @@ from workbench.accounts.features import Features
 
 
 def workbench(request):
-    return {"WORKBENCH": settings.WORKBENCH, "FEATURES": Features}
+    return {
+        "WORKBENCH": settings.WORKBENCH,
+        "FEATURES": Features,
+        "DEBUG": settings.DEBUG,
+    }

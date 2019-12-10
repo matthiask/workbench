@@ -160,3 +160,17 @@ tbody th > a {
   position: relative;
   top: -50px;
 }
+
+.debug-is-active::before {
+  content: "DEBUG";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  font-size: 10px;
+  height: 15px;
+  background: rgba(150, 0, 0, 0.8);
+  color: white;
+  text-align: center;
+}

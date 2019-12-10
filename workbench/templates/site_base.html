@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>
 
-<body class="d-flex flex-column" role="document">
+<body class="d-flex flex-column {% if DEBUG %}debug-is-active{% endif %}" role="document">
 
   {% block body %}{% endblock body %}
 
