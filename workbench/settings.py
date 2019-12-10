@@ -216,6 +216,35 @@ WORKBENCH = {
         BACKGROUND="#dadcab",
         URL="https://dbpag.feinheit.ch",
     ),
+    "bf": types.SimpleNamespace(
+        SSO_DOMAIN="blindflugstudios.com",
+        PDF_LANGUAGE="de",
+        PDF_COMPANY="Blindflug Studios AG",
+        PDF_ADDRESS=(
+            "Blindflug Studiso AG · Fabrikstrasse 54 · 8005 Zürich"
+            " · blindflugstudios.com"
+        ),
+        PDF_VAT_NO="CHE-155.657.233 MWST",
+        PDF_OFFER_TERMS=(
+            "Bestandteil dieser Offerte sind die zum Zeitpunkt"
+            " des Vertragsabschlusses aktuellen Allgemeinen"
+            " Geschäftsbedingungen der Blindflug Studios AG."
+        ),
+        PDF_INVOICE_PAYMENT=(
+            "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
+            " der Referenznummer %(code)s bis zum %(due)s"
+            " auf Konto IBAN CH31 0687 7705 0560 9509 7 bei der"
+            " Zürcher Landbank AG."
+        ),
+        FONTS={
+            "regular": font("HelveticaNeueLight.ttf"),
+            "bold": font("HelveticaNeueBold.ttf"),
+            "italic": font("HelveticaNeueLightItalic.ttf"),
+            "bolditalic": font("HelveticaNeueBoldItalic.ttf"),
+        },
+        BACKGROUND="#dadcab",
+        URL="https://workbench.blindflugstudios.com",
+    ),
 }[env("NAMESPACE", required=True)]
 
 SILENCED_SYSTEM_CHECKS = [
