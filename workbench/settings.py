@@ -165,6 +165,7 @@ def font(name):
 NAMESPACE = env("NAMESPACE", required=True)
 WORKBENCH = {
     "feinheit": types.SimpleNamespace(
+        TITLE="Feinheit",
         SSO_DOMAIN="feinheit.ch",
         PDF_LANGUAGE="de",
         PDF_COMPANY="Feinheit AG",
@@ -187,10 +188,10 @@ WORKBENCH = {
             "italic": font("ZuricBTLigIta.ttf"),
             "bolditalic": font("ZuricBTBolIta.ttf"),
         },
-        BACKGROUND="#e3f2fd",
         URL="https://workbench.feinheit.ch",
     ),
     "dbpag": types.SimpleNamespace(
+        TITLE="DBAG",
         SSO_DOMAIN="diebruchpiloten.com",
         PDF_LANGUAGE="de",
         PDF_COMPANY="Die Bruchpiloten AG",
@@ -215,10 +216,10 @@ WORKBENCH = {
             "italic": font("HelveticaNeueLightItalic.ttf"),
             "bolditalic": font("HelveticaNeueBoldItalic.ttf"),
         },
-        BACKGROUND="#dadcab",
         URL="https://dbpag.feinheit.ch",
     ),
     "bf": types.SimpleNamespace(
+        TITLE="Blindflug",
         SSO_DOMAIN="blindflugstudios.com",
         PDF_LANGUAGE="de",
         PDF_COMPANY="Blindflug Studios AG",
@@ -244,7 +245,6 @@ WORKBENCH = {
             "italic": font("HelveticaNeueLightItalic.ttf"),
             "bolditalic": font("HelveticaNeueBoldItalic.ttf"),
         },
-        BACKGROUND="#dadcab",
         URL="https://workbench.blindflugstudios.com",
     ),
 }[env("NAMESPACE", required=True)]
