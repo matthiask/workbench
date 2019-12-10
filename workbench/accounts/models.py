@@ -156,9 +156,13 @@ class User(Model, AbstractBaseUser):
 
     @cached_property
     def all_users_hours(self):
-        return self.loggedhours.model.objects.select_related(
-            "service__project__owned_by", "rendered_by"
-        ).order_by("-created_at")[:20]
+        return (
+            self.loggedhours.model.objects.filter(
+                rendered_on__gte=dt.date.today() - dt.timedelta(days=7)
+            )
+            .select_related("service__project__owned_by", "rendered_by")
+            .order_by("-created_at")[:20]
+        )
 
     @cached_property
     def active_projects(self):
