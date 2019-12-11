@@ -60,6 +60,8 @@ def deploy():
 
     _do_deploy("www/workbench/", "workbench")
     _do_deploy("www/dbpag-workbench/", "dbpag-workbench")
+    _do_deploy("www/bf-workbench/", "bf-workbench")
+    _do_deploy("www/workbench-test/", "workbench-test")
 
 
 @task
@@ -69,6 +71,8 @@ def deploy_code():
 
     _do_deploy("www/workbench/", "workbench", rsync=False)
     _do_deploy("www/dbpag-workbench/", "dbpag-workbench", rsync=False)
+    _do_deploy("www/bf-workbench/", "bf-workbench", rsync=False)
+    _do_deploy("www/workbench-test/", "workbench-test", rsync=False)
 
 
 @task
