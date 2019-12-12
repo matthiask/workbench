@@ -1,6 +1,7 @@
 import datetime as dt
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from workbench import factories
@@ -229,3 +230,29 @@ class AWTTest(TestCase):
         absence = Absence.objects.create(user=user, starts_on=dt.date.today(), days=1)
         response = self.client.get(absence.urls["detail"])
         self.assertRedirects(response, "/absences/?u=" + str(user.pk))
+
+    def test_employment_validation(self):
+        user = factories.UserFactory.create()
+        kw = {"user": user, "percentage": 100, "vacation_weeks": 5, "notes": ""}
+        Employment(**kw).full_clean()
+        Employment(
+            **kw, green_hours_target=20, hourly_labor_costs=Decimal(20)
+        ).full_clean()
+
+        msg = [
+            (
+                "__all__",
+                [
+                    "Either provide both hourly labor costs"
+                    " and green hours target or none."
+                ],
+            )
+        ]
+
+        with self.assertRaises(ValidationError) as cm:
+            Employment(**kw, green_hours_target=20).full_clean()
+        self.assertEqual(list(cm.exception), msg)
+
+        with self.assertRaises(ValidationError) as cm:
+            Employment(**kw, hourly_labor_costs=20).full_clean()
+        self.assertEqual(list(cm.exception), msg)

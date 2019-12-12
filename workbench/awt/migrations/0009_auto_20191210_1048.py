@@ -15,13 +15,7 @@ class Migration(migrations.Migration):
             model_name="employment",
             name="green_hours_target",
             field=models.SmallIntegerField(
-                blank=True,
-                null=True,
-                validators=[
-                    django.core.validators.MinValueValidator(0),
-                    django.core.validators.MaxLengthValidator(100),
-                ],
-                verbose_name="green hours target",
+                blank=True, null=True, verbose_name="green hours target"
             ),
         ),
         migrations.AddField(
