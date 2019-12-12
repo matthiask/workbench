@@ -69,8 +69,10 @@ class AccountsTest(TestCase):
         self.assertTrue(user.features["yes"])
         self.assertFalse(user.features["no"])
         self.assertFalse(user.features["maybe"])
+        self.assertFalse(user.features["missing"])
 
         user = User(email="test@example.com")
         self.assertTrue(user.features["yes"])
         self.assertFalse(user.features["no"])
         self.assertTrue(user.features["maybe"])
+        self.assertFalse(user.features["missing"])
