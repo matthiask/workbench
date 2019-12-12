@@ -252,6 +252,33 @@ WORKBENCH = {
         URL="https://workbench.blindflugstudios.com",
         FEATURES={"book_keeping": False, "glassfrog": False},
     ),
+    "test": types.SimpleNamespace(
+        TITLE="Test",
+        SSO_DOMAIN="feinheit.ch",
+        PDF_LANGUAGE="de",
+        PDF_COMPANY="Feinheit AG",
+        PDF_ADDRESS="Feinheit AG · Fabrikstrasse 54 · 8005 Zürich · www.feinheit.ch",
+        PDF_VAT_NO="CHE-113.948.417 MWST",
+        PDF_OFFER_TERMS=(
+            "Bestandteil dieser Offerte sind die zum Zeitpunkt"
+            " des Vertragsabschlusses aktuellen Allgemeinen"
+            " Geschäftsbedingungen der Feinheit AG."
+            " Die jeweils aktuelle Version finden Sie auf www.feinheit.ch/agb/."
+        ),
+        PDF_INVOICE_PAYMENT=(
+            "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
+            " der Referenznummer %(code)s bis zum %(due)s"
+            " auf ZKB Konto IBAN CH52 0070 0114 8022 0855 1."
+        ),
+        FONTS={
+            "regular": font("ZuricBTLig.ttf"),
+            "bold": font("ZuricBTBol.ttf"),
+            "italic": font("ZuricBTLigIta.ttf"),
+            "bolditalic": font("ZuricBTBolIta.ttf"),
+        },
+        URL="https://workbench-test.feinheit.ch",
+        FEATURES={"book_keeping": True, "glassfrog": False},
+    ),
 }[env("NAMESPACE", required=True)]
 
 SILENCED_SYSTEM_CHECKS = [
