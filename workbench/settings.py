@@ -6,11 +6,10 @@ from collections import defaultdict
 from django.utils.translation import gettext_lazy as _
 
 import dj_database_url
-from speckenv import env, read_speckenv
+from speckenv import env
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-read_speckenv(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("SECRET_KEY", required=True)
 DEBUG = env("DEBUG", default=any(arg in {"runserver"} for arg in sys.argv))
