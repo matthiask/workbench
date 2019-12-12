@@ -188,6 +188,10 @@ WORKBENCH = {
             "bolditalic": font("ZuricBTBolIta.ttf"),
         },
         URL="https://workbench.feinheit.ch",
+        FEATURES={
+            "book_keeping": {"mk@feinheit.ch", "mgi@feinheit.ch"},
+            "glassfrog": True,
+        },
     ),
     "dbpag": types.SimpleNamespace(
         TITLE="DBAG",
@@ -215,7 +219,8 @@ WORKBENCH = {
             "italic": font("HelveticaNeueLightItalic.ttf"),
             "bolditalic": font("HelveticaNeueBoldItalic.ttf"),
         },
-        URL="https://dbpag.feinheit.ch",
+        URL="https://workbench.diebruchpiloten.com",
+        FEATURES={"book_keeping": True, "glassfrog": False},
     ),
     "bf": types.SimpleNamespace(
         TITLE="Blindflug",
@@ -245,6 +250,7 @@ WORKBENCH = {
             "bolditalic": font("HelveticaNeueBoldItalic.ttf"),
         },
         URL="https://workbench.blindflugstudios.com",
+        FEATURES={"book_keeping": False, "glassfrog": False},
     ),
 }[env("NAMESPACE", required=True)]
 
@@ -270,7 +276,7 @@ MAILCHIMP_API_KEY = env("MAILCHIMP_API_KEY", warn=True)
 MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID", warn=True)
 GLASSFROG_TOKEN = env("GLASSFROG_TOKEN", warn=True)
 
-FEATURES = defaultdict(lambda: True) if TESTING else env("FEATURES", warn=True)
+FEATURES = defaultdict(lambda: True) if TESTING else WORKBENCH.FEATURES
 
 if DEBUG:  # pragma: no cover
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
