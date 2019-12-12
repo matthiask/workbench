@@ -281,10 +281,6 @@ WORKBENCH = {
     ),
 }[env("NAMESPACE", required=True)]
 
-SILENCED_SYSTEM_CHECKS = [
-    "1_10.W001"  # MIDDLEWARE_CLASSES is not used anymore, thank you.
-]
-
 INTERNAL_IPS = ["127.0.0.1"]
 
 if LIVE:  # pragma: no cover
