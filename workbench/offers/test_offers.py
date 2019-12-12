@@ -231,7 +231,7 @@ class OffersTest(TestCase):
         self.assertIsNone(offer.closed_on)
 
     def test_list(self):
-        factories.OfferFactory.create()
+        offer = factories.OfferFactory.create()
         self.client.force_login(factories.UserFactory.create())
 
         def valid(p):
@@ -242,6 +242,10 @@ class OffersTest(TestCase):
         valid("s=all")
         valid("s=10")
         valid("s=20")
+        valid("s=20")
+        valid("org={}".format(offer.project.customer_id))
+        valid("owned_by={}".format(offer.owned_by_id))
+        valid("owned_by=0")  # only inactive
 
     def test_create_message(self):
         self.client.force_login(factories.UserFactory.create())
