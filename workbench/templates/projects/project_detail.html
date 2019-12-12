@@ -227,7 +227,7 @@
               <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;service={{ row.service.pk|default:0 }}">
                 {{ row.logged_cost|stringformat:'.2f' }} / {{ row.service.cost|default:0|stringformat:'.2f' }}
               </a>
-              {% if row.service.pk %}{% bar row.logged_cost row.service.service_cost %}{% endif %}
+              {% if row.service.pk %}{% bar row.logged_cost row.service.cost %}{% endif %}
             </span>
             <span class="col-md-4 text-right">
               {% if row.service.allow_logging and not row.service.is_rejected %}
