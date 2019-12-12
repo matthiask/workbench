@@ -35,7 +35,7 @@ for job in $(jobs -p); do wait $job; done
         local("bash %s" % f.name)
 
 
-def _do_deploy(folder, service, rsync=True):
+def _do_deploy(folder, rsync):
     with cd(folder):
         run("git checkout master")
         run("git fetch origin")
@@ -49,7 +49,13 @@ def _do_deploy(folder, service, rsync=True):
         rsync_project(
             local_dir="static/", remote_dir="%sstatic/" % folder,
         )
-    run("sudo systemctl restart %s.service" % service)
+
+
+def _restart_all():
+    run("systemctl --user restart workbench@fh")
+    run("systemctl --user restart workbench@dbpag")
+    run("systemctl --user restart workbench@bf")
+    run("systemctl --user restart workbench@test")
 
 
 @task
@@ -57,22 +63,16 @@ def deploy():
     check()
     local("git push origin master")
     local("yarn run prod")
-
-    _do_deploy("www/workbench/", "workbench")
-    _do_deploy("www/dbpag-workbench/", "dbpag-workbench")
-    _do_deploy("www/bf-workbench/", "bf-workbench")
-    _do_deploy("www/workbench-test/", "workbench-test")
+    _do_deploy("www/workbench/", rsync=True)
+    _restart_all()
 
 
 @task
 def deploy_code():
     check()
     local("git push origin master")
-
-    _do_deploy("www/workbench/", "workbench", rsync=False)
-    _do_deploy("www/dbpag-workbench/", "dbpag-workbench", rsync=False)
-    _do_deploy("www/bf-workbench/", "bf-workbench", rsync=False)
-    _do_deploy("www/workbench-test/", "workbench-test", rsync=False)
+    _do_deploy("www/workbench/", rsync=False)
+    _restart_all()
 
 
 @task
