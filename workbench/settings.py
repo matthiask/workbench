@@ -228,7 +228,7 @@ WORKBENCH = {
         PDF_LANGUAGE="de",
         PDF_COMPANY="Blindflug Studios AG",
         PDF_ADDRESS=(
-            "Blindflug Studiso AG · Fabrikstrasse 54 · 8005 Zürich"
+            "Blindflug Studios AG · Fabrikstrasse 54 · 8005 Zürich"
             " · blindflugstudios.com"
         ),
         PDF_VAT_NO="CHE-155.657.233 MWST",
