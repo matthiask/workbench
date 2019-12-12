@@ -3,7 +3,7 @@
 {% load i18n workbench %}
 
 {% block title %}
-  {{ object|h }}
+  {{ view.meta.verbose_name }}
   {% history_link object %}
 {% endblock %}
 
