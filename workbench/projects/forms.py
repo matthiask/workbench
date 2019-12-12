@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 
-from workbench.accounts.features import Features
+from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.circles.models import Role
 from workbench.contacts.models import Organization, Person
@@ -250,12 +250,12 @@ class ServiceForm(ModelForm):
             self.fields["effort_rate"].disabled = True
             self.fields.pop("service_type")
 
-        if not self.request.user.features[Features.GLASSFROG]:
+        if not self.request.user.features[FEATURES.GLASSFROG]:
             self.fields.pop("role")
 
     def clean(self):
         data = super().clean()
-        if self.request.user.features[Features.GLASSFROG] and not data.get("role"):
+        if self.request.user.features[FEATURES.GLASSFROG] and not data.get("role"):
             self.add_warning(_("No role selected."), code="no-role-selected")
         return data
 

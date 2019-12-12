@@ -19,11 +19,11 @@ def feature_required(feature, message=_("Access denied, sorry.")):
     return decorator
 
 
-class Features:
+class FEATURES:
     BOOK_KEEPING = "book_keeping"
     GLASSFROG = "glassfrog"
 
 
 book_keeping_only = feature_required(
-    Features.BOOK_KEEPING, _("Only book keeping may access this, sorry.")
+    FEATURES.BOOK_KEEPING, _("Only book keeping may access this, sorry.")
 )

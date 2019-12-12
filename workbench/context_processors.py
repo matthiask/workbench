@@ -1,11 +1,11 @@
 from django.conf import settings
 
-from workbench.accounts.features import Features
+from workbench.accounts.features import FEATURES
 
 
 def workbench(request):
     return {
         "WORKBENCH": settings.WORKBENCH,
-        "FEATURES": Features,
+        "FEATURES": FEATURES,
         "DEBUG": settings.DEBUG,
     }
