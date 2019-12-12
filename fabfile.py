@@ -6,6 +6,7 @@ from fabric.contrib.project import rsync_project
 
 env.forward_agent = True
 env.hosts = ["deploy@workbench.feinheit.ch"]
+WORKBENCH = ["fh", "dbpag", "bf", "test"]
 
 
 @task
@@ -43,8 +44,10 @@ def _do_deploy(folder, rsync):
         run('find . -name "*.pyc" -delete')
         run("venv/bin/pip install -U pip wheel setuptools")
         run("venv/bin/pip install -r requirements.txt")
-        run("venv/bin/python manage.py migrate")
         run("venv/bin/python manage.py collectstatic --noinput")
+        for wb in WORKBENCH:
+            run("DOTENV=.env/{} venv/bin/python manage.py migrate".format(wb))
+
     if rsync:
         rsync_project(
             local_dir="static/", remote_dir="%sstatic/" % folder,
@@ -52,10 +55,8 @@ def _do_deploy(folder, rsync):
 
 
 def _restart_all():
-    run("systemctl --user restart workbench@fh")
-    run("systemctl --user restart workbench@dbpag")
-    run("systemctl --user restart workbench@bf")
-    run("systemctl --user restart workbench@test")
+    for wb in WORKBENCH:
+        run("systemctl --user restart workbench@{}".format(wb))
 
 
 @task
