@@ -1,5 +1,6 @@
 from django.conf.urls import url
 
+from workbench.accounts.features import FEATURES, feature_required
 from workbench.awt.views import ReportView
 from workbench.circles.reporting import hours_by_circle
 from workbench.projects.reporting import hours_per_customer
@@ -33,7 +34,7 @@ urlpatterns = [
     ),
     url(
         r"^hours-by-circle/$",
-        hours_filter_view,
+        feature_required(FEATURES.GLASSFROG)(hours_filter_view),
         {
             "template_name": "reporting/hours_by_circle.html",
             "stats_fn": hours_by_circle,

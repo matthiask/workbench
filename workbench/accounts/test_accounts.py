@@ -1,7 +1,10 @@
 from django.test import TestCase
+from django.test.utils import override_settings
+from django.urls import reverse
 
 from workbench import factories
 from workbench.accounts.models import User
+from workbench.tools.testing import messages
 
 
 class AccountsTest(TestCase):
@@ -46,3 +49,14 @@ class AccountsTest(TestCase):
 
     def test_ordering(self):
         self.assertTrue(User(_short_name="a") < User(_full_name="b"))
+
+    @override_settings(FEATURES={"glassfrog": False})
+    def test_feature_required(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        response = self.client.get(
+            reverse("report_hours_by_circle"), HTTP_REFERER="/test/"
+        )
+        self.assertRedirects(response, "/test/", fetch_redirect_response=False)
+        self.assertEqual(messages(response), ["Access denied, sorry."])
