@@ -111,7 +111,7 @@ def update_requirements():
     local("rm -rf venv")
     local("python3 -m venv venv")
     local("venv/bin/pip install -U pip wheel setuptools")
-    local("venv/bin/pip install -U -r requirements-to-freeze.txt")
+    local("venv/bin/pip install -U -r requirements-to-freeze.txt --pre")
     execute("freeze")
 
 

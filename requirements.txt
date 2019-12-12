@@ -4,12 +4,12 @@ asgiref==3.2.3
 beautifulsoup4==4.8.1
 certifi==2019.11.28
 chardet==3.0.4
-coverage==5.0b1
+coverage==5.0b2
 dj-database-url==0.5.0
 Django==3.0
 django-admin-ordering==0.12.0
 django-authlib==0.9.3
-django-bootstrap4==1.1.0
+django-bootstrap4==1.1.1
 django-countries==5.5
 django-debug-toolbar==2.1
 django-fineforms==0.5.0
@@ -31,7 +31,7 @@ mccabe==0.6.1
 oauthlib==3.1.0
 openpyxl==3.0.2
 pdfdocument==3.3
-phonenumbers==8.11.0
+phonenumbers==8.11.1
 Pillow==6.2.1
 psycopg2-binary==2.8.4
 pycodestyle==2.5.0
