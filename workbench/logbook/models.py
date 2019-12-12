@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
-from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -61,9 +60,6 @@ class LoggedHours(Model):
 
     def __str__(self):
         return "%s: %s" % (self.service.title, self.description)
-
-    def __html__(self):
-        return format_html("{}:<br>{}", self.service.title, self.description)
 
     @classmethod
     def allow_delete(cls, instance, request):
