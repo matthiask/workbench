@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from workbench import factories
-from workbench.expenses.models import ExpenseReport
+from workbench.expenses.models import ExchangeRates, ExpenseReport
 from workbench.logbook.models import LoggedCost
 from workbench.tools.formats import local_date_format
 from workbench.tools.testing import messages
@@ -160,3 +160,35 @@ class ExpensesTest(TestCase):
         self.assertEqual(
             messages(response), ["Could not find any expenses to reimburse."]
         )
+
+    def test_exchange_rate_str(self):
+        today = dt.date.today()
+        self.assertEqual(str(ExchangeRates(day=today)), str(today))
+
+    def test_exchange_rate_conversion(self):
+        # From https://api.exchangeratesapi.io/latest?base=CHF, but pruned
+        ExchangeRates.objects.create(
+            day=dt.date(2019, 12, 11),
+            rates={
+                "rates": {
+                    "CHF": 1.0,
+                    "EUR": 0.9160864786,
+                    "USD": 1.014565775,
+                    "PLN": 3.927171125,
+                },
+                "base": "CHF",
+                "date": "2019-12-11",
+            },
+        )
+
+        self.client.force_login(factories.UserFactory.create())
+
+        response = self.client.get("/expenses/convert/")
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {"cost": ""})
+
+        response = self.client.get(
+            "/expenses/convert/?day=2019-12-11&currency=EUR&cost=100"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"cost": "109.16"})
