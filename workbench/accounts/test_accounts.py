@@ -60,3 +60,17 @@ class AccountsTest(TestCase):
         )
         self.assertRedirects(response, "/test/", fetch_redirect_response=False)
         self.assertEqual(messages(response), ["Access denied, sorry."])
+
+    @override_settings(
+        FEATURES={"yes": True, "no": False, "maybe": {"test@example.com"}}
+    )
+    def test_user_features(self):
+        user = User(email="test@example.org")
+        self.assertTrue(user.features["yes"])
+        self.assertFalse(user.features["no"])
+        self.assertFalse(user.features["maybe"])
+
+        user = User(email="test@example.com")
+        self.assertTrue(user.features["yes"])
+        self.assertFalse(user.features["no"])
+        self.assertTrue(user.features["maybe"])
