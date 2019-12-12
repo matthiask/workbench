@@ -174,3 +174,7 @@ tbody th > a {
   color: white;
   text-align: center;
 }
+
+.uplink {
+  margin-bottom: 0.5rem;
+}
