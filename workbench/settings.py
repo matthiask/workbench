@@ -12,8 +12,8 @@ from speckenv import env
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 SECRET_KEY = env("SECRET_KEY", required=True)
-DEBUG = env("DEBUG", default=any(arg in {"runserver"} for arg in sys.argv))
-TESTING = env("TESTING", default=any(arg in {"test"} for arg in sys.argv))
+DEBUG = env("DEBUG", default=bool({"runserver"}.intersection(sys.argv)))
+TESTING = env("TESTING", default="test" in sys.argv)
 LIVE = env("LIVE", default=False)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
 ADMINS = MANAGERS = [("Matthias Kestenholz", "mk@feinheit.ch")]
