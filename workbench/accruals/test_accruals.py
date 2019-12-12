@@ -206,3 +206,7 @@ class AccrualsTest(TestCase):
         valid("")
         valid("?owned_by=0")
         valid("?owned_by=%s" % user.pk)
+
+        response = self.client.get(accrual.urls["detail"] + "?owned_by=abc")
+        self.assertRedirects(response, accrual.urls["detail"])
+        self.assertEqual(messages(response), [])
