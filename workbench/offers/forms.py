@@ -2,6 +2,7 @@ from django import forms
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
+from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization
 from workbench.offers.models import Offer
@@ -27,6 +28,16 @@ class OfferSearchForm(forms.Form):
         widget=Autocomplete(model=Organization),
         label="",
     )
+    owned_by = forms.TypedChoiceField(
+        coerce=int,
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["owned_by"].choices = User.objects.choices(collapse_inactive=True)
 
     def filter(self, queryset):
         data = self.cleaned_data
@@ -40,6 +51,10 @@ class OfferSearchForm(forms.Form):
             )
         if data.get("org"):
             queryset = queryset.filter(project__customer=data.get("org"))
+        if data.get("owned_by") == 0:
+            queryset = queryset.filter(owned_by__is_active=False)
+        elif data.get("owned_by"):
+            queryset = queryset.filter(owned_by=data.get("owned_by"))
 
         return queryset.select_related(
             "owned_by",
