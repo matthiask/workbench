@@ -123,6 +123,17 @@ class CreditEntriesTest(TestCase):
         self.assertEqual(invoice.status, invoice.PAID)
         self.assertEqual(invoice.closed_on, entry.value_date)
 
+        with io.open(
+            os.path.join(
+                settings.BASE_DIR, "workbench", "test", "account-statement-2.csv"
+            )
+        ) as f:
+            response = self.client.post(
+                "/credit-control/upload/", {"statement": f, "ledger": ledger.pk}
+            )
+
+        self.assertContains(response, "no-known-payments")
+
     def test_list(self):
         self.client.force_login(factories.UserFactory.create())
         ledger = factories.LedgerFactory.create()
