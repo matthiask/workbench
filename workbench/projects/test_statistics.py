@@ -63,44 +63,20 @@ class StatisticsTest(TestCase):
         response = self.client.get("/report/project-budget-statistics/")
         self.assertContains(response, "project budget statistics")
 
-        self.assertEqual(
-            self.client.get(
-                "/report/project-budget-statistics/?owned_by=0"
-            ).status_code,
-            200,
-        )
-        self.assertEqual(
-            self.client.get(
-                "/report/project-budget-statistics/?owned_by={}".format(user.pk)
-            ).status_code,
-            200,
-        )
-        self.assertEqual(
-            self.client.get(
-                "/report/project-budget-statistics/?owned_by=bla"
-            ).status_code,
-            302,
-        )
+        def code(p, status_code=200):
+            self.assertEqual(
+                self.client.get("/report/project-budget-statistics/?" + p).status_code,
+                status_code,
+            )
 
-        self.assertEqual(
-            self.client.get("/report/project-budget-statistics/?s=").status_code, 200
-        )
-        self.assertEqual(
-            self.client.get("/report/project-budget-statistics/?s=closed").status_code,
-            200,
-        )
+        code("owned_by=0")
+        code("owned_by={}".format(user.pk))
+        code("owned_by=bla", 302)
 
-        self.assertEqual(
-            self.client.get(
-                "/report/project-budget-statistics/?internal=on"
-            ).status_code,
-            200,
-        )
-
-        self.assertEqual(
-            self.client.get("/report/project-budget-statistics/?xlsx=1").status_code,
-            200,
-        )
+        code("s=")
+        code("s=closed")
+        code("internal=on")
+        code("xlsx=1")
 
     def test_not_archived_hours_grouped_services_green_hours_hpc(self):
         service1 = factories.ServiceFactory.create(effort_rate=180, effort_type="Any")
