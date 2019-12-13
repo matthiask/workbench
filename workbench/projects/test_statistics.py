@@ -94,6 +94,13 @@ class StatisticsTest(TestCase):
         )
 
         self.assertEqual(
+            self.client.get(
+                "/report/project-budget-statistics/?internal=on"
+            ).status_code,
+            200,
+        )
+
+        self.assertEqual(
             self.client.get("/report/project-budget-statistics/?xlsx=1").status_code,
             200,
         )

@@ -196,6 +196,7 @@ class ProjectBudgetStatisticsForm(forms.Form):
         widget=forms.Select(attrs={"class": "custom-select"}),
         label="",
     )
+    internal = forms.BooleanField(label=_("internal"), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -211,7 +212,10 @@ class ProjectBudgetStatisticsForm(forms.Form):
             queryset = Project.objects.all()
         else:
             queryset = Project.objects.open()
-        queryset = queryset.exclude(type=Project.INTERNAL)
+        if data.get("internal"):
+            queryset = queryset.filter(type=Project.INTERNAL)
+        else:
+            queryset = queryset.exclude(type=Project.INTERNAL)
         if data.get("owned_by") == 0:
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get("owned_by"):
