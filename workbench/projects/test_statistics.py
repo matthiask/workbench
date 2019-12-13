@@ -86,9 +86,6 @@ class StatisticsTest(TestCase):
             self.client.get("/report/project-budget-statistics/?s=").status_code, 200
         )
         self.assertEqual(
-            self.client.get("/report/project-budget-statistics/?s=all").status_code, 200
-        )
-        self.assertEqual(
             self.client.get("/report/project-budget-statistics/?s=closed").status_code,
             200,
         )

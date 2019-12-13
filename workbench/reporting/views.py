@@ -185,13 +185,7 @@ def hours_filter_view(request, form, *, template_name, stats_fn):
 class ProjectBudgetStatisticsForm(forms.Form):
     owned_by = forms.TypedChoiceField(label="", coerce=int, required=False)
     s = forms.ChoiceField(
-        choices=[
-            ("all", _("All")),
-            (
-                _("status"),
-                [("", _("Open")), ("closed", _("Closed during the last year"))],
-            ),
-        ],
+        choices=[("", _("Open")), ("closed", _("Closed during the last year"))],
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
         label="",
@@ -208,8 +202,6 @@ class ProjectBudgetStatisticsForm(forms.Form):
             queryset = Project.objects.closed().filter(
                 closed_on__gte=timezone.now() - dt.timedelta(days=366)
             )
-        elif data.get("s") == "all":
-            queryset = Project.objects.all()
         else:
             queryset = Project.objects.open()
         if data.get("internal"):
