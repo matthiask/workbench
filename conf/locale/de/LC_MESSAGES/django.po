@@ -2091,7 +2091,7 @@ msgstr "Umsatz"
 
 #: workbench/templates/reporting/key_data.html
 msgid "gross margin"
-msgstr "Gewinn ohne Fixkosten"
+msgstr "Umsatz bereinigt"
 
 #: workbench/templates/reporting/key_data.html workbench/tools/pdf.py
 msgid "date"
