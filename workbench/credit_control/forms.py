@@ -10,7 +10,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.invoices.models import Invoice
 from workbench.tools.formats import currency, local_date_format
-from workbench.tools.forms import Autocomplete, ModelForm, Textarea
+from workbench.tools.forms import Autocomplete, ModelForm, Textarea, WarningsForm
 
 
 class CreditEntrySearchForm(forms.Form):
@@ -69,7 +69,7 @@ class CreditEntryForm(ModelForm):
         return instance
 
 
-class AccountStatementUploadForm(forms.Form):
+class AccountStatementUploadForm(WarningsForm, forms.Form):
     ledger = CreditEntry._meta.get_field("ledger").formfield(widget=forms.RadioSelect)
     statement = forms.FileField(label=_("account statement"))
     statement_data = forms.CharField(
@@ -99,6 +99,26 @@ class AccountStatementUploadForm(forms.Form):
             self.data["statement_data"] = json.dumps(
                 self.statement_list, sort_keys=True
             )
+
+            reference_numbers = [
+                entry["reference_number"] for entry in self.statement_list
+            ]
+
+            if (
+                reference_numbers
+                and not CreditEntry.objects.filter(
+                    ledger=data["ledger"], reference_number__in=reference_numbers
+                ).exists()
+            ):
+                self.add_warning(
+                    _(
+                        "The uploaded list only contains new payments."
+                        " This is somewhat surprising if you exported"
+                        " the list from the correct bank account.",
+                    ),
+                    code="no-known-payments",
+                )
+
         return data
 
     def save(self):

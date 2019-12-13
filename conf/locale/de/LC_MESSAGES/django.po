@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-10 17:16+0100\n"
+"POT-Creation-Date: 2019-12-13 16:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -661,6 +661,14 @@ msgid "Automatically filled in when submitting a parseable account statement."
 msgstr ""
 "Wird automatisch gefüllt wenn ein einlesbarer Kontoauszug hochgeladen wird."
 
+#: workbench/credit_control/forms.py
+msgid ""
+"The uploaded list only contains new payments. This is somewhat surprising if "
+"you exported the list from the correct bank account."
+msgstr ""
+"Die hochgeladene Liste enthält nur neue Zahlungen. Das ist zumindest "
+"unerwartet, falls die Liste vom korrekten Bankkonto exportiert wurde."
+
 #: workbench/credit_control/forms.py workbench/invoices/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/reporting/key_data.html
@@ -704,7 +712,7 @@ msgid "value date"
 msgstr "Valuta"
 
 #: workbench/credit_control/models.py workbench/expenses/models.py
-#: workbench/management/commands/export_debtors.py
+#: workbench/expenses/views.py workbench/management/commands/export_debtors.py
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data.html
@@ -854,11 +862,6 @@ msgstr "Status"
 #: workbench/expenses/views.py
 msgid "receipt"
 msgstr "Beleg"
-
-#: workbench/expenses/views.py workbench/invoices/models.py
-#: workbench/offers/models.py
-msgid "total CHF"
-msgstr "Total CHF"
 
 #: workbench/generic.py
 msgid "Search form was invalid."
@@ -1159,6 +1162,10 @@ msgstr "Total CHF Akonto"
 #: workbench/invoices/models.py workbench/offers/models.py
 msgid "total CHF incl. tax"
 msgstr "Total CHF inkl. MwSt."
+
+#: workbench/invoices/models.py workbench/offers/models.py
+msgid "total CHF"
+msgstr "Total CHF"
 
 #: workbench/invoices/models.py
 msgid "Invoices in preparation may be deleted, others not."
