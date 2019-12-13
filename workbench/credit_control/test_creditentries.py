@@ -125,6 +125,17 @@ class CreditEntriesTest(TestCase):
 
         with io.open(
             os.path.join(
+                settings.BASE_DIR, "workbench", "test", "account-statement.csv"
+            )
+        ) as f:
+            response = self.client.post(
+                "/credit-control/upload/", {"statement": f, "ledger": ledger.pk}
+            )
+
+        self.assertNotContains(response, "no-known-payments")
+
+        with io.open(
+            os.path.join(
                 settings.BASE_DIR, "workbench", "test", "account-statement-2.csv"
             )
         ) as f:
