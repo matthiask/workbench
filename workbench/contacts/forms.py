@@ -21,6 +21,13 @@ from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
 class OrganizationSearchForm(forms.Form):
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": _("search")}
+        ),
+        label="",
+    )
     g = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         required=False,
@@ -38,6 +45,13 @@ class OrganizationSearchForm(forms.Form):
 
 
 class PersonSearchForm(forms.Form):
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": _("search")}
+        ),
+        label="",
+    )
     g = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         required=False,

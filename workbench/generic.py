@@ -98,7 +98,7 @@ class ListView(ToolsMixin, vanilla.ListView):
         queryset = self.model.objects.all()
 
         if self.search_form_class:
-            q = self.request.GET.get("q")
+            q = self.search_form.cleaned_data.get("q")
             queryset = self.search_form.filter(queryset.search(q) if q else queryset)
 
         return queryset

@@ -12,6 +12,13 @@ from workbench.tools.forms import Autocomplete, Textarea
 
 
 class OfferSearchForm(forms.Form):
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": _("search")}
+        ),
+        label="",
+    )
     s = forms.ChoiceField(
         choices=(
             ("all", _("All states")),

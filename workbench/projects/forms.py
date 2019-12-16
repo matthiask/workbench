@@ -15,6 +15,13 @@ from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
 
 
 class ProjectSearchForm(forms.Form):
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": _("search")}
+        ),
+        label="",
+    )
     s = forms.ChoiceField(
         choices=[
             ("all", _("All")),

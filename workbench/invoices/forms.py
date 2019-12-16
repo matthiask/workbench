@@ -21,6 +21,13 @@ from workbench.tools.pdf import pdf_response
 
 
 class InvoiceSearchForm(forms.Form):
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": _("search")}
+        ),
+        label="",
+    )
     s = forms.ChoiceField(
         choices=(
             ("", _("All states")),
@@ -554,6 +561,13 @@ class ServiceForm(ModelForm):
 
 
 class RecurringInvoiceSearchForm(forms.Form):
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": _("search")}
+        ),
+        label="",
+    )
     s = forms.ChoiceField(
         choices=(("all", _("All states")), ("", _("Open")), ("closed", _("Closed"))),
         required=False,

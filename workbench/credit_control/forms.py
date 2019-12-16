@@ -14,6 +14,13 @@ from workbench.tools.forms import Autocomplete, ModelForm, Textarea, WarningsFor
 
 
 class CreditEntrySearchForm(forms.Form):
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": _("search")}
+        ),
+        label="",
+    )
     s = forms.ChoiceField(
         choices=(
             ("", _("All states")),

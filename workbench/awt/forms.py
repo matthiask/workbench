@@ -10,6 +10,13 @@ from workbench.tools.forms import ModelForm, Textarea
 
 
 class AbsenceSearchForm(forms.Form):
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": _("search")}
+        ),
+        label="",
+    )
     u = forms.TypedChoiceField(
         coerce=int,
         required=False,

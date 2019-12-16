@@ -18,6 +18,13 @@ from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
 class LoggedHoursSearchForm(forms.Form):
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": _("search")}
+        ),
+        label="",
+    )
     rendered_by = forms.ModelChoiceField(
         queryset=User.objects.all(),
         required=False,
@@ -96,6 +103,13 @@ class LoggedHoursSearchForm(forms.Form):
 
 
 class LoggedCostSearchForm(forms.Form):
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": _("search")}
+        ),
+        label="",
+    )
     rendered_by = forms.ModelChoiceField(
         queryset=User.objects.all(),
         required=False,

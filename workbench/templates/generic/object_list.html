@@ -14,19 +14,10 @@
         {% if view.search_form.changed_data %}
           <a class="btn btn-outline-info" href="." title="{% trans 'Reset the filter form' %}"  data-reset-filter>&times;</a>
         {% endif %}
-        {% if view.search_form %}
-          <label class="sr-only">{% trans 'search' %}</label>
-          <input
-            class="form-control"
-            type="search"
-            name="q"
-            placeholder="{% trans 'search' %}"
-            value="{{ view.request.GET.q|default:'' }}">
-        {% endif %}
 
-        {% for f in view.search_form %}
-          {% ff_field f %}
-        {% endfor %}
+        {% if view.search_form %}
+          {% ff_fields view.search_form %}
+        {% endif %}
 
         {% block search-form-buttons %}
         {% if view.show_create_button %}
