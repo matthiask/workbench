@@ -146,6 +146,11 @@ class PersonForm(ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        request = kwargs["request"]
+        initial = kwargs.setdefault("initial", {})
+        if request.GET.get("organization"):
+            initial["organization"] = request.GET["organization"]
+
         super().__init__(*args, **kwargs)
         kwargs.pop("request")
         self.formsets = (

@@ -39,6 +39,10 @@
     </tr>
   </table>
 
+<a href="{% url 'contacts_person_create' %}?organization={{ object.pk }}" class="btn btn-primary">
+  {% include "svg/plus.svg" %}
+  {% trans 'person' %}
+</a>
 <a href="{% url 'invoices_invoice_create' %}?customer={{ object.pk }}" class="btn btn-primary">
   {% include "svg/plus.svg" %}
   {% trans 'invoice' %}
