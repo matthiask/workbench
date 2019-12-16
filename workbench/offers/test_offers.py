@@ -245,6 +245,7 @@ class OffersTest(TestCase):
         valid("s=20")
         valid("org={}".format(offer.project.customer_id))
         valid("owned_by={}".format(offer.owned_by_id))
+        valid("owned_by=-1")  # mine
         valid("owned_by=0")  # only inactive
 
     def test_create_message(self):

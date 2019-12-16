@@ -15,12 +15,12 @@ from workbench.invoices.models import Invoice, RecurringInvoice, Service
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.services.models import ServiceType
 from workbench.tools.formats import currency, hours, local_date_format
-from workbench.tools.forms import Autocomplete, ModelForm, Textarea
+from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
 from workbench.tools.models import Z
 from workbench.tools.pdf import pdf_response
 
 
-class InvoiceSearchForm(forms.Form):
+class InvoiceSearchForm(Form):
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(
@@ -54,7 +54,9 @@ class InvoiceSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["owned_by"].choices = User.objects.choices(collapse_inactive=True)
+        self.fields["owned_by"].choices = User.objects.choices(
+            collapse_inactive=True, myself=True
+        )
 
     def filter(self, queryset):
         data = self.cleaned_data
@@ -68,7 +70,9 @@ class InvoiceSearchForm(forms.Form):
             queryset = queryset.filter(status=data.get("s"))
         if data.get("org"):
             queryset = queryset.filter(customer=data.get("org"))
-        if data.get("owned_by") == 0:
+        if data.get("owned_by") == -1:
+            queryset = queryset.filter(owned_by=self.request.user)
+        elif data.get("owned_by") == 0:
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
@@ -560,7 +564,7 @@ class ServiceForm(ModelForm):
         self.instance.invoice = self.invoice
 
 
-class RecurringInvoiceSearchForm(forms.Form):
+class RecurringInvoiceSearchForm(Form):
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(
@@ -589,7 +593,9 @@ class RecurringInvoiceSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["owned_by"].choices = User.objects.choices(collapse_inactive=True)
+        self.fields["owned_by"].choices = User.objects.choices(
+            collapse_inactive=True, myself=True
+        )
 
     def filter(self, queryset):
         data = self.cleaned_data
@@ -603,7 +609,9 @@ class RecurringInvoiceSearchForm(forms.Form):
             )
         if data.get("org"):
             queryset = queryset.filter(customer=data.get("org"))
-        if data.get("owned_by") == 0:
+        if data.get("owned_by") == -1:
+            queryset = queryset.filter(owned_by=self.request.user)
+        elif data.get("owned_by") == 0:
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))

@@ -12,12 +12,12 @@ from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
-from workbench.tools.forms import Autocomplete, DateInput, ModelForm, Textarea
+from workbench.tools.forms import Autocomplete, DateInput, Form, ModelForm, Textarea
 from workbench.tools.validation import monday, raise_if_errors
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
-class LoggedHoursSearchForm(forms.Form):
+class LoggedHoursSearchForm(Form):
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(
@@ -25,11 +25,10 @@ class LoggedHoursSearchForm(forms.Form):
         ),
         label="",
     )
-    rendered_by = forms.ModelChoiceField(
-        queryset=User.objects.all(),
+    rendered_by = forms.TypedChoiceField(
+        coerce=int,
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
-        empty_label=_("All users"),
         label="",
     )
     project = forms.ModelChoiceField(
@@ -63,12 +62,14 @@ class LoggedHoursSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["rendered_by"].choices = User.objects.choices(
-            collapse_inactive=False
+            collapse_inactive=False, myself=True
         )
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get("rendered_by"):
+        if data.get("rendered_by") == -1:
+            queryset = queryset.filter(rendered_by=self.request.user)
+        elif data.get("rendered_by"):
             queryset = queryset.filter(rendered_by=data.get("rendered_by"))
         if data.get("project"):
             queryset = queryset.filter(service__project=data.get("project"))
@@ -102,7 +103,7 @@ class LoggedHoursSearchForm(forms.Form):
             return xlsx.to_response("hours.xlsx")
 
 
-class LoggedCostSearchForm(forms.Form):
+class LoggedCostSearchForm(Form):
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(
@@ -110,11 +111,10 @@ class LoggedCostSearchForm(forms.Form):
         ),
         label="",
     )
-    rendered_by = forms.ModelChoiceField(
-        queryset=User.objects.all(),
+    rendered_by = forms.TypedChoiceField(
+        coerce=int,
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
-        empty_label=_("All users"),
         label="",
     )
     project = forms.ModelChoiceField(
@@ -142,12 +142,14 @@ class LoggedCostSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["rendered_by"].choices = User.objects.choices(
-            collapse_inactive=False
+            collapse_inactive=False, myself=True
         )
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get("rendered_by"):
+        if data.get("rendered_by") == -1:
+            queryset = queryset.filter(rendered_by=self.request.user)
+        elif data.get("rendered_by"):
             queryset = queryset.filter(rendered_by=data.get("rendered_by"))
         if data.get("project"):
             queryset = queryset.filter(service__project=data.get("project"))

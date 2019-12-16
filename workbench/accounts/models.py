@@ -46,11 +46,13 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def choices(self, *, collapse_inactive):
+    def choices(self, *, collapse_inactive, myself=False):
         users = {True: [], False: []}
         for user in self.all():
             users[user.is_active].append((user.id, user.get_full_name()))
         choices = [("", _("All users"))]
+        if myself:
+            choices.append((-1, _("Show mine only")))
         if collapse_inactive:
             choices.append((0, _("Inactive users")))
         choices.append((_("Active"), users[True]))

@@ -14,13 +14,13 @@ from workbench.contacts.models import (
     PhoneNumber,
     PostalAddress,
 )
-from workbench.tools.forms import Autocomplete, ModelForm, Textarea
+from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
 from workbench.tools.models import ProtectedError, SlowCollector
 from workbench.tools.substitute_with import substitute_with
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
-class OrganizationSearchForm(forms.Form):
+class OrganizationSearchForm(Form):
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(
@@ -44,7 +44,7 @@ class OrganizationSearchForm(forms.Form):
         return queryset
 
 
-class PersonSearchForm(forms.Form):
+class PersonSearchForm(Form):
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(

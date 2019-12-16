@@ -23,7 +23,7 @@ def filter_form(form_class):
     def decorator(view):
         @wraps(view)
         def inner(request, *args, **kwargs):
-            form = form_class(request.GET)
+            form = form_class(request.GET, request=request)
             if not form.is_valid():
                 messages.warning(request, _("Form was invalid."))
                 return redirect(".")

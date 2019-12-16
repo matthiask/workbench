@@ -14,7 +14,7 @@ from workbench.projects.models import Project
 from workbench.projects.reporting import overdrawn_projects, project_budget_statistics
 from workbench.reporting import green_hours, key_data
 from workbench.tools.formats import local_date_format
-from workbench.tools.forms import DateInput
+from workbench.tools.forms import DateInput, Form
 from workbench.tools.models import ONE, Z
 from workbench.tools.validation import filter_form, monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -28,7 +28,7 @@ def overdrawn_projects_view(request):
     )
 
 
-class OpenItemsForm(forms.Form):
+class OpenItemsForm(Form):
     cutoff_date = forms.DateField(
         label=_("cutoff date"), required=False, widget=DateInput()
     )
@@ -147,7 +147,7 @@ def key_data_view(request):
     )
 
 
-class HoursFilterForm(forms.Form):
+class HoursFilterForm(Form):
     date_from = forms.DateField(
         label=_("date from"), required=False, widget=DateInput()
     )
@@ -182,7 +182,7 @@ def hours_filter_view(request, form, *, template_name, stats_fn):
     )
 
 
-class ProjectBudgetStatisticsForm(forms.Form):
+class ProjectBudgetStatisticsForm(Form):
     owned_by = forms.TypedChoiceField(label="", coerce=int, required=False)
     s = forms.ChoiceField(
         choices=[("", _("Open")), ("closed", _("Closed during the last year"))],
@@ -194,7 +194,9 @@ class ProjectBudgetStatisticsForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["owned_by"].choices = User.objects.choices(collapse_inactive=True)
+        self.fields["owned_by"].choices = User.objects.choices(
+            collapse_inactive=True, myself=True
+        )
 
     def queryset(self):
         data = self.cleaned_data
@@ -208,7 +210,9 @@ class ProjectBudgetStatisticsForm(forms.Form):
             queryset = queryset.filter(type=Project.INTERNAL)
         else:
             queryset = queryset.exclude(type=Project.INTERNAL)
-        if data.get("owned_by") == 0:
+        if data.get("owned_by") == -1:
+            queryset = queryset.filter(owned_by=self.request.user)
+        elif data.get("owned_by") == 0:
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
@@ -262,7 +266,7 @@ def project_budget_statistics_view(request, form):
     )
 
 
-class DateRangeFilterForm(forms.Form):
+class DateRangeFilterForm(Form):
     date_from = forms.DateField(
         label=_("date from"), required=False, widget=DateInput()
     )

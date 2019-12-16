@@ -83,7 +83,7 @@ class ListView(ToolsMixin, vanilla.ListView):
 
     def get(self, request, *args, **kwargs):
         if self.search_form_class:
-            self.search_form = self.search_form_class(request.GET)
+            self.search_form = self.search_form_class(request.GET, request=request)
             if not self.search_form.is_valid():
                 messages.warning(request, _("Search form was invalid."))
                 return HttpResponseRedirect("?e=1")

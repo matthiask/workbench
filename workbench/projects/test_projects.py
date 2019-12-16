@@ -274,6 +274,7 @@ class ProjectsTest(TestCase):
         valid("type=internal")
         valid("type=maintenance")
         valid("owned_by={}".format(user.id))
+        valid("owned_by=-1")  # mine
         valid("owned_by=0")  # only inactive
 
     def test_invalid_search_form(self):

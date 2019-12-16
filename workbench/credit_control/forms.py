@@ -10,10 +10,10 @@ from django.utils.translation import gettext, gettext_lazy as _
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.invoices.models import Invoice
 from workbench.tools.formats import currency, local_date_format
-from workbench.tools.forms import Autocomplete, ModelForm, Textarea, WarningsForm
+from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, WarningsForm
 
 
-class CreditEntrySearchForm(forms.Form):
+class CreditEntrySearchForm(Form):
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(

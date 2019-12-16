@@ -1,15 +1,15 @@
 import datetime as dt
 
-from django import forms, http
+from django import forms
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.awt.models import Absence
-from workbench.tools.forms import ModelForm, Textarea
+from workbench.tools.forms import Form, ModelForm, Textarea
 
 
-class AbsenceSearchForm(forms.Form):
+class AbsenceSearchForm(Form):
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(
@@ -26,17 +26,17 @@ class AbsenceSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["u"].choices = User.objects.choices(collapse_inactive=False)
+        self.fields["u"].choices = User.objects.choices(
+            collapse_inactive=False, myself=True
+        )
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get("u"):
+        if data.get("u") == -1:
+            queryset = queryset.filter(user=self.request.user)
+        elif data.get("u"):
             queryset = queryset.filter(user=data.get("u"))
         return queryset.select_related("user")
-
-    def response(self, request, queryset):
-        if "u" not in request.GET:
-            return http.HttpResponseRedirect("?u={}".format(request.user.id))
 
 
 class AbsenceForm(ModelForm):

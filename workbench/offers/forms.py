@@ -8,10 +8,10 @@ from workbench.contacts.models import Organization
 from workbench.offers.models import Offer
 from workbench.projects.models import Service
 from workbench.tools.formats import local_date_format
-from workbench.tools.forms import Autocomplete, Textarea
+from workbench.tools.forms import Autocomplete, Form, Textarea
 
 
-class OfferSearchForm(forms.Form):
+class OfferSearchForm(Form):
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(
@@ -44,7 +44,9 @@ class OfferSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["owned_by"].choices = User.objects.choices(collapse_inactive=True)
+        self.fields["owned_by"].choices = User.objects.choices(
+            collapse_inactive=True, myself=True
+        )
 
     def filter(self, queryset):
         data = self.cleaned_data
@@ -58,7 +60,9 @@ class OfferSearchForm(forms.Form):
             )
         if data.get("org"):
             queryset = queryset.filter(project__customer=data.get("org"))
-        if data.get("owned_by") == 0:
+        if data.get("owned_by") == -1:
+            queryset = queryset.filter(owned_by=self.request.user)
+        elif data.get("owned_by") == 0:
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))

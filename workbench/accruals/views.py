@@ -8,10 +8,11 @@ from django.utils.translation import gettext as _
 from workbench import generic
 from workbench.accounts.models import User
 from workbench.accruals.models import Accrual
+from workbench.tools.forms import Form
 from workbench.tools.xlsx import XLSXDocument
 
 
-class AccrualFilterForm(forms.Form):
+class AccrualFilterForm(Form):
     owned_by = forms.TypedChoiceField(
         coerce=int,
         required=False,
@@ -21,11 +22,15 @@ class AccrualFilterForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["owned_by"].choices = User.objects.choices(collapse_inactive=True)
+        self.fields["owned_by"].choices = User.objects.choices(
+            collapse_inactive=True, myself=True
+        )
 
     def filter(self, queryset):
         data = self.cleaned_data
-        if data.get("owned_by") == 0:
+        if data.get("owned_by") == -1:
+            queryset = queryset.filter(invoice__project__owned_by=self.request.user)
+        elif data.get("owned_by") == 0:
             queryset = queryset.filter(invoice__project__owned_by__is_active=False)
         elif data.get("owned_by"):
             queryset = queryset.filter(invoice__project__owned_by=data.get("owned_by"))
@@ -50,7 +55,7 @@ class CutoffDateDetailView(generic.DetailView):
         accruals = Accrual.objects.filter(cutoff_date=self.object.day).select_related(
             "invoice__project", "invoice__owned_by"
         )
-        filter_form = AccrualFilterForm(request.GET)
+        filter_form = AccrualFilterForm(request.GET, request=request)
         if not filter_form.is_valid():
             return http.HttpResponseRedirect(".")
         accruals = filter_form.filter(accruals)

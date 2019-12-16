@@ -165,6 +165,7 @@ class RecurringTest(TestCase):
         valid("s=closed")
         valid("org={}".format(factories.OrganizationFactory.create().pk))
         valid("owned_by={}".format(user.id))
+        valid("owned_by=-1")  # mine
         valid("owned_by=0")  # only inactive
 
     def test_pretty_status(self):

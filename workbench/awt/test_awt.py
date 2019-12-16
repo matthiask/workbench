@@ -26,7 +26,7 @@ class AWTTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
         response = self.client.get("/absences/")
-        self.assertRedirects(response, "/absences/?u={}".format(user.pk))
+        self.assertEqual(response.status_code, 200)
 
     def test_year(self):
         year = factories.YearFactory.create()

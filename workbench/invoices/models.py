@@ -484,6 +484,9 @@ class RecurringInvoice(ModelWithTotal):
     def __str__(self):
         return self.title
 
+    def __html__(self):
+        return "%s - %s" % (self.title, self.owned_by.get_short_name())
+
     @property
     def pretty_status(self):
         if self.ends_on:

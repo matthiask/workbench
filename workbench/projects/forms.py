@@ -14,7 +14,7 @@ from workbench.services.models import ServiceType
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
 
 
-class ProjectSearchForm(forms.Form):
+class ProjectSearchForm(Form):
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(
@@ -68,7 +68,9 @@ class ProjectSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["owned_by"].choices = User.objects.choices(collapse_inactive=True)
+        self.fields["owned_by"].choices = User.objects.choices(
+            collapse_inactive=True, myself=True
+        )
 
     def filter(self, queryset):
         data = self.cleaned_data
@@ -90,7 +92,9 @@ class ProjectSearchForm(forms.Form):
             queryset = queryset.filter(customer=data.get("org"))
         if data.get("type"):
             queryset = queryset.filter(type=data.get("type"))
-        if data.get("owned_by") == 0:
+        elif data.get("owned_by") == -1:
+            queryset = queryset.filter(owned_by=self.request.user)
+        elif data.get("owned_by") == 0:
             queryset = queryset.filter(owned_by__is_active=False)
         elif data.get("owned_by"):
             queryset = queryset.filter(owned_by=data.get("owned_by"))
