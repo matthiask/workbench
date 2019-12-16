@@ -6,7 +6,7 @@ import reducer from "./reducers"
 import logger from "redux-logger"
 import persistState from "redux-localstorage"
 
-const VERSION = 2
+const VERSION = 3
 
 const serialize = data => {
   return JSON.stringify({...data, _v: VERSION})
@@ -18,6 +18,15 @@ const deserialize = blob => {
   const {_v, ...data} = parsed
   if (_v == VERSION) {
     return data
+  } else if (_v == 2) {
+    return {
+      ...data,
+      activities: Object.fromEntries(
+        Object.entries(data.activities).filter(
+          ([id]) => id && id != "null" && id != "undefined"
+        )
+      ),
+    }
   } else if (_v == 1) {
     return {
       ...data,
