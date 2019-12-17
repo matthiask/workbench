@@ -204,6 +204,7 @@ class AccrualsTest(TestCase):
             self.assertEqual(response.status_code, 200)
 
         valid("")
+        valid("?owned_by=-1")
         valid("?owned_by=0")
         valid("?owned_by=%s" % user.pk)
 

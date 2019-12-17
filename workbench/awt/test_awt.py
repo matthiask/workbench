@@ -28,6 +28,12 @@ class AWTTest(TestCase):
         response = self.client.get("/absences/")
         self.assertEqual(response.status_code, 200)
 
+        response = self.client.get("/absences/?user=0")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get("/absences/?user=-1")
+        self.assertEqual(response.status_code, 200)
+
     def test_year(self):
         year = factories.YearFactory.create()
         self.assertEqual(year.months, [30 for i in range(12)])
@@ -230,6 +236,19 @@ class AWTTest(TestCase):
         absence = Absence.objects.create(user=user, starts_on=dt.date.today(), days=1)
         response = self.client.get(absence.urls["detail"])
         self.assertRedirects(response, "/absences/?u=" + str(user.pk))
+
+    def test_list(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        def code(suffix, status_code=200):
+            self.assertEqual(
+                self.client.get("/absences/?{}".format(suffix)).status_code, status_code
+            )
+
+        code("")
+        code("u=-1")
+        code("u={}".format(user.pk))
 
     def test_employment_validation(self):
         user = factories.UserFactory.create()

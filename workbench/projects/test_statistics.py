@@ -69,6 +69,7 @@ class StatisticsTest(TestCase):
                 status_code,
             )
 
+        code("owned_by=-1")
         code("owned_by=0")
         code("owned_by={}".format(user.pk))
         code("owned_by=bla", 302)

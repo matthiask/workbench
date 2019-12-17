@@ -417,6 +417,7 @@ class LogbookTest(TestCase):
 
         valid("")
         valid("q=test")
+        valid("rendered_by=-1")
         valid("rendered_by=" + str(user.pk))
         valid("project=" + str(hours.service.project.pk))
         valid("date_from=2018-01-01")
@@ -440,6 +441,7 @@ class LogbookTest(TestCase):
 
         valid("")
         valid("q=test")
+        valid("rendered_by=-1")
         valid("rendered_by=" + str(user.pk))
         valid("project=" + str(cost.service.project.pk))
         valid("organization=" + str(cost.service.project.customer.pk))

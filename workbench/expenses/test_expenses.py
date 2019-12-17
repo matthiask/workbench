@@ -1,5 +1,6 @@
 import datetime as dt
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
@@ -192,3 +193,26 @@ class ExpensesTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"cost": "109.16"})
+
+    def test_one_or_other(self):
+        service = factories.ServiceFactory.create()
+        kw = {
+            "service": service,
+            "created_by": service.project.owned_by,
+            "rendered_by": service.project.owned_by,
+            "cost": 10,
+            "description": "Test",
+        }
+        with self.assertRaises(ValidationError) as cm:
+            LoggedCost(**kw, expense_currency="EUR").full_clean()
+        self.assertEqual(
+            list(cm.exception),
+            [("expense_cost", ["Either fill in all fields or none."])],
+        )
+
+        with self.assertRaises(ValidationError) as cm:
+            LoggedCost(**kw, expense_cost=10).full_clean()
+        self.assertEqual(
+            list(cm.exception),
+            [("expense_currency", ["Either fill in all fields or none."])],
+        )

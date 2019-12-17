@@ -1,6 +1,7 @@
 import datetime as dt
 
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from workbench import factories
 from workbench.offers.models import Offer
@@ -534,3 +535,13 @@ class ProjectsTest(TestCase):
 
         service = project.services.get()
         self.assertEqual(service.effort_rate, 250)
+
+    @override_settings(FEATURES={"glassfrog": False})
+    def test_no_role(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(
+            project.urls["createservice"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertNotContains(response, "id_role")

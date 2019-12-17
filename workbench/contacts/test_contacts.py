@@ -272,3 +272,12 @@ class ContactsTest(TestCase):
         person.refresh_from_db()
         self.assertEqual(person.organization, new)
         self.assertEqual(new.groups.count(), 0)  # Group (m2m) not assigned
+
+    def test_create_person_with_preselected_organization(self):
+        organization = factories.OrganizationFactory.create(name="ABCD")
+        self.client.force_login(organization.primary_contact)
+
+        response = self.client.get(
+            Person.urls["create"] + "?organization={}".format(organization.pk)
+        )
+        self.assertContains(response, 'value="ABCD"')
