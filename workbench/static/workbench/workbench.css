@@ -82,12 +82,22 @@ tbody th > a {
   display: block !important;
 }
 
+.form-search {
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
 .form-search input,
 .form-search select {
   max-width: 10em;
 }
 .form-search > * {
   margin-left: 0.25rem;
+}
+.form-search .form-group {
+  margin-bottom: 0.25rem;
+}
+.form-search label:empty {
+  display: none;
 }
 
 .modal-footer .pagination {
