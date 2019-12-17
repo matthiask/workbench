@@ -9,6 +9,7 @@ from django.utils.html import mark_safe
 from django.utils.translation import gettext_lazy as _, override
 
 from workbench.accounts.models import User
+from workbench.accounts.features import FEATURES
 from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
 from workbench.logbook.models import LoggedCost, LoggedHours
@@ -404,15 +405,19 @@ class LoggedCostForm(ModelForm):
             self.fields["expense_currency"].disabled = True
             self.fields["expense_cost"].disabled = True
 
-        rates = ExchangeRates.objects.newest()
-        self.fields["expense_currency"] = forms.ChoiceField(
-            choices=[("", "----------")]
-            + [(currency, currency) for currency in rates.rates["rates"]],
-            widget=forms.Select(attrs={"class": "custom-select"}),
-            required=False,
-            initial=self.instance.expense_currency,
-            label=self.instance._meta.get_field("expense_currency").verbose_name,
-        )
+        if self.request.user.features[FEATURES.FOREIGN_CURRENCIES]:
+            rates = ExchangeRates.objects.newest()
+            self.fields["expense_currency"] = forms.ChoiceField(
+                choices=[("", "----------")]
+                + [(currency, currency) for currency in rates.rates["rates"]],
+                widget=forms.Select(attrs={"class": "custom-select"}),
+                required=False,
+                initial=self.instance.expense_currency,
+                label=self.instance._meta.get_field("expense_currency").verbose_name,
+            )
+        else:
+            self.fields.pop("expense_currency")
+            self.fields.pop("expense_cost")
 
     def clean(self):
         data = super().clean()

@@ -17,13 +17,15 @@
   {% ff_field form.service %}
 
   {% ff_field form.are_expenses %}
-  <div class="form-row align-items-end {% if not form.instance.expense_cost %}d-none{% endif %}" id="foreign-currency">
-    <div class="col-3">{% ff_field form.expense_currency %}</div>
-    <div class="col-6">{% ff_field form.expense_cost %}</div>
-    <div class="col-3" style="margin-bottom:1rem">
-      <button type="button" class="btn btn-primary" data-convert>{% trans 'convert' %}</button>
+  {% if form.expense_currency %}
+    <div class="form-row align-items-end {% if not form.instance.expense_cost %}d-none{% endif %}" id="foreign-currency">
+      <div class="col-3">{% ff_field form.expense_currency %}</div>
+      <div class="col-6">{% ff_field form.expense_cost %}</div>
+      <div class="col-3" style="margin-bottom:1rem">
+        <button type="button" class="btn btn-primary" data-convert>{% trans 'convert' %}</button>
+      </div>
     </div>
-  </div>
+  {% endif %}
   {% ff_field form.third_party_costs %}
 
   {% ff_field form.cost %}
@@ -31,7 +33,7 @@
 {% endblock %}
 
 {% block footer %}
-  {% if not form.instance.expense_cost %}
+  {% if form.expense_currency and not form.instance.expense_cost %}
     <button type="button" class="btn btn-primary mr-auto"
       onclick="_cl(this, 'invisible', true);_cl(_sel('#foreign-currency'), 'd-none', false);_sel('#id_are_expenses').checked=true"
       >{% trans 'expenses in foreign currency' %}</button>

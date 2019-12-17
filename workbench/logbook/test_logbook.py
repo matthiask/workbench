@@ -1,6 +1,7 @@
 import datetime as dt
 
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils import timezone
 
 from workbench import factories
@@ -598,3 +599,14 @@ class LogbookTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 201)
+
+    @override_settings(FEATURES={"foreign_currencies": False})
+    def test_no_role(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(
+            project.urls["createcost"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertNotContains(response, "id_expense_currency")
+        self.assertNotContains(response, "id_expense_cost")
