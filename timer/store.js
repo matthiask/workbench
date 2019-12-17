@@ -13,29 +13,34 @@ const serialize = data => {
 }
 
 const deserialize = blob => {
-  let parsed = JSON.parse(blob)
-  if (!parsed || !parsed._v) return {}
-  const {_v, ...data} = parsed
-  if (_v == VERSION) {
-    return data
-  } else if (_v == 2) {
-    return {
-      ...data,
-      activities: Object.fromEntries(
-        Object.entries(data.activities).filter(
-          ([id]) => id && id != "null" && id != "undefined"
-        )
-      ),
+  const deserializeRaw = () => {
+    let parsed = JSON.parse(blob)
+    if (!parsed || !parsed._v) return {}
+    const {_v, ...data} = parsed
+    if (_v == VERSION) {
+      return data
+    } else if (_v == 2) {
+      return data
+    } else if (_v == 1) {
+      return {
+        ...data,
+        activities: Object.fromEntries(
+          data.activities.map(activity => [activity.id, activity])
+        ),
+      }
     }
-  } else if (_v == 1) {
-    return {
-      ...data,
-      activities: Object.fromEntries(
-        data.activities.map(activity => [activity.id, activity])
-      ),
-    }
+    return {}
   }
-  return {}
+
+  const data = deserializeRaw()
+  return {
+    ...data,
+    activities: Object.fromEntries(
+      Object.entries(data.activities).filter(
+        ([id]) => id && id != "null" && id != "undefined"
+      )
+    ),
+  }
 }
 
 export function configureStore(initialState = undefined) {
