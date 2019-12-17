@@ -222,7 +222,7 @@ class Project(Model):
         not_archived_logged_cost_per_service = {
             row["service"]: row["cost__sum"]
             for row in LoggedCost.objects.order_by()
-            .filter(service__project=self, archived_at__isnull=False)
+            .filter(service__project=self, archived_at__isnull=True)
             .values("service")
             .annotate(Sum("cost"))
         }
