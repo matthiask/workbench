@@ -21,10 +21,14 @@ def feature_required(feature, message=_("Access denied, sorry.")):
 
 class FEATURES:
     BOOK_KEEPING = "book_keeping"
+    CONTROLLING = "controlling"
     FOREIGN_CURRENCIES = "foreign_currencies"
     GLASSFROG = "glassfrog"
 
 
 book_keeping_only = feature_required(
     FEATURES.BOOK_KEEPING, _("Only book keeping may access this, sorry.")
+)
+controlling_only = feature_required(
+    FEATURES.CONTROLLING, _("Only controlling may access this, sorry.")
 )

@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from workbench.accounts.features import FEATURES, feature_required
+from workbench.accounts.features import FEATURES, controlling_only, feature_required
 from workbench.awt.views import ReportView
 from workbench.circles.reporting import hours_by_circle
 from workbench.projects.reporting import hours_per_customer
@@ -21,8 +21,12 @@ urlpatterns = [
         overdrawn_projects_view,
         name="report_overdrawn_projects",
     ),
-    url(r"^open-items-list/$", open_items_list, name="report_open_items_list"),
-    url(r"^key-data/$", key_data_view, name="report_key_data"),
+    url(
+        r"^open-items-list/$",
+        controlling_only(open_items_list),
+        name="report_open_items_list",
+    ),
+    url(r"^key-data/$", controlling_only(key_data_view), name="report_key_data"),
     url(
         r"^hours-per-customer/$",
         hours_filter_view,
@@ -43,7 +47,7 @@ urlpatterns = [
     ),
     url(
         r"^project-budget-statistics/$",
-        project_budget_statistics_view,
+        controlling_only(project_budget_statistics_view),
         name="report_project_budget_statistics",
     ),
     url(r"^green-hours/$", green_hours_view, name="report_green_hours"),
