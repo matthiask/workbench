@@ -99,6 +99,9 @@ tbody th > a {
 .form-search label:empty {
   display: none;
 }
+.form-search .widget--checkboxinput {
+  align-self: center;
+}
 
 .modal-footer .pagination {
   margin-bottom: 0;
