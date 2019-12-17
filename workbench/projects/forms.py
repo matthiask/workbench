@@ -1,9 +1,10 @@
 import datetime as dt
 
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.db.models import F
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, override
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
@@ -190,9 +191,10 @@ class ProjectForm(ModelForm):
         if instance.closed_on and not self.cleaned_data.get("is_closed"):
             instance.closed_on = None
         if self.instance.flat_rate:
-            self.instance.services.editable().update(
-                effort_type=_("flat rate"), effort_rate=self.instance.flat_rate
-            )
+            with override(settings.WORKBENCH.PDF_LANGUAGE):
+                self.instance.services.editable().update(
+                    effort_type=_("flat rate"), effort_rate=self.instance.flat_rate
+                )
         instance.save()
         if "customer" in self.changed_data:
             instance.invoices.update(customer=instance.customer)
@@ -229,9 +231,10 @@ class ServiceForm(ModelForm):
         if not self.project:
             self.project = kwargs["instance"].project
         elif self.project.flat_rate:
-            kwargs["instance"] = Service(
-                effort_type=_("flat rate"), effort_rate=self.project.flat_rate
-            )
+            with override(settings.WORKBENCH.PDF_LANGUAGE):
+                kwargs["instance"] = Service(
+                    effort_type=_("flat rate"), effort_rate=self.project.flat_rate
+                )
 
         super().__init__(*args, **kwargs)
 

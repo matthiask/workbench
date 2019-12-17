@@ -2,10 +2,11 @@ import datetime as dt
 from decimal import ROUND_UP, Decimal
 
 from django import forms
+from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.html import mark_safe
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, override
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization
@@ -344,8 +345,9 @@ class LoggedHoursForm(ModelForm):
                 description=self.cleaned_data["service_description"],
             )
             if self.project.flat_rate:
-                service.effort_type = _("flat rate")
-                service.effort_rate = self.project.flat_rate
+                with override(settings.WORKBENCH.PDF_LANGUAGE):
+                    service.effort_type = _("flat rate")
+                    service.effort_rate = self.project.flat_rate
             service.save()
             instance.service = service
         instance.save()
