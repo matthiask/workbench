@@ -21,8 +21,8 @@ def feature_required(feature, message=_("Access denied, sorry.")):
 
 class FEATURES:
     BOOK_KEEPING = "book_keeping"
-    GLASSFROG = "glassfrog"
     FOREIGN_CURRENCIES = "foreign_currencies"
+    GLASSFROG = "glassfrog"
 
 
 book_keeping_only = feature_required(
