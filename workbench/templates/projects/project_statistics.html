@@ -49,6 +49,7 @@
   </tr>
   {% for offer, services in object.grouped_services.offers %}
     {% for row in services %}
+    {% if row.logged_hours %}
       <tr>
         <th>{{ row.service.title }}</th>
         <th class="text-right">
@@ -67,6 +68,7 @@
           </td>
         {% endfor %}
       </tr>
+    {% endif %}
     {% endfor %}
   {% endfor %}
 </table>
