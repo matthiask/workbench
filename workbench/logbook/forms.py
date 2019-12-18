@@ -8,8 +8,8 @@ from django.utils import timezone
 from django.utils.html import mark_safe
 from django.utils.translation import gettext_lazy as _, override
 
-from workbench.accounts.models import User
 from workbench.accounts.features import FEATURES
+from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
 from workbench.logbook.models import LoggedCost, LoggedHours

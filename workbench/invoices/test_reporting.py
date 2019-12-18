@@ -14,6 +14,7 @@ class ReportingTest(TestCase):
                 due_on=dt.date.today() + dt.timedelta(days=15),
                 subtotal=50,
                 status=factories.Invoice.SENT,
+                third_party_costs=5,  # key data branch
             )
 
         self.client.force_login(factories.UserFactory.create())
