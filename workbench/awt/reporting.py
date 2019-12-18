@@ -148,7 +148,7 @@ def annual_working_time(year, *, users):
 
     def working_time(data):
         at = absences_time(data)
-        return [sum((data["hours"][i], at[i],), Z,) for i in range(12)]
+        return [sum((data["hours"][i], at[i]), Z) for i in range(12)]
 
     def monthly_sums(data):
         sums = [None] * 12
