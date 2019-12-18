@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-16 20:42+0100\n"
+"POT-Creation-Date: 2019-12-18 12:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,7 +39,7 @@ msgstr ""
 msgid "Please authenticate."
 msgstr "Bitte anmelden."
 
-#: workbench/accounts/models.py workbench/logbook/forms.py
+#: workbench/accounts/models.py
 msgid "All users"
 msgstr "Alle Benutzer"
 
@@ -1809,6 +1809,10 @@ msgstr "Stundensaldo fortlaufend"
 #: workbench/templates/awt/year_detail.html
 msgid "vacation days credit"
 msgstr "Guthaben an Ferientagen"
+
+#: workbench/templates/awt/year_detail.html
+msgid "balance"
+msgstr "Bilanz"
 
 #: workbench/templates/awt/year_detail.html
 msgid "vacation days"

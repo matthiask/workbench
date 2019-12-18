@@ -187,6 +187,9 @@ def annual_working_time(year, *, users):
                         month_data["vacation_days_correction"]
                     ),
                     "vacation_days_credit": vacation_days_credit[user.id],
+                    "balance": sum(sums)
+                    + month_data["year"].working_time_per_day
+                    * vacation_days_credit[user.id],
                     "other_absences": sum(month_data["other_absences"]),
                     "target": sum(month_data["target"]),
                     "hours": sum(month_data["hours"]),

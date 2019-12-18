@@ -141,6 +141,10 @@ tbody th > a {
 }
 
 @media print {
+  body {
+    font-size: 13px;
+  }
+
   .tiny-icons {
     display: none;
   }
