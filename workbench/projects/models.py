@@ -46,10 +46,14 @@ class ProjectQuerySet(SearchQuerySet):
     def old_projects(self):
         from workbench.logbook.models import LoggedHours
 
-        return self.open().exclude(
-            id__in=LoggedHours.objects.order_by()
-            .filter(rendered_on__gte=dt.date.today() - dt.timedelta(days=60))
-            .values("service__project")
+        return (
+            self.open()
+            .filter(id__in=LoggedHours.objects.order_by().values("service__project"))
+            .exclude(
+                id__in=LoggedHours.objects.order_by()
+                .filter(rendered_on__gte=dt.date.today() - dt.timedelta(days=60))
+                .values("service__project")
+            )
         )
 
     def invalid_customer_contact_combination(self):
