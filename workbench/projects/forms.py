@@ -88,7 +88,9 @@ class ProjectSearchForm(Form):
         elif data.get("s") == "old-projects":
             queryset = queryset.old_projects()
         elif data.get("s") == "invalid-customer-contact-combination":
-            queryset = queryset.exclude(customer=F("contact__organization"))
+            queryset = queryset.filter(closed_on__isnull=True).exclude(
+                customer=F("contact__organization")
+            )
         if data.get("org"):
             queryset = queryset.filter(customer=data.get("org"))
         if data.get("type"):
