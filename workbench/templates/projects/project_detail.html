@@ -42,39 +42,43 @@
             </div>
           </span>
           <span class="col-md-4">
-            <table class="table table-borderless table-sm">
-              <tr>
-                <th class="text-right">{% trans 'total costs' %}</th>
-                <td>
-                  {{ project.grouped_services.total_logged_cost|currency }}
-                  {% if project.grouped_services.total_logged_hours_rate_undefined %}
-                    <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.grouped_services.total_logged_hours_rate_undefined|hours }})</span>
-                  {% endif %}
-                  /
-                  {{ project.grouped_services.total_service_cost|currency }}
-                  {% if project.grouped_services.total_service_hours_rate_undefined %}
-                    <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.grouped_services.total_service_hours_rate_undefined|hours }})</span>
-                  {% endif %}
-                </td>
-              </tr>
 
-              <tr>
-                <th class="text-right">{% trans 'not archived' %}</th>
-                <td>
-                  {{ project.not_archived_total.total|currency }}
-                  {% if project.not_archived_total.hours_rate_undefined %}
-                  <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.not_archived_total.hours_rate_undefined|hours }}){% endif %}
-                  </span>
-                  (<a class="inline" href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}&amp;not_archived=1">{% trans "hours" %}</a> /
-                  <a class="inline" href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;not_archived=1">{% trans "cost" %}</a>)
-                </td>
-              </tr>
+            {% if request.user|has:FEATURES.CONTROLLING %}
+              <table class="table table-borderless table-sm">
+                <tr>
+                  <th class="text-right">{% trans 'total costs' %}</th>
+                  <td>
+                    {{ project.grouped_services.total_logged_cost|currency }}
+                    {% if project.grouped_services.total_logged_hours_rate_undefined %}
+                      <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.grouped_services.total_logged_hours_rate_undefined|hours }})</span>
+                    {% endif %}
+                    /
+                    {{ project.grouped_services.total_service_cost|currency }}
+                    {% if project.grouped_services.total_service_hours_rate_undefined %}
+                      <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.grouped_services.total_service_hours_rate_undefined|hours }})</span>
+                    {% endif %}
+                  </td>
+                </tr>
 
-              <tr>
-                <th class="text-right">{% trans 'total excl. tax' %}</th>
-                <td>{{ project.project_invoices_total_excl_tax|currency }}</td>
-              </tr>
-            </table>
+                <tr>
+                  <th class="text-right">{% trans 'not archived' %}</th>
+                  <td>
+                    {{ project.not_archived_total.total|currency }}
+                    {% if project.not_archived_total.hours_rate_undefined %}
+                    <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.not_archived_total.hours_rate_undefined|hours }}){% endif %}
+                    </span>
+                    (<a class="inline" href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}&amp;not_archived=1">{% trans "hours" %}</a> /
+                    <a class="inline" href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;not_archived=1">{% trans "cost" %}</a>)
+                  </td>
+                </tr>
+
+                <tr>
+                  <th class="text-right">{% trans 'total excl. tax' %}</th>
+                  <td>{{ project.project_invoices_total_excl_tax|currency }}</td>
+                </tr>
+              </table>
+            {% endif %} {# CONTROLLING #}
+
           </span>
         </div>
       </div>
@@ -88,16 +92,18 @@
       <a href="{{ object.urls.statistics }}" class="btn btn-primary" data-toggle="ajaxmodal">
         {% trans 'statistics' %}</a>
 
-      <span class="btn-group">
-        <a href="{{ object.urls.offers_pdf }}" class="btn btn-primary" target="_blank">{% trans 'offers PDF' %}</a>
-        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <span class="sr-only">Toggle Dropdown</span>
-        </button>
-        <div class="dropdown-menu dropdown-menu-right">
-          <a class="dropdown-item" href="{{ object.urls.offers_pdf }}?disposition=attachment">
-            {% trans 'Download' %}</a>
-        </div>
-      </span>
+      {% if request.user|has:FEATURES.CONTROLLING %}
+        <span class="btn-group">
+          <a href="{{ object.urls.offers_pdf }}" class="btn btn-primary" target="_blank">{% trans 'offers PDF' %}</a>
+          <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="sr-only">Toggle Dropdown</span>
+          </button>
+          <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="{{ object.urls.offers_pdf }}?disposition=attachment">
+              {% trans 'Download' %}</a>
+          </div>
+        </span>
+      {% endif %}
 
       <a href="{{ project.urls.delete }}" class="btn btn-outline-danger float-right">
         {% trans 'Delete' %}</a>
@@ -117,34 +123,36 @@
               {{ offer.status_badge }}
             </div>
 
-            <div>
-              <span class="btn-group">
-                <a href="{{ offer.urls.pdf }}" class="btn btn-primary btn-sm" target="_blank">PDF</a>
-                <button type="button" class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <span class="sr-only">Toggle Dropdown</span>
-                </button>
-                <div class="dropdown-menu dropdown-menu-right">
-                  <a class="dropdown-item" href="{{ offer.urls.pdf }}?disposition=attachment">
-                    {% trans 'Download' %}</a>
-                </div>
-              </span>
+            {% if request.user|has:FEATURES.CONTROLLING %}
+              <div>
+                <span class="btn-group">
+                  <a href="{{ offer.urls.pdf }}" class="btn btn-primary btn-sm" target="_blank">PDF</a>
+                  <button type="button" class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="sr-only">Toggle Dropdown</span>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="{{ offer.urls.pdf }}?disposition=attachment">
+                      {% trans 'Download' %}</a>
+                  </div>
+                </span>
 
-              <span class="dropdown">
-                <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
-                  id="offer-dropdown-{{ offer.pk }}"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  {% trans 'offer' %}
-                </button>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="offer-dropdown-{{ offer.pk }}">
-                  <a class="dropdown-item" href="{{ offer.urls.update }}">
-                    {% trans 'Update' %}</a>
-                  <a class="dropdown-item" href="{{ offer.urls.copy }}" data-toggle="ajaxmodal">
-                    {% trans 'Copy' %}</a>
-                  <a class="dropdown-item" href="{{ offer.urls.delete }}">
-                    {% trans 'Delete' %}</a>
-                </div>
-              </span>
-            </div>
+                <span class="dropdown">
+                  <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
+                    id="offer-dropdown-{{ offer.pk }}"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% trans 'offer' %}
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="offer-dropdown-{{ offer.pk }}">
+                    <a class="dropdown-item" href="{{ offer.urls.update }}">
+                      {% trans 'Update' %}</a>
+                    <a class="dropdown-item" href="{{ offer.urls.copy }}" data-toggle="ajaxmodal">
+                      {% trans 'Copy' %}</a>
+                    <a class="dropdown-item" href="{{ offer.urls.delete }}">
+                      {% trans 'Delete' %}</a>
+                  </div>
+                </span>
+              </div>
+            {% endif %} {# CONTROLLING #}
 
           </div>
 
@@ -154,8 +162,11 @@
           <div class="d-flex w-100 justify-content-between">
             <h5 class="d-inline my-0">{% trans 'Not offered yet' %}</h5>
 
-            <a href="{{ project.urls.createoffer }}" class="btn btn-primary btn-sm">
-              {% include 'svg/plus.svg' %} {% trans 'offer' %}</a>
+            {% if request.user|has:FEATURES.CONTROLLING %}
+              <a href="{{ project.urls.createoffer }}" class="btn btn-primary btn-sm">
+                {% include 'svg/plus.svg' %} {% trans 'offer' %}</a>
+            {% endif %}
+
           </div>
 
         {% endif %}
@@ -171,35 +182,38 @@
               <a href="" class="btn btn-primary btn-sm" title="{% trans 'Sort' %}" data-sortable-grabber>
                 {% include 'svg/grabber.svg' %}</a>
 
-              <span class="dropdown">
-                <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
-                  id="service-dropdown-{{ row.service.pk }}"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  {% trans 'service' %}
-                </button>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="service-dropdown-{{ row.service.pk }}">
-                  <a class="dropdown-item" href="{{ row.service.urls.update }}" data-toggle="ajaxmodal">
-                    {% trans 'Update' %}</a>
-                  <a class="dropdown-item" href="{{ row.service.urls.reassign_logbook }}" data-toggle="ajaxmodal">
-                    {% trans 'Reassign logbook entries' %}</a>
-                  <a class="dropdown-item" href="{{ row.service.urls.delete }}" data-toggle="ajaxmodal">
-                    {% trans 'Delete' %}</a>
-                  <a class="dropdown-item" href="{{ row.service.urls.move }}" data-toggle="ajaxmodal">
-                    {% trans 'Move to other project' %}</a>
-                  {% if row.service.pk and not row.service.effort_rate %}
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">{% trans 'Assign service type' %}:</h6>
-                    {% for service_type in view.default_service_types %}
-                    <a class="dropdown-item" href="{{ row.service.urls.assign_service_type }}?service_type={{ service_type.pk }}">
-                      <div class="d-flex w-100 justify-content-between">
-                        <span>{{ service_type.title }}</span>
-                        <span>{{ service_type.hourly_rate|currency }}</span>
-                      </div>
-                    </a>
-                    {% endfor %}
-                  {% endif %}
-                </div>
-              </span>
+              {% if request.user|has:FEATURES.CONTROLLING %}
+                <span class="dropdown">
+                  <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
+                    id="service-dropdown-{{ row.service.pk }}"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% trans 'service' %}
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="service-dropdown-{{ row.service.pk }}">
+                    <a class="dropdown-item" href="{{ row.service.urls.update }}" data-toggle="ajaxmodal">
+                      {% trans 'Update' %}</a>
+                    <a class="dropdown-item" href="{{ row.service.urls.reassign_logbook }}" data-toggle="ajaxmodal">
+                      {% trans 'Reassign logbook entries' %}</a>
+                    <a class="dropdown-item" href="{{ row.service.urls.delete }}" data-toggle="ajaxmodal">
+                      {% trans 'Delete' %}</a>
+                    <a class="dropdown-item" href="{{ row.service.urls.move }}" data-toggle="ajaxmodal">
+                      {% trans 'Move to other project' %}</a>
+                    {% if row.service.pk and not row.service.effort_rate %}
+                      <div class="dropdown-divider"></div>
+                      <h6 class="dropdown-header">{% trans 'Assign service type' %}:</h6>
+                      {% for service_type in view.default_service_types %}
+                      <a class="dropdown-item" href="{{ row.service.urls.assign_service_type }}?service_type={{ service_type.pk }}">
+                        <div class="d-flex w-100 justify-content-between">
+                          <span>{{ service_type.title }}</span>
+                          <span>{{ service_type.hourly_rate|currency }}</span>
+                        </div>
+                      </a>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                </span>
+              {% endif %} {# CONTROLLING #}
+
             </div>
           {% endif %}
 
@@ -250,7 +264,7 @@
     </div>
     {% endfor %}
 
-    {% if object.project_invoices %}
+    {% if request.user|has:FEATURES.CONTROLLING and object.project_invoices %}
     <div class="card my-3">
       <div class="card-header d-flex align-items-center justify-content-between">
         <h5 class="d-inline my-0">{% trans 'invoices' %}</h5>
@@ -276,26 +290,28 @@
     </div>
     {% endif %}
 
-    <span class="dropdown">
-      <button class="btn btn-primary dropdown-toggle" type="button"
-        id="invoice-dropdown-button" data-toggle="dropdown"
-        aria-haspopup="true" aria-expanded="false">
-        {% include "svg/plus.svg" %}
-        {% trans 'invoice' %}</a>
-      </button>
-      <div class="dropdown-menu" aria-labelledby="invoice-dropdown-button">
-        <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=fixed">{% trans 'Fixed amount' %}</a>
-        <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=down-payment">{% trans 'Down payment' %}</a>
-        <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=logbook">{% trans 'Services from logbook' %}</a>
-        <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=offer">{% trans 'Services from offer' %}</a>
-      </div>
-    </span>
-    <a href="{{ project.urls.createoffer }}" class="btn btn-primary">
-      {% include 'svg/plus.svg' %} {% trans 'offer' %}</a>
+    {% if request.user|has:FEATURES.CONTROLLING %}
+      <span class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button"
+          id="invoice-dropdown-button" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          {% include "svg/plus.svg" %}
+          {% trans 'invoice' %}</a>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="invoice-dropdown-button">
+          <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=fixed">{% trans 'Fixed amount' %}</a>
+          <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=down-payment">{% trans 'Down payment' %}</a>
+          <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=logbook">{% trans 'Services from logbook' %}</a>
+          <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=offer">{% trans 'Services from offer' %}</a>
+        </div>
+      </span>
+      <a href="{{ project.urls.createoffer }}" class="btn btn-primary">
+        {% include 'svg/plus.svg' %} {% trans 'offer' %}</a>
+      <a href="{{ project.urls.createservice }}" class="btn btn-primary"
+        data-toggle="ajaxmodal">
+        {% include "svg/plus.svg" %} {% trans 'service' %}</a>
+    {% endif %}
 
-    <a href="{{ project.urls.createservice }}" class="btn btn-primary"
-      data-toggle="ajaxmodal">
-      {% include "svg/plus.svg" %} {% trans 'service' %}</a>
     <a href="{{ project.urls.createhours }}" class="btn btn-primary" data-toggle="ajaxmodal" data-createhours>
       {% include "svg/plus.svg" %}
       {% trans 'hours' %}</a>

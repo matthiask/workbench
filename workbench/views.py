@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+from workbench.accounts.features import FEATURES
 from workbench.audit.models import LoggedAction
 from workbench.contacts.models import (
     EmailAddress,
@@ -47,6 +48,57 @@ def search(request):
     return render(request, "search.html", {"query": q, "results": results})
 
 
+def _projects_project_cfg(user):
+    exclude = {"_code", "_fts"}
+    related = []
+    if user.features[FEATURES.CONTROLLING]:
+        related = [(Offer, "project_id"), (Service, "project_id")]
+    else:
+        exclude |= {"flat_rate"}
+    return {"exclude": exclude, "related": related}
+
+
+def _logbook_entry_cfg(user):
+    exclude = set()
+    if not user.features[FEATURES.CONTROLLING]:
+        exclude |= {"invoice_service", "archived_at"}
+    return {"exclude": exclude}
+
+
+def _offers_offer_cfg(user):
+    exclude = {"_code"}
+    if not user.features[FEATURES.CONTROLLING]:
+        exclude |= {
+            "subtotal",
+            "discount",
+            "liable_to_vat",
+            "total_excl_tax",
+            "tax_rate",
+            "total",
+            "show_service_details",
+        }
+    return {"exclude": exclude}
+
+
+def _projects_service_cfg(user):
+    exclude = {"position"}
+    if not user.features[FEATURES.CONTROLLING]:
+        exclude |= {
+            "service_cost",
+            "effort_type",
+            "effort_rate",
+            "effort_hours",
+            "cost",
+            "third_party_costs",
+            "is_optional",
+            "offer",
+            "allow_logging",
+        }
+    if not user.features[FEATURES.GLASSFROG]:
+        exclude |= {"role"}
+    return {"exclude": exclude}
+
+
 HISTORY = {
     "accounts_user": {"exclude": {"is_admin", "last_login", "password"}},
     "awt_employment": {"exclude": {"hourly_labor_costs", "green_hours_target"}},
@@ -60,12 +112,11 @@ HISTORY = {
     },
     "invoices_invoice": {"exclude": {"_code", "_fts"}},
     "invoices_service": {"exclude": {"position"}},
-    "offers_offer": {"exclude": {"_code"}},
-    "projects_project": {
-        "exclude": {"_code", "_fts"},
-        "related": [(Offer, "project_id"), (Service, "project_id")],
-    },
-    "projects_service": {"exclude": {"position"}},
+    "logbook_loggedcost": _logbook_entry_cfg,
+    "logbook_loggedhours": _logbook_entry_cfg,
+    "offers_offer": _offers_offer_cfg,
+    "projects_project": _projects_project_cfg,
+    "projects_service": _projects_service_cfg,
 }
 
 DB_TABLE_TO_MODEL = {model._meta.db_table: model for model in apps.get_models()}
@@ -78,6 +129,8 @@ def history(request, db_table, attribute, id):
         raise Http404
 
     cfg = HISTORY.get(db_table, {})
+    if callable(cfg):
+        cfg = cfg(request.user)
     exclude = cfg.get("exclude", set())
 
     fields = [

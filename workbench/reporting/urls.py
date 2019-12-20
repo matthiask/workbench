@@ -18,7 +18,7 @@ urlpatterns = [
     url(r"^annual-working-time/$", ReportView.as_view(), name="awt_year_report"),
     url(
         r"^overdrawn-projects/$",
-        overdrawn_projects_view,
+        controlling_only(overdrawn_projects_view),
         name="report_overdrawn_projects",
     ),
     url(
@@ -50,5 +50,7 @@ urlpatterns = [
         controlling_only(project_budget_statistics_view),
         name="report_project_budget_statistics",
     ),
-    url(r"^green-hours/$", green_hours_view, name="report_green_hours"),
+    url(
+        r"^green-hours/$", controlling_only(green_hours_view), name="report_green_hours"
+    ),
 ]

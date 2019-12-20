@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
+from workbench.accounts.features import controlling_only
 from workbench.invoices.forms import CreateProjectInvoiceForm
 from workbench.invoices.models import Invoice
 from workbench.logbook.forms import LoggedCostForm, LoggedHoursForm
@@ -68,7 +69,7 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/offers-pdf/$",
-        ProjectOfferPDFView.as_view(),
+        controlling_only(ProjectOfferPDFView.as_view()),
         name="projects_project_offers_pdf",
     ),
     url(
