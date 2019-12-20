@@ -446,7 +446,7 @@ class ProjectsTest(TestCase):
 
         response = self.client.post(
             project.urls["select"],
-            {"project-project": project.pk},
+            {"modal-project": project.pk},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 299)

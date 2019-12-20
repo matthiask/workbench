@@ -206,7 +206,7 @@ class ContactsTest(TestCase):
             response, 'data-autocomplete-url="/contacts/people/autocomplete/"'
         )
 
-        response = self.client.post(person.urls["select"], {"person-person": person.pk})
+        response = self.client.post(person.urls["select"], {"modal-person": person.pk})
         self.assertEqual(response.status_code, 299)
         self.assertEqual(response.json(), {"redirect": person.get_absolute_url()})
 

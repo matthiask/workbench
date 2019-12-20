@@ -142,11 +142,11 @@ class AWTTest(TestCase):
         response = self.client.post(
             "/absences/create/",
             {
-                "user": user.pk,
-                "starts_on": dt.date.today().isoformat(),
-                "days": 3,
-                "description": "Sick",
-                "is_vacation": "",
+                "modal-user": user.pk,
+                "modal-starts_on": dt.date.today().isoformat(),
+                "modal-days": 3,
+                "modal-description": "Sick",
+                "modal-is_vacation": "",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -171,11 +171,11 @@ class AWTTest(TestCase):
         response = self.client.post(
             "/absences/create/",
             {
-                "user": user.pk,
-                "starts_on": "2018-01-01",
-                "days": 3,
-                "description": "Sick",
-                "is_vacation": "",
+                "modal-user": user.pk,
+                "modal-starts_on": "2018-01-01",
+                "modal-days": 3,
+                "modal-description": "Sick",
+                "modal-is_vacation": "",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )

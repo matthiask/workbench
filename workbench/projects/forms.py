@@ -12,7 +12,7 @@ from workbench.circles.models import Role
 from workbench.contacts.models import Organization, Person
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
-from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
+from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
 
 
 class ProjectSearchForm(Form):
@@ -330,13 +330,10 @@ class ServiceMoveForm(ModelForm):
         return data
 
 
+@add_prefix("modal")
 class ProjectAutocompleteForm(forms.Form):
     project = forms.ModelChoiceField(
         queryset=Project.objects.all(),
         widget=Autocomplete(model=Project, params={"only_open": "on"}),
         label="",
     )
-
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("prefix", "project")
-        super().__init__(*args, **kwargs)

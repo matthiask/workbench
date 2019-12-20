@@ -304,7 +304,7 @@ class OffersTest(TestCase):
         )
 
         project = factories.ProjectFactory.create()
-        response = self.client.post(offer.urls["copy"], {"project-project": project.pk})
+        response = self.client.post(offer.urls["copy"], {"modal-project": project.pk})
         self.assertEqual(response.status_code, 299)
         offer = project.offers.first()
         self.assertEqual(

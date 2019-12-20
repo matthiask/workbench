@@ -14,7 +14,14 @@ from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
-from workbench.tools.forms import Autocomplete, DateInput, Form, ModelForm, Textarea
+from workbench.tools.forms import (
+    Autocomplete,
+    DateInput,
+    Form,
+    ModelForm,
+    Textarea,
+    add_prefix,
+)
 from workbench.tools.validation import monday, raise_if_errors
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -183,6 +190,7 @@ class LoggedCostSearchForm(Form):
             return xlsx.to_response("costs.xlsx")
 
 
+@add_prefix("modal")
 class LoggedHoursForm(ModelForm):
     user_fields = default_to_current_user = ("rendered_by",)
 
@@ -355,6 +363,7 @@ class LoggedHoursForm(ModelForm):
         return instance
 
 
+@add_prefix("modal")
 class LoggedCostForm(ModelForm):
     user_fields = default_to_current_user = ("rendered_by",)
 

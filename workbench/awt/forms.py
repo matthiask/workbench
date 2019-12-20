@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.awt.models import Absence
-from workbench.tools.forms import Form, ModelForm, Textarea
+from workbench.tools.forms import Form, ModelForm, Textarea, add_prefix
 
 
 class AbsenceSearchForm(Form):
@@ -39,6 +39,7 @@ class AbsenceSearchForm(Form):
         return queryset.select_related("user")
 
 
+@add_prefix("modal")
 class AbsenceForm(ModelForm):
     user_fields = default_to_current_user = ("user",)
 

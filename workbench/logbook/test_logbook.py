@@ -17,18 +17,15 @@ class LogbookTest(TestCase):
         self.client.force_login(project.owned_by)
 
         def send(url=project.urls["createhours"], **kwargs):
-            return self.client.post(
-                url,
-                {
-                    "rendered_by": project.owned_by_id,
-                    "rendered_on": dt.date.today().isoformat(),
-                    "service": service.id,
-                    "hours": "0.1",
-                    "description": "Test",
-                    **kwargs,
-                },
-                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-            )
+            data = {
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-service": service.id,
+                "modal-hours": "0.1",
+                "modal-description": "Test",
+            }
+            data.update({"modal-%s" % key: value for key, value in kwargs.items()})
+            return self.client.post(url, data, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
 
         response = send()
         self.assertEqual(response.status_code, 201)
@@ -79,11 +76,13 @@ class LogbookTest(TestCase):
         response = self.client.post(
             hours.urls["update"],
             {
-                "rendered_by": hours.rendered_by_id,
-                "rendered_on": (dt.date.today() - dt.timedelta(days=7)).isoformat(),
-                "service": hours.service_id,
-                "hours": "0.1",
-                "description": "Test",
+                "modal-rendered_by": hours.rendered_by_id,
+                "modal-rendered_on": (
+                    dt.date.today() - dt.timedelta(days=7)
+                ).isoformat(),
+                "modal-service": hours.service_id,
+                "modal-hours": "0.1",
+                "modal-description": "Test",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -99,11 +98,11 @@ class LogbookTest(TestCase):
         response = self.client.post(
             hours.urls["update"],
             {
-                "rendered_by": hours.rendered_by_id,
-                "rendered_on": day.isoformat(),
-                "service": hours.service_id,
-                "hours": "0.1",
-                "description": "Test 2",
+                "modal-rendered_by": hours.rendered_by_id,
+                "modal-rendered_on": day.isoformat(),
+                "modal-service": hours.service_id,
+                "modal-hours": "0.1",
+                "modal-description": "Test 2",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -119,11 +118,13 @@ class LogbookTest(TestCase):
         response = self.client.post(
             project.urls["createhours"],
             {
-                "rendered_by": user.id,
-                "rendered_on": (dt.date.today() - dt.timedelta(days=10)).isoformat(),
-                "service": service.id,
-                "hours": "0.1",
-                "description": "Test",
+                "modal-rendered_by": user.id,
+                "modal-rendered_on": (
+                    dt.date.today() - dt.timedelta(days=10)
+                ).isoformat(),
+                "modal-service": service.id,
+                "modal-hours": "0.1",
+                "modal-description": "Test",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -135,7 +136,7 @@ class LogbookTest(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="number" name="hours" value="0.1" step="0.1" class="form-control" required id="id_hours">',  # noqa
+            '<input type="number" name="modal-hours" value="0.1" step="0.1" class="form-control" required id="id_modal-hours">',  # noqa
             html=True,
         )
 
@@ -147,7 +148,7 @@ class LogbookTest(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="number" name="hours" value="0.1" step="0.1" class="form-control" required disabled id="id_hours">',  # noqa
+            '<input type="number" name="modal-hours" value="0.1" step="0.1" class="form-control" required disabled id="id_modal-hours">',  # noqa
             html=True,
         )
 
@@ -158,13 +159,13 @@ class LogbookTest(TestCase):
         response = self.client.post(
             project.urls["createhours"],
             {
-                "rendered_by": project.owned_by_id,
-                "rendered_on": dt.date.today().isoformat(),
-                # "service": service.id,
-                "hours": "0.1",
-                "description": "Test",
-                "service_title": "service title",
-                "service_description": "service description",
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                # "modal-service": service.id,
+                "modal-hours": "0.1",
+                "modal-description": "Test",
+                "modal-service_title": "service title",
+                "modal-service_description": "service description",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -190,13 +191,13 @@ class LogbookTest(TestCase):
         response = self.client.post(
             project.urls["createhours"],
             {
-                "rendered_by": project.owned_by_id,
-                "rendered_on": dt.date.today().isoformat(),
-                # "service": service.id,
-                "hours": "0.1",
-                "description": "Test",
-                "service_title": "service title",
-                "service_description": "service description",
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                # "modal-service": service.id,
+                "modal-hours": "0.1",
+                "modal-description": "Test",
+                "modal-service_title": "service title",
+                "modal-service_description": "service description",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -214,13 +215,13 @@ class LogbookTest(TestCase):
         response = self.client.post(
             service.project.urls["createhours"],
             {
-                "rendered_by": service.project.owned_by_id,
-                "rendered_on": dt.date.today().isoformat(),
-                "service": service.id,
-                "hours": "0.1",
-                "description": "Test",
-                "service_title": "service title",
-                "service_description": "service description",
+                "modal-rendered_by": service.project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-service": service.id,
+                "modal-hours": "0.1",
+                "modal-description": "Test",
+                "modal-service_title": "service title",
+                "modal-service_description": "service description",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -237,11 +238,11 @@ class LogbookTest(TestCase):
         response = self.client.post(
             service.project.urls["createhours"],
             {
-                "rendered_by": service.project.owned_by_id,
-                "rendered_on": "20.14.2019",
-                "service": service.id,
-                "hours": "0.1",
-                "description": "Test",
+                "modal-rendered_by": service.project.owned_by_id,
+                "modal-rendered_on": "20.14.2019",
+                "modal-service": service.id,
+                "modal-hours": "0.1",
+                "modal-description": "Test",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -259,12 +260,12 @@ class LogbookTest(TestCase):
         response = self.client.post(
             service.project.urls["createhours"],
             {
-                "rendered_by": service.project.owned_by_id,
-                "rendered_on": "11.2313231",
-                "initial-rendered_on": "2019-07-11",
-                "service": service.id,
-                "hours": "0.1",
-                "description": "Test",
+                "modal-rendered_by": service.project.owned_by_id,
+                "modal-rendered_on": "11.2313231",
+                "modal-initial-rendered_on": "2019-07-11",
+                "modal-service": service.id,
+                "modal-hours": "0.1",
+                "modal-description": "Test",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -279,12 +280,12 @@ class LogbookTest(TestCase):
         response = self.client.post(
             project.urls["createcost"],
             {
-                "service": service.id,
-                "rendered_by": project.owned_by_id,
-                "rendered_on": dt.date.today().isoformat(),
-                "cost": "10",
-                "third_party_costs": "9",
-                "description": "Anything",
+                "modal-service": service.id,
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-cost": "10",
+                "modal-third_party_costs": "9",
+                "modal-description": "Anything",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -297,12 +298,12 @@ class LogbookTest(TestCase):
         response = self.client.post(
             cost.urls["update"],
             {
-                "service": service.id,
-                "rendered_by": project.owned_by_id,
-                "rendered_on": dt.date.today().isoformat(),
-                "cost": "10",
-                "third_party_costs": "9",
-                "description": "Anything",
+                "modal-service": service.id,
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-cost": "10",
+                "modal-third_party_costs": "9",
+                "modal-description": "Anything",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -311,12 +312,12 @@ class LogbookTest(TestCase):
         response = self.client.post(
             cost.urls["update"],
             {
-                "service": service.id,
-                "rendered_by": project.owned_by_id,
-                "rendered_on": dt.date.today().isoformat(),
-                "cost": "10",
-                "third_party_costs": "9",
-                "description": "Anything",
+                "modal-service": service.id,
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-cost": "10",
+                "modal-third_party_costs": "9",
+                "modal-description": "Anything",
                 WarningsForm.ignore_warnings_id: "project-closed",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
@@ -328,12 +329,12 @@ class LogbookTest(TestCase):
         response = self.client.post(
             cost.urls["update"],
             {
-                "service": service.id,
-                "rendered_by": project.owned_by_id,
-                "rendered_on": dt.date.today().isoformat(),
-                "cost": "10",
-                "third_party_costs": "9",
-                "description": "Anything",
+                "modal-service": service.id,
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-cost": "10",
+                "modal-third_party_costs": "9",
+                "modal-description": "Anything",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -349,14 +350,14 @@ class LogbookTest(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="number" name="hours" value="1.0" step="0.1"'
-            ' class="form-control" required disabled id="id_hours">',
+            '<input type="number" name="modal-hours" value="1.0" step="0.1"'
+            ' class="form-control" required disabled id="id_modal-hours">',
             html=True,
         )
         self.assertContains(
             response,
-            '<input type="date" name="rendered_on" value="{}"'
-            ' class="form-control" required disabled id="id_rendered_on">'
+            '<input type="date" name="modal-rendered_on" value="{}"'
+            ' class="form-control" required disabled id="id_modal-rendered_on">'
             "".format(hours.rendered_on.isoformat()),
             html=True,
         )
@@ -554,7 +555,7 @@ class LogbookTest(TestCase):
 
         response = self.client.post(
             "/logbook/hours/create/",
-            {"project-project": project.pk},
+            {"modal-project": project.pk},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         # Do not fetch the redirect response because the X-Requested-With
@@ -571,12 +572,12 @@ class LogbookTest(TestCase):
         response = self.client.post(
             project.urls["createcost"],
             {
-                "service": service.id,
-                "rendered_by": project.owned_by_id,
-                "rendered_on": dt.date.today().isoformat(),
-                "cost": "10",
-                "third_party_costs": "11",
-                "description": "Anything",
+                "modal-service": service.id,
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-cost": "10",
+                "modal-third_party_costs": "11",
+                "modal-description": "Anything",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -588,12 +589,12 @@ class LogbookTest(TestCase):
         response = self.client.post(
             project.urls["createcost"],
             {
-                "service": service.id,
-                "rendered_by": project.owned_by_id,
-                "rendered_on": dt.date.today().isoformat(),
-                "cost": "10",
-                "third_party_costs": "11",
-                "description": "Anything",
+                "modal-service": service.id,
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-cost": "10",
+                "modal-third_party_costs": "11",
+                "modal-description": "Anything",
                 WarningsForm.ignore_warnings_id: "third-party-costs-higher",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
@@ -608,5 +609,5 @@ class LogbookTest(TestCase):
         response = self.client.get(
             project.urls["createcost"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
-        self.assertNotContains(response, "id_expense_currency")
-        self.assertNotContains(response, "id_expense_cost")
+        self.assertNotContains(response, "id_modal-expense_currency")
+        self.assertNotContains(response, "id_modal-expense_cost")

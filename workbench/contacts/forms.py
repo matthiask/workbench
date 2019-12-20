@@ -14,7 +14,7 @@ from workbench.contacts.models import (
     PhoneNumber,
     PostalAddress,
 )
-from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
+from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
 from workbench.tools.models import ProtectedError, SlowCollector
 from workbench.tools.substitute_with import substitute_with
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -352,11 +352,8 @@ class PostalAddressSelectionForm(ModelForm):
         return data
 
 
+@add_prefix("modal")
 class PersonAutocompleteForm(forms.Form):
     person = forms.ModelChoiceField(
         queryset=Person.objects.all(), widget=Autocomplete(model=Person), label=""
     )
-
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("prefix", "person")
-        super().__init__(*args, **kwargs)

@@ -238,12 +238,12 @@ class InvoicesTest(TestCase):
         response = self.client.post(
             cost.urls["update"],
             {
-                "service": cost.service_id,
-                "rendered_by": cost.rendered_by_id,
-                "rendered_on": cost.rendered_on.isoformat(),
-                "third_party_costs": cost.third_party_costs or "",
-                "cost": 2 * cost.cost,
-                "description": cost.description,
+                "modal-service": cost.service_id,
+                "modal-rendered_by": cost.rendered_by_id,
+                "modal-rendered_on": cost.rendered_on.isoformat(),
+                "modal-third_party_costs": cost.third_party_costs or "",
+                "modal-cost": 2 * cost.cost,
+                "modal-description": cost.description,
                 WarningsForm.ignore_warnings_id: "part-of-invoice",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",

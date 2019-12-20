@@ -1,4 +1,5 @@
 import time
+from functools import wraps
 from urllib.parse import urlencode
 
 from django import forms
@@ -210,3 +211,15 @@ class ModelForm(WarningsForm, forms.ModelForm):
                 self.add_warning(_("No contact selected."), code="no-contact")
 
         return data
+
+
+def add_prefix(prefix):
+    def decorator(cls):
+        @wraps(cls)
+        def fn(*args, **kwargs):
+            kwargs.setdefault("prefix", prefix)
+            return cls(*args, **kwargs)
+
+        return fn
+
+    return decorator

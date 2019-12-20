@@ -58,13 +58,13 @@ class ExpensesTest(TestCase):
         response = self.client.post(
             project.urls["createcost"],
             {
-                "service": service.id,
-                "rendered_by": project.owned_by_id,
-                "rendered_on": local_date_format(dt.date.today()),
-                "cost": "10",
-                "description": "Anything",
-                "are_expenses": "on",
-                # "third_party_costs": "9",
+                "modal-service": service.id,
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": local_date_format(dt.date.today()),
+                "modal-cost": "10",
+                "modal-description": "Anything",
+                "modal-are_expenses": "on",
+                # "modal-third_party_costs": "9",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -75,13 +75,13 @@ class ExpensesTest(TestCase):
         response = self.client.post(
             project.urls["createcost"],
             {
-                "service": service.id,
-                "rendered_by": project.owned_by_id,
-                "rendered_on": dt.date.today().isoformat(),
-                "cost": "10",
-                "description": "Anything",
-                "are_expenses": "on",
-                "third_party_costs": "9",
+                "modal-service": service.id,
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-cost": "10",
+                "modal-description": "Anything",
+                "modal-are_expenses": "on",
+                "modal-third_party_costs": "9",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -113,7 +113,7 @@ class ExpensesTest(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="number" name="third_party_costs" value="9.00" step="0.01" class="form-control" disabled id="id_third_party_costs">',  # noqa
+            '<input type="number" name="modal-third_party_costs" value="9.00" step="0.01" class="form-control" disabled id="id_modal-third_party_costs">',  # noqa
             html=True,
         )
 
