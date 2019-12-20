@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 
 from workbench import generic
+from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.awt.models import Year
 from workbench.awt.reporting import annual_working_time
@@ -27,7 +28,8 @@ class ReportView(generic.DetailView):
         param = self.request.GET.get("user")
         users = None
         if param == "active":
-            users = self.object.active_users()
+            if self.request.user.features[FEATURES.CONTROLLING]:
+                users = self.object.active_users()
         elif param:
             users = User.objects.filter(id=param)
         if not users:

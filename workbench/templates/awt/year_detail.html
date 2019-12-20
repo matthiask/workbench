@@ -16,9 +16,11 @@
           href="?year={{ y }}">{{ y }}</a>
       </li>
       {% endfor %}
-      <li class="nav-item ml-auto">
-        <a class="nav-link" href="{% querystring user='active' %}">{% trans 'active users' %}</a>
-      </li>
+      {% if request.user|has:FEATURES.CONTROLLING %}
+        <li class="nav-item ml-auto">
+          <a class="nav-link" href="{% querystring user='active' %}">{% trans 'active users' %}</a>
+        </li>
+      {% endif %}
     </ul>
   </div>
 
