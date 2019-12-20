@@ -27,7 +27,7 @@
 {% block footer %}
   {% if form.hide_new_service %}
     <button type="button" class="btn btn-primary mr-auto"
-      onclick="_cl(this, 'invisible', true);_cl(_sel('#new-service'), 'd-none', false)">
+      onclick="_cl(this, 'invisible', true);_cl(_sel('#new-service'), 'd-none', false);_sel('#id_service').value=''">
       {% trans 'new service' %}
     </button>
   {% endif %}
