@@ -155,6 +155,9 @@ class ProjectForm(ModelForm):
                 initial=bool(self.instance.closed_on),
             )
 
+        if not self.request.user.features[FEATURES.CONTROLLING]:
+            self.fields.pop("flat_rate")
+
     def clean(self):
         data = super().clean()
 
