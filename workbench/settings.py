@@ -190,6 +190,8 @@ WORKBENCH = {
         URL="https://workbench.feinheit.ch",
         FEATURES={
             "book_keeping": {"mk@feinheit.ch", "mgi@feinheit.ch"},
+            "controlling": True,
+            "foreign_currencies": False,
             "glassfrog": True,
         },
     ),
@@ -220,7 +222,12 @@ WORKBENCH = {
             "bolditalic": font("HelveticaNeueBoldItalic.ttf"),
         },
         URL="https://workbench.diebruchpiloten.com",
-        FEATURES={"book_keeping": True, "glassfrog": False},
+        FEATURES={
+            "book_keeping": True,
+            "controlling": True,
+            "foreign_currencies": False,
+            "glassfrog": False,
+        },
     ),
     "bf": types.SimpleNamespace(
         TITLE="Blindflug",
@@ -250,7 +257,12 @@ WORKBENCH = {
             "bolditalic": font("HelveticaNeueBoldItalic.ttf"),
         },
         URL="https://workbench.blindflugstudios.com",
-        FEATURES={"book_keeping": False, "glassfrog": False},
+        FEATURES={
+            "book_keeping": False,
+            "controlling": False,
+            "foreign_currencies": True,
+            "glassfrog": False,
+        },
     ),
     "test": types.SimpleNamespace(
         TITLE="Test",
@@ -277,7 +289,12 @@ WORKBENCH = {
             "bolditalic": font("ZuricBTBolIta.ttf"),
         },
         URL="https://workbench-test.feinheit.ch",
-        FEATURES={"book_keeping": True, "glassfrog": False},
+        FEATURES={
+            "book_keeping": True,
+            "controlling": True,
+            "foreign_currencies": True,
+            "glassfrog": False,
+        },
     ),
 }[env("NAMESPACE", required=True)]
 
