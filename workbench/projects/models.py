@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from django.contrib import messages
 from django.db import models
-from django.db.models import Q, Sum
+from django.db.models import F, Q, Sum
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -51,6 +51,9 @@ class ProjectQuerySet(SearchQuerySet):
             .filter(rendered_on__gte=dt.date.today() - dt.timedelta(days=60))
             .values("service__project")
         )
+
+    def invalid_customer_contact_combination(self):
+        return self.open().exclude(customer=F("contact__organization"))
 
 
 @model_urls

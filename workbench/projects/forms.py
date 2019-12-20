@@ -3,7 +3,6 @@ import datetime as dt
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import F
 from django.utils.translation import gettext_lazy as _, override
 
 from workbench.accounts.features import FEATURES
@@ -76,9 +75,9 @@ class ProjectSearchForm(Form):
     def filter(self, queryset):
         data = self.cleaned_data
         if data.get("s") == "":
-            queryset = queryset.filter(closed_on__isnull=True)
+            queryset = queryset.open()
         elif data.get("s") == "closed":
-            queryset = queryset.filter(closed_on__isnull=False)
+            queryset = queryset.closed()
         elif data.get("s") == "no-invoices":
             queryset = queryset.orders().without_invoices()
         elif data.get("s") == "accepted-offers":
@@ -88,9 +87,7 @@ class ProjectSearchForm(Form):
         elif data.get("s") == "old-projects":
             queryset = queryset.old_projects()
         elif data.get("s") == "invalid-customer-contact-combination":
-            queryset = queryset.filter(closed_on__isnull=True).exclude(
-                customer=F("contact__organization")
-            )
+            queryset = queryset.invalid_customer_contact_combination()
         if data.get("org"):
             queryset = queryset.filter(customer=data.get("org"))
         if data.get("type"):
