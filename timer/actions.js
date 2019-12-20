@@ -79,14 +79,14 @@ export async function sendLogbook(dispatch, {activity, current, seconds}) {
   }
 
   const body = new FormData()
-  if (activity.service) body.append("service", activity.service.value)
-  body.append("description", activity.description)
-  body.append("hours", Math.ceil(seconds / 360) / 10)
+  if (activity.service) body.append("modal-service", activity.service.value)
+  body.append("modal-description", activity.description)
+  body.append("modal-hours", Math.ceil(seconds / 360) / 10)
   body.append(
-    "rendered_by",
+    "modal-rendered_by",
     document.getElementById("root").dataset.currentUser
   )
-  body.append("rendered_on", new Date().toISOString().replace(/T.*/, ""))
+  body.append("modal-rendered_on", new Date().toISOString().replace(/T.*/, ""))
 
   const headers = new Headers()
   headers.append("X-Requested-With", "XMLHttpRequest")
