@@ -1,3 +1,5 @@
+from django.utils.translation import gettext as _
+
 from xlsxdocument import XLSXDocument
 
 from workbench.contacts.models import PostalAddress
@@ -71,5 +73,35 @@ class WorkbenchXLSXDocument(XLSXDocument):
                     "country",
                     "postal_address_override",
                 ]
+            ],
+        )
+
+    def project_budget_statistics(self, stats):
+        self.add_sheet(_("projects"))
+        self.table(
+            [
+                _("project"),
+                _("offered"),
+                _("logbook"),
+                _("undefined rate"),
+                _("third party costs"),
+                _("invoiced"),
+                _("not archived"),
+                _("total hours"),
+                _("delta"),
+            ],
+            [
+                (
+                    project["project"],
+                    project["offered"],
+                    project["logbook"],
+                    project["effort_hours_with_rate_undefined"],
+                    project["third_party_costs"],
+                    project["invoiced"],
+                    project["not_archived"],
+                    project["hours"],
+                    project["delta"],
+                )
+                for project in stats
             ],
         )
