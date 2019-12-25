@@ -105,3 +105,12 @@ class WorkbenchXLSXDocument(XLSXDocument):
                 for project in stats
             ],
         )
+
+    def accruals(self, queryset):
+        self.table_from_queryset(
+            queryset.select_related("invoice__project", "invoice__owned_by"),
+            additional=[
+                (_("total excl. tax"), lambda item: item.invoice.total_excl_tax),
+                (_("accrual"), lambda item: item.accrual),
+            ],
+        )

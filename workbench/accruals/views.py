@@ -9,7 +9,7 @@ from workbench import generic
 from workbench.accounts.models import User
 from workbench.accruals.models import Accrual
 from workbench.tools.forms import Form
-from workbench.tools.xlsx import XLSXDocument
+from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
 class AccrualFilterForm(Form):
@@ -61,14 +61,8 @@ class CutoffDateDetailView(generic.DetailView):
         accruals = filter_form.filter(accruals)
 
         if request.GET.get("xlsx"):
-            xlsx = XLSXDocument()
-            xlsx.table_from_queryset(
-                accruals,
-                additional=[
-                    (_("total excl. tax"), lambda item: item.invoice.total_excl_tax),
-                    (_("accrual"), lambda item: item.accrual),
-                ],
-            )
+            xlsx = WorkbenchXLSXDocument()
+            xlsx.accruals(accruals)
             return xlsx.to_response(
                 "accruals-{}.xlsx".format(self.object.day.isoformat())
             )
