@@ -240,6 +240,7 @@ class Project(Model):
         }
 
         for service in self.services.all():
+            service.offer = offers_map.get(service.offer_id)  # Reuse
             logged = logged_hours_per_service_and_user.get(service.id, {})
             row = {
                 "service": service,
