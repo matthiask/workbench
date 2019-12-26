@@ -4,10 +4,13 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
 
+from freezegun import freeze_time
+
 from workbench import factories
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import messages
+from workbench.tools.validation import logbook_lock
 
 
 class LogbookTest(TestCase):
@@ -362,6 +365,7 @@ class LogbookTest(TestCase):
             html=True,
         )
 
+    @freeze_time("2019-12-15")
     def test_logged_hours_deletion(self):
         hours = factories.LoggedHoursFactory.create(
             rendered_on=dt.date.today() - dt.timedelta(days=10)
@@ -611,3 +615,11 @@ class LogbookTest(TestCase):
         )
         self.assertNotContains(response, "id_modal-expense_currency")
         self.assertNotContains(response, "id_modal-expense_cost")
+
+    @freeze_time("2019-12-31")
+    def test_logbook_lock_monday(self):
+        self.assertEqual(logbook_lock(), dt.date(2019, 12, 30))
+
+    @freeze_time("2020-01-02")
+    def test_logbook_lock_first_of_year(self):
+        self.assertEqual(logbook_lock(), dt.date(2020, 1, 1))

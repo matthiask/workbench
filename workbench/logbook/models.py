@@ -11,7 +11,7 @@ from workbench.accounts.models import User
 from workbench.projects.models import Service
 from workbench.tools.models import HoursField, Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
-from workbench.tools.validation import monday, raise_if_errors
+from workbench.tools.validation import logbook_lock, raise_if_errors
 
 
 @model_urls
@@ -66,7 +66,7 @@ class LoggedHours(Model):
         if instance.invoice_service_id or instance.archived_at:
             messages.error(request, _("Cannot delete archived logged hours."))
             return False
-        if instance.rendered_on < monday():
+        if instance.rendered_on < logbook_lock():
             messages.error(request, _("Cannot delete logged hours from past weeks."))
             return False
         return super().allow_delete(instance, request)

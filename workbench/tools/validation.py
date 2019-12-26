@@ -7,9 +7,14 @@ from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 
 
-def monday(day=None):
-    day = day or dt.date.today()
+def monday():
+    day = dt.date.today()
     return day - dt.timedelta(days=day.weekday())
+
+
+def logbook_lock():
+    day = dt.date.today()
+    return max(day.replace(month=1, day=1), day - dt.timedelta(days=day.weekday()))
 
 
 def raise_if_errors(errors, exclude=None):

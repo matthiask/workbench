@@ -22,7 +22,7 @@ from workbench.tools.forms import (
     Textarea,
     add_prefix,
 )
-from workbench.tools.validation import monday, raise_if_errors
+from workbench.tools.validation import logbook_lock, raise_if_errors
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -280,7 +280,7 @@ class LoggedHoursForm(ModelForm):
             self.fields.pop("service_description")
             if (
                 self.instance.rendered_by.enforce_same_week_logging
-                and self.instance.rendered_on < monday()
+                and self.instance.rendered_on < logbook_lock()
             ):
                 self.fields["hours"].disabled = True
                 self.fields["rendered_by"].disabled = True
@@ -315,7 +315,7 @@ class LoggedHoursForm(ModelForm):
             if not data["rendered_by"].enforce_same_week_logging:
                 # Fine
                 pass
-            elif data["rendered_on"] < monday():
+            elif data["rendered_on"] < logbook_lock():
                 errors["rendered_on"] = _(
                     "Sorry, hours have to be logged in the same week."
                 )
