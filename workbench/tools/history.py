@@ -13,9 +13,17 @@ from django.utils.translation import gettext as _
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.awt.models import Absence, Employment
-from workbench.contacts.models import EmailAddress, Person, PhoneNumber, PostalAddress
+from workbench.contacts.models import (
+    EmailAddress,
+    Organization,
+    Person,
+    PhoneNumber,
+    PostalAddress,
+)
+from workbench.invoices.models import Invoice, Service as InvoiceService
+from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
-from workbench.projects.models import Service
+from workbench.projects.models import Project, Service as ProjectService
 from workbench.tools.formats import local_date_format
 
 
@@ -63,7 +71,7 @@ def formatter(field):
             except model.DoesNotExist:
                 pretty = _("Deleted %s instance") % model._meta.verbose_name
 
-            if model._meta.db_table in HISTORY:
+            if model in HISTORY:
                 return format_html(
                     '<a href="{}" data-toggle="ajaxmodal">{}</a>',
                     reverse("history", args=(model._meta.db_table, "id", value)),
@@ -267,7 +275,7 @@ def _projects_project_cfg(user):
     }
     related = []
     if user.features[FEATURES.CONTROLLING]:
-        related = [(Offer, "project_id"), (Service, "project_id")]
+        related = [(Offer, "project_id"), (ProjectService, "project_id")]
         fields |= {"flat_rate"}
     return {"fields": fields, "related": related}
 
@@ -308,7 +316,7 @@ WITH_TOTAL = {
 }
 
 HISTORY = {
-    "accounts_user": {
+    User: {
         "fields": {
             "email",
             "is_active",
@@ -319,10 +327,8 @@ HISTORY = {
         },
         "related": [(Employment, "user_id"), (Absence, "user_id")],
     },
-    "awt_absence": {
-        "fields": {"user", "starts_on", "days", "description", "is_vacation"}
-    },
-    "awt_employment": {
+    Absence: {"fields": {"user", "starts_on", "days", "description", "is_vacation"}},
+    Employment: {
         "fields": {
             "user",
             "date_from",
@@ -332,9 +338,9 @@ HISTORY = {
             "notes",
         }
     },
-    "contacts_emailaddress": {"fields": {"person", "type", "email"}},
-    "contacts_phonenumber": {"fields": {"person", "type", "phone_number"}},
-    "contacts_postaladdress": {
+    EmailAddress: {"fields": {"person", "type", "email"}},
+    PhoneNumber: {"fields": {"person", "type", "phone_number"}},
+    PostalAddress: {
         "fields": {
             "person",
             "type",
@@ -347,7 +353,7 @@ HISTORY = {
             "postal_address_override",
         }
     },
-    "contacts_organization": {
+    Organization: {
         "fields": {
             "name",
             "is_private_person",
@@ -357,7 +363,7 @@ HISTORY = {
         },
         "related": [(Person, "organization_id")],
     },
-    "contacts_person": {
+    Person: {
         "fields": {
             "is_archived",
             "given_name",
@@ -376,11 +382,11 @@ HISTORY = {
             (PostalAddress, "person_id"),
         ],
     },
-    "invoices_invoice": _invoices_invoice_cfg,
-    "invoices_service": _invoices_service_cfg,
-    "logbook_loggedcost": _logbook_loggedcost_cfg,
-    "logbook_loggedhours": _logbook_loggedhours_cfg,
-    "offers_offer": _offers_offer_cfg,
-    "projects_project": _projects_project_cfg,
-    "projects_service": _projects_service_cfg,
+    Invoice: _invoices_invoice_cfg,
+    InvoiceService: _invoices_service_cfg,
+    LoggedCost: _logbook_loggedcost_cfg,
+    LoggedHours: _logbook_loggedhours_cfg,
+    Offer: _offers_offer_cfg,
+    Project: _projects_project_cfg,
+    ProjectService: _projects_service_cfg,
 }

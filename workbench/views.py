@@ -47,7 +47,7 @@ DB_TABLE_TO_MODEL = {model._meta.db_table: model for model in apps.get_models()}
 def history(request, db_table, attribute, id):
     try:
         model = DB_TABLE_TO_MODEL[db_table]
-        cfg = HISTORY[db_table]
+        cfg = HISTORY[model]
     except KeyError:
         raise Http404
 
