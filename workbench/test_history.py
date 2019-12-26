@@ -1,6 +1,7 @@
 import datetime as dt
 
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from workbench import factories
 from workbench.accounts.middleware import set_user_name
@@ -115,3 +116,29 @@ class HistoryTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/history/not_exists/id/3/")
         self.assertEqual(response.status_code, 404)
+
+    def test_invoices_invisible_without_controlling(self):
+        invoice = factories.InvoiceFactory.create()
+        self.client.force_login(invoice.owned_by)
+        url = "/history/invoices_invoice/id/{}/".format(invoice.pk)
+
+        with override_settings(FEATURES={"controlling": True}):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+
+        with override_settings(FEATURES={"controlling": False}):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 404)
+
+    def test_offer_total_visibility(self):
+        offer = factories.OfferFactory.create()
+        self.client.force_login(offer.owned_by)
+        url = "/history/offers_offer/id/{}/".format(offer.pk)
+
+        with override_settings(FEATURES={"controlling": True}):
+            response = self.client.get(url)
+            self.assertContains(response, "'Total'")
+
+        with override_settings(FEATURES={"controlling": False}):
+            response = self.client.get(url)
+            self.assertNotContains(response, "'Total'")
