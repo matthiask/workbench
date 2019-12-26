@@ -202,7 +202,8 @@ def _invoices_invoice_cfg(user):
             "postal_address",
             "payment_notice",
         }
-        | WITH_TOTAL
+        | WITH_TOTAL,
+        "related": [(CreditEntry, "invoice_id")],
     }
 
 

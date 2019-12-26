@@ -1,5 +1,6 @@
 from django.contrib.postgres.fields import HStoreField
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 
@@ -7,10 +8,14 @@ class LoggedActionQuerySet(models.QuerySet):
     def for_model(self, model):
         return self.filter(table_name=model._meta.db_table)
 
-    def with_row_data(self, **kwargs):
-        return self.filter(
-            **{"row_data__%s" % key: value for key, value in kwargs.items()}
-        )
+    def with_data(self, **kwargs):
+        queryset = self
+        for key, value in kwargs.items():
+            queryset = queryset.filter(
+                Q(**{"row_data__%s" % key: value})
+                | Q(**{"changed_fields__%s" % key: value})
+            )
+        return queryset
 
 
 class LoggedAction(models.Model):
