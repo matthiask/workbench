@@ -30,7 +30,7 @@ class WorkingTimeModelFactory(factory.DjangoModelFactory):
 
 class YearFactory(factory.DjangoModelFactory):
     working_time_model = factory.SubFactory(WorkingTimeModelFactory)
-    year = dt.date.today().year
+    year = factory.LazyAttribute(lambda a: dt.date.today().year)
     january = 30
     february = 30
     march = 30
@@ -135,7 +135,7 @@ class InvoiceFactory(factory.DjangoModelFactory):
     owned_by = factory.SubFactory(UserFactory)
     title = factory.Sequence(lambda n: "Invoice %d" % n)
     type = Invoice.FIXED
-    invoiced_on = dt.date.today()
+    invoiced_on = factory.LazyAttribute(lambda a: dt.date.today())
 
     class Meta:
         model = Invoice
@@ -173,7 +173,7 @@ class LoggedHoursFactory(factory.DjangoModelFactory):
     service = factory.SubFactory(ServiceFactory)
     created_by = factory.SubFactory(UserFactory)
     rendered_by = factory.SubFactory(UserFactory)
-    rendered_on = dt.date.today()
+    rendered_on = factory.LazyAttribute(lambda a: dt.date.today())
     hours = 1
 
     class Meta:
@@ -184,7 +184,7 @@ class LoggedCostFactory(factory.DjangoModelFactory):
     service = factory.SubFactory(ServiceFactory)
     created_by = factory.SubFactory(UserFactory)
     rendered_by = factory.LazyAttribute(lambda obj: obj.created_by)
-    rendered_on = dt.date.today()
+    rendered_on = factory.LazyAttribute(lambda a: dt.date.today())
     cost = 10
 
     class Meta:
@@ -203,7 +203,7 @@ class LedgerFactory(factory.DjangoModelFactory):
 class CreditEntryFactory(factory.DjangoModelFactory):
     ledger = factory.SubFactory(LedgerFactory)
     reference_number = factory.Sequence(lambda n: "payment{}".format(n))
-    value_date = dt.date.today()
+    value_date = factory.LazyAttribute(lambda a: dt.date.today())
     total = 1
     payment_notice = factory.Sequence(lambda n: "Payment {}".format(n))
 
