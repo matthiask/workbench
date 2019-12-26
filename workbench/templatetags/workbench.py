@@ -193,7 +193,7 @@ SELECT id, given_name, family_name, date_of_birth FROM (
     WHERE date_of_birth is not null
 ) AS subquery
 WHERE diff < 7 or diff > 350
-ORDER BY extract(month from date_of_birth), extract(day from date_of_birth)
+ORDER BY (diff + 180) % 365 DESC
             """
         )
         return [
