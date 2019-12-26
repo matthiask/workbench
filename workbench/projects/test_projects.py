@@ -545,3 +545,14 @@ class ProjectsTest(TestCase):
             project.urls["createservice"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertNotContains(response, "id_role")
+
+    def test_no_flat_rate(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.urls["update"])
+        self.assertContains(response, "id_flat_rate")
+
+        with override_settings(FEATURES={"controlling": False}):
+            response = self.client.get(project.urls["update"])
+            self.assertNotContains(response, "id_flat_rate")

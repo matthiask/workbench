@@ -27,10 +27,9 @@ class ReportView(generic.DetailView):
     def get_context_data(self, **kwargs):
         param = self.request.GET.get("user")
         users = None
-        if param == "active":
-            if self.request.user.features[FEATURES.CONTROLLING]:
-                users = self.object.active_users()
-        elif param:
+        if param == "active" and self.request.user.features[FEATURES.CONTROLLING]:
+            users = self.object.active_users()
+        elif param and param != "active":
             users = User.objects.filter(id=param)
         if not users:
             users = [self.request.user]

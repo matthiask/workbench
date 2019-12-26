@@ -5,19 +5,12 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from workbench.accounts.features import FEATURES
 from workbench.audit.models import LoggedAction
-from workbench.contacts.models import (
-    EmailAddress,
-    Organization,
-    Person,
-    PhoneNumber,
-    PostalAddress,
-)
+from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.offers.models import Offer
-from workbench.projects.models import Project, Service
-from workbench.tools.history import changes
+from workbench.projects.models import Project
+from workbench.tools.history import HISTORY, changes
 
 
 def search(request):
@@ -48,95 +41,24 @@ def search(request):
     return render(request, "search.html", {"query": q, "results": results})
 
 
-def _projects_project_cfg(user):
-    exclude = {"_code", "_fts"}
-    related = []
-    if user.features[FEATURES.CONTROLLING]:
-        related = [(Offer, "project_id"), (Service, "project_id")]
-    else:
-        exclude |= {"flat_rate"}
-    return {"exclude": exclude, "related": related}
-
-
-def _logbook_entry_cfg(user):
-    exclude = set()
-    if not user.features[FEATURES.CONTROLLING]:
-        exclude |= {"invoice_service", "archived_at"}
-    return {"exclude": exclude}
-
-
-def _offers_offer_cfg(user):
-    exclude = {"_code"}
-    if not user.features[FEATURES.CONTROLLING]:
-        exclude |= {
-            "subtotal",
-            "discount",
-            "liable_to_vat",
-            "total_excl_tax",
-            "tax_rate",
-            "total",
-            "show_service_details",
-        }
-    return {"exclude": exclude}
-
-
-def _projects_service_cfg(user):
-    exclude = {"position"}
-    if not user.features[FEATURES.CONTROLLING]:
-        exclude |= {
-            "service_cost",
-            "effort_type",
-            "effort_rate",
-            "effort_hours",
-            "cost",
-            "third_party_costs",
-            "is_optional",
-            "offer",
-            "allow_logging",
-        }
-    if not user.features[FEATURES.GLASSFROG]:
-        exclude |= {"role"}
-    return {"exclude": exclude}
-
-
-HISTORY = {
-    "accounts_user": {"exclude": {"is_admin", "last_login", "password"}},
-    "awt_employment": {"exclude": {"hourly_labor_costs", "green_hours_target"}},
-    "contacts_person": {
-        "exclude": {"_fts"},
-        "related": [
-            (PhoneNumber, "person_id"),
-            (EmailAddress, "person_id"),
-            (PostalAddress, "person_id"),
-        ],
-    },
-    "invoices_invoice": {"exclude": {"_code", "_fts"}},
-    "invoices_service": {"exclude": {"position"}},
-    "logbook_loggedcost": _logbook_entry_cfg,
-    "logbook_loggedhours": _logbook_entry_cfg,
-    "offers_offer": _offers_offer_cfg,
-    "projects_project": _projects_project_cfg,
-    "projects_service": _projects_service_cfg,
-}
-
 DB_TABLE_TO_MODEL = {model._meta.db_table: model for model in apps.get_models()}
 
 
 def history(request, db_table, attribute, id):
     try:
         model = DB_TABLE_TO_MODEL[db_table]
+        cfg = HISTORY[db_table]
     except KeyError:
         raise Http404
 
-    cfg = HISTORY.get(db_table, {})
     if callable(cfg):
         cfg = cfg(request.user)
-    exclude = cfg.get("exclude", set())
+    fields = cfg.get("fields", set())
 
     fields = [
         f
         for f in model._meta.get_fields()
-        if hasattr(f, "attname") and not f.primary_key and f.name not in exclude
+        if hasattr(f, "attname") and not f.primary_key and f.name in fields
     ]
 
     instance = None

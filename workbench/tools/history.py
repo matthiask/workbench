@@ -3,13 +3,19 @@ from collections import namedtuple
 from functools import lru_cache
 
 from django.db import models
+from django.http import Http404
 from django.urls import reverse
 from django.utils import dateparse
 from django.utils.html import conditional_escape, format_html, mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
+from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.awt.models import Absence, Employment
+from workbench.contacts.models import EmailAddress, Person, PhoneNumber, PostalAddress
+from workbench.offers.models import Offer
+from workbench.projects.models import Service
 from workbench.tools.formats import local_date_format
 
 
@@ -57,11 +63,14 @@ def formatter(field):
             except model.DoesNotExist:
                 pretty = _("Deleted %s instance") % model._meta.verbose_name
 
-            return format_html(
-                '<a href="{}" data-toggle="ajaxmodal">{}</a>',
-                reverse("history", args=(model._meta.db_table, "id", value)),
-                pretty,
-            )
+            if model._meta.db_table in HISTORY:
+                return format_html(
+                    '<a href="{}" data-toggle="ajaxmodal">{}</a>',
+                    reverse("history", args=(model._meta.db_table, "id", value)),
+                    pretty,
+                )
+            else:
+                return pretty
 
         return _fn
 
@@ -142,3 +151,221 @@ def changes(model, fields, actions):
             changes.append(Change(changes=version_changes, version=action))
 
     return changes
+
+
+def _invoices_invoice_cfg(user):
+    if not user.features[FEATURES.CONTROLLING]:
+        raise Http404
+    return {
+        "fields": {
+            "customer",
+            "contact",
+            "project",
+            "invoiced_on",
+            "due_on",
+            "closed_on",
+            "last_reminded_on",
+            "title",
+            "description",
+            "owned_by",
+            "created_at",
+            "status",
+            "type",
+            "down_payment_applied_to",
+            "down_payment_total",
+            "third_party_costs",
+            "postal_address",
+            "payment_notice",
+        }
+        | WITH_TOTAL
+    }
+
+
+def _invoices_service_cfg(user):
+    if not user.features[FEATURES.CONTROLLING]:
+        raise Http404
+    return {
+        "fields": {
+            "created_at",
+            "title",
+            "description",
+            "service_hours",
+            "service_cost",
+            "effort_type",
+            "effort_hours",
+            "effort_rate",
+            "cost",
+            "third_party_costs",
+            "invoice",
+            "project_service",
+        }
+    }
+
+
+def _logbook_loggedcost_cfg(user):
+    fields = {
+        "service",
+        "created_at",
+        "created_by",
+        "rendered_on",
+        "rendered_by",
+        "cost",
+        "third_party_costs",
+        "description",
+        "are_expenses",
+        "expense_report",
+    }
+    if user.features[FEATURES.CONTROLLING]:
+        fields |= {"invoice_service", "archived_at"}
+    if user.features[FEATURES.FOREIGN_CURRENCIES]:
+        fields |= {"expense_currency", "expense_cost"}
+    return {"fields": fields}
+
+
+def _logbook_loggedhours_cfg(user):
+    fields = {
+        "service",
+        "created_at",
+        "created_by",
+        "rendered_on",
+        "rendered_by",
+        "hours",
+        "description",
+    }
+    if user.features[FEATURES.CONTROLLING]:
+        fields |= {"invoice_service", "archived_at"}
+    return {"fields": fields}
+
+
+def _offers_offer_cfg(user):
+    fields = {
+        "created_at",
+        "project",
+        "offered_on",
+        "closed_on",
+        "title",
+        "description",
+        "owned_by",
+        "status",
+        "postal_address",
+    }
+    if user.features[FEATURES.CONTROLLING]:
+        fields |= WITH_TOTAL
+    return {"fields": fields}
+
+
+def _projects_project_cfg(user):
+    fields = {
+        "customer",
+        "contact",
+        "title",
+        "description",
+        "owned_by",
+        "type",
+        "created_at",
+        "closed_on",
+    }
+    related = []
+    if user.features[FEATURES.CONTROLLING]:
+        related = [(Offer, "project_id"), (Service, "project_id")]
+        fields |= {"flat_rate"}
+    return {"fields": fields, "related": related}
+
+
+def _projects_service_cfg(user):
+    fields = {
+        "created_at",
+        "title",
+        "description",
+        "service_hours",
+        "project",
+        "offer",
+        "allow_logging",
+        "is_optional",
+    }
+    if user.features[FEATURES.CONTROLLING]:
+        fields |= {
+            "service_cost",
+            "effort_type",
+            "effort_rate",
+            "effort_hours",
+            "cost",
+            "third_party_costs",
+        }
+    if user.features[FEATURES.GLASSFROG]:
+        fields |= {"role"}
+    return {"fields": fields}
+
+
+WITH_TOTAL = {
+    "subtotal",
+    "discount",
+    "liable_to_vat",
+    "total_excl_tax",
+    "tax_rate",
+    "total",
+    "show_service_details",
+}
+
+HISTORY = {
+    "accounts_user": {
+        "fields": {
+            "email",
+            "is_active",
+            "_short_name",
+            "_full_name",
+            "enforce_same_week_logging",
+            "working_time_model",
+        },
+        "related": [(Employment, "user_id"), (Absence, "user_id")],
+    },
+    "awt_absence": {
+        "fields": {"user", "starts_on", "days", "description", "is_vacation"}
+    },
+    "awt_employment": {
+        "fields": {
+            "user",
+            "date_from",
+            "date_until",
+            "percentage",
+            "vacation_weeks",
+            "notes",
+        }
+    },
+    "contacts_organization": {
+        "fields": {
+            "name",
+            "is_private_person",
+            "notes",
+            "primary_contact",
+            "default_billing_address",
+        },
+        "related": [(Person, "organization_id")],
+    },
+    "contacts_person": {
+        "fields": {
+            "is_archived",
+            "given_name",
+            "family_name",
+            "address",
+            "address_on_first_name_terms",
+            "salutation",
+            "date_of_birth",
+            "notes",
+            "organization",
+            "primary_contact",
+        },
+        "related": [
+            (PhoneNumber, "person_id"),
+            (EmailAddress, "person_id"),
+            (PostalAddress, "person_id"),
+        ],
+    },
+    "invoices_invoice": _invoices_invoice_cfg,
+    "invoices_service": _invoices_service_cfg,
+    "logbook_loggedcost": _logbook_loggedcost_cfg,
+    "logbook_loggedhours": _logbook_loggedhours_cfg,
+    "offers_offer": _offers_offer_cfg,
+    "projects_project": _projects_project_cfg,
+    "projects_service": _projects_service_cfg,
+}

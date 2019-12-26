@@ -248,6 +248,15 @@ class OffersTest(TestCase):
         valid("owned_by=-1")  # mine
         valid("owned_by=0")  # only inactive
 
+    def test_detail(self):
+        offer = factories.OfferFactory.create()
+        self.client.force_login(offer.owned_by)
+
+        self.assertRedirects(
+            self.client.get("/offers/{}/".format(offer.id)),
+            "{}#offer{}".format(offer.project.get_absolute_url(), offer.id),
+        )
+
     def test_create_message(self):
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/offers/create/")
