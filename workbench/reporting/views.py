@@ -91,6 +91,26 @@ def key_data_view(request):
         row["month"]: row["gross_margin"] for row in gross_margin_by_month
     }
 
+    gross_margin_by_years = {}
+    for month in gross_margin_by_month:
+        try:
+            year = gross_margin_by_years[month["date"].year]
+        except KeyError:
+            gross_margin_by_years[month["date"].year] = year = {
+                "year": month["date"].year,
+                "gross_profit": Z,
+                "third_party_costs": Z,
+                "accruals": Z,
+                "gross_margin": Z,
+                "months": [],
+            }
+
+        year["months"].append(month)
+        year["gross_profit"] += month["gross_profit"]["total_excl_tax"]
+        year["third_party_costs"] += month["third_party_costs"]["third_party_costs"]
+        year["accruals"] += month["accruals"]["delta"]
+        year["gross_margin"] += month["gross_margin"]
+
     gh = [
         row
         for row in green_hours.green_hours_by_month()
@@ -119,6 +139,9 @@ def key_data_view(request):
         "reporting/key_data.html",
         {
             "date_range": date_range,
+            "gross_margin_by_years": [
+                row[1] for row in sorted(gross_margin_by_years.items())
+            ],
             "gross_margin_by_month": gross_margin_by_month,
             "invoiced_corrected": [
                 (year, [gross_margin_months.get((year, i), Z) for i in range(1, 13)])
