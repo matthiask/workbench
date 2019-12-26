@@ -47,8 +47,16 @@ class Command(BaseCommand):
 
         for customer, total_excl_tax in invoiced_per_customer.items():
             _c_hours = sum(hours[customer].values(), Z)
+            if not total_excl_tax:
+                continue
             if not _c_hours:
-                print("No hours for customer", customer)
+                print(
+                    "No hours for customer",
+                    customer,
+                    "with",
+                    total_excl_tax,
+                    Organization.objects.get(pk=customer),
+                )
                 continue
             for user, _u_hours in hours[customer].items():
                 earned[customer][user] += _u_hours / _c_hours * total_excl_tax
