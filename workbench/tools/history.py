@@ -332,6 +332,21 @@ HISTORY = {
             "notes",
         }
     },
+    "contacts_emailaddress": {"fields": {"person", "type", "email"}},
+    "contacts_phonenumber": {"fields": {"person", "type", "phone_number"}},
+    "contacts_postaladdress": {
+        "fields": {
+            "person",
+            "type",
+            "street",
+            "house_number",
+            "address_suffix",
+            "postal_code",
+            "city",
+            "country",
+            "postal_address_override",
+        }
+    },
     "contacts_organization": {
         "fields": {
             "name",
