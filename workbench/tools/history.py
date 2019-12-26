@@ -20,6 +20,7 @@ from workbench.contacts.models import (
     PhoneNumber,
     PostalAddress,
 )
+from workbench.credit_control.models import CreditEntry
 from workbench.invoices.models import Invoice, Service as InvoiceService
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
@@ -159,6 +160,22 @@ def changes(model, fields, actions):
             changes.append(Change(changes=version_changes, version=action))
 
     return changes
+
+
+def _credit_control_creditentry_cfg(user):
+    if not user.features[FEATURES.CONTROLLING]:
+        raise Http404
+    return {
+        "fields": {
+            "ledger",
+            "reference_number",
+            "value_date",
+            "total",
+            "payment_notice",
+            "invoice",
+            "notes",
+        }
+    }
 
 
 def _invoices_invoice_cfg(user):
@@ -328,6 +345,7 @@ HISTORY = {
         "related": [(Employment, "user_id"), (Absence, "user_id")],
     },
     Absence: {"fields": {"user", "starts_on", "days", "description", "is_vacation"}},
+    CreditEntry: _credit_control_creditentry_cfg,
     Employment: {
         "fields": {
             "user",
