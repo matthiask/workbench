@@ -21,6 +21,7 @@ from workbench.contacts.models import (
     PostalAddress,
 )
 from workbench.credit_control.models import CreditEntry
+from workbench.expenses.models import ExpenseReport
 from workbench.invoices.models import (
     Invoice,
     RecurringInvoice,
@@ -373,6 +374,10 @@ HISTORY = {
     },
     Absence: {"fields": {"user", "starts_on", "days", "description", "is_vacation"}},
     CreditEntry: _credit_control_creditentry_cfg,
+    ExpenseReport: {
+        "fields": {"created_at", "created_by", "closed_on", "owned_by", "total"},
+        "related": [(LoggedCost, "expense_report_id")],
+    },
     Employment: {
         "fields": {
             "user",
