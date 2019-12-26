@@ -86,7 +86,7 @@ def history(request, db_table, attribute, id):
             "id": id,
         }
 
-    actions = LoggedAction.objects.for_model_id(model, **{attribute: id})
+    actions = LoggedAction.objects.for_model(model).with_row_data(**{attribute: id})
 
     return render(
         request,
