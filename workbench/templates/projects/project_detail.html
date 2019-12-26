@@ -217,7 +217,11 @@
             </div>
           {% endif %}
 
-          <h5 class="mb-1">{{ row.service.title }} {% history_link row.service %}</h5>
+          <h5 class="mb-1">
+            {{ row.service.title }}
+            {% if row.service.is_optional %}<em>({% trans 'optional' %})</em>{% endif %}
+            {% history_link row.service %}
+          </h5>
           <p>
             {{ row.service.description|linebreaksbr|default:'&nbsp;'|urlize }}
           </p>
