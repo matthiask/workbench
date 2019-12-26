@@ -92,7 +92,7 @@
       <a href="{{ object.urls.statistics }}" class="btn btn-primary" data-toggle="ajaxmodal">
         {% trans 'statistics' %}</a>
 
-      {% if request.user|has:FEATURES.CONTROLLING %}
+      {% if request.user|has:FEATURES.CONTROLLING and project.grouped_services.offers|length > 1 %}
         <span class="btn-group">
           <a href="{{ object.urls.offers_pdf }}" class="btn btn-primary" target="_blank">{% trans 'offers PDF' %}</a>
           <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
