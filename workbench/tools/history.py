@@ -21,7 +21,11 @@ from workbench.contacts.models import (
     PostalAddress,
 )
 from workbench.credit_control.models import CreditEntry
-from workbench.invoices.models import Invoice, Service as InvoiceService
+from workbench.invoices.models import (
+    Invoice,
+    RecurringInvoice,
+    Service as InvoiceService,
+)
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service as ProjectService
@@ -228,6 +232,28 @@ def _invoices_service_cfg(user):
     }
 
 
+def _invoices_recurringinvoice_cfg(user):
+    if not user.features[FEATURES.CONTROLLING]:
+        raise Http404
+    return {
+        "fields": {
+            "customer",
+            "contact",
+            "title",
+            "description",
+            "owned_by",
+            "created_at",
+            "third_party_costs",
+            "postal_address",
+            "starts_on",
+            "ends_on",
+            "periodicity",
+            "next_period_starts_on",
+        }
+        | WITH_TOTAL
+    }
+
+
 def _logbook_loggedcost_cfg(user):
     fields = {
         "service",
@@ -403,6 +429,7 @@ HISTORY = {
     },
     Invoice: _invoices_invoice_cfg,
     InvoiceService: _invoices_service_cfg,
+    RecurringInvoice: _invoices_recurringinvoice_cfg,
     LoggedCost: _logbook_loggedcost_cfg,
     LoggedHours: _logbook_loggedhours_cfg,
     Offer: _offers_offer_cfg,
