@@ -84,7 +84,14 @@ class ExpenseReportPDFView(generic.DetailView):
             pdf.table(
                 [
                     (
-                        "%s %s" % (_("total"), currency_code or "CHF"),
+                        "%s %s %s"
+                        % (
+                            _("total"),
+                            currency_code or "CHF",
+                            ""
+                            if self.object.closed_on
+                            else _("(provisional, not ready for reimbursement)"),
+                        ),
                         currency(total_cost),
                     )
                 ],

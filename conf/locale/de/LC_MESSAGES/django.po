@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-18 12:40+0100\n"
+"POT-Creation-Date: 2019-12-26 23:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,6 +27,10 @@ msgstr "Zugriff verweigert :-("
 
 #: workbench/accounts/features.py
 msgid "Only book keeping may access this, sorry."
+msgstr "Nur Buchhaltung kann auf diesen Bereich zugreifen."
+
+#: workbench/accounts/features.py
+msgid "Only controlling may access this, sorry."
 msgstr "Nur Buchhaltung kann auf diesen Bereich zugreifen."
 
 #: workbench/accounts/forms.py
@@ -164,15 +168,16 @@ msgstr ""
 "abgegolten wird."
 
 #: workbench/accruals/models.py workbench/invoices/views.py
-#: workbench/logbook/__init__.py workbench/reporting/views.py
+#: workbench/logbook/__init__.py
 #: workbench/templates/accruals/cutoffdate_detail.html
 #: workbench/templates/base.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/xlsx.py
 msgid "logbook"
 msgstr "Logbuch"
 
-#: workbench/accruals/models.py workbench/accruals/views.py
+#: workbench/accruals/models.py workbench/tools/xlsx.py
 msgid "accrual"
 msgstr "Abgrenzung"
 
@@ -183,15 +188,6 @@ msgstr "Kann Abgrenzungen für zukünftige Stichtage nicht generieren."
 #: workbench/accruals/views.py
 msgid "Generated accruals."
 msgstr "Abgrenzungen erstellt."
-
-#: workbench/accruals/views.py
-#: workbench/templates/accruals/cutoffdate_detail.html
-#: workbench/templates/invoices/invoice_detail.html
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/key_data.html
-#: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
-msgid "total excl. tax"
-msgstr "Total exkl. MwSt."
 
 #: workbench/audit/__init__.py
 msgid "audit"
@@ -874,6 +870,10 @@ msgstr "Status"
 msgid "receipt"
 msgstr "Beleg"
 
+#: workbench/expenses/views.py
+msgid "(provisional, not ready for reimbursement)"
+msgstr "(provisorisch, nicht bereit zur Auszahlung)"
+
 #: workbench/generic.py
 msgid "Search form was invalid."
 msgstr "Suchformular war ungültig."
@@ -1062,13 +1062,14 @@ msgid "contact"
 msgstr "Kontakt"
 
 #: workbench/invoices/models.py workbench/offers/models.py
-#: workbench/projects/models.py workbench/reporting/views.py
+#: workbench/projects/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/reporting/overdrawn_projects.html
 #: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/xlsx.py
 msgid "project"
 msgstr "Projekt"
 
@@ -1098,11 +1099,12 @@ msgid "down payment total"
 msgstr "Anzahlungstotal"
 
 #: workbench/invoices/models.py workbench/logbook/models.py
-#: workbench/reporting/views.py workbench/services/models.py
+#: workbench/services/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/xlsx.py
 msgid "third party costs"
 msgstr "Fremdkosten"
 
@@ -1406,8 +1408,9 @@ msgstr "Projekt für Erfassung auswählen"
 msgid "earned"
 msgstr "Verdient"
 
-#: workbench/management/commands/profitability.py workbench/reporting/views.py
+#: workbench/management/commands/profitability.py
 #: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/xlsx.py
 msgid "invoiced"
 msgstr "Verrechnet"
 
@@ -1489,6 +1492,7 @@ msgstr "%s zu Projekt kopieren"
 
 #: workbench/projects/__init__.py workbench/projects/models.py
 #: workbench/templates/base.html workbench/templates/shortcuts.html
+#: workbench/tools/xlsx.py
 msgid "projects"
 msgstr "Projekte"
 
@@ -1635,32 +1639,6 @@ msgstr "Intern"
 msgid "Closed during the last year"
 msgstr "Geschlossen während dem letzten Jahr"
 
-#: workbench/reporting/views.py
-#: workbench/templates/reporting/project_budget_statistics.html
-msgid "offered"
-msgstr "Offeriert"
-
-#: workbench/reporting/views.py
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/projects/project_statistics.html
-#: workbench/templates/reporting/project_budget_statistics.html
-msgid "undefined rate"
-msgstr "ohne Stundensatz"
-
-#: workbench/reporting/views.py
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/project_budget_statistics.html
-msgid "not archived"
-msgstr "Nicht archiviert"
-
-#: workbench/reporting/views.py
-msgid "total hours"
-msgstr "Stunden insgesamt"
-
-#: workbench/reporting/views.py
-msgid "delta"
-msgstr "Delta"
-
 #: workbench/services/models.py
 msgid "service type"
 msgstr "Leistungstyp"
@@ -1732,6 +1710,15 @@ msgstr "Abgrenzungen erstellen"
 #: workbench/templates/projects/project_detail.html
 msgid "Delete"
 msgstr "Löschen"
+
+#: workbench/templates/accruals/cutoffdate_detail.html
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/key_data.html
+#: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
+#: workbench/tools/xlsx.py
+msgid "total excl. tax"
+msgstr "Total exkl. MwSt."
 
 #: workbench/templates/accruals/cutoffdate_detail.html
 #: workbench/templates/contacts/person_form.html
@@ -2020,6 +2007,19 @@ msgstr "Gesamtkosten"
 
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_statistics.html
+#: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/xlsx.py
+msgid "undefined rate"
+msgstr "ohne Stundensatz"
+
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/xlsx.py
+msgid "not archived"
+msgstr "Nicht archiviert"
+
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_statistics.html
 msgid "statistics"
 msgstr "Statistik"
 
@@ -2042,6 +2042,10 @@ msgstr "Zu anderem Projekt verschieben"
 #: workbench/templates/projects/project_detail.html
 msgid "Assign service type"
 msgstr "Leistungstyp zuweisen"
+
+#: workbench/templates/projects/project_detail.html
+msgid "optional"
+msgstr "optional"
 
 #: workbench/templates/projects/project_detail.html
 msgid "No services yet."
@@ -2122,6 +2126,11 @@ msgstr "Stundenverteilung"
 #: workbench/templates/reporting/overdrawn_projects.html
 msgid "effort hours"
 msgstr "Aufwände in Stunden"
+
+#: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/xlsx.py
+msgid "offered"
+msgstr "Offeriert"
 
 #: workbench/templates/search.html
 msgid "Only showing 100 items. Additional results have been omitted."
@@ -2304,6 +2313,14 @@ msgstr "Anzahlungsrechnung"
 #: workbench/tools/validation.py
 msgid "Form was invalid."
 msgstr "Formular war ungültig."
+
+#: workbench/tools/xlsx.py
+msgid "total hours"
+msgstr "Stunden insgesamt"
+
+#: workbench/tools/xlsx.py
+msgid "delta"
+msgstr "Delta"
 
 #: workbench/views.py
 msgid "Search query missing."
