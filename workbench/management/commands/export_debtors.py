@@ -27,14 +27,22 @@ def append_invoice(*, zf, ledger_slug, invoice):
 
 
 class Command(BaseCommand):
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--year",
+            type=int,
+            default=dt.date.today().year,
+            help="The year for which to export debtors (defaults to %(default)s)",
+        )
+        parser.add_argument("target", type=str)
+
     def handle(self, **options):
-        today = dt.date.today()
-        date_range = [dt.date(today.year, 1, 1), dt.date(today.year, 12, 31)]
+        date_range = [dt.date(options["year"], 1, 1), dt.date(options["year"], 12, 31)]
         activate("de")
 
         xlsx = WorkbenchXLSXDocument()
         with zipfile.ZipFile(
-            "invoices.zip", "w", compression=zipfile.ZIP_DEFLATED
+            options["target"], "w", compression=zipfile.ZIP_DEFLATED
         ) as zf:
             for ledger in Ledger.objects.all():
                 rows = []
