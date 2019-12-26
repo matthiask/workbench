@@ -5,7 +5,7 @@
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-lg-10 col-xl-8">
-  <h1>{{ object|h }} {% history_link object %}</h1>
+  <h1>{{ object|h }}</h1>
 
   <table class="table table-striped">
     {% for name, value in object|field_value_pairs %}
