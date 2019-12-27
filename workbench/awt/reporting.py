@@ -67,7 +67,9 @@ def full_time_equivalents_by_month():
     this_year = dt.date.today().year
     for employment in Employment.objects.all():
         percentage_factor = Decimal(employment.percentage) / 100
-        for month, days in monthly_days(employment.date_from, employment.date_until):
+        for month, days in monthly_days(  # pragma: no branch
+            employment.date_from, employment.date_until
+        ):
             if month.year > this_year:
                 break
             dpm = days_per_month(month.year)

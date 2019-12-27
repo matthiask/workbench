@@ -228,6 +228,10 @@ class StatisticsTest(TestCase):
         self.assertAlmostEqual(gh[-1]["percentage"], Decimal(33))
 
         self.client.force_login(p_green.owned_by)
+        # Also run the FTE code branch
+        p_green.owned_by.employments.create(
+            percentage=50, vacation_weeks=5, date_from=dt.date(2010, 1, 1)
+        )
         self.assertEqual(self.client.get("/report/key-data/").status_code, 200)
 
     def test_statistics(self):
