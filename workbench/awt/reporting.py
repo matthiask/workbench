@@ -62,6 +62,20 @@ def active_users(year):
     )
 
 
+def full_time_equivalents_by_month():
+    months = defaultdict(lambda: Z)
+    this_year = dt.date.today().year
+    for employment in Employment.objects.all():
+        percentage_factor = Decimal(employment.percentage) / 100
+        for month, days in monthly_days(employment.date_from, employment.date_until):
+            if month.year > this_year:
+                break
+            dpm = days_per_month(month.year)
+            partial_month_factor = Decimal(days) / dpm[month.month - 1]
+            months[month] += percentage_factor * partial_month_factor
+    return months
+
+
 def annual_working_time(year, *, users):
     absences = defaultdict(lambda: {"vacation_days": [], "other_absences": []})
     months = Months(year=year, users=users)

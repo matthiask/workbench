@@ -76,6 +76,8 @@
         <th class="text-right">{% trans 'accruals' %}</th>
         <th class="text-right"></th>
         <th class="text-right">{% trans 'gross margin' %}</th>
+        <th class="text-right">{% trans 'FTE' %}</th>
+        <th class="text-right">{% trans 'margin / FTE' %}</th>
       </tr>
     </thead>
     <tbody>
@@ -87,6 +89,8 @@
           <th></th>
           <th class="text-right">{{ year.accruals|currency }}</th>
           <th class="text-right">{{ year.gross_margin|currency }}</th>
+          <th class="text-right">{{ year.fte|stringformat:'.1f' }}</th>
+          <th class="text-right">{{ year.margin_per_fte|currency }}</th>
         </tr>
         {% for month in year.months reversed %}
         <tr>
@@ -104,10 +108,12 @@
           <td class="text-right text-muted">{{ month.accruals.accrual|currency }}</td>
           <td class="text-right">{{ month.accruals.delta|currency:1 }}</td>
           <td class="text-right">{{ month.gross_margin|currency }}</td>
+          <td class="text-right">{{ month.fte|stringformat:'.1f' }}</td>
+          <td class="text-right">{{ month.margin_per_fte|currency }}</td>
         </tr>
 
         <tr>
-          <td colspan="6" class="collapse bg-dark" id="gp{{ month.key }}">
+          <td colspan="8" class="collapse bg-dark" id="gp{{ month.key }}">
             <table class="table table-sm bg-light">
               <tr>
                 <th class="w-100">{% trans 'invoice' %}</th>
@@ -135,7 +141,7 @@
         </tr>
 
         <tr>
-          <td colspan="6" class="collapse bg-dark" id="tpc{{ month.key }}">
+          <td colspan="8" class="collapse bg-dark" id="tpc{{ month.key }}">
             <table class="table table-sm bg-light">
               {% for cost in month.third_party_costs.logged_costs %}
                 {% if forloop.first %}

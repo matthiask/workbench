@@ -6,6 +6,7 @@ from django.db import connections
 from django.db.models import Q, Sum
 
 from workbench.accruals.models import Accrual
+from workbench.awt.reporting import full_time_equivalents_by_month
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
@@ -98,23 +99,27 @@ def gross_margin_by_month(date_range):
     gross = gross_profit_by_month(date_range)
     third = third_party_costs_by_month(date_range)
     accruals = accruals_by_month(date_range)
+    fte = full_time_equivalents_by_month()
 
     months = sorted(set(chain.from_iterable([gross, third, accruals])))
     profit = []
     for month in months:
+        date = dt.date(month[0], month[1], 1)
         row = {
             "month": month,
             "key": "%s-%s" % month,
-            "date": dt.date(month[0], month[1], 1),
+            "date": date,
             "gross_profit": gross[month],
             "third_party_costs": third[month],
             "accruals": accruals.get(month) or {"accrual": None, "delta": Z},
+            "fte": fte.get(date, Z),
         }
         row["gross_margin"] = (
             row["gross_profit"]["total_excl_tax"]
             + row["third_party_costs"]["third_party_costs"]
             + row["accruals"]["delta"]
         )
+        row["margin_per_fte"] = row["gross_margin"] / row["fte"] if row["fte"] else None
         profit.append(row)
 
     return profit

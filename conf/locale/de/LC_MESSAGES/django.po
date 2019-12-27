@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-26 23:14+0100\n"
+"POT-Creation-Date: 2019-12-27 12:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -387,8 +387,12 @@ msgstr "Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."
 
 #: workbench/awt/views.py
 #, python-format
-msgid "Target time for %s not found."
-msgstr "Sollzeit für %s nicht gefunden."
+msgid ""
+"No annual working time defined for user %(user)s with working time model "
+"%(working_time_model)s."
+msgstr ""
+"Keine Jahresarbeitszeit definiert für Benutzer %(user)s mit "
+"Arbeitszeitmodell %(working_time_model)s."
 
 #: workbench/circles/models.py
 msgid "circle"
@@ -2115,6 +2119,14 @@ msgstr "Umsatz"
 msgid "gross margin"
 msgstr "Umsatz bereinigt"
 
+#: workbench/templates/reporting/key_data.html
+msgid "FTE"
+msgstr "FTE"
+
+#: workbench/templates/reporting/key_data.html
+msgid "margin / FTE"
+msgstr "Umsatz / FTE"
+
 #: workbench/templates/reporting/key_data.html workbench/tools/pdf.py
 msgid "date"
 msgstr "Datum"
@@ -2330,3 +2342,6 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Target time for %s not found."
+#~ msgstr "Sollzeit für %s nicht gefunden."

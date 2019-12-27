@@ -102,6 +102,8 @@ def key_data_view(request):
                 "third_party_costs": Z,
                 "accruals": Z,
                 "gross_margin": Z,
+                "fte": [],
+                "margin_per_fte": [],
                 "months": [],
             }
 
@@ -110,6 +112,13 @@ def key_data_view(request):
         year["third_party_costs"] += month["third_party_costs"]["third_party_costs"]
         year["accruals"] += month["accruals"]["delta"]
         year["gross_margin"] += month["gross_margin"]
+        year["fte"].append(month["fte"])
+
+    for year in gross_margin_by_years.values():
+        year["fte"] = sum(year["fte"]) / len(year["fte"])
+        year["margin_per_fte"] = (
+            year["gross_margin"] / year["fte"] if year["fte"] else None
+        )
 
     gh = [
         row
