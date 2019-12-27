@@ -37,7 +37,7 @@ class Months(dict):
         year = self.year_for_user(key)
         self[key] = value = {
             "year": year,
-            "months": [dt.date(self.year, i, 1) for i in range(1, 13)],
+            "months": [dt.date(year.year, i, 1) for i in range(1, 13)],
             "target_days": year.months,
             "percentage": [Z for i in range(12)],
             "available_vacation_days": [Z for i in range(12)],
