@@ -291,12 +291,7 @@ class ProjectBudgetStatisticsForm(Form):
             queryset = queryset.filter(type=Project.INTERNAL)
         else:
             queryset = queryset.exclude(type=Project.INTERNAL)
-        if data.get("owned_by") == -1:
-            queryset = queryset.filter(owned_by=self.request.user)
-        elif data.get("owned_by") == 0:
-            queryset = queryset.filter(owned_by__is_active=False)
-        elif data.get("owned_by"):
-            queryset = queryset.filter(owned_by=data.get("owned_by"))
+        queryset = self.apply_owned_by(queryset)
         return queryset.select_related("owned_by")
 
 

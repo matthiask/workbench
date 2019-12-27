@@ -88,17 +88,9 @@ class ProjectSearchForm(Form):
             queryset = queryset.old_projects()
         elif data.get("s") == "invalid-customer-contact-combination":
             queryset = queryset.invalid_customer_contact_combination()
-        if data.get("org"):
-            queryset = queryset.filter(customer=data.get("org"))
-        if data.get("type"):
-            queryset = queryset.filter(type=data.get("type"))
-        if data.get("owned_by") == -1:
-            queryset = queryset.filter(owned_by=self.request.user)
-        elif data.get("owned_by") == 0:
-            queryset = queryset.filter(owned_by__is_active=False)
-        elif data.get("owned_by"):
-            queryset = queryset.filter(owned_by=data.get("owned_by"))
-
+        queryset = self.apply_renamed(queryset, "org", "customer")
+        queryset = self.apply_simple(queryset, "type")
+        queryset = self.apply_owned_by(queryset)
         return queryset.select_related("customer", "contact__organization", "owned_by")
 
 

@@ -68,15 +68,8 @@ class InvoiceSearchForm(Form):
             queryset = queryset.overdue().order_by("due_on", "id")
         elif data.get("s"):
             queryset = queryset.filter(status=data.get("s"))
-        if data.get("org"):
-            queryset = queryset.filter(customer=data.get("org"))
-        if data.get("owned_by") == -1:
-            queryset = queryset.filter(owned_by=self.request.user)
-        elif data.get("owned_by") == 0:
-            queryset = queryset.filter(owned_by__is_active=False)
-        elif data.get("owned_by"):
-            queryset = queryset.filter(owned_by=data.get("owned_by"))
-
+        queryset = self.apply_renamed(queryset, "org", "customer")
+        queryset = self.apply_owned_by(queryset)
         return queryset.select_related(
             "customer", "contact__organization", "owned_by", "project__owned_by"
         )
@@ -607,15 +600,8 @@ class RecurringInvoiceSearchForm(Form):
             queryset = queryset.filter(
                 Q(ends_on__isnull=False) & Q(ends_on__lt=dt.date.today())
             )
-        if data.get("org"):
-            queryset = queryset.filter(customer=data.get("org"))
-        if data.get("owned_by") == -1:
-            queryset = queryset.filter(owned_by=self.request.user)
-        elif data.get("owned_by") == 0:
-            queryset = queryset.filter(owned_by__is_active=False)
-        elif data.get("owned_by"):
-            queryset = queryset.filter(owned_by=data.get("owned_by"))
-
+        queryset = self.apply_renamed(queryset, "org", "customer")
+        queryset = self.apply_owned_by(queryset)
         return queryset.select_related("customer", "contact__organization", "owned_by")
 
 

@@ -58,15 +58,8 @@ class OfferSearchForm(Form):
             queryset = queryset.filter(
                 status__lte=Offer.OFFERED, project__closed_on__isnull=True
             )
-        if data.get("org"):
-            queryset = queryset.filter(project__customer=data.get("org"))
-        if data.get("owned_by") == -1:
-            queryset = queryset.filter(owned_by=self.request.user)
-        elif data.get("owned_by") == 0:
-            queryset = queryset.filter(owned_by__is_active=False)
-        elif data.get("owned_by"):
-            queryset = queryset.filter(owned_by=data.get("owned_by"))
-
+        queryset = self.apply_renamed(queryset, "org", "project__customer")
+        queryset = self.apply_owned_by(queryset)
         return queryset.select_related(
             "owned_by",
             "project__owned_by",

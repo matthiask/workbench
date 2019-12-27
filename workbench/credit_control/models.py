@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from workbench.credit_control import parsers
@@ -34,7 +35,11 @@ class Ledger(Model):
 
 
 class CreditEntryQuerySet(SearchQuerySet):
-    pass
+    def pending(self):
+        return self.filter(Q(invoice__isnull=True) & Q(notes=""))
+
+    def processed(self):
+        return self.filter(~Q(invoice__isnull=True) | ~Q(notes=""))
 
 
 @model_urls

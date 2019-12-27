@@ -37,11 +37,7 @@ class OrganizationSearchForm(Form):
     )
 
     def filter(self, queryset):
-        data = self.cleaned_data
-
-        if data.get("g"):
-            queryset = queryset.filter(groups=data.get("g"))
-        return queryset
+        return self.apply_renamed(queryset, "g", "groups")
 
 
 class PersonSearchForm(Form):
@@ -61,11 +57,7 @@ class PersonSearchForm(Form):
     )
 
     def filter(self, queryset):
-        data = self.cleaned_data
-
-        if data.get("g"):
-            queryset = queryset.filter(groups=data.get("g"))
-        return queryset
+        return self.apply_renamed(queryset, "g", "groups")
 
     def response(self, request, queryset):
         if request.GET.get("xlsx"):

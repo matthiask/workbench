@@ -27,14 +27,7 @@ class AccrualFilterForm(Form):
         )
 
     def filter(self, queryset):
-        data = self.cleaned_data
-        if data.get("owned_by") == -1:
-            queryset = queryset.filter(invoice__project__owned_by=self.request.user)
-        elif data.get("owned_by") == 0:
-            queryset = queryset.filter(invoice__project__owned_by__is_active=False)
-        elif data.get("owned_by"):
-            queryset = queryset.filter(invoice__project__owned_by=data.get("owned_by"))
-        return queryset
+        return self.apply_owned_by(queryset, attribute="invoice__project__owned_by")
 
 
 class CutoffDateDetailView(generic.DetailView):

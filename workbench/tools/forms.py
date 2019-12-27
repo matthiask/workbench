@@ -141,6 +141,28 @@ class Form(forms.Form):
         self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
 
+    def apply_simple(self, queryset, *fields):
+        data = self.cleaned_data
+        for field, value in ((field, data.get(field)) for field in fields):
+            if value:
+                queryset = queryset.filter(**{field: value})
+        return queryset
+
+    def apply_renamed(self, queryset, param, field):
+        value = self.cleaned_data.get(param)
+        if value:
+            return queryset.filter(**{field: value})
+        return queryset
+
+    def apply_owned_by(self, queryset, *, attribute="owned_by"):
+        value = self.cleaned_data.get("owned_by")
+        if value == 0:
+            return queryset.filter(**{"{}__is_active".format(attribute): False})
+        elif value:
+            user = self.request.user if value == -1 else value
+            return queryset.filter(**{attribute: user})
+        return queryset
+
 
 class ModelForm(WarningsForm, forms.ModelForm):
     user_fields = ()

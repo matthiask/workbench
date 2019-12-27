@@ -3,7 +3,6 @@ import json
 import re
 
 from django import forms
-from django.db.models import Q
 from django.utils.html import format_html, mark_safe
 from django.utils.translation import gettext, gettext_lazy as _
 
@@ -42,11 +41,10 @@ class CreditEntrySearchForm(Form):
     def filter(self, queryset):
         data = self.cleaned_data
         if data.get("s") == "pending":
-            queryset = queryset.filter(Q(invoice__isnull=True) & Q(notes=""))
+            queryset = queryset.pending()
         elif data.get("s") == "processed":
-            queryset = queryset.filter(~Q(invoice__isnull=True) | ~Q(notes=""))
-        if data.get("ledger"):
-            queryset = queryset.filter(ledger=data["ledger"])
+            queryset = queryset.processed()
+        queryset = self.apply_simple(queryset, "ledger")
         return queryset.select_related(
             "invoice__project", "invoice__owned_by", "ledger"
         )
