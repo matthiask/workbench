@@ -34,28 +34,20 @@ class Months(dict):
         except KeyError:
             pass
 
-        try:
-            year = self.year_for_user(key)
-        except KeyError:
-            year = None
-
-        self[key] = value = (
-            {
-                "year": year,
-                "months": [dt.date(self.year, i, 1) for i in range(1, 13)],
-                "target_days": year.months,
-                "percentage": [Z for i in range(12)],
-                "available_vacation_days": [Z for i in range(12)],
-                "vacation_days": [Z for i in range(12)],
-                "vacation_days_correction": [Z for i in range(12)],
-                "other_absences": [Z for i in range(12)],
-                "target": [Z for i in range(12)],
-                "hours": [Z for i in range(12)],
-                "employments": OrderedSet(),
-            }
-            if year
-            else {"year": None}
-        )
+        year = self.year_for_user(key)
+        self[key] = value = {
+            "year": year,
+            "months": [dt.date(self.year, i, 1) for i in range(1, 13)],
+            "target_days": year.months,
+            "percentage": [Z for i in range(12)],
+            "available_vacation_days": [Z for i in range(12)],
+            "vacation_days": [Z for i in range(12)],
+            "vacation_days_correction": [Z for i in range(12)],
+            "other_absences": [Z for i in range(12)],
+            "target": [Z for i in range(12)],
+            "hours": [Z for i in range(12)],
+            "employments": OrderedSet(),
+        }
         return value
 
     def year_for_user(self, user_id):
