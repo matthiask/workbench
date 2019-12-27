@@ -92,7 +92,7 @@ class ProjectSearchForm(Form):
             queryset = queryset.filter(customer=data.get("org"))
         if data.get("type"):
             queryset = queryset.filter(type=data.get("type"))
-        elif data.get("owned_by") == -1:
+        if data.get("owned_by") == -1:
             queryset = queryset.filter(owned_by=self.request.user)
         elif data.get("owned_by") == 0:
             queryset = queryset.filter(owned_by__is_active=False)
