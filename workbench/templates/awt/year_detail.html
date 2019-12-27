@@ -12,7 +12,7 @@
     <ul class="nav nav-tabs my-3">
       {% for y in years %}
       <li class="nav-item">
-        <a class="nav-link {% if y == view.year %}active{% endif %}"
+        <a class="nav-link {% if y == year %}active{% endif %}"
           href="?year={{ y }}">{{ y }}</a>
       </li>
       {% endfor %}

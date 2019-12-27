@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from workbench.accounts.features import FEATURES, controlling_only, feature_required
-from workbench.awt.views import ReportView
+from workbench.awt.views import annual_working_time_view
 from workbench.circles.reporting import hours_by_circle
 from workbench.projects.reporting import hours_per_customer
 from workbench.reporting.views import (
@@ -15,7 +15,7 @@ from workbench.reporting.views import (
 
 
 urlpatterns = [
-    url(r"^annual-working-time/$", ReportView.as_view(), name="awt_year_report"),
+    url(r"^annual-working-time/$", annual_working_time_view, name="awt_year_report"),
     url(
         r"^overdrawn-projects/$",
         controlling_only(overdrawn_projects_view),

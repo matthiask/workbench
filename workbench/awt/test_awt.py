@@ -15,12 +15,8 @@ class AWTTest(TestCase):
     def test_redirect(self):
         user = factories.UserFactory.create()
         self.client.force_login(user)
-        response = self.client.get("/report/annual-working-time/")
-        self.assertRedirects(response, "/")
-
-        factories.YearFactory.create(working_time_model=user.working_time_model)
-        response = self.client.get("/report/annual-working-time/")
-        self.assertEqual(response.status_code, 200)
+        response = self.client.get("/report/annual-working-time/?year=asdf")
+        self.assertRedirects(response, "/report/annual-working-time/")
 
     def test_absences_list(self):
         user = factories.UserFactory.create()
@@ -104,7 +100,7 @@ class AWTTest(TestCase):
         self.assertEqual(employments[1].date_until, dt.date(2018, 9, 30))
         self.assertEqual(employments[2].date_until, dt.date(9999, 12, 31))
 
-        awt = annual_working_time(year.year, users=[user])[0]
+        awt = annual_working_time(year.year, users=[user])["statistics"][0]
 
         self.assertAlmostEqual(awt["totals"]["target_days"], Decimal("360"))
         self.assertAlmostEqual(awt["totals"]["percentage"], Decimal("85"))
@@ -205,14 +201,16 @@ class AWTTest(TestCase):
 
     def test_report_view(self):
         year = factories.YearFactory.create()
-        user = factories.UserFactory.create(working_time_model=year.working_time_model)
+        user = factories.UserFactory.create(
+            _full_name="Fritz", working_time_model=year.working_time_model
+        )
         inactive = factories.UserFactory.create(
             working_time_model=year.working_time_model
         )
         Employment.objects.create(user=user, percentage=50, vacation_weeks=5)
 
         # New user has a different working time model...
-        self.client.force_login(factories.UserFactory.create())
+        self.client.force_login(factories.UserFactory.create(_full_name="Hans"))
 
         url = "/report/annual-working-time/"
         response = self.client.get(url)
@@ -227,8 +225,13 @@ class AWTTest(TestCase):
         self.assertContains(response, str(inactive))
 
         response = self.client.get(url + "?year=2018")
-        self.assertRedirects(response, "/")
-        self.assertEqual(messages(response), ["Target time for 2018 not found."])
+        self.assertEqual(
+            messages(response),
+            [
+                "No annual working time defined for user Hans"
+                " with working time model Test."
+            ],
+        )
 
     def test_non_ajax_redirect(self):
         user = factories.UserFactory.create()

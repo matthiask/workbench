@@ -21,6 +21,12 @@ class Months(dict):
         }
         self.users = users
         self.users_to_wtm = {user.id: user.working_time_model_id for user in users}
+        self.users_with_wtm = [
+            user for user in users if self.year_by_wtm.get(self.users_to_wtm[user.id])
+        ]
+        self.users_without_wtm = [
+            user for user in users if user not in self.users_with_wtm
+        ]
 
     def __getitem__(self, key):
         try:
@@ -70,14 +76,14 @@ def annual_working_time(year, *, users):
     vacation_days_credit = defaultdict(lambda: Z)
     dpm = days_per_month(year)
 
-    for employment in Employment.objects.filter(user__in=users).order_by("-date_from"):
+    for employment in Employment.objects.filter(
+        user__in=months.users_with_wtm
+    ).order_by("-date_from"):
         percentage_factor = Decimal(employment.percentage) / 100
         available_vacation_days_per_month = (
             Decimal(employment.vacation_weeks) * 5 / 12 * percentage_factor
         )
         month_data = months[employment.user_id]
-        if not month_data["year"]:
-            continue
 
         for month, days in monthly_days(employment.date_from, employment.date_until):
             if month.year < year:
@@ -101,16 +107,13 @@ def annual_working_time(year, *, users):
 
     for row in (
         LoggedHours.objects.order_by()
-        .filter(rendered_by__in=users, rendered_on__year=year)
+        .filter(rendered_by__in=months.users_with_wtm, rendered_on__year=year)
         .values("rendered_by")
         .annotate(month=ExtractMonth("rendered_on"))
         .values("rendered_by", "month")
         .annotate(Sum("hours"))
     ):
         month_data = months[row["rendered_by"]]
-        if not month_data["year"]:
-            continue
-
         month_data["hours"][row["month"] - 1] += row["hours__sum"]
 
     remaining = {
@@ -118,12 +121,9 @@ def annual_working_time(year, *, users):
         for user, month_data in months.items()
     }
     for absence in Absence.objects.filter(
-        user__in=users, starts_on__year=year
+        user__in=months.users_with_wtm, starts_on__year=year
     ).order_by("starts_on"):
         month_data = months[absence.user_id]
-        if not month_data["year"]:
-            continue
-
         key = "vacation_days" if absence.is_vacation else "other_absences"
         month_data[key][absence.starts_on.month - 1] += absence.days
         absences[absence.user_id][key].append(absence)
@@ -167,11 +167,8 @@ def annual_working_time(year, *, users):
         return sums
 
     statistics = []
-    for user in users:
+    for user in months.users_with_wtm:
         month_data = months[user.id]
-        if not month_data["year"]:
-            continue
-
         sums = monthly_sums(month_data)
         at = absences_time(month_data)
         wt = working_time(month_data)
@@ -209,4 +206,4 @@ def annual_working_time(year, *, users):
             }
         )
 
-    return statistics
+    return {"months": months, "statistics": statistics}
