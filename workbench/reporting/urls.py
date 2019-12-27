@@ -7,6 +7,8 @@ from workbench.projects.reporting import hours_per_customer
 from workbench.reporting.views import (
     green_hours_view,
     hours_filter_view,
+    key_data_gross_profit,
+    key_data_third_party_costs,
     key_data_view,
     open_items_list,
     overdrawn_projects_view,
@@ -27,6 +29,14 @@ urlpatterns = [
         name="report_open_items_list",
     ),
     url(r"^key-data/$", controlling_only(key_data_view), name="report_key_data"),
+    url(
+        r"^key-data/gross-profit/(?P<year>[0-9]{4})\.(?P<month>[0-9]{1,2})/$",
+        controlling_only(key_data_gross_profit),
+    ),
+    url(
+        r"^key-data/third-party-costs/(?P<year>[0-9]{4})\.(?P<month>[0-9]{1,2})/$",
+        controlling_only(key_data_third_party_costs),
+    ),
     url(
         r"^hours-per-customer/$",
         hours_filter_view,

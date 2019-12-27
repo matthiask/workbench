@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.invoices.models import Invoice
 from workbench.invoices.utils import next_valid_day
+from workbench.logbook.models import LoggedCost
 from workbench.projects.models import Project
 from workbench.projects.reporting import overdrawn_projects, project_budget_statistics
 from workbench.reporting import green_hours, key_data
@@ -79,12 +80,60 @@ def open_items_list(request, form):
     )
 
 
+def key_data_details(fn):
+    def view(request, year, month):
+        year = int(year)
+        month = int(month)
+        date_range = [dt.date(year, month, 1)]
+        date_range.append(next_valid_day(year, month + 1, 1) - dt.timedelta(days=1))
+        return fn(request, date_range)
+
+    return view
+
+
+@key_data_details
+def key_data_gross_profit(request, date_range):
+    return render(
+        request,
+        "reporting/key_data_gross_profit.html",
+        {
+            "date_range": date_range,
+            "invoices": Invoice.objects.valid()
+            .filter(invoiced_on__range=date_range)
+            .order_by("invoiced_on", "id")
+            .select_related("project", "owned_by"),
+        },
+    )
+
+
+@key_data_details
+def key_data_third_party_costs(request, date_range):
+    return render(
+        request,
+        "reporting/key_data_third_party_costs.html",
+        {
+            "date_range": date_range,
+            "third_party_costs": LoggedCost.objects.filter(
+                rendered_on__range=date_range,
+                third_party_costs__isnull=False,
+                invoice_service__isnull=True,
+            )
+            .order_by("rendered_on", "id")
+            .select_related("service"),
+            "invoices": Invoice.objects.valid()
+            .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z))
+            .order_by("invoiced_on", "id")
+            .select_related("project", "owned_by"),
+        },
+    )
+
+
 def key_data_view(request):
     today = dt.date.today()
     this_months_end = next_valid_day(today.year, today.month + 1, 1) - dt.timedelta(
         days=1
     )
-    date_range = [dt.date(this_months_end.year - 2, 1, 1), this_months_end]
+    date_range = [dt.date(this_months_end.year - 3, 1, 1), this_months_end]
 
     gross_margin_by_month = key_data.gross_margin_by_month(date_range)
     gross_margin_months = {
@@ -108,8 +157,8 @@ def key_data_view(request):
             }
 
         year["months"].append(month)
-        year["gross_profit"] += month["gross_profit"]["total_excl_tax"]
-        year["third_party_costs"] += month["third_party_costs"]["third_party_costs"]
+        year["gross_profit"] += month["gross_profit"]
+        year["third_party_costs"] += month["third_party_costs"]
         year["accruals"] += month["accruals"]["delta"]
         year["gross_margin"] += month["gross_margin"]
         year["fte"].append(month["fte"])
@@ -154,7 +203,7 @@ def key_data_view(request):
             "gross_margin_by_month": gross_margin_by_month,
             "invoiced_corrected": [
                 (year, [gross_margin_months.get((year, i), Z) for i in range(1, 13)])
-                for year in range(this_months_end.year - 2, this_months_end.year + 1)
+                for year in range(date_range[0].year, date_range[1].year + 1)
             ],
             "green_hours": yearly_headline(gh),
             "hours_distribution": {

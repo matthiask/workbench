@@ -233,6 +233,13 @@ class StatisticsTest(TestCase):
             percentage=50, vacation_weeks=5, date_from=dt.date(2010, 1, 1)
         )
         self.assertEqual(self.client.get("/report/key-data/").status_code, 200)
+        self.assertEqual(
+            self.client.get("/report/key-data/gross-profit/2019.01/").status_code, 200
+        )
+        self.assertEqual(
+            self.client.get("/report/key-data/third-party-costs/2019.01/").status_code,
+            200,
+        )
 
     def test_statistics(self):
         hours = factories.LoggedHoursFactory.create()

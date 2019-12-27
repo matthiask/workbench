@@ -1,0 +1,58 @@
+{% extends "modal.html" %}
+
+{% load i18n workbench %}
+
+{% block size %}modal-xl{% endblock %}
+
+{% block title %}{% trans 'third party costs' %} {{ date_range.0|date:'F Y' }}{% endblock %}
+
+{% block body %}
+<table class="table table-sm bg-light">
+  {% for cost in logged_costs %}
+    {% if forloop.first %}
+      <tr>
+        <th class="w-100">{% trans 'logged cost' %}</th>
+        <th></th>
+        <th class="text-nowrap">{% trans 'date' %}</th>
+        <th></th>
+        <th class="text-nowrap text-right">{% trans 'third party costs' %}</th>
+      </tr>
+    {% endif %}
+    <tr>
+      <td>
+        <a data-toggle="ajaxmodal" href="{{ cost.get_absolute_url }}">
+          {{ cost.service }}: {{ cost }}
+        </a>
+      </td>
+      <td></td>
+      <td>{{ cost.rendered_on|local_date_format }}</td>
+      <td></td>
+      <td class="text-right">{{ cost.third_party_costs|currency }}</td>
+    </tr>
+  {% endfor %}
+
+  {% for invoice in invoices %}
+    {% if forloop.first %}
+      <tr>
+        <th class="w-100">{% trans 'invoice' %}</th>
+        <th class="text-nowrap">{% trans 'type' %}</th>
+        <th class="text-nowrap">{% trans 'date' %}</th>
+        <th class="text-nowrap">{% trans 'total excl. tax' %}</th>
+        <th class="text-nowrap text-right">{% trans 'third party costs' %}</th>
+      </tr>
+    {% endif %}
+    <tr>
+      <td>
+        <a href="{{ invoice.get_absolute_url }}">
+          {{ invoice|h }}
+          {{ invoice.status_badge }}
+        </a>
+      </td>
+      <td>{{ invoice.get_type_display }}</td>
+      <td>{{ invoice.invoiced_on|local_date_format }}</td>
+      <td class="text-right">{{ invoice.total_excl_tax|currency }}</td></td>
+      <td class="text-right">{{ invoice.third_party_costs|currency }}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}
