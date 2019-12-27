@@ -6,6 +6,7 @@ from django.db.models import Sum
 from django.db.models.functions import ExtractMonth
 from django.utils.datastructures import OrderedSet
 
+from workbench.accounts.models import User
 from workbench.awt.models import Absence, Employment, Year
 from workbench.awt.utils import days_per_month, monthly_days
 from workbench.logbook.models import LoggedHours
@@ -53,6 +54,14 @@ class Months(dict):
 
     def year_for_user(self, user_id):
         return self.year_by_wtm[self.users_to_wtm[user_id]]
+
+
+def active_users(year):
+    return User.objects.filter(
+        id__in=Employment.objects.filter(
+            date_from__lte=dt.date(year, 12, 31), date_until__gte=dt.date(year, 1, 1),
+        ).values("user")
+    )
 
 
 def annual_working_time(year, *, users):

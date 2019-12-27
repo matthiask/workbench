@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from workbench import factories
 from workbench.awt.models import Absence, Employment
-from workbench.awt.reporting import annual_working_time
+from workbench.awt.reporting import active_users, annual_working_time
 from workbench.awt.utils import monthly_days
 from workbench.tools.testing import messages
 
@@ -195,13 +195,13 @@ class AWTTest(TestCase):
         self.assertEqual(employment.date_until, dt.date.max)
         self.assertEqual(str(employment), "since 01.01.2018")
 
-        self.assertEqual(list(year.active_users()), [user])
+        self.assertEqual(list(active_users(year.year)), [user])
 
         employment.date_until = dt.date(2018, 6, 30)
         employment.save()
         self.assertEqual(str(employment), "01.01.2018 - 30.06.2018")
 
-        self.assertEqual(list(year.active_users()), [])
+        self.assertEqual(list(active_users(year.year)), [])
 
     def test_report_view(self):
         year = factories.YearFactory.create()

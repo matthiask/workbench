@@ -8,7 +8,7 @@ from workbench import generic
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.awt.models import Year
-from workbench.awt.reporting import annual_working_time
+from workbench.awt.reporting import active_users, annual_working_time
 
 
 class ReportView(generic.DetailView):
@@ -28,7 +28,7 @@ class ReportView(generic.DetailView):
         param = self.request.GET.get("user")
         users = None
         if param == "active" and self.request.user.features[FEATURES.CONTROLLING]:
-            users = self.object.active_users()
+            users = active_users(self.year)
         elif param and param != "active":
             users = User.objects.filter(id=param)
         if not users:
