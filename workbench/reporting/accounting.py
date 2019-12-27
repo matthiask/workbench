@@ -2,6 +2,7 @@ import datetime as dt
 import io
 
 from django.core.mail import EmailMessage
+from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
 from workbench.accruals.models import Accrual
@@ -27,7 +28,7 @@ def send_accounting_files():
     xlsx.accruals(Accrual.objects.filter(cutoff_date=today - dt.timedelta(days=1)))
 
     mail = EmailMessage(
-        "Accounting files",
+        _("Accounting files"),
         to=list(
             User.objects.filter(is_active=True, is_admin=True).values_list(
                 "email", flat=True
@@ -39,6 +40,6 @@ def send_accounting_files():
         mail.attach(
             "accounting.xlsx",
             buf.getvalue(),
-            "application/vnd.openxmlformats-officedocument." "spreadsheetml.sheet",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
     mail.send()

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-27 21:41+0100\n"
+"POT-Creation-Date: 2019-12-28 00:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -784,6 +784,27 @@ msgid "expenses"
 msgstr "Spesen"
 
 #: workbench/expenses/forms.py workbench/projects/forms.py
+msgid "All"
+msgstr "Alle"
+
+#: workbench/expenses/forms.py workbench/expenses/views.py
+#: workbench/invoices/models.py workbench/offers/models.py
+#: workbench/projects/forms.py workbench/templates/invoices/invoice_detail.html
+msgid "status"
+msgstr "Status"
+
+#: workbench/expenses/forms.py workbench/expenses/models.py
+#: workbench/expenses/views.py workbench/invoices/models.py
+#: workbench/offers/models.py workbench/templates/start.html
+msgid "In preparation"
+msgstr "In Vorbereitung"
+
+#: workbench/expenses/forms.py workbench/invoices/forms.py
+#: workbench/projects/forms.py
+msgid "Closed"
+msgstr "Abgeschlossen"
+
+#: workbench/expenses/forms.py workbench/projects/forms.py
 msgid "is closed"
 msgstr "Ist geschlossen"
 
@@ -845,12 +866,6 @@ msgstr "Kann eine geschlossene Spesenabrechnung nicht mehr löschen."
 msgid "closed on %s"
 msgstr "geschlossen am %s"
 
-#: workbench/expenses/models.py workbench/expenses/views.py
-#: workbench/invoices/models.py workbench/offers/models.py
-#: workbench/templates/start.html
-msgid "In preparation"
-msgstr "In Vorbereitung"
-
 #: workbench/expenses/models.py
 msgid "day"
 msgstr "Tag"
@@ -866,12 +881,6 @@ msgstr "Wechselkurse"
 #: workbench/expenses/views.py workbench/templates/generic/object_list.html
 msgid "of"
 msgstr "von"
-
-#: workbench/expenses/views.py workbench/invoices/models.py
-#: workbench/offers/models.py workbench/projects/forms.py
-#: workbench/templates/invoices/invoice_detail.html
-msgid "status"
-msgstr "Status"
 
 #: workbench/expenses/views.py
 msgid "receipt"
@@ -1030,10 +1039,6 @@ msgstr ""
 #: workbench/invoices/forms.py workbench/projects/forms.py
 msgid "Optional, but useful for quickly filling the fields below."
 msgstr "Optional, aber nützlich um Felder unten rasch zu füllen."
-
-#: workbench/invoices/forms.py workbench/projects/forms.py
-msgid "Closed"
-msgstr "Abgeschlossen"
 
 #: workbench/invoices/models.py
 msgid "Sent"
@@ -1506,10 +1511,6 @@ msgid "projects"
 msgstr "Projekte"
 
 #: workbench/projects/forms.py
-msgid "All"
-msgstr "Alle"
-
-#: workbench/projects/forms.py
 msgid "defined search"
 msgstr "Definierte Suche"
 
@@ -1622,6 +1623,10 @@ msgstr "Logbucheinträge von %(instance)s neu zuweisen"
 #: workbench/projects/views.py workbench/templates/shortcuts.html
 msgid "Jump to project"
 msgstr "Zu Projekt springen"
+
+#: workbench/reporting/accounting.py
+msgid "Accounting files"
+msgstr "Buchhaltungsdaten"
 
 #: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data.html
