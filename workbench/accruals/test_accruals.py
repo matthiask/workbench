@@ -142,7 +142,7 @@ class AccrualsTest(TestCase):
             [dt.date(2018, 1, 1), dt.date(2019, 2, 28)]
         )
         self.assertEqual(len(invoiced), 1)
-        self.assertEqual(invoiced[(2018, 12)]["total_excl_tax"], Decimal(200))
+        self.assertEqual(invoiced[(2018, 12)], Decimal(200))
 
         invoiced = key_data.gross_margin_by_month(
             [dt.date(2018, 1, 1), dt.date(2019, 2, 28)]
