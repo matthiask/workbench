@@ -117,19 +117,6 @@ class HistoryTest(TestCase):
         response = self.client.get("/history/not_exists/id/3/")
         self.assertEqual(response.status_code, 404)
 
-    def test_invoices_invisible_without_controlling(self):
-        invoice = factories.InvoiceFactory.create()
-        self.client.force_login(invoice.owned_by)
-        url = "/history/invoices_invoice/id/{}/".format(invoice.pk)
-
-        with override_settings(FEATURES={"controlling": True}):
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-
-        with override_settings(FEATURES={"controlling": False}):
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 404)
-
     def test_offer_total_visibility(self):
         offer = factories.OfferFactory.create()
         self.client.force_login(offer.owned_by)
@@ -142,3 +129,37 @@ class HistoryTest(TestCase):
         with override_settings(FEATURES={"controlling": False}):
             response = self.client.get(url)
             self.assertNotContains(response, "'Total'")
+
+    def assert_404_without_controlling(self, url):
+        with override_settings(FEATURES={"controlling": True}):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+
+        with override_settings(FEATURES={"controlling": False}):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 404)
+
+    def test_credit_entry_visibility(self):
+        self.client.force_login(factories.UserFactory.create())
+        entry = factories.CreditEntryFactory.create()
+        url = "/history/credit_control_creditentry/id/{}/".format(entry.pk)
+        self.assert_404_without_controlling(url)
+
+    def test_invoice_visibility(self):
+        invoice = factories.InvoiceFactory.create()
+        self.client.force_login(invoice.owned_by)
+        url = "/history/invoices_invoice/id/{}/".format(invoice.pk)
+        self.assert_404_without_controlling(url)
+
+    def test_invoice_service_visibility(self):
+        invoice = factories.InvoiceFactory.create()
+        self.client.force_login(invoice.owned_by)
+        service = invoice.services.create()
+        url = "/history/invoices_service/id/{}/".format(service.pk)
+        self.assert_404_without_controlling(url)
+
+    def test_recurring_invoice_visibility(self):
+        invoice = factories.RecurringInvoiceFactory.create()
+        self.client.force_login(invoice.owned_by)
+        url = "/history/invoices_recurringinvoice/id/{}/".format(invoice.pk)
+        self.assert_404_without_controlling(url)
