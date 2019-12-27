@@ -189,7 +189,7 @@ WORKBENCH = {
         },
         URL="https://workbench.feinheit.ch",
         FEATURES={
-            "book_keeping": {"mk@feinheit.ch", "mgi@feinheit.ch"},
+            "bookkeeping": {"mk@feinheit.ch", "mgi@feinheit.ch"},
             "controlling": True,
             "foreign_currencies": False,
             "glassfrog": True,
@@ -223,7 +223,7 @@ WORKBENCH = {
         },
         URL="https://workbench.diebruchpiloten.com",
         FEATURES={
-            "book_keeping": True,
+            "bookkeeping": True,
             "controlling": True,
             "foreign_currencies": False,
             "glassfrog": False,
@@ -258,7 +258,7 @@ WORKBENCH = {
         },
         URL="https://workbench.blindflugstudios.com",
         FEATURES={
-            "book_keeping": False,
+            "bookkeeping": False,
             "controlling": False,
             "foreign_currencies": True,
             "glassfrog": False,
@@ -290,7 +290,7 @@ WORKBENCH = {
         },
         URL="https://workbench-test.feinheit.ch",
         FEATURES={
-            "book_keeping": True,
+            "bookkeeping": True,
             "controlling": True,
             "foreign_currencies": True,
             "glassfrog": False,

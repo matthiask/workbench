@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from workbench import generic
-from workbench.accounts.features import book_keeping_only
+from workbench.accounts.features import bookkeeping_only
 from workbench.credit_control.forms import (
     AccountStatementUploadForm,
     CreditEntryForm,
@@ -29,7 +29,7 @@ urlpatterns = [
     ),
     url(
         r"^create/$",
-        book_keeping_only(
+        bookkeeping_only(
             generic.CreateView.as_view(
                 model=CreditEntry,
                 form_class=CreditEntryForm,
@@ -40,7 +40,7 @@ urlpatterns = [
     ),
     url(
         r"^upload/$",
-        book_keeping_only(
+        bookkeeping_only(
             AccountStatementUploadView.as_view(
                 model=CreditEntry,
                 form_class=AccountStatementUploadForm,
@@ -51,19 +51,19 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/update/$",
-        book_keeping_only(
+        bookkeeping_only(
             generic.UpdateView.as_view(model=CreditEntry, form_class=CreditEntryForm)
         ),
         name="credit_control_creditentry_update",
     ),
     url(
         r"^(?P<pk>\d+)/delete/$",
-        book_keeping_only(generic.DeleteView.as_view(model=CreditEntry)),
+        bookkeeping_only(generic.DeleteView.as_view(model=CreditEntry)),
         name="credit_control_creditentry_delete",
     ),
     url(
         r"^assign/$",
-        book_keeping_only(AssignCreditEntriesView.as_view(model=CreditEntry)),
+        bookkeeping_only(AssignCreditEntriesView.as_view(model=CreditEntry)),
         name="credit_control_creditentry_assign",
     ),
 ]
