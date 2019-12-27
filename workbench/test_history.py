@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from workbench import factories
+from workbench.accounts.features import FEATURES
 from workbench.accounts.middleware import set_user_name
 from workbench.projects.models import Project
 from workbench.tools import history
@@ -117,18 +118,48 @@ class HistoryTest(TestCase):
         response = self.client.get("/history/not_exists/id/3/")
         self.assertEqual(response.status_code, 404)
 
+    def assert_only_visible_with(self, url, text, feature):
+        with override_settings(FEATURES={feature: True}):
+            response = self.client.get(url)
+            self.assertContains(response, text)
+
+        with override_settings(FEATURES={feature: False}):
+            response = self.client.get(url)
+            self.assertNotContains(response, text)
+
     def test_offer_total_visibility(self):
         offer = factories.OfferFactory.create()
         self.client.force_login(offer.owned_by)
         url = "/history/offers_offer/id/{}/".format(offer.pk)
+        self.assert_only_visible_with(url, "'Total'", FEATURES.CONTROLLING)
 
-        with override_settings(FEATURES={"controlling": True}):
-            response = self.client.get(url)
-            self.assertContains(response, "'Total'")
+    def test_logged_cost_visibility(self):
+        cost = factories.LoggedCostFactory.create()
+        self.client.force_login(cost.rendered_by)
+        url = "/history/logbook_loggedcost/id/{}/".format(cost.pk)
+        self.assert_only_visible_with(url, "'Archived at'", FEATURES.CONTROLLING)
+        self.assert_only_visible_with(
+            url, "'Original cost'", FEATURES.FOREIGN_CURRENCIES
+        )
 
-        with override_settings(FEATURES={"controlling": False}):
-            response = self.client.get(url)
-            self.assertNotContains(response, "'Total'")
+    def test_logged_hours_visibility(self):
+        hours = factories.LoggedHoursFactory.create()
+        self.client.force_login(hours.rendered_by)
+        url = "/history/logbook_loggedhours/id/{}/".format(hours.pk)
+        self.assert_only_visible_with(url, "'Archived at'", FEATURES.CONTROLLING)
+
+    def test_project_visibility(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        url = "/history/projects_project/id/{}/".format(project.pk)
+        self.assert_only_visible_with(url, "'Flat rate'", FEATURES.CONTROLLING)
+
+    def test_project_service_visibility(self):
+        service = factories.ServiceFactory.create()
+        self.client.force_login(service.project.owned_by)
+        url = "/history/projects_service/id/{}/".format(service.pk)
+        self.assert_only_visible_with(url, "'Cost'", FEATURES.CONTROLLING)
+        self.assert_only_visible_with(url, "'Role'", FEATURES.GLASSFROG)
 
     def assert_404_without_controlling(self, url):
         with override_settings(FEATURES={"controlling": True}):
