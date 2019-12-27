@@ -15,8 +15,15 @@ def send_accounting_files():
     if (today.day, today.month) != (1, 1):
         return
 
+    projects = Project.objects.open().exclude(type=Project.INTERNAL)
     xlsx = WorkbenchXLSXDocument()
-    xlsx.project_budget_statistics(project_budget_statistics(Project.objects.open()))
+    xlsx.project_budget_statistics(
+        sorted(
+            project_budget_statistics(projects),
+            key=lambda project: project["delta"],
+            reverse=True,
+        )
+    )
     xlsx.accruals(Accrual.objects.filter(cutoff_date=today - dt.timedelta(days=1)))
 
     mail = EmailMessage(
