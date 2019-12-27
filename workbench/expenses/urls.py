@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from workbench import generic
-from workbench.expenses.forms import ExpenseReportForm
+from workbench.expenses.forms import ExpenseReportForm, ExpenseReportSearchForm
 from workbench.expenses.models import ExpenseReport
 from workbench.expenses.views import ExpenseReportPDFView, convert
 
@@ -9,7 +9,9 @@ from workbench.expenses.views import ExpenseReportPDFView, convert
 urlpatterns = [
     url(
         r"^$",
-        generic.ListView.as_view(model=ExpenseReport),
+        generic.ListView.as_view(
+            model=ExpenseReport, search_form_class=ExpenseReportSearchForm
+        ),
         name="expenses_expensereport_list",
     ),
     url(

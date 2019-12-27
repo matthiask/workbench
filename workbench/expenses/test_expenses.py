@@ -48,6 +48,11 @@ class ExpensesTest(TestCase):
 
         valid("")
         valid("q=test")
+        valid("s=in-preparation")
+        valid("s=closed")
+        valid("owned_by={}".format(user.id))
+        valid("owned_by=-1")  # mine
+        valid("owned_by=0")  # only inactive
 
     def test_expenses(self):
         project = factories.ProjectFactory.create()

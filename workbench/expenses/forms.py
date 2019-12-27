@@ -5,10 +5,52 @@ from django.db.models import Q
 from django.utils.html import format_html
 from django.utils.translation import gettext as _
 
+from workbench.accounts.models import User
 from workbench.expenses.models import ExpenseReport
 from workbench.logbook.models import LoggedCost
 from workbench.tools.formats import currency, local_date_format
-from workbench.tools.forms import ModelForm
+from workbench.tools.forms import Form, ModelForm
+
+
+class ExpenseReportSearchForm(Form):
+    s = forms.ChoiceField(
+        choices=[
+            ("", _("All")),
+            (
+                _("status"),
+                [("in-preparation", _("In preparation")), ("closed", _("Closed"))],
+            ),
+        ],
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
+    )
+    owned_by = forms.TypedChoiceField(
+        coerce=int,
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["owned_by"].choices = User.objects.choices(
+            collapse_inactive=True, myself=True
+        )
+
+    def filter(self, queryset):
+        data = self.cleaned_data
+        if data.get("s") == "in-preparation":
+            queryset = queryset.filter(closed_on__isnull=True)
+        elif data.get("s") == "closed":
+            queryset = queryset.filter(closed_on__isnull=False)
+        if data.get("owned_by") == -1:
+            queryset = queryset.filter(owned_by=self.request.user)
+        elif data.get("owned_by") == 0:
+            queryset = queryset.filter(owned_by__is_active=False)
+        elif data.get("owned_by"):
+            queryset = queryset.filter(owned_by=data.get("owned_by"))
+        return queryset.select_related("owned_by")
 
 
 class ExpenseReportForm(ModelForm):
