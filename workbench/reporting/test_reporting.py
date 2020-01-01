@@ -10,6 +10,7 @@ from workbench.reporting.accounting import send_accounting_files
 class ReportingTest(TestCase):
     def test_send_accounting_files(self):
         factories.UserFactory.create(is_admin=True)
+        factories.ProjectFactory.create()
 
         with freeze_time("2019-12-26"):
             send_accounting_files()
