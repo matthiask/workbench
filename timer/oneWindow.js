@@ -10,7 +10,7 @@ export function initOneWindow() {
     if (e.key === STORAGE_KEY) {
       /* eslint-disable-next-line */
       document.body.innerHTML = document.body.innerHTML // Remove all behaviors
-      document.body.classList.add("deactivated")
+      document.querySelector('div[role="main"]').classList.add("deactivated")
     }
   })
 }

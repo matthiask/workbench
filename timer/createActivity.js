@@ -7,7 +7,7 @@ import {gettext} from "./i18n.js"
 export const CreateActivity = connect()(({dispatch}) => {
   return (
     <button
-      className="btn btn-secondary"
+      className="btn btn-secondary create-activity"
       type="button"
       onClick={() => {
         createActivity(dispatch)

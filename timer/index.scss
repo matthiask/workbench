@@ -1,24 +1,32 @@
 $root-font-size: 1rem;
 
-html {
-  font-size: $root-font-size;
+html,
+body {
   min-height: 100vh;
 }
 
-#root {
-  min-height: 100vh;
+div[role="main"] {
+  flex: 1;
   display: flex;
-  flex-flow: column nowrap;
+  padding-bottom: 1rem !important;
 }
 
 .navbar {
   margin-bottom: 0.5rem;
 }
 
+.create-activity {
+  position: fixed;
+  top: 58px;
+  right: 10px;
+  z-index: 1005;
+}
+
 .activity-list {
   flex: 1 0 auto;
   position: relative;
   overflow: hidden;
+  margin: -15px;
 }
 
 .activity {
@@ -124,5 +132,5 @@ html {
   left: 0;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(3px);
-  z-index: 99999;
+  z-index: 1010;
 }

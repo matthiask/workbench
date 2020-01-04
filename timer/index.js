@@ -16,11 +16,13 @@ document.addEventListener("DOMContentLoaded", () => {
   initOneWindow()
   loadProjects(storeInstance.dispatch)
   migrateOldData(storeInstance.dispatch)
+
+  const el = document.querySelector('div[role="main"]')
   ReactDOM.render(
     <Provider store={storeInstance}>
       <Timer />
     </Provider>,
-    document.getElementById("root")
+    el
   )
 })
 
