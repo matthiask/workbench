@@ -78,7 +78,9 @@ ORDER BY cutoff_date
 
     today = dt.date.today()
     accruals[(today.year, today.month)] = {
-        "accrual": -Accrual.objects.generate_accruals(cutoff_date=today, save=False),
+        "accrual": -Accrual.objects.generate_accruals(cutoff_date=today, save=False)[
+            "total"
+        ],
         "delta": None,
     }
 

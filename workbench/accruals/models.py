@@ -51,6 +51,7 @@ class AccrualQuerySet(models.QuerySet):
         # month = dt.date.today().replace(day=1)
 
         total = Z
+        accruals = []
 
         down_payment_invoices = Invoice.objects.valid().filter(
             project__isnull=False,
@@ -121,11 +122,12 @@ class AccrualQuerySet(models.QuerySet):
                         logbook=logged[invoice.project_id],
                     )
 
+                accruals.append(obj)
                 total += obj.accrual
 
             remaining[invoice.project_id] -= invoice.total_excl_tax
 
-        return total
+        return {"accruals": accruals, "total": total}
 
 
 @model_urls

@@ -23,6 +23,7 @@
         <th class="text-right">{% trans 'invoiced' %}</th>
         <th class="text-right">{% trans 'not archived' %}</th>
         <th class="text-right">&Delta;</th>
+        <th class="text-right">{% trans 'accrual' %}</th>
       </tr>
     </thead>
     <tbody>
@@ -43,6 +44,7 @@
             {% pie project.not_archived project.hours %}
           </td>
           <td class="text-right">{{ project.delta|currency:True }}</td>
+          <td class="text-right">{{ project.accrual|currency:True }}</td>
         </tr>
       {% endfor %}
     </tbody>

@@ -150,6 +150,7 @@ class StatisticsTest(TestCase):
             stats,
             [
                 {
+                    "accrual": Decimal("0.00"),
                     "cost": Decimal("0.00"),
                     "delta": Decimal("1800.000"),
                     "effort_cost": Decimal("3600.000"),

@@ -89,6 +89,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
                 _("not archived"),
                 _("total hours"),
                 _("delta"),
+                _("accrual"),
             ],
             [
                 (
@@ -101,6 +102,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
                     project["not_archived"],
                     project["hours"],
                     project["delta"],
+                    project["accrual"],
                 )
                 for project in stats
             ],

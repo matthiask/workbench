@@ -1,8 +1,10 @@
+import datetime as dt
 from collections import defaultdict
 
 from django.db.models import Sum
 
 from workbench.accounts.models import User
+from workbench.accruals.models import Accrual
 from workbench.contacts.models import Organization
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
@@ -158,6 +160,12 @@ def project_budget_statistics(projects):
         .annotate(Sum("total_excl_tax"))
     }
 
+    accruals_per_project = defaultdict(lambda: Z)
+    for accrual in Accrual.objects.generate_accruals(
+        cutoff_date=dt.date.today(), save=False
+    )["accruals"]:
+        accruals_per_project[accrual.invoice.project_id] -= accrual.accrual
+
     return [
         {
             "project": project,
@@ -176,6 +184,7 @@ def project_budget_statistics(projects):
             "delta": cost_per_project.get(project.id, Z)
             + effort_cost_per_project[project.id]
             - invoiced_per_project.get(project.id, Z),
+            "accrual": accruals_per_project[project.id],
         }
         for project in projects
     ]
