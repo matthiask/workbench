@@ -30,21 +30,21 @@
       {% for project in projects %}
         <tr>
           <td>{% link_or_none project.project with_badge=True %}</td>
-          <td class="text-right">{{ project.offered|currency }}</td>
-          <td class="text-right text-nowrap">
+          <td class="text-right {% if not project.offered %}text-black-30{% endif %}">{{ project.offered|currency }}</td>
+          <td class="text-right text-nowrap {% if not project.logbook and not project.effort_hours_with_rate_undefined %}text-black-30{% endif %}">
             {{ project.logbook|currency }}
             {% if project.effort_hours_with_rate_undefined %}
             <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.effort_hours_with_rate_undefined|hours }})</span>
             {% endif %}
           </td>
-          <td class="text-right">{{ project.third_party_costs|currency }}</td>
-          <td class="text-right">{{ project.invoiced|currency }}</td>
+          <td class="text-right {% if not project.third_party_costs %}text-black-30{% endif %}">{{ project.third_party_costs|currency }}</td>
+          <td class="text-right {% if not project.invoiced %}text-black-30{% endif %}">{{ project.invoiced|currency }}</td>
           <td class="text-right text-nowrap">
             {{ project.not_archived|hours }} / {{ project.hours|hours }}
             {% pie project.not_archived project.hours %}
           </td>
-          <td class="text-right">{{ project.delta|currency:True }}</td>
-          <td class="text-right">{{ project.accrual|currency:True }}</td>
+          <td class="text-right {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
+          <td class="text-right {% if not project.accrual %}text-black-30{% endif %}">{{ project.accrual|currency:True }}</td>
         </tr>
       {% endfor %}
     </tbody>
