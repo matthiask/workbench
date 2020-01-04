@@ -234,7 +234,7 @@ $(function() {
     this.blur()
     const value = prompt(this.dataset.hoursButton)
     if (parseFloat(value)) {
-      $("#id_days")
+      $("#id_modal-days")
         .val((parseFloat(value) / 8).toFixed(2))
         .focus()
     }
@@ -242,8 +242,8 @@ $(function() {
 
   $(document.body).on("click", "[data-multiply-cost]", function() {
     const factor = parseFloat(this.dataset.multiplyCost),
-      tpc = parseFloat($("#id_third_party_costs").val()),
-      cost = $("#id_cost")
+      tpc = parseFloat($("#id_modal-third_party_costs").val()),
+      cost = $("#id_modal-cost")
 
     if (tpc && factor) {
       cost.val((factor * tpc).toFixed(2)).focus()
