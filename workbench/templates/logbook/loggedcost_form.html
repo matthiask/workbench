@@ -35,7 +35,7 @@
 {% block footer %}
   {% if form.expense_currency and not form.instance.expense_cost %}
     <button type="button" class="btn btn-primary mr-auto"
-      onclick="_cl(this, 'invisible', true);_cl(_sel('#foreign-currency'), 'd-none', false);_sel('#id_are_expenses').checked=true"
+      onclick="_cl(this, 'invisible', true);_cl(_sel('#foreign-currency'), 'd-none', false);_sel('#id_modal-are_expenses').checked=true"
       >{% trans 'expenses in foreign currency' %}</button>
   {% endif %}
   <button type="submit" class="btn btn-primary">{% trans 'save' %}</button>
