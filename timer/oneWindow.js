@@ -8,7 +8,9 @@ export function initOneWindow() {
 
   window.addEventListener("storage", e => {
     if (e.key === STORAGE_KEY) {
-      document.write("<h1>Only one window allowed at a time</h1>")
+      /* eslint-disable-next-line */
+      document.body.innerHTML = document.body.innerHTML // Remove all behaviors
+      document.body.classList.add("deactivated")
     }
   })
 }
