@@ -12,8 +12,8 @@ from workbench.invoices.models import Invoice
 from workbench.invoices.utils import next_valid_day
 from workbench.logbook.models import LoggedCost
 from workbench.projects.models import Project
-from workbench.projects.reporting import overdrawn_projects, project_budget_statistics
-from workbench.reporting import green_hours, key_data
+from workbench.projects.reporting import overdrawn_projects
+from workbench.reporting import green_hours, key_data, project_budget_statistics
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import DateInput, Form
 from workbench.tools.models import ONE, Z
@@ -302,7 +302,11 @@ def project_budget_statistics_view(request, form):
         if request.GET.get("s") == "closed"
         else (lambda project: project["delta"])
     )
-    stats = sorted(project_budget_statistics(form.queryset()), key=key, reverse=True)
+    stats = sorted(
+        project_budget_statistics.project_budget_statistics(form.queryset()),
+        key=key,
+        reverse=True,
+    )
     if request.GET.get("xlsx") and stats:
         xlsx = WorkbenchXLSXDocument()
         xlsx.project_budget_statistics(stats)

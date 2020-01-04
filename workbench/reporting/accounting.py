@@ -7,7 +7,7 @@ from django.utils.translation import gettext as _
 from workbench.accounts.models import User
 from workbench.accruals.models import Accrual
 from workbench.projects.models import Project
-from workbench.projects.reporting import project_budget_statistics
+from workbench.reporting import project_budget_statistics
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -20,7 +20,7 @@ def send_accounting_files():
     xlsx = WorkbenchXLSXDocument()
     xlsx.project_budget_statistics(
         sorted(
-            project_budget_statistics(projects),
+            project_budget_statistics.project_budget_statistics(projects),
             key=lambda project: project["delta"],
             reverse=True,
         )
