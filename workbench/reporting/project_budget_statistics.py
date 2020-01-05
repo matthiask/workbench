@@ -120,7 +120,6 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             "invoiced",
             "hours",
             "not_archived",
-            "delta",
             "accrual",
         ]
     }
