@@ -273,7 +273,9 @@ class ProjectBudgetStatisticsForm(Form):
 
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
-        data.setdefault("cutoff_date", dt.date.today().isoformat())
+        today = dt.date.today()
+        data.setdefault("cutoff_date", today.isoformat())
+        kwargs.setdefault("initial", {}).setdefault("cutoff_date", today)
         super().__init__(data, *args, **kwargs)
         self.fields["owned_by"].choices = User.objects.choices(
             collapse_inactive=True, myself=True
