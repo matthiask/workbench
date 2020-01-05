@@ -61,9 +61,7 @@ class InvoiceSearchForm(Form):
     def filter(self, queryset):
         data = self.cleaned_data
         if data.get("s") == "open":
-            queryset = queryset.filter(
-                status__in=(Invoice.IN_PREPARATION, Invoice.SENT)
-            )
+            queryset = queryset.open()
         elif data.get("s") == "overdue":
             queryset = queryset.overdue().order_by("due_on", "id")
         elif data.get("s"):
