@@ -271,8 +271,10 @@ class ProjectBudgetStatisticsForm(Form):
     )
     internal = forms.BooleanField(label=_("internal"), required=False)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, data, *args, **kwargs):
+        data = data.copy()
+        data.setdefault("cutoff_date", dt.date.today().isoformat())
+        super().__init__(data, *args, **kwargs)
         self.fields["owned_by"].choices = User.objects.choices(
             collapse_inactive=True, myself=True
         )
