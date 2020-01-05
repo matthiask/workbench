@@ -20,6 +20,9 @@ from workbench.tools.validation import raise_if_errors
 
 
 class InvoiceQuerySet(SearchQuerySet):
+    def unpaid(self):
+        return self.filter(status__in=(Invoice.IN_PREPARATION, Invoice.SENT))
+
     def valid(self):
         return self.filter(
             status__in=(Invoice.IN_PREPARATION, Invoice.SENT, Invoice.PAID)

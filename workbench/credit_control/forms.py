@@ -202,14 +202,11 @@ class AssignCreditEntriesForm(forms.Form):
                             )
                         ),
                     )
-                    for invoice in Invoice.objects.filter(
-                        status__in=(Invoice.IN_PREPARATION, Invoice.SENT),
-                        total=entry.total,
-                    ).select_related(
+                    for invoice in Invoice.objects.unpaid()
+                    .filter(total=entry.total)
+                    .select_related(
                         "contact__organization", "customer", "owned_by", "project"
-                    )[
-                        :100
-                    ]
+                    )[:100]
                 ],
                 coerce=int,
                 required=False,
