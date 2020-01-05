@@ -108,23 +108,26 @@ def project_budget_statistics(projects, *, cutoff_date=None):
         }
         for project in projects
     ]
+    overall = {
+        key: sum(s[key] for s in statistics)
+        for key in [
+            "logbook",
+            "cost",
+            "effort_cost",
+            "effort_hours_with_rate_undefined",
+            "third_party_costs",
+            "offered",
+            "invoiced",
+            "hours",
+            "not_archived",
+            "delta",
+            "accrual",
+        ]
+    }
+    overall["delta_positive"] = sum(s["delta"] for s in statistics if s["delta"] > 0)
+    overall["delta_negative"] = sum(s["delta"] for s in statistics if s["delta"] < 0)
 
     return {
         "statistics": sorted(statistics, key=lambda s: s["delta"], reverse=True),
-        "overall": {
-            key: sum(s[key] for s in statistics)
-            for key in [
-                "logbook",
-                "cost",
-                "effort_cost",
-                "effort_hours_with_rate_undefined",
-                "third_party_costs",
-                "offered",
-                "invoiced",
-                "hours",
-                "not_archived",
-                "delta",
-                "accrual",
-            ]
-        },
+        "overall": overall,
     }

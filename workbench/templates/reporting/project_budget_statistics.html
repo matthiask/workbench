@@ -40,7 +40,13 @@
           {{ statistics.overall.not_archived|hours }} / {{ statistics.overall.hours|hours }}
           {% pie statistics.overall.not_archived statistics.overall.hours %}
         </th>
-        <th class="text-right">{{ statistics.overall.delta|currency:True }}</th>
+        <th class="text-right">
+          {{ statistics.overall.delta|currency:True }}<br>
+          <small class="font-weight-normal">
+            {{ statistics.overall.delta_positive|currency:True }}<br>
+            {{ statistics.overall.delta_negative|currency:True }}
+          </small>
+        </th>
         <th class="text-right">{{ statistics.overall.accrual|currency:True }}</th>
       </tr>
       {% for project in statistics.statistics %}
