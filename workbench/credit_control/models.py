@@ -57,7 +57,7 @@ class CreditEntry(Model):
     total = MoneyField(_("total"))
     payment_notice = models.CharField(_("payment notice"), max_length=1000, blank=True)
 
-    invoice = models.ForeignKey(
+    invoice = models.OneToOneField(
         Invoice,
         on_delete=models.PROTECT,
         blank=True,
@@ -65,6 +65,7 @@ class CreditEntry(Model):
         verbose_name=_("invoice"),
     )
     notes = models.TextField(_("notes"), blank=True)
+    _fts = models.TextField(editable=False, blank=True)
 
     objects = CreditEntryQuerySet.as_manager()
 
@@ -75,3 +76,9 @@ class CreditEntry(Model):
 
     def __str__(self):
         return self.reference_number
+
+    def save(self, *args, **kwargs):
+        self._fts = " ".join(str(part) for part in [self.invoice or "", self.total])
+        super().save(*args, **kwargs)
+
+    save.alters_data = True
