@@ -2,6 +2,7 @@ import datetime as dt
 from collections import defaultdict
 
 from django.db.models import Sum
+from django.utils import timezone
 
 from workbench.accruals.models import Accrual
 from workbench.invoices.models import Invoice
@@ -10,9 +11,14 @@ from workbench.offers.models import Offer
 from workbench.tools.models import Z
 
 
-def project_budget_statistics(projects):
+def project_budget_statistics(projects, *, cutoff_date=None):
+    cutoff_date = cutoff_date or dt.date.today()
+    cutoff_dttm = timezone.make_aware(dt.datetime.combine(cutoff_date, dt.time.max))
+
     costs = (
-        LoggedCost.objects.filter(service__project__in=projects)
+        LoggedCost.objects.filter(
+            service__project__in=projects, rendered_on__lte=cutoff_dttm
+        )
         .order_by()
         .values("service__project")
     )
@@ -28,7 +34,9 @@ def project_budget_statistics(projects):
     }
 
     hours = (
-        LoggedHours.objects.filter(service__project__in=projects)
+        LoggedHours.objects.filter(
+            service__project__in=projects, rendered_on__lte=cutoff_dttm
+        )
         .order_by()
         .values("service__project", "service__effort_rate")
         .annotate(Sum("hours"))
@@ -74,11 +82,11 @@ def project_budget_statistics(projects):
 
     accruals_per_project = defaultdict(lambda: Z)
     for accrual in Accrual.objects.generate_accruals(
-        cutoff_date=dt.date.today(), save=False
+        cutoff_date=cutoff_date, save=False
     )["accruals"]:
         accruals_per_project[accrual.invoice.project_id] -= accrual.accrual
 
-    return [
+    statistics = [
         {
             "project": project,
             "logbook": cost_per_project.get(project.id, Z)
@@ -100,3 +108,23 @@ def project_budget_statistics(projects):
         }
         for project in projects
     ]
+
+    return {
+        "statistics": sorted(statistics, key=lambda s: s["delta"], reverse=True),
+        "overall": {
+            key: sum(s[key] for s in statistics)
+            for key in [
+                "logbook",
+                "cost",
+                "effort_cost",
+                "effort_hours_with_rate_undefined",
+                "third_party_costs",
+                "offered",
+                "invoiced",
+                "hours",
+                "not_archived",
+                "delta",
+                "accrual",
+            ]
+        },
+    }

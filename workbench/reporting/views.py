@@ -265,11 +265,9 @@ def hours_filter_view(request, form, *, template_name, stats_fn):
 
 class ProjectBudgetStatisticsForm(Form):
     owned_by = forms.TypedChoiceField(label="", coerce=int, required=False)
-    s = forms.ChoiceField(
-        choices=[("", _("Open")), ("closed", _("Closed during the last year"))],
-        required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
-        label="",
+    cutoff_date = forms.DateField(widget=DateInput, required=False, label="")
+    closed_during_the_last_year = forms.BooleanField(
+        label=_("Closed during the last year"), required=False
     )
     internal = forms.BooleanField(label=_("internal"), required=False)
 
@@ -281,12 +279,12 @@ class ProjectBudgetStatisticsForm(Form):
 
     def queryset(self):
         data = self.cleaned_data
-        if data.get("s") == "closed":
+        if data.get("closed_during_the_last_year"):
             queryset = Project.objects.closed().filter(
                 closed_on__gte=timezone.now() - dt.timedelta(days=366)
             )
         else:
-            queryset = Project.objects.open()
+            queryset = Project.objects.open(on=self.cleaned_data.get("cutoff_date"))
         if data.get("internal"):
             queryset = queryset.filter(type=Project.INTERNAL)
         else:
@@ -297,25 +295,24 @@ class ProjectBudgetStatisticsForm(Form):
 
 @filter_form(ProjectBudgetStatisticsForm)
 def project_budget_statistics_view(request, form):
-    key = (
-        (lambda project: project["project"].closed_on)
-        if request.GET.get("s") == "closed"
-        else (lambda project: project["delta"])
+    statistics = project_budget_statistics.project_budget_statistics(
+        form.queryset(), cutoff_date=form.cleaned_data.get("cutoff_date")
     )
-    stats = sorted(
-        project_budget_statistics.project_budget_statistics(form.queryset()),
-        key=key,
-        reverse=True,
-    )
-    if request.GET.get("xlsx") and stats:
+
+    if form.cleaned_data.get("closed_during_the_last_year"):
+        statistics["statistics"] = sorted(
+            statistics["statistics"], key=lambda s: s["project"].closed_on, reverse=True
+        )
+
+    if request.GET.get("xlsx") and statistics["statistics"]:
         xlsx = WorkbenchXLSXDocument()
-        xlsx.project_budget_statistics(stats)
+        xlsx.project_budget_statistics(statistics)
         return xlsx.to_response("project-budget-statistics.xlsx")
 
     return render(
         request,
         "reporting/project_budget_statistics.html",
-        {"form": form, "projects": stats},
+        {"form": form, "statistics": statistics},
     )
 
 

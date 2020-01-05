@@ -19,11 +19,7 @@ def send_accounting_files():
     projects = Project.objects.open().exclude(type=Project.INTERNAL)
     xlsx = WorkbenchXLSXDocument()
     xlsx.project_budget_statistics(
-        sorted(
-            project_budget_statistics.project_budget_statistics(projects),
-            key=lambda project: project["delta"],
-            reverse=True,
-        )
+        project_budget_statistics.project_budget_statistics(projects),
     )
     xlsx.accruals(Accrual.objects.filter(cutoff_date=today - dt.timedelta(days=1)))
 

@@ -30,7 +30,20 @@
       </tr>
     </thead>
     <tbody>
-      {% for project in projects %}
+      <tr>
+        <th></th>
+        <th class="text-right">{{ statistics.overall.offered|currency }}</th>
+        <th class="text-right">{{ statistics.overall.logbook|currency }}</th>
+        <th class="text-right">{{ statistics.overall.third_party_costs|currency }}</th>
+        <th class="text-right">{{ statistics.overall.invoiced|currency }}</th>
+        <th class="text-right text-nowrap">
+          {{ statistics.overall.not_archived|hours }} / {{ statistics.overall.hours|hours }}
+          {% pie statistics.overall.not_archived statistics.overall.hours %}
+        </th>
+        <th class="text-right">{{ statistics.overall.delta|currency:True }}</th>
+        <th class="text-right">{{ statistics.overall.accrual|currency:True }}</th>
+      </tr>
+      {% for project in statistics.statistics %}
         <tr>
           <td>{% link_or_none project.project with_badge=True %}</td>
           <td class="text-right {% if not project.offered %}text-black-30{% endif %}">{{ project.offered|currency }}</td>

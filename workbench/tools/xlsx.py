@@ -76,11 +76,12 @@ class WorkbenchXLSXDocument(XLSXDocument):
             ],
         )
 
-    def project_budget_statistics(self, stats):
+    def project_budget_statistics(self, statistics):
         self.add_sheet(_("projects"))
         self.table(
             [
                 _("project"),
+                _("responsible"),
                 _("offered"),
                 _("logbook"),
                 _("undefined rate"),
@@ -94,6 +95,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
             [
                 (
                     project["project"],
+                    project["project"].owned_by.get_short_name(),
                     project["offered"],
                     project["logbook"],
                     project["effort_hours_with_rate_undefined"],
@@ -104,7 +106,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
                     project["delta"],
                     project["accrual"],
                 )
-                for project in stats
+                for project in statistics["statistics"]
             ],
         )
 

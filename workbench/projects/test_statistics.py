@@ -5,12 +5,8 @@ from django.test import TestCase
 
 from workbench import factories
 from workbench.projects.models import Project
-from workbench.projects.reporting import (
-    hours_per_customer,
-    overdrawn_projects,
-    project_budget_statistics,
-)
-from workbench.reporting import green_hours
+from workbench.projects.reporting import hours_per_customer, overdrawn_projects
+from workbench.reporting import green_hours, project_budget_statistics
 from workbench.tools.models import Z
 
 
@@ -145,9 +141,11 @@ class StatisticsTest(TestCase):
         self.assertEqual(len(hpc["organizations"]), 1)
         self.assertEqual(len(hpc["users"]), 1)
 
-        stats = project_budget_statistics(Project.objects.all())
+        stats = project_budget_statistics.project_budget_statistics(
+            Project.objects.all()
+        )
         self.assertEqual(
-            stats,
+            stats["statistics"],
             [
                 {
                     "accrual": Decimal("0.00"),

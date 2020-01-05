@@ -20,8 +20,17 @@ from workbench.tools.urls import model_urls
 
 
 class ProjectQuerySet(SearchQuerySet):
-    def open(self):
-        return self.filter(closed_on__isnull=True)
+    def open(self, *, on=None):
+        return (
+            self.filter(closed_on__isnull=True)
+            if on is None
+            else self.filter(
+                Q(closed_on__isnull=True) | Q(closed_on__gt=on),
+                created_at__lte=timezone.make_aware(
+                    dt.datetime.combine(on, dt.time.max)
+                ),
+            )
+        )
 
     def closed(self):
         return self.filter(closed_on__isnull=False)
