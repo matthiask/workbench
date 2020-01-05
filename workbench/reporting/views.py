@@ -265,7 +265,7 @@ def hours_filter_view(request, form, *, template_name, stats_fn):
 
 class ProjectBudgetStatisticsForm(Form):
     owned_by = forms.TypedChoiceField(label="", coerce=int, required=False)
-    cutoff_date = forms.DateField(widget=DateInput, required=False, label="")
+    cutoff_date = forms.DateField(widget=DateInput, label="")
     closed_during_the_last_year = forms.BooleanField(
         label=_("Closed during the last year"), required=False
     )
