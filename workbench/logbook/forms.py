@@ -353,7 +353,7 @@ class LoggedHoursForm(ModelForm):
                 title=self.cleaned_data["service_title"],
                 description=self.cleaned_data["service_description"],
             )
-            if self.project.flat_rate:
+            if self.project.flat_rate is not None:
                 with override(settings.WORKBENCH.PDF_LANGUAGE):
                     service.effort_type = _("flat rate")
                     service.effort_rate = self.project.flat_rate

@@ -164,7 +164,7 @@ class ProjectForm(ModelForm):
 
         if (
             set(self.changed_data) & {"flat_rate"}
-            and data.get("flat_rate")
+            and data.get("flat_rate") is not None
             and self.instance.services.exists()
         ):
             self.add_warning(
@@ -184,7 +184,7 @@ class ProjectForm(ModelForm):
             instance.closed_on = dt.date.today()
         if instance.closed_on and not self.cleaned_data.get("is_closed"):
             instance.closed_on = None
-        if self.instance.flat_rate:
+        if self.instance.flat_rate is not None:
             with override(settings.WORKBENCH.PDF_LANGUAGE):
                 self.instance.services.editable().update(
                     effort_type=_("flat rate"), effort_rate=self.instance.flat_rate
@@ -224,7 +224,7 @@ class ServiceForm(ModelForm):
         self.project = kwargs.pop("project", None)
         if not self.project:
             self.project = kwargs["instance"].project
-        elif self.project.flat_rate:
+        elif self.project.flat_rate is not None:
             with override(settings.WORKBENCH.PDF_LANGUAGE):
                 kwargs["instance"] = Service(
                     effort_type=_("flat rate"), effort_rate=self.project.flat_rate
@@ -253,7 +253,7 @@ class ServiceForm(ModelForm):
                     ),
                 )
 
-        if self.project.flat_rate:
+        if self.project.flat_rate is not None:
             self.fields["effort_type"].disabled = True
             self.fields["effort_rate"].disabled = True
             self.fields.pop("service_type")
