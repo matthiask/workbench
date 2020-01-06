@@ -29,9 +29,7 @@
         {{ days }} day(s) starting on {{ start }}
       {% endblocktrans %}
     </div>
-    <div class="col-md-4 text-right">
-      {% if object.is_vacation %}{% trans 'is vacation' %}{% endif %}
-    </div>
+    <div class="col-md-4 text-right">{{ object.get_reason_display }}</div>
   </div>
 </a>
 {% endfor %}
