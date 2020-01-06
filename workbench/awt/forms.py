@@ -45,8 +45,8 @@ class AbsenceForm(ModelForm):
 
     class Meta:
         model = Absence
-        fields = ["user", "starts_on", "days", "description", "is_vacation"]
-        widgets = {"description": Textarea({"rows": 2})}
+        fields = ["user", "starts_on", "days", "description", "reason"]
+        widgets = {"description": Textarea({"rows": 2}), "reason": forms.RadioSelect}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -54,6 +54,7 @@ class AbsenceForm(ModelForm):
             '<a href="#" data-hours-button="{hours}">{hours}</a>',
             hours=_("Enter hours"),
         )
+        self.fields["reason"].choices = Absence.REASON_CHOICES
 
     def clean(self):
         data = super().clean()

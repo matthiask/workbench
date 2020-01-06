@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-27 12:03+0100\n"
+"POT-Creation-Date: 2020-01-06 17:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,7 +69,7 @@ msgstr "Entfernen"
 msgid "Reset"
 msgstr "Zurücksetzen"
 
-#: timer/createActivity.js timer/timer.js
+#: timer/createActivity.js
 msgid "Timer"
 msgstr "Timer"
 

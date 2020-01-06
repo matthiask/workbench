@@ -78,10 +78,10 @@ class AWTTest(TestCase):
             description="anything",
             rendered_on=dt.date(2018, 1, 1),
         )
-        user.absences.create(starts_on=dt.date(2018, 1, 1), days=5, is_vacation=True)
-        user.absences.create(starts_on=dt.date(2018, 4, 1), days=45, is_vacation=True)
-        user.absences.create(starts_on=dt.date(2018, 7, 1), days=10, is_vacation=False)
-        user.absences.create(starts_on=dt.date(2018, 10, 1), days=10, is_vacation=True)
+        user.absences.create(starts_on=dt.date(2018, 1, 1), days=5, reason="vacation")
+        user.absences.create(starts_on=dt.date(2018, 4, 1), days=45, reason="vacation")
+        user.absences.create(starts_on=dt.date(2018, 7, 1), days=10, reason="other")
+        user.absences.create(starts_on=dt.date(2018, 10, 1), days=10, reason="vacation")
         user.employments.create(
             date_from=dt.date(2014, 1, 1),
             date_until=dt.date(2014, 3, 31),
@@ -110,12 +110,13 @@ class AWTTest(TestCase):
         )
 
         self.assertAlmostEqual(awt["totals"]["hours"], Decimal("1000"))
-        self.assertAlmostEqual(awt["totals"]["vacation_days"], Decimal("60"))
+        self.assertAlmostEqual(awt["totals"]["absence_vacation"], Decimal("60"))
         # 21.25 - 50 - 10 = -38.75
         self.assertAlmostEqual(
             awt["totals"]["vacation_days_correction"], Decimal("-38.75")
         )
-        self.assertAlmostEqual(awt["totals"]["other_absences"], Decimal("10"))
+        self.assertAlmostEqual(awt["totals"]["absence_sickness"], Decimal("0"))
+        self.assertAlmostEqual(awt["totals"]["absence_other"], Decimal("10"))
 
         # 3/4 * 80% * 360 + 1/4 * 100% * 360 = 306
         self.assertAlmostEqual(awt["totals"]["target"], Decimal("306") * 8)
@@ -142,7 +143,7 @@ class AWTTest(TestCase):
                 "modal-starts_on": dt.date.today().isoformat(),
                 "modal-days": 3,
                 "modal-description": "Sick",
-                "modal-is_vacation": "",
+                "modal-reason": "sickness",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -171,7 +172,7 @@ class AWTTest(TestCase):
                 "modal-starts_on": "2018-01-01",
                 "modal-days": 3,
                 "modal-description": "Sick",
-                "modal-is_vacation": "",
+                "modal-reason": "sickness",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )

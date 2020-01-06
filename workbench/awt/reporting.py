@@ -41,9 +41,10 @@ class Months(dict):
             "target_days": year.months,
             "percentage": [Z for i in range(12)],
             "available_vacation_days": [Z for i in range(12)],
-            "vacation_days": [Z for i in range(12)],
+            "absence_vacation": [Z for i in range(12)],
+            "absence_sickness": [Z for i in range(12)],
+            "absence_other": [Z for i in range(12)],
             "vacation_days_correction": [Z for i in range(12)],
-            "other_absences": [Z for i in range(12)],
             "target": [Z for i in range(12)],
             "hours": [Z for i in range(12)],
             "employments": OrderedSet(),
@@ -79,7 +80,9 @@ def full_time_equivalents_by_month():
 
 
 def annual_working_time(year, *, users):
-    absences = defaultdict(lambda: {"vacation_days": [], "other_absences": []})
+    absences = defaultdict(
+        lambda: {"absence_vacation": [], "absence_sickness": [], "absence_other": []}
+    )
     months = Months(year=year, users=users)
     vacation_days_credit = defaultdict(lambda: Z)
     dpm = days_per_month(year)
@@ -132,7 +135,7 @@ def annual_working_time(year, *, users):
         user__in=months.users_with_wtm, starts_on__year=year
     ).order_by("starts_on"):
         month_data = months[absence.user_id]
-        key = "vacation_days" if absence.is_vacation else "other_absences"
+        key = "absence_%s" % absence.reason
         month_data[key][absence.starts_on.month - 1] += absence.days
         absences[absence.user_id][key].append(absence)
 
@@ -153,9 +156,10 @@ def annual_working_time(year, *, users):
         return [
             sum(
                 (
-                    data["vacation_days"][i],
+                    data["absence_vacation"][i],
+                    data["absence_sickness"][i],
                     data["vacation_days_correction"][i],
-                    data["other_absences"][i],
+                    data["absence_other"][i],
                 ),
                 Z,
             )
@@ -196,7 +200,7 @@ def annual_working_time(year, *, users):
                     "available_vacation_days": sum(
                         month_data["available_vacation_days"]
                     ),
-                    "vacation_days": sum(month_data["vacation_days"]),
+                    "absence_vacation": sum(month_data["absence_vacation"]),
                     "vacation_days_correction": sum(
                         month_data["vacation_days_correction"]
                     ),
@@ -204,7 +208,8 @@ def annual_working_time(year, *, users):
                     "balance": sum(sums)
                     + month_data["year"].working_time_per_day
                     * vacation_days_credit[user.id],
-                    "other_absences": sum(month_data["other_absences"]),
+                    "absence_sickness": sum(month_data["absence_sickness"]),
+                    "absence_other": sum(month_data["absence_other"]),
                     "target": sum(month_data["target"]),
                     "hours": sum(month_data["hours"]),
                     "absences_time": sum(at),

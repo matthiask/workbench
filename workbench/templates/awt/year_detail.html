@@ -68,14 +68,20 @@
 
       <tr>
         <th class="text-nowrap">{% trans 'vacation days taken' %}</th>
-        {% for value in stats.vacation_days %}<td class="text-left {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
-        <th class="text-right">{{ totals.vacation_days|days }}</th>
+        {% for value in stats.absence_vacation %}<td class="text-left {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
+        <th class="text-right">{{ totals.absence_vacation|days }}</th>
+      </tr>
+
+      <tr>
+        <th class="text-nowrap">{% trans 'sickness days' %}</th>
+        {% for value in stats.absence_sickness %}<td class="text-left {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
+        <th class="text-right">{{ totals.absence_sickness|days }}</th>
       </tr>
 
       <tr>
         <th class="text-nowrap">{% trans 'other absences' %}</th>
-        {% for value in stats.other_absences %}<td class="text-left {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
-        <th class="text-right">{{ totals.other_absences|days }}</th>
+        {% for value in stats.absence_other %}<td class="text-left {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
+        <th class="text-right">{{ totals.absence_other|days }}</th>
       </tr>
 
       {% if totals.vacation_days_correction %}
@@ -147,13 +153,13 @@
     </table>
 
     <div class="row">
-      <div class="col-md-6 col-12">
+      <div class="col-md-4 col-12">
 
         <table class="table table-sm table-bordered table-responsive-lg">
           <tr class="thead-light">
             <th colspan="3">{% trans 'vacation days' %}</th>
           </tr>
-          {% for absence in data.absences.vacation_days %}
+          {% for absence in data.absences.absence_vacation %}
             <tr>
               <td>
                 {% blocktrans with date=absence.starts_on|local_date_format %}from {{ date }}{% endblocktrans %}
@@ -166,13 +172,32 @@
 
       </div>
 
-      <div class="col-md-6 col-12">
+      <div class="col-md-4 col-12">
+
+        <table class="table table-sm table-bordered table-responsive-lg">
+          <tr class="thead-light">
+            <th colspan="3">{% trans 'sickness days' %}</th>
+          </tr>
+          {% for absence in data.absences.absence_sickness %}
+            <tr>
+              <td>
+                {% blocktrans with date=absence.starts_on|local_date_format %}from {{ date }}{% endblocktrans %}
+              </td>
+              <td>{{ absence.days|days }}</td>
+              <td>{{ absence.description }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+
+      </div>
+
+      <div class="col-md-4 col-12">
 
         <table class="table table-sm table-bordered table-responsive-lg">
           <tr class="thead-light">
             <th colspan="3">{% trans 'other absences' %}</th>
           </tr>
-          {% for absence in data.absences.other_absences %}
+          {% for absence in data.absences.absence_other %}
             <tr>
               <td>
                 {% blocktrans with date=absence.starts_on|local_date_format %}from {{ date }}{% endblocktrans %}

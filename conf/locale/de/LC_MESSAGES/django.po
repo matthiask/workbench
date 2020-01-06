@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-28 00:01+0100\n"
+"POT-Creation-Date: 2020-01-06 17:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -178,7 +178,9 @@ msgstr ""
 msgid "logbook"
 msgstr "Logbuch"
 
-#: workbench/accruals/models.py workbench/tools/xlsx.py
+#: workbench/accruals/models.py
+#: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/xlsx.py
 msgid "accrual"
 msgstr "Abgrenzung"
 
@@ -356,6 +358,18 @@ msgstr ""
 "Entweder Lohnkosten pro Stunde UND Grüne Stunden-Zielwert angeben oder "
 "nichts von beidem."
 
+#: workbench/awt/models.py
+msgid "vacation"
+msgstr "Ferien"
+
+#: workbench/awt/models.py
+msgid "sickness"
+msgstr "Krankheit"
+
+#: workbench/awt/models.py
+msgid "other"
+msgstr "Andere Gründe"
+
 #: workbench/awt/models.py workbench/invoices/models.py
 msgid "starts on"
 msgstr "startet am"
@@ -369,6 +383,10 @@ msgstr "startet am"
 #: workbench/templates/logbook/loggedhours_detail.html
 msgid "description"
 msgstr "Beschreibung"
+
+#: workbench/awt/models.py
+msgid "reason"
+msgstr "Grund"
 
 #: workbench/awt/models.py workbench/templates/awt/absence_list.html
 msgid "is vacation"
@@ -831,6 +849,7 @@ msgstr "Geschlossen am"
 
 #: workbench/expenses/models.py workbench/invoices/models.py
 #: workbench/offers/models.py workbench/projects/models.py
+#: workbench/tools/xlsx.py
 msgid "responsible"
 msgstr "verantwortlich"
 
@@ -936,7 +955,7 @@ msgid "invoices"
 msgstr "Rechnungen"
 
 #: workbench/invoices/forms.py workbench/offers/forms.py
-#: workbench/projects/forms.py workbench/reporting/views.py
+#: workbench/projects/forms.py
 msgid "Open"
 msgstr "Offen"
 
@@ -1785,6 +1804,10 @@ msgid "vacation days taken"
 msgstr "Bezogene Ferientage"
 
 #: workbench/templates/awt/year_detail.html
+msgid "sickness days"
+msgstr "Krankheitstage"
+
+#: workbench/templates/awt/year_detail.html
 msgid "other absences"
 msgstr "Andere Abwesenheiten"
 
@@ -1939,6 +1962,7 @@ msgid "delete"
 msgstr "Löschen"
 
 #: workbench/templates/generic/object_list.html
+#: workbench/templates/reporting/project_budget_statistics.html
 msgid "Reset the filter form"
 msgstr "Suchformular zurücksetzen"
 

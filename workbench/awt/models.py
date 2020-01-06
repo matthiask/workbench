@@ -141,12 +141,23 @@ class Employment(Model):
 
 @model_urls
 class Absence(Model):
+    VACATION = "vacation"
+    SICKNESS = "sickness"
+    OTHER = "other"
+
+    REASON_CHOICES = [
+        (VACATION, _("vacation")),
+        (SICKNESS, _("sickness")),
+        (OTHER, _("other")),
+    ]
+
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name=_("user"), related_name="absences"
     )
     starts_on = models.DateField(_("starts on"))
     days = models.DecimalField(_("days"), max_digits=4, decimal_places=2)
     description = models.TextField(_("description"))
+    reason = models.CharField(_("reason"), max_length=10, choices=REASON_CHOICES)
     is_vacation = models.BooleanField(_("is vacation"), default=True)
 
     class Meta:
@@ -156,6 +167,12 @@ class Absence(Model):
 
     def __str__(self):
         return self.description
+
+    def save(self, *args, **kwargs):
+        self.is_vacation = self.reason == self.VACATION
+        super().save(*args, **kwargs)
+
+    save.alters_data = True
 
     @classmethod
     def allow_update(cls, instance, request):
