@@ -120,11 +120,12 @@
           <th class="text-nowrap">{% trans 'vacation days credit' %}</th>
           <th colspan="13" class="text-right">{{ totals.vacation_days_credit|days }}</th>
         </tr>
-        <tr>
-          <th class="text-nowrap">{% trans 'balance' %}</th>
-          <th colspan="13" class="text-right">{{ totals.balance|hours }}</th>
-        </tr>
       {% endif %}
+
+      <tr>
+        <th class="text-nowrap">{% trans 'balance' %}</th>
+        <th colspan="13" class="text-right">{{ totals.balance|hours }}</th>
+      </tr>
 
     </table>
 
