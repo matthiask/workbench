@@ -23,6 +23,12 @@ class AbsenceSearchForm(Form):
         widget=forms.Select(attrs={"class": "custom-select"}),
         label="",
     )
+    reason = forms.ChoiceField(
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+        choices=[("", _("All reasons"))] + Absence.REASON_CHOICES,
+        label="",
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -36,6 +42,8 @@ class AbsenceSearchForm(Form):
             queryset = queryset.filter(user=self.request.user)
         elif data.get("u"):
             queryset = queryset.filter(user=data.get("u"))
+        if data.get("reason"):
+            queryset = queryset.filter(reason=data.get("reason"))
         return queryset.select_related("user")
 
 

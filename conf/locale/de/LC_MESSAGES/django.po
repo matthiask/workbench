@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-06 17:43+0100\n"
+"POT-Creation-Date: 2020-01-06 17:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -221,6 +221,10 @@ msgid "search"
 msgstr "Suche"
 
 #: workbench/awt/forms.py
+msgid "All reasons"
+msgstr "Alle Gründe"
+
+#: workbench/awt/forms.py
 msgid "Enter hours"
 msgstr "Stunden eingeben"
 
@@ -388,7 +392,7 @@ msgstr "Beschreibung"
 msgid "reason"
 msgstr "Grund"
 
-#: workbench/awt/models.py workbench/templates/awt/absence_list.html
+#: workbench/awt/models.py
 msgid "is vacation"
 msgstr "sind Ferien"
 
