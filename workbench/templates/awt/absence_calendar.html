@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n %}
+{% load i18n workbench %}
 
 {% block title %}{% trans 'absence calendar' %} - {{ block.super }}{% endblock %}
 
@@ -28,8 +28,8 @@
       [
         '{{ user.get_full_name }}',
         '{{ absence }} {{ absence.reason }}/{{ absence.get_reason_display }} {{ absence.days }}',
-        new Date({{ absence.starts_on|date:'Y, m, d' }}),
-        new Date({{ absence.ends_on|default:absence.starts_on|date:'Y, m, d' }}),
+        new Date({{ absence.starts_on|js_date }}),
+        new Date({{ absence.ends_on|default:absence.starts_on|js_date }}),
       ],
       {% endfor %}
       {% endfor %}

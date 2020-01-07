@@ -210,3 +210,8 @@ ORDER BY (diff + 180) % 365 DESC
 @register.filter
 def has(user, feature):
     return user.features[feature]
+
+
+@register.filter
+def js_date(date):
+    return "new Date({}, {}, {})".format(date.year, date.month - 1, date.day)
