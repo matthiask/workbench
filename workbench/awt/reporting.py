@@ -219,4 +219,21 @@ def annual_working_time(year, *, users):
             }
         )
 
-    return {"months": months, "statistics": statistics}
+    overall = {
+        key: sum((s["totals"][key] for s in statistics), Z)
+        for key in [
+            "percentage",
+            "available_vacation_days",
+            "absence_vacation",
+            "vacation_days_correction",
+            "vacation_days_credit",
+            "absence_sickness",
+            "absence_other",
+            "hours",
+            "running_sum",
+            "balance",
+        ]
+    }
+    overall["absence_vacation"] -= overall["vacation_days_correction"]
+
+    return {"months": months, "overall": overall, "statistics": statistics}

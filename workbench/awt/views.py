@@ -38,6 +38,7 @@ def annual_working_time_view(request):
         request,
         "awt/year_detail.html",
         {
+            "overall": statistics["overall"],
             "statistics": statistics["statistics"],
             "object": year,
             "year": year,

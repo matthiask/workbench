@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-06 17:51+0100\n"
+"POT-Creation-Date: 2020-01-07 11:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1779,6 +1779,43 @@ msgid "active users"
 msgstr "Aktive Benutzer"
 
 #: workbench/templates/awt/year_detail.html
+#: workbench/templates/reporting/key_data.html
+msgid "facts"
+msgstr "Fakten"
+
+#: workbench/templates/awt/year_detail.html
+msgid "vacation days available"
+msgstr "Verfügbare Ferientage"
+
+#: workbench/templates/awt/year_detail.html
+msgid "vacation days taken"
+msgstr "Bezogene Ferientage"
+
+#: workbench/templates/awt/year_detail.html
+msgid "corrected"
+msgstr "korrigiert"
+
+#: workbench/templates/awt/year_detail.html
+msgid "sickness days"
+msgstr "Krankheitstage"
+
+#: workbench/templates/awt/year_detail.html
+msgid "other absences"
+msgstr "Andere Abwesenheiten"
+
+#: workbench/templates/awt/year_detail.html
+msgid "net work hours"
+msgstr "Stundensaldo"
+
+#: workbench/templates/awt/year_detail.html
+msgid "vacation days credit"
+msgstr "Guthaben an Ferientagen"
+
+#: workbench/templates/awt/year_detail.html
+msgid "balance"
+msgstr "Bilanz"
+
+#: workbench/templates/awt/year_detail.html
 msgid "Total"
 msgstr "Total"
 
@@ -1791,10 +1828,6 @@ msgid "pensum"
 msgstr "Pensum"
 
 #: workbench/templates/awt/year_detail.html
-msgid "vacation days available"
-msgstr "Verfügbare Ferientage"
-
-#: workbench/templates/awt/year_detail.html
 msgid "target time"
 msgstr "Sollstunden"
 
@@ -1802,18 +1835,6 @@ msgstr "Sollstunden"
 #, python-format
 msgid "calculated with %(hours)s per day"
 msgstr "berechnet mit %(hours)s pro Tag"
-
-#: workbench/templates/awt/year_detail.html
-msgid "vacation days taken"
-msgstr "Bezogene Ferientage"
-
-#: workbench/templates/awt/year_detail.html
-msgid "sickness days"
-msgstr "Krankheitstage"
-
-#: workbench/templates/awt/year_detail.html
-msgid "other absences"
-msgstr "Andere Abwesenheiten"
 
 #: workbench/templates/awt/year_detail.html
 msgid "vacation days correction"
@@ -1834,14 +1855,6 @@ msgstr "Stundensaldo pro Monat"
 #: workbench/templates/awt/year_detail.html
 msgid "running net work hours"
 msgstr "Stundensaldo fortlaufend"
-
-#: workbench/templates/awt/year_detail.html
-msgid "vacation days credit"
-msgstr "Guthaben an Ferientagen"
-
-#: workbench/templates/awt/year_detail.html
-msgid "balance"
-msgstr "Bilanz"
 
 #: workbench/templates/awt/year_detail.html
 msgid "vacation days"
@@ -2125,10 +2138,6 @@ msgstr "Grün"
 #: workbench/templates/reporting/hours_by_circle.html
 msgid "No circle"
 msgstr "Kein Kreis"
-
-#: workbench/templates/reporting/key_data.html
-msgid "facts"
-msgstr "Fakten"
 
 #: workbench/templates/reporting/key_data.html
 msgid "service hours in open orders"
