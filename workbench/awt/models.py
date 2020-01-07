@@ -11,6 +11,7 @@ from workbench.accounts.models import User
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import HoursField, Model, MoneyField
 from workbench.tools.urls import model_urls
+from workbench.tools.validation import raise_if_errors
 
 
 class WorkingTimeModel(models.Model):
@@ -210,3 +211,10 @@ class Absence(Model):
             return cls.urls["list"] + "?u={}".format(
                 instance.user_id if instance else ""
             )
+
+    def clean_fields(self, exclude):
+        super().clean_fields(exclude)
+        errors = {}
+        if self.starts_on and self.ends_on and self.ends_on < self.starts_on:
+            errors["ends_on"] = _("Absences cannot end before they began.")
+        raise_if_errors(errors, exclude)
