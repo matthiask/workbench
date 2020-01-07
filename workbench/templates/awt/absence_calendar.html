@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% load i18n workbench %}
+{% load i18n workbench webpack_loader %}
 
 {% block title %}{% trans 'absence calendar' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 
 <h1>{% trans 'absence calendar' %}</h1>
-
-{{ absences|json_script:'absences' }}
-
+  <div id="absences-root"></div>
+  {{ absences|json_script:'absences-data' }}
+  {% render_bundle "absences" %}
 {% endblock %}
