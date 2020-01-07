@@ -3,6 +3,7 @@ import datetime as dt
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -139,6 +140,16 @@ class Employment(Model):
             )
 
 
+class AbsenceQuerySet(models.QuerySet):
+    def for_date(self, date):
+        cutoff = date - dt.timedelta(days=15)
+
+        return self.filter(
+            Q(ends_on__isnull=True, starts_on__gte=cutoff)
+            | Q(ends_on__isnull=False, ends_on__gte=cutoff)
+        )
+
+
 @model_urls
 class Absence(Model):
     VACATION = "vacation"
@@ -165,6 +176,8 @@ class Absence(Model):
     description = models.TextField(_("description"))
     reason = models.CharField(_("reason"), max_length=10, choices=REASON_CHOICES)
     is_vacation = models.BooleanField(_("is vacation"), default=True)
+
+    objects = AbsenceQuerySet.as_manager()
 
     class Meta:
         ordering = ["-starts_on", "-pk"]

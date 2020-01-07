@@ -1,4 +1,5 @@
 import datetime as dt
+from collections import defaultdict
 
 from django.contrib import messages
 from django.shortcuts import redirect, render
@@ -6,7 +7,7 @@ from django.utils.translation import gettext as _
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
-from workbench.awt.models import Year
+from workbench.awt.models import Absence, Year
 from workbench.awt.reporting import active_users, annual_working_time
 
 
@@ -52,3 +53,13 @@ def annual_working_time_view(request):
             "view": {"meta": Year._meta},
         },
     )
+
+
+def absence_calendar(request):
+    absences = defaultdict(list)
+    for absence in Absence.objects.for_date(dt.date.today()).select_related("user"):
+        absences[absence.user].append(absence)
+
+    absences = sorted(absences.items())
+
+    return render(request, "awt/absence_calendar.html", {"absences": absences})
