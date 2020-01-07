@@ -19,25 +19,19 @@ def local_date_format(dttm, fmt=None):
     )
 
 
-def currency(value, show_plus_sign=False):
-    if value:
-        value = value.quantize(H2)
-    return (
-        "{}{:,.2f}".format("+" if show_plus_sign and value > 0 else "", value).replace(
-            ",", "’"
-        )
-        if value
-        else "0.00"
-    )
+def _fmt(*, fmt, value, exp, plus_sign=False):
+    value = value.quantize(exp) if value else exp
+    value = value if value != 0 else exp  # Avoid -0.0
+    return fmt.format("+" if plus_sign and value > 0 else "", value).replace(",", "’")
 
 
-def days(value):
-    if value:
-        value = value.quantize(H2)
-    return "{:,.2f}d".format(value).replace(",", "’") if value else "0.00d"
+def currency(value, plus_sign=False):
+    return _fmt(fmt="{}{:,.2f}", value=value, exp=H2, plus_sign=plus_sign)
 
 
-def hours(value):
-    if value:
-        value = value.quantize(H1)
-    return "{:,.1f}h".format(value).replace(",", "’") if value else "0.0h"
+def days(value, plus_sign=False):
+    return _fmt(fmt="{}{:,.2f}d", value=value, exp=H2, plus_sign=plus_sign)
+
+
+def hours(value, plus_sign=False):
+    return _fmt(fmt="{}{:,.1f}h", value=value, exp=H1, plus_sign=plus_sign)

@@ -49,7 +49,7 @@
         </tr>
 
         <tr>
-          <td class="text-right">{{ overall.running_sum|hours }}</td>
+          <td class="text-right">{{ overall.running_sum|hours:True }}</td>
           <th>{% trans 'net work hours' %}</th>
         </tr>
 
@@ -59,7 +59,7 @@
         </tr>
 
         <tr>
-          <td class="text-right">{{ overall.balance|hours }}</td>
+          <td class="text-right">{{ overall.balance|hours:True }}</td>
           <th>{% trans 'balance' %}</th>
         </tr>
 
