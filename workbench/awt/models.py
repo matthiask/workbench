@@ -141,12 +141,14 @@ class Employment(Model):
 
 
 class AbsenceQuerySet(models.QuerySet):
-    def for_date(self, date):
+    def calendar(self, date=None):
+        date = date or dt.date.today()
         cutoff = date - dt.timedelta(days=15)
 
         return self.filter(
             Q(ends_on__isnull=True, starts_on__gte=cutoff)
-            | Q(ends_on__isnull=False, ends_on__gte=cutoff)
+            | Q(ends_on__isnull=False, ends_on__gte=cutoff),
+            Q(starts_on__lte=date + dt.timedelta(days=365)),
         )
 
 

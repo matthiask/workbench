@@ -57,7 +57,7 @@ def annual_working_time_view(request):
 
 def absence_calendar(request):
     absences = defaultdict(list)
-    for absence in Absence.objects.for_date(dt.date.today()).select_related("user"):
+    for absence in Absence.objects.calendar().select_related("user"):
         absences[absence.user].append(absence)
 
     absences = sorted(absences.items())
