@@ -155,6 +155,12 @@ class Absence(Model):
         User, on_delete=models.CASCADE, verbose_name=_("user"), related_name="absences"
     )
     starts_on = models.DateField(_("starts on"))
+    ends_on = models.DateField(
+        _("ends on"),
+        blank=True,
+        null=True,
+        help_text=_("Only used for the visualization of absences."),
+    )
     days = models.DecimalField(_("days"), max_digits=4, decimal_places=2)
     description = models.TextField(_("description"))
     reason = models.CharField(_("reason"), max_length=10, choices=REASON_CHOICES)

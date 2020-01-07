@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-07 11:40+0100\n"
+"POT-Creation-Date: 2020-01-07 11:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -377,6 +377,14 @@ msgstr "Andere Gründe"
 #: workbench/awt/models.py workbench/invoices/models.py
 msgid "starts on"
 msgstr "startet am"
+
+#: workbench/awt/models.py workbench/invoices/models.py
+msgid "ends on"
+msgstr "endet am"
+
+#: workbench/awt/models.py
+msgid "Only used for the visualization of absences."
+msgstr "Wird nur für die Visualisierung der Abwesenheiten verwendet."
 
 #: workbench/awt/models.py workbench/invoices/models.py
 #: workbench/invoices/views.py workbench/logbook/forms.py
@@ -1247,10 +1255,6 @@ msgstr "monatlich"
 #: workbench/invoices/models.py
 msgid "weekly"
 msgstr "wöchentlich"
-
-#: workbench/invoices/models.py
-msgid "ends on"
-msgstr "endet am"
 
 #: workbench/invoices/models.py
 msgid "periodicity"

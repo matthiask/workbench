@@ -53,7 +53,7 @@ class AbsenceForm(ModelForm):
 
     class Meta:
         model = Absence
-        fields = ["user", "starts_on", "days", "description", "reason"]
+        fields = ["user", "starts_on", "ends_on", "days", "description", "reason"]
         widgets = {"description": Textarea({"rows": 2}), "reason": forms.RadioSelect}
 
     def __init__(self, *args, **kwargs):
