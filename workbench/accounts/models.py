@@ -172,13 +172,14 @@ class User(Model, AbstractBaseUser):
 
         return Project.objects.filter(
             Q(
+                closed_on__isnull=True,
                 id__in=self.loggedhours.filter(
                     rendered_on__gte=dt.date.today() - dt.timedelta(days=7)
                 )
                 .values("service__project")
                 .annotate(Count("id"))
                 .filter(id__count__gte=3)
-                .values("service__project")
+                .values("service__project"),
             )
             | Q(
                 id__in=self.loggedhours.filter(rendered_on__gte=dt.date.today()).values(
