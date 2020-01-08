@@ -1,7 +1,7 @@
 $white: #fff;
 $black: #020202;
 $alto: #ddd;
-$gallery: #eee;
+$gallery: #eeeeee;
 
 $apple: #3eb32d;
 $antique-brass: #cc875c;
@@ -13,6 +13,11 @@ $absence-colors: (
   "andere-grunde": $cornflower-blue,
 );
 
+.absences-wrapper {
+  max-width: 100%;
+  overflow: auto;
+}
+
 .absences {
   --grid-gap: 0.125rem;
   --scale-row-height: 4rem;
@@ -20,6 +25,8 @@ $absence-colors: (
 
   display: grid;
   grid-gap: var(--grid-gap);
+  min-width: min-content;
+
   background:
     /* Person Row Divider */ repeating-linear-gradient(
       to bottom,
