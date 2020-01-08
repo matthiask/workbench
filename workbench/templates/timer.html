@@ -4,11 +4,8 @@
 
 {% block title %}Timer - {{ block.super }}{% endblock %}
 
-{% block content %}
-  <script src="{% url 'javascript-catalog' %}"></script>
-  {% render_bundle "main" %}
-{% endblock %}
-
 {% block js %}{{ block.super }}
+<script src="{% url 'javascript-catalog' %}"></script>
+{% render_bundle "main" %}
 <span id="current-user" data-current-user="{{ request.user.id }}"></span>
 {% endblock %}
