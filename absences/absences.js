@@ -11,13 +11,18 @@ export const Absences = ({absencesByPerson, dateList}) => {
       <style>
         {`
           .absences {
+            --day-column-width: 1rem;
+            --person-row-height: 2rem;
+            --person-count: ${absencesByPerson.length};
             grid-template-columns:
-              [names] 10rem
-              ${dateList.map(d => `[${getColumnName(d)}] 1rem`).join("\n")};
+              [names] var(--name-column-width)
+              ${dateList
+                .map(d => `[${getColumnName(d)}] var(--day-column-width)`)
+                .join("\n")};
             grid-template-rows:
-              [scale] 1rem
+              [scale] var(--scale-row-height)
               ${absencesByPerson
-                .map(p => `[person-${p.slug}] 2rem`)
+                .map(p => `[person-${p.slug}] var(--person-row-height)`)
                 .join("\n")};
           }
         `}

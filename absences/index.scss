@@ -1,6 +1,7 @@
 $white: #fff;
 $black: #020202;
 $alto: #ddd;
+$gallery: #eee;
 
 $apple: #3eb32d;
 $antique-brass: #cc875c;
@@ -13,13 +14,48 @@ $absence-colors: (
 );
 
 .absences {
+  --grid-gap: 0.125rem;
+  --scale-row-height: 3rem;
+  --name-column-width: 10rem;
+
   display: grid;
-  grid-gap: 2px;
+  grid-gap: var(--grid-gap);
+  background:
+    /* Person Row Divider */ repeating-linear-gradient(
+      to bottom,
+      $alto 0,
+      $alto var(--grid-gap),
+      transparent 0,
+      transparent calc(var(--person-row-height) + var(--grid-gap))
+    ),
+    /* Name Column */
+      linear-gradient(
+        to right,
+        $white 0,
+        $white calc(var(--name-column-width) + var(--grid-gap))
+      ),
+    /* Week Columns */
+      repeating-linear-gradient(
+        to right,
+        $gallery 0,
+        $gallery calc((var(--day-column-width) + var(--grid-gap)) * 7),
+        $white 0,
+        $white calc((var(--day-column-width) + var(--grid-gap)) * 2 * 7)
+      );
+  background-position: 0 var(--scale-row-height), 0,
+    calc(var(--name-column-width) + var(--grid-gap)) 0;
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-size: 100%
+      calc(var(--person-count) * (var(--person-row-height) + var(--grid-gap))),
+    calc(var(--name-column-width) + var(--grid-gap)) auto, auto;
 }
 
 .absences__person {
   grid-column: 1 / 2;
   grid-row-end: span 1;
+
+  display: flex;
+  align-items: center;
 }
 
 .absence {
