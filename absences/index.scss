@@ -101,9 +101,18 @@ $popup-width: 12rem;
   font-size: 0.75rem;
   color: $white;
 
+  &:hover {
+    text-decoration: none;
+    color: $white;
+  }
+
   @each $reason, $color in $absence-colors {
     &--#{$reason} {
       background-color: $color;
+
+      &:hover {
+        background-color: lighten($color, 5%);
+      }
     }
   }
 }
