@@ -106,7 +106,7 @@ const Absence = ({absence, person}) => {
   const [showPopup, setShowPopup] = useState(false)
   const {startsOn, endsOn} = absence
   const style = {
-    gridColumn: `${getColumnName(startsOn)} / ${getColumnName(endsOn)}`,
+    gridColumn: `${getColumnName(startsOn)} / ${getColumnName(endsOn + 24 * 60 * 60 * 1000)}`,
     gridRowStart: getRowName(person.slug),
   }
 

@@ -35,8 +35,12 @@ function getDateList(start, end) {
 
   while (currentDate <= end) {
     list.push(currentDate)
-    currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1))
+    // create a new (duplicate) date object so the new one can be altered without changing the first one
+    currentDate = new Date(currentDate.getTime())
+    currentDate.setDate(currentDate.getDate() + 1)
   }
+
+  list.push(currentDate) // we need one more date for one more column grid line
 
   return list
 }
