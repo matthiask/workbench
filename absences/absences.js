@@ -80,17 +80,17 @@ const Absence = ({absence, person}) => {
       <span className="absence__label">
         {absence.reason + " / " + absence.description}
       </span>
-      {showPopup ? <Popup absence={absence} person={person} /> : null}
+      {showPopup ? <Popup absence={absence} /> : null}
     </div>
   )
 }
 
-const Popup = ({person, absence}) => {
+const Popup = ({absence}) => {
   return (
     <div className="absence__popup">
+      <strong>{absence.reason}</strong>
+      <hr />
       <p>
-        <strong>{absence.reason}</strong>
-        <hr />
         {readableDate(new Date(absence.startsOn))} –{" "}
         {readableDate(new Date(absence.endsOn))} <br />
         Beschreibung: {absence.description} <br />
