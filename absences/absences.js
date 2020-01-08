@@ -1,6 +1,6 @@
 import React, {useState, useMemo} from "react"
 
-import {formatDate, slugify, readableDate, getWeekNumber} from "./utils"
+import {formatDate, readableDate, getWeekNumber} from "./utils"
 
 const getColumnName = t => `date-${formatDate(new Date(t))}`
 const getRowName = slug => `person-${slug}`

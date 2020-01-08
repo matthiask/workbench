@@ -3,8 +3,6 @@ import "./index.scss"
 import ReactDOM from "react-dom"
 import React from "react"
 
-import {formatDate, slugify} from "./utils"
-
 import {Absences} from "./absences"
 
 function getTimeBoundaries(absences) {
