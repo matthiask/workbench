@@ -1,11 +1,11 @@
 $white: #fff;
 $black: #020202;
 $alto: #ddd;
-$gallery: #eeeeee;
 
 $apple: #3eb32d;
 $antique-brass: #cc875c;
 $cornflower-blue: #7e73ff;
+$zircon: #F4F7FF;
 
 $absence-colors: (
   "ferien": $apple,
@@ -44,8 +44,8 @@ $absence-colors: (
     /* Week Columns */
       repeating-linear-gradient(
         to right,
-        $gallery 0,
-        $gallery calc((var(--day-column-width) + var(--grid-gap)) * 7),
+        $zircon 0,
+        $zircon calc((var(--day-column-width) + var(--grid-gap)) * 7),
         $white 0,
         $white calc((var(--day-column-width) + var(--grid-gap)) * 2 * 7)
       );
