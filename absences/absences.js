@@ -46,8 +46,6 @@ export const Absences = ({absencesByPerson, dateList}) => {
     [dateList]
   )
 
-  console.log(dateList.findIndex(d => d === scaleValues[1].date))
-
   return (
     <React.Fragment>
       <style>
