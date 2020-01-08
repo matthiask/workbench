@@ -125,7 +125,7 @@ const Absence = ({absence, person}) => {
       }}
     >
       <span className="absence__label">
-        {absence.reasonDisplay + " / " + absence.description}
+        {absence.reasonDisplay + " – " + absence.description}
       </span>
       {showPopup ? <Popup absence={absence} /> : null}
     </a>
