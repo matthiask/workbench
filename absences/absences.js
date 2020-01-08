@@ -78,7 +78,7 @@ export const Absences = ({absencesByPerson, dateList}) => {
             <Person person={person} />
             {person.absences.map(a => (
               <Absence
-                key={`${person.name}-${a.startsOn}-${a.endsOn}-${a.reason}`}
+                key={a.id}
                 absence={a}
                 person={person}
               />
@@ -111,10 +111,12 @@ const Absence = ({absence, person}) => {
   }
 
   return (
-    <div
-      className={`absence absence--${slugify(absence.reason)}`}
+    <a
+      href={`/absences/${absence.id}/`}
+      data-toggle="ajaxmodal"
+      className={`absence absence--${absence.reason}`}
       style={style}
-      title={`${absence.reason} – ${absence.description}`}
+      title={`${absence.reasonDisplay} – ${absence.description}`}
       onMouseEnter={() => {
         setShowPopup(true)
       }}
@@ -123,17 +125,17 @@ const Absence = ({absence, person}) => {
       }}
     >
       <span className="absence__label">
-        {absence.reason + " / " + absence.description}
+        {absence.reasonDisplay + " / " + absence.description}
       </span>
       {showPopup ? <Popup absence={absence} /> : null}
-    </div>
+    </a>
   )
 }
 
 const Popup = ({absence}) => {
   return (
     <div className="absence__popup">
-      <strong>{absence.reason}</strong>
+      <strong>{absence.reasonDisplay}</strong>
       <hr />
       <p>
         {readableDate(new Date(absence.startsOn))} –{" "}

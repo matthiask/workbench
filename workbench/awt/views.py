@@ -63,21 +63,26 @@ def absence_calendar(request):
 
     absences = sorted(
         (
-            user.get_full_name(),
-            [
-                {
-                    "reason": absence.get_reason_display(),
-                    "startsOn": time.mktime(absence.starts_on.timetuple()),
-                    "endsOn": time.mktime(
-                        (absence.ends_on or absence.starts_on).timetuple()
-                    ),
-                    "days": absence.days,
-                    "description": absence.description,
-                }
-                for absence in user_absences
-            ],
-        )
-        for user, user_absences in absences.items()
+            (
+                {"fullName": user.get_full_name(), "id": user.id},
+                [
+                    {
+                        "id": absence.id,
+                        "reason": absence.reason,
+                        "reasonDisplay": absence.get_reason_display(),
+                        "startsOn": time.mktime(absence.starts_on.timetuple()),
+                        "endsOn": time.mktime(
+                            (absence.ends_on or absence.starts_on).timetuple()
+                        ),
+                        "days": absence.days,
+                        "description": absence.description,
+                    }
+                    for absence in user_absences
+                ],
+            )
+            for user, user_absences in absences.items()
+        ),
+        key=lambda row: row[0]["fullName"],
     )
 
     return render(request, "awt/absence_calendar.html", {"absences": absences})
