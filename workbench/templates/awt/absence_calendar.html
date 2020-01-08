@@ -5,8 +5,13 @@
 {% block title %}{% trans 'absence calendar' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
+  <div class="d-flex w-100 align-items-start justify-content-between">
+    <h1 class="absences-title">{% trans 'absence calendar' %}</h1>
+    <a href="{% url 'awt_absence_create' %}" class="btn btn-primary" data-toggle="ajaxmodal">
+      {% include 'svg/plus.svg' %} {% trans 'absence' %}
+    </a>
+  </div>
 
-<h1 class="absences-title">{% trans 'absence calendar' %}</h1>
   <div id="absences-root" class="absences-wrapper"></div>
   {{ absences|json_script:'absences-data' }}
   <script src="{% url 'javascript-catalog' %}"></script>
