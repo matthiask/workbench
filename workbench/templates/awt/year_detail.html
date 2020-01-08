@@ -204,9 +204,7 @@
           </tr>
           {% for absence in data.absences.absence_vacation %}
             <tr>
-              <td>
-                {% blocktrans with date=absence.starts_on|local_date_format %}from {{ date }}{% endblocktrans %}
-              </td>
+              <td>{{ absence.pretty_duration }}</td>
               <td>{{ absence.days|days }}</td>
               <td>{{ absence.description }}</td>
             </tr>

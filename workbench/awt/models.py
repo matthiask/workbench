@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext
 
 from workbench.accounts.models import User
 from workbench.tools.formats import local_date_format
@@ -218,3 +218,17 @@ class Absence(Model):
         if self.starts_on and self.ends_on and self.ends_on < self.starts_on:
             errors["ends_on"] = _("Absences cannot end before they began.")
         raise_if_errors(errors, exclude)
+
+    @property
+    def pretty_status(self):
+        return "%s, %s" % (
+            ngettext("%s day", "%s days", self.days) % self.days,
+            self.pretty_duration,
+        )
+
+    @property
+    def pretty_duration(self):
+        return "%s - %s" % (
+            local_date_format(self.starts_on),
+            local_date_format(self.ends_on or self.starts_on),
+        )

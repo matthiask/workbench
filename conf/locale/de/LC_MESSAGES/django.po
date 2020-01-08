@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-07 12:54+0100\n"
+"POT-Creation-Date: 2020-01-08 14:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -419,6 +419,13 @@ msgstr "Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."
 #: workbench/awt/models.py
 msgid "Absences cannot end before they began."
 msgstr "Absenzen können nicht vor ihrem Beginn zu Ende gehen."
+
+#: workbench/awt/models.py
+#, python-format
+msgid "%s day"
+msgid_plural "%s days"
+msgstr[0] "%s Tag"
+msgstr[1] "%s Tage"
 
 #: workbench/awt/views.py
 #, python-format
@@ -1781,11 +1788,6 @@ msgstr "Sichern"
 msgid "absence calendar"
 msgstr "Abwesenheitskalender"
 
-#: workbench/templates/awt/absence_list.html
-#, python-format
-msgid "%(days)s day(s) starting on %(start)s"
-msgstr "%(days)s Tag(e), ab %(start)s"
-
 #: workbench/templates/awt/year_detail.html
 msgid "active users"
 msgstr "Aktive Benutzer"
@@ -2404,6 +2406,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "Target time for %s not found."
-#~ msgstr "Sollzeit für %s nicht gefunden."
