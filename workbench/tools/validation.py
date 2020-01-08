@@ -7,8 +7,8 @@ from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 
 
-def monday():
-    day = dt.date.today()
+def monday(day=None):
+    day = day or dt.date.today()
     return day - dt.timedelta(days=day.weekday())
 
 

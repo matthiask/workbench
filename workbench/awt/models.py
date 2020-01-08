@@ -11,7 +11,7 @@ from workbench.accounts.models import User
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import HoursField, Model, MoneyField
 from workbench.tools.urls import model_urls
-from workbench.tools.validation import raise_if_errors
+from workbench.tools.validation import monday, raise_if_errors
 
 
 class WorkingTimeModel(models.Model):
@@ -142,9 +142,9 @@ class Employment(Model):
 
 
 class AbsenceQuerySet(models.QuerySet):
-    def calendar(self, date=None):
-        date = date or dt.date.today()
-        cutoff = date - dt.timedelta(days=15)
+    def calendar(self):
+        date = monday(dt.date.today())
+        cutoff = date - dt.timedelta(days=7)
 
         return self.filter(
             Q(ends_on__isnull=True, starts_on__gte=cutoff)
