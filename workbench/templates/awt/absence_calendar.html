@@ -6,8 +6,8 @@
 
 {% block content %}
 
-<h1>{% trans 'absence calendar' %}</h1>
-  <div id="absences-root"></div>
+<h1 class="absences-title">{% trans 'absence calendar' %}</h1>
+  <div id="absences-root" class="absences-wrapper"></div>
   {{ absences|json_script:'absences-data' }}
   {% render_bundle "absences" %}
 {% endblock %}

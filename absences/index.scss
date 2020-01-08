@@ -13,6 +13,10 @@ $absence-colors: (
   "andere-grunde": $cornflower-blue,
 );
 
+.absences-title {
+  margin-bottom: 2rem;
+}
+
 .absences-wrapper {
   max-width: 100%;
   overflow: auto;
