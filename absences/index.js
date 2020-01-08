@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   absencesByPerson = absencesByPerson.map(person => ({
     name: person[0].fullName,
-    slug: "" + person[0].id,
+    id: "" + person[0].id,
     absences: person[1].map(a => ({
       ...a,
       startsOn: a.startsOn * 1000,

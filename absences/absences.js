@@ -3,7 +3,7 @@ import React, {useState, useMemo} from "react"
 import {formatDate, readableDate, getWeekNumber} from "./utils"
 
 const getColumnName = t => `date-${formatDate(new Date(t))}`
-const getRowName = slug => `person-${slug}`
+const getRowName = id => `person-${id}`
 
 const MONTHS = [
   "Januar",
@@ -66,7 +66,7 @@ export const Absences = ({absencesByPerson, dateList}) => {
             grid-template-rows:
               [scale] var(--scale-row-height)
               ${absencesByPerson
-                .map(p => `[person-${p.slug}] var(--person-row-height)`)
+                .map(p => `[person-${p.id}] var(--person-row-height)`)
                 .join("\n")};
           }
         `}
@@ -74,7 +74,7 @@ export const Absences = ({absencesByPerson, dateList}) => {
       <div className="absences">
         <Scale scaleValues={scaleValues} />
         {absencesByPerson.map(person => (
-          <React.Fragment key={person.slug}>
+          <React.Fragment key={person.id}>
             <Person person={person} />
             {person.absences.map(a => (
               <Absence
@@ -92,7 +92,7 @@ export const Absences = ({absencesByPerson, dateList}) => {
 
 const Person = ({person}) => {
   const style = {
-    gridRow: `${getRowName(person.slug)} / span 1`,
+    gridRow: `${getRowName(person.id)} / span 1`,
   }
 
   return (
@@ -107,7 +107,7 @@ const Absence = ({absence, person}) => {
   const {startsOn, endsOn} = absence
   const style = {
     gridColumn: `${getColumnName(startsOn)} / ${getColumnName(endsOn + 24 * 60 * 60 * 1000)}`,
-    gridRowStart: getRowName(person.slug),
+    gridRowStart: getRowName(person.id),
   }
 
   return (
