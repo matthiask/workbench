@@ -51,7 +51,7 @@ export const Absences = ({absencesByPerson, dateList}) => {
       <style>
         {`
           .absences {
-            --day-column-width: 1rem;
+            --day-column-width: .5rem;
             --day-column-offset:
               ${dateList.findIndex(d => d === scaleValues[1].date) - 7};
             --person-row-height: 2rem;

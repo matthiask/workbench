@@ -78,8 +78,11 @@ $absence-colors: (
   position: relative;
   grid-row-end: span 1;
 
-  margin: 0.125rem;
-  padding: 0.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+
+  margin: 0.125rem 0;
+  padding: 0.25rem 0.25rem;
   border-radius: 2px;
 
   font-size: 0.75rem;
