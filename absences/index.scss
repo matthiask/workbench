@@ -1,0 +1,17 @@
+.absences {
+  display: grid;
+}
+
+.absences__person {
+  grid-column: 1 / 2;
+  grid-row-end: span 1;
+}
+
+.absences__absence {
+  grid-row-end: span 1;
+
+  background-color: #abcdef;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
