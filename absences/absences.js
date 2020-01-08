@@ -1,6 +1,6 @@
 import React from "react"
 
-import {formatDate} from "./utils"
+import {formatDate, slugify} from "./utils"
 
 const getColumnName = t => `date-${formatDate(new Date(t))}`
 const getRowName = slug => `person-${slug}`
@@ -61,7 +61,9 @@ const Absence = ({absence, person}) => {
 
   return (
     <div
-      className="absences__absence"
+      className={`absences__absence absences__absence--${slugify(
+        absence.reason
+      )}`}
       style={style}
       title={`${person.name} – ${absence.reason} – ${absence.description}`}
     >

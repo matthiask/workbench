@@ -1,3 +1,16 @@
+$white: #fff;
+$black: #020202;
+
+$apple: #3EB32D;
+$antique-brass: #CC875C;
+$cornflower-blue: #7E73FF;
+
+$absence-colors: (
+  "ferien": $apple,
+  "krankheit": $antique-brass,
+  "andere-grunde": $cornflower-blue
+);
+
 .absences {
   display: grid;
 }
@@ -10,8 +23,19 @@
 .absences__absence {
   grid-row-end: span 1;
 
-  background-color: #abcdef;
+  padding: .25rem .5rem;
+  border-radius: 2px;
+
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+
+  font-size: .75rem;
+  color: $white;
+
+  @each $reason, $color in $absence-colors {
+    &--#{$reason} {
+      background-color: $color;
+    }
+  }
 }
