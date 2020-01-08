@@ -1,3 +1,13 @@
+const dayOfWeek = [
+  window.pgettext("one letter Sunday", "S"),
+  window.pgettext("one letter Monday", "M"),
+  window.pgettext("one letter Tuesday", "T"),
+  window.pgettext("one letter Wednesday", "W"),
+  window.pgettext("one letter Thursday", "T"),
+  window.pgettext("one letter Friday", "F"),
+  window.pgettext("one letter Saturday", "S"),
+]
+
 export function formatDate(d) {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
 }
@@ -6,8 +16,9 @@ export function readableDate(d) {
   const day = d.getDate()
   const month = d.getMonth() + 1
   const year = d.getFullYear()
+  const dow = dayOfWeek[d.getDay()]
 
-  return `${day}.${month}.${year}`
+  return `${dow} ${day}.${month}.${year}`
 }
 
 // https://stackoverflow.com/a/6117889
