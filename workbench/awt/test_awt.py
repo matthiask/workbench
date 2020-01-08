@@ -18,18 +18,6 @@ class AWTTest(TestCase):
         response = self.client.get("/report/annual-working-time/?year=asdf")
         self.assertRedirects(response, "/report/annual-working-time/")
 
-    def test_absences_list(self):
-        user = factories.UserFactory.create()
-        self.client.force_login(user)
-        response = self.client.get("/absences/")
-        self.assertEqual(response.status_code, 200)
-
-        response = self.client.get("/absences/?user=0")
-        self.assertEqual(response.status_code, 200)
-
-        response = self.client.get("/absences/?user=-1")
-        self.assertEqual(response.status_code, 200)
-
     def test_year(self):
         year = factories.YearFactory.create()
         self.assertEqual(year.months, [30 for i in range(12)])
@@ -253,6 +241,8 @@ class AWTTest(TestCase):
         code("")
         code("u=-1")
         code("u={}".format(user.pk))
+        code("reason=sickness")
+        code("reason=nothing", 302)
 
     def test_employment_validation(self):
         user = factories.UserFactory.create()
@@ -278,4 +268,36 @@ class AWTTest(TestCase):
 
         with self.assertRaises(ValidationError) as cm:
             Employment(**kw, hourly_labor_costs=20).full_clean()
+        self.assertEqual(list(cm.exception), msg)
+
+    def test_calendar(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        Absence.objects.create(
+            user=user,
+            starts_on=dt.date.today(),
+            days=0,
+            description="Test",
+            reason=Absence.VACATION,
+        )
+
+        self.assertEqual(self.client.get("/report/absence-calendar/").status_code, 200)
+
+    def test_absence_validation(self):
+        user = factories.UserFactory.create()
+        kw = {
+            "user": user,
+            "starts_on": dt.date(2020, 2, 1),
+            "days": 0,
+            "description": "Nothing",
+            "reason": "vacation",
+        }
+        Absence(**kw).full_clean()
+        Absence(**kw, ends_on=dt.date(2020, 2, 2)).full_clean()
+
+        msg = [("ends_on", ["Absences cannot end before they began."])]
+
+        with self.assertRaises(ValidationError) as cm:
+            Absence(**kw, ends_on=dt.date(2020, 1, 30)).full_clean()
         self.assertEqual(list(cm.exception), msg)
