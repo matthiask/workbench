@@ -84,7 +84,7 @@ export async function sendLogbook(dispatch, {activity, current, seconds}) {
   body.append("modal-hours", Math.ceil(seconds / 360) / 10)
   body.append(
     "modal-rendered_by",
-    document.getElementById("root").dataset.currentUser
+    document.getElementById("current-user").dataset.currentUser
   )
   body.append("modal-rendered_on", new Date().toISOString().replace(/T.*/, ""))
 
