@@ -13,13 +13,14 @@ $absence-colors: (
   "andere-grunde": $cornflower-blue,
 );
 
+$popup-width: 12rem;
+
 .absences-title {
   margin-bottom: 2rem;
 }
 
 .absences-wrapper {
-  max-width: 100%;
-  overflow: auto;
+  min-width: min-content;
 }
 
 .absences {
@@ -30,6 +31,7 @@ $absence-colors: (
   display: grid;
   grid-gap: var(--grid-gap);
   min-width: min-content;
+  margin-right: $popup-width;
 
   background:
     /* Person Row Divider */ repeating-linear-gradient(
@@ -119,7 +121,7 @@ $absence-colors: (
   top: calc(100% + 0.25rem);
 
   padding: 0.5rem;
-  width: 12rem;
+  width: $popup-width;
 
   z-index: 100;
   background-color: $white;
