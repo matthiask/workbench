@@ -1,43 +1,13 @@
 {% extends "base.html" %}
 
-{% load i18n workbench %}
+{% load i18n workbench webpack_loader %}
 
 {% block title %}{% trans 'absence calendar' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% trans 'absence calendar' %}</h1>
-
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
-<script type="text/javascript">
-  google.charts.load("current", {packages:["timeline"]});
-  google.charts.setOnLoadCallback(drawChart);
-  function drawChart() {
-
-    var container = document.getElementById('example3.1');
-    var chart = new google.visualization.Timeline(container);
-    var dataTable = new google.visualization.DataTable();
-    dataTable.addColumn({ type: 'string', id: 'Position' });
-    dataTable.addColumn({ type: 'string', id: 'Name' });
-    dataTable.addColumn({ type: 'date', id: 'Start' });
-    dataTable.addColumn({ type: 'date', id: 'End' });
-    dataTable.addRows([
-			{% for user, user_absences in absences %}
-      {% for absence in user_absences %}
-      [
-        '{{ user.get_full_name }}',
-        '{{ absence }} {{ absence.reason }}/{{ absence.get_reason_display }} {{ absence.days }}',
-        new Date({{ absence.starts_on|js_date }}),
-        new Date({{ absence.ends_on|default:absence.starts_on|js_date }}),
-      ],
-      {% endfor %}
-      {% endfor %}
-    ]);
-
-    chart.draw(dataTable);
-  }
-</script>
-<div id="example3.1" style="height: 1000px;"></div>
-
+<h1 class="absences-title">{% trans 'absence calendar' %}</h1>
+  <div id="absences-root" class="absences-wrapper"></div>
+  {{ absences|json_script:'absences-data' }}
+  {% render_bundle "absences" %}
 {% endblock %}

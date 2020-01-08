@@ -1,0 +1,147 @@
+$white: #fff;
+$black: #020202;
+$alto: #ddd;
+
+$apple: #3eb32d;
+$antique-brass: #cc875c;
+$cornflower-blue: #7e73ff;
+$zircon: #F4F7FF;
+
+$absence-colors: (
+  "vacation": $apple,
+  "sickness": $antique-brass,
+  "other": $cornflower-blue,
+);
+
+$popup-width: 12rem;
+
+.absences-title {
+  margin-bottom: 2rem;
+}
+
+.absences-wrapper {
+  min-width: min-content;
+}
+
+.absences {
+  --grid-gap: 0.125rem;
+  --scale-row-height: 4rem;
+  --name-column-width: 10rem;
+
+  display: grid;
+  grid-gap: var(--grid-gap);
+  min-width: min-content;
+  margin-right: $popup-width;
+
+  background:
+    /* Person Row Divider */ repeating-linear-gradient(
+      to bottom,
+      $alto 0,
+      $alto var(--grid-gap),
+      transparent 0,
+      transparent calc(var(--person-row-height) + var(--grid-gap))
+    ),
+    /* Name Column */
+      linear-gradient(
+        to right,
+        $white 0,
+        $white calc(var(--name-column-width) + var(--grid-gap))
+      ),
+    /* Week Columns */
+      repeating-linear-gradient(
+        to right,
+        $zircon 0,
+        $zircon calc((var(--day-column-width) + var(--grid-gap)) * 7),
+        $white 0,
+        $white calc((var(--day-column-width) + var(--grid-gap)) * 2 * 7)
+      );
+  background-position: 0 var(--scale-row-height), 0,
+    calc(
+        var(--name-column-width) + var(--grid-gap) + var(--day-column-offset) *
+          ((var(--day-column-width) + var(--grid-gap)))
+      )
+      0;
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-size: 100%
+      calc(var(--person-count) * (var(--person-row-height) + var(--grid-gap))),
+    calc(var(--name-column-width) + var(--grid-gap)) auto,
+    calc(var(--day-count) * ((var(--day-column-width) + var(--grid-gap)))) 100%;
+}
+
+.absences__scale-tick {
+  grid-row: scale / span 1;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  padding: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.absences__person {
+  grid-column: 1 / 2;
+  grid-row-end: span 1;
+
+  display: flex;
+  align-items: center;
+}
+
+.absence {
+  position: relative;
+  grid-row-end: span 1;
+
+  display: flex;
+  align-items: center;
+
+  margin: 0.125rem 0;
+  padding: 0.25rem 0.25rem;
+  border-radius: 2px;
+
+  font-size: 0.75rem;
+  color: $white;
+
+  &:hover {
+    text-decoration: none;
+    color: $white;
+  }
+
+  @each $reason, $color in $absence-colors {
+    &--#{$reason} {
+      background-color: $color;
+
+      &:hover {
+        background-color: lighten($color, 5%);
+      }
+    }
+  }
+}
+
+.absence__label {
+  display: block;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.absence__popup {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+
+  padding: 0.5rem;
+  width: $popup-width;
+
+  z-index: 100;
+  background-color: $white;
+  color: $black;
+  border: 1px solid $alto;
+
+  p {
+    margin-bottom: 0;
+  }
+
+  hr {
+    border-color: $alto;
+  }
+}

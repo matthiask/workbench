@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "prettier": "prettier --write .*js *js *.scss workbench/static/workbench/* 'timer/**/*.{js,scss}'",
+    "prettier": "prettier --write .*js *js *.scss workbench/static/workbench/* 'timer/**/*.{js,scss}' 'absences/**/*.{js,scss}'",
     "check": "eslint workbench/static/workbench/ timer/**/*.js && prettier --list-different 'timer/**/*.{js,scss}'",
     "eslint": "eslint workbench/static/workbench/ timer/**/*.js",
     "build-bootstrap": "webpack -p --config webpack.config.bootstrap.js",
@@ -13,6 +13,7 @@
   "dependencies": {
     "@babel/core": "^7.7.7",
     "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.7.7",
     "@babel/preset-env": "^7.7.7",
     "@babel/preset-react": "^7.7.4",
     "autoprefixer": "^9.7.3",

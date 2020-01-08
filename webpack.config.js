@@ -32,10 +32,11 @@ function cssLoader(firstLoader) {
 
 module.exports = {
   mode: DEBUG ? "development" : "production",
-  context: path.join(__dirname, "timer"),
+  context: path.join(__dirname),
   // devtool: "source-map",
   entry: {
-    main: "./index.js",
+    main: "./timer/index.js",
+    absences: "./absences/index.js",
   },
   output: {
     path: path.resolve("./static/workbench/timer/"),
