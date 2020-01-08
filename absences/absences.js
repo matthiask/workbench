@@ -1,6 +1,6 @@
-import React from "react"
+import React, {useState} from "react"
 
-import {formatDate, slugify} from "./utils"
+import {formatDate, slugify, readableDate} from "./utils"
 
 const getColumnName = t => `date-${formatDate(new Date(t))}`
 const getRowName = slug => `person-${slug}`
@@ -53,6 +53,7 @@ const Person = ({person}) => {
 }
 
 const Absence = ({absence, person}) => {
+  const [showPopup, setShowPopup] = useState(false)
   const {startsOn, endsOn} = absence
   const style = {
     gridColumn: `${getColumnName(startsOn)} / ${getColumnName(endsOn)}`,
@@ -61,13 +62,35 @@ const Absence = ({absence, person}) => {
 
   return (
     <div
-      className={`absences__absence absences__absence--${slugify(
-        absence.reason
-      )}`}
+      className={`absence absence--${slugify(absence.reason)}`}
       style={style}
-      title={`${person.name} – ${absence.reason} – ${absence.description}`}
+      title={`${absence.reason} – ${absence.description}`}
+      onMouseEnter={() => {
+        setShowPopup(true)
+      }}
+      onMouseLeave={() => {
+        setShowPopup(false)
+      }}
     >
-      {absence.reason + " / " + absence.description}
+      <span className="absence__label">
+        {absence.reason + " / " + absence.description}
+      </span>
+      {showPopup ? <Popup absence={absence} person={person} /> : null}
+    </div>
+  )
+}
+
+const Popup = ({person, absence}) => {
+  return (
+    <div className="absence__popup">
+      <p>
+        <strong>{absence.reason}</strong>
+        <hr />
+        {readableDate(new Date(absence.startsOn))} –{" "}
+        {readableDate(new Date(absence.endsOn))} <br />
+        Beschreibung: {absence.description} <br />
+        Tage: {absence.days}d <br />
+      </p>
     </div>
   )
 }

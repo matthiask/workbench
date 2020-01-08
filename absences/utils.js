@@ -2,6 +2,14 @@ export function formatDate(d) {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
 }
 
+export function readableDate(d) {
+  const day = d.getDate()
+  const month = d.getMonth() + 1
+  const year = d.getFullYear()
+
+  return `${day}.${month}.${year}`
+}
+
 // https://medium.com/@mhagemann/the-ultimate-way-to-slugify-a-url-string-in-javascript-b8e4a0d849e1
 export function slugify(string) {
   const a =
