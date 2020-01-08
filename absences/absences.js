@@ -77,11 +77,7 @@ export const Absences = ({absencesByPerson, dateList}) => {
           <React.Fragment key={person.id}>
             <Person person={person} />
             {person.absences.map(a => (
-              <Absence
-                key={a.id}
-                absence={a}
-                person={person}
-              />
+              <Absence key={a.id} absence={a} person={person} />
             ))}
           </React.Fragment>
         ))}
@@ -106,7 +102,9 @@ const Absence = ({absence, person}) => {
   const [showPopup, setShowPopup] = useState(false)
   const {startsOn, endsOn} = absence
   const style = {
-    gridColumn: `${getColumnName(startsOn)} / ${getColumnName(endsOn + 24 * 60 * 60 * 1000)}`,
+    gridColumn: `${getColumnName(startsOn)} / ${getColumnName(
+      endsOn + 24 * 60 * 60 * 1000
+    )}`,
     gridRowStart: getRowName(person.id),
   }
 
