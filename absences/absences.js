@@ -5,20 +5,11 @@ import {formatDate, readableDate, getWeekNumber} from "./utils"
 const getColumnName = t => `date-${formatDate(new Date(t))}`
 const getRowName = id => `person-${id}`
 
+// prettier-ignore
 const MONTHS = [
-  "Januar",
-  "Februar",
-  "März",
-  "April",
-  "Mai",
-  "Juni",
-  "Juli",
-  "August",
-  "September",
-  "Oktober",
-  "November",
-  "Dezember",
-]
+  "January", "February", "March", "April", "May", "June", "July", "August",
+  "September", "October", "November", "December"
+].map(m => window.gettext(m))
 
 export const Absences = ({absencesByPerson, dateList}) => {
   const scaleValues = useMemo(
