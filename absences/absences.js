@@ -1,19 +1,65 @@
-import React, {useState} from "react"
+import React, {useState, useMemo} from "react"
 
-import {formatDate, slugify, readableDate} from "./utils"
+import {formatDate, slugify, readableDate, getWeekNumber} from "./utils"
 
 const getColumnName = t => `date-${formatDate(new Date(t))}`
 const getRowName = slug => `person-${slug}`
 
+const MONTHS = [
+  "Januar",
+  "Februar",
+  "März",
+  "April",
+  "Mai",
+  "Juni",
+  "Juli",
+  "August",
+  "September",
+  "Oktober",
+  "November",
+  "Dezember",
+]
+
 export const Absences = ({absencesByPerson, dateList}) => {
+  const scaleValues = useMemo(
+    () =>
+      dateList.reduce((acc, date) => {
+        const week = getWeekNumber(date)[1]
+
+        const entryOfSameWeek = acc.find(e => e.week === week)
+        const entryOfSameMonth = acc.find(e => e.month === date.getMonth())
+        const entryOfSameYear = acc.find(e => e.year === date.getFullYear())
+
+        if (entryOfSameWeek) {
+          return acc
+        }
+
+        acc.push({
+          week: !entryOfSameWeek ? week : "",
+          month: !entryOfSameMonth ? date.getMonth() : "",
+          year: !entryOfSameYear ? date.getFullYear() : "",
+          date: date,
+        })
+
+        return acc
+      }, []),
+    [dateList]
+  )
+
+  console.log(dateList.findIndex(d => d === scaleValues[1].date))
+
   return (
     <React.Fragment>
       <style>
         {`
           .absences {
             --day-column-width: 1rem;
+            --day-column-offset:
+              ${dateList.findIndex(d => d === scaleValues[1].date) - 7};
             --person-row-height: 2rem;
             --person-count: ${absencesByPerson.length};
+            --day-count: ${dateList.length};
+
             grid-template-columns:
               [names] var(--name-column-width)
               ${dateList
@@ -28,6 +74,7 @@ export const Absences = ({absencesByPerson, dateList}) => {
         `}
       </style>
       <div className="absences">
+        <Scale scaleValues={scaleValues} />
         {absencesByPerson.map(person => (
           <React.Fragment key={person.slug}>
             <Person person={person} />
@@ -97,5 +144,27 @@ const Popup = ({absence}) => {
         Tage: {absence.days}d <br />
       </p>
     </div>
+  )
+}
+
+const Scale = ({scaleValues}) => {
+  return (
+    <React.Fragment>
+      {scaleValues.map(entry => {
+        const style = {
+          gridColumn: `${getColumnName(entry.date)} / span 1`,
+        }
+
+        return (
+          <div key={entry.date} className="absences__scale-tick" style={style}>
+            {entry.year}
+            <br />
+            {MONTHS[entry.month]}
+            <br />
+            {entry.week}
+          </div>
+        )
+      })}
+    </React.Fragment>
   )
 }
