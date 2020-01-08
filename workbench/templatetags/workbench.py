@@ -25,7 +25,9 @@ register.filter(local_date_format)
 
 @register.simple_tag
 def link_or_none(object, pretty=None, none=mark_safe("&ndash;"), with_badge=False):
-    if not object:
+    if object == 0:
+        return object
+    elif not object:
         return none
     elif hasattr(object, "get_absolute_url"):
         return format_html(
