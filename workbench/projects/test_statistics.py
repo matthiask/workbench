@@ -70,8 +70,7 @@ class StatisticsTest(TestCase):
         code("owned_by={}".format(user.pk))
         code("owned_by=bla", 302)
 
-        code("s=")
-        code("s=closed")
+        code("closed_during_the_last_year=on")
         code("internal=on")
         code("xlsx=1")
 
