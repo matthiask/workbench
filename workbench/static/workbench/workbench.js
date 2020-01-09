@@ -135,7 +135,7 @@ $(function() {
       const key = `search-${window.location.pathname}`
       window.localStorage.setItem(
         key,
-        /\be=1\b/.test(window.location.search) ? "" : window.location.search
+        /\b_error=\b/.test(window.location.search) ? "" : window.location.search
       )
     }
   })

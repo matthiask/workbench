@@ -76,7 +76,7 @@ class InvoiceSearchForm(Form):
         if request.GET.get("pdf"):
             if not queryset.exists():
                 messages.warning(request, _("No invoices found."))
-                return HttpResponseRedirect("?e=1")
+                return HttpResponseRedirect("?_error=1")
 
             pdf, response = pdf_response(
                 "invoices",

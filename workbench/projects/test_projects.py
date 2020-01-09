@@ -259,30 +259,32 @@ class ProjectsTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        def valid(p):
-            self.assertEqual(self.client.get("/projects/?" + p).status_code, 200)
+        def code(p, status_code=200):
+            self.assertEqual(self.client.get("/projects/?" + p).status_code, status_code)
 
-        valid("")
-        valid("q=test")
-        valid("s=all")
-        valid("s=closed")
-        valid("s=no-invoices")
-        valid("s=accepted-offers")
-        valid("s=accepted-offers-no-invoices")
-        valid("s=old-projects")
-        valid("s=invalid-customer-contact-combination")
-        valid("org={}".format(project.customer_id))
-        valid("type=internal")
-        valid("type=maintenance")
-        valid("owned_by={}".format(user.id))
-        valid("owned_by=-1")  # mine
-        valid("owned_by=0")  # only inactive
+        code("")
+        code("q=test")
+        code("s=all")
+        code("s=closed")
+        code("s=no-invoices")
+        code("s=accepted-offers")
+        code("s=accepted-offers-no-invoices")
+        code("s=old-projects")
+        code("s=invalid-customer-contact-combination")
+        code("org={}".format(project.customer_id))
+        code("type=internal")
+        code("type=maintenance")
+        code("owned_by={}".format(user.id))
+        code("owned_by=-1")  # mine
+        code("owned_by=0")  # only inactive
+
+        code("invalid=3", 302)
 
     def test_invalid_search_form(self):
         user = factories.UserFactory.create()
         self.client.force_login(user)
         response = self.client.get("/projects/?org=0")
-        self.assertRedirects(response, "/projects/?e=1")
+        self.assertRedirects(response, "/projects/?_error=1")
         self.assertEqual(messages(response), ["Search form was invalid."])
 
     def test_autocomplete(self):

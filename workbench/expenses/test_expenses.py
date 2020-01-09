@@ -49,7 +49,6 @@ class ExpensesTest(TestCase):
             self.assertEqual(self.client.get("/expenses/?" + p).status_code, 200)
 
         valid("")
-        valid("q=test")
         valid("s=in-preparation")
         valid("s=closed")
         valid("owned_by={}".format(user.id))
