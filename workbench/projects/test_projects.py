@@ -260,7 +260,9 @@ class ProjectsTest(TestCase):
         self.client.force_login(user)
 
         def code(p, status_code=200):
-            self.assertEqual(self.client.get("/projects/?" + p).status_code, status_code)
+            self.assertEqual(
+                self.client.get("/projects/?" + p).status_code, status_code
+            )
 
         code("")
         code("q=test")

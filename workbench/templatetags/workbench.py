@@ -136,7 +136,7 @@ def querystring(context, **kwargs):
         sorted(
             (key, value)
             for key, value in dict(context["request"].GET.items(), **kwargs).items()
-            if value
+            if key not in {"_error"} and value
         )
     )
     return "?%s" % query if query else ""
