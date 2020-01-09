@@ -35,6 +35,8 @@ def invoice_to_dict(invoice, **kwargs):
 
 
 class InvoicesTest(TestCase):
+    fixtures = ["exchangerates.json"]
+
     def setUp(self):
         deactivate_all()
 

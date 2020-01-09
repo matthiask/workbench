@@ -12,6 +12,8 @@ from workbench.tools.testing import messages
 
 
 class ExpensesTest(TestCase):
+    fixtures = ["exchangerates.json"]
+
     def test_logged_cost_deletion(self):
         costs = factories.LoggedCostFactory.create(archived_at=timezone.now())
         self.client.force_login(costs.created_by)

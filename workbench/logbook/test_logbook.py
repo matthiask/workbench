@@ -14,6 +14,8 @@ from workbench.tools.validation import logbook_lock
 
 
 class LogbookTest(TestCase):
+    fixtures = ["exchangerates.json"]
+
     def test_create_logged_hours(self):
         service = factories.ServiceFactory.create()
         project = service.project
