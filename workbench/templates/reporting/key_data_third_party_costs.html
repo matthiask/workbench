@@ -8,7 +8,7 @@
 
 {% block body %}
 <table class="table table-sm bg-light">
-  {% for cost in logged_costs %}
+  {% for cost in third_party_costs %}
     {% if forloop.first %}
       <tr>
         <th class="w-100">{% trans 'logged cost' %}</th>
