@@ -20,37 +20,37 @@ msgstr ""
 #: absences/utils.js
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "So"
 
 #: absences/utils.js
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "Mo"
 
 #: absences/utils.js
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "Di"
 
 #: absences/utils.js
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "Mi"
 
 #: absences/utils.js
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "Do"
 
 #: absences/utils.js
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "Fr"
 
 #: absences/utils.js
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "Sa"
 
 #: timer/actions.js
 msgid "Unable to submit the logbook entry"
