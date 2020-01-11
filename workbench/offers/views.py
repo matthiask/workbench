@@ -3,14 +3,14 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 
-from workbench.generic import DetailView
+from workbench import generic
 from workbench.offers.forms import OfferCopyForm
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.tools.pdf import pdf_response
 
 
-class OfferPDFView(DetailView):
+class OfferPDFView(generic.DetailView):
     model = Offer
 
     def get(self, request, *args, **kwargs):
@@ -28,7 +28,7 @@ class OfferPDFView(DetailView):
         return response
 
 
-class ProjectOfferPDFView(DetailView):
+class ProjectOfferPDFView(generic.DetailView):
     model = Project
 
     def get(self, request, *args, **kwargs):
@@ -46,6 +46,11 @@ class ProjectOfferPDFView(DetailView):
         pdf.offers_pdf(project=self.object, offers=offers)
 
         return response
+
+
+class OfferDeleteView(generic.DeleteView):
+    def get_success_url(self):
+        return self.object.project.get_absolute_url()
 
 
 def copy_offer(request, pk):

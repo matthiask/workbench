@@ -5,7 +5,7 @@ from workbench import generic
 from workbench.accounts.features import controlling_only
 from workbench.offers.forms import OfferForm, OfferSearchForm
 from workbench.offers.models import Offer
-from workbench.offers.views import OfferPDFView, copy_offer
+from workbench.offers.views import OfferDeleteView, OfferPDFView, copy_offer
 
 
 urlpatterns = [
@@ -33,7 +33,7 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/delete/$",
-        controlling_only(generic.DeleteView.as_view(model=Offer)),
+        controlling_only(OfferDeleteView.as_view(model=Offer)),
         name="offers_offer_delete",
     ),
     url(
