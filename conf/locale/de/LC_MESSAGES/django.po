@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-11 15:37+0100\n"
+"POT-Creation-Date: 2020-01-11 16:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -787,7 +787,7 @@ msgstr "In Vorbereitung"
 msgid "Closed"
 msgstr "Abgeschlossen"
 
-#: workbench/expenses/forms.py workbench/projects/forms.py
+#: workbench/expenses/forms.py
 msgid "is closed"
 msgstr "Ist geschlossen"
 
@@ -1582,6 +1582,10 @@ msgstr "Intern"
 msgid "Set this if you want all services to have the same hourly rate."
 msgstr ""
 "Setze dies, falls alle Leistungen den gleichen Stundensatz haben sollen."
+
+#: workbench/projects/models.py
+msgid "Leave this empty if you do not want to close the project yet."
+msgstr "Bitte leer lassen, falls Du das Projekt noch nicht schliessen willst."
 
 #: workbench/projects/models.py
 msgid "allow logging"

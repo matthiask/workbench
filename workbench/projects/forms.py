@@ -1,5 +1,3 @@
-import datetime as dt
-
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -107,6 +105,7 @@ class ProjectForm(ModelForm):
             "owned_by",
             "type",
             "flat_rate",
+            "closed_on",
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
@@ -140,13 +139,6 @@ class ProjectForm(ModelForm):
 
         super().__init__(*args, **kwargs)
         self.fields["type"].choices = Project.TYPE_CHOICES
-        if self.instance.pk:
-            self.fields["is_closed"] = forms.BooleanField(
-                label=_("is closed"),
-                required=False,
-                initial=bool(self.instance.closed_on),
-            )
-
         if not self.request.user.features[FEATURES.CONTROLLING]:
             self.fields.pop("flat_rate")
 
@@ -180,10 +172,6 @@ class ProjectForm(ModelForm):
 
     def save(self):
         instance = super().save(commit=False)
-        if not instance.closed_on and self.cleaned_data.get("is_closed"):
-            instance.closed_on = dt.date.today()
-        if instance.closed_on and not self.cleaned_data.get("is_closed"):
-            instance.closed_on = None
         if self.instance.flat_rate is not None:
             with override(settings.WORKBENCH.PDF_LANGUAGE):
                 self.instance.services.editable().update(

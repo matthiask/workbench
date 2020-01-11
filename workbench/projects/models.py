@@ -17,6 +17,7 @@ from workbench.services.models import ServiceBase
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import Model, MoneyField, SearchQuerySet, Z
 from workbench.tools.urls import model_urls
+from workbench.tools.validation import raise_if_errors
 
 
 class ProjectQuerySet(SearchQuerySet):
@@ -158,6 +159,15 @@ class Project(Model):
             super().save(*args, **kwargs)
 
     save.alters_data = True
+
+    def clean_fields(self, exclude=None):
+        super().clean_fields(exclude=exclude)
+        errors = {}
+        if self.closed_on and self.closed_on > dt.date.today():
+            errors["closed_on"] = _(
+                "Leave this empty if you do not want to close the project yet."
+            )
+        raise_if_errors(errors)
 
     @property
     def status_badge(self):

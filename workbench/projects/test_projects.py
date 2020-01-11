@@ -318,46 +318,6 @@ class ProjectsTest(TestCase):
             {"results": []},
         )
 
-    def test_update(self):
-        project = factories.ProjectFactory.create()
-        self.client.force_login(project.owned_by)
-
-        response = self.client.get(project.urls["create"])
-        self.assertNotContains(response, "is_closed")
-
-        response = self.client.get(project.urls["update"])
-        self.assertContains(response, "is_closed")
-
-        response = self.client.post(
-            project.urls["update"],
-            {
-                "customer": project.customer_id,
-                "contact": project.contact_id,
-                "title": project.title,
-                "owned_by": project.owned_by_id,
-                "type": project.type,
-                "is_closed": "on",
-            },
-        )
-        self.assertRedirects(response, project.urls["detail"])
-        project.refresh_from_db()
-        self.assertEqual(project.closed_on, dt.date.today())
-
-        response = self.client.post(
-            project.urls["update"],
-            {
-                "customer": project.customer_id,
-                "contact": project.contact_id,
-                "title": project.title,
-                "owned_by": project.owned_by_id,
-                "type": project.type,
-                "is_closed": "",
-            },
-        )
-        self.assertRedirects(response, project.urls["detail"])
-        project.refresh_from_db()
-        self.assertIsNone(project.closed_on)
-
     def test_customer_update(self):
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
