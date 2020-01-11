@@ -81,34 +81,37 @@ class ListView(ToolsMixin, vanilla.ListView):
     search_form_class = None
     show_create_button = True
 
+    @classonlymethod
+    def as_view(cls, **initkwargs):
+        assert cls.search_form_class or initkwargs.get(
+            "search_form_class"
+        ), "search_form_class is required for list view"
+        return super().as_view(**initkwargs)
+
     def get(self, request, *args, **kwargs):
-        if self.search_form_class:
-            self.search_form = self.search_form_class(request.GET, request=request)
-            if not self.search_form.is_valid():
-                messages.warning(request, _("Search form was invalid."))
-                return HttpResponseRedirect("?_error=1")
+        self.search_form = self.search_form_class(request.GET, request=request)
+        if not self.search_form.is_valid():
+            messages.warning(request, _("Search form was invalid."))
+            return HttpResponseRedirect("?_error=1")
 
-            if (
-                set(request.GET)
-                - set(self.search_form.fields)
-                - {"page", "pdf", "xlsx", "_error"}
-            ):
-                messages.warning(request, _("Invalid parameters to form."))
-                return HttpResponseRedirect("?_error=1")
+        if (
+            set(request.GET)
+            - set(self.search_form.fields)
+            - {"page", "pdf", "xlsx", "_error"}
+        ):
+            messages.warning(request, _("Invalid parameters to form."))
+            return HttpResponseRedirect("?_error=1")
 
-            if hasattr(self.search_form, "response"):
-                response = self.search_form.response(request, self.get_queryset())
-                if response:
-                    return response
+        if hasattr(self.search_form, "response"):
+            response = self.search_form.response(request, self.get_queryset())
+            if response:
+                return response
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = self.model.objects.all()
-
-        if self.search_form_class:
-            q = self.search_form.cleaned_data.get("q")
-            queryset = self.search_form.filter(queryset.search(q) if q else queryset)
-
+        q = self.search_form.cleaned_data.get("q")
+        queryset = self.search_form.filter(queryset.search(q) if q else queryset)
         return queryset
 
 
