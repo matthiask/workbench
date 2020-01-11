@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 
 from workbench.generic import DetailView
+from workbench.offers.forms import OfferCopyForm
 from workbench.offers.models import Offer
-from workbench.projects.forms import ProjectAutocompleteForm
 from workbench.projects.models import Project
 from workbench.tools.pdf import pdf_response
 
@@ -50,7 +50,9 @@ class ProjectOfferPDFView(DetailView):
 
 def copy_offer(request, pk):
     offer = get_object_or_404(Offer, pk=pk)
-    form = ProjectAutocompleteForm(request.POST if request.method == "POST" else None)
+    form = OfferCopyForm(
+        request.POST if request.method == "POST" else None, project=offer.project
+    )
     if form.is_valid():
         new = offer.copy_to(project=form.cleaned_data["project"], owned_by=request.user)
         return JsonResponse({"redirect": new.get_absolute_url()}, status=299)

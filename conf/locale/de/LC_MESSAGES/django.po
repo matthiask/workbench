@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-11 16:14+0100\n"
+"POT-Creation-Date: 2020-01-11 20:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -142,13 +142,6 @@ msgstr "Jahresarbeitszeit"
 #: workbench/awt/admin.py workbench/awt/models.py
 msgid "days"
 msgstr "Tage"
-
-#: workbench/awt/forms.py workbench/contacts/forms.py
-#: workbench/credit_control/forms.py workbench/invoices/forms.py
-#: workbench/logbook/forms.py workbench/offers/forms.py
-#: workbench/projects/forms.py
-msgid "search"
-msgstr "Suche"
 
 #: workbench/awt/forms.py
 msgid "All reasons"
@@ -398,6 +391,12 @@ msgstr "entfernt"
 #: workbench/templates/contacts/object_list.html
 msgid "contacts"
 msgstr "Kontakte"
+
+#: workbench/contacts/forms.py workbench/credit_control/forms.py
+#: workbench/invoices/forms.py workbench/logbook/forms.py
+#: workbench/offers/forms.py workbench/projects/forms.py
+msgid "search"
+msgstr "Suche"
 
 #: workbench/contacts/forms.py
 msgid "All groups"
@@ -1438,6 +1437,10 @@ msgid ""
 msgstr ""
 "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Offerte wurde "
 "schon am %(closed)s geschlossen. Bist Du sicher?"
+
+#: workbench/offers/forms.py
+msgid "Select a different project as target."
+msgstr "Wähle ein anderes Projekt als Ziel."
 
 #: workbench/offers/models.py
 msgid "Offered"

@@ -68,8 +68,10 @@ $(function() {
 
   $(document.body).on("submit", ".modal-dialog form", function(_event) {
     if (this.method.toLowerCase() == "post") {
-      const action = this.action
-      $.post(action, $(this).serialize(), function(data, status, jqXHR) {
+      const action = this.action,
+        data = $(this).serialize()
+      this.parentNode.removeChild(this)
+      $.post(action, data, function(data, status, jqXHR) {
         // 201 CREATED, 202 ACCEPTED or 204 NO CONTENT
         if (
           jqXHR.status === 201 ||
@@ -80,7 +82,6 @@ $(function() {
           dismissModals()
           window.location.reload()
         } else if (jqXHR.status === 299) {
-          console.log(data, jqXHR)
           window.location.href = data.redirect
         } else {
           initModal(data)

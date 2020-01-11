@@ -6,9 +6,9 @@ from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization
 from workbench.offers.models import Offer
-from workbench.projects.models import Service
+from workbench.projects.models import Project, Service
 from workbench.tools.formats import local_date_format
-from workbench.tools.forms import Autocomplete, Form, Textarea
+from workbench.tools.forms import Autocomplete, Form, Textarea, add_prefix
 
 
 class OfferSearchForm(Form):
@@ -161,3 +161,22 @@ class OfferForm(PostalAddressSelectionForm):
         )
         instance.save()
         return instance
+
+
+@add_prefix("modal")
+class OfferCopyForm(forms.Form):
+    project = forms.ModelChoiceField(
+        queryset=Project.objects.all(),
+        widget=Autocomplete(model=Project, params={"only_open": "on"}),
+        label="",
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.project = kwargs.pop("project")
+        super().__init__(*args, **kwargs)
+
+    def clean_project(self):
+        project = self.cleaned_data.get("project")
+        if project == self.project:
+            raise forms.ValidationError(_("Select a different project as target."))
+        return project
