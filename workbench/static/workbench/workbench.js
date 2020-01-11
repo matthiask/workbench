@@ -99,25 +99,6 @@ $(function() {
     return false
   })
 
-  $(document.body).on("submit", "form[data-ajaxform]", function(event) {
-    event.preventDefault()
-    const form = this
-
-    $.post(form.action, $(form).serialize(), function(data, status, jqXHR) {
-      // 201 CREATED, 202 ACCEPTED or 204 NO CONTENT
-      if (
-        jqXHR.status === 201 ||
-        jqXHR.status === 202 ||
-        jqXHR.status === 204
-      ) {
-        // Fine!
-        $("button", form).text("OK!")
-      } else {
-        alert("Saving failed!")
-      }
-    })
-  })
-
   // Autosubmit forms
   $(document.body).on(
     "change",
