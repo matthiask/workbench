@@ -4,7 +4,6 @@ from collections import defaultdict
 from django.db.models import Sum
 from django.utils import timezone
 
-from workbench.accruals.models import Accrual
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
@@ -80,12 +79,6 @@ def project_budget_statistics(projects, *, cutoff_date=None):
         .annotate(Sum("total_excl_tax"))
     }
 
-    accruals_per_project = defaultdict(lambda: Z)
-    for accrual in Accrual.objects.generate_accruals(
-        cutoff_date=cutoff_date, save=False
-    )["accruals"]:
-        accruals_per_project[accrual.invoice.project_id] -= accrual.accrual
-
     statistics = [
         {
             "project": project,
@@ -104,7 +97,6 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             "delta": cost_per_project.get(project.id, Z)
             + effort_cost_per_project[project.id]
             - invoiced_per_project.get(project.id, Z),
-            "accrual": accruals_per_project[project.id],
         }
         for project in projects
     ]
@@ -120,7 +112,6 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             "invoiced",
             "hours",
             "not_archived",
-            "accrual",
         ]
     }
     overall["delta_positive"] = sum(s["delta"] for s in statistics if s["delta"] > 0)

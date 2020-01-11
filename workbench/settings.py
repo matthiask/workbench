@@ -50,6 +50,7 @@ INSTALLED_APPS = [
         "workbench.logbook",
         "workbench.offers",
         "workbench.projects",
+        "workbench.reporting",
         "workbench.services",
         "debug_toolbar" if DEBUG else "",
     ]

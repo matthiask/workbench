@@ -6,11 +6,11 @@ from django.db import connections
 from django.db.models import Q, Sum
 from django.db.models.functions import ExtractMonth, ExtractYear
 
-from workbench.accruals.models import Accrual
 from workbench.awt.reporting import full_time_equivalents_by_month
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
+from workbench.reporting.models import Accruals
 from workbench.tools.models import Z
 
 
@@ -78,7 +78,7 @@ ORDER BY cutoff_date
 
     today = dt.date.today()
     accruals[(today.year, today.month)] = {
-        "accrual": -Accrual.objects.generate_accruals(cutoff_date=today, save=False)[
+        "accrual": -Accruals.objects.generate_accruals(cutoff_date=today, save=False)[
             "total"
         ],
         "delta": None,

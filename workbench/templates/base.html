@@ -51,7 +51,6 @@
             {% if request.user|has:FEATURES.CONTROLLING %}
               <a class="dropdown-item" href="{% url 'invoices_recurringinvoice_list' %}">{% trans 'recurring invoices'|capfirst %}</a>
               <a class="dropdown-item" href="{% url 'credit_control_creditentry_list' %}">{% trans 'credit entries'|capfirst %}</a>
-              <a class="dropdown-item" href="{% url 'accruals_cutoffdate_list' %}">{% trans 'accruals'|capfirst %}</a>
             {% endif %}
             <a class="dropdown-item" href="{% url 'expenses_expensereport_list' %}">{% trans 'expense reports'|capfirst %}</a>
           </div>

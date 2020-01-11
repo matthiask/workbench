@@ -26,7 +26,6 @@
         <th class="text-right">{% trans 'invoiced' %}</th>
         <th class="text-right">{% trans 'not archived' %}</th>
         <th class="text-right">&Delta;</th>
-        <th class="text-right">{% trans 'accrual' %}</th>
       </tr>
     </thead>
     <tbody>
@@ -44,7 +43,6 @@
           {{ statistics.overall.delta_positive|currency:True }}<br>
           {{ statistics.overall.delta_negative|currency:True }}
         </th>
-        <th class="text-right">{{ statistics.overall.accrual|currency:True }}</th>
       </tr>
       {% for project in statistics.statistics %}
         <tr>
@@ -63,7 +61,6 @@
             {% pie project.not_archived project.hours %}
           </td>
           <td class="text-right {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
-          <td class="text-right {% if not project.accrual %}text-black-30{% endif %}">{{ project.accrual|currency:True }}</td>
         </tr>
       {% endfor %}
     </tbody>
