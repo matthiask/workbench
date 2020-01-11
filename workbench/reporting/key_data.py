@@ -72,11 +72,11 @@ ORDER BY cutoff_date DESC
 
         for row in cursor:
             # Overwrite earlier accruals if a month has more than one cutoff date
-            accruals[(row[0].year, row[0].month)] = {"accrual": -row[1], "delta": None}
+            accruals[(row[0].year, row[0].month)] = {"accrual": row[1], "delta": None}
 
     today = dt.date.today()
     accruals[(today.year, today.month)] = {
-        "accrual": -Accruals.objects.for_cutoff_date(cutoff_date=today, save=False),
+        "accrual": Accruals.objects.for_cutoff_date(cutoff_date=today, save=False),
         "delta": None,
     }
 
