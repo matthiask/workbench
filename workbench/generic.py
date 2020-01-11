@@ -109,10 +109,8 @@ class ListView(ToolsMixin, vanilla.ListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        queryset = self.model.objects.all()
         q = self.search_form.cleaned_data.get("q")
-        queryset = self.search_form.filter(queryset.search(q) if q else queryset)
-        return queryset
+        return self.search_form.filter(self.model.objects.search(q))
 
 
 class DetailView(ToolsMixin, vanilla.DetailView):
