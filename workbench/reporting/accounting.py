@@ -5,7 +5,6 @@ from django.core.mail import EmailMessage
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
-from workbench.accruals.models import Accrual
 from workbench.projects.models import Project
 from workbench.reporting import project_budget_statistics
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -21,7 +20,6 @@ def send_accounting_files():
     xlsx.project_budget_statistics(
         project_budget_statistics.project_budget_statistics(projects),
     )
-    xlsx.accruals(Accrual.objects.filter(cutoff_date=today - dt.timedelta(days=1)))
 
     mail = EmailMessage(
         _("Accounting files"),

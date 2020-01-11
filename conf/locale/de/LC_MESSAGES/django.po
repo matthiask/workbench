@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-09 16:49+0100\n"
+"POT-Creation-Date: 2020-01-11 15:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -121,76 +121,6 @@ msgstr "Willkommen! Bitte fülle das folgende Formular aus."
 #: workbench/accounts/views.py
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
-
-#: workbench/accruals/__init__.py workbench/accruals/models.py
-#: workbench/templates/base.html workbench/templates/reporting/key_data.html
-msgid "accruals"
-msgstr "Abgrenzungen"
-
-#: workbench/accruals/forms.py
-msgid "Unusual cutoff date (not last of the month)."
-msgstr "Ungewöhnlicher Stichtag (nicht letzter Tag des Monats)."
-
-#: workbench/accruals/models.py workbench/reporting/views.py
-msgid "cutoff date"
-msgstr "Stichtag"
-
-#: workbench/accruals/models.py
-msgid "cutoff dates"
-msgstr "Stichtage"
-
-#: workbench/accruals/models.py
-msgid "Cannot modify a cutoff date where accrual records already exist."
-msgstr "Kann Stichtag mit schon existierenden Abgrenzungen nicht bearbeiten."
-
-#: workbench/accruals/models.py workbench/credit_control/models.py
-#: workbench/invoices/models.py workbench/management/commands/export_debtors.py
-#: workbench/templates/accruals/cutoffdate_detail.html
-#: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/contacts/person_detail.html
-#: workbench/templates/credit_control/creditentry_list.html
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/key_data_gross_profit.html
-#: workbench/templates/reporting/key_data_third_party_costs.html
-#: workbench/templates/reporting/open_items_list.html workbench/tools/pdf.py
-msgid "invoice"
-msgstr "Rechnung"
-
-#: workbench/accruals/models.py
-#: workbench/templates/accruals/cutoffdate_detail.html
-msgid "work progress"
-msgstr "Arbeitsfortschritt"
-
-#: workbench/accruals/models.py
-msgid ""
-"Percentage of down payment invoice for which the work has already been done."
-msgstr ""
-"Anteil der schon geleisteten Arbeit, welcher durch die Anzahlungsrechnung "
-"abgegolten wird."
-
-#: workbench/accruals/models.py workbench/invoices/views.py
-#: workbench/logbook/__init__.py
-#: workbench/templates/accruals/cutoffdate_detail.html
-#: workbench/templates/base.html
-#: workbench/templates/invoices/invoice_detail.html
-#: workbench/templates/reporting/project_budget_statistics.html
-#: workbench/tools/xlsx.py
-msgid "logbook"
-msgstr "Logbuch"
-
-#: workbench/accruals/models.py
-#: workbench/templates/reporting/project_budget_statistics.html
-#: workbench/tools/xlsx.py
-msgid "accrual"
-msgstr "Abgrenzung"
-
-#: workbench/accruals/views.py
-msgid "Cannot generate accruals for future cutoff dates."
-msgstr "Kann Abgrenzungen für zukünftige Stichtage nicht generieren."
-
-#: workbench/accruals/views.py
-msgid "Generated accruals."
-msgstr "Abgrenzungen erstellt."
 
 #: workbench/audit/__init__.py
 msgid "audit"
@@ -783,6 +713,18 @@ msgstr "Total"
 msgid "payment notice"
 msgstr "Zahlungsnotiz"
 
+#: workbench/credit_control/models.py workbench/invoices/models.py
+#: workbench/management/commands/export_debtors.py
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/contacts/person_detail.html
+#: workbench/templates/credit_control/creditentry_list.html
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/key_data_gross_profit.html
+#: workbench/templates/reporting/key_data_third_party_costs.html
+#: workbench/templates/reporting/open_items_list.html workbench/tools/pdf.py
+msgid "invoice"
+msgstr "Rechnung"
+
 #: workbench/credit_control/models.py
 msgid "credit entry"
 msgstr "Gutschrift"
@@ -1339,6 +1281,14 @@ msgstr "Stunden"
 msgid "cost"
 msgstr "Kosten"
 
+#: workbench/invoices/views.py workbench/logbook/__init__.py
+#: workbench/templates/base.html
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/xlsx.py
+msgid "logbook"
+msgstr "Logbuch"
+
 #: workbench/invoices/views.py
 #, python-format
 msgid "Created %s invoice."
@@ -1670,6 +1620,14 @@ msgstr "Zu Projekt springen"
 msgid "Accounting files"
 msgstr "Buchhaltungsdaten"
 
+#: workbench/reporting/models.py workbench/reporting/views.py
+msgid "cutoff date"
+msgstr "Stichtag"
+
+#: workbench/reporting/models.py workbench/templates/reporting/key_data.html
+msgid "accruals"
+msgstr "Abgrenzungen"
+
 #: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data.html
 msgid "profitable"
@@ -1735,7 +1693,10 @@ msgstr "Zurück zum Start"
 msgid "Sign in"
 msgstr "Anmelden"
 
-#: workbench/templates/accruals/cutoffdate_detail.html
+#: workbench/templates/awt/absence_calendar.html workbench/templates/base.html
+msgid "absence calendar"
+msgstr "Abwesenheitskalender"
+
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
@@ -1749,11 +1710,6 @@ msgstr "Anmelden"
 msgid "Update"
 msgstr "Bearbeiten"
 
-#: workbench/templates/accruals/cutoffdate_detail.html
-msgid "Create accruals"
-msgstr "Abgrenzungen erstellen"
-
-#: workbench/templates/accruals/cutoffdate_detail.html
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
@@ -1766,31 +1722,6 @@ msgstr "Abgrenzungen erstellen"
 #: workbench/templates/projects/project_detail.html
 msgid "Delete"
 msgstr "Löschen"
-
-#: workbench/templates/accruals/cutoffdate_detail.html
-#: workbench/templates/invoices/invoice_detail.html
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/key_data_gross_profit.html
-#: workbench/templates/reporting/key_data_third_party_costs.html
-#: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
-#: workbench/tools/xlsx.py
-msgid "total excl. tax"
-msgstr "Total exkl. MwSt."
-
-#: workbench/templates/accruals/cutoffdate_detail.html
-#: workbench/templates/contacts/person_form.html
-#: workbench/templates/credit_control/creditentry_upload.html
-#: workbench/templates/fineforms/submit.html
-#: workbench/templates/generic/object_form.html
-#: workbench/templates/logbook/loggedcost_form.html
-#: workbench/templates/logbook/loggedhours_form.html
-#: workbench/templates/modalform.html
-msgid "save"
-msgstr "Sichern"
-
-#: workbench/templates/awt/absence_calendar.html workbench/templates/base.html
-msgid "absence calendar"
-msgstr "Abwesenheitskalender"
 
 #: workbench/templates/awt/year_detail.html
 msgid "active users"
@@ -1965,6 +1896,16 @@ msgstr "%(class)s erstellen"
 
 #: workbench/templates/contacts/person_form.html
 #: workbench/templates/credit_control/creditentry_upload.html
+#: workbench/templates/fineforms/submit.html
+#: workbench/templates/generic/object_form.html
+#: workbench/templates/logbook/loggedcost_form.html
+#: workbench/templates/logbook/loggedhours_form.html
+#: workbench/templates/modalform.html
+msgid "save"
+msgstr "Sichern"
+
+#: workbench/templates/contacts/person_form.html
+#: workbench/templates/credit_control/creditentry_upload.html
 #: workbench/templates/generic/object_confirm_delete.html
 #: workbench/templates/generic/object_form.html
 #: workbench/templates/modal_confirm_delete.html
@@ -2018,6 +1959,14 @@ msgstr "Zwischentotal"
 #: workbench/tools/pdf.py
 msgid "discount"
 msgstr "Rabatt"
+
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/key_data_gross_profit.html
+#: workbench/templates/reporting/key_data_third_party_costs.html
+#: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
+msgid "total excl. tax"
+msgstr "Total exkl. MwSt."
 
 #: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "Create invoices"

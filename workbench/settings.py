@@ -39,7 +39,6 @@ INSTALLED_APPS = [
         "webpack_loader",
         "django.forms",
         "workbench.accounts",
-        "workbench.accruals",
         "workbench.audit",
         "workbench.awt",
         "workbench.circles",
