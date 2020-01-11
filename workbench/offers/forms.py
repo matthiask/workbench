@@ -8,7 +8,8 @@ from workbench.contacts.models import Organization
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.tools.formats import local_date_format
-from workbench.tools.forms import Autocomplete, Form, Textarea, add_prefix
+from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
+from workbench.tools.models import ProtectedError, SlowCollector
 
 
 class OfferSearchForm(Form):
@@ -180,3 +181,26 @@ class OfferCopyForm(forms.Form):
         if project == self.project:
             raise forms.ValidationError(_("Select a different project as target."))
         return project
+
+
+class OfferDeleteForm(ModelForm):
+    class Meta:
+        model = Offer
+        fields = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        collector = SlowCollector(using=self.instance._state.db)
+        try:
+            collector.collect([self.instance])
+        except ProtectedError:
+            pass
+        else:
+            self.fields["delete_services"] = forms.BooleanField(
+                label=_("Delete offers' services?"), required=False
+            )
+
+    def delete(self):
+        if self.cleaned_data.get("delete_services"):
+            self.instance.services.all().delete()
+            self.instance.delete()

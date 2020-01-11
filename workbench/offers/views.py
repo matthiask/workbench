@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 
 from workbench import generic
-from workbench.offers.forms import OfferCopyForm
+from workbench.offers.forms import OfferCopyForm, OfferDeleteForm
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.tools.pdf import pdf_response
@@ -49,6 +49,8 @@ class ProjectOfferPDFView(generic.DetailView):
 
 
 class OfferDeleteView(generic.DeleteView):
+    delete_form_class = OfferDeleteForm
+
     def get_success_url(self):
         return self.object.project.get_absolute_url()
 
