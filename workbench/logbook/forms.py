@@ -76,6 +76,7 @@ class LoggedHoursSearchForm(Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
+        queryset = queryset.search(data.get("q"))
         if data.get("rendered_by") == -1:
             queryset = queryset.filter(rendered_by=self.request.user)
         elif data.get("rendered_by"):
@@ -156,6 +157,7 @@ class LoggedCostSearchForm(Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
+        queryset = queryset.search(data.get("q"))
         if data.get("rendered_by") == -1:
             queryset = queryset.filter(rendered_by=self.request.user)
         elif data.get("rendered_by"):

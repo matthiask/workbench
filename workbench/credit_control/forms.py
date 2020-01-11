@@ -40,6 +40,7 @@ class CreditEntrySearchForm(Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
+        queryset = queryset.search(data.get("q"))
         if data.get("s") == "pending":
             queryset = queryset.pending()
         elif data.get("s") == "processed":

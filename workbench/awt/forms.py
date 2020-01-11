@@ -10,13 +10,6 @@ from workbench.tools.forms import Form, ModelForm, Textarea, add_prefix
 
 
 class AbsenceSearchForm(Form):
-    q = forms.CharField(
-        required=False,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": _("search")}
-        ),
-        label="",
-    )
     u = forms.TypedChoiceField(
         coerce=int,
         required=False,
@@ -38,6 +31,7 @@ class AbsenceSearchForm(Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
+        # queryset = queryset.search(data.get("q"))
         if data.get("u") == -1:
             queryset = queryset.filter(user=self.request.user)
         elif data.get("u"):

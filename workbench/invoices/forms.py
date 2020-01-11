@@ -60,6 +60,7 @@ class InvoiceSearchForm(Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
+        queryset = queryset.search(data.get("q"))
         if data.get("s") == "open":
             queryset = queryset.open()
         elif data.get("s") == "overdue":
@@ -590,6 +591,7 @@ class RecurringInvoiceSearchForm(Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
+        queryset = queryset.search(data.get("q"))
         if data.get("s") == "":
             queryset = queryset.filter(
                 Q(ends_on__isnull=True) | Q(ends_on__gte=dt.date.today())

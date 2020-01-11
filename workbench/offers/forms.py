@@ -50,6 +50,7 @@ class OfferSearchForm(Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
+        queryset = queryset.search(data.get("q"))
         if data.get("s") == "all":
             pass
         elif data.get("s"):

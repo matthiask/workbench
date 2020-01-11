@@ -72,6 +72,7 @@ class ProjectSearchForm(Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
+        queryset = queryset.search(data.get("q"))
         if data.get("s") == "":
             queryset = queryset.open()
         elif data.get("s") == "closed":
