@@ -8,16 +8,14 @@ from workbench.tools.models import MoneyField
 
 
 class AccrualsQuerySet(models.QuerySet):
-    def for_cutoff_date(self, cutoff_date, *, save=True):
+    def accruals(self, cutoff_date):
         projects = Project.objects.open(on=cutoff_date)
         statistics = project_budget_statistics(projects, cutoff_date=cutoff_date)
+        return statistics["overall"]["delta_negative"]
 
-        if not save:
-            return statistics["overall"]["delta_negative"]
-
+    def for_cutoff_date(self, cutoff_date):
         instance, created = self.update_or_create(
-            cutoff_date=cutoff_date,
-            defaults={"accruals": statistics["overall"]["delta_negative"]},
+            cutoff_date=cutoff_date, defaults={"accruals": self.accruals(cutoff_date)},
         )
         return instance
 
