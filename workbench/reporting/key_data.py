@@ -62,13 +62,11 @@ def accruals_by_month(date_range):
     with connections["default"].cursor() as cursor:
         cursor.execute(
             """\
-SELECT
+SELECT DISTINCT ON (cutoff_date)
     cutoff_date,
-    COALESCE(SUM(i.total_excl_tax * (100 - a.work_progress) / 100), 0)
-FROM accruals_accrual a
-LEFT JOIN invoices_invoice i ON i.id=a.invoice_id
-GROUP BY cutoff_date
-ORDER BY cutoff_date
+    accruals
+FROM reporting_accruals a
+ORDER BY cutoff_date DESC
 """
         )
 
@@ -78,9 +76,7 @@ ORDER BY cutoff_date
 
     today = dt.date.today()
     accruals[(today.year, today.month)] = {
-        "accrual": -Accruals.objects.generate_accruals(cutoff_date=today, save=False)[
-            "total"
-        ],
+        "accrual": -Accruals.objects.for_cutoff_date(cutoff_date=today, save=False),
         "delta": None,
     }
 

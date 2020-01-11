@@ -1,13 +1,32 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from workbench.projects.models import Project
+from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import MoneyField
+
+
+class AccrualsQuerySet(models.QuerySet):
+    def for_cutoff_date(self, cutoff_date, *, save=True):
+        projects = Project.objects.open(on=cutoff_date)
+        statistics = project_budget_statistics(projects, cutoff_date=cutoff_date)
+
+        if not save:
+            return statistics["overall"]["delta_negative"]
+
+        instance, created = self.update_or_create(
+            cutoff_date=cutoff_date,
+            defaults={"accruals": statistics["overall"]["delta_negative"]},
+        )
+        return instance
 
 
 class Accruals(models.Model):
     cutoff_date = models.DateField(_("cutoff date"), unique=True)
     accruals = MoneyField(_("accruals"))
+
+    objects = AccrualsQuerySet.as_manager()
 
     class Meta:
         ordering = ["-cutoff_date"]
