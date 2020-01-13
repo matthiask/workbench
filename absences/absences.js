@@ -11,7 +11,7 @@ const MONTHS = [
   "September", "October", "November", "December"
 ].map(m => window.gettext(m))
 
-export const Absences = ({absencesByPerson, dateList}) => {
+export const Absences = ({absencesByPerson, dateList, reasonList}) => {
   const scaleValues = useMemo(
     () =>
       dateList.reduce((acc, date) => {
@@ -62,6 +62,7 @@ export const Absences = ({absencesByPerson, dateList}) => {
           }
         `}
       </style>
+      <Legend reasons={reasonList} />
       <div className="absences">
         <Scale scaleValues={scaleValues} />
         {absencesByPerson.map(person => (
@@ -155,5 +156,20 @@ const Scale = ({scaleValues}) => {
         )
       })}
     </React.Fragment>
+  )
+}
+
+const Legend = ({reasons}) => {
+  return (
+    <ul className="absences-legend">
+      {reasons.map(r => (
+        <li
+          key={r.reason}
+          className={`absences-legend__item absences-legend__item--${r.reason}`}
+        >
+          {r.reasonDisplay}
+        </li>
+      ))}
+    </ul>
   )
 }

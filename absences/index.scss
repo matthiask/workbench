@@ -29,14 +29,14 @@ $z-index: (
 }
 
 .absences-wrapper {
-  min-width: min-content;
-}
-
-.absences {
   --grid-gap: 0.125rem;
   --scale-row-height: 4rem;
   --name-column-width: 10rem;
 
+  min-width: min-content;
+}
+
+.absences {
   display: grid;
   grid-gap: var(--grid-gap);
   min-width: min-content;
@@ -162,5 +162,37 @@ $z-index: (
 
   hr {
     border-color: $alto;
+  }
+}
+
+.absences-legend {
+  display: flex;
+  padding: 0;
+  margin-left: calc(var(--name-column-width) + var(--grid-gap));
+  list-style: none;
+}
+
+.absences-legend__item {
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+
+  &::before {
+    content: "";
+
+    display: block;
+    width: 0.75rem;
+    height: 0.75rem;
+
+    margin-right: 0.375rem;
+    border-radius: 2px;
+  }
+
+  @each $reason, $color in $absence-colors {
+    &--#{$reason} {
+      &::before {
+        background-color: $color;
+      }
+    }
   }
 }
