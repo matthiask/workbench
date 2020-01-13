@@ -2,7 +2,6 @@ import datetime as dt
 from collections import defaultdict
 from itertools import chain
 
-from django.db import connections
 from django.db.models import Q, Sum
 from django.db.models.functions import ExtractMonth, ExtractYear
 
@@ -59,20 +58,11 @@ def third_party_costs_by_month(date_range):
 
 def accruals_by_month(date_range):
     accruals = {(0, 0): {"accrual": Z, "delta": None}}
-    with connections["default"].cursor() as cursor:
-        cursor.execute(
-            """\
-SELECT DISTINCT ON (cutoff_date)
-    cutoff_date,
-    accruals
-FROM reporting_accruals a
-ORDER BY cutoff_date DESC
-"""
-        )
-
-        for row in cursor:
-            # Overwrite earlier accruals if a month has more than one cutoff date
-            accruals[(row[0].year, row[0].month)] = {"accrual": row[1], "delta": None}
+    for accrual in Accruals.objects.order_by("cutoff_date"):
+        accruals[(accrual.cutoff_date.year, accrual.cutoff_date.month)] = {
+            "accrual": accrual.accruals,
+            "delta": None,
+        }
 
     today = dt.date.today()
     accruals[(today.year, today.month)] = {
