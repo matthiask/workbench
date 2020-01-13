@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 
-from workbench.accounts.models import User
+from workbench.accounts.models import Team, User
 from workbench.awt.models import Employment
 
 
@@ -53,3 +53,8 @@ class UserAdmin(UserAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.unregister(Group)  # We are not using stock users or groups.
+
+
+@admin.register(Team)
+class TeamAdmin(admin.ModelAdmin):
+    filter_horizontal = ["members"]

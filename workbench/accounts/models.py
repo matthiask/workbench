@@ -225,3 +225,18 @@ class UserFeatures:
         return self.email in setting
 
     __getitem__ = __getattr__
+
+
+class Team(models.Model):
+    name = models.CharField(_("name"), max_length=100)
+    members = models.ManyToManyField(
+        User, related_name="teams", verbose_name=_("members")
+    )
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = _("team")
+        verbose_name_plural = _("teams")
+
+    def __str__(self):
+        return self.name

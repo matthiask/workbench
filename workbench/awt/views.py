@@ -2,14 +2,16 @@ import datetime as dt
 import time
 from collections import defaultdict
 
+from django import forms
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
 
 from workbench.accounts.features import FEATURES
-from workbench.accounts.models import User
+from workbench.accounts.models import Team, User
 from workbench.awt.models import Absence, Year
 from workbench.awt.reporting import active_users, annual_working_time
+from workbench.tools.forms import Form
 
 
 def annual_working_time_view(request):
@@ -56,9 +58,25 @@ def annual_working_time_view(request):
     )
 
 
+class CalendarFilterForm(Form):
+    team = forms.ModelChoiceField(
+        Team.objects.all(), empty_label=_("Everyone"), label="", required=False
+    )
+
+    def queryset(self):
+        data = self.cleaned_data
+        queryset = Absence.objects.calendar().select_related("user")
+        if data.get("team"):
+            queryset = queryset.filter(user__teams=data.get("team"))
+        return queryset
+
+
 def absence_calendar(request):
+    form = CalendarFilterForm(request.GET, request=request)
+    form.is_valid()
+
     absences = defaultdict(list)
-    for absence in Absence.objects.calendar().select_related("user"):
+    for absence in form.queryset():
         absences[absence.user].append(absence)
 
     absences = sorted(
@@ -92,6 +110,7 @@ def absence_calendar(request):
             "absences_data": {
                 "absencesByPerson": absences,
                 "reasonList": Absence.REASON_CHOICES,
-            }
+            },
+            "form": form,
         },
     )

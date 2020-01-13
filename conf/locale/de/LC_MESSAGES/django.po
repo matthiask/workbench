@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-11 21:02+0100\n"
+"POT-Creation-Date: 2020-01-13 16:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -105,6 +105,24 @@ msgstr "Benutzer"
 msgid "users"
 msgstr "Benutzer"
 
+#: workbench/accounts/models.py workbench/awt/models.py
+#: workbench/circles/models.py workbench/contacts/models.py
+#: workbench/credit_control/models.py
+msgid "name"
+msgstr "Name"
+
+#: workbench/accounts/models.py
+msgid "members"
+msgstr "Members"
+
+#: workbench/accounts/models.py
+msgid "team"
+msgstr "Team"
+
+#: workbench/accounts/models.py
+msgid "teams"
+msgstr "Teams"
+
 #: workbench/accounts/views.py
 msgid "Error while fetching user data. Please try again."
 msgstr "Fehler während Abholen der Nutzerdaten. Bitte nochmals versuchen."
@@ -154,11 +172,6 @@ msgstr "Stunden eingeben"
 #: workbench/awt/forms.py
 msgid "Creating absences for past years is not allowed."
 msgstr "Abwesenheiten in vergangenen Jahren erstellen ist nicht erlaubt."
-
-#: workbench/awt/models.py workbench/circles/models.py
-#: workbench/contacts/models.py workbench/credit_control/models.py
-msgid "name"
-msgstr "Name"
 
 #: workbench/awt/models.py workbench/services/models.py
 msgid "position"
@@ -358,6 +371,10 @@ msgid ""
 msgstr ""
 "Keine Jahresarbeitszeit definiert für Benutzer %(user)s mit "
 "Arbeitszeitmodell %(working_time_model)s."
+
+#: workbench/awt/views.py
+msgid "Everyone"
+msgstr "Alle"
 
 #: workbench/circles/models.py
 msgid "circle"
@@ -1708,6 +1725,12 @@ msgstr "Anmelden"
 msgid "absence calendar"
 msgstr "Abwesenheitskalender"
 
+#: workbench/templates/awt/absence_calendar.html
+#: workbench/templates/generic/object_list.html
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "Reset the filter form"
+msgstr "Suchformular zurücksetzen"
+
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
@@ -1947,11 +1970,6 @@ msgstr "Warnungen ignorieren"
 #: workbench/templates/modal_confirm_delete.html
 msgid "delete"
 msgstr "Löschen"
-
-#: workbench/templates/generic/object_list.html
-#: workbench/templates/reporting/project_budget_statistics.html
-msgid "Reset the filter form"
-msgstr "Suchformular zurücksetzen"
 
 #: workbench/templates/history_modal.html workbench/templatetags/workbench.py
 msgid "History"
