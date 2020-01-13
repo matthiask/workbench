@@ -352,15 +352,28 @@ class OffersTest(TestCase):
 
         self.assertEqual(gs["offers"], [(offer, [])])
 
-    def test_offer_deletion(self):
+    def test_offer_deletion_without_logbook(self):
         offer = factories.OfferFactory.create()
         self.client.force_login(offer.owned_by)
 
         response = self.client.get(offer.urls["delete"])
         self.assertContains(response, "delete_services")
 
+        response = self.client.post(offer.urls["delete"], {"delete_services": "on"})
+        self.assertRedirects(response, offer.project.urls["detail"])
+
+        self.assertEqual(offer.project.services.count(), 0)
+
+    def test_offer_deletion_with_logbook(self):
+        offer = factories.OfferFactory.create()
+        self.client.force_login(offer.owned_by)
         service = factories.ServiceFactory.create(project=offer.project, offer=offer)
         factories.LoggedHoursFactory.create(service=service)
 
         response = self.client.get(offer.urls["delete"])
         self.assertNotContains(response, "delete_services")
+
+        response = self.client.post(offer.urls["delete"], {"delete_services": "on"})
+        self.assertRedirects(response, offer.project.urls["detail"])
+
+        self.assertEqual(offer.project.services.count(), 1)
