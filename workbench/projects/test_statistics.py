@@ -157,6 +157,8 @@ class StatisticsTest(TestCase):
                 }
             ],
         )
+        self.assertEqual(stats["overall"]["delta_positive"], Decimal("1800.00"))
+        self.assertEqual(stats["overall"]["delta_negative"], Decimal("0.00"))
 
     def create_projects(self):
         p_internal = factories.ProjectFactory.create(type=Project.INTERNAL)
