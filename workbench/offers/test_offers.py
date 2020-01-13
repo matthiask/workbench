@@ -8,7 +8,7 @@ from workbench import factories
 from workbench.offers.models import Offer
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
-from workbench.tools.testing import messages
+from workbench.tools.testing import check_code, messages
 
 
 class OffersTest(TestCase):
@@ -234,19 +234,17 @@ class OffersTest(TestCase):
         offer = factories.OfferFactory.create()
         self.client.force_login(factories.UserFactory.create())
 
-        def valid(p):
-            self.assertEqual(self.client.get("/offers/?" + p).status_code, 200)
-
-        valid("")
-        valid("q=test")
-        valid("s=all")
-        valid("s=10")
-        valid("s=20")
-        valid("s=20")
-        valid("org={}".format(offer.project.customer_id))
-        valid("owned_by={}".format(offer.owned_by_id))
-        valid("owned_by=-1")  # mine
-        valid("owned_by=0")  # only inactive
+        code = check_code(self, "/offers/")
+        code("")
+        code("q=test")
+        code("s=all")
+        code("s=10")
+        code("s=20")
+        code("s=20")
+        code("org={}".format(offer.project.customer_id))
+        code("owned_by={}".format(offer.owned_by_id))
+        code("owned_by=-1")  # mine
+        code("owned_by=0")  # only inactive
 
     def test_detail(self):
         offer = factories.OfferFactory.create()

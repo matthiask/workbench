@@ -13,7 +13,7 @@ from workbench.credit_control.parsers import (
     postfinance_preprocess_notice,
     postfinance_reference_number,
 )
-from workbench.tools.testing import messages
+from workbench.tools.testing import check_code, messages
 
 
 class CreditEntriesTest(TestCase):
@@ -149,14 +149,12 @@ class CreditEntriesTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
         ledger = factories.LedgerFactory.create()
 
-        def valid(p):
-            self.assertEqual(self.client.get("/credit-control/?" + p).status_code, 200)
-
-        valid("")
-        valid("q=test")
-        valid("s=pending")
-        valid("s=processed")
-        valid("ledger={}".format(ledger.pk))
+        code = check_code(self, "/credit-control/")
+        code("")
+        code("q=test")
+        code("s=pending")
+        code("s=processed")
+        code("ledger={}".format(ledger.pk))
 
     def test_create_entry(self):
         self.client.force_login(factories.UserFactory.create())

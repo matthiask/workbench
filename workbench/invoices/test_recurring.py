@@ -7,7 +7,7 @@ from django.utils.translation import deactivate_all
 from workbench import factories
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.invoices.tasks import create_recurring_invoices_and_notify
-from workbench.tools.testing import messages
+from workbench.tools.testing import check_code, messages
 
 
 class RecurringTest(TestCase):
@@ -154,19 +154,15 @@ class RecurringTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        def valid(p):
-            self.assertEqual(
-                self.client.get("/recurring-invoices/?" + p).status_code, 200
-            )
-
-        valid("")
-        valid("q=test")
-        valid("s=all")
-        valid("s=closed")
-        valid("org={}".format(factories.OrganizationFactory.create().pk))
-        valid("owned_by={}".format(user.id))
-        valid("owned_by=-1")  # mine
-        valid("owned_by=0")  # only inactive
+        code = check_code(self, "/recurring-invoices/")
+        code("")
+        code("q=test")
+        code("s=all")
+        code("s=closed")
+        code("org={}".format(factories.OrganizationFactory.create().pk))
+        code("owned_by={}".format(user.id))
+        code("owned_by=-1")  # mine
+        code("owned_by=0")  # only inactive
 
     def test_pretty_status(self):
         person = factories.PersonFactory.create(

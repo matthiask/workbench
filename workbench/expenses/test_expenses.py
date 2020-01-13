@@ -8,7 +8,7 @@ from workbench import factories
 from workbench.expenses.models import ExchangeRates, ExpenseReport
 from workbench.logbook.models import LoggedCost
 from workbench.tools.formats import local_date_format
-from workbench.tools.testing import messages
+from workbench.tools.testing import check_code, messages
 
 
 class ExpensesTest(TestCase):
@@ -45,15 +45,13 @@ class ExpensesTest(TestCase):
             ]
         )
 
-        def valid(p):
-            self.assertEqual(self.client.get("/expenses/?" + p).status_code, 200)
-
-        valid("")
-        valid("s=in-preparation")
-        valid("s=closed")
-        valid("owned_by={}".format(user.id))
-        valid("owned_by=-1")  # mine
-        valid("owned_by=0")  # only inactive
+        code = check_code(self, "/expenses/")
+        code("")
+        code("s=in-preparation")
+        code("s=closed")
+        code("owned_by={}".format(user.id))
+        code("owned_by=-1")  # mine
+        code("owned_by=0")  # only inactive
 
     def test_expenses(self):
         project = factories.ProjectFactory.create()

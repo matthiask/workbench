@@ -9,7 +9,7 @@ from freezegun import freeze_time
 from workbench import factories
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.tools.forms import WarningsForm
-from workbench.tools.testing import messages
+from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import logbook_lock
 
 
@@ -420,23 +420,21 @@ class LogbookTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        def valid(p):
-            self.assertEqual(self.client.get("/logbook/hours/?" + p).status_code, 200)
-
-        valid("")
-        valid("q=test")
-        valid("rendered_by=-1")
-        valid("rendered_by=" + str(user.pk))
-        valid("project=" + str(hours.service.project.pk))
-        valid("date_from=2018-01-01")
-        valid("date_until=2018-01-01")
-        valid("service=" + str(hours.service.pk))
-        valid("circle=0")
-        valid("circle=1")
-        valid("role=1")
-        valid("organization=" + str(hours.service.project.customer.pk))
-        valid("not_archived=1")
-        valid("xlsx=1")
+        code = check_code(self, "/logbook/hours/")
+        code("")
+        code("q=test")
+        code("rendered_by=-1")
+        code("rendered_by=" + str(user.pk))
+        code("project=" + str(hours.service.project.pk))
+        code("date_from=2018-01-01")
+        code("date_until=2018-01-01")
+        code("service=" + str(hours.service.pk))
+        code("circle=0")
+        code("circle=1")
+        code("role=1")
+        code("organization=" + str(hours.service.project.customer.pk))
+        code("not_archived=1")
+        code("xlsx=1")
 
     def test_logged_cost_list(self):
         cost = factories.LoggedCostFactory.create()
@@ -444,22 +442,20 @@ class LogbookTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        def valid(p):
-            self.assertEqual(self.client.get("/logbook/costs/?" + p).status_code, 200)
-
-        valid("")
-        valid("q=test")
-        valid("rendered_by=-1")
-        valid("rendered_by=" + str(user.pk))
-        valid("project=" + str(cost.service.project.pk))
-        valid("organization=" + str(cost.service.project.customer.pk))
-        valid("expenses=on")
-        valid("date_from=2018-01-01")
-        valid("date_until=2018-01-01")
-        valid("service=0")
-        valid("service=" + str(service.pk))
-        valid("not_archived=1")
-        valid("xlsx=1")
+        code = check_code(self, "/logbook/costs/")
+        code("")
+        code("q=test")
+        code("rendered_by=-1")
+        code("rendered_by=" + str(user.pk))
+        code("project=" + str(cost.service.project.pk))
+        code("organization=" + str(cost.service.project.customer.pk))
+        code("expenses=on")
+        code("date_from=2018-01-01")
+        code("date_until=2018-01-01")
+        code("service=0")
+        code("service=" + str(service.pk))
+        code("not_archived=1")
+        code("xlsx=1")
 
     def test_non_ajax_redirect_hours(self):
         hours = factories.LoggedHoursFactory.create()

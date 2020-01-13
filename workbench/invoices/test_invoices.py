@@ -9,7 +9,7 @@ from workbench import factories
 from workbench.invoices.models import Invoice
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
-from workbench.tools.testing import messages
+from workbench.tools.testing import check_code, messages
 
 
 def invoice_to_dict(invoice, **kwargs):
@@ -523,18 +523,16 @@ class InvoicesTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        def valid(p):
-            self.assertEqual(self.client.get("/invoices/?" + p).status_code, 200)
-
-        valid("")
-        valid("q=test")
-        valid("s=open")
-        valid("s=overdue")
-        valid("s=40")  # PAID
-        valid("org={}".format(factories.OrganizationFactory.create().pk))
-        valid("owned_by={}".format(user.id))
-        valid("owned_by=-1")  # mine
-        valid("owned_by=0")  # only inactive
+        code = check_code(self, "/invoices/")
+        code("")
+        code("q=test")
+        code("s=open")
+        code("s=overdue")
+        code("s=40")  # PAID
+        code("org={}".format(factories.OrganizationFactory.create().pk))
+        code("owned_by={}".format(user.id))
+        code("owned_by=-1")  # mine
+        code("owned_by=0")  # only inactive
 
     def test_list_pdfs(self):
         user = factories.UserFactory.create()
