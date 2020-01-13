@@ -13,7 +13,7 @@
   </div>
 
   <div id="absences-root" class="absences-wrapper"></div>
-  {{ absences|json_script:'absences-data' }}
+  {{ absences_data|json_script:'absences-data' }}
   <script src="{% url 'javascript-catalog' %}"></script>
   {% render_bundle "absences" %}
 {% endblock %}
