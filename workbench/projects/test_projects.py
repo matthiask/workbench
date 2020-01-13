@@ -516,3 +516,41 @@ class ProjectsTest(TestCase):
         with override_settings(FEATURES={"controlling": False}):
             response = self.client.get(project.urls["update"])
             self.assertNotContains(response, "id_flat_rate")
+
+    def test_project_closing_reopening(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            project.urls["update"],
+            {
+                "customer": project.customer_id,
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "type": project.type,
+                "closed_on": (dt.date.today() + dt.timedelta(days=10)).isoformat(),
+            },
+        )
+        self.assertContains(
+            response, "Leave this empty if you do not want to close the project yet."
+        )
+
+        response = self.client.post(
+            project.urls["update"],
+            {
+                "customer": project.customer_id,
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "type": project.type,
+                "closed_on": dt.date(2019, 12, 31).isoformat(),
+            },
+        )
+        self.assertRedirects(response, project.urls["detail"])
+
+        project.refresh_from_db()
+        self.assertEqual(
+            project.status_badge,
+            '<span class="badge badge-light">Order, closed on 31.12.2019</span>',
+        )
