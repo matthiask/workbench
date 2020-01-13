@@ -5,7 +5,7 @@ import factory
 from faker import Factory
 from faker.providers import address
 
-from workbench.accounts.models import User
+from workbench.accounts.models import Team, User
 from workbench.awt.models import WorkingTimeModel, Year
 from workbench.contacts.models import Organization, Person, PostalAddress
 from workbench.credit_control.models import CreditEntry, Ledger
@@ -60,6 +60,13 @@ class UserFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = User
+
+
+class TeamFactory(factory.DjangoModelFactory):
+    name = factory.Sequence(lambda n: "Team %d" % n)
+
+    class Meta:
+        model = Team
 
 
 # CONTACTS ####################################################################

@@ -8,7 +8,7 @@ from workbench import factories
 from workbench.awt.models import Absence, Employment
 from workbench.awt.reporting import active_users, annual_working_time
 from workbench.awt.utils import monthly_days
-from workbench.tools.testing import messages
+from workbench.tools.testing import check_code, messages
 
 
 class AWTTest(TestCase):
@@ -233,11 +233,7 @@ class AWTTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        def code(suffix, status_code=200):
-            self.assertEqual(
-                self.client.get("/absences/?{}".format(suffix)).status_code, status_code
-            )
-
+        code = check_code(self, "/absences/")
         code("")
         code("u=-1")
         code("u={}".format(user.pk))
@@ -282,7 +278,12 @@ class AWTTest(TestCase):
             reason=Absence.VACATION,
         )
 
-        self.assertEqual(self.client.get("/report/absence-calendar/").status_code, 200)
+        code = check_code(self, "/report/absence-calendar/")
+        code("")
+
+        team = factories.TeamFactory.create()
+        user.teams.add(team)
+        code("team={}".format(team.pk))
 
     def test_absence_validation(self):
         user = factories.UserFactory.create()

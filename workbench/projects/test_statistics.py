@@ -8,6 +8,7 @@ from workbench.projects.models import Project
 from workbench.projects.reporting import hours_per_customer, overdrawn_projects
 from workbench.reporting import green_hours, project_budget_statistics
 from workbench.tools.models import Z
+from workbench.tools.testing import check_code
 
 
 class StatisticsTest(TestCase):
@@ -59,12 +60,7 @@ class StatisticsTest(TestCase):
         response = self.client.get("/report/project-budget-statistics/")
         self.assertContains(response, "project budget statistics")
 
-        def code(p, status_code=200):
-            self.assertEqual(
-                self.client.get("/report/project-budget-statistics/?" + p).status_code,
-                status_code,
-            )
-
+        code = check_code(self, "/report/project-budget-statistics/")
         code("owned_by=-1")
         code("owned_by=0")
         code("owned_by={}".format(user.pk))

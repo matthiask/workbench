@@ -7,7 +7,7 @@ from workbench import factories
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.tools.forms import WarningsForm
-from workbench.tools.testing import messages
+from workbench.tools.testing import check_code, messages
 
 
 class ProjectsTest(TestCase):
@@ -259,11 +259,7 @@ class ProjectsTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        def code(p, status_code=200):
-            self.assertEqual(
-                self.client.get("/projects/?" + p).status_code, status_code
-            )
-
+        code = check_code(self, "/projects/")
         code("")
         code("q=test")
         code("s=all")
