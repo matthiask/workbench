@@ -103,9 +103,6 @@ class ExpenseReport(Model):
 
 
 class ExchangeRatesQuerySet(models.QuerySet):
-    def for_today(self):
-        return self.for_day(dt.date.today())
-
     def for_day(self, day):
         try:
             return self.get(day=day)
@@ -119,7 +116,7 @@ class ExchangeRatesQuerySet(models.QuerySet):
         try:
             return self.latest()
         except self.model.DoesNotExist:
-            return self.for_today()
+            return self.for_day(dt.date.today())
 
 
 class ExchangeRates(models.Model):

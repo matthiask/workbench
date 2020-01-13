@@ -1,11 +1,16 @@
 import datetime as dt
+import json
+import os
+from unittest import mock
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
 from workbench import factories
 from workbench.expenses.models import ExchangeRates, ExpenseReport
+from workbench.expenses.rates import exchange_rates
 from workbench.logbook.models import LoggedCost
 from workbench.tools.formats import local_date_format
 from workbench.tools.testing import check_code, messages
@@ -219,4 +224,50 @@ class ExpensesTest(TestCase):
         self.assertEqual(
             list(cm.exception),
             [("expense_currency", ["Either fill in all fields or none."])],
+        )
+
+
+def mocked_json(*args, **kwargs):
+    with open(
+        os.path.join(settings.BASE_DIR, "workbench", "fixtures", "exchangerates.json")
+    ) as f:
+        return json.load(f)[0]["fields"]["rates"]
+
+
+@mock.patch("workbench.expenses.models.exchange_rates", side_effect=mocked_json)
+class MockedRemoteDataTest(TestCase):
+    def test_with_mocked_remote_data(self, mock_get):
+        self.assertEqual(mock_get.call_count, 0)
+        rates = ExchangeRates.objects.newest()
+        self.assertEqual(mock_get.call_count, 1)
+        self.assertEqual(rates.rates["date"], "2019-12-10")
+
+        rates = ExchangeRates.objects.create(
+            day=dt.date.today() + dt.timedelta(days=1), rates={}
+        )
+        self.assertEqual(ExchangeRates.objects.newest(), rates)
+        self.assertEqual(mock_get.call_count, 1)
+
+
+def mocked_get(*args, **kwargs):
+    class MockRequest:
+        def json(self):
+            return {}
+
+    return MockRequest()
+
+
+@mock.patch("workbench.expenses.rates.requests.get", side_effect=mocked_get)
+class ExchangeRatesTest(TestCase):
+    def test_exchange_rates_today(self, mock_get):
+        exchange_rates()
+        self.assertEqual(
+            mock_get.call_args[0], ("https://api.exchangeratesapi.io/latest?base=CHF",),
+        )
+
+    def test_exchange_rates_someday(self, mock_get):
+        exchange_rates(dt.date(2019, 10, 12))
+        self.assertEqual(
+            mock_get.call_args[0],
+            ("https://api.exchangeratesapi.io/2019-10-12?base=CHF",),
         )
