@@ -43,23 +43,8 @@ function getDateList(start, end) {
   return list
 }
 
-function getReasonList(absences) {
-  return absences.reduce((acc, person) => {
-    person.absences.forEach(absence => {
-      if (!acc.find(r => r.reason === absence.reason)) {
-        acc.push({
-          reason: absence.reason,
-          reasonDisplay: absence.reasonDisplay,
-        })
-      }
-    })
-
-    return acc
-  }, [])
-}
-
 document.addEventListener("DOMContentLoaded", () => {
-  let absencesByPerson = JSON.parse(
+  let {absencesByPerson, reasonList} = JSON.parse(
     document.getElementById("absences-data").textContent
   )
 
@@ -72,8 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
       endsOn: a.endsOn * 1000,
     })),
   }))
-
-  const reasonList = getReasonList(absencesByPerson)
 
   const timeBoundaries = getTimeBoundaries(absencesByPerson)
 

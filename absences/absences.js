@@ -162,12 +162,12 @@ const Scale = ({scaleValues}) => {
 const Legend = ({reasons}) => {
   return (
     <ul className="absences-legend">
-      {reasons.map(r => (
+      {reasons.map(([reason, reasonDisplay]) => (
         <li
-          key={r.reason}
-          className={`absences-legend__item absences-legend__item--${r.reason}`}
+          key={reason}
+          className={`absences-legend__item absences-legend__item--${reason}`}
         >
-          {r.reasonDisplay}
+          {reasonDisplay}
         </li>
       ))}
     </ul>

@@ -85,4 +85,13 @@ def absence_calendar(request):
         key=lambda row: row[0]["fullName"],
     )
 
-    return render(request, "awt/absence_calendar.html", {"absences": absences})
+    return render(
+        request,
+        "awt/absence_calendar.html",
+        {
+            "absences_data": {
+                "absencesByPerson": absences,
+                "reasonList": Absence.REASON_CHOICES,
+            }
+        },
+    )
