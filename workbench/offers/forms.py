@@ -192,7 +192,7 @@ class OfferDeleteForm(ModelForm):
         super().__init__(*args, **kwargs)
         collector = SlowCollector(using=self.instance._state.db)
         try:
-            collector.collect([self.instance])
+            collector.collect(self.instance.services.all())
         except ProtectedError:
             pass
         else:

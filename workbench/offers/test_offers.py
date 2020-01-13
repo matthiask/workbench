@@ -351,3 +351,16 @@ class OffersTest(TestCase):
         gs = offer.project.grouped_services
 
         self.assertEqual(gs["offers"], [(offer, [])])
+
+    def test_offer_deletion(self):
+        offer = factories.OfferFactory.create()
+        self.client.force_login(offer.owned_by)
+
+        response = self.client.get(offer.urls["delete"])
+        self.assertContains(response, "delete_services")
+
+        service = factories.ServiceFactory.create(project=offer.project, offer=offer)
+        factories.LoggedHoursFactory.create(service=service)
+
+        response = self.client.get(offer.urls["delete"])
+        self.assertNotContains(response, "delete_services")
