@@ -1,5 +1,7 @@
 import React, {useState, useMemo} from "react"
 
+const {gettext, interpolate} = window
+
 import {formatDate, readableDate, getWeekNumber} from "./utils"
 
 const getColumnName = t => `date-${formatDate(new Date(t))}`
@@ -9,7 +11,7 @@ const getRowName = id => `person-${id}`
 const MONTHS = [
   "January", "February", "March", "April", "May", "June", "July", "August",
   "September", "October", "November", "December"
-].map(m => window.gettext(m))
+].map(m => gettext(m))
 
 export const Absences = ({absencesByPerson, dateList, reasonList}) => {
   const scaleValues = useMemo(
@@ -151,7 +153,10 @@ const Scale = ({scaleValues}) => {
             <br />
             {MONTHS[entry.month]}
             <br />
-            {entry.week}
+            {entry.date.getDate()}.
+            <small className="text-nowrap">
+              {interpolate(gettext("Week %s"), [entry.week])}
+            </small>
           </div>
         )
       })}
