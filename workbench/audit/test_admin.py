@@ -12,10 +12,14 @@ class AuditTest(TestCase):
         user = factories.UserFactory.create(is_admin=True)
         self.client.force_login(user)
 
+        user.enforce_same_week_logging = False
+        user.save()
+
         response = self.client.get("/admin/audit/loggedaction/")
         self.assertNotContains(response, "add/")
         self.assertNotContains(response, "<select")
         self.assertContains(response, "INSERT accounts_user")
+        self.assertContains(response, "UPDATE accounts_user")  # change
 
         response = self.client.get(
             "/admin/audit/loggedaction/{}/change/".format(
