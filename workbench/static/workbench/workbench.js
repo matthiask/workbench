@@ -113,13 +113,12 @@ $(function() {
 
   // Search form restoration
   $(".form-search").each(function() {
-    if (window.location.search) {
-      const key = `search-${window.location.pathname}`
-      window.localStorage.setItem(
-        key,
-        /\b_error=\b/.test(window.location.search) ? "" : window.location.search
-      )
-    }
+    let params = new URLSearchParams(window.location.search.slice(1))
+    ;["page", "pdf", "xlsx", "_error"].forEach(key => params.delete(key))
+    params.sort()
+    params = params.toString()
+    const key = `search-${window.location.pathname}`
+    window.localStorage.setItem(key, params ? `?${params}` : "")
   })
 
   function localStorageKeyFor(href) {
