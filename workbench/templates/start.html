@@ -6,20 +6,6 @@
 <div class="row justify-content-center">
   <div class="col-lg-6">
 
-    <div class="card mb-3">
-      <div class="card-header"><h3 class="my-0">Hi, {{ user }}</h3></div>
-      <div class="card-body">
-        <p class="card-text">
-
-          <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
-            {{ user.hours.today|hours }} {% trans 'today' %}</a> /
-          <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
-            {{ user.hours.week|hours }} {% trans 'this week' %}</a>
-
-        </p>
-      </div>
-    </div>
-
     {% if user.in_preparation %}
     <div class="card mb-3">
       <div class="card-header"><h3 class="my-0">
@@ -91,9 +77,18 @@
   <div class="col-lg-6">
 
     <div class="card mb-3">
-      <div class="card-header"><h3 class="my-0">
-        <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{% trans "today's hours" %}</a>
-      </h3></div>
+      <div class="card-header">
+        <h3 class="my-0 d-flex w-100 justify-content-between">
+          <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{% trans "today's hours" %}</a>
+
+          <small>
+            <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}&amp;date_from={% now 'Y-m-d' %}">
+              {{ user.hours.today|hours }} {% trans 'today' %}</a> /
+            <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
+              {{ user.hours.week|hours }} {% trans 'this week' %}</a>
+          </small>
+        </h3>
+      </div>
 
       {% if user.todays_hours %}
         <div class="list-group list-group-flush">

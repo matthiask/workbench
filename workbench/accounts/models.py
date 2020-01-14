@@ -153,7 +153,7 @@ class User(Model, AbstractBaseUser):
         return (
             self.loggedhours.filter(rendered_on=dt.date.today())
             .select_related("service__project__owned_by", "rendered_by")
-            .order_by("-created_at")[:5]
+            .order_by("-created_at")[:15]
         )
 
     @cached_property
