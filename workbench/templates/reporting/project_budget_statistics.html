@@ -11,7 +11,7 @@
 
   <form method="get" class="form-inline form-search mb-3" data-autosubmit>
     {% if form.changed_data %}
-      <a class="btn btn-outline-info" href="." title="{% trans 'Reset the filter form' %}"  data-reset-filter>&times;</a>
+      <a class="btn btn-info" href="." title="{% trans 'Reset the filter form' %}"  data-reset-filter>&times;</a>
     {% endif %}
     {% ff_fields form %}
   </form>
