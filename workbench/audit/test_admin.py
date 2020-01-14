@@ -15,7 +15,6 @@ class AuditTest(TestCase):
         response = self.client.get("/admin/audit/loggedaction/")
         self.assertNotContains(response, "add/")
         self.assertNotContains(response, "<select")
-        self.assertContains(response, "UPDATE accounts_user")  # login
         self.assertContains(response, "INSERT accounts_user")
 
         response = self.client.get(
