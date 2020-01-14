@@ -277,6 +277,14 @@ class AWTTest(TestCase):
             description="Test",
             reason=Absence.VACATION,
         )
+        Absence.objects.create(
+            user=user,
+            starts_on=dt.date.today() + dt.timedelta(days=10),
+            ends_on=dt.date.today() + dt.timedelta(days=20),
+            days=0,
+            description="Test",
+            reason=Absence.VACATION,
+        )
 
         code = check_code(self, "/report/absence-calendar/")
         code("")
