@@ -72,13 +72,13 @@ def oauth2(request):
     if new_user:
         messages.success(request, _("Welcome! Please fill in your details."))
         response = redirect("accounts_update")
-        response.set_cookie("login_hint", user.email, expires=30 * 86400)
+        response.set_cookie("login_hint", user.email, expires=180 * 86400)
         return response
 
     next = request.get_signed_cookie("next", default=None, salt="next")
     response = redirect(next if next else "/")
     response.delete_cookie("next")
-    response.set_cookie("login_hint", user.email, expires=30 * 86400)
+    response.set_cookie("login_hint", user.email, expires=180 * 86400)
     return response
 
 
