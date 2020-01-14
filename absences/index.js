@@ -5,8 +5,7 @@ import React from "react"
 
 import {Absences} from "./absences"
 
-function getTimeBoundaries(absences) {
-  let minStartsOn = null
+function getTimeBoundaries(absences, minStartsOn) {
   let maxEndsOn = null
 
   absences.forEach(({absences}) => {
@@ -44,7 +43,7 @@ function getDateList(start, end) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  let {absencesByPerson, reasonList} = JSON.parse(
+  let {absencesByPerson, monday, reasonList} = JSON.parse(
     document.getElementById("absences-data").textContent
   )
 
@@ -58,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })),
   }))
 
-  const timeBoundaries = getTimeBoundaries(absencesByPerson)
+  const timeBoundaries = getTimeBoundaries(absencesByPerson, monday * 1000)
 
   const dateList = getDateList(
     new Date(timeBoundaries.start),

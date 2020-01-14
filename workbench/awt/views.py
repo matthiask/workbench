@@ -12,6 +12,7 @@ from workbench.accounts.models import Team, User
 from workbench.awt.models import Absence, Year
 from workbench.awt.reporting import active_users, annual_working_time
 from workbench.tools.forms import Form
+from workbench.tools.validation import monday
 
 
 def annual_working_time_view(request):
@@ -110,6 +111,7 @@ def absence_calendar(request):
             "absences_data": {
                 "absencesByPerson": absences,
                 "reasonList": Absence.REASON_CHOICES,
+                "monday": time.mktime(monday().timetuple()),
             },
             "form": form,
         },
