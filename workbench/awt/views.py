@@ -76,32 +76,37 @@ def absence_calendar(request):
     form = CalendarFilterForm(request.GET, request=request)
     form.is_valid()
 
+    dates = {dt.date.today()}
     absences = defaultdict(list)
     for absence in form.queryset():
         absences[absence.user].append(absence)
+        dates.add(absence.starts_on)
+        dates.add(absence.ends_on)
 
     absences = sorted(
         (
-            (
-                {"fullName": user.get_full_name(), "id": user.id},
-                [
+            {
+                "name": user.get_full_name(),
+                "id": user.id,
+                "absences": [
                     {
                         "id": absence.id,
                         "reason": absence.reason,
                         "reasonDisplay": absence.get_reason_display(),
-                        "startsOn": time.mktime(absence.starts_on.timetuple()),
+                        "startsOn": time.mktime(absence.starts_on.timetuple()) * 1000,
                         "endsOn": time.mktime(
                             (absence.ends_on or absence.starts_on).timetuple()
-                        ),
+                        )
+                        * 1000,
                         "days": absence.days,
                         "description": absence.description,
                     }
                     for absence in user_absences
                 ],
-            )
+            }
             for user, user_absences in absences.items()
         ),
-        key=lambda row: row[0]["fullName"],
+        key=lambda row: row["name"],
     )
 
     return render(
@@ -111,6 +116,10 @@ def absence_calendar(request):
             "absences_data": {
                 "absencesByPerson": absences,
                 "reasonList": Absence.REASON_CHOICES,
+                "timeBoundaries": {
+                    "start": time.mktime(monday(min(dates)).timetuple()) * 1000,
+                    "end": time.mktime(monday(max(dates)).timetuple()) * 1000,
+                },
                 "monday": time.mktime(monday().timetuple()),
             },
             "form": form,
