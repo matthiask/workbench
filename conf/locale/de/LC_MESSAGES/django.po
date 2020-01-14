@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-13 17:30+0100\n"
+"POT-Creation-Date: 2020-01-14 09:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -307,7 +307,7 @@ msgid "sickness"
 msgstr "Krankheit"
 
 #: workbench/awt/models.py
-msgid "other"
+msgid "other reasons"
 msgstr "Andere Gründe"
 
 #: workbench/awt/models.py workbench/invoices/models.py
@@ -1998,6 +1998,12 @@ msgid "total excl. tax"
 msgstr "Total exkl. MwSt."
 
 #: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/projects/project_detail.html
+msgid "Copy"
+msgstr "Kopieren"
+
+#: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "Create invoices"
 msgstr "Rechnungen erstellen"
 
@@ -2039,11 +2045,6 @@ msgstr "umrechnen"
 #: workbench/templates/logbook/loggedcost_form.html
 msgid "expenses in foreign currency"
 msgstr "Spesen in Fremdwährung"
-
-#: workbench/templates/logbook/loggedhours_detail.html
-#: workbench/templates/projects/project_detail.html
-msgid "Copy"
-msgstr "Kopieren"
 
 #: workbench/templates/logbook/loggedhours_form.html
 msgid "new service"
@@ -2388,3 +2389,6 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "other"
+#~ msgstr "Andere Gründe"

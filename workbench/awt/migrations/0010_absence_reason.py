@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 choices=[
                     ("vacation", "vacation"),
                     ("sickness", "sickness"),
-                    ("other", "other"),
+                    ("other", "other reasons"),
                 ],
                 default="",
                 max_length=10,

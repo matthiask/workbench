@@ -162,7 +162,7 @@ class Absence(Model):
     REASON_CHOICES = [
         (VACATION, _("vacation")),
         (SICKNESS, _("sickness")),
-        (OTHER, _("other")),
+        (OTHER, _("other reasons")),
     ]
 
     user = models.ForeignKey(
