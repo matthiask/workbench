@@ -642,7 +642,29 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
         request = kwargs["request"]
         initial = kwargs.setdefault("initial", {})
 
-        if request.GET.get("contact"):
+        if request.GET.get("copy"):
+            try:
+                invoice = RecurringInvoice.objects.get(pk=request.GET["copy"])
+            except (RecurringInvoice.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update(
+                    {
+                        "customer": invoice.customer_id,
+                        "contact": invoice.contact_id,
+                        "title": invoice.title,
+                        "description": invoice.description,
+                        "owned_by": invoice.owned_by_id,
+                        "postal_address": invoice.postal_address,
+                        "periodicity": invoice.periodicity,
+                        "subtotal": invoice.subtotal,
+                        "discount": invoice.discount,
+                        "third_party_costs": invoice.third_party_costs,
+                        "liable_to_vat": invoice.liable_to_vat,
+                    }
+                )
+
+        elif request.GET.get("contact"):
             try:
                 contact = Person.objects.get(pk=request.GET.get("contact"))
             except (Person.DoesNotExist, TypeError, ValueError):

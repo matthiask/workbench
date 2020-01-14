@@ -225,3 +225,14 @@ class RecurringTest(TestCase):
             RecurringInvoice.urls["create"] + "?contact={}".format(person.pk)
         )
         self.assertContains(response, 'method="POST"')
+
+    def test_copy(self):
+        invoice = factories.RecurringInvoiceFactory.create()
+        self.client.force_login(invoice.owned_by)
+
+        response = self.client.get(invoice.urls["create"] + "?copy=" + str(invoice.pk))
+        self.assertContains(response, 'value="{}"'.format(invoice.title))
+        # print(response, response.content.decode("utf-8"))
+
+        response = self.client.get(invoice.urls["create"] + "?copy=blub")
+        self.assertEqual(response.status_code, 200)  # No crash

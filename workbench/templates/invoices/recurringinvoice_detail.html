@@ -19,6 +19,8 @@
   <a href="{{ object.urls.update }}" class="btn btn-primary">
     {% trans 'Update' %}
   </a>
+  <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-primary">
+    {% trans 'Copy' %}</a>
   <a href="?create_invoices=1" class="btn btn-primary">
     {% trans 'Create invoices' %}
   </a>
