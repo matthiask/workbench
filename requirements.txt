@@ -21,7 +21,7 @@ et-xmlfile==1.0.1
 factory-boy==2.12.0
 Faker==3.0.0
 flake8==3.7.9
-freezegun==0.3.12
+freezegun==0.3.13
 gunicorn==20.0.4
 idna==2.8
 jdcal==1.4.1
