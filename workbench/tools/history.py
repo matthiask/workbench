@@ -41,6 +41,8 @@ def boolean_formatter(value):
         return _("yes")
     elif value in {False, "f"}:
         return _("no")
+    elif value is None:
+        return _("<no value>")
     return value
 
 
