@@ -82,6 +82,7 @@ def absence_calendar(request):
         absences[absence.user].append(absence)
         dates.add(absence.starts_on)
         dates.add(absence.ends_on)
+    dates.discard(None)
 
     absences = sorted(
         (
