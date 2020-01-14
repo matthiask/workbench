@@ -142,6 +142,13 @@ def querystring(context, **kwargs):
     return "?%s" % query if query else ""
 
 
+@register.simple_tag(takes_context=True)
+def page_links(context, page_obj):
+    for page in page_obj.paginator.page_range:
+        if abs(page - page_obj.number) < 7:
+            yield page, querystring(context, page=page)
+
+
 @register.simple_tag
 def history_link(instance):
     return (

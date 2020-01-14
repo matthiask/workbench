@@ -47,6 +47,11 @@
         {% else %}<li class="page-item disabled"><span class="page-link">&laquo;</span></li>
         {% endif %}
 
+        {% page_links page_obj as pages %}
+        {% for page, url in pages %}
+        <li class="page-item {% if page == page_obj.number %}active{% endif %}"><a class="page-link" href="{{ url }}">{{ page }}</a></li>
+        {% endfor %}
+
         {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="{% querystring page=page_obj.next_page_number %}">&raquo;</a></li>
         {% else %}<li class="page-item disabled"><span class="page-link">&raquo;</span></li>
         {% endif %}
