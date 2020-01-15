@@ -50,7 +50,7 @@ VALUES
 
 INSERT INTO accounts_user
 (id, password, last_login, email, is_active, is_admin, _short_name, _full_name, enforce_same_week_logging, language, working_time_model_id)
-SELECT id, '', NULL, email, is_active, is_superuser, username, concat(first_name, ' ', last_name), TRUE, '', 1 FROM
+SELECT id, '', NULL, email, is_active, is_superuser, username, concat(first_name, ' ', last_name), TRUE, 'de', 1 FROM
 dblink(
     'dbname=bf_metronom',
     'SELECT u.id, u.email, u.is_active, u.is_superuser, u.username, u.first_name, u.last_name, a.dob FROM auth_user u LEFT JOIN accounts_profile p ON p.user_id=u.id LEFT JOIN addressbook_person a ON p.person_id=a.id'
