@@ -10,6 +10,7 @@ from workbench.reporting.views import (
     key_data_gross_profit,
     key_data_third_party_costs,
     key_data_view,
+    labor_costs_view,
     open_items_list,
     overdrawn_projects_view,
     project_budget_statistics_view,
@@ -63,5 +64,8 @@ urlpatterns = [
     ),
     url(
         r"^green-hours/$", controlling_only(green_hours_view), name="report_green_hours"
+    ),
+    url(
+        r"^labor-costs/$", controlling_only(labor_costs_view), name="report_labor_costs"
     ),
 ]

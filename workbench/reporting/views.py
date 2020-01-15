@@ -13,7 +13,12 @@ from workbench.invoices.utils import next_valid_day
 from workbench.logbook.models import LoggedCost
 from workbench.projects.models import Project
 from workbench.projects.reporting import overdrawn_projects
-from workbench.reporting import green_hours, key_data, project_budget_statistics
+from workbench.reporting import (
+    green_hours,
+    key_data,
+    labor_costs,
+    project_budget_statistics,
+)
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import DateInput, Form
 from workbench.tools.models import ONE, Z
@@ -352,5 +357,22 @@ def green_hours_view(request, form):
                 [form.cleaned_data["date_from"], form.cleaned_data["date_until"]],
                 users=form.cleaned_data["users"],
             ),
+        },
+    )
+
+
+def labor_costs_view(request):
+    try:
+        year = int(request.GET.get("year"))
+    except Exception:
+        year = dt.date.today().year
+
+    return render(
+        request,
+        "reporting/labor_costs.html",
+        {
+            "labor_costs": labor_costs.labor_costs(
+                [dt.date(year, 1, 1), dt.date(year, 12, 31)]
+            )
         },
     )

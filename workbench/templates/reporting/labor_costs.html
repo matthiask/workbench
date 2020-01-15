@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% load fineforms i18n static workbench %}
+
+{% block title %}{% trans 'labor costs' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-sm-12 col-md-8">
+  <h1>{% trans 'labor costs' %}</h1>
+
+  {% comment %}
+  <form method="get" class="mb-3">
+    {% ff_fields form %}
+    {% ff_submit _('show') %}
+  </form>
+  {% endcomment %}
+
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>{% trans 'project' %}</th>
+        <th class="text-right">{% trans 'hours' %}</th>
+        <th class="text-right">{% trans 'hours with rate undefined' %}</th>
+        <th class="text-right">{% trans 'costs' %}</th>
+        <th class="text-right">{% trans 'costs with green hours target' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in labor_costs %}
+    <tr>
+      <th>{% link_or_none row.project %}</th>
+      <td class="text-right">{{ row.hours|hours }}</td>
+      <td class="text-right">{{ row.hours_with_rate_undefined|hours }}</td>
+      <td class="text-right">{{ row.costs|currency }}</td>
+      <td class="text-right">{{ row.costs_with_green_hours_target|currency }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+</div>
+{% endblock %}
