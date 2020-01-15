@@ -5,7 +5,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [("audit", "0002_auto_20190321_1626")]
+    dependencies = [
+        ("audit", "0002_auto_20190321_1626"),
+        ("invoices", "0006_auto_20190309_2143"),
+    ]
 
     operations = [
         migrations.RunSQL(
