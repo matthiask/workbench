@@ -17,8 +17,7 @@ def user_middleware(get_response):
             set_user_name(
                 "user-%d-%s" % (request.user.id, request.user.get_short_name())
             )
-            if request.user.language:
-                activate(request.user.language)
+            activate(request.user.language)
             return get_response(request)
 
         set_user_name("user-0-anonymous")
