@@ -976,3 +976,7 @@ WHERE effort_rate IS NOT NULL AND projects_service.project_id=p.project_id;
 --  Zumbühl Moritz      |        10 |     2
 -- (39 rows)
 --
+
+UPDATE accounts_user SET email='moritz@blindflugstudios.com' WHERE id=4;
+UPDATE accounts_user SET email='jeremy@blindflugstudios.com' WHERE id=89;
+UPDATE accounts_user SET is_admin=TRUE WHERE id=120;
