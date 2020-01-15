@@ -258,8 +258,18 @@ WORKBENCH = {
         },
         URL="https://workbench.blindflugstudios.com",
         FEATURES={
-            "bookkeeping": False,
-            "controlling": False,
+            "bookkeeping": {
+                "moritz@blindflugstudios.com",
+                "jeremy@blindflugstudios.com",
+                "frederic@blindflugstudios.com",
+                "mk@feinheit.ch",
+            },
+            "controlling": {
+                "moritz@blindflugstudios.com",
+                "jeremy@blindflugstudios.com",
+                "frederic@blindflugstudios.com",
+                "mk@feinheit.ch",
+            },
             "foreign_currencies": True,
             "glassfrog": False,
         },
