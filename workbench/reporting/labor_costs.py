@@ -1,4 +1,3 @@
-import datetime as dt
 from collections import defaultdict
 
 from django.db import connections
@@ -54,9 +53,3 @@ def labor_costs(date_range):
             "owned_by"
         )
     ]
-
-
-def test():
-    from pprint import pprint
-
-    pprint(labor_costs([dt.date(2019, 1, 1), dt.date(2019, 12, 31)]))

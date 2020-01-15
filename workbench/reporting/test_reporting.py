@@ -8,6 +8,7 @@ from freezegun import freeze_time
 
 from workbench import factories
 from workbench.reporting.accounting import send_accounting_files
+from workbench.reporting.labor_costs import labor_costs
 from workbench.reporting.models import Accruals
 
 
@@ -28,3 +29,29 @@ class ReportingTest(TestCase):
         self.assertEqual(
             Accruals.objects.for_cutoff_date(dt.date.today()).accruals, Decimal("0.00")
         )
+
+    def test_labor_costs(self):
+        user1 = factories.EmploymentFactory.create().user
+        user2 = factories.EmploymentFactory.create(
+            hourly_labor_costs=100, green_hours_target=75
+        ).user
+
+        service = factories.ServiceFactory.create()
+
+        factories.LoggedHoursFactory.create(service=service, rendered_by=user1)
+        factories.LoggedHoursFactory.create(service=service, rendered_by=user2)
+
+        self.client.force_login(user1)
+        response = self.client.get("/report/labor-costs/")
+        self.assertEqual(response.status_code, 200)
+
+        year = dt.date.today().year
+        lc = labor_costs([dt.date(year, 1, 1), dt.date(year, 12, 31)])
+
+        self.assertEqual(len(lc), 1)
+        self.assertAlmostEqual(lc[0]["costs"], Decimal("100"))
+        self.assertAlmostEqual(
+            lc[0]["costs_with_green_hours_target"], Decimal("133.3333333")
+        )
+        self.assertEqual(lc[0]["hours"], 2)
+        self.assertEqual(lc[0]["hours_with_rate_undefined"], 1)
