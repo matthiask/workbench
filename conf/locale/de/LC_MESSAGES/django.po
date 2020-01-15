@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-14 09:57+0100\n"
+"POT-Creation-Date: 2020-01-15 12:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1083,6 +1083,7 @@ msgstr "Kontakt"
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/overdrawn_projects.html
 #: workbench/templates/reporting/project_budget_statistics.html
 #: workbench/tools/xlsx.py
@@ -1285,6 +1286,7 @@ msgstr "Stundensatz"
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_list.html
+#: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/start.html
 msgid "hours"
 msgstr "Stunden"
@@ -2182,6 +2184,22 @@ msgstr "Stundenverteilung"
 msgid "date"
 msgstr "Datum"
 
+#: workbench/templates/reporting/labor_costs.html
+msgid "labor costs"
+msgstr "Personalaufwand"
+
+#: workbench/templates/reporting/labor_costs.html
+msgid "hours with rate undefined"
+msgstr "Stunden ohne Satz"
+
+#: workbench/templates/reporting/labor_costs.html
+msgid "costs"
+msgstr "Kosten"
+
+#: workbench/templates/reporting/labor_costs.html
+msgid "costs with green hours target"
+msgstr "Kosten unter Einbezug des Grüne Stunden-Zielwerts"
+
 #: workbench/templates/reporting/overdrawn_projects.html
 msgid "effort hours"
 msgstr "Aufwände in Stunden"
@@ -2236,14 +2254,6 @@ msgid "log costs in any project"
 msgstr "Kosten in irgendeinem Projekt eintragen"
 
 #: workbench/templates/start.html
-msgid "today"
-msgstr "heute"
-
-#: workbench/templates/start.html
-msgid "this week"
-msgstr "diese Woche"
-
-#: workbench/templates/start.html
 msgid "active projects"
 msgstr "Aktive Projekte"
 
@@ -2258,6 +2268,14 @@ msgstr "Geburtstage"
 #: workbench/templates/start.html
 msgid "today's hours"
 msgstr "Stunden von heute"
+
+#: workbench/templates/start.html
+msgid "today"
+msgstr "heute"
+
+#: workbench/templates/start.html
+msgid "this week"
+msgstr "diese Woche"
 
 #: workbench/templates/start.html
 msgid "no hours today"

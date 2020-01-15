@@ -371,8 +371,10 @@ def labor_costs_view(request):
         request,
         "reporting/labor_costs.html",
         {
-            "labor_costs": labor_costs.labor_costs(
-                [dt.date(year, 1, 1), dt.date(year, 12, 31)]
-            )
+            "labor_costs": sorted(
+                labor_costs.labor_costs([dt.date(year, 1, 1), dt.date(year, 12, 31)]),
+                key=lambda row: row["costs"],
+                reverse=True,
+            ),
         },
     )
