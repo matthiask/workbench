@@ -726,7 +726,9 @@ INSERT INTO awt_employment (
   date_until,
   percentage,
   vacation_weeks,
-  notes
+  notes,
+  hourly_labor_costs,
+  green_hours_target
 )
 SELECT
   user_id,
@@ -734,7 +736,9 @@ SELECT
   date '9999-12-31',
   percent,
   CASE WHEN percent > 0 THEN vacation_days * 20 / percent ELSE 0 END,
-  ''
+  '',
+  100,
+  70
 FROM
 dblink(
   'dbname=bf_metronom',
