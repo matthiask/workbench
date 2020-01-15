@@ -69,10 +69,9 @@ MIDDLEWARE = [
         "django.middleware.locale.LocaleMiddleware",
         "django.middleware.csrf.CsrfViewMiddleware",
         "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "workbench.accounts.middleware.user_language",
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
-        "workbench.accounts.middleware.login_required",
+        "workbench.accounts.middleware.user_middleware",
     ]
     if m
 ]

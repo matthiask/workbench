@@ -11,12 +11,14 @@ def set_user_name(username):
     )
 
 
-def login_required(get_response):
+def user_middleware(get_response):
     def middleware(request):
         if request.user.is_authenticated:
             set_user_name(
                 "user-%d-%s" % (request.user.id, request.user.get_short_name())
             )
+            if request.user.language:
+                activate(request.user.language)
             return get_response(request)
 
         set_user_name("user-0-anonymous")
@@ -29,14 +31,5 @@ def login_required(get_response):
         response = HttpResponseRedirect(reverse("login"))
         response.set_signed_cookie("next", request.get_full_path(), salt="next")
         return response
-
-    return middleware
-
-
-def user_language(get_response):
-    def middleware(request):
-        if request.user.is_authenticated and request.user.language:
-            activate(request.user.language)
-        return get_response(request)
 
     return middleware
