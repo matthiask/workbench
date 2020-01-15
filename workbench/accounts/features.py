@@ -24,6 +24,7 @@ class FEATURES:
     CONTROLLING = "controlling"
     FOREIGN_CURRENCIES = "foreign_currencies"
     GLASSFROG = "glassfrog"
+    LABOR_COSTS = "labor_costs"
 
 
 bookkeeping_only = feature_required(
@@ -31,4 +32,7 @@ bookkeeping_only = feature_required(
 )
 controlling_only = feature_required(
     FEATURES.CONTROLLING, _("Only controlling may access this, sorry.")
+)
+labor_costs_only = feature_required(
+    FEATURES.LABOR_COSTS, _("Only labor costs may access this, sorry.")
 )

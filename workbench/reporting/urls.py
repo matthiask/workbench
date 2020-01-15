@@ -1,6 +1,11 @@
 from django.conf.urls import url
 
-from workbench.accounts.features import FEATURES, controlling_only, feature_required
+from workbench.accounts.features import (
+    FEATURES,
+    controlling_only,
+    feature_required,
+    labor_costs_only,
+)
 from workbench.awt.views import absence_calendar, annual_working_time_view
 from workbench.circles.reporting import hours_by_circle
 from workbench.projects.reporting import hours_per_customer
@@ -66,6 +71,6 @@ urlpatterns = [
         r"^green-hours/$", controlling_only(green_hours_view), name="report_green_hours"
     ),
     url(
-        r"^labor-costs/$", controlling_only(labor_costs_view), name="report_labor_costs"
+        r"^labor-costs/$", labor_costs_only(labor_costs_view), name="report_labor_costs"
     ),
 ]
