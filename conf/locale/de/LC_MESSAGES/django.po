@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-15 12:05+0100\n"
+"POT-Creation-Date: 2020-01-15 13:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,6 +32,10 @@ msgstr "Nur Buchhaltung kann auf diesen Bereich zugreifen."
 #: workbench/accounts/features.py
 msgid "Only controlling may access this, sorry."
 msgstr "Nur Buchhaltung kann auf diesen Bereich zugreifen."
+
+#: workbench/accounts/features.py
+msgid "Only labor costs may access this, sorry."
+msgstr "Nur Personalkosten kann auf diesen Bereich zugreifen."
 
 #: workbench/accounts/forms.py
 msgid "Managed automatically. Contact your administrator to change this."
@@ -1899,6 +1903,10 @@ msgstr "Stunden pro Kundschaft"
 msgid "green hours"
 msgstr "Grüne Stunden"
 
+#: workbench/templates/base.html workbench/templates/reporting/labor_costs.html
+msgid "labor costs"
+msgstr "Personalaufwand"
+
 #: workbench/templates/base.html
 msgid "Settings"
 msgstr "Einstellungen"
@@ -2183,10 +2191,6 @@ msgstr "Stundenverteilung"
 #: workbench/tools/pdf.py
 msgid "date"
 msgstr "Datum"
-
-#: workbench/templates/reporting/labor_costs.html
-msgid "labor costs"
-msgstr "Personalaufwand"
 
 #: workbench/templates/reporting/labor_costs.html
 msgid "hours with rate undefined"
