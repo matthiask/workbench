@@ -273,7 +273,7 @@ msgstr "Bemerkungen"
 
 #: workbench/awt/models.py
 msgid "hourly labor costs"
-msgstr "Lohnkosten pro Stunde"
+msgstr "Personalaufwand pro Stunde"
 
 #: workbench/awt/models.py
 msgid "green hours target"
