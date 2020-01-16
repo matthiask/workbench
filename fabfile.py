@@ -83,12 +83,9 @@ def deploy_code():
 @task
 def pull_database(namespace):
     remote = {"fh": "workbench", "dbpag": "dbpag-workbench"}[namespace]
-
-    local("dropdb --if-exists workbench")
-    local("createdb --encoding UTF8 workbench")
     local(
-        'ssh root@workbench.feinheit.ch "sudo -u postgres pg_dump -Ox %s"'
-        " | psql workbench" % remote
+        'ssh root@workbench.feinheit.ch "sudo -u postgres pg_dump -Fc %s"'
+        " | pg_restore -Oxc --if-exists -d workbench" % remote
     )
 
 
