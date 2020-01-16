@@ -108,10 +108,12 @@ class HistoryTest(TestCase):
         # Only two versions -- position changes are excluded
         self.assertContains(response, "UPDATE", 1)
 
-    def test_nocrash(self):
+    def test_formatter_details(self):
         # Do not crash when encountering invalid values.
         self.assertEqual(history.boolean_formatter("stuff"), "stuff")
         self.assertEqual(history.date_formatter("stuff"), "stuff")
+        self.assertEqual(history.boolean_formatter(None), "<no value>")
+        self.assertEqual(history.date_formatter(None), "<no value>")
 
     def test_404(self):
         self.client.force_login(factories.UserFactory.create())
