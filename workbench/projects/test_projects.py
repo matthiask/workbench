@@ -554,20 +554,3 @@ class ProjectsTest(TestCase):
             project.status_badge,
             '<span class="badge badge-light">Order, closed on 31.12.2019</span>',
         )
-
-    def test_pagination_branch(self):
-        user = factories.UserFactory.create()
-        organization = factories.OrganizationFactory.create()
-        person = factories.PersonFactory.create(organization=organization)
-        self.client.force_login(user)
-        for i in range(200):
-            factories.ProjectFactory.create(
-                customer=organization, contact=person, owned_by=user
-            )
-
-        response = self.client.get("/projects/")
-        self.assertContains(
-            response,
-            '<li class="page-item"><a class="page-link" href="?page=2">2</a></li>',
-            html=True,
-        )
