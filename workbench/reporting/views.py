@@ -4,7 +4,6 @@ from itertools import groupby
 from django import forms
 from django.db.models import Q
 from django.shortcuts import render
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -290,7 +289,7 @@ class ProjectBudgetStatisticsForm(Form):
         data = self.cleaned_data
         if data.get("closed_during_the_last_year"):
             queryset = Project.objects.closed().filter(
-                closed_on__gte=timezone.now() - dt.timedelta(days=366)
+                closed_on__gte=dt.date.today() - dt.timedelta(days=366)
             )
         else:
             queryset = Project.objects.open(on=self.cleaned_data.get("cutoff_date"))
