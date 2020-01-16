@@ -56,6 +56,7 @@ class StatisticsTest(TestCase):
         self.client.force_login(user)
 
         factories.ProjectFactory.create()
+        factories.ProjectFactory.create(closed_on=dt.date.today())
 
         response = self.client.get("/report/project-budget-statistics/")
         self.assertContains(response, "project budget statistics")

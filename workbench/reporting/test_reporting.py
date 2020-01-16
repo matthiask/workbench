@@ -26,9 +26,9 @@ class ReportingTest(TestCase):
             self.assertEqual(len(mail.outbox), 1)
 
     def test_accruals(self):
-        self.assertEqual(
-            Accruals.objects.for_cutoff_date(dt.date.today()).accruals, Decimal("0.00")
-        )
+        obj = Accruals.objects.for_cutoff_date(dt.date.today())
+        self.assertEqual(obj.accruals, Decimal("0.00"))
+        self.assertEqual(str(obj), obj.cutoff_date.strftime("%d.%m.%Y"))
 
     def test_labor_costs(self):
         user1 = factories.EmploymentFactory.create().user
