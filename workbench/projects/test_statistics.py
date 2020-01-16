@@ -7,6 +7,7 @@ from workbench import factories
 from workbench.projects.models import Project
 from workbench.projects.reporting import hours_per_customer, overdrawn_projects
 from workbench.reporting import green_hours, project_budget_statistics
+from workbench.reporting.models import Accruals
 from workbench.tools.models import Z
 from workbench.tools.testing import check_code
 
@@ -228,14 +229,24 @@ class StatisticsTest(TestCase):
         p_green.owned_by.employments.create(
             percentage=50, vacation_weeks=5, date_from=dt.date(2010, 1, 1)
         )
+
+        # More branches
+        invoice = factories.InvoiceFactory.create(
+            subtotal=100, third_party_costs=10, status=factories.Invoice.SENT
+        )
+        Accruals.objects.for_cutoff_date(dt.date.today())
+        factories.LoggedCostFactory.create(description="ASDF", third_party_costs=1)
+
         self.assertEqual(self.client.get("/report/key-data/").status_code, 200)
-        self.assertEqual(
-            self.client.get("/report/key-data/gross-profit/2019.01/").status_code, 200
-        )
-        self.assertEqual(
-            self.client.get("/report/key-data/third-party-costs/2019.01/").status_code,
-            200,
-        )
+
+        month = dt.date.today().strftime("%Y.%m")
+        response = self.client.get("/report/key-data/gross-profit/%s/" % month)
+        self.assertContains(response, invoice.title)
+
+        response = self.client.get("/report/key-data/third-party-costs/%s/" % month)
+        self.assertContains(response, invoice.title)
+        self.assertContains(response, "ASDF")
+        # print(response, response.content.decode("utf-8"))
 
     def test_statistics(self):
         hours = factories.LoggedHoursFactory.create()
