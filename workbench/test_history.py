@@ -6,6 +6,7 @@ from django.test.utils import override_settings
 from workbench import factories
 from workbench.accounts.features import FEATURES
 from workbench.accounts.middleware import set_user_name
+from workbench.audit.models import LoggedAction
 from workbench.projects.models import Project
 from workbench.tools import history
 
@@ -91,7 +92,7 @@ class HistoryTest(TestCase):
         )
         # print(response, response.content.decode("utf-8"))
 
-    def test_exclusion(self):
+    def test_exclusion_in_trigger(self):
         service = factories.ServiceFactory.create()
         service.position += 1
         service.save()
@@ -107,6 +108,30 @@ class HistoryTest(TestCase):
         self.assertContains(response, "INSERT")
         # Only two versions -- position changes are excluded
         self.assertContains(response, "UPDATE", 1)
+
+        actions = LoggedAction.objects.for_model(service).with_data(id=service.id)
+        self.assertEqual(len(actions), 2)  # Position updates not logged by trigger
+
+    def test_exclusion_in_python(self):
+        employment = factories.EmploymentFactory.create()
+        employment.hourly_labor_costs = 100
+        employment.green_hours_target = 50
+        employment.save()
+
+        self.client.force_login(employment.user)
+        response = self.client.get(
+            "/history/awt_employment/id/{}/".format(employment.id)
+        )
+        self.assertContains(response, "INSERT", 1)
+        self.assertNotContains(response, "UPDATE")  # Logged but not shown
+
+        actions = LoggedAction.objects.for_model(employment).with_data(id=employment.id)
+        self.assertEqual(len(actions), 2)
+        self.assertEqual(actions[0].changed_fields, None)
+        self.assertEqual(
+            actions[1].changed_fields,
+            {"green_hours_target": "50", "hourly_labor_costs": "100.00"},
+        )
 
     def test_formatter_details(self):
         # Do not crash when encountering invalid values.
