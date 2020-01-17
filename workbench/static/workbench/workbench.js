@@ -324,6 +324,32 @@ function initWidgets() {
       $("#id_modal-third_party_costs").val(data.cost)
     })
   })
+
+  $("[data-offer-form]").each(function() {
+    const form = this
+    // const form = $(this)
+
+    function recalculate() {
+      let offerCost = 0
+
+      Array.from(form.querySelectorAll("[data-service]")).forEach(service => {
+        const effortRate = parseFloat(service.querySelector("[data-effort-rate] input").value) || 0
+        const effortHours = parseFloat(service.querySelector("[data-effort-hours] input").value) || 0
+        const cost = parseFloat(service.querySelector("[data-cost] input").value) || 0
+
+        const serviceCosts = effortRate * effortHours + cost
+        offerCost += serviceCosts
+
+        service.querySelector("[data-service-costs]").textContent = serviceCosts
+      })
+
+      document.querySelector("[data-offer-cost]").textContent = offerCost
+    }
+
+    recalculate()
+    form.addEventListener("change", recalculate)
+
+  })
 }
 
 window.addInlineForm = function addInlineForm(slug, onComplete) {

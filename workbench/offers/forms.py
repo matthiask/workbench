@@ -170,10 +170,23 @@ class OfferForm(PostalAddressSelectionForm):
         return instance
 
 
+class ServiceForm(forms.ModelForm):
+    class Meta:
+        model = Service
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk and self.instance.project.flat_rate is not None:
+            self.fields["effort_type"].disabled = True
+            self.fields["effort_rate"].disabled = True
+
+
 ServiceFormset = inlineformset_factory(
     Offer,
     Service,
-    fields=("title", "effort_type", "effort_rate", "effort_hours"),
+    form=ServiceForm,
+    fields=("title", "effort_type", "effort_rate", "effort_hours", "cost"),
     extra=0,
 )
 

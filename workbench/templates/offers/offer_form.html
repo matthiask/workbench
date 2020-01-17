@@ -4,16 +4,16 @@
 
 {% block content %}
 <div class="row justify-content-center">
-  <div class="col-md-8 col-lg-6">
+  <div class="col-md-10 col-lg-8">
     <h1>
       {% if object %}
-        {% blocktrans with object=object.full_name %}Update {{ object }}{% endblocktrans %}
+        {% blocktrans with object=object %}Update {{ object }}{% endblocktrans %}
       {% else %}
         {% blocktrans with class=view.meta.verbose_name %}Create {{ class }}{% endblocktrans %}
       {% endif %}
     </h1>
 
-    <form method="POST" action="." class="form-horizontal">
+    <form method="POST" action="." class="form-horizontal" data-offer-form>
       {% csrf_token %}
 
       {% include 'fineforms/warnings.html' %}
@@ -27,13 +27,15 @@
           <div class="card-body">
             {{ form.id }}
             {% ff_errors form %}
-            <div class="row">
-              <div class="col-6">{% ff_field form.title %}</div>
-              <div class="col-2">{% ff_field form.effort_type %}</div>
-              <div class="col-2">{% ff_field form.effort_rate %}</div>
-              <div class="col-2">{% ff_field form.effort_hours %}</div>
+            <div class="row" data-service>
+              <div class="col-12">{% ff_field form.title %}</div>
+              <div class="col-4">{% ff_field form.effort_type %}</div>
+              <div class="col-2" data-effort-rate>{% ff_field form.effort_rate %}</div>
+              <div class="col-2" data-effort-hours>{% ff_field form.effort_hours %}</div>
+              <div class="col-2" data-cost>{% ff_field form.cost %}</div>
+              <div class="col-2" style="align-self:center" data-service-costs></div>
             </div>
-            {% ff_fields form exclude='title,effort_type,effort_rate,effort_hours' %}
+            {% ff_fields form exclude='title,effort_type,effort_rate,effort_hours,cost' %}
           </div>
         </div>
         {% endformset %}
@@ -42,6 +44,8 @@
           {% include 'svg/plus.svg' %}
         </a>
       {% endif %}
+
+      <div data-offer-cost></div>
 
       <div class="row mt-5">
         <div class="col-sm-12">
