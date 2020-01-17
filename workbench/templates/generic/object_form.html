@@ -33,7 +33,7 @@
         {% ff_errors form %}
         {% ff_fields form %}
 
-        {% for formset in view.formsets.values %}{{ formset }}{% endfor %}
+        {% for formset in form.formsets.values %}{{ formset }}{% endfor %}
 
         <div class="row">
           <div class="col-sm-12">
