@@ -1,5 +1,6 @@
 from django import forms
 from django.db.models import Q
+from django.forms.models import inlineformset_factory
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -132,6 +133,11 @@ class OfferForm(PostalAddressSelectionForm):
         )
         self.fields["subtotal"].disabled = True
 
+        kwargs.pop("request")
+        self.formsets = (
+            {"services": ServiceFormset(*args, **kwargs)} if self.instance.pk else {}
+        )
+
     def clean(self):
         data = super().clean()
         s_dict = dict(Offer.STATUS_CHOICES)
@@ -162,6 +168,14 @@ class OfferForm(PostalAddressSelectionForm):
         )
         instance.save()
         return instance
+
+
+ServiceFormset = inlineformset_factory(
+    Offer,
+    Service,
+    fields=("title", "effort_type", "effort_rate", "effort_hours"),
+    extra=0,
+)
 
 
 @add_prefix("modal")

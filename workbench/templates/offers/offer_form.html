@@ -1,0 +1,61 @@
+{% extends "generic/object_form.html" %}
+
+{% load bootstrap4 fineforms formset i18n %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <h1>
+      {% if object %}
+        {% blocktrans with object=object.full_name %}Update {{ object }}{% endblocktrans %}
+      {% else %}
+        {% blocktrans with class=view.meta.verbose_name %}Create {{ class }}{% endblocktrans %}
+      {% endif %}
+    </h1>
+
+    <form method="POST" action="." class="form-horizontal">
+      {% csrf_token %}
+
+      {% include 'fineforms/warnings.html' %}
+      {% ff_errors form %}
+      {% ff_fields form %}
+
+      {% if form.formsets %}
+        <h4>{% trans 'services' %}</h4>
+        {% formset form.formsets.services "services" %}
+        <div id="{{ form_id }}" class="card bg-light mb-3">
+          <div class="card-body">
+            {{ form.id }}
+            {% ff_errors form %}
+            <div class="row">
+              <div class="col-6">{% ff_field form.title %}</div>
+              <div class="col-2">{% ff_field form.effort_type %}</div>
+              <div class="col-2">{% ff_field form.effort_rate %}</div>
+              <div class="col-2">{% ff_field form.effort_hours %}</div>
+            </div>
+            {% ff_fields form exclude='title,effort_type,effort_rate,effort_hours' %}
+          </div>
+        </div>
+        {% endformset %}
+        <a href="#" class="btn btn-primary"
+          onclick="return addInlineForm('services')">
+          {% include 'svg/plus.svg' %}
+        </a>
+      {% endif %}
+
+      <div class="row mt-5">
+        <div class="col-sm-12">
+          <button type="submit" class="btn btn-primary">
+            {% trans 'save' %}</button>
+
+          {% if object.get_absolute_url %}
+          <a href="{{ object.get_absolute_url }}" class="btn float-right btn-outline-danger">
+            {% trans 'cancel' %}</a>
+          {% endif %}
+        </div>
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}
