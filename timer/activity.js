@@ -184,7 +184,9 @@ export const Activity = connect((state, ownProps) => ({
                 {icons.pen}
               </button>
               <button
-                className="btn btn-sm ml-2 btn-success"
+                className={`btn btn-sm ml-2 ${
+                  isReady ? "btn-success" : "btn-light"
+                }`}
                 disabled={!activity.project || !isReady}
                 type="button"
                 onClick={() =>
