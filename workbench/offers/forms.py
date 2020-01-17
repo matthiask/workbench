@@ -256,4 +256,4 @@ class OfferDeleteForm(ModelForm):
     def delete(self):
         if self.cleaned_data.get("delete_services"):
             self.instance.services.all().delete()
-            self.instance.delete()
+        self.instance.delete()
