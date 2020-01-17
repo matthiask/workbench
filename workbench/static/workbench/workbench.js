@@ -105,6 +105,13 @@ $(function() {
     "change",
     "form[data-autosubmit] select, form[data-autosubmit] input",
     function() {
+      if (this.form.method != "get") {
+        $(this)
+          .closest("form")
+          .submit()
+        return
+      }
+
       const fd = new FormData(this.form)
       let params = new URLSearchParams()
       for (var part of fd) {
