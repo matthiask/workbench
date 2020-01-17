@@ -105,9 +105,14 @@ $(function() {
     "change",
     "form[data-autosubmit] select, form[data-autosubmit] input",
     function() {
-      $(this)
-        .closest("form")
-        .submit()
+      const fd = new FormData(this.form)
+      let params = new URLSearchParams()
+      for (var part of fd) {
+        if (part[1]) params.append(part[0], part[1])
+      }
+      params.sort()
+      params = params.toString()
+      window.location.href = params ? `?${params}` : "."
     }
   )
 
@@ -115,7 +120,6 @@ $(function() {
   $(".form-search").each(function() {
     let params = new URLSearchParams(window.location.search.slice(1))
     ;["page", "pdf", "xlsx", "_error"].forEach(key => params.delete(key))
-    params.sort()
     params = params.toString()
     const key = `search-${window.location.pathname}`
     window.localStorage.setItem(key, params ? `?${params}` : "")
