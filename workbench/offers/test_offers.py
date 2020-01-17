@@ -377,3 +377,50 @@ class OffersTest(TestCase):
         self.assertRedirects(response, offer.project.urls["detail"])
 
         self.assertEqual(offer.project.services.count(), 1)
+
+    def test_offer_pricing(self):
+        offer = factories.OfferFactory.create()
+        service = factories.ServiceFactory.create(offer=offer, project=offer.project)
+
+        self.client.force_login(offer.owned_by)
+        response = self.client.get(offer.urls["pricing"])
+        self.assertContains(response, "data-effort-rate", 2)  # Empty form too
+
+        response = self.client.post(
+            offer.urls["pricing"],
+            {
+                "discount": 100,
+                "liable_to_vat": "on",
+                "services-TOTAL_FORMS": 1,
+                "services-INITIAL_FORMS": 1,
+                "services-MAX_NUM_FORMS": 1000,
+                "services-0-id": service.id,
+                "services-0-offer": offer.id,
+                "services-0-title": service.title,
+                "services-0-effort_type": "Programming",
+                "services-0-effort_rate": 250,
+                "services-0-effort_hours": 10,
+                "services-0-cost": 35,
+            },
+        )
+
+        self.assertRedirects(response, offer.get_absolute_url())
+
+        offer.refresh_from_db()
+        service.refresh_from_db()
+
+        self.assertEqual(service.service_cost, 250 * 10 + 35)
+        self.assertEqual(offer.total_excl_tax, 250 * 10 + 35 - 100)
+
+    def test_offer_pricing_with_flat_rate(self):
+        project = factories.ProjectFactory.create(flat_rate=160)
+        offer = factories.OfferFactory.create(project=project)
+        factories.ServiceFactory.create(offer=offer, project=project)
+
+        self.client.force_login(project.owned_by)
+        response = self.client.get(offer.urls["pricing"])
+        self.assertContains(
+            response,
+            '<input type="number" name="services-0-effort_rate" step="0.01" class="form-control" disabled id="id_services-0-effort_rate">',  # noqa
+            html=True,
+        )

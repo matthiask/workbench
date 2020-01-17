@@ -34,9 +34,7 @@ def overdrawn_projects_view(request):
 
 
 class OpenItemsForm(Form):
-    cutoff_date = forms.DateField(
-        label=_("cutoff date"), widget=DateInput()
-    )
+    cutoff_date = forms.DateField(label=_("cutoff date"), widget=DateInput())
 
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
