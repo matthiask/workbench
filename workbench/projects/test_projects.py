@@ -362,6 +362,7 @@ class ProjectsTest(TestCase):
 
         response = self.client.get(project.urls["create"] + "?copy=" + str(project.pk))
         self.assertContains(response, 'value="{}"'.format(project.title))
+        self.assertNotContains(response, "closed_on")
         # print(response, response.content.decode("utf-8"))
 
         response = self.client.get(project.urls["create"] + "?copy=blub")

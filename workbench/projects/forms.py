@@ -142,6 +142,8 @@ class ProjectForm(ModelForm):
         self.fields["type"].choices = Project.TYPE_CHOICES
         if not self.request.user.features[FEATURES.CONTROLLING]:
             self.fields.pop("flat_rate")
+        if not self.instance.pk:
+            self.fields.pop("closed_on")
 
     def clean(self):
         data = super().clean()
