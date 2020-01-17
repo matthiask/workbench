@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, redirect
 
 from workbench import generic
 from workbench.accounts.features import controlling_only
-from workbench.offers.forms import OfferForm, OfferSearchForm
+from workbench.offers.forms import OfferForm, OfferPricingForm, OfferSearchForm
 from workbench.offers.models import Offer
 from workbench.offers.views import OfferDeleteView, OfferPDFView, copy_offer
 
@@ -30,6 +30,17 @@ urlpatterns = [
         r"^(?P<pk>\d+)/update/$",
         controlling_only(generic.UpdateView.as_view(form_class=OfferForm, model=Offer)),
         name="offers_offer_update",
+    ),
+    url(
+        r"^(?P<pk>\d+)/pricing/$",
+        controlling_only(
+            generic.UpdateView.as_view(
+                form_class=OfferPricingForm,
+                model=Offer,
+                template_name_suffix="_pricing",
+            )
+        ),
+        name="offers_offer_pricing",
     ),
     url(
         r"^(?P<pk>\d+)/delete/$",

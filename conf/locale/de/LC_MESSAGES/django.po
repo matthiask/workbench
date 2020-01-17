@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-15 13:12+0100\n"
+"POT-Creation-Date: 2020-01-17 09:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -471,6 +471,7 @@ msgstr "Die Postadresse müsste vermutlich mindestens drei Zeilen lang sein."
 #: workbench/contacts/models.py workbench/invoices/models.py
 #: workbench/logbook/forms.py workbench/offers/models.py
 #: workbench/projects/models.py workbench/services/models.py
+#: workbench/templates/offers/offer_pricing.html
 msgid "title"
 msgstr "Titel"
 
@@ -915,6 +916,7 @@ msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
 #: workbench/generic.py workbench/templates/contacts/person_form.html
 #: workbench/templates/credit_control/creditentry_upload.html
 #: workbench/templates/generic/object_form.html
+#: workbench/templates/offers/offer_pricing.html
 #, python-format
 msgid "Update %(object)s"
 msgstr "%(object)s bearbeiten"
@@ -1021,6 +1023,7 @@ msgstr "Alles auswählen"
 #: workbench/invoices/forms.py workbench/offers/forms.py
 #: workbench/services/__init__.py workbench/services/models.py
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/offers/offer_pricing.html
 msgid "services"
 msgstr "Leistungen"
 
@@ -1278,6 +1281,7 @@ msgid "rendered on"
 msgstr "Erbracht am"
 
 #: workbench/invoices/views.py workbench/services/models.py
+#: workbench/templates/offers/offer_pricing.html
 msgid "effort type"
 msgstr "Aufwandtyp"
 
@@ -1298,6 +1302,7 @@ msgstr "Stunden"
 #: workbench/invoices/views.py workbench/logbook/models.py
 #: workbench/services/models.py workbench/templates/invoices/service_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
+#: workbench/templates/offers/offer_pricing.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/service_form.html
 msgid "cost"
@@ -1486,6 +1491,7 @@ msgid "offered on"
 msgstr "offeriert am"
 
 #: workbench/offers/models.py workbench/projects/models.py
+#: workbench/templates/offers/offer_pricing.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/service_form.html workbench/tools/pdf.py
 msgid "offer"
@@ -1699,7 +1705,7 @@ msgstr "Leistungstypen"
 msgid "service hours"
 msgstr "Leistungsstunden"
 
-#: workbench/services/models.py
+#: workbench/services/models.py workbench/templates/offers/offer_pricing.html
 msgid "service cost"
 msgstr "Leistungskosten"
 
@@ -1934,6 +1940,7 @@ msgstr "ja,nein"
 #: workbench/templates/contacts/person_form.html
 #: workbench/templates/credit_control/creditentry_upload.html
 #: workbench/templates/generic/object_form.html
+#: workbench/templates/offers/offer_pricing.html
 #, python-format
 msgid "Create %(class)s"
 msgstr "%(class)s erstellen"
@@ -1945,6 +1952,7 @@ msgstr "%(class)s erstellen"
 #: workbench/templates/logbook/loggedcost_form.html
 #: workbench/templates/logbook/loggedhours_form.html
 #: workbench/templates/modalform.html
+#: workbench/templates/offers/offer_pricing.html
 msgid "save"
 msgstr "Sichern"
 
@@ -1953,6 +1961,7 @@ msgstr "Sichern"
 #: workbench/templates/generic/object_confirm_delete.html
 #: workbench/templates/generic/object_form.html
 #: workbench/templates/modal_confirm_delete.html
+#: workbench/templates/offers/offer_pricing.html
 msgid "cancel"
 msgstr "Abbruch"
 
@@ -2064,6 +2073,17 @@ msgstr "Neue Leistung"
 msgid "Close"
 msgstr "Schliessen"
 
+#: workbench/templates/offers/offer_pricing.html
+#, fuzzy
+#| msgid "effort type"
+msgid "effort rate"
+msgstr "Aufwandtyp"
+
+#: workbench/templates/offers/offer_pricing.html
+#: workbench/templates/reporting/overdrawn_projects.html
+msgid "effort hours"
+msgstr "Aufwände in Stunden"
+
 #: workbench/templates/projects/project_detail.html
 msgid "total costs"
 msgstr "Gesamtkosten"
@@ -2089,6 +2109,10 @@ msgstr "Statistik"
 #: workbench/templates/projects/project_detail.html
 msgid "offers PDF"
 msgstr "Offerten-PDF"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Pricing"
+msgstr "Kalkulation"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Sort"
@@ -2203,10 +2227,6 @@ msgstr "Kosten"
 #: workbench/templates/reporting/labor_costs.html
 msgid "costs with green hours target"
 msgstr "Kosten unter Einbezug des Grüne Stunden-Zielwerts"
-
-#: workbench/templates/reporting/overdrawn_projects.html
-msgid "effort hours"
-msgstr "Aufwände in Stunden"
 
 #: workbench/templates/reporting/project_budget_statistics.html
 #: workbench/tools/xlsx.py

@@ -195,3 +195,7 @@ tbody th > a {
 .uplink {
   margin-bottom: 0.5rem;
 }
+
+.table-offer-pricing tbody label {
+  display: none;
+}

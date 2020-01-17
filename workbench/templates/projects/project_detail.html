@@ -145,6 +145,8 @@
                   <div class="dropdown-menu dropdown-menu-right" aria-labelledby="offer-dropdown-{{ offer.pk }}">
                     <a class="dropdown-item" href="{{ offer.urls.update }}">
                       {% trans 'Update' %}</a>
+                    <a class="dropdown-item" href="{{ offer.urls.pricing }}">
+                      {% trans 'Pricing' %}</a>
                     <a class="dropdown-item" href="{{ offer.urls.copy }}" data-toggle="ajaxmodal">
                       {% trans 'Copy' %}</a>
                     <a class="dropdown-item" href="{{ offer.urls.delete }}">

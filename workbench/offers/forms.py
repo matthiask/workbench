@@ -133,11 +133,6 @@ class OfferForm(PostalAddressSelectionForm):
         )
         self.fields["subtotal"].disabled = True
 
-        kwargs.pop("request")
-        self.formsets = (
-            {"services": ServiceFormset(*args, **kwargs)} if self.instance.pk else {}
-        )
-
     def clean(self):
         data = super().clean()
         s_dict = dict(Offer.STATUS_CHOICES)
@@ -170,6 +165,36 @@ class OfferForm(PostalAddressSelectionForm):
         return instance
 
 
+class OfferPricingForm(ModelForm):
+    class Meta:
+        model = Offer
+        fields = ("subtotal", "discount", "total_excl_tax", "liable_to_vat", "total")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["subtotal"].disabled = True
+        self.fields["total_excl_tax"].disabled = True
+        self.fields["total"].disabled = True
+
+        kwargs.pop("request")
+        self.formsets = (
+            {"services": ServiceFormset(*args, **kwargs)} if self.instance.pk else {}
+        )
+
+    def is_valid(self):
+        return all(
+            [super().is_valid()]
+            + [formset.is_valid() for formset in self.formsets.values()]
+        )
+
+    def save(self, commit=True):
+        for formset in self.formsets.values():
+            # TODO pass skip_related_model=True
+            formset.save()
+        return super().save()
+
+
 class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
@@ -188,6 +213,7 @@ ServiceFormset = inlineformset_factory(
     form=ServiceForm,
     fields=("title", "effort_type", "effort_rate", "effort_hours", "cost"),
     extra=0,
+    can_delete=False,
 )
 
 

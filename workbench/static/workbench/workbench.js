@@ -328,27 +328,38 @@ function initWidgets() {
   $("[data-offer-form]").each(function() {
     const form = this
     // const form = $(this)
+    //
+    const read = (sel, root = document) =>
+      parseFloat(root.querySelector(sel).value) || 0
+    const write = (sel, value, root = document) =>
+      (root.querySelector(sel).value = value.toFixed(2))
 
     function recalculate() {
       let offerCost = 0
 
       Array.from(form.querySelectorAll("[data-service]")).forEach(service => {
-        const effortRate = parseFloat(service.querySelector("[data-effort-rate] input").value) || 0
-        const effortHours = parseFloat(service.querySelector("[data-effort-hours] input").value) || 0
-        const cost = parseFloat(service.querySelector("[data-cost] input").value) || 0
+        const effortRate = read("[data-effort-rate] input", service)
+        const effortHours = read("[data-effort-hours] input", service)
+        const cost = read("[data-cost] input", service)
 
-        const serviceCosts = effortRate * effortHours + cost
-        offerCost += serviceCosts
+        const serviceCost = effortRate * effortHours + cost
+        offerCost += serviceCost
 
-        service.querySelector("[data-service-costs]").textContent = serviceCosts
+        write("[data-service-cost]", serviceCost, service)
       })
 
-      document.querySelector("[data-offer-cost]").textContent = offerCost
+      const discount = read("#id_discount")
+      const liableToVat = document.querySelector("#id_liable_to_vat").checked
+      const totalExclTax = offerCost - discount
+      const total = totalExclTax * (liableToVat ? 1.077 : 1)
+
+      write("#id_subtotal", offerCost)
+      write("#id_total_excl_tax", totalExclTax)
+      write("#id_total", total)
     }
 
     recalculate()
     form.addEventListener("change", recalculate)
-
   })
 }
 

@@ -1,0 +1,94 @@
+{% extends "generic/object_form.html" %}
+
+{% load bootstrap4 fineforms formset i18n %}
+
+{% block uplink %}
+{% if view.object %}
+  <a href="{{ view.object.get_absolute_url }}" class="btn btn-primary btn-sm uplink">
+    {% include 'svg/chevron-left.svg' %} {% trans 'offer' %}
+  </a>
+{% else %}{{ block.super }}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-12">
+    <h1>
+      {% if object %}
+        {% blocktrans with object=object %}Update {{ object }}{% endblocktrans %}
+      {% else %}
+        {% blocktrans with class=view.meta.verbose_name %}Create {{ class }}{% endblocktrans %}
+      {% endif %}
+    </h1>
+
+    <form method="POST" action="." class="form-horizontal" data-offer-form>
+      {% csrf_token %}
+
+      {% include 'fineforms/warnings.html' %}
+      {% ff_errors form %}
+
+      {% if form.formsets %}
+        <h4>{% trans 'services' %}</h4>
+        <table class="table table-sm table-offer-pricing">
+          <colgroup>
+            <col />
+            <col width="50%" />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+          </colgroup>
+          <thead>
+            <tr>
+              <th></th>
+              <th>{% trans 'title' %}</th>
+              <th>{% trans 'effort type' %}</th>
+              <th>{% trans 'effort rate' %}</th>
+              <th>{% trans 'effort hours' %}</th>
+              <th>{% trans 'cost' %}</th>
+              <th>{% trans 'service cost' %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% formset form.formsets.services "services" %}
+              <tr id="{{ form_id }}" data-service>
+                <td>
+                  {% ff_errors form %}
+                  {% ff_fields form exclude='title,effort_type,effort_rate,effort_hours,cost' %}
+                </td>
+                <td>{% ff_field form.title %}</td>
+                <td>{% ff_field form.effort_type %}</td>
+                <td data-effort-rate>{% ff_field form.effort_rate %}</td>
+                <td data-effort-hours>{% ff_field form.effort_hours %}</td>
+                <td data-cost>{% ff_field form.cost %}</td>
+                <td><input type="text" class="form-control" disabled data-service-cost></td>
+              </div>
+            </tr>
+            {% endformset %}
+          </tbody>
+        </table>
+      {% endif %}
+
+      {% ff_fields form %}
+
+
+      <div data-offer-cost></div>
+
+      <div class="row mt-5">
+        <div class="col-sm-12">
+          <button type="submit" class="btn btn-primary">
+            {% trans 'save' %}</button>
+
+          {% if object.get_absolute_url %}
+          <a href="{{ object.get_absolute_url }}" class="btn float-right btn-outline-danger">
+            {% trans 'cancel' %}</a>
+          {% endif %}
+        </div>
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}
