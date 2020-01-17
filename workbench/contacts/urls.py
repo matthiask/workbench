@@ -6,9 +6,10 @@ from workbench.contacts.forms import (
     OrganizationDeleteForm,
     OrganizationForm,
     PersonForm,
+    PersonSearchForm,
 )
 from workbench.contacts.models import Organization, Person
-from workbench.contacts.views import OrganizationListView, PersonListView, select
+from workbench.contacts.views import OrganizationListView, select
 
 
 urlpatterns = [
@@ -45,7 +46,11 @@ urlpatterns = [
         ),
         name="contacts_organization_delete",
     ),
-    url(r"^people/$", PersonListView.as_view(), name="contacts_person_list"),
+    url(
+        r"^people/$",
+        generic.ListView.as_view(model=Person, search_form_class=PersonSearchForm),
+        name="contacts_person_list",
+    ),
     url(
         r"^people/autocomplete/$",
         generic.AutocompleteView.as_view(

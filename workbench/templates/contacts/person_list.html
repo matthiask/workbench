@@ -7,32 +7,3 @@
 {% if request.GET %}<a href="{% querystring xlsx=1 %}" class="btn btn-primary">
   {% include 'svg/desktop-download.svg' %} XLSX</a>{% endif %}
 {% endblock %}
-
-{% block objects %}
-<div class="list-group list-group-flush">
-  {% for person in object_list %}
-  <div class="list-group-item px-0">
-    <h5 class="mb-1"><a href="{{ person.get_absolute_url }}">{{ person.full_name }}</a></h5>
-    <div class="row">
-      <div class="col-md-5 text-truncate">
-        {% if person.organization %}
-        <a href="{{ person.organization.get_absolute_url }}">{{ person.organization }}</a>
-        {% endif %}
-      </div>
-      <div class="col-md-4 text-truncate">
-        {% if person.email %}
-          <a href="mailto:{{ person.email }}">{{ person.email }}</a>
-        {% endif %}
-      </div>
-      <div class="col-md-3 text-truncate">
-        {% if person.phone_number %}
-          <a href="tel:{{ person.phone_number }}">{{ person.phone_number }}</a>
-        {% endif %}
-      </div>
-    </div>
-    <p class="mb-0">
-    </p>
-  </div>
-  {% endfor %}
-</div>
-{% endblock %}

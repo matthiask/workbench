@@ -60,8 +60,10 @@ class PersonSearchForm(Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
-        queryset = queryset.search(data.get("q"))
-        return self.apply_renamed(queryset, "g", "groups")
+        queryset = queryset.search(data.get("q")).active()
+        return self.apply_renamed(queryset, "g", "groups").select_related(
+            "organization"
+        )
 
     def response(self, request, queryset):
         if request.GET.get("xlsx"):
