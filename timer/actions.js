@@ -56,27 +56,23 @@ export async function loadProjects(dispatch) {
   }
 }
 
+export async function openForm(dispatch, {activity, current, seconds}) {
+  const url = endpoint(CREATE_HOURS, activity.project.value)
+  const params = new URLSearchParams()
+  if (activity.service) params.append("service", activity.service.value)
+  params.append("description", activity.description)
+  params.append("hours", Math.ceil(seconds / 360) / 10)
+
+  dispatch({type: "STOP", current})
+  dispatch({type: "MODAL_ACTIVITY", id: activity.id})
+  const finalUrl = `${url}?${params.toString()}`
+  console.log(finalUrl)
+  window.openModalFromUrl(finalUrl)
+  return
+}
+
 export async function sendLogbook(dispatch, {activity, current, seconds}) {
   const url = endpoint(CREATE_HOURS, activity.project.value)
-
-  if (
-    !activity.description ||
-    !activity.description.length ||
-    !activity.service ||
-    !seconds
-  ) {
-    const params = new URLSearchParams()
-    if (activity.service) params.append("service", activity.service.value)
-    params.append("description", activity.description)
-    params.append("hours", Math.ceil(seconds / 360) / 10)
-
-    dispatch({type: "STOP", current})
-    dispatch({type: "MODAL_ACTIVITY", id: activity.id})
-    const finalUrl = `${url}?${params.toString()}`
-    console.log(finalUrl)
-    window.openModalFromUrl(finalUrl)
-    return
-  }
 
   const body = new FormData()
   if (activity.service) body.append("modal-service", activity.service.value)

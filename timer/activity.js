@@ -4,11 +4,12 @@ import {connect} from "react-redux"
 import Select from "react-select"
 import AsyncSelect from "react-select/async"
 
-import {fetchProjects, fetchServices, sendLogbook} from "./actions.js"
+import {fetchProjects, fetchServices, openForm, sendLogbook} from "./actions.js"
 import {ActivitySettings} from "./activitySettings.js"
 import {COLORS} from "./colors.js"
 import {gettext, OUTCOME} from "./i18n.js"
 import {clamp, prettyDuration, timestamp} from "./utils.js"
+import * as icons from "./icons.js"
 
 const createUpdater = ({id, dispatch}) => fields =>
   dispatch({
@@ -150,19 +151,7 @@ export const Activity = connect((state, ownProps) => ({
                 onClick={() => setShowSettings(!showSettings)}
                 title={gettext("Settings")}
               >
-                <svg
-                  viewBox="0 0 30 30"
-                  style={{
-                    width: "1.5em",
-                    height: "1.5em",
-                    margin: "-0.25rem -0.25rem",
-                    fill: "#888",
-                  }}
-                >
-                  <circle cx="15" cy="3" r="2.5" />
-                  <circle cx="15" cy="13" r="2.5" />
-                  <circle cx="15" cy="23" r="2.5" />
-                </svg>
+                {icons.cog}
               </button>
               <button
                 className={`btn btn-sm ml-2 ${
@@ -177,13 +166,26 @@ export const Activity = connect((state, ownProps) => ({
                   })
                 }
               >
-                {isActive ? gettext("Pause") : gettext("Start")}
+                {isActive ? icons.pause : icons.play}
               </button>
               <button
-                className={`btn btn-sm ml-2 ${
-                  isReady ? "btn-success" : "btn-light"
-                }`}
+                className="btn btn-sm ml-2 btn-light"
                 disabled={!activity.project}
+                type="button"
+                onClick={() =>
+                  openForm(dispatch, {
+                    activity,
+                    current,
+                    seconds,
+                  })
+                }
+                title={gettext("Open logged hours form")}
+              >
+                {icons.pen}
+              </button>
+              <button
+                className="btn btn-sm ml-2 btn-success"
+                disabled={!activity.project || !isReady}
                 type="button"
                 onClick={() =>
                   sendLogbook(dispatch, {
@@ -192,8 +194,9 @@ export const Activity = connect((state, ownProps) => ({
                     seconds,
                   })
                 }
+                title={gettext("Send to logbook")}
               >
-                {isReady ? gettext("Send") : gettext("Open")}
+                {icons.arrow}
               </button>
             </div>
           </div>
