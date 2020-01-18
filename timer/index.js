@@ -56,3 +56,18 @@ function migrateOldData(dispatch) {
     /* Do nothing */
   }
 }
+
+import ReconnectingWebsocket from "reconnecting-websocket"
+const timerData = JSON.parse(document.querySelector("#timer-data").textContent)
+
+;(function() {
+  const ws = new ReconnectingWebsocket(`ws://127.0.0.1:8080/${timerData.key}`)
+
+  ws.addEventListener("open", arg => console.log("open", arg))
+  ws.addEventListener("close", arg => console.log("close", arg))
+  ws.addEventListener("message", arg => console.log("message", arg))
+
+  setInterval(() => ws.send(`Hello from Browser ${navigator.userAgent}`), 5000)
+
+  window.ws = ws
+})()

@@ -5,7 +5,8 @@
 {% block title %}Timer - {{ block.super }}{% endblock %}
 
 {% block js %}{{ block.super }}
+{{ timer_data|json_script:'timer-data' }}
+<span id="current-user" data-current-user="{{ request.user.id }}"></span>
 <script src="{% url 'javascript-catalog' %}"></script>
 {% render_bundle "main" %}
-<span id="current-user" data-current-user="{{ request.user.id }}"></span>
 {% endblock %}

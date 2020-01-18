@@ -12,7 +12,7 @@ from workbench import views
 urlpatterns = [
     url(r"^$", render, {"template_name": "start.html"}),
     url(r"^404/$", render, {"template_name": "404.html"}),
-    url(r"^timer/$", render, {"template_name": "timer.html"}),
+    url(r"^timer/$", views.timer),
     url(r"^shortcuts/$", render, {"template_name": "shortcuts.html"}, name="shortcuts"),
     url(r"^admin/", admin.site.urls),
     url(r"^accounts/", include("workbench.accounts.urls")),

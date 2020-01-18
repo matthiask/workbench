@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.conf import settings
 from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import render
@@ -96,5 +97,17 @@ def history(request, db_table, attribute, id):
             "title": title,
             "changes": changes(model, fields, actions),
             "related": related,
+        },
+    )
+
+
+def timer(request):
+    return render(
+        request,
+        "timer.html",
+        {
+            "timer_data": {
+                "key": "timer_{}_{}".format(settings.NAMESPACE, request.user.id)
+            }
         },
     )

@@ -26,6 +26,7 @@ trap "kill 0" EXIT
 
 PYTHONWARNINGS=always venv/bin/python manage.py runserver 0.0.0.0:%(port)s &
 HOST=%(host)s yarn run dev &
+PYTHONWARNINGS=always yarn run timer-server &
 
 for job in $(jobs -p); do wait $job; done
 """
