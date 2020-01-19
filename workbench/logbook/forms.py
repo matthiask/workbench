@@ -322,7 +322,7 @@ class LoggedHoursForm(ModelForm):
                     "Sorry, hours have to be logged in the same week."
                 )
             elif data["rendered_on"] > dt.date.today() + dt.timedelta(days=7):
-                errors["rendered_on"] = _("Sorry, too early.")
+                errors["rendered_on"] = _("Sorry, that's too far in the future.")
 
         try:
             latest = LoggedHours.objects.filter(
@@ -454,5 +454,9 @@ class LoggedCostForm(ModelForm):
                     _("Third party costs shouldn't be higher than costs."),
                     code="third-party-costs-higher",
                 )
+        if data.get("rendered_on") and data[
+            "rendered_on"
+        ] > dt.date.today() + dt.timedelta(days=7):
+            errors["rendered_on"] = _("Sorry, that's too far in the future.")
         raise_if_errors(errors)
         return data

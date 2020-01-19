@@ -51,7 +51,7 @@ class LogbookTest(TestCase):
         response = send(
             rendered_on=(dt.date.today() + dt.timedelta(days=10)).isoformat()
         )
-        self.assertContains(response, "Sorry, too early.")
+        self.assertContains(response, "Sorry, that&#x27;s too far in the future.")
 
         response = send(service="")
         self.assertContains(
@@ -282,68 +282,46 @@ class LogbookTest(TestCase):
         project = service.project
         self.client.force_login(project.owned_by)
 
-        response = self.client.post(
-            project.urls["createcost"],
-            {
+        def send(url=project.urls["createcost"], additional=None, **kwargs):
+            data = {
                 "modal-service": service.id,
                 "modal-rendered_by": project.owned_by_id,
                 "modal-rendered_on": dt.date.today().isoformat(),
                 "modal-cost": "10",
                 "modal-third_party_costs": "9",
                 "modal-description": "Anything",
-            },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
+            }
+            data.update(additional or {})
+            data.update({"modal-%s" % key: value for key, value in kwargs.items()})
+            return self.client.post(url, data, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+
+        response = send()
         self.assertEqual(response.status_code, 201)
 
         cost = LoggedCost.objects.get()
         project.closed_on = dt.date.today()
         project.save()
 
-        response = self.client.post(
-            cost.urls["update"],
-            {
-                "modal-service": service.id,
-                "modal-rendered_by": project.owned_by_id,
-                "modal-rendered_on": dt.date.today().isoformat(),
-                "modal-cost": "10",
-                "modal-third_party_costs": "9",
-                "modal-description": "Anything",
-            },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
+        response = send(cost.urls["update"])
         self.assertContains(response, "This project has been closed recently.")
 
-        response = self.client.post(
+        response = send(
             cost.urls["update"],
-            {
-                "modal-service": service.id,
-                "modal-rendered_by": project.owned_by_id,
-                "modal-rendered_on": dt.date.today().isoformat(),
-                "modal-cost": "10",
-                "modal-third_party_costs": "9",
-                "modal-description": "Anything",
-                WarningsForm.ignore_warnings_id: "project-closed",
-            },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            additional={WarningsForm.ignore_warnings_id: "project-closed"},
         )
         self.assertEqual(response.status_code, 202)
 
         project.closed_on = dt.date.today() - dt.timedelta(days=20)
         project.save()
-        response = self.client.post(
-            cost.urls["update"],
-            {
-                "modal-service": service.id,
-                "modal-rendered_by": project.owned_by_id,
-                "modal-rendered_on": dt.date.today().isoformat(),
-                "modal-cost": "10",
-                "modal-third_party_costs": "9",
-                "modal-description": "Anything",
-            },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
+
+        response = send(cost.urls["update"])
         self.assertContains(response, "This project has been closed too long ago.")
+
+        response = send(
+            cost.urls["update"],
+            rendered_on=(dt.date.today() + dt.timedelta(days=10)).isoformat(),
+        )
+        self.assertContains(response, "Sorry, that&#x27;s too far in the future.")
 
     def test_update_old_disabled_fields(self):
         hours = factories.LoggedHoursFactory.create(

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-17 09:52+0100\n"
+"POT-Creation-Date: 2020-01-19 13:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1286,6 +1286,7 @@ msgid "effort type"
 msgstr "Aufwandtyp"
 
 #: workbench/invoices/views.py workbench/services/models.py
+#: workbench/templates/offers/offer_pricing.html
 msgid "hourly rate"
 msgstr "Stundensatz"
 
@@ -1350,8 +1351,8 @@ msgid "Sorry, hours have to be logged in the same week."
 msgstr "Tut mir leid, Stunden müssen in der gleichen Woche erfasst werden."
 
 #: workbench/logbook/forms.py
-msgid "Sorry, too early."
-msgstr "Tut mir leid, zu früh."
+msgid "Sorry, that's too far in the future."
+msgstr "Tut mir leid, Datum zu weit in der Zukunft."
 
 #: workbench/logbook/forms.py
 msgid "This seems to be a duplicate. Is it?"
@@ -2074,12 +2075,6 @@ msgid "Close"
 msgstr "Schliessen"
 
 #: workbench/templates/offers/offer_pricing.html
-#, fuzzy
-#| msgid "effort type"
-msgid "effort rate"
-msgstr "Aufwandtyp"
-
-#: workbench/templates/offers/offer_pricing.html
 #: workbench/templates/reporting/overdrawn_projects.html
 msgid "effort hours"
 msgstr "Aufwände in Stunden"
@@ -2157,7 +2152,6 @@ msgstr "Erfasste Stunden pro Benutzer"
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/hours_by_circle.html
 #: workbench/templates/reporting/hours_per_customer.html
-#: workbench/templates/reporting/open_items_list.html
 msgid "show"
 msgstr "Anzeigen"
 
@@ -2431,6 +2425,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "other"
-#~ msgstr "Andere Gründe"
