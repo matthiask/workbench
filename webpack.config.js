@@ -39,10 +39,10 @@ module.exports = {
     absences: "./absences/index.js",
   },
   output: {
-    path: path.resolve("./static/workbench/timer/"),
+    path: path.resolve("./static/workbench/"),
     publicPath: DEBUG
       ? "http" + (HTTPS ? "s" : "") + "://" + HOST + ":4000/"
-      : (process.env.STATIC_URL || "/static/") + "workbench/timer/",
+      : (process.env.STATIC_URL || "/static/") + "workbench/",
     filename: DEBUG ? "[name].js" : "[name]-[contenthash].js",
   },
   module: {
