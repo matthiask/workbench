@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.audit.models import LoggedAction
 from workbench.offers.models import Offer
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
@@ -417,6 +418,10 @@ class OffersTest(TestCase):
 
         self.assertEqual(service.service_cost, 250 * 10 + 35)
         self.assertEqual(offer.total_excl_tax, 250 * 10 + 35 - 100)
+
+        # Offer should only have updated once (because of skip_related_model)
+        actions = LoggedAction.objects.for_model(offer).with_data(id=offer.id)
+        self.assertEqual([action.action for action in actions], ["I", "U"])
 
     def test_offer_pricing_with_flat_rate(self):
         project = factories.ProjectFactory.create(flat_rate=160)

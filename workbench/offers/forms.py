@@ -209,7 +209,6 @@ class OfferPricingForm(ModelForm):
 
     def save(self, commit=True):
         for formset in self.formsets.values():
-            # TODO pass skip_related_model=True
             formset.save()
         return super().save()
 
@@ -224,6 +223,11 @@ class ServiceForm(forms.ModelForm):
         if self.instance.pk and self.instance.project.flat_rate is not None:
             self.fields["effort_type"].disabled = True
             self.fields["effort_rate"].disabled = True
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.save(skip_related_model=True)
+        return instance
 
 
 ServiceFormset = inlineformset_factory(
