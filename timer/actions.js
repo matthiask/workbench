@@ -60,8 +60,8 @@ export async function openForm(dispatch, {activity, current, seconds}) {
   const url = endpoint(CREATE_HOURS, activity.project.value)
   const params = new URLSearchParams()
   if (activity.service) params.append("service", activity.service.value)
+  if (seconds) params.append("hours", Math.ceil(seconds / 360) / 10)
   params.append("description", activity.description)
-  params.append("hours", Math.ceil(seconds / 360) / 10)
 
   dispatch({type: "STOP", current})
   dispatch({type: "MODAL_ACTIVITY", id: activity.id})
