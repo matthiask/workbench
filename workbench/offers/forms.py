@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib import messages
 from django.db.models import Q
 from django.forms.models import inlineformset_factory
 from django.utils.translation import gettext_lazy as _
@@ -71,6 +72,21 @@ class OfferSearchForm(Form):
         )
 
 
+def warn_if_not_in_preparation(form):
+    if (
+        form.instance.pk
+        and form.instance.status >= form.instance.OFFERED
+        and form.request.method == "GET"
+    ):
+        messages.warning(
+            form.request,
+            _(
+                "This offer is not in preparation anymore."
+                " I assume you know what you're doing and wont stand in the way."
+            ),
+        )
+
+
 class OfferForm(PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
 
@@ -104,6 +120,8 @@ class OfferForm(PostalAddressSelectionForm):
             self.project = kwargs["instance"].project
 
         super().__init__(*args, **kwargs)
+        warn_if_not_in_preparation(self)
+
         self.instance.project = self.project
         self.service_candidates = Service.objects.filter(
             Q(project=self.project), Q(offer__isnull=True) | Q(offer=self.instance)
@@ -172,6 +190,7 @@ class OfferPricingForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        warn_if_not_in_preparation(self)
 
         self.fields["subtotal"].disabled = True
         self.fields["total_excl_tax"].disabled = True

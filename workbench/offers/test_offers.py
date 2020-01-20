@@ -146,6 +146,12 @@ class OffersTest(TestCase):
         )
         self.assertRedirects(response, offer.get_absolute_url())
 
+        response = self.client.get(offer.urls["update"])
+        self.assertContains(
+            response,
+            "This offer is not in preparation anymore. I assume you know what you",
+        )
+
         offer.refresh_from_db()
         self.assertEqual(offer.closed_on, dt.date.today())
         self.assertAlmostEqual(offer.subtotal, Decimal("2000"))
