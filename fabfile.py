@@ -44,6 +44,8 @@ def _do_deploy(folder, rsync):
         run('find . -name "*.pyc" -delete')
         run("venv/bin/pip install -U pip wheel setuptools")
         run("venv/bin/pip install -r requirements.txt")
+        for wb in WORKBENCH:
+            run("DOTENV=.env/{} venv/bin/python manage.py migrate".format(wb))
         if rsync:
             rsync_project(
                 local_dir="static/", remote_dir="%sstatic/" % folder, delete=True
@@ -53,8 +55,6 @@ def _do_deploy(folder, rsync):
                 WORKBENCH[0]
             )
         )
-        for wb in WORKBENCH:
-            run("DOTENV=.env/{} venv/bin/python manage.py migrate".format(wb))
 
 
 def _restart_all():
