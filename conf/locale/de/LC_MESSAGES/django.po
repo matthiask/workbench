@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-19 13:25+0100\n"
+"POT-Creation-Date: 2020-01-20 10:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1457,6 +1457,14 @@ msgstr "Ansatz"
 #: workbench/templates/start.html
 msgid "offers"
 msgstr "Offerten"
+
+#: workbench/offers/forms.py
+msgid ""
+"This offer is not in preparation anymore. I assume you know what you're "
+"doing and wont stand in the way."
+msgstr ""
+"Diese Offerte befindet sich nicht mehr in Vorbereitung. Ich gehe davon aus, "
+"dass Du weisst was Du tust und werde nicht im Weg stehen."
 
 #: workbench/offers/forms.py
 #, python-format
