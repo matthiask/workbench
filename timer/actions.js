@@ -57,14 +57,15 @@ export async function loadProjects(dispatch) {
 }
 
 export async function openForm(dispatch, {activity, current, seconds}) {
+  if (current.id == activity.id) dispatch({type: "STOP", current})
+  dispatch({type: "MODAL_ACTIVITY", id: activity.id})
+
   const url = endpoint(CREATE_HOURS, activity.project.value)
   const params = new URLSearchParams()
   if (activity.service) params.append("service", activity.service.value)
   if (seconds) params.append("hours", Math.ceil(seconds / 360) / 10)
   params.append("description", activity.description)
 
-  dispatch({type: "STOP", current})
-  dispatch({type: "MODAL_ACTIVITY", id: activity.id})
   const finalUrl = `${url}?${params.toString()}`
   console.log(finalUrl)
   window.openModalFromUrl(finalUrl)
@@ -97,7 +98,7 @@ export async function sendLogbook(dispatch, {activity, current, seconds}) {
   if (response.status == 200) {
     window.initModal(await response.text())
   } else if (response.status == 201) {
-    dispatch({type: "STOP", current})
+    if (current.id == activity.id) dispatch({type: "STOP", current})
     dispatch({
       type: "UPDATE_ACTIVITY",
       id: activity.id,
