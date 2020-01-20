@@ -44,6 +44,8 @@ function current(state = null, action) {
       }
     case "STOP":
       return null
+    case "REMOVE_ACTIVITY":
+      return state && state.id == action.id ? null : state
     default:
       return state
   }
