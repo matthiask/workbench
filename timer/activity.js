@@ -97,20 +97,32 @@ export const Activity = connect((state, ownProps) => ({
         </div>
         <div className="activity-body">
           <div className="form-group">
-            <AsyncSelect
-              className="select"
-              classNamePrefix="select"
-              defaultOptions={projects}
-              loadOptions={async (inputValue, callback) => {
-                callback(await fetchProjects(inputValue))
-              }}
-              onChange={value => {
-                dispatchUpdate({project: value, service: null})
-                setServices([])
-              }}
-              placeholder={gettext("Select or search project...")}
-              value={activity.project}
-            />
+            <div className="input-group input-group-sm">
+              <AsyncSelect
+                className="select"
+                classNamePrefix="select"
+                defaultOptions={projects}
+                loadOptions={async (inputValue, callback) => {
+                  callback(await fetchProjects(inputValue))
+                }}
+                onChange={value => {
+                  dispatchUpdate({project: value, service: null})
+                  setServices([])
+                }}
+                placeholder={gettext("Select or search project...")}
+                value={activity.project}
+              />
+              {activity.project && (
+                <div className="input-group-append">
+                  <a
+                    href={`/projects/${activity.project.value}/`}
+                    className="input-group-text"
+                  >
+                    {icons.arrow}
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
           <div className="form-group">
             <Select
