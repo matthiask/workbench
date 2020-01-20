@@ -211,7 +211,7 @@ export const Activity = connect((state, ownProps) => ({
                 }
                 title={gettext("Send to logbook")}
               >
-                {icons.arrow}
+                {icons.save}
               </button>
             </div>
           </div>
