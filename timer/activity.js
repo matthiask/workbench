@@ -117,6 +117,7 @@ export const Activity = connect((state, ownProps) => ({
                   <a
                     href={`/projects/${activity.project.value}/`}
                     className="input-group-text"
+                    title={gettext("Go to the project")}
                   >
                     {icons.arrow}
                   </a>
