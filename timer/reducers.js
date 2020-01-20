@@ -20,7 +20,7 @@ function activities(state = {}, action) {
       }
     case "START":
     case "STOP": {
-      if (!action.current) return state
+      if (!action.current && !state[action.current.id]) return state
       const activity = state[action.current.id]
       return {
         ...state,
