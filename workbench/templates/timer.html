@@ -6,6 +6,8 @@
 
 {% block js %}{{ block.super }}
 <script src="{% url 'javascript-catalog' %}"></script>
+{% render_bundle "manifest" %}
+{% render_bundle "vendors" %}
 {% render_bundle "main" %}
 <span id="current-user" data-current-user="{{ request.user.id }}"></span>
 {% endblock %}

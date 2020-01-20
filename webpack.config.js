@@ -6,18 +6,23 @@ const DEBUG = process.env.NODE_ENV !== "production"
 const HOST = process.env.HOST || "127.0.0.1"
 const HTTPS = !!process.env.HTTPS
 
-module.exports = merge.smart(config.commonConfig, config.reactConfig, {
-  context: path.join(__dirname),
-  // devtool: "source-map",
-  entry: {
-    main: "./timer/index.js",
-    absences: "./absences/index.js",
-  },
-  output: {
-    path: path.resolve("./static/workbench/"),
-    publicPath: DEBUG
-      ? "http" + (HTTPS ? "s" : "") + "://" + HOST + ":4000/"
-      : (process.env.STATIC_URL || "/static/") + "workbench/",
-    filename: DEBUG ? "[name].js" : "[name]-[contenthash].js",
-  },
-})
+module.exports = merge.smart(
+  config.commonConfig,
+  config.chunkSplittingConfig,
+  config.reactConfig,
+  {
+    context: path.join(__dirname),
+    // devtool: "source-map",
+    entry: {
+      main: "./timer/index.js",
+      absences: "./absences/index.js",
+    },
+    output: {
+      path: path.resolve("./static/workbench/"),
+      publicPath: DEBUG
+        ? "http" + (HTTPS ? "s" : "") + "://" + HOST + ":4000/"
+        : (process.env.STATIC_URL || "/static/") + "workbench/",
+      filename: DEBUG ? "[name].js" : "[name]-[contenthash].js",
+    },
+  }
+)
