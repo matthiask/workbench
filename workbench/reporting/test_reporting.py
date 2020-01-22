@@ -9,7 +9,7 @@ from freezegun import freeze_time
 from workbench import factories
 from workbench.reporting.accounting import send_accounting_files
 from workbench.reporting.labor_costs import labor_costs
-from workbench.reporting.models import Accruals
+from workbench.reporting.models import MonthlyAccrual
 
 
 class ReportingTest(TestCase):
@@ -26,7 +26,7 @@ class ReportingTest(TestCase):
             self.assertEqual(len(mail.outbox), 1)
 
     def test_accruals(self):
-        obj = Accruals.objects.for_cutoff_date(dt.date.today())
+        obj = MonthlyAccrual.objects.for_cutoff_date(dt.date.today())
         self.assertEqual(obj.accruals, Decimal("0.00"))
         self.assertEqual(str(obj), obj.cutoff_date.strftime("%d.%m.%Y"))
 

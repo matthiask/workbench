@@ -12,6 +12,10 @@ def monday(day=None):
     return day - dt.timedelta(days=day.weekday())
 
 
+def is_end_of_month(day):
+    return (day + dt.timedelta(days=1)).day == 1
+
+
 def logbook_lock():
     day = dt.date.today()
     return max(day.replace(month=1, day=1), day - dt.timedelta(days=day.weekday()))

@@ -9,7 +9,7 @@ from workbench.awt.reporting import full_time_equivalents_by_month
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
-from workbench.reporting.models import Accruals
+from workbench.reporting.models import MonthlyAccrual
 from workbench.tools.models import Z
 
 
@@ -58,7 +58,7 @@ def third_party_costs_by_month(date_range):
 
 def accruals_by_month(date_range):
     accruals = {(0, 0): {"accrual": Z, "delta": None}}
-    for accrual in Accruals.objects.order_by("cutoff_date"):
+    for accrual in MonthlyAccrual.objects.order_by("cutoff_date"):
         accruals[(accrual.cutoff_date.year, accrual.cutoff_date.month)] = {
             "accrual": accrual.accruals,
             "delta": None,
@@ -66,7 +66,7 @@ def accruals_by_month(date_range):
 
     today = dt.date.today()
     accruals[(today.year, today.month)] = {
-        "accrual": Accruals.objects.accruals(cutoff_date=today),
+        "accrual": MonthlyAccrual.objects.accruals(cutoff_date=today),
         "delta": None,
     }
 

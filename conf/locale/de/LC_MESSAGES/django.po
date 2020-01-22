@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-20 10:16+0100\n"
+"POT-Creation-Date: 2020-01-20 19:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1085,7 +1085,7 @@ msgid "contact"
 msgstr "Kontakt"
 
 #: workbench/invoices/models.py workbench/offers/models.py
-#: workbench/projects/models.py
+#: workbench/projects/models.py workbench/reporting/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -1676,6 +1676,25 @@ msgstr "Stichtag"
 #: workbench/reporting/models.py workbench/templates/reporting/key_data.html
 msgid "accruals"
 msgstr "Abgrenzungen"
+
+#: workbench/reporting/models.py
+msgid "monthly accruals"
+msgstr "monatliche Abgrenzungen"
+
+#: workbench/reporting/models.py
+msgid "accrual"
+msgstr "Abgrenzung"
+
+#: workbench/reporting/models.py
+msgid ""
+"Positive values for not yet invoiced services, negative values for accruals."
+msgstr ""
+"Positive Werte für noch nicht verrechnete Dienstleistungen, negative Werte "
+"für Abgrenzungen."
+
+#: workbench/reporting/models.py
+msgid "justification"
+msgstr "Begründung"
 
 #: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data.html

@@ -7,6 +7,7 @@ from django.utils import timezone
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
+from workbench.reporting.models import Accrual
 from workbench.tools.models import Z
 
 
@@ -78,9 +79,19 @@ def project_budget_statistics(projects, *, cutoff_date=None):
         .values("project")
         .annotate(Sum("total_excl_tax"))
     }
+    accruals = {
+        accrual.project_id: accrual
+        for accrual in Accrual.objects.filter(cutoff_date=cutoff_date)
+    }
 
-    statistics = [
-        {
+    def _p(project):
+        delta = (
+            cost_per_project.get(project.id, Z)
+            + effort_cost_per_project[project.id]
+            - invoiced_per_project.get(project.id, Z)
+        )
+        accrual = accruals.get(project.id)
+        return {
             "project": project,
             "logbook": cost_per_project.get(project.id, Z)
             + effort_cost_per_project[project.id],
@@ -94,12 +105,12 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             "invoiced": invoiced_per_project.get(project.id, Z),
             "hours": hours_per_project[project.id],
             "not_archived": not_archived_hours.get(project.id, Z),
-            "delta": cost_per_project.get(project.id, Z)
-            + effort_cost_per_project[project.id]
-            - invoiced_per_project.get(project.id, Z),
+            "delta_calculated": delta,
+            "accrual": accruals.get(project.id),
+            "delta": accrual.accrual if accrual else delta,
         }
-        for project in projects
-    ]
+
+    statistics = [_p(project) for project in projects]
     overall = {
         key: sum(s[key] for s in statistics)
         for key in [
