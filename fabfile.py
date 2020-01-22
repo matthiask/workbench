@@ -138,3 +138,4 @@ def update():
     local("venv/bin/pip install -U pip wheel")
     local("venv/bin/pip install -r requirements.txt")
     local("yarn")
+    local("venv/bin/python manage.py migrate")
