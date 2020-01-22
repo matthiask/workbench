@@ -129,6 +129,7 @@ export const Activity = connect((state, ownProps) => ({
             <Select
               className="select"
               classNamePrefix="select"
+              isClearable={true}
               isDisabled={!services.length}
               options={services}
               onChange={row => {
