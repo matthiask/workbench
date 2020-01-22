@@ -59,56 +59,55 @@ def annual_working_time_view(request):
     )
 
 
-class CalendarFilterForm(Form):
+class UserFilterForm(Form):
     team = forms.ModelChoiceField(
         Team.objects.all(), empty_label=_("Everyone"), label="", required=False
     )
 
     def queryset(self):
         data = self.cleaned_data
-        queryset = Absence.objects.calendar().select_related("user")
+        queryset = User.objects.active()
         if data.get("team"):
-            queryset = queryset.filter(user__teams=data.get("team"))
+            queryset = queryset.filter(teams=data.get("team"))
         return queryset
 
 
 def absence_calendar(request):
-    form = CalendarFilterForm(request.GET, request=request)
+    form = UserFilterForm(request.GET, request=request)
     form.is_valid()
+
+    users = form.queryset()
 
     dates = {dt.date.today()}
     absences = defaultdict(list)
-    for absence in form.queryset():
-        absences[absence.user].append(absence)
+    for absence in Absence.objects.calendar().filter(user__in=users):
+        absences[absence.user_id].append(absence)
         dates.add(absence.starts_on)
         dates.add(absence.ends_on)
     dates.discard(None)
 
-    absences = sorted(
-        (
-            {
-                "name": user.get_full_name(),
-                "id": user.id,
-                "absences": [
-                    {
-                        "id": absence.id,
-                        "reason": absence.reason,
-                        "reasonDisplay": absence.get_reason_display(),
-                        "startsOn": time.mktime(absence.starts_on.timetuple()) * 1000,
-                        "endsOn": time.mktime(
-                            (absence.ends_on or absence.starts_on).timetuple()
-                        )
-                        * 1000,
-                        "days": absence.days,
-                        "description": absence.description,
-                    }
-                    for absence in user_absences
-                ],
-            }
-            for user, user_absences in absences.items()
-        ),
-        key=lambda row: row["name"],
-    )
+    absences = [
+        {
+            "name": user.get_full_name(),
+            "id": user.id,
+            "absences": [
+                {
+                    "id": absence.id,
+                    "reason": absence.reason,
+                    "reasonDisplay": absence.get_reason_display(),
+                    "startsOn": time.mktime(absence.starts_on.timetuple()) * 1000,
+                    "endsOn": time.mktime(
+                        (absence.ends_on or absence.starts_on).timetuple()
+                    )
+                    * 1000,
+                    "days": absence.days,
+                    "description": absence.description,
+                }
+                for absence in absences[user.id]
+            ],
+        }
+        for user in users
+    ]
 
     return render(
         request,

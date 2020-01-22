@@ -66,6 +66,9 @@ class UserManager(BaseUserManager):
             users[user.is_active].append((user.id, user.get_full_name()))
         return users[False] + [(_("Active"), users[True])]
 
+    def active(self):
+        return self.filter(is_active=True)
+
 
 @total_ordering
 class User(Model, AbstractBaseUser):
