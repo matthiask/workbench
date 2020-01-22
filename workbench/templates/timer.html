@@ -5,6 +5,7 @@
 {% block title %}Timer - {{ block.super }}{% endblock %}
 
 {% block js %}{{ block.super }}
+{{ state|json_script:'timer-state' }}
 <script src="{% url 'javascript-catalog' %}"></script>
 {% render_bundle "manifest" %}
 {% render_bundle "vendors" %}

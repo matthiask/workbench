@@ -7,12 +7,13 @@ from django.urls import path
 from django.views.i18n import JavaScriptCatalog
 
 from workbench import views
+from workbench.timer.views import timer
 
 
 urlpatterns = [
     url(r"^$", render, {"template_name": "start.html"}),
     url(r"^404/$", render, {"template_name": "404.html"}),
-    url(r"^timer/$", render, {"template_name": "timer.html"}),
+    url(r"^timer/$", timer),
     url(r"^shortcuts/$", render, {"template_name": "shortcuts.html"}, name="shortcuts"),
     url(r"^admin/", admin.site.urls),
     url(r"^accounts/", include("workbench.accounts.urls")),

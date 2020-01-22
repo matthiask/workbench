@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-20 10:16+0100\n"
+"POT-Creation-Date: 2020-01-22 13:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -101,7 +101,7 @@ msgstr "Arbeitszeitmodell"
 
 #: workbench/accounts/models.py workbench/awt/models.py
 #: workbench/management/commands/profitability.py
-#: workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/green_hours.html workbench/timer/models.py
 msgid "user"
 msgstr "Benutzer"
 
@@ -2318,6 +2318,22 @@ msgstr "ja"
 #: workbench/templatetags/workbench.py workbench/tools/history.py
 msgid "no"
 msgstr "nein"
+
+#: workbench/timer/admin.py workbench/timer/models.py
+msgid "state"
+msgstr "Status"
+
+#: workbench/timer/models.py
+msgid "updated at"
+msgstr "aktualisiert um"
+
+#: workbench/timer/models.py
+msgid "timer state"
+msgstr "Timer-Status"
+
+#: workbench/timer/models.py
+msgid "timer states"
+msgstr "Timer-Stati"
 
 #: workbench/tools/forms.py
 msgid "Is automatically filled using the organization's contact."
