@@ -199,3 +199,7 @@ tbody th > a {
 .table-offer-pricing tbody label {
   display: none;
 }
+
+date-input-polyfill {
+  z-index: 99999;
+}
