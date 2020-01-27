@@ -200,6 +200,6 @@ tbody th > a {
   display: none;
 }
 
-date-input-polyfill {
+[data-open="true"] {
   z-index: 99999;
 }
