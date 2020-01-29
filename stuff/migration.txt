@@ -27,12 +27,12 @@ SET application_name TO 'Metronom-Import';
 INSERT INTO services_servicetype
 (id, title, hourly_rate, position)
 VALUES
-(1, 'Beratung', 200, 10),
-(2, 'Konzept', 200, 20),
-(3, 'Grafik', 160, 30),
-(4, 'Multimedia & Film', 180, 40),
-(5, 'Programmierung & IT', 180, 50),
-(6, 'Projektorganisation', 130, 60),
+(1, 'Consulting', 200, 10),
+(2, 'Conception & Game Design', 200, 20),
+(3, 'Art', 160, 30),
+(4, 'Marketing', 180, 40),
+(5, 'Programming', 180, 50),
+(6, 'Project Management', 130, 60),
 (7, 'Administration', 100, 70);
 
 --
