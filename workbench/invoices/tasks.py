@@ -1,4 +1,3 @@
-import datetime as dt
 from collections import defaultdict
 
 from django.conf import settings
@@ -11,9 +10,8 @@ from workbench.tools.formats import currency, local_date_format
 
 def create_recurring_invoices_and_notify():
     by_owner = defaultdict(list)
-    today = dt.date.today()
     for ri in RecurringInvoice.objects.renewal_candidates():
-        for invoice in ri.create_invoices(generate_until=today):
+        for invoice in ri.create_invoices():
             by_owner[invoice.owned_by].append(invoice)
 
     for owner, invoices in by_owner.items():

@@ -1,4 +1,3 @@
-import datetime as dt
 from collections import defaultdict
 
 from django.contrib import messages
@@ -99,7 +98,7 @@ class RecurringInvoiceDetailView(generic.DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if request.GET.get("create_invoices"):
-            invoices = self.object.create_invoices(generate_until=dt.date.today())
+            invoices = self.object.create_invoices()
             messages.info(
                 request,
                 ngettext("Created %s invoice.", "Created %s invoices.", len(invoices))

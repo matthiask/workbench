@@ -4,6 +4,8 @@ from django.core import mail
 from django.test import TestCase
 from django.utils.translation import deactivate_all
 
+from freezegun import freeze_time
+
 from workbench import factories
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.invoices.tasks import create_recurring_invoices_and_notify
@@ -35,18 +37,19 @@ class RecurringTest(TestCase):
 
         self.assertEqual(ri.next_period_starts_on, None)
 
-        self.assertEqual(
-            len(ri.create_invoices(generate_until=dt.date(2019, 1, 1))), 12
-        )
+        with freeze_time("2019-01-01"):
+            self.assertEqual(len(ri.create_invoices()), 12)
 
         ri.ends_on = None
         ri.save()
-        self.assertEqual(len(ri.create_invoices(generate_until=dt.date(2019, 1, 1))), 1)
+
+        with freeze_time("2019-01-01"):
+            self.assertEqual(len(ri.create_invoices()), 1)
 
         # Continue generating invoices after January '19
         invoices = []
         for ri in RecurringInvoice.objects.renewal_candidates():
-            invoices.extend(ri.create_invoices(generate_until=dt.date.today()))
+            invoices.extend(ri.create_invoices())
         self.assertTrue(len(invoices) > 1)
 
     def test_creation(self):
@@ -279,5 +282,5 @@ class RecurringTest(TestCase):
             create_invoice_on_day=10,
         )
 
-        self.assertEqual(len(r1.create_invoices(generate_until=dt.date.today())), 1)
-        self.assertEqual(len(r2.create_invoices(generate_until=dt.date.today())), 0)
+        self.assertEqual(len(r1.create_invoices()), 1)
+        self.assertEqual(len(r2.create_invoices()), 0)
