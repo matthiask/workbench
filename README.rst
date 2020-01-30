@@ -24,7 +24,7 @@ Local setup::
 
 Development::
 
-    venv/bin/python manage.py runserver
+    fab dev
 
 Code style & prettification::
 
@@ -32,8 +32,6 @@ Code style & prettification::
     yarn prettier
     yarn eslint
 
-Compile those parts of the frontend code which require it, mainly the
-Bootstrap library::
+Compile the bootstrap library::
 
-    yarn build
-    yarn watch
+    yarn build-bootstrap
