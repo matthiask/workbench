@@ -99,9 +99,7 @@ class RecurringInvoiceDetailView(generic.DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if request.GET.get("create_invoices"):
-            invoices = self.object.create_invoices(
-                generate_until=dt.date.today() + dt.timedelta(days=20)
-            )
+            invoices = self.object.create_invoices(generate_until=dt.date.today())
             messages.info(
                 request,
                 ngettext("Created %s invoice.", "Created %s invoices.", len(invoices))

@@ -473,6 +473,13 @@ class RecurringInvoice(ModelWithTotal):
     periodicity = models.CharField(
         _("periodicity"), max_length=20, choices=PERIODICITY_CHOICES
     )
+    create_invoice_on_day = models.IntegerField(
+        _("create invoice on day"),
+        default=-20,
+        help_text=_(
+            "Invoices are created 20 days before their period begins by default."
+        ),
+    )
     next_period_starts_on = models.DateField(
         _("next period starts on"), blank=True, null=True
     )

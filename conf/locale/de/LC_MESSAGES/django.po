@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-22 13:05+0100\n"
+"POT-Creation-Date: 2020-01-30 14:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1240,6 +1240,15 @@ msgstr "wöchentlich"
 #: workbench/invoices/models.py
 msgid "periodicity"
 msgstr "Periodizität"
+
+#: workbench/invoices/models.py
+msgid "create invoice on day"
+msgstr "erstelle Rechnung am Tag"
+
+#: workbench/invoices/models.py
+msgid "Invoices are created 20 days before their period begins by default."
+msgstr ""
+"Standardmässig werden Rechnungen 20 Tage bevor ihre Periode beginnt erstellt."
 
 #: workbench/invoices/models.py
 msgid "next period starts on"

@@ -251,6 +251,7 @@ def _invoices_recurringinvoice_cfg(user):
             "starts_on",
             "ends_on",
             "periodicity",
+            "create_invoice_on_day",
             "next_period_starts_on",
         }
         | WITH_TOTAL
