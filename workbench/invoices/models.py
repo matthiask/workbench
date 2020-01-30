@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db import models
 from django.db.models import F, Q, Sum
 from django.db.models.expressions import RawSQL
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -418,19 +419,16 @@ class Service(ServiceBase):
 
 
 class RecurringInvoiceQuerySet(SearchQuerySet):
-    def create_invoices(self):
-        generate_until = dt.date.today() + dt.timedelta(days=20)
-        invoices = []
-        for ri in self.filter(
-            Q(starts_on__lte=generate_until),
-            Q(ends_on__isnull=True)
-            | Q(next_period_starts_on__isnull=True)
-            | Q(ends_on__gte=F("next_period_starts_on")),
-            Q(next_period_starts_on__isnull=True)
-            | Q(next_period_starts_on__lte=generate_until),
-        ).select_related("customer", "contact", "owned_by"):
-            invoices.extend(ri.create_invoices(generate_until=generate_until))
-        return invoices
+    def renewal_candidates(self):
+        today = dt.date.today()
+        return (
+            self.annotate(_start=Coalesce("next_period_starts_on", "starts_on"),)
+            .filter(
+                Q(_start__lte=today - F("create_invoice_on_day")),
+                Q(ends_on__isnull=True) | Q(ends_on__gte=F("_start")),
+            )
+            .select_related("customer", "contact", "owned_by")
+        )
 
 
 @model_urls
@@ -560,7 +558,10 @@ class RecurringInvoice(ModelWithTotal):
         generate_until = min(filter(None, (generate_until, self.ends_on)))
         this_period = next(days)
         while True:
-            if this_period > generate_until:
+            if (
+                this_period + dt.timedelta(days=self.create_invoice_on_day)
+                > generate_until
+            ):
                 break
             next_period = next(days)
             invoices.append(

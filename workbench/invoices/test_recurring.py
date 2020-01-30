@@ -44,7 +44,10 @@ class RecurringTest(TestCase):
         self.assertEqual(len(ri.create_invoices(generate_until=dt.date(2019, 1, 1))), 1)
 
         # Continue generating invoices after January '19
-        self.assertTrue(len(RecurringInvoice.objects.create_invoices()) > 1)
+        invoices = []
+        for ri in RecurringInvoice.objects.renewal_candidates():
+            invoices.extend(ri.create_invoices(generate_until=dt.date.today()))
+        self.assertTrue(len(invoices) > 1)
 
     def test_creation(self):
         person = factories.PersonFactory.create(
@@ -239,3 +242,42 @@ class RecurringTest(TestCase):
 
         response = self.client.get(invoice.urls["create"] + "?copy=blub")
         self.assertEqual(response.status_code, 200)  # No crash
+
+    def test_renewal_candidates(self):
+        r1 = factories.RecurringInvoiceFactory.create(
+            starts_on=dt.date.today() + dt.timedelta(days=10), periodicity="monthly",
+        )
+        r2 = factories.RecurringInvoiceFactory.create(
+            starts_on=dt.date.today() + dt.timedelta(days=30), periodicity="monthly",
+        )
+
+        self.assertEqual(set(RecurringInvoice.objects.renewal_candidates()), {r1})
+
+        r3 = factories.RecurringInvoiceFactory.create(
+            starts_on=dt.date.today() + dt.timedelta(days=-250),
+            periodicity="yearly",
+            create_invoice_on_day=300,
+        )
+        r4 = factories.RecurringInvoiceFactory.create(
+            starts_on=dt.date.today() + dt.timedelta(days=-350),
+            periodicity="yearly",
+            create_invoice_on_day=300,
+        )
+
+        self.assertEqual(set(RecurringInvoice.objects.renewal_candidates()), {r1, r4})
+
+        r2, r3  # Using those variables
+
+    def test_positive_create_invoice_on_day(self):
+        r1 = factories.RecurringInvoiceFactory.create(
+            starts_on=dt.date.today(), periodicity="monthly",
+        )
+        r2 = factories.RecurringInvoiceFactory.create(
+            starts_on=dt.date.today(),
+            periodicity="monthly",
+            # Wait with invoice creation until 10 days into the period:
+            create_invoice_on_day=10,
+        )
+
+        self.assertEqual(len(r1.create_invoices(generate_until=dt.date.today())), 1)
+        self.assertEqual(len(r2.create_invoices(generate_until=dt.date.today())), 0)
