@@ -1,5 +1,6 @@
 from decimal import Decimal
 from functools import partial
+from itertools import islice
 
 from django.contrib import messages
 from django.core.validators import MinValueValidator
@@ -51,7 +52,9 @@ class Model(models.Model):
                 )
                 % {
                     "object": instance,
-                    "related": ", ".join(str(o) for o in exc.protected_objects[:10]),
+                    "related": ", ".join(
+                        str(o) for o in islice(exc.protected_objects, 10)
+                    ),
                 },
             )
             return False
