@@ -78,8 +78,8 @@
 
     <div class="card mb-3">
       <div class="card-header">
-        <h3 class="my-0 d-flex w-100 justify-content-between">
-          <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{% trans "today's hours" %}</a>
+        <h3 class="my-0">
+          <a class="d-block" href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{% trans "today's hours" %}</a>
 
           <small>
             <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}&amp;date_from={% now 'Y-m-d' %}">

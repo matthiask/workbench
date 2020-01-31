@@ -64,14 +64,17 @@
             {% if request.user|has:FEATURES.CONTROLLING %}
               <a class="dropdown-item" href="{% url 'report_key_data' %}">{% trans 'key data'|capfirst %}</a>
             {% endif %}
+
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-header">{% trans 'working time' %}</div>
             <a class="dropdown-item" href="{% url 'awt_year_report' %}">{% trans 'annual working time'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'awt_absence_calendar' %}">{% trans 'absence calendar' %}</a>
 
             {% if request.user|has:FEATURES.CONTROLLING %}
               <div class="dropdown-divider"></div>
               <div class="dropdown-header">{% trans 'projects' %}</div>
-              <a class="dropdown-item" href="{% url 'report_overdrawn_projects' %}">{% trans 'overdrawn projects'|capfirst %}</a>
               <a class="dropdown-item" href="{% url 'report_project_budget_statistics' %}">{% trans 'project budget statistics'|capfirst %}</a>
+              <a class="dropdown-item" href="{% url 'report_overdrawn_projects' %}">{% trans 'overdrawn projects'|capfirst %}</a>
               <div class="dropdown-divider"></div>
               <div class="dropdown-header">{% trans 'invoices' %}</div>
               <a class="dropdown-item" href="{% url 'report_open_items_list' %}">{% trans 'open items list'|capfirst %}</a>
