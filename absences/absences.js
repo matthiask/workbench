@@ -75,6 +75,7 @@ export const Absences = ({absencesByPerson, dateList, reasonList}) => {
             ))}
           </React.Fragment>
         ))}
+        <Now />
       </div>
     </React.Fragment>
   )
@@ -122,6 +123,15 @@ const Absence = ({absence, person}) => {
       {showPopup ? <Popup absence={absence} /> : null}
     </a>
   )
+}
+
+const Now = () => {
+  const style = {
+    gridColumn: `${getColumnName(Date.now())} / span 1`,
+    gridRowStart: 1,
+    gridRowEnd: -1,
+  }
+  return <span className="absence__now" style={style} />
 }
 
 const Popup = ({absence}) => {

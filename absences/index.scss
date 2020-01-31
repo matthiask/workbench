@@ -88,6 +88,12 @@ $z-index: (
   font-size: 0.75rem;
 }
 
+.absence__now {
+  position: relative;
+  left: calc(var(--day-column-width) / 2);
+  border-left: 1px solid rgba(255, 100, 0, 0.7);
+}
+
 .absences__person {
   @include z-index("person-column");
 
