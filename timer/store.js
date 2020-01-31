@@ -40,6 +40,14 @@ const remotePersister = store => next => action => {
   return state
 }
 
+const initialTitle = document.title
+const notifier = store => next => action => {
+  const state = next(action)
+  const {current} = store.getState()
+  document.title = `${current ? "▶ " : "⏸ "}${initialTitle}`
+  return state
+}
+
 const serialize = data => {
   return JSON.stringify({...data, _v: VERSION})
 }
@@ -99,7 +107,7 @@ export function configureStore() {
         deserialize,
         merge,
       }),
-      applyMiddleware(remotePersister, thunk, logger)
+      applyMiddleware(notifier, remotePersister, thunk, logger)
     )
   )
 
