@@ -5,7 +5,9 @@ from functools import reduce
 from itertools import count
 
 from django import forms
+from django.contrib import messages
 from django.http import JsonResponse
+from django.shortcuts import redirect
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
@@ -22,13 +24,21 @@ class ExpenseReportPDFView(generic.DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
+        if not self.object.closed_on:
+            messages.warning(
+                request,
+                _(
+                    "Please close the expense report first. Generating PDFs"
+                    " for open expense reports isn't allowed."
+                ),
+            )
+            return redirect(self.object)
+
         pdf, response = pdf_response(
             self.object.code,
             as_attachment=request.GET.get("disposition") == "attachment",
         )
         pdf.init_report()
-        pdf.watermark("" if self.object.closed_on else _("In preparation"))
-
         pdf.h1(_("expense report"))
         pdf.spacer(2 * mm)
         pdf.table(
@@ -84,14 +94,7 @@ class ExpenseReportPDFView(generic.DetailView):
             pdf.table(
                 [
                     (
-                        "%s %s %s"
-                        % (
-                            _("total"),
-                            currency_code or "CHF",
-                            ""
-                            if self.object.closed_on
-                            else _("(provisional, not ready for reimbursement)"),
-                        ),
+                        "%s %s" % (_("total"), currency_code or "CHF"),
                         currency(total_cost),
                     )
                 ],

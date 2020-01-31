@@ -114,8 +114,6 @@ class ExpensesTest(TestCase):
         self.assertRedirects(response, report.urls["detail"])
         self.assertEqual(report.total, 9)
 
-        self.assertEqual(self.client.get(report.urls["pdf"]).status_code, 200)
-
         # Some fields are now disabled
         response = self.client.get(
             cost1.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
@@ -142,6 +140,16 @@ class ExpensesTest(TestCase):
         report.refresh_from_db()
         self.assertEqual(report.total, 5)
 
+        response = self.client.get(report.urls["pdf"])
+        self.assertRedirects(response, report.urls["detail"])
+        self.assertEqual(
+            messages(response),
+            [
+                "Please close the expense report first. Generating PDFs"
+                " for open expense reports isn't allowed."
+            ],
+        )
+
         response = self.client.post(report.urls["delete"])
         self.assertRedirects(response, "/expenses/")
 
@@ -162,6 +170,8 @@ class ExpensesTest(TestCase):
         self.assertRedirects(response, report.urls["detail"])
         self.assertEqual(messages(response), ["Cannot delete a closed expense report."])
         # print(response, response.content.decode("utf-8"))
+
+        self.assertEqual(self.client.get(report.urls["pdf"]).status_code, 200)
 
     def test_no_expenses(self):
         self.client.force_login(factories.UserFactory.create())

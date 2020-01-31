@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-31 13:40+0100\n"
+"POT-Creation-Date: 2020-01-31 14:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -798,8 +798,8 @@ msgid "status"
 msgstr "Status"
 
 #: workbench/expenses/forms.py workbench/expenses/models.py
-#: workbench/expenses/views.py workbench/invoices/models.py
-#: workbench/offers/models.py workbench/templates/start.html
+#: workbench/invoices/models.py workbench/offers/models.py
+#: workbench/templates/start.html
 msgid "In preparation"
 msgstr "In Vorbereitung"
 
@@ -883,6 +883,14 @@ msgstr "Wechselkurse"
 msgid "exchange rates"
 msgstr "Wechselkurse"
 
+#: workbench/expenses/views.py
+msgid ""
+"Please close the expense report first. Generating PDFs for open expense "
+"reports isn't allowed."
+msgstr ""
+"Bitte schliesse die Spesenabrechnung. Es können keine PDFs generiert werden "
+"für Spesenabrechnungen, welche sich noch in Vorbereitung befinden."
+
 #: workbench/expenses/views.py workbench/templates/generic/object_list.html
 msgid "of"
 msgstr "von"
@@ -890,10 +898,6 @@ msgstr "von"
 #: workbench/expenses/views.py
 msgid "receipt"
 msgstr "Beleg"
-
-#: workbench/expenses/views.py
-msgid "(provisional, not ready for reimbursement)"
-msgstr "(provisorisch, nicht bereit zur Auszahlung)"
 
 #: workbench/generic.py
 msgid "Search form was invalid."
@@ -2470,3 +2474,6 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "(provisional, not ready for reimbursement)"
+#~ msgstr "(provisorisch, nicht bereit zur Auszahlung)"
