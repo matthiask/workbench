@@ -13,10 +13,6 @@ module.exports = merge.smart(
   {
     context: path.join(__dirname),
     // devtool: "source-map",
-    entry: {
-      main: "./timer/index.js",
-      absences: "./absences/index.js",
-    },
     output: {
       path: path.resolve("./static/workbench/"),
       publicPath: DEBUG
@@ -26,3 +22,9 @@ module.exports = merge.smart(
     },
   }
 )
+
+// Smart webpack merging is not smart enough to remove the default `main` entrypoint
+module.exports.entry = {
+  timer: "./timer/index.js",
+  absences: "./absences/index.js",
+}
