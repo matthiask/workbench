@@ -44,7 +44,7 @@ const initialTitle = document.title
 const notifier = store => next => action => {
   const state = next(action)
   const {current} = store.getState()
-  document.title = `${current ? "▶ " : "⏸ "}${initialTitle}`
+  document.title = `${current ? "▶ " : ""}${initialTitle}`
   return state
 }
 
