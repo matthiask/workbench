@@ -56,6 +56,19 @@ class Organization(Model):
     def allow_delete(cls, instance, request):
         return None
 
+    def recent_projects(self):
+        return self.project_set.select_related("owned_by")[:10]
+
+    def recent_invoices(self):
+        return self.invoice_set.select_related("owned_by")[:10]
+
+    def recent_offers(self):
+        from workbench.offers.models import Offer
+
+        return Offer.objects.filter(project__customer=self).select_related(
+            "project", "owned_by"
+        )[:10]
+
 
 class PersonQuerySet(SearchQuerySet):
     def active(self):

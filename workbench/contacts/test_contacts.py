@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from workbench import factories
 from workbench.contacts.models import Group, Organization, Person, PhoneNumber
@@ -281,3 +282,18 @@ class ContactsTest(TestCase):
             Person.urls["create"] + "?organization={}".format(organization.pk)
         )
         self.assertContains(response, 'value="ABCD"')
+
+    def test_organization_detail(self):
+        organization = factories.OrganizationFactory.create()
+        self.client.force_login(organization.primary_contact)
+
+        response = self.client.get(organization.urls["detail"])
+        self.assertContains(response, "recent projects")
+        self.assertContains(response, "recent invoices")
+        self.assertContains(response, "recent offers")
+
+        with override_settings(FEATURES={"controlling": False}):
+            response = self.client.get(organization.urls["detail"])
+            self.assertContains(response, "recent projects")
+            self.assertNotContains(response, "recent invoices")
+            self.assertNotContains(response, "recent offers")

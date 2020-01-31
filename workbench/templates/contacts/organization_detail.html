@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="row justify-content-center">
-<div class="col-md-10 col-lg-8">
+<div class="col-12">
   <h1>{{ object }} {% history_link object %}</h1>
 
   <table class="table table-striped">
@@ -54,5 +54,70 @@
 <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
   {% trans 'Delete' %}</a>
 </div>
+</div>
+
+<div class="row mt-5">
+
+  <div class="col-lg-4">
+    <div class="card mb-3">
+      <div class="card-header"><h3 class="my-0">
+        <a href="{% url 'projects_project_list' %}?org={{ organization.pk }}">
+          {% trans 'recent projects' %}
+        </a>
+      </h3></div>
+
+      <div class="list-group list-group-flush">
+        {% for object in organization.recent_projects %}
+          <a class="list-group-item list-group-item-action" href="{{ object.get_absolute_url }}">
+            {{ object|h }}
+            {{ object.status_badge }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {% if request.user|has:FEATURES.CONTROLLING %}
+
+    <div class="col-lg-4">
+      <div class="card mb-3">
+        <div class="card-header"><h3 class="my-0">
+          <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}">
+            {% trans 'recent invoices' %}
+          </a>
+        </h3></div>
+
+        <div class="list-group list-group-flush">
+          {% for object in organization.recent_invoices %}
+            <a class="list-group-item list-group-item-action" href="{{ object.get_absolute_url }}">
+              {{ object|h }}
+              {{ object.status_badge }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card mb-3">
+        <div class="card-header"><h3 class="my-0">
+          <a href="{% url 'offers_offer_list' %}?org={{ organization.pk }}">
+            {% trans 'recent offers' %}
+          </a>
+        </h3></div>
+
+        <div class="list-group list-group-flush">
+          {% for object in organization.recent_offers %}
+            <a class="list-group-item list-group-item-action" href="{{ object.get_absolute_url }}">
+              {{ object|h }}
+              {{ object.status_badge }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  {% endif %}
+
 </div>
 {% endblock %}
