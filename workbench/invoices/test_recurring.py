@@ -189,6 +189,10 @@ class RecurringTest(TestCase):
             subtotal=200,
         )
         self.assertEqual(ri.pretty_status, "monthly from 01.01.2018 until 31.12.2050")
+        self.assertEqual(
+            ri.pretty_next_period,
+            "Next period starts on 01.01.2018, invoice will be created on 12.12.2017",
+        )
 
         ri = RecurringInvoice.objects.create(
             customer=person.organization,
@@ -201,6 +205,24 @@ class RecurringTest(TestCase):
             subtotal=200,
         )
         self.assertEqual(ri.pretty_status, "monthly from 01.01.2018")
+        self.assertEqual(
+            ri.pretty_next_period,
+            "Next period starts on 01.01.2018, invoice will be created on 12.12.2017",
+        )
+
+        ri = RecurringInvoice.objects.create(
+            customer=person.organization,
+            contact=person,
+            title="Recurring invoice",
+            owned_by=person.primary_contact,
+            starts_on=dt.date(2018, 1, 1),
+            ends_on=dt.date(2018, 1, 31),
+            next_period_starts_on=dt.date(2018, 2, 1),
+            periodicity="monthly",
+            subtotal=200,
+        )
+        self.assertEqual(ri.pretty_status, "monthly from 01.01.2018 until 31.01.2018")
+        self.assertEqual(ri.pretty_next_period, "")
 
     def test_pre_form(self):
         self.client.force_login(factories.UserFactory.create())
