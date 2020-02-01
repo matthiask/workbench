@@ -10,12 +10,6 @@
   <h1>{{ object|h }} {% history_link object %}</h1>
 
   <table class="table table-striped">
-    {% for name, value in object|field_value_pairs %}
-    <tr>
-      <th class="text-right">{{ name }}</th>
-      <td>{% link_or_none value %}</td>
-    </tr>
-    {% endfor %}
     <tr>
       <th class="text-right">{% trans 'expenses' %}</th>
       <td>
@@ -31,6 +25,14 @@
           <br>
         {% endfor %}
       </td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'status' %}</th>
+      <td>{{ object.status_badge }}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'total' %}</th>
+      <td>{{ object.total|currency }}</td>
     </tr>
   </table>
 
