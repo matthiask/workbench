@@ -8,12 +8,56 @@
   <h1>{{ object|h }} {% history_link object %}</h1>
 
   <table class="table table-striped">
-    {% for name, value in object|field_value_pairs %}
     <tr>
-      <th class="text-right">{{ name }}</th>
-      <td>{% link_or_none value %}</td>
+      <th class="text-right">{% trans 'customer' %}</th>
+      <td>{% link_or_none object.customer %}</td>
     </tr>
-    {% endfor %}
+    <tr>
+      <th class="text-right">{% trans 'contact' %}</th>
+      <td>{% link_or_none object.contact %}</td>
+    </tr>
+
+    <tr>
+      <th class="text-right">{% trans 'subtotal' %}</th>
+      <td>{{ object.subtotal|currency }}</td>
+    </tr>
+    {% if object.discount %}
+      <tr>
+        <th class="text-right">{% trans 'discount' %}</th>
+        <td>-{{ object.discount|currency }}</td>
+      </tr>
+    {% endif %}
+    {% if object.liable_to_vat and object.subtotal != object.total_excl_tax %}
+      <tr>
+        <th class="text-right">{% trans 'total excl. tax' %}</th>
+        <td>{{ object.total_excl_tax|currency }}</td>
+      </tr>
+    {% endif %}
+    <tr>
+      <th class="text-right">{% trans 'total' %}</th>
+      <td>{{ object.total|currency }}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'third party costs' %}</th>
+      <td>{{ object.third_party_costs|currency }}</td>
+    </tr>
+
+    <tr>
+      <th class="text-right">{% trans 'status' %}</th>
+      <td>
+        {{ object.status_badge }}
+        <br>
+        {{ object.pretty_next_period }}
+      </td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'description' %}</th>
+      <td>{{ object.description|linebreaksbr|default:"&ndash;" }}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'postal address' %}</th>
+      <td>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</td>
+    </tr>
   </table>
 
   <a href="{{ object.urls.update }}" class="btn btn-primary">

@@ -509,6 +509,17 @@ class RecurringInvoice(ModelWithTotal):
         }
 
     @property
+    def pretty_next_period(self):
+        start = self.next_period_starts_on or self.starts_on
+        if self.ends_on and self.ends_on < start:
+            return ""
+        create = start + dt.timedelta(days=self.create_invoice_on_day)
+
+        return _(
+            "Next period starts on %(start)s, invoice will be created on %(create)s"
+        ) % {"start": local_date_format(start), "create": local_date_format(create)}
+
+    @property
     def status_badge(self):
         return format_html(
             '<span class="badge badge-{}">{}</span>',

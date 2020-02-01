@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-31 14:06+0100\n"
+"POT-Creation-Date: 2020-02-01 09:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -331,6 +331,7 @@ msgstr "Wird nur für die Visualisierung der Abwesenheiten verwendet."
 #: workbench/logbook/models.py workbench/offers/models.py
 #: workbench/projects/models.py workbench/services/models.py
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 msgid "description"
@@ -623,6 +624,7 @@ msgstr "Überschreibt die Postadresse komplett falls gesetzt."
 
 #: workbench/contacts/models.py workbench/invoices/models.py
 #: workbench/offers/models.py workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "postal address"
 msgstr "Postadresse"
 
@@ -721,6 +723,7 @@ msgstr "Valuta"
 #: workbench/credit_control/models.py workbench/expenses/models.py
 #: workbench/expenses/views.py workbench/management/commands/export_debtors.py
 #: workbench/templates/credit_control/creditentry_list.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
@@ -794,6 +797,7 @@ msgstr "Alle"
 #: workbench/expenses/forms.py workbench/expenses/views.py
 #: workbench/invoices/models.py workbench/offers/models.py
 #: workbench/projects/forms.py workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "status"
 msgstr "Status"
 
@@ -1079,12 +1083,14 @@ msgstr "Leistungen"
 #: workbench/invoices/models.py workbench/management/commands/profitability.py
 #: workbench/projects/models.py
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/reporting/overdrawn_projects.html
 msgid "customer"
 msgstr "Kundschaft"
 
 #: workbench/invoices/models.py workbench/projects/models.py
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "contact"
 msgstr "Kontakt"
 
@@ -1129,6 +1135,7 @@ msgstr "Anzahlungstotal"
 #: workbench/invoices/models.py workbench/logbook/models.py
 #: workbench/services/models.py
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/key_data_third_party_costs.html
@@ -1276,6 +1283,12 @@ msgstr "%(periodicity)s von %(from)s bis %(until)s"
 #, python-format
 msgid "%(periodicity)s from %(from)s"
 msgstr "%(periodicity)s seit %(from)s"
+
+#: workbench/invoices/models.py
+#, python-format
+msgid "Next period starts on %(start)s, invoice will be created on %(create)s"
+msgstr ""
+"Nächste Periode beginnt am %(start)s, Rechnung wird am %(create)s erstellt."
 
 #: workbench/invoices/models.py
 msgid "Period"
@@ -2032,17 +2045,20 @@ msgstr "Geschichte"
 msgid "No history found"
 msgstr "Keine Geschichte gefunden"
 
-#: workbench/templates/invoices/invoice_detail.html workbench/tools/models.py
-#: workbench/tools/pdf.py
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/tools/models.py workbench/tools/pdf.py
 msgid "subtotal"
 msgstr "Zwischentotal"
 
-#: workbench/templates/invoices/invoice_detail.html workbench/tools/models.py
-#: workbench/tools/pdf.py
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/tools/models.py workbench/tools/pdf.py
 msgid "discount"
 msgstr "Rabatt"
 
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/key_data_third_party_costs.html
