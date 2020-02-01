@@ -1,5 +1,11 @@
+import datetime as dt
+
 from django.template import Context, Template, TemplateSyntaxError
 from django.test import TestCase
+from django.utils.translation import deactivate_all
+
+from workbench import factories
+from workbench.templatetags.workbench import field_value_pairs, link_or_none
 
 
 class TemplateTagsTest(TestCase):
@@ -83,3 +89,17 @@ class TemplateTagsTest(TestCase):
   <path d="M 10 0 A 10 10 0 0 1 10.0 0.0 L 10 10 z" class="pie-arc" />
 </svg>""",  # noqa
         )
+
+    def test_link_or_none(self):
+        self.assertEqual(link_or_none(0), 0)
+        self.assertEqual(str(link_or_none(None)), "&ndash;")
+
+    def test_field_value_pairs(self):
+        deactivate_all()
+        absence = factories.AbsenceFactory.create(starts_on=dt.date(2020, 1, 1))
+        pairs = dict(field_value_pairs(absence))
+
+        self.assertEqual(pairs["starts on"], "01.01.2020")
+        self.assertEqual(pairs["ends on"], None)
+        self.assertEqual(pairs["reason"], "vacation")
+        self.assertEqual(pairs["is vacation"], "yes")

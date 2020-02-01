@@ -6,7 +6,7 @@ from faker import Factory
 from faker.providers import address
 
 from workbench.accounts.models import Team, User
-from workbench.awt.models import Employment, WorkingTimeModel, Year
+from workbench.awt.models import Absence, Employment, WorkingTimeModel, Year
 from workbench.contacts.models import Organization, Person, PostalAddress
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.invoices.models import Invoice, RecurringInvoice
@@ -76,6 +76,16 @@ class EmploymentFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Employment
+
+
+class AbsenceFactory(factory.DjangoModelFactory):
+    user = factory.SubFactory(UserFactory)
+    reason = "vacation"
+    starts_on = factory.LazyAttribute(lambda a: dt.date.today())
+    days = 1
+
+    class Meta:
+        model = Absence
 
 
 # CONTACTS ####################################################################
