@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+from workbench.accounts.features import FEATURES
 from workbench.audit.models import LoggedAction
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import Invoice, RecurringInvoice
@@ -17,6 +18,19 @@ def search(request):
     results = []
     q = request.GET.get("q", "")
     if q:
+        sources = [
+            Project.objects.select_related("owned_by"),
+            Organization.objects.all(),
+            Person.objects.active(),
+        ]
+        if request.user.features[FEATURES.CONTROLLING]:
+            sources.extend(
+                [
+                    Invoice.objects.select_related("project", "owned_by"),
+                    RecurringInvoice.objects.all(),
+                    Offer.objects.select_related("project", "owned_by"),
+                ]
+            )
         results = [
             {
                 "verbose_name_plural": queryset.model._meta.verbose_name_plural,
@@ -26,14 +40,7 @@ def search(request):
                 ),
                 "results": queryset.search(q)[:101],
             }
-            for queryset in (
-                Project.objects.select_related("owned_by"),
-                Organization.objects.all(),
-                Person.objects.active(),
-                Invoice.objects.select_related("project", "owned_by"),
-                RecurringInvoice.objects.all(),
-                Offer.objects.select_related("project", "owned_by"),
-            )
+            for queryset in sources
         ]
     else:
         messages.error(request, _("Search query missing."))
