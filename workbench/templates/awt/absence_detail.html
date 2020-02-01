@@ -6,12 +6,22 @@
 
 {% block body %}
   <table class="table table-striped">
-    {% for name, value in object|field_value_pairs %}
     <tr>
-      <th class="text-right">{{ name }}</th>
-      <td>{% link_or_none value %}</td>
+      <th class="text-right">{% trans 'user' %}</th>
+      <td>{% link_or_none object.user %}</td>
     </tr>
-    {% endfor %}
+    <tr>
+      <th class="text-right">{% trans 'absence' %}</th>
+      <td>{{ object.pretty_status }}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'reason' %}</th>
+      <td>{{ object.get_reason_display }}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'description' %}</th>
+      <td>{{ object.description|linebreaksbr }}</td>
+    </tr>
   </table>
 {% endblock %}
 

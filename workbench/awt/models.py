@@ -223,11 +223,11 @@ class Absence(Model):
     def pretty_status(self):
         return "%s, %s" % (
             ngettext("%s day", "%s days", self.days) % self.days,
-            self.pretty_duration,
+            self.pretty_period,
         )
 
     @property
-    def pretty_duration(self):
+    def pretty_period(self):
         return "%s - %s" % (
             local_date_format(self.starts_on),
             local_date_format(self.ends_on or self.starts_on),

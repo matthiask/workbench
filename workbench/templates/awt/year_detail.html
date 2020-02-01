@@ -204,7 +204,7 @@
           </tr>
           {% for absence in data.absences.absence_vacation %}
             <tr>
-              <td>{{ absence.pretty_duration }}</td>
+              <td>{{ absence.pretty_period }}</td>
               <td>{{ absence.days|days }}</td>
               <td>{{ absence.description }}</td>
             </tr>
