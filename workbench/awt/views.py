@@ -12,7 +12,7 @@ from workbench.accounts.models import Team, User
 from workbench.awt.models import Absence, Year
 from workbench.awt.reporting import active_users, annual_working_time
 from workbench.tools.forms import Form
-from workbench.tools.validation import monday
+from workbench.tools.validation import filter_form, monday
 
 
 def annual_working_time_view(request):
@@ -72,10 +72,8 @@ class UserFilterForm(Form):
         return queryset
 
 
-def absence_calendar(request):
-    form = UserFilterForm(request.GET, request=request)
-    form.is_valid()
-
+@filter_form(UserFilterForm)
+def absence_calendar(request, form):
     users = form.queryset()
 
     dates = {dt.date.today()}

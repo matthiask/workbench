@@ -291,6 +291,7 @@ class AWTTest(TestCase):
         team = factories.TeamFactory.create()
         user.teams.add(team)
         code("team={}".format(team.pk))
+        code("team=abc", status_code=302)
 
     def test_absence_validation(self):
         user = factories.UserFactory.create()
