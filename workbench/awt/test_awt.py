@@ -223,11 +223,10 @@ class AWTTest(TestCase):
         )
 
     def test_non_ajax_redirect(self):
-        user = factories.UserFactory.create()
-        self.client.force_login(user)
-        absence = Absence.objects.create(user=user, starts_on=dt.date.today(), days=1)
+        absence = factories.AbsenceFactory.create()
+        self.client.force_login(absence.user)
         response = self.client.get(absence.urls["detail"])
-        self.assertRedirects(response, "/absences/?u=" + str(user.pk))
+        self.assertRedirects(response, "/absences/?u=" + str(absence.user.pk))
 
     def test_list(self):
         user = factories.UserFactory.create()
