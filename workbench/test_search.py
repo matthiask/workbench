@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from workbench import factories
 from workbench.tools.search import process_query
@@ -14,6 +15,24 @@ class SearchTest(TestCase):
 
         response = self.client.get("/search/?q=Test")
         self.assertContains(response, project.get_absolute_url())
+
+        self.assertContains(response, "projects")
+        self.assertContains(response, "organizations")
+        self.assertContains(response, "people")
+        self.assertContains(response, "invoices")
+        self.assertContains(response, "recurring-invoices")
+        self.assertContains(response, "offers")
+
+        with override_settings(FEATURES={"controlling": False}):
+            response = self.client.get("/search/?q=Test")
+            self.assertContains(response, project.get_absolute_url())
+
+            self.assertContains(response, "projects")
+            self.assertContains(response, "organizations")
+            self.assertContains(response, "people")
+            self.assertNotContains(response, "invoices")
+            self.assertNotContains(response, "recurring-invoices")
+            self.assertNotContains(response, "offers")
 
     def test_process_query(self):
         self.assertEqual(process_query(""), "")
