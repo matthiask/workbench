@@ -20,6 +20,7 @@ from workbench.projects.forms import (
 )
 from workbench.projects.models import Project, Service
 from workbench.projects.views import (
+    OffersRenumberView,
     assign_service_type,
     projects,
     select,
@@ -71,6 +72,11 @@ urlpatterns = [
         r"^(?P<pk>\d+)/offers-pdf/$",
         controlling_only(ProjectOfferPDFView.as_view()),
         name="projects_project_offers_pdf",
+    ),
+    url(
+        r"^(?P<pk>\d+)/renumber-offers/$",
+        controlling_only(OffersRenumberView.as_view(model=Project)),
+        name="projects_project_renumber_offers",
     ),
     url(
         r"^create/$",

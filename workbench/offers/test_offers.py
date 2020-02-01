@@ -435,3 +435,31 @@ class OffersTest(TestCase):
             '<input type="number" name="services-0-effort_rate" step="0.01" class="form-control" disabled id="id_services-0-effort_rate">',  # noqa
             html=True,
         )
+
+    def test_renumber_offers(self):
+        project = factories.ProjectFactory.create()
+        offer1 = factories.OfferFactory.create(project=project)
+        offer2 = factories.OfferFactory.create(project=project)
+        field1 = "offer_{}_code".format(offer1.pk)
+        field2 = "offer_{}_code".format(offer2.pk)
+
+        self.client.force_login(project.owned_by)
+        response = self.client.get(project.urls["renumber_offers"])
+        self.assertContains(response, field1)
+        self.assertContains(response, field2)
+
+        response = self.client.post(
+            project.urls["renumber_offers"], {field1: 1, field2: 1}
+        )
+        self.assertContains(response, "Codes must be unique")
+
+        response = self.client.post(
+            project.urls["renumber_offers"], {field1: 4, field2: 3}
+        )
+        self.assertRedirects(response, project.urls["detail"])
+
+        offer1.refresh_from_db()
+        offer2.refresh_from_db()
+
+        self.assertEqual(offer1._code, 4)
+        self.assertEqual(offer2._code, 3)

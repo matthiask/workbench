@@ -5,7 +5,8 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 
-from workbench.projects.forms import ProjectAutocompleteForm
+from workbench import generic
+from workbench.projects.forms import OffersRenumberForm, ProjectAutocompleteForm
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 
@@ -23,6 +24,10 @@ def select(request):
         "generic/select_object.html",
         {"form": form, "title": _("Jump to project")},
     )
+
+
+class OffersRenumberView(generic.UpdateView):
+    form_class = OffersRenumberForm
 
 
 def assign_service_type(request, pk):

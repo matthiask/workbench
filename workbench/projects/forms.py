@@ -322,3 +322,31 @@ class ProjectAutocompleteForm(forms.Form):
         widget=Autocomplete(model=Project, params={"only_open": "on"}),
         label="",
     )
+
+
+class OffersRenumberForm(Form):
+    def __init__(self, *args, **kwargs):
+        self.project = kwargs.pop("instance")
+
+        super().__init__(*args, **kwargs)
+
+        self.offers = self.project.offers.order_by("_code")
+        for offer in self.offers:
+            self.fields["offer_{}_code".format(offer.pk)] = forms.IntegerField(
+                label=str(offer), initial=offer._code, min_value=1,
+            )
+
+    def clean(self):
+        data = super().clean()
+        self.codes = {
+            offer: data.get("offer_{}_code".format(offer.pk)) for offer in self.offers
+        }
+        if len(self.codes) != len(set(self.codes.values())):
+            raise forms.ValidationError(_("Codes must be unique."))
+        return data
+
+    def save(self):
+        for offer, code in self.codes.items():
+            offer._code = code
+            offer.save()
+        return self.project

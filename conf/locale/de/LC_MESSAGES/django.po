@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-01 09:47+0100\n"
+"POT-Creation-Date: 2020-02-01 16:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -101,6 +101,7 @@ msgstr "Arbeitszeitmodell"
 
 #: workbench/accounts/models.py workbench/awt/models.py
 #: workbench/management/commands/profitability.py
+#: workbench/templates/awt/absence_detail.html
 #: workbench/templates/reporting/green_hours.html workbench/timer/models.py
 msgid "user"
 msgstr "Benutzer"
@@ -330,6 +331,7 @@ msgstr "Wird nur für die Visualisierung der Abwesenheiten verwendet."
 #: workbench/invoices/views.py workbench/logbook/forms.py
 #: workbench/logbook/models.py workbench/offers/models.py
 #: workbench/projects/models.py workbench/services/models.py
+#: workbench/templates/awt/absence_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -337,7 +339,7 @@ msgstr "Wird nur für die Visualisierung der Abwesenheiten verwendet."
 msgid "description"
 msgstr "Beschreibung"
 
-#: workbench/awt/models.py
+#: workbench/awt/models.py workbench/templates/awt/absence_detail.html
 msgid "reason"
 msgstr "Grund"
 
@@ -346,6 +348,7 @@ msgid "is vacation"
 msgstr "sind Ferien"
 
 #: workbench/awt/models.py workbench/templates/awt/absence_calendar.html
+#: workbench/templates/awt/absence_detail.html
 msgid "absence"
 msgstr "Abwesenheit"
 
@@ -723,6 +726,7 @@ msgstr "Valuta"
 #: workbench/credit_control/models.py workbench/expenses/models.py
 #: workbench/expenses/views.py workbench/management/commands/export_debtors.py
 #: workbench/templates/credit_control/creditentry_list.html
+#: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data_gross_profit.html
@@ -796,7 +800,9 @@ msgstr "Alle"
 
 #: workbench/expenses/forms.py workbench/expenses/views.py
 #: workbench/invoices/models.py workbench/offers/models.py
-#: workbench/projects/forms.py workbench/templates/invoices/invoice_detail.html
+#: workbench/projects/forms.py
+#: workbench/templates/expenses/expensereport_detail.html
+#: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "status"
 msgstr "Status"
@@ -1637,6 +1643,10 @@ msgstr ""
 msgid "This project is already closed."
 msgstr "Dieses Projekt wurde schon geschlossen."
 
+#: workbench/projects/forms.py
+msgid "Codes must be unique."
+msgstr ""
+
 #: workbench/projects/models.py
 msgid "Order"
 msgstr "Auftrag"
@@ -2153,6 +2163,10 @@ msgstr "Statistik"
 #: workbench/templates/projects/project_detail.html
 msgid "offers PDF"
 msgstr "Offerten-PDF"
+
+#: workbench/templates/projects/project_detail.html
+msgid "renumber offers"
+msgstr "Offerten neu nummerieren"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Pricing"

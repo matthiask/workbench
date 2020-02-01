@@ -103,6 +103,11 @@
               {% trans 'Download' %}</a>
           </div>
         </span>
+
+        <a href="{{ object.urls.renumber_offers }}" class="btn btn-primary">
+          {% trans 'renumber offers' %}
+        </a>
+
       {% endif %}
 
       <a href="{{ project.urls.delete }}" class="btn btn-outline-danger float-right">
