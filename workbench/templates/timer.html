@@ -7,8 +7,10 @@
 {% block js %}{{ block.super }}
 {{ state|json_script:'timer-state' }}
 <script src="{% url 'javascript-catalog' %}"></script>
-{% render_bundle "manifest" %}
-{% render_bundle "vendors" %}
-{% render_bundle "timer" %}
+{% if not TESTING %}
+  {% render_bundle "manifest" %}
+  {% render_bundle "vendors" %}
+  {% render_bundle "timer" %}
+{% endif %}
 <span id="current-user" data-current-user="{{ request.user.id }}"></span>
 {% endblock %}

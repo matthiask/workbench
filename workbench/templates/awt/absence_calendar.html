@@ -23,7 +23,9 @@
   <div id="absences-root" class="absences-wrapper"></div>
   {{ absences_data|json_script:'absences-data' }}
   <script src="{% url 'javascript-catalog' %}"></script>
-  {% render_bundle "manifest" %}
-  {% render_bundle "vendors" %}
-  {% render_bundle "absences" %}
+  {% if not TESTING %}
+    {% render_bundle "manifest" %}
+    {% render_bundle "vendors" %}
+    {% render_bundle "absences" %}
+  {% endif %}
 {% endblock %}

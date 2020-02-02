@@ -8,4 +8,5 @@ def workbench(request):
         "WORKBENCH": settings.WORKBENCH,
         "FEATURES": FEATURES,
         "DEBUG": settings.DEBUG,
+        "TESTING": settings.TESTING,
     }

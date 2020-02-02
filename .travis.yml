@@ -12,6 +12,7 @@ env:
     - SECRET_KEY=unsafe
     - LIVE=False
     - NAMESPACE=feinheit
+    - TESTING=True
 install:
   - pip install -U pip setuptools wheel
   - pip install -r requirements.txt
