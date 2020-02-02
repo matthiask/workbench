@@ -6,8 +6,15 @@ python:
   - 3.7
 services:
   - postgresql
+env:
+  global:
+    - DATABASE_URL=postgres://localhost:5432/workbench
+    - SECRET_KEY=unsafe
+    - LIVE=False
+    - NAMESPACE=feinheit
 install:
   - pip install -U pip setuptools wheel
   - pip install -r requirements.txt
 script:
-  - ./runtests.sh
+  - coverage run ./manage.py test -v2
+  - coverage report -m --fail-under=99
