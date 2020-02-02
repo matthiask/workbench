@@ -2,6 +2,8 @@
 Workbench
 =========
 
+.. image:: https://travis-ci.org/matthiask/workbench.svg?branch=master
+    :target: https://travis-ci.org/matthiask/workbench
 
 Recommended contents of ``.env`` (add some random value for
 ``SECRET_KEY`` and copy the ``OAUTH2_CLIENT_*`` values from the ``.env``
