@@ -13,9 +13,18 @@ env:
     - LIVE=False
     - NAMESPACE=feinheit
     - TESTING=True
-install:
-  - pip install -U pip setuptools wheel
-  - pip install -r requirements.txt
+jobs:
+  include:
+    - python: 3.7
+      env: requirements.txt
+      install:
+        - pip install -U pip setuptools wheel
+        - pip install -r requirements.txt
+    - python: 3.7
+      env: requirements-to-freeze.txt
+      install:
+        - pip install -U pip setuptools wheel
+        - pip install -U --pre -r requirements-to-freeze.txt
 script:
   - coverage run ./manage.py test -v2
   - coverage report -m --fail-under=99
