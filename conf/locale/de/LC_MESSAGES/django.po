@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-01 16:16+0100\n"
+"POT-Creation-Date: 2020-02-03 09:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1645,7 +1645,7 @@ msgstr "Dieses Projekt wurde schon geschlossen."
 
 #: workbench/projects/forms.py
 msgid "Codes must be unique."
-msgstr ""
+msgstr "Codes müssen eindeutig sein."
 
 #: workbench/projects/models.py
 msgid "Order"
@@ -2161,8 +2161,16 @@ msgid "statistics"
 msgstr "Statistik"
 
 #: workbench/templates/projects/project_detail.html
+msgid "project offers"
+msgstr "Projektofferten"
+
+#: workbench/templates/projects/project_detail.html
 msgid "offers PDF"
 msgstr "Offerten-PDF"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Show"
+msgstr "Anzeigen"
 
 #: workbench/templates/projects/project_detail.html
 msgid "renumber offers"
@@ -2504,6 +2512,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "(provisional, not ready for reimbursement)"
-#~ msgstr "(provisorisch, nicht bereit zur Auszahlung)"
