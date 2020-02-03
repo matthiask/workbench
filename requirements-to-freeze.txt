@@ -1,6 +1,6 @@
 beautifulsoup4
 coverage
-Django>=3.0b1
+Django
 django-admin-ordering
 django-authlib
 django-bootstrap4
