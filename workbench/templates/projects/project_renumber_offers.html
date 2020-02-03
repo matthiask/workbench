@@ -1,0 +1,28 @@
+{% extends "generic/object_form.html" %}
+
+{% load i18n %}
+
+{% block js %}{{ block.super }}
+<style>
+[role="main"] form .widget--numberinput,
+[role="main"] form .widget--numberinput label {
+  cursor: move;
+}
+</style>
+<script>
+jQuery(function($) {
+  $("[role=\"main\"] form").sortable({
+    cursor: "move",
+    items: ".widget--numberinput",
+    // handle: "[data-sortable-grabber]",
+    stop: function(event, ui) {
+      let index = 0;
+      $("[role=\"main\"] form .widget--numberinput input").each(function() {
+        console.log(this)
+        this.value = ++index;
+      })
+    },
+  });
+});
+</script>
+{% endblock %}

@@ -75,7 +75,11 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/renumber-offers/$",
-        controlling_only(OffersRenumberView.as_view(model=Project)),
+        controlling_only(
+            OffersRenumberView.as_view(
+                model=Project, template_name_suffix="_renumber_offers"
+            )
+        ),
         name="projects_project_renumber_offers",
     ),
     url(
