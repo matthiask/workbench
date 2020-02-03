@@ -89,7 +89,7 @@ class Command(BaseCommand):
             invoice.next_period_starts_on = next(dates)
             invoice.save()
 
-        RecurringInvoice.objects.create_invoices()
+        # RecurringInvoice.objects.create_invoices()
 
         self.stdout.write("dehtmling invoices...")
         for instance in Invoice.objects.all():
