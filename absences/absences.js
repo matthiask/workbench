@@ -67,6 +67,7 @@ export const Absences = ({absencesByPerson, dateList, reasonList}) => {
       <Legend reasons={reasonList} />
       <div className="absences">
         <Scale scaleValues={scaleValues} />
+        <Now />
         {absencesByPerson.map(person => (
           <React.Fragment key={person.id}>
             <Person person={person} />
@@ -75,7 +76,6 @@ export const Absences = ({absencesByPerson, dateList, reasonList}) => {
             ))}
           </React.Fragment>
         ))}
-        <Now />
       </div>
     </React.Fragment>
   )
@@ -128,7 +128,7 @@ const Absence = ({absence, person}) => {
 const Now = () => {
   const style = {
     gridColumn: `${getColumnName(Date.now())} / span 1`,
-    gridRowStart: 1,
+    gridRowStart: 2,
     gridRowEnd: -1,
   }
   return <span className="absence__now" style={style} />

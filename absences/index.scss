@@ -92,6 +92,7 @@ $z-index: (
   position: relative;
   left: calc(var(--day-column-width) / 2);
   border-left: 1px solid rgba(255, 100, 0, 0.7);
+  pointer-events: none;
 }
 
 .absences__person {
