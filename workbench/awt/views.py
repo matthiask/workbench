@@ -4,6 +4,7 @@ from collections import defaultdict
 
 from django import forms
 from django.contrib import messages
+from django.db.models.functions import Coalesce
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
 
@@ -78,11 +79,15 @@ def absence_calendar(request, form):
 
     dates = {dt.date.today()}
     absences = defaultdict(list)
-    for absence in Absence.objects.calendar().filter(user__in=users):
+    cutoff = monday() - dt.timedelta(days=7)
+    queryset = Absence.objects.annotate(
+        _ends_on=Coalesce("ends_on", "starts_on")
+    ).filter(_ends_on__gte=cutoff, user__in=users)
+
+    for absence in queryset:
         absences[absence.user_id].append(absence)
-        dates.add(absence.starts_on)
-        dates.add(absence.ends_on)
-    dates.discard(None)
+        dates.add(max(absence.starts_on, cutoff))
+        dates.add(absence._ends_on)
 
     absences = [
         {
@@ -93,7 +98,8 @@ def absence_calendar(request, form):
                     "id": absence.id,
                     "reason": absence.reason,
                     "reasonDisplay": absence.get_reason_display(),
-                    "startsOn": time.mktime(absence.starts_on.timetuple()) * 1000,
+                    "startsOn": time.mktime(max(absence.starts_on, cutoff).timetuple())
+                    * 1000,
                     "endsOn": time.mktime(
                         (absence.ends_on or absence.starts_on).timetuple()
                     )

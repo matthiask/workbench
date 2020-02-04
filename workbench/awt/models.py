@@ -3,7 +3,6 @@ import datetime as dt
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _, ngettext
 
@@ -11,7 +10,7 @@ from workbench.accounts.models import User
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import HoursField, Model, MoneyField
 from workbench.tools.urls import model_urls
-from workbench.tools.validation import monday, raise_if_errors
+from workbench.tools.validation import raise_if_errors
 
 
 class WorkingTimeModel(models.Model):
@@ -141,18 +140,6 @@ class Employment(Model):
             )
 
 
-class AbsenceQuerySet(models.QuerySet):
-    def calendar(self):
-        date = monday(dt.date.today())
-        cutoff = date - dt.timedelta(days=7)
-
-        return self.filter(
-            Q(ends_on__isnull=True, starts_on__gte=cutoff)
-            | Q(ends_on__isnull=False, ends_on__gte=cutoff),
-            Q(starts_on__lte=date + dt.timedelta(days=365)),
-        )
-
-
 @model_urls
 class Absence(Model):
     VACATION = "vacation"
@@ -179,8 +166,6 @@ class Absence(Model):
     description = models.TextField(_("description"))
     reason = models.CharField(_("reason"), max_length=10, choices=REASON_CHOICES)
     is_vacation = models.BooleanField(_("is vacation"), default=True)
-
-    objects = AbsenceQuerySet.as_manager()
 
     class Meta:
         ordering = ["-starts_on", "-pk"]
