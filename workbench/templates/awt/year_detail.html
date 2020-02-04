@@ -103,7 +103,7 @@
       <tr>
         <th class="text-nowrap">
           {% trans 'target time' %}
-          <small>({% blocktrans with hours=year.working_time_per_day|hours %}calculated with {{ hours }} per day{% endblocktrans %})</small>
+          <small>({% blocktrans with hours=stats.year.working_time_per_day|hours %}calculated with {{ hours }} per day{% endblocktrans %})</small>
         </th>
         {% for value in stats.target %}<td class="text-right {% if not value %}text-black-30{% endif %}">{{ value|hours }}</td>{% endfor %}
         <th class="text-right">{{ totals.target|hours }}</th>
