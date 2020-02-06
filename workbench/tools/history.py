@@ -376,7 +376,15 @@ HISTORY = {
         "related": [(Employment, "user_id"), (Absence, "user_id")],
     },
     Absence: {
-        "fields": {"user", "starts_on", "days", "description", "reason", "is_vacation"}
+        "fields": {
+            "user",
+            "starts_on",
+            "ends_on",
+            "days",
+            "description",
+            "reason",
+            "is_vacation",
+        }
     },
     CreditEntry: _credit_control_creditentry_cfg,
     ExpenseReport: {
