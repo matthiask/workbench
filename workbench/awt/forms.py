@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.awt.models import Absence
-from workbench.tools.forms import Form, ModelForm, Textarea, add_prefix
+from workbench.tools.forms import Form, ModelForm, Textarea, WarningsForm, add_prefix
 
 
 class AbsenceSearchForm(Form):
@@ -42,7 +42,7 @@ class AbsenceSearchForm(Form):
 
 
 @add_prefix("modal")
-class AbsenceForm(ModelForm):
+class AbsenceForm(ModelForm, WarningsForm):
     user_fields = default_to_current_user = ("user",)
 
     class Meta:
@@ -60,8 +60,19 @@ class AbsenceForm(ModelForm):
 
     def clean(self):
         data = super().clean()
-        if data.get("starts_on") and data["starts_on"].year < dt.date.today().year:
-            raise forms.ValidationError(
-                {"starts_on": _("Creating absences for past years is not allowed.")}
-            )
+        if data.get("starts_on"):
+            today = dt.date.today()
+            if data["starts_on"].year < today.year:
+                raise forms.ValidationError(
+                    {"starts_on": _("Creating absences for past years is not allowed.")}
+                )
+            elif (data["starts_on"] - today).days > 366:
+                self.add_warning(
+                    _(
+                        "Impressive planning skills or wrong date?"
+                        " Absence starts in more than one year."
+                    ),
+                    code="impressive-planning-skills",
+                )
+
         return data

@@ -8,6 +8,7 @@ from workbench import factories
 from workbench.awt.models import Absence, Employment
 from workbench.awt.reporting import active_users, annual_working_time
 from workbench.awt.utils import monthly_days
+from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
 
 
@@ -167,6 +168,40 @@ class AWTTest(TestCase):
         self.assertContains(
             response, "Creating absences for past years is not allowed."
         )
+
+    def test_planning_skills(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        response = self.client.post(
+            "/absences/create/",
+            {
+                "modal-user": user.pk,
+                "modal-starts_on": "2100-01-01",
+                "modal-days": 3,
+                "modal-description": "Sick",
+                "modal-reason": "sickness",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(
+            response,
+            "Impressive planning skills or wrong date?"
+            " Absence starts in more than one year.",
+        )
+
+        response = self.client.post(
+            "/absences/create/",
+            {
+                "modal-user": user.pk,
+                "modal-starts_on": "2100-01-01",
+                "modal-days": 3,
+                "modal-description": "Sick",
+                "modal-reason": "sickness",
+                WarningsForm.ignore_warnings_id: "impressive-planning-skills",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
 
     def test_employment_model(self):
         factories.UserFactory.create()  # Additional instance for active_users()

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-03 09:33+0100\n"
+"POT-Creation-Date: 2020-02-07 14:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -177,6 +177,14 @@ msgstr "Stunden eingeben"
 #: workbench/awt/forms.py
 msgid "Creating absences for past years is not allowed."
 msgstr "Abwesenheiten in vergangenen Jahren erstellen ist nicht erlaubt."
+
+#: workbench/awt/forms.py
+msgid ""
+"Impressive planning skills or wrong date? Absence starts in more than one "
+"year."
+msgstr ""
+"Beeindruckende Planungsfähigkeiten oder falsches Datum? Abwesenheit beginnt "
+"in mehr als einem Jahr."
 
 #: workbench/awt/models.py workbench/services/models.py
 msgid "position"
