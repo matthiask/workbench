@@ -200,8 +200,11 @@ class Absence(Model):
     def clean_fields(self, exclude):
         super().clean_fields(exclude)
         errors = {}
-        if self.starts_on and self.ends_on and self.ends_on < self.starts_on:
-            errors["ends_on"] = _("Absences cannot end before they began.")
+        if self.starts_on and self.ends_on:
+            if self.ends_on < self.starts_on:
+                errors["ends_on"] = _("Absences cannot end before they began.")
+            if self.starts_on.year != self.ends_on.year:
+                errors["ends_on"] = _("Start and end must be in the same year.")
         raise_if_errors(errors, exclude)
 
     @property

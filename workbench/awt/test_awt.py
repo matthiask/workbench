@@ -345,3 +345,9 @@ class AWTTest(TestCase):
         with self.assertRaises(ValidationError) as cm:
             Absence(**kw, ends_on=dt.date(2020, 1, 30)).full_clean()
         self.assertEqual(list(cm.exception), msg)
+
+        msg = [("ends_on", ["Start and end must be in the same year."])]
+
+        with self.assertRaises(ValidationError) as cm:
+            Absence(**kw, ends_on=dt.date(2022, 1, 30)).full_clean()
+        self.assertEqual(list(cm.exception), msg)

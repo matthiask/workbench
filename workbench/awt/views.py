@@ -82,7 +82,11 @@ def absence_calendar(request, form):
     cutoff = monday() - dt.timedelta(days=7)
     queryset = Absence.objects.annotate(
         _ends_on=Coalesce("ends_on", "starts_on")
-    ).filter(_ends_on__gte=cutoff, user__in=users)
+    ).filter(
+        starts_on__lte=cutoff + dt.timedelta(days=366),
+        _ends_on__gte=cutoff,
+        user__in=users,
+    )
 
     for absence in queryset:
         absences[absence.user_id].append(absence)

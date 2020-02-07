@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-07 14:52+0100\n"
+"POT-Creation-Date: 2020-02-07 15:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -371,6 +371,10 @@ msgstr "Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."
 #: workbench/awt/models.py
 msgid "Absences cannot end before they began."
 msgstr "Absenzen können nicht vor ihrem Beginn zu Ende gehen."
+
+#: workbench/awt/models.py
+msgid "Start and end must be in the same year."
+msgstr "Anfang und Ende müssen im gleichen Jahr liegen."
 
 #: workbench/awt/models.py
 #, python-format
