@@ -63,9 +63,10 @@ class AbsenceForm(ModelForm, WarningsForm):
         if data.get("starts_on"):
             today = dt.date.today()
             if data["starts_on"].year < today.year:
-                raise forms.ValidationError(
-                    {"starts_on": _("Creating absences for past years is not allowed.")}
+                self.add_error(
+                    "starts_on", _("Creating absences for past years is not allowed.")
                 )
+
             elif (data["starts_on"] - today).days > 366:
                 self.add_warning(
                     _(

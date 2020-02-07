@@ -309,9 +309,7 @@ class ServiceMoveForm(ModelForm):
     def clean(self):
         data = super().clean()
         if data.get("project") and data.get("project").closed_on:
-            raise forms.ValidationError(
-                {"project": _("This project is already closed.")}
-            )
+            self.add_error("project", _("This project is already closed."))
         return data
 
 
