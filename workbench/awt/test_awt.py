@@ -169,6 +169,14 @@ class AWTTest(TestCase):
             response, "Creating absences for past years is not allowed."
         )
 
+    def test_no_data_no_crash(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        response = self.client.post(
+            "/absences/create/", {}, HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 200)
+
     def test_planning_skills(self):
         user = factories.UserFactory.create()
         self.client.force_login(user)
