@@ -93,7 +93,6 @@ class Person(Model):
     salutation = models.CharField(
         _("complete salutation"),
         max_length=100,
-        blank=True,
         help_text=_("Dear John/Dear Ms Smith"),
     )
     date_of_birth = models.DateField(_("date of birth"), blank=True, null=True)

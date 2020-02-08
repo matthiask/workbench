@@ -36,11 +36,6 @@ class ContactsTest(TestCase):
     def test_update(self):
         person = factories.PersonFactory.create()
         self.client.force_login(person.primary_contact)
-        response = self.client.post(person.urls["update"], person_to_dict(person))
-        self.assertContains(
-            response, "No salutation set. This will make newsletters ugly."
-        )
-
         response = self.client.post(
             person.urls["update"], person_to_dict(person, salutation="Dear")
         )
