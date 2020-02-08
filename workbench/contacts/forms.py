@@ -165,7 +165,7 @@ class PersonForm(ModelForm):
 
     def clean(self):
         data = super().clean()
-        if len(data.get("salutation", "").split()) < 2:
+        if data.get("salutation") and len(data.get("salutation").split()) < 2:
             self.add_warning(
                 _("This does not look right. Please add a full salutation."),
                 code="short-salutation",
