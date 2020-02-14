@@ -81,7 +81,7 @@ def deploy_code():
 
 @task
 def pull_database(namespace):
-    remote = {"fh": "workbench", "dbpag": "dbpag-workbench", "bf": "bf-metronom"}[
+    remote = {"fh": "workbench", "dbpag": "dbpag-workbench", "bf": "bf-workbench"}[
         namespace
     ]
     local(
