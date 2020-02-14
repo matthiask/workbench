@@ -127,10 +127,13 @@ def annual_working_time(year, *, users):
         month_data = months[row["rendered_by"]]
         month_data["hours"][row["month"] - 1] += row["hours__sum"]
 
-    remaining = {
-        user: sum(month_data["available_vacation_days"])
-        for user, month_data in months.items()
-    }
+    remaining = defaultdict(
+        lambda: Z,
+        {
+            user: sum(month_data["available_vacation_days"])
+            for user, month_data in months.items()
+        },
+    )
     for absence in Absence.objects.filter(
         user__in=months.users_with_wtm, starts_on__year=year
     ).order_by("starts_on"):
