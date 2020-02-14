@@ -84,9 +84,11 @@ def pull_database(namespace):
     remote = {"fh": "workbench", "dbpag": "dbpag-workbench", "bf": "bf-workbench"}[
         namespace
     ]
+    local("dropdb --if-exists workbench")
+    local("createdb workbench")
     local(
         'ssh root@workbench.feinheit.ch "sudo -u postgres pg_dump -Fc %s"'
-        " | pg_restore -Oxc --if-exists -d workbench" % remote
+        " | pg_restore -Ox -d workbench" % remote
     )
 
 
