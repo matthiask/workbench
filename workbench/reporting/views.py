@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
 
-from workbench.accounts.models import User
+from workbench.accounts.models import Team, User
 from workbench.invoices.models import Invoice
 from workbench.invoices.utils import next_valid_day
 from workbench.logbook.models import LoggedCost
@@ -329,8 +329,11 @@ class DateRangeFilterForm(Form):
     date_until = forms.DateField(
         label=_("date until"), required=False, widget=DateInput()
     )
-    users = forms.ModelMultipleChoiceField(
-        User.objects.all(), label=_("users"), required=False
+    team = forms.ModelChoiceField(
+        Team.objects.all(),
+        empty_label=_("Everyone"),
+        label=Team._meta.verbose_name,
+        required=False,
     )
 
     def __init__(self, data, *args, **kwargs):
@@ -339,8 +342,13 @@ class DateRangeFilterForm(Form):
         data.setdefault("date_from", dt.date(today.year, 1, 1).isoformat())
         data.setdefault("date_until", dt.date(today.year, 12, 31).isoformat())
         super().__init__(data, *args, **kwargs)
-        self.fields["users"].choices = User.objects.choices(collapse_inactive=False)
-        self.fields["users"].widget.attrs = {"size": 10}
+
+    def users(self):
+        data = self.cleaned_data
+        queryset = User.objects.all()
+        if data.get("team"):
+            queryset = queryset.filter(teams=data.get("team"))
+        return queryset
 
 
 @filter_form(DateRangeFilterForm)
@@ -352,7 +360,7 @@ def green_hours_view(request, form):
             "form": form,
             "green_hours": green_hours.green_hours(
                 [form.cleaned_data["date_from"], form.cleaned_data["date_until"]],
-                users=form.cleaned_data["users"],
+                users=form.users(),
             ),
         },
     )

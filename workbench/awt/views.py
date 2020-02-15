@@ -65,7 +65,7 @@ class UserFilterForm(Form):
         Team.objects.all(), empty_label=_("Everyone"), label="", required=False
     )
 
-    def queryset(self):
+    def users(self):
         data = self.cleaned_data
         queryset = User.objects.active()
         if data.get("team"):
@@ -75,7 +75,7 @@ class UserFilterForm(Form):
 
 @filter_form(UserFilterForm)
 def absence_calendar(request, form):
-    users = form.queryset()
+    users = form.users()
 
     dates = {dt.date.today()}
     absences = defaultdict(list)

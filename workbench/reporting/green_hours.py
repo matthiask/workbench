@@ -91,7 +91,7 @@ WHERE service.hours / logged.hours < 1;
         maintenance[0] += maintenance[user.id]
         internal[0] += internal[user.id]
     ret[0] = data(0)
-    return sorted(ret.items())
+    return sorted((user, rec) for user, rec in ret.items() if rec["total"])
 
 
 def green_hours_by_month():
