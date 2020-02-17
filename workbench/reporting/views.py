@@ -4,6 +4,7 @@ from itertools import groupby
 from django import forms
 from django.db.models import Q
 from django.shortcuts import render
+from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import Team, User
@@ -306,6 +307,51 @@ class DateRangeFilterForm(Form):
         data.setdefault("date_from", (monday() - dt.timedelta(days=7)).isoformat())
         data.setdefault("date_until", (monday() + dt.timedelta(days=6)).isoformat())
         super().__init__(data, *args, **kwargs)
+
+        this_month = dt.date.today().replace(day=1)
+        last_month = (this_month - dt.timedelta(days=1)).replace(day=1)
+        next_month = (this_month + dt.timedelta(days=31)).replace(day=1)
+
+        self.fields["date_from"].help_text = format_html(
+            "{}: {}",
+            _("Set predefined period"),
+            format_html_join(
+                ", ",
+                '<a href="#" data-set-period="{}:{}">{}</a>',
+                [
+                    (
+                        (monday() + dt.timedelta(days=0)).isoformat(),
+                        (monday() + dt.timedelta(days=6)).isoformat(),
+                        _("this week"),
+                    ),
+                    (
+                        (monday() - dt.timedelta(days=7)).isoformat(),
+                        (monday() - dt.timedelta(days=1)).isoformat(),
+                        _("last week"),
+                    ),
+                    (
+                        this_month.isoformat(),
+                        (next_month - dt.timedelta(days=1)).isoformat(),
+                        _("this month"),
+                    ),
+                    (
+                        last_month.isoformat(),
+                        (this_month - dt.timedelta(days=1)).isoformat(),
+                        _("last month"),
+                    ),
+                    (
+                        dt.date(this_month.year, 1, 1).isoformat(),
+                        dt.date(this_month.year, 12, 31).isoformat(),
+                        _("this year"),
+                    ),
+                    (
+                        dt.date(this_month.year - 1, 1, 1).isoformat(),
+                        dt.date(this_month.year - 1, 12, 31).isoformat(),
+                        _("last year"),
+                    ),
+                ],
+            ),
+        )
 
     def users(self):
         data = self.cleaned_data

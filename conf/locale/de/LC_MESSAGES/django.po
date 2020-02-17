@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-07 15:14+0100\n"
+"POT-Creation-Date: 2020-02-17 20:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -106,7 +106,7 @@ msgstr "Arbeitszeitmodell"
 msgid "user"
 msgstr "Benutzer"
 
-#: workbench/accounts/models.py workbench/reporting/views.py
+#: workbench/accounts/models.py
 msgid "users"
 msgstr "Benutzer"
 
@@ -392,7 +392,7 @@ msgstr ""
 "Keine Jahresarbeitszeit definiert für Benutzer %(user)s mit "
 "Arbeitszeitmodell %(working_time_model)s."
 
-#: workbench/awt/views.py
+#: workbench/awt/views.py workbench/reporting/views.py
 msgid "Everyone"
 msgstr "Alle"
 
@@ -442,10 +442,6 @@ msgstr "Alle Gruppen"
 #: workbench/contacts/forms.py
 msgid "substitute with"
 msgstr "ersetzen durch"
-
-#: workbench/contacts/forms.py
-msgid "No salutation set. This will make newsletters ugly."
-msgstr "Keine Begrüssung gesetzt. Das macht Newsletter hässlich."
 
 #: workbench/contacts/forms.py
 msgid "This does not look right. Please add a full salutation."
@@ -1750,6 +1746,34 @@ msgstr "Intern"
 msgid "Closed during the last year"
 msgstr "Geschlossen während dem letzten Jahr"
 
+#: workbench/reporting/views.py
+msgid "Set predefined period"
+msgstr "Vordefinierte Periode setzen"
+
+#: workbench/reporting/views.py workbench/templates/start.html
+msgid "this week"
+msgstr "diese Woche"
+
+#: workbench/reporting/views.py
+msgid "last week"
+msgstr "letzte Woche"
+
+#: workbench/reporting/views.py
+msgid "this month"
+msgstr "diesen Monat"
+
+#: workbench/reporting/views.py
+msgid "last month"
+msgstr "letzten Monat"
+
+#: workbench/reporting/views.py
+msgid "this year"
+msgstr "dieses Jahr"
+
+#: workbench/reporting/views.py
+msgid "last year"
+msgstr "letztes Jahr"
+
 #: workbench/services/models.py
 msgid "service type"
 msgstr "Leistungstyp"
@@ -2375,10 +2399,6 @@ msgid "today"
 msgstr "heute"
 
 #: workbench/templates/start.html
-msgid "this week"
-msgstr "diese Woche"
-
-#: workbench/templates/start.html
 msgid "no hours today"
 msgstr "keine Stunden heute"
 
@@ -2524,3 +2544,6 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "No salutation set. This will make newsletters ugly."
+#~ msgstr "Keine Begrüssung gesetzt. Das macht Newsletter hässlich."
