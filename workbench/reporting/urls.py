@@ -70,7 +70,7 @@ urlpatterns = [
     url(
         r"^green-hours/$",
         controlling_only(hours_filter_view),
-        {"template_name": "reporting/green_hours.html", "stats": green_hours},
+        {"template_name": "reporting/green_hours.html", "stats_fn": green_hours},
         name="report_green_hours",
     ),
     url(
