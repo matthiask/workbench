@@ -230,41 +230,6 @@ def key_data_view(request):
     )
 
 
-class HoursFilterForm(Form):
-    date_from = forms.DateField(
-        label=_("date from"), required=False, widget=DateInput()
-    )
-    date_until = forms.DateField(
-        label=_("date until"), required=False, widget=DateInput()
-    )
-    users = forms.ModelMultipleChoiceField(
-        User.objects.all(), label=_("users"), required=False
-    )
-
-    def __init__(self, data, *args, **kwargs):
-        data = data.copy()
-        data.setdefault("date_from", monday().isoformat())
-        data.setdefault("date_until", (monday() + dt.timedelta(days=6)).isoformat())
-        super().__init__(data, *args, **kwargs)
-        self.fields["users"].choices = User.objects.choices(collapse_inactive=False)
-        self.fields["users"].widget.attrs = {"size": 10}
-
-
-@filter_form(HoursFilterForm)
-def hours_filter_view(request, form, *, template_name, stats_fn):
-    return render(
-        request,
-        template_name,
-        {
-            "form": form,
-            "stats": stats_fn(
-                [form.cleaned_data["date_from"], form.cleaned_data["date_until"]],
-                users=form.cleaned_data["users"],
-            ),
-        },
-    )
-
-
 class ProjectBudgetStatisticsForm(Form):
     owned_by = forms.TypedChoiceField(label="", coerce=int, required=False)
     cutoff_date = forms.DateField(widget=DateInput, label="")
@@ -337,10 +302,9 @@ class DateRangeFilterForm(Form):
     )
 
     def __init__(self, data, *args, **kwargs):
-        today = dt.date.today()
         data = data.copy()
-        data.setdefault("date_from", dt.date(today.year, 1, 1).isoformat())
-        data.setdefault("date_until", dt.date(today.year, 12, 31).isoformat())
+        data.setdefault("date_from", (monday() - dt.timedelta(days=7)).isoformat())
+        data.setdefault("date_until", (monday() + dt.timedelta(days=6)).isoformat())
         super().__init__(data, *args, **kwargs)
 
     def users(self):
@@ -352,13 +316,13 @@ class DateRangeFilterForm(Form):
 
 
 @filter_form(DateRangeFilterForm)
-def green_hours_view(request, form):
+def hours_filter_view(request, form, *, template_name, stats_fn):
     return render(
         request,
-        "reporting/green_hours.html",
+        template_name,
         {
             "form": form,
-            "green_hours": green_hours.green_hours(
+            "stats": stats_fn(
                 [form.cleaned_data["date_from"], form.cleaned_data["date_until"]],
                 users=form.users(),
             ),

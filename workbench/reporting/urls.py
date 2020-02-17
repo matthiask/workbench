@@ -9,8 +9,8 @@ from workbench.accounts.features import (
 from workbench.awt.views import absence_calendar, annual_working_time_view
 from workbench.circles.reporting import hours_by_circle
 from workbench.projects.reporting import hours_per_customer
+from workbench.reporting.green_hours import green_hours
 from workbench.reporting.views import (
-    green_hours_view,
     hours_filter_view,
     key_data_gross_profit,
     key_data_third_party_costs,
@@ -68,7 +68,10 @@ urlpatterns = [
         name="report_project_budget_statistics",
     ),
     url(
-        r"^green-hours/$", controlling_only(green_hours_view), name="report_green_hours"
+        r"^green-hours/$",
+        controlling_only(hours_filter_view),
+        {"template_name": "reporting/green_hours.html", "stats": green_hours},
+        name="report_green_hours",
     ),
     url(
         r"^labor-costs/$", labor_costs_only(labor_costs_view), name="report_labor_costs"
