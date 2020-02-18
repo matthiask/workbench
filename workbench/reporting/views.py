@@ -19,6 +19,7 @@ from workbench.reporting import (
     labor_costs,
     project_budget_statistics,
 )
+from workbench.reporting.utils import date_ranges
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import DateInput, Form
 from workbench.tools.models import ONE, Z
@@ -308,62 +309,11 @@ class DateRangeFilterForm(Form):
         data.setdefault("date_until", (monday() + dt.timedelta(days=6)).isoformat())
         super().__init__(data, *args, **kwargs)
 
-        this_month = dt.date.today().replace(day=1)
-        last_month = (this_month - dt.timedelta(days=1)).replace(day=1)
-        next_month = (this_month + dt.timedelta(days=31)).replace(day=1)
-
-        this_quarter = dt.date(this_month.year, 1 + (this_month.month - 1) // 3 * 3, 1)
-        last_quarter = (this_quarter - dt.timedelta(days=75)).replace(day=1)
-        next_quarter = (this_quarter + dt.timedelta(days=105)).replace(day=1)
-
         self.fields["date_from"].help_text = format_html(
             "{}: {}",
             _("Set predefined period"),
             format_html_join(
-                ", ",
-                '<a href="#" data-set-period="{}:{}">{}</a>',
-                [
-                    (
-                        (monday() + dt.timedelta(days=0)).isoformat(),
-                        (monday() + dt.timedelta(days=6)).isoformat(),
-                        _("this week"),
-                    ),
-                    (
-                        (monday() - dt.timedelta(days=7)).isoformat(),
-                        (monday() - dt.timedelta(days=1)).isoformat(),
-                        _("last week"),
-                    ),
-                    (
-                        this_month.isoformat(),
-                        (next_month - dt.timedelta(days=1)).isoformat(),
-                        _("this month"),
-                    ),
-                    (
-                        last_month.isoformat(),
-                        (this_month - dt.timedelta(days=1)).isoformat(),
-                        _("last month"),
-                    ),
-                    (
-                        this_quarter.isoformat(),
-                        (next_quarter - dt.timedelta(days=1)).isoformat(),
-                        _("this quarter"),
-                    ),
-                    (
-                        last_quarter.isoformat(),
-                        (this_quarter - dt.timedelta(days=1)).isoformat(),
-                        _("last quarter"),
-                    ),
-                    (
-                        dt.date(this_month.year, 1, 1).isoformat(),
-                        dt.date(this_month.year, 12, 31).isoformat(),
-                        _("this year"),
-                    ),
-                    (
-                        dt.date(this_month.year - 1, 1, 1).isoformat(),
-                        dt.date(this_month.year - 1, 12, 31).isoformat(),
-                        _("last year"),
-                    ),
-                ],
+                ", ", '<a href="#" data-set-period="{}:{}">{}</a>', date_ranges()
             ),
         )
 
