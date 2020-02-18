@@ -34,6 +34,7 @@ class CirclesTest(TestCase):
         r1 = Role.objects.create(name="Role 1", circle=Circle.objects.create(name="C1"))
         r2 = Role.objects.create(name="Role 2", circle=Circle.objects.create(name="C2"))
         Role.objects.create(name="Role 3", circle=r2.circle)
+        Role.objects.create(name="Role 4", circle=Circle.objects.create(name="C4"))
 
         s1 = factories.ServiceFactory.create(role=r1)
         s2 = factories.ServiceFactory.create(role=r2)
@@ -60,9 +61,13 @@ class CirclesTest(TestCase):
             "/report/hours-by-circle/?users={}".format(s1.project.owned_by.id)
         )
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "C1")
+        self.assertContains(response, "C2")
         self.assertContains(response, "Role 1")
         self.assertContains(response, "Role 2")
         self.assertNotContains(response, "Role 3")
+        self.assertNotContains(response, "Role 4")
+        self.assertNotContains(response, "C4")
 
     def test_role_warning(self):
         project = factories.ProjectFactory.create()
