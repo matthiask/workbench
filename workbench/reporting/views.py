@@ -312,6 +312,10 @@ class DateRangeFilterForm(Form):
         last_month = (this_month - dt.timedelta(days=1)).replace(day=1)
         next_month = (this_month + dt.timedelta(days=31)).replace(day=1)
 
+        this_quarter = dt.date(this_month.year, 1 + (this_month.month - 1) // 3 * 3, 1)
+        last_quarter = (this_quarter - dt.timedelta(days=75)).replace(day=1)
+        next_quarter = (this_quarter + dt.timedelta(days=105)).replace(day=1)
+
         self.fields["date_from"].help_text = format_html(
             "{}: {}",
             _("Set predefined period"),
@@ -338,6 +342,16 @@ class DateRangeFilterForm(Form):
                         last_month.isoformat(),
                         (this_month - dt.timedelta(days=1)).isoformat(),
                         _("last month"),
+                    ),
+                    (
+                        this_quarter.isoformat(),
+                        (next_quarter - dt.timedelta(days=1)).isoformat(),
+                        _("this quarter"),
+                    ),
+                    (
+                        last_quarter.isoformat(),
+                        (this_quarter - dt.timedelta(days=1)).isoformat(),
+                        _("last quarter"),
                     ),
                     (
                         dt.date(this_month.year, 1, 1).isoformat(),
