@@ -205,6 +205,10 @@ class StatisticsTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/report/green-hours/")
         self.assertEqual(response.status_code, 200)
+        response = self.client.get(
+            "/report/green-hours/?team={}".format(factories.TeamFactory.create().pk)
+        )
+        self.assertEqual(response.status_code, 200)
 
         gh = green_hours.green_hours([dt.date(2019, 1, 1), dt.date(2019, 3, 31)])
         overall = gh[-1]
