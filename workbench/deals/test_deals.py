@@ -58,9 +58,8 @@ class DealsTest(TestCase):
         )
 
         response = self.client.post(
-            deal.urls["set_status"],
+            deal.urls["set_status"] + "?status={}".format(factories.Deal.DECLINED),
             {
-                "status": factories.Deal.DECLINED,
                 "closing_type": factories.ClosingTypeFactory.create(
                     represents_a_win=False
                 ).pk,
@@ -76,7 +75,7 @@ class DealsTest(TestCase):
         )
 
         response = self.client.post(
-            deal.urls["set_status"], {"status": factories.Deal.OPEN},
+            deal.urls["set_status"] + "?status={}".format(factories.Deal.OPEN),
         )
         self.assertRedirects(response, deal.urls["detail"])
 
