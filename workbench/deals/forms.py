@@ -100,10 +100,11 @@ class DealForm(ModelForm):
                 label=vt.title, required=False, initial=values.get(vt.id)
             )
 
-        if self.instance.id:
-            attributes = {a.group_id: a.id for a in self.instance.attributes.all()}
-        else:
-            attributes = {}
+        attributes = (
+            {a.group_id: a.id for a in self.instance.attributes.all()}
+            if self.instance.id
+            else {}
+        )
         for group in AttributeGroup.objects.active():
             key = "attribute_{}".format(group.id)
             self.fields[key] = forms.ModelChoiceField(
