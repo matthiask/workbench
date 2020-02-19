@@ -146,3 +146,20 @@ class DealsTest(TestCase):
         deal = Deal.objects.get()
         self.assertEqual(deal.value, 200)
         self.assertEqual(deal.values.count(), 1)
+
+    def test_set_status(self):
+        deal = factories.DealFactory.create()
+        self.client.force_login(deal.owned_by)
+
+        response = self.client.get(deal.urls["set_status"] + "?status=10")
+        self.assertNotContains(response, "closing_type")
+        self.assertNotContains(response, "closing_notice")
+
+        response = self.client.get(deal.urls["set_status"] + "?status=20")
+        self.assertContains(response, "Award of contract")
+
+        response = self.client.get(deal.urls["set_status"] + "?status=30")
+        self.assertContains(response, "Reason for losing")
+
+        response = self.client.get(deal.urls["set_status"] + "?status=40")
+        self.assertEqual(response.status_code, 404)

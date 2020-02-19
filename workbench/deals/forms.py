@@ -1,6 +1,7 @@
 import datetime as dt
 
 from django import forms
+from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -177,6 +178,9 @@ class SetStatusForm(ModelForm):
             ].queryset.filter(represents_a_win=False)
             self.fields["status"].disabled = True
 
+        else:
+            raise Http404
+
     def clean(self):
         data = super().clean()
         if data["status"] != Deal.OPEN and not data.get("closing_type"):
@@ -197,6 +201,8 @@ class SetStatusForm(ModelForm):
             and not instance.closed_on
         ):
             instance.closed_on = dt.date.today()
+        else:
+            raise Http404
 
         instance.save()
         return instance
