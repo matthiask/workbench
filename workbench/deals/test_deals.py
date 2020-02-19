@@ -4,6 +4,8 @@ from django.db.models import ProtectedError
 from django.test import TestCase
 from django.utils.translation import deactivate_all
 
+from freezegun import freeze_time
+
 from workbench import factories
 from workbench.deals.models import Deal
 from workbench.tools.formats import local_date_format
@@ -163,3 +165,10 @@ class DealsTest(TestCase):
 
         response = self.client.get(deal.urls["set_status"] + "?status=40")
         self.assertEqual(response.status_code, 404)
+
+    @freeze_time("2020-02-18")
+    def test_badge(self):
+        self.assertEqual(
+            factories.DealFactory.create().status_badge,
+            '<span class="badge badge-info">Open since 18.02.2020</span>',
+        )
