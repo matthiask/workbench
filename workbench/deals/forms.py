@@ -156,9 +156,9 @@ class SetStatusForm(ModelForm):
         instance = kwargs["instance"]
         instance.status = int(kwargs["request"].GET.get("status", instance.status))
         super().__init__(*args, **kwargs)
+        self.fields["status"].disabled = True
 
         if instance.status == Deal.OPEN:
-            self.fields["status"].disabled = True
             self.fields.pop("closing_type")
             self.fields.pop("closing_notice")
 
@@ -168,7 +168,6 @@ class SetStatusForm(ModelForm):
             self.fields["closing_type"].queryset = self.fields[
                 "closing_type"
             ].queryset.filter(represents_a_win=True)
-            self.fields["status"].disabled = True
 
         elif instance.status == Deal.DECLINED:
             self.fields["closing_type"].empty_label = None
@@ -176,7 +175,6 @@ class SetStatusForm(ModelForm):
             self.fields["closing_type"].queryset = self.fields[
                 "closing_type"
             ].queryset.filter(represents_a_win=False)
-            self.fields["status"].disabled = True
 
         else:
             raise Http404
@@ -196,13 +194,10 @@ class SetStatusForm(ModelForm):
             instance.closed_on = None
             instance.closing_type = None
             instance.closing_notice = ""
-        elif (
-            instance.status in {instance.ACCEPTED, instance.DECLINED}
-            and not instance.closed_on
-        ):
-            instance.closed_on = dt.date.today()
-        else:
-            raise Http404
+        elif instance.status in {instance.ACCEPTED, instance.DECLINED}:
+            instance.closed_on = instance.closed_on or dt.date.today()
+        else:  # pragma: no cover
+            raise Exception("Shouldn't hit this branch, ever.")
 
         instance.save()
         return instance
