@@ -142,7 +142,15 @@ class Deal(Model):
         verbose_name_plural = _("deals")
 
     def __str__(self):
-        return self.title
+        return "%s %s" % (self.title, self.owned_by.get_short_name())
+
+    def __html__(self):
+        return format_html(
+            "<small>{}</small> {} - {}",
+            self.code,
+            self.title,
+            self.owned_by.get_short_name(),
+        )
 
     def save(self, *args, **kwargs):
         self.value = sum((v.value for v in self.values.all()), Z)
@@ -164,7 +172,7 @@ class Deal(Model):
 
     @property
     def status_badge(self):
-        css = {self.OPEN: "info", self.ACCEPTED: "default", self.DECLINED: "danger"}[
+        css = {self.OPEN: "info", self.ACCEPTED: "success", self.DECLINED: "danger"}[
             self.status
         ]
 
