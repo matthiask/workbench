@@ -304,12 +304,12 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="attribute",
-            name="attribute",
+            name="group",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="values",
                 to="deals.AttributeGroup",
-                verbose_name="attribute",
+                verbose_name="attribute group",
             ),
         ),
         migrations.CreateModel(

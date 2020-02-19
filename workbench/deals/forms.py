@@ -100,6 +100,10 @@ class DealForm(ModelForm):
                 label=vt.title, required=False, initial=values.get(vt.id)
             )
 
+        if self.instance.id:
+            attributes = {a.group_id: a.id for a in self.instance.attributes.all()}
+        else:
+            attributes = {}
         for group in AttributeGroup.objects.active():
             key = "attribute_{}".format(group.id)
             self.fields[key] = forms.ModelChoiceField(
@@ -107,6 +111,7 @@ class DealForm(ModelForm):
                 required=group.is_required,
                 label=group.title,
                 widget=forms.RadioSelect,
+                initial=attributes.get(group.id),
             )
 
     def save(self, **kwargs):
@@ -123,6 +128,15 @@ class DealForm(ModelForm):
                 types.add(vt.id)
 
         instance.values.exclude(type__in=types).delete()
+
+        attributes = []
+        for group in AttributeGroup.objects.active():
+            key = "attribute_{}".format(group.id)
+
+            if self.cleaned_data.get(key) is not None:
+                attributes.append(self.cleaned_data.get(key))
+
+        instance.attributes.set(attributes)
 
         if instance.status in {instance.OPEN} and instance.closed_on:
             instance.closed_on = None

@@ -36,7 +36,7 @@ class ValueTypeAdmin(OrderableAdmin, admin.ModelAdmin):
 class AttributeInline(OrderableAdmin, admin.TabularInline):
     model = models.Attribute
     extra = 0
-    fk_name = "attribute"
+    fk_name = "group"
     ordering_field = "position"
 
 

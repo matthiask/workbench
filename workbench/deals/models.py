@@ -46,11 +46,11 @@ class AttributeGroup(models.Model):
 
 
 class Attribute(models.Model):
-    attribute = models.ForeignKey(
+    group = models.ForeignKey(
         AttributeGroup,
         on_delete=models.CASCADE,
         related_name="values",
-        verbose_name=_("attribute"),
+        verbose_name=_("attribute group"),
     )
     title = models.CharField(_("title"), max_length=200)
     position = models.PositiveIntegerField(_("position"), default=0)
