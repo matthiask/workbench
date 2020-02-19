@@ -149,6 +149,13 @@ class DealsTest(TestCase):
         self.assertEqual(deal.value, 200)
         self.assertEqual(deal.values.count(), 1)
 
+        da = deal.dealattribute_set.get()
+        self.assertEqual(da.attribute, attribute1_1)
+        self.assertEqual(
+            str(da),
+            "Some deal {} - A1.1".format(person.primary_contact.get_short_name()),
+        )
+
     def test_set_status(self):
         deal = factories.DealFactory.create()
         self.client.force_login(deal.owned_by)
