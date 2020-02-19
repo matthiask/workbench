@@ -14,6 +14,22 @@
       <td>{% link_or_none value %}</td>
     </tr>
     {% endfor %}
+    <tr>
+      <th class="text-right">{% trans 'values' %}</th>
+      <td>
+        {% for value in object.values.all %}
+          {{ value.type }}: {{ value }}<br>
+        {% endfor %}
+      </td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'attributes' %}</th>
+      <td>
+        {% for attribute in object.attributes.all %}
+        {{ attribute.group }}: {{ attribute }}<br>
+        {% endfor %}
+      </td>
+    </tr>
   </table>
 
   <a href="{{ object.urls.update }}" class="btn btn-primary">
