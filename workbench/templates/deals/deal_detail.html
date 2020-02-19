@@ -1,0 +1,35 @@
+{% extends "generic/object_detail.html" %}
+
+{% load i18n workbench %}
+
+{% block content %}
+<div class="row">
+<div class="col-md-6 offset-md-3">
+  <h1>{{ object|h }} {% history_link object %}</h1>
+
+  <table class="table table-striped">
+    {% for name, value in object|field_value_pairs %}
+    <tr>
+      <th class="text-right">{{ name }}</th>
+      <td>{% link_or_none value %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <a href="{{ object.urls.update }}" class="btn btn-primary">
+    {% trans 'Update' %}
+  </a>
+
+  <a href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}" class="btn btn-success">
+    {% trans 'accepted'|capfirst %}
+  </a>
+  <a href="{{ object.urls.set_status }}?status={{ object.DECLINED }}" class="btn btn-danger">
+    {% trans 'declined'|capfirst %}
+  </a>
+
+  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
+    {% trans 'Delete' %}
+  </a>
+</div>
+</div>
+{% endblock %}

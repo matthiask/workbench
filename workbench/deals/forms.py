@@ -79,13 +79,11 @@ class DealForm(ModelForm):
             "description",
             "stage",
             "owned_by",
-            "status",
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
             "contact": Autocomplete(model=Person),
             "description": Textarea,
-            "status": forms.RadioSelect,
         }
 
     def __init__(self, *args, **kwargs):
@@ -148,4 +146,55 @@ class DealForm(ModelForm):
             instance.closed_on = dt.date.today()
 
         instance.save()
+        return instance
+
+
+class SetStatusForm(ModelForm):
+    class Meta:
+        model = Deal
+        fields = ["status", "closing_type", "closing_notice"]
+        widgets = {
+            "status": forms.RadioSelect,
+            "closing_type": forms.RadioSelect,
+            "closing_notice": Textarea,
+        }
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs["instance"]
+        instance.status = int(kwargs["request"].GET.get("status", instance.status))
+        super().__init__(*args, **kwargs)
+
+        if instance.status == Deal.ACCEPTED:
+            self.fields["closing_type"].empty_label = None
+            self.fields["closing_type"].label = _("Award of contract")
+            self.fields["closing_type"].queryset = self.fields[
+                "closing_type"
+            ].queryset.filter(represents_a_win=True)
+        elif instance.status == Deal.DECLINED:
+            self.fields["closing_type"].empty_label = None
+            self.fields["closing_type"].label = _("Reason for losing")
+            self.fields["closing_type"].queryset = self.fields[
+                "closing_type"
+            ].queryset.filter(represents_a_win=False)
+
+    def clean(self):
+        data = super().clean()
+        if data["status"] != Deal.OPEN and not data.get("closing_type"):
+            self.add_error(
+                "closing_type", _("This field is required when closing a deal.")
+            )
+        return data
+
+    def save(self, *args, **kwargs):
+        instance = super().save(*args, **kwargs)
+
+        if instance.status in {instance.OPEN}:
+            instance.closed_on = None
+            instance.closing_type = None
+        elif (
+            instance.status in {instance.ACCEPTED, instance.DECLINED}
+            and not instance.closed_on
+        ):
+            instance.closed_on = dt.date.today()
+
         return instance

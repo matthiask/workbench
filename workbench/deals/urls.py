@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from workbench import generic
-from workbench.deals.forms import DealForm, DealSearchForm
+from workbench.deals.forms import DealForm, DealSearchForm, SetStatusForm
 from workbench.deals.models import Deal
 
 
@@ -25,6 +25,11 @@ urlpatterns = [
         r"^(?P<pk>\d+)/update/$",
         generic.UpdateView.as_view(form_class=DealForm, model=Deal),
         name="deals_deal_update",
+    ),
+    url(
+        r"^(?P<pk>\d+)/set-status/$",
+        generic.UpdateView.as_view(form_class=SetStatusForm, model=Deal),
+        name="deals_deal_set_status",
     ),
     url(
         r"^(?P<pk>\d+)/delete/$",
