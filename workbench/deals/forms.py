@@ -186,7 +186,7 @@ class SetStatusForm(ModelForm):
         return data
 
     def save(self, *args, **kwargs):
-        instance = super().save(*args, **kwargs)
+        instance = super().save(commit=False)
 
         if instance.status in {instance.OPEN}:
             instance.closed_on = None
@@ -197,4 +197,5 @@ class SetStatusForm(ModelForm):
         ):
             instance.closed_on = dt.date.today()
 
+        instance.save()
         return instance

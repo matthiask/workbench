@@ -47,8 +47,6 @@ class DealsTest(TestCase):
                 "title": "Some deal",
                 "stage": factories.StageFactory.create().pk,
                 "owned_by": person.primary_contact_id,
-                "estimated_value": 5000,
-                "status": factories.Deal.OPEN,
             },
         )
         self.assertEqual(response.status_code, 302)
@@ -60,15 +58,12 @@ class DealsTest(TestCase):
         )
 
         response = self.client.post(
-            deal.urls["update"],
+            deal.urls["set_status"],
             {
-                "customer": person.organization.id,
-                "contact": person.id,
-                "title": "Some deal",
-                "stage": factories.StageFactory.create().pk,
-                "owned_by": person.primary_contact_id,
-                "estimated_value": 5000,
                 "status": factories.Deal.DECLINED,
+                "closing_type": factories.ClosingTypeFactory.create(
+                    represents_a_win=False
+                ).pk,
             },
         )
         self.assertRedirects(response, deal.urls["detail"])
@@ -81,16 +76,7 @@ class DealsTest(TestCase):
         )
 
         response = self.client.post(
-            deal.urls["update"],
-            {
-                "customer": person.organization.id,
-                "contact": person.id,
-                "title": "Some deal",
-                "stage": factories.StageFactory.create().pk,
-                "owned_by": person.primary_contact_id,
-                "estimated_value": 5000,
-                "status": factories.Deal.OPEN,
-            },
+            deal.urls["set_status"], {"status": factories.Deal.OPEN},
         )
         self.assertRedirects(response, deal.urls["detail"])
 
