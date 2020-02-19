@@ -51,7 +51,7 @@ class Sector(models.Model):
 
 class ClosingType(models.Model):
     title = models.CharField(_("title"), max_length=200)
-    is_won = models.BooleanField(_("is won"), default=False)
+    represents_a_win = models.BooleanField(_("represents a win"), default=False)
     position = models.PositiveIntegerField(_("position"), default=0)
 
     class Meta:
@@ -101,7 +101,6 @@ class Deal(Model):
     )
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
-    closed_on = models.DateField(_("closed on"), blank=True, null=True)
 
     source = models.ForeignKey(
         Source, on_delete=models.PROTECT, verbose_name=_("source")
@@ -109,6 +108,8 @@ class Deal(Model):
     sector = models.ForeignKey(
         Sector, on_delete=models.PROTECT, verbose_name=_("sector")
     )
+
+    closed_on = models.DateField(_("closed on"), blank=True, null=True)
     closing_type = models.ForeignKey(
         ClosingType,
         on_delete=models.PROTECT,
@@ -116,6 +117,7 @@ class Deal(Model):
         null=True,
         verbose_name=_("closing type"),
     )
+    closing_notice = models.TextField(_("closing notice"), blank=True)
 
     _fts = models.TextField(editable=False, blank=True)
 

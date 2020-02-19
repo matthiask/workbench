@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
@@ -114,5 +116,14 @@ class DealForm(ModelForm):
                 types.add(vt.id)
 
         instance.values.exclude(type__in=types).delete()
+
+        if instance.status in {instance.OPEN} and instance.closed_on:
+            instance.closed_on = None
+        elif (
+            instance.status in {instance.ACCEPTED, instance.DECLINED}
+            and not instance.closed_on
+        ):
+            instance.closed_on = dt.date.today()
+
         instance.save()
         return instance

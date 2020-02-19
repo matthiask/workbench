@@ -20,6 +20,8 @@ class DealsTest(TestCase):
 
     def test_detail(self):
         deal = factories.DealFactory.create()
+        deal.values.create(type=factories.ValueTypeFactory.create(), value=42)
+        deal.save()
 
         self.client.force_login(deal.owned_by)
         response = self.client.get(deal.urls["detail"])
@@ -42,6 +44,8 @@ class DealsTest(TestCase):
                 "owned_by": person.primary_contact_id,
                 "estimated_value": 5000,
                 "status": factories.Deal.OPEN,
+                "source": factories.SourceFactory.create().pk,
+                "sector": factories.SectorFactory.create().pk,
             },
         )
         self.assertEqual(response.status_code, 302)
@@ -62,8 +66,11 @@ class DealsTest(TestCase):
                 "owned_by": person.primary_contact_id,
                 "estimated_value": 5000,
                 "status": factories.Deal.DECLINED,
+                "source": deal.source_id,
+                "sector": deal.sector_id,
             },
         )
+        self.assertRedirects(response, deal.urls["detail"])
 
         deal.refresh_from_db()
         self.assertEqual(deal.closed_on, dt.date.today())
@@ -82,8 +89,11 @@ class DealsTest(TestCase):
                 "owned_by": person.primary_contact_id,
                 "estimated_value": 5000,
                 "status": factories.Deal.OPEN,
+                "source": deal.source_id,
+                "sector": deal.sector_id,
             },
         )
+        self.assertRedirects(response, deal.urls["detail"])
 
         deal.refresh_from_db()
         self.assertIsNone(deal.closed_on)

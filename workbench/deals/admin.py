@@ -49,6 +49,6 @@ class SectorAdmin(OrderableAdmin, admin.ModelAdmin):
 
 @admin.register(models.ClosingType)
 class ClosingType(OrderableAdmin, admin.ModelAdmin):
-    list_display = ["title", "is_won", "position"]
+    list_display = ["title", "represents_a_win", "position"]
     list_editable = ["position"]
     ordering_field = "position"

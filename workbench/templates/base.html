@@ -26,6 +26,7 @@
         {% mark_current request.path %}
         <li class="nav-item"><a class="nav-link" href="{% url 'projects_project_list' %}">{% trans 'projects'|capfirst %}</a></li>
         {% if request.user|has:FEATURES.CONTROLLING %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'deals_deal_list' %}">{% trans 'deals'|capfirst %}</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'offers_offer_list' %}">{% trans 'offers'|capfirst %}</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'invoices_invoice_list' %}">{% trans 'invoices'|capfirst %}</a></li>
         {% endif %}
