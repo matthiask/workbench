@@ -172,3 +172,9 @@ class DealsTest(TestCase):
             factories.DealFactory.create().status_badge,
             '<span class="badge badge-info">Open since 18.02.2020</span>',
         )
+        self.assertEqual(
+            factories.DealFactory.create(
+                status=Deal.ACCEPTED, closed_on=dt.date.today()
+            ).pretty_status,
+            "accepted on 18.02.2020",
+        )
