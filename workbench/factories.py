@@ -9,7 +9,7 @@ from workbench.accounts.models import Team, User
 from workbench.awt.models import Absence, Employment, WorkingTimeModel, Year
 from workbench.contacts.models import Organization, Person, PostalAddress
 from workbench.credit_control.models import CreditEntry, Ledger
-from workbench.deals.models import ClosingType, Deal, Sector, Source, Stage, ValueType
+from workbench.deals.models import AttributeGroup, ClosingType, Deal, Stage, ValueType
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
@@ -249,14 +249,9 @@ class ValueTypeFactory(factory.DjangoModelFactory):
         model = ValueType
 
 
-class SourceFactory(factory.DjangoModelFactory):
+class AttributeGroupFactory(factory.DjangoModelFactory):
     class Meta:
-        model = Source
-
-
-class SectorFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Sector
+        model = AttributeGroup
 
 
 class ClosingTypeFactory(factory.DjangoModelFactory):
@@ -271,8 +266,6 @@ class DealFactory(factory.DjangoModelFactory):
     )
     owned_by = factory.SubFactory(UserFactory)
     stage = factory.SubFactory(StageFactory)
-    source = factory.SubFactory(SourceFactory)
-    sector = factory.SubFactory(SectorFactory)
 
     class Meta:
         model = Deal

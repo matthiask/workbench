@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
-from workbench.deals.models import Deal, Stage, Value, ValueType
+from workbench.deals.models import AttributeGroup, Deal, Stage, Value, ValueType
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
 
 
@@ -80,8 +80,6 @@ class DealForm(ModelForm):
             "stage",
             "owned_by",
             "status",
-            "sector",
-            "source",
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
@@ -100,6 +98,15 @@ class DealForm(ModelForm):
 
             self.fields[key] = field.formfield(
                 label=vt.title, required=False, initial=values.get(vt.id)
+            )
+
+        for group in AttributeGroup.objects.active():
+            key = "attribute_{}".format(group.id)
+            self.fields[key] = forms.ModelChoiceField(
+                queryset=group.values.active(),
+                required=group.is_required,
+                label=group.title,
+                widget=forms.RadioSelect,
             )
 
     def save(self, **kwargs):

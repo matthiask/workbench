@@ -23,27 +23,45 @@ class Stage(Model):
         return self.title
 
 
-class Source(models.Model):
+class NotArchivedQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_archived=False)
+
+
+class AttributeGroup(models.Model):
     title = models.CharField(_("title"), max_length=200)
     position = models.PositiveIntegerField(_("position"), default=0)
+    is_archived = models.BooleanField(_("is archived"), default=False)
+    is_required = models.BooleanField(_("is required"), default=True)
+
+    objects = NotArchivedQuerySet.as_manager()
 
     class Meta:
         ordering = ("position", "id")
-        verbose_name = _("source")
-        verbose_name_plural = _("sources")
+        verbose_name = _("attribute group")
+        verbose_name_plural = _("attribute groups")
 
     def __str__(self):
         return self.title
 
 
-class Sector(models.Model):
+class Attribute(models.Model):
+    attribute = models.ForeignKey(
+        AttributeGroup,
+        on_delete=models.CASCADE,
+        related_name="values",
+        verbose_name=_("attribute"),
+    )
     title = models.CharField(_("title"), max_length=200)
     position = models.PositiveIntegerField(_("position"), default=0)
+    is_archived = models.BooleanField(_("is archived"), default=False)
+
+    objects = NotArchivedQuerySet.as_manager()
 
     class Meta:
         ordering = ("position", "id")
-        verbose_name = _("sector")
-        verbose_name_plural = _("sector")
+        verbose_name = _("attribute")
+        verbose_name_plural = _("attributes")
 
     def __str__(self):
         return self.title
@@ -102,11 +120,8 @@ class Deal(Model):
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
 
-    source = models.ForeignKey(
-        Source, on_delete=models.PROTECT, verbose_name=_("source")
-    )
-    sector = models.ForeignKey(
-        Sector, on_delete=models.PROTECT, verbose_name=_("sector")
+    attributes = models.ManyToManyField(
+        Attribute, verbose_name=_("attributes"), through="DealAttribute",
     )
 
     closed_on = models.DateField(_("closed on"), blank=True, null=True)
@@ -156,6 +171,20 @@ class Deal(Model):
         return format_html(
             '<span class="badge badge-{}">{}</span>', css, self.pretty_status
         )
+
+
+class DealAttribute(models.Model):
+    deal = models.ForeignKey(Deal, on_delete=models.CASCADE, verbose_name=_("deal"))
+    attribute = models.ForeignKey(
+        Attribute, on_delete=models.PROTECT, verbose_name=_("attribute")
+    )
+
+    class Meta:
+        verbose_name = _("deal attribute")
+        verbose_name_plural = _("deal attributes")
+
+    def __str__(self):
+        return "{} - {}".format(self.deal, self.attribute)
 
 
 class ValueType(models.Model):

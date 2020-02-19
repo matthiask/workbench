@@ -22,8 +22,9 @@ class Migration(migrations.Migration):
         ),
         migrations.RunSQL(
             "SELECT audit_audit_table('deals_stage');"
-            "SELECT audit_audit_table('deals_source');"
-            "SELECT audit_audit_table('deals_sector');"
+            "SELECT audit_audit_table('deals_attributegroup');"
+            "SELECT audit_audit_table('deals_attribute');"
+            "SELECT audit_audit_table('deals_dealattribute');"
             "SELECT audit_audit_table('deals_closingtype');"
             "SELECT audit_audit_table('deals_valuetype');"
             "SELECT audit_audit_table('deals_value');"

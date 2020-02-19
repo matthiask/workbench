@@ -33,16 +33,17 @@ class ValueTypeAdmin(OrderableAdmin, admin.ModelAdmin):
     ordering_field = "position"
 
 
-@admin.register(models.Source)
-class SourceAdmin(OrderableAdmin, admin.ModelAdmin):
-    list_display = ["title", "position"]
-    list_editable = ["position"]
+class AttributeInline(OrderableAdmin, admin.TabularInline):
+    model = models.Attribute
+    extra = 0
+    fk_name = "attribute"
     ordering_field = "position"
 
 
-@admin.register(models.Sector)
-class SectorAdmin(OrderableAdmin, admin.ModelAdmin):
-    list_display = ["title", "position"]
+@admin.register(models.AttributeGroup)
+class AttributeGroupAdmin(OrderableAdmin, admin.ModelAdmin):
+    inlines = [AttributeInline]
+    list_display = ["title", "is_archived", "is_required", "position"]
     list_editable = ["position"]
     ordering_field = "position"
 
