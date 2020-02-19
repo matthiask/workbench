@@ -164,18 +164,26 @@ class SetStatusForm(ModelForm):
         instance.status = int(kwargs["request"].GET.get("status", instance.status))
         super().__init__(*args, **kwargs)
 
-        if instance.status == Deal.ACCEPTED:
+        if instance.status == Deal.OPEN:
+            self.fields["status"].disabled = True
+            self.fields.pop("closing_type")
+            self.fields.pop("closing_notice")
+
+        elif instance.status == Deal.ACCEPTED:
             self.fields["closing_type"].empty_label = None
             self.fields["closing_type"].label = _("Award of contract")
             self.fields["closing_type"].queryset = self.fields[
                 "closing_type"
             ].queryset.filter(represents_a_win=True)
+            self.fields["status"].disabled = True
+
         elif instance.status == Deal.DECLINED:
             self.fields["closing_type"].empty_label = None
             self.fields["closing_type"].label = _("Reason for losing")
             self.fields["closing_type"].queryset = self.fields[
                 "closing_type"
             ].queryset.filter(represents_a_win=False)
+            self.fields["status"].disabled = True
 
     def clean(self):
         data = super().clean()
@@ -191,6 +199,7 @@ class SetStatusForm(ModelForm):
         if instance.status in {instance.OPEN}:
             instance.closed_on = None
             instance.closing_type = None
+            instance.closing_notice = ""
         elif (
             instance.status in {instance.ACCEPTED, instance.DECLINED}
             and not instance.closed_on

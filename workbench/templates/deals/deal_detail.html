@@ -36,6 +36,9 @@
     {% trans 'Update' %}
   </a>
 
+  <a href="{{ object.urls.set_status }}?status={{ object.OPEN }}" class="btn btn-info">
+    {% trans 'open'|capfirst %}
+  </a>
   <a href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}" class="btn btn-success">
     {% trans 'accepted'|capfirst %}
   </a>
