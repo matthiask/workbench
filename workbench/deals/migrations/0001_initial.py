@@ -307,7 +307,7 @@ class Migration(migrations.Migration):
             name="group",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name="values",
+                related_name="attributes",
                 to="deals.AttributeGroup",
                 verbose_name="attribute group",
             ),

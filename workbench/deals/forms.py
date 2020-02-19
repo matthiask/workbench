@@ -106,7 +106,7 @@ class DealForm(ModelForm):
         for group in AttributeGroup.objects.active():
             key = "attribute_{}".format(group.id)
             self.fields[key] = forms.ModelChoiceField(
-                queryset=group.values.active(),
+                queryset=group.attributes.active(),
                 required=group.is_required,
                 label=group.title,
                 widget=forms.RadioSelect,

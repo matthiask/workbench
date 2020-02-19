@@ -49,7 +49,7 @@ class Attribute(models.Model):
     group = models.ForeignKey(
         AttributeGroup,
         on_delete=models.CASCADE,
-        related_name="values",
+        related_name="attributes",
         verbose_name=_("attribute group"),
     )
     title = models.CharField(_("title"), max_length=200)
