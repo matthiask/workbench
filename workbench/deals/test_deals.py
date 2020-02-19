@@ -1,12 +1,17 @@
 import datetime as dt
 
+from django.db.models import ProtectedError
 from django.test import TestCase
+from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.tools.formats import local_date_format
 
 
 class DealsTest(TestCase):
+    def setUp(self):
+        deactivate_all()
+
     def test_list(self):
         self.client.force_login(factories.UserFactory.create())
 
@@ -95,3 +100,12 @@ class DealsTest(TestCase):
             deal.pretty_status,
             "Open since {}".format(local_date_format(dt.date.today())),
         )
+
+    def test_protected_m2m(self):
+        deal = factories.DealFactory.create()
+        group = factories.AttributeGroupFactory.create()
+        value = group.values.create(title="Test", position=0)
+        deal.attributes.add(value)
+
+        with self.assertRaises(ProtectedError):
+            group.delete()
