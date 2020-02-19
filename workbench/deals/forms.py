@@ -194,10 +194,8 @@ class SetStatusForm(ModelForm):
             instance.closed_on = None
             instance.closing_type = None
             instance.closing_notice = ""
-        elif instance.status in {instance.ACCEPTED, instance.DECLINED}:
+        if instance.status in {instance.ACCEPTED, instance.DECLINED}:
             instance.closed_on = instance.closed_on or dt.date.today()
-        else:  # pragma: no cover
-            raise Exception("Shouldn't hit this branch, ever.")
 
         instance.save()
         return instance
