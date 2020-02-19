@@ -105,7 +105,8 @@ class DealsTest(TestCase):
         type1 = factories.ValueTypeFactory.create()
         type2 = factories.ValueTypeFactory.create(title="programming")
 
-        group1 = factories.AttributeGroupFactory.create()
+        group1 = factories.AttributeGroupFactory.create(title="G1")
+        self.assertEqual(str(group1), "G1")
         attribute1_1 = group1.attributes.create(title="A1.1")
         group1.attributes.create(title="A1.2")
         group1.attributes.create(title="A1.3", is_archived=True)
