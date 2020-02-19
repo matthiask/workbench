@@ -90,8 +90,59 @@ class DealsTest(TestCase):
     def test_protected_m2m(self):
         deal = factories.DealFactory.create()
         group = factories.AttributeGroupFactory.create()
-        value = group.values.create(title="Test", position=0)
+        value = group.attributes.create(title="Test", position=0)
         deal.attributes.add(value)
 
         with self.assertRaises(ProtectedError):
             group.delete()
+
+    def test_values_and_attributes(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        type1 = factories.ValueTypeFactory.create()
+        type2 = factories.ValueTypeFactory.create(title="programming")
+
+        group1 = factories.AttributeGroupFactory.create()
+        attribute1_1 = group1.attributes.create(title="A1.1")
+        group1.attributes.create(title="A1.2")
+        group1.attributes.create(title="A1.3", is_archived=True)
+
+        group2 = factories.AttributeGroupFactory.create(is_required=False)
+        group2.attributes.create(title="A2.1")
+        group2.attributes.create(title="A2.2")
+
+        group3 = factories.AttributeGroupFactory.create(is_archived=True)
+        group3.attributes.create(title="A3.1")
+
+        response = self.client.get(Deal.urls["create"])
+        self.assertContains(response, type1.title)
+        self.assertContains(response, "A1.1")
+        self.assertNotContains(response, "A1.3")
+        self.assertContains(response, "A2.1")
+        self.assertNotContains(response, "A3.1")
+
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        self.client.force_login(person.primary_contact)
+
+        response = self.client.post(
+            "/deals/create/",
+            {
+                "customer": person.organization.id,
+                "contact": person.id,
+                "title": "Some deal",
+                "stage": factories.StageFactory.create().pk,
+                "owned_by": person.primary_contact_id,
+                "value_{}".format(type1.id): 200,
+                "value_{}".format(type2.id): "",
+                "attribute_{}".format(group1.pk): attribute1_1.pk,
+                "attribute_{}".format(group2.pk): "",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+
+        deal = Deal.objects.get()
+        self.assertEqual(deal.value, 200)
+        self.assertEqual(deal.values.count(), 1)

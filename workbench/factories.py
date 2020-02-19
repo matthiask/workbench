@@ -245,6 +245,8 @@ class StageFactory(factory.DjangoModelFactory):
 
 
 class ValueTypeFactory(factory.DjangoModelFactory):
+    title = "Consulting"
+
     class Meta:
         model = ValueType
 
