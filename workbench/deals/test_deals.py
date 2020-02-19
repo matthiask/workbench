@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.deals.models import Deal
 from workbench.tools.formats import local_date_format
 
 
@@ -50,7 +51,7 @@ class DealsTest(TestCase):
             },
         )
         self.assertEqual(response.status_code, 302)
-        deal = factories.Deal.objects.get()
+        deal = Deal.objects.get()
         self.assertIsNone(deal.closed_on)
         self.assertEqual(
             deal.pretty_status,
@@ -58,7 +59,7 @@ class DealsTest(TestCase):
         )
 
         response = self.client.post(
-            deal.urls["set_status"] + "?status={}".format(factories.Deal.DECLINED),
+            deal.urls["set_status"] + "?status={}".format(Deal.DECLINED),
             {
                 "closing_type": factories.ClosingTypeFactory.create(
                     represents_a_win=False
@@ -75,7 +76,7 @@ class DealsTest(TestCase):
         )
 
         response = self.client.post(
-            deal.urls["set_status"] + "?status={}".format(factories.Deal.OPEN),
+            deal.urls["set_status"] + "?status={}".format(Deal.OPEN),
         )
         self.assertRedirects(response, deal.urls["detail"])
 
