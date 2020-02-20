@@ -2,6 +2,12 @@
 
 {% load i18n workbench %}
 
+{% block search-form-buttons %}
+{{ block.super }}
+<a href="{% querystring xlsx=1 %}" class="btn btn-primary">
+  {% include 'svg/desktop-download.svg' %} XLSX</a>
+{% endblock %}
+
 {% block objects %}
 <div class="list-group list-group-flush">
   {% for object in object_list %}

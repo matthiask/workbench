@@ -6,8 +6,17 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
-from workbench.deals.models import AttributeGroup, Deal, Stage, Value, ValueType
+from workbench.deals.models import (
+    Attribute,
+    AttributeGroup,
+    Deal,
+    DealAttribute,
+    Stage,
+    Value,
+    ValueType,
+)
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
+from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
 class DealSearchForm(Form):
@@ -59,6 +68,38 @@ class DealSearchForm(Form):
         return queryset.select_related(
             "stage", "owned_by", "customer", "contact__organization"
         )
+
+    def response(self, request, queryset):
+        if request.GET.get("xlsx"):
+            xlsx = WorkbenchXLSXDocument()
+            additional = []
+            values = {
+                (v.deal_id, v.type_id): v.value
+                for v in Value.objects.filter(deal__in=queryset)
+            }
+            attributes = {
+                (a.deal_id, a.attribute.group_id): a.attribute
+                for a in DealAttribute.objects.filter(deal__in=queryset).select_related(
+                    "attribute"
+                )
+            }
+
+            for vt in ValueType.objects.all():
+                additional.append(
+                    (
+                        "{}: {}".format(Value._meta.verbose_name, vt),
+                        (lambda id: lambda deal: values.get((deal.id, id)))(vt.id),
+                    )
+                )
+            for ag in AttributeGroup.objects.all():
+                additional.append(
+                    (
+                        "{}: {}".format(Attribute._meta.verbose_name, ag),
+                        (lambda id: lambda deal: attributes.get((deal.id, id)))(ag.id),
+                    )
+                )
+            xlsx.table_from_queryset(queryset, additional=additional)
+            return xlsx.to_response("deals.xlsx")
 
 
 class DealForm(ModelForm):

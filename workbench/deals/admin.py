@@ -28,7 +28,7 @@ class StageAdmin(OrderableAdmin, admin.ModelAdmin):
 
 @admin.register(models.ValueType)
 class ValueTypeAdmin(OrderableAdmin, admin.ModelAdmin):
-    list_display = ["title", "position"]
+    list_display = ["title", "is_archived", "position"]
     list_editable = ["position"]
     ordering_field = "position"
 

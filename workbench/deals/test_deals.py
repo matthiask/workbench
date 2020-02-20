@@ -197,3 +197,21 @@ class DealsTest(TestCase):
             ).pretty_status,
             "accepted on 18.02.2020",
         )
+
+    def test_xlsx(self):
+        deal = factories.DealFactory.create()
+
+        group = factories.AttributeGroupFactory.create()
+        attribute = group.attributes.create(title="Test", position=0)
+        deal.attributes.add(attribute)
+
+        deal.values.create(type=factories.ValueTypeFactory.create(), value=42)
+        deal.save()
+
+        self.client.force_login(deal.owned_by)
+        response = self.client.get("/deals/?xlsx=1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response["content-type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
