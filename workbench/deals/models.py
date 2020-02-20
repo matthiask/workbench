@@ -137,7 +137,7 @@ class Deal(Model):
     _fts = models.TextField(editable=False, blank=True)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["-id"]
         verbose_name = _("deal")
         verbose_name_plural = _("deals")
 

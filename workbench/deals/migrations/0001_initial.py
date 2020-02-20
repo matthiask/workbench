@@ -158,7 +158,7 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "deal",
                 "verbose_name_plural": "deals",
-                "ordering": ["-created_at"],
+                "ordering": ["-id"],
             },
         ),
         migrations.CreateModel(
