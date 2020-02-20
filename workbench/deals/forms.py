@@ -92,7 +92,7 @@ class DealForm(ModelForm):
 
         field = Value._meta.get_field("value")
         values = {v.type_id: v.value for v in self.instance.values.all()}
-        for vt in ValueType.objects.all():
+        for vt in ValueType.objects.active():
             key = "value_{}".format(vt.id)
 
             self.fields[key] = field.formfield(
@@ -118,7 +118,7 @@ class DealForm(ModelForm):
         instance = super().save(**kwargs)
         types = set()
 
-        for vt in ValueType.objects.all():
+        for vt in ValueType.objects.active():
             key = "value_{}".format(vt.id)
 
             if self.cleaned_data.get(key) is not None:

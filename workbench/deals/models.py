@@ -198,6 +198,9 @@ class DealAttribute(models.Model):
 class ValueType(models.Model):
     title = models.CharField(_("title"), max_length=200)
     position = models.PositiveIntegerField(_("position"), default=0)
+    is_archived = models.BooleanField(_("is archived"), default=False)
+
+    objects = NotArchivedQuerySet.as_manager()
 
     class Meta:
         ordering = ("position", "id")
