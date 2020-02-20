@@ -28,7 +28,9 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/set-status/$",
-        generic.UpdateView.as_view(form_class=SetStatusForm, model=Deal),
+        generic.UpdateView.as_view(
+            form_class=SetStatusForm, model=Deal, template_name="modalform.html"
+        ),
         name="deals_deal_set_status",
     ),
     url(

@@ -8,42 +8,81 @@
   <h1>{{ object|h }} {% history_link object %}</h1>
 
   <table class="table table-striped">
-    {% for name, value in object|field_value_pairs %}
     <tr>
-      <th class="text-right">{{ name }}</th>
-      <td>{% link_or_none value %}</td>
+      <th class="text-right">{% trans 'customer' %}</th>
+      <td>{% link_or_none object.customer %}</td>
     </tr>
-    {% endfor %}
     <tr>
-      <th class="text-right">{% trans 'values' %}</th>
+      <th class="text-right">{% trans 'contact' %}</th>
+      <td>{% link_or_none object.contact %}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'stage' %}</th>
+      <td>{{ object.stage }}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'status' %}</th>
       <td>
+        <div class="row justify-content-between">
+          <div class="col">
+            {{ object.status_badge }}
+            {% if object.status != object.OPEN %}
+              <br>
+              {{ object.closing_type }}<br>
+              {{ object.closing_notice|linebreaksbr }}
+            {% endif %}
+          </div>
+
+          <div class="col-auto">
+            {% if object.status != object.OPEN %}
+              <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.OPEN }}" class="btn btn-sm btn-info">
+                {% trans 'open'|capfirst %}
+              </a>
+            {% endif %}
+
+            {% if object.status != object.ACCEPTED %}
+              <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}" class="btn btn-sm btn-success">
+                {% trans 'accepted'|capfirst %}
+              </a>
+            {% endif %}
+
+            {% if object.status != object.DECLINED %}
+              <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.DECLINED }}" class="btn btn-sm btn-danger">
+                {% trans 'declined'|capfirst %}
+              </a>
+            {% endif %}
+
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'description' %}</th>
+      <td>{{ object.description|linebreaksbr|default:"&ndash;" }}</td>
+    </tr>
+
+    <tr>
+      <th class="text-right">{% trans 'value' %}</th>
+      <td>
+        <strong>{{ object.value|currency }}</strong>
+        <br>
         {% for value in object.values.all %}
           {{ value.type }}: {{ value }}<br>
         {% endfor %}
       </td>
     </tr>
+
+    {% for attribute in object.attributes.all %}
     <tr>
-      <th class="text-right">{% trans 'attributes' %}</th>
-      <td>
-        {% for attribute in object.attributes.all %}
-        {{ attribute.group }}: {{ attribute }}<br>
-        {% endfor %}
-      </td>
+      <th class="text-right">{{ attribute.group }}</th>
+      <td>{{ attribute }}</td>
     </tr>
+    {% endfor %}
+
   </table>
 
   <a href="{{ object.urls.update }}" class="btn btn-primary">
     {% trans 'Update' %}
-  </a>
-
-  <a href="{{ object.urls.set_status }}?status={{ object.OPEN }}" class="btn btn-info">
-    {% trans 'open'|capfirst %}
-  </a>
-  <a href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}" class="btn btn-success">
-    {% trans 'accepted'|capfirst %}
-  </a>
-  <a href="{{ object.urls.set_status }}?status={{ object.DECLINED }}" class="btn btn-danger">
-    {% trans 'declined'|capfirst %}
   </a>
 
   <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
