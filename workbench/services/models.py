@@ -52,9 +52,18 @@ class ServiceBase(Model):
         verbose_name_plural = _("services")
 
     def __str__(self):
-        return " - ".join(
-            filter(None, (self.title, Truncator(self.description).chars(50)))
+        return Truncator(
+            " - ".join(filter(None, (self.title, self.description)))
+        ).chars(100)
+
+    def project_service_title(self):
+        title = "{}: {}{}{}".format(
+            self.project,
+            self.title,
+            " - " if self.description else "",
+            self.description,
         )
+        return Truncator(title).chars(100)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
