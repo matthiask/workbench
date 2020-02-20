@@ -34,7 +34,7 @@ class DealsTest(TestCase):
         self.client.force_login(deal.owned_by)
         response = self.client.get(deal.urls["detail"])
         # print(response, response.content.decode("utf-8"))
-        self.assertContains(response, "<td>42.00</td>")
+        self.assertContains(response, "42.00")
 
     def test_crud(self):
         person = factories.PersonFactory.create(
