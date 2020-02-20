@@ -189,12 +189,13 @@ class SetStatusForm(ModelForm):
 
     def save(self, *args, **kwargs):
         instance = super().save(commit=False)
+        assert instance.status in {Deal.OPEN, Deal.ACCEPTED, Deal.DECLINED}
 
-        if instance.status in {instance.OPEN}:
+        if instance.status == instance.OPEN:
             instance.closed_on = None
             instance.closing_type = None
             instance.closing_notice = ""
-        if instance.status in {instance.ACCEPTED, instance.DECLINED}:
+        else:
             instance.closed_on = instance.closed_on or dt.date.today()
 
         instance.save()
