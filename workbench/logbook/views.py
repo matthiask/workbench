@@ -9,7 +9,11 @@ def create(request, *, viewname):
         return redirect("/")
     form = ProjectAutocompleteForm(request.POST if request.method == "POST" else None)
     if form.is_valid():
-        return redirect(form.cleaned_data["project"].urls[viewname])
+        return redirect(
+            "{}?{}".format(
+                form.cleaned_data["project"].urls[viewname], request.GET.urlencode()
+            )
+        )
     return render(
         request,
         "generic/select_object.html",
