@@ -206,6 +206,7 @@ class SetStatusForm(ModelForm):
         elif instance.status == Deal.ACCEPTED:
             self.fields["closing_type"].empty_label = None
             self.fields["closing_type"].label = _("Award of contract")
+            self.fields["closing_type"].required = True
             self.fields["closing_type"].queryset = self.fields[
                 "closing_type"
             ].queryset.filter(represents_a_win=True)
@@ -213,6 +214,7 @@ class SetStatusForm(ModelForm):
         elif instance.status == Deal.DECLINED:
             self.fields["closing_type"].empty_label = None
             self.fields["closing_type"].label = _("Reason for losing")
+            self.fields["closing_type"].required = True
             self.fields["closing_type"].queryset = self.fields[
                 "closing_type"
             ].queryset.filter(represents_a_win=False)
