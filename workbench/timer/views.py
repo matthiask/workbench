@@ -1,5 +1,7 @@
 import json
 
+from django import forms
+from django.core.signing import TimestampSigner
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.decorators import decorator_from_middleware
@@ -8,8 +10,8 @@ from django.views.decorators.http import require_POST
 
 from corsheaders.middleware import CorsMiddleware
 
+from workbench.accounts.models import User
 from workbench.timer.models import TimerState, Timestamp
-from workbench.tools.forms import ModelForm
 
 
 def timer(request):
@@ -30,24 +32,34 @@ def timer(request):
     return render(request, "timer.html", {"state": state.state if state else None})
 
 
-class TimestampForm(ModelForm):
+class TimestampForm(forms.ModelForm):
+    user_key = forms.CharField(required=False)
+
     class Meta:
         model = Timestamp
         fields = ["type", "notes"]
 
-    def save(self):
-        instance = super().save(commit=False)
-        instance.user = self.request.user
-        instance.save()
-        return instance
+
+signer = TimestampSigner()
 
 
 @csrf_exempt
 @decorator_from_middleware(CorsMiddleware)
 @require_POST
 def create_timestamp(request):
-    form = TimestampForm(request.POST, request=request)
+    form = TimestampForm(request.POST)
     if not form.is_valid():
         return JsonResponse({}, status=400)
-    form.save()
+    instance = form.save(commit=False)
+    if request.user.is_authenticated:
+        instance.user = request.user
+    elif form.cleaned_data.get("user_key"):
+        try:
+            email = signer.unsign(form.cleaned_data["user_key"])
+            instance.user = User.objects.get(is_active=True, email=email)
+        except Exception:
+            return JsonResponse({}, status=403)
+    else:
+        return JsonResponse({}, status=403)
+    instance.save()
     return JsonResponse({}, status=201)

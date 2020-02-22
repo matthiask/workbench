@@ -4,6 +4,7 @@ from freezegun import freeze_time
 
 from workbench import factories
 from workbench.timer.models import TimerState, Timestamp
+from workbench.timer.views import signer
 
 
 class TimerTest(TestCase):
@@ -48,3 +49,24 @@ class TimerTest(TestCase):
         self.assertEqual(t.type, "start")
         self.assertEqual(t.notes, "blub")
         self.assertIn(str(t), {"20.02.2020 04:00", "20.02.2020 05:00"})
+
+    def test_timestamp_auth(self):
+        response = self.client.post("/create-timestamp/", {"type": "bla"})
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post("/create-timestamp/", {"type": "start"})
+        self.assertEqual(response.status_code, 403)
+
+        response = self.client.post(
+            "/create-timestamp/", {"type": "start", "user_key": "test"}
+        )
+        self.assertEqual(response.status_code, 403)
+
+        user = factories.UserFactory.create()
+        response = self.client.post(
+            "/create-timestamp/", {"type": "start", "user_key": signer.sign(user.email)}
+        )
+        self.assertEqual(response.status_code, 201)
+
+        t = Timestamp.objects.get()
+        self.assertEqual(t.user, user)
