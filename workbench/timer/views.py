@@ -2,8 +2,11 @@ import json
 
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
-from workbench.timer.models import TimerState
+from workbench.timer.models import TimerState, Timestamp
+from workbench.tools.forms import ModelForm
 
 
 def timer(request):
@@ -22,3 +25,25 @@ def timer(request):
 
     state = TimerState.objects.filter(user=request.user).first()
     return render(request, "timer.html", {"state": state.state if state else None})
+
+
+class TimestampForm(ModelForm):
+    class Meta:
+        model = Timestamp
+        fields = ["type", "notes"]
+
+    def save(self):
+        instance = super().save(commit=False)
+        instance.user = self.request.user
+        instance.save()
+        return instance
+
+
+@csrf_exempt
+@require_POST
+def create_timestamp(request):
+    form = TimestampForm(request.POST, request=request)
+    if not form.is_valid():
+        return JsonResponse({}, status=400)
+    form.save()
+    return JsonResponse({}, status=201)

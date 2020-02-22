@@ -1,7 +1,9 @@
 from django.test import TestCase
 
+from freezegun import freeze_time
+
 from workbench import factories
-from workbench.timer.models import TimerState
+from workbench.timer.models import TimerState, Timestamp
 
 
 class TimerTest(TestCase):
@@ -29,3 +31,20 @@ class TimerTest(TestCase):
             response,
             '<div class="readonly"><code><pre>{&#x27;a&#x27;: 1}</pre></code></div>',
         )
+
+    @freeze_time("2020-02-20T03:00:00+00:00")
+    def test_timestamp(self):
+        self.client.force_login(factories.UserFactory.create())
+
+        response = self.client.post("/create-timestamp/", {"type": "bla"})
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(
+            "/create-timestamp/", {"type": "start", "notes": "blub"}
+        )
+        self.assertEqual(response.status_code, 201)
+
+        t = Timestamp.objects.get()
+        self.assertEqual(t.type, "start")
+        self.assertEqual(t.notes, "blub")
+        self.assertIn(str(t), {"20.02.2020 04:00", "20.02.2020 05:00"})
