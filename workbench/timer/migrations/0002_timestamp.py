@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                 (
                     "type",
                     models.CharField(
-                        choices=[("start", "start"), ("lap", "lap"), ("stop", "stop")],
+                        choices=[("start", "start"), ("split", "split"), ("stop", "stop")],
                         max_length=10,
                         verbose_name="type",
                     ),

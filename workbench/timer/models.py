@@ -22,10 +22,10 @@ class TimerState(models.Model):
 
 class Timestamp(models.Model):
     START = "start"
-    LAP = "lap"
+    SPLIT = "split"
     STOP = "stop"
 
-    TYPE_CHOICES = [(START, _("start")), (LAP, _("lap")), (STOP, _("stop"))]
+    TYPE_CHOICES = [(START, _("start")), (SPLIT, _("split")), (STOP, _("stop"))]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
