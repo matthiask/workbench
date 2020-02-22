@@ -33,7 +33,7 @@ def timer(request):
 
 
 class TimestampForm(forms.ModelForm):
-    user_key = forms.CharField(required=False)
+    user = forms.CharField(required=False)
 
     class Meta:
         model = Timestamp
@@ -53,9 +53,9 @@ def create_timestamp(request):
     instance = form.save(commit=False)
     if request.user.is_authenticated:
         instance.user = request.user
-    elif form.cleaned_data.get("user_key"):
+    elif form.cleaned_data.get("user"):
         try:
-            email = signer.unsign(form.cleaned_data["user_key"])
+            email = signer.unsign(form.cleaned_data["user"])
             instance.user = User.objects.get(is_active=True, email=email)
         except Exception:
             return JsonResponse({}, status=403)

@@ -58,13 +58,13 @@ class TimerTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
         response = self.client.post(
-            "/create-timestamp/", {"type": "start", "user_key": "test"}
+            "/create-timestamp/", {"type": "start", "user": "test"}
         )
         self.assertEqual(response.status_code, 403)
 
         user = factories.UserFactory.create()
         response = self.client.post(
-            "/create-timestamp/", {"type": "start", "user_key": signer.sign(user.email)}
+            "/create-timestamp/", {"type": "start", "user": signer.sign(user.email)}
         )
         self.assertEqual(response.status_code, 201)
 
