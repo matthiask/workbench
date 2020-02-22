@@ -21,4 +21,4 @@ class TimerStateAdmin(admin.ModelAdmin):
 
 @admin.register(models.Timestamp)
 class TimestampAdmin(admin.ModelAdmin):
-    list_display = ["user", "created_at", "type"]
+    list_display = ["user", "created_at", "type", "notes"]
