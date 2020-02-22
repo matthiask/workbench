@@ -72,7 +72,7 @@
                 <strong>
                   {{ row.timestamp.created_at|date:'H:i' }}
                 </strong>
-                {{ row.timestamp.get_type_display }}
+                <span class="badge badge-dark">{{ row.timestamp.get_type_display }}</span>
                 {{ row.timestamp.notes }}
               </div>
 
@@ -90,7 +90,7 @@
             <strong>
               {{ row.timestamp.created_at|date:'H:i' }}
             </strong>
-            {{ row.timestamp.get_type_display }}
+            <span class="badge badge-dark">{{ row.timestamp.get_type_display }}</span>
             {{ row.timestamp.notes }}
           </div>
         {% endif %}

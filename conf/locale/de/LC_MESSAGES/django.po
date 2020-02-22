@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-18 04:22+0100\n"
+"POT-Creation-Date: 2020-02-22 18:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -281,6 +281,7 @@ msgstr "Ferienwochen für ein volles Anstellungsjahr."
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/credit_control/creditentry_list.html
+#: workbench/timer/models.py
 msgid "notes"
 msgstr "Bemerkungen"
 
@@ -464,6 +465,7 @@ msgstr ""
 #: workbench/projects/models.py
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/key_data_third_party_costs.html
+#: workbench/timer/models.py
 msgid "type"
 msgstr "Typ"
 
@@ -837,7 +839,7 @@ msgstr "Eine geschlossene Spesenabrechnung bleibt geschlossen."
 #: workbench/expenses/models.py workbench/expenses/views.py
 #: workbench/invoices/models.py workbench/logbook/models.py
 #: workbench/offers/models.py workbench/projects/models.py
-#: workbench/services/models.py
+#: workbench/services/models.py workbench/timer/models.py
 msgid "created at"
 msgstr "Erstellt um"
 
@@ -1721,6 +1723,38 @@ msgstr "Stichtag"
 msgid "accruals"
 msgstr "Abgrenzungen"
 
+#: workbench/reporting/utils.py workbench/templates/start.html
+msgid "this week"
+msgstr "diese Woche"
+
+#: workbench/reporting/utils.py
+msgid "last week"
+msgstr "letzte Woche"
+
+#: workbench/reporting/utils.py
+msgid "this month"
+msgstr "diesen Monat"
+
+#: workbench/reporting/utils.py
+msgid "last month"
+msgstr "letzten Monat"
+
+#: workbench/reporting/utils.py
+msgid "this quarter"
+msgstr "dieses Quartal"
+
+#: workbench/reporting/utils.py
+msgid "last quarter"
+msgstr "letztes Quartal"
+
+#: workbench/reporting/utils.py
+msgid "this year"
+msgstr "dieses Jahr"
+
+#: workbench/reporting/utils.py
+msgid "last year"
+msgstr "letztes Jahr"
+
 #: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data.html
 msgid "profitable"
@@ -1749,38 +1783,6 @@ msgstr "Geschlossen während dem letzten Jahr"
 #: workbench/reporting/views.py
 msgid "Set predefined period"
 msgstr "Vordefinierte Periode setzen"
-
-#: workbench/reporting/views.py workbench/templates/start.html
-msgid "this week"
-msgstr "diese Woche"
-
-#: workbench/reporting/views.py
-msgid "last week"
-msgstr "letzte Woche"
-
-#: workbench/reporting/views.py
-msgid "this month"
-msgstr "diesen Monat"
-
-#: workbench/reporting/views.py
-msgid "last month"
-msgstr "letzten Monat"
-
-#: workbench/reporting/views.py
-msgid "this quarter"
-msgstr "dieses Quartal"
-
-#: workbench/reporting/views.py
-msgid "last quarter"
-msgstr "letztes Quartal"
-
-#: workbench/reporting/views.py
-msgid "this year"
-msgstr "dieses Jahr"
-
-#: workbench/reporting/views.py
-msgid "last year"
-msgstr "letztes Jahr"
 
 #: workbench/services/models.py
 msgid "service type"
@@ -2394,6 +2396,10 @@ msgstr "Aktive Projekte"
 msgid "no active projects"
 msgstr "Keine aktiven Projekte"
 
+#: workbench/templates/start.html workbench/timer/models.py
+msgid "timestamps"
+msgstr "Zeitmarken"
+
 #: workbench/templates/start.html
 msgid "birthdays"
 msgstr "Geburtstage"
@@ -2437,6 +2443,22 @@ msgstr "Timer-Status"
 #: workbench/timer/models.py
 msgid "timer states"
 msgstr "Timer-Stati"
+
+#: workbench/timer/models.py
+msgid "start"
+msgstr "Start"
+
+#: workbench/timer/models.py
+msgid "split"
+msgstr "Split"
+
+#: workbench/timer/models.py
+msgid "stop"
+msgstr "Stop"
+
+#: workbench/timer/models.py
+msgid "timestamp"
+msgstr "Zeitmarke"
 
 #: workbench/tools/forms.py
 msgid "Is automatically filled using the organization's contact."
