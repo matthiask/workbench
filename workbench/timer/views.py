@@ -2,8 +2,11 @@ import json
 
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils.decorators import decorator_from_middleware
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+
+from corsheaders.middleware import CorsMiddleware
 
 from workbench.timer.models import TimerState, Timestamp
 from workbench.tools.forms import ModelForm
@@ -40,6 +43,7 @@ class TimestampForm(ModelForm):
 
 
 @csrf_exempt
+@decorator_from_middleware(CorsMiddleware)
 @require_POST
 def create_timestamp(request):
     form = TimestampForm(request.POST, request=request)

@@ -4,6 +4,7 @@ Django
 django-admin-ordering
 django-authlib
 django-bootstrap4
+django-cors-headers
 django-countries
 django-debug-toolbar
 django-fineforms

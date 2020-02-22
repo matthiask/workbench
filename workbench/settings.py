@@ -35,6 +35,7 @@ INSTALLED_APPS = [
         "bootstrap4",
         "django_countries",
         "authlib",
+        "corsheaders",
         "fineforms",
         "webpack_loader",
         "django.forms",
@@ -336,6 +337,10 @@ MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID", warn=True)
 GLASSFROG_TOKEN = env("GLASSFROG_TOKEN", warn=True)
 
 FEATURES = defaultdict(lambda: True) if TESTING else WORKBENCH.FEATURES
+
+# Fine since it's only used for selected views
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_URLS_REGEX = r"^/create-timestamp/.*$"  # Better safe than sorry
 
 if DEBUG:  # pragma: no cover
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
