@@ -1,7 +1,7 @@
 import json
 
 from django import forms
-from django.core.signing import TimestampSigner
+from django.core.signing import Signer
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.decorators import decorator_from_middleware
@@ -40,7 +40,7 @@ class TimestampForm(forms.ModelForm):
         fields = ["type", "notes"]
 
 
-signer = TimestampSigner()
+signer = Signer(salt="timestamps")
 
 
 @csrf_exempt

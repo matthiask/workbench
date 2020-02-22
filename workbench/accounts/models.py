@@ -210,6 +210,10 @@ class User(Model, AbstractBaseUser):
         }
 
     @cached_property
+    def timestamps(self):
+        return self.timestamp_set.structured()
+
+    @cached_property
     def features(self):
         return UserFeatures(email=self.email)
 

@@ -1,3 +1,6 @@
+import datetime as dt
+from decimal import ROUND_UP, Decimal
+
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
@@ -20,6 +23,32 @@ class TimerState(models.Model):
         return str(self.user)
 
 
+class TimestampQuerySet(models.QuerySet):
+    def structured(self, *, day=None):
+        day = day or dt.date.today()
+        entries = list(self.filter(created_at__date=day).order_by("pk"))
+        if not entries:
+            return []
+
+        ret = [
+            {"timestamp": entries[0], "elapsed": Decimal("0.0")},
+        ]
+        entries[0].type = Timestamp.START  # Override
+
+        for previous, current in zip(entries, entries[1:]):
+            if previous.type == Timestamp.STOP:
+                seconds = 0
+                current.type = Timestamp.START  # Override
+            else:
+                seconds = (current.created_at - previous.created_at).total_seconds()
+            elapsed = (Decimal(seconds) / 3600).quantize(
+                Decimal("0.0"), rounding=ROUND_UP
+            )
+            ret.append({"timestamp": current, "elapsed": elapsed})
+
+        return ret
+
+
 class Timestamp(models.Model):
     START = "start"
     SPLIT = "split"
@@ -31,6 +60,8 @@ class Timestamp(models.Model):
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     type = models.CharField(_("type"), max_length=10, choices=TYPE_CHOICES)
     notes = models.CharField(_("notes"), max_length=500, blank=True)
+
+    objects = TimestampQuerySet.as_manager()
 
     class Meta:
         ordering = ["-pk"]

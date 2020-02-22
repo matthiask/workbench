@@ -58,6 +58,47 @@
       {% endif %}
     </div>
 
+    {% if user.timestamps %}
+    <div class="card mb-3">
+      <div class="card-header"><h3 class="my-0">{% trans "timestamps" %}</h3></div>
+
+      <div class="list-group list-group-flush">
+        {% for row in user.timestamps %}
+        {% if row.elapsed %}
+          <a class="list-group-item list-group-item-action" href="{% url 'logbook_loggedhours_create' %}?hours={{ row.elapsed|stringformat:'s' }}" data-toggle="ajaxmodal">
+            <div class="d-flex w-100">
+
+              <div>
+                <strong>
+                  {{ row.timestamp.created_at|date:'H:i' }}
+                </strong>
+                {{ row.timestamp.get_type_display }}
+                {{ row.timestamp.notes }}
+              </div>
+
+              {% if row.elapsed %}
+              <span class="btn btn-sm btn-primary ml-auto">
+                {{ row.elapsed|hours:True }}
+              </span>
+              {% endif %}
+
+            </div>
+
+          </a>
+        {% else %}
+          <div class="list-group-item">
+            <strong>
+              {{ row.timestamp.created_at|date:'H:i' }}
+            </strong>
+            {{ row.timestamp.get_type_display }}
+            {{ row.timestamp.notes }}
+          </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
     {% birthdays as birthdays %}
     {% if birthdays %}
     <div class="card mb-3">
