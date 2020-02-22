@@ -8,22 +8,31 @@ from workbench.invoices.models import RecurringInvoice
 from workbench.tools.formats import currency, local_date_format
 
 
+TEMPLATE = """\
+{base_url}{recurring_url} ==>
+{invoice} {total} {invoiced_on}
+{base_url}{invoice_url}
+
+"""
+
+
 def create_recurring_invoices_and_notify():
     by_owner = defaultdict(list)
     for ri in RecurringInvoice.objects.renewal_candidates():
         for invoice in ri.create_invoices():
-            by_owner[invoice.owned_by].append(invoice)
+            by_owner[invoice.owned_by].append((ri, invoice))
 
     for owner, invoices in by_owner.items():
         invoices = "\n".join(
-            "{} {} {}\n{}{}\n".format(
-                invoice,
-                currency(invoice.total),
-                local_date_format(invoice.invoiced_on),
-                settings.WORKBENCH.URL,
-                invoice.get_absolute_url(),
+            TEMPLATE.format(
+                invoice=invoice,
+                total=currency(invoice.total),
+                invoiced_on=local_date_format(invoice.invoiced_on),
+                base_url=settings.WORKBENCH.URL,
+                invoice_url=invoice.get_absolute_url(),
+                recurring_url=ri.get_absolute_url(),
             )
-            for invoice in invoices
+            for (ri, invoice) in invoices
         )
         mail = EmailMultiAlternatives(
             _("recurring invoices"), invoices, to=[owner.email], bcc=settings.BCC
