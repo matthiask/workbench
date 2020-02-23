@@ -12,6 +12,16 @@
             {% ff_errors form %}
             {% ff_fields form %}
           {% endblock %}
+
+          {% if links %}
+          <div class="list-group">
+            {% for link in links %}
+            <a href="{{ link.url }}" class="list-group-item list-group-action" {{ link.attrs|safe }}>
+              {{ link.title }}
+            </a>
+            {% endfor %}
+          </div>
+          {% endif %}
         </div>
       </div><!-- /.modal-content -->
     </form>
