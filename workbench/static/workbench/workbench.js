@@ -210,6 +210,14 @@ $(function() {
       $(e.target)
         .parents("form")
         .submit()
+    } else if (e.keyCode >= 49 && e.keyCode <= 57) {
+      const el = _sel('[data-number-shortcut="' + (e.keyCode - 48) + '"]')
+      if (!el) return
+      if (el.dataset.toggle == "ajaxmodal") {
+        window.openModalFromUrl(el.href)
+      } else {
+        window.location.href = el.href
+      }
     } else {
       window.console && window.console.log(e, e.keyCode)
       return

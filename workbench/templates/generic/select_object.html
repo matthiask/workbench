@@ -16,7 +16,8 @@
           {% if links %}
           <div class="list-group">
             {% for link in links %}
-            <a href="{{ link.url }}" class="list-group-item list-group-item-action" {{ link.attrs|safe }}>
+            <a href="{{ link.url }}" class="list-group-item list-group-item-action" {{ link.attrs|safe }} data-number-shortcut="{{ forloop.counter }}">
+              <span class="badge badge-dark float-right mt-1">{{ forloop.counter }}</span>
               {{ link.title }}
             </a>
             {% endfor %}
