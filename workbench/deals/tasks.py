@@ -55,11 +55,11 @@ def initial():
 
     group = AttributeGroup.objects.create(title="Quelle", position=10)
     for i, title in enumerate(SOURCES):
-        group.values.create(title=title, position=10 * (i + 1))
+        group.attributes.create(title=title, position=10 * (i + 1))
 
     group = AttributeGroup.objects.create(title="Branche", position=20)
     for i, title in enumerate(SECTORS):
-        group.values.create(title=title, position=10 * (i + 1))
+        group.attributes.create(title=title, position=10 * (i + 1))
 
     for i, title in enumerate(WINS):
         ClosingType.objects.create(
