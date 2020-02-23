@@ -221,7 +221,9 @@ class User(Model, AbstractBaseUser):
 
     @cached_property
     def timestamps(self):
-        return self.timestamp_set.structured()
+        from workbench.timer.models import Timestamp
+
+        return Timestamp.for_user(self)
 
     @cached_property
     def signed_email(self):

@@ -77,7 +77,7 @@ class TimestampsTest(TestCase):
         t = Timestamp.objects.get()
         self.assertEqual(t.user, user)
 
-    def test_structured(self):
+    def test_timestamps_scenario(self):
         today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
         user = factories.UserFactory.create()
 
@@ -154,6 +154,31 @@ class TimestampsTest(TestCase):
             [row["timestamp"].type for row in user.timestamps],
             [Timestamp.START, Timestamp.START],
         )
+
+    def test_latest_logbook_entry(self):
+        today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
+        user = factories.UserFactory.create()
+
+        t1 = user.timestamp_set.create(
+            type=Timestamp.START, created_at=today + dt.timedelta(minutes=0)
+        )
+        l1 = factories.LoggedHoursFactory.create(
+            rendered_by=user,
+            created_at=today + dt.timedelta(minutes=10),
+            description="ABC",
+        )
+        t2 = user.timestamp_set.create(
+            type=Timestamp.SPLIT, created_at=today + dt.timedelta(minutes=20)
+        )
+
+        self.assertEqual(len(user.timestamps), 3)
+        self.assertEqual(user.timestamps[0]["elapsed"], Decimal("0.0"))
+        self.assertEqual(user.timestamps[1]["elapsed"], Decimal("0.2"))
+        self.assertEqual(user.timestamps[2]["elapsed"], Decimal("0.2"))
+
+        self.assertEqual(user.timestamps[0]["timestamp"], t1)
+        self.assertIn(l1.description, user.timestamps[1]["timestamp"].notes)
+        self.assertEqual(user.timestamps[2]["timestamp"], t2)
 
     def test_view(self):
         deactivate_all()

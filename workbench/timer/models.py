@@ -24,10 +24,50 @@ class TimerState(models.Model):
         return str(self.user)
 
 
-class TimestampQuerySet(models.QuerySet):
-    def structured(self, *, day=None):
+class Timestamp(models.Model):
+    START = "start"
+    SPLIT = "split"
+    STOP = "stop"
+
+    TYPE_CHOICES = [(START, _("start")), (SPLIT, _("split")), (STOP, _("stop"))]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))
+    created_at = models.DateTimeField(_("created at"), default=timezone.now)
+    type = models.CharField(_("type"), max_length=10, choices=TYPE_CHOICES)
+    notes = models.CharField(_("notes"), max_length=500, blank=True)
+
+    class Meta:
+        ordering = ["-pk"]
+        verbose_name = _("timestamp")
+        verbose_name_plural = _("timestamps")
+
+    def __str__(self):
+        return local_date_format(self.created_at)
+
+    @property
+    def badge(self):
+        css = {self.START: "primary", self.SPLIT: "info", self.STOP: "success"}
+        return format_html(
+            '<span class="badge badge-{}">{}</span>',
+            css[self.type],
+            self.get_type_display(),
+        )
+
+    @classmethod
+    def for_user(cls, user, *, day=None):
         day = day or dt.date.today()
-        entries = list(self.filter(created_at__date=day).order_by("pk"))
+        entries = list(cls.objects.filter(user=user, created_at__date=day))
+        latest = user.loggedhours.order_by("-created_at").first()
+        if latest and latest.rendered_on == day:
+            entries.append(
+                cls(
+                    created_at=latest.created_at,
+                    type=cls.SPLIT,
+                    notes=_("Latest logbook entry on %(service)s: %(description)s")
+                    % {"service": latest.service, "description": latest.description},
+                )
+            )
+        entries = sorted(entries, key=lambda timestamp: timestamp.created_at)
         if not entries:
             return []
 
@@ -52,35 +92,3 @@ class TimestampQuerySet(models.QuerySet):
             previous = current
 
         return ret
-
-
-class Timestamp(models.Model):
-    START = "start"
-    SPLIT = "split"
-    STOP = "stop"
-
-    TYPE_CHOICES = [(START, _("start")), (SPLIT, _("split")), (STOP, _("stop"))]
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))
-    created_at = models.DateTimeField(_("created at"), default=timezone.now)
-    type = models.CharField(_("type"), max_length=10, choices=TYPE_CHOICES)
-    notes = models.CharField(_("notes"), max_length=500, blank=True)
-
-    objects = TimestampQuerySet.as_manager()
-
-    class Meta:
-        ordering = ["-pk"]
-        verbose_name = _("timestamp")
-        verbose_name_plural = _("timestamps")
-
-    def __str__(self):
-        return local_date_format(self.created_at)
-
-    @property
-    def badge(self):
-        css = {self.START: "primary", self.SPLIT: "info", self.STOP: "success"}
-        return format_html(
-            '<span class="badge badge-{}">{}</span>',
-            css[self.type],
-            self.get_type_display(),
-        )
