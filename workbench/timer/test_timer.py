@@ -182,6 +182,9 @@ class TimestampsTest(TestCase):
 
     def test_view(self):
         deactivate_all()
-        self.client.force_login(factories.UserFactory.create())
+        user = factories.UserFactory.create()
+        user.timestamp_set.create(type=Timestamp.START)
+
+        self.client.force_login(user)
         response = self.client.get("/timestamps/")
         self.assertContains(response, "timestamps")
