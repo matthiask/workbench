@@ -1,7 +1,6 @@
 import json
 
 from django import forms
-from django.core.signing import Signer
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.decorators import decorator_from_middleware
@@ -40,9 +39,6 @@ class TimestampForm(forms.ModelForm):
         fields = ["type", "notes"]
 
 
-signer = Signer(salt="timestamps")
-
-
 @csrf_exempt
 @decorator_from_middleware(CorsMiddleware)
 @require_POST
@@ -55,8 +51,7 @@ def create_timestamp(request):
         instance.user = request.user
     elif form.cleaned_data.get("user"):
         try:
-            email = signer.unsign(form.cleaned_data["user"])
-            instance.user = User.objects.get(is_active=True, email=email)
+            instance.user = User.objects.get_by_signed_email(form.cleaned_data["user"])
         except Exception:
             return JsonResponse({}, status=403)
     else:

@@ -60,7 +60,10 @@
 
     {% if user.timestamps %}
     <div class="card mb-3">
-      <div class="card-header"><h3 class="my-0">{% trans "timestamps" %}</h3></div>
+      <div class="card-header">
+        <h3 class="my-0">{% trans "timestamps" %}</h3>
+        <a href="https://406.ch/timer.html?user={{ user.signed_email }}&amp;url={{ request.build_absolute_uri }}create-timestamps/">Prototype</a>
+      </div>
 
       <div class="list-group list-group-flush">
         {% for row in user.timestamps %}
