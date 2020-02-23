@@ -110,7 +110,9 @@
             {% endif %}
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'timer' %}">{% trans 'timer'|capfirst %}</a>
+            {% if request.user|has:FEATURES.TIMESTAMPS %}
             <a class="dropdown-item" href="{% url 'timestamps' %}">{% trans 'timestamps'|capfirst %}</a>
+            {% endif %}
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'logout' %}">{% trans 'Sign out'|capfirst %}</a>
           </div>

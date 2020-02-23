@@ -195,6 +195,7 @@ WORKBENCH = {
             "foreign_currencies": False,
             "glassfrog": True,
             "labor_costs": False,
+            "timestamps": True,
         },
     ),
     "dbpag": types.SimpleNamespace(
@@ -230,6 +231,7 @@ WORKBENCH = {
             "foreign_currencies": False,
             "glassfrog": False,
             "labor_costs": False,
+            "timestamps": False,
         },
     ),
     "bf": types.SimpleNamespace(
@@ -281,6 +283,7 @@ WORKBENCH = {
                 "frederic@blindflugstudios.com",
                 "mk@feinheit.ch",
             },
+            "timestamps": False,
         },
     ),
     "test": types.SimpleNamespace(
@@ -314,6 +317,7 @@ WORKBENCH = {
             "foreign_currencies": True,
             "glassfrog": False,
             "labor_costs": True,
+            "timestamps": True,
         },
     ),
 }[env("NAMESPACE", required=True)]
