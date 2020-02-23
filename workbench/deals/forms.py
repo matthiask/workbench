@@ -1,6 +1,7 @@
 import datetime as dt
 
 from django import forms
+from django.contrib import messages
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 
@@ -102,6 +103,20 @@ class DealSearchForm(Form):
             return xlsx.to_response("deals.xlsx")
 
 
+def warn_if_not_in_preparation(form):
+    if (
+        form.instance.closed_on
+        and form.request.method == "GET"
+    ):
+        messages.warning(
+            form.request,
+            _(
+                "This deal is already closed."
+                " I assume you know what you're doing and wont stand in the way."
+            ),
+        )
+
+
 class DealForm(ModelForm):
     user_fields = default_to_current_user = ("owned_by",)
 
@@ -130,6 +145,7 @@ class DealForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        warn_if_not_in_preparation(self)
 
         field = Value._meta.get_field("value")
         values = {v.type_id: v.value for v in self.instance.values.all()}

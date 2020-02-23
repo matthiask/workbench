@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-23 17:25+0100\n"
+"POT-Creation-Date: 2020-02-23 17:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -814,6 +814,14 @@ msgstr "Offen"
 #: workbench/offers/forms.py
 msgid "Exact"
 msgstr "Exakt"
+
+#: workbench/deals/forms.py
+msgid ""
+"This deal is already closed. I assume you know what you're doing and wont "
+"stand in the way."
+msgstr ""
+"Dieses Geschäft ist schon geschlossen. Ich gehe davon aus, dass Du weisst "
+"was Du tust und werde nicht im Weg stehen."
 
 #: workbench/deals/forms.py workbench/deals/models.py
 #: workbench/templates/deals/deal_detail.html

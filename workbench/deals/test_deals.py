@@ -70,6 +70,9 @@ class DealsTest(TestCase):
         )
         self.assertRedirects(response, deal.urls["detail"])
 
+        response = self.client.get(deal.urls["update"])
+        self.assertContains(response, "This deal is already closed.")
+
         deal.refresh_from_db()
         self.assertEqual(deal.closed_on, dt.date.today())
         self.assertEqual(
