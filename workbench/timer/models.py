@@ -30,13 +30,14 @@ class TimestampQuerySet(models.QuerySet):
         if not entries:
             return []
 
-        ret = [
-            {"timestamp": entries[0], "elapsed": Decimal("0.0")},
-        ]
-        entries[0].type = Timestamp.START  # Override
+        ret = []
+        previous = None
+        for current in entries:
+            if previous is None and current.type == Timestamp.STOP:
+                # Skip
+                continue
 
-        for previous, current in zip(entries, entries[1:]):
-            if previous.type == Timestamp.STOP:
+            if previous is None or previous.type == Timestamp.STOP:
                 seconds = 0
                 current.type = Timestamp.START  # Override
             else:
@@ -45,6 +46,7 @@ class TimestampQuerySet(models.QuerySet):
                 Decimal("0.0"), rounding=ROUND_UP
             )
             ret.append({"timestamp": current, "elapsed": elapsed})
+            previous = current
 
         return ret
 

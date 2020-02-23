@@ -77,6 +77,15 @@ class TimerTest(TestCase):
     def test_structured(self):
         today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
         user = factories.UserFactory.create()
+
+        # Insert STOPs at the beginning -- they should be skipped
+        user.timestamp_set.create(
+            type=Timestamp.STOP, created_at=today - dt.timedelta(minutes=60)
+        )
+        user.timestamp_set.create(
+            type=Timestamp.STOP, created_at=today - dt.timedelta(minutes=80)
+        )
+
         t1 = user.timestamp_set.create(type=Timestamp.START, created_at=today)
         t2 = user.timestamp_set.create(
             type=Timestamp.SPLIT, created_at=today + dt.timedelta(minutes=40)
@@ -102,3 +111,6 @@ class TimerTest(TestCase):
                 {"elapsed": Decimal("0.0"), "timestamp": t5},
             ],
         )
+
+        # Type has been overridden
+        self.assertEqual(user.timestamps[-1]["timestamp"].type, Timestamp.START)
