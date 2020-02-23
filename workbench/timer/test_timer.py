@@ -159,6 +159,8 @@ class TimestampsTest(TestCase):
         today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
         user = factories.UserFactory.create()
 
+        self.assertEqual(Timestamp.for_user(user), [])
+
         t1 = user.timestamp_set.create(
             type=Timestamp.START, created_at=today + dt.timedelta(minutes=0)
         )
