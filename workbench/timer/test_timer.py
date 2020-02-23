@@ -102,6 +102,9 @@ class TimestampsTest(TestCase):
         t5 = user.timestamp_set.create(
             type=Timestamp.SPLIT, created_at=today + dt.timedelta(minutes=140)
         )
+        t6 = user.timestamp_set.create(
+            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=160)
+        )
 
         self.assertEqual(
             user.timestamps,
@@ -112,11 +115,22 @@ class TimestampsTest(TestCase):
                 {"elapsed": Decimal("1.0"), "timestamp": t4},
                 # 0.0 after a STOP
                 {"elapsed": Decimal("0.0"), "timestamp": t5},
+                {"elapsed": Decimal("0.4"), "timestamp": t6},
             ],
         )
 
-        # Type has been overridden
-        self.assertEqual(user.timestamps[-1]["timestamp"].type, Timestamp.START)
+        # Some types have been overridden
+        self.assertEqual(
+            [row["timestamp"].type for row in user.timestamps],
+            [
+                Timestamp.START,
+                Timestamp.SPLIT,
+                Timestamp.SPLIT,
+                Timestamp.STOP,
+                Timestamp.START,  # Was: SPLIT
+                Timestamp.STOP,
+            ],
+        )
 
     def test_view(self):
         deactivate_all()
