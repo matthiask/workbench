@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-22 18:10+0100\n"
+"POT-Creation-Date: 2020-02-23 21:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2020,6 +2020,11 @@ msgstr "Verwaltung"
 msgid "timer"
 msgstr "Timer"
 
+#: workbench/templates/base.html workbench/templates/timestamps.html
+#: workbench/timer/models.py
+msgid "timestamps"
+msgstr "Zeitmarken"
+
 #: workbench/templates/base.html
 msgid "Sign out"
 msgstr "Abmelden"
@@ -2396,10 +2401,6 @@ msgstr "Aktive Projekte"
 msgid "no active projects"
 msgstr "Keine aktiven Projekte"
 
-#: workbench/templates/start.html workbench/timer/models.py
-msgid "timestamps"
-msgstr "Zeitmarken"
-
 #: workbench/templates/start.html
 msgid "birthdays"
 msgstr "Geburtstage"
@@ -2459,6 +2460,11 @@ msgstr "Stop"
 #: workbench/timer/models.py
 msgid "timestamp"
 msgstr "Zeitmarke"
+
+#: workbench/timer/models.py
+#, python-format
+msgid "Latest logbook entry on %(service)s: %(description)s"
+msgstr "Letzter Logbucheintrag auf %(service)s: %(description)s"
 
 #: workbench/tools/forms.py
 msgid "Is automatically filled using the organization's contact."
