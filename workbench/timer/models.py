@@ -74,19 +74,19 @@ class Timestamp(models.Model):
         ret = []
         previous = None
         for current in entries:
-            if (
-                previous is None or previous.type == Timestamp.STOP
-            ) and current.type == Timestamp.STOP:
-                # Skip
-                continue
-
             if previous is None or previous.type == Timestamp.STOP:
+                if current.type == Timestamp.STOP:
+                    # Skip
+                    continue
+
                 seconds = 0
                 current.type = Timestamp.START  # Override
             elif current.type == Timestamp.START:
                 seconds = 0
+
             else:
                 seconds = (current.created_at - previous.created_at).total_seconds()
+
             elapsed = (Decimal(seconds) / 3600).quantize(
                 Decimal("0.0"), rounding=ROUND_UP
             )
