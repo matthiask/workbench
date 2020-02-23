@@ -1,4 +1,8 @@
+import datetime as dt
+from decimal import Decimal
+
 from django.test import TestCase
+from django.utils import timezone
 
 from freezegun import freeze_time
 
@@ -70,3 +74,32 @@ class TimerTest(TestCase):
 
         t = Timestamp.objects.get()
         self.assertEqual(t.user, user)
+
+    def test_structured(self):
+        today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
+        user = factories.UserFactory.create()
+        t1 = user.timestamp_set.create(type=Timestamp.START, created_at=today)
+        t2 = user.timestamp_set.create(
+            type=Timestamp.SPLIT, created_at=today + dt.timedelta(minutes=40)
+        )
+        t3 = user.timestamp_set.create(
+            type=Timestamp.SPLIT, created_at=today + dt.timedelta(minutes=60)
+        )
+        t4 = user.timestamp_set.create(
+            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=115)
+        )
+        t5 = user.timestamp_set.create(
+            type=Timestamp.SPLIT, created_at=today + dt.timedelta(minutes=140)
+        )
+
+        self.assertEqual(
+            user.timestamps,
+            [
+                {"elapsed": Decimal("0.0"), "timestamp": t1},
+                {"elapsed": Decimal("0.7"), "timestamp": t2},
+                {"elapsed": Decimal("0.4"), "timestamp": t3},
+                {"elapsed": Decimal("1.0"), "timestamp": t4},
+                # 0.0 after a STOP
+                {"elapsed": Decimal("0.0"), "timestamp": t5},
+            ],
+        )
