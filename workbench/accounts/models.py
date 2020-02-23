@@ -240,6 +240,11 @@ class UserFeatures:
         try:
             setting = settings.FEATURES[key]
         except KeyError:
+            from workbench.accounts.features import KNOWN_FEATURES, UnknownFeature
+
+            if key not in KNOWN_FEATURES:
+                raise UnknownFeature("Unknown feature: %r" % key)
+
             return False
         if setting is True or setting is False:
             return setting
