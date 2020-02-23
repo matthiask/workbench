@@ -4,6 +4,7 @@ from functools import total_ordering
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.core.signing import BadSignature, Signer
 from django.db import models
 from django.db.models import Count, Q, Sum
 from django.utils.functional import cached_property
@@ -11,6 +12,9 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.tools.models import Model
 from workbench.tools.validation import monday
+
+
+signer = Signer(salt="user")
 
 
 class UserManager(BaseUserManager):
@@ -68,6 +72,12 @@ class UserManager(BaseUserManager):
 
     def active(self):
         return self.filter(is_active=True)
+
+    def get_by_signed_email(self, signed_email):
+        try:
+            return self.get(is_active=True, email=signer.unsign(signed_email))
+        except BadSignature:
+            raise self.model.DoesNotExist
 
 
 @total_ordering
@@ -210,6 +220,14 @@ class User(Model, AbstractBaseUser):
         }
 
     @cached_property
+    def timestamps(self):
+        return self.timestamp_set.structured()
+
+    @cached_property
+    def signed_email(self):
+        return signer.sign(self.email)
+
+    @cached_property
     def features(self):
         return UserFeatures(email=self.email)
 
@@ -222,6 +240,11 @@ class UserFeatures:
         try:
             setting = settings.FEATURES[key]
         except KeyError:
+            from workbench.accounts.features import KNOWN_FEATURES, UnknownFeature
+
+            if key not in KNOWN_FEATURES:
+                raise UnknownFeature("Unknown feature: %r" % key)
+
             return False
         if setting is True or setting is False:
             return setting

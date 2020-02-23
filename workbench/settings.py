@@ -35,6 +35,7 @@ INSTALLED_APPS = [
         "bootstrap4",
         "django_countries",
         "authlib",
+        "corsheaders",
         "fineforms",
         "webpack_loader",
         "django.forms",
@@ -194,6 +195,7 @@ WORKBENCH = {
             "foreign_currencies": False,
             "glassfrog": True,
             "labor_costs": False,
+            "timestamps": True,
         },
     ),
     "dbpag": types.SimpleNamespace(
@@ -229,6 +231,7 @@ WORKBENCH = {
             "foreign_currencies": False,
             "glassfrog": False,
             "labor_costs": False,
+            "timestamps": False,
         },
     ),
     "bf": types.SimpleNamespace(
@@ -280,6 +283,7 @@ WORKBENCH = {
                 "frederic@blindflugstudios.com",
                 "mk@feinheit.ch",
             },
+            "timestamps": False,
         },
     ),
     "test": types.SimpleNamespace(
@@ -313,6 +317,7 @@ WORKBENCH = {
             "foreign_currencies": True,
             "glassfrog": False,
             "labor_costs": True,
+            "timestamps": True,
         },
     ),
 }[env("NAMESPACE", required=True)]
@@ -336,6 +341,10 @@ MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID", warn=True)
 GLASSFROG_TOKEN = env("GLASSFROG_TOKEN", warn=True)
 
 FEATURES = defaultdict(lambda: True) if TESTING else WORKBENCH.FEATURES
+
+# Fine since it's only used for selected views
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_URLS_REGEX = r"^/create-timestamp/.*$"  # Better safe than sorry
 
 if DEBUG:  # pragma: no cover
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

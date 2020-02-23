@@ -8,7 +8,7 @@ from workbench.timer import models
 
 
 @admin.register(models.TimerState)
-class TimerStateModelAdmin(admin.ModelAdmin):
+class TimerStateAdmin(admin.ModelAdmin):
     list_display = ["user", "updated_at"]
     fields = ["user", "pretty_state", "updated_at"]
     readonly_fields = ["user", "pretty_state", "updated_at"]
@@ -17,3 +17,8 @@ class TimerStateModelAdmin(admin.ModelAdmin):
         return format_html("<code><pre>{}</pre></code>", pformat(instance.state))
 
     pretty_state.short_description = _("state")
+
+
+@admin.register(models.Timestamp)
+class TimestampAdmin(admin.ModelAdmin):
+    list_display = ["user", "created_at", "type", "notes"]
