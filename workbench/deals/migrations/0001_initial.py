@@ -202,6 +202,10 @@ class Migration(migrations.Migration):
                     "position",
                     models.PositiveIntegerField(default=0, verbose_name="position"),
                 ),
+                (
+                    "is_archived",
+                    models.BooleanField(default=False, verbose_name="is archived"),
+                ),
             ],
             options={
                 "verbose_name": "value type",
