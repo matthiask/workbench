@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-19 17:41+0100\n"
+"POT-Creation-Date: 2020-02-23 17:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -282,6 +282,7 @@ msgstr "Ferienwochen für ein volles Anstellungsjahr."
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/credit_control/creditentry_list.html
+#: workbench/timer/models.py
 msgid "notes"
 msgstr "Bemerkungen"
 
@@ -341,6 +342,7 @@ msgstr "Wird nur für die Visualisierung der Abwesenheiten verwendet."
 #: workbench/logbook/forms.py workbench/logbook/models.py
 #: workbench/offers/models.py workbench/projects/models.py
 #: workbench/services/models.py workbench/templates/awt/absence_detail.html
+#: workbench/templates/deals/deal_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -466,6 +468,7 @@ msgstr ""
 #: workbench/invoices/models.py workbench/projects/models.py
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/key_data_third_party_costs.html
+#: workbench/timer/models.py
 msgid "type"
 msgstr "Typ"
 
@@ -813,6 +816,7 @@ msgid "Exact"
 msgstr "Exakt"
 
 #: workbench/deals/forms.py workbench/deals/models.py
+#: workbench/templates/deals/deal_detail.html
 msgid "stage"
 msgstr "Stadium"
 
@@ -864,7 +868,7 @@ msgstr "Abschlusstyp"
 msgid "closing types"
 msgstr "Abschlusstypen"
 
-#: workbench/deals/models.py
+#: workbench/deals/models.py workbench/templates/deals/deal_detail.html
 msgid "open"
 msgstr "offen"
 
@@ -878,6 +882,7 @@ msgstr "abgelehnt"
 
 #: workbench/deals/models.py workbench/invoices/models.py
 #: workbench/management/commands/profitability.py workbench/projects/models.py
+#: workbench/templates/deals/deal_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/reporting/overdrawn_projects.html
@@ -885,7 +890,7 @@ msgid "customer"
 msgstr "Kundschaft"
 
 #: workbench/deals/models.py workbench/invoices/models.py
-#: workbench/projects/models.py
+#: workbench/projects/models.py workbench/templates/deals/deal_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "contact"
@@ -897,13 +902,14 @@ msgstr "Kontakt"
 msgid "responsible"
 msgstr "verantwortlich"
 
-#: workbench/deals/models.py
+#: workbench/deals/models.py workbench/templates/deals/deal_detail.html
 msgid "value"
 msgstr "Wert"
 
 #: workbench/deals/models.py workbench/expenses/forms.py
 #: workbench/expenses/views.py workbench/invoices/models.py
 #: workbench/offers/models.py workbench/projects/forms.py
+#: workbench/templates/deals/deal_detail.html
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
@@ -914,6 +920,7 @@ msgstr "Status"
 #: workbench/expenses/views.py workbench/invoices/models.py
 #: workbench/logbook/models.py workbench/offers/models.py
 #: workbench/projects/models.py workbench/services/models.py
+#: workbench/timer/models.py
 msgid "created at"
 msgstr "Erstellt um"
 
@@ -2130,6 +2137,11 @@ msgstr "Verwaltung"
 msgid "timer"
 msgstr "Timer"
 
+#: workbench/templates/base.html workbench/templates/timestamps.html
+#: workbench/timer/models.py
+msgid "timestamps"
+msgstr "Zeitmarken"
+
 #: workbench/templates/base.html
 msgid "Sign out"
 msgstr "Abmelden"
@@ -2549,6 +2561,22 @@ msgstr "Timer-Status"
 #: workbench/timer/models.py
 msgid "timer states"
 msgstr "Timer-Stati"
+
+#: workbench/timer/models.py
+msgid "start"
+msgstr "Start"
+
+#: workbench/timer/models.py
+msgid "split"
+msgstr "Split"
+
+#: workbench/timer/models.py
+msgid "stop"
+msgstr "Stop"
+
+#: workbench/timer/models.py
+msgid "timestamp"
+msgstr "Zeitmarke"
 
 #: workbench/tools/forms.py
 msgid "Is automatically filled using the organization's contact."

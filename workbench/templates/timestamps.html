@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% load i18n workbench %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+
+    <div class="card mb-3">
+      <div class="card-header">
+        <h3 class="my-0">{% trans "timestamps" %}</h3>
+        <a href="https://406.ch/timer.html?user={{ user.signed_email }}&amp;url={{ url }}" target="_blank" rel="noopener noreferer">Prototype</a>
+      </div>
+
+      <div class="list-group list-group-flush">
+        {% for row in user.timestamps %}
+        {% if row.elapsed %}
+          <a class="list-group-item list-group-item-action" href="{% url 'logbook_loggedhours_create' %}?hours={{ row.elapsed|stringformat:'s' }}" data-toggle="ajaxmodal">
+            <div class="d-flex w-100">
+
+              <div>
+                <strong>
+                  {{ row.timestamp.created_at|date:'H:i' }}
+                </strong>
+                <span class="badge badge-dark">{{ row.timestamp.get_type_display }}</span>
+                {{ row.timestamp.notes }}
+              </div>
+
+              {% if row.elapsed %}
+              <span class="btn btn-sm btn-primary ml-auto">
+                {{ row.elapsed|hours:True }}
+              </span>
+              {% endif %}
+
+            </div>
+
+          </a>
+        {% else %}
+          <div class="list-group-item">
+            <strong>
+              {{ row.timestamp.created_at|date:'H:i' }}
+            </strong>
+            <span class="badge badge-dark">{{ row.timestamp.get_type_display }}</span>
+            {{ row.timestamp.notes }}
+          </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

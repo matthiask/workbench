@@ -25,6 +25,7 @@ class FEATURES:
     FOREIGN_CURRENCIES = "foreign_currencies"
     GLASSFROG = "glassfrog"
     LABOR_COSTS = "labor_costs"
+    TIMESTAMPS = "timestamps"
 
 
 bookkeeping_only = feature_required(
@@ -36,3 +37,10 @@ controlling_only = feature_required(
 labor_costs_only = feature_required(
     FEATURES.LABOR_COSTS, _("Only labor costs may access this, sorry.")
 )
+
+
+KNOWN_FEATURES = {getattr(FEATURES, attr) for attr in dir(FEATURES) if attr.isupper()}
+
+
+class UnknownFeature(Exception):
+    pass

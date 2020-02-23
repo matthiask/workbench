@@ -379,6 +379,13 @@ function initWidgets() {
     recalculate()
     form.addEventListener("change", recalculate)
   })
+
+  // Some browsers when set to some languages do not accept decimal values with
+  // the point but require a comma (which is annoying). Make all number fields
+  // use the en-US locale to work around this misbehavior.
+  $('input[type="number"]').each(function() {
+    this.setAttribute("lang", "en-US")
+  })
 }
 
 window.addInlineForm = function addInlineForm(slug, onComplete) {

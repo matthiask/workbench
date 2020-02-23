@@ -544,6 +544,17 @@ class LogbookTest(TestCase):
             response, project.urls["createhours"], fetch_redirect_response=False
         )
 
+        response = self.client.post(
+            "/logbook/hours/create/?hours=3",
+            {"modal-project": project.pk},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertRedirects(
+            response,
+            "{}?hours=3".format(project.urls["createhours"]),
+            fetch_redirect_response=False,
+        )
+
     def test_cost_gte_third_party_costs(self):
         service = factories.ServiceFactory.create()
         project = service.project

@@ -22,7 +22,9 @@ def user_middleware(get_response):
 
         set_user_name("user-0-anonymous")
 
-        if request.path.startswith(("/accounts/", "/favicon", "/robots", "/sitemap")):
+        if request.path.startswith(
+            ("/accounts/", "/favicon", "/robots", "/sitemap", "/create-timestamp")
+        ):
             return get_response(request)
 
         messages.info(request, _("Please authenticate."))

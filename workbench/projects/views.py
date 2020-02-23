@@ -9,6 +9,7 @@ from workbench import generic
 from workbench.projects.forms import OffersRenumberForm, ProjectAutocompleteForm
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
+from workbench.templatetags.workbench import h
 
 
 def select(request):
@@ -22,7 +23,14 @@ def select(request):
     return render(
         request,
         "generic/select_object.html",
-        {"form": form, "title": _("Jump to project")},
+        {
+            "form": form,
+            "title": _("Jump to project"),
+            "links": [
+                {"title": h(project), "url": project.get_absolute_url(), "attrs": ""}
+                for project in request.user.active_projects
+            ],
+        },
     )
 
 

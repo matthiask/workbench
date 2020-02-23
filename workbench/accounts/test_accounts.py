@@ -3,6 +3,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 
 from workbench import factories
+from workbench.accounts.features import UnknownFeature
 from workbench.accounts.models import User
 from workbench.tools.testing import messages
 
@@ -69,10 +70,12 @@ class AccountsTest(TestCase):
         self.assertTrue(user.features["yes"])
         self.assertFalse(user.features["no"])
         self.assertFalse(user.features["maybe"])
-        self.assertFalse(user.features["missing"])
+        with self.assertRaises(UnknownFeature):
+            user.features["missing"]
 
         user = User(email="test@example.com")
         self.assertTrue(user.features["yes"])
         self.assertFalse(user.features["no"])
         self.assertTrue(user.features["maybe"])
-        self.assertFalse(user.features["missing"])
+        with self.assertRaises(UnknownFeature):
+            user.features["missing"]
