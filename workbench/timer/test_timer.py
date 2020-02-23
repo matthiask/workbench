@@ -8,7 +8,6 @@ from freezegun import freeze_time
 
 from workbench import factories
 from workbench.timer.models import TimerState, Timestamp
-from workbench.timer.views import signer
 
 
 class TimerTest(TestCase):
@@ -68,7 +67,7 @@ class TimerTest(TestCase):
 
         user = factories.UserFactory.create()
         response = self.client.post(
-            "/create-timestamp/", {"type": "start", "user": signer.sign(user.email)}
+            "/create-timestamp/", {"type": "start", "user": user.signed_email}
         )
         self.assertEqual(response.status_code, 201)
 
