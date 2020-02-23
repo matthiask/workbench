@@ -16,7 +16,7 @@
           {% if links %}
           <div class="list-group">
             {% for link in links %}
-            <a href="{{ link.url }}" class="list-group-item list-group-action" {{ link.attrs|safe }}>
+            <a href="{{ link.url }}" class="list-group-item list-group-item-action" {{ link.attrs|safe }}>
               {{ link.title }}
             </a>
             {% endfor %}
