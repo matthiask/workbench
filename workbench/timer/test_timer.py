@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.test import TestCase
 from django.utils import timezone
+from django.utils.translation import deactivate_all
 
 from freezegun import freeze_time
 
@@ -36,6 +37,8 @@ class TimerTest(TestCase):
             '<div class="readonly"><code><pre>{&#x27;a&#x27;: 1}</pre></code></div>',
         )
 
+
+class TimestampsTest(TestCase):
     @freeze_time("2020-02-20T03:00:00+00:00")
     def test_timestamp(self):
         self.client.force_login(factories.UserFactory.create())
@@ -114,3 +117,9 @@ class TimerTest(TestCase):
 
         # Type has been overridden
         self.assertEqual(user.timestamps[-1]["timestamp"].type, Timestamp.START)
+
+    def test_view(self):
+        deactivate_all()
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.get("/timestamps/")
+        self.assertContains(response, "timestamps")
