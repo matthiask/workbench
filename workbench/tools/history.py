@@ -21,6 +21,7 @@ from workbench.contacts.models import (
     PostalAddress,
 )
 from workbench.credit_control.models import CreditEntry
+from workbench.deals.models import Deal, Stage, Value
 from workbench.expenses.models import ExpenseReport
 from workbench.invoices.models import (
     Invoice,
@@ -183,6 +184,40 @@ def _credit_control_creditentry_cfg(user):
             "notes",
         }
     }
+
+
+def _deals_deal_cfg(user):
+    if not user.features[FEATURES.CONTROLLING]:
+        raise Http404
+    return {
+        "fields": {
+            "customer",
+            "contact",
+            "stage",
+            "title",
+            "description",
+            "owned_by",
+            "value",
+            "status",
+            "created_at",
+            "closed_on",
+            "closing_type",
+            "closing_notice",
+        },
+        "related": [(Value, "deal_id")],
+    }
+
+
+def _deals_stage_cfg(user):
+    if not user.features[FEATURES.CONTROLLING]:
+        raise Http404
+    return {"fields": {"title", "position"}}
+
+
+def _deals_value_cfg(user):
+    if not user.features[FEATURES.CONTROLLING]:
+        raise Http404
+    return {"fields": {"deal", "type", "value"}}
 
 
 def _invoices_invoice_cfg(user):
@@ -387,6 +422,9 @@ HISTORY = {
         }
     },
     CreditEntry: _credit_control_creditentry_cfg,
+    Deal: _deals_deal_cfg,
+    Stage: _deals_stage_cfg,
+    Value: _deals_value_cfg,
     ExpenseReport: {
         "fields": {"created_at", "created_by", "closed_on", "owned_by", "total"},
         "related": [(LoggedCost, "expense_report_id")],

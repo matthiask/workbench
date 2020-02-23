@@ -221,3 +221,15 @@ class HistoryTest(TestCase):
         self.client.force_login(invoice.owned_by)
         url = "/history/invoices_recurringinvoice/id/{}/".format(invoice.pk)
         self.assert_404_without_controlling(url)
+
+    def test_deal_visibility(self):
+        deal = factories.DealFactory.create()
+        self.client.force_login(deal.owned_by)
+        url = "/history/deals_deal/id/{}/".format(deal.pk)
+        self.assert_404_without_controlling(url)
+
+        url = "/history/deals_stage/id/{}/".format(deal.stage_id)
+        self.assert_404_without_controlling(url)
+
+        url = "/history/deals_value/deal_id/{}/".format(deal.pk)
+        self.assert_404_without_controlling(url)
