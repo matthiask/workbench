@@ -74,7 +74,9 @@ class Timestamp(models.Model):
         ret = []
         previous = None
         for current in entries:
-            if previous is None and current.type == Timestamp.STOP:
+            if (
+                previous is None or previous.type == Timestamp.STOP
+            ) and current.type == Timestamp.STOP:
                 # Skip
                 continue
 

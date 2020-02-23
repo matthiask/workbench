@@ -155,6 +155,33 @@ class TimestampsTest(TestCase):
             [Timestamp.START, Timestamp.START],
         )
 
+    def test_timestamps_stop_stop(self):
+        """Test that repeated STOPs are dropped"""
+        today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
+        user = factories.UserFactory.create()
+
+        t1 = user.timestamp_set.create(
+            type=Timestamp.START, created_at=today + dt.timedelta(minutes=0)
+        )
+        t2 = user.timestamp_set.create(
+            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=30)
+        )
+        user.timestamp_set.create(
+            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=40)
+        )
+
+        self.assertEqual(
+            user.timestamps,
+            [
+                {"elapsed": Decimal("0.0"), "timestamp": t1},
+                {"elapsed": Decimal("0.5"), "timestamp": t2},
+            ],
+        )
+        self.assertEqual(
+            [row["timestamp"].type for row in user.timestamps],
+            [Timestamp.START, Timestamp.STOP],
+        )
+
     def test_latest_logbook_entry(self):
         today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
         user = factories.UserFactory.create()
