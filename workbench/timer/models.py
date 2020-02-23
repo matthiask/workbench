@@ -40,6 +40,8 @@ class TimestampQuerySet(models.QuerySet):
             if previous is None or previous.type == Timestamp.STOP:
                 seconds = 0
                 current.type = Timestamp.START  # Override
+            elif current.type == Timestamp.START:
+                seconds = 0
             else:
                 seconds = (current.created_at - previous.created_at).total_seconds()
             elapsed = (Decimal(seconds) / 3600).quantize(

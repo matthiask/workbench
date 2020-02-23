@@ -132,6 +132,29 @@ class TimestampsTest(TestCase):
             ],
         )
 
+    def test_timestamps_start_start(self):
+        today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
+        user = factories.UserFactory.create()
+
+        t1 = user.timestamp_set.create(
+            type=Timestamp.START, created_at=today + dt.timedelta(minutes=0)
+        )
+        t2 = user.timestamp_set.create(
+            type=Timestamp.START, created_at=today + dt.timedelta(minutes=30)
+        )
+
+        self.assertEqual(
+            user.timestamps,
+            [
+                {"elapsed": Decimal("0.0"), "timestamp": t1},
+                {"elapsed": Decimal("0.0"), "timestamp": t2},
+            ],
+        )
+        self.assertEqual(
+            [row["timestamp"].type for row in user.timestamps],
+            [Timestamp.START, Timestamp.START],
+        )
+
     def test_view(self):
         deactivate_all()
         self.client.force_login(factories.UserFactory.create())
