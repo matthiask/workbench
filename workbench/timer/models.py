@@ -4,6 +4,7 @@ from decimal import ROUND_UP, Decimal
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -74,3 +75,12 @@ class Timestamp(models.Model):
 
     def __str__(self):
         return local_date_format(self.created_at)
+
+    @property
+    def badge(self):
+        css = {self.START: "primary", self.SPLIT: "info", self.STOP: "success"}
+        return format_html(
+            '<span class="badge badge-{}">{}</span>',
+            css[self.type],
+            self.get_type_display(),
+        )
