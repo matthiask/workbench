@@ -185,6 +185,9 @@ $(function() {
     } else if (e.keyCode === 82) {
       // r
       window.location.href = restoreSearch("/invoices/")
+    } else if (e.keyCode === 84) {
+      // t
+      window.location.href = restoreSearch("/timestamps/")
     } else if (e.keyCode === 76) {
       // l
       const el = _sel("[data-createhours]")
