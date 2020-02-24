@@ -110,12 +110,12 @@ class TimestampsTest(TestCase):
         self.assertEqual(
             user.timestamps,
             [
-                {"elapsed": Decimal("0.0"), "timestamp": t1},
+                {"elapsed": None, "timestamp": t1},
                 {"elapsed": Decimal("0.7"), "timestamp": t2},
                 {"elapsed": Decimal("0.4"), "timestamp": t3},
                 {"elapsed": Decimal("1.0"), "timestamp": t4},
                 # 0.0 after a STOP
-                {"elapsed": Decimal("0.0"), "timestamp": t5},
+                {"elapsed": None, "timestamp": t5},
                 {"elapsed": Decimal("0.4"), "timestamp": t6},
             ],
         )
@@ -146,10 +146,7 @@ class TimestampsTest(TestCase):
 
         self.assertEqual(
             user.timestamps,
-            [
-                {"elapsed": Decimal("0.0"), "timestamp": t1},
-                {"elapsed": Decimal("0.0"), "timestamp": t2},
-            ],
+            [{"elapsed": None, "timestamp": t1}, {"elapsed": None, "timestamp": t2}],
         )
         self.assertEqual(
             [row["timestamp"].type for row in user.timestamps],
@@ -174,7 +171,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(
             user.timestamps,
             [
-                {"elapsed": Decimal("0.0"), "timestamp": t1},
+                {"elapsed": None, "timestamp": t1},
                 {"elapsed": Decimal("0.5"), "timestamp": t2},
             ],
         )
@@ -202,7 +199,7 @@ class TimestampsTest(TestCase):
         )
 
         self.assertEqual(len(user.timestamps), 3)
-        self.assertEqual(user.timestamps[0]["elapsed"], Decimal("0.0"))
+        self.assertEqual(user.timestamps[0]["elapsed"], None)
         self.assertEqual(user.timestamps[1]["elapsed"], Decimal("0.2"))
         self.assertEqual(user.timestamps[2]["elapsed"], Decimal("0.2"))
 

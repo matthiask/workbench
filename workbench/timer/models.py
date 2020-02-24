@@ -81,17 +81,18 @@ class Timestamp(models.Model):
                     # Skip
                     continue
 
-                seconds = 0
                 current.type = Timestamp.START  # Override
+                elapsed = None
+
             elif current.type == Timestamp.START:
-                seconds = 0
+                elapsed = None
 
             else:
                 seconds = (current.created_at - previous.created_at).total_seconds()
+                elapsed = (Decimal(seconds) / 3600).quantize(
+                    Decimal("0.0"), rounding=ROUND_UP
+                )
 
-            elapsed = (Decimal(seconds) / 3600).quantize(
-                Decimal("0.0"), rounding=ROUND_UP
-            )
             ret.append({"timestamp": current, "elapsed": elapsed})
             previous = current
 
