@@ -57,7 +57,9 @@ class Timestamp(models.Model):
     def for_user(cls, user, *, day=None):
         day = day or dt.date.today()
         entries = list(cls.objects.filter(user=user, created_at__date=day))
-        latest = user.loggedhours.order_by("-created_at").first()
+        latest = (
+            user.loggedhours.select_related("service").order_by("-created_at").first()
+        )
         if latest and latest.rendered_on == day:
             entries.append(
                 cls(
