@@ -8,7 +8,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.tools.formats import local_date_format
+from workbench.tools.formats import hours, local_date_format
 
 
 class TimerState(models.Model):
@@ -57,18 +57,21 @@ class Timestamp(models.Model):
     def for_user(cls, user, *, day=None):
         day = day or dt.date.today()
         entries = list(cls.objects.filter(user=user, created_at__date=day))
-        latest = (
-            user.loggedhours.select_related("service").order_by("-created_at").first()
-        )
-        if latest and latest.rendered_on == day:
-            entries.append(
-                cls(
-                    created_at=latest.created_at,
-                    type=cls.SPLIT,
-                    notes=_("Latest logbook entry on %(service)s: %(description)s")
-                    % {"service": latest.service, "description": latest.description},
-                )
+        entries.extend(
+            cls(
+                created_at=entry.created_at,
+                type=cls.START,
+                notes=_("Logbook entry on %(service)s: %(description)s (%(hours)s)")
+                % {
+                    "service": entry.service,
+                    "description": entry.description,
+                    "hours": hours(entry.hours),
+                },
             )
+            for entry in user.loggedhours.filter(rendered_on=day).select_related(
+                "service"
+            )
+        )
         entries = sorted(entries, key=lambda timestamp: timestamp.created_at)
         if not entries:
             return []

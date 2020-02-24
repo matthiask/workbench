@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-23 21:25+0100\n"
+"POT-Creation-Date: 2020-02-24 15:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2463,8 +2463,8 @@ msgstr "Zeitmarke"
 
 #: workbench/timer/models.py
 #, python-format
-msgid "Latest logbook entry on %(service)s: %(description)s"
-msgstr "Letzter Logbucheintrag auf %(service)s: %(description)s"
+msgid "Logbook entry on %(service)s: %(description)s (%(hours)s)"
+msgstr "Logbucheintrag auf %(service)s: %(description)s (%(hours)s)"
 
 #: workbench/tools/forms.py
 msgid "Is automatically filled using the organization's contact."

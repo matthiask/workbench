@@ -200,7 +200,7 @@ class TimestampsTest(TestCase):
 
         self.assertEqual(len(user.timestamps), 3)
         self.assertEqual(user.timestamps[0]["elapsed"], None)
-        self.assertEqual(user.timestamps[1]["elapsed"], Decimal("0.2"))
+        self.assertEqual(user.timestamps[1]["elapsed"], None)
         self.assertEqual(user.timestamps[2]["elapsed"], Decimal("0.2"))
 
         self.assertEqual(user.timestamps[0]["timestamp"], t1)
