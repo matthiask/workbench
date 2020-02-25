@@ -43,7 +43,7 @@
           </span>
           <span class="col-md-4">
 
-            {% if request.user|has:FEATURES.CONTROLLING %}
+            {% if request.user|has_feature:FEATURES.CONTROLLING %}
               <table class="table table-borderless table-sm">
                 <tr>
                   <th class="text-right">{% trans 'total costs' %}</th>
@@ -92,7 +92,7 @@
       <a href="{{ object.urls.statistics }}" class="btn btn-primary" data-toggle="ajaxmodal">
         {% trans 'statistics' %}</a>
 
-      {% if request.user|has:FEATURES.CONTROLLING and project.grouped_services.offers|length > 1 %}
+      {% if request.user|has_feature:FEATURES.CONTROLLING and project.grouped_services.offers|length > 1 %}
         <span class="dropdown">
           <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             {% trans 'project offers' %}
@@ -130,7 +130,7 @@
               {{ offer.status_badge }}
             </div>
 
-            {% if request.user|has:FEATURES.CONTROLLING %}
+            {% if request.user|has_feature:FEATURES.CONTROLLING %}
               <div>
                 <span class="btn-group">
                   <a href="{{ offer.urls.pdf }}" class="btn btn-primary btn-sm" target="_blank">PDF</a>
@@ -171,7 +171,7 @@
           <div class="d-flex w-100 justify-content-between">
             <h5 class="d-inline my-0">{% trans 'Not offered yet' %}</h5>
 
-            {% if request.user|has:FEATURES.CONTROLLING %}
+            {% if request.user|has_feature:FEATURES.CONTROLLING %}
               <a href="{{ project.urls.createoffer }}" class="btn btn-primary btn-sm">
                 {% include 'svg/plus.svg' %} {% trans 'offer' %}</a>
             {% endif %}
@@ -191,7 +191,7 @@
               <a href="" class="btn btn-primary btn-sm" title="{% trans 'Sort' %}" data-sortable-grabber>
                 {% include 'svg/grabber.svg' %}</a>
 
-              {% if request.user|has:FEATURES.CONTROLLING %}
+              {% if request.user|has_feature:FEATURES.CONTROLLING %}
                 <span class="dropdown">
                   <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
                     id="service-dropdown-{{ row.service.pk }}"
@@ -277,7 +277,7 @@
     </div>
     {% endfor %}
 
-    {% if request.user|has:FEATURES.CONTROLLING and object.project_invoices %}
+    {% if request.user|has_feature:FEATURES.CONTROLLING and object.project_invoices %}
     <div class="card my-3">
       <div class="card-header d-flex align-items-center justify-content-between">
         <h5 class="d-inline my-0">{% trans 'invoices' %}</h5>
@@ -303,7 +303,7 @@
     </div>
     {% endif %}
 
-    {% if request.user|has:FEATURES.CONTROLLING %}
+    {% if request.user|has_feature:FEATURES.CONTROLLING %}
       <span class="dropdown">
         <button class="btn btn-primary dropdown-toggle" type="button"
           id="invoice-dropdown-button" data-toggle="dropdown"

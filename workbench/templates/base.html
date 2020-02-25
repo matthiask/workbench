@@ -25,7 +25,7 @@
         <li class="nav-item"><a class="nav-link" href="/">{% trans 'dashboard'|capfirst %}</a></li>
         {% mark_current request.path %}
         <li class="nav-item"><a class="nav-link" href="{% url 'projects_project_list' %}">{% trans 'projects'|capfirst %}</a></li>
-        {% if request.user|has:FEATURES.CONTROLLING %}
+        {% if request.user|has_feature:FEATURES.CONTROLLING %}
           <li class="nav-item"><a class="nav-link" href="{% url 'offers_offer_list' %}">{% trans 'offers'|capfirst %}</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'invoices_invoice_list' %}">{% trans 'invoices'|capfirst %}</a></li>
         {% endif %}
@@ -48,7 +48,7 @@
             {% trans 'bookkeeping'|capfirst %}
           </a>
           <div class="dropdown-menu" aria-labelledby="bookkeepingDropdown">
-            {% if request.user|has:FEATURES.CONTROLLING %}
+            {% if request.user|has_feature:FEATURES.CONTROLLING %}
               <a class="dropdown-item" href="{% url 'invoices_recurringinvoice_list' %}">{% trans 'recurring invoices'|capfirst %}</a>
               <a class="dropdown-item" href="{% url 'credit_control_creditentry_list' %}">{% trans 'credit entries'|capfirst %}</a>
             {% endif %}
@@ -61,7 +61,7 @@
             {% trans 'reports'|capfirst %}
           </a>
           <div class="dropdown-menu" aria-labelledby="reportsDropdown">
-            {% if request.user|has:FEATURES.CONTROLLING %}
+            {% if request.user|has_feature:FEATURES.CONTROLLING %}
               <a class="dropdown-item" href="{% url 'report_key_data' %}">{% trans 'key data'|capfirst %}</a>
             {% endif %}
 
@@ -70,7 +70,7 @@
             <a class="dropdown-item" href="{% url 'awt_year_report' %}">{% trans 'annual working time'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'awt_absence_calendar' %}">{% trans 'absence calendar' %}</a>
 
-            {% if request.user|has:FEATURES.CONTROLLING %}
+            {% if request.user|has_feature:FEATURES.CONTROLLING %}
               <div class="dropdown-divider"></div>
               <div class="dropdown-header">{% trans 'projects' %}</div>
               <a class="dropdown-item" href="{% url 'report_project_budget_statistics' %}">{% trans 'project budget statistics'|capfirst %}</a>
@@ -80,14 +80,14 @@
               <a class="dropdown-item" href="{% url 'report_open_items_list' %}">{% trans 'open items list'|capfirst %}</a>
               <div class="dropdown-divider"></div>
               <div class="dropdown-header">{% trans 'logged hours' %}</div>
-              {% if request.user|has:FEATURES.GLASSFROG %}
+              {% if request.user|has_feature:FEATURES.GLASSFROG %}
                 <a class="dropdown-item" href="{% url 'report_hours_by_circle' %}">{% trans 'hours by circle'|capfirst %}</a>
               {% endif %}
               <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">{% trans 'hours per customer'|capfirst %}</a>
               <a class="dropdown-item" href="{% url 'report_green_hours' %}">{% trans 'green hours'|capfirst %}</a>
             {% endif %} {# CONTROLLING #}
 
-            {% if request.user|has:FEATURES.LABOR_COSTS %}
+            {% if request.user|has_feature:FEATURES.LABOR_COSTS %}
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="{% url 'report_labor_costs' %}">{% trans 'labor costs'|capfirst %}</a>
             {% endif %}
@@ -110,7 +110,7 @@
             {% endif %}
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'timer' %}">{% trans 'timer'|capfirst %}</a>
-            {% if request.user|has:FEATURES.TIMESTAMPS %}
+            {% if request.user|has_feature:FEATURES.TIMESTAMPS %}
             <a class="dropdown-item" href="{% url 'timestamps' %}">{% trans 'timestamps'|capfirst %}</a>
             {% endif %}
             <div class="dropdown-divider"></div>
