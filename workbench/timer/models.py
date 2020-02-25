@@ -89,9 +89,17 @@ class Timestamp(models.Model):
                 "service"
             )
         )
-        entries = sorted(entries, key=lambda timestamp: timestamp.created_at)
         if not entries:
             return []
+        entries = sorted(entries, key=lambda timestamp: timestamp.created_at)
+        if entries[-1].type != Timestamp.STOP:
+            entries.append(
+                cls(
+                    created_at=timezone.now(),
+                    type=cls.SPLIT,
+                    notes=_("<current time since last timestamp>"),
+                )
+            )
 
         ret = []
         previous = None
