@@ -42,6 +42,14 @@
             </div>
 
           </a>
+        {% elif row.timestamp.url %}
+          <a class="list-group-item list-group-item-action" href="{{ row.timestamp.url }}" data-toggle="ajaxmodal">
+            <strong>
+              {{ row.timestamp.created_at|date:'H:i' }}
+            </strong>
+            {{ row.timestamp.badge }}
+            {{ row.timestamp.notes }}
+          </a>
         {% else %}
           <div class="list-group-item">
             <strong>

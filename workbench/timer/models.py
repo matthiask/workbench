@@ -50,6 +50,10 @@ class Timestamp(models.Model):
     def __str__(self):
         return local_date_format(self.created_at)
 
+    def __init__(self, *args, **kwargs):
+        self.url = kwargs.pop("url", "")
+        super().__init__(*args, **kwargs)
+
     def save(self, *args, **kwargs):
         assert self.type != self.LOGBOOK, "Not to be used for timestamps"
         super().save(*args, **kwargs)
@@ -84,6 +88,7 @@ class Timestamp(models.Model):
                     "description": entry.description,
                     "hours": hours(entry.hours),
                 },
+                url=entry.get_absolute_url(),
             )
             for entry in user.loggedhours.filter(rendered_on=day).select_related(
                 "service"
