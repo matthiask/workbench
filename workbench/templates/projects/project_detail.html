@@ -325,7 +325,7 @@
         {% include "svg/plus.svg" %} {% trans 'service' %}</a>
     {% endif %}
 
-    <a href="{{ project.urls.createhours }}" class="btn btn-primary" data-toggle="ajaxmodal" data-createhours>
+    <a href="{{ project.urls.createhours }}" class="btn btn-primary" data-toggle="ajaxmodal">
       {% include "svg/plus.svg" %}
       {% trans 'hours' %}</a>
     <a href="{{ project.urls.createcost }}" class="btn btn-primary" data-toggle="ajaxmodal" data-createcost>
@@ -334,6 +334,13 @@
 
   </div>
 </div>
+{% endblock %}
+
+{% block fixed-add-button %}
+  <a href="{{ project.urls.createhours }}"
+     data-createhours
+     data-toggle="ajaxmodal"
+     class="btn btn-primary fixed-btn" title="{% trans 'log hours' %}"></a>
 {% endblock %}
 
 {% block js %}{{ block.super }}

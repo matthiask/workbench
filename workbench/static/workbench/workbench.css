@@ -203,3 +203,22 @@ tbody th > a {
 [data-open="true"] {
   z-index: 99999;
 }
+
+.fixed-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  z-index: 99999;
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+.fixed-btn::after {
+  content: "⏱";
+  position: relative;
+  top: -.37em;
+  left: -.2em;
+}

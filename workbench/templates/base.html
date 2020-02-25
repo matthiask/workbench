@@ -136,4 +136,11 @@
 
   </div> <!-- /container -->
 
+  {% block fixed-add-button %}
+  <a href="{% url 'logbook_loggedhours_create' %}"
+     data-createhours
+     data-toggle="ajaxmodal"
+     class="btn btn-primary fixed-btn" title="{% trans 'log hours' %}"></a>
+  {% endblock %}
+
 {% endblock body %}
