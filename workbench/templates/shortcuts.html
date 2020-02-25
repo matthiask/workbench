@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n %}
+{% load i18n workbench %}
 
 {% block title %}{% trans 'keyboard shortcuts' %} - {{ block.super }}{% endblock %}
 
@@ -59,6 +59,13 @@
         <th class="text-right text-nowrap">Ctrl-R</th>
         <td>{% trans 'invoices' %}</td>
       </tr>
+
+      {% if request.user|has:FEATURES.TIMESTAMPS %}
+      <tr>
+        <th class="text-right text-nowrap">Ctrl-T</th>
+        <td>{% trans 'timestamps' %}</td>
+      </tr>
+      {% endif %}
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-L</th>
