@@ -12,7 +12,7 @@
       {% endif %}
     </div>
   {% else %}
-    {{ label_tag }}
+    {% if field.label %}{{ label_tag }}{% endif %}
     <div class="">
       {% if field.field.help_text %}
         <small class="form-text text-muted form-help-text">{{ field.field.help_text }}</small>
