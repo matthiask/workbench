@@ -28,8 +28,14 @@ class Timestamp(models.Model):
     START = "start"
     SPLIT = "split"
     STOP = "stop"
+    LOGBOOK = "logbook"
 
-    TYPE_CHOICES = [(START, _("start")), (SPLIT, _("split")), (STOP, _("stop"))]
+    TYPE_CHOICES = [
+        (START, _("start")),
+        (SPLIT, _("split")),
+        (STOP, _("stop")),
+        (LOGBOOK, _("logbook")),
+    ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
@@ -44,9 +50,20 @@ class Timestamp(models.Model):
     def __str__(self):
         return local_date_format(self.created_at)
 
+    def save(self, *args, **kwargs):
+        assert self.type != self.LOGBOOK, "Not to be used for timestamps"
+        super().save(*args, **kwargs)
+
+    save.alters_data = True
+
     @property
     def badge(self):
-        css = {self.START: "primary", self.SPLIT: "info", self.STOP: "success"}
+        css = {
+            self.START: "primary",
+            self.SPLIT: "info",
+            self.STOP: "success",
+            self.LOGBOOK: "secondary",
+        }
         return format_html(
             '<span class="badge badge-{}">{}</span>',
             css[self.type],
@@ -60,7 +77,7 @@ class Timestamp(models.Model):
         entries.extend(
             cls(
                 created_at=entry.created_at,
-                type=cls.START,
+                type=cls.LOGBOOK,
                 notes=_("Logbook entry on %(service)s: %(description)s (%(hours)s)")
                 % {
                     "service": entry.service,
@@ -84,10 +101,11 @@ class Timestamp(models.Model):
                     # Skip
                     continue
 
-                current.type = Timestamp.START  # Override
+                if current.type not in {Timestamp.START, Timestamp.LOGBOOK}:
+                    current.type = Timestamp.START  # Override
                 elapsed = None
 
-            elif current.type == Timestamp.START:
+            elif current.type in {Timestamp.START, Timestamp.LOGBOOK}:
                 elapsed = None
 
             else:
