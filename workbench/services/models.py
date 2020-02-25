@@ -52,15 +52,15 @@ class ServiceBase(Model):
         verbose_name_plural = _("services")
 
     def __str__(self):
-        return Truncator(
-            " - ".join(filter(None, (self.title, self.description)))
-        ).chars(100)
+        return Truncator(": ".join(filter(None, (self.title, self.description)))).chars(
+            100
+        )
 
     def project_service_title(self):
         title = "{}: {}{}{}".format(
             self.project,
             self.title,
-            " - " if self.description else "",
+            ": " if self.description else "",
             self.description,
         )
         return Truncator(title).chars(100)

@@ -185,7 +185,7 @@ class LogbookTest(TestCase):
         )
         self.assertContains(
             response,
-            '<a href="/projects/{}/#service{}">service title - service description'
+            '<a href="/projects/{}/#service{}">service title: service description'
             "</a>".format(project.id, entry.service.id),
         )
 
