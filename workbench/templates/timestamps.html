@@ -8,7 +8,15 @@
 
     <div class="card mb-3">
       <div class="card-header d-flex w-100 justify-content-between">
-        <h3 class="my-0">{% trans "timestamps" %}</h3>
+        <h3 class="my-0">
+          {% trans "timestamps" %}
+          <small>
+            <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}&amp;date_from={% now 'Y-m-d' %}">
+              {{ user.hours.today|hours }} {% trans 'today' %}</a> /
+            <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
+              {{ user.hours.week|hours }} {% trans 'this week' %}</a>
+          </small>
+        </h3>
         <a href="https://406.ch/timer.html?user={{ user.signed_email }}&amp;url={{ url }}&amp;title={{ WORKBENCH.TITLE }}"
            class="btn btn-primary btn-sm"
            target="_blank"
