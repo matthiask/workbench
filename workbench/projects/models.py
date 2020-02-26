@@ -338,6 +338,9 @@ class Project(Model):
             "total_logged_cost": total_logged_cost,
             "total_service_hours_rate_undefined": total_service_hours_rate_undefined,
             "total_logged_hours_rate_undefined": total_logged_hours_rate_undefined,
+            "total_discount": sum(
+                (offer.discount for offer in offers if not offer.is_rejected), Z
+            ),
         }
 
     @cached_property

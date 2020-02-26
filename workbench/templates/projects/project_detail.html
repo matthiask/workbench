@@ -57,6 +57,9 @@
                     {% if project.grouped_services.total_service_hours_rate_undefined %}
                       <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.grouped_services.total_service_hours_rate_undefined|hours }})</span>
                     {% endif %}
+                    {% if project.grouped_services.total_discount %}
+                      (-{{ project.grouped_services.total_discount|currency }} {% trans 'discount' %})
+                    {% endif %}
                   </td>
                 </tr>
 
