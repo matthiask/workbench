@@ -60,12 +60,10 @@
         <td>{% trans 'invoices' %}</td>
       </tr>
 
-      {% if request.user|has_feature:FEATURES.TIMESTAMPS %}
       <tr>
         <th class="text-right text-nowrap">Ctrl-T</th>
         <td>{% trans 'timestamps' %}</td>
       </tr>
-      {% endif %}
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-L</th>
