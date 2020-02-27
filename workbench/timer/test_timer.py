@@ -215,3 +215,7 @@ class TimestampsTest(TestCase):
         self.client.force_login(user)
         response = self.client.get("/timestamps/")
         self.assertContains(response, "timestamps")
+
+    def test_controller(self):
+        response = self.client.get("/timestamps-controller/")
+        self.assertContains(response, "Timestamps")

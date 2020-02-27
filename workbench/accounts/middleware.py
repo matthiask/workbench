@@ -23,7 +23,14 @@ def user_middleware(get_response):
         set_user_name("user-0-anonymous")
 
         if request.path.startswith(
-            ("/accounts/", "/favicon", "/robots", "/sitemap", "/create-timestamp")
+            (
+                "/accounts/",
+                "/favicon",
+                "/robots",
+                "/sitemap",
+                "/create-timestamp",
+                "/timestamps-controller",
+            )
         ):
             return get_response(request)
 

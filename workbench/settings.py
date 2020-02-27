@@ -332,6 +332,7 @@ if LIVE:  # pragma: no cover
     SECURE_REDIRECT_EXEMPT = [r"^create-timestamp/"]
 else:
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+    WORKBENCH.TITLE = "(debug) {}".format(WORKBENCH.TITLE)
 
 MAILCHIMP_API_KEY = env("MAILCHIMP_API_KEY", warn=True)
 MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID", warn=True)
