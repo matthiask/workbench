@@ -8,6 +8,7 @@ from django.utils.translation import deactivate_all
 from freezegun import freeze_time
 
 from workbench import factories
+from workbench.accounts.models import User
 from workbench.timer.models import TimerState, Timestamp
 
 
@@ -219,3 +220,23 @@ class TimestampsTest(TestCase):
     def test_controller(self):
         response = self.client.get("/timestamps-controller/")
         self.assertContains(response, "Timestamps")
+
+    def test_latest_created_at(self):
+        user = factories.UserFactory.create()
+        self.assertEqual(user.latest_created_at, None)
+
+        user = User.objects.get(id=user.id)
+        t = user.timestamp_set.create(
+            created_at=timezone.now() - dt.timedelta(seconds=99), type=Timestamp.SPLIT
+        )
+        self.assertEqual(user.latest_created_at, t.created_at)
+
+        user = User.objects.get(id=user.id)
+        h = factories.LoggedHoursFactory.create(rendered_by=user)
+        self.assertEqual(user.latest_created_at, h.created_at)
+
+        user = User.objects.get(id=user.id)
+        t = user.timestamp_set.create(
+            created_at=timezone.now() + dt.timedelta(seconds=99), type=Timestamp.SPLIT
+        )
+        self.assertEqual(user.latest_created_at, t.created_at)
