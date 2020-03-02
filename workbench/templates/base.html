@@ -112,8 +112,11 @@
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'timer' %}">{% trans 'timer'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'timestamps' %}">{% trans 'timestamps'|capfirst %}</a>
+            {% if request.user|has_feature:FEATURES.CONTROLLING %}
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'deals_deal_list' %}">{% trans 'deals'|capfirst %}</a>
+            {% endif %}
+
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'logout' %}">{% trans 'Sign out'|capfirst %}</a>
           </div>
