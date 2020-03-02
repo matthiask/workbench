@@ -58,7 +58,7 @@
 
 <div class="row mt-5">
 
-  <div class="col-lg-4">
+  <div class="col-md-6 col-lg-4">
     <div class="card mb-3">
       <div class="card-header"><h3 class="my-0">
         <a href="{% url 'projects_project_list' %}?org={{ organization.pk }}">
@@ -79,7 +79,7 @@
 
   {% if request.user|has_feature:FEATURES.CONTROLLING %}
 
-    <div class="col-lg-4">
+    <div class="col-md-6 col-lg-4">
       <div class="card mb-3">
         <div class="card-header"><h3 class="my-0">
           <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}">
@@ -98,7 +98,7 @@
       </div>
     </div>
 
-    <div class="col-lg-4">
+    <div class="col-md-6 col-lg-4">
       <div class="card mb-3">
         <div class="card-header"><h3 class="my-0">
           <a href="{% url 'offers_offer_list' %}?org={{ organization.pk }}">
