@@ -7,27 +7,42 @@
   <div class="col-lg-6">
 
     <div class="card mb-3">
-      <div class="card-header">
-        <h3 class="my-0">{% trans "timestamps" %}</h3>
-        <a href="https://406.ch/timer.html?user={{ user.signed_email }}&amp;url={{ url }}" target="_blank" rel="noopener noreferer">Prototype</a>
+      <div class="card-header d-flex w-100 justify-content-between">
+        <h3 class="my-0">
+          {% trans "timestamps" %}
+          <small>
+            <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}&amp;date_from={% now 'Y-m-d' %}">
+              {{ user.hours.today|hours }} {% trans 'today' %}</a> /
+            <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
+              {{ user.hours.week|hours }} {% trans 'this week' %}</a>
+          </small>
+        </h3>
+        <a href="{% url 'timestamps-controller' %}?user={{ user.signed_email }}&amp;url={{ url }}&amp;title={{ WORKBENCH.TITLE }}"
+           class="btn btn-primary btn-sm align-self-start"
+           target="_blank"
+           rel="noopener noreferrer"
+           onclick="window.open(this.href, 'timestamps', 'innerHeight=400,innerWidth=400,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no');return false">
+          {% trans 'controller' %}</a>
       </div>
 
       <div class="list-group list-group-flush">
         {% for row in user.timestamps %}
         {% if row.elapsed %}
-          <a class="list-group-item list-group-item-action" href="{% url 'logbook_loggedhours_create' %}?hours={{ row.elapsed|stringformat:'s' }}" data-toggle="ajaxmodal">
+          <a class="list-group-item list-group-item-action"
+            href="{% url 'logbook_loggedhours_create' %}?hours={{ row.elapsed|stringformat:'s' }}"
+            data-toggle="ajaxmodal">
             <div class="d-flex w-100">
 
               <div>
                 <strong>
                   {{ row.timestamp.created_at|date:'H:i' }}
                 </strong>
-                <span class="badge badge-dark">{{ row.timestamp.get_type_display }}</span>
+                {{ row.timestamp.badge }}
                 {{ row.timestamp.notes }}
               </div>
 
               {% if row.elapsed %}
-              <span class="btn btn-sm btn-primary ml-auto">
+              <span class="btn btn-sm btn-primary ml-auto align-self-start">
                 {{ row.elapsed|hours:True }}
               </span>
               {% endif %}
@@ -35,12 +50,20 @@
             </div>
 
           </a>
+        {% elif row.timestamp.url %}
+          <a class="list-group-item list-group-item-action" href="{{ row.timestamp.url }}" data-toggle="ajaxmodal">
+            <strong>
+              {{ row.timestamp.created_at|date:'H:i' }}
+            </strong>
+            {{ row.timestamp.badge }}
+            {{ row.timestamp.notes }}
+          </a>
         {% else %}
           <div class="list-group-item">
             <strong>
               {{ row.timestamp.created_at|date:'H:i' }}
             </strong>
-            <span class="badge badge-dark">{{ row.timestamp.get_type_display }}</span>
+            {{ row.timestamp.badge }}
             {{ row.timestamp.notes }}
           </div>
         {% endif %}

@@ -8,6 +8,7 @@ from django.utils.translation import deactivate_all
 from freezegun import freeze_time
 
 from workbench import factories
+from workbench.accounts.models import User
 from workbench.timer.models import TimerState, Timestamp
 
 
@@ -63,12 +64,13 @@ class TimestampsTest(TestCase):
         response = self.client.post("/create-timestamp/", {"type": "start"})
         self.assertEqual(response.status_code, 403)
 
+        user = factories.UserFactory.create()
+
         response = self.client.post(
-            "/create-timestamp/", {"type": "start", "user": "test"}
+            "/create-timestamp/", {"type": "start", "user": user.email}
         )
         self.assertEqual(response.status_code, 403)
 
-        user = factories.UserFactory.create()
         response = self.client.post(
             "/create-timestamp/", {"type": "start", "user": user.signed_email}
         )
@@ -77,7 +79,7 @@ class TimestampsTest(TestCase):
         t = Timestamp.objects.get()
         self.assertEqual(t.user, user)
 
-    def test_structured(self):
+    def test_timestamps_scenario(self):
         today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
         user = factories.UserFactory.create()
 
@@ -102,24 +104,142 @@ class TimestampsTest(TestCase):
         t5 = user.timestamp_set.create(
             type=Timestamp.SPLIT, created_at=today + dt.timedelta(minutes=140)
         )
+        t6 = user.timestamp_set.create(
+            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=160)
+        )
 
         self.assertEqual(
             user.timestamps,
             [
-                {"elapsed": Decimal("0.0"), "timestamp": t1},
+                {"elapsed": None, "timestamp": t1},
                 {"elapsed": Decimal("0.7"), "timestamp": t2},
                 {"elapsed": Decimal("0.4"), "timestamp": t3},
                 {"elapsed": Decimal("1.0"), "timestamp": t4},
                 # 0.0 after a STOP
-                {"elapsed": Decimal("0.0"), "timestamp": t5},
+                {"elapsed": None, "timestamp": t5},
+                {"elapsed": Decimal("0.4"), "timestamp": t6},
             ],
         )
 
-        # Type has been overridden
-        self.assertEqual(user.timestamps[-1]["timestamp"].type, Timestamp.START)
+        # Some types have been overridden
+        self.assertEqual(
+            [row["timestamp"].type for row in user.timestamps],
+            [
+                Timestamp.START,
+                Timestamp.SPLIT,
+                Timestamp.SPLIT,
+                Timestamp.STOP,
+                Timestamp.START,  # Was: SPLIT
+                Timestamp.STOP,
+            ],
+        )
+
+    def test_timestamps_start_start(self):
+        today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
+        user = factories.UserFactory.create()
+
+        t1 = user.timestamp_set.create(
+            type=Timestamp.START, created_at=today + dt.timedelta(minutes=0)
+        )
+        t2 = user.timestamp_set.create(
+            type=Timestamp.START, created_at=today + dt.timedelta(minutes=29)
+        )
+
+        self.assertEqual(
+            user.timestamps,
+            [
+                {"elapsed": None, "timestamp": t1},
+                {"elapsed": Decimal("0.5"), "timestamp": t2},
+            ],
+        )
+        self.assertEqual(
+            [row["timestamp"].type for row in user.timestamps],
+            [Timestamp.START, Timestamp.SPLIT],  # 2nd was: START
+        )
+
+    def test_timestamps_stop_stop(self):
+        """Test that repeated STOPs are dropped"""
+        today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
+        user = factories.UserFactory.create()
+
+        t1 = user.timestamp_set.create(
+            type=Timestamp.START, created_at=today + dt.timedelta(minutes=0)
+        )
+        t2 = user.timestamp_set.create(
+            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=30)
+        )
+        user.timestamp_set.create(
+            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=40)
+        )
+
+        self.assertEqual(
+            user.timestamps,
+            [
+                {"elapsed": None, "timestamp": t1},
+                {"elapsed": Decimal("0.5"), "timestamp": t2},
+            ],
+        )
+        self.assertEqual(
+            [row["timestamp"].type for row in user.timestamps],
+            [Timestamp.START, Timestamp.STOP],
+        )
+
+    def test_latest_logbook_entry(self):
+        today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
+        user = factories.UserFactory.create()
+
+        self.assertEqual(Timestamp.for_user(user), [])
+
+        t1 = user.timestamp_set.create(
+            type=Timestamp.START, created_at=today + dt.timedelta(minutes=0)
+        )
+        l1 = factories.LoggedHoursFactory.create(
+            rendered_by=user,
+            created_at=today + dt.timedelta(minutes=10),
+            description="ABC",
+        )
+        t2 = user.timestamp_set.create(
+            type=Timestamp.SPLIT, created_at=today + dt.timedelta(minutes=20)
+        )
+
+        self.assertEqual(len(user.timestamps), 3)
+        self.assertEqual(user.timestamps[0]["elapsed"], None)
+        self.assertEqual(user.timestamps[1]["elapsed"], None)
+        self.assertEqual(user.timestamps[2]["elapsed"], Decimal("0.2"))
+
+        self.assertEqual(user.timestamps[0]["timestamp"], t1)
+        self.assertIn(l1.description, user.timestamps[1]["timestamp"].notes)
+        self.assertEqual(user.timestamps[2]["timestamp"], t2)
 
     def test_view(self):
         deactivate_all()
-        self.client.force_login(factories.UserFactory.create())
+        user = factories.UserFactory.create()
+        user.timestamp_set.create(type=Timestamp.START)
+
+        self.client.force_login(user)
         response = self.client.get("/timestamps/")
         self.assertContains(response, "timestamps")
+
+    def test_controller(self):
+        response = self.client.get("/timestamps-controller/")
+        self.assertContains(response, "Timestamps")
+
+    def test_latest_created_at(self):
+        user = factories.UserFactory.create()
+        self.assertEqual(user.latest_created_at, None)
+
+        user = User.objects.get(id=user.id)
+        t = user.timestamp_set.create(
+            created_at=timezone.now() - dt.timedelta(seconds=99), type=Timestamp.SPLIT
+        )
+        self.assertEqual(user.latest_created_at, t.created_at)
+
+        user = User.objects.get(id=user.id)
+        h = factories.LoggedHoursFactory.create(rendered_by=user)
+        self.assertEqual(user.latest_created_at, h.created_at)
+
+        user = User.objects.get(id=user.id)
+        t = user.timestamp_set.create(
+            created_at=timezone.now() + dt.timedelta(seconds=99), type=Timestamp.SPLIT
+        )
+        self.assertEqual(user.latest_created_at, t.created_at)

@@ -25,7 +25,6 @@ class FEATURES:
     FOREIGN_CURRENCIES = "foreign_currencies"
     GLASSFROG = "glassfrog"
     LABOR_COSTS = "labor_costs"
-    TIMESTAMPS = "timestamps"
 
 
 bookkeeping_only = feature_required(

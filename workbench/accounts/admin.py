@@ -42,9 +42,11 @@ class UserAdmin(UserAdmin):
                     for field in User._meta.get_fields()
                     if field.editable and field.name not in {"password", "id"}
                 ]
+                + ["signed_email"]
             },
         )
     ]
+    readonly_fields = ["signed_email"]
     search_fields = ("email", "_short_name", "_full_name")
     ordering = ("email",)
     filter_horizontal = ()

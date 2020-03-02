@@ -54,7 +54,8 @@ urlpatterns = [
     url(
         r"^people/autocomplete/$",
         generic.AutocompleteView.as_view(
-            model=Person, queryset=Person.objects.select_related("organization")
+            model=Person,
+            queryset=Person.objects.active().select_related("organization"),
         ),
         name="contacts_person_autocomplete",
     ),

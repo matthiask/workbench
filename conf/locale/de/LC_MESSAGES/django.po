@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-23 17:32+0100\n"
+"POT-Creation-Date: 2020-03-02 17:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1483,7 +1483,7 @@ msgstr "Kosten"
 #: workbench/templates/base.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html
-#: workbench/tools/xlsx.py
+#: workbench/timer/models.py workbench/tools/xlsx.py
 msgid "logbook"
 msgstr "Logbuch"
 
@@ -1847,6 +1847,7 @@ msgid "accruals"
 msgstr "Abgrenzungen"
 
 #: workbench/reporting/utils.py workbench/templates/start.html
+#: workbench/templates/timestamps.html
 msgid "this week"
 msgstr "diese Woche"
 
@@ -2145,14 +2146,19 @@ msgstr "Verwaltung"
 msgid "timer"
 msgstr "Timer"
 
-#: workbench/templates/base.html workbench/templates/timestamps.html
-#: workbench/timer/models.py
+#: workbench/templates/base.html workbench/templates/shortcuts.html
+#: workbench/templates/timestamps.html workbench/timer/models.py
 msgid "timestamps"
 msgstr "Zeitmarken"
 
 #: workbench/templates/base.html
 msgid "Sign out"
 msgstr "Abmelden"
+
+#: workbench/templates/base.html
+#: workbench/templates/projects/project_detail.html
+msgid "log hours"
+msgstr "Stunden erfassen"
 
 #: workbench/templates/contacts/organization_detail.html
 msgid "yes,no"
@@ -2239,7 +2245,8 @@ msgstr "Zwischentotal"
 
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/tools/models.py workbench/tools/pdf.py
+#: workbench/templates/projects/project_detail.html workbench/tools/models.py
+#: workbench/tools/pdf.py
 msgid "discount"
 msgstr "Rabatt"
 
@@ -2534,7 +2541,7 @@ msgstr "Geburtstage"
 msgid "today's hours"
 msgstr "Stunden von heute"
 
-#: workbench/templates/start.html
+#: workbench/templates/start.html workbench/templates/timestamps.html
 msgid "today"
 msgstr "heute"
 
@@ -2545,6 +2552,10 @@ msgstr "keine Stunden heute"
 #: workbench/templates/start.html
 msgid "all users' hours"
 msgstr "Stunden von allen"
+
+#: workbench/templates/timestamps.html
+msgid "controller"
+msgstr "Controller"
 
 #: workbench/templatetags/workbench.py workbench/tools/history.py
 msgid "yes"
@@ -2585,6 +2596,11 @@ msgstr "Stop"
 #: workbench/timer/models.py
 msgid "timestamp"
 msgstr "Zeitmarke"
+
+#: workbench/timer/models.py
+#, python-format
+msgid "Logbook entry on %(service)s: %(description)s (%(hours)s)"
+msgstr "Logbucheintrag auf %(service)s: %(description)s (%(hours)s)"
 
 #: workbench/tools/forms.py
 msgid "Is automatically filled using the organization's contact."
@@ -2700,6 +2716,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "<current time since last timestamp>"
+#~ msgstr "<aktuelle Zeit seit der letzten Zeitmarke>"
 
 #~ msgid "No salutation set. This will make newsletters ugly."
 #~ msgstr "Keine Begrüssung gesetzt. Das macht Newsletter hässlich."

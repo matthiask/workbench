@@ -21,7 +21,7 @@
 
 .container-fluid[role="main"] {
   padding-top: 1rem;
-  padding-bottom: 4rem;
+  padding-bottom: 5rem;
 }
 
 .input-group .short {
@@ -202,4 +202,25 @@ tbody th > a {
 
 [data-open="true"] {
   z-index: 99999;
+}
+
+.fixed-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  z-index: 1030;
+  text-align: center;
+  font-size: 1.8rem;
+  box-shadow: 1px 3px 5px 0 rgba(0, 0, 50, 0.3);
+  background-image: url("lib/stopwatch.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+.fixed-btn:hover {
+  opacity: 1;
 }

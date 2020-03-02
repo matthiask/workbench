@@ -5,7 +5,7 @@ from functools import total_ordering
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.signing import BadSignature, Signer
-from django.db import models
+from django.db import connections, models
 from django.db.models import Count, Q, Sum
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -221,7 +221,9 @@ class User(Model, AbstractBaseUser):
 
     @cached_property
     def timestamps(self):
-        return self.timestamp_set.structured()
+        from workbench.timer.models import Timestamp
+
+        return Timestamp.for_user(self)
 
     @cached_property
     def signed_email(self):
@@ -230,6 +232,26 @@ class User(Model, AbstractBaseUser):
     @cached_property
     def features(self):
         return UserFeatures(email=self.email)
+
+    @cached_property
+    def latest_created_at(self):
+        with connections["default"].cursor() as cursor:
+            cursor.execute(
+                """
+with sq as (
+   select max(created_at) as created_at
+   from logbook_loggedhours
+   where rendered_on=%s and rendered_by_id=%s
+   union all
+   select max(created_at) as created_at
+   from timer_timestamp
+   where user_id=%s
+)
+select max(created_at) from sq
+                """,
+                [dt.date.today(), self.id, self.id],
+            )
+            return list(cursor)[0][0]
 
 
 class UserFeatures:

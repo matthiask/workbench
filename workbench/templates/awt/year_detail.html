@@ -16,7 +16,7 @@
            href="{% querystring year=y %}">{{ y }}</a>
       </li>
       {% endfor %}
-      {% if request.user|has:FEATURES.CONTROLLING %}
+      {% if request.user|has_feature:FEATURES.CONTROLLING %}
         <li class="nav-item ml-auto">
           <a class="nav-link" href="{% querystring user='active' %}">{% trans 'active users' %}</a>
         </li>
@@ -24,7 +24,7 @@
     </ul>
   </div>
 
-  {% if request.user|has:FEATURES.CONTROLLING and request.GET.user == 'active' %}
+  {% if request.user|has_feature:FEATURES.CONTROLLING and request.GET.user == 'active' %}
     <div style="break-after:page;max-width:40rem">
       <h2 class="mt-5">{% trans 'facts' %}</h2>
       <table class="table">

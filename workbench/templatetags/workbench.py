@@ -224,5 +224,5 @@ ORDER BY (diff + 180) % 365 DESC
 
 
 @register.filter
-def has(user, feature):
+def has_feature(user, feature):
     return user.features[feature]

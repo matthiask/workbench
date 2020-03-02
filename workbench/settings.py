@@ -196,7 +196,6 @@ WORKBENCH = {
             "foreign_currencies": False,
             "glassfrog": True,
             "labor_costs": False,
-            "timestamps": True,
         },
     ),
     "dbpag": types.SimpleNamespace(
@@ -232,7 +231,6 @@ WORKBENCH = {
             "foreign_currencies": False,
             "glassfrog": False,
             "labor_costs": False,
-            "timestamps": False,
         },
     ),
     "bf": types.SimpleNamespace(
@@ -284,7 +282,6 @@ WORKBENCH = {
                 "frederic@blindflugstudios.com",
                 "mk@feinheit.ch",
             },
-            "timestamps": False,
         },
     ),
     "test": types.SimpleNamespace(
@@ -318,7 +315,6 @@ WORKBENCH = {
             "foreign_currencies": True,
             "glassfrog": False,
             "labor_costs": True,
-            "timestamps": True,
         },
     ),
 }[env("NAMESPACE", required=True)]
@@ -334,8 +330,10 @@ if LIVE:  # pragma: no cover
     SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 604800  # One week
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_REDIRECT_EXEMPT = [r"^create-timestamp/"]
 else:
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+    WORKBENCH.TITLE = "(debug) {}".format(WORKBENCH.TITLE)
 
 MAILCHIMP_API_KEY = env("MAILCHIMP_API_KEY", warn=True)
 MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID", warn=True)

@@ -231,13 +231,8 @@ class LoggedHoursForm(ModelForm):
                 initial["hours"] = request.GET["hours"]
 
             elif not initial.get("hours"):
-                latest = (
-                    LoggedHours.objects.filter(rendered_by=request.user)
-                    .order_by("-created_at")
-                    .first()
-                )
-                timesince = latest and int(
-                    (timezone.now() - latest.created_at).total_seconds()
+                timesince = request.user.latest_created_at and int(
+                    (timezone.now() - request.user.latest_created_at).total_seconds()
                 )
                 if timesince and timesince < 4 * 3600:
                     initial.setdefault(

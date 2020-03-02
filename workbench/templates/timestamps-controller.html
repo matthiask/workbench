@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timestamps</title>
+
+<style>
+body {
+  font-family: sans-serif;
+  min-height: 90vh;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  color: #333;
+}
+
+main {
+  max-width: 30rem;
+}
+
+.notes,
+.buttons {
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+}
+
+input {
+  border: 1px solid grey;
+  padding: 0.25rem;
+  font-size: 2rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.notes {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.buttons {
+  display: grid;
+  grid-gap: 0.5rem;
+}
+
+button {
+  border: none;
+  font-size: 2rem;
+  padding: 1.5rem;
+  color: #fff;
+}
+
+[data-type="start"] {
+  background: #2780e3;
+  grid-column: 1;
+  grid-row: 1;
+}
+[data-type="stop"] {
+  background: #3fb618;
+  grid-column: 2;
+  grid-row: 1;
+}
+[data-type="split"] {
+  background: #9954bb;
+  flex-basis: 100%;
+  grid-row: 2;
+  grid-column: 1 / span 2;
+}
+
+#status {
+  min-height: 1.5rem;
+  text-align: center;
+}
+
+.success {
+  color: green;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const $ = (sel, base=document) => base.querySelector(sel)
+
+  const notes = $("[name=notes]")
+
+  let statusTimeout = null
+  const setStatus = (success, message = "") => {
+    clearTimeout(statusTimeout)
+
+    const f = $("#status")
+    f.textContent = message
+    f.classList.toggle("success", success)
+
+    statusTimeout = setTimeout(() => {
+      f.textContent = ""
+      f.classList.remove("success")
+    }, 2000)
+  }
+
+  const params = new URLSearchParams(window.location.search)
+  const url = params.get("url")
+  const user = params.get("user")
+  const title = params.get("title")
+
+  if (!user || !url) {
+    alert("Necessary configuration parameters missing.")
+  }
+
+  if (title) {
+    document.title += `: ${title}`
+    $("h1").textContent += `: ${title}`
+  }
+
+  document.body.addEventListener("click", async e => {
+    const button = e.target.closest("button[data-type]")
+
+    if (button) {
+      const fd = new FormData()
+      fd.append("type", button.dataset.type)
+      fd.append("notes", notes.value)
+      fd.append("user", user)
+      try {
+        const response = await fetch(`${url}`, {
+          method: "POST",
+          body: fd,
+        })
+        if (!response.ok) throw Error()
+        const _data = await response.json()
+
+        notes.value = ""
+        setStatus(true, "Saved!")
+      } catch(err) {
+        setStatus(false, `Error: ${err}`)
+      }
+    }
+  })
+})
+
+</script>
+
+</head>
+<body>
+
+<main>
+  <h1>Timestamps</h1>
+
+  <div class="notes">
+    <input type="text" name="notes" value="" placeholder="Notes">
+  </div>
+
+  <div class="buttons">
+    <button type="button" data-type="start">Start</button>
+    <button type="button" data-type="stop">Stop</button>
+    <button type="button" data-type="split">Split</button>
+  </Div>
+
+  <div id="status"></div>
+</main>
+
+</body>
+</html>
