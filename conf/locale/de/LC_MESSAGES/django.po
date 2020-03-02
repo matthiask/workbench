@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-02 17:33+0100\n"
+"POT-Creation-Date: 2020-03-02 21:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -823,10 +823,9 @@ msgstr ""
 "Dieses Geschäft ist schon geschlossen. Ich gehe davon aus, dass Du weisst "
 "was Du tust und werde nicht im Weg stehen."
 
-#: workbench/deals/forms.py workbench/deals/models.py
-#: workbench/templates/deals/deal_detail.html
-msgid "stage"
-msgstr "Stadium"
+#: workbench/deals/forms.py
+msgid "This field is required when probability is high."
+msgstr "Dieses Feld wird benötigt wenn die Wahrscheinlichkeit hoch ist."
 
 #: workbench/deals/forms.py
 msgid "Award of contract"
@@ -839,10 +838,6 @@ msgstr "Verlustgrund"
 #: workbench/deals/forms.py
 msgid "This field is required when closing a deal."
 msgstr "Dieses Feld wird benötigt wenn Du ein Geschäft schliesst."
-
-#: workbench/deals/models.py
-msgid "stages"
-msgstr "Stadien"
 
 #: workbench/deals/models.py
 msgid "is required"
@@ -888,6 +883,18 @@ msgstr "akzeptiert"
 msgid "declined"
 msgstr "abgelehnt"
 
+#: workbench/deals/models.py
+msgid "unknown"
+msgstr "unbekannt"
+
+#: workbench/deals/models.py
+msgid "normal"
+msgstr "normal"
+
+#: workbench/deals/models.py
+msgid "high"
+msgstr "hoch"
+
 #: workbench/deals/models.py workbench/invoices/models.py
 #: workbench/management/commands/profitability.py workbench/projects/models.py
 #: workbench/templates/deals/deal_detail.html
@@ -924,6 +931,14 @@ msgstr "Wert"
 msgid "status"
 msgstr "Status"
 
+#: workbench/deals/models.py workbench/templates/deals/deal_detail.html
+msgid "probability"
+msgstr "Wahrscheinlichkeit"
+
+#: workbench/deals/models.py workbench/templates/deals/deal_detail.html
+msgid "decision expected on"
+msgstr "Entscheidung erwartet am"
+
 #: workbench/deals/models.py workbench/expenses/models.py
 #: workbench/expenses/views.py workbench/invoices/models.py
 #: workbench/logbook/models.py workbench/offers/models.py
@@ -955,6 +970,11 @@ msgstr "Offen seit %(created_at)s"
 #, python-format
 msgid "%(status)s on %(closed_on)s"
 msgstr "%(status)s am %(closed_on)s"
+
+#: workbench/deals/models.py
+#, python-format
+msgid "decision expected on %s"
+msgstr "Entscheidung erwartet am %s"
 
 #: workbench/deals/models.py
 msgid "deal attribute"
@@ -2716,6 +2736,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "stage"
+#~ msgstr "Stadium"
+
+#~ msgid "stages"
+#~ msgstr "Stadien"
 
 #~ msgid "<current time since last timestamp>"
 #~ msgstr "<aktuelle Zeit seit der letzten Zeitmarke>"

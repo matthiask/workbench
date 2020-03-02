@@ -228,8 +228,5 @@ class HistoryTest(TestCase):
         url = "/history/deals_deal/id/{}/".format(deal.pk)
         self.assert_404_without_controlling(url)
 
-        url = "/history/deals_stage/id/{}/".format(deal.stage_id)
-        self.assert_404_without_controlling(url)
-
         url = "/history/deals_value/deal_id/{}/".format(deal.pk)
         self.assert_404_without_controlling(url)

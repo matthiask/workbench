@@ -18,8 +18,7 @@
     </div>
     <div class="row">
       <div class="col-md-6">{% firstof object.contact object.customer %}</div>
-      <div class="col-md-2">{{ object.stage }}</div>
-      <div class="col-md-1">{{ object.created_at.date|local_date_format }}</div>
+      <div class="col-md-3">{{ object.pretty_probability }}</div>
       <div class="col-md-3 text-md-right">{{ object.value|currency }}</div>
     </div>
   </a>

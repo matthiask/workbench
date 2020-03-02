@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.utils.html import format_html
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
@@ -178,6 +178,23 @@ class Deal(Model):
 
         return format_html(
             '<span class="badge badge-{}">{}</span>', css, self.pretty_status
+        )
+
+    @property
+    def pretty_probability(self):
+        return ", ".join(
+            filter(
+                None,
+                (
+                    self.get_probability_display(),
+                    (
+                        gettext("decision expected on %s")
+                        % local_date_format(self.decision_expected_on)
+                    )
+                    if self.decision_expected_on
+                    else "",
+                ),
+            )
         )
 
 
