@@ -142,16 +142,19 @@ class TimestampsTest(TestCase):
             type=Timestamp.START, created_at=today + dt.timedelta(minutes=0)
         )
         t2 = user.timestamp_set.create(
-            type=Timestamp.START, created_at=today + dt.timedelta(minutes=30)
+            type=Timestamp.START, created_at=today + dt.timedelta(minutes=29)
         )
 
         self.assertEqual(
             user.timestamps[:2],  # Cut off the auto-now timestamp
-            [{"elapsed": None, "timestamp": t1}, {"elapsed": None, "timestamp": t2}],
+            [
+                {"elapsed": None, "timestamp": t1},
+                {"elapsed": Decimal("0.5"), "timestamp": t2},
+            ],
         )
         self.assertEqual(
             [row["timestamp"].type for row in user.timestamps],
-            [Timestamp.START, Timestamp.START, Timestamp.SPLIT],
+            [Timestamp.START, Timestamp.SPLIT, Timestamp.SPLIT],  # 2nd was: START
         )
 
     def test_timestamps_stop_stop(self):

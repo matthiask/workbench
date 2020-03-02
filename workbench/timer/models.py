@@ -118,10 +118,13 @@ class Timestamp(models.Model):
                     current.type = Timestamp.START  # Override
                 elapsed = None
 
-            elif current.type in {Timestamp.START, Timestamp.LOGBOOK}:
+            elif current.type in {Timestamp.LOGBOOK}:
                 elapsed = None
 
             else:
+                if previous and {previous.type, current.type} == {Timestamp.START}:
+                    current.type = Timestamp.SPLIT  # Override
+
                 seconds = (current.created_at - previous.created_at).total_seconds()
                 elapsed = (Decimal(seconds) / 3600).quantize(
                     Decimal("0.0"), rounding=ROUND_UP
