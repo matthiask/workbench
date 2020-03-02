@@ -69,3 +69,6 @@ def initial():
         ClosingType.objects.create(
             title=title, represents_a_win=False, position=10 * (i + 1 + len(WINS))
         )
+
+
+initial()
