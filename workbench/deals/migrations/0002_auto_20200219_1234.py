@@ -21,7 +21,6 @@ class Migration(migrations.Migration):
             )
         ),
         migrations.RunSQL(
-            "SELECT audit_audit_table('deals_stage');"
             "SELECT audit_audit_table('deals_valuetype');"
             "SELECT audit_audit_table('deals_value');"
             "SELECT audit_audit_table('deals_deal', ARRAY['_fts', 'fts_document']);"

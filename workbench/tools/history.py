@@ -21,7 +21,7 @@ from workbench.contacts.models import (
     PostalAddress,
 )
 from workbench.credit_control.models import CreditEntry
-from workbench.deals.models import Deal, Stage, Value
+from workbench.deals.models import Deal, Value
 from workbench.expenses.models import ExpenseReport
 from workbench.invoices.models import (
     Invoice,
@@ -193,12 +193,13 @@ def _deals_deal_cfg(user):
         "fields": {
             "customer",
             "contact",
-            "stage",
             "title",
             "description",
             "owned_by",
             "value",
             "status",
+            "probability",
+            "decision_expected_on",
             "created_at",
             "closed_on",
             "closing_type",
@@ -206,12 +207,6 @@ def _deals_deal_cfg(user):
         },
         "related": [(Value, "deal_id")],
     }
-
-
-def _deals_stage_cfg(user):
-    if not user.features[FEATURES.CONTROLLING]:
-        raise Http404
-    return {"fields": {"title", "position"}}
 
 
 def _deals_value_cfg(user):
@@ -423,7 +418,6 @@ HISTORY = {
     },
     CreditEntry: _credit_control_creditentry_cfg,
     Deal: _deals_deal_cfg,
-    Stage: _deals_stage_cfg,
     Value: _deals_value_cfg,
     ExpenseReport: {
         "fields": {"created_at", "created_by", "closed_on", "owned_by", "total"},

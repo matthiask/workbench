@@ -13,17 +13,10 @@ class ValueInline(admin.TabularInline):
 @admin.register(models.Deal)
 class DealAdmin(admin.ModelAdmin):
     inlines = [ValueInline]
-    list_display = ["title", "owned_by", "value", "status", "created_at"]
+    list_display = ["title", "owned_by", "value", "status", "probability", "created_at"]
     list_filter = ["status"]
     raw_id_fields = ["customer", "contact", "owned_by"]
     search_fields = ["title", "description"]
-
-
-@admin.register(models.Stage)
-class StageAdmin(OrderableAdmin, admin.ModelAdmin):
-    list_display = ["title", "position"]
-    list_editable = ["position"]
-    ordering_field = "position"
 
 
 @admin.register(models.ValueType)

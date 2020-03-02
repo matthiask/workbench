@@ -9,7 +9,7 @@ from workbench.accounts.models import Team, User
 from workbench.awt.models import Absence, Employment, WorkingTimeModel, Year
 from workbench.contacts.models import Organization, Person, PostalAddress
 from workbench.credit_control.models import CreditEntry, Ledger
-from workbench.deals.models import AttributeGroup, ClosingType, Deal, Stage, ValueType
+from workbench.deals.models import AttributeGroup, ClosingType, Deal, ValueType
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
@@ -239,11 +239,6 @@ class CreditEntryFactory(factory.DjangoModelFactory):
 
 
 # DEALS #######################################################################
-class StageFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Stage
-
-
 class ValueTypeFactory(factory.DjangoModelFactory):
     title = "Consulting"
 
@@ -267,7 +262,6 @@ class DealFactory(factory.DjangoModelFactory):
         lambda obj: PersonFactory.create(organization=obj.customer)
     )
     owned_by = factory.SubFactory(UserFactory)
-    stage = factory.SubFactory(StageFactory)
 
     class Meta:
         model = Deal

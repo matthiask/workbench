@@ -17,8 +17,12 @@
       <td>{% link_or_none object.contact %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'stage' %}</th>
-      <td>{{ object.stage }}</td>
+      <th class="text-right">{% trans 'probability' %}</th>
+      <td>{{ object.get_probability_display }}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'decision expected on' %}</th>
+      <td>{{ object.decision_expected_on|local_date_format }}</td>
     </tr>
     <tr>
       <th class="text-right">{% trans 'status' %}</th>

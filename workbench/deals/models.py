@@ -10,19 +10,6 @@ from workbench.tools.models import Model, MoneyField, Z
 from workbench.tools.urls import model_urls
 
 
-class Stage(Model):
-    title = models.CharField(_("title"), max_length=200)
-    position = models.PositiveIntegerField(_("position"), default=0)
-
-    class Meta:
-        ordering = ("position", "id")
-        verbose_name = _("stage")
-        verbose_name_plural = _("stages")
-
-    def __str__(self):
-        return self.title
-
-
 class NotArchivedQuerySet(models.QuerySet):
     def active(self):
         return self.filter(is_archived=False)
@@ -93,6 +80,16 @@ class Deal(Model):
         (DECLINED, _("declined")),
     )
 
+    UNKNOWN = 10
+    NORMAL = 20
+    HIGH = 30
+
+    PROBABILITY_CHOICES = [
+        (UNKNOWN, _("unknown")),
+        (NORMAL, _("normal")),
+        (HIGH, _("high")),
+    ]
+
     customer = models.ForeignKey(
         Organization, on_delete=models.PROTECT, verbose_name=_("customer")
     )
@@ -104,9 +101,6 @@ class Deal(Model):
         verbose_name=_("contact"),
     )
 
-    stage = models.ForeignKey(
-        Stage, on_delete=models.PROTECT, verbose_name=_("stage"), related_name="deals"
-    )
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
     owned_by = models.ForeignKey(
@@ -116,6 +110,12 @@ class Deal(Model):
 
     status = models.PositiveIntegerField(
         _("status"), choices=STATUS_CHOICES, default=OPEN
+    )
+    probability = models.IntegerField(
+        _("probability"), choices=PROBABILITY_CHOICES, default=UNKNOWN
+    )
+    decision_expected_on = models.DateField(
+        _("decision expected on"), blank=True, null=True
     )
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)

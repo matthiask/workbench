@@ -48,7 +48,7 @@ class DealsTest(TestCase):
                 "customer": person.organization.id,
                 "contact": person.id,
                 "title": "Some deal",
-                "stage": factories.StageFactory.create().pk,
+                "probability": Deal.NORMAL,
                 "owned_by": person.primary_contact_id,
             },
         )
@@ -139,7 +139,7 @@ class DealsTest(TestCase):
                 "customer": person.organization.id,
                 "contact": person.id,
                 "title": "Some deal",
-                "stage": factories.StageFactory.create().pk,
+                "probability": Deal.NORMAL,
                 "owned_by": person.primary_contact_id,
                 "value_{}".format(type1.id): 200,
                 "value_{}".format(type2.id): "",
@@ -218,3 +218,21 @@ class DealsTest(TestCase):
             response["content-type"],
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
+
+    def test_decision_expected_on_conditionally_required(self):
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        self.client.force_login(person.primary_contact)
+
+        response = self.client.post(
+            "/deals/create/",
+            {
+                "customer": person.organization.id,
+                "contact": person.id,
+                "title": "Some deal",
+                "probability": Deal.HIGH,
+                "owned_by": person.primary_contact_id,
+            },
+        )
+        self.assertContains(response, "This field is required when probability is high")

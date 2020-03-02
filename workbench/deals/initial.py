@@ -1,14 +1,5 @@
-from workbench.deals.models import AttributeGroup, ClosingType, Stage, ValueType
+from workbench.deals.models import AttributeGroup, ClosingType, ValueType
 
-
-STAGES = [
-    "Sammelbecken",
-    "Erstkontakt",
-    "Auftragsschärfung",
-    "unter 80%",
-    "80% später",
-    "80% jetzt",
-]
 
 VALUE_TYPES = ["Beratung & Konzept", "Grafik", "Programmierung"]
 
@@ -47,9 +38,6 @@ LOSS = ["Preis", "Andere Agentur (Idee)", "Vorgehen", "Sonstiges ..."]
 
 
 def initial():
-    for i, title in enumerate(STAGES):
-        Stage.objects.create(title=title, position=10 * (i + 1))
-
     for i, title in enumerate(VALUE_TYPES):
         ValueType.objects.create(title=title, position=10 * (i + 1))
 

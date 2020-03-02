@@ -12,7 +12,6 @@ from workbench.deals.models import (
     AttributeGroup,
     Deal,
     DealAttribute,
-    Stage,
     Value,
     ValueType,
 )
@@ -66,9 +65,7 @@ class DealSearchForm(Form):
             queryset = queryset.filter(status=data.get("s"))
         queryset = self.apply_renamed(queryset, "org", "customer")
         queryset = self.apply_owned_by(queryset)
-        return queryset.select_related(
-            "stage", "owned_by", "customer", "contact__organization"
-        )
+        return queryset.select_related("owned_by", "customer", "contact__organization")
 
     def response(self, request, queryset):
         if request.GET.get("xlsx"):
@@ -104,10 +101,7 @@ class DealSearchForm(Form):
 
 
 def warn_if_not_in_preparation(form):
-    if (
-        form.instance.closed_on
-        and form.request.method == "GET"
-    ):
+    if form.instance.closed_on and form.request.method == "GET":
         messages.warning(
             form.request,
             _(
@@ -120,13 +114,6 @@ def warn_if_not_in_preparation(form):
 class DealForm(ModelForm):
     user_fields = default_to_current_user = ("owned_by",)
 
-    stage = forms.ModelChoiceField(
-        queryset=Stage.objects.all(),
-        label=_("stage"),
-        empty_label=None,
-        widget=forms.RadioSelect,
-    )
-
     class Meta:
         model = Deal
         fields = (
@@ -134,12 +121,14 @@ class DealForm(ModelForm):
             "customer",
             "title",
             "description",
-            "stage",
+            "probability",
+            "decision_expected_on",
             "owned_by",
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
             "contact": Autocomplete(model=Person),
+            "probability": forms.RadioSelect,
             "description": Textarea,
         }
 
@@ -170,6 +159,17 @@ class DealForm(ModelForm):
                 widget=forms.RadioSelect,
                 initial=attributes.get(group.id),
             )
+
+    def clean(self):
+        data = super().clean()
+        if data.get("probability") == Deal.HIGH and not data.get(
+            "decision_expected_on"
+        ):
+            self.add_error(
+                "decision_expected_on",
+                _("This field is required when probability is high."),
+            )
+        return data
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
