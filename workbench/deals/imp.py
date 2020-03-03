@@ -1,5 +1,6 @@
 import datetime as dt
 import os
+from functools import lru_cache
 from pprint import pprint
 from types import SimpleNamespace
 
@@ -104,6 +105,7 @@ def req(path, params):
 organizations = list(Organization.objects.all())
 
 
+@lru_cache(maxsize=None)
 def get_organization(name):
     return sorted(
         organizations,
@@ -125,17 +127,17 @@ def run_import():
     # pprint(deals)
     # return
 
-    orgmap = {}
-    for deal in deals:
-        name = deal["org_id"]["name"] if deal["org_id"] else None
-        if not name or name in orgmap:
-            continue
+    if False:
+        orgmap = {}
+        for deal in deals:
+            name = deal["org_id"]["name"] if deal["org_id"] else None
+            if not name or name in orgmap:
+                continue
 
-        orgmap[name] = get_organization(name)
+            orgmap[name] = get_organization(name)
 
-    pprint(orgmap)
-
-    return
+        pprint(orgmap)
+        return
 
     set_user_name("Pipedrive Import")
 
@@ -144,16 +146,20 @@ def run_import():
 
         cls.objects.all().delete()
 
-    res = initial()  # noqa
+    res = initial()
 
     users = {u.email: u for u in User.objects.all()}
 
     for deal in deals:
+        if not deal["org_id"]:
+            print("No organization!", deal)
+            continue
+
         row = {
             "title": deal["title"],
             "owned_by": users[deal["user_id"]["email"]],
             "created_at": parse_date(deal["add_time"]),
-            "customer": deal["org_id"]["name"] if deal["org_id"] else None,
+            "customer": get_organization(deal["org_id"]["name"]),
             "contact": None,
             "value": deal["value"],
             "status": Deal.ACCEPTED if deal["status"] == "won" else Deal.OPEN,
@@ -217,14 +223,7 @@ def run_import():
 
         attributes = row.pop("attributes")
         values = row.pop("values")
-        """
-        row["customer"] = Organization.objects.create(
-            title="{} (Pipedrive Import)".format(row["customer"]),
-            primary_contact=row["user_id"],
-        )
-        """
-        row.pop("customer")
-        row["customer_id"] = 1
+
         deal = Deal(**row)
         super(Deal, deal).save()
 
