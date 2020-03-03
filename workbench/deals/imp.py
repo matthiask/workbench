@@ -225,6 +225,14 @@ def run_import():
         values = row.pop("values")
 
         deal = Deal(**row)
+        deal._fts = " ".join(
+            str(part)
+            for part in [
+                deal.code,
+                deal.customer.name,
+                deal.contact.full_name if deal.contact else "",
+            ]
+        )
         super(Deal, deal).save()
 
         for key, value in values.items():

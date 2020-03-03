@@ -154,6 +154,14 @@ class Deal(Model):
 
     def save(self, *args, **kwargs):
         self.value = sum((v.value for v in self.values.all()), Z)
+        self._fts = " ".join(
+            str(part)
+            for part in [
+                self.code,
+                self.customer.name,
+                self.contact.full_name if self.contact else "",
+            ]
+        )
         super().save(*args, **kwargs)
 
     save.alters_data = True
