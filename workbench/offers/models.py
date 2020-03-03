@@ -1,4 +1,5 @@
 import datetime as dt
+from functools import total_ordering
 
 from django.contrib import messages
 from django.core.exceptions import ValidationError
@@ -31,6 +32,7 @@ class OfferQuerySet(SearchQuerySet):
 
 
 @model_urls
+@total_ordering
 class Offer(ModelWithTotal):
     IN_PREPARATION = 10
     OFFERED = 20
@@ -86,6 +88,13 @@ class Offer(ModelWithTotal):
             self.code,
             self.title,
             self.owned_by.get_short_name(),
+        )
+
+    def __lt__(self, other):
+        return (
+            (self.status, -self.pk) < (other.status, -other.pk)
+            if isinstance(other, Offer)
+            else 1
         )
 
     def get_absolute_url(self):

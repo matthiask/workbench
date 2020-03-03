@@ -415,10 +415,18 @@ class ProjectsTest(TestCase):
 
     def test_services_api(self):
         service = factories.ServiceFactory.create()
+        offer = factories.OfferFactory.create(project=service.project)
+        factories.ServiceFactory.create(project=service.project, offer=offer)
+
         self.client.force_login(service.project.owned_by)
 
         response = self.client.get(service.project.urls["services"])
         self.assertEqual(response["content-type"], "application/json")
+
+        services = response.json()["services"]
+        self.assertEqual(len(services), 2)
+        self.assertIn(offer.code, services[0]["label"])
+        self.assertEqual(services[1]["label"], "Not offered yet")
 
     def test_projects_api(self):
         user = factories.UserFactory.create()
