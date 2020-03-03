@@ -174,9 +174,9 @@ def run_import():
 
         elif deal["stage_id"] == 20:
             row["probability"] = Deal.HIGH
-            row["decision_expected_on"] = parse_date(
-                deal["update_time"]
-            ) + dt.timedelta(days=30)
+            row["decision_expected_on"] = (
+                parse_date(deal["rotten_time"]) if deal["rotten_time"] else None
+            )
 
         elif deal["stage_id"] == 23:
             row["decision_expected_on"] = parse_date(
