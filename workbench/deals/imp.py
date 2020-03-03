@@ -163,7 +163,10 @@ def run_import():
             "values": {},
         }
 
-        if deal["stage_id"] == 20:
+        if deal["stage_id"] == 29:  # Sammelbecken
+            continue
+
+        elif deal["stage_id"] == 20:
             row["probability"] = Deal.HIGH
             row["decision_expected_on"] = parse_date(
                 deal["update_time"]
