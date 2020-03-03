@@ -32,7 +32,8 @@
             {{ object.status_badge }}
             {% if object.status != object.OPEN %}
               <br>
-              {{ object.closing_type }}<br>
+              {{ object.pretty_closing_type }}
+              <br>
               {{ object.closing_notice|linebreaksbr }}
             {% endif %}
           </div>
@@ -44,13 +45,13 @@
               </a>
             {% endif %}
 
-            {% if object.status != object.ACCEPTED %}
+            {% if object.status != object.ACCEPTED or not object.closing_type %}
               <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}" class="btn btn-sm btn-success">
                 {% trans 'accepted'|capfirst %}
               </a>
             {% endif %}
 
-            {% if object.status != object.DECLINED %}
+            {% if object.status != object.DECLINED or not object.closing_type %}
               <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.DECLINED }}" class="btn btn-sm btn-danger">
                 {% trans 'declined'|capfirst %}
               </a>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-02 21:27+0100\n"
+"POT-Creation-Date: 2020-03-03 17:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -975,6 +975,10 @@ msgstr "%(status)s am %(closed_on)s"
 #, python-format
 msgid "decision expected on %s"
 msgstr "Entscheidung erwartet am %s"
+
+#: workbench/deals/models.py
+msgid "<closing type missing>"
+msgstr "<Abschlusstyp fehlt>"
 
 #: workbench/deals/models.py
 msgid "deal attribute"

@@ -21,8 +21,6 @@ class AttributeGroup(models.Model):
     is_archived = models.BooleanField(_("is archived"), default=False)
     is_required = models.BooleanField(_("is required"), default=True)
 
-    objects = NotArchivedQuerySet.as_manager()
-
     class Meta:
         ordering = ("position", "id")
         verbose_name = _("attribute group")
@@ -205,6 +203,10 @@ class Deal(Model):
             )
         )
 
+    @property
+    def pretty_closing_type(self):
+        return self.closing_type or _("<closing type missing>")
+
 
 class DealAttribute(models.Model):
     deal = models.ForeignKey(Deal, on_delete=models.CASCADE, verbose_name=_("deal"))
@@ -224,8 +226,6 @@ class ValueType(models.Model):
     title = models.CharField(_("title"), max_length=200)
     position = models.PositiveIntegerField(_("position"), default=0)
     is_archived = models.BooleanField(_("is archived"), default=False)
-
-    objects = NotArchivedQuerySet.as_manager()
 
     class Meta:
         ordering = ("position", "id")

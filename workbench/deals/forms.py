@@ -138,8 +138,11 @@ class DealForm(ModelForm):
 
         field = Value._meta.get_field("value")
         values = {v.type_id: v.value for v in self.instance.values.all()}
-        for vt in ValueType.objects.active():
+        for vt in ValueType.objects.all():
             key = "value_{}".format(vt.id)
+
+            if vt.is_archived and vt.id not in values:
+                continue
 
             self.fields[key] = field.formfield(
                 label=vt.title, required=False, initial=values.get(vt.id)
@@ -150,8 +153,11 @@ class DealForm(ModelForm):
             if self.instance.id
             else {}
         )
-        for group in AttributeGroup.objects.active():
+        for group in AttributeGroup.objects.all():
             key = "attribute_{}".format(group.id)
+            if group.is_archived and group.id not in attributes:
+                continue
+
             self.fields[key] = forms.ModelChoiceField(
                 queryset=group.attributes.active(),
                 required=group.is_required,
@@ -175,7 +181,7 @@ class DealForm(ModelForm):
         instance = super().save(**kwargs)
         types = set()
 
-        for vt in ValueType.objects.active():
+        for vt in ValueType.objects.all():
             key = "value_{}".format(vt.id)
 
             if self.cleaned_data.get(key) is not None:
@@ -188,7 +194,7 @@ class DealForm(ModelForm):
         instance.save()
 
         attributes = []
-        for group in AttributeGroup.objects.active():
+        for group in AttributeGroup.objects.all():
             key = "attribute_{}".format(group.id)
 
             if self.cleaned_data.get(key) is not None:

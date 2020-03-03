@@ -64,6 +64,9 @@ def initial():
         res.value_types.append(
             ValueType.objects.create(title=title, position=10 * (i + 1))
         )
+    res.old_value_type = ValueType.objects.create(
+        title="Nicht zugeordnet", position=0, is_archived=True
+    )
 
     res.sources = []
     group = AttributeGroup.objects.create(title="Quelle", position=10)
@@ -186,7 +189,7 @@ def run_import():
         elif deal["stage_id"] == 15:
             row["probability"] = Deal.NORMAL
 
-        if deal["9ef99f10926f537a6b8fcdba376acff9cf681689"]:
+        if deal["status"] == "won" and deal["9ef99f10926f537a6b8fcdba376acff9cf681689"]:
             row["closing_type"] = {
                 "56": res.wins[0],
                 "57": res.wins[1],
@@ -206,6 +209,8 @@ def run_import():
                     "32": res.value_types[0],
                 }[deal["2f4a07c1b43fbe7c4bb32af8ca063193ac600410"]]
             ] = deal["value"]
+        else:
+            row["values"][res.old_value_type] = deal["value"]
 
         if deal["4ee42cb2b9ae3a449812d61ebfffbae5dd47edaa"]:
             row["attributes"]["sources"] = {
