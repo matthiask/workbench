@@ -262,6 +262,7 @@ class DealFactory(factory.DjangoModelFactory):
         lambda obj: PersonFactory.create(organization=obj.customer)
     )
     owned_by = factory.SubFactory(UserFactory)
+    title = "Some deal"
 
     class Meta:
         model = Deal

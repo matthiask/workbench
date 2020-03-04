@@ -186,7 +186,7 @@ class DealForm(ModelForm):
 
             if self.cleaned_data.get(key) is not None:
                 self.instance.values.update_or_create(
-                    type=vt, value=self.cleaned_data[key]
+                    type=vt, defaults={"value": self.cleaned_data[key]}
                 )
                 types.add(vt.id)
 

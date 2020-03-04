@@ -255,3 +255,37 @@ class DealsTest(TestCase):
             ),
         )
         self.assertIn("badge-warning", deal.status_badge)
+
+    def test_update_with_archived_valuetype(self):
+        vt = factories.ValueTypeFactory.create(is_archived=True)
+        deal = factories.DealFactory.create()
+        deal.values.create(type=vt, value=200)
+        deal.save()
+
+        deal.refresh_from_db()
+        self.assertEqual(deal.value, 200)
+
+        self.client.force_login(deal.owned_by)
+        response = self.client.get(deal.urls["update"])
+
+        self.assertContains(response, 'name="value_{}"'.format(vt.id))
+        self.assertContains(response, 'value="200.00"')
+
+        self.assertNotContains(
+            self.client.get(deal.urls["create"]), 'name="value_{}"'.format(vt.id)
+        )
+
+        response = self.client.post(
+            deal.urls["update"],
+            {
+                "customer": deal.customer_id,
+                "contact": deal.contact_id,
+                "title": deal.title,
+                "probability": Deal.NORMAL,
+                "owned_by": deal.owned_by_id,
+                "value_{}".format(vt.id): 500,
+            },
+        )
+        self.assertRedirects(response, deal.urls["detail"])
+        deal.refresh_from_db()
+        self.assertEqual(deal.value, 500)
