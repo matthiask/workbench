@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-26 12:11+0100\n"
+"POT-Creation-Date: 2020-03-04 09:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -741,7 +741,7 @@ msgstr "Valuta"
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
-#: workbench/tools/pdf.py
+#: workbench/tools/pdf.py workbench/tools/xlsx.py
 msgid "total"
 msgstr "Total"
 
@@ -760,6 +760,7 @@ msgstr "Zahlungsnotiz"
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/key_data_third_party_costs.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/pdf.py
+#: workbench/tools/xlsx.py
 msgid "invoice"
 msgstr "Rechnung"
 
@@ -1314,7 +1315,7 @@ msgstr "Zeitraum"
 #: workbench/services/models.py
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
-#: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_detail.html workbench/tools/xlsx.py
 msgid "service"
 msgstr "Leistung"
 
@@ -1328,7 +1329,7 @@ msgid "effort type"
 msgstr "Aufwandtyp"
 
 #: workbench/invoices/views.py workbench/services/models.py
-#: workbench/templates/offers/offer_pricing.html
+#: workbench/templates/offers/offer_pricing.html workbench/tools/xlsx.py
 msgid "hourly rate"
 msgstr "Stundensatz"
 
@@ -2120,7 +2121,8 @@ msgstr "Zwischentotal"
 
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/tools/models.py workbench/tools/pdf.py
+#: workbench/templates/projects/project_detail.html workbench/tools/models.py
+#: workbench/tools/pdf.py
 msgid "discount"
 msgstr "Rabatt"
 
@@ -2270,7 +2272,7 @@ msgid "Services from offer"
 msgstr "Leistungen aus Offerte"
 
 #: workbench/templates/projects/project_statistics.html
-msgid "logged hours per effort rate"
+msgid "logged hours per hourly rate"
 msgstr "Erfasste Stunden pro Stundensatz"
 
 #: workbench/templates/projects/project_statistics.html
@@ -2476,10 +2478,6 @@ msgstr "Zeitmarke"
 msgid "Logbook entry on %(service)s: %(description)s (%(hours)s)"
 msgstr "Logbucheintrag auf %(service)s: %(description)s (%(hours)s)"
 
-#: workbench/timer/models.py
-msgid "<current time since last timestamp>"
-msgstr "<aktuelle Zeit seit der letzten Zeitmarke>"
-
 #: workbench/tools/forms.py
 msgid "Is automatically filled using the organization's contact."
 msgstr "Kann automatisch mit der Organisation des Kontaktes gefüllt werden."
@@ -2579,6 +2577,10 @@ msgid "Form was invalid."
 msgstr "Formular war ungültig."
 
 #: workbench/tools/xlsx.py
+msgid "by service and user"
+msgstr "Nach Leistung und Benutzer"
+
+#: workbench/tools/xlsx.py
 msgid "total hours"
 msgstr "Stunden insgesamt"
 
@@ -2594,6 +2596,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "No salutation set. This will make newsletters ugly."
-#~ msgstr "Keine Begrüssung gesetzt. Das macht Newsletter hässlich."
