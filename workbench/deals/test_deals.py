@@ -2,6 +2,7 @@ import datetime as dt
 
 from django.db.models import ProtectedError
 from django.test import TestCase
+from django.utils import timezone
 from django.utils.translation import deactivate_all
 
 from freezegun import freeze_time
@@ -257,6 +258,16 @@ class DealsTest(TestCase):
             ),
         )
         self.assertIn("badge-warning", deal.status_badge)
+
+    def test_caveat_status(self):
+        self.assertIn(
+            "badge-info",
+            Deal(created_at=timezone.now() - dt.timedelta(days=30)).status_badge,
+        )
+        self.assertIn(
+            "badge-caveat",
+            Deal(created_at=timezone.now() - dt.timedelta(days=360)).status_badge,
+        )
 
     def test_update_with_archived_valuetype(self):
         vt = factories.ValueTypeFactory.create(is_archived=True)

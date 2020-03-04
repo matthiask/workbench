@@ -186,12 +186,17 @@ class Deal(Model):
     def status_badge(self):
         if self.decision_expected_on and self.decision_expected_on < dt.date.today():
             css = "warning"
+        elif self.status == self.OPEN:
+            open_since = (dt.date.today() - self.created_at.date()).days
+            if (
+                open_since
+                > {self.UNKNOWN: 180, self.NORMAL: 90, self.HIGH: 45}[self.probability]
+            ):
+                css = "caveat"
+            else:
+                css = "info"
         else:
-            css = {
-                self.OPEN: "info",
-                self.ACCEPTED: "success",
-                self.DECLINED: "danger",
-            }[self.status]
+            css = {self.ACCEPTED: "success", self.DECLINED: "danger"}[self.status]
 
         return format_html(
             '<span class="badge badge-{}">{}</span>', css, self.pretty_status
