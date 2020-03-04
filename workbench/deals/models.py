@@ -198,23 +198,6 @@ class Deal(Model):
         )
 
     @property
-    def pretty_probability(self):
-        return ", ".join(
-            filter(
-                None,
-                (
-                    self.get_probability_display(),
-                    (
-                        gettext("decision expected on %s")
-                        % local_date_format(self.decision_expected_on)
-                    )
-                    if self.decision_expected_on
-                    else "",
-                ),
-            )
-        )
-
-    @property
     def pretty_closing_type(self):
         return self.closing_type or _("<closing type missing>")
 
