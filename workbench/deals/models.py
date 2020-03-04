@@ -135,7 +135,7 @@ class Deal(Model):
     _fts = models.TextField(editable=False, blank=True)
 
     class Meta:
-        ordering = ["status", "-probability", "decision_expected_on", "id"]
+        ordering = ["-probability", "status", "decision_expected_on", "id"]
         verbose_name = _("deal")
         verbose_name_plural = _("deals")
 
