@@ -25,7 +25,9 @@
     <tbody>
       {% for row in stats.by_user %}
       <tr>
-        <td>{{ row.user }}</td>
+        <td>
+          <a href="deals/{% querystring user=row.user.id %}" data-toggle="ajaxmodal">{{ row.user }}</a>
+        </td>
         <td class="text-right">{{ row.count }}</td>
         <td class="text-right">{{ row.sum|currency }}</td>
       </tr>

@@ -322,3 +322,14 @@ class DealsTest(TestCase):
             deal_group(Deal(probability=Deal.HIGH, decision_expected_on=offset(20)))[0],
             1,
         )
+
+    def test_deal_reporting(self):
+        deal = factories.DealFactory.create(
+            status=Deal.ACCEPTED, closed_on=dt.date.today()
+        )
+        self.client.force_login(deal.owned_by)
+
+        response = self.client.get(
+            "/report/accepted-deals/?date_from=2020-01-01&date_until=2099-01-01"
+        )
+        self.assertContains(response, "accepted deals")

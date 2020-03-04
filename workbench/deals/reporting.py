@@ -19,6 +19,7 @@ def accepted_deals(date_range, *, users=None):
     deals = [
         {
             "user": user,
+            "user_id": str(user.id),
             "deals": deals,
             "count": len(deals),
             "sum": sum(deal.value for deal in deals),
@@ -33,7 +34,7 @@ def accepted_deals(date_range, *, users=None):
     }
 
 
-def test():
+def test():  # pragma: no cover
     from pprint import pprint
 
     pprint(accepted_deals([dt.date(2020, 1, 1), dt.date(2020, 3, 31)]))

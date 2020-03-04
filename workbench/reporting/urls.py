@@ -81,6 +81,15 @@ urlpatterns = [
         name="report_accepted_deals",
     ),
     url(
+        r"^accepted-deals/deals/$",
+        controlling_only(hours_filter_view),
+        {
+            "template_name": "reporting/accepted_deals_for_user.html",
+            "stats_fn": accepted_deals,
+        },
+        name="report_accepted_deals",
+    ),
+    url(
         r"^labor-costs/$", labor_costs_only(labor_costs_view), name="report_labor_costs"
     ),
 ]
