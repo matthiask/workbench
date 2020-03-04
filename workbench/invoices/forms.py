@@ -18,6 +18,7 @@ from workbench.tools.formats import currency, hours, local_date_format
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
 from workbench.tools.models import Z
 from workbench.tools.pdf import pdf_response
+from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
 class InvoiceSearchForm(Form):
@@ -98,6 +99,11 @@ class InvoiceSearchForm(Form):
 
             pdf.generate()
             return response
+
+        if request.GET.get("xlsx"):
+            xlsx = WorkbenchXLSXDocument()
+            xlsx.table_from_queryset(queryset)
+            return xlsx.to_response("invoices.xlsx")
 
 
 class InvoiceForm(PostalAddressSelectionForm):

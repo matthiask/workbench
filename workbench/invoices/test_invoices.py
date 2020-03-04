@@ -533,6 +533,7 @@ class InvoicesTest(TestCase):
         code("owned_by={}".format(user.id))
         code("owned_by=-1")  # mine
         code("owned_by=0")  # only inactive
+        code("xlsx=1")
 
     def test_list_pdfs(self):
         user = factories.UserFactory.create()
