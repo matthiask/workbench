@@ -9,19 +9,34 @@
 {% endblock %}
 
 {% block objects %}
-<div class="list-group list-group-flush">
-  {% for object in object_list %}
-  <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action">
-    <div class="d-flex w-100 justify-content-between">
-      <h5 class="mb-1">{{ object|h }}</h5>
-      {{ object.status_badge }}
+<div class="row">
+
+  {% for group in object_list|group_deals_by_probability %}
+  <div class="col-xl">
+
+    <div class="card mb-5">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-1">{{ group.title }}</h5>
+        <span>{{ group.sum|currency }}</span>
+      </div>
+      <div class="list-group list-group-flush">
+        {% for object in group.deals %}
+        <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{ object|h }}</h5>
+            {{ object.status_badge }}
+          </div>
+          <div class="row">
+            <div class="col-md-6">{% firstof object.contact object.customer %}</div>
+            <div class="col-md-6 text-md-right">{{ object.value|currency }}</div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
     </div>
-    <div class="row">
-      <div class="col-md-6">{% firstof object.contact object.customer %}</div>
-      <div class="col-md-3">{{ object.pretty_probability }}</div>
-      <div class="col-md-3 text-md-right">{{ object.value|currency }}</div>
-    </div>
-  </a>
+
+  </div>
   {% endfor %}
+
 </div>
 {% endblock %}

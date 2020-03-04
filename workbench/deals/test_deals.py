@@ -236,3 +236,22 @@ class DealsTest(TestCase):
             },
         )
         self.assertContains(response, "This field is required when probability is high")
+
+    def test_decision_expected_on_status(self):
+        today = dt.date.today()
+        deal = Deal(decision_expected_on=today)
+        self.assertEqual(
+            deal.pretty_status,
+            "Decision expected on {}".format(local_date_format(today)),
+        )
+        self.assertIn("badge-info", deal.status_badge)
+
+        deal = Deal(decision_expected_on=today - dt.timedelta(days=1))
+
+        self.assertEqual(
+            deal.pretty_status,
+            "Decision expected on {}".format(
+                local_date_format(today - dt.timedelta(days=1))
+            ),
+        )
+        self.assertIn("badge-warning", deal.status_badge)

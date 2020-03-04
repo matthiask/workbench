@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 17:17+0100\n"
+"POT-Creation-Date: 2020-03-04 08:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -961,15 +961,20 @@ msgstr "Abschlussnotiz"
 msgid "deal"
 msgstr "Geschäft"
 
-#: workbench/deals/models.py
-#, python-format
-msgid "Open since %(created_at)s"
-msgstr "Offen seit %(created_at)s"
-
 #: workbench/deals/models.py workbench/offers/models.py
 #, python-format
 msgid "%(status)s on %(closed_on)s"
 msgstr "%(status)s am %(closed_on)s"
+
+#: workbench/deals/models.py
+#, python-format
+msgid "Decision expected on %(decision_expected_on)s"
+msgstr "Entscheidung erwartet am %(decision_expected_on)s"
+
+#: workbench/deals/models.py
+#, python-format
+msgid "Open since %(created_at)s"
+msgstr "Offen seit %(created_at)s"
 
 #: workbench/deals/models.py
 #, python-format
@@ -2588,6 +2593,26 @@ msgstr "ja"
 #: workbench/templatetags/workbench.py workbench/tools/history.py
 msgid "no"
 msgstr "nein"
+
+#: workbench/templatetags/workbench.py
+msgid "high probability, next 4 weeks"
+msgstr "Hohe Wahrscheinlichkeit, nächste 4 Wochen"
+
+#: workbench/templatetags/workbench.py
+msgid "high probability, next 12 weeks"
+msgstr "Hohe Wahrscheinlichkeit, nächste 12 Wochen"
+
+#: workbench/templatetags/workbench.py
+msgid "high probability, later"
+msgstr "Hohe Wahrscheinlichkeit, später"
+
+#: workbench/templatetags/workbench.py
+msgid "normal probability"
+msgstr "Normale Wahrscheinlichkeit"
+
+#: workbench/templatetags/workbench.py
+msgid "unknown probability"
+msgstr "Wahrscheinlichkeit unbekannt"
 
 #: workbench/timer/admin.py workbench/timer/models.py
 msgid "state"

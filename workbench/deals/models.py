@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django.db import models
 from django.utils import timezone
 from django.utils.html import format_html
@@ -169,18 +171,27 @@ class Deal(Model):
         d = {
             "created_at": local_date_format(self.created_at.date()),
             "closed_on": self.closed_on and local_date_format(self.closed_on),
+            "decision_expected_on": self.decision_expected_on
+            and local_date_format(self.decision_expected_on),
             "status": self.get_status_display(),
         }
 
-        if self.status == self.OPEN:
-            return _("Open since %(created_at)s") % d
-        return _("%(status)s on %(closed_on)s") % d
+        if self.status != self.OPEN:
+            return _("%(status)s on %(closed_on)s") % d
+        if self.decision_expected_on:
+            return _("Decision expected on %(decision_expected_on)s") % d
+        return _("Open since %(created_at)s") % d
 
     @property
     def status_badge(self):
-        css = {self.OPEN: "info", self.ACCEPTED: "success", self.DECLINED: "danger"}[
-            self.status
-        ]
+        if self.decision_expected_on and self.decision_expected_on < dt.date.today():
+            css = "warning"
+        else:
+            css = {
+                self.OPEN: "info",
+                self.ACCEPTED: "success",
+                self.DECLINED: "danger",
+            }[self.status]
 
         return format_html(
             '<span class="badge badge-{}">{}</span>', css, self.pretty_status
