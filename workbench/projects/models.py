@@ -67,7 +67,7 @@ class ProjectQuerySet(SearchQuerySet):
         )
 
     def invalid_customer_contact_combination(self):
-        return self.open().exclude(customer=F("contact__organization"))
+        return self.exclude(customer=F("contact__organization"))
 
 
 @model_urls
