@@ -10,7 +10,9 @@ urlpatterns = [
     url(
         r"^$",
         controlling_only(
-            generic.ListView.as_view(model=Deal, search_form_class=DealSearchForm)
+            generic.ListView.as_view(
+                model=Deal, search_form_class=DealSearchForm, paginate_by=None
+            )
         ),
         name="deals_deal_list",
     ),
