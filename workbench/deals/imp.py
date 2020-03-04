@@ -4,6 +4,7 @@ from functools import lru_cache
 from pprint import pprint
 from types import SimpleNamespace
 
+from django.db import connections
 from django.utils import timezone
 
 import jellyfish
@@ -144,10 +145,23 @@ def run_import():
 
     set_user_name("Pipedrive Import")
 
-    for cls in [Deal, AttributeGroup, ClosingType, ValueType]:
-        pass
+    with connections["default"].cursor() as cursor:
+        cursor.execute(
+            """\
+TRUNCATE deals_deal RESTART IDENTITY CASCADE;
+TRUNCATE deals_valuetype RESTART IDENTITY CASCADE;
+TRUNCATE deals_attributegroup RESTART IDENTITY CASCADE;
+TRUNCATE deals_closingtype RESTART IDENTITY CASCADE;
 
-        cls.objects.all().delete()
+DELETE FROM audit_logged_actions
+WHERE table_name IN (
+    'deals_deal',
+    'deals_value',
+    'deals_valuetype',
+    'deals_attributegroup'
+);
+            """
+        )
 
     res = initial()
 
