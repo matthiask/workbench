@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-04 17:08+0100\n"
+"POT-Creation-Date: 2020-03-04 17:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -102,6 +102,7 @@ msgstr "Arbeitszeitmodell"
 #: workbench/accounts/models.py workbench/awt/models.py
 #: workbench/management/commands/profitability.py
 #: workbench/templates/awt/absence_detail.html
+#: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/green_hours.html workbench/timer/models.py
 msgid "user"
 msgstr "Benutzer"
@@ -741,6 +742,7 @@ msgstr "Valuta"
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
@@ -802,7 +804,7 @@ msgid "assign credit entries"
 msgstr "Gutschriften zuweisen"
 
 #: workbench/deals/__init__.py workbench/deals/models.py
-#: workbench/templates/base.html
+#: workbench/templates/base.html workbench/templates/shortcuts.html
 msgid "deals"
 msgstr "Geschäfte"
 
@@ -919,6 +921,7 @@ msgid "responsible"
 msgstr "verantwortlich"
 
 #: workbench/deals/models.py workbench/templates/deals/deal_detail.html
+#: workbench/templates/reporting/accepted_deals.html
 msgid "value"
 msgstr "Wert"
 
@@ -2151,6 +2154,11 @@ msgstr "Stunden pro Kundschaft"
 msgid "green hours"
 msgstr "Grüne Stunden"
 
+#: workbench/templates/base.html
+#: workbench/templates/reporting/accepted_deals.html
+msgid "accepted deals"
+msgstr "Gewonnene Geschäfte"
+
 #: workbench/templates/base.html workbench/templates/reporting/labor_costs.html
 msgid "labor costs"
 msgstr "Personalaufwand"
@@ -2428,11 +2436,16 @@ msgstr "Erfasste Stunden pro Stundensatz"
 msgid "logged hours per user"
 msgstr "Erfasste Stunden pro Benutzer"
 
+#: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/hours_by_circle.html
 #: workbench/templates/reporting/hours_per_customer.html
 msgid "show"
 msgstr "Anzeigen"
+
+#: workbench/templates/reporting/accepted_deals.html
+msgid "count"
+msgstr "Anzahl"
 
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data.html

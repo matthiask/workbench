@@ -86,6 +86,10 @@
               {% endif %}
               <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">{% trans 'hours per customer'|capfirst %}</a>
               <a class="dropdown-item" href="{% url 'report_green_hours' %}">{% trans 'green hours'|capfirst %}</a>
+
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-header">{% trans 'deals' %}</div>
+              <a class="dropdown-item" href="{% url 'report_accepted_deals' %}">{% trans 'accepted deals'|capfirst %}</a>
             {% endif %} {# CONTROLLING #}
 
             {% if request.user|has_feature:FEATURES.LABOR_COSTS %}
