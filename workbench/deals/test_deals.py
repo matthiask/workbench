@@ -8,6 +8,7 @@ from freezegun import freeze_time
 
 from workbench import factories
 from workbench.deals.models import Deal
+from workbench.templatetags.workbench import deal_group
 from workbench.tools.formats import local_date_format
 
 
@@ -16,7 +17,8 @@ class DealsTest(TestCase):
         deactivate_all()
 
     def test_list(self):
-        self.client.force_login(factories.UserFactory.create())
+        deal = factories.DealFactory.create()
+        self.client.force_login(deal.owned_by)
 
         self.assertEqual(self.client.get("/deals/").status_code, 200)
         self.assertEqual(self.client.get("/deals/?s=").status_code, 200)
@@ -289,3 +291,23 @@ class DealsTest(TestCase):
         self.assertRedirects(response, deal.urls["detail"])
         deal.refresh_from_db()
         self.assertEqual(deal.value, 500)
+
+    def test_deal_group(self):
+        def offset(offset=0):
+            return dt.date.today() + dt.timedelta(days=offset)
+
+        self.assertEqual(deal_group(Deal())[0], 5)
+        self.assertEqual(deal_group(Deal(probability=Deal.NORMAL))[0], 4)
+        self.assertEqual(deal_group(Deal(probability=Deal.HIGH))[0], 3)
+        self.assertEqual(
+            deal_group(Deal(probability=Deal.HIGH, decision_expected_on=offset(90)))[0],
+            3,
+        )
+        self.assertEqual(
+            deal_group(Deal(probability=Deal.HIGH, decision_expected_on=offset(30)))[0],
+            2,
+        )
+        self.assertEqual(
+            deal_group(Deal(probability=Deal.HIGH, decision_expected_on=offset(20)))[0],
+            1,
+        )
