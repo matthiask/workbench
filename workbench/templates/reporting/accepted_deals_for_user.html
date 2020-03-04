@@ -1,0 +1,28 @@
+{% extends "modal.html" %}
+
+{% load i18n workbench %}
+
+{% block size %}modal-xl{% endblock %}
+
+{% block title %}{% trans 'accepted deals' %}{% endblock %}
+
+{% block body %}
+{% for row in stats.by_user %}
+{% if row.user_id == request.GET.user %}
+
+<table class="table table-sm bg-light">
+  <tr>
+    <th class="w-100">{% trans 'deal' %}</th>
+    <th class="text-right">{% trans 'value' %}</th>
+  </tr>
+  {% for deal in row.deals %}
+    <tr>
+      <td>{% link_or_none deal with_badge=True %}</td>
+      <td class="text-right">{{ deal.value|currency }}</td>
+    </tr>
+  {% endfor %}
+</table>
+
+{% endif %}
+{% endfor %}
+{% endblock %}

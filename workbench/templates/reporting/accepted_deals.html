@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% load fineforms i18n static workbench %}
+
+{% block title %}{% trans 'accepted deals' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-sm-12 col-md-8">
+  <h1>{% trans 'accepted deals' %}</h1>
+
+  <form method="get" class="mb-3">
+    {% ff_fields form %}
+    {% ff_submit _('show') %}
+  </form>
+
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>{% trans 'user' %}</th>
+        <th class="text-right">{% trans 'count' %}</th>
+        <th class="text-right">{% trans 'value' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in stats.by_user %}
+      <tr>
+        <td>
+          <a href="deals/{% querystring user=row.user.id %}" data-toggle="ajaxmodal">{{ row.user }}</a>
+        </td>
+        <td class="text-right">{{ row.count }}</td>
+        <td class="text-right">{{ row.sum|currency }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <th>{% trans 'total' %}</th>
+        <th class="text-right">{{ stats.count }}</th>
+        <th class="text-right">{{ stats.sum|currency }}</th>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+</div>
+{% endblock %}

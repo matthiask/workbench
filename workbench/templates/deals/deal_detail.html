@@ -1,0 +1,98 @@
+{% extends "generic/object_detail.html" %}
+
+{% load i18n workbench %}
+
+{% block content %}
+<div class="row">
+<div class="col-md-6 offset-md-3">
+  <h1>{{ object|h }} {% history_link object %}</h1>
+
+  <table class="table table-striped">
+    <tr>
+      <th class="text-right">{% trans 'customer' %}</th>
+      <td>{% link_or_none object.customer %}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'contact' %}</th>
+      <td>{% link_or_none object.contact %}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'probability' %}</th>
+      <td>{{ object.get_probability_display }}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'decision expected on' %}</th>
+      <td>{{ object.decision_expected_on|local_date_format }}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'status' %}</th>
+      <td>
+        <div class="row justify-content-between">
+          <div class="col">
+            {{ object.status_badge }}
+            {% if object.status != object.OPEN %}
+              <br>
+              {{ object.pretty_closing_type }}
+              <br>
+              {{ object.closing_notice|linebreaksbr }}
+            {% endif %}
+          </div>
+
+          <div class="col-auto">
+            {% if object.status != object.OPEN %}
+              <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.OPEN }}" class="btn btn-sm btn-info">
+                {% trans 'open'|capfirst %}
+              </a>
+            {% endif %}
+
+            {% if object.status != object.ACCEPTED or not object.closing_type %}
+              <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}" class="btn btn-sm btn-success">
+                {% trans 'accepted'|capfirst %}
+              </a>
+            {% endif %}
+
+            {% if object.status != object.DECLINED or not object.closing_type %}
+              <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.DECLINED }}" class="btn btn-sm btn-danger">
+                {% trans 'declined'|capfirst %}
+              </a>
+            {% endif %}
+
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <th class="text-right">{% trans 'description' %}</th>
+      <td>{{ object.description|linebreaksbr|default:"&ndash;" }}</td>
+    </tr>
+
+    <tr>
+      <th class="text-right">{% trans 'value' %}</th>
+      <td>
+        <strong>{{ object.value|currency }}</strong>
+        <br>
+        {% for value in object.values.all %}
+          {{ value.type }}: {{ value }}<br>
+        {% endfor %}
+      </td>
+    </tr>
+
+    {% for attribute in object.attributes.all %}
+    <tr>
+      <th class="text-right">{{ attribute.group }}</th>
+      <td>{{ attribute }}</td>
+    </tr>
+    {% endfor %}
+
+  </table>
+
+  <a href="{{ object.urls.update }}" class="btn btn-primary">
+    {% trans 'Update' %}
+  </a>
+
+  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
+    {% trans 'Delete' %}
+  </a>
+</div>
+</div>
+{% endblock %}

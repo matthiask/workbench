@@ -8,6 +8,7 @@ from workbench.accounts.features import (
 )
 from workbench.awt.views import absence_calendar, annual_working_time_view
 from workbench.circles.reporting import hours_by_circle
+from workbench.deals.reporting import accepted_deals
 from workbench.projects.reporting import hours_per_customer
 from workbench.reporting.green_hours import green_hours
 from workbench.reporting.views import (
@@ -72,6 +73,21 @@ urlpatterns = [
         controlling_only(hours_filter_view),
         {"template_name": "reporting/green_hours.html", "stats_fn": green_hours},
         name="report_green_hours",
+    ),
+    url(
+        r"^accepted-deals/$",
+        controlling_only(hours_filter_view),
+        {"template_name": "reporting/accepted_deals.html", "stats_fn": accepted_deals},
+        name="report_accepted_deals",
+    ),
+    url(
+        r"^accepted-deals/deals/$",
+        controlling_only(hours_filter_view),
+        {
+            "template_name": "reporting/accepted_deals_for_user.html",
+            "stats_fn": accepted_deals,
+        },
+        name="report_accepted_deals",
     ),
     url(
         r"^labor-costs/$", labor_costs_only(labor_costs_view), name="report_labor_costs"

@@ -41,6 +41,7 @@
     {% endfor %}
     {% endblock %}
 
+    {% if page_obj %}
     <nav class="mt-3">
       <ul class="pagination align-items-center">
         {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="{% querystring page=page_obj.previous_page_number %}">&laquo;</a></li>
@@ -61,6 +62,8 @@
         </li>
       </ul>
     </nav>
+    {% endif %} {# page_obj #}
+
   </div>
 </div>
 {% endblock %}

@@ -85,6 +85,37 @@ def group_hours_by_day(iterable):
         yield (day, sum((item.hours for item in instances), Z), instances)
 
 
+def deal_group(deal):
+    decision_expected_within = (
+        (deal.decision_expected_on - dt.date.today()).days
+        if deal.decision_expected_on
+        else 99999999999
+    )
+
+    if deal.probability == deal.HIGH:
+        if decision_expected_within <= 4 * 7:
+            return (1, _("high probability, next 4 weeks"))
+        elif decision_expected_within <= 12 * 7:
+            return (2, _("high probability, next 12 weeks"))
+        else:
+            return (3, _("high probability, later"))
+    elif deal.probability == deal.NORMAL:
+        return (4, _("normal probability"))
+    else:
+        return (5, _("unknown probability"))
+
+
+@register.filter
+def group_deals_by_probability(iterable):
+    for group, deals in groupby(iterable, deal_group):
+        deals = list(deals)
+        yield {
+            "title": group[1],
+            "deals": deals,
+            "sum": sum((deal.value for deal in deals), Z),
+        }
+
+
 @register.simple_tag
 def bar(value, one):
     if not one:
