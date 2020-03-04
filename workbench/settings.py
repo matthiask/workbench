@@ -191,7 +191,7 @@ WORKBENCH = {
         },
         URL="https://workbench.feinheit.ch",
         FEATURES={
-            "bookkeeping": {"mk@feinheit.ch", "mgi@feinheit.ch"},
+            "bookkeeping": {"mk@feinheit.ch"},
             "controlling": True,
             "foreign_currencies": False,
             "glassfrog": True,

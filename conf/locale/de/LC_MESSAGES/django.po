@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-04 08:36+0100\n"
+"POT-Creation-Date: 2020-03-04 17:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -744,7 +744,7 @@ msgstr "Valuta"
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
-#: workbench/tools/pdf.py
+#: workbench/tools/pdf.py workbench/tools/xlsx.py
 msgid "total"
 msgstr "Total"
 
@@ -763,6 +763,7 @@ msgstr "Zahlungsnotiz"
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/key_data_third_party_costs.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/pdf.py
+#: workbench/tools/xlsx.py
 msgid "invoice"
 msgstr "Rechnung"
 
@@ -975,11 +976,6 @@ msgstr "Entscheidung erwartet am %(decision_expected_on)s"
 #, python-format
 msgid "Open since %(created_at)s"
 msgstr "Offen seit %(created_at)s"
-
-#: workbench/deals/models.py
-#, python-format
-msgid "decision expected on %s"
-msgstr "Entscheidung erwartet am %s"
 
 #: workbench/deals/models.py
 msgid "<closing type missing>"
@@ -1471,7 +1467,7 @@ msgstr "Zeitraum"
 #: workbench/services/models.py
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
-#: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_detail.html workbench/tools/xlsx.py
 msgid "service"
 msgstr "Leistung"
 
@@ -1485,7 +1481,7 @@ msgid "effort type"
 msgstr "Aufwandtyp"
 
 #: workbench/invoices/views.py workbench/services/models.py
-#: workbench/templates/offers/offer_pricing.html
+#: workbench/templates/offers/offer_pricing.html workbench/tools/xlsx.py
 msgid "hourly rate"
 msgstr "Stundensatz"
 
@@ -2425,7 +2421,7 @@ msgid "Services from offer"
 msgstr "Leistungen aus Offerte"
 
 #: workbench/templates/projects/project_statistics.html
-msgid "logged hours per effort rate"
+msgid "logged hours per hourly rate"
 msgstr "Erfasste Stunden pro Stundensatz"
 
 #: workbench/templates/projects/project_statistics.html
@@ -2750,6 +2746,10 @@ msgid "Form was invalid."
 msgstr "Formular war ungültig."
 
 #: workbench/tools/xlsx.py
+msgid "by service and user"
+msgstr "Nach Leistung und Benutzer"
+
+#: workbench/tools/xlsx.py
 msgid "total hours"
 msgstr "Stunden insgesamt"
 
@@ -2766,14 +2766,5 @@ msgstr "Suchanfrage fehlt."
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
 
-#~ msgid "stage"
-#~ msgstr "Stadium"
-
-#~ msgid "stages"
-#~ msgstr "Stadien"
-
-#~ msgid "<current time since last timestamp>"
-#~ msgstr "<aktuelle Zeit seit der letzten Zeitmarke>"
-
-#~ msgid "No salutation set. This will make newsletters ugly."
-#~ msgstr "Keine Begrüssung gesetzt. Das macht Newsletter hässlich."
+#~ msgid "decision expected on %s"
+#~ msgstr "Entscheidung erwartet am %s"
