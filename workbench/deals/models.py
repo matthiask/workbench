@@ -184,9 +184,11 @@ class Deal(Model):
 
     @property
     def status_badge(self):
-        if self.decision_expected_on and self.decision_expected_on < dt.date.today():
-            css = "warning"
-        elif self.status == self.OPEN:
+        if self.status != self.OPEN:
+            css = {self.ACCEPTED: "success", self.DECLINED: "danger"}[self.status]
+        elif self.decision_expected_on:
+            css = "warning" if self.decision_expected_on < dt.date.today() else "info"
+        else:
             open_since = (dt.date.today() - self.created_at.date()).days
             if (
                 open_since
@@ -195,8 +197,6 @@ class Deal(Model):
                 css = "caveat"
             else:
                 css = "info"
-        else:
-            css = {self.ACCEPTED: "success", self.DECLINED: "danger"}[self.status]
 
         return format_html(
             '<span class="badge badge-{}">{}</span>', css, self.pretty_status
