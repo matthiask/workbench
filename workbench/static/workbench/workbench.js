@@ -188,6 +188,9 @@ $(function() {
     } else if (e.keyCode === 84) {
       // t
       window.location.href = restoreSearch("/timestamps/")
+    } else if (e.keyCode === 68) {
+      // d
+      window.location.href = restoreSearch("/deals/")
     } else if (e.keyCode === 76) {
       // l
       const el = _sel("[data-createhours]")
