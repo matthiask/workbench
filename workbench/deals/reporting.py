@@ -79,6 +79,7 @@ def accepted_deals(date_range, *, users=None):
         "target": sum(type.weekly_target or 0 for type in valuetypes)
         * date_range_length
         / 7,
+        "weeks": date_range_length / 7,
     }
 
 

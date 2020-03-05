@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-05 11:19+0100\n"
+"POT-Creation-Date: 2020-03-05 11:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1009,6 +1009,10 @@ msgstr "Geschäftsattribut"
 #: workbench/deals/models.py
 msgid "deal attributes"
 msgstr "Geschäftsattribute"
+
+#: workbench/deals/models.py
+msgid "weekly target"
+msgstr "Wochenziel"
 
 #: workbench/deals/models.py
 msgid "value type"
@@ -2466,6 +2470,14 @@ msgstr "Anzeigen"
 #: workbench/templates/reporting/key_data.html
 msgid "month"
 msgstr "Monat"
+
+#: workbench/templates/reporting/accepted_deals.html
+msgid "target"
+msgstr "Ziel"
+
+#: workbench/templates/reporting/accepted_deals.html
+msgid "weeks"
+msgstr "Wochen"
 
 #: workbench/templates/reporting/accepted_deals.html
 msgid "count"

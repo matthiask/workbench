@@ -42,7 +42,7 @@
         <th class="text-right">{{ stats.sum|currency }}</th>
       </tr>
       <tr>
-        <th>{% trans 'target' %}</th>
+        <th>{% trans 'target' %} ({{ stats.weeks|stringformat:'.1f' }} {% trans 'weeks' %})</th>
         {% for row in stats.by_valuetype %}
           <th class="text-right">
             {{ row.target|currency }}
