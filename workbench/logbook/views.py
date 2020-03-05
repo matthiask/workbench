@@ -23,7 +23,7 @@ def create(request, *, viewname):
             "links": [
                 {
                     "title": h(project),
-                    "url": "{}?{}".format(project.urls["createhours"], params),
+                    "url": "{}?{}".format(project.urls[viewname], params),
                     "attrs": 'data-toggle="ajaxmodal"',
                 }
                 for project in request.user.active_projects
