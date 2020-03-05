@@ -56,10 +56,8 @@ class AccountsTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        response = self.client.get(
-            reverse("report_hours_by_circle"), HTTP_REFERER="/test/"
-        )
-        self.assertRedirects(response, "/test/", fetch_redirect_response=False)
+        response = self.client.get(reverse("report_hours_by_circle"))
+        self.assertRedirects(response, "/")
         self.assertEqual(messages(response), ["Access denied, sorry."])
 
     @override_settings(

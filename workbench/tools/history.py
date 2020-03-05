@@ -187,7 +187,7 @@ def _credit_control_creditentry_cfg(user):
 
 
 def _deals_deal_cfg(user):
-    if not user.features[FEATURES.CONTROLLING]:
+    if not user.features[FEATURES.DEALS]:
         raise Http404
     return {
         "fields": {
@@ -210,13 +210,13 @@ def _deals_deal_cfg(user):
 
 
 def _deals_value_cfg(user):
-    if not user.features[FEATURES.CONTROLLING]:
+    if not user.features[FEATURES.DEALS]:
         raise Http404
     return {"fields": {"deal", "type", "value"}}
 
 
 def _deals_valuetype_cfg(user):
-    if not user.features[FEATURES.CONTROLLING]:
+    if not user.features[FEATURES.DEALS]:
         raise Http404
     return {"fields": {"title", "is_archived", "weekly_target"}}
 

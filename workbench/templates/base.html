@@ -28,6 +28,8 @@
         {% if request.user|has_feature:FEATURES.CONTROLLING %}
           <li class="nav-item"><a class="nav-link" href="{% url 'offers_offer_list' %}">{% trans 'offers'|capfirst %}</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'invoices_invoice_list' %}">{% trans 'invoices'|capfirst %}</a></li>
+        {% endif %}
+        {% if request.user|has_feature:FEATURES.DEALS %}
           <li class="nav-item"><a class="nav-link" href="{% url 'deals_deal_list' %}">{% trans 'deals'|capfirst %}</a></li>
         {% endif %}
         <li class="nav-item"><a class="nav-link" href="{% url 'contacts' %}">{% trans 'contacts'|capfirst %}</a></li>

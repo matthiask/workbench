@@ -193,6 +193,7 @@ WORKBENCH = {
         FEATURES={
             "bookkeeping": {"mk@feinheit.ch"},
             "controlling": True,
+            "deals": True,
             "foreign_currencies": False,
             "glassfrog": True,
             "labor_costs": False,
@@ -228,6 +229,7 @@ WORKBENCH = {
         FEATURES={
             "bookkeeping": True,
             "controlling": True,
+            "deals": False,
             "foreign_currencies": False,
             "glassfrog": False,
             "labor_costs": False,
@@ -274,6 +276,7 @@ WORKBENCH = {
                 "frederic@blindflugstudios.com",
                 "mk@feinheit.ch",
             },
+            "deals": False,
             "foreign_currencies": True,
             "glassfrog": False,
             "labor_costs": {
@@ -312,6 +315,7 @@ WORKBENCH = {
         FEATURES={
             "bookkeeping": True,
             "controlling": True,
+            "deals": True,
             "foreign_currencies": True,
             "glassfrog": False,
             "labor_costs": True,

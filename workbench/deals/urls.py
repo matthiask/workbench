@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from workbench import generic
-from workbench.accounts.features import controlling_only
+from workbench.accounts.features import deals_only
 from workbench.deals.forms import DealForm, DealSearchForm, SetStatusForm
 from workbench.deals.models import Deal
 
@@ -9,7 +9,7 @@ from workbench.deals.models import Deal
 urlpatterns = [
     url(
         r"^$",
-        controlling_only(
+        deals_only(
             generic.ListView.as_view(
                 model=Deal, search_form_class=DealSearchForm, paginate_by=None
             )
@@ -18,22 +18,22 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/$",
-        controlling_only(generic.DetailView.as_view(model=Deal)),
+        deals_only(generic.DetailView.as_view(model=Deal)),
         name="deals_deal_detail",
     ),
     url(
         r"^create/$",
-        controlling_only(generic.CreateView.as_view(form_class=DealForm, model=Deal)),
+        deals_only(generic.CreateView.as_view(form_class=DealForm, model=Deal)),
         name="deals_deal_create",
     ),
     url(
         r"^(?P<pk>\d+)/update/$",
-        controlling_only(generic.UpdateView.as_view(form_class=DealForm, model=Deal)),
+        deals_only(generic.UpdateView.as_view(form_class=DealForm, model=Deal)),
         name="deals_deal_update",
     ),
     url(
         r"^(?P<pk>\d+)/set-status/$",
-        controlling_only(
+        deals_only(
             generic.UpdateView.as_view(
                 form_class=SetStatusForm, model=Deal, template_name="modalform.html"
             )
@@ -42,7 +42,7 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/delete/$",
-        controlling_only(generic.DeleteView.as_view(model=Deal)),
+        deals_only(generic.DeleteView.as_view(model=Deal)),
         name="deals_deal_delete",
     ),
 ]

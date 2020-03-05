@@ -12,7 +12,7 @@ def feature_required(feature, message=_("Access denied, sorry.")):
             if request.user.features[feature]:
                 return view(request, *args, **kwargs)
             messages.warning(request, message)
-            return HttpResponseRedirect(request.META.get("HTTP_REFERER") or "/")
+            return HttpResponseRedirect("/")
 
         return require_feature
 
@@ -22,6 +22,7 @@ def feature_required(feature, message=_("Access denied, sorry.")):
 class FEATURES:
     BOOKKEEPING = "bookkeeping"
     CONTROLLING = "controlling"
+    DEALS = "deals"
     FOREIGN_CURRENCIES = "foreign_currencies"
     GLASSFROG = "glassfrog"
     LABOR_COSTS = "labor_costs"
@@ -30,12 +31,9 @@ class FEATURES:
 bookkeeping_only = feature_required(
     FEATURES.BOOKKEEPING, _("Only bookkeeping may access this, sorry.")
 )
-controlling_only = feature_required(
-    FEATURES.CONTROLLING, _("Only controlling may access this, sorry.")
-)
-labor_costs_only = feature_required(
-    FEATURES.LABOR_COSTS, _("Only labor costs may access this, sorry.")
-)
+controlling_only = feature_required(FEATURES.CONTROLLING)
+deals_only = feature_required(FEATURES.DEALS)
+labor_costs_only = feature_required(FEATURES.LABOR_COSTS)
 
 
 KNOWN_FEATURES = {getattr(FEATURES, attr) for attr in dir(FEATURES) if attr.isupper()}
