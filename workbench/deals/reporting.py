@@ -55,6 +55,7 @@ def accepted_deals(date_range, *, users=None):
         }
         for month, by_valuetype in by_month_and_valuetype.items()
     ]
+    date_range_length = (date_range[1] - date_range[0]).days + 1
 
     return {
         "by_user": sorted(deals, key=lambda row: row["sum"], reverse=True),
@@ -66,12 +67,18 @@ def accepted_deals(date_range, *, users=None):
                     by_valuetype[type]
                     for by_valuetype in by_month_and_valuetype.values()
                 ),
+                "target": type.weekly_target * date_range_length / 7
+                if type.weekly_target is not None
+                else None,
             }
             for type in valuetypes
         ],
         "valuetypes": valuetypes,
         "sum": sum(row["sum"] for row in deals),
         "count": sum(row["count"] for row in deals),
+        "target": sum(type.weekly_target or 0 for type in valuetypes)
+        * date_range_length
+        / 7,
     }
 
 

@@ -41,6 +41,23 @@
         {% endfor %}
         <th class="text-right">{{ stats.sum|currency }}</th>
       </tr>
+      <tr>
+        <th>{% trans 'target' %}</th>
+        {% for row in stats.by_valuetype %}
+          <th class="text-right">
+            {{ row.target|currency }}
+            <div style="margin:-5px 0;display:inline-block">
+              {% pie row.sum row.target type='good' size=28 %}
+            </div>
+          </th>
+        {% endfor %}
+        <th class="text-right">
+          {{ stats.target|currency }}
+          <div style="margin:-5px 0;display:inline-block">
+            {% pie stats.sum stats.target type='good' size=28 %}
+          </div>
+        </th>
+      </tr>
     </tbody>
   </table>
 

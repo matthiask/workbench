@@ -227,6 +227,7 @@ class ValueType(models.Model):
     title = models.CharField(_("title"), max_length=200)
     position = models.PositiveIntegerField(_("position"), default=0)
     is_archived = models.BooleanField(_("is archived"), default=False)
+    weekly_target = MoneyField(_("weekly target"), blank=True, null=True)
 
     class Meta:
         ordering = ("position", "id")

@@ -346,8 +346,8 @@ class DealsTest(TestCase):
         self.assertEqual(
             stats["by_valuetype"],
             [
-                {"type": vt2, "sum": Decimal("400")},
-                {"type": vt1, "sum": Decimal("200")},
+                {"type": vt2, "target": None, "sum": Decimal("400")},
+                {"type": vt1, "target": None, "sum": Decimal("200")},
             ],
         )
         self.assertEqual(len(stats["by_user"]), 1)

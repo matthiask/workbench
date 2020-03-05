@@ -21,8 +21,8 @@ class DealAdmin(admin.ModelAdmin):
 
 @admin.register(models.ValueType)
 class ValueTypeAdmin(OrderableAdmin, admin.ModelAdmin):
-    list_display = ["title", "is_archived", "position"]
-    list_editable = ["position"]
+    list_display = ["title", "is_archived", "position", "weekly_target"]
+    list_editable = ["position", "weekly_target"]
     ordering_field = "position"
 
 
