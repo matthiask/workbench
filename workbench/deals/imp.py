@@ -174,6 +174,7 @@ WHERE table_name IN (
 
         row = {
             "title": deal["title"],
+            "description": "https://{}/deal/{}".format(DOMAIN, deal["id"]),
             "owned_by": users[deal["user_id"]["email"]],
             "created_at": parse_date(deal["add_time"]),
             "customer": get_organization(deal["org_id"]["name"]),
