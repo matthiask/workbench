@@ -21,7 +21,7 @@ from workbench.contacts.models import (
     PostalAddress,
 )
 from workbench.credit_control.models import CreditEntry
-from workbench.deals.models import Deal, Value
+from workbench.deals.models import Deal, Value, ValueType
 from workbench.expenses.models import ExpenseReport
 from workbench.invoices.models import (
     Invoice,
@@ -213,6 +213,12 @@ def _deals_value_cfg(user):
     if not user.features[FEATURES.CONTROLLING]:
         raise Http404
     return {"fields": {"deal", "type", "value"}}
+
+
+def _deals_valuetype_cfg(user):
+    if not user.features[FEATURES.CONTROLLING]:
+        raise Http404
+    return {"fields": {"title", "is_archived", "weekly_target"}}
 
 
 def _invoices_invoice_cfg(user):
@@ -419,6 +425,7 @@ HISTORY = {
     CreditEntry: _credit_control_creditentry_cfg,
     Deal: _deals_deal_cfg,
     Value: _deals_value_cfg,
+    ValueType: _deals_valuetype_cfg,
     ExpenseReport: {
         "fields": {"created_at", "created_by", "closed_on", "owned_by", "total"},
         "related": [(LoggedCost, "expense_report_id")],

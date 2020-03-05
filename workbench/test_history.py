@@ -230,3 +230,7 @@ class HistoryTest(TestCase):
 
         url = "/history/deals_value/deal_id/{}/".format(deal.pk)
         self.assert_404_without_controlling(url)
+
+        type = factories.ValueTypeFactory.create()
+        url = "/history/deals_valuetype/id/{}/".format(type.pk)
+        self.assert_404_without_controlling(url)
