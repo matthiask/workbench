@@ -12,12 +12,14 @@
 
 <table class="table table-sm bg-light">
   <tr>
-    <th class="w-100">{% trans 'deal' %}</th>
+    <th>{% trans 'deal' %}</th>
+    <th></th>
     <th class="text-right">{% trans 'value' %}</th>
   </tr>
   {% for deal in row.deals %}
     <tr>
       <td>{% link_or_none deal with_badge=True %}</td>
+      <td>{% firstof deal.contact deal.customer %}</td>
       <td class="text-right">{{ deal.value|currency }}</td>
     </tr>
   {% endfor %}
