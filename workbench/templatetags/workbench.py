@@ -160,7 +160,7 @@ def pie(value, one, size=20, type="bad"):
         large_arc=1 if angle > math.pi else 0,
         x=hsize + math.sin(angle) * hsize,
         y=hsize - math.cos(angle) * hsize,
-        size=size,
+        size=size + 2,
         hsize=hsize,
         type=type,
     )

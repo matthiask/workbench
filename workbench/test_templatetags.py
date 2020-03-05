@@ -75,7 +75,7 @@ class TemplateTagsTest(TestCase):
         t = Template("{% load workbench %}{% pie 1 3 %}")
         self.assertEqual(
             t.render(Context()),
-            """<svg width="20" height="20" class="pie bad" style="display: inline-block">
+            """<svg width="22" height="22" class="pie bad" style="display: inline-block">
   <circle r="10" cx="10" cy="10" class="pie-circle" />
   <path d="M 10 0 A 10 10 0 0 1 18.66025403784439 14.999999999999998 L 10 10 z" class="pie-arc" />
 </svg>""",  # noqa
@@ -84,7 +84,7 @@ class TemplateTagsTest(TestCase):
         t = Template("{% load workbench %}{% pie 1 0 %}")
         self.assertEqual(
             t.render(Context()),
-            """<svg width="20" height="20" class="pie bad" style="display: inline-block">
+            """<svg width="22" height="22" class="pie bad" style="display: inline-block">
   <circle r="10" cx="10" cy="10" class="pie-circle" />
   <path d="M 10 0 A 10 10 0 0 1 10.0 0.0 L 10 10 z" class="pie-arc" />
 </svg>""",  # noqa
