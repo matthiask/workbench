@@ -2,16 +2,16 @@ from functools import wraps
 
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 
-def feature_required(feature, message=_("Access denied, sorry.")):
+def feature_required(feature):
     def decorator(view):
         @wraps(view)
         def require_feature(request, *args, **kwargs):
             if request.user.features[feature]:
                 return view(request, *args, **kwargs)
-            messages.warning(request, message)
+            messages.warning(request, _("Feature not available"))
             return HttpResponseRedirect("/")
 
         return require_feature
@@ -28,9 +28,7 @@ class FEATURES:
     LABOR_COSTS = "labor_costs"
 
 
-bookkeeping_only = feature_required(
-    FEATURES.BOOKKEEPING, _("Only bookkeeping may access this, sorry.")
-)
+bookkeeping_only = feature_required(FEATURES.BOOKKEEPING)
 controlling_only = feature_required(FEATURES.CONTROLLING)
 deals_only = feature_required(FEATURES.DEALS)
 labor_costs_only = feature_required(FEATURES.LABOR_COSTS)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-05 11:45+0100\n"
+"POT-Creation-Date: 2020-03-05 13:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,20 +22,8 @@ msgid "accounts"
 msgstr "Konten"
 
 #: workbench/accounts/features.py
-msgid "Access denied, sorry."
-msgstr "Zugriff verweigert :-("
-
-#: workbench/accounts/features.py
-msgid "Only bookkeeping may access this, sorry."
-msgstr "Nur Buchhaltung kann auf diesen Bereich zugreifen."
-
-#: workbench/accounts/features.py
-msgid "Only controlling may access this, sorry."
-msgstr "Nur Buchhaltung kann auf diesen Bereich zugreifen."
-
-#: workbench/accounts/features.py
-msgid "Only labor costs may access this, sorry."
-msgstr "Nur Personalkosten kann auf diesen Bereich zugreifen."
+msgid "Feature not available"
+msgstr "Feature nicht verfügbar"
 
 #: workbench/accounts/forms.py
 msgid "Managed automatically. Contact your administrator to change this."
@@ -2810,6 +2798,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "decision expected on %s"
-#~ msgstr "Entscheidung erwartet am %s"

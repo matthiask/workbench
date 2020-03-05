@@ -58,7 +58,7 @@ class AccountsTest(TestCase):
 
         response = self.client.get(reverse("report_hours_by_circle"))
         self.assertRedirects(response, "/")
-        self.assertEqual(messages(response), ["Access denied, sorry."])
+        self.assertEqual(messages(response), ["Feature not available"])
 
     @override_settings(
         FEATURES={"yes": True, "no": False, "maybe": {"test@example.com"}}
