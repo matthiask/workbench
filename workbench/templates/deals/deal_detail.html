@@ -63,7 +63,7 @@
     </tr>
     <tr>
       <th class="text-right">{% trans 'description' %}</th>
-      <td>{{ object.description|linebreaksbr|default:"&ndash;" }}</td>
+      <td>{{ object.description|linebreaksbr|urlize|default:"&ndash;" }}</td>
     </tr>
 
     <tr>
