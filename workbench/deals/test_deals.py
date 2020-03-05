@@ -1,4 +1,5 @@
 import datetime as dt
+from decimal import Decimal
 
 from django.db.models import ProtectedError
 from django.test import TestCase
@@ -9,6 +10,7 @@ from freezegun import freeze_time
 
 from workbench import factories
 from workbench.deals.models import Deal
+from workbench.deals.reporting import accepted_deals
 from workbench.templatetags.workbench import deal_group
 from workbench.tools.formats import local_date_format
 
@@ -327,9 +329,30 @@ class DealsTest(TestCase):
         deal = factories.DealFactory.create(
             status=Deal.ACCEPTED, closed_on=dt.date.today()
         )
+        vt1 = factories.ValueTypeFactory.create(position=1)
+        vt2 = factories.ValueTypeFactory.create(position=0)
+        deal.values.create(type=vt1, value=200)
+        deal.values.create(type=vt2, value=400)
+        deal.save()
+
         self.client.force_login(deal.owned_by)
 
         response = self.client.get(
             "/report/accepted-deals/?date_from=2020-01-01&date_until=2099-01-01"
         )
         self.assertContains(response, "accepted deals")
+
+        stats = accepted_deals([dt.date(2020, 1, 1), dt.date(2099, 1, 1)])
+        self.assertEqual(
+            stats["by_valuetype"],
+            [
+                {"type": vt2, "sum": Decimal("400")},
+                {"type": vt1, "sum": Decimal("200")},
+            ],
+        )
+        self.assertEqual(len(stats["by_user"]), 1)
+        self.assertEqual(stats["count"], 1)
+        self.assertEqual(stats["sum"], Decimal("600"))
+
+        stats = accepted_deals([dt.date(2020, 1, 1), dt.date(2099, 1, 1)], users=[])
+        self.assertEqual(stats["sum"], Decimal("0"))

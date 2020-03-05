@@ -1,4 +1,5 @@
 import datetime as dt
+from functools import total_ordering
 
 from django.db import models
 from django.utils import timezone
@@ -221,6 +222,7 @@ class DealAttribute(models.Model):
         return "{} - {}".format(self.deal, self.attribute)
 
 
+@total_ordering
 class ValueType(models.Model):
     title = models.CharField(_("title"), max_length=200)
     position = models.PositiveIntegerField(_("position"), default=0)
@@ -233,6 +235,13 @@ class ValueType(models.Model):
 
     def __str__(self):
         return self.title
+
+    def __lt__(self, other):
+        return (
+            (self.position, -self.pk) < (other.position, -other.pk)
+            if isinstance(other, self.__class__)
+            else 1
+        )
 
 
 class Value(models.Model):

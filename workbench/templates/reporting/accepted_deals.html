@@ -17,6 +17,36 @@
   <table class="table table-sm table-striped">
     <thead>
       <tr>
+        <th>{% trans 'month' %}</th>
+        {% for row in stats.by_valuetype %}
+          <th class="text-right">{{ row.type }}</th>
+        {% endfor %}
+        <th class="text-right">{% trans 'total' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in stats.by_month_and_valuetype %}
+      <tr>
+        <td>{{ row.month|date:'F Y' }}</td>
+        {% for value in row.values %}
+          <td class="text-right">{{ value.value|currency }}</td>
+        {% endfor %}
+        <td class="text-right">{{ row.sum|currency }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <th>{% trans 'total' %}</th>
+        {% for row in stats.by_valuetype %}
+          <th class="text-right">{{ row.sum|currency }}</th>
+        {% endfor %}
+        <th class="text-right">{{ stats.sum|currency }}</th>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
         <th>{% trans 'user' %}</th>
         <th class="text-right">{% trans 'count' %}</th>
         <th class="text-right">{% trans 'value' %}</th>
@@ -29,7 +59,12 @@
           <a href="deals/{% querystring user=row.user.id %}" data-toggle="ajaxmodal">{{ row.user }}</a>
         </td>
         <td class="text-right">{{ row.count }}</td>
-        <td class="text-right">{{ row.sum|currency }}</td>
+        <td class="text-right">
+          {{ row.sum|currency }}
+          <div style="margin:-5px 0;display:inline-block">
+            {% pie row.sum stats.sum type='good' size=28 %}
+          </div>
+        </td>
       </tr>
       {% endfor %}
       <tr>
