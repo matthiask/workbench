@@ -50,6 +50,7 @@
         <td>{% trans 'Jump to project' %}</td>
       </tr>
 
+      {% if request.user|has_feature:FEATURES.CONTROLLING %}
       <tr>
         <th class="text-right text-nowrap">Ctrl-O</th>
         <td>{% trans 'offers' %}</td>
@@ -59,16 +60,19 @@
         <th class="text-right text-nowrap">Ctrl-R</th>
         <td>{% trans 'invoices' %}</td>
       </tr>
+      {% endif %}
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-T</th>
         <td>{% trans 'timestamps' %}</td>
       </tr>
 
+      {% if request.user|has_feature:FEATURES.DEALS %}
       <tr>
         <th class="text-right text-nowrap">Ctrl-D</th>
         <td>{% trans 'deals' %}</td>
       </tr>
+      {% endif %}
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-L</th>
