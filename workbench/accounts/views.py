@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.contrib import auth, messages
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import get_language, gettext as _
 from django.views.decorators.cache import never_cache
 
@@ -35,9 +36,9 @@ def login(request):
 
 @never_cache
 def oauth2(request):
-    client = GoogleOAuth2Client(
-        request, login_hint=request.COOKIES.get("login_hint", "")
-    )
+    auth_params = request.GET.dict()
+    auth_params.setdefault("login_hint", request.COOKIES.get("login_hint", ""))
+    client = GoogleOAuth2Client(request, authorization_params=auth_params)
 
     if not request.GET.get("code"):
         return redirect(client.get_authentication_url())
@@ -65,7 +66,14 @@ def oauth2(request):
         auth.login(request, user)
     else:
         messages.error(request, _("No user with email address %s found.") % email)
-        response = redirect("login")
+        response = HttpResponseRedirect(
+            "{}{}".format(
+                reverse("login"),
+                "?login_hint=&prompt=select_account"
+                if auth_params.get("login_hint")
+                else "",
+            )
+        )
         response.delete_cookie("login_hint")
         return response
 
