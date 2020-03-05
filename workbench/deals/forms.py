@@ -168,8 +168,10 @@ class DealForm(ModelForm):
 
     def clean(self):
         data = super().clean()
-        if data.get("probability") == Deal.HIGH and not data.get(
-            "decision_expected_on"
+        if (
+            self.instance.status == Deal.OPEN
+            and data.get("probability") == Deal.HIGH
+            and not data.get("decision_expected_on")
         ):
             self.add_error(
                 "decision_expected_on",
