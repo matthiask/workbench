@@ -155,7 +155,21 @@ export const Activity = connect((state, ownProps) => ({
             />
           </div>
           <div className="d-flex align-items-center justify-content-between">
-            <div className="activity-duration pl-2">
+            <div
+              className="activity-duration pl-2"
+              onClick={() => {
+                const newSeconds = parseInt(prompt("Update seconds", seconds))
+                if (newSeconds) {
+                  dispatchUpdate({
+                    seconds: parseInt(
+                      newSeconds -
+                        (isActive ? timestamp() - current.startedAt : 0)
+                    ),
+                  })
+                }
+              }}
+              style={{cursor: "cell"}}
+            >
               {prettyDuration(seconds)}
             </div>
             <div>
