@@ -246,7 +246,8 @@ $(function() {
     }
   })
 
-  $(document.body).on("click", "[data-multiply-cost]", function() {
+  $(document.body).on("click", "[data-multiply-cost]", function(e) {
+    e.preventDefault()
     const factor = parseFloat(this.dataset.multiplyCost),
       tpc = parseFloat($("#id_modal-third_party_costs").val()),
       cost = $("#id_modal-cost")
@@ -256,7 +257,8 @@ $(function() {
     }
   })
 
-  $(document.body).on("click", "[data-field-value]", function() {
+  $(document.body).on("click", "[data-field-value]", function(e) {
+    e.preventDefault()
     const field = $(this)
       .closest(".form-group")
       .find("input, textarea, select")

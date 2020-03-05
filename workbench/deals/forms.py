@@ -3,6 +3,7 @@ import datetime as dt
 from django import forms
 from django.contrib import messages
 from django.http import Http404
+from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -165,6 +166,21 @@ class DealForm(ModelForm):
                 widget=forms.RadioSelect,
                 initial=attributes.get(group.id),
             )
+
+        today = dt.date.today()
+        self.fields["decision_expected_on"].help_text = format_html(
+            "{} {}",
+            _("Set date to:"),
+            format_html_join(
+                ", ",
+                '<a href="#" data-field-value="{}">{}</a>',
+                [
+                    ((today + dt.timedelta(days=30)).isoformat(), _("one month")),
+                    ((today + dt.timedelta(days=60)).isoformat(), _("two months")),
+                    ((today + dt.timedelta(days=90)).isoformat(), _("three months")),
+                ],
+            ),
+        )
 
     def clean(self):
         data = super().clean()
