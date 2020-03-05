@@ -14,6 +14,7 @@ def accepted_deals(date_range, *, users=None):
         .prefetch_related(
             Prefetch("values", queryset=Value.objects.select_related("type"))
         )
+        .order_by("closed_on")
     )
 
     if users is not None:
