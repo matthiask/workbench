@@ -36,7 +36,7 @@ def login(request):
         "accounts/login.html",
         {
             "auth_params": "?login_hint=&prompt=consent+select_account",
-            "auth_button": _("Choose account"),
+            "auth_button": _("Select Google account"),
         }
         if request.GET.get("_error")
         else {},

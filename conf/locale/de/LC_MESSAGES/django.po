@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-05 13:16+0100\n"
+"POT-Creation-Date: 2020-03-06 01:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -116,6 +116,10 @@ msgstr "Team"
 #: workbench/accounts/models.py
 msgid "teams"
 msgstr "Teams"
+
+#: workbench/accounts/views.py
+msgid "Select Google account"
+msgstr "Google-Konto auswählen"
 
 #: workbench/accounts/views.py
 msgid "Error while fetching user data. Please try again."
@@ -1221,7 +1225,7 @@ msgid "Not offered yet"
 msgstr "Noch nicht offeriert"
 
 #: workbench/invoices/forms.py
-msgid "Choose all"
+msgid "Select all"
 msgstr "Alles auswählen"
 
 #: workbench/invoices/forms.py workbench/offers/forms.py

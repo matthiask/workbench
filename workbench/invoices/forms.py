@@ -372,7 +372,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                         "{}"
                         "</div>",
                         offer if offer else _("Not offered yet"),
-                        _("Choose all"),
+                        _("Select all"),
                     ),
                     [
                         (
