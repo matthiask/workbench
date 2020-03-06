@@ -9,7 +9,7 @@
 
   <table class="table table-striped">
     <tr>
-      <td class="text-right">{% trans 'people' %}</td>
+      <td class="text-right">{% trans 'people'|capfirst %}</td>
       <td>
         {% for person in organization.people.active %}
           <a class="inline" href="{{ person.get_absolute_url }}">{{ person.full_name }}</a>{% if not forloop.last %},{% endif %}
@@ -17,7 +17,7 @@
       </td>
     </tr>
     <tr>
-      <td class="text-right">{% trans 'groups' %}</td>
+      <td class="text-right">{{ organization|label:'groups' }}</td>
       <td>
         {% for group in organization.groups.all %}
           <a class="inline" href="{% url 'contacts_organization_list' %}?g={{ group.id }}">{{ group }}</a>{% if not forloop.last %},{% endif %}
@@ -26,29 +26,29 @@
       </td>
     </tr>
     <tr>
-      <td class="text-right">{% trans 'is private person' %}</td>
+      <td class="text-right">{{ object|label:'is_private_person' }}</td>
       <td>{{ organization.is_private_person|yesno:_("yes,no") }}</td>
     </tr>
     <tr>
-      <td class="text-right">{% trans 'default billing address' %}</td>
+      <td class="text-right">{{ object|label:'default_billing_address' }}</td>
       <td>{{ organization.default_billing_address|linebreaksbr|default:"&ndash;" }}</td>
     </tr>
     <tr>
-      <td class="text-right">{% trans 'notes' %}</td>
+      <td class="text-right">{{ object|label:'notes' }}</td>
       <td>{{ organization.notes|urlize|linebreaksbr|default:"&ndash;" }}</td>
     </tr>
   </table>
 
 <a href="{% url 'contacts_person_create' %}?organization={{ object.pk }}" class="btn btn-primary">
   {% include "svg/plus.svg" %}
-  {% trans 'person' %}
+  {% trans 'person'|capfirst %}
 </a>
 <a href="{% url 'invoices_invoice_create' %}?customer={{ object.pk }}" class="btn btn-primary">
   {% include "svg/plus.svg" %}
-  {% trans 'invoice' %}
+  {% trans 'invoice'|capfirst %}
 </a>
 <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}"
-  class="btn btn-primary">{% trans 'invoices' %}</a>
+  class="btn btn-primary">{% trans 'invoices'|capfirst %}</a>
 <a href="{{ object.urls.update }}" class="btn btn-primary">
   {% trans 'Update' %}</a>
 <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
@@ -62,7 +62,7 @@
     <div class="card mb-3">
       <div class="card-header"><h3 class="my-0">
         <a href="{% url 'projects_project_list' %}?org={{ organization.pk }}">
-          {% trans 'recent projects' %}
+          {% trans 'Recent projects' %}
         </a>
       </h3></div>
 
@@ -83,7 +83,7 @@
       <div class="card mb-3">
         <div class="card-header"><h3 class="my-0">
           <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}">
-            {% trans 'recent invoices' %}
+            {% trans 'Recent invoices' %}
           </a>
         </h3></div>
 
@@ -102,7 +102,7 @@
       <div class="card mb-3">
         <div class="card-header"><h3 class="my-0">
           <a href="{% url 'offers_offer_list' %}?org={{ organization.pk }}">
-            {% trans 'recent offers' %}
+            {% trans 'Recent offers' %}
           </a>
         </h3></div>
 

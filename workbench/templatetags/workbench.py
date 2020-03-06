@@ -8,6 +8,7 @@ from django.db import connections, models
 from django.template.defaultfilters import linebreaksbr
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join, mark_safe
+from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
 from workbench.tools.formats import currency, days, hours, local_date_format
@@ -257,3 +258,8 @@ ORDER BY (diff + 180) % 365 DESC
 @register.filter
 def has_feature(user, feature):
     return user.features[feature]
+
+
+@register.filter
+def label(instance, field):
+    return capfirst(instance._meta.get_field(field).verbose_name)

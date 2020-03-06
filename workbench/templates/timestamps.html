@@ -9,7 +9,7 @@
     <div class="card mb-3">
       <div class="card-header d-flex w-100 justify-content-between">
         <h3 class="my-0">
-          {% trans "timestamps" %}
+          {% trans "timestamps"|capfirst %}
           <small>
             <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}&amp;date_from={% now 'Y-m-d' %}">
               {{ user.hours.today|hours }} {% trans 'today' %}</a> /

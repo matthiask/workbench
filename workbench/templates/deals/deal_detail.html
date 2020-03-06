@@ -9,23 +9,23 @@
 
   <table class="table table-striped">
     <tr>
-      <th class="text-right">{% trans 'customer' %}</th>
+      <th class="text-right">{{ object|label:'customer' }}</th>
       <td>{% link_or_none object.customer %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'contact' %}</th>
+      <th class="text-right">{{ object|label:'contact' }}</th>
       <td>{% link_or_none object.contact %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'probability' %}</th>
+      <th class="text-right">{{ object|label:'probability' }}</th>
       <td>{{ object.get_probability_display }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'decision expected on' %}</th>
+      <th class="text-right">{{ object|label:'decision_expected_on' }}</th>
       <td>{{ object.decision_expected_on|local_date_format }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'status' %}</th>
+      <th class="text-right">{{ object|label:'status' }}</th>
       <td>
         <div class="row justify-content-between">
           <div class="col">
@@ -62,12 +62,12 @@
       </td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'description' %}</th>
+      <th class="text-right">{{ object|label:'description' }}</th>
       <td>{{ object.description|linebreaksbr|urlize|default:"&ndash;" }}</td>
     </tr>
 
     <tr>
-      <th class="text-right">{% trans 'value' %}</th>
+      <th class="text-right">{{ object|label:'value' }}</th>
       <td>
         <strong>{{ object.value|currency }}</strong>
         <br>

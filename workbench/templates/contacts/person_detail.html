@@ -31,12 +31,12 @@
     {% endfor %}
   </div>
   <div class="col-lg-4">
-    <strong>{% trans 'date of birth' %}:</strong><br>
+    <strong>{{ person|label:'date_of_birth' }}</strong><br>
     {{ person.date_of_birth|local_date_format|default:'&ndash;' }}<br>
-    <strong>{% trans 'notes' %}:</strong><br>
+    <strong>{{ person|label:'notes' }}</strong><br>
     {{ person.notes|urlize|linebreaksbr|default:'&ndash;' }}
     <br>
-    <strong>{% trans 'groups' %}:</strong><br>
+    <strong>{{ person|label:'groups' }}</strong><br>
     {% for group in person.groups.all %}
       <a href="{% url 'contacts_person_list' %}?g={{ group.id }}">{{ group }}</a><br>
     {% empty %}&ndash;
@@ -47,7 +47,7 @@
 
 <a href="{% url 'invoices_invoice_create' %}?contact={{ object.pk }}" class="btn btn-primary">
   {% include "svg/plus.svg" %}
-  {% trans 'invoice' %}
+  {% trans 'invoice'|capfirst %}
 </a>
 <a href="{{ object.urls.update }}" class="btn btn-primary">
   {% trans 'Update' %}</a>

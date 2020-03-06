@@ -69,20 +69,20 @@
             {% endif %}
 
             <div class="dropdown-divider"></div>
-            <div class="dropdown-header">{% trans 'working time' %}</div>
+            <div class="dropdown-header">{% trans 'working time'|capfirst %}</div>
             <a class="dropdown-item" href="{% url 'awt_year_report' %}">{% trans 'annual working time'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'awt_absence_calendar' %}">{% trans 'absence calendar' %}</a>
 
             {% if request.user|has_feature:FEATURES.CONTROLLING %}
               <div class="dropdown-divider"></div>
-              <div class="dropdown-header">{% trans 'projects' %}</div>
+              <div class="dropdown-header">{% trans 'projects'|capfirst %}</div>
               <a class="dropdown-item" href="{% url 'report_project_budget_statistics' %}">{% trans 'project budget statistics'|capfirst %}</a>
               <a class="dropdown-item" href="{% url 'report_overdrawn_projects' %}">{% trans 'overdrawn projects'|capfirst %}</a>
               <div class="dropdown-divider"></div>
-              <div class="dropdown-header">{% trans 'invoices' %}</div>
+              <div class="dropdown-header">{% trans 'invoices'|capfirst %}</div>
               <a class="dropdown-item" href="{% url 'report_open_items_list' %}">{% trans 'open items list'|capfirst %}</a>
               <div class="dropdown-divider"></div>
-              <div class="dropdown-header">{% trans 'logged hours' %}</div>
+              <div class="dropdown-header">{% trans 'logged hours'|capfirst %}</div>
               {% if request.user|has_feature:FEATURES.GLASSFROG %}
                 <a class="dropdown-item" href="{% url 'report_hours_by_circle' %}">{% trans 'hours by circle'|capfirst %}</a>
               {% endif %}
@@ -92,7 +92,7 @@
 
             {% if request.user|has_feature:FEATURES.DEALS %}
               <div class="dropdown-divider"></div>
-              <div class="dropdown-header">{% trans 'deals' %}</div>
+              <div class="dropdown-header">{% trans 'deals'|capfirst %}</div>
               <a class="dropdown-item" href="{% url 'report_accepted_deals' %}">{% trans 'accepted deals'|capfirst %}</a>
             {% endif %}
 
@@ -134,7 +134,7 @@
     {% block uplink %}
       {% if view.model.urls.list and view.model.urls.list != request.path %}
         <a href="{{ view.model.urls.list }}" class="btn btn-primary btn-sm uplink">
-          {% include 'svg/chevron-left.svg' %} {{ view.meta.verbose_name_plural }}
+          {% include 'svg/chevron-left.svg' %} {{ view.meta.verbose_name_plural|capfirst }}
         </a>
       {% endif %}
     {% endblock %}

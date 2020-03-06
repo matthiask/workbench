@@ -9,39 +9,39 @@
 
   <table class="table table-striped">
     <tr>
-      <th class="text-right">{% trans 'customer' %}</th>
+      <th class="text-right">{% trans 'customer'|capfirst %}</th>
       <td>{% link_or_none object.customer %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'contact' %}</th>
+      <th class="text-right">{% trans 'contact'|capfirst %}</th>
       <td>{% link_or_none object.contact %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'project' %}</th>
+      <th class="text-right">{% trans 'project'|capfirst %}</th>
       <td>{% link_or_none object.project %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'status' %}</th>
+      <th class="text-right">{% trans 'status'|capfirst %}</th>
       <td>
         {{ object.status_badge }}
         {{ object.payment_notice|linebreaksbr }}
       </td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'invoiced on' %}</th>
+      <th class="text-right">{% trans 'invoiced on'|capfirst %}</th>
       <td>{{ object.invoiced_on|local_date_format }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'description' %}</th>
+      <th class="text-right">{% trans 'description'|capfirst %}</th>
       <td>{{ object.description|linebreaksbr|default:"&ndash;" }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'postal address' %}</th>
+      <th class="text-right">{% trans 'postal address'|capfirst %}</th>
       <td>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</td>
     </tr>
     {% if object.type == object.SERVICES %}
       <tr>
-        <th class="text-right">{% trans 'services' %}</th>
+        <th class="text-right">{% trans 'services'|capfirst %}</th>
         <td>
           <table class="table">
             {% for service in object.services.all %}
@@ -68,24 +68,24 @@
       </tr>
     {% endif %}
     <tr>
-      <th class="text-right">{% trans 'subtotal' %}</th>
+      <th class="text-right">{% trans 'subtotal'|capfirst %}</th>
       <td>{{ object.subtotal|currency }}</td>
     </tr>
     {% if object.discount %}
       <tr>
-        <th class="text-right">{% trans 'discount' %}</th>
+        <th class="text-right">{% trans 'discount'|capfirst %}</th>
         <td>-{{ object.discount|currency }}</td>
       </tr>
     {% endif %}
     {% if object.down_payment_total %}
       <tr>
-        <th class="text-right">{% trans 'down payment total' %}</th>
+        <th class="text-right">{% trans 'down payment total'|capfirst %}</th>
         <td>-{{ object.down_payment_total|currency }}</td>
       </tr>
     {% endif %}
     {% if object.liable_to_vat and object.subtotal != object.total_excl_tax %}
       <tr>
-        <th class="text-right">{% trans 'total excl. tax' %}</th>
+        <th class="text-right">{% trans 'total excl. tax'|capfirst %}</th>
         <td>{{ object.total_excl_tax|currency }}</td>
       </tr>
     {% endif %}
@@ -94,7 +94,7 @@
       <td>{{ object.total|currency }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'third party costs' %}</th>
+      <th class="text-right">{% trans 'third party costs'|capfirst %}</th>
       <td>{{ object.third_party_costs|currency }}</td>
     </tr>
   </table>
@@ -111,7 +111,7 @@
   </span>
   {% if object.type == object.SERVICES %}
     <a href="{{ object.urls.xlsx }}" class="btn btn-primary">
-      {% trans 'logbook' %} (XLSX)
+      {% trans 'logbook'|capfirst %} (XLSX)
     </a>
   {% endif %}
   <a href="{{ object.urls.update }}" class="btn btn-primary">

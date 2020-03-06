@@ -28,7 +28,7 @@
 
     <div class="card mb-3">
       <div class="card-header"><h3 class="my-0">
-        <a href="{% url 'projects_project_list' %}">{% trans 'active projects' %}</a>
+        <a href="{% url 'projects_project_list' %}">{% trans 'active projects'|capfirst %}</a>
       </h3></div>
 
       {% if user.active_projects %}
@@ -61,7 +61,7 @@
     {% birthdays as birthdays %}
     {% if birthdays %}
     <div class="card mb-3">
-      <div class="card-header"><h3 class="my-0">{% trans "birthdays" %}</h3></div>
+      <div class="card-header"><h3 class="my-0">{% trans "birthdays"|capfirst %}</h3></div>
       <div class="card-body">
         {% for birthday in birthdays %}
           <a href="{% url 'contacts_person_detail' pk=birthday.id as url %}{{ url }}" class="text-nowrap">
@@ -79,7 +79,7 @@
     <div class="card mb-3">
       <div class="card-header">
         <h3 class="my-0">
-          <a class="d-block" href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{% trans "today's hours" %}</a>
+          <a class="d-block" href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{% trans "today's hours"|capfirst %}</a>
 
           <small>
             <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}&amp;date_from={% now 'Y-m-d' %}">
@@ -103,13 +103,13 @@
           {% endfor %}
         </div>
       {% else %}
-        <div class="card-body">{% trans 'no hours today' %}</div>
+        <div class="card-body">{% trans 'no hours today'|capfirst %}</div>
       {% endif %}
     </div>
 
     <div class="card mb-3">
       <div class="card-header"><h3 class="my-0">
-        <a href="{% url 'logbook_loggedhours_list' %}">{% trans "all users' hours" %}</a>
+        <a href="{% url 'logbook_loggedhours_list' %}">{% trans "all users' hours"|capfirst %}</a>
       </h3></div>
 
       {% if user.all_users_hours %}

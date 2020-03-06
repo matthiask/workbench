@@ -25,7 +25,7 @@
 
             <div class="row">
               <div class="col-md-6">
-                {% trans 'hours' %}:
+                {% trans 'Hours' %}:
                 <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}" class="inline">
                   {{ project.grouped_services.logged_hours|hours }}</a>
                 / {{ project.grouped_services.service_hours|hours }}
@@ -33,7 +33,7 @@
               </div>
 
               <div class="col-md-6">
-                {% trans 'cost' %}:
+                {% trans 'Cost' %}:
                 <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}" class="inline">
                   {{ project.grouped_services.logged_cost|currency }}</a>
                 / {{ project.grouped_services.service_cost|currency }}
@@ -93,22 +93,22 @@
       <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-primary">
         {% trans 'Copy' %}</a>
       <a href="{{ object.urls.statistics }}" class="btn btn-primary" data-toggle="ajaxmodal">
-        {% trans 'statistics' %}</a>
+        {% trans 'Statistics' %}</a>
 
       {% if request.user|has_feature:FEATURES.CONTROLLING and project.grouped_services.offers|length > 1 %}
         <span class="dropdown">
           <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {% trans 'project offers' %}
+            {% trans 'Project offers' %}
           </button>
           <div class="dropdown-menu dropdown-menu-right">
-            <h6 class="dropdown-header">{% trans 'offers PDF' %}</h6>
+            <h6 class="dropdown-header">{% trans 'offers PDF'|capfirst %}</h6>
             <a class="dropdown-item" href="{{ object.urls.offers_pdf }}" target="_blank">
               {% trans 'Show' %}</a>
             <a class="dropdown-item" href="{{ object.urls.offers_pdf }}?disposition=attachment">
               {% trans 'Download' %}</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{{ object.urls.renumber_offers }}" class="btn btn-primary">
-              {% trans 'renumber offers' %}</a>
+              {% trans 'Renumber offers' %}</a>
           </div>
         </span>
 
@@ -150,7 +150,7 @@
                   <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
                     id="offer-dropdown-{{ offer.pk }}"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {% trans 'offer' %}
+                    {% trans 'offer'|capfirst %}
                   </button>
                   <div class="dropdown-menu dropdown-menu-right" aria-labelledby="offer-dropdown-{{ offer.pk }}">
                     <a class="dropdown-item" href="{{ offer.urls.update }}">
@@ -176,7 +176,7 @@
 
             {% if request.user|has_feature:FEATURES.CONTROLLING %}
               <a href="{{ project.urls.createoffer }}" class="btn btn-primary btn-sm">
-                {% include 'svg/plus.svg' %} {% trans 'offer' %}</a>
+                {% include 'svg/plus.svg' %} {% trans 'offer'|capfirst %}</a>
             {% endif %}
 
           </div>
@@ -199,7 +199,7 @@
                   <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
                     id="service-dropdown-{{ row.service.pk }}"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {% trans 'service' %}
+                    {% trans 'service'|capfirst %}
                   </button>
                   <div class="dropdown-menu dropdown-menu-right" aria-labelledby="service-dropdown-{{ row.service.pk }}">
                     <a class="dropdown-item" href="{{ row.service.urls.update }}" data-toggle="ajaxmodal">
@@ -264,11 +264,11 @@
                 {% if row.service.pk %}
                   <a href="{{ project.urls.createhours }}?service={{ row.service.pk }}"
                     data-toggle="ajaxmodal">
-                    {% include "svg/plus.svg" %} {% trans 'hours' %}</a>
+                    {% include "svg/plus.svg" %} {% trans 'Hours' %}</a>
                 {% endif %}
                 <a href="{{ project.urls.createcost }}?service={{ row.service.pk|default:'' }}"
                   data-toggle="ajaxmodal">
-                  {% include "svg/plus.svg" %} {% trans 'cost' %}</a>
+                  {% include "svg/plus.svg" %} {% trans 'Cost' %}</a>
               {% endif %}
             </span>
           </small>
@@ -312,7 +312,7 @@
           id="invoice-dropdown-button" data-toggle="dropdown"
           aria-haspopup="true" aria-expanded="false">
           {% include "svg/plus.svg" %}
-          {% trans 'invoice' %}</a>
+          {% trans 'invoice'|capfirst %}</a>
         </button>
         <div class="dropdown-menu" aria-labelledby="invoice-dropdown-button">
           <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=fixed">{% trans 'Fixed amount' %}</a>
@@ -322,18 +322,18 @@
         </div>
       </span>
       <a href="{{ project.urls.createoffer }}" class="btn btn-primary">
-        {% include 'svg/plus.svg' %} {% trans 'offer' %}</a>
+        {% include 'svg/plus.svg' %} {% trans 'offer'|capfirst %}</a>
       <a href="{{ project.urls.createservice }}" class="btn btn-primary"
         data-toggle="ajaxmodal">
-        {% include "svg/plus.svg" %} {% trans 'service' %}</a>
+        {% include "svg/plus.svg" %} {% trans 'service'|capfirst %}</a>
     {% endif %}
 
     <a href="{{ project.urls.createhours }}" class="btn btn-primary" data-toggle="ajaxmodal">
       {% include "svg/plus.svg" %}
-      {% trans 'hours' %}</a>
+      {% trans 'Hours' %}</a>
     <a href="{{ project.urls.createcost }}" class="btn btn-primary" data-toggle="ajaxmodal" data-createcost>
       {% include "svg/plus.svg" %}
-      {% trans 'cost' %}</a>
+      {% trans 'Cost' %}</a>
 
   </div>
 </div>

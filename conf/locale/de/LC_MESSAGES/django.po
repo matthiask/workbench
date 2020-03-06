@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-06 01:48+0100\n"
+"POT-Creation-Date: 2020-03-06 02:49+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -272,8 +272,6 @@ msgstr "Ferienwochen für ein volles Anstellungsjahr."
 #: workbench/credit_control/forms.py workbench/credit_control/models.py
 #: workbench/management/commands/export_debtors.py
 #: workbench/templates/awt/year_detail.html
-#: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/contacts/person_detail.html
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/timer/models.py
 msgid "notes"
@@ -335,7 +333,6 @@ msgstr "Wird nur für die Visualisierung der Abwesenheiten verwendet."
 #: workbench/logbook/forms.py workbench/logbook/models.py
 #: workbench/offers/models.py workbench/projects/models.py
 #: workbench/services/models.py workbench/templates/awt/absence_detail.html
-#: workbench/templates/deals/deal_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -466,7 +463,6 @@ msgid "type"
 msgstr "Typ"
 
 #: workbench/contacts/forms.py workbench/contacts/models.py
-#: workbench/templates/contacts/organization_detail.html
 msgid "default billing address"
 msgstr "Standard-Rechnungsadresse"
 
@@ -490,13 +486,10 @@ msgid "group"
 msgstr "Gruppe"
 
 #: workbench/contacts/models.py
-#: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/contacts/person_detail.html
 msgid "groups"
 msgstr "Gruppen"
 
 #: workbench/contacts/models.py
-#: workbench/templates/contacts/organization_detail.html
 msgid "is private person"
 msgstr "ist Privatperson"
 
@@ -556,7 +549,7 @@ msgstr "vollständige Begrüssung"
 msgid "Dear John/Dear Ms Smith"
 msgstr "Lieber Hans/Sehr geehrte Frau Muster"
 
-#: workbench/contacts/models.py workbench/templates/contacts/person_detail.html
+#: workbench/contacts/models.py
 msgid "date of birth"
 msgstr "Geburtstag"
 
@@ -908,7 +901,6 @@ msgstr "hoch"
 
 #: workbench/deals/models.py workbench/invoices/models.py
 #: workbench/management/commands/profitability.py workbench/projects/models.py
-#: workbench/templates/deals/deal_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/reporting/overdrawn_projects.html
@@ -916,7 +908,7 @@ msgid "customer"
 msgstr "Kundschaft"
 
 #: workbench/deals/models.py workbench/invoices/models.py
-#: workbench/projects/models.py workbench/templates/deals/deal_detail.html
+#: workbench/projects/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "contact"
@@ -928,8 +920,7 @@ msgstr "Kontakt"
 msgid "responsible"
 msgstr "verantwortlich"
 
-#: workbench/deals/models.py workbench/templates/deals/deal_detail.html
-#: workbench/templates/reporting/accepted_deals.html
+#: workbench/deals/models.py workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/accepted_deals_for_user.html
 msgid "value"
 msgstr "Wert"
@@ -937,18 +928,17 @@ msgstr "Wert"
 #: workbench/deals/models.py workbench/expenses/forms.py
 #: workbench/expenses/views.py workbench/invoices/models.py
 #: workbench/offers/models.py workbench/projects/forms.py
-#: workbench/templates/deals/deal_detail.html
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "status"
 msgstr "Status"
 
-#: workbench/deals/models.py workbench/templates/deals/deal_detail.html
+#: workbench/deals/models.py
 msgid "probability"
 msgstr "Wahrscheinlichkeit"
 
-#: workbench/deals/models.py workbench/templates/deals/deal_detail.html
+#: workbench/deals/models.py
 msgid "decision expected on"
 msgstr "Entscheidung erwartet am"
 
@@ -2213,15 +2203,15 @@ msgid "yes,no"
 msgstr "ja,nein"
 
 #: workbench/templates/contacts/organization_detail.html
-msgid "recent projects"
+msgid "Recent projects"
 msgstr "Letzte Projekte"
 
 #: workbench/templates/contacts/organization_detail.html
-msgid "recent invoices"
+msgid "Recent invoices"
 msgstr "Letzte Rechnungen"
 
 #: workbench/templates/contacts/organization_detail.html
-msgid "recent offers"
+msgid "Recent offers"
 msgstr "Letzte Offerten"
 
 #: workbench/templates/contacts/person_form.html
@@ -2240,7 +2230,7 @@ msgstr "%(class)s erstellen"
 #: workbench/templates/logbook/loggedhours_form.html
 #: workbench/templates/modalform.html
 #: workbench/templates/offers/offer_pricing.html
-msgid "save"
+msgid "Save"
 msgstr "Sichern"
 
 #: workbench/templates/contacts/person_form.html
@@ -2370,6 +2360,14 @@ msgid "effort hours"
 msgstr "Aufwände in Stunden"
 
 #: workbench/templates/projects/project_detail.html
+msgid "Hours"
+msgstr "Stunden"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Cost"
+msgstr "Kosten"
+
+#: workbench/templates/projects/project_detail.html
 msgid "total costs"
 msgstr "Gesamtkosten"
 
@@ -2388,11 +2386,11 @@ msgstr "Nicht archiviert"
 
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_statistics.html
-msgid "statistics"
+msgid "Statistics"
 msgstr "Statistik"
 
 #: workbench/templates/projects/project_detail.html
-msgid "project offers"
+msgid "Project offers"
 msgstr "Projektofferten"
 
 #: workbench/templates/projects/project_detail.html
@@ -2404,7 +2402,7 @@ msgid "Show"
 msgstr "Anzeigen"
 
 #: workbench/templates/projects/project_detail.html
-msgid "renumber offers"
+msgid "Renumber offers"
 msgstr "Offerten neu nummerieren"
 
 #: workbench/templates/projects/project_detail.html
