@@ -16,6 +16,7 @@ from workbench.deals.models import (
     Value,
     ValueType,
 )
+from workbench.tools.formats import in_days
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -167,17 +168,17 @@ class DealForm(ModelForm):
                 initial=attributes.get(group.id),
             )
 
-        today = dt.date.today()
         self.fields["decision_expected_on"].help_text = format_html(
             "{} {}",
-            _("Set date to:"),
+            _("Expected"),
             format_html_join(
                 ", ",
                 '<a href="#" data-field-value="{}">{}</a>',
                 [
-                    ((today + dt.timedelta(days=30)).isoformat(), _("one month")),
-                    ((today + dt.timedelta(days=60)).isoformat(), _("two months")),
-                    ((today + dt.timedelta(days=90)).isoformat(), _("three months")),
+                    (in_days(7).isoformat(), _("in one week")),
+                    (in_days(30).isoformat(), _("in one month")),
+                    (in_days(60).isoformat(), _("in two months")),
+                    (in_days(90).isoformat(), _("in three months")),
                 ],
             ),
         )

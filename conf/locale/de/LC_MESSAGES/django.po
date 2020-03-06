@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-06 11:23+0100\n"
+"POT-Creation-Date: 2020-03-06 17:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -814,20 +814,24 @@ msgstr ""
 "was Du tust und werde nicht im Weg stehen."
 
 #: workbench/deals/forms.py
-msgid "Set date to:"
-msgstr "Datum setzen auf:"
+msgid "Expected"
+msgstr "Erwartet"
 
 #: workbench/deals/forms.py
-msgid "one month"
-msgstr "einen Monat"
+msgid "in one week"
+msgstr "in einer Woche"
 
 #: workbench/deals/forms.py
-msgid "two months"
-msgstr "zwei Monate"
+msgid "in one month"
+msgstr "in einem Monat"
 
 #: workbench/deals/forms.py
-msgid "three months"
-msgstr "drei Monate"
+msgid "in two months"
+msgstr "in zwei Monaten"
+
+#: workbench/deals/forms.py
+msgid "in three months"
+msgstr "in drei Monaten"
 
 #: workbench/deals/forms.py
 msgid "This field is required when probability is high."
@@ -2816,3 +2820,6 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Set date to:"
+#~ msgstr "Datum setzen auf:"

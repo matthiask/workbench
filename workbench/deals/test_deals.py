@@ -12,7 +12,7 @@ from workbench import factories
 from workbench.deals.models import Deal
 from workbench.deals.reporting import accepted_deals
 from workbench.templatetags.workbench import deal_group
-from workbench.tools.formats import local_date_format
+from workbench.tools.formats import in_days, local_date_format
 
 
 class DealsTest(TestCase):
@@ -306,23 +306,20 @@ class DealsTest(TestCase):
         self.assertEqual(deal.value, 500)
 
     def test_deal_group(self):
-        def offset(offset=0):
-            return dt.date.today() + dt.timedelta(days=offset)
+        def idx(**kwargs):
+            return deal_group(Deal(**kwargs))[0]
 
-        self.assertEqual(deal_group(Deal())[0], 5)
-        self.assertEqual(deal_group(Deal(probability=Deal.NORMAL))[0], 4)
-        self.assertEqual(deal_group(Deal(probability=Deal.HIGH))[0], 3)
+        self.assertEqual(idx(), 5)
+        self.assertEqual(idx(probability=Deal.NORMAL), 4)
+        self.assertEqual(idx(probability=Deal.HIGH), 3)
         self.assertEqual(
-            deal_group(Deal(probability=Deal.HIGH, decision_expected_on=offset(90)))[0],
-            3,
+            idx(probability=Deal.HIGH, decision_expected_on=in_days(90)), 3,
         )
         self.assertEqual(
-            deal_group(Deal(probability=Deal.HIGH, decision_expected_on=offset(30)))[0],
-            2,
+            idx(probability=Deal.HIGH, decision_expected_on=in_days(30)), 2,
         )
         self.assertEqual(
-            deal_group(Deal(probability=Deal.HIGH, decision_expected_on=offset(20)))[0],
-            1,
+            idx(probability=Deal.HIGH, decision_expected_on=in_days(20)), 1,
         )
 
     def test_deal_reporting(self):
