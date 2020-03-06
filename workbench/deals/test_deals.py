@@ -305,6 +305,24 @@ class DealsTest(TestCase):
         deal.refresh_from_db()
         self.assertEqual(deal.value, 500)
 
+    def test_update_with_archived_attribute(self):
+        group = factories.AttributeGroupFactory.create()
+        group.attributes.create(title="ACTIVE")
+        attribute = group.attributes.create(title="ARCHIVED", is_archived=True)
+
+        deal = factories.DealFactory.create()
+
+        self.client.force_login(deal.owned_by)
+        response = self.client.get(deal.urls["update"])
+        self.assertNotContains(response, "ARCHIVED")
+
+        deal.attributes.add(attribute)
+        response = self.client.get(deal.urls["update"])
+        self.assertContains(response, "ARCHIVED")
+
+        response = self.client.get(deal.urls["create"])
+        self.assertNotContains(response, "ARCHIVED")
+
     def test_deal_group(self):
         def idx(**kwargs):
             return deal_group(Deal(**kwargs))[0]

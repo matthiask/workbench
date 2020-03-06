@@ -161,12 +161,16 @@ class DealForm(ModelForm):
                 continue
 
             self.fields[key] = forms.ModelChoiceField(
-                queryset=group.attributes.active(),
+                queryset=group.attributes.all(),
                 required=group.is_required,
                 label=group.title,
                 widget=forms.RadioSelect,
                 initial=attributes.get(group.id),
             )
+            self.fields[key].choices = [
+                (a.id, str(a))
+                for a in group.attributes.active(include=attributes.get(group.id))
+            ]
 
         self.fields["decision_expected_on"].help_text = format_html(
             "{} {}",

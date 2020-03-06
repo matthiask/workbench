@@ -15,8 +15,8 @@ from workbench.tools.urls import model_urls
 
 
 class NotArchivedQuerySet(models.QuerySet):
-    def active(self):
-        return self.filter(is_archived=False)
+    def active(self, include=None):
+        return self.filter(Q(is_archived=False) | Q(id=include))
 
 
 class AttributeGroup(models.Model):
