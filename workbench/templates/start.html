@@ -6,26 +6,6 @@
 <div class="row justify-content-center">
   <div class="col-lg-6">
 
-    {% if user.in_preparation %}
-    <div class="card mb-3">
-      <div class="card-header"><h3 class="my-0">
-        {% trans 'In preparation' %}
-      </h3></div>
-      <div class="card-body">
-        {% for thing in user.in_preparation.offers %}
-          {% if forloop.first %}<strong>{% trans 'offers' %}:</strong>{% endif %}
-          {% link_or_none thing %}
-          {% if forloop.last %}<br>{% endif %}
-        {% endfor %}
-        {% for thing in user.in_preparation.invoices %}
-          {% if forloop.first %}<strong>{% trans 'invoices' %}:</strong>{% endif %}
-          {% link_or_none thing %}
-          {% if forloop.last %}<br>{% endif %}
-        {% endfor %}
-      </div>
-    </div>
-    {% endif %}
-
     <div class="card mb-3">
       <div class="card-header"><h3 class="my-0">
         <a href="{% url 'projects_project_list' %}">{% trans 'active projects'|capfirst %}</a>
@@ -58,10 +38,44 @@
       {% endif %}
     </div>
 
+    {% if user.in_preparation %}
+    <div class="card mb-3">
+      <div class="card-header"><h3 class="my-0">
+        {% trans 'In preparation' %}
+      </h3></div>
+      <div class="card-body">
+        {% for thing in user.in_preparation.offers %}
+          {% if forloop.first %}<strong>{% trans 'offers' %}:</strong>{% endif %}
+          {% link_or_none thing %}
+          {% if forloop.last %}<br>{% endif %}
+        {% endfor %}
+        {% for thing in user.in_preparation.invoices %}
+          {% if forloop.first %}<strong>{% trans 'invoices' %}:</strong>{% endif %}
+          {% link_or_none thing %}
+          {% if forloop.last %}<br>{% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if user|has_feature:FEATURES.DEALS and user.deals %}
+    <div class="card mb-3">
+      <div class="card-header"><h3 class="my-0">
+          <a href="{% url 'deals_deal_list' %}">{% trans 'deals'|capfirst %}</a>
+          <small>({% trans 'possibly requiring action' %})</small>
+      </h3></div>
+      <div class="card-body">
+        {% for deal in user.deals %}
+          {% link_or_none deal with_badge=True %}<br>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
     {% birthdays as birthdays %}
     {% if birthdays %}
     <div class="card mb-3">
-      <div class="card-header"><h3 class="my-0">{% trans "birthdays"|capfirst %}</h3></div>
+      <div class="card-header"><h3 class="my-0">{% trans "Birthdays" %}</h3></div>
       <div class="card-body">
         {% for birthday in birthdays %}
           <a href="{% url 'contacts_person_detail' pk=birthday.id as url %}{{ url }}" class="text-nowrap">

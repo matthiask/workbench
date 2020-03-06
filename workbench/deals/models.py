@@ -2,6 +2,7 @@ import datetime as dt
 from functools import total_ordering
 
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -9,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.tools.formats import currency, local_date_format
-from workbench.tools.models import Model, MoneyField, Z
+from workbench.tools.models import Model, MoneyField, SearchQuerySet, Z
 from workbench.tools.urls import model_urls
 
 
@@ -67,6 +68,13 @@ class ClosingType(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class DealQuerySet(SearchQuerySet):
+    def maybe_actionable(self, *, user):
+        return self.filter(
+            Q(status=Deal.OPEN), Q(owned_by=user) | Q(owned_by__is_active=False)
+        ).select_related("owned_by")
 
 
 @model_urls
@@ -136,6 +144,8 @@ class Deal(Model):
     closing_notice = models.TextField(_("closing notice"), blank=True)
 
     _fts = models.TextField(editable=False, blank=True)
+
+    objects = DealQuerySet.as_manager()
 
     class Meta:
         ordering = ["-probability", "status", "decision_expected_on", "id"]

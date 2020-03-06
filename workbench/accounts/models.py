@@ -220,6 +220,12 @@ class User(Model, AbstractBaseUser):
         }
 
     @cached_property
+    def deals(self):
+        from workbench.deals.models import Deal
+
+        return Deal.objects.maybe_actionable(user=self)
+
+    @cached_property
     def timestamps(self):
         from workbench.timer.models import Timestamp
 
