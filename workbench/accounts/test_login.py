@@ -61,7 +61,7 @@ class LoginTestCase(TestCase):
         )
 
         response = client.get("/accounts/oauth2/?code=x")
-        self.assertRedirects(response, "/accounts/login/")
+        self.assertRedirects(response, "/accounts/login/?_error=1")
         self.assertEqual(
             messages(response),
             ["Keinen Benutzer mit Emailadresse user@example.com gefunden."],
@@ -86,9 +86,7 @@ class LoginTestCase(TestCase):
 
         FakeFlow.EMAIL = "user@example.com"
         response = client.get("/accounts/oauth2/?code=x")
-        self.assertRedirects(
-            response, "/accounts/login/?login_hint=&prompt=select_account"
-        )
+        self.assertRedirects(response, "/accounts/login/?_error=1")
         self.assertEqual(
             messages(response),
             ["Keinen Benutzer mit Emailadresse user@example.com gefunden."],

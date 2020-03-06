@@ -31,7 +31,16 @@ class UserUpdateView(UpdateView):
 def login(request):
     if request.user.is_authenticated:
         return redirect("/")
-    return render(request, "accounts/login.html")
+    return render(
+        request,
+        "accounts/login.html",
+        {
+            "auth_params": "?login_hint=&prompt=consent+select_account",
+            "auth_button": _("Choose account"),
+        }
+        if request.GET.get("_error")
+        else {},
+    )
 
 
 @never_cache
@@ -66,14 +75,7 @@ def oauth2(request):
         auth.login(request, user)
     else:
         messages.error(request, _("No user with email address %s found.") % email)
-        response = HttpResponseRedirect(
-            "{}{}".format(
-                reverse("login"),
-                "?login_hint=&prompt=select_account"
-                if auth_params.get("login_hint")
-                else "",
-            )
-        )
+        response = HttpResponseRedirect("{}?_error=1".format(reverse("login")))
         response.delete_cookie("login_hint")
         return response
 
