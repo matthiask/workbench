@@ -36,11 +36,7 @@ urlpatterns = [
     ),
     url(
         r"^hours/(?P<pk>\d+)/update/$",
-        generic.UpdateView.as_view(
-            model=LoggedHours,
-            form_class=LoggedHoursForm,
-            template_name="modalform.html",
-        ),
+        generic.UpdateView.as_view(model=LoggedHours, form_class=LoggedHoursForm),
         name="logbook_loggedhours_update",
     ),
     url(
@@ -72,9 +68,7 @@ urlpatterns = [
     ),
     url(
         r"^costs/(?P<pk>\d+)/update/$",
-        generic.UpdateView.as_view(
-            model=LoggedCost, form_class=LoggedCostForm, template_name="modalform.html"
-        ),
+        generic.UpdateView.as_view(model=LoggedCost, form_class=LoggedCostForm),
         name="logbook_loggedcost_update",
     ),
     url(
