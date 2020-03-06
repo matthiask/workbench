@@ -414,7 +414,7 @@ class InvoicesTest(TestCase):
             "/invoices/create/?customer={}".format(person.organization.id)
         )
         self.assertContains(
-            response, 'value="The Organization Ltd" placeholder="organization"'
+            response, 'value="The Organization Ltd" placeholder="Organization"'
         )
         self.assertContains(response, 'id="id_postal_address"')
         self.assertNotContains(response, 'data-field-value="')
