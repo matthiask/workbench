@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _, override
 
 from workbench.accounts.features import FEATURES
@@ -23,9 +24,9 @@ class ProjectSearchForm(Form):
     s = forms.ChoiceField(
         choices=[
             ("all", _("All")),
-            (_("status"), [("", _("Open")), ("closed", _("Closed"))]),
+            (capfirst(_("status")), [("", _("Open")), ("closed", _("Closed"))]),
             (
-                _("defined search"),
+                _("Defined search"),
                 [
                     ("no-invoices", _("No invoices")),
                     ("accepted-offers", _("Accepted offers")),

@@ -11,7 +11,7 @@
 
   <table class="table table-striped">
     <tr>
-      <th class="text-right">{% trans 'expenses' %}</th>
+      <th class="text-right">{% trans 'expenses'|capfirst %}</th>
       <td>
         {% for cost in object.expenses.all reversed %}
           <a href="{{ cost.urls.detail }}" data-toggle="ajaxmodal">
@@ -27,11 +27,11 @@
       </td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'status' %}</th>
+      <th class="text-right">{% trans 'status'|capfirst %}</th>
       <td>{{ object.status_badge }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'total' %}</th>
+      <th class="text-right">{% trans 'total'|capfirst %}</th>
       <td>{{ object.total|currency }}</td>
     </tr>
   </table>

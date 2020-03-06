@@ -2,32 +2,32 @@
 
 {% load fineforms i18n static workbench %}
 
-{% block title %}{% trans 'green hours' %} - {{ block.super }}{% endblock %}
+{% block title %}{% trans 'Green hours' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12 col-md-8">
-  <h1>{% trans 'green hours' %}</h1>
+  <h1>{% trans 'Green hours' %}</h1>
 
   <form method="get" class="mb-3">
     {% ff_fields form %}
-    {% ff_submit _('show') %}
+    {% ff_submit _('Show') %}
   </form>
 
   <table class="table table-sm table-striped">
     <thead>
       <tr>
-        <th>{% trans 'user' %}</th>
-        <th class="text-right">{% trans 'profitable' %}</th>
+        <th>{% trans 'user'|capfirst %}</th>
+        <th class="text-right">{% trans 'profitable'|capfirst %}</th>
         <th></th>
-        <th class="text-right">{% trans 'overdrawn' %}</th>
+        <th class="text-right">{% trans 'overdrawn'|capfirst %}</th>
         <th></th>
-        <th class="text-right">{% trans 'maintenance' %}</th>
+        <th class="text-right">{% trans 'maintenance'|capfirst %}</th>
         <th></th>
-        <th class="text-right">{% trans 'internal' %}</th>
+        <th class="text-right">{% trans 'internal'|capfirst %}</th>
         <th></th>
-        <th class="text-right">{% trans 'total' %}</th>
-        <th class="text-right">{% trans 'green' %}</th>
+        <th class="text-right">{% trans 'total'|capfirst %}</th>
+        <th class="text-right">{% trans 'green'|capfirst %}</th>
       </tr>
     </thead>
     <tbody>
@@ -36,7 +36,7 @@
       {% if user %}
         <td>{{ user }}</td>
       {% else %}
-        <th>{% trans 'total' %}</th>
+        <th>{% trans 'total'|capfirst %}</th>
       {% endif %}
       <td class="text-right">{{ stats.green|hours }}</td>
       <td>{% percentage stats.green stats.total %}</td>

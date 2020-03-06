@@ -44,10 +44,10 @@ class StatisticsTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
 
         response = self.client.get("/report/overdrawn-projects/")
-        self.assertContains(response, "overdrawn projects")
+        self.assertContains(response, "Overdrawn projects")
 
         response = self.client.get("/report/hours-per-customer/")
-        self.assertContains(response, "hours per customer")
+        self.assertContains(response, "Hours per customer")
 
         response = self.client.get("/report/hours-per-customer/?date_from=bla")
         self.assertRedirects(response, "/report/hours-per-customer/")
@@ -60,7 +60,7 @@ class StatisticsTest(TestCase):
         factories.ProjectFactory.create(closed_on=dt.date.today())
 
         response = self.client.get("/report/project-budget-statistics/")
-        self.assertContains(response, "project budget statistics")
+        self.assertContains(response, "Project budget statistics")
 
         code = check_code(self, "/report/project-budget-statistics/")
         code("owned_by=-1")

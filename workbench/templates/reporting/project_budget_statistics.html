@@ -2,12 +2,12 @@
 
 {% load fineforms i18n static workbench %}
 
-{% block title %}{% trans 'project budget statistics' %} - {{ block.super }}{% endblock %}
+{% block title %}{% trans 'Project budget statistics' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12 col-lg-10">
-  <h1>{% trans 'project budget statistics' %}</h1>
+  <h1>{% trans 'Project budget statistics' %}</h1>
 
   <form method="get" class="form-inline form-search mb-3" data-autosubmit>
     {% if form.changed_data %}
@@ -19,12 +19,12 @@
   <table class="table table-sm table-hover">
     <thead class="sticky">
       <tr>
-        <th>{% trans 'project' %}</th>
-        <th class="text-right">{% trans 'offered' %}</th>
-        <th class="text-right">{% trans 'logbook' %}</th>
-        <th class="text-right">{% trans 'third party costs' %}</th>
-        <th class="text-right">{% trans 'invoiced' %}</th>
-        <th class="text-right">{% trans 'not archived' %}</th>
+        <th>{% trans 'project'|capfirst %}</th>
+        <th class="text-right">{% trans 'offered'|capfirst %}</th>
+        <th class="text-right">{% trans 'logbook'|capfirst %}</th>
+        <th class="text-right">{% trans 'third party costs'|capfirst %}</th>
+        <th class="text-right">{% trans 'invoiced'|capfirst %}</th>
+        <th class="text-right">{% trans 'not archived'|capfirst %}</th>
         <th class="text-right">&Delta;</th>
       </tr>
     </thead>

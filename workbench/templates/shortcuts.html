@@ -2,12 +2,12 @@
 
 {% load i18n workbench %}
 
-{% block title %}{% trans 'keyboard shortcuts' %} - {{ block.super }}{% endblock %}
+{% block title %}{% trans 'Keyboard shortcuts' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-md-8 col-lg-6">
-    <h1>{% trans 'keyboard shortcuts' %}</h1>
+    <h1>{% trans 'Keyboard shortcuts' %}</h1>
 
     <table class="table" data-shortcuts>
       <tr>
@@ -32,7 +32,7 @@
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-C</th>
-        <td>{% trans 'people' %}</td>
+        <td>{% trans 'people'|capfirst %}</td>
       </tr>
 
       <tr>
@@ -42,7 +42,7 @@
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-P</th>
-        <td>{% trans 'projects' %}</td>
+        <td>{% trans 'projects'|capfirst %}</td>
       </tr>
 
       <tr>
@@ -53,24 +53,24 @@
       {% if request.user|has_feature:FEATURES.CONTROLLING %}
       <tr>
         <th class="text-right text-nowrap">Ctrl-O</th>
-        <td>{% trans 'offers' %}</td>
+        <td>{% trans 'offers'|capfirst %}</td>
       </tr>
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-R</th>
-        <td>{% trans 'invoices' %}</td>
+        <td>{% trans 'invoices'|capfirst %}</td>
       </tr>
       {% endif %}
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-T</th>
-        <td>{% trans 'timestamps' %}</td>
+        <td>{% trans 'timestamps'|capfirst %}</td>
       </tr>
 
       {% if request.user|has_feature:FEATURES.DEALS %}
       <tr>
         <th class="text-right text-nowrap">Ctrl-D</th>
-        <td>{% trans 'deals' %}</td>
+        <td>{% trans 'deals'|capfirst %}</td>
       </tr>
       {% endif %}
 

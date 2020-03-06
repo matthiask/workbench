@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
+from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -69,7 +70,7 @@ class Autocomplete(forms.TextInput):
                 + self.params,
                 "field": format_html("<input{} />", flatatt(final_attrs)),
                 "pretty": escape(pretty),
-                "placeholder": opts.verbose_name,
+                "placeholder": capfirst(opts.verbose_name),
                 "btn_attrs": "" if value else "disabled",
             }
         )

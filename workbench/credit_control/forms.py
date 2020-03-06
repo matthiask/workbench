@@ -77,9 +77,9 @@ class CreditEntryForm(ModelForm):
 
 class AccountStatementUploadForm(WarningsForm, forms.Form):
     ledger = CreditEntry._meta.get_field("ledger").formfield(widget=forms.RadioSelect)
-    statement = forms.FileField(label=_("account statement"))
+    statement = forms.FileField(label=_("Account statement"))
     statement_data = forms.CharField(
-        label=_("statement data"),
+        label=_("Statement data"),
         help_text=_(
             "Automatically filled in when submitting a parseable account statement."
         ),

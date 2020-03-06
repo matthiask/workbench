@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-06 03:00+0100\n"
+"POT-Creation-Date: 2020-03-06 03:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -248,11 +248,11 @@ msgstr "Arbeitszeit pro Tag"
 msgid "years"
 msgstr "Jahre"
 
-#: workbench/awt/models.py workbench/reporting/views.py
+#: workbench/awt/models.py
 msgid "date from"
 msgstr "Datum von"
 
-#: workbench/awt/models.py workbench/reporting/views.py
+#: workbench/awt/models.py
 msgid "date until"
 msgstr "Datum bis"
 
@@ -661,11 +661,11 @@ msgid "All ledgers"
 msgstr "Alle Konten"
 
 #: workbench/credit_control/forms.py
-msgid "account statement"
+msgid "Account statement"
 msgstr "Kontoauszug"
 
 #: workbench/credit_control/forms.py
-msgid "statement data"
+msgid "Statement data"
 msgstr "Auszugsdaten"
 
 #: workbench/credit_control/forms.py
@@ -1746,7 +1746,7 @@ msgid "projects"
 msgstr "Projekte"
 
 #: workbench/projects/forms.py
-msgid "defined search"
+msgid "Defined search"
 msgstr "Definierte Suche"
 
 #: workbench/projects/forms.py
@@ -1821,7 +1821,7 @@ msgstr "Auftrag"
 msgid "Maintenance"
 msgstr "Wartung"
 
-#: workbench/projects/models.py
+#: workbench/projects/models.py workbench/reporting/views.py
 msgid "Internal"
 msgstr "Intern"
 
@@ -1936,6 +1936,14 @@ msgstr "Intern"
 #: workbench/reporting/views.py
 msgid "Closed during the last year"
 msgstr "Geschlossen während dem letzten Jahr"
+
+#: workbench/reporting/views.py
+msgid "Date from"
+msgstr "Datum von"
+
+#: workbench/reporting/views.py
+msgid "Date until"
+msgstr "Datum bis"
 
 #: workbench/reporting/views.py
 msgid "Set predefined period"
@@ -2093,7 +2101,7 @@ msgid "working time"
 msgstr "Arbeitszeit"
 
 #: workbench/templates/awt/year_detail.html
-msgid "net work hours per month"
+msgid "net work Hours per month"
 msgstr "Stundensaldo pro Monat"
 
 #: workbench/templates/awt/year_detail.html
@@ -2127,37 +2135,37 @@ msgstr "Kennzahlen"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/project_budget_statistics.html
-msgid "project budget statistics"
+msgid "Project budget statistics"
 msgstr "Projekt-Budgetstatistik"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/overdrawn_projects.html
-msgid "overdrawn projects"
+msgid "Overdrawn projects"
 msgstr "Überzogene Projekte"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/open_items_list.html
-msgid "open items list"
+msgid "Open items list"
 msgstr "Offene-Posten-Liste"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/hours_by_circle.html
-msgid "hours by circle"
+msgid "Hours by circle"
 msgstr "Stunden pro Kreis"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/hours_per_customer.html
-msgid "hours per customer"
+msgid "Hours per customer"
 msgstr "Stunden pro Kundschaft"
 
 #: workbench/templates/base.html workbench/templates/reporting/green_hours.html
-msgid "green hours"
+msgid "Green hours"
 msgstr "Grüne Stunden"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/accepted_deals_for_user.html
-msgid "accepted deals"
+msgid "Accepted deals"
 msgstr "Gewonnene Geschäfte"
 
 #: workbench/templates/base.html workbench/templates/reporting/labor_costs.html
@@ -2169,7 +2177,7 @@ msgid "Settings"
 msgstr "Einstellungen"
 
 #: workbench/templates/base.html workbench/templates/shortcuts.html
-msgid "keyboard shortcuts"
+msgid "Keyboard shortcuts"
 msgstr "Tastaturkürzel"
 
 #: workbench/templates/base.html
@@ -2177,7 +2185,7 @@ msgid "Admin panel"
 msgstr "Verwaltung"
 
 #: workbench/templates/base.html
-msgid "timer"
+msgid "Timer"
 msgstr "Timer"
 
 #: workbench/templates/base.html workbench/templates/shortcuts.html
@@ -2230,18 +2238,20 @@ msgid "Save"
 msgstr "Sichern"
 
 #: workbench/templates/contacts/person_form.html
-#: workbench/templates/credit_control/creditentry_upload.html
 #: workbench/templates/generic/object_confirm_delete.html
-#: workbench/templates/generic/object_form.html
 #: workbench/templates/modal_confirm_delete.html
 #: workbench/templates/offers/offer_pricing.html
 msgid "cancel"
 msgstr "Abbruch"
 
 #: workbench/templates/credit_control/creditentry_upload.html
-#: workbench/templates/generic/object_form.html
-msgid "continue"
+msgid "Continue"
 msgstr "Weiter"
+
+#: workbench/templates/credit_control/creditentry_upload.html
+#: workbench/templates/generic/object_form.html
+msgid "Cancel"
+msgstr "Storniert"
 
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/invoice_detail.html
@@ -2262,6 +2272,10 @@ msgstr "Warnungen ignorieren"
 #: workbench/templates/modal_confirm_delete.html
 msgid "delete"
 msgstr "Löschen"
+
+#: workbench/templates/generic/object_form.html
+msgid "continue"
+msgstr "Weiter"
 
 #: workbench/templates/history_modal.html workbench/templatetags/workbench.py
 msgid "History"
@@ -2394,6 +2408,10 @@ msgid "offers PDF"
 msgstr "Offerten-PDF"
 
 #: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/accepted_deals.html
+#: workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/hours_by_circle.html
+#: workbench/templates/reporting/hours_per_customer.html
 msgid "Show"
 msgstr "Anzeigen"
 
@@ -2438,19 +2456,12 @@ msgid "Services from offer"
 msgstr "Leistungen aus Offerte"
 
 #: workbench/templates/projects/project_statistics.html
-msgid "logged hours per hourly rate"
+msgid "logged Hours per hourly rate"
 msgstr "Erfasste Stunden pro Stundensatz"
 
 #: workbench/templates/projects/project_statistics.html
-msgid "logged hours per user"
+msgid "logged Hours per user"
 msgstr "Erfasste Stunden pro Benutzer"
-
-#: workbench/templates/reporting/accepted_deals.html
-#: workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/hours_by_circle.html
-#: workbench/templates/reporting/hours_per_customer.html
-msgid "show"
-msgstr "Anzeigen"
 
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/key_data.html
@@ -2614,7 +2625,7 @@ msgid "all users' hours"
 msgstr "Stunden von allen"
 
 #: workbench/templates/timestamps.html
-msgid "controller"
+msgid "Controller"
 msgstr "Controller"
 
 #: workbench/templatetags/workbench.py workbench/tools/history.py

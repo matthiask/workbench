@@ -99,7 +99,7 @@ class TemplateTagsTest(TestCase):
         absence = factories.AbsenceFactory.create(starts_on=dt.date(2020, 1, 1))
         pairs = dict(field_value_pairs(absence))
 
-        self.assertEqual(pairs["starts on"], "01.01.2020")
-        self.assertEqual(pairs["ends on"], None)
-        self.assertEqual(pairs["reason"], "vacation")
-        self.assertEqual(pairs["is vacation"], "yes")
+        self.assertEqual(pairs["Starts on"], "01.01.2020")
+        self.assertEqual(pairs["Ends on"], None)
+        self.assertEqual(pairs["Reason"], "vacation")
+        self.assertEqual(pairs["Is vacation"], "yes")

@@ -10,37 +10,37 @@
 {% block body %}
   <table class="table table-striped">
     <tr>
-      <th class="text-right">{% trans 'project' %}</th>
+      <th class="text-right">{% trans 'project'|capfirst %}</th>
       <td>{% link_or_none object.service.project %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'service' %}</th>
+      <th class="text-right">{% trans 'service'|capfirst %}</th>
       <td>{% link_or_none object.service %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'created' %}</th>
+      <th class="text-right">{% trans 'created'|capfirst %}</th>
       <td>
         {{ object.created_at|local_date_format }} {% trans 'by' %}
         {{ object.created_by.get_short_name }}
       </td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'rendered' %}</th>
+      <th class="text-right">{% trans 'rendered'|capfirst %}</th>
       <td>
         {{ object.rendered_on|local_date_format }} {% trans 'by' %}
         {{ object.rendered_by.get_short_name }}
       </td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'hours' %}</th>
+      <th class="text-right">{% trans 'hours'|capfirst %}</th>
       <td>{{ object.hours }}h</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'description' %}</th>
+      <th class="text-right">{% trans 'description'|capfirst %}</th>
       <td>{{ object.description|linebreaksbr }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'invoicing' %}</th>
+      <th class="text-right">{% trans 'invoicing'|capfirst %}</th>
       <td>
         {% if object.invoice_service %}{% link_or_none object.invoice_service %}
         {% elif object.archived_at %}

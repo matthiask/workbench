@@ -2,12 +2,12 @@
 
 {% load fineforms i18n workbench %}
 
-{% block title %}{% trans 'open items list' %} - {{ block.super }}{% endblock %}
+{% block title %}{% trans 'Open items list' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row">
 <div class="col-sm-12">
-  <h1>{% trans 'open items list' %}</h1>
+  <h1>{% trans 'Open items list' %}</h1>
 
   <form method="get" class="mb-3" data-autosubmit>
     {% ff_fields form %}
@@ -16,10 +16,10 @@
   <table class="table table-sm table-hover table-responsive-lg">
     <thead class="sticky">
       <tr>
-        <th class="w-100">{% trans 'invoice' %}</th>
-        <th class="text-nowrap text-right">{% trans 'invoiced on' %}</th>
-        <th class="text-nowrap text-right">{% trans 'total excl. tax' %}</th>
-        <th class="text-nowrap text-right">{% trans 'total' %}</th>
+        <th class="w-100">{% trans 'invoice'|capfirst %}</th>
+        <th class="text-nowrap text-right">{% trans 'invoiced on'|capfirst %}</th>
+        <th class="text-nowrap text-right">{% trans 'total excl. tax'|capfirst %}</th>
+        <th class="text-nowrap text-right">{% trans 'total'|capfirst %}</th>
       </tr>
     </thead>
     <tbody>
@@ -39,7 +39,7 @@
     {% endfor %}
     </tbody>
     <tfoot>
-      <th>{% trans 'total' %}</th>
+      <th>{% trans 'total'|capfirst %}</th>
       <th></th>
       <th class="text-right">{{ open_items_list.total_excl_tax|currency }}</th>
       <th class="text-right">{{ open_items_list.total|currency }}</th>

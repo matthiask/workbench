@@ -5,6 +5,7 @@ from django import forms
 from django.db.models import Q
 from django.shortcuts import render
 from django.utils.html import format_html, format_html_join
+from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import Team, User
@@ -36,7 +37,7 @@ def overdrawn_projects_view(request):
 
 
 class OpenItemsForm(Form):
-    cutoff_date = forms.DateField(label=_("cutoff date"), widget=DateInput())
+    cutoff_date = forms.DateField(label=capfirst(_("cutoff date")), widget=DateInput())
 
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
@@ -238,7 +239,7 @@ class ProjectBudgetStatisticsForm(Form):
     closed_during_the_last_year = forms.BooleanField(
         label=_("Closed during the last year"), required=False
     )
-    internal = forms.BooleanField(label=_("internal"), required=False)
+    internal = forms.BooleanField(label=_("Internal"), required=False)
 
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
@@ -291,15 +292,15 @@ def project_budget_statistics_view(request, form):
 
 class DateRangeFilterForm(Form):
     date_from = forms.DateField(
-        label=_("date from"), required=False, widget=DateInput()
+        label=_("Date from"), required=False, widget=DateInput()
     )
     date_until = forms.DateField(
-        label=_("date until"), required=False, widget=DateInput()
+        label=_("Date until"), required=False, widget=DateInput()
     )
     team = forms.ModelChoiceField(
         Team.objects.all(),
         empty_label=_("Everyone"),
-        label=Team._meta.verbose_name,
+        label=capfirst(Team._meta.verbose_name),
         required=False,
     )
 

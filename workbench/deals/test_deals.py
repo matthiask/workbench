@@ -340,7 +340,7 @@ class DealsTest(TestCase):
         response = self.client.get(
             "/report/accepted-deals/?date_from=2020-01-01&date_until=2099-01-01"
         )
-        self.assertContains(response, "accepted deals")
+        self.assertContains(response, "Accepted deals")
 
         stats = accepted_deals([dt.date(2020, 1, 1), dt.date(2099, 1, 1)])
         self.assertEqual(

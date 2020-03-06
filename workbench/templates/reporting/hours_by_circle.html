@@ -2,16 +2,16 @@
 
 {% load fineforms i18n workbench %}
 
-{% block title %}{% trans 'hours by circle' %} - {{ block.super }}{% endblock %}
+{% block title %}{% trans 'Hours by circle' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12 col-md-8">
-  <h1>{% trans 'hours by circle' %}</h1>
+  <h1>{% trans 'Hours by circle' %}</h1>
 
   <form method="get" class="mb-3">
     {% ff_fields form %}
-    {% ff_submit _('show') %}
+    {% ff_submit _('Show') %}
   </form>
 
   <table class="table table-sm table-responsive-lg table-hover">

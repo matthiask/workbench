@@ -8,7 +8,7 @@
 
 {% block body %}
 
-<h2>{% trans 'logged hours per hourly rate' %}</h2>
+<h2>{% trans 'logged Hours per hourly rate' %}</h2>
 <table>
 {% for rate, hours in object.grouped_services.logged_hours_per_effort_rate %}
 <tr {% if rate is None %}class="text-warning"{% endif %}>
@@ -22,7 +22,7 @@
 {% endfor %}
 </table>
 
-<h2>{% trans 'logged hours per user' %}</h2>
+<h2>{% trans 'logged Hours per user' %}</h2>
 
 <table class="table table-sm table-responsive">
   <tr>

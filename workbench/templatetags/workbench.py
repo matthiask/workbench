@@ -54,11 +54,11 @@ def field_value_pairs(object):
             continue
 
         if field.choices:
-            yield (field.verbose_name, object._get_FIELD_display(field))
+            yield (capfirst(field.verbose_name), object._get_FIELD_display(field))
 
         elif isinstance(field, models.TextField):
             yield (
-                field.verbose_name,
+                capfirst(field.verbose_name),
                 linebreaksbr(getattr(object, field.name)),
             )
 
@@ -69,7 +69,7 @@ def field_value_pairs(object):
             elif isinstance(value, bool):
                 value = _("yes") if value else _("no")
 
-            yield (field.verbose_name, value)
+            yield (capfirst(field.verbose_name), value)
 
 
 @register.filter

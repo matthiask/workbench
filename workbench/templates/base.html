@@ -76,24 +76,24 @@
             {% if request.user|has_feature:FEATURES.CONTROLLING %}
               <div class="dropdown-divider"></div>
               <div class="dropdown-header">{% trans 'projects'|capfirst %}</div>
-              <a class="dropdown-item" href="{% url 'report_project_budget_statistics' %}">{% trans 'project budget statistics'|capfirst %}</a>
-              <a class="dropdown-item" href="{% url 'report_overdrawn_projects' %}">{% trans 'overdrawn projects'|capfirst %}</a>
+              <a class="dropdown-item" href="{% url 'report_project_budget_statistics' %}">{% trans 'Project budget statistics' %}</a>
+              <a class="dropdown-item" href="{% url 'report_overdrawn_projects' %}">{% trans 'Overdrawn projects' %}</a>
               <div class="dropdown-divider"></div>
               <div class="dropdown-header">{% trans 'invoices'|capfirst %}</div>
-              <a class="dropdown-item" href="{% url 'report_open_items_list' %}">{% trans 'open items list'|capfirst %}</a>
+              <a class="dropdown-item" href="{% url 'report_open_items_list' %}">{% trans 'Open items list' %}</a>
               <div class="dropdown-divider"></div>
               <div class="dropdown-header">{% trans 'logged hours'|capfirst %}</div>
               {% if request.user|has_feature:FEATURES.GLASSFROG %}
-                <a class="dropdown-item" href="{% url 'report_hours_by_circle' %}">{% trans 'hours by circle'|capfirst %}</a>
+                <a class="dropdown-item" href="{% url 'report_hours_by_circle' %}">{% trans 'Hours by circle'|capfirst %}</a>
               {% endif %}
-              <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">{% trans 'hours per customer'|capfirst %}</a>
-              <a class="dropdown-item" href="{% url 'report_green_hours' %}">{% trans 'green hours'|capfirst %}</a>
+              <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">{% trans 'Hours per customer'|capfirst %}</a>
+              <a class="dropdown-item" href="{% url 'report_green_hours' %}">{% trans 'Green hours' %}</a>
             {% endif %} {# CONTROLLING #}
 
             {% if request.user|has_feature:FEATURES.DEALS %}
               <div class="dropdown-divider"></div>
               <div class="dropdown-header">{% trans 'deals'|capfirst %}</div>
-              <a class="dropdown-item" href="{% url 'report_accepted_deals' %}">{% trans 'accepted deals'|capfirst %}</a>
+              <a class="dropdown-item" href="{% url 'report_accepted_deals' %}">{% trans 'Accepted deals'|capfirst %}</a>
             {% endif %}
 
             {% if request.user|has_feature:FEATURES.LABOR_COSTS %}
@@ -112,16 +112,16 @@
             Hi, {{ user.get_short_name }}!
           </a>
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-            <a class="dropdown-item" href="{% url 'accounts_update' %}">{% trans 'Settings'|capfirst %}</a>
-            <a class="dropdown-item" href="{% url 'shortcuts' %}">{% trans 'keyboard shortcuts'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'accounts_update' %}">{% trans 'Settings' %}</a>
+            <a class="dropdown-item" href="{% url 'shortcuts' %}">{% trans 'Keyboard shortcuts' %}</a>
             {% if request.user.is_admin %}
-            <a class="dropdown-item" href="{% url 'admin:index' %}">{% trans 'Admin panel'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'admin:index' %}">{% trans 'Admin panel' %}</a>
             {% endif %}
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'timer' %}">{% trans 'timer'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'timer' %}">{% trans 'Timer' %}</a>
             <a class="dropdown-item" href="{% url 'timestamps' %}">{% trans 'timestamps'|capfirst %}</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'logout' %}">{% trans 'Sign out'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'logout' %}">{% trans 'Sign out' %}</a>
           </div>
         </li>
       </ul>

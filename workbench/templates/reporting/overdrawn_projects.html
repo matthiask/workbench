@@ -2,21 +2,21 @@
 
 {% load i18n workbench %}
 
-{% block title %}{% trans 'overdrawn projects' %} - {{ block.super }}{% endblock %}
+{% block title %}{% trans 'Overdrawn projects' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row">
 <div class="col-sm-12">
-  <h1>{% trans 'overdrawn projects' %}</h1>
+  <h1>{% trans 'Overdrawn projects' %}</h1>
 
   <table class="table table-sm table-hover table-responsive-lg">
     <thead class="sticky">
       <tr>
-        <th class="w-100">{% trans 'project' %}</th>
-        <th class="w-100">{% trans 'customer' %}</th>
-        <th class="text-nowrap text-right">{% trans 'effort hours' %}</th>
-        <th class="text-nowrap text-right">{% trans 'logged hours' %}</th>
-        <th class="text-nowrap text-right">{% trans 'overdrawn' %}</th>
+        <th class="w-100">{% trans 'project'|capfirst %}</th>
+        <th class="w-100">{% trans 'customer'|capfirst %}</th>
+        <th class="text-nowrap text-right">{% trans 'effort hours'|capfirst %}</th>
+        <th class="text-nowrap text-right">{% trans 'logged hours'|capfirst %}</th>
+        <th class="text-nowrap text-right">{% trans 'overdrawn'|capfirst %}</th>
       </tr>
     </thead>
     <tbody>
