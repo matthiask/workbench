@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-06 02:49+0100\n"
+"POT-Creation-Date: 2020-03-06 03:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -425,8 +425,9 @@ msgstr "Kontakte"
 #: workbench/contacts/forms.py workbench/credit_control/forms.py
 #: workbench/deals/forms.py workbench/invoices/forms.py
 #: workbench/logbook/forms.py workbench/offers/forms.py
-#: workbench/projects/forms.py
-msgid "search"
+#: workbench/projects/forms.py workbench/templates/base.html
+#: workbench/templates/search.html
+msgid "Search"
 msgstr "Suche"
 
 #: workbench/contacts/forms.py
@@ -656,7 +657,7 @@ msgid "Processed"
 msgstr "Verarbeitet"
 
 #: workbench/credit_control/forms.py
-msgid "all ledgers"
+msgid "All ledgers"
 msgstr "Alle Konten"
 
 #: workbench/credit_control/forms.py
@@ -764,7 +765,7 @@ msgstr "Gutschriften"
 
 #: workbench/credit_control/views.py
 #: workbench/templates/credit_control/creditentry_list.html
-msgid "upload account statement"
+msgid "Upload account statement"
 msgstr "Kontoauszug hochladen"
 
 #: workbench/credit_control/views.py
@@ -785,7 +786,7 @@ msgstr "%(class)s wurden erfolgreich geändert."
 
 #: workbench/credit_control/views.py
 #: workbench/templates/credit_control/creditentry_list.html
-msgid "assign credit entries"
+msgid "Assign credit entries"
 msgstr "Gutschriften zuweisen"
 
 #: workbench/deals/__init__.py workbench/deals/models.py
@@ -1981,7 +1982,7 @@ msgid "Sign in"
 msgstr "Anmelden"
 
 #: workbench/templates/awt/absence_calendar.html workbench/templates/base.html
-msgid "absence calendar"
+msgid "Absence calendar"
 msgstr "Abwesenheitskalender"
 
 #: workbench/templates/awt/absence_calendar.html
@@ -2023,7 +2024,6 @@ msgid "active users"
 msgstr "Aktive Benutzer"
 
 #: workbench/templates/awt/year_detail.html
-#: workbench/templates/reporting/key_data.html
 msgid "facts"
 msgstr "Fakten"
 
@@ -2109,10 +2109,6 @@ msgstr "Ferientage"
 msgid "from %(date)s"
 msgstr "Ab %(date)s"
 
-#: workbench/templates/base.html workbench/templates/search.html
-msgid "Search"
-msgstr "Suche"
-
 #: workbench/templates/base.html
 msgid "dashboard"
 msgstr "Dashboard"
@@ -2126,7 +2122,7 @@ msgid "reports"
 msgstr "Berichte"
 
 #: workbench/templates/base.html workbench/templates/reporting/key_data.html
-msgid "key data"
+msgid "Key data"
 msgstr "Kennzahlen"
 
 #: workbench/templates/base.html
@@ -2483,6 +2479,10 @@ msgid "No circle"
 msgstr "Kein Kreis"
 
 #: workbench/templates/reporting/key_data.html
+msgid "Facts"
+msgstr "Fakten"
+
+#: workbench/templates/reporting/key_data.html
 msgid "service hours in open orders"
 msgstr "Leistungsstunden in offenen Aufträgen"
 
@@ -2495,16 +2495,16 @@ msgid "sent invoices total excl. tax"
 msgstr "Total exkl. MwSt. aller offenen Rechnungen"
 
 #: workbench/templates/reporting/key_data.html
-msgid "revenue minus third party costs and accruals"
+msgid "Revenue minus third party costs and accruals"
 msgstr "Umsatz minus Fremdkosten minus Abgrenzungen"
 
 #: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/key_data_gross_profit.html
-msgid "gross profit"
+msgid "Gross profit"
 msgstr "Umsatz"
 
 #: workbench/templates/reporting/key_data.html
-msgid "gross margin"
+msgid "Gross margin"
 msgstr "Umsatz bereinigt"
 
 #: workbench/templates/reporting/key_data.html
@@ -2512,11 +2512,11 @@ msgid "FTE"
 msgstr "FTE"
 
 #: workbench/templates/reporting/key_data.html
-msgid "margin / FTE"
+msgid "Margin / FTE"
 msgstr "Umsatz / FTE"
 
 #: workbench/templates/reporting/key_data.html
-msgid "hours distribution"
+msgid "Hours distribution"
 msgstr "Stundenverteilung"
 
 #: workbench/templates/reporting/key_data_third_party_costs.html

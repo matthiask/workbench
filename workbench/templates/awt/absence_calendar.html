@@ -2,11 +2,11 @@
 
 {% load fineforms i18n workbench webpack_loader %}
 
-{% block title %}{% trans 'absence calendar' %} - {{ block.super }}{% endblock %}
+{% block title %}{% trans 'Absence calendar' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
   <div class="d-flex w-100 align-items-start justify-content-between">
-    <h1 class="absences-title">{% trans 'absence calendar' %}</h1>
+    <h1 class="absences-title">{% trans 'Absence calendar' %}</h1>
 
     <form method="get" class="form-inline form-search mb-3 ml-auto mr-3" data-autosubmit>
       {% if form.changed_data %}
@@ -16,7 +16,7 @@
     </form>
 
     <a href="{% url 'awt_absence_create' %}" class="btn btn-primary" data-toggle="ajaxmodal">
-      {% include 'svg/plus.svg' %} {% trans 'absence' %}
+      {% include 'svg/plus.svg' %} {% trans 'absence'|capfirst %}
     </a>
   </div>
 

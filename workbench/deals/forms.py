@@ -24,7 +24,7 @@ class DealSearchForm(Form):
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": _("search")}
+            attrs={"class": "form-control", "placeholder": _("Search")}
         ),
         label="",
     )

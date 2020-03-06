@@ -16,7 +16,7 @@ class CreditEntrySearchForm(Form):
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": _("search")}
+            attrs={"class": "form-control", "placeholder": _("Search")}
         ),
         label="",
     )
@@ -33,7 +33,7 @@ class CreditEntrySearchForm(Form):
     ledger = forms.ModelChoiceField(
         Ledger.objects.all(),
         required=False,
-        empty_label=_("all ledgers"),
+        empty_label=_("All ledgers"),
         widget=forms.Select(attrs={"class": "custom-select"}),
         label="",
     )

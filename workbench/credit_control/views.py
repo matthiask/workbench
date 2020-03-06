@@ -10,7 +10,7 @@ class AccountStatementUploadView(generic.CreateView):
     template_name_suffix = "_upload"
 
     def get_context_data(self, **kwargs):
-        kwargs.setdefault("override_title", _("upload account statement"))
+        kwargs.setdefault("override_title", _("Upload account statement"))
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
@@ -48,5 +48,5 @@ class AssignCreditEntriesView(generic.CreateView):
         return redirect(".")
 
     def get_context_data(self, **kwargs):
-        kwargs.setdefault("override_title", _("assign credit entries"))
+        kwargs.setdefault("override_title", _("Assign credit entries"))
         return super().get_context_data(**kwargs)

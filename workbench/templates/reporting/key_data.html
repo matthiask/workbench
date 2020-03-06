@@ -2,17 +2,17 @@
 
 {% load fineforms i18n static workbench %}
 
-{% block title %}{% trans 'key data' %} - {{ block.super }}{% endblock %}
+{% block title %}{% trans 'Key data' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12">
   <h1>
-    {% trans 'key data' %}
+    {% trans 'Key data' %}
     {# <small>{{ date_range.0|local_date_format }} &ndash; {{ date_range.1|local_date_format }}</small> #}
   </h1>
 
-  <h2 class="mt-5">{% trans 'facts' %}</h2>
+  <h2 class="mt-5">{% trans 'Facts' %}</h2>
   <table class="table">
     <tr>
       <td class="text-right">{{ service_hours_in_open_orders|hours }}</td>
@@ -30,7 +30,7 @@
 
   <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
 
-  <h2 class="mt-5">{% trans 'revenue minus third party costs and accruals' %}</h2>
+  <h2 class="mt-5">{% trans 'Revenue minus third party costs and accruals' %}</h2>
   <canvas id="invoiced-corrected" width="1200" height="450"></canvas>
   <script>
     new Chart("invoiced-corrected", {
@@ -70,14 +70,14 @@
   <table class="table table-hover">
     <thead class="sticky">
       <tr>
-        <th>{% trans 'month' %}</th>
-        <th class="text-right">{% trans 'gross profit' %}</th>
-        <th class="text-right">{% trans 'third party costs' %}</th>
-        <th class="text-right">{% trans 'accruals' %}</th>
+        <th>{% trans 'month'|capfirst %}</th>
+        <th class="text-right">{% trans 'Gross profit' %}</th>
+        <th class="text-right">{% trans 'third party costs'|capfirst %}</th>
+        <th class="text-right">{% trans 'accruals'|capfirst %}</th>
         <th class="text-right"></th>
-        <th class="text-right">{% trans 'gross margin' %}</th>
+        <th class="text-right">{% trans 'Gross margin' %}</th>
         <th class="text-right">{% trans 'FTE' %}</th>
-        <th class="text-right">{% trans 'margin / FTE' %}</th>
+        <th class="text-right">{% trans 'Margin / FTE' %}</th>
       </tr>
     </thead>
     <tbody>
@@ -116,7 +116,7 @@
     </tbody>
   </table>
 
-  <h2 class="mt-5">{% trans 'hours distribution' %}</h2>
+  <h2 class="mt-5">{% trans 'Hours distribution' %}</h2>
   <canvas id="hours-distribution" width="1200" height="450"></canvas>
   <script>
     new Chart("hours-distribution", {

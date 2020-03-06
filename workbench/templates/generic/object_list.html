@@ -23,7 +23,7 @@
         {% if view.show_create_button %}
           <a href="{{ view.model.urls.create }}" class="btn btn-primary">
             {% include "svg/plus.svg" %}
-            {{ view.meta.verbose_name }}
+            {{ view.meta.verbose_name|capfirst }}
           </a>
         {% endif %}
         {% endblock %}

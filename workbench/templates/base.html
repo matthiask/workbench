@@ -65,13 +65,13 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="reportsDropdown">
             {% if request.user|has_feature:FEATURES.CONTROLLING %}
-              <a class="dropdown-item" href="{% url 'report_key_data' %}">{% trans 'key data'|capfirst %}</a>
+              <a class="dropdown-item" href="{% url 'report_key_data' %}">{% trans 'Key data' %}</a>
             {% endif %}
 
             <div class="dropdown-divider"></div>
             <div class="dropdown-header">{% trans 'working time'|capfirst %}</div>
             <a class="dropdown-item" href="{% url 'awt_year_report' %}">{% trans 'annual working time'|capfirst %}</a>
-            <a class="dropdown-item" href="{% url 'awt_absence_calendar' %}">{% trans 'absence calendar' %}</a>
+            <a class="dropdown-item" href="{% url 'awt_absence_calendar' %}">{% trans 'Absence calendar' %}</a>
 
             {% if request.user|has_feature:FEATURES.CONTROLLING %}
               <div class="dropdown-divider"></div>
