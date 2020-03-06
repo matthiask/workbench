@@ -283,12 +283,12 @@ class ContactsTest(TestCase):
         self.client.force_login(organization.primary_contact)
 
         response = self.client.get(organization.urls["detail"])
-        self.assertContains(response, "recent projects")
-        self.assertContains(response, "recent invoices")
-        self.assertContains(response, "recent offers")
+        self.assertContains(response, "Recent projects")
+        self.assertContains(response, "Recent invoices")
+        self.assertContains(response, "Recent offers")
 
         with override_settings(FEATURES={"controlling": False}):
             response = self.client.get(organization.urls["detail"])
-            self.assertContains(response, "recent projects")
-            self.assertNotContains(response, "recent invoices")
-            self.assertNotContains(response, "recent offers")
+            self.assertContains(response, "Recent projects")
+            self.assertNotContains(response, "Recent invoices")
+            self.assertNotContains(response, "Recent offers")
