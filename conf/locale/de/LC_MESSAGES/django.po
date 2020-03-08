@@ -2461,12 +2461,12 @@ msgid "Services from offer"
 msgstr "Leistungen aus Offerte"
 
 #: workbench/templates/projects/project_statistics.html
-msgid "logged Hours per hourly rate"
+msgid "Logged hours per hourly rate"
 msgstr "Erfasste Stunden pro Stundensatz"
 
 #: workbench/templates/projects/project_statistics.html
-msgid "logged Hours per user"
-msgstr "Erfasste Stunden pro Benutzer"
+msgid "Logged hours per user"
+msgstr "Erfasste Stunden pro Nutzer*in"
 
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/key_data.html
