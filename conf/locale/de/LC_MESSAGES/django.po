@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-06 17:23+0100\n"
+"POT-Creation-Date: 2020-03-09 16:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -841,7 +841,7 @@ msgstr "Dieses Feld wird benötigt wenn die Wahrscheinlichkeit hoch ist."
 msgid "Award of contract"
 msgstr "Projektvergabe"
 
-#: workbench/deals/forms.py
+#: workbench/deals/forms.py workbench/templates/reporting/declined_deals.html
 msgid "Reason for losing"
 msgstr "Verlustgrund"
 
@@ -909,6 +909,7 @@ msgstr "hoch"
 #: workbench/management/commands/profitability.py workbench/projects/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/reporting/declined_deals.html
 #: workbench/templates/reporting/overdrawn_projects.html
 msgid "customer"
 msgstr "Kundschaft"
@@ -928,6 +929,7 @@ msgstr "verantwortlich"
 
 #: workbench/deals/models.py workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/accepted_deals_for_user.html
+#: workbench/templates/reporting/declined_deals.html
 msgid "value"
 msgstr "Wert"
 
@@ -968,6 +970,7 @@ msgstr "Abschlussnotiz"
 
 #: workbench/deals/models.py
 #: workbench/templates/reporting/accepted_deals_for_user.html
+#: workbench/templates/reporting/declined_deals.html
 msgid "deal"
 msgstr "Geschäft"
 
@@ -2173,6 +2176,11 @@ msgstr "Grüne Stunden"
 msgid "Accepted deals"
 msgstr "Gewonnene Geschäfte"
 
+#: workbench/templates/base.html
+#: workbench/templates/reporting/declined_deals.html
+msgid "Declined deals"
+msgstr "Verlorene Geschäfte"
+
 #: workbench/templates/base.html workbench/templates/reporting/labor_costs.html
 msgid "labor costs"
 msgstr "Personalaufwand"
@@ -2414,6 +2422,7 @@ msgstr "Offerten-PDF"
 
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/accepted_deals.html
+#: workbench/templates/reporting/declined_deals.html
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/hours_by_circle.html
 #: workbench/templates/reporting/hours_per_customer.html

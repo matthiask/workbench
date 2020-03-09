@@ -85,6 +85,18 @@ def accepted_deals(date_range, *, users=None):
     }
 
 
+def declined_deals(date_range, *, users=None):
+    queryset = (
+        Deal.objects.filter(status=Deal.DECLINED, closed_on__range=date_range)
+        .select_related("customer", "contact__organization", "owned_by")
+        .prefetch_related(
+            Prefetch("values", queryset=Value.objects.select_related("type"))
+        )
+        .order_by("-closed_on")
+    )
+    return queryset
+
+
 def test():  # pragma: no cover
     from pprint import pprint
 

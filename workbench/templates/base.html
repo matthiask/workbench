@@ -93,7 +93,8 @@
             {% if request.user|has_feature:FEATURES.DEALS %}
               <div class="dropdown-divider"></div>
               <div class="dropdown-header">{% trans 'deals'|capfirst %}</div>
-              <a class="dropdown-item" href="{% url 'report_accepted_deals' %}">{% trans 'Accepted deals'|capfirst %}</a>
+              <a class="dropdown-item" href="{% url 'report_accepted_deals' %}">{% trans 'Accepted deals' %}</a>
+              <a class="dropdown-item" href="{% url 'report_declined_deals' %}">{% trans 'Declined deals' %}</a>
             {% endif %}
 
             {% if request.user|has_feature:FEATURES.LABOR_COSTS %}

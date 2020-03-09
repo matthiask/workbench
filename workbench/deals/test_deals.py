@@ -371,3 +371,6 @@ class DealsTest(TestCase):
 
         stats = accepted_deals([dt.date(2020, 1, 1), dt.date(2099, 1, 1)], users=[])
         self.assertEqual(stats["sum"], Decimal("0"))
+
+        response = self.client.get("/report/declined-deals/")
+        self.assertContains(response, "Declined deals")

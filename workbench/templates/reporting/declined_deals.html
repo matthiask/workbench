@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% load fineforms i18n workbench %}
+
+{% block title %}{% trans 'Declined deals' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-10 col-lg-8">
+  <h1>{% trans 'Declined deals' %}</h1>
+
+  <form method="get" class="mb-3">
+    {% ff_fields form %}
+    {% ff_submit _('Show') %}
+  </form>
+
+  <table class="table table-responsive-lg">
+    <thead class="sticky">
+      <tr>
+        <th>{% trans 'deal'|capfirst %}</th>
+        <th>{% trans 'customer'|capfirst %}</th>
+        <th>{% trans 'Reason for losing' %}</th>
+        <th class="text-nowrap text-right">{% trans 'value'|capfirst %}</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for deal in stats %}
+      <tr>
+        <td>
+          <a href="{{ deal.get_absolute_url }}">
+            {{ deal|h }} {{ deal.status_badge }}
+          </a>
+        </td>
+        <td>{% firstof deal.contact deal.customer %}</td>
+        <td>{{ deal.closing_type }} {{ deal.closing_notice }}</td>
+        <td class="text-right">{{ deal.value|currency }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+</div>
+{% endblock %}
