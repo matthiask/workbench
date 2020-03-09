@@ -10,7 +10,7 @@ from workbench import factories
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
-from workbench.tools.validation import logbook_lock
+from workbench.tools.validation import in_days, logbook_lock
 
 
 class LogbookTest(TestCase):
@@ -41,16 +41,12 @@ class LogbookTest(TestCase):
         response = send()
         self.assertContains(response, "This seems to be a duplicate.")
 
-        response = send(
-            rendered_on=(dt.date.today() - dt.timedelta(days=10)).isoformat()
-        )
+        response = send(rendered_on=in_days(-10).isoformat())
         self.assertContains(
             response, "Sorry, hours have to be logged in the same week."
         )
 
-        response = send(
-            rendered_on=(dt.date.today() + dt.timedelta(days=10)).isoformat()
-        )
+        response = send(rendered_on=in_days(10).isoformat())
         self.assertContains(response, "Sorry, that&#x27;s too far in the future.")
 
         response = send(service="")
@@ -69,7 +65,7 @@ class LogbookTest(TestCase):
         response = send()
         self.assertContains(response, "This project has been closed recently.")
 
-        project.closed_on = dt.date.today() - dt.timedelta(days=20)
+        project.closed_on = in_days(-20)
         project.save()
         response = send()
         self.assertContains(response, "This project has been closed too long ago.")
@@ -82,9 +78,7 @@ class LogbookTest(TestCase):
             hours.urls["update"],
             {
                 "modal-rendered_by": hours.rendered_by_id,
-                "modal-rendered_on": (
-                    dt.date.today() - dt.timedelta(days=7)
-                ).isoformat(),
+                "modal-rendered_on": in_days(-7).isoformat(),
                 "modal-service": hours.service_id,
                 "modal-hours": "0.1",
                 "modal-description": "Test",
@@ -96,7 +90,7 @@ class LogbookTest(TestCase):
         )
 
     def test_update_past_week_allowed(self):
-        day = dt.date.today() - dt.timedelta(days=7)
+        day = in_days(-7)
         hours = factories.LoggedHoursFactory.create(rendered_on=day)
         self.client.force_login(hours.rendered_by)
 
@@ -124,9 +118,7 @@ class LogbookTest(TestCase):
             project.urls["createhours"],
             {
                 "modal-rendered_by": user.id,
-                "modal-rendered_on": (
-                    dt.date.today() - dt.timedelta(days=10)
-                ).isoformat(),
+                "modal-rendered_on": in_days(-10).isoformat(),
                 "modal-service": service.id,
                 "modal-hours": "0.1",
                 "modal-description": "Test",
@@ -311,22 +303,17 @@ class LogbookTest(TestCase):
         )
         self.assertEqual(response.status_code, 202)
 
-        project.closed_on = dt.date.today() - dt.timedelta(days=20)
+        project.closed_on = in_days(-20)
         project.save()
 
         response = send(cost.urls["update"])
         self.assertContains(response, "This project has been closed too long ago.")
 
-        response = send(
-            cost.urls["update"],
-            rendered_on=(dt.date.today() + dt.timedelta(days=10)).isoformat(),
-        )
+        response = send(cost.urls["update"], rendered_on=in_days(10).isoformat())
         self.assertContains(response, "Sorry, that&#x27;s too far in the future.")
 
     def test_update_old_disabled_fields(self):
-        hours = factories.LoggedHoursFactory.create(
-            rendered_on=dt.date.today() - dt.timedelta(days=10)
-        )
+        hours = factories.LoggedHoursFactory.create(rendered_on=in_days(-10))
         self.client.force_login(hours.rendered_by)
         response = self.client.get(
             hours.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
@@ -347,9 +334,7 @@ class LogbookTest(TestCase):
 
     @freeze_time("2019-12-15")
     def test_logged_hours_deletion(self):
-        hours = factories.LoggedHoursFactory.create(
-            rendered_on=dt.date.today() - dt.timedelta(days=10)
-        )
+        hours = factories.LoggedHoursFactory.create(rendered_on=in_days(-10))
         self.client.force_login(hours.rendered_by)
         response = self.client.post(
             hours.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"

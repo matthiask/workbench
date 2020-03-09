@@ -10,6 +10,7 @@ from workbench.awt.reporting import active_users, annual_working_time
 from workbench.awt.utils import monthly_days
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
+from workbench.tools.validation import in_days
 
 
 class AWTTest(TestCase):
@@ -321,8 +322,8 @@ class AWTTest(TestCase):
         )
         Absence.objects.create(
             user=user,
-            starts_on=dt.date.today() + dt.timedelta(days=10),
-            ends_on=dt.date.today() + dt.timedelta(days=20),
+            starts_on=in_days(10),
+            ends_on=in_days(20),
             days=0,
             description="Test",
             reason=Absence.VACATION,

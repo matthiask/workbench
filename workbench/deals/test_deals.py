@@ -12,7 +12,8 @@ from workbench import factories
 from workbench.deals.models import Deal
 from workbench.deals.reporting import accepted_deals
 from workbench.templatetags.workbench import deal_group
-from workbench.tools.formats import in_days, local_date_format
+from workbench.tools.formats import local_date_format
+from workbench.tools.validation import in_days
 
 
 class DealsTest(TestCase):
@@ -251,13 +252,11 @@ class DealsTest(TestCase):
         )
         self.assertIn("badge-info", deal.status_badge)
 
-        deal = Deal(decision_expected_on=today - dt.timedelta(days=1))
+        deal = Deal(decision_expected_on=in_days(-1))
 
         self.assertEqual(
             deal.pretty_status,
-            "Decision expected on {}".format(
-                local_date_format(today - dt.timedelta(days=1))
-            ),
+            "Decision expected on {}".format(local_date_format(in_days(-1))),
         )
         self.assertIn("badge-warning", deal.status_badge)
 

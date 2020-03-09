@@ -10,6 +10,7 @@ from workbench.invoices.models import Invoice
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
+from workbench.tools.validation import in_days
 
 
 def invoice_to_dict(invoice, **kwargs):
@@ -544,9 +545,7 @@ class InvoicesTest(TestCase):
         self.assertEqual(messages(response), ["No invoices found."])
 
         factories.InvoiceFactory.create(
-            invoiced_on=dt.date.today() - dt.timedelta(days=60),
-            due_on=dt.date.today() - dt.timedelta(days=45),
-            status=Invoice.SENT,
+            invoiced_on=in_days(-60), due_on=in_days(-45), status=Invoice.SENT,
         )
         response = self.client.get("/invoices/?pdf=1")
         self.assertEqual(response.status_code, 200)
@@ -586,7 +585,7 @@ class InvoicesTest(TestCase):
                 status=Invoice.SENT,
                 postal_address="Test\nStreet\nCity",
                 invoiced_on=dt.date.today(),
-                due_on=dt.date.today() - dt.timedelta(days=1),
+                due_on=in_days(-1),
             ).full_clean()
         self.assertEqual(
             list(cm.exception), [("due_on", ["Due date has to be after invoice date."])]
@@ -611,7 +610,7 @@ class InvoicesTest(TestCase):
         invoice = factories.InvoiceFactory.create(
             title="Test",
             subtotal=20,
-            invoiced_on=dt.date.today() - dt.timedelta(days=1),
+            invoiced_on=in_days(-1),
             due_on=dt.date.today(),
             status=Invoice.SENT,
         )
@@ -631,7 +630,7 @@ class InvoicesTest(TestCase):
         invoice = factories.InvoiceFactory.create(
             title="Test",
             subtotal=20,
-            invoiced_on=dt.date.today() - dt.timedelta(days=1),
+            invoiced_on=in_days(-1),
             due_on=dt.date.today(),
             closed_on=dt.date.today(),
             status=Invoice.PAID,
@@ -767,7 +766,7 @@ class InvoicesTest(TestCase):
 
     def test_status(self):
         today = dt.date.today()
-        yesterday = dt.date.today() - dt.timedelta(days=1)
+        yesterday = in_days(-1)
         fmt = local_date_format(today)
         self.assertEqual(
             Invoice(status=Invoice.IN_PREPARATION).pretty_status,
@@ -779,18 +778,14 @@ class InvoicesTest(TestCase):
         )
         self.assertEqual(
             Invoice(
-                status=Invoice.SENT,
-                invoiced_on=yesterday,
-                due_on=today - dt.timedelta(days=5),
+                status=Invoice.SENT, invoiced_on=yesterday, due_on=in_days(-5),
             ).pretty_status,
             "Sent on {} but overdue".format(local_date_format(yesterday)),
         )
         self.assertIn(
             "badge-warning",
             Invoice(
-                status=Invoice.SENT,
-                invoiced_on=yesterday,
-                due_on=today - dt.timedelta(days=5),
+                status=Invoice.SENT, invoiced_on=yesterday, due_on=in_days(-5),
             ).status_badge,
         )
         self.assertEqual(

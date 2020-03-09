@@ -11,7 +11,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from workbench.tools.models import Model
-from workbench.tools.validation import monday
+from workbench.tools.validation import in_days, monday
 
 
 signer = Signer(salt="user")
@@ -172,9 +172,7 @@ class User(Model, AbstractBaseUser):
     @cached_property
     def all_users_hours(self):
         return (
-            self.loggedhours.model.objects.filter(
-                rendered_on__gte=dt.date.today() - dt.timedelta(days=7)
-            )
+            self.loggedhours.model.objects.filter(rendered_on__gte=in_days(-7))
             .select_related("service__project__owned_by", "rendered_by")
             .order_by("-created_at")[:20]
         )
@@ -186,9 +184,7 @@ class User(Model, AbstractBaseUser):
         return Project.objects.filter(
             Q(
                 closed_on__isnull=True,
-                id__in=self.loggedhours.filter(
-                    rendered_on__gte=dt.date.today() - dt.timedelta(days=7)
-                )
+                id__in=self.loggedhours.filter(rendered_on__gte=in_days(-7))
                 .values("service__project")
                 .annotate(Count("id"))
                 .filter(id__count__gte=3)

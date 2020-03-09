@@ -37,3 +37,7 @@ def filter_form(form_class):
         return inner
 
     return decorator
+
+
+def in_days(days):
+    return dt.date.today() + dt.timedelta(days=days)

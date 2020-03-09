@@ -8,6 +8,7 @@ from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
+from workbench.tools.validation import in_days
 
 
 class ProjectsTest(TestCase):
@@ -538,7 +539,7 @@ class ProjectsTest(TestCase):
                 "title": project.title,
                 "owned_by": project.owned_by_id,
                 "type": project.type,
-                "closed_on": (dt.date.today() + dt.timedelta(days=10)).isoformat(),
+                "closed_on": in_days(10).isoformat(),
             },
         )
         self.assertContains(

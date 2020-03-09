@@ -35,7 +35,3 @@ def days(value, plus_sign=False):
 
 def hours(value, plus_sign=False):
     return _fmt(fmt="{}{:,.1f}h", value=value, exp=H1, plus_sign=plus_sign)
-
-
-def in_days(days):
-    return dt.date.today() + dt.timedelta(days=days)

@@ -14,6 +14,7 @@ from workbench.expenses.rates import exchange_rates
 from workbench.logbook.models import LoggedCost
 from workbench.tools.formats import local_date_format
 from workbench.tools.testing import check_code, messages
+from workbench.tools.validation import in_days
 
 
 class ExpensesTest(TestCase):
@@ -252,9 +253,7 @@ class MockedRemoteDataTest(TestCase):
         self.assertEqual(mock_get.call_count, 1)
         self.assertEqual(rates.rates["date"], "2019-12-10")
 
-        rates = ExchangeRates.objects.create(
-            day=dt.date.today() + dt.timedelta(days=1), rates={}
-        )
+        rates = ExchangeRates.objects.create(day=in_days(1), rates={})
         self.assertEqual(ExchangeRates.objects.newest(), rates)
         self.assertEqual(mock_get.call_count, 1)
 

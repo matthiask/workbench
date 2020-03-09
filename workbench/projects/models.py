@@ -17,7 +17,7 @@ from workbench.services.models import ServiceBase
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import Model, MoneyField, SearchQuerySet, Z
 from workbench.tools.urls import model_urls
-from workbench.tools.validation import raise_if_errors
+from workbench.tools.validation import in_days, raise_if_errors
 
 
 class ProjectQuerySet(SearchQuerySet):
@@ -61,7 +61,7 @@ class ProjectQuerySet(SearchQuerySet):
             .filter(id__in=LoggedHours.objects.order_by().values("service__project"))
             .exclude(
                 id__in=LoggedHours.objects.order_by()
-                .filter(rendered_on__gte=dt.date.today() - dt.timedelta(days=60))
+                .filter(rendered_on__gte=in_days(-60))
                 .values("service__project")
             )
         )

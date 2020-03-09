@@ -10,6 +10,7 @@ from workbench import factories
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.invoices.tasks import create_recurring_invoices_and_notify
 from workbench.tools.testing import check_code, messages
+from workbench.tools.validation import in_days
 
 
 class RecurringTest(TestCase):
@@ -270,23 +271,19 @@ class RecurringTest(TestCase):
 
     def test_renewal_candidates(self):
         r1 = factories.RecurringInvoiceFactory.create(
-            starts_on=dt.date.today() + dt.timedelta(days=10), periodicity="monthly",
+            starts_on=in_days(10), periodicity="monthly",
         )
         r2 = factories.RecurringInvoiceFactory.create(
-            starts_on=dt.date.today() + dt.timedelta(days=30), periodicity="monthly",
+            starts_on=in_days(30), periodicity="monthly",
         )
 
         self.assertEqual(set(RecurringInvoice.objects.renewal_candidates()), {r1})
 
         r3 = factories.RecurringInvoiceFactory.create(
-            starts_on=dt.date.today() + dt.timedelta(days=-250),
-            periodicity="yearly",
-            create_invoice_on_day=300,
+            starts_on=in_days(-250), periodicity="yearly", create_invoice_on_day=300,
         )
         r4 = factories.RecurringInvoiceFactory.create(
-            starts_on=dt.date.today() + dt.timedelta(days=-350),
-            periodicity="yearly",
-            create_invoice_on_day=300,
+            starts_on=in_days(-350), periodicity="yearly", create_invoice_on_day=300,
         )
 
         self.assertEqual(set(RecurringInvoice.objects.renewal_candidates()), {r1, r4})

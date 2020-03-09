@@ -17,7 +17,7 @@ from workbench.services.models import ServiceBase
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import ModelWithTotal, MoneyField, SearchQuerySet, Z
 from workbench.tools.urls import model_urls
-from workbench.tools.validation import raise_if_errors
+from workbench.tools.validation import in_days, raise_if_errors
 
 
 class InvoiceQuerySet(SearchQuerySet):
@@ -31,9 +31,7 @@ class InvoiceQuerySet(SearchQuerySet):
 
     def overdue(self):
         return self.filter(
-            status=Invoice.SENT,
-            due_on__isnull=False,
-            due_on__lte=dt.date.today() - dt.timedelta(days=30),
+            status=Invoice.SENT, due_on__isnull=False, due_on__lte=in_days(-30)
         )
 
 
@@ -567,13 +565,7 @@ class RecurringInvoice(ModelWithTotal):
             self.periodicity,
         )
         generate_until = min(
-            filter(
-                None,
-                (
-                    dt.date.today() - dt.timedelta(days=self.create_invoice_on_day),
-                    self.ends_on,
-                ),
-            )
+            filter(None, (in_days(-self.create_invoice_on_day), self.ends_on,),)
         )
         this_period = next(days)
         while True:

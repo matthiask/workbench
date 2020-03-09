@@ -16,8 +16,8 @@ from workbench.deals.models import (
     Value,
     ValueType,
 )
-from workbench.tools.formats import in_days
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
+from workbench.tools.validation import in_days
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 

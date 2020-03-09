@@ -24,7 +24,7 @@ from workbench.reporting.utils import date_ranges
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import DateInput, Form
 from workbench.tools.models import ONE, Z
-from workbench.tools.validation import filter_form, monday
+from workbench.tools.validation import filter_form, in_days, monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -254,9 +254,7 @@ class ProjectBudgetStatisticsForm(Form):
     def queryset(self):
         data = self.cleaned_data
         if data.get("closed_during_the_last_year"):
-            queryset = Project.objects.closed().filter(
-                closed_on__gte=dt.date.today() - dt.timedelta(days=366)
-            )
+            queryset = Project.objects.closed().filter(closed_on__gte=in_days(-366))
         else:
             queryset = Project.objects.open(on=self.cleaned_data.get("cutoff_date"))
         if data.get("internal"):

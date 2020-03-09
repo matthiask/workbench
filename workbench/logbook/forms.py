@@ -1,4 +1,3 @@
-import datetime as dt
 from decimal import ROUND_UP, Decimal
 
 from django import forms
@@ -22,7 +21,7 @@ from workbench.tools.forms import (
     Textarea,
     add_prefix,
 )
-from workbench.tools.validation import logbook_lock, raise_if_errors
+from workbench.tools.validation import in_days, logbook_lock, raise_if_errors
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -295,7 +294,7 @@ class LoggedHoursForm(ModelForm):
                 "Deselect the existing service if you want to create a new service."
             )
         if self.project.closed_on:
-            if self.project.closed_on < dt.date.today() - dt.timedelta(days=15):
+            if self.project.closed_on < in_days(-14):
                 errors["__all__"] = _("This project has been closed too long ago.")
             else:
                 self.add_warning(
@@ -316,7 +315,7 @@ class LoggedHoursForm(ModelForm):
                 errors["rendered_on"] = _(
                     "Sorry, hours have to be logged in the same week."
                 )
-            elif data["rendered_on"] > dt.date.today() + dt.timedelta(days=7):
+            elif data["rendered_on"] > in_days(7):
                 errors["rendered_on"] = _("Sorry, that's too far in the future.")
 
         try:
@@ -429,7 +428,7 @@ class LoggedCostForm(ModelForm):
         data = super().clean()
         errors = {}
         if self.project.closed_on:
-            if self.project.closed_on < dt.date.today() - dt.timedelta(days=15):
+            if self.project.closed_on < in_days(-14):
                 errors["__all__"] = _("This project has been closed too long ago.")
             else:
                 self.add_warning(
@@ -449,9 +448,7 @@ class LoggedCostForm(ModelForm):
                     _("Third party costs shouldn't be higher than costs."),
                     code="third-party-costs-higher",
                 )
-        if data.get("rendered_on") and data[
-            "rendered_on"
-        ] > dt.date.today() + dt.timedelta(days=7):
+        if data.get("rendered_on") and data["rendered_on"] > in_days(7):
             errors["rendered_on"] = _("Sorry, that's too far in the future.")
         raise_if_errors(errors)
         return data
