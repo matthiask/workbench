@@ -3,7 +3,7 @@ from collections import defaultdict
 
 from django.db.models import Prefetch
 
-from workbench.deals.models import Deal, Value
+from workbench.deals.models import Deal, Value, ValueType
 from workbench.tools.models import Z
 
 
@@ -44,6 +44,7 @@ def accepted_deals(date_range, *, users=None):
         for user, deals in by_user.items()
     ]
 
+    valuetypes |= set(ValueType.objects.filter(weekly_target__isnull=False))
     valuetypes = sorted(valuetypes)
     months = [
         {
