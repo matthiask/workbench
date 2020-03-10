@@ -345,23 +345,31 @@ def labor_costs_view(request):
     except Exception:
         year = dt.date.today().year
 
-    lc = labor_costs.labor_costs([dt.date(year, 1, 1), dt.date(year, 12, 31)])
+    date_range = [dt.date(year, 1, 1), dt.date(year, 12, 31)]
 
     if request.GET.get("project"):
-        stats = [row for row in lc if str(row["project"].id) == request.GET["project"]][
-            0
-        ]
         return render(
             request,
-            "reporting/labor_costs_project.html",
+            "reporting/labor_costs_by_user.html",
             {
-                "stats": stats,
-                "by_user": sorted(
-                    stats["by_user"].items(),
-                    key=lambda row: row[1]["costs"],
-                    reverse=True,
+                "stats": labor_costs.labor_costs_by_user(
+                    date_range, project=request.GET.get("project")
+                ),
+            },
+        )
+    if request.GET.get("cost_center"):
+        return render(
+            request,
+            "reporting/labor_costs_by_user.html",
+            {
+                "stats": labor_costs.labor_costs_by_user(
+                    date_range, cost_center=request.GET.get("cost_center")
                 ),
             },
         )
 
-    return render(request, "reporting/labor_costs.html", {"labor_costs": lc})
+    return render(
+        request,
+        "reporting/labor_costs.html",
+        {"stats": labor_costs.labor_costs_by_cost_center(date_range)},
+    )

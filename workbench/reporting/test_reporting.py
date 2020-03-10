@@ -8,7 +8,7 @@ from freezegun import freeze_time
 
 from workbench import factories
 from workbench.reporting.accounting import send_accounting_files
-from workbench.reporting.labor_costs import labor_costs
+from workbench.reporting.labor_costs import labor_costs_by_cost_center
 from workbench.reporting.models import Accruals
 
 
@@ -50,13 +50,21 @@ class ReportingTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-        year = dt.date.today().year
-        lc = labor_costs([dt.date(year, 1, 1), dt.date(year, 12, 31)])
-
-        self.assertEqual(len(lc), 1)
-        self.assertAlmostEqual(lc[0]["costs"], Decimal("100"))
-        self.assertAlmostEqual(
-            lc[0]["costs_with_green_hours_target"], Decimal("133.3333333")
+        response = self.client.get(
+            "/report/labor-costs/?cost_center={}".format(
+                factories.CostCenterFactory.create().pk
+            )
         )
-        self.assertEqual(lc[0]["hours"], 2)
-        self.assertEqual(lc[0]["hours_with_rate_undefined"], 1)
+        self.assertEqual(response.status_code, 200)
+
+        year = dt.date.today().year
+        lc = labor_costs_by_cost_center([dt.date(year, 1, 1), dt.date(year, 12, 31)])
+        lcp = lc[0]["projects"]
+
+        self.assertEqual(len(lcp), 1)
+        self.assertAlmostEqual(lcp[0]["costs"], Decimal("100"))
+        self.assertAlmostEqual(
+            lcp[0]["costs_with_green_hours_target"], Decimal("133.3333333")
+        )
+        self.assertEqual(lcp[0]["hours"], 2)
+        self.assertEqual(lcp[0]["hours_with_rate_undefined"], 1)

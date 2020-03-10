@@ -4,7 +4,7 @@
 
 {% block size %}modal-xl{% endblock %}
 
-{% block title %}{% trans 'Labor costs for ' %} {{ stats.project }} {{ date_range.0|date:'F Y' }}{% endblock %}
+{% block title %}{% trans 'Labor costs' %} {{ date_range.0|date:'F Y' }}{% endblock %}
 
 {% block body %}
 <table class="table table-sm bg-light">
@@ -15,13 +15,13 @@
     <th class="text-right">{% trans 'costs' %}</th>
     <th class="text-right">{% trans 'costs with green hours target' %}</th>
   </tr>
-  {% for user, user_stats in by_user %}
+  {% for row in stats.by_user %}
     <tr>
-      <td title="{{ user.email }}">{{ user }}</td>
-      <td class="text-right">{{ user_stats.hours|hours }}</td>
-      <td class="text-right">{{ user_stats.hours_with_rate_undefined|hours }}</td>
-      <td class="text-right">{{ user_stats.costs|currency }}</td>
-      <td class="text-right">{{ user_stats.costs_with_green_hours_target|currency }}</td>
+      <td title="{{ row.user.email }}">{{ row.user }}</td>
+      <td class="text-right">{{ row.hours|hours }}</td>
+      <td class="text-right">{{ row.hours_with_rate_undefined|hours }}</td>
+      <td class="text-right">{{ row.costs|currency }}</td>
+      <td class="text-right">{{ row.costs_with_green_hours_target|currency }}</td>
     </tr>
   {% endfor %}
   <tr>

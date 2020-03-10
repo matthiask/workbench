@@ -27,18 +27,34 @@
       </tr>
     </thead>
     <tbody>
-    {% for row in labor_costs %}
-    <tr>
-      <td>
-        <a href="{% querystring project=row.project.id %}" data-toggle="ajaxmodal">
-          {{ row.project|h }}
-        </a>
-      </td>
-      <td class="text-right">{{ row.hours|hours }}</td>
-      <td class="text-right">{{ row.hours_with_rate_undefined|hours }}</td>
-      <td class="text-right">{{ row.costs|currency }}</td>
-      <td class="text-right">{{ row.costs_with_green_hours_target|currency }}</td>
-    </tr>
+    {% for cc_row in stats %}
+      <tr>
+        <th>
+          {% if cc_row.cost_center %}
+            <a href="{% querystring cost_center=cc_row.cost_center.id %}" data-toggle="ajaxmodal">
+              {{ cc_row.cost_center }}
+            </a>
+          {% else %}{% trans "No cost center defined" %}
+          {% endif %}
+        </th>
+        <th class="text-right">{{ cc_row.hours|hours }}</th>
+        <th class="text-right">{{ cc_row.hours_with_rate_undefined|hours }}</th>
+        <th class="text-right">{{ cc_row.costs|currency }}</th>
+        <th class="text-right">{{ cc_row.costs_with_green_hours_target|currency }}</th>
+      </tr>
+      {% for row in cc_row.projects %}
+        <tr>
+          <td>
+            <a href="{% querystring project=row.project.id %}" data-toggle="ajaxmodal">
+              {{ row.project|h }}
+            </a>
+          </td>
+          <td class="text-right">{{ row.hours|hours }}</td>
+          <td class="text-right">{{ row.hours_with_rate_undefined|hours }}</td>
+          <td class="text-right">{{ row.costs|currency }}</td>
+          <td class="text-right">{{ row.costs_with_green_hours_target|currency }}</td>
+        </tr>
+      {% endfor %}
     {% endfor %}
     </tbody>
   </table>

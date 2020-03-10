@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-10 08:52+0100\n"
+"POT-Creation-Date: 2020-03-10 21:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -91,7 +91,9 @@ msgstr "Arbeitszeitmodell"
 #: workbench/management/commands/profitability.py
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/reporting/accepted_deals.html
-#: workbench/templates/reporting/green_hours.html workbench/timer/models.py
+#: workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/labor_costs_by_user.html
+#: workbench/timer/models.py
 msgid "user"
 msgstr "Benutzer"
 
@@ -180,7 +182,7 @@ msgstr ""
 "in mehr als einem Jahr."
 
 #: workbench/awt/models.py workbench/deals/models.py
-#: workbench/services/models.py
+#: workbench/reporting/models.py workbench/services/models.py
 msgid "position"
 msgstr "Position"
 
@@ -478,7 +480,8 @@ msgstr "Die Postadresse müsste vermutlich mindestens drei Zeilen lang sein."
 #: workbench/contacts/models.py workbench/deals/models.py
 #: workbench/invoices/models.py workbench/logbook/forms.py
 #: workbench/offers/models.py workbench/projects/models.py
-#: workbench/services/models.py workbench/templates/offers/offer_pricing.html
+#: workbench/reporting/models.py workbench/services/models.py
+#: workbench/templates/offers/offer_pricing.html
 msgid "title"
 msgstr "Titel"
 
@@ -731,6 +734,7 @@ msgstr "Valuta"
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data_gross_profit.html
+#: workbench/templates/reporting/labor_costs_by_user.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
 #: workbench/tools/pdf.py workbench/tools/xlsx.py
 msgid "total"
@@ -1507,6 +1511,7 @@ msgstr "Stundensatz"
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_list.html
 #: workbench/templates/reporting/labor_costs.html
+#: workbench/templates/reporting/labor_costs_by_user.html
 #: workbench/templates/start.html
 msgid "hours"
 msgstr "Stunden"
@@ -1838,6 +1843,10 @@ msgid "Set this if you want all services to have the same hourly rate."
 msgstr ""
 "Setze dies, falls alle Leistungen den gleichen Stundensatz haben sollen."
 
+#: workbench/projects/models.py workbench/reporting/models.py
+msgid "cost center"
+msgstr "Kostenstelle"
+
 #: workbench/projects/models.py
 msgid "Leave this empty if you do not want to close the project yet."
 msgstr "Bitte leer lassen, falls Du das Projekt noch nicht schliessen willst."
@@ -1886,6 +1895,10 @@ msgstr "Stichtag"
 #: workbench/reporting/models.py workbench/templates/reporting/key_data.html
 msgid "accruals"
 msgstr "Abgrenzungen"
+
+#: workbench/reporting/models.py
+msgid "cost centers"
+msgstr "Kostenstellen"
 
 #: workbench/reporting/utils.py workbench/templates/start.html
 #: workbench/templates/timestamps.html
@@ -2295,14 +2308,14 @@ msgstr "Löschen"
 msgid "continue"
 msgstr "Weiter"
 
-#: workbench/templates/history.html workbench/templates/history_modal.html
-#: workbench/templates/reporting/deal_history.html
-msgid "No history found"
-msgstr "Keine Geschichte gefunden"
-
 #: workbench/templates/history_modal.html workbench/templatetags/workbench.py
 msgid "History"
 msgstr "Geschichte"
+
+#: workbench/templates/history_modal.html
+#: workbench/templates/reporting/deal_history.html
+msgid "No history found"
+msgstr "Keine Geschichte gefunden"
 
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
@@ -2557,16 +2570,27 @@ msgid "date"
 msgstr "Datum"
 
 #: workbench/templates/reporting/labor_costs.html
+#: workbench/templates/reporting/labor_costs_by_user.html
 msgid "hours with rate undefined"
 msgstr "Stunden ohne Satz"
 
 #: workbench/templates/reporting/labor_costs.html
+#: workbench/templates/reporting/labor_costs_by_user.html
 msgid "costs"
 msgstr "Kosten"
 
 #: workbench/templates/reporting/labor_costs.html
+#: workbench/templates/reporting/labor_costs_by_user.html
 msgid "costs with green hours target"
 msgstr "Kosten unter Einbezug des Grüne Stunden-Zielwerts"
+
+#: workbench/templates/reporting/labor_costs.html
+msgid "No cost center defined"
+msgstr "Keine Kostenstelle definiert"
+
+#: workbench/templates/reporting/labor_costs_by_user.html
+msgid "Labor costs"
+msgstr "Personalaufwand"
 
 #: workbench/templates/reporting/project_budget_statistics.html
 #: workbench/tools/xlsx.py
