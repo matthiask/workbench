@@ -22,7 +22,7 @@ file on the production server)::
 Local setup::
 
     fab setup
-    fab pull_database:fh
+    fab pull_db:fh
 
 Development::
 

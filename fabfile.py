@@ -80,7 +80,7 @@ def deploy_code():
 
 
 @task
-def pull_database(namespace):
+def pull_db(namespace):
     remote = {"fh": "workbench", "dbpag": "dbpag-workbench", "bf": "bf-workbench"}[
         namespace
     ]
@@ -89,6 +89,17 @@ def pull_database(namespace):
     local(
         'ssh -C root@workbench.feinheit.ch "sudo -u postgres pg_dump -Ox %s"'
         " | psql workbench" % remote
+    )
+
+
+@task
+def dump_db(namespace):
+    remote = {"fh": "workbench", "dbpag": "dbpag-workbench", "bf": "bf-workbench"}[
+        namespace
+    ]
+    local(
+        'ssh -C root@workbench.feinheit.ch "sudo -u postgres pg_dump -Ox %s"'
+        " > tmp/%s.sql" % (remote, remote)
     )
 
 
