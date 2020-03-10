@@ -1,4 +1,3 @@
-import re
 from collections import namedtuple
 from functools import lru_cache
 
@@ -106,16 +105,10 @@ def changes(model, fields, actions):
     if not actions:
         return changes
 
-    users = {str(u.pk): u.get_full_name() for u in User.objects.all()}
-    for action in actions:
-        match = re.search(r"^user-([0-9]+)-", action.user_name)
-        if match:
-            pk = match.groups()[0]
-            action.pretty_user_name = users.get(pk) or action.user_name
-        else:
-            action.pretty_user_name = action.user_name
+    users = {u.pk: u.get_full_name() for u in User.objects.all()}
 
     for action in actions:
+        action.pretty_user_name = users.get(action.user_id) or action.user_name
         if action.action == "I":
             values = action.row_data
             version_changes = [

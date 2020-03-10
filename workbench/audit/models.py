@@ -1,6 +1,9 @@
+import re
+
 from django.contrib.postgres.fields import HStoreField
 from django.db import models
 from django.db.models import Q
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 
@@ -50,3 +53,8 @@ class LoggedAction(models.Model):
             getattr(self, "pretty_user_name", self.user_name),
             self.created_at,
         )
+
+    @cached_property
+    def user_id(self):
+        match = re.search(r"^user-([0-9]+)-", self.user_name)
+        return int(match.groups()[0]) if match else None

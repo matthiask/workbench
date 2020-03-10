@@ -3,7 +3,9 @@ from collections import defaultdict
 
 from django.db.models import Prefetch
 
+from workbench.audit.models import LoggedAction
 from workbench.deals.models import Deal, Value, ValueType
+from workbench.tools.history import EVERYTHING, changes
 from workbench.tools.models import Z
 
 
@@ -95,6 +97,34 @@ def declined_deals(date_range, *, users=None):
         .order_by("-closed_on")
     )
     return queryset
+
+
+def deal_history(date_range, *, users=None):
+    fields = [
+        f
+        for f in Deal._meta.get_fields()
+        if f.name
+        in {
+            "id",
+            "title",
+            "value",
+            "probability",
+            "decision_expected_on",
+            "status",
+            "closing_type",
+            "closing_notice",
+        }
+    ]
+
+    actions = LoggedAction.objects.for_model(Deal).filter(
+        created_at__range=[date_range[0], date_range[1] + dt.timedelta(days=1)]
+    )
+    user_ids = EVERYTHING if users is None else {user.id for user in users} | {None}
+    return [
+        change
+        for change in changes(Deal, fields, actions)
+        if change.version.user_id in user_ids
+    ]
 
 
 def test():  # pragma: no cover

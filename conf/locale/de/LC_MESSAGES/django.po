@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-09 16:04+0100\n"
+"POT-Creation-Date: 2020-03-10 08:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2181,6 +2181,11 @@ msgstr "Gewonnene Geschäfte"
 msgid "Declined deals"
 msgstr "Verlorene Geschäfte"
 
+#: workbench/templates/base.html
+#: workbench/templates/reporting/deal_history.html
+msgid "Deal history"
+msgstr "Geschichte der Geschäfte"
+
 #: workbench/templates/base.html workbench/templates/reporting/labor_costs.html
 msgid "labor costs"
 msgstr "Personalaufwand"
@@ -2290,13 +2295,14 @@ msgstr "Löschen"
 msgid "continue"
 msgstr "Weiter"
 
+#: workbench/templates/history.html workbench/templates/history_modal.html
+#: workbench/templates/reporting/deal_history.html
+msgid "No history found"
+msgstr "Keine Geschichte gefunden"
+
 #: workbench/templates/history_modal.html workbench/templatetags/workbench.py
 msgid "History"
 msgstr "Geschichte"
-
-#: workbench/templates/history_modal.html
-msgid "No history found"
-msgstr "Keine Geschichte gefunden"
 
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
@@ -2422,6 +2428,7 @@ msgstr "Offerten-PDF"
 
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/accepted_deals.html
+#: workbench/templates/reporting/deal_history.html
 #: workbench/templates/reporting/declined_deals.html
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/hours_by_circle.html

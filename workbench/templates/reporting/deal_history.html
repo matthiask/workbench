@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% load fineforms i18n workbench %}
+
+{% block title %}{% trans 'Deal history' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-10 col-lg-8">
+  <h1>{% trans 'Deal history' %}</h1>
+
+  <form method="get" class="mb-3">
+    {% ff_fields form %}
+    {% ff_submit _('Show') %}
+  </form>
+
+  {% for change in stats reversed %}
+    <h4>
+      <a href="{% url 'history' change.version.table_name 'id' change.version.row_data.id %}" data-toggle="ajaxmodal">
+        {{ change.version.get_action_display }} {{ change.version.table_name }} {{ change.version.row_data.id }}</a>
+      / {{ change.version.pretty_user_name|default:'🧙' }} / {{ change.version.created_at|local_date_format }}
+    </h4>
+    <ul>
+      {% for pretty in change.changes %}
+        <li>{{ pretty }}</li>
+      {% endfor %}
+    </ul>
+  {% empty %}
+    <h4>{% trans 'No history found' %}</h4>
+  {% endfor %}
+
+</div>
+</div>
+{% endblock %}
