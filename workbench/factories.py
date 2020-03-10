@@ -14,6 +14,7 @@ from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
+from workbench.reporting.models import CostCenter
 from workbench.services.models import ServiceType
 
 
@@ -266,3 +267,11 @@ class DealFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Deal
+
+
+# REPORTING ###################################################################
+class CostCenterFactory(factory.DjangoModelFactory):
+    title = "Anything"
+
+    class Meta:
+        model = CostCenter

@@ -236,6 +236,13 @@ class HistoryTest(TestCase):
         url = "/history/deals_valuetype/id/{}/".format(type.pk)
         self.assert_404_without_feature(url, feature="deals")
 
+    def test_costcenter_visibility(self):
+        self.client.force_login(factories.UserFactory.create())
+        url = "/history/reporting_costcenter/id/{}/".format(
+            factories.CostCenterFactory.create().pk
+        )
+        self.assert_404_without_feature(url, feature="labor_costs")
+
     def test_everything(self):
         self.assertIn(object(), EVERYTHING)
         self.assertIn("blub", EVERYTHING)
