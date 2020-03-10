@@ -44,8 +44,9 @@ class LoggedAction(models.Model):
         verbose_name_plural = _("logged actions")
 
     def __str__(self):
-        return "%s %s at %s" % (
+        return "%s %s by %s at %s" % (
             self.get_action_display(),
             self.table_name,
+            getattr(self, "pretty_user_name", self.user_name),
             self.created_at,
         )
