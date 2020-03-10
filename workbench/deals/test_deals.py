@@ -373,3 +373,6 @@ class DealsTest(TestCase):
 
         response = self.client.get("/report/declined-deals/")
         self.assertContains(response, "Declined deals")
+
+        response = self.client.get("/report/deal-history/")
+        self.assertContains(response, "Deal history")

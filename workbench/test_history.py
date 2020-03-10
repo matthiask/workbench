@@ -8,7 +8,7 @@ from workbench.accounts.features import FEATURES
 from workbench.accounts.middleware import set_user_name
 from workbench.audit.models import LoggedAction
 from workbench.projects.models import Project
-from workbench.tools.history import Formatter
+from workbench.tools.history import EVERYTHING, Formatter
 
 
 class HistoryTest(TestCase):
@@ -235,3 +235,7 @@ class HistoryTest(TestCase):
         type = factories.ValueTypeFactory.create()
         url = "/history/deals_valuetype/id/{}/".format(type.pk)
         self.assert_404_without_feature(url, feature="deals")
+
+    def test_everything(self):
+        self.assertIn(object(), EVERYTHING)
+        self.assertIn("blub", EVERYTHING)
