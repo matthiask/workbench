@@ -103,6 +103,13 @@ def dump_db(namespace):
     )
 
 
+@task
+def load_db(path):
+    local("dropdb --if-exists workbench")
+    local("createdb workbench")
+    local("psql workbench < %s" % path)
+
+
 @task(alias="mm")
 def makemessages():
     local(
