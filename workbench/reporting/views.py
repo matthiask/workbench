@@ -345,14 +345,23 @@ def labor_costs_view(request):
     except Exception:
         year = dt.date.today().year
 
-    return render(
-        request,
-        "reporting/labor_costs.html",
-        {
-            "labor_costs": sorted(
-                labor_costs.labor_costs([dt.date(year, 1, 1), dt.date(year, 12, 31)]),
-                key=lambda row: row["costs"],
-                reverse=True,
-            ),
-        },
-    )
+    lc = labor_costs.labor_costs([dt.date(year, 1, 1), dt.date(year, 12, 31)])
+
+    if request.GET.get("project"):
+        stats = [row for row in lc if str(row["project"].id) == request.GET["project"]][
+            0
+        ]
+        return render(
+            request,
+            "reporting/labor_costs_project.html",
+            {
+                "stats": stats,
+                "by_user": sorted(
+                    stats["by_user"].items(),
+                    key=lambda row: row[1]["costs"],
+                    reverse=True,
+                ),
+            },
+        )
+
+    return render(request, "reporting/labor_costs.html", {"labor_costs": lc})

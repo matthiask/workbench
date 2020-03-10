@@ -29,7 +29,11 @@
     <tbody>
     {% for row in labor_costs %}
     <tr>
-      <th>{% link_or_none row.project %}</th>
+      <td>
+        <a href="{% querystring project=row.project.id %}" data-toggle="ajaxmodal">
+          {{ row.project|h }}
+        </a>
+      </td>
       <td class="text-right">{{ row.hours|hours }}</td>
       <td class="text-right">{{ row.hours_with_rate_undefined|hours }}</td>
       <td class="text-right">{{ row.costs|currency }}</td>

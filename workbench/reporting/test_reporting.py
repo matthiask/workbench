@@ -45,6 +45,11 @@ class ReportingTest(TestCase):
         response = self.client.get("/report/labor-costs/")
         self.assertEqual(response.status_code, 200)
 
+        response = self.client.get(
+            "/report/labor-costs/?project={}".format(service.project_id)
+        )
+        self.assertEqual(response.status_code, 200)
+
         year = dt.date.today().year
         lc = labor_costs([dt.date(year, 1, 1), dt.date(year, 12, 31)])
 

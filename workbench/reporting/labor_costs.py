@@ -33,7 +33,12 @@ def labor_costs(date_range):
             "costs": Z,
             "costs_with_green_hours_target": Z,
             "by_user": defaultdict(
-                lambda: {"hours": Z, "costs": Z, "costs_with_green_hours_target": Z}
+                lambda: {
+                    "hours": Z,
+                    "hours_with_rate_undefined": Z,
+                    "costs": Z,
+                    "costs_with_green_hours_target": Z,
+                }
             ),
         }
     )
@@ -54,6 +59,8 @@ def labor_costs(date_range):
 
             if hlc is None:
                 project["hours_with_rate_undefined"] += hours
+                by_user["hours_with_rate_undefined"] += hours
+
             else:
                 costs = hours * hlc
                 costs_with_ght = hours * hlc * 100 / ght
@@ -64,12 +71,16 @@ def labor_costs(date_range):
                 by_user["costs"] += costs
                 by_user["costs_with_green_hours_target"] += costs_with_ght
 
-    return [
-        {"project": project, **projects[project.id]}
-        for project in Project.objects.filter(id__in=projects.keys()).select_related(
-            "owned_by"
-        )
-    ]
+    return sorted(
+        [
+            {"project": project, **projects[project.id]}
+            for project in Project.objects.filter(
+                id__in=projects.keys()
+            ).select_related("owned_by")
+        ],
+        key=lambda row: row["costs"],
+        reverse=True,
+    )
 
 
 def test():  # pragma: no cover
