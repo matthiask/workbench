@@ -1,10 +1,10 @@
-def substitute_with(to_delete, instance):
+def substitute_with(*, to_delete, keep):
     """
     Substitute the first argument with the second in all relations,
     and delete the first argument afterwards.
     """
-    assert to_delete.__class__ == instance.__class__
-    assert to_delete.pk != instance.pk
+    assert to_delete.__class__ == keep.__class__
+    assert to_delete.pk != keep.pk
 
     fields = [
         f
@@ -17,5 +17,5 @@ def substitute_with(to_delete, instance):
             {related_object.field.name: to_delete.pk}
         )
 
-        queryset.update(**{related_object.field.name: instance.pk})
+        queryset.update(**{related_object.field.name: keep.pk})
     to_delete.delete()

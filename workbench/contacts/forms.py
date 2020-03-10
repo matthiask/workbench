@@ -113,7 +113,7 @@ class OrganizationDeleteForm(ModelForm):
     def delete(self):
         if "substitute_with" in self.fields:
             substitute_with(
-                to_delete=self.instance, instance=self.cleaned_data["substitute_with"]
+                to_delete=self.instance, keep=self.cleaned_data["substitute_with"]
             )
         else:
             self.instance.delete()
