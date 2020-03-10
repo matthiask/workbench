@@ -9,7 +9,7 @@
 {% block body %}
 <table class="table table-sm bg-light">
   <tr>
-    <th>{% trans 'invoice'|capfirst %}</th>
+    <th>{% trans 'user'|capfirst %}</th>
     <th class="text-right">{% trans 'hours' %}</th>
     <th class="text-right">{% trans 'hours with rate undefined' %}</th>
     <th class="text-right">{% trans 'costs' %}</th>
@@ -17,12 +17,19 @@
   </tr>
   {% for user, user_stats in by_user %}
     <tr>
-      <td>{{ user }}</td>
+      <td title="{{ user.email }}">{{ user }}</td>
       <td class="text-right">{{ user_stats.hours|hours }}</td>
       <td class="text-right">{{ user_stats.hours_with_rate_undefined|hours }}</td>
       <td class="text-right">{{ user_stats.costs|currency }}</td>
       <td class="text-right">{{ user_stats.costs_with_green_hours_target|currency }}</td>
     </tr>
   {% endfor %}
+  <tr>
+    <th>{% trans 'total'|capfirst %}</th>
+    <th class="text-right">{{ stats.hours|hours }}</th>
+    <th class="text-right">{{ stats.hours_with_rate_undefined|hours }}</th>
+    <th class="text-right">{{ stats.costs|currency }}</th>
+    <th class="text-right">{{ stats.costs_with_green_hours_target|currency }}</th>
+  </tr>
 </table>
 {% endblock %}
