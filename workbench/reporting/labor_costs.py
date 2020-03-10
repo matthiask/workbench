@@ -52,8 +52,6 @@ def _labor_costs_by_project_id(date_range, *, where=[], params=[]):
         }
     )
 
-    users = {u.id: u for u in User.objects.all()}
-
     with connections["default"].cursor() as cursor:
         where.append("lh.rendered_on >= %s and lh.rendered_on <= %s")
         params.extend(date_range)
@@ -63,7 +61,7 @@ def _labor_costs_by_project_id(date_range, *, where=[], params=[]):
             project = projects[project_id]
             project["hours"] += hours
 
-            by_user = project["by_user"][users.get(rendered_by_id, rendered_by_id)]
+            by_user = project["by_user"][rendered_by_id]
             by_user["hours"] += hours
 
             if hlc is None:
@@ -120,8 +118,10 @@ def labor_costs_by_user(date_range, *, project=None, cost_center=None):
     else:
         projects = _labor_costs_by_project_id(date_range)
 
-    users = sorted(
-        set(chain.from_iterable(row["by_user"].keys() for row in projects.values()))
+    users = User.objects.filter(
+        id__in=set(
+            chain.from_iterable(row["by_user"].keys() for row in projects.values())
+        )
     )
     by_user = defaultdict(lambda: dict.fromkeys(KEYS, Z))
     overall = dict.fromkeys(KEYS, Z)
