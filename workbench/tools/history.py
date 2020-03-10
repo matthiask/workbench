@@ -43,6 +43,10 @@ def default_if_none(value, default):
 
 
 class Formatter:
+    def __init__(self):
+        self._flatchoices = {}
+        self._prettified_instances = {}
+
     def format_bool(self, value):
         if value in {True, "t"}:
             return _("yes")
@@ -58,31 +62,47 @@ class Formatter:
         dt = dateparse.parse_datetime(value) or dateparse.parse_date(value)
         return local_date_format(dt) if dt else value
 
+    def format_choice(self, field, value):
+        if field not in self._flatchoices:
+            self._flatchoices[field] = {
+                str(key): value for key, value in field.flatchoices
+            }
+        return default_if_none(
+            self._flatchoices[field].get(value, value), _("<no value>")
+        )
+
+    def format_related_model(self, field, value):
+        if value is None:
+            return _("<no value>")
+
+        model = field.related_model
+        key = (model, value)
+        if key in self._prettified_instances:
+            return self._prettified_instances[key]
+
+        queryset = model._default_manager.all()
+
+        try:
+            pretty = str(queryset.get(pk=value))
+        except model.DoesNotExist:
+            pretty = _("Deleted %s instance") % model._meta.verbose_name
+
+        if model in HISTORY:
+            pretty = format_html(
+                '<a href="{}" data-toggle="ajaxmodal">{}</a>',
+                reverse("history", args=(model._meta.db_table, "id", value)),
+                pretty,
+            )
+
+        self._prettified_instances[key] = pretty
+        return pretty
+
     def format(self, field, value):
         if field.choices:
-            choices = {str(key): value for key, value in field.flatchoices}
-            return default_if_none(choices.get(value, value), _("<no value>"))
+            return self.format_choice(field, value)
 
         if field.related_model:
-            model = field.related_model
-            queryset = model._default_manager.all()
-
-            if value is None:
-                return _("<no value>")
-
-            try:
-                pretty = str(queryset.get(pk=value))
-            except model.DoesNotExist:
-                pretty = _("Deleted %s instance") % model._meta.verbose_name
-
-            if model in HISTORY:
-                return format_html(
-                    '<a href="{}" data-toggle="ajaxmodal">{}</a>',
-                    reverse("history", args=(model._meta.db_table, "id", value)),
-                    pretty,
-                )
-            else:
-                return pretty
+            return self.format_related_model(field, value)
 
         if isinstance(field, (models.BooleanField, models.NullBooleanField)):
             return self.format_bool(value)

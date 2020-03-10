@@ -8,7 +8,7 @@ from workbench.accounts.features import FEATURES
 from workbench.accounts.middleware import set_user_name
 from workbench.audit.models import LoggedAction
 from workbench.projects.models import Project
-from workbench.tools import history
+from workbench.tools.history import Formatter
 
 
 class HistoryTest(TestCase):
@@ -135,10 +135,11 @@ class HistoryTest(TestCase):
 
     def test_formatter_details(self):
         # Do not crash when encountering invalid values.
-        self.assertEqual(history.boolean_formatter("stuff"), "stuff")
-        self.assertEqual(history.date_formatter("stuff"), "stuff")
-        self.assertEqual(history.boolean_formatter(None), "<no value>")
-        self.assertEqual(history.date_formatter(None), "<no value>")
+        formatter = Formatter()
+        self.assertEqual(formatter.format_bool("stuff"), "stuff")
+        self.assertEqual(formatter.format_date("stuff"), "stuff")
+        self.assertEqual(formatter.format_bool(None), "<no value>")
+        self.assertEqual(formatter.format_date(None), "<no value>")
 
     def test_404(self):
         self.client.force_login(factories.UserFactory.create())
