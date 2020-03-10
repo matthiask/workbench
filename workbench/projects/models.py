@@ -112,6 +112,15 @@ class Project(Model):
     _code = models.IntegerField(_("code"))
     _fts = models.TextField(editable=False, blank=True)
 
+    cost_center = models.ForeignKey(
+        "reporting.CostCenter",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_("cost center"),
+        related_name="projects",
+    )
+
     objects = ProjectQuerySet.as_manager()
 
     class Meta:

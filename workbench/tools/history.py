@@ -29,6 +29,7 @@ from workbench.invoices.models import (
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service as ProjectService
+from workbench.reporting.models import CostCenter
 from workbench.tools.formats import local_date_format
 
 
@@ -371,6 +372,8 @@ def _projects_project_cfg(user):
     if user.features[FEATURES.CONTROLLING]:
         related = [(Offer, "project_id"), (ProjectService, "project_id")]
         fields |= {"flat_rate"}
+    if user.features[FEATURES.LABOR_COSTS]:
+        fields |= {"cost_center"}
     return {"fields": fields, "related": related}
 
 
@@ -397,6 +400,12 @@ def _projects_service_cfg(user):
     if user.features[FEATURES.GLASSFROG]:
         fields |= {"role"}
     return {"fields": fields}
+
+
+def _reporting_costcenter_cfg(user):
+    if not user.features[FEATURES.LABOR_COSTS]:
+        raise Http404
+    return {"fields": {"title"}}
 
 
 WITH_TOTAL = {
@@ -502,4 +511,5 @@ HISTORY = {
     Offer: _offers_offer_cfg,
     Project: _projects_project_cfg,
     ProjectService: _projects_service_cfg,
+    CostCenter: _reporting_costcenter_cfg,
 }

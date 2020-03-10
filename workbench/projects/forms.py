@@ -104,6 +104,7 @@ class ProjectForm(ModelForm):
             "customer",
             "title",
             "description",
+            "cost_center",
             "owned_by",
             "type",
             "flat_rate",
@@ -143,6 +144,8 @@ class ProjectForm(ModelForm):
         self.fields["type"].choices = Project.TYPE_CHOICES
         if not self.request.user.features[FEATURES.CONTROLLING]:
             self.fields.pop("flat_rate")
+        if not self.request.user.features[FEATURES.LABOR_COSTS]:
+            self.fields.pop("cost_center")
         if not self.instance.pk:
             self.fields.pop("closed_on")
 

@@ -33,3 +33,16 @@ class Accruals(models.Model):
 
     def __str__(self):
         return local_date_format(self.cutoff_date)
+
+
+class CostCenter(models.Model):
+    title = models.CharField(_("title"), max_length=200)
+    position = models.PositiveIntegerField(_("position"), default=0)
+
+    class Meta:
+        ordering = ("position", "id")
+        verbose_name = _("cost center")
+        verbose_name_plural = _("cost centers")
+
+    def __str__(self):
+        return self.title
