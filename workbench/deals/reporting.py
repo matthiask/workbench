@@ -2,6 +2,7 @@ import datetime as dt
 from collections import defaultdict
 
 from django.db.models import Prefetch
+from django.utils import timezone
 
 from workbench.audit.models import LoggedAction
 from workbench.deals.models import Deal, Value, ValueType
@@ -117,7 +118,10 @@ def deal_history(date_range, *, users=None):
     ]
 
     actions = LoggedAction.objects.for_model(Deal).filter(
-        created_at__range=[date_range[0], date_range[1] + dt.timedelta(days=1)]
+        created_at__range=[
+            timezone.make_aware(dt.datetime.combine(day, time))
+            for day, time in zip(date_range, [dt.time.min, dt.time.max])
+        ]
     )
     user_ids = EVERYTHING if users is None else {user.id for user in users} | {None}
     return [
