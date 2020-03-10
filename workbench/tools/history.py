@@ -1,5 +1,4 @@
 from collections import namedtuple
-from functools import lru_cache
 
 from django.db import models
 from django.http import Http404
@@ -33,44 +32,41 @@ from workbench.projects.models import Project, Service as ProjectService
 from workbench.tools.formats import local_date_format
 
 
+# This is an object which __contains__ everything
+EVERYTHING = type(str("c"), (), {"__contains__": lambda *a: True})()
+
 Change = namedtuple("Change", "changes version")
-
-
-def boolean_formatter(value):
-    if value in {True, "t"}:
-        return _("yes")
-    elif value in {False, "f"}:
-        return _("no")
-    elif value is None:
-        return _("<no value>")
-    return value
 
 
 def default_if_none(value, default):
     return default if value is None else value
 
 
-def date_formatter(value):
-    if value is None:
-        return _("<no value>")
-    dt = dateparse.parse_datetime(value) or dateparse.parse_date(value)
-    return local_date_format(dt) if dt else value
+class Formatter:
+    def format_bool(self, value):
+        if value in {True, "t"}:
+            return _("yes")
+        elif value in {False, "f"}:
+            return _("no")
+        elif value is None:
+            return _("<no value>")
+        return value
 
+    def format_date(self, value):
+        if value is None:
+            return _("<no value>")
+        dt = dateparse.parse_datetime(value) or dateparse.parse_date(value)
+        return local_date_format(dt) if dt else value
 
-@lru_cache()
-def formatter(field):
-    """
-    Returns a formatter for the passed model field instance
-    """
-    if field.choices:
-        choices = {str(key): value for key, value in field.flatchoices}
-        return lambda value: default_if_none(choices.get(value, value), "<empty>")
+    def format(self, field, value):
+        if field.choices:
+            choices = {str(key): value for key, value in field.flatchoices}
+            return default_if_none(choices.get(value, value), _("<no value>"))
 
-    if field.related_model:
-        model = field.related_model
-        queryset = model._default_manager.all()
+        if field.related_model:
+            model = field.related_model
+            queryset = model._default_manager.all()
 
-        def _fn(value):
             if value is None:
                 return _("<no value>")
 
@@ -88,15 +84,15 @@ def formatter(field):
             else:
                 return pretty
 
-        return _fn
+        if isinstance(field, (models.BooleanField, models.NullBooleanField)):
+            return self.format_bool(value)
 
-    if isinstance(field, (models.BooleanField, models.NullBooleanField)):
-        return boolean_formatter
+        if isinstance(field, models.DateField):
+            return self.format_date(value)
 
-    if isinstance(field, models.DateField):
-        return date_formatter
+        return default_if_none(value, _("<no value>"))
 
-    return lambda value: default_if_none(value, _("<no value>"))
+    __call__ = format
 
 
 def changes(model, fields, actions):
@@ -106,6 +102,7 @@ def changes(model, fields, actions):
         return changes
 
     users = {u.pk: u.get_full_name() for u in User.objects.all()}
+    formatter = Formatter()
 
     for action in actions:
         action.pretty_user_name = users.get(action.user_id) or action.user_name
@@ -117,7 +114,7 @@ def changes(model, fields, actions):
                     % {
                         "field": conditional_escape(capfirst(f.verbose_name)),
                         "current": conditional_escape(
-                            formatter(f)(values.get(f.attname))
+                            formatter(f, values.get(f.attname))
                         ),
                     }
                 )
@@ -133,7 +130,7 @@ def changes(model, fields, actions):
                     % {
                         "field": conditional_escape(capfirst(f.verbose_name)),
                         "current": conditional_escape(
-                            formatter(f)(values.get(f.attname))
+                            formatter(f, values.get(f.attname))
                         ),
                     }
                 )
@@ -149,7 +146,7 @@ def changes(model, fields, actions):
                     % {
                         "field": conditional_escape(capfirst(f.verbose_name)),
                         "current": conditional_escape(
-                            formatter(f)(values.get(f.attname))
+                            formatter(f, values.get(f.attname))
                         ),
                     }
                 )
