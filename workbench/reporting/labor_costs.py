@@ -130,7 +130,7 @@ def labor_costs_by_user(date_range, *, project=None, cost_center=None):
         for key in KEYS:
             overall[key] += row[key]
             for user in users:
-                by_user[user][key] += row["by_user"][user][key]
+                by_user[user][key] += row["by_user"][user.id][key]
 
     return {"by_user": [{"user": user, **by_user[user]} for user in users], **overall}
 
