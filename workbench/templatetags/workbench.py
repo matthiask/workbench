@@ -265,3 +265,9 @@ def has_feature(user, feature):
 @register.filter
 def label(instance, field):
     return capfirst(instance._meta.get_field(field).verbose_name)
+
+
+@register.filter
+def addf(a, b):
+    """Add values without converting them to integers (as |add seems to do)"""
+    return a + b

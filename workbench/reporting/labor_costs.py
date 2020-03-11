@@ -10,7 +10,7 @@ from workbench.projects.models import Project
 from workbench.tools.models import Z
 
 
-SQL = """
+LABOR_COSTS_SQL = """
 select
     p.id,
     hourly_labor_costs,
@@ -28,13 +28,32 @@ where %s
 group by p.id, hourly_labor_costs, green_hours_target, lh.rendered_by_id
 """
 
+REVENUE_SQL = """
+with sq as (
+    select
+        p.id,
+        greatest(hourly_labor_costs, coalesce(ps.effort_rate)) as min_effort_rate,
+        sum(lh.hours) as hours
+    from logbook_loggedhours lh
+    left join projects_service ps on lh.service_id=ps.id
+    left join projects_project p on ps.project_id=p.id
+    left outer join lateral (select * from awt_employment) as costs on
+    lh.rendered_by_id=costs.user_id
+    and lh.rendered_on >= costs.date_from
+    and lh.rendered_on <= costs.date_until
+    where %s
+    group by p.id, min_effort_rate
+)
+select id, sum(min_effort_rate * hours) from sq group by id
+"""
+
 USER_KEYS = [
     "hours",
     "hours_with_rate_undefined",
     "costs",
     "costs_with_green_hours_target",
 ]
-PROJECT_KEYS = USER_KEYS + ["third_party_costs"]
+PROJECT_KEYS = USER_KEYS + ["third_party_costs", "revenue"]
 
 
 def _labor_costs_by_project_id(date_range, *, project=None, cost_center=None):
@@ -45,6 +64,7 @@ def _labor_costs_by_project_id(date_range, *, project=None, cost_center=None):
             "costs": Z,
             "costs_with_green_hours_target": Z,
             "third_party_costs": Z,
+            "revenue": Z,
             "by_user": defaultdict(
                 lambda: {
                     "hours": Z,
@@ -56,26 +76,22 @@ def _labor_costs_by_project_id(date_range, *, project=None, cost_center=None):
         }
     )
 
-    logged_costs = LoggedCost.objects.order_by().filter(
-        rendered_on__range=date_range, third_party_costs__isnull=False
-    )
+    logged_costs = LoggedCost.objects.order_by().filter(rendered_on__range=date_range)
+
+    where = ["lh.rendered_on >= %s and lh.rendered_on <= %s"]
+    params = date_range[:]
+
+    if project is not None:
+        where.append("p.id=%s")
+        params.append(project)
+        logged_costs = logged_costs.filter(service__project=project)
+    if cost_center is not None:
+        where.append("p.cost_center_id=%s")
+        params.append(cost_center)
+        logged_costs = logged_costs.filter(service__project__cost_center=cost_center)
 
     with connections["default"].cursor() as cursor:
-        where = ["lh.rendered_on >= %s and lh.rendered_on <= %s"]
-        params = date_range[:]
-
-        if project is not None:
-            where.append("p.id=%s")
-            params.append(project)
-            logged_costs = logged_costs.filter(service__project=project)
-        if cost_center is not None:
-            where.append("p.cost_center_id=%s")
-            params.append(cost_center)
-            logged_costs = logged_costs.filter(
-                service__project__cost_center=cost_center
-            )
-
-        cursor.execute(SQL % " and ".join(where), params)
+        cursor.execute(LABOR_COSTS_SQL % " and ".join(where), params)
 
         for project_id, hlc, ght, rendered_by_id, hours in cursor:
             project = projects[project_id]
@@ -98,11 +114,21 @@ def _labor_costs_by_project_id(date_range, *, project=None, cost_center=None):
                 by_user["costs"] += costs
                 by_user["costs_with_green_hours_target"] += costs_with_ght
 
-    for row in logged_costs.values("service__project").annotate(
-        cost=Sum("third_party_costs")
+    with connections["default"].cursor() as cursor:
+        cursor.execute(REVENUE_SQL % " and ".join(where), params)
+
+        for project_id, revenue in cursor:
+            projects[project_id]["revenue"] += revenue
+
+    for row in (
+        logged_costs.filter(third_party_costs__isnull=False)
+        .values("service__project")
+        .annotate(cost=Sum("third_party_costs"))
     ):
-        project = projects[row["service__project"]]
-        project["third_party_costs"] += row["cost"]
+        projects[row["service__project"]]["third_party_costs"] += row["cost"]
+
+    for row in logged_costs.values("service__project").annotate(cost=Sum("cost")):
+        projects[row["service__project"]]["revenue"] += row["cost"]
 
     return projects
 
@@ -161,5 +187,5 @@ def test():  # pragma: no cover
     from pprint import pprint
     import datetime as dt
 
-    # pprint(labor_costs_by_cost_center([dt.date(2019, 1, 1), dt.date.today()]))
-    pprint(labor_costs_by_user([dt.date(2020, 1, 1), dt.date.today()], cost_center=1))
+    pprint(labor_costs_by_cost_center([dt.date(2019, 1, 1), dt.date.today()]))
+    # pprint(labor_costs_by_user([dt.date(2020, 1, 1), dt.date.today()], cost_center=1))
