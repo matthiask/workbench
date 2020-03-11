@@ -11,9 +11,9 @@
   <tr>
     <th>{% trans 'user'|capfirst %}</th>
     <th class="text-right">{% trans 'hours'|capfirst %}</th>
-    <th class="text-right">{% trans 'Hours with rate undefined' %}</th>
-    <th class="text-right">{% trans 'costs'|capfirst %}</th>
-    <th class="text-right">{% trans 'Costs with green hours target' %}</th>
+    <th class="text-right">{% trans 'Undefined rate' %}</th>
+    <th class="text-right">{% trans 'Net cost' %}</th>
+    <th class="text-right">{% trans 'Productivity costs' %}</th>
   </tr>
   {% for row in stats.by_user %}
     <tr>
