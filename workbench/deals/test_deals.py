@@ -379,7 +379,11 @@ class DealsTest(TestCase):
 
     def test_related_offers(self):
         deal = factories.DealFactory.create()
-        offer = factories.OfferFactory.create()
+        offer = factories.OfferFactory.create(
+            title="Test",
+            postal_address="Test\nTest street\nTest",
+            offered_on=dt.date.today(),
+        )
 
         self.client.force_login(deal.owned_by)
 
@@ -391,6 +395,23 @@ class DealsTest(TestCase):
 
         self.assertEqual(deal.related_offers.get(), offer)
 
+        # Accept the deal, and accept related offers while doing this
+        response = self.client.get(deal.urls["set_status"] + "?status=20")
+        self.assertContains(response, offer.code)
+
+        closing_type = factories.ClosingTypeFactory.create(represents_a_win=True)
+        response = self.client.post(
+            deal.urls["set_status"] + "?status=20",
+            {"closing_type": closing_type.pk, "related_offers": [offer.pk]},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
+
+        offer.refresh_from_db()
+        self.assertEqual(offer.status, offer.ACCEPTED)
+        self.assertTrue(offer.closed_on is not None)
+
+        # Remove offers
         response = self.client.post(deal.urls["remove_offer"], {"modal-offer": ""})
         self.assertRedirects(response, deal.urls["detail"])
 
