@@ -9,12 +9,12 @@ class ServiceAdmin(admin.ModelAdmin):
         "project",
         "offer",
         "title",
-        "description",
-        "position",
         "service_hours",
         "service_cost",
     )
+    list_select_related = ["project__owned_by", "offer__project", "offer__owned_by"]
     raw_id_fields = ["project", "offer"]
+    search_fields = ["project__title", "title", "description"]
 
 
 @admin.register(models.Project)
