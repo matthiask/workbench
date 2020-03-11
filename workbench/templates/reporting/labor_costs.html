@@ -7,7 +7,15 @@
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12 col-md-8">
-  <h1>{% trans 'Labor costs' %}</h1>
+  <h1>
+    {% trans 'Labor costs' %}
+    <small style="font-size:60%">
+      {% for year in years %}
+        <a {% if year == active_year %}class="active"{% endif %} href="{% querystring year=year %}">{{ year }}</a>
+        {% if not forloop.last %} / {% endif %}
+      {% endfor %}
+    </small>
+  </h1>
 
   {% comment %}
   <form method="get" class="mb-3">

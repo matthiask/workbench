@@ -374,8 +374,14 @@ def labor_costs_view(request):
             {"stats": labor_costs.labor_costs_by_user(date_range)},
         )
 
+    current_year = dt.date.today().year
+
     return render(
         request,
         "reporting/labor_costs.html",
-        {"stats": labor_costs.labor_costs_by_cost_center(date_range)},
+        {
+            "stats": labor_costs.labor_costs_by_cost_center(date_range),
+            "years": range(current_year, current_year - 4, -1),
+            "active_year": year,
+        },
     )

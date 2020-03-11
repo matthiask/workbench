@@ -34,7 +34,7 @@ KEYS = [
 ]
 
 
-def _labor_costs_by_project_id(date_range, *, where=[], params=[]):
+def _labor_costs_by_project_id(date_range, *, where=None, params=None):
     projects = defaultdict(
         lambda: {
             "hours": Z,
@@ -53,7 +53,9 @@ def _labor_costs_by_project_id(date_range, *, where=[], params=[]):
     )
 
     with connections["default"].cursor() as cursor:
+        where = where or []
         where.append("lh.rendered_on >= %s and lh.rendered_on <= %s")
+        params = params or []
         params.extend(date_range)
         cursor.execute(SQL % " and ".join(where), params)
 
