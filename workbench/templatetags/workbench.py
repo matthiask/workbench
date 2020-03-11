@@ -257,6 +257,8 @@ ORDER BY (diff + 180) % 365 DESC
 
 @register.filter
 def has_feature(user, feature):
+    if not hasattr(user, "features"):  # e.g. AnonymousUser
+        return False
     return user.features[feature]
 
 

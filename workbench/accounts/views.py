@@ -1,16 +1,15 @@
 from django.conf import settings
 from django.contrib import auth, messages
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect, render
-from django.urls import reverse, reverse_lazy
-from django.utils.translation import get_language, gettext as _
+from django.urls import reverse
+from django.utils.translation import gettext as _
 from django.views.decorators.cache import never_cache
 
 from authlib.google import GoogleOAuth2Client
 
-from workbench.accounts.forms import UserForm
+from workbench.accounts.forms import CreateUserForm, UpdateUserForm
 from workbench.accounts.models import User
-from workbench.awt.models import WorkingTimeModel
 from workbench.generic import UpdateView
 
 
@@ -20,11 +19,32 @@ def accounts(request):
 
 class UserUpdateView(UpdateView):
     model = User
-    form_class = UserForm
-    success_url = reverse_lazy("accounts_update")
+    form_class = UpdateUserForm
+    success_url = "/"
 
     def get_object(self):
-        return self.request.user
+        if self.request.user.is_authenticated:
+            return self.request.user
+        elif "user_email" in self.request.session:
+            return User(email=self.request.session["user_email"])
+        else:
+            raise Http404
+
+    def get_form_class(self):
+        return UpdateUserForm if self.object.pk else CreateUserForm
+
+    def form_valid(self, form):
+        response = HttpResponseRedirect(self.get_success_url())
+        self.object = form.save(commit=False)
+        if self.object.pk:  # Existed already
+            self.object.save()
+            return response
+
+        self.object.email = self.request.session.pop("user_email")
+        self.object.save()
+        auth.login(self.request, auth.authenticate(email=self.object.email))
+        response.set_cookie("login_hint", self.object.email, expires=180 * 86400)
+        return response
 
 
 @never_cache
@@ -59,37 +79,33 @@ def oauth2(request):
         return redirect("login")
 
     email = user_data.get("email")
-    new_user = False
-
-    if email.endswith("@%s" % settings.WORKBENCH.SSO_DOMAIN):
-        user, new_user = User.objects.get_or_create(
-            email=email,
-            defaults={
-                "language": get_language(),
-                "working_time_model": WorkingTimeModel.objects.first(),
-            },
-        )
-
     user = auth.authenticate(request, email=email)
     if user and user.is_active:
         auth.login(request, user)
+        next = request.get_signed_cookie("next", default=None, salt="next")
+        response = redirect(next if next else "/")
+        response.delete_cookie("next")
+        response.set_cookie("login_hint", user.email, expires=180 * 86400)
+        return response
+
+    elif User.objects.filter(email=email).exists():
+        messages.error(
+            request, _("The user with email address %s is inactive.") % email
+        )
+        response = HttpResponseRedirect("{}?_error=1".format(reverse("login")))
+        response.delete_cookie("login_hint")
+        return response
+
+    elif email.endswith("@%s" % settings.WORKBENCH.SSO_DOMAIN):
+        messages.info(request, _("Welcome! Please fill in your details."))
+        request.session["user_email"] = email
+        return redirect("accounts_update")
+
     else:
         messages.error(request, _("No user with email address %s found.") % email)
         response = HttpResponseRedirect("{}?_error=1".format(reverse("login")))
         response.delete_cookie("login_hint")
         return response
-
-    if new_user:
-        messages.success(request, _("Welcome! Please fill in your details."))
-        response = redirect("accounts_update")
-        response.set_cookie("login_hint", user.email, expires=180 * 86400)
-        return response
-
-    next = request.get_signed_cookie("next", default=None, salt="next")
-    response = redirect(next if next else "/")
-    response.delete_cookie("next")
-    response.set_cookie("login_hint", user.email, expires=180 * 86400)
-    return response
 
 
 def logout(request):

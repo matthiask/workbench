@@ -96,7 +96,7 @@ class User(Model, AbstractBaseUser):
         _("enforce same week logging"), default=True
     )
     language = models.CharField(
-        _("language"), max_length=10, blank=True, choices=settings.LANGUAGES
+        _("language"), max_length=10, choices=settings.LANGUAGES
     )
     working_time_model = models.ForeignKey(
         "awt.WorkingTimeModel",

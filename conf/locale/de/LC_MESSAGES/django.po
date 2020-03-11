@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-11 09:01+0100\n"
+"POT-Creation-Date: 2020-03-11 09:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -129,12 +129,17 @@ msgstr "Fehler während Abholen der Nutzerdaten. Bitte nochmals versuchen."
 
 #: workbench/accounts/views.py
 #, python-format
-msgid "No user with email address %s found."
-msgstr "Keinen Benutzer mit Emailadresse %s gefunden."
+msgid "The user with email address %s is inactive."
+msgstr "Der Benutzer mit Emailadresse %s ist inaktiv."
 
 #: workbench/accounts/views.py
 msgid "Welcome! Please fill in your details."
 msgstr "Willkommen! Bitte fülle das folgende Formular aus."
+
+#: workbench/accounts/views.py
+#, python-format
+msgid "No user with email address %s found."
+msgstr "Keinen Benutzer mit Emailadresse %s gefunden."
 
 #: workbench/accounts/views.py
 msgid "You have been signed out."
@@ -2204,8 +2209,8 @@ msgid "Labor costs"
 msgstr "Personalaufwand"
 
 #: workbench/templates/base.html
-msgid "Settings"
-msgstr "Einstellungen"
+msgid "Profile"
+msgstr "Profil"
 
 #: workbench/templates/base.html workbench/templates/shortcuts.html
 msgid "Keyboard shortcuts"
@@ -2866,3 +2871,6 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Settings"
+#~ msgstr "Einstellungen"

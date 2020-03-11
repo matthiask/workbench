@@ -24,7 +24,7 @@ def user_middleware(get_response):
 
         if request.path.startswith(
             (
-                "/accounts/",
+                "/accounts",
                 "/favicon",
                 "/robots",
                 "/sitemap",

@@ -1,8 +1,10 @@
 from django.conf import settings
 from django.test import Client, TestCase
+from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.accounts import views
+from workbench.accounts.models import User
 from workbench.tools.testing import messages
 
 
@@ -23,6 +25,9 @@ views.GoogleOAuth2Client = lambda *a, **kw: FakeFlow()
 
 
 class LoginTestCase(TestCase):
+    def tearDown(self):
+        deactivate_all()
+
     def test_login(self):
         user = factories.UserFactory.create()
 
@@ -60,18 +65,24 @@ class LoginTestCase(TestCase):
             response, "http://example.com/auth/", fetch_redirect_response=False
         )
 
-        response = client.get("/accounts/oauth2/?code=x")
+        response = client.get("/accounts/oauth2/?code=x", HTTP_ACCEPT_LANGUAGE="en")
         self.assertRedirects(response, "/accounts/login/?_error=1")
         self.assertEqual(
-            messages(response),
-            ["Keinen Benutzer mit Emailadresse user@example.com gefunden."],
+            messages(response), ["No user with email address user@example.com found."],
         )
 
         FakeFlow.EMAIL = "user@{}".format(settings.WORKBENCH.SSO_DOMAIN)
-        response = client.get("/accounts/oauth2/?code=x")
+        response = client.get("/accounts/oauth2/?code=x", HTTP_ACCEPT_LANGUAGE="en")
         self.assertRedirects(response, "/accounts/update/")
-        self.assertEqual(
-            messages(response), ["Willkommen! Bitte fülle das folgende Formular aus."]
+        self.assertEqual(messages(response), ["Welcome! Please fill in your details."])
+        response = client.post(
+            "/accounts/update/",
+            {
+                "_full_name": "Test",
+                "_short_name": "T",
+                "language": "en",
+                "working_time_model": factories.WorkingTimeModelFactory.create().pk,
+            },
         )
         self.assertEqual(client.cookies.get("login_hint").value, FakeFlow.EMAIL)
 
@@ -81,15 +92,25 @@ class LoginTestCase(TestCase):
         self.assertEqual(messages(response), [])
         self.assertEqual(client.cookies.get("login_hint").value, FakeFlow.EMAIL)
 
+        # Disabled user
+        User.objects.update(is_active=False)
+        client = Client()
+        FakeFlow.EMAIL = "user@{}".format(settings.WORKBENCH.SSO_DOMAIN)
+        response = client.get("/accounts/oauth2/?code=x", HTTP_ACCEPT_LANGUAGE="en")
+        self.assertRedirects(response, "/accounts/login/?_error=1")
+        self.assertEqual(
+            messages(response),
+            ["The user with email address user@feinheit.ch is inactive."],
+        )
+
         client = Client()
         client.cookies.load({"login_hint": FakeFlow.EMAIL})
 
         FakeFlow.EMAIL = "user@example.com"
-        response = client.get("/accounts/oauth2/?code=x")
+        response = client.get("/accounts/oauth2/?code=x", HTTP_ACCEPT_LANGUAGE="en")
         self.assertRedirects(response, "/accounts/login/?_error=1")
         self.assertEqual(
-            messages(response),
-            ["Keinen Benutzer mit Emailadresse user@example.com gefunden."],
+            messages(response), ["No user with email address user@example.com found."]
         )
         # Login hint cookie has been removed when login fails
         self.assertEqual(client.cookies.get("login_hint").value, "")
@@ -104,3 +125,25 @@ class LoginTestCase(TestCase):
             messages(response),
             ["Fehler während Abholen der Nutzerdaten. Bitte nochmals versuchen."],
         )
+
+    def test_accounts_update_404(self):
+        response = self.client.get("/accounts/update/")
+        self.assertEqual(response.status_code, 404)
+
+    def test_account_update(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        response = self.client.post(
+            "/accounts/update/",
+            {
+                "_full_name": "Test",
+                "_short_name": "T",
+                "language": "en",
+                "working_time_model": factories.WorkingTimeModelFactory.create().pk,
+            },
+        )
+        self.assertRedirects(response, "/")
+
+        user.refresh_from_db()
+        self.assertEqual(user._short_name, "T")

@@ -13,7 +13,6 @@ class Migration(migrations.Migration):
             name="language",
             field=models.CharField(
                 choices=[("en", "english"), ("de", "german")],
-                blank=True,
                 max_length=10,
                 verbose_name="language",
             ),
