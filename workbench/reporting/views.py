@@ -295,12 +295,6 @@ class DateRangeFilterForm(Form):
     date_until = forms.DateField(
         label=_("Date until"), required=False, widget=DateInput()
     )
-    team = forms.ModelChoiceField(
-        Team.objects.all(),
-        empty_label=_("Everyone"),
-        label=capfirst(Team._meta.verbose_name),
-        required=False,
-    )
 
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
@@ -316,6 +310,15 @@ class DateRangeFilterForm(Form):
             ),
         )
 
+
+class DateRangeAndTeamFilterForm(DateRangeFilterForm):
+    team = forms.ModelChoiceField(
+        Team.objects.all(),
+        empty_label=_("Everyone"),
+        label=capfirst(Team._meta.verbose_name),
+        required=False,
+    )
+
     def users(self):
         data = self.cleaned_data
         queryset = User.objects.all()
@@ -324,7 +327,7 @@ class DateRangeFilterForm(Form):
         return queryset
 
 
-@filter_form(DateRangeFilterForm)
+@filter_form(DateRangeAndTeamFilterForm)
 def hours_filter_view(request, form, *, template_name, stats_fn):
     return render(
         request,
@@ -339,13 +342,9 @@ def hours_filter_view(request, form, *, template_name, stats_fn):
     )
 
 
-def labor_costs_view(request):
-    try:
-        year = int(request.GET.get("year"))
-    except Exception:
-        year = dt.date.today().year
-
-    date_range = [dt.date(year, 1, 1), dt.date(year, 12, 31)]
+@filter_form(DateRangeFilterForm)
+def labor_costs_view(request, form):
+    date_range = [form.cleaned_data["date_from"], form.cleaned_data["date_until"]]
 
     if request.GET.get("project"):
         return render(
@@ -374,15 +373,12 @@ def labor_costs_view(request):
             {"stats": labor_costs.labor_costs_by_user(date_range)},
         )
 
-    current_year = dt.date.today().year
-
     return render(
         request,
         "reporting/labor_costs.html",
         {
             "stats": labor_costs.labor_costs_by_cost_center(date_range),
             "date_range": date_range,
-            "years": range(current_year, current_year - 4, -1),
-            "active_year": year,
+            "form": form,
         },
     )
