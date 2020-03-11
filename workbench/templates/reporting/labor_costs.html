@@ -42,7 +42,7 @@
           {{ cc_row.cost_center|default:_("No cost center defined") }}
         </th>
         <th class="text-right">{{ cc_row.hours|hours }}</th>
-        <th class="text-right">{{ cc_row.hours_with_rate_undefined|hours }}</th>
+        <th class="text-right {% if not cc_row.hours_with_rate_undefined %}text-black-30{% endif %}">{{ cc_row.hours_with_rate_undefined|hours }}</th>
         <th class="text-right">{{ cc_row.costs|currency }}</th>
         <th class="text-right">{{ cc_row.costs_with_green_hours_target|currency }}</th>
         <td>
@@ -58,8 +58,10 @@
           <td>
             {% link_or_none row.project %}
           </td>
-          <td class="text-right">{{ row.hours|hours }}</td>
-          <td class="text-right">{{ row.hours_with_rate_undefined|hours }}</td>
+          <td class="text-right">
+            <a href="{% url 'logbook_loggedhours_list' %}{% querystring date_from=date_range.0.isoformat date_until=date_range.1.isoformat project=row.project.id %}">{{ row.hours|hours }}</a>
+          </td>
+          <td class="text-right {% if not row.hours_with_rate_undefined %}text-black-30{% endif %}">{{ row.hours_with_rate_undefined|hours }}</td>
           <td class="text-right">{{ row.costs|currency }}</td>
           <td class="text-right">{{ row.costs_with_green_hours_target|currency }}</td>
           <td>
@@ -75,7 +77,7 @@
         {% trans 'total'|capfirst %}
       </th>
       <th class="text-right">{{ stats.hours|hours }}</th>
-      <th class="text-right">{{ stats.hours_with_rate_undefined|hours }}</th>
+      <th class="text-right {% if not stats.hours_with_rate_undefined %}text-black-30{% endif %}">{{ stats.hours_with_rate_undefined|hours }}</th>
       <th class="text-right">{{ stats.costs|currency }}</th>
       <th class="text-right">{{ stats.costs_with_green_hours_target|currency }}</th>
       <td>

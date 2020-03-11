@@ -381,6 +381,7 @@ def labor_costs_view(request):
         "reporting/labor_costs.html",
         {
             "stats": labor_costs.labor_costs_by_cost_center(date_range),
+            "date_range": date_range,
             "years": range(current_year, current_year - 4, -1),
             "active_year": year,
         },
