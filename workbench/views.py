@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
 from workbench.accounts.features import FEATURES
@@ -83,7 +84,7 @@ def history(request, db_table, attribute, id):
 
         related = [
             (
-                model._meta.verbose_name_plural,
+                capfirst(model._meta.verbose_name_plural),
                 reverse("history", args=(model._meta.db_table, attribute, id)),
             )
             for model, attribute in cfg.get("related", [])

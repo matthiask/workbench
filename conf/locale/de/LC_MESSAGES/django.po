@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-11 08:50+0100\n"
+"POT-Creation-Date: 2020-03-11 09:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1529,7 +1529,7 @@ msgstr "Kosten"
 #: workbench/templates/base.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html
-#: workbench/timer/models.py workbench/tools/xlsx.py
+#: workbench/timer/models.py
 msgid "logbook"
 msgstr "Logbuch"
 
@@ -1660,7 +1660,6 @@ msgstr "Verdient"
 
 #: workbench/management/commands/profitability.py
 #: workbench/templates/reporting/project_budget_statistics.html
-#: workbench/tools/xlsx.py
 msgid "invoiced"
 msgstr "Verrechnet"
 
@@ -1699,7 +1698,7 @@ msgstr "Wähle ein anderes Projekt als Ziel."
 msgid "Delete offers' services?"
 msgstr "Offertleistungen löschen?"
 
-#: workbench/offers/models.py
+#: workbench/offers/models.py workbench/tools/xlsx.py
 msgid "Offered"
 msgstr "Offeriert"
 
@@ -2411,20 +2410,19 @@ msgid "Cost"
 msgstr "Kosten"
 
 #: workbench/templates/projects/project_detail.html
-msgid "total costs"
+msgid "Total costs"
 msgstr "Gesamtkosten"
 
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_statistics.html
 #: workbench/templates/reporting/project_budget_statistics.html
-#: workbench/tools/xlsx.py
 msgid "undefined rate"
 msgstr "ohne Stundensatz"
 
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html
 #: workbench/tools/xlsx.py
-msgid "not archived"
+msgid "Not archived"
 msgstr "Nicht archiviert"
 
 #: workbench/templates/projects/project_detail.html
@@ -2590,7 +2588,6 @@ msgid "No cost center defined"
 msgstr "Keine Kostenstelle definiert"
 
 #: workbench/templates/reporting/project_budget_statistics.html
-#: workbench/tools/xlsx.py
 msgid "offered"
 msgstr "Offeriert"
 
@@ -2838,15 +2835,27 @@ msgid "Form was invalid."
 msgstr "Formular war ungültig."
 
 #: workbench/tools/xlsx.py
-msgid "by service and user"
+msgid "By service and user"
 msgstr "Nach Leistung und Benutzer"
 
 #: workbench/tools/xlsx.py
-msgid "total hours"
+msgid "Logbook"
+msgstr "Logbuch"
+
+#: workbench/tools/xlsx.py
+msgid "Undefined rate"
+msgstr "Ohne Stundensatz"
+
+#: workbench/tools/xlsx.py
+msgid "Invoiced"
+msgstr "Verrechnet"
+
+#: workbench/tools/xlsx.py
+msgid "Total hours"
 msgstr "Stunden insgesamt"
 
 #: workbench/tools/xlsx.py
-msgid "delta"
+msgid "Delta"
 msgstr "Delta"
 
 #: workbench/views.py
@@ -2857,9 +2866,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "labor costs"
-#~ msgstr "Personalaufwand"
-
-#~ msgid "Set date to:"
-#~ msgstr "Datum setzen auf:"

@@ -1,11 +1,13 @@
 from collections import defaultdict
 from itertools import chain
 
+from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
 from xlsxdocument import XLSXDocument
 
 from workbench.contacts.models import PostalAddress
+from workbench.templatetags.workbench import label
 from workbench.tools.formats import H1
 
 
@@ -22,10 +24,10 @@ class WorkbenchXLSXDocument(XLSXDocument):
         self.table_from_queryset(
             queryset,
             additional=[
-                (_("hourly rate"), lambda hours: hours.service.effort_rate),
-                (_("project"), lambda hours: hours.service.project),
+                (capfirst(_("hourly rate")), lambda hours: hours.service.effort_rate),
+                (capfirst(_("project")), lambda hours: hours.service.project),
                 (
-                    _("invoice"),
+                    capfirst(_("invoice")),
                     lambda hours: hours.invoice_service.invoice
                     if hours.invoice_service
                     else None,
@@ -38,7 +40,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
         for h in queryset:
             by_service_and_user[h.service][h.rendered_by] += h.hours
 
-        self.add_sheet(_("by service and user"))
+        self.add_sheet(_("By service and user"))
         users = sorted(
             set(
                 chain.from_iterable(
@@ -48,7 +50,10 @@ class WorkbenchXLSXDocument(XLSXDocument):
         )
 
         self.table(
-            [_("project"), _("service"), _("hourly rate"), _("total")]
+            [
+                capfirst(t)
+                for t in [_("project"), _("service"), _("hourly rate"), _("total")]
+            ]
             + [user.get_short_name() for user in users],
             [
                 [
@@ -75,10 +80,10 @@ class WorkbenchXLSXDocument(XLSXDocument):
                 "invoice_service__invoice__project",
             ),
             additional=[
-                ("service", lambda cost: cost.service),
-                ("project", lambda cost: cost.service.project),
+                (capfirst(_("service")), lambda cost: cost.service),
+                (capfirst(_("project")), lambda cost: cost.service.project),
                 (
-                    "invoice",
+                    capfirst(_("invoice")),
                     lambda cost: cost.invoice_service.invoice
                     if cost.invoice_service
                     else None,
@@ -101,7 +106,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
         self.table_from_queryset(
             queryset.select_related("organization", "primary_contact"),
             additional=[
-                (field, getter(field))
+                (str(label(PostalAddress, field)), getter(field))
                 for field in [
                     "street",
                     "house_number",
@@ -118,16 +123,16 @@ class WorkbenchXLSXDocument(XLSXDocument):
         self.add_sheet(_("projects"))
         self.table(
             [
-                _("project"),
-                _("responsible"),
-                _("offered"),
-                _("logbook"),
-                _("undefined rate"),
-                _("third party costs"),
-                _("invoiced"),
-                _("not archived"),
-                _("total hours"),
-                _("delta"),
+                capfirst(_("project")),
+                capfirst(_("responsible")),
+                _("Offered"),
+                _("Logbook"),
+                _("Undefined rate"),
+                capfirst(_("third party costs")),
+                _("Invoiced"),
+                _("Not archived"),
+                _("Total hours"),
+                _("Delta"),
             ],
             [
                 (
