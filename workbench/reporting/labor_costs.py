@@ -2,8 +2,10 @@ from collections import defaultdict
 from itertools import chain, groupby
 
 from django.db import connections
+from django.db.models import Sum
 
 from workbench.accounts.models import User
+from workbench.logbook.models import LoggedCost
 from workbench.projects.models import Project
 from workbench.tools.models import Z
 
@@ -26,12 +28,13 @@ where %s
 group by p.id, hourly_labor_costs, green_hours_target, lh.rendered_by_id
 """
 
-KEYS = [
+USER_KEYS = [
     "hours",
     "hours_with_rate_undefined",
     "costs",
     "costs_with_green_hours_target",
 ]
+PROJECT_KEYS = USER_KEYS + ["third_party_costs"]
 
 
 def _labor_costs_by_project_id(date_range, *, where=None, params=None):
@@ -41,6 +44,7 @@ def _labor_costs_by_project_id(date_range, *, where=None, params=None):
             "hours_with_rate_undefined": Z,
             "costs": Z,
             "costs_with_green_hours_target": Z,
+            "third_party_costs": Z,
             "by_user": defaultdict(
                 lambda: {
                     "hours": Z,
@@ -80,6 +84,22 @@ def _labor_costs_by_project_id(date_range, *, where=None, params=None):
                 by_user["costs"] += costs
                 by_user["costs_with_green_hours_target"] += costs_with_ght
 
+    queryset = LoggedCost.objects.order_by().filter(
+        rendered_on__range=date_range, third_party_costs__isnull=False
+    )
+
+    # FIXME Do this properly
+    if "cost_center" in where[0]:
+        queryset = queryset.filter(service__project__cost_center=params[0])
+    if "project" in where[0]:
+        queryset = queryset.filter(service__project=params[1])
+
+    for row in queryset.values("service__project").annotate(
+        cost=Sum("third_party_costs")
+    ):
+        project = projects[row["service__project"]]
+        project["third_party_costs"] += row["cost"]
+
     return projects
 
 
@@ -101,11 +121,11 @@ def labor_costs_by_cost_center(date_range):
         sorted_projects, lambda row: row["project"].cost_center
     ):
         cc_projects = list(cc_projects)
-        cc_row = {key: sum(row[key] for row in cc_projects) for key in KEYS}
+        cc_row = {key: sum(row[key] for row in cc_projects) for key in PROJECT_KEYS}
         cc_row.update({"cost_center": cost_center, "projects": cc_projects})
         cost_centers.append(cc_row)
 
-    ret = {key: sum(row[key] for row in cost_centers) for key in KEYS}
+    ret = {key: sum(row[key] for row in cost_centers) for key in PROJECT_KEYS}
     ret["cost_centers"] = cost_centers
     return ret
 
@@ -127,12 +147,13 @@ def labor_costs_by_user(date_range, *, project=None, cost_center=None):
             chain.from_iterable(row["by_user"].keys() for row in projects.values())
         )
     )
-    by_user = defaultdict(lambda: dict.fromkeys(KEYS, Z))
-    overall = dict.fromkeys(KEYS, Z)
+    by_user = defaultdict(lambda: dict.fromkeys(USER_KEYS, Z))
+    overall = dict.fromkeys(PROJECT_KEYS, Z)
 
     for row in projects.values():
-        for key in KEYS:
+        for key in PROJECT_KEYS:
             overall[key] += row[key]
+        for key in USER_KEYS:
             for user in users:
                 by_user[user][key] += row["by_user"][user.id][key]
 
@@ -144,4 +165,4 @@ def test():  # pragma: no cover
     import datetime as dt
 
     # pprint(labor_costs_by_cost_center([dt.date(2019, 1, 1), dt.date.today()]))
-    pprint(labor_costs_by_user([dt.date(2019, 1, 1), dt.date.today()], project=5026))
+    pprint(labor_costs_by_user([dt.date(2020, 1, 1), dt.date.today()], cost_center=1))

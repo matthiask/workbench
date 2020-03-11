@@ -31,5 +31,10 @@
     <th class="text-right">{{ stats.costs|currency }}</th>
     <th class="text-right">{{ stats.costs_with_green_hours_target|currency }}</th>
   </tr>
+  <tr>
+    <td>{% trans 'third party costs'|capfirst %}</td>
+    <td colspan="3"></td>
+    <td class="text-right">{{ stats.third_party_costs|currency }}</td>
+  </tr>
 </table>
 {% endblock %}
