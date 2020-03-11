@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-10 21:05+0100\n"
+"POT-Creation-Date: 2020-03-11 08:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2200,7 +2200,8 @@ msgid "Deal history"
 msgstr "Geschichte der Geschäfte"
 
 #: workbench/templates/base.html workbench/templates/reporting/labor_costs.html
-msgid "labor costs"
+#: workbench/templates/reporting/labor_costs_by_user.html
+msgid "Labor costs"
 msgstr "Personalaufwand"
 
 #: workbench/templates/base.html
@@ -2571,7 +2572,7 @@ msgstr "Datum"
 
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
-msgid "hours with rate undefined"
+msgid "Hours with rate undefined"
 msgstr "Stunden ohne Satz"
 
 #: workbench/templates/reporting/labor_costs.html
@@ -2581,16 +2582,12 @@ msgstr "Kosten"
 
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
-msgid "costs with green hours target"
+msgid "Costs with green hours target"
 msgstr "Kosten unter Einbezug des Grüne Stunden-Zielwerts"
 
 #: workbench/templates/reporting/labor_costs.html
 msgid "No cost center defined"
 msgstr "Keine Kostenstelle definiert"
-
-#: workbench/templates/reporting/labor_costs_by_user.html
-msgid "Labor costs"
-msgstr "Personalaufwand"
 
 #: workbench/templates/reporting/project_budget_statistics.html
 #: workbench/tools/xlsx.py
@@ -2860,6 +2857,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "labor costs"
+#~ msgstr "Personalaufwand"
 
 #~ msgid "Set date to:"
 #~ msgstr "Datum setzen auf:"

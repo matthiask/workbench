@@ -10,10 +10,10 @@
 <table class="table table-sm bg-light">
   <tr>
     <th>{% trans 'user'|capfirst %}</th>
-    <th class="text-right">{% trans 'hours' %}</th>
-    <th class="text-right">{% trans 'hours with rate undefined' %}</th>
-    <th class="text-right">{% trans 'costs' %}</th>
-    <th class="text-right">{% trans 'costs with green hours target' %}</th>
+    <th class="text-right">{% trans 'hours'|capfirst %}</th>
+    <th class="text-right">{% trans 'Hours with rate undefined' %}</th>
+    <th class="text-right">{% trans 'costs'|capfirst %}</th>
+    <th class="text-right">{% trans 'Costs with green hours target' %}</th>
   </tr>
   {% for row in stats.by_user %}
     <tr>
