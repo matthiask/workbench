@@ -376,3 +376,25 @@ class DealsTest(TestCase):
 
         response = self.client.get("/report/deal-history/")
         self.assertContains(response, "Deal history")
+
+    def test_related_offers(self):
+        deal = factories.DealFactory.create()
+        offer = factories.OfferFactory.create()
+
+        self.client.force_login(deal.owned_by)
+
+        response = self.client.post(deal.urls["add_offer"], {"modal-offer": ""})
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(deal.urls["add_offer"], {"modal-offer": offer.pk})
+        self.assertEqual(response.status_code, 201)
+
+        self.assertEqual(deal.related_offers.get(), offer)
+
+        response = self.client.post(deal.urls["remove_offer"], {"modal-offer": ""})
+        self.assertRedirects(response, deal.urls["detail"])
+
+        response = self.client.post(
+            deal.urls["remove_offer"], {"modal-offer": offer.pk}
+        )
+        self.assertRedirects(response, deal.urls["detail"])

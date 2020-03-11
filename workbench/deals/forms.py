@@ -267,6 +267,25 @@ class SetStatusForm(ModelForm):
         else:
             raise Http404
 
+        if instance.status != Deal.OPEN:
+            related_offers = instance.related_offers.all()
+            self.fields["related_offers"] = forms.ModelMultipleChoiceField(
+                queryset=related_offers,
+                label=_("Accept offers")
+                if instance.status == Deal.ACCEPTED
+                else _("Reject offers"),
+                required=False,
+                widget=forms.CheckboxSelectMultiple,
+                initial=[offer.id for offer in related_offers],
+            )
+            self.fields["related_offers"].choices = [
+                (
+                    offer.id,
+                    format_html("{}<br>{}", offer.__html__(), offer.status_badge),
+                )
+                for offer in related_offers
+            ]
+
     def clean(self):
         data = super().clean()
         if data["status"] != Deal.OPEN and not data.get("closing_type"):
@@ -285,6 +304,15 @@ class SetStatusForm(ModelForm):
             instance.closing_notice = ""
         else:
             instance.closed_on = instance.closed_on or dt.date.today()
+
+            for offer in self.cleaned_data.get("related_offers", ()):
+                offer.status = (
+                    offer.ACCEPTED
+                    if instance.status == Deal.ACCEPTED
+                    else offer.REJECTED
+                )
+                offer.full_clean()
+                offer.save()
 
         instance.save()
         return instance

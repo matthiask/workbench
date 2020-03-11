@@ -17,6 +17,13 @@ urlpatterns = [
         name="offers_offer_list",
     ),
     url(
+        r"^autocomplete/$",
+        generic.AutocompleteView.as_view(
+            model=Offer, queryset=Offer.objects.select_related("owned_by", "project"),
+        ),
+        name="offers_offer_autocomplete",
+    ),
+    url(
         r"^(?P<pk>\d+)/$",
         lambda request, pk: redirect(get_object_or_404(Offer, pk=pk)),
         name="offers_offer_detail",

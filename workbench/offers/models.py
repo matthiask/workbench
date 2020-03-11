@@ -30,6 +30,9 @@ class OfferQuerySet(SearchQuerySet):
     def accepted(self):
         return self.filter(status=Offer.ACCEPTED)
 
+    def sr(self):
+        return self.select_related("owned_by", "project")
+
 
 @model_urls
 @total_ordering

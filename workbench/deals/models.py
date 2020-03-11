@@ -145,6 +145,13 @@ class Deal(Model):
 
     _fts = models.TextField(editable=False, blank=True)
 
+    related_offers = models.ManyToManyField(
+        "offers.Offer",
+        blank=True,
+        related_name="deals",
+        verbose_name=_("related offers"),
+    )
+
     objects = DealQuerySet.as_manager()
 
     class Meta:

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-11 15:37+0100\n"
+"POT-Creation-Date: 2020-03-11 18:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -977,6 +977,10 @@ msgid "closing notice"
 msgstr "Abschlussnotiz"
 
 #: workbench/deals/models.py
+msgid "related offers"
+msgstr "verbundenen Offerten"
+
+#: workbench/deals/models.py
 #: workbench/templates/reporting/accepted_deals_for_user.html
 #: workbench/templates/reporting/declined_deals.html
 msgid "deal"
@@ -1024,6 +1028,25 @@ msgstr "Werttypen"
 #: workbench/deals/models.py
 msgid "values"
 msgstr "Werte"
+
+#: workbench/deals/views.py
+#, python-format
+msgid "Successfully added the offer %(offer)s as a related offer."
+msgstr ""
+"Die Offerte %(offer)s wurde erfolgreich zu den zugehörigen Offerten "
+"hinzugefügt."
+
+#: workbench/deals/views.py
+#, python-format
+msgid "Link offer to %(deal)s"
+msgstr "Offerte mit Geschäft %(deal)s verbinden"
+
+#: workbench/deals/views.py
+#, python-format
+msgid "Successfully removed the offer %(offer)s as a related offer."
+msgstr ""
+"Die Offerte %(offer)s wurde erfolgreich von den zugehörigen Offerten "
+"entfernt."
 
 #: workbench/expenses/__init__.py workbench/expenses/forms.py
 #: workbench/logbook/forms.py
@@ -2289,7 +2312,19 @@ msgstr "Weiter"
 #: workbench/templates/credit_control/creditentry_upload.html
 #: workbench/templates/generic/object_form.html
 msgid "Cancel"
-msgstr "Storniert"
+msgstr "Abbrechen"
+
+#: workbench/templates/deals/deal_detail.html
+msgid "Unlink offer"
+msgstr "Offerte entfernen"
+
+#: workbench/templates/deals/deal_detail.html
+msgid "No related offers"
+msgstr "Keine verbundenen Offerten"
+
+#: workbench/templates/deals/deal_detail.html
+msgid "Link offer"
+msgstr "Offerte verbinden"
 
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/invoice_detail.html

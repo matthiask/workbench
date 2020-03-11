@@ -2,6 +2,7 @@ from django.conf.urls import url
 
 from workbench import generic
 from workbench.accounts.features import deals_only
+from workbench.deals import views
 from workbench.deals.forms import DealForm, DealSearchForm, SetStatusForm
 from workbench.deals.models import Deal
 
@@ -39,6 +40,16 @@ urlpatterns = [
             )
         ),
         name="deals_deal_set_status",
+    ),
+    url(
+        r"^(?P<pk>[0-9]+)/add-offer/$",
+        deals_only(views.add_offer),
+        name="deals_deal_add_offer",
+    ),
+    url(
+        r"^(?P<pk>[0-9]+)/remove-offer/$",
+        deals_only(views.remove_offer),
+        name="deals_deal_remove_offer",
     ),
     url(
         r"^(?P<pk>\d+)/delete/$",
