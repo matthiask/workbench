@@ -37,7 +37,7 @@ USER_KEYS = [
 PROJECT_KEYS = USER_KEYS + ["third_party_costs"]
 
 
-def _labor_costs_by_project_id(date_range, *, where=None, params=None):
+def _labor_costs_by_project_id(date_range, *, project=None, cost_center=None):
     projects = defaultdict(
         lambda: {
             "hours": Z,
@@ -56,11 +56,25 @@ def _labor_costs_by_project_id(date_range, *, where=None, params=None):
         }
     )
 
+    logged_costs = LoggedCost.objects.order_by().filter(
+        rendered_on__range=date_range, third_party_costs__isnull=False
+    )
+
     with connections["default"].cursor() as cursor:
-        where = where or []
-        where.append("lh.rendered_on >= %s and lh.rendered_on <= %s")
-        params = params or []
-        params.extend(date_range)
+        where = ["lh.rendered_on >= %s and lh.rendered_on <= %s"]
+        params = date_range[:]
+
+        if project is not None:
+            where.append("p.id=%s")
+            params.append(project)
+            logged_costs = logged_costs.filter(service__project=project)
+        if cost_center is not None:
+            where.append("p.cost_center_id=%s")
+            params.append(cost_center)
+            logged_costs = logged_costs.filter(
+                service__project__cost_center=cost_center
+            )
+
         cursor.execute(SQL % " and ".join(where), params)
 
         for project_id, hlc, ght, rendered_by_id, hours in cursor:
@@ -84,17 +98,7 @@ def _labor_costs_by_project_id(date_range, *, where=None, params=None):
                 by_user["costs"] += costs
                 by_user["costs_with_green_hours_target"] += costs_with_ght
 
-    queryset = LoggedCost.objects.order_by().filter(
-        rendered_on__range=date_range, third_party_costs__isnull=False
-    )
-
-    # FIXME Do this properly
-    if "cost_center" in where[0]:
-        queryset = queryset.filter(service__project__cost_center=params[0])
-    if "project" in where[0]:
-        queryset = queryset.filter(service__project=params[1])
-
-    for row in queryset.values("service__project").annotate(
+    for row in logged_costs.values("service__project").annotate(
         cost=Sum("third_party_costs")
     ):
         project = projects[row["service__project"]]
@@ -131,16 +135,9 @@ def labor_costs_by_cost_center(date_range):
 
 
 def labor_costs_by_user(date_range, *, project=None, cost_center=None):
-    if project is not None:
-        projects = _labor_costs_by_project_id(
-            date_range, where=["p.id=%s"], params=[project]
-        )
-    elif cost_center is not None:
-        projects = _labor_costs_by_project_id(
-            date_range, where=["p.cost_center_id=%s"], params=[cost_center]
-        )
-    else:
-        projects = _labor_costs_by_project_id(date_range)
+    projects = _labor_costs_by_project_id(
+        date_range, project=project, cost_center=cost_center
+    )
 
     users = User.objects.filter(
         id__in=set(
