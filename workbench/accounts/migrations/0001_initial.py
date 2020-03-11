@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                 (
                     "_short_name",
                     models.CharField(
-                        blank=True, max_length=30, verbose_name="short name"
+                        blank=True, max_length=30, verbose_name="initials"
                     ),
                 ),
                 (

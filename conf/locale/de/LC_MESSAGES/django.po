@@ -67,8 +67,8 @@ msgid "is admin"
 msgstr "ist Admin"
 
 #: workbench/accounts/models.py
-msgid "short name"
-msgstr "Kurzer Name"
+msgid "initials"
+msgstr "Kürzel"
 
 #: workbench/accounts/models.py
 msgid "full name"

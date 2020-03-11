@@ -89,7 +89,7 @@ class User(Model, AbstractBaseUser):
     is_active = models.BooleanField(_("is active"), default=True)
     is_admin = models.BooleanField(_("is admin"), default=False)
 
-    _short_name = models.CharField(_("short name"), blank=True, max_length=30)
+    _short_name = models.CharField(_("initials"), blank=True, max_length=30)
     _full_name = models.CharField(_("full name"), blank=True, max_length=200)
 
     enforce_same_week_logging = models.BooleanField(
