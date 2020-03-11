@@ -27,7 +27,7 @@
       </tr>
     </thead>
     <tbody>
-    {% for cc_row in stats %}
+    {% for cc_row in stats.cost_centers %}
       <tr>
         <th>
           {% if cc_row.cost_center %}
@@ -56,6 +56,17 @@
         </tr>
       {% endfor %}
     {% endfor %}
+    <tr>
+      <th>
+        <a href="{% querystring users="all" %}" data-toggle="ajaxmodal">
+          {% trans 'total'|capfirst %}
+        </a>
+      </th>
+      <th class="text-right">{{ stats.hours|hours }}</th>
+      <th class="text-right">{{ stats.hours_with_rate_undefined|hours }}</th>
+      <th class="text-right">{{ stats.costs|currency }}</th>
+      <th class="text-right">{{ stats.costs_with_green_hours_target|currency }}</th>
+    </tr>
     </tbody>
   </table>
 

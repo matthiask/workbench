@@ -103,7 +103,9 @@ def labor_costs_by_cost_center(date_range):
         cc_row.update({"cost_center": cost_center, "projects": cc_projects})
         cost_centers.append(cc_row)
 
-    return cost_centers
+    ret = {key: sum(row[key] for row in cost_centers) for key in KEYS}
+    ret["cost_centers"] = cost_centers
+    return ret
 
 
 def labor_costs_by_user(date_range, *, project=None, cost_center=None):

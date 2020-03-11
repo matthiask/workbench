@@ -357,7 +357,7 @@ def labor_costs_view(request):
                 ),
             },
         )
-    if request.GET.get("cost_center"):
+    elif request.GET.get("cost_center"):
         return render(
             request,
             "reporting/labor_costs_by_user.html",
@@ -366,6 +366,12 @@ def labor_costs_view(request):
                     date_range, cost_center=request.GET.get("cost_center")
                 ),
             },
+        )
+    elif request.GET.get("users"):
+        return render(
+            request,
+            "reporting/labor_costs_by_user.html",
+            {"stats": labor_costs.labor_costs_by_user(date_range)},
         )
 
     return render(

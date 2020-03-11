@@ -59,7 +59,7 @@ class ReportingTest(TestCase):
 
         year = dt.date.today().year
         lc = labor_costs_by_cost_center([dt.date(year, 1, 1), dt.date(year, 12, 31)])
-        lcp = lc[0]["projects"]
+        lcp = lc["cost_centers"][0]["projects"]
 
         self.assertEqual(len(lcp), 1)
         self.assertAlmostEqual(lcp[0]["costs"], Decimal("100"))
