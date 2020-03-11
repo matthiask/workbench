@@ -134,16 +134,19 @@ class LoginTestCase(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
+        wtm = factories.WorkingTimeModelFactory.create()
+
         response = self.client.post(
             "/accounts/update/",
             {
                 "_full_name": "Test",
                 "_short_name": "T",
                 "language": "en",
-                "working_time_model": factories.WorkingTimeModelFactory.create().pk,
+                "working_time_model": wtm.pk,
             },
         )
         self.assertRedirects(response, "/")
 
         user.refresh_from_db()
         self.assertEqual(user._short_name, "T")
+        self.assertNotEqual(user.working_time_model, wtm)  # Can only be set initially
