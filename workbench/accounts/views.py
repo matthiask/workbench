@@ -8,7 +8,7 @@ from django.views.decorators.cache import never_cache
 
 from authlib.google import GoogleOAuth2Client
 
-from workbench.accounts.forms import CreateUserForm, UpdateUserForm
+from workbench.accounts.forms import UserForm
 from workbench.accounts.models import User
 from workbench.generic import UpdateView
 
@@ -19,7 +19,7 @@ def accounts(request):
 
 class UserUpdateView(UpdateView):
     model = User
-    form_class = UpdateUserForm
+    form_class = UserForm
     success_url = "/"
 
     def get_object(self):
@@ -29,9 +29,6 @@ class UserUpdateView(UpdateView):
             return User(email=self.request.session["user_email"])
         else:
             raise Http404
-
-    def get_form_class(self):
-        return UpdateUserForm if self.object.pk else CreateUserForm
 
     def form_valid(self, form):
         response = HttpResponseRedirect(self.get_success_url())

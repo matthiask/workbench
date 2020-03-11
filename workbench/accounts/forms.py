@@ -7,29 +7,14 @@ from workbench.awt.models import WorkingTimeModel
 from workbench.tools.forms import ModelForm
 
 
-class UpdateUserForm(ModelForm):
-    class Meta:
-        model = User
-        fields = ("_full_name", "_short_name", "email", "language")
-        widgets = {"language": forms.RadioSelect}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["email"].disabled = True
-        self.fields["email"].help_text = _(
-            "Managed automatically. Contact your administrator to change this."
-        )
-        self.fields["language"].choices = settings.LANGUAGES
-
-
-class CreateUserForm(ModelForm):
+class UserForm(ModelForm):
     class Meta:
         model = User
         fields = (
             "_full_name",
             "_short_name",
-            "email",
             "language",
+            "email",
             "working_time_model",
         )
         widgets = {
@@ -41,9 +26,15 @@ class CreateUserForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["email"].disabled = True
         self.fields["email"].help_text = _(
-            "Managed automatically. Contact your administrator to change this."
+            "Contact your administrator to change this value."
         )
         self.fields["language"].choices = settings.LANGUAGES
         self.fields["working_time_model"].choices = [
             (wtm.id, str(wtm)) for wtm in WorkingTimeModel.objects.all()
         ]
+
+        if self.instance.pk:
+            self.fields["working_time_model"].disabled = True
+            self.fields["working_time_model"].help_text = _(
+                "Contact your administrator to change this value."
+            )
