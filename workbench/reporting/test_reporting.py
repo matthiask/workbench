@@ -40,6 +40,9 @@ class ReportingTest(TestCase):
 
         factories.LoggedHoursFactory.create(service=service, rendered_by=user1)
         factories.LoggedHoursFactory.create(service=service, rendered_by=user2)
+        factories.LoggedCostFactory.create(
+            service=service, third_party_costs=10, cost=15
+        )
 
         self.client.force_login(user1)
         response = self.client.get("/report/labor-costs/")
@@ -71,3 +74,6 @@ class ReportingTest(TestCase):
         )
         self.assertEqual(lcp[0]["hours"], 2)
         self.assertEqual(lcp[0]["hours_with_rate_undefined"], 1)
+
+        self.assertEqual(lcp[0]["third_party_costs"], Decimal("10"))
+        self.assertEqual(lcp[0]["revenue"], Decimal("115"))
