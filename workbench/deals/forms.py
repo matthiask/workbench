@@ -276,7 +276,11 @@ class SetStatusForm(ModelForm):
                 else _("Reject offers"),
                 required=False,
                 widget=forms.CheckboxSelectMultiple,
-                initial=[offer.id for offer in related_offers],
+                initial=[
+                    offer.id
+                    for offer in related_offers
+                    if offer.status < offer.ACCEPTED
+                ],
             )
             self.fields["related_offers"].choices = [
                 (

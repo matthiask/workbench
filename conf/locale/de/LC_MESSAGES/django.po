@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-11 18:35+0100\n"
+"POT-Creation-Date: 2020-03-11 22:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -852,6 +852,14 @@ msgstr "Projektvergabe"
 #: workbench/deals/forms.py workbench/templates/reporting/declined_deals.html
 msgid "Reason for losing"
 msgstr "Verlustgrund"
+
+#: workbench/deals/forms.py
+msgid "Accept offers"
+msgstr "Offerten akzeptieren"
+
+#: workbench/deals/forms.py
+msgid "Reject offers"
+msgstr "Offerten ablehnen"
 
 #: workbench/deals/forms.py
 msgid "This field is required when closing a deal."
