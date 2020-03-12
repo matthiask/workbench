@@ -97,7 +97,7 @@ class ListView(ToolsMixin, vanilla.ListView):
         if (
             set(request.GET)
             - set(self.search_form.fields)
-            - {"page", "pdf", "xlsx", "_error"}
+            - {"page", "pdf", "xlsx", "_error", "disposition"}
         ):
             messages.warning(request, _("Invalid parameters to form."))
             return HttpResponseRedirect("?_error=1")
