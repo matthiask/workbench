@@ -4,6 +4,7 @@ from django import forms
 from django.contrib import messages
 from django.http import Http404
 from django.utils.html import format_html, format_html_join
+from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -147,7 +148,9 @@ class DealForm(ModelForm):
                 continue
 
             self.fields[key] = field.formfield(
-                label=vt.title, required=False, initial=values.get(vt.id)
+                label="%s (%s)" % (vt.title, capfirst(_("total CHF"))),
+                required=False,
+                initial=values.get(vt.id),
             )
 
         attributes = (
