@@ -172,7 +172,7 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "deal",
                 "verbose_name_plural": "deals",
-                "ordering": ["-probability", "status", "decision_expected_on", "id"],
+                "ordering": ["-pk"],
             },
         ),
         migrations.CreateModel(

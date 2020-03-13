@@ -76,7 +76,7 @@ class Offer(ModelWithTotal):
     objects = OfferQuerySet.as_manager()
 
     class Meta:
-        ordering = ("status", "-pk")
+        ordering = ["-pk"]
         verbose_name = _("offer")
         verbose_name_plural = _("offers")
 

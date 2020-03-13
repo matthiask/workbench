@@ -109,7 +109,16 @@ def deal_group(deal):
 
 
 @register.filter
-def group_deals_by_probability(iterable):
+def group_deals_by_probability(iterable, should_group):
+    if not should_group:
+        deals = list(iterable)
+        yield {
+            "title": capfirst(iterable.model._meta.verbose_name_plural),
+            "deals": deals,
+            "sum": sum((deal.value for deal in deals), Z),
+        }
+        return
+
     for group, deals in groupby(iterable, deal_group):
         deals = list(deals)
         yield {

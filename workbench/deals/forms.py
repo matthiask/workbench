@@ -34,7 +34,10 @@ class DealSearchForm(Form):
         choices=(
             ("all", _("All states")),
             ("", _("Open")),
-            (_("Exact"), Deal.STATUS_CHOICES),
+            (
+                _("Closed"),
+                [row for row in Deal.STATUS_CHOICES if not row[0] == Deal.OPEN],
+            ),
         ),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
@@ -62,10 +65,16 @@ class DealSearchForm(Form):
     def filter(self, queryset):
         data = self.cleaned_data
         queryset = queryset.search(data.get("q"))
+        self.should_group_deals = False
         if data.get("s") == "":
-            queryset = queryset.filter(status=Deal.OPEN)
+            queryset = queryset.filter(status=Deal.OPEN).order_by(
+                "-probability", "status", "decision_expected_on", "id"
+            )
+            self.should_group_deals = True
         elif data.get("s") != "all":
-            queryset = queryset.filter(status=data.get("s"))
+            queryset = queryset.filter(status=data.get("s")).order_by(
+                "-closed_on", "-pk"
+            )
         queryset = self.apply_renamed(queryset, "org", "customer")
         queryset = self.apply_owned_by(queryset)
         return queryset.select_related("owned_by", "customer", "contact__organization")

@@ -27,10 +27,10 @@ class DealsTest(TestCase):
         self.assertEqual(self.client.get("/deals/").status_code, 200)
         self.assertEqual(self.client.get("/deals/?s=").status_code, 200)
         self.assertEqual(self.client.get("/deals/?s=all").status_code, 200)
-        self.assertEqual(self.client.get("/deals/?s=10").status_code, 200)
         self.assertEqual(self.client.get("/deals/?s=20").status_code, 200)
         self.assertEqual(self.client.get("/deals/?s=30").status_code, 200)
-        self.assertEqual(self.client.get("/deals/?s=40").status_code, 302)
+
+        self.assertEqual(self.client.get("/deals/?s=42").status_code, 302)
 
     def test_detail(self):
         deal = factories.DealFactory.create()

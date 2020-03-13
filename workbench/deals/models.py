@@ -155,7 +155,7 @@ class Deal(Model):
     objects = DealQuerySet.as_manager()
 
     class Meta:
-        ordering = ["-probability", "status", "decision_expected_on", "id"]
+        ordering = ["-pk"]
         verbose_name = _("deal")
         verbose_name_plural = _("deals")
 

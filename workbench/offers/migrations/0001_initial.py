@@ -122,7 +122,7 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "offer",
                 "verbose_name_plural": "offers",
-                "ordering": ("status", "-pk"),
+                "ordering": ["-pk"],
             },
         )
     ]
