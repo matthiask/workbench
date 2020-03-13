@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-11 22:15+0100\n"
+"POT-Creation-Date: 2020-03-13 09:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -275,10 +275,10 @@ msgstr "Ferienwochen für ein volles Anstellungsjahr."
 
 #: workbench/awt/models.py workbench/contacts/models.py
 #: workbench/credit_control/forms.py workbench/credit_control/models.py
-#: workbench/management/commands/export_debtors.py
-#: workbench/templates/awt/year_detail.html
+#: workbench/management/commands/export_debtors.py workbench/notes/__init__.py
+#: workbench/notes/models.py workbench/templates/awt/year_detail.html
 #: workbench/templates/credit_control/creditentry_list.html
-#: workbench/timer/models.py
+#: workbench/templates/notes/widget.html workbench/timer/models.py
 msgid "notes"
 msgstr "Bemerkungen"
 
@@ -336,8 +336,9 @@ msgstr "Wird nur für die Visualisierung der Abwesenheiten verwendet."
 #: workbench/awt/models.py workbench/deals/models.py
 #: workbench/invoices/models.py workbench/invoices/views.py
 #: workbench/logbook/forms.py workbench/logbook/models.py
-#: workbench/offers/models.py workbench/projects/models.py
-#: workbench/services/models.py workbench/templates/awt/absence_detail.html
+#: workbench/notes/models.py workbench/offers/models.py
+#: workbench/projects/models.py workbench/services/models.py
+#: workbench/templates/awt/absence_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -482,9 +483,9 @@ msgstr "Die Postadresse müsste vermutlich mindestens drei Zeilen lang sein."
 
 #: workbench/contacts/models.py workbench/deals/models.py
 #: workbench/invoices/models.py workbench/logbook/forms.py
-#: workbench/offers/models.py workbench/projects/models.py
-#: workbench/reporting/models.py workbench/services/models.py
-#: workbench/templates/offers/offer_pricing.html
+#: workbench/notes/models.py workbench/offers/models.py
+#: workbench/projects/models.py workbench/reporting/models.py
+#: workbench/services/models.py workbench/templates/offers/offer_pricing.html
 msgid "title"
 msgstr "Titel"
 
@@ -968,9 +969,9 @@ msgstr "Entscheidung erwartet am"
 
 #: workbench/deals/models.py workbench/expenses/models.py
 #: workbench/expenses/views.py workbench/invoices/models.py
-#: workbench/logbook/models.py workbench/offers/models.py
-#: workbench/projects/models.py workbench/services/models.py
-#: workbench/timer/models.py
+#: workbench/logbook/models.py workbench/notes/models.py
+#: workbench/offers/models.py workbench/projects/models.py
+#: workbench/services/models.py workbench/timer/models.py
 msgid "created at"
 msgstr "Erstellt um"
 
@@ -1087,6 +1088,7 @@ msgid "Once an expense report is closed it stays that way."
 msgstr "Eine geschlossene Spesenabrechnung bleibt geschlossen."
 
 #: workbench/expenses/models.py workbench/logbook/models.py
+#: workbench/notes/models.py
 msgid "created by"
 msgstr "Erstellt von"
 
@@ -1705,6 +1707,14 @@ msgstr "Verrechnet"
 msgid "rate"
 msgstr "Ansatz"
 
+#: workbench/notes/forms.py
+msgid "Unable to determine the object this note should be added to."
+msgstr "Konnte Objekt nicht bestimmen, wo die Bemerkung angehängt werden soll."
+
+#: workbench/notes/models.py
+msgid "note"
+msgstr "Bemerkung"
+
 #: workbench/offers/__init__.py workbench/offers/models.py
 #: workbench/templates/base.html workbench/templates/shortcuts.html
 #: workbench/templates/start.html
@@ -2301,7 +2311,7 @@ msgstr "%(class)s erstellen"
 #: workbench/templates/generic/object_form.html
 #: workbench/templates/logbook/loggedcost_form.html
 #: workbench/templates/logbook/loggedhours_form.html
-#: workbench/templates/modalform.html
+#: workbench/templates/modalform.html workbench/templates/notes/widget.html
 #: workbench/templates/offers/offer_pricing.html
 msgid "Save"
 msgstr "Sichern"
@@ -2319,6 +2329,7 @@ msgstr "Weiter"
 
 #: workbench/templates/credit_control/creditentry_upload.html
 #: workbench/templates/generic/object_form.html
+#: workbench/templates/notes/widget.html
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -2445,6 +2456,14 @@ msgstr "Neue Leistung"
 #: workbench/templates/modal.html
 msgid "Close"
 msgstr "Schliessen"
+
+#: workbench/templates/notes/widget.html
+msgid "Add note"
+msgstr "Bemerkung hinzufügen"
+
+#: workbench/templates/notes/widget.html
+msgid "Toggle form"
+msgstr "Formular anzeigen"
 
 #: workbench/templates/offers/offer_pricing.html
 #: workbench/templates/reporting/overdrawn_projects.html

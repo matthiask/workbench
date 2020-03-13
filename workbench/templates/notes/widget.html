@@ -3,35 +3,50 @@
 
 <h3>{% trans 'notes'|capfirst %}</h3>
 {% for note in notes %}
-<p class="mb-3">
-  <em>{{ note.created_by }} at {{ note.created_at|local_date_format }}</em><br>
-  <strong>{{ note.title }}</strong><br>
-  {{ note.description|linebreaksbr }}
-</p>
+<div class="card mb-3">
+  <div class="card-header">
+    {{ note.created_by }} at {{ note.created_at|local_date_format }}
+  </div>
+  <div class="card-body">
+    <div class="card-title">{{ note.title }}</div>
+    <div class="card-text">{{ note.description|linebreaksbr }}</div>
+  </div>
+</div>
 {% endfor %}
 
-<form method="POST" action="{% url 'notes:add' %}" class="mt-5">
-  {% csrf_token %}
-  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    {% trans 'Add note' %}
 
-  <h4>{% trans 'Add note' %}</h4>
-
-  {% include 'fineforms/warnings.html' %}
-  {% ff_errors form %}
-  {% ff_fields form %}
-
-  <div class="row">
-    <div class="col-sm-12">
-      <button type="submit" class="btn btn-primary">
-        {% trans 'Save' %}</button>
-
-      {% if object.get_absolute_url %}
-      <a href="{{ object.get_absolute_url }}" class="btn float-right btn-outline-danger">
-        {% trans 'Cancel' %}</a>
-      {% endif %}
-    </div>
+    <button type="button" class="btn btn-primary" data-target="#note-add-form" data-toggle="collapse" aria-expanded="false">
+      {% trans 'Toggle form' %}
+    </button>
   </div>
+  <div class="card-body collapse" id="note-add-form">
 
-</form>
+    <form method="POST" action="{% url 'notes:add' %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+      {% include 'fineforms/warnings.html' %}
+      {% ff_errors form %}
+      {% ff_fields form %}
+
+      <div class="row">
+        <div class="col-sm-12">
+          <button type="submit" class="btn btn-primary">
+            {% trans 'Save' %}</button>
+
+          {% if object.get_absolute_url %}
+          <a href="{{ object.get_absolute_url }}" class="btn float-right btn-outline-danger">
+            {% trans 'Cancel' %}</a>
+          {% endif %}
+        </div>
+      </div>
+
+    </form>
+
+  </div>
+</div>
 
 </div>
