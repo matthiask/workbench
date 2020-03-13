@@ -30,8 +30,8 @@ def search(request):
                 [
                     Invoice.objects.select_related("project", "owned_by"),
                     RecurringInvoice.objects.all(),
-                    Offer.objects.select_related("project", "owned_by"),
-                    Deal.objects.all(),
+                    Offer.objects.select_related("project", "owned_by").order_by("-pk"),
+                    Deal.objects.order_by("-pk"),
                 ]
             )
         results = [
