@@ -397,6 +397,16 @@ class CreateProjectInvoiceForm(InvoiceForm):
             widget=forms.CheckboxSelectMultiple(attrs={"size": 30}),
         )
 
+        self.fields["disable_logging"] = forms.TypedChoiceField(
+            label=_("Disable logging on selected services from now on?"),
+            choices=[
+                (1, _("Yes, disable logging from now on")),
+                (0, _("No, do not change anything")),
+            ],
+            coerce=lambda x: int(x),
+            widget=forms.RadioSelect,
+        )
+
     def save(self):
         if self.request.GET.get("type") != "services":
             return super().save()
@@ -409,6 +419,8 @@ class CreateProjectInvoiceForm(InvoiceForm):
             instance.create_services_from_logbook(services)
         else:
             instance.create_services_from_offer(services)
+        if self.cleaned_data["disable_logging"]:
+            services.update(allow_logging=False)
         return instance
 
 

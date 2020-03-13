@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-13 09:08+0100\n"
+"POT-Creation-Date: 2020-03-13 13:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -822,6 +822,11 @@ msgstr ""
 "Dieses Geschäft ist schon geschlossen. Ich gehe davon aus, dass Du weisst "
 "was Du tust und werde nicht im Weg stehen."
 
+#: workbench/deals/forms.py workbench/invoices/models.py
+#: workbench/offers/models.py
+msgid "total CHF"
+msgstr "Total CHF"
+
 #: workbench/deals/forms.py
 msgid "Expected"
 msgstr "Erwartet"
@@ -1276,6 +1281,18 @@ msgid "services"
 msgstr "Leistungen"
 
 #: workbench/invoices/forms.py
+msgid "Disable logging on selected services from now on?"
+msgstr "Leistungserfassung auf ausgewählten Leistungen ab sofort verbieten?"
+
+#: workbench/invoices/forms.py
+msgid "Yes, disable logging from now on"
+msgstr "Ja, die Erfassung ab sofort verbieten"
+
+#: workbench/invoices/forms.py
+msgid "No, do not change anything"
+msgstr "Nein, bitte nichts ändern"
+
+#: workbench/invoices/forms.py
 msgid "Other invoice types must be created directly on a project."
 msgstr "Andere Rechnungstypen müssen direkt auf einem Projekt erstellt werden."
 
@@ -1439,10 +1456,6 @@ msgstr "Total CHF Akonto"
 #: workbench/invoices/models.py workbench/offers/models.py
 msgid "total CHF incl. tax"
 msgstr "Total CHF inkl. MwSt."
-
-#: workbench/invoices/models.py workbench/offers/models.py
-msgid "total CHF"
-msgstr "Total CHF"
 
 #: workbench/invoices/models.py
 msgid "Invoices in preparation may be deleted, others not."

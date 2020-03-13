@@ -95,7 +95,7 @@ class InvoicesTest(TestCase):
         self.assertAlmostEqual(invoice.subtotal, Decimal("2500"))
 
     def test_create_service_invoice_from_offer(self):
-        service = factories.ServiceFactory.create(cost=100)
+        service = factories.ServiceFactory.create(cost=100, allow_logging=True)
         url = service.project.urls["createinvoice"] + "?type=services&source=offer"
         self.client.force_login(service.project.owned_by)
         response = self.client.get(url)
@@ -112,6 +112,7 @@ class InvoicesTest(TestCase):
                 "liable_to_vat": "1",
                 "postal_address": "Anything\nStreet\nCity",
                 "selected_services": [service.pk],
+                "disable_logging": 1,
             },
         )
         # print(response, response.content.decode("utf-8"))
@@ -119,6 +120,9 @@ class InvoicesTest(TestCase):
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls["detail"])
         self.assertEqual(invoice.subtotal, 100)
+
+        service.refresh_from_db()
+        self.assertFalse(service.allow_logging)
 
         service = invoice.services.get()
         response = self.client.post(
@@ -194,6 +198,7 @@ class InvoicesTest(TestCase):
                     service3.pk,
                     service4.pk,
                 ],
+                "disable_logging": 0,
             },
         )
         invoice = Invoice.objects.get()
@@ -298,6 +303,7 @@ class InvoicesTest(TestCase):
                 "liable_to_vat": "1",
                 "postal_address": "Anything\nStreet\nCity",
                 "selected_services": [service.pk],
+                "disable_logging": 0,
             },
         )
 
@@ -342,6 +348,7 @@ class InvoicesTest(TestCase):
                 "liable_to_vat": "1",
                 "postal_address": "Anything\nStreet\nCity",
                 "selected_services": [service.pk],
+                "disable_logging": 0,
             },
         )
         invoice = Invoice.objects.get()
