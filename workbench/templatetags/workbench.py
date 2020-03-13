@@ -276,12 +276,13 @@ def addf(a, b):
 
 
 @register.inclusion_tag("notes/widget.html", takes_context=True)
-def notes(context, content_object):
+def notes(context, instance):
     request = context["request"]
+    notes = (
+        Note.objects.for_content_object(instance).select_related("created_by").reverse()
+    )
     return {
-        "form": NoteForm(request=request, content_object=content_object),
-        "notes": Note.objects.for_content_object(content_object)
-        .select_related("created_by")
-        .reverse(),
+        "form": NoteForm(request=request, content_object=instance),
+        "notes": notes,
         "request": request,
     }

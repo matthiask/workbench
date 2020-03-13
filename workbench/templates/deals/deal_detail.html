@@ -39,23 +39,17 @@
           </div>
 
           <div class="col-auto">
-            {% if object.status != object.OPEN %}
-              <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.OPEN }}" class="btn btn-sm btn-info">
-                {% trans 'open'|capfirst %}
-              </a>
-            {% endif %}
+            <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.OPEN }}" class="btn btn-sm btn-info">
+              {% trans 'open'|capfirst %}
+            </a>
 
-            {% if object.status != object.ACCEPTED or not object.closing_type %}
-              <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}" class="btn btn-sm btn-success">
-                {% trans 'accepted'|capfirst %}
-              </a>
-            {% endif %}
+            <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}" class="btn btn-sm btn-success">
+              {% trans 'accepted'|capfirst %}
+            </a>
 
-            {% if object.status != object.DECLINED or not object.closing_type %}
-              <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.DECLINED }}" class="btn btn-sm btn-danger">
-                {% trans 'declined'|capfirst %}
-              </a>
-            {% endif %}
+            <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.DECLINED }}" class="btn btn-sm btn-danger">
+              {% trans 'declined'|capfirst %}
+            </a>
 
           </div>
         </div>
