@@ -49,6 +49,7 @@ INSTALLED_APPS = [
         "workbench.expenses",
         "workbench.invoices",
         "workbench.logbook",
+        "workbench.notes",
         "workbench.offers",
         "workbench.projects",
         "workbench.reporting",

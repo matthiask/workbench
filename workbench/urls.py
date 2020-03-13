@@ -29,6 +29,7 @@ urlpatterns = [
     url(r"^history/(\w+)/(\w+)/([0-9]+)/$", views.history, name="history"),
     url(r"^report/", include("workbench.reporting.urls")),
     url(r"", include("workbench.timer.urls")),
+    url(r"^notes/", include("workbench.notes.urls")),
 ]
 
 urlpatterns += i18n_patterns(

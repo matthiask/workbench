@@ -1,0 +1,37 @@
+{% load i18n fineforms workbench %}
+<div class="notes mt-5">
+
+<h3>{% trans 'notes'|capfirst %}</h3>
+{% for note in notes %}
+<p class="mb-3">
+  <em>{{ note.created_by }} at {{ note.created_at|local_date_format }}</em><br>
+  <strong>{{ note.title }}</strong><br>
+  {{ note.description|linebreaksbr }}
+</p>
+{% endfor %}
+
+<form method="POST" action="{% url 'notes:add' %}" class="mt-5">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+  <h4>{% trans 'Add note' %}</h4>
+
+  {% include 'fineforms/warnings.html' %}
+  {% ff_errors form %}
+  {% ff_fields form %}
+
+  <div class="row">
+    <div class="col-sm-12">
+      <button type="submit" class="btn btn-primary">
+        {% trans 'Save' %}</button>
+
+      {% if object.get_absolute_url %}
+      <a href="{{ object.get_absolute_url }}" class="btn float-right btn-outline-danger">
+        {% trans 'Cancel' %}</a>
+      {% endif %}
+    </div>
+  </div>
+
+</form>
+
+</div>

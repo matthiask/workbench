@@ -11,6 +11,8 @@ from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
+from workbench.notes.forms import NoteForm
+from workbench.notes.models import Note
 from workbench.tools.formats import currency, days, hours, local_date_format
 from workbench.tools.models import Z
 
@@ -271,3 +273,15 @@ def label(instance, field):
 def addf(a, b):
     """Add values without converting them to integers (as |add seems to do)"""
     return a + b
+
+
+@register.inclusion_tag("notes/widget.html", takes_context=True)
+def notes(context, content_object):
+    request = context["request"]
+    return {
+        "form": NoteForm(request=request, content_object=content_object),
+        "notes": Note.objects.for_content_object(content_object)
+        .select_related("created_by")
+        .reverse(),
+        "request": request,
+    }
