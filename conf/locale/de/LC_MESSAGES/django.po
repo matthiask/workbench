@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-13 13:06+0100\n"
+"POT-Creation-Date: 2020-03-14 09:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -809,10 +809,10 @@ msgstr "Geschäfte"
 msgid "Open"
 msgstr "Offen"
 
-#: workbench/deals/forms.py workbench/invoices/forms.py
-#: workbench/offers/forms.py
-msgid "Exact"
-msgstr "Exakt"
+#: workbench/deals/forms.py workbench/expenses/forms.py
+#: workbench/invoices/forms.py workbench/projects/forms.py
+msgid "Closed"
+msgstr "Abgeschlossen"
 
 #: workbench/deals/forms.py
 msgid ""
@@ -1079,11 +1079,6 @@ msgstr "Alle"
 msgid "In preparation"
 msgstr "In Vorbereitung"
 
-#: workbench/expenses/forms.py workbench/invoices/forms.py
-#: workbench/projects/forms.py
-msgid "Closed"
-msgstr "Abgeschlossen"
-
 #: workbench/expenses/forms.py
 msgid "is closed"
 msgstr "Ist geschlossen"
@@ -1210,6 +1205,10 @@ msgstr "Rechnungen"
 #: workbench/invoices/forms.py
 msgid "More than 30 days overdue"
 msgstr "Seit mehr als 30 Tagen überfällig"
+
+#: workbench/invoices/forms.py workbench/offers/forms.py
+msgid "Exact"
+msgstr "Exakt"
 
 #: workbench/invoices/forms.py
 msgid "No invoices found."
@@ -2853,6 +2852,10 @@ msgstr "<kein Wert>"
 #, python-format
 msgid "Deleted %s instance"
 msgstr "Gelöschte %s-Instanz"
+
+#: workbench/tools/history.py
+msgid "<anonymous>"
+msgstr "<anonym>"
 
 #: workbench/tools/history.py
 #, python-format

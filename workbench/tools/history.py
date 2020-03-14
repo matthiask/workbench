@@ -123,6 +123,7 @@ def changes(model, fields, actions):
         return changes
 
     users = {u.pk: u.get_full_name() for u in User.objects.all()}
+    users[0] = _("<anonymous>")
     formatter = Formatter()
 
     for action in actions:
