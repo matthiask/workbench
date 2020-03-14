@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.db import connections
 from django.http import HttpResponseRedirect
@@ -22,16 +23,7 @@ def user_middleware(get_response):
 
         set_user_name("user-0-anonymous")
 
-        if request.path.startswith(
-            (
-                "/accounts",
-                "/favicon",
-                "/robots",
-                "/sitemap",
-                "/create-timestamp",
-                "/timestamps-controller",
-            )
-        ):
+        if request.path.startswith(settings.LOGIN_REQUIRED_EXEMPT):
             return get_response(request)
 
         messages.info(request, _("Please authenticate."))

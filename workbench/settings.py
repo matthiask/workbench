@@ -62,6 +62,14 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = "accounts.User"
 LOGIN_REDIRECT_URL = "/"
+LOGIN_REQUIRED_EXEMPT = (
+    "/accounts",
+    "/favicon",
+    "/robots",
+    "/sitemap",
+    "/create-timestamp",
+    "/timestamps-controller",
+)
 
 MIDDLEWARE = [
     m
