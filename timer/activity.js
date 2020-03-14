@@ -6,7 +6,6 @@ import AsyncSelect from "react-select/async"
 
 import {fetchProjects, fetchServices, openForm, sendLogbook} from "./actions.js"
 import {ActivitySettings} from "./activitySettings.js"
-import {COLORS} from "./colors.js"
 import {gettext, OUTCOME} from "./i18n.js"
 import {clamp, prettyDuration, timestamp} from "./utils.js"
 import * as icons from "./icons.js"
@@ -39,11 +38,6 @@ export const Activity = connect((state, ownProps) => ({
   projects: state.projects,
 }))(({activity, current, projects, dispatch}) => {
   const dispatchUpdate = createUpdater({id: activity.id, dispatch})
-
-  // Precondition check
-  if (COLORS.indexOf(activity.color) === -1) {
-    dispatchUpdate({color: COLORS[Math.floor(Math.random() * COLORS.length)]})
-  }
 
   // State vars
   const [showSettings, setShowSettings] = useState(false)
