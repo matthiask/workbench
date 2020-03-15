@@ -249,7 +249,7 @@ SELECT id, given_name, family_name, date_of_birth FROM (
         date_of_birth,
         (current_date - date_of_birth) % 365.24 AS diff
     FROM contacts_person
-    WHERE date_of_birth is not null
+    WHERE date_of_birth is not null AND is_archived=FALSE
 ) AS subquery
 WHERE diff < 7 or diff > 350
 ORDER BY (diff + 180) % 365 DESC
