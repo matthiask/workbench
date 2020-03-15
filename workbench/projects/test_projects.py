@@ -507,6 +507,7 @@ class ProjectsTest(TestCase):
 
         service = project.services.get()
         self.assertEqual(service.effort_rate, 250)
+        self.assertEqual(service.effort_type, "Pauschalsatz")
 
     @override_settings(FEATURES={"glassfrog": False})
     def test_no_role(self):
