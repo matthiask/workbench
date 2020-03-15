@@ -2,7 +2,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.utils.text import capfirst
-from django.utils.translation import gettext_lazy as _, override
+from django.utils.translation import gettext, gettext_lazy as _, override
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
@@ -182,7 +182,8 @@ class ProjectForm(ModelForm):
         if self.instance.flat_rate is not None:
             with override(settings.WORKBENCH.PDF_LANGUAGE):
                 self.instance.services.editable().update(
-                    effort_type=_("flat rate"), effort_rate=self.instance.flat_rate
+                    effort_type=gettext("flat rate"),
+                    effort_rate=self.instance.flat_rate,
                 )
         instance.save()
         if "customer" in self.changed_data:
@@ -222,7 +223,7 @@ class ServiceForm(ModelForm):
         elif self.project.flat_rate is not None:
             with override(settings.WORKBENCH.PDF_LANGUAGE):
                 kwargs["instance"] = Service(
-                    effort_type=_("flat rate"), effort_rate=self.project.flat_rate
+                    effort_type=gettext("flat rate"), effort_rate=self.project.flat_rate
                 )
 
         super().__init__(*args, **kwargs)

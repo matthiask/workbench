@@ -456,7 +456,9 @@ class ProjectsTest(TestCase):
         self.client.force_login(project.owned_by)
 
         response = self.client.get(
-            project.urls["createservice"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            project.urls["createservice"],
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            HTTP_ACCEPT_LANGUAGE="en",
         )
         # print(response.content.decode("utf-8"))
 
@@ -467,7 +469,7 @@ class ProjectsTest(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="text" name="effort_type" value="flat rate" maxlength="50" class="form-control" disabled id="id_effort_type">',  # noqa
+            '<input type="text" name="effort_type" value="Pauschalsatz" maxlength="50" class="form-control" disabled id="id_effort_type">',  # noqa
             html=True,
         )
         self.assertNotContains(response, 'id="id_service_type"')
