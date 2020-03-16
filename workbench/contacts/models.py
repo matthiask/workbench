@@ -50,7 +50,7 @@ class Organization(Model):
         verbose_name_plural = _("organizations")
 
     def __str__(self):
-        return self.name
+        return self.name.replace("\n", " ")
 
     @classmethod
     def allow_delete(cls, instance, request):
