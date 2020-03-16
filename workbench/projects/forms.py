@@ -135,7 +135,9 @@ class ProjectForm(ModelForm):
                         "description": project.description,
                         "type": project.type,
                         "owned_by": (
-                            project.owned_by_id if project.owned_by.is_active else None
+                            project.owned_by_id
+                            if project.owned_by.is_active
+                            else request.user.id
                         ),
                     }
                 )
