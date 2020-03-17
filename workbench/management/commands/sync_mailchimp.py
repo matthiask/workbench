@@ -38,7 +38,7 @@ class Command(BaseCommand):
             )
         }
 
-        persons_to_sync = Person.objects.filter(is_archived=False, id__in=person_ids)
+        persons_to_sync = Person.objects.active().filter(id__in=person_ids)
 
         emails = {
             obj.person_id: obj
