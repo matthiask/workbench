@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-14 09:48+0100\n"
+"POT-Creation-Date: 2020-03-17 08:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2761,6 +2761,10 @@ msgstr "keine Stunden heute"
 #: workbench/templates/start.html
 msgid "all users' hours"
 msgstr "Stunden von allen"
+
+#: workbench/templates/timestamps.html
+msgid "Previous day"
+msgstr "Vorheriger Tag"
 
 #: workbench/templates/timestamps.html
 msgid "Controller"

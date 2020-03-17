@@ -13,6 +13,8 @@ from corsheaders.middleware import CorsMiddleware
 
 from workbench.accounts.models import User
 from workbench.timer.models import TimerState, Timestamp
+from workbench.tools.forms import Form
+from workbench.tools.validation import filter_form
 
 
 def timer(request):
@@ -62,13 +64,19 @@ def create_timestamp(request):
     return JsonResponse({}, status=201)
 
 
-def timestamps(request):
-    day = dt.date.today()
+class DayForm(Form):
+    day = forms.DateField(required=False)
+
+
+@filter_form(DayForm)
+def timestamps(request, form):
+    day = form.cleaned_data["day"] or dt.date.today()
     return render(
         request,
         "timestamps.html",
         {
             "timestamps": Timestamp.for_user(request.user, day=day),
+            "previous": day - dt.timedelta(days=1),
             "url": request.build_absolute_uri(reverse("create_timestamp")),
         },
     )
