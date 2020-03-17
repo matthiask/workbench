@@ -24,64 +24,14 @@ class TimerState(models.Model):
         return str(self.user)
 
 
-class Timestamp(models.Model):
-    START = "start"
-    SPLIT = "split"
-    STOP = "stop"
-    LOGBOOK = "logbook"
-
-    TYPE_CHOICES = [
-        (START, _("start")),
-        (SPLIT, _("split")),
-        (STOP, _("stop")),
-        (LOGBOOK, _("logbook")),
-    ]
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))
-    created_at = models.DateTimeField(_("created at"), default=timezone.now)
-    type = models.CharField(_("type"), max_length=10, choices=TYPE_CHOICES)
-    notes = models.CharField(_("notes"), max_length=500, blank=True)
-
-    class Meta:
-        ordering = ["-pk"]
-        verbose_name = _("timestamp")
-        verbose_name_plural = _("timestamps")
-
-    def __str__(self):
-        return local_date_format(self.created_at)
-
-    def __init__(self, *args, **kwargs):
-        self.url = kwargs.pop("url", "")
-        super().__init__(*args, **kwargs)
-
-    def save(self, *args, **kwargs):
-        assert self.type != self.LOGBOOK, "Not to be used for timestamps"
-        super().save(*args, **kwargs)
-
-    save.alters_data = True
-
-    @property
-    def badge(self):
-        css = {
-            self.START: "primary",
-            self.SPLIT: "info",
-            self.STOP: "success",
-            self.LOGBOOK: "secondary",
-        }
-        return format_html(
-            '<span class="badge badge-{}">{}</span>',
-            css[self.type],
-            self.get_type_display(),
-        )
-
-    @classmethod
-    def for_user(cls, user, *, day=None):
+class TimestampQuerySet(models.QuerySet):
+    def for_user(self, user, *, day=None):
         day = day or dt.date.today()
-        entries = list(cls.objects.filter(user=user, created_at__date=day))
+        entries = list(self.filter(user=user, created_at__date=day))
         entries.extend(
-            cls(
+            self.model(
                 created_at=entry.created_at,
-                type=cls.LOGBOOK,
+                type=self.model.LOGBOOK,
                 notes=_("Logbook entry on %(service)s: %(description)s (%(hours)s)")
                 % {
                     "service": entry.service,
@@ -126,3 +76,56 @@ class Timestamp(models.Model):
             previous = current
 
         return ret
+
+
+class Timestamp(models.Model):
+    START = "start"
+    SPLIT = "split"
+    STOP = "stop"
+    LOGBOOK = "logbook"
+
+    TYPE_CHOICES = [
+        (START, _("start")),
+        (SPLIT, _("split")),
+        (STOP, _("stop")),
+        (LOGBOOK, _("logbook")),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))
+    created_at = models.DateTimeField(_("created at"), default=timezone.now)
+    type = models.CharField(_("type"), max_length=10, choices=TYPE_CHOICES)
+    notes = models.CharField(_("notes"), max_length=500, blank=True)
+
+    objects = TimestampQuerySet.as_manager()
+
+    class Meta:
+        ordering = ["-pk"]
+        verbose_name = _("timestamp")
+        verbose_name_plural = _("timestamps")
+
+    def __str__(self):
+        return local_date_format(self.created_at)
+
+    def __init__(self, *args, **kwargs):
+        self.url = kwargs.pop("url", "")
+        super().__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        assert self.type != self.LOGBOOK, "Not to be used for timestamps"
+        super().save(*args, **kwargs)
+
+    save.alters_data = True
+
+    @property
+    def badge(self):
+        css = {
+            self.START: "primary",
+            self.SPLIT: "info",
+            self.STOP: "success",
+            self.LOGBOOK: "secondary",
+        }
+        return format_html(
+            '<span class="badge badge-{}">{}</span>',
+            css[self.type],
+            self.get_type_display(),
+        )

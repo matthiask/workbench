@@ -19,16 +19,26 @@
         </h3>
         <div>
 
+          {% if previous %}
           <a href="?day={{ previous.isoformat }}" class="btn btn-primary btn-sm align-self-start"
                                                   title="{% trans 'Previous day' %}">
             &laquo;
           </a>
+          {% endif %}
+
           <a href="{% url 'timestamps-controller' %}?user={{ user.signed_email }}&amp;url={{ url }}&amp;title={{ WORKBENCH.TITLE }}"
              class="btn btn-primary btn-sm align-self-start"
              target="_blank"
              rel="noopener noreferrer"
              onclick="window.open(this.href, 'timestamps', 'innerHeight=400,innerWidth=400,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no');return false">
             {% trans 'Controller' %}</a>
+
+          {% if next %}
+          <a href="?day={{ next.isoformat }}" class="btn btn-primary btn-sm align-self-start"
+                                                  title="{% trans 'Next day' %}">
+            &raquo;
+          </a>
+          {% endif %}
 
         </div>
       </div>
@@ -37,7 +47,7 @@
         {% for row in timestamps %}
         {% if row.elapsed %}
           <a class="list-group-item list-group-item-action"
-            href="{% url 'logbook_loggedhours_create' %}?hours={{ row.elapsed|stringformat:'s' }}"
+            href="{% url 'logbook_loggedhours_create' %}?hours={{ row.elapsed|stringformat:'s' }}&amp;rendered_on={{ day.isoformat }}"
             data-toggle="ajaxmodal">
             <div class="d-flex w-100">
 

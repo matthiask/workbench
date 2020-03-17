@@ -70,13 +70,16 @@ class DayForm(Form):
 
 @filter_form(DayForm)
 def timestamps(request, form):
-    day = form.cleaned_data["day"] or dt.date.today()
+    today = dt.date.today()
+    day = form.cleaned_data["day"] or today
     return render(
         request,
         "timestamps.html",
         {
-            "timestamps": Timestamp.for_user(request.user, day=day),
+            "timestamps": Timestamp.objects.for_user(request.user, day=day),
+            "day": day,
             "previous": day - dt.timedelta(days=1),
+            "next": day + dt.timedelta(days=1) if day < today else None,
             "url": request.build_absolute_uri(reverse("create_timestamp")),
         },
     )
