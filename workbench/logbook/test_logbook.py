@@ -42,12 +42,10 @@ class LogbookTest(TestCase):
         self.assertContains(response, "This seems to be a duplicate.")
 
         response = send(rendered_on=in_days(-10).isoformat())
-        self.assertContains(
-            response, "Sorry, hours have to be logged in the same week."
-        )
+        self.assertContains(response, "Hours have to be logged in the same week.")
 
         response = send(rendered_on=in_days(10).isoformat())
-        self.assertContains(response, "Sorry, that&#x27;s too far in the future.")
+        self.assertContains(response, "That&#x27;s too far in the future.")
 
         response = send(service="")
         self.assertContains(
@@ -85,9 +83,7 @@ class LogbookTest(TestCase):
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assertContains(
-            response, "Sorry, hours have to be logged in the same week."
-        )
+        self.assertContains(response, "Hours have to be logged in the same week.")
 
     def test_update_past_week_allowed(self):
         day = in_days(-7)
@@ -310,7 +306,7 @@ class LogbookTest(TestCase):
         self.assertContains(response, "This project has been closed too long ago.")
 
         response = send(cost.urls["update"], rendered_on=in_days(10).isoformat())
-        self.assertContains(response, "Sorry, that&#x27;s too far in the future.")
+        self.assertContains(response, "That&#x27;s too far in the future.")
 
     def test_update_old_disabled_fields(self):
         hours = factories.LoggedHoursFactory.create(rendered_on=in_days(-10))

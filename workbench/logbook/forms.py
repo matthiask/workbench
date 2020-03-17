@@ -314,11 +314,9 @@ class LoggedHoursForm(ModelForm):
                 # Fine
                 pass
             elif data["rendered_on"] < logbook_lock():
-                errors["rendered_on"] = _(
-                    "Sorry, hours have to be logged in the same week."
-                )
+                errors["rendered_on"] = _("Hours have to be logged in the same week.")
             elif data["rendered_on"] > in_days(7):
-                errors["rendered_on"] = _("Sorry, that's too far in the future.")
+                errors["rendered_on"] = _("That's too far in the future.")
 
         try:
             latest = LoggedHours.objects.filter(
@@ -451,6 +449,6 @@ class LoggedCostForm(ModelForm):
                     code="third-party-costs-higher",
                 )
         if data.get("rendered_on") and data["rendered_on"] > in_days(7):
-            errors["rendered_on"] = _("Sorry, that's too far in the future.")
+            errors["rendered_on"] = _("That's too far in the future.")
         raise_if_errors(errors)
         return data

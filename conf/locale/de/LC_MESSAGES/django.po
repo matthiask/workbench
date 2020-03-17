@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-17 08:54+0100\n"
+"POT-Creation-Date: 2020-03-17 10:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1615,12 +1615,12 @@ msgid "This entry is already part of an invoice."
 msgstr "Dieser Eintrag ist schon Teil einer Rechnung."
 
 #: workbench/logbook/forms.py
-msgid "Sorry, hours have to be logged in the same week."
-msgstr "Tut mir leid, Stunden müssen in der gleichen Woche erfasst werden."
+msgid "Hours have to be logged in the same week."
+msgstr "Stunden müssen in der gleichen Woche erfasst werden."
 
 #: workbench/logbook/forms.py
-msgid "Sorry, that's too far in the future."
-msgstr "Tut mir leid, Datum zu weit in der Zukunft."
+msgid "That's too far in the future."
+msgstr "Datum zu weit in der Zukunft."
 
 #: workbench/logbook/forms.py
 msgid "This seems to be a duplicate. Is it?"
@@ -2767,6 +2767,10 @@ msgid "Previous day"
 msgstr "Vorheriger Tag"
 
 #: workbench/templates/timestamps.html
+msgid "Next day"
+msgstr "Nächster Tag"
+
+#: workbench/templates/timestamps.html
 msgid "Controller"
 msgstr "Controller"
 
@@ -2815,6 +2819,11 @@ msgid "timer states"
 msgstr "Timer-Stati"
 
 #: workbench/timer/models.py
+#, python-format
+msgid "Logbook entry on %(service)s: %(description)s (%(hours)s)"
+msgstr "Logbucheintrag auf %(service)s: %(description)s (%(hours)s)"
+
+#: workbench/timer/models.py
 msgid "start"
 msgstr "Start"
 
@@ -2829,11 +2838,6 @@ msgstr "Stop"
 #: workbench/timer/models.py
 msgid "timestamp"
 msgstr "Zeitmarke"
-
-#: workbench/timer/models.py
-#, python-format
-msgid "Logbook entry on %(service)s: %(description)s (%(hours)s)"
-msgstr "Logbucheintrag auf %(service)s: %(description)s (%(hours)s)"
 
 #: workbench/tools/forms.py
 msgid "Is automatically filled using the organization's contact."
