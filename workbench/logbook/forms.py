@@ -13,6 +13,7 @@ from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
+from workbench.timer.models import Timestamp
 from workbench.tools.forms import (
     Autocomplete,
     DateInput,
@@ -339,8 +340,14 @@ class LoggedHoursForm(ModelForm):
 
     def save(self):
         instance = super().save(commit=False)
+        timestamp = None
         if not instance.pk:
             instance.created_by = self.request.user
+            if self.request.GET.get("timestamp"):
+                timestamp = Timestamp.objects.filter(
+                    user=self.request.user, id=self.request.GET.get("timestamp")
+                ).first()
+
         if not self.cleaned_data.get("service") and self.cleaned_data.get(
             "service_title"
         ):
@@ -356,6 +363,10 @@ class LoggedHoursForm(ModelForm):
             service.save()
             instance.service = service
         instance.save()
+        if timestamp:
+            timestamp.logged_hours = instance
+            timestamp.save()
+
         return instance
 
 

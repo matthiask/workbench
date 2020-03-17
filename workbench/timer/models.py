@@ -8,6 +8,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
+from workbench.logbook.models import LoggedHours
 from workbench.tools.formats import hours, local_date_format
 
 
@@ -27,7 +28,12 @@ class TimerState(models.Model):
 class TimestampQuerySet(models.QuerySet):
     def for_user(self, user, *, day=None):
         day = day or dt.date.today()
-        entries = list(self.filter(user=user, created_at__date=day))
+        entries = list(
+            self.filter(user=user, created_at__date=day).select_related(
+                "logged_hours__service"
+            )
+        )
+        known_logged_hours = set(entry.logged_hours for entry in entries)
         entries.extend(
             self.model(
                 created_at=entry.created_at,
@@ -43,6 +49,7 @@ class TimestampQuerySet(models.QuerySet):
             for entry in user.loggedhours.filter(rendered_on=day).select_related(
                 "service"
             )
+            if entry not in known_logged_hours
         )
         if not entries:
             return []
@@ -95,6 +102,13 @@ class Timestamp(models.Model):
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     type = models.CharField(_("type"), max_length=10, choices=TYPE_CHOICES)
     notes = models.CharField(_("notes"), max_length=500, blank=True)
+    logged_hours = models.OneToOneField(
+        LoggedHours,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_("logged hours"),
+    )
 
     objects = TimestampQuerySet.as_manager()
 

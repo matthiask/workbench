@@ -45,9 +45,31 @@
 
       <div class="list-group list-group-flush">
         {% for row in timestamps %}
-        {% if row.elapsed %}
+        {% if row.elapsed and row.timestamp.logged_hours %}
           <a class="list-group-item list-group-item-action"
-            href="{% url 'logbook_loggedhours_create' %}?hours={{ row.elapsed|stringformat:'s' }}&amp;rendered_on={{ day.isoformat }}"
+             href="{{ row.timestamp.logged_hours.get_absolute_url }}"
+            data-toggle="ajaxmodal">
+            <div class="d-flex w-100">
+
+              <div>
+                <strong>
+                  {{ row.timestamp.created_at|date:'H:i' }}
+                </strong>
+                {{ row.timestamp.badge }}
+                {{ row.timestamp.logged_hours }}
+              </div>
+
+              <span class="btn btn-sm ml-auto align-self-start btn-light">
+                {{ row.timestamp.logged_hours.hours|hours:True }}
+              </span>
+
+            </div>
+
+          </a>
+
+        {% elif row.elapsed %}
+          <a class="list-group-item list-group-item-action"
+             href="{% url 'logbook_loggedhours_create' %}?hours={{ row.elapsed|stringformat:'s' }}&amp;rendered_on={{ day.isoformat }}&amp;timestamp={{ row.timestamp.pk }}"
             data-toggle="ajaxmodal">
             <div class="d-flex w-100">
 
@@ -59,11 +81,9 @@
                 {{ row.timestamp.notes }}
               </div>
 
-              {% if row.elapsed %}
-              <span class="btn btn-sm btn-primary ml-auto align-self-start">
+              <span class="btn btn-sm ml-auto align-self-start btn-primary">
                 {{ row.elapsed|hours:True }}
               </span>
-              {% endif %}
 
             </div>
 

@@ -247,3 +247,28 @@ class TimestampsTest(TestCase):
             created_at=timezone.now() + dt.timedelta(seconds=99), type=Timestamp.SPLIT
         )
         self.assertEqual(user.latest_created_at, t.created_at)
+
+    def test_link_timestamps(self):
+        service = factories.ServiceFactory.create()
+        user = service.project.owned_by
+        self.client.force_login(user)
+
+        t = user.timestamp_set.create(
+            created_at=timezone.now() - dt.timedelta(seconds=99), type=Timestamp.SPLIT
+        )
+
+        response = self.client.post(
+            service.project.urls["createhours"] + "?timestamp={}".format(t.pk),
+            {
+                "modal-rendered_by": user.pk,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-service": service.id,
+                "modal-hours": "0.2",
+                "modal-description": "Test",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        t.refresh_from_db()
+        self.assertEqual(t.logged_hours.description, "Test")
