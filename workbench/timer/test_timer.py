@@ -108,8 +108,9 @@ class TimestampsTest(TestCase):
             type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=160)
         )
 
+        timestamps = Timestamp.for_user(user)
         self.assertEqual(
-            user.timestamps,
+            timestamps,
             [
                 {"elapsed": None, "timestamp": t1},
                 {"elapsed": Decimal("0.7"), "timestamp": t2},
@@ -123,7 +124,7 @@ class TimestampsTest(TestCase):
 
         # Some types have been overridden
         self.assertEqual(
-            [row["timestamp"].type for row in user.timestamps],
+            [row["timestamp"].type for row in timestamps],
             [
                 Timestamp.START,
                 Timestamp.SPLIT,
@@ -145,15 +146,16 @@ class TimestampsTest(TestCase):
             type=Timestamp.START, created_at=today + dt.timedelta(minutes=29)
         )
 
+        timestamps = Timestamp.for_user(user)
         self.assertEqual(
-            user.timestamps,
+            timestamps,
             [
                 {"elapsed": None, "timestamp": t1},
                 {"elapsed": Decimal("0.5"), "timestamp": t2},
             ],
         )
         self.assertEqual(
-            [row["timestamp"].type for row in user.timestamps],
+            [row["timestamp"].type for row in timestamps],
             [Timestamp.START, Timestamp.SPLIT],  # 2nd was: START
         )
 
@@ -172,15 +174,16 @@ class TimestampsTest(TestCase):
             type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=40)
         )
 
+        timestamps = Timestamp.for_user(user)
         self.assertEqual(
-            user.timestamps,
+            timestamps,
             [
                 {"elapsed": None, "timestamp": t1},
                 {"elapsed": Decimal("0.5"), "timestamp": t2},
             ],
         )
         self.assertEqual(
-            [row["timestamp"].type for row in user.timestamps],
+            [row["timestamp"].type for row in timestamps],
             [Timestamp.START, Timestamp.STOP],
         )
 
@@ -202,14 +205,15 @@ class TimestampsTest(TestCase):
             type=Timestamp.SPLIT, created_at=today + dt.timedelta(minutes=20)
         )
 
-        self.assertEqual(len(user.timestamps), 3)
-        self.assertEqual(user.timestamps[0]["elapsed"], None)
-        self.assertEqual(user.timestamps[1]["elapsed"], None)
-        self.assertEqual(user.timestamps[2]["elapsed"], Decimal("0.2"))
+        timestamps = Timestamp.for_user(user)
+        self.assertEqual(len(timestamps), 3)
+        self.assertEqual(timestamps[0]["elapsed"], None)
+        self.assertEqual(timestamps[1]["elapsed"], None)
+        self.assertEqual(timestamps[2]["elapsed"], Decimal("0.2"))
 
-        self.assertEqual(user.timestamps[0]["timestamp"], t1)
-        self.assertIn(l1.description, user.timestamps[1]["timestamp"].notes)
-        self.assertEqual(user.timestamps[2]["timestamp"], t2)
+        self.assertEqual(timestamps[0]["timestamp"], t1)
+        self.assertIn(l1.description, timestamps[1]["timestamp"].notes)
+        self.assertEqual(timestamps[2]["timestamp"], t2)
 
     def test_view(self):
         deactivate_all()

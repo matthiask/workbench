@@ -1,3 +1,4 @@
+import datetime as dt
 import json
 
 from django import forms
@@ -62,8 +63,12 @@ def create_timestamp(request):
 
 
 def timestamps(request):
+    day = dt.date.today()
     return render(
         request,
         "timestamps.html",
-        {"url": request.build_absolute_uri(reverse("create_timestamp"))},
+        {
+            "timestamps": Timestamp.for_user(request.user, day=day),
+            "url": request.build_absolute_uri(reverse("create_timestamp")),
+        },
     )

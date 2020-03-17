@@ -222,12 +222,6 @@ class User(Model, AbstractBaseUser):
         return Deal.objects.maybe_actionable(user=self)
 
     @cached_property
-    def timestamps(self):
-        from workbench.timer.models import Timestamp
-
-        return Timestamp.for_user(self)
-
-    @cached_property
     def signed_email(self):
         return signer.sign(self.email)
 
