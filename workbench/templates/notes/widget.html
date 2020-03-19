@@ -4,8 +4,13 @@
 <h3>{% trans 'notes'|capfirst %}</h3>
 {% for note in notes %}
 <div class="card mb-3">
-  <div class="card-header">
-    {{ note.created_by }} at {{ note.created_at|local_date_format }}
+  <div class="card-header d-flex justify-content-between">
+    <h5 class="mb-1">
+      {{ note.created_by }} at {{ note.created_at|local_date_format }}
+    </h5>
+    <a href="{{ note.urls.update }}" class="btn btn-primary btn-sm" data-toggle="ajaxmodal">
+      {% trans 'Update' %}
+    </a>
   </div>
   <div class="card-body">
     <div class="card-title"><strong>{{ note.title }}</strong></div>
@@ -24,7 +29,7 @@
   </div>
   <div class="card-body collapse" id="note-add-form">
 
-    <form method="POST" action="{% url 'notes:add' %}">
+    <form method="POST" action="{% url 'notes_note_add' %}">
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ request.get_full_path }}">
 

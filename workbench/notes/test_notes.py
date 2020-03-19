@@ -60,5 +60,16 @@ class NotesTest(TestCase):
 
         # print(response, response.content.decode("utf-8"))
 
+        note = Note.objects.get()
+        response = self.client.post(
+            note.urls["update"],
+            {"title": "Updated", "description": note.description},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
+
+        note.refresh_from_db()
+        self.assertEqual(note.title, "Updated")
+
     def test_str(self):
         self.assertEqual(str(Note(title="bla")), "bla")

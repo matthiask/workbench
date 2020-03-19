@@ -5,6 +5,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
+from workbench.tools.models import Model
+from workbench.tools.urls import model_urls
 
 
 class NoteQuerySet(models.QuerySet):
@@ -15,7 +17,8 @@ class NoteQuerySet(models.QuerySet):
         )
 
 
-class Note(models.Model):
+@model_urls
+class Note(Model):
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     created_by = models.ForeignKey(
         User,
