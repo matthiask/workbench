@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-19 15:08+0100\n"
+"POT-Creation-Date: 2020-03-19 15:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -766,11 +766,11 @@ msgstr "Rechnung"
 
 #: workbench/credit_control/models.py
 msgid "credit entry"
-msgstr "Gutschrift"
+msgstr "Zahlungseingang"
 
 #: workbench/credit_control/models.py workbench/templates/base.html
 msgid "credit entries"
-msgstr "Gutschriften"
+msgstr "Zahlungseingänge"
 
 #: workbench/credit_control/views.py
 #: workbench/templates/credit_control/creditentry_list.html
@@ -781,12 +781,12 @@ msgstr "Kontoauszug hochladen"
 #, python-format
 msgid "Created %s credit entry."
 msgid_plural "Created %s credit entries."
-msgstr[0] "%s Gutschrift erstellt."
-msgstr[1] "%s Gutschriften erstellt."
+msgstr[0] "%s Zahlungseingang erstellt."
+msgstr[1] "%s Zahlungseingänge erstellt."
 
 #: workbench/credit_control/views.py
 msgid "All credit entries have already been assigned."
-msgstr "Alle Gutschriften wurden zugewiesen."
+msgstr "Alle Zahlungseingänge wurden zugewiesen."
 
 #: workbench/credit_control/views.py
 #, python-format
@@ -796,7 +796,7 @@ msgstr "%(class)s wurden erfolgreich geändert."
 #: workbench/credit_control/views.py
 #: workbench/templates/credit_control/creditentry_list.html
 msgid "Assign credit entries"
-msgstr "Gutschriften zuweisen"
+msgstr "Zahlungseingänge zuweisen"
 
 #: workbench/deals/__init__.py workbench/deals/models.py
 #: workbench/templates/base.html workbench/templates/shortcuts.html
@@ -1400,7 +1400,7 @@ msgstr "Code"
 #: workbench/invoices/models.py
 msgid "This fields' value is overridden when processing credit entries."
 msgstr ""
-"Der Inhalt dieses Felds wird bei der Verarbeitung von Gutschriften "
+"Der Inhalt dieses Felds wird bei der Verarbeitung von Zahlungseingängen "
 "überschrieben."
 
 #: workbench/invoices/models.py
