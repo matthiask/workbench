@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-17 10:30+0100\n"
+"POT-Creation-Date: 2020-03-19 15:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1398,6 +1398,12 @@ msgid "code"
 msgstr "Code"
 
 #: workbench/invoices/models.py
+msgid "This fields' value is overridden when processing credit entries."
+msgstr ""
+"Der Inhalt dieses Felds wird bei der Verarbeitung von Gutschriften "
+"überschrieben."
+
+#: workbench/invoices/models.py
 msgid "Invoice and/or due date missing for selected state."
 msgstr ""
 "Rechnungs- und/oder Fälligkeitsdatum fehlen für den augewählten Status."
@@ -1658,6 +1664,7 @@ msgstr "Archiviert um"
 #: workbench/logbook/models.py workbench/templates/awt/year_detail.html
 #: workbench/templates/base.html
 #: workbench/templates/reporting/overdrawn_projects.html
+#: workbench/timer/models.py
 msgid "logged hours"
 msgstr "Erfasste Stunden"
 
@@ -2089,6 +2096,7 @@ msgstr "Suchformular zurücksetzen"
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/notes/widget.html
 #: workbench/templates/projects/project_detail.html
 msgid "Update"
 msgstr "Bearbeiten"
@@ -2103,6 +2111,7 @@ msgstr "Bearbeiten"
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/notes/note_form.html
 #: workbench/templates/projects/project_detail.html
 msgid "Delete"
 msgstr "Löschen"
@@ -2323,7 +2332,8 @@ msgstr "%(class)s erstellen"
 #: workbench/templates/generic/object_form.html
 #: workbench/templates/logbook/loggedcost_form.html
 #: workbench/templates/logbook/loggedhours_form.html
-#: workbench/templates/modalform.html workbench/templates/notes/widget.html
+#: workbench/templates/modalform.html workbench/templates/notes/note_form.html
+#: workbench/templates/notes/widget.html
 #: workbench/templates/offers/offer_pricing.html
 msgid "Save"
 msgstr "Sichern"

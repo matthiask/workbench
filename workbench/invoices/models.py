@@ -121,7 +121,11 @@ class Invoice(ModelWithTotal):
     _code = models.IntegerField(_("code"))
     _fts = models.TextField(editable=False, blank=True)
 
-    payment_notice = models.TextField(_("payment notice"), blank=True)
+    payment_notice = models.TextField(
+        _("payment notice"),
+        blank=True,
+        help_text=_("This fields' value is overridden when processing credit entries."),
+    )
 
     objects = InvoiceQuerySet.as_manager()
 

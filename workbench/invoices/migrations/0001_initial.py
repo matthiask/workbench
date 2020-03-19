@@ -148,7 +148,11 @@ class Migration(migrations.Migration):
                 ("_code", models.IntegerField(verbose_name="code")),
                 (
                     "payment_notice",
-                    models.TextField(blank=True, verbose_name="payment notice"),
+                    models.TextField(
+                        blank=True,
+                        help_text="This fields' value is overridden when processing credit entries.",
+                        verbose_name="payment notice",
+                    ),
                 ),
                 (
                     "contact",
