@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-19 17:40+0100\n"
+"POT-Creation-Date: 2020-03-19 18:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1725,6 +1725,10 @@ msgstr "Verrechnet"
 #: workbench/management/commands/profitability.py
 msgid "rate"
 msgstr "Ansatz"
+
+#: workbench/notes/admin.py
+msgid "content object"
+msgstr "Inhaltsobjekt"
 
 #: workbench/notes/forms.py
 msgid "Unable to determine the object this note should be added to."
