@@ -1,7 +1,9 @@
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, override
+
+from authlib.email import render_to_mail
 
 from workbench.notes.models import Note
 from workbench.tools.forms import ModelForm, Textarea
@@ -17,7 +19,9 @@ class NoteForm(ModelForm):
         content_object = kwargs.pop("content_object", None)
         super().__init__(*args, **kwargs)
 
-        if not self.instance.pk:
+        self.is_new = not self.instance.pk
+
+        if self.is_new:
             self.fields["content_type"] = forms.ModelChoiceField(
                 ContentType.objects.all(),
                 initial=ContentType.objects.get_for_model(content_object).pk
@@ -32,7 +36,7 @@ class NoteForm(ModelForm):
 
     def clean(self):
         data = super().clean()
-        if not self.instance.pk:
+        if self.is_new:
             try:
                 data["content_object"] = data["content_type"].get_object_for_this_type(
                     pk=data["object_id"]
@@ -45,10 +49,25 @@ class NoteForm(ModelForm):
         return data
 
     def save(self):
-        if self.instance.pk:
+        if not self.is_new:
             return super().save()
         instance = super().save(commit=False)
         instance.content_object = self.cleaned_data["content_object"]
         instance.created_by = self.request.user
         instance.save()
+
+        owned_by = getattr(instance.content_object, "owned_by", None)
+        if owned_by and owned_by.is_active and owned_by != instance.created_by:
+            with override(owned_by.language):
+                render_to_mail(
+                    "notes/note_notification",
+                    {
+                        "note": instance,
+                        "url": self.request.build_absolute_uri(
+                            instance.content_object.get_absolute_url()
+                        ),
+                    },
+                    to=[owned_by.email],
+                ).send(fail_silently=True)
+
         return instance

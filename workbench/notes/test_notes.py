@@ -1,4 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
+from django.core import mail
 from django.test import TestCase
 from django.utils.translation import deactivate_all
 
@@ -73,3 +74,38 @@ class NotesTest(TestCase):
 
     def test_str(self):
         self.assertEqual(str(Note(title="bla")), "bla")
+
+    def test_note_notification(self):
+        deal = factories.DealFactory.create()
+        self.client.force_login(deal.owned_by)
+
+        content_type = ContentType.objects.get_for_model(deal)
+
+        response = self.client.post(
+            "/notes/add-note/",
+            {
+                "content_type": content_type.pk,
+                "object_id": deal.pk,
+                "title": "Test title",
+                "description": "Test description",
+                "next": deal.urls["detail"],
+            },
+        )
+        self.assertRedirects(response, deal.urls["detail"])
+
+        self.assertEqual(len(mail.outbox), 0)
+
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.post(
+            "/notes/add-note/",
+            {
+                "content_type": content_type.pk,
+                "object_id": deal.pk,
+                "title": "Test title",
+                "description": "Test description",
+                "next": deal.urls["detail"],
+            },
+        )
+        self.assertRedirects(response, deal.urls["detail"])
+
+        self.assertEqual(len(mail.outbox), 1)

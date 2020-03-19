@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-19 15:56+0100\n"
+"POT-Creation-Date: 2020-03-19 17:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2478,6 +2478,18 @@ msgstr "Neue Leistung"
 #: workbench/templates/modal.html
 msgid "Close"
 msgstr "Schliessen"
+
+#: workbench/templates/notes/note_notification.txt
+#, python-format
+msgid "New note on %(content_object)s"
+msgstr "Neue Bemerkung bei %(content_object)s"
+
+#: workbench/templates/notes/note_notification.txt
+#, python-format
+msgid "%(created_by)s just created a new note on \"%(content_object)s\":"
+msgstr ""
+"%(created_by)s hat soeben eine neue Bemerkung bei \"%(content_object)s\" "
+"hinzugefügt:"
 
 #: workbench/templates/notes/widget.html
 msgid "Add note"
