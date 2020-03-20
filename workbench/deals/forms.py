@@ -212,15 +212,18 @@ class DealForm(ModelForm):
             )
         return data
 
-    def save(self, **kwargs):
-        instance = super().save(**kwargs)
+    def save(self):
+        instance = super().save(commit=False)
+        if not instance.pk:
+            instance.save()
+
         types = set()
 
         for vt in ValueType.objects.all():
             key = "value_{}".format(vt.id)
 
             if self.cleaned_data.get(key) is not None:
-                self.instance.values.update_or_create(
+                instance.values.update_or_create(
                     type=vt, defaults={"value": self.cleaned_data[key]}
                 )
                 types.add(vt.id)
