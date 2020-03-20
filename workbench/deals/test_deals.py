@@ -160,6 +160,10 @@ class DealsTest(TestCase):
         self.assertEqual(deal.value, 200)
         self.assertEqual(deal.values.count(), 1)
 
+        # Deal has been saved once
+        actions = LoggedAction.objects.for_model(deal).with_data(id=deal.id)
+        self.assertEqual([action.action for action in actions], ["I"])
+
         da = deal.dealattribute_set.get()
         self.assertEqual(da.attribute, attribute1_1)
         self.assertEqual(

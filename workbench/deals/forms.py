@@ -18,6 +18,7 @@ from workbench.deals.models import (
     ValueType,
 )
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
+from workbench.tools.models import Z
 from workbench.tools.validation import in_days
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -214,22 +215,19 @@ class DealForm(ModelForm):
 
     def save(self):
         instance = super().save(commit=False)
-        if not instance.pk:
-            instance.save()
-
-        types = set()
+        values = {}
 
         for vt in ValueType.objects.all():
             key = "value_{}".format(vt.id)
-
             if self.cleaned_data.get(key) is not None:
-                instance.values.update_or_create(
-                    type=vt, defaults={"value": self.cleaned_data[key]}
-                )
-                types.add(vt.id)
+                values[vt] = self.cleaned_data[key]
 
-        instance.values.exclude(type__in=types).delete()
-        instance.save()
+        instance.value = sum(values.values(), Z)
+        instance.save(skip_value_calculation=True)
+
+        instance.values.exclude(type__in=values.keys()).delete()
+        for vt, value in values.items():
+            instance.values.update_or_create(type=vt, defaults={"value": value})
 
         attributes = []
         for group in AttributeGroup.objects.all():

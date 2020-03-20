@@ -171,7 +171,11 @@ class Deal(Model):
         )
 
     def save(self, *args, **kwargs):
-        self.value = sum((v.value for v in self.values.all()), Z)
+        skip_value_calculation = kwargs.pop("skip_value_calculation", False)
+
+        if not skip_value_calculation:
+            self.value = sum((v.value for v in self.values.all()), Z)
+
         self._fts = " ".join(
             str(part)
             for part in [
