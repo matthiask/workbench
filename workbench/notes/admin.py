@@ -7,7 +7,7 @@ from . import models
 
 def content_object_url(instance):
     try:
-        url = instance.content_object_url()
+        url = instance.get_absolute_url()
     except Exception:
         return instance.content_type.name
     else:

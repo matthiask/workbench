@@ -6,11 +6,11 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.tools.models import Model
+from workbench.tools.models import Model, SearchQuerySet
 from workbench.tools.urls import model_urls
 
 
-class NoteQuerySet(models.QuerySet):
+class NoteQuerySet(SearchQuerySet):
     def for_content_object(self, content_object):
         return self.filter(
             content_type=ContentType.objects.get_for_model(content_object),
@@ -44,9 +44,14 @@ class Note(Model):
         verbose_name_plural = _("notes")
 
     def __str__(self):
-        return self.title
+        return "{} - {} {} - {}".format(
+            self.title,
+            self.content_type.name,
+            self.object_id,
+            self.created_by.get_short_name(),
+        )
 
-    def content_object_url(self):
+    def get_absolute_url(self):
         model = self.content_type.model_class()
         viewname = "%s_%s_detail" % (model._meta.app_label, model._meta.model_name)
         return reverse(viewname, kwargs={"pk": self.object_id})

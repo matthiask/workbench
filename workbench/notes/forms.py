@@ -6,7 +6,14 @@ from django.utils.translation import gettext as _, override
 from authlib.email import render_to_mail
 
 from workbench.notes.models import Note
-from workbench.tools.forms import ModelForm, Textarea
+from workbench.tools.forms import Form, ModelForm, Textarea
+
+
+class NoteSearchForm(Form):
+    def filter(self, queryset):
+        # data = self.cleaned_data
+        # queryset = queryset.search(data.get("q"))
+        return queryset.select_related("created_by", "content_type")
 
 
 class NoteForm(ModelForm):

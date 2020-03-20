@@ -6,12 +6,20 @@ from django.utils.translation import deactivate_all
 from workbench import factories
 from workbench.notes.admin import content_object_url
 from workbench.notes.models import Note
-from workbench.tools.testing import messages
+from workbench.tools.testing import check_code, messages
 
 
 class NotesTest(TestCase):
     def setUp(self):
         deactivate_all()
+
+    def test_list(self):
+        deal = factories.DealFactory.create()
+        Note.objects.create(content_object=deal, created_by=deal.owned_by, title="Test")
+        self.client.force_login(deal.owned_by)
+
+        code = check_code(self, "/notes/")
+        code("")
 
     def test_for_content_object(self):
         deal = factories.DealFactory.create()
@@ -72,9 +80,6 @@ class NotesTest(TestCase):
 
         note.refresh_from_db()
         self.assertEqual(note.title, "Updated")
-
-    def test_str(self):
-        self.assertEqual(str(Note(title="bla")), "bla")
 
     def test_note_notification(self):
         deal = factories.DealFactory.create()
