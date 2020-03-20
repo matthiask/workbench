@@ -9,6 +9,7 @@ from django.utils.translation import deactivate_all
 from freezegun import freeze_time
 
 from workbench import factories
+from workbench.audit.models import LoggedAction
 from workbench.deals.models import Deal
 from workbench.deals.reporting import accepted_deals
 from workbench.templatetags.workbench import deal_group
@@ -289,6 +290,10 @@ class DealsTest(TestCase):
             self.client.get(deal.urls["create"]), 'name="value_{}"'.format(vt.id)
         )
 
+        # Deal has been saved twice (insert, and update with value)
+        actions = LoggedAction.objects.for_model(deal).with_data(id=deal.id)
+        self.assertEqual([action.action for action in actions], ["I", "U"])
+
         response = self.client.post(
             deal.urls["update"],
             {
@@ -303,6 +308,10 @@ class DealsTest(TestCase):
         self.assertRedirects(response, deal.urls["detail"])
         deal.refresh_from_db()
         self.assertEqual(deal.value, 500)
+
+        # Deal has been saved _one_ additional time
+        actions = LoggedAction.objects.for_model(deal).with_data(id=deal.id)
+        self.assertEqual([action.action for action in actions], ["I", "U", "U"])
 
     def test_update_with_archived_attribute(self):
         group = factories.AttributeGroupFactory.create()
