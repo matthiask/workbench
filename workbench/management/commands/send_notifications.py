@@ -24,7 +24,7 @@ class Command(BaseCommand):
         self.unhandled_mails()
 
     def monday_mails(self):
-        for app in App.objects.all():
+        for app in App.objects.filter(is_paused=False):
             with activate_app(app.slug):
                 weeks = {}
                 for day in app.days.filter(

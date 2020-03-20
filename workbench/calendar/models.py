@@ -33,6 +33,7 @@ class App(Model):
     slug = models.SlugField(_("slug"), unique=True)
     ordering = models.IntegerField(_("ordering"), default=0)
     users = models.ManyToManyField(User, related_name="apps", verbose_name=_("users"))
+    is_paused = models.BooleanField(_("is paused"), default=False)
 
     class Meta:
         ordering = ["ordering"]
