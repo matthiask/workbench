@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
-from workbench.notes.admin import content_object_link
+from workbench.notes.admin import content_object_url
 from workbench.notes.models import Note
 from workbench.tools.testing import messages
 
@@ -111,13 +111,13 @@ class NotesTest(TestCase):
 
         self.assertEqual(len(mail.outbox), 1)
 
-    def test_content_object_link(self):
+    def test_content_object_url(self):
         # Has URL
         deal = factories.DealFactory.create()
         content_type = ContentType.objects.get_for_model(deal)
 
         self.assertEqual(
-            content_object_link(Note(content_type=content_type, object_id=42)),
+            content_object_url(Note(content_type=content_type, object_id=42)),
             '<a href="/deals/42/">deal</a>',
         )
 
@@ -126,6 +126,6 @@ class NotesTest(TestCase):
         content_type = ContentType.objects.get_for_model(types.consulting)
 
         self.assertEqual(
-            content_object_link(Note(content_type=content_type, object_id=42)),
+            content_object_url(Note(content_type=content_type, object_id=42)),
             "service type",
         )

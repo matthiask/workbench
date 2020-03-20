@@ -1,27 +1,24 @@
 from django.contrib import admin
-from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from . import models
 
 
-def content_object_link(instance):
-    model = instance.content_type.model_class()
-    viewname = "%s_%s_detail" % (model._meta.app_label, model._meta.model_name)
+def content_object_url(instance):
     try:
-        url = reverse(viewname, kwargs={"pk": instance.object_id})
+        url = instance.content_object_url()
     except Exception:
-        return model._meta.verbose_name
+        return instance.content_type.name
     else:
-        return format_html('<a href="{}">{}</a>', url, model._meta.verbose_name)
+        return format_html('<a href="{}">{}</a>', url, instance.content_type.name)
 
 
-content_object_link.short_description = _("content object")
+content_object_url.short_description = _("content object")
 
 
 @admin.register(models.Note)
 class NoteAdmin(admin.ModelAdmin):
-    list_display = ["title", content_object_link, "created_by", "created_at"]
+    list_display = ["title", content_object_url, "created_by", "created_at"]
     list_select_related = ["content_type", "created_by"]
     search_fields = ["title", "description"]

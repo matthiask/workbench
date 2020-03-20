@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -44,3 +45,8 @@ class Note(Model):
 
     def __str__(self):
         return self.title
+
+    def content_object_url(self):
+        model = self.content_type.model_class()
+        viewname = "%s_%s_detail" % (model._meta.app_label, model._meta.model_name)
+        return reverse(viewname, kwargs={"pk": self.object_id})
