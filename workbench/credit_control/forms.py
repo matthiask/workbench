@@ -1,5 +1,4 @@
 import datetime as dt
-import json
 import re
 
 from django import forms
@@ -75,32 +74,19 @@ class CreditEntryForm(ModelForm):
         return instance
 
 
-class AccountStatementUploadForm(WarningsForm, forms.Form):
+class AccountStatementUploadForm(WarningsForm, Form):
     ledger = CreditEntry._meta.get_field("ledger").formfield(widget=forms.RadioSelect)
     statement = forms.FileField(label=_("Account statement"))
-    statement_data = forms.CharField(
-        label=_("Statement data"),
-        help_text=_(
-            "Automatically filled in when submitting a parseable account statement."
-        ),
-    )
 
     def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
         self.fields["ledger"].choices = [
             (ledger.id, str(ledger)) for ledger in Ledger.objects.all()
         ]
 
-        if self.request.POST.get("statement_data") or self.request.FILES:
-            self.fields["statement"].required = False
-        else:
-            self.fields["statement_data"].required = False
-
     def clean(self):
         data = super().clean()
         if data.get("statement") and data.get("ledger"):
-            self.data = self.data.copy()
             try:
                 self.statement_list = data["ledger"].parse_fn(data["statement"].read())
             except Exception as exc:
@@ -111,9 +97,6 @@ class AccountStatementUploadForm(WarningsForm, forms.Form):
                     )
                     % exc
                 )
-            self.data["statement_data"] = json.dumps(
-                self.statement_list, sort_keys=True
-            )
 
             reference_numbers = [
                 entry["reference_number"] for entry in self.statement_list
@@ -137,10 +120,8 @@ class AccountStatementUploadForm(WarningsForm, forms.Form):
         return data
 
     def save(self):
-        entries = json.loads(self.cleaned_data["statement_data"])
-
         created_entries = []
-        for data in entries:
+        for data in self.statement_list:
             reference_number = data.pop("reference_number")
             data["value_date"] = dt.datetime.strptime(
                 data["value_date"], "%Y-%m-%d"

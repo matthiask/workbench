@@ -13,6 +13,7 @@ from workbench.credit_control.parsers import (
     postfinance_preprocess_notice,
     postfinance_reference_number,
 )
+from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
 
 
@@ -62,38 +63,31 @@ class CreditEntriesTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
         ledger = factories.LedgerFactory.create()
 
-        response = self.client.get("/credit-control/upload/")
-        # Not required!
-        self.assertContains(
-            response,
-            '<input type="text" name="statement_data" class="form-control" id="id_statement_data">',  # noqa
-            html=True,
-        )
+        def send(data={}):
+            with io.open(
+                os.path.join(
+                    settings.BASE_DIR, "workbench", "test", "account-statement.csv"
+                )
+            ) as f:
+                return self.client.post(
+                    "/credit-control/upload/",
+                    {"statement": f, "ledger": ledger.pk, **data},
+                )
 
-        with io.open(
-            os.path.join(
-                settings.BASE_DIR, "workbench", "test", "account-statement.csv"
-            )
-        ) as f:
-            response = self.client.post(
-                "/credit-control/upload/", {"statement": f, "ledger": ledger.pk}
-            )
+        response = send({"ledger": -1})
+        self.assertContains(response, "Select a valid choice.")
 
-        self.assertContains(response, "reference_number")
-        statement_data = response.context_data["form"].data["statement_data"]
+        response = send()
+        self.assertContains(response, "no-known-payments")
 
-        response = self.client.post(
-            "/credit-control/upload/",
-            {"statement_data": statement_data, "ledger": ledger.pk},
-        )
+        response = send({WarningsForm.ignore_warnings_id: "no-known-payments"})
 
+        # print(response, response.content.decode("utf-8"))
         self.assertRedirects(response, "/credit-control/")
         self.assertEqual(messages(response), ["Created 2 credit entries."])
 
-        response = self.client.post(
-            "/credit-control/upload/",
-            {"statement_data": statement_data, "ledger": ledger.pk},
-        )
+        response = send()
+
         self.assertRedirects(response, "/credit-control/")
         self.assertEqual(messages(response), ["Created 0 credit entries."])
 
@@ -122,28 +116,6 @@ class CreditEntriesTest(TestCase):
         invoice.refresh_from_db()
         self.assertEqual(invoice.status, invoice.PAID)
         self.assertEqual(invoice.closed_on, entry.value_date)
-
-        with io.open(
-            os.path.join(
-                settings.BASE_DIR, "workbench", "test", "account-statement.csv"
-            )
-        ) as f:
-            response = self.client.post(
-                "/credit-control/upload/", {"statement": f, "ledger": ledger.pk}
-            )
-
-        self.assertNotContains(response, "no-known-payments")
-
-        with io.open(
-            os.path.join(
-                settings.BASE_DIR, "workbench", "test", "account-statement-2.csv"
-            )
-        ) as f:
-            response = self.client.post(
-                "/credit-control/upload/", {"statement": f, "ledger": ledger.pk}
-            )
-
-        self.assertContains(response, "no-known-payments")
 
     def test_list(self):
         self.client.force_login(factories.UserFactory.create())
@@ -219,3 +191,16 @@ class CreditEntriesTest(TestCase):
             entries[2]["reference_number"], "pf-d0436a6497bf533d2ae49809169f5481"
         )
         self.assertIn("2019-0214-0001", entries[2]["payment_notice"])
+
+    def test_invalid_account_statement(self):
+        self.client.force_login(factories.UserFactory.create())
+        ledger = factories.LedgerFactory.create()
+
+        with io.open(
+            os.path.join(settings.BASE_DIR, "workbench", "test", "stopwatch.png"), "rb"
+        ) as f:
+            response = self.client.post(
+                "/credit-control/upload/", {"statement": f, "ledger": ledger.pk}
+            )
+
+        self.assertContains(response, "Error while parsing the statement.")
