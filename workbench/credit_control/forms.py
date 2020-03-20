@@ -101,7 +101,16 @@ class AccountStatementUploadForm(WarningsForm, forms.Form):
         data = super().clean()
         if data.get("statement") and data.get("ledger"):
             self.data = self.data.copy()
-            self.statement_list = data["ledger"].parse_fn(data["statement"].read())
+            try:
+                self.statement_list = data["ledger"].parse_fn(data["statement"].read())
+            except Exception as exc:
+                raise forms.ValidationError(
+                    _(
+                        "Error while parsing the statement."
+                        " Did you upload a valid CSV file? (Technical error: %s)"
+                    )
+                    % exc
+                )
             self.data["statement_data"] = json.dumps(
                 self.statement_list, sort_keys=True
             )
