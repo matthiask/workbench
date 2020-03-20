@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-19 18:37+0100\n"
+"POT-Creation-Date: 2020-03-20 16:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -277,6 +277,7 @@ msgstr "Ferienwochen für ein volles Anstellungsjahr."
 #: workbench/credit_control/forms.py workbench/credit_control/models.py
 #: workbench/management/commands/export_debtors.py workbench/notes/__init__.py
 #: workbench/notes/models.py workbench/templates/awt/year_detail.html
+#: workbench/templates/base.html
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/templates/notes/widget.html workbench/timer/models.py
 msgid "notes"
@@ -672,13 +673,13 @@ msgid "Account statement"
 msgstr "Kontoauszug"
 
 #: workbench/credit_control/forms.py
-msgid "Statement data"
-msgstr "Auszugsdaten"
-
-#: workbench/credit_control/forms.py
-msgid "Automatically filled in when submitting a parseable account statement."
+#, python-format
+msgid ""
+"Error while parsing the statement. Did you upload a valid CSV file? "
+"(Technical error: %s)"
 msgstr ""
-"Wird automatisch gefüllt wenn ein einlesbarer Kontoauszug hochgeladen wird."
+"Fehler beim Einlesen des Auszugs. Hast Du eine gültige CSV-Datei "
+"hochgeladen? (Technischer Fehler: %s)"
 
 #: workbench/credit_control/forms.py
 msgid ""
@@ -1171,7 +1172,6 @@ msgid "%(class)s '%(object)s' has been created successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
 
 #: workbench/generic.py workbench/templates/contacts/person_form.html
-#: workbench/templates/credit_control/creditentry_upload.html
 #: workbench/templates/generic/object_form.html
 #: workbench/templates/offers/offer_pricing.html
 #, python-format
@@ -2323,7 +2323,6 @@ msgid "Recent offers"
 msgstr "Letzte Offerten"
 
 #: workbench/templates/contacts/person_form.html
-#: workbench/templates/credit_control/creditentry_upload.html
 #: workbench/templates/generic/object_form.html
 #: workbench/templates/offers/offer_pricing.html
 #, python-format
@@ -2331,7 +2330,6 @@ msgid "Create %(class)s"
 msgstr "%(class)s erstellen"
 
 #: workbench/templates/contacts/person_form.html
-#: workbench/templates/credit_control/creditentry_upload.html
 #: workbench/templates/fineforms/submit.html
 #: workbench/templates/generic/object_form.html
 #: workbench/templates/logbook/loggedcost_form.html
@@ -2348,16 +2346,6 @@ msgstr "Sichern"
 #: workbench/templates/offers/offer_pricing.html
 msgid "cancel"
 msgstr "Abbruch"
-
-#: workbench/templates/credit_control/creditentry_upload.html
-msgid "Continue"
-msgstr "Weiter"
-
-#: workbench/templates/credit_control/creditentry_upload.html
-#: workbench/templates/generic/object_form.html
-#: workbench/templates/notes/widget.html
-msgid "Cancel"
-msgstr "Abbrechen"
 
 #: workbench/templates/deals/deal_detail.html
 msgid "Unlink offer"
@@ -2394,6 +2382,11 @@ msgstr "Löschen"
 #: workbench/templates/generic/object_form.html
 msgid "continue"
 msgstr "Weiter"
+
+#: workbench/templates/generic/object_form.html
+#: workbench/templates/notes/widget.html
+msgid "Cancel"
+msgstr "Abbrechen"
 
 #: workbench/templates/history_modal.html workbench/templatetags/workbench.py
 msgid "History"
@@ -2995,15 +2988,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "Hours with rate undefined"
-#~ msgstr "Stunden ohne Satz"
-
-#~ msgid "costs"
-#~ msgstr "Kosten"
-
-#~ msgid "Costs with green hours target"
-#~ msgstr "Kosten unter Einbezug des Grüne Stunden-Zielwerts"
-
-#~ msgid "Settings"
-#~ msgstr "Einstellungen"
