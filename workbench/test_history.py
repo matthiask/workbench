@@ -145,6 +145,22 @@ class HistoryTest(TestCase):
         self.assertEqual(prettifier.handle_bool({"x": None}, f), "<no value>")
         self.assertEqual(prettifier.handle_date({"x": None}, f), "<no value>")
 
+    def test_choices_prettification(self):
+        field = factories.Invoice._meta.get_field("status")
+        prettifier = Prettifier()
+
+        values = {"status": "10"}  # Stringified Invoice.IN_PREPARATION
+        self.assertEqual(prettifier.handle_choice(values, field), "In preparation")
+        self.assertEqual(values["status"], 10)  # Not "10"
+
+        values = {"status": "15"}  # Does not exist
+        self.assertEqual(prettifier.handle_choice(values, field), "15")
+        self.assertEqual(values["status"], "15")
+
+        values = {"status": None}
+        self.assertEqual(prettifier.handle_choice(values, field), "<no value>")
+        self.assertEqual(values["status"], None)
+
     def test_404(self):
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/history/not_exists/id/3/")
