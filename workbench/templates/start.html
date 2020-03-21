@@ -58,15 +58,20 @@
     </div>
     {% endif %}
 
-    {% if user|has_feature:FEATURES.DEALS and user.deals %}
+    {% if user.acquisition %}
     <div class="card mb-3">
-      <div class="card-header"><h3 class="my-0">
-          <a href="{% url 'deals_deal_list' %}">{% trans 'deals'|capfirst %}</a>
+      <div class="card-header">
+        <h3 class="my-0">
+          {% trans 'Deals and offers' %}
           <small>({% trans 'possibly requiring action' %})</small>
-      </h3></div>
+        </h3>
+      </div>
       <div class="card-body">
-        {% for deal in user.deals %}
-          {% link_or_none deal with_badge=True %}<br>
+        {% for row in user.acquisition %}
+        <h4 {% if not forloop.first %}class="mt-4"{% endif %}>
+          <a href="{{ row.url }}">{{ row.verbose_name_plural }}</a>
+        </h4>
+        {% for object in row.objects %}{% link_or_none object with_badge=True %}<br>{% endfor %}
         {% endfor %}
       </div>
     </div>

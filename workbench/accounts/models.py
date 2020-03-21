@@ -10,6 +10,7 @@ from django.db.models import Count, Q, Sum
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
+from workbench.accounts.features import FEATURES
 from workbench.tools.models import Model
 from workbench.tools.validation import in_days, monday
 
@@ -216,10 +217,31 @@ class User(Model, AbstractBaseUser):
         }
 
     @cached_property
-    def deals(self):
+    def acquisition(self):
         from workbench.deals.models import Deal
+        from workbench.offers.models import Offer
 
-        return Deal.objects.maybe_actionable(user=self)
+        rows = []
+        if self.features[FEATURES.DEALS]:
+            rows.append(
+                {
+                    "type": "deals",
+                    "verbose_name_plural": Deal._meta.verbose_name_plural,
+                    "url": Deal.urls["list"],
+                    "objects": Deal.objects.maybe_actionable(user=self),
+                }
+            )
+        if self.features[FEATURES.CONTROLLING]:
+            rows.append(
+                {
+                    "type": "offers",
+                    "verbose_name_plural": Offer._meta.verbose_name_plural,
+                    "url": Offer.urls["list"],
+                    "objects": Offer.objects.maybe_actionable(user=self),
+                }
+            )
+
+        return [row for row in rows if row["objects"]]
 
     @cached_property
     def signed_email(self):

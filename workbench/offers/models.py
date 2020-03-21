@@ -27,6 +27,12 @@ class OfferQuerySet(SearchQuerySet):
             [("", "----------")] + offers[True] + [(_("In preparation"), offers[False])]
         )
 
+    def maybe_actionable(self, *, user):
+        return self.filter(
+            Q(status__lt=Offer.ACCEPTED),
+            Q(owned_by=user) | Q(owned_by__is_active=False),
+        ).select_related("project", "owned_by")
+
     def accepted(self):
         return self.filter(status=Offer.ACCEPTED)
 

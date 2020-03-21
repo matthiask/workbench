@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-20 16:32+0100\n"
+"POT-Creation-Date: 2020-03-21 09:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -801,7 +801,6 @@ msgstr "Zahlungseingänge zuweisen"
 
 #: workbench/deals/__init__.py workbench/deals/models.py
 #: workbench/templates/base.html workbench/templates/shortcuts.html
-#: workbench/templates/start.html
 msgid "deals"
 msgstr "Geschäfte"
 
@@ -2756,6 +2755,10 @@ msgstr "Aktive Projekte"
 #: workbench/templates/start.html
 msgid "no active projects"
 msgstr "Keine aktiven Projekte"
+
+#: workbench/templates/start.html
+msgid "Deals and offers"
+msgstr "Geschäfte und Offerten"
 
 #: workbench/templates/start.html
 msgid "possibly requiring action"
