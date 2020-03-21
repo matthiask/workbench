@@ -21,6 +21,10 @@
       <td>{% link_or_none object.project %}</td>
     </tr>
     <tr>
+      <th class="text-right">{% trans 'invoiced on'|capfirst %}</th>
+      <td>{{ object.invoiced_on|local_date_format }}</td>
+    </tr>
+    <tr>
       <th class="text-right">{% trans 'status'|capfirst %}</th>
       <td>
         {{ object.status_badge }}
@@ -28,8 +32,13 @@
       </td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'invoiced on'|capfirst %}</th>
-      <td>{{ object.invoiced_on|local_date_format }}</td>
+      <th class="text-right">{% trans 'Payment reminders sent at' %}</th>
+      <td>
+        {% for day in object.payment_reminders_sent_at %}
+          {{ day|local_date_format }}{% if not forloop.last %},{% endif %}
+        {% empty %}{% trans 'None yet' %}
+        {% endfor %}
+      </td>
     </tr>
     <tr>
       <th class="text-right">{% trans 'description'|capfirst %}</th>

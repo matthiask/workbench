@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-21 09:32+0100\n"
+"POT-Creation-Date: 2020-03-21 18:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2075,6 +2075,10 @@ msgstr "Seite nicht gefunden :-("
 msgid "Back to the start"
 msgstr "Zurück zum Start"
 
+#: workbench/templates/_history.html
+msgid "No history found"
+msgstr "Keine Geschichte gefunden"
+
 #: workbench/templates/accounts/login.html
 msgid "Sign in"
 msgstr "Anmelden"
@@ -2391,10 +2395,13 @@ msgstr "Abbrechen"
 msgid "History"
 msgstr "Geschichte"
 
-#: workbench/templates/history_modal.html
-#: workbench/templates/reporting/deal_history.html
-msgid "No history found"
-msgstr "Keine Geschichte gefunden"
+#: workbench/templates/invoices/invoice_detail.html
+msgid "Payment reminders sent at"
+msgstr "Zahlungserinnerungen verschickt am"
+
+#: workbench/templates/invoices/invoice_detail.html
+msgid "None yet"
+msgstr "Noch keine"
 
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html

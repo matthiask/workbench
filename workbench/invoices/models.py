@@ -10,6 +10,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
+from workbench.audit.models import LoggedAction
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.utils import recurring
 from workbench.projects.models import Project
@@ -273,6 +274,19 @@ class Invoice(ModelWithTotal):
             return _("Paid on %(closed_on)s") % d
         else:
             return self.get_status_display()
+
+    def payment_reminders_sent_at(self):
+        from workbench.tools.history import changes  # Avoid a circular import
+
+        actions = LoggedAction.objects.for_model(self).with_data(id=self.id)
+        return [
+            day
+            for day in [
+                change.values["last_reminded_on"]
+                for change in changes(self, {"last_reminded_on"}, actions)
+            ]
+            if day
+        ]
 
     @property
     def status_badge(self):
