@@ -1,4 +1,5 @@
 from collections import namedtuple
+from decimal import Decimal
 
 from django.db import models
 from django.http import Http404
@@ -36,57 +37,81 @@ from workbench.tools.formats import local_date_format
 # This is an object which __contains__ everything
 EVERYTHING = type(str("c"), (), {"__contains__": lambda *a: True})()
 
-Change = namedtuple("Change", "changes pretty_user_name version")
+Change = namedtuple("Change", "changes created_at pretty_user_name values version")
 
 
 def default_if_none(value, default):
     return default if value is None else value
 
 
-class Formatter:
+class Prettifier:
     def __init__(self):
         self._flatchoices = {}
         self._prettified_instances = {}
 
-    def format_bool(self, value):
+    def handle_bool(self, values, field):
+        value = values.get(field.attname)
         if value in {True, "t"}:
+            values[field.attname] = True
             return _("yes")
         elif value in {False, "f"}:
+            values[field.attname] = False
             return _("no")
         elif value is None:
+            values[field.attname] = None
             return _("<no value>")
         return value
 
-    def format_date(self, value):
+    def handle_choice(self, values, field):
+        if field not in self._flatchoices:
+            self._flatchoices[field] = {
+                str(key): (key, value) for key, value in field.flatchoices
+            }
+        value = values.get(field.attname)
+        if value in self._flatchoices[field]:
+            key, value = self._flatchoices[field][value]
+            values[field.attname] = key
+
+        return default_if_none(value, _("<no value>"))
+
+    def handle_date(self, values, field):
+        value = values.get(field.attname)
         if value is None:
             return _("<no value>")
         dt = dateparse.parse_datetime(value) or dateparse.parse_date(value)
-        return local_date_format(dt) if dt else value
+        if dt:
+            values[field.attname] = dt
+            return local_date_format(dt)
+        return value
 
-    def format_choice(self, field, value):
-        if field not in self._flatchoices:
-            self._flatchoices[field] = {
-                str(key): value for key, value in field.flatchoices
-            }
-        return default_if_none(
-            self._flatchoices[field].get(value, value), _("<no value>")
-        )
+    def handle_decimal(self, values, field):
+        value = values.get(field.attname)
+        if value:
+            value = Decimal(value)
+            values[field.attname] = value
+        return default_if_none(value, _("<no value>"))
 
-    def format_related_model(self, field, value):
+    def handle_related_model(self, values, field):
+        value = values.get(field.attname)
         if value is None:
             return _("<no value>")
 
         model = field.related_model
         key = (model, value)
         if key in self._prettified_instances:
-            return self._prettified_instances[key]
+            values[field.attname] = self._prettified_instances[key][0]
+            return self._prettified_instances[key][1]
 
         queryset = model._default_manager.all()
 
+        instance = None
         try:
-            pretty = str(queryset.get(pk=value))
+            instance = queryset.get(pk=value)
+            pretty = str(instance)
         except model.DoesNotExist:
             pretty = _("Deleted %s instance") % model._meta.verbose_name
+        else:
+            values[field.attname] = instance
 
         if model in HISTORY:
             pretty = format_html(
@@ -95,25 +120,28 @@ class Formatter:
                 pretty,
             )
 
-        self._prettified_instances[key] = pretty
+        self._prettified_instances[key] = (instance, pretty)
         return pretty
 
-    def format(self, field, value):
+    def format(self, values, field):
+        value = values.get(field.attname)
+
         if field.choices:
-            return self.format_choice(field, value)
+            return self.handle_choice(values, field)
 
         if field.related_model:
-            return self.format_related_model(field, value)
+            return self.handle_related_model(values, field)
 
         if isinstance(field, (models.BooleanField, models.NullBooleanField)):
-            return self.format_bool(value)
+            return self.handle_bool(values, field)
 
         if isinstance(field, models.DateField):
-            return self.format_date(value)
+            return self.handle_date(values, field)
+
+        if isinstance(field, models.DecimalField):
+            return self.handle_decimal(values, field)
 
         return default_if_none(value, _("<no value>"))
-
-    __call__ = format
 
 
 def changes(model, fields, actions):
@@ -130,7 +158,7 @@ def changes(model, fields, actions):
         if hasattr(f, "attname") and not f.primary_key and f.name in fields
     ]
 
-    formatter = Formatter()
+    prettifier = Prettifier()
 
     for action in actions:
         if action.action == "I":
@@ -140,13 +168,11 @@ def changes(model, fields, actions):
                     _("Initial value of '%(field)s' was '%(current)s'.")
                     % {
                         "field": conditional_escape(capfirst(f.verbose_name)),
-                        "current": conditional_escape(
-                            formatter(f, values.get(f.attname))
-                        ),
+                        "current": conditional_escape(prettifier.format(values, f)),
                     }
                 )
                 for f in fields
-                if not (f.many_to_many or f.one_to_many)  # Avoid those relation types.
+                if f.attname in values
             ]
 
         elif action.action == "U":
@@ -156,9 +182,7 @@ def changes(model, fields, actions):
                     _("New value of '%(field)s' was '%(current)s'.")
                     % {
                         "field": conditional_escape(capfirst(f.verbose_name)),
-                        "current": conditional_escape(
-                            formatter(f, values.get(f.attname))
-                        ),
+                        "current": conditional_escape(prettifier.format(values, f)),
                     }
                 )
                 for f in fields
@@ -172,20 +196,24 @@ def changes(model, fields, actions):
                     _("Final value of '%(field)s' was '%(current)s'.")
                     % {
                         "field": conditional_escape(capfirst(f.verbose_name)),
-                        "current": conditional_escape(
-                            formatter(f, values.get(f.attname))
-                        ),
+                        "current": conditional_escape(prettifier.format(values, f)),
                     }
                 )
                 for f in fields
-                if not (f.many_to_many or f.one_to_many)  # Avoid those relation types.
+                if f.attname in values
             ]
 
         if version_changes:
             changes.append(
                 Change(
                     changes=version_changes,
+                    created_at=action.created_at,
                     pretty_user_name=users.get(action.user_id) or action.user_name,
+                    values={
+                        f.attname: values.get(f.attname)
+                        for f in fields
+                        if f.attname in values
+                    },
                     version=action,
                 )
             )
