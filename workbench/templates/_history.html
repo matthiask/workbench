@@ -1,0 +1,16 @@
+{% load i18n workbench %}
+
+{% for change in changes reversed %}
+  <h4>
+    <a href="{% url 'history' change.version.table_name 'id' change.version.row_data.id %}" data-toggle="ajaxmodal">
+      {{ change.version.get_action_display }} {{ change.version.table_name }} {{ change.version.row_data.id }}</a>
+    / {{ change.pretty_user_name|default:'🧙' }} / {{ change.version.created_at|local_date_format }}
+  </h4>
+  <ul>
+    {% for pretty in change.changes %}
+      <li>{{ pretty }}</li>
+    {% endfor %}
+  </ul>
+{% empty %}
+  <h4>{% trans 'No history found' %}</h4>
+{% endfor %}
