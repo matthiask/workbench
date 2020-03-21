@@ -36,7 +36,7 @@ from workbench.tools.formats import local_date_format
 # This is an object which __contains__ everything
 EVERYTHING = type(str("c"), (), {"__contains__": lambda *a: True})()
 
-Change = namedtuple("Change", "changes version")
+Change = namedtuple("Change", "changes pretty_user_name version")
 
 
 def default_if_none(value, default):
@@ -133,7 +133,6 @@ def changes(model, fields, actions):
     formatter = Formatter()
 
     for action in actions:
-        action.pretty_user_name = users.get(action.user_id) or action.user_name
         if action.action == "I":
             values = action.row_data
             version_changes = [
@@ -183,7 +182,13 @@ def changes(model, fields, actions):
             ]
 
         if version_changes:
-            changes.append(Change(changes=version_changes, version=action))
+            changes.append(
+                Change(
+                    changes=version_changes,
+                    pretty_user_name=users.get(action.user_id) or action.user_name,
+                    version=action,
+                )
+            )
 
     return changes
 
