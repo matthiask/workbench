@@ -1,4 +1,5 @@
 import datetime as dt
+from types import SimpleNamespace
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -8,7 +9,7 @@ from workbench.accounts.features import FEATURES
 from workbench.accounts.middleware import set_user_name
 from workbench.audit.models import LoggedAction
 from workbench.projects.models import Project
-from workbench.tools.history import EVERYTHING, Formatter
+from workbench.tools.history import EVERYTHING, Prettifier
 
 
 class HistoryTest(TestCase):
@@ -133,13 +134,16 @@ class HistoryTest(TestCase):
             {"green_hours_target": "50", "hourly_labor_costs": "100.00"},
         )
 
-    def test_formatter_details(self):
+    def test_prettifier_details(self):
         # Do not crash when encountering invalid values.
-        formatter = Formatter()
-        self.assertEqual(formatter.format_bool("stuff"), "stuff")
-        self.assertEqual(formatter.format_date("stuff"), "stuff")
-        self.assertEqual(formatter.format_bool(None), "<no value>")
-        self.assertEqual(formatter.format_date(None), "<no value>")
+        prettifier = Prettifier()
+        f = SimpleNamespace(attname="x")
+
+        self.assertEqual(prettifier.handle_bool({"x": "stuff"}, f), "stuff")
+        self.assertEqual(prettifier.handle_date({"x": "stuff"}, f), "stuff")
+
+        self.assertEqual(prettifier.handle_bool({"x": None}, f), "<no value>")
+        self.assertEqual(prettifier.handle_date({"x": None}, f), "<no value>")
 
     def test_404(self):
         self.client.force_login(factories.UserFactory.create())
