@@ -124,6 +124,12 @@ def changes(model, fields, actions):
 
     users = {u.pk: u.get_full_name() for u in User.objects.all()}
     users[0] = _("<anonymous>")
+    fields = [
+        f
+        for f in model._meta.get_fields()
+        if hasattr(f, "attname") and not f.primary_key and f.name in fields
+    ]
+
     formatter = Formatter()
 
     for action in actions:

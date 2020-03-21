@@ -65,12 +65,6 @@ def history(request, db_table, attribute, id):
         cfg = cfg(request.user)
     fields = cfg.get("fields", set())
 
-    fields = [
-        f
-        for f in model._meta.get_fields()
-        if hasattr(f, "attname") and not f.primary_key and f.name in fields
-    ]
-
     instance = None
     title = None
     related = []

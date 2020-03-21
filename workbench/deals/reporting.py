@@ -101,28 +101,22 @@ def declined_deals(date_range, *, users=None):
 
 
 def deal_history(date_range, *, users=None):
-    fields = [
-        f
-        for f in Deal._meta.get_fields()
-        if f.name
-        in {
-            "id",
-            "title",
-            "value",
-            "probability",
-            "decision_expected_on",
-            "status",
-            "closing_type",
-            "closing_notice",
-        }
-    ]
-
     actions = LoggedAction.objects.for_model(Deal).filter(
         created_at__range=[
             timezone.make_aware(dt.datetime.combine(day, time))
             for day, time in zip(date_range, [dt.time.min, dt.time.max])
         ]
     )
+    fields = {
+        "id",
+        "title",
+        "value",
+        "probability",
+        "decision_expected_on",
+        "status",
+        "closing_type",
+        "closing_notice",
+    }
     user_ids = EVERYTHING if users is None else {user.id for user in users} | {None}
     return [
         change
