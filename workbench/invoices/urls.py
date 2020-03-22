@@ -2,6 +2,7 @@ from django.conf.urls import url
 
 from workbench import generic
 from workbench.accounts.features import controlling_only
+from workbench.invoices import views
 from workbench.invoices.forms import (
     CreatePersonInvoiceForm,
     InvoiceDeleteForm,
@@ -10,7 +11,6 @@ from workbench.invoices.forms import (
     ServiceForm,
 )
 from workbench.invoices.models import Invoice, Service
-from workbench.invoices.views import InvoicePDFView, InvoiceXLSXView
 
 
 urlpatterns = [
@@ -61,12 +61,12 @@ urlpatterns = [
     ),
     url(
         r"^(?P<pk>\d+)/pdf/$",
-        controlling_only(InvoicePDFView.as_view()),
+        controlling_only(views.InvoicePDFView.as_view()),
         name="invoices_invoice_pdf",
     ),
     url(
         r"^(?P<pk>\d+)/xlsx/$",
-        controlling_only(InvoiceXLSXView.as_view()),
+        controlling_only(views.InvoiceXLSXView.as_view()),
         name="invoices_invoice_xlsx",
     ),
     # Services
@@ -85,5 +85,11 @@ urlpatterns = [
             generic.UpdateView.as_view(model=Service, form_class=ServiceForm)
         ),
         name="invoices_service_update",
+    ),
+    url(r"^reminders/$", controlling_only(views.reminders), name="invoices_reminders"),
+    url(
+        r"^dunning-letter/(?P<customer_id>[0-9]+)/$",
+        controlling_only(views.dunning_letter),
+        name="invoices_dunning_letter",
     ),
 ]

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-21 18:05+0100\n"
+"POT-Creation-Date: 2020-03-22 17:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -931,6 +931,7 @@ msgstr "hoch"
 #: workbench/management/commands/profitability.py workbench/projects/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/invoices/reminders.html
 #: workbench/templates/reporting/declined_deals.html
 #: workbench/templates/reporting/overdrawn_projects.html
 msgid "customer"
@@ -1196,6 +1197,7 @@ msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
 #: workbench/invoices/__init__.py workbench/invoices/models.py
 #: workbench/templates/base.html
 #: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/invoices/reminders.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/shortcuts.html workbench/templates/start.html
 msgid "invoices"
@@ -2434,6 +2436,22 @@ msgstr "Kopieren"
 #: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "Create invoices"
 msgstr "Rechnungen erstellen"
+
+#: workbench/templates/invoices/reminders.html
+msgid "Reminders"
+msgstr "Mahnungen"
+
+#: workbench/templates/invoices/reminders.html
+msgid "Last reminded on"
+msgstr "Zuletzt gemahnt am"
+
+#: workbench/templates/invoices/reminders.html
+msgid "Generate a dunning letter"
+msgstr "Zahlungserinnerung generieren"
+
+#: workbench/templates/invoices/reminders.html
+msgid "Not reminded yet"
+msgstr "Noch nicht gemahnt"
 
 #: workbench/templates/invoices/service_form.html
 #: workbench/templates/projects/service_form.html

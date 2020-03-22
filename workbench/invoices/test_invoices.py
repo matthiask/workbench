@@ -535,7 +535,6 @@ class InvoicesTest(TestCase):
         code("")
         code("q=test")
         code("s=open")
-        code("s=overdue")
         code("s=40")  # PAID
         code("org={}".format(factories.OrganizationFactory.create().pk))
         code("owned_by={}".format(user.id))
@@ -555,10 +554,6 @@ class InvoicesTest(TestCase):
             invoiced_on=in_days(-60), due_on=in_days(-45), status=Invoice.SENT,
         )
         response = self.client.get("/invoices/?pdf=1")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["content-type"], "application/pdf")
-
-        response = self.client.get("/invoices/?pdf=1&s=overdue")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/pdf")
 
@@ -866,3 +861,34 @@ class InvoicesTest(TestCase):
         with self.assertRaises(ValidationError) as cm:
             invoice.clean_fields()
         self.assertEqual(list(cm.exception), msg)
+
+    def test_reminders(self):
+        invoice = factories.InvoiceFactory.create(
+            invoiced_on=in_days(-60), due_on=in_days(-45), status=Invoice.SENT,
+        )
+        factories.InvoiceFactory.create(
+            customer=invoice.customer,
+            contact=invoice.contact,
+            invoiced_on=in_days(-60),
+            due_on=in_days(-45),
+            status=Invoice.SENT,
+        )
+
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.get("/invoices/reminders/")
+        self.assertContains(response, "Not reminded yet")
+        # print(response, response.content.decode("utf-8"))
+
+        response = self.client.post(
+            "/invoices/dunning-letter/{}/".format(invoice.customer_id)
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["content-type"], "application/pdf")
+
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.last_reminded_on, dt.date.today())
+
+        self.assertEqual(invoice.payment_reminders_sent_at(), [dt.date.today()])
+
+        response = self.client.get("/invoices/reminders/")
+        self.assertNotContains(response, "Not reminded yet")

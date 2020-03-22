@@ -1,5 +1,4 @@
 import datetime as dt
-import itertools
 
 from django import forms
 from django.contrib import messages
@@ -33,7 +32,6 @@ class InvoiceSearchForm(Form):
         choices=(
             ("", _("All states")),
             ("open", _("Open")),
-            ("overdue", _("More than 30 days overdue")),
             (_("Exact"), Invoice.STATUS_CHOICES),
         ),
         required=False,
@@ -64,8 +62,6 @@ class InvoiceSearchForm(Form):
         queryset = queryset.search(data.get("q"))
         if data.get("s") == "open":
             queryset = queryset.open()
-        elif data.get("s") == "overdue":
-            queryset = queryset.overdue().order_by("due_on", "id")
         elif data.get("s"):
             queryset = queryset.filter(status=data.get("s"))
         queryset = self.apply_renamed(queryset, "org", "customer")
@@ -84,19 +80,10 @@ class InvoiceSearchForm(Form):
                 "invoices",
                 as_attachment=request.GET.get("disposition") == "attachment",
             )
-
-            if self.cleaned_data.get("s") == "overdue":
-                for organization, invoices in itertools.groupby(
-                    queryset.order_by("customer", "due_on", "id"),
-                    lambda invoice: invoice.customer,
-                ):
-                    pdf.dunning_letter(invoices=list(invoices))
-            else:
-                for invoice in queryset:
-                    pdf.init_letter()
-                    pdf.process_invoice(invoice)
-                    pdf.restart()
-
+            for invoice in queryset:
+                pdf.init_letter()
+                pdf.process_invoice(invoice)
+                pdf.restart()
             pdf.generate()
             return response
 

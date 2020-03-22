@@ -32,7 +32,7 @@ class InvoiceQuerySet(SearchQuerySet):
 
     def overdue(self):
         return self.filter(
-            status=Invoice.SENT, due_on__isnull=False, due_on__lte=in_days(-30)
+            status=Invoice.SENT, due_on__isnull=False, due_on__lte=in_days(-15)
         )
 
 
