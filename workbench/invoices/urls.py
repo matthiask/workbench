@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from workbench import generic
-from workbench.accounts.features import controlling_only
+from workbench.accounts.features import bookkeeping_only, controlling_only
 from workbench.invoices import views
 from workbench.invoices.forms import (
     CreatePersonInvoiceForm,
@@ -86,10 +86,10 @@ urlpatterns = [
         ),
         name="invoices_service_update",
     ),
-    url(r"^reminders/$", controlling_only(views.reminders), name="invoices_reminders"),
+    url(r"^reminders/$", bookkeeping_only(views.reminders), name="invoices_reminders"),
     url(
         r"^dunning-letter/(?P<customer_id>[0-9]+)/$",
-        controlling_only(views.dunning_letter),
+        bookkeeping_only(views.dunning_letter),
         name="invoices_dunning_letter",
     ),
 ]

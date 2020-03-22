@@ -54,6 +54,8 @@
             {% if request.user|has_feature:FEATURES.CONTROLLING %}
               <a class="dropdown-item" href="{% url 'invoices_recurringinvoice_list' %}">{% trans 'recurring invoices'|capfirst %}</a>
               <a class="dropdown-item" href="{% url 'credit_control_creditentry_list' %}">{% trans 'credit entries'|capfirst %}</a>
+            {% endif %}
+            {% if request.user|has_feature:FEATURES.BOOKKEEPING %}
               <a class="dropdown-item" href="{% url 'invoices_reminders' %}">{% trans 'Reminders' %}</a>
             {% endif %}
             <a class="dropdown-item" href="{% url 'expenses_expensereport_list' %}">{% trans 'expense reports'|capfirst %}</a>
