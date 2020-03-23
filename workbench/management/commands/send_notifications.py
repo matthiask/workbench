@@ -55,6 +55,8 @@ class Command(BaseCommand):
             per_app.setdefault(day.app, []).append(day)
 
         for app, days in per_app.items():
+            if app.is_paused:
+                continue
             with activate_app(app.slug):
                 mail = EmailMultiAlternatives(
                     "Nicht besetzte Tage: {}".format(app.title),
