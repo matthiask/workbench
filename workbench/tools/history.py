@@ -286,6 +286,8 @@ def _invoices_invoice_cfg(user):
             "last_reminded_on",
             "title",
             "description",
+            "service_period_from",
+            "service_period_until",
             "owned_by",
             "created_at",
             "status",
