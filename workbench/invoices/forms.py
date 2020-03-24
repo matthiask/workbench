@@ -322,6 +322,8 @@ class CreateProjectInvoiceForm(InvoiceForm):
 
         if invoice_type == "services":
             self.add_services_field()
+            self.fields.pop("service_period_from")
+            self.fields.pop("service_period_until")
 
         if (
             self.request.method == "GET"

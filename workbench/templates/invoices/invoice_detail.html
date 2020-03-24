@@ -46,7 +46,7 @@
     </tr>
     <tr>
       <th class="text-right">{% trans 'Service period' %}</th>
-      <td>{{ object.service_period }}</td>
+      <td>{{ object.service_period|default:"&ndash;" }}</td>
     </tr>
     <tr>
       <th class="text-right">{% trans 'postal address'|capfirst %}</th>

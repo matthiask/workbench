@@ -6,7 +6,6 @@ from django.db.models import F, Q, Sum
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Coalesce
 from django.utils import timezone
-from django.utils.functional import cached_property
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
@@ -371,6 +370,10 @@ class Invoice(ModelWithTotal):
                     invoice_service=service, archived_at=timezone.now()
                 )
 
+        (
+            self.service_period_from,
+            self.service_period_until,
+        ) = self.service_period_from_logbook()
         self.save()
 
     def create_services_from_offer(self, project_services):
@@ -397,6 +400,10 @@ class Invoice(ModelWithTotal):
                 invoice_service=service, archived_at=timezone.now()
             )
 
+        (
+            self.service_period_from,
+            self.service_period_until,
+        ) = self.service_period_from_logbook()
         self.save()
 
     @classmethod
@@ -408,16 +415,10 @@ class Invoice(ModelWithTotal):
             return False
         return None
 
-    @cached_property
-    def service_period(self):
-        if self.type == self.DOWN_PAYMENT:
-            return None
-
-        period = [self.service_period_from, self.service_period_until]
-        if not all(period):
-            with connections["default"].cursor() as cursor:
-                cursor.execute(
-                    """
+    def service_period_from_logbook(self):
+        with connections["default"].cursor() as cursor:
+            cursor.execute(
+                """
 with sq as (
     select min(rendered_on) as min_date, max(rendered_on) as max_date
     from logbook_loggedhours log
@@ -432,11 +433,14 @@ with sq as (
     where i_s.invoice_id=%s
 )
 select min(min_date), max(max_date) from sq
-                    """,
-                    [self.id, self.id],
-                )
-                period = list(cursor)[0]
+                """,
+                [self.id, self.id],
+            )
+            return list(cursor)[0]
 
+    @property
+    def service_period(self):
+        period = [self.service_period_from, self.service_period_until]
         return (
             "%s - %s" % tuple(local_date_format(day) for day in period)
             if all(period)

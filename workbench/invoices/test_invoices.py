@@ -120,6 +120,7 @@ class InvoicesTest(TestCase):
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls["detail"])
         self.assertEqual(invoice.subtotal, 100)
+        self.assertEqual(invoice.service_period, None)
 
         service.refresh_from_db()
         self.assertFalse(service.allow_logging)
@@ -160,13 +161,23 @@ class InvoicesTest(TestCase):
         service4 = factories.ServiceFactory.create(project=project, title="nothing")
 
         cost = factories.LoggedCostFactory.create(
-            service=service1, cost=10, description="Test"
+            service=service1,
+            cost=10,
+            description="Test",
+            rendered_on=dt.date(2020, 3, 18),
         )
         hours = factories.LoggedHoursFactory.create(
-            service=service1, hours=1, description="Test"
+            service=service1,
+            hours=1,
+            description="Test",
+            rendered_on=dt.date(2020, 3, 20),
         )
-        factories.LoggedHoursFactory.create(service=service2, hours=2)
-        factories.LoggedHoursFactory.create(service=service3, hours=3)
+        factories.LoggedHoursFactory.create(
+            service=service2, hours=2, rendered_on=dt.date(2020, 3, 20)
+        )
+        factories.LoggedHoursFactory.create(
+            service=service3, hours=3, rendered_on=dt.date(2020, 3, 22)
+        )
 
         url = project.urls["createinvoice"] + "?type=services&source=logbook"
         self.client.force_login(project.owned_by)
@@ -204,6 +215,7 @@ class InvoicesTest(TestCase):
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls["detail"])
         self.assertEqual(invoice.subtotal, 610)
+        self.assertEqual(invoice.service_period, "18.03.2020 - 22.03.2020")
 
         cost.refresh_from_db()
         self.assertEqual(cost.invoice_service.invoice, invoice)
@@ -933,35 +945,3 @@ class InvoicesTest(TestCase):
 
         response = self.client.get("/invoices/reminders/")
         self.assertNotContains(response, "Not reminded yet")
-
-    def test_service_period(self):
-        project = factories.ProjectFactory.create()
-        invoice = factories.InvoiceFactory.create(
-            project=project,
-            customer=project.customer,
-            contact=project.contact,
-            type=Invoice.SERVICES,
-        )
-        self.assertEqual(invoice.service_period, None)
-
-        service = factories.ServiceFactory.create(
-            project=project, effort_type="Consulting", effort_rate=200
-        )
-
-        factories.LoggedHoursFactory.create(
-            service=service, rendered_on=dt.date(2020, 1, 1)
-        )
-        factories.LoggedCostFactory.create(
-            service=service, rendered_on=dt.date(2020, 1, 31)
-        )
-        invoice.create_services_from_logbook(project.services.all())
-
-        invoice = Invoice.objects.get()
-        self.assertEqual(invoice.service_period, "01.01.2020 - 31.01.2020")
-
-        invoice.service_period_from = dt.date(2020, 1, 15)
-        invoice.service_period_until = dt.date(2020, 2, 15)
-        invoice.save()
-
-        invoice = Invoice.objects.get()
-        self.assertEqual(invoice.service_period, "15.01.2020 - 15.02.2020")
