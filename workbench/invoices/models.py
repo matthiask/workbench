@@ -598,19 +598,9 @@ class RecurringInvoice(ModelWithTotal):
             invoiced_on=period_starts_on,
             due_on=period_starts_on + dt.timedelta(days=15),
             title=self.title,
-            description="\r\n\r\n".join(
-                filter(
-                    None,
-                    (
-                        self.description,
-                        "{}: {} - {}".format(
-                            _("Period"),
-                            local_date_format(period_starts_on),
-                            local_date_format(period_ends_on),
-                        ),
-                    ),
-                )
-            ),
+            description=self.description,
+            service_period_from=period_starts_on,
+            service_period_until=period_ends_on,
             owned_by=self.owned_by,
             status=Invoice.IN_PREPARATION,
             type=Invoice.FIXED,
