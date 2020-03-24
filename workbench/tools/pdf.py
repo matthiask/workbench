@@ -199,7 +199,7 @@ class PDFDocument(_PDFDocument):
             canvas.drawRightString(
                 pdf.bounds.E,
                 pdf.bounds.outsideS,
-                _("page %d")
+                _("Page %d")
                 % (
                     doc.page - doc.restartDocPageNumbers[doc.restartDocIndex - 1]
                     if doc.restartDocIndex

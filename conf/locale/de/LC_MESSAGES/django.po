@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-24 08:49+0100\n"
+"POT-Creation-Date: 2020-03-24 10:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1434,6 +1434,10 @@ msgstr "Bitte gib eine kurze Begründung für die Stornierung an."
 msgid "Either fill in both fields or none."
 msgstr "Entweder beide Felder einfüllen oder keines."
 
+#: workbench/invoices/models.py
+msgid "Until date has to be after from date."
+msgstr "Bis-Datum muss später als Von-Datum sein."
+
 #: workbench/invoices/models.py workbench/offers/models.py
 #, python-format
 msgid "In preparation since %(created_at)s"
@@ -1544,10 +1548,6 @@ msgstr "%(periodicity)s seit %(from)s"
 msgid "Next period starts on %(start)s, invoice will be created on %(create)s"
 msgstr ""
 "Nächste Periode beginnt am %(start)s, Rechnung wird am %(create)s erstellt."
-
-#: workbench/invoices/models.py
-msgid "Period"
-msgstr "Zeitraum"
 
 #: workbench/invoices/views.py workbench/logbook/models.py
 #: workbench/services/models.py
@@ -2969,7 +2969,7 @@ msgstr "%s exkl. MwSt."
 
 #: workbench/tools/pdf.py
 #, python-format
-msgid "page %d"
+msgid "Page %d"
 msgstr "Seite %d"
 
 #: workbench/tools/pdf.py
@@ -3028,6 +3028,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "More than 30 days overdue"
-#~ msgstr "Seit mehr als 30 Tagen überfällig"

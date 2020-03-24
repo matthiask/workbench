@@ -608,6 +608,47 @@ class InvoicesTest(TestCase):
             [("__all__", ["Invoices of type Down payment require a project."])],
         )
 
+        with self.assertRaises(ValidationError) as cm:
+            Invoice(
+                title="Test",
+                customer=factories.OrganizationFactory.create(),
+                owned_by=factories.UserFactory.create(),
+                type=Invoice.FIXED,
+                _code=0,
+                status=Invoice.SENT,
+                postal_address="Test\nStreet\nCity",
+                invoiced_on=dt.date.today(),
+                due_on=in_days(0),
+                service_period_from=in_days(0),
+                service_period_until=None,
+            ).full_clean()
+        self.assertEqual(
+            list(cm.exception),
+            [
+                ("service_period_from", ["Either fill in both fields or none."]),
+                ("service_period_until", ["Either fill in both fields or none."]),
+            ],
+        )
+
+        with self.assertRaises(ValidationError) as cm:
+            Invoice(
+                title="Test",
+                customer=factories.OrganizationFactory.create(),
+                owned_by=factories.UserFactory.create(),
+                type=Invoice.FIXED,
+                _code=0,
+                status=Invoice.SENT,
+                postal_address="Test\nStreet\nCity",
+                invoiced_on=dt.date.today(),
+                due_on=in_days(0),
+                service_period_from=in_days(0),
+                service_period_until=in_days(-1),
+            ).full_clean()
+        self.assertEqual(
+            list(cm.exception),
+            [("service_period_until", ["Until date has to be after from date."])],
+        )
+
     def test_unlock_sent_invoice(self):
         invoice = factories.InvoiceFactory.create(
             title="Test",
@@ -892,3 +933,26 @@ class InvoicesTest(TestCase):
 
         response = self.client.get("/invoices/reminders/")
         self.assertNotContains(response, "Not reminded yet")
+
+    def test_service_period(self):
+        project = factories.ProjectFactory.create()
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        service = factories.ServiceFactory.create(
+            project=project, effort_type="Consulting", effort_rate=200
+        )
+
+        factories.LoggedHoursFactory.create(
+            service=service, rendered_on=dt.date(2020, 1, 1)
+        )
+        factories.LoggedCostFactory.create(
+            service=service, rendered_on=dt.date(2020, 1, 31)
+        )
+
+        invoice.create_services_from_logbook(project.services.all())
+
+        self.assertEqual(invoice.service_period, "01.01.2020 - 31.01.2020")

@@ -252,6 +252,12 @@ class Invoice(ModelWithTotal):
             errors["service_period_from"] = errors["service_period_until"] = _(
                 "Either fill in both fields or none."
             )
+        if (
+            self.service_period_from
+            and self.service_period_until
+            and self.service_period_from > self.service_period_until
+        ):
+            errors["service_period_until"] = _("Until date has to be after from date.")
 
         raise_if_errors(errors, exclude)
 
@@ -413,17 +419,17 @@ class Invoice(ModelWithTotal):
                 cursor.execute(
                     """
 with sq as (
-select min(rendered_on) as min_date, max(rendered_on) as max_date
-from logbook_loggedhours log
-left join invoices_service i_s on log.invoice_service_id=i_s.id
-where i_s.invoice_id=%s
+    select min(rendered_on) as min_date, max(rendered_on) as max_date
+    from logbook_loggedhours log
+    left join invoices_service i_s on log.invoice_service_id=i_s.id
+    where i_s.invoice_id=%s
 
-union all
+    union all
 
-select min(rendered_on) as min_date, max(rendered_on) as max_date
-from logbook_loggedcost log
-left join invoices_service i_s on log.invoice_service_id=i_s.id
-where i_s.invoice_id=%s
+    select min(rendered_on) as min_date, max(rendered_on) as max_date
+    from logbook_loggedcost log
+    left join invoices_service i_s on log.invoice_service_id=i_s.id
+    where i_s.invoice_id=%s
 )
 select min(min_date), max(max_date) from sq
                     """,
