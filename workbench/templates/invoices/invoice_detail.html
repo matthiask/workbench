@@ -45,6 +45,10 @@
       <td>{{ object.description|linebreaksbr|default:"&ndash;" }}</td>
     </tr>
     <tr>
+      <th class="text-right">{% trans 'Service period' %}</th>
+      <td>{{ object.service_period }}</td>
+    </tr>
+    <tr>
       <th class="text-right">{% trans 'postal address'|capfirst %}</th>
       <td>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</td>
     </tr>

@@ -105,6 +105,8 @@ class InvoiceForm(PostalAddressSelectionForm):
             "due_on",
             "title",
             "description",
+            "service_period_from",
+            "service_period_until",
             "owned_by",
             "status",
             "closed_on",
@@ -139,6 +141,8 @@ class InvoiceForm(PostalAddressSelectionForm):
 
         if self.instance.type == self.instance.DOWN_PAYMENT:
             self.fields["subtotal"].label = _("Down payment")
+            self.fields.pop("service_period_from")
+            self.fields.pop("service_period_until")
 
         if self.instance.type == self.instance.SERVICES:
             self.fields["subtotal"].disabled = True

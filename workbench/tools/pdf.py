@@ -350,6 +350,9 @@ class PDFDocument(_PDFDocument):
             self.spacer(5 * mm)
             self.p(instance.description)
         self.spacer()
+        if getattr(instance, "service_period", None):
+            self.p("%s: %s" % (_("Service period"), instance.service_period))
+            self.spacer()
         self.table_services(
             instance.services.all(),
             show_details=getattr(instance, "show_service_details", False),

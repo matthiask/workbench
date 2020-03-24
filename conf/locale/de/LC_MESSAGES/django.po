@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-22 17:38+0100\n"
+"POT-Creation-Date: 2020-03-24 08:49+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1203,10 +1203,6 @@ msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
 msgid "invoices"
 msgstr "Rechnungen"
 
-#: workbench/invoices/forms.py
-msgid "More than 30 days overdue"
-msgstr "Seit mehr als 30 Tagen überfällig"
-
 #: workbench/invoices/forms.py workbench/offers/forms.py
 msgid "Exact"
 msgstr "Exakt"
@@ -1367,6 +1363,14 @@ msgid "last reminded on"
 msgstr "zuletzt gemahnt am"
 
 #: workbench/invoices/models.py
+msgid "service period from"
+msgstr "Leistungen erbracht von"
+
+#: workbench/invoices/models.py
+msgid "service period until"
+msgstr "Leistungen erbracht bis"
+
+#: workbench/invoices/models.py
 msgid "down payment applied to"
 msgstr "Anzahlung angewendet auf"
 
@@ -1425,6 +1429,10 @@ msgstr "Rechnungen vom Typ %(type)s benötigen zwingend ein Projekt."
 #: workbench/invoices/models.py
 msgid "Please provide a short reason for the invoice cancellation."
 msgstr "Bitte gib eine kurze Begründung für die Stornierung an."
+
+#: workbench/invoices/models.py
+msgid "Either fill in both fields or none."
+msgstr "Entweder beide Felder einfüllen oder keines."
 
 #: workbench/invoices/models.py workbench/offers/models.py
 #, python-format
@@ -2223,6 +2231,10 @@ msgstr "Dashboard"
 msgid "bookkeeping"
 msgstr "Buchhaltung"
 
+#: workbench/templates/base.html workbench/templates/invoices/reminders.html
+msgid "Reminders"
+msgstr "Mahnungen"
+
 #: workbench/templates/base.html
 msgid "reports"
 msgstr "Berichte"
@@ -2405,6 +2417,10 @@ msgstr "Zahlungserinnerungen verschickt am"
 msgid "None yet"
 msgstr "Noch keine"
 
+#: workbench/templates/invoices/invoice_detail.html workbench/tools/pdf.py
+msgid "Service period"
+msgstr "Zeitraum"
+
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/tools/models.py workbench/tools/pdf.py
@@ -2436,10 +2452,6 @@ msgstr "Kopieren"
 #: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "Create invoices"
 msgstr "Rechnungen erstellen"
-
-#: workbench/templates/invoices/reminders.html
-msgid "Reminders"
-msgstr "Mahnungen"
 
 #: workbench/templates/invoices/reminders.html
 msgid "Last reminded on"
@@ -3016,3 +3028,6 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "More than 30 days overdue"
+#~ msgstr "Seit mehr als 30 Tagen überfällig"

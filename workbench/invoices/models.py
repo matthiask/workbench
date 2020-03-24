@@ -1,11 +1,12 @@
 import datetime as dt
 
 from django.contrib import messages
-from django.db import models
+from django.db import connections, models
 from django.db.models import F, Q, Sum
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Coalesce
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
@@ -94,6 +95,12 @@ class Invoice(ModelWithTotal):
 
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
+    service_period_from = models.DateField(
+        _("service period from"), blank=True, null=True
+    )
+    service_period_until = models.DateField(
+        _("service period until"), blank=True, null=True
+    )
     owned_by = models.ForeignKey(
         User, on_delete=models.PROTECT, verbose_name=_("responsible")
     )
@@ -239,6 +246,11 @@ class Invoice(ModelWithTotal):
         if self.status == Invoice.CANCELED and not self.payment_notice:
             errors["payment_notice"] = _(
                 "Please provide a short reason for the invoice cancellation."
+            )
+
+        if bool(self.service_period_from) != bool(self.service_period_until):
+            errors["service_period_from"] = errors["service_period_until"] = _(
+                "Either fill in both fields or none."
             )
 
         raise_if_errors(errors, exclude)
@@ -389,6 +401,41 @@ class Invoice(ModelWithTotal):
             )
             return False
         return None
+
+    @cached_property
+    def service_period(self):
+        if self.type == self.DOWN_PAYMENT:
+            return None
+
+        period = [self.service_period_from, self.service_period_until]
+        if not all(period):
+            with connections["default"].cursor() as cursor:
+                cursor.execute(
+                    """
+with sq as (
+select min(rendered_on) as min_date, max(rendered_on) as max_date
+from logbook_loggedhours log
+left join invoices_service i_s on log.invoice_service_id=i_s.id
+where i_s.invoice_id=%s
+
+union all
+
+select min(rendered_on) as min_date, max(rendered_on) as max_date
+from logbook_loggedcost log
+left join invoices_service i_s on log.invoice_service_id=i_s.id
+where i_s.invoice_id=%s
+)
+select min(min_date), max(max_date) from sq
+                    """,
+                    [self.id, self.id],
+                )
+                period = list(cursor)[0]
+
+        return (
+            "%s - %s" % tuple(local_date_format(day) for day in period)
+            if all(period)
+            else None
+        )
 
 
 @model_urls
