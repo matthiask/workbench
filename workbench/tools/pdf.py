@@ -379,7 +379,7 @@ class PDFDocument(_PDFDocument):
                         )
                     ),
                 ),
-                (_("our reference"), offer.owned_by.get_full_name()),
+                (_("Our reference"), offer.owned_by.get_full_name()),
                 (
                     _("valid until"),
                     (
@@ -417,7 +417,7 @@ class PDFDocument(_PDFDocument):
                         )
                     ),
                 ),
-                (_("our reference"), invoice.owned_by.get_full_name()),
+                (_("Our reference"), invoice.owned_by.get_full_name()),
                 ("MwSt.-Nr.", settings.WORKBENCH.PDF_VAT_NO),
             ],
             footer=settings.WORKBENCH.PDF_INVOICE_PAYMENT

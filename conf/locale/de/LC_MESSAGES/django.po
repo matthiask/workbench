@@ -2985,7 +2985,7 @@ msgid "tax"
 msgstr "MwSt."
 
 #: workbench/tools/pdf.py
-msgid "our reference"
+msgid "Our reference"
 msgstr "Unsere Referenz"
 
 #: workbench/tools/pdf.py
