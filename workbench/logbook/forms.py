@@ -62,8 +62,8 @@ class LoggedHoursSearchForm(Form):
         widget=forms.HiddenInput,
         label="",
     )
-    circle = forms.IntegerField(required=False, widget=forms.HiddenInput, label="",)
-    role = forms.IntegerField(required=False, widget=forms.HiddenInput, label="",)
+    circle = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
+    role = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
     not_archived = forms.BooleanField(
         required=False, widget=forms.HiddenInput, label=""
     )

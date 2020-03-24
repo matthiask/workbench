@@ -130,7 +130,7 @@ TEMPLATES = [
     }
 ]
 
-LOCALE_PATHS = (os.path.join(BASE_DIR, "conf", "locale"),)
+LOCALE_PATHS = [os.path.join(BASE_DIR, "conf", "locale")]
 
 AUTHENTICATION_BACKENDS = ["authlib.backends.EmailBackend"]
 

@@ -113,7 +113,7 @@ def gross_margin_by_month(date_range):
 def service_hours_in_open_orders():
     return (
         Service.objects.budgeted()
-        .filter(project__type=Project.ORDER, project__closed_on__isnull=True,)
+        .filter(project__type=Project.ORDER, project__closed_on__isnull=True)
         .order_by()
         .aggregate(h=Sum("service_hours"))["h"]
         or Z

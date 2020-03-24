@@ -485,7 +485,7 @@ class RecurringInvoiceQuerySet(SearchQuerySet):
     def renewal_candidates(self):
         today = dt.date.today()
         return (
-            self.annotate(_start=Coalesce("next_period_starts_on", "starts_on"),)
+            self.annotate(_start=Coalesce("next_period_starts_on", "starts_on"))
             .filter(
                 Q(_start__lte=today - F("create_invoice_on_day")),
                 Q(ends_on__isnull=True) | Q(ends_on__gte=F("_start")),
@@ -620,7 +620,7 @@ class RecurringInvoice(ModelWithTotal):
             self.periodicity,
         )
         generate_until = min(
-            filter(None, (in_days(-self.create_invoice_on_day), self.ends_on,),)
+            filter(None, (in_days(-self.create_invoice_on_day), self.ends_on))
         )
         this_period = next(days)
         while True:
