@@ -29,12 +29,6 @@ export const Timer = connect(({activities, current}) => ({
       ...activity,
       seconds,
       isActive: true,
-      isReady:
-        activity.description &&
-        activity.description.length &&
-        activity.project &&
-        activity.service &&
-        seconds > 0,
     }
   })
 
