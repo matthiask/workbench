@@ -135,12 +135,12 @@ export const Activity = connect((state, ownProps) => ({
             <div
               className="activity-duration pl-2"
               onClick={() => {
-                const newSeconds = parseInt(
+                const seconds = parseInt(
                   prompt("Update seconds", activity.seconds)
                 )
-                if (newSeconds) {
+                if (seconds) {
                   dispatchUpdate({
-                    seconds: parseInt(newSeconds),
+                    seconds,
                   })
                 }
               }}
