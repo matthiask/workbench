@@ -6,6 +6,7 @@
 
 {% block js %}{{ block.super }}
 {{ state|json_script:'timer-state' }}
+{{ hours|json_script:'user-hours' }}
 <script src="{% url 'javascript-catalog' %}"></script>
 {% if not TESTING %}
   {% render_bundle "manifest" %}

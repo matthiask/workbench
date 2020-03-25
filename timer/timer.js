@@ -5,6 +5,8 @@ import {Activity} from "./activity.js"
 import {CreateActivity} from "./createActivity.js"
 import {prettyDuration, timestamp} from "./utils.js"
 
+const hours = JSON.parse(document.getElementById("user-hours").textContent)
+
 export const Timer = connect(({activities, current}) => ({
   activities,
   current,
@@ -43,8 +45,12 @@ export const Timer = connect(({activities, current}) => ({
   return (
     <>
       <CreateActivity />
-      <div className="btn btn-info total-seconds">
-        {prettyDuration(totalSeconds)}
+      <div className="total-seconds">
+        Today: {hours.today}
+        <br />
+        This week: {hours.week}
+        <br />
+        Timer: {prettyDuration(totalSeconds)}
       </div>
       <div className="activity-list">
         {activities.map(activity => (

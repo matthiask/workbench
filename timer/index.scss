@@ -23,8 +23,8 @@ div[role="main"] {
 .total-seconds {
   pointer-events: none;
   position: fixed;
-  top: 100px;
-  right: 10px;
+  left: 10px;
+  bottom: 20px;
 }
 
 .activity-list {

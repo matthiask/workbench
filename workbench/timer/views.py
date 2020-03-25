@@ -13,6 +13,7 @@ from corsheaders.middleware import CorsMiddleware
 
 from workbench.accounts.models import User
 from workbench.timer.models import TimerState, Timestamp
+from workbench.tools.formats import hours
 from workbench.tools.forms import Form
 from workbench.tools.validation import filter_form
 
@@ -32,7 +33,17 @@ def timer(request):
         )
 
     state = TimerState.objects.filter(user=request.user).first()
-    return render(request, "timer.html", {"state": state.state if state else None})
+    return render(
+        request,
+        "timer.html",
+        {
+            "state": state.state if state else None,
+            "hours": {
+                "today": hours(request.user.hours["today"]),
+                "week": hours(request.user.hours["week"]),
+            },
+        },
+    )
 
 
 class TimestampForm(forms.ModelForm):
