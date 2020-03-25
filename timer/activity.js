@@ -38,6 +38,13 @@ export const Activity = connect((state, ownProps) => ({
     ? activity.project.label.replace(/^[-0-9\s]+/, "")
     : gettext("Activity")
 
+  const isReady =
+    activity.description &&
+    activity.description.length &&
+    activity.project &&
+    activity.service &&
+    activity.seconds > 0
+
   return (
     <Draggable
       handle=".js-drag-handle"
@@ -181,9 +188,9 @@ export const Activity = connect((state, ownProps) => ({
               </button>
               <button
                 className={`btn btn-sm ml-2 ${
-                  activity.isReady ? "btn-success" : "btn-light"
+                  isReady ? "btn-success" : "btn-light"
                 }`}
-                disabled={!activity.project || !activity.isReady}
+                disabled={!activity.project || !isReady}
                 type="button"
                 onClick={() =>
                   sendLogbook(dispatch, {
