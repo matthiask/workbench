@@ -115,7 +115,7 @@ export async function sendLogbook(dispatch, {activity, current}) {
 
 export function overwriteSeconds(dispatch, {activity}) {
   const seconds = parseInt(
-    prompt(gettext("Update seconds"), Math.ceil(activity.seconds))
+    prompt(gettext("Overwrite seconds"), Math.ceil(activity.seconds))
   )
   if (!isNaN(seconds)) {
     dispatch({

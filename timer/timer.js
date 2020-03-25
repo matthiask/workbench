@@ -3,6 +3,7 @@ import {connect} from "react-redux"
 
 import {Activity} from "./activity.js"
 import {CreateActivity} from "./createActivity.js"
+import {gettext} from "./i18n.js"
 import {prettyDuration, timestamp} from "./utils.js"
 
 const hours = JSON.parse(document.getElementById("user-hours").textContent)
@@ -40,11 +41,11 @@ export const Timer = connect(({activities, current}) => ({
     <>
       <CreateActivity />
       <div className="total-seconds">
-        Today: {hours.today}
+        {gettext("Today")}: {hours.today}
         <br />
-        This week: {hours.week}
+        {gettext("This week")}: {hours.week}
         <br />
-        Timer: {prettyDuration(totalSeconds)}
+        {gettext("Timer")}: {prettyDuration(totalSeconds)}
       </div>
       <div className="activity-list">
         {activities.map(activity => (
