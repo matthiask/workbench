@@ -18,7 +18,7 @@ const createUpdater = ({id, dispatch}) => fields =>
   })
 
 export const Activity = connect((state, ownProps) => ({
-  ...ownProps,
+  activity: ownProps.activity,
   current: state.current,
   projects: state.projects,
 }))(({activity, current, projects, dispatch}) => {
