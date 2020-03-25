@@ -7,7 +7,7 @@ import AsyncSelect from "react-select/async"
 import {fetchProjects, fetchServices, openForm, sendLogbook} from "./actions.js"
 import {ActivitySettings} from "./activitySettings.js"
 import {gettext, OUTCOME} from "./i18n.js"
-import {clamp, prettyDuration, timestamp} from "./utils.js"
+import {clamp, prettyDuration} from "./utils.js"
 import * as icons from "./icons.js"
 
 const createUpdater = ({id, dispatch}) => fields =>
@@ -16,21 +16,6 @@ const createUpdater = ({id, dispatch}) => fields =>
     id,
     fields,
   })
-
-const analyze = (activity, current) => {
-  const isActive = current && current.id == activity.id
-  const seconds = Math.ceil(
-    activity.seconds + (isActive ? timestamp() - current.startedAt : 0)
-  )
-  const isReady =
-    activity.description &&
-    activity.description.length &&
-    activity.project &&
-    activity.service &&
-    seconds > 0
-
-  return {isActive, seconds, isReady}
-}
 
 export const Activity = connect((state, ownProps) => ({
   ...ownProps,
@@ -42,17 +27,6 @@ export const Activity = connect((state, ownProps) => ({
   // State vars
   const [showSettings, setShowSettings] = useState(false)
   const [services, setServices] = useState([])
-
-  // Analyze
-  const {isActive, isReady, seconds} = analyze(activity, current)
-
-  // Update each second if active
-  const [, updateState] = useState()
-  useEffect(() => {
-    if (!isActive) return
-    const interval = setInterval(() => updateState({}), 1000)
-    return () => clearInterval(interval)
-  }, [isActive])
 
   // Fill services dropdown
   useEffect(() => {
@@ -80,7 +54,9 @@ export const Activity = connect((state, ownProps) => ({
       }
     >
       <form
-        className={`activity ${isActive ? "is-active" : ""} card px-2 py-2`}
+        className={`activity ${
+          activity.isActive ? "is-active" : ""
+        } card px-2 py-2`}
         style={{backgroundColor: activity.color}}
       >
         <div
@@ -152,19 +128,18 @@ export const Activity = connect((state, ownProps) => ({
             <div
               className="activity-duration pl-2"
               onClick={() => {
-                const newSeconds = parseInt(prompt("Update seconds", seconds))
+                const newSeconds = parseInt(
+                  prompt("Update seconds", activity.seconds)
+                )
                 if (newSeconds) {
                   dispatchUpdate({
-                    seconds: parseInt(
-                      newSeconds -
-                        (isActive ? timestamp() - current.startedAt : 0)
-                    ),
+                    seconds: parseInt(newSeconds),
                   })
                 }
               }}
               style={{cursor: "cell"}}
             >
-              {prettyDuration(seconds)}
+              {prettyDuration(activity.seconds)}
             </div>
             <div>
               <button
@@ -177,18 +152,18 @@ export const Activity = connect((state, ownProps) => ({
               </button>
               <button
                 className={`btn btn-sm ml-2 ${
-                  isActive ? "btn-warning" : "btn-light"
+                  activity.isActive ? "btn-warning" : "btn-light"
                 }`}
                 type="button"
                 onClick={() =>
                   dispatch({
-                    type: isActive ? "STOP" : "START",
+                    type: activity.isActive ? "STOP" : "START",
                     id: activity.id,
                     current,
                   })
                 }
               >
-                {isActive ? icons.pause : icons.play}
+                {activity.isActive ? icons.pause : icons.play}
               </button>
               <button
                 className="btn btn-sm ml-2 btn-light"
@@ -198,7 +173,6 @@ export const Activity = connect((state, ownProps) => ({
                   openForm(dispatch, {
                     activity,
                     current,
-                    seconds,
                   })
                 }
                 title={gettext("Open logged hours form")}
@@ -207,15 +181,14 @@ export const Activity = connect((state, ownProps) => ({
               </button>
               <button
                 className={`btn btn-sm ml-2 ${
-                  isReady ? "btn-success" : "btn-light"
+                  activity.isReady ? "btn-success" : "btn-light"
                 }`}
-                disabled={!activity.project || !isReady}
+                disabled={!activity.project || !activity.isReady}
                 type="button"
                 onClick={() =>
                   sendLogbook(dispatch, {
                     activity,
                     current,
-                    seconds,
                   })
                 }
                 title={gettext("Send to logbook")}
@@ -236,7 +209,7 @@ export const Activity = connect((state, ownProps) => ({
               dispatch({type: "REMOVE_ACTIVITY", id: activity.id})
             }}
             resetActivity={() => {
-              if (isActive) dispatch({type: "STOP", current})
+              if (activity.isActive) dispatch({type: "STOP", current})
               dispatchUpdate({seconds: 0})
               setShowSettings(false)
             }}

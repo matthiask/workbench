@@ -1,5 +1,3 @@
-$root-font-size: 1rem;
-
 html,
 body {
   min-height: 100vh;
@@ -22,6 +20,13 @@ div[role="main"] {
   z-index: 1005;
 }
 
+.total-seconds {
+  pointer-events: none;
+  position: fixed;
+  top: 100px;
+  right: 10px;
+}
+
 .activity-list {
   flex: 1 0 auto;
   position: relative;
@@ -30,7 +35,7 @@ div[role="main"] {
 }
 
 .activity {
-  width: 18rem;
+  width: 290px;
   position: absolute;
 
   transition: background-color 0.2s ease-in-out;

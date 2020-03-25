@@ -58,14 +58,15 @@ export async function loadProjects(dispatch) {
   }
 }
 
-export async function openForm(dispatch, {activity, current, seconds}) {
+export async function openForm(dispatch, {activity, current}) {
   if (current && current.id == activity.id) dispatch({type: "STOP", current})
   dispatch({type: "MODAL_ACTIVITY", id: activity.id})
 
   const url = endpoint(CREATE_HOURS, activity.project.value)
   const params = new URLSearchParams()
   if (activity.service) params.append("service", activity.service.value)
-  if (seconds) params.append("hours", Math.ceil(seconds / 360) / 10)
+  if (activity.seconds)
+    params.append("hours", Math.ceil(activity.seconds / 360) / 10)
   params.append("description", activity.description)
 
   const finalUrl = `${url}?${params.toString()}`
@@ -74,13 +75,13 @@ export async function openForm(dispatch, {activity, current, seconds}) {
   return
 }
 
-export async function sendLogbook(dispatch, {activity, current, seconds}) {
+export async function sendLogbook(dispatch, {activity, current}) {
   const url = endpoint(CREATE_HOURS, activity.project.value)
 
   const body = new FormData()
   if (activity.service) body.append("modal-service", activity.service.value)
   body.append("modal-description", activity.description)
-  body.append("modal-hours", Math.ceil(seconds / 360) / 10)
+  body.append("modal-hours", Math.ceil(activity.seconds / 360) / 10)
   body.append(
     "modal-rendered_by",
     document.getElementById("current-user").dataset.currentUser
