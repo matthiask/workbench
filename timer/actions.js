@@ -112,3 +112,16 @@ export async function sendLogbook(dispatch, {activity, current}) {
     alert(gettext("Unable to submit the logbook entry"))
   }
 }
+
+export function overwriteSeconds(dispatch, {activity}) {
+  const seconds = parseInt(
+    prompt(gettext("Update seconds"), Math.ceil(activity.seconds))
+  )
+  if (!isNaN(seconds)) {
+    dispatch({
+      type: "UPDATE_ACTIVITY",
+      id: activity.id,
+      fields: {seconds},
+    })
+  }
+}

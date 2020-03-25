@@ -4,7 +4,13 @@ import {connect} from "react-redux"
 import Select from "react-select"
 import AsyncSelect from "react-select/async"
 
-import {fetchProjects, fetchServices, openForm, sendLogbook} from "./actions.js"
+import {
+  fetchProjects,
+  fetchServices,
+  openForm,
+  overwriteSeconds,
+  sendLogbook,
+} from "./actions.js"
 import {ActivitySettings} from "./activitySettings.js"
 import {gettext, OUTCOME} from "./i18n.js"
 import {clamp, prettyDuration} from "./utils.js"
@@ -109,9 +115,7 @@ export const Activity = connect((state, ownProps) => ({
               isClearable={true}
               isDisabled={!services.length}
               options={services}
-              onChange={row => {
-                dispatchUpdate({service: row})
-              }}
+              onChange={service => dispatchUpdate({service})}
               placeholder={
                 services.length
                   ? gettext("Select service...")
@@ -134,16 +138,7 @@ export const Activity = connect((state, ownProps) => ({
           <div className="d-flex align-items-center justify-content-between">
             <div
               className="activity-duration pl-2"
-              onClick={() => {
-                const seconds = parseInt(
-                  prompt("Update seconds", activity.seconds)
-                )
-                if (seconds) {
-                  dispatchUpdate({
-                    seconds,
-                  })
-                }
-              }}
+              onClick={() => overwriteSeconds(dispatch, {activity})}
               style={{cursor: "cell"}}
             >
               {prettyDuration(activity.seconds)}
