@@ -11,7 +11,7 @@ from django.utils.translation import gettext as _
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
-from workbench.awt.models import Absence, Employment
+from workbench.awt.models import Absence, Employment, Year
 from workbench.contacts.models import (
     EmailAddress,
     Organization,
@@ -224,38 +224,14 @@ def changes(model, fields, actions):
 def _credit_control_creditentry_cfg(user):
     if not user.features[FEATURES.CONTROLLING]:
         raise Http404
-    return {
-        "fields": {
-            "ledger",
-            "reference_number",
-            "value_date",
-            "total",
-            "payment_notice",
-            "invoice",
-            "notes",
-        }
-    }
+    return {"fields": EVERYTHING}
 
 
 def _deals_deal_cfg(user):
     if not user.features[FEATURES.DEALS]:
         raise Http404
     return {
-        "fields": {
-            "customer",
-            "contact",
-            "title",
-            "description",
-            "owned_by",
-            "value",
-            "status",
-            "probability",
-            "decision_expected_on",
-            "created_at",
-            "closed_on",
-            "closing_type",
-            "closing_notice",
-        },
+        "fields": EVERYTHING,
         "related": [(Value, "deal_id")],
     }
 
@@ -263,42 +239,20 @@ def _deals_deal_cfg(user):
 def _deals_value_cfg(user):
     if not user.features[FEATURES.DEALS]:
         raise Http404
-    return {"fields": {"deal", "type", "value"}}
+    return {"fields": EVERYTHING}
 
 
 def _deals_valuetype_cfg(user):
     if not user.features[FEATURES.DEALS]:
         raise Http404
-    return {"fields": {"title", "is_archived", "weekly_target"}}
+    return {"fields": EVERYTHING}
 
 
 def _invoices_invoice_cfg(user):
     if not user.features[FEATURES.CONTROLLING]:
         raise Http404
     return {
-        "fields": {
-            "customer",
-            "contact",
-            "project",
-            "invoiced_on",
-            "due_on",
-            "closed_on",
-            "last_reminded_on",
-            "title",
-            "description",
-            "service_period_from",
-            "service_period_until",
-            "owned_by",
-            "created_at",
-            "status",
-            "type",
-            "down_payment_applied_to",
-            "down_payment_total",
-            "third_party_costs",
-            "postal_address",
-            "payment_notice",
-        }
-        | WITH_TOTAL,
+        "fields": EVERYTHING,
         "related": [(CreditEntry, "invoice_id")],
     }
 
@@ -306,45 +260,13 @@ def _invoices_invoice_cfg(user):
 def _invoices_service_cfg(user):
     if not user.features[FEATURES.CONTROLLING]:
         raise Http404
-    return {
-        "fields": {
-            "created_at",
-            "title",
-            "description",
-            "service_hours",
-            "service_cost",
-            "effort_type",
-            "effort_hours",
-            "effort_rate",
-            "cost",
-            "third_party_costs",
-            "invoice",
-            "project_service",
-        }
-    }
+    return {"fields": EVERYTHING}
 
 
 def _invoices_recurringinvoice_cfg(user):
     if not user.features[FEATURES.CONTROLLING]:
         raise Http404
-    return {
-        "fields": {
-            "customer",
-            "contact",
-            "title",
-            "description",
-            "owned_by",
-            "created_at",
-            "third_party_costs",
-            "postal_address",
-            "starts_on",
-            "ends_on",
-            "periodicity",
-            "create_invoice_on_day",
-            "next_period_starts_on",
-        }
-        | WITH_TOTAL
-    }
+    return {"fields": EVERYTHING}
 
 
 def _logbook_loggedcost_cfg(user):
@@ -472,23 +394,14 @@ HISTORY = {
         },
         "related": [(Employment, "user_id"), (Absence, "user_id")],
     },
-    Absence: {
-        "fields": {
-            "user",
-            "starts_on",
-            "ends_on",
-            "days",
-            "description",
-            "reason",
-            "is_vacation",
-        }
-    },
+    Absence: {"fields": EVERYTHING},
+    Year: {"fields": EVERYTHING},
     CreditEntry: _credit_control_creditentry_cfg,
     Deal: _deals_deal_cfg,
     Value: _deals_value_cfg,
     ValueType: _deals_valuetype_cfg,
     ExpenseReport: {
-        "fields": {"created_at", "created_by", "closed_on", "owned_by", "total"},
+        "fields": EVERYTHING,
         "related": [(LoggedCost, "expense_report_id")],
     },
     Employment: {
@@ -501,44 +414,12 @@ HISTORY = {
             "notes",
         }
     },
-    EmailAddress: {"fields": {"person", "type", "email"}},
-    PhoneNumber: {"fields": {"person", "type", "phone_number"}},
-    PostalAddress: {
-        "fields": {
-            "person",
-            "type",
-            "street",
-            "house_number",
-            "address_suffix",
-            "postal_code",
-            "city",
-            "country",
-            "postal_address_override",
-        }
-    },
-    Organization: {
-        "fields": {
-            "name",
-            "is_private_person",
-            "notes",
-            "primary_contact",
-            "default_billing_address",
-        },
-        "related": [(Person, "organization_id")],
-    },
+    EmailAddress: {"fields": EVERYTHING},
+    PhoneNumber: {"fields": EVERYTHING},
+    PostalAddress: {"fields": EVERYTHING},
+    Organization: {"fields": EVERYTHING, "related": [(Person, "organization_id")]},
     Person: {
-        "fields": {
-            "is_archived",
-            "given_name",
-            "family_name",
-            "address",
-            "address_on_first_name_terms",
-            "salutation",
-            "date_of_birth",
-            "notes",
-            "organization",
-            "primary_contact",
-        },
+        "fields": EVERYTHING,
         "related": [
             (PhoneNumber, "person_id"),
             (EmailAddress, "person_id"),
