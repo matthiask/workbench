@@ -257,13 +257,16 @@ class User(Model, AbstractBaseUser):
             cursor.execute(
                 """
 with sq as (
-   select max(created_at) as created_at
-   from logbook_loggedhours
-   where rendered_on=%s and rendered_by_id=%s
-   union all
-   select max(created_at) as created_at
-   from timer_timestamp
-   where user_id=%s
+    select max(created_at) as created_at
+    from logbook_loggedhours
+    where rendered_on=%s and rendered_by_id=%s and id not in (
+        select logged_hours_id from timer_timestamp
+        where logged_hours_id is not NULL
+    )
+    union all
+    select max(created_at) as created_at
+    from timer_timestamp
+    where user_id=%s
 )
 select max(created_at) from sq
                 """,

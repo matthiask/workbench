@@ -232,20 +232,34 @@ class TimestampsTest(TestCase):
         user = factories.UserFactory.create()
         self.assertEqual(user.latest_created_at, None)
 
-        user = User.objects.get(id=user.id)
         t = user.timestamp_set.create(
             created_at=timezone.now() - dt.timedelta(seconds=99), type=Timestamp.SPLIT
         )
+        user = User.objects.get(id=user.id)
         self.assertEqual(user.latest_created_at, t.created_at)
 
-        user = User.objects.get(id=user.id)
         h = factories.LoggedHoursFactory.create(rendered_by=user)
+        user = User.objects.get(id=user.id)
         self.assertEqual(user.latest_created_at, h.created_at)
 
-        user = User.objects.get(id=user.id)
         t = user.timestamp_set.create(
             created_at=timezone.now() + dt.timedelta(seconds=99), type=Timestamp.SPLIT
         )
+        user = User.objects.get(id=user.id)
+        self.assertEqual(user.latest_created_at, t.created_at)
+
+        h = factories.LoggedHoursFactory.create(
+            rendered_by=user, created_at=timezone.now() + dt.timedelta(seconds=300)
+        )
+        user = User.objects.get(id=user.id)
+        self.assertEqual(user.latest_created_at, h.created_at)
+
+        # After assigning the logged_hours relation latest_created_at should
+        # be back to Timestamp.created_at
+        t.logged_hours = h
+        t.save()
+
+        user = User.objects.get(id=user.id)
         self.assertEqual(user.latest_created_at, t.created_at)
 
     def test_link_timestamps(self):
