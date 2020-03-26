@@ -30,6 +30,7 @@ class InvoiceAdmin(admin.ModelAdmin):
         "total_excl_tax",
     )
     list_filter = ("type", "status")
+    radio_fields = {"status": admin.HORIZONTAL, "type": admin.HORIZONTAL}
     raw_id_fields = ("customer", "contact", "project", "down_payment_applied_to")
 
 
@@ -46,4 +47,5 @@ class RecurringInvoiceAdmin(admin.ModelAdmin):
         "total_excl_tax",
     ]
     list_filter = ["periodicity"]
+    radio_fields = {"periodicity": admin.HORIZONTAL}
     raw_id_fields = ["customer", "contact"]

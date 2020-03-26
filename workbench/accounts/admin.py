@@ -46,6 +46,7 @@ class UserAdmin(UserAdmin):
             },
         )
     ]
+    radio_fields = {"language": admin.HORIZONTAL}
     readonly_fields = ["signed_email"]
     search_fields = ("email", "_short_name", "_full_name")
     ordering = ("email",)

@@ -13,7 +13,7 @@ class ServiceAdmin(admin.ModelAdmin):
         "service_cost",
     )
     list_select_related = ["project__owned_by", "offer__project", "offer__owned_by"]
-    raw_id_fields = ["project", "offer"]
+    raw_id_fields = ["project", "offer", "role"]
     search_fields = ["project__title", "title", "description"]
 
 

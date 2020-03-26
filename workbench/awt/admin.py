@@ -45,3 +45,5 @@ class EmploymentAdmin(admin.ModelAdmin):
 @admin.register(models.Absence)
 class AbsenceAdmin(admin.ModelAdmin):
     list_display = ["user", "starts_on", "days", "description", "is_vacation"]
+    radio_fields = {"reason": admin.HORIZONTAL}
+    readonly_fields = ["is_vacation"]

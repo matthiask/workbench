@@ -15,7 +15,7 @@ class DealAdmin(admin.ModelAdmin):
     inlines = [ValueInline]
     list_display = ["title", "owned_by", "value", "status", "probability", "created_at"]
     list_filter = ["status"]
-    raw_id_fields = ["customer", "contact", "owned_by"]
+    raw_id_fields = ["customer", "contact", "owned_by", "related_offers"]
     search_fields = ["title", "description"]
 
 
