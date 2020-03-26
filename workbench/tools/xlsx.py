@@ -36,9 +36,11 @@ class WorkbenchXLSXDocument(XLSXDocument):
         )
 
         by_service_and_user = defaultdict(lambda: defaultdict(lambda: H1))
+        by_user = defaultdict(lambda: H1)
 
         for h in queryset:
             by_service_and_user[h.service][h.rendered_by] += h.hours
+            by_user[h.rendered_by] += h.hours
 
         self.add_sheet(_("By service and user"))
         users = sorted(
@@ -56,6 +58,10 @@ class WorkbenchXLSXDocument(XLSXDocument):
             ]
             + [user.get_short_name() for user in users],
             [
+                [capfirst(_("total")), "", "", sum(by_user.values(), H1)]
+                + [by_user.get(user) for user in users]
+            ]
+            + [
                 [
                     service.project,
                     service,
