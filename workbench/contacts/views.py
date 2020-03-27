@@ -50,7 +50,7 @@ def person_vcard(request, pk):
         mail = EmailMultiAlternatives(
             "vCard: {}".format(person.full_name), "", to=[request.user.email]
         )
-        mail.attach("vcard.vcf", vcard, "text/x-vCard;charset=utf-8")
+        mail.attach("vcard.vcf", vcard, "text/x-vCard")
         mail.send(fail_silently=True)
         messages.success(
             request,
