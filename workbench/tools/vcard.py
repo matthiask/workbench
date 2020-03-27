@@ -5,7 +5,7 @@ def person_to_vcard(person):
     v = vCard()
     v.add("n")
     v.n.value = vcard.Name(
-        family=person.family_name, given=person.given_name, additional=person.address
+        family=person.family_name, given=person.given_name, prefix=person.address
     )
     v.add("fn")
     v.fn.value = person.full_name
