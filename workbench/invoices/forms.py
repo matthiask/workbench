@@ -71,10 +71,10 @@ class InvoiceSearchForm(Form):
         )
 
     def response(self, request, queryset):
-        if request.GET.get("pdf"):
+        if request.GET.get("export") == "pdf":
             if not queryset.exists():
                 messages.warning(request, _("No invoices found."))
-                return HttpResponseRedirect("?_error=1")
+                return HttpResponseRedirect("?error=1")
 
             pdf, response = pdf_response(
                 "invoices",
@@ -87,7 +87,7 @@ class InvoiceSearchForm(Form):
             pdf.generate()
             return response
 
-        if request.GET.get("xlsx"):
+        if request.GET.get("export") == "xlsx":
             xlsx = WorkbenchXLSXDocument()
             xlsx.table_from_queryset(queryset)
             return xlsx.to_response("invoices.xlsx")

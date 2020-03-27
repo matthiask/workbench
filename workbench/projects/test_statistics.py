@@ -70,7 +70,7 @@ class StatisticsTest(TestCase):
 
         code("closed_during_the_last_year=on")
         code("internal=on")
-        code("xlsx=1")
+        code("export=xlsx")
 
     def test_not_archived_hours_grouped_services_green_hours_hpc(self):
         service1 = factories.ServiceFactory.create(effort_rate=180, effort_type="Any")

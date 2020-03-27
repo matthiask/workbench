@@ -119,7 +119,10 @@ $(function () {
   // Search form restoration
   $(".form-search").each(function () {
     let params = new URLSearchParams(window.location.search.slice(1))
-    ;["page", "pdf", "xlsx", "_error"].forEach((key) => params.delete(key))
+    // Also see workbench/generic.py
+    ;["disposition", "error", "export", "page"].forEach((key) =>
+      params.delete(key)
+    )
     params = params.toString()
     const key = `search-${window.location.pathname}`
     window.localStorage.setItem(key, params ? `?${params}` : "")

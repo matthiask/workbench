@@ -81,7 +81,7 @@ class DealSearchForm(Form):
         return queryset.select_related("owned_by", "customer", "contact__organization")
 
     def response(self, request, queryset):
-        if request.GET.get("xlsx"):
+        if request.GET.get("export") == "xlsx":
             xlsx = WorkbenchXLSXDocument()
             additional = []
             values = {

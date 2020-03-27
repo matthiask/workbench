@@ -66,7 +66,7 @@ class LoginTestCase(TestCase):
         )
 
         response = client.get("/accounts/oauth2/?code=x", HTTP_ACCEPT_LANGUAGE="en")
-        self.assertRedirects(response, "/accounts/login/?_error=1")
+        self.assertRedirects(response, "/accounts/login/?error=1")
         self.assertEqual(
             messages(response), ["No user with email address user@example.com found."],
         )
@@ -97,7 +97,7 @@ class LoginTestCase(TestCase):
         client = Client()
         FakeFlow.EMAIL = "user@{}".format(settings.WORKBENCH.SSO_DOMAIN)
         response = client.get("/accounts/oauth2/?code=x", HTTP_ACCEPT_LANGUAGE="en")
-        self.assertRedirects(response, "/accounts/login/?_error=1")
+        self.assertRedirects(response, "/accounts/login/?error=1")
         self.assertEqual(
             messages(response),
             ["The user with email address user@feinheit.ch is inactive."],
@@ -108,7 +108,7 @@ class LoginTestCase(TestCase):
 
         FakeFlow.EMAIL = "user@example.com"
         response = client.get("/accounts/oauth2/?code=x", HTTP_ACCEPT_LANGUAGE="en")
-        self.assertRedirects(response, "/accounts/login/?_error=1")
+        self.assertRedirects(response, "/accounts/login/?error=1")
         self.assertEqual(
             messages(response), ["No user with email address user@example.com found."]
         )

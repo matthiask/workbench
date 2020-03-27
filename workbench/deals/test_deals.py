@@ -223,7 +223,7 @@ class DealsTest(TestCase):
         deal.save()
 
         self.client.force_login(deal.owned_by)
-        response = self.client.get("/deals/?xlsx=1")
+        response = self.client.get("/deals/?export=xlsx")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response["content-type"],

@@ -552,20 +552,20 @@ class InvoicesTest(TestCase):
         code("owned_by={}".format(user.id))
         code("owned_by=-1")  # mine
         code("owned_by=0")  # only inactive
-        code("xlsx=1")
+        code("export=xlsx")
 
     def test_list_pdfs(self):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        response = self.client.get("/invoices/?pdf=1")
+        response = self.client.get("/invoices/?export=pdf")
         self.assertEqual(response.status_code, 302)
         self.assertEqual(messages(response), ["No invoices found."])
 
         factories.InvoiceFactory.create(
             invoiced_on=in_days(-60), due_on=in_days(-45), status=Invoice.SENT,
         )
-        response = self.client.get("/invoices/?pdf=1")
+        response = self.client.get("/invoices/?export=pdf")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/pdf")
 

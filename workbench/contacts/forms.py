@@ -66,7 +66,7 @@ class PersonSearchForm(Form):
         )
 
     def response(self, request, queryset):
-        if request.GET.get("xlsx"):
+        if request.GET.get("export") == "xlsx":
             xlsx = WorkbenchXLSXDocument()
             xlsx.people(queryset)
             return xlsx.to_response("people.xlsx")

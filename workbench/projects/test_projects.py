@@ -283,7 +283,7 @@ class ProjectsTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
         response = self.client.get("/projects/?org=0")
-        self.assertRedirects(response, "/projects/?_error=1")
+        self.assertRedirects(response, "/projects/?error=1")
         self.assertEqual(messages(response), ["Search form was invalid."])
 
     def test_autocomplete(self):

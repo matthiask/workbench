@@ -65,7 +65,7 @@ class OpenItemsForm(Form):
 
 @filter_form(OpenItemsForm)
 def open_items_list(request, form):
-    if request.GET.get("xlsx"):
+    if request.GET.get("export") == "xlsx":
         xlsx = WorkbenchXLSXDocument()
         xlsx.table_from_queryset(
             form.open_items_list()["list"].select_related(
@@ -276,7 +276,7 @@ def project_budget_statistics_view(request, form):
             statistics["statistics"], key=lambda s: s["project"].closed_on, reverse=True
         )
 
-    if request.GET.get("xlsx") and statistics["statistics"]:
+    if request.GET.get("export") == "xlsx" and statistics["statistics"]:
         xlsx = WorkbenchXLSXDocument()
         xlsx.project_budget_statistics(statistics)
         return xlsx.to_response("project-budget-statistics.xlsx")

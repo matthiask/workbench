@@ -55,7 +55,7 @@ def login(request):
             "auth_params": "?login_hint=&prompt=consent+select_account",
             "auth_button": _("Select Google account"),
         }
-        if request.GET.get("_error")
+        if request.GET.get("error")
         else {},
     )
 
@@ -89,7 +89,7 @@ def oauth2(request):
         messages.error(
             request, _("The user with email address %s is inactive.") % email
         )
-        response = HttpResponseRedirect("{}?_error=1".format(reverse("login")))
+        response = HttpResponseRedirect("{}?error=1".format(reverse("login")))
         response.delete_cookie("login_hint")
         return response
 
@@ -100,7 +100,7 @@ def oauth2(request):
 
     else:
         messages.error(request, _("No user with email address %s found.") % email)
-        response = HttpResponseRedirect("{}?_error=1".format(reverse("login")))
+        response = HttpResponseRedirect("{}?error=1".format(reverse("login")))
         response.delete_cookie("login_hint")
         return response
 

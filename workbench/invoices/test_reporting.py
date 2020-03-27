@@ -29,7 +29,7 @@ class ReportingTest(TestCase):
         self.assertContains(response, '<th class="text-right">0.00</th>')
 
         self.assertEqual(
-            self.client.get("/report/open-items-list/?xlsx=1").status_code, 200
+            self.client.get("/report/open-items-list/?export=xlsx").status_code, 200
         )
         # print(response, response.content.decode("utf-8"))
 

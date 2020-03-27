@@ -393,7 +393,7 @@ class LogbookTest(TestCase):
         code("role=1")
         code("organization=" + str(hours.service.project.customer.pk))
         code("not_archived=1")
-        code("xlsx=1")
+        code("export=xlsx")
 
     def test_logged_cost_list(self):
         cost = factories.LoggedCostFactory.create()
@@ -414,7 +414,7 @@ class LogbookTest(TestCase):
         code("service=0")
         code("service=" + str(service.pk))
         code("not_archived=1")
-        code("xlsx=1")
+        code("export=xlsx")
 
     def test_non_ajax_redirect_hours(self):
         hours = factories.LoggedHoursFactory.create()

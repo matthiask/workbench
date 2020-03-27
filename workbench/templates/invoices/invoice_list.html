@@ -6,16 +6,16 @@
 {{ block.super }}
 
 <span class="btn-group">
-  <a href="{% querystring pdf=1 %}" class="btn btn-primary" target="_blank">PDF</a>
+  <a href="{% querystring export='pdf' %}" class="btn btn-primary" target="_blank">PDF</a>
   <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     <span class="sr-only">Toggle Dropdown</span>
   </button>
   <div class="dropdown-menu dropdown-menu-right">
-    <a class="dropdown-item" href="{% querystring pdf=1 disposition='attachment' %}">
+    <a class="dropdown-item" href="{% querystring export='pdf' disposition='attachment' %}">
       {% trans 'Download' %}</a>
   </div>
 </span>
-<a href="{% querystring xlsx=1 %}" class="btn btn-primary">{% include 'svg/desktop-download.svg' %} XLSX</a>
+<a href="{% querystring export='xlsx' %}" class="btn btn-primary">{% include 'svg/desktop-download.svg' %} XLSX</a>
 
 {% endblock %}
 
