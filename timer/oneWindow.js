@@ -6,7 +6,7 @@ export function initOneWindow() {
   const ident = createIdentifier()
   localStorage.setItem(STORAGE_KEY, ident)
 
-  window.addEventListener("storage", e => {
+  window.addEventListener("storage", (e) => {
     if (e.key === STORAGE_KEY) {
       /* eslint-disable-next-line */
       document.body.innerHTML = document.body.innerHTML // Remove all behaviors

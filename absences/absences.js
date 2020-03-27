@@ -4,8 +4,8 @@ const {gettext, interpolate} = window
 
 import {formatDate, readableDate, getWeekNumber} from "./utils"
 
-const getColumnName = t => `date-${formatDate(new Date(t))}`
-const getRowName = id => `person-${id}`
+const getColumnName = (t) => `date-${formatDate(new Date(t))}`
+const getRowName = (id) => `person-${id}`
 
 // prettier-ignore
 const MONTHS = [
@@ -19,9 +19,9 @@ export const Absences = ({absencesByPerson, dateList, reasonList}) => {
       dateList.reduce((acc, date) => {
         const week = getWeekNumber(date)[1]
 
-        const entryOfSameWeek = acc.find(e => e.week === week)
-        const entryOfSameMonth = acc.find(e => e.month === date.getMonth())
-        const entryOfSameYear = acc.find(e => e.year === date.getFullYear())
+        const entryOfSameWeek = acc.find((e) => e.week === week)
+        const entryOfSameMonth = acc.find((e) => e.month === date.getMonth())
+        const entryOfSameYear = acc.find((e) => e.year === date.getFullYear())
 
         if (entryOfSameWeek) {
           return acc
@@ -46,7 +46,7 @@ export const Absences = ({absencesByPerson, dateList, reasonList}) => {
           .absences {
             --day-column-width: .5rem;
             --day-column-offset:
-              ${dateList.findIndex(d => d === scaleValues[1].date) - 7};
+              ${dateList.findIndex((d) => d === scaleValues[1].date) - 7};
             --person-row-height: 2rem;
             --person-count: ${absencesByPerson.length};
             --day-count: ${dateList.length};
@@ -54,12 +54,12 @@ export const Absences = ({absencesByPerson, dateList, reasonList}) => {
             grid-template-columns:
               [names] var(--name-column-width)
               ${dateList
-                .map(d => `[${getColumnName(d)}] var(--day-column-width)`)
+                .map((d) => `[${getColumnName(d)}] var(--day-column-width)`)
                 .join("\n")};
             grid-template-rows:
               [scale] var(--scale-row-height)
               ${absencesByPerson
-                .map(p => `[person-${p.id}] var(--person-row-height)`)
+                .map((p) => `[person-${p.id}] var(--person-row-height)`)
                 .join("\n")};
           }
         `}
@@ -68,10 +68,10 @@ export const Absences = ({absencesByPerson, dateList, reasonList}) => {
       <div className="absences">
         <Scale scaleValues={scaleValues} />
         <Now />
-        {absencesByPerson.map(person => (
+        {absencesByPerson.map((person) => (
           <React.Fragment key={person.id}>
             <Person person={person} />
-            {person.absences.map(a => (
+            {person.absences.map((a) => (
               <Absence key={a.id} absence={a} person={person} />
             ))}
           </React.Fragment>
@@ -152,7 +152,7 @@ const Popup = ({absence}) => {
 const Scale = ({scaleValues}) => {
   return (
     <React.Fragment>
-      {scaleValues.map(entry => {
+      {scaleValues.map((entry) => {
         const style = {
           gridColumn: `${getColumnName(entry.date)} / span 1`,
         }

@@ -16,7 +16,7 @@ import {gettext, OUTCOME} from "./i18n.js"
 import {clamp, prettyDuration} from "./utils.js"
 import * as icons from "./icons.js"
 
-const createUpdater = ({id, dispatch}) => fields =>
+const createUpdater = ({id, dispatch}) => (fields) =>
   dispatch({
     type: "UPDATE_ACTIVITY",
     id,
@@ -37,7 +37,7 @@ export const Activity = connect((state, ownProps) => ({
   // Fill services dropdown
   useEffect(() => {
     if (!activity.project) return
-    fetchServices(activity.project.value).then(data => setServices(data))
+    fetchServices(activity.project.value).then((data) => setServices(data))
   }, [activity.project])
 
   const activityTitle = activity.project
@@ -88,7 +88,7 @@ export const Activity = connect((state, ownProps) => ({
                 loadOptions={async (inputValue, callback) => {
                   callback(await fetchProjects(inputValue))
                 }}
-                onChange={value => {
+                onChange={(value) => {
                   dispatchUpdate({project: value, service: null})
                   setServices([])
                 }}
@@ -115,7 +115,7 @@ export const Activity = connect((state, ownProps) => ({
               isClearable={true}
               isDisabled={!services.length}
               options={services}
-              onChange={service => dispatchUpdate({service})}
+              onChange={(service) => dispatchUpdate({service})}
               placeholder={
                 services.length
                   ? gettext("Select service...")
@@ -131,7 +131,7 @@ export const Activity = connect((state, ownProps) => ({
               className="form-control"
               rows="2"
               value={activity.description}
-              onChange={e => dispatchUpdate({description: e.target.value})}
+              onChange={(e) => dispatchUpdate({description: e.target.value})}
               placeholder={OUTCOME}
             />
           </div>
@@ -203,7 +203,7 @@ export const Activity = connect((state, ownProps) => ({
         {showSettings ? (
           <ActivitySettings
             color={activity.color}
-            setColor={color => {
+            setColor={(color) => {
               dispatchUpdate({color})
               setShowSettings(false)
             }}

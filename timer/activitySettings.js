@@ -11,7 +11,7 @@ export const ActivitySettings = ({
 }) => (
   <div className="activity-settings">
     <div className="activity-color-chooser">
-      {COLORS.map(c => (
+      {COLORS.map((c) => (
         <label
           key={c}
           className={c == color ? "checked" : ""}

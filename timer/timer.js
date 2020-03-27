@@ -20,7 +20,7 @@ export const Timer = connect(({activities, current}) => ({
     return () => clearInterval(interval)
   }, [current])
 
-  activities = Object.values(activities).map(activity => {
+  activities = Object.values(activities).map((activity) => {
     if (!current || current.id != activity.id) return activity
 
     const seconds = Math.ceil(
@@ -48,7 +48,7 @@ export const Timer = connect(({activities, current}) => ({
         {gettext("Timer")}: {prettyDuration(totalSeconds)}
       </div>
       <div className="activity-list">
-        {activities.map(activity => (
+        {activities.map((activity) => (
           <Activity key={activity.id} activity={activity} />
         ))}
       </div>

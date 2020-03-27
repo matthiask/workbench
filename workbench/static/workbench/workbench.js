@@ -7,36 +7,31 @@ function _cl(el, cl, add) {
   el.classList[add ? "add" : "remove"](cl)
 }
 
-$(function() {
+$(function () {
   const gettext =
     window.gettext ||
-    function(t) {
+    function (t) {
       return t
     }
 
   // AJAX modals
-  const dismissModals = function() {
+  const dismissModals = function () {
     // LOL, dismiss.
     $(".modal, .modal-backdrop").remove()
-    $(document.body)
-      .removeClass("modal-open")
-      .removeAttr("style")
+    $(document.body).removeClass("modal-open").removeAttr("style")
   }
 
-  const initModal = function(data) {
+  const initModal = function (data) {
     dismissModals()
 
     $(data).modal()
 
-    setTimeout(function() {
+    setTimeout(function () {
       const fields = $(".modal").find("input, select")
       if (fields.filter("[autofocus]").length) {
         fields.filter("[autofocus]").focus()
       } else {
-        fields
-          .filter(":visible")
-          .first()
-          .focus()
+        fields.filter(":visible").first().focus()
       }
     }, 100)
 
@@ -44,13 +39,13 @@ $(function() {
   }
 
   window.initModal = initModal
-  window.openModalFromUrl = function(url) {
+  window.openModalFromUrl = function (url) {
     $.ajax({
       url: url,
-      success: function(data) {
+      success: function (data) {
         initModal(data)
       },
-      error: function() {
+      error: function () {
         alert(gettext("Unable to open the form"))
       },
       xhrFields: {
@@ -59,19 +54,19 @@ $(function() {
     })
   }
 
-  $(document.body).on("click", "[data-toggle]", function(event) {
+  $(document.body).on("click", "[data-toggle]", function (event) {
     if (this.dataset.toggle == "ajaxmodal") {
       event.preventDefault()
       window.openModalFromUrl(this.href)
     }
   })
 
-  $(document.body).on("submit", ".modal-dialog form", function(_event) {
+  $(document.body).on("submit", ".modal-dialog form", function (_event) {
     if (this.method.toLowerCase() == "post") {
       const action = this.action,
         data = $(this).serialize()
       this.parentNode.removeChild(this)
-      $.post(action, data, function(data, status, jqXHR) {
+      $.post(action, data, function (data, status, jqXHR) {
         // 201 CREATED, 202 ACCEPTED or 204 NO CONTENT
         if (
           jqXHR.status === 201 ||
@@ -88,7 +83,7 @@ $(function() {
         }
       })
     } else {
-      $.get(this.action + "?" + $(this).serialize(), function(
+      $.get(this.action + "?" + $(this).serialize(), function (
         data /*,
         status,
         jqXHR
@@ -104,11 +99,9 @@ $(function() {
   $(document.body).on(
     "change",
     "form[data-autosubmit] select, form[data-autosubmit] input",
-    function() {
+    function () {
       if (this.form.method != "get") {
-        $(this)
-          .closest("form")
-          .submit()
+        $(this).closest("form").submit()
         return
       }
 
@@ -124,9 +117,9 @@ $(function() {
   )
 
   // Search form restoration
-  $(".form-search").each(function() {
+  $(".form-search").each(function () {
     let params = new URLSearchParams(window.location.search.slice(1))
-    ;["page", "pdf", "xlsx", "_error"].forEach(key => params.delete(key))
+    ;["page", "pdf", "xlsx", "_error"].forEach((key) => params.delete(key))
     params = params.toString()
     const key = `search-${window.location.pathname}`
     window.localStorage.setItem(key, params ? `?${params}` : "")
@@ -141,7 +134,7 @@ $(function() {
   }
 
   // Restore the search params when going through the main menu...
-  $(".navbar").on("click", "a", function(e) {
+  $(".navbar").on("click", "a", function (e) {
     const orig = e.originalEvent
     if (orig.altKey || orig.ctrlKey || orig.metakey || orig.shiftKey) return
 
@@ -149,21 +142,19 @@ $(function() {
     window.location.href = restoreSearch(this.getAttribute("href"))
   })
 
-  $("h1, [data-reset-filter]").on("click", function() {
+  $("h1, [data-reset-filter]").on("click", function () {
     window.localStorage.removeItem(localStorageKeyFor(window.location.pathname))
   })
 
   // Hotkeys
-  $(document.body).on("keydown", function(e) {
+  $(document.body).on("keydown", function (e) {
     if (/Mac/.test(navigator.platform) ? !e.ctrlKey : !e.altKey) {
       return
     }
 
     if (e.keyCode === 70) {
       // f
-      $(".form-search input[name=q]")
-        .focus()
-        .select()
+      $(".form-search input[name=q]").focus().select()
     } else if (e.keyCode === 72) {
       // h
       window.location.href = "/"
@@ -209,13 +200,9 @@ $(function() {
       }
     } else if (e.keyCode === 81) {
       // q
-      $(".navbar input[type=search]")
-        .focus()
-        .select()
+      $(".navbar input[type=search]").focus().select()
     } else if (e.keyCode === 13) {
-      $(e.target)
-        .parents("form")
-        .submit()
+      $(e.target).parents("form").submit()
     } else if (e.keyCode >= 49 && e.keyCode <= 57) {
       const el = _sel('[data-number-shortcut="' + (e.keyCode - 48) + '"]')
       if (!el) return
@@ -236,7 +223,7 @@ $(function() {
   initWidgets()
 
   // Some special cases...
-  $(document.body).on("click", "[data-hours-button]", function() {
+  $(document.body).on("click", "[data-hours-button]", function () {
     this.blur()
     const value = prompt(this.dataset.hoursButton)
     if (parseFloat(value)) {
@@ -246,7 +233,7 @@ $(function() {
     }
   })
 
-  $(document.body).on("click", "[data-multiply-cost]", function(e) {
+  $(document.body).on("click", "[data-multiply-cost]", function (e) {
     e.preventDefault()
     const factor = parseFloat(this.dataset.multiplyCost),
       tpc = parseFloat($("#id_modal-third_party_costs").val()),
@@ -257,15 +244,13 @@ $(function() {
     }
   })
 
-  $(document.body).on("click", "[data-field-value]", function(e) {
+  $(document.body).on("click", "[data-field-value]", function (e) {
     e.preventDefault()
-    const field = $(this)
-      .closest(".form-group")
-      .find("input, textarea, select")
+    const field = $(this).closest(".form-group").find("input, textarea, select")
     field.val(this.dataset.fieldValue)
   })
 
-  $(document.body).on("click", "[data-set-period]", function(e) {
+  $(document.body).on("click", "[data-set-period]", function (e) {
     e.preventDefault()
     const value = this.dataset.setPeriod.split(":")
     $("#id_date_from").val(value[0])
@@ -281,7 +266,7 @@ function initWidgets() {
   const invoicedOn = $("#id_invoiced_on")
   const dueOn = $("#id_due_on")
   if (invoicedOn.length && dueOn.length) {
-    invoicedOn.on("change", function(_event) {
+    invoicedOn.on("change", function (_event) {
       const due = new Date(
         new Date(invoicedOn.val()).getTime() + 14 * 86400 * 1000
       )
@@ -295,22 +280,22 @@ function initWidgets() {
     })
   }
 
-  $("[data-autofill]:not(.initialized)").each(function() {
+  $("[data-autofill]:not(.initialized)").each(function () {
     const self = $(this),
       data = self.data("autofill"),
       sel = self.find("select")
 
     self.addClass("initialized")
-    sel.on("change", function() {
+    sel.on("change", function () {
       if (data["" + this.value]) {
-        $.each(data["" + this.value], function(key, value) {
+        $.each(data["" + this.value], function (key, value) {
           self.find("[name$='" + key + "']").val(value)
         })
       }
     })
   })
 
-  $("[data-autocomplete-id]:not(.initialized)").each(function() {
+  $("[data-autocomplete-id]:not(.initialized)").each(function () {
     const self = $(this),
       url = self.data("autocomplete-url"),
       id = self.data("autocomplete-id"),
@@ -320,33 +305,31 @@ function initWidgets() {
       .addClass("initialized")
       .autocomplete({
         minLength: 2,
-        source: function(request, response) {
-          $.get(url, {q: request.term}, function(data) {
+        source: function (request, response) {
+          $.get(url, {q: request.term}, function (data) {
             response(data.results)
           })
         },
-        focus: function(event, ui) {
+        focus: function (event, ui) {
           self.val(ui.item.label)
           return false
         },
-        select: function(event, ui) {
+        select: function (event, ui) {
           self.val(ui.item.label)
           input.val(ui.item.value).trigger("change")
           return false
         },
       })
-      .on("focus", function() {
+      .on("focus", function () {
         this.select()
       })
   })
 
-  $(document.body).on("click", "[data-clear]", function() {
-    $(this.dataset.clear)
-      .val("")
-      .trigger("change")
+  $(document.body).on("click", "[data-clear]", function () {
+    $(this.dataset.clear).val("").trigger("change")
   })
 
-  $(document.body).on("click", "[data-convert]", function() {
+  $(document.body).on("click", "[data-convert]", function () {
     const params = new URLSearchParams()
     params.append("day", $("#id_modal-rendered_on").val())
     params.append("currency", $("#id_modal-expense_currency").val())
@@ -354,12 +337,12 @@ function initWidgets() {
     console.log(params)
     console.log(params.toString())
 
-    $.getJSON("/expenses/convert/?" + params.toString(), function(data) {
+    $.getJSON("/expenses/convert/?" + params.toString(), function (data) {
       $("#id_modal-third_party_costs").val(data.cost)
     })
   })
 
-  $("[data-offer-form]").each(function() {
+  $("[data-offer-form]").each(function () {
     const form = this
     // const form = $(this)
     //
@@ -371,7 +354,7 @@ function initWidgets() {
     function recalculate() {
       let offerCost = 0
 
-      Array.from(form.querySelectorAll("[data-service]")).forEach(service => {
+      Array.from(form.querySelectorAll("[data-service]")).forEach((service) => {
         const effortRate = read("[data-effort-rate] input", service)
         const effortHours = read("[data-effort-hours] input", service)
         const cost = read("[data-cost] input", service)
@@ -399,7 +382,7 @@ function initWidgets() {
   // Some browsers when set to some languages do not accept decimal values with
   // the point but require a comma (which is annoying). Make all number fields
   // use the en-US locale to work around this misbehavior.
-  $('input[type="number"]').each(function() {
+  $('input[type="number"]').each(function () {
     this.setAttribute("lang", "en-US")
   })
 }
@@ -418,7 +401,7 @@ window.addInlineForm = function addInlineForm(slug, onComplete) {
   for (let i = 0; i < attributes.length; ++i) {
     const attr = attributes[i]
 
-    form.find("*[" + attr + "*=__prefix__]").each(function() {
+    form.find("*[" + attr + "*=__prefix__]").each(function () {
       const el = $(this)
       el.attr(attr, el.attr(attr).replace(/__prefix__/, newId))
     })

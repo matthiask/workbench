@@ -9,7 +9,7 @@ import debounce from "lodash.debounce"
 
 const VERSION = 3
 
-const _debouncedSave = debounce(function(dispatch, state) {
+const _debouncedSave = debounce(function (dispatch, state) {
   const headers = new Headers()
   headers.append("X-Requested-With", "XMLHttpRequest")
   headers.append("X-CSRFToken", document.cookie.match(/\bcsrftoken=(.+?)\b/)[1])
@@ -25,34 +25,34 @@ const _debouncedSave = debounce(function(dispatch, state) {
     body,
     headers,
   })
-    .then(response => response.json())
-    .then(data => {
+    .then((response) => response.json())
+    .then((data) => {
       window.console.log(data)
     })
-    .catch(err => {
+    .catch((err) => {
       window.console.error(err)
     })
 }, 2500)
 
-const remotePersister = store => next => action => {
+const remotePersister = (store) => (next) => (action) => {
   const state = next(action)
   _debouncedSave(store.dispatch, store.getState())
   return state
 }
 
 const initialTitle = document.title
-const notifier = store => next => action => {
+const notifier = (store) => (next) => (action) => {
   const state = next(action)
   const {current} = store.getState()
   document.title = `${current ? "▶ " : ""}${initialTitle}`
   return state
 }
 
-const serialize = data => {
+const serialize = (data) => {
   return JSON.stringify({...data, _v: VERSION})
 }
 
-const deserialize = blob => {
+const deserialize = (blob) => {
   const deserializeRaw = () => {
     let parsed = JSON.parse(blob)
     if (!parsed || !parsed._v) return {}
@@ -65,7 +65,7 @@ const deserialize = blob => {
       return {
         ...data,
         activities: Object.fromEntries(
-          data.activities.map(activity => [activity.id, activity])
+          data.activities.map((activity) => [activity.id, activity])
         ),
       }
     }

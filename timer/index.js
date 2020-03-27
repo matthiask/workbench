@@ -44,7 +44,7 @@ function migrateOldData(dispatch) {
     const data = JSON.parse(localStorage.getItem("workbench-timer"))
     console.log(data)
 
-    data.projects.forEach(project => {
+    data.projects.forEach((project) => {
       createActivity(dispatch, {
         project: {label: project.title, value: project.id},
         seconds: data.seconds[project.id] || 0,
