@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-24 10:58+0100\n"
+"POT-Creation-Date: 2020-03-27 17:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -646,6 +646,17 @@ msgstr "Postadressen"
 #: workbench/contacts/views.py workbench/templates/shortcuts.html
 msgid "Jump to person"
 msgstr "Zu Person springen"
+
+#: workbench/contacts/views.py
+#, python-format
+msgid ""
+"You seem to be using iOS. iOS does not support directly opening vCard files. "
+"Instead, you have been sent an email containing the vCard to your email "
+"address, %s."
+msgstr ""
+"Es scheint, dass Du iOS verwendest. Leider unterstützt iOS das direkte "
+"Öffnen von vCard Dateien nicht. Stattdessen hast Du ein Mail an die Adresse "
+"%s erhalten, mit der vCard als Anhang."
 
 #: workbench/credit_control/__init__.py
 msgid "credit control"
