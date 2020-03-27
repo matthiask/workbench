@@ -292,3 +292,11 @@ class ContactsTest(TestCase):
             self.assertContains(response, "Recent projects")
             self.assertNotContains(response, "Recent invoices")
             self.assertNotContains(response, "Recent offers")
+
+    def test_vcard_export(self):
+        person = factories.PersonFactory.create()
+        self.client.force_login(person.primary_contact)
+
+        response = self.client.get(person.urls["vcard"])
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["content-type"], "text/x-vCard")

@@ -43,7 +43,7 @@ def person_to_vcard(person):
     return v
 
 
-def test():
+def test():  # pragma: no cover
     from workbench.contacts.models import Person
 
     p = Person.objects.get(pk=2)
