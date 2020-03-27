@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -5,6 +7,7 @@ from django.test.utils import override_settings
 from workbench import factories
 from workbench.contacts.models import Group, Organization, Person, PhoneNumber
 from workbench.tools.testing import messages
+from workbench.tools.vcard import person_to_vcard
 
 
 def person_to_dict(person, **kwargs):
@@ -300,3 +303,21 @@ class ContactsTest(TestCase):
         response = self.client.get(person.urls["vcard"])
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "text/x-vCard")
+
+    def test_vcard(self):
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create(),
+            date_of_birth=dt.date(2020, 3, 1),
+            notes="Bla",
+        )
+
+        factories.PostalAddressFactory.create(person=person)
+        factories.PostalAddressFactory.create(
+            person=person, postal_address_override="OVERRIDE"
+        )
+        person.emailaddresses.create(email="test@example.com", type="work")
+        person.phonenumbers.create(phone_number="012 345 678", type="work")
+
+        serialized = person_to_vcard(person).serialize()
+        self.assertIn("OVERRIDE", serialized)
+        self.assertIn("2020-03-01", serialized)

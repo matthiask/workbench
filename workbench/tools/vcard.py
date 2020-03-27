@@ -28,7 +28,7 @@ def person_to_vcard(person):
     for address in person.postaladdresses.all():
         attr = v.add("adr")
         if address.postal_address_override:
-            attr.value = address.postal_address_override
+            attr.value = vcard.Address(street=address.postal_address_override)
         else:
             attr.value = vcard.Address(
                 street="{} {}\n{}".format(
