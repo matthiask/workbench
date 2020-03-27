@@ -1,11 +1,13 @@
 from django.db.models import Prefetch
-from django.http import JsonResponse
-from django.shortcuts import render
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, render
+from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
 from workbench.contacts.forms import OrganizationSearchForm, PersonAutocompleteForm
 from workbench.contacts.models import Organization, Person
 from workbench.generic import ListView
+from workbench.tools.vcard import person_to_vcard
 
 
 class OrganizationListView(ListView):
@@ -31,3 +33,14 @@ def select(request):
         "generic/select_object.html",
         {"form": form, "title": _("Jump to person")},
     )
+
+
+def person_vcard(request, pk):
+    person = get_object_or_404(Person, pk=pk)
+    response = HttpResponse(
+        person_to_vcard(person).serialize(), content_type="text/x-vCard"
+    )
+    response["Content-Disposition"] = 'attachment; filename="{}.vcf"'.format(
+        slugify(person.full_name)
+    )
+    return response

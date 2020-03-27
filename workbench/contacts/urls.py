@@ -9,7 +9,7 @@ from workbench.contacts.forms import (
     PersonSearchForm,
 )
 from workbench.contacts.models import Organization, Person
-from workbench.contacts.views import OrganizationListView, select
+from workbench.contacts.views import OrganizationListView, person_vcard, select
 
 
 urlpatterns = [
@@ -80,4 +80,5 @@ urlpatterns = [
         generic.DeleteView.as_view(model=Person),
         name="contacts_person_delete",
     ),
+    url(r"^people/(?P<pk>\d+)/vcard/$", person_vcard, name="contacts_person_vcard"),
 ]
