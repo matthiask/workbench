@@ -302,7 +302,7 @@ class ContactsTest(TestCase):
 
         response = self.client.get(person.urls["vcard"])
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["content-type"], "text/x-vCard")
+        self.assertEqual(response["content-type"], "text/x-vCard;charset=utf-8")
 
     def test_vcard(self):
         person = factories.PersonFactory.create(

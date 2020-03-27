@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+
 from vobject import vCard, vcard
 
 
@@ -41,6 +43,13 @@ def person_to_vcard(person):
             )
         attr.type_param = address.type
     return v
+
+
+class VCardResponse(HttpResponse):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("content_type", "text/x-vCard;charset=utf-8")
+        super().__init__(*args, **kwargs)
+        self.setdefault("Content-Disposition", 'inline; filename="vcard.vcf"')
 
 
 def test():  # pragma: no cover
