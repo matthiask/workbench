@@ -1,5 +1,6 @@
 import datetime as dt
 
+from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -303,6 +304,14 @@ class ContactsTest(TestCase):
         response = self.client.get(person.urls["vcard"])
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "text/x-vCard;charset=utf-8")
+
+        self.assertEqual(len(mail.outbox), 0)
+        response = self.client.get(
+            person.urls["vcard"],
+            HTTP_USER_AGENT="Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",  # noqa
+        )
+        self.assertRedirects(response, person.urls["detail"])
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_vcard(self):
         person = factories.PersonFactory.create(
