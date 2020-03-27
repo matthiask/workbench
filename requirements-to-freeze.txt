@@ -23,4 +23,5 @@ Pillow
 psycopg2-binary
 reportlab
 speckenv
+vobject
 xlsxdocument
