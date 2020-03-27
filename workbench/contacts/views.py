@@ -40,7 +40,7 @@ def person_vcard(request, pk):
     response = HttpResponse(
         person_to_vcard(person).serialize(), content_type="text/x-vCard"
     )
-    response["Content-Disposition"] = 'attachment; filename="{}.vcf"'.format(
+    response["Content-Disposition"] = 'inline; filename="{}.vcf"'.format(
         slugify(person.full_name)
     )
     return response
