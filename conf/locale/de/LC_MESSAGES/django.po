@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-28 20:54+0100\n"
+"POT-Creation-Date: 2020-03-28 21:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1737,7 +1737,8 @@ msgstr "startet um"
 msgid "ends at"
 msgstr "endet um"
 
-#: workbench/logbook/models.py workbench/timer/models.py
+#: workbench/logbook/models.py workbench/templates/timestamps.html
+#: workbench/timer/models.py
 msgid "break"
 msgstr "Pause"
 
@@ -2803,24 +2804,28 @@ msgid "Home"
 msgstr "Start"
 
 #: workbench/templates/shortcuts.html
-msgid "log hours in active project or in any project if none is active"
+msgid "Log hours in active project or in any project if none is active"
 msgstr ""
 "Stunden in aktuellem Projekt eintragen, oder in irgendeinem Projekt falls "
 "keins aktiv ist"
 
 #: workbench/templates/shortcuts.html
-msgid "log hours in any project"
+msgid "Log hours in any project"
 msgstr "Stunden in irgendeinem Projekt eintragen"
 
 #: workbench/templates/shortcuts.html
-msgid "log costs in active project or in any project if none is active"
+msgid "Log costs in active project or in any project if none is active"
 msgstr ""
 "Kosten in aktuellem Projekt eintragen, oder in irgendeinem Projekt falls "
 "keins aktiv ist"
 
 #: workbench/templates/shortcuts.html
-msgid "log costs in any project"
+msgid "Log costs in any project"
 msgstr "Kosten in irgendeinem Projekt eintragen"
+
+#: workbench/templates/shortcuts.html
+msgid "Log a break"
+msgstr "Pause erfassen"
 
 #: workbench/templates/start.html
 msgid "active projects"
