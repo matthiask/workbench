@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-28 18:24+0100\n"
+"POT-Creation-Date: 2020-03-28 20:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1737,7 +1737,7 @@ msgstr "startet um"
 msgid "ends at"
 msgstr "endet um"
 
-#: workbench/logbook/models.py
+#: workbench/logbook/models.py workbench/timer/models.py
 msgid "break"
 msgstr "Pause"
 
@@ -1748,6 +1748,10 @@ msgstr "Pausen"
 #: workbench/logbook/models.py
 msgid "Breaks should end later than they begin."
 msgstr "Pausen sollten später enden als beginnen."
+
+#: workbench/logbook/models.py
+msgid "Cannot modify breaks of other users."
+msgstr "Es ist nicht erlaubt, Pausen anderer Nutzer*innen zu ändern."
 
 #: workbench/logbook/views.py
 msgid "Select project for logging"

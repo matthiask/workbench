@@ -166,6 +166,10 @@ tbody th > a {
   background-color: #e5ec16;
 }
 
+.badge-break {
+  background-color: lightskyblue;
+}
+
 .text-black-30 {
   color: rgba(0, 0, 0, 0.3) !important;
 }

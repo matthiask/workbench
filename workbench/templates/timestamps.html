@@ -45,7 +45,7 @@
 
       <div class="list-group list-group-flush">
         {% for row in timestamps %}
-        {% if row.elapsed and row.timestamp.logged_hours %}
+        {% if row.timestamp.logged_hours %}
           <a class="list-group-item list-group-item-action"
              href="{{ row.timestamp.logged_hours.get_absolute_url }}"
             data-toggle="ajaxmodal">
@@ -67,10 +67,30 @@
 
           </a>
 
-        {% elif row.elapsed %}
+        {% elif row.timestamp.logged_break %}
           <a class="list-group-item list-group-item-action"
-             href="{% url 'logbook_loggedhours_create' %}?hours={{ row.elapsed|stringformat:'s' }}&amp;rendered_on={{ day.isoformat }}&amp;timestamp={{ row.timestamp.pk }}"
+             href="{{ row.timestamp.logged_break.get_absolute_url }}"
             data-toggle="ajaxmodal">
+            <div class="d-flex w-100">
+
+              <div>
+                <strong>
+                  {{ row.timestamp.created_at|date:'H:i' }}
+                </strong>
+                {{ row.timestamp.badge }}
+                {{ row.timestamp.logged_break }}
+              </div>
+
+              <span class="btn btn-sm ml-auto align-self-start btn-light">
+                {{ row.elapsed|hours:True }}
+              </span>
+
+            </div>
+
+          </a>
+
+        {% elif row.elapsed %}
+          <div class="list-group-item">
             <div class="d-flex w-100">
 
               <div>
@@ -81,13 +101,23 @@
                 {{ row.timestamp.notes }}
               </div>
 
-              <span class="btn btn-sm ml-auto align-self-start btn-primary">
+              <a
+                href="{% url 'logbook_loggedhours_create' %}?hours={{ row.elapsed|stringformat:'s' }}&amp;rendered_on={{ day.isoformat }}&amp;timestamp={{ row.timestamp.pk }}"
+                data-toggle="ajaxmodal"
+                class="btn btn-sm ml-auto align-self-start btn-primary">
                 {{ row.elapsed|hours:True }}
-              </span>
+              </a>
+
+              <a href="{% url 'logbook_break_create' %}?day={{ day.isoformat }}&amp;starts_at={{ row.previous.time.isoformat }}&amp;ends_at={{ row.timestamp.time.isoformat }}&amp;timestamp={{ row.timestamp.pk }}"
+                 data-toggle="ajaxmodal"
+                 class="btn btn-sm ml-2 align-self-start btn-primary">
+                {% trans 'break' %}
+              </a>
 
             </div>
 
-          </a>
+          </div>
+
         {% elif row.timestamp.url %}
           <a class="list-group-item list-group-item-action" href="{{ row.timestamp.url }}" data-toggle="ajaxmodal">
             <strong>
@@ -96,6 +126,7 @@
             {{ row.timestamp.badge }}
             {{ row.timestamp.notes }}
           </a>
+
         {% else %}
           <div class="list-group-item">
             <strong>

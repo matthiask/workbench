@@ -5,10 +5,11 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
 from django.utils.html import format_html
+from django.utils.timezone import localtime
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.logbook.models import LoggedHours
+from workbench.logbook.models import Break, LoggedHours
 from workbench.tools.formats import hours, local_date_format
 
 
@@ -30,7 +31,7 @@ class TimestampQuerySet(models.QuerySet):
         day = day or dt.date.today()
         entries = list(
             self.filter(user=user, created_at__date=day).select_related(
-                "logged_hours__service"
+                "logged_hours__service", "logged_break"
             )
         )
         known_logged_hours = set(entry.logged_hours for entry in entries)
@@ -79,7 +80,7 @@ class TimestampQuerySet(models.QuerySet):
                     Decimal("0.0"), rounding=ROUND_UP
                 )
 
-            ret.append({"timestamp": current, "elapsed": elapsed})
+            ret.append({"timestamp": current, "previous": previous, "elapsed": elapsed})
             previous = current
 
         return ret
@@ -90,12 +91,14 @@ class Timestamp(models.Model):
     SPLIT = "split"
     STOP = "stop"
     LOGBOOK = "logbook"
+    BREAK = "break"
 
     TYPE_CHOICES = [
         (START, _("start")),
         (SPLIT, _("split")),
         (STOP, _("stop")),
         (LOGBOOK, _("logbook")),
+        (BREAK, _("break")),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))
@@ -108,6 +111,9 @@ class Timestamp(models.Model):
         blank=True,
         null=True,
         verbose_name=_("logged hours"),
+    )
+    logged_break = models.OneToOneField(
+        Break, on_delete=models.CASCADE, blank=True, null=True, verbose_name=_("break"),
     )
 
     objects = TimestampQuerySet.as_manager()
@@ -137,9 +143,14 @@ class Timestamp(models.Model):
             self.SPLIT: "info",
             self.STOP: "success",
             self.LOGBOOK: "secondary",
+            self.BREAK: "break",
         }
         return format_html(
             '<span class="badge badge-{}">{}</span>',
             css[self.type],
             self.get_type_display(),
         )
+
+    @property
+    def time(self):
+        return localtime(self.created_at).time().replace(microsecond=0)

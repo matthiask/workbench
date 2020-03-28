@@ -40,6 +40,7 @@ class Migration(migrations.Migration):
                             ("split", "split"),
                             ("stop", "stop"),
                             ("logbook", "logbook"),
+                            ("break", "break"),
                         ],
                         max_length=10,
                         verbose_name="type",

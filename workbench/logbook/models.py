@@ -200,11 +200,11 @@ class Break(Model):
 
     @property
     def starts_at_datetime(self):
-        return dt.datetime.combine(self.day, self.starts_at)
+        return timezone.make_aware(dt.datetime.combine(self.day, self.starts_at))
 
     @property
     def ends_at_datetime(self):
-        return dt.datetime.combine(self.day, self.ends_at)
+        return timezone.make_aware(dt.datetime.combine(self.day, self.ends_at))
 
     @property
     def timedelta(self):
@@ -213,7 +213,16 @@ class Break(Model):
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
         errors = {}
-        if self.starts_at_datetime > self.ends_at_datetime:
+        if self.starts_at_datetime >= self.ends_at_datetime:
             errors["ends_at"] = _("Breaks should end later than they begin.")
 
         raise_if_errors(errors, exclude)
+
+    @classmethod
+    def allow_update(cls, instance, request):
+        if instance.user == request.user:
+            return True
+        messages.error(request, _("Cannot modify breaks of other users."))
+        return False
+
+    allow_delete = allow_update

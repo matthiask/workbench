@@ -1,3 +1,4 @@
+import datetime as dt
 from decimal import ROUND_UP, Decimal
 
 from django import forms
@@ -5,6 +6,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.html import mark_safe
+from django.utils.timezone import localtime
 from django.utils.translation import gettext, gettext_lazy as _, override
 
 from workbench.accounts.features import FEATURES
@@ -479,9 +481,47 @@ class BreakSearchForm(Form):
 
 
 class BreakForm(ModelForm):
-    user_fields = default_to_current_user = ("user",)
-
     class Meta:
         model = Break
-        fields = "__all__"
-        widgets = {"description": Textarea}
+        fields = ["day", "starts_at", "ends_at", "description"]
+        widgets = {"description": Textarea({"rows": 2})}
+
+    def __init__(self, *args, **kwargs):
+        request = kwargs["request"]
+        initial = kwargs.setdefault("initial", {})
+        latest = localtime(request.user.latest_created_at)
+        if dt.date.today() == latest.date():
+            initial.setdefault("starts_at", latest.time())
+        initial.setdefault("ends_at", localtime(timezone.now()).time())
+        for field in ["day", "starts_at", "ends_at"]:
+            if request.GET.get(field):
+                initial[field] = request.GET.get(field)
+        super().__init__(*args, **kwargs)
+
+    def save(self):
+        instance = super().save(commit=False)
+        timestamp = None
+        if not instance.pk:
+            instance.user = self.request.user
+            if self.request.GET.get("timestamp"):
+                timestamp = Timestamp.objects.filter(
+                    user=self.request.user, id=self.request.GET.get("timestamp")
+                ).first()
+
+        instance.save()
+        if timestamp:
+            timestamp.logged_break = instance
+            timestamp.type = Timestamp.BREAK
+            timestamp.save()
+
+        else:
+            Timestamp.objects.update_or_create(
+                logged_break=instance,
+                defaults={
+                    "user": instance.user,
+                    "created_at": instance.ends_at_datetime,
+                    "type": Timestamp.BREAK,
+                },
+            )
+
+        return instance

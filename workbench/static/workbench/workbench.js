@@ -201,6 +201,9 @@ $(function () {
       } else {
         window.openModalFromUrl(el.href)
       }
+    } else if (e.keyCode === 66) {
+      // b
+      window.openModalFromUrl("/logbook/breaks/create/")
     } else if (e.keyCode === 81) {
       // q
       $(".navbar input[type=search]").focus().select()

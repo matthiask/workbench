@@ -112,13 +112,13 @@ class TimestampsTest(TestCase):
         self.assertEqual(
             timestamps,
             [
-                {"elapsed": None, "timestamp": t1},
-                {"elapsed": Decimal("0.7"), "timestamp": t2},
-                {"elapsed": Decimal("0.4"), "timestamp": t3},
-                {"elapsed": Decimal("1.0"), "timestamp": t4},
+                {"elapsed": None, "previous": None, "timestamp": t1},
+                {"elapsed": Decimal("0.7"), "previous": t1, "timestamp": t2},
+                {"elapsed": Decimal("0.4"), "previous": t2, "timestamp": t3},
+                {"elapsed": Decimal("1.0"), "previous": t3, "timestamp": t4},
                 # 0.0 after a STOP
-                {"elapsed": None, "timestamp": t5},
-                {"elapsed": Decimal("0.4"), "timestamp": t6},
+                {"elapsed": None, "previous": t4, "timestamp": t5},
+                {"elapsed": Decimal("0.4"), "previous": t5, "timestamp": t6},
             ],
         )
 
@@ -150,8 +150,8 @@ class TimestampsTest(TestCase):
         self.assertEqual(
             timestamps,
             [
-                {"elapsed": None, "timestamp": t1},
-                {"elapsed": Decimal("0.5"), "timestamp": t2},
+                {"elapsed": None, "previous": None, "timestamp": t1},
+                {"elapsed": Decimal("0.5"), "previous": t1, "timestamp": t2},
             ],
         )
         self.assertEqual(
@@ -178,8 +178,8 @@ class TimestampsTest(TestCase):
         self.assertEqual(
             timestamps,
             [
-                {"elapsed": None, "timestamp": t1},
-                {"elapsed": Decimal("0.5"), "timestamp": t2},
+                {"elapsed": None, "previous": None, "timestamp": t1},
+                {"elapsed": Decimal("0.5"), "previous": t1, "timestamp": t2},
             ],
         )
         self.assertEqual(
