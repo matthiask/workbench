@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-27 17:57+0100\n"
+"POT-Creation-Date: 2020-03-28 18:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -86,7 +86,7 @@ msgid "working time model"
 msgstr "Arbeitszeitmodell"
 
 #: workbench/accounts/models.py workbench/awt/models.py
-#: workbench/management/commands/profitability.py
+#: workbench/logbook/models.py workbench/management/commands/profitability.py
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/green_hours.html
@@ -1136,7 +1136,7 @@ msgstr "Kann eine geschlossene Spesenabrechnung nicht mehr löschen."
 msgid "closed on %s"
 msgstr "geschlossen am %s"
 
-#: workbench/expenses/models.py
+#: workbench/expenses/models.py workbench/logbook/models.py
 msgid "day"
 msgstr "Tag"
 
@@ -1729,6 +1729,26 @@ msgstr "Spesen sind Teil einer Spesenabrechnung, kann Eintrag nicht löschen."
 msgid "Either fill in all fields or none."
 msgstr "Entweder alle Felder einfüllen oder keine."
 
+#: workbench/logbook/models.py
+msgid "starts at"
+msgstr "startet um"
+
+#: workbench/logbook/models.py
+msgid "ends at"
+msgstr "endet um"
+
+#: workbench/logbook/models.py
+msgid "break"
+msgstr "Pause"
+
+#: workbench/logbook/models.py workbench/templates/base.html
+msgid "breaks"
+msgstr "Pausen"
+
+#: workbench/logbook/models.py
+msgid "Breaks should end later than they begin."
+msgstr "Pausen sollten später enden als beginnen."
+
 #: workbench/logbook/views.py
 msgid "Select project for logging"
 msgstr "Projekt für Erfassung auswählen"
@@ -2122,6 +2142,7 @@ msgstr "Suchformular zurücksetzen"
 #: workbench/templates/generic/object_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/logbook/break_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/notes/widget.html
@@ -2137,6 +2158,7 @@ msgstr "Bearbeiten"
 #: workbench/templates/generic/object_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/logbook/break_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/notes/note_form.html

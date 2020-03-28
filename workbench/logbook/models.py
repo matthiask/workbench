@@ -178,3 +178,42 @@ class LoggedCost(Model):
             if self.expense_cost is None:
                 errors["expense_cost"] = _("Either fill in all fields or none.")
         raise_if_errors(errors, exclude)
+
+
+@model_urls
+class Break(Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, verbose_name=_("user"), related_name="breaks"
+    )
+    day = models.DateField(_("day"), default=dt.date.today)
+    starts_at = models.TimeField(_("starts at"))
+    ends_at = models.TimeField(_("ends at"))
+    description = models.TextField(_("description"), blank=True)
+
+    class Meta:
+        ordering = ["-day", "-starts_at"]
+        verbose_name = _("break")
+        verbose_name_plural = _("breaks")
+
+    def __str__(self):
+        return "{} - {}".format(self.starts_at, self.ends_at)
+
+    @property
+    def starts_at_datetime(self):
+        return dt.datetime.combine(self.day, self.starts_at)
+
+    @property
+    def ends_at_datetime(self):
+        return dt.datetime.combine(self.day, self.ends_at)
+
+    @property
+    def timedelta(self):
+        return self.ends_at_datetime - self.starts_at_datetime
+
+    def clean_fields(self, exclude=None):
+        super().clean_fields(exclude=exclude)
+        errors = {}
+        if self.starts_at_datetime > self.ends_at_datetime:
+            errors["ends_at"] = _("Breaks should end later than they begin.")
+
+        raise_if_errors(errors, exclude)

@@ -11,7 +11,7 @@ from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
-from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.projects.models import Project, Service
 from workbench.timer.models import Timestamp
 from workbench.tools.forms import (
@@ -469,3 +469,19 @@ class LoggedCostForm(ModelForm):
             errors["rendered_on"] = _("That's too far in the future.")
         raise_if_errors(errors)
         return data
+
+
+class BreakSearchForm(Form):
+    def filter(self, queryset):
+        # data = self.cleaned_data
+        # queryset = queryset.search(data.get("q"))
+        return queryset.select_related("user")
+
+
+class BreakForm(ModelForm):
+    user_fields = default_to_current_user = ("user",)
+
+    class Meta:
+        model = Break
+        fields = "__all__"
+        widgets = {"description": Textarea}

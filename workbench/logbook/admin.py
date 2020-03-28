@@ -21,5 +21,11 @@ class LoggedCostAdmin(admin.ModelAdmin):
     raw_id_fields = ("service", "invoice_service", "expense_report")
 
 
+class BreakAdmin(admin.ModelAdmin):
+    list_display = ["user", "day", "starts_at", "ends_at", "description"]
+    raw_id_fields = ["user"]
+
+
 admin.site.register(models.LoggedHours, LoggedHoursAdmin)
 admin.site.register(models.LoggedCost, LoggedCostAdmin)
+admin.site.register(models.Break, BreakAdmin)

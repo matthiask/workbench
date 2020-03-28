@@ -27,7 +27,7 @@ from workbench.invoices.models import (
     RecurringInvoice,
     Service as InvoiceService,
 )
-from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service as ProjectService
 from workbench.reporting.models import CostCenter
@@ -429,6 +429,7 @@ HISTORY = {
     Invoice: _invoices_invoice_cfg,
     InvoiceService: _invoices_service_cfg,
     RecurringInvoice: _invoices_recurringinvoice_cfg,
+    Break: {"fields": EVERYTHING},
     LoggedCost: _logbook_loggedcost_cfg,
     LoggedHours: _logbook_loggedhours_cfg,
     Offer: _offers_offer_cfg,

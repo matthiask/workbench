@@ -41,6 +41,7 @@
           <div class="dropdown-menu" aria-labelledby="logbookDropdown">
             <a class="dropdown-item" href="{% url 'logbook_loggedhours_list' %}">{% trans 'logged hours'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'logbook_loggedcost_list' %}">{% trans 'logged costs'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'logbook_break_list' %}">{% trans 'breaks'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'awt_absence_list' %}">{% trans 'absences'|capfirst %}</a>
             {# <div class="dropdown-divider"></div> #}
           </div>
