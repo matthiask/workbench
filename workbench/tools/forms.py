@@ -156,7 +156,7 @@ class Form(forms.Form):
         return queryset
 
     def apply_owned_by(self, queryset, *, attribute="owned_by"):
-        value = self.cleaned_data.get("owned_by")
+        value = self.cleaned_data.get(attribute)
         if value == 0:
             return queryset.filter(**{"{}__is_active".format(attribute): False})
         elif value:

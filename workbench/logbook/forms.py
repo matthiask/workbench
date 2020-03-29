@@ -474,9 +474,23 @@ class LoggedCostForm(ModelForm):
 
 
 class BreakSearchForm(Form):
+    user = forms.TypedChoiceField(
+        coerce=int,
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["user"].choices = User.objects.choices(
+            collapse_inactive=True, myself=True
+        )
+
     def filter(self, queryset):
         # data = self.cleaned_data
         # queryset = queryset.search(data.get("q"))
+        queryset = self.apply_owned_by(queryset, attribute="user")
         return queryset.select_related("user")
 
 
