@@ -516,16 +516,20 @@ class BreakForm(ModelForm):
         super().__init__(*args, **kwargs)
 
     def save(self):
+        if self.instance.pk:
+            return super().save()
+
         instance = super().save(commit=False)
+        instance.user = self.request.user
+
         timestamp = None
-        if not instance.pk:
-            instance.user = self.request.user
-            if self.request.GET.get("timestamp"):
-                timestamp = Timestamp.objects.filter(
-                    user=self.request.user, id=self.request.GET.get("timestamp")
-                ).first()
+        if self.request.GET.get("timestamp"):
+            timestamp = Timestamp.objects.filter(
+                user=self.request.user, id=self.request.GET.get("timestamp")
+            ).first()
 
         instance.save()
+
         if timestamp:
             timestamp.logged_break = instance
             timestamp.type = Timestamp.BREAK
