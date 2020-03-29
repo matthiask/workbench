@@ -201,6 +201,9 @@ $(function () {
       } else {
         window.openModalFromUrl(el.href)
       }
+    } else if (e.keyCode === 66 && e.shiftKey) {
+      // Shift-b
+      window.location.href = "/logbook/breaks/"
     } else if (e.keyCode === 66) {
       // b
       window.openModalFromUrl("/logbook/breaks/create/")
