@@ -22,6 +22,7 @@
         <th class="text-right">{% trans 'Count' %}</th>
         <th class="text-right">{% trans 'Sum' %}</th>
         <th class="text-right">{% trans 'Average' %}</th>
+        <th class="text-right">{% trans 'Days with insufficient breaks' %}</th>
       </tr>
     </thead>
     <tbody>
@@ -37,6 +38,10 @@
         <td class="text-right">{{ row.logged_hours_stats.count }}</td>
         <td class="text-right">{{ row.logged_hours_stats.sum|hours }}</td>
         <td class="text-right">{{ row.logged_hours_stats.avg|stringformat:'.2f' }}h</td>
+        <td class="text-right">
+          {{ row.insufficient_breaks.days }} / {{ row.insufficient_breaks.of }}
+          {% pie row.insufficient_breaks.days row.insufficient_breaks.of %}
+        </td>
     {% endfor %}
     </tbody>
   </table>

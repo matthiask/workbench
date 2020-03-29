@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-29 14:37+0200\n"
+"POT-Creation-Date: 2020-03-29 16:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2336,6 +2336,10 @@ msgstr "Stunden pro Kundschaft"
 msgid "Green hours"
 msgstr "Grüne Stunden"
 
+#: workbench/templates/base.html workbench/templates/reporting/logging.html
+msgid "Logging statistics"
+msgstr "Logbuch-Statistik"
+
 #: workbench/templates/base.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/accepted_deals_for_user.html
@@ -2803,10 +2807,6 @@ msgid "Details"
 msgstr "Details"
 
 #: workbench/templates/reporting/logging.html
-msgid "Logging statistics"
-msgstr "Logbuch-Statistik"
-
-#: workbench/templates/reporting/logging.html
 msgid "Point in time of logging"
 msgstr "Zeitpunkt der Erfassung"
 
@@ -2821,6 +2821,10 @@ msgstr "Summe"
 #: workbench/templates/reporting/logging.html
 msgid "Average"
 msgstr "Durchschnitt"
+
+#: workbench/templates/reporting/logging.html
+msgid "Days with insufficient breaks"
+msgstr "Tage mit zuwenig Pausenzeit"
 
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "offered"
