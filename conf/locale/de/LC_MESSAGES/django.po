@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-29 17:47+0200\n"
+"POT-Creation-Date: 2020-03-29 17:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2981,15 +2981,15 @@ msgid "Logbook entry on %(service)s: %(description)s (%(hours)s)"
 msgstr "Logbucheintrag auf %(service)s: %(description)s (%(hours)s)"
 
 #: workbench/timer/models.py
-msgid "start"
+msgid "Start"
 msgstr "Start"
 
 #: workbench/timer/models.py
-msgid "split"
+msgid "Split"
 msgstr "Split"
 
 #: workbench/timer/models.py
-msgid "stop"
+msgid "Stop"
 msgstr "Stop"
 
 #: workbench/timer/models.py

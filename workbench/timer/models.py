@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
 from django.utils.html import format_html
+from django.utils.text import capfirst
 from django.utils.timezone import localtime
 from django.utils.translation import gettext_lazy as _
 
@@ -94,11 +95,11 @@ class Timestamp(models.Model):
     BREAK = "break"
 
     TYPE_CHOICES = [
-        (START, _("start")),
-        (SPLIT, _("split")),
-        (STOP, _("stop")),
-        (LOGBOOK, _("logbook")),
-        (BREAK, _("break")),
+        (START, _("Start")),
+        (SPLIT, _("Split")),
+        (STOP, _("Stop")),
+        (LOGBOOK, capfirst(_("logbook"))),
+        (BREAK, capfirst(_("break"))),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))

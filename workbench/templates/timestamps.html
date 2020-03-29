@@ -37,7 +37,7 @@
              class="btn btn-primary btn-sm align-self-start"
              target="_blank"
              rel="noopener noreferrer"
-             onclick="window.open(this.href, 'timestamps', 'innerHeight=400,innerWidth=400,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no');return false">
+             onclick="window.open(this.href, 'timestamps', 'innerHeight=450,innerWidth=400,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no');return false">
             {% trans 'Controller' %}</a>
 
         </div>
@@ -89,35 +89,6 @@
 
           </a>
 
-        {% elif row.elapsed %}
-          <div class="list-group-item">
-            <div class="d-flex w-100">
-
-              <div>
-                <strong>
-                  {{ row.timestamp.created_at|date:'H:i' }}
-                </strong>
-                {{ row.timestamp.badge }}
-                {{ row.timestamp.notes }}
-              </div>
-
-              <a
-                href="{% url 'logbook_loggedhours_create' %}?hours={{ row.elapsed|stringformat:'s' }}&amp;rendered_on={{ day.isoformat }}&amp;timestamp={{ row.timestamp.pk }}"
-                data-toggle="ajaxmodal"
-                class="btn btn-sm ml-auto align-self-start btn-primary">
-                {{ row.elapsed|hours:True }}
-              </a>
-
-              <a href="{% url 'logbook_break_create' %}?day={{ day.isoformat }}&amp;starts_at={{ row.previous.time.isoformat }}&amp;ends_at={{ row.timestamp.time.isoformat }}&amp;timestamp={{ row.timestamp.pk }}"
-                 data-toggle="ajaxmodal"
-                 class="btn btn-sm ml-2 align-self-start btn-primary">
-                {% trans 'break' %}
-              </a>
-
-            </div>
-
-          </div>
-
         {% elif row.timestamp.url %}
           <a class="list-group-item list-group-item-action" href="{{ row.timestamp.url }}" data-toggle="ajaxmodal">
             <strong>
@@ -129,11 +100,37 @@
 
         {% else %}
           <div class="list-group-item">
-            <strong>
-              {{ row.timestamp.created_at|date:'H:i' }}
-            </strong>
-            {{ row.timestamp.badge }}
-            {{ row.timestamp.notes }}
+            <div class="d-flex w-100">
+
+              <div>
+                <strong>
+                  {{ row.timestamp.created_at|date:'H:i' }}
+                </strong>
+                {{ row.timestamp.badge }}
+                {{ row.timestamp.notes }}
+              </div>
+
+              <div class="ml-auto">
+
+                <a href="{% url 'logbook_break_create' %}?day={{ day.isoformat }}&amp;starts_at={{ row.previous.time.isoformat }}&amp;ends_at={{ row.timestamp.time.isoformat }}&amp;timestamp={{ row.timestamp.pk }}"
+                   data-toggle="ajaxmodal"
+                   class="btn btn-sm align-self-start btn-primary">
+                  {% trans 'break'|capfirst %}
+                </a>
+
+                {% if row.elapsed %}
+                <a
+                  href="{% url 'logbook_loggedhours_create' %}?hours={{ row.elapsed|stringformat:'s' }}&amp;rendered_on={{ day.isoformat }}&amp;timestamp={{ row.timestamp.pk }}"
+                  data-toggle="ajaxmodal"
+                  class="btn btn-sm align-self-start btn-primary">
+                  {{ row.elapsed|hours:True }}
+                </a>
+                {% endif %}
+
+              </div>
+
+            </div>
+
           </div>
         {% endif %}
         {% endfor %}

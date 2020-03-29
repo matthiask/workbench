@@ -36,11 +36,11 @@ class Migration(migrations.Migration):
                     "type",
                     models.CharField(
                         choices=[
-                            ("start", "start"),
-                            ("split", "split"),
-                            ("stop", "stop"),
-                            ("logbook", "logbook"),
-                            ("break", "break"),
+                            ("start", "Start"),
+                            ("split", "Split"),
+                            ("stop", "Stop"),
+                            ("logbook", "Logbook"),
+                            ("break", "Break"),
                         ],
                         max_length=10,
                         verbose_name="type",
