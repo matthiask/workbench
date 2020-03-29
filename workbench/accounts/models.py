@@ -286,7 +286,8 @@ select max(created_at) from sq
             or Z
         ) + add
         break_seconds = sum(
-            (brk.timedelta.total_seconds() for brk in self.breaks.filter(day=day)), Z,
+            (int(brk.timedelta.total_seconds()) for brk in self.breaks.filter(day=day)),
+            Z,
         )
         msg = _(
             "You should take a break of at least %(minutes)s minutes"

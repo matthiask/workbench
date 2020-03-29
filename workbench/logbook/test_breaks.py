@@ -223,6 +223,12 @@ class BreaksTest(TestCase):
         self.client.force_login(user)
 
         factories.LoggedHoursFactory.create(rendered_by=user, hours=5)
+        Break.objects.create(
+            user=user,
+            day=dt.date.today(),
+            starts_at=dt.time(12, 0),
+            ends_at=dt.time(12, 5),
+        )
 
         data = {
             "modal-rendered_by": user.id,
