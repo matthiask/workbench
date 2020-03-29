@@ -1786,7 +1786,7 @@ msgstr "Spät"
 
 #: workbench/logbook/reporting.py
 msgid "Average logging time is %.0f hours after noon."
-msgstr "Durchschnittliche Erfassungszeit ist %.1f Stunden nach dem Mittag."
+msgstr "Durchschnittliche Erfassungszeit ist %.0f Stunden nach dem Mittag."
 
 #: workbench/logbook/reporting.py
 #, python-format
