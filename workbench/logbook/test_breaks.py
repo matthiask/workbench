@@ -10,6 +10,7 @@ from freezegun import freeze_time
 from workbench import factories
 from workbench.logbook.models import Break
 from workbench.timer.models import Timestamp
+from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code
 from workbench.tools.validation import in_days
 
@@ -253,10 +254,17 @@ class BreaksTest(TestCase):
 
             self.assertIsNone(user.take_a_break_warning(add=1, day=in_days(-1)))
 
+            response = self.client.post(
+                service.project.urls["createhours"],
+                {**data, WarningsForm.ignore_warnings_id: "take-a-break"},
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            )
+            self.assertEqual(response.status_code, 201)
+
         # With skip_breaks=True, everything just works
         response = self.client.post(
             service.project.urls["createhours"],
-            data,
+            {**data, "modal-hours": "3.0"},  # No duplicate
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 201)
