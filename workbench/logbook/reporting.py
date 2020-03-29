@@ -104,11 +104,11 @@ combined as (
         and breaks.day=logged_hours.day
 ),
 insufficient_breaks as (
-    select * from combined where hours >= 5.5 and hours < 7 and break_seconds < 900
-    union all
-    select * from combined where hours >= 7.0 and hours < 9 and break_seconds < 1800
-    union all
-    select * from combined where hours >= 9 and break_seconds < 3600
+    select * from combined
+    where
+        hours >= 9 and break_seconds < 3600
+        or hours >= 7 and break_seconds < 1800
+        or hours >= 5.5 and break_seconds < 900
 )
 select
     user_id,

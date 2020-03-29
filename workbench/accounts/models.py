@@ -11,7 +11,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.features import FEATURES
-from workbench.tools.models import Model
+from workbench.tools.models import Model, Z
 from workbench.tools.validation import in_days, monday
 
 
@@ -273,6 +273,33 @@ select max(created_at) from sq
                 [dt.date.today(), self.id, self.id],
             )
             return list(cursor)[0][0]
+
+    def take_a_break_warning(self, *, add=0, day=None):
+        if self.features[FEATURES.SKIP_BREAKS]:
+            return None
+
+        day = day or dt.date.today()
+        hours = (
+            self.loggedhours.filter(rendered_on=day)
+            .order_by()
+            .aggregate(h=Sum("hours"))["h"]
+            or Z
+        ) + add
+        break_seconds = sum(
+            (brk.timedelta.total_seconds() for brk in self.breaks.filter(day=day)), Z,
+        )
+        msg = _(
+            "You should take a break of at least %(minutes)s minutes"
+            " when working more than %(hours)s hours."
+        )
+
+        if hours >= 9 and break_seconds < 3600:
+            return msg % {"minutes": 60, "hours": 9}
+        elif hours >= 7 and break_seconds < 1800:
+            return msg % {"minutes": 30, "hours": 7}
+        elif hours >= 5.5 and break_seconds < 900:
+            return msg % {"minutes": 15, "hours": 5.5}
+        return None
 
 
 class UserFeatures:

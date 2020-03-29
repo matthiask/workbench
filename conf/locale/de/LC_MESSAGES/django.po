@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-29 16:17+0200\n"
+"POT-Creation-Date: 2020-03-29 17:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -98,6 +98,15 @@ msgstr "Benutzer"
 #: workbench/accounts/models.py
 msgid "users"
 msgstr "Benutzer"
+
+#: workbench/accounts/models.py
+#, python-format
+msgid ""
+"You should take a break of at least %(minutes)s minutes when working more "
+"than %(hours)s hours."
+msgstr ""
+"Du musst eine Pause von mindestens %(minutes)s Minuten machen, wenn Du mehr "
+"als %(hours)s Stunden arbeitest."
 
 #: workbench/accounts/models.py workbench/awt/models.py
 #: workbench/circles/models.py workbench/contacts/models.py

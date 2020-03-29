@@ -327,6 +327,16 @@ class LoggedHoursForm(ModelForm):
             elif data["rendered_on"] > in_days(7):
                 errors["rendered_on"] = _("That's too far in the future.")
 
+        if (
+            all(data.get(f) for f in ["rendered_by", "rendered_on", "hours"])
+            and not self.instance.pk
+        ):
+            msg = data["rendered_by"].take_a_break_warning(
+                day=data["rendered_on"], add=data["hours"]
+            )
+            if msg:
+                self.add_warning(msg, code="take-a-break")
+
         try:
             latest = LoggedHours.objects.filter(
                 Q(rendered_by=self.request.user), ~Q(id=self.instance.id)
