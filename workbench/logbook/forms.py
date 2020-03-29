@@ -504,6 +504,7 @@ class BreakSearchForm(Form):
         return queryset.select_related("user")
 
 
+@add_prefix("modal")
 class BreakForm(ModelForm):
     class Meta:
         model = Break
@@ -524,6 +525,18 @@ class BreakForm(ModelForm):
         initial.setdefault("ends_at", localtime(timezone.now()).time())
 
         super().__init__(*args, **kwargs)
+
+    def clean(self):
+        data = super().clean()
+        errors = {}
+        if data.get("day"):
+            if data["day"] < logbook_lock():
+                errors["day"] = _("Breaks have to be logged in the same week.")
+            elif data["day"] > in_days(7):
+                errors["day"] = _("That's too far in the future.")
+
+        raise_if_errors(errors)
+        return data
 
     def save(self):
         if self.instance.pk:

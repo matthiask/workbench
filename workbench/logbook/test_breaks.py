@@ -2,6 +2,7 @@ import datetime as dt
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils import timezone
 
 from freezegun import freeze_time
@@ -10,6 +11,7 @@ from workbench import factories
 from workbench.logbook.models import Break
 from workbench.timer.models import Timestamp
 from workbench.tools.testing import check_code
+from workbench.tools.validation import in_days
 
 
 class BreaksTest(TestCase):
@@ -92,6 +94,46 @@ class BreaksTest(TestCase):
         self.assertContains(response, "starts_at=08:45:00")
         self.assertContains(response, "ends_at=09:00:00")
 
+    def test_day_validation(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        response = self.client.post(
+            Break.urls["create"],
+            {
+                "modal-day": "",
+                "modal-starts_at": "12:00",
+                "modal-ends_at": "12:45",
+                "modal-description": "",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "This field is required.")
+
+        response = self.client.post(
+            Break.urls["create"],
+            {
+                "modal-day": "2010-01-01",
+                "modal-starts_at": "12:00",
+                "modal-ends_at": "12:45",
+                "modal-description": "",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "Breaks have to be logged in the same week.")
+
+        response = self.client.post(
+            Break.urls["create"],
+            {
+                "modal-day": "9999-01-01",
+                "modal-starts_at": "12:00",
+                "modal-ends_at": "12:45",
+                "modal-description": "",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "That&#x27;s too far in the future.")
+
     def test_break_form_save_creates_timestamp(self):
         user = factories.UserFactory.create()
         self.client.force_login(user)
@@ -99,10 +141,10 @@ class BreaksTest(TestCase):
         response = self.client.post(
             Break.urls["create"],
             {
-                "day": dt.date.today().isoformat(),
-                "starts_at": "12:00",
-                "ends_at": "12:45",
-                "description": "",
+                "modal-day": dt.date.today().isoformat(),
+                "modal-starts_at": "12:00",
+                "modal-ends_at": "12:45",
+                "modal-description": "",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -122,10 +164,10 @@ class BreaksTest(TestCase):
         response = self.client.post(
             Break.urls["create"] + "?timestamp={}".format(t.pk),
             {
-                "day": dt.date.today().isoformat(),
-                "starts_at": "12:00",
-                "ends_at": "12:45",
-                "description": "",
+                "modal-day": dt.date.today().isoformat(),
+                "modal-starts_at": "12:00",
+                "modal-ends_at": "12:45",
+                "modal-description": "",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -142,10 +184,10 @@ class BreaksTest(TestCase):
         response = self.client.post(
             brk.urls["update"] + "?timestamp={}".format(t2.pk),
             {
-                "day": dt.date.today().isoformat(),
-                "starts_at": "12:00",
-                "ends_at": "12:45",
-                "description": "",
+                "modal-day": dt.date.today().isoformat(),
+                "modal-starts_at": "12:00",
+                "modal-ends_at": "12:45",
+                "modal-description": "",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -174,3 +216,41 @@ class BreaksTest(TestCase):
             brk.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertContains(response, "Cannot modify breaks of other users.")
+
+    def test_break_warning(self):
+        service = factories.ServiceFactory.create()
+        user = service.project.owned_by
+        self.client.force_login(user)
+
+        factories.LoggedHoursFactory.create(rendered_by=user, hours=5)
+
+        data = {
+            "modal-rendered_by": user.id,
+            "modal-rendered_on": dt.date.today().isoformat(),
+            "modal-service": service.id,
+            "modal-hours": "2.0",
+            "modal-description": "Test",
+        }
+
+        with override_settings(FEATURES={"skip_breaks": False}):
+            response = self.client.post(
+                service.project.urls["createhours"],
+                data,
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            )
+            self.assertContains(response, "You should take a break")
+
+            self.assertIsNotNone(user.take_a_break_warning(add=10))
+            self.assertIsNotNone(user.take_a_break_warning(add=3))
+            self.assertIsNotNone(user.take_a_break_warning(add=1))
+            self.assertIsNone(user.take_a_break_warning(add=0))
+
+            self.assertIsNone(user.take_a_break_warning(add=1, day=in_days(-1)))
+
+        # With skip_breaks=True, everything just works
+        response = self.client.post(
+            service.project.urls["createhours"],
+            data,
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
