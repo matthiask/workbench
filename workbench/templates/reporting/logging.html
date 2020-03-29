@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% load fineforms i18n static workbench %}
+
+{% block title %}{% trans 'Logging statistics' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-sm-12 col-lg-8">
+  <h1>{% trans 'Logging statistics' %}</h1>
+
+  <form method="get" class="mb-3">
+    {% ff_fields form %}
+    {% ff_submit _('Show') %}
+  </form>
+
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>{% trans 'user'|capfirst %}</th>
+        <th>{% trans 'Point in time of logging' %}</th>
+        <th class="text-right">{% trans 'Count' %}</th>
+        <th class="text-right">{% trans 'Sum' %}</th>
+        <th class="text-right">{% trans 'Average' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in logbook_stats %}
+      <tr>
+        <td>{{ row.user }}</td>
+        <td>
+          <span class="badge badge-{{ row.mean_logging_delay.classification.1 }}"
+                title="{{ row.mean_logging_delay.classification.2 }}">
+            {{ row.mean_logging_delay.classification.0 }}
+          </span>
+        </td>
+        <td class="text-right">{{ row.logged_hours_stats.count }}</td>
+        <td class="text-right">{{ row.logged_hours_stats.sum|hours }}</td>
+        <td class="text-right">{{ row.logged_hours_stats.avg|stringformat:'.2f' }}h</td>
+    {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+</div>
+{% endblock %}

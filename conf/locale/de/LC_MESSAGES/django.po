@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-28 21:37+0100\n"
+"POT-Creation-Date: 2020-03-29 14:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -91,7 +91,7 @@ msgstr "Arbeitszeitmodell"
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/labor_costs_by_user.html
-#: workbench/timer/models.py
+#: workbench/templates/reporting/logging.html workbench/timer/models.py
 msgid "user"
 msgstr "Benutzer"
 
@@ -1754,6 +1754,32 @@ msgstr "Pausen sollten später enden als beginnen."
 msgid "Cannot modify breaks of other users."
 msgstr "Es ist nicht erlaubt, Pausen anderer Nutzer*innen zu ändern."
 
+#: workbench/logbook/reporting.py
+msgid "Immediate"
+msgstr "Sofort"
+
+#: workbench/logbook/reporting.py
+msgid "Same day"
+msgstr "Gleicher Tag"
+
+#: workbench/logbook/reporting.py workbench/templates/timestamps.html
+msgid "Next day"
+msgstr "Nächster Tag"
+
+#: workbench/logbook/reporting.py
+msgid "Late"
+msgstr "Spät"
+
+#: workbench/logbook/reporting.py
+#, python-format
+msgid "Average logging time is %.1f hours after noon."
+msgstr "Durchschnittliche Erfassungezeit ist %.1f Stunden nach dem Mittag."
+
+#: workbench/logbook/reporting.py
+#, python-format
+msgid "Average logging delay is %.1f days."
+msgstr "Die durchschnittliche Zeit bis zur Erfassung beträgt %.1f Tage."
+
 #: workbench/logbook/views.py
 msgid "Select project for logging"
 msgstr "Projekt für Erfassung auswählen"
@@ -2620,6 +2646,7 @@ msgstr "Offerten-PDF"
 #: workbench/templates/reporting/hours_by_circle.html
 #: workbench/templates/reporting/hours_per_customer.html
 #: workbench/templates/reporting/labor_costs.html
+#: workbench/templates/reporting/logging.html
 msgid "Show"
 msgstr "Anzeigen"
 
@@ -2775,6 +2802,26 @@ msgstr "Keine Kostenstelle definiert"
 msgid "Details"
 msgstr "Details"
 
+#: workbench/templates/reporting/logging.html
+msgid "Logging statistics"
+msgstr "Logbuch-Statistik"
+
+#: workbench/templates/reporting/logging.html
+msgid "Point in time of logging"
+msgstr "Zeitpunkt der Erfassung"
+
+#: workbench/templates/reporting/logging.html
+msgid "Count"
+msgstr "Anzahl"
+
+#: workbench/templates/reporting/logging.html
+msgid "Sum"
+msgstr "Summe"
+
+#: workbench/templates/reporting/logging.html
+msgid "Average"
+msgstr "Durchschnitt"
+
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "offered"
 msgstr "Offeriert"
@@ -2866,10 +2913,6 @@ msgstr "Stunden von allen"
 #: workbench/templates/timestamps.html
 msgid "Previous day"
 msgstr "Vorheriger Tag"
-
-#: workbench/templates/timestamps.html
-msgid "Next day"
-msgstr "Nächster Tag"
 
 #: workbench/templates/timestamps.html
 msgid "Controller"

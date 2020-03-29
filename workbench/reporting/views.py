@@ -12,6 +12,7 @@ from workbench.accounts.models import Team, User
 from workbench.invoices.models import Invoice
 from workbench.invoices.utils import next_valid_day
 from workbench.logbook.models import LoggedCost
+from workbench.logbook.reporting import logbook_stats
 from workbench.projects.models import Project
 from workbench.projects.reporting import overdrawn_projects
 from workbench.reporting import (
@@ -381,4 +382,15 @@ def labor_costs_view(request, form):
             "date_range": date_range,
             "form": form,
         },
+    )
+
+
+@filter_form(DateRangeFilterForm)
+def logging(request, form):
+    date_range = [form.cleaned_data["date_from"], form.cleaned_data["date_until"]]
+
+    return render(
+        request,
+        "reporting/logging.html",
+        {"form": form, "logbook_stats": logbook_stats(date_range)},
     )

@@ -92,6 +92,7 @@
               {% endif %}
               <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">{% trans 'Hours per customer'|capfirst %}</a>
               <a class="dropdown-item" href="{% url 'report_green_hours' %}">{% trans 'Green hours' %}</a>
+              <a class="dropdown-item" href="{% url 'report_logging' %}">{% trans 'Logging statistics' %}</a>
             {% endif %} {# CONTROLLING #}
 
             {% if request.user|has_feature:FEATURES.DEALS %}

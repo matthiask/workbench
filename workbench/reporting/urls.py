@@ -18,6 +18,7 @@ from workbench.reporting.views import (
     key_data_third_party_costs,
     key_data_view,
     labor_costs_view,
+    logging,
     open_items_list,
     overdrawn_projects_view,
     project_budget_statistics_view,
@@ -104,4 +105,5 @@ urlpatterns = [
     url(
         r"^labor-costs/$", labor_costs_only(labor_costs_view), name="report_labor_costs"
     ),
+    url(r"^logging/$", controlling_only(logging), name="report_logging"),
 ]
