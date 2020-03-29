@@ -503,13 +503,16 @@ class BreakForm(ModelForm):
     def __init__(self, *args, **kwargs):
         request = kwargs["request"]
         initial = kwargs.setdefault("initial", {})
-        latest = localtime(request.user.latest_created_at)
-        if dt.date.today() == latest.date():
-            initial.setdefault("starts_at", latest.time())
-        initial.setdefault("ends_at", localtime(timezone.now()).time())
         for field in ["day", "starts_at", "ends_at"]:
             if request.GET.get(field):
                 initial[field] = request.GET.get(field)
+
+        if "starts_at" not in initial:
+            latest = localtime(request.user.latest_created_at)
+            if dt.date.today() == latest.date():
+                initial.setdefault("starts_at", latest.time())
+        initial.setdefault("ends_at", localtime(timezone.now()).time())
+
         super().__init__(*args, **kwargs)
 
     def save(self):
