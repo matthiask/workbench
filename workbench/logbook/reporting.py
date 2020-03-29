@@ -14,7 +14,7 @@ class LoggingDelay:
 
 
 def classify_logging_delay(delay):
-    explanation = _("Average logging time is %.1f hours after noon.") % delay
+    explanation = _("Average logging time is %.0f hours after noon.") % delay
 
     if delay < 3:
         return _("Immediate"), "success", explanation

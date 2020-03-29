@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-29 19:01+0200\n"
+"POT-Creation-Date: 2020-03-29 19:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1756,6 +1756,7 @@ msgid "break"
 msgstr "Pause"
 
 #: workbench/logbook/models.py workbench/templates/base.html
+#: workbench/templates/shortcuts.html
 msgid "breaks"
 msgstr "Pausen"
 
@@ -1784,9 +1785,8 @@ msgid "Late"
 msgstr "Spät"
 
 #: workbench/logbook/reporting.py
-#, python-format
-msgid "Average logging time is %.1f hours after noon."
-msgstr "Durchschnittliche Erfassungezeit ist %.1f Stunden nach dem Mittag."
+msgid "Average logging time is %.0f hours after noon."
+msgstr "Durchschnittliche Erfassungszeit ist %.1f Stunden nach dem Mittag."
 
 #: workbench/logbook/reporting.py
 #, python-format
