@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-30 18:14+0200\n"
+"POT-Creation-Date: 2020-03-30 19:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -386,11 +386,8 @@ msgid "Start and end must be in the same year."
 msgstr "Anfang und Ende müssen im gleichen Jahr liegen."
 
 #: workbench/awt/models.py
-#, python-format
-msgid "%s day"
-msgid_plural "%s days"
-msgstr[0] "%s Tag"
-msgstr[1] "%s Tage"
+msgid "%s days"
+msgstr "%s Tage"
 
 #: workbench/awt/views.py
 #, python-format
@@ -1679,10 +1676,8 @@ msgid "Third party costs shouldn't be higher than costs."
 msgstr "Fremdkosten sollten nicht höher sein als die Kosten."
 
 #: workbench/logbook/forms.py
-#, fuzzy
-#| msgid "Breaks have to be logged in the same week."
 msgid "Breaks have to be logged promptly."
-msgstr "Pausen müssen in der gleichen Woche erfasst werden."
+msgstr "Pausen müssen zeitnah erfasst werden."
 
 #: workbench/logbook/models.py
 msgid "rendered by"

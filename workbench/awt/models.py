@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _, ngettext
+from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.tools.formats import local_date_format
@@ -209,10 +209,7 @@ class Absence(Model):
 
     @property
     def pretty_status(self):
-        return "%s, %s" % (
-            ngettext("%s day", "%s days", self.days) % self.days,
-            self.pretty_period,
-        )
+        return "%s, %s" % (gettext("%s days") % self.days, self.pretty_period)
 
     @property
     def pretty_period(self):
