@@ -269,3 +269,8 @@ class BreaksTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 201)
+
+        # Now the message also appears by default
+        with override_settings(FEATURES={"skip_breaks": False}):
+            response = self.client.get("/")
+            self.assertContains(response, "You should take a break")

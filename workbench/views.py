@@ -16,6 +16,11 @@ from workbench.projects.models import Project
 from workbench.tools.history import HISTORY, changes
 
 
+def start(request):
+    request.user.take_a_break_warning(request=request)
+    return render(request, "start.html")
+
+
 def search(request):
     results = []
     q = request.GET.get("q", "")

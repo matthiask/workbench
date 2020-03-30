@@ -81,6 +81,7 @@ class DayForm(Form):
 
 @filter_form(DayForm)
 def timestamps(request, form):
+    request.user.take_a_break_warning(request=request)
     today = dt.date.today()
     day = form.cleaned_data["day"] or today
     timestamps = Timestamp.objects.for_user(request.user, day=day)

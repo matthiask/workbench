@@ -3,6 +3,7 @@ from decimal import Decimal
 from functools import total_ordering
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.signing import BadSignature, Signer
 from django.db import connections, models
@@ -274,7 +275,7 @@ select max(created_at) from sq
             )
             return list(cursor)[0][0]
 
-    def take_a_break_warning(self, *, add=0, day=None):
+    def take_a_break_warning(self, *, add=0, day=None, request=None):
         if self.features[FEATURES.SKIP_BREAKS]:
             return None
 
@@ -295,12 +296,17 @@ select max(created_at) from sq
         )
 
         if hours + add >= 9 and break_seconds < 3600:
-            return msg % {"minutes": 60, "hours": 9}
+            msg = msg % {"minutes": 60, "hours": 9}
         elif hours + add >= 7 and break_seconds < 1800:
-            return msg % {"minutes": 30, "hours": 7}
+            msg = msg % {"minutes": 30, "hours": 7}
         elif hours + add >= 5.5 and break_seconds < 900:
-            return msg % {"minutes": 15, "hours": 5.5}
-        return None
+            msg = msg % {"minutes": 15, "hours": 5.5}
+        else:
+            msg = None
+
+        if msg and request:
+            messages.warning(request, msg)
+        return msg
 
 
 class UserFeatures:
