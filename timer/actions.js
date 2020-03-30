@@ -113,7 +113,7 @@ export async function sendLogbook(dispatch, {activity, current}) {
   }
 }
 
-export function overwriteSeconds(dispatch, {activity}) {
+export function overwriteSeconds(dispatch, {activity, current}) {
   const seconds = parseInt(
     prompt(gettext("Overwrite seconds"), Math.ceil(activity.seconds))
   )
@@ -123,5 +123,8 @@ export function overwriteSeconds(dispatch, {activity}) {
       id: activity.id,
       fields: {seconds},
     })
+    if (current && current.id == activity.id) {
+      dispatch({type: "START", id: activity.id})
+    }
   }
 }

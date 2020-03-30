@@ -138,7 +138,7 @@ export const Activity = connect((state, ownProps) => ({
           <div className="d-flex align-items-center justify-content-between">
             <div
               className="activity-duration pl-2"
-              onClick={() => overwriteSeconds(dispatch, {activity})}
+              onClick={() => overwriteSeconds(dispatch, {activity, current})}
               style={{cursor: "cell"}}
             >
               {prettyDuration(activity.seconds)}
