@@ -36,6 +36,9 @@ class TimestampQuerySet(models.QuerySet):
             )
         )
         known_logged_hours = set(entry.logged_hours for entry in entries)
+        logged_hours = user.loggedhours.filter(rendered_on=day).select_related(
+            "service"
+        )
         entries.extend(
             self.model(
                 created_at=entry.created_at,
@@ -48,13 +51,12 @@ class TimestampQuerySet(models.QuerySet):
                 },
                 url=entry.get_absolute_url(),
             )
-            for entry in user.loggedhours.filter(rendered_on=day).select_related(
-                "service"
-            )
+            for entry in logged_hours
             if entry not in known_logged_hours
         )
         if not entries:
-            return []
+            return {"timestamps": [], "hours": Decimal(0)}
+
         entries = sorted(entries, key=lambda timestamp: timestamp.created_at)
 
         ret = []
@@ -84,7 +86,10 @@ class TimestampQuerySet(models.QuerySet):
             ret.append({"timestamp": current, "previous": previous, "elapsed": elapsed})
             previous = current
 
-        return ret
+        return {
+            "timestamps": ret,
+            "hours": sum((hours.hours for hours in logged_hours), Decimal(0)),
+        }
 
 
 class Timestamp(models.Model):

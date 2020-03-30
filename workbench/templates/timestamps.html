@@ -19,7 +19,7 @@
               <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
                 {{ user.hours.week|hours }} {% trans 'this week' %}</a>
             {% else %}
-              {{ day|local_date_format }} / {{ hours|hours }}
+              {{ day|local_date_format }} / {{ timestamps.hours|hours }}
             {% endif %}
           </small>
         </h3>
@@ -50,7 +50,7 @@
       </div>
 
       <div class="list-group list-group-flush">
-        {% for row in timestamps %}
+        {% for row in timestamps.timestamps %}
         {% if row.timestamp.logged_hours %}
           <a class="list-group-item list-group-item-action"
              href="{{ row.timestamp.logged_hours.get_absolute_url }}"

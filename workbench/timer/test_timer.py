@@ -108,7 +108,7 @@ class TimestampsTest(TestCase):
             type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=160)
         )
 
-        timestamps = Timestamp.objects.for_user(user)
+        timestamps = Timestamp.objects.for_user(user)["timestamps"]
         self.assertEqual(
             timestamps,
             [
@@ -146,7 +146,7 @@ class TimestampsTest(TestCase):
             type=Timestamp.START, created_at=today + dt.timedelta(minutes=29)
         )
 
-        timestamps = Timestamp.objects.for_user(user)
+        timestamps = Timestamp.objects.for_user(user)["timestamps"]
         self.assertEqual(
             timestamps,
             [
@@ -174,7 +174,7 @@ class TimestampsTest(TestCase):
             type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=40)
         )
 
-        timestamps = Timestamp.objects.for_user(user)
+        timestamps = Timestamp.objects.for_user(user)["timestamps"]
         self.assertEqual(
             timestamps,
             [
@@ -191,7 +191,7 @@ class TimestampsTest(TestCase):
         today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
         user = factories.UserFactory.create()
 
-        self.assertEqual(Timestamp.objects.for_user(user), [])
+        self.assertEqual(Timestamp.objects.for_user(user)["timestamps"], [])
 
         t1 = user.timestamp_set.create(
             type=Timestamp.START, created_at=today + dt.timedelta(minutes=0)
@@ -205,7 +205,7 @@ class TimestampsTest(TestCase):
             type=Timestamp.SPLIT, created_at=today + dt.timedelta(minutes=20)
         )
 
-        timestamps = Timestamp.objects.for_user(user)
+        timestamps = Timestamp.objects.for_user(user)["timestamps"]
         self.assertEqual(len(timestamps), 3)
         self.assertEqual(timestamps[0]["elapsed"], None)
         self.assertEqual(timestamps[1]["elapsed"], None)
