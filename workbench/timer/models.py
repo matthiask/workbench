@@ -67,7 +67,11 @@ class TimestampQuerySet(models.QuerySet):
                     # Skip
                     continue
 
-                if current.type not in {Timestamp.START, Timestamp.LOGBOOK}:
+                if current.type not in {
+                    Timestamp.START,
+                    Timestamp.LOGBOOK,
+                    Timestamp.BREAK,
+                }:
                     current.type = Timestamp.START  # Override
                 elapsed = None
 
