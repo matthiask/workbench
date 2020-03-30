@@ -112,19 +112,19 @@ insufficient_breaks as (
 )
 select
     user_id,
-    count(*) as count,
+    count(*),
     (
         select count(*)
-        from logged_hours
+        from insufficient_breaks
         where insufficient_breaks.user_id=logged_hours.user_id
     )
-from insufficient_breaks
+from logged_hours
 group by user_id
             """,
             [*date_range, *date_range],
         )
 
-        return {user_id: {"days": days, "of": of} for user_id, days, of in cursor}
+        return {user_id: {"days": days, "of": of} for user_id, of, days in cursor}
 
 
 def logbook_stats(date_range):
@@ -139,7 +139,7 @@ def logbook_stats(date_range):
             "user": user,
             "mean_logging_delay": mld[user.id],
             "logged_hours_stats": lhs[user.id],
-            "insufficient_breaks": ib.get(user.id, 0),
+            "insufficient_breaks": ib[user.id],
         }
         for user in users
     ]
