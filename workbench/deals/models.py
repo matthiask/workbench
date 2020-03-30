@@ -214,7 +214,7 @@ class Deal(Model):
             open_since = (dt.date.today() - self.created_at.date()).days
             if (
                 open_since
-                > {self.UNKNOWN: 180, self.NORMAL: 90, self.HIGH: 45}[self.probability]
+                > {self.UNKNOWN: 90, self.NORMAL: 45, self.HIGH: 20}[self.probability]
             ):
                 css = "caveat"
             else:
