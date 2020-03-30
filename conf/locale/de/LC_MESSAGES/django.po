@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-30 10:32+0200\n"
+"POT-Creation-Date: 2020-03-30 18:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -102,11 +102,11 @@ msgstr "Benutzer"
 #: workbench/accounts/models.py
 #, python-format
 msgid ""
-"You should take a break of at least %(minutes)s minutes when working more "
-"than %(hours)s hours."
+"You should take (and log!) a break of at least %(minutes)s minutes when "
+"working more than %(hours)s hours."
 msgstr ""
-"Du musst eine Pause von mindestens %(minutes)s Minuten machen, wenn Du mehr "
-"als %(hours)s Stunden arbeitest."
+"Du musst eine Pause von mindestens %(minutes)s Minuten machen (und "
+"erfassen!), wenn Du mehr als %(hours)s Stunden arbeitest."
 
 #: workbench/accounts/models.py workbench/awt/models.py
 #: workbench/circles/models.py workbench/contacts/models.py
@@ -2670,14 +2670,7 @@ msgid "offers PDF"
 msgstr "Offerten-PDF"
 
 #: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/accepted_deals.html
-#: workbench/templates/reporting/deal_history.html
-#: workbench/templates/reporting/declined_deals.html
-#: workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/hours_by_circle.html
-#: workbench/templates/reporting/hours_per_customer.html
 #: workbench/templates/reporting/labor_costs.html
-#: workbench/templates/reporting/logging.html
 msgid "Show"
 msgstr "Anzeigen"
 

@@ -291,7 +291,7 @@ select max(created_at) from sq
             Z,
         )
         msg = _(
-            "You should take a break of at least %(minutes)s minutes"
+            "You should take (and log!) a break of at least %(minutes)s minutes"
             " when working more than %(hours)s hours."
         )
 
