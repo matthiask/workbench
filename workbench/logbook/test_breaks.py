@@ -121,7 +121,7 @@ class BreaksTest(TestCase):
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assertContains(response, "Breaks have to be logged in the same week.")
+        self.assertContains(response, "Breaks have to be logged promptly.")
 
         response = self.client.post(
             Break.urls["create"],

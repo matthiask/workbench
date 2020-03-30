@@ -530,8 +530,8 @@ class BreakForm(ModelForm):
         data = super().clean()
         errors = {}
         if data.get("day"):
-            if data["day"] < logbook_lock():
-                errors["day"] = _("Breaks have to be logged in the same week.")
+            if data["day"] < logbook_lock() - dt.timedelta(days=7):
+                errors["day"] = _("Breaks have to be logged promptly.")
             elif data["day"] > in_days(7):
                 errors["day"] = _("That's too far in the future.")
 
