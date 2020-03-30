@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-29 19:08+0200\n"
+"POT-Creation-Date: 2020-03-30 10:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1679,7 +1679,9 @@ msgid "Third party costs shouldn't be higher than costs."
 msgstr "Fremdkosten sollten nicht höher sein als die Kosten."
 
 #: workbench/logbook/forms.py
-msgid "Breaks have to be logged in the same week."
+#, fuzzy
+#| msgid "Breaks have to be logged in the same week."
+msgid "Breaks have to be logged promptly."
 msgstr "Pausen müssen in der gleichen Woche erfasst werden."
 
 #: workbench/logbook/models.py
@@ -1761,6 +1763,13 @@ msgid "breaks"
 msgstr "Pausen"
 
 #: workbench/logbook/models.py
+#, python-format
+msgid "%s minute"
+msgid_plural "%s minutes"
+msgstr[0] "%s Minute"
+msgstr[1] "%s Minuten"
+
+#: workbench/logbook/models.py
 msgid "Breaks should end later than they begin."
 msgstr "Pausen sollten später enden als beginnen."
 
@@ -1785,6 +1794,7 @@ msgid "Late"
 msgstr "Spät"
 
 #: workbench/logbook/reporting.py
+#, python-format
 msgid "Average logging time is %.0f hours after noon."
 msgstr "Durchschnittliche Erfassungszeit ist %.0f Stunden nach dem Mittag."
 

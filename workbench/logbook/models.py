@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext
 
 from workbench.accounts.models import User
 from workbench.projects.models import Service
@@ -196,7 +196,8 @@ class Break(Model):
         verbose_name_plural = _("breaks")
 
     def __str__(self):
-        return "{} - {}".format(self.starts_at, self.ends_at)
+        minutes = int(self.timedelta.total_seconds() // 60)
+        return ngettext("%s minute", "%s minutes", minutes) % minutes
 
     @property
     def starts_at_datetime(self):
