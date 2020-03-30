@@ -284,7 +284,7 @@ select max(created_at) from sq
             .order_by()
             .aggregate(h=Sum("hours"))["h"]
             or Z
-        ) + add
+        )
         break_seconds = sum(
             (int(brk.timedelta.total_seconds()) for brk in self.breaks.filter(day=day)),
             Z,
@@ -294,11 +294,11 @@ select max(created_at) from sq
             " when working more than %(hours)s hours."
         )
 
-        if hours >= 9 and break_seconds < 3600:
+        if hours + add >= 9 and break_seconds < 3600:
             return msg % {"minutes": 60, "hours": 9}
-        elif hours >= 7 and break_seconds < 1800:
+        elif hours + add >= 7 and break_seconds < 1800:
             return msg % {"minutes": 30, "hours": 7}
-        elif hours >= 5.5 and break_seconds < 900:
+        elif hours + add >= 5.5 and break_seconds < 900:
             return msg % {"minutes": 15, "hours": 5.5}
         return None
 
