@@ -15,6 +15,7 @@ from workbench.accounts.models import User
 from workbench.timer.models import TimerState, Timestamp
 from workbench.tools.formats import hours
 from workbench.tools.forms import Form
+from workbench.tools.models import Z
 from workbench.tools.validation import filter_form
 
 
@@ -83,14 +84,25 @@ class DayForm(Form):
 def timestamps(request, form):
     today = dt.date.today()
     day = form.cleaned_data["day"] or today
+    timestamps = Timestamp.objects.for_user(request.user, day=day)
+    hours = sum(
+        (
+            row["timestamp"].logged_hours.hours
+            for row in timestamps
+            if row["timestamp"].logged_hours
+        ),
+        Z,
+    )
     return render(
         request,
         "timestamps.html",
         {
-            "timestamps": Timestamp.objects.for_user(request.user, day=day),
+            "timestamps": timestamps,
             "day": day,
             "previous": day - dt.timedelta(days=1),
             "next": day + dt.timedelta(days=1) if day < today else None,
             "url": request.build_absolute_uri(reverse("create_timestamp")),
+            "is_today": day == today,
+            "hours": hours,
         },
     )
