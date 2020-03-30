@@ -503,6 +503,15 @@ class BreakSearchForm(Form):
         queryset = self.apply_owned_by(queryset, attribute="user")
         return queryset.select_related("user")
 
+    def response(self, request, queryset):
+        if (
+            request.GET.get("export") == "xlsx"
+            and request.user.features[FEATURES.CONTROLLING]
+        ):
+            xlsx = WorkbenchXLSXDocument()
+            xlsx.table_from_queryset(queryset)
+            return xlsx.to_response("breaks.xlsx")
+
 
 @add_prefix("modal")
 class BreakForm(ModelForm):

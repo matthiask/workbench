@@ -31,6 +31,7 @@ class BreaksTest(TestCase):
         code("")
         code("user=-1")
         code("user={}".format(user.pk))
+        code("export=xlsx")
 
     def test_valid_break(self):
         brk = Break(
