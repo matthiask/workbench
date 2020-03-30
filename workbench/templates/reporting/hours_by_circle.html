@@ -9,9 +9,8 @@
 <div class="col-sm-12 col-md-8">
   <h1>{% trans 'Hours by circle' %}</h1>
 
-  <form method="get" class="mb-3">
+  <form method="get" class="mb-3" data-autosubmit>
     {% ff_fields form %}
-    {% ff_submit _('Show') %}
   </form>
 
   <table class="table table-sm table-responsive-lg table-hover">

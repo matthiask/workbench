@@ -257,13 +257,14 @@ $(function () {
     e.preventDefault()
     const field = $(this).closest(".form-group").find("input, textarea, select")
     field.val(this.dataset.fieldValue)
+    field.trigger("change")
   })
 
   $(document.body).on("click", "[data-set-period]", function (e) {
     e.preventDefault()
     const value = this.dataset.setPeriod.split(":")
     $("#id_date_from").val(value[0])
-    $("#id_date_until").val(value[1])
+    $("#id_date_until").val(value[1]).trigger("change")
   })
 })
 

@@ -9,9 +9,8 @@
 <div class="col-md-10 col-lg-8">
   <h1>{% trans 'Deal history' %}</h1>
 
-  <form method="get" class="mb-3">
+  <form method="get" class="mb-3" data-autosubmit>
     {% ff_fields form %}
-    {% ff_submit _('Show') %}
   </form>
 
   {% include '_history.html' with changes=stats %}
