@@ -13,11 +13,20 @@
 {% block objects %}
 <div class="list-group list-group-flush">
 {% for object in object_list %}
+{% ifchanged object.day %}
+<h5 class="mt-3 mb-3 d-flex justify-content-between">
+  <span>{{ object.day|local_date_format }}</span>
+  {# <span class="text-right">{{ sum }}h</span> #}
+</h5>
+{% endifchanged %}
 <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action px-0"
   data-toggle="ajaxmodal">
   <div class="d-flex w-100 justify-content-between">
-    <h5 class="mb-1">{{ object|h }}</h5>
-    {{ object.status_badge }}
+    <h5 class="mb-1">{{ object|h }} {{ object.description }}</h5>
+    <span>
+      {{ object.starts_at|date:'H:i' }} &ndash;
+      {{ object.ends_at|date:'H:i' }}
+    </span>
   </div>
   <div class="row">
     <div class="col-md-4">{{ object.user.get_full_name }}</div>
