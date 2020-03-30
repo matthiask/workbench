@@ -246,7 +246,7 @@ class BreaksTest(TestCase):
                 data,
                 HTTP_X_REQUESTED_WITH="XMLHttpRequest",
             )
-            self.assertContains(response, "You should take a break")
+            self.assertContains(response, "You should take")
 
             self.assertIsNotNone(user.take_a_break_warning(add=10))
             self.assertIsNotNone(user.take_a_break_warning(add=3))
@@ -273,4 +273,4 @@ class BreaksTest(TestCase):
         # Now the message also appears by default
         with override_settings(FEATURES={"skip_breaks": False}):
             response = self.client.get("/")
-            self.assertContains(response, "You should take a break")
+            self.assertContains(response, "You should take")
