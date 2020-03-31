@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-30 19:50+0200\n"
+"POT-Creation-Date: 2020-03-31 13:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -386,6 +386,7 @@ msgid "Start and end must be in the same year."
 msgstr "Anfang und Ende müssen im gleichen Jahr liegen."
 
 #: workbench/awt/models.py
+#, python-format
 msgid "%s days"
 msgstr "%s Tage"
 
@@ -1773,8 +1774,13 @@ msgid "Cannot modify breaks of other users."
 msgstr "Es ist nicht erlaubt, Pausen anderer Nutzer*innen zu ändern."
 
 #: workbench/logbook/reporting.py
-msgid "Immediate"
-msgstr "Sofort"
+#, python-format
+msgid "Average logging time is %.0f hours after noon."
+msgstr "Durchschnittliche Erfassungszeit ist %.0f Stunden nach dem Mittag."
+
+#: workbench/logbook/reporting.py
+msgid "Promptly"
+msgstr "Zeitnah"
 
 #: workbench/logbook/reporting.py
 msgid "Same day"
@@ -1785,18 +1791,13 @@ msgid "Next day"
 msgstr "Nächster Tag"
 
 #: workbench/logbook/reporting.py
-msgid "Late"
-msgstr "Spät"
-
-#: workbench/logbook/reporting.py
-#, python-format
-msgid "Average logging time is %.0f hours after noon."
-msgstr "Durchschnittliche Erfassungszeit ist %.0f Stunden nach dem Mittag."
-
-#: workbench/logbook/reporting.py
 #, python-format
 msgid "Average logging delay is %.1f days."
 msgstr "Die durchschnittliche Zeit bis zur Erfassung beträgt %.1f Tage."
+
+#: workbench/logbook/reporting.py
+msgid "Late"
+msgstr "Spät"
 
 #: workbench/logbook/views.py
 msgid "Select project for logging"

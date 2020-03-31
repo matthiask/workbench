@@ -6,18 +6,11 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 
 
-class LoggingDelay:
-    IMMEDIATE = _("Immediate"), "success"
-    SAME_DAY = _("Same day"), "light"
-    NEXT_DAY = _("Next day"), "caveat"
-    LATE = _("Late"), "danger"
-
-
 def classify_logging_delay(delay):
     explanation = _("Average logging time is %.0f hours after noon.") % delay
 
     if delay < 3:
-        return _("Immediate"), "success", explanation
+        return _("Promptly"), "success", explanation
     elif delay < 8:
         return _("Same day"), "light", explanation
     elif delay < 30:
