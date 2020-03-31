@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import decorator_from_middleware
+from django.utils.timezone import make_aware
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
@@ -64,10 +65,16 @@ class TimestampForm(ModelForm):
                 )
             except Exception:
                 raise forms.ValidationError("Invalid user")
+
+        if data.get("time"):
+            data["created_at"] = make_aware(
+                dt.datetime.combine(dt.date.today(), data["time"])
+            )
         return data
 
     def save(self):
         instance = super().save(commit=False)
+        instance.created_at = self.cleaned_data.get("created_at", instance.created_at)
         instance.user = self.cleaned_data["user"]
         instance.save()
         return instance

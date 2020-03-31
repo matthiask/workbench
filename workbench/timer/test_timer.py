@@ -79,6 +79,20 @@ class TimestampsTest(TestCase):
         t = Timestamp.objects.get()
         self.assertEqual(t.user, user)
 
+    def test_timestamp_with_time(self):
+        user = factories.UserFactory.create()
+
+        response = self.client.post(
+            "/create-timestamp/",
+            {"type": "start", "user": user.signed_email, "time": "09:23"},
+        )
+        self.assertEqual(response.status_code, 201)
+
+        t = Timestamp.objects.get()
+        created_at = timezone.localtime(t.created_at)
+        self.assertEqual(created_at.hour, 9)
+        self.assertEqual(created_at.minute, 23)
+
     def test_timestamps_scenario(self):
         today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
         user = factories.UserFactory.create()
