@@ -214,7 +214,12 @@ class Break(Model):
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
         errors = {}
-        if self.starts_at_datetime >= self.ends_at_datetime:
+        if (
+            self.day
+            and self.starts_at
+            and self.ends_at
+            and self.starts_at_datetime >= self.ends_at_datetime
+        ):
             errors["ends_at"] = _("Breaks should end later than they begin.")
 
         raise_if_errors(errors, exclude)

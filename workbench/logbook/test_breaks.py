@@ -115,6 +115,18 @@ class BreaksTest(TestCase):
         response = self.client.post(
             Break.urls["create"],
             {
+                "modal-day": dt.date.today().isoformat(),
+                "modal-starts_at": "12:00",
+                "modal-ends_at": "12",
+                "modal-description": "",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "Enter a valid time.")
+
+        response = self.client.post(
+            Break.urls["create"],
+            {
                 "modal-day": "2010-01-01",
                 "modal-starts_at": "12:00",
                 "modal-ends_at": "12:45",
