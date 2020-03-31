@@ -62,14 +62,14 @@ class TimestampsTest(TestCase):
         self.assertEqual(response.status_code, 400)
 
         response = self.client.post("/create-timestamp/", {"type": "start"})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 400)
 
         user = factories.UserFactory.create()
 
         response = self.client.post(
             "/create-timestamp/", {"type": "start", "user": user.email}
         )
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 400)
 
         response = self.client.post(
             "/create-timestamp/", {"type": "start", "user": user.signed_email}

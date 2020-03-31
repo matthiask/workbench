@@ -14,7 +14,7 @@ from corsheaders.middleware import CorsMiddleware
 from workbench.accounts.models import User
 from workbench.timer.models import TimerState, Timestamp
 from workbench.tools.formats import hours
-from workbench.tools.forms import Form
+from workbench.tools.forms import Form, ModelForm
 from workbench.tools.validation import filter_form
 
 
@@ -46,32 +46,41 @@ def timer(request):
     )
 
 
-class TimestampForm(forms.ModelForm):
-    user = forms.CharField(required=False)
+class TimestampForm(ModelForm):
+    time = forms.TimeField(required=False)
 
     class Meta:
         model = Timestamp
         fields = ["type", "notes"]
+
+    def clean(self):
+        data = super().clean()
+        if self.request.user.is_authenticated:
+            data["user"] = self.request.user
+        else:
+            try:
+                data["user"] = User.objects.get_by_signed_email(
+                    self.request.POST.get("user")
+                )
+            except Exception:
+                raise forms.ValidationError("Invalid user")
+        return data
+
+    def save(self):
+        instance = super().save(commit=False)
+        instance.user = self.cleaned_data["user"]
+        instance.save()
+        return instance
 
 
 @csrf_exempt
 @decorator_from_middleware(CorsMiddleware)
 @require_POST
 def create_timestamp(request):
-    form = TimestampForm(request.POST)
+    form = TimestampForm(request.POST, request=request)
     if not form.is_valid():
         return JsonResponse({}, status=400)
-    instance = form.save(commit=False)
-    if request.user.is_authenticated:
-        instance.user = request.user
-    elif form.cleaned_data.get("user"):
-        try:
-            instance.user = User.objects.get_by_signed_email(form.cleaned_data["user"])
-        except Exception:
-            return JsonResponse({}, status=403)
-    else:
-        return JsonResponse({}, status=403)
-    instance.save()
+    form.save()
     return JsonResponse({}, status=201)
 
 
