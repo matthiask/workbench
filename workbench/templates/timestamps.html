@@ -129,6 +129,11 @@
                 </a>
                 {% endif %}
 
+                <form class="d-inline" method="post" action="{{ row.timestamp.get_delete_url }}" onsubmit="return confirm('{% trans 'Really delete?'|escapejs %}')">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
+                </form>
+
               </div>
 
             </div>

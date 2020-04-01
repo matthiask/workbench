@@ -3,6 +3,7 @@ from decimal import ROUND_UP, Decimal
 
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.text import capfirst
@@ -164,3 +165,6 @@ class Timestamp(models.Model):
     @property
     def time(self):
         return localtime(self.created_at).time().replace(microsecond=0)
+
+    def get_delete_url(self):
+        return reverse("delete_timestamp", args=(self.pk,))

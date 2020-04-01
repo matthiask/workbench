@@ -57,6 +57,9 @@ class TimestampsTest(TestCase):
         self.assertEqual(t.notes, "blub")
         self.assertIn(str(t), {"20.02.2020 04:00", "20.02.2020 05:00"})
 
+        response = self.client.post(t.get_delete_url())
+        self.assertRedirects(response, "/timestamps/")
+
     def test_timestamp_auth(self):
         response = self.client.post("/create-timestamp/", {"type": "bla"})
         self.assertEqual(response.status_code, 400)

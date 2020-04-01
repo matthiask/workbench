@@ -2,11 +2,13 @@ import datetime as dt
 import json
 
 from django import forms
+from django.contrib import messages
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.decorators import decorator_from_middleware
 from django.utils.timezone import make_aware
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
@@ -89,6 +91,18 @@ def create_timestamp(request):
         return JsonResponse({}, status=400)
     form.save()
     return JsonResponse({}, status=201)
+
+
+@require_POST
+def delete_timestamp(request, pk):
+    timestamp = get_object_or_404(Timestamp.objects.filter(user=request.user), pk=pk)
+    timestamp.delete()
+    messages.success(
+        request,
+        _("%(class)s '%(object)s' has been deleted successfully.")
+        % {"class": timestamp._meta.verbose_name, "object": timestamp},
+    )
+    return redirect("timestamps")
 
 
 class DayForm(Form):

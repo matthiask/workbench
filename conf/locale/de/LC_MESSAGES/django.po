@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-31 13:13+0200\n"
+"POT-Creation-Date: 2020-04-01 12:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1207,7 +1207,7 @@ msgstr "%(class)s '%(object)s' wurde erfolgreich geändert."
 msgid "Delete %(object)s"
 msgstr "%(object)s löschen"
 
-#: workbench/generic.py workbench/projects/forms.py
+#: workbench/generic.py workbench/projects/forms.py workbench/timer/views.py
 #, python-format
 msgid "%(class)s '%(object)s' has been deleted successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
@@ -2666,7 +2666,6 @@ msgid "offers PDF"
 msgstr "Offerten-PDF"
 
 #: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/labor_costs.html
 msgid "Show"
 msgstr "Anzeigen"
 
@@ -2933,6 +2932,10 @@ msgstr "Vorheriger Tag"
 #: workbench/templates/timestamps.html
 msgid "Controller"
 msgstr "Controller"
+
+#: workbench/templates/timestamps.html
+msgid "Really delete?"
+msgstr "Wirklich löschen?"
 
 #: workbench/templatetags/workbench.py workbench/tools/history.py
 msgid "yes"
