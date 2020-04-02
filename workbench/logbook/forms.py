@@ -536,7 +536,7 @@ class BreakForm(ModelForm):
     def __init__(self, *args, **kwargs):
         request = kwargs["request"]
         initial = kwargs.setdefault("initial", {})
-        for field in ["day", "starts_at", "ends_at"]:
+        for field in ["day", "starts_at", "ends_at", "description"]:
             if request.GET.get(field):
                 initial[field] = request.GET.get(field)
 
