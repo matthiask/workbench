@@ -357,7 +357,8 @@ class OffersTest(TestCase):
         offer = factories.OfferFactory.create()
         gs = offer.project.grouped_services
 
-        self.assertEqual(gs["offers"], [(offer, [])])
+        self.assertEqual(gs["offers"][0][0], offer)
+        self.assertEqual(gs["offers"][0][1]["services"], [])
 
     def test_offer_deletion_without_logbook(self):
         offer = factories.OfferFactory.create()

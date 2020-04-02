@@ -355,7 +355,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 return currency(row["service"].service_cost)
 
         choices = []
-        for offer, services in self.project.grouped_services["offers"]:
+        for offer, offer_data in self.project.grouped_services["offers"]:
             choices.append(
                 (
                     format_html(
@@ -380,7 +380,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                                 amount(row),
                             ),
                         )
-                        for row in services
+                        for row in offer_data["services"]
                     ],
                 )
             )

@@ -205,11 +205,11 @@ class Project(Model):
         from workbench.logbook.models import LoggedHours, LoggedCost
 
         # Logged vs. service hours
-        service_hours = Z
-        logged_hours = Z
+        service_hours = defaultdict(lambda: Z)
+        logged_hours = defaultdict(lambda: Z)
         # Logged vs. service cost
-        service_cost = Z
-        logged_cost = Z
+        service_cost = defaultdict(lambda: Z)
+        logged_cost = defaultdict(lambda: Z)
         # Project logbook vs. project service cost (hours and cost)
         total_service_cost = Z
         total_logged_cost = Z
@@ -218,7 +218,9 @@ class Project(Model):
 
         offers = self.offers.select_related("owned_by")
         offers_map = {offer.id: offer for offer in offers}
-        services_by_offer = defaultdict(list, {offer: [] for offer in offers})
+        services_by_offer = defaultdict(
+            lambda: {"services": []}, ((offer, {"services": []}) for offer in offers)
+        )
 
         logged_hours_per_service_and_user = defaultdict(dict)
         logged_hours_per_user = defaultdict(lambda: Z)
@@ -290,14 +292,18 @@ class Project(Model):
                 "not_archived_logged_hours"
             ] + row["not_archived_logged_cost"]
 
-            logged_hours += row["logged_hours"]
-            logged_cost += row["logged_cost"]
+            logged_hours[service.offer] += row["logged_hours"]
+            logged_cost[service.offer] += row["logged_cost"]
+            logged_hours[service.project] += row["logged_hours"]
+            logged_cost[service.project] += row["logged_cost"]
             total_logged_cost += row["logged_cost"]
             logged_hours_per_effort_rate[service.effort_rate] += row["logged_hours"]
 
             if not service.is_rejected:
-                service_hours += service.service_hours
-                service_cost += service.cost or Z
+                service_hours[service.offer] += service.service_hours
+                service_cost[service.offer] += service.cost or Z
+                service_hours[service.project] += service.service_hours
+                service_cost[service.project] += service.cost or Z
                 total_service_cost += service.service_cost
 
             if service.effort_rate is not None:
@@ -307,14 +313,20 @@ class Project(Model):
                 if not service.is_rejected:
                     total_service_hours_rate_undefined += service.service_hours
 
-            services_by_offer[offers_map.get(service.offer_id)].append(row)
+            services_by_offer[offers_map.get(service.offer_id)]["services"].append(row)
+
+        for offer, offer_data in services_by_offer.items():
+            offer_data["service_hours"] = service_hours[offer]
+            offer_data["logged_hours"] = logged_hours[offer]
+            offer_data["service_cost"] = service_cost[offer]
+            offer_data["logged_cost"] = logged_cost[offer]
 
         return {
             "offers": sorted(
                 (
                     item
                     for item in services_by_offer.items()
-                    if item[1] or item[0] is not None
+                    if item[1]["services"] or item[0] is not None
                 ),
                 key=lambda item: (
                     # Rejected offers are at the end
@@ -325,7 +337,7 @@ class Project(Model):
                     item[0]._code if item[0] else 1e100,
                 ),
             ),
-            "logged_hours": logged_hours,
+            "logged_hours": logged_hours[self],
             "logged_hours_per_user": sorted(
                 ((users[user], hours) for user, hours in logged_hours_per_user.items()),
                 key=lambda row: row[1],
@@ -340,9 +352,9 @@ class Project(Model):
                 key=lambda row: row[0] or Decimal("9999999"),
                 reverse=True,
             ),
-            "logged_cost": logged_cost,
-            "service_hours": service_hours,
-            "service_cost": service_cost,
+            "logged_cost": logged_cost[self],
+            "service_hours": service_hours[self],
+            "service_cost": service_cost[self],
             "total_service_cost": total_service_cost,
             "total_logged_cost": total_logged_cost,
             "total_service_hours_rate_undefined": total_service_hours_rate_undefined,

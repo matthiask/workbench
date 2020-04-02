@@ -119,7 +119,7 @@
         {% trans 'Delete' %}</a>
     </div>
 
-    {% for offer, services in project.grouped_services.offers %}
+    {% for offer, offer_data in project.grouped_services.offers %}
     <div class="card my-3 {% if offer and offer.is_rejected %}border border-danger opacity-60{% endif %}">
       <div class="card-header">
         {% if offer %}
@@ -170,6 +170,24 @@
 
           <p>{{ offer.description|linebreaksbr|urlize }}</p>
 
+          <small class="row justify-content-between">
+            <span class="col-md-4">
+                <a href="{% url 'logbook_loggedhours_list' %}?offer={{ offer.pk }}">
+                  {% trans 'Hours' %}:
+                  {{ offer_data.logged_hours|hours }} / {{ offer_data.service_hours|hours }}
+                </a>
+                {% bar offer_data.logged_hours offer_data.service_hours %}
+            </span>
+            <span class="col-md-4">
+              <a href="{% url 'logbook_loggedcost_list' %}?offer={{ offer.pk }}">
+                {% trans 'Cost' %}:
+                {{ offer_data.logged_cost|stringformat:'.2f' }} / {{ offer_data.service_cost|default:0|stringformat:'.2f' }}
+              </a>
+              {% bar offer_data.logged_cost offer_data.service_cost %}
+            </span>
+            <span class="col-md-4"></span>
+          </small>
+
         {% else %}
           <div class="d-flex w-100 justify-content-between">
             <h5 class="d-inline my-0">{% trans 'Not offered yet' %}</h5>
@@ -185,7 +203,7 @@
       </div>
 
       <div class="list-group list-group-flush" data-sortable-container>
-        {% for row in services %}
+        {% for row in offer_data.services %}
         <div class="list-group-item" {% if row.service.pk %}data-sortable-item="{{ row.service.pk }}"{% endif %}>
           {% if row.service.pk %}
             <div class="anchor-container"><a name="service{{ row.service.pk }}" class="anchor"></a></div>
