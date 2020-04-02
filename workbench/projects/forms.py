@@ -329,6 +329,32 @@ class ProjectAutocompleteForm(forms.Form):
     )
 
 
+@add_prefix("modal")
+class ProjectOrServiceAutocompleteForm(forms.Form):
+    project = forms.ModelChoiceField(
+        queryset=Project.objects.all(),
+        widget=Autocomplete(model=Project, params={"only_open": "on"}),
+        label="",
+        required=False,
+    )
+    service = forms.ModelChoiceField(
+        queryset=Service.objects.all(),
+        widget=Autocomplete(model=Service),
+        label="",
+        required=False,
+    )
+
+    def clean(self):
+        data = super().clean()
+        if data["project"]:
+            return data
+        elif data["service"]:
+            data["project"] = data["service"].project
+            return data
+        self.add_error("project", _("This field is required."))
+        return data
+
+
 class OffersRenumberForm(Form):
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("instance")

@@ -539,6 +539,23 @@ class LogbookTest(TestCase):
             fetch_redirect_response=False,
         )
 
+        service = factories.ServiceFactory.create(project=project)
+        response = self.client.post(
+            "/logbook/hours/create/",
+            {"modal-service": service.pk},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertRedirects(
+            response,
+            "{}?service={}".format(project.urls["createhours"], service.pk),
+            fetch_redirect_response=False,
+        )
+
+        response = self.client.post(
+            "/logbook/hours/create/", {}, HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertContains(response, "This field is required.")
+
     def test_cost_gte_third_party_costs(self):
         service = factories.ServiceFactory.create()
         project = service.project

@@ -177,4 +177,14 @@ urlpatterns = [
     url(r"^service/set-order/$", set_order, name="projects_service_set_order"),
     url(r"^(?P<pk>[0-9]+)/services/$", services, name="projects_project_services"),
     url(r"^projects/$", projects, name="projects_project_projects"),
+    url(
+        r"^service/autocomplete/$",
+        generic.AutocompleteView.as_view(
+            model=Service,
+            queryset=Service.objects.filter(
+                project__closed_on__isnull=True
+            ).select_related("project__owned_by"),
+        ),
+        name="projects_service_autocomplete",
+    ),
 ]

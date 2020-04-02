@@ -400,7 +400,7 @@ class Project(Model):
         return {"total": total, "hours_rate_undefined": hours_rate_undefined}
 
 
-class ServiceQuerySet(models.QuerySet):
+class ServiceQuerySet(SearchQuerySet):
     def choices(self):
         offers = defaultdict(list)
         for service in self.select_related("offer__project", "offer__owned_by"):
