@@ -274,6 +274,7 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
 
 class AutocompleteView(ToolsMixin, vanilla.ListView):
     filter = None
+    label_from_instance = str
 
     def get(self, request, *args, **kwargs):
         q = request.GET.get("q")
@@ -284,7 +285,7 @@ class AutocompleteView(ToolsMixin, vanilla.ListView):
         return JsonResponse(
             {
                 "results": [
-                    {"label": str(instance), "value": instance.pk}
+                    {"label": self.label_from_instance(instance), "value": instance.pk}
                     for instance in queryset[:50]
                 ]
                 if q

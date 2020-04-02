@@ -184,6 +184,9 @@ urlpatterns = [
             queryset=Service.objects.filter(
                 project__closed_on__isnull=True
             ).select_related("project__owned_by"),
+            label_from_instance=lambda service: "{} ({})".format(
+                service, service.project
+            ),
         ),
         name="projects_service_autocomplete",
     ),

@@ -326,15 +326,6 @@ class ProjectAutocompleteForm(forms.Form):
         queryset=Project.objects.all(),
         widget=Autocomplete(model=Project, params={"only_open": "on"}),
         label="",
-    )
-
-
-@add_prefix("modal")
-class ProjectOrServiceAutocompleteForm(forms.Form):
-    project = forms.ModelChoiceField(
-        queryset=Project.objects.all(),
-        widget=Autocomplete(model=Project, params={"only_open": "on"}),
-        label="",
         required=False,
     )
     service = forms.ModelChoiceField(

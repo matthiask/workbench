@@ -15,8 +15,14 @@ def select(request):
         return redirect("/")
     form = ProjectAutocompleteForm(request.POST if request.method == "POST" else None)
     if form.is_valid():
+        data = form.cleaned_data
         return JsonResponse(
-            {"redirect": form.cleaned_data["project"].get_absolute_url()}, status=299
+            {
+                "redirect": data["service"].get_absolute_url()
+                if data["service"]
+                else data["project"].get_absolute_url()
+            },
+            status=299,
         )
     return render(
         request,
