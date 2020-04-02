@@ -14,7 +14,6 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
-from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.timer.models import Timestamp
 from workbench.tools.forms import (
@@ -65,12 +64,7 @@ class LoggedHoursSearchForm(Form):
         widget=forms.HiddenInput,
         label="",
     )
-    offer = forms.ModelChoiceField(
-        queryset=Offer.objects.all(),
-        required=False,
-        widget=forms.HiddenInput,
-        label="",
-    )
+    offer = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
     circle = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
     role = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
     not_archived = forms.BooleanField(
@@ -104,7 +98,9 @@ class LoggedHoursSearchForm(Form):
         # "hidden" filters
         if data.get("service"):
             queryset = queryset.filter(service=data.get("service"))
-        if data.get("offer"):
+        if data.get("offer") == 0:
+            queryset = queryset.filter(service__offer__isnull=True)
+        elif data.get("offer"):
             queryset = queryset.filter(service__offer=data.get("offer"))
         if data.get("circle") == 0:
             queryset = queryset.filter(service__role__isnull=True)
@@ -158,13 +154,13 @@ class LoggedCostSearchForm(Form):
     date_until = forms.DateField(
         widget=DateInput, required=False, label=mark_safe("&ndash;&nbsp;")
     )
-    service = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
-    offer = forms.ModelChoiceField(
-        queryset=Offer.objects.all(),
+    service = forms.ModelChoiceField(
+        queryset=Service.objects.all(),
         required=False,
         widget=forms.HiddenInput,
         label="",
     )
+    offer = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
     not_archived = forms.BooleanField(
         required=False, widget=forms.HiddenInput, label=""
     )
@@ -196,11 +192,11 @@ class LoggedCostSearchForm(Form):
             queryset = queryset.filter(rendered_on__lte=data.get("date_until"))
 
         # "hidden" filters
-        if data.get("service") == 0:
-            queryset = queryset.filter(service=None)
-        elif data.get("service"):
+        if data.get("service"):
             queryset = queryset.filter(service=data.get("service"))
-        if data.get("offer"):
+        if data.get("offer") == 0:
+            queryset = queryset.filter(service__offer__isnull=True)
+        elif data.get("offer"):
             queryset = queryset.filter(service__offer=data.get("offer"))
         if data.get("not_archived"):
             queryset = queryset.filter(archived_at__isnull=True)

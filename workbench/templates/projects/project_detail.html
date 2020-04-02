@@ -170,24 +170,6 @@
 
           <p>{{ offer.description|linebreaksbr|urlize }}</p>
 
-          <small class="row justify-content-between">
-            <span class="col-md-4">
-                <a href="{% url 'logbook_loggedhours_list' %}?offer={{ offer.pk }}">
-                  {% trans 'Hours' %}:
-                  {{ offer_data.logged_hours|hours }} / {{ offer_data.service_hours|hours }}
-                </a>
-                {% bar offer_data.logged_hours offer_data.service_hours %}
-            </span>
-            <span class="col-md-4">
-              <a href="{% url 'logbook_loggedcost_list' %}?offer={{ offer.pk }}">
-                {% trans 'Cost' %}:
-                {{ offer_data.logged_cost|stringformat:'.2f' }} / {{ offer_data.service_cost|default:0|stringformat:'.2f' }}
-              </a>
-              {% bar offer_data.logged_cost offer_data.service_cost %}
-            </span>
-            <span class="col-md-4"></span>
-          </small>
-
         {% else %}
           <div class="d-flex w-100 justify-content-between">
             <h5 class="d-inline my-0">{% trans 'Not offered yet' %}</h5>
@@ -200,6 +182,25 @@
           </div>
 
         {% endif %}
+
+        <small class="row justify-content-between">
+          <span class="col-md-4">
+            <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}&amp;offer={{ offer.pk|default:0 }}">
+              {% trans 'Hours' %}:
+              {{ offer_data.logged_hours|hours }} / {{ offer_data.service_hours|hours }}
+            </a>
+            {% bar offer_data.logged_hours offer_data.service_hours %}
+          </span>
+          <span class="col-md-4">
+            <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;offer={{ offer.pk|default:0 }}">
+              {% trans 'Cost' %}:
+              {{ offer_data.logged_cost|stringformat:'.2f' }} / {{ offer_data.service_cost|default:0|stringformat:'.2f' }}
+            </a>
+            {% bar offer_data.logged_cost offer_data.service_cost %}
+          </span>
+          <span class="col-md-4"></span>
+        </small>
+
       </div>
 
       <div class="list-group list-group-flush" data-sortable-container>
@@ -272,7 +273,7 @@
               {% endif %}
             </span>
             <span class="col-md-4">
-              <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;service={{ row.service.pk|default:0 }}">
+              <a href="{% url 'logbook_loggedcost_list' %}?service={{ row.service.pk }}">
                 {{ row.logged_cost|stringformat:'.2f' }} / {{ row.service.cost|default:0|stringformat:'.2f' }}
               </a>
               {% if row.service.pk %}{% bar row.logged_cost row.service.cost %}{% endif %}

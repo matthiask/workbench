@@ -389,6 +389,7 @@ class LogbookTest(TestCase):
         code("date_until=2018-01-01")
         code("service=" + str(hours.service.pk))
         code("offer={}".format(factories.OfferFactory.create().pk))
+        code("offer=0")
         code("circle=0")
         code("circle=1")
         code("role=1")
@@ -412,9 +413,9 @@ class LogbookTest(TestCase):
         code("expenses=on")
         code("date_from=2018-01-01")
         code("date_until=2018-01-01")
-        code("service=0")
         code("service=" + str(service.pk))
         code("offer={}".format(factories.OfferFactory.create().pk))
+        code("offer=0")
         code("not_archived=1")
         code("export=xlsx")
 
