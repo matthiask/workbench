@@ -539,15 +539,16 @@ class LogbookTest(TestCase):
             fetch_redirect_response=False,
         )
 
-        service = factories.ServiceFactory.create(project=project)
+        service = factories.ServiceFactory.create()
         response = self.client.post(
             "/logbook/hours/create/",
-            {"modal-service": service.pk},
+            {"modal-project": project.pk, "modal-service": service.pk},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertRedirects(
             response,
-            "{}?service={}".format(project.urls["createhours"], service.pk),
+            # NOT project.urls["createhours"]
+            "{}?service={}".format(service.project.urls["createhours"], service.pk),
             fetch_redirect_response=False,
         )
 

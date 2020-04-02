@@ -346,10 +346,10 @@ class ProjectOrServiceAutocompleteForm(forms.Form):
 
     def clean(self):
         data = super().clean()
-        if data["project"]:
-            return data
-        elif data["service"]:
+        if data["service"]:
             data["project"] = data["service"].project
+            return data
+        elif data["project"]:
             return data
         self.add_error("project", _("This field is required."))
         return data
