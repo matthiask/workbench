@@ -55,7 +55,7 @@ class TimestampsTest(TestCase):
         t = Timestamp.objects.get()
         self.assertEqual(t.type, "start")
         self.assertEqual(t.notes, "blub")
-        self.assertIn(str(t), {"20.02.2020 04:00", "20.02.2020 05:00"})
+        self.assertIn("Start @", str(t))
 
         response = self.client.post(t.get_delete_url())
         self.assertRedirects(response, "/timestamps/")

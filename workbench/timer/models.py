@@ -135,7 +135,9 @@ class Timestamp(models.Model):
         verbose_name_plural = _("timestamps")
 
     def __str__(self):
-        return local_date_format(self.created_at)
+        return "{} @ {}".format(
+            self.get_type_display(), local_date_format(self.created_at)
+        )
 
     def __init__(self, *args, **kwargs):
         self.url = kwargs.pop("url", "")

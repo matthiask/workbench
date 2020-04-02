@@ -88,9 +88,8 @@ class TimestampForm(ModelForm):
 def create_timestamp(request):
     form = TimestampForm(request.POST, request=request)
     if not form.is_valid():
-        return JsonResponse({}, status=400)
-    form.save()
-    return JsonResponse({}, status=201)
+        return JsonResponse({"errors": form.errors.as_json()}, status=400)
+    return JsonResponse({"success": str(form.save())}, status=201)
 
 
 @require_POST
