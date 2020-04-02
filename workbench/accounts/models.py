@@ -11,7 +11,7 @@ from django.db.models import Count, Q, Sum
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from workbench.accounts.features import FEATURES
+from workbench.accounts.features import FEATURES, UserFeatures
 from workbench.tools.models import Model, Z
 from workbench.tools.validation import in_days, monday
 
@@ -254,27 +254,6 @@ select max(created_at) from sq
         if msg and request:
             messages.warning(request, msg)
         return msg
-
-
-class UserFeatures:
-    def __init__(self, *, email):
-        self.email = email
-
-    def __getattr__(self, key):
-        try:
-            setting = settings.FEATURES[key]
-        except KeyError:
-            from workbench.accounts.features import KNOWN_FEATURES, UnknownFeature
-
-            if key not in KNOWN_FEATURES:
-                raise UnknownFeature("Unknown feature: %r" % key)
-
-            return False
-        if setting is True or setting is False:
-            return setting
-        return self.email in setting
-
-    __getitem__ = __getattr__
 
 
 class Team(models.Model):

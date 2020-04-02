@@ -1,5 +1,6 @@
 from functools import wraps
 
+from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.utils.translation import gettext as _
@@ -40,3 +41,22 @@ KNOWN_FEATURES = {getattr(FEATURES, attr) for attr in dir(FEATURES) if attr.isup
 
 class UnknownFeature(Exception):
     pass
+
+
+class UserFeatures:
+    def __init__(self, *, email):
+        self.email = email
+
+    def __getattr__(self, key):
+        try:
+            setting = settings.FEATURES[key]
+        except KeyError:
+            if key not in KNOWN_FEATURES:
+                raise UnknownFeature("Unknown feature: %r" % key)
+
+            return False
+        if setting is True or setting is False:
+            return setting
+        return self.email in setting
+
+    __getitem__ = __getattr__
