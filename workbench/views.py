@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.contrib import messages
+from django.db import connections
 from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse
@@ -11,14 +12,102 @@ from workbench.audit.models import LoggedAction
 from workbench.contacts.models import Organization, Person
 from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice, RecurringInvoice
+from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.tools.history import HISTORY, changes
+from workbench.tools.validation import in_days
+
+
+def _acquisition(user):
+    rows = []
+    if user.features[FEATURES.DEALS]:
+        rows.append(
+            {
+                "type": "deals",
+                "verbose_name_plural": Deal._meta.verbose_name_plural,
+                "url": Deal.urls["list"],
+                "objects": Deal.objects.maybe_actionable(user=user),
+            }
+        )
+    if user.features[FEATURES.CONTROLLING]:
+        rows.append(
+            {
+                "type": "offers",
+                "verbose_name_plural": Offer._meta.verbose_name_plural,
+                "url": Offer.urls["list"],
+                "objects": Offer.objects.maybe_actionable(user=user),
+            }
+        )
+
+    return [row for row in rows if row["objects"]]
+
+
+def _all_users_hours():
+    return (
+        LoggedHours.objects.filter(rendered_on__gte=in_days(-7))
+        .select_related("service__project__owned_by", "rendered_by")
+        .order_by("-created_at")[:20]
+    )
+
+
+def _birthdays():
+    with connections["default"].cursor() as cursor:
+        cursor.execute(
+            """
+SELECT id, given_name, family_name, date_of_birth FROM (
+    SELECT
+        id,
+        given_name,
+        family_name,
+        date_of_birth,
+        (current_date - date_of_birth) % 365.24 AS diff
+    FROM contacts_person
+    WHERE date_of_birth is not null AND is_archived=FALSE
+) AS subquery
+WHERE diff < 7 or diff > 350
+ORDER BY (diff + 180) % 365 DESC
+            """
+        )
+        return [
+            {
+                "id": row[0],
+                "given_name": row[1],
+                "family_name": row[2],
+                "date_of_birth": row[3],
+            }
+            for row in cursor
+        ]
+
+
+def _in_preparation(user):
+    invoices = Invoice.objects.filter(
+        owned_by=user, status=Invoice.IN_PREPARATION
+    ).select_related("project", "owned_by")
+    offers = Offer.objects.filter(
+        owned_by=user, status=Offer.IN_PREPARATION
+    ).select_related("project", "owned_by")
+
+    return {
+        key: value
+        for key, value in [("invoices", invoices), ("offers", offers)]
+        if value
+    }
 
 
 def start(request):
     request.user.take_a_break_warning(request=request)
-    return render(request, "start.html")
+
+    return render(
+        request,
+        "start.html",
+        {
+            "acquisition": _acquisition(request.user),
+            "all_users_hours": _all_users_hours(),
+            "birthdays": _birthdays(),
+            "in_preparation": _in_preparation(request.user),
+        },
+    )
 
 
 def search(request):

@@ -172,14 +172,6 @@ class User(Model, AbstractBaseUser):
         )
 
     @cached_property
-    def all_users_hours(self):
-        return (
-            self.loggedhours.model.objects.filter(rendered_on__gte=in_days(-7))
-            .select_related("service__project__owned_by", "rendered_by")
-            .order_by("-created_at")[:20]
-        )
-
-    @cached_property
     def active_projects(self):
         from workbench.projects.models import Project
 
@@ -198,51 +190,6 @@ class User(Model, AbstractBaseUser):
                 )
             )
         ).select_related("customer", "contact__organization", "owned_by")
-
-    @cached_property
-    def in_preparation(self):
-        from workbench.invoices.models import Invoice
-        from workbench.offers.models import Offer
-
-        invoices = Invoice.objects.filter(
-            owned_by=self, status=Invoice.IN_PREPARATION
-        ).select_related("project", "owned_by")
-        offers = Offer.objects.filter(
-            owned_by=self, status=Offer.IN_PREPARATION
-        ).select_related("project", "owned_by")
-
-        return {
-            key: value
-            for key, value in [("invoices", invoices), ("offers", offers)]
-            if value
-        }
-
-    @cached_property
-    def acquisition(self):
-        from workbench.deals.models import Deal
-        from workbench.offers.models import Offer
-
-        rows = []
-        if self.features[FEATURES.DEALS]:
-            rows.append(
-                {
-                    "type": "deals",
-                    "verbose_name_plural": Deal._meta.verbose_name_plural,
-                    "url": Deal.urls["list"],
-                    "objects": Deal.objects.maybe_actionable(user=self),
-                }
-            )
-        if self.features[FEATURES.CONTROLLING]:
-            rows.append(
-                {
-                    "type": "offers",
-                    "verbose_name_plural": Offer._meta.verbose_name_plural,
-                    "url": Offer.urls["list"],
-                    "objects": Offer.objects.maybe_actionable(user=self),
-                }
-            )
-
-        return [row for row in rows if row["objects"]]
 
     @cached_property
     def signed_email(self):

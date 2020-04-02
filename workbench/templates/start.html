@@ -38,7 +38,7 @@
       {% endif %}
     </div>
 
-    {% if user.in_preparation %}
+    {% if in_preparation %}
     <div class="card mb-3">
       <div class="card-header"><h3 class="my-0">
         {% trans 'In preparation' %}
@@ -58,7 +58,7 @@
     </div>
     {% endif %}
 
-    {% if user.acquisition %}
+    {% if acquisition %}
     <div class="card mb-3">
       <div class="card-header">
         <h3 class="my-0">
@@ -67,7 +67,7 @@
         </h3>
       </div>
       <div class="card-body">
-        {% for row in user.acquisition %}
+        {% for row in acquisition %}
         <h4 {% if not forloop.first %}class="mt-4"{% endif %}>
           <a href="{{ row.url }}">{{ row.verbose_name_plural }}</a>
         </h4>
@@ -77,7 +77,6 @@
     </div>
     {% endif %}
 
-    {% birthdays as birthdays %}
     {% if birthdays %}
     <div class="card mb-3">
       <div class="card-header"><h3 class="my-0">{% trans "Birthdays" %}</h3></div>
@@ -131,9 +130,9 @@
         <a href="{% url 'logbook_loggedhours_list' %}">{% trans "all users' hours"|capfirst %}</a>
       </h3></div>
 
-      {% if user.all_users_hours %}
+      {% if all_users_hours %}
         <div class="list-group list-group-flush">
-          {% for hours in user.all_users_hours %}
+          {% for hours in all_users_hours %}
           <a class="list-group-item list-group-item-action" href="{{ hours.get_absolute_url }}" data-toggle="ajaxmodal">
             <small class="d-flex justify-content-between">
               <span>{{ hours.service.project_service_title }}</span>
