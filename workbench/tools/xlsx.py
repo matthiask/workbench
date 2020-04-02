@@ -37,10 +37,16 @@ class WorkbenchXLSXDocument(XLSXDocument):
 
         by_service_and_user = defaultdict(lambda: defaultdict(lambda: H1))
         by_user = defaultdict(lambda: H1)
+        by_service_and_month = defaultdict(lambda: defaultdict(lambda: H1))
+        by_month = defaultdict(lambda: H1)
 
         for h in queryset:
             by_service_and_user[h.service][h.rendered_by] += h.hours
             by_user[h.rendered_by] += h.hours
+
+            month = h.rendered_on.replace(day=1)
+            by_service_and_month[h.service][month] += h.hours
+            by_month[month] += h.hours
 
         self.add_sheet(_("By service and user"))
         users = sorted(
@@ -71,6 +77,39 @@ class WorkbenchXLSXDocument(XLSXDocument):
                 + [by_users.get(user) for user in users]
                 for service, by_users in sorted(
                     by_service_and_user.items(),
+                    key=lambda row: (row[0].project_id, row[0].position),
+                )
+            ],
+        )
+
+        self.add_sheet(_("By service and month"))
+        months = sorted(
+            set(
+                chain.from_iterable(
+                    months.keys() for months in by_service_and_month.values()
+                )
+            )
+        )
+        self.table(
+            [
+                capfirst(t)
+                for t in [_("project"), _("service"), _("hourly rate"), _("total")]
+            ]
+            + months,
+            [
+                [capfirst(_("total")), "", "", sum(by_month.values(), H1)]
+                + [by_month.get(month) for month in months]
+            ]
+            + [
+                [
+                    service.project,
+                    service,
+                    service.effort_rate,
+                    sum(by_month.values(), H1),
+                ]
+                + [by_months.get(month) for month in months]
+                for service, by_months in sorted(
+                    by_service_and_month.items(),
                     key=lambda row: (row[0].project_id, row[0].position),
                 )
             ],

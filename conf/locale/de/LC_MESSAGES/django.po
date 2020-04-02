@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-01 12:06+0200\n"
+"POT-Creation-Date: 2020-04-02 09:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3107,6 +3107,10 @@ msgstr "Formular war ungültig."
 #: workbench/tools/xlsx.py
 msgid "By service and user"
 msgstr "Nach Leistung und Benutzer"
+
+#: workbench/tools/xlsx.py
+msgid "By service and month"
+msgstr "Nach Leistung und Monat"
 
 #: workbench/tools/xlsx.py
 msgid "Logbook"
