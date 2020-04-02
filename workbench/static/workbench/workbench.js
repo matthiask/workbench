@@ -77,6 +77,7 @@ $(function () {
           dismissModals()
           window.location.reload()
         } else if (jqXHR.status === 299) {
+          dismissModals()
           window.location.href = data.redirect
         } else {
           initModal(data)
