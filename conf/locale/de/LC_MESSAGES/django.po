@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-03 08:11+0200\n"
+"POT-Creation-Date: 2020-04-03 11:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -347,8 +347,7 @@ msgstr "Wird nur für die Visualisierung der Abwesenheiten verwendet."
 #: workbench/invoices/models.py workbench/invoices/views.py
 #: workbench/logbook/forms.py workbench/logbook/models.py
 #: workbench/notes/models.py workbench/offers/models.py
-#: workbench/projects/models.py workbench/services/models.py
-#: workbench/templates/awt/absence_detail.html
+#: workbench/services/models.py workbench/templates/awt/absence_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -2009,6 +2008,18 @@ msgstr "Wartung"
 #: workbench/projects/models.py workbench/reporting/views.py
 msgid "Internal"
 msgstr "Intern"
+
+#: workbench/projects/models.py
+msgid "project description"
+msgstr "Projektbeschreibung"
+
+#: workbench/projects/models.py
+msgid ""
+"Do not use this for the offer description. You can add the offer description "
+"later."
+msgstr ""
+"Verwende dieses Feld nicht für die Offertenbeschreibung. Diese kannst Du "
+"später hinzufügen."
 
 #: workbench/projects/models.py
 msgid "Set this if you want all services to have the same hourly rate."
