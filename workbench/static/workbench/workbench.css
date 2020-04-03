@@ -118,6 +118,8 @@ tbody th > a {
 .form-help-text {
   display: block;
   margin: -10px 0 8px;
+  font-size: 85%;
+  font-color: #443;
 }
 
 .navbar-brand svg {
