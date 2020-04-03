@@ -59,6 +59,10 @@
     data-toggle="ajaxmodal">
     {% trans 'Update' %}
   </a>
+  <a href="{{ object.urls.move }}" class="btn btn-primary"
+    data-toggle="ajaxmodal">
+    {% trans 'Move' %}
+  </a>
   <a href="{{ object.service.project.urls.createhours }}?copy={{ object.pk }}" class="btn btn-primary mr-auto"
     data-toggle="ajaxmodal">
     {% trans 'Copy' %}

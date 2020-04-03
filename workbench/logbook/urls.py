@@ -1,13 +1,16 @@
 from django.conf.urls import url
 from django.shortcuts import redirect
+from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
 from workbench.logbook.forms import (
     BreakForm,
     BreakSearchForm,
     LoggedCostForm,
+    LoggedCostMoveForm,
     LoggedCostSearchForm,
     LoggedHoursForm,
+    LoggedHoursMoveForm,
     LoggedHoursSearchForm,
 )
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
@@ -42,6 +45,16 @@ urlpatterns = [
         name="logbook_loggedhours_update",
     ),
     url(
+        r"^hours/(?P<pk>\d+)/move/$",
+        generic.UpdateView.as_view(
+            model=LoggedHours,
+            form_class=LoggedHoursMoveForm,
+            template_name="modalform.html",
+            title=_("Move %(object)s"),
+        ),
+        name="logbook_loggedhours_move",
+    ),
+    url(
         r"^hours/(?P<pk>\d+)/delete/$",
         generic.DeleteView.as_view(
             model=LoggedHours, template_name="modal_confirm_delete.html"
@@ -72,6 +85,16 @@ urlpatterns = [
         r"^costs/(?P<pk>\d+)/update/$",
         generic.UpdateView.as_view(model=LoggedCost, form_class=LoggedCostForm),
         name="logbook_loggedcost_update",
+    ),
+    url(
+        r"^hours/(?P<pk>\d+)/move/$",
+        generic.UpdateView.as_view(
+            model=LoggedCost,
+            form_class=LoggedCostMoveForm,
+            template_name="modalform.html",
+            title=_("Move %(object)s"),
+        ),
+        name="logbook_loggedcost_move",
     ),
     url(
         r"^costs/(?P<pk>\d+)/delete/$",

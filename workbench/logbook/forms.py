@@ -3,6 +3,7 @@ from decimal import ROUND_UP, Decimal
 
 from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.html import mark_safe
@@ -592,3 +593,46 @@ class BreakForm(ModelForm):
             )
 
         return instance
+
+
+class LoggedMoveForm(ModelForm):
+    service = forms.ModelChoiceField(
+        queryset=Service.objects.logging().filter(project__closed_on__isnull=True),
+        widget=Autocomplete(model=Service),
+        label="",
+        required=False,
+        initial="",
+    )
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("initial", {}).setdefault("service", "")
+        super().__init__(*args, **kwargs)
+
+        if self.instance.archived_at:
+            self.move_forbidden = _("Cannot move archived logbook entries.")
+        elif self.instance.service.project.closed_on:
+            self.move_forbidden = _("Cannot move logbook entries of closed projects.")
+        else:
+            self.move_forbidden = False
+        if self.move_forbidden:
+            messages.error(self.request, self.move_forbidden)
+
+    def clean(self):
+        data = super().clean()
+        if self.move_forbidden:
+            self.add_error("__all__", self.move_forbidden)
+        return data
+
+
+@add_prefix("modal")
+class LoggedHoursMoveForm(LoggedMoveForm):
+    class Meta:
+        model = LoggedHours
+        fields = ["service"]
+
+
+@add_prefix("modal")
+class LoggedCostMoveForm(LoggedMoveForm):
+    class Meta:
+        model = LoggedCost
+        fields = ["service"]
