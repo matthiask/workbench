@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from django.contrib import messages
 from django.db import models
-from django.db.models import F, Q, Sum
+from django.db.models import F, Prefetch, Q, Sum
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -221,6 +221,7 @@ class Project(Model):
     @cached_property
     def grouped_services(self):
         # Avoid circular imports
+        from workbench.deals.models import Deal
         from workbench.logbook.models import LoggedHours, LoggedCost
 
         # Logged vs. service hours
@@ -235,7 +236,9 @@ class Project(Model):
         total_service_hours_rate_undefined = Z
         total_logged_hours_rate_undefined = Z
 
-        offers = self.offers.select_related("owned_by")
+        offers = self.offers.select_related("owned_by").prefetch_related(
+            Prefetch("deals", Deal.objects.select_related("owned_by"))
+        )
         offers_map = {offer.id: offer for offer in offers}
         services_by_offer = defaultdict(
             lambda: {"services": []}, ((offer, {"services": []}) for offer in offers)

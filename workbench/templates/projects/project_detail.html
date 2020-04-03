@@ -131,6 +131,11 @@
               {% history_link offer %}
               &nbsp;
               {{ offer.status_badge }}
+
+              {% for deal in offer.deals.all %}
+                {% if forloop.first %}({% trans 'Related deals' %}:{% endif %}
+                {% link_or_none deal %}{% if forloop.last %}){% else %},{% endif %}
+              {% endfor %}
             </div>
 
             {% if request.user|has_feature:FEATURES.CONTROLLING %}
