@@ -167,6 +167,17 @@ class OfferForm(PostalAddressSelectionForm):
                 code="status-change-but-already-closed",
             )
 
+        if data["status"] == Offer.DECLINED:
+            self.add_warning(
+                _(
+                    "You are setting the offer status to 'Declined'."
+                    " However, if you just want to change a few things"
+                    " and send the offer to the client again then you"
+                    " could just as well put the offer back into preparation."
+                ),
+                code="yes-please-decline",
+            )
+
         return data
 
     def save(self):

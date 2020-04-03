@@ -458,3 +458,39 @@ class OffersTest(TestCase):
 
         self.assertEqual(offer1._code, 4)
         self.assertEqual(offer2._code, 3)
+
+    def test_please_decline(self):
+        offer = factories.OfferFactory.create()
+        self.client.force_login(offer.owned_by)
+
+        response = self.client.post(
+            offer.urls["update"],
+            {
+                "title": "Stuff",
+                "owned_by": offer.owned_by_id,
+                "discount": "10",
+                "liable_to_vat": "1",
+                "postal_address": "Anything\nStreet\nCity",
+                "offered_on": dt.date.today().isoformat(),
+                "status": Offer.DECLINED,
+            },
+        )
+        self.assertContains(
+            response,
+            "However, if you just want to change a few things and send the offer",
+        )
+
+        response = self.client.post(
+            offer.urls["update"],
+            {
+                "title": "Stuff",
+                "owned_by": offer.owned_by_id,
+                "discount": "10",
+                "liable_to_vat": "1",
+                "postal_address": "Anything\nStreet\nCity",
+                "offered_on": dt.date.today().isoformat(),
+                "status": Offer.DECLINED,
+                WarningsForm.ignore_warnings_id: "yes-please-decline",
+            },
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
