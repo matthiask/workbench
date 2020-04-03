@@ -6,7 +6,7 @@ certifi==2019.11.28
 chardet==3.0.4
 coverage==5.0.4
 dj-database-url==0.5.0
-Django==3.0.4
+Django==3.0.5
 django-admin-ordering==0.12.0
 django-authlib==0.9.4
 django-bootstrap4==1.1.1
@@ -32,8 +32,8 @@ mccabe==0.6.1
 oauthlib==3.1.0
 openpyxl==3.0.3
 pdfdocument==3.3
-phonenumbers==8.12.0
-Pillow==7.0.0
+phonenumbers==8.12.1
+Pillow==7.1.1
 psycopg2-binary==2.8.4
 pycodestyle==2.5.0
 pyflakes==2.1.1
