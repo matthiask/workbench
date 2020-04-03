@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-03 14:52+0200\n"
+"POT-Creation-Date: 2020-04-03 15:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1684,6 +1684,14 @@ msgstr "Fremdkosten sollten nicht höher sein als die Kosten."
 msgid "Breaks have to be logged promptly."
 msgstr "Pausen müssen zeitnah erfasst werden."
 
+#: workbench/logbook/forms.py
+msgid "Cannot move archived logbook entries."
+msgstr "Kann archivierte Logbucheinträge nicht verschieben."
+
+#: workbench/logbook/forms.py
+msgid "Cannot move logbook entries of closed projects."
+msgstr "Kann Logbucheinträge von geschlossenen Projekten nicht verschieben."
+
 #: workbench/logbook/models.py
 msgid "rendered by"
 msgstr "Erbracht von"
@@ -1802,6 +1810,11 @@ msgstr "Die durchschnittliche Zeit bis zur Erfassung beträgt %.1f Tage."
 #: workbench/logbook/reporting.py
 msgid "Late"
 msgstr "Spät"
+
+#: workbench/logbook/urls.py
+#, python-format
+msgid "Move %(object)s"
+msgstr "%(object)s verschieben"
 
 #: workbench/logbook/views.py
 msgid "Select project for logging"
@@ -2611,6 +2624,11 @@ msgstr "Verrechnung"
 #, python-format
 msgid "Archived at %(archived_at)s"
 msgstr "Archiviert um %(archived_at)s"
+
+#: workbench/templates/logbook/loggedcost_detail.html
+#: workbench/templates/logbook/loggedhours_detail.html
+msgid "Move"
+msgstr "Verschieben"
 
 #: workbench/templates/logbook/loggedcost_form.html
 msgid "convert"
