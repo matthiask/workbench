@@ -157,12 +157,6 @@ class OffersTest(TestCase):
         self.assertEqual(offer.closed_on, dt.date.today())
         self.assertAlmostEqual(offer.subtotal, Decimal("2000"))
 
-        response = self.client.get(offer.urls["delete"])
-        self.assertRedirects(response, offer.get_absolute_url())
-        self.assertEqual(
-            messages(response), ["Offers in preparation may be deleted, others not."]
-        )
-
         response = self.client.get(service.urls["detail"])
         self.assertRedirects(
             response, "%s#service%s" % (offer.project.urls["detail"], service.pk)

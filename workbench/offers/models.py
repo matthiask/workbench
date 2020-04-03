@@ -201,15 +201,6 @@ class Offer(ModelWithTotal):
             return False
         return True
 
-    @classmethod
-    def allow_delete(cls, instance, request):
-        if instance.status > instance.IN_PREPARATION:
-            messages.error(
-                request, _("Offers in preparation may be deleted, others not.")
-            )
-            return False
-        return super().allow_delete(instance, request)
-
     @property
     def is_rejected(self):
         return self.status == self.REJECTED
