@@ -84,7 +84,7 @@ class DealsTest(TestCase):
         self.assertEqual(deal.closed_on, dt.date.today())
         self.assertEqual(
             deal.pretty_status,
-            "declined on {}".format(local_date_format(dt.date.today())),
+            "Declined on {}".format(local_date_format(dt.date.today())),
         )
 
         response = self.client.post(
@@ -209,7 +209,7 @@ class DealsTest(TestCase):
             factories.DealFactory.create(
                 status=Deal.ACCEPTED, closed_on=dt.date.today()
             ).pretty_status,
-            "accepted on 18.02.2020",
+            "Accepted on 18.02.2020",
         )
 
     def test_xlsx(self):
