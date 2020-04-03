@@ -19,6 +19,16 @@
   }
 }
 
+.w-third {
+  width: 33% !important;
+}
+
+@media screen and (max-width: 575px) {
+  .w-third {
+    width: 66% !important;
+  }
+}
+
 .container-fluid[role="main"] {
   padding-top: 1rem;
   padding-bottom: 5rem;
