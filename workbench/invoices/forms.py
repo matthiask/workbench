@@ -76,6 +76,13 @@ class InvoiceSearchForm(Form):
                 messages.warning(request, _("No invoices found."))
                 return HttpResponseRedirect("?error=1")
 
+            count = queryset.count()
+            if count > 250:
+                messages.error(
+                    request, _("%s invoices in selection, that's too many.") % count
+                )
+                return HttpResponseRedirect("?error=1")
+
             pdf, response = pdf_response(
                 "invoices",
                 as_attachment=request.GET.get("disposition") == "attachment",

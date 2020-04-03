@@ -554,6 +554,25 @@ class InvoicesTest(TestCase):
         code("owned_by=0")  # only inactive
         code("export=xlsx")
 
+    def test_too_many_invoices(self):
+        invoice = factories.InvoiceFactory.create()
+
+        for i in range(250):
+            factories.InvoiceFactory.create(
+                customer=invoice.customer,
+                contact=invoice.contact,
+                owned_by=invoice.owned_by,
+            )
+
+        self.client.force_login(invoice.owned_by)
+        response = self.client.get("/invoices/?export=pdf")
+        self.assertRedirects(
+            response, "/invoices/?error=1", fetch_redirect_response=False
+        )
+        self.assertEqual(
+            messages(response), ["251 invoices in selection, that's too many."]
+        )
+
     def test_list_pdfs(self):
         user = factories.UserFactory.create()
         self.client.force_login(user)
