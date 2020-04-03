@@ -275,7 +275,7 @@ def notes(context, instance):
 def analyze(object_list):
     pks = [object.pk for object in object_list]
 
-    if object_list.model == Project:
+    if object_list.model == Project:  # pragma: no branch (for now)
         service_hours = {
             row["project"]: row["service_hours__sum"]
             for row in Service.objects.filter(project__in=pks)

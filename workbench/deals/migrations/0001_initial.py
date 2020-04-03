@@ -134,7 +134,7 @@ class Migration(migrations.Migration):
                 (
                     "status",
                     models.PositiveIntegerField(
-                        choices=[(10, "open"), (20, "accepted"), (30, "declined")],
+                        choices=[(10, "Open"), (20, "Accepted"), (30, "Declined")],
                         default=10,
                         verbose_name="status",
                     ),

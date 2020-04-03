@@ -612,3 +612,46 @@ class LogbookTest(TestCase):
     @freeze_time("2020-01-02")
     def test_logbook_lock_first_of_year(self):
         self.assertEqual(logbook_lock(), dt.date(2020, 1, 1))
+
+    def test_move_logbook_entry(self):
+        service = factories.ServiceFactory.create()
+
+        self.client.force_login(service.project.owned_by)
+
+        hours = factories.LoggedHoursFactory.create(archived_at=timezone.now())
+        response = self.client.get(
+            hours.urls["move"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertContains(response, "Cannot move archived logbook entries.")
+
+        hours = factories.LoggedHoursFactory.create()
+        hours.service.project.closed_on = dt.date.today()
+        hours.service.project.save()
+
+        response = self.client.get(
+            hours.urls["move"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertContains(response, "Cannot move logbook entries of closed projects.")
+
+        response = self.client.post(
+            hours.urls["move"],
+            {"modal-service": service.pk},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        # Once as django.contrib.messages message, once as validation error
+        self.assertContains(
+            response, "Cannot move logbook entries of closed projects.", 2
+        )
+
+        hours.service.project.closed_on = None
+        hours.service.project.save()
+
+        response = self.client.post(
+            hours.urls["move"],
+            {"modal-service": service.pk},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
+
+        hours.refresh_from_db()
+        self.assertEqual(hours.service, service)
