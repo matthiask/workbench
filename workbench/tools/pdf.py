@@ -56,6 +56,9 @@ class PDFDocument(_PDFDocument):
             fontSize=self.style.fontSize,
             firstLineIndent=0,
         )
+        self.style.normalWithExtraLeading = style(
+            self.style.normal, leading=1.75 * self.style.fontSize,
+        )
         self.style.heading1 = style(
             self.style.normal,
             fontName="Rep-Bold",
@@ -257,25 +260,28 @@ class PDFDocument(_PDFDocument):
                 "",
             ),
             (
-                ", ".join(
-                    filter(
-                        None,
-                        [
-                            (
-                                "%s %s à %s/h"
-                                % (
-                                    hours(service.effort_hours),
-                                    service.effort_type,
-                                    currency(service.effort_rate),
+                MarkupParagraph(
+                    ", ".join(
+                        filter(
+                            None,
+                            [
+                                (
+                                    "%s %s à %s/h"
+                                    % (
+                                        hours(service.effort_hours),
+                                        service.effort_type,
+                                        currency(service.effort_rate),
+                                    )
                                 )
-                            )
-                            if service.effort_hours and service.effort_rate
-                            else "",
-                            ("%s %s" % (currency(service.cost), _("fixed costs")))
-                            if service.cost
-                            else "",
-                        ],
-                    )
+                                if service.effort_hours and service.effort_rate
+                                else "",
+                                ("%s %s" % (currency(service.cost), _("fixed costs")))
+                                if service.cost
+                                else "",
+                            ],
+                        )
+                    ),
+                    self.style.normalWithExtraLeading,
                 ),
                 MarkupParagraph(
                     "<i>%s</i>" % currency(service.service_cost.quantize(Z)),
@@ -285,7 +291,6 @@ class PDFDocument(_PDFDocument):
                 else "",
                 "" if is_optional else currency(service.service_cost.quantize(Z)),
             ),
-            ("", "", ""),
         ]
 
     def table_services(self, services, *, show_details=False):
@@ -349,7 +354,7 @@ class PDFDocument(_PDFDocument):
         if instance.description:
             self.spacer(5 * mm)
             self.p(instance.description)
-        self.spacer()
+        self.spacer(2 * mm)
         if getattr(instance, "service_period", None):
             self.p("%s: %s" % (_("Service period"), instance.service_period))
             self.spacer()
@@ -358,7 +363,7 @@ class PDFDocument(_PDFDocument):
             show_details=getattr(instance, "show_service_details", False),
         )
         self.table_total(instance)
-        self.spacer()
+        self.spacer(2 * mm)
         self.p(footer)
 
     def process_offer(self, offer):
