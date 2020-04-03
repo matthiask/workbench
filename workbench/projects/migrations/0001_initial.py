@@ -124,7 +124,11 @@ class Migration(migrations.Migration):
                 ("title", models.CharField(max_length=200, verbose_name="title")),
                 (
                     "description",
-                    models.TextField(blank=True, verbose_name="description"),
+                    models.TextField(
+                        blank=True,
+                        verbose_name="project description",
+                        help_text="Do not use this for the offer description. You can add the offer description later.",
+                    ),
                 ),
                 (
                     "status",

@@ -113,9 +113,7 @@ class OfferForm(PostalAddressSelectionForm):
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project", None)
         if self.project:  # Creating a new offer
-            kwargs.setdefault("initial", {}).update(
-                {"title": self.project.title, "description": self.project.description}
-            )
+            kwargs.setdefault("initial", {}).update({"title": self.project.title})
         else:
             self.project = kwargs["instance"].project
 

@@ -106,7 +106,14 @@ class Project(Model):
     )
 
     title = models.CharField(_("title"), max_length=200)
-    description = models.TextField(_("description"), blank=True)
+    description = models.TextField(
+        _("project description"),
+        blank=True,
+        help_text=_(
+            "Do not use this for the offer description."
+            " You can add the offer description later."
+        ),
+    )
     owned_by = models.ForeignKey(
         User, on_delete=models.PROTECT, verbose_name=_("responsible")
     )
