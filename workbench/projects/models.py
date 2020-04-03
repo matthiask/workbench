@@ -53,6 +53,18 @@ class ProjectQuerySet(SearchQuerySet):
 
         return self.filter(id__in=Offer.objects.accepted().values("project"))
 
+    def solely_declined_offers(self):
+        from workbench.offers.models import Offer
+
+        return self.filter(
+            Q(id__in=Offer.objects.values("project"))
+            & ~Q(
+                id__in=Offer.objects.filter(
+                    status__in=(Offer.IN_PREPARATION, Offer.OFFERED, Offer.ACCEPTED)
+                ).values("project")
+            )
+        )
+
     def old_projects(self):
         from workbench.logbook.models import LoggedHours
 

@@ -268,6 +268,7 @@ class ProjectsTest(TestCase):
         code("s=no-invoices")
         code("s=accepted-offers")
         code("s=accepted-offers-no-invoices")
+        code("s=solely-declined-offers")
         code("s=old-projects")
         code("s=invalid-customer-contact-combination")
         code("org={}".format(project.customer_id))
