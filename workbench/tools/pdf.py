@@ -48,7 +48,7 @@ class PDFDocument(_PDFDocument):
     def generate_style(self, *args, **kwargs):
         self.style = Empty()
         self.style.fontName = "Rep"
-        self.style.fontSize = 8
+        self.style.fontSize = 8.5
 
         self.style.normal = style(
             getSampleStyleSheet()["Normal"],
