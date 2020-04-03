@@ -8,7 +8,7 @@
     <h5 class="mb-1">
       {{ note.created_by }} at {{ note.created_at|local_date_format }}
     </h5>
-    <a href="{{ note.urls.update }}" class="btn btn-primary btn-sm" data-toggle="ajaxmodal">
+    <a href="{{ note.urls.update }}" class="btn btn-primary btn-sm align-self-start" data-toggle="ajaxmodal">
       {% trans 'Update' %}
     </a>
   </div>
@@ -23,7 +23,7 @@
   <div class="card-header d-flex justify-content-between align-items-center">
     <h5 class="mb-1">{% trans 'Add note' %}</h5>
 
-    <button type="button" class="btn btn-primary btn-sm" data-target="#note-add-form" data-toggle="collapse" aria-expanded="false">
+    <button type="button" class="btn btn-primary btn-sm align-self-start" data-target="#note-add-form" data-toggle="collapse" aria-expanded="false">
       {% trans 'Toggle form' %}
     </button>
   </div>
