@@ -4,7 +4,7 @@ from decimal import Decimal as D
 from itertools import chain
 
 from django.conf import settings
-from django.utils.text import capfirst
+from django.utils.text import Truncator, capfirst
 from django.utils.translation import activate, gettext as _
 
 from pdfdocument.document import (
@@ -317,7 +317,7 @@ class PDFDocument(_PDFDocument):
                             "%s: %s (%s)"
                             % (
                                 _("Down payment"),
-                                invoice,
+                                Truncator(invoice).chars(60),
                                 invoice.invoiced_on.strftime("%d.%m.%Y")
                                 if invoice.invoiced_on
                                 else _("NO DATE YET"),
