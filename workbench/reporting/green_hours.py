@@ -32,7 +32,7 @@ FROM logged
 LEFT JOIN service ON logged.project_id=service.project_id
 WHERE service.hours / logged.hours < 1;
             """,
-            [Offer.REJECTED],
+            [Offer.DECLINED],
         )
         green_hours_factor = defaultdict(lambda: ONE, cursor)
 
@@ -105,7 +105,7 @@ service AS (
   SELECT ps.project_id, SUM(service_hours) AS hours
   FROM projects_service ps
   LEFT OUTER JOIN offers_offer o ON ps.offer_id=o.id
-  WHERE ps.offer_id IS NULL OR o.status!=40 -- Rejected
+  WHERE ps.offer_id IS NULL OR o.status!=40 -- Declined
   GROUP BY ps.project_id
 ),
 logged AS (

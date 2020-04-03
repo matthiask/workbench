@@ -321,7 +321,7 @@ class Project(Model):
             total_logged_cost += row["logged_cost"]
             logged_hours_per_effort_rate[service.effort_rate] += row["logged_hours"]
 
-            if not service.is_rejected:
+            if not service.is_declined:
                 service_hours[service.offer] += service.service_hours
                 service_cost[service.offer] += service.cost or Z
                 service_hours[service.project] += service.service_hours
@@ -332,7 +332,7 @@ class Project(Model):
                 total_logged_cost += service.effort_rate * row["logged_hours"]
             else:
                 total_logged_hours_rate_undefined += row["logged_hours"]
-                if not service.is_rejected:
+                if not service.is_declined:
                     total_service_hours_rate_undefined += service.service_hours
 
             services_by_offer[offers_map.get(service.offer_id)]["services"].append(row)
@@ -351,9 +351,9 @@ class Project(Model):
                     if item[1]["services"] or item[0] is not None
                 ),
                 key=lambda item: (
-                    # Rejected offers are at the end
-                    item[0].is_rejected if item[0] else False,
-                    # None is between rejected offers and other offers
+                    # Declined offers are at the end
+                    item[0].is_declined if item[0] else False,
+                    # None is between declined offers and other offers
                     item[0] is None,
                     # Else order by code
                     item[0]._code if item[0] else 1e100,
@@ -382,7 +382,7 @@ class Project(Model):
             "total_service_hours_rate_undefined": total_service_hours_rate_undefined,
             "total_logged_hours_rate_undefined": total_logged_hours_rate_undefined,
             "total_discount": sum(
-                (offer.discount for offer in offers if not offer.is_rejected), Z
+                (offer.discount for offer in offers if not offer.is_declined), Z
             ),
         }
 
@@ -441,7 +441,7 @@ class ServiceQuerySet(SearchQuerySet):
     def budgeted(self):
         from workbench.offers.models import Offer
 
-        return self.filter(Q(offer__isnull=True) | ~Q(offer__status=Offer.REJECTED))
+        return self.filter(Q(offer__isnull=True) | ~Q(offer__status=Offer.DECLINED))
 
     def logging(self):
         return self.budgeted().filter(allow_logging=True)
@@ -521,5 +521,5 @@ class Service(ServiceBase):
             return instance.get_absolute_url() if instance else "projects_project_list"
 
     @property
-    def is_rejected(self):
-        return self.offer.is_rejected if self.offer else False
+    def is_declined(self):
+        return self.offer.is_declined if self.offer else False

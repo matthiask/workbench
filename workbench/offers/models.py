@@ -46,13 +46,13 @@ class Offer(ModelWithTotal):
     IN_PREPARATION = 10
     OFFERED = 20
     ACCEPTED = 30
-    REJECTED = 40
+    DECLINED = 40
 
     STATUS_CHOICES = (
         (IN_PREPARATION, _("In preparation")),
         (OFFERED, _("Offered")),
         (ACCEPTED, _("Accepted")),
-        (REJECTED, _("Rejected")),
+        (DECLINED, _("Declined")),
     )
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
@@ -142,7 +142,7 @@ class Offer(ModelWithTotal):
     def clean(self):
         super().clean()
 
-        if self.status in (self.OFFERED, self.ACCEPTED, self.REJECTED):
+        if self.status in (self.OFFERED, self.ACCEPTED, self.DECLINED):
             if not self.offered_on:
                 raise ValidationError(
                     {"status": _("Offered on date missing for selected state.")}
@@ -163,7 +163,7 @@ class Offer(ModelWithTotal):
             return _("Offered on %(offered_on)s") % {
                 "offered_on": local_date_format(self.offered_on)
             }
-        elif self.status in (self.ACCEPTED, self.REJECTED):
+        elif self.status in (self.ACCEPTED, self.DECLINED):
             return _("%(status)s on %(closed_on)s") % {
                 "status": self.get_status_display(),
                 "closed_on": local_date_format(self.closed_on),
@@ -176,7 +176,7 @@ class Offer(ModelWithTotal):
             self.IN_PREPARATION: "info",
             self.OFFERED: "success",
             self.ACCEPTED: "default",
-            self.REJECTED: "danger",
+            self.DECLINED: "danger",
         }[self.status]
 
         return format_html(
@@ -202,8 +202,8 @@ class Offer(ModelWithTotal):
         return True
 
     @property
-    def is_rejected(self):
-        return self.status == self.REJECTED
+    def is_declined(self):
+        return self.status == self.DECLINED
 
     def copy_to(self, *, project, owned_by):
         offer = Offer.objects.create(

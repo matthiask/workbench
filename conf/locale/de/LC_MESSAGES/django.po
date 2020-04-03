@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-03 15:15+0200\n"
+"POT-Creation-Date: 2020-04-03 15:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -821,8 +821,9 @@ msgstr "Zahlungseingänge zuweisen"
 msgid "deals"
 msgstr "Geschäfte"
 
-#: workbench/deals/forms.py workbench/invoices/forms.py
-#: workbench/offers/forms.py workbench/projects/forms.py
+#: workbench/deals/forms.py workbench/deals/models.py
+#: workbench/invoices/forms.py workbench/offers/forms.py
+#: workbench/projects/forms.py
 msgid "Open"
 msgstr "Offen"
 
@@ -881,7 +882,7 @@ msgid "Accept offers"
 msgstr "Offerten akzeptieren"
 
 #: workbench/deals/forms.py
-msgid "Reject offers"
+msgid "Decline offers"
 msgstr "Offerten ablehnen"
 
 #: workbench/deals/forms.py
@@ -920,17 +921,13 @@ msgstr "Abschlusstyp"
 msgid "closing types"
 msgstr "Abschlusstypen"
 
-#: workbench/deals/models.py workbench/templates/deals/deal_detail.html
-msgid "open"
-msgstr "offen"
+#: workbench/deals/models.py workbench/offers/models.py
+msgid "Accepted"
+msgstr "Akzeptiert"
 
-#: workbench/deals/models.py workbench/templates/deals/deal_detail.html
-msgid "accepted"
-msgstr "akzeptiert"
-
-#: workbench/deals/models.py workbench/templates/deals/deal_detail.html
-msgid "declined"
-msgstr "abgelehnt"
+#: workbench/deals/models.py workbench/offers/models.py
+msgid "Declined"
+msgstr "Abgelehnt"
 
 #: workbench/deals/models.py
 msgid "unknown"
@@ -1885,14 +1882,6 @@ msgstr "Offertleistungen löschen?"
 msgid "Offered"
 msgstr "Offeriert"
 
-#: workbench/offers/models.py
-msgid "Accepted"
-msgstr "Akzeptiert"
-
-#: workbench/offers/models.py
-msgid "Rejected"
-msgstr "Abgelehnt"
-
 #: workbench/offers/models.py workbench/tools/pdf.py
 msgid "offered on"
 msgstr "offeriert am"
@@ -1920,10 +1909,6 @@ msgid ""
 msgstr ""
 "Offerten können nur aus Projekten erstellt werden. Gehe zuerst zum Projekt, "
 "füge Leistungen hinzu, und dann kannst Du die eigentliche Offerte erstellen."
-
-#: workbench/offers/models.py
-msgid "Offers in preparation may be deleted, others not."
-msgstr "Offerten in Vorbereitung können gelöscht werden, andere nicht."
 
 #: workbench/offers/views.py
 msgid "No offers in project."
@@ -2492,6 +2477,18 @@ msgstr "Sichern"
 #: workbench/templates/offers/offer_pricing.html
 msgid "cancel"
 msgstr "Abbruch"
+
+#: workbench/templates/deals/deal_detail.html
+msgid "open"
+msgstr "offen"
+
+#: workbench/templates/deals/deal_detail.html
+msgid "accepted"
+msgstr "akzeptiert"
+
+#: workbench/templates/deals/deal_detail.html
+msgid "declined"
+msgstr "abgelehnt"
 
 #: workbench/templates/deals/deal_detail.html
 msgid "Unlink offer"
@@ -3183,3 +3180,6 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Offers in preparation may be deleted, others not."
+#~ msgstr "Offerten in Vorbereitung können gelöscht werden, andere nicht."

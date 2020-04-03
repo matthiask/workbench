@@ -286,7 +286,7 @@ class SetStatusForm(ModelForm):
                 queryset=related_offers,
                 label=_("Accept offers")
                 if instance.status == Deal.ACCEPTED
-                else _("Reject offers"),
+                else _("Decline offers"),
                 required=False,
                 widget=forms.CheckboxSelectMultiple,
                 initial=[
@@ -326,7 +326,7 @@ class SetStatusForm(ModelForm):
                 offer.status = (
                     offer.ACCEPTED
                     if instance.status == Deal.ACCEPTED
-                    else offer.REJECTED
+                    else offer.DECLINED
                 )
                 offer.full_clean()
                 offer.save()

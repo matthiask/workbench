@@ -84,9 +84,9 @@ class Deal(Model):
     DECLINED = 30
 
     STATUS_CHOICES = (
-        (OPEN, _("open")),
-        (ACCEPTED, _("accepted")),
-        (DECLINED, _("declined")),
+        (OPEN, _("Open")),
+        (ACCEPTED, _("Accepted")),
+        (DECLINED, _("Declined")),
     )
 
     UNKNOWN = 10
