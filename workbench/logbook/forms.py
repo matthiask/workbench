@@ -600,7 +600,6 @@ class LoggedMoveForm(ModelForm):
         queryset=Service.objects.logging().filter(project__closed_on__isnull=True),
         widget=Autocomplete(model=Service),
         label="",
-        required=False,
         initial="",
     )
 
