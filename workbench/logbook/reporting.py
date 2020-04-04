@@ -125,17 +125,31 @@ def logbook_stats(date_range):
     lhs = logged_hours_stats(date_range)
     ib = insufficient_breaks(date_range)
 
-    users = User.objects.filter(id__in=mld.keys() | lhs.keys())
-
-    return [
+    users = [
         {
             "user": user,
             "mean_logging_delay": mld[user.id],
             "logged_hours_stats": lhs[user.id],
             "insufficient_breaks": ib[user.id],
         }
-        for user in users
+        for user in User.objects.filter(id__in=mld.keys() | lhs.keys())
     ]
+
+    lhs_count = sum((user["logged_hours_stats"]["count"] for user in users), 0)
+    lhs_sum = sum((user["logged_hours_stats"]["sum"] for user in users), 0)
+
+    return {
+        "users": users,
+        "logged_hours_stats": {
+            "count": lhs_count,
+            "sum": lhs_sum,
+            "avg": lhs_sum / lhs_count,
+        },
+        "insufficient_breaks": {
+            "days": sum((user["insufficient_breaks"]["days"] for user in users), 0),
+            "of": sum((user["insufficient_breaks"]["of"] for user in users), 0),
+        },
+    }
 
 
 def test():  # pragma: no cover

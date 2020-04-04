@@ -23,9 +23,9 @@ class ReportingTest(TestCase):
 
         stats = logbook_stats([dt.date.today(), dt.date.today()])
 
-        self.assertEqual(len(stats), 2)
+        self.assertEqual(len(stats["users"]), 2)
         self.assertEqual(
-            stats[0]["logged_hours_stats"],
+            stats["users"][0]["logged_hours_stats"],
             {"avg": Decimal("1"), "count": 1, "sum": Decimal("1.0")},
         )
 

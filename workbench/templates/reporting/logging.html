@@ -25,23 +25,35 @@
       </tr>
     </thead>
     <tbody>
-    {% for row in logbook_stats %}
+      {% for row in logbook_stats.users %}
+        <tr>
+          <td>{{ row.user }}</td>
+          <td>
+            <span class="badge badge-{{ row.mean_logging_delay.classification.1 }}"
+                  title="{{ row.mean_logging_delay.classification.2 }}">
+              {{ row.mean_logging_delay.classification.0 }}
+            </span>
+          </td>
+          <td class="text-right">{{ row.logged_hours_stats.count }}</td>
+          <td class="text-right">{{ row.logged_hours_stats.sum|hours }}</td>
+          <td class="text-right">{{ row.logged_hours_stats.avg|stringformat:'.2f' }}h</td>
+          <td class="text-right">
+            {{ row.insufficient_breaks.days }} / {{ row.insufficient_breaks.of }}
+            {% pie row.insufficient_breaks.days row.insufficient_breaks.of %}
+          </td>
+        </tr>
+      {% endfor %}
       <tr>
-        <td>{{ row.user }}</td>
-        <td>
-          <span class="badge badge-{{ row.mean_logging_delay.classification.1 }}"
-                title="{{ row.mean_logging_delay.classification.2 }}">
-            {{ row.mean_logging_delay.classification.0 }}
-          </span>
-        </td>
-        <td class="text-right">{{ row.logged_hours_stats.count }}</td>
-        <td class="text-right">{{ row.logged_hours_stats.sum|hours }}</td>
-        <td class="text-right">{{ row.logged_hours_stats.avg|stringformat:'.2f' }}h</td>
-        <td class="text-right">
-          {{ row.insufficient_breaks.days }} / {{ row.insufficient_breaks.of }}
-          {% pie row.insufficient_breaks.days row.insufficient_breaks.of %}
-        </td>
-    {% endfor %}
+        <th>{% trans 'total'|capfirst %}</th>
+        <th></th>
+        <th class="text-right">{{ logbook_stats.logged_hours_stats.count }}</th>
+        <th class="text-right">{{ logbook_stats.logged_hours_stats.sum|hours }}</th>
+        <th class="text-right">{{ logbook_stats.logged_hours_stats.avg|stringformat:'.2f' }}h</th>
+        <th class="text-right">
+          {{ logbook_stats.insufficient_breaks.days }} / {{ logbook_stats.insufficient_breaks.of }}
+          {% pie logbook_stats.insufficient_breaks.days logbook_stats.insufficient_breaks.of %}
+        </th>
+      </tr>
     </tbody>
   </table>
 
