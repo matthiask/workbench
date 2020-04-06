@@ -22,7 +22,7 @@
 
 $spacer: 0.5rem;
 
-$font-size-base: 0.875rem;
+$font-size-base: 0.93755rem;
 $h1-font-size: $font-size-base * 2.1;
 $h2-font-size: $font-size-base * 1.8;
 $h3-font-size: $font-size-base * 1.6;
@@ -207,4 +207,8 @@ $alert-border-width: 0 !default;
 
 .btn {
   fill: currentColor;
+}
+
+h3, h4, h5, h6, .h3, .h4, .h5, .h6, .badge {
+  letter-spacing: 0.0125em;
 }
