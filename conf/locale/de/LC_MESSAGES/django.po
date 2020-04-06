@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-03 15:34+0200\n"
+"POT-Creation-Date: 2020-04-06 10:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -758,6 +758,7 @@ msgstr "Valuta"
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
+#: workbench/templates/reporting/logging.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
 #: workbench/tools/pdf.py workbench/tools/xlsx.py
 msgid "total"
@@ -1876,8 +1877,8 @@ msgid ""
 "just as well put the offer back into preparation."
 msgstr ""
 "Du hast den Offertenstatus auf 'Abgelehnt' gesetzt. Wenn Du nur einige Dinge "
-"anpassen willst und die Offerte nochmals der Kundschaft senden willst, kannst "
-"Du die Offerte auch einfach zurück auf 'In Vorbereitung' setzen."
+"anpassen willst und die Offerte nochmals der Kundschaft senden willst, "
+"kannst Du die Offerte auch einfach zurück auf 'In Vorbereitung' setzen."
 
 #: workbench/offers/forms.py
 msgid "Select a different project as target."
@@ -2047,6 +2048,15 @@ msgstr "Kostenstelle"
 #: workbench/projects/models.py
 msgid "Leave this empty if you do not want to close the project yet."
 msgstr "Bitte leer lassen, falls Du das Projekt noch nicht schliessen willst."
+
+#: workbench/projects/models.py
+#, python-format
+msgid ""
+"All offers of project %(project)s are declined. You might want to close the "
+"project now?"
+msgstr ""
+"Alle Offerten des Projektes %(project)s sind abgelehnt. Vielleicht möchtest "
+"Du das Projekt jetzt schliessen?"
 
 #: workbench/projects/models.py
 msgid "allow logging"
