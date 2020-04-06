@@ -1,21 +1,39 @@
 @font-face {
   font-family: "Source Sans Pro";
-  src: url("./workbench/static/workbench/fonts/SourceSansPro-Bold.otf") format("opentype"), /* Open Type Font */
-    url("./workbench/static/workbench/fonts/SourceSansPro-Bold.svg") format("svg"), /* Legacy iOS */
-    url("./workbench/static/workbench/fonts/SourceSansPro-Bold.ttf") format("truetype"), /* Safari, Android, iOS */
-    url("./workbench/static/workbench/fonts/SourceSansPro-Bold.woff") format("woff"), /* Modern Browsers */
-    url("./workbench/static/workbench/fonts/SourceSansPro-Bold.woff2") format("woff2"); /* Modern Browsers */
+  src: url("./workbench/static/workbench/lib/fonts/SourceSansPro-Bold.otf")
+      format("opentype"),
+    /* Open Type Font */
+      url("./workbench/static/workbench/lib/fonts/SourceSansPro-Bold.svg")
+      format("svg"),
+    /* Legacy iOS */
+      url("./workbench/static/workbench/lib/fonts/SourceSansPro-Bold.ttf")
+      format("truetype"),
+    /* Safari, Android, iOS */
+      url("./workbench/static/workbench/lib/fonts/SourceSansPro-Bold.woff")
+      format("woff"),
+    /* Modern Browsers */
+      url("./workbench/static/workbench/lib/fonts/SourceSansPro-Bold.woff2")
+      format("woff2"); /* Modern Browsers */
   font-weight: bold;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Source Sans Pro";
-  src: url("./workbench/static/workbench/fonts/SourceSansPro-Regular.otf") format("opentype"), /* Open Type Font */
-    url("./workbench/static/workbench/fonts/SourceSansPro-Regular.svg") format("svg"), /* Legacy iOS */
-    url("./workbench/static/workbench/fonts/SourceSansPro-Regular.ttf") format("truetype"), /* Safari, Android, iOS */
-    url("./workbench/static/workbench/fonts/SourceSansPro-Regular.woff") format("woff"), /* Modern Browsers */
-    url("./workbench/static/workbench/fonts/SourceSansPro-Regular.woff2") format("woff2"); /* Modern Browsers */
+  src: url("./workbench/static/workbench/lib/fonts/SourceSansPro-Regular.otf")
+      format("opentype"),
+    /* Open Type Font */
+      url("./workbench/static/workbench/lib/fonts/SourceSansPro-Regular.svg")
+      format("svg"),
+    /* Legacy iOS */
+      url("./workbench/static/workbench/lib/fonts/SourceSansPro-Regular.ttf")
+      format("truetype"),
+    /* Safari, Android, iOS */
+      url("./workbench/static/workbench/lib/fonts/SourceSansPro-Regular.woff")
+      format("woff"),
+    /* Modern Browsers */
+      url("./workbench/static/workbench/lib/fonts/SourceSansPro-Regular.woff2")
+      format("woff2"); /* Modern Browsers */
   font-weight: normal;
   font-style: normal;
 }
@@ -102,8 +120,7 @@ $link-color: $primary !default;
 
 // Fonts
 
-$font-family-sans-serif: "Source Sans Pro", Calibri, Candara, Arial,
-  sans-serif !default;
+$font-family-sans-serif: "Source Sans Pro", Calibri, Candara, Arial, sans-serif !default;
 
 $font-size-base: 0.875rem !default;
 
@@ -209,6 +226,18 @@ $alert-border-width: 0 !default;
   fill: currentColor;
 }
 
-h3, h4, h5, h6, .h3, .h4, .h5, .h6, .badge {
+h3,
+h4,
+h5,
+h6,
+.h3,
+.h4,
+.h5,
+.h6,
+.badge {
   letter-spacing: 0.0125em;
+}
+
+body .ui-widget {
+  font-family: $font-family-sans-serif;
 }
