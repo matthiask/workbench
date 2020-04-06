@@ -49,6 +49,20 @@ module.exports = {
           },
         ],
       },
+      {
+        test: /\.(woff|woff2|svg|eot|ttf|otf)$/,
+        use: [
+          {
+            loader: "url-loader",
+            options: {
+              limit: 500,
+              name: "[name].[ext]",
+              emitFile: false,
+              publicPath: "/static/workbench/fonts/",
+            },
+          },
+        ],
+      },
     ],
   },
 }
