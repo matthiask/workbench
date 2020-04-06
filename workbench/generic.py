@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import classonlymethod
 from django.utils.functional import cached_property
+from django.utils.text import capfirst
 from django.utils.translation import gettext as _, gettext_lazy
 
 import vanilla
@@ -67,11 +68,13 @@ class ToolsMixin(object):
         if self.title:
             kwargs.setdefault(
                 "title",
-                self.title
-                % {
-                    "object": self.model._meta.verbose_name,
-                    "instance": getattr(self, "object", None),
-                },
+                capfirst(
+                    self.title
+                    % {
+                        "object": self.model._meta.verbose_name,
+                        "instance": getattr(self, "object", None),
+                    }
+                ),
             )
         return super().get_context_data(**kwargs)
 
@@ -143,8 +146,10 @@ class CreateView(ToolsMixin, vanilla.CreateView):
         self.object = form.save()
         messages.success(
             self.request,
-            _("%(class)s '%(object)s' has been created successfully.")
-            % {"class": self.object._meta.verbose_name, "object": self.object},
+            capfirst(
+                _("%(class)s '%(object)s' has been created successfully.")
+                % {"class": self.object._meta.verbose_name, "object": self.object}
+            ),
         )
 
         if self.request.is_ajax():
@@ -201,8 +206,10 @@ class UpdateView(ToolsMixin, vanilla.UpdateView):
         self.object = form.save()
         messages.success(
             self.request,
-            _("%(class)s '%(object)s' has been updated successfully.")
-            % {"class": self.object._meta.verbose_name, "object": self.object},
+            capfirst(
+                _("%(class)s '%(object)s' has been updated successfully.")
+                % {"class": self.object._meta.verbose_name, "object": self.object}
+            ),
         )
         if self.request.is_ajax():
             return HttpResponse("Thanks", status=202)  # Accepted
@@ -254,8 +261,10 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
 
         messages.success(
             self.request,
-            _("%(class)s '%(object)s' has been deleted successfully.")
-            % {"class": self.model._meta.verbose_name, "object": self.object},
+            capfirst(
+                _("%(class)s '%(object)s' has been deleted successfully.")
+                % {"class": self.model._meta.verbose_name, "object": self.object},
+            ),
         )
         if request.is_ajax():
             return HttpResponse("Thanks", status=204)  # No content

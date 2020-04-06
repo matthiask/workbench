@@ -76,7 +76,7 @@ class ContactsTest(TestCase):
         self.assertRedirects(response, person.urls["detail"])
         self.assertEqual(
             messages(response),
-            ["person 'Vorname Nachname' has been updated successfully."],
+            ["Person 'Vorname Nachname' has been updated successfully."],
         )
 
     def test_lists(self):

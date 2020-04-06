@@ -184,7 +184,7 @@ class OffersTest(TestCase):
         service.refresh_from_db()
         self.assertFalse(service.allow_logging)
         self.assertEqual(
-            messages(response), ["service 'Any service' has been updated successfully."]
+            messages(response), ["Service 'Any service' has been updated successfully."]
         )
         self.assertEqual(service.offer, offer)
 
@@ -503,6 +503,6 @@ class OffersTest(TestCase):
             [
                 "All offers of project {} are declined. You might "
                 "want to close the project now?".format(offer.project),
-                "offer '{}' has been updated successfully.".format(offer),
+                "Offer '{}' has been updated successfully.".format(offer),
             ],
         )
