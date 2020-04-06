@@ -189,6 +189,7 @@ class OfferForm(PostalAddressSelectionForm):
             offer=None
         )
         instance.save()
+        instance.project.solely_declined_offers_warning(request=self.request)
         return instance
 
 

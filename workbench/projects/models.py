@@ -421,6 +421,20 @@ class Project(Model):
         )
         return {"total": total, "hours_rate_undefined": hours_rate_undefined}
 
+    def solely_declined_offers_warning(self, *, request):
+        from workbench.offers.models import Offer
+
+        status = set(self.offers.order_by().values_list("status", flat=True))
+        if status == {Offer.DECLINED}:
+            messages.warning(
+                request,
+                _(
+                    "All offers of project %(project)s are declined."
+                    " You might want to close the project now?"
+                )
+                % {"project": self},
+            )
+
 
 class ServiceQuerySet(SearchQuerySet):
     def choices(self):

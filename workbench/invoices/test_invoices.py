@@ -272,7 +272,7 @@ class InvoicesTest(TestCase):
 
         self.assertContains(
             self.client.get("/"),
-            "logged cost &#x27;Test&#x27; has been updated successfully.",
+            "Logged cost &#x27;Test&#x27; has been updated successfully.",
         )
 
         cost.refresh_from_db()
@@ -294,7 +294,7 @@ class InvoicesTest(TestCase):
         self.assertEqual(Invoice.objects.count(), 0)
         self.assertEqual(
             messages(response),
-            ["invoice '{}' has been deleted successfully.".format(invoice)],
+            ["Invoice '{}' has been deleted successfully.".format(invoice)],
         )
 
     def test_delete_service_invoice_with_logs(self):
@@ -343,7 +343,7 @@ class InvoicesTest(TestCase):
         self.assertRedirects(response, invoice.urls["list"])
         self.assertEqual(
             messages(response),
-            ["invoice '{}' has been deleted successfully.".format(invoice)],
+            ["Invoice '{}' has been deleted successfully.".format(invoice)],
         )
 
         cost.refresh_from_db()

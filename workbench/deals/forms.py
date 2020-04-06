@@ -281,7 +281,9 @@ class SetStatusForm(ModelForm):
             raise Http404
 
         if instance.status != Deal.OPEN:
-            related_offers = instance.related_offers.all()
+            related_offers = instance.related_offers.select_related(
+                "owned_by", "project"
+            )
             self.fields["related_offers"] = forms.ModelMultipleChoiceField(
                 queryset=related_offers,
                 label=_("Accept offers")
@@ -322,6 +324,7 @@ class SetStatusForm(ModelForm):
         else:
             instance.closed_on = instance.closed_on or dt.date.today()
 
+            projects = set()
             for offer in self.cleaned_data.get("related_offers", ()):
                 offer.status = (
                     offer.ACCEPTED
@@ -330,6 +333,10 @@ class SetStatusForm(ModelForm):
                 )
                 offer.full_clean()
                 offer.save()
+                projects.add(offer.project)
+
+            for project in projects:
+                project.solely_declined_offers_warning(request=self.request)
 
         instance.save()
         return instance

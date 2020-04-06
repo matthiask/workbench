@@ -180,7 +180,7 @@ class ProjectsTest(TestCase):
         )
         self.assertEqual(response.status_code, 204)
         self.assertEqual(
-            messages(response), ["service 'Any service' has been deleted successfully."]
+            messages(response), ["Service 'Any service' has been deleted successfully."]
         )
         self.assertEqual(Service.objects.count(), 0)
 

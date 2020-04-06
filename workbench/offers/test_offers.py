@@ -184,7 +184,7 @@ class OffersTest(TestCase):
         service.refresh_from_db()
         self.assertFalse(service.allow_logging)
         self.assertEqual(
-            messages(response), ["service 'Any service' has been updated successfully."]
+            messages(response), ["Service 'Any service' has been updated successfully."]
         )
         self.assertEqual(service.offer, offer)
 
@@ -493,4 +493,16 @@ class OffersTest(TestCase):
                 WarningsForm.ignore_warnings_id: "yes-please-decline",
             },
         )
-        self.assertRedirects(response, offer.get_absolute_url())
+        self.assertRedirects(
+            response, offer.get_absolute_url(), fetch_redirect_response=False
+        )
+
+        offer.refresh_from_db()
+        self.assertEqual(
+            messages(response),
+            [
+                "All offers of project {} are declined. You might "
+                "want to close the project now?".format(offer.project),
+                "Offer '{}' has been updated successfully.".format(offer),
+            ],
+        )
