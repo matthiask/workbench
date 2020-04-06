@@ -493,4 +493,16 @@ class OffersTest(TestCase):
                 WarningsForm.ignore_warnings_id: "yes-please-decline",
             },
         )
-        self.assertRedirects(response, offer.get_absolute_url())
+        self.assertRedirects(
+            response, offer.get_absolute_url(), fetch_redirect_response=False
+        )
+
+        offer.refresh_from_db()
+        self.assertEqual(
+            messages(response),
+            [
+                "All offers of project {} are declined. You might "
+                "want to close the project now?".format(offer.project),
+                "offer '{}' has been updated successfully.".format(offer),
+            ],
+        )
