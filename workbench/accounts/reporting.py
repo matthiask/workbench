@@ -29,7 +29,7 @@ ORDER BY week
         cursor.execute(
             """
 SELECT
-    extract(dow from rendered_on) AS dow,
+    (extract(dow from rendered_on)::integer + 6) %% 7 AS dow,
     SUM(hours)
 FROM logbook_loggedhours
 WHERE rendered_by_id=%s AND rendered_on>=%s
@@ -40,13 +40,13 @@ ORDER BY dow
         )
 
         dows = [
-            _("Sunday"),
             _("Monday"),
             _("Tuesday"),
             _("Wednesday"),
             _("Thursday"),
             _("Friday"),
             _("Saturday"),
+            _("Sunday"),
         ]
 
         stats["hours_per_weekday"] = [
