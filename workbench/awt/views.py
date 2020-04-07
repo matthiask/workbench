@@ -126,7 +126,7 @@ def absence_calendar(request, form):
                 "reasonList": Absence.REASON_CHOICES,
                 "timeBoundaries": {
                     "start": time.mktime(monday(min(dates)).timetuple()) * 1000,
-                    "end": time.mktime(monday(max(dates)).timetuple()) * 1000,
+                    "end": time.mktime(max(dates).timetuple()) * 1000,
                 },
                 "monday": time.mktime(monday().timetuple()),
             },
