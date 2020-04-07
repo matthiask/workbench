@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% load i18n static workbench %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-10">
+
+    <h1>{{ user }}</h1>
+
+    <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
+
+    <h2 class="mt-4">{% trans 'Hours per weekday' %}</h2>
+    <canvas id="hours-per-weekday" width="1200" height="250"></canvas>
+    <script>
+      new Chart("hours-per-weekday", {
+        type: "bar",
+        data: {
+          labels: [{% for row in logged_hours.hours_per_weekday %}"{{ row.name }}", {% endfor %}],
+          datasets: [
+            {
+              label: "{% trans 'Hours per weekday' %}",
+              data: [{% for row in logged_hours.hours_per_weekday %}{{ row.hours|stringformat:'f' }}, {% endfor %}],
+              backgroundColor: '#abc',
+            },
+          ],
+        },
+        options: {
+          legend: false,
+        },
+      })
+    </script>
+
+    <h2 class="mt-4">{% trans 'Hours per week' %}</h2>
+    <canvas id="hours-per-week" width="1200" height="450"></canvas>
+    <script>
+      new Chart("hours-per-week", {
+        type: "bar",
+        data: {
+          labels: [{% for row in logged_hours.hours_per_week %}"KW{{ row.week|date:'W' }}", {% endfor %}],
+          datasets: [
+            {
+              label: "{% trans 'Hours per week' %}",
+              data: [{% for row in logged_hours.hours_per_week %}{{ row.hours|stringformat:'f' }}, {% endfor %}],
+              backgroundColor: '#bca',
+            },
+          ],
+        },
+        options: {
+          legend: false,
+        },
+      })
+    </script>
+
+  </div>
+</div>
+{% endblock %}

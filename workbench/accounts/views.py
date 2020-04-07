@@ -10,6 +10,7 @@ from authlib.google import GoogleOAuth2Client
 
 from workbench.accounts.forms import UserForm
 from workbench.accounts.models import User
+from workbench.accounts.reporting import logged_hours
 from workbench.generic import UpdateView
 
 
@@ -111,3 +112,10 @@ def logout(request):
     response = redirect("login")
     response.delete_cookie("login_hint")
     return response
+
+
+def profile(request):
+    user = request.user
+    return render(
+        request, "profile.html", {"user": user, "logged_hours": logged_hours(user)}
+    )

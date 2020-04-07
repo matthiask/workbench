@@ -14,7 +14,7 @@ urlpatterns = [
     url(r"^404/$", render, {"template_name": "404.html"}),
     url(r"^shortcuts/$", render, {"template_name": "shortcuts.html"}, name="shortcuts"),
     url(r"^admin/", admin.site.urls),
-    url(r"^accounts/", include("workbench.accounts.urls")),
+    url(r"", include("workbench.accounts.urls")),
     url(r"^contacts/", include("workbench.contacts.urls")),
     url(r"^logbook/", include("workbench.logbook.urls")),
     url(r"^absences/", include("workbench.awt.urls")),

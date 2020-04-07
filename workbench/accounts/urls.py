@@ -4,9 +4,11 @@ from . import views
 
 
 urlpatterns = [
-    url(r"^$", views.accounts, name="accounts"),
-    url(r"^update/$", views.UserUpdateView.as_view(), name="accounts_update"),
-    url(r"^login/$", views.login, name="login"),
-    url(r"^oauth2/$", views.oauth2, name="accounts_oauth2"),
-    url(r"^logout/$", views.logout, name="logout"),
+    url(r"^accounts/$", views.accounts, name="accounts"),
+    url(r"^accounts/update/$", views.UserUpdateView.as_view(), name="accounts_update"),
+    url(r"^accounts/login/$", views.login, name="login"),
+    url(r"^accounts/oauth2/$", views.oauth2, name="accounts_oauth2"),
+    url(r"^accounts/logout/$", views.logout, name="logout"),
+    #
+    url(r"^profile/$", views.profile, name="profile"),
 ]
