@@ -16,17 +16,19 @@
       new Chart("hours-per-weekday", {
         type: "bar",
         data: {
-          labels: [{% for row in logged_hours.hours_per_weekday %}"{{ row.name }}", {% endfor %}],
+          labels: [{% for row in logged_hours.rendered_hours_per_weekday %}"{{ row.name }}", {% endfor %}],
           datasets: [
             {
-              label: "{% trans 'Hours per weekday' %}",
-              data: [{% for row in logged_hours.hours_per_weekday %}{{ row.hours|stringformat:'f' }}, {% endfor %}],
+              label: "{% trans 'Rendered' %}",
+              data: [{% for row in logged_hours.rendered_hours_per_weekday %}{{ row.hours|stringformat:'f' }}, {% endfor %}],
               backgroundColor: '#abc',
             },
+            {
+              label: "{% trans 'Created' %}",
+              data: [{% for row in logged_hours.created_hours_per_weekday %}{{ row.hours|stringformat:'f' }}, {% endfor %}],
+              backgroundColor: '#bca',
+            },
           ],
-        },
-        options: {
-          legend: false,
         },
       })
     </script>

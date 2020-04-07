@@ -11,4 +11,5 @@ urlpatterns = [
     url(r"^accounts/logout/$", views.logout, name="logout"),
     #
     url(r"^profile/$", views.profile, name="profile"),
+    url(r"^profile/(?P<pk>[0-9]+)/$", views.profile, name="profile"),
 ]

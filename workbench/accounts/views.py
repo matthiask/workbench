@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import auth, messages
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import never_cache
@@ -114,8 +114,8 @@ def logout(request):
     return response
 
 
-def profile(request):
-    user = request.user
+def profile(request, pk=None):
+    user = request.user if pk is None else get_object_or_404(User, pk=pk)
     return render(
         request, "profile.html", {"user": user, "logged_hours": logged_hours(user)}
     )

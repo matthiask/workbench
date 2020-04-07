@@ -5,10 +5,17 @@ from workbench.accounts.models import User
 from workbench.tools.validation import in_days
 
 
+def query(sql, params):
+    with connections["default"].cursor() as cursor:
+        cursor.execute(sql, params)
+        return list(cursor)
+
+
 def logged_hours(user):
     stats = {}
-    with connections["default"].cursor() as cursor:
-        cursor.execute(
+    stats["hours_per_week"] = [
+        {"week": week, "hours": hours}
+        for week, hours in query(
             """
 SELECT
     date_trunc('week', rendered_on) AS week,
@@ -17,16 +24,24 @@ FROM logbook_loggedhours
 WHERE rendered_by_id=%s AND rendered_on>=%s
 GROUP BY week
 ORDER BY week
-            """,
+""",
             [user.id, in_days(-365)],
         )
+    ]
 
-        stats["hours_per_week"] = [
-            {"week": week, "hours": hours} for week, hours in cursor
-        ]
+    dows = [
+        _("Monday"),
+        _("Tuesday"),
+        _("Wednesday"),
+        _("Thursday"),
+        _("Friday"),
+        _("Saturday"),
+        _("Sunday"),
+    ]
 
-    with connections["default"].cursor() as cursor:
-        cursor.execute(
+    stats["rendered_hours_per_weekday"] = [
+        {"dow": int(dow), "name": dows[int(dow)], "hours": hours}
+        for dow, hours in query(
             """
 SELECT
     (extract(dow from rendered_on)::integer + 6) %% 7 AS dow,
@@ -38,21 +53,23 @@ ORDER BY dow
             """,
             [user.id, in_days(-365)],
         )
+    ]
 
-        dows = [
-            _("Monday"),
-            _("Tuesday"),
-            _("Wednesday"),
-            _("Thursday"),
-            _("Friday"),
-            _("Saturday"),
-            _("Sunday"),
-        ]
-
-        stats["hours_per_weekday"] = [
-            {"dow": int(dow), "name": dows[int(dow)], "hours": hours}
-            for dow, hours in cursor
-        ]
+    stats["created_hours_per_weekday"] = [
+        {"dow": int(dow), "name": dows[int(dow)], "hours": hours}
+        for dow, hours in query(
+            """
+SELECT
+    (extract(dow from created_at)::integer + 6) %% 7 AS dow,
+    SUM(hours)
+FROM logbook_loggedhours
+WHERE rendered_by_id=%s AND rendered_on>=%s
+GROUP BY dow
+ORDER BY dow
+            """,
+            [user.id, in_days(-365)],
+        )
+    ]
 
     return stats
 
