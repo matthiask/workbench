@@ -271,7 +271,9 @@
                     {{ row.service.service_hours|hours }} {{ row.service.effort_type }}
                   {% else %}
                     {{ row.service.service_hours|hours }}
-                    <span class="text-warning">{% trans 'undefined rate' %}</span>
+                    {% if row.logged_hours or row.service.service_hours %}
+                      <span class="text-warning">{% trans 'undefined rate' %}</span>
+                    {% endif %}
                   {% endif %}
                 </a>
                 {% bar row.logged_hours row.service.service_hours %}
