@@ -20,12 +20,12 @@
           datasets: [
             {
               label: "{% trans 'Rendered' %}",
-              data: [{% for row in logged_hours.rendered_hours_per_weekday %}{{ row.hours|stringformat:'f' }}, {% endfor %}],
+              data: [{% for row in logged_hours.rendered_hours_per_weekday %}{{ row.hours|stringformat:'.1f' }}, {% endfor %}],
               backgroundColor: '#abc',
             },
             {
               label: "{% trans 'Created' %}",
-              data: [{% for row in logged_hours.created_hours_per_weekday %}{{ row.hours|stringformat:'f' }}, {% endfor %}],
+              data: [{% for row in logged_hours.created_hours_per_weekday %}{{ row.hours|stringformat:'.1f' }}, {% endfor %}],
               backgroundColor: '#bca',
             },
           ],
@@ -43,7 +43,7 @@
           datasets: [
             {
               label: "{% trans 'Hours per week' %}",
-              data: [{% for row in logged_hours.hours_per_week %}{{ row.hours|stringformat:'f' }}, {% endfor %}],
+              data: [{% for row in logged_hours.hours_per_week %}{{ row.hours|stringformat:'.1f' }}, {% endfor %}],
               backgroundColor: '#bca',
             },
           ],

@@ -44,13 +44,19 @@ ORDER BY week
         {"dow": int(dow), "name": dows[int(dow)], "hours": hours}
         for dow, hours in query(
             """
-SELECT
-    (extract(isodow from rendered_on)::integer) as dow,
-    SUM(hours)
-FROM logbook_loggedhours
-WHERE rendered_by_id=%s AND rendered_on>=%s
-GROUP BY dow
-ORDER BY dow
+WITH sq AS (
+    SELECT
+        (extract(isodow from rendered_on)::integer) as dow,
+        SUM(hours) AS hours
+    FROM logbook_loggedhours
+    WHERE rendered_by_id=%s AND rendered_on>=%s
+    GROUP BY dow
+    ORDER BY dow
+)
+SELECT series.dow, COALESCE(sq.hours, 0)
+FROM generate_series(1, 7) AS series(dow)
+LEFT OUTER JOIN sq ON series.dow=sq.dow
+ORDER BY series.dow
             """,
             [user.id, in_days(-365)],
         )
@@ -60,13 +66,19 @@ ORDER BY dow
         {"dow": int(dow), "name": dows[int(dow)], "hours": hours}
         for dow, hours in query(
             """
-SELECT
-    (extract(isodow from created_at)::integer) as dow,
-    SUM(hours)
-FROM logbook_loggedhours
-WHERE rendered_by_id=%s AND rendered_on>=%s
-GROUP BY dow
-ORDER BY dow
+WITH sq AS (
+    SELECT
+        (extract(isodow from timezone('CET', created_at))::integer) as dow,
+        SUM(hours) AS hours
+    FROM logbook_loggedhours
+    WHERE rendered_by_id=%s AND rendered_on>=%s
+    GROUP BY dow
+    ORDER BY dow
+)
+SELECT series.dow, COALESCE(sq.hours, 0)
+FROM generate_series(1, 7) AS series(dow)
+LEFT OUTER JOIN sq ON series.dow=sq.dow
+ORDER BY series.dow
             """,
             [user.id, in_days(-365)],
         )
