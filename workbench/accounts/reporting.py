@@ -78,12 +78,5 @@ ORDER BY dow
 def test():  # pragma: no cover
     from pprint import pprint
 
-    # today = dt.date.today()
-    # date_range = [today - dt.timedelta(days=56), today]
-    # pprint(mean_logging_delay(date_range))
-    # pprint(logged_hours_stats(date_range))
-    # pprint(insufficient_breaks(date_range))
-    # pprint(logbook_stats(date_range))
-
     u = User.objects.get(pk=1)
     pprint(logged_hours(u))

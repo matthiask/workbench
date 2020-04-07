@@ -32,7 +32,10 @@ REVENUE_SQL = """
 with sq as (
     select
         p.id,
-        greatest(hourly_labor_costs, coalesce(ps.effort_rate)) as min_effort_rate,
+        greatest(
+            coalesce(hourly_labor_costs, 0),
+            coalesce(ps.effort_rate, 0)
+        ) as min_effort_rate,
         sum(lh.hours) as hours
     from logbook_loggedhours lh
     left join projects_service ps on lh.service_id=ps.id
