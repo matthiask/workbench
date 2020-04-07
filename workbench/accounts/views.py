@@ -115,7 +115,9 @@ def logout(request):
 
 
 def profile(request, pk=None):
-    user = request.user if pk is None else get_object_or_404(User, pk=pk)
+    user = (
+        request.user if pk is None else get_object_or_404(User.objects.active(), pk=pk)
+    )
     return render(
         request, "profile.html", {"user": user, "logged_hours": logged_hours(user)}
     )
