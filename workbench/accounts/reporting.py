@@ -30,6 +30,7 @@ ORDER BY week
     ]
 
     dows = [
+        None,
         _("Monday"),
         _("Tuesday"),
         _("Wednesday"),
@@ -44,7 +45,7 @@ ORDER BY week
         for dow, hours in query(
             """
 SELECT
-    (extract(dow from rendered_on)::integer + 6) %% 7 AS dow,
+    (extract(isodow from rendered_on)::integer) as dow,
     SUM(hours)
 FROM logbook_loggedhours
 WHERE rendered_by_id=%s AND rendered_on>=%s
@@ -60,7 +61,7 @@ ORDER BY dow
         for dow, hours in query(
             """
 SELECT
-    (extract(dow from created_at)::integer + 6) %% 7 AS dow,
+    (extract(isodow from created_at)::integer) as dow,
     SUM(hours)
 FROM logbook_loggedhours
 WHERE rendered_by_id=%s AND rendered_on>=%s
