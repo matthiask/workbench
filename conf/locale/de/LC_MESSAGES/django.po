@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-06 10:37+0200\n"
+"POT-Creation-Date: 2020-04-07 16:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -125,6 +125,34 @@ msgstr "Team"
 #: workbench/accounts/models.py
 msgid "teams"
 msgstr "Teams"
+
+#: workbench/accounts/reporting.py
+msgid "Monday"
+msgstr "Montag"
+
+#: workbench/accounts/reporting.py
+msgid "Tuesday"
+msgstr "Dienstag"
+
+#: workbench/accounts/reporting.py
+msgid "Wednesday"
+msgstr "Mittwoch"
+
+#: workbench/accounts/reporting.py
+msgid "Thursday"
+msgstr "Donnerstag"
+
+#: workbench/accounts/reporting.py
+msgid "Friday"
+msgstr "Freitag"
+
+#: workbench/accounts/reporting.py
+msgid "Saturday"
+msgstr "Samstag"
+
+#: workbench/accounts/reporting.py
+msgid "Sunday"
+msgstr "Sonntag"
 
 #: workbench/accounts/views.py
 msgid "Select Google account"
@@ -2687,6 +2715,22 @@ msgstr "Formular anzeigen"
 #: workbench/templates/reporting/overdrawn_projects.html
 msgid "effort hours"
 msgstr "Aufwände in Stunden"
+
+#: workbench/templates/profile.html
+msgid "Hours per weekday"
+msgstr "Stunden pro Wochentag"
+
+#: workbench/templates/profile.html
+msgid "Rendered"
+msgstr "Erbracht"
+
+#: workbench/templates/profile.html
+msgid "Created"
+msgstr "Erstellt"
+
+#: workbench/templates/profile.html
+msgid "Hours per week"
+msgstr "Stunden pro Woche"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Hours"
