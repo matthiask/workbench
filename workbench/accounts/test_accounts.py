@@ -77,3 +77,10 @@ class AccountsTest(TestCase):
         self.assertTrue(user.features["maybe"])
         with self.assertRaises(UnknownFeature):
             user.features["missing"]
+
+    def test_profile(self):
+        hours = factories.LoggedHoursFactory.create()
+        self.client.force_login(hours.rendered_by)
+
+        response = self.client.get("/profile/")
+        self.assertContains(response, "Hours per week")
