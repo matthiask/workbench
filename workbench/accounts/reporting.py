@@ -1,8 +1,10 @@
+import datetime as dt
+
 from django.db import connections
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
-from workbench.tools.validation import in_days
+from workbench.tools.validation import in_days, monday
 
 
 def query(sql, params):
@@ -13,19 +15,26 @@ def query(sql, params):
 
 def logged_hours(user):
     stats = {}
+
+    from_ = monday(in_days(-365))
     stats["hours_per_week"] = [
         {"week": week, "hours": hours}
         for week, hours in query(
             """
-SELECT
-    date_trunc('week', rendered_on) AS week,
-    SUM(hours)
-FROM logbook_loggedhours
-WHERE rendered_by_id=%s AND rendered_on>=%s
-GROUP BY week
-ORDER BY week
+WITH sq AS (
+    SELECT
+        date_trunc('week', rendered_on) AS week,
+        SUM(hours) AS hours
+    FROM logbook_loggedhours
+    WHERE rendered_by_id=%s AND rendered_on>=%s
+    GROUP BY week
+)
+SELECT series.week, COALESCE(sq.hours, 0)
+FROM generate_series(%s, %s, '7 days') AS series(week)
+LEFT OUTER JOIN sq ON series.week=sq.week
+ORDER BY series.week
 """,
-            [user.id, in_days(-365)],
+            [user.id, from_, from_, monday() + dt.timedelta(days=6)],
         )
     ]
 
