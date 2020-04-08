@@ -75,6 +75,7 @@ ORDER BY series.week
         """,
         [user.id, from_, from_, monday() + dt.timedelta(days=6)],
     ):
+        customer = customer.split("\n")[0]
         hours_per_customer[week][customer] = hours
         total_hours_per_customer[customer] += hours
 
@@ -90,7 +91,7 @@ ORDER BY series.week
         "weeks": weeks,
         "by_customer": [
             {
-                "name": customer.split("\n")[0],
+                "name": customer,
                 "hours": [hours_per_customer[week].get(customer, 0) for week in weeks],
             }
             for customer in customers
@@ -99,7 +100,7 @@ ORDER BY series.week
     customers = set(customers)
     stats["hours_per_customer"]["by_customer"].append(
         {
-            "name": _("Everyone else"),
+            "name": _("All others"),
             "hours": [
                 sum(
                     (

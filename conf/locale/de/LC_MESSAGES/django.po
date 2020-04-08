@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-07 16:40+0200\n"
+"POT-Creation-Date: 2020-04-08 14:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -125,6 +125,10 @@ msgstr "Team"
 #: workbench/accounts/models.py
 msgid "teams"
 msgstr "Teams"
+
+#: workbench/accounts/reporting.py
+msgid "All others"
+msgstr "Alle anderen"
 
 #: workbench/accounts/reporting.py
 msgid "Monday"
@@ -2040,15 +2044,16 @@ msgstr "Dieses Feld ist zwingend erforderlich."
 msgid "Codes must be unique."
 msgstr "Codes müssen eindeutig sein."
 
-#: workbench/projects/models.py
+#: workbench/projects/models.py workbench/templates/profile.html
 msgid "Order"
 msgstr "Auftrag"
 
-#: workbench/projects/models.py
+#: workbench/projects/models.py workbench/templates/profile.html
 msgid "Maintenance"
 msgstr "Wartung"
 
 #: workbench/projects/models.py workbench/reporting/views.py
+#: workbench/templates/profile.html
 msgid "Internal"
 msgstr "Intern"
 
@@ -2421,7 +2426,7 @@ msgstr "Offene-Posten-Liste"
 msgid "Hours by circle"
 msgstr "Stunden pro Kreis"
 
-#: workbench/templates/base.html
+#: workbench/templates/base.html workbench/templates/profile.html
 #: workbench/templates/reporting/hours_per_customer.html
 msgid "Hours per customer"
 msgstr "Stunden pro Kundschaft"
