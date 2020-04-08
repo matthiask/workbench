@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-08 14:01+0200\n"
+"POT-Creation-Date: 2020-04-08 17:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2035,6 +2035,15 @@ msgstr ""
 #: workbench/projects/forms.py
 msgid "This project is already closed."
 msgstr "Dieses Projekt wurde schon geschlossen."
+
+#: workbench/projects/forms.py
+#, python-format
+msgid ""
+"The project %(project)s has a flat rate which will be applied to this "
+"service too."
+msgstr ""
+"Das Projekt %(project)s hat einen Pauschalsatz, welcher auf diese Leistung "
+"auch angewendet wird."
 
 #: workbench/projects/forms.py
 msgid "This field is required."

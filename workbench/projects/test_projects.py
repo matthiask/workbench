@@ -373,25 +373,47 @@ class ProjectsTest(TestCase):
     def test_move(self):
         project = factories.ProjectFactory.create()
         closed = factories.ProjectFactory.create(closed_on=dt.date.today())
+        flat_rate = factories.ProjectFactory.create(flat_rate=100)
         service = factories.ServiceFactory.create()
         self.client.force_login(project.owned_by)
 
         response = self.client.post(
             service.urls["move"],
-            {"project": closed.pk},
+            {"modal-project": closed.pk},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertContains(response, "This project is already closed.")
 
         response = self.client.post(
             service.urls["move"],
-            {"project": project.pk},
+            {"modal-project": flat_rate.pk},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, 'value="new-project-has-flat-rate"')
+
+        response = self.client.post(
+            service.urls["move"],
+            {"modal-project": project.pk},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 202)
 
         service.refresh_from_db()
         self.assertEqual(service.project, project)
+        self.assertEqual(service.effort_rate, None)
+
+        response = self.client.post(
+            service.urls["move"],
+            {
+                "modal-project": flat_rate.pk,
+                WarningsForm.ignore_warnings_id: "new-project-has-flat-rate",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
+
+        service.refresh_from_db()
+        self.assertEqual(service.effort_rate, 100)
 
     def test_select(self):
         project = factories.ProjectFactory.create()

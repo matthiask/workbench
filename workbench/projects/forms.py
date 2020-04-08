@@ -310,17 +310,44 @@ class ReassignLogbookForm(Form):
         return service
 
 
+@add_prefix("modal")
 class ServiceMoveForm(ModelForm):
     class Meta:
         model = Service
         fields = ["project"]
-        widgets = {"project": Autocomplete(model=Project)}
+        widgets = {"project": Autocomplete(model=Project, params={"only_open": "on"})}
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("initial", {}).setdefault("project", "")
+        super().__init__(*args, **kwargs)
 
     def clean(self):
         data = super().clean()
         if data.get("project") and data.get("project").closed_on:
             self.add_error("project", _("This project is already closed."))
+
+        if (
+            data.get("project")
+            and self.instance.project.flat_rate is None
+            and data["project"].flat_rate is not None
+        ):
+            self.add_warning(
+                _(
+                    "The project %(project)s has a flat rate which will be applied"
+                    " to this service too."
+                )
+                % {"project": data["project"]},
+                code="new-project-has-flat-rate",
+            )
         return data
+
+    def save(self):
+        instance = super().save(commit=False)
+        if instance.project.flat_rate is not None:
+            instance.effort_type = gettext("flat rate")
+            instance.effort_rate = instance.project.flat_rate
+        instance.save()
+        return instance
 
 
 @add_prefix("modal")

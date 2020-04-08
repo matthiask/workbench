@@ -80,6 +80,7 @@ class AccountsTest(TestCase):
 
     def test_profile(self):
         hours = factories.LoggedHoursFactory.create()
+        hours = factories.LoggedHoursFactory.create(rendered_by=hours.rendered_by)
         self.client.force_login(hours.rendered_by)
 
         response = self.client.get("/profile/")
