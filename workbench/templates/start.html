@@ -100,10 +100,10 @@
           <a class="d-block" href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{% trans "today's hours"|capfirst %}</a>
 
           <small>
-            <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}&amp;date_from={% now 'Y-m-d' %}">
-              {{ user.hours.today|hours }} {% trans 'today' %}</a> /
-            <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">
-              {{ user.hours.week|hours }} {% trans 'this week' %}</a>
+            <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}">
+              {{ request.user.hours.today|hours }} {% trans 'today' %}</a> /
+            <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">
+              {{ request.user.hours.week|hours }} {% trans 'this week' %}</a>
           </small>
         </h3>
       </div>
