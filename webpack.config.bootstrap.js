@@ -4,9 +4,11 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 module.exports = {
   entry: "./app.js",
   mode: "production",
+  context: path.resolve(__dirname, "workbench", "static", "workbench"),
   output: {
     filename: "[name].js",
     path: path.resolve(__dirname, "workbench", "static", "workbench", "lib"),
+    publicPath: "/static/workbench/",
   },
   plugins: [
     new MiniCssExtractPlugin({
@@ -50,15 +52,14 @@ module.exports = {
         ],
       },
       {
-        test: /\.(woff|woff2|svg|eot|ttf|otf)$/,
+        test: /\.(png|woff|woff2|svg|eot|otf|ttf|gif|jpe?g)$/,
         use: [
           {
             loader: "url-loader",
             options: {
               limit: 500,
-              name: "[name].[ext]",
+              name: "[path][name].[ext]",
               emitFile: false,
-              publicPath: "/static/workbench/lib/fonts/",
             },
           },
         ],
