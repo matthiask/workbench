@@ -1,4 +1,5 @@
 import datetime as dt
+from collections import defaultdict
 
 from django.db import connections
 from django.utils.translation import gettext as _
@@ -49,6 +50,69 @@ ORDER BY series.week
             }
 
     stats["hours_per_week"] = [row[1] for row in sorted(hours_per_week.items())]
+
+    hours_per_customer = defaultdict(dict)
+    total_hours_per_customer = defaultdict(int)
+
+    for week, customer, hours in query(
+        """
+WITH sq AS (
+    SELECT
+        date_trunc('week', rendered_on) AS week,
+        customer.name AS customer,
+        SUM(hours) AS hours
+    FROM logbook_loggedhours hours
+    LEFT JOIN projects_service service ON hours.service_id=service.id
+    LEFT JOIN projects_project project ON service.project_id=project.id
+    LEFT JOIN contacts_organization customer ON project.customer_id=customer.id
+    WHERE rendered_by_id=%s AND rendered_on>=%s
+    GROUP BY week, customer.name
+)
+SELECT series.week, COALESCE(sq.customer, ''), COALESCE(sq.hours, 0)
+FROM generate_series(%s, %s, '7 days') AS series(week)
+LEFT OUTER JOIN sq ON series.week=sq.week
+ORDER BY series.week
+        """,
+        [user.id, from_, from_, monday() + dt.timedelta(days=6)],
+    ):
+        hours_per_customer[week][customer] = hours
+        total_hours_per_customer[customer] += hours
+
+    customers = [
+        row[0]
+        for row in sorted(
+            total_hours_per_customer.items(), key=lambda row: row[1], reverse=True
+        )
+    ][:10]
+
+    weeks = sorted(hours_per_customer.keys())
+    stats["hours_per_customer"] = {
+        "weeks": weeks,
+        "by_customer": [
+            {
+                "name": customer.split("\n")[0],
+                "hours": [hours_per_customer[week].get(customer, 0) for week in weeks],
+            }
+            for customer in customers
+        ],
+    }
+    customers = set(customers)
+    stats["hours_per_customer"]["by_customer"].append(
+        {
+            "name": _("Everyone else"),
+            "hours": [
+                sum(
+                    (
+                        hours
+                        for customer, hours in hours_per_customer[week].items()
+                        if customer not in customers
+                    ),
+                    0,
+                )
+                for week in weeks
+            ],
+        }
+    )
 
     dows = [
         None,

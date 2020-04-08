@@ -68,6 +68,38 @@
       })
     </script>
 
+    <h2 class="mt-4">{% trans 'Hours per customer' %}</h2>
+    <canvas id="hours-per-customer" width="1200" height="600"></canvas>
+    <script>
+      new Chart("hours-per-customer", {
+        type: "line",
+        data: {
+          labels: [{% for week in logged_hours.hours_per_customer.weeks %}"KW{{ week|date:'W' }}", {% endfor %}],
+          datasets: [
+            {% for customer in logged_hours.hours_per_customer.by_customer %}
+            {
+              label: "{{ customer.name|escapejs }}",
+              data: [{% for hour in customer.hours %}{{ hour|stringformat:'.1f' }}, {% endfor %}],
+              backgroundColor: "{% cycle '#2780e3' '#6610f2' '#613d7c' '#e83e8c' '#ff0039' '#f0ad4e' '#ff7518' '#3fb618' '#20c997' '#9954bb' '#868e96' '#373a3c' '#2780e3' '#373a3c' '#3fb618' '#9954bb' '#ff7518' '#ff0039' '#f8f9fa' '#373a3c' %}",
+
+            },
+            {% endfor %}
+          ],
+        },
+        options: {
+          scales: {
+            xAxes: [{stacked: true}],
+            yAxes: [{stacked: true}],
+          },
+        elements: {
+          line: {
+            tension: 0,
+          },
+        },
+        },
+      })
+    </script>
+
   </div>
 </div>
 {% endblock %}
