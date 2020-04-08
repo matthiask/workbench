@@ -17,26 +17,38 @@ def logged_hours(user):
     stats = {}
 
     from_ = monday(in_days(-365))
-    stats["hours_per_week"] = [
-        {"week": week, "hours": hours}
-        for week, hours in query(
-            """
+    hours_per_week = {}
+    for week, type, hours in query(
+        """
 WITH sq AS (
     SELECT
         date_trunc('week', rendered_on) AS week,
+        project.type AS type,
         SUM(hours) AS hours
-    FROM logbook_loggedhours
+    FROM logbook_loggedhours hours
+    LEFT JOIN projects_service service ON hours.service_id=service.id
+    LEFT JOIN projects_project project ON service.project_id=project.id
     WHERE rendered_by_id=%s AND rendered_on>=%s
-    GROUP BY week
+    GROUP BY week, project.type
 )
-SELECT series.week, COALESCE(sq.hours, 0)
+SELECT series.week, sq.type, COALESCE(sq.hours, 0)
 FROM generate_series(%s, %s, '7 days') AS series(week)
 LEFT OUTER JOIN sq ON series.week=sq.week
 ORDER BY series.week
 """,
-            [user.id, from_, from_, monday() + dt.timedelta(days=6)],
-        )
-    ]
+        [user.id, from_, from_, monday() + dt.timedelta(days=6)],
+    ):
+        if week in hours_per_week:
+            hours_per_week[week]["hours"] += hours
+            hours_per_week[week]["by_type"][type] = hours
+        else:
+            hours_per_week[week] = {
+                "week": week,
+                "hours": hours,
+                "by_type": {type: hours},
+            }
+
+    stats["hours_per_week"] = [row[1] for row in sorted(hours_per_week.items())]
 
     dows = [
         None,

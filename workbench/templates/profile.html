@@ -21,12 +21,13 @@
             {
               label: "{% trans 'Rendered' %}",
               data: [{% for row in logged_hours.rendered_hours_per_weekday %}{{ row.hours|stringformat:'.1f' }}, {% endfor %}],
-              backgroundColor: '#abc',
+              backgroundColor: '#2780e3',
             },
             {
               label: "{% trans 'Created' %}",
               data: [{% for row in logged_hours.created_hours_per_weekday %}{{ row.hours|stringformat:'.1f' }}, {% endfor %}],
-              backgroundColor: '#bca',
+              backgroundColor: '#9954bb',
+              borderColor: '#9954bb',
             },
           ],
         },
@@ -42,14 +43,27 @@
           labels: [{% for row in logged_hours.hours_per_week %}"KW{{ row.week|date:'W' }}", {% endfor %}],
           datasets: [
             {
-              label: "{% trans 'Hours per week' %}",
-              data: [{% for row in logged_hours.hours_per_week %}{{ row.hours|stringformat:'.1f' }}, {% endfor %}],
-              backgroundColor: '#bca',
+              label: "{% trans 'Order' %}",
+              data: [{% for row in logged_hours.hours_per_week %}{{ row.by_type.order|default:0|stringformat:'.1f' }}, {% endfor %}],
+              backgroundColor: '#3fb618',
+            },
+            {
+              label: "{% trans 'Maintenance' %}",
+              data: [{% for row in logged_hours.hours_per_week %}{{ row.by_type.maintenance|default:0|stringformat:'.1f' }}, {% endfor %}],
+              backgroundColor: '#373a3c',
+            },
+            {
+              label: "{% trans 'Internal' %}",
+              data: [{% for row in logged_hours.hours_per_week %}{{ row.by_type.internal|default:0|stringformat:'.1f' }}, {% endfor %}],
+              backgroundColor: '#9954bb',
             },
           ],
         },
         options: {
-          legend: false,
+          scales: {
+            xAxes: [{stacked: true}],
+            yAxes: [{stacked: true}],
+          },
         },
       })
     </script>
