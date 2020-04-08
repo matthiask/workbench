@@ -58,7 +58,7 @@ module.exports = {
               limit: 500,
               name: "[name].[ext]",
               emitFile: false,
-              publicPath: "/static/workbench/fonts/",
+              publicPath: "/static/workbench/lib/fonts/",
             },
           },
         ],
