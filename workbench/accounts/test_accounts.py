@@ -5,6 +5,7 @@ from django.urls import reverse
 from workbench import factories
 from workbench.accounts.features import UnknownFeature
 from workbench.accounts.models import User
+from workbench.projects.models import Project
 from workbench.tools.testing import messages
 
 
@@ -80,7 +81,12 @@ class AccountsTest(TestCase):
 
     def test_profile(self):
         hours = factories.LoggedHoursFactory.create()
-        hours = factories.LoggedHoursFactory.create(rendered_by=hours.rendered_by)
+        hours = factories.LoggedHoursFactory.create(
+            service=factories.ServiceFactory.create(
+                project=factories.ProjectFactory.create(type=Project.INTERNAL)
+            ),
+            rendered_by=hours.rendered_by,
+        )
         self.client.force_login(hours.rendered_by)
 
         response = self.client.get("/profile/")
