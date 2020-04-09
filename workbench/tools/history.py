@@ -390,6 +390,7 @@ HISTORY = {
             "_short_name",
             "_full_name",
             "enforce_same_week_logging",
+            "person",
             "working_time_model",
         },
         "related": [(Employment, "user_id"), (Absence, "user_id")],

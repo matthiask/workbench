@@ -31,8 +31,10 @@ class UserAdmin(UserAdmin):
         "enforce_same_week_logging",
         "working_time_model",
         "last_login",
+        "person",
     )
     list_filter = ("is_active", "is_admin", "working_time_model")
+    list_select_related = ["person__organization", "working_time_model"]
     fieldsets = add_fieldsets = [
         (
             None,
@@ -47,6 +49,7 @@ class UserAdmin(UserAdmin):
         )
     ]
     radio_fields = {"language": admin.HORIZONTAL}
+    raw_id_fields = ["person"]
     readonly_fields = ["signed_email"]
     search_fields = ("email", "_short_name", "_full_name")
     ordering = ("email",)

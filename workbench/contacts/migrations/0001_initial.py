@@ -93,6 +93,7 @@ class Migration(migrations.Migration):
                     "primary_contact",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
                         to=settings.AUTH_USER_MODEL,
                         verbose_name="primary contact",
                     ),
@@ -158,6 +159,7 @@ class Migration(migrations.Migration):
                     "primary_contact",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
                         to=settings.AUTH_USER_MODEL,
                         verbose_name="primary contact",
                     ),

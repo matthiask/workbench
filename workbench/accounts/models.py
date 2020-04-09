@@ -105,6 +105,13 @@ class User(Model, AbstractBaseUser):
         on_delete=models.CASCADE,
         verbose_name=_("working time model"),
     )
+    person = models.OneToOneField(
+        "contacts.Person",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        verbose_name=_("person"),
+    )
 
     objects = UserManager()
 
