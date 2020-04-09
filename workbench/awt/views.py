@@ -11,6 +11,7 @@ from django.utils.translation import gettext as _
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import Team, User
 from workbench.awt.models import Absence, Year
+from workbench.awt.pdf import annual_working_time_pdf
 from workbench.awt.reporting import active_users, annual_working_time
 from workbench.tools.forms import Form
 from workbench.tools.validation import filter_form, monday
@@ -42,8 +43,6 @@ def annual_working_time_view(request):
         )
 
     if request.GET.get("export") == "pdf":
-        from workbench.awt.pdf import annual_working_time_pdf
-
         return annual_working_time_pdf(statistics)
 
     return render(

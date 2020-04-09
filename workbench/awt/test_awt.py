@@ -266,6 +266,9 @@ class AWTTest(TestCase):
             ],
         )
 
+        response = self.client.get(url + "?export=pdf&user=active")
+        self.assertEqual(response.status_code, 200)
+
     def test_non_ajax_redirect(self):
         absence = factories.AbsenceFactory.create()
         self.client.force_login(absence.user)
