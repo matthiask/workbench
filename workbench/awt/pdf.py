@@ -1,24 +1,43 @@
+import datetime as dt
+import io
+import zipfile
+
+from django.http import HttpResponse
 from django.utils.formats import date_format
+from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
-from workbench.tools.formats import days, hours
-from workbench.tools.pdf import mm, pdf_response
+from workbench.tools.formats import days, hours, local_date_format
+from workbench.tools.pdf import PDFDocument, mm
 
 
 def annual_working_time_pdf(statistics):
-    from pprint import pprint
+    with io.BytesIO() as buf:
+        with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+            for data in statistics["statistics"]:
+                zf.writestr(
+                    "%s-%s.pdf"
+                    % (
+                        slugify(data["user"].get_full_name()),
+                        data["months"]["year"].year,
+                    ),
+                    user_stats_pdf(data),
+                )
+        response = HttpResponse(buf.getvalue(), content_type="application/zip")
+        response["Content-Disposition"] = 'attachment; filename="awt.zip"'
+        return response
 
-    pprint(statistics)
 
-    pdf, response = pdf_response("annual-working-time", as_attachment=True, font_size=7)
-    pdf.init_report()
+def user_stats_pdf(data):
+    with io.BytesIO() as buf:
+        pdf = PDFDocument(buf, font_size=7)
+        pdf.init_report()
 
-    awt_columns = [9.5 * mm for i in range(12)]
-    awt_columns.append(12 * mm)
-    awt_columns.insert(0, pdf.bounds.E - pdf.bounds.W - sum(awt_columns))
-    awt_table_style = pdf.style.tableHead + (("TOPPADDING", (0, 1), (-1, -1), 3),)
+        awt_columns = [9.5 * mm for i in range(12)]
+        awt_columns.append(12 * mm)
+        awt_columns.insert(0, pdf.bounds.E - pdf.bounds.W - sum(awt_columns))
+        awt_table_style = pdf.style.tableHead + (("TOPPADDING", (0, 1), (-1, -1), 3),)
 
-    for data in statistics["statistics"]:
         pdf.h1(data["user"])
         pdf.spacer(1 * mm)
         pdf.p(_("annual working time"))
@@ -176,7 +195,7 @@ def annual_working_time_pdf(statistics):
                 )
                 pdf.spacer()
 
-        pdf.pagebreak()
+        pdf.p(_("Generated on %(day)s") % {"day": local_date_format(dt.date.today())})
 
-    pdf.generate()
-    return response
+        pdf.generate()
+        return buf.getvalue()

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-09 16:42+0200\n"
+"POT-Creation-Date: 2020-04-09 17:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -314,11 +314,13 @@ msgstr "Datum von"
 msgid "date until"
 msgstr "Datum bis"
 
-#: workbench/awt/models.py workbench/templates/awt/year_detail.html
+#: workbench/awt/models.py workbench/awt/pdf.py
+#: workbench/templates/awt/year_detail.html
 msgid "percentage"
 msgstr "Prozent"
 
-#: workbench/awt/models.py workbench/templates/awt/year_detail.html
+#: workbench/awt/models.py workbench/awt/pdf.py
+#: workbench/templates/awt/year_detail.html
 msgid "vacation weeks"
 msgstr "Ferienwochen"
 
@@ -326,7 +328,7 @@ msgstr "Ferienwochen"
 msgid "Vacation weeks for a full year."
 msgstr "Ferienwochen für ein volles Anstellungsjahr."
 
-#: workbench/awt/models.py workbench/contacts/models.py
+#: workbench/awt/models.py workbench/awt/pdf.py workbench/contacts/models.py
 #: workbench/credit_control/forms.py workbench/credit_control/models.py
 #: workbench/management/commands/export_debtors.py workbench/notes/__init__.py
 #: workbench/notes/models.py workbench/templates/awt/year_detail.html
@@ -344,7 +346,8 @@ msgstr "Personalaufwand pro Stunde"
 msgid "green hours target"
 msgstr "Grüne Stunden-Zielwert"
 
-#: workbench/awt/models.py workbench/templates/awt/year_detail.html
+#: workbench/awt/models.py workbench/awt/pdf.py
+#: workbench/templates/awt/year_detail.html
 msgid "employment"
 msgstr "Anstellungsverhältnis"
 
@@ -492,6 +495,23 @@ msgstr "Stundensaldo pro Monat"
 #: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
 msgid "running net work hours"
 msgstr "Stundensaldo fortlaufend"
+
+#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+msgid "vacation days credit"
+msgstr "Guthaben an Ferientagen"
+
+#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+msgid "balance"
+msgstr "Bilanz"
+
+#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+msgid "vacation days"
+msgstr "Ferientage"
+
+#: workbench/awt/pdf.py
+#, python-format
+msgid "Generated on %(day)s"
+msgstr "Generiert am %(day)s"
 
 #: workbench/awt/views.py
 #, python-format
@@ -2378,21 +2398,9 @@ msgid "net work hours"
 msgstr "Stundensaldo"
 
 #: workbench/templates/awt/year_detail.html
-msgid "vacation days credit"
-msgstr "Guthaben an Ferientagen"
-
-#: workbench/templates/awt/year_detail.html
-msgid "balance"
-msgstr "Bilanz"
-
-#: workbench/templates/awt/year_detail.html
 #, python-format
 msgid "calculated with %(hours)s per day"
 msgstr "berechnet mit %(hours)s pro Tag"
-
-#: workbench/templates/awt/year_detail.html
-msgid "vacation days"
-msgstr "Ferientage"
 
 #: workbench/templates/awt/year_detail.html
 #, python-format
