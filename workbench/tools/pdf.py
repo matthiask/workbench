@@ -45,10 +45,15 @@ def style(base, **kwargs):
 
 
 class PDFDocument(_PDFDocument):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("font_name", "Rep")
+        kwargs.setdefault("font_size", 8.5)
+        super().__init__(*args, **kwargs)
+
     def generate_style(self, *args, **kwargs):
         self.style = Empty()
-        self.style.fontName = "Rep"
-        self.style.fontSize = 8.5
+        self.style.fontName = self.font_name
+        self.style.fontSize = self.font_size
 
         self.style.normal = style(
             getSampleStyleSheet()["Normal"],
