@@ -20,11 +20,16 @@
     </thead>
     <tbody>
       {% for anniversary in work_anniversaries %}
+        {% ifchanged anniversary.already %}{% if not forloop.first %}
+          <tr>
+            <td colspan="4"><hr></td>
+          </tr>
+        {% endif %}{% endifchanged %}
         <tr>
           <td>{{ anniversary.name }}</td>
           <td>{{ anniversary.start|local_date_format }}</td>
           <td class="text-right">{{ anniversary.anniversary }}.</td>
-          <td>{{ anniversary.next|local_date_format }}</td>
+          <td>{{ anniversary.this_year|local_date_format }}</td>
         </tr>
       {% endfor %}
     </tbody>

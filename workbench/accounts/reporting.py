@@ -173,10 +173,8 @@ ORDER BY series.dow
 
 
 def work_anniversaries():
-    today = dt.date.today()
-    md = (today.month, today.day)
-
     anniversaries = []
+    today = dt.date.today()
 
     for name, start in query(
         """
@@ -191,25 +189,25 @@ WITH earliest AS (
 SELECT _full_name, earliest.start
 FROM accounts_user u
 LEFT JOIN earliest ON u.id=earliest.user_id
-WHERE earliest.start IS NOT NULL AND u.is_active=TRUE
+WHERE
+    earliest.start IS NOT NULL
+    AND earliest.start < %s
+    AND u.is_active=TRUE
         """,
-        [],
+        [today.replace(month=1, day=1)],
     ):
-        if (start.month, start.day) >= md:
-            next = dt.date(today.year, start.month, start.day)
-        else:
-            next = dt.date(today.year + 1, start.month, start.day)
-
+        this_year = start.replace(year=today.year)
         anniversaries.append(
             {
                 "name": name,
                 "start": start,
-                "next": next,
-                "anniversary": next.year - start.year,
+                "this_year": this_year,
+                "anniversary": this_year.year - start.year,
+                "already": this_year > today,
             }
         )
 
-    return sorted(anniversaries, key=lambda row: row["next"])
+    return sorted(anniversaries, key=lambda row: (row["this_year"], row["name"]))
 
 
 def test():  # pragma: no cover

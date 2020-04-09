@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -91,3 +93,13 @@ class AccountsTest(TestCase):
 
         response = self.client.get("/profile/")
         self.assertContains(response, "Hours per week")
+
+    def test_work_anniversaries(self):
+        user = factories.UserFactory.create()
+        user.employments.create(
+            percentage=100, vacation_weeks=5, date_from=dt.date(2018, 1, 1)
+        )
+
+        self.client.force_login(user)
+        response = self.client.get("/report/work-anniversaries/")
+        self.assertContains(response, user.get_full_name())
