@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-08 17:04+0200\n"
+"POT-Creation-Date: 2020-04-09 10:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -85,13 +85,20 @@ msgstr "Sprache"
 msgid "working time model"
 msgstr "Arbeitszeitmodell"
 
+#: workbench/accounts/models.py workbench/contacts/models.py
+#: workbench/templates/contacts/organization_detail.html
+msgid "person"
+msgstr "Person"
+
 #: workbench/accounts/models.py workbench/awt/models.py
 #: workbench/logbook/models.py workbench/management/commands/profitability.py
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/labor_costs_by_user.html
-#: workbench/templates/reporting/logging.html workbench/timer/models.py
+#: workbench/templates/reporting/logging.html
+#: workbench/templates/reporting/work_anniversaries.html
+#: workbench/timer/models.py
 msgid "user"
 msgstr "Benutzer"
 
@@ -599,11 +606,6 @@ msgstr "Lieber Hans/Sehr geehrte Frau Muster"
 #: workbench/contacts/models.py
 msgid "date of birth"
 msgstr "Geburtstag"
-
-#: workbench/contacts/models.py
-#: workbench/templates/contacts/organization_detail.html
-msgid "person"
-msgstr "Person"
 
 #: workbench/contacts/models.py workbench/templates/contacts/object_list.html
 #: workbench/templates/contacts/organization_detail.html
@@ -2491,6 +2493,11 @@ msgid "timestamps"
 msgstr "Zeitmarken"
 
 #: workbench/templates/base.html
+#: workbench/templates/reporting/work_anniversaries.html
+msgid "Work anniversaries"
+msgstr "Jubiläen"
+
+#: workbench/templates/base.html
 msgid "Sign out"
 msgstr "Abmelden"
 
@@ -2966,6 +2973,18 @@ msgstr "Tage mit zuwenig Pausenzeit"
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "offered"
 msgstr "Offeriert"
+
+#: workbench/templates/reporting/work_anniversaries.html
+msgid "Started on"
+msgstr "Gestartet am"
+
+#: workbench/templates/reporting/work_anniversaries.html
+msgid "Work anniversary"
+msgstr "Jubiläum"
+
+#: workbench/templates/reporting/work_anniversaries.html
+msgid "On"
+msgstr "Am"
 
 #: workbench/templates/search.html
 msgid "Only showing 100 items. Additional results have been omitted."

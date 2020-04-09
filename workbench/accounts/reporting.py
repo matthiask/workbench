@@ -4,7 +4,6 @@ from collections import defaultdict
 from django.db import connections
 from django.utils.translation import gettext as _
 
-from workbench.accounts.models import User
 from workbench.tools.validation import in_days, monday
 
 
@@ -173,8 +172,51 @@ ORDER BY series.dow
     return stats
 
 
+def work_anniversaries():
+    today = dt.date.today()
+    md = (today.month, today.day)
+
+    anniversaries = []
+
+    for name, start in query(
+        """
+WITH earliest AS (
+    SELECT
+        user_id,
+        MIN(date_from) AS start
+    FROM awt_employment
+    WHERE percentage>0
+    GROUP BY user_id
+)
+SELECT _full_name, earliest.start
+FROM accounts_user u
+LEFT JOIN earliest ON u.id=earliest.user_id
+WHERE earliest.start IS NOT NULL AND u.is_active=TRUE
+        """,
+        [],
+    ):
+        if (start.month, start.day) >= md:
+            next = dt.date(today.year, start.month, start.day)
+        else:
+            next = dt.date(today.year + 1, start.month, start.day)
+
+        anniversaries.append(
+            {
+                "name": name,
+                "start": start,
+                "next": next,
+                "anniversary": next.year - start.year,
+            }
+        )
+
+    return sorted(anniversaries, key=lambda row: row["next"])
+
+
 def test():  # pragma: no cover
     from pprint import pprint
 
-    u = User.objects.get(pk=1)
-    pprint(logged_hours(u))
+    # from workbench.accounts.models import User
+    # u = User.objects.get(pk=1)
+    # pprint(logged_hours(u))
+
+    pprint(work_anniversaries())

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% load fineforms i18n static workbench %}
+
+{% block title %}{% trans 'Work anniversaries' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-sm-12 col-lg-8">
+  <h1>{% trans 'Work anniversaries' %}</h1>
+
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>{% trans 'user'|capfirst %}</th>
+        <th>{% trans 'Started on' %}</th>
+        <th class="text-right">{% trans 'Work anniversary' %}</th>
+        <th>{% trans 'On' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for anniversary in work_anniversaries %}
+        <tr>
+          <td>{{ anniversary.name }}</td>
+          <td>{{ anniversary.start|local_date_format }}</td>
+          <td class="text-right">{{ anniversary.anniversary }}.</td>
+          <td>{{ anniversary.next|local_date_format }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+</div>
+{% endblock %}

@@ -9,6 +9,7 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import Team, User
+from workbench.accounts.reporting import work_anniversaries
 from workbench.invoices.models import Invoice
 from workbench.invoices.utils import next_valid_day
 from workbench.logbook.models import LoggedCost
@@ -393,4 +394,12 @@ def logging(request, form):
         request,
         "reporting/logging.html",
         {"form": form, "logbook_stats": logbook_stats(date_range)},
+    )
+
+
+def work_anniversaries_view(request):
+    return render(
+        request,
+        "reporting/work_anniversaries.html",
+        {"work_anniversaries": work_anniversaries()},
     )

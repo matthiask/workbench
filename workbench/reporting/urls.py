@@ -22,6 +22,7 @@ from workbench.reporting.views import (
     open_items_list,
     overdrawn_projects_view,
     project_budget_statistics_view,
+    work_anniversaries_view,
 )
 
 
@@ -106,4 +107,9 @@ urlpatterns = [
         r"^labor-costs/$", labor_costs_only(labor_costs_view), name="report_labor_costs"
     ),
     url(r"^logging/$", controlling_only(logging), name="report_logging"),
+    url(
+        r"^work-anniversaries/$",
+        work_anniversaries_view,
+        name="report_work_anniversaries",
+    ),
 ]
