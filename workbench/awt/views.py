@@ -40,6 +40,12 @@ def annual_working_time_view(request):
             )
             % {"user": user, "working_time_model": user.working_time_model},
         )
+
+    if request.GET.get("export") == "pdf":
+        from workbench.awt.pdf import annual_working_time_pdf
+
+        return annual_working_time_pdf(statistics)
+
     return render(
         request,
         "awt/year_detail.html",

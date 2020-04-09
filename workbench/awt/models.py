@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.tools.formats import local_date_format
+from workbench.tools.formats import hours, local_date_format
 from workbench.tools.models import HoursField, Model, MoneyField
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
@@ -77,6 +77,10 @@ class Year(Model):
     @property
     def months(self):
         return [getattr(self, field) for field in self.MONTHS]
+
+    @property
+    def pretty_working_time_per_day(self):
+        return "%s/%s" % (hours(self.working_time_per_day), _("day"))
 
 
 class Employment(Model):

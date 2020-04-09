@@ -547,6 +547,11 @@ als gegenstandslos zu betrachten.</p>
             self.process_invoice(invoice)
             self.restart()
 
+    def table_columns(self, columns):
+        given = sum(filter(None, columns))
+        calculated = (self.bounds.E - self.bounds.W - given) / columns.count(None)
+        return [calculated if col is None else col for col in columns]
+
 
 def pdf_response(*args, **kwargs):
     activate(settings.WORKBENCH.PDF_LANGUAGE)

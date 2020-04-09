@@ -20,56 +20,55 @@
         <li class="nav-item ml-auto">
           <a class="nav-link" href="{% querystring user='active' %}">{% trans 'active users' %}</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% querystring export='pdf' %}">PDF</a>
+        </li>
       {% endif %}
     </ul>
   </div>
 
   {% if request.user|has_feature:FEATURES.CONTROLLING and request.GET.user == 'active' %}
-    <div style="break-after:page;max-width:40rem">
-      <h2 class="mt-5">{% trans 'facts' %}</h2>
-      <table class="table">
-        <tr>
-          <td class="text-right">{{ overall.available_vacation_days|days }}</td>
-          <th>{% trans 'vacation days available' %}</th>
-        </tr>
+    <h2 class="mt-5">{% trans 'facts' %}</h2>
+    <table class="table">
+      <tr>
+        <td class="text-right">{{ overall.available_vacation_days|days }}</td>
+        <th>{% trans 'vacation days available' %}</th>
+      </tr>
 
-        <tr>
-          <td class="text-right">{{ overall.absence_vacation|days }}</td>
-          <th>{% trans 'vacation days taken' %} ({% trans 'corrected' %})</th>
-        </tr>
+      <tr>
+        <td class="text-right">{{ overall.absence_vacation|days }}</td>
+        <th>{% trans 'vacation days taken' %} ({% trans 'corrected' %})</th>
+      </tr>
 
-        <tr>
-          <td class="text-right">{{ overall.absence_sickness|days }}</td>
-          <th>{% trans 'sickness days' %}</th>
-        </tr>
+      <tr>
+        <td class="text-right">{{ overall.absence_sickness|days }}</td>
+        <th>{% trans 'sickness days' %}</th>
+      </tr>
 
-        <tr>
-          <td class="text-right">{{ overall.absence_other|days }}</td>
-          <th>{% trans 'other absences' %}</th>
-        </tr>
+      <tr>
+        <td class="text-right">{{ overall.absence_other|days }}</td>
+        <th>{% trans 'other absences' %}</th>
+      </tr>
 
-        <tr>
-          <td class="text-right">{{ overall.running_sum|hours:True }}</td>
-          <th>{% trans 'net work hours' %}</th>
-        </tr>
+      <tr>
+        <td class="text-right">{{ overall.running_sum|hours:True }}</td>
+        <th>{% trans 'net work hours' %}</th>
+      </tr>
 
-        <tr>
-          <td class="text-right">{{ overall.vacation_days_credit|days }}</td>
-          <th>{% trans 'vacation days credit' %}</th>
-        </tr>
+      <tr>
+        <td class="text-right">{{ overall.vacation_days_credit|days }}</td>
+        <th>{% trans 'vacation days credit' %}</th>
+      </tr>
 
-        <tr>
-          <td class="text-right">{{ overall.balance|hours:True }}</td>
-          <th>{% trans 'balance' %}</th>
-        </tr>
+      <tr>
+        <td class="text-right">{{ overall.balance|hours:True }}</td>
+        <th>{% trans 'balance' %}</th>
+      </tr>
 
-      </table>
-    </div>
+    </table>
   {% endif %}
 
   {% for data in statistics %}
-  <div style="break-after:page">
-
     {% with user=data.user stats=data.months totals=data.totals monthly_sums=data.monthly_sums running_sums=data.running_sums %}
     <h2 class="mt-5">{{ user }}</h2>
     <table class="table table-sm table-bordered table-responsive-lg">
@@ -154,7 +153,7 @@
       </tr>
 
       <tr>
-        <th class="text-nowrap">{% trans 'net work Hours per month' %}</th>
+        <th class="text-nowrap">{% trans 'net work hours per month' %}</th>
         {% for value in monthly_sums %}<td class="text-right">{% if value is not None %}{{ value|hours }}{% endif %}</td>{% endfor %}
         <th></th>
       </tr>
@@ -253,8 +252,6 @@
     </div>
 
     {% endwith %}
-
-  </div>
   {% endfor %}
 
 </div>
