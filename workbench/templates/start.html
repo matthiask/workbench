@@ -82,7 +82,7 @@
       <div class="card-header"><h3 class="my-0">{% trans "Birthdays" %}</h3></div>
       <div class="card-body">
         {% for birthday in birthdays %}
-          <a href="{% url 'contacts_person_detail' pk=birthday.id as url %}{{ url }}" class="text-nowrap">
+          <a href="{% url 'contacts_person_detail' pk=birthday.id as url %}{{ url }}" class="text-nowrap{% if birthday.is_active_user %} font-weight-bold{% endif %}">
             {{ birthday.given_name }} {{ birthday.family_name }}
             ({{ birthday.date_of_birth|local_date_format }})</a>{% if not forloop.last %},{% endif %}
         {% endfor %}

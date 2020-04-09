@@ -55,14 +55,16 @@ def _birthdays():
     with connections["default"].cursor() as cursor:
         cursor.execute(
             """
-SELECT id, given_name, family_name, date_of_birth FROM (
+SELECT id, given_name, family_name, date_of_birth, is_active_user FROM (
     SELECT
-        id,
+        p.id,
         given_name,
         family_name,
         date_of_birth,
+        u.is_active AS is_active_user,
         (current_date - date_of_birth) % 365.24 AS diff
-    FROM contacts_person
+    FROM contacts_person p
+    LEFT OUTER JOIN accounts_user u ON p.id=u.person_id
     WHERE date_of_birth is not null AND is_archived=FALSE
 ) AS subquery
 WHERE diff < 7 or diff > 350
@@ -75,6 +77,7 @@ ORDER BY (diff + 180) % 365 DESC
                 "given_name": row[1],
                 "family_name": row[2],
                 "date_of_birth": row[3],
+                "is_active_user": row[4],
             }
             for row in cursor
         ]
