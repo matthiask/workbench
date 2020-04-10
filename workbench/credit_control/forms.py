@@ -121,12 +121,21 @@ class AccountStatementUploadForm(WarningsForm, Form):
 
     def save(self):
         created_entries = []
+        ledger = self.cleaned_data["ledger"]
+        newest = ledger.transactions.order_by("-value_date").first()
+        newest_date = newest.value_date if newest else dt.date.min
+
         for data in self.statement_list:
+            if data["value_date"] < newest_date:
+                # Skip credit entries with a value date earlier than the latest
+                # existing credit entry. Credit entries of the same day are
+                # allowed (!)
+                continue
+
             reference_number = data.pop("reference_number")
-            c, created = CreditEntry.objects.get_or_create(
-                ledger=self.cleaned_data["ledger"],
-                reference_number=reference_number,
-                defaults=data,
+
+            c, created = ledger.transactions.get_or_create(
+                reference_number=reference_number, defaults=data
             )
             if created:
                 created_entries.append(c)
