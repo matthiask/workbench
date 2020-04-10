@@ -22,6 +22,7 @@ class SearchTest(TestCase):
         self.assertContains(response, "invoices")
         self.assertContains(response, "recurring-invoices")
         self.assertContains(response, "offers")
+        self.assertContains(response, "deals")
 
         with override_settings(FEATURES={"controlling": False}):
             response = self.client.get("/search/?q=Test")
@@ -33,6 +34,7 @@ class SearchTest(TestCase):
             self.assertNotContains(response, "invoices")
             self.assertNotContains(response, "recurring-invoices")
             self.assertNotContains(response, "offers")
+            self.assertNotContains(response, "deals")
 
     def test_process_query(self):
         self.assertEqual(process_query(""), "")
