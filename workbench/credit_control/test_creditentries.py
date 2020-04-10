@@ -178,9 +178,9 @@ class CreditEntriesTest(TestCase):
             entries = parse_postfinance_csv(f.read())
 
         self.assertEqual(len(entries), 3)
-        self.assertEqual(entries[0]["total"], "1193.30")
+        self.assertEqual(entries[0]["total"], Decimal("1193.30"))
         self.assertEqual(entries[0]["reference_number"], "pf-190618CH04D10XYZ")
-        self.assertEqual(entries[0]["value_date"], "2019-06-18")
+        self.assertEqual(entries[0]["value_date"], dt.date(2019, 6, 18))
 
         self.assertEqual(
             entries[1]["reference_number"], "pf-bad7372a51d085b97f7b0e782841490b"

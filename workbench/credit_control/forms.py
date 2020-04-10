@@ -123,9 +123,6 @@ class AccountStatementUploadForm(WarningsForm, Form):
         created_entries = []
         for data in self.statement_list:
             reference_number = data.pop("reference_number")
-            data["value_date"] = dt.datetime.strptime(
-                data["value_date"], "%Y-%m-%d"
-            ).date()
             c, created = CreditEntry.objects.get_or_create(
                 ledger=self.cleaned_data["ledger"],
                 reference_number=reference_number,

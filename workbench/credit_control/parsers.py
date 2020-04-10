@@ -37,8 +37,8 @@ def parse_zkb_csv(data):
             entries.append(
                 {
                     "reference_number": reference,
-                    "value_date": day.isoformat(),
-                    "total": str(amount),
+                    "value_date": day,
+                    "total": amount,
                     "payment_notice": "; ".join(
                         filter(None, (details[1], details[10], row[4]))
                     ),
@@ -91,8 +91,8 @@ def parse_postfinance_csv(data):
         entries.append(
             {
                 "reference_number": postfinance_reference_number(payment_notice, day),
-                "value_date": day.isoformat(),
-                "total": row[2],
+                "value_date": day,
+                "total": Decimal(row[2]),
                 "payment_notice": payment_notice,
             }
         )
