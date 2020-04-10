@@ -4,7 +4,7 @@
 
 {% block objects %}
 <div class="list-group list-group-flush">
-  {% for project in object_list|analyze %}
+  {% for project in object_list|analyze_projects %}
   <div class="list-group-item px-0">
     <div class="d-flex w-100 justify-content-between">
       <h5 class="mb-1">

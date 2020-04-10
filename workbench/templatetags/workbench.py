@@ -15,7 +15,7 @@ from django.utils.translation import gettext as _
 from workbench.logbook.models import LoggedHours
 from workbench.notes.forms import NoteForm
 from workbench.notes.models import Note
-from workbench.projects.models import Project, Service
+from workbench.projects.models import Service
 from workbench.tools.formats import currency, days, hours, local_date_format
 from workbench.tools.models import Z
 
@@ -272,28 +272,26 @@ def notes(context, instance):
 
 
 @register.filter
-def analyze(object_list):
+def analyze_projects(object_list):
     pks = [object.pk for object in object_list]
+    service_hours = {
+        row["project"]: row["service_hours__sum"]
+        for row in Service.objects.filter(project__in=pks)
+        .order_by()
+        .values("project")
+        .annotate(Sum("service_hours"))
+    }
+    logged_hours = {
+        row["service__project"]: row["hours__sum"]
+        for row in LoggedHours.objects.filter(service__project__in=pks)
+        .order_by()
+        .values("service__project")
+        .annotate(Sum("hours"))
+    }
 
-    if object_list.model == Project:  # pragma: no branch (for now)
-        service_hours = {
-            row["project"]: row["service_hours__sum"]
-            for row in Service.objects.filter(project__in=pks)
-            .order_by()
-            .values("project")
-            .annotate(Sum("service_hours"))
+    for object in object_list:
+        object.analyzed = {
+            "service_hours": service_hours.get(object.pk, 0),
+            "logged_hours": logged_hours.get(object.pk, 0),
         }
-        logged_hours = {
-            row["service__project"]: row["hours__sum"]
-            for row in LoggedHours.objects.filter(service__project__in=pks)
-            .order_by()
-            .values("service__project")
-            .annotate(Sum("hours"))
-        }
-
-        for object in object_list:
-            object.analyzed = {
-                "service_hours": service_hours.get(object.pk, 0),
-                "logged_hours": logged_hours.get(object.pk, 0),
-            }
     return object_list
