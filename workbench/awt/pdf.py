@@ -12,6 +12,13 @@ from workbench.tools.pdf import PDFDocument, mm
 
 
 def annual_working_time_pdf(statistics):
+    if len(statistics["statistics"]) == 1:
+        response = HttpResponse(
+            user_stats_pdf(statistics["statistics"][0]), content_type="application/pdf"
+        )
+        response["Content-Disposition"] = 'attachment; filename="awt.pdf"'
+        return response
+
     with io.BytesIO() as buf:
         with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
             for data in statistics["statistics"]:
