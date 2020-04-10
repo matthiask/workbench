@@ -6,9 +6,7 @@ from vobject import vCard, vcard
 def person_to_vcard(person):
     v = vCard()
     v.add("n")
-    v.n.value = vcard.Name(
-        family=person.family_name, given=person.given_name, prefix=person.address
-    )
+    v.n.value = vcard.Name(family=person.family_name, given=person.given_name)
     v.add("fn")
     v.fn.value = person.full_name
 
