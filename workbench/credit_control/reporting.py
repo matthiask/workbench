@@ -33,9 +33,7 @@ def paid_debtors_zip(date_range, *, file):
         for ledger in Ledger.objects.all():
             rows = []
             for entry in (
-                CreditEntry.objects.filter(
-                    ledger=ledger, value_date__range=date_range
-                )
+                CreditEntry.objects.filter(ledger=ledger, value_date__range=date_range)
                 .order_by("value_date")
                 .select_related("invoice__project", "invoice__owned_by")
             ):
@@ -51,9 +49,7 @@ def paid_debtors_zip(date_range, *, file):
 
                 if entry.invoice:
                     append_invoice(
-                        zf=zf,
-                        ledger_slug=slugify(ledger.name),
-                        invoice=entry.invoice,
+                        zf=zf, ledger_slug=slugify(ledger.name), invoice=entry.invoice,
                     )
 
             xlsx.add_sheet(slugify(ledger.name))
