@@ -188,12 +188,10 @@ def user_stats_pdf(data):
             ("absence_sickness", _("sickness days")),
             ("absence_other", _("other absences")),
         ]:
-
-            table = []
-            for absence in data["absences"][key]:
-                table.append(
-                    [absence.pretty_period, days(absence.days), absence.description]
-                )
+            table = [
+                [absence.pretty_period, days(absence.days), absence.description]
+                for absence in data["absences"][key]
+            ]
             if table:
                 pdf.table(
                     [[reason, "", ""]] + table,

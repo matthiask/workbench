@@ -268,6 +268,7 @@ class AWTTest(TestCase):
 
         other = factories.UserFactory.create(working_time_model=year.working_time_model)
         Employment.objects.create(user=other, percentage=50, vacation_weeks=5)
+        factories.AbsenceFactory.create(user=other)
 
         response = self.client.get(url + "?export=pdf&user=active")
         self.assertEqual(response.status_code, 200)
