@@ -266,8 +266,16 @@ class AWTTest(TestCase):
             ],
         )
 
+        other = factories.UserFactory.create(working_time_model=year.working_time_model)
+        Employment.objects.create(user=other, percentage=50, vacation_weeks=5)
+
         response = self.client.get(url + "?export=pdf&user=active")
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["content-type"], "application/zip")
+
+        response = self.client.get(url + "?export=pdf&user={}".format(user.pk))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["content-type"], "application/pdf")
 
     def test_non_ajax_redirect(self):
         absence = factories.AbsenceFactory.create()
