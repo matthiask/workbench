@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-09 17:24+0200\n"
+"POT-Creation-Date: 2020-04-11 17:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -330,7 +330,7 @@ msgstr "Ferienwochen für ein volles Anstellungsjahr."
 
 #: workbench/awt/models.py workbench/awt/pdf.py workbench/contacts/models.py
 #: workbench/credit_control/forms.py workbench/credit_control/models.py
-#: workbench/management/commands/export_debtors.py workbench/notes/__init__.py
+#: workbench/credit_control/reporting.py workbench/notes/__init__.py
 #: workbench/notes/models.py workbench/templates/awt/year_detail.html
 #: workbench/templates/base.html
 #: workbench/templates/credit_control/creditentry_list.html
@@ -861,14 +861,13 @@ msgstr "Konten"
 msgid "reference number"
 msgstr "Referenz-Nr."
 
-#: workbench/credit_control/models.py
-#: workbench/management/commands/export_debtors.py
+#: workbench/credit_control/models.py workbench/credit_control/reporting.py
 #: workbench/templates/credit_control/creditentry_list.html
 msgid "value date"
 msgstr "Valuta"
 
-#: workbench/credit_control/models.py workbench/expenses/models.py
-#: workbench/expenses/views.py workbench/management/commands/export_debtors.py
+#: workbench/credit_control/models.py workbench/credit_control/reporting.py
+#: workbench/expenses/models.py workbench/expenses/views.py
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
@@ -883,14 +882,14 @@ msgstr "Valuta"
 msgid "total"
 msgstr "Total"
 
-#: workbench/credit_control/models.py workbench/invoices/models.py
-#: workbench/management/commands/export_debtors.py
+#: workbench/credit_control/models.py workbench/credit_control/reporting.py
+#: workbench/invoices/models.py
 #: workbench/templates/credit_control/creditentry_list.html
 msgid "payment notice"
 msgstr "Zahlungsnotiz"
 
-#: workbench/credit_control/models.py workbench/invoices/models.py
-#: workbench/management/commands/export_debtors.py
+#: workbench/credit_control/models.py workbench/credit_control/reporting.py
+#: workbench/invoices/models.py
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/credit_control/creditentry_list.html
@@ -909,6 +908,12 @@ msgstr "Zahlungseingang"
 #: workbench/credit_control/models.py workbench/templates/base.html
 msgid "credit entries"
 msgstr "Zahlungseingänge"
+
+#: workbench/credit_control/reporting.py workbench/deals/models.py
+#: workbench/expenses/models.py workbench/invoices/models.py
+#: workbench/offers/models.py workbench/projects/models.py
+msgid "closed on"
+msgstr "Geschlossen am"
 
 #: workbench/credit_control/views.py
 #: workbench/templates/credit_control/creditentry_list.html
@@ -1114,12 +1119,6 @@ msgstr "Entscheidung erwartet am"
 #: workbench/services/models.py workbench/timer/models.py
 msgid "created at"
 msgstr "Erstellt um"
-
-#: workbench/deals/models.py workbench/expenses/models.py
-#: workbench/invoices/models.py workbench/management/commands/export_debtors.py
-#: workbench/offers/models.py workbench/projects/models.py
-msgid "closed on"
-msgstr "Geschlossen am"
 
 #: workbench/deals/models.py
 msgid "closing notice"
@@ -3136,6 +3135,10 @@ msgstr "Timer-Stati"
 #, python-format
 msgid "Logbook entry on %(service)s: %(description)s (%(hours)s)"
 msgstr "Logbucheintrag auf %(service)s: %(description)s (%(hours)s)"
+
+#: workbench/timer/models.py
+msgid "Maybe the start of the next logbook entry?"
+msgstr "Vielleicht der Beginn des nächsten Logbucheintrags?"
 
 #: workbench/timer/models.py
 msgid "Start"

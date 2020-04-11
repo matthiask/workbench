@@ -110,6 +110,7 @@
                 </strong>
                 {{ row.timestamp.badge }}
                 {{ row.timestamp.notes }}
+                {% if row.timestamp.comment %}<em>{{ row.timestamp.comment }}</em>{% endif %}
               </div>
 
               <div class="ml-auto">
@@ -129,10 +130,12 @@
                 </a>
                 {% endif %}
 
-                <form class="d-inline" method="post" action="{{ row.timestamp.get_delete_url }}" onsubmit="return confirm('{% trans 'Really delete?'|escapejs %}')">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
-                </form>
+                {% if row.timestamp.pk %}
+                  <form class="d-inline" method="post" action="{{ row.timestamp.get_delete_url }}" onsubmit="return confirm('{% trans 'Really delete?'|escapejs %}')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
+                  </form>
+                {% endif %}
 
               </div>
 

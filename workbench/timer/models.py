@@ -51,6 +51,7 @@ class TimestampQuerySet(models.QuerySet):
                     "hours": hours(entry.hours),
                 },
                 url=entry.get_absolute_url(),
+                logged_hours=entry,
             )
             for entry in logged_hours
             if entry not in known_logged_hours
@@ -62,7 +63,7 @@ class TimestampQuerySet(models.QuerySet):
 
         ret = []
         previous = None
-        for current in entries:
+        for current in entries[:]:
             if previous is None or previous.type == Timestamp.STOP:
                 if current.type == Timestamp.STOP:
                     # Skip
@@ -77,6 +78,32 @@ class TimestampQuerySet(models.QuerySet):
                 elapsed = None
 
             elif current.type in {Timestamp.LOGBOOK}:
+                current_started_at = current.created_at - dt.timedelta(
+                    hours=float(current.logged_hours.hours)
+                )
+                seconds = Decimal(
+                    (current_started_at - previous.created_at).total_seconds()
+                )
+
+                if seconds > 600:  # Arbitrary cut-off
+                    entry = self.model(
+                        id=0,
+                        created_at=current_started_at,
+                        type=self.model.START,
+                        notes=""
+                    )
+                    entry.comment = _("Maybe the start of the next logbook entry?")
+                    ret.append(
+                        {
+                            "timestamp": entry,
+                            "previous": previous,
+                            "elapsed": (seconds / 3600).quantize(
+                                Decimal("0.0"), rounding=ROUND_UP
+                            ),
+                        }
+                    )
+                    previous = entry
+
                 elapsed = None
 
             else:
