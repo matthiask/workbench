@@ -300,7 +300,7 @@ class DateRangeFilterForm(Form):
 
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
-        data.setdefault("date_from", (monday() - dt.timedelta(days=7)).isoformat())
+        data.setdefault("date_from", monday().isoformat())
         data.setdefault("date_until", (monday() + dt.timedelta(days=6)).isoformat())
         super().__init__(data, *args, **kwargs)
 
