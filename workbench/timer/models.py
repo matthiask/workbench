@@ -85,7 +85,7 @@ class TimestampQuerySet(models.QuerySet):
                     (current_started_at - previous.created_at).total_seconds()
                 )
 
-                if seconds > 600:  # Arbitrary cut-off
+                if seconds > 900:  # Arbitrary cut-off
                     entry = self.model(
                         id=0,
                         created_at=current_started_at,
