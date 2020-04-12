@@ -303,3 +303,41 @@ class TimestampsTest(TestCase):
 
         t.refresh_from_db()
         self.assertEqual(t.logged_hours.description, "Test")
+
+    def test_autodetect_possible_break(self):
+        today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
+        user = factories.UserFactory.create()
+
+        l1 = factories.LoggedHoursFactory.create(
+            rendered_by=user,
+            created_at=today + dt.timedelta(minutes=0),
+            description="ABC",
+            hours=1,
+        )
+
+        l2 = factories.LoggedHoursFactory.create(
+            rendered_by=user,
+            created_at=today + dt.timedelta(minutes=90),
+            description="ABC",
+            hours=1,
+        )
+
+        l3 = factories.LoggedHoursFactory.create(
+            rendered_by=user,
+            created_at=today + dt.timedelta(minutes=155),
+            description="ABC",
+            hours=1,
+        )
+
+        timestamps = Timestamp.objects.for_user(user)["timestamps"]
+
+        self.assertEqual(len(timestamps), 4)
+        self.assertEqual(timestamps[0]["timestamp"].logged_hours, l1)
+        self.assertEqual(timestamps[2]["timestamp"].logged_hours, l2)
+        self.assertEqual(timestamps[3]["timestamp"].logged_hours, l3)
+
+        auto = timestamps[1]
+        self.assertEqual(auto["elapsed"], Decimal("0.5"))
+        self.assertEqual(
+            auto["timestamp"].comment, "Maybe the start of the next logbook entry?"
+        )

@@ -90,7 +90,7 @@ class TimestampQuerySet(models.QuerySet):
                         id=0,
                         created_at=current_started_at,
                         type=self.model.START,
-                        notes=""
+                        notes="",
                     )
                     entry.comment = _("Maybe the start of the next logbook entry?")
                     ret.append(
