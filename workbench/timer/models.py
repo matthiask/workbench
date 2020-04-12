@@ -63,7 +63,7 @@ class TimestampQuerySet(models.QuerySet):
 
         ret = []
         previous = None
-        for current in entries[:]:
+        for current in entries:
             if previous is None or previous.type == Timestamp.STOP:
                 if current.type == Timestamp.STOP:
                     # Skip
