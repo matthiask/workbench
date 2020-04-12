@@ -329,7 +329,9 @@ class TimestampsTest(TestCase):
             hours=1,
         )
 
-        timestamps = Timestamp.objects.for_user(user)["timestamps"]
+        for_user = Timestamp.objects.for_user(user)
+        self.assertEqual(for_user["hours"], Decimal("3"))
+        timestamps = for_user["timestamps"]
 
         self.assertEqual(len(timestamps), 4)
         self.assertEqual(timestamps[0]["timestamp"].logged_hours, l1)
