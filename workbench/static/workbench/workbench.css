@@ -146,6 +146,7 @@ tbody th > a {
 
 .badge {
   align-self: flex-start;
+  font-weight: normal;
 }
 
 .opacity-60 {
@@ -175,7 +176,7 @@ tbody th > a {
 
 .badge-caveat,
 .bg-caveat {
-  background-color: #e4cf4a;
+  background-color: #f1e53b;
 }
 
 .badge-break {
