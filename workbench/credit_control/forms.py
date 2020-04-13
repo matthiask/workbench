@@ -125,7 +125,7 @@ class AccountStatementUploadForm(WarningsForm, Form):
         newest = ledger.transactions.order_by("-value_date").first()
         newest_date = newest.value_date if newest else dt.date.min
 
-        for data in self.statement_list:
+        for data in reversed(self.statement_list):  # From past to present
             if data["value_date"] < newest_date:
                 # Skip credit entries with a value date earlier than the latest
                 # existing credit entry. Credit entries of the same day are
