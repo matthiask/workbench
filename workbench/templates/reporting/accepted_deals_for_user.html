@@ -14,12 +14,14 @@
   <tr>
     <th>{% trans 'deal' %}</th>
     <th></th>
+    <th>{% trans 'Award of contract' %}</th>
     <th class="text-right">{% trans 'value' %}</th>
   </tr>
   {% for deal in row.deals %}
     <tr>
       <td>{% link_or_none deal with_badge=True %}</td>
       <td>{% firstof deal.contact deal.customer %}</td>
+      <td>{{ deal.closing_type }}{% if deal.closing_notice %}: {{ deal.closing_notice }}{% endif %}</td>
       <td class="text-right">{{ deal.value|currency }}</td>
     </tr>
   {% endfor %}

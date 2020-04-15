@@ -31,7 +31,7 @@
           </a>
         </td>
         <td>{% firstof deal.contact deal.customer %}</td>
-        <td>{{ deal.closing_type }}: {{ deal.closing_notice }}</td>
+        <td>{{ deal.closing_type }}{% if deal.closing_notice %}: {{ deal.closing_notice }}{% endif %}</td>
         <td class="text-right">{{ deal.value|currency }}</td>
       </tr>
     {% endfor %}
