@@ -41,10 +41,18 @@
         <th>{% trans 'total'|capfirst %}</th>
         {% for row in stats.by_valuetype %}
           <th class="text-right">{{ row.sum|currency }}</th>
-          <th></th>
+          <th>
+            <div style="margin:-5px 0;display:inline-block">
+              {% pie row.sum row.target type='good' size=28 %}
+            </div>
+          </th>
         {% endfor %}
         <th class="text-right">{{ stats.sum|currency }}</th>
-        <th></th>
+        <th>
+          <div style="margin:-5px 0;display:inline-block">
+            {% pie stats.sum stats.target type='good' size=28 %}
+          </div>
+        </th>
       </tr>
       <tr>
         <th>{% trans 'target'|capfirst %} ({{ stats.weeks|stringformat:'.1f' }} {% trans 'weeks' %})</th>
@@ -52,20 +60,12 @@
           <th class="text-right">
             {{ row.target|currency }}
           </th>
-          <th>
-            <div style="margin:-5px 0;display:inline-block">
-              {% pie row.sum row.target type='good' size=28 %}
-            </div>
-          </th>
+          <th></th>
         {% endfor %}
         <th class="text-right">
           {{ stats.target|currency }}
         </th>
-        <th>
-          <div style="margin:-5px 0;display:inline-block">
-            {% pie stats.sum stats.target type='good' size=28 %}
-          </div>
-        </th>
+        <th></th>
       </tr>
     </tbody>
   </table>
