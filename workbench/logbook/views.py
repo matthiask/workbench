@@ -29,13 +29,6 @@ def create(request, *, viewname):
                     "attrs": 'data-toggle="ajaxmodal"',
                 }
                 for project in request.user.active_projects
-            ]
-            + [
-                {
-                    "title": _("Log a break"),
-                    "url": "/logbook/breaks/create/",
-                    "attrs": 'data-toggle="ajaxmodal"',
-                },
             ],
         },
     )

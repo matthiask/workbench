@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "prettier": "prettier --write .*js *js *.scss workbench/static/workbench/* 'timer/**/*.{js,scss}' 'absences/**/*.{js,scss}'",
+    "prettier": "prettier --write .*js *js workbench/static/workbench/* 'timer/**/*.{js,scss}' 'absences/**/*.{js,scss}'",
     "check": "eslint workbench/static/workbench/ timer/**/*.js && prettier --list-different 'timer/**/*.{js,scss}' 'absences/**/*.{js,scss}'",
     "eslint": "eslint workbench/static/workbench/ timer/**/*.js absences/**/*.js",
     "build-bootstrap": "webpack -p --config webpack.config.bootstrap.js",

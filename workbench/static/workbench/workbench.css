@@ -234,6 +234,7 @@ tbody th > a {
   font-size: 1.8rem;
   box-shadow: 1px 3px 5px 0 rgba(0, 0, 50, 0.3);
   background-image: url("lib/stopwatch.png");
+  background-position: center center;
   background-repeat: no-repeat;
   background-size: contain;
   opacity: 0.5;
@@ -241,4 +242,10 @@ tbody th > a {
 }
 .fixed-btn:hover {
   opacity: 1;
+}
+
+.fixed-btn.break {
+  /* bottom: 5rem; */
+  left: 4.25rem;
+  background-image: url("lib/break.svg");
 }

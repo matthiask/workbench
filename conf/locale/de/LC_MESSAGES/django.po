@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-11 17:37+0200\n"
+"POT-Creation-Date: 2020-04-16 17:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -995,6 +995,7 @@ msgid "This field is required when probability is high."
 msgstr "Dieses Feld wird benötigt wenn die Wahrscheinlichkeit hoch ist."
 
 #: workbench/deals/forms.py
+#: workbench/templates/reporting/accepted_deals_for_user.html
 msgid "Award of contract"
 msgstr "Projektvergabe"
 
@@ -1925,10 +1926,6 @@ msgstr "%(object)s verschieben"
 msgid "Select project for logging"
 msgstr "Projekt für Erfassung auswählen"
 
-#: workbench/logbook/views.py workbench/templates/shortcuts.html
-msgid "Log a break"
-msgstr "Pause erfassen"
-
 #: workbench/management/commands/profitability.py
 msgid "earned"
 msgstr "Verdient"
@@ -2515,6 +2512,10 @@ msgstr "Abmelden"
 msgid "log hours"
 msgstr "Stunden erfassen"
 
+#: workbench/templates/base.html
+msgid "took a break"
+msgstr "Habe eine Pause gemacht"
+
 #: workbench/templates/contacts/organization_detail.html
 msgid "yes,no"
 msgstr "ja,nein"
@@ -3038,6 +3039,10 @@ msgstr ""
 #: workbench/templates/shortcuts.html
 msgid "Log costs in any project"
 msgstr "Kosten in irgendeinem Projekt eintragen"
+
+#: workbench/templates/shortcuts.html
+msgid "Log a break"
+msgstr "Pause erfassen"
 
 #: workbench/templates/start.html
 msgid "active projects"
