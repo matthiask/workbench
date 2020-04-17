@@ -214,7 +214,7 @@ def key_data_view(request):
             ],
             "green_hours": yearly_headline(gh),
             "hours_distribution": {
-                "labels": [local_date_format(row["month"], "F Y") for row in gh],
+                "labels": [local_date_format(row["month"], fmt="F Y") for row in gh],
                 "datasets": [
                     {
                         "label": label,

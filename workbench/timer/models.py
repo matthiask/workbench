@@ -164,7 +164,7 @@ class Timestamp(models.Model):
     def __str__(self):
         return "{} @ {}{}{}".format(
             self.get_type_display(),
-            local_date_format(self.created_at),
+            local_date_format(self.created_at, fmt="H:i"),
             ": " if self.notes else "",
             self.notes,
         )

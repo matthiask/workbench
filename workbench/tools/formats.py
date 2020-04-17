@@ -9,7 +9,7 @@ H1 = Decimal("0.0")
 H2 = Decimal("0.00")
 
 
-def local_date_format(dttm, fmt=None):
+def local_date_format(dttm, *, fmt=None):
     if not dttm:
         return ""
     if hasattr(dttm, "astimezone"):
