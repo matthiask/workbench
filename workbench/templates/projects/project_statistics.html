@@ -27,14 +27,14 @@
 <table class="table table-sm table-responsive">
   <tr>
     <th></th>
-    <th>{% trans 'Offered' %}</th>
-    <th></th>
+    <th>{% trans 'Scheduled' %}</th>
+    <th>{% trans 'Logged' %}</th>
     {% for user, hours in object.grouped_services.logged_hours_per_user %}
       <th class="text-right">{{ user.get_short_name }}</th>
     {% endfor %}
   </tr>
   <tr>
-    <th></th>
+    <th>{% trans 'Total' %}</th>
     <th class="text-right"></th>
     <th class="text-right">
       <a href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}">
@@ -51,7 +51,7 @@
   </tr>
   {% for offer, offer_data in object.grouped_services.offers %}
     {% for row in offer_data.services %}
-    {% if row.logged_hours %}
+    {% if row.logged_hours or row.service.service_hours %}
       <tr>
         <th>{{ row.service.title }}</th>
         <th class="text-right">{{ row.service.service_hours|hours }}</th>

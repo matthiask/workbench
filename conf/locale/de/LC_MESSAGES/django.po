@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-16 17:40+0200\n"
+"POT-Creation-Date: 2020-04-17 16:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -437,6 +437,7 @@ msgid "%s days"
 msgstr "%s Tage"
 
 #: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/templates/projects/project_statistics.html
 msgid "Total"
 msgstr "Total"
 
@@ -1992,8 +1993,7 @@ msgstr "Wähle ein anderes Projekt als Ziel."
 msgid "Delete offers' services?"
 msgstr "Offertleistungen löschen?"
 
-#: workbench/offers/models.py
-#: workbench/templates/projects/project_statistics.html workbench/tools/xlsx.py
+#: workbench/offers/models.py workbench/tools/xlsx.py
 msgid "Offered"
 msgstr "Offeriert"
 
@@ -2855,6 +2855,14 @@ msgstr "Erfasste Stunden pro Stundensatz"
 #: workbench/templates/projects/project_statistics.html
 msgid "Logged hours per user"
 msgstr "Erfasste Stunden pro Nutzer*in"
+
+#: workbench/templates/projects/project_statistics.html
+msgid "Scheduled"
+msgstr "Geplant"
+
+#: workbench/templates/projects/project_statistics.html
+msgid "Logged"
+msgstr "Erfasst"
 
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/key_data.html
