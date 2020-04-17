@@ -68,6 +68,7 @@ LOGIN_REQUIRED_EXEMPT = (
     "/robots",
     "/sitemap",
     "/create-timestamp",
+    "/list-timestamps",
     "/timestamps-controller",
 )
 
@@ -347,7 +348,7 @@ if LIVE:  # pragma: no cover
     SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 604800  # One week
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_REDIRECT_EXEMPT = [r"^create-timestamp/"]
+    SECURE_REDIRECT_EXEMPT = [r"^(create-timestamp|list-timestamps)/"]
 else:
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
     WORKBENCH.TITLE = "(debug) {}".format(WORKBENCH.TITLE)

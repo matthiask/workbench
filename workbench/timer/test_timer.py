@@ -343,3 +343,29 @@ class TimestampsTest(TestCase):
         self.assertEqual(
             auto["timestamp"].comment, "Maybe the start of the next logbook entry?"
         )
+
+    def test_list_timestamps(self):
+        user = factories.UserFactory.create()
+
+        response = self.client.get("/list-timestamps/")
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.get(
+            "/list-timestamps/?user={}".format(user.signed_email)
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data, {"user": str(user), "success": True, "timestamps": []})
+
+        user.timestamp_set.create(
+            type=Timestamp.START, created_at=timezone.now() - dt.timedelta(seconds=10)
+        )
+        user.timestamp_set.create(type=Timestamp.SPLIT)
+
+        response = self.client.get(
+            "/list-timestamps/?user={}".format(user.signed_email)
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data["timestamps"]), 2)
+        self.assertEqual(data["timestamps"][1]["elapsed"], "0.1")

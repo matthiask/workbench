@@ -10,7 +10,7 @@ from django.utils.decorators import decorator_from_middleware
 from django.utils.timezone import make_aware
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from corsheaders.middleware import CorsMiddleware
 
@@ -49,7 +49,22 @@ def timer(request):
     )
 
 
-class TimestampForm(ModelForm):
+class SignedEmailUserMixin:
+    def clean(self):
+        data = super().clean()
+        if self.request.user.is_authenticated:
+            data["user"] = self.request.user
+        else:
+            try:
+                data["user"] = User.objects.get_by_signed_email(
+                    self.request.POST.get("user") or self.request.GET.get("user")
+                )
+            except Exception:
+                raise forms.ValidationError("Invalid user")
+        return data
+
+
+class TimestampForm(SignedEmailUserMixin, ModelForm):
     time = forms.TimeField(required=False)
 
     class Meta:
@@ -58,16 +73,6 @@ class TimestampForm(ModelForm):
 
     def clean(self):
         data = super().clean()
-        if self.request.user.is_authenticated:
-            data["user"] = self.request.user
-        else:
-            try:
-                data["user"] = User.objects.get_by_signed_email(
-                    self.request.POST.get("user")
-                )
-            except Exception:
-                raise forms.ValidationError("Invalid user")
-
         if data.get("time"):
             data["created_at"] = make_aware(
                 dt.datetime.combine(dt.date.today(), data["time"])
@@ -90,6 +95,34 @@ def create_timestamp(request):
     if not form.is_valid():
         return JsonResponse({"errors": form.errors.as_json()}, status=400)
     return JsonResponse({"success": str(form.save())}, status=201)
+
+
+class SignedEmailUserForm(SignedEmailUserMixin, Form):
+    pass
+
+
+@require_GET
+def list_timestamps(request):
+    form = SignedEmailUserForm(request.GET, request=request)
+    if not form.is_valid():
+        return JsonResponse({"errors": form.errors.as_json()}, status=400)
+
+    user = form.cleaned_data["user"]
+    return JsonResponse(
+        {
+            "success": True,
+            "user": str(user),
+            "timestamps": [
+                {
+                    "created_at": row["timestamp"].created_at,
+                    "timestamp": str(row["timestamp"]),
+                    "type": row["timestamp"].type,
+                    "elapsed": row["elapsed"],
+                }
+                for row in Timestamp.objects.for_user(user)["timestamps"]
+            ],
+        }
+    )
 
 
 @require_POST
