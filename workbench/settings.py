@@ -85,6 +85,7 @@ MIDDLEWARE = [
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "workbench.accounts.middleware.user_middleware",
+        "workbench.middleware.history_fallback",
     ]
     if m
 ]
