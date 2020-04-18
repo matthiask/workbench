@@ -67,7 +67,9 @@
           </a>
         </th>
         <th class="progress-cell">
-          {% bar row.logged_hours row.service.service_hours %}
+          {% if row.service.allow_logging or row.logged_hours %}
+            {% bar row.logged_hours row.service.service_hours %}
+          {% endif %}
         </th>
         {% project_statistics_row object.grouped_services.logged_hours_per_user row.logged_hours_per_user as user_row %}
         {% for user, hours in user_row %}
