@@ -266,3 +266,17 @@ class HistoryTest(TestCase):
     def test_everything(self):
         self.assertIn(object(), EVERYTHING)
         self.assertIn("blub", EVERYTHING)
+
+    def test_fallback(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        url = project.get_absolute_url()
+        pk = project.pk
+
+        project.delete()
+
+        response = self.client.get(url)
+        self.assertContains(
+            response, "/history/projects_project/id/{}/".format(pk), status_code=404
+        )
