@@ -118,6 +118,7 @@ def list_timestamps(request):
                     "timestamp": str(row["timestamp"]),
                     "type": row["timestamp"].type,
                     "elapsed": row["elapsed"],
+                    "comment": getattr(row["timestamp"], "comment", None),
                 }
                 for row in Timestamp.objects.for_user(user)["timestamps"]
             ],
