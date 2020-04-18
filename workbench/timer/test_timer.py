@@ -355,7 +355,9 @@ class TimestampsTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        self.assertEqual(data, {"user": str(user), "success": True, "timestamps": []})
+        self.assertEqual(
+            data, {"hours": "0", "user": str(user), "success": True, "timestamps": []}
+        )
 
         user.timestamp_set.create(
             type=Timestamp.START, created_at=timezone.now() - dt.timedelta(seconds=10)

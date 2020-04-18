@@ -108,10 +108,12 @@ def list_timestamps(request):
         return JsonResponse({"errors": form.errors.as_json()}, status=400)
 
     user = form.cleaned_data["user"]
+    data = Timestamp.objects.for_user(user)
     return JsonResponse(
         {
             "success": True,
             "user": str(user),
+            "hours": data["hours"],
             "timestamps": [
                 {
                     "created_at": row["timestamp"].created_at,
@@ -120,7 +122,7 @@ def list_timestamps(request):
                     "elapsed": row["elapsed"],
                     "comment": getattr(row["timestamp"], "comment", None),
                 }
-                for row in Timestamp.objects.for_user(user)["timestamps"]
+                for row in data["timestamps"]
             ],
         }
     )
