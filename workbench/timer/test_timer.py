@@ -229,7 +229,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(timestamps[2]["elapsed"], Decimal("0.2"))
 
         self.assertEqual(timestamps[0]["timestamp"], t1)
-        self.assertIn(l1.description, timestamps[1]["timestamp"].notes)
+        self.assertIn(l1.description, timestamps[1]["timestamp"].pretty_notes)
         self.assertEqual(timestamps[2]["timestamp"], t2)
 
     def test_view(self):

@@ -197,7 +197,11 @@ class Break(Model):
 
     def __str__(self):
         minutes = int(self.timedelta.total_seconds() // 60)
-        return ngettext("%s minute", "%s minutes", minutes) % minutes
+        parts = [
+            ngettext("%s minute", "%s minutes", minutes) % minutes,
+            self.description,
+        ]
+        return " ".join(filter(None, parts))
 
     @property
     def starts_at_datetime(self):

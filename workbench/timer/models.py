@@ -44,12 +44,6 @@ class TimestampQuerySet(models.QuerySet):
             self.model(
                 created_at=entry.created_at,
                 type=self.model.LOGBOOK,
-                notes=_("Logbook entry on %(service)s: %(description)s (%(hours)s)")
-                % {
-                    "service": entry.service,
-                    "description": entry.description,
-                    "hours": hours(entry.hours),
-                },
                 url=entry.get_absolute_url(),
                 logged_hours=entry,
             )
@@ -139,6 +133,8 @@ class Timestamp(models.Model):
         (BREAK, capfirst(_("break"))),
     ]
 
+    TYPE_DICT = dict(TYPE_CHOICES)
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     type = models.CharField(_("type"), max_length=10, choices=TYPE_CHOICES)
@@ -161,14 +157,6 @@ class Timestamp(models.Model):
         verbose_name = _("timestamp")
         verbose_name_plural = _("timestamps")
 
-    def __str__(self):
-        return "{} @ {}{}{}".format(
-            self.get_type_display(),
-            local_date_format(self.created_at, fmt="H:i"),
-            ": " if self.notes else "",
-            self.notes,
-        )
-
     def __init__(self, *args, **kwargs):
         self.url = kwargs.pop("url", "")
         super().__init__(*args, **kwargs)
@@ -178,6 +166,34 @@ class Timestamp(models.Model):
         super().save(*args, **kwargs)
 
     save.alters_data = True
+
+    @property
+    def pretty_type(self):
+        if self.logged_hours:
+            return self.LOGBOOK
+        elif self.logged_break:
+            return self.BREAK
+        return self.type
+
+    def __str__(self):
+        return "{} @ {}{}{}".format(
+            self.TYPE_DICT[self.pretty_type],
+            local_date_format(self.created_at, fmt="H:i"),
+            ": " if self.pretty_notes else "",
+            self.pretty_notes,
+        )
+
+    @property
+    def pretty_notes(self):
+        if self.logged_hours:
+            return "{entry} ({hours})".format(
+                entry=self.logged_hours, hours=hours(self.logged_hours.hours)
+            )
+
+        if self.logged_break:
+            return str(self.logged_break)
+
+        return self.notes
 
     @property
     def badge(self):
@@ -190,8 +206,8 @@ class Timestamp(models.Model):
         }
         return format_html(
             '<span class="badge badge-{}">{}</span>',
-            css[self.type],
-            self.get_type_display(),
+            css[self.pretty_type],
+            self.TYPE_DICT[self.pretty_type],
         )
 
     @property
