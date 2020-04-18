@@ -22,6 +22,14 @@
 .w-third {
   width: 33% !important;
 }
+.table .progress-cell {
+  min-width: 6rem;
+  padding: 8px 1rem 10px 0.5rem;
+  vertical-align: bottom;
+}
+.progress-cell .progress {
+  height: 1em;
+}
 
 @media screen and (max-width: 575px) {
   .w-third {

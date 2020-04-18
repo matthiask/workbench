@@ -29,17 +29,23 @@
     <th></th>
     <th>{% trans 'Scheduled' %}</th>
     <th>{% trans 'Logged' %}</th>
+    <th></th>
     {% for user, hours in object.grouped_services.logged_hours_per_user %}
       <th class="text-right">{{ user.get_short_name }}</th>
     {% endfor %}
   </tr>
   <tr>
     <th>{% trans 'Total' %}</th>
-    <th class="text-right"></th>
+    <th class="text-right">
+      {{ object.grouped_services.service_hours|hours }}
+    </th>
     <th class="text-right">
       <a href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}">
         {{ object.grouped_services.logged_hours|hours }}
       </a>
+    </th>
+    <th class="progress-cell">
+      {% bar object.grouped_services.logged_hours object.grouped_services.service_hours %}
     </th>
     {% for user, hours in object.grouped_services.logged_hours_per_user %}
       <th class="text-right">
@@ -59,6 +65,9 @@
           <a href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}">
             {{ row.logged_hours|hours }}
           </a>
+        </th>
+        <th class="progress-cell">
+          {% bar row.logged_hours row.service.service_hours %}
         </th>
         {% project_statistics_row object.grouped_services.logged_hours_per_user row.logged_hours_per_user as user_row %}
         {% for user, hours in user_row %}
