@@ -8,6 +8,10 @@ FALLBACKS = [
     (r"^/projects/(?P<id>[0-9]+)/", lambda kw: ("projects_project", "id", kw["id"])),
     (r"^/offers/(?P<id>[0-9]+)/", lambda kw: ("offers_offer", "id", kw["id"])),
     (r"^/invoices/(?P<id>[0-9]+)/", lambda kw: ("invoices_invoice", "id", kw["id"])),
+    (
+        r"^/recurring-invoices/(?P<id>[0-9]+)/",
+        lambda kw: ("invoices_recurringinvoice", "id", kw["id"]),
+    ),
 ]
 
 
