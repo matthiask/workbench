@@ -1,6 +1,8 @@
 import datetime as dt
 import types
 
+from django.utils import timezone
+
 import factory
 from faker import Factory
 from faker.providers import address
@@ -11,7 +13,7 @@ from workbench.contacts.models import Organization, Person, PostalAddress
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.deals.models import AttributeGroup, ClosingType, Deal, ValueType
 from workbench.invoices.models import Invoice, RecurringInvoice
-from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.reporting.models import CostCenter
@@ -217,6 +219,19 @@ class LoggedCostFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = LoggedCost
+
+
+class BreakFactory(factory.DjangoModelFactory):
+    user = factory.SubFactory(UserFactory)
+    day = factory.LazyAttribute(lambda a: dt.date.today())
+    starts_at = factory.LazyAttribute(
+        lambda a: (timezone.now() - dt.timedelta(seconds=3600)).time()
+    )
+    ends_at = factory.LazyAttribute(lambda a: timezone.now().time())
+    description = "Brk"
+
+    class Meta:
+        model = Break
 
 
 # CREDIT CONTROL ##############################################################

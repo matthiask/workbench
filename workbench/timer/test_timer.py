@@ -371,3 +371,12 @@ class TimestampsTest(TestCase):
         data = response.json()
         self.assertEqual(len(data["timestamps"]), 2)
         self.assertEqual(data["timestamps"][1]["elapsed"], "0.1")
+
+    def test_pretty(self):
+        hours = factories.LoggedHoursFactory.create()
+        brk = factories.BreakFactory.create()
+
+        self.assertEqual(Timestamp(logged_hours=hours).pretty_type, "logbook")
+        self.assertEqual(Timestamp(logged_break=brk).pretty_type, "break")
+
+        self.assertEqual(Timestamp(logged_break=brk).pretty_notes, str(brk))
