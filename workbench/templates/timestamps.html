@@ -114,11 +114,13 @@
 
               <div class="ml-auto">
 
-                <a href="{% url 'logbook_break_create' %}?day={{ day.isoformat }}&amp;starts_at={{ row.previous.time.isoformat }}&amp;ends_at={{ row.timestamp.time.isoformat }}&amp;timestamp={{ row.timestamp.pk }}&amp;description={{ row.timestamp.notes }}"
-                   data-toggle="ajaxmodal"
-                   class="btn btn-sm align-self-start btn-primary">
-                  {% trans 'break'|capfirst %}
-                </a>
+                {% if not forloop.first %}
+                  <a href="{% url 'logbook_break_create' %}?day={{ day.isoformat }}&amp;starts_at={{ row.previous.time.isoformat }}&amp;ends_at={{ row.timestamp.time.isoformat }}&amp;timestamp={{ row.timestamp.pk }}&amp;description={{ row.timestamp.notes }}"
+                     data-toggle="ajaxmodal"
+                     class="btn btn-sm align-self-start btn-primary">
+                    {% trans 'break'|capfirst %}
+                  </a>
+                {% endif %}
 
                 {% if row.elapsed %}
                 <a
