@@ -7,6 +7,11 @@ function _cl(el, cl, add) {
   el.classList[add ? "add" : "remove"](cl)
 }
 
+function doSubmit(el) {
+  const form = el.closest("form")
+  form.requestSubmit ? form.requestSubmit() : form.submit()
+}
+
 $(function () {
   const gettext =
     window.gettext ||
@@ -102,7 +107,7 @@ $(function () {
     "form[data-autosubmit] select, form[data-autosubmit] input",
     function () {
       if (this.form.method != "get") {
-        $(this).closest("form").submit()
+        doSubmit(this.form)
         return
       }
 
@@ -212,7 +217,7 @@ $(function () {
       // q
       $(".navbar input[type=search]").focus().select()
     } else if (e.keyCode === 13) {
-      $(e.target).parents("form").submit()
+      doSubmit(e.target)
     } else if (e.keyCode >= 49 && e.keyCode <= 57) {
       const el = _sel('[data-number-shortcut="' + (e.keyCode - 48) + '"]')
       if (!el) return
