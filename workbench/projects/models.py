@@ -424,6 +424,9 @@ class Project(Model):
     def solely_declined_offers_warning(self, *, request):
         from workbench.offers.models import Offer
 
+        if self.closed_on:
+            return
+
         status = set(self.offers.order_by().values_list("status", flat=True))
         if status == {Offer.DECLINED}:
             messages.warning(

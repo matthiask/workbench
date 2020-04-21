@@ -144,8 +144,5 @@ def sent_invoices_total():
 
 def open_offers_total():
     return (
-        Offer.objects.offered()
-        .order_by()
-        .aggregate(t=Sum("total_excl_tax"))["t"]
-        or Z
+        Offer.objects.offered().order_by().aggregate(t=Sum("total_excl_tax"))["t"] or Z
     )
