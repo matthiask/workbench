@@ -4,6 +4,8 @@ from decimal import Decimal
 from django.test import TestCase
 from django.utils.translation import deactivate_all
 
+from freezegun import freeze_time
+
 from workbench import factories
 from workbench.audit.models import LoggedAction
 from workbench.offers.models import Offer
@@ -502,7 +504,7 @@ class OffersTest(TestCase):
             response, offer.get_absolute_url(), fetch_redirect_response=False
         )
 
-        offer.refresh_from_db()
+        offer.refresh_from_db()  # Refresh the offer title etc.
         self.assertEqual(
             messages(response),
             [
@@ -510,4 +512,19 @@ class OffersTest(TestCase):
                 "want to close the project now?".format(offer.project),
                 "Offer '{}' has been updated successfully.".format(offer),
             ],
+        )
+
+        offer.project.closed_on = dt.date.today()
+        self.assertIsNone(offer.project.solely_declined_offers_warning(request=None))
+
+    @freeze_time("2020-04-21")
+    def test_offer_with_closed_project(self):
+        project = factories.ProjectFactory.create(closed_on=dt.date.today())
+        offer = factories.OfferFactory.create(
+            project=project, offered_on=dt.date.today(), status=Offer.OFFERED
+        )
+
+        self.assertEqual(
+            offer.status_badge,
+            '<span class="badge badge-warning">Offered on 21.04.2020, but project closed on 21.04.2020</span>',  # noqa
         )
