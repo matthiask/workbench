@@ -215,8 +215,8 @@
             <div class="anchor-container"><a name="service{{ row.service.pk }}" class="anchor"></a></div>
 
             <div class="float-right">
-              <a href="" class="btn btn-primary btn-sm" title="{% trans 'Sort' %}" data-sortable-grabber>
-                {% include 'svg/grabber.svg' %}</a>
+              <span class="btn btn-primary btn-sm" title="{% trans 'Sort' %}" data-sortable-grabber>
+                {% include 'svg/grabber.svg' %}</span>
 
               {% if request.user|has_feature:FEATURES.CONTROLLING %}
                 <span class="dropdown">
@@ -373,6 +373,11 @@
 {% endblock %}
 
 {% block js %}{{ block.super }}
+<style>
+[data-sortable-grabber] {
+  cursor: move;
+}
+</style>
 <script>
 jQuery(function($) {
   $("[data-sortable-container]").sortable({
