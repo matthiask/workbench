@@ -16,7 +16,8 @@ def query(sql, params):
 def logged_hours(user):
     stats = {}
 
-    from_ = monday(in_days(-365))
+    from_ = monday(in_days(-180))
+
     hours_per_week = {}
     for week, type, hours in query(
         """
@@ -143,7 +144,7 @@ FROM generate_series(1, 7) AS series(dow)
 LEFT OUTER JOIN sq ON series.dow=sq.dow
 ORDER BY series.dow
             """,
-            [user.id, in_days(-365)],
+            [user.id, from_],
         )
     ]
 
@@ -165,7 +166,7 @@ FROM generate_series(1, 7) AS series(dow)
 LEFT OUTER JOIN sq ON series.dow=sq.dow
 ORDER BY series.dow
             """,
-            [user.id, in_days(-365)],
+            [user.id, from_],
         )
     ]
 
