@@ -270,20 +270,25 @@ class OffersTest(TestCase):
         )
 
     def test_status(self):
+        project = factories.ProjectFactory.create()
         today = dt.date.today()
         self.assertEqual(
-            Offer(status=Offer.IN_PREPARATION).pretty_status,
+            Offer(project=project, status=Offer.IN_PREPARATION).pretty_status,
             "In preparation since {}".format(local_date_format(today)),
         )
         self.assertEqual(
-            Offer(status=Offer.OFFERED, offered_on=today).pretty_status,
+            Offer(
+                project=project, status=Offer.OFFERED, offered_on=today
+            ).pretty_status,
             "Offered on {}".format(local_date_format(today)),
         )
         self.assertEqual(
-            Offer(status=Offer.DECLINED, closed_on=today).pretty_status,
+            Offer(
+                project=project, status=Offer.DECLINED, closed_on=today
+            ).pretty_status,
             "Declined on {}".format(local_date_format(today)),
         )
-        self.assertEqual(Offer(status="42").pretty_status, "42")
+        self.assertEqual(Offer(project=project, status="42").pretty_status, "42")
 
     def test_declined_offer(self):
         project = factories.ProjectFactory.create()
