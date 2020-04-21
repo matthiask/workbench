@@ -16,15 +16,19 @@
   <table class="table">
     <tr>
       <td class="text-right">{{ service_hours_in_open_orders|hours }}</td>
-      <th>{% trans 'service hours in open orders' %}</th>
+      <th>{% trans 'Service hours in open orders' %}</th>
     </tr>
     <tr>
       <td class="text-right">{{ logged_hours_in_open_orders|hours }}</td>
-      <th>{% trans 'logged hours in open orders' %}</th>
+      <th>{% trans 'Logged hours in open orders' %}</th>
     </tr>
     <tr>
       <td class="text-right">{{ sent_invoices_total|currency }}</td>
-      <th>{% trans 'sent invoices total excl. tax' %}</th>
+      <th>{% trans 'Sent invoices total excl. tax' %}</th>
+    </tr>
+    <tr>
+      <td class="text-right">{{ open_offers_total|currency }}</td>
+      <th>{% trans 'Open offers total excl. tax' %}</th>
     </tr>
   </table>
 

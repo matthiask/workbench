@@ -33,6 +33,9 @@ class OfferQuerySet(SearchQuerySet):
             Q(owned_by=user) | Q(owned_by__is_active=False),
         ).select_related("project", "owned_by")
 
+    def offered(self):
+        return self.filter(status=Offer.OFFERED)
+
     def accepted(self):
         return self.filter(status=Offer.ACCEPTED)
 
@@ -160,6 +163,14 @@ class Offer(ModelWithTotal):
                 "created_at": local_date_format(self.created_at.date())
             }
         elif self.status == self.OFFERED:
+            if self.project.closed_on:
+                return _(
+                    "Offered on %(offered_on)s, but project closed on %(closed_on)s"
+                ) % {
+                    "offered_on": local_date_format(self.offered_on),
+                    "closed_on": local_date_format(self.project.closed_on),
+                }
+
             return _("Offered on %(offered_on)s") % {
                 "offered_on": local_date_format(self.offered_on)
             }
@@ -172,12 +183,15 @@ class Offer(ModelWithTotal):
 
     @property
     def status_badge(self):
-        css = {
-            self.IN_PREPARATION: "info",
-            self.OFFERED: "success",
-            self.ACCEPTED: "default",
-            self.DECLINED: "danger",
-        }[self.status]
+        if self.status == self.OFFERED and self.project.closed_on:
+            css = "warning"
+        else:
+            css = {
+                self.IN_PREPARATION: "info",
+                self.OFFERED: "success",
+                self.ACCEPTED: "default",
+                self.DECLINED: "danger",
+            }[self.status]
 
         return format_html(
             '<span class="badge badge-{}">{}</span>', css, self.pretty_status

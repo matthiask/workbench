@@ -231,6 +231,7 @@ def key_data_view(request):
             "service_hours_in_open_orders": key_data.service_hours_in_open_orders(),
             "logged_hours_in_open_orders": key_data.logged_hours_in_open_orders(),
             "sent_invoices_total": key_data.sent_invoices_total(),
+            "open_offers_total": key_data.open_offers_total(),
         },
     )
 

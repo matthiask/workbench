@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-17 16:01+0200\n"
+"POT-Creation-Date: 2020-04-21 16:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2014,6 +2014,11 @@ msgstr "Offertdatum fehlt für den ausgewählten Status."
 
 #: workbench/offers/models.py
 #, python-format
+msgid "Offered on %(offered_on)s, but project closed on %(closed_on)s"
+msgstr "Offeriert am %(offered_on)s, aber Projekt geschlossen am %(closed_on)s"
+
+#: workbench/offers/models.py
+#, python-format
 msgid "Offered on %(offered_on)s"
 msgstr "Offeriert am %(offered_on)s"
 
@@ -2747,6 +2752,10 @@ msgstr "Formular anzeigen"
 msgid "effort hours"
 msgstr "Aufwände in Stunden"
 
+#: workbench/templates/open-modal.html
+msgid "This page does not exist (anymore)."
+msgstr ""
+
 #: workbench/templates/profile.html
 msgid "Hours per weekday"
 msgstr "Stunden pro Wochentag"
@@ -2895,16 +2904,20 @@ msgid "Facts"
 msgstr "Fakten"
 
 #: workbench/templates/reporting/key_data.html
-msgid "service hours in open orders"
+msgid "Service hours in open orders"
 msgstr "Leistungsstunden in offenen Aufträgen"
 
 #: workbench/templates/reporting/key_data.html
-msgid "logged hours in open orders"
+msgid "Logged hours in open orders"
 msgstr "Erfasste Stunden in offenen Aufträgen"
 
 #: workbench/templates/reporting/key_data.html
-msgid "sent invoices total excl. tax"
+msgid "Sent invoices total excl. tax"
 msgstr "Total exkl. MwSt. aller offenen Rechnungen"
+
+#: workbench/templates/reporting/key_data.html
+msgid "Open offers total excl. tax"
+msgstr "Total exkl. MwSt. aller offenen Offerten"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Revenue minus third party costs and accruals"
@@ -3145,11 +3158,6 @@ msgid "timer states"
 msgstr "Timer-Stati"
 
 #: workbench/timer/models.py
-#, python-format
-msgid "Logbook entry on %(service)s: %(description)s (%(hours)s)"
-msgstr "Logbucheintrag auf %(service)s: %(description)s (%(hours)s)"
-
-#: workbench/timer/models.py
 msgid "Maybe the start of the next logbook entry?"
 msgstr "Vielleicht der Beginn des nächsten Logbucheintrags?"
 
@@ -3303,6 +3311,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Logbook entry on %(service)s: %(description)s (%(hours)s)"
+#~ msgstr "Logbucheintrag auf %(service)s: %(description)s (%(hours)s)"
 
 #~ msgid "Offers in preparation may be deleted, others not."
 #~ msgstr "Offerten in Vorbereitung können gelöscht werden, andere nicht."

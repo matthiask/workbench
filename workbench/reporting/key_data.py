@@ -8,6 +8,7 @@ from django.db.models.functions import ExtractMonth, ExtractYear
 from workbench.awt.reporting import full_time_equivalents_by_month
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.reporting.models import Accruals
 from workbench.tools.models import Z
@@ -135,6 +136,15 @@ def logged_hours_in_open_orders():
 def sent_invoices_total():
     return (
         Invoice.objects.filter(status=Invoice.SENT)
+        .order_by()
+        .aggregate(t=Sum("total_excl_tax"))["t"]
+        or Z
+    )
+
+
+def open_offers_total():
+    return (
+        Offer.objects.offered()
         .order_by()
         .aggregate(t=Sum("total_excl_tax"))["t"]
         or Z
