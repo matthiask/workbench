@@ -108,15 +108,18 @@
         </h3>
       </div>
 
-      {% if user.todays_hours %}
+      {% if todays_hours %}
         <div class="list-group list-group-flush">
-          {% for hours in user.todays_hours %}
+          {% for hours in todays_hours %}
           <a class="list-group-item list-group-item-action" href="{{ hours.get_absolute_url }}" data-toggle="ajaxmodal">
             <small class="d-flex justify-content-between">
               <span>{{ hours.service.project_service_title }}</span>
               <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
             </small>
-            <p class="card-text"><strong>{{ hours.hours|hours }}</strong> {{ hours.description }}</p>
+            <p class="card-text">
+              <strong>{{ hours.hours|hours }}</strong> {{ hours.description }}
+              {% if hours.timestamp %}<small title="{% trans 'timestamp'|capfirst %}">(@{{ hours.timestamp.pretty_time }})</small>{% endif %}
+            </p>
           </a>
           {% endfor %}
         </div>
@@ -138,7 +141,10 @@
               <span>{{ hours.service.project_service_title }}</span>
               <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
             </small>
-            <p class="card-text"><strong>{{ hours.hours|hours }}</strong> {{ hours.description }}</p>
+            <p class="card-text">
+              <strong>{{ hours.hours|hours }}</strong> {{ hours.description }}
+              {% if hours.timestamp %}<small title="{% trans 'timestamp'|capfirst %}">(@{{ hours.timestamp.pretty_time }})</small>{% endif %}
+            </p>
           </a>
           {% endfor %}
         </div>

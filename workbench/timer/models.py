@@ -178,10 +178,14 @@ class Timestamp(models.Model):
     def __str__(self):
         return "{} @ {}{}{}".format(
             self.TYPE_DICT[self.pretty_type],
-            local_date_format(self.created_at, fmt="H:i"),
+            self.pretty_time,
             ": " if self.pretty_notes else "",
             self.pretty_notes,
         )
+
+    @property
+    def pretty_time(self):
+        return local_date_format(self.created_at, fmt="H:i")
 
     @property
     def pretty_notes(self):

@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django.apps import apps
 from django.contrib import messages
 from django.db import connections
@@ -43,10 +45,18 @@ def _acquisition(user):
     return [row for row in rows if row["objects"]]
 
 
+def _todays_hours(user):
+    return (
+        LoggedHours.objects.filter(rendered_by=user, rendered_on=dt.date.today())
+        .select_related("service__project__owned_by", "rendered_by", "timestamp")
+        .order_by("-created_at")[:15]
+    )
+
+
 def _all_users_hours():
     return (
         LoggedHours.objects.filter(rendered_on__gte=in_days(-7))
-        .select_related("service__project__owned_by", "rendered_by")
+        .select_related("service__project__owned_by", "rendered_by", "timestamp")
         .order_by("-created_at")[:20]
     )
 
@@ -106,6 +116,7 @@ def start(request):
         "start.html",
         {
             "acquisition": _acquisition(request.user),
+            "todays_hours": _todays_hours(request.user),
             "all_users_hours": _all_users_hours(),
             "birthdays": _birthdays(),
             "in_preparation": _in_preparation(request.user),

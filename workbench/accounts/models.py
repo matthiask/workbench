@@ -171,14 +171,6 @@ class User(Model, AbstractBaseUser):
         }
 
     @cached_property
-    def todays_hours(self):
-        return (
-            self.loggedhours.filter(rendered_on=dt.date.today())
-            .select_related("service__project__owned_by", "rendered_by")
-            .order_by("-created_at")[:15]
-        )
-
-    @cached_property
     def active_projects(self):
         from workbench.projects.models import Project
 
