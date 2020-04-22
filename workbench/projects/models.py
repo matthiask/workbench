@@ -345,19 +345,9 @@ class Project(Model):
 
         return {
             "offers": sorted(
-                (
-                    item
-                    for item in services_by_offer.items()
-                    if item[1]["services"] or item[0] is not None
-                ),
-                key=lambda item: (
-                    # Declined offers are at the end
-                    item[0].is_declined if item[0] else False,
-                    # None is between declined offers and other offers
-                    item[0] is None,
-                    # Else order by code
-                    item[0]._code if item[0] else 1e100,
-                ),
+                item
+                for item in services_by_offer.items()
+                if item[1]["services"] or item[0] is not None
             ),
             "logged_hours": logged_hours[self],
             "logged_hours_per_user": sorted(

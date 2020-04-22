@@ -103,11 +103,17 @@ class Offer(ModelWithTotal):
         )
 
     def __lt__(self, other):
-        return (
-            (self.status, -self.pk) < (other.status, -other.pk)
-            if isinstance(other, Offer)
-            else 1
-        )
+        # Sorting:
+        # - Declined offers are at the end
+        # - None (not offered yet) is between declined and other offers
+        # - Else order by _code
+        myself = (self.is_declined, True, self._code)
+        if other is None:
+            return myself < (False, True, 1e100)
+        elif isinstance(other, Offer):
+            return myself < (other.is_declined, True, other._code)
+        else:
+            return 1
 
     def get_absolute_url(self):
         return "%s#offer%s" % (self.project.get_absolute_url(), self.pk)
