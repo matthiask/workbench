@@ -528,3 +528,26 @@ class OffersTest(TestCase):
             offer.status_badge,
             '<span class="badge badge-warning">Offered on 21.04.2020, but project closed on 21.04.2020</span>',  # noqa
         )
+
+    def test_offers_ordering(self):
+        project = factories.ProjectFactory.create()
+
+        declined = factories.OfferFactory.create(
+            project=project, offered_on=dt.date.today(), status=Offer.DECLINED
+        )
+        accepted = factories.OfferFactory.create(
+            project=project, offered_on=dt.date.today(), status=Offer.ACCEPTED
+        )
+        in_preparation = factories.OfferFactory.create(project=project)
+        factories.ServiceFactory.create(project=project)
+
+        self.assertTrue(accepted < in_preparation)  # _code
+        self.assertTrue(in_preparation < None)
+        self.assertTrue(None < declined)
+        self.assertTrue(in_preparation < declined)
+
+        self.assertEqual(
+            [row[0] for row in project.grouped_services["offers"]],
+            [accepted, in_preparation, None, declined],
+        )
+        self.assertEqual(in_preparation < 42, 0)

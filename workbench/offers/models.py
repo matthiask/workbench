@@ -113,7 +113,7 @@ class Offer(ModelWithTotal):
         elif isinstance(other, Offer):
             return myself < (other.is_declined, True, other._code)
         else:
-            return 1
+            return 0
 
     def get_absolute_url(self):
         return "%s#offer%s" % (self.project.get_absolute_url(), self.pk)
