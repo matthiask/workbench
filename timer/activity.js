@@ -40,9 +40,18 @@ export const Activity = connect((state, ownProps) => ({
     fetchServices(activity.project.value).then((data) => setServices(data))
   }, [activity.project])
 
-  const activityTitle = activity.project
-    ? activity.project.label.replace(/^[-0-9\s]+/, "")
-    : gettext("Activity")
+  // Backwards compatibility, remove in a few weeks
+  useEffect(() => {
+    if (!activity.title && activity.project) {
+      dispatchUpdate({
+        title:
+          activity.titleOverride ||
+          activity.project.label.replace(/^[-0-9\s]+/, ""),
+      })
+    }
+  }, [activity.project])
+
+  const activityTitle = activity.title || gettext("Activity")
 
   const isReady =
     activity.description &&
@@ -76,7 +85,7 @@ export const Activity = connect((state, ownProps) => ({
           className="py-2 px-2 text-truncate js-drag-handle"
           title={activityTitle}
         >
-          {activity.titleOverride || activityTitle}
+          {activityTitle}
         </div>
         <div className="activity-body">
           <div className="form-group">
@@ -89,7 +98,11 @@ export const Activity = connect((state, ownProps) => ({
                   callback(await fetchProjects(inputValue))
                 }}
                 onChange={(value) => {
-                  dispatchUpdate({project: value, service: null})
+                  dispatchUpdate({
+                    title: value.label.replace(/^[-0-9\s]+/, ""),
+                    project: value,
+                    service: null,
+                  })
                   setServices([])
                 }}
                 placeholder={gettext("Select or search project...")}
@@ -145,7 +158,9 @@ export const Activity = connect((state, ownProps) => ({
             </div>
             <div>
               <button
-                className="btn btn-light btn-sm"
+                className={`btn btn-light btn-sm ${
+                  showSettings ? "active" : ""
+                }`}
                 type="button"
                 onClick={() => setShowSettings(!showSettings)}
                 title={gettext("Settings")}
@@ -202,15 +217,10 @@ export const Activity = connect((state, ownProps) => ({
         </div>
         {showSettings ? (
           <ActivitySettings
-            titleOverride={activity.titleOverride}
-            setTitleOverride={(titleOverride) => {
-              dispatchUpdate({titleOverride})
-            }}
+            title={activity.title}
             color={activity.color}
-            setColor={(color) => {
-              dispatchUpdate({color})
-              setShowSettings(false)
-            }}
+            dispatchUpdate={dispatchUpdate}
+            closeSettings={() => setShowSettings(false)}
             removeActivity={() => {
               dispatch({type: "REMOVE_ACTIVITY", id: activity.id})
             }}

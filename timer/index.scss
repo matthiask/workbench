@@ -62,17 +62,16 @@ div[role="main"] {
 
 .activity-settings {
   position: absolute;
-  top: 44px;
-  right: 8px;
-  left: 8px;
+  bottom: 40px;
+  right: 3px;
+  left: 3px;
   z-index: 1;
-  padding: 1rem;
+  padding: 0.5rem;
   background: #fff;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.7);
 }
 
 .activity-color-chooser {
-  font-size: 1.1rem;
   text-align: center;
 
   input {
@@ -81,8 +80,8 @@ div[role="main"] {
 
   label {
     display: inline-block;
-    width: 1em;
-    height: 1em;
+    width: 19px;
+    height: 19px;
     margin: 0 1px;
     border: 1px solid #ccc;
     cursor: pointer;

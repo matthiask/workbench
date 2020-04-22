@@ -4,10 +4,10 @@ import {COLORS} from "./colors.js"
 import {gettext} from "./i18n.js"
 
 export const ActivitySettings = ({
-  titleOverride,
-  setTitleOverride,
+  title,
   color,
-  setColor,
+  dispatchUpdate,
+  closeSettings,
   removeActivity,
   resetActivity,
 }) => (
@@ -16,9 +16,8 @@ export const ActivitySettings = ({
       <input
         type="text"
         className="activity-title form-control"
-        placeholder={gettext("Override the title")}
-        value={titleOverride}
-        onChange={(e) => setTitleOverride(e.target.value)}
+        value={title}
+        onChange={(e) => dispatchUpdate({title: e.target.value})}
       />
     </div>
     <div className="activity-color-chooser">
@@ -32,21 +31,29 @@ export const ActivitySettings = ({
             type="radio"
             name="color"
             value={c}
-            onClick={() => setColor(c)}
+            onClick={() => dispatchUpdate({color: c})}
           />
         </label>
       ))}
     </div>
-    <div className="d-flex mt-3 justify-content-between">
+
+    <div className="d-flex mt-3">
       <button
-        className="btn btn-danger"
+        className="btn btn-sm btn-primary"
+        type="button"
+        onClick={closeSettings}
+      >
+        {gettext("OK")}
+      </button>
+      <button
+        className="btn btn-sm btn-danger ml-auto mr-1"
         type="button"
         onClick={() => removeActivity()}
       >
         {gettext("Remove")}
       </button>
       <button
-        className="btn btn-warning"
+        className="btn btn-sm btn-warning"
         type="button"
         onClick={() => resetActivity()}
       >
