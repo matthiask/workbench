@@ -4,12 +4,23 @@ import {COLORS} from "./colors.js"
 import {gettext} from "./i18n.js"
 
 export const ActivitySettings = ({
+  titleOverride,
+  setTitleOverride,
   color,
   setColor,
   removeActivity,
   resetActivity,
 }) => (
   <div className="activity-settings">
+    <div className="form-group">
+      <input
+        type="text"
+        className="activity-title form-control"
+        placeholder={gettext("Override the title")}
+        value={titleOverride}
+        onChange={(e) => setTitleOverride(e.target.value)}
+      />
+    </div>
     <div className="activity-color-chooser">
       {COLORS.map((c) => (
         <label

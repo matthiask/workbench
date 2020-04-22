@@ -76,7 +76,7 @@ export const Activity = connect((state, ownProps) => ({
           className="py-2 px-2 text-truncate js-drag-handle"
           title={activityTitle}
         >
-          {activityTitle}
+          {activity.titleOverride || activityTitle}
         </div>
         <div className="activity-body">
           <div className="form-group">
@@ -202,6 +202,10 @@ export const Activity = connect((state, ownProps) => ({
         </div>
         {showSettings ? (
           <ActivitySettings
+            titleOverride={activity.titleOverride}
+            setTitleOverride={(titleOverride) => {
+              dispatchUpdate({titleOverride})
+            }}
             color={activity.color}
             setColor={(color) => {
               dispatchUpdate({color})

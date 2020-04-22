@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-25 21:51+0100\n"
+"POT-Creation-Date: 2020-04-22 11:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -100,6 +100,10 @@ msgstr "Öffne das Stundenformular"
 #: timer/activity.js
 msgid "Send to logbook"
 msgstr "Sende ins Logbuch"
+
+#: timer/activitySettings.js
+msgid "Override the title"
+msgstr "Titel überschreiben"
 
 #: timer/activitySettings.js
 msgid "Remove"

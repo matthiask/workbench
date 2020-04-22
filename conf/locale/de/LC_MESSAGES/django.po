@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-21 16:50+0200\n"
+"POT-Creation-Date: 2020-04-22 11:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2754,7 +2754,7 @@ msgstr "Aufwände in Stunden"
 
 #: workbench/templates/open-modal.html
 msgid "This page does not exist (anymore)."
-msgstr ""
+msgstr "Diese Seite existiert nicht (mehr)."
 
 #: workbench/templates/profile.html
 msgid "Hours per weekday"
@@ -3093,6 +3093,10 @@ msgstr "Stunden von heute"
 msgid "today"
 msgstr "heute"
 
+#: workbench/templates/start.html workbench/timer/models.py
+msgid "timestamp"
+msgstr "Zeitmarke"
+
 #: workbench/templates/start.html
 msgid "no hours today"
 msgstr "keine Stunden heute"
@@ -3172,10 +3176,6 @@ msgstr "Split"
 #: workbench/timer/models.py
 msgid "Stop"
 msgstr "Stop"
-
-#: workbench/timer/models.py
-msgid "timestamp"
-msgstr "Zeitmarke"
 
 #: workbench/tools/forms.py
 msgid "Is automatically filled using the organization's contact."
