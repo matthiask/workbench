@@ -2,13 +2,15 @@ import itertools
 import re
 
 from django.db import models
+from django.db.models import Sum
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 import phonenumbers
 from django_countries.fields import CountryField
 
 from workbench.accounts.models import User
-from workbench.tools.models import Model, SearchQuerySet
+from workbench.tools.models import Model, SearchQuerySet, Z
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
 
@@ -71,6 +73,31 @@ class Organization(Model):
         return Offer.objects.filter(project__customer=self).select_related(
             "project", "owned_by"
         )[:10]
+
+    @cached_property
+    def statistics(self):
+        from workbench.reporting.project_budget_statistics import (
+            project_budget_statistics,
+        )
+
+        pbs = project_budget_statistics(self.project_set.all())["overall"]
+
+        invoices = (
+            self.invoice_set.valid()
+            .filter(project__isnull=True)
+            .order_by()
+            .aggregate(Sum("total_excl_tax"), Sum("third_party_costs"))
+        )
+
+        pbs["invoiced"] += invoices["total_excl_tax__sum"] or Z
+        pbs["third_party_costs"] += invoices["third_party_costs__sum"] or Z
+
+        pbs["gross_margin_per_hour"] = (
+            (pbs["invoiced"] - pbs["third_party_costs"]) / pbs["hours"]
+            if pbs["hours"]
+            else None
+        )
+        return pbs
 
 
 class PersonQuerySet(SearchQuerySet):

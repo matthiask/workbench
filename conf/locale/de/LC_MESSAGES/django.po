@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-23 09:49+0200\n"
+"POT-Creation-Date: 2020-04-23 10:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -483,6 +483,7 @@ msgstr "Anrechenbare Abwesenheitsstunden"
 
 #: workbench/awt/pdf.py workbench/logbook/models.py
 #: workbench/templates/awt/year_detail.html workbench/templates/base.html
+#: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/reporting/overdrawn_projects.html
 #: workbench/timer/models.py
 msgid "logged hours"
@@ -1521,6 +1522,7 @@ msgstr "Anzahlungstotal"
 
 #: workbench/invoices/models.py workbench/logbook/models.py
 #: workbench/services/models.py
+#: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -1997,7 +1999,9 @@ msgstr "Wähle ein anderes Projekt als Ziel."
 msgid "Delete offers' services?"
 msgstr "Offertleistungen löschen?"
 
-#: workbench/offers/models.py workbench/tools/xlsx.py
+#: workbench/offers/models.py
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/tools/xlsx.py
 msgid "Offered"
 msgstr "Offeriert"
 
@@ -2528,6 +2532,22 @@ msgid "yes,no"
 msgstr "ja,nein"
 
 #: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_statistics.html
+msgid "Statistics"
+msgstr "Statistik"
+
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/reporting/key_data.html
+#: workbench/templates/reporting/key_data_gross_profit.html
+msgid "Gross profit"
+msgstr "Umsatz"
+
+#: workbench/templates/contacts/organization_detail.html
+msgid "Gross margin / hour"
+msgstr "Umsatz bereinigt / Stunde"
+
+#: workbench/templates/contacts/organization_detail.html
 msgid "Recent projects"
 msgstr "Letzte Projekte"
 
@@ -2798,11 +2818,6 @@ msgid "Not archived"
 msgstr "Nicht archiviert"
 
 #: workbench/templates/projects/project_detail.html
-#: workbench/templates/projects/project_statistics.html
-msgid "Statistics"
-msgstr "Statistik"
-
-#: workbench/templates/projects/project_detail.html
 msgid "Project offers"
 msgstr "Projektofferten"
 
@@ -2923,11 +2938,6 @@ msgstr "Total exkl. MwSt. aller offenen Offerten"
 #: workbench/templates/reporting/key_data.html
 msgid "Revenue minus third party costs and accruals"
 msgstr "Umsatz minus Fremdkosten minus Abgrenzungen"
-
-#: workbench/templates/reporting/key_data.html
-#: workbench/templates/reporting/key_data_gross_profit.html
-msgid "Gross profit"
-msgstr "Umsatz"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Gross margin"

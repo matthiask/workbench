@@ -58,7 +58,41 @@
 
 <div class="row mt-5">
 
-  <div class="col-md-6 col-lg-4">
+  {% if request.user|has_feature:FEATURES.CONTROLLING %}
+    <div class="col-md-6 col-lg-3">
+      <div class="card mb-3">
+        <div class="card-header"><h3 class="my-0">{% trans 'Statistics' %}</h3></div>
+
+        <div class="card-body">
+          <table class="table table-sm">
+            <tr>
+              <th class="text-right">{% trans 'Offered' %}</th>
+              <td>{{ object.statistics.offered|currency }}</td>
+            </tr>
+            <tr>
+              <th class="text-right">{% trans 'Gross profit' %}</th>
+              <td>{{ object.statistics.invoiced|currency }}</td>
+            </tr>
+            <tr>
+              <th class="text-right">{% trans 'third party costs'|capfirst %}</th>
+              <td>{{ object.statistics.third_party_costs|currency }}</td>
+            </tr>
+            <tr>
+              <th class="text-right">{% trans 'logged hours'|capfirst %}</th>
+              <td>{{ object.statistics.hours|hours }}</td>
+            </tr>
+            <tr>
+              <th class="text-right">{% trans 'Gross margin / hour' %}</th>
+              <td>{{ object.statistics.gross_margin_per_hour|currency }}</td>
+            </tr>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="col-md-6 col-lg-3">
     <div class="card mb-3">
       <div class="card-header"><h3 class="my-0">
         <a href="{% url 'projects_project_list' %}?org={{ organization.pk }}">
@@ -79,7 +113,7 @@
 
   {% if request.user|has_feature:FEATURES.CONTROLLING %}
 
-    <div class="col-md-6 col-lg-4">
+    <div class="col-md-6 col-lg-3">
       <div class="card mb-3">
         <div class="card-header"><h3 class="my-0">
           <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}">
@@ -98,7 +132,7 @@
       </div>
     </div>
 
-    <div class="col-md-6 col-lg-4">
+    <div class="col-md-6 col-lg-3">
       <div class="card mb-3">
         <div class="card-header"><h3 class="my-0">
           <a href="{% url 'offers_offer_list' %}?org={{ organization.pk }}">
