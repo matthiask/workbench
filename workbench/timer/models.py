@@ -12,6 +12,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.logbook.models import Break, LoggedHours
+from workbench.projects.models import Project
 from workbench.tools.formats import hours, local_date_format
 
 
@@ -149,6 +150,13 @@ class Timestamp(models.Model):
     logged_break = models.OneToOneField(
         Break, on_delete=models.CASCADE, blank=True, null=True, verbose_name=_("break"),
     )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_("project"),
+    )
 
     objects = TimestampQuerySet.as_manager()
 
@@ -217,6 +225,13 @@ class Timestamp(models.Model):
     @property
     def time(self):
         return localtime(self.created_at).time().replace(microsecond=0)
+
+    def get_loggedhours_create_url(self):
+        return (
+            reverse("projects_project_createhours", kwargs={"pk": self.project_id})
+            if self.project_id
+            else reverse("logbook_loggedhours_create")
+        )
 
     def get_delete_url(self):
         return reverse("delete_timestamp", args=(self.pk,))

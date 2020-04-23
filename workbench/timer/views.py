@@ -69,7 +69,7 @@ class TimestampForm(SignedEmailUserMixin, ModelForm):
 
     class Meta:
         model = Timestamp
-        fields = ["type", "notes"]
+        fields = ["type", "notes", "project"]
 
     def clean(self):
         data = super().clean()

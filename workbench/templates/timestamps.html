@@ -124,7 +124,7 @@
 
                 {% if row.elapsed %}
                 <a
-                  href="{% url 'logbook_loggedhours_create' %}?hours={{ row.elapsed|stringformat:'s' }}&amp;rendered_on={{ day.isoformat }}&amp;timestamp={{ row.timestamp.pk }}&amp;description={{ row.timestamp.notes }}"
+                  href="{{ row.timestamp.get_loggedhours_create_url }}?hours={{ row.elapsed|stringformat:'s' }}&amp;rendered_on={{ day.isoformat }}&amp;timestamp={{ row.timestamp.pk }}&amp;description={{ row.timestamp.notes }}"
                   data-toggle="ajaxmodal"
                   class="btn btn-sm align-self-start btn-primary">
                   {{ row.elapsed|hours:True }}
