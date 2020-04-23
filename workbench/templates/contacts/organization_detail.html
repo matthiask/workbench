@@ -66,11 +66,15 @@
         <div class="card-body">
           <table class="table table-sm">
             <tr>
-              <th class="text-right">{% trans 'Offered' %}</th>
+              <th class="text-right">
+                <a href="{% url 'offers_offer_list' %}?org={{ object.pk }}&amp;s=all">{% trans 'Offered' %}</a>
+              </th>
               <td>{{ object.statistics.offered|currency }}</td>
             </tr>
             <tr>
-              <th class="text-right">{% trans 'Gross profit' %}</th>
+              <th class="text-right">
+                <a href="{% url 'invoices_invoice_list' %}?org={{ object.pk }}">{% trans 'Gross profit' %}</a>
+              </th>
               <td>{{ object.statistics.invoiced|currency }}</td>
             </tr>
             <tr>
@@ -78,7 +82,9 @@
               <td>{{ object.statistics.third_party_costs|currency }}</td>
             </tr>
             <tr>
-              <th class="text-right">{% trans 'logged hours'|capfirst %}</th>
+              <th class="text-right">
+                <a href="{% url 'logbook_loggedhours_list' %}?organization={{ object.pk }}">{% trans 'logged hours'|capfirst %}</a>
+              </th>
               <td>{{ object.statistics.hours|hours }}</td>
             </tr>
             <tr>
