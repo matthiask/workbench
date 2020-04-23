@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-22 11:35+0200\n"
+"POT-Creation-Date: 2020-04-23 09:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -164,6 +164,10 @@ msgstr "Samstag"
 #: workbench/accounts/reporting.py
 msgid "Sunday"
 msgstr "Sonntag"
+
+#: workbench/accounts/views.py workbench/templates/base.html
+msgid "Settings"
+msgstr "Einstellungen"
 
 #: workbench/accounts/views.py
 msgid "Select Google account"
@@ -893,6 +897,7 @@ msgstr "Zahlungsnotiz"
 #: workbench/invoices/models.py
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
+#: workbench/templates/credit_control/creditentry_detail.html
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/key_data_gross_profit.html
@@ -1303,7 +1308,6 @@ msgid "%(class)s '%(object)s' has been created successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
 
 #: workbench/generic.py workbench/templates/contacts/person_form.html
-#: workbench/templates/generic/object_form.html
 #: workbench/templates/offers/offer_pricing.html
 #, python-format
 msgid "Update %(object)s"
@@ -2353,6 +2357,7 @@ msgstr "Suchformular zurücksetzen"
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
+#: workbench/templates/credit_control/creditentry_detail.html
 #: workbench/templates/deals/deal_detail.html
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/generic/object_detail.html
@@ -2369,6 +2374,7 @@ msgstr "Bearbeiten"
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
+#: workbench/templates/credit_control/creditentry_detail.html
 #: workbench/templates/deals/deal_detail.html
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/generic/object_detail.html
@@ -2482,10 +2488,6 @@ msgstr "Geschichte der Geschäfte"
 msgid "Labor costs"
 msgstr "Personalaufwand"
 
-#: workbench/templates/base.html
-msgid "Profile"
-msgstr "Profil"
-
 #: workbench/templates/base.html workbench/templates/shortcuts.html
 msgid "Keyboard shortcuts"
 msgstr "Tastaturkürzel"
@@ -2538,7 +2540,6 @@ msgid "Recent offers"
 msgstr "Letzte Offerten"
 
 #: workbench/templates/contacts/person_form.html
-#: workbench/templates/generic/object_form.html
 #: workbench/templates/offers/offer_pricing.html
 #, python-format
 msgid "Create %(class)s"
@@ -3311,9 +3312,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "Logbook entry on %(service)s: %(description)s (%(hours)s)"
-#~ msgstr "Logbucheintrag auf %(service)s: %(description)s (%(hours)s)"
-
-#~ msgid "Offers in preparation may be deleted, others not."
-#~ msgstr "Offerten in Vorbereitung können gelöscht werden, andere nicht."
