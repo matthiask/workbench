@@ -7,7 +7,6 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import ProtectedError
 from django.db.models.deletion import Collector
-from django.template.loader import render_to_string
 from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.tools.formats import currency
@@ -72,20 +71,6 @@ class Model(models.Model):
     @property
     def pretty_status(self):
         return self.get_status_display() if hasattr(self, "get_status_display") else ""
-
-    def snippet(self):
-        opts = self._meta
-        return render_to_string(
-            [
-                "%s/%s_snippet.html" % (opts.app_label, opts.model_name.lower()),
-                "generic/object_snippet.html",
-            ],
-            {
-                "object": self,
-                opts.model_name.lower(): self,
-                "verbose_name": opts.verbose_name,
-            },
-        )
 
 
 ONE = Decimal("1")
