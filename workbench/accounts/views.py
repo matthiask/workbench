@@ -3,7 +3,7 @@ from django.contrib import auth, messages
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.cache import never_cache
 
 from authlib.google import GoogleOAuth2Client
@@ -22,6 +22,7 @@ class UserUpdateView(UpdateView):
     model = User
     form_class = UserForm
     success_url = "/"
+    title = gettext_lazy("Settings")
 
     def get_object(self):
         if self.request.user.is_authenticated:
