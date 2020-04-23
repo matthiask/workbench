@@ -2,20 +2,16 @@
 
 {% load bootstrap4 fineforms i18n workbench %}
 
-{% block title %}{% if object %}{{ object }} - {% endif %} {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
+{% block title %}{{ title }} - {% if object %}{{ object }} - {% endif %} {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-md-10 col-lg-8">
     <h1>
-      {% if override_title %}
-        {{ override_title }}
-      {% elif object %}
-        <a href="{{ object.get_absolute_url }}">
-        {% blocktrans %}Update {{ object }}{% endblocktrans %}
-        </a>
+      {% if object %}
+        <a href="{{ object.get_absolute_url }}">{{ title }}</a>
       {% else %}
-        {% blocktrans with class=view.meta.verbose_name %}Create {{ class }}{% endblocktrans %}
+        {{ title }}
       {% endif %}
     </h1>
 

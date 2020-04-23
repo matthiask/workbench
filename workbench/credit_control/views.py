@@ -8,7 +8,7 @@ from workbench.credit_control.forms import AssignCreditEntriesForm
 
 class AccountStatementUploadView(generic.CreateView):
     def get_context_data(self, **kwargs):
-        kwargs.setdefault("override_title", _("Upload account statement"))
+        kwargs.setdefault("title", _("Upload account statement"))
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
@@ -46,5 +46,5 @@ class AssignCreditEntriesView(generic.CreateView):
         return redirect(".")
 
     def get_context_data(self, **kwargs):
-        kwargs.setdefault("override_title", _("Assign credit entries"))
+        kwargs.setdefault("title", _("Assign credit entries"))
         return super().get_context_data(**kwargs)
