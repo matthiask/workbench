@@ -39,7 +39,7 @@
     </div>
 
     {% if in_preparation %}
-    <div class="card mb-3">
+    <div class="card mb-3 d-none d-md-block">
       <div class="card-header"><h3 class="my-0">
         {% trans 'In preparation' %}
       </h3></div>
@@ -59,7 +59,7 @@
     {% endif %}
 
     {% if acquisition %}
-    <div class="card mb-3">
+    <div class="card mb-3 d-none d-md-block">
       <div class="card-header">
         <h3 class="my-0">
           {% trans 'Deals and offers' %}
@@ -78,7 +78,7 @@
     {% endif %}
 
     {% if birthdays %}
-    <div class="card mb-3">
+    <div class="card mb-3 d-none d-md-block">
       <div class="card-header"><h3 class="my-0">{% trans "Birthdays" %}</h3></div>
       <div class="card-body">
         {% for birthday in birthdays %}
@@ -103,7 +103,8 @@
             <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}">
               {{ request.user.hours.today|hours }} {% trans 'today' %}</a> /
             <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">
-              {{ request.user.hours.week|hours }} {% trans 'this week' %}</a>
+              {{ request.user.hours.week|hours }} {% trans 'this week' %}</a> /
+            <a href="{% url 'timestamps' %}">{% trans 'timestamps'|capfirst %}</a>
           </small>
         </h3>
       </div>
