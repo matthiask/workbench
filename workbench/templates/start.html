@@ -44,12 +44,12 @@
         {% trans 'In preparation' %}
       </h3></div>
       <div class="card-body">
-        {% for thing in user.in_preparation.offers %}
+        {% for thing in in_preparation.offers %}
           {% if forloop.first %}<strong>{% trans 'offers' %}:</strong>{% endif %}
           {% link_or_none thing %}
           {% if forloop.last %}<br>{% endif %}
         {% endfor %}
-        {% for thing in user.in_preparation.invoices %}
+        {% for thing in in_preparation.invoices %}
           {% if forloop.first %}<strong>{% trans 'invoices' %}:</strong>{% endif %}
           {% link_or_none thing %}
           {% if forloop.last %}<br>{% endif %}
