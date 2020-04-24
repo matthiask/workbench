@@ -34,6 +34,7 @@ const _debouncedSave = debounce(function (dispatch, state) {
     })
 }, 2500)
 
+// eslint-disable-next-line no-unused-vars
 const remotePersister = (store) => (next) => (action) => {
   const state = next(action)
   _debouncedSave(store.dispatch, store.getState())
@@ -107,7 +108,12 @@ export function configureStore() {
         deserialize,
         merge,
       }),
-      applyMiddleware(notifier, remotePersister, thunk, logger)
+      applyMiddleware(
+        notifier,
+        // remotePersister,
+        thunk,
+        logger
+      )
     )
   )
 

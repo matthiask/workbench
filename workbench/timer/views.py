@@ -35,7 +35,7 @@ def timer(request):
             {"success": True, "updated_at": instance.updated_at}, status=200
         )
 
-    state = TimerState.objects.filter(user=request.user).first()
+    state = None  # TimerState.objects.filter(user=request.user).first()
     return render(
         request,
         "timer.html",
