@@ -5,8 +5,8 @@ from django.utils.formats import date_format
 from django.utils.timezone import localtime
 
 
-H1 = Decimal("0.0")
-H2 = Decimal("0.00")
+Z1 = Decimal("0.0")
+Z2 = Decimal("0.00")
 
 
 def local_date_format(dttm, *, fmt=None):
@@ -26,12 +26,12 @@ def _fmt(*, fmt, value, exp, plus_sign=False):
 
 
 def currency(value, plus_sign=False):
-    return _fmt(fmt="{}{:,.2f}", value=value, exp=H2, plus_sign=plus_sign)
+    return _fmt(fmt="{}{:,.2f}", value=value, exp=Z2, plus_sign=plus_sign)
 
 
 def days(value, plus_sign=False):
-    return _fmt(fmt="{}{:,.2f}d", value=value, exp=H2, plus_sign=plus_sign)
+    return _fmt(fmt="{}{:,.2f}d", value=value, exp=Z2, plus_sign=plus_sign)
 
 
 def hours(value, plus_sign=False):
-    return _fmt(fmt="{}{:,.1f}h", value=value, exp=H1, plus_sign=plus_sign)
+    return _fmt(fmt="{}{:,.1f}h", value=value, exp=Z1, plus_sign=plus_sign)

@@ -1,5 +1,5 @@
 import datetime as dt
-from decimal import Decimal
+from decimal import ROUND_UP, Decimal
 from functools import total_ordering
 
 from django.conf import settings
@@ -8,11 +8,13 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.signing import BadSignature, Signer
 from django.db import connections, models
 from django.db.models import Count, Q, Sum
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.features import FEATURES, UserFeatures
-from workbench.tools.models import Model, Z
+from workbench.tools.formats import Z1
+from workbench.tools.models import Model
 from workbench.tools.validation import in_days, monday
 
 
@@ -221,6 +223,17 @@ select max(created_at) from sq
             )
             return list(cursor)[0][0]
 
+    @cached_property
+    def hours_since_latest(self):
+        return (
+            (
+                Decimal(int((timezone.now() - self.latest_created_at).total_seconds()))
+                / 3600
+            ).quantize(Z1, rounding=ROUND_UP)
+            if self.latest_created_at
+            else Z1
+        )
+
     def take_a_break_warning(self, *, add=0, day=None, request=None):
         if self.features[FEATURES.SKIP_BREAKS]:
             return None
@@ -230,11 +243,11 @@ select max(created_at) from sq
             self.loggedhours.filter(rendered_on=day)
             .order_by()
             .aggregate(h=Sum("hours"))["h"]
-            or Z
+            or Z1
         )
         break_seconds = sum(
             (int(brk.timedelta.total_seconds()) for brk in self.breaks.filter(day=day)),
-            Z,
+            Z1,
         )
         msg = _(
             "You should take (and log!) a break of at least %(minutes)s minutes"

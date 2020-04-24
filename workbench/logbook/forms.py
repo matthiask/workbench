@@ -1,5 +1,4 @@
 import datetime as dt
-from decimal import ROUND_UP, Decimal
 
 from django import forms
 from django.conf import settings
@@ -253,16 +252,8 @@ class LoggedHoursForm(ModelForm):
                 initial["hours"] = request.GET["hours"]
 
             elif not initial.get("hours"):
-                timesince = request.user.latest_created_at and int(
-                    (timezone.now() - request.user.latest_created_at).total_seconds()
-                )
-                if timesince and timesince < 4 * 3600:
-                    initial.setdefault(
-                        "hours",
-                        (timesince / Decimal(3600)).quantize(
-                            Decimal("0.0"), rounding=ROUND_UP
-                        ),
-                    )
+                if request.user.hours_since_latest <= 12:
+                    initial.setdefault("hours", request.user.hours_since_latest)
 
             if request.GET.get("service"):
                 initial["service"] = request.GET.get("service")

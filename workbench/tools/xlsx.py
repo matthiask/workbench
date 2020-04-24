@@ -8,7 +8,7 @@ from xlsxdocument import XLSXDocument
 
 from workbench.contacts.models import PostalAddress
 from workbench.templatetags.workbench import label
-from workbench.tools.formats import H1
+from workbench.tools.formats import Z1
 
 
 class WorkbenchXLSXDocument(XLSXDocument):
@@ -35,10 +35,10 @@ class WorkbenchXLSXDocument(XLSXDocument):
             ],
         )
 
-        by_service_and_user = defaultdict(lambda: defaultdict(lambda: H1))
-        by_user = defaultdict(lambda: H1)
-        by_service_and_month = defaultdict(lambda: defaultdict(lambda: H1))
-        by_month = defaultdict(lambda: H1)
+        by_service_and_user = defaultdict(lambda: defaultdict(lambda: Z1))
+        by_user = defaultdict(lambda: Z1)
+        by_service_and_month = defaultdict(lambda: defaultdict(lambda: Z1))
+        by_month = defaultdict(lambda: Z1)
 
         for h in queryset:
             by_service_and_user[h.service][h.rendered_by] += h.hours
@@ -64,7 +64,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
             ]
             + [user.get_short_name() for user in users],
             [
-                [capfirst(_("total")), "", "", sum(by_user.values(), H1)]
+                [capfirst(_("total")), "", "", sum(by_user.values(), Z1)]
                 + [by_user.get(user) for user in users]
             ]
             + [
@@ -72,7 +72,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
                     service.project,
                     service,
                     service.effort_rate,
-                    sum(by_users.values(), H1),
+                    sum(by_users.values(), Z1),
                 ]
                 + [by_users.get(user) for user in users]
                 for service, by_users in sorted(
@@ -97,7 +97,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
             ]
             + months,
             [
-                [capfirst(_("total")), "", "", sum(by_month.values(), H1)]
+                [capfirst(_("total")), "", "", sum(by_month.values(), Z1)]
                 + [by_month.get(month) for month in months]
             ]
             + [
@@ -105,7 +105,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
                     service.project,
                     service,
                     service.effort_rate,
-                    sum(by_month.values(), H1),
+                    sum(by_month.values(), Z1),
                 ]
                 + [by_months.get(month) for month in months]
                 for service, by_months in sorted(
