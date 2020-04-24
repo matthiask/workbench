@@ -6,7 +6,7 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.logbook.models import LoggedHours
 from workbench.projects.models import Project, Service
-from workbench.tools.models import Z
+from workbench.tools.formats import Z1
 
 
 def overdrawn_projects():
@@ -35,9 +35,10 @@ def overdrawn_projects():
     projects = [
         {
             "project": project,
-            "logged_hours": logged_hours.get(project.id, Z),
-            "service_hours": service_hours.get(project.id, Z),
-            "delta": logged_hours.get(project.id, Z) - service_hours.get(project.id, Z),
+            "logged_hours": logged_hours.get(project.id, Z1),
+            "service_hours": service_hours.get(project.id, Z1),
+            "delta": logged_hours.get(project.id, Z1)
+            - service_hours.get(project.id, Z1),
         }
         for project in projects
     ]
@@ -55,8 +56,8 @@ def overdrawn_projects():
 
 
 def hours_per_customer(date_range, *, users=None):
-    hours = defaultdict(lambda: defaultdict(lambda: Z))
-    user_hours = defaultdict(lambda: Z)
+    hours = defaultdict(lambda: defaultdict(lambda: Z1))
+    user_hours = defaultdict(lambda: Z1)
     seen_organizations = set()
     seen_users = set()
 
@@ -80,7 +81,7 @@ def hours_per_customer(date_range, *, users=None):
             {
                 "organization": org,
                 "user_hours": [(user, hours[org.id][user.id]) for user in user_list],
-                "total_hours": sum(hours[org.id].values(), Z),
+                "total_hours": sum(hours[org.id].values(), Z1),
             }
         )
 
@@ -90,5 +91,5 @@ def hours_per_customer(date_range, *, users=None):
         ),
         "users": user_list,
         "user_hours": [(user, user_hours[user.id]) for user in user_list],
-        "total_hours": sum(user_hours.values(), Z),
+        "total_hours": sum(user_hours.values(), Z1),
     }

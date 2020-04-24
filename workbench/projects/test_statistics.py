@@ -8,7 +8,7 @@ from workbench.projects.models import Project
 from workbench.projects.reporting import hours_per_customer, overdrawn_projects
 from workbench.reporting import green_hours, project_budget_statistics
 from workbench.reporting.models import Accruals
-from workbench.tools.models import Z
+from workbench.tools.formats import Z1, Z2
 from workbench.tools.testing import check_code
 
 
@@ -78,7 +78,7 @@ class StatisticsTest(TestCase):
 
         project = Project.objects.get()
         self.assertEqual(
-            project.not_archived_total, {"total": Z, "hours_rate_undefined": Z}
+            project.not_archived_total, {"total": Z2, "hours_rate_undefined": Z1}
         )
 
         factories.LoggedHoursFactory.create(service=service1, hours=10)
@@ -103,14 +103,14 @@ class StatisticsTest(TestCase):
 
         project = Project.objects.get()
         self.assertEqual(
-            project.not_archived_total, {"total": Z, "hours_rate_undefined": Z}
+            project.not_archived_total, {"total": Z2, "hours_rate_undefined": Z1}
         )
 
         hours = factories.LoggedHoursFactory.create(service=service1, hours=10)
         project = Project.objects.get()
         self.assertEqual(
             project.not_archived_total,
-            {"total": Decimal("1800.00"), "hours_rate_undefined": Z},
+            {"total": Decimal("1800.00"), "hours_rate_undefined": Z1},
         )
 
         self.assertEqual(project.project_invoices_total_excl_tax, Decimal("1800.00"))

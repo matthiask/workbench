@@ -6,8 +6,8 @@ from django.utils import timezone
 
 from workbench.audit.models import LoggedAction
 from workbench.deals.models import Deal, Value, ValueType
+from workbench.tools.formats import Z2
 from workbench.tools.history import EVERYTHING, changes
-from workbench.tools.models import Z
 
 
 def accepted_deals(date_range, *, users=None):
@@ -24,7 +24,7 @@ def accepted_deals(date_range, *, users=None):
         queryset = queryset.filter(owned_by__in=users)
 
     by_user = defaultdict(list)
-    by_month_and_valuetype = defaultdict(lambda: defaultdict(lambda: Z))
+    by_month_and_valuetype = defaultdict(lambda: defaultdict(lambda: Z2))
 
     valuetypes = set()
 
@@ -54,7 +54,7 @@ def accepted_deals(date_range, *, users=None):
             "month": month,
             "sum": sum(by_valuetype.values()),
             "values": [
-                {"type": type, "value": by_valuetype.get(type, Z)}
+                {"type": type, "value": by_valuetype.get(type, Z2)}
                 for type in valuetypes
             ],
         }

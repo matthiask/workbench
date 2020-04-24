@@ -15,8 +15,8 @@ from workbench.contacts.models import Organization, Person
 from workbench.invoices.utils import recurring
 from workbench.projects.models import Project
 from workbench.services.models import ServiceBase
-from workbench.tools.formats import local_date_format
-from workbench.tools.models import ModelWithTotal, MoneyField, SearchQuerySet, Z
+from workbench.tools.formats import Z1, Z2, local_date_format
+from workbench.tools.models import ModelWithTotal, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import in_days, raise_if_errors
 
@@ -117,10 +117,10 @@ class Invoice(ModelWithTotal):
         verbose_name=_("down payment applied to"),
         related_name="down_payment_invoices",
     )
-    down_payment_total = MoneyField(_("down payment total"), default=Z)
+    down_payment_total = MoneyField(_("down payment total"), default=Z2)
     third_party_costs = MoneyField(
         _("third party costs"),
-        default=Z,
+        default=Z2,
         help_text=_("Only used for statistical purposes."),
     )
 
@@ -201,14 +201,14 @@ class Invoice(ModelWithTotal):
     def _calculate_total(self):
         if self.type == self.SERVICES:
             services = self.services.all()
-            self.subtotal = sum((service.service_cost for service in services), Z)
+            self.subtotal = sum((service.service_cost for service in services), Z2)
             self.third_party_costs = sum(
                 (
                     service.third_party_costs
                     for service in services
                     if service.third_party_costs
                 ),
-                Z,
+                Z2,
             )
         super()._calculate_total()
 
@@ -344,8 +344,8 @@ class Invoice(ModelWithTotal):
                 archived_at__isnull=True
             ).order_by()
 
-            hours = not_archived_effort.aggregate(Sum("hours"))["hours__sum"] or Z
-            cost = not_archived_costs.aggregate(Sum("cost"))["cost__sum"] or Z
+            hours = not_archived_effort.aggregate(Sum("hours"))["hours__sum"] or Z1
+            cost = not_archived_costs.aggregate(Sum("cost"))["cost__sum"] or Z2
 
             if hours or cost:
                 service = Service(
@@ -534,7 +534,7 @@ class RecurringInvoice(ModelWithTotal):
 
     third_party_costs = MoneyField(
         _("third party costs"),
-        default=Z,
+        default=Z2,
         help_text=_("Only used for statistical purposes."),
     )
     postal_address = models.TextField(_("postal address"))

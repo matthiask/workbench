@@ -10,7 +10,8 @@ import phonenumbers
 from django_countries.fields import CountryField
 
 from workbench.accounts.models import User
-from workbench.tools.models import Model, SearchQuerySet, Z
+from workbench.tools.formats import Z2
+from workbench.tools.models import Model, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
 
@@ -89,8 +90,8 @@ class Organization(Model):
             .aggregate(Sum("total_excl_tax"), Sum("third_party_costs"))
         )
 
-        pbs["invoiced"] += invoices["total_excl_tax__sum"] or Z
-        pbs["third_party_costs"] += invoices["third_party_costs__sum"] or Z
+        pbs["invoiced"] += invoices["total_excl_tax__sum"] or Z2
+        pbs["third_party_costs"] += invoices["third_party_costs__sum"] or Z2
 
         pbs["gross_margin_per_hour"] = (
             (pbs["invoiced"] - pbs["third_party_costs"]) / pbs["hours"]

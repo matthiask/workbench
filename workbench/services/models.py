@@ -4,7 +4,8 @@ from django.utils import timezone
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 
-from workbench.tools.models import HoursFieldAllowNegatives, Model, MoneyField, Z
+from workbench.tools.formats import Z1, Z2
+from workbench.tools.models import HoursFieldAllowNegatives, Model, MoneyField
 from workbench.tools.validation import raise_if_errors
 
 
@@ -76,8 +77,8 @@ class ServiceBase(Model):
         if not self.position:
             max_pos = self.__class__._default_manager.aggregate(m=Max("position"))["m"]
             self.position = 10 + (max_pos or 0)
-        self.service_hours = self.effort_hours or Z
-        self.service_cost = self.cost or Z
+        self.service_hours = self.effort_hours or Z1
+        self.service_cost = self.cost or Z2
         if all((self.effort_hours, self.effort_rate)):
             self.service_cost += self.effort_hours * self.effort_rate
 

@@ -23,9 +23,8 @@ from workbench.reporting import (
     project_budget_statistics,
 )
 from workbench.reporting.utils import date_ranges
-from workbench.tools.formats import local_date_format
+from workbench.tools.formats import Z0, Z2, local_date_format
 from workbench.tools.forms import DateInput, Form
-from workbench.tools.models import ONE, Z
 from workbench.tools.validation import filter_form, in_days, monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -60,8 +59,8 @@ class OpenItemsForm(Form):
 
         return {
             "list": open_items,
-            "total_excl_tax": sum((i.total_excl_tax for i in open_items), Z),
-            "total": sum((i.total for i in open_items), Z),
+            "total_excl_tax": sum((i.total_excl_tax for i in open_items), Z2),
+            "total": sum((i.total for i in open_items), Z2),
         }
 
 
@@ -128,7 +127,7 @@ def key_data_third_party_costs(request, date_range):
             .order_by("rendered_on", "id")
             .select_related("service"),
             "invoices": Invoice.objects.valid()
-            .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z))
+            .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z2))
             .order_by("invoiced_on", "id")
             .select_related("project", "owned_by"),
         },
@@ -154,10 +153,10 @@ def key_data_view(request):
         except KeyError:
             gross_margin_by_years[month["date"].year] = year = {
                 "year": month["date"].year,
-                "gross_profit": Z,
-                "third_party_costs": Z,
-                "accruals": Z,
-                "gross_margin": Z,
+                "gross_profit": Z2,
+                "third_party_costs": Z2,
+                "accruals": Z2,
+                "gross_margin": Z2,
                 "fte": [],
                 "margin_per_fte": [],
                 "months": [],
@@ -183,7 +182,7 @@ def key_data_view(request):
     ]
 
     def yearly_headline(gh):
-        zero = {"green": Z, "red": Z, "maintenance": Z, "internal": Z, "total": Z}
+        zero = {"green": Z2, "red": Z2, "maintenance": Z2, "internal": Z2, "total": Z2}
 
         for key, months in groupby(gh, key=lambda row: row["month"].year):
             this = zero.copy()
@@ -196,7 +195,7 @@ def key_data_view(request):
                 this["total"] += month["total"]
             this["percentage"] = (
                 100 * (this["green"] + this["maintenance"]) / this["total"]
-            ).quantize(ONE)
+            ).quantize(Z0)
             yield key, this, months
 
     return render(
@@ -209,7 +208,7 @@ def key_data_view(request):
             ],
             "gross_margin_by_month": gross_margin_by_month,
             "invoiced_corrected": [
-                (year, [gross_margin_months.get((year, i), Z) for i in range(1, 13)])
+                (year, [gross_margin_months.get((year, i), Z2) for i in range(1, 13)])
                 for year in range(date_range[0].year, date_range[1].year + 1)
             ],
             "green_hours": yearly_headline(gh),

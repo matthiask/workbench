@@ -474,6 +474,26 @@ class LogbookTest(TestCase):
         self.assertContains(response, 'value="2.0"')  # hours
         self.assertContains(response, "blub")
 
+    def test_no_autofill_hours(self):
+        hours = factories.LoggedHoursFactory.create(
+            created_at=timezone.now() - dt.timedelta(hours=20)
+        )
+        self.client.force_login(hours.rendered_by)
+
+        response = self.client.get(
+            hours.service.project.urls["createhours"],
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(
+            response,
+            '<option value="{}" selected>Any service</option>'.format(hours.service_id),
+        )
+        self.assertContains(
+            response,
+            '<input type="number" name="modal-hours" step="0.1" class="form-control" required id="id_modal-hours">',  # noqa
+            html=True,
+        )
+
     def test_redirect(self):
         self.client.force_login(factories.UserFactory.create())
         self.assertRedirects(self.client.get("/logbook/"), "/logbook/hours/")

@@ -13,8 +13,7 @@ from django.utils.translation import gettext as _
 
 from workbench import generic
 from workbench.expenses.models import ExchangeRates, ExpenseReport
-from workbench.tools.formats import currency, local_date_format
-from workbench.tools.models import Z
+from workbench.tools.formats import Z2, currency, local_date_format
 from workbench.tools.pdf import MarkupParagraph, mm, pdf_response
 
 
@@ -89,7 +88,7 @@ class ExpenseReportPDFView(generic.DetailView):
             total_cost = reduce(
                 operator.add,
                 (cost.expense_cost or cost.third_party_costs for cost in sublist),
-                Z,
+                Z2,
             )
             pdf.table(
                 [
@@ -122,4 +121,4 @@ def convert(request):
     cost = form.cleaned_data["cost"] / Decimal(
         str(rates.rates["rates"][form.cleaned_data["currency"]])
     )
-    return JsonResponse({"cost": cost.quantize(Z)})
+    return JsonResponse({"cost": cost.quantize(Z2)})

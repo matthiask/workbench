@@ -7,7 +7,7 @@ from django.db.models import Sum
 from workbench.accounts.models import User
 from workbench.logbook.models import LoggedCost
 from workbench.projects.models import Project
-from workbench.tools.models import Z
+from workbench.tools.formats import Z1, Z2
 
 
 LABOR_COSTS_SQL = """
@@ -62,18 +62,18 @@ PROJECT_KEYS = USER_KEYS + ["third_party_costs", "revenue"]
 def _labor_costs_by_project_id(date_range, *, project=None, cost_center=None):
     projects = defaultdict(
         lambda: {
-            "hours": Z,
-            "hours_with_rate_undefined": Z,
-            "costs": Z,
-            "costs_with_green_hours_target": Z,
-            "third_party_costs": Z,
-            "revenue": Z,
+            "hours": Z1,
+            "hours_with_rate_undefined": Z1,
+            "costs": Z2,
+            "costs_with_green_hours_target": Z2,
+            "third_party_costs": Z2,
+            "revenue": Z2,
             "by_user": defaultdict(
                 lambda: {
-                    "hours": Z,
-                    "hours_with_rate_undefined": Z,
-                    "costs": Z,
-                    "costs_with_green_hours_target": Z,
+                    "hours": Z1,
+                    "hours_with_rate_undefined": Z1,
+                    "costs": Z2,
+                    "costs_with_green_hours_target": Z2,
                 }
             ),
         }
@@ -173,8 +173,8 @@ def labor_costs_by_user(date_range, *, project=None, cost_center=None):
             chain.from_iterable(row["by_user"].keys() for row in projects.values())
         )
     )
-    by_user = defaultdict(lambda: dict.fromkeys(USER_KEYS, Z))
-    overall = dict.fromkeys(PROJECT_KEYS, Z)
+    by_user = defaultdict(lambda: dict.fromkeys(USER_KEYS, Z2))
+    overall = dict.fromkeys(PROJECT_KEYS, Z2)
 
     for row in projects.values():
         for key in PROJECT_KEYS:

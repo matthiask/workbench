@@ -13,9 +13,8 @@ from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import Invoice, RecurringInvoice, Service
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.services.models import ServiceType
-from workbench.tools.formats import currency, hours, local_date_format
+from workbench.tools.formats import Z2, currency, hours, local_date_format
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
-from workbench.tools.models import Z
 from workbench.tools.pdf import pdf_response
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -283,7 +282,7 @@ class InvoiceForm(PostalAddressSelectionForm):
 
         if instance.type in (instance.FIXED, instance.DOWN_PAYMENT):
             instance.subtotal = self.cleaned_data["subtotal"]
-            instance.down_payment_total = Z
+            instance.down_payment_total = Z2
 
         if "apply_down_payment" in self.cleaned_data:
             if not instance.pk:
@@ -297,7 +296,7 @@ class InvoiceForm(PostalAddressSelectionForm):
                     invoice.total_excl_tax
                     for invoice in self.cleaned_data.get("apply_down_payment")
                 ),
-                Z,
+                Z2,
             )
 
         instance.save()
@@ -315,7 +314,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
             title=self.project.title,
             description=self.project.description,
             type=type,
-            third_party_costs=Z if type == Invoice.SERVICES else None,
+            third_party_costs=Z2 if type == Invoice.SERVICES else None,
         )
 
         super().__init__(*args, **kwargs)

@@ -7,7 +7,7 @@ from workbench.accounts.models import User
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
-from workbench.tools.models import ONE, Z
+from workbench.tools.formats import Z0, Z1
 
 
 def green_hours(date_range, *, users=None):
@@ -34,9 +34,9 @@ WHERE service.hours / logged.hours < 1;
             """,
             [Offer.DECLINED],
         )
-        green_hours_factor = defaultdict(lambda: ONE, cursor)
+        green_hours_factor = defaultdict(lambda: Z0 + 1, cursor)
 
-    within = defaultdict(lambda: defaultdict(lambda: Z))
+    within = defaultdict(lambda: defaultdict(lambda: Z1))
     project_ids = set()
     user_ids = set()
 
@@ -50,10 +50,10 @@ WHERE service.hours / logged.hours < 1;
         user_ids.add(row["rendered_by"])
         within[row["service__project"]][row["rendered_by"]] = row["hours__sum"]
 
-    green = defaultdict(lambda: Z)
-    red = defaultdict(lambda: Z)
-    maintenance = defaultdict(lambda: Z)
-    internal = defaultdict(lambda: Z)
+    green = defaultdict(lambda: Z1)
+    red = defaultdict(lambda: Z1)
+    maintenance = defaultdict(lambda: Z1)
+    internal = defaultdict(lambda: Z1)
 
     for project_id, type in Project.objects.filter(id__in=project_ids).values_list(
         "id", "type"
@@ -65,7 +65,7 @@ WHERE service.hours / logged.hours < 1;
                 maintenance[user_id] += hours
             else:
                 green[user_id] += green_hours_factor[project_id] * hours
-                red[user_id] += (ONE - green_hours_factor[project_id]) * hours
+                red[user_id] += (1 - green_hours_factor[project_id]) * hours
 
     def data(user_id):
         ret = {
@@ -194,7 +194,7 @@ ORDER BY th.month
                 "internal": row[3],
                 "total": row[4],
                 "red": row[4] - row[1] - row[2] - row[3],
-                "percentage": (100 * (row[1] + row[2]) / row[4]).quantize(ONE),
+                "percentage": (100 * (row[1] + row[2]) / row[4]).quantize(Z0),
             }
             for row in cursor
         ]

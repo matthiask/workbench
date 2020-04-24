@@ -14,8 +14,8 @@ from django.utils.translation import gettext, gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.services.models import ServiceBase
-from workbench.tools.formats import local_date_format
-from workbench.tools.models import Model, MoneyField, SearchQuerySet, Z
+from workbench.tools.formats import Z1, Z2, local_date_format
+from workbench.tools.models import Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import in_days, raise_if_errors
 
@@ -225,16 +225,16 @@ class Project(Model):
         from workbench.logbook.models import LoggedHours, LoggedCost
 
         # Logged vs. service hours
-        service_hours = defaultdict(lambda: Z)
-        logged_hours = defaultdict(lambda: Z)
+        service_hours = defaultdict(lambda: Z1)
+        logged_hours = defaultdict(lambda: Z1)
         # Logged vs. service cost
-        service_cost = defaultdict(lambda: Z)
-        logged_cost = defaultdict(lambda: Z)
+        service_cost = defaultdict(lambda: Z2)
+        logged_cost = defaultdict(lambda: Z2)
         # Project logbook vs. project service cost (hours and cost)
-        total_service_cost = Z
-        total_logged_cost = Z
-        total_service_hours_rate_undefined = Z
-        total_logged_hours_rate_undefined = Z
+        total_service_cost = Z2
+        total_logged_cost = Z2
+        total_service_hours_rate_undefined = Z1
+        total_logged_hours_rate_undefined = Z1
 
         offers = self.offers.select_related("owned_by").prefetch_related(
             Prefetch("deals", Deal.objects.select_related("owned_by"))
@@ -245,8 +245,8 @@ class Project(Model):
         )
 
         logged_hours_per_service_and_user = defaultdict(dict)
-        logged_hours_per_user = defaultdict(lambda: Z)
-        logged_hours_per_effort_rate = defaultdict(lambda: Z)
+        logged_hours_per_user = defaultdict(lambda: Z1)
+        logged_hours_per_effort_rate = defaultdict(lambda: Z1)
 
         for row in (
             LoggedHours.objects.order_by()
@@ -296,21 +296,21 @@ class Project(Model):
             logged = logged_hours_per_service_and_user.get(service.id, {})
             row = {
                 "service": service,
-                "logged_hours": sum(logged.values(), Z),
+                "logged_hours": sum(logged.values(), Z1),
                 "logged_hours_per_user": sorted(
                     ((users[user], hours) for user, hours in logged.items()),
                     key=lambda row: row[1],
                     reverse=True,
                 ),
-                "logged_cost": logged_cost_per_service.get(service.id, Z),
+                "logged_cost": logged_cost_per_service.get(service.id, Z2),
                 "not_archived_logged_hours": not_archived_logged_hours_per_service.get(
-                    service.id, Z
+                    service.id, Z1
                 ),
                 "not_archived_logged_cost": not_archived_logged_cost_per_service.get(
-                    service.id, Z
+                    service.id, Z1
                 ),
             }
-            row["not_archived"] = (service.effort_rate or Z) * row[
+            row["not_archived"] = (service.effort_rate or Z2) * row[
                 "not_archived_logged_hours"
             ] + row["not_archived_logged_cost"]
 
@@ -323,9 +323,9 @@ class Project(Model):
 
             if not service.is_declined:
                 service_hours[service.offer] += service.service_hours
-                service_cost[service.offer] += service.cost or Z
+                service_cost[service.offer] += service.cost or Z2
                 service_hours[service.project] += service.service_hours
-                service_cost[service.project] += service.cost or Z
+                service_cost[service.project] += service.cost or Z2
                 total_service_cost += service.service_cost
 
             if service.effort_rate is not None:
@@ -372,7 +372,7 @@ class Project(Model):
             "total_service_hours_rate_undefined": total_service_hours_rate_undefined,
             "total_logged_hours_rate_undefined": total_logged_hours_rate_undefined,
             "total_discount": sum(
-                (offer.discount for offer in offers if not offer.is_declined), Z
+                (offer.discount for offer in offers if not offer.is_declined), Z2
             ),
         }
 
@@ -382,15 +382,15 @@ class Project(Model):
 
     @cached_property
     def project_invoices_total_excl_tax(self):
-        return sum((invoice.total_excl_tax for invoice in self.project_invoices), Z)
+        return sum((invoice.total_excl_tax for invoice in self.project_invoices), Z2)
 
     @cached_property
     def not_archived_total(self):
         # Avoid circular imports
         from workbench.logbook.models import LoggedCost, LoggedHours
 
-        total = Z
-        hours_rate_undefined = Z
+        total = Z2
+        hours_rate_undefined = Z1
 
         for row in (
             LoggedHours.objects.order_by()
@@ -407,7 +407,7 @@ class Project(Model):
             LoggedCost.objects.order_by()
             .filter(service__project=self, archived_at__isnull=True)
             .aggregate(Sum("cost"))["cost__sum"]
-            or Z
+            or Z2
         )
         return {"total": total, "hours_rate_undefined": hours_rate_undefined}
 

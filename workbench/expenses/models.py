@@ -11,8 +11,8 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.expenses.rates import exchange_rates
 from workbench.logbook.models import LoggedCost
-from workbench.tools.formats import currency, local_date_format
-from workbench.tools.models import Model, MoneyField, Z
+from workbench.tools.formats import Z2, currency, local_date_format
+from workbench.tools.models import Model, MoneyField
 from workbench.tools.urls import model_urls
 
 
@@ -31,7 +31,7 @@ class ExpenseReport(Model):
     )
     total = MoneyField(
         _("total"),
-        default=Z,
+        default=Z2,
         blank=True,
         null=True,
         help_text=_("Total incl. tax for third-party services."),
@@ -51,7 +51,7 @@ class ExpenseReport(Model):
 
     def save(self, *args, **kwargs):
         if self.pk:
-            self.total = self.expenses.aggregate(t=Sum("third_party_costs"))["t"] or Z
+            self.total = self.expenses.aggregate(t=Sum("third_party_costs"))["t"] or Z2
         super().save(*args, **kwargs)
 
     save.alters_data = True

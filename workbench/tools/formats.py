@@ -5,6 +5,7 @@ from django.utils.formats import date_format
 from django.utils.timezone import localtime
 
 
+Z0 = Decimal("0")
 Z1 = Decimal("0.0")
 Z2 = Decimal("0.00")
 

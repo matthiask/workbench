@@ -13,8 +13,8 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.projects.models import Project, Service
-from workbench.tools.formats import local_date_format
-from workbench.tools.models import ModelWithTotal, SearchQuerySet, Z
+from workbench.tools.formats import Z2, local_date_format
+from workbench.tools.models import ModelWithTotal, SearchQuerySet
 from workbench.tools.urls import model_urls
 
 
@@ -144,7 +144,7 @@ class Offer(ModelWithTotal):
                 for service in self.services.all()
                 if not service.is_optional
             ),
-            Z,
+            Z2,
         )
         super()._calculate_total()
 

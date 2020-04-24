@@ -9,8 +9,8 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
-from workbench.tools.formats import currency, local_date_format
-from workbench.tools.models import Model, MoneyField, SearchQuerySet, Z
+from workbench.tools.formats import Z2, currency, local_date_format
+from workbench.tools.models import Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 
 
@@ -174,7 +174,7 @@ class Deal(Model):
         skip_value_calculation = kwargs.pop("skip_value_calculation", False)
 
         if not skip_value_calculation:
-            self.value = sum((v.value for v in self.values.all()), Z)
+            self.value = sum((v.value for v in self.values.all()), Z2)
 
         self._fts = " ".join(
             str(part)

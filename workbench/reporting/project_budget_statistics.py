@@ -7,7 +7,7 @@ from django.utils import timezone
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
-from workbench.tools.models import Z
+from workbench.tools.formats import Z1, Z2
 
 
 def project_budget_statistics(projects, *, cutoff_date=None):
@@ -40,9 +40,9 @@ def project_budget_statistics(projects, *, cutoff_date=None):
         .values("service__project", "service__effort_rate")
         .annotate(Sum("hours"))
     )
-    effort_cost_per_project = defaultdict(lambda: Z)
-    effort_hours_with_rate_undefined_per_project = defaultdict(lambda: Z)
-    hours_per_project = defaultdict(lambda: Z)
+    effort_cost_per_project = defaultdict(lambda: Z2)
+    effort_hours_with_rate_undefined_per_project = defaultdict(lambda: Z1)
+    hours_per_project = defaultdict(lambda: Z1)
 
     for row in hours:
         if row["service__effort_rate"] is None:
@@ -82,21 +82,21 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     statistics = [
         {
             "project": project,
-            "logbook": cost_per_project.get(project.id, Z)
+            "logbook": cost_per_project.get(project.id, Z2)
             + effort_cost_per_project[project.id],
-            "cost": cost_per_project.get(project.id, Z),
+            "cost": cost_per_project.get(project.id, Z2),
             "effort_cost": effort_cost_per_project[project.id],
             "effort_hours_with_rate_undefined": effort_hours_with_rate_undefined_per_project[  # noqa
                 project.id
             ],
-            "third_party_costs": third_party_costs_per_project.get(project.id, Z),
-            "offered": offered_per_project.get(project.id, Z),
-            "invoiced": invoiced_per_project.get(project.id, Z),
+            "third_party_costs": third_party_costs_per_project.get(project.id, Z2),
+            "offered": offered_per_project.get(project.id, Z2),
+            "invoiced": invoiced_per_project.get(project.id, Z2),
             "hours": hours_per_project[project.id],
-            "not_archived": not_archived_hours.get(project.id, Z),
-            "delta": cost_per_project.get(project.id, Z)
+            "not_archived": not_archived_hours.get(project.id, Z1),
+            "delta": cost_per_project.get(project.id, Z2)
             + effort_cost_per_project[project.id]
-            - invoiced_per_project.get(project.id, Z),
+            - invoiced_per_project.get(project.id, Z2),
         }
         for project in projects
     ]

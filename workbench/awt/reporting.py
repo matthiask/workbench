@@ -10,7 +10,7 @@ from workbench.accounts.models import User
 from workbench.awt.models import Absence, Employment, Year
 from workbench.awt.utils import days_per_month, monthly_days
 from workbench.logbook.models import LoggedHours
-from workbench.tools.models import Z
+from workbench.tools.formats import Z1
 
 
 class Months(dict):
@@ -39,14 +39,14 @@ class Months(dict):
             "year": year,
             "months": [dt.date(year.year, i, 1) for i in range(1, 13)],
             "target_days": year.months,
-            "percentage": [Z for i in range(12)],
-            "available_vacation_days": [Z for i in range(12)],
-            "absence_vacation": [Z for i in range(12)],
-            "absence_sickness": [Z for i in range(12)],
-            "absence_other": [Z for i in range(12)],
-            "vacation_days_correction": [Z for i in range(12)],
-            "target": [Z for i in range(12)],
-            "hours": [Z for i in range(12)],
+            "percentage": [Z1 for i in range(12)],
+            "available_vacation_days": [Z1 for i in range(12)],
+            "absence_vacation": [Z1 for i in range(12)],
+            "absence_sickness": [Z1 for i in range(12)],
+            "absence_other": [Z1 for i in range(12)],
+            "vacation_days_correction": [Z1 for i in range(12)],
+            "target": [Z1 for i in range(12)],
+            "hours": [Z1 for i in range(12)],
             "employments": OrderedSet(),
         }
         return value
@@ -64,7 +64,7 @@ def active_users(year):
 
 
 def full_time_equivalents_by_month():
-    months = defaultdict(lambda: Z)
+    months = defaultdict(lambda: Z1)
     this_year = dt.date.today().year
     for employment in Employment.objects.all():
         percentage_factor = Decimal(employment.percentage) / 100
@@ -84,7 +84,7 @@ def annual_working_time(year, *, users):
         lambda: {"absence_vacation": [], "absence_sickness": [], "absence_other": []}
     )
     months = Months(year=year, users=users)
-    vacation_days_credit = defaultdict(lambda: Z)
+    vacation_days_credit = defaultdict(lambda: Z1)
     dpm = days_per_month(year)
 
     for employment in Employment.objects.filter(
@@ -128,7 +128,7 @@ def annual_working_time(year, *, users):
         month_data["hours"][row["month"] - 1] += row["hours__sum"]
 
     remaining = defaultdict(
-        lambda: Z,
+        lambda: Z1,
         {
             user: sum(month_data["available_vacation_days"])
             for user, month_data in months.items()
@@ -164,7 +164,7 @@ def annual_working_time(year, *, users):
                     data["vacation_days_correction"][i],
                     data["absence_other"][i],
                 ),
-                Z,
+                Z1,
             )
             * data["year"].working_time_per_day
             for i in range(12)
@@ -172,7 +172,7 @@ def annual_working_time(year, *, users):
 
     def working_time(data):
         at = absences_time(data)
-        return [sum((data["hours"][i], at[i]), Z) for i in range(12)]
+        return [sum((data["hours"][i], at[i]), Z1) for i in range(12)]
 
     def monthly_sums(data):
         sums = [None] * 12
@@ -196,7 +196,7 @@ def annual_working_time(year, *, users):
                 "working_time": wt,
                 "absences_time": at,
                 "monthly_sums": sums,
-                "running_sums": [sum(sums[:i], Z) for i in range(1, 13)],
+                "running_sums": [sum(sums[:i], Z1) for i in range(1, 13)],
                 "totals": {
                     "target_days": sum(month_data["target_days"]),
                     "percentage": sum(month_data["percentage"]) / 12,
@@ -223,7 +223,7 @@ def annual_working_time(year, *, users):
         )
 
     overall = {
-        key: sum((s["totals"][key] for s in statistics), Z)
+        key: sum((s["totals"][key] for s in statistics), Z1)
         for key in [
             "percentage",
             "available_vacation_days",

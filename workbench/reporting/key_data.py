@@ -11,11 +11,11 @@ from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.reporting.models import Accruals
-from workbench.tools.models import Z
+from workbench.tools.formats import Z1, Z2
 
 
 def gross_profit_by_month(date_range):
-    profit = defaultdict(lambda: Z)
+    profit = defaultdict(lambda: Z2)
     for result in (
         Invoice.objects.valid()
         .order_by()
@@ -29,7 +29,7 @@ def gross_profit_by_month(date_range):
 
 
 def third_party_costs_by_month(date_range):
-    costs = defaultdict(lambda: Z)
+    costs = defaultdict(lambda: Z2)
 
     for result in (
         LoggedCost.objects.filter(
@@ -47,7 +47,7 @@ def third_party_costs_by_month(date_range):
     for result in (
         Invoice.objects.valid()
         .order_by()
-        .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z))
+        .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z2))
         .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))
         .values("year", "month")
         .annotate(Sum("third_party_costs"))
@@ -58,7 +58,7 @@ def third_party_costs_by_month(date_range):
 
 
 def accruals_by_month(date_range):
-    accruals = {(0, 0): {"accrual": Z, "delta": None}}
+    accruals = {(0, 0): {"accrual": Z2, "delta": None}}
     for accrual in Accruals.objects.order_by("cutoff_date"):
         accruals[(accrual.cutoff_date.year, accrual.cutoff_date.month)] = {
             "accrual": accrual.accruals,
@@ -99,8 +99,8 @@ def gross_margin_by_month(date_range):
             "date": date,
             "gross_profit": gross[month],
             "third_party_costs": third[month],
-            "accruals": accruals.get(month) or {"accrual": None, "delta": Z},
-            "fte": fte.get(date, Z),
+            "accruals": accruals.get(month) or {"accrual": None, "delta": Z2},
+            "fte": fte.get(date, Z2),
         }
         row["gross_margin"] = (
             row["gross_profit"] + row["third_party_costs"] + row["accruals"]["delta"]
@@ -117,7 +117,7 @@ def service_hours_in_open_orders():
         .filter(project__type=Project.ORDER, project__closed_on__isnull=True)
         .order_by()
         .aggregate(h=Sum("service_hours"))["h"]
-        or Z
+        or Z1
     )
 
 
@@ -129,7 +129,7 @@ def logged_hours_in_open_orders():
         )
         .order_by()
         .aggregate(h=Sum("hours"))["h"]
-        or Z
+        or Z1
     )
 
 
@@ -138,11 +138,11 @@ def sent_invoices_total():
         Invoice.objects.filter(status=Invoice.SENT)
         .order_by()
         .aggregate(t=Sum("total_excl_tax"))["t"]
-        or Z
+        or Z2
     )
 
 
 def open_offers_total():
     return (
-        Offer.objects.offered().order_by().aggregate(t=Sum("total_excl_tax"))["t"] or Z
+        Offer.objects.offered().order_by().aggregate(t=Sum("total_excl_tax"))["t"] or Z2
     )

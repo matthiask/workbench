@@ -16,8 +16,7 @@ from workbench.logbook.models import LoggedHours
 from workbench.notes.forms import NoteForm
 from workbench.notes.models import Note
 from workbench.projects.models import Service
-from workbench.tools.formats import currency, days, hours, local_date_format
-from workbench.tools.models import Z
+from workbench.tools.formats import Z1, Z2, currency, days, hours, local_date_format
 
 
 register = template.Library()
@@ -89,7 +88,7 @@ def h(object):
 def group_hours_by_day(iterable):
     for day, instances in groupby(iterable, lambda logged: logged.rendered_on):
         instances = list(instances)
-        yield (day, sum((item.hours for item in instances), Z), instances)
+        yield (day, sum((item.hours for item in instances), Z1), instances)
 
 
 def deal_group(deal):
@@ -119,7 +118,7 @@ def group_deals_by_probability(iterable, should_group):
         yield {
             "title": capfirst(iterable.model._meta.verbose_name_plural),
             "deals": deals,
-            "sum": sum((deal.value for deal in deals), Z),
+            "sum": sum((deal.value for deal in deals), Z2),
         }
         return
 
@@ -128,7 +127,7 @@ def group_deals_by_probability(iterable, should_group):
         yield {
             "title": group[1],
             "deals": deals,
-            "sum": sum((deal.value for deal in deals), Z),
+            "sum": sum((deal.value for deal in deals), Z2),
         }
 
 

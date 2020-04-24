@@ -17,8 +17,8 @@ from workbench.deals.models import (
     Value,
     ValueType,
 )
+from workbench.tools.formats import Z2
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
-from workbench.tools.models import Z
 from workbench.tools.validation import in_days
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -222,7 +222,7 @@ class DealForm(ModelForm):
             if self.cleaned_data.get(key) is not None:
                 values[vt] = self.cleaned_data[key]
 
-        instance.value = sum(values.values(), Z)
+        instance.value = sum(values.values(), Z2)
         instance.save(skip_value_calculation=True)
 
         instance.values.exclude(type__in=values.keys()).delete()
