@@ -27,7 +27,7 @@
 <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action px-0"
   data-toggle="ajaxmodal">
   <div class="d-flex w-100 justify-content-between">
-    <h5 class="mb-1">{{ object|h }} {{ object.description }}</h5>
+    <h5 class="mb-1">{{ object|h }}</h5>
     <span>
       {{ object.starts_at|date:'H:i' }} &ndash;
       {{ object.ends_at|date:'H:i' }}
