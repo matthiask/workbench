@@ -168,7 +168,9 @@ class DealsTest(TestCase):
         self.assertEqual(da.attribute, attribute1_1)
         self.assertEqual(
             str(da),
-            "Some deal {} - A1.1".format(person.primary_contact.get_short_name()),
+            "{} Some deal - {} - A1.1".format(
+                deal.code, person.primary_contact.get_short_name()
+            ),
         )
 
         response = self.client.get(deal.urls["update"])
