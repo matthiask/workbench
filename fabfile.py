@@ -1,23 +1,21 @@
 import tempfile
 
-from fabric.api import cd, env, execute, local, run, task
-from fabric.contrib.project import rsync_project
+from fabric2 import Connection, task
 
 
-env.forward_agent = True
-env.hosts = ["deploy@workbench.feinheit.ch"]
-WORKBENCH = ["fh", "dbpag", "bf", "test"]
-
-
-@task
-def check():
-    local("venv/bin/flake8 .")
-    local("yarn run check")
+host = "deploy@workbench.feinheit.ch"
+installations = ["fh", "dbpag", "bf", "test"]
 
 
 @task
-def dev():
-    with tempfile.NamedTemporaryFile() as f:
+def check(c):
+    c.run("venv/bin/flake8 .")
+    c.run("yarn run check")
+
+
+@task
+def dev(c):
+    with tempfile.NamedTemporaryFile("w+") as f:
         # https://gist.github.com/jiaaro/b2e1b7c705022c2cf56888152a999f65
         f.write(
             """\
@@ -33,90 +31,90 @@ for job in $(jobs -p); do wait $job; done
         )
         f.flush()
 
-        local("bash %s" % f.name)
+        c.run("bash %s" % f.name)
 
 
-def _do_deploy(folder, rsync):
-    with cd(folder):
-        run("git checkout master")
-        run("git fetch origin")
-        run("git merge --ff-only origin/master")
-        run('find . -name "*.pyc" -delete')
-        run("venv/bin/pip install -U pip wheel setuptools")
-        run("venv/bin/pip install -r requirements.txt")
-        for wb in WORKBENCH:
-            run("DOTENV=.env/{} venv/bin/python manage.py migrate".format(wb))
+def _do_deploy(c, folder, rsync):
+    with c.cd(folder):
+        c.run("git checkout master")
+        c.run("git fetch origin")
+        c.run("git merge --ff-only origin/master")
+        c.run('find . -name "*.pyc" -delete')
+        c.run("venv/bin/pip install -U pip wheel setuptools")
+        c.run("venv/bin/pip install -r requirements.txt")
+        for wb in installations:
+            c.run("DOTENV=.env/{} venv/bin/python manage.py migrate".format(wb))
         if rsync:
-            rsync_project(
-                local_dir="static/", remote_dir="%sstatic/" % folder, delete=True
-            )
-        run(
+            c.local("rsync -avz --delete static/ {}:{}static".format(host, folder))
+        c.run(
             "DOTENV=.env/{} venv/bin/python manage.py collectstatic --noinput".format(
-                WORKBENCH[0]
+                installations[0]
             )
         )
 
 
-def _restart_all():
-    for wb in WORKBENCH:
-        run("systemctl --user restart workbench@{}".format(wb))
+def _restart_all(c):
+    for wb in installations:
+        c.run("systemctl --user restart workbench@{}".format(wb))
 
 
 @task
-def deploy():
+def deploy(c):
     check()
-    local("git push origin master")
-    local("yarn run prod")
-    _do_deploy("www/workbench/", rsync=True)
-    _restart_all()
+    c.run("git push origin master")
+    c.run("yarn run prod")
+    with Connection(host, forward_agent=True) as c:
+        _do_deploy(c, "www/workbench/", rsync=True)
+        _restart_all(c)
 
 
 @task
-def deploy_code():
-    check()
-    local("git push origin master")
-    _do_deploy("www/workbench/", rsync=False)
-    _restart_all()
+def deploy_code(c):
+    check(c)
+    c.run("git push origin master")
+    with Connection(host, forward_agent=True) as c:
+        _do_deploy(c, "www/workbench/", rsync=False)
+        _restart_all(c)
 
 
 @task
-def pull_db(namespace):
+def pull_db(c, namespace):
     remote = {"fh": "workbench", "dbpag": "dbpag-workbench", "bf": "bf-workbench"}[
         namespace
     ]
-    local("dropdb --if-exists workbench")
-    local("createdb workbench")
-    local(
+    c.run("dropdb --if-exists workbench")
+    c.run("createdb workbench")
+    c.run(
         'ssh -C root@workbench.feinheit.ch "sudo -u postgres pg_dump -Ox %s"'
         " | psql workbench" % remote
     )
 
 
 @task
-def dump_db(namespace):
+def dump_db(c, namespace):
     remote = {"fh": "workbench", "dbpag": "dbpag-workbench", "bf": "bf-workbench"}[
         namespace
     ]
-    local(
+    c.run(
         'ssh -C root@workbench.feinheit.ch "sudo -u postgres pg_dump -Ox %s"'
         " > tmp/%s.sql" % (remote, remote)
     )
 
 
 @task
-def load_db(path):
-    local("dropdb --if-exists workbench")
-    local("createdb workbench")
-    local("psql workbench < %s" % path)
+def load_db(c, path):
+    c.run("dropdb --if-exists workbench")
+    c.run("createdb workbench")
+    c.run("psql workbench < %s" % path)
 
 
-@task(alias="mm")
-def makemessages():
-    local(
+@task
+def mm(c):
+    c.run(
         "venv/bin/python manage.py makemessages -a -i venv -i htmlcov"
         " --add-location file"
     )
-    local(
+    c.run(
         "venv/bin/python manage.py makemessages -a -i venv -i htmlcov"
         " --add-location file"
         " -i node_modules -i lib"
@@ -124,23 +122,23 @@ def makemessages():
     )
 
 
-@task(alias="cm")
-def compilemessages():
-    local("cd conf && ../venv/bin/python ../manage.py compilemessages")
+@task
+def cm(c):
+    c.run("cd conf && ../venv/bin/python ../manage.py compilemessages")
 
 
 @task
-def update_requirements():
-    local("rm -rf venv")
-    local("python3 -m venv venv")
-    local("venv/bin/pip install -U pip wheel setuptools")
-    local("venv/bin/pip install -U -r requirements-to-freeze.txt --pre")
-    execute("freeze")
+def update_requirements(c):
+    c.run("rm -rf venv")
+    c.run("python3 -m venv venv")
+    c.run("venv/bin/pip install -U pip wheel setuptools")
+    c.run("venv/bin/pip install -U -r requirements-to-freeze.txt --pre")
+    freeze(c)
 
 
 @task
-def freeze():
-    local(
+def freeze(c):
+    c.run(
         '(printf "# AUTOGENERATED, DO NOT EDIT\n\n";'
         "venv/bin/pip freeze -l"
         # Until Ubuntu gets its act together:
@@ -150,14 +148,14 @@ def freeze():
 
 
 @task
-def setup():
-    local("python3 -m venv venv")
-    execute("update")
+def setup(c):
+    c.run("python3 -m venv venv")
+    update(c)
 
 
 @task
-def update():
-    local("venv/bin/pip install -U pip wheel")
-    local("venv/bin/pip install -r requirements.txt")
-    local("yarn")
-    local("venv/bin/python manage.py migrate")
+def update(c):
+    c.run("venv/bin/pip install -U pip wheel")
+    c.run("venv/bin/pip install -r requirements.txt")
+    c.run("yarn")
+    c.run("venv/bin/python manage.py migrate")
