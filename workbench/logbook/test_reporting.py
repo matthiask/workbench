@@ -30,7 +30,7 @@ class ReportingTest(TestCase):
         )
 
     def test_classify_logging_delay(self):
-        self.assertEqual(classify_logging_delay(-1)[1], "success")
-        self.assertEqual(classify_logging_delay(4)[1], "light")
-        self.assertEqual(classify_logging_delay(10)[1], "caveat")
-        self.assertEqual(classify_logging_delay(40)[1], "danger")
+        self.assertEqual(classify_logging_delay(Decimal(-1))[1], "success")
+        self.assertEqual(classify_logging_delay(Decimal(4))[1], "light")
+        self.assertEqual(classify_logging_delay(Decimal(10))[1], "caveat")
+        self.assertEqual(classify_logging_delay(Decimal(40))[1], "danger")
