@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-23 10:23+0200\n"
+"POT-Creation-Date: 2020-04-28 17:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1483,7 +1483,7 @@ msgstr "Leistungen"
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/overdrawn_projects.html
 #: workbench/templates/reporting/project_budget_statistics.html
-#: workbench/tools/xlsx.py
+#: workbench/timer/models.py workbench/tools/xlsx.py
 msgid "project"
 msgstr "Projekt"
 
@@ -1900,8 +1900,8 @@ msgstr "Es ist nicht erlaubt, Pausen anderer Nutzer*innen zu ändern."
 
 #: workbench/logbook/reporting.py
 #, python-format
-msgid "Average logging time is %.0f hours after noon."
-msgstr "Durchschnittliche Erfassungszeit ist %.0f Stunden nach dem Mittag."
+msgid "Average logging time is %s after noon."
+msgstr "Durchschnittliche Erfassungszeit ist %s nach dem Mittag."
 
 #: workbench/logbook/reporting.py
 msgid "Promptly"
@@ -1917,8 +1917,8 @@ msgstr "Nächster Tag"
 
 #: workbench/logbook/reporting.py
 #, python-format
-msgid "Average logging delay is %.1f days."
-msgstr "Die durchschnittliche Zeit bis zur Erfassung beträgt %.1f Tage."
+msgid "Average logging delay is %s."
+msgstr "Die durchschnittliche Zeit bis zur Erfassung beträgt %s."
 
 #: workbench/logbook/reporting.py
 msgid "Late"
@@ -2505,7 +2505,8 @@ msgid "Timer"
 msgstr "Timer"
 
 #: workbench/templates/base.html workbench/templates/shortcuts.html
-#: workbench/templates/timestamps.html workbench/timer/models.py
+#: workbench/templates/start.html workbench/templates/timestamps.html
+#: workbench/timer/models.py
 msgid "timestamps"
 msgstr "Zeitmarken"
 

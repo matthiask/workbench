@@ -4,10 +4,11 @@ from django.db import connections
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
+from workbench.tools.formats import days, hours
 
 
 def classify_logging_delay(delay):
-    explanation = _("Average logging time is %.0f hours after noon.") % delay
+    explanation = _("Average logging time is %s after noon.") % hours(delay)
 
     if delay < 3:
         return _("Promptly"), "success", explanation
@@ -16,7 +17,7 @@ def classify_logging_delay(delay):
     elif delay < 30:
         return _("Next day"), "caveat", explanation
 
-    explanation = _("Average logging delay is %.1f days.") % (delay / 24)
+    explanation = _("Average logging delay is %s.") % days(delay / 24)
     return _("Late"), "danger", explanation
 
 
@@ -32,7 +33,7 @@ WITH sq as (
     WHERE rendered_on BETWEEN %s AND %s
     GROUP BY user_id
 )
-SELECT user_id, ceil(extract(epoch from delay) / 3600)
+SELECT user_id, cast(extract(epoch from delay) as numeric) / 3600
 FROM sq
             """,
             date_range,

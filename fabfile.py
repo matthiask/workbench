@@ -111,10 +111,12 @@ def load_db(c, path):
 @task
 def mm(c):
     c.run(
+        "PATH=/usr/bin:/usr/sbin "
         "venv/bin/python manage.py makemessages -a -i venv -i htmlcov"
         " --add-location file",
     )
     c.run(
+        "PATH=/usr/bin:/usr/sbin "
         "venv/bin/python manage.py makemessages -a -i venv -i htmlcov"
         " --add-location file"
         " -i node_modules -i lib"
@@ -124,7 +126,10 @@ def mm(c):
 
 @task
 def cm(c):
-    c.run("cd conf && ../venv/bin/python ../manage.py compilemessages")
+    c.run(
+        "cd conf &&"
+        " PATH=/usr/bin:/usr/sbin ../venv/bin/python ../manage.py compilemessages"
+    )
 
 
 @task
