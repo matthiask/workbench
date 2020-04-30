@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-28 17:17+0200\n"
+"POT-Creation-Date: 2020-04-30 10:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2376,7 +2376,6 @@ msgid "Update"
 msgstr "Bearbeiten"
 
 #: workbench/templates/awt/absence_detail.html
-#: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/credit_control/creditentry_detail.html
 #: workbench/templates/deals/deal_detail.html
@@ -2531,6 +2530,10 @@ msgstr "Habe eine Pause gemacht"
 #: workbench/templates/contacts/organization_detail.html
 msgid "yes,no"
 msgstr "ja,nein"
+
+#: workbench/templates/contacts/organization_detail.html
+msgid "Delete or substitute"
+msgstr "Löschen oder ersetzen"
 
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/projects/project_detail.html
