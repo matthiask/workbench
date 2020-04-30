@@ -71,9 +71,6 @@ class Year(Model):
     def __str__(self):
         return "%s %s" % (self.year, self.working_time_model)
 
-    def get_absolute_url(self):
-        return reverse("awt_year_report") + "?year={}".format(self.year)
-
     @property
     def months(self):
         return [getattr(self, field) for field in self.MONTHS]
