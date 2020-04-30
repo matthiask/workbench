@@ -224,7 +224,17 @@ def changes(model, fields, actions):
 def _credit_control_creditentry_cfg(user):
     if not user.features[FEATURES.CONTROLLING]:
         raise Http404
-    return {"fields": EVERYTHING}
+    return {
+        "fields": {
+            "ledger",
+            "reference_number",
+            "value_date",
+            "total",
+            "payment_notice",
+            "invoice",
+            "notes",
+        }
+    }
 
 
 def _deals_deal_cfg(user):
