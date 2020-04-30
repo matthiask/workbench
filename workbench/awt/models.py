@@ -3,7 +3,6 @@ import datetime as dt
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.urls import reverse
 from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
