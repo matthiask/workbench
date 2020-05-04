@@ -65,13 +65,13 @@
       <td>
         <strong>{{ object.value|currency }}</strong>
         <br>
-        {% for value in object.values.all %}
+        {% for value in object.values.select_related %}
           {{ value.type }}: {{ value }}<br>
         {% endfor %}
       </td>
     </tr>
 
-    {% for attribute in object.attributes.all %}
+    {% for attribute in object.attributes.select_related %}
     <tr>
       <th class="text-right">{{ attribute.group }}</th>
       <td>{{ attribute }}</td>
@@ -81,7 +81,7 @@
     <tr>
       <th class="text-right">{{ object|label:'related_offers' }}</th>
       <td>
-        {% for offer in object.related_offers.sr %}
+        {% for offer in object.get_related_offers %}
           <div class="clearfix mb-2">
             <form
               method="post"

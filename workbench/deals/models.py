@@ -170,6 +170,9 @@ class Deal(Model):
             self.owned_by.get_short_name(),
         )
 
+    def get_related_offers(self):
+        return self.related_offers.select_related("owned_by", "project")
+
     def save(self, *args, **kwargs):
         skip_value_calculation = kwargs.pop("skip_value_calculation", False)
 
