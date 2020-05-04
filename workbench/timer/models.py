@@ -1,7 +1,6 @@
 import datetime as dt
 from decimal import ROUND_UP, Decimal
 
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -14,19 +13,6 @@ from workbench.accounts.models import User
 from workbench.logbook.models import Break, LoggedHours
 from workbench.projects.models import Project
 from workbench.tools.formats import hours, local_date_format
-
-
-class TimerState(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name=_("user"))
-    state = JSONField(_("state"), default=dict)
-    updated_at = models.DateTimeField(_("updated at"), auto_now=True)
-
-    class Meta:
-        verbose_name = _("timer state")
-        verbose_name_plural = _("timer states")
-
-    def __str__(self):
-        return str(self.user)
 
 
 class TimestampQuerySet(models.QuerySet):

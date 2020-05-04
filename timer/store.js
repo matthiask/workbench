@@ -5,41 +5,8 @@ import reducer from "./reducers"
 import thunk from "redux-thunk"
 import logger from "redux-logger"
 import persistState from "redux-localstorage"
-import debounce from "lodash.debounce"
 
 const VERSION = 3
-
-const _debouncedSave = debounce(function (dispatch, state) {
-  const headers = new Headers()
-  headers.append("X-Requested-With", "XMLHttpRequest")
-  headers.append("X-CSRFToken", document.cookie.match(/\bcsrftoken=(.+?)\b/)[1])
-
-  const body = new FormData()
-  // eslint-disable-next-line no-unused-vars
-  const {projects, modalActivity, ...serverState} = state
-  body.append("state", JSON.stringify(serverState))
-
-  fetch(".", {
-    credentials: "include",
-    method: "POST",
-    body,
-    headers,
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      window.console.log(data)
-    })
-    .catch((err) => {
-      window.console.error(err)
-    })
-}, 2500)
-
-// eslint-disable-next-line no-unused-vars
-const remotePersister = (store) => (next) => (action) => {
-  const state = next(action)
-  _debouncedSave(store.dispatch, store.getState())
-  return state
-}
 
 const initialTitle = document.title
 const notifier = (store) => (next) => (action) => {

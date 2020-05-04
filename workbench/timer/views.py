@@ -1,5 +1,4 @@
 import datetime as dt
-import json
 
 from django import forms
 from django.contrib import messages
@@ -15,32 +14,17 @@ from django.views.decorators.http import require_GET, require_POST
 from corsheaders.middleware import CorsMiddleware
 
 from workbench.accounts.models import User
-from workbench.timer.models import TimerState, Timestamp
+from workbench.timer.models import Timestamp
 from workbench.tools.formats import hours
 from workbench.tools.forms import Form, ModelForm
 from workbench.tools.validation import filter_form
 
 
 def timer(request):
-    if request.method == "POST":
-        try:
-            state = json.loads(request.POST.get("state"))
-        except Exception:
-            return JsonResponse({}, status=400)
-
-        instance, created = TimerState.objects.update_or_create(
-            user=request.user, defaults={"state": state}
-        )
-        return JsonResponse(
-            {"success": True, "updated_at": instance.updated_at}, status=200
-        )
-
-    state = None  # TimerState.objects.filter(user=request.user).first()
     return render(
         request,
         "timer.html",
         {
-            "state": state.state if state else None,
             "hours": {
                 "today": hours(request.user.hours["today"]),
                 "week": hours(request.user.hours["week"]),
