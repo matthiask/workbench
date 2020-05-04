@@ -964,3 +964,9 @@ class InvoicesTest(TestCase):
 
         response = self.client.get("/invoices/reminders/")
         self.assertNotContains(response, "Not reminded yet")
+
+    def test_reset_last_invoiced_on(self):
+        invoice = factories.InvoiceFactory.create(
+            invoiced_on=in_days(0), last_reminded_on=in_days(-15)
+        )
+        self.assertIsNone(invoice.last_reminded_on)

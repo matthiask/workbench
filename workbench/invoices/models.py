@@ -183,6 +183,14 @@ class Invoice(ModelWithTotal):
                 self.project.title if self.project else "",
             ]
         )
+        if (
+            self.invoiced_on
+            and self.last_reminded_on
+            and self.last_reminded_on < self.invoiced_on
+        ):
+            # Reset last_reminded_on if it is before invoiced_on
+            self.last_reminded_on = None
+
         if new:
             super().save()
         else:
