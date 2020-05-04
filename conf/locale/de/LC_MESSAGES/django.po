@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-30 10:56+0200\n"
+"POT-Creation-Date: 2020-05-04 11:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2024,6 +2024,11 @@ msgstr "Offertdatum fehlt für den ausgewählten Status."
 #, python-format
 msgid "Offered on %(offered_on)s, but project closed on %(closed_on)s"
 msgstr "Offeriert am %(offered_on)s, aber Projekt geschlossen am %(closed_on)s"
+
+#: workbench/offers/models.py
+#, python-format
+msgid "Offered on %(offered_on)s, but not valid anymore"
+msgstr "Offeriert am %(offered_on)s, aber Offerte nicht mehr gültig"
 
 #: workbench/offers/models.py
 #, python-format

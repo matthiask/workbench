@@ -529,6 +529,20 @@ class OffersTest(TestCase):
             '<span class="badge badge-warning">Offered on 21.04.2020, but project closed on 21.04.2020</span>',  # noqa
         )
 
+    @freeze_time("2020-05-04")
+    def test_offer_not_valid_anymore(self):
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(
+            project=project,
+            offered_on=dt.date.today() - dt.timedelta(days=90),
+            status=Offer.OFFERED,
+        )
+
+        self.assertEqual(
+            offer.status_badge,
+            '<span class="badge badge-warning">Offered on 04.02.2020, but not valid anymore</span>',  # noqa
+        )
+
     def test_offers_ordering(self):
         project = factories.ProjectFactory.create()
 

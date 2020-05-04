@@ -393,8 +393,8 @@ class PDFDocument(_PDFDocument):
                 (
                     _("valid until"),
                     (
-                        local_date_format(offer.offered_on + dt.timedelta(days=60))
-                        if offer.offered_on
+                        local_date_format(offer.valid_until)
+                        if offer.valid_until
                         else MarkupParagraph(
                             "<b>%s</b>" % _("NO DATE YET"), style=self.style.bold
                         )

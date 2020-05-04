@@ -163,6 +163,10 @@ class Offer(ModelWithTotal):
             self.closed_on = None
 
     @property
+    def valid_until(self):
+        return self.offered_on + dt.timedelta(days=60) if self.offered_on else None
+
+    @property
     def pretty_status(self):
         if self.status == self.IN_PREPARATION:
             return _("In preparation since %(created_at)s") % {
@@ -175,6 +179,11 @@ class Offer(ModelWithTotal):
                 ) % {
                     "offered_on": local_date_format(self.offered_on),
                     "closed_on": local_date_format(self.project.closed_on),
+                }
+
+            if self.valid_until < dt.date.today():
+                return _("Offered on %(offered_on)s, but not valid anymore") % {
+                    "offered_on": local_date_format(self.offered_on),
                 }
 
             return _("Offered on %(offered_on)s") % {
@@ -190,6 +199,8 @@ class Offer(ModelWithTotal):
     @property
     def status_badge(self):
         if self.status == self.OFFERED and self.project.closed_on:
+            css = "warning"
+        elif self.status == self.OFFERED and self.valid_until < dt.date.today():
             css = "warning"
         else:
             css = {
