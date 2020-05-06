@@ -73,7 +73,7 @@ class BreaksTest(TestCase):
         self.assertContains(response, 'value="09:00:00"')
 
         user.timestamp_set.create(
-            created_at=timezone.now() - dt.timedelta(days=1), type=Timestamp.SPLIT
+            created_at=timezone.now() - dt.timedelta(days=1), type=Timestamp.STOP
         )
 
         response = self.client.get(Break.urls["create"])
@@ -85,9 +85,9 @@ class BreaksTest(TestCase):
         now = timezone.localtime(timezone.now()).replace(
             hour=9, minute=0, second=0, microsecond=0
         )
-        user.timestamp_set.create(type=Timestamp.SPLIT, created_at=now)
+        user.timestamp_set.create(type=Timestamp.STOP, created_at=now)
         user.timestamp_set.create(
-            type=Timestamp.SPLIT, created_at=now - dt.timedelta(seconds=900)
+            type=Timestamp.STOP, created_at=now - dt.timedelta(seconds=900)
         )
 
         self.client.force_login(user)
@@ -171,7 +171,7 @@ class BreaksTest(TestCase):
 
     def test_break_form_save_assigns_timestamp(self):
         user = factories.UserFactory.create()
-        t = user.timestamp_set.create(type=Timestamp.SPLIT)
+        t = user.timestamp_set.create(type=Timestamp.STOP)
 
         self.client.force_login(user)
 
@@ -194,7 +194,7 @@ class BreaksTest(TestCase):
         self.assertEqual(t.type, Timestamp.BREAK)
         self.assertEqual(Timestamp.objects.count(), 1)
 
-        t2 = user.timestamp_set.create(type=Timestamp.SPLIT)
+        t2 = user.timestamp_set.create(type=Timestamp.STOP)
         response = self.client.post(
             brk.urls["update"] + "?timestamp={}".format(t2.pk),
             {

@@ -257,3 +257,41 @@ tbody th > a {
   left: 4.25rem;
   background-image: url("lib/break.svg");
 }
+
+/* TIMESTAMPS */
+
+.ts-time {
+  position: absolute;
+  z-index: 1;
+  left: 0.25rem;
+  bottom: -0.25rem;
+}
+
+.ts-time .badge {
+  padding-right: 0.5rem;
+  position: relative;
+}
+
+.ts-time .badge::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -0.5rem;
+  bottom: 0;
+  border-style: solid;
+  border-width: 0.5rem 0.5rem 0 0;
+  border-color: white transparent transparent transparent;
+  transform-origin: 0 0;
+  transform: rotate(90deg);
+}
+.ts-time .badge::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border-style: solid;
+  border-width: 0.5rem 0.5rem 0 0;
+  border-color: white transparent transparent transparent;
+  transform: rotate(180deg);
+}

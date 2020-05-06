@@ -55,6 +55,11 @@ class TimestampForm(SignedEmailUserMixin, ModelForm):
         model = Timestamp
         fields = ["type", "notes", "project"]
 
+    def __init__(self, data, *args, **kwargs):
+        data = data.copy()
+        data["type"] = "stop" if data.get("type") == "split" else data.get("type")
+        super().__init__(data, *args, **kwargs)
+
     def clean(self):
         data = super().clean()
         if data.get("time"):

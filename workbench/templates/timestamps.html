@@ -52,62 +52,75 @@
       <div class="list-group list-group-flush">
         {% for row in timestamps.timestamps %}
         {% if row.timestamp.logged_hours %}
-          <a class="list-group-item list-group-item-action"
-             href="{{ row.timestamp.logged_hours.get_absolute_url }}"
-            data-toggle="ajaxmodal">
-            <div class="d-flex w-100">
+          <div class="list-group-item ts-{{ row.timestamp.pretty_type }}">
+            <div class="ts-time">
+              <strong>
+                {{ row.timestamp.created_at|date:'H:i' }}
+              </strong>
+              {{ row.timestamp.badge }}
+            </div>
 
+            <div class="d-flex w-100">
               <div>
-                <strong>
-                  {{ row.timestamp.created_at|date:'H:i' }}
-                </strong>
-                {{ row.timestamp.badge }}
                 {{ row.timestamp.logged_hours }}
               </div>
-
-              <span class="btn btn-sm ml-auto align-self-start btn-light">
+              <a
+                  href="{{ row.timestamp.logged_hours.get_absolute_url }}"
+                  data-toggle="ajaxmodal"
+                  class="btn btn-sm ml-auto align-self-start btn-light">
                 {{ row.timestamp.logged_hours.hours|hours:True }}
-              </span>
-
+              </a>
             </div>
 
-          </a>
+          </div>
 
         {% elif row.timestamp.logged_break %}
-          <a class="list-group-item list-group-item-action"
-             href="{{ row.timestamp.logged_break.get_absolute_url }}"
-            data-toggle="ajaxmodal">
-            <div class="d-flex w-100">
-
-              <div>
-                <strong>
-                  {{ row.timestamp.created_at|date:'H:i' }}
-                </strong>
-                {{ row.timestamp.badge }}
-                {{ row.timestamp.logged_break }}
-              </div>
-
+          <div class="list-group-item ts-{{ row.timestamp.pretty_type }}">
+            <div class="ts-time">
+              <strong>
+                {{ row.timestamp.created_at|date:'H:i' }}
+              </strong>
+              {{ row.timestamp.badge }}
             </div>
-          </a>
+
+            <div class="d-flex w-100">
+              {{ row.timestamp.logged_break }}
+
+              <a
+                 href="{{ row.timestamp.logged_break.get_absolute_url }}"
+                 data-toggle="ajaxmodal"
+                 class="btn btn-sm ml-auto align-self-start btn-light">
+                {% trans 'break'|capfirst %}
+              </a>
+            </div>
+          </div>
 
         {% elif row.timestamp.url %}
-          <a class="list-group-item list-group-item-action" href="{{ row.timestamp.url }}" data-toggle="ajaxmodal">
-            <strong>
-              {{ row.timestamp.created_at|date:'H:i' }}
-            </strong>
-            {{ row.timestamp.badge }}
-            {{ row.timestamp.notes }}
-          </a>
+          <div class="list-group-item ts-{{ row.timestamp.pretty_type }}" href="{{ row.timestamp.url }}" data-toggle="ajaxmodal">
+            <div class="ts-time">
+              <strong>
+                {{ row.timestamp.created_at|date:'H:i' }}
+              </strong>
+              {{ row.timestamp.badge }}
+            </div>
+
+            <a href="{{ row.timestamp.url }}" data-toggle="ajaxmodal">
+              {{ row.timestamp.notes }}
+            </a>
+          </div>
 
         {% else %}
-          <div class="list-group-item">
+          <div class="list-group-item ts-{{ row.timestamp.pretty_type }}">
+            <div class="ts-time">
+              <strong>
+                {{ row.timestamp.created_at|date:'H:i' }}
+              </strong>
+              {{ row.timestamp.badge }}
+            </div>
+
             <div class="d-flex w-100">
 
               <div>
-                <strong>
-                  {{ row.timestamp.created_at|date:'H:i' }}
-                </strong>
-                {{ row.timestamp.badge }}
                 {{ row.timestamp.notes }}
                 {% if row.timestamp.comment %}<em>{{ row.timestamp.comment }}</em>{% endif %}
               </div>

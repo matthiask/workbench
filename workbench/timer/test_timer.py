@@ -88,25 +88,25 @@ class TimestampsTest(TestCase):
         user = factories.UserFactory.create()
 
         # Insert STOPs at the beginning -- they should be skipped
-        user.timestamp_set.create(
+        ts1 = user.timestamp_set.create(
             type=Timestamp.STOP, created_at=today - dt.timedelta(minutes=60)
         )
-        user.timestamp_set.create(
+        ts2 = user.timestamp_set.create(
             type=Timestamp.STOP, created_at=today - dt.timedelta(minutes=80)
         )
 
         t1 = user.timestamp_set.create(type=Timestamp.START, created_at=today)
         t2 = user.timestamp_set.create(
-            type=Timestamp.SPLIT, created_at=today + dt.timedelta(minutes=40)
+            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=40)
         )
         t3 = user.timestamp_set.create(
-            type=Timestamp.SPLIT, created_at=today + dt.timedelta(minutes=60)
+            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=60)
         )
         t4 = user.timestamp_set.create(
             type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=115)
         )
         t5 = user.timestamp_set.create(
-            type=Timestamp.SPLIT, created_at=today + dt.timedelta(minutes=140)
+            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=140)
         )
         t6 = user.timestamp_set.create(
             type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=160)
@@ -116,12 +116,13 @@ class TimestampsTest(TestCase):
         self.assertEqual(
             timestamps,
             [
-                {"elapsed": None, "previous": None, "timestamp": t1},
+                {"elapsed": None, "previous": None, "timestamp": ts2},
+                {"elapsed": Decimal("0.4"), "previous": ts2, "timestamp": ts1},
+                {"elapsed": Decimal("1.0"), "previous": ts1, "timestamp": t1},
                 {"elapsed": Decimal("0.7"), "previous": t1, "timestamp": t2},
                 {"elapsed": Decimal("0.4"), "previous": t2, "timestamp": t3},
                 {"elapsed": Decimal("1.0"), "previous": t3, "timestamp": t4},
-                # 0.0 after a STOP
-                {"elapsed": None, "previous": t4, "timestamp": t5},
+                {"elapsed": Decimal("0.5"), "previous": t4, "timestamp": t5},
                 {"elapsed": Decimal("0.4"), "previous": t5, "timestamp": t6},
             ],
         )
@@ -130,66 +131,15 @@ class TimestampsTest(TestCase):
         self.assertEqual(
             [row["timestamp"].type for row in timestamps],
             [
+                Timestamp.STOP,
+                Timestamp.STOP,
                 Timestamp.START,
-                Timestamp.SPLIT,
-                Timestamp.SPLIT,
                 Timestamp.STOP,
-                Timestamp.START,  # Was: SPLIT
+                Timestamp.STOP,
+                Timestamp.STOP,
+                Timestamp.STOP,
                 Timestamp.STOP,
             ],
-        )
-
-    def test_timestamps_start_start(self):
-        """Subsequent STARTs are converted into SPLITs"""
-        today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
-        user = factories.UserFactory.create()
-
-        t1 = user.timestamp_set.create(
-            type=Timestamp.START, created_at=today + dt.timedelta(minutes=0)
-        )
-        t2 = user.timestamp_set.create(
-            type=Timestamp.START, created_at=today + dt.timedelta(minutes=29)
-        )
-
-        timestamps = Timestamp.objects.for_user(user)["timestamps"]
-        self.assertEqual(
-            timestamps,
-            [
-                {"elapsed": None, "previous": None, "timestamp": t1},
-                {"elapsed": Decimal("0.5"), "previous": t1, "timestamp": t2},
-            ],
-        )
-        self.assertEqual(
-            [row["timestamp"].type for row in timestamps],
-            [Timestamp.START, Timestamp.SPLIT],  # 2nd was: START
-        )
-
-    def test_timestamps_stop_stop(self):
-        """Test that repeated STOPs are dropped"""
-        today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
-        user = factories.UserFactory.create()
-
-        t1 = user.timestamp_set.create(
-            type=Timestamp.START, created_at=today + dt.timedelta(minutes=0)
-        )
-        t2 = user.timestamp_set.create(
-            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=30)
-        )
-        user.timestamp_set.create(
-            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=40)
-        )
-
-        timestamps = Timestamp.objects.for_user(user)["timestamps"]
-        self.assertEqual(
-            timestamps,
-            [
-                {"elapsed": None, "previous": None, "timestamp": t1},
-                {"elapsed": Decimal("0.5"), "previous": t1, "timestamp": t2},
-            ],
-        )
-        self.assertEqual(
-            [row["timestamp"].type for row in timestamps],
-            [Timestamp.START, Timestamp.STOP],
         )
 
     def test_latest_logbook_entry(self):
@@ -208,7 +158,7 @@ class TimestampsTest(TestCase):
             description="ABC",
         )
         t2 = user.timestamp_set.create(
-            type=Timestamp.SPLIT, created_at=today + dt.timedelta(minutes=20)
+            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=20)
         )
 
         timestamps = Timestamp.objects.for_user(user)["timestamps"]
@@ -242,7 +192,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(user.latest_created_at, None)
 
         t = user.timestamp_set.create(
-            created_at=timezone.now() - dt.timedelta(seconds=99), type=Timestamp.SPLIT
+            created_at=timezone.now() - dt.timedelta(seconds=99), type=Timestamp.STOP
         )
         user = User.objects.get(id=user.id)
         self.assertEqual(user.latest_created_at, t.created_at)
@@ -252,7 +202,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(user.latest_created_at, h.created_at)
 
         t = user.timestamp_set.create(
-            created_at=timezone.now() + dt.timedelta(seconds=99), type=Timestamp.SPLIT
+            created_at=timezone.now() + dt.timedelta(seconds=99), type=Timestamp.STOP
         )
         user = User.objects.get(id=user.id)
         self.assertEqual(user.latest_created_at, t.created_at)
@@ -278,7 +228,7 @@ class TimestampsTest(TestCase):
         self.client.force_login(user)
 
         t = user.timestamp_set.create(
-            created_at=timezone.now() - dt.timedelta(seconds=99), type=Timestamp.SPLIT
+            created_at=timezone.now() - dt.timedelta(seconds=99), type=Timestamp.STOP
         )
 
         response = self.client.post(
@@ -296,47 +246,6 @@ class TimestampsTest(TestCase):
 
         t.refresh_from_db()
         self.assertEqual(t.logged_hours.description, "Test")
-
-    def test_autodetect_possible_break(self):
-        """Possible breaks are proposed to the user"""
-        today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
-        user = factories.UserFactory.create()
-
-        l1 = factories.LoggedHoursFactory.create(
-            rendered_by=user,
-            created_at=today + dt.timedelta(minutes=0),
-            description="ABC",
-            hours=1,
-        )
-
-        l2 = factories.LoggedHoursFactory.create(
-            rendered_by=user,
-            created_at=today + dt.timedelta(minutes=90),
-            description="ABC",
-            hours=1,
-        )
-
-        l3 = factories.LoggedHoursFactory.create(
-            rendered_by=user,
-            created_at=today + dt.timedelta(minutes=155),
-            description="ABC",
-            hours=1,
-        )
-
-        for_user = Timestamp.objects.for_user(user)
-        self.assertEqual(for_user["hours"], Decimal("3"))
-        timestamps = for_user["timestamps"]
-
-        self.assertEqual(len(timestamps), 4)
-        self.assertEqual(timestamps[0]["timestamp"].logged_hours, l1)
-        self.assertEqual(timestamps[2]["timestamp"].logged_hours, l2)
-        self.assertEqual(timestamps[3]["timestamp"].logged_hours, l3)
-
-        auto = timestamps[1]
-        self.assertEqual(auto["elapsed"], Decimal("0.5"))
-        self.assertEqual(
-            auto["timestamp"].comment, "Maybe the start of the next logbook entry?"
-        )
 
     def test_list_timestamps(self):
         """The timestamps listing endpoint works"""
@@ -357,7 +266,7 @@ class TimestampsTest(TestCase):
         user.timestamp_set.create(
             type=Timestamp.START, created_at=timezone.now() - dt.timedelta(seconds=10)
         )
-        user.timestamp_set.create(type=Timestamp.SPLIT)
+        user.timestamp_set.create(type=Timestamp.STOP)
 
         response = self.client.get(
             "/list-timestamps/?user={}".format(user.signed_email)

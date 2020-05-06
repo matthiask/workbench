@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.logbook.models import Break, LoggedHours
 from workbench.projects.models import Project
-from workbench.tools.formats import hours, local_date_format
+from workbench.tools.formats import Z0, Z1, hours, local_date_format
 
 
 class TimestampQuerySet(models.QuerySet):
@@ -38,83 +38,36 @@ class TimestampQuerySet(models.QuerySet):
             if entry not in known_logged_hours
         )
         if not entries:
-            return {"timestamps": [], "hours": Decimal(0)}
+            return {"timestamps": [], "hours": Z0}
 
         entries = sorted(entries, key=lambda timestamp: timestamp.created_at)
 
         ret = []
         previous = None
         for current in entries:
-            if previous is None or previous.type == Timestamp.STOP:
-                if current.type == Timestamp.STOP:
-                    # Skip
-                    continue
+            elapsed = None
 
-                if current.type not in {
-                    Timestamp.START,
-                    Timestamp.LOGBOOK,
-                    Timestamp.BREAK,
-                }:
-                    current.type = Timestamp.START  # Override
-                elapsed = None
-
-            elif current.type in {Timestamp.LOGBOOK}:
-                current_started_at = current.created_at - dt.timedelta(
-                    hours=float(current.logged_hours.hours)
-                )
-                seconds = Decimal(
-                    (current_started_at - previous.created_at).total_seconds()
-                )
-
-                if seconds > 900:  # Arbitrary cut-off
-                    entry = self.model(
-                        id=0,
-                        created_at=current_started_at,
-                        type=self.model.START,
-                        notes="",
-                    )
-                    entry.comment = _("Maybe the start of the next logbook entry?")
-                    ret.append(
-                        {
-                            "timestamp": entry,
-                            "previous": previous,
-                            "elapsed": (seconds / 3600).quantize(
-                                Decimal("0.0"), rounding=ROUND_UP
-                            ),
-                        }
-                    )
-                    previous = entry
-
-                elapsed = None
-
-            else:
-                if previous and {previous.type, current.type} == {Timestamp.START}:
-                    current.type = Timestamp.SPLIT  # Override
-
+            if previous and current.pretty_type not in {Timestamp.LOGBOOK}:
                 seconds = (current.created_at - previous.created_at).total_seconds()
-                elapsed = (Decimal(seconds) / 3600).quantize(
-                    Decimal("0.0"), rounding=ROUND_UP
-                )
+                elapsed = (Decimal(seconds) / 3600).quantize(Z1, rounding=ROUND_UP)
 
             ret.append({"timestamp": current, "previous": previous, "elapsed": elapsed})
             previous = current
 
         return {
             "timestamps": ret,
-            "hours": sum((hours.hours for hours in logged_hours), Decimal(0)),
+            "hours": sum((hours.hours for hours in logged_hours), Z0),
         }
 
 
 class Timestamp(models.Model):
     START = "start"
-    SPLIT = "split"
     STOP = "stop"
     LOGBOOK = "logbook"
     BREAK = "break"
 
     TYPE_CHOICES = [
         (START, _("Start")),
-        (SPLIT, _("Split")),
         (STOP, _("Stop")),
         (LOGBOOK, capfirst(_("logbook"))),
         (BREAK, capfirst(_("break"))),
@@ -197,7 +150,6 @@ class Timestamp(models.Model):
     def badge(self):
         css = {
             self.START: "primary",
-            self.SPLIT: "info",
             self.STOP: "success",
             self.LOGBOOK: "secondary",
             self.BREAK: "break",
