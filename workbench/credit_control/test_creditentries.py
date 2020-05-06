@@ -19,6 +19,7 @@ from workbench.tools.testing import check_code, messages
 
 class CreditEntriesTest(TestCase):
     def test_assignment(self):
+        """Batch assignment of credit entries to invoices"""
         for i in range(10):
             invoice = factories.InvoiceFactory.create(
                 subtotal=10 + i, liable_to_vat=False
@@ -60,6 +61,7 @@ class CreditEntriesTest(TestCase):
         )
 
     def test_account_statement_upload(self):
+        """Uploading account statements with and without duplicates"""
         self.client.force_login(factories.UserFactory.create())
         ledger = factories.LedgerFactory.create()
 
@@ -118,6 +120,7 @@ class CreditEntriesTest(TestCase):
         self.assertEqual(invoice.closed_on, entry.value_date)
 
     def test_list(self):
+        """Filter form validation"""
         self.client.force_login(factories.UserFactory.create())
         ledger = factories.LedgerFactory.create()
 
@@ -129,6 +132,7 @@ class CreditEntriesTest(TestCase):
         code("ledger={}".format(ledger.pk))
 
     def test_create_entry(self):
+        """Creating credit entries "by hand" works"""
         self.client.force_login(factories.UserFactory.create())
 
         response = self.client.post(
@@ -147,6 +151,7 @@ class CreditEntriesTest(TestCase):
         self.assertRedirects(response, entry.urls["list"])
 
     def test_postfinance_utilities(self):
+        """Utilities for the PostFinance CSV export"""
         self.assertEqual(
             postfinance_preprocess_notice("bla 2019 -0001-0001 test"),
             "bla 2019-0001-0001 test",
@@ -169,6 +174,7 @@ class CreditEntriesTest(TestCase):
         )
 
     def test_postfinance_parse_csv(self):
+        """Generating PostFinance reference numbers when uploading acc. statements"""
         with io.open(
             os.path.join(
                 settings.BASE_DIR, "workbench", "test", "postfinance-export.csv"
@@ -193,6 +199,7 @@ class CreditEntriesTest(TestCase):
         self.assertIn("2019-0214-0001", entries[2]["payment_notice"])
 
     def test_invalid_account_statement(self):
+        """Completely invalid account statements do not crash the backend"""
         self.client.force_login(factories.UserFactory.create())
         ledger = factories.LedgerFactory.create()
 

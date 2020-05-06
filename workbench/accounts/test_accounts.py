@@ -13,6 +13,7 @@ from workbench.tools.testing import messages
 
 class AccountsTest(TestCase):
     def test_user(self):
+        """User's methods and atttributes work as expected"""
         with self.assertRaises(ValueError):
             User.objects.create_user("", "")
 
@@ -23,6 +24,7 @@ class AccountsTest(TestCase):
         self.assertFalse(user.is_staff)
 
     def test_admin(self):
+        """Admin user's methods and atttributes work as expected"""
         user = User.objects.create_superuser("test@example.com", "")
         self.assertFalse(user.has_usable_password())
         self.assertTrue(user.has_perm("stuff"))
@@ -30,6 +32,7 @@ class AccountsTest(TestCase):
         self.assertTrue(user.is_staff)
 
     def test_choices(self):
+        """User.objects.choices() does what it should"""
         u1 = factories.UserFactory.create(_full_name="M A", is_active=True)
         u2 = factories.UserFactory.create(_full_name="M I", is_active=False)
 
@@ -52,10 +55,12 @@ class AccountsTest(TestCase):
         )
 
     def test_ordering(self):
+        """Ordering of users while falling back to different attributes"""
         self.assertTrue(User(_short_name="a") < User(_full_name="b"))
 
     @override_settings(FEATURES={"glassfrog": False})
     def test_feature_required(self):
+        """The feature_required decorator redirects users and adds a message"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -67,6 +72,7 @@ class AccountsTest(TestCase):
         FEATURES={"yes": True, "no": False, "maybe": {"test@example.com"}}
     )
     def test_user_features(self):
+        """Features may either be enabled for all, for some or for no users"""
         user = User(email="test@example.org")
         self.assertTrue(user.features["yes"])
         self.assertFalse(user.features["no"])
@@ -82,6 +88,7 @@ class AccountsTest(TestCase):
             user.features["missing"]
 
     def test_profile(self):
+        """The profile view doesn't crash"""
         hours = factories.LoggedHoursFactory.create()
         hours = factories.LoggedHoursFactory.create(
             service=factories.ServiceFactory.create(
@@ -95,6 +102,7 @@ class AccountsTest(TestCase):
         self.assertContains(response, "Hours per week")
 
     def test_work_anniversaries(self):
+        """The work anniversaries report doesn't crash"""
         user = factories.UserFactory.create()
         user.employments.create(
             percentage=100, vacation_weeks=5, date_from=dt.date(2018, 1, 1)

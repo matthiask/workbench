@@ -38,6 +38,7 @@ def person_to_dict(person, **kwargs):
 
 class ContactsTest(TestCase):
     def test_update(self):
+        """A single-word salutation does not look right"""
         person = factories.PersonFactory.create()
         self.client.force_login(person.primary_contact)
         response = self.client.post(
@@ -53,6 +54,7 @@ class ContactsTest(TestCase):
         self.assertRedirects(response, person.urls["detail"])
 
     def test_warning(self):
+        """Changing the organization of a person with projects produces a warning"""
         person = factories.PersonFactory.create(
             organization=factories.OrganizationFactory.create(), salutation="Dear John"
         )
@@ -80,6 +82,7 @@ class ContactsTest(TestCase):
         )
 
     def test_lists(self):
+        """The people list basically works"""
         factories.PersonFactory.create()
         person = factories.PersonFactory.create()
         group1 = Group.objects.create(title="A")
@@ -103,6 +106,7 @@ class ContactsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_organization_list(self):
+        """The organization list basically works"""
         group1 = Group.objects.create(title="A")
         group2 = Group.objects.create(title="B")
         organization = factories.OrganizationFactory.create()
@@ -121,6 +125,7 @@ class ContactsTest(TestCase):
         self.assertNotContains(response, str(organization))
 
     def test_formset(self):
+        """The emails formset works"""
         person = factories.PersonFactory.create()
         person.emailaddresses.create(type="E1", email="e1@example.com")
         person.emailaddresses.create(type="E2", email="e2@example.com")
@@ -138,6 +143,7 @@ class ContactsTest(TestCase):
         self.assertContains(response, "e3@example.com")
 
     def test_details(self):
+        """Common methods of person details do the right thing"""
         person = factories.PersonFactory.create()
         email = person.emailaddresses.create(email="test@example.com")
         phone = person.phonenumbers.create(phone_number="012 345 678")
@@ -152,6 +158,7 @@ class ContactsTest(TestCase):
             self.assertEqual(detail.urls["detail"], person.urls["detail"])
 
     def test_weights(self):
+        """Test weighting depending on the type of person details"""
         person = factories.PersonFactory.create()
         email = person.emailaddresses.create(email="test@example.com")
 
@@ -176,10 +183,12 @@ class ContactsTest(TestCase):
         self.assertEqual(email.weight, -100)
 
     def test_contacts_redirect(self):
+        """Accessing /contacts/ (not linked anywhere) redirects"""
         self.client.force_login(factories.UserFactory.create())
         self.assertRedirects(self.client.get("/contacts/"), "/contacts/people/")
 
     def test_phone_numbers(self):
+        """Phone number validation"""
         person = factories.PersonFactory.create()
         kw = {"person": person, "type": "work"}
         with self.assertRaises(ValidationError):
@@ -198,6 +207,7 @@ class ContactsTest(TestCase):
         self.assertEqual(nr.phone_number, "+41555111141")
 
     def test_select(self):
+        """The person select popup returns a redirect JSON"""
         person = factories.PersonFactory.create()
         self.client.force_login(person.primary_contact)
 
@@ -211,6 +221,7 @@ class ContactsTest(TestCase):
         self.assertEqual(response.json(), {"redirect": person.get_absolute_url()})
 
     def test_phone_number_formatting(self):
+        """Phone numbers are formatted correctly, no crash on invalid data"""
         pn = PhoneNumber()
         pn.phone_number = "+41791234567"
         self.assertEqual(pn.pretty_number, "+41 79 123 45 67")
@@ -218,6 +229,7 @@ class ContactsTest(TestCase):
         self.assertEqual(pn.pretty_number, "abcd")
 
     def test_person_create_redirect(self):
+        """Creating persons redirects to their update page (for adding details)"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -236,6 +248,7 @@ class ContactsTest(TestCase):
         self.assertRedirects(response, person.urls["update"])
 
     def test_organization_delete_without_relations(self):
+        """Organizations without relations can be deleted"""
         organization = factories.OrganizationFactory.create()
         self.client.force_login(organization.primary_contact)
 
@@ -248,6 +261,7 @@ class ContactsTest(TestCase):
         self.assertEqual(Organization.objects.count(), 0)
 
     def test_organization_delete_with_relations(self):
+        """Organizations with relations can be merged with a different org."""
         organization = factories.OrganizationFactory.create()
         person = factories.PersonFactory.create(organization=organization)
         self.client.force_login(organization.primary_contact)
@@ -274,6 +288,7 @@ class ContactsTest(TestCase):
         self.assertEqual(new.groups.count(), 0)  # Group (m2m) not assigned
 
     def test_create_person_with_preselected_organization(self):
+        """Adding a person to an existing org. preselects the organization"""
         organization = factories.OrganizationFactory.create(name="ABCD")
         self.client.force_login(organization.primary_contact)
 
@@ -283,6 +298,8 @@ class ContactsTest(TestCase):
         self.assertContains(response, 'value="ABCD"')
 
     def test_organization_detail(self):
+        """The organization detail page contains a few additional headings
+        depending on the controlling feature"""
         organization = factories.OrganizationFactory.create()
         self.client.force_login(organization.primary_contact)
 
@@ -298,6 +315,7 @@ class ContactsTest(TestCase):
             self.assertNotContains(response, "Recent offers")
 
     def test_vcard_export(self):
+        """Persons' details can be exported as a vCard or mailed to iOS users"""
         person = factories.PersonFactory.create()
         self.client.force_login(person.primary_contact)
 
@@ -314,6 +332,7 @@ class ContactsTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_vcard(self):
+        """Test aspects of the generated vCard export"""
         person = factories.PersonFactory.create(
             organization=factories.OrganizationFactory.create(),
             date_of_birth=dt.date(2020, 3, 1),

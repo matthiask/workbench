@@ -29,6 +29,7 @@ class LoginTestCase(TestCase):
         deactivate_all()
 
     def test_login(self):
+        """Basic login and logout redirects"""
         user = factories.UserFactory.create()
 
         self.assertRedirects(self.client.get("/"), "/accounts/login/")
@@ -43,6 +44,7 @@ class LoginTestCase(TestCase):
         self.assertRedirects(self.client.get("/accounts/login/"), "/")
 
     def test_login_hint_removal_on_logout(self):
+        """The login_hint cookie is removed when logging out explicitly"""
         user = factories.UserFactory.create()
         self.client.login(email=user.email)
         self.client.cookies.load({"login_hint": "test@example.com"})
@@ -56,6 +58,7 @@ class LoginTestCase(TestCase):
         self.assertEqual(self.client.cookies.get("login_hint").value, "")
 
     def test_server_flow(self):
+        """Exercise the OAuth2 webserver flow implementation"""
         FakeFlow.EMAIL = "user@example.com"
         FakeFlow.RAISE_EXCEPTION = False
 
@@ -116,6 +119,7 @@ class LoginTestCase(TestCase):
         self.assertEqual(client.cookies.get("login_hint").value, "")
 
     def test_server_flow_user_data_failure(self):
+        """Failing to fetch user data shouldn't produce an internal server error"""
         FakeFlow.EMAIL = "user@example.com"
         FakeFlow.RAISE_EXCEPTION = True
 
@@ -127,10 +131,12 @@ class LoginTestCase(TestCase):
         )
 
     def test_accounts_update_404(self):
+        """No authentication and no saved email address --> 404"""
         response = self.client.get("/accounts/update/")
         self.assertEqual(response.status_code, 404)
 
     def test_account_update(self):
+        """Users can only update some fields themselves"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 

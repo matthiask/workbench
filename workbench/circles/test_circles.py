@@ -13,6 +13,7 @@ class CirclesTest(TestCase):
         deactivate_all()
 
     def test_choices(self):
+        """Role.objects.choices() works"""
         c = Circle.objects.create(name="B circle")
         r1 = c.roles.create(name="Role 1")
         r3 = c.roles.create(name="Role 2", is_removed=True)
@@ -31,6 +32,7 @@ class CirclesTest(TestCase):
         )
 
     def test_reporting(self):
+        """Reporting hours per circle and role works"""
         r1 = Role.objects.create(name="Role 1", circle=Circle.objects.create(name="C1"))
         r2 = Role.objects.create(name="Role 2", circle=Circle.objects.create(name="C2"))
         Role.objects.create(name="Role 3", circle=r2.circle)
@@ -70,6 +72,7 @@ class CirclesTest(TestCase):
         self.assertNotContains(response, "C4")
 
     def test_role_warning(self):
+        """Users are warned when creating a service without selecting a role"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 

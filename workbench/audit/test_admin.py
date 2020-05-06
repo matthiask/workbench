@@ -6,6 +6,7 @@ from workbench.audit.models import LoggedAction
 
 class AuditTest(TestCase):
     def test_admin(self):
+        """The audit trail cannot be changed through the Django admin"""
         # Generate some objects
         factories.ProjectFactory.create()
 

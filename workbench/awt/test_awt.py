@@ -15,16 +15,19 @@ from workbench.tools.validation import in_days
 
 class AWTTest(TestCase):
     def test_redirect(self):
+        """Invalid year produces a redirect"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
         response = self.client.get("/report/annual-working-time/?year=asdf")
         self.assertRedirects(response, "/report/annual-working-time/")
 
     def test_year(self):
+        """Basic year methods work"""
         year = factories.YearFactory.create()
         self.assertEqual(year.months, [30 for i in range(12)])
 
     def test_monthly_days(self):
+        """Days per month are calculated correctly  for partial months"""
         for from_, until_, dates in [
             (
                 dt.date(2018, 2, 1),
@@ -56,6 +59,7 @@ class AWTTest(TestCase):
                 self.assertEqual(list(monthly_days(from_, until_)), dates)
 
     def test_working_time(self):
+        """Verify that the annual working time report yields correct results"""
         service = factories.ServiceFactory.create()
         user = service.project.owned_by
         year = factories.YearFactory.create(
@@ -118,12 +122,14 @@ class AWTTest(TestCase):
         self.assertAlmostEqual(awt["totals"]["running_sum"], Decimal("-1198"))
 
     def test_admin_list(self):
+        """The admin changelist of years contains the calculated sum of working days"""
         self.client.force_login(factories.UserFactory.create(is_admin=True))
         factories.YearFactory.create()
         response = self.client.get("/admin/awt/year/")
         self.assertContains(response, '<td class="field-days">360.00</td>')
 
     def test_absence_editing(self):
+        """Creating and updating absences in the current year works"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
         response = self.client.post(
@@ -152,9 +158,6 @@ class AWTTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Absences of past years are locked.")
 
-    def test_only_this_year(self):
-        user = factories.UserFactory.create()
-        self.client.force_login(user)
         response = self.client.post(
             "/absences/create/",
             {
@@ -171,6 +174,7 @@ class AWTTest(TestCase):
         )
 
     def test_no_data_no_crash(self):
+        """POSTing the absence form without any data does not crash the backend"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
         response = self.client.post(
@@ -179,6 +183,7 @@ class AWTTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_planning_skills(self):
+        """Creating absences in the far future requires impressive-planning-skills"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
         response = self.client.post(
@@ -213,6 +218,7 @@ class AWTTest(TestCase):
         self.assertEqual(response.status_code, 201)
 
     def test_employment_model(self):
+        """Exercise the employment model"""
         factories.UserFactory.create()  # Additional instance for active_users()
 
         year = factories.YearFactory.create()
@@ -233,6 +239,7 @@ class AWTTest(TestCase):
         self.assertEqual(list(active_users(year.year)), [])
 
     def test_report_view(self):
+        """The export view produces individual PDFs or ZIP files containing PDFs"""
         year = factories.YearFactory.create()
         user = factories.UserFactory.create(
             _full_name="Fritz", working_time_model=year.working_time_model
@@ -279,12 +286,14 @@ class AWTTest(TestCase):
         self.assertEqual(response["content-type"], "application/pdf")
 
     def test_non_ajax_redirect(self):
+        """The absence URL redirects when encountering a non-AJAX request"""
         absence = factories.AbsenceFactory.create()
         self.client.force_login(absence.user)
         response = self.client.get(absence.urls["detail"])
         self.assertRedirects(response, "/absences/?u=" + str(absence.user.pk))
 
     def test_list(self):
+        """The absence list and its filters do not crash"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -296,6 +305,7 @@ class AWTTest(TestCase):
         code("reason=nothing", 302)
 
     def test_employment_validation(self):
+        """Test model validation of employments"""
         user = factories.UserFactory.create()
         kw = {"user": user, "percentage": 100, "vacation_weeks": 5, "notes": ""}
         Employment(**kw).full_clean()
@@ -322,6 +332,7 @@ class AWTTest(TestCase):
         self.assertEqual(list(cm.exception), msg)
 
     def test_calendar(self):
+        """The absence calendar report does not crash"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -350,6 +361,7 @@ class AWTTest(TestCase):
         code("team=abc", status_code=302)
 
     def test_absence_validation(self):
+        """Test model validation of absences"""
         user = factories.UserFactory.create()
         kw = {
             "user": user,
