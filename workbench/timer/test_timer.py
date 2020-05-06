@@ -14,6 +14,7 @@ from workbench.timer.models import Timestamp
 
 class TimerTest(TestCase):
     def test_timer(self):
+        """The timer view does not crash"""
         user = factories.UserFactory.create(is_admin=True)
         self.client.force_login(user)
 
@@ -24,6 +25,7 @@ class TimerTest(TestCase):
 class TimestampsTest(TestCase):
     @freeze_time("2020-02-20T03:00:00+00:00")
     def test_timestamp(self):
+        """Basic smoke test of timestamp creation and deletion"""
         self.client.force_login(factories.UserFactory.create())
 
         response = self.client.post("/create-timestamp/", {"type": "bla"})
@@ -43,6 +45,7 @@ class TimestampsTest(TestCase):
         self.assertRedirects(response, "/timestamps/")
 
     def test_timestamp_auth(self):
+        """The API supports different authorizations"""
         response = self.client.post("/create-timestamp/", {"type": "bla"})
         self.assertEqual(response.status_code, 400)
 
@@ -65,6 +68,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(t.user, user)
 
     def test_timestamp_with_time(self):
+        """Specifying a time makes the endpoint use it instead of the current time"""
         user = factories.UserFactory.create()
 
         response = self.client.post(
@@ -79,6 +83,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(created_at.minute, 23)
 
     def test_timestamps_scenario(self):
+        """Test a scenario with a break in the middle"""
         today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
         user = factories.UserFactory.create()
 
@@ -135,6 +140,7 @@ class TimestampsTest(TestCase):
         )
 
     def test_timestamps_start_start(self):
+        """Subsequent STARTs are converted into SPLITs"""
         today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
         user = factories.UserFactory.create()
 
@@ -187,6 +193,7 @@ class TimestampsTest(TestCase):
         )
 
     def test_latest_logbook_entry(self):
+        """Timestamps are automatically created for logged hours"""
         today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
         user = factories.UserFactory.create()
 
@@ -215,6 +222,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(timestamps[2]["timestamp"], t2)
 
     def test_view(self):
+        """The timnestamps view does not crash"""
         deactivate_all()
         user = factories.UserFactory.create()
         user.timestamp_set.create(type=Timestamp.START)
@@ -224,10 +232,12 @@ class TimestampsTest(TestCase):
         self.assertContains(response, "timestamps")
 
     def test_controller(self):
+        """The timestamps controller does not crash"""
         response = self.client.get("/timestamps-controller/")
         self.assertContains(response, "Timestamps")
 
     def test_latest_created_at(self):
+        """User.latest_created_at takes logged hours AND timestamps into account"""
         user = factories.UserFactory.create()
         self.assertEqual(user.latest_created_at, None)
 
@@ -262,6 +272,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(user.latest_created_at, t.created_at)
 
     def test_link_timestamps(self):
+        """Linking logged hours to timestamps"""
         service = factories.ServiceFactory.create()
         user = service.project.owned_by
         self.client.force_login(user)
@@ -287,6 +298,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(t.logged_hours.description, "Test")
 
     def test_autodetect_possible_break(self):
+        """Possible breaks are proposed to the user"""
         today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
         user = factories.UserFactory.create()
 
@@ -327,6 +339,7 @@ class TimestampsTest(TestCase):
         )
 
     def test_list_timestamps(self):
+        """The timestamps listing endpoint works"""
         user = factories.UserFactory.create()
 
         response = self.client.get("/list-timestamps/")
@@ -355,6 +368,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(data["timestamps"][1]["elapsed"], "0.1")
 
     def test_pretty(self):
+        """Prettifying types and notes works"""
         hours = factories.LoggedHoursFactory.create()
         brk = factories.BreakFactory.create()
 

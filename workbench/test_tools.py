@@ -16,11 +16,14 @@ from workbench.tools.testing import messages
 
 class ToolsTest(TestCase):
     def test_model(self):
+        """Shared methods of tools.models.Model work"""
         self.assertEqual(Year().code, "")
         self.assertEqual(Year(pk=3).code, "00003")
         self.assertEqual(Year().pretty_status, "")
 
     def test_invalid_autocomplete(self):
+        """Invalid initial values for the Autocomplete widget are ignored"""
+
         class ProjectForm(forms.ModelForm):
             class Meta:
                 model = Project
@@ -31,6 +34,7 @@ class ToolsTest(TestCase):
         self.assertIn('value=""', str(form))
 
     def test_model_with_total(self):
+        """The calculation of totals excl. and incl. tax work"""
         m = ModelWithTotal(
             subtotal=Decimal("20"), discount=Decimal("5"), tax_rate=Decimal("8.0")
         )
@@ -45,11 +49,13 @@ class ToolsTest(TestCase):
         self.assertEqual(m.pretty_total_excl, "15.00 excl. tax (5.00 discount)")
 
     def test_create_absence_redirect(self):
+        """The create view uses the get_redirect_url of models"""
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/absences/create/")
         self.assertRedirects(response, "/absences/")
 
     def test_deletion(self):
+        """Related objects are checked automatically when attempting deletion"""
         hours = factories.LoggedHoursFactory.create(description="Bla")
         project = hours.service.project
 
@@ -68,6 +74,7 @@ class ToolsTest(TestCase):
         )
 
     def test_formats_hours(self):
+        """Number formatting"""
         for value, result in [
             (Decimal("42.22"), "42.2h"),
             (Decimal("42.27"), "42.3h"),

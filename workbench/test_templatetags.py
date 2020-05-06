@@ -10,6 +10,7 @@ from workbench.templatetags.workbench import field_value_pairs, link_or_none
 
 class TemplateTagsTest(TestCase):
     def test_mark_current(self):
+        """{% mark_current %}"""
         t = Template(
             """
             {% load mark_current %}
@@ -51,10 +52,12 @@ class TemplateTagsTest(TestCase):
                     self.assertNotIn(notexists, html)
 
     def test_invalid(self):
+        """Invalid mark_current usage (no argument)"""
         with self.assertRaises(TemplateSyntaxError):
             Template("{% load mark_current %}{% mark_current %}")
 
     def test_bar(self):
+        """{% bar %} template tag"""
         t = Template("{% load workbench %}{% bar value one %}")
         self.assertEqual(
             t.render(Context({"value": 10, "one": 100})),
@@ -72,6 +75,7 @@ class TemplateTagsTest(TestCase):
         )
 
     def test_pie(self):
+        """{% pie %} template tag"""
         t = Template("{% load workbench %}{% pie 1 3 %}")
         self.assertEqual(
             t.render(Context()),
@@ -91,10 +95,12 @@ class TemplateTagsTest(TestCase):
         )
 
     def test_link_or_none(self):
+        """{% link_or_none %} with special values"""
         self.assertEqual(link_or_none(0), 0)
         self.assertEqual(str(link_or_none(None)), "&ndash;")
 
     def test_field_value_pairs(self):
+        """The |field_value_pairs filter does what it should"""
         deactivate_all()
         absence = factories.AbsenceFactory.create(starts_on=dt.date(2020, 1, 1))
         pairs = dict(field_value_pairs(absence))
