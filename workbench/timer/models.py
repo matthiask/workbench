@@ -5,9 +5,7 @@ from urllib.parse import urlencode
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.html import format_html
 from django.utils.text import capfirst
-from django.utils.timezone import localtime
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User

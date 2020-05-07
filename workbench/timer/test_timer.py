@@ -2,8 +2,8 @@ import datetime as dt
 from decimal import Decimal
 
 from django.test import TestCase
-from django.utils import timezone
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.timezone import localtime
 from django.utils.translation import deactivate_all
 
@@ -155,7 +155,7 @@ class TimestampsTest(TestCase):
 
         self.assertEqual(Timestamp.objects.slices(user), [])
 
-        t1 = user.timestamp_set.create(
+        user.timestamp_set.create(
             type=Timestamp.START, created_at=today + dt.timedelta(minutes=0)
         )
         l1 = factories.LoggedHoursFactory.create(
@@ -164,7 +164,7 @@ class TimestampsTest(TestCase):
             description="ABC",
             hours=Decimal("0.2"),  # It was only ten minutes
         )
-        t2 = user.timestamp_set.create(
+        user.timestamp_set.create(
             type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=20)
         )
 
