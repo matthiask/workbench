@@ -51,12 +51,6 @@ const deserialize = (blob) => {
   }
 }
 
-const merge = (initial, persisted) => {
-  initial = initial || {}
-  persisted = persisted || {}
-  return (initial.version || 0) > (persisted.version || 0) ? initial : persisted
-}
-
 export function configureStore() {
   let initialState
   try {
@@ -73,7 +67,6 @@ export function configureStore() {
       persistState(null, {
         serialize,
         deserialize,
-        merge,
       }),
       applyMiddleware(
         notifier,

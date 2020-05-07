@@ -71,24 +71,11 @@ function projects(state = [], action) {
   }
 }
 
-function version(state = 0, action) {
-  if (action.type.indexOf("@@") == 0) return state
-  switch (action.type) {
-    case "PROJECTS":
-    case "MODAL_ACTIVITY":
-      return state
-    default:
-      console.log("Incrementing version because of", action)
-      return state + 1
-  }
-}
-
 const reducer = combineReducers({
   activities,
   current,
   modalActivity,
   projects,
-  version,
 })
 
 export default reducer
