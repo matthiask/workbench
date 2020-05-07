@@ -13,40 +13,61 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.logbook.models import Break, LoggedHours
 from workbench.projects.models import Project
-from workbench.tools.formats import Z0, Z1, hours, local_date_format
+from workbench.tools.formats import Z1, hours, local_date_format
 
 
-def break_create_url(day, current, previous, *, description=None):
-    return "{}?{}".format(
-        reverse("logbook_break_create"),
-        urlencode(
-            [
-                ("day", day.isoformat()),
-                ("description", current.notes if description is None else description),
-                ("starts_at", previous.time.isoformat() if previous else "",),
-                ("ends_at", current.time.isoformat()),
-                ("timestamp", current.pk),
-            ]
-        ),
-    )
+class Slice(dict):
+    @property
+    def show_create_buttons(self):
+        return not (self.get("logged_hours") or self.get("logged_break"))
 
+    @property
+    def elapsed_hours(self):
+        if self.get("logged_hours"):
+            return self["logged_hours"].hours
+        elif self.get("logged_break"):
+            seconds = self["logged_break"].timedelta.total_seconds()
+        elif self.get("starts_at") and self.get("ends_at"):
+            seconds = (self["ends_at"] - self["starts_at"]).total_seconds()
+        else:
+            return None
+        return Decimal(seconds / 3600).quantize(Z1, rounding=ROUND_UP)
 
-def loggedhours_create_url(day, current, elapsed, timestamp_id=None):
-    return "{}?{}".format(
-        current.get_loggedhours_create_url(),
-        urlencode(
-            [
-                ("description", current.notes),
-                ("hours", str(elapsed)),
-                ("rendered_on", day.isoformat()),
-                ("timestamp", current.pk if timestamp_id is None else timestamp_id),
-            ]
-        ),
-    )
+    @property
+    def hours_create_url(self):
+        if not self.show_create_buttons:
+            return None
+
+        params = [
+            ("rendered_on", self["day"].isoformat()),
+            ("description", self["description"]),
+            ("hours", self.elapsed_hours or ""),
+            ("timestamp", self.get("timestamp_id") or ""),
+        ]
+        return "{}?{}".format(
+            reverse("projects_project_createhours", kwargs={"pk": self["project_id"]})
+            if self.get("project_id")
+            else reverse("logbook_loggedhours_create"),
+            urlencode(params),
+        )
+
+    @property
+    def break_create_url(self):
+        if not self.show_create_buttons:
+            return None
+
+        params = [
+            ("day", self["day"].isoformat()),
+            ("description", self["description"]),
+            ("starts_at", local_date_format(self.get("starts_at"), fmt="H:i:s")),
+            ("end_at", local_date_format(self.get("end_at"), fmt="H:i:s")),
+            ("timestamp", self.get("timestamp_id") or ""),
+        ]
+        return "{}?{}".format(reverse("logbook_break_create"), urlencode(params))
 
 
 class TimestampQuerySet(models.QuerySet):
-    def for_user(self, user, *, day=None):
+    def slices(self, user, *, day=None):
         day = day or dt.date.today()
         entries = list(
             self.filter(user=user, created_at__date=day).select_related(
@@ -64,46 +85,57 @@ class TimestampQuerySet(models.QuerySet):
             for entry in logged_hours
             if entry not in known_logged_hours
         )
-        if not entries:
-            return {"timestamps": [], "hours": Z0}
-
         entries = sorted(entries, key=lambda timestamp: timestamp.created_at)
 
-        ret = []
         previous = None
-        for current in entries:
-            row = {
-                "timestamp": current,
-                "previous": previous,
-                "elapsed": None,
-                "break_create_url": break_create_url(day, current, previous),
-            }
+        slices = []
+        for entry in entries:
+            if slices:
+                slices[-1].setdefault("ends_at", entry.created_at)
+
+            slice = Slice(
+                day=day,
+                description=entry.logged_hours or entry.logged_break or entry.notes,
+                logged_hours=entry.logged_hours,
+                logged_break=entry.logged_break,
+                project_id=entry.project_id,
+                timestamp_id=entry.id,
+            )
+
+            if entry.type == entry.START:
+                slice["starts_at"] = entry.created_at
+            else:
+                slice["ends_at"] = entry.created_at
+
+            if (
+                previous
+                and previous.type == previous.START
+                and entry.type != entry.START
+                and slice.show_create_buttons
+            ):
+                slices[-1]["description"] += "; ".join(
+                    filter(None, (slices[-1]["description"], entry.notes))
+                )
+                previous = entry
+                continue
+
+            slices.append(slice)
 
             if previous:
-                seconds = (current.created_at - previous.created_at).total_seconds()
-                row["elapsed"] = (Decimal(seconds) / 3600).quantize(
-                    Z1, rounding=ROUND_UP
-                )
+                slices[-1].setdefault("starts_at", previous.created_at)
 
-                if {previous.type, current.type} == {Timestamp.START}:
-                    row["break_create_url"] = break_create_url(
-                        day, current, previous, description=previous.notes
-                    )
-                    row["loggedhours_create_url"] = loggedhours_create_url(
-                        day, previous, row["elapsed"], timestamp_id=current.pk
-                    )
-                else:
-                    row["loggedhours_create_url"] = loggedhours_create_url(
-                        day, current, row["elapsed"]
-                    )
+            previous = entry
 
-            ret.append(row)
-            previous = current
+        if slices and slice != slices[-1]:
+            slices.append(slice)
 
-        return {
-            "timestamps": ret,
-            "hours": sum((hours.hours for hours in logged_hours), Z0),
-        }
+        if slices and not slices[-1].get("ends_at"):
+            if slices[-1]["logged_break"]:
+                slices[-1]["ends_at"] = slices[-1]["logged_break"].ends_at_datetime
+            elif slices[-1]["logged_hours"]:
+                slices[-1]["ends_at"] = slices[-1]["logged_hours"].created_at
+
+        return slices
 
 
 class Timestamp(models.Model):
@@ -156,37 +188,12 @@ class Timestamp(models.Model):
 
     save.alters_data = True
 
-    @property
-    def pretty_type(self):
-        if self.logged_hours:
-            return self.LOGBOOK
-        elif self.logged_break:
-            return self.BREAK
-        return self.type
-
     def __str__(self):
-        return "{} @ {}{}{}".format(
-            self.TYPE_DICT[self.type],
-            self.pretty_time,
-            ": " if self.pretty_notes else "",
-            self.pretty_notes,
-        )
+        return self.notes
 
     @property
     def pretty_time(self):
         return local_date_format(self.created_at, fmt="H:i")
-
-    @property
-    def pretty_notes(self):
-        if self.logged_hours:
-            return "{entry} ({hours})".format(
-                entry=self.logged_hours, hours=hours(self.logged_hours.hours)
-            )
-
-        if self.logged_break:
-            return str(self.logged_break)
-
-        return self.notes
 
     @property
     def badge(self):

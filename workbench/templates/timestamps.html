@@ -19,7 +19,7 @@
               <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">
                 {{ request.user.hours.week|hours }} {% trans 'this week' %}</a>
             {% else %}
-              {{ day|local_date_format }} / {{ timestamps.hours|hours }}
+              {{ day|local_date_format }} / {{ hours|hours }}
             {% endif %}
           </small>
         </h3>
@@ -49,70 +49,56 @@
         </div>
       </div>
 
-      <div class="ts-list">
-        {% for row in timestamps.timestamps %}
-          <div class="ts-item ts-{{ row.timestamp.type }}">
-            <div class="ts-time">
-              <strong>
-                {{ row.timestamp.created_at|date:'H:i' }}
-              </strong>
-              {{ row.timestamp.badge }}
-            </div>
+      <div class="list-group list-group-flush">
+        {% for slice in slices %}
+          <div class="list-group-item">
+            <div class="d-flex w-100">
 
-            <div class="ts-notes">
-              {{ row.timestamp.pretty_notes }}
-              {% if row.timestamp.comment %}<em>{{ row.timestamp.comment }}</em>{% endif %}
-            </div>
+              <div>
+                <strong>
+                  {{ slice.starts_at|date:'H:i'|default:'?' }} - {{ slice.ends_at|date:'H:i'|default:'?' }}
+                </strong>
+                {% if slice.elapsed_hours is not None %}{{ slice.elapsed_hours|hours:True }}{% endif %}
+                {{ slice.description }}
+              </div>
 
-            <div class="ts-actions">
-              {% if row.timestamp.logged_hours %}
-                <a
-                    href="{{ row.timestamp.logged_hours.get_absolute_url }}"
-                    data-toggle="ajaxmodal"
-                    class="btn btn-sm ml-auto align-self-start btn-light">
-                  {{ row.timestamp.logged_hours.hours|hours:True }}
-                </a>
+              <div class="ml-auto">
 
-              {% elif row.timestamp.logged_break %}
-                <a
-                   href="{{ row.timestamp.logged_break.get_absolute_url }}"
+                {% if slice.hours_create_url %}
+                <a href="{{ slice.hours_create_url }}"
                    data-toggle="ajaxmodal"
-                   class="btn btn-sm ml-auto align-self-start btn-light">
+                   class="btn btn-sm align-self-start btn-primary">
+                  {% trans 'hours'|capfirst %}
+                </a>
+                {% endif %}
+
+                {% if not forloop.first and slice.break_create_url %}
+                <a href="{{ slice.break_create_url }}"
+                   data-toggle="ajaxmodal"
+                   class="btn btn-sm align-self-start btn-primary">
                   {% trans 'break'|capfirst %}
                 </a>
+                {% endif %}
 
-              {% else %}
+                {% if slice.logged_hours %}
+                <a href="{{ slice.logged_hours.get_absolute_url }}"
+                   data-toggle="ajaxmodal"
+                   class="btn btn-sm btn-outline-primary">{% trans 'hours'|capfirst %}</a>
 
-                <div class="ml-auto">
+                {% elif slice.logged_break %}
+                <a href="{{ slice.logged_break.get_absolute_url }}"
+                   data-toggle="ajaxmodal"
+                   class="btn btn-sm btn-outline-primary">{% trans 'break'|capfirst %}</a>
 
-                  {% if not forloop.first %}
-                    <a href="{{ row.break_create_url }}"
-                       data-toggle="ajaxmodal"
-                       class="btn btn-sm align-self-start btn-primary">
-                      {% trans 'break'|capfirst %}
-                    </a>
-                  {% endif %}
+                {% elif slice.timestamp_id %}
+                <form class="d-inline" method="post" action="{% url 'delete_timestamp' slice.timestamp_id %}" onsubmit="return confirm('{% trans 'Really delete?'|escapejs %}')">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
+                </form>
+                {% endif %}
 
-                  {% if row.elapsed %}
-                    <a
-                      href="{{ row.loggedhours_create_url }}"
-                      data-toggle="ajaxmodal"
-                      class="btn btn-sm align-self-start btn-primary">
-                      {{ row.elapsed|hours:True }}
-                    </a>
-                  {% endif %}
 
-                  {% if row.timestamp.pk %}
-                    <form class="d-inline" method="post" action="{{ row.timestamp.get_delete_url }}" onsubmit="return confirm('{% trans 'Really delete?'|escapejs %}')">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
-                    </form>
-                  {% endif %}
-
-                </div>
-
-              {% endif %}
-
+              </div>
             </div>
           </div>
         {% endfor %}

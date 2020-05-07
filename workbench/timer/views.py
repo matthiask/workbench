@@ -15,7 +15,7 @@ from corsheaders.middleware import CorsMiddleware
 
 from workbench.accounts.models import User
 from workbench.timer.models import Timestamp
-from workbench.tools.formats import hours
+from workbench.tools.formats import Z1, hours, local_date_format
 from workbench.tools.forms import Form, ModelForm
 from workbench.tools.validation import filter_form
 
@@ -97,21 +97,29 @@ def list_timestamps(request):
         return JsonResponse({"errors": form.errors.as_json()}, status=400)
 
     user = form.cleaned_data["user"]
-    data = Timestamp.objects.for_user(user)
+    slices = Timestamp.objects.slices(user)
+    daily_hours = sum(
+        (slice["logged_hours"].hours for slice in slices if slice.get("logged_hours")),
+        Z1,
+    )
     return JsonResponse(
         {
             "success": True,
             "user": str(user),
-            "hours": data["hours"],
+            "hours": daily_hours,
             "timestamps": [
                 {
-                    "created_at": row["timestamp"].created_at,
-                    "timestamp": str(row["timestamp"]),
-                    "type": row["timestamp"].type,
-                    "elapsed": row["elapsed"],
-                    "comment": getattr(row["timestamp"], "comment", None),
+                    "timestamp": "{} {} {}".format(
+                        local_date_format(slice["starts_at"], fmt="H:i"),
+                        hours(slice.elapsed_hours, plus_sign=True)
+                        if slice.elapsed_hours is not None
+                        else "  ?  ",
+                        slice["description"],
+                    ),
+                    "elapsed": slice.elapsed_hours,
+                    "comment": "",
                 }
-                for row in data["timestamps"]
+                for slice in slices
             ],
         }
     )
@@ -138,17 +146,21 @@ def timestamps(request, form):
     request.user.take_a_break_warning(request=request)
     today = dt.date.today()
     day = form.cleaned_data["day"] or today
-    timestamps = Timestamp.objects.for_user(request.user, day=day)
+    slices = Timestamp.objects.slices(request.user, day=day)
+    hours = sum(
+        (slice["logged_hours"].hours for slice in slices if slice.get("logged_hours")),
+        Z1,
+    )
     return render(
         request,
         "timestamps.html",
         {
-            "timestamps": timestamps,
+            "slices": slices,
+            "hours": hours,
             "day": day,
             "previous": day - dt.timedelta(days=1),
             "next": day + dt.timedelta(days=1) if day < today else None,
             "url": request.build_absolute_uri(reverse("create_timestamp")),
             "is_today": day == today,
-            "hours": hours,
         },
     )

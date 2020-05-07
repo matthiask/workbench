@@ -147,7 +147,7 @@ class TimestampsTest(TestCase):
         today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
         user = factories.UserFactory.create()
 
-        self.assertEqual(Timestamp.objects.for_user(user)["timestamps"], [])
+        self.assertEqual(Timestamp.objects.slices(user), [])
 
         t1 = user.timestamp_set.create(
             type=Timestamp.START, created_at=today + dt.timedelta(minutes=0)
@@ -161,15 +161,17 @@ class TimestampsTest(TestCase):
             type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=20)
         )
 
-        timestamps = Timestamp.objects.for_user(user)["timestamps"]
-        self.assertEqual(len(timestamps), 3)
-        self.assertEqual(timestamps[0]["elapsed"], None)
-        self.assertEqual(timestamps[1]["elapsed"], None)
-        self.assertEqual(timestamps[2]["elapsed"], Decimal("0.2"))
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(len(slices), 3)
+        self.assertEqual(slices[0].elapsed_hours, Decimal("0.2"))
+        self.assertEqual(slices[1].elapsed_hours, Decimal("0.2"))
+        self.assertEqual(slices[2].elapsed_hours, Decimal("0.2"))
 
-        self.assertEqual(timestamps[0]["timestamp"], t1)
-        self.assertIn(l1.description, timestamps[1]["timestamp"].pretty_notes)
-        self.assertEqual(timestamps[2]["timestamp"], t2)
+        self.assertTrue(slices[0].show_create_buttons)
+        self.assertFalse(slices[1].show_create_buttons)
+        self.assertTrue(slices[2].show_create_buttons)
+
+        self.assertEqual(l1, slices[1]["description"])
 
     def test_view(self):
         """The timnestamps view does not crash"""
@@ -260,7 +262,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(
-            data, {"hours": "0", "user": str(user), "success": True, "timestamps": []}
+            data, {"hours": "0.0", "user": str(user), "success": True, "timestamps": []}
         )
 
         user.timestamp_set.create(
@@ -276,12 +278,12 @@ class TimestampsTest(TestCase):
         self.assertEqual(len(data["timestamps"]), 2)
         self.assertEqual(data["timestamps"][1]["elapsed"], "0.1")
 
-    def test_pretty(self):
-        """Prettifying types and notes works"""
-        hours = factories.LoggedHoursFactory.create()
-        brk = factories.BreakFactory.create()
+    def test_post_split(self):
+        """Backwards compatibility: Type "split" still works"""
+        self.client.force_login(factories.UserFactory.create())
 
-        self.assertEqual(Timestamp(logged_hours=hours).pretty_type, "logbook")
-        self.assertEqual(Timestamp(logged_break=brk).pretty_type, "break")
+        response = self.client.post("/create-timestamp/", {"type": "split"})
+        self.assertEqual(response.status_code, 201)
 
-        self.assertEqual(Timestamp(logged_break=brk).pretty_notes, str(brk))
+        t = Timestamp.objects.get()
+        self.assertEqual(t.type, "stop")
