@@ -1,5 +1,6 @@
 import datetime as dt
 from decimal import ROUND_UP, Decimal
+from urllib.parse import urlencode
 
 from django.db import models
 from django.urls import reverse
@@ -13,6 +14,35 @@ from workbench.accounts.models import User
 from workbench.logbook.models import Break, LoggedHours
 from workbench.projects.models import Project
 from workbench.tools.formats import Z0, Z1, hours, local_date_format
+
+
+def break_create_url(day, current, previous, *, description=None):
+    return "{}?{}".format(
+        reverse("logbook_break_create"),
+        urlencode(
+            [
+                ("day", day.isoformat()),
+                ("description", current.notes if description is None else description),
+                ("starts_at", previous.time.isoformat() if previous else "",),
+                ("ends_at", current.time.isoformat()),
+                ("timestamp", current.pk),
+            ]
+        ),
+    )
+
+
+def loggedhours_create_url(day, current, elapsed, timestamp_id=None):
+    return "{}?{}".format(
+        current.get_loggedhours_create_url(),
+        urlencode(
+            [
+                ("description", current.notes),
+                ("hours", str(elapsed)),
+                ("rendered_on", day.isoformat()),
+                ("timestamp", current.pk if timestamp_id is None else timestamp_id),
+            ]
+        ),
+    )
 
 
 class TimestampQuerySet(models.QuerySet):
@@ -29,10 +59,7 @@ class TimestampQuerySet(models.QuerySet):
         )
         entries.extend(
             self.model(
-                created_at=entry.created_at,
-                type=self.model.LOGBOOK,
-                url=entry.get_absolute_url(),
-                logged_hours=entry,
+                created_at=entry.created_at, type=self.model.LOGBOOK, logged_hours=entry
             )
             for entry in logged_hours
             if entry not in known_logged_hours
@@ -45,13 +72,32 @@ class TimestampQuerySet(models.QuerySet):
         ret = []
         previous = None
         for current in entries:
-            elapsed = None
+            row = {
+                "timestamp": current,
+                "previous": previous,
+                "elapsed": None,
+                "break_create_url": break_create_url(day, current, previous),
+            }
 
-            if previous and current.pretty_type not in {Timestamp.LOGBOOK}:
+            if previous:
                 seconds = (current.created_at - previous.created_at).total_seconds()
-                elapsed = (Decimal(seconds) / 3600).quantize(Z1, rounding=ROUND_UP)
+                row["elapsed"] = (Decimal(seconds) / 3600).quantize(
+                    Z1, rounding=ROUND_UP
+                )
 
-            ret.append({"timestamp": current, "previous": previous, "elapsed": elapsed})
+                if {previous.type, current.type} == {Timestamp.START}:
+                    row["break_create_url"] = break_create_url(
+                        day, current, previous, description=previous.notes
+                    )
+                    row["loggedhours_create_url"] = loggedhours_create_url(
+                        day, previous, row["elapsed"], timestamp_id=current.pk
+                    )
+                else:
+                    row["loggedhours_create_url"] = loggedhours_create_url(
+                        day, current, row["elapsed"]
+                    )
+
+            ret.append(row)
             previous = current
 
         return {
@@ -104,10 +150,6 @@ class Timestamp(models.Model):
         verbose_name = _("timestamp")
         verbose_name_plural = _("timestamps")
 
-    def __init__(self, *args, **kwargs):
-        self.url = kwargs.pop("url", "")
-        super().__init__(*args, **kwargs)
-
     def save(self, *args, **kwargs):
         assert self.type != self.LOGBOOK, "Not to be used for timestamps"
         super().save(*args, **kwargs)
@@ -124,7 +166,7 @@ class Timestamp(models.Model):
 
     def __str__(self):
         return "{} @ {}{}{}".format(
-            self.TYPE_DICT[self.pretty_type],
+            self.TYPE_DICT[self.type],
             self.pretty_time,
             ": " if self.pretty_notes else "",
             self.pretty_notes,
@@ -156,8 +198,8 @@ class Timestamp(models.Model):
         }
         return format_html(
             '<span class="badge badge-{}">{}</span>',
-            css[self.pretty_type],
-            self.TYPE_DICT[self.pretty_type],
+            css[self.type],
+            self.TYPE_DICT[self.type],
         )
 
     @property

@@ -49,9 +49,9 @@
         </div>
       </div>
 
-      <div class="list-group list-group-flush">
+      <div class="ts-list">
         {% for row in timestamps.timestamps %}
-          <div class="list-group-item ts-{{ row.timestamp.pretty_type }}">
+          <div class="ts-item ts-{{ row.timestamp.type }}">
             <div class="ts-time">
               <strong>
                 {{ row.timestamp.created_at|date:'H:i' }}
@@ -59,81 +59,61 @@
               {{ row.timestamp.badge }}
             </div>
 
-        {% if row.timestamp.logged_hours %}
-
-            <div class="d-flex w-100">
-              <div>
-                {{ row.timestamp.logged_hours }}
-              </div>
-              <a
-                  href="{{ row.timestamp.logged_hours.get_absolute_url }}"
-                  data-toggle="ajaxmodal"
-                  class="btn btn-sm ml-auto align-self-start btn-light">
-                {{ row.timestamp.logged_hours.hours|hours:True }}
-              </a>
+            <div class="ts-notes">
+              {{ row.timestamp.pretty_notes }}
+              {% if row.timestamp.comment %}<em>{{ row.timestamp.comment }}</em>{% endif %}
             </div>
 
-        {% elif row.timestamp.logged_break %}
-
-            <div class="d-flex w-100">
-              {{ row.timestamp.logged_break }}
-
-              <a
-                 href="{{ row.timestamp.logged_break.get_absolute_url }}"
-                 data-toggle="ajaxmodal"
-                 class="btn btn-sm ml-auto align-self-start btn-light">
-                {% trans 'break'|capfirst %}
-              </a>
-            </div>
-
-        {% elif row.timestamp.url %}
-
-            <div class="d-flex w-100">
-              <a href="{{ row.timestamp.url }}" data-toggle="ajaxmodal">
-                {{ row.timestamp.notes }}
-              </a>
-            </div>
-
-        {% else %}
-
-            <div class="d-flex w-100">
-              <div>
-                {{ row.timestamp.notes }}
-                {% if row.timestamp.comment %}<em>{{ row.timestamp.comment }}</em>{% endif %}
-              </div>
-
-              <div class="ml-auto">
-
-                {% if not forloop.first %}
-                  <a href="{% url 'logbook_break_create' %}?day={{ day.isoformat }}&amp;starts_at={{ row.previous.time.isoformat }}&amp;ends_at={{ row.timestamp.time.isoformat }}&amp;timestamp={{ row.timestamp.pk }}&amp;description={{ row.timestamp.notes }}"
-                     data-toggle="ajaxmodal"
-                     class="btn btn-sm align-self-start btn-primary">
-                    {% trans 'break'|capfirst %}
-                  </a>
-                {% endif %}
-
-                {% if row.elapsed %}
+            <div class="ts-actions">
+              {% if row.timestamp.logged_hours %}
                 <a
-                  href="{{ row.timestamp.get_loggedhours_create_url }}?hours={{ row.elapsed|stringformat:'s' }}&amp;rendered_on={{ day.isoformat }}&amp;timestamp={{ row.timestamp.pk }}&amp;description={{ row.timestamp.notes }}"
-                  data-toggle="ajaxmodal"
-                  class="btn btn-sm align-self-start btn-primary">
-                  {{ row.elapsed|hours:True }}
+                    href="{{ row.timestamp.logged_hours.get_absolute_url }}"
+                    data-toggle="ajaxmodal"
+                    class="btn btn-sm ml-auto align-self-start btn-light">
+                  {{ row.timestamp.logged_hours.hours|hours:True }}
                 </a>
-                {% endif %}
 
-                {% if row.timestamp.pk %}
-                  <form class="d-inline" method="post" action="{{ row.timestamp.get_delete_url }}" onsubmit="return confirm('{% trans 'Really delete?'|escapejs %}')">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
-                  </form>
-                {% endif %}
+              {% elif row.timestamp.logged_break %}
+                <a
+                   href="{{ row.timestamp.logged_break.get_absolute_url }}"
+                   data-toggle="ajaxmodal"
+                   class="btn btn-sm ml-auto align-self-start btn-light">
+                  {% trans 'break'|capfirst %}
+                </a>
 
-              </div>
+              {% else %}
+
+                <div class="ml-auto">
+
+                  {% if not forloop.first %}
+                    <a href="{{ row.break_create_url }}"
+                       data-toggle="ajaxmodal"
+                       class="btn btn-sm align-self-start btn-primary">
+                      {% trans 'break'|capfirst %}
+                    </a>
+                  {% endif %}
+
+                  {% if row.elapsed %}
+                    <a
+                      href="{{ row.loggedhours_create_url }}"
+                      data-toggle="ajaxmodal"
+                      class="btn btn-sm align-self-start btn-primary">
+                      {{ row.elapsed|hours:True }}
+                    </a>
+                  {% endif %}
+
+                  {% if row.timestamp.pk %}
+                    <form class="d-inline" method="post" action="{{ row.timestamp.get_delete_url }}" onsubmit="return confirm('{% trans 'Really delete?'|escapejs %}')">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
+                    </form>
+                  {% endif %}
+
+                </div>
+
+              {% endif %}
 
             </div>
-
-        {% endif %}
-
           </div>
         {% endfor %}
       </div>
