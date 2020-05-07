@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-04 11:44+0200\n"
+"POT-Creation-Date: 2020-05-07 11:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2091,6 +2091,15 @@ msgid "All types"
 msgstr "Alle Typen"
 
 #: workbench/projects/forms.py
+msgid "Set predefined value:"
+msgstr "Vordefinierten Wert setzen:"
+
+#: workbench/projects/forms.py workbench/templates/start.html
+#: workbench/templates/timestamps.html
+msgid "today"
+msgstr "heute"
+
+#: workbench/projects/forms.py
 msgid ""
 "This project already has invoices. The invoices' customer record will be "
 "changed too."
@@ -3109,10 +3118,6 @@ msgstr "Geburtstage"
 msgid "today's hours"
 msgstr "Stunden von heute"
 
-#: workbench/templates/start.html workbench/templates/timestamps.html
-msgid "today"
-msgstr "heute"
-
 #: workbench/templates/start.html workbench/timer/models.py
 msgid "timestamp"
 msgstr "Zeitmarke"
@@ -3164,22 +3169,6 @@ msgstr "Normale Wahrscheinlichkeit"
 #: workbench/templatetags/workbench.py
 msgid "unknown probability"
 msgstr "Wahrscheinlichkeit unbekannt"
-
-#: workbench/timer/admin.py workbench/timer/models.py
-msgid "state"
-msgstr "Status"
-
-#: workbench/timer/models.py
-msgid "updated at"
-msgstr "aktualisiert um"
-
-#: workbench/timer/models.py
-msgid "timer state"
-msgstr "Timer-Status"
-
-#: workbench/timer/models.py
-msgid "timer states"
-msgstr "Timer-Stati"
 
 #: workbench/timer/models.py
 msgid "Maybe the start of the next logbook entry?"
@@ -3331,3 +3320,15 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "state"
+#~ msgstr "Status"
+
+#~ msgid "updated at"
+#~ msgstr "aktualisiert um"
+
+#~ msgid "timer state"
+#~ msgstr "Timer-Status"
+
+#~ msgid "timer states"
+#~ msgstr "Timer-Stati"

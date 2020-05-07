@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.utils.html import format_html
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _, override
 
@@ -11,6 +12,7 @@ from workbench.contacts.models import Organization, Person
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
+from workbench.tools.validation import in_days
 
 
 class ProjectSearchForm(Form):
@@ -153,6 +155,13 @@ class ProjectForm(ModelForm):
             self.fields.pop("cost_center")
         if not self.instance.pk:
             self.fields.pop("closed_on")
+
+        self.fields["closed_on"].help_text = format_html(
+            '{} <a href="#" data-field-value="{}">{}</a>',
+            _("Set predefined value:"),
+            in_days(0).isoformat(),
+            _("today"),
+        )
 
     def clean(self):
         data = super().clean()
