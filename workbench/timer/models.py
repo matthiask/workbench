@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.logbook.models import Break, LoggedHours
 from workbench.projects.models import Project
-from workbench.tools.formats import Z1, hours, local_date_format
+from workbench.tools.formats import Z1, local_date_format
 
 
 class Slice(dict):
@@ -60,7 +60,7 @@ class Slice(dict):
             ("day", self["day"].isoformat()),
             ("description", self["description"]),
             ("starts_at", local_date_format(self.get("starts_at"), fmt="H:i:s")),
-            ("end_at", local_date_format(self.get("end_at"), fmt="H:i:s")),
+            ("ends_at", local_date_format(self.get("ends_at"), fmt="H:i:s")),
             ("timestamp", self.get("timestamp_id") or ""),
         ]
         return "{}?{}".format(reverse("logbook_break_create"), urlencode(params))
@@ -113,7 +113,7 @@ class TimestampQuerySet(models.QuerySet):
                 and entry.type != entry.START
                 and slice.show_create_buttons
             ):
-                slices[-1]["description"] += "; ".join(
+                slices[-1]["description"] = "; ".join(
                     filter(None, (slices[-1]["description"], entry.notes))
                 )
                 previous = entry
@@ -150,8 +150,6 @@ class Timestamp(models.Model):
         (LOGBOOK, capfirst(_("logbook"))),
         (BREAK, capfirst(_("break"))),
     ]
-
-    TYPE_DICT = dict(TYPE_CHOICES)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
@@ -194,31 +192,3 @@ class Timestamp(models.Model):
     @property
     def pretty_time(self):
         return local_date_format(self.created_at, fmt="H:i")
-
-    @property
-    def badge(self):
-        css = {
-            self.START: "primary",
-            self.STOP: "success",
-            self.LOGBOOK: "secondary",
-            self.BREAK: "break",
-        }
-        return format_html(
-            '<span class="badge badge-{}">{}</span>',
-            css[self.type],
-            self.TYPE_DICT[self.type],
-        )
-
-    @property
-    def time(self):
-        return localtime(self.created_at).time().replace(microsecond=0)
-
-    def get_loggedhours_create_url(self):
-        return (
-            reverse("projects_project_createhours", kwargs={"pk": self.project_id})
-            if self.project_id
-            else reverse("logbook_loggedhours_create")
-        )
-
-    def get_delete_url(self):
-        return reverse("delete_timestamp", args=(self.pk,))

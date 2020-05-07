@@ -93,8 +93,8 @@ class BreaksTest(TestCase):
         self.client.force_login(user)
 
         response = self.client.get("/timestamps/")
-        self.assertContains(response, "starts_at=08:45:00")
-        self.assertContains(response, "ends_at=09:00:00")
+        self.assertContains(response, "starts_at=08%3A45%3A00")
+        self.assertContains(response, "ends_at=09%3A00%3A00")
 
     def test_day_validation(self):
         user = factories.UserFactory.create()

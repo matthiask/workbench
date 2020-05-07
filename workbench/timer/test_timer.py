@@ -3,6 +3,8 @@ from decimal import Decimal
 
 from django.test import TestCase
 from django.utils import timezone
+from django.urls import reverse
+from django.utils.timezone import localtime
 from django.utils.translation import deactivate_all
 
 from freezegun import freeze_time
@@ -10,6 +12,7 @@ from freezegun import freeze_time
 from workbench import factories
 from workbench.accounts.models import User
 from workbench.timer.models import Timestamp
+from workbench.tools.formats import local_date_format
 
 
 class TimerTest(TestCase):
@@ -39,9 +42,9 @@ class TimestampsTest(TestCase):
         t = Timestamp.objects.get()
         self.assertEqual(t.type, "start")
         self.assertEqual(t.notes, "blub")
-        self.assertIn("Start @", str(t))
+        self.assertEqual(str(t), "blub")
 
-        response = self.client.post(t.get_delete_url())
+        response = self.client.post(reverse("delete_timestamp", args=(t.pk,)))
         self.assertRedirects(response, "/timestamps/")
 
     def test_timestamp_auth(self):
@@ -84,7 +87,9 @@ class TimestampsTest(TestCase):
 
     def test_timestamps_scenario(self):
         """Test a scenario with a break in the middle"""
-        today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
+        today = localtime(timezone.now()).replace(
+            hour=9, minute=0, second=0, microsecond=0
+        )
         user = factories.UserFactory.create()
 
         # Insert STOPs at the beginning -- they should be skipped
@@ -95,9 +100,14 @@ class TimestampsTest(TestCase):
             type=Timestamp.STOP, created_at=today - dt.timedelta(minutes=80)
         )
 
-        t1 = user.timestamp_set.create(type=Timestamp.START, created_at=today)
-        t2 = user.timestamp_set.create(
-            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=40)
+        t1 = user.timestamp_set.create(
+            type=Timestamp.START, created_at=today, notes="Aaa"
+        )
+        # t2 =  # unused
+        user.timestamp_set.create(
+            type=Timestamp.STOP,
+            created_at=today + dt.timedelta(minutes=40),
+            notes="Bbb",
         )
         t3 = user.timestamp_set.create(
             type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=60)
@@ -112,33 +122,29 @@ class TimestampsTest(TestCase):
             type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=160)
         )
 
-        timestamps = Timestamp.objects.for_user(user)["timestamps"]
-        self.assertEqual(
-            timestamps,
-            [
-                {"elapsed": None, "previous": None, "timestamp": ts2},
-                {"elapsed": Decimal("0.4"), "previous": ts2, "timestamp": ts1},
-                {"elapsed": Decimal("1.0"), "previous": ts1, "timestamp": t1},
-                {"elapsed": Decimal("0.7"), "previous": t1, "timestamp": t2},
-                {"elapsed": Decimal("0.4"), "previous": t2, "timestamp": t3},
-                {"elapsed": Decimal("1.0"), "previous": t3, "timestamp": t4},
-                {"elapsed": Decimal("0.5"), "previous": t4, "timestamp": t5},
-                {"elapsed": Decimal("0.4"), "previous": t5, "timestamp": t6},
-            ],
-        )
+        slices = Timestamp.objects.slices(user)
 
-        # Some types have been overridden
+        partial = [
+            (
+                slice.elapsed_hours,
+                local_date_format(slice.get("starts_at"), fmt="H:i"),
+                local_date_format(slice.get("ends_at"), fmt="H:i"),
+                slice["timestamp_id"],
+                slice["description"],
+            )
+            for slice in slices
+        ]
+
         self.assertEqual(
-            [row["timestamp"].type for row in timestamps],
+            partial,
             [
-                Timestamp.STOP,
-                Timestamp.STOP,
-                Timestamp.START,
-                Timestamp.STOP,
-                Timestamp.STOP,
-                Timestamp.STOP,
-                Timestamp.STOP,
-                Timestamp.STOP,
+                (None, "", "07:40", ts2.pk, ""),
+                (Decimal("0.4"), "07:40", "08:00", ts1.pk, ""),
+                (Decimal("0.7"), "09:00", "09:40", t1.pk, "Aaa; Bbb"),
+                (Decimal("0.4"), "09:40", "10:00", t3.pk, ""),
+                (Decimal("1.0"), "10:00", "10:55", t4.pk, ""),
+                (Decimal("0.5"), "10:55", "11:20", t5.pk, ""),
+                (Decimal("0.4"), "11:20", "11:40", t6.pk, ""),
             ],
         )
 
@@ -156,6 +162,7 @@ class TimestampsTest(TestCase):
             rendered_by=user,
             created_at=today + dt.timedelta(minutes=10),
             description="ABC",
+            hours=Decimal("0.2"),  # It was only ten minutes
         )
         t2 = user.timestamp_set.create(
             type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=20)
@@ -174,7 +181,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(l1, slices[1]["description"])
 
     def test_view(self):
-        """The timnestamps view does not crash"""
+        """The timestamps view does not crash"""
         deactivate_all()
         user = factories.UserFactory.create()
         user.timestamp_set.create(type=Timestamp.START)
@@ -276,7 +283,8 @@ class TimestampsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(len(data["timestamps"]), 2)
-        self.assertEqual(data["timestamps"][1]["elapsed"], "0.1")
+        self.assertEqual(data["timestamps"][0]["elapsed"], "0.1")
+        self.assertEqual(data["timestamps"][1]["elapsed"], None)
 
     def test_post_split(self):
         """Backwards compatibility: Type "split" still works"""
