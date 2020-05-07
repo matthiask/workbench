@@ -153,15 +153,15 @@ class ProjectForm(ModelForm):
             self.fields.pop("flat_rate")
         if not self.request.user.features[FEATURES.LABOR_COSTS]:
             self.fields.pop("cost_center")
-        if not self.instance.pk:
+        if self.instance.pk:
+            self.fields["closed_on"].help_text = format_html(
+                '{} <a href="#" data-field-value="{}">{}</a>',
+                _("Set predefined value:"),
+                in_days(0).isoformat(),
+                _("today"),
+            )
+        else:
             self.fields.pop("closed_on")
-
-        self.fields["closed_on"].help_text = format_html(
-            '{} <a href="#" data-field-value="{}">{}</a>',
-            _("Set predefined value:"),
-            in_days(0).isoformat(),
-            _("today"),
-        )
 
     def clean(self):
         data = super().clean()
