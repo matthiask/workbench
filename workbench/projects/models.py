@@ -382,7 +382,14 @@ class Project(Model):
 
     @cached_property
     def project_invoices_total_excl_tax(self):
-        return sum((invoice.total_excl_tax for invoice in self.project_invoices), Z2)
+        return sum(
+            (
+                invoice.total_excl_tax
+                for invoice in self.project_invoices
+                if invoice.is_valid
+            ),
+            Z2,
+        )
 
     @cached_property
     def not_archived_total(self):

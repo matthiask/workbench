@@ -26,9 +26,7 @@ class InvoiceQuerySet(SearchQuerySet):
         return self.filter(status__in=(Invoice.IN_PREPARATION, Invoice.SENT))
 
     def valid(self):
-        return self.filter(
-            status__in=(Invoice.IN_PREPARATION, Invoice.SENT, Invoice.PAID)
-        )
+        return self.filter(status__in=Invoice.VALID)
 
     def overdue(self):
         return self.filter(
@@ -49,6 +47,7 @@ class Invoice(ModelWithTotal):
         (PAID, _("Paid")),
         (CANCELED, _("Canceled")),
     )
+    VALID = {IN_PREPARATION, SENT, PAID}
 
     FIXED = "fixed"
     DOWN_PAYMENT = "down-payment"
@@ -267,6 +266,10 @@ class Invoice(ModelWithTotal):
             errors["service_period_until"] = _("Until date has to be after from date.")
 
         raise_if_errors(errors, exclude)
+
+    @property
+    def is_valid(self):
+        return self.status in self.VALID
 
     @property
     def pretty_status(self):
