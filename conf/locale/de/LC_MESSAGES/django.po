@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-07 11:06+0200\n"
+"POT-Creation-Date: 2020-05-08 16:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1720,7 +1720,7 @@ msgstr "Stundensatz"
 #: workbench/templates/projects/project_list.html
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
-#: workbench/templates/start.html
+#: workbench/templates/start.html workbench/templates/timestamps.html
 msgid "hours"
 msgstr "Stunden"
 
@@ -3171,16 +3171,12 @@ msgid "unknown probability"
 msgstr "Wahrscheinlichkeit unbekannt"
 
 #: workbench/timer/models.py
-msgid "Maybe the start of the next logbook entry?"
-msgstr "Vielleicht der Beginn des nächsten Logbucheintrags?"
+msgid "<detected>"
+msgstr "<entdeckt>"
 
 #: workbench/timer/models.py
 msgid "Start"
 msgstr "Start"
-
-#: workbench/timer/models.py
-msgid "Split"
-msgstr "Split"
 
 #: workbench/timer/models.py
 msgid "Stop"
@@ -3320,15 +3316,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "state"
-#~ msgstr "Status"
-
-#~ msgid "updated at"
-#~ msgstr "aktualisiert um"
-
-#~ msgid "timer state"
-#~ msgstr "Timer-Status"
-
-#~ msgid "timer states"
-#~ msgstr "Timer-Stati"

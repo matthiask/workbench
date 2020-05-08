@@ -6,7 +6,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import capfirst
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.logbook.models import Break, LoggedHours
@@ -157,7 +157,7 @@ class TimestampQuerySet(models.QuerySet):
                             Slice(
                                 day=day,
                                 description="",
-                                comment="<autodetected>",
+                                comment=gettext("<detected>"),
                                 starts_at=previous["ends_at"],
                                 ends_at=slice["starts_at"],
                             )

@@ -141,7 +141,7 @@ class TimestampsTest(TestCase):
             [
                 (None, "", "07:40", ts2.pk, "", None),
                 (Decimal("0.4"), "07:40", "08:00", ts1.pk, "", None),
-                (Decimal("1.0"), "08:00", "09:00", None, "", "<autodetected>"),
+                (Decimal("1.0"), "08:00", "09:00", None, "", "<detected>"),
                 (Decimal("0.7"), "09:00", "09:40", t1.pk, "Aaa; Bbb", None),
                 (Decimal("0.4"), "09:40", "10:00", t3.pk, "", None),
                 (Decimal("1.0"), "10:00", "10:55", t4.pk, "", None),
@@ -309,7 +309,7 @@ class TimestampsTest(TestCase):
 
         slices = Timestamp.objects.slices(user)
         self.assertEqual(len(slices), 3)
-        self.assertEqual(slices[1]["comment"], "<autodetected>")
+        self.assertEqual(slices[1]["comment"], "<detected>")
 
     def test_gap_between_logbook_entries(self):
         """A slice is automatically generated if the gap between subsequent
