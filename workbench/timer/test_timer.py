@@ -310,3 +310,17 @@ class TimestampsTest(TestCase):
         slices = Timestamp.objects.slices(user)
         self.assertEqual(len(slices), 3)
         self.assertEqual(slices[1]["comment"], "<autodetected>")
+
+    def test_gap_between_logbook_entries(self):
+        """A slice is automatically generated if the gap between subsequent
+        logbook entries if there is a gap in-between"""
+        user = factories.UserFactory.create()
+
+        factories.LoggedHoursFactory.create(
+            rendered_by=user, created_at=timezone.now() - dt.timedelta(seconds=10799)
+        )
+        factories.LoggedHoursFactory.create(rendered_by=user)
+
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(len(slices), 3)
+        self.assertEqual(slices[1].elapsed_hours, Decimal("2"))

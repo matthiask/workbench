@@ -100,10 +100,21 @@ class TimestampQuerySet(models.QuerySet):
                 timestamp_id=entry.id,
             )
 
+            if entry.logged_break:
+                slice["starts_at"] = entry.logged_break.starts_at_datetime
+                slice["ends_at"] = entry.logged_break.ends_at_datetime
             if entry.type == entry.START:
                 slice["starts_at"] = entry.created_at
+                if entry.logged_hours:
+                    slice["ends_at"] = entry.created_at + dt.timedelta(
+                        seconds=int(3600 * entry.logged_hours.hours)
+                    )
             else:
                 slice["ends_at"] = entry.created_at
+                if entry.logged_hours:
+                    slice["starts_at"] = entry.created_at - dt.timedelta(
+                        seconds=int(3600 * entry.logged_hours.hours)
+                    )
 
             if (
                 previous
@@ -118,23 +129,6 @@ class TimestampQuerySet(models.QuerySet):
                 )
                 previous = entry
                 continue
-
-            if (
-                previous
-                and previous.type != previous.START
-                and entry.type == entry.START
-            ):
-                gap = (entry.created_at - previous.created_at).total_seconds()
-                if gap > 300:
-                    slices.append(
-                        Slice(
-                            day=day,
-                            description="",
-                            comment="<autodetected>",
-                            starts_at=previous.created_at,
-                            ends_at=entry.created_at,
-                        )
-                    )
 
             slices.append(slice)
 
@@ -152,7 +146,26 @@ class TimestampQuerySet(models.QuerySet):
             elif slices[-1]["logged_hours"]:
                 slices[-1]["ends_at"] = slices[-1]["logged_hours"].created_at
 
-        return slices
+        previous = None
+        result = []
+        for slice in slices:
+            if previous is not None:
+                if slice.get("starts_at") and previous.get("ends_at"):
+                    gap = (slice["starts_at"] - previous["ends_at"]).total_seconds()
+                    if gap > 300:
+                        result.append(
+                            Slice(
+                                day=day,
+                                description="",
+                                comment="<autodetected>",
+                                starts_at=previous["ends_at"],
+                                ends_at=slice["starts_at"],
+                            )
+                        )
+            result.append(slice)
+            previous = slice
+
+        return result
 
 
 class Timestamp(models.Model):
