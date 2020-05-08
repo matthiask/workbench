@@ -60,6 +60,7 @@
                 </strong>
                 {% if slice.elapsed_hours is not None %}{{ slice.elapsed_hours|hours:True }}{% endif %}
                 {{ slice.description }}
+                {% if slice.comment %}<em>{{ slice.comment }}</em>{% endif %}
               </div>
 
               <div class="ml-auto">

@@ -129,8 +129,9 @@ class TimestampsTest(TestCase):
                 slice.elapsed_hours,
                 local_date_format(slice.get("starts_at"), fmt="H:i"),
                 local_date_format(slice.get("ends_at"), fmt="H:i"),
-                slice["timestamp_id"],
+                slice.get("timestamp_id"),
                 slice["description"],
+                slice.get("comment"),
             )
             for slice in slices
         ]
@@ -138,13 +139,14 @@ class TimestampsTest(TestCase):
         self.assertEqual(
             partial,
             [
-                (None, "", "07:40", ts2.pk, ""),
-                (Decimal("0.4"), "07:40", "08:00", ts1.pk, ""),
-                (Decimal("0.7"), "09:00", "09:40", t1.pk, "Aaa; Bbb"),
-                (Decimal("0.4"), "09:40", "10:00", t3.pk, ""),
-                (Decimal("1.0"), "10:00", "10:55", t4.pk, ""),
-                (Decimal("0.5"), "10:55", "11:20", t5.pk, ""),
-                (Decimal("0.4"), "11:20", "11:40", t6.pk, ""),
+                (None, "", "07:40", ts2.pk, "", None),
+                (Decimal("0.4"), "07:40", "08:00", ts1.pk, "", None),
+                (Decimal("1.0"), "08:00", "09:00", None, "", "<autodetected>"),
+                (Decimal("0.7"), "09:00", "09:40", t1.pk, "Aaa; Bbb", None),
+                (Decimal("0.4"), "09:40", "10:00", t3.pk, "", None),
+                (Decimal("1.0"), "10:00", "10:55", t4.pk, "", None),
+                (Decimal("0.5"), "10:55", "11:20", t5.pk, "", None),
+                (Decimal("0.4"), "11:20", "11:40", t6.pk, "", None),
             ],
         )
 
@@ -295,3 +297,16 @@ class TimestampsTest(TestCase):
 
         t = Timestamp.objects.get()
         self.assertEqual(t.type, "stop")
+
+    def test_gap_between_hours_and_start(self):
+        """A slice is automatically generated if there is a gap between a
+        log/stop and a start"""
+        hours = factories.LoggedHoursFactory.create(
+            created_at=timezone.now() - dt.timedelta(minutes=33),
+        )
+        user = hours.rendered_by
+        user.timestamp_set.create(type=Timestamp.START, notes="Mittag")
+
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(len(slices), 3)
+        self.assertEqual(slices[1]["comment"], "<autodetected>")

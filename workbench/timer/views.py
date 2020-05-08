@@ -117,7 +117,7 @@ def list_timestamps(request):
                         slice["description"],
                     ),
                     "elapsed": slice.elapsed_hours,
-                    "comment": "",
+                    "comment": slice.get("comment", ""),
                 }
                 for slice in slices
             ],

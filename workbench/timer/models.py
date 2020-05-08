@@ -119,6 +119,23 @@ class TimestampQuerySet(models.QuerySet):
                 previous = entry
                 continue
 
+            if (
+                previous
+                and previous.type != previous.START
+                and entry.type == entry.START
+            ):
+                gap = (entry.created_at - previous.created_at).total_seconds()
+                if gap > 300:
+                    slices.append(
+                        Slice(
+                            day=day,
+                            description="",
+                            comment="<autodetected>",
+                            starts_at=previous.created_at,
+                            ends_at=entry.created_at,
+                        )
+                    )
+
             slices.append(slice)
 
             if previous:
