@@ -112,7 +112,7 @@ class TimestampQuerySet(models.QuerySet):
                 and slice.show_create_buttons
             ):
                 slices[-1]["description"] = "; ".join(
-                    filter(None, (slices[-1]["description"], entry.notes))
+                    filter(None, (str(slices[-1]["description"]), entry.notes))
                 )
                 previous = entry
                 continue

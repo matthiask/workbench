@@ -109,11 +109,11 @@ def list_timestamps(request):
             "hours": daily_hours,
             "timestamps": [
                 {
-                    "timestamp": "{} {} {}".format(
+                    "timestamp": "{:>5} {:^5} {}".format(
                         local_date_format(slice.get("starts_at"), fmt="H:i"),
                         hours(slice.elapsed_hours, plus_sign=True)
                         if slice.elapsed_hours is not None
-                        else "  ?  ",
+                        else "?",
                         slice["description"],
                     ),
                     "elapsed": slice.elapsed_hours,
