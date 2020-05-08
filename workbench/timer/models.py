@@ -108,11 +108,13 @@ class TimestampQuerySet(models.QuerySet):
             if (
                 previous
                 and previous.type == previous.START
+                and not previous.logged_break
+                and not previous.logged_hours
                 and entry.type != entry.START
                 and slice.show_create_buttons
             ):
                 slices[-1]["description"] = "; ".join(
-                    filter(None, (str(slices[-1]["description"]), entry.notes))
+                    filter(None, (slices[-1]["description"], entry.notes))
                 )
                 previous = entry
                 continue

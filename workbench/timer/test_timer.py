@@ -101,7 +101,7 @@ class TimestampsTest(TestCase):
         )
 
         t1 = user.timestamp_set.create(
-            type=Timestamp.START, created_at=today, notes="Aaa"
+            type=Timestamp.START, created_at=today, notes="Aaa",
         )
         # t2 =  # unused
         user.timestamp_set.create(
