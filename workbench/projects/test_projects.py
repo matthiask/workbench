@@ -13,6 +13,7 @@ from workbench.tools.validation import in_days
 
 class ProjectsTest(TestCase):
     def test_create(self):
+        """Create a project and create, update, delete and merge a few services"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
         person = factories.PersonFactory(
@@ -144,6 +145,7 @@ class ProjectsTest(TestCase):
         self.assertEqual(set(project.services.all()), {service2})
 
     def test_try_delete_available(self):
+        """The try_delete box is only available if service isn't bound to an offer"""
         service = factories.ServiceFactory.create()
         self.client.force_login(service.project.owned_by)
 
@@ -162,6 +164,7 @@ class ProjectsTest(TestCase):
         self.assertNotContains(response, "try_delete")
 
     def test_service_with_rate_zero(self):
+        """Services with 0/h rate are allowed (since effort_rate is Falsy)"""
         Service(
             project=factories.ProjectFactory.create(),
             title="Any",
@@ -169,22 +172,8 @@ class ProjectsTest(TestCase):
             effort_rate=0,
         ).full_clean()
 
-    def test_service_deletion(self):
-        service = factories.ServiceFactory.create()
-        self.client.force_login(service.project.owned_by)
-        response = self.client.get(
-            service.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
-        )
-        response = self.client.post(
-            service.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
-        )
-        self.assertEqual(response.status_code, 204)
-        self.assertEqual(
-            messages(response), ["Service 'Any service' has been deleted successfully."]
-        )
-        self.assertEqual(Service.objects.count(), 0)
-
     def test_autofill(self):
+        """Required autofilling attributes for service types are available"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -202,6 +191,7 @@ class ProjectsTest(TestCase):
         self.assertContains(response, "&quot;effort_rate&quot;: 250")
 
     def test_delete(self):
+        """Attempting to delete a project with logged costs redirects immediately"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -216,6 +206,7 @@ class ProjectsTest(TestCase):
         self.assertRedirects(response, project.urls["detail"])
 
     def test_create_validation(self):
+        """Creating projects requires consistent and complete data"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -256,6 +247,7 @@ class ProjectsTest(TestCase):
         )
 
     def test_lists(self):
+        """Filter form smoke test"""
         project = factories.ProjectFactory.create()
         user = factories.UserFactory.create()
         self.client.force_login(user)
@@ -281,6 +273,7 @@ class ProjectsTest(TestCase):
         code("invalid=3", 302)
 
     def test_invalid_search_form(self):
+        """Invalid filter form redirect test"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
         response = self.client.get("/projects/?org=0")
@@ -288,6 +281,7 @@ class ProjectsTest(TestCase):
         self.assertEqual(messages(response), ["Search form was invalid."])
 
     def test_autocomplete(self):
+        """Test the autocomplete endpoints of contacts and projects"""
         project = factories.ProjectFactory.create(closed_on=dt.date.today())
         user = factories.UserFactory.create()
         self.client.force_login(user)
@@ -317,6 +311,7 @@ class ProjectsTest(TestCase):
         )
 
     def test_customer_update(self):
+        """Updating customers of projects reassigns invoices (after asking)"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
         invoice = factories.InvoiceFactory.create(
@@ -359,6 +354,7 @@ class ProjectsTest(TestCase):
         self.assertEqual(invoice.customer, new_org)
 
     def test_copy(self):
+        """Copying projects works"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -371,6 +367,7 @@ class ProjectsTest(TestCase):
         self.assertEqual(response.status_code, 200)  # No crash
 
     def test_move(self):
+        """Moving services to other projects works and also handles flat rates"""
         project = factories.ProjectFactory.create()
         closed = factories.ProjectFactory.create(closed_on=dt.date.today())
         flat_rate = factories.ProjectFactory.create(flat_rate=100)
@@ -416,6 +413,7 @@ class ProjectsTest(TestCase):
         self.assertEqual(service.effort_rate, 100)
 
     def test_select(self):
+        """Test the project select modal"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -438,6 +436,7 @@ class ProjectsTest(TestCase):
         self.assertEqual(response.json(), {"redirect": project.get_absolute_url()})
 
     def test_services_api(self):
+        """The services API returns JSON with the expected format"""
         service = factories.ServiceFactory.create()
         offer = factories.OfferFactory.create(project=service.project)
         factories.ServiceFactory.create(project=service.project, offer=offer)
@@ -453,6 +452,7 @@ class ProjectsTest(TestCase):
         self.assertEqual(services[1]["label"], "Not offered yet")
 
     def test_projects_api(self):
+        """The projects API returns JSON"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -460,6 +460,7 @@ class ProjectsTest(TestCase):
         self.assertEqual(response["content-type"], "application/json")
 
     def test_assign_service_types(self):
+        """The assign services type endpoint works and redirects"""
         service = factories.ServiceFactory.create()
         self.client.force_login(service.project.owned_by)
 
@@ -475,6 +476,7 @@ class ProjectsTest(TestCase):
         self.assertEqual(service.effort_rate, 250)
 
     def test_create_services_with_flat_rates(self):
+        """Projects with flat rates do not allow changing effort rates on services"""
         project = factories.ProjectFactory.create(flat_rate=250)
         self.client.force_login(project.owned_by)
 
@@ -498,6 +500,8 @@ class ProjectsTest(TestCase):
         self.assertNotContains(response, 'id="id_service_type"')
 
     def test_add_flat_rate_to_existing_project(self):
+        """Adding a flat rate to a project with services warns about
+        overridding their effort rate"""
         project = factories.ServiceFactory.create().project
         self.client.force_login(project.owned_by)
 
@@ -534,6 +538,7 @@ class ProjectsTest(TestCase):
 
     @override_settings(FEATURES={"glassfrog": False})
     def test_no_role(self):
+        """The service form has no role field when not GLASSFROG"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -543,6 +548,7 @@ class ProjectsTest(TestCase):
         self.assertNotContains(response, "id_role")
 
     def test_no_flat_rate(self):
+        """Uses without CONTROLLING do not see the flat rate field"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -554,6 +560,7 @@ class ProjectsTest(TestCase):
             self.assertNotContains(response, "id_flat_rate")
 
     def test_project_closing_reopening(self):
+        """Closing a project in the future isn't allowed"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 

@@ -8,6 +8,7 @@ from workbench.invoices.utils import next_valid_day, recurring
 
 class UtilsTest(TestCase):
     def test_next_valid_day(self):
+        """The next_valid_day returns valid days :-)"""
         self.assertEqual(next_valid_day(2016, 2, 28), dt.date(2016, 2, 28))
         self.assertEqual(next_valid_day(2016, 2, 29), dt.date(2016, 2, 29))
 
@@ -21,6 +22,7 @@ class UtilsTest(TestCase):
         self.assertEqual(next_valid_day(2018, 27, 1), dt.date(2020, 3, 1))
 
     def test_recurring(self):
+        """The recurring() utilty returns expected values"""
         self.assertEqual(
             list(islice(recurring(dt.date(2016, 2, 29), "yearly"), 5)),
             [

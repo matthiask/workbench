@@ -18,13 +18,8 @@ class OffersTest(TestCase):
     def tearDown(self):
         deactivate_all()
 
-    def test_factories(self):
-        offer = factories.OfferFactory.create()
-
-        self.client.force_login(offer.owned_by)
-        self.client.get(offer.project.urls["detail"])
-
     def test_create_offer(self):
+        """Create an offer and generate a PDF"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -81,6 +76,7 @@ class OffersTest(TestCase):
         self.assertEqual(pdf["content-type"], "application/pdf")
 
     def test_offers_pdf(self):
+        """Generate a PDF containing several offers"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -104,6 +100,7 @@ class OffersTest(TestCase):
         self.assertEqual(response["content-type"], "application/pdf")
 
     def test_update_offer(self):
+        """Offer and bound services update warnings and errors"""
         offer = factories.OfferFactory.create(title="Test")
         service = factories.ServiceFactory.create(
             project=offer.project,
@@ -234,6 +231,7 @@ class OffersTest(TestCase):
         self.assertIsNone(offer.closed_on)
 
     def test_list(self):
+        """Filter form smoke test"""
         offer = factories.OfferFactory.create()
         self.client.force_login(factories.UserFactory.create())
 
@@ -250,6 +248,7 @@ class OffersTest(TestCase):
         code("owned_by=0")  # only inactive
 
     def test_detail(self):
+        """The detail URL of offers redirects to the project detail page anchor"""
         offer = factories.OfferFactory.create()
         self.client.force_login(offer.owned_by)
 
@@ -259,6 +258,7 @@ class OffersTest(TestCase):
         )
 
     def test_create_message(self):
+        """Attempting to directly create an offer only produces a help message"""
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/offers/create/")
         self.assertRedirects(response, "/offers/")
@@ -272,6 +272,7 @@ class OffersTest(TestCase):
         )
 
     def test_status(self):
+        """Offer status badge"""
         project = factories.ProjectFactory.create()
         today = dt.date.today()
         self.assertEqual(
@@ -293,6 +294,8 @@ class OffersTest(TestCase):
         self.assertEqual(Offer(project=project, status="42").pretty_status, "42")
 
     def test_declined_offer(self):
+        """Declined offers' services do not allow logging and are not part of
+        service hours"""
         project = factories.ProjectFactory.create()
 
         offer1 = factories.OfferFactory.create(project=project, status=Offer.DECLINED)
@@ -309,6 +312,7 @@ class OffersTest(TestCase):
         self.assertEqual(project.services.logging().count(), 2)
 
     def test_offer_copying(self):
+        """Offers can be copied to different projects"""
         offer = factories.OfferFactory.create()
         factories.ServiceFactory.create(project=offer.project, offer=offer)
 
@@ -337,6 +341,7 @@ class OffersTest(TestCase):
         self.assertEqual(project.services.count(), 1)
 
     def test_postal_address_validation(self):
+        """Postal addresses are validated (a bit)"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -355,6 +360,7 @@ class OffersTest(TestCase):
         self.assertContains(response, 'value="short-postal-address"')
 
     def test_grouped_services_empty_offers(self):
+        """Offers without services still appear in Project.grouped_services"""
         offer = factories.OfferFactory.create()
         gs = offer.project.grouped_services
 
@@ -362,6 +368,7 @@ class OffersTest(TestCase):
         self.assertEqual(gs["offers"][0][1]["services"], [])
 
     def test_offer_deletion_without_logbook(self):
+        """Offers without linked logged hours can be deleted, including all services"""
         offer = factories.OfferFactory.create()
         self.client.force_login(offer.owned_by)
 
@@ -374,6 +381,7 @@ class OffersTest(TestCase):
         self.assertEqual(offer.project.services.count(), 0)
 
     def test_offer_deletion_with_logbook(self):
+        """Offers with some linked logged hours can be deleted, but the service stays"""
         offer = factories.OfferFactory.create()
         self.client.force_login(offer.owned_by)
         service = factories.ServiceFactory.create(project=offer.project, offer=offer)
@@ -388,6 +396,7 @@ class OffersTest(TestCase):
         self.assertEqual(offer.project.services.count(), 1)
 
     def test_offer_pricing(self):
+        """Offer total calculation works"""
         offer = factories.OfferFactory.create()
         service = factories.ServiceFactory.create(offer=offer, project=offer.project)
 
@@ -426,6 +435,7 @@ class OffersTest(TestCase):
         self.assertEqual([action.action for action in actions], ["I", "U"])
 
     def test_offer_pricing_with_flat_rate(self):
+        """Pricing with flat rates does not allow editing effort rates"""
         project = factories.ProjectFactory.create(flat_rate=160)
         offer = factories.OfferFactory.create(project=project)
         factories.ServiceFactory.create(offer=offer, project=project)
@@ -439,6 +449,7 @@ class OffersTest(TestCase):
         )
 
     def test_renumber_offers(self):
+        """Offers can be renumbered (and reordered)"""
         project = factories.ProjectFactory.create()
         offer1 = factories.OfferFactory.create(project=project)
         offer2 = factories.OfferFactory.create(project=project)
@@ -467,6 +478,7 @@ class OffersTest(TestCase):
         self.assertEqual(offer2._code, 3)
 
     def test_please_decline(self):
+        """Please do not decline offers but update them and send them again"""
         offer = factories.OfferFactory.create()
         self.client.force_login(offer.owned_by)
 
@@ -519,6 +531,7 @@ class OffersTest(TestCase):
 
     @freeze_time("2020-04-21")
     def test_offer_with_closed_project(self):
+        """Sent offers on closed projects have a warning badge"""
         project = factories.ProjectFactory.create(closed_on=dt.date.today())
         offer = factories.OfferFactory.create(
             project=project, offered_on=dt.date.today(), status=Offer.OFFERED
@@ -531,6 +544,7 @@ class OffersTest(TestCase):
 
     @freeze_time("2020-05-04")
     def test_offer_not_valid_anymore(self):
+        """Sent offers which are not valid anymore have a warning badge"""
         project = factories.ProjectFactory.create()
         offer = factories.OfferFactory.create(
             project=project,
@@ -544,6 +558,7 @@ class OffersTest(TestCase):
         )
 
     def test_offers_ordering(self):
+        """The ordering of offers is: Valid offers, not offered yet, declined offers"""
         project = factories.ProjectFactory.create()
 
         declined = factories.OfferFactory.create(

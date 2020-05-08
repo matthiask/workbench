@@ -13,7 +13,8 @@ from workbench.tools.testing import check_code
 
 
 class StatisticsTest(TestCase):
-    def test_stats(self):
+    def test_overdrawn_projects(self):
+        """Overdrawn projects are overdrawn"""
         service1 = factories.ServiceFactory.create(effort_hours=2)
         factories.ServiceFactory.create(effort_hours=4)
 
@@ -41,6 +42,7 @@ class StatisticsTest(TestCase):
         )
 
     def test_view(self):
+        """Hit a few reporting views"""
         self.client.force_login(factories.UserFactory.create())
 
         response = self.client.get("/report/overdrawn-projects/")
@@ -53,6 +55,7 @@ class StatisticsTest(TestCase):
         self.assertRedirects(response, "/report/hours-per-customer/")
 
     def test_some_project_budget_statistics_view(self):
+        """Project budget statistics filter form smoke test"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -73,6 +76,7 @@ class StatisticsTest(TestCase):
         code("export=xlsx")
 
     def test_not_archived_hours_grouped_services_green_hours_hpc(self):
+        """Test a scenario"""
         service1 = factories.ServiceFactory.create(effort_rate=180, effort_type="Any")
         service2 = factories.ServiceFactory.create(project=service1.project)
 
@@ -195,6 +199,7 @@ class StatisticsTest(TestCase):
         )
 
     def test_green_hours(self):
+        """Green hours report incl. filtering and overall stats"""
         self.create_projects()
         p_green = factories.ProjectFactory.create(type=Project.ORDER)
         s_green = factories.ServiceFactory.create(project=p_green, effort_hours=20)
@@ -253,6 +258,7 @@ class StatisticsTest(TestCase):
         # print(response, response.content.decode("utf-8"))
 
     def test_statistics(self):
+        """The project statistics modal does not crash"""
         hours = factories.LoggedHoursFactory.create()
         self.client.force_login(hours.rendered_by)
         response = self.client.get(hours.service.project.urls["statistics"])

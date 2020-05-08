@@ -7,6 +7,7 @@ from workbench.tools.search import process_query
 
 class SearchTest(TestCase):
     def test_search(self):
+        """Searching works and only shows allowed content objects"""
         project = factories.ProjectFactory.create(title="Test")
         self.client.force_login(project.owned_by)
 
@@ -37,6 +38,7 @@ class SearchTest(TestCase):
             self.assertNotContains(response, "deals")
 
     def test_process_query(self):
+        """Specific testing of query->tsquery conversion"""
         self.assertEqual(process_query(""), "")
         self.assertEqual(process_query("org"), "org:*")
         self.assertEqual(process_query("a b"), "a & b:*")

@@ -14,6 +14,7 @@ from workbench.reporting.models import Accruals
 
 class ReportingTest(TestCase):
     def test_send_accounting_files(self):
+        """Accounting files are automatically sent on the first day of the year"""
         factories.UserFactory.create(is_admin=True)
         factories.ProjectFactory.create()
 
@@ -26,11 +27,13 @@ class ReportingTest(TestCase):
             self.assertEqual(len(mail.outbox), 1)
 
     def test_accruals(self):
+        """Accrual calculation does not crash..."""
         obj = Accruals.objects.for_cutoff_date(dt.date.today())
         self.assertEqual(obj.accruals, Decimal("0.00"))
         self.assertEqual(str(obj), obj.cutoff_date.strftime("%d.%m.%Y"))
 
     def test_labor_costs(self):
+        """The labor costs report does a few things"""
         user1 = factories.EmploymentFactory.create().user
         user2 = factories.EmploymentFactory.create(
             hourly_labor_costs=100, green_hours_target=75

@@ -22,6 +22,7 @@ class DealsTest(TestCase):
         deactivate_all()
 
     def test_list(self):
+        """Filtering smoke test"""
         deal = factories.DealFactory.create()
         self.client.force_login(deal.owned_by)
 
@@ -34,6 +35,7 @@ class DealsTest(TestCase):
         self.assertEqual(self.client.get("/deals/?s=42").status_code, 302)
 
     def test_detail(self):
+        """Deals detail view"""
         deal = factories.DealFactory.create()
         deal.values.create(type=factories.ValueTypeFactory.create(), value=42)
         deal.save()
@@ -44,6 +46,7 @@ class DealsTest(TestCase):
         self.assertContains(response, "42.00")
 
     def test_crud(self):
+        """CRUD of deals incl. reopening etc."""
         person = factories.PersonFactory.create(
             organization=factories.OrganizationFactory.create()
         )
@@ -100,6 +103,7 @@ class DealsTest(TestCase):
         )
 
     def test_protected_m2m(self):
+        """Deleting an attribute group where attributes exist already does not work"""
         deal = factories.DealFactory.create()
         group = factories.AttributeGroupFactory.create()
         value = group.attributes.create(title="Test", position=0)
@@ -109,6 +113,7 @@ class DealsTest(TestCase):
             group.delete()
 
     def test_values_and_attributes(self):
+        """Test creating and updating deals with values and attributes"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -182,6 +187,7 @@ class DealsTest(TestCase):
         )
 
     def test_set_status(self):
+        """The deal status modal works"""
         deal = factories.DealFactory.create()
         self.client.force_login(deal.owned_by)
 
@@ -203,6 +209,7 @@ class DealsTest(TestCase):
 
     @freeze_time("2020-02-18")
     def test_badge(self):
+        """The deal badge contains expected informations"""
         self.assertEqual(
             factories.DealFactory.create().status_badge,
             '<span class="badge badge-info">Open since 18.02.2020</span>',
@@ -215,6 +222,7 @@ class DealsTest(TestCase):
         )
 
     def test_xlsx(self):
+        """Smoke test of the deals XLSX export"""
         deal = factories.DealFactory.create()
 
         group = factories.AttributeGroupFactory.create()
@@ -233,6 +241,7 @@ class DealsTest(TestCase):
         )
 
     def test_decision_expected_on_conditionally_required(self):
+        """The "decision expected on" field is required when probability is high"""
         person = factories.PersonFactory.create(
             organization=factories.OrganizationFactory.create()
         )
@@ -251,6 +260,7 @@ class DealsTest(TestCase):
         self.assertContains(response, "This field is required when probability is high")
 
     def test_decision_expected_on_status(self):
+        """The status of a deal depends on the "decision expected on" field"""
         today = dt.date.today()
         deal = Deal(decision_expected_on=today)
         self.assertEqual(
@@ -268,6 +278,7 @@ class DealsTest(TestCase):
         self.assertIn("badge-warning", deal.status_badge)
 
     def test_caveat_status(self):
+        """The status changes after some days for inactive deals"""
         self.assertIn(
             "badge-info",
             Deal(created_at=timezone.now() - dt.timedelta(days=30)).status_badge,
@@ -278,6 +289,7 @@ class DealsTest(TestCase):
         )
 
     def test_update_with_archived_valuetype(self):
+        """Deals using archived value types can be updated"""
         vt = factories.ValueTypeFactory.create(is_archived=True)
         deal = factories.DealFactory.create()
         deal.values.create(type=vt, value=200)
@@ -320,6 +332,7 @@ class DealsTest(TestCase):
         self.assertEqual([action.action for action in actions], ["I", "U", "U"])
 
     def test_update_with_archived_attribute(self):
+        """Creating deals does not show archived attributes, but updating does"""
         group = factories.AttributeGroupFactory.create()
         group.attributes.create(title="ACTIVE")
         attribute = group.attributes.create(title="ARCHIVED", is_archived=True)
@@ -338,6 +351,9 @@ class DealsTest(TestCase):
         self.assertNotContains(response, "ARCHIVED")
 
     def test_deal_group(self):
+        """Deals are grouped according to their probability and how far off the
+        decision is expected to come"""
+
         def idx(**kwargs):
             return deal_group(Deal(**kwargs))[0]
 
@@ -355,6 +371,7 @@ class DealsTest(TestCase):
         )
 
     def test_deal_reporting(self):
+        """Deal reporting: Accepted and declined deals, history of deals"""
         deal = factories.DealFactory.create(
             status=Deal.ACCEPTED, closed_on=dt.date.today()
         )
@@ -393,6 +410,7 @@ class DealsTest(TestCase):
         self.assertContains(response, "Deal history")
 
     def test_related_offers(self):
+        """Offers can be linked to deals"""
         deal = factories.DealFactory.create()
         offer = factories.OfferFactory.create(
             title="Test",

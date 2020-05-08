@@ -17,6 +17,7 @@ from workbench.tools.validation import in_days
 
 class BreaksTest(TestCase):
     def test_list(self):
+        """Filter form smoke test"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -34,6 +35,7 @@ class BreaksTest(TestCase):
         code("export=xlsx")
 
     def test_valid_break(self):
+        """Model validation of a valid break raises no exceptions"""
         brk = Break(
             user=factories.UserFactory.create(),
             day=dt.date.today(),
@@ -44,6 +46,7 @@ class BreaksTest(TestCase):
         self.assertEqual(brk.timedelta.total_seconds(), 3600)
 
     def test_break_validation(self):
+        """Model validation of an invalid break fails"""
         with self.assertRaises(ValidationError) as cm:
             Break(
                 user=factories.UserFactory.create(),
@@ -59,6 +62,7 @@ class BreaksTest(TestCase):
 
     @freeze_time("2020-01-02")
     def test_break_form_initial(self):
+        """Fields are initialized as expected"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -81,6 +85,7 @@ class BreaksTest(TestCase):
         self.assertNotContains(response, 'value="2020-01-01"')
 
     def test_break_from_timestamps(self):
+        """The breaks form URL contains expected values when using timestamps"""
         user = factories.UserFactory.create()
         now = timezone.localtime(timezone.now()).replace(
             hour=9, minute=0, second=0, microsecond=0
@@ -97,6 +102,7 @@ class BreaksTest(TestCase):
         self.assertContains(response, "ends_at=09%3A00%3A00")
 
     def test_day_validation(self):
+        """Some day values are not allowed"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -149,6 +155,7 @@ class BreaksTest(TestCase):
         self.assertContains(response, "That&#x27;s too far in the future.")
 
     def test_break_form_save_creates_timestamp(self):
+        """Creating breaks automatically creates a timestamp"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -170,6 +177,7 @@ class BreaksTest(TestCase):
         self.assertEqual(t.type, Timestamp.BREAK)
 
     def test_break_form_save_assigns_timestamp(self):
+        """Creating a break from the timestamps button sets the logged_break attr"""
         user = factories.UserFactory.create()
         t = user.timestamp_set.create(type=Timestamp.STOP)
 
@@ -211,6 +219,7 @@ class BreaksTest(TestCase):
         self.assertIsNone(t2.logged_break)  # No reassignment
 
     def test_update_delete_forbidden(self):
+        """Updating and deleting of others' breaks is not allowed"""
         brk = Break.objects.create(
             user=factories.UserFactory.create(),
             day=dt.date.today(),
@@ -232,6 +241,7 @@ class BreaksTest(TestCase):
         self.assertContains(response, "Cannot modify breaks of other users.")
 
     def test_break_warning(self):
+        """Various places show a take-a-break warning if too much work and no break"""
         service = factories.ServiceFactory.create()
         user = service.project.owned_by
         self.client.force_login(user)

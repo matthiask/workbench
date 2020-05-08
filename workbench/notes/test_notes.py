@@ -14,6 +14,7 @@ class NotesTest(TestCase):
         deactivate_all()
 
     def test_list(self):
+        """Notes listing"""
         deal = factories.DealFactory.create()
         Note.objects.create(content_object=deal, created_by=deal.owned_by, title="Test")
         self.client.force_login(deal.owned_by)
@@ -21,14 +22,8 @@ class NotesTest(TestCase):
         code = check_code(self, "/notes/")
         code("")
 
-    def test_for_content_object(self):
-        deal = factories.DealFactory.create()
-        note = Note.objects.create(
-            content_object=deal, created_by=deal.owned_by, title="Test"
-        )
-        self.assertEqual(Note.objects.for_content_object(deal).get(), note)
-
     def test_form(self):
+        """Assigning a note to a content object works as expected"""
         deal = factories.DealFactory.create()
         self.client.force_login(deal.owned_by)
 
@@ -82,6 +77,7 @@ class NotesTest(TestCase):
         self.assertEqual(note.title, "Updated")
 
     def test_note_notification(self):
+        """Adding notes to content objects owned by others sends a notification"""
         deal = factories.DealFactory.create()
         self.client.force_login(deal.owned_by)
 
@@ -117,6 +113,7 @@ class NotesTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_content_object_url(self):
+        """The content_object_url admin helper works"""
         # Has URL
         deal = factories.DealFactory.create()
         content_type = ContentType.objects.get_for_model(deal)

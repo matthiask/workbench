@@ -17,6 +17,7 @@ class LogbookTest(TestCase):
     fixtures = ["exchangerates.json"]
 
     def test_create_logged_hours(self):
+        """Creating logged hours with errors and warnings"""
         service = factories.ServiceFactory.create()
         project = service.project
         self.client.force_login(project.owned_by)
@@ -69,6 +70,7 @@ class LogbookTest(TestCase):
         self.assertContains(response, "This project has been closed too long ago.")
 
     def test_move_to_past_week_forbidden(self):
+        """Moving hours into the past week is not allowed"""
         hours = factories.LoggedHoursFactory.create()
         self.client.force_login(hours.rendered_by)
 
@@ -86,17 +88,19 @@ class LogbookTest(TestCase):
         self.assertContains(response, "Hours have to be logged in the same week.")
 
     def test_update_past_week_allowed(self):
+        """Updating hours of the past week allows _some_ updates"""
         day = in_days(-7)
         hours = factories.LoggedHoursFactory.create(rendered_on=day)
         self.client.force_login(hours.rendered_by)
 
+        # Do not POST disabled fields' values
         response = self.client.post(
             hours.urls["update"],
             {
-                "modal-rendered_by": hours.rendered_by_id,
-                "modal-rendered_on": day.isoformat(),
+                # "modal-rendered_by": hours.rendered_by_id,
+                # "modal-rendered_on": day.isoformat(),
                 "modal-service": hours.service_id,
-                "modal-hours": "0.1",
+                # "modal-hours": "0.1",
                 "modal-description": "Test 2",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
@@ -104,6 +108,7 @@ class LogbookTest(TestCase):
         self.assertEqual(response.status_code, 202)
 
     def test_past_week_logging(self):
+        """Past week logging is allowed when enforce_same_week_logging is False"""
         service = factories.ServiceFactory.create()
         project = service.project
         user = factories.UserFactory.create(enforce_same_week_logging=False)
@@ -146,6 +151,7 @@ class LogbookTest(TestCase):
         )
 
     def test_log_and_create_service(self):
+        """Logging hours and creating a new service is possible at the same time"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -178,6 +184,8 @@ class LogbookTest(TestCase):
         )
 
     def test_log_and_create_service_with_flat_rate(self):
+        """Creating services through the logged hours form on projects with
+        flat rates assigns the flat rate"""
         project = factories.ProjectFactory.create(flat_rate=250)
         self.client.force_login(project.owned_by)
 
@@ -201,6 +209,7 @@ class LogbookTest(TestCase):
         self.assertEqual(entry.service.effort_rate, 250)
 
     def test_log_and_both_service_create(self):
+        """Filling in the service form and selecting an existing service fails"""
         service = factories.ServiceFactory.create()
 
         self.client.force_login(service.project.owned_by)
@@ -225,6 +234,7 @@ class LogbookTest(TestCase):
         )
 
     def test_invalid_date(self):
+        """Invalid dates produce validation errors not crashes"""
         service = factories.ServiceFactory.create()
         self.client.force_login(service.project.owned_by)
 
@@ -243,6 +253,7 @@ class LogbookTest(TestCase):
         self.assertContains(response, "Enter a valid date.")
 
     def test_duplicate_detection_with_invalid_date(self):
+        """Duplicate detection with an invalid date does not crash either"""
         service = factories.ServiceFactory.create()
         self.client.force_login(service.project.owned_by)
 
@@ -266,6 +277,7 @@ class LogbookTest(TestCase):
         self.assertContains(response, "Enter a valid date.")
 
     def test_create_and_update_logged_cost(self):
+        """Creating and updating logged costs playthrough"""
         service = factories.ServiceFactory.create()
         project = service.project
         self.client.force_login(project.owned_by)
@@ -309,6 +321,7 @@ class LogbookTest(TestCase):
         self.assertContains(response, "That&#x27;s too far in the future.")
 
     def test_update_old_disabled_fields(self):
+        """Some fields are disabled when updating locked hours"""
         hours = factories.LoggedHoursFactory.create(rendered_on=in_days(-10))
         self.client.force_login(hours.rendered_by)
         response = self.client.get(
@@ -330,6 +343,7 @@ class LogbookTest(TestCase):
 
     @freeze_time("2019-12-15")
     def test_logged_hours_deletion(self):
+        """Deleting hours from past weeks or locked hours is not allowed"""
         hours = factories.LoggedHoursFactory.create(rendered_on=in_days(-10))
         self.client.force_login(hours.rendered_by)
         response = self.client.post(
@@ -356,6 +370,7 @@ class LogbookTest(TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_logged_cost_deletion(self):
+        """Deleting archived logged costs is not allowed"""
         costs = factories.LoggedCostFactory.create(archived_at=timezone.now())
         self.client.force_login(costs.created_by)
 
@@ -374,6 +389,7 @@ class LogbookTest(TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_logged_hours_list(self):
+        """Filter form smoke test"""
         factories.LoggedHoursFactory.create()
         hours = factories.LoggedHoursFactory.create()
         user = factories.UserFactory.create()
@@ -398,6 +414,7 @@ class LogbookTest(TestCase):
         code("export=xlsx")
 
     def test_logged_cost_list(self):
+        """Filter form smoke test"""
         cost = factories.LoggedCostFactory.create()
         service = factories.ServiceFactory.create()
         user = factories.UserFactory.create()
@@ -420,6 +437,7 @@ class LogbookTest(TestCase):
         code("export=xlsx")
 
     def test_non_ajax_redirect_hours(self):
+        """Non-AJAX requests to logged hours produce redirects"""
         hours = factories.LoggedHoursFactory.create()
         self.client.force_login(hours.rendered_by)
         response = self.client.get(hours.urls["detail"])
@@ -428,6 +446,7 @@ class LogbookTest(TestCase):
         )
 
     def test_non_ajax_redirect_cost(self):
+        """Non-AJAX requests to logged costs produce redirects"""
         cost = factories.LoggedCostFactory.create()
         self.client.force_login(cost.created_by)
         response = self.client.get(cost.urls["detail"])
@@ -444,6 +463,7 @@ class LogbookTest(TestCase):
         )
 
     def test_autofill_field(self):
+        """The hours and services fields are automatically filled in"""
         hours = factories.LoggedHoursFactory.create(
             created_at=timezone.now() - dt.timedelta(hours=2)
         )
@@ -475,6 +495,7 @@ class LogbookTest(TestCase):
         self.assertContains(response, "blub")
 
     def test_no_autofill_hours(self):
+        """The hours field isn't filled automatically when the gap is too large"""
         hours = factories.LoggedHoursFactory.create(
             created_at=timezone.now() - dt.timedelta(hours=20)
         )
@@ -495,10 +516,12 @@ class LogbookTest(TestCase):
         )
 
     def test_redirect(self):
+        """The /logbook/ URL just redirects"""
         self.client.force_login(factories.UserFactory.create())
         self.assertRedirects(self.client.get("/logbook/"), "/logbook/hours/")
 
     def test_initialize_hours(self):
+        """Hours can be initialized using query parameters too"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
         response = self.client.get(
@@ -508,6 +531,7 @@ class LogbookTest(TestCase):
         self.assertContains(response, 'value="1.5"')
 
     def test_copy(self):
+        """Hours can be copied"""
         hours = factories.LoggedHoursFactory.create()
         self.client.force_login(factories.UserFactory.create())
 
@@ -524,6 +548,7 @@ class LogbookTest(TestCase):
         self.assertEqual(response.status_code, 200)  # No crash
 
     def test_pre_form(self):
+        """Test the project selection modal"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -578,6 +603,7 @@ class LogbookTest(TestCase):
         self.assertContains(response, "This field is required.")
 
     def test_cost_gte_third_party_costs(self):
+        """Cost should hopefully be higher than third party costs"""
         service = factories.ServiceFactory.create()
         project = service.project
         self.client.force_login(project.owned_by)
@@ -615,7 +641,8 @@ class LogbookTest(TestCase):
         self.assertEqual(response.status_code, 201)
 
     @override_settings(FEATURES={"foreign_currencies": False})
-    def test_no_role(self):
+    def test_no_foreign_currencies(self):
+        """Do not show expense currency and cost if no FOREIGN_CURRENCIES"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -627,13 +654,16 @@ class LogbookTest(TestCase):
 
     @freeze_time("2019-12-31")
     def test_logbook_lock_monday(self):
+        """Assert that the logbook locks on current monday..."""
         self.assertEqual(logbook_lock(), dt.date(2019, 12, 30))
 
     @freeze_time("2020-01-02")
     def test_logbook_lock_first_of_year(self):
+        """Assert that the logbook locks on the first day of the year"""
         self.assertEqual(logbook_lock(), dt.date(2020, 1, 1))
 
     def test_move_logbook_entry(self):
+        """Move logbook entries except if it is archived"""
         service = factories.ServiceFactory.create()
 
         self.client.force_login(service.project.owned_by)

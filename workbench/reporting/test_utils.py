@@ -9,6 +9,7 @@ from workbench.reporting.utils import date_ranges
 class UtilsTest(TestCase):
     @freeze_time("2020-02-25")
     def test_date_ranges(self):
+        """The date ranges utility returns expected values"""
         deactivate_all()
         self.assertEqual(
             date_ranges(),

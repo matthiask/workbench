@@ -21,6 +21,7 @@ class ExpensesTest(TestCase):
     fixtures = ["exchangerates.json"]
 
     def test_logged_cost_deletion(self):
+        """Archived logged costs cannot be deleted, others can"""
         costs = factories.LoggedCostFactory.create(archived_at=timezone.now())
         self.client.force_login(costs.created_by)
 
@@ -39,6 +40,7 @@ class ExpensesTest(TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_list(self):
+        """Filter form smoke test"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -60,6 +62,7 @@ class ExpensesTest(TestCase):
         code("owned_by=0")  # only inactive
 
     def test_expenses(self):
+        """Expense logging and expense report creation"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -175,6 +178,7 @@ class ExpensesTest(TestCase):
         self.assertEqual(self.client.get(report.urls["pdf"]).status_code, 200)
 
     def test_no_expenses(self):
+        """Expense report creation without expenses fails early"""
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/expenses/create/")
         self.assertRedirects(response, "/expenses/")
@@ -183,10 +187,12 @@ class ExpensesTest(TestCase):
         )
 
     def test_exchange_rate_str(self):
+        """__str__ method of exchange rates..."""
         today = dt.date.today()
         self.assertEqual(str(ExchangeRates(day=today)), str(today))
 
     def test_exchange_rate_conversion(self):
+        """The exchange rate conversion API returns expected values"""
         # From https://api.exchangeratesapi.io/latest?base=CHF, but pruned
         ExchangeRates.objects.create(
             day=dt.date(2019, 12, 11),
@@ -215,6 +221,7 @@ class ExpensesTest(TestCase):
         self.assertEqual(response.json(), {"cost": "109.16"})
 
     def test_one_or_other(self):
+        """Foreign expenses require both the expense amount and the currency"""
         service = factories.ServiceFactory.create()
         kw = {
             "service": service,
@@ -248,6 +255,7 @@ def mocked_json(*args, **kwargs):
 @mock.patch("workbench.expenses.models.exchange_rates", side_effect=mocked_json)
 class MockedRemoteDataTest(TestCase):
     def test_with_mocked_remote_data(self, mock_get):
+        """Exchange rates determination"""
         self.assertEqual(mock_get.call_count, 0)
         rates = ExchangeRates.objects.newest()
         self.assertEqual(mock_get.call_count, 1)
@@ -269,12 +277,14 @@ def mocked_get(*args, **kwargs):
 @mock.patch("workbench.expenses.rates.requests.get", side_effect=mocked_get)
 class ExchangeRatesTest(TestCase):
     def test_exchange_rates_today(self, mock_get):
+        """exchange_rates() without arguments fetches today's exchange rates"""
         exchange_rates()
         self.assertEqual(
             mock_get.call_args[0], ("https://api.exchangeratesapi.io/latest?base=CHF",),
         )
 
     def test_exchange_rates_someday(self, mock_get):
+        """Exchange rates of a specific day hits the expected URL"""
         exchange_rates(dt.date(2019, 10, 12))
         self.assertEqual(
             mock_get.call_args[0],

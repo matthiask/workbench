@@ -18,6 +18,7 @@ class RecurringTest(TestCase):
         deactivate_all()
 
     def test_recurring_invoice(self):
+        """Creating recurring invoices and invoices from a RI works as expected"""
         person = factories.PersonFactory.create(
             organization=factories.OrganizationFactory.create()
         )
@@ -54,6 +55,7 @@ class RecurringTest(TestCase):
         self.assertTrue(len(invoices) > 1)
 
     def test_creation(self):
+        """Creation of recurring invoices, with the customer/contaact pre-form"""
         person = factories.PersonFactory.create(
             organization=factories.OrganizationFactory.create()
         )
@@ -149,6 +151,7 @@ class RecurringTest(TestCase):
         self.assertEqual(messages(response), ["Created 0 invoices."])
 
     def test_create_and_notify(self):
+        """The recurring invoices task notifies owners"""
         factories.RecurringInvoiceFactory.create()
 
         create_recurring_invoices_and_notify()
@@ -159,6 +162,7 @@ class RecurringTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_list(self):
+        """Filter form smoke test"""
         factories.RecurringInvoiceFactory.create()
 
         user = factories.UserFactory.create()
@@ -175,6 +179,7 @@ class RecurringTest(TestCase):
         code("owned_by=0")  # only inactive
 
     def test_pretty_status(self):
+        """Recurring invoice status badge"""
         person = factories.PersonFactory.create(
             organization=factories.OrganizationFactory.create()
         )
@@ -226,6 +231,7 @@ class RecurringTest(TestCase):
         self.assertEqual(ri.pretty_next_period, "")
 
     def test_pre_form(self):
+        """Pre-form branch coverage"""
         self.client.force_login(factories.UserFactory.create())
 
         # pre_form does not have these fields
@@ -259,6 +265,7 @@ class RecurringTest(TestCase):
         self.assertContains(response, 'method="POST"')
 
     def test_copy(self):
+        """Copying recurring invoices"""
         invoice = factories.RecurringInvoiceFactory.create()
         self.client.force_login(invoice.owned_by)
 
@@ -270,6 +277,8 @@ class RecurringTest(TestCase):
         self.assertEqual(response.status_code, 200)  # No crash
 
     def test_renewal_candidates(self):
+        """Renewal candidates depends on start date and the day of period when
+        the invoice is created"""
         r1 = factories.RecurringInvoiceFactory.create(
             starts_on=in_days(10), periodicity="monthly",
         )
@@ -291,6 +300,7 @@ class RecurringTest(TestCase):
         r2, r3  # Using those variables
 
     def test_positive_create_invoice_on_day(self):
+        """Invoice creation can be moved within the period"""
         r1 = factories.RecurringInvoiceFactory.create(
             starts_on=dt.date.today(), periodicity="monthly",
         )

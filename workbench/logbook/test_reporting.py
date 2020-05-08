@@ -9,6 +9,7 @@ from workbench.logbook.reporting import classify_logging_delay, logbook_stats
 
 class ReportingTest(TestCase):
     def test_report(self):
+        """Smoke test the logging stats report"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -18,6 +19,7 @@ class ReportingTest(TestCase):
         self.assertContains(response, "Logging statistics")
 
     def test_stats(self):
+        """_Very_ basic testing of logged hours statistics"""
         factories.LoggedHoursFactory.create()
         factories.LoggedHoursFactory.create()
 
@@ -30,6 +32,7 @@ class ReportingTest(TestCase):
         )
 
     def test_classify_logging_delay(self):
+        """Logging delay classification"""
         self.assertEqual(classify_logging_delay(Decimal(-1))[1], "success")
         self.assertEqual(classify_logging_delay(Decimal(4))[1], "light")
         self.assertEqual(classify_logging_delay(Decimal(10))[1], "caveat")

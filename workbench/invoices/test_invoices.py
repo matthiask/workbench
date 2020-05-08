@@ -41,18 +41,9 @@ class InvoicesTest(TestCase):
     def setUp(self):
         deactivate_all()
 
-    def test_factories(self):
-        invoice = factories.InvoiceFactory.create()
-
-        self.client.force_login(invoice.owned_by)
-        self.client.get(invoice.urls["detail"])
-
-        response = self.client.post(invoice.urls["delete"])
-        self.assertRedirects(
-            response, invoice.urls["list"], fetch_redirect_response=False
-        )
-
     def test_down_payment_invoice(self):
+        """Down payment invoices do not have service details and validate the
+        postal address (as any other invoice too)"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -95,6 +86,8 @@ class InvoicesTest(TestCase):
         self.assertAlmostEqual(invoice.subtotal, Decimal("2500"))
 
     def test_create_service_invoice_from_offer(self):
+        """Service invoice creation from offers (services) works and results in
+        the expected invoice total"""
         service = factories.ServiceFactory.create(cost=100, allow_logging=True)
         url = service.project.urls["createinvoice"] + "?type=services&source=offer"
         self.client.force_login(service.project.owned_by)
@@ -147,6 +140,8 @@ class InvoicesTest(TestCase):
         self.assertEqual(Invoice.objects.count(), 0)
 
     def test_create_service_invoice_from_logbook(self):
+        """Service invoice creation from the logbook works and results in the
+        expected invoice total"""
         project = factories.ProjectFactory.create()
         service1 = factories.ServiceFactory.create(
             project=project, title="cost-only", cost=100
@@ -298,6 +293,8 @@ class InvoicesTest(TestCase):
         )
 
     def test_delete_service_invoice_with_logs(self):
+        """Deleting service invoices with related logbook entries unarchives
+        those entries"""
         service = factories.ServiceFactory.create()
         cost = factories.LoggedCostFactory.create(
             cost=150, service=service, description="this"
@@ -368,6 +365,8 @@ class InvoicesTest(TestCase):
         self.assertAlmostEqual(invoice.subtotal, Decimal(150))
 
     def test_pre_form(self):
+        """Creating invoices directly shows a pre-form allowing selection of
+        customer/contact combinations"""
         self.client.force_login(factories.UserFactory.create())
 
         # pre_form does not have these fields
@@ -388,6 +387,7 @@ class InvoicesTest(TestCase):
         self.assertNotContains(response, 'id="id_description"')
 
     def test_create_update_person_invoice(self):
+        """Test creating and updating invoices not linked to projects"""
         person = factories.PersonFactory.create(
             organization=factories.OrganizationFactory.create()
         )
@@ -426,6 +426,7 @@ class InvoicesTest(TestCase):
         self.assertAlmostEqual(invoice.total, Decimal("107.7"))
 
     def test_customer_create_invoice(self):
+        """Creating invoices for organizations shows the postal address selector too"""
         person = factories.PersonFactory.create(
             organization=factories.OrganizationFactory.create()
         )
@@ -449,26 +450,8 @@ class InvoicesTest(TestCase):
         self.assertContains(response, 'id="id_postal_address"')
         self.assertContains(response, 'data-field-value="')
 
-    def test_contact_check_with_project_invoice(self):
-        project = factories.ProjectFactory.create()
-        self.client.force_login(project.owned_by)
-        url = project.urls["createinvoice"] + "?type=fixed"
-        response = self.client.post(
-            url,
-            {
-                "contact": factories.PersonFactory.create().pk,
-                "title": "Stuff",
-                "owned_by": project.owned_by_id,
-                "subtotal": 100,
-                "discount": 0,
-                "liable_to_vat": 1,
-                "postal_address": "Anything\nStreet\nCity",
-                "third_party_costs": 0,
-            },
-        )
-        self.assertContains(response, "does not belong to")
-
     def test_update_invoice(self):
+        """Updating invoices produces a variety of errors and warnings"""
         invoice = factories.InvoiceFactory.create(
             contact=None, postal_address="Test\nStreet\nCity"
         )
@@ -539,6 +522,7 @@ class InvoicesTest(TestCase):
         self.assertEqual(invoice.closed_on, dt.date.today())
 
     def test_list(self):
+        """Filter form smoke test"""
         factories.InvoiceFactory.create()
         user = factories.UserFactory.create()
         self.client.force_login(user)
@@ -555,6 +539,7 @@ class InvoicesTest(TestCase):
         code("export=xlsx")
 
     def test_too_many_invoices(self):
+        """Creating a PDF with too many invoices fails"""
         invoice = factories.InvoiceFactory.create()
 
         for i in range(250):
@@ -574,6 +559,7 @@ class InvoicesTest(TestCase):
         )
 
     def test_list_pdfs(self):
+        """Various checks when exporting PDFs of lists"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -589,6 +575,7 @@ class InvoicesTest(TestCase):
         self.assertEqual(response["content-type"], "application/pdf")
 
     def test_model_validation(self):
+        """Invoice model validation"""
         invoice = Invoice(
             title="Test",
             customer=factories.OrganizationFactory.create(),
@@ -681,6 +668,7 @@ class InvoicesTest(TestCase):
         )
 
     def test_unlock_sent_invoice(self):
+        """Unlocking sent invoices is possible after ignoring a warning"""
         invoice = factories.InvoiceFactory.create(
             title="Test",
             subtotal=20,
@@ -701,6 +689,7 @@ class InvoicesTest(TestCase):
         )
 
     def test_change_paid_invoice(self):
+        """Changing paid invoices is possible too"""
         invoice = factories.InvoiceFactory.create(
             title="Test",
             subtotal=20,
@@ -747,6 +736,7 @@ class InvoicesTest(TestCase):
         self.assertIsNone(invoice.closed_on)
 
     def test_down_payment(self):
+        """Down payment invoices can be linked to invoices"""
         project = factories.ProjectFactory.create()
         down_payment = factories.InvoiceFactory.create(
             project=project, type=Invoice.DOWN_PAYMENT, subtotal=100
@@ -825,6 +815,7 @@ class InvoicesTest(TestCase):
         self.assertRedirects(response, invoice.urls["list"])
 
     def test_change_contact(self):
+        """Selecting contacts belonging to different customers fails"""
         invoice = factories.InvoiceFactory.create(title="Test", subtotal=20)
         self.client.force_login(invoice.owned_by)
 
@@ -839,6 +830,7 @@ class InvoicesTest(TestCase):
         )
 
     def test_status(self):
+        """Test various results of the status badge"""
         today = dt.date.today()
         yesterday = in_days(-1)
         fmt = local_date_format(today)
@@ -875,6 +867,7 @@ class InvoicesTest(TestCase):
         self.assertEqual(Invoice(status=Invoice.CANCELED).pretty_status, "Canceled")
 
     def test_service_update(self):
+        """Updating invoice services"""
         project = factories.ProjectFactory.create()
         invoice = factories.InvoiceFactory.create(
             project=project,
@@ -908,7 +901,7 @@ class InvoicesTest(TestCase):
         )
 
     def test_person_invoice_without_vat(self):
-        # Test another branch in workbench/tools/pdf.py
+        """Test another branch in workbench/tools/pdf.py"""
 
         invoice = factories.InvoiceFactory.create(liable_to_vat=False)
         self.client.force_login(invoice.owned_by)
@@ -916,6 +909,7 @@ class InvoicesTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_cancellation_with_payment_notice(self):
+        """Canceling invoices requires entering a payment notice"""
         invoice = factories.InvoiceFactory.create(
             invoiced_on=dt.date.today(),
             due_on=dt.date.today(),
@@ -935,6 +929,7 @@ class InvoicesTest(TestCase):
         self.assertEqual(list(cm.exception), msg)
 
     def test_reminders(self):
+        """The reminders view allows exporting dunning letters"""
         invoice = factories.InvoiceFactory.create(
             invoiced_on=in_days(-60), due_on=in_days(-45), status=Invoice.SENT,
         )
@@ -966,6 +961,7 @@ class InvoicesTest(TestCase):
         self.assertNotContains(response, "Not reminded yet")
 
     def test_reset_last_invoiced_on(self):
+        """last_reminded_on < invoiced_on values are silently corrected/dropped"""
         invoice = factories.InvoiceFactory.create(
             invoiced_on=in_days(0), last_reminded_on=in_days(-15)
         )

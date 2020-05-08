@@ -7,6 +7,7 @@ from workbench.tools.validation import in_days
 
 class ReportingTest(TestCase):
     def test_open_items(self):
+        """The open items list offers filtering by cutoff date and XLSX exports"""
         for i in range(20):
             factories.InvoiceFactory.create(
                 invoiced_on=in_days(0),
@@ -33,4 +34,5 @@ class ReportingTest(TestCase):
         )
         # print(response, response.content.decode("utf-8"))
 
+        # Hit the key data view to cover some branches and verify that it does not crash
         self.assertEqual(self.client.get("/report/key-data/").status_code, 200)
