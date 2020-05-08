@@ -26,6 +26,9 @@ class TimerTest(TestCase):
 
 
 class TimestampsTest(TestCase):
+    def setUp(self):
+        deactivate_all()
+
     @freeze_time("2020-02-20T03:00:00+00:00")
     def test_timestamp(self):
         """Basic smoke test of timestamp creation and deletion"""
@@ -184,7 +187,6 @@ class TimestampsTest(TestCase):
 
     def test_view(self):
         """The timestamps view does not crash"""
-        deactivate_all()
         user = factories.UserFactory.create()
         user.timestamp_set.create(type=Timestamp.START)
 
