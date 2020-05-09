@@ -105,6 +105,9 @@ class ContactsTest(TestCase):
         response = self.client.get("/contacts/people/?export=xlsx")
         self.assertEqual(response.status_code, 200)
 
+        response = self.client.get("/contacts/people/?export=vcard")
+        self.assertEqual(response.status_code, 200)
+
     def test_organization_list(self):
         """The organization list basically works"""
         group1 = Group.objects.create(title="A")

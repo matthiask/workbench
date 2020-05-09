@@ -17,6 +17,7 @@ from workbench.contacts.models import (
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
 from workbench.tools.models import ProtectedError, SlowCollector
 from workbench.tools.substitute_with import substitute_with
+from workbench.tools.vcard import person_to_vcard, render_vcard_response
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -70,6 +71,17 @@ class PersonSearchForm(Form):
             xlsx = WorkbenchXLSXDocument()
             xlsx.people(queryset)
             return xlsx.to_response("people.xlsx")
+
+        elif request.GET.get("export") == "vcard":
+            return render_vcard_response(
+                request,
+                "\n".join(
+                    person_to_vcard(person).serialize()
+                    for person in queryset.prefetch_related(
+                        "phonenumbers", "emailaddresses", "postaladdresses"
+                    )[:250]
+                ),
+            )
 
 
 class OrganizationForm(ModelForm):

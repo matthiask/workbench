@@ -6,4 +6,6 @@
 {{ block.super }}
 {% if request.GET %}<a href="{% querystring export='xlsx' %}" class="btn btn-primary">
   {% include 'svg/desktop-download.svg' %} XLSX</a>{% endif %}
+{% if request.GET %}<a href="{% querystring export='vcard' %}" class="btn btn-primary">
+  {% include 'svg/desktop-download.svg' %} vCard</a>{% endif %}
 {% endblock %}
