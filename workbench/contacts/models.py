@@ -319,7 +319,6 @@ class PostalAddress(PersonDetail):
 
     def get_maps_url(self):
         parts = [self.street, self.house_number, self.postal_code, self.city]
-
         if any(parts):
             return "https://www.google.com/maps?{}".format(
                 urlencode({"q": " ".join(parts)})

@@ -1,4 +1,9 @@
-from django.http import HttpResponse
+import re
+
+from django.contrib import messages
+from django.core.mail import EmailMultiAlternatives
+from django.http import HttpResponse, HttpResponseRedirect
+from django.utils.translation import gettext as _
 
 from vobject import vCard, vcard
 
@@ -43,11 +48,31 @@ def person_to_vcard(person):
     return v
 
 
-class VCardResponse(HttpResponse):
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("content_type", "text/x-vCard;charset=utf-8")
-        super().__init__(*args, **kwargs)
-        self.setdefault("Content-Disposition", 'inline; filename="vcard.vcf"')
+def is_ios(user_agent):
+    return re.search(r"(ios|ipad|iphone)", user_agent, re.I)
+
+
+def render_vcard_response(request, vcard, subject=""):
+    if is_ios(request.META.get("HTTP_USER_AGENT") or ""):
+        mail = EmailMultiAlternatives(
+            ": ".join(filter(None, ("vCard", subject))), "", to=[request.user.email]
+        )
+        mail.attach("vcard.vcf", vcard, "text/x-vCard")
+        mail.send(fail_silently=True)
+        messages.success(
+            request,
+            _(
+                "You seem to be using iOS. iOS does not support directly opening"
+                " vCard files. Instead, you have been sent an email containing"
+                " the vCard to your email address, %s."
+            )
+            % request.user.email,
+        )
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER") or "/")
+
+    response = HttpResponse(vcard, content_type="text/x-vCard;charset=utf-8")
+    response["Content-Disposition"] = 'inline; filename="vcard.vcf"'
+    return response
 
 
 def test():  # pragma: no cover
