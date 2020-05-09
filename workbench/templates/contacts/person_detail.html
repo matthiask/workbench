@@ -27,6 +27,10 @@
     {% for address in person.postaladdresses.all %}
       <strong>{{ address.type|capfirst }}:</strong><br>
       {{ address.postal_address|linebreaksbr }}
+      {% if address.get_maps_url %}
+        <br>
+        <a href="{{ address.get_maps_url }}" target="_blank" rel="noopener noreferrer">{% trans 'Maps' %}</a>
+      {% endif %}
       <br>
     {% endfor %}
   </div>

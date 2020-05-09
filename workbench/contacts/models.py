@@ -1,5 +1,6 @@
 import itertools
 import re
+from urllib.parse import urlencode
 
 from django.db import models
 from django.db.models import Sum
@@ -315,3 +316,12 @@ class PostalAddress(PersonDetail):
             self.country.name if self.country.code != "CH" else "",
         ]
         return "\n".join(filter(None, lines))
+
+    def get_maps_url(self):
+        parts = [self.street, self.house_number, self.postal_code, self.city]
+
+        if any(parts):
+            return "https://www.google.com/maps?{}".format(
+                urlencode({"q": " ".join(parts)})
+            )
+        return None
