@@ -353,3 +353,11 @@ class ContactsTest(TestCase):
         serialized = person_to_vcard(person).serialize()
         self.assertIn("OVERRIDE", serialized)
         self.assertIn("2020-03-01", serialized)
+
+    def test_maps_url(self):
+        """Person.get_maps_url returns a maps URL"""
+        address = factories.PostalAddressFactory.build()
+        self.assertIn("google.com/maps", address.get_maps_url())
+
+        address = factories.PostalAddress()
+        self.assertIsNone(address.get_maps_url())
