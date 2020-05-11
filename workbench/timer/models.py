@@ -40,8 +40,12 @@ class Slice(dict):
             ("rendered_on", self["day"].isoformat()),
             ("description", self["description"]),
             ("hours", self.elapsed_hours or ""),
-            ("timestamp", self.get("timestamp_id") or ""),
         ]
+        if self.get("timestamp_id"):
+            params.append(("timestamp_id", self["timestamp_id"]))
+        elif self.show_create_buttons:
+            params.append(("detected_ends_at", self["ends_at"]))
+
         return "{}?{}".format(
             reverse("projects_project_createhours", kwargs={"pk": self["project_id"]})
             if self.get("project_id")

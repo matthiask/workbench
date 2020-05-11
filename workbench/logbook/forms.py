@@ -371,6 +371,12 @@ class LoggedHoursForm(ModelForm):
                 timestamp = Timestamp.objects.filter(
                     user=self.request.user, id=self.request.GET.get("timestamp")
                 ).first()
+            elif self.request.GET.get("detected_ends_at"):
+                timestamp = Timestamp(
+                    user=self.request.user,
+                    type=Timestamp.STOP,
+                    created_at=self.request.GET.get("detected_ends_at"),
+                )
 
         if not self.cleaned_data.get("service") and self.cleaned_data.get(
             "service_title"
@@ -590,6 +596,12 @@ class BreakForm(ModelForm):
             Timestamp.objects.filter(
                 user=self.request.user, id=self.request.GET.get("timestamp")
             ).update(logged_break=instance)
+        elif self.request.GET.get("detected_ends_at"):
+            Timestamp.objects.create(
+                user=self.request.user,
+                type=Timestamp.STOP,
+                created_at=self.request.GET.get("detected_ends_at"),
+            )
 
         return instance
 
