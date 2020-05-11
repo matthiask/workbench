@@ -185,8 +185,8 @@ class Break(Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name=_("user"), related_name="breaks"
     )
-    starts_at = models.DateTimeField(_("starts at"), null=True)
-    ends_at = models.DateTimeField(_("ends at"), null=True)
+    starts_at = models.DateTimeField(_("starts at"))
+    ends_at = models.DateTimeField(_("ends at"))
 
     description = models.TextField(_("description"), blank=True)
 
