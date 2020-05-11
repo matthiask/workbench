@@ -5,6 +5,7 @@ from django.test import TestCase
 
 from workbench import factories
 from workbench.logbook.reporting import classify_logging_delay, logbook_stats
+from workbench.tools.formats import Z1
 
 
 class ReportingTest(TestCase):
@@ -20,6 +21,13 @@ class ReportingTest(TestCase):
 
     def test_stats(self):
         """_Very_ basic testing of logged hours statistics"""
+        stats = logbook_stats([dt.date.today(), dt.date.today()])
+
+        self.assertEqual(len(stats["users"]), 0)
+        self.assertEqual(
+            stats["logged_hours_stats"], {"count": 0, "sum": Z1, "avg": None}
+        )
+
         factories.LoggedHoursFactory.create()
         factories.LoggedHoursFactory.create()
 

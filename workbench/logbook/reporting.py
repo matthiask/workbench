@@ -4,7 +4,7 @@ from django.db import connections
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
-from workbench.tools.formats import days, hours
+from workbench.tools.formats import Z1, days, hours
 
 
 def classify_logging_delay(delay):
@@ -137,14 +137,14 @@ def logbook_stats(date_range):
     ]
 
     lhs_count = sum((user["logged_hours_stats"]["count"] for user in users), 0)
-    lhs_sum = sum((user["logged_hours_stats"]["sum"] for user in users), 0)
+    lhs_sum = sum((user["logged_hours_stats"]["sum"] for user in users), Z1)
 
     return {
         "users": users,
         "logged_hours_stats": {
             "count": lhs_count,
             "sum": lhs_sum,
-            "avg": lhs_sum / lhs_count,
+            "avg": lhs_sum / lhs_count if lhs_count else None,
         },
         "insufficient_breaks": {
             "days": sum((user["insufficient_breaks"]["days"] for user in users), 0),
