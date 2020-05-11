@@ -114,7 +114,7 @@ def list_timestamps(request):
                         hours(slice.elapsed_hours, plus_sign=True)
                         if slice.elapsed_hours is not None
                         else "?",
-                        slice["description"],
+                        slice["description"] or "-",
                     ),
                     "elapsed": slice.elapsed_hours,
                     "comment": slice.get("comment", ""),

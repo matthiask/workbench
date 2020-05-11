@@ -217,7 +217,7 @@ class Timestamp(models.Model):
     save.alters_data = True
 
     def __str__(self):
-        return self.notes
+        return "{:>5} {}".format(self.pretty_time, self.notes)
 
     @property
     def pretty_time(self):
