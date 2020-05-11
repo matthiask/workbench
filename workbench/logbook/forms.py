@@ -615,9 +615,11 @@ class BreakForm(ModelForm):
                 user=self.request.user, id=self.request.GET.get("timestamp")
             ).update(logged_break=instance)
         elif self.request.GET.get("detected_ends_at"):
-            DetectedTimestampForm(self.request.GET).build_if_valid(
+            timestamp = DetectedTimestampForm(self.request.GET).build_if_valid(
                 user=self.request.user, logged_break=instance
-            ).save()
+            )
+            if timestamp:
+                timestamp.save()
 
         return instance
 
