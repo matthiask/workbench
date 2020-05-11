@@ -420,6 +420,10 @@ class DealsTest(TestCase):
 
         self.client.force_login(deal.owned_by)
 
+        # No related offers, field should not exist at all
+        response = self.client.get(deal.urls["set_status"] + "?status=20")
+        self.assertNotContains(response, "related_offers")
+
         response = self.client.post(deal.urls["add_offer"], {"modal-offer": ""})
         self.assertEqual(response.status_code, 200)
 
@@ -428,10 +432,12 @@ class DealsTest(TestCase):
 
         self.assertEqual(deal.related_offers.get(), offer)
 
-        # Accept the deal, and accept related offers while doing this
+        # Related offers should now appear in the form
         response = self.client.get(deal.urls["set_status"] + "?status=20")
+        self.assertContains(response, "related_offers")
         self.assertContains(response, offer.code)
 
+        # Accept the deal, and accept related offers while doing this
         closing_type = factories.ClosingTypeFactory.create(represents_a_win=True)
         response = self.client.post(
             deal.urls["set_status"] + "?status=20",

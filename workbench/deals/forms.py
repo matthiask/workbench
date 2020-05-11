@@ -284,26 +284,27 @@ class SetStatusForm(ModelForm):
             related_offers = instance.related_offers.select_related(
                 "owned_by", "project"
             )
-            self.fields["related_offers"] = forms.ModelMultipleChoiceField(
-                queryset=related_offers,
-                label=_("Accept offers")
-                if instance.status == Deal.ACCEPTED
-                else _("Decline offers"),
-                required=False,
-                widget=forms.CheckboxSelectMultiple,
-                initial=[
-                    offer.id
-                    for offer in related_offers
-                    if offer.status < offer.ACCEPTED
-                ],
-            )
-            self.fields["related_offers"].choices = [
-                (
-                    offer.id,
-                    format_html("{}<br>{}", offer.__html__(), offer.status_badge),
+            if related_offers:
+                self.fields["related_offers"] = forms.ModelMultipleChoiceField(
+                    queryset=related_offers,
+                    label=_("Accept offers")
+                    if instance.status == Deal.ACCEPTED
+                    else _("Decline offers"),
+                    required=False,
+                    widget=forms.CheckboxSelectMultiple,
+                    initial=[
+                        offer.id
+                        for offer in related_offers
+                        if offer.status < offer.ACCEPTED
+                    ],
                 )
-                for offer in related_offers
-            ]
+                self.fields["related_offers"].choices = [
+                    (
+                        offer.id,
+                        format_html("{}<br>{}", offer.__html__(), offer.status_badge),
+                    )
+                    for offer in related_offers
+                ]
 
     def clean(self):
         data = super().clean()
