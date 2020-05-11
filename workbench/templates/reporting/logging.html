@@ -48,7 +48,11 @@
         <th></th>
         <th class="text-right">{{ logbook_stats.logged_hours_stats.count }}</th>
         <th class="text-right">{{ logbook_stats.logged_hours_stats.sum|hours }}</th>
-        <th class="text-right">{{ logbook_stats.logged_hours_stats.avg|stringformat:'.2f' }}h</th>
+        <th class="text-right">
+          {% if logbook_stats.logged_hours_stats.avg is None %}&ndash;
+          {% else %}{{ logbook_stats.logged_hours_stats.avg|stringformat:'.2f' }}h
+          {% endif %}
+        </th>
         <th class="text-right">
           {{ logbook_stats.insufficient_breaks.days }} / {{ logbook_stats.insufficient_breaks.of }}
           {% pie logbook_stats.insufficient_breaks.days logbook_stats.insufficient_breaks.of %}
