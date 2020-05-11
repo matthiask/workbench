@@ -70,10 +70,10 @@ def insufficient_breaks(date_range):
 with breaks as (
     select
         user_id,
-        day,
+        date_trunc('day', starts_at) as day,
         sum(extract(epoch from (ends_at - starts_at))) as break_seconds
     from logbook_break
-    where day between %s and %s
+    where date_trunc('day', starts_at) between %s and %s
     group by user_id, day
 ),
 logged_hours as (

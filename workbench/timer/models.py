@@ -83,6 +83,15 @@ class TimestampQuerySet(models.QuerySet):
             for entry in logged_hours
             if entry not in known_logged_hours
         )
+        known_breaks = set(entry.logged_break for entry in entries)
+        breaks = user.breaks.filter(starts_at__date=day)
+        entries.extend(
+            self.model(
+                created_at=entry.ends_at, type=self.model.BREAK, logged_break=entry
+            )
+            for entry in breaks
+            if entry not in known_breaks
+        )
         entries = sorted(entries, key=lambda timestamp: timestamp.created_at)
 
         previous = None
@@ -101,9 +110,9 @@ class TimestampQuerySet(models.QuerySet):
             )
 
             if entry.logged_break:
-                slice["starts_at"] = entry.logged_break.starts_at_datetime
-                slice["ends_at"] = entry.logged_break.ends_at_datetime
-            if entry.type == entry.START:
+                slice["starts_at"] = entry.logged_break.starts_at
+                slice["ends_at"] = entry.logged_break.ends_at
+            elif entry.type == entry.START:
                 slice["starts_at"] = entry.created_at
                 if entry.logged_hours:
                     slice["ends_at"] = entry.created_at + dt.timedelta(
@@ -142,7 +151,7 @@ class TimestampQuerySet(models.QuerySet):
 
         if slices and not slices[-1].get("ends_at"):
             if slices[-1]["logged_break"]:
-                slices[-1]["ends_at"] = slices[-1]["logged_break"].ends_at_datetime
+                slices[-1]["ends_at"] = slices[-1]["logged_break"].ends_at
             elif slices[-1]["logged_hours"]:
                 slices[-1]["ends_at"] = slices[-1]["logged_hours"].created_at
 

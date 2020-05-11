@@ -15,6 +15,10 @@ from workbench.tools.testing import check_code
 from workbench.tools.validation import in_days
 
 
+def c(day, time):
+    return timezone.make_aware(dt.datetime.combine(day, time))
+
+
 class BreaksTest(TestCase):
     def test_list(self):
         """Filter form smoke test"""
@@ -23,9 +27,8 @@ class BreaksTest(TestCase):
 
         Break.objects.create(
             user=factories.UserFactory.create(),
-            day=dt.date.today(),
-            starts_at=dt.time(12, 0),
-            ends_at=dt.time(13, 0),
+            starts_at=c(dt.date.today(), dt.time(12, 0)),
+            ends_at=c(dt.date.today(), dt.time(13, 0)),
         )
 
         code = check_code(self, "/logbook/breaks/")
@@ -38,9 +41,8 @@ class BreaksTest(TestCase):
         """Model validation of a valid break raises no exceptions"""
         brk = Break(
             user=factories.UserFactory.create(),
-            day=dt.date.today(),
-            starts_at=dt.time(12, 0),
-            ends_at=dt.time(13, 0),
+            starts_at=c(dt.date.today(), dt.time(12, 0)),
+            ends_at=c(dt.date.today(), dt.time(13, 0)),
         )
         brk.full_clean()
         self.assertEqual(brk.timedelta.total_seconds(), 3600)
@@ -50,9 +52,8 @@ class BreaksTest(TestCase):
         with self.assertRaises(ValidationError) as cm:
             Break(
                 user=factories.UserFactory.create(),
-                day=dt.date.today(),
-                starts_at=dt.time(12, 0),
-                ends_at=dt.time(11, 0),
+                starts_at=c(dt.date.today(), dt.time(12, 0)),
+                ends_at=c(dt.date.today(), dt.time(11, 0)),
             ).full_clean()
 
         self.assertEqual(
@@ -154,28 +155,6 @@ class BreaksTest(TestCase):
         )
         self.assertContains(response, "That&#x27;s too far in the future.")
 
-    def test_break_form_save_creates_timestamp(self):
-        """Creating breaks automatically creates a timestamp"""
-        user = factories.UserFactory.create()
-        self.client.force_login(user)
-
-        response = self.client.post(
-            Break.urls["create"],
-            {
-                "modal-day": dt.date.today().isoformat(),
-                "modal-starts_at": "12:00",
-                "modal-ends_at": "12:45",
-                "modal-description": "",
-            },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
-        self.assertEqual(response.status_code, 201)
-
-        brk = user.breaks.get()
-        t = user.timestamp_set.latest("pk")
-        self.assertEqual(brk, t.logged_break)
-        self.assertEqual(t.type, Timestamp.BREAK)
-
     def test_break_form_save_assigns_timestamp(self):
         """Creating a break from the timestamps button sets the logged_break attr"""
         user = factories.UserFactory.create()
@@ -199,7 +178,7 @@ class BreaksTest(TestCase):
         t.refresh_from_db()
 
         self.assertEqual(t.logged_break, brk)
-        self.assertEqual(t.type, Timestamp.BREAK)
+        self.assertEqual(t.type, Timestamp.STOP)  # Type hasn't changed
         self.assertEqual(Timestamp.objects.count(), 1)
 
         t2 = user.timestamp_set.create(type=Timestamp.STOP)
@@ -222,9 +201,8 @@ class BreaksTest(TestCase):
         """Updating and deleting of others' breaks is not allowed"""
         brk = Break.objects.create(
             user=factories.UserFactory.create(),
-            day=dt.date.today(),
-            starts_at=dt.time(12, 0),
-            ends_at=dt.time(13, 0),
+            starts_at=c(dt.date.today(), dt.time(12, 0)),
+            ends_at=c(dt.date.today(), dt.time(13, 0)),
         )
 
         user = factories.UserFactory.create()
@@ -249,9 +227,8 @@ class BreaksTest(TestCase):
         factories.LoggedHoursFactory.create(rendered_by=user, hours=5)
         Break.objects.create(
             user=user,
-            day=dt.date.today(),
-            starts_at=dt.time(12, 0),
-            ends_at=dt.time(12, 5),
+            starts_at=c(dt.date.today(), dt.time(12, 0)),
+            ends_at=c(dt.date.today(), dt.time(12, 5)),
         )
 
         data = {

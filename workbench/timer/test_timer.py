@@ -326,3 +326,19 @@ class TimestampsTest(TestCase):
         slices = Timestamp.objects.slices(user)
         self.assertEqual(len(slices), 3)
         self.assertEqual(slices[1].elapsed_hours, Decimal("2"))
+
+    def test_start_break(self):
+        """Start a break, log the break -- further logbook entries should use
+        the end of the break as reference time"""
+        user = factories.UserFactory.create()
+
+        t = user.timestamp_set.create(
+            type=Timestamp.START, created_at=timezone.now() - dt.timedelta(seconds=901)
+        )
+        t.logged_break = factories.BreakFactory.create(
+            user=user, starts_at=t.created_at, ends_at=timezone.now()
+        )
+        t.save()
+
+        self.assertEqual(len(Timestamp.objects.slices(user)), 1)
+        self.assertEqual(user.latest_created_at, t.logged_break.ends_at)

@@ -185,13 +185,13 @@ class Break(Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name=_("user"), related_name="breaks"
     )
-    day = models.DateField(_("day"), default=dt.date.today)
-    starts_at = models.TimeField(_("starts at"))
-    ends_at = models.TimeField(_("ends at"))
+    starts_at = models.DateTimeField(_("starts at"), null=True)
+    ends_at = models.DateTimeField(_("ends at"), null=True)
+
     description = models.TextField(_("description"), blank=True)
 
     class Meta:
-        ordering = ["-day", "-starts_at"]
+        ordering = ["-starts_at"]
         verbose_name = _("break")
         verbose_name_plural = _("breaks")
 
@@ -204,27 +204,19 @@ class Break(Model):
         return " ".join(filter(None, parts))
 
     @property
-    def starts_at_datetime(self):
-        return timezone.make_aware(dt.datetime.combine(self.day, self.starts_at))
-
-    @property
-    def ends_at_datetime(self):
-        return timezone.make_aware(dt.datetime.combine(self.day, self.ends_at))
-
-    @property
     def timedelta(self):
-        return self.ends_at_datetime - self.starts_at_datetime
+        return self.ends_at - self.starts_at
 
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
         errors = {}
-        if (
-            self.day
-            and self.starts_at
-            and self.ends_at
-            and self.starts_at_datetime >= self.ends_at_datetime
-        ):
-            errors["ends_at"] = _("Breaks should end later than they begin.")
+        if self.starts_at and self.ends_at:
+
+            if self.starts_at.date() != self.ends_at.date():
+                errors["ends_at"] = _("Breaks must start end end on the same day.")
+
+            if self.starts_at >= self.ends_at:
+                errors["ends_at"] = _("Breaks should end later than they begin.")
 
         raise_if_errors(errors, exclude)
 

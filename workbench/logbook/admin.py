@@ -22,7 +22,7 @@ class LoggedCostAdmin(admin.ModelAdmin):
 
 
 class BreakAdmin(admin.ModelAdmin):
-    list_display = ["user", "day", "starts_at", "ends_at", "description"]
+    list_display = ["user", "starts_at", "ends_at", "description"]
     raw_id_fields = ["user"]
 
 

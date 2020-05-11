@@ -216,10 +216,14 @@ with sq as (
     select max(created_at) as created_at
     from timer_timestamp
     where user_id=%s
+    union all
+    select max(ends_at) as created_at
+    from logbook_break
+    where user_id=%s
 )
 select max(created_at) from sq
                 """,
-                [dt.date.today(), self.id, self.id],
+                [dt.date.today(), self.id, self.id, self.id],
             )
             return list(cursor)[0][0]
 
@@ -246,7 +250,10 @@ select max(created_at) from sq
             or Z1
         )
         break_seconds = sum(
-            (int(brk.timedelta.total_seconds()) for brk in self.breaks.filter(day=day)),
+            (
+                int(brk.timedelta.total_seconds())
+                for brk in self.breaks.filter(starts_at__date=day)
+            ),
             Z1,
         )
         msg = _(

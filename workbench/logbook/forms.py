@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.html import mark_safe
+from django.utils.text import capfirst
 from django.utils.timezone import localtime
 from django.utils.translation import gettext, gettext_lazy as _, override
 
@@ -520,9 +521,13 @@ class BreakSearchForm(Form):
 
 @add_prefix("modal")
 class BreakForm(ModelForm):
+    day = forms.DateField(label=capfirst(_("day")))
+    starts_at = forms.TimeField(label=capfirst(_("starts at")))
+    ends_at = forms.TimeField(label=capfirst(_("ends at")))
+
     class Meta:
         model = Break
-        fields = ["day", "starts_at", "ends_at", "description"]
+        fields = ["description"]
         widgets = {"description": Textarea({"rows": 2})}
 
     def __init__(self, *args, **kwargs):
@@ -537,9 +542,19 @@ class BreakForm(ModelForm):
                 latest = localtime(request.user.latest_created_at)
                 if dt.date.today() == latest.date():
                     initial.setdefault("starts_at", latest.time())
+            initial.setdefault("day", dt.date.today())
             initial.setdefault("ends_at", localtime(timezone.now()).time())
 
+        else:
+            initial.setdefault("day", kwargs["instance"].starts_at.date())
+            initial.setdefault(
+                "starts_at", localtime(kwargs["instance"].starts_at).time()
+            )
+            initial.setdefault("ends_at", localtime(kwargs["instance"].ends_at).time())
+
         super().__init__(*args, **kwargs)
+
+        self.order_fields(("day", "starts_at", "ends_at"))
 
     def clean(self):
         data = super().clean()
@@ -551,6 +566,14 @@ class BreakForm(ModelForm):
                 errors["day"] = _("That's too far in the future.")
 
         raise_if_errors(errors)
+
+        if all(data.get(f) for f in ("day", "starts_at", "ends_at")):
+            data["starts_at"] = timezone.make_aware(
+                dt.datetime.combine(data["day"], data["starts_at"])
+            )
+            data["ends_at"] = timezone.make_aware(
+                dt.datetime.combine(data["day"], data["ends_at"])
+            )
         return data
 
     def save(self):
@@ -559,29 +582,14 @@ class BreakForm(ModelForm):
 
         instance = super().save(commit=False)
         instance.user = self.request.user
-
-        timestamp = None
-        if self.request.GET.get("timestamp"):
-            timestamp = Timestamp.objects.filter(
-                user=self.request.user, id=self.request.GET.get("timestamp")
-            ).first()
-
+        instance.starts_at = self.cleaned_data["starts_at"]
+        instance.ends_at = self.cleaned_data["ends_at"]
         instance.save()
 
-        if timestamp:
-            timestamp.logged_break = instance
-            timestamp.type = Timestamp.BREAK
-            timestamp.save()
-
-        else:
-            Timestamp.objects.update_or_create(
-                logged_break=instance,
-                defaults={
-                    "user": instance.user,
-                    "created_at": instance.ends_at_datetime,
-                    "type": Timestamp.BREAK,
-                },
-            )
+        if self.request.GET.get("timestamp"):
+            Timestamp.objects.filter(
+                user=self.request.user, id=self.request.GET.get("timestamp")
+            ).update(logged_break=instance)
 
         return instance
 
