@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.utils.html import mark_safe
 from django.utils.text import capfirst
 from django.utils.timezone import localtime
@@ -27,6 +28,25 @@ from workbench.tools.forms import (
 )
 from workbench.tools.validation import in_days, logbook_lock, raise_if_errors
 from workbench.tools.xlsx import WorkbenchXLSXDocument
+
+
+class DetectedTimestampForm(forms.Form):
+    detected_ends_at = forms.CharField()
+
+    def clean_detected_ends_at(self):
+        value = parse_datetime(self.cleaned_data.get("detected_ends_at"))
+        if not value:
+            raise forms.ValidationError("Invalid value '%s'" % value)
+        return value
+
+    def build_if_valid(self, **kwargs):
+        if self.is_valid():
+            kwargs.setdefault("notes", gettext("<detected>"))
+            return Timestamp(
+                type=Timestamp.STOP,
+                created_at=self.cleaned_data["detected_ends_at"],
+                **kwargs
+            )
 
 
 class LoggedHoursSearchForm(Form):
@@ -371,11 +391,10 @@ class LoggedHoursForm(ModelForm):
                 timestamp = Timestamp.objects.filter(
                     user=self.request.user, id=self.request.GET.get("timestamp")
                 ).first()
-            elif self.request.GET.get("detected_ends_at"):
-                timestamp = Timestamp(
-                    user=self.request.user,
-                    type=Timestamp.STOP,
-                    created_at=self.request.GET.get("detected_ends_at"),
+                timestamp.logged_hours = instance
+            else:
+                timestamp = DetectedTimestampForm(self.request.GET).build_if_valid(
+                    user=self.request.user, logged_hours=instance
                 )
 
         if not self.cleaned_data.get("service") and self.cleaned_data.get(
@@ -394,7 +413,6 @@ class LoggedHoursForm(ModelForm):
             instance.service = service
         instance.save()
         if timestamp:
-            timestamp.logged_hours = instance
             timestamp.save()
 
         return instance
@@ -597,11 +615,9 @@ class BreakForm(ModelForm):
                 user=self.request.user, id=self.request.GET.get("timestamp")
             ).update(logged_break=instance)
         elif self.request.GET.get("detected_ends_at"):
-            Timestamp.objects.create(
-                user=self.request.user,
-                type=Timestamp.STOP,
-                created_at=self.request.GET.get("detected_ends_at"),
-            )
+            DetectedTimestampForm(self.request.GET).build_if_valid(
+                user=self.request.user, logged_break=instance
+            ).save()
 
         return instance
 

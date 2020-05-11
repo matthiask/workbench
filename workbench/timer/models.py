@@ -39,10 +39,10 @@ class Slice(dict):
         params = [
             ("rendered_on", self["day"].isoformat()),
             ("description", self["description"]),
-            ("hours", self.elapsed_hours or ""),
+            ("hours", self.elapsed_hours),
         ]
         if self.get("timestamp_id"):
-            params.append(("timestamp_id", self["timestamp_id"]))
+            params.append(("timestamp", self["timestamp_id"]))
         elif self.show_create_buttons:
             params.append(("detected_ends_at", self["ends_at"]))
 
@@ -50,7 +50,7 @@ class Slice(dict):
             reverse("projects_project_createhours", kwargs={"pk": self["project_id"]})
             if self.get("project_id")
             else reverse("logbook_loggedhours_create"),
-            urlencode(params),
+            urlencode([pair for pair in params if pair[1]]),
         )
 
     @property
@@ -63,9 +63,12 @@ class Slice(dict):
             ("description", self["description"]),
             ("starts_at", local_date_format(self.get("starts_at"), fmt="H:i:s")),
             ("ends_at", local_date_format(self.get("ends_at"), fmt="H:i:s")),
-            ("timestamp", self.get("timestamp_id") or ""),
+            ("timestamp", self.get("timestamp_id")),
         ]
-        return "{}?{}".format(reverse("logbook_break_create"), urlencode(params))
+        return "{}?{}".format(
+            reverse("logbook_break_create"),
+            urlencode([pair for pair in params if pair[1]]),
+        )
 
 
 class TimestampQuerySet(models.QuerySet):

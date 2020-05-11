@@ -11,6 +11,7 @@ from freezegun import freeze_time
 
 from workbench import factories
 from workbench.accounts.models import User
+from workbench.logbook.forms import DetectedTimestampForm
 from workbench.timer.models import Timestamp
 from workbench.tools.formats import local_date_format
 
@@ -244,6 +245,10 @@ class TimestampsTest(TestCase):
             created_at=timezone.now() - dt.timedelta(seconds=99), type=Timestamp.STOP
         )
 
+        slices = Timestamp.objects.slices(user)
+        self.assertIn("timestamp={}".format(t.pk), slices[0].hours_create_url)
+        self.assertIn("timestamp={}".format(t.pk), slices[0].break_create_url)
+
         response = self.client.post(
             service.project.urls["createhours"] + "?timestamp={}".format(t.pk),
             {
@@ -342,3 +347,57 @@ class TimestampsTest(TestCase):
 
         self.assertEqual(len(Timestamp.objects.slices(user)), 1)
         self.assertEqual(user.latest_created_at, t.logged_break.ends_at)
+
+    def test_create_timestamp_from_detected(self):
+        """The buttons for <detected> gaps lead to a form which fills the gap
+        instead of appending new slices"""
+        user = factories.UserFactory.create()
+
+        factories.LoggedHoursFactory.create(
+            rendered_by=user, created_at=timezone.now() - dt.timedelta(seconds=10799)
+        )
+        hours = factories.LoggedHoursFactory.create(rendered_by=user)
+
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(len(slices), 3)
+        self.assertEqual(slices[1].elapsed_hours, Decimal("2"))
+
+        self.assertTrue(slices[1].show_create_buttons)
+        self.assertIn("detected_ends_at", slices[1].hours_create_url)
+
+        self.client.force_login(user)
+        response = self.client.post(
+            "{}?{}".format(
+                hours.service.project.urls["createhours"],
+                slices[1].hours_create_url.split("?")[1],
+            ),
+            {
+                "modal-rendered_by": user.pk,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-service": hours.service_id,
+                "modal-hours": "2",
+                "modal-description": "Test",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(len(slices), 3)  # Still 3
+
+        t = Timestamp.objects.get()
+        self.assertEqual(slices[1]["timestamp_id"], t.id)
+
+    def test_detected_timestamp_form(self):
+        """Test various inputs to the DetectedTimestampForm"""
+
+        self.assertFalse(DetectedTimestampForm({}).is_valid())
+        self.assertFalse(DetectedTimestampForm({"detected_ends_at": ""}).is_valid())
+        self.assertFalse(
+            DetectedTimestampForm({"detected_ends_at": "2010-01-01"}).is_valid()
+        )
+        self.assertTrue(
+            DetectedTimestampForm(
+                {"detected_ends_at": "2010-01-01 15:30+02:00"}
+            ).is_valid()
+        )

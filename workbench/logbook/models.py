@@ -213,7 +213,7 @@ class Break(Model):
         if self.starts_at and self.ends_at:
 
             if self.starts_at.date() != self.ends_at.date():
-                errors["ends_at"] = _("Breaks must start end end on the same day.")
+                errors["ends_at"] = _("Breaks must start and end on the same day.")
 
             if self.starts_at >= self.ends_at:
                 errors["ends_at"] = _("Breaks should end later than they begin.")

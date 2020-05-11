@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-08 16:37+0200\n"
+"POT-Creation-Date: 2020-05-11 17:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -306,7 +306,7 @@ msgid "years"
 msgstr "Jahre"
 
 #: workbench/awt/models.py workbench/expenses/models.py
-#: workbench/logbook/models.py
+#: workbench/logbook/forms.py
 msgid "day"
 msgstr "Tag"
 
@@ -777,17 +777,6 @@ msgstr "Postadressen"
 #: workbench/contacts/views.py workbench/templates/shortcuts.html
 msgid "Jump to person"
 msgstr "Zu Person springen"
-
-#: workbench/contacts/views.py
-#, python-format
-msgid ""
-"You seem to be using iOS. iOS does not support directly opening vCard files. "
-"Instead, you have been sent an email containing the vCard to your email "
-"address, %s."
-msgstr ""
-"Es scheint, dass Du iOS verwendest. Leider unterstützt iOS das direkte "
-"Öffnen von vCard Dateien nicht. Stattdessen hast Du ein Mail an die Adresse "
-"%s erhalten, mit der vCard als Anhang."
 
 #: workbench/credit_control/__init__.py
 msgid "credit control"
@@ -1749,6 +1738,10 @@ msgid_plural "Created %s invoices."
 msgstr[0] "%s Rechnung erstellt."
 msgstr[1] "%s Rechnungen erstellt."
 
+#: workbench/logbook/forms.py workbench/timer/models.py
+msgid "<detected>"
+msgstr "<entdeckt>"
+
 #: workbench/logbook/forms.py
 msgid "This field is required unless you create a new service."
 msgstr "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung."
@@ -1799,6 +1792,14 @@ msgstr "Fremdkosten müssen für Spesen angegeben werden."
 #: workbench/logbook/forms.py
 msgid "Third party costs shouldn't be higher than costs."
 msgstr "Fremdkosten sollten nicht höher sein als die Kosten."
+
+#: workbench/logbook/forms.py workbench/logbook/models.py
+msgid "starts at"
+msgstr "startet um"
+
+#: workbench/logbook/forms.py workbench/logbook/models.py
+msgid "ends at"
+msgstr "endet um"
 
 #: workbench/logbook/forms.py
 msgid "Breaks have to be logged promptly."
@@ -1865,14 +1866,6 @@ msgstr "Spesen sind Teil einer Spesenabrechnung, kann Eintrag nicht löschen."
 msgid "Either fill in all fields or none."
 msgstr "Entweder alle Felder einfüllen oder keine."
 
-#: workbench/logbook/models.py
-msgid "starts at"
-msgstr "startet um"
-
-#: workbench/logbook/models.py
-msgid "ends at"
-msgstr "endet um"
-
 #: workbench/logbook/models.py workbench/templates/timestamps.html
 #: workbench/timer/models.py
 msgid "break"
@@ -1889,6 +1882,10 @@ msgid "%s minute"
 msgid_plural "%s minutes"
 msgstr[0] "%s Minute"
 msgstr[1] "%s Minuten"
+
+#: workbench/logbook/models.py
+msgid "Breaks must start and end on the same day."
+msgstr "Anfang und Ende müssen im gleichen Jahr liegen."
 
 #: workbench/logbook/models.py
 msgid "Breaks should end later than they begin."
@@ -2577,6 +2574,10 @@ msgstr "Letzte Rechnungen"
 msgid "Recent offers"
 msgstr "Letzte Offerten"
 
+#: workbench/templates/contacts/person_detail.html
+msgid "Maps"
+msgstr "Maps"
+
 #: workbench/templates/contacts/person_form.html
 #: workbench/templates/offers/offer_pricing.html
 #, python-format
@@ -3171,10 +3172,6 @@ msgid "unknown probability"
 msgstr "Wahrscheinlichkeit unbekannt"
 
 #: workbench/timer/models.py
-msgid "<detected>"
-msgstr "<entdeckt>"
-
-#: workbench/timer/models.py
 msgid "Start"
 msgstr "Start"
 
@@ -3283,6 +3280,17 @@ msgstr "Anzahlungsrechnung"
 #: workbench/tools/validation.py
 msgid "Form was invalid."
 msgstr "Formular war ungültig."
+
+#: workbench/tools/vcard.py
+#, python-format
+msgid ""
+"You seem to be using iOS. iOS does not support directly opening vCard files. "
+"Instead, you have been sent an email containing the vCard to your email "
+"address, %s."
+msgstr ""
+"Es scheint, dass Du iOS verwendest. Leider unterstützt iOS das direkte "
+"Öffnen von vCard Dateien nicht. Stattdessen hast Du ein Mail an die Adresse "
+"%s erhalten, mit der vCard als Anhang."
 
 #: workbench/tools/xlsx.py
 msgid "By service and user"

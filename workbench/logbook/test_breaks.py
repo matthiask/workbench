@@ -61,6 +61,18 @@ class BreaksTest(TestCase):
             [("ends_at", ["Breaks should end later than they begin."])],
         )
 
+        with self.assertRaises(ValidationError) as cm:
+            Break(
+                user=factories.UserFactory.create(),
+                starts_at=c(dt.date(2020, 1, 1), dt.time(12, 0)),
+                ends_at=c(dt.date.today(), dt.time(11, 0)),
+            ).full_clean()
+
+        self.assertEqual(
+            list(cm.exception),
+            [("ends_at", ["Breaks must start and end on the same day."])],
+        )
+
     @freeze_time("2020-01-02")
     def test_break_form_initial(self):
         """Fields are initialized as expected"""
@@ -154,6 +166,18 @@ class BreaksTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertContains(response, "That&#x27;s too far in the future.")
+
+        response = self.client.post(
+            Break.urls["create"],
+            {
+                "modal-day": dt.date.today().isoformat(),
+                "modal-starts_at": "12:00",
+                "modal-ends_at": "12:45",
+                "modal-description": "",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
 
     def test_break_form_save_assigns_timestamp(self):
         """Creating a break from the timestamps button sets the logged_break attr"""
