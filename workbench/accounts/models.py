@@ -206,6 +206,7 @@ class User(Model, AbstractBaseUser):
             cursor.execute(
                 """
 with sq as (
+    -- created_at of logged hours with no linked timestamp
     select max(created_at) as created_at
     from logbook_loggedhours
     where rendered_on=%s and rendered_by_id=%s and id not in (
@@ -215,18 +216,21 @@ with sq as (
 
     union all
 
+    -- the end of the latest break
     select max(ends_at) as created_at
     from logbook_break
     where user_id=%s
 
     union all
 
+    -- the latest timestamp
     select max(created_at) as created_at
     from timer_timestamp
     where user_id=%s
 
     union all
 
+    -- the latest START timestamp's creation time + logged hours duration
     select max(ts.created_at + make_interval(secs => 3600 * lh.hours))
     from timer_timestamp ts
     left join logbook_loggedhours lh on ts.logged_hours_id=lh.id
