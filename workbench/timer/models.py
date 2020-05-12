@@ -63,8 +63,12 @@ class Slice(dict):
             ("description", self["description"]),
             ("starts_at", local_date_format(self.get("starts_at"), fmt="H:i:s")),
             ("ends_at", local_date_format(self.get("ends_at"), fmt="H:i:s")),
-            ("timestamp", self.get("timestamp_id")),
         ]
+        if self.get("timestamp_id"):
+            params.append(("timestamp", self["timestamp_id"]))
+        elif self.show_create_buttons:
+            params.append(("detected_ends_at", self["ends_at"]))
+
         return "{}?{}".format(
             reverse("logbook_break_create"),
             urlencode([pair for pair in params if pair[1]]),

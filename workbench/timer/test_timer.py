@@ -348,7 +348,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(len(Timestamp.objects.slices(user)), 1)
         self.assertEqual(user.latest_created_at, t.logged_break.ends_at)
 
-    def test_create_timestamp_from_detected(self):
+    def test_hours_autocreate_timestamp_from_detected(self):
         """The buttons for <detected> gaps lead to a form which fills the gap
         instead of appending new slices"""
         user = factories.UserFactory.create()
@@ -376,6 +376,43 @@ class TimestampsTest(TestCase):
                 "modal-rendered_on": dt.date.today().isoformat(),
                 "modal-service": hours.service_id,
                 "modal-hours": "2",
+                "modal-description": "Test",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(len(slices), 3)  # Still 3
+
+        t = Timestamp.objects.get()
+        self.assertEqual(slices[1]["timestamp_id"], t.id)
+
+    def test_break_autocreate_timestamp_from_detected(self):
+        """The buttons for <detected> gaps lead to a form which fills the gap
+        instead of appending new slices"""
+        user = factories.UserFactory.create()
+
+        factories.LoggedHoursFactory.create(
+            rendered_by=user, created_at=timezone.now() - dt.timedelta(seconds=10799)
+        )
+        factories.LoggedHoursFactory.create(rendered_by=user)
+
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(len(slices), 3)
+        self.assertEqual(slices[1].elapsed_hours, Decimal("2"))
+
+        self.assertTrue(slices[1].show_create_buttons)
+        self.assertIn("detected_ends_at", slices[1].break_create_url)
+
+        self.client.force_login(user)
+        response = self.client.post(
+            slices[1].break_create_url,
+            {
+                "modal-user": user.pk,
+                "modal-day": dt.date.today().isoformat(),
+                "modal-starts_at": localtime(slices[1]["starts_at"]).time().isoformat(),
+                "modal-ends_at": localtime(slices[1]["ends_at"]).time().isoformat(),
                 "modal-description": "Test",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",

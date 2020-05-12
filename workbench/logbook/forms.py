@@ -610,17 +610,18 @@ class BreakForm(ModelForm):
         instance.ends_at = self.cleaned_data["ends_at"]
         instance.save()
 
+        timestamp = None
         if self.request.GET.get("timestamp"):
             Timestamp.objects.filter(
                 user=self.request.user, id=self.request.GET.get("timestamp")
             ).update(logged_break=instance)
-        elif self.request.GET.get("detected_ends_at"):
+        else:
             timestamp = DetectedTimestampForm(self.request.GET).build_if_valid(
                 user=self.request.user, logged_break=instance
             )
-            if timestamp:
-                timestamp.save()
 
+        if timestamp:
+            timestamp.save()
         return instance
 
 
