@@ -212,18 +212,29 @@ with sq as (
         select logged_hours_id from timer_timestamp
         where logged_hours_id is not NULL
     )
+
     union all
-    select max(created_at) as created_at
-    from timer_timestamp
-    where user_id=%s
-    union all
+
     select max(ends_at) as created_at
     from logbook_break
     where user_id=%s
+
+    union all
+
+    select max(created_at) as created_at
+    from timer_timestamp
+    where user_id=%s
+
+    union all
+
+    select max(ts.created_at + make_interval(secs => 3600 * lh.hours))
+    from timer_timestamp ts
+    left join logbook_loggedhours lh on ts.logged_hours_id=lh.id
+    where ts.user_id=%s and ts.type='start'
 )
 select max(created_at) from sq
                 """,
-                [dt.date.today(), self.id, self.id, self.id],
+                [dt.date.today(), self.id, self.id, self.id, self.id],
             )
             return list(cursor)[0][0]
 

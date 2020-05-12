@@ -189,7 +189,12 @@ class TimestampsTest(TestCase):
     def test_view(self):
         """The timestamps view does not crash"""
         user = factories.UserFactory.create()
-        user.timestamp_set.create(type=Timestamp.START)
+        user.timestamp_set.create(
+            type=Timestamp.START, created_at=timezone.now() - dt.timedelta(seconds=9)
+        )
+
+        factories.LoggedHoursFactory.create(rendered_by=user)
+        factories.BreakFactory.create(user=user)
 
         self.client.force_login(user)
         response = self.client.get("/timestamps/")
@@ -438,3 +443,31 @@ class TimestampsTest(TestCase):
                 {"detected_ends_at": "2010-01-01 15:30+02:00"}
             ).is_valid()
         )
+
+    def test_start_with_start(self):
+        """Test the behavior of a START timestamp with logged hours"""
+        user = factories.UserFactory.create()
+
+        # Create a START 15 minutes ago and a logged hours entry spanning 12 of
+        # those 15 minutes
+        user.timestamp_set.create(
+            type=Timestamp.START,
+            created_at=timezone.now() - dt.timedelta(seconds=900),
+            logged_hours=factories.LoggedHoursFactory.create(
+                hours=Decimal("0.2"),
+                created_at=timezone.now() + dt.timedelta(seconds=3600),  # Not now
+            ),
+        )
+
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(len(slices), 1)
+
+        # 12 * 60 = 720
+        # 900 - 720 ~= 180
+        seconds = (timezone.now() - slices[0]["ends_at"]).total_seconds()
+        self.assertTrue(175 < seconds < 185)
+
+        # Those three minutes should also be visible here (despite the
+        # timestamp created_at value)
+        seconds = (timezone.now() - user.latest_created_at).total_seconds()
+        self.assertTrue(seconds < 185)
