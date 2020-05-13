@@ -31,8 +31,8 @@
       <th>{% trans 'Open offers total excl. tax' %}</th>
     </tr>
     <tr>
-      <td class="text-right">{{ average_employment_duration.active_users|stringformat:'.2f' }} {% trans 'years' %}</td>
-      <th>{% trans 'Average employment duration of active users' %}</th>
+      <td class="text-right">{{ average_employment_duration.current_users|stringformat:'.2f' }} {% trans 'years' %}</td>
+      <th>{% trans 'Average employment duration of current users' %}</th>
     </tr>
     <tr>
       <td class="text-right">{{ average_employment_duration.all_users|stringformat:'.2f' }} {% trans 'years' %}</td>

@@ -214,7 +214,7 @@ WHERE
 def average_employment_duration():
     stats = {}
 
-    stats["active_users"] = query(
+    stats["current_users"] = query(
         """
 with date_from_until as (
     select
