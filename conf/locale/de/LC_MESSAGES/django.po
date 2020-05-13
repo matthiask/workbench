@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 17:16+0200\n"
+"POT-Creation-Date: 2020-05-13 13:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -301,7 +301,7 @@ msgstr "Dezember"
 msgid "working time per day"
 msgstr "Arbeitszeit pro Tag"
 
-#: workbench/awt/models.py
+#: workbench/awt/models.py workbench/templates/reporting/key_data.html
 msgid "years"
 msgstr "Jahre"
 
@@ -2953,6 +2953,14 @@ msgstr "Total exkl. MwSt. aller offenen Rechnungen"
 #: workbench/templates/reporting/key_data.html
 msgid "Open offers total excl. tax"
 msgstr "Total exkl. MwSt. aller offenen Offerten"
+
+#: workbench/templates/reporting/key_data.html
+msgid "Average employment duration of active users"
+msgstr "Durchschnittliche Anstellungsdauer der aktiven Mitarbeiter*innen"
+
+#: workbench/templates/reporting/key_data.html
+msgid "Average employment duration of all users"
+msgstr "Durchschnittliche Anstellungsdauer aller Mitarbeiter*innen"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Revenue minus third party costs and accruals"

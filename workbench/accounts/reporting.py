@@ -211,6 +211,58 @@ WHERE
     return sorted(anniversaries, key=lambda row: (row["this_year"], row["name"]))
 
 
+def average_employment_duration():
+    stats = {}
+
+    stats["active_users"] = query(
+        """
+with date_from_until as (
+    select
+        user_id,
+        date_from,
+        case
+            when date_until='9999-12-31' then current_date
+            else date_until
+        end as date_until
+    from awt_employment e
+    left join accounts_user u on e.user_id=u.id
+    where u.is_active=TRUE
+),
+durations as (
+select user_id, sum(date_until - date_from) as duration
+from date_from_until
+group by user_id
+)
+select avg(duration)/365.24 from durations
+        """,
+        [],
+    )[0][0]
+
+    stats["all_users"] = query(
+        """
+with date_from_until as (
+    select
+        user_id,
+        date_from,
+        case
+            when date_until='9999-12-31' then current_date
+            else date_until
+        end as date_until
+    from awt_employment
+),
+durations as (
+select user_id, sum(date_until - date_from) as duration
+from date_from_until
+group by user_id
+)
+select avg(duration)/365.24 from durations
+        """,
+        [],
+    )[0][0]
+
+    return stats
+
+
 def test():  # pragma: no cover
     from pprint import pprint
 

@@ -30,6 +30,14 @@
       <td class="text-right">{{ open_offers_total|currency }}</td>
       <th>{% trans 'Open offers total excl. tax' %}</th>
     </tr>
+    <tr>
+      <td class="text-right">{{ average_employment_duration.active_users|stringformat:'.2f' }} {% trans 'years' %}</td>
+      <th>{% trans 'Average employment duration of active users' %}</th>
+    </tr>
+    <tr>
+      <td class="text-right">{{ average_employment_duration.all_users|stringformat:'.2f' }} {% trans 'years' %}</td>
+      <th>{% trans 'Average employment duration of all users' %}</th>
+    </tr>
   </table>
 
   <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>

@@ -9,7 +9,7 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import Team, User
-from workbench.accounts.reporting import work_anniversaries
+from workbench.accounts.reporting import average_employment_duration, work_anniversaries
 from workbench.invoices.models import Invoice
 from workbench.invoices.utils import next_valid_day
 from workbench.logbook.models import LoggedCost
@@ -231,6 +231,7 @@ def key_data_view(request):
             "logged_hours_in_open_orders": key_data.logged_hours_in_open_orders(),
             "sent_invoices_total": key_data.sent_invoices_total(),
             "open_offers_total": key_data.open_offers_total(),
+            "average_employment_duration": average_employment_duration(),
         },
     )
 
