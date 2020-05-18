@@ -9,6 +9,9 @@ from django.views.i18n import JavaScriptCatalog
 from workbench import views
 
 
+admin.site.enable_nav_sidebar = False
+
+
 urlpatterns = [
     url(r"^$", views.start),
     url(r"^404/$", render, {"template_name": "404.html"}),
