@@ -70,7 +70,7 @@
 
   {% for data in statistics %}
     {% with user=data.user stats=data.months totals=data.totals monthly_sums=data.monthly_sums running_sums=data.running_sums %}
-    <h2 class="mt-5">{{ user }}</h2>
+    <h2 class="mt-5"><a href="{% querystring user=user.pk %}">{{ user }}</a></h2>
     <table class="table table-sm table-bordered table-responsive-lg">
       <tr class="thead-light">
         <th>{{ year.year }}</th>
