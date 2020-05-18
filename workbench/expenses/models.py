@@ -1,7 +1,6 @@
 import datetime as dt
 
 from django.contrib import messages
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
@@ -121,7 +120,7 @@ class ExchangeRatesQuerySet(models.QuerySet):
 
 class ExchangeRates(models.Model):
     day = models.DateField(_("day"), unique=True)
-    rates = JSONField()
+    rates = models.JSONField()
 
     objects = ExchangeRatesQuerySet.as_manager()
 
