@@ -1,5 +1,5 @@
-from django.conf.urls import url
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import re_path
 from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
@@ -38,12 +38,12 @@ def autocomplete_filter(*, request, queryset):
 
 
 urlpatterns = [
-    url(
+    re_path(
         r"^$",
         generic.ListView.as_view(model=Project, search_form_class=ProjectSearchForm),
         name="projects_project_list",
     ),
-    url(
+    re_path(
         r"^autocomplete/$",
         generic.AutocompleteView.as_view(
             model=Project,
@@ -52,8 +52,8 @@ urlpatterns = [
         ),
         name="projects_project_autocomplete",
     ),
-    url(r"^select/$", select, name="projects_project_select"),
-    url(
+    re_path(r"^select/$", select, name="projects_project_select"),
+    re_path(
         r"^(?P<pk>\d+)/$",
         generic.DetailView.as_view(
             model=Project,
@@ -63,17 +63,17 @@ urlpatterns = [
         ),
         name="projects_project_detail",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/statistics/$",
         generic.DetailView.as_view(model=Project, template_name_suffix="_statistics"),
         name="projects_project_statistics",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/offers-pdf/$",
         controlling_only(ProjectOfferPDFView.as_view()),
         name="projects_project_offers_pdf",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/renumber-offers/$",
         controlling_only(
             OffersRenumberView.as_view(
@@ -82,29 +82,29 @@ urlpatterns = [
         ),
         name="projects_project_renumber_offers",
     ),
-    url(
+    re_path(
         r"^create/$",
         generic.CreateView.as_view(form_class=ProjectForm, model=Project),
         name="projects_project_create",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/update/$",
         generic.UpdateView.as_view(form_class=ProjectForm, model=Project),
         name="projects_project_update",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/delete/$",
         generic.DeleteView.as_view(model=Project),
         name="projects_project_delete",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/createoffer/$",
         generic.CreateRelatedView.as_view(
             model=Offer, form_class=OfferForm, related_model=Project
         ),
         name="projects_project_createoffer",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/createinvoice/$",
         generic.CreateRelatedView.as_view(
             model=Invoice, form_class=CreateProjectInvoiceForm, related_model=Project
@@ -112,7 +112,7 @@ urlpatterns = [
         name="projects_project_createinvoice",
     ),
     # HOURS
-    url(
+    re_path(
         r"^(?P<pk>\d+)/createhours/$",
         generic.CreateRelatedView.as_view(
             model=LoggedHours, form_class=LoggedHoursForm, related_model=Project
@@ -120,7 +120,7 @@ urlpatterns = [
         name="projects_project_createhours",
     ),
     # COSTS
-    url(
+    re_path(
         r"^(?P<pk>\d+)/createcost/$",
         generic.CreateRelatedView.as_view(
             model=LoggedCost, form_class=LoggedCostForm, related_model=Project
@@ -128,24 +128,24 @@ urlpatterns = [
         name="projects_project_createcost",
     ),
     # Services
-    url(
+    re_path(
         r"^(?P<pk>\d+)/createservice/$",
         generic.CreateRelatedView.as_view(
             model=Service, form_class=ServiceForm, related_model=Project
         ),
         name="projects_project_createservice",
     ),
-    url(
+    re_path(
         r"^service/(?P<pk>\d+)/$",
         lambda request, pk: redirect(get_object_or_404(Service, pk=pk)),
         name="projects_service_detail",
     ),
-    url(
+    re_path(
         r"^service/(?P<pk>\d+)/update/$",
         generic.UpdateView.as_view(model=Service, form_class=ServiceForm),
         name="projects_service_update",
     ),
-    url(
+    re_path(
         r"^service/(?P<pk>\d+)/reassign-logbook/$",
         generic.UpdateView.as_view(
             model=Service,
@@ -155,29 +155,29 @@ urlpatterns = [
         ),
         name="projects_service_reassign_logbook",
     ),
-    url(
+    re_path(
         r"^service/(?P<pk>\d+)/delete/$",
         generic.DeleteView.as_view(
             model=Service, template_name="modal_confirm_delete.html"
         ),
         name="projects_service_delete",
     ),
-    url(
+    re_path(
         r"^service/(?P<pk>\d+)/move/$",
         generic.UpdateView.as_view(
             model=Service, form_class=ServiceMoveForm, template_name="modalform.html"
         ),
         name="projects_service_move",
     ),
-    url(
+    re_path(
         r"^service/(?P<pk>\d+)/assign-service-type/$",
         assign_service_type,
         name="projects_service_assign_service_type",
     ),
-    url(r"^service/set-order/$", set_order, name="projects_service_set_order"),
-    url(r"^(?P<pk>[0-9]+)/services/$", services, name="projects_project_services"),
-    url(r"^projects/$", projects, name="projects_project_projects"),
-    url(
+    re_path(r"^service/set-order/$", set_order, name="projects_service_set_order"),
+    re_path(r"^(?P<pk>[0-9]+)/services/$", services, name="projects_project_services"),
+    re_path(r"^projects/$", projects, name="projects_project_projects"),
+    re_path(
         r"^service/autocomplete/$",
         generic.AutocompleteView.as_view(
             model=Service,

@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from workbench import generic
 from workbench.accounts.features import controlling_only
@@ -8,7 +8,7 @@ from workbench.invoices.views import RecurringInvoiceDetailView
 
 
 urlpatterns = [
-    url(
+    re_path(
         r"^$",
         controlling_only(
             generic.ListView.as_view(
@@ -17,12 +17,12 @@ urlpatterns = [
         ),
         name="invoices_recurringinvoice_list",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/$",
         controlling_only(RecurringInvoiceDetailView.as_view(model=RecurringInvoice)),
         name="invoices_recurringinvoice_detail",
     ),
-    url(
+    re_path(
         r"^create/$",
         controlling_only(
             generic.CreateView.as_view(
@@ -31,7 +31,7 @@ urlpatterns = [
         ),
         name="invoices_recurringinvoice_create",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/update/$",
         controlling_only(
             generic.UpdateView.as_view(
@@ -40,7 +40,7 @@ urlpatterns = [
         ),
         name="invoices_recurringinvoice_update",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/delete/$",
         controlling_only(generic.DeleteView.as_view(model=RecurringInvoice)),
         name="invoices_recurringinvoice_delete",

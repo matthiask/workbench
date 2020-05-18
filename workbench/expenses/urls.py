@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from workbench import generic
 from workbench.expenses.forms import ExpenseReportForm, ExpenseReportSearchForm
@@ -7,37 +7,37 @@ from workbench.expenses.views import ExpenseReportPDFView, convert
 
 
 urlpatterns = [
-    url(
+    re_path(
         r"^$",
         generic.ListView.as_view(
             model=ExpenseReport, search_form_class=ExpenseReportSearchForm
         ),
         name="expenses_expensereport_list",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/$",
         generic.DetailView.as_view(model=ExpenseReport),
         name="expenses_expensereport_detail",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/pdf/$",
         ExpenseReportPDFView.as_view(),
         name="expenses_expensereport_pdf",
     ),
-    url(
+    re_path(
         r"^create/$",
         generic.CreateView.as_view(model=ExpenseReport, form_class=ExpenseReportForm),
         name="expenses_expensereport_create",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/update/$",
         generic.UpdateView.as_view(model=ExpenseReport, form_class=ExpenseReportForm),
         name="expenses_expensereport_update",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/delete/$",
         generic.DeleteView.as_view(model=ExpenseReport),
         name="expenses_expensereport_delete",
     ),
-    url(r"^convert/$", convert, name="expenses_convert"),
+    re_path(r"^convert/$", convert, name="expenses_convert"),
 ]

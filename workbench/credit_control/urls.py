@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from workbench import generic
 from workbench.accounts.features import bookkeeping_only
@@ -15,19 +15,19 @@ from workbench.credit_control.views import (
 
 
 urlpatterns = [
-    url(
+    re_path(
         r"^$",
         generic.ListView.as_view(
             model=CreditEntry, search_form_class=CreditEntrySearchForm
         ),
         name="credit_control_creditentry_list",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/$",
         generic.DetailView.as_view(model=CreditEntry),
         name="credit_control_creditentry_detail",
     ),
-    url(
+    re_path(
         r"^create/$",
         bookkeeping_only(
             generic.CreateView.as_view(
@@ -38,7 +38,7 @@ urlpatterns = [
         ),
         name="credit_control_creditentry_create",
     ),
-    url(
+    re_path(
         r"^upload/$",
         bookkeeping_only(
             AccountStatementUploadView.as_view(
@@ -49,19 +49,19 @@ urlpatterns = [
         ),
         name="credit_control_creditentry_upload",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/update/$",
         bookkeeping_only(
             generic.UpdateView.as_view(model=CreditEntry, form_class=CreditEntryForm)
         ),
         name="credit_control_creditentry_update",
     ),
-    url(
+    re_path(
         r"^(?P<pk>\d+)/delete/$",
         bookkeeping_only(generic.DeleteView.as_view(model=CreditEntry)),
         name="credit_control_creditentry_delete",
     ),
-    url(
+    re_path(
         r"^assign/$",
         bookkeeping_only(AssignCreditEntriesView.as_view(model=CreditEntry)),
         name="credit_control_creditentry_assign",
