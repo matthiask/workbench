@@ -8,8 +8,18 @@ from workbench.tools.validation import in_days
 class ReportingTest(TestCase):
     def test_open_items(self):
         """The open items list offers filtering by cutoff date and XLSX exports"""
-        for i in range(20):
+        invoice = factories.InvoiceFactory.create(
+            invoiced_on=in_days(0),
+            due_on=in_days(15),
+            subtotal=50,
+            status=factories.Invoice.SENT,
+            third_party_costs=5,  # key data branch
+        )
+        for i in range(5):
             factories.InvoiceFactory.create(
+                customer=invoice.customer,
+                contact=invoice.contact,
+                owned_by=invoice.owned_by,
                 invoiced_on=in_days(0),
                 due_on=in_days(15),
                 subtotal=50,
@@ -22,7 +32,7 @@ class ReportingTest(TestCase):
         self.assertRedirects(response, "/report/open-items-list/")
         self.assertEqual(messages(response), ["Form was invalid."])
         response = self.client.get("/report/open-items-list/")
-        self.assertContains(response, '<th class="text-right">1’000.00</th>')
+        self.assertContains(response, '<th class="text-right">300.00</th>')
 
         response = self.client.get(
             "/report/open-items-list/?cutoff_date={}".format(in_days(-1).isoformat())

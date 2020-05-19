@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from django import forms
+from django.conf import settings
 from django.forms.models import inlineformset_factory
 from django.template.defaultfilters import linebreaksbr
 from django.utils.html import format_html, format_html_join
@@ -79,7 +80,7 @@ class PersonSearchForm(Form):
                     person_to_vcard(person).serialize()
                     for person in queryset.prefetch_related(
                         "phonenumbers", "emailaddresses", "postaladdresses"
-                    )[:250]
+                    )[: settings.BATCH_MAX_ITEMS]
                 ),
             )
 

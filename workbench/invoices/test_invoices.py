@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
 
 from workbench import factories
@@ -538,11 +539,12 @@ class InvoicesTest(TestCase):
         code("owned_by=0")  # only inactive
         code("export=xlsx")
 
+    @override_settings(BATCH_MAX_ITEMS=5)
     def test_too_many_invoices(self):
         """Creating a PDF with too many invoices fails"""
         invoice = factories.InvoiceFactory.create()
 
-        for i in range(250):
+        for i in range(5):
             factories.InvoiceFactory.create(
                 customer=invoice.customer,
                 contact=invoice.contact,
@@ -555,7 +557,7 @@ class InvoicesTest(TestCase):
             response, "/invoices/?error=1", fetch_redirect_response=False
         )
         self.assertEqual(
-            messages(response), ["251 invoices in selection, that's too many."]
+            messages(response), ["6 invoices in selection, that's too many."]
         )
 
     def test_list_pdfs(self):

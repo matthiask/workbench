@@ -1,6 +1,7 @@
 import datetime as dt
 
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponseRedirect
@@ -76,7 +77,7 @@ class InvoiceSearchForm(Form):
                 return HttpResponseRedirect("?error=1")
 
             count = queryset.count()
-            if count > 250:
+            if count > settings.BATCH_MAX_ITEMS:
                 messages.error(
                     request, _("%s invoices in selection, that's too many.") % count
                 )

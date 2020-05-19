@@ -382,6 +382,8 @@ TEST_RUNNER = "django_slowtests.testrunner.DiscoverSlowestTestsRunner"
 TESTS_REPORT_TMP_FILES_PREFIX = "tmp/slowtests_"
 NUM_SLOW_TESTS = 20
 
+BATCH_MAX_ITEMS = 250
+
 if TESTING:  # pragma: no cover
     PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
     DATABASES["default"]["TEST"] = {"SERIALIZE": False}
