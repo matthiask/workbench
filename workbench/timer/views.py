@@ -110,7 +110,7 @@ def list_timestamps(request):
             "timestamps": [
                 {
                     "timestamp": "{:>5} {:^5} {}".format(
-                        local_date_format(slice.get("starts_at"), fmt="H:i"),
+                        local_date_format(slice.get("ends_at"), fmt="H:i"),
                         hours(slice.elapsed_hours, plus_sign=True)
                         if slice.elapsed_hours is not None
                         else "?",
