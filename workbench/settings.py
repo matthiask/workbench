@@ -20,6 +20,8 @@ ADMINS = MANAGERS = [("Matthias Kestenholz", "mk@feinheit.ch")]
 DEFAULT_FROM_EMAIL = SERVER_EMAIL = "workbench@workbench.feinheit.ch"
 BCC = env("BCC", default=[row[1] for row in MANAGERS])
 
+DEBUG_TOOLBAR = DEBUG and not TESTING
+
 INSTALLED_APPS = [
     a
     for a in [
@@ -55,7 +57,7 @@ INSTALLED_APPS = [
         "workbench.reporting",
         "workbench.services",
         "workbench.timer",
-        "debug_toolbar" if DEBUG else "",
+        "debug_toolbar" if DEBUG_TOOLBAR else "",
     ]
     if a
 ]
@@ -76,7 +78,7 @@ MIDDLEWARE = [
     m
     for m in [
         "django.middleware.security.SecurityMiddleware" if LIVE else "",
-        "debug_toolbar.middleware.DebugToolbarMiddleware" if DEBUG else "",
+        "debug_toolbar.middleware.DebugToolbarMiddleware" if DEBUG_TOOLBAR else "",
         "django.contrib.sessions.middleware.SessionMiddleware",
         "django.middleware.common.CommonMiddleware",
         "django.middleware.locale.LocaleMiddleware",
@@ -358,8 +360,6 @@ MAILCHIMP_API_KEY = env("MAILCHIMP_API_KEY", warn=True)
 MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID", warn=True)
 GLASSFROG_TOKEN = env("GLASSFROG_TOKEN", warn=True)
 
-FEATURES = defaultdict(lambda: True) if TESTING else WORKBENCH.FEATURES
-
 # Fine since it's only used for selected views
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r"^/create-timestamp/.*$"  # Better safe than sorry
@@ -376,3 +376,13 @@ if env("SQL", default=False):  # pragma: no cover
         "handlers": ["console"],
         "propagate": False,
     }
+
+FEATURES = WORKBENCH.FEATURES
+TEST_RUNNER = "django_slowtests.testrunner.DiscoverSlowestTestsRunner"
+TESTS_REPORT_TMP_FILES_PREFIX = "tmp/slowtests_"
+NUM_SLOW_TESTS = 20
+
+if TESTING:  # pragma: no cover
+    PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+    DATABASES["default"]["TEST"] = {"SERIALIZE": False}
+    FEATURES = defaultdict(lambda: True)

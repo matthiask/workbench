@@ -40,7 +40,7 @@ urlpatterns += i18n_patterns(
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
 )
 
-if settings.DEBUG:  # pragma: no cover
+if settings.DEBUG_TOOLBAR:  # pragma: no cover
     import debug_toolbar
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
