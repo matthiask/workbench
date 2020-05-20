@@ -14,6 +14,9 @@ from workbench.projects.models import Project
 from workbench.tools.formats import Z1, local_date_format
 
 
+TIMESTAMPS_DETECT_GAP = 300  # seconds
+
+
 class Slice(dict):
     @property
     def show_create_buttons(self):
@@ -172,7 +175,7 @@ class TimestampQuerySet(models.QuerySet):
             if previous is not None:
                 if slice.get("starts_at") and previous.get("ends_at"):
                     gap = (slice["starts_at"] - previous["ends_at"]).total_seconds()
-                    if gap > 300:
+                    if gap > TIMESTAMPS_DETECT_GAP:
                         result.append(
                             Slice(
                                 day=day,
