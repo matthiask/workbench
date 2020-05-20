@@ -104,11 +104,11 @@ class TimestampsTest(TestCase):
             type=Timestamp.STOP, created_at=today - dt.timedelta(minutes=80)
         )
 
-        t1 = user.timestamp_set.create(
+        # t1 =  # unused
+        user.timestamp_set.create(
             type=Timestamp.START, created_at=today, notes="Aaa",
         )
-        # t2 =  # unused
-        user.timestamp_set.create(
+        t2 = user.timestamp_set.create(
             type=Timestamp.STOP,
             created_at=today + dt.timedelta(minutes=40),
             notes="Bbb",
@@ -146,7 +146,7 @@ class TimestampsTest(TestCase):
                 (None, "", "07:40", ts2.pk, "", None),
                 (Decimal("0.4"), "07:40", "08:00", ts1.pk, "", None),
                 (Decimal("1.0"), "08:00", "09:00", None, "", "<detected>"),
-                (Decimal("0.7"), "09:00", "09:40", t1.pk, "Aaa; Bbb", None),
+                (Decimal("0.7"), "09:00", "09:40", t2.pk, "Aaa; Bbb", None),
                 (Decimal("0.4"), "09:40", "10:00", t3.pk, "", None),
                 (Decimal("1.0"), "10:00", "10:55", t4.pk, "", None),
                 (Decimal("0.5"), "10:55", "11:20", t5.pk, "", None),
@@ -156,33 +156,32 @@ class TimestampsTest(TestCase):
 
     def test_latest_logbook_entry(self):
         """Timestamps are automatically created for logged hours"""
-        today = timezone.now().replace(hour=9, minute=0, second=0, microsecond=0)
+        now = timezone.now()
         user = factories.UserFactory.create()
 
         self.assertEqual(Timestamp.objects.slices(user), [])
 
         user.timestamp_set.create(
-            type=Timestamp.START, created_at=today + dt.timedelta(minutes=0)
+            type=Timestamp.START, created_at=now - dt.timedelta(minutes=60)
         )
         l1 = factories.LoggedHoursFactory.create(
             rendered_by=user,
-            created_at=today + dt.timedelta(minutes=10),
+            created_at=now - dt.timedelta(minutes=10),
             description="ABC",
             hours=Decimal("0.2"),  # It was only ten minutes
         )
-        user.timestamp_set.create(
-            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=20)
-        )
+        user.timestamp_set.create(type=Timestamp.STOP, created_at=now)
 
         slices = Timestamp.objects.slices(user)
         self.assertEqual(len(slices), 3)
-        self.assertEqual(slices[0].elapsed_hours, Decimal("0.2"))
+        # 50 minutes - 2 * 0.1h = 38 minutes ==> 0.7h
+        self.assertEqual(slices[0].elapsed_hours, Decimal("0.7"))
         self.assertEqual(slices[1].elapsed_hours, Decimal("0.2"))
         self.assertEqual(slices[2].elapsed_hours, Decimal("0.2"))
 
-        self.assertTrue(slices[0].show_create_buttons)
-        self.assertFalse(slices[1].show_create_buttons)
-        self.assertTrue(slices[2].show_create_buttons)
+        self.assertTrue(slices[0].no_associated_log)
+        self.assertFalse(slices[1].no_associated_log)
+        self.assertTrue(slices[2].no_associated_log)
 
         self.assertEqual(l1, slices[1]["description"])
 
@@ -289,16 +288,19 @@ class TimestampsTest(TestCase):
         user.timestamp_set.create(
             type=Timestamp.START, created_at=timezone.now() - dt.timedelta(seconds=10)
         )
-        user.timestamp_set.create(type=Timestamp.STOP)
+        stop = user.timestamp_set.create(type=Timestamp.STOP)
+
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(len(slices), 1)
+        self.assertEqual(slices[0]["timestamp_id"], stop.id)
 
         response = self.client.get(
             "/list-timestamps/?user={}".format(user.signed_email)
         )
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        self.assertEqual(len(data["timestamps"]), 2)
+        self.assertEqual(len(data["timestamps"]), 1)
         self.assertEqual(data["timestamps"][0]["elapsed"], "0.1")
-        self.assertEqual(data["timestamps"][1]["elapsed"], None)
 
     def test_post_split(self):
         """Backwards compatibility: Type "split" still works"""
@@ -367,7 +369,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(len(slices), 3)
         self.assertEqual(slices[1].elapsed_hours, Decimal("2"))
 
-        self.assertTrue(slices[1].show_create_buttons)
+        self.assertTrue(slices[1].no_associated_log)
         self.assertIn("detected_ends_at", slices[1].hours_create_url)
 
         self.client.force_login(user)
@@ -407,7 +409,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(len(slices), 3)
         self.assertEqual(slices[1].elapsed_hours, Decimal("2"))
 
-        self.assertTrue(slices[1].show_create_buttons)
+        self.assertTrue(slices[1].no_associated_log)
         self.assertIn("detected_ends_at", slices[1].break_create_url)
 
         self.client.force_login(user)
@@ -444,7 +446,7 @@ class TimestampsTest(TestCase):
             ).is_valid()
         )
 
-    def test_start_with_start(self):
+    def test_start_with_log(self):
         """Test the behavior of a START timestamp with logged hours"""
         user = factories.UserFactory.create()
 
@@ -471,3 +473,26 @@ class TimestampsTest(TestCase):
         # timestamp created_at value)
         seconds = (timezone.now() - user.latest_created_at).total_seconds()
         self.assertTrue(seconds < 185)
+
+    def test_start_stop_log(self):
+        """A start and a stop with a log and still only one slice"""
+        user = factories.UserFactory.create()
+        t1 = user.timestamp_set.create(
+            type=Timestamp.START, created_at=timezone.now() - dt.timedelta(seconds=900),
+        )
+        t2 = user.timestamp_set.create(type=Timestamp.STOP)
+
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(len(slices), 1)
+        self.assertNotEqual(slices[0]["timestamp_id"], t1.pk)
+        self.assertEqual(slices[0]["timestamp_id"], t2.pk)
+        self.assertEqual(slices[0].elapsed_hours, Decimal("0.3"))
+
+        t2.logged_hours = factories.LoggedHoursFactory.create(
+            hours=Decimal("0.3"), rendered_by=user
+        )
+        t2.save()
+
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(len(slices), 1)
+        self.assertEqual(slices[0]["timestamp_id"], t2.pk)

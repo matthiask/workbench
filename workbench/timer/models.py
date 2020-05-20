@@ -19,7 +19,7 @@ TIMESTAMPS_DETECT_GAP = 300  # seconds
 
 class Slice(dict):
     @property
-    def show_create_buttons(self):
+    def no_associated_log(self):
         return not (self.get("logged_hours") or self.get("logged_break"))
 
     @property
@@ -36,7 +36,7 @@ class Slice(dict):
 
     @property
     def hours_create_url(self):
-        if not self.show_create_buttons:
+        if not self.no_associated_log:
             return None
 
         params = [
@@ -46,7 +46,7 @@ class Slice(dict):
         ]
         if self.get("timestamp_id"):
             params.append(("timestamp", self["timestamp_id"]))
-        elif self.show_create_buttons:
+        elif self.no_associated_log:
             params.append(("detected_ends_at", self["ends_at"]))
 
         return "{}?{}".format(
@@ -58,7 +58,7 @@ class Slice(dict):
 
     @property
     def break_create_url(self):
-        if not self.show_create_buttons:
+        if not self.no_associated_log:
             return None
 
         params = [
@@ -69,7 +69,7 @@ class Slice(dict):
         ]
         if self.get("timestamp_id"):
             params.append(("timestamp", self["timestamp_id"]))
-        elif self.show_create_buttons:
+        elif self.no_associated_log:
             params.append(("detected_ends_at", self["ends_at"]))
 
         return "{}?{}".format(
@@ -80,6 +80,36 @@ class Slice(dict):
 
 class TimestampQuerySet(models.QuerySet):
     def slices(self, user, *, day=None):
+        """
+        Create a list of slices from timestamps, logged hours and breaks
+
+        The algorithm works as follows:
+
+        1. Aggregate all timestamps into a list of ``Slice()`` objects. Slices
+        and unsaved timestamps are also generated from logged hours and breaks
+        without a timestamp linking them.
+            a. STOP timestamps' ``created_at`` field denotes the end of a slice.
+            b. START timestamps' ``created_at`` field denotes the start of a slice.
+            c. Timestamps having a logged hours object use the ``hours`` field
+               to either fill in the start of a slice (for STOP timestamps) or the
+               end of a slice (for START timestamps).
+            d. Breaks have a start and an end so those values are used directly
+            e. Logged hours without a timestamp are treated as STOP timestamps,
+               the ``created_at`` field of logged hours is treated as timestamp
+               creation date.
+        2. Merge overlapping slices or generate slices from gaps.
+            a. A START timestamp opening a slice is merged with the next slice
+               if the next timestamp wasn't a START and the START timestamp does
+               not have an associated logbook entry.
+            b. The overlap detection algorithm also takes logged hours into
+               account by comparing the start of subsequent slices to the
+               ``TIMESTAMPS_DETECT_GAP``.
+            c. If the gap between two slices is longer than
+               ``TIMESTAMPS_DETECT_GAP`` (300 seconds or 5 minutes) the algorithm
+               detects a missing gap.
+        3. Update the start and end of all slices now that slices have been merged
+           and/or detected.
+        """
         day = day or dt.date.today()
         entries = list(
             self.filter(user=user, created_at__date=day).select_related(
@@ -108,12 +138,9 @@ class TimestampQuerySet(models.QuerySet):
         )
         entries = sorted(entries, key=lambda timestamp: timestamp.created_at)
 
-        previous = None
+        # 1. Create slices
         slices = []
         for entry in entries:
-            if slices:
-                slices[-1].setdefault("ends_at", entry.created_at)
-
             slice = Slice(
                 day=day,
                 description=entry.logged_hours or entry.logged_break or entry.notes,
@@ -121,6 +148,7 @@ class TimestampQuerySet(models.QuerySet):
                 logged_break=entry.logged_break,
                 project_id=entry.project_id,
                 timestamp_id=entry.id,
+                is_start=entry.type == entry.START,
             )
 
             if entry.logged_break:
@@ -139,54 +167,72 @@ class TimestampQuerySet(models.QuerySet):
                         seconds=int(3600 * entry.logged_hours.hours)
                     )
 
-            if (
-                previous
-                and previous.type == previous.START
-                and not previous.logged_break
-                and not previous.logged_hours
-                and entry.type != entry.START
-                and slice.show_create_buttons
-            ):
-                slices[-1]["description"] = "; ".join(
-                    filter(None, (slices[-1]["description"], entry.notes))
-                )
-                previous = entry
-                continue
-
             slices.append(slice)
 
-            if previous:
-                slices[-1].setdefault("starts_at", previous.created_at)
-
-            previous = entry
-
-        if slices and slice != slices[-1]:
-            slices.append(slice)
-
-        if slices and not slices[-1].get("ends_at"):
-            if slices[-1]["logged_break"]:
-                slices[-1]["ends_at"] = slices[-1]["logged_break"].ends_at
-            elif slices[-1]["logged_hours"]:
-                slices[-1]["ends_at"] = slices[-1]["logged_hours"].created_at
-
+        # 2. Merge overlapping slices or generate slices from gaps
         previous = None
         result = []
         for slice in slices:
-            if previous is not None:
-                if slice.get("starts_at") and previous.get("ends_at"):
-                    gap = (slice["starts_at"] - previous["ends_at"]).total_seconds()
-                    if gap > TIMESTAMPS_DETECT_GAP:
-                        result.append(
-                            Slice(
-                                day=day,
-                                description="",
-                                comment=gettext("<detected>"),
-                                starts_at=previous["ends_at"],
-                                ends_at=slice["starts_at"],
-                            )
+            if previous is None:
+                result.append(slice)
+                previous = slice
+                continue
+
+            if (
+                previous["is_start"]
+                and previous.no_associated_log
+                and not slice["is_start"]
+            ):
+                if slice.no_associated_log:
+                    previous.update(
+                        {
+                            "timestamp_id": slice["timestamp_id"],
+                            "logged_hours": slice["logged_hours"],
+                            "logged_break": slice["logged_break"],
+                            "is_start": False,  # Not anymore
+                            "description": "; ".join(
+                                filter(
+                                    None,
+                                    [
+                                        str(previous["description"]),
+                                        str(slice["description"]),
+                                    ],
+                                )
+                            ),
+                            "ends_at": slice["ends_at"],
+                        }
+                    )
+                    previous = slice
+                    continue
+
+                else:
+                    gap = (slice["starts_at"] - previous["starts_at"]).total_seconds()
+                    if gap <= TIMESTAMPS_DETECT_GAP:
+                        result[-1] = slice
+                        previous = slice
+                        continue
+
+            if slice.get("starts_at") and previous.get("ends_at"):
+                gap = (slice["starts_at"] - previous["ends_at"]).total_seconds()
+                if gap > TIMESTAMPS_DETECT_GAP:
+                    result.append(
+                        Slice(
+                            day=day,
+                            description="",
+                            comment=gettext("<detected>"),
+                            starts_at=previous["ends_at"],
+                            ends_at=slice["starts_at"],
+                            is_start=False,
                         )
+                    )
+
             result.append(slice)
             previous = slice
+
+        # 3. Fill in boundaries
+        for previous, slice in zip(result, result[1:]):
+            boundary = previous.get("ends_at") or slice.get("starts_at")
+            slice["starts_at"] = previous["ends_at"] = boundary
 
         return result
 
