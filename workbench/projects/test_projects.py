@@ -597,3 +597,30 @@ class ProjectsTest(TestCase):
             project.status_badge,
             '<span class="badge badge-light">Order, closed on 31.12.2019</span>',
         )
+
+    def test_initialize_customer_contact(self):
+        """Initialize customer and/or contact using query parameters"""
+        person = factories.PersonFactory(
+            organization=factories.OrganizationFactory.create()
+        )
+
+        self.client.force_login(person.primary_contact)
+
+        self.assertEqual(
+            self.client.get(Project.urls["create"] + "?customer=0").status_code, 200
+        )
+        self.assertEqual(
+            self.client.get(Project.urls["create"] + "?contact=0").status_code, 200
+        )
+
+        response = self.client.get(
+            Project.urls["create"] + "?customer={}".format(person.organization_id)
+        )
+        self.assertContains(response, 'value="{}"'.format(person.organization))
+        self.assertNotContains(response, 'value="{}"'.format(person))
+
+        response = self.client.get(
+            Project.urls["create"] + "?contact={}".format(person.id)
+        )
+        self.assertContains(response, 'value="{}"'.format(person.organization))
+        self.assertContains(response, 'value="{}"'.format(person))

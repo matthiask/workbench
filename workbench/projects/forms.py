@@ -147,6 +147,22 @@ class ProjectForm(ModelForm):
                     }
                 )
 
+        elif request.GET.get("contact"):
+            try:
+                contact = Person.objects.get(pk=request.GET.get("contact"))
+            except (Person.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update({"customer": contact.organization, "contact": contact})
+
+        elif request.GET.get("customer"):
+            try:
+                customer = Organization.objects.get(pk=request.GET.get("customer"))
+            except (Organization.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update({"customer": customer})
+
         super().__init__(*args, **kwargs)
         self.fields["type"].choices = Project.TYPE_CHOICES
         if not self.request.user.features[FEATURES.CONTROLLING]:
