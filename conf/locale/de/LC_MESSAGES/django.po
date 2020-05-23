@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-23 09:49+0200\n"
+"POT-Creation-Date: 2020-05-23 12:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1069,6 +1069,7 @@ msgstr "hoch"
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/invoices/reminders.html
+#: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/declined_deals.html
 #: workbench/templates/reporting/overdrawn_projects.html
 msgid "customer"
@@ -1078,6 +1079,7 @@ msgstr "Kundschaft"
 #: workbench/projects/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/projects/project_detail.html
 msgid "contact"
 msgstr "Kontakt"
 
@@ -1472,6 +1474,7 @@ msgstr "Leistungen"
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/overdrawn_projects.html
 #: workbench/templates/reporting/project_budget_statistics.html
@@ -1518,6 +1521,7 @@ msgstr "Anzahlungstotal"
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
+#: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/key_data_third_party_costs.html
 #: workbench/templates/reporting/labor_costs.html
@@ -1729,6 +1733,7 @@ msgstr "Kosten"
 #: workbench/invoices/views.py workbench/logbook/__init__.py
 #: workbench/templates/base.html
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html
 #: workbench/timer/models.py
 msgid "logbook"
@@ -1938,6 +1943,7 @@ msgid "earned"
 msgstr "Verdient"
 
 #: workbench/management/commands/profitability.py
+#: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "invoiced"
 msgstr "Verrechnet"
@@ -1959,8 +1965,8 @@ msgid "note"
 msgstr "Bemerkung"
 
 #: workbench/offers/__init__.py workbench/offers/models.py
-#: workbench/templates/base.html workbench/templates/shortcuts.html
-#: workbench/templates/start.html
+#: workbench/templates/projects/object_list.html
+#: workbench/templates/shortcuts.html workbench/templates/start.html
 msgid "offers"
 msgstr "Offerten"
 
@@ -2053,10 +2059,20 @@ msgid "Copy %s to project"
 msgstr "%s zu Projekt kopieren"
 
 #: workbench/projects/__init__.py workbench/projects/models.py
-#: workbench/templates/base.html workbench/templates/projects/object_list.html
+#: workbench/templates/base.html
+#: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/object_list.html
 #: workbench/templates/shortcuts.html workbench/tools/xlsx.py
 msgid "projects"
 msgstr "Projekte"
+
+#: workbench/projects/forms.py
+msgid ""
+"Projects are linked with this campaign. They will be released when deleting "
+"this campaign."
+msgstr ""
+"Projekte sind mit dieser Kampagne verbunden. Die Verbindung wird aufgelöst, "
+"wenn diese Kampagne gelöscht wird."
 
 #: workbench/projects/forms.py
 msgid "Defined search"
@@ -2153,6 +2169,7 @@ msgid "Codes must be unique."
 msgstr "Codes müssen eindeutig sein."
 
 #: workbench/projects/models.py
+#: workbench/templates/projects/project_detail.html
 msgid "campaign"
 msgstr "Kampagne"
 
@@ -2393,6 +2410,7 @@ msgstr "Suchformular zurücksetzen"
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/notes/widget.html
+#: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_detail.html
 msgid "Update"
 msgstr "Bearbeiten"
@@ -2409,6 +2427,7 @@ msgstr "Bearbeiten"
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/notes/note_form.html
+#: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_detail.html
 msgid "Delete"
 msgstr "Löschen"
@@ -2570,6 +2589,7 @@ msgid "Gross profit"
 msgstr "Umsatz"
 
 #: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/projects/campaign_detail.html
 msgid "Gross margin / hour"
 msgstr "Umsatz bereinigt / Stunde"
 
@@ -2706,6 +2726,7 @@ msgstr "Total exkl. MwSt."
 
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_detail.html
 msgid "Copy"
 msgstr "Kopieren"
@@ -2823,6 +2844,25 @@ msgstr "Erstellt"
 msgid "Hours per week"
 msgstr "Stunden pro Woche"
 
+#: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "offered"
+msgstr "Offeriert"
+
+#: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/xlsx.py
+msgid "Not archived"
+msgstr "Nicht archiviert"
+
+#: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_statistics.html
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "undefined rate"
+msgstr "ohne Stundensatz"
+
 #: workbench/templates/projects/project_detail.html
 msgid "Hours"
 msgstr "Stunden"
@@ -2834,18 +2874,6 @@ msgstr "Kosten"
 #: workbench/templates/projects/project_detail.html
 msgid "Total costs"
 msgstr "Gesamtkosten"
-
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/projects/project_statistics.html
-#: workbench/templates/reporting/project_budget_statistics.html
-msgid "undefined rate"
-msgstr "ohne Stundensatz"
-
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/project_budget_statistics.html
-#: workbench/tools/xlsx.py
-msgid "Not archived"
-msgstr "Nicht archiviert"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Project offers"
@@ -3049,10 +3077,6 @@ msgstr "Durchschnitt"
 #: workbench/templates/reporting/logging.html
 msgid "Days with insufficient breaks"
 msgstr "Tage mit zuwenig Pausenzeit"
-
-#: workbench/templates/reporting/project_budget_statistics.html
-msgid "offered"
-msgstr "Offeriert"
 
 #: workbench/templates/reporting/work_anniversaries.html
 msgid "Started on"
