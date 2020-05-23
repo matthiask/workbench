@@ -114,6 +114,27 @@ class CampaignForm(ModelForm):
         super().__init__(*args, **kwargs)
 
 
+class CampaignDeleteForm(ModelForm):
+    class Meta:
+        model = Campaign
+        fields = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.projects.exists():
+            self.add_warning(
+                _(
+                    "Projects are linked with this campaign."
+                    " They will be released when deleting this campaign."
+                ),
+                code="release-projects",
+            )
+
+    def delete(self):
+        self.instance.projects.update(campaign=None)
+        self.instance.delete()
+
+
 class ProjectSearchForm(Form):
     q = forms.CharField(
         required=False,

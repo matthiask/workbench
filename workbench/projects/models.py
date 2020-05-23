@@ -77,6 +77,10 @@ class Campaign(Model):
 
     save.alters_data = True
 
+    @classmethod
+    def allow_delete(cls, instance, request):
+        return None
+
     @cached_property
     def statistics(self):
         from workbench.reporting.project_budget_statistics import (

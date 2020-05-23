@@ -12,6 +12,7 @@ from workbench.offers.forms import OfferForm
 from workbench.offers.models import Offer
 from workbench.offers.views import ProjectOfferPDFView
 from workbench.projects.forms import (
+    CampaignDeleteForm,
     CampaignForm,
     CampaignSearchForm,
     ProjectForm,
@@ -77,7 +78,9 @@ urlpatterns = [
     ),
     re_path(
         r"^campaigns/(?P<pk>\d+)/delete/$",
-        generic.DeleteView.as_view(model=Campaign),
+        generic.DeleteView.as_view(
+            model=Campaign, delete_form_class=CampaignDeleteForm
+        ),
         name="projects_campaign_delete",
     ),
     # Projects

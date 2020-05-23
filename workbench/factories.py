@@ -15,7 +15,7 @@ from workbench.deals.models import AttributeGroup, ClosingType, Deal, ValueType
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
-from workbench.projects.models import Project, Service
+from workbench.projects.models import Campaign, Project, Service
 from workbench.reporting.models import CostCenter
 from workbench.services.models import ServiceType
 
@@ -125,6 +125,15 @@ class PostalAddressFactory(factory.DjangoModelFactory):
 
 
 # PROJECTS ####################################################################
+class CampaignFactory(factory.DjangoModelFactory):
+    customer = factory.SubFactory(OrganizationFactory)
+    owned_by = factory.SubFactory(UserFactory)
+    title = factory.Sequence(lambda n: "Campaign %d" % n)
+
+    class Meta:
+        model = Campaign
+
+
 class ProjectFactory(factory.DjangoModelFactory):
     customer = factory.SubFactory(OrganizationFactory)
     contact = factory.LazyAttribute(
