@@ -16,7 +16,7 @@ from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
-from workbench.projects.models import Project
+from workbench.projects.models import Campaign, Project
 from workbench.tools.history import HISTORY, changes
 from workbench.tools.validation import in_days
 
@@ -130,9 +130,12 @@ def search(request):
     if q:
         sources = [
             Project.objects.select_related("owned_by"),
-            Organization.objects.all(),
-            Person.objects.active(),
         ]
+        if request.user.features[FEATURES.CAMPAIGNS]:
+            sources.append(Campaign.objects.select_related("owned_by"))
+        sources.extend(
+            [Organization.objects.all(), Person.objects.active()]
+        )
         if request.user.features[FEATURES.CONTROLLING]:
             sources.extend(
                 [
