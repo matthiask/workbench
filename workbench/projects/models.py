@@ -1,6 +1,7 @@
 import datetime as dt
 from collections import defaultdict
 from decimal import Decimal
+from functools import total_ordering
 
 from django.contrib import messages
 from django.db import models
@@ -89,6 +90,7 @@ class Campaign(Model):
             if overall["hours"]
             else None
         )
+        pbs["statistics"] = sorted(pbs["statistics"], key=lambda s: s["project"])
         return pbs
 
 
@@ -155,6 +157,7 @@ class ProjectQuerySet(SearchQuerySet):
 
 
 @model_urls
+@total_ordering
 class Project(Model):
     ORDER = "order"
     MAINTENANCE = "maintenance"
@@ -237,6 +240,9 @@ class Project(Model):
             self.title,
             self.owned_by.get_short_name(),
         )
+
+    def __lt__(self, other):
+        return self.id < other.id if isinstance(other, Project) else 1
 
     @property
     def code(self):
