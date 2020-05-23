@@ -55,7 +55,7 @@ def _do_deploy(c, folder, rsync):
 
 def _restart_all(c):
     for wb in installations:
-        c.run("systemctl --user restart workbench@{}".format(wb))
+        c.run("systemctl --user restart workbench@{}".format(wb), echo=True)
 
 
 @task
