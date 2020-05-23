@@ -82,10 +82,11 @@ class Campaign(Model):
             project_budget_statistics,
         )
 
-        pbs = project_budget_statistics(self.projects.all())["overall"]
-        pbs["gross_margin_per_hour"] = (
-            (pbs["invoiced"] - pbs["third_party_costs"]) / pbs["hours"]
-            if pbs["hours"]
+        pbs = project_budget_statistics(self.projects.all())
+        overall = pbs["overall"]
+        overall["gross_margin_per_hour"] = (
+            (overall["invoiced"] - overall["third_party_costs"]) / overall["hours"]
+            if overall["hours"]
             else None
         )
         return pbs

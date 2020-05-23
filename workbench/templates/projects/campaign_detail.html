@@ -9,7 +9,7 @@
 <div class="col-md-8">
   <h1>{{ object|h }} {% history_link object %}</h1>
 
-  <table class="table table-striped">
+  <table class="table">
     {% for name, value in object|field_value_pairs %}
     <tr>
       <th class="text-right">{{ name }}</th>
@@ -20,9 +20,67 @@
     <tr>
       <th class="text-right">{% trans 'projects'|capfirst %}</th>
       <td>
-        {% for project in object.projects.all %}
-          {% link_or_none project with_badge=True %}
-        {% endfor %}
+
+        {% if request.user|has_feature:FEATURES.CONTROLLING %}
+          {% with statistics=object.statistics %}
+          <table class="table table-sm table-hover">
+            <thead class="sticky">
+              <tr>
+                <th>{% trans 'project'|capfirst %}</th>
+                <th class="text-right">{% trans 'offered'|capfirst %}</th>
+                <th class="text-right">{% trans 'logbook'|capfirst %}</th>
+                <th class="text-right">{% trans 'third party costs'|capfirst %}</th>
+                <th class="text-right">{% trans 'invoiced'|capfirst %}</th>
+                <th class="text-right">{% trans 'Not archived' %}</th>
+                <th class="text-right">&Delta;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th></th>
+                <th class="text-right">{{ statistics.overall.offered|currency }}</th>
+                <th class="text-right">{{ statistics.overall.logbook|currency }}</th>
+                <th class="text-right">{{ statistics.overall.third_party_costs|currency }}</th>
+                <th class="text-right">{{ statistics.overall.invoiced|currency }}</th>
+                <th class="text-right text-nowrap">
+                  {{ statistics.overall.not_archived|hours }} / {{ statistics.overall.hours|hours }}
+                  {% pie statistics.overall.not_archived statistics.overall.hours %}
+                </th>
+                <th class="text-right">
+                  {{ statistics.overall.delta_positive|currency:True }}<br>
+                  {{ statistics.overall.delta_negative|currency:True }}
+                </th>
+              </tr>
+              {% for project in statistics.statistics %}
+                <tr>
+                  <td>{% link_or_none project.project with_badge=True %}</td>
+                  <td class="text-right {% if not project.offered %}text-black-30{% endif %}">{{ project.offered|currency }}</td>
+                  <td class="text-right text-nowrap {% if not project.logbook and not project.effort_hours_with_rate_undefined %}text-black-30{% endif %}">
+                    {{ project.logbook|currency }}
+                    {% if project.effort_hours_with_rate_undefined %}
+                    <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.effort_hours_with_rate_undefined|hours }})</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-right {% if not project.third_party_costs %}text-black-30{% endif %}">{{ project.third_party_costs|currency }}</td>
+                  <td class="text-right {% if not project.invoiced %}text-black-30{% endif %}">{{ project.invoiced|currency }}</td>
+                  <td class="text-right text-nowrap">
+                    {{ project.not_archived|hours }} / {{ project.hours|hours }}
+                    {% pie project.not_archived project.hours %}
+                  </td>
+                  <td class="text-right {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% endwith %}
+          <strong>{% trans 'Gross margin / hour' %}:</strong>
+          {{ object.statistics.overall.gross_margin_per_hour|currency }}
+        {% else %}
+          {% for project in object.projects.all %}
+            {% link_or_none project with_badge=True %}
+          {% endfor %}
+        {% endif %}
+
       </td>
     </tr>
   </table>
@@ -34,49 +92,5 @@
     {% trans 'Delete' %}
   </a>
 </div>
-</div>
-
-<div class="row mt-5">
-
-  {% if request.user|has_feature:FEATURES.CONTROLLING %}
-    <div class="col-md-6 col-lg-3">
-      <div class="card mb-3">
-        <div class="card-header"><h3 class="my-0">{% trans 'Statistics' %}</h3></div>
-
-        <div class="card-body">
-          <table class="table table-sm">
-            <tr>
-              <th class="text-right">
-                <a href="{% url 'offers_offer_list' %}?org={{ object.pk }}&amp;s=all">{% trans 'Offered' %}</a>
-              </th>
-              <td>{{ object.statistics.offered|currency }}</td>
-            </tr>
-            <tr>
-              <th class="text-right">
-                <a href="{% url 'invoices_invoice_list' %}?org={{ object.pk }}">{% trans 'Gross profit' %}</a>
-              </th>
-              <td>{{ object.statistics.invoiced|currency }}</td>
-            </tr>
-            <tr>
-              <th class="text-right">{% trans 'third party costs'|capfirst %}</th>
-              <td>{{ object.statistics.third_party_costs|currency }}</td>
-            </tr>
-            <tr>
-              <th class="text-right">
-                <a href="{% url 'logbook_loggedhours_list' %}?organization={{ object.pk }}">{% trans 'logged hours'|capfirst %}</a>
-              </th>
-              <td>{{ object.statistics.hours|hours }}</td>
-            </tr>
-            <tr>
-              <th class="text-right">{% trans 'Gross margin / hour' %}</th>
-              <td>{{ object.statistics.gross_margin_per_hour|currency }}</td>
-            </tr>
-          </table>
-        </div>
-
-      </div>
-    </div>
-  {% endif %}
-
 </div>
 {% endblock %}
