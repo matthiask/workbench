@@ -1,0 +1,23 @@
+{% extends "projects/object_list.html" %}
+
+{% load bootstrap4 i18n workbench %}
+
+{% block objects %}
+<div class="list-group list-group-flush">
+  {% for campaign in object_list %}
+  <div class="list-group-item px-0">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">
+        <a href="{{ campaign.get_absolute_url }}">{{ campaign|h }}</a>
+      </h5>
+      {{ campaign.status_badge }}
+    </div>
+    <div class="d-flex w-100 justify-content-between">
+      <p class="mb-1">
+        <a href="{{ campaign.customer.get_absolute_url }}">{{ campaign.customer }}</a>
+      </p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

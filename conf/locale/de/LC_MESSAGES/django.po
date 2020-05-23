@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-13 16:34+0200\n"
+"POT-Creation-Date: 2020-05-23 09:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -398,7 +398,8 @@ msgstr "Wird nur für die Visualisierung der Abwesenheiten verwendet."
 #: workbench/invoices/models.py workbench/invoices/views.py
 #: workbench/logbook/forms.py workbench/logbook/models.py
 #: workbench/notes/models.py workbench/offers/models.py
-#: workbench/services/models.py workbench/templates/awt/absence_detail.html
+#: workbench/projects/models.py workbench/services/models.py
+#: workbench/templates/awt/absence_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -1465,6 +1466,8 @@ msgstr "Leistungen"
 
 #: workbench/invoices/models.py workbench/offers/models.py
 #: workbench/projects/models.py
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/contacts/person_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -2050,8 +2053,8 @@ msgid "Copy %s to project"
 msgstr "%s zu Projekt kopieren"
 
 #: workbench/projects/__init__.py workbench/projects/models.py
-#: workbench/templates/base.html workbench/templates/shortcuts.html
-#: workbench/tools/xlsx.py
+#: workbench/templates/base.html workbench/templates/projects/object_list.html
+#: workbench/templates/shortcuts.html workbench/tools/xlsx.py
 msgid "projects"
 msgstr "Projekte"
 
@@ -2148,6 +2151,14 @@ msgstr "Dieses Feld ist zwingend erforderlich."
 #: workbench/projects/forms.py
 msgid "Codes must be unique."
 msgstr "Codes müssen eindeutig sein."
+
+#: workbench/projects/models.py
+msgid "campaign"
+msgstr "Kampagne"
+
+#: workbench/projects/models.py workbench/templates/projects/object_list.html
+msgid "campaigns"
+msgstr "Kampagnen"
 
 #: workbench/projects/models.py workbench/templates/profile.html
 msgid "Order"

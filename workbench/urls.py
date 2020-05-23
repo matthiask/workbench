@@ -22,7 +22,6 @@ urlpatterns = [
     re_path(r"^contacts/", include("workbench.contacts.urls")),
     re_path(r"^logbook/", include("workbench.logbook.urls")),
     re_path(r"^absences/", include("workbench.awt.urls")),
-    re_path(r"^offers/", include("workbench.offers.urls")),
     re_path(r"^projects/", include("workbench.projects.urls")),
     re_path(r"^invoices/", include("workbench.invoices.urls")),
     re_path(r"^recurring-invoices/", include("workbench.invoices.recurring_urls")),

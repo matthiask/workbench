@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from workbench import factories
+from workbench.contacts.models import Organization
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.tools.forms import WarningsForm
@@ -21,7 +22,7 @@ class ProjectsTest(TestCase):
         )
 
         response = self.client.post(
-            "/projects/create/",
+            Project.urls["create"],
             {
                 # "customer": person.organization.pk,  automatic
                 "contact": person.pk,
@@ -94,7 +95,7 @@ class ProjectsTest(TestCase):
         service1.loggedcosts.create(created_by=user, rendered_by=user, cost=10)
 
         response = self.client.post(
-            "/projects/service/set-order/", {"ids[]": [service2.id, service1.id]}
+            Service.urls["set_order"], {"ids[]": [service2.id, service1.id]}
         )
         self.assertEqual(response.status_code, 202)
         self.assertEqual(list(project.services.all()), [service2, service1])
@@ -211,7 +212,7 @@ class ProjectsTest(TestCase):
         self.client.force_login(user)
 
         response = self.client.post(
-            "/projects/create/",
+            Project.urls["create"],
             {"title": "Test project", "owned_by": user.pk, "type": Project.INTERNAL},
         )
         self.assertEqual(response.status_code, 200)
@@ -226,7 +227,7 @@ class ProjectsTest(TestCase):
         )
 
         response = self.client.post(
-            "/projects/create/",
+            Project.urls["create"],
             {
                 "customer": org.pk,
                 "contact": person.pk,
@@ -240,7 +241,7 @@ class ProjectsTest(TestCase):
             dict(response.context_data["form"].errors),
             {
                 "contact": [
-                    "The contact Vorname Nachname / The Organization Ltd"
+                    "The contact Vorname Nachname"
                     " does not belong to The Organization Ltd."
                 ]
             },
@@ -252,7 +253,7 @@ class ProjectsTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        code = check_code(self, "/projects/")
+        code = check_code(self, Project.urls["list"])
         code("")
         code("q=test")
         code("s=all")
@@ -276,8 +277,8 @@ class ProjectsTest(TestCase):
         """Invalid filter form redirect test"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
-        response = self.client.get("/projects/?org=0")
-        self.assertRedirects(response, "/projects/?error=1")
+        response = self.client.get(Project.urls["list"] + "?org=0")
+        self.assertRedirects(response, Project.urls["list"] + "?error=1")
         self.assertEqual(messages(response), ["Search form was invalid."])
 
     def test_autocomplete(self):
@@ -286,11 +287,11 @@ class ProjectsTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        response = self.client.get("/contacts/organizations/autocomplete/")
+        response = self.client.get(Organization.urls["autocomplete"])
         self.assertEqual(response.json(), {"results": []})
-        response = self.client.get("/contacts/organizations/autocomplete/?q=")
+        response = self.client.get(Organization.urls["autocomplete"] + "?q=")
         self.assertEqual(response.json(), {"results": []})
-        response = self.client.get("/contacts/organizations/autocomplete/?q=Orga")
+        response = self.client.get(Organization.urls["autocomplete"] + "?q=Orga")
         self.assertEqual(
             response.json(),
             {
@@ -301,12 +302,14 @@ class ProjectsTest(TestCase):
         )
 
         self.assertEqual(
-            self.client.get("/projects/autocomplete/?q=proj").json(),
+            self.client.get(Project.urls["autocomplete"] + "?q=proj").json(),
             {"results": [{"label": str(project), "value": project.id}]},
         )
 
         self.assertEqual(
-            self.client.get("/projects/autocomplete/?q=proj&only_open=on").json(),
+            self.client.get(
+                Project.urls["autocomplete"] + "?q=proj&only_open=on"
+            ).json(),
             {"results": []},
         )
 
@@ -424,7 +427,10 @@ class ProjectsTest(TestCase):
             project.urls["select"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertContains(
-            response, 'data-autocomplete-url="/projects/autocomplete/?only_open=on"'
+            response,
+            'data-autocomplete-url="{}?only_open=on"'.format(
+                Project.urls["autocomplete"]
+            ),
         )
 
         response = self.client.post(

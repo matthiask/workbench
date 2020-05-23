@@ -29,7 +29,7 @@ from workbench.invoices.models import (
 )
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
-from workbench.projects.models import Project, Service as ProjectService
+from workbench.projects.models import Campaign, Project, Service as ProjectService
 from workbench.reporting.models import CostCenter
 from workbench.tools.formats import local_date_format
 
@@ -331,6 +331,15 @@ def _offers_offer_cfg(user):
     return {"fields": fields}
 
 
+def _projects_campaign_cfg(user):
+    if not user.features[FEATURES.CAMPAIGNS]:
+        raise Http404
+    return {
+        "fields": {"customer", "title", "description", "owned_by"},
+        "related": [(Project, "campaign_id")],
+    }
+
+
 def _projects_project_cfg(user):
     fields = {
         "customer",
@@ -346,6 +355,8 @@ def _projects_project_cfg(user):
     if user.features[FEATURES.CONTROLLING]:
         related = [(Offer, "project_id"), (ProjectService, "project_id")]
         fields |= {"flat_rate"}
+    if user.features[FEATURES.CAMPAIGNS]:
+        fields |= {"campaign"}
     if user.features[FEATURES.LABOR_COSTS]:
         fields |= {"cost_center"}
     return {"fields": fields, "related": related}
@@ -444,6 +455,7 @@ HISTORY = {
     LoggedCost: _logbook_loggedcost_cfg,
     LoggedHours: _logbook_loggedhours_cfg,
     Offer: _offers_offer_cfg,
+    Campaign: _projects_campaign_cfg,
     Project: _projects_project_cfg,
     ProjectService: _projects_service_cfg,
     CostCenter: _reporting_costcenter_cfg,

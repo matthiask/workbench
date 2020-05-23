@@ -20,6 +20,77 @@ from workbench.tools.urls import model_urls
 from workbench.tools.validation import in_days, raise_if_errors
 
 
+class CampaignQuerySet(SearchQuerySet):
+    def open(self):
+        return self.filter(
+            Q(
+                id__in=Project.objects.open()
+                .filter(campaign__isnull=False)
+                .values("campaign")
+            )
+        )
+
+    def closed(self):
+        return self.filter(
+            ~Q(
+                id__in=Project.objects.open()
+                .filter(campaign__isnull=False)
+                .values("campaign")
+            )
+        )
+
+
+@model_urls
+class Campaign(Model):
+    customer = models.ForeignKey(
+        Organization, on_delete=models.PROTECT, verbose_name=_("customer")
+    )
+    title = models.CharField(_("title"), max_length=200)
+    description = models.TextField(_("description"), blank=True)
+    owned_by = models.ForeignKey(
+        User, on_delete=models.PROTECT, verbose_name=_("responsible")
+    )
+    _fts = models.TextField(editable=False, blank=True)
+
+    objects = CampaignQuerySet.as_manager()
+
+    class Meta:
+        ordering = ["-id"]
+        verbose_name = _("campaign")
+        verbose_name_plural = _("campaigns")
+
+    def __str__(self):
+        return "%s %s - %s" % (self.code, self.title, self.owned_by.get_short_name())
+
+    def __html__(self):
+        return format_html(
+            "<small>{}</small> {} - {}",
+            self.code,
+            self.title,
+            self.owned_by.get_short_name(),
+        )
+
+    def save(self, *args, **kwargs):
+        self._fts = " ".join(str(part) for part in [self.code, self.customer.name])
+        super().save(*args, **kwargs)
+
+    save.alters_data = True
+
+    @cached_property
+    def statistics(self):
+        from workbench.reporting.project_budget_statistics import (
+            project_budget_statistics,
+        )
+
+        pbs = project_budget_statistics(self.projects.all())["overall"]
+        pbs["gross_margin_per_hour"] = (
+            (pbs["invoiced"] - pbs["third_party_costs"]) / pbs["hours"]
+            if pbs["hours"]
+            else None
+        )
+        return pbs
+
+
 class ProjectQuerySet(SearchQuerySet):
     def open(self, *, on=None):
         return (
@@ -137,6 +208,14 @@ class Project(Model):
         blank=True,
         null=True,
         verbose_name=_("cost center"),
+        related_name="projects",
+    )
+    campaign = models.ForeignKey(
+        Campaign,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        verbose_name=_("campaign"),
         related_name="projects",
     )
 

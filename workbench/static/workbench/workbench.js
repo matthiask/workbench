@@ -181,7 +181,7 @@ $(function () {
       window.location.href = restoreSearch("/projects/")
     } else if (e.keyCode === 79) {
       // o
-      window.location.href = restoreSearch("/offers/")
+      window.location.href = restoreSearch("/projects/offers/")
     } else if (e.keyCode === 82) {
       // r
       window.location.href = restoreSearch("/invoices/")

@@ -22,7 +22,7 @@
               {{ project.status_badge }}
             </div>
             <div class="d-flex w-100 justify-content-between">
-              <p class="mb-1">{{ project.contact|default:project.customer }}</p>
+              <p class="mb-1">{{ project.contact.name_with_organization|default:project.customer }}</p>
               <small>
                 <a href="{{ project.urls.createhours }}" data-toggle="ajaxmodal">
                   +{% trans 'hours' %}

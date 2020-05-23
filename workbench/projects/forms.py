@@ -9,10 +9,109 @@ from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.circles.models import Role
 from workbench.contacts.models import Organization, Person
-from workbench.projects.models import Project, Service
+from workbench.projects.models import Campaign, Project, Service
 from workbench.services.models import ServiceType
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
 from workbench.tools.validation import in_days
+
+
+class CampaignSearchForm(Form):
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": _("Search")}
+        ),
+        label="",
+    )
+    s = forms.ChoiceField(
+        choices=[
+            ("", _("All")),
+            (capfirst(_("status")), [("open", _("Open")), ("closed", _("Closed"))]),
+        ],
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
+    )
+    org = forms.ModelChoiceField(
+        queryset=Organization.objects.all(),
+        required=False,
+        widget=Autocomplete(model=Organization),
+        label="",
+    )
+    owned_by = forms.TypedChoiceField(
+        coerce=int,
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["owned_by"].choices = User.objects.choices(
+            collapse_inactive=True, myself=True
+        )
+
+    def filter(self, queryset):
+        data = self.cleaned_data
+        queryset = queryset.search(data.get("q"))
+        if data.get("s") == "open":
+            queryset = queryset.open()
+        elif data.get("s") == "closed":
+            queryset = queryset.closed()
+        queryset = self.apply_renamed(queryset, "org", "customer")
+        queryset = self.apply_simple(queryset, "type")
+        queryset = self.apply_owned_by(queryset)
+        return queryset.select_related("customer", "owned_by")
+
+
+class CampaignForm(ModelForm):
+    user_fields = default_to_current_user = ("owned_by",)
+
+    class Meta:
+        model = Campaign
+        fields = (
+            "customer",
+            "title",
+            "description",
+            "owned_by",
+        )
+        widgets = {
+            "customer": Autocomplete(model=Organization),
+            "description": Textarea,
+        }
+
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.setdefault("initial", {})
+        request = kwargs["request"]
+
+        if request.GET.get("copy"):
+            try:
+                campaign = Campaign.objects.get(pk=request.GET["copy"])
+            except (Campaign.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update(
+                    {
+                        "customer": campaign.customer_id,
+                        "title": campaign.title,
+                        "description": campaign.description,
+                        "owned_by": (
+                            campaign.owned_by_id
+                            if campaign.owned_by.is_active
+                            else request.user.id
+                        ),
+                    }
+                )
+
+        elif request.GET.get("customer"):
+            try:
+                customer = Organization.objects.get(pk=request.GET.get("customer"))
+            except (Organization.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update({"customer": customer})
+
+        super().__init__(*args, **kwargs)
 
 
 class ProjectSearchForm(Form):
@@ -109,6 +208,7 @@ class ProjectForm(ModelForm):
             "customer",
             "title",
             "description",
+            "campaign",
             "cost_center",
             "owned_by",
             "type",
@@ -118,6 +218,7 @@ class ProjectForm(ModelForm):
         widgets = {
             "customer": Autocomplete(model=Organization),
             "contact": Autocomplete(model=Person),
+            "campaign": Autocomplete(model=Campaign),
             "description": Textarea,
             "type": forms.RadioSelect,
         }
@@ -163,10 +264,16 @@ class ProjectForm(ModelForm):
             else:
                 initial.update({"customer": customer})
 
+        for field in ["cost_center", "campaign"]:
+            if request.GET.get(field):
+                initial[field] = request.GET.get(field)
+
         super().__init__(*args, **kwargs)
         self.fields["type"].choices = Project.TYPE_CHOICES
         if not self.request.user.features[FEATURES.CONTROLLING]:
             self.fields.pop("flat_rate")
+        if not self.request.user.features[FEATURES.CAMPAIGNS]:
+            self.fields.pop("campaign")
         if not self.request.user.features[FEATURES.LABOR_COSTS]:
             self.fields.pop("cost_center")
         if self.instance.pk:

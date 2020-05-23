@@ -27,7 +27,7 @@
             {{ object.status_badge }}
           </div>
           <div class="row">
-            <div class="col-md-9">{% firstof object.contact object.customer %}</div>
+            <div class="col-md-9">{{ object.contact.name_with_organization|default:object.customer }}</div>
             <div class="col-md-3 text-md-right">{{ object.value|currency }}</div>
           </div>
         </a>

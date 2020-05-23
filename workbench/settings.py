@@ -205,6 +205,7 @@ WORKBENCH = {
         URL="https://workbench.feinheit.ch",
         FEATURES={
             "bookkeeping": {"jg@feinheit.ch", "mk@feinheit.ch"},
+            "campaigns": True,
             "controlling": True,
             "deals": True,
             "foreign_currencies": False,
@@ -242,6 +243,7 @@ WORKBENCH = {
         URL="https://workbench.diebruchpiloten.com",
         FEATURES={
             "bookkeeping": True,
+            "campaigns": False,
             "controlling": True,
             "deals": False,
             "foreign_currencies": False,
@@ -285,6 +287,7 @@ WORKBENCH = {
                 "frederic@blindflugstudios.com",
                 "mk@feinheit.ch",
             },
+            "campaigns": False,
             "controlling": {
                 "moritz@blindflugstudios.com",
                 "jeremy@blindflugstudios.com",
@@ -330,6 +333,7 @@ WORKBENCH = {
         URL="https://workbench-test.feinheit.ch",
         FEATURES={
             "bookkeeping": True,
+            "campaigns": False,
             "controlling": True,
             "deals": True,
             "foreign_currencies": True,

@@ -21,4 +21,10 @@ class ServiceAdmin(admin.ModelAdmin):
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ("title", "customer", "owned_by", "type", "closed_on")
     list_filter = ["type", "closed_on"]
-    raw_id_fields = ("customer", "contact", "owned_by")
+    raw_id_fields = ["customer", "contact", "owned_by", "campaign"]
+
+
+@admin.register(models.Campaign)
+class CampaignAdmin(admin.ModelAdmin):
+    list_display = ["title", "customer", "owned_by"]
+    raw_id_fields = ["customer", "owned_by"]

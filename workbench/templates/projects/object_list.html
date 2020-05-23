@@ -1,0 +1,19 @@
+{% extends "generic/object_list.html" %}
+
+{% load bootstrap4 i18n mark_current workbench %}
+
+{% block content-title %}
+<h1>
+  {% trans 'projects'|capfirst %}
+  <small>
+    {% mark_current request.path %}
+    <a href="{% url 'projects_project_list' %}">{% trans 'projects'|capfirst %}</a>
+    {% if request.user|has_feature:FEATURES.CONTROLLING %}
+      <a href="{% url 'offers_offer_list' %}">{% trans 'offers'|capfirst %}</a>
+    {% endif %}
+    <a href="{% url 'projects_campaign_list' %}">{% trans 'campaigns'|capfirst %}</a>
+    {% endmark_current %}
+  </small>
+</h1>
+{% endblock %}
+

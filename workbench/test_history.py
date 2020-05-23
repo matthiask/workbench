@@ -303,6 +303,7 @@ class HistoryTest(TestCase):
         project.delete()
 
         response = self.client.get(url)
+        # print(response, response.content.decode("utf-8"))
         self.assertContains(
             response, "/history/projects_project/id/{}/".format(pk), status_code=404
         )

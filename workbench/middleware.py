@@ -4,18 +4,42 @@ from django.shortcuts import render
 from django.urls import reverse
 
 
-FALLBACKS = [
-    (r"^/projects/(?P<id>[0-9]+)/", lambda kw: ("projects_project", "id", kw["id"])),
-    (r"^/offers/(?P<id>[0-9]+)/", lambda kw: ("offers_offer", "id", kw["id"])),
-    (r"^/invoices/(?P<id>[0-9]+)/", lambda kw: ("invoices_invoice", "id", kw["id"])),
-    (
-        r"^/recurring-invoices/(?P<id>[0-9]+)/",
-        lambda kw: ("invoices_recurringinvoice", "id", kw["id"]),
-    ),
-]
+FALLBACKS = None
+
+
+def initialize_fallbacks():
+    global FALLBACKS
+
+    if FALLBACKS:
+        return
+
+    from workbench.invoices.models import Invoice, RecurringInvoice
+    from workbench.offers.models import Offer
+    from workbench.projects.models import Project
+
+    FALLBACKS = [
+        (
+            r"^{}(?P<id>[0-9]+)/".format(Project.urls["list"]),
+            lambda kw: ("projects_project", "id", kw["id"]),
+        ),
+        (
+            r"^{}(?P<id>[0-9]+)/".format(Offer.urls["list"]),
+            lambda kw: ("offers_offer", "id", kw["id"]),
+        ),
+        (
+            r"^{}(?P<id>[0-9]+)/".format(Invoice.urls["list"]),
+            lambda kw: ("invoices_invoice", "id", kw["id"]),
+        ),
+        (
+            r"^{}(?P<id>[0-9]+)/".format(RecurringInvoice.urls["list"]),
+            lambda kw: ("invoices_recurringinvoice", "id", kw["id"]),
+        ),
+    ]
 
 
 def history_fallback(get_response):
+    initialize_fallbacks()
+
     def middleware(request):
         response = get_response(request)
         if response.status_code == 404:

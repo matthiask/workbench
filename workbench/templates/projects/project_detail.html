@@ -6,14 +6,23 @@
 <div class="row">
   <div class="col-md-12">
 
-    <h1 data-timer-title="{{ project.code }} {{ project.title }}">
+    <h1>
       {{ project|h }} {% history_link project %}
       <span style="font-size:14px">{{ object.status_badge }}</span>
     </h1>
 
     <p>
-      {% if project.contact %}{% link_or_none project.contact %}
-      {% else %}{% link_or_none project.customer %}
+      <strong>{% trans 'customer'|capfirst %}:</strong>
+      {% link_or_none project.customer %}
+      &nbsp;
+
+      <strong>{% trans 'contact'|capfirst %}:</strong>
+      {% link_or_none project.contact %}
+      &nbsp;
+
+      {% if request.user|has_feature:FEATURES.CAMPAIGNS %}
+        <strong>{% trans 'campaign'|capfirst %}:</strong>
+        {% link_or_none project.campaign %}
       {% endif %}
     </p>
 
@@ -319,7 +328,7 @@
               {{ invoice.status_badge }}
             </div>
             <div class="row">
-              <div class="col-md-7">{{ invoice.contact|default:invoice.customer }}</div>
+              <div class="col-md-7">{{ invoice.contact.name_with_organization|default:invoice.customer }}</div>
               <div class="col-md-2">{{ invoice.get_type_display }}</div>
               <div class="col-md-3 text-md-right">
                 {{ invoice.total_excl_tax|currency }} exkl. /

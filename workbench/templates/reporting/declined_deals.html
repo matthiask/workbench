@@ -30,7 +30,7 @@
             {{ deal|h }} {{ deal.status_badge }}
           </a>
         </td>
-        <td>{% firstof deal.contact deal.customer %}</td>
+        <td>{{ deal.contact.name_with_organization|default:deal.customer }}</td>
         <td>{{ deal.closing_type }}{% if deal.closing_notice %}: {{ deal.closing_notice }}{% endif %}</td>
         <td class="text-right">{{ deal.value|currency }}</td>
       </tr>

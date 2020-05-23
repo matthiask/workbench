@@ -22,6 +22,7 @@ def feature_required(feature):
 
 class FEATURES:
     BOOKKEEPING = "bookkeeping"
+    CAMPAIGNS = "campaigns"
     CONTROLLING = "controlling"
     DEALS = "deals"
     FOREIGN_CURRENCIES = "foreign_currencies"

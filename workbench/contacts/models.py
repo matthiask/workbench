@@ -154,13 +154,17 @@ class Person(Model):
         verbose_name_plural = _("people")
 
     def __str__(self):
-        if self.organization_id and not self.organization.is_private_person:
-            return "%s / %s" % (self.full_name, self.organization)
         return self.full_name
 
     @property
     def full_name(self):
         return " ".join(filter(None, (self.given_name, self.family_name)))
+
+    @property
+    def name_with_organization(self):
+        if self.organization_id and not self.organization.is_private_person:
+            return "%s / %s" % (self.organization, self.full_name)
+        return self.full_name
 
     def save(self, *args, **kwargs):
         self._fts = " ".join(

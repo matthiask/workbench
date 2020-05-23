@@ -8,6 +8,7 @@ from freezegun import freeze_time
 
 from workbench import factories
 from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.projects.models import Project
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days, logbook_lock
@@ -179,8 +180,8 @@ class LogbookTest(TestCase):
         )
         self.assertContains(
             response,
-            '<a href="/projects/{}/#service{}">service title: service description'
-            "</a>".format(project.id, entry.service.id),
+            '<a href="{}#service{}">service title: service description'
+            "</a>".format(project.get_absolute_url(), entry.service.id),
         )
 
     def test_log_and_create_service_with_flat_rate(self):
@@ -559,7 +560,10 @@ class LogbookTest(TestCase):
             "/logbook/hours/create/", HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertContains(
-            response, 'data-autocomplete-url="/projects/autocomplete/?only_open=on"'
+            response,
+            'data-autocomplete-url="{}?only_open=on"'.format(
+                Project.urls["autocomplete"]
+            ),
         )
 
         response = self.client.post(

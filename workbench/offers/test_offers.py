@@ -9,6 +9,7 @@ from freezegun import freeze_time
 from workbench import factories
 from workbench.audit.models import LoggedAction
 from workbench.offers.models import Offer
+from workbench.projects.models import Project
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
@@ -235,7 +236,7 @@ class OffersTest(TestCase):
         offer = factories.OfferFactory.create()
         self.client.force_login(factories.UserFactory.create())
 
-        code = check_code(self, "/offers/")
+        code = check_code(self, Offer.urls["list"])
         code("")
         code("q=test")
         code("s=all")
@@ -253,15 +254,15 @@ class OffersTest(TestCase):
         self.client.force_login(offer.owned_by)
 
         self.assertRedirects(
-            self.client.get("/offers/{}/".format(offer.id)),
+            self.client.get("{}{}/".format(Offer.urls["list"], offer.id)),
             "{}#offer{}".format(offer.project.get_absolute_url(), offer.id),
         )
 
     def test_create_message(self):
         """Attempting to directly create an offer only produces a help message"""
         self.client.force_login(factories.UserFactory.create())
-        response = self.client.get("/offers/create/")
-        self.assertRedirects(response, "/offers/")
+        response = self.client.get(Offer.urls["create"])
+        self.assertRedirects(response, Offer.urls["list"])
         self.assertEqual(
             messages(response),
             [
@@ -319,7 +320,10 @@ class OffersTest(TestCase):
         self.client.force_login(offer.owned_by)
         response = self.client.get(offer.urls["copy"])
         self.assertContains(
-            response, 'data-autocomplete-url="/projects/autocomplete/?only_open=on"'
+            response,
+            'data-autocomplete-url="{}?only_open=on"'.format(
+                Project.urls["autocomplete"]
+            ),
         )
 
         response = self.client.post(

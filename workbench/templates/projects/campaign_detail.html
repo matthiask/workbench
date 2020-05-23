@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% load i18n workbench %}
+
+{% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-8">
+  <h1>{{ object|h }} {% history_link object %}</h1>
+
+  <table class="table table-striped">
+    {% for name, value in object|field_value_pairs %}
+    <tr>
+      <th class="text-right">{{ name }}</th>
+      <td>{% link_or_none value %}</td>
+    </tr>
+    {% endfor %}
+
+    <tr>
+      <th class="text-right">{% trans 'projects'|capfirst %}</th>
+      <td>
+        {% for project in object.projects.all %}
+          {% link_or_none project with_badge=True %}
+        {% endfor %}
+      </td>
+    </tr>
+  </table>
+
+  <a href="{{ object.urls.update }}" class="btn btn-primary">
+    {% trans 'Update' %}
+  </a>
+  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
+    {% trans 'Delete' %}
+  </a>
+</div>
+</div>
+
+<div class="row mt-5">
+
+  {% if request.user|has_feature:FEATURES.CONTROLLING %}
+    <div class="col-md-6 col-lg-3">
+      <div class="card mb-3">
+        <div class="card-header"><h3 class="my-0">{% trans 'Statistics' %}</h3></div>
+
+        <div class="card-body">
+          <table class="table table-sm">
+            <tr>
+              <th class="text-right">
+                <a href="{% url 'offers_offer_list' %}?org={{ object.pk }}&amp;s=all">{% trans 'Offered' %}</a>
+              </th>
+              <td>{{ object.statistics.offered|currency }}</td>
+            </tr>
+            <tr>
+              <th class="text-right">
+                <a href="{% url 'invoices_invoice_list' %}?org={{ object.pk }}">{% trans 'Gross profit' %}</a>
+              </th>
+              <td>{{ object.statistics.invoiced|currency }}</td>
+            </tr>
+            <tr>
+              <th class="text-right">{% trans 'third party costs'|capfirst %}</th>
+              <td>{{ object.statistics.third_party_costs|currency }}</td>
+            </tr>
+            <tr>
+              <th class="text-right">
+                <a href="{% url 'logbook_loggedhours_list' %}?organization={{ object.pk }}">{% trans 'logged hours'|capfirst %}</a>
+              </th>
+              <td>{{ object.statistics.hours|hours }}</td>
+            </tr>
+            <tr>
+              <th class="text-right">{% trans 'Gross margin / hour' %}</th>
+              <td>{{ object.statistics.gross_margin_per_hour|currency }}</td>
+            </tr>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
