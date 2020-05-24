@@ -162,7 +162,7 @@ class Person(Model):
 
     @property
     def name_with_organization(self):
-        if self.organization_id and not self.organization.is_private_person:
+        if self.organization and not self.organization.is_private_person:
             return "%s / %s" % (self.organization, self.full_name)
         return self.full_name
 

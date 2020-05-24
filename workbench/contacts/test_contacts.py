@@ -361,3 +361,62 @@ class ContactsTest(TestCase):
 
         address = factories.PostalAddress()
         self.assertIsNone(address.get_maps_url())
+
+    def test_person_stringification(self):
+        """Persons' and postal addresses' string representation matches expectations"""
+
+        organization = factories.OrganizationFactory.build(name="Employer A")
+        person = factories.PersonFactory.build(
+            organization=organization, given_name="Hans", family_name="Wurst"
+        )
+
+        self.assertEqual(str(person), "Hans Wurst")
+        self.assertEqual(person.name_with_organization, "Employer A / Hans Wurst")
+
+        home = factories.PostalAddressFactory.build(
+            person=person,
+            type="home",
+            street="Street",
+            house_number="42",
+            postal_code="8000",
+            city="Zürich",
+        )
+
+        work = factories.PostalAddressFactory.build(
+            person=person,
+            type="work",
+            street="Other street",
+            house_number="42",
+            postal_code="8000",
+            city="Zürich",
+        )
+
+        self.assertEqual(
+            home.postal_address,
+            """\
+Hans Wurst
+Street 42
+8000 Zürich""",
+        )
+
+        self.assertEqual(
+            work.postal_address,
+            """\
+Employer A
+Hans Wurst
+Other street 42
+8000 Zürich""",
+        )
+
+        organization.is_private_person = True
+        self.assertEqual(
+            work.postal_address,
+            """\
+Hans Wurst
+Other street 42
+8000 Zürich""",
+        )
+
+        person = factories.PersonFactory.build(given_name="Fritz", family_name="Muster")
+        self.assertEqual(str(person), "Fritz Muster")
+        self.assertEqual(person.name_with_organization, "Fritz Muster")

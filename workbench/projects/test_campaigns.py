@@ -26,6 +26,9 @@ class CampaignsTest(TestCase):
         self.assertEqual(campaign.customer, organization)
         self.assertRedirects(response, campaign.urls["detail"])
 
+        response = self.client.get(campaign.urls["delete"])
+        self.assertNotContains(response, WarningsForm.ignore_warnings_id)
+
         project = factories.ProjectFactory.create(campaign=campaign)
 
         response = self.client.get(campaign.urls["delete"])
@@ -39,6 +42,15 @@ class CampaignsTest(TestCase):
 
         project.refresh_from_db()
         self.assertIs(project.campaign, None)
+
+    def test_statistics(self):
+        """Campaign statistics do not crash"""
+        campaign = factories.CampaignFactory.create()
+        factories.ProjectFactory.create(campaign=campaign)
+        factories.ProjectFactory.create(campaign=campaign)
+
+        self.assertEqual(len(campaign.statistics["statistics"]), 2)
+        self.assertIs(campaign.statistics["overall"]["gross_margin_per_hour"], None)
 
     def test_lists(self):
         """Filter form smoke test"""

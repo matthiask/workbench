@@ -56,6 +56,7 @@ urlpatterns = [
         generic.AutocompleteView.as_view(
             model=Person,
             queryset=Person.objects.active().select_related("organization"),
+            label_from_instance=lambda person: person.name_with_organization,
         ),
         name="contacts_person_autocomplete",
     ),
