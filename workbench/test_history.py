@@ -264,6 +264,13 @@ class HistoryTest(TestCase):
         url = "/history/invoices_recurringinvoice/id/{}/".format(invoice.pk)
         self.assert_404_without_feature(url, feature="controlling")
 
+    def test_campaign_visibility(self):
+        """Campaigns are invisible without CAMPAIGNS"""
+        campaign = factories.CampaignFactory.create()
+        self.client.force_login(campaign.owned_by)
+        url = "/history/projects_campaign/id/{}/".format(campaign.pk)
+        self.assert_404_without_feature(url, feature="campaigns")
+
     def test_deal_visibility(self):
         """Deals are invisible without DEALS"""
         deal = factories.DealFactory.create()
