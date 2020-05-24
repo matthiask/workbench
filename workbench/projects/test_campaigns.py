@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from workbench import factories
-from workbench.projects.models import Campaign
+from workbench.projects.models import Campaign, Project
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code
 
@@ -13,6 +13,14 @@ class CampaignsTest(TestCase):
         self.client.force_login(user)
 
         organization = factories.OrganizationFactory.create()
+
+        response = self.client.get(Campaign.urls["create"] + "?customer=bla")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(
+            Campaign.urls["create"] + "?customer={}".format(organization.id)
+        )
+        self.assertContains(response, 'value="The Organization Ltd"')
 
         response = self.client.post(
             Campaign.urls["create"],
@@ -42,6 +50,16 @@ class CampaignsTest(TestCase):
 
         project.refresh_from_db()
         self.assertIs(project.campaign, None)
+
+    def test_create_project_with_campaign(self):
+        """Preselecting the campaign when creating a project works"""
+        campaign = factories.CampaignFactory.create()
+        self.client.force_login(campaign.owned_by)
+
+        response = self.client.get(
+            Project.urls["create"] + "?campaign={}".format(campaign.pk)
+        )
+        self.assertContains(response, 'value="{}"'.format(str(campaign)))
 
     def test_statistics(self):
         """Campaign statistics do not crash"""

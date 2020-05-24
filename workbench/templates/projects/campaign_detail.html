@@ -85,6 +85,10 @@
     </tr>
   </table>
 
+  <a href="{% url 'projects_project_create' %}?campaign={{ object.pk }}" class="btn btn-primary">
+    {% include "svg/plus.svg" %}
+    {% trans 'project'|capfirst %}
+  </a>
   <a href="{{ object.urls.update }}" class="btn btn-primary">
     {% trans 'Update' %}
   </a>
