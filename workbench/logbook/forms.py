@@ -269,17 +269,14 @@ class LoggedHoursForm(ModelForm):
                         }
                     )
 
-            if request.GET.get("hours"):
-                initial["hours"] = request.GET["hours"]
+            for field in ["description", "hours", "rendered_on", "service"]:
+                if request.GET.get(field):
+                    initial[field] = request.GET.get(field)
 
-            elif not initial.get("hours"):
-                if request.user.hours_since_latest <= 12:
-                    initial.setdefault("hours", request.user.hours_since_latest)
+            if not initial.get("hours") and request.user.hours_since_latest <= 12:
+                initial.setdefault("hours", request.user.hours_since_latest)
 
-            if request.GET.get("service"):
-                initial["service"] = request.GET.get("service")
-
-            elif not initial.get("service"):
+            if not initial.get("service"):
                 latest_on_project = (
                     LoggedHours.objects.filter(
                         rendered_by=request.user, service__project=self.project
@@ -289,10 +286,6 @@ class LoggedHoursForm(ModelForm):
                 )
                 if latest_on_project:
                     initial.setdefault("service", latest_on_project.service_id)
-
-            for field in ["rendered_on", "description"]:
-                if request.GET.get(field):
-                    initial[field] = request.GET.get(field)
 
         else:
             self.project = kwargs["instance"].service.project
