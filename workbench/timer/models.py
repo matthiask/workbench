@@ -46,7 +46,7 @@ class Slice(dict):
         ]
         if self.get("timestamp_id"):
             params.append(("timestamp", self["timestamp_id"]))
-        elif self.no_associated_log:
+        else:  # No timestamp ID and no associated log -- it's a detected slice!
             params.append(("detected_ends_at", self["ends_at"]))
 
         return "{}?{}".format(
@@ -69,7 +69,7 @@ class Slice(dict):
         ]
         if self.get("timestamp_id"):
             params.append(("timestamp", self["timestamp_id"]))
-        elif self.no_associated_log:
+        else:  # No timestamp ID and no associated log -- it's a detected slice!
             params.append(("detected_ends_at", self["ends_at"]))
 
         return "{}?{}".format(
