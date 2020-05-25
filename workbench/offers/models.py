@@ -2,7 +2,6 @@ import datetime as dt
 from functools import total_ordering
 
 from django.contrib import messages
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.db.models.expressions import RawSQL
@@ -16,6 +15,7 @@ from workbench.projects.models import Project, Service
 from workbench.tools.formats import Z2, local_date_format
 from workbench.tools.models import ModelWithTotal, SearchQuerySet
 from workbench.tools.urls import model_urls
+from workbench.tools.validation import raise_if_errors
 
 
 class OfferQuerySet(SearchQuerySet):
@@ -64,6 +64,7 @@ class Offer(ModelWithTotal):
     )
 
     offered_on = models.DateField(_("offered on"), blank=True, null=True)
+    valid_until = models.DateField(_("valid until"), blank=True, null=True)
     closed_on = models.DateField(_("closed on"), blank=True, null=True)
 
     title = models.CharField(_("title"), max_length=200)
@@ -145,13 +146,24 @@ class Offer(ModelWithTotal):
         )
         super()._calculate_total()
 
-    def clean(self):
-        super().clean()
+    def clean_fields(self, exclude=None):
+        super().clean_fields(exclude=exclude)
+        errors = {}
 
         if self.status in (self.OFFERED, self.ACCEPTED, self.DECLINED):
             if not self.offered_on:
-                raise ValidationError(
-                    {"status": _("Offered on date missing for selected state.")}
+                errors.setdefault("status", []).append(
+                    _("Offered on date missing for selected state.")
+                )
+            if not self.valid_until:
+                errors.setdefault("status", []).append(
+                    _("Valid until date missing for selected state.")
+                )
+
+        if self.offered_on and self.valid_until:
+            if self.offered_on > self.valid_until:
+                errors["valid_until"] = _(
+                    "Valid until date has to be after offered on date."
                 )
 
         if self.status >= self.ACCEPTED and not self.closed_on:
@@ -159,9 +171,7 @@ class Offer(ModelWithTotal):
         elif self.status < self.ACCEPTED and self.closed_on:
             self.closed_on = None
 
-    @property
-    def valid_until(self):
-        return self.offered_on + dt.timedelta(days=60) if self.offered_on else None
+        raise_if_errors(errors)
 
     @property
     def pretty_status(self):

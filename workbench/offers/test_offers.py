@@ -1,6 +1,7 @@
 import datetime as dt
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils.translation import deactivate_all
 
@@ -13,6 +14,7 @@ from workbench.projects.models import Project
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
+from workbench.tools.validation import in_days
 
 
 class OffersTest(TestCase):
@@ -92,6 +94,7 @@ class OffersTest(TestCase):
         self.assertEqual(response["content-type"], "application/pdf")
 
         offer.offered_on = dt.date.today()
+        offer.valid_until = in_days(60)
         offer.save()
         project.description = "Test"
         project.save()
@@ -131,6 +134,7 @@ class OffersTest(TestCase):
             },
         )
         self.assertContains(response, "Offered on date missing for selected state.")
+        self.assertContains(response, "Valid until date missing for selected state.")
 
         response = self.client.post(
             offer.urls["update"],
@@ -142,6 +146,7 @@ class OffersTest(TestCase):
                 "postal_address": "Anything\nStreet\nCity",
                 "services": [service.id],
                 "offered_on": dt.date.today().isoformat(),
+                "valid_until": in_days(60).isoformat(),
                 "status": Offer.ACCEPTED,
             },
         )
@@ -282,7 +287,10 @@ class OffersTest(TestCase):
         )
         self.assertEqual(
             Offer(
-                project=project, status=Offer.OFFERED, offered_on=today
+                project=project,
+                status=Offer.OFFERED,
+                offered_on=today,
+                valid_until=today,
             ).pretty_status,
             "Offered on {}".format(local_date_format(today)),
         )
@@ -494,7 +502,8 @@ class OffersTest(TestCase):
                 "discount": "10",
                 "liable_to_vat": "1",
                 "postal_address": "Anything\nStreet\nCity",
-                "offered_on": dt.date.today().isoformat(),
+                "offered_on": in_days(0).isoformat(),
+                "valid_until": in_days(60).isoformat(),
                 "status": Offer.DECLINED,
             },
         )
@@ -511,7 +520,8 @@ class OffersTest(TestCase):
                 "discount": "10",
                 "liable_to_vat": "1",
                 "postal_address": "Anything\nStreet\nCity",
-                "offered_on": dt.date.today().isoformat(),
+                "offered_on": in_days(0).isoformat(),
+                "valid_until": in_days(60).isoformat(),
                 "status": Offer.DECLINED,
                 WarningsForm.ignore_warnings_id: "yes-please-decline",
             },
@@ -552,7 +562,8 @@ class OffersTest(TestCase):
         project = factories.ProjectFactory.create()
         offer = factories.OfferFactory.create(
             project=project,
-            offered_on=dt.date.today() - dt.timedelta(days=90),
+            offered_on=in_days(-90),
+            valid_until=in_days(-30),
             status=Offer.OFFERED,
         )
 
@@ -584,3 +595,31 @@ class OffersTest(TestCase):
             [accepted, in_preparation, None, declined],
         )
         self.assertEqual(in_preparation < 42, 0)
+
+    def test_model_validation(self):
+        """Offer model validation"""
+        offer = Offer(
+            title="Test",
+            project=factories.ProjectFactory.create(),
+            owned_by=factories.UserFactory.create(),
+            status=Offer.OFFERED,
+            postal_address="Test\nStreet\nCity",
+            _code=1,
+        )
+        msg = [
+            "Offered on date missing for selected state.",
+            "Valid until date missing for selected state.",
+        ]
+
+        with self.assertRaises(ValidationError) as cm:
+            offer.clean_fields()
+        self.assertEqual(list(cm.exception), [("status", msg)])
+
+        with self.assertRaises(ValidationError) as cm:
+            offer.offered_on = in_days(0)
+            offer.valid_until = in_days(-1)
+            offer.full_clean()
+        self.assertEqual(
+            list(cm.exception),
+            [("valid_until", ["Valid until date has to be after offered on date."])],
+        )

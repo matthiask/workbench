@@ -415,7 +415,8 @@ class DealsTest(TestCase):
         offer = factories.OfferFactory.create(
             title="Test",
             postal_address="Test\nTest street\nTest",
-            offered_on=dt.date.today(),
+            offered_on=in_days(0),
+            valid_until=in_days(60),
         )
 
         self.client.force_login(deal.owned_by)

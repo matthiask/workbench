@@ -92,6 +92,7 @@ class OfferForm(PostalAddressSelectionForm):
         model = Offer
         fields = (
             "offered_on",
+            "valid_until",
             "title",
             "description",
             "owned_by",

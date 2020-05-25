@@ -296,6 +296,23 @@ function initWidgets() {
     })
   }
 
+  const offeredOn = $("#id_offered_on")
+  const validUntil = $("#id_valid_until")
+  if (offeredOn.length && validUntil.length) {
+    offeredOn.on("change", function (_event) {
+      const day = new Date(
+        new Date(offeredOn.val()).getTime() + 59 * 86400 * 1000
+      )
+      validUntil.val(
+        addZero(day.getFullYear()) +
+          "-" +
+          addZero(1 + day.getMonth()) +
+          "-" +
+          addZero(day.getDate())
+      )
+    })
+  }
+
   $("[data-autofill]:not(.initialized)").each(function () {
     const self = $(this),
       data = self.data("autofill"),
