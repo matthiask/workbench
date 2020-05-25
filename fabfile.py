@@ -44,8 +44,9 @@ def _do_deploy(c, folder, rsync):
         c.run("venv/bin/pip install -r requirements.txt")
         for wb in installations:
             c.run("DOTENV=.env/{} venv/bin/python manage.py migrate".format(wb))
-        if rsync:
-            c.local("rsync -avz --delete static/ {}:{}static".format(host, folder))
+    if rsync:
+        c.local("rsync -avz --delete static/ {}:{}static".format(host, folder))
+    with c.cd(folder):
         c.run(
             "DOTENV=.env/{} venv/bin/python manage.py collectstatic --noinput".format(
                 installations[0]
