@@ -606,14 +606,16 @@ class OffersTest(TestCase):
             postal_address="Test\nStreet\nCity",
             _code=1,
         )
-        msg = [
-            "Offered on date missing for selected state.",
-            "Valid until date missing for selected state.",
-        ]
 
         with self.assertRaises(ValidationError) as cm:
             offer.clean_fields()
-        self.assertEqual(list(cm.exception), [("status", msg)])
+        self.assertEqual(
+            list(cm.exception),
+            [
+                ("offered_on", ["Offered on date missing for selected state."]),
+                ("valid_until", ["Valid until date missing for selected state."]),
+            ],
+        )
 
         with self.assertRaises(ValidationError) as cm:
             offer.offered_on = in_days(0)

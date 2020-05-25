@@ -152,11 +152,11 @@ class Offer(ModelWithTotal):
 
         if self.status in (self.OFFERED, self.ACCEPTED, self.DECLINED):
             if not self.offered_on:
-                errors.setdefault("status", []).append(
+                errors.setdefault("offered_on", []).append(
                     _("Offered on date missing for selected state.")
                 )
             if not self.valid_until:
-                errors.setdefault("status", []).append(
+                errors.setdefault("valid_until", []).append(
                     _("Valid until date missing for selected state.")
                 )
 

@@ -391,7 +391,7 @@ class PDFDocument(_PDFDocument):
                 ),
                 (_("Our reference"), offer.owned_by.get_full_name()),
                 (
-                    _("valid until"),
+                    capfirst(_("valid until")),
                     (
                         local_date_format(offer.valid_until)
                         if offer.valid_until

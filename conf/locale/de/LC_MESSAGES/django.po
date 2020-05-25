@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-23 12:17+0200\n"
+"POT-Creation-Date: 2020-05-25 13:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2015,6 +2015,10 @@ msgstr "Offeriert"
 msgid "offered on"
 msgstr "offeriert am"
 
+#: workbench/offers/models.py workbench/tools/pdf.py
+msgid "valid until"
+msgstr "Gültig bis"
+
 #: workbench/offers/models.py workbench/projects/models.py
 #: workbench/templates/offers/offer_pricing.html
 #: workbench/templates/projects/project_detail.html
@@ -2025,6 +2029,14 @@ msgstr "Offerte"
 #: workbench/offers/models.py
 msgid "Offered on date missing for selected state."
 msgstr "Offertdatum fehlt für den ausgewählten Status."
+
+#: workbench/offers/models.py
+msgid "Valid until date missing for selected state."
+msgstr "Ende der Gültigkeit fehlt für den ausgewählten Status."
+
+#: workbench/offers/models.py
+msgid "Valid until date has to be after offered on date."
+msgstr "Ende der Gültigkeit muss nach dem Offertdatum liegen."
 
 #: workbench/offers/models.py
 #, python-format
@@ -3311,10 +3323,6 @@ msgstr "MwSt."
 #: workbench/tools/pdf.py
 msgid "Our reference"
 msgstr "Unsere Referenz"
-
-#: workbench/tools/pdf.py
-msgid "valid until"
-msgstr "Gültig bis"
 
 #: workbench/tools/pdf.py
 msgid "down payment invoice"
