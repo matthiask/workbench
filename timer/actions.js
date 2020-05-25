@@ -2,12 +2,11 @@ import {COLORS} from "./colors.js"
 import {gettext} from "./i18n.js"
 import {containsJSON, createIdentifier} from "./utils.js"
 
-// FIXME reverse() those URLs...
-const ACTIVE_PROJECTS = () => "/projects/projects/projects/"
-const PROJECT_SEARCH = (q) =>
-  `/projects/projects/autocomplete/?only_open=1&q=${q}`
-const SERVICES = (id) => `/projects/projects/${id}/services/`
-const CREATE_HOURS = (id) => `/projects/projects/${id}/createhours/`
+const BASE_URL = document.getElementById("projects-base-url").dataset.url
+const ACTIVE_PROJECTS = () => `${BASE_URL}projects/`
+const PROJECT_SEARCH = (q) => `${BASE_URL}autocomplete/?only_open=1&q=${q}`
+const SERVICES = (id) => `${BASE_URL}${id}/services/`
+const CREATE_HOURS = (id) => `${BASE_URL}${id}/createhours/`
 const endpoint = (fn, ...args) => fn(...args)
 
 export function createActivity(dispatch, fields = {}) {
@@ -66,9 +65,12 @@ export async function openForm(dispatch, {activity, current}) {
 
   const url = endpoint(CREATE_HOURS, activity.project.value)
   const params = new URLSearchParams()
-  if (activity.service) params.append("service", activity.service.value)
-  if (activity.seconds)
+  if (activity.service) {
+    params.append("service", activity.service.value)
+  }
+  if (activity.seconds) {
     params.append("hours", Math.ceil(activity.seconds / 360) / 10)
+  }
   params.append("description", activity.description)
 
   const finalUrl = `${url}?${params.toString()}`

@@ -7,13 +7,14 @@
 {% block js %}{{ block.super }}
 {{ state|json_script:'timer-state' }}
 {{ hours|json_script:'user-hours' }}
+<span id="current-user" data-current-user="{{ request.user.id }}"></span>
+<span id="projects-base-url" data-url="{% url 'projects_project_list' %}"></span>
 <script src="{% url 'javascript-catalog' %}"></script>
 {% if not TESTING %}
   {% render_bundle "manifest" %}
   {% render_bundle "vendors" %}
   {% render_bundle "timer" %}
 {% endif %}
-<span id="current-user" data-current-user="{{ request.user.id }}"></span>
 {% endblock %}
 
 {% block fixed-add-button %}{% endblock %}
