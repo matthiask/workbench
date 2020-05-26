@@ -47,7 +47,6 @@ class Invoice(ModelWithTotal):
         (PAID, _("Paid")),
         (CANCELED, _("Canceled")),
     )
-    VALID = {IN_PREPARATION, SENT, PAID}
     INVOICED_STATUSES = {SENT, PAID}
 
     FIXED = "fixed"
