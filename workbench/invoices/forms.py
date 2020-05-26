@@ -163,7 +163,7 @@ class InvoiceForm(PostalAddressSelectionForm):
             self.fields.pop("show_service_details")
 
         if self.instance.type != Invoice.DOWN_PAYMENT and self.instance.project_id:
-            eligible_down_payment_invoices = Invoice.objects.valid().filter(
+            eligible_down_payment_invoices = Invoice.objects.invoiced().filter(
                 Q(project=self.instance.project),
                 Q(type=Invoice.DOWN_PAYMENT),
                 Q(down_payment_applied_to__isnull=True)

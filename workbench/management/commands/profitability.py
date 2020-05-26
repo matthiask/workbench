@@ -23,7 +23,7 @@ class Command(BaseCommand):
 
         invoiced_per_customer = {
             row["customer"]: row["total_excl_tax__sum"] - row["third_party_costs__sum"]
-            for row in Invoice.objects.valid()
+            for row in Invoice.objects.invoiced()
             .filter(project__isnull=False)
             .order_by()
             .values("customer")

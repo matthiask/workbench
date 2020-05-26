@@ -121,7 +121,7 @@ class ProjectQuerySet(SearchQuerySet):
         from workbench.invoices.models import Invoice
 
         return self.exclude(
-            id__in=Invoice.objects.valid()
+            id__in=Invoice.objects.invoiced()
             .filter(project__isnull=False)
             .values("project")
         )
@@ -476,7 +476,7 @@ class Project(Model):
             (
                 invoice.total_excl_tax
                 for invoice in self.project_invoices
-                if invoice.is_valid
+                if invoice.is_invoiced
             ),
             Z2,
         )

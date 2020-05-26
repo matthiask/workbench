@@ -72,7 +72,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     }
     invoiced_per_project = {
         row["project"]: row["total_excl_tax__sum"]
-        for row in Invoice.objects.valid()
+        for row in Invoice.objects.invoiced()
         .filter(project__in=projects, invoiced_on__lte=cutoff_date)
         .order_by()
         .values("project")

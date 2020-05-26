@@ -17,7 +17,7 @@ from workbench.tools.formats import Z1, Z2
 def gross_profit_by_month(date_range):
     profit = defaultdict(lambda: Z2)
     for result in (
-        Invoice.objects.valid()
+        Invoice.objects.invoiced()
         .order_by()
         .filter(invoiced_on__range=date_range)
         .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))
@@ -45,7 +45,7 @@ def third_party_costs_by_month(date_range):
         costs[(result["year"], result["month"])] -= result["third_party_costs__sum"]
 
     for result in (
-        Invoice.objects.valid()
+        Invoice.objects.invoiced()
         .order_by()
         .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z2))
         .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))

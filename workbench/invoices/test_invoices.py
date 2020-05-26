@@ -741,7 +741,11 @@ class InvoicesTest(TestCase):
         """Down payment invoices can be linked to invoices"""
         project = factories.ProjectFactory.create()
         down_payment = factories.InvoiceFactory.create(
-            project=project, type=Invoice.DOWN_PAYMENT, subtotal=100
+            project=project,
+            type=Invoice.DOWN_PAYMENT,
+            subtotal=100,
+            invoiced_on=in_days(0),
+            status=Invoice.SENT,
         )
 
         self.client.force_login(project.owned_by)
@@ -751,11 +755,6 @@ class InvoicesTest(TestCase):
         self.assertContains(response, down_payment.code)
         self.assertContains(response, down_payment.pretty_total_excl)
         self.assertContains(response, down_payment.pretty_status)
-
-        response = self.client.get(url)
-        self.assertContains(
-            response, "This project already has an invoice in preparation."
-        )
 
         response = self.client.post(
             url,
@@ -968,3 +967,15 @@ class InvoicesTest(TestCase):
             invoiced_on=in_days(0), last_reminded_on=in_days(-15)
         )
         self.assertIsNone(invoice.last_reminded_on)
+
+    def test_invoice_in_preparation_message(self):
+        """More than one project invoice in preparation produces a warning"""
+        project = factories.ProjectFactory.create()
+        factories.InvoiceFactory.create(project=project)
+        self.client.force_login(project.owned_by)
+
+        url = project.urls["createinvoice"] + "?type=fixed"
+        response = self.client.get(url)
+        self.assertContains(
+            response, "This project already has an invoice in preparation."
+        )

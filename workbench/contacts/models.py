@@ -85,7 +85,7 @@ class Organization(Model):
         pbs = project_budget_statistics(self.project_set.all())["overall"]
 
         invoices = (
-            self.invoice_set.valid()
+            self.invoice_set.invoiced()
             .filter(project__isnull=True)
             .order_by()
             .aggregate(Sum("total_excl_tax"), Sum("third_party_costs"))

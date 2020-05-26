@@ -4,12 +4,14 @@ from decimal import Decimal
 from django.test import TestCase
 
 from workbench import factories
+from workbench.invoices.models import Invoice
 from workbench.projects.models import Project
 from workbench.projects.reporting import hours_per_customer, overdrawn_projects
 from workbench.reporting import green_hours, project_budget_statistics
 from workbench.reporting.models import Accruals
 from workbench.tools.formats import Z1, Z2
 from workbench.tools.testing import check_code
+from workbench.tools.validation import in_days
 
 
 class StatisticsTest(TestCase):
@@ -102,6 +104,8 @@ class StatisticsTest(TestCase):
             customer=project.customer,
             contact=project.contact,
             type=factories.Invoice.SERVICES,
+            invoiced_on=in_days(0),
+            status=Invoice.SENT,
         )
         invoice.create_services_from_logbook(project.services.all())
 

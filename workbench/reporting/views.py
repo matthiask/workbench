@@ -104,7 +104,7 @@ def key_data_gross_profit(request, date_range):
         "reporting/key_data_gross_profit.html",
         {
             "date_range": date_range,
-            "invoices": Invoice.objects.valid()
+            "invoices": Invoice.objects.invoiced()
             .filter(invoiced_on__range=date_range)
             .order_by("invoiced_on", "id")
             .select_related("project", "owned_by"),
@@ -126,7 +126,7 @@ def key_data_third_party_costs(request, date_range):
             )
             .order_by("rendered_on", "id")
             .select_related("service"),
-            "invoices": Invoice.objects.valid()
+            "invoices": Invoice.objects.invoiced()
             .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z2))
             .order_by("invoiced_on", "id")
             .select_related("project", "owned_by"),
