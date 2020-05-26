@@ -9,7 +9,7 @@ from django.utils.decorators import decorator_from_middleware
 from django.utils.timezone import make_aware
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_POST
 
 from corsheaders.middleware import CorsMiddleware
 
@@ -90,7 +90,7 @@ class SignedEmailUserForm(SignedEmailUserMixin, Form):
     pass
 
 
-@require_GET
+# @require_GET  Problems with Origin: and CORS requests...
 def list_timestamps(request):
     form = SignedEmailUserForm(request.GET, request=request)
     if not form.is_valid():
