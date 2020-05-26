@@ -17,6 +17,7 @@ from workbench.services.models import ServiceType
 from workbench.tools.formats import Z2, currency, hours, local_date_format
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
 from workbench.tools.pdf import pdf_response
+from workbench.tools.validation import in_days
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -254,6 +255,26 @@ class InvoiceForm(PostalAddressSelectionForm):
                     "to": s_dict[data["status"]],
                 },
                 code="status-unexpected",
+            )
+
+        if (
+            self.instance._orig_status == Invoice.IN_PREPARATION
+            and data["status"] > Invoice.IN_PREPARATION
+            and data.get("invoiced_on")
+            and data["invoiced_on"] < in_days(-3)
+        ):
+            self.add_warning(
+                _(
+                    "Moving status from '%(from)s' to '%(to)s' with an"
+                    " invoice date in the past (%(date)s)."
+                    " This may be correct but maybe it's not what you want."
+                )
+                % {
+                    "from": s_dict[Invoice.IN_PREPARATION],
+                    "to": s_dict[data["status"]],
+                    "date": local_date_format(data["invoiced_on"]),
+                },
+                code="invoiced-in-past",
             )
 
         if data["status"] >= Invoice.PAID and not data["closed_on"]:

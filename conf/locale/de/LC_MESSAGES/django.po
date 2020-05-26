@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-25 13:15+0200\n"
+"POT-Creation-Date: 2020-05-26 17:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1374,6 +1374,16 @@ msgstr ""
 #, python-format
 msgid "Moving status from '%(from)s' to '%(to)s'. Are you sure?"
 msgstr "Status von '%(from)s' zu '%(to)s' ändern. Bist Du sicher?"
+
+#: workbench/invoices/forms.py
+#, python-format
+msgid ""
+"Moving status from '%(from)s' to '%(to)s' with an invoice date in the past "
+"(%(date)s). This may be correct but maybe it's not what you want."
+msgstr ""
+"Du änderst den Status von '%(from)s' zu '%(to)s' mit einem Rechnungsdatum in "
+"der Vergangenheit (%(date)s). Dies kann korrekt sein, aber ist "
+"möglicherweise nicht das, was Du willst."
 
 #: workbench/invoices/forms.py
 #, python-format

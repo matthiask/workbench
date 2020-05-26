@@ -690,6 +690,23 @@ class InvoicesTest(TestCase):
             " Are you sure?",
         )
 
+    def test_send_invoice_with_past_invoice_date(self):
+        """Advancing the status from in preparation with a past invoice date
+        emits a warning"""
+        invoice = factories.InvoiceFactory.create(
+            title="Test",
+            subtotal=20,
+            invoiced_on=in_days(-7),
+            due_on=dt.date.today(),
+            status=Invoice.IN_PREPARATION,
+        )
+        self.client.force_login(invoice.owned_by)
+
+        response = self.client.post(
+            invoice.urls["update"], invoice_to_dict(invoice, status=Invoice.SENT),
+        )
+        self.assertContains(response, "with an invoice date in the past")
+
     def test_change_paid_invoice(self):
         """Changing paid invoices is possible too"""
         invoice = factories.InvoiceFactory.create(

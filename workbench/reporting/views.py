@@ -47,7 +47,8 @@ class OpenItemsForm(Form):
 
     def open_items_list(self):
         open_items = (
-            Invoice.objects.invoiced().filter(
+            Invoice.objects.invoiced()
+            .filter(
                 Q(invoiced_on__lte=self.cleaned_data["cutoff_date"]),
                 Q(closed_on__gt=self.cleaned_data["cutoff_date"])
                 | Q(closed_on__isnull=True),
