@@ -110,15 +110,21 @@ def list_timestamps(request):
             "hours": daily_hours,
             "timestamps": [
                 {
-                    "timestamp": "{:>5} {:^5} {}".format(
-                        local_date_format(slice.get("ends_at"), fmt="H:i"),
-                        hours(slice.elapsed_hours, plus_sign=True)
+                    "timestamp": "{:>5} - {:>5} {:^7} {}".format(
+                        local_date_format(slice.get("starts_at"), fmt="H:i") or "?  ",
+                        local_date_format(slice.get("ends_at"), fmt="H:i") or "?  ",
+                        "({})".format(hours(slice.elapsed_hours, plus_sign=True))
                         if slice.elapsed_hours is not None
                         else "?",
                         slice["description"] or "-",
                     ),
                     "elapsed": slice.elapsed_hours,
-                    "comment": slice.get("comment", ""),
+                    "comment": slice.get("comment", "")
+                    or (
+                        "[{}]".format(slice["project"])
+                        if slice.no_associated_log and slice.get("project")
+                        else ""
+                    ),
                 }
                 for slice in slices
             ],

@@ -50,8 +50,8 @@ class Slice(dict):
             params.append(("detected_ends_at", self["ends_at"]))
 
         return "{}?{}".format(
-            reverse("projects_project_createhours", kwargs={"pk": self["project_id"]})
-            if self.get("project_id")
+            reverse("projects_project_createhours", kwargs={"pk": self["project"].pk})
+            if self.get("project")
             else reverse("logbook_loggedhours_create"),
             urlencode([pair for pair in params if pair[1]]),
         )
@@ -113,7 +113,7 @@ class TimestampQuerySet(models.QuerySet):
         day = day or dt.date.today()
         entries = list(
             self.filter(user=user, created_at__date=day).select_related(
-                "logged_hours__service", "logged_break"
+                "logged_hours__service", "logged_break", "project__owned_by"
             )
         )
         known_logged_hours = set(entry.logged_hours for entry in entries)
@@ -146,7 +146,7 @@ class TimestampQuerySet(models.QuerySet):
                 description=entry.logged_hours or entry.logged_break or entry.notes,
                 logged_hours=entry.logged_hours,
                 logged_break=entry.logged_break,
-                project_id=entry.project_id,
+                project=entry.project,
                 timestamp_id=entry.id,
                 is_start=entry.type == entry.START,
             )
