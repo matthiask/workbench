@@ -28,7 +28,11 @@
         <tr>
           <td>{{ anniversary.name }}</td>
           <td>{{ anniversary.start|local_date_format }}</td>
-          <td class="text-right">{{ anniversary.anniversary }}.</td>
+          <td class="text-right">
+            {% if anniversary.anniversary %}{{ anniversary.anniversary }}.
+            {% else %}✨
+            {% endif %}
+          </td>
           <td>{{ anniversary.this_year|local_date_format }}</td>
         </tr>
       {% endfor %}

@@ -186,7 +186,7 @@ employments AS (
     date_from,
     date_until
   FROM awt_employment
-  WHERE percentage>0 AND date_from <= %s
+  WHERE percentage>0
   ORDER BY date_from
 ),
 ends AS (
@@ -212,7 +212,7 @@ FROM accounts_user u
 LEFT JOIN earliest ON u.id=earliest.user_id
 WHERE earliest.start IS NOT NULL AND u.is_active=TRUE
         """,
-        [today.replace(month=1, day=1)],
+        [],
     ):
         this_year = start.replace(year=today.year)
         anniversaries.append(
