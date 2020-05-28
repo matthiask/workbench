@@ -203,8 +203,8 @@ earliest AS (
     MAX(date_from) AS start
   FROM employments
   LEFT JOIN ends USING (user_id)
-  -- ... has not an ending employment preceeding it (one day difference)
-  WHERE NOT date_from = ANY(ends.ends)
+  -- ... has no ending employment preceeding it (one day difference)
+  WHERE date_from <> ALL(ends.ends)
   GROUP BY user_id
 )
 SELECT _full_name, earliest.start
