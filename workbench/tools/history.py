@@ -408,6 +408,7 @@ HISTORY = {
         "fields": {
             "email",
             "is_active",
+            "is_admin",
             "_short_name",
             "_full_name",
             "enforce_same_week_logging",
