@@ -1,8 +1,7 @@
-from django.contrib import admin
-
 from admin_ordering.admin import OrderableAdmin
 
 from workbench.deals import models
+from workbench.tools import admin
 
 
 class ValueInline(admin.TabularInline):
@@ -20,7 +19,7 @@ class DealAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.ValueType)
-class ValueTypeAdmin(OrderableAdmin, admin.ModelAdmin):
+class ValueTypeAdmin(OrderableAdmin, admin.ReadWriteModelAdmin):
     list_display = ["title", "is_archived", "position", "weekly_target"]
     list_editable = ["position", "weekly_target"]
     ordering_field = "position"
@@ -34,7 +33,7 @@ class AttributeInline(OrderableAdmin, admin.TabularInline):
 
 
 @admin.register(models.AttributeGroup)
-class AttributeGroupAdmin(OrderableAdmin, admin.ModelAdmin):
+class AttributeGroupAdmin(OrderableAdmin, admin.ReadWriteModelAdmin):
     inlines = [AttributeInline]
     list_display = ["title", "is_archived", "is_required", "position"]
     list_editable = ["position"]
@@ -42,7 +41,7 @@ class AttributeGroupAdmin(OrderableAdmin, admin.ModelAdmin):
 
 
 @admin.register(models.ClosingType)
-class ClosingType(OrderableAdmin, admin.ModelAdmin):
+class ClosingType(OrderableAdmin, admin.ReadWriteModelAdmin):
     list_display = ["title", "represents_a_win", "position"]
     list_editable = ["position"]
     ordering_field = "position"

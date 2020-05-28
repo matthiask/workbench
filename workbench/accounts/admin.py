@@ -50,7 +50,12 @@ class UserAdmin(UserAdmin):
     ]
     radio_fields = {"language": admin.HORIZONTAL}
     raw_id_fields = ["person"]
-    readonly_fields = ["signed_email"]
+    readonly_fields = [
+        "signed_email",
+        "email",
+        "enforce_same_week_logging",
+        "last_login",
+    ]
     search_fields = ("email", "_short_name", "_full_name")
     ordering = ("email",)
     filter_horizontal = ()

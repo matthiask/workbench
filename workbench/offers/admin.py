@@ -1,4 +1,4 @@
-from django.contrib import admin
+from workbench.tools import admin
 
 from . import models
 

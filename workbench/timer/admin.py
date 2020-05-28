@@ -1,6 +1,5 @@
-from django.contrib import admin
-
 from workbench.timer import models
+from workbench.tools import admin
 
 
 @admin.register(models.Timestamp)

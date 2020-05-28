@@ -1,10 +1,9 @@
-from django.contrib import admin
-
 from workbench.credit_control import models
+from workbench.tools import admin
 
 
 @admin.register(models.Ledger)
-class LedgerAdmin(admin.ModelAdmin):
+class LedgerAdmin(admin.ReadWriteModelAdmin):
     radio_fields = {"parser": admin.VERTICAL}
 
 

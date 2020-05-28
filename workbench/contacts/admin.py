@@ -1,5 +1,3 @@
-from django.contrib import admin
-
 from workbench.contacts.models import (
     EmailAddress,
     Group,
@@ -8,6 +6,7 @@ from workbench.contacts.models import (
     PhoneNumber,
     PostalAddress,
 )
+from workbench.tools import admin
 
 
 class PhoneNumberInline(admin.TabularInline):
@@ -25,6 +24,7 @@ class PostalAddressInline(admin.TabularInline):
     extra = 0
 
 
+@admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     filter_horizontal = ("groups",)
     list_display = ("name", "primary_contact")
@@ -32,6 +32,7 @@ class OrganizationAdmin(admin.ModelAdmin):
     search_fields = ("name", "notes")
 
 
+@admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
     filter_horizontal = ("groups",)
     inlines = [PhoneNumberInline, EmailAddressInline, PostalAddressInline]
@@ -41,6 +42,6 @@ class PersonAdmin(admin.ModelAdmin):
     search_fields = ["given_name", "family_name", "notes"]
 
 
-admin.site.register(Group)
-admin.site.register(Organization, OrganizationAdmin)
-admin.site.register(Person, PersonAdmin)
+@admin.register(Group)
+class GroupAdmin(admin.ReadWriteModelAdmin):
+    pass

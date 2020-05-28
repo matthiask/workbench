@@ -1,7 +1,8 @@
-from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from admin_ordering.admin import OrderableAdmin
+
+from workbench.tools import admin
 
 from . import models
 
