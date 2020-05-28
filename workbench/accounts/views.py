@@ -28,7 +28,8 @@ class UserUpdateView(UpdateView):
         if self.request.user.is_authenticated:
             return self.request.user
         elif "user_email" in self.request.session:
-            return User(email=self.request.session["user_email"])
+            email = self.request.session["user_email"]
+            return User(email=email, _short_name=email.split("@")[0])
         else:
             raise Http404
 
