@@ -179,21 +179,41 @@ def work_anniversaries():
 
     for name, start in query(
         """
-WITH earliest AS (
-    SELECT
-        user_id,
-        MIN(date_from) AS start
-    FROM awt_employment
-    WHERE percentage>0
-    GROUP BY user_id
+WITH
+employments AS (
+  SELECT
+    user_id,
+    date_from,
+    date_until
+  FROM awt_employment
+  WHERE percentage>0
+  ORDER BY date_from
+),
+ends AS (
+  SELECT
+    user_id,
+    array_agg(date_until + 1) AS ends
+  FROM employments
+  GROUP BY user_id
+),
+earliest AS (
+  SELECT
+    user_id,
+    -- The latest start which ...
+    MAX(date_from) AS start
+  FROM employments
+  LEFT JOIN ends USING (user_id)
+  -- ... has not an ending employment preceeding it (one day difference)
+  WHERE NOT date_from = ANY(ends.ends)
+  GROUP BY user_id
 )
 SELECT _full_name, earliest.start
 FROM accounts_user u
 LEFT JOIN earliest ON u.id=earliest.user_id
 WHERE
-    earliest.start IS NOT NULL
-    AND earliest.start < %s
-    AND u.is_active=TRUE
+  earliest.start IS NOT NULL
+  AND earliest.start < %s
+  AND u.is_active=TRUE
         """,
         [today.replace(month=1, day=1)],
     ):
