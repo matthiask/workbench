@@ -11,7 +11,9 @@
     {% if request.user|has_feature:FEATURES.CONTROLLING %}
       <a href="{% url 'offers_offer_list' %}">{% trans 'offers'|capfirst %}</a>
     {% endif %}
-    <a href="{% url 'projects_campaign_list' %}">{% trans 'campaigns'|capfirst %}</a>
+    {% if request.user|has_feature:FEATURES.CAMPAIGNS %}
+      <a href="{% url 'projects_campaign_list' %}">{% trans 'campaigns'|capfirst %}</a>
+    {% endif %}
     {% endmark_current %}
   </small>
 </h1>
