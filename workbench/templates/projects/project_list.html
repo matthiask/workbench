@@ -14,7 +14,7 @@
     </div>
     <div class="d-flex w-100 justify-content-between">
       <p class="mb-1">
-        {% if project.contact %}<a href="{{ project.contact.get_absolute_url }}">{{ project.contact }}</a>
+        {% if project.contact %}<a href="{{ project.contact.get_absolute_url }}">{{ project.contact.name_with_organization }}</a>
         {% else %}<a href="{{ project.customer.get_absolute_url }}">{{ project.customer }}</a>
         {% endif %}
       </p>
