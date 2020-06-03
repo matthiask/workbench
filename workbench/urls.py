@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import include, path, re_path
 from django.views.i18n import JavaScriptCatalog
 
@@ -33,6 +33,18 @@ urlpatterns = [
     re_path(r"^report/", include("workbench.reporting.urls")),
     re_path(r"", include("workbench.timer.urls")),
     re_path(r"^notes/", include("workbench.notes.urls")),
+]
+
+# Legacy URL redirects
+urlpatterns += [
+    re_path(
+        r"^projects/([0-9]+)/$",
+        lambda request, pk: redirect("projects_project_detail", pk=pk),
+    ),
+    re_path(
+        r"^offers/([0-9]+)/$",
+        lambda request, pk: redirect("offers_offer_detail", pk=pk),
+    ),
 ]
 
 urlpatterns += i18n_patterns(
