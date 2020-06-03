@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.core import mail
 from django.test import TestCase
 
-from freezegun import freeze_time
+from time_machine import travel
 
 from workbench import factories
 from workbench.reporting.accounting import send_accounting_files
@@ -18,11 +18,11 @@ class ReportingTest(TestCase):
         factories.UserFactory.create(is_admin=True)
         factories.ProjectFactory.create()
 
-        with freeze_time("2019-12-26"):
+        with travel("2019-12-26 12:00"):
             send_accounting_files()
             self.assertEqual(len(mail.outbox), 0)
 
-        with freeze_time("2020-01-01"):
+        with travel("2020-01-01 12:00"):
             send_accounting_files()
             self.assertEqual(len(mail.outbox), 1)
 

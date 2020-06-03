@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.utils.timezone import localtime
 from django.utils.translation import deactivate_all
 
-from freezegun import freeze_time
+from time_machine import travel
 
 from workbench import factories
 from workbench.accounts.models import User
@@ -30,7 +30,7 @@ class TimestampsTest(TestCase):
     def setUp(self):
         deactivate_all()
 
-    @freeze_time("2020-02-20T03:00:00+00:00")
+    @travel("2020-02-20T03:00:00+00:00")
     def test_timestamp(self):
         """Basic smoke test of timestamp creation and deletion"""
         self.client.force_login(factories.UserFactory.create())

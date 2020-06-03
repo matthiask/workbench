@@ -14,7 +14,6 @@ django-webpack-loader
 dj-database-url
 factory-boy
 flake8
-freezegun
 gunicorn
 lxml
 mailchimp3
@@ -24,5 +23,6 @@ Pillow
 psycopg2-binary
 reportlab
 speckenv
+time-machine
 vobject
 xlsxdocument

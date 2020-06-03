@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
 
-from freezegun import freeze_time
+from time_machine import travel
 
 from workbench import factories
 from workbench.logbook.models import Break
@@ -73,7 +73,7 @@ class BreaksTest(TestCase):
             [("ends_at", ["Breaks must start and end on the same day."])],
         )
 
-    @freeze_time("2020-01-02")
+    @travel("2020-01-02 12:00")
     def test_break_form_initial(self):
         """Fields are initialized as expected"""
         user = factories.UserFactory.create()

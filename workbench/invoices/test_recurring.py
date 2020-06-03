@@ -4,7 +4,7 @@ from django.core import mail
 from django.test import TestCase
 from django.utils.translation import deactivate_all
 
-from freezegun import freeze_time
+from time_machine import travel
 
 from workbench import factories
 from workbench.invoices.models import Invoice, RecurringInvoice
@@ -39,13 +39,13 @@ class RecurringTest(TestCase):
 
         self.assertEqual(ri.next_period_starts_on, None)
 
-        with freeze_time("2019-01-01"):
+        with travel("2019-01-01 12:00"):
             self.assertEqual(len(ri.create_invoices()), 12)
 
         ri.ends_on = None
         ri.save()
 
-        with freeze_time("2019-01-01"):
+        with travel("2019-01-01 12:00"):
             self.assertEqual(len(ri.create_invoices()), 1)
 
         # Continue generating invoices after January '19

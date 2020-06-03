@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.utils import timezone
 from django.utils.translation import deactivate_all
 
-from freezegun import freeze_time
+from time_machine import travel
 
 from workbench import factories
 from workbench.audit.models import LoggedAction
@@ -207,7 +207,7 @@ class DealsTest(TestCase):
         response = self.client.post(deal.urls["set_status"] + "?status=20")
         self.assertContains(response, "This field is required when closing a deal.")
 
-    @freeze_time("2020-02-18")
+    @travel("2020-02-18 12:00:00")
     def test_badge(self):
         """The deal badge contains expected informations"""
         self.assertEqual(

@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
 
-from freezegun import freeze_time
+from time_machine import travel
 
 from workbench import factories
 from workbench.logbook.models import LoggedCost, LoggedHours
@@ -342,7 +342,7 @@ class LogbookTest(TestCase):
             html=True,
         )
 
-    @freeze_time("2019-12-15")
+    @travel("2019-12-15 12:00")
     def test_logged_hours_deletion(self):
         """Deleting hours from past weeks or locked hours is not allowed"""
         hours = factories.LoggedHoursFactory.create(rendered_on=in_days(-10))
@@ -656,12 +656,12 @@ class LogbookTest(TestCase):
         self.assertNotContains(response, "id_modal-expense_currency")
         self.assertNotContains(response, "id_modal-expense_cost")
 
-    @freeze_time("2019-12-31")
+    @travel("2019-12-31 12:00")
     def test_logbook_lock_monday(self):
         """Assert that the logbook locks on current monday..."""
         self.assertEqual(logbook_lock(), dt.date(2019, 12, 30))
 
-    @freeze_time("2020-01-02")
+    @travel("2020-01-02 12:00")
     def test_logbook_lock_first_of_year(self):
         """Assert that the logbook locks on the first day of the year"""
         self.assertEqual(logbook_lock(), dt.date(2020, 1, 1))
