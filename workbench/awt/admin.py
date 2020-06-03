@@ -15,7 +15,7 @@ class WorkingTimeModelAdmin(OrderableAdmin, admin.ModelAdmin):
 
 
 @admin.register(models.Year)
-class YearAdmin(admin.ModelAdmin):
+class YearAdmin(admin.ReadWriteModelAdmin):
     list_display = [
         "year",
         "working_time_model",
