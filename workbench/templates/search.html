@@ -20,6 +20,7 @@
             <a href="{{ result.get_absolute_url }}">
               {{ result|h }}
               {{ result.status_badge }}
+              {% if result.organization %}({{ result.organization }}){% endif %}
             </a>
           </li>
         {% endif %}

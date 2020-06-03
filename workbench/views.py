@@ -133,7 +133,12 @@ def search(request):
         ]
         if request.user.features[FEATURES.CAMPAIGNS]:
             sources.append(Campaign.objects.select_related("owned_by"))
-        sources.extend([Organization.objects.all(), Person.objects.active()])
+        sources.extend(
+            [
+                Organization.objects.all(),
+                Person.objects.active().select_related("organization"),
+            ]
+        )
         if request.user.features[FEATURES.CONTROLLING]:
             sources.extend(
                 [
