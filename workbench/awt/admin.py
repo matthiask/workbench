@@ -8,7 +8,7 @@ from . import models
 
 
 @admin.register(models.WorkingTimeModel)
-class WorkingTimeModelAdmin(OrderableAdmin, admin.ModelAdmin):
+class WorkingTimeModelAdmin(OrderableAdmin, admin.ReadWriteModelAdmin):
     list_display = ["name", "position"]
     list_editable = ["position"]
     ordering_field = "position"
@@ -31,7 +31,7 @@ class YearAdmin(admin.ReadWriteModelAdmin):
 
 
 @admin.register(models.Employment)
-class EmploymentAdmin(admin.ModelAdmin):
+class EmploymentAdmin(admin.ReadWriteModelAdmin):
     list_display = [
         "user",
         "date_from",
