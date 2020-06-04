@@ -313,3 +313,10 @@ class RecurringTest(TestCase):
 
         self.assertEqual(len(r1.create_invoices()), 1)
         self.assertEqual(len(r2.create_invoices()), 0)
+
+    def test_create_project(self):
+        """Recurring invoices may optionally create projects"""
+        r = factories.RecurringInvoiceFactory.create(create_project=True)
+
+        invoices = r.create_invoices()
+        self.assertIsNotNone(invoices[0].project)

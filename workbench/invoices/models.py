@@ -566,6 +566,12 @@ class RecurringInvoice(ModelWithTotal):
         _("next period starts on"), blank=True, null=True
     )
 
+    create_project = models.BooleanField(
+        _("Create project?"),
+        help_text=_("Invoices are created without projects by default."),
+        default=False,
+    )
+
     objects = RecurringInvoiceQuerySet.as_manager()
 
     class Meta:
@@ -612,10 +618,21 @@ class RecurringInvoice(ModelWithTotal):
         )
 
     def create_single_invoice(self, *, period_starts_on, period_ends_on):
+        project = None
+        if self.create_project:
+            project = Project.objects.create(
+                customer=self.customer,
+                contact=self.contact,
+                title=self.title,
+                description=self.description,
+                owned_by=self.owned_by,
+                type=Project.MAINTENANCE,
+            )
+
         return Invoice.objects.create(
             customer=self.customer,
             contact=self.contact,
-            project=None,
+            project=project,
             invoiced_on=period_starts_on,
             due_on=period_starts_on + dt.timedelta(days=15),
             title=self.title,
