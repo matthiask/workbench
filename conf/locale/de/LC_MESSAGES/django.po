@@ -1674,7 +1674,7 @@ msgstr "nächste Periode beginnt am"
 
 #: workbench/invoices/models.py
 msgid "Create project?"
-msgstr "Projeckt erstellen?"
+msgstr "Projekt erstellen?"
 
 #: workbench/invoices/models.py
 msgid "Invoices are created without projects by default."
