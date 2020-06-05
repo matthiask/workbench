@@ -33,10 +33,7 @@ urlpatterns = [
     re_path(r"^report/", include("workbench.reporting.urls")),
     re_path(r"", include("workbench.timer.urls")),
     re_path(r"^notes/", include("workbench.notes.urls")),
-]
-
-# Legacy URL redirects
-urlpatterns += [
+    # Legacy URL redirects
     re_path(
         r"^projects/([0-9]+)/$",
         lambda request, pk: redirect("projects_project_detail", pk=pk),
