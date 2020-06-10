@@ -19,7 +19,10 @@
 
     <tr>
       <th class="text-right">{% trans 'invoice'|capfirst %}</th>
-      <td>{% link_or_none object.invoice %}</td>
+      <td>
+        {% link_or_none object.invoice with_badge=True %}
+        {% if object.invoice %}{% trans 'invoice total'|capfirst %}: {{ object.invoice.total|currency }}{% endif %}
+      </td>
     </tr>
   </table>
 
