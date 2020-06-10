@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-04 14:38+0200\n"
+"POT-Creation-Date: 2020-06-10 09:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2663,6 +2663,10 @@ msgstr "Sichern"
 #: workbench/templates/offers/offer_pricing.html
 msgid "cancel"
 msgstr "Abbruch"
+
+#: workbench/templates/credit_control/creditentry_detail.html
+msgid "invoice total"
+msgstr "Rechnungstotal"
 
 #: workbench/templates/deals/deal_detail.html
 msgid "open"
