@@ -10,7 +10,10 @@ from workbench.tools.formats import currency, local_date_format
 
 TEMPLATE = """\
 {base_url}{recurring_url} ==>
-{invoice} {total} {invoiced_on}
+{customer}
+{invoiced_on}
+{invoice}
+{total}
 {base_url}{invoice_url}
 
 """
@@ -26,6 +29,9 @@ def create_recurring_invoices_and_notify():
         invoices = "\n".join(
             TEMPLATE.format(
                 invoice=invoice,
+                customer=invoice.contact.name_with_organization
+                if invoice.contact
+                else invoice.customer,
                 total=currency(invoice.total),
                 invoiced_on=local_date_format(invoice.invoiced_on),
                 base_url=settings.WORKBENCH.URL,
