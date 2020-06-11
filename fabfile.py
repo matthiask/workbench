@@ -36,9 +36,9 @@ for job in $(jobs -p); do wait $job; done
 
 def _do_deploy(c, folder, rsync):
     with c.cd(folder):
-        c.run("git checkout master")
+        c.run("git checkout main")
         c.run("git fetch origin")
-        c.run("git merge --ff-only origin/master")
+        c.run("git merge --ff-only origin/main")
         c.run('find . -name "*.pyc" -delete')
         c.run("venv/bin/pip install -U pip wheel setuptools")
         c.run("venv/bin/pip install -r requirements.txt")
@@ -62,7 +62,7 @@ def _restart_all(c):
 @task
 def deploy(c):
     check(c)
-    c.run("git push origin master")
+    c.run("git push origin main")
     c.run("yarn run prod")
     with Connection(host, forward_agent=True) as c:
         _do_deploy(c, "www/workbench/", rsync=True)
@@ -72,7 +72,7 @@ def deploy(c):
 @task
 def deploy_code(c):
     check(c)
-    c.run("git push origin master")
+    c.run("git push origin main")
     with Connection(host, forward_agent=True) as c:
         _do_deploy(c, "www/workbench/", rsync=False)
         _restart_all(c)

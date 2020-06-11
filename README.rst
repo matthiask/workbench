@@ -2,7 +2,7 @@
 Workbench
 =========
 
-.. image:: https://travis-ci.org/matthiask/workbench.svg?branch=master
+.. image:: https://travis-ci.org/matthiask/workbench.svg?branch=main
     :target: https://travis-ci.org/matthiask/workbench
 
 Recommended contents of ``.env`` (add some random value for
