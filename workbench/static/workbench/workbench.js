@@ -87,6 +87,7 @@ $(function () {
           window.location.href = data.redirect
           const to = new URL(data.redirect, window.location.href)
           if (to.pathname === window.location.pathname) {
+            // Alternative: window.hashchange -> window.location.reload()
             window.location.reload()
           }
         } else {
