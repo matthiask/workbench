@@ -250,7 +250,7 @@ ServiceFormset = inlineformset_factory(
 
 
 @add_prefix("modal")
-class OfferCopyForm(forms.Form):
+class OfferCopyForm(Form):
     project = forms.ModelChoiceField(
         queryset=Project.objects.all(),
         widget=Autocomplete(model=Project, params={"only_open": "on"}),
@@ -264,7 +264,10 @@ class OfferCopyForm(forms.Form):
     def clean_project(self):
         project = self.cleaned_data.get("project")
         if project == self.project:
-            raise forms.ValidationError(_("Select a different project as target."))
+            self.add_warning(
+                _("Same project selected as offer already belongs to."),
+                code="same-project",
+            )
         return project
 
 

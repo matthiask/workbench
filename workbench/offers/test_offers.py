@@ -338,7 +338,7 @@ class OffersTest(TestCase):
             offer.urls["copy"], {"modal-project": offer.project.pk}
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Select a different project as target.")
+        self.assertContains(response, 'value="same-project"')
 
         project = factories.ProjectFactory.create()
         response = self.client.post(offer.urls["copy"], {"modal-project": project.pk})

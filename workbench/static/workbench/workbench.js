@@ -83,7 +83,12 @@ $(function () {
           window.location.reload()
         } else if (jqXHR.status === 299) {
           dismissModals()
+
           window.location.href = data.redirect
+          const to = new URL(data.redirect, window.location.href)
+          if (to.pathname === window.location.pathname) {
+            window.location.reload()
+          }
         } else {
           initModal(data)
         }

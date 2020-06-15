@@ -129,7 +129,7 @@
     </div>
 
     {% for offer, offer_data in project.grouped_services.offers %}
-    <div class="card my-3 {% if offer and offer.is_declined %}border border-danger opacity-60{% endif %}">
+    <div class="card my-3 {% if offer and offer.is_declined %}border border-danger opacity-60{% endif %}" id="offer{{ offer.pk }}">
       <div class="card-header">
         {% if offer %}
           <div class="d-flex w-100 justify-content-between">

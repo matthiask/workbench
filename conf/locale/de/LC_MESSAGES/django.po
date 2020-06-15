@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-10 09:51+0200\n"
+"POT-Creation-Date: 2020-06-15 13:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2016,8 +2016,10 @@ msgstr ""
 "kannst Du die Offerte auch einfach zurück auf 'In Vorbereitung' setzen."
 
 #: workbench/offers/forms.py
-msgid "Select a different project as target."
-msgstr "Wähle ein anderes Projekt als Ziel."
+msgid "Same project selected as offer already belongs to."
+msgstr ""
+"Gleiches Projekt ausgewählt wie dasjenige, zu welchem die Offerte schon "
+"gehört."
 
 #: workbench/offers/forms.py
 msgid "Delete offers' services?"
@@ -3398,3 +3400,6 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Select a different project as target."
+#~ msgstr "Wähle ein anderes Projekt als Ziel."

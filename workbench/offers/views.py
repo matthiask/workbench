@@ -58,7 +58,9 @@ class OfferDeleteView(generic.DeleteView):
 def copy_offer(request, pk):
     offer = get_object_or_404(Offer, pk=pk)
     form = OfferCopyForm(
-        request.POST if request.method == "POST" else None, project=offer.project
+        request.POST if request.method == "POST" else None,
+        project=offer.project,
+        request=request,
     )
     if form.is_valid():
         new = offer.copy_to(project=form.cleaned_data["project"], owned_by=request.user)
