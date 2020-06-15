@@ -76,9 +76,9 @@ class Autocomplete(forms.TextInput):
         )
 
 
-class WarningsForm(forms.BaseForm):
+class WarningsForm:
     """
-    Form subclass which allows implementing validation warnings
+    Form class mixin which allows implementing validation warnings
     In contrast to Django's ``ValidationError``, these warnings may
     be ignored by checking a checkbox.
     The warnings support consists of the following methods and properties:
@@ -134,7 +134,7 @@ class DateInput(forms.TextInput):
     input_type = "date"
 
 
-class Form(forms.Form):
+class Form(WarningsForm, forms.Form):
     required_css_class = "required"
     error_css_class = "is-invalid"
 

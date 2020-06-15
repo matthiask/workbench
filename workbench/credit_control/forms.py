@@ -8,7 +8,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.invoices.models import Invoice
 from workbench.tools.formats import currency, local_date_format
-from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, WarningsForm
+from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
 
 
 class CreditEntrySearchForm(Form):
@@ -74,7 +74,7 @@ class CreditEntryForm(ModelForm):
         return instance
 
 
-class AccountStatementUploadForm(WarningsForm, Form):
+class AccountStatementUploadForm(Form):
     ledger = CreditEntry._meta.get_field("ledger").formfield(widget=forms.RadioSelect)
     statement = forms.FileField(label=_("Account statement"))
 
