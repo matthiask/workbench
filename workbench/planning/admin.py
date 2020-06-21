@@ -4,15 +4,18 @@ from . import models
 
 
 @admin.register(models.PlanningTeamMembership)
-class PlanningTeamMembershipAdmin(admin.ModelAdmin):
+class PlanningTeamMembershipAdmin(admin.ReadWriteModelAdmin):
     list_display = ["project", "user"]
+    raw_id_fields = ["project"]
 
 
 @admin.register(models.PlanningRequest)
-class PlanningRequestAdmin(admin.ModelAdmin):
-    raw_id_fields = ["project", "offer", "receivers", "created_by"]
+class PlanningRequestAdmin(admin.ReadWriteModelAdmin):
+    filter_horizontal = ["receivers"]
+    raw_id_fields = ["project", "offer", "created_by"]
 
 
 @admin.register(models.PlannedWork)
-class PlannedWorkAdmin(admin.ModelAdmin):
+class PlannedWorkAdmin(admin.ReadWriteModelAdmin):
+    list_display = ["project", "user", "planned_hours", "weeks"]
     raw_id_fields = ["project", "offer", "request", "user"]
