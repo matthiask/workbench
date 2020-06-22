@@ -2,7 +2,7 @@ from django import forms
 
 from workbench.accounts.models import User
 from workbench.offers.models import Offer
-from workbench.planning.models import PlanningRequest
+from workbench.planning.models import PlannedWork, PlanningRequest
 from workbench.projects.models import Project
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
 
@@ -33,7 +33,7 @@ class PlanningRequestSearchForm(Form):
             queryset = queryset.filter(status__lte=PlanningRequest.OFFERED)
         queryset = self.apply_renamed(queryset, "org", "project__customer")
         """
-        queryset = self.apply_owned_by(queryset)
+        queryset = self.apply_owned_by(queryset, attribute="created_by")
         return queryset.select_related(
             "created_by",
             "project__owned_by",
@@ -82,3 +82,69 @@ class PlanningRequestForm(ModelForm):
         instance.save()
         self.save_m2m()
         return instance
+
+
+class PlannedWorkSearchForm(Form):
+    user = forms.TypedChoiceField(
+        coerce=int,
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["user"].choices = User.objects.choices(
+            collapse_inactive=True, myself=True
+        )
+
+    def filter(self, queryset):
+        """
+        data = self.cleaned_data
+        queryset = queryset.search(data.get("q"))
+        if data.get("s") == "all":
+            pass
+        elif data.get("s"):
+            queryset = queryset.filter(status=data.get("s"))
+        else:
+            queryset = queryset.filter(status__lte=PlanningRequest.OFFERED)
+        queryset = self.apply_renamed(queryset, "org", "project__customer")
+        """
+        queryset = self.apply_owned_by(queryset, attribute="user")
+        return queryset.select_related(
+            "user",
+            "project__owned_by",
+            "project__customer",
+            "project__contact__organization",
+        )
+
+
+class PlannedWorkForm(ModelForm):
+    user_fields = default_to_current_user = ("user",)
+
+    class Meta:
+        model = PlannedWork
+        fields = (
+            "project",
+            "offer",
+            "request",
+            "user",
+            "planned_hours",
+            "notes",
+            "weeks",
+        )
+        widgets = {
+            "project": Autocomplete(model=Project, params={"only_open": "on"}),
+            "offer": Autocomplete(model=Offer),
+            "notes": Textarea,
+        }
+
+    def _____init__(self, *args, **kwargs):
+        self.project = kwargs.pop("project", None)
+        if self.project:  # Creating a new offer
+            kwargs.setdefault("initial", {}).update({"title": self.project.title})
+        else:
+            self.project = kwargs["instance"].project
+
+        super().__init__(*args, **kwargs)
+        self.instance.project = self.project
