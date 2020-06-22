@@ -1,13 +1,13 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
-from workbench.tools.formats import hours, local_date_format
+from workbench.tools.formats import Z1, hours, local_date_format
 from workbench.tools.models import HoursField, Model, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
@@ -88,6 +88,18 @@ class PlanningRequest(Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.planned_hours = (
+                self.planned_work.order_by().aggregate(h=Sum("planned_hours"))["h"]
+                or Z1
+            )
+        else:
+            self.planned_hours = Z1
+        super().save(*args, **kwargs)
+
+    save.alters_data = True
 
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)

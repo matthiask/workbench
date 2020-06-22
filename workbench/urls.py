@@ -28,6 +28,7 @@ urlpatterns = [
     re_path(r"^credit-control/", include("workbench.credit_control.urls")),
     re_path(r"^expenses/", include("workbench.expenses.urls")),
     re_path(r"^deals/", include("workbench.deals.urls")),
+    re_path(r"^planning/", include("workbench.planning.urls")),
     re_path(r"^search/$", views.search, name="search"),
     re_path(r"^history/(\w+)/(\w+)/([0-9]+)/$", views.history, name="history"),
     re_path(r"^report/", include("workbench.reporting.urls")),
