@@ -89,6 +89,22 @@ class PlanningRequest(Model):
     def __str__(self):
         return self.title
 
+    def clean_fields(self, exclude=None):
+        super().clean_fields(exclude=exclude)
+        errors = {}
+
+        if self.earliest_start_on.weekday() != 0:
+            errors["earliest_start_on"] = _("Only mondays allowed.")
+        if self.completion_requested_on.weekday() != 0:
+            errors["completion_requested_on"] = _("Only mondays allowed.")
+
+        if self.completion_requested_on <= self.earliest_start_on:
+            errors["completion_requested_on"] = _(
+                "Allow at least one week for the work please."
+            )
+
+        raise_if_errors(errors, exclude)
+
 
 @model_urls
 class PlannedWork(Model):
@@ -137,11 +153,10 @@ class PlannedWork(Model):
         super().clean_fields(exclude=exclude)
         errors = {}
 
-        if self.weeks:
-            no_mondays = [day for day in self.weeks if day.weekday() != 0]
-            if no_mondays:
-                errors["weeks"] = _("Only mondays allowed, but field contains %s.") % (
-                    ", ".join(local_date_format(day) for day in no_mondays),
-                )
+        no_mondays = [day for day in self.weeks if day.weekday() != 0]
+        if no_mondays:
+            errors["weeks"] = _("Only mondays allowed, but field contains %s.") % (
+                ", ".join(local_date_format(day) for day in no_mondays),
+            )
 
         raise_if_errors(errors, exclude)

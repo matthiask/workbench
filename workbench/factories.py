@@ -15,7 +15,11 @@ from workbench.deals.models import AttributeGroup, ClosingType, Deal, ValueType
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
-from workbench.planning.models import PlannedWork
+from workbench.planning.models import (
+    PlannedWork,
+    PlanningRequest,
+    PlanningTeamMembership,
+)
 from workbench.projects.models import Campaign, Project, Service
 from workbench.reporting.models import CostCenter
 from workbench.services.models import ServiceType
@@ -302,6 +306,27 @@ class CostCenterFactory(factory.DjangoModelFactory):
 
 
 # PLANNING ####################################################################
+class PlanningTeamMembershipFactory(factory.DjangoModelFactory):
+    project = factory.SubFactory(ProjectFactory)
+    user = factory.SubFactory(UserFactory)
+
+    class Meta:
+        model = PlanningTeamMembership
+
+
+class PlanningRequestFactory(factory.DjangoModelFactory):
+    project = factory.SubFactory(ProjectFactory)
+    created_by = factory.SubFactory(UserFactory)
+    requested_hours = 20
+    planned_hours = 0
+    earliest_start_on = dt.date(2020, 6, 22)
+    completion_requested_on = dt.date(2020, 6, 29)
+    title = "Planning request"
+
+    class Meta:
+        model = PlanningRequest
+
+
 class PlannedWorkFactory(factory.DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     user = factory.SubFactory(UserFactory)
