@@ -235,4 +235,8 @@ class Migration(migrations.Migration):
                 "ordering": ["weeks"],
             },
         ),
+        migrations.RunSQL(
+            "SELECT audit_audit_table('planning_planningrequest');"
+            "SELECT audit_audit_table('planning_plannedwork');"
+        ),
     ]
