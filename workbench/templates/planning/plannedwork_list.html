@@ -19,6 +19,12 @@
     <h5 class="mb-1">{{ object|h }}</h5>
     {{ object.status_badge }}
   </div>
+  <div class="d-flex justify-content-between">
+    <span class="w-50">{{ object.project }}</span>
+    <span>{{ object.planned_hours|hours }}</span>
+    <span>{{ object.user.get_full_name }}</span>
+    <span>{{ object.pretty_from_until }}</span>
+  </div>
 </a>
 {% endfor %}
 {% endblock %}

@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Q, Sum
@@ -7,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
-from workbench.tools.formats import Z1, hours, local_date_format
+from workbench.tools.formats import Z1, local_date_format
 from workbench.tools.models import HoursField, Model, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
@@ -150,6 +152,7 @@ class PlannedWork(Model):
         related_name="planned_work",
     )
     planned_hours = HoursField(_("planned hours"))
+    title = models.CharField(_("title"), max_length=200)
     notes = models.TextField(_("notes"), blank=True)
     weeks = ArrayField(models.DateField(), verbose_name=_("weeks"))
 
@@ -159,7 +162,7 @@ class PlannedWork(Model):
         verbose_name_plural = _("planned work")
 
     def __str__(self):
-        return hours(self.planned_hours)
+        return self.title
 
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
@@ -173,3 +176,10 @@ class PlannedWork(Model):
                 )
 
         raise_if_errors(errors, exclude)
+
+    @property
+    def pretty_from_until(self):
+        return "{} – {}".format(
+            local_date_format(min(self.weeks)),
+            local_date_format(max(self.weeks) + dt.timedelta(days=6)),
+        )

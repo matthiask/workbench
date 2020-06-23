@@ -142,8 +142,9 @@ class PlannedWorkForm(ModelForm):
             "offer",
             "request",
             "user",
-            "planned_hours",
+            "title",
             "notes",
+            "planned_hours",
         )
         widgets = {
             "project": Autocomplete(model=Project, params={"only_open": "on"}),
