@@ -41,7 +41,7 @@ def planned_work(*, users=None):
                 }
                 for project, offers in projects_offers.items()
             ],
-            key=lambda row: row["project"],
+            key=lambda row: row["project"],  # FIXME sort by timeline
         ),
         "by_week": [by_week[week] for week in weeks],
     }
