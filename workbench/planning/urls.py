@@ -27,20 +27,26 @@ urlpatterns = [
     path(
         "requests/create/",
         generic.CreateView.as_view(
-            model=PlanningRequest, form_class=PlanningRequestForm
+            model=PlanningRequest,
+            form_class=PlanningRequestForm,
+            template_name="modalform.html",
         ),
         name="planning_planningrequest_create",
     ),
     path(
         "requests/<int:pk>/update/",
         generic.UpdateView.as_view(
-            model=PlanningRequest, form_class=PlanningRequestForm
+            model=PlanningRequest,
+            form_class=PlanningRequestForm,
+            template_name="modalform.html",
         ),
         name="planning_planningrequest_update",
     ),
     path(
         "requests/<int:pk>/delete/",
-        generic.DeleteView.as_view(model=PlanningRequest),
+        generic.DeleteView.as_view(
+            model=PlanningRequest, template_name="modal_confirm_delete.html"
+        ),
         name="planning_planningrequest_delete",
     ),
     # Planned work
@@ -58,17 +64,27 @@ urlpatterns = [
     ),
     path(
         "work/create/",
-        generic.CreateView.as_view(model=PlannedWork, form_class=PlannedWorkForm),
+        generic.CreateView.as_view(
+            model=PlannedWork,
+            form_class=PlannedWorkForm,
+            template_name="modalform.html",
+        ),
         name="planning_plannedwork_create",
     ),
     path(
         "work/<int:pk>/update/",
-        generic.UpdateView.as_view(model=PlannedWork, form_class=PlannedWorkForm),
+        generic.UpdateView.as_view(
+            model=PlannedWork,
+            form_class=PlannedWorkForm,
+            template_name="modalform.html",
+        ),
         name="planning_plannedwork_update",
     ),
     path(
         "work/<int:pk>/delete/",
-        generic.DeleteView.as_view(model=PlannedWork),
+        generic.DeleteView.as_view(
+            model=PlannedWork, template_name="modal_confirm_delete.html"
+        ),
         name="planning_plannedwork_delete",
     ),
 ]

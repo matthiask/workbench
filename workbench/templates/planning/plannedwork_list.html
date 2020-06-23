@@ -1,0 +1,24 @@
+{% extends "generic/object_list.html" %}
+
+{% load bootstrap4 i18n workbench %}
+
+{% block search-form-buttons %}
+  <a href="{{ view.model.urls.create }}" class="btn btn-primary"
+    data-toggle="ajaxmodal">
+    {% include "svg/plus.svg" %}
+    {{ view.meta.verbose_name|capfirst }}
+  </a>
+{% endblock %}
+
+{% block objects %}
+{% for object in object_list %}
+<a href="{{ object.get_absolute_url }}"
+  class="list-group-item list-group-item-action"
+  data-toggle="ajaxmodal">
+  <div class="d-flex w-100 justify-content-between">
+    <h5 class="mb-1">{{ object|h }}</h5>
+    {{ object.status_badge }}
+  </div>
+</a>
+{% endfor %}
+{% endblock %}

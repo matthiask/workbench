@@ -6,7 +6,7 @@
   <a href="{{ view.model.urls.create }}" class="btn btn-primary"
     data-toggle="ajaxmodal">
     {% include "svg/plus.svg" %}
-    {{ view.meta.verbose_name }}
+    {{ view.meta.verbose_name|capfirst }}
   </a>
   {% if request.user|has_feature:FEATURES.CONTROLLING %}
     <a href="{% querystring export='xlsx' %}" class="btn btn-primary">
