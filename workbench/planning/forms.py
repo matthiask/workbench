@@ -17,6 +17,12 @@ from workbench.tools.validation import monday
 
 
 class PlanningRequestSearchForm(Form):
+    project = forms.ModelChoiceField(
+        queryset=Project.objects.all(),
+        required=False,
+        widget=Autocomplete(model=Project),
+        label="",
+    )
     created_by = forms.TypedChoiceField(
         coerce=int,
         required=False,
@@ -31,17 +37,9 @@ class PlanningRequestSearchForm(Form):
         )
 
     def filter(self, queryset):
-        """
         data = self.cleaned_data
-        queryset = queryset.search(data.get("q"))
-        if data.get("s") == "all":
-            pass
-        elif data.get("s"):
-            queryset = queryset.filter(status=data.get("s"))
-        else:
-            queryset = queryset.filter(status__lte=PlanningRequest.OFFERED)
-        queryset = self.apply_renamed(queryset, "org", "project__customer")
-        """
+        if data.get("project"):
+            queryset = queryset.filter(service__project=data.get("project"))
         queryset = self.apply_owned_by(queryset, attribute="created_by")
         return queryset.select_related(
             "created_by",
@@ -102,6 +100,12 @@ class PlanningRequestForm(ModelForm):
 
 
 class PlannedWorkSearchForm(Form):
+    project = forms.ModelChoiceField(
+        queryset=Project.objects.all(),
+        required=False,
+        widget=Autocomplete(model=Project),
+        label="",
+    )
     user = forms.TypedChoiceField(
         coerce=int,
         required=False,
@@ -116,17 +120,9 @@ class PlannedWorkSearchForm(Form):
         )
 
     def filter(self, queryset):
-        """
         data = self.cleaned_data
-        queryset = queryset.search(data.get("q"))
-        if data.get("s") == "all":
-            pass
-        elif data.get("s"):
-            queryset = queryset.filter(status=data.get("s"))
-        else:
-            queryset = queryset.filter(status__lte=PlanningRequest.OFFERED)
-        queryset = self.apply_renamed(queryset, "org", "project__customer")
-        """
+        if data.get("project"):
+            queryset = queryset.filter(service__project=data.get("project"))
         queryset = self.apply_owned_by(queryset, attribute="user")
         return queryset.select_related(
             "user",
