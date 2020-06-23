@@ -161,6 +161,12 @@ class PlannedWorkForm(ModelForm):
             self.project = kwargs["instance"].project
         """
 
+        initial = kwargs.setdefault("initial", {})
+        request = kwargs["request"]
+        for field in ["project", "offer", "request"]:
+            if request.GET.get(field):
+                initial.setdefault(field, request.GET.get(field))
+
         super().__init__(*args, **kwargs)
         # self.instance.project = self.project
 
@@ -175,7 +181,7 @@ class PlannedWorkForm(ModelForm):
                         local_date_format(day + dt.timedelta(days=6)),
                     ),
                 )
-                for day in islice(recurring(monday(), "weekly"), 52,)
+                for day in islice(recurring(monday(), "weekly"), 52)
             ],
             widget=forms.SelectMultiple(attrs={"size": 20}),
             initial=self.instance.weeks,
