@@ -331,6 +331,7 @@ class PlannedWorkFactory(factory.DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     user = factory.SubFactory(UserFactory)
     planned_hours = 20
+    title = "Planned work"
 
     class Meta:
         model = PlannedWork
