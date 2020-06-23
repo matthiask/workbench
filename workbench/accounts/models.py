@@ -15,6 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.features import FEATURES, UserFeatures
 from workbench.tools.formats import Z1
 from workbench.tools.models import Model
+from workbench.tools.urls import model_urls
 from workbench.tools.validation import in_days, monday
 
 
@@ -84,6 +85,7 @@ class UserManager(BaseUserManager):
             raise self.model.DoesNotExist
 
 
+@model_urls
 @total_ordering
 class User(Model, AbstractBaseUser):
     USERNAME_FIELD = "email"

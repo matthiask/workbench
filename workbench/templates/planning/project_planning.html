@@ -1,0 +1,13 @@
+{% extends "generic/object_detail.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans 'planning'|capfirst %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <h1>{% trans 'planning'|capfirst %}</h1>
+  </div>
+</div>
+{% endblock %}

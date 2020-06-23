@@ -1,6 +1,7 @@
 from django.urls import path
 
 from workbench import generic
+from workbench.planning import views
 from workbench.planning.forms import (
     PlannedWorkForm,
     PlannedWorkSearchForm,
@@ -74,5 +75,16 @@ urlpatterns = [
             model=PlannedWork, template_name="modal_confirm_delete.html"
         ),
         name="planning_plannedwork_delete",
+    ),
+    # Reports
+    path(
+        "project/<int:pk>/",
+        views.ProjectPlanningView.as_view(),
+        name="projects_project_planning",
+    ),
+    path(
+        "user/<int:pk>/",
+        views.UserPlanningView.as_view(),
+        name="accounts_user_planning",
     ),
 ]
