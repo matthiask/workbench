@@ -4,6 +4,8 @@
 
 {% block title %}{{ object }} {% history_link object %}{% endblock %}
 
+{% block size %}modal-xl{% endblock %}
+
 {% block body %}
   <table class="table table-striped">
     {% for name, value in object|field_value_pairs %}
@@ -12,6 +14,12 @@
       <td>{% link_or_none value %}</td>
     </tr>
     {% endfor %}
+    <tr>
+      <th class="text-right">{{ object|label:'receivers' }}</th>
+      <td>
+        {% for user in object.receivers.all %}{{ user.get_full_name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+      </td>
+    </tr>
   </table>
 {% endblock %}
 

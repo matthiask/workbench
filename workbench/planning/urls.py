@@ -27,18 +27,14 @@ urlpatterns = [
     path(
         "requests/create/",
         generic.CreateView.as_view(
-            model=PlanningRequest,
-            form_class=PlanningRequestForm,
-            template_name="modalform.html",
+            model=PlanningRequest, form_class=PlanningRequestForm,
         ),
         name="planning_planningrequest_create",
     ),
     path(
         "requests/<int:pk>/update/",
         generic.UpdateView.as_view(
-            model=PlanningRequest,
-            form_class=PlanningRequestForm,
-            template_name="modalform.html",
+            model=PlanningRequest, form_class=PlanningRequestForm,
         ),
         name="planning_planningrequest_update",
     ),
@@ -64,20 +60,12 @@ urlpatterns = [
     ),
     path(
         "work/create/",
-        generic.CreateView.as_view(
-            model=PlannedWork,
-            form_class=PlannedWorkForm,
-            template_name="modalform.html",
-        ),
+        generic.CreateView.as_view(model=PlannedWork, form_class=PlannedWorkForm),
         name="planning_plannedwork_create",
     ),
     path(
         "work/<int:pk>/update/",
-        generic.UpdateView.as_view(
-            model=PlannedWork,
-            form_class=PlannedWorkForm,
-            template_name="modalform.html",
-        ),
+        generic.UpdateView.as_view(model=PlannedWork, form_class=PlannedWorkForm),
         name="planning_plannedwork_update",
     ),
     path(

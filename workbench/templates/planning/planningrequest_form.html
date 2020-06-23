@@ -1,0 +1,23 @@
+{% extends "modalform.html" %}
+
+{% load bootstrap4 fineforms i18n workbench %}
+
+{% block size %}modal-xl{% endblock %}
+
+{% block title %}
+{% if view.project %}{{ view.project.title }}{% else %}{{ block.super }}{% endif %}
+{% endblock %}
+
+{% block body %}
+  {% include 'fineforms/warnings.html' %}
+  {% ff_errors form %}
+
+  <div class="row">
+    <div class="col-lg-6">
+      {% ff_fields form exclude='requested_hours,receivers' %}
+    </div>
+    <div class="col-lg-6 receivers">
+      {% ff_fields form fields='requested_hours,receivers' %}
+    </div>
+  </div>
+{% endblock %}

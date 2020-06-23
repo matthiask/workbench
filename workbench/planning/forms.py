@@ -1,10 +1,19 @@
+import datetime as dt
+from itertools import islice
+
 from django import forms
+from django.db.models import Q
+from django.utils.text import capfirst
+from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
+from workbench.invoices.utils import recurring
 from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork, PlanningRequest
 from workbench.projects.models import Project
+from workbench.tools.formats import local_date_format
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
+from workbench.tools.validation import monday
 
 
 class PlanningRequestSearchForm(Form):
@@ -61,17 +70,25 @@ class PlanningRequestForm(ModelForm):
             "project": Autocomplete(model=Project, params={"only_open": "on"}),
             "offer": Autocomplete(model=Offer),
             "description": Textarea,
+            "receivers": forms.CheckboxSelectMultiple,
         }
 
-    def _____init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        """
         self.project = kwargs.pop("project", None)
         if self.project:  # Creating a new offer
             kwargs.setdefault("initial", {}).update({"title": self.project.title})
         else:
             self.project = kwargs["instance"].project
+        """
 
         super().__init__(*args, **kwargs)
-        self.instance.project = self.project
+        # self.instance.project = self.project
+
+        q = Q(is_active=True)
+        if self.instance.pk:
+            q |= Q(id__in=self.instance.receivers.values_list("id", flat=True))
+        self.fields["receivers"].queryset = User.objects.filter(q)
 
     def save(self):
         if self.instance.pk:
@@ -131,7 +148,6 @@ class PlannedWorkForm(ModelForm):
             "user",
             "planned_hours",
             "notes",
-            "weeks",
         )
         widgets = {
             "project": Autocomplete(model=Project, params={"only_open": "on"}),
@@ -139,12 +155,37 @@ class PlannedWorkForm(ModelForm):
             "notes": Textarea,
         }
 
-    def _____init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        """
         self.project = kwargs.pop("project", None)
         if self.project:  # Creating a new offer
             kwargs.setdefault("initial", {}).update({"title": self.project.title})
         else:
             self.project = kwargs["instance"].project
+        """
 
         super().__init__(*args, **kwargs)
-        self.instance.project = self.project
+        # self.instance.project = self.project
+
+        self.fields["weeks"] = forms.MultipleChoiceField(
+            label=capfirst(_("weeks")),
+            choices=[
+                (
+                    day,
+                    "KW{} ({} - {})".format(
+                        local_date_format(day, fmt="W"),
+                        local_date_format(day),
+                        local_date_format(day + dt.timedelta(days=6)),
+                    ),
+                )
+                for day in islice(recurring(monday(), "weekly"), 52,)
+            ],
+            widget=forms.SelectMultiple(attrs={"size": 20}),
+            initial=self.instance.weeks,
+        )
+
+    def save(self):
+        instance = super().save(commit=False)
+        instance.weeks = self.cleaned_data.get("weeks")
+        instance.save()
+        return instance

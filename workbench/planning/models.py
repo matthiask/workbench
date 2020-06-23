@@ -165,10 +165,11 @@ class PlannedWork(Model):
         super().clean_fields(exclude=exclude)
         errors = {}
 
-        no_mondays = [day for day in self.weeks if day.weekday() != 0]
-        if no_mondays:
-            errors["weeks"] = _("Only mondays allowed, but field contains %s.") % (
-                ", ".join(local_date_format(day) for day in no_mondays),
-            )
+        if self.weeks:
+            no_mondays = [day for day in self.weeks if day.weekday() != 0]
+            if no_mondays:
+                errors["weeks"] = _("Only mondays allowed, but field contains %s.") % (
+                    ", ".join(local_date_format(day) for day in no_mondays),
+                )
 
         raise_if_errors(errors, exclude)
