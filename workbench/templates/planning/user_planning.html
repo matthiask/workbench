@@ -57,7 +57,7 @@
             </a>
           </td>
           <td></td>
-          {% for hours in pw.weeks %}<td class="text-right">{% if hours %}{{ hours|hours }}{% endif %}</td>{% endfor %}
+          {% for hours in pw.hours_per_week %}<td class="text-right">{% if hours %}{{ hours|hours }}{% endif %}</td>{% endfor %}
         </tr>
         {% endfor %}
         {% endfor %}

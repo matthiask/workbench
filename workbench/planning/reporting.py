@@ -26,7 +26,9 @@ def planned_work(*, users=None):
         projects_offers[pw.project][pw.offer].append(
             {
                 "planned_work": pw,
-                "weeks": [per_week if week in pw.weeks else Z1 for week in weeks],
+                "hours_per_week": [
+                    per_week if week in pw.weeks else Z1 for week in weeks
+                ],
             }
         )
 
