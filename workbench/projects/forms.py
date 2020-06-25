@@ -261,6 +261,7 @@ class ProjectForm(ModelForm):
                         "title": project.title,
                         "description": project.description,
                         "type": project.type,
+                        "flat_rate": project.flat_rate,
                         "owned_by": (
                             project.owned_by_id
                             if project.owned_by.is_active
