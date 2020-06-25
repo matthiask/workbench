@@ -24,7 +24,7 @@
         </li>
         <li class="nav-item"><a class="nav-link" href="/">{% trans 'dashboard'|capfirst %}</a></li>
         {% mark_current request.path %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'projects' %}">{% trans 'projects'|capfirst %}</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'projects_project_list' %}">{% trans 'projects'|capfirst %}</a></li>
         {% if request.user|has_feature:FEATURES.CONTROLLING %}
           <li class="nav-item"><a class="nav-link" href="{% url 'invoices_invoice_list' %}">{% trans 'invoices'|capfirst %}</a></li>
         {% endif %}

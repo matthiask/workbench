@@ -6,8 +6,8 @@
 <h1>
   {% trans 'projects'|capfirst %}
   <small>
+    <a {% if request.path == "/projects/" %}class="active"{% endif %} href="{% url 'projects_project_list' %}">{% trans 'projects'|capfirst %}</a>
     {% mark_current request.path %}
-    <a href="{% url 'projects_project_list' %}">{% trans 'projects'|capfirst %}</a>
     {% if request.user|has_feature:FEATURES.CONTROLLING %}
       <a href="{% url 'offers_offer_list' %}">{% trans 'offers'|capfirst %}</a>
     {% endif %}
