@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-15 13:28+0200\n"
+"POT-Creation-Date: 2020-06-25 22:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,6 +56,22 @@ msgstr "Fr"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Sa"
+
+#: planning/index.js
+msgid "Calendar week"
+msgstr "Kalenderwoche"
+
+#: planning/index.js
+msgid "Hours per week"
+msgstr "Stunden pro Woche"
+
+#: planning/index.js
+msgid "Not part of an offer"
+msgstr "Nicht Teil einer Offerte"
+
+#: planning/index.js
+msgid "Add planned work"
+msgstr "Geplante Arbeit hinzufügen"
 
 #: timer/actions.js
 msgid "Unable to submit the logbook entry"
