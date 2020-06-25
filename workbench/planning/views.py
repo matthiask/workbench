@@ -14,6 +14,6 @@ class UserPlanningView(generic.DetailView):
     template_name = "planning/user_planning.html"
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(
-            planned_work=reporting.planned_work(users=[self.object]), **kwargs
-        )
+        pw = reporting.planned_work(users=[self.object])
+
+        return super().get_context_data(planned_work=pw, planning_data=pw, **kwargs)

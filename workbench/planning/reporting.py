@@ -1,10 +1,11 @@
+import datetime as dt
 from collections import defaultdict
 from itertools import islice
 
 from workbench.accounts.models import User
 from workbench.invoices.utils import recurring
 from workbench.planning.models import PlannedWork
-from workbench.tools.formats import Z1
+from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.validation import monday
 
 
@@ -18,14 +19,19 @@ def planned_work(*, users=None):
     for pw in PlannedWork.objects.filter(weeks__overlap=weeks).select_related(
         "project__owned_by", "offer__project", "offer__owned_by"
     ):
-        per_week = pw.planned_hours / len(pw.weeks)
+        per_week = (pw.planned_hours / len(pw.weeks)).quantize(Z2)
         for week in pw.weeks:
             by_week[week] += per_week
             by_project_and_week[pw.project][week] += per_week
 
         projects_offers[pw.project][pw.offer].append(
             {
-                "planned_work": pw,
+                "planned_work": {
+                    "id": pw.id,
+                    "title": pw.title,
+                    "planned_hours": pw.planned_hours,
+                    "update_url": pw.urls["update"],
+                },
                 "hours_per_week": [
                     per_week if week in pw.weeks else Z1 for week in weeks
                 ],
@@ -33,17 +39,42 @@ def planned_work(*, users=None):
         )
 
     return {
-        "weeks": weeks,
+        "weeks": [
+            {
+                "date_from": week,
+                "date_until": week + dt.timedelta(days=6),
+                "week": local_date_format(week, fmt="W"),
+            }
+            for week in weeks
+        ],
         "projects_offers": sorted(
             [
                 {
-                    "project": project,
+                    "project": {
+                        "id": project.id,
+                        "title": project.title,
+                        "code": project.code,
+                        "url": project.get_absolute_url(),
+                    },
                     "by_week": [by_project_and_week[project][week] for week in weeks],
-                    "offers": dict(offers),
+                    "offers": [
+                        {
+                            "offer": {
+                                "id": offer.id,
+                                "title": offer.title,
+                                "code": offer.code,
+                                "url": offer.get_absolute_url(),
+                            }
+                            if offer
+                            else None,
+                            "planned_works": planned_works,
+                        }
+                        for offer, planned_works in sorted(offers.items())
+                    ],
                 }
                 for project, offers in projects_offers.items()
             ],
-            key=lambda row: row["project"],  # FIXME sort by timeline
+            key=lambda row: row["project"]["id"],  # FIXME sort by timeline
         ),
         "by_week": [by_week[week] for week in weeks],
     }

@@ -265,3 +265,9 @@ tbody th > a {
 .receivers .widget--checkboxselectmultiple .my-2 .form-check {
   flex: 1 0 50%;
   margin: 0 0 0.25rem 0;
+}
+
+.besides {
+  font-size: 85%;
+  color: #555;
+}

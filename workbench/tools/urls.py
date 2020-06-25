@@ -37,7 +37,7 @@ def model_urls(cls):
             pass
 
         instance = MyModel.objects.get(...)
-        instance.urls["detail"] == instance.get_absolute_re_path()
+        instance.urls["detail"] == instance.get_absolute_url()
     """
 
     cls.urls = _Descriptor(

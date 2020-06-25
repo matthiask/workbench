@@ -27,4 +27,5 @@ module.exports = merge.smart(
 module.exports.entry = {
   timer: "./timer/index.js",
   absences: "./absences/index.js",
+  planning: "./planning/index.js",
 }

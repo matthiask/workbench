@@ -1,6 +1,6 @@
 {% extends "generic/object_detail.html" %}
 
-{% load i18n workbench %}
+{% load i18n workbench webpack_loader %}
 
 {% block title %}{% trans 'planning'|capfirst %} - {{ block.super }}{% endblock %}
 
@@ -8,62 +8,15 @@
 <div class="row">
   <div class="col-12">
     <h1>{% trans 'planning'|capfirst %}: {{ object }}</h1>
-
-    <table class="table table-hover table-sm">
-      <thead>
-        <tr>
-          <th></th>
-          <th></th>
-          <th></th>
-          {% for week in planned_work.weeks %}<th class="text-right">KW{{ week|date:'W' }}</th>{% endfor %}
-        </tr>
-      </thead>
-      <tfoot>
-        <tr>
-          <th colspan="2">{% trans 'Total' %}</th>
-          <th>
-            <a href="{% url 'planning_plannedwork_create' %}" data-toggle="ajaxmodal">&plus;</a>
-          </th>
-          {% for hours in planned_work.by_week %}
-          <th class="text-right">{{ hours|hours }}</th>
-          {% endfor %}
-        </tr>
-      </tfoot>
-      <tbody>
-        {% for project in planned_work.projects_offers %}
-        <tr>
-          <th colspan="2">{{ project.project }}</th>
-          <th>
-            <a href="{% url 'planning_plannedwork_create' %}?project={{ project.project.pk }}" data-toggle="ajaxmodal">&plus;</a>
-          </th>
-          {% for hours in project.by_week %}<th class="text-right">{% if hours %}{{ hours|hours }}{% endif %}</th>{% endfor %}
-        </tr>
-        {% for offer, planned_works in project.offers.items %}
-        <tr>
-          <td colspan="2">{{ offer|default:_('No offer specified') }}</td>
-          <td>
-            {% if offer %}
-              <a href="{% url 'planning_plannedwork_create' %}?project={{ project.project.pk }}&amp;offer={{ offer.pk }}" data-toggle="ajaxmodal">&plus;</a>
-            {% endif %}
-          </td>
-          {% for hours in project.by_week %}<th></th>{% endfor %}
-        </tr>
-        {% for pw in planned_works %}
-        <tr style="font-size:85%;color:#555">
-          <td></td>
-          <td>
-            <a href="{{ pw.planned_work.urls.update }}" data-toggle="ajaxmodal">
-              {{ pw.planned_work|h }}
-            </a>
-          </td>
-          <td></td>
-          {% for hours in pw.hours_per_week %}<td class="text-right">{% if hours %}{{ hours|hours }}{% endif %}</td>{% endfor %}
-        </tr>
-        {% endfor %}
-        {% endfor %}
-        {% endfor %}
-      </tbody>
-    </table>
   </div>
 </div>
+
+  <div id="planning-root" class="planning-wrapper"></div>
+  {{ planning_data|json_script:'planning-data' }}
+  <script src="{% url 'javascript-catalog' %}"></script>
+  {% if not TESTING %}
+    {% render_bundle "manifest" %}
+    {% render_bundle "vendors" %}
+    {% render_bundle "planning" %}
+  {% endif %}
 {% endblock %}
