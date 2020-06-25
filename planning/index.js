@@ -73,7 +73,7 @@ function Project({by_week, offers, project}) {
         className="planning--stripe1"
       />
       <Cell row={row} column={1} className="planning--title is-project">
-        <a href={project.url} target="_blank">
+        <a href={project.url} target="_blank" rel="noreferrer">
           <strong>{project.title}</strong>
         </a>
         <AddPlannedWorkLink params={`project=${project.id}`} />
@@ -115,7 +115,7 @@ function Offer({project, offer, planned_works}) {
       <Cell row={row} column={1} className="planning--title is-offer pl-3">
         {offer ? (
           <>
-            <a href={offer.url} target="_blank">
+            <a href={offer.url} target="_blank" rel="noreferrer">
               {offer.title}
             </a>
             <AddPlannedWorkLink
