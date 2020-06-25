@@ -12,7 +12,7 @@ from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork, PlanningRequest
 from workbench.projects.models import Project
 from workbench.tools.formats import local_date_format
-from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
+from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
 from workbench.tools.validation import monday
 
 
@@ -49,6 +49,7 @@ class PlanningRequestSearchForm(Form):
         )
 
 
+@add_prefix("modal")
 class PlanningRequestForm(ModelForm):
     user_fields = default_to_current_user = ("created_by",)
 
@@ -132,6 +133,7 @@ class PlannedWorkSearchForm(Form):
         )
 
 
+@add_prefix("modal")
 class PlannedWorkForm(ModelForm):
     user_fields = default_to_current_user = ("user",)
 
