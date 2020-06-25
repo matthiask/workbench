@@ -181,10 +181,10 @@ $(function () {
       window.location.href = restoreSearch("/contacts/people/")
     } else if (e.keyCode === 80 && e.shiftKey) {
       // Shift-p
-      window.openModalFromUrl("/projects/projects/select/")
+      window.openModalFromUrl("/projects/select/")
     } else if (e.keyCode === 80) {
       // p
-      window.location.href = restoreSearch("/projects/projects/")
+      window.location.href = restoreSearch("/projects/")
     } else if (e.keyCode === 79) {
       // o
       window.location.href = restoreSearch("/projects/offers/")
