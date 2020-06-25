@@ -39,7 +39,7 @@ class PlanningRequestSearchForm(Form):
     def filter(self, queryset):
         data = self.cleaned_data
         if data.get("project"):
-            queryset = queryset.filter(service__project=data.get("project"))
+            queryset = queryset.filter(project=data.get("project"))
         queryset = self.apply_owned_by(queryset, attribute="created_by")
         return queryset.select_related(
             "created_by",
@@ -122,7 +122,7 @@ class PlannedWorkSearchForm(Form):
     def filter(self, queryset):
         data = self.cleaned_data
         if data.get("project"):
-            queryset = queryset.filter(service__project=data.get("project"))
+            queryset = queryset.filter(project=data.get("project"))
         queryset = self.apply_owned_by(queryset, attribute="user")
         return queryset.select_related(
             "user",
