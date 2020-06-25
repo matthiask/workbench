@@ -1,11 +1,15 @@
 .planning-wrapper {
   --grid-gap: 0.125rem;
-  --scale-row-height: 2rem;
   --title-column-width: 20rem;
-  --week-width: 3rem;
+  --week-width: 2.3rem;
   --default-height: 1.4rem;
 
+  --stripe1: #efefef;
+  --stripe2: #f4f4ff;
+  --stripe3: #f8f8f8;
+
   min-width: min-content;
+  position: relative;
 }
 
 .planning {
@@ -16,24 +20,52 @@
   grid-auto-columns: var(--week-width);
   grid-auto-rows: var(--default-height);
   grid-template-columns: var(--title-column-width);
-  grid-template-rows: var(--scale-row-height);
 }
 
-.planning--pw {
+.planning--title {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background-color: #fff;
+
+  &.is-project {
+    border-top: 1px solid #ccc;
+    background-color: var(--stripe1);
+  }
+  &.is-offer {
+    background-color: var(--stripe2);
+  }
+}
+
+.planning--small {
   font-size: 85%;
   color: #555;
+  line-height: 1.7;
+}
+
+.planning--add-pw {
+  display: inline-block;
+  font-size: 70%;
+  background: var(--gray);
+  color: var(--white);
+  width: 1.5em;
+  text-align: center;
+  border-radius: 10px;
+  position: absolute;
+  right: 3px;
+  top: 3px;
 }
 
 .planning--stripe1 {
   border-top: 1px solid #ccc;
-  background-color: #efefef;
+  background-color: var(--stripe1);
   padding: 10px 0;
 }
 
 .planning--stripe2 {
-  background-color: #f4f4ff;
+  background-color: var(--stripe2);
 }
 
 .planning--stripe3 {
-  background-color: #f8f8f8;
+  background-color: var(--stripe3);
 }

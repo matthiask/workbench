@@ -10,7 +10,7 @@ from workbench.tools.validation import monday
 
 
 def planned_work(*, users=None):
-    weeks = list(islice(recurring(monday(), "weekly"), 24))
+    weeks = list(islice(recurring(monday(), "weekly"), 35))
 
     by_week = defaultdict(lambda: Z1)
     by_project_and_week = defaultdict(lambda: defaultdict(lambda: Z1))
