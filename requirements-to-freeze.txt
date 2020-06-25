@@ -1,12 +1,12 @@
 beautifulsoup4
 coverage
-Django
+Django>=3.1b1
 django-admin-ordering
 django-authlib
 django-bootstrap4
 django-cors-headers
 django-countries
-django-debug-toolbar
+django-debug-toolbar>=3.0a1
 django-fineforms
 django-slowtests
 django-vanilla-views
