@@ -20,10 +20,18 @@ const WEEK_START = 4
 
 function Planning({data}) {
   const gridRef = useRef(null)
-  const rowCtx = {row: WEEK_START}
+  const rowCtx = {
+    __row: 2,
+    current: function () {
+      return this.__row
+    },
+    next: function () {
+      return ++this.__row
+    },
+  }
 
   useLayoutEffect(() => {
-    gridRef.current.style.gridTemplateRows = `repeat(${rowCtx.row}, var(--default-height))`
+    gridRef.current.style.gridTemplateRows = `repeat(${rowCtx.current()}, var(--default-height))`
   }, [])
 
   return (
@@ -37,7 +45,12 @@ function Planning({data}) {
           }, var(--week-width))`,
         }}
       >
-        <Cell row={1} column={1} className="planning--scale">
+        <Cell
+          row={1}
+          column={1}
+          colspan="span 3"
+          className="planning--scale text-right pr-2"
+        >
           <strong>{gettext("Calendar week")}</strong>
         </Cell>
         {data.weeks.map((_, idx) => {
@@ -63,7 +76,12 @@ function Planning({data}) {
           </Cell>
         ))}
 
-        <Cell row={2} column={1} className="planning--scale">
+        <Cell
+          row={2}
+          column={1}
+          colspan="span 3"
+          className="planning--scale text-right pr-2"
+        >
           <strong>{gettext("Hours per week")}</strong>
         </Cell>
         {data.by_week.map((hours, idx) => (
@@ -92,8 +110,8 @@ function Planning({data}) {
 
 function Project({by_week, offers, project}) {
   const ctx = useContext(RowContext)
-  ++ctx.row // Skip one row
-  const row = ++ctx.row
+  ctx.next() // Skip one row
+  const row = ctx.next()
   return (
     <>
       <div
@@ -147,7 +165,7 @@ function Project({by_week, offers, project}) {
 
 function Offer({project, offer, planned_works}) {
   const ctx = useContext(RowContext)
-  const row = ++ctx.row
+  const row = ctx.next()
 
   return (
     <>
@@ -196,7 +214,7 @@ function Offer({project, offer, planned_works}) {
 
 function PlannedWork({planned_work, hours_per_week, isEven}) {
   const ctx = useContext(RowContext)
-  const row = ++ctx.row
+  const row = ctx.next()
   return (
     <>
       {isEven ? (
