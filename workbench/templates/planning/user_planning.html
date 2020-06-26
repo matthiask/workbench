@@ -19,4 +19,13 @@
     {% render_bundle "vendors" %}
     {% render_bundle "planning" %}
   {% endif %}
+
+<div class="row mt-5">
+  <div class="col-12">
+    <a href="{% url 'planning_plannedwork_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
+      {% include 'svg/plus.svg' %}
+      {% trans 'planned work'|capfirst %}
+    </a>
+  </div>
+</div>
 {% endblock %}

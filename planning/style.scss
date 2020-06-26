@@ -1,6 +1,8 @@
 .planning-wrapper {
   --grid-gap: 0.125rem;
   --title-column-width: 20rem;
+  --range-width: 6rem;
+  --hours-total-width: 2rem;
   --week-width: 2.3rem;
   --default-height: 1.4rem;
 
@@ -20,14 +22,17 @@
 
   grid-auto-columns: var(--week-width);
   grid-auto-rows: var(--default-height);
-  grid-template-columns: var(--title-column-width);
+  grid-template-columns: var(--title-column-width) var(--range-width) var(
+      --hours-total-width
+    );
+  font-size: 14px;
 }
 
 .planning--title {
   position: sticky;
   left: 0;
   z-index: 1;
-  background-color: #fff;
+  background-color: white;
 
   &.is-project {
     border-top: 1px solid #ccc;
@@ -39,7 +44,7 @@
 }
 
 .planning--small {
-  font-size: 85%;
+  font-size: 90%;
   color: #555;
   line-height: 1.7;
 }
@@ -80,4 +85,12 @@
   color: var(--white);
   text-align: center;
   padding: 0 3px;
+
+  &.is-project {
+    background-color: var(--indigo);
+  }
+
+  &.is-total {
+    background-color: var(--purple);
+  }
 }

@@ -31,6 +31,12 @@ def planned_work(*, users=None):
                     "title": pw.title,
                     "planned_hours": pw.planned_hours,
                     "update_url": pw.urls["update"],
+                    "range": "{} – {}".format(
+                        local_date_format(min(pw.weeks), fmt="d.m."),
+                        local_date_format(
+                            max(pw.weeks) + dt.timedelta(days=6), fmt="d.m.",
+                        ),
+                    ),
                 },
                 "hours_per_week": [
                     per_week if week in pw.weeks else Z1 for week in weeks
