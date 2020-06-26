@@ -67,6 +67,8 @@ def planned_work(*, users=None):
                         "title": offer.title,
                         "code": offer.code,
                         "url": offer.get_absolute_url(),
+                        "creatework": offer.project.urls["creatework"]
+                        + "?offer={}".format(offer.pk),
                     }
                     if offer
                     else {}
@@ -104,6 +106,7 @@ def planned_work(*, users=None):
                 "title": project.title,
                 "code": project.code,
                 "url": project.get_absolute_url(),
+                "creatework": project.urls["creatework"],
                 "date_from": date_from,
                 "date_until": date_until,
                 "range": "{} – {}".format(

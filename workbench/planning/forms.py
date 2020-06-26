@@ -140,7 +140,6 @@ class PlannedWorkForm(ModelForm):
     class Meta:
         model = PlannedWork
         fields = (
-            "project",
             "offer",
             "request",
             "user",
@@ -149,31 +148,29 @@ class PlannedWorkForm(ModelForm):
             "planned_hours",
         )
         widgets = {
-            "project": Autocomplete(model=Project, params={"only_open": "on"}),
-            "offer": Autocomplete(model=Offer),
             "notes": Textarea,
         }
 
     def __init__(self, *args, **kwargs):
-        """
         self.project = kwargs.pop("project", None)
-        if self.project:  # Creating a new offer
-            kwargs.setdefault("initial", {}).update({"title": self.project.title})
+        if self.project:  # Creating a new object
+            # kwargs.setdefault("initial", {}).update({"title": self.project.title})
+            pass
         else:
             self.project = kwargs["instance"].project
-        """
 
         initial = kwargs.setdefault("initial", {})
         request = kwargs["request"]
-        for field in ["project", "offer", "request"]:
+        for field in ["offer", "request"]:
             if request.GET.get(field):
                 initial.setdefault(field, request.GET.get(field))
 
         super().__init__(*args, **kwargs)
-        # self.instance.project = self.project
+        self.instance.project = self.project
 
-        self.fields["project"].required = False
-
+        self.fields["offer"].queryset = self.instance.project.offers.select_related(
+            "owned_by"
+        )
         self.fields["weeks"] = forms.MultipleChoiceField(
             label=capfirst(_("weeks")),
             choices=[

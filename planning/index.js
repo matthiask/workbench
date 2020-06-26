@@ -140,7 +140,14 @@ function Project({by_week, offers, project}) {
         <a href={project.url} target="_blank" rel="noreferrer">
           <strong>{project.title}</strong>
         </a>
-        <AddPlannedWorkLink params={`project=${project.id}`} />
+        <a
+          className="planning--add-pw"
+          data-toggle="ajaxmodal"
+          title={gettext("Add planned work")}
+          href={project.creatework}
+        >
+          +
+        </a>
       </Cell>
       <Cell
         row={row}
@@ -197,9 +204,14 @@ function Offer({project, offer, planned_works}) {
             <a href={offer.url} target="_blank" rel="noreferrer">
               {offer.title}
             </a>
-            <AddPlannedWorkLink
-              params={`project=${project.id}&offer=${offer.id}`}
-            />
+            <a
+              className="planning--add-pw"
+              data-toggle="ajaxmodal"
+              title={gettext("Add planned work")}
+              href={offer.creatework}
+            >
+              +
+            </a>
           </>
         ) : (
           gettext("Not part of an offer")
@@ -305,19 +317,6 @@ function findContiguousWeekRanges(hours_per_week) {
   }
 
   return ranges
-}
-
-function AddPlannedWorkLink({params}) {
-  return (
-    <a
-      className="planning--add-pw"
-      href={`/planning/work/create/?${params || ""}`}
-      title={gettext("Add planned work")}
-      data-toggle="ajaxmodal"
-    >
-      +
-    </a>
-  )
 }
 
 function Cell({

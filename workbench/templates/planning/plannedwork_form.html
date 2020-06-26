@@ -14,10 +14,10 @@
 
   <div class="row">
     <div class="col-lg-7">
-      {% ff_fields form fields='project,offer,request,user,title,notes' %}
+      {% ff_fields form fields='offer,request,user,title,notes' %}
     </div>
     <div class="col-lg-5">
-      {% ff_fields form exclude='project,offer,request,user,title,notes' %}
+      {% ff_fields form exclude='offer,request,user,title,notes' %}
     </div>
   </div>
 {% endblock %}

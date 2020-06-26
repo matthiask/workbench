@@ -1,6 +1,7 @@
 from django.urls import path
 
 from workbench import generic
+from workbench.logbook.views import create
 from workbench.planning import views
 from workbench.planning.forms import (
     PlannedWorkForm,
@@ -9,6 +10,7 @@ from workbench.planning.forms import (
     PlanningRequestSearchForm,
 )
 from workbench.planning.models import PlannedWork, PlanningRequest
+from workbench.projects.models import Project
 
 
 urlpatterns = [
@@ -61,8 +63,16 @@ urlpatterns = [
     ),
     path(
         "work/create/",
-        generic.CreateView.as_view(model=PlannedWork, form_class=PlannedWorkForm),
+        create,
+        {"viewname": "creatework"},
         name="planning_plannedwork_create",
+    ),
+    path(
+        "work/create/<int:pk>/",
+        generic.CreateRelatedView.as_view(
+            model=PlannedWork, form_class=PlannedWorkForm, related_model=Project
+        ),
+        name="projects_project_creatework",
     ),
     path(
         "work/<int:pk>/update/",
