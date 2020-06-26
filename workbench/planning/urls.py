@@ -1,3 +1,4 @@
+from django.shortcuts import redirect
 from django.urls import path
 
 from workbench import generic
@@ -91,6 +92,11 @@ urlpatterns = [
         "project/<int:pk>/",
         views.ProjectPlanningView.as_view(),
         name="projects_project_planning",
+    ),
+    path(
+        "user/",
+        lambda request: redirect("accounts_user_planning", pk=request.user.pk),
+        name="planning_report_redirect_to_self",
     ),
     path(
         "user/<int:pk>/",
