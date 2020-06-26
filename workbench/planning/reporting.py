@@ -174,13 +174,12 @@ SELECT MIN(week), MAX(week) FROM sq
             """,
             [project.id],
         )
-        result = list(cursor)
+        result = list(cursor)[0]
 
     if result[0]:
         weeks = list(
             islice(
-                recurring(monday(), "weekly"),
-                2 + (result[0][1] - result[0][0]).days // 7,
+                recurring(monday(), "weekly"), 2 + (result[1] - result[0]).days // 7,
             )
         )
     else:
@@ -313,7 +312,7 @@ SELECT MIN(week), MAX(week) FROM sq
             for week in weeks
         ],
         "projects_offers": sorted(
-            [project_record(project, offers)],
+            [project_record(project, offers)] if offers else [],
             key=lambda row: (
                 row["project"]["date_until"],
                 row["project"]["date_from"],
