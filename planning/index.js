@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const RowContext = createContext()
 
 const FIRST_DATA_ROW = 3
-const FIRST_DATA_COLUMN = 4
+const FIRST_DATA_COLUMN = 5
 
 function months(weeks) {
   const months = []
@@ -54,7 +54,7 @@ function Planning({data}) {
         ref={gridRef}
         className="planning"
         style={{
-          gridTemplateColumns: `var(--title-column-width) var(--range-width) var(--hours-total-width) repeat(${
+          gridTemplateColumns: `var(--title-column-width) var(--action-width) var(--range-width) var(--hours-total-width) repeat(${
             1 + data.weeks.length
           }, var(--week-width))`,
         }}
@@ -94,7 +94,7 @@ function Planning({data}) {
         <Cell
           row={3}
           column={1}
-          colspan="span 3"
+          colspan="span 4"
           className="planning--scale text-right pr-2"
         >
           <strong>{gettext("Hours per week")}</strong>
@@ -140,6 +140,8 @@ function Project({by_week, offers, project}) {
         <a href={project.url} target="_blank" rel="noreferrer">
           <strong>{project.title}</strong>
         </a>
+      </Cell>
+      <Cell row={row} column={2}>
         <a
           className="planning--add-pw"
           data-toggle="ajaxmodal"
@@ -151,14 +153,16 @@ function Project({by_week, offers, project}) {
       </Cell>
       <Cell
         row={row}
-        column={2}
+        column={3}
         className="planning--small text-center"
         style={{whiteSpace: "nowrap"}}
       >
         {project.range}
       </Cell>
-      <Cell row={row} column={3} className="planning--small text-center">
-        {parseFloat(project.planned_hours).toFixed(0)}h
+      <Cell row={row} column={4} className="planning--small text-right">
+        {`${parseFloat(project.worked_hours).toFixed(0)}h / ${parseFloat(
+          project.planned_hours
+        ).toFixed(0)}h`}
       </Cell>
       {by_week.map((hours, idx) => {
         hours = parseFloat(hours)
@@ -198,12 +202,14 @@ function Offer({offer, planned_works}) {
         }}
         className="planning--stripe2"
       />
-      <Cell row={row} column={1} className="planning--title is-offer pl-3">
-        {offer.id ? (
-          <>
+      {offer.id ? (
+        <>
+          <Cell row={row} column={1} className="planning--title is-offer pl-3">
             <a href={offer.url} target="_blank" rel="noreferrer">
               {offer.title}
             </a>
+          </Cell>
+          <Cell row={row} column={2}>
             <a
               className="planning--add-pw"
               data-toggle="ajaxmodal"
@@ -212,21 +218,25 @@ function Offer({offer, planned_works}) {
             >
               +
             </a>
-          </>
-        ) : (
-          gettext("Not part of an offer")
-        )}
-      </Cell>
+          </Cell>
+        </>
+      ) : (
+        <Cell row={row} column={1} className="planning--title is-offer pl-3">
+          {gettext("Not part of an offer")}
+        </Cell>
+      )}
       <Cell
         row={row}
-        column={2}
+        column={3}
         className="planning--small text-center"
         style={{whiteSpace: "nowrap"}}
       >
         {offer.range}
       </Cell>
-      <Cell row={row} column={3} className="planning--small text-center">
-        {parseFloat(offer.planned_hours).toFixed(0)}h
+      <Cell row={row} column={4} className="planning--small text-right">
+        {`${parseFloat(offer.worked_hours).toFixed(0)}h / ${parseFloat(
+          offer.planned_hours
+        ).toFixed(0)}h`}
       </Cell>
       {planned_works.map((planned_work, idx) => (
         <PlannedWork
@@ -261,13 +271,13 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
       </Cell>
       <Cell
         row={row}
-        column={2}
+        column={3}
         className="planning--small text-center"
         style={{whiteSpace: "nowrap"}}
       >
         {planned_work.range}
       </Cell>
-      <Cell row={row} column={3} className="planning--small text-center">
+      <Cell row={row} column={4} className="planning--small text-right">
         {parseFloat(planned_work.planned_hours).toFixed(0)}h
       </Cell>
       {findContiguousWeekRanges(hours_per_week).map((range, idx) => (

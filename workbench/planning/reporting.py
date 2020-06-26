@@ -2,8 +2,11 @@ import datetime as dt
 from collections import defaultdict
 from itertools import islice
 
+from django.db.models import Sum
+
 from workbench.accounts.models import User
 from workbench.invoices.utils import recurring
+from workbench.logbook.models import LoggedHours
 from workbench.planning.models import PlannedWork
 from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.validation import monday
@@ -15,6 +18,7 @@ def planned_work(*, users=None):
     by_week = defaultdict(lambda: Z1)
     by_project_and_week = defaultdict(lambda: defaultdict(lambda: Z1))
     projects_offers = defaultdict(lambda: defaultdict(list))
+    project_ids = set()
 
     for pw in PlannedWork.objects.filter(weeks__overlap=weeks).select_related(
         "project__owned_by", "offer__project", "offer__owned_by"
@@ -47,6 +51,18 @@ def planned_work(*, users=None):
             }
         )
 
+        project_ids.add(pw.project.pk)
+
+    worked_hours_by_offer = defaultdict(lambda: Z1)
+    worked_hours_by_project = defaultdict(lambda: Z1)
+    for row in (
+        LoggedHours.objects.filter(service__project__in=project_ids)
+        .values("service__project", "service__offer")
+        .annotate(Sum("hours"))
+    ):
+        worked_hours_by_offer[row["service__offer"]] += row["hours__sum"]
+        worked_hours_by_project[row["service__project"]] += row["hours__sum"]
+
     def offer_record(offer, planned_works):
         date_from = min(pw["planned_work"]["date_from"] for pw in planned_works)
         date_until = max(pw["planned_work"]["date_until"] for pw in planned_works)
@@ -61,6 +77,7 @@ def planned_work(*, users=None):
                     local_date_format(date_until, fmt="d.m."),
                 ),
                 "planned_hours": hours,
+                "worked_hours": Z1,
                 **(
                     {
                         "id": offer.id,
@@ -69,6 +86,7 @@ def planned_work(*, users=None):
                         "url": offer.get_absolute_url(),
                         "creatework": offer.project.urls["creatework"]
                         + "?offer={}".format(offer.pk),
+                        "worked_hours": worked_hours_by_offer[offer.id],
                     }
                     if offer
                     else {}
@@ -114,6 +132,7 @@ def planned_work(*, users=None):
                     local_date_format(date_until, fmt="d.m."),
                 ),
                 "planned_hours": hours,
+                "worked_hours": worked_hours_by_project[project.id],
             },
             "by_week": [by_project_and_week[project][week] for week in weeks],
             "offers": offers,

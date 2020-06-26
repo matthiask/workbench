@@ -1,8 +1,9 @@
 .planning-wrapper {
   --grid-gap: 0.125rem;
-  --title-column-width: 20rem;
-  --range-width: 6rem;
-  --hours-total-width: 2rem;
+  --title-column-width: 16rem;
+  --action-width: 1rem;
+  --range-width: 5rem;
+  --hours-total-width: 4.5rem;
   --week-width: 2rem;
   --default-height: 1.4rem;
 
@@ -22,9 +23,9 @@
 
   grid-auto-columns: var(--week-width);
   grid-auto-rows: var(--default-height);
-  grid-template-columns: var(--title-column-width) var(--range-width) var(
-      --hours-total-width
-    );
+  grid-template-columns:
+    var(--title-column-width) var(--action-width) var(--range-width)
+    var(--hours-total-width);
   font-size: 14px;
 }
 
@@ -33,6 +34,9 @@
   left: 0;
   z-index: 1;
   background-color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   &.is-project {
     border-top: 1px solid #ccc;
@@ -57,9 +61,6 @@
   width: 1.5em;
   text-align: center;
   border-radius: 10px;
-  position: absolute;
-  right: 3px;
-  top: 3px;
 }
 
 .planning--stripe1 {
