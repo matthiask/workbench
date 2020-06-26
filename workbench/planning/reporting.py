@@ -53,7 +53,7 @@ def user_planning(user):
 
         project_ids.add(pw.project.pk)
 
-    for pr in PlanningRequest.objects.filter(receivers=user,).select_related(
+    for pr in PlanningRequest.objects.filter(receivers=user).select_related(
         "project__owned_by", "offer__project", "offer__owned_by"
     ):
         date_from = pr.earliest_start_on
@@ -201,10 +201,22 @@ WITH sq AS (
     SELECT unnest(weeks) AS week
     FROM planning_plannedwork
     WHERE project_id=%s
+
+    UNION ALL
+
+    SELECT earliest_start_on AS week
+    FROM planning_planningrequest
+    WHERE project_id=%s
+
+    UNION ALL
+
+    SELECT completion_requested_on AS week
+    FROM planning_planningrequest
+    WHERE project_id=%s
 )
 SELECT MIN(week), MAX(week) FROM sq
             """,
-            [project.id],
+            [project.id, project.id, project.id],
         )
         result = list(cursor)[0]
 
@@ -246,6 +258,36 @@ SELECT MIN(week), MAX(week) FROM sq
                 },
                 "hours_per_week": [
                     per_week if week in pw.weeks else Z1 for week in weeks
+                ],
+            }
+        )
+
+    for pr in PlanningRequest.objects.filter(project=project).select_related(
+        "project__owned_by", "offer__project", "offer__owned_by"
+    ):
+        date_from = pr.earliest_start_on
+        date_until = pr.completion_requested_on - dt.timedelta(days=1)
+
+        requested_weeks = (pr.completion_requested_on - date_from).days // 7
+        per_week = (pr.requested_hours / requested_weeks).quantize(Z2)
+
+        offers[pr.offer].append(
+            {
+                "planned_work": {  # FIXME
+                    "id": pr.id,
+                    "title": pr.title,
+                    "planned_hours": Z1,
+                    "requested_hours": pr.requested_hours,
+                    "url": pr.get_absolute_url(),
+                    "date_from": date_from,
+                    "date_until": date_until,
+                    "range": "{} – {}".format(
+                        local_date_format(date_from, fmt="d.m."),
+                        local_date_format(date_until, fmt="d.m."),
+                    ),
+                },
+                "hours_per_week": [
+                    per_week if date_from < week < date_until else Z1 for week in weeks
                 ],
             }
         )
@@ -362,4 +404,4 @@ def test():  # pragma: no cover
     # pprint(user_planning(User.objects.get(pk=1)))
     from workbench.projects.models import Project
 
-    pprint(project_planning(Project.objects.get(pk=8284)))
+    pprint(project_planning(Project.objects.get(pk=8238)))
