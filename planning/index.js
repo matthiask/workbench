@@ -16,12 +16,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const RowContext = createContext()
 
-const WEEK_START = 4
+const FIRST_DATA_ROW = 2
+const FIRST_DATA_COLUMN = 4
 
 function Planning({data}) {
   const gridRef = useRef(null)
   const rowCtx = {
-    __row: 2,
+    __row: FIRST_DATA_ROW,
     current: function () {
       return this.__row
     },
@@ -59,7 +60,7 @@ function Planning({data}) {
               key={idx}
               row="1"
               rowspan="-1"
-              column={WEEK_START + idx}
+              column={FIRST_DATA_COLUMN + idx}
               className="planning--stripe4"
             />
           )
@@ -69,7 +70,7 @@ function Planning({data}) {
             key={week.week}
             className="planning--scale text-center"
             row={1}
-            column={WEEK_START + idx}
+            column={FIRST_DATA_COLUMN + idx}
             title={`${week.date_from} – ${week.date_until}`}
           >
             <strong>{week.week}</strong>
@@ -88,7 +89,7 @@ function Planning({data}) {
           <Cell
             key={idx}
             row={2}
-            column={WEEK_START + idx}
+            column={FIRST_DATA_COLUMN + idx}
             className="planning--range planning--small is-total"
             style={{
               opacity: opacityClamp(0.3 + parseFloat(parseFloat(hours) / 20)),
@@ -146,7 +147,7 @@ function Project({by_week, offers, project}) {
           <Cell
             key={idx}
             row={row}
-            column={WEEK_START + idx}
+            column={FIRST_DATA_COLUMN + idx}
             className="planning--range planning--small is-project"
             style={{
               opacity: opacityClamp(0.3 + hours / 20),
@@ -247,7 +248,7 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
         <Cell
           key={idx}
           row={row}
-          column={WEEK_START + range.start}
+          column={FIRST_DATA_COLUMN + range.start}
           colspan={`span ${range.length}`}
           className="planning--range planning--small is-work"
           tag="a"
