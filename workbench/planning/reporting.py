@@ -7,7 +7,7 @@ from django.db.models import Sum
 
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedHours
-from workbench.planning.models import PlannedWork
+from workbench.planning.models import PlannedWork, PlanningRequest
 from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.validation import monday
 
@@ -52,6 +52,38 @@ def user_planning(user):
         )
 
         project_ids.add(pw.project.pk)
+
+    for pr in PlanningRequest.objects.filter(receivers=user,).select_related(
+        "project__owned_by", "offer__project", "offer__owned_by"
+    ):
+        date_from = pr.earliest_start_on
+        date_until = pr.completion_requested_on - dt.timedelta(days=1)
+
+        requested_weeks = (pr.completion_requested_on - date_from).days // 7
+        per_week = (pr.requested_hours / requested_weeks).quantize(Z2)
+
+        projects_offers[pr.project][pr.offer].append(
+            {
+                "planned_work": {  # FIXME
+                    "id": pr.id,
+                    "title": pr.title,
+                    "planned_hours": Z1,
+                    "requested_hours": pr.requested_hours,
+                    "url": pr.get_absolute_url(),
+                    "date_from": date_from,
+                    "date_until": date_until,
+                    "range": "{} – {}".format(
+                        local_date_format(date_from, fmt="d.m."),
+                        local_date_format(date_until, fmt="d.m."),
+                    ),
+                },
+                "hours_per_week": [
+                    per_week if date_from < week < date_until else Z1 for week in weeks
+                ],
+            }
+        )
+
+        project_ids.add(pr.project.pk)
 
     worked_hours_by_offer = defaultdict(lambda: Z1)
     worked_hours_by_project = defaultdict(lambda: Z1)

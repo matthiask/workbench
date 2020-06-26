@@ -1,6 +1,8 @@
 import datetime as dt
+from decimal import Decimal
 
 from django.contrib.postgres.fields import ArrayField
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Q, Sum
 from django.utils import timezone
@@ -62,7 +64,9 @@ class PlanningRequest(Model):
         verbose_name=_("offer"),
         related_name="planning_requests",
     )
-    requested_hours = HoursField(_("requested hours"))
+    requested_hours = HoursField(
+        _("requested hours"), validators=[MinValueValidator(Decimal("0.1"))]
+    )
     planned_hours = HoursField(_("planned hours"))
     earliest_start_on = models.DateField(_("earliest start on"))
     completion_requested_on = models.DateField(_("completion requested on"))
@@ -151,7 +155,9 @@ class PlannedWork(Model):
         verbose_name=_("user"),
         related_name="planned_work",
     )
-    planned_hours = HoursField(_("planned hours"))
+    planned_hours = HoursField(
+        _("planned hours"), validators=[MinValueValidator(Decimal("0.1"))]
+    )
     title = models.CharField(_("title"), max_length=200)
     notes = models.TextField(_("notes"), blank=True)
     weeks = ArrayField(models.DateField(), verbose_name=_("weeks"))

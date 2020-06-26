@@ -252,6 +252,7 @@ function Offer({offer, planned_works}) {
 function PlannedWork({planned_work, hours_per_week, isEven}) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
+  const isRequest = !!planned_work.requested_hours
   return (
     <>
       {isEven ? (
@@ -263,7 +264,7 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
       <Cell
         row={row}
         column={1}
-        className="planning--title is-pw planning--small pl-5"
+        className={`planning--title ${isRequest ? "is-pr" : "is-pw"} planning--small pl-5`}
       >
         <a href={planned_work.url} data-toggle="ajaxmodal">
           {planned_work.title}
@@ -286,7 +287,7 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
           row={row}
           column={FIRST_DATA_COLUMN + range.start}
           colspan={`span ${range.length}`}
-          className="planning--range planning--small is-work"
+          className={`planning--range planning--small ${isRequest ? "is-pr" : "is-pw"}`}
           tag="a"
           href={planned_work.url}
           data-toggle="ajaxmodal"

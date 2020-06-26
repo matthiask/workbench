@@ -85,7 +85,6 @@
 }
 
 .planning--range {
-  background-color: var(--teal);
   color: var(--white);
   text-align: center;
   padding: 0 3px;
@@ -99,7 +98,24 @@
     background-color: var(--purple);
   }
 
-  &.is-work:hover {
+  &.is-pw {
+    background-color: var(--teal);
+  }
+
+  &.is-pr {
+    background-image: repeating-linear-gradient(
+      135deg,
+      var(--teal) 0,
+      var(--teal) 5px,
+      #ccc 5px,
+      #ccc 10px
+    );
+    background-size: 100% 100%;
+    background-repeat: repeat;
+  }
+
+  &.is-pw:hover,
+  &.is-pr:hover {
     opacity: 0.7;
   }
 }
