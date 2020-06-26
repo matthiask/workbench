@@ -182,15 +182,25 @@ function AddPlannedWorkLink({params}) {
       title={gettext("Add planned work")}
       data-toggle="ajaxmodal"
     >
-      +{/*→ {gettext("Add work")}*/}
+      +
     </a>
   )
 }
 
-function Cell({row, column, children, ...props}) {
+function Cell({
+  row,
+  column,
+  rowspan = "span 1",
+  colspan = "span 1",
+  children,
+  ...props
+}) {
   return (
     <div
-      style={{gridRow: `${row} / span 1`, gridColumn: `${column} / span 1`}}
+      style={{
+        gridRow: `${row} / ${rowspan}`,
+        gridColumn: `${column} / ${colspan}`,
+      }}
       {...props}
     >
       {children}
