@@ -24,6 +24,9 @@ def planned_work(*, users=None):
             by_week[week] += per_week
             by_project_and_week[pw.project][week] += per_week
 
+        date_from = min(pw.weeks)
+        date_until = max(pw.weeks) + dt.timedelta(days=6)
+
         projects_offers[pw.project][pw.offer].append(
             {
                 "planned_work": {
@@ -31,11 +34,11 @@ def planned_work(*, users=None):
                     "title": pw.title,
                     "planned_hours": pw.planned_hours,
                     "update_url": pw.urls["update"],
+                    "date_from": date_from,
+                    "date_until": date_until,
                     "range": "{} – {}".format(
-                        local_date_format(min(pw.weeks), fmt="d.m."),
-                        local_date_format(
-                            max(pw.weeks) + dt.timedelta(days=6), fmt="d.m.",
-                        ),
+                        local_date_format(date_from, fmt="d.m."),
+                        local_date_format(date_until, fmt="d.m."),
                     ),
                 },
                 "hours_per_week": [
@@ -43,6 +46,75 @@ def planned_work(*, users=None):
                 ],
             }
         )
+
+    def offer_record(offer, planned_works):
+        date_from = min(pw["planned_work"]["date_from"] for pw in planned_works)
+        date_until = max(pw["planned_work"]["date_until"] for pw in planned_works)
+        hours = sum(pw["planned_work"]["planned_hours"] for pw in planned_works)
+
+        return {
+            "offer": {
+                "date_from": date_from,
+                "date_until": date_until,
+                "range": "{} – {}".format(
+                    local_date_format(date_from, fmt="d.m."),
+                    local_date_format(date_until, fmt="d.m."),
+                ),
+                "planned_hours": hours,
+                **(
+                    {
+                        "id": offer.id,
+                        "title": offer.title,
+                        "code": offer.code,
+                        "url": offer.get_absolute_url(),
+                    }
+                    if offer
+                    else {}
+                ),
+            },
+            "planned_works": sorted(
+                planned_works,
+                key=lambda row: (
+                    row["planned_work"]["date_from"],
+                    row["planned_work"]["date_until"],
+                ),
+            ),
+        }
+
+    def project_record(project, offers):
+        offers = sorted(
+            (
+                offer_record(offer, planned_works)
+                for offer, planned_works in sorted(offers.items())
+            ),
+            key=lambda row: (
+                row["offer"]["date_from"],
+                row["offer"]["date_until"],
+                -row["offer"]["planned_hours"],
+            ),
+        )
+
+        date_from = min(rec["offer"]["date_from"] for rec in offers)
+        date_until = max(rec["offer"]["date_until"] for rec in offers)
+        hours = sum(rec["offer"]["planned_hours"] for rec in offers)
+
+        return {
+            "project": {
+                "id": project.id,
+                "title": project.title,
+                "code": project.code,
+                "url": project.get_absolute_url(),
+                "date_from": date_from,
+                "date_until": date_until,
+                "range": "{} – {}".format(
+                    local_date_format(date_from, fmt="d.m."),
+                    local_date_format(date_until, fmt="d.m."),
+                ),
+                "planned_hours": hours,
+            },
+            "by_week": [by_project_and_week[project][week] for week in weeks],
+            "offers": offers,
+        }
 
     return {
         "weeks": [
@@ -55,32 +127,14 @@ def planned_work(*, users=None):
         ],
         "projects_offers": sorted(
             [
-                {
-                    "project": {
-                        "id": project.id,
-                        "title": project.title,
-                        "code": project.code,
-                        "url": project.get_absolute_url(),
-                    },
-                    "by_week": [by_project_and_week[project][week] for week in weeks],
-                    "offers": [
-                        {
-                            "offer": {
-                                "id": offer.id,
-                                "title": offer.title,
-                                "code": offer.code,
-                                "url": offer.get_absolute_url(),
-                            }
-                            if offer
-                            else None,
-                            "planned_works": planned_works,
-                        }
-                        for offer, planned_works in sorted(offers.items())
-                    ],
-                }
+                project_record(project, offers)
                 for project, offers in projects_offers.items()
             ],
-            key=lambda row: row["project"]["id"],  # FIXME sort by timeline
+            key=lambda row: (
+                row["project"]["date_from"],
+                row["project"]["date_until"],
+                -row["project"]["planned_hours"],
+            ),
         ),
         "by_week": [by_week[week] for week in weeks],
     }

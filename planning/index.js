@@ -109,6 +109,17 @@ function Project({by_week, offers, project}) {
         </a>
         <AddPlannedWorkLink params={`project=${project.id}`} />
       </Cell>
+      <Cell
+        row={row}
+        column={2}
+        className="planning--small text-center"
+        style={{whiteSpace: "nowrap"}}
+      >
+        {project.range}
+      </Cell>
+      <Cell row={row} column={3} className="planning--small text-center">
+        {parseFloat(project.planned_hours).toFixed(0)}h
+      </Cell>
       {by_week.map((hours, idx) => {
         hours = parseFloat(hours)
         if (!hours) return null
@@ -148,7 +159,7 @@ function Offer({project, offer, planned_works}) {
         className="planning--stripe2"
       />
       <Cell row={row} column={1} className="planning--title is-offer pl-3">
-        {offer ? (
+        {offer.id ? (
           <>
             <a href={offer.url} target="_blank" rel="noreferrer">
               {offer.title}
@@ -160,6 +171,17 @@ function Offer({project, offer, planned_works}) {
         ) : (
           gettext("Not part of an offer")
         )}
+      </Cell>
+      <Cell
+        row={row}
+        column={2}
+        className="planning--small text-center"
+        style={{whiteSpace: "nowrap"}}
+      >
+        {offer.range}
+      </Cell>
+      <Cell row={row} column={3} className="planning--small text-center">
+        {parseFloat(offer.planned_hours).toFixed(0)}h
       </Cell>
       {planned_works.map((planned_work, idx) => (
         <PlannedWork
