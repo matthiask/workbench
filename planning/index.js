@@ -264,7 +264,9 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
       <Cell
         row={row}
         column={1}
-        className={`planning--title ${isRequest ? "is-pr" : "is-pw"} planning--small pl-5`}
+        className={`planning--title ${
+          isRequest ? "is-pr" : "is-pw"
+        } planning--small pl-5`}
       >
         <a href={planned_work.url} data-toggle="ajaxmodal">
           {planned_work.title}
@@ -287,7 +289,9 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
           row={row}
           column={FIRST_DATA_COLUMN + range.start}
           colspan={`span ${range.length}`}
-          className={`planning--range planning--small ${isRequest ? "is-pr" : "is-pw"}`}
+          className={`planning--range planning--small ${
+            isRequest ? "is-pr" : "is-pw"
+          }`}
           tag="a"
           href={planned_work.url}
           data-toggle="ajaxmodal"
