@@ -13,7 +13,7 @@ from workbench.planning.models import PlannedWork, PlanningRequest
 from workbench.projects.models import Project
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
-from workbench.tools.validation import monday
+from workbench.tools.validation import monday, raise_if_errors
 
 
 class PlanningRequestSearchForm(Form):
@@ -172,6 +172,8 @@ class PlannedWorkForm(ModelForm):
         super().__init__(*args, **kwargs)
         # self.instance.project = self.project
 
+        self.fields["project"].required = False
+
         self.fields["weeks"] = forms.MultipleChoiceField(
             label=capfirst(_("weeks")),
             choices=[
@@ -188,6 +190,25 @@ class PlannedWorkForm(ModelForm):
             widget=forms.SelectMultiple(attrs={"size": 20}),
             initial=self.instance.weeks,
         )
+
+    def clean(self):
+        data = super().clean()
+        errors = {}
+
+        if not data.get("project") and data.get("offer"):
+            data["project"] = data["offer"].project
+        if not data.get("project") and data.get("request"):
+            data["project"] = data["request"].project
+        if not data.get("project"):
+            errors["project"] = _("This field is required.")
+
+        if data.get("offer") and data["offer"].project != data.get("project"):
+            errors["offer"] = _("The offer must belong to the project above.")
+        if data.get("request") and data["request"].project != data.get("project"):
+            errors["request"] = _("The request must belong to the project above.")
+
+        raise_if_errors(errors)
+        return data
 
     def save(self):
         instance = super().save(commit=False)
