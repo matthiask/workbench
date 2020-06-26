@@ -176,21 +176,55 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
           {planned_work.title}
         </a>
       </Cell>
-      {hours_per_week.map((hours, idx) => {
-        if (!parseFloat(hours)) return null
-        return (
-          <Cell
-            key={idx}
-            row={row}
-            column={2 + idx}
-            className="planning--small text-right"
-          >
-            {hours}
-          </Cell>
-        )
-      })}
+      {findContiguousWeekRanges(hours_per_week).map((range, idx) => (
+        <Cell
+          key={idx}
+          row={row}
+          column={2 + range.start}
+          colspan={`span ${range.length}`}
+          className="planning--range planning--small"
+          tag="a"
+          href={planned_work.update_url}
+          data-toggle="ajaxmodal"
+        >
+          {planned_work.planned_hours}h
+        </Cell>
+      ))}
     </>
   )
+}
+
+function findContiguousWeekRanges(hours_per_week) {
+  hours_per_week = hours_per_week.map((hours) => parseFloat(hours))
+
+  let rangeStart = -1
+  // const ranges = [{start: 0, length: hours_per_week.length - 1}]
+  // return ranges
+
+  let ranges = []
+
+  for (let i = 0; i < hours_per_week.length; ++i) {
+    if (hours_per_week[i]) {
+      if (rangeStart < 0) {
+        // Start new range
+        rangeStart = i
+      }
+    } else {
+      if (rangeStart >= 0) {
+        ranges.push({start: rangeStart, length: i - rangeStart})
+        rangeStart = -1
+      }
+    }
+  }
+
+  if (rangeStart >= 0) {
+    ranges.push({
+      start: rangeStart,
+      length: hours_per_week.length - 1 - rangeStart,
+    })
+  }
+
+  return ranges
 }
 
 function AddPlannedWorkLink({params}) {
@@ -211,18 +245,19 @@ function Cell({
   column,
   rowspan = "span 1",
   colspan = "span 1",
+  tag = "div",
   children,
   ...props
 }) {
-  return (
-    <div
-      style={{
+  return React.createElement(
+    tag,
+    {
+      style: {
         gridRow: `${row} / ${rowspan}`,
         gridColumn: `${column} / ${colspan}`,
-      }}
-      {...props}
-    >
-      {children}
-    </div>
+      },
+      ...props,
+    },
+    children
   )
 }
