@@ -90,8 +90,8 @@ def planned_work(*, users=None):
                 for offer, planned_works in sorted(offers.items())
             ),
             key=lambda row: (
-                row["offer"]["date_from"],
                 row["offer"]["date_until"],
+                row["offer"]["date_from"],
                 -row["offer"]["planned_hours"],
             ),
         )
@@ -133,8 +133,8 @@ def planned_work(*, users=None):
                 for project, offers in projects_offers.items()
             ],
             key=lambda row: (
-                row["project"]["date_from"],
                 row["project"]["date_until"],
+                row["project"]["date_from"],
                 -row["project"]["planned_hours"],
             ),
         ),
