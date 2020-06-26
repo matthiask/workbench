@@ -30,10 +30,16 @@ urlpatterns = [
     ),
     path(
         "requests/create/",
-        generic.CreateView.as_view(
-            model=PlanningRequest, form_class=PlanningRequestForm,
-        ),
+        create,
+        {"viewname": "createrequest"},
         name="planning_planningrequest_create",
+    ),
+    path(
+        "requests/create/<int:pk>/",
+        generic.CreateRelatedView.as_view(
+            model=PlanningRequest, form_class=PlanningRequestForm, related_model=Project
+        ),
+        name="projects_project_createrequest",
     ),
     path(
         "requests/<int:pk>/update/",

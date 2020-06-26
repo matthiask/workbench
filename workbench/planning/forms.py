@@ -8,7 +8,6 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.invoices.utils import recurring
-from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork, PlanningRequest
 from workbench.projects.models import Project
 from workbench.tools.formats import local_date_format
@@ -56,7 +55,6 @@ class PlanningRequestForm(ModelForm):
     class Meta:
         model = PlanningRequest
         fields = (
-            "project",
             "offer",
             "title",
             "description",
@@ -66,23 +64,23 @@ class PlanningRequestForm(ModelForm):
             "receivers",
         )
         widgets = {
-            "project": Autocomplete(model=Project, params={"only_open": "on"}),
-            "offer": Autocomplete(model=Offer),
             "description": Textarea,
             "receivers": forms.CheckboxSelectMultiple,
         }
 
     def __init__(self, *args, **kwargs):
-        """
         self.project = kwargs.pop("project", None)
-        if self.project:  # Creating a new offer
+        if self.project:  # Creating a new object
             kwargs.setdefault("initial", {}).update({"title": self.project.title})
         else:
             self.project = kwargs["instance"].project
-        """
 
         super().__init__(*args, **kwargs)
-        # self.instance.project = self.project
+        self.instance.project = self.project
+
+        self.fields["offer"].queryset = self.instance.project.offers.select_related(
+            "owned_by"
+        )
 
         q = Q(is_active=True)
         if self.instance.pk:
@@ -189,6 +187,44 @@ class PlannedWorkForm(ModelForm):
             widget=forms.SelectMultiple(attrs={"size": 20}),
             initial=self.instance.weeks,
         )
+
+    def clean(self):
+        data = super().clean()
+
+        if data.get("user") and data["user"] != self.request.user:
+            self.add_warning(
+                _(
+                    "You are creating or updating planned work for somebody else."
+                    " Are you sure they are OK with that?"
+                ),
+                code="planning-for-somebody-else",
+            )
+
+        if data.get("request") and data.get("weeks"):
+            outside = [
+                week
+                for week in data["weeks"]
+                if week.week < data["request"].earliest_start_on
+                or week.week >= data["request"].completion_requested_on
+            ]
+            if outside:
+                self.add_warning(
+                    _(
+                        "At least one week is outside the requested range of"
+                        " %(from)s – %(until)s: %(weeks)s"
+                    )
+                    % {
+                        "from": local_date_format(data["request"].earliest_start_on),
+                        "until": local_date_format(
+                            data["request"].completion_requested_on
+                            - dt.timedelta(days=1)
+                        ),
+                        "weeks": ", ".join(local_date_format(week) for week in outside),
+                    },
+                    code="weeks-outside-request",
+                )
+
+        return data
 
     def save(self):
         instance = super().save(commit=False)

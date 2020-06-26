@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-25 22:11+0200\n"
+"POT-Creation-Date: 2020-06-26 17:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2103,6 +2103,23 @@ msgstr "Planung"
 msgid "weeks"
 msgstr "Wochen"
 
+#: workbench/planning/forms.py
+msgid ""
+"You are creating or updating planned work for somebody else. Are you sure "
+"they are OK with that?"
+msgstr ""
+"Du erstellst oder bearbeitest die geplante Arbeit für jemand anderes. Bist "
+"Du sicher, dass diese einverstanden sind?"
+
+#: workbench/planning/forms.py
+#, python-format
+msgid ""
+"At least one week is outside the requested range of %(from)s – %(until)s: "
+"%(weeks)s"
+msgstr ""
+"Mindestens eine Woche liegt ausserhalb des angefragten Zeitraumes von "
+"%(from)s – %(until)s: %(weeks)s"
+
 #: workbench/planning/models.py
 msgid "planning team membership"
 msgstr "Planungsteam-Mitgliedschaft"
@@ -2136,6 +2153,7 @@ msgid "closed at"
 msgstr "geschlossen um"
 
 #: workbench/planning/models.py
+#: workbench/templates/planning/project_planning.html
 msgid "planning request"
 msgstr "Planungsanfrage"
 
@@ -2152,6 +2170,8 @@ msgid "Allow at least one week for the work please."
 msgstr "Mindestens eine Woche für die Arbeit zulassen."
 
 #: workbench/planning/models.py workbench/templates/base.html
+#: workbench/templates/planning/project_planning.html
+#: workbench/templates/planning/user_planning.html
 msgid "planned work"
 msgstr "geplante Arbeit"
 
