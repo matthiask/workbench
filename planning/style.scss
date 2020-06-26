@@ -5,8 +5,9 @@
   --default-height: 1.4rem;
 
   --stripe1: #efefef;
-  --stripe2: #f4f4ff;
-  --stripe3: #f8f8f8;
+  --stripe2: #f1f1ff;
+  --stripe3: #f4f4f4;
+  --stripe4: #f9f9f9;
 
   min-width: min-content;
   position: relative;
@@ -68,4 +69,8 @@
 
 .planning--stripe3 {
   background-color: var(--stripe3);
+}
+
+.planning--stripe4 {
+  background-color: var(--stripe4);
 }

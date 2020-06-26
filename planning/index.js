@@ -1,7 +1,7 @@
 import "./style.scss"
 
 import ReactDOM from "react-dom"
-import React, {createContext, useContext} from "react"
+import React, {createContext, useContext, useLayoutEffect, useRef} from "react"
 
 const identity = (t) => t
 export const gettext = window.gettext || identity
@@ -15,9 +15,17 @@ document.addEventListener("DOMContentLoaded", () => {
 const RowContext = createContext()
 
 function Planning({data}) {
+  const gridRef = useRef(null)
+  const rowCtx = {row: 2}
+
+  useLayoutEffect(() => {
+    gridRef.current.style.gridTemplateRows = `repeat(${rowCtx.row}, var(--default-height))`
+  }, [])
+
   return (
-    <RowContext.Provider value={{row: 2}}>
+    <RowContext.Provider value={rowCtx}>
       <div
+        ref={gridRef}
         className="planning"
         style={{
           gridTemplateColumns: `var(--title-column-width) repeat(${
@@ -28,6 +36,17 @@ function Planning({data}) {
         <Cell row={1} column={1} className="planning--scale">
           <strong>{gettext("Calendar week")}</strong>
         </Cell>
+        {data.weeks.map((_, idx) => {
+          return idx % 2 ? null : (
+            <Cell
+              key={idx}
+              row="1"
+              rowspan="-1"
+              column={2 + idx}
+              className="planning--stripe4"
+            />
+          )
+        })}
         {data.weeks.map((week, idx) => (
           <Cell
             key={week.week}
