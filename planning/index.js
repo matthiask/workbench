@@ -322,9 +322,11 @@ function findContiguousWeekRanges(hours_per_week) {
   if (rangeStart >= 0) {
     ranges.push({
       start: rangeStart,
-      length: hours_per_week.length - 1 - rangeStart,
+      length: hours_per_week.length - rangeStart,
     })
   }
+
+  console.log({ranges})
 
   return ranges
 }

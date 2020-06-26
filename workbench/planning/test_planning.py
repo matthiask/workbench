@@ -58,3 +58,7 @@ class PlanningTest(TestCase):
         report = reporting.user_planning(pw.user)
         self.assertEqual(sum(report["by_week"]), 20)
         self.assertEqual(len(report["projects_offers"]), 1)
+
+        report = reporting.project_planning(pw.project)
+        self.assertEqual(sum(report["by_week"]), 20)
+        self.assertEqual(len(report["projects_offers"]), 1)

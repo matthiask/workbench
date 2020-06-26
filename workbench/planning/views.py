@@ -8,6 +8,11 @@ class ProjectPlanningView(generic.DetailView):
     model = Project
     template_name = "planning/project_planning.html"
 
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(
+            planning_data=reporting.project_planning(self.object), **kwargs
+        )
+
 
 class UserPlanningView(generic.DetailView):
     model = User
