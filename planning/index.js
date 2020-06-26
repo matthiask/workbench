@@ -59,14 +59,6 @@ function Planning({data}) {
           }, var(--week-width))`,
         }}
       >
-        <Cell
-          row={1}
-          column={1}
-          colspan="span 3"
-          className="planning--scale text-right pr-2"
-        >
-          <strong>{gettext("Calendar week")}</strong>
-        </Cell>
         {data.weeks.map((_, idx) => {
           return idx % 2 ? null : (
             <Cell
