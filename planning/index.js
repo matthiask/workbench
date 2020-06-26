@@ -201,7 +201,7 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
         {planned_work.range}
       </Cell>
       <Cell row={row} column={3} className="planning--small text-center">
-        {planned_work.planned_hours}
+        {parseFloat(planned_work.planned_hours).toFixed(0)}h
       </Cell>
       {findContiguousWeekRanges(hours_per_week).map((range, idx) => (
         <Cell
