@@ -16,8 +16,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const RowContext = createContext()
 
-const FIRST_DATA_ROW = 2
+const FIRST_DATA_ROW = 3
 const FIRST_DATA_COLUMN = 4
+
+function months(weeks) {
+  const months = []
+  let month = null
+  for (let index = 0; index < weeks.length; ++index) {
+    let week = weeks[index]
+    if (week.month !== month) {
+      month = week.month
+      months.push({index, month})
+    }
+  }
+  return months
+}
 
 function Planning({data}) {
   const gridRef = useRef(null)
@@ -65,20 +78,29 @@ function Planning({data}) {
             />
           )
         })}
+        {months(data.weeks).map((month, idx) => (
+          <Cell
+            key={idx}
+            className="planning--scale pl-3"
+            row={1}
+            column={FIRST_DATA_COLUMN + month.index}
+          >
+            <strong>{month.month}</strong>
+          </Cell>
+        ))}
         {data.weeks.map((week, idx) => (
           <Cell
-            key={week.week}
+            key={idx}
             className="planning--scale text-center"
-            row={1}
+            row={2}
             column={FIRST_DATA_COLUMN + idx}
-            title={`${week.date_from} – ${week.date_until}`}
           >
-            <strong>{week.week}</strong>
+            <strong>{week.day}</strong>
           </Cell>
         ))}
 
         <Cell
-          row={2}
+          row={3}
           column={1}
           colspan="span 3"
           className="planning--scale text-right pr-2"
@@ -88,7 +110,7 @@ function Planning({data}) {
         {data.by_week.map((hours, idx) => (
           <Cell
             key={idx}
-            row={2}
+            row={3}
             column={FIRST_DATA_COLUMN + idx}
             className="planning--range planning--small is-total"
             style={{

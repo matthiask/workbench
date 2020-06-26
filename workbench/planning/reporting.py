@@ -119,9 +119,8 @@ def planned_work(*, users=None):
     return {
         "weeks": [
             {
-                "date_from": week,
-                "date_until": week + dt.timedelta(days=6),
-                "week": local_date_format(week, fmt="W"),
+                "month": local_date_format(week, fmt="F"),
+                "day": local_date_format(week, fmt="d."),
             }
             for week in weeks
         ],
