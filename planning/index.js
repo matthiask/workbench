@@ -179,13 +179,13 @@ function Project({by_week, offers, project}) {
         )
       })}
       {offers.map((offer, idx) => (
-        <Offer key={idx} project={project} {...offer} />
+        <Offer key={idx} {...offer} />
       ))}
     </>
   )
 }
 
-function Offer({project, offer, planned_works}) {
+function Offer({offer, planned_works}) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
