@@ -15,5 +15,5 @@ class UserPlanningView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(
-            planning_data=reporting.planned_work_for_user(self.object), **kwargs
+            planning_data=reporting.user_planning(self.object), **kwargs
         )

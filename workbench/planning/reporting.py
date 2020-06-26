@@ -12,7 +12,7 @@ from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.validation import monday
 
 
-def planned_work_for_user(user):
+def user_planning(user):
     weeks = list(islice(recurring(monday(), "weekly"), 52))
 
     by_week = defaultdict(lambda: Z1)
@@ -164,4 +164,4 @@ def planned_work_for_user(user):
 def test():  # pragma: no cover
     from pprint import pprint
 
-    pprint(planned_work_for_user(User.objects.get(pk=1)))
+    pprint(user_planning(User.objects.get(pk=1)))

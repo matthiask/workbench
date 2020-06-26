@@ -55,6 +55,6 @@ class PlanningTest(TestCase):
         service = factories.ServiceFactory.create(project=pw.project)
         factories.LoggedHoursFactory.create(rendered_by=pw.user, service=service)
 
-        report = reporting.planned_work_for_user(pw.user)
+        report = reporting.user_planning(pw.user)
         self.assertEqual(sum(report["by_week"]), 20)
         self.assertEqual(len(report["projects_offers"]), 1)
