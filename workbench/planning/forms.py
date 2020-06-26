@@ -171,6 +171,8 @@ class PlannedWorkForm(ModelForm):
         self.fields["offer"].queryset = self.instance.project.offers.select_related(
             "owned_by"
         )
+        self.fields["request"].queryset = self.instance.project.planning_requests.all()
+
         self.fields["weeks"] = forms.MultipleChoiceField(
             label=capfirst(_("weeks")),
             choices=[
