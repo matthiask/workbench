@@ -210,7 +210,7 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
         column={1}
         className="planning--title is-pw planning--small pl-5"
       >
-        <a href={planned_work.update_url} data-toggle="ajaxmodal">
+        <a href={planned_work.url} data-toggle="ajaxmodal">
           {planned_work.title}
         </a>
       </Cell>
@@ -233,7 +233,7 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
           colspan={`span ${range.length}`}
           className="planning--range planning--small is-work"
           tag="a"
-          href={planned_work.update_url}
+          href={planned_work.url}
           data-toggle="ajaxmodal"
         />
       ))}

@@ -33,7 +33,7 @@ def planned_work(*, users=None):
                     "id": pw.id,
                     "title": pw.title,
                     "planned_hours": pw.planned_hours,
-                    "update_url": pw.urls["update"],
+                    "url": pw.get_absolute_url(),
                     "date_from": date_from,
                     "date_until": date_until,
                     "range": "{} – {}".format(
