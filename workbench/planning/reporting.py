@@ -12,7 +12,7 @@ from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.validation import monday
 
 
-def planned_work(*, users=None):
+def planned_work_for_user(user):
     weeks = list(islice(recurring(monday(), "weekly"), 52))
 
     by_week = defaultdict(lambda: Z1)
@@ -20,9 +20,9 @@ def planned_work(*, users=None):
     projects_offers = defaultdict(lambda: defaultdict(list))
     project_ids = set()
 
-    for pw in PlannedWork.objects.filter(weeks__overlap=weeks).select_related(
-        "project__owned_by", "offer__project", "offer__owned_by"
-    ):
+    for pw in PlannedWork.objects.filter(
+        user=user, weeks__overlap=weeks
+    ).select_related("project__owned_by", "offer__project", "offer__owned_by"):
         per_week = (pw.planned_hours / len(pw.weeks)).quantize(Z2)
         for week in pw.weeks:
             by_week[week] += per_week
@@ -56,7 +56,7 @@ def planned_work(*, users=None):
     worked_hours_by_offer = defaultdict(lambda: Z1)
     worked_hours_by_project = defaultdict(lambda: Z1)
     for row in (
-        LoggedHours.objects.filter(service__project__in=project_ids)
+        LoggedHours.objects.filter(service__project__in=project_ids, rendered_by=user)
         .values("service__project", "service__offer")
         .annotate(Sum("hours"))
     ):
@@ -164,6 +164,4 @@ def planned_work(*, users=None):
 def test():  # pragma: no cover
     from pprint import pprint
 
-    pprint(planned_work(users=[User.objects.get(pk=1)]))
-
-    # pprint(accepted_deals([dt.date(2020, 1, 1), dt.date(2020, 3, 31)]))
+    pprint(planned_work_for_user(User.objects.get(pk=1)))

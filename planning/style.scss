@@ -61,6 +61,9 @@
   width: 1.5em;
   text-align: center;
   border-radius: 10px;
+
+  transition: 0.2s;
+  transition-property: color background;
 }
 
 .planning--stripe1 {
@@ -86,6 +89,7 @@
   color: var(--white);
   text-align: center;
   padding: 0 3px;
+  transition: opacity 0.2s;
 
   &.is-project {
     background-color: var(--indigo);
@@ -93,5 +97,9 @@
 
   &.is-total {
     background-color: var(--purple);
+  }
+
+  &.is-work:hover {
+    opacity: 0.7;
   }
 }

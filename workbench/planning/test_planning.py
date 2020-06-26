@@ -5,6 +5,8 @@ from django.test import TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.planning import reporting
+from workbench.tools.validation import monday
 
 
 class PlanningTest(TestCase):
@@ -45,3 +47,14 @@ class PlanningTest(TestCase):
             pr.clean_fields(exclude=["completion_requested_on"])
 
         self.assertEqual(list(cm.exception), msg)
+
+    def test_reporting_smoke(self):
+        """Smoke test the planned work report"""
+        pw = factories.PlannedWorkFactory.create(weeks=[monday()])
+
+        service = factories.ServiceFactory.create(project=pw.project)
+        factories.LoggedHoursFactory.create(rendered_by=pw.user, service=service)
+
+        report = reporting.planned_work_for_user(pw.user)
+        self.assertEqual(sum(report["by_week"]), 20)
+        self.assertEqual(len(report["projects_offers"]), 1)
