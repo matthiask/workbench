@@ -238,21 +238,17 @@ function Offer({offer, planned_works}) {
       <Cell row={row} column={4} className="planning--small text-right">
         {`${fixed(offer.worked_hours, 0)}h / ${fixed(offer.planned_hours, 0)}h`}
       </Cell>
-      {planned_works.map((planned_work, idx) => (
-        <PlannedWork
-          key={planned_work.planned_work.id}
-          {...planned_work}
-          isEven={(1 + idx) % 2 === 0}
-        />
+      {planned_works.map((work, idx) => (
+        <Work key={work.work.id} {...work} isEven={(1 + idx) % 2 === 0} />
       ))}
     </>
   )
 }
 
-function PlannedWork({planned_work, hours_per_week, isEven}) {
+function Work({work, hours_per_week, isEven}) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
-  const isRequest = !!planned_work.requested_hours
+  const isRequest = !!work.requested_hours
   return (
     <>
       {isEven ? (
@@ -268,8 +264,8 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
           isRequest ? "is-pr font-italic" : "is-pw"
         } planning--small pl-5`}
       >
-        <a href={planned_work.url} data-toggle="ajaxmodal">
-          {planned_work.title}
+        <a href={work.url} data-toggle="ajaxmodal">
+          {work.title}
         </a>
       </Cell>
       <Cell
@@ -278,15 +274,15 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
         className="planning--small text-center"
         style={{whiteSpace: "nowrap"}}
       >
-        {planned_work.range}
+        {work.range}
       </Cell>
       <Cell row={row} column={4} className="planning--small text-right">
         {isRequest
-          ? `${fixed(planned_work.missing_hours, 0)}h / ${fixed(
-              planned_work.requested_hours,
+          ? `${fixed(work.missing_hours, 0)}h / ${fixed(
+              work.requested_hours,
               0
             )}h`
-          : `${fixed(planned_work.planned_hours, 0)}h`}
+          : `${fixed(work.planned_hours, 0)}h`}
       </Cell>
       {findContiguousWeekRanges(hours_per_week).map((range, idx) => (
         <Cell
@@ -298,7 +294,7 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
             isRequest ? "is-pr" : "is-pw"
           }`}
           tag="a"
-          href={planned_work.url}
+          href={work.url}
           data-toggle="ajaxmodal"
         />
       ))}
