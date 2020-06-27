@@ -4,6 +4,12 @@
 
 {% block title %}{% trans 'planning'|capfirst %} - {{ block.super }}{% endblock %}
 
+{% block uplink %}
+  <a href="{{ object.get_absolute_url }}" class="btn btn-primary btn-sm uplink">
+    {% include 'svg/chevron-left.svg' %} {% trans 'project' %}
+  </a>
+{% endblock %}
+
 {% block content %}
 <div class="row">
   <div class="col-12">
