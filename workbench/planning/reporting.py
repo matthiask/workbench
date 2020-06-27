@@ -66,6 +66,7 @@ def user_planning(user):
         projects_offers[pr.project][pr.offer].append(
             {
                 "work": {  # FIXME
+                    "is_request": True,
                     "id": pr.id,
                     "title": "{}: {}".format(_("Request"), pr.title),
                     "requested_hours": pr.requested_hours,
@@ -97,10 +98,10 @@ def user_planning(user):
         worked_hours_by_offer[row["service__offer"]] += row["hours__sum"]
         worked_hours_by_project[row["service__project"]] += row["hours__sum"]
 
-    def offer_record(offer, planned_works):
-        date_from = min(pw["work"]["date_from"] for pw in planned_works)
-        date_until = max(pw["work"]["date_until"] for pw in planned_works)
-        hours = sum(pw["work"]["planned_hours"] for pw in planned_works)
+    def offer_record(offer, work_list):
+        date_from = min(pw["work"]["date_from"] for pw in work_list)
+        date_until = max(pw["work"]["date_until"] for pw in work_list)
+        hours = sum(pw["work"]["planned_hours"] for pw in work_list)
 
         return {
             "offer": {
@@ -126,8 +127,8 @@ def user_planning(user):
                     else {}
                 ),
             },
-            "planned_works": sorted(
-                planned_works,
+            "work_list": sorted(
+                work_list,
                 key=lambda row: (row["work"]["date_from"], row["work"]["date_until"],),
             ),
         }
@@ -135,8 +136,8 @@ def user_planning(user):
     def project_record(project, offers):
         offers = sorted(
             (
-                offer_record(offer, planned_works)
-                for offer, planned_works in sorted(offers.items())
+                offer_record(offer, work_list)
+                for offer, work_list in sorted(offers.items())
             ),
             key=lambda row: (
                 row["offer"]["date_until"],
@@ -273,6 +274,7 @@ SELECT MIN(week), MAX(week) FROM sq
         offers[pr.offer].append(
             {
                 "work": {  # FIXME
+                    "is_request": True,
                     "id": pr.id,
                     "title": "{}: {}".format(_("Request"), pr.title),
                     "requested_hours": pr.requested_hours,
@@ -302,10 +304,10 @@ SELECT MIN(week), MAX(week) FROM sq
         worked_hours_by_offer[row["service__offer"]] += row["hours__sum"]
         worked_hours += row["hours__sum"]
 
-    def offer_record(offer, planned_works):
-        date_from = min(pw["work"]["date_from"] for pw in planned_works)
-        date_until = max(pw["work"]["date_until"] for pw in planned_works)
-        hours = sum(pw["work"]["planned_hours"] for pw in planned_works)
+    def offer_record(offer, work_list):
+        date_from = min(pw["work"]["date_from"] for pw in work_list)
+        date_until = max(pw["work"]["date_until"] for pw in work_list)
+        hours = sum(pw["work"]["planned_hours"] for pw in work_list)
 
         return {
             "offer": {
@@ -331,8 +333,8 @@ SELECT MIN(week), MAX(week) FROM sq
                     else {}
                 ),
             },
-            "planned_works": sorted(
-                planned_works,
+            "work_list": sorted(
+                work_list,
                 key=lambda row: (row["work"]["date_from"], row["work"]["date_until"],),
             ),
         }
@@ -340,8 +342,8 @@ SELECT MIN(week), MAX(week) FROM sq
     def project_record(project, offers):
         offers = sorted(
             (
-                offer_record(offer, planned_works)
-                for offer, planned_works in sorted(offers.items())
+                offer_record(offer, work_list)
+                for offer, work_list in sorted(offers.items())
             ),
             key=lambda row: (
                 row["offer"]["date_until"],

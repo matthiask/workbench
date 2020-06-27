@@ -191,7 +191,7 @@ function Project({by_week, offers, project}) {
   )
 }
 
-function Offer({offer, planned_works}) {
+function Offer({offer, work_list}) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
@@ -238,7 +238,7 @@ function Offer({offer, planned_works}) {
       <Cell row={row} column={4} className="planning--small text-right">
         {`${fixed(offer.worked_hours, 0)}h / ${fixed(offer.planned_hours, 0)}h`}
       </Cell>
-      {planned_works.map((work, idx) => (
+      {work_list.map((work, idx) => (
         <Work key={work.work.id} {...work} isEven={(1 + idx) % 2 === 0} />
       ))}
     </>
@@ -248,7 +248,6 @@ function Offer({offer, planned_works}) {
 function Work({work, hours_per_week, isEven}) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
-  const isRequest = !!work.requested_hours
   return (
     <>
       {isEven ? (
@@ -261,7 +260,7 @@ function Work({work, hours_per_week, isEven}) {
         row={row}
         column={1}
         className={`planning--title ${
-          isRequest ? "is-pr font-italic" : "is-pw"
+          work.is_request ? "is-pr font-italic" : "is-pw"
         } planning--small pl-5`}
       >
         <a href={work.url} data-toggle="ajaxmodal">
@@ -277,7 +276,7 @@ function Work({work, hours_per_week, isEven}) {
         {work.range}
       </Cell>
       <Cell row={row} column={4} className="planning--small text-right">
-        {isRequest
+        {work.is_request
           ? `${fixed(work.missing_hours, 0)}h / ${fixed(
               work.requested_hours,
               0
@@ -291,7 +290,7 @@ function Work({work, hours_per_week, isEven}) {
           column={FIRST_DATA_COLUMN + range.start}
           colspan={`span ${range.length}`}
           className={`planning--range planning--small ${
-            isRequest ? "is-pr" : "is-pw"
+            work.is_request ? "is-pr" : "is-pw"
           }`}
           tag="a"
           href={work.url}
