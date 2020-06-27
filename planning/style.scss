@@ -89,6 +89,7 @@
   text-align: center;
   padding: 0 3px;
   transition: opacity 0.2s;
+  border-radius: 3px;
 
   &.is-project {
     background-color: var(--indigo);
@@ -108,7 +109,7 @@
       var(--teal) 0,
       var(--teal) 5px,
       #ccc 5px,
-      #ccc 10px
+      #ccc 8px
     );
     background-size: 100% 100%;
     background-repeat: repeat;

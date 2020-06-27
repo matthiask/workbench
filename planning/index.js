@@ -7,6 +7,7 @@ const clamp = (min, max) => (value) => Math.max(Math.min(value, max), min)
 const opacityClamp = clamp(0.3, 1)
 const identity = (t) => t
 export const gettext = window.gettext || identity
+const fixed = (s, decimalPlaces) => parseFloat(s).toFixed(decimalPlaces)
 
 document.addEventListener("DOMContentLoaded", () => {
   const data = JSON.parse(document.querySelector("#planning-data").textContent)
@@ -106,10 +107,10 @@ function Planning({data}) {
             column={FIRST_DATA_COLUMN + idx}
             className="planning--range planning--small is-total"
             style={{
-              opacity: opacityClamp(0.3 + parseFloat(parseFloat(hours) / 20)),
+              opacity: opacityClamp(0.3 + parseFloat(hours) / 20),
             }}
           >
-            <strong>{parseFloat(hours).toFixed(1)}</strong>
+            <strong>{fixed(hours, 1)}</strong>
           </Cell>
         ))}
 
@@ -160,9 +161,10 @@ function Project({by_week, offers, project}) {
         {project.range}
       </Cell>
       <Cell row={row} column={4} className="planning--small text-right">
-        {`${parseFloat(project.worked_hours).toFixed(0)}h / ${parseFloat(
-          project.planned_hours
-        ).toFixed(0)}h`}
+        {`${fixed(project.worked_hours, 0)}h / ${fixed(
+          project.planned_hours,
+          0
+        )}h`}
       </Cell>
       {by_week.map((hours, idx) => {
         hours = parseFloat(hours)
@@ -234,9 +236,7 @@ function Offer({offer, planned_works}) {
         {offer.range}
       </Cell>
       <Cell row={row} column={4} className="planning--small text-right">
-        {`${parseFloat(offer.worked_hours).toFixed(0)}h / ${parseFloat(
-          offer.planned_hours
-        ).toFixed(0)}h`}
+        {`${fixed(offer.worked_hours, 0)}h / ${fixed(offer.planned_hours, 0)}h`}
       </Cell>
       {planned_works.map((planned_work, idx) => (
         <PlannedWork
@@ -265,7 +265,7 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
         row={row}
         column={1}
         className={`planning--title ${
-          isRequest ? "is-pr" : "is-pw"
+          isRequest ? "is-pr font-italic" : "is-pw"
         } planning--small pl-5`}
       >
         <a href={planned_work.url} data-toggle="ajaxmodal">
@@ -281,7 +281,12 @@ function PlannedWork({planned_work, hours_per_week, isEven}) {
         {planned_work.range}
       </Cell>
       <Cell row={row} column={4} className="planning--small text-right">
-        {parseFloat(planned_work.planned_hours).toFixed(0)}h
+        {isRequest
+          ? `${fixed(planned_work.missing_hours, 0)}h / ${fixed(
+              planned_work.requested_hours,
+              0
+            )}h`
+          : `${fixed(planned_work.planned_hours, 0)}h`}
       </Cell>
       {findContiguousWeekRanges(hours_per_week).map((range, idx) => (
         <Cell
