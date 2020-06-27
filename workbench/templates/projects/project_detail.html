@@ -103,6 +103,10 @@
         {% trans 'Copy' %}</a>
       <a href="{{ object.urls.statistics }}" class="btn btn-primary" data-toggle="ajaxmodal">
         {% trans 'Statistics' %}</a>
+      {% if request.user|has_feature:FEATURES.PLANNING %}
+        <a href="{{ object.urls.planning }}" class="btn btn-primary">
+          {% include 'svg/project.svg' %} {% trans 'planning'|capfirst %}</a>
+      {% endif %}
 
       {% if request.user|has_feature:FEATURES.CONTROLLING and project.grouped_services.offers|length > 1 %}
         <span class="dropdown">
