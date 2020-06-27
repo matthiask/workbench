@@ -151,7 +151,7 @@ function Project({by_week, offers, project}) {
         >
           +
         </a>{" "}
-        <a href={`../../project/${project.id}/`}>
+        <a href={project.planning}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="15"

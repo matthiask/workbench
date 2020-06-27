@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import auth, messages
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.cache import never_cache
@@ -11,7 +11,7 @@ from authlib.google import GoogleOAuth2Client
 from workbench.accounts.forms import UserForm
 from workbench.accounts.models import User
 from workbench.accounts.reporting import logged_hours
-from workbench.generic import UpdateView
+from workbench.generic import DetailView, UpdateView
 
 
 def accounts(request):
@@ -116,10 +116,11 @@ def logout(request):
     return response
 
 
-def profile(request, pk=None):
-    user = (
-        request.user if pk is None else get_object_or_404(User.objects.active(), pk=pk)
-    )
-    return render(
-        request, "profile.html", {"user": user, "logged_hours": logged_hours(user)}
-    )
+class ProfileView(DetailView):
+    model = User
+    queryset = User.objects.active()
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(
+            logged_hours=logged_hours(self.object), **kwargs
+        )

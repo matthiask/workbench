@@ -11,6 +11,7 @@ from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.forms import OfferForm
 from workbench.offers.models import Offer
 from workbench.offers.views import ProjectOfferPDFView
+from workbench.planning.views import ProjectPlanningView
 from workbench.projects.forms import (
     CampaignDeleteForm,
     CampaignForm,
@@ -112,6 +113,11 @@ urlpatterns = [
         r"^(?P<pk>\d+)/statistics/$",
         generic.DetailView.as_view(model=Project, template_name_suffix="_statistics"),
         name="projects_project_statistics",
+    ),
+    re_path(
+        r"^(?P<pk>\d+)/planning/$",
+        ProjectPlanningView.as_view(),
+        name="projects_project_planning",
     ),
     re_path(
         r"^(?P<pk>\d+)/offers-pdf/$",

@@ -1,4 +1,7 @@
-from django.urls import re_path
+from django.shortcuts import redirect
+from django.urls import path, re_path
+
+from workbench.planning.views import UserPlanningView
 
 from . import views
 
@@ -12,6 +15,15 @@ urlpatterns = [
     re_path(r"^accounts/oauth2/$", views.oauth2, name="accounts_oauth2"),
     re_path(r"^accounts/logout/$", views.logout, name="logout"),
     #
-    re_path(r"^profile/$", views.profile, name="profile"),
-    re_path(r"^profile/(?P<pk>[0-9]+)/$", views.profile, name="profile"),
+    path(
+        "user/",
+        lambda request: redirect("accounts_user_detail", pk=request.user.pk),
+        name="accounts_user_redirect_to_self",
+    ),
+    path("user/<int:pk>/", views.ProfileView.as_view(), name="accounts_user_detail"),
+    path(
+        "user/<int:pk>/planning/",
+        UserPlanningView.as_view(),
+        name="accounts_user_planning",
+    ),
 ]

@@ -85,9 +85,7 @@ class Migration(migrations.Migration):
                     models.DecimalField(
                         decimal_places=1,
                         max_digits=10,
-                        validators=[
-                            django.core.validators.MinValueValidator(Decimal("0.1"))
-                        ],
+                        validators=[django.core.validators.MinValueValidator(0)],
                         verbose_name="planned hours",
                     ),
                 ),
@@ -183,7 +181,9 @@ class Migration(migrations.Migration):
                     models.DecimalField(
                         decimal_places=1,
                         max_digits=10,
-                        validators=[django.core.validators.MinValueValidator(0)],
+                        validators=[
+                            django.core.validators.MinValueValidator(Decimal("0.1"))
+                        ],
                         verbose_name="planned hours",
                     ),
                 ),
