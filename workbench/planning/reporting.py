@@ -208,7 +208,7 @@ WITH sq AS (
 
     UNION ALL
 
-    SELECT completion_requested_on AS week
+    SELECT completion_requested_on - 7 AS week
     FROM planning_planningrequest
     WHERE project_id=%s
 )
@@ -221,7 +221,7 @@ SELECT MIN(week), MAX(week) FROM sq
     if result[0]:
         weeks = list(
             islice(
-                recurring(monday(), "weekly"), 2 + (result[1] - result[0]).days // 7,
+                recurring(result[0], "weekly"), 2 + (result[1] - result[0]).days // 7,
             )
         )
     else:
