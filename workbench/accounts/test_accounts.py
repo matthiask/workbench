@@ -98,7 +98,7 @@ class AccountsTest(TestCase):
         )
         self.client.force_login(hours.rendered_by)
 
-        response = self.client.get("/profile/")
+        response = self.client.get("/user/{}/".format(hours.rendered_by.id))
         self.assertContains(response, "Hours per week")
 
     def test_work_anniversaries(self):

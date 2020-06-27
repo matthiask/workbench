@@ -140,6 +140,9 @@ class User(Model, AbstractBaseUser):
             else 1
         )
 
+    def get_absolute_url(self):
+        return self.urls["detail"] if self.pk else "/"
+
     def has_perm(self, perm, obj=None):
         """Does the user have a specific permission?"""
         # Simplest possible answer: Yes, always
