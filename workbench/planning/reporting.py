@@ -57,11 +57,9 @@ def user_planning(user):
     for pr in PlanningRequest.objects.filter(receivers=user).select_related(
         "project__owned_by", "offer__project", "offer__owned_by"
     ):
-        date_from = pr.earliest_start_on
-        date_until = pr.completion_requested_on - dt.timedelta(days=1)
-
-        requested_weeks = (pr.completion_requested_on - date_from).days // 7
-        per_week = (pr.requested_hours / requested_weeks).quantize(Z2)
+        date_from = min(pr.weeks)
+        date_until = max(pr.weeks)
+        per_week = (pr.requested_hours / len(pr.weeks)).quantize(Z2)
 
         projects_offers[pr.project][pr.offer].append(
             {
@@ -81,7 +79,7 @@ def user_planning(user):
                     ),
                 },
                 "hours_per_week": [
-                    per_week if date_from < week < date_until else Z1 for week in weeks
+                    per_week if week in pr.weeks else Z1 for week in weeks
                 ],
             }
         )

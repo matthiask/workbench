@@ -1,14 +1,17 @@
 import datetime as dt
 from decimal import Decimal
+from itertools import takewhile
 
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Q, Sum
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
+from workbench.invoices.utils import recurring
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.tools.formats import Z1, local_date_format
@@ -123,6 +126,15 @@ class PlanningRequest(Model):
 
         raise_if_errors(errors, exclude)
 
+    @cached_property
+    def weeks(self):
+        return list(
+            takewhile(
+                lambda x: x < self.completion_requested_on,
+                recurring(self.earliest_start_on, "weekly"),
+            )
+        )
+
 
 @model_urls
 class PlannedWork(Model):
@@ -169,6 +181,31 @@ class PlannedWork(Model):
 
     def __str__(self):
         return self.title
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._update_request_ids = {self.request_id}
+
+    def _update_requests(self):
+        self._update_request_ids.add(self.request_id)
+        self._update_request_ids.discard(None)
+        if self._update_request_ids:
+            for request in PlanningRequest.objects.filter(
+                id__in=self._update_request_ids
+            ):
+                request.save()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self._update_requests()
+
+    save.alters_data = False
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        self._update_requests()
+
+    delete.alters_data = False
 
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)

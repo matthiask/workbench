@@ -24,8 +24,13 @@
 {% endblock %}
 
 {% block footer %}
-  <a href="{{ object.urls.update }}" data-toggle="ajaxmodal" class="btn btn-primary mr-auto">
+  <a href="{{ object.urls.update }}" data-toggle="ajaxmodal" class="btn btn-primary">
     {% trans 'Update' %}
+  </a>
+  <a href="{{ object.project.urls.creatework }}?request={{ object.id }}"
+     data-toggle="ajaxmodal"
+     class="btn btn-primary mr-auto">
+    {% trans 'Accept' %}
   </a>
   <a href="{{ object.urls.delete }}" data-toggle="ajaxmodal" class="btn btn-outline-danger">
     {% trans 'Delete' %}

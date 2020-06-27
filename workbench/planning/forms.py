@@ -3,6 +3,7 @@ from itertools import islice
 
 from django import forms
 from django.db.models import Q
+from django.utils.dateparse import parse_date
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
@@ -159,9 +160,25 @@ class PlannedWorkForm(ModelForm):
 
         initial = kwargs.setdefault("initial", {})
         request = kwargs["request"]
-        for field in ["offer", "request"]:
+        for field in ["offer"]:
             if request.GET.get(field):
                 initial.setdefault(field, request.GET.get(field))
+
+        if request.GET.get("request"):
+            try:
+                pr = self.project.planning_requests.get(pk=request.GET["request"])
+            except (PlanningRequest.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.setdefault("offer", pr.offer_id)
+                initial.update(
+                    {
+                        "request": pr.id,
+                        "title": pr.title,
+                        "planned_hours": pr.requested_hours - pr.planned_hours,
+                        "weeks": pr.weeks,
+                    }
+                )
 
         super().__init__(*args, **kwargs)
         self.instance.project = self.project
@@ -171,7 +188,7 @@ class PlannedWorkForm(ModelForm):
         )
         self.fields["request"].queryset = self.instance.project.planning_requests.all()
 
-        self.fields["weeks"] = forms.MultipleChoiceField(
+        self.fields["weeks"] = forms.TypedMultipleChoiceField(
             label=capfirst(_("weeks")),
             choices=[
                 (
@@ -186,6 +203,7 @@ class PlannedWorkForm(ModelForm):
             ],
             widget=forms.SelectMultiple(attrs={"size": 20}),
             initial=self.instance.weeks,
+            coerce=parse_date,
         )
 
     def clean(self):
@@ -204,8 +222,8 @@ class PlannedWorkForm(ModelForm):
             outside = [
                 week
                 for week in data["weeks"]
-                if week.week < data["request"].earliest_start_on
-                or week.week >= data["request"].completion_requested_on
+                if week < data["request"].earliest_start_on
+                or week >= data["request"].completion_requested_on
             ]
             if outside:
                 self.add_warning(

@@ -457,7 +457,7 @@ HISTORY = {
     LoggedCost: _logbook_loggedcost_cfg,
     LoggedHours: _logbook_loggedhours_cfg,
     Offer: _offers_offer_cfg,
-    PlanningRequest: {"fields": EVERYTHING},
+    PlanningRequest: {"fields": EVERYTHING, "related": [(PlannedWork, "request_id")]},
     PlannedWork: {"fields": EVERYTHING},
     Campaign: _projects_campaign_cfg,
     Project: _projects_project_cfg,
