@@ -277,9 +277,10 @@ SELECT MIN(week), MAX(week) FROM sq
             {
                 "planned_work": {  # FIXME
                     "id": pr.id,
-                    "title": pr.title,
-                    "planned_hours": Z1,
+                    "title": "{}: {}".format(_("Request"), pr.title),
                     "requested_hours": pr.requested_hours,
+                    "planned_hours": pr.planned_hours,
+                    "missing_hours": pr.requested_hours - pr.planned_hours,
                     "url": pr.get_absolute_url(),
                     "date_from": date_from,
                     "date_until": date_until,
