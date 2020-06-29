@@ -591,17 +591,20 @@ class BreakForm(ModelForm):
             data["ends_at"] = timezone.make_aware(
                 dt.datetime.combine(data["day"], data["ends_at"])
             )
+
         return data
 
     def save(self):
-        if self.instance.pk:
-            return super().save()
-
+        new = not self.instance.pk
         instance = super().save(commit=False)
-        instance.user = self.request.user
         instance.starts_at = self.cleaned_data["starts_at"]
         instance.ends_at = self.cleaned_data["ends_at"]
+        if new:
+            instance.user = self.request.user
         instance.save()
+
+        if not new:
+            return instance
 
         timestamp = None
         if self.request.GET.get("timestamp"):
