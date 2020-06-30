@@ -164,6 +164,7 @@ class PlannedWorkForm(ModelForm):
             if request.GET.get(field):
                 initial.setdefault(field, request.GET.get(field))
 
+        pr = None
         if request.GET.get("request"):
             try:
                 pr = self.project.planning_requests.get(pk=request.GET["request"])
@@ -188,6 +189,13 @@ class PlannedWorkForm(ModelForm):
         )
         self.fields["request"].queryset = self.instance.project.planning_requests.all()
 
+        date_from_options = [
+            monday(),
+            self.instance.weeks and min(self.instance.weeks),
+            pr and min(pr.weeks),
+        ]
+        date_from = min(filter(None, date_from_options)) - dt.timedelta(days=70)
+
         self.fields["weeks"] = forms.TypedMultipleChoiceField(
             label=capfirst(_("weeks")),
             choices=[
@@ -199,10 +207,10 @@ class PlannedWorkForm(ModelForm):
                         local_date_format(day + dt.timedelta(days=6)),
                     ),
                 )
-                for day in islice(recurring(monday(), "weekly"), 52)
+                for day in islice(recurring(date_from, "weekly"), 52)
             ],
             widget=forms.SelectMultiple(attrs={"size": 20}),
-            initial=self.instance.weeks,
+            initial=self.instance.weeks or [monday()],
             coerce=parse_date,
         )
 
