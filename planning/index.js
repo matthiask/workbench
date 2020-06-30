@@ -117,6 +117,8 @@ function Planning({data}) {
         {data.projects_offers.map((project) => (
           <Project key={project.project.id} {...project} />
         ))}
+
+        <Absences absences={data.absences} />
       </div>
     </RowContext.Provider>
   )
@@ -311,6 +313,56 @@ function Work({work, hours_per_week, isEven}) {
           data-toggle="ajaxmodal"
         />
       ))}
+    </>
+  )
+}
+
+function Absences({absences}) {
+  const ctx = useContext(RowContext)
+  ctx.next() // Skip one row
+  const row = ctx.next()
+
+  return (
+    <>
+      <div
+        style={{
+          gridRow: row,
+          gridColumn: `1 / -1`,
+        }}
+        className="planning--stripe1"
+      />
+      <Cell row={row} column={1} className="planning--title is-project">
+        <strong>{gettext("Absences")}</strong>
+      </Cell>
+      {absences.map((user, idx) => (
+        <UserAbsences key={idx} user={user} />
+      ))}
+    </>
+  )
+}
+
+function UserAbsences({user}) {
+  const ctx = useContext(RowContext)
+  const row = ctx.next()
+
+  return (
+    <>
+      <Cell row={row} column={1} className="planning--title is-absence pl-3">
+        {user[0]}
+      </Cell>
+      {user[1].map((absence, idx) =>
+        absence ? (
+          <Cell
+            key={idx}
+            row={row}
+            column={FIRST_DATA_COLUMN + idx}
+            className="planning--range planning--small is-absence"
+            tag="a"
+            href={absence.url}
+            data-toggle="ajaxmodal"
+          ></Cell>
+        ) : null
+      )}
     </>
   )
 }

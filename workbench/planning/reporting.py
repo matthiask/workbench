@@ -3,9 +3,10 @@ from collections import defaultdict
 from itertools import islice
 
 from django.db import connections
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.utils.translation import gettext as _
 
+from workbench.awt.models import Absence
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedHours
 from workbench.planning.models import PlannedWork, PlanningRequest
@@ -230,6 +231,7 @@ SELECT MIN(week), MAX(week) FROM sq
 
     by_week = defaultdict(lambda: Z1)
     offers = defaultdict(list)
+    user_ids = set()
 
     for pw in PlannedWork.objects.filter(
         project=project, weeks__overlap=weeks
@@ -260,9 +262,12 @@ SELECT MIN(week), MAX(week) FROM sq
                 ],
             }
         )
+        user_ids.add(pw.user_id)
 
-    for pr in PlanningRequest.objects.filter(project=project).select_related(
-        "project__owned_by", "offer__project", "offer__owned_by"
+    for pr in (
+        PlanningRequest.objects.filter(project=project)
+        .select_related("project__owned_by", "offer__project", "offer__owned_by")
+        .prefetch_related("receivers")
     ):
         date_from = pr.earliest_start_on
         date_until = pr.completion_requested_on - dt.timedelta(days=1)
@@ -292,6 +297,8 @@ SELECT MIN(week), MAX(week) FROM sq
                 ],
             }
         )
+
+        user_ids |= {user.id for user in pr.receivers.all()}
 
     worked_hours_by_offer = defaultdict(lambda: Z1)
     worked_hours = Z1
@@ -376,6 +383,24 @@ SELECT MIN(week), MAX(week) FROM sq
             "offers": offers,
         }
 
+    absences = defaultdict(lambda: [None] * len(weeks))
+
+    for absence in Absence.objects.filter(
+        Q(user__in=user_ids), Q(starts_on__lte=max(weeks)), Q(ends_on__gte=min(weeks)),
+    ).select_related("user"):
+        data = {
+            "reason": absence.get_reason_display(),
+            "description": absence.description,
+            "days": absence.days,
+            "url": absence.get_absolute_url(),
+        }
+
+        date_from = monday(absence.starts_on)
+        date_until = monday(absence.ends_on or absence.starts_on)
+        for idx, week in enumerate(weeks):
+            if date_from <= week <= date_until:
+                absences[absence.user][idx] = data
+
     return {
         "weeks": [
             {
@@ -393,6 +418,7 @@ SELECT MIN(week), MAX(week) FROM sq
             ),
         ),
         "by_week": [by_week[week] for week in weeks],
+        "absences": [(str(user), lst) for user, lst in sorted(absences.items())],
     }
 
 

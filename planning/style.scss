@@ -115,8 +115,13 @@
     background-repeat: repeat;
   }
 
+  &.is-absence {
+    background-color: var(--blue);
+  }
+
   &.is-pw:hover,
-  &.is-pr:hover {
+  &.is-pr:hover,
+  &.is-absence:hover {
     opacity: 0.7;
   }
 }
