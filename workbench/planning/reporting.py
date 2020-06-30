@@ -170,6 +170,23 @@ def user_planning(user):
             "offers": offers,
         }
 
+    absences = defaultdict(lambda: [None] * len(weeks))
+    for absence in Absence.objects.filter(
+        Q(user=user), Q(starts_on__lte=max(weeks)), Q(ends_on__gte=min(weeks)),
+    ).select_related("user"):
+        data = {
+            "reason": absence.get_reason_display(),
+            "description": absence.description,
+            "days": absence.days,
+            "url": absence.get_absolute_url(),
+        }
+
+        date_from = monday(absence.starts_on)
+        date_until = monday(absence.ends_on or absence.starts_on)
+        for idx, week in enumerate(weeks):
+            if date_from <= week <= date_until:
+                absences[absence.user][idx] = data
+
     return {
         "weeks": [
             {
@@ -190,6 +207,7 @@ def user_planning(user):
             ),
         ),
         "by_week": [by_week[week] for week in weeks],
+        "absences": [(str(user), lst) for user, lst in sorted(absences.items())],
     }
 
 
@@ -384,7 +402,6 @@ SELECT MIN(week), MAX(week) FROM sq
         }
 
     absences = defaultdict(lambda: [None] * len(weeks))
-
     for absence in Absence.objects.filter(
         Q(user__in=user_ids), Q(starts_on__lte=max(weeks)), Q(ends_on__gte=min(weeks)),
     ).select_related("user"):
