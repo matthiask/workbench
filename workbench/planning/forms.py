@@ -194,7 +194,7 @@ class PlannedWorkForm(ModelForm):
             self.instance.weeks and min(self.instance.weeks),
             pr and min(pr.weeks),
         ]
-        date_from = min(filter(None, date_from_options)) - dt.timedelta(days=70)
+        date_from = min(filter(None, date_from_options)) - dt.timedelta(days=21)
 
         self.fields["weeks"] = forms.TypedMultipleChoiceField(
             label=capfirst(_("weeks")),
