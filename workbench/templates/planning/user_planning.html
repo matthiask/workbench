@@ -1,15 +1,8 @@
-{% extends "generic/object_detail.html" %}
+{% extends "accounts/user_base.html" %}
 
 {% load i18n workbench webpack_loader %}
 
-{% block title %}{% trans 'planning'|capfirst %} - {{ block.super }}{% endblock %}
-
-{% block content %}
-<div class="row">
-  <div class="col-12">
-    <h1>{% trans 'planning'|capfirst %}: {{ object }}</h1>
-  </div>
-</div>
+{% block inner_content %}
 
   <div id="planning-root" class="planning-wrapper"></div>
   {{ planning_data|json_script:'planning-data' }}

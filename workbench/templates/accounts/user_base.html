@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% load i18n mark_current workbench %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-10">
+
+    <h1>{{ user }}</h1>
+
+    <ul class="nav nav-tabs my-3">
+      {% mark_current request.path %}
+      <li class="nav-item">
+        <a class="nav-link" href="{{ user.urls.planning }}">{% trans 'Planning' %}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ user.urls.statistics }}">{% trans 'Statistics' %}</a>
+      </li>
+      {% endmark_current %}
+    </ul>
+
+  </div>
+</div>
+
+{% block inner_content %}{% endblock %}
+
+{% endblock %}

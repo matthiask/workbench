@@ -4,7 +4,12 @@ from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
 from workbench.awt.models import WorkingTimeModel
-from workbench.tools.forms import ModelForm
+from workbench.tools.forms import Form, ModelForm
+
+
+class UserSearchForm(Form):
+    def filter(self, queryset):
+        return queryset.filter(is_active=True)
 
 
 class UserForm(ModelForm):

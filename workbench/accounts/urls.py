@@ -1,6 +1,9 @@
 from django.shortcuts import redirect
 from django.urls import path, re_path
 
+from workbench import generic
+from workbench.accounts.forms import UserSearchForm
+from workbench.accounts.models import User
 from workbench.planning.views import UserPlanningView
 
 from . import views
@@ -16,14 +19,25 @@ urlpatterns = [
     re_path(r"^accounts/logout/$", views.logout, name="logout"),
     #
     path(
-        "user/",
-        lambda request: redirect("accounts_user_detail", pk=request.user.pk),
-        name="accounts_user_redirect_to_self",
+        "users/",
+        generic.ListView.as_view(
+            model=User, search_form_class=UserSearchForm, show_create_button=False,
+        ),
+        name="accounts_user_list",
     ),
-    path("user/<int:pk>/", views.ProfileView.as_view(), name="accounts_user_detail"),
     path(
-        "user/<int:pk>/planning/",
+        "users/<int:pk>/",
+        lambda request, pk: redirect("planning/"),
+        name="accounts_user_detail",
+    ),
+    path(
+        "users/<int:pk>/planning/",
         UserPlanningView.as_view(),
         name="accounts_user_planning",
+    ),
+    path(
+        "users/<int:pk>/statistics/",
+        views.ProfileView.as_view(),
+        name="accounts_user_statistics",
     ),
 ]

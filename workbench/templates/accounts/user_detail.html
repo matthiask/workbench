@@ -1,12 +1,10 @@
-{% extends "base.html" %}
+{% extends "accounts/user_base.html" %}
 
 {% load i18n static workbench %}
 
-{% block content %}
+{% block inner_content %}
 <div class="row justify-content-center">
   <div class="col-lg-10">
-
-    <h1>{{ user }}</h1>
 
     <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
 
