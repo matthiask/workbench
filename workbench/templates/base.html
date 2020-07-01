@@ -128,6 +128,7 @@
             <a class="dropdown-item" href="{% url 'timestamps' %}">{% trans 'timestamps'|capfirst %}</a>
             {% if request.user|has_feature:FEATURES.PLANNING %}
             <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'accounts_user_list' %}">{% trans 'users'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'planning_planningrequest_list' %}">{% trans 'planning requests'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'planning_plannedwork_list' %}">{% trans 'planned work'|capfirst %}</a>
             <a class="dropdown-item" href="{{ request.user.urls.planning }}">{% trans 'Your planned work' %}</a>

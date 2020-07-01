@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-27 13:45+0200\n"
+"POT-Creation-Date: 2020-07-01 08:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -102,7 +102,7 @@ msgstr "Person"
 msgid "user"
 msgstr "Benutzer"
 
-#: workbench/accounts/models.py
+#: workbench/accounts/models.py workbench/templates/base.html
 msgid "users"
 msgstr "Benutzer"
 
@@ -2095,7 +2095,6 @@ msgstr "%s zu Projekt kopieren"
 
 #: workbench/planning/__init__.py
 #: workbench/templates/planning/project_planning.html
-#: workbench/templates/planning/user_planning.html
 #: workbench/templates/projects/project_detail.html
 msgid "planning"
 msgstr "Planung"
@@ -2515,6 +2514,17 @@ msgstr "Keine Geschichte gefunden"
 msgid "Sign in"
 msgstr "Anmelden"
 
+#: workbench/templates/accounts/user_base.html
+msgid "Planning"
+msgstr "Planung"
+
+#: workbench/templates/accounts/user_base.html
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_statistics.html
+msgid "Statistics"
+msgstr "Statistik"
+
 #: workbench/templates/accounts/user_detail.html
 msgid "Hours per weekday"
 msgstr "Stunden pro Wochentag"
@@ -2728,12 +2738,6 @@ msgstr "ja,nein"
 #: workbench/templates/contacts/organization_detail.html
 msgid "Delete or substitute"
 msgstr "Löschen oder ersetzen"
-
-#: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/projects/project_statistics.html
-msgid "Statistics"
-msgstr "Statistik"
 
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/reporting/key_data.html
