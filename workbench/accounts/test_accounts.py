@@ -87,8 +87,8 @@ class AccountsTest(TestCase):
         with self.assertRaises(UnknownFeature):
             user.features["missing"]
 
-    def test_profile(self):
-        """The profile view doesn't crash"""
+    def test_user_views(self):
+        """The user views do not crash"""
         hours = factories.LoggedHoursFactory.create()
         hours = factories.LoggedHoursFactory.create(
             service=factories.ServiceFactory.create(
@@ -97,8 +97,18 @@ class AccountsTest(TestCase):
             rendered_by=hours.rendered_by,
         )
         self.client.force_login(hours.rendered_by)
+        user = hours.rendered_by
 
-        response = self.client.get("/user/{}/".format(hours.rendered_by.id))
+        response = self.client.get("/users/")
+        self.assertContains(response, user.get_full_name())
+
+        response = self.client.get("/users/{}/".format(user.id))
+        self.assertRedirects(response, "/users/{}/planning/".format(user.id))
+
+        response = self.client.get("/users/{}/planning/".format(user.id))
+        self.assertContains(response, 'id="planning-data"')
+
+        response = self.client.get("/users/{}/statistics/".format(user.id))
         self.assertContains(response, "Hours per week")
 
     def test_work_anniversaries(self):
