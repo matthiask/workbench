@@ -192,7 +192,7 @@ class PlannedWorkForm(ModelForm):
         date_from_options = [
             monday(),
             self.instance.weeks and min(self.instance.weeks),
-            pr and min(pr.weeks),
+            pr and min(pr.weeks),  # FIXME pr is from GET, POST may be different
         ]
         date_from = min(filter(None, date_from_options)) - dt.timedelta(days=21)
 

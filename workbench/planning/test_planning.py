@@ -91,3 +91,121 @@ class PlanningTest(TestCase):
             self.assertTrue(form.is_valid())
             queryset = form.filter(model.objects.all())
             self.assertEqual(list(queryset), [])
+
+    def test_planning_request_form(self):
+        """Create and update a planning request"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        offer = factories.OfferFactory.create()
+
+        response = self.client.get(project.urls["createrequest"])
+        self.assertNotContains(response, offer.code)
+        # print(response, response.content.decode("utf-8"))
+
+        response = self.client.post(
+            project.urls["createrequest"],
+            {
+                "modal-title": "Request",
+                "modal-earliest_start_on": "2020-06-29",
+                "modal-completion_requested_on": "2020-07-27",
+                "modal-requested_hours": "40",
+                "modal-receivers": [offer.owned_by.id, project.owned_by.id],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        pr = PlanningRequest.objects.get()
+        self.assertEqual(
+            pr.weeks,
+            [
+                dt.date(2020, 6, 29),
+                dt.date(2020, 7, 6),
+                dt.date(2020, 7, 13),
+                dt.date(2020, 7, 20),
+            ],
+        )
+        self.assertEqual(set(pr.receivers.all()), {offer.owned_by, project.owned_by})
+
+        response = self.client.post(
+            pr.urls["update"],
+            {
+                "modal-title": "Request",
+                "modal-earliest_start_on": "2020-06-29",
+                "modal-completion_requested_on": "2020-07-27",
+                "modal-requested_hours": "40",
+                "modal-receivers": [offer.owned_by.id],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(set(pr.receivers.all()), {offer.owned_by})
+
+    def test_planned_work_crud(self):
+        """Create, update and delete planned work"""
+        pr = factories.PlanningRequestFactory.create(
+            earliest_start_on=monday(),
+            completion_requested_on=monday() + dt.timedelta(days=14),
+        )
+        self.client.force_login(pr.created_by)
+
+        response = self.client.post(
+            pr.project.urls["creatework"],
+            {
+                "modal-user": pr.created_by.id,
+                "modal-title": "bla",
+                "modal-planned_hours": 50,
+                "modal-weeks": [monday().isoformat()],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        response = self.client.post(
+            pr.project.urls["creatework"] + "?request={}".format(pr.id),
+            {
+                "modal-request": pr.id,
+                "modal-user": pr.created_by.id,
+                "modal-title": "bla",
+                "modal-planned_hours": 50,
+                "modal-weeks": [
+                    monday().isoformat(),
+                    (monday() + dt.timedelta(days=7)).isoformat(),
+                ],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        # print(response, response.content.decode("utf-8"))
+        self.assertEqual(response.status_code, 201)
+
+        response = self.client.post(
+            pr.project.urls["creatework"],
+            {
+                "modal-user": pr.project.owned_by.id,
+                "modal-title": "bla",
+                "modal-planned_hours": 50,
+                "modal-weeks": [monday().isoformat()],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "planning-for-somebody-else")
+
+        response = self.client.post(
+            pr.project.urls["creatework"] + "?request={}".format(pr.id),
+            {
+                "modal-request": pr.id,
+                "modal-user": pr.created_by.id,
+                "modal-title": "bla",
+                "modal-planned_hours": 50,
+                "modal-weeks": [
+                    monday().isoformat(),
+                    (monday() + dt.timedelta(days=14)).isoformat(),
+                ],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "weeks-outside-request")
+
+        # TODO check what happens with pr.planned_hours when updating, changing
+        # request and deleting work
