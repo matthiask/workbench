@@ -209,3 +209,33 @@ class PlanningTest(TestCase):
 
         # TODO check what happens with pr.planned_hours when updating, changing
         # request and deleting work
+
+    def test_replanning(self):
+        """Moving planned work between requests"""
+
+        pr1 = factories.PlanningRequestFactory.create(requested_hours=50)
+        pr2 = factories.PlanningRequestFactory.create(requested_hours=50)
+
+        pw = factories.PlannedWorkFactory.create(
+            request=pr1, weeks=[monday()], planned_hours=20
+        )
+
+        pr1.refresh_from_db()
+        pr2.refresh_from_db()
+        self.assertEqual(pr1.planned_hours, 20)
+        self.assertEqual(pr2.planned_hours, 0)
+
+        pw.request = pr2
+        pw.save()
+
+        pr1.refresh_from_db()
+        pr2.refresh_from_db()
+        self.assertEqual(pr1.planned_hours, 0)
+        self.assertEqual(pr2.planned_hours, 20)
+
+        pw.delete()
+
+        pr1.refresh_from_db()
+        pr2.refresh_from_db()
+        self.assertEqual(pr1.planned_hours, 0)
+        self.assertEqual(pr2.planned_hours, 0)
