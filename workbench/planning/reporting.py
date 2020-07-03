@@ -65,10 +65,14 @@ class Planning:
             self._user_ids.add(pw.user.id)
 
     def add_planning_requests(self, queryset):
-        for pr in queryset.filter(
-            Q(earliest_start_on__lte=max(self.weeks)),
-            Q(completion_requested_on__gte=min(self.weeks)),
-        ).select_related("project__owned_by", "offer__project", "offer__owned_by"):
+        for pr in (
+            queryset.filter(
+                Q(earliest_start_on__lte=max(self.weeks)),
+                Q(completion_requested_on__gte=min(self.weeks)),
+            )
+            .select_related("project__owned_by", "offer__project", "offer__owned_by")
+            .prefetch_related("receivers")
+        ):
             date_from = min(pr.weeks)
             date_until = max(pr.weeks)
             per_week = (pr.requested_hours / len(pr.weeks)).quantize(Z2)
@@ -97,7 +101,7 @@ class Planning:
             )
 
             self._project_ids.add(pr.project.pk)
-            # FIXME user_ids |= {user.id for user in pr.receivers.all()}
+            self._user_ids |= {user.id for user in pr.receivers.all()}
 
     def add_worked_hours(self, queryset):
         for row in (
