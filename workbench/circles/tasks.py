@@ -1,9 +1,10 @@
 from django.conf import settings
+from django.db import transaction
+from django.db.models import ProtectedError
 
 import requests
 
 from workbench.circles.models import Circle, Role
-from workbench.projects.models import Service
 
 
 def update_circles():
@@ -46,8 +47,10 @@ def update_circles():
         )
         seen_roles.add(role["id"])
 
-    unseen = Role.objects.exclude(id__in=seen_roles)
-    unseen.exclude(
-        id__in=Service.objects.filter(role__isnull=False).values("role")
-    ).delete()
-    unseen.update(is_removed=True)
+    for role in Role.objects.exclude(id__in=seen_roles):
+        try:
+            with transaction.atomic():
+                role.delete()
+        except ProtectedError:
+            role.is_removed = True
+            role.save()

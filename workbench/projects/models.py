@@ -590,7 +590,7 @@ class Service(ServiceBase):
     )
     role = models.ForeignKey(
         "circles.Role",
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         related_name="services",
         verbose_name=_("role"),
         blank=True,
