@@ -5,6 +5,7 @@
   --range-width: 5rem;
   --hours-total-width: 4.5rem;
   --week-width: 2rem;
+  --user-width: 2rem;
   --default-height: 1.4rem;
 
   --stripe1: #efefef;
@@ -25,7 +26,7 @@
   grid-auto-rows: var(--default-height);
   grid-template-columns:
     var(--title-column-width) var(--action-width) var(--range-width)
-    var(--hours-total-width);
+    var(--hours-total-width) var(--user-width);
   font-size: 14px;
 }
 

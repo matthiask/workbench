@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const RowContext = createContext()
 
 const FIRST_DATA_ROW = 3
-const FIRST_DATA_COLUMN = 5
+const FIRST_DATA_COLUMN = 6
 
 function months(weeks) {
   const months = []
@@ -55,7 +55,7 @@ function Planning({data}) {
         ref={gridRef}
         className="planning"
         style={{
-          gridTemplateColumns: `var(--title-column-width) var(--action-width) var(--range-width) var(--hours-total-width) repeat(${
+          gridTemplateColumns: `var(--title-column-width) var(--action-width) var(--range-width) var(--hours-total-width) var(--user-width) repeat(${
             1 + data.weeks.length
           }, var(--week-width))`,
         }}
@@ -298,6 +298,9 @@ function Work({work, hours_per_week, isEven}) {
               0
             )}h`
           : `${fixed(work.planned_hours, 0)}h`}
+      </Cell>
+      <Cell row={row} column={5} className="planning--small text-center">
+        {work.user}
       </Cell>
       {findContiguousWeekRanges(hours_per_week).map((range, idx) => (
         <Cell
