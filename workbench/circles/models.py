@@ -44,15 +44,15 @@ class Role(models.Model):
         verbose_name_plural = _("roles")
 
     def __str__(self):
-        return " ".join(
-            filter(
-                None,
-                [
-                    ("(%s)" % gettext("removed")) if self.is_removed else None,
-                    ("%s:" % capfirst(gettext("for the circle")))
-                    if self.for_circle
-                    else None,
-                    self.name,
-                ],
+        prefix = gettext("(removed)") + " " if self.is_removed else ""
+        if self.for_circle:
+            return "%s%s [%s]" % (
+                prefix,
+                capfirst(gettext("for the circle")),
+                self.circle,
             )
-        )
+        return "%s%s [%s]" % (prefix, self.name, self.circle)
+
+    @property
+    def pretty_name(self):
+        return capfirst(gettext("for the circle")) if self.for_circle else self.name

@@ -26,8 +26,17 @@ class CirclesTest(TestCase):
             Role.objects.choices(),
             [
                 ("", "----------"),
-                ("A circle", [(r4.id, "Role 1"), (r5.id, "Role 2")]),
-                ("B circle", [(r1.id, "Role 1"), (r3.id, "(removed) Role 2")]),
+                (
+                    "A circle",
+                    [(r4.id, "Role 1 [A circle]"), (r5.id, "Role 2 [A circle]")],
+                ),
+                (
+                    "B circle",
+                    [
+                        (r1.id, "Role 1 [B circle]"),
+                        (r3.id, "(removed) Role 2 [B circle]"),
+                    ],
+                ),
             ],
         )
 

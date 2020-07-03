@@ -40,7 +40,7 @@
       {% for role in circle.roles %}
       <tr>
         <td>
-          <a href="https://app.glassfrog.com/roles/{{ role.role.pk }}">{{ role.role }}</a>
+          <a href="https://app.glassfrog.com/roles/{{ role.role.pk }}">{{ role.role.pretty_name }}</a>
         </td>
         {% for user, hours in role.by_user %}
           <td class="text-right">
