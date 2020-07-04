@@ -6,7 +6,8 @@ import React, {createContext, useContext, useLayoutEffect, useRef} from "react"
 const clamp = (min, max) => (value) => Math.max(Math.min(value, max), min)
 const opacityClamp = clamp(0.3, 1)
 const identity = (t) => t
-export const gettext = window.gettext || identity
+const gettext = window.gettext || identity
+const interpolate = window.interpolate || identity
 const fixed = (s, decimalPlaces) => parseFloat(s).toFixed(decimalPlaces)
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -92,7 +93,12 @@ function Planning({data}) {
           </Cell>
         ))}
 
-        {data.capacity && <Capacity {...data.capacity} />}
+        {data.capacity && (
+          <Capacity
+            {...data.capacity}
+            dailyPlanningHours={data.daily_planning_hours}
+          />
+        )}
         <TotalByWeek by_week={data.by_week} />
         {data.capacity && (
           <DeltaByWeek planned={data.by_week} capacity={data.capacity.total} />
@@ -101,7 +107,10 @@ function Planning({data}) {
           <Project key={project.project.id} {...project} />
         ))}
 
-        <Absences absences={data.absences} />
+        <Absences
+          absences={data.absences}
+          dailyPlanningHours={data.daily_planning_hours}
+        />
       </div>
     </RowContext.Provider>
   )
@@ -174,7 +183,7 @@ function DeltaByWeek({planned, capacity}) {
   )
 }
 
-function Capacity({total, by_user}) {
+function Capacity({total, by_user, dailyPlanningHours}) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
@@ -186,7 +195,8 @@ function Capacity({total, by_user}) {
         colspan={`span ${FIRST_DATA_COLUMN - 1}`}
         className="planning--scale text-right pr-2"
       >
-        <strong>{gettext("Capacity per week")}</strong>
+        <strong>{gettext("Capacity per week")}</strong> (
+        {interpolate(gettext("%sh/day"), [dailyPlanningHours])})
       </Cell>
       {total.map((hours, idx) => (
         <Cell
@@ -435,7 +445,7 @@ function Work({work, hours_per_week, isEven}) {
   )
 }
 
-function Absences({absences}) {
+function Absences({absences, dailyPlanningHours}) {
   const ctx = useContext(RowContext)
   ctx.next() // Skip one row
   const row = ctx.next()
@@ -450,7 +460,8 @@ function Absences({absences}) {
         className="planning--stripe1"
       />
       <Cell row={row} column={1} className="planning--title is-project">
-        <strong>{gettext("Absences")}</strong>
+        <strong>{gettext("Absences")}</strong> (
+        {interpolate(gettext("%sh/day"), [dailyPlanningHours])})
       </Cell>
       {absences.map((user, idx) => (
         <UserAbsences key={idx} user={user} />
@@ -468,17 +479,16 @@ function UserAbsences({user}) {
       <Cell row={row} column={1} className="planning--title is-absence pl-3">
         {user[0]}
       </Cell>
-      {user[1].map((absence, idx) =>
-        absence ? (
+      {user[1].map((hours, idx) =>
+        hours ? (
           <Cell
             key={idx}
             row={row}
             column={FIRST_DATA_COLUMN + idx}
             className="planning--range planning--small is-absence"
-            tag="a"
-            href={absence.url}
-            data-toggle="ajaxmodal"
-          ></Cell>
+          >
+            {fixed(hours, 1)}
+          </Cell>
         ) : null
       )}
     </>

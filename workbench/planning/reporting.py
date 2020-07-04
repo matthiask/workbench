@@ -15,7 +15,7 @@ from workbench.tools.reporting import query
 from workbench.tools.validation import monday
 
 
-WEEKLY_PLANNING_HOURS = 5 * 7
+DAILY_PLANNING_HOURS = 7
 
 
 class Planning:
@@ -32,7 +32,7 @@ class Planning:
         self._worked_hours_by_offer = defaultdict(lambda: Z1)
         self._worked_hours_by_project = defaultdict(lambda: Z1)
 
-        self._absences = defaultdict(lambda: [None] * len(weeks))
+        self._absences = defaultdict(lambda: [0] * len(weeks))
 
     def add_planned_work(self, queryset):
         for pw in queryset.filter(weeks__overlap=self.weeks).select_related(
@@ -125,18 +125,18 @@ class Planning:
             Q(starts_on__lte=max(self.weeks)),
             Q(ends_on__gte=min(self.weeks)),
         ).select_related("user"):
-            data = {
-                "reason": absence.get_reason_display(),
-                "description": absence.description,
-                "days": absence.days,
-                "url": absence.get_absolute_url(),
-            }
-
             date_from = monday(absence.starts_on)
             date_until = monday(absence.ends_on or absence.starts_on)
-            for idx, week in enumerate(self.weeks):
-                if date_from <= week <= date_until:
-                    self._absences[absence.user][idx] = data
+            hours = absence.days * DAILY_PLANNING_HOURS
+            weeks = [
+                (idx, week)
+                for idx, week in enumerate(self.weeks)
+                if date_from <= week <= date_until
+            ]
+
+            for idx, week in weeks:
+                self._absences[absence.user][idx] += hours / len(weeks)
+                self._by_week[week] += hours / len(weeks)
 
     def _offer_record(self, offer, work_list):
         date_from = min(pw["work"]["date_from"] for pw in work_list)
@@ -223,7 +223,7 @@ class Planning:
 
         for week, user, capacity in query(
             """
-select week, user_id, percentage * %s / 100 as capacity
+select week, user_id, percentage * 5 * %s / 100 as capacity
 from generate_series(%s::date, %s::date, '7 days') as week
 left outer join lateral (
     select * from awt_employment where user_id = any (%s)
@@ -231,7 +231,7 @@ left outer join lateral (
 on employment.date_from <= week and employment.date_until > week
 where percentage is not NULL -- NULL produced by outer join
             """,
-            [WEEKLY_PLANNING_HOURS, min(self.weeks), max(self.weeks), user_ids],
+            [DAILY_PLANNING_HOURS, min(self.weeks), max(self.weeks), user_ids],
         ):
             by_user[user][week.date()] = capacity
             total[week.date()] += capacity
@@ -253,6 +253,7 @@ where percentage is not NULL -- NULL produced by outer join
 
     def report(self):
         return {
+            "daily_planning_hours": DAILY_PLANNING_HOURS,
             "weeks": [
                 {
                     "month": local_date_format(week, fmt="F"),
