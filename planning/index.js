@@ -139,7 +139,7 @@ function TotalByWeek({by_week}) {
             opacity: opacityClamp(0.3 + parseFloat(hours) / 20),
           }}
         >
-          {fixed(hours, 1)}
+          {fixed(hours, 0)}
         </Cell>
       ))}
     </>
@@ -175,7 +175,7 @@ function DeltaByWeek({planned, capacity}) {
                   : `hsl(120, ${clamp(0, 50)(-delta * 3)}%, 70%)`,
             }}
           >
-            {fixed(delta, 1)}
+            {fixed(delta, 0)}
           </Cell>
         )
       })}
@@ -208,7 +208,7 @@ function Capacity({total, by_user, dailyPlanningHours}) {
             opacity: opacityClamp(0.3 + parseFloat(hours) / 20),
           }}
         >
-          {fixed(hours, 1)}
+          {fixed(hours, 0)}
         </Cell>
       ))}
       {by_user.length > 1
@@ -244,7 +244,7 @@ function UserCapacity({user, capacity}) {
             opacity: opacityClamp(0.3 + parseFloat(hours) / 20),
           }}
         >
-          {fixed(hours, 1)}
+          {fixed(hours, 0)}
         </Cell>
       ))}
     </>
@@ -487,7 +487,7 @@ function UserAbsences({user}) {
             column={FIRST_DATA_COLUMN + idx}
             className="planning--range planning--small is-absence"
           >
-            {fixed(hours, 1)}
+            {fixed(hours, 0)}
           </Cell>
         ) : null
       )}
