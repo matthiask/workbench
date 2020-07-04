@@ -115,7 +115,7 @@ function TotalByWeek({by_week}) {
       <Cell
         row={row}
         column={1}
-        colspan="span 4"
+        colspan={`span ${FIRST_DATA_COLUMN - 1}`}
         className="planning--scale text-right pr-2"
       >
         <strong>{gettext("Planned hours per week")}</strong>
@@ -145,7 +145,7 @@ function DeltaByWeek({planned, capacity}) {
       <Cell
         row={row}
         column={1}
-        colspan="span 4"
+        colspan={`span ${FIRST_DATA_COLUMN - 1}`}
         className="planning--scale text-right pr-2"
       >
         <strong>{gettext("Delta")}</strong>
@@ -183,7 +183,7 @@ function Capacity({total, by_user}) {
       <Cell
         row={row}
         column={1}
-        colspan="span 4"
+        colspan={`span ${FIRST_DATA_COLUMN - 1}`}
         className="planning--scale text-right pr-2"
       >
         <strong>{gettext("Capacity per week")}</strong>
@@ -217,7 +217,7 @@ function UserCapacity({user, capacity}) {
       <Cell
         row={row}
         column={1}
-        colspan="span 4"
+        colspan={`span ${FIRST_DATA_COLUMN - 1}`}
         className="planning--scale text-right pr-2"
         tag="a"
         href={user.url}

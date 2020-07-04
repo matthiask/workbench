@@ -242,7 +242,7 @@ where percentage is not NULL -- NULL produced by outer join
             "by_user": [
                 {
                     "user": {
-                        "name": user.get_short_name(),
+                        "name": user.get_full_name(),
                         "url": user.urls["planning"],
                     },
                     "capacity": [by_user[user.id].get(week, 0) for week in self.weeks],
