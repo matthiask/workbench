@@ -240,7 +240,10 @@ on employment.date_from <= week and employment.date_until > week
             "total": [total.get(week, 0) for week in self.weeks],
             "by_user": [
                 {
-                    "user": user.get_short_name(),
+                    "user": {
+                        "name": user.get_short_name(),
+                        "url": user.urls["planning"],
+                    },
                     "capacity": [by_user[user.id].get(week, 0) for week in self.weeks],
                 }
                 for user in sorted(users)

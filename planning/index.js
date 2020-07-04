@@ -219,8 +219,10 @@ function UserCapacity({user, capacity}) {
         column={1}
         colspan="span 4"
         className="planning--scale text-right pr-2"
+        tag="a"
+        href={user.url}
       >
-        {user}
+        {user.name}
       </Cell>
       {capacity.map((hours, idx) => (
         <Cell
