@@ -4,7 +4,7 @@
   --action-width: 2.5rem;
   --range-width: 5rem;
   --hours-total-width: 4.5rem;
-  --week-width: 2rem;
+  --week-width: 2.3rem;
   --user-width: 2rem;
   --default-height: 1.4rem;
 
@@ -98,6 +98,14 @@
 
   &.is-total {
     background-color: var(--purple);
+  }
+
+  &.is-capacity {
+    background-color: #888;
+  }
+
+  &.is-user-capacity {
+    background-color: #bbb;
   }
 
   &.is-pw {

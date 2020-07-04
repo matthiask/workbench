@@ -15,9 +15,13 @@ from workbench.tools.reporting import query
 from workbench.tools.validation import monday
 
 
+WEEKLY_PLANNING_HOURS = 5 * 7
+
+
 class Planning:
     def __init__(self, *, weeks, users=None):
         self.weeks = weeks
+        self.users = users
 
         self._by_week = defaultdict(lambda: Z1)
         self._by_project_and_week = defaultdict(lambda: defaultdict(lambda: Z1))
@@ -213,26 +217,30 @@ class Planning:
         by_user = defaultdict(dict)
         total = defaultdict(int)
 
-        for week, user, percentage in query(
+        user_ids = (
+            [user.id for user in self.users] if self.users else list(self._user_ids)
+        )
+
+        for week, user, capacity in query(
             """
-select week, user_id, percentage
+select week, user_id, percentage * %s / 100
 from generate_series(%s::date, %s::date, '7 days') as week
 left outer join lateral (
     select * from awt_employment where user_id = any (%s)
 ) as employment
 on employment.date_from <= week and employment.date_until > week
             """,
-            [min(self.weeks), max(self.weeks), list(self._user_ids)],
+            [WEEKLY_PLANNING_HOURS, min(self.weeks), max(self.weeks), user_ids],
         ):
-            by_user[user][week.date()] = percentage
-            total[week.date()] += percentage
+            by_user[user][week.date()] = capacity
+            total[week.date()] += capacity
 
-        users = list(User.objects.filter(id__in=by_user))
+        users = self.users or list(User.objects.filter(id__in=by_user))
         return {
             "total": [total.get(week, 0) for week in self.weeks],
             "by_user": [
                 {
-                    "user": user,
+                    "user": user.get_short_name(),
                     "capacity": [by_user[user.id].get(week, 0) for week in self.weeks],
                 }
                 for user in sorted(users)
@@ -240,9 +248,6 @@ on employment.date_from <= week and employment.date_until > week
         }
 
     def report(self):
-        # from pprint import pprint
-        # pprint(self.capacity())
-
         return {
             "weeks": [
                 {
@@ -266,12 +271,13 @@ on employment.date_from <= week and employment.date_until > week
             "absences": [
                 (str(user), lst) for user, lst in sorted(self._absences.items())
             ],
+            "capacity": self.capacity() if self.users else None,
         }
 
 
 def user_planning(user):
     weeks = list(islice(recurring(monday(), "weekly"), 52))
-    planning = Planning(weeks=weeks)
+    planning = Planning(weeks=weeks, users=[user])
     planning.add_planned_work(user.planned_work.all())
     planning.add_planning_requests(user.received_planning_requests.all())
     planning.add_worked_hours(user.loggedhours.all())
@@ -281,7 +287,7 @@ def user_planning(user):
 
 def team_planning(team):
     weeks = list(islice(recurring(monday(), "weekly"), 52))
-    planning = Planning(weeks=weeks, users=team.members.all())
+    planning = Planning(weeks=weeks, users=list(team.members.all()))
     planning.add_planned_work(PlannedWork.objects.filter(user__teams=team))
     planning.add_planning_requests(
         PlanningRequest.objects.filter(receivers__teams=team)
@@ -331,7 +337,6 @@ SELECT MIN(week), MAX(week) FROM sq
     planning.add_planned_work(project.planned_work.all())
     planning.add_planning_requests(project.planning_requests.all())
     planning.add_worked_hours(LoggedHours.objects.all())
-    # planning.add_absences(user.absences.all())
     planning.add_absences(Absence.objects.all())
     return planning.report()
 
@@ -339,8 +344,17 @@ SELECT MIN(week), MAX(week) FROM sq
 def test():  # pragma: no cover
     from pprint import pprint
 
-    # from workbench.accounts.models import User
-    # pprint(user_planning(User.objects.get(pk=1)))
-    from workbench.projects.models import Project
+    if False:
+        from workbench.accounts.models import User
 
-    pprint(project_planning(Project.objects.get(pk=8238)))
+        pprint(user_planning(User.objects.get(pk=1)))
+
+    if True:
+        from workbench.accounts.models import Team
+
+        pprint(team_planning(Team.objects.get(pk=1)))
+
+    if False:
+        from workbench.projects.models import Project
+
+        pprint(project_planning(Project.objects.get(pk=8238)))

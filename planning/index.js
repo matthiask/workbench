@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const RowContext = createContext()
 
-const FIRST_DATA_ROW = 3
+const FIRST_DATA_ROW = 2
 const FIRST_DATA_COLUMN = 6
 
 function months(weeks) {
@@ -92,28 +92,11 @@ function Planning({data}) {
           </Cell>
         ))}
 
-        <Cell
-          row={3}
-          column={1}
-          colspan="span 4"
-          className="planning--scale text-right pr-2"
-        >
-          <strong>{gettext("Hours per week")}</strong>
-        </Cell>
-        {data.by_week.map((hours, idx) => (
-          <Cell
-            key={idx}
-            row={3}
-            column={FIRST_DATA_COLUMN + idx}
-            className="planning--range planning--small is-total"
-            style={{
-              opacity: opacityClamp(0.3 + parseFloat(hours) / 20),
-            }}
-          >
-            <strong>{fixed(hours, 1)}</strong>
-          </Cell>
-        ))}
-
+        {data.capacity && <Capacity {...data.capacity} />}
+        <TotalByWeek by_week={data.by_week} />
+        {data.capacity && (
+          <DeltaByWeek planned={data.by_week} capacity={data.capacity.total} />
+        )}
         {data.projects_offers.map((project) => (
           <Project key={project.project.id} {...project} />
         ))}
@@ -122,8 +105,138 @@ function Planning({data}) {
       </div>
     </RowContext.Provider>
   )
+}
 
-  // {JSON.stringify(data)}
+function TotalByWeek({by_week}) {
+  const ctx = useContext(RowContext)
+  const row = ctx.next()
+  return (
+    <>
+      <Cell
+        row={row}
+        column={1}
+        colspan="span 4"
+        className="planning--scale text-right pr-2"
+      >
+        <strong>{gettext("Planned hours per week")}</strong>
+      </Cell>
+      {by_week.map((hours, idx) => (
+        <Cell
+          key={idx}
+          row={row}
+          column={FIRST_DATA_COLUMN + idx}
+          className="planning--range planning--small is-total"
+          style={{
+            opacity: opacityClamp(0.3 + parseFloat(hours) / 20),
+          }}
+        >
+          {fixed(hours, 1)}
+        </Cell>
+      ))}
+    </>
+  )
+}
+
+function DeltaByWeek({planned, capacity}) {
+  const ctx = useContext(RowContext)
+  const row = ctx.next()
+  return (
+    <>
+      <Cell
+        row={row}
+        column={1}
+        colspan="span 4"
+        className="planning--scale text-right pr-2"
+      >
+        <strong>{gettext("Delta")}</strong>
+      </Cell>
+      {planned.map((hours, idx) => {
+        const delta = hours - capacity[idx]
+
+        return (
+          <Cell
+            key={idx}
+            row={row}
+            column={FIRST_DATA_COLUMN + idx}
+            className="planning--range planning--small is-delta"
+            style={{
+              backgroundColor:
+                delta > 0
+                  ? `hsl(0, ${clamp(0, 70)(delta * 5)}%, 70%)`
+                  : `hsl(120, ${clamp(0, 50)(-delta * 3)}%, 70%)`,
+            }}
+          >
+            {fixed(delta, 1)}
+          </Cell>
+        )
+      })}
+    </>
+  )
+}
+
+function Capacity({total, by_user}) {
+  const ctx = useContext(RowContext)
+  const row = ctx.next()
+
+  return (
+    <>
+      <Cell
+        row={row}
+        column={1}
+        colspan="span 4"
+        className="planning--scale text-right pr-2"
+      >
+        <strong>{gettext("Capacity per week")}</strong>
+      </Cell>
+      {total.map((hours, idx) => (
+        <Cell
+          key={idx}
+          row={row}
+          column={FIRST_DATA_COLUMN + idx}
+          className="planning--range planning--small is-capacity"
+          style={{
+            opacity: opacityClamp(0.3 + parseFloat(hours) / 20),
+          }}
+        >
+          {fixed(hours, 1)}
+        </Cell>
+      ))}
+      {by_user.length > 1
+        ? by_user.map((user, idx) => <UserCapacity key={idx} {...user} />)
+        : null}
+    </>
+  )
+}
+
+function UserCapacity({user, capacity}) {
+  const ctx = useContext(RowContext)
+  const row = ctx.next()
+
+  return (
+    <>
+      <Cell
+        row={row}
+        column={1}
+        colspan="span 4"
+        className="planning--scale text-right pr-2"
+      >
+        {user}
+      </Cell>
+      {capacity.map((hours, idx) => (
+        <Cell
+          key={idx}
+          row={row}
+          column={FIRST_DATA_COLUMN + idx}
+          className="planning--range planning--small is-user-capacity"
+          style={{
+            opacity: opacityClamp(0.3 + parseFloat(hours) / 20),
+          }}
+        >
+          {fixed(hours, 1)}
+        </Cell>
+      ))}
+    </>
+  )
 }
 
 function Project({by_week, offers, project}) {

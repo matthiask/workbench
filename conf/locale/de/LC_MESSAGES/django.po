@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-01 08:02+0200\n"
+"POT-Creation-Date: 2020-07-04 14:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -125,11 +125,11 @@ msgstr "Name"
 msgid "members"
 msgstr "Members"
 
-#: workbench/accounts/models.py
+#: workbench/accounts/models.py workbench/templates/planning/team_planning.html
 msgid "team"
 msgstr "Team"
 
-#: workbench/accounts/models.py
+#: workbench/accounts/models.py workbench/templates/base.html
 msgid "teams"
 msgstr "Teams"
 
@@ -533,13 +533,13 @@ msgstr ""
 msgid "Everyone"
 msgstr "Alle"
 
+#: workbench/circles/__init__.py workbench/circles/models.py
+msgid "circles"
+msgstr "Kreise"
+
 #: workbench/circles/models.py
 msgid "circle"
 msgstr "Kreis"
-
-#: workbench/circles/models.py
-msgid "circles"
-msgstr "Kreise"
 
 #: workbench/circles/models.py
 msgid "for the circle"
@@ -558,8 +558,8 @@ msgid "roles"
 msgstr "Rollen"
 
 #: workbench/circles/models.py
-msgid "removed"
-msgstr "entfernt"
+msgid "(removed)"
+msgstr "(entfernt)"
 
 #: workbench/contacts/__init__.py workbench/templates/base.html
 #: workbench/templates/contacts/object_list.html
@@ -2093,8 +2093,9 @@ msgstr "Keine Offerten im Projekt."
 msgid "Copy %s to project"
 msgstr "%s zu Projekt kopieren"
 
-#: workbench/planning/__init__.py
+#: workbench/planning/__init__.py workbench/templates/accounts/team_detail.html
 #: workbench/templates/planning/project_planning.html
+#: workbench/templates/planning/team_planning.html
 #: workbench/templates/projects/project_detail.html
 msgid "planning"
 msgstr "Planung"
@@ -2180,10 +2181,6 @@ msgstr "geplante Arbeit"
 #, python-format
 msgid "Only mondays allowed, but field contains %s."
 msgstr "Nur Montage erlaubt, aber Feld enthält %s."
-
-#: workbench/planning/reporting.py
-msgid "Request"
-msgstr "Anfrage"
 
 #: workbench/projects/__init__.py workbench/projects/models.py
 #: workbench/templates/base.html
@@ -2514,6 +2511,47 @@ msgstr "Keine Geschichte gefunden"
 msgid "Sign in"
 msgstr "Anmelden"
 
+#: workbench/templates/accounts/team_detail.html
+#: workbench/templates/awt/absence_detail.html
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/contacts/person_detail.html
+#: workbench/templates/credit_control/creditentry_detail.html
+#: workbench/templates/deals/deal_detail.html
+#: workbench/templates/expenses/expensereport_detail.html
+#: workbench/templates/generic/object_detail.html
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/logbook/break_detail.html
+#: workbench/templates/logbook/loggedcost_detail.html
+#: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/notes/widget.html
+#: workbench/templates/planning/plannedwork_detail.html
+#: workbench/templates/planning/planningrequest_detail.html
+#: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/project_detail.html
+msgid "Update"
+msgstr "Bearbeiten"
+
+#: workbench/templates/accounts/team_detail.html
+#: workbench/templates/awt/absence_detail.html
+#: workbench/templates/contacts/person_detail.html
+#: workbench/templates/credit_control/creditentry_detail.html
+#: workbench/templates/deals/deal_detail.html
+#: workbench/templates/expenses/expensereport_detail.html
+#: workbench/templates/generic/object_detail.html
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/logbook/break_detail.html
+#: workbench/templates/logbook/loggedcost_detail.html
+#: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/notes/note_form.html
+#: workbench/templates/planning/plannedwork_detail.html
+#: workbench/templates/planning/planningrequest_detail.html
+#: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/project_detail.html
+msgid "Delete"
+msgstr "Löschen"
+
 #: workbench/templates/accounts/user_base.html
 msgid "Planning"
 msgstr "Planung"
@@ -2555,45 +2593,6 @@ msgstr "Abwesenheitskalender"
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "Reset the filter form"
 msgstr "Suchformular zurücksetzen"
-
-#: workbench/templates/awt/absence_detail.html
-#: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/contacts/person_detail.html
-#: workbench/templates/credit_control/creditentry_detail.html
-#: workbench/templates/deals/deal_detail.html
-#: workbench/templates/expenses/expensereport_detail.html
-#: workbench/templates/generic/object_detail.html
-#: workbench/templates/invoices/invoice_detail.html
-#: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/templates/logbook/break_detail.html
-#: workbench/templates/logbook/loggedcost_detail.html
-#: workbench/templates/logbook/loggedhours_detail.html
-#: workbench/templates/notes/widget.html
-#: workbench/templates/planning/plannedwork_detail.html
-#: workbench/templates/planning/planningrequest_detail.html
-#: workbench/templates/projects/campaign_detail.html
-#: workbench/templates/projects/project_detail.html
-msgid "Update"
-msgstr "Bearbeiten"
-
-#: workbench/templates/awt/absence_detail.html
-#: workbench/templates/contacts/person_detail.html
-#: workbench/templates/credit_control/creditentry_detail.html
-#: workbench/templates/deals/deal_detail.html
-#: workbench/templates/expenses/expensereport_detail.html
-#: workbench/templates/generic/object_detail.html
-#: workbench/templates/invoices/invoice_detail.html
-#: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/templates/logbook/break_detail.html
-#: workbench/templates/logbook/loggedcost_detail.html
-#: workbench/templates/logbook/loggedhours_detail.html
-#: workbench/templates/notes/note_form.html
-#: workbench/templates/planning/plannedwork_detail.html
-#: workbench/templates/planning/planningrequest_detail.html
-#: workbench/templates/projects/campaign_detail.html
-#: workbench/templates/projects/project_detail.html
-msgid "Delete"
-msgstr "Löschen"
 
 #: workbench/templates/awt/year_detail.html
 msgid "active users"
@@ -3509,6 +3508,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Request"
+#~ msgstr "Anfrage"
 
 #~ msgid "Select a different project as target."
 #~ msgstr "Wähle ein anderes Projekt als Ziel."
