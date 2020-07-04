@@ -315,18 +315,39 @@ class DateRangeFilterForm(Form):
 
 
 class DateRangeAndTeamFilterForm(DateRangeFilterForm):
-    team = forms.ModelChoiceField(
-        Team.objects.all(),
-        empty_label=_("Everyone"),
-        label=capfirst(Team._meta.verbose_name),
-        required=False,
-    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["team"] = forms.TypedChoiceField(
+            choices=[("", _("Everyone"))]
+            + [
+                [
+                    capfirst(Team._meta.verbose_name_plural),
+                    [(team.id, str(team)) for team in Team.objects.all()],
+                ]
+            ]
+            + [
+                [
+                    capfirst(User._meta.verbose_name_plural),
+                    [
+                        (-user.id, str(user))
+                        for user in User.objects.filter(is_active=True)
+                    ],
+                ]
+            ],
+            label=capfirst(Team._meta.verbose_name),
+            required=False,
+            coerce=int,
+        )
 
     def users(self):
         data = self.cleaned_data
+        print(data)
         queryset = User.objects.all()
-        if data.get("team"):
+        if data.get("team") and data.get("team") > 0:
             queryset = queryset.filter(teams=data.get("team"))
+        elif data.get("team") and data.get("team") < 0:
+            queryset = queryset.filter(id=-data.get("team"))
         return queryset
 
 
