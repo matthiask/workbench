@@ -19,7 +19,7 @@
     <tr>
       <th class="text-right">{{ object|label:'members' }}</th>
       <td>
-        {% for user in object.members.all %}
+        {% for user in object.members.active %}
           {% link_or_none user %}
         {% endfor %}
       </td>
