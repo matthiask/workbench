@@ -79,7 +79,7 @@ class Planning:
             )
             .select_related("project__owned_by", "offer__project", "offer__owned_by")
             .prefetch_related("receivers")
-        ):
+        ).distinct():
             date_from = min(pr.weeks)
             date_until = max(pr.weeks)
             per_week = (pr.requested_hours / len(pr.weeks)).quantize(Z2)
