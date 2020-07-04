@@ -1,16 +1,10 @@
 import datetime as dt
 from collections import defaultdict
 
-from django.db import connections
 from django.utils.translation import gettext as _
 
+from workbench.tools.reporting import query
 from workbench.tools.validation import in_days, monday
-
-
-def query(sql, params):
-    with connections["default"].cursor() as cursor:
-        cursor.execute(sql, params)
-        return list(cursor)
 
 
 def logged_hours(user):

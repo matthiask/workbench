@@ -5,10 +5,12 @@ from itertools import islice
 from django.db import connections
 from django.db.models import Q, Sum
 
+from workbench.accounts.models import User
 from workbench.awt.models import Absence
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedHours
 from workbench.tools.formats import Z1, Z2, local_date_format
+from workbench.tools.reporting import query
 from workbench.tools.validation import monday
 
 
@@ -206,7 +208,40 @@ class Planning:
             "offers": offers,
         }
 
+    def capacity(self):
+        by_user = defaultdict(dict)
+        total = defaultdict(int)
+
+        for week, user, percentage in query(
+            """
+select week, user_id, percentage
+from generate_series(%s::date, %s::date, '7 days') as week
+left outer join lateral (
+    select * from awt_employment where user_id = any (%s)
+) as employment
+on employment.date_from <= week and employment.date_until > week
+            """,
+            [min(self.weeks), max(self.weeks), list(self._user_ids)],
+        ):
+            by_user[user][week.date()] = percentage
+            total[week.date()] += percentage
+
+        users = list(User.objects.filter(id__in=by_user))
+        return {
+            "total": [total.get(week, 0) for week in self.weeks],
+            "by_user": [
+                {
+                    "user": user,
+                    "capacity": [by_user[user.id].get(week, 0) for week in self.weeks],
+                }
+                for user in sorted(users)
+            ],
+        }
+
     def report(self):
+        # from pprint import pprint
+        # pprint(self.capacity())
+
         return {
             "weeks": [
                 {
