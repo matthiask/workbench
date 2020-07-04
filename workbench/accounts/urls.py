@@ -2,9 +2,9 @@ from django.shortcuts import redirect
 from django.urls import path, re_path
 
 from workbench import generic
-from workbench.accounts.forms import UserSearchForm
-from workbench.accounts.models import User
-from workbench.planning.views import UserPlanningView
+from workbench.accounts.forms import TeamForm, TeamSearchForm, UserSearchForm
+from workbench.accounts.models import Team, User
+from workbench.planning.views import TeamPlanningView, UserPlanningView
 
 from . import views
 
@@ -39,5 +39,36 @@ urlpatterns = [
         "users/<int:pk>/statistics/",
         views.ProfileView.as_view(),
         name="accounts_user_statistics",
+    ),
+    # Teams
+    re_path(
+        r"^teams/$",
+        generic.ListView.as_view(model=Team, search_form_class=TeamSearchForm),
+        name="accounts_team_list",
+    ),
+    re_path(
+        r"^teams/(?P<pk>\d+)/$",
+        generic.DetailView.as_view(model=Team),
+        name="accounts_team_detail",
+    ),
+    re_path(
+        r"^teams/create/$",
+        generic.CreateView.as_view(form_class=TeamForm, model=Team),
+        name="accounts_team_create",
+    ),
+    re_path(
+        r"^teams/(?P<pk>\d+)/update/$",
+        generic.UpdateView.as_view(form_class=TeamForm, model=Team),
+        name="accounts_team_update",
+    ),
+    path(
+        "teams/<int:pk>/planning/",
+        TeamPlanningView.as_view(),
+        name="accounts_team_planning",
+    ),
+    re_path(
+        r"^teams/(?P<pk>\d+)/delete/$",
+        generic.DeleteView.as_view(model=Team),
+        name="accounts_team_delete",
     ),
 ]

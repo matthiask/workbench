@@ -9,20 +9,21 @@ from workbench.accounts.models import User
 from workbench.awt.models import Absence
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedHours
+from workbench.planning.models import PlannedWork, PlanningRequest
 from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.reporting import query
 from workbench.tools.validation import monday
 
 
 class Planning:
-    def __init__(self, *, weeks):
+    def __init__(self, *, weeks, users=None):
         self.weeks = weeks
 
         self._by_week = defaultdict(lambda: Z1)
         self._by_project_and_week = defaultdict(lambda: defaultdict(lambda: Z1))
         self._projects_offers = defaultdict(lambda: defaultdict(list))
         self._project_ids = set()
-        self._user_ids = set()
+        self._user_ids = {user.id for user in users} if users else set()
 
         self._worked_hours_by_offer = defaultdict(lambda: Z1)
         self._worked_hours_by_project = defaultdict(lambda: Z1)
@@ -275,6 +276,18 @@ def user_planning(user):
     planning.add_planning_requests(user.received_planning_requests.all())
     planning.add_worked_hours(user.loggedhours.all())
     planning.add_absences(user.absences.all())
+    return planning.report()
+
+
+def team_planning(team):
+    weeks = list(islice(recurring(monday(), "weekly"), 52))
+    planning = Planning(weeks=weeks, users=team.members.all())
+    planning.add_planned_work(PlannedWork.objects.filter(user__teams=team))
+    planning.add_planning_requests(
+        PlanningRequest.objects.filter(receivers__teams=team)
+    )
+    planning.add_worked_hours(LoggedHours.objects.filter(rendered_by__teams=team))
+    planning.add_absences(Absence.objects.filter(user__teams=team))
     return planning.report()
 
 

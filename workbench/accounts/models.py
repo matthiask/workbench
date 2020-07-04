@@ -292,7 +292,8 @@ select max(created_at) from sq
         return msg
 
 
-class Team(models.Model):
+@model_urls
+class Team(Model):
     name = models.CharField(_("name"), max_length=100)
     members = models.ManyToManyField(
         User, related_name="teams", verbose_name=_("members")

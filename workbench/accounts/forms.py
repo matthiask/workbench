@@ -2,7 +2,7 @@ from django import forms
 from django.conf import settings
 from django.utils.translation import gettext as _
 
-from workbench.accounts.models import User
+from workbench.accounts.models import Team, User
 from workbench.awt.models import WorkingTimeModel
 from workbench.tools.forms import Form, ModelForm
 
@@ -43,3 +43,22 @@ class UserForm(ModelForm):
             self.fields["working_time_model"].help_text = _(
                 "Contact your administrator to change this value."
             )
+
+
+class TeamSearchForm(Form):
+    def filter(self, queryset):
+        return queryset
+
+
+class TeamForm(ModelForm):
+    class Meta:
+        model = Team
+        fields = ["name", "members"]
+        widgets = {"members": forms.CheckboxSelectMultiple}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        candidates = User.objects.active()
+        if self.instance.pk:
+            candidates |= self.instance.members.all()
+        self.fields["members"].queryset = candidates.distinct()
