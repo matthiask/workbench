@@ -72,6 +72,13 @@ function Planning({data}) {
             />
           )
         })}
+        <Cell
+          key="this_week_index"
+          row="1"
+          rowspan="-1"
+          column={FIRST_DATA_COLUMN + data.this_week_index}
+          className="planning--this-week"
+        />
         {months(data.weeks).map((month, idx) => (
           <Cell
             key={idx}

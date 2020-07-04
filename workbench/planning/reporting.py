@@ -254,6 +254,7 @@ where percentage is not NULL -- NULL produced by outer join
     def report(self):
         return {
             "daily_planning_hours": DAILY_PLANNING_HOURS,
+            "this_week_index": self.weeks.index(monday()),
             "weeks": [
                 {
                     "month": local_date_format(week, fmt="F"),
@@ -281,7 +282,7 @@ where percentage is not NULL -- NULL produced by outer join
 
 
 def user_planning(user):
-    weeks = list(islice(recurring(monday(), "weekly"), 52))
+    weeks = list(islice(recurring(monday() - dt.timedelta(days=14), "weekly"), 52))
     planning = Planning(weeks=weeks, users=[user])
     planning.add_planned_work(user.planned_work.all())
     planning.add_planning_requests(user.received_planning_requests.all())
@@ -291,7 +292,7 @@ def user_planning(user):
 
 
 def team_planning(team):
-    weeks = list(islice(recurring(monday(), "weekly"), 52))
+    weeks = list(islice(recurring(monday() - dt.timedelta(days=14), "weekly"), 52))
     planning = Planning(weeks=weeks, users=list(team.members.all()))
     planning.add_planned_work(PlannedWork.objects.filter(user__teams=team))
     planning.add_planning_requests(
@@ -336,7 +337,7 @@ SELECT MIN(week), MAX(week) FROM sq
             )
         )
     else:
-        weeks = list(islice(recurring(monday(), "weekly"), 52))
+        weeks = list(islice(recurring(monday() - dt.timedelta(days=14), "weekly"), 52))
 
     planning = Planning(weeks=weeks)
     planning.add_planned_work(project.planned_work.all())
