@@ -342,7 +342,6 @@ class DateRangeAndTeamFilterForm(DateRangeFilterForm):
 
     def users(self):
         data = self.cleaned_data
-        print(data)
         queryset = User.objects.all()
         if data.get("team") and data.get("team") > 0:
             queryset = queryset.filter(teams=data.get("team"))
