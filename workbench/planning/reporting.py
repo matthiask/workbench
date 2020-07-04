@@ -15,7 +15,7 @@ from workbench.tools.reporting import query
 from workbench.tools.validation import monday
 
 
-DAILY_PLANNING_HOURS = 7
+DAILY_PLANNING_HOURS = 6
 
 
 class Planning:
