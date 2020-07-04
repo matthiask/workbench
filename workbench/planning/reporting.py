@@ -223,12 +223,13 @@ class Planning:
 
         for week, user, capacity in query(
             """
-select week, user_id, percentage * %s / 100
+select week, user_id, percentage * %s / 100 as capacity
 from generate_series(%s::date, %s::date, '7 days') as week
 left outer join lateral (
     select * from awt_employment where user_id = any (%s)
 ) as employment
 on employment.date_from <= week and employment.date_until > week
+where percentage is not NULL -- NULL produced by outer join
             """,
             [WEEKLY_PLANNING_HOURS, min(self.weeks), max(self.weeks), user_ids],
         ):
