@@ -22,8 +22,10 @@ pdfdocument
 phonenumbers
 Pillow
 psycopg2-binary
+qrbill
 reportlab
 speckenv
+svglib
 time-machine
 vobject
 xlsxdocument
