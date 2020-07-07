@@ -26,19 +26,17 @@
     {% render_bundle "planning" %}
   {% endif %}
 
-{% comment %}
 <div class="row mt-5">
   <div class="col-12">
-    <a href="{{ object.urls.createrequest }}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
+    <a href="{% url 'planning_planningrequest_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
       {% include 'svg/plus.svg' %}
       {% trans 'planning request'|capfirst %}
     </a>
-    <a href="{{ object.urls.creatework }}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
+    <a href="{% url 'planning_plannedwork_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
       {% include 'svg/plus.svg' %}
       {% trans 'planned work'|capfirst %}
     </a>
   </div>
 </div>
-{% endcomment %}
 
 {% endblock %}
