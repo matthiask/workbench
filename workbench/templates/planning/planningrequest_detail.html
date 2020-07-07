@@ -17,7 +17,11 @@
     <tr>
       <th class="text-right">{{ object|label:'receivers' }}</th>
       <td>
-        {% for user in object.receivers.all %}{{ user.get_full_name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+        {% for user, work in object.receivers_with_work %}
+          {{ user.get_full_name }}:
+          {% for pw in work %}<a data-toggle="ajaxmodal" class="d-inline" href="{{ pw.get_absolute_url }}">{{ pw }}</a>{% if not forloop.last %}, {% endif %}{% empty %}–{% endfor %}
+          <br>
+        {% endfor %}
       </td>
     </tr>
   </table>

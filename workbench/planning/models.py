@@ -14,7 +14,7 @@ from workbench.accounts.models import User
 from workbench.invoices.utils import recurring
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
-from workbench.tools.formats import Z1, local_date_format
+from workbench.tools.formats import Z1, hours, local_date_format
 from workbench.tools.models import HoursField, Model, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
@@ -135,6 +135,13 @@ class PlanningRequest(Model):
             )
         )
 
+    @cached_property
+    def receivers_with_work(self):
+        work = {user: [] for user in self.receivers.all()}
+        for pw in self.planned_work.select_related("user"):
+            work.setdefault(pw.user, []).append(pw)
+        return sorted(work.items())
+
 
 @model_urls
 class PlannedWork(Model):
@@ -180,7 +187,7 @@ class PlannedWork(Model):
         verbose_name_plural = _("planned work")
 
     def __str__(self):
-        return self.title
+        return "{} ({})".format(self.title, hours(self.planned_hours))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
