@@ -6,13 +6,14 @@ from . import models
 @admin.register(models.Service)
 class ServiceAdmin(admin.ModelAdmin):
     list_display = (
+        "title",
         "project",
         "offer",
-        "title",
         "service_hours",
         "service_cost",
     )
     list_select_related = ["project__owned_by", "offer__project", "offer__owned_by"]
+    ordering = ["-pk"]
     raw_id_fields = ["project", "offer", "role"]
     search_fields = ["project__title", "title", "description"]
 

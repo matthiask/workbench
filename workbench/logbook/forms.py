@@ -16,6 +16,7 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
+from workbench.projects.forms import UNSPECIFIC_TITLE
 from workbench.projects.models import Project, Service
 from workbench.timer.models import Timestamp
 from workbench.tools.forms import (
@@ -294,7 +295,7 @@ class LoggedHoursForm(ModelForm):
         self.fields["service"].choices = self.project.services.logging().choices()
         self.fields["service"].required = False
         if len(self.fields["service"].choices) > 1 and not self.request.POST.get(
-            "service_title"
+            "modal-service_title"
         ):
             self.hide_new_service = True
             self.fields["service"].widget.attrs["autofocus"] = True
@@ -333,6 +334,14 @@ class LoggedHoursForm(ModelForm):
         if self.instance.invoice_service:
             self.add_warning(
                 _("This entry is already part of an invoice."), code="part-of-invoice"
+            )
+        if UNSPECIFIC_TITLE.search(data.get("service_title", "")):
+            self.add_warning(
+                _(
+                    "This title seems awfully unspecific."
+                    " Please use specific titles for services."
+                ),
+                code="unspecific-service",
             )
 
         if all(

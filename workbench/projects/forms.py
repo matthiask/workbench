@@ -1,3 +1,5 @@
+import re
+
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -350,6 +352,9 @@ class ProjectForm(ModelForm):
         return instance
 
 
+UNSPECIFIC_TITLE = re.compile(r"(general|allg|unspec)", re.I)
+
+
 class ServiceForm(ModelForm):
     service_type = forms.ModelChoiceField(
         ServiceType.objects.all(),
@@ -420,6 +425,14 @@ class ServiceForm(ModelForm):
         data = super().clean()
         if self.request.user.features[FEATURES.GLASSFROG] and not data.get("role"):
             self.add_warning(_("No role selected."), code="no-role-selected")
+        if UNSPECIFIC_TITLE.search(data.get("title", "")):
+            self.add_warning(
+                _(
+                    "This title seems awfully unspecific."
+                    " Please use specific titles for services."
+                ),
+                code="unspecific-service",
+            )
         return data
 
 
