@@ -5,7 +5,7 @@ from itertools import takewhile
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import Q, Sum
+from django.db.models import Sum
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -15,7 +15,7 @@ from workbench.invoices.utils import recurring
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.tools.formats import Z1, hours, local_date_format
-from workbench.tools.models import HoursField, Model, SearchQuerySet
+from workbench.tools.models import HoursField, Model
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
 
@@ -40,15 +40,6 @@ class PlanningTeamMembership(Model):
 
     def __str__(self):
         return "{} <--> {}".format(self.project, self.user)
-
-
-class PlanningRequestQuerySet(SearchQuerySet):
-    def open(self):
-        return self.filter(
-            Q(closed_at__isnull=True),
-            Q(project__closed_on__isnull=True),
-            Q(offer__isnull=True) | Q(offer__in=Offer.objects.not_declined()),
-        )
 
 
 @model_urls
@@ -87,8 +78,6 @@ class PlanningRequest(Model):
         related_name="sent_planning_requests",
     )
     closed_at = models.DateTimeField(_("closed at"), blank=True, null=True)
-
-    objects = PlanningRequestQuerySet.as_manager()
 
     class Meta:
         ordering = ["earliest_start_on", "completion_requested_on"]

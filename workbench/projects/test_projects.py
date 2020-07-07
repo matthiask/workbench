@@ -630,3 +630,34 @@ class ProjectsTest(TestCase):
         )
         self.assertContains(response, 'value="{}"'.format(person.organization))
         self.assertContains(response, 'value="{}"'.format(person))
+
+    def test_unspecific_service_title(self):
+        """Unspecific titles raise a warning"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            project.urls["createservice"],
+            {
+                "title": "Programmierung allgemein",
+                "effort_type": "Consulting",
+                "effort_rate": "180",
+                "allow_logging": True,
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "unspecific-service")
+
+        response = self.client.post(
+            project.urls["createhours"],
+            {
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-hours": "0.1",
+                "modal-description": "Test",
+                "modal-service_title": "Programmierung allgemein",
+                "modal-service_description": "service description",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "unspecific-service")

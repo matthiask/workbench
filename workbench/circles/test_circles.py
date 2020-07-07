@@ -21,6 +21,7 @@ class CirclesTest(TestCase):
         c = Circle.objects.create(name="A circle")
         r4 = c.roles.create(name="Role 1")
         r5 = c.roles.create(name="Role 2")
+        r6 = c.roles.create(name="A circle", for_circle=True)
 
         self.assertEqual(
             Role.objects.choices(),
@@ -28,7 +29,11 @@ class CirclesTest(TestCase):
                 ("", "----------"),
                 (
                     "A circle",
-                    [(r4.id, "Role 1 [A circle]"), (r5.id, "Role 2 [A circle]")],
+                    [
+                        (r6.id, "For the circle [A circle]"),
+                        (r4.id, "Role 1 [A circle]"),
+                        (r5.id, "Role 2 [A circle]"),
+                    ],
                 ),
                 (
                     "B circle",

@@ -25,6 +25,9 @@ class PlanningTest(TestCase):
             pw.clean_fields(exclude=["weeks"])
         self.assertEqual(list(cm.exception), msg)
 
+        pw.weeks = [dt.date(2020, 6, 22)]
+        pw.full_clean()  # Does not raise
+
         pr = factories.PlanningRequestFactory.create()
         pr.full_clean()
 

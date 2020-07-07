@@ -1,11 +1,12 @@
 import datetime as dt
 
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
 from workbench import factories
 from workbench.accounts.features import UnknownFeature
+from workbench.accounts.forms import TeamForm, TeamSearchForm
 from workbench.accounts.models import User
 from workbench.projects.models import Project
 from workbench.tools.testing import messages
@@ -121,3 +122,26 @@ class AccountsTest(TestCase):
         self.client.force_login(user)
         response = self.client.get("/report/work-anniversaries/")
         self.assertContains(response, user.get_full_name())
+
+    def test_team_crud(self):
+        """CRUD of teams"""
+
+        rf = RequestFactory()
+        req = rf.get("/")
+
+        form = TeamSearchForm(request=req)
+        stuff = object()
+        self.assertEqual(form.filter(stuff), stuff)
+
+        user = factories.UserFactory.create()
+        inactive = factories.UserFactory.create(is_active=False)
+
+        form = TeamForm({"name": "A Team", "members": [user.id]}, request=req)
+        self.assertEqual(set(form.fields["members"].queryset), {user})
+
+        team = form.save()
+        self.assertEqual(set(team.members.all()), {user})
+
+        team.members.add(inactive)
+        form = TeamForm(instance=team, request=req)
+        self.assertEqual(set(form.fields["members"].queryset), {user, inactive})

@@ -39,9 +39,6 @@ class OfferQuerySet(SearchQuerySet):
     def accepted(self):
         return self.filter(status=Offer.ACCEPTED)
 
-    def not_declined(self):
-        return self.filter(~Q(status=Offer.DECLINED))
-
 
 @model_urls
 @total_ordering
