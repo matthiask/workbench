@@ -1,4 +1,5 @@
 import datetime as dt
+from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.test import RequestFactory, TestCase
@@ -57,15 +58,29 @@ class PlanningTest(TestCase):
         """Smoke test the planned work report"""
         pw = factories.PlannedWorkFactory.create(weeks=[monday()])
 
+        factories.EmploymentFactory.create(user=pw.user, date_from=dt.date(2020, 1, 1))
         service = factories.ServiceFactory.create(project=pw.project)
         factories.LoggedHoursFactory.create(rendered_by=pw.user, service=service)
+        factories.AbsenceFactory.create(user=pw.user)
+        pr = factories.PlanningRequestFactory.create(
+            project=pw.project,
+            earliest_start_on=monday(),
+            completion_requested_on=monday() + dt.timedelta(days=7),
+        )
+        pr.receivers.add(pw.user)
 
         report = reporting.user_planning(pw.user)
-        self.assertEqual(sum(report["by_week"]), 20)
+        self.assertAlmostEqual(sum(report["by_week"]), Decimal("26"))
         self.assertEqual(len(report["projects_offers"]), 1)
 
         report = reporting.project_planning(pw.project)
-        self.assertEqual(sum(report["by_week"]), 20)
+        self.assertAlmostEqual(sum(report["by_week"]), Decimal("26"))
+        self.assertEqual(len(report["projects_offers"]), 1)
+
+        team = factories.TeamFactory.create()
+        team.members.add(pw.user)
+        report = reporting.team_planning(team)
+        self.assertAlmostEqual(sum(report["by_week"]), Decimal("26"))
         self.assertEqual(len(report["projects_offers"]), 1)
 
     def test_planning_search_forms(self):
@@ -145,6 +160,20 @@ class PlanningTest(TestCase):
         self.assertEqual(response.status_code, 202)
         self.assertEqual(set(pr.receivers.all()), {offer.owned_by})
 
+    def test_planned_work_with_offer(self):
+        """Planned work with offer preselection"""
+        offer = factories.OfferFactory.create()
+        self.client.force_login(offer.owned_by)
+
+        response = self.client.get(
+            offer.project.urls["creatework"] + "?offer={}".format(offer.pk)
+        )
+        self.assertContains(
+            response,
+            '<option value="{}" selected>{}</option>'.format(offer.pk, offer),
+            html=True,
+        )
+
     def test_planned_work_crud(self):
         """Create, update and delete planned work"""
         pr = factories.PlanningRequestFactory.create(
@@ -152,6 +181,9 @@ class PlanningTest(TestCase):
             completion_requested_on=monday() + dt.timedelta(days=14),
         )
         self.client.force_login(pr.created_by)
+
+        response = self.client.get(pr.project.urls["creatework"] + "?request=bla")
+        self.assertEqual(response.status_code, 200)  # No crash
 
         response = self.client.post(
             pr.project.urls["creatework"],
@@ -209,9 +241,6 @@ class PlanningTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertContains(response, "weeks-outside-request")
-
-        # TODO check what happens with pr.planned_hours when updating, changing
-        # request and deleting work
 
     def test_replanning(self):
         """Moving planned work between requests"""

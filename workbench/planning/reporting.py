@@ -123,7 +123,8 @@ class Planning:
         for absence in queryset.filter(
             Q(user__in=self._user_ids),
             Q(starts_on__lte=max(self.weeks)),
-            Q(ends_on__gte=min(self.weeks)),
+            Q(ends_on__isnull=False, ends_on__gte=min(self.weeks))
+            | Q(ends_on__isnull=True, starts_on__gte=min(self.weeks)),
         ).select_related("user"):
             date_from = monday(absence.starts_on)
             date_until = monday(absence.ends_on or absence.starts_on)

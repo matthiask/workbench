@@ -165,9 +165,10 @@ class PlannedWorkForm(ModelForm):
                 initial.setdefault(field, request.GET.get(field))
 
         pr = None
-        if request.GET.get("request"):
+        pr_id = request.POST.get("request") or request.GET.get("request")
+        if pr_id:
             try:
-                pr = self.project.planning_requests.get(pk=request.GET["request"])
+                pr = self.project.planning_requests.get(pk=pr_id)
             except (PlanningRequest.DoesNotExist, TypeError, ValueError):
                 pass
             else:
@@ -192,7 +193,7 @@ class PlannedWorkForm(ModelForm):
         date_from_options = [
             monday(),
             self.instance.weeks and min(self.instance.weeks),
-            pr and min(pr.weeks),  # FIXME pr is from GET, POST may be different
+            pr and min(pr.weeks),
         ]
         date_from = min(filter(None, date_from_options)) - dt.timedelta(days=21)
 
