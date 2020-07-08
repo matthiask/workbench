@@ -32,6 +32,27 @@ class AccountsTest(TestCase):
         self.assertTrue(user.has_module_perms("stuff"))
         self.assertTrue(user.is_staff)
 
+        self.client.force_login(user)
+
+        # Email is readonly
+        response = self.client.get("/admin/accounts/user/{}/change/".format(user.pk))
+        self.assertContains(
+            response, '<div class="readonly">{}</div>'.format(user.email)
+        )
+
+        # Creating an user through the admin interface is possible
+        wtm = factories.WorkingTimeModelFactory.create()
+        data = {
+            "email": "test@example.org",
+            "language": "en",
+            "working_time_model": wtm.id,
+            "employments-TOTAL_FORMS": 0,
+            "employments-INITIAL_FORMS": 0,
+            "employments-MAX_NUM_FORMS": 1000,
+        }
+        response = self.client.post("/admin/accounts/user/add/", data)
+        self.assertEqual(response.status_code, 302)
+
     def test_choices(self):
         """User.objects.choices() does what it should"""
         u1 = factories.UserFactory.create(_full_name="M A", is_active=True)
