@@ -240,7 +240,7 @@ class ProjectForm(ModelForm):
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
-            "contact": Autocomplete(model=Person),
+            "contact": Autocomplete(model=Person, params={"only_employees": "on"}),
             "campaign": Autocomplete(model=Campaign),
             "description": Textarea,
             "type": forms.RadioSelect,

@@ -12,6 +12,14 @@ from workbench.contacts.models import Organization, Person
 from workbench.contacts.views import OrganizationListView, person_vcard, select
 
 
+def autocomplete_filter(*, request, queryset):
+    return (
+        queryset.filter(organization__isnull=False)
+        if request.GET.get("only_employees")
+        else queryset
+    )
+
+
 urlpatterns = [
     re_path(r"^$", lambda request: redirect("contacts_person_list"), name="contacts"),
     re_path(
@@ -56,6 +64,7 @@ urlpatterns = [
         generic.AutocompleteView.as_view(
             model=Person,
             queryset=Person.objects.active().select_related("organization"),
+            filter=autocomplete_filter,
             label_from_instance=lambda person: person.name_with_organization,
         ),
         name="contacts_person_autocomplete",

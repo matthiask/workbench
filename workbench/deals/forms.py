@@ -140,7 +140,7 @@ class DealForm(ModelForm):
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
-            "contact": Autocomplete(model=Person),
+            "contact": Autocomplete(model=Person, params={"only_employees": "on"}),
             "probability": forms.RadioSelect,
             "description": Textarea,
         }

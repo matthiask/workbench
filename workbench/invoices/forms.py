@@ -129,7 +129,7 @@ class InvoiceForm(PostalAddressSelectionForm):
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
-            "contact": Autocomplete(model=Person),
+            "contact": Autocomplete(model=Person, params={"only_employees": "on"}),
             "status": forms.RadioSelect,
             "description": Textarea,
             "payment_notice": Textarea({"rows": 2}),
@@ -474,7 +474,7 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
-            "contact": Autocomplete(model=Person),
+            "contact": Autocomplete(model=Person, params={"only_employees": "on"}),
             "description": Textarea,
             "postal_address": Textarea,
         }
@@ -669,7 +669,7 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
-            "contact": Autocomplete(model=Person),
+            "contact": Autocomplete(model=Person, params={"only_employees": "on"}),
             "description": Textarea,
             "postal_address": Textarea,
             "periodicity": forms.RadioSelect,
