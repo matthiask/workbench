@@ -255,7 +255,7 @@ where percentage is not NULL -- NULL produced by outer join
     def report(self):
         try:
             this_week_index = self.weeks.index(monday())
-        except IndexError:
+        except ValueError:
             this_week_index = None
         return {
             "daily_planning_hours": DAILY_PLANNING_HOURS,
