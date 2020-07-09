@@ -312,7 +312,7 @@ class Project(Model):
     def grouped_services(self):
         # Avoid circular imports
         from workbench.deals.models import Deal
-        from workbench.logbook.models import LoggedHours, LoggedCost
+        from workbench.logbook.models import LoggedCost, LoggedHours
 
         # Logged vs. service hours
         service_hours = defaultdict(lambda: Z1)

@@ -187,8 +187,8 @@ def labor_costs_by_user(date_range, *, project=None, cost_center=None):
 
 
 def test():  # pragma: no cover
-    from pprint import pprint
     import datetime as dt
+    from pprint import pprint
 
     pprint(labor_costs_by_cost_center([dt.date(2019, 1, 1), dt.date.today()]))
     # pprint(labor_costs_by_user([dt.date(2020, 1, 1), dt.date.today()], cost_center=1))

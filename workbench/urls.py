@@ -50,8 +50,9 @@ urlpatterns += i18n_patterns(
 )
 
 if settings.DEBUG_TOOLBAR:  # pragma: no cover
-    import debug_toolbar
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
+    import debug_toolbar
 
     urlpatterns = (
         urlpatterns
