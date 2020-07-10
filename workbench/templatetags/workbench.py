@@ -17,6 +17,7 @@ from workbench.notes.forms import NoteForm
 from workbench.notes.models import Note
 from workbench.projects.models import Service
 from workbench.tools.formats import Z1, Z2, currency, days, hours, local_date_format
+from workbench.tools.history import EVERYTHING
 
 
 register = template.Library()
@@ -47,7 +48,12 @@ def link_or_none(object, pretty=None, none=mark_safe("&ndash;"), with_badge=Fals
 
 
 @register.filter
-def field_value_pairs(object):
+def field_value_pairs(object, fields=None):
+    fields = (
+        fields.split(",")
+        if fields
+        else getattr(object, "field_value_pairs", EVERYTHING)
+    )
     for field in object._meta.get_fields():
         if (
             field.one_to_many
@@ -55,6 +61,7 @@ def field_value_pairs(object):
             or field.many_to_many
             or field.primary_key
             or field.name in {"_fts"}
+            or field.name not in fields
         ):
             continue
 
