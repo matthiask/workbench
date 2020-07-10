@@ -27,7 +27,7 @@ urlpatterns = [
     ),
     path(
         "users/<int:pk>/",
-        lambda request, pk: redirect("planning/"),
+        generic.DetailView.as_view(model=User),
         name="accounts_user_detail",
     ),
     path(

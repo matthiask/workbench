@@ -119,6 +119,7 @@ def logout(request):
 class ProfileView(DetailView):
     model = User
     queryset = User.objects.active()
+    template_name_suffix = "_statistics"
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(

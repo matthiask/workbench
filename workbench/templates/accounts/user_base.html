@@ -9,6 +9,9 @@
     <h1>{{ user }}</h1>
 
     <ul class="nav nav-tabs my-3">
+      <li class="nav-item">
+        <a class="nav-link" href="{{ user.urls.detail }}">{% trans 'user'|capfirst %}</a>
+      </li>
       {% mark_current request.path %}
       <li class="nav-item">
         <a class="nav-link" href="{{ user.urls.planning }}">{% trans 'Planning' %}</a>
