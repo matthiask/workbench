@@ -60,11 +60,17 @@ class WorkbenchXLSXDocument(XLSXDocument):
         self.table(
             [
                 capfirst(t)
-                for t in [_("project"), _("service"), _("hourly rate"), _("total")]
+                for t in [
+                    _("project"),
+                    _("service"),
+                    _("hourly rate"),
+                    _("total"),
+                    _("total"),
+                ]
             ]
             + [user.get_short_name() for user in users],
             [
-                [capfirst(_("total")), "", "", sum(by_user.values(), Z1)]
+                [capfirst(_("total")), "", "", sum(by_user.values(), Z1), ""]
                 + [by_user.get(user) for user in users]
             ]
             + [
@@ -73,6 +79,9 @@ class WorkbenchXLSXDocument(XLSXDocument):
                     service,
                     service.effort_rate,
                     sum(by_users.values(), Z1),
+                    None
+                    if service.effort_rate is None
+                    else sum(by_users.values(), Z1) * service.effort_rate,
                 ]
                 + [by_users.get(user) for user in users]
                 for service, by_users in sorted(
@@ -93,11 +102,17 @@ class WorkbenchXLSXDocument(XLSXDocument):
         self.table(
             [
                 capfirst(t)
-                for t in [_("project"), _("service"), _("hourly rate"), _("total")]
+                for t in [
+                    _("project"),
+                    _("service"),
+                    _("hourly rate"),
+                    _("total"),
+                    _("total"),
+                ]
             ]
             + months,
             [
-                [capfirst(_("total")), "", "", sum(by_month.values(), Z1)]
+                [capfirst(_("total")), "", "", sum(by_month.values(), Z1), ""]
                 + [by_month.get(month) for month in months]
             ]
             + [
@@ -105,7 +120,10 @@ class WorkbenchXLSXDocument(XLSXDocument):
                     service.project,
                     service,
                     service.effort_rate,
-                    sum(by_month.values(), Z1),
+                    sum(by_months.values(), Z1),
+                    None
+                    if service.effort_rate is None
+                    else sum(by_months.values(), Z1) * service.effort_rate,
                 ]
                 + [by_months.get(month) for month in months]
                 for service, by_months in sorted(
