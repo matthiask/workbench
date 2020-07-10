@@ -86,6 +86,7 @@ class LoggedHoursSearchForm(Form):
         widget=forms.HiddenInput,
         label="",
     )
+    campaign = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
     offer = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
     circle = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
     role = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
@@ -120,6 +121,8 @@ class LoggedHoursSearchForm(Form):
         # "hidden" filters
         if data.get("service"):
             queryset = queryset.filter(service=data.get("service"))
+        if data.get("campaign"):
+            queryset = queryset.filter(service__project__campaign=data.get("campaign"))
         if data.get("offer") == 0:
             queryset = queryset.filter(service__offer__isnull=True)
         elif data.get("offer"):
@@ -182,6 +185,7 @@ class LoggedCostSearchForm(Form):
         widget=forms.HiddenInput,
         label="",
     )
+    campaign = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
     offer = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
     not_archived = forms.BooleanField(
         required=False, widget=forms.HiddenInput, label=""
@@ -216,6 +220,8 @@ class LoggedCostSearchForm(Form):
         # "hidden" filters
         if data.get("service"):
             queryset = queryset.filter(service=data.get("service"))
+        if data.get("campaign"):
+            queryset = queryset.filter(service__project__campaign=data.get("campaign"))
         if data.get("offer") == 0:
             queryset = queryset.filter(service__offer__isnull=True)
         elif data.get("offer"):

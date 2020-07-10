@@ -1,4 +1,3 @@
-from django.shortcuts import redirect
 from django.urls import path, re_path
 
 from workbench import generic

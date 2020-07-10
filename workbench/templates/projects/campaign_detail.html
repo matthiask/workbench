@@ -98,6 +98,14 @@
   </a>
   <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-primary">
     {% trans 'Copy' %}</a>
+
+  <a href="{% url 'logbook_loggedhours_list' %}?campaign={{ object.pk }}" class="btn btn-primary">
+    {% trans 'logged hours'|capfirst %}
+  </a>
+  <a href="{% url 'logbook_loggedcost_list' %}?campaign={{ object.pk }}" class="btn btn-primary">
+    {% trans 'logged cost'|capfirst %}
+  </a>
+
   <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
     {% trans 'Delete' %}
   </a>
