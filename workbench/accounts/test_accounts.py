@@ -125,7 +125,7 @@ class AccountsTest(TestCase):
         self.assertContains(response, user.get_full_name())
 
         response = self.client.get("/users/{}/".format(user.id))
-        self.assertRedirects(response, "/users/{}/planning/".format(user.id))
+        self.assertContains(response, user.email)
 
         response = self.client.get("/users/{}/planning/".format(user.id))
         self.assertContains(response, 'id="planning-data"')
