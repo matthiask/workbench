@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-07 15:36+0200\n"
+"POT-Creation-Date: 2020-07-10 17:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -92,7 +92,8 @@ msgstr "Person"
 
 #: workbench/accounts/models.py workbench/awt/models.py
 #: workbench/logbook/models.py workbench/management/commands/profitability.py
-#: workbench/planning/models.py workbench/templates/awt/absence_detail.html
+#: workbench/planning/models.py workbench/templates/accounts/user_base.html
+#: workbench/templates/awt/absence_detail.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/labor_costs_by_user.html
@@ -485,6 +486,7 @@ msgstr "Anrechenbare Abwesenheitsstunden"
 #: workbench/awt/pdf.py workbench/logbook/models.py
 #: workbench/templates/awt/year_detail.html workbench/templates/base.html
 #: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/reporting/overdrawn_projects.html
 #: workbench/timer/models.py
 msgid "logged hours"
@@ -583,6 +585,17 @@ msgid "substitute with"
 msgstr "ersetzen durch"
 
 #: workbench/contacts/forms.py
+msgid ""
+"This organization has related objects. It is therefore not possible to "
+"delete it, but you may reassign the related objects to a different "
+"organization. Alternatively, you can also archive the organization."
+msgstr ""
+"Diese Organisation hat verbundene Objekte. Es ist deshalb nicht möglich, "
+"die Organisation zu löschen, aber Du kannst die Objekte mit einer anderen "
+"Organisation verbinden. Alternativ kannst Du diese Organisation auch "
+"archivieren."
+
+#: workbench/contacts/forms.py
 msgid "This does not look right. Please add a full salutation."
 msgstr ""
 "Das sieht nicht korrekt aus. Bitte definiere eine vollständige Begrüssung."
@@ -636,6 +649,14 @@ msgstr "Gruppe"
 msgid "groups"
 msgstr "Gruppen"
 
+#: workbench/contacts/models.py workbench/deals/models.py
+msgid "is archived"
+msgstr "ist archiviert"
+
+#: workbench/contacts/models.py
+msgid "It is preferrable to archive records instead of deleting them."
+msgstr "Es ist bevorzugt, Einträge zu archivieren statt zu löschen."
+
 #: workbench/contacts/models.py
 msgid "is private person"
 msgstr "ist Privatperson"
@@ -659,14 +680,6 @@ msgstr "Organisation"
 #: workbench/contacts/models.py workbench/templates/contacts/object_list.html
 msgid "organizations"
 msgstr "Organisationen"
-
-#: workbench/contacts/models.py workbench/deals/models.py
-msgid "is archived"
-msgstr "ist archiviert"
-
-#: workbench/contacts/models.py
-msgid "It is preferrable to archive records instead of deleting them."
-msgstr "Es ist bevorzugt, Einträge zu archivieren statt zu löschen."
 
 #: workbench/contacts/models.py
 msgid "given name"
@@ -1882,6 +1895,7 @@ msgid "original cost"
 msgstr "Originalbetrag"
 
 #: workbench/logbook/models.py
+#: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/reporting/key_data_third_party_costs.html
 msgid "logged cost"
 msgstr "Erfasste Kosten"
@@ -2310,16 +2324,18 @@ msgstr "Kampagne"
 msgid "campaigns"
 msgstr "Kampagnen"
 
-#: workbench/projects/models.py workbench/templates/accounts/user_detail.html
+#: workbench/projects/models.py
+#: workbench/templates/accounts/user_statistics.html
 msgid "Order"
 msgstr "Auftrag"
 
-#: workbench/projects/models.py workbench/templates/accounts/user_detail.html
+#: workbench/projects/models.py
+#: workbench/templates/accounts/user_statistics.html
 msgid "Maintenance"
 msgstr "Wartung"
 
 #: workbench/projects/models.py workbench/reporting/views.py
-#: workbench/templates/accounts/user_detail.html
+#: workbench/templates/accounts/user_statistics.html
 msgid "Internal"
 msgstr "Intern"
 
@@ -2572,23 +2588,24 @@ msgstr "Planung"
 msgid "Statistics"
 msgstr "Statistik"
 
-#: workbench/templates/accounts/user_detail.html
+#: workbench/templates/accounts/user_statistics.html
 msgid "Hours per weekday"
 msgstr "Stunden pro Wochentag"
 
-#: workbench/templates/accounts/user_detail.html
+#: workbench/templates/accounts/user_statistics.html
 msgid "Rendered"
 msgstr "Erbracht"
 
-#: workbench/templates/accounts/user_detail.html
+#: workbench/templates/accounts/user_statistics.html
 msgid "Created"
 msgstr "Erstellt"
 
-#: workbench/templates/accounts/user_detail.html
+#: workbench/templates/accounts/user_statistics.html
 msgid "Hours per week"
 msgstr "Stunden pro Woche"
 
-#: workbench/templates/accounts/user_detail.html workbench/templates/base.html
+#: workbench/templates/accounts/user_statistics.html
+#: workbench/templates/base.html
 #: workbench/templates/reporting/hours_per_customer.html
 msgid "Hours per customer"
 msgstr "Stunden pro Kundschaft"

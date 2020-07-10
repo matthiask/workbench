@@ -30,8 +30,18 @@ class Group(Model):
         return self.title
 
 
+class OrganizationQuerySet(SearchQuerySet):
+    def active(self):
+        return self.filter(is_archived=False)
+
+
 @model_urls
 class Organization(Model):
+    is_archived = models.BooleanField(
+        _("is archived"),
+        default=False,
+        help_text=_("It is preferrable to archive records instead of deleting them."),
+    )
     name = models.TextField(_("name"))
     is_private_person = models.BooleanField(_("is private person"), default=False)
     notes = models.TextField(_("notes"), blank=True)
@@ -50,6 +60,8 @@ class Organization(Model):
         ),
     )
     groups = models.ManyToManyField(Group, verbose_name=_("groups"), blank=True)
+
+    objects = OrganizationQuerySet.as_manager()
 
     class Meta:
         ordering = ("name",)

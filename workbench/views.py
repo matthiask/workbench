@@ -135,7 +135,7 @@ def search(request):
             sources.append(Campaign.objects.select_related("owned_by"))
         sources.extend(
             [
-                Organization.objects.all(),
+                Organization.objects.active(),
                 Person.objects.active().select_related("organization"),
             ]
         )

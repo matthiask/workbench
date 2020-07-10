@@ -2,6 +2,7 @@ from collections import OrderedDict
 
 from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.forms.models import inlineformset_factory
 from django.template.defaultfilters import linebreaksbr
 from django.utils.html import format_html, format_html_join
@@ -40,7 +41,7 @@ class OrganizationSearchForm(Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
-        queryset = queryset.search(data.get("q"))
+        queryset = queryset.search(data.get("q")).active()
         return self.apply_renamed(queryset, "g", "groups")
 
 
@@ -97,6 +98,7 @@ class OrganizationForm(ModelForm):
             "primary_contact",
             "default_billing_address",
             "groups",
+            "is_archived",
         )
         widgets = {
             "name": Textarea(),
@@ -122,6 +124,17 @@ class OrganizationDeleteForm(ModelForm):
                 widget=Autocomplete(model=Organization),
                 label=_("substitute with"),
             )
+            if self.request.method == "GET":
+                messages.info(
+                    self.request,
+                    _(
+                        "This organization has related objects. It is"
+                        " therefore not possible to delete it, but you"
+                        " may reassign the related objects to a different"
+                        " organization."
+                        " Alternatively, you can also archive the organization."
+                    ),
+                )
 
     def delete(self):
         if "substitute_with" in self.fields:
