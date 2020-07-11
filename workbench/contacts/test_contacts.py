@@ -2,11 +2,12 @@ import datetime as dt
 
 from django.core import mail
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 
 from workbench import factories
 from workbench.contacts.models import Group, Organization, Person, PhoneNumber
+from workbench.contacts.urls import autocomplete_filter
 from workbench.tools.testing import messages
 from workbench.tools.vcard import person_to_vcard
 
@@ -420,3 +421,13 @@ Other street 42
         person = factories.PersonFactory.build(given_name="Fritz", family_name="Muster")
         self.assertEqual(str(person), "Fritz Muster")
         self.assertEqual(person.name_with_organization, "Fritz Muster")
+
+    def test_autocomplete_filter(self):
+        """autocomplete_filter test"""
+        rf = RequestFactory()
+        req = rf.get("/?only_employees=on")
+
+        factories.PersonFactory.create()
+        self.assertEqual(
+            list(autocomplete_filter(request=req, queryset=Person.objects.all())), []
+        )

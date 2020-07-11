@@ -198,6 +198,19 @@ class PlanningTest(TestCase):
         )
         self.assertEqual(response.status_code, 201)
 
+        pw = PlannedWork.objects.get()
+        response = self.client.post(
+            pw.urls["update"],
+            {
+                "modal-user": pr.created_by.id,
+                "modal-title": "bla",
+                "modal-planned_hours": 50,
+                "modal-weeks": [monday().isoformat()],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
+
         response = self.client.post(
             pr.project.urls["creatework"] + "?request={}".format(pr.id),
             {

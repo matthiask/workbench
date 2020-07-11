@@ -2,7 +2,7 @@ import datetime as dt
 from decimal import Decimal
 
 from django.core import mail
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 
 from time_machine import travel
 
@@ -10,6 +10,7 @@ from workbench import factories
 from workbench.reporting.accounting import send_accounting_files
 from workbench.reporting.labor_costs import labor_costs_by_cost_center
 from workbench.reporting.models import Accruals
+from workbench.reporting.views import DateRangeAndTeamFilterForm
 
 
 class ReportingTest(TestCase):
@@ -80,3 +81,21 @@ class ReportingTest(TestCase):
 
         self.assertEqual(lcp[0]["third_party_costs"], Decimal("10"))
         self.assertEqual(lcp[0]["revenue"], Decimal("115"))
+
+    def test_teams_filter(self):
+        """Filtering by teams and individuals"""
+        rf = RequestFactory()
+        req = rf.get("/")
+
+        user1 = factories.UserFactory.create()
+        user2 = factories.UserFactory.create()
+        team = factories.TeamFactory.create()
+        team.members.add(user1)
+
+        form = DateRangeAndTeamFilterForm({"team": team.id}, request=req)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(set(form.users()), {user1})
+
+        form = DateRangeAndTeamFilterForm({"team": -user2.id}, request=req)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(set(form.users()), {user2})

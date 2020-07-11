@@ -165,10 +165,7 @@ class PlannedWorkForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project", None)
-        if self.project:  # Creating a new object
-            # kwargs.setdefault("initial", {}).update({"title": self.project.title})
-            pass
-        else:
+        if not self.project:  # Updating
             self.project = kwargs["instance"].project
 
         initial = kwargs.setdefault("initial", {})
