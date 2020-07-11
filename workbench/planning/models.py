@@ -20,28 +20,6 @@ from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
 
 
-class PlanningTeamMembership(Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE,
-        verbose_name=_("project"),
-        related_name="planning_team_memberships",
-    )
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name=_("user"),
-        related_name="planning_team_memberships",
-    )
-
-    class Meta:
-        verbose_name = _("planning team membership")
-        verbose_name_plural = _("planning team memberships")
-
-    def __str__(self):
-        return "{} <--> {}".format(self.project, self.user)
-
-
 @model_urls
 class PlanningRequest(Model):
     project = models.ForeignKey(

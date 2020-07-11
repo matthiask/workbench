@@ -3,12 +3,6 @@ from workbench.tools import admin
 from . import models
 
 
-@admin.register(models.PlanningTeamMembership)
-class PlanningTeamMembershipAdmin(admin.ReadWriteModelAdmin):
-    list_display = ["project", "user"]
-    raw_id_fields = ["project"]
-
-
 @admin.register(models.PlanningRequest)
 class PlanningRequestAdmin(admin.ReadWriteModelAdmin):
     filter_horizontal = ["receivers"]
