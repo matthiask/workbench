@@ -28,4 +28,4 @@ jobs:
 script:
   - mkdir -p tmp
   - coverage run ./manage.py test -v2
-  - coverage report -m --fail-under=98
+  - coverage report -m --fail-under=99
