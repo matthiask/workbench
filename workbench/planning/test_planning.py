@@ -28,6 +28,7 @@ class PlanningTest(TestCase):
 
         pw.weeks = [dt.date(2020, 6, 22)]
         pw.full_clean()  # Does not raise
+        self.assertEqual(pw.pretty_from_until, "22.06.2020 – 28.06.2020")
 
         pr = factories.PlanningRequestFactory.create()
         pr.full_clean()
@@ -271,3 +272,25 @@ class PlanningTest(TestCase):
         pr2.refresh_from_db()
         self.assertEqual(pr1.planned_hours, 0)
         self.assertEqual(pr2.planned_hours, 0)
+
+    def test_receivers_with_work(self):
+        """receivers_with_work returns all requested and planned work"""
+
+        pr = factories.PlanningRequestFactory.create()
+        only_receiver = factories.UserFactory.create()
+        pr.receivers.add(only_receiver)
+        only_pw = factories.PlannedWorkFactory.create(
+            project=pr.project, request=pr, weeks=[monday()]
+        )
+        both = factories.PlannedWorkFactory.create(
+            project=pr.project, request=pr, weeks=[monday()]
+        )
+        pr.receivers.add(both.user)
+
+        self.assertEqual(set(pr.receivers.all()), {both.user, only_receiver})
+        self.assertEqual(len(pr.receivers_with_work), 3)
+
+        receivers = dict(pr.receivers_with_work)
+        self.assertEqual(receivers[only_receiver], [])
+        self.assertEqual(receivers[both.user], [both])
+        self.assertEqual(receivers[only_pw.user], [only_pw])
