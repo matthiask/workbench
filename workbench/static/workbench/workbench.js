@@ -278,6 +278,15 @@ $(function () {
     $("#id_date_from").val(value[0])
     $("#id_date_until").val(value[1]).trigger("change")
   })
+
+  $(document.body).on("click", "[data-select-receivers]", function (e) {
+    e.preventDefault()
+    const arr = this.dataset.selectReceivers.split(",")
+    const inputs = Array.from(
+      document.querySelectorAll('input[name="modal-receivers"]')
+    )
+    inputs.forEach((el) => (el.checked = arr.includes(el.value)))
+  })
 })
 
 function initWidgets() {

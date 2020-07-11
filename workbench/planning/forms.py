@@ -4,10 +4,11 @@ from itertools import islice
 from django import forms
 from django.db.models import Q
 from django.utils.dateparse import parse_date
+from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
-from workbench.accounts.models import User
+from workbench.accounts.models import Team, User
 from workbench.invoices.utils import recurring
 from workbench.planning.models import PlannedWork, PlanningRequest
 from workbench.projects.models import Project
@@ -87,6 +88,18 @@ class PlanningRequestForm(ModelForm):
         if self.instance.pk:
             q |= Q(id__in=self.instance.receivers.values_list("id", flat=True))
         self.fields["receivers"].queryset = User.objects.filter(q)
+        self.fields["receivers"].help_text = format_html(
+            "{}: {}",
+            _("Select team"),
+            format_html_join(
+                ", ",
+                '<a href="#" data-select-receivers="{}">{}</a>',
+                [
+                    (",".join(str(member.id) for member in team.members.all()), team)
+                    for team in Team.objects.prefetch_related("members")
+                ],
+            ),
+        )
 
     def save(self):
         if self.instance.pk:

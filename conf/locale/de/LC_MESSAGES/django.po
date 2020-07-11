@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-10 17:38+0200\n"
+"POT-Creation-Date: 2020-07-11 10:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -590,8 +590,8 @@ msgid ""
 "delete it, but you may reassign the related objects to a different "
 "organization. Alternatively, you can also archive the organization."
 msgstr ""
-"Diese Organisation hat verbundene Objekte. Es ist deshalb nicht möglich, "
-"die Organisation zu löschen, aber Du kannst die Objekte mit einer anderen "
+"Diese Organisation hat verbundene Objekte. Es ist deshalb nicht möglich, die "
+"Organisation zu löschen, aber Du kannst die Objekte mit einer anderen "
 "Organisation verbinden. Alternativ kannst Du diese Organisation auch "
 "archivieren."
 
@@ -2120,6 +2120,10 @@ msgstr "%s zu Projekt kopieren"
 #: workbench/templates/projects/project_detail.html
 msgid "planning"
 msgstr "Planung"
+
+#: workbench/planning/forms.py
+msgid "Select team"
+msgstr "Team auswählen"
 
 #: workbench/planning/forms.py workbench/planning/models.py
 #: workbench/templates/reporting/accepted_deals.html
