@@ -307,3 +307,27 @@ class PlanningTest(TestCase):
         self.assertEqual(receivers[only_receiver], [])
         self.assertEqual(receivers[both.user], [both])
         self.assertEqual(receivers[only_pw.user], [only_pw])
+
+    def test_planning_views(self):
+        """The planning views do not crash"""
+        user = factories.UserFactory.create()
+        team = factories.TeamFactory.create()
+        project = factories.ProjectFactory.create()
+
+        self.client.force_login(user)
+
+        response = self.client.get(user.urls["planning"])
+        self.assertContains(response, 'id="planning-data"')
+
+        response = self.client.get(team.urls["planning"])
+        self.assertContains(response, 'id="planning-data"')
+
+        response = self.client.get(project.urls["planning"])
+        self.assertContains(response, 'id="planning-data"')
+
+    def test_this_week_index(self):
+        """this_week_index is None if current week isn't part of the report"""
+        pw = factories.PlannedWorkFactory.create(weeks=[dt.date(2020, 6, 22)])
+
+        report = reporting.project_planning(pw.project)
+        self.assertIsNone(report["this_week_index"])
