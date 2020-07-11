@@ -121,6 +121,18 @@ class AWTTest(TestCase):
         # 306 * 8 - 1000 - 21.25 * 8 - 10 * 8 = 1198
         self.assertAlmostEqual(awt["totals"]["running_sum"], Decimal("-1198"))
 
+        # Now, test that the PDF does not crash
+        self.client.force_login(user)
+
+        response = self.client.get("/report/annual-working-time/?export=pdf&year=2018")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["content-type"], "application/pdf")
+
+        user.employments.all().delete()
+        response = self.client.get("/report/annual-working-time/?export=pdf&year=2018")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["content-type"], "application/pdf")
+
     def test_admin_list(self):
         """The admin changelist of years contains the calculated sum of working days"""
         self.client.force_login(factories.UserFactory.create(is_admin=True))

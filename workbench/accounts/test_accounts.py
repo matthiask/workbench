@@ -127,9 +127,6 @@ class AccountsTest(TestCase):
         response = self.client.get("/users/{}/".format(user.id))
         self.assertContains(response, user.email)
 
-        response = self.client.get("/users/{}/planning/".format(user.id))
-        self.assertContains(response, 'id="planning-data"')
-
         response = self.client.get("/users/{}/statistics/".format(user.id))
         self.assertContains(response, "Hours per week")
 
