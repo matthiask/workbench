@@ -13,9 +13,11 @@
         <a class="nav-link" href="{{ user.urls.detail }}">{% trans 'user'|capfirst %}</a>
       </li>
       {% mark_current request.path %}
-      <li class="nav-item">
-        <a class="nav-link" href="{{ user.urls.planning }}">{% trans 'Planning' %}</a>
-      </li>
+      {% if request.user|has_feature:FEATURES.PLANNING %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ user.urls.planning }}">{% trans 'Planning' %}</a>
+        </li>
+      {% endif %}
       <li class="nav-item">
         <a class="nav-link" href="{{ user.urls.statistics }}">{% trans 'Statistics' %}</a>
       </li>
