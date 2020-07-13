@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 from django.db import models
 from django.db.models import Sum
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 import phonenumbers
 from django_countries.fields import CountryField
@@ -69,7 +69,10 @@ class Organization(Model):
         verbose_name_plural = _("organizations")
 
     def __str__(self):
-        return self.name.replace("\n", " ")
+        parts = [self.name.replace("\n", " ")]
+        if self.is_archived:
+            parts.append(gettext("(archived)"))
+        return " ".join(parts)
 
     @classmethod
     def allow_delete(cls, instance, request):
@@ -166,7 +169,10 @@ class Person(Model):
         verbose_name_plural = _("people")
 
     def __str__(self):
-        return self.full_name
+        parts = [self.full_name]
+        if self.is_archived:
+            parts.append(gettext("(archived)"))
+        return " ".join(parts)
 
     @property
     def full_name(self):

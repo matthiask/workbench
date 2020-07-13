@@ -431,3 +431,15 @@ Other street 42
         self.assertEqual(
             list(autocomplete_filter(request=req, queryset=Person.objects.all())), []
         )
+
+    def test_archived_str(self):
+        """__str__ of archived persons and organizations mentions the archival"""
+        person = factories.PersonFactory.build(
+            given_name="Test", family_name="Just", is_archived=True
+        )
+        self.assertEqual(str(person), "Test Just (archived)")
+
+        organization = factories.OrganizationFactory.build(
+            name="Test", is_archived=True
+        )
+        self.assertEqual(str(organization), "Test (archived)")
