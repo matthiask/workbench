@@ -183,8 +183,8 @@ class Planning:
                 for offer, work_list in sorted(offers.items())
             ),
             key=lambda row: (
-                row["offer"]["date_until"],
                 row["offer"]["date_from"],
+                row["offer"]["date_until"],
                 -row["offer"]["planned_hours"],
             ),
         )
@@ -274,8 +274,8 @@ where percentage is not NULL -- NULL produced by outer join
                     for project, offers in self._projects_offers.items()
                 ],
                 key=lambda row: (
-                    row["project"]["date_until"],
                     row["project"]["date_from"],
+                    row["project"]["date_until"],
                     -row["project"]["planned_hours"],
                 ),
             ),
