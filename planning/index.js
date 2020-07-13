@@ -115,7 +115,7 @@ function Planning({data}) {
         )}
         {data.capacity && (
           <TotalByWeek
-            by_week={data.by_week}
+            by_week={data.requested_by_week}
             title={gettext("Requested hours per week")}
           />
         )}
