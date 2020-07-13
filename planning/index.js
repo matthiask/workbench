@@ -106,9 +106,18 @@ function Planning({data}) {
             dailyPlanningHours={data.daily_planning_hours}
           />
         )}
-        <TotalByWeek by_week={data.by_week} />
+        <TotalByWeek
+          by_week={data.by_week}
+          title={gettext("Planned hours per week")}
+        />
         {data.capacity && (
           <DeltaByWeek planned={data.by_week} capacity={data.capacity.total} />
+        )}
+        {data.capacity && (
+          <TotalByWeek
+            by_week={data.by_week}
+            title={gettext("Requested hours per week")}
+          />
         )}
         {data.projects_offers.map((project) => (
           <Project key={project.project.id} {...project} />
@@ -123,7 +132,7 @@ function Planning({data}) {
   )
 }
 
-function TotalByWeek({by_week}) {
+function TotalByWeek({by_week, title}) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
   return (
@@ -134,7 +143,7 @@ function TotalByWeek({by_week}) {
         colspan={`span ${FIRST_DATA_COLUMN - 1}`}
         className="planning--scale text-right pr-2"
       >
-        <strong>{gettext("Planned hours per week")}</strong>
+        <strong>{title}</strong>
       </Cell>
       {by_week.map((hours, idx) => (
         <Cell

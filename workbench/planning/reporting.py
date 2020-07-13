@@ -24,6 +24,7 @@ class Planning:
         self.users = users
 
         self._by_week = defaultdict(lambda: Z1)
+        self._requested_by_week = defaultdict(lambda: Z1)
         self._by_project_and_week = defaultdict(lambda: defaultdict(lambda: Z1))
         self._projects_offers = defaultdict(lambda: defaultdict(list))
         self._project_ids = set()
@@ -83,6 +84,8 @@ class Planning:
             date_from = min(pr.weeks)
             date_until = max(pr.weeks)
             per_week = (pr.requested_hours / len(pr.weeks)).quantize(Z2)
+            for week in pr.weeks:
+                self._requested_by_week[week] += per_week
 
             self._projects_offers[pr.project][pr.offer].append(
                 {
@@ -279,6 +282,7 @@ where percentage is not NULL -- NULL produced by outer join
                 ),
             ),
             "by_week": [self._by_week[week] for week in self.weeks],
+            "requested_by_week": [self._requested_by_week[week] for week in self.weeks],
             "absences": [
                 (str(user), lst) for user, lst in sorted(self._absences.items())
             ],
