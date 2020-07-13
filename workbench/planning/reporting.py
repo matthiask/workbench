@@ -81,11 +81,12 @@ class Planning:
             .select_related("project__owned_by", "offer__project", "offer__owned_by")
             .prefetch_related("receivers")
         ).distinct():
-            date_from = min(pr.weeks)
-            date_until = max(pr.weeks)
             per_week = (pr.missing_hours / len(pr.weeks)).quantize(Z2)
             for week in pr.weeks:
                 self._requested_by_week[week] += per_week
+
+            date_from = min(pr.weeks)
+            date_until = max(pr.weeks) + dt.timedelta(days=6)
 
             self._projects_offers[pr.project][pr.offer].append(
                 {
