@@ -1,0 +1,9 @@
+{% load i18n workbench %}
+{% blocktrans with project=object.project.title %}New planning request on {{ project }}{% endblocktrans %}
+
+{% trans 'planning request'|capfirst %}: {{ object.title }}
+{% trans 'project'|capfirst %}: {{ object.project }}
+{% trans 'Missing hours' %}: {{ object.missing_hours|hours }}
+{% trans 'Requested by' %}: {{ object.created_by }}
+
+{{ WORKBENCH.URL }}{{ object.project.urls.planning }}

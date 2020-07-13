@@ -2,13 +2,16 @@ import datetime as dt
 from decimal import Decimal
 from itertools import takewhile
 
+from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Sum, signals
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+
+from authlib.email import render_to_mail
 
 from workbench.accounts.models import User
 from workbench.invoices.utils import recurring
@@ -112,6 +115,19 @@ class PlanningRequest(Model):
     @property
     def missing_hours(self):
         return self.requested_hours - self.planned_hours
+
+
+def receivers_changed(sender, action, instance, pk_set, **kwargs):
+    if action == "post_add":
+        users = User.objects.filter(pk__in=pk_set)
+        render_to_mail(
+            "planning/planningrequest_notification",
+            {"object": instance, "WORKBENCH": settings.WORKBENCH},
+            to=[user.email for user in users],
+        ).send(fail_silently=True)
+
+
+signals.m2m_changed.connect(receivers_changed, sender=PlanningRequest.receivers.through)
 
 
 @model_urls

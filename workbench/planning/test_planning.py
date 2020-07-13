@@ -1,6 +1,7 @@
 import datetime as dt
 from decimal import Decimal
 
+from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import RequestFactory, TestCase
 from django.utils.translation import deactivate_all
@@ -331,3 +332,14 @@ class PlanningTest(TestCase):
 
         report = reporting.project_planning(pw.project)
         self.assertIsNone(report["this_week_index"])
+
+    def test_planning_request_notification(self):
+        """Receivers of a planning request are notified"""
+        pr = factories.PlanningRequestFactory.create()
+        pr.receivers.add(
+            factories.UserFactory.create(),
+            factories.UserFactory.create(),
+            factories.UserFactory.create(),
+        )
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("New planning request", mail.outbox[0].subject)
