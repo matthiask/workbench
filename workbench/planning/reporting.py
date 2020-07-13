@@ -161,6 +161,7 @@ class Planning:
                     {
                         "id": offer.id,
                         "title": offer.title,
+                        "is_declined": offer.is_declined,
                         "url": offer.get_absolute_url(),
                         "creatework": offer.project.urls["creatework"]
                         + "?offer={}".format(offer.pk),
@@ -197,6 +198,7 @@ class Planning:
             "project": {
                 "id": project.id,
                 "title": project.title,
+                "is_closed": bool(project.closed_on),
                 "url": project.get_absolute_url(),
                 "planning": project.urls["planning"],
                 "creatework": project.urls["creatework"],

@@ -280,9 +280,16 @@ function Project({by_week, offers, project}) {
         }}
         className="planning--stripe1"
       />
-      <Cell row={row} column={1} className="planning--title is-project">
+      <Cell
+        row={row}
+        column={1}
+        className={`planning--title is-project ${
+          project.is_closed ? "is-closed" : ""
+        }`}
+      >
         <a href={project.url} target="_blank" rel="noreferrer">
           <strong>{project.title}</strong>
+          {project.is_closed ? <> {gettext("(closed)")}</> : ""}
         </a>
       </Cell>
       <Cell row={row} column={2} style={{color: "var(--primary)"}}>
@@ -363,9 +370,16 @@ function Offer({offer, work_list}) {
       />
       {offer.id ? (
         <>
-          <Cell row={row} column={1} className="planning--title is-offer pl-3">
+          <Cell
+            row={row}
+            column={1}
+            className={`planning--title is-offer ${
+              offer.is_declined ? "is-declined" : ""
+            } pl-3`}
+          >
             <a href={offer.url} target="_blank" rel="noreferrer">
               {offer.title}
+              {offer.is_declined ? <> {gettext("(declined)")}</> : ""}
             </a>
           </Cell>
         </>
@@ -536,26 +550,31 @@ function findContiguousWeekRanges(hours_per_week) {
   return ranges
 }
 
-function Cell({
-  row,
-  column,
-  rowspan = "span 1",
-  colspan = "span 1",
-  tag = "div",
-  children,
-  style = {},
-  ...props
-}) {
-  return React.createElement(
-    tag,
+const Cell = React.forwardRef(
+  (
     {
-      style: {
-        gridRow: `${row} / ${rowspan}`,
-        gridColumn: `${column} / ${colspan}`,
-        ...style,
-      },
-      ...props,
+      row,
+      column,
+      rowspan = "span 1",
+      colspan = "span 1",
+      tag = "div",
+      children,
+      style = {},
+      ...props
     },
-    children
-  )
-}
+    ref
+  ) =>
+    React.createElement(
+      tag,
+      {
+        ref,
+        style: {
+          gridRow: `${row} / ${rowspan}`,
+          gridColumn: `${column} / ${colspan}`,
+          ...style,
+        },
+        ...props,
+      },
+      children
+    )
+)
