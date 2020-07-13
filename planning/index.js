@@ -368,16 +368,6 @@ function Offer({offer, work_list}) {
               {offer.title}
             </a>
           </Cell>
-          <Cell row={row} column={2}>
-            <a
-              className="planning--add-pw"
-              data-toggle="ajaxmodal"
-              title={gettext("Add planned work")}
-              href={offer.creatework}
-            >
-              +
-            </a>
-          </Cell>
         </>
       ) : (
         <Cell row={row} column={1} className="planning--title is-offer pl-3">

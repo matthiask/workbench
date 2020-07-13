@@ -161,7 +161,6 @@ class Planning:
                     {
                         "id": offer.id,
                         "title": offer.title,
-                        "code": offer.code,
                         "url": offer.get_absolute_url(),
                         "creatework": offer.project.urls["creatework"]
                         + "?offer={}".format(offer.pk),
@@ -198,7 +197,6 @@ class Planning:
             "project": {
                 "id": project.id,
                 "title": project.title,
-                "code": project.code,
                 "url": project.get_absolute_url(),
                 "planning": project.urls["planning"],
                 "creatework": project.urls["creatework"],
