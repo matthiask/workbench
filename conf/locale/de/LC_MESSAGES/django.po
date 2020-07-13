@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-11 10:30+0200\n"
+"POT-Creation-Date: 2020-07-13 11:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: workbench/accounts/__init__.py
+#: workbench/accounts/__init__.py workbench/templates/base.html
 msgid "accounts"
 msgstr "Konten"
 
@@ -2115,6 +2115,7 @@ msgid "Copy %s to project"
 msgstr "%s zu Projekt kopieren"
 
 #: workbench/planning/__init__.py workbench/templates/accounts/team_detail.html
+#: workbench/templates/base.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/planning/team_planning.html
 #: workbench/templates/projects/project_detail.html
@@ -2146,14 +2147,6 @@ msgid ""
 msgstr ""
 "Mindestens eine Woche liegt ausserhalb des angefragten Zeitraumes von "
 "%(from)s – %(until)s: %(weeks)s"
-
-#: workbench/planning/models.py
-msgid "planning team membership"
-msgstr "Planungsteam-Mitgliedschaft"
-
-#: workbench/planning/models.py
-msgid "planning team memberships"
-msgstr "Planungsteam-Mitgliedschaften"
 
 #: workbench/planning/models.py
 msgid "requested hours"
@@ -2724,8 +2717,8 @@ msgid "Keyboard shortcuts"
 msgstr "Tastaturkürzel"
 
 #: workbench/templates/base.html
-msgid "Admin panel"
-msgstr "Verwaltung"
+msgid "Time tracking"
+msgstr "Zeiterfassung"
 
 #: workbench/templates/base.html
 msgid "Timer"
@@ -2745,6 +2738,10 @@ msgstr "Deine geplante Arbeit"
 #: workbench/templates/reporting/work_anniversaries.html
 msgid "Work anniversaries"
 msgstr "Jubiläen"
+
+#: workbench/templates/base.html
+msgid "Admin panel"
+msgstr "Verwaltung"
 
 #: workbench/templates/base.html
 msgid "Sign out"
@@ -3538,6 +3535,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "planning team membership"
+#~ msgstr "Planungsteam-Mitgliedschaft"
+
+#~ msgid "planning team memberships"
+#~ msgstr "Planungsteam-Mitgliedschaften"
 
 #~ msgid "Request"
 #~ msgstr "Anfrage"
