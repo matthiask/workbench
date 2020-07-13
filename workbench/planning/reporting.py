@@ -83,7 +83,7 @@ class Planning:
         ).distinct():
             date_from = min(pr.weeks)
             date_until = max(pr.weeks)
-            per_week = (pr.requested_hours / len(pr.weeks)).quantize(Z2)
+            per_week = (pr.missing_hours / len(pr.weeks)).quantize(Z2)
             for week in pr.weeks:
                 self._requested_by_week[week] += per_week
 
@@ -95,7 +95,7 @@ class Planning:
                         "title": pr.title,
                         "requested_hours": pr.requested_hours,
                         "planned_hours": pr.planned_hours,
-                        "missing_hours": pr.requested_hours - pr.planned_hours,
+                        "missing_hours": pr.missing_hours,
                         "url": pr.get_absolute_url(),
                         "date_from": date_from,
                         "date_until": date_until,

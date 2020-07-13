@@ -109,6 +109,10 @@ class PlanningRequest(Model):
             work.setdefault(pw.user, []).append(pw)
         return sorted(work.items())
 
+    @property
+    def missing_hours(self):
+        return self.requested_hours - self.planned_hours
+
 
 @model_urls
 class PlannedWork(Model):
