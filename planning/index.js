@@ -50,6 +50,10 @@ function Planning({data}) {
     gridRef.current.style.gridTemplateRows = `14px 16px 16px repeat(${
       rowCtx.current() - 2
     }, var(--default-height))`
+
+    Array.from(document.querySelectorAll(".planning--title a")).forEach(
+      (el) => (el.title = el.textContent)
+    )
   }, [])
 
   return (
@@ -371,6 +375,10 @@ function Offer({offer, work_list}) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
+  const classList = ["planning--title is-offer pl-3"]
+  if (offer.is_declined) classList.push("is-declined")
+  if (!offer.is_accepted) classList.push("is-not-accepted")
+
   return (
     <>
       <div
@@ -382,16 +390,15 @@ function Offer({offer, work_list}) {
       />
       {offer.id ? (
         <>
-          <Cell
-            row={row}
-            column={1}
-            className={`planning--title is-offer ${
-              offer.is_declined ? "is-declined" : ""
-            } pl-3`}
-          >
+          <Cell row={row} column={1} className={classList.join(" ")}>
             <a href={offer.url} target="_blank" rel="noreferrer">
               {offer.title}
               {offer.is_declined ? <> {gettext("(declined)")}</> : ""}
+              {!offer.is_accepted && !offer.is_declined ? (
+                <> {gettext("(not accepted yet)")}</>
+              ) : (
+                ""
+              )}
             </a>
           </Cell>
         </>

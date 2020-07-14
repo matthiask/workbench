@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-13 22:34+0200\n"
+"POT-Creation-Date: 2020-07-14 09:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -130,7 +130,8 @@ msgstr "Members"
 msgid "team"
 msgstr "Team"
 
-#: workbench/accounts/models.py workbench/templates/base.html
+#: workbench/accounts/models.py workbench/templates/accounts/user_detail.html
+#: workbench/templates/base.html
 msgid "teams"
 msgstr "Teams"
 
@@ -2123,6 +2124,7 @@ msgstr "%s zu Projekt kopieren"
 #: workbench/templates/base.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/planning/team_planning.html
+#: workbench/templates/planning/user_planning.html
 #: workbench/templates/projects/project_detail.html
 msgid "planning"
 msgstr "Planung"
@@ -2585,6 +2587,7 @@ msgid "Planning"
 msgstr "Planung"
 
 #: workbench/templates/accounts/user_base.html
+#: workbench/templates/accounts/user_statistics.html
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_statistics.html
@@ -3038,6 +3041,10 @@ msgstr "Fehlende Stunden"
 #: workbench/templates/planning/planningrequest_notification.txt
 msgid "Requested by"
 msgstr "Anfrage von"
+
+#: workbench/templates/planning/planningrequest_notification.txt
+msgid "Receivers"
+msgstr "Adressat*innen"
 
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html

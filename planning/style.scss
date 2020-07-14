@@ -50,6 +50,9 @@
   &.is-offer {
     background-color: var(--stripe2);
 
+    &.is-not-accepted a {
+      color: rgba(220, 140, 20, 1);
+    }
     &.is-declined a {
       color: rgba(180, 50, 0, 1);
     }

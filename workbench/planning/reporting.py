@@ -163,6 +163,7 @@ class Planning:
                         "id": offer.id,
                         "title": offer.title,
                         "is_declined": offer.is_declined,
+                        "is_accepted": offer.is_accepted,
                         "url": offer.get_absolute_url(),
                         "creatework": offer.project.urls["creatework"]
                         + "?offer={}".format(offer.pk),

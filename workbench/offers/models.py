@@ -240,6 +240,10 @@ class Offer(ModelWithTotal):
         return True
 
     @property
+    def is_accepted(self):
+        return self.status == self.ACCEPTED
+
+    @property
     def is_declined(self):
         return self.status == self.DECLINED
 
