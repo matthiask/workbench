@@ -26,7 +26,11 @@ register = template.Library()
 register.filter(currency)
 register.filter(days)
 register.filter(hours)
-register.filter(local_date_format)
+
+
+@register.filter(name="local_date_format")
+def local_date_format_filter(dttm, fmt=None):
+    return local_date_format(dttm, fmt=fmt)
 
 
 @register.simple_tag
@@ -57,6 +61,7 @@ def field_value_pairs(object, fields=None):
     for field in object._meta.get_fields():
         if (
             field.one_to_many
+            or field.one_to_one
             or field.many_to_many
             or field.primary_key
             or field.name in {"_fts"}

@@ -25,7 +25,7 @@ class BreaksTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        Break.objects.create(
+        brk = Break.objects.create(
             user=factories.UserFactory.create(),
             starts_at=c(dt.date.today(), dt.time(12, 0)),
             ends_at=c(dt.date.today(), dt.time(13, 0)),
@@ -36,6 +36,9 @@ class BreaksTest(TestCase):
         code("user=-1")
         code("user={}".format(user.pk))
         code("export=xlsx")
+
+        response = self.client.get(brk.urls["detail"])
+        self.assertContains(response, str(brk))
 
     def test_valid_break(self):
         """Model validation of a valid break raises no exceptions"""

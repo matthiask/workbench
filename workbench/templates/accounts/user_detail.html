@@ -13,6 +13,10 @@
     </tr>
     {% endfor %}
     <tr>
+      <th class="text-right">{% trans 'person'|capfirst %}</th>
+      <td>{% link_or_none object.person %}</td>
+    </tr>
+    <tr>
       <th class="text-right">{% trans 'teams'|capfirst %}</th>
       <td>
         {% for team in object.teams.all %}{% link_or_none team %}{% endfor %}

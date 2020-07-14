@@ -6,12 +6,21 @@
 
 {% block body %}
   <table class="table table-striped">
-    {% for name, value in object|field_value_pairs %}
     <tr>
-      <th class="text-right">{{ name }}</th>
-      <td>{% link_or_none value %}</td>
+      <th class="text-right">{{ object|label:'user' }}</th>
+      <td>{% link_or_none object.user %}</td>
     </tr>
-    {% endfor %}
+    <tr>
+      <th class="text-right">{% trans 'break'|capfirst %}</th>
+      <td>
+        {{ object.starts_at|local_date_format:'H:i' }} –
+        {{ object.ends_at|local_date_format:'H:i' }}
+      </td>
+    </tr>
+    <tr>
+      <th class="text-right">{{ object|label:'description' }}</th>
+      <td>{{ object.description|linebreaksbr|default:'–' }}</td>
+    </tr>
   </table>
 {% endblock %}
 
