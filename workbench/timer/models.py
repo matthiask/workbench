@@ -51,7 +51,7 @@ class Slice(dict):
 
         return "{}?{}".format(
             reverse("projects_project_createhours", kwargs={"pk": self["project"].pk})
-            if self.get("project")
+            if self.get("project") and not self["project"].is_logbook_locked
             else reverse("logbook_loggedhours_create"),
             urlencode([pair for pair in params if pair[1]]),
         )

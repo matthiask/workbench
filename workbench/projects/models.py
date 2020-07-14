@@ -525,6 +525,10 @@ class Project(Model):
                 % {"project": self},
             )
 
+    @property
+    def is_logbook_locked(self):
+        return self.closed_on and self.closed_on < in_days(-14)
+
 
 class ServiceQuerySet(SearchQuerySet):
     def choices(self):
