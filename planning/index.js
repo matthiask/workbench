@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const RowContext = createContext()
 
-const FIRST_DATA_ROW = 2
+const FIRST_DATA_ROW = 3
 const FIRST_DATA_COLUMN = 6
 
 function months(weeks) {
@@ -47,7 +47,9 @@ function Planning({data}) {
   }
 
   useLayoutEffect(() => {
-    gridRef.current.style.gridTemplateRows = `repeat(${rowCtx.current()}, var(--default-height))`
+    gridRef.current.style.gridTemplateRows = `repeat(3, 16px) repeat(${
+      rowCtx.current() - 2
+    }, var(--default-height))`
   }, [])
 
   return (
@@ -92,11 +94,21 @@ function Planning({data}) {
         {data.weeks.map((week, idx) => (
           <Cell
             key={idx}
-            className="planning--scale text-center"
+            className="planning--scale text-center planning--small"
             row={2}
             column={FIRST_DATA_COLUMN + idx}
           >
-            <strong>{week.day}</strong>
+            {week.week}
+          </Cell>
+        ))}
+        {data.weeks.map((week, idx) => (
+          <Cell
+            key={idx}
+            className="planning--scale text-center planning--smaller"
+            row={3}
+            column={FIRST_DATA_COLUMN + idx}
+          >
+            {week.period}
           </Cell>
         ))}
 

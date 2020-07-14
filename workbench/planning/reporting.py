@@ -267,7 +267,11 @@ where percentage is not NULL -- NULL produced by outer join
             "weeks": [
                 {
                     "month": local_date_format(week, fmt="F"),
-                    "day": local_date_format(week, fmt="d."),
+                    "week": local_date_format(week, fmt="W"),
+                    "period": "{}–{}".format(
+                        local_date_format(week, fmt="j."),
+                        local_date_format(week + dt.timedelta(days=6), fmt="j."),
+                    ),
                 }
                 for week in self.weeks
             ],
