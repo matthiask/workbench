@@ -56,6 +56,10 @@ function Planning({data}) {
     )
   }, [])
 
+  const plannedAndRequested = data.requested_by_week.map(
+    (hours, idx) => parseFloat(hours) + parseFloat(data.by_week[idx])
+  )
+
   return (
     <RowContext.Provider value={rowCtx}>
       <div
@@ -127,13 +131,20 @@ function Planning({data}) {
           title={gettext("Planned hours per week")}
         />
         {data.capacity && (
-          <DeltaByWeek planned={data.by_week} capacity={data.capacity.total} />
-        )}
-        {data.capacity && (
-          <TotalByWeek
-            by_week={data.requested_by_week}
-            title={gettext("Requested hours per week")}
-          />
+          <>
+            <DeltaByWeek
+              planned={data.by_week}
+              capacity={data.capacity.total}
+            />
+            <TotalByWeek
+              by_week={data.requested_by_week}
+              title={gettext("Requested hours per week")}
+            />
+            <DeltaByWeek
+              planned={plannedAndRequested}
+              capacity={data.capacity.total}
+            />
+          </>
         )}
         {data.projects_offers.map((project) => (
           <Project key={project.project.id} {...project} />
@@ -563,8 +574,6 @@ function findContiguousWeekRanges(hours_per_week) {
       length: hours_per_week.length - rangeStart,
     })
   }
-
-  console.log({ranges})
 
   return ranges
 }
