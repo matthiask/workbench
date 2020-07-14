@@ -2,6 +2,8 @@
 
 {% load i18n workbench webpack_loader %}
 
+{% block title %}{% trans 'planning'|capfirst %} - {{ block.super }}{% endblock %}
+
 {% block inner_content %}
 
   <div id="planning-root" class="planning-wrapper"></div>

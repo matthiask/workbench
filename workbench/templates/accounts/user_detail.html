@@ -6,7 +6,7 @@
 <div class="row">
 <div class="col-md-6 offset-md-3">
   <table class="table table-striped">
-    {% for name, value in object|field_value_pairs:'email,is_active,_short_name,_full_name,language,working_time_model' %}
+    {% for name, value in object|field_value_pairs:'email,is_active,_short_name,_full_name,language,working_time_model,person' %}
     <tr>
       <th class="text-right">{{ name }}</th>
       <td>{% link_or_none value %}</td>
