@@ -1,3 +1,4 @@
+import shutil
 import tempfile
 
 from fabric2 import Connection, task
@@ -136,10 +137,18 @@ def cm(c):
     )
 
 
+def _which(binaries):
+    return next(
+        binary for binary in (shutil.which(binary) for binary in binaries) if binary
+    )
+
+
 @task
 def update_requirements(c):
+    interpreter = _which(("python3.9", "python3.8", "python3.7", "python3.6"))
+
     c.run("rm -rf venv")
-    c.run("python3 -m venv venv")
+    c.run("{} -m venv venv".format(interpreter))
     c.run("venv/bin/pip install -U pip wheel setuptools")
     c.run("venv/bin/pip install -U -r requirements-to-freeze.txt --pre")
     freeze(c)
