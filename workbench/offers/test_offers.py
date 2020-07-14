@@ -625,3 +625,8 @@ class OffersTest(TestCase):
             list(cm.exception),
             [("valid_until", ["Valid until date has to be after offered on date."])],
         )
+
+    def test_properties(self):
+        """Offer property testing"""
+        self.assertTrue(Offer(status=Offer.ACCEPTED).is_accepted)
+        self.assertTrue(Offer(status=Offer.DECLINED).is_declined)

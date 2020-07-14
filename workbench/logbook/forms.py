@@ -331,7 +331,7 @@ class LoggedHoursForm(ModelForm):
                 "Deselect the existing service if you want to create a new service."
             )
         if self.project.closed_on:
-            if self.is_logbook_locked:
+            if self.project.is_logbook_locked:
                 errors["__all__"] = _("This project has been closed too long ago.")
             else:
                 self.add_warning(
