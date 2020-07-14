@@ -313,7 +313,7 @@ WORKBENCH = {
                 "frederic@blindflugstudios.com",
                 "mk@feinheit.ch",
             },
-            "planning": False,
+            "planning": True,
             "skip_breaks": True,  # For now
         },
     ),
