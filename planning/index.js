@@ -47,7 +47,7 @@ function Planning({data}) {
   }
 
   useLayoutEffect(() => {
-    gridRef.current.style.gridTemplateRows = `repeat(3, 16px) repeat(${
+    gridRef.current.style.gridTemplateRows = `14px 16px 16px repeat(${
       rowCtx.current() - 2
     }, var(--default-height))`
   }, [])
@@ -84,7 +84,7 @@ function Planning({data}) {
         {months(data.weeks).map((month, idx) => (
           <Cell
             key={idx}
-            className="planning--scale pl-3"
+            className="planning--scale text-center planning--small"
             row={1}
             column={FIRST_DATA_COLUMN + month.index}
           >

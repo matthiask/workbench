@@ -266,7 +266,7 @@ where percentage is not NULL -- NULL produced by outer join
             "this_week_index": this_week_index,
             "weeks": [
                 {
-                    "month": local_date_format(week, fmt="F"),
+                    "month": local_date_format(week, fmt="M"),
                     "week": local_date_format(week, fmt="W"),
                     "period": "{}–{}".format(
                         local_date_format(week, fmt="j."),
