@@ -57,7 +57,6 @@ def field_value_pairs(object, fields=None):
     for field in object._meta.get_fields():
         if (
             field.one_to_many
-            or field.one_to_one
             or field.many_to_many
             or field.primary_key
             or field.name in {"_fts"}
