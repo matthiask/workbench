@@ -1,5 +1,3 @@
-import re
-
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -14,7 +12,7 @@ from workbench.contacts.models import Organization, Person
 from workbench.projects.models import Campaign, Project, Service
 from workbench.services.models import ServiceType
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
-from workbench.tools.validation import in_days
+from workbench.tools.validation import in_days, is_title_specific
 
 
 class CampaignSearchForm(Form):
@@ -352,9 +350,6 @@ class ProjectForm(ModelForm):
         return instance
 
 
-UNSPECIFIC_TITLE = re.compile(r"(general|allg|unspec)", re.I)
-
-
 class ServiceForm(ModelForm):
     service_type = forms.ModelChoiceField(
         ServiceType.objects.all(),
@@ -425,7 +420,7 @@ class ServiceForm(ModelForm):
         data = super().clean()
         if self.request.user.features[FEATURES.GLASSFROG] and not data.get("role"):
             self.add_warning(_("No role selected."), code="no-role-selected")
-        if UNSPECIFIC_TITLE.search(data.get("title", "")):
+        if data.get("title") and not is_title_specific(data["title"]):
             self.add_warning(
                 _(
                     "This title seems awfully unspecific."

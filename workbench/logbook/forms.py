@@ -16,7 +16,6 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
-from workbench.projects.forms import UNSPECIFIC_TITLE
 from workbench.projects.models import Project, Service
 from workbench.timer.models import Timestamp
 from workbench.tools.forms import (
@@ -27,7 +26,12 @@ from workbench.tools.forms import (
     Textarea,
     add_prefix,
 )
-from workbench.tools.validation import in_days, logbook_lock, raise_if_errors
+from workbench.tools.validation import (
+    in_days,
+    is_title_specific,
+    logbook_lock,
+    raise_if_errors,
+)
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -341,7 +345,7 @@ class LoggedHoursForm(ModelForm):
             self.add_warning(
                 _("This entry is already part of an invoice."), code="part-of-invoice"
             )
-        if UNSPECIFIC_TITLE.search(data.get("service_title", "")):
+        if data.get("service_title") and not is_title_specific(data["service_title"]):
             self.add_warning(
                 _(
                     "This title seems awfully unspecific."

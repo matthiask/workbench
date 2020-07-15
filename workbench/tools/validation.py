@@ -1,4 +1,5 @@
 import datetime as dt
+import re
 from functools import wraps
 
 from django.contrib import messages
@@ -41,3 +42,11 @@ def filter_form(form_class):
 
 def in_days(days):
     return dt.date.today() + dt.timedelta(days=days)
+
+
+UNSPECIFIC_TITLE = re.compile(r"(general|allg|unspec)", re.I)
+WHITESPACE = re.compile(r"\s+")
+
+
+def is_title_specific(title):
+    return not UNSPECIFIC_TITLE.search(title) or len(WHITESPACE.split(title)) >= 5

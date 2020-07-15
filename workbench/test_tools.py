@@ -12,6 +12,7 @@ from workbench.tools import formats
 from workbench.tools.forms import Autocomplete
 from workbench.tools.models import ModelWithTotal
 from workbench.tools.testing import messages
+from workbench.tools.validation import is_title_specific
 
 
 class ToolsTest(TestCase):
@@ -87,3 +88,11 @@ class ToolsTest(TestCase):
         ]:
             with self.subTest(value=value, result=result):
                 self.assertEqual(formats.hours(value), result)
+
+    def test_is_title_specific(self):
+        """is_title_specific tests"""
+        self.assertTrue(is_title_specific("Implementation Kontaktformular"))
+        self.assertFalse(is_title_specific("Programmierung allgemein"))
+        self.assertTrue(
+            is_title_specific("Analyse der Storyboards und allgemeine Anforderungen")
+        )
