@@ -143,7 +143,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(
             partial,
             [
-                (None, "", "07:40", ts2.pk, "", None),
+                (Decimal(0), "", "07:40", ts2.pk, "", None),
                 (Decimal("0.4"), "07:40", "08:00", ts1.pk, "", None),
                 (Decimal("1.0"), "08:00", "09:00", None, "", "<detected>"),
                 (Decimal("0.7"), "09:00", "09:40", t2.pk, "Aaa; Bbb", None),

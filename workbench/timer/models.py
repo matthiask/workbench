@@ -30,6 +30,9 @@ class Slice(dict):
             seconds = self["logged_break"].timedelta.total_seconds()
         elif self.get("starts_at") and self.get("ends_at"):
             seconds = (self["ends_at"] - self["starts_at"]).total_seconds()
+        elif not self.get("starts_at") and self.get("ends_at"):
+            # STOP only; no way to prefill a nonzero elapsed hours value
+            return Decimal(0)
         else:
             return None
         return Decimal(seconds / 3600).quantize(Z1, rounding=ROUND_UP)
@@ -49,12 +52,15 @@ class Slice(dict):
         else:  # No timestamp ID and no associated log -- it's a detected slice!
             params.append(("detected_ends_at", self["ends_at"]))
 
-        return "{}?{}".format(
+        url = (
             reverse("projects_project_createhours", kwargs={"pk": self["project"].pk})
             if self.get("project") and not self["project"].is_logbook_locked
-            else reverse("logbook_loggedhours_create"),
-            urlencode([pair for pair in params if pair[1]]),
+            else reverse("logbook_loggedhours_create")
         )
+        # Keep zero too (see elapsed_hours above)
+        query = urlencode([pair for pair in params if pair[1] or pair[1] == 0])
+
+        return "{}?{}".format(url, query)
 
     @property
     def break_create_url(self):
