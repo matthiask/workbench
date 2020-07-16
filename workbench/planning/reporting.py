@@ -66,6 +66,7 @@ class Planning:
                     "hours_per_week": [
                         per_week if week in pw.weeks else Z1 for week in self.weeks
                     ],
+                    "per_week": per_week,
                 }
             )
 
@@ -108,6 +109,7 @@ class Planning:
                     "hours_per_week": [
                         per_week if week in pr.weeks else Z1 for week in self.weeks
                     ],
+                    "per_week": per_week,
                 }
             )
 

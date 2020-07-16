@@ -436,7 +436,7 @@ function Offer({offer, work_list}) {
   )
 }
 
-function Work({work, hours_per_week, isEven}) {
+function Work({work, hours_per_week, per_week, isEven}) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
   return (
@@ -489,6 +489,7 @@ function Work({work, hours_per_week, isEven}) {
           tag="a"
           href={work.url}
           data-toggle="ajaxmodal"
+          title={interpolate(gettext("%sh per week"), [fixed(per_week, 1)])}
         />
       ))}
     </>
