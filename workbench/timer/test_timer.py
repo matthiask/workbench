@@ -496,3 +496,14 @@ class TimestampsTest(TestCase):
         slices = Timestamp.objects.slices(user)
         self.assertEqual(len(slices), 1)
         self.assertEqual(slices[0]["timestamp_id"], t2.pk)
+
+    def test_elapsed_none_with_only_start(self):
+        """A bare START makes one slice with no elapsed time at all"""
+        user = factories.UserFactory.create()
+        user.timestamp_set.create(
+            type=Timestamp.START, created_at=timezone.now() - dt.timedelta(seconds=900)
+        )
+
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(len(slices), 1)
+        self.assertEqual(slices[0].elapsed_hours, None)
