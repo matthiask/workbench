@@ -19,8 +19,8 @@ TIMESTAMPS_DETECT_GAP = 300  # seconds
 
 class Slice(dict):
     @property
-    def no_associated_log(self):
-        return not (self.get("logged_hours") or self.get("logged_break"))
+    def has_associated_log(self):
+        return bool(self.get("logged_hours") or self.get("logged_break"))
 
     @property
     def elapsed_hours(self):
@@ -39,7 +39,7 @@ class Slice(dict):
 
     @property
     def hours_create_url(self):
-        if not self.no_associated_log:
+        if self.has_associated_log:
             return None
 
         params = [
@@ -64,7 +64,7 @@ class Slice(dict):
 
     @property
     def break_create_url(self):
-        if not self.no_associated_log:
+        if self.has_associated_log:
             return None
 
         params = [
@@ -186,10 +186,10 @@ class TimestampQuerySet(models.QuerySet):
 
             if (
                 previous["is_start"]
-                and previous.no_associated_log
+                and not previous.has_associated_log
                 and not slice["is_start"]
             ):
-                if slice.no_associated_log:
+                if not slice.has_associated_log:
                     previous.update(
                         {
                             "timestamp_id": slice["timestamp_id"],

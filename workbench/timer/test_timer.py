@@ -179,9 +179,9 @@ class TimestampsTest(TestCase):
         self.assertEqual(slices[1].elapsed_hours, Decimal("0.2"))
         self.assertEqual(slices[2].elapsed_hours, Decimal("0.2"))
 
-        self.assertTrue(slices[0].no_associated_log)
-        self.assertFalse(slices[1].no_associated_log)
-        self.assertTrue(slices[2].no_associated_log)
+        self.assertFalse(slices[0].has_associated_log)
+        self.assertTrue(slices[1].has_associated_log)
+        self.assertFalse(slices[2].has_associated_log)
 
         self.assertEqual(l1, slices[1]["description"])
 
@@ -369,7 +369,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(len(slices), 3)
         self.assertEqual(slices[1].elapsed_hours, Decimal("2"))
 
-        self.assertTrue(slices[1].no_associated_log)
+        self.assertFalse(slices[1].has_associated_log)
         self.assertIn("detected_ends_at", slices[1].hours_create_url)
 
         self.client.force_login(user)
@@ -409,7 +409,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(len(slices), 3)
         self.assertEqual(slices[1].elapsed_hours, Decimal("2"))
 
-        self.assertTrue(slices[1].no_associated_log)
+        self.assertFalse(slices[1].has_associated_log)
         self.assertIn("detected_ends_at", slices[1].break_create_url)
 
         self.client.force_login(user)

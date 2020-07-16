@@ -122,7 +122,7 @@ def list_timestamps(request):
                     "comment": slice.get("comment", "")
                     or (
                         "[{}]".format(slice["project"])
-                        if slice.no_associated_log and slice.get("project")
+                        if not slice.has_associated_log and slice.get("project")
                         else ""
                     ),
                 }
