@@ -27,6 +27,18 @@ class OfferQuerySet(SearchQuerySet):
             [("", "----------")] + offers[True] + [(_("In preparation"), offers[False])]
         )
 
+    def not_declined_choices(self, *, include=None):
+        offers = {True: [], False: []}
+        for offer in self.filter(
+            ~Q(status=Offer.DECLINED) | Q(pk=include)
+        ).select_related("project", "owned_by"):
+            offers[offer.is_declined].append((offer.pk, offer))
+        return (
+            [("", "----------")]
+            + offers[False]
+            + ([(_("Declined"), offers[True])] if offers[True] else [])
+        )
+
     def maybe_actionable(self, *, user):
         return self.filter(
             Q(status__lt=Offer.ACCEPTED),

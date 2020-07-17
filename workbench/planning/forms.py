@@ -80,8 +80,10 @@ class PlanningRequestForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.instance.project = self.project
 
-        self.fields["offer"].queryset = self.instance.project.offers.select_related(
-            "owned_by"
+        self.fields[
+            "offer"
+        ].choices = self.instance.project.offers.not_declined_choices(
+            include=self.instance.offer_id
         )
 
         q = Q(is_active=True)
@@ -195,8 +197,10 @@ class PlannedWorkForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.instance.project = self.project
 
-        self.fields["offer"].queryset = self.instance.project.offers.select_related(
-            "owned_by"
+        self.fields[
+            "offer"
+        ].choices = self.instance.project.offers.not_declined_choices(
+            include=self.instance.offer_id
         )
         self.fields["request"].queryset = self.instance.project.planning_requests.all()
 
