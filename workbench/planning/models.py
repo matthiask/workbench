@@ -61,7 +61,7 @@ class PlanningRequest(Model):
     closed_at = models.DateTimeField(_("closed at"), blank=True, null=True)
 
     class Meta:
-        ordering = ["earliest_start_on", "completion_requested_on"]
+        ordering = ["-pk"]
         verbose_name = _("planning request")
         verbose_name_plural = _("planning requests")
 
@@ -169,7 +169,7 @@ class PlannedWork(Model):
     weeks = ArrayField(models.DateField(), verbose_name=_("weeks"))
 
     class Meta:
-        ordering = ["weeks"]
+        ordering = ["-pk"]
         verbose_name = _("planned work")
         verbose_name_plural = _("planned work")
 

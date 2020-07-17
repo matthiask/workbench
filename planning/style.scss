@@ -132,7 +132,7 @@
     background-color: var(--teal);
   }
 
-  &.is-pr {
+  &.is-request {
     background-image: repeating-linear-gradient(
       125deg,
       var(--teal) 0,
@@ -149,7 +149,7 @@
   }
 
   &.is-pw:hover,
-  &.is-pr:hover {
+  &.is-request:hover {
     opacity: 0.7;
   }
 }

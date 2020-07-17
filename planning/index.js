@@ -451,7 +451,7 @@ function Work({work, hours_per_week, per_week, isEven}) {
         row={row}
         column={1}
         className={`planning--title ${
-          work.is_request ? "is-pr font-italic" : "is-pw"
+          work.is_request ? "is-request font-italic" : "is-pw"
         } planning--small pl-5`}
       >
         <a href={work.url} data-toggle="ajaxmodal">
@@ -474,7 +474,13 @@ function Work({work, hours_per_week, per_week, isEven}) {
             )}h`
           : `${fixed(work.planned_hours, 0)}h`}
       </Cell>
-      <Cell row={row} column={5} className="planning--small text-center">
+      <Cell
+        row={row}
+        column={5}
+        className={`planning--small ${
+          work.is_request ? "font-italic" : ""
+        } text-center`}
+      >
         {work.user}
       </Cell>
       {findContiguousWeekRanges(hours_per_week).map((range, idx) => (
@@ -484,7 +490,7 @@ function Work({work, hours_per_week, per_week, isEven}) {
           column={FIRST_DATA_COLUMN + range.start}
           colspan={`span ${range.length}`}
           className={`planning--range planning--small ${
-            work.is_request ? "is-pr" : "is-pw"
+            work.is_request ? "is-request" : "is-pw"
           }`}
           tag="a"
           href={work.url}

@@ -95,6 +95,7 @@ class Planning:
                         "is_request": True,
                         "id": pr.id,
                         "title": pr.title,
+                        "user": pr.created_by.get_short_name(),
                         "requested_hours": pr.requested_hours,
                         "planned_hours": pr.planned_hours,
                         "missing_hours": pr.missing_hours,

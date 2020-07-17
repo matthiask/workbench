@@ -155,7 +155,7 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "planning request",
                 "verbose_name_plural": "planning requests",
-                "ordering": ["earliest_start_on", "completion_requested_on"],
+                "ordering": ["-pk"],
             },
         ),
         migrations.CreateModel(
@@ -238,7 +238,7 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "planned work",
                 "verbose_name_plural": "planned work",
-                "ordering": ["weeks"],
+                "ordering": ["-pk"],
             },
         ),
         migrations.RunSQL(
