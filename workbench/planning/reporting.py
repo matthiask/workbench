@@ -310,7 +310,7 @@ def user_planning(user):
 
 def team_planning(team):
     weeks = list(islice(recurring(monday() - dt.timedelta(days=14), "weekly"), 52))
-    planning = Planning(weeks=weeks, users=list(team.members.all()))
+    planning = Planning(weeks=weeks, users=list(team.members.active()))
     planning.add_planned_work(PlannedWork.objects.filter(user__teams=team))
     planning.add_planning_requests(
         PlanningRequest.objects.filter(receivers__teams=team)
