@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 09:40+0200\n"
+"POT-Creation-Date: 2020-07-17 14:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -86,6 +86,7 @@ msgid "working time model"
 msgstr "Arbeitszeitmodell"
 
 #: workbench/accounts/models.py workbench/contacts/models.py
+#: workbench/templates/accounts/user_detail.html
 #: workbench/templates/contacts/organization_detail.html
 msgid "person"
 msgstr "Person"
@@ -1922,8 +1923,8 @@ msgstr "Spesen sind Teil einer Spesenabrechnung, kann Eintrag nicht löschen."
 msgid "Either fill in all fields or none."
 msgstr "Entweder alle Felder einfüllen oder keine."
 
-#: workbench/logbook/models.py workbench/templates/timestamps.html
-#: workbench/timer/models.py
+#: workbench/logbook/models.py workbench/templates/logbook/break_detail.html
+#: workbench/templates/timestamps.html workbench/timer/models.py
 msgid "break"
 msgstr "Pause"
 
@@ -2132,6 +2133,10 @@ msgstr "Planung"
 #: workbench/planning/forms.py
 msgid "Select team"
 msgstr "Team auswählen"
+
+#: workbench/planning/forms.py
+msgid "The selected offer is declined."
+msgstr "Die ausgewählte Offerte ist abgelehnt."
 
 #: workbench/planning/forms.py workbench/planning/models.py
 #: workbench/templates/reporting/accepted_deals.html
@@ -2652,7 +2657,7 @@ msgstr "berechnet mit %(hours)s pro Tag"
 msgid "from %(date)s"
 msgstr "Ab %(date)s"
 
-#: workbench/templates/base.html
+#: workbench/templates/base.html workbench/templates/start.html
 msgid "dashboard"
 msgstr "Dashboard"
 

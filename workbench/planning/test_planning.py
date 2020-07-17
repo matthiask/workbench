@@ -343,3 +343,35 @@ class PlanningTest(TestCase):
         )
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("New planning request", mail.outbox[0].subject)
+
+    def test_declined_offer_warning(self):
+        """Warn when offer is declined"""
+        offer = factories.OfferFactory.create(status=factories.Offer.DECLINED)
+        self.client.force_login(offer.owned_by)
+
+        response = self.client.post(
+            offer.project.urls["creatework"],
+            {
+                "modal-user": offer.owned_by_id,
+                "modal-title": "bla",
+                "modal-planned_hours": 50,
+                "modal-weeks": [monday().isoformat()],
+                "modal-offer": offer.id,
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, 'value="offer-is-declined"')
+
+        response = self.client.post(
+            offer.project.urls["createrequest"],
+            {
+                "modal-title": "Request",
+                "modal-earliest_start_on": "2020-06-29",
+                "modal-completion_requested_on": "2020-07-27",
+                "modal-requested_hours": "40",
+                "modal-receivers": [offer.owned_by.id],
+                "modal-offer": offer.id,
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, 'value="offer-is-declined"')

@@ -103,6 +103,16 @@ class PlanningRequestForm(ModelForm):
             ),
         )
 
+    def clean(self):
+        data = super().clean()
+
+        if data.get("offer") and data["offer"].is_declined:
+            self.add_warning(
+                _("The selected offer is declined."), code="offer-is-declined"
+            )
+
+        return data
+
     def save(self):
         if self.instance.pk:
             return super().save()
@@ -264,6 +274,11 @@ class PlannedWorkForm(ModelForm):
                     },
                     code="weeks-outside-request",
                 )
+
+        if data.get("offer") and data["offer"].is_declined:
+            self.add_warning(
+                _("The selected offer is declined."), code="offer-is-declined"
+            )
 
         return data
 
