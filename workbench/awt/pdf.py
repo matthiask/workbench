@@ -34,9 +34,13 @@ def annual_working_time_pdf(statistics):
             xlsx = WorkbenchXLSXDocument()
             xlsx.add_sheet(_("running net work hours"))
             xlsx.table(
-                [""] + [date_format(day, "M") for day in data["months"]["months"]],
+                [""]
+                + [date_format(day, "M") for day in data["months"]["months"]]
+                + [_("vacation days credit")],
                 [
-                    [data["user"].get_full_name()] + data["running_sums"]
+                    [data["user"].get_full_name()]
+                    + data["running_sums"]
+                    + [data["totals"]["vacation_days_credit"]]
                     for data in statistics["statistics"]
                 ],
             )
