@@ -9,6 +9,7 @@ from django.utils.translation import gettext as _
 
 from workbench.tools.formats import days, hours, local_date_format
 from workbench.tools.pdf import PDFDocument, mm
+from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
 def annual_working_time_pdf(statistics):
@@ -30,6 +31,18 @@ def annual_working_time_pdf(statistics):
                     ),
                     user_stats_pdf(data),
                 )
+            xlsx = WorkbenchXLSXDocument()
+            xlsx.add_sheet(_("running net work hours"))
+            xlsx.table(
+                [""] + [date_format(day, "M") for day in data["months"]["months"]],
+                [
+                    [data["user"].get_full_name()] + data["running_sums"]
+                    for data in statistics["statistics"]
+                ],
+            )
+            with io.BytesIO() as x:
+                xlsx.workbook.save(x)
+                zf.writestr("statistics.xlsx", x.getvalue())
         response = HttpResponse(buf.getvalue(), content_type="application/zip")
         response["Content-Disposition"] = 'attachment; filename="awt.zip"'
         return response
