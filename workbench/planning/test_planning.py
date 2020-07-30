@@ -343,6 +343,8 @@ class PlanningTest(TestCase):
         )
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("New planning request", mail.outbox[0].subject)
+        self.assertEqual(len(mail.outbox[0].to), 3)
+        self.assertEqual(len(mail.outbox[0].reply_to), 4)
 
     def test_declined_offer_warning(self):
         """Warn when offer is declined"""

@@ -124,6 +124,7 @@ def receivers_changed(sender, action, instance, pk_set, **kwargs):
             "planning/planningrequest_notification",
             {"object": instance, "WORKBENCH": settings.WORKBENCH},
             to=[user.email for user in users],
+            reply_to=[instance.created_by.email] + [user.email for user in users],
         ).send(fail_silently=True)
 
 

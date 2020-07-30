@@ -111,6 +111,8 @@ class NotesTest(TestCase):
         self.assertRedirects(response, deal.urls["detail"])
 
         self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox[0].to), 1)
+        self.assertEqual(len(mail.outbox[0].reply_to), 2)
 
     def test_content_object_url(self):
         """The content_object_url admin helper works"""

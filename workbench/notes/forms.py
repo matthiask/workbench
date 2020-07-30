@@ -75,6 +75,7 @@ class NoteForm(ModelForm):
                         ),
                     },
                     to=[owned_by.email],
+                    reply_to=[owned_by.email, instance.created_by.email],
                 ).send(fail_silently=True)
 
         return instance
