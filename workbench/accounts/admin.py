@@ -50,17 +50,11 @@ class UserAdmin(UserAdmin):
     ]
     radio_fields = {"language": admin.HORIZONTAL}
     raw_id_fields = ["person"]
+    readonly_fields = ["signed_email", "last_login"]
     search_fields = ("email", "_short_name", "_full_name")
     ordering = ("email",)
     filter_horizontal = ()
     inlines = [EmploymentInline]
-
-    def get_readonly_fields(self, request, obj=None):
-        return (
-            ["signed_email", "email", "enforce_same_week_logging", "last_login"]
-            if obj
-            else ["signed_email", "last_login"]
-        )
 
 
 admin.site.register(User, UserAdmin)

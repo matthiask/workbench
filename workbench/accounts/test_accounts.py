@@ -34,11 +34,9 @@ class AccountsTest(TestCase):
 
         self.client.force_login(user)
 
-        # Email is readonly
+        # Contains the signed email value
         response = self.client.get("/admin/accounts/user/{}/change/".format(user.pk))
-        self.assertContains(
-            response, '<div class="readonly">{}</div>'.format(user.email)
-        )
+        self.assertContains(response, '<div class="readonly">{}:'.format(user.email))
 
         # Creating an user through the admin interface is possible
         wtm = factories.WorkingTimeModelFactory.create()
