@@ -152,4 +152,9 @@
   &.is-request:hover {
     opacity: 0.7;
   }
+
+  &.is-period {
+    height: 6px;
+    margin-top: 8px;
+  }
 }

@@ -483,6 +483,15 @@ function Work({work, hours_per_week, per_week, isEven}) {
       >
         {work.user}
       </Cell>
+      {work.period && (
+        <Cell
+          key={`${work.id}-period`}
+          row={row}
+          column={FIRST_DATA_COLUMN + work.period[0]}
+          colspan={FIRST_DATA_COLUMN + work.period[1] + 1}
+          className="planning--range is-request is-period"
+        />
+      )}
       {findContiguousWeekRanges(hours_per_week).map((range, idx) => (
         <Cell
           key={idx}

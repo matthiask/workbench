@@ -18,6 +18,13 @@ from workbench.tools.validation import monday
 DAILY_PLANNING_HOURS = 6
 
 
+def _period(weeks, min, max):
+    try:
+        return [weeks.index(min), weeks.index(max)]
+    except ValueError:
+        return None
+
+
 class Planning:
     def __init__(self, *, weeks, users=None):
         self.weeks = weeks
@@ -106,6 +113,7 @@ class Planning:
                             local_date_format(date_from, fmt="d.m."),
                             local_date_format(date_until, fmt="d.m."),
                         ),
+                        "period": _period(self.weeks, min(pr.weeks), max(pr.weeks)),
                     },
                     "hours_per_week": [
                         per_week if week in pr.weeks else Z1 for week in self.weeks
