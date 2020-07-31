@@ -133,14 +133,14 @@
     </div>
 
     {% for offer, offer_data in project.grouped_services.offers %}
-    <div class="card my-3 {% if offer and offer.is_declined %}border border-danger opacity-60{% endif %}" id="offer{{ offer.pk }}">
+    <div class="card my-3 {% if offer and offer.is_declined %}border border-danger opacity-60{% endif %}">
       <div class="card-header">
         {% if offer %}
           <div class="d-flex w-100 justify-content-between">
 
             <div>
               <div class="anchor-container"><a name="offer{{ offer.pk }}" class="anchor"></a></div>
-              <h5 class="d-inline my-0">{{ offer|h }}</h5>
+              <h5 class="d-inline my-0"><a href="{{ offer.get_absolute_url }}">{{ offer|h }}</a></h5>
               {% history_link offer %}
               &nbsp;
               {{ offer.status_badge }}
