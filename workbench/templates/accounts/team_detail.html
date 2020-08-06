@@ -32,6 +32,9 @@
   <a href="{{ object.urls.planning }}" class="btn btn-primary">
     {% include 'svg/project.svg' %} {% trans 'planning'|capfirst %}
   </a>
+  <a href="{% url 'awt_absence_calendar' %}?team={{ object.pk }}" class="btn btn-primary">
+    {% trans 'Absence calendar' %}
+  </a>
   <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
     {% trans 'Delete' %}
   </a>
