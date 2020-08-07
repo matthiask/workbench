@@ -39,6 +39,8 @@ def link_or_none(object, pretty=None, none=mark_safe("&ndash;"), with_badge=Fals
         return object
     elif not object:
         return none
+    elif hasattr(object, "html_link"):
+        return object.html_link()
     elif hasattr(object, "get_absolute_url"):
         return format_html(
             '<a href="{}">{}{}</a>',

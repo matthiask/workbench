@@ -6,9 +6,10 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import Sum, signals
+from django.db.models import F, Sum, signals
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from authlib.email import render_to_mail
@@ -18,9 +19,21 @@ from workbench.invoices.utils import recurring
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.tools.formats import Z1, hours, local_date_format
-from workbench.tools.models import HoursField, Model
+from workbench.tools.models import HoursField, Model, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
+
+
+class PlanningRequestQuerySet(SearchQuerySet):
+    def with_missing_hours(self):
+        return self.annotate(
+            _missing_hours=F("requested_hours") - F("planned_hours")
+        ).filter(_missing_hours__gt=0)
+
+    def maybe_actionable(self, *, user):
+        return (
+            self.with_missing_hours().filter(receivers=user).select_related("project")
+        )
 
 
 @model_urls
@@ -59,6 +72,8 @@ class PlanningRequest(Model):
         related_name="sent_planning_requests",
     )
     closed_at = models.DateTimeField(_("closed at"), blank=True, null=True)
+
+    objects = PlanningRequestQuerySet.as_manager()
 
     class Meta:
         ordering = ["-pk"]
@@ -115,6 +130,11 @@ class PlanningRequest(Model):
     @property
     def missing_hours(self):
         return self.requested_hours - self.planned_hours
+
+    def html_link(self):
+        return format_html(
+            '<a href="{}" data-toggle="ajaxmodal">{}</a>', self.get_absolute_url(), self
+        )
 
 
 def receivers_changed(sender, action, instance, pk_set, **kwargs):

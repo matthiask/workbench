@@ -60,16 +60,15 @@
     </div>
     {% endif %}
 
-    {% if acquisition %}
+    {% if needs_action %}
     <div class="card mb-3 d-none d-md-block">
       <div class="card-header">
         <h3 class="my-0">
-          {% trans 'Deals and offers' %}
-          <small>({% trans 'possibly requiring action' %})</small>
+          {% trans 'Possibly requiring action' %}
         </h3>
       </div>
       <div class="card-body">
-        {% for row in acquisition %}
+        {% for row in needs_action %}
         <h4 {% if not forloop.first %}class="mt-4"{% endif %}>
           <a href="{{ row.url }}">{{ row.verbose_name_plural }}</a>
         </h4>

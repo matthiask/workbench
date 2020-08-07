@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-17 14:15+0200\n"
+"POT-Creation-Date: 2020-08-07 05:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -445,6 +445,14 @@ msgid "%s days"
 msgstr "%s Tage"
 
 #: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+msgid "running net work hours"
+msgstr "Stundensaldo fortlaufend"
+
+#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+msgid "vacation days credit"
+msgstr "Guthaben an Ferientagen"
+
+#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
 #: workbench/templates/projects/project_statistics.html
 msgid "Total"
 msgstr "Total"
@@ -502,14 +510,6 @@ msgstr "Arbeitszeit"
 #: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
 msgid "net work hours per month"
 msgstr "Stundensaldo pro Monat"
-
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
-msgid "running net work hours"
-msgstr "Stundensaldo fortlaufend"
-
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
-msgid "vacation days credit"
-msgstr "Guthaben an Ferientagen"
 
 #: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
 msgid "balance"
@@ -2568,6 +2568,11 @@ msgid "Update"
 msgstr "Bearbeiten"
 
 #: workbench/templates/accounts/team_detail.html
+#: workbench/templates/awt/absence_calendar.html workbench/templates/base.html
+msgid "Absence calendar"
+msgstr "Abwesenheitskalender"
+
+#: workbench/templates/accounts/team_detail.html
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/credit_control/creditentry_detail.html
@@ -2620,10 +2625,6 @@ msgstr "Stunden pro Woche"
 #: workbench/templates/reporting/hours_per_customer.html
 msgid "Hours per customer"
 msgstr "Stunden pro Kundschaft"
-
-#: workbench/templates/awt/absence_calendar.html workbench/templates/base.html
-msgid "Absence calendar"
-msgstr "Abwesenheitskalender"
 
 #: workbench/templates/awt/absence_calendar.html
 #: workbench/templates/generic/object_list.html
@@ -3350,12 +3351,8 @@ msgid "no active projects"
 msgstr "Keine aktiven Projekte"
 
 #: workbench/templates/start.html
-msgid "Deals and offers"
-msgstr "Geschäfte und Offerten"
-
-#: workbench/templates/start.html
-msgid "possibly requiring action"
-msgstr "benötigen evtl. eine Aktion"
+msgid "Possibly requiring action"
+msgstr "Benötigen evtl. eine Aktion"
 
 #: workbench/templates/start.html
 msgid "Birthdays"
@@ -3566,12 +3563,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "planning team membership"
-#~ msgstr "Planungsteam-Mitgliedschaft"
-
-#~ msgid "planning team memberships"
-#~ msgstr "Planungsteam-Mitgliedschaften"
-
-#~ msgid "Select a different project as target."
-#~ msgstr "Wähle ein anderes Projekt als Ziel."
