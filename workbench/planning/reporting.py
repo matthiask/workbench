@@ -67,6 +67,7 @@ class Planning:
                         "is_request": False,
                         "id": pw.id,
                         "title": pw.title,
+                        "text": pw.user.get_short_name(),
                         "user": pw.user.get_short_name(),
                         "planned_hours": pw.planned_hours,
                         "url": pw.get_absolute_url(),
