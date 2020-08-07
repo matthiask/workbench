@@ -20,9 +20,16 @@ DAILY_PLANNING_HOURS = 6
 
 def _period(weeks, min, max):
     try:
-        return [weeks.index(min), weeks.index(max)]
+        start = weeks.index(min)
     except ValueError:
-        return None
+        start = 0
+
+    try:
+        end = weeks.index(max)
+    except ValueError:
+        end = len(weeks) - 1
+
+    return [start, end]
 
 
 class Planning:
@@ -102,7 +109,9 @@ class Planning:
                         "is_request": True,
                         "id": pr.id,
                         "title": pr.title,
-                        "user": pr.created_by.get_short_name(),
+                        "text": ", ".join(
+                            user.get_short_name() for user in pr.receivers.all()
+                        ),
                         "requested_hours": pr.requested_hours,
                         "planned_hours": pr.planned_hours,
                         "missing_hours": pr.missing_hours,
@@ -115,9 +124,6 @@ class Planning:
                         ),
                         "period": _period(self.weeks, min(pr.weeks), max(pr.weeks)),
                     },
-                    "hours_per_week": [
-                        per_week if week in pr.weeks else Z1 for week in self.weeks
-                    ],
                     "per_week": per_week,
                 }
             )

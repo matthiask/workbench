@@ -489,24 +489,31 @@ function Work({work, hours_per_week, per_week, isEven}) {
           row={row}
           column={FIRST_DATA_COLUMN + work.period[0]}
           colspan={FIRST_DATA_COLUMN + work.period[1] + 1}
-          className="planning--range is-request is-period"
-        />
-      )}
-      {findContiguousWeekRanges(hours_per_week).map((range, idx) => (
-        <Cell
-          key={idx}
-          row={row}
-          column={FIRST_DATA_COLUMN + range.start}
-          colspan={`span ${range.length}`}
-          className={`planning--range planning--small ${
-            work.is_request ? "is-request" : "is-pw"
-          }`}
+          className="planning--range is-request"
           tag="a"
           href={work.url}
           data-toggle="ajaxmodal"
           title={interpolate(gettext("%sh per week"), [fixed(per_week, 1)])}
-        />
-      ))}
+        >
+          <span>{work.text}</span>
+        </Cell>
+      )}
+      {hours_per_week &&
+        findContiguousWeekRanges(hours_per_week).map((range, idx) => (
+          <Cell
+            key={idx}
+            row={row}
+            column={FIRST_DATA_COLUMN + range.start}
+            colspan={`span ${range.length}`}
+            className="planning--range planning--small is-pw"
+            tag="a"
+            href={work.url}
+            data-toggle="ajaxmodal"
+            title={interpolate(gettext("%sh per week"), [fixed(per_week, 1)])}
+          >
+            <span>{work.text}</span>
+          </Cell>
+        ))}
     </>
   )
 }

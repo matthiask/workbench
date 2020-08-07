@@ -111,6 +111,7 @@
   padding: 0 3px;
   transition: opacity 0.2s;
   border-radius: 3px;
+  position: relative;
 
   &.is-project {
     background-color: var(--indigo);
@@ -153,8 +154,15 @@
     opacity: 0.7;
   }
 
-  &.is-period {
-    height: 6px;
-    margin-top: 8px;
+  &.is-request {
+    span {
+      position: absolute;
+      color: #666;
+      font-size: 85%;
+      left: 100%;
+      text-align: left;
+      text-indent: 4px;
+      white-space: nowrap;
+    }
   }
 }
