@@ -394,6 +394,9 @@
      data-createhours
      data-toggle="ajaxmodal"
      class="btn btn-primary fixed-btn" title="{% trans 'log hours' %}"></a>
+  <a href="{% url 'logbook_break_create' %}"
+     data-toggle="ajaxmodal"
+     class="btn btn-primary fixed-btn break" title="{% trans 'took a break' %}"></a>
 {% endblock %}
 
 {% block js %}{{ block.super }}
