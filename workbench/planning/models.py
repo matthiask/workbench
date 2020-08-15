@@ -28,7 +28,7 @@ class PlanningRequestQuerySet(SearchQuerySet):
     def with_missing_hours(self):
         return self.annotate(
             _missing_hours=F("requested_hours") - F("planned_hours")
-        ).filter(_missing_hours__gt=0)
+        ).filter(project__closed_on__isnull=True, _missing_hours__gt=0)
 
     def maybe_actionable(self, *, user):
         return (
