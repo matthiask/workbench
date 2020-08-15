@@ -4,6 +4,7 @@ import types
 from django.utils import timezone
 
 import factory
+from factory.django import DjangoModelFactory
 from faker import Factory
 from faker.providers import address
 
@@ -26,14 +27,14 @@ faker.add_provider(address)
 
 
 # AWT #########################################################################
-class WorkingTimeModelFactory(factory.DjangoModelFactory):
+class WorkingTimeModelFactory(DjangoModelFactory):
     name = "Test"
 
     class Meta:
         model = WorkingTimeModel
 
 
-class YearFactory(factory.DjangoModelFactory):
+class YearFactory(DjangoModelFactory):
     working_time_model = factory.SubFactory(WorkingTimeModelFactory)
     year = factory.LazyAttribute(lambda a: dt.date.today().year)
     january = 30
@@ -55,7 +56,7 @@ class YearFactory(factory.DjangoModelFactory):
 
 
 # ACCOUNTS ####################################################################
-class UserFactory(factory.DjangoModelFactory):
+class UserFactory(DjangoModelFactory):
     is_active = True
     _full_name = factory.LazyFunction(faker.name)
     _short_name = factory.Sequence(lambda n: "user%d" % n)
@@ -67,14 +68,14 @@ class UserFactory(factory.DjangoModelFactory):
         model = User
 
 
-class TeamFactory(factory.DjangoModelFactory):
+class TeamFactory(DjangoModelFactory):
     name = factory.Sequence(lambda n: "Team %d" % n)
 
     class Meta:
         model = Team
 
 
-class EmploymentFactory(factory.DjangoModelFactory):
+class EmploymentFactory(DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     percentage = 100
     vacation_weeks = 5
@@ -83,7 +84,7 @@ class EmploymentFactory(factory.DjangoModelFactory):
         model = Employment
 
 
-class AbsenceFactory(factory.DjangoModelFactory):
+class AbsenceFactory(DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     reason = "vacation"
     starts_on = factory.LazyAttribute(lambda a: dt.date.today())
@@ -94,7 +95,7 @@ class AbsenceFactory(factory.DjangoModelFactory):
 
 
 # CONTACTS ####################################################################
-class PersonFactory(factory.DjangoModelFactory):
+class PersonFactory(DjangoModelFactory):
     given_name = "Vorname"
     family_name = "Nachname"
     primary_contact = factory.SubFactory(UserFactory)
@@ -103,7 +104,7 @@ class PersonFactory(factory.DjangoModelFactory):
         model = Person
 
 
-class OrganizationFactory(factory.DjangoModelFactory):
+class OrganizationFactory(DjangoModelFactory):
     primary_contact = factory.SubFactory(UserFactory)
     name = "The Organization Ltd"
 
@@ -111,7 +112,7 @@ class OrganizationFactory(factory.DjangoModelFactory):
         model = Organization
 
 
-class PostalAddressFactory(factory.DjangoModelFactory):
+class PostalAddressFactory(DjangoModelFactory):
     type = "work"
     person = factory.SubFactory(PersonFactory)
     street = factory.LazyFunction(faker.street_name)
@@ -126,7 +127,7 @@ class PostalAddressFactory(factory.DjangoModelFactory):
 
 
 # PROJECTS ####################################################################
-class CampaignFactory(factory.DjangoModelFactory):
+class CampaignFactory(DjangoModelFactory):
     customer = factory.SubFactory(OrganizationFactory)
     owned_by = factory.SubFactory(UserFactory)
     title = factory.Sequence(lambda n: "Campaign %d" % n)
@@ -135,7 +136,7 @@ class CampaignFactory(factory.DjangoModelFactory):
         model = Campaign
 
 
-class ProjectFactory(factory.DjangoModelFactory):
+class ProjectFactory(DjangoModelFactory):
     customer = factory.SubFactory(OrganizationFactory)
     contact = factory.LazyAttribute(
         lambda obj: PersonFactory.create(organization=obj.customer)
@@ -148,7 +149,7 @@ class ProjectFactory(factory.DjangoModelFactory):
         model = Project
 
 
-class ServiceFactory(factory.DjangoModelFactory):
+class ServiceFactory(DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     title = "Any service"
     service_hours = 0
@@ -158,7 +159,7 @@ class ServiceFactory(factory.DjangoModelFactory):
 
 
 # OFFERS ######################################################################
-class OfferFactory(factory.DjangoModelFactory):
+class OfferFactory(DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     owned_by = factory.SubFactory(UserFactory)
 
@@ -167,7 +168,7 @@ class OfferFactory(factory.DjangoModelFactory):
 
 
 # INVOICES ####################################################################
-class InvoiceFactory(factory.DjangoModelFactory):
+class InvoiceFactory(DjangoModelFactory):
     customer = factory.SubFactory(OrganizationFactory)
     contact = factory.LazyAttribute(
         lambda obj: PersonFactory.create(organization=obj.customer)
@@ -181,7 +182,7 @@ class InvoiceFactory(factory.DjangoModelFactory):
         model = Invoice
 
 
-class RecurringInvoiceFactory(factory.DjangoModelFactory):
+class RecurringInvoiceFactory(DjangoModelFactory):
     customer = factory.SubFactory(OrganizationFactory)
     contact = factory.LazyAttribute(
         lambda obj: PersonFactory.create(organization=obj.customer)
@@ -209,7 +210,7 @@ def service_types():
 
 
 # LOGBOOK #####################################################################
-class LoggedHoursFactory(factory.DjangoModelFactory):
+class LoggedHoursFactory(DjangoModelFactory):
     service = factory.SubFactory(ServiceFactory)
     created_by = factory.SubFactory(UserFactory)
     rendered_by = factory.SubFactory(UserFactory)
@@ -220,7 +221,7 @@ class LoggedHoursFactory(factory.DjangoModelFactory):
         model = LoggedHours
 
 
-class LoggedCostFactory(factory.DjangoModelFactory):
+class LoggedCostFactory(DjangoModelFactory):
     service = factory.SubFactory(ServiceFactory)
     created_by = factory.SubFactory(UserFactory)
     rendered_by = factory.LazyAttribute(lambda obj: obj.created_by)
@@ -231,7 +232,7 @@ class LoggedCostFactory(factory.DjangoModelFactory):
         model = LoggedCost
 
 
-class BreakFactory(factory.DjangoModelFactory):
+class BreakFactory(DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     starts_at = factory.LazyAttribute(
         lambda a: (timezone.now() - dt.timedelta(seconds=3600))
@@ -244,7 +245,7 @@ class BreakFactory(factory.DjangoModelFactory):
 
 
 # CREDIT CONTROL ##############################################################
-class LedgerFactory(factory.DjangoModelFactory):
+class LedgerFactory(DjangoModelFactory):
     name = "bank account"
     parser = "zkb-csv"
 
@@ -252,7 +253,7 @@ class LedgerFactory(factory.DjangoModelFactory):
         model = Ledger
 
 
-class CreditEntryFactory(factory.DjangoModelFactory):
+class CreditEntryFactory(DjangoModelFactory):
     ledger = factory.SubFactory(LedgerFactory)
     reference_number = factory.Sequence(lambda n: "payment{}".format(n))
     value_date = factory.LazyAttribute(lambda a: dt.date.today())
@@ -264,24 +265,24 @@ class CreditEntryFactory(factory.DjangoModelFactory):
 
 
 # DEALS #######################################################################
-class ValueTypeFactory(factory.DjangoModelFactory):
+class ValueTypeFactory(DjangoModelFactory):
     title = "Consulting"
 
     class Meta:
         model = ValueType
 
 
-class AttributeGroupFactory(factory.DjangoModelFactory):
+class AttributeGroupFactory(DjangoModelFactory):
     class Meta:
         model = AttributeGroup
 
 
-class ClosingTypeFactory(factory.DjangoModelFactory):
+class ClosingTypeFactory(DjangoModelFactory):
     class Meta:
         model = ClosingType
 
 
-class DealFactory(factory.DjangoModelFactory):
+class DealFactory(DjangoModelFactory):
     customer = factory.SubFactory(OrganizationFactory)
     contact = factory.LazyAttribute(
         lambda obj: PersonFactory.create(organization=obj.customer)
@@ -294,7 +295,7 @@ class DealFactory(factory.DjangoModelFactory):
 
 
 # REPORTING ###################################################################
-class CostCenterFactory(factory.DjangoModelFactory):
+class CostCenterFactory(DjangoModelFactory):
     title = "Anything"
 
     class Meta:
@@ -302,7 +303,7 @@ class CostCenterFactory(factory.DjangoModelFactory):
 
 
 # PLANNING ####################################################################
-class PlanningRequestFactory(factory.DjangoModelFactory):
+class PlanningRequestFactory(DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     created_by = factory.SubFactory(UserFactory)
     requested_hours = 20
@@ -315,7 +316,7 @@ class PlanningRequestFactory(factory.DjangoModelFactory):
         model = PlanningRequest
 
 
-class PlannedWorkFactory(factory.DjangoModelFactory):
+class PlannedWorkFactory(DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     user = factory.SubFactory(UserFactory)
     planned_hours = 20
