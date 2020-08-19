@@ -14,63 +14,67 @@ config.update(
 
 
 @task
-def check(c):
-    c.run("venv/bin/flake8 .")
-    c.run("yarn run check")
+def check(ctx):
+    ctx.run("venv/bin/flake8 .")
+    ctx.run("yarn run check")
 
 
-def _do_deploy(c, folder, rsync):
-    with c.cd(folder):
-        c.run("git checkout main")
-        c.run("git fetch origin")
-        c.run("git merge --ff-only origin/main")
-        c.run('find . -name "*.pyc" -delete')
-        c.run("venv/bin/pip install -U pip wheel setuptools")
-        c.run("venv/bin/pip install -r requirements.txt")
+def _do_deploy(conn, folder, rsync):
+    with conn.cd(folder):
+        conn.run("git checkout main")
+        conn.run("git fetch origin")
+        conn.run("git merge --ff-only origin/main")
+        conn.run('find . -name "*.pyc" -delete')
+        conn.run("venv/bin/pip install -U pip wheel setuptools")
+        conn.run("venv/bin/pip install -r requirements.txt")
         for wb in config.installations:
-            c.run("DOTENV=.env/{} venv/bin/python manage.py migrate".format(wb))
+            conn.run("DOTENV=.env/{} venv/bin/python manage.py migrate".format(wb))
     if rsync:
-        c.local("rsync -avz --delete static/ {}:{}static".format(config.host, folder))
-    with c.cd(folder):
-        c.run(
+        conn.local(
+            "rsync -avz --delete static/ {}:{}static".format(config.host, folder)
+        )
+    with conn.cd(folder):
+        conn.run(
             "DOTENV=.env/{} venv/bin/python manage.py collectstatic --noinput".format(
                 config.installations[0]
             ),
         )
 
 
-def _restart_all(c):
+def _restart_all(conn):
     for wb in config.installations:
-        c.run("systemctl --user restart workbench@{}".format(wb), echo=True)
+        conn.run("systemctl --user restart workbench@{}".format(wb), echo=True)
 
 
 @task
-def deploy(c):
-    check(c)
-    c.run("git push origin main")
-    c.run("yarn run prod")
-    with Connection(config.host) as c:
-        _do_deploy(c, "www/workbench/", rsync=True)
-        _restart_all(c)
+def deploy(ctx):
+    check(ctx)
+    ctx.run("git push origin main")
+    ctx.run("yarn run prod")
+    with Connection(config.host) as conn:
+        _do_deploy(conn, "www/workbench/", rsync=True)
+        _restart_all(conn)
+    fl.fetch(ctx)
 
 
 @task
-def deploy_code(c):
-    check(c)
-    c.run("git push origin main")
-    with Connection(config.host) as c:
-        _do_deploy(c, "www/workbench/", rsync=False)
-        _restart_all(c)
+def deploy_code(ctx):
+    check(ctx)
+    ctx.run("git push origin main")
+    with Connection(config.host) as conn:
+        _do_deploy(conn, "www/workbench/", rsync=False)
+        _restart_all(conn)
+    fl.fetch(ctx)
 
 
 @task
-def pull_db(c, namespace):
+def pull_db(ctx, namespace):
     remote = {"fh": "workbench", "dbpag": "dbpag-workbench", "bf": "bf-workbench"}[
         namespace
     ]
-    c.run("dropdb --if-exists workbench", warn=True)
-    c.run("createdb workbench")
-    c.run(
+    ctx.run("dropdb --if-exists workbench", warn=True)
+    ctx.run("createdb workbench")
+    ctx.run(
         'ssh -C root@workbench.feinheit.ch "sudo -u postgres pg_dump -Ox %s"'
         " | psql workbench" % remote,
     )
