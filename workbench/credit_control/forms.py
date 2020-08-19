@@ -197,6 +197,13 @@ class AssignCreditEntriesForm(forms.Form):
                                     else gettext("NO DATE YET"),
                                     "<br>",
                                     currency(invoice.total),
+                                    format_html(
+                                        "<br><span style='color:darkred'>{}: {}</span>",
+                                        _("third party costs"),
+                                        currency(invoice.third_party_costs),
+                                    )
+                                    if invoice.third_party_costs
+                                    else "",
                                     "</span>",
                                 )
                             )
