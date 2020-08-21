@@ -13,6 +13,7 @@ from django.utils.translation import gettext, gettext_lazy as _, override
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.circles.models import Role
 from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
@@ -253,6 +254,9 @@ class LoggedHoursForm(ModelForm):
     service_description = forms.CharField(
         label=_("description"), required=False, widget=Textarea({"rows": 2})
     )
+    service_role = forms.ModelChoiceField(
+        queryset=Role.objects.all(), label=_("role"), required=False
+    )
 
     class Meta:
         model = LoggedHours
@@ -315,6 +319,7 @@ class LoggedHoursForm(ModelForm):
         if self.instance.pk:
             self.fields.pop("service_title")
             self.fields.pop("service_description")
+            self.fields.pop("service_role")
             if (
                 self.instance.rendered_by.enforce_same_week_logging
                 and self.instance.rendered_on < logbook_lock()
@@ -322,6 +327,12 @@ class LoggedHoursForm(ModelForm):
                 self.fields["hours"].disabled = True
                 self.fields["rendered_by"].disabled = True
                 self.fields["rendered_on"].disabled = True
+
+        else:
+            if self.request.user.features[FEATURES.GLASSFROG]:
+                self.fields["service_role"].choices = Role.objects.choices()
+            else:
+                self.fields.pop("service_role")
 
     def clean(self):
         data = super().clean()
@@ -353,6 +364,12 @@ class LoggedHoursForm(ModelForm):
                 ),
                 code="unspecific-service",
             )
+        if (
+            data.get("service_title")
+            and "service_role" in self.fields
+            and not data.get("service_role")
+        ):
+            self.add_warning(_("No role selected."), code="no-role-selected")
 
         if all(
             f in self.fields and data.get(f) for f in ["rendered_by", "rendered_on"]
@@ -416,6 +433,7 @@ class LoggedHoursForm(ModelForm):
                 project=self.project,
                 title=self.cleaned_data["service_title"],
                 description=self.cleaned_data["service_description"],
+                role=self.cleaned_data.get("service_role"),
             )
             if self.project.flat_rate is not None:
                 with override(settings.WORKBENCH.PDF_LANGUAGE):

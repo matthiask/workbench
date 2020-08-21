@@ -166,6 +166,7 @@ class LogbookTest(TestCase):
                 "modal-description": "Test",
                 "modal-service_title": "service title",
                 "modal-service_description": "service description",
+                "modal-service_role": factories.RoleFactory.create().pk,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -200,6 +201,7 @@ class LogbookTest(TestCase):
                 "modal-description": "Test",
                 "modal-service_title": "service title",
                 "modal-service_description": "service description",
+                "modal-service_role": factories.RoleFactory.create().pk,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -225,6 +227,7 @@ class LogbookTest(TestCase):
                 "modal-description": "Test",
                 "modal-service_title": "service title",
                 "modal-service_description": "service description",
+                "modal-service_role": factories.RoleFactory.create().pk,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -233,6 +236,33 @@ class LogbookTest(TestCase):
             response,
             "Deselect the existing service if you want to create a new service.",
         )
+
+    @override_settings(FEATURES={"glassfrog": False})
+    def test_no_service_role_without_glassfrog(self):
+        """The service_role field isn't shown and isn't required without GLASSFROG"""
+        service = factories.ServiceFactory.create()
+
+        self.client.force_login(service.project.owned_by)
+
+        response = self.client.get(
+            service.project.urls["createhours"], HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertNotContains(response, "service_role")
+
+        response = self.client.post(
+            service.project.urls["createhours"],
+            {
+                "modal-rendered_by": service.project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-hours": "0.1",
+                "modal-description": "Test",
+                "modal-service_title": "service title",
+                "modal-service_description": "service description",
+                # No modal-service_role
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
 
     def test_invalid_date(self):
         """Invalid dates produce validation errors not crashes"""

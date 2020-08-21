@@ -14,6 +14,7 @@
       <h5>{% trans 'new service' %}</h5>
       {% ff_field form.service_title %}
       {% ff_field form.service_description %}
+      {% if form.service_role %}{% ff_field form.service_role %}{% endif %}
       <hr>
     </div>
   {% endif %}
