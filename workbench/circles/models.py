@@ -20,7 +20,7 @@ class Circle(models.Model):
 class RoleQuerySet(models.QuerySet):
     def choices(self):
         circles = defaultdict(list)
-        for role in self.select_related("circle"):
+        for role in self.filter(is_removed=False).select_related("circle"):
             circles[role.circle].append(role)
         return [("", "----------")] + [
             (circle.name, [(role.id, str(role)) for role in roles])

@@ -16,7 +16,7 @@ class CirclesTest(TestCase):
         """Role.objects.choices() works"""
         c = Circle.objects.create(name="B circle")
         r1 = c.roles.create(name="Role 1")
-        r3 = c.roles.create(name="Role 2", is_removed=True)
+        c.roles.create(name="Role 2", is_removed=True)
 
         c = Circle.objects.create(name="A circle")
         r4 = c.roles.create(name="Role 1")
@@ -39,7 +39,7 @@ class CirclesTest(TestCase):
                     "B circle",
                     [
                         (r1.id, "Role 1 [B circle]"),
-                        (r3.id, "(removed) Role 2 [B circle]"),
+                        # (r3.id, "(removed) Role 2 [B circle]"),
                     ],
                 ),
             ],
