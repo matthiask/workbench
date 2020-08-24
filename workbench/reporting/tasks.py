@@ -1,11 +1,14 @@
 import datetime as dt
 
+from workbench.invoices.utils import recurring
 from workbench.reporting.models import Accruals
-from workbench.tools.validation import in_days
 
 
 def create_accruals_for_last_month():
     today = dt.date.today()
-    if today.day != 1:
-        return
-    Accruals.objects.for_cutoff_date(in_days(-1))
+    start = today.replace(year=today.year - 1, day=1)
+
+    for day in recurring(start, "monthly"):
+        if day > today:
+            break
+        Accruals.objects.for_cutoff_date(day - dt.timedelta(days=1))
