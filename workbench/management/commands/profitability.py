@@ -8,7 +8,7 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedHours
-from workbench.tools.models import Z
+from workbench.tools.formats import Z1
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -29,10 +29,10 @@ class Command(BaseCommand):
             .values("customer")
             .annotate(Sum("total_excl_tax"), Sum("third_party_costs"))
         }
-        hours = defaultdict(lambda: defaultdict(lambda: Z))
-        earned = defaultdict(lambda: defaultdict(lambda: Z))
-        customer_hours = defaultdict(lambda: Z)
-        user_hours = defaultdict(lambda: Z)
+        hours = defaultdict(lambda: defaultdict(lambda: Z1))
+        earned = defaultdict(lambda: defaultdict(lambda: Z1))
+        customer_hours = defaultdict(lambda: Z1)
+        user_hours = defaultdict(lambda: Z1)
 
         for row in (
             LoggedHours.objects.order_by()
@@ -46,7 +46,7 @@ class Command(BaseCommand):
             user_hours[row["rendered_by"]] += row["hours__sum"]
 
         for customer, total_excl_tax in invoiced_per_customer.items():
-            _c_hours = sum(hours[customer].values(), Z)
+            _c_hours = sum(hours[customer].values(), Z1)
             if not total_excl_tax:
                 continue
             if not _c_hours:
@@ -66,7 +66,7 @@ class Command(BaseCommand):
                 with_rate(
                     {
                         "customer": customer,
-                        "invoiced": invoiced_per_customer.get(customer.id, Z),
+                        "invoiced": invoiced_per_customer.get(customer.id, Z1),
                         "hours": customer_hours[customer.id],
                     },
                     "invoiced",
@@ -81,7 +81,7 @@ class Command(BaseCommand):
                 with_rate(
                     {
                         "user": user,
-                        "earned": sum((c[user.id] for c in earned.values()), Z),
+                        "earned": sum((c[user.id] for c in earned.values()), Z1),
                         "hours": user_hours[user.id],
                     },
                     "earned",
