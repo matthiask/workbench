@@ -6,7 +6,7 @@ from workbench.reporting.models import Accruals
 
 def create_accruals_for_last_month():
     today = dt.date.today()
-    start = today.replace(year=today.year - 1, day=1)
+    start = today.replace(year=today.year - 2, day=1)
 
     for day in recurring(start, "monthly"):
         if day > today:

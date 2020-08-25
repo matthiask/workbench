@@ -46,6 +46,7 @@ def third_party_costs_by_month(date_range):
 
     for result in (
         Invoice.objects.invoiced()
+        .filter(~Q(type=Invoice.DOWN_PAYMENT))
         .order_by()
         .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z2))
         .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))
