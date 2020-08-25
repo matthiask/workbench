@@ -15,26 +15,27 @@ config.update(
 
 @task
 def check(ctx):
-    ctx.run("venv/bin/flake8 .")
-    ctx.run("yarn run check")
+    fl.run(ctx, "venv/bin/flake8 .")
+    fl.run(ctx, "yarn run check")
 
 
 def _do_deploy(conn, folder, rsync):
     with conn.cd(folder):
-        conn.run("git checkout main")
-        conn.run("git fetch origin")
-        conn.run("git merge --ff-only origin/main")
-        conn.run('find . -name "*.pyc" -delete')
-        conn.run("venv/bin/pip install -U pip wheel setuptools")
-        conn.run("venv/bin/pip install -r requirements.txt")
+        fl.run(conn, "git checkout main")
+        fl.run(conn, "git fetch origin")
+        fl.run(conn, "git merge --ff-only origin/main")
+        fl.run(conn, 'find . -name "*.pyc" -delete')
+        fl.run(conn, "venv/bin/pip install -U pip wheel setuptools")
+        fl.run(conn, "venv/bin/pip install -r requirements.txt")
         for wb in config.installations:
-            conn.run("DOTENV=.env/{} venv/bin/python manage.py migrate".format(wb))
+            fl.run(conn, "DOTENV=.env/{} venv/bin/python manage.py migrate".format(wb))
     if rsync:
         conn.local(
             "rsync -avz --delete static/ {}:{}static".format(config.host, folder)
         )
     with conn.cd(folder):
-        conn.run(
+        fl.run(
+            conn,
             "DOTENV=.env/{} venv/bin/python manage.py collectstatic --noinput".format(
                 config.installations[0]
             ),
@@ -43,14 +44,14 @@ def _do_deploy(conn, folder, rsync):
 
 def _restart_all(conn):
     for wb in config.installations:
-        conn.run("systemctl --user restart workbench@{}".format(wb), echo=True)
+        fl.run(conn, "systemctl --user restart workbench@{}".format(wb), echo=True)
 
 
 @task
 def deploy(ctx):
     check(ctx)
-    ctx.run("git push origin main")
-    ctx.run("yarn run prod")
+    fl.run(ctx, "git push origin main")
+    fl.run(ctx, "yarn run prod")
     with Connection(config.host) as conn:
         _do_deploy(conn, "www/workbench/", rsync=True)
         _restart_all(conn)
@@ -60,7 +61,7 @@ def deploy(ctx):
 @task
 def deploy_code(ctx):
     check(ctx)
-    ctx.run("git push origin main")
+    fl.run(ctx, "git push origin main")
     with Connection(config.host) as conn:
         _do_deploy(conn, "www/workbench/", rsync=False)
         _restart_all(conn)
@@ -72,9 +73,10 @@ def pull_db(ctx, namespace):
     remote = {"fh": "workbench", "dbpag": "dbpag-workbench", "bf": "bf-workbench"}[
         namespace
     ]
-    ctx.run("dropdb --if-exists workbench", warn=True)
-    ctx.run("createdb workbench")
-    ctx.run(
+    fl.run(ctx, "dropdb --if-exists workbench", warn=True)
+    fl.run(ctx, "createdb workbench")
+    fl.run(
+        ctx,
         'ssh -C root@workbench.feinheit.ch "sudo -u postgres pg_dump -Ox %s"'
         " | psql workbench" % remote,
     )
