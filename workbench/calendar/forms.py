@@ -78,10 +78,10 @@ class PresenceForm(forms.Form):
         self.year = date.today().year
         super().__init__(*args, **kwargs)
         presences = {
-            p.user_id: p.percentage for p in self.app.presences.filter(year=self.year)
+            p.user_id: p.percentage for p in self.app.presences.filter(year=self.year, user__is_active=True)
         }
 
-        for user in self.app.users.all():
+        for user in self.app.users.filter(is_active=True):
             self.fields["presence_{}".format(user.id)] = forms.IntegerField(
                 label=user.get_full_name(),
                 required=False,
@@ -90,7 +90,7 @@ class PresenceForm(forms.Form):
 
     def save(self):
         to_delete = set()
-        for user in self.app.users.all():
+        for user in self.app.users.filter(is_active=True):
             value = self.cleaned_data.get("presence_{}".format(user.id))
             if value is None:
                 to_delete.add(user.id)
