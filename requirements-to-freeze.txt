@@ -13,7 +13,6 @@ django-vanilla-views
 django-webpack-loader
 dj-database-url
 factory-boy
-flake8
 gunicorn
 lxml
 mailchimp3

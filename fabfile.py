@@ -15,7 +15,7 @@ config.update(
 
 @task
 def check(ctx):
-    fl.run(ctx, "venv/bin/flake8 .")
+    fl.run(ctx, "pipx run --spec 'flake8>=3.8.3' flake8 .")
     fl.run(ctx, "yarn run check")
 
 
