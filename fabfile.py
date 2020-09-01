@@ -74,7 +74,6 @@ def _restart_all(conn):
 def deploy(ctx):
     check(ctx)
     fl.run(ctx, "git push origin main")
-    fl.run(ctx, "yarn run prod")
     fl.run(ctx, "NODE_ENV=production yarn run webpack -p --bail")
     with Connection(config.host) as conn:
         _do_deploy(conn, "www/workbench/", rsync=True)
