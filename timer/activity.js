@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from "react"
+import React, { useState, useEffect } from "react"
 import Draggable from "react-draggable"
-import {connect} from "react-redux"
+import { connect } from "react-redux"
 import Select from "react-select"
 import AsyncSelect from "react-select/async"
 
@@ -11,12 +11,12 @@ import {
   overwriteSeconds,
   sendLogbook,
 } from "./actions.js"
-import {ActivitySettings} from "./activitySettings.js"
-import {gettext, OUTCOME} from "./i18n.js"
-import {clamp, prettyDuration} from "./utils.js"
+import { ActivitySettings } from "./activitySettings.js"
+import { gettext, OUTCOME } from "./i18n.js"
+import { clamp, prettyDuration } from "./utils.js"
 import * as icons from "./icons.js"
 
-const createUpdater = ({id, dispatch}) => (fields) =>
+const createUpdater = ({ id, dispatch }) => (fields) =>
   dispatch({
     type: "UPDATE_ACTIVITY",
     id,
@@ -27,8 +27,8 @@ export const Activity = connect((state, ownProps) => ({
   activity: ownProps.activity,
   current: state.current,
   projects: state.projects,
-}))(({activity, current, projects, dispatch}) => {
-  const dispatchUpdate = createUpdater({id: activity.id, dispatch})
+}))(({ activity, current, projects, dispatch }) => {
+  const dispatchUpdate = createUpdater({ id: activity.id, dispatch })
 
   // State vars
   const [showSettings, setShowSettings] = useState(false)
@@ -79,7 +79,7 @@ export const Activity = connect((state, ownProps) => ({
         className={`activity ${
           activity.isActive ? "is-active" : ""
         } card px-2 py-2`}
-        style={{backgroundColor: activity.color}}
+        style={{ backgroundColor: activity.color }}
       >
         <div
           className="py-2 px-2 text-truncate js-drag-handle"
@@ -128,7 +128,7 @@ export const Activity = connect((state, ownProps) => ({
               isClearable={true}
               isDisabled={!services.length}
               options={services}
-              onChange={(service) => dispatchUpdate({service})}
+              onChange={(service) => dispatchUpdate({ service })}
               placeholder={
                 services.length
                   ? gettext("Select service...")
@@ -144,15 +144,15 @@ export const Activity = connect((state, ownProps) => ({
               className="form-control"
               rows="2"
               value={activity.description}
-              onChange={(e) => dispatchUpdate({description: e.target.value})}
+              onChange={(e) => dispatchUpdate({ description: e.target.value })}
               placeholder={OUTCOME}
             />
           </div>
           <div className="d-flex align-items-center justify-content-between">
             <div
               className="activity-duration pl-2"
-              onClick={() => overwriteSeconds(dispatch, {activity, current})}
-              style={{cursor: "cell"}}
+              onClick={() => overwriteSeconds(dispatch, { activity, current })}
+              style={{ cursor: "cell" }}
             >
               {prettyDuration(activity.seconds)}
             </div>
@@ -222,11 +222,11 @@ export const Activity = connect((state, ownProps) => ({
             dispatchUpdate={dispatchUpdate}
             closeSettings={() => setShowSettings(false)}
             removeActivity={() => {
-              dispatch({type: "REMOVE_ACTIVITY", id: activity.id})
+              dispatch({ type: "REMOVE_ACTIVITY", id: activity.id })
             }}
             resetActivity={() => {
-              if (activity.isActive) dispatch({type: "STOP", current})
-              dispatchUpdate({seconds: 0})
+              if (activity.isActive) dispatch({ type: "STOP", current })
+              dispatchUpdate({ seconds: 0 })
               setShowSettings(false)
             }}
           />

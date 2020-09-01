@@ -1,8 +1,8 @@
-import React, {useState, useMemo} from "react"
+import React, { useState, useMemo } from "react"
 
-const {gettext, interpolate} = window
+const { gettext, interpolate } = window
 
-import {formatDate, readableDate, getWeekNumber} from "./utils"
+import { formatDate, readableDate, getWeekNumber } from "./utils"
 
 const getColumnName = (t) => `date-${formatDate(new Date(t))}`
 const getRowName = (id) => `person-${id}`
@@ -13,7 +13,7 @@ const MONTHS = [
   "September", "October", "November", "December"
 ].map(m => gettext(m))
 
-export const Absences = ({absencesByPerson, dateList, reasonList}) => {
+export const Absences = ({ absencesByPerson, dateList, reasonList }) => {
   const scaleValues = useMemo(
     () =>
       dateList.reduce((acc, date) => {
@@ -81,7 +81,7 @@ export const Absences = ({absencesByPerson, dateList, reasonList}) => {
   )
 }
 
-const Person = ({person}) => {
+const Person = ({ person }) => {
   const style = {
     gridRow: `${getRowName(person.id)} / span 1`,
   }
@@ -93,9 +93,9 @@ const Person = ({person}) => {
   )
 }
 
-const Absence = ({absence, person}) => {
+const Absence = ({ absence, person }) => {
   const [showPopup, setShowPopup] = useState(false)
-  const {startsOn, endsOn} = absence
+  const { startsOn, endsOn } = absence
   const style = {
     gridColumn: `${getColumnName(startsOn)} / ${getColumnName(
       endsOn + 24 * 60 * 60 * 1000
@@ -134,7 +134,7 @@ const Now = () => {
   return <span className="absence__now" style={style} />
 }
 
-const Popup = ({absence}) => {
+const Popup = ({ absence }) => {
   return (
     <div className="absence__popup">
       <strong>{absence.reasonDisplay}</strong>
@@ -149,7 +149,7 @@ const Popup = ({absence}) => {
   )
 }
 
-const Scale = ({scaleValues}) => {
+const Scale = ({ scaleValues }) => {
   return (
     <React.Fragment>
       {scaleValues.map((entry) => {
@@ -174,7 +174,7 @@ const Scale = ({scaleValues}) => {
   )
 }
 
-const Legend = ({reasons}) => {
+const Legend = ({ reasons }) => {
   return (
     <ul className="absences-legend">
       {reasons.map(([reason, reasonDisplay]) => (

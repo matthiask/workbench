@@ -1,4 +1,4 @@
-import {createIdentifier} from "./utils.js"
+import { createIdentifier } from "./utils.js"
 
 const STORAGE_KEY = "one-window"
 

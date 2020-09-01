@@ -1,7 +1,12 @@
 import "./style.scss"
 
 import ReactDOM from "react-dom"
-import React, {createContext, useContext, useLayoutEffect, useRef} from "react"
+import React, {
+  createContext,
+  useContext,
+  useLayoutEffect,
+  useRef,
+} from "react"
 
 const clamp = (min, max) => (value) => Math.max(Math.min(value, max), min)
 const opacityClamp = clamp(0.3, 1)
@@ -28,13 +33,13 @@ function months(weeks) {
     let week = weeks[index]
     if (week.month !== month) {
       month = week.month
-      months.push({index, month})
+      months.push({ index, month })
     }
   }
   return months
 }
 
-function Planning({data}) {
+function Planning({ data }) {
   const gridRef = useRef(null)
   const rowCtx = {
     __row: FIRST_DATA_ROW,
@@ -159,7 +164,7 @@ function Planning({data}) {
   )
 }
 
-function TotalByWeek({by_week, title}) {
+function TotalByWeek({ by_week, title }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
   return (
@@ -189,7 +194,7 @@ function TotalByWeek({by_week, title}) {
   )
 }
 
-function DeltaByWeek({planned, capacity}) {
+function DeltaByWeek({ planned, capacity }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
   return (
@@ -226,7 +231,7 @@ function DeltaByWeek({planned, capacity}) {
   )
 }
 
-function Capacity({total, by_user, dailyPlanningHours}) {
+function Capacity({ total, by_user, dailyPlanningHours }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
@@ -261,7 +266,7 @@ function Capacity({total, by_user, dailyPlanningHours}) {
   )
 }
 
-function UserCapacity({user, capacity}) {
+function UserCapacity({ user, capacity }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
@@ -294,7 +299,7 @@ function UserCapacity({user, capacity}) {
   )
 }
 
-function Project({by_week, offers, project}) {
+function Project({ by_week, offers, project }) {
   const ctx = useContext(RowContext)
   ctx.next() // Skip one row
   const row = ctx.next()
@@ -319,7 +324,7 @@ function Project({by_week, offers, project}) {
           {project.is_closed ? <> {gettext("(closed)")}</> : ""}
         </a>
       </Cell>
-      <Cell row={row} column={2} style={{color: "var(--primary)"}}>
+      <Cell row={row} column={2} style={{ color: "var(--primary)" }}>
         <a
           className="planning--add-pw"
           data-toggle="ajaxmodal"
@@ -347,7 +352,7 @@ function Project({by_week, offers, project}) {
         row={row}
         column={3}
         className="planning--small text-center"
-        style={{whiteSpace: "nowrap"}}
+        style={{ whiteSpace: "nowrap" }}
       >
         {project.range}
       </Cell>
@@ -382,7 +387,7 @@ function Project({by_week, offers, project}) {
   )
 }
 
-function Offer({offer, work_list}) {
+function Offer({ offer, work_list }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
@@ -422,7 +427,7 @@ function Offer({offer, work_list}) {
         row={row}
         column={3}
         className="planning--small text-center"
-        style={{whiteSpace: "nowrap"}}
+        style={{ whiteSpace: "nowrap" }}
       >
         {offer.range}
       </Cell>
@@ -436,14 +441,14 @@ function Offer({offer, work_list}) {
   )
 }
 
-function Work({work, hours_per_week, per_week, isEven}) {
+function Work({ work, hours_per_week, per_week, isEven }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
   return (
     <>
       {isEven ? (
         <div
-          style={{gridRow: row, gridColumn: "1 / -1"}}
+          style={{ gridRow: row, gridColumn: "1 / -1" }}
           className="planning--stripe3"
         />
       ) : null}
@@ -462,7 +467,7 @@ function Work({work, hours_per_week, per_week, isEven}) {
         row={row}
         column={3}
         className="planning--small text-center"
-        style={{whiteSpace: "nowrap"}}
+        style={{ whiteSpace: "nowrap" }}
       >
         {work.range}
       </Cell>
@@ -518,7 +523,7 @@ function Work({work, hours_per_week, per_week, isEven}) {
   )
 }
 
-function Absences({absences, dailyPlanningHours}) {
+function Absences({ absences, dailyPlanningHours }) {
   const ctx = useContext(RowContext)
   ctx.next() // Skip one row
   const row = ctx.next()
@@ -543,7 +548,7 @@ function Absences({absences, dailyPlanningHours}) {
   )
 }
 
-function UserAbsences({user}) {
+function UserAbsences({ user }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
@@ -585,7 +590,7 @@ function findContiguousWeekRanges(hours_per_week) {
       }
     } else {
       if (rangeStart >= 0) {
-        ranges.push({start: rangeStart, length: i - rangeStart})
+        ranges.push({ start: rangeStart, length: i - rangeStart })
         rangeStart = -1
       }
     }

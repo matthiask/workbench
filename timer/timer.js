@@ -1,17 +1,17 @@
-import React, {useEffect, useState} from "react"
-import {connect} from "react-redux"
+import React, { useEffect, useState } from "react"
+import { connect } from "react-redux"
 
-import {Activity} from "./activity.js"
-import {CreateActivity} from "./createActivity.js"
-import {gettext} from "./i18n.js"
-import {prettyDuration, timestamp} from "./utils.js"
+import { Activity } from "./activity.js"
+import { CreateActivity } from "./createActivity.js"
+import { gettext } from "./i18n.js"
+import { prettyDuration, timestamp } from "./utils.js"
 
 const hours = JSON.parse(document.getElementById("user-hours").textContent)
 
-export const Timer = connect(({activities, current}) => ({
+export const Timer = connect(({ activities, current }) => ({
   activities,
   current,
-}))(({activities, current}) => {
+}))(({ activities, current }) => {
   // Update each second if any activity is current
   const [, updateState] = useState()
   useEffect(() => {

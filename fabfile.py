@@ -15,8 +15,31 @@ config.update(
 
 @task
 def check(ctx):
-    fl.run(ctx, "pipx run --spec 'flake8>=3.8.3' flake8 .")
-    fl.run(ctx, "yarn run check")
+    fl.check(ctx)
+    fl.run(
+        ctx,
+        "yarn run prettier --list-different --no-semi --trailing-comma es5"
+        ' "absences/**/*.js" "planning/**/*.js" "timer/**/*.js"',
+    )
+    fl.run(
+        ctx,
+        'yarn run eslint "absences/**/*.js" "planning/**/*.js" "timer/**/*.js"',
+    )
+    fl.run(
+        ctx,
+        "pipx run interrogate"
+        " -e node_modules -e venv -v -f 99 --whitelist-regex 'test_.*'",
+    )
+
+
+@task
+def fmt(ctx):
+    fl.fmt(ctx)
+    fl.run(
+        ctx,
+        "yarn run prettier --write --no-semi --trailing-comma es5"
+        ' "absences/**/*.js" "planning/**/*.js" "timer/**/*.js"',
+    )
 
 
 def _do_deploy(conn, folder, rsync):
@@ -52,6 +75,7 @@ def deploy(ctx):
     check(ctx)
     fl.run(ctx, "git push origin main")
     fl.run(ctx, "yarn run prod")
+    fl.run(ctx, "NODE_ENV=production yarn run webpack -p --bail")
     with Connection(config.host) as conn:
         _do_deploy(conn, "www/workbench/", rsync=True)
         _restart_all(conn)
@@ -82,4 +106,4 @@ def pull_db(ctx, namespace):
     )
 
 
-ns = Collection(*fl.GENERAL, check, deploy, deploy_code, pull_db)
+ns = Collection(*fl.GENERAL, check, deploy, deploy_code, fmt, pull_db)

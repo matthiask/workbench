@@ -5,11 +5,7 @@ module.exports = {
     jquery: true,
     node: true,
   },
-  extends: [
-    "eslint:recommended",
-    "plugin:prettier/recommended",
-    "plugin:react/recommended",
-  ],
+  extends: ["eslint:recommended", "plugin:react/recommended"],
   globals: {
     Atomics: "readonly",
     SharedArrayBuffer: "readonly",
@@ -22,11 +18,8 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: "module",
   },
-  plugins: ["react", "prettier"],
+  plugins: ["react"],
   rules: {
-    "prettier/prettier": "error",
-    "react/display-name": 0,
-    "react/prop-types": 0,
     "no-unused-vars": [
       "error",
       {

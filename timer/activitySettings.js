@@ -1,7 +1,7 @@
 import React from "react"
 
-import {COLORS} from "./colors.js"
-import {gettext} from "./i18n.js"
+import { COLORS } from "./colors.js"
+import { gettext } from "./i18n.js"
 
 export const ActivitySettings = ({
   title,
@@ -17,7 +17,7 @@ export const ActivitySettings = ({
         type="text"
         className="activity-title form-control"
         value={title}
-        onChange={(e) => dispatchUpdate({title: e.target.value})}
+        onChange={(e) => dispatchUpdate({ title: e.target.value })}
       />
     </div>
     <div className="activity-color-chooser">
@@ -25,13 +25,13 @@ export const ActivitySettings = ({
         <label
           key={c}
           className={c == color ? "checked" : ""}
-          style={{backgroundColor: c}}
+          style={{ backgroundColor: c }}
         >
           <input
             type="radio"
             name="color"
             value={c}
-            onClick={() => dispatchUpdate({color: c})}
+            onClick={() => dispatchUpdate({ color: c })}
           />
         </label>
       ))}

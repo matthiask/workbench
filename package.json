@@ -1,11 +1,6 @@
 {
   "scripts": {
-    "prettier": "prettier --write .*js *js workbench/static/workbench/* 'planning/**/*.{js,scss}' 'timer/**/*.{js,scss}' 'absences/**/*.{js,scss}'",
-    "check": "eslint workbench/static/workbench/ timer/**/*.js absences/**/*.js planning/**/*.js && prettier --list-different 'planning/**/*.{js,scss}' 'timer/**/*.{js,scss}' 'absences/**/*.{js,scss}'",
-    "eslint": "eslint workbench/static/workbench/ planning/**/*.js timer/**/*.js absences/**/*.js",
-    "build-bootstrap": "webpack -p --config webpack.config.bootstrap.js",
-    "dev": "webpack-dev-server --hot",
-    "prod": "NODE_ENV=production webpack -p --bail"
+    "build-bootstrap": "webpack -p --config webpack.config.bootstrap.js"
   },
   "eslintIgnore": [
     "workbench/static/workbench/lib"
@@ -15,7 +10,6 @@
     "bootstrap": "^4.5.2",
     "eslint": "^7.7.0",
     "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.20.6",
     "fh-webpack-config": "^1.0.6",
     "jquery": "^3.5.1",
@@ -31,10 +25,5 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
     "url-loader": "^4.0.0"
-  },
-  "prettier": {
-    "trailingComma": "es5",
-    "bracketSpacing": false,
-    "semi": false
   }
 }

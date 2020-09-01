@@ -1,6 +1,6 @@
-import {COLORS} from "./colors.js"
-import {gettext} from "./i18n.js"
-import {containsJSON, createIdentifier} from "./utils.js"
+import { COLORS } from "./colors.js"
+import { gettext } from "./i18n.js"
+import { containsJSON, createIdentifier } from "./utils.js"
 
 const BASE_URL = document.getElementById("projects-base-url").dataset.url
 const ACTIVE_PROJECTS = () => `${BASE_URL}projects/`
@@ -59,9 +59,9 @@ export async function loadProjects(dispatch) {
   }
 }
 
-export async function openForm(dispatch, {activity, current}) {
-  if (current && current.id == activity.id) dispatch({type: "STOP", current})
-  dispatch({type: "MODAL_ACTIVITY", id: activity.id})
+export async function openForm(dispatch, { activity, current }) {
+  if (current && current.id == activity.id) dispatch({ type: "STOP", current })
+  dispatch({ type: "MODAL_ACTIVITY", id: activity.id })
 
   const url = endpoint(CREATE_HOURS, activity.project.value)
   const params = new URLSearchParams()
@@ -79,7 +79,7 @@ export async function openForm(dispatch, {activity, current}) {
   return
 }
 
-export async function sendLogbook(dispatch, {activity, current}) {
+export async function sendLogbook(dispatch, { activity, current }) {
   const url = endpoint(CREATE_HOURS, activity.project.value)
 
   const body = new FormData()
@@ -105,11 +105,12 @@ export async function sendLogbook(dispatch, {activity, current}) {
   if (response.status == 200) {
     window.initModal(await response.text())
   } else if (response.status == 201) {
-    if (current && current.id == activity.id) dispatch({type: "STOP", current})
+    if (current && current.id == activity.id)
+      dispatch({ type: "STOP", current })
     dispatch({
       type: "UPDATE_ACTIVITY",
       id: activity.id,
-      fields: {description: "", seconds: 0},
+      fields: { description: "", seconds: 0 },
     })
     window.location.reload()
   } else {
@@ -117,7 +118,7 @@ export async function sendLogbook(dispatch, {activity, current}) {
   }
 }
 
-export function overwriteSeconds(dispatch, {activity, current}) {
+export function overwriteSeconds(dispatch, { activity, current }) {
   const seconds = parseInt(
     prompt(gettext("Overwrite seconds"), Math.ceil(activity.seconds))
   )
@@ -125,10 +126,10 @@ export function overwriteSeconds(dispatch, {activity, current}) {
     dispatch({
       type: "UPDATE_ACTIVITY",
       id: activity.id,
-      fields: {seconds},
+      fields: { seconds },
     })
     if (current && current.id == activity.id) {
-      dispatch({type: "START", id: activity.id})
+      dispatch({ type: "START", id: activity.id })
     }
   }
 }

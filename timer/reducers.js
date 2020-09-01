@@ -1,11 +1,11 @@
-import {combineReducers} from "redux"
+import { combineReducers } from "redux"
 
-import {timestamp} from "./utils.js"
+import { timestamp } from "./utils.js"
 
 function activities(state = {}, action) {
   switch (action.type) {
     case "ADD_ACTIVITY":
-      return {...state, [action.activity.id]: action.activity}
+      return { ...state, [action.activity.id]: action.activity }
     case "REMOVE_ACTIVITY":
       return Object.fromEntries(
         Object.entries(state).filter(([id]) => id != action.id)

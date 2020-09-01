@@ -354,7 +354,7 @@ function initWidgets() {
       .autocomplete({
         minLength: 2,
         source: function (request, response) {
-          $.get(url, {q: request.term}, function (data) {
+          $.get(url, { q: request.term }, function (data) {
             response(data.results)
           })
         },

@@ -3,7 +3,7 @@ import "./index.scss"
 import ReactDOM from "react-dom"
 import React from "react"
 
-import {Absences} from "./absences"
+import { Absences } from "./absences"
 
 function getDateList(start, end) {
   let list = []
@@ -22,7 +22,7 @@ function getDateList(start, end) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  let {absencesByPerson, reasonList, timeBoundaries} = JSON.parse(
+  let { absencesByPerson, reasonList, timeBoundaries } = JSON.parse(
     document.getElementById("absences-data").textContent
   )
 

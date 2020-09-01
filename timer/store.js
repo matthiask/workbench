@@ -1,6 +1,6 @@
 import React from "react"
 
-import {createStore, applyMiddleware, compose} from "redux"
+import { createStore, applyMiddleware, compose } from "redux"
 import reducer from "./reducers"
 import thunk from "redux-thunk"
 import logger from "redux-logger"
@@ -11,20 +11,20 @@ const VERSION = 3
 const initialTitle = document.title
 const notifier = (store) => (next) => (action) => {
   const state = next(action)
-  const {current} = store.getState()
+  const { current } = store.getState()
   document.title = `${current ? "▶ " : ""}${initialTitle}`
   return state
 }
 
 const serialize = (data) => {
-  return JSON.stringify({...data, _v: VERSION})
+  return JSON.stringify({ ...data, _v: VERSION })
 }
 
 const deserialize = (blob) => {
   const deserializeRaw = () => {
     let parsed = JSON.parse(blob)
     if (!parsed || !parsed._v) return {}
-    const {_v, ...data} = parsed
+    const { _v, ...data } = parsed
     if (_v == VERSION) {
       return data
     } else if (_v == 2) {
