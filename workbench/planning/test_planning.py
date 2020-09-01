@@ -10,6 +10,7 @@ from workbench import factories
 from workbench.planning import reporting
 from workbench.planning.forms import PlannedWorkSearchForm, PlanningRequestSearchForm
 from workbench.planning.models import PlannedWork, PlanningRequest
+from workbench.templatetags.workbench import link_or_none
 from workbench.tools.validation import monday
 
 
@@ -377,3 +378,8 @@ class PlanningTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertContains(response, 'value="offer-is-declined"')
+
+    def test_link_or_none_of_planning_requests(self):
+        """Planning requests have a specific implementation of link_or_none"""
+        pr = factories.PlanningRequestFactory.create()
+        self.assertEqual(pr.html_link(), link_or_none(pr))
