@@ -106,7 +106,9 @@ class TimestampsTest(TestCase):
 
         # t1 =  # unused
         user.timestamp_set.create(
-            type=Timestamp.START, created_at=today, notes="Aaa",
+            type=Timestamp.START,
+            created_at=today,
+            notes="Aaa",
         )
         t2 = user.timestamp_set.create(
             type=Timestamp.STOP,
@@ -478,7 +480,8 @@ class TimestampsTest(TestCase):
         """A start and a stop with a log and still only one slice"""
         user = factories.UserFactory.create()
         t1 = user.timestamp_set.create(
-            type=Timestamp.START, created_at=timezone.now() - dt.timedelta(seconds=900),
+            type=Timestamp.START,
+            created_at=timezone.now() - dt.timedelta(seconds=900),
         )
         t2 = user.timestamp_set.create(type=Timestamp.STOP)
 

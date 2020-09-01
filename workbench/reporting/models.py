@@ -15,7 +15,8 @@ class AccrualsQuerySet(models.QuerySet):
 
     def for_cutoff_date(self, cutoff_date):
         instance, created = self.update_or_create(
-            cutoff_date=cutoff_date, defaults={"accruals": self.accruals(cutoff_date)},
+            cutoff_date=cutoff_date,
+            defaults={"accruals": self.accruals(cutoff_date)},
         )
         return instance
 

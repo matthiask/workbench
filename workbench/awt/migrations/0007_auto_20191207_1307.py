@@ -26,6 +26,7 @@ class Migration(migrations.Migration):
             field=models.IntegerField(verbose_name="year"),
         ),
         migrations.AlterUniqueTogether(
-            name="year", unique_together={("working_time_model", "year")},
+            name="year",
+            unique_together={("working_time_model", "year")},
         ),
     ]

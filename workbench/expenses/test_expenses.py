@@ -280,7 +280,8 @@ class ExchangeRatesTest(TestCase):
         """exchange_rates() without arguments fetches today's exchange rates"""
         exchange_rates()
         self.assertEqual(
-            mock_get.call_args[0], ("https://api.exchangeratesapi.io/latest?base=CHF",),
+            mock_get.call_args[0],
+            ("https://api.exchangeratesapi.io/latest?base=CHF",),
         )
 
     def test_exchange_rates_someday(self, mock_get):

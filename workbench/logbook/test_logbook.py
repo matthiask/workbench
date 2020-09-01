@@ -245,7 +245,8 @@ class LogbookTest(TestCase):
         self.client.force_login(service.project.owned_by)
 
         response = self.client.get(
-            service.project.urls["createhours"], HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            service.project.urls["createhours"],
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertNotContains(response, "service_role")
 

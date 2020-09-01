@@ -297,5 +297,7 @@ class OfferDeleteForm(ModelForm):
 @add_prefix("modal")
 class OfferAutocompleteForm(forms.Form):
     offer = forms.ModelChoiceField(
-        queryset=Offer.objects.all(), widget=Autocomplete(model=Offer), label="",
+        queryset=Offer.objects.all(),
+        widget=Autocomplete(model=Offer),
+        label="",
     )

@@ -268,7 +268,11 @@ class Timestamp(models.Model):
         verbose_name=_("logged hours"),
     )
     logged_break = models.OneToOneField(
-        Break, on_delete=models.CASCADE, blank=True, null=True, verbose_name=_("break"),
+        Break,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        verbose_name=_("break"),
     )
     project = models.ForeignKey(
         Project,

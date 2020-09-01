@@ -42,7 +42,8 @@ urlpatterns = [
     path(
         "requests/<int:pk>/update/",
         generic.UpdateView.as_view(
-            model=PlanningRequest, form_class=PlanningRequestForm,
+            model=PlanningRequest,
+            form_class=PlanningRequestForm,
         ),
         name="planning_planningrequest_update",
     ),

@@ -20,7 +20,9 @@ urlpatterns = [
     path(
         "users/",
         generic.ListView.as_view(
-            model=User, search_form_class=UserSearchForm, show_create_button=False,
+            model=User,
+            search_form_class=UserSearchForm,
+            show_create_button=False,
         ),
         name="accounts_user_list",
     ),

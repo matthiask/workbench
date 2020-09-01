@@ -17,7 +17,8 @@ class Migration(migrations.Migration):
         migrations.RunSQL(search.create_structure("deals_deal")),
         migrations.RunSQL(
             search.fts(
-                "deals_deal", ["title", "description", "closing_notice", "_fts"],
+                "deals_deal",
+                ["title", "description", "closing_notice", "_fts"],
             )
         ),
         migrations.RunSQL(

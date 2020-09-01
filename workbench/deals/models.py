@@ -130,7 +130,9 @@ class Deal(Model):
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
 
     attributes = models.ManyToManyField(
-        Attribute, verbose_name=_("attributes"), through="DealAttribute",
+        Attribute,
+        verbose_name=_("attributes"),
+        through="DealAttribute",
     )
 
     closed_on = models.DateField(_("closed on"), blank=True, null=True)

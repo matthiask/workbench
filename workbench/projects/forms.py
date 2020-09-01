@@ -547,7 +547,9 @@ class OffersRenumberForm(Form):
         self.offers = self.project.offers.order_by("_code")
         for offer in self.offers:
             self.fields["offer_{}_code".format(offer.pk)] = forms.IntegerField(
-                label=str(offer), initial=offer._code, min_value=1,
+                label=str(offer),
+                initial=offer._code,
+                min_value=1,
             )
 
     def clean(self):

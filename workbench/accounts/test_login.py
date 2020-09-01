@@ -71,7 +71,8 @@ class LoginTestCase(TestCase):
         response = client.get("/accounts/oauth2/?code=x", HTTP_ACCEPT_LANGUAGE="en")
         self.assertRedirects(response, "/accounts/login/?error=1")
         self.assertEqual(
-            messages(response), ["No user with email address user@example.com found."],
+            messages(response),
+            ["No user with email address user@example.com found."],
         )
 
         FakeFlow.EMAIL = "user@{}".format(settings.WORKBENCH.SSO_DOMAIN)

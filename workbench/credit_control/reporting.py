@@ -49,7 +49,9 @@ def paid_debtors_zip(date_range, *, file):
 
                 if entry.invoice:
                     append_invoice(
-                        zf=zf, ledger_slug=slugify(ledger.name), invoice=entry.invoice,
+                        zf=zf,
+                        ledger_slug=slugify(ledger.name),
+                        invoice=entry.invoice,
                     )
 
             xlsx.add_sheet(slugify(ledger.name))

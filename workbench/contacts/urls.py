@@ -30,7 +30,8 @@ urlpatterns = [
     re_path(
         r"^organizations/autocomplete/$",
         generic.AutocompleteView.as_view(
-            model=Organization, queryset=Organization.objects.active(),
+            model=Organization,
+            queryset=Organization.objects.active(),
         ),
         name="contacts_organization_autocomplete",
     ),

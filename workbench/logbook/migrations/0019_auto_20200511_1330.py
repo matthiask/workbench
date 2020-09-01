@@ -18,9 +18,18 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "breaks",
             },
         ),
-        migrations.RemoveField(model_name="break", name="ends_at",),
-        migrations.RemoveField(model_name="break", name="starts_at",),
-        migrations.RemoveField(model_name="break", name="day",),
+        migrations.RemoveField(
+            model_name="break",
+            name="ends_at",
+        ),
+        migrations.RemoveField(
+            model_name="break",
+            name="starts_at",
+        ),
+        migrations.RemoveField(
+            model_name="break",
+            name="day",
+        ),
         migrations.RenameField("break", "_ends_at", "ends_at"),
         migrations.RenameField("break", "_starts_at", "starts_at"),
         migrations.AlterField(

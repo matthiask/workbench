@@ -58,7 +58,8 @@ class Months(dict):
 def active_users(year):
     return User.objects.filter(
         id__in=Employment.objects.filter(
-            date_from__lte=dt.date(year, 12, 31), date_until__gte=dt.date(year, 1, 1),
+            date_from__lte=dt.date(year, 12, 31),
+            date_until__gte=dt.date(year, 1, 1),
         ).values("user")
     )
 

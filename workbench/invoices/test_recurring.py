@@ -280,19 +280,25 @@ class RecurringTest(TestCase):
         """Renewal candidates depends on start date and the day of period when
         the invoice is created"""
         r1 = factories.RecurringInvoiceFactory.create(
-            starts_on=in_days(10), periodicity="monthly",
+            starts_on=in_days(10),
+            periodicity="monthly",
         )
         r2 = factories.RecurringInvoiceFactory.create(
-            starts_on=in_days(30), periodicity="monthly",
+            starts_on=in_days(30),
+            periodicity="monthly",
         )
 
         self.assertEqual(set(RecurringInvoice.objects.renewal_candidates()), {r1})
 
         r3 = factories.RecurringInvoiceFactory.create(
-            starts_on=in_days(-250), periodicity="yearly", create_invoice_on_day=300,
+            starts_on=in_days(-250),
+            periodicity="yearly",
+            create_invoice_on_day=300,
         )
         r4 = factories.RecurringInvoiceFactory.create(
-            starts_on=in_days(-350), periodicity="yearly", create_invoice_on_day=300,
+            starts_on=in_days(-350),
+            periodicity="yearly",
+            create_invoice_on_day=300,
         )
 
         self.assertEqual(set(RecurringInvoice.objects.renewal_candidates()), {r1, r4})
@@ -302,7 +308,8 @@ class RecurringTest(TestCase):
     def test_positive_create_invoice_on_day(self):
         """Invoice creation can be moved within the period"""
         r1 = factories.RecurringInvoiceFactory.create(
-            starts_on=dt.date.today(), periodicity="monthly",
+            starts_on=dt.date.today(),
+            periodicity="monthly",
         )
         r2 = factories.RecurringInvoiceFactory.create(
             starts_on=dt.date.today(),

@@ -226,7 +226,11 @@ urlpatterns = [
         name="projects_service_assign_service_type",
     ),
     re_path(r"^service/set-order/$", set_order, name="projects_service_set_order"),
-    re_path(r"^(?P<pk>[0-9]+)/services/$", services, name="projects_project_services",),
+    re_path(
+        r"^(?P<pk>[0-9]+)/services/$",
+        services,
+        name="projects_project_services",
+    ),
     re_path(r"^projects/$", projects, name="projects_project_projects"),
     re_path(
         r"^service/autocomplete/$",

@@ -19,7 +19,8 @@ urlpatterns = [
     re_path(
         r"^autocomplete/$",
         generic.AutocompleteView.as_view(
-            model=Offer, queryset=Offer.objects.select_related("owned_by", "project"),
+            model=Offer,
+            queryset=Offer.objects.select_related("owned_by", "project"),
         ),
         name="offers_offer_autocomplete",
     ),

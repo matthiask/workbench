@@ -361,13 +361,16 @@ class DealsTest(TestCase):
         self.assertEqual(idx(probability=Deal.NORMAL), 4)
         self.assertEqual(idx(probability=Deal.HIGH), 3)
         self.assertEqual(
-            idx(probability=Deal.HIGH, decision_expected_on=in_days(90)), 3,
+            idx(probability=Deal.HIGH, decision_expected_on=in_days(90)),
+            3,
         )
         self.assertEqual(
-            idx(probability=Deal.HIGH, decision_expected_on=in_days(30)), 2,
+            idx(probability=Deal.HIGH, decision_expected_on=in_days(30)),
+            2,
         )
         self.assertEqual(
-            idx(probability=Deal.HIGH, decision_expected_on=in_days(20)), 1,
+            idx(probability=Deal.HIGH, decision_expected_on=in_days(20)),
+            1,
         )
 
     def test_deal_reporting(self):

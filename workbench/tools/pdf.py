@@ -62,7 +62,8 @@ class PDFDocument(_PDFDocument):
             firstLineIndent=0,
         )
         self.style.normalWithExtraLeading = style(
-            self.style.normal, leading=1.75 * self.style.fontSize,
+            self.style.normal,
+            leading=1.75 * self.style.fontSize,
         )
         self.style.heading1 = style(
             self.style.normal,

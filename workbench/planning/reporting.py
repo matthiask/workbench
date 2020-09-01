@@ -193,7 +193,10 @@ class Planning:
             },
             "work_list": sorted(
                 work_list,
-                key=lambda row: (row["work"]["date_from"], row["work"]["date_until"],),
+                key=lambda row: (
+                    row["work"]["date_from"],
+                    row["work"]["date_until"],
+                ),
             ),
         }
 
@@ -366,7 +369,8 @@ SELECT MIN(week), MAX(week) FROM sq
     if result[0]:
         weeks = list(
             islice(
-                recurring(result[0], "weekly"), 2 + (result[1] - result[0]).days // 7,
+                recurring(result[0], "weekly"),
+                2 + (result[1] - result[0]).days // 7,
             )
         )
     else:

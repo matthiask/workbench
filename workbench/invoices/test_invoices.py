@@ -570,7 +570,9 @@ class InvoicesTest(TestCase):
         self.assertEqual(messages(response), ["No invoices found."])
 
         factories.InvoiceFactory.create(
-            invoiced_on=in_days(-60), due_on=in_days(-45), status=Invoice.SENT,
+            invoiced_on=in_days(-60),
+            due_on=in_days(-45),
+            status=Invoice.SENT,
         )
         response = self.client.get("/invoices/?export=pdf")
         self.assertEqual(response.status_code, 200)
@@ -703,7 +705,8 @@ class InvoicesTest(TestCase):
         self.client.force_login(invoice.owned_by)
 
         response = self.client.post(
-            invoice.urls["update"], invoice_to_dict(invoice, status=Invoice.SENT),
+            invoice.urls["update"],
+            invoice_to_dict(invoice, status=Invoice.SENT),
         )
         self.assertContains(response, "with an invoice date in the past")
 
@@ -862,14 +865,18 @@ class InvoicesTest(TestCase):
         )
         self.assertEqual(
             Invoice(
-                status=Invoice.SENT, invoiced_on=yesterday, due_on=in_days(-5),
+                status=Invoice.SENT,
+                invoiced_on=yesterday,
+                due_on=in_days(-5),
             ).pretty_status,
             "Sent on {} but overdue".format(local_date_format(yesterday)),
         )
         self.assertIn(
             "badge-warning",
             Invoice(
-                status=Invoice.SENT, invoiced_on=yesterday, due_on=in_days(-5),
+                status=Invoice.SENT,
+                invoiced_on=yesterday,
+                due_on=in_days(-5),
             ).status_badge,
         )
         self.assertEqual(
@@ -949,7 +956,9 @@ class InvoicesTest(TestCase):
     def test_reminders(self):
         """The reminders view allows exporting dunning letters"""
         invoice = factories.InvoiceFactory.create(
-            invoiced_on=in_days(-60), due_on=in_days(-45), status=Invoice.SENT,
+            invoiced_on=in_days(-60),
+            due_on=in_days(-45),
+            status=Invoice.SENT,
         )
         factories.InvoiceFactory.create(
             customer=invoice.customer,
