@@ -92,16 +92,15 @@ def deploy_code(ctx):
 
 
 @task
-def pull_db(ctx, namespace):
-    remote = {"fh": "workbench", "dbpag": "dbpag-workbench", "bf": "bf-workbench"}[
-        namespace
-    ]
+def pull_db(ctx, installation="fh"):
     fl.run(ctx, "dropdb --if-exists workbench", warn=True)
     fl.run(ctx, "createdb workbench")
+    with Connection(config.host) as conn:
+        e = fl._srv_env(conn, f"www/workbench/.env/{installation}")
+        srv_dsn = e("DATABASE_URL")
     fl.run(
         ctx,
-        'ssh -C root@workbench.feinheit.ch "sudo -u postgres pg_dump -Ox %s"'
-        " | psql workbench" % remote,
+        f'ssh -C {config.host} "pg_dump -Ox {srv_dsn}" | psql workbench',
     )
 
 
