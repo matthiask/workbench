@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-16 11:47+0200\n"
+"POT-Creation-Date: 2020-09-03 11:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,11 +16,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: absences/absences.js
-#, javascript-format
-msgid "Week %s"
-msgstr "KW%s"
 
 #: absences/utils.js
 msgctxt "one letter Sunday"
@@ -57,56 +52,6 @@ msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Sa"
 
-#: planning/index.js
-msgid "Planned hours per week"
-msgstr "Geplante Stunden pro Woche"
-
-#: planning/index.js
-msgid "Requested hours per week"
-msgstr "Angefragte Stunden pro Woche"
-
-#: planning/index.js
-msgid "Delta"
-msgstr "Delta"
-
-#: planning/index.js
-msgid "Capacity per week"
-msgstr "Kapazität pro Woche"
-
-#: planning/index.js
-#, javascript-format
-msgid "%sh/day"
-msgstr "%sh/Tag"
-
-#: planning/index.js
-msgid "(closed)"
-msgstr "(geschlossen)"
-
-#: planning/index.js
-msgid "Add planned work"
-msgstr "Geplante Arbeit hinzufügen"
-
-#: planning/index.js
-msgid "(declined)"
-msgstr "(abgelehnt)"
-
-#: planning/index.js
-msgid "(not accepted yet)"
-msgstr "(noch nicht akzeptiert)"
-
-#: planning/index.js
-msgid "Not part of an offer"
-msgstr "Nicht Teil einer Offerte"
-
-#: planning/index.js
-#, javascript-format
-msgid "%sh per week"
-msgstr "%sh pro Woche"
-
-#: planning/index.js
-msgid "Absences"
-msgstr "Abwesenheiten"
-
 #: timer/actions.js
 msgid "Unable to submit the logbook entry"
 msgstr "Konnte Logbucheintrag nicht abschicken"
@@ -118,38 +63,6 @@ msgstr "Sekunden überschreiben"
 #: timer/activity.js
 msgid "Activity"
 msgstr "Aktivität"
-
-#: timer/activity.js
-msgid "Select or search project..."
-msgstr "Projekt auswählen oder suchen..."
-
-#: timer/activity.js
-msgid "Go to the project"
-msgstr "Zum Projekt gehen"
-
-#: timer/activity.js
-msgid "Select service..."
-msgstr "Leistung auswählen..."
-
-#: timer/activity.js
-msgid "No services available"
-msgstr "Keine Leistungen verfügbar"
-
-#: timer/activity.js
-msgid "No project selected"
-msgstr "Kein Projekt ausgewählt"
-
-#: timer/activity.js
-msgid "Settings"
-msgstr "Einstellungen"
-
-#: timer/activity.js
-msgid "Open logged hours form"
-msgstr "Öffne das Stundenformular"
-
-#: timer/activity.js
-msgid "Send to logbook"
-msgstr "Sende ins Logbuch"
 
 #: timer/activitySettings.js
 msgid "OK"
@@ -182,3 +95,69 @@ msgstr "Diese Woche"
 #: workbench/static/workbench/workbench.js
 msgid "Unable to open the form"
 msgstr "Konnte Formular nicht öffnen"
+
+#, javascript-format
+#~ msgid "Week %s"
+#~ msgstr "KW%s"
+
+#~ msgid "Planned hours per week"
+#~ msgstr "Geplante Stunden pro Woche"
+
+#~ msgid "Requested hours per week"
+#~ msgstr "Angefragte Stunden pro Woche"
+
+#~ msgid "Delta"
+#~ msgstr "Delta"
+
+#~ msgid "Capacity per week"
+#~ msgstr "Kapazität pro Woche"
+
+#, javascript-format
+#~ msgid "%sh/day"
+#~ msgstr "%sh/Tag"
+
+#~ msgid "(closed)"
+#~ msgstr "(geschlossen)"
+
+#~ msgid "Add planned work"
+#~ msgstr "Geplante Arbeit hinzufügen"
+
+#~ msgid "(declined)"
+#~ msgstr "(abgelehnt)"
+
+#~ msgid "(not accepted yet)"
+#~ msgstr "(noch nicht akzeptiert)"
+
+#~ msgid "Not part of an offer"
+#~ msgstr "Nicht Teil einer Offerte"
+
+#, javascript-format
+#~ msgid "%sh per week"
+#~ msgstr "%sh pro Woche"
+
+#~ msgid "Absences"
+#~ msgstr "Abwesenheiten"
+
+#~ msgid "Select or search project..."
+#~ msgstr "Projekt auswählen oder suchen..."
+
+#~ msgid "Go to the project"
+#~ msgstr "Zum Projekt gehen"
+
+#~ msgid "Select service..."
+#~ msgstr "Leistung auswählen..."
+
+#~ msgid "No services available"
+#~ msgstr "Keine Leistungen verfügbar"
+
+#~ msgid "No project selected"
+#~ msgstr "Kein Projekt ausgewählt"
+
+#~ msgid "Settings"
+#~ msgstr "Einstellungen"
+
+#~ msgid "Open logged hours form"
+#~ msgstr "Öffne das Stundenformular"
+
+#~ msgid "Send to logbook"
+#~ msgstr "Sende ins Logbuch"

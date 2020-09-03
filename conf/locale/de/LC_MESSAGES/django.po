@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-07 05:37+0200\n"
+"POT-Creation-Date: 2020-09-03 11:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -553,7 +553,8 @@ msgstr "Für den Kreis"
 msgid "is removed"
 msgstr "ist entfernt"
 
-#: workbench/circles/models.py workbench/projects/models.py
+#: workbench/circles/models.py workbench/logbook/forms.py
+#: workbench/projects/models.py
 msgid "role"
 msgstr "Rolle"
 
@@ -851,6 +852,22 @@ msgstr "Verrechnet am"
 #: workbench/credit_control/forms.py workbench/tools/pdf.py
 msgid "NO DATE YET"
 msgstr "NOCH KEIN DATUM"
+
+#: workbench/credit_control/forms.py workbench/invoices/models.py
+#: workbench/logbook/models.py workbench/services/models.py
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/logbook/loggedcost_detail.html
+#: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/reporting/key_data.html
+#: workbench/templates/reporting/key_data_third_party_costs.html
+#: workbench/templates/reporting/labor_costs.html
+#: workbench/templates/reporting/labor_costs_by_user.html
+#: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/xlsx.py
+msgid "third party costs"
+msgstr "Fremdkosten"
 
 #: workbench/credit_control/models.py
 msgid "ZKB CSV"
@@ -1548,22 +1565,6 @@ msgstr "Anzahlung angewendet auf"
 msgid "down payment total"
 msgstr "Anzahlungstotal"
 
-#: workbench/invoices/models.py workbench/logbook/models.py
-#: workbench/services/models.py
-#: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/invoices/invoice_detail.html
-#: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/templates/logbook/loggedcost_detail.html
-#: workbench/templates/projects/campaign_detail.html
-#: workbench/templates/reporting/key_data.html
-#: workbench/templates/reporting/key_data_third_party_costs.html
-#: workbench/templates/reporting/labor_costs.html
-#: workbench/templates/reporting/labor_costs_by_user.html
-#: workbench/templates/reporting/project_budget_statistics.html
-#: workbench/tools/xlsx.py
-msgid "third party costs"
-msgstr "Fremdkosten"
-
 #: workbench/invoices/models.py
 msgid "Only used for statistical purposes."
 msgstr "Wird nur für statistische Auswertungen verwendet."
@@ -1819,6 +1820,10 @@ msgid ""
 msgstr ""
 "Mir scheint, dass der Titel furchtbar unspezifisch ist. Bitte verwende "
 "spezifische Titel für Leistungen."
+
+#: workbench/logbook/forms.py workbench/projects/forms.py
+msgid "No role selected."
+msgstr "Keine Rolle ausgewählt."
 
 #: workbench/logbook/forms.py
 msgid "Hours have to be logged in the same week."
@@ -2122,7 +2127,6 @@ msgid "Copy %s to project"
 msgstr "%s zu Projekt kopieren"
 
 #: workbench/planning/__init__.py workbench/templates/accounts/team_detail.html
-#: workbench/templates/base.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/planning/team_planning.html
 #: workbench/templates/planning/user_planning.html
@@ -2142,14 +2146,6 @@ msgstr "Die ausgewählte Offerte ist abgelehnt."
 #: workbench/templates/reporting/accepted_deals.html
 msgid "weeks"
 msgstr "Wochen"
-
-#: workbench/planning/forms.py
-msgid ""
-"You are creating or updating planned work for somebody else. Are you sure "
-"they are OK with that?"
-msgstr ""
-"Du erstellst oder bearbeitest die geplante Arbeit für jemand anderes. Bist "
-"Du sicher, dass diese einverstanden sind?"
 
 #: workbench/planning/forms.py
 #, python-format
@@ -2191,7 +2187,7 @@ msgstr "geschlossen um"
 msgid "planning request"
 msgstr "Planungsanfrage"
 
-#: workbench/planning/models.py workbench/templates/base.html
+#: workbench/planning/models.py
 msgid "planning requests"
 msgstr "Planungsanfragen"
 
@@ -2294,10 +2290,6 @@ msgid ""
 msgstr ""
 "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte "
 "verbunden ist, welche sich nicht mehr in Vorbereitung befindet."
-
-#: workbench/projects/forms.py
-msgid "No role selected."
-msgstr "Keine Rolle ausgewählt."
 
 #: workbench/projects/forms.py
 msgid "Try deleting the service after reassigning logbook entries"
@@ -2727,10 +2719,6 @@ msgstr "Geschichte der Geschäfte"
 msgid "Labor costs"
 msgstr "Personalaufwand"
 
-#: workbench/templates/base.html workbench/templates/shortcuts.html
-msgid "Keyboard shortcuts"
-msgstr "Tastaturkürzel"
-
 #: workbench/templates/base.html
 msgid "Time tracking"
 msgstr "Zeiterfassung"
@@ -2746,13 +2734,13 @@ msgid "timestamps"
 msgstr "Zeitmarken"
 
 #: workbench/templates/base.html
-msgid "Your planned work"
-msgstr "Deine geplante Arbeit"
-
-#: workbench/templates/base.html
 #: workbench/templates/reporting/work_anniversaries.html
 msgid "Work anniversaries"
 msgstr "Jubiläen"
+
+#: workbench/templates/base.html workbench/templates/shortcuts.html
+msgid "Keyboard shortcuts"
+msgstr "Tastaturkürzel"
 
 #: workbench/templates/base.html
 msgid "Admin panel"
@@ -2768,6 +2756,7 @@ msgid "log hours"
 msgstr "Stunden erfassen"
 
 #: workbench/templates/base.html
+#: workbench/templates/projects/project_detail.html
 msgid "took a break"
 msgstr "Habe eine Pause gemacht"
 
