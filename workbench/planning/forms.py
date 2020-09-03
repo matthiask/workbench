@@ -242,15 +242,6 @@ class PlannedWorkForm(ModelForm):
     def clean(self):
         data = super().clean()
 
-        if data.get("user") and data["user"] != self.request.user:
-            self.add_warning(
-                _(
-                    "You are creating or updating planned work for somebody else."
-                    " Are you sure they are OK with that?"
-                ),
-                code="planning-for-somebody-else",
-            )
-
         if data.get("request") and data.get("weeks"):
             outside = [
                 week

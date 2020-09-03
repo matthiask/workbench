@@ -231,18 +231,6 @@ class PlanningTest(TestCase):
         self.assertEqual(response.status_code, 201)
 
         response = self.client.post(
-            pr.project.urls["creatework"],
-            {
-                "modal-user": pr.project.owned_by.id,
-                "modal-title": "bla",
-                "modal-planned_hours": 50,
-                "modal-weeks": [monday().isoformat()],
-            },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
-        self.assertContains(response, "planning-for-somebody-else")
-
-        response = self.client.post(
             pr.project.urls["creatework"] + "?request={}".format(pr.id),
             {
                 "modal-request": pr.id,
