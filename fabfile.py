@@ -72,6 +72,7 @@ def _restart_all(conn):
 
 @task
 def deploy(ctx):
+    fl._check_branch(ctx)
     check(ctx)
     fl.run(ctx, "git push origin main")
     fl.run(ctx, "NODE_ENV=production yarn run webpack -p --bail")
