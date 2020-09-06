@@ -2,12 +2,12 @@
 
 {% load fineforms i18n static workbench %}
 
-{% block title %}{% trans 'Hours per customer' %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'Hours per customer' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12 col-md-8">
-  <h1>{% trans 'Hours per customer' %}</h1>
+  <h1>{% translate 'Hours per customer' %}</h1>
 
   <form method="get" class="mb-3" data-autosubmit>
     {% ff_fields form %}

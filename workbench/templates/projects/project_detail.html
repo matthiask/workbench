@@ -12,16 +12,16 @@
     </h1>
 
     <p>
-      <strong>{% trans 'customer'|capfirst %}:</strong>
+      <strong>{% translate 'customer'|capfirst %}:</strong>
       {% link_or_none project.customer %}
       &nbsp;
 
-      <strong>{% trans 'contact'|capfirst %}:</strong>
+      <strong>{% translate 'contact'|capfirst %}:</strong>
       {% link_or_none project.contact %}
       &nbsp;
 
       {% if request.user|has_feature:FEATURES.CAMPAIGNS %}
-        <strong>{% trans 'campaign'|capfirst %}:</strong>
+        <strong>{% translate 'campaign'|capfirst %}:</strong>
         {% link_or_none project.campaign %}
       {% endif %}
     </p>
@@ -34,7 +34,7 @@
 
             <div class="row">
               <div class="col-md-6">
-                {% trans 'Hours' %}:
+                {% translate 'Hours' %}:
                 <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}" class="inline">
                   {{ project.grouped_services.logged_hours|hours }}</a>
                 / {{ project.grouped_services.service_hours|hours }}
@@ -42,7 +42,7 @@
               </div>
 
               <div class="col-md-6">
-                {% trans 'Cost' %}:
+                {% translate 'Cost' %}:
                 <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}" class="inline">
                   {{ project.grouped_services.logged_cost|currency }}</a>
                 / {{ project.grouped_services.service_cost|currency }}
@@ -55,37 +55,37 @@
             {% if request.user|has_feature:FEATURES.CONTROLLING %}
               <table class="table table-borderless table-sm">
                 <tr>
-                  <th class="text-right">{% trans 'Total costs' %}</th>
+                  <th class="text-right">{% translate 'Total costs' %}</th>
                   <td>
                     {{ project.grouped_services.total_logged_cost|currency }}
                     {% if project.grouped_services.total_logged_hours_rate_undefined %}
-                      <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.grouped_services.total_logged_hours_rate_undefined|hours }})</span>
+                      <span class="text-warning" title="{% translate 'undefined rate' %}">(+{{ project.grouped_services.total_logged_hours_rate_undefined|hours }})</span>
                     {% endif %}
                     /
                     {{ project.grouped_services.total_service_cost|currency }}
                     {% if project.grouped_services.total_service_hours_rate_undefined %}
-                      <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.grouped_services.total_service_hours_rate_undefined|hours }})</span>
+                      <span class="text-warning" title="{% translate 'undefined rate' %}">(+{{ project.grouped_services.total_service_hours_rate_undefined|hours }})</span>
                     {% endif %}
                     {% if project.grouped_services.total_discount %}
-                      (-{{ project.grouped_services.total_discount|currency }} {% trans 'discount' %})
+                      (-{{ project.grouped_services.total_discount|currency }} {% translate 'discount' %})
                     {% endif %}
                   </td>
                 </tr>
 
                 <tr>
-                  <th class="text-right">{% trans 'Not archived' %}</th>
+                  <th class="text-right">{% translate 'Not archived' %}</th>
                   <td>
                     {{ project.not_archived_total.total|currency }}
                     {% if project.not_archived_total.hours_rate_undefined %}
-                    <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.not_archived_total.hours_rate_undefined|hours }}){% endif %}
+                    <span class="text-warning" title="{% translate 'undefined rate' %}">(+{{ project.not_archived_total.hours_rate_undefined|hours }}){% endif %}
                     </span>
-                    (<a class="inline" href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}&amp;not_archived=1">{% trans "hours" %}</a> /
-                    <a class="inline" href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;not_archived=1">{% trans "cost" %}</a>)
+                    (<a class="inline" href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}&amp;not_archived=1">{% translate "hours" %}</a> /
+                    <a class="inline" href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;not_archived=1">{% translate "cost" %}</a>)
                   </td>
                 </tr>
 
                 <tr>
-                  <th class="text-right">{% trans 'total excl. tax'|capfirst %}</th>
+                  <th class="text-right">{% translate 'total excl. tax'|capfirst %}</th>
                   <td>{{ project.project_invoices_total_excl_tax|currency }}</td>
                 </tr>
               </table>
@@ -98,30 +98,30 @@
 
     <div class="clearfix">
       <a href="{{ project.urls.update }}" class="btn btn-primary">
-        {% trans 'Update' %}</a>
+        {% translate 'Update' %}</a>
       <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-primary">
-        {% trans 'Copy' %}</a>
+        {% translate 'Copy' %}</a>
       <a href="{{ object.urls.statistics }}" class="btn btn-primary" data-toggle="ajaxmodal">
-        {% trans 'Statistics' %}</a>
+        {% translate 'Statistics' %}</a>
       {% if request.user|has_feature:FEATURES.PLANNING %}
         <a href="{{ object.urls.planning }}" class="btn btn-primary">
-          {% include 'svg/project.svg' %} {% trans 'planning'|capfirst %}</a>
+          {% include 'svg/project.svg' %} {% translate 'planning'|capfirst %}</a>
       {% endif %}
 
       {% if request.user|has_feature:FEATURES.CONTROLLING and project.grouped_services.offers|length > 1 %}
         <span class="dropdown">
           <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {% trans 'Project offers' %}
+            {% translate 'Project offers' %}
           </button>
           <div class="dropdown-menu dropdown-menu-right">
-            <h6 class="dropdown-header">{% trans 'offers PDF'|capfirst %}</h6>
+            <h6 class="dropdown-header">{% translate 'offers PDF'|capfirst %}</h6>
             <a class="dropdown-item" href="{{ object.urls.offers_pdf }}" target="_blank">
-              {% trans 'Show' %}</a>
+              {% translate 'Show' %}</a>
             <a class="dropdown-item" href="{{ object.urls.offers_pdf }}?disposition=attachment">
-              {% trans 'Download' %}</a>
+              {% translate 'Download' %}</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{{ object.urls.renumber_offers }}" class="btn btn-primary">
-              {% trans 'Renumber offers' %}</a>
+              {% translate 'Renumber offers' %}</a>
           </div>
         </span>
 
@@ -129,7 +129,7 @@
       {% endif %}
 
       <a href="{{ project.urls.delete }}" class="btn btn-outline-danger float-right">
-        {% trans 'Delete' %}</a>
+        {% translate 'Delete' %}</a>
     </div>
 
     {% for offer, offer_data in project.grouped_services.offers %}
@@ -146,7 +146,7 @@
               {{ offer.status_badge }}
 
               {% for deal in offer.deals.all %}
-                {% if forloop.first %}({% trans 'Related deals' %}:{% endif %}
+                {% if forloop.first %}({% translate 'Related deals' %}:{% endif %}
                 {% link_or_none deal %}{% if forloop.last %}){% else %},{% endif %}
               {% endfor %}
             </div>
@@ -160,7 +160,7 @@
                   </button>
                   <div class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item" href="{{ offer.urls.pdf }}?disposition=attachment">
-                      {% trans 'Download' %}</a>
+                      {% translate 'Download' %}</a>
                   </div>
                 </span>
 
@@ -168,17 +168,17 @@
                   <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
                     id="offer-dropdown-{{ offer.pk }}"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {% trans 'offer'|capfirst %}
+                    {% translate 'offer'|capfirst %}
                   </button>
                   <div class="dropdown-menu dropdown-menu-right" aria-labelledby="offer-dropdown-{{ offer.pk }}">
                     <a class="dropdown-item" href="{{ offer.urls.update }}">
-                      {% trans 'Update' %}</a>
+                      {% translate 'Update' %}</a>
                     <a class="dropdown-item" href="{{ offer.urls.pricing }}">
-                      {% trans 'Pricing' %}</a>
+                      {% translate 'Pricing' %}</a>
                     <a class="dropdown-item" href="{{ offer.urls.copy }}" data-toggle="ajaxmodal">
-                      {% trans 'Copy' %}</a>
+                      {% translate 'Copy' %}</a>
                     <a class="dropdown-item" href="{{ offer.urls.delete }}">
-                      {% trans 'Delete' %}</a>
+                      {% translate 'Delete' %}</a>
                   </div>
                 </span>
                 {% if offer.is_declined %}
@@ -187,7 +187,7 @@
                      data-target=".offer-{{ offer.id }}-collapsed"
                      aria-expanded="false"
                      class="btn btn-primary btn-sm">
-                    {% trans 'Show' %}
+                    {% translate 'Show' %}
                   </a>
                 {% endif %}
               </div>
@@ -201,11 +201,11 @@
 
         {% else %}
           <div class="d-flex w-100 justify-content-between">
-            <h5 class="d-inline my-0">{% trans 'Not offered yet' %}</h5>
+            <h5 class="d-inline my-0">{% translate 'Not offered yet' %}</h5>
 
             {% if request.user|has_feature:FEATURES.CONTROLLING %}
               <a href="{{ project.urls.createoffer }}" class="btn btn-primary btn-sm">
-                {% include 'svg/plus.svg' %} {% trans 'offer'|capfirst %}</a>
+                {% include 'svg/plus.svg' %} {% translate 'offer'|capfirst %}</a>
             {% endif %}
 
           </div>
@@ -215,14 +215,14 @@
         <small class="row justify-content-between">
           <span class="col-md-4">
             <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}&amp;offer={{ offer.pk|default:0 }}">
-              {% trans 'Hours' %}:
+              {% translate 'Hours' %}:
               {{ offer_data.logged_hours|hours }} / {{ offer_data.service_hours|hours }}
             </a>
             {% bar offer_data.logged_hours offer_data.service_hours %}
           </span>
           <span class="col-md-4">
             <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;offer={{ offer.pk|default:0 }}">
-              {% trans 'Cost' %}:
+              {% translate 'Cost' %}:
               {{ offer_data.logged_cost|stringformat:'.2f' }} / {{ offer_data.service_cost|default:0|stringformat:'.2f' }}
             </a>
             {% bar offer_data.logged_cost offer_data.service_cost %}
@@ -239,7 +239,7 @@
             <div class="anchor-container"><a name="service{{ row.service.pk }}" class="anchor"></a></div>
 
             <div class="float-right">
-              <span class="btn btn-primary btn-sm" title="{% trans 'Sort' %}" data-sortable-grabber>
+              <span class="btn btn-primary btn-sm" title="{% translate 'Sort' %}" data-sortable-grabber>
                 {% include 'svg/grabber.svg' %}</span>
 
               {% if request.user|has_feature:FEATURES.CONTROLLING %}
@@ -247,20 +247,20 @@
                   <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
                     id="service-dropdown-{{ row.service.pk }}"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {% trans 'service'|capfirst %}
+                    {% translate 'service'|capfirst %}
                   </button>
                   <div class="dropdown-menu dropdown-menu-right" aria-labelledby="service-dropdown-{{ row.service.pk }}">
                     <a class="dropdown-item" href="{{ row.service.urls.update }}" data-toggle="ajaxmodal">
-                      {% trans 'Update' %}</a>
+                      {% translate 'Update' %}</a>
                     <a class="dropdown-item" href="{{ row.service.urls.reassign_logbook }}" data-toggle="ajaxmodal">
-                      {% trans 'Reassign logbook entries' %}</a>
+                      {% translate 'Reassign logbook entries' %}</a>
                     <a class="dropdown-item" href="{{ row.service.urls.delete }}" data-toggle="ajaxmodal">
-                      {% trans 'Delete' %}</a>
+                      {% translate 'Delete' %}</a>
                     <a class="dropdown-item" href="{{ row.service.urls.move }}" data-toggle="ajaxmodal">
-                      {% trans 'Move to other project' %}</a>
+                      {% translate 'Move to other project' %}</a>
                     {% if row.service.pk and not row.service.effort_rate %}
                       <div class="dropdown-divider"></div>
-                      <h6 class="dropdown-header">{% trans 'Assign service type' %}:</h6>
+                      <h6 class="dropdown-header">{% translate 'Assign service type' %}:</h6>
                       {% for service_type in view.default_service_types %}
                       <a class="dropdown-item" href="{{ row.service.urls.assign_service_type }}?service_type={{ service_type.pk }}">
                         <div class="d-flex w-100 justify-content-between">
@@ -279,7 +279,7 @@
 
           <h5 class="mb-1">
             {{ row.service.title }}
-            {% if row.service.is_optional %}<em>({% trans 'optional' %})</em>{% endif %}
+            {% if row.service.is_optional %}<em>({% translate 'optional' %})</em>{% endif %}
             {% history_link row.service %}
           </h5>
           <p>
@@ -296,7 +296,7 @@
                   {% else %}
                     {{ row.service.service_hours|hours }}
                     {% if row.logged_hours or row.service.service_hours %}
-                      <span class="text-warning">{% trans 'undefined rate' %}</span>
+                      <span class="text-warning">{% translate 'undefined rate' %}</span>
                     {% endif %}
                   {% endif %}
                 </a>
@@ -314,17 +314,17 @@
                 {% if row.service.pk %}
                   <a href="{{ project.urls.createhours }}?service={{ row.service.pk }}"
                     data-toggle="ajaxmodal">
-                    {% include "svg/plus.svg" %} {% trans 'Hours' %}</a>
+                    {% include "svg/plus.svg" %} {% translate 'Hours' %}</a>
                 {% endif %}
                 <a href="{{ project.urls.createcost }}?service={{ row.service.pk|default:'' }}"
                   data-toggle="ajaxmodal">
-                  {% include "svg/plus.svg" %} {% trans 'Cost' %}</a>
+                  {% include "svg/plus.svg" %} {% translate 'Cost' %}</a>
               {% endif %}
             </span>
           </small>
         </div>
         {% empty %}
-        <div class="card-body">{% trans 'No services yet.' %}</div>
+        <div class="card-body">{% translate 'No services yet.' %}</div>
         {% endfor %}
       </div>
     </div>
@@ -333,7 +333,7 @@
     {% if request.user|has_feature:FEATURES.CONTROLLING and object.project_invoices %}
     <div class="card my-3">
       <div class="card-header d-flex align-items-center justify-content-between">
-        <h5 class="d-inline my-0">{% trans 'invoices' %}</h5>
+        <h5 class="d-inline my-0">{% translate 'invoices' %}</h5>
       </div>
       <div class="list-group list-group-flush">
         {% for invoice in object.project_invoices %}
@@ -362,28 +362,28 @@
           id="invoice-dropdown-button" data-toggle="dropdown"
           aria-haspopup="true" aria-expanded="false">
           {% include "svg/plus.svg" %}
-          {% trans 'invoice'|capfirst %}</a>
+          {% translate 'invoice'|capfirst %}</a>
         </button>
         <div class="dropdown-menu" aria-labelledby="invoice-dropdown-button">
-          <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=fixed">{% trans 'Fixed amount' %}</a>
-          <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=down-payment">{% trans 'Down payment' %}</a>
-          <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=logbook">{% trans 'Services from logbook' %}</a>
-          <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=offer">{% trans 'Services from offer' %}</a>
+          <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=fixed">{% translate 'Fixed amount' %}</a>
+          <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=down-payment">{% translate 'Down payment' %}</a>
+          <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=logbook">{% translate 'Services from logbook' %}</a>
+          <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=offer">{% translate 'Services from offer' %}</a>
         </div>
       </span>
       <a href="{{ project.urls.createoffer }}" class="btn btn-primary">
-        {% include 'svg/plus.svg' %} {% trans 'offer'|capfirst %}</a>
+        {% include 'svg/plus.svg' %} {% translate 'offer'|capfirst %}</a>
       <a href="{{ project.urls.createservice }}" class="btn btn-primary"
         data-toggle="ajaxmodal">
-        {% include "svg/plus.svg" %} {% trans 'service'|capfirst %}</a>
+        {% include "svg/plus.svg" %} {% translate 'service'|capfirst %}</a>
     {% endif %}
 
     <a href="{{ project.urls.createhours }}" class="btn btn-primary" data-toggle="ajaxmodal">
       {% include "svg/plus.svg" %}
-      {% trans 'Hours' %}</a>
+      {% translate 'Hours' %}</a>
     <a href="{{ project.urls.createcost }}" class="btn btn-primary" data-toggle="ajaxmodal" data-createcost>
       {% include "svg/plus.svg" %}
-      {% trans 'Cost' %}</a>
+      {% translate 'Cost' %}</a>
 
   </div>
 </div>
@@ -393,10 +393,10 @@
   <a href="{{ project.urls.createhours }}"
      data-createhours
      data-toggle="ajaxmodal"
-     class="btn btn-primary fixed-btn" title="{% trans 'log hours' %}"></a>
+     class="btn btn-primary fixed-btn" title="{% translate 'log hours' %}"></a>
   <a href="{% url 'logbook_break_create' %}"
      data-toggle="ajaxmodal"
-     class="btn btn-primary fixed-btn break" title="{% trans 'took a break' %}"></a>
+     class="btn btn-primary fixed-btn break" title="{% translate 'took a break' %}"></a>
 {% endblock %}
 
 {% block js %}{{ block.super }}

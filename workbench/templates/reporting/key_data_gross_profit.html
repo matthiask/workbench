@@ -4,16 +4,16 @@
 
 {% block size %}modal-xl{% endblock %}
 
-{% block title %}{% trans 'Gross profit' %} {{ date_range.0|date:'F Y' }}{% endblock %}
+{% block title %}{% translate 'Gross profit' %} {{ date_range.0|date:'F Y' }}{% endblock %}
 
 {% block body %}
 <table class="table table-sm bg-light">
   <tr>
-    <th class="w-100">{% trans 'invoice'|capfirst %}</th>
-    <th class="text-nowrap">{% trans 'type'|capfirst %}</th>
-    <th class="text-nowrap">{% trans 'invoiced on'|capfirst %}</th>
-    <th class="text-nowrap text-right">{% trans 'total'|capfirst %}</th>
-    <th class="text-nowrap text-right">{% trans 'total excl. tax'|capfirst %}</th>
+    <th class="w-100">{% translate 'invoice'|capfirst %}</th>
+    <th class="text-nowrap">{% translate 'type'|capfirst %}</th>
+    <th class="text-nowrap">{% translate 'invoiced on'|capfirst %}</th>
+    <th class="text-nowrap text-right">{% translate 'total'|capfirst %}</th>
+    <th class="text-nowrap text-right">{% translate 'total excl. tax'|capfirst %}</th>
   </tr>
   {% for invoice in invoices %}
     <tr>

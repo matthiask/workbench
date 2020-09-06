@@ -2,12 +2,12 @@
 
 {% load fineforms i18n static workbench %}
 
-{% block title %}{% trans 'Green hours' %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'Green hours' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12 col-md-8">
-  <h1>{% trans 'Green hours' %}</h1>
+  <h1>{% translate 'Green hours' %}</h1>
 
   <form method="get" class="mb-3" data-autosubmit>
     {% ff_fields form %}
@@ -16,17 +16,17 @@
   <table class="table table-sm table-striped">
     <thead>
       <tr>
-        <th>{% trans 'user'|capfirst %}</th>
-        <th class="text-right">{% trans 'profitable'|capfirst %}</th>
+        <th>{% translate 'user'|capfirst %}</th>
+        <th class="text-right">{% translate 'profitable'|capfirst %}</th>
         <th></th>
-        <th class="text-right">{% trans 'overdrawn'|capfirst %}</th>
+        <th class="text-right">{% translate 'overdrawn'|capfirst %}</th>
         <th></th>
-        <th class="text-right">{% trans 'maintenance'|capfirst %}</th>
+        <th class="text-right">{% translate 'maintenance'|capfirst %}</th>
         <th></th>
-        <th class="text-right">{% trans 'internal'|capfirst %}</th>
+        <th class="text-right">{% translate 'internal'|capfirst %}</th>
         <th></th>
-        <th class="text-right">{% trans 'total'|capfirst %}</th>
-        <th class="text-right">{% trans 'green'|capfirst %}</th>
+        <th class="text-right">{% translate 'total'|capfirst %}</th>
+        <th class="text-right">{% translate 'green'|capfirst %}</th>
       </tr>
     </thead>
     <tbody>
@@ -35,7 +35,7 @@
       {% if user %}
         <td>{{ user }}</td>
       {% else %}
-        <th>{% trans 'total'|capfirst %}</th>
+        <th>{% translate 'total'|capfirst %}</th>
       {% endif %}
       <td class="text-right">{{ stats.green|hours }}</td>
       <td>{% percentage stats.green stats.total %}</td>

@@ -4,17 +4,17 @@
 
 {% block size %}modal-xl{% endblock %}
 
-{% block title %}{% trans 'Statistics' %}{% endblock %}
+{% block title %}{% translate 'Statistics' %}{% endblock %}
 
 {% block body %}
 
-<h2>{% trans 'Logged hours per hourly rate' %}</h2>
+<h2>{% translate 'Logged hours per hourly rate' %}</h2>
 <table>
 {% for rate, hours in object.grouped_services.logged_hours_per_effort_rate %}
 <tr {% if rate is None %}class="text-warning"{% endif %}>
   <td class="text-right">{{ hours|hours }} &nbsp;</td>
   <td>
-    {% if rate is None %}{% trans 'undefined rate' %}
+    {% if rate is None %}{% translate 'undefined rate' %}
     {% else %}{{ rate|currency }}/h
     {% endif %}
   </td>
@@ -22,20 +22,20 @@
 {% endfor %}
 </table>
 
-<h2>{% trans 'Logged hours per user' %}</h2>
+<h2>{% translate 'Logged hours per user' %}</h2>
 
 <table class="table table-sm table-responsive">
   <tr>
     <th></th>
-    <th>{% trans 'Scheduled' %}</th>
-    <th>{% trans 'Logged' %}</th>
+    <th>{% translate 'Scheduled' %}</th>
+    <th>{% translate 'Logged' %}</th>
     <th></th>
     {% for user, hours in object.grouped_services.logged_hours_per_user %}
       <th class="text-right">{{ user.get_short_name }}</th>
     {% endfor %}
   </tr>
   <tr>
-    <th>{% trans 'Total' %}</th>
+    <th>{% translate 'Total' %}</th>
     <th class="text-right">
       {{ object.grouped_services.service_hours|hours }}
     </th>

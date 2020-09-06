@@ -29,7 +29,7 @@
       {{ address.postal_address|linebreaksbr }}
       {% if address.get_maps_url %}
         <br>
-        <a href="{{ address.get_maps_url }}" target="_blank" rel="noopener noreferrer">{% trans 'Maps' %}</a>
+        <a href="{{ address.get_maps_url }}" target="_blank" rel="noopener noreferrer">{% translate 'Maps' %}</a>
       {% endif %}
       <br>
     {% endfor %}
@@ -51,17 +51,17 @@
 
 <a href="{% url 'projects_project_create' %}?contact={{ object.pk }}" class="btn btn-primary">
   {% include "svg/plus.svg" %}
-  {% trans 'project'|capfirst %}
+  {% translate 'project'|capfirst %}
 </a>
 <a href="{% url 'invoices_invoice_create' %}?contact={{ object.pk }}" class="btn btn-primary">
   {% include "svg/plus.svg" %}
-  {% trans 'invoice'|capfirst %}
+  {% translate 'invoice'|capfirst %}
 </a>
 <a href="{{ object.urls.vcard }}" class="btn btn-primary">
   {% include 'svg/desktop-download.svg' %} vCard
 </a>
 <a href="{{ object.urls.update }}" class="btn btn-primary">
-  {% trans 'Update' %}</a>
+  {% translate 'Update' %}</a>
 <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
-  {% trans 'Delete' %}</a>
+  {% translate 'Delete' %}</a>
 {% endblock %}

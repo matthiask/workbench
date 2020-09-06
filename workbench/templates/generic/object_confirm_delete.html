@@ -8,7 +8,7 @@
 <div class="row">
   <div class="col-md-6 offset-md-3">
     <h1>
-      {% blocktrans %}Delete {{ object }}{% endblocktrans %}
+      {% blocktranslate %}Delete {{ object }}{% endblocktranslate %}
     </h1>
 
     <form method="POST" action="." class="form">
@@ -20,9 +20,9 @@
       {% endif %}
       {% buttons %}
         <a href="{{ object.get_absolute_url }}" class="btn btn-primary">
-          {% trans 'cancel' %}</a>
+          {% translate 'cancel' %}</a>
         <button type="submit" class="btn btn-danger float-right">
-          {% trans 'delete' %}</button>
+          {% translate 'delete' %}</button>
       {% endbuttons %}
     </form>
 

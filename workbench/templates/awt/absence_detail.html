@@ -7,19 +7,19 @@
 {% block body %}
   <table class="table table-striped">
     <tr>
-      <th class="text-right">{% trans 'user'|capfirst %}</th>
+      <th class="text-right">{% translate 'user'|capfirst %}</th>
       <td>{% link_or_none object.user %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'absence'|capfirst %}</th>
+      <th class="text-right">{% translate 'absence'|capfirst %}</th>
       <td>{{ object.pretty_status }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'reason'|capfirst %}</th>
+      <th class="text-right">{% translate 'reason'|capfirst %}</th>
       <td>{{ object.get_reason_display }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'description'|capfirst %}</th>
+      <th class="text-right">{% translate 'description'|capfirst %}</th>
       <td>{{ object.description|linebreaksbr }}</td>
     </tr>
   </table>
@@ -27,9 +27,9 @@
 
 {% block footer %}
   <a href="{{ object.urls.update }}" data-toggle="ajaxmodal" class="btn btn-primary mr-auto">
-    {% trans 'Update' %}
+    {% translate 'Update' %}
   </a>
   <a href="{{ object.urls.delete }}" data-toggle="ajaxmodal" class="btn btn-outline-danger">
-    {% trans 'Delete' %}
+    {% translate 'Delete' %}
   </a>
 {% endblock %}

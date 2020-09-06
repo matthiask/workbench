@@ -7,9 +7,9 @@
   <div class="col-md-8 col-lg-6">
     <h1>
       {% if object %}
-        {% blocktrans with object=object.full_name %}Update {{ object }}{% endblocktrans %}
+        {% blocktranslate with object=object.full_name %}Update {{ object }}{% endblocktranslate %}
       {% else %}
-        {% blocktrans with class=view.meta.verbose_name %}Create {{ class }}{% endblocktrans %}
+        {% blocktranslate with class=view.meta.verbose_name %}Create {{ class }}{% endblocktranslate %}
       {% endif %}
     </h1>
 
@@ -21,7 +21,7 @@
       {% ff_fields form %}
 
       {% if form.formsets %}
-        <h4>{% trans 'phone numbers' %}</h4>
+        <h4>{% translate 'phone numbers' %}</h4>
         {% formset form.formsets.phonenumbers "phonenumbers" %}
         <div id="{{ form_id }}" class="card bg-light mb-3">
           <div class="card-body">
@@ -40,7 +40,7 @@
           {% include 'svg/plus.svg' %}
         </a>
 
-        <h4 class="mt-5">{% trans 'email addresses' %}</h4>
+        <h4 class="mt-5">{% translate 'email addresses' %}</h4>
         {% formset form.formsets.emailaddresses "emailaddresses" %}
         <div id="{{ form_id }}" class="card bg-light mb-3">
           <div class="card-body">
@@ -59,7 +59,7 @@
           {% include 'svg/plus.svg' %}
         </a>
 
-        <h4 class="mt-5">{% trans 'postal addresses' %}</h4>
+        <h4 class="mt-5">{% translate 'postal addresses' %}</h4>
         {% formset form.formsets.postaladdresses "postaladdresses" %}
         <div id="{{ form_id }}" class="card bg-light mb-3">
           <div class="card-body">
@@ -89,11 +89,11 @@
       <div class="row mt-5">
         <div class="col-sm-12">
           <button type="submit" class="btn btn-primary">
-            {% trans 'Save' %}</button>
+            {% translate 'Save' %}</button>
 
           {% if object.get_absolute_url %}
           <a href="{{ object.get_absolute_url }}" class="btn float-right btn-outline-danger">
-            {% trans 'cancel' %}</a>
+            {% translate 'cancel' %}</a>
           {% endif %}
         </div>
       </div>

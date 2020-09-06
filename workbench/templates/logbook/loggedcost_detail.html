@@ -10,56 +10,56 @@
 {% block body %}
   <table class="table table-striped">
     <tr>
-      <th class="text-right">{% trans 'project'|capfirst %}</th>
+      <th class="text-right">{% translate 'project'|capfirst %}</th>
       <td>{% link_or_none object.service.project %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'service'|capfirst %}</th>
+      <th class="text-right">{% translate 'service'|capfirst %}</th>
       <td>{% link_or_none object.service %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'created'|capfirst %}</th>
+      <th class="text-right">{% translate 'created'|capfirst %}</th>
       <td>
-        {{ object.created_at|local_date_format }} {% trans 'by' %}
+        {{ object.created_at|local_date_format }} {% translate 'by' %}
         {{ object.created_by.get_short_name }}
       </td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'rendered'|capfirst %}</th>
+      <th class="text-right">{% translate 'rendered'|capfirst %}</th>
       <td>
-        {{ object.rendered_on|local_date_format }} {% trans 'by' %}
+        {{ object.rendered_on|local_date_format }} {% translate 'by' %}
         {{ object.rendered_by.get_short_name }}
       </td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'cost'|capfirst %}</th>
+      <th class="text-right">{% translate 'cost'|capfirst %}</th>
       <td>
         {{ object.cost|currency }}
         {% if object.third_party_costs %}
           /
-          {% if object.are_expenses %}{% trans 'expenses' %}{% else %}{% trans 'third party costs'|capfirst %}{% endif %}:
+          {% if object.are_expenses %}{% translate 'expenses' %}{% else %}{% translate 'third party costs'|capfirst %}{% endif %}:
           {{ object.third_party_costs|currency }}
         {% endif %}
       </td>
     </tr>
     {% if object.are_expenses %}
       <tr>
-        <th class="text-right">{% trans 'expense report'|capfirst %}</th>
+        <th class="text-right">{% translate 'expense report'|capfirst %}</th>
         <td>{% link_or_none object.expense_report%}</td>
       </tr>
     {% endif %}
     <tr>
-      <th class="text-right">{% trans 'description'|capfirst %}</th>
+      <th class="text-right">{% translate 'description'|capfirst %}</th>
       <td>{{ object.description|linebreaksbr }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'invoicing'|capfirst %}</th>
+      <th class="text-right">{% translate 'invoicing'|capfirst %}</th>
       <td>
         {% if object.invoice_service %}{% link_or_none object.invoice_service %}
         {% elif object.archived_at %}
-          {% blocktrans with archived_at=object.archived_at|local_date_format trimmed %}
+          {% blocktranslate with archived_at=object.archived_at|local_date_format trimmed %}
             Archived at {{ archived_at }}
-          {% endblocktrans %}
+          {% endblocktranslate %}
         {% else %}&ndash;
         {% endif %}
       </td>
@@ -70,14 +70,14 @@
 {% block footer %}
   <a href="{{ object.urls.update }}" class="btn btn-primary mr-auto"
     data-toggle="ajaxmodal">
-    {% trans 'Update' %}
+    {% translate 'Update' %}
   </a>
   <a href="{{ object.urls.move }}" class="btn btn-primary mr-auto"
     data-toggle="ajaxmodal">
-    {% trans 'Move' %}
+    {% translate 'Move' %}
   </a>
   <a href="{{ object.urls.delete }}" class="btn btn-outline-danger"
     data-toggle="ajaxmodal"
-    >{% trans 'Delete' %}
+    >{% translate 'Delete' %}
   </a>
 {% endblock %}

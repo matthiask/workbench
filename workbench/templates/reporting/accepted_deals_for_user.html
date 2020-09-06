@@ -4,7 +4,7 @@
 
 {% block size %}modal-xl{% endblock %}
 
-{% block title %}{% trans 'Accepted deals' %}{% endblock %}
+{% block title %}{% translate 'Accepted deals' %}{% endblock %}
 
 {% block body %}
 {% for row in stats.by_user %}
@@ -12,10 +12,10 @@
 
 <table class="table table-sm bg-light">
   <tr>
-    <th>{% trans 'deal' %}</th>
+    <th>{% translate 'deal' %}</th>
     <th></th>
-    <th>{% trans 'Award of contract' %}</th>
-    <th class="text-right">{% trans 'value' %}</th>
+    <th>{% translate 'Award of contract' %}</th>
+    <th class="text-right">{% translate 'value' %}</th>
   </tr>
   {% for deal in row.deals %}
     <tr>

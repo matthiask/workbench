@@ -9,7 +9,7 @@
 
   <table class="table table-striped">
     <tr>
-      <td class="text-right">{% trans 'people'|capfirst %}</td>
+      <td class="text-right">{% translate 'people'|capfirst %}</td>
       <td>
         {% for person in organization.people.all %}
           <a class="inline" href="{{ person.get_absolute_url }}">{{ person }}</a>{% if not forloop.last %},{% endif %}
@@ -41,22 +41,22 @@
 
 <a href="{% url 'contacts_person_create' %}?organization={{ object.pk }}" class="btn btn-primary">
   {% include "svg/plus.svg" %}
-  {% trans 'person'|capfirst %}
+  {% translate 'person'|capfirst %}
 </a>
 <a href="{% url 'projects_project_create' %}?customer={{ object.pk }}" class="btn btn-primary">
   {% include "svg/plus.svg" %}
-  {% trans 'project'|capfirst %}
+  {% translate 'project'|capfirst %}
 </a>
 <a href="{% url 'invoices_invoice_create' %}?customer={{ object.pk }}" class="btn btn-primary">
   {% include "svg/plus.svg" %}
-  {% trans 'invoice'|capfirst %}
+  {% translate 'invoice'|capfirst %}
 </a>
 <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}"
-  class="btn btn-primary">{% trans 'invoices'|capfirst %}</a>
+  class="btn btn-primary">{% translate 'invoices'|capfirst %}</a>
 <a href="{{ object.urls.update }}" class="btn btn-primary">
-  {% trans 'Update' %}</a>
+  {% translate 'Update' %}</a>
 <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
-  {% trans 'Delete or substitute' %}</a>
+  {% translate 'Delete or substitute' %}</a>
 </div>
 </div>
 
@@ -65,34 +65,34 @@
   {% if request.user|has_feature:FEATURES.CONTROLLING %}
     <div class="col-md-6 col-lg-3">
       <div class="card mb-3">
-        <div class="card-header"><h3 class="my-0">{% trans 'Statistics' %}</h3></div>
+        <div class="card-header"><h3 class="my-0">{% translate 'Statistics' %}</h3></div>
 
         <div class="card-body">
           <table class="table table-sm">
             <tr>
               <th class="text-right">
-                <a href="{% url 'offers_offer_list' %}?org={{ object.pk }}&amp;s=all">{% trans 'Offered' %}</a>
+                <a href="{% url 'offers_offer_list' %}?org={{ object.pk }}&amp;s=all">{% translate 'Offered' %}</a>
               </th>
               <td>{{ object.statistics.offered|currency }}</td>
             </tr>
             <tr>
               <th class="text-right">
-                <a href="{% url 'invoices_invoice_list' %}?org={{ object.pk }}">{% trans 'Gross profit' %}</a>
+                <a href="{% url 'invoices_invoice_list' %}?org={{ object.pk }}">{% translate 'Gross profit' %}</a>
               </th>
               <td>{{ object.statistics.invoiced|currency }}</td>
             </tr>
             <tr>
-              <th class="text-right">{% trans 'third party costs'|capfirst %}</th>
+              <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
               <td>{{ object.statistics.third_party_costs|currency }}</td>
             </tr>
             <tr>
               <th class="text-right">
-                <a href="{% url 'logbook_loggedhours_list' %}?organization={{ object.pk }}">{% trans 'logged hours'|capfirst %}</a>
+                <a href="{% url 'logbook_loggedhours_list' %}?organization={{ object.pk }}">{% translate 'logged hours'|capfirst %}</a>
               </th>
               <td>{{ object.statistics.hours|hours }}</td>
             </tr>
             <tr>
-              <th class="text-right">{% trans 'Gross margin / hour' %}</th>
+              <th class="text-right">{% translate 'Gross margin / hour' %}</th>
               <td>{{ object.statistics.gross_margin_per_hour|currency }}</td>
             </tr>
           </table>
@@ -106,7 +106,7 @@
     <div class="card mb-3">
       <div class="card-header"><h3 class="my-0">
         <a href="{% url 'projects_project_list' %}?org={{ organization.pk }}">
-          {% trans 'Recent projects' %}
+          {% translate 'Recent projects' %}
         </a>
       </h3></div>
 
@@ -127,7 +127,7 @@
       <div class="card mb-3">
         <div class="card-header"><h3 class="my-0">
           <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}">
-            {% trans 'Recent invoices' %}
+            {% translate 'Recent invoices' %}
           </a>
         </h3></div>
 
@@ -146,7 +146,7 @@
       <div class="card mb-3">
         <div class="card-header"><h3 class="my-0">
           <a href="{% url 'offers_offer_list' %}?org={{ organization.pk }}">
-            {% trans 'Recent offers' %}
+            {% translate 'Recent offers' %}
           </a>
         </h3></div>
 

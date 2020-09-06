@@ -2,7 +2,7 @@
 
 {% load i18n workbench %}
 
-{% block title %}{% trans 'timestamps'|capfirst %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'timestamps'|capfirst %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -11,13 +11,13 @@
     <div class="card mb-3">
       <div class="card-header d-flex w-100 justify-content-between">
         <h3 class="my-0">
-          {% trans "timestamps"|capfirst %}
+          {% translate "timestamps"|capfirst %}
           <small>
             {% if is_today %}
               <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}">
-                {{ request.user.hours.today|hours }} {% trans 'today' %}</a> /
+                {{ request.user.hours.today|hours }} {% translate 'today' %}</a> /
               <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">
-                {{ request.user.hours.week|hours }} {% trans 'this week' %}</a>
+                {{ request.user.hours.week|hours }} {% translate 'this week' %}</a>
             {% else %}
               {{ day|local_date_format }} / {{ hours|hours }}
             {% endif %}
@@ -27,14 +27,14 @@
 
           {% if previous %}
           <a href="?day={{ previous.isoformat }}" class="btn btn-primary btn-sm align-self-start"
-                                                  title="{% trans 'Previous day' %}">
+                                                  title="{% translate 'Previous day' %}">
             &laquo;
           </a>
           {% endif %}
 
           {% if next %}
           <a href="?day={{ next.isoformat }}" class="btn btn-primary btn-sm align-self-start"
-                                              title="{% trans 'Next day' %}">
+                                              title="{% translate 'Next day' %}">
             &raquo;
           </a>
           {% endif %}
@@ -44,7 +44,7 @@
              target="_blank"
              rel="noopener noreferrer"
              onclick="window.open(this.href, 'timestamps', 'innerHeight=450,innerWidth=400,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no');return false">
-            {% trans 'Controller' %}</a>
+            {% translate 'Controller' %}</a>
 
         </div>
       </div>
@@ -69,7 +69,7 @@
                 <a href="{{ slice.hours_create_url }}"
                    data-toggle="ajaxmodal"
                    class="btn btn-sm align-self-start btn-primary">
-                  {% trans 'hours'|capfirst %}
+                  {% translate 'hours'|capfirst %}
                 </a>
                 {% endif %}
 
@@ -77,22 +77,22 @@
                 <a href="{{ slice.break_create_url }}"
                    data-toggle="ajaxmodal"
                    class="btn btn-sm align-self-start btn-primary">
-                  {% trans 'break'|capfirst %}
+                  {% translate 'break'|capfirst %}
                 </a>
                 {% endif %}
 
                 {% if slice.logged_hours %}
                 <a href="{{ slice.logged_hours.get_absolute_url }}"
                    data-toggle="ajaxmodal"
-                   class="btn btn-sm btn-outline-primary">{% trans 'hours'|capfirst %}</a>
+                   class="btn btn-sm btn-outline-primary">{% translate 'hours'|capfirst %}</a>
 
                 {% elif slice.logged_break %}
                 <a href="{{ slice.logged_break.get_absolute_url }}"
                    data-toggle="ajaxmodal"
-                   class="btn btn-sm btn-outline-primary">{% trans 'break'|capfirst %}</a>
+                   class="btn btn-sm btn-outline-primary">{% translate 'break'|capfirst %}</a>
 
                 {% elif slice.timestamp_id %}
-                <form class="d-inline" method="post" action="{% url 'delete_timestamp' slice.timestamp_id %}" onsubmit="return confirm('{% trans 'Really delete?'|escapejs %}')">
+                <form class="d-inline" method="post" action="{% url 'delete_timestamp' slice.timestamp_id %}" onsubmit="return confirm('{% translate 'Really delete?'|escapejs %}')">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
                 </form>

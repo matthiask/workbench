@@ -21,7 +21,7 @@
     </div>
     <div class="col-md-5">
       <div data-autofill="{{ view.default_service_types_json }}">
-        <h5>{% trans 'effort' %}</h5>
+        <h5>{% translate 'effort' %}</h5>
         {% if form.service_type %}{% ff_field form.service_type %}{% endif %}
         <div class="row">
           <div class="col-md-12">{% ff_field form.effort_type %}</div>
@@ -30,13 +30,13 @@
         </div>
       </div>
 
-      <h5>{% trans 'cost' %}</h5>
+      <h5>{% translate 'cost' %}</h5>
       <div class="row">
         <div class="col-md-6">{% ff_field form.cost %}</div>
         <div class="col-md-6">{% ff_field form.third_party_costs %}</div>
       </div>
 
-      <h5>{% trans 'offer' %}</h5>
+      <h5>{% translate 'offer' %}</h5>
       {% ff_fields form fields='offer,is_optional' %}
     </div>
   </div>

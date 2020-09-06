@@ -2,7 +2,7 @@
 
 {% load i18n workbench webpack_loader %}
 
-{% block title %}{% trans 'planning'|capfirst %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'planning'|capfirst %} - {{ block.super }}{% endblock %}
 
 {% block inner_content %}
 
@@ -19,7 +19,7 @@
   <div class="col-12">
     <a href="{% url 'planning_plannedwork_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
       {% include 'svg/plus.svg' %}
-      {% trans 'planned work'|capfirst %}
+      {% translate 'planned work'|capfirst %}
     </a>
   </div>
 </div>

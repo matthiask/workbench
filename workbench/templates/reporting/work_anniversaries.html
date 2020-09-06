@@ -2,20 +2,20 @@
 
 {% load fineforms i18n static workbench %}
 
-{% block title %}{% trans 'Work anniversaries' %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'Work anniversaries' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12 col-lg-8">
-  <h1>{% trans 'Work anniversaries' %}</h1>
+  <h1>{% translate 'Work anniversaries' %}</h1>
 
   <table class="table table-sm table-striped">
     <thead>
       <tr>
-        <th>{% trans 'user'|capfirst %}</th>
-        <th>{% trans 'Started on' %}</th>
-        <th class="text-right">{% trans 'Work anniversary' %}</th>
-        <th>{% trans 'On' %}</th>
+        <th>{% translate 'user'|capfirst %}</th>
+        <th>{% translate 'Started on' %}</th>
+        <th class="text-right">{% translate 'Work anniversary' %}</th>
+        <th>{% translate 'On' %}</th>
       </tr>
     </thead>
     <tbody>

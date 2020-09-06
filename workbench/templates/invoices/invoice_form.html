@@ -5,7 +5,7 @@
 {% block uplink %}
 {% if view.project %}
   <a href="{{ view.project.get_absolute_url }}" class="btn btn-primary btn-sm uplink">
-    {% include 'svg/chevron-left.svg' %} {% trans 'project' %}
+    {% include 'svg/chevron-left.svg' %} {% translate 'project' %}
   </a>
 {% else %}{{ block.super }}
 {% endif %}

@@ -2,12 +2,12 @@
 
 {% load fineforms i18n workbench %}
 
-{% block title %}{% trans 'Deal history' %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'Deal history' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-md-10 col-lg-8">
-  <h1>{% trans 'Deal history' %}</h1>
+  <h1>{% translate 'Deal history' %}</h1>
 
   <form method="get" class="mb-3" data-autosubmit>
     {% ff_fields form %}

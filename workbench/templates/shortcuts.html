@@ -2,106 +2,106 @@
 
 {% load i18n workbench %}
 
-{% block title %}{% trans 'Keyboard shortcuts' %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'Keyboard shortcuts' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-md-8 col-lg-6">
-    <h1>{% trans 'Keyboard shortcuts' %}</h1>
+    <h1>{% translate 'Keyboard shortcuts' %}</h1>
 
     <table class="table" data-shortcuts>
       <tr>
         <th class="text-right text-nowrap">Ctrl-Q</th>
-        <td>{% trans 'Search everything' %}</td>
+        <td>{% translate 'Search everything' %}</td>
       </tr>
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-F</th>
-        <td>{% trans 'Focus the search form in list views' %}</td>
+        <td>{% translate 'Focus the search form in list views' %}</td>
       </tr>
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-Return</th>
-        <td>{% trans 'Submit the current form' %}</td>
+        <td>{% translate 'Submit the current form' %}</td>
       </tr>
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-H</th>
-        <td>{% trans 'Home' %}</td>
+        <td>{% translate 'Home' %}</td>
       </tr>
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-C</th>
-        <td>{% trans 'people'|capfirst %}</td>
+        <td>{% translate 'people'|capfirst %}</td>
       </tr>
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-Shift-C</th>
-        <td>{% trans 'Jump to person' %}</td>
+        <td>{% translate 'Jump to person' %}</td>
       </tr>
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-P</th>
-        <td>{% trans 'projects'|capfirst %}</td>
+        <td>{% translate 'projects'|capfirst %}</td>
       </tr>
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-Shift-P</th>
-        <td>{% trans 'Jump to project' %}</td>
+        <td>{% translate 'Jump to project' %}</td>
       </tr>
 
       {% if request.user|has_feature:FEATURES.CONTROLLING %}
       <tr>
         <th class="text-right text-nowrap">Ctrl-O</th>
-        <td>{% trans 'offers'|capfirst %}</td>
+        <td>{% translate 'offers'|capfirst %}</td>
       </tr>
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-R</th>
-        <td>{% trans 'invoices'|capfirst %}</td>
+        <td>{% translate 'invoices'|capfirst %}</td>
       </tr>
       {% endif %}
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-T</th>
-        <td>{% trans 'timestamps'|capfirst %}</td>
+        <td>{% translate 'timestamps'|capfirst %}</td>
       </tr>
 
       {% if request.user|has_feature:FEATURES.DEALS %}
       <tr>
         <th class="text-right text-nowrap">Ctrl-D</th>
-        <td>{% trans 'deals'|capfirst %}</td>
+        <td>{% translate 'deals'|capfirst %}</td>
       </tr>
       {% endif %}
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-L</th>
-        <td>{% trans 'Log hours in active project or in any project if none is active' %}</td>
+        <td>{% translate 'Log hours in active project or in any project if none is active' %}</td>
       </tr>
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-Shift-L</th>
-        <td>{% trans 'Log hours in any project' %}</td>
+        <td>{% translate 'Log hours in any project' %}</td>
       </tr>
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-K</th>
-        <td>{% trans 'Log costs in active project or in any project if none is active' %}</td>
+        <td>{% translate 'Log costs in active project or in any project if none is active' %}</td>
       </tr>
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-Shift-K</th>
-        <td>{% trans 'Log costs in any project' %}</td>
+        <td>{% translate 'Log costs in any project' %}</td>
       </tr>
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-B</th>
-        <td>{% trans 'Log a break' %}</td>
+        <td>{% translate 'Log a break' %}</td>
       </tr>
 
       <tr>
         <th class="text-right text-nowrap">Ctrl-Shift-B</th>
-        <td>{% trans 'breaks'|capfirst %}</td>
+        <td>{% translate 'breaks'|capfirst %}</td>
       </tr>
 
     </table>

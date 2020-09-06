@@ -2,20 +2,20 @@
 
 {% load i18n workbench %}
 
-{% block title %}{% trans 'Reminders' %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'Reminders' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 
 <div class="row">
 <div class="col-sm-12">
-  <h1>{% trans 'Reminders' %}</h1>
+  <h1>{% translate 'Reminders' %}</h1>
 
   <table class="table table-sm table-responsive-lg">
     <thead class="sticky">
       <tr>
-        <th class="">{% trans 'customer'|capfirst %}</th>
-        <th class="text-nowrap">{% trans 'invoices'|capfirst %}</th>
-        <th class="text-nowrap text-right">{% trans 'Last reminded on' %}</th>
+        <th class="">{% translate 'customer'|capfirst %}</th>
+        <th class="text-nowrap">{% translate 'invoices'|capfirst %}</th>
+        <th class="text-nowrap text-right">{% translate 'Last reminded on' %}</th>
       </tr>
     </thead>
     <tbody>
@@ -26,7 +26,7 @@
           <form method="post" action="{% url 'invoices_dunning_letter' customer_id=row.organization.id %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-sm btn-primary">
-              {% trans 'Generate a dunning letter' %} (PDF)
+              {% translate 'Generate a dunning letter' %} (PDF)
             </button>
           </form>
         </td>

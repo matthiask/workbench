@@ -1,7 +1,7 @@
 {% load i18n fineforms workbench %}
 <div class="notes mt-5">
 
-<h3>{% trans 'notes'|capfirst %}</h3>
+<h3>{% translate 'notes'|capfirst %}</h3>
 {% for note in notes %}
 <div class="card mb-3">
   <div class="card-header d-flex justify-content-between">
@@ -9,7 +9,7 @@
       {{ note.created_by }} at {{ note.created_at|local_date_format }}
     </h5>
     <a href="{{ note.urls.update }}" class="btn btn-primary btn-sm align-self-start" data-toggle="ajaxmodal">
-      {% trans 'Update' %}
+      {% translate 'Update' %}
     </a>
   </div>
   <div class="card-body">
@@ -21,10 +21,10 @@
 
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-1">{% trans 'Add note' %}</h5>
+    <h5 class="mb-1">{% translate 'Add note' %}</h5>
 
     <button type="button" class="btn btn-primary btn-sm align-self-start" data-target="#note-add-form" data-toggle="collapse" aria-expanded="false">
-      {% trans 'Toggle form' %}
+      {% translate 'Toggle form' %}
     </button>
   </div>
   <div class="card-body collapse" id="note-add-form">
@@ -40,11 +40,11 @@
       <div class="row">
         <div class="col-sm-12">
           <button type="submit" class="btn btn-primary">
-            {% trans 'Save' %}</button>
+            {% translate 'Save' %}</button>
 
           {% if object.get_absolute_url %}
           <a href="{{ object.get_absolute_url }}" class="btn float-right btn-outline-danger">
-            {% trans 'Cancel' %}</a>
+            {% translate 'Cancel' %}</a>
           {% endif %}
         </div>
       </div>

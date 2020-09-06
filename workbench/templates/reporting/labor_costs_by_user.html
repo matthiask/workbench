@@ -4,16 +4,16 @@
 
 {% block size %}modal-xl{% endblock %}
 
-{% block title %}{% trans 'Labor costs' %} {{ date_range.0|date:'F Y' }}{% endblock %}
+{% block title %}{% translate 'Labor costs' %} {{ date_range.0|date:'F Y' }}{% endblock %}
 
 {% block body %}
 <table class="table table-sm bg-light">
   <tr>
-    <th>{% trans 'user'|capfirst %}</th>
-    <th class="text-right">{% trans 'hours'|capfirst %}</th>
-    <th class="text-right">{% trans 'Undefined rate' %}</th>
-    <th class="text-right">{% trans 'Net cost' %}</th>
-    <th class="text-right">{% trans 'Productivity costs' %}</th>
+    <th>{% translate 'user'|capfirst %}</th>
+    <th class="text-right">{% translate 'hours'|capfirst %}</th>
+    <th class="text-right">{% translate 'Undefined rate' %}</th>
+    <th class="text-right">{% translate 'Net cost' %}</th>
+    <th class="text-right">{% translate 'Productivity costs' %}</th>
   </tr>
   {% for row in stats.by_user %}
     <tr>
@@ -25,14 +25,14 @@
     </tr>
   {% endfor %}
   <tr>
-    <th>{% trans 'total'|capfirst %}</th>
+    <th>{% translate 'total'|capfirst %}</th>
     <th class="text-right">{{ stats.hours|hours }}</th>
     <th class="text-right">{{ stats.hours_with_rate_undefined|hours }}</th>
     <th class="text-right">{{ stats.costs|currency }}</th>
     <th class="text-right">{{ stats.costs_with_green_hours_target|currency }}</th>
   </tr>
   <tr>
-    <td>{% trans 'third party costs'|capfirst %}</td>
+    <td>{% translate 'third party costs'|capfirst %}</td>
     <td colspan="3"></td>
     <td class="text-right">{{ stats.third_party_costs|currency }}</td>
   </tr>

@@ -2,7 +2,7 @@
 {% if top_errors or has_field_errors %}
 <div class="alert alert-danger alert-dismissable">
   <button class="close" type="button" data-dismiss="alert" aria-hidden="true">&#215;</button>
-  {% trans "Please correct the following errors:" %}<br>
+  {% translate "Please correct the following errors:" %}<br>
   {% for error in top_errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
 </div>
 {% endif %}

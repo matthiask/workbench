@@ -2,12 +2,12 @@
 
 {% load fineforms i18n static workbench %}
 
-{% block title %}{% trans 'Logging statistics' %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'Logging statistics' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12 col-lg-8">
-  <h1>{% trans 'Logging statistics' %}</h1>
+  <h1>{% translate 'Logging statistics' %}</h1>
 
   <form method="get" class="mb-3" data-autosubmit>
     {% ff_fields form %}
@@ -16,12 +16,12 @@
   <table class="table table-sm table-striped">
     <thead>
       <tr>
-        <th>{% trans 'user'|capfirst %}</th>
-        <th>{% trans 'Point in time of logging' %}</th>
-        <th class="text-right">{% trans 'Count' %}</th>
-        <th class="text-right">{% trans 'Sum' %}</th>
-        <th class="text-right">{% trans 'Average' %}</th>
-        <th class="text-right">{% trans 'Days with insufficient breaks' %}</th>
+        <th>{% translate 'user'|capfirst %}</th>
+        <th>{% translate 'Point in time of logging' %}</th>
+        <th class="text-right">{% translate 'Count' %}</th>
+        <th class="text-right">{% translate 'Sum' %}</th>
+        <th class="text-right">{% translate 'Average' %}</th>
+        <th class="text-right">{% translate 'Days with insufficient breaks' %}</th>
       </tr>
     </thead>
     <tbody>
@@ -44,7 +44,7 @@
         </tr>
       {% endfor %}
       <tr>
-        <th>{% trans 'total'|capfirst %}</th>
+        <th>{% translate 'total'|capfirst %}</th>
         <th></th>
         <th class="text-right">{{ logbook_stats.logged_hours_stats.count }}</th>
         <th class="text-right">{{ logbook_stats.logged_hours_stats.sum|hours }}</th>

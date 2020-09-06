@@ -2,47 +2,47 @@
 
 {% load fineforms i18n static workbench %}
 
-{% block title %}{% trans 'Key data' %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'Key data' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12">
   <h1>
-    {% trans 'Key data' %}
+    {% translate 'Key data' %}
     {# <small>{{ date_range.0|local_date_format }} &ndash; {{ date_range.1|local_date_format }}</small> #}
   </h1>
 
-  <h2 class="mt-5">{% trans 'Facts' %}</h2>
+  <h2 class="mt-5">{% translate 'Facts' %}</h2>
   <table class="table">
     <tr>
       <td class="text-right">{{ service_hours_in_open_orders|hours }}</td>
-      <th>{% trans 'Service hours in open orders' %}</th>
+      <th>{% translate 'Service hours in open orders' %}</th>
     </tr>
     <tr>
       <td class="text-right">{{ logged_hours_in_open_orders|hours }}</td>
-      <th>{% trans 'Logged hours in open orders' %}</th>
+      <th>{% translate 'Logged hours in open orders' %}</th>
     </tr>
     <tr>
       <td class="text-right">{{ sent_invoices_total|currency }}</td>
-      <th>{% trans 'Sent invoices total excl. tax' %}</th>
+      <th>{% translate 'Sent invoices total excl. tax' %}</th>
     </tr>
     <tr>
       <td class="text-right">{{ open_offers_total|currency }}</td>
-      <th>{% trans 'Open offers total excl. tax' %}</th>
+      <th>{% translate 'Open offers total excl. tax' %}</th>
     </tr>
     <tr>
-      <td class="text-right">{{ average_employment_duration.current_users|stringformat:'.2f' }} {% trans 'years' %}</td>
-      <th>{% trans 'Average employment duration of current users' %}</th>
+      <td class="text-right">{{ average_employment_duration.current_users|stringformat:'.2f' }} {% translate 'years' %}</td>
+      <th>{% translate 'Average employment duration of current users' %}</th>
     </tr>
     <tr>
-      <td class="text-right">{{ average_employment_duration.all_users|stringformat:'.2f' }} {% trans 'years' %}</td>
-      <th>{% trans 'Average employment duration of all users' %}</th>
+      <td class="text-right">{{ average_employment_duration.all_users|stringformat:'.2f' }} {% translate 'years' %}</td>
+      <th>{% translate 'Average employment duration of all users' %}</th>
     </tr>
   </table>
 
   <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
 
-  <h2 class="mt-5">{% trans 'Revenue minus third party costs and accruals' %}</h2>
+  <h2 class="mt-5">{% translate 'Revenue minus third party costs and accruals' %}</h2>
   <canvas id="invoiced-corrected" width="1200" height="450"></canvas>
   <script>
     new Chart("invoiced-corrected", {
@@ -82,14 +82,14 @@
   <table class="table table-hover">
     <thead class="sticky">
       <tr>
-        <th>{% trans 'month'|capfirst %}</th>
-        <th class="text-right">{% trans 'Gross profit' %}</th>
-        <th class="text-right">{% trans 'third party costs'|capfirst %}</th>
-        <th class="text-right">{% trans 'accruals'|capfirst %}</th>
+        <th>{% translate 'month'|capfirst %}</th>
+        <th class="text-right">{% translate 'Gross profit' %}</th>
+        <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
+        <th class="text-right">{% translate 'accruals'|capfirst %}</th>
         <th class="text-right"></th>
-        <th class="text-right">{% trans 'Gross margin' %}</th>
-        <th class="text-right">{% trans 'FTE' %}</th>
-        <th class="text-right">{% trans 'Margin / FTE' %}</th>
+        <th class="text-right">{% translate 'Gross margin' %}</th>
+        <th class="text-right">{% translate 'FTE' %}</th>
+        <th class="text-right">{% translate 'Margin / FTE' %}</th>
       </tr>
     </thead>
     <tbody>
@@ -128,7 +128,7 @@
     </tbody>
   </table>
 
-  <h2 class="mt-5">{% trans 'Hours distribution' %}</h2>
+  <h2 class="mt-5">{% translate 'Hours distribution' %}</h2>
   <canvas id="hours-distribution" width="1200" height="450"></canvas>
   <script>
     new Chart("hours-distribution", {
@@ -157,16 +157,16 @@
   <table class="table">
     <thead class="sticky">
       <tr>
-        <th>{% trans 'month' %}</th>
-        <th class="text-right">{% trans 'profitable' %}</th>
+        <th>{% translate 'month' %}</th>
+        <th class="text-right">{% translate 'profitable' %}</th>
         <th></th>
-        <th class="text-right">{% trans 'overdrawn' %}</th>
+        <th class="text-right">{% translate 'overdrawn' %}</th>
         <th></th>
-        <th class="text-right">{% trans 'maintenance' %}</th>
+        <th class="text-right">{% translate 'maintenance' %}</th>
         <th></th>
-        <th class="text-right">{% trans 'internal' %}</th>
+        <th class="text-right">{% translate 'internal' %}</th>
         <th></th>
-        <th class="text-right">{% trans 'green' %}</th>
+        <th class="text-right">{% translate 'green' %}</th>
       </tr>
     </thead>
     <tbody>

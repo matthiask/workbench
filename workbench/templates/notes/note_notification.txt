@@ -1,9 +1,9 @@
 {% load i18n %}
-{% blocktrans with content_object=note.content_object %}New note on {{ content_object }}{% endblocktrans %}
+{% blocktranslate with content_object=note.content_object %}New note on {{ content_object }}{% endblocktranslate %}
 
-{% blocktrans with created_by=note.created_by content_object=note.content_object trimmed %}
+{% blocktranslate with created_by=note.created_by content_object=note.content_object trimmed %}
 {{ created_by }} just created a new note on "{{ content_object }}":
-{% endblocktrans %}
+{% endblocktranslate %}
 
 {{ note.title }}
 {{ note.description }}

@@ -12,16 +12,16 @@
 
     <ul class="nav nav-tabs my-3">
       <li class="nav-item">
-        <a class="nav-link" href="{{ user.urls.detail }}">{% trans 'user'|capfirst %}</a>
+        <a class="nav-link" href="{{ user.urls.detail }}">{% translate 'user'|capfirst %}</a>
       </li>
       {% mark_current request.path %}
       {% if request.user|has_feature:FEATURES.PLANNING %}
         <li class="nav-item">
-          <a class="nav-link" href="{{ user.urls.planning }}">{% trans 'Planning' %}</a>
+          <a class="nav-link" href="{{ user.urls.planning }}">{% translate 'Planning' %}</a>
         </li>
       {% endif %}
       <li class="nav-item">
-        <a class="nav-link" href="{{ user.urls.statistics }}">{% trans 'Statistics' %}</a>
+        <a class="nav-link" href="{{ user.urls.statistics }}">{% translate 'Statistics' %}</a>
       </li>
       {% endmark_current %}
     </ul>

@@ -2,7 +2,7 @@
 
 {% load i18n static workbench %}
 
-{% block title %}{% trans 'Statistics' %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'Statistics' %} - {{ block.super }}{% endblock %}
 
 {% block inner_content %}
 <div class="row justify-content-center">
@@ -10,7 +10,7 @@
 
     <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
 
-    <h2 class="mt-4">{% trans 'Hours per weekday' %}</h2>
+    <h2 class="mt-4">{% translate 'Hours per weekday' %}</h2>
     <canvas id="hours-per-weekday" width="1200" height="250"></canvas>
     <script>
       new Chart("hours-per-weekday", {
@@ -19,12 +19,12 @@
           labels: [{% for row in logged_hours.rendered_hours_per_weekday %}"{{ row.name }}", {% endfor %}],
           datasets: [
             {
-              label: "{% trans 'Rendered' %}",
+              label: "{% translate 'Rendered' %}",
               data: [{% for row in logged_hours.rendered_hours_per_weekday %}{{ row.hours|stringformat:'.1f' }}, {% endfor %}],
               backgroundColor: '#2780e3',
             },
             {
-              label: "{% trans 'Created' %}",
+              label: "{% translate 'Created' %}",
               data: [{% for row in logged_hours.created_hours_per_weekday %}{{ row.hours|stringformat:'.1f' }}, {% endfor %}],
               backgroundColor: '#9954bb',
               borderColor: '#9954bb',
@@ -34,7 +34,7 @@
       })
     </script>
 
-    <h2 class="mt-4">{% trans 'Hours per week' %}</h2>
+    <h2 class="mt-4">{% translate 'Hours per week' %}</h2>
     <canvas id="hours-per-week" width="1200" height="450"></canvas>
     <script>
       new Chart("hours-per-week", {
@@ -43,17 +43,17 @@
           labels: [{% for row in logged_hours.hours_per_week %}"KW{{ row.week|date:'W' }}", {% endfor %}],
           datasets: [
             {
-              label: "{% trans 'Order' %}",
+              label: "{% translate 'Order' %}",
               data: [{% for row in logged_hours.hours_per_week %}{{ row.by_type.order|default:0|stringformat:'.1f' }}, {% endfor %}],
               backgroundColor: '#3fb618',
             },
             {
-              label: "{% trans 'Maintenance' %}",
+              label: "{% translate 'Maintenance' %}",
               data: [{% for row in logged_hours.hours_per_week %}{{ row.by_type.maintenance|default:0|stringformat:'.1f' }}, {% endfor %}],
               backgroundColor: '#373a3c',
             },
             {
-              label: "{% trans 'Internal' %}",
+              label: "{% translate 'Internal' %}",
               data: [{% for row in logged_hours.hours_per_week %}{{ row.by_type.internal|default:0|stringformat:'.1f' }}, {% endfor %}],
               backgroundColor: '#9954bb',
             },
@@ -68,7 +68,7 @@
       })
     </script>
 
-    <h2 class="mt-4">{% trans 'Hours per customer' %}</h2>
+    <h2 class="mt-4">{% translate 'Hours per customer' %}</h2>
     <canvas id="hours-per-customer" width="1200" height="600"></canvas>
     <script>
       new Chart("hours-per-customer", {

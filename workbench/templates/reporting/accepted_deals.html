@@ -2,12 +2,12 @@
 
 {% load fineforms i18n static workbench %}
 
-{% block title %}{% trans 'Accepted deals' %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'Accepted deals' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12 col-md-8">
-  <h1>{% trans 'Accepted deals' %}</h1>
+  <h1>{% translate 'Accepted deals' %}</h1>
 
   <form method="get" class="mb-3" data-autosubmit>
     {% ff_fields form %}
@@ -16,12 +16,12 @@
   <table class="table table-sm table-striped">
     <thead>
       <tr>
-        <th>{% trans 'month'|capfirst %}</th>
+        <th>{% translate 'month'|capfirst %}</th>
         {% for row in stats.by_valuetype %}
           <th class="text-right">{{ row.type }}</th>
           <th></th>
         {% endfor %}
-        <th class="text-right">{% trans 'total'|capfirst %}</th>
+        <th class="text-right">{% translate 'total'|capfirst %}</th>
         <th></th>
       </tr>
     </thead>
@@ -38,7 +38,7 @@
       </tr>
       {% endfor %}
       <tr>
-        <th>{% trans 'total'|capfirst %}</th>
+        <th>{% translate 'total'|capfirst %}</th>
         {% for row in stats.by_valuetype %}
           <th class="text-right">{{ row.sum|currency }}</th>
           <th>
@@ -55,7 +55,7 @@
         </th>
       </tr>
       <tr>
-        <th>{% trans 'target'|capfirst %} ({{ stats.weeks|stringformat:'.1f' }} {% trans 'weeks' %})</th>
+        <th>{% translate 'target'|capfirst %} ({{ stats.weeks|stringformat:'.1f' }} {% translate 'weeks' %})</th>
         {% for row in stats.by_valuetype %}
           <th class="text-right">
             {{ row.target|currency }}
@@ -73,10 +73,10 @@
   <table class="table table-sm table-striped">
     <thead>
       <tr>
-        <th>{% trans 'user'|capfirst %}</th>
-        <th class="text-right">{% trans 'count'|capfirst %}</th>
+        <th>{% translate 'user'|capfirst %}</th>
+        <th class="text-right">{% translate 'count'|capfirst %}</th>
         <th></th>
-        <th class="text-right">{% trans 'value'|capfirst %}</th>
+        <th class="text-right">{% translate 'value'|capfirst %}</th>
       </tr>
     </thead>
     <tbody>
@@ -97,7 +97,7 @@
       </tr>
       {% endfor %}
       <tr>
-        <th>{% trans 'total'|capfirst %}</th>
+        <th>{% translate 'total'|capfirst %}</th>
         <th class="text-right">{{ stats.count }}</th>
         <th></th>
         <th class="text-right">{{ stats.sum|currency }}</th>

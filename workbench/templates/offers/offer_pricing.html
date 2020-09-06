@@ -5,7 +5,7 @@
 {% block uplink %}
 {% if view.object %}
   <a href="{{ view.object.get_absolute_url }}" class="btn btn-primary btn-sm uplink">
-    {% include 'svg/chevron-left.svg' %} {% trans 'offer' %}
+    {% include 'svg/chevron-left.svg' %} {% translate 'offer' %}
   </a>
 {% else %}{{ block.super }}
 {% endif %}
@@ -16,9 +16,9 @@
   <div class="col-md-12">
     <h1>
       {% if object %}
-        {% blocktrans with object=object %}Update {{ object }}{% endblocktrans %}
+        {% blocktranslate with object=object %}Update {{ object }}{% endblocktranslate %}
       {% else %}
-        {% blocktrans with class=view.meta.verbose_name %}Create {{ class }}{% endblocktrans %}
+        {% blocktranslate with class=view.meta.verbose_name %}Create {{ class }}{% endblocktranslate %}
       {% endif %}
     </h1>
 
@@ -29,7 +29,7 @@
       {% ff_errors form %}
 
       {% if form.formsets %}
-        <h4>{% trans 'services' %}</h4>
+        <h4>{% translate 'services' %}</h4>
         <table class="table table-sm table-offer-pricing">
           <colgroup>
             <col />
@@ -43,12 +43,12 @@
           <thead>
             <tr>
               <th></th>
-              <th>{% trans 'title' %}</th>
-              <th>{% trans 'effort type' %}</th>
-              <th>{% trans 'hourly rate' %}</th>
-              <th>{% trans 'effort hours' %}</th>
-              <th>{% trans 'cost' %}</th>
-              <th>{% trans 'service cost' %}</th>
+              <th>{% translate 'title' %}</th>
+              <th>{% translate 'effort type' %}</th>
+              <th>{% translate 'hourly rate' %}</th>
+              <th>{% translate 'effort hours' %}</th>
+              <th>{% translate 'cost' %}</th>
+              <th>{% translate 'service cost' %}</th>
             </tr>
           </thead>
           <tbody>
@@ -78,11 +78,11 @@
       <div class="row mt-5">
         <div class="col-sm-12">
           <button type="submit" class="btn btn-primary">
-            {% trans 'Save' %}</button>
+            {% translate 'Save' %}</button>
 
           {% if object.get_absolute_url %}
           <a href="{{ object.get_absolute_url }}" class="btn float-right btn-outline-danger">
-            {% trans 'cancel' %}</a>
+            {% translate 'cancel' %}</a>
           {% endif %}
         </div>
       </div>

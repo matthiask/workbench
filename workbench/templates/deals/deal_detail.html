@@ -40,15 +40,15 @@
 
           <div class="col-auto">
             <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.OPEN }}" class="btn btn-sm btn-info">
-              {% trans 'open'|capfirst %}
+              {% translate 'open'|capfirst %}
             </a>
 
             <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}" class="btn btn-sm btn-success">
-              {% trans 'accepted'|capfirst %}
+              {% translate 'accepted'|capfirst %}
             </a>
 
             <a data-toggle="ajaxmodal" href="{{ object.urls.set_status }}?status={{ object.DECLINED }}" class="btn btn-sm btn-danger">
-              {% trans 'declined'|capfirst %}
+              {% translate 'declined'|capfirst %}
             </a>
 
           </div>
@@ -91,13 +91,13 @@
               <input type="hidden" name="modal-offer" value="{{ offer.pk }}">
               <button
                 type="submit"
-                title="{% trans 'Unlink offer' %}"
+                title="{% translate 'Unlink offer' %}"
                 class="btn btn-outline-danger btn-sm">&times;</button>
             </form>
             {% link_or_none offer with_badge=True %}
           </div>
         {% empty %}
-          {% trans 'No related offers' %}
+          {% translate 'No related offers' %}
         {% endfor %}
       </td>
     </tr>
@@ -105,14 +105,14 @@
   </table>
 
   <a href="{{ object.urls.update }}" class="btn btn-primary">
-    {% trans 'Update' %}
+    {% translate 'Update' %}
   </a>
   <a href="{{ object.urls.add_offer }}" class="btn btn-primary" data-toggle="ajaxmodal">
-    {% trans 'Link offer' %}
+    {% translate 'Link offer' %}
   </a>
 
   <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
-    {% trans 'Delete' %}
+    {% translate 'Delete' %}
   </a>
 
   {% notes object %}

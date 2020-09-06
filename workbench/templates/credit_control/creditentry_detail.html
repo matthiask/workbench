@@ -18,19 +18,19 @@
     {% endfor %}
 
     <tr>
-      <th class="text-right">{% trans 'invoice'|capfirst %}</th>
+      <th class="text-right">{% translate 'invoice'|capfirst %}</th>
       <td>
         {% link_or_none object.invoice with_badge=True %}
-        {% if object.invoice %}{% trans 'invoice total'|capfirst %}: {{ object.invoice.total|currency }}{% endif %}
+        {% if object.invoice %}{% translate 'invoice total'|capfirst %}: {{ object.invoice.total|currency }}{% endif %}
       </td>
     </tr>
   </table>
 
   <a href="{{ object.urls.update }}" class="btn btn-primary">
-    {% trans 'Update' %}
+    {% translate 'Update' %}
   </a>
   <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
-    {% trans 'Delete' %}
+    {% translate 'Delete' %}
   </a>
 </div>
 </div>

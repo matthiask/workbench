@@ -2,16 +2,16 @@
 
 {% load fineforms i18n static workbench %}
 
-{% block title %}{% trans 'Project budget statistics' %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'Project budget statistics' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12 col-lg-10">
-  <h1>{% trans 'Project budget statistics' %}</h1>
+  <h1>{% translate 'Project budget statistics' %}</h1>
 
   <form method="get" class="form-inline form-search mb-3" data-autosubmit>
     {% if form.changed_data %}
-      <a class="btn btn-info" href="." title="{% trans 'Reset the filter form' %}"  data-reset-filter>&times;</a>
+      <a class="btn btn-info" href="." title="{% translate 'Reset the filter form' %}"  data-reset-filter>&times;</a>
     {% endif %}
     {% ff_fields form %}
   </form>
@@ -19,12 +19,12 @@
   <table class="table table-sm table-hover">
     <thead class="sticky">
       <tr>
-        <th>{% trans 'project'|capfirst %}</th>
-        <th class="text-right">{% trans 'offered'|capfirst %}</th>
-        <th class="text-right">{% trans 'logbook'|capfirst %}</th>
-        <th class="text-right">{% trans 'third party costs'|capfirst %}</th>
-        <th class="text-right">{% trans 'invoiced'|capfirst %}</th>
-        <th class="text-right">{% trans 'Not archived' %}</th>
+        <th>{% translate 'project'|capfirst %}</th>
+        <th class="text-right">{% translate 'offered'|capfirst %}</th>
+        <th class="text-right">{% translate 'logbook'|capfirst %}</th>
+        <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
+        <th class="text-right">{% translate 'invoiced'|capfirst %}</th>
+        <th class="text-right">{% translate 'Not archived' %}</th>
         <th class="text-right">&Delta;</th>
       </tr>
     </thead>
@@ -51,7 +51,7 @@
           <td class="text-right text-nowrap {% if not project.logbook and not project.effort_hours_with_rate_undefined %}text-black-30{% endif %}">
             {{ project.logbook|currency }}
             {% if project.effort_hours_with_rate_undefined %}
-            <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.effort_hours_with_rate_undefined|hours }})</span>
+            <span class="text-warning" title="{% translate 'undefined rate' %}">(+{{ project.effort_hours_with_rate_undefined|hours }})</span>
             {% endif %}
           </td>
           <td class="text-right {% if not project.third_party_costs %}text-black-30{% endif %}">{{ project.third_party_costs|currency }}</td>

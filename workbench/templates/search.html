@@ -2,19 +2,19 @@
 
 {% load i18n workbench %}
 
-{% block title %}{% trans 'Search' %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'Search' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row">
   <div class="col-md-12">
-    <h1>{% trans 'Search' %}</h1>
+    <h1>{% translate 'Search' %}</h1>
     {% for result in results %}
       <h3><a href="{{ result.url }}?q={{ query }}">{{ result.verbose_name_plural }}</a></h3>
       {% for result in result.results %}
         {% if forloop.first %}<ul>{% endif %}
 
         {% if forloop.counter == 101 %}
-          <li>{% trans 'Only showing 100 items. Additional results have been omitted.' %}</li>
+          <li>{% translate 'Only showing 100 items. Additional results have been omitted.' %}</li>
         {% else %}
           <li>
             <a href="{{ result.get_absolute_url }}">
@@ -27,7 +27,7 @@
 
         {% if forloop.last %}</ul>{% endif %}
       {% empty %}
-        <p>{% trans 'No results found.' %}</p>
+        <p>{% translate 'No results found.' %}</p>
       {% endfor %}
     {% endfor %}
   </div>

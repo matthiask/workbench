@@ -2,12 +2,12 @@
 
 {% load fineforms i18n static workbench %}
 
-{% block title %}{% trans 'Labor costs' %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'Labor costs' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
 <div class="col-sm-12 col-lg-10">
-  <h1>{% trans 'Labor costs' %}</h1>
+  <h1>{% translate 'Labor costs' %}</h1>
 
   <form method="get" class="mb-3" data-autosubmit>
     {% ff_fields form %}
@@ -16,14 +16,14 @@
   <table class="table table-sm table-striped">
     <thead>
       <tr>
-        <th>{% trans 'project'|capfirst %}</th>
-        <th class="text-right">{% trans 'hours'|capfirst %}</th>
-        <th class="text-right">{% trans 'Undefined rate' %}</th>
-        <th class="text-right">{% trans 'Net cost' %}</th>
-        <th class="text-right">{% trans 'Productivity costs' %}</th>
-        <th class="text-right">{% trans 'third party costs'|capfirst %}</th>
-        <th class="text-right">{% trans 'cost'|capfirst %}</th>
-        <th class="text-right" title="{% trans 'Hours times max(hourly rate, hourly labor cost)' %}">{% trans 'Revenue' %}</th>
+        <th>{% translate 'project'|capfirst %}</th>
+        <th class="text-right">{% translate 'hours'|capfirst %}</th>
+        <th class="text-right">{% translate 'Undefined rate' %}</th>
+        <th class="text-right">{% translate 'Net cost' %}</th>
+        <th class="text-right">{% translate 'Productivity costs' %}</th>
+        <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
+        <th class="text-right">{% translate 'cost'|capfirst %}</th>
+        <th class="text-right" title="{% translate 'Hours times max(hourly rate, hourly labor cost)' %}">{% translate 'Revenue' %}</th>
         <th></th>
       </tr>
     </thead>
@@ -43,7 +43,7 @@
         <td>
           {% if cc_row.cost_center %}
             <a href="{% querystring cost_center=cc_row.cost_center.id %}" data-toggle="ajaxmodal">
-              {% trans 'Details' %}
+              {% translate 'Details' %}
             </a>
           {% endif %}
         </td>
@@ -64,7 +64,7 @@
           <td class="text-right">{{ row.revenue|currency }}</td>
           <td>
             <a href="{% querystring project=row.project.id %}" data-toggle="ajaxmodal">
-              {% trans 'Details' %}
+              {% translate 'Details' %}
             </a>
           </td>
         </tr>
@@ -72,7 +72,7 @@
     {% endfor %}
     <tr>
       <th>
-        {% trans 'total'|capfirst %}
+        {% translate 'total'|capfirst %}
       </th>
       <th class="text-right">{{ stats.hours|hours }}</th>
       <th class="text-right {% if not stats.hours_with_rate_undefined %}text-black-30{% endif %}">{{ stats.hours_with_rate_undefined|hours }}</th>
@@ -83,7 +83,7 @@
       <th class="text-right">{{ stats.revenue|currency }}</th>
       <td>
         <a href="{% querystring users="all" %}" data-toggle="ajaxmodal">
-          {% trans 'Details' %}
+          {% translate 'Details' %}
         </a>
       </td>
     </tr>

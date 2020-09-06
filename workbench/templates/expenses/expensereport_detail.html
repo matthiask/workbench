@@ -11,7 +11,7 @@
 
   <table class="table table-striped">
     <tr>
-      <th class="text-right">{% trans 'expenses'|capfirst %}</th>
+      <th class="text-right">{% translate 'expenses'|capfirst %}</th>
       <td>
         {% for cost in object.expenses.all reversed %}
           <a href="{{ cost.urls.detail }}" data-toggle="ajaxmodal">
@@ -27,17 +27,17 @@
       </td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'status'|capfirst %}</th>
+      <th class="text-right">{% translate 'status'|capfirst %}</th>
       <td>{{ object.status_badge }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% trans 'total'|capfirst %}</th>
+      <th class="text-right">{% translate 'total'|capfirst %}</th>
       <td>{{ object.total|currency }}</td>
     </tr>
   </table>
 
   <a href="{{ object.urls.update }}" class="btn btn-primary">
-    {% trans 'Update' %}
+    {% translate 'Update' %}
   </a>
   <span class="btn-group">
     <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank">PDF</a>
@@ -46,11 +46,11 @@
     </button>
     <div class="dropdown-menu dropdown-menu-right">
       <a class="dropdown-item" href="{{ object.urls.pdf }}?disposition=attachment">
-        {% trans 'Download' %}</a>
+        {% translate 'Download' %}</a>
     </div>
   </span>
   <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
-    {% trans 'Delete' %}
+    {% translate 'Delete' %}
   </a>
 </div>
 </div>

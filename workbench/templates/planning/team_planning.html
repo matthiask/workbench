@@ -2,18 +2,18 @@
 
 {% load i18n workbench webpack_loader %}
 
-{% block title %}{% trans 'planning'|capfirst %} - {{ block.super }}{% endblock %}
+{% block title %}{% translate 'planning'|capfirst %} - {{ block.super }}{% endblock %}
 
 {% block uplink %}
   <a href="{{ object.get_absolute_url }}" class="btn btn-primary btn-sm uplink">
-    {% include 'svg/chevron-left.svg' %} {% trans 'team' %}
+    {% include 'svg/chevron-left.svg' %} {% translate 'team' %}
   </a>
 {% endblock %}
 
 {% block content %}
 <div class="row">
   <div class="col-12">
-    <h1>{% trans 'planning'|capfirst %}: {{ object }}</h1>
+    <h1>{% translate 'planning'|capfirst %}: {{ object }}</h1>
   </div>
 </div>
 
@@ -30,11 +30,11 @@
   <div class="col-12">
     <a href="{% url 'planning_planningrequest_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
       {% include 'svg/plus.svg' %}
-      {% trans 'planning request'|capfirst %}
+      {% translate 'planning request'|capfirst %}
     </a>
     <a href="{% url 'planning_plannedwork_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
       {% include 'svg/plus.svg' %}
-      {% trans 'planned work'|capfirst %}
+      {% translate 'planned work'|capfirst %}
     </a>
   </div>
 </div>

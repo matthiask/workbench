@@ -4,18 +4,18 @@
 
 {% block size %}modal-xl{% endblock %}
 
-{% block title %}{% trans 'third party costs'|capfirst %} {{ date_range.0|date:'F Y' }}{% endblock %}
+{% block title %}{% translate 'third party costs'|capfirst %} {{ date_range.0|date:'F Y' }}{% endblock %}
 
 {% block body %}
 <table class="table table-sm bg-light">
   {% for cost in third_party_costs %}
     {% if forloop.first %}
       <tr>
-        <th class="w-100">{% trans 'logged cost'|capfirst %}</th>
+        <th class="w-100">{% translate 'logged cost'|capfirst %}</th>
         <th></th>
-        <th class="text-nowrap">{% trans 'date'|capfirst %}</th>
+        <th class="text-nowrap">{% translate 'date'|capfirst %}</th>
         <th></th>
-        <th class="text-nowrap text-right">{% trans 'third party costs'|capfirst %}</th>
+        <th class="text-nowrap text-right">{% translate 'third party costs'|capfirst %}</th>
       </tr>
     {% endif %}
     <tr>
@@ -34,11 +34,11 @@
   {% for invoice in invoices %}
     {% if forloop.first %}
       <tr>
-        <th class="w-100">{% trans 'invoice'|capfirst %}</th>
-        <th class="text-nowrap">{% trans 'type'|capfirst %}</th>
-        <th class="text-nowrap">{% trans 'date'|capfirst %}</th>
-        <th class="text-nowrap">{% trans 'total excl. tax'|capfirst %}</th>
-        <th class="text-nowrap text-right">{% trans 'third party costs'|capfirst %}</th>
+        <th class="w-100">{% translate 'invoice'|capfirst %}</th>
+        <th class="text-nowrap">{% translate 'type'|capfirst %}</th>
+        <th class="text-nowrap">{% translate 'date'|capfirst %}</th>
+        <th class="text-nowrap">{% translate 'total excl. tax'|capfirst %}</th>
+        <th class="text-nowrap text-right">{% translate 'third party costs'|capfirst %}</th>
       </tr>
     {% endif %}
     <tr>

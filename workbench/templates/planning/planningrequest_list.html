@@ -22,7 +22,7 @@
   <div class="d-flex justify-content-between">
     <span class="w-50">{{ object.project }}</span>
     <span>
-      {{ object.created_at.date|local_date_format }} {% trans 'by' %}
+      {{ object.created_at.date|local_date_format }} {% translate 'by' %}
       {{ object.created_by.get_short_name }}
     </span>
     <span>{{ object.requested_hours|hours }}</span>

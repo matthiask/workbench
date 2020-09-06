@@ -18,7 +18,7 @@
     {% if form and form.pre_form %}
       <form method="GET" action="{{ request.get_full_path }}">
         {% ff_fields form %}
-        <button type="submit" class="btn btn-primary">{% trans 'continue' %}</button>
+        <button type="submit" class="btn btn-primary">{% translate 'continue' %}</button>
       </form>
     {% else %}
       <form method="POST" action="{{ request.get_full_path }}"
@@ -34,11 +34,11 @@
         <div class="row">
           <div class="col-sm-12">
             <button type="submit" class="btn btn-primary">
-              {% trans 'Save' %}</button>
+              {% translate 'Save' %}</button>
 
             {% if object.get_absolute_url %}
             <a href="{{ object.get_absolute_url }}" class="btn float-right btn-outline-danger">
-              {% trans 'Cancel' %}</a>
+              {% translate 'Cancel' %}</a>
             {% endif %}
           </div>
         </div>

@@ -11,7 +11,7 @@
   {% ff_errors form %}
   {% if form.service_title %}
     <div class="{% if form.hide_new_service %}d-none{% endif %}" id="new-service">
-      <h5>{% trans 'new service' %}</h5>
+      <h5>{% translate 'new service' %}</h5>
       {% ff_field form.service_title %}
       {% ff_field form.service_description %}
       {% if form.service_role %}{% ff_field form.service_role %}{% endif %}
@@ -31,8 +31,8 @@
   {% if form.service_title and form.hide_new_service %}
     <button type="button" class="btn btn-primary mr-auto"
       onclick="_cl(this, 'invisible', true);_cl(_sel('#new-service'), 'd-none', false);_sel('#id_modal-service').value=''">
-      {% trans 'new service' %}
+      {% translate 'new service' %}
     </button>
   {% endif %}
-  <button type="submit" class="btn btn-primary">{% trans 'Save' %}</button>
+  <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
 {% endblock %}

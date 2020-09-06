@@ -18,7 +18,7 @@
     {% endfor %}
 
     <tr>
-      <th class="text-right">{% trans 'projects'|capfirst %}</th>
+      <th class="text-right">{% translate 'projects'|capfirst %}</th>
       <td>
 
         {% if request.user|has_feature:FEATURES.CONTROLLING %}
@@ -26,12 +26,12 @@
           <table class="table table-sm table-hover">
             <thead class="sticky">
               <tr>
-                <th>{% trans 'project'|capfirst %}</th>
-                <th class="text-right">{% trans 'offered'|capfirst %}</th>
-                <th class="text-right">{% trans 'logbook'|capfirst %}</th>
-                <th class="text-right">{% trans 'third party costs'|capfirst %}</th>
-                <th class="text-right">{% trans 'invoiced'|capfirst %}</th>
-                <th class="text-right">{% trans 'Not archived' %}</th>
+                <th>{% translate 'project'|capfirst %}</th>
+                <th class="text-right">{% translate 'offered'|capfirst %}</th>
+                <th class="text-right">{% translate 'logbook'|capfirst %}</th>
+                <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
+                <th class="text-right">{% translate 'invoiced'|capfirst %}</th>
+                <th class="text-right">{% translate 'Not archived' %}</th>
                 <th class="text-right">&Delta;</th>
               </tr>
             </thead>
@@ -61,7 +61,7 @@
                   <td class="text-right text-nowrap {% if not project.logbook and not project.effort_hours_with_rate_undefined %}text-black-30{% endif %}">
                     {{ project.logbook|currency }}
                     {% if project.effort_hours_with_rate_undefined %}
-                    <span class="text-warning" title="{% trans 'undefined rate' %}">(+{{ project.effort_hours_with_rate_undefined|hours }})</span>
+                    <span class="text-warning" title="{% translate 'undefined rate' %}">(+{{ project.effort_hours_with_rate_undefined|hours }})</span>
                     {% endif %}
                     {% bar project.logbook project.offered %}
                   </td>
@@ -77,7 +77,7 @@
             </tbody>
           </table>
           {% endwith %}
-          <strong>{% trans 'Gross margin / hour' %}:</strong>
+          <strong>{% translate 'Gross margin / hour' %}:</strong>
           {{ object.statistics.overall.gross_margin_per_hour|currency }}
         {% else %}
           {% for project in object.projects.all %}
@@ -91,23 +91,23 @@
 
   <a href="{% url 'projects_project_create' %}?campaign={{ object.pk }}" class="btn btn-primary">
     {% include "svg/plus.svg" %}
-    {% trans 'project'|capfirst %}
+    {% translate 'project'|capfirst %}
   </a>
   <a href="{{ object.urls.update }}" class="btn btn-primary">
-    {% trans 'Update' %}
+    {% translate 'Update' %}
   </a>
   <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-primary">
-    {% trans 'Copy' %}</a>
+    {% translate 'Copy' %}</a>
 
   <a href="{% url 'logbook_loggedhours_list' %}?campaign={{ object.pk }}" class="btn btn-primary">
-    {% trans 'logged hours'|capfirst %}
+    {% translate 'logged hours'|capfirst %}
   </a>
   <a href="{% url 'logbook_loggedcost_list' %}?campaign={{ object.pk }}" class="btn btn-primary">
-    {% trans 'logged cost'|capfirst %}
+    {% translate 'logged cost'|capfirst %}
   </a>
 
   <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
-    {% trans 'Delete' %}
+    {% translate 'Delete' %}
   </a>
 </div>
 </div>
