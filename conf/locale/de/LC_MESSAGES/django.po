@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-03 11:42+0200\n"
+"POT-Creation-Date: 2020-09-07 12:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2211,6 +2211,11 @@ msgstr "geplante Arbeit"
 msgid "Only mondays allowed, but field contains %s."
 msgstr "Nur Montage erlaubt, aber Feld enthält %s."
 
+#: workbench/planning/models.py
+#, python-format
+msgid "%(planned_hours)s in %(weeks)s weeks (%(per_week)s per week)"
+msgstr "%(planned_hours)s in %(weeks)s Wochen (%(per_week)s pro Woche)"
+
 #: workbench/projects/__init__.py workbench/projects/models.py
 #: workbench/templates/base.html
 #: workbench/templates/projects/campaign_detail.html
@@ -3019,6 +3024,10 @@ msgstr "Aufwände in Stunden"
 #: workbench/templates/open-modal.html
 msgid "This page does not exist (anymore)."
 msgstr "Diese Seite existiert nicht (mehr)."
+
+#: workbench/templates/planning/plannedwork_detail.html
+msgid "Periods"
+msgstr "Zeiträume"
 
 #: workbench/templates/planning/planningrequest_detail.html
 msgid "Accept"

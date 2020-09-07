@@ -241,3 +241,35 @@ class PlannedWork(Model):
             local_date_format(min(self.weeks)),
             local_date_format(max(self.weeks) + dt.timedelta(days=6)),
         )
+
+    @property
+    def ranges(self):
+        def _find_ranges(weeks):
+            start = weeks[0]
+            maybe_end = weeks[0]
+            for day in weeks[1:]:
+                if (day - maybe_end).days == 7:
+                    maybe_end = day
+                else:
+                    yield start, maybe_end
+                    start = maybe_end = day
+
+            yield start, maybe_end
+
+        for from_, until_ in _find_ranges(self.weeks):
+            yield {
+                "from": from_,
+                "until": until_,
+                "pretty": "{} – {}".format(
+                    local_date_format(from_),
+                    local_date_format(until_ + dt.timedelta(days=6)),
+                ),
+            }
+
+    @property
+    def pretty_planned_hours(self):
+        return _("%(planned_hours)s in %(weeks)s weeks (%(per_week)s per week)") % {
+            "planned_hours": hours(self.planned_hours),
+            "weeks": len(self.weeks),
+            "per_week": hours(self.planned_hours / len(self.weeks)),
+        }
