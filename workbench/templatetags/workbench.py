@@ -288,7 +288,8 @@ def analyze_projects(object_list):
     pks = [object.pk for object in object_list]
     service_hours = {
         row["project"]: row["service_hours__sum"]
-        for row in Service.objects.filter(project__in=pks)
+        for row in Service.objects.budgeted()
+        .filter(project__in=pks)
         .order_by()
         .values("project")
         .annotate(Sum("service_hours"))
