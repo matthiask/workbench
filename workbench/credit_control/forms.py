@@ -154,7 +154,8 @@ class AssignCreditEntriesForm(forms.Form):
         )[:20]:
             self.fields["entry_{}_invoice".format(entry.pk)] = forms.TypedChoiceField(
                 label=format_html(
-                    '<a href="{}" target="_blank">{}, {}: {}</a>',
+                    '<a href="{}" target="_blank"'
+                    ' rel="noopener noreferrer">{}, {}: {}</a>',
                     entry.get_absolute_url(),
                     entry.total,
                     local_date_format(entry.value_date),

@@ -319,7 +319,7 @@ function Project({ by_week, offers, project }) {
           project.is_closed ? "is-closed" : ""
         }`}
       >
-        <a href={project.url} target="_blank" rel="noreferrer">
+        <a href={project.url} target="_blank" rel="noopener noreferrer">
           <strong>{project.title}</strong>
           {project.is_closed ? <> {gettext("(closed)")}</> : ""}
         </a>
@@ -407,7 +407,7 @@ function Offer({ offer, work_list }) {
       {offer.id ? (
         <>
           <Cell row={row} column={1} className={classList.join(" ")}>
-            <a href={offer.url} target="_blank" rel="noreferrer">
+            <a href={offer.url} target="_blank" rel="noopener noreferrer">
               {offer.title}
               {offer.is_declined ? <> {gettext("(declined)")}</> : ""}
               {!offer.is_accepted && !offer.is_declined ? (
