@@ -49,6 +49,11 @@ class LogbookTest(TestCase):
         response = send(rendered_on=in_days(10).isoformat())
         self.assertContains(response, "That&#x27;s too far in the future.")
 
+        response = send(service="-42")
+        self.assertContains(
+            response, "This field is required unless you create a new service."
+        )
+
         response = send(service="")
         self.assertContains(
             response, "This field is required unless you create a new service."

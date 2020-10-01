@@ -337,11 +337,11 @@ class LoggedHoursForm(ModelForm):
     def clean(self):
         data = super().clean()
         errors = {}
-        if not data["service"] and not data.get("service_title"):
+        if not data.get("service") and not data.get("service_title"):
             errors["service"] = _(
                 "This field is required unless you create a new service."
             )
-        elif data["service"] and data.get("service_title"):
+        elif data.get("service") and data.get("service_title"):
             errors["service"] = _(
                 "Deselect the existing service if you want to create a new service."
             )
