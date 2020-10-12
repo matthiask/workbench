@@ -1,0 +1,16 @@
+{% extends "modalform.html" %}
+
+{% load fineforms i18n %}
+
+{% block body %}
+  {% include 'fineforms/warnings.html' %}
+  {% ff_errors form %}
+  {% ff_field form.user %}
+  <div class="form-row">
+    <div class="col-6">{% ff_field form.starts_on %}</div>
+    <div class="col-6">{% ff_field form.ends_on %}</div>
+  </div>
+  {% ff_field form.days %}
+  {% ff_field form.description %}
+  {% ff_field form.reason %}
+{% endblock %}

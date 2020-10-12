@@ -13,11 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="absence",
             name="ends_on",
-            field=models.DateField(
-                blank=True,
-                help_text="Only used for the visualization of absences.",
-                null=True,
-                verbose_name="ends on",
-            ),
+            field=models.DateField(blank=True, null=True, verbose_name="ends on"),
         ),
     ]
