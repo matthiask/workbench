@@ -311,6 +311,14 @@ function initWidgets() {
     })
   }
 
+  const startsOn = $("#id_modal-starts_on")
+  const endsOn = $("#id_modal-ends_on")
+  if (startsOn.length && endsOn.length) {
+    startsOn.on("change", function () {
+      if (!endsOn.val()) endsOn.val(startsOn.val())
+    })
+  }
+
   const offeredOn = $("#id_offered_on")
   const validUntil = $("#id_valid_until")
   if (offeredOn.length && validUntil.length) {
