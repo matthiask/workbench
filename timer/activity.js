@@ -65,9 +65,14 @@ export const Activity = connect((state, ownProps) => ({
       handle=".js-drag-handle"
       bounds="parent"
       defaultPosition={{
-        x: clamp(activity.left, 0, window.innerWidth - 300),
-        y: clamp(activity.top, 0, window.innerHeight - 300),
+        x:
+          10 *
+          Math.floor(clamp(activity.left, 0, window.innerWidth - 300) / 10),
+        y:
+          10 *
+          Math.floor(clamp(activity.top, 0, window.innerHeight - 300) / 10),
       }}
+      grid={[10, 10]}
       onStop={(e, data) =>
         dispatchUpdate({
           left: data.x,

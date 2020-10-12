@@ -31,11 +31,11 @@ div[role="main"] {
   flex: 1 0 auto;
   position: relative;
   overflow: hidden;
-  margin: -15px;
+  margin: -15px -8px;
 }
 
 .activity {
-  width: 290px;
+  width: 286px;
   position: absolute;
 
   transition: background-color 0.2s ease-in-out;
@@ -109,6 +109,10 @@ div[role="main"] {
 .btn-light {
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 0;
+}
+
+.form-group textarea {
+  height: 78px;
 }
 
 .btn-light:not([disabled]):hover {
