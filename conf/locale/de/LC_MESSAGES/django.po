@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-07 12:00+0200\n"
+"POT-Creation-Date: 2020-10-12 15:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -382,8 +382,12 @@ msgid "sickness"
 msgstr "Krankheit"
 
 #: workbench/awt/models.py
-msgid "other reasons"
-msgstr "Andere Gründe"
+msgid "paid leave (e.g. civilian service, maternity etc.)"
+msgstr "Bezahlter Urlaub (zB Zivildienst, Mutterschaft etc.)"
+
+#: workbench/awt/models.py
+msgid "other reasons (no working time)"
+msgstr "Andere Gründe (keine Arbeitszeit)"
 
 #: workbench/awt/models.py workbench/invoices/models.py
 msgid "starts on"
@@ -417,6 +421,10 @@ msgstr "Grund"
 #: workbench/awt/models.py
 msgid "is vacation"
 msgstr "sind Ferien"
+
+#: workbench/awt/models.py
+msgid "is working time"
+msgstr "ist Arbeitszeit"
 
 #: workbench/awt/models.py workbench/templates/awt/absence_calendar.html
 #: workbench/templates/awt/absence_detail.html
@@ -482,8 +490,8 @@ msgid "sickness days"
 msgstr "Krankheitstage"
 
 #: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
-msgid "other absences"
-msgstr "Andere Abwesenheiten"
+msgid "Paid leave"
+msgstr "Bezahlter Urlaub"
 
 #: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
 msgid "vacation days correction"
@@ -2651,6 +2659,10 @@ msgid "calculated with %(hours)s per day"
 msgstr "berechnet mit %(hours)s pro Tag"
 
 #: workbench/templates/awt/year_detail.html
+msgid "other absences"
+msgstr "Andere Abwesenheiten"
+
+#: workbench/templates/awt/year_detail.html
 #, python-format
 msgid "from %(date)s"
 msgstr "Ab %(date)s"
@@ -3561,3 +3573,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "other reasons (does not count towards annual working time)"
+#~ msgstr "Andere Gründe (wird in der Jahresarbeitszeit nicht berücksichtigt)"
+
+#~ msgid "other reasons"
+#~ msgstr "Andere Gründe"

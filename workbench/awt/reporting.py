@@ -43,7 +43,7 @@ class Months(dict):
             "available_vacation_days": [Z1 for i in range(12)],
             "absence_vacation": [Z1 for i in range(12)],
             "absence_sickness": [Z1 for i in range(12)],
-            "absence_other": [Z1 for i in range(12)],
+            "absence_paid": [Z1 for i in range(12)],
             "vacation_days_correction": [Z1 for i in range(12)],
             "target": [Z1 for i in range(12)],
             "hours": [Z1 for i in range(12)],
@@ -82,7 +82,7 @@ def full_time_equivalents_by_month():
 
 def annual_working_time(year, *, users):
     absences = defaultdict(
-        lambda: {"absence_vacation": [], "absence_sickness": [], "absence_other": []}
+        lambda: {"absence_vacation": [], "absence_sickness": [], "absence_paid": []}
     )
     months = Months(year=year, users=users)
     vacation_days_credit = defaultdict(lambda: Z1)
@@ -136,7 +136,7 @@ def annual_working_time(year, *, users):
         },
     )
     for absence in Absence.objects.filter(
-        user__in=months.users_with_wtm, starts_on__year=year
+        user__in=months.users_with_wtm, starts_on__year=year, is_working_time=True
     ).order_by("starts_on"):
         month_data = months[absence.user_id]
         key = "absence_%s" % absence.reason
@@ -162,8 +162,8 @@ def annual_working_time(year, *, users):
                 (
                     data["absence_vacation"][i],
                     data["absence_sickness"][i],
+                    data["absence_paid"][i],
                     data["vacation_days_correction"][i],
-                    data["absence_other"][i],
                 ),
                 Z1,
             )
@@ -213,7 +213,7 @@ def annual_working_time(year, *, users):
                     + month_data["year"].working_time_per_day
                     * vacation_days_credit[user.id],
                     "absence_sickness": sum(month_data["absence_sickness"]),
-                    "absence_other": sum(month_data["absence_other"]),
+                    "absence_paid": sum(month_data["absence_paid"]),
                     "target": sum(month_data["target"]),
                     "hours": sum(month_data["hours"]),
                     "absences_time": sum(at),
@@ -232,7 +232,7 @@ def annual_working_time(year, *, users):
             "vacation_days_correction",
             "vacation_days_credit",
             "absence_sickness",
-            "absence_other",
+            "absence_paid",
             "hours",
             "running_sum",
             "balance",

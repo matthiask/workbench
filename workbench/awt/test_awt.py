@@ -74,7 +74,7 @@ class AWTTest(TestCase):
         )
         user.absences.create(starts_on=dt.date(2018, 1, 1), days=5, reason="vacation")
         user.absences.create(starts_on=dt.date(2018, 4, 1), days=45, reason="vacation")
-        user.absences.create(starts_on=dt.date(2018, 7, 1), days=10, reason="other")
+        user.absences.create(starts_on=dt.date(2018, 7, 1), days=10, reason="paid")
         user.absences.create(starts_on=dt.date(2018, 10, 1), days=10, reason="vacation")
         user.employments.create(
             date_from=dt.date(2014, 1, 1),
@@ -88,6 +88,10 @@ class AWTTest(TestCase):
         user.employments.create(
             date_from=dt.date(2018, 10, 1), percentage=100, vacation_weeks=5
         )
+
+        # Should have no effect
+        a = user.absences.create(starts_on=dt.date(2018, 8, 1), days=10, reason="other")
+        self.assertFalse(a.is_working_time)
 
         employments = list(user.employments.all())
         self.assertEqual(employments[0].date_until, dt.date(2014, 3, 31))
@@ -110,7 +114,7 @@ class AWTTest(TestCase):
             awt["totals"]["vacation_days_correction"], Decimal("-38.75")
         )
         self.assertAlmostEqual(awt["totals"]["absence_sickness"], Decimal("0"))
-        self.assertAlmostEqual(awt["totals"]["absence_other"], Decimal("10"))
+        self.assertAlmostEqual(awt["totals"]["absence_paid"], Decimal("10"))
 
         # 3/4 * 80% * 360 + 1/4 * 100% * 360 = 306
         self.assertAlmostEqual(awt["totals"]["target"], Decimal("306") * 8)

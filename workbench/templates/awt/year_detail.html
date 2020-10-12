@@ -46,8 +46,8 @@
       </tr>
 
       <tr>
-        <td class="text-right">{{ overall.absence_other|days }}</td>
-        <th>{% translate 'other absences' %}</th>
+        <td class="text-right">{{ overall.absence_paid|days }}</td>
+        <th>{% translate 'Paid leave' %}</th>
       </tr>
 
       <tr>
@@ -121,9 +121,9 @@
       </tr>
 
       <tr>
-        <th class="text-nowrap">{% translate 'other absences' %}</th>
-        {% for value in stats.absence_other %}<td class="text-left {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
-        <th class="text-right">{{ totals.absence_other|days }}</th>
+        <th class="text-nowrap">{% translate 'Paid leave' %}</th>
+        {% for value in stats.absence_paid %}<td class="text-left {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
+        <th class="text-right">{{ totals.absence_paid|days }}</th>
       </tr>
 
       {% if totals.vacation_days_correction %}
@@ -235,9 +235,9 @@
 
         <table class="table table-sm table-bordered table-responsive-lg">
           <tr class="thead-light">
-            <th colspan="3">{% translate 'other absences' %}</th>
+            <th colspan="3">{% translate 'Paid leave' %}</th>
           </tr>
-          {% for absence in data.absences.absence_other %}
+          {% for absence in data.absences.absence_paid %}
             <tr>
               <td>
                 {% blocktranslate with date=absence.starts_on|local_date_format %}from {{ date }}{% endblocktranslate %}

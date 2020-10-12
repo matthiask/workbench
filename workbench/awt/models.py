@@ -144,12 +144,14 @@ class Employment(Model):
 class Absence(Model):
     VACATION = "vacation"
     SICKNESS = "sickness"
+    PAID = "paid"
     OTHER = "other"
 
     REASON_CHOICES = [
         (VACATION, _("vacation")),
         (SICKNESS, _("sickness")),
-        (OTHER, _("other reasons")),
+        (PAID, _("paid leave (e.g. civilian service, maternity etc.)")),
+        (OTHER, _("other reasons (no working time)")),
     ]
 
     user = models.ForeignKey(
@@ -166,6 +168,7 @@ class Absence(Model):
     description = models.TextField(_("description"))
     reason = models.CharField(_("reason"), max_length=10, choices=REASON_CHOICES)
     is_vacation = models.BooleanField(_("is vacation"), default=True)
+    is_working_time = models.BooleanField(_("is working time"), default=True)
 
     class Meta:
         ordering = ["-starts_on", "-pk"]
@@ -177,6 +180,7 @@ class Absence(Model):
 
     def save(self, *args, **kwargs):
         self.is_vacation = self.reason == self.VACATION
+        self.is_working_time = self.reason != self.OTHER
         super().save(*args, **kwargs)
 
     save.alters_data = True
