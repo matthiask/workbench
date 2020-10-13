@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-12 15:00+0200\n"
+"POT-Creation-Date: 2020-10-13 11:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -389,6 +389,11 @@ msgstr "Bezahlter Urlaub (zB Zivildienst, Mutterschaft etc.)"
 msgid "other reasons (no working time)"
 msgstr "Andere Gründe (keine Arbeitszeit)"
 
+#: workbench/awt/models.py workbench/awt/pdf.py
+#: workbench/templates/awt/year_detail.html
+msgid "Working time correction"
+msgstr "Arbeitszeit-Korrektur"
+
 #: workbench/awt/models.py workbench/invoices/models.py
 msgid "starts on"
 msgstr "startet am"
@@ -396,10 +401,6 @@ msgstr "startet am"
 #: workbench/awt/models.py workbench/invoices/models.py
 msgid "ends on"
 msgstr "endet am"
-
-#: workbench/awt/models.py
-msgid "Only used for the visualization of absences."
-msgstr "Wird nur für die Visualisierung der Abwesenheiten verwendet."
 
 #: workbench/awt/models.py workbench/deals/models.py
 #: workbench/invoices/models.py workbench/invoices/views.py
@@ -438,6 +439,13 @@ msgstr "Abwesenheiten"
 #: workbench/awt/models.py
 msgid "Absences of past years are locked."
 msgstr "Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."
+
+#: workbench/awt/models.py
+msgid ""
+"You are not permitted to edit absences of type «Working time correction»."
+msgstr ""
+"Du hast die Erlaubnis zur Bearbeitung von «Arbeitszeit-Korrektur»-Absenzen "
+"nicht."
 
 #: workbench/awt/models.py
 msgid "Absences cannot end before they began."
@@ -2659,10 +2667,6 @@ msgid "calculated with %(hours)s per day"
 msgstr "berechnet mit %(hours)s pro Tag"
 
 #: workbench/templates/awt/year_detail.html
-msgid "other absences"
-msgstr "Andere Abwesenheiten"
-
-#: workbench/templates/awt/year_detail.html
 #, python-format
 msgid "from %(date)s"
 msgstr "Ab %(date)s"
@@ -3573,6 +3577,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Only used for the visualization of absences."
+#~ msgstr "Wird nur für die Visualisierung der Abwesenheiten verwendet."
+
+#~ msgid "other absences"
+#~ msgstr "Andere Abwesenheiten"
 
 #~ msgid "other reasons (does not count towards annual working time)"
 #~ msgstr "Andere Gründe (wird in der Jahresarbeitszeit nicht berücksichtigt)"

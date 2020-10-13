@@ -4,6 +4,7 @@ from django import forms
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.awt.models import Absence
 from workbench.tools.forms import Form, ModelForm, Textarea, WarningsForm, add_prefix
@@ -57,6 +58,13 @@ class AbsenceForm(ModelForm, WarningsForm):
             hours=_("Enter hours"),
         )
         self.fields["reason"].choices = Absence.REASON_CHOICES
+
+        if not self.request.user.features[FEATURES.BOOKKEEPING]:
+            self.fields["reason"].choices = [
+                choice
+                for choice in Absence.REASON_CHOICES
+                if choice[0] != Absence.CORRECTION
+            ]
 
     def clean(self):
         data = super().clean()

@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext, gettext_lazy as _
 
+from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.tools.formats import hours, local_date_format
 from workbench.tools.models import HoursField, Model, MoneyField
@@ -146,12 +147,14 @@ class Absence(Model):
     SICKNESS = "sickness"
     PAID = "paid"
     OTHER = "other"
+    CORRECTION = "correction"
 
     REASON_CHOICES = [
         (VACATION, _("vacation")),
         (SICKNESS, _("sickness")),
         (PAID, _("paid leave (e.g. civilian service, maternity etc.)")),
         (OTHER, _("other reasons (no working time)")),
+        (CORRECTION, _("Working time correction")),
     ]
 
     user = models.ForeignKey(
@@ -184,6 +187,18 @@ class Absence(Model):
     def allow_update(cls, instance, request):
         if instance.starts_on.year < dt.date.today().year:
             messages.error(request, _("Absences of past years are locked."))
+            return False
+        if (
+            instance.reason == instance.CORRECTION
+            and not request.user.features[FEATURES.BOOKKEEPING]
+        ):
+            messages.error(
+                request,
+                _(
+                    "You are not permitted to edit absences"
+                    " of type «Working time correction»."
+                ),
+            )
             return False
         return True
 

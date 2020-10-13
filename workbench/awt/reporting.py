@@ -44,6 +44,7 @@ class Months(dict):
             "absence_vacation": [Z1 for i in range(12)],
             "absence_sickness": [Z1 for i in range(12)],
             "absence_paid": [Z1 for i in range(12)],
+            "absence_correction": [Z1 for i in range(12)],
             "vacation_days_correction": [Z1 for i in range(12)],
             "target": [Z1 for i in range(12)],
             "hours": [Z1 for i in range(12)],
@@ -82,7 +83,12 @@ def full_time_equivalents_by_month():
 
 def annual_working_time(year, *, users):
     absences = defaultdict(
-        lambda: {"absence_vacation": [], "absence_sickness": [], "absence_paid": []}
+        lambda: {
+            "absence_vacation": [],
+            "absence_sickness": [],
+            "absence_paid": [],
+            "absence_correction": [],
+        }
     )
     months = Months(year=year, users=users)
     vacation_days_credit = defaultdict(lambda: Z1)
@@ -163,6 +169,7 @@ def annual_working_time(year, *, users):
                     data["absence_vacation"][i],
                     data["absence_sickness"][i],
                     data["absence_paid"][i],
+                    data["absence_correction"][i],
                     data["vacation_days_correction"][i],
                 ),
                 Z1,
@@ -214,6 +221,7 @@ def annual_working_time(year, *, users):
                     * vacation_days_credit[user.id],
                     "absence_sickness": sum(month_data["absence_sickness"]),
                     "absence_paid": sum(month_data["absence_paid"]),
+                    "absence_correction": sum(month_data["absence_correction"]),
                     "target": sum(month_data["target"]),
                     "hours": sum(month_data["hours"]),
                     "absences_time": sum(at),
@@ -233,6 +241,7 @@ def annual_working_time(year, *, users):
             "vacation_days_credit",
             "absence_sickness",
             "absence_paid",
+            "absence_correction",
             "hours",
             "running_sum",
             "balance",

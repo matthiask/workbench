@@ -51,6 +51,11 @@
       </tr>
 
       <tr>
+        <td class="text-right">{{ overall.absence_correction|days }}</td>
+        <th>{% translate 'Working time correction' %}</th>
+      </tr>
+
+      <tr>
         <td class="text-right">{{ overall.running_sum|hours:True }}</td>
         <th>{% translate 'net work hours' %}</th>
       </tr>
@@ -120,11 +125,21 @@
         <th class="text-right">{{ totals.absence_sickness|days }}</th>
       </tr>
 
+      {% if totals.absence_paid %}
       <tr>
         <th class="text-nowrap">{% translate 'Paid leave' %}</th>
         {% for value in stats.absence_paid %}<td class="text-left {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
         <th class="text-right">{{ totals.absence_paid|days }}</th>
       </tr>
+      {% endif %}
+
+      {% if totals.absence_correction %}
+      <tr>
+        <th class="text-nowrap">{% translate 'Working time correction' %}</th>
+        {% for value in stats.absence_correction %}<td class="text-left {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
+        <th class="text-right">{{ totals.absence_correction|days }}</th>
+      </tr>
+      {% endif %}
 
       {% if totals.vacation_days_correction %}
         <tr>
@@ -238,6 +253,19 @@
             <th colspan="3">{% translate 'Paid leave' %}</th>
           </tr>
           {% for absence in data.absences.absence_paid %}
+            <tr>
+              <td>
+                {% blocktranslate with date=absence.starts_on|local_date_format %}from {{ date }}{% endblocktranslate %}
+              </td>
+              <td>{{ absence.days|days }}</td>
+              <td>{{ absence.description }}</td>
+            </tr>
+          {% endfor %}
+
+          <tr class="thead-light">
+            <th colspan="3">{% translate 'Working time correction' %}</th>
+          </tr>
+          {% for absence in data.absences.absence_correction %}
             <tr>
               <td>
                 {% blocktranslate with date=absence.starts_on|local_date_format %}from {{ date }}{% endblocktranslate %}

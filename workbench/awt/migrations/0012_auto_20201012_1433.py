@@ -24,6 +24,7 @@ class Migration(migrations.Migration):
                     ("sickness", "sickness"),
                     ("paid", "paid leave (e.g. civilian service, maternity etc.)"),
                     ("other", "other reasons (no working time)"),
+                    ("correction", "Working time correction"),
                 ],
                 max_length=10,
                 verbose_name="reason",
