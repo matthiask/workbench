@@ -12,6 +12,7 @@ django-slowtests
 django-vanilla-views
 django-webpack-loader
 dj-database-url
+dj-email-url
 factory-boy
 gunicorn
 lxml

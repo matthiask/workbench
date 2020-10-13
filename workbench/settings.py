@@ -6,6 +6,7 @@ from collections import defaultdict
 from django.utils.translation import gettext_lazy as _
 
 import dj_database_url
+import dj_email_url
 from speckenv import env
 
 
@@ -380,7 +381,9 @@ GLASSFROG_TOKEN = env("GLASSFROG_TOKEN", warn=True)
 CORS_ORIGIN_ALLOW_ALL = True
 
 if DEBUG:  # pragma: no cover
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    globals().update(dj_email_url.parse(env("EMAIL_URL", default="console:")))
+else:
+    globals().update(dj_email_url.parse(env("EMAIL_URL", default="smtp:", warn=True)))
 
 if env("SQL", default=False):  # pragma: no cover
     from django.utils.log import DEFAULT_LOGGING as LOGGING
