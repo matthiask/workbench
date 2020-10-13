@@ -48,8 +48,8 @@ class AbsenceForm(ModelForm, WarningsForm):
 
     class Meta:
         model = Absence
-        fields = ["user", "starts_on", "ends_on", "days", "description", "reason"]
-        widgets = {"description": Textarea({"rows": 2}), "reason": forms.RadioSelect}
+        fields = ["user", "starts_on", "ends_on", "days", "reason", "description"]
+        widgets = {"description": Textarea({"rows": 2})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -57,12 +57,10 @@ class AbsenceForm(ModelForm, WarningsForm):
             '<a href="#" data-hours-button="{hours}">{hours}</a>',
             hours=_("Enter hours"),
         )
-        self.fields["reason"].choices = Absence.REASON_CHOICES
-
         if not self.request.user.features[FEATURES.BOOKKEEPING]:
             self.fields["reason"].choices = [
                 choice
-                for choice in Absence.REASON_CHOICES
+                for choice in self.fields["reason"].choices
                 if choice[0] != Absence.CORRECTION
             ]
 
