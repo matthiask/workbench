@@ -382,7 +382,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 if DEBUG:  # pragma: no cover
     globals().update(dj_email_url.parse(env("EMAIL_URL", default="console:")))
-else:
+else:  # pragma: no cover
     globals().update(dj_email_url.parse(env("EMAIL_URL", default="smtp:", warn=True)))
 
 if env("SQL", default=False):  # pragma: no cover
