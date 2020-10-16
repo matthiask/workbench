@@ -10,7 +10,7 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
 from workbench.accounts.features import FEATURES
-from workbench.accounts.models import User
+from workbench.accounts.models import Team, User
 from workbench.awt.models import Absence, Employment, Year
 from workbench.contacts.models import (
     EmailAddress,
@@ -418,6 +418,7 @@ HISTORY = {
         },
         "related": [(Employment, "user_id"), (Absence, "user_id")],
     },
+    Team: {"fields": EVERYTHING},
     Absence: {"fields": EVERYTHING},
     Year: {"fields": EVERYTHING},
     CreditEntry: _credit_control_creditentry_cfg,
