@@ -290,7 +290,7 @@ class Timestamp(models.Model):
         verbose_name_plural = _("timestamps")
 
     def save(self, *args, **kwargs):
-        assert self.type != self.LOGBOOK, "Not to be used for timestamps"
+        assert self.type in {self.START, self.STOP}, "Not to be used for timestamps"
         super().save(*args, **kwargs)
 
     save.alters_data = True
