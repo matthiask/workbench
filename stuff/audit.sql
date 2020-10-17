@@ -164,7 +164,7 @@ CREATE OR REPLACE FUNCTION audit_audit_table(target_table regclass) RETURNS void
 SELECT audit_audit_table($1, ARRAY[]::text[]);
 $$ LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION audit_audit_table_initial(target_table regclass, ignored_cols text[]) RETURNS void AS $body$
+CREATE OR REPLACE FUNCTION audit_audit_table_initial(target_table regclass) RETURNS void AS $body$
 DECLARE
   _q_txt text;
 BEGIN

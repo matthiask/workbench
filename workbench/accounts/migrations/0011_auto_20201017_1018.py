@@ -12,6 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            "SELECT audit_audit_table_initial('accounts_team', ARRAY[]::text[]);",
+            "SELECT audit_audit_table_initial('accounts_team');",
+            "DELETE FROM audit_logged_actions WHERE table_name='accounts_team');",
         ),
     ]
