@@ -31,7 +31,7 @@ CREATE EXTENSION IF NOT EXISTS hstore;
 -- you're interested in, into a temporary table where you CREATE any useful
 -- indexes and do your analysis.
 --
-CREATE TABLE audit_logged_actions (
+CREATE TABLE IF NOT EXISTS audit_logged_actions (
     event_id bigserial primary key,
     table_name text not null,
     user_name text,
@@ -41,9 +41,9 @@ CREATE TABLE audit_logged_actions (
     changed_fields hstore
 );
 
-CREATE INDEX logged_actions_relid_idx ON audit_logged_actions(table_name);
-CREATE INDEX logged_actions_action_tstamp_tx_stm_idx ON audit_logged_actions(created_at);
-CREATE INDEX logged_actions_action_idx ON audit_logged_actions(action);
+CREATE INDEX IF NOT EXISTS logged_actions_relid_idx ON audit_logged_actions(table_name);
+CREATE INDEX IF NOT EXISTS logged_actions_action_tstamp_tx_stm_idx ON audit_logged_actions(created_at);
+CREATE INDEX IF NOT EXISTS logged_actions_action_idx ON audit_logged_actions(action);
 
 CREATE OR REPLACE FUNCTION audit_if_modified_func() RETURNS TRIGGER AS $body$
 DECLARE
@@ -163,3 +163,17 @@ language 'plpgsql';
 CREATE OR REPLACE FUNCTION audit_audit_table(target_table regclass) RETURNS void AS $$
 SELECT audit_audit_table($1, ARRAY[]::text[]);
 $$ LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION audit_audit_table_initial(target_table regclass, ignored_cols text[]) RETURNS void AS $body$
+DECLARE
+  _q_txt text;
+BEGIN
+  _q_txt = 'INSERT INTO audit_logged_actions ' ||
+    '(table_name, user_name, created_at, action, row_data, changed_fields) ' ||
+    'SELECT ''' || target_table || ''', '''', NOW(), ''I'', hstore(' || target_table || '.*), ''''::hstore ' ||
+    'FROM ' || target_table;
+  EXECUTE _q_txt;
+
+END;
+$body$
+language 'plpgsql';
