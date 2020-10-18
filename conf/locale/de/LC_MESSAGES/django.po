@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-13 11:32+0200\n"
+"POT-Creation-Date: 2020-10-18 09:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -218,6 +218,14 @@ msgstr "Jahresarbeitszeit"
 #: workbench/awt/admin.py workbench/awt/models.py
 msgid "days"
 msgstr "Tage"
+
+#: workbench/awt/forms.py workbench/contacts/forms.py
+#: workbench/credit_control/forms.py workbench/deals/forms.py
+#: workbench/invoices/forms.py workbench/logbook/forms.py
+#: workbench/offers/forms.py workbench/projects/forms.py
+#: workbench/templates/base.html workbench/templates/search.html
+msgid "Search"
+msgstr "Suche"
 
 #: workbench/awt/forms.py
 msgid "All reasons"
@@ -586,14 +594,6 @@ msgstr "(entfernt)"
 #: workbench/templates/contacts/object_list.html
 msgid "contacts"
 msgstr "Kontakte"
-
-#: workbench/contacts/forms.py workbench/credit_control/forms.py
-#: workbench/deals/forms.py workbench/invoices/forms.py
-#: workbench/logbook/forms.py workbench/offers/forms.py
-#: workbench/projects/forms.py workbench/templates/base.html
-#: workbench/templates/search.html
-msgid "Search"
-msgstr "Suche"
 
 #: workbench/contacts/forms.py
 msgid "All groups"
@@ -2143,6 +2143,7 @@ msgid "Copy %s to project"
 msgstr "%s zu Projekt kopieren"
 
 #: workbench/planning/__init__.py workbench/templates/accounts/team_detail.html
+#: workbench/templates/base.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/planning/team_planning.html
 #: workbench/templates/planning/user_planning.html
@@ -2739,6 +2740,10 @@ msgstr "Geschichte der Geschäfte"
 #: workbench/templates/reporting/labor_costs_by_user.html
 msgid "Labor costs"
 msgstr "Personalaufwand"
+
+#: workbench/templates/base.html
+msgid "Sent requests"
+msgstr "Versendete Anfragen"
 
 #: workbench/templates/base.html
 msgid "Time tracking"

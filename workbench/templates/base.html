@@ -122,7 +122,10 @@
             <div class="dropdown-header">{{ request.user.get_full_name }}</div>
             <a class="dropdown-item" href="{% url 'accounts_update' %}">{% translate 'Settings' %}</a>
             {% if request.user|has_feature:FEATURES.PLANNING %}
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-header">{% translate 'planning'|capfirst %}</div>
             <a class="dropdown-item" href="{{ request.user.urls.planning }}">{% translate 'planned work'|capfirst %}</a>
+            <a class="dropdown-item" href="{% url 'planning_planningrequest_list' %}?created_by=-1">{% translate 'Sent requests' %}</a>
             {% endif %}
 
             <div class="dropdown-divider"></div>

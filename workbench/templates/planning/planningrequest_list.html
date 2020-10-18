@@ -25,7 +25,7 @@
       {{ object.created_at.date|local_date_format }} {% translate 'by' %}
       {{ object.created_by.get_short_name }}
     </span>
-    <span>{{ object.requested_hours|hours }}</span>
+    <span>{{ object.planned_hours|hours }} / {{ object.requested_hours|hours }}</span>
     <span>
       {{ object.earliest_start_on|local_date_format }} –
       {{ object.completion_requested_on|local_date_format }}
