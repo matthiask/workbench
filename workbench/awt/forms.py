@@ -8,6 +8,7 @@ from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.awt.models import Absence
 from workbench.tools.forms import Form, ModelForm, Textarea, WarningsForm, add_prefix
+from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
 class AbsenceSearchForm(Form):
@@ -47,6 +48,15 @@ class AbsenceSearchForm(Form):
         if data.get("reason"):
             queryset = queryset.filter(reason=data.get("reason"))
         return queryset.select_related("user")
+
+    def response(self, request, queryset):
+        if (
+            request.GET.get("export") == "xlsx"
+            and request.user.features[FEATURES.CONTROLLING]
+        ):
+            xlsx = WorkbenchXLSXDocument()
+            xlsx.table_from_queryset(queryset)
+            return xlsx.to_response("absences.xlsx")
 
 
 @add_prefix("modal")
