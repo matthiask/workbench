@@ -17,19 +17,21 @@ body {
   flex-flow: column nowrap;
   justify-content: center;
   color: #333;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
 }
 
 main {
   max-width: 30rem;
 }
 
-.notes,
-.buttons {
-  margin-bottom: 1.5rem;
-}
-
-label {
-  display: block;
+main > * + * {
+  margin-top: 1rem;
 }
 
 input {
@@ -43,10 +45,12 @@ input::placeholder {
   color: #999;
 }
 
-.notes {
-  display: flex;
-  gap: 1rem;
-  flex-flow: column nowrap;
+.notes input {
+  width: 100%;
+}
+
+input + input {
+  margin-top: 1rem;
 }
 
 .buttons {
