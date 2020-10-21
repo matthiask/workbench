@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-13 11:32+0200\n"
+"POT-Creation-Date: 2020-10-21 10:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,147 +17,168 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: absences/utils.js
+#: absences/utils.js conf/strings.js
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "So"
 
-#: absences/utils.js
+#: absences/utils.js conf/strings.js
 msgctxt "one letter Monday"
 msgid "M"
 msgstr "Mo"
 
-#: absences/utils.js
+#: absences/utils.js conf/strings.js
 msgctxt "one letter Tuesday"
 msgid "T"
 msgstr "Di"
 
-#: absences/utils.js
+#: absences/utils.js conf/strings.js
 msgctxt "one letter Wednesday"
 msgid "W"
 msgstr "Mi"
 
-#: absences/utils.js
+#: absences/utils.js conf/strings.js
 msgctxt "one letter Thursday"
 msgid "T"
 msgstr "Do"
 
-#: absences/utils.js
+#: absences/utils.js conf/strings.js
 msgctxt "one letter Friday"
 msgid "F"
 msgstr "Fr"
 
-#: absences/utils.js
+#: absences/utils.js conf/strings.js
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Sa"
 
-#: timer/actions.js
-msgid "Unable to submit the logbook entry"
-msgstr "Konnte Logbucheintrag nicht abschicken"
+#: conf/strings.js
+#, javascript-format
+msgid "%sh per week"
+msgstr "%sh pro Woche"
 
-#: timer/actions.js
-msgid "Overwrite seconds"
-msgstr "Sekunden überschreiben"
+#: conf/strings.js
+#, javascript-format
+msgid "%sh/day"
+msgstr "%sh/Tag"
 
-#: timer/activity.js
+#: conf/strings.js
+msgid "(closed)"
+msgstr "(geschlossen)"
+
+#: conf/strings.js
+msgid "(declined)"
+msgstr "(abgelehnt)"
+
+#: conf/strings.js
+msgid "(not accepted yet)"
+msgstr "(noch nicht akzeptiert)"
+
+#: conf/strings.js
+msgid "Absences"
+msgstr "Abwesenheiten"
+
+#: conf/strings.js timer/activity.js
 msgid "Activity"
 msgstr "Aktivität"
 
-#: timer/activitySettings.js
+#: conf/strings.js
+msgid "Add planned work"
+msgstr "Geplante Arbeit hinzufügen"
+
+#: conf/strings.js
+msgid "Capacity per week"
+msgstr "Kapazität pro Woche"
+
+#: conf/strings.js
+msgid "Delta"
+msgstr "Delta"
+
+#: conf/strings.js
+msgid "Go to the project"
+msgstr "Zum Projekt gehen"
+
+#: conf/strings.js
+msgid "No project selected"
+msgstr "Kein Projekt ausgewählt"
+
+#: conf/strings.js
+msgid "No services available"
+msgstr "Keine Leistungen verfügbar"
+
+#: conf/strings.js
+msgid "Not part of an offer"
+msgstr "Nicht Teil einer Offerte"
+
+#: conf/strings.js timer/activitySettings.js
 msgid "OK"
 msgstr "OK"
 
-#: timer/activitySettings.js
+#: conf/strings.js
+msgid "Open logged hours form"
+msgstr "Öffne das Stundenformular"
+
+#: conf/strings.js timer/actions.js
+msgid "Overwrite seconds"
+msgstr "Sekunden überschreiben"
+
+#: conf/strings.js
+msgid "Planned hours per week"
+msgstr "Geplante Stunden pro Woche"
+
+#: conf/strings.js timer/activitySettings.js
 msgid "Remove"
 msgstr "Entfernen"
 
-#: timer/activitySettings.js
+#: conf/strings.js
+msgid "Requested hours per week"
+msgstr "Angefragte Stunden pro Woche"
+
+#: conf/strings.js timer/activitySettings.js
 msgid "Reset"
 msgstr "Zurücksetzen"
 
-#: timer/createActivity.js timer/timer.js
-msgid "Timer"
-msgstr "Timer"
+#: conf/strings.js
+msgid "Select or search project..."
+msgstr "Projekt auswählen oder suchen..."
 
-#: timer/i18n.js
-msgid "What outcome do you seek?"
-msgstr "Welches Ergebnis strebst Du an?"
+#: conf/strings.js
+msgid "Select service..."
+msgstr "Leistung auswählen..."
 
-#: timer/timer.js
-msgid "Today"
-msgstr "Heute"
+#: conf/strings.js
+msgid "Send to logbook"
+msgstr "Sende ins Logbuch"
 
-#: timer/timer.js
+#: conf/strings.js
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: conf/strings.js timer/timer.js
 msgid "This week"
 msgstr "Diese Woche"
 
-#: workbench/static/workbench/workbench.js
+#: conf/strings.js timer/createActivity.js timer/timer.js
+msgid "Timer"
+msgstr "Timer"
+
+#: conf/strings.js timer/timer.js
+msgid "Today"
+msgstr "Heute"
+
+#: conf/strings.js workbench/static/workbench/workbench.js
 msgid "Unable to open the form"
 msgstr "Konnte Formular nicht öffnen"
 
+#: conf/strings.js timer/actions.js
+msgid "Unable to submit the logbook entry"
+msgstr "Konnte Logbucheintrag nicht abschicken"
+
+#: conf/strings.js
 #, javascript-format
-#~ msgid "Week %s"
-#~ msgstr "KW%s"
+msgid "Week %s"
+msgstr "KW%s"
 
-#~ msgid "Planned hours per week"
-#~ msgstr "Geplante Stunden pro Woche"
-
-#~ msgid "Requested hours per week"
-#~ msgstr "Angefragte Stunden pro Woche"
-
-#~ msgid "Delta"
-#~ msgstr "Delta"
-
-#~ msgid "Capacity per week"
-#~ msgstr "Kapazität pro Woche"
-
-#, javascript-format
-#~ msgid "%sh/day"
-#~ msgstr "%sh/Tag"
-
-#~ msgid "(closed)"
-#~ msgstr "(geschlossen)"
-
-#~ msgid "Add planned work"
-#~ msgstr "Geplante Arbeit hinzufügen"
-
-#~ msgid "(declined)"
-#~ msgstr "(abgelehnt)"
-
-#~ msgid "(not accepted yet)"
-#~ msgstr "(noch nicht akzeptiert)"
-
-#~ msgid "Not part of an offer"
-#~ msgstr "Nicht Teil einer Offerte"
-
-#, javascript-format
-#~ msgid "%sh per week"
-#~ msgstr "%sh pro Woche"
-
-#~ msgid "Absences"
-#~ msgstr "Abwesenheiten"
-
-#~ msgid "Select or search project..."
-#~ msgstr "Projekt auswählen oder suchen..."
-
-#~ msgid "Go to the project"
-#~ msgstr "Zum Projekt gehen"
-
-#~ msgid "Select service..."
-#~ msgstr "Leistung auswählen..."
-
-#~ msgid "No services available"
-#~ msgstr "Keine Leistungen verfügbar"
-
-#~ msgid "No project selected"
-#~ msgstr "Kein Projekt ausgewählt"
-
-#~ msgid "Settings"
-#~ msgstr "Einstellungen"
-
-#~ msgid "Open logged hours form"
-#~ msgstr "Öffne das Stundenformular"
-
-#~ msgid "Send to logbook"
-#~ msgstr "Sende ins Logbuch"
+#: conf/strings.js timer/i18n.js
+msgid "What outcome do you seek?"
+msgstr "Welches Ergebnis strebst Du an?"

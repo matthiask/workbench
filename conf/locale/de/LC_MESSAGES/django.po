@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-18 09:57+0200\n"
+"POT-Creation-Date: 2020-10-21 10:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1544,7 +1544,7 @@ msgstr "Leistungen"
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/overdrawn_projects.html
 #: workbench/templates/reporting/project_budget_statistics.html
-#: workbench/timer/models.py workbench/tools/xlsx.py
+#: workbench/tools/xlsx.py
 msgid "project"
 msgstr "Projekt"
 

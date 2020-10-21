@@ -42,6 +42,15 @@ def fmt(ctx):
     )
 
 
+@fl.task
+def mm(ctx):
+    fl.run(
+        ctx,
+        "venv/bin/python extract_gettext.py > conf/strings.js",
+    )
+    fl.mm(ctx)
+
+
 def _do_deploy(conn, folder, rsync):
     with conn.cd(folder):
         fl.run(conn, "git checkout main")
@@ -105,4 +114,4 @@ def pull_db(ctx, installation="fh"):
     )
 
 
-ns = Collection(*fl.GENERAL, check, deploy, deploy_code, fmt, pull_db)
+ns = Collection(*fl.GENERAL, check, deploy, deploy_code, fmt, mm, pull_db)
