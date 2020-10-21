@@ -8,4 +8,4 @@ class TimestampAdmin(admin.ModelAdmin):
     list_display = ["user", "created_at", "type", "notes"]
     list_filter = [("user", admin.RelatedOnlyFieldListFilter)]
     radio_fields = {"type": admin.HORIZONTAL}
-    raw_id_fields = ["logged_hours", "logged_break", "project"]
+    raw_id_fields = ["logged_hours", "logged_break"]

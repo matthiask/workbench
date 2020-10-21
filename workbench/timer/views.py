@@ -53,7 +53,7 @@ class TimestampForm(SignedEmailUserMixin, ModelForm):
 
     class Meta:
         model = Timestamp
-        fields = ["type", "notes", "project"]
+        fields = ["type", "notes"]
 
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
@@ -119,12 +119,7 @@ def list_timestamps(request):
                         slice["description"] or "-",
                     ),
                     "elapsed": slice.elapsed_hours,
-                    "comment": slice.get("comment", "")
-                    or (
-                        "[{}]".format(slice["project"])
-                        if not slice.has_associated_log and slice.get("project")
-                        else ""
-                    ),
+                    "comment": slice.get("comment", ""),
                 }
                 for slice in slices
             ],

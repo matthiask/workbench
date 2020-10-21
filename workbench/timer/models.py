@@ -10,7 +10,6 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.logbook.models import Break, LoggedHours
-from workbench.projects.models import Project
 from workbench.tools.formats import Z1, local_date_format
 
 
@@ -52,15 +51,10 @@ class Slice(dict):
         else:  # No timestamp ID and no associated log -- it's a detected slice!
             params.append(("detected_ends_at", self["ends_at"]))
 
-        url = (
-            reverse("projects_project_createhours", kwargs={"pk": self["project"].pk})
-            if self.get("project") and not self["project"].is_logbook_locked
-            else reverse("logbook_loggedhours_create")
-        )
         # Keep zero too (see elapsed_hours above)
         query = urlencode([pair for pair in params if pair[1] or pair[1] == 0])
 
-        return "{}?{}".format(url, query)
+        return "{}?{}".format(reverse("logbook_loggedhours_create"), query)
 
     @property
     def break_create_url(self):
@@ -119,7 +113,7 @@ class TimestampQuerySet(models.QuerySet):
         day = day or dt.date.today()
         entries = list(
             self.filter(user=user, created_at__date=day).select_related(
-                "logged_hours__service", "logged_break", "project__owned_by"
+                "logged_hours__service", "logged_break"
             )
         )
         known_logged_hours = set(entry.logged_hours for entry in entries)
@@ -152,7 +146,6 @@ class TimestampQuerySet(models.QuerySet):
                 description=entry.logged_hours or entry.logged_break or entry.notes,
                 logged_hours=entry.logged_hours,
                 logged_break=entry.logged_break,
-                project=entry.project,
                 timestamp_id=entry.id,
                 is_start=entry.type == entry.START,
             )
@@ -273,13 +266,6 @@ class Timestamp(models.Model):
         blank=True,
         null=True,
         verbose_name=_("break"),
-    )
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        verbose_name=_("project"),
     )
 
     objects = TimestampQuerySet.as_manager()
