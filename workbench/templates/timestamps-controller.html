@@ -45,6 +45,7 @@ input::placeholder {
 
 .notes {
   display: flex;
+  gap: 1rem;
   flex-flow: column nowrap;
 }
 
@@ -91,6 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const $ = (sel, base=document) => base.querySelector(sel)
 
   const notes = $("[name=notes]")
+  const time = $("[name=time]")
 
   let statusTimeout = null
   const setStatus = (success, message = "") => {
@@ -127,6 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const fd = new FormData()
       fd.append("type", button.dataset.type)
       fd.append("notes", notes.value)
+      fd.append("time", time.value)
       fd.append("user", user)
       try {
         const response = await fetch(`${url}`, {
@@ -137,6 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const _data = await response.json()
 
         notes.value = ""
+        time.value = ""
         setStatus(true, "Saved!")
       } catch(err) {
         setStatus(false, `Error: ${err}`)
@@ -155,12 +159,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   <div class="notes">
     <input type="text" name="notes" value="" placeholder="Notes">
+    <input type="time" name="time" value="" placeholder="Time">
   </div>
 
   <div class="buttons">
     <button type="button" data-type="start">Start</button>
     <button type="button" data-type="stop">Stop</button>
-  </Div>
+  </div>
 
   <div id="status"></div>
 </main>
