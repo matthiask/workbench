@@ -3,6 +3,8 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.test.utils import override_settings
+from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.awt.models import Absence, Employment
@@ -14,6 +16,9 @@ from workbench.tools.validation import in_days
 
 
 class AWTTest(TestCase):
+    def setUp(self):
+        deactivate_all()
+
     def test_redirect(self):
         """Invalid year produces a redirect"""
         user = factories.UserFactory.create()
@@ -401,3 +406,22 @@ class AWTTest(TestCase):
         with self.assertRaises(ValidationError) as cm:
             Absence(**kw, ends_on=dt.date(2022, 1, 30)).full_clean()
         self.assertEqual(list(cm.exception), msg)
+
+    @override_settings(FEATURES={"bookkeeping": False})
+    def test_correction(self):
+        """Absences with reason "correction" only with bookkeeping"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        response = self.client.get(
+            Absence.urls["create"],
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertNotContains(response, 'value="correction"')
+
+        absence = factories.AbsenceFactory.create(user=user, reason=Absence.CORRECTION)
+        response = self.client.get(
+            absence.urls["update"],
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "You are not permitted to edit absences of type")
