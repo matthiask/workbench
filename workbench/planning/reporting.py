@@ -66,6 +66,7 @@ class Planning:
                     "work": {
                         "is_request": False,
                         "id": pw.id,
+                        "request_id": pw.request_id,
                         "title": pw.title,
                         "text": pw.user.get_short_name(),
                         "user": pw.user.get_short_name(),
@@ -161,6 +162,30 @@ class Planning:
                 self._absences[absence.user][idx] += hours / len(weeks)
                 self._by_week[week] += hours / len(weeks)
 
+    def _sort_work_list(self, work_list):
+        def key(work):
+            return (work["date_from"], work["date_until"])
+
+        for_requests = defaultdict(list)
+        everything_else = []
+
+        for row in work_list:
+            if row["work"].get("request_id"):
+                for_requests[row["work"]["request_id"]].append(row)
+            else:
+                everything_else.append(row)
+
+        for row in sorted(
+            everything_else,
+            key=lambda row: (
+                row["work"]["date_from"],
+                row["work"]["date_until"],
+            ),
+        ):
+            yield row
+            if row["work"]["is_request"] and row["work"]["id"] in for_requests:
+                yield from for_requests[row["work"]["id"]]
+
     def _offer_record(self, offer, work_list):
         date_from = min(pw["work"]["date_from"] for pw in work_list)
         date_until = max(pw["work"]["date_until"] for pw in work_list)
@@ -191,13 +216,7 @@ class Planning:
                     else {}
                 ),
             },
-            "work_list": sorted(
-                work_list,
-                key=lambda row: (
-                    row["work"]["date_from"],
-                    row["work"]["date_until"],
-                ),
-            ),
+            "work_list": list(self._sort_work_list(work_list)),
         }
 
     def _project_record(self, project, offers):

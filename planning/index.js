@@ -8,8 +8,8 @@ import React, {
   useRef,
 } from "react"
 
-const clamp = (min, max) => (value) => Math.max(Math.min(value, max), min)
-const opacityClamp = clamp(0.3, 1)
+const clamp = (min, value, max) => Math.max(Math.min(value, max), min)
+const opacityClamp = (value) => clamp(0.3, value, 1)
 const identity = (t) => t
 const gettext = window.gettext || identity
 const interpolate = window.interpolate || identity
@@ -219,8 +219,8 @@ function DeltaByWeek({ planned, capacity }) {
             style={{
               backgroundColor:
                 delta > 0
-                  ? `hsl(0, ${clamp(0, 70)(delta * 5)}%, 70%)`
-                  : `hsl(120, ${clamp(0, 50)(-delta * 3)}%, 70%)`,
+                  ? `hsl(0, ${clamp(0, delta * 5, 70)}%, 70%)`
+                  : `hsl(120, ${clamp(0, -delta * 3, 50)}%, 70%)`,
             }}
           >
             {fixed(delta, 0)}

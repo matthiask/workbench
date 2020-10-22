@@ -134,6 +134,7 @@
   }
 
   &.is-request {
+    /*
     background-image: repeating-linear-gradient(
       125deg,
       var(--teal) 0,
@@ -141,8 +142,29 @@
       #ccc 5px,
       #ccc 8px
     );
-    background-size: 100% 100%;
-    background-repeat: repeat;
+    */
+    background-image: linear-gradient(#000 0, #000 100%);
+    background-position: center;
+    background-size: 100% 10%;
+    background-repeat: repeat-x;
+
+    &::before,
+    &::after {
+      background: #000;
+      position: absolute;
+      content: "";
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+    }
+
+    &::before {
+      left: 0;
+    }
+
+    &::after {
+      right: 0;
+    }
   }
 
   &.is-absence {

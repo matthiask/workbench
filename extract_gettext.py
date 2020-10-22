@@ -17,8 +17,7 @@ def gettext_calls(file):
     with open(file, encoding="utf-8") as f:
         return [
             match[0]
-            for match in
-            re.findall(
+            for match in re.findall(
                 r"""\b(\w*gettext\(\s*(['"]).+?\2\s*\))""",
                 f.read(),
             )
