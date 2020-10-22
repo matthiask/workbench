@@ -319,6 +319,7 @@ class AWTTest(TestCase):
         code("u={}".format(user.pk))
         code("reason=sickness")
         code("reason=nothing", 302)
+        code("export=xlsx")
 
     def test_employment_validation(self):
         """Test model validation of employments"""
