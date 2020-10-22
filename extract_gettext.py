@@ -16,9 +16,9 @@ def js_files():
 def gettext_calls(file):
     with open(file, encoding="utf-8") as f:
         return [
-            match[0]
+            f"{match[0]}({match[1]})"
             for match in re.findall(
-                r"""\b(\w*gettext\(\s*(['"]).+?\2\s*\))""",
+                r"""\b(\w*gettext)\(\s*((['"]).+?\3)\s*\)""",
                 f.read(),
             )
         ]
