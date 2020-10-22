@@ -167,9 +167,6 @@ class Planning:
                 self._by_week[week] += hours / len(weeks)
 
     def _sort_work_list(self, work_list):
-        def key(work):
-            return (work["date_from"], work["date_until"])
-
         for_requests = defaultdict(list)
         everything_else = []
 
