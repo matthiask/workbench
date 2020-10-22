@@ -134,15 +134,6 @@
   }
 
   &.is-request {
-    /*
-    background-image: repeating-linear-gradient(
-      125deg,
-      var(--teal) 0,
-      var(--teal) 5px,
-      #ccc 5px,
-      #ccc 8px
-    );
-    */
     background-image: linear-gradient(#000 0, #000 100%);
     background-position: center;
     background-size: 100% 10%;
@@ -187,5 +178,21 @@
       text-indent: 4px;
       white-space: nowrap;
     }
+  }
+
+  &.is-pw.is-provisional {
+    background-image: repeating-linear-gradient(
+      125deg,
+      var(--teal) 0,
+      var(--teal) 5px,
+      #ccc 5px,
+      #ccc 8px
+    );
+  }
+}
+
+@media print {
+  .no-pr {
+    display: none;
   }
 }

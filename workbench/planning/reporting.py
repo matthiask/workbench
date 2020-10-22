@@ -51,7 +51,7 @@ class Planning:
 
     def add_planned_work(self, queryset):
         for pw in queryset.filter(weeks__overlap=self.weeks).select_related(
-            "user", "project__owned_by", "offer__project", "offer__owned_by"
+            "user", "project__owned_by", "offer__project", "offer__owned_by", "request"
         ):
             per_week = (pw.planned_hours / len(pw.weeks)).quantize(Z2)
             for week in pw.weeks:
@@ -78,6 +78,9 @@ class Planning:
                             local_date_format(date_from, fmt="d.m."),
                             local_date_format(date_until, fmt="d.m."),
                         ),
+                        "is_provisional": pw.request.is_provisional
+                        if pw.request
+                        else False,
                     },
                     "hours_per_week": [
                         per_week if week in pw.weeks else Z1 for week in self.weeks
@@ -125,6 +128,7 @@ class Planning:
                             local_date_format(date_until, fmt="d.m."),
                         ),
                         "period": _period(self.weeks, min(pr.weeks), max(pr.weeks)),
+                        "is_provisional": pr.is_provisional,
                     },
                     "per_week": per_week,
                 }

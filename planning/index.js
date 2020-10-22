@@ -324,7 +324,12 @@ function Project({ by_week, offers, project }) {
           {project.is_closed ? <> {gettext("(closed)")}</> : ""}
         </a>
       </Cell>
-      <Cell row={row} column={2} style={{ color: "var(--primary)" }}>
+      <Cell
+        row={row}
+        column={2}
+        style={{ color: "var(--primary)" }}
+        className="no-pr"
+      >
         <a
           className="planning--add-pw"
           data-toggle="ajaxmodal"
@@ -457,7 +462,7 @@ function Work({ work, hours_per_week, per_week, isEven }) {
         column={1}
         className={`planning--title ${
           work.is_request ? "is-request font-italic" : "is-pw"
-        } planning--small pl-5`}
+        } ${work.is_provisional ? "is-provisional" : ""} planning--small pl-5`}
       >
         <a href={work.url} data-toggle="ajaxmodal">
           {work.title}
@@ -484,7 +489,7 @@ function Work({ work, hours_per_week, per_week, isEven }) {
         column={5}
         className={`planning--small ${
           work.is_request ? "font-italic" : ""
-        } text-center`}
+        } text-center no-pr`}
       >
         {work.user}
       </Cell>
@@ -494,13 +499,15 @@ function Work({ work, hours_per_week, per_week, isEven }) {
           row={row}
           column={FIRST_DATA_COLUMN + work.period[0]}
           colspan={FIRST_DATA_COLUMN + work.period[1] + 1}
-          className="planning--range is-request"
+          className={`planning--range is-request ${
+            work.is_provisional ? "is-provisional" : ""
+          }`}
           tag="a"
           href={work.url}
           data-toggle="ajaxmodal"
           title={interpolate(gettext("%sh per week"), [fixed(per_week, 1)])}
         >
-          <span>{work.text}</span>
+          <span className="no-pr">{work.text}</span>
         </Cell>
       )}
       {hours_per_week &&
@@ -510,13 +517,15 @@ function Work({ work, hours_per_week, per_week, isEven }) {
             row={row}
             column={FIRST_DATA_COLUMN + range.start}
             colspan={`span ${range.length}`}
-            className="planning--range planning--small is-pw"
+            className={`planning--range planning--small is-pw ${
+              work.is_provisional ? "is-provisional" : ""
+            }`}
             tag="a"
             href={work.url}
             data-toggle="ajaxmodal"
             title={interpolate(gettext("%sh per week"), [fixed(per_week, 1)])}
           >
-            <span>{work.text}</span>
+            <span className="no-pr">{work.text}</span>
           </Cell>
         ))}
     </>

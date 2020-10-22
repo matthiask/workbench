@@ -72,6 +72,7 @@ class PlanningRequest(Model):
         related_name="sent_planning_requests",
     )
     closed_at = models.DateTimeField(_("closed at"), blank=True, null=True)
+    is_provisional = models.BooleanField(_("is provisional"), default=False)
 
     objects = PlanningRequestQuerySet.as_manager()
 

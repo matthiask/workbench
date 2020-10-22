@@ -60,6 +60,7 @@ class PlanningRequestForm(ModelForm):
             "offer",
             "title",
             "description",
+            "is_provisional",
             "requested_hours",
             "earliest_start_on",
             "completion_requested_on",
