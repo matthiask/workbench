@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-21 10:14+0200\n"
+"POT-Creation-Date: 2020-10-22 09:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -182,3 +182,12 @@ msgstr "KW%s"
 #: conf/strings.js timer/i18n.js
 msgid "What outcome do you seek?"
 msgstr "Welches Ergebnis strebst Du an?"
+
+#: conf/strings.js
+msgid "is provisional"
+msgstr "ist provisorisch"
+
+#: conf/strings.js
+msgctxt "provisional"
+msgid "prov."
+msgstr "prov."

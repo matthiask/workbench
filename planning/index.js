@@ -10,9 +10,9 @@ import React, {
 
 const clamp = (min, value, max) => Math.max(Math.min(value, max), min)
 const opacityClamp = (value) => clamp(0.3, value, 1)
-const identity = (t) => t
-const gettext = window.gettext || identity
-const interpolate = window.interpolate || identity
+const gettext = window.gettext || ((t) => t)
+const pgettext = window.pgettext || ((ctx, t) => t)
+const interpolate = window.interpolate || ((t) => t)
 const fixed = (s, decimalPlaces) => parseFloat(s).toFixed(decimalPlaces)
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -461,13 +461,23 @@ function Work({ work, hours_per_week, per_week, isEven }) {
         row={row}
         column={1}
         className={`planning--title ${
-          work.is_request ? "is-request font-italic" : "is-pw"
+          work.is_request ? "is-request" : "is-pw"
         } ${work.is_provisional ? "is-provisional" : ""} planning--small pl-5`}
       >
         <a href={work.url} data-toggle="ajaxmodal">
           {work.title}
         </a>
       </Cell>
+      {work.is_provisional ? (
+        <Cell
+          row={row}
+          column={2}
+          className="planning--small"
+          title={gettext("is provisional")}
+        >
+          {pgettext("provisional", "prov.")}
+        </Cell>
+      ) : null}
       <Cell
         row={row}
         column={3}
