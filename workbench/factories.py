@@ -1,5 +1,6 @@
 import datetime as dt
 import types
+from decimal import Decimal
 
 from django.utils import timezone
 
@@ -320,7 +321,7 @@ class PlanningRequestFactory(DjangoModelFactory):
 class PlannedWorkFactory(DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     user = factory.SubFactory(UserFactory)
-    planned_hours = 20
+    planned_hours = Decimal(20)
     title = "Planned work"
 
     class Meta:

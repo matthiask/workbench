@@ -371,3 +371,31 @@ class PlanningTest(TestCase):
         """Planning requests have a specific implementation of link_or_none"""
         pr = factories.PlanningRequestFactory.create()
         self.assertEqual(pr.html_link(), link_or_none(pr))
+
+    def test_planned_work_ranges(self):
+        """Range detection works"""
+        pw = factories.PlannedWorkFactory.create(
+            weeks=[
+                dt.date(2020, 6, 22),
+                dt.date(2020, 6, 29),
+                # dt.date(2020, 7, 6),
+                dt.date(2020, 7, 13),
+                dt.date(2020, 7, 20),
+            ]
+        )
+        self.assertEqual(
+            list(pw.ranges),
+            [
+                {
+                    "from": dt.date(2020, 6, 22),
+                    "until": dt.date(2020, 6, 29),
+                    "pretty": "22.06.2020 – 05.07.2020",
+                },
+                {
+                    "from": dt.date(2020, 7, 13),
+                    "until": dt.date(2020, 7, 20),
+                    "pretty": "13.07.2020 – 26.07.2020",
+                },
+            ],
+        )
+        self.assertEqual(pw.pretty_planned_hours, "20.0h in 4 weeks (5.0h per week)")
