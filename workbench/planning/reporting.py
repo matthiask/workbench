@@ -167,12 +167,12 @@ class Planning:
                 self._by_week[week] += hours / len(weeks)
 
     def _sort_work_list(self, work_list):
-        for_requests = defaultdict(list)
+        for_requests = {}
         everything_else = []
 
         for row in work_list:
             if row["work"].get("request_id"):
-                for_requests[row["work"]["request_id"]].append(row)
+                for_requests.setdefault(row["work"]["request_id"], []).append(row)
             else:
                 everything_else.append(row)
 
@@ -185,7 +185,9 @@ class Planning:
         ):
             yield row
             if row["work"]["is_request"] and row["work"]["id"] in for_requests:
-                yield from for_requests[row["work"]["id"]]
+                yield from for_requests.pop(row["work"]["id"], [])
+
+        assert not for_requests, "Planned work hanging off requests used up"
 
     def _offer_record(self, offer, work_list):
         date_from = min(pw["work"]["date_from"] for pw in work_list)
