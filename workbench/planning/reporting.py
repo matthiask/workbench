@@ -187,7 +187,9 @@ class Planning:
             if row["work"]["is_request"] and row["work"]["id"] in for_requests:
                 yield from for_requests.pop(row["work"]["id"], [])
 
-        assert not for_requests, "Planned work hanging off requests used up"
+        # Items where offers do not match or whatever
+        for items in for_requests.values():
+            yield from items
 
     def _offer_record(self, offer, work_list):
         date_from = min(pw["work"]["date_from"] for pw in work_list)
@@ -354,7 +356,9 @@ def team_planning(team):
     planning = Planning(weeks=weeks, users=list(team.members.active()))
     planning.add_planned_work(PlannedWork.objects.filter(user__teams=team))
     planning.add_planning_requests(
-        PlanningRequest.objects.filter(receivers__teams=team)
+        PlanningRequest.objects.filter(
+            Q(receivers__teams=team) | Q(planned_work__user__teams=team)
+        )
     )
     planning.add_worked_hours(LoggedHours.objects.filter(rendered_by__teams=team))
     planning.add_absences(Absence.objects.filter(user__teams=team))
