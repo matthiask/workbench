@@ -67,8 +67,8 @@ class PlanningTest(TestCase):
         factories.AbsenceFactory.create(user=pw.user)
         pr = factories.PlanningRequestFactory.create(
             project=pw.project,
-            earliest_start_on=monday(),
-            completion_requested_on=monday() + dt.timedelta(days=7),
+            earliest_start_on=monday() - dt.timedelta(days=21),
+            completion_requested_on=monday() + dt.timedelta(days=700),
         )
         pr.receivers.add(pw.user)
 
@@ -98,9 +98,9 @@ class PlanningTest(TestCase):
 
         work_list = report["projects_offers"][0]["offers"][0]["work_list"]
         self.assertEqual(len(work_list), 3)
-        self.assertEqual(work_list[0]["work"]["id"], pw.id)
-        self.assertEqual(work_list[1]["work"]["id"], pr.id)
-        self.assertEqual(work_list[2]["work"]["id"], pw2.id)
+        self.assertEqual(work_list[0]["work"]["id"], pr.id)
+        self.assertEqual(work_list[1]["work"]["id"], pw2.id)
+        self.assertEqual(work_list[2]["work"]["id"], pw.id)
 
     def test_planning_search_forms(self):
         """Planning request search form branch test"""

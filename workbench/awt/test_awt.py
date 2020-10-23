@@ -142,6 +142,13 @@ class AWTTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/pdf")
 
+        user.absences.create(
+            starts_on=dt.date(2018, 10, 1), days=10, reason="correction"
+        )
+        response = self.client.get("/report/annual-working-time/?export=pdf&year=2018")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["content-type"], "application/pdf")
+
     def test_admin_list(self):
         """The admin changelist of years contains the calculated sum of working days"""
         self.client.force_login(factories.UserFactory.create(is_admin=True))
