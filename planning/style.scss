@@ -13,6 +13,8 @@
   --stripe3: #f4f4f4;
   --stripe4: #f9f9f9;
 
+  --planning: #186662;
+
   min-width: min-content;
   position: relative;
 }
@@ -134,14 +136,14 @@
   }
 
   &.is-request {
-    background-image: linear-gradient(#000 0, #000 100%);
-    background-position: center;
+    background-image: linear-gradient(var(--planning) 0, var(--planning) 100%);
+    background-position: center center;
     background-size: 100% 10%;
     background-repeat: repeat-x;
 
     &::before,
     &::after {
-      background: #000;
+      background: var(--planning);
       position: absolute;
       content: "";
       top: 6px;

@@ -19,7 +19,7 @@ def check(ctx):
     fl.run(
         ctx,
         "yarn run prettier --list-different --no-semi --trailing-comma es5"
-        ' "absences/**/*.js" "planning/**/*.js" "timer/**/*.js"',
+        ' "absences/**/*.*" "planning/**/*.*" "timer/**/*.*"',
     )
     fl.run(
         ctx,
@@ -38,7 +38,7 @@ def fmt(ctx):
     fl.run(
         ctx,
         "yarn run prettier --write --no-semi --trailing-comma es5"
-        ' "absences/**/*.js" "planning/**/*.js" "timer/**/*.js"',
+        ' "absences/**/*.*" "planning/**/*.*" "timer/**/*.*"',
     )
 
 
