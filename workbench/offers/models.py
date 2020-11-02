@@ -91,6 +91,7 @@ class Offer(ModelWithTotal):
 
     postal_address = models.TextField(_("postal address"))
     _code = models.IntegerField(_("code"))
+    _fts = models.TextField(editable=False, blank=True)
 
     objects = OfferQuerySet.as_manager()
 
@@ -129,17 +130,28 @@ class Offer(ModelWithTotal):
         return "%s#offer%s" % (self.project.get_absolute_url(), self.pk)
 
     def save(self, *args, **kwargs):
-        new = False
-        if not self.pk:
+        new = not self.pk
+        if new:
             self._code = RawSQL(
                 "SELECT COALESCE(MAX(_code), 0) + 1 FROM offers_offer"
                 " WHERE project_id = %s",
                 (self.project_id,),
             )
-            new = True
-        super().save(*args, **kwargs)
-        if new:
+            super().save(*args, **kwargs)
             self.refresh_from_db()
+
+        self._fts = " ".join(
+            str(part)
+            for part in [
+                self.code,
+                self.project._fts,
+            ]
+        )
+
+        if new:
+            super().save()
+        else:
+            super().save(*args, **kwargs)
 
     save.alters_data = True
 

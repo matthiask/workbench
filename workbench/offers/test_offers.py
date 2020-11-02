@@ -442,9 +442,12 @@ class OffersTest(TestCase):
         self.assertEqual(service.service_cost, 250 * 10 + 35)
         self.assertEqual(offer.total_excl_tax, 250 * 10 + 35 - 100)
 
-        # Offer should only have updated once (because of skip_related_model)
+        # Offer has been
+        # - inserted
+        # - updated once because of _fts
+        # - updated only once because of skip_related_model
         actions = LoggedAction.objects.for_model(offer).with_data(id=offer.id)
-        self.assertEqual([action.action for action in actions], ["I", "U"])
+        self.assertEqual([action.action for action in actions], ["I", "U", "U"])
 
     def test_offer_pricing_with_flat_rate(self):
         """Pricing with flat rates does not allow editing effort rates"""
