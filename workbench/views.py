@@ -209,7 +209,7 @@ def history(request, db_table, attribute, id):
         ]
     else:
         title = _("%(model)s with %(attribute)s=%(id)s") % {
-            "model": model._meta.verbose_name_plural,
+            "model": capfirst(model._meta.verbose_name_plural),
             "attribute": attribute,
             "id": id,
         }
