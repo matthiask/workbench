@@ -44,8 +44,12 @@ jobs:
         ALLOWED_HOSTS: '["*"]'
         DATABASE_URL: 'postgres://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres'
         DEBUG: 'True'
+        LIVE: 'False'
+        NAMESPACE: 'feinheit'
         SECRET_KEY: 'unsafe'
+        TESTING: 'True'
 
       run: |
+        mkdir -p tmp
         coverage run ./manage.py test -v2
         coverage report -m
