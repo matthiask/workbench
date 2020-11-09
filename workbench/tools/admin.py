@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.admin import (  # noqa
     HORIZONTAL,
     VERTICAL,
@@ -14,10 +15,10 @@ class ModelAdmin(ReadWriteModelAdmin):
         return []
 
     def has_add_permission(self, request, obj=None):
-        return False
+        return settings.WORKBENCH.READ_WRITE_ADMIN
 
     def has_change_permission(self, request, obj=None):
-        return False
+        return settings.WORKBENCH.READ_WRITE_ADMIN
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        return settings.WORKBENCH.READ_WRITE_ADMIN

@@ -223,6 +223,7 @@ WORKBENCH = {
             "planning": True,
             "skip_breaks": False,
         },
+        READ_WRITE_ADMIN=False,
     ),
     "dbpag": types.SimpleNamespace(
         TITLE="DBAG",
@@ -262,6 +263,7 @@ WORKBENCH = {
             "planning": False,
             "skip_breaks": False,
         },
+        READ_WRITE_ADMIN=False,
     ),
     "bf": types.SimpleNamespace(
         TITLE="Blindflug",
@@ -317,6 +319,7 @@ WORKBENCH = {
             "planning": True,
             "skip_breaks": True,  # For now
         },
+        READ_WRITE_ADMIN=True,
     ),
     "test": types.SimpleNamespace(
         TITLE="Test",
@@ -354,6 +357,7 @@ WORKBENCH = {
             "planning": True,
             "skip_breaks": False,
         },
+        READ_WRITE_ADMIN=False,
     ),
 }[env("NAMESPACE", required=True)]
 
