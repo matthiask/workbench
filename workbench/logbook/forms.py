@@ -13,11 +13,12 @@ from django.utils.translation import gettext, gettext_lazy as _, override
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
-from workbench.circles.models import Role
+from workbench.circles.models import Circle, Role
 from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
-from workbench.projects.models import Project, Service
+from workbench.offers.models import Offer
+from workbench.projects.models import Campaign, Project, Service
 from workbench.timer.models import Timestamp
 from workbench.tools.forms import (
     Autocomplete,
@@ -26,6 +27,7 @@ from workbench.tools.forms import (
     ModelForm,
     Textarea,
     add_prefix,
+    querystring,
 )
 from workbench.tools.validation import (
     in_days,
@@ -51,7 +53,7 @@ class DetectedTimestampForm(forms.Form):
             return Timestamp(
                 type=Timestamp.STOP,
                 created_at=self.cleaned_data["detected_ends_at"],
-                **kwargs
+                **kwargs,
             )
 
 
@@ -91,10 +93,17 @@ class LoggedHoursSearchForm(Form):
         widget=forms.HiddenInput,
         label="",
     )
-    campaign = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
+    campaign = forms.ModelChoiceField(
+        queryset=Campaign.objects.all(),
+        required=False,
+        widget=forms.HiddenInput,
+        label="",
+    )
     offer = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
     circle = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
-    role = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
+    role = forms.ModelChoiceField(
+        queryset=Role.objects.all(), required=False, widget=forms.HiddenInput, label=""
+    )
     not_archived = forms.BooleanField(
         required=False, widget=forms.HiddenInput, label=""
     )
@@ -124,21 +133,66 @@ class LoggedHoursSearchForm(Form):
             queryset = queryset.filter(rendered_on__lte=data.get("date_until"))
 
         # "hidden" filters
+        self.hidden_filters = []
         if data.get("service"):
-            queryset = queryset.filter(service=data.get("service"))
+            service = data.get("service")
+            self.hidden_filters.append(
+                (
+                    f"{capfirst(service._meta.verbose_name)}: {service}",
+                    querystring(self.request.GET, service=""),
+                ),
+            )
+            queryset = queryset.filter(service=service)
         if data.get("campaign"):
-            queryset = queryset.filter(service__project__campaign=data.get("campaign"))
+            campaign = data.get("campaign")
+            self.hidden_filters.append(
+                (
+                    f"{capfirst(campaign._meta.verbose_name)}: {campaign}",
+                    querystring(self.request.GET, campaign=""),
+                ),
+            )
+            queryset = queryset.filter(service__project__campaign=campaign)
         if data.get("offer") == 0:
+            self.hidden_filters.append(
+                (_("No offer"), querystring(self.request.GET, offer=""))
+            )
             queryset = queryset.filter(service__offer__isnull=True)
         elif data.get("offer"):
-            queryset = queryset.filter(service__offer=data.get("offer"))
+            offer = Offer.objects.filter(pk=data.get("offer")).first()
+            self.hidden_filters.append(
+                (
+                    f"{capfirst(offer._meta.verbose_name)}: {offer}",
+                    querystring(self.request.GET, offer=""),
+                ),
+            )
+            queryset = queryset.filter(service__offer=offer)
         if data.get("circle") == 0:
             queryset = queryset.filter(service__role__isnull=True)
+            self.hidden_filters.append(
+                (_("No circle"), querystring(self.request.GET, circle=""))
+            )
         elif data.get("circle"):
-            queryset = queryset.filter(service__role__circle=data.get("circle"))
+            circle = Circle.objects.filter(pk=data.get("circle")).first()
+            self.hidden_filters.append(
+                (
+                    f"{capfirst(circle._meta.verbose_name)}: {circle}",
+                    querystring(self.request.GET, circle=""),
+                ),
+            )
+            queryset = queryset.filter(service__role__circle=circle)
         if data.get("role"):
-            queryset = queryset.filter(service__role=data.get("role"))
+            role = data.get("role")
+            self.hidden_filters.append(
+                (
+                    f"{capfirst(role._meta.verbose_name)}: {role}",
+                    querystring(self.request.GET, role=""),
+                ),
+            )
+            queryset = queryset.filter(service__role=role)
         if data.get("not_archived"):
+            self.hidden_filters.append(
+                (_("Not archived"), querystring(self.request.GET, not_archived=""))
+            )
             queryset = queryset.filter(archived_at__isnull=True)
 
         return queryset.select_related("service__project__owned_by", "rendered_by")
@@ -190,7 +244,12 @@ class LoggedCostSearchForm(Form):
         widget=forms.HiddenInput,
         label="",
     )
-    campaign = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
+    campaign = forms.ModelChoiceField(
+        queryset=Campaign.objects.all(),
+        required=False,
+        widget=forms.HiddenInput,
+        label="",
+    )
     offer = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
     not_archived = forms.BooleanField(
         required=False, widget=forms.HiddenInput, label=""
@@ -223,15 +282,43 @@ class LoggedCostSearchForm(Form):
             queryset = queryset.filter(rendered_on__lte=data.get("date_until"))
 
         # "hidden" filters
+        self.hidden_filters = []
         if data.get("service"):
-            queryset = queryset.filter(service=data.get("service"))
+            service = data.get("service")
+            self.hidden_filters.append(
+                (
+                    f"{capfirst(service._meta.verbose_name)}: {service}",
+                    querystring(self.request.GET, service=""),
+                ),
+            )
+            queryset = queryset.filter(service=service)
         if data.get("campaign"):
-            queryset = queryset.filter(service__project__campaign=data.get("campaign"))
+            campaign = data.get("campaign")
+            self.hidden_filters.append(
+                (
+                    f"{capfirst(campaign._meta.verbose_name)}: {campaign}",
+                    querystring(self.request.GET, campaign=""),
+                ),
+            )
+            queryset = queryset.filter(service__project__campaign=campaign)
         if data.get("offer") == 0:
+            self.hidden_filters.append(
+                (_("No offer"), querystring(self.request.GET, offer=""))
+            )
             queryset = queryset.filter(service__offer__isnull=True)
         elif data.get("offer"):
-            queryset = queryset.filter(service__offer=data.get("offer"))
+            offer = Offer.objects.filter(pk=data.get("offer")).first()
+            self.hidden_filters.append(
+                (
+                    f"{capfirst(offer._meta.verbose_name)}: {offer}",
+                    querystring(self.request.GET, offer=""),
+                ),
+            )
+            queryset = queryset.filter(service__offer=offer)
         if data.get("not_archived"):
+            self.hidden_filters.append(
+                (_("Not archived"), querystring(self.request.GET, not_archived=""))
+            )
             queryset = queryset.filter(archived_at__isnull=True)
 
         return queryset.select_related("service__project__owned_by", "rendered_by")

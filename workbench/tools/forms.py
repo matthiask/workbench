@@ -246,3 +246,15 @@ def add_prefix(prefix):
         return fn
 
     return decorator
+
+
+def querystring(params=None, **kwargs):
+    params = params.items() if params else ()
+    query = urlencode(
+        sorted(
+            (key, value)
+            for key, value in dict(params, **kwargs).items()
+            if key not in {"error"} and value
+        )
+    )
+    return "?%s" % query

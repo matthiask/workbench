@@ -16,6 +16,9 @@
         {% endif %}
 
         {% if view.search_form %}
+          {% for label, url in view.search_form.hidden_filters %}
+            <a class="btn btn-info" href="{{ url }}">&times; {{ label }}</a>
+          {% endfor %}
           {% ff_fields view.search_form %}
         {% endif %}
 

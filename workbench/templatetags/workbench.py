@@ -1,7 +1,6 @@
 import datetime as dt
 import math
 from itertools import groupby
-from urllib.parse import urlencode
 
 from django import template
 from django.db import models
@@ -17,6 +16,7 @@ from workbench.notes.forms import NoteForm
 from workbench.notes.models import Note
 from workbench.projects.models import Service
 from workbench.tools.formats import Z1, Z2, currency, days, hours, local_date_format
+from workbench.tools.forms import querystring as _qs
 from workbench.tools.history import EVERYTHING
 
 
@@ -196,14 +196,7 @@ def pie(value, one, size=20, type="bad"):
 
 @register.simple_tag(takes_context=True)
 def querystring(context, **kwargs):
-    query = urlencode(
-        sorted(
-            (key, value)
-            for key, value in dict(context["request"].GET.items(), **kwargs).items()
-            if key not in {"error"} and value
-        )
-    )
-    return "?%s" % query if query else ""
+    return _qs(context["request"].GET, **kwargs)
 
 
 @register.simple_tag(takes_context=True)
