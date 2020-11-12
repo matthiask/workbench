@@ -161,7 +161,7 @@ class LoggedHoursSearchForm(Form):
             offer = Offer.objects.filter(pk=data.get("offer")).first()
             self.hidden_filters.append(
                 (
-                    f"{capfirst(offer._meta.verbose_name)}: {offer}",
+                    f"{capfirst(Offer._meta.verbose_name)}: {offer}",
                     querystring(self.request.GET, offer=""),
                 ),
             )
@@ -175,7 +175,7 @@ class LoggedHoursSearchForm(Form):
             circle = Circle.objects.filter(pk=data.get("circle")).first()
             self.hidden_filters.append(
                 (
-                    f"{capfirst(circle._meta.verbose_name)}: {circle}",
+                    f"{capfirst(Circle._meta.verbose_name)}: {circle}",
                     querystring(self.request.GET, circle=""),
                 ),
             )
@@ -310,7 +310,7 @@ class LoggedCostSearchForm(Form):
             offer = Offer.objects.filter(pk=data.get("offer")).first()
             self.hidden_filters.append(
                 (
-                    f"{capfirst(offer._meta.verbose_name)}: {offer}",
+                    f"{capfirst(Offer._meta.verbose_name)}: {offer}",
                     querystring(self.request.GET, offer=""),
                 ),
             )
