@@ -25,19 +25,15 @@
         </h3>
         <div>
 
-          {% if previous %}
-          <a href="?day={{ previous.isoformat }}" class="btn btn-primary btn-sm align-self-start"
-                                                  title="{% translate 'Previous day' %}">
+          <a href="?day={{ previous.isoformat }}" class="btn btn-primary btn-sm align-self-start{% if not previous %} disabled{% endif %}"
+                                                  title="{% translate 'Previous day' %}"{% if not previous %} aria-disabled="true"{% endif %}>
             &laquo;
           </a>
-          {% endif %}
 
-          {% if next %}
-          <a href="?day={{ next.isoformat }}" class="btn btn-primary btn-sm align-self-start"
-                                              title="{% translate 'Next day' %}">
+          <a href="?day={{ next.isoformat }}" class="btn btn-primary btn-sm align-self-start{% if not next %} disabled{% endif %}"
+                                              title="{% translate 'Next day' %}"{% if not next %} aria-disabled="true"{% endif %}>
             &raquo;
           </a>
-          {% endif %}
 
           <a href="{% url 'timestamps-controller' %}?user={{ request.user.signed_email }}&amp;url={{ url }}&amp;title={{ WORKBENCH.TITLE }}"
              class="btn btn-primary btn-sm align-self-start"
