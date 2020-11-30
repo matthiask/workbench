@@ -44,6 +44,7 @@ class AccountsTest(TestCase):
             "email": "test@example.org",
             "language": "en",
             "working_time_model": wtm.id,
+            "planning_hours_per_day": 6,
             "employments-TOTAL_FORMS": 0,
             "employments-INITIAL_FORMS": 0,
             "employments-MAX_NUM_FORMS": 1000,

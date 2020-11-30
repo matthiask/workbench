@@ -150,6 +150,7 @@ class LoginTestCase(TestCase):
                 "_short_name": "T",
                 "language": "en",
                 "working_time_model": wtm.pk,
+                "planning_hours_per_day": 6,
             },
         )
         self.assertRedirects(response, "/")

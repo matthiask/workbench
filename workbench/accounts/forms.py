@@ -46,7 +46,8 @@ class UserForm(ModelForm):
                 "Contact your administrator to change this value."
             )
 
-        if not self.request.user.features[FEATURES.PLANNING]:
+        user = self.request.user
+        if not hasattr(user, "features") or not user.features[FEATURES.PLANNING]:
             self.fields.pop("planning_hours_per_day")
 
 
