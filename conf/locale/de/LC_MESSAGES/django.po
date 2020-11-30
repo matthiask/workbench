@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-22 09:44+0200\n"
+"POT-Creation-Date: 2020-11-30 15:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -84,6 +84,14 @@ msgstr "Sprache"
 #: workbench/accounts/models.py workbench/awt/models.py
 msgid "working time model"
 msgstr "Arbeitszeitmodell"
+
+#: workbench/accounts/models.py
+msgid "planning hours per day"
+msgstr "Planungsstunden pro Tag"
+
+#: workbench/accounts/models.py
+msgid "How many hours are available for freely planning projects?"
+msgstr "Wie viele Stunden sind frei verfügbar für die Projektplanung?"
 
 #: workbench/accounts/models.py workbench/contacts/models.py
 #: workbench/templates/accounts/user_detail.html
@@ -1809,6 +1817,22 @@ msgid "<detected>"
 msgstr "<entdeckt>"
 
 #: workbench/logbook/forms.py
+msgid "No offer"
+msgstr "Keine Offerte"
+
+#: workbench/logbook/forms.py
+#: workbench/templates/reporting/hours_by_circle.html
+msgid "No circle"
+msgstr "Kein Kreis"
+
+#: workbench/logbook/forms.py workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/xlsx.py
+msgid "Not archived"
+msgstr "Nicht archiviert"
+
+#: workbench/logbook/forms.py
 msgid "This field is required unless you create a new service."
 msgstr "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung."
 
@@ -3082,13 +3106,6 @@ msgstr "Offeriert"
 
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/project_budget_statistics.html
-#: workbench/tools/xlsx.py
-msgid "Not archived"
-msgstr "Nicht archiviert"
-
-#: workbench/templates/projects/campaign_detail.html
-#: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_statistics.html
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "undefined rate"
@@ -3195,10 +3212,6 @@ msgstr "Anzahl"
 #: workbench/templates/reporting/key_data.html
 msgid "green"
 msgstr "Grün"
-
-#: workbench/templates/reporting/hours_by_circle.html
-msgid "No circle"
-msgstr "Kein Kreis"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Facts"

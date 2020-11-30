@@ -125,12 +125,7 @@ function Planning({ data }) {
           </Cell>
         ))}
 
-        {data.capacity && (
-          <Capacity
-            {...data.capacity}
-            dailyPlanningHours={data.daily_planning_hours}
-          />
-        )}
+        {data.capacity && <Capacity {...data.capacity} />}
         <TotalByWeek
           by_week={data.by_week}
           title={gettext("Planned hours per week")}
@@ -155,10 +150,7 @@ function Planning({ data }) {
           <Project key={project.project.id} {...project} />
         ))}
 
-        <Absences
-          absences={data.absences}
-          dailyPlanningHours={data.daily_planning_hours}
-        />
+        <Absences absences={data.absences} />
       </div>
     </RowContext.Provider>
   )
@@ -231,7 +223,7 @@ function DeltaByWeek({ planned, capacity }) {
   )
 }
 
-function Capacity({ total, by_user, dailyPlanningHours }) {
+function Capacity({ total, by_user }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
@@ -243,8 +235,7 @@ function Capacity({ total, by_user, dailyPlanningHours }) {
         colspan={`span ${FIRST_DATA_COLUMN - 1}`}
         className="planning--scale text-right pr-2"
       >
-        <strong>{gettext("Capacity per week")}</strong> (
-        {interpolate(gettext("%sh/day"), [dailyPlanningHours])})
+        <strong>{gettext("Capacity per week")}</strong>
       </Cell>
       {total.map((hours, idx) => (
         <Cell
@@ -542,7 +533,7 @@ function Work({ work, hours_per_week, per_week, isEven }) {
   )
 }
 
-function Absences({ absences, dailyPlanningHours }) {
+function Absences({ absences }) {
   const ctx = useContext(RowContext)
   ctx.next() // Skip one row
   const row = ctx.next()
@@ -557,8 +548,7 @@ function Absences({ absences, dailyPlanningHours }) {
         className="planning--stripe1"
       />
       <Cell row={row} column={1} className="planning--title is-project">
-        <strong>{gettext("Absences")}</strong> (
-        {interpolate(gettext("%sh/day"), [dailyPlanningHours])})
+        <strong>{gettext("Absences")}</strong>
       </Cell>
       {absences.map((user, idx) => (
         <UserAbsences key={idx} user={user} />

@@ -15,9 +15,6 @@ from workbench.tools.reporting import query
 from workbench.tools.validation import monday
 
 
-DAILY_PLANNING_HOURS = 6
-
-
 def _period(weeks, min, max):
     try:
         start = weeks.index(min)
@@ -155,7 +152,7 @@ class Planning:
         ).select_related("user"):
             date_from = monday(absence.starts_on)
             date_until = monday(absence.ends_on or absence.starts_on)
-            hours = absence.days * DAILY_PLANNING_HOURS
+            hours = absence.days * absence.user.planning_hours_per_day
             weeks = [
                 (idx, week)
                 for idx, week in enumerate(self.weeks)
@@ -274,15 +271,18 @@ class Planning:
 
         for week, user, capacity in query(
             """
-select week, user_id, percentage * 5 * %s / 100 as capacity
+select week, user_id, percentage * 5 * planning_hours_per_day / 100 as capacity
 from generate_series(%s::date, %s::date, '7 days') as week
 left outer join lateral (
-    select * from awt_employment where user_id = any (%s)
+    select user_id, date_from, date_until, percentage, planning_hours_per_day
+    from awt_employment
+    left join accounts_user on awt_employment.user_id=accounts_user.id
+    where user_id = any (%s)
 ) as employment
 on employment.date_from <= week and employment.date_until > week
 where percentage is not NULL -- NULL produced by outer join
             """,
-            [DAILY_PLANNING_HOURS, min(self.weeks), max(self.weeks), user_ids],
+            [min(self.weeks), max(self.weeks), user_ids],
         ):
             by_user[user][week.date()] = capacity
             total[week.date()] += capacity
@@ -308,7 +308,6 @@ where percentage is not NULL -- NULL produced by outer join
         except ValueError:
             this_week_index = None
         return {
-            "daily_planning_hours": DAILY_PLANNING_HOURS,
             "this_week_index": this_week_index,
             "weeks": [
                 {

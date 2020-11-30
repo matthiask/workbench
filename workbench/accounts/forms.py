@@ -2,6 +2,7 @@ from django import forms
 from django.conf import settings
 from django.utils.translation import gettext as _
 
+from workbench.accounts.features import FEATURES
 from workbench.accounts.models import Team, User
 from workbench.awt.models import WorkingTimeModel
 from workbench.tools.forms import Form, ModelForm
@@ -21,6 +22,7 @@ class UserForm(ModelForm):
             "language",
             "email",
             "working_time_model",
+            "planning_hours_per_day",
         )
         widgets = {
             "language": forms.RadioSelect,
@@ -43,6 +45,9 @@ class UserForm(ModelForm):
             self.fields["working_time_model"].help_text = _(
                 "Contact your administrator to change this value."
             )
+
+        if not self.request.user.features[FEATURES.PLANNING]:
+            self.fields.pop("planning_hours_per_day")
 
 
 class TeamSearchForm(Form):

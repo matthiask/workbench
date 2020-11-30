@@ -109,6 +109,13 @@ class User(Model, AbstractBaseUser):
         on_delete=models.CASCADE,
         verbose_name=_("working time model"),
     )
+    planning_hours_per_day = models.DecimalField(
+        _("planning hours per day"),
+        default=6,
+        max_digits=5,
+        decimal_places=2,
+        help_text=_("How many hours are available for freely planning projects?"),
+    )
     person = models.OneToOneField(
         "contacts.Person",
         on_delete=models.PROTECT,
