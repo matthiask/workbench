@@ -360,6 +360,14 @@ class AWTTest(TestCase):
             Employment(**kw, hourly_labor_costs=20).full_clean()
         self.assertEqual(list(cm.exception), msg)
 
+        msg = [("date_until", ["Employments cannot end before they began."])]
+
+        with self.assertRaises(ValidationError) as cm:
+            Employment(
+                **kw, date_from=dt.date.today(), date_until=dt.date(2020, 1, 30)
+            ).full_clean()
+        self.assertEqual(list(cm.exception), msg)
+
     def test_calendar(self):
         """The absence calendar report does not crash"""
         user = factories.UserFactory.create()

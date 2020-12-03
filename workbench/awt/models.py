@@ -1,7 +1,6 @@
 import datetime as dt
 
 from django.contrib import messages
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext, gettext_lazy as _
 
@@ -132,13 +131,15 @@ class Employment(Model):
 
     def clean_fields(self, exclude):
         super().clean_fields(exclude)
+        errors = {}
         if (self.hourly_labor_costs is None) != (self.green_hours_target is None):
-            raise ValidationError(
-                _(
-                    "Either provide both hourly labor costs"
-                    " and green hours target or none."
-                )
+            errors["__all__"] = _(
+                "Either provide both hourly labor costs"
+                " and green hours target or none."
             )
+        if self.date_from and self.date_until and self.date_from > self.date_until:
+            errors["date_until"] = _("Employments cannot end before they began.")
+        raise_if_errors(errors, exclude)
 
 
 @model_urls
