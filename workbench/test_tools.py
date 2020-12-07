@@ -96,3 +96,14 @@ class ToolsTest(TestCase):
         self.assertTrue(
             is_title_specific("Analyse der Storyboards und allgemeine Anforderungen")
         )
+
+    def test_formats_minutes_and_hours(self):
+        """Duration formatting"""
+        for value, result in [
+            (0, "0 minutes"),
+            (60, "1 minute"),
+            (3600, "1 hour 0 minutes"),
+            (7261, "2 hours 1 minute"),
+        ]:
+            with self.subTest(value=value, result=result):
+                self.assertEqual(formats.hours_and_minutes(value), result)

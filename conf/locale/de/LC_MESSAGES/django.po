@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-03 10:56+0100\n"
+"POT-Creation-Date: 2020-12-07 14:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1983,13 +1983,6 @@ msgid "breaks"
 msgstr "Pausen"
 
 #: workbench/logbook/models.py
-#, python-format
-msgid "%s minute"
-msgid_plural "%s minutes"
-msgstr[0] "%s Minute"
-msgstr[1] "%s Minuten"
-
-#: workbench/logbook/models.py
 msgid "Breaks must start and end on the same day."
 msgstr "Anfang und Ende müssen im gleichen Jahr liegen."
 
@@ -3461,6 +3454,20 @@ msgstr "Start"
 #: workbench/timer/models.py
 msgid "Stop"
 msgstr "Stop"
+
+#: workbench/tools/formats.py
+#, python-format
+msgid "%s hour"
+msgid_plural "%s hours"
+msgstr[0] "%s Stunde"
+msgstr[1] "%s Stunden"
+
+#: workbench/tools/formats.py
+#, python-format
+msgid "%s minute"
+msgid_plural "%s minutes"
+msgstr[0] "%s Minute"
+msgstr[1] "%s Minuten"
 
 #: workbench/tools/forms.py
 msgid "Is automatically filled using the organization's contact."

@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.utils.formats import date_format
 from django.utils.timezone import localtime
+from django.utils.translation import ngettext
 
 
 Z0 = Decimal("0")
@@ -36,3 +37,13 @@ def days(value, plus_sign=False):
 
 def hours(value, plus_sign=False):
     return _fmt(fmt="{}{:,.1f}h", value=value, exp=Z1, plus_sign=plus_sign)
+
+
+def hours_and_minutes(seconds):
+    minutes = int(seconds) // 60
+    hours, minutes = divmod(minutes, 60)
+    parts = [
+        (ngettext("%s hour", "%s hours", hours) % hours) if hours else None,
+        ngettext("%s minute", "%s minutes", minutes) % minutes,
+    ]
+    return " ".join(filter(None, parts))

@@ -5,10 +5,11 @@ from django.contrib import messages
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _, ngettext
+from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.projects.models import Service
+from workbench.tools.formats import hours_and_minutes
 from workbench.tools.models import HoursField, Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import logbook_lock, raise_if_errors
@@ -196,9 +197,8 @@ class Break(Model):
         verbose_name_plural = _("breaks")
 
     def __str__(self):
-        minutes = int(self.timedelta.total_seconds() // 60)
         parts = [
-            ngettext("%s minute", "%s minutes", minutes) % minutes,
+            hours_and_minutes(self.timedelta.total_seconds()),
             self.description,
         ]
         return " ".join(filter(None, parts))
