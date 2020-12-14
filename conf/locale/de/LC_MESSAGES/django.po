@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-07 14:21+0100\n"
+"POT-Creation-Date: 2020-12-14 15:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3147,6 +3147,14 @@ msgstr "Kalkulation"
 #: workbench/templates/projects/project_detail.html
 msgid "Sort"
 msgstr "Sortieren"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Request work"
+msgstr "Arbeit anfragen"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Plan work"
+msgstr "Arbeit planen"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Reassign logbook entries"

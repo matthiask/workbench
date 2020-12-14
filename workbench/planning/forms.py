@@ -2,7 +2,7 @@ import datetime as dt
 from itertools import islice
 
 from django import forms
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.utils.dateparse import parse_date
 from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
@@ -12,7 +12,7 @@ from workbench.accounts.models import Team, User
 from workbench.invoices.utils import recurring
 from workbench.planning.models import PlannedWork, PlanningRequest
 from workbench.projects.models import Project
-from workbench.tools.formats import local_date_format
+from workbench.tools.formats import Z1, local_date_format
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
 from workbench.tools.validation import monday
 
@@ -77,6 +77,40 @@ class PlanningRequestForm(ModelForm):
             kwargs.setdefault("initial", {}).update({"title": self.project.title})
         else:
             self.project = kwargs["instance"].project
+
+        initial = kwargs.setdefault("initial", {})
+        request = kwargs["request"]
+
+        if offer_id := request.GET.get("plan_offer"):
+            try:
+                offer = self.project.offers.get(pk=offer_id)
+            except (self.project.offers.model.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update(
+                    {
+                        "title": offer.title,
+                        "description": offer.description,
+                        "requested_hours": offer.services.aggregate(
+                            h=Sum("service_hours")
+                        )["h"]
+                        or Z1,
+                    }
+                )
+
+        if service_id := request.GET.get("service"):
+            try:
+                service = self.project.services.get(pk=service_id)
+            except (self.project.services.model.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update(
+                    {
+                        "title": f"{self.project.title}: {service.title}",
+                        "description": service.description,
+                        "requested_hours": service.service_hours,
+                    }
+                )
 
         super().__init__(*args, **kwargs)
         self.instance.project = self.project
@@ -202,6 +236,37 @@ class PlannedWorkForm(ModelForm):
                         "title": pr.title,
                         "planned_hours": pr.requested_hours - pr.planned_hours,
                         "weeks": pr.weeks,
+                    }
+                )
+
+        if offer_id := request.GET.get("plan_offer"):
+            try:
+                offer = self.project.offers.get(pk=offer_id)
+            except (self.project.offers.model.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update(
+                    {
+                        "title": offer.title,
+                        "description": offer.description,
+                        "requested_hours": offer.services.aggregate(
+                            h=Sum("service_hours")
+                        )["h"]
+                        or Z1,
+                    }
+                )
+
+        if service_id := request.GET.get("service"):
+            try:
+                service = self.project.services.get(pk=service_id)
+            except (self.project.services.model.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update(
+                    {
+                        "title": f"{self.project.title}: {service.title}",
+                        "description": service.description,
+                        "planned_hours": service.service_hours,
                     }
                 )
 
