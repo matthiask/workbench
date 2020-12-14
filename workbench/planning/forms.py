@@ -249,7 +249,7 @@ class PlannedWorkForm(ModelForm):
                     {
                         "title": offer.title,
                         "description": offer.description,
-                        "requested_hours": offer.services.aggregate(
+                        "planned_hours": offer.services.aggregate(
                             h=Sum("service_hours")
                         )["h"]
                         or Z1,
