@@ -248,7 +248,7 @@ class PlannedWorkForm(ModelForm):
                 initial.update(
                     {
                         "title": offer.title,
-                        "description": offer.description,
+                        "notes": offer.description,
                         "planned_hours": offer.services.aggregate(
                             h=Sum("service_hours")
                         )["h"]
@@ -265,7 +265,7 @@ class PlannedWorkForm(ModelForm):
                 initial.update(
                     {
                         "title": f"{self.project.title}: {service.title}",
-                        "description": service.description,
+                        "notes": service.description,
                         "planned_hours": service.service_hours,
                     }
                 )

@@ -415,3 +415,48 @@ class PlanningTest(TestCase):
             ],
         )
         self.assertEqual(pw.pretty_planned_hours, "20.0h in 4 weeks (5.0h per week)")
+
+    def test_initialize_form_using_offer(self):
+        """Initializing planning requests and planned work using offers"""
+
+        offer = factories.OfferFactory.create(
+            title="Testing title",
+            description="Testing description",
+        )
+        self.client.force_login(offer.owned_by)
+
+        response = self.client.get(
+            offer.project.urls["createrequest"] + f"?plan_offer={offer.pk}"
+        )
+        self.assertContains(response, 'value="Testing title"')
+        self.assertContains(response, "Testing description")
+
+        response = self.client.get(
+            offer.project.urls["creatework"] + f"?plan_offer={offer.pk}"
+        )
+        self.assertContains(response, 'value="Testing title"')
+        self.assertContains(response, "Testing description")
+
+    def test_initialize_form_using_service(self):
+        """Initializing planning requests and planned work using services"""
+
+        service = factories.ServiceFactory.create(
+            title="Testing title",
+            description="Testing description",
+            effort_hours=20,
+        )
+        self.client.force_login(service.project.owned_by)
+
+        response = self.client.get(
+            service.project.urls["createrequest"] + f"?service={service.pk}"
+        )
+        self.assertContains(response, f'value="{service.project.title}: Testing title"')
+        self.assertContains(response, "Testing description")
+        self.assertContains(response, 'value="20.0"')
+
+        response = self.client.get(
+            service.project.urls["creatework"] + f"?service={service.pk}"
+        )
+        self.assertContains(response, f'value="{service.project.title}: Testing title"')
+        self.assertContains(response, "Testing description")
+        self.assertContains(response, 'value="20.0"')
