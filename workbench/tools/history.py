@@ -417,6 +417,7 @@ HISTORY = {
             "enforce_same_week_logging",
             "person",
             "working_time_model",
+            "planning_hours_per_day",
         },
         "related": [(Employment, "user_id"), (Absence, "user_id")],
     },
