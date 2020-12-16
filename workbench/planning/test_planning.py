@@ -437,6 +437,14 @@ class PlanningTest(TestCase):
         self.assertContains(response, 'value="Testing title"')
         self.assertContains(response, "Testing description")
 
+        response = self.client.get(
+            offer.project.urls["createrequest"] + "?plan_offer=bla"
+        )
+        self.assertEqual(response.status_code, 200)  # No crash
+
+        response = self.client.get(offer.project.urls["creatework"] + "?plan_offer=bla")
+        self.assertEqual(response.status_code, 200)  # No crash
+
     def test_initialize_form_using_service(self):
         """Initializing planning requests and planned work using services"""
 
@@ -460,3 +468,11 @@ class PlanningTest(TestCase):
         self.assertContains(response, f'value="{service.project.title}: Testing title"')
         self.assertContains(response, "Testing description")
         self.assertContains(response, 'value="20.0"')
+
+        response = self.client.get(
+            service.project.urls["createrequest"] + "?service=bla"
+        )
+        self.assertEqual(response.status_code, 200)  # No crash
+
+        response = self.client.get(service.project.urls["creatework"] + "?service=bla")
+        self.assertEqual(response.status_code, 200)  # No crash
