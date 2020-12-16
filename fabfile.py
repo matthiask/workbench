@@ -57,7 +57,7 @@ def _do_deploy(conn, folder, rsync):
         fl.run(conn, "git fetch origin")
         fl.run(conn, "git merge --ff-only origin/main")
         fl.run(conn, 'find . -name "*.pyc" -delete')
-        fl.run(conn, "venv/bin/pip install -U pip wheel setuptools")
+        fl.run(conn, "venv/bin/pip install -U 'pip!=20.3.2' wheel setuptools")
         fl.run(conn, "venv/bin/pip install -r requirements.txt")
         for wb in config.installations:
             fl.run(conn, "DOTENV=.env/{} venv/bin/python manage.py migrate".format(wb))
