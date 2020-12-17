@@ -180,6 +180,14 @@ class Planning:
                 row["work"]["date_until"],
             ),
         ):
+            # Is request, has no missing hours and no planned hours in current view?
+            if (
+                row["work"]["is_request"]
+                and not row["work"]["missing_hours"]
+                and not for_requests.get(row["work"]["id"])
+            ):
+                continue
+
             yield row
             if row["work"]["is_request"] and row["work"]["id"] in for_requests:
                 yield from for_requests.pop(row["work"]["id"], [])
@@ -192,6 +200,10 @@ class Planning:
         date_from = min(pw["work"]["date_from"] for pw in work_list)
         date_until = max(pw["work"]["date_until"] for pw in work_list)
         hours = sum(pw["work"]["planned_hours"] for pw in work_list)
+
+        work_list = list(self._sort_work_list(work_list))
+        if not work_list:
+            return None
 
         return {
             "offer": {
@@ -218,14 +230,17 @@ class Planning:
                     else {}
                 ),
             },
-            "work_list": list(self._sort_work_list(work_list)),
+            "work_list": work_list,
         }
 
     def _project_record(self, project, offers):
         offers = sorted(
-            (
-                self._offer_record(offer, work_list)
-                for offer, work_list in sorted(offers.items())
+            filter(
+                None,
+                (
+                    self._offer_record(offer, work_list)
+                    for offer, work_list in sorted(offers.items())
+                ),
             ),
             key=lambda row: (
                 row["offer"]["date_from"],
@@ -233,6 +248,9 @@ class Planning:
                 -row["offer"]["planned_hours"],
             ),
         )
+
+        if not offers:
+            return None
 
         date_from = min(rec["offer"]["date_from"] for rec in offers)
         date_until = max(rec["offer"]["date_until"] for rec in offers)
@@ -321,10 +339,13 @@ where percentage is not NULL -- NULL produced by outer join
                 for week in self.weeks
             ],
             "projects_offers": sorted(
-                [
-                    self._project_record(project, offers)
-                    for project, offers in self._projects_offers.items()
-                ],
+                filter(
+                    None,
+                    (
+                        self._project_record(project, offers)
+                        for project, offers in self._projects_offers.items()
+                    ),
+                ),
                 key=lambda row: (
                     row["project"]["date_from"],
                     row["project"]["date_until"],
