@@ -53,6 +53,7 @@ class RecurringTest(TestCase):
         for ri in RecurringInvoice.objects.renewal_candidates():
             invoices.extend(ri.create_invoices())
         self.assertTrue(len(invoices) > 1)
+        self.assertEqual({invoice.type for invoice in invoices}, {Invoice.FIXED})
 
     def test_creation(self):
         """Creation of recurring invoices, with the customer/contaact pre-form"""
@@ -327,3 +328,4 @@ class RecurringTest(TestCase):
 
         invoices = r.create_invoices()
         self.assertIsNotNone(invoices[0].project)
+        self.assertEqual(invoices[0].type, invoices[0].DOWN_PAYMENT)

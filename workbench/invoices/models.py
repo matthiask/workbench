@@ -641,7 +641,7 @@ class RecurringInvoice(ModelWithTotal):
             service_period_until=period_ends_on,
             owned_by=self.owned_by,
             status=Invoice.IN_PREPARATION,
-            type=Invoice.FIXED,
+            type=Invoice.DOWN_PAYMENT if self.create_project else Invoice.FIXED,
             postal_address=self.postal_address,
             subtotal=self.subtotal,
             discount=self.discount,
