@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-14 15:29+0100\n"
+"POT-Creation-Date: 2020-12-21 09:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -108,7 +108,7 @@ msgstr "Person"
 #: workbench/templates/reporting/labor_costs_by_user.html
 #: workbench/templates/reporting/logging.html
 #: workbench/templates/reporting/work_anniversaries.html
-#: workbench/timer/models.py
+#: workbench/timer/models.py workbench/tools/xlsx.py
 msgid "user"
 msgstr "Benutzer"
 
@@ -3141,20 +3141,20 @@ msgid "Related deals"
 msgstr "Verbundene Geschäfte"
 
 #: workbench/templates/projects/project_detail.html
-msgid "Pricing"
-msgstr "Kalkulation"
-
-#: workbench/templates/projects/project_detail.html
-msgid "Sort"
-msgstr "Sortieren"
-
-#: workbench/templates/projects/project_detail.html
 msgid "Request work"
 msgstr "Arbeit anfragen"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Plan work"
 msgstr "Arbeit planen"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Pricing"
+msgstr "Kalkulation"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Sort"
+msgstr "Sortieren"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Reassign logbook entries"
@@ -3593,6 +3593,10 @@ msgstr "Nach Leistung und Benutzer"
 #: workbench/tools/xlsx.py
 msgid "By service and month"
 msgstr "Nach Leistung und Monat"
+
+#: workbench/tools/xlsx.py
+msgid "By user and month"
+msgstr "Nach Benutzer und Monat"
 
 #: workbench/tools/xlsx.py
 msgid "Logbook"

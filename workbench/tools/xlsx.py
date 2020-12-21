@@ -38,6 +38,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
         by_service_and_user = defaultdict(lambda: defaultdict(lambda: Z1))
         by_user = defaultdict(lambda: Z1)
         by_service_and_month = defaultdict(lambda: defaultdict(lambda: Z1))
+        by_user_and_month = defaultdict(lambda: defaultdict(lambda: Z1))
         by_month = defaultdict(lambda: Z1)
 
         for h in queryset:
@@ -46,6 +47,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
 
             month = h.rendered_on.replace(day=1)
             by_service_and_month[h.service][month] += h.hours
+            by_user_and_month[h.rendered_by][month] += h.hours
             by_month[month] += h.hours
 
         self.add_sheet(_("By service and user"))
@@ -129,6 +131,40 @@ class WorkbenchXLSXDocument(XLSXDocument):
                 for service, by_months in sorted(
                     by_service_and_month.items(),
                     key=lambda row: (row[0].project_id, row[0].position),
+                )
+            ],
+        )
+
+        self.add_sheet(_("By user and month"))
+        months = sorted(
+            set(
+                chain.from_iterable(
+                    months.keys() for months in by_user_and_month.values()
+                )
+            )
+        )
+        self.table(
+            [
+                capfirst(t)
+                for t in [
+                    _("user"),
+                    _("total"),
+                ]
+            ]
+            + months,
+            [
+                [capfirst(_("total")), sum(by_month.values(), Z1)]
+                + [by_month.get(month) for month in months]
+            ]
+            + [
+                [
+                    user,
+                    sum(by_months.values(), Z1),
+                ]
+                + [by_months.get(month) for month in months]
+                for user, by_months in sorted(
+                    by_user_and_month.items(),
+                    # key=lambda row: (row[0].project_id, row[0].position),
                 )
             ],
         )
