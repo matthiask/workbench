@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-31 15:43+0100\n"
+"POT-Creation-Date: 2020-12-31 15:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2694,8 +2694,9 @@ msgid "calculated with %(hours)s per day"
 msgstr "berechnet mit %(hours)s pro Tag"
 
 #: workbench/templates/awt/year_detail.html
-msgid "carryover the balance"
-msgstr "Bilanz übertragen"
+#, python-format
+msgid "carry forward the balance into %(this_year)s"
+msgstr "Bilanz ins %(this_year)s übertragen"
 
 #: workbench/templates/awt/year_detail.html
 #, python-format
@@ -3627,6 +3628,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "carryover the balance"
+#~ msgstr "Bilanz übertragen"
 
 #~ msgid "Only used for the visualization of absences."
 #~ msgstr "Wird nur für die Visualisierung der Abwesenheiten verwendet."

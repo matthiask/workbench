@@ -63,6 +63,7 @@ def annual_working_time_view(request):
             ),
             "view": {"meta": Year._meta},
             "is_last_year": year == this_year - 1,
+            "this_year": this_year,
         },
     )
 
