@@ -1,6 +1,6 @@
 import datetime as dt
 from collections import defaultdict
-from decimal import Decimal
+from decimal import ROUND_UP, Decimal
 
 from django.db.models import Sum
 from django.db.models.functions import ExtractMonth
@@ -10,7 +10,7 @@ from workbench.accounts.models import User
 from workbench.awt.models import Absence, Employment, Year
 from workbench.awt.utils import days_per_month, monthly_days
 from workbench.logbook.models import LoggedHours
-from workbench.tools.formats import Z1
+from workbench.tools.formats import Z1, Z2
 
 
 class Months(dict):
@@ -195,6 +195,10 @@ def annual_working_time(year, *, users):
         sums = monthly_sums(month_data)
         at = absences_time(month_data)
         wt = working_time(month_data)
+        balance = (
+            sum(sums)
+            + month_data["year"].working_time_per_day * vacation_days_credit[user.id]
+        )
         statistics.append(
             {
                 "user": user,
@@ -215,10 +219,13 @@ def annual_working_time(year, *, users):
                     "vacation_days_correction": sum(
                         month_data["vacation_days_correction"]
                     ),
-                    "vacation_days_credit": vacation_days_credit[user.id],
-                    "balance": sum(sums)
-                    + month_data["year"].working_time_per_day
-                    * vacation_days_credit[user.id],
+                    "vacation_days_credit": vacation_days_credit[user.id].quantize(
+                        Z2, rounding=ROUND_UP
+                    ),
+                    "balance": balance,
+                    "balance_days": (
+                        balance / month_data["year"].working_time_per_day
+                    ).quantize(Z2, rounding=ROUND_UP),
                     "absence_sickness": sum(month_data["absence_sickness"]),
                     "absence_paid": sum(month_data["absence_paid"]),
                     "absence_correction": sum(month_data["absence_correction"]),
@@ -226,7 +233,7 @@ def annual_working_time(year, *, users):
                     "hours": sum(month_data["hours"]),
                     "absences_time": sum(at),
                     "working_time": sum(wt),
-                    "running_sum": sum(sums),
+                    "running_sum": sum(sums).quantize(Z1),
                 },
             }
         )

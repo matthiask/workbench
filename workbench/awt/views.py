@@ -18,8 +18,9 @@ from workbench.tools.validation import filter_form, monday
 
 
 def annual_working_time_view(request):
+    this_year = dt.date.today().year
     try:
-        year = int(request.GET.get("year", dt.date.today().year))
+        year = int(request.GET.get("year", this_year))
     except Exception:
         return redirect(".")
 
@@ -61,6 +62,7 @@ def annual_working_time_view(request):
                 reverse=True,
             ),
             "view": {"meta": Year._meta},
+            "is_last_year": year == this_year - 1,
         },
     )
 

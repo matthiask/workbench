@@ -69,6 +69,12 @@ class AbsenceForm(ModelForm, WarningsForm):
         widgets = {"description": Textarea({"rows": 2})}
 
     def __init__(self, *args, **kwargs):
+        initial = kwargs.setdefault("initial", {})
+        request = kwargs["request"]
+        for field in ["user", "starts_on", "ends_on", "days", "reason", "description"]:
+            if request.GET.get(field):
+                initial[field] = request.GET.get(field)
+
         super().__init__(*args, **kwargs)
         self.fields["days"].help_text = format_html(
             '<a href="#" data-hours-button="{hours}">{hours}</a>',

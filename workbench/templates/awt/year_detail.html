@@ -187,7 +187,16 @@
 
       <tr>
         <th class="text-nowrap">{% translate 'balance' %}</th>
-        <th colspan="13" class="text-right">{{ totals.balance|hours }}</th>
+        <td colspan="12" class="text-right">
+          {% if is_last_year and user.is_active and request.user|has_feature:FEATURES.BOOKKEEPING %}
+          <a href="{% url 'awt_absence_create' %}?reason=correction&amp;user={{ user.id }}&amp;starts_on={% now 'Y' %}-01-01&amp;days={{ totals.balance_days }}&amp;description={{ totals.vacation_days_credit }} {% translate 'vacation days' %}, {{ totals.running_sum }} {% translate 'hours' %}" data-toggle="ajaxmodal">
+            {% translate 'carryover the balance' %}
+          </a>
+          {% endif %}
+        </td>
+        <th class="text-right">
+          {{ totals.balance|hours }}
+        </th>
       </tr>
 
     </table>
