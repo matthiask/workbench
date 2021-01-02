@@ -80,7 +80,7 @@ class AbsenceForm(ModelForm, WarningsForm):
             '<a href="#" data-hours-button="{hours}">{hours}</a>',
             hours=_("Enter hours"),
         )
-        if not self.request.user.features[FEATURES.BOOKKEEPING]:
+        if not self.request.user.features[FEATURES.WORKING_TIME_CORRECTION]:
             self.fields["reason"].choices = [
                 choice
                 for choice in self.fields["reason"].choices

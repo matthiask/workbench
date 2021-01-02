@@ -191,7 +191,7 @@ class Absence(Model):
             return False
         if (
             instance.reason == instance.CORRECTION
-            and not request.user.features[FEATURES.BOOKKEEPING]
+            and not request.user.features[FEATURES.WORKING_TIME_CORRECTION]
         ):
             messages.error(
                 request,

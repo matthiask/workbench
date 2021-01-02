@@ -30,6 +30,7 @@ class FEATURES:
     LABOR_COSTS = "labor_costs"
     PLANNING = "planning"
     SKIP_BREAKS = "skip_breaks"
+    WORKING_TIME_CORRECTION = "working_time_correction"
 
 
 bookkeeping_only = feature_required(FEATURES.BOOKKEEPING)

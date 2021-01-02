@@ -7,6 +7,7 @@ from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.accounts.features import FEATURES
 from workbench.awt.models import Absence, Employment
 from workbench.awt.reporting import active_users, annual_working_time
 from workbench.awt.utils import monthly_days
@@ -422,7 +423,7 @@ class AWTTest(TestCase):
             Absence(**kw, ends_on=dt.date(2022, 1, 30)).full_clean()
         self.assertEqual(list(cm.exception), msg)
 
-    @override_settings(FEATURES={"bookkeeping": False})
+    @override_settings(FEATURES={FEATURES.WORKING_TIME_CORRECTION: False})
     def test_correction(self):
         """Absences with reason "correction" only with bookkeeping"""
         user = factories.UserFactory.create()
