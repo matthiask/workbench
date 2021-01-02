@@ -84,9 +84,9 @@ class CampaignForm(ModelForm):
         initial = kwargs.setdefault("initial", {})
         request = kwargs["request"]
 
-        if request.GET.get("copy"):
+        if pk := request.GET.get("copy"):
             try:
-                campaign = Campaign.objects.get(pk=request.GET["copy"])
+                campaign = Campaign.objects.get(pk=pk)
             except (Campaign.DoesNotExist, TypeError, ValueError):
                 pass
             else:
@@ -103,9 +103,9 @@ class CampaignForm(ModelForm):
                     }
                 )
 
-        elif request.GET.get("customer"):
+        elif pk := request.GET.get("customer"):
             try:
-                customer = Organization.objects.get(pk=request.GET.get("customer"))
+                customer = Organization.objects.get(pk=pk)
             except (Organization.DoesNotExist, TypeError, ValueError):
                 pass
             else:
@@ -248,9 +248,9 @@ class ProjectForm(ModelForm):
         initial = kwargs.setdefault("initial", {})
         request = kwargs["request"]
 
-        if request.GET.get("copy"):
+        if pk := request.GET.get("copy"):
             try:
-                project = Project.objects.get(pk=request.GET["copy"])
+                project = Project.objects.get(pk=pk)
             except (Project.DoesNotExist, TypeError, ValueError):
                 pass
             else:
@@ -270,25 +270,25 @@ class ProjectForm(ModelForm):
                     }
                 )
 
-        elif request.GET.get("contact"):
+        elif pk := request.GET.get("contact"):
             try:
-                contact = Person.objects.get(pk=request.GET.get("contact"))
+                contact = Person.objects.get(pk=pk)
             except (Person.DoesNotExist, TypeError, ValueError):
                 pass
             else:
                 initial.update({"customer": contact.organization, "contact": contact})
 
-        elif request.GET.get("customer"):
+        elif pk := request.GET.get("customer"):
             try:
-                customer = Organization.objects.get(pk=request.GET.get("customer"))
+                customer = Organization.objects.get(pk=pk)
             except (Organization.DoesNotExist, TypeError, ValueError):
                 pass
             else:
                 initial.update({"customer": customer})
 
         for field in ["cost_center", "campaign"]:
-            if request.GET.get(field):
-                initial[field] = request.GET.get(field)
+            if value := request.GET.get(field):
+                initial[field] = value
 
         super().__init__(*args, **kwargs)
         self.fields["type"].choices = Project.TYPE_CHOICES

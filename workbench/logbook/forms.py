@@ -356,9 +356,9 @@ class LoggedHoursForm(ModelForm):
             initial = kwargs.setdefault("initial", {})
             request = kwargs["request"]
 
-            if request.GET.get("copy"):
+            if pk := request.GET.get("copy"):
                 try:
-                    hours = LoggedHours.objects.get(pk=request.GET["copy"])
+                    hours = LoggedHours.objects.get(pk=pk)
                 except (LoggedHours.DoesNotExist, TypeError, ValueError):
                     pass
                 else:
@@ -372,8 +372,8 @@ class LoggedHoursForm(ModelForm):
                     )
 
             for field in ["description", "hours", "rendered_on", "service"]:
-                if request.GET.get(field):
-                    initial[field] = request.GET.get(field)
+                if value := request.GET.get(field):
+                    initial[field] = value
 
             if not initial.get("hours") and request.user.hours_since_latest <= 12:
                 initial.setdefault("hours", request.user.hours_since_latest)
@@ -503,9 +503,9 @@ class LoggedHoursForm(ModelForm):
         timestamp = None
         if not instance.pk:
             instance.created_by = self.request.user
-            if self.request.GET.get("timestamp"):
+            if pk := self.request.GET.get("timestamp"):
                 timestamp = Timestamp.objects.filter(
-                    user=self.request.user, id=self.request.GET.get("timestamp")
+                    user=self.request.user, id=pk
                 ).first()
                 timestamp.logged_hours = instance
             else:
@@ -675,8 +675,8 @@ class BreakForm(ModelForm):
         request = kwargs["request"]
         initial = kwargs.setdefault("initial", {})
         for field in ["day", "starts_at", "ends_at", "description"]:
-            if request.GET.get(field):
-                initial[field] = request.GET.get(field)
+            if value := request.GET.get(field):
+                initial[field] = value
 
         if "instance" not in kwargs:
             if "starts_at" not in initial:
@@ -731,10 +731,10 @@ class BreakForm(ModelForm):
             return instance
 
         timestamp = None
-        if self.request.GET.get("timestamp"):
-            Timestamp.objects.filter(
-                user=self.request.user, id=self.request.GET.get("timestamp")
-            ).update(logged_break=instance)
+        if pk := self.request.GET.get("timestamp"):
+            Timestamp.objects.filter(user=self.request.user, id=pk).update(
+                logged_break=instance
+            )
         else:
             timestamp = DetectedTimestampForm(self.request.GET).build_if_valid(
                 user=self.request.user, logged_break=instance

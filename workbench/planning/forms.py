@@ -218,12 +218,11 @@ class PlannedWorkForm(ModelForm):
         initial = kwargs.setdefault("initial", {})
         request = kwargs["request"]
         for field in ["offer"]:
-            if request.GET.get(field):
-                initial.setdefault(field, request.GET.get(field))
+            if value := request.GET.get(field):
+                initial.setdefault(field, value)
 
         pr = None
-        pr_id = request.POST.get("request") or request.GET.get("request")
-        if pr_id:
+        if pr_id := request.POST.get("request") or request.GET.get("request"):
             try:
                 pr = self.project.planning_requests.get(pk=pr_id)
             except (PlanningRequest.DoesNotExist, TypeError, ValueError):

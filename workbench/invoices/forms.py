@@ -490,17 +490,17 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
         customer = None
         self.pre_form = False
 
-        if request.GET.get("contact"):
+        if pk := request.GET.get("contact"):
             try:
-                contact = Person.objects.get(pk=request.GET.get("contact"))
+                contact = Person.objects.get(pk=pk)
             except (Person.DoesNotExist, TypeError, ValueError):
                 self.pre_form = True
             else:
                 initial.update({"customer": contact.organization, "contact": contact})
 
-        elif request.GET.get("customer"):
+        elif pk := request.GET.get("customer"):
             try:
-                customer = Organization.objects.get(pk=request.GET.get("customer"))
+                customer = Organization.objects.get(pk=pk)
             except (Organization.DoesNotExist, TypeError, ValueError):
                 self.pre_form = True
             else:
@@ -683,9 +683,9 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
         request = kwargs["request"]
         initial = kwargs.setdefault("initial", {})
 
-        if request.GET.get("copy"):
+        if pk := request.GET.get("copy"):
             try:
-                invoice = RecurringInvoice.objects.get(pk=request.GET["copy"])
+                invoice = RecurringInvoice.objects.get(pk=pk)
             except (RecurringInvoice.DoesNotExist, TypeError, ValueError):
                 pass
             else:
@@ -706,17 +706,17 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
                     }
                 )
 
-        elif request.GET.get("contact"):
+        elif pk := request.GET.get("contact"):
             try:
-                contact = Person.objects.get(pk=request.GET.get("contact"))
+                contact = Person.objects.get(pk=pk)
             except (Person.DoesNotExist, TypeError, ValueError):
                 self.pre_form = True
             else:
                 initial.update({"customer": contact.organization, "contact": contact})
 
-        elif request.GET.get("customer"):
+        elif pk := request.GET.get("customer"):
             try:
-                customer = Organization.objects.get(pk=request.GET.get("customer"))
+                customer = Organization.objects.get(pk=pk)
             except (Organization.DoesNotExist, TypeError, ValueError):
                 self.pre_form = True
             else:

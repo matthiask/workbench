@@ -136,8 +136,7 @@ def start(request):
 
 def search(request):
     results = []
-    q = request.GET.get("q", "")
-    if q:
+    if q := request.GET.get("q", ""):
         sources = [
             Project.objects.select_related("owned_by"),
         ]

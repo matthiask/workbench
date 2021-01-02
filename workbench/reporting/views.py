@@ -370,23 +370,21 @@ def hours_filter_view(request, form, *, template_name, stats_fn):
 def labor_costs_view(request, form):
     date_range = [form.cleaned_data["date_from"], form.cleaned_data["date_until"]]
 
-    if request.GET.get("project"):
+    if project := request.GET.get("project"):
         return render(
             request,
             "reporting/labor_costs_by_user.html",
             {
-                "stats": labor_costs.labor_costs_by_user(
-                    date_range, project=request.GET.get("project")
-                ),
+                "stats": labor_costs.labor_costs_by_user(date_range, project=project),
             },
         )
-    elif request.GET.get("cost_center"):
+    elif cost_center := request.GET.get("cost_center"):
         return render(
             request,
             "reporting/labor_costs_by_user.html",
             {
                 "stats": labor_costs.labor_costs_by_user(
-                    date_range, cost_center=request.GET.get("cost_center")
+                    date_range, cost_center=cost_center
                 ),
             },
         )
