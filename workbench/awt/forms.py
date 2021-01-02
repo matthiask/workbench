@@ -72,8 +72,8 @@ class AbsenceForm(ModelForm, WarningsForm):
         initial = kwargs.setdefault("initial", {})
         request = kwargs["request"]
         for field in ["user", "starts_on", "ends_on", "days", "reason", "description"]:
-            if request.GET.get(field):
-                initial[field] = request.GET.get(field)
+            if value := request.GET.get(field):
+                initial[field] = value
 
         super().__init__(*args, **kwargs)
         self.fields["days"].help_text = format_html(
