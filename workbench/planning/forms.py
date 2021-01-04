@@ -297,7 +297,7 @@ class PlannedWorkForm(ModelForm):
                         local_date_format(day + dt.timedelta(days=6)),
                     ),
                 )
-                for day in islice(recurring(date_from, "weekly"), 52)
+                for day in islice(recurring(date_from, "weekly"), 80)
             ],
             widget=forms.SelectMultiple(attrs={"size": 20}),
             initial=self.instance.weeks or [monday()],
