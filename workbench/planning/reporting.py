@@ -413,6 +413,7 @@ SELECT MIN(week), MAX(week) FROM sq
         result = list(cursor)[0]
 
     if result[0]:
+        result = (min(result[0], monday() - dt.timedelta(days=14)), result[1])
         weeks = list(
             islice(
                 recurring(result[0], "weekly"),
