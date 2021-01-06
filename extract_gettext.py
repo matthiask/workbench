@@ -31,10 +31,10 @@ def extract_args(part):
     for idx, c in enumerate(part):
         if c == quote:
             quote = ""
-        elif c in {"'", '"'}:
-            quote = c
         elif quote:
             pass
+        elif c in {"'", '"'}:
+            quote = c
         elif c == "(":
             parens += 1
         elif c == ")":
