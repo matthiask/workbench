@@ -199,7 +199,11 @@ class Planning:
     def _offer_record(self, offer, work_list):
         date_from = min(pw["work"]["date_from"] for pw in work_list)
         date_until = max(pw["work"]["date_until"] for pw in work_list)
-        hours = sum(pw["work"]["planned_hours"] for pw in work_list)
+        hours = sum(
+            pw["work"]["planned_hours"]
+            for pw in work_list
+            if not pw["work"]["is_request"]
+        )
 
         work_list = list(self._sort_work_list(work_list))
         if not work_list:
