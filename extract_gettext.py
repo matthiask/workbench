@@ -43,7 +43,7 @@ def extract_args(part):
         if parens == 0:
             return part[1:idx]
 
-    return part
+    return ""
 
 
 def gettext_calls(source):
@@ -61,6 +61,8 @@ def gettext_calls(source):
     ["gettext(':-/')"]
     >>> list(gettext_calls("gettext(':-)')"))
     ["gettext(':-)')"]
+    >>> list(gettext_calls("abc gettext('xyz' def pgettext('ctx', 'str') xzz"))
+    ["pgettext('ctx', 'str')"]
     """
 
     parts = deque(part.strip() for part in re.split(r"\b(\w*gettext)\b", source))
