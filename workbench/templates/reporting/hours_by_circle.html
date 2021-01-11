@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="row justify-content-center">
-<div class="col-sm-12 col-md-8">
+<div class="col-sm-12 col-lg-10">
   <h1>{% translate 'Hours by circle' %}</h1>
 
   <form method="get" class="mb-3" data-autosubmit>
@@ -17,6 +17,7 @@
     <thead>
       <tr>
         <th></th>
+        <th>{% translate 'category'|capfirst %}</th>
         {% for user in stats.circles.0.users %}<th class="text-right">{{ user.get_short_name }}</th>{% endfor %}
         <th class="text-right">{{ stats.total_hours|hours }}</th>
       </tr>
@@ -29,6 +30,7 @@
             <a href="https://app.glassfrog.com/circles/{{ circle.circle.pk }}">{{ circle.circle }}</a>
           {% else %}{% translate 'No circle' %}{% endif %}
         </th>
+        <th></th>
         {% for user, hours in circle.by_user %}
           <th class="text-right">
             {% if hours %}<a href="{% url 'logbook_loggedhours_list' %}?circle={{ circle.circle.pk|default:0 }}&amp;rendered_by={{ user.pk }}">{{ hours|hours }}</a>
@@ -42,6 +44,7 @@
         <td>
           <a href="https://app.glassfrog.com/roles/{{ role.role.pk }}">{{ role.role.pretty_name }}</a>
         </td>
+        <td title="{{ role.role.get_work_category_display }}">{{ role.role.get_short_work_category_display|default:'&ndash;' }}</td>
         {% for user, hours in role.by_user %}
           <td class="text-right">
             {% if hours %}<a href="{% url 'logbook_loggedhours_list' %}?role={{ role.role.pk }}&amp;rendered_by={{ user.pk }}">{{ hours|hours }}</a>

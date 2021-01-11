@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="row justify-content-center">
-<div class="col-sm-12 col-md-8">
+<div class="col-sm-12 col-lg-10">
   <h1>{% translate 'Hours per work category' %}</h1>
 
   <form method="get" class="mb-3" data-autosubmit>
@@ -17,9 +17,9 @@
     <thead>
       <tr>
         <th>{% translate 'user'|capfirst %}</th>
-        {% for name, title in stats.categories %}
-        <th class="text-right">{{ title }}</th>
-        <th></th>
+        {% for name, title, short in stats.categories %}
+          <th class="text-right" title="{{ title }}">{{ short }}</th>
+          <th></th>
         {% endfor %}
         <th class="text-right">{% translate 'Undefined' %}</th>
         <th></th>

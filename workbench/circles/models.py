@@ -35,10 +35,11 @@ class Role(models.Model):
     PAID_WORK = "paid-work"
     OTHER = "other"
 
-    WORK_CATEGORY_CHOICES = [
+    WORK_CATEGORIES = [
         (
             KNOWLEDGE_TRANSFER,
             _("Knowledge transfer (debriefings, reading, exchanges)"),
+            _("Knowledge transfer"),
         ),
         (
             SOCIAL_CARE,
@@ -46,28 +47,27 @@ class Role(models.Model):
                 "Social care (personal development, people care,"
                 " care for the work environment)"
             ),
+            _("Social care"),
         ),
         (
             OUTREACH,
             _("Outreach (corporate communication, acquisition)"),
+            _("Outreach"),
         ),
         (
             PAID_WORK,
+            _("Paid work"),
             _("Paid work"),
         ),
         (
             OTHER,
             _("Other (internal administration and coordination, etc.)"),
+            _("Other"),
         ),
     ]
 
-    WORK_CATEGORY_SHORT = {
-        KNOWLEDGE_TRANSFER: _("Knowledge transfer"),
-        SOCIAL_CARE: _("Social care"),
-        OUTREACH: _("Outreach"),
-        PAID_WORK: _("Paid work"),
-        OTHER: _("Other"),
-    }
+    WORK_CATEGORY_CHOICES = [row[:2] for row in WORK_CATEGORIES]
+    WORK_CATEGORY_SHORT = {row[0]: row[2] for row in WORK_CATEGORIES}
 
     circle = models.ForeignKey(
         Circle, on_delete=models.CASCADE, related_name="roles", verbose_name=_("circle")
