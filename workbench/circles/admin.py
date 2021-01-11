@@ -10,7 +10,7 @@ class CircleAdmin(admin.ModelAdmin):
 
 @admin.register(models.Role)
 class RoleAdmin(admin.ReadWriteModelAdmin):
-    list_display = ["name", "circle", "is_removed", "work_category"]
+    list_display = ["name", "circle", "for_circle", "is_removed", "work_category"]
     list_editable = ["work_category"]
     list_filter = ["circle", "is_removed"]
     readonly_fields = ["circle", "name", "for_circle", "is_removed"]
