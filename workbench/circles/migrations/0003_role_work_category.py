@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                     ),
                     ("outreach", "Outreach (corporate communication, acquisition)"),
                     ("paid-work", "Paid work"),
-                    ("other", "Other"),
+                    ("other", "Other (internal administration and coordination, etc.)"),
                 ],
                 max_length=20,
                 verbose_name="category",

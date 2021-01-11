@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-11 09:57+0100\n"
+"POT-Creation-Date: 2021-01-11 10:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -602,8 +602,8 @@ msgid "Paid work"
 msgstr "Bezahlte Arbeit"
 
 #: workbench/circles/models.py
-msgid "Other"
-msgstr "Anderes"
+msgid "Other (internal administration and coordination, etc.)"
+msgstr "Anderes (interne Administration und Koordination, etc.)"
 
 #: workbench/circles/models.py
 msgid "Knowledge transfer"
@@ -616,6 +616,10 @@ msgstr "Social Care"
 #: workbench/circles/models.py
 msgid "Outreach"
 msgstr "Outreach"
+
+#: workbench/circles/models.py
+msgid "Other"
+msgstr "Anderes"
 
 #: workbench/circles/models.py
 msgid "for the circle"
@@ -3276,10 +3280,8 @@ msgid "green"
 msgstr "Grün"
 
 #: workbench/templates/reporting/hours_per_work_category.html
-#, fuzzy
-#| msgid "Undefined rate"
 msgid "Undefined"
-msgstr "Ohne Stundensatz"
+msgstr "Nicht definiert"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Facts"

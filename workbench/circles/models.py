@@ -57,7 +57,7 @@ class Role(models.Model):
         ),
         (
             OTHER,
-            _("Other"),
+            _("Other (internal administration and coordination, etc.)"),
         ),
     ]
 
