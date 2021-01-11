@@ -104,6 +104,7 @@ class LoggedHoursSearchForm(Form):
     role = forms.ModelChoiceField(
         queryset=Role.objects.all(), required=False, widget=forms.HiddenInput, label=""
     )
+    category = forms.CharField(required=False, widget=forms.HiddenInput, label="")
     not_archived = forms.BooleanField(
         required=False, widget=forms.HiddenInput, label=""
     )
@@ -189,6 +190,25 @@ class LoggedHoursSearchForm(Form):
                 ),
             )
             queryset = queryset.filter(service__role=role)
+        if category := data.get("category"):
+            self.hidden_filters.append(
+                (
+                    f"{capfirst(_('category'))}: {category}",
+                    querystring(self.request.GET, category=""),
+                ),
+            )
+            queryset = queryset.filter(service__role__work_category=category)
+        elif "category" in data:
+            self.hidden_filters.append(
+                (
+                    f"{capfirst(_('category'))}: {_('Undefined')}",
+                    querystring(self.request.GET, category=""),
+                ),
+            )
+            queryset = queryset.filter(
+                Q(service__role__isnull=True) | Q(service__role__work_category="")
+            )
+
         if data.get("not_archived"):
             self.hidden_filters.append(
                 (_("Not archived"), querystring(self.request.GET, not_archived=""))

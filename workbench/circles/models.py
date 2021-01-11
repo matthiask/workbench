@@ -35,39 +35,36 @@ class Role(models.Model):
     OUTREACH = "outreach"
     OTHER = "other"
 
-    WORK_CATEGORIES = [
+    CATEGORIES = [
         (
             PAID_WORK,
             _("Paid work"),
-            _("Paid work"),
+            "",
         ),
         (
             KNOWLEDGE_TRANSFER,
-            _("Knowledge transfer (debriefings, reading, exchanges)"),
             _("Knowledge transfer"),
+            _("debriefings, reading, exchanges"),
         ),
         (
             SOCIAL_CARE,
-            _(
-                "Social care (personal development, people care,"
-                " care for the work environment)"
-            ),
             _("Social care"),
+            _("personal development, people care, care for the work environment"),
         ),
         (
             OUTREACH,
-            _("Outreach (corporate communication, acquisition)"),
             _("Outreach"),
+            _("corporate communication, acquisition"),
         ),
         (
             OTHER,
-            _("Other (internal administration and coordination, etc.)"),
-            _("Other"),
+            _("Other internal matters"),
+            _("administration, bookkeeping, coordination, etc."),
         ),
     ]
 
-    WORK_CATEGORY_CHOICES = [row[:2] for row in WORK_CATEGORIES]
-    WORK_CATEGORY_SHORT = {row[0]: row[2] for row in WORK_CATEGORIES}
+    CATEGORY_CHOICES = [row[:2] for row in CATEGORIES]
+    CATEGORY_DESCRIPTION = {row[0]: row[2] for row in CATEGORIES}
 
     circle = models.ForeignKey(
         Circle, on_delete=models.CASCADE, related_name="roles", verbose_name=_("circle")
@@ -78,7 +75,7 @@ class Role(models.Model):
     work_category = models.CharField(
         _("category"),
         max_length=20,
-        choices=WORK_CATEGORY_CHOICES,
+        choices=CATEGORY_CHOICES,
         blank=True,
     )
 
@@ -103,5 +100,5 @@ class Role(models.Model):
     def pretty_name(self):
         return capfirst(gettext("for the circle")) if self.for_circle else self.name
 
-    def get_short_work_category_display(self):
-        return self.WORK_CATEGORY_SHORT.get(self.work_category, self.work_category)
+    def get_work_category_description(self):
+        return self.CATEGORY_DESCRIPTION.get(self.work_category, self.work_category)

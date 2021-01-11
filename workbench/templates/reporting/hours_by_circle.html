@@ -44,7 +44,7 @@
         <td>
           <a href="https://app.glassfrog.com/roles/{{ role.role.pk }}">{{ role.role.pretty_name }}</a>
         </td>
-        <td title="{{ role.role.get_work_category_display }}">{{ role.role.get_short_work_category_display|default:'&ndash;' }}</td>
+        <td title="{{ role.role.get_work_category_description }}">{{ role.role.get_work_category_display|default:'&ndash;' }}</td>
         {% for user, hours in role.by_user %}
           <td class="text-right">
             {% if hours %}<a href="{% url 'logbook_loggedhours_list' %}?role={{ role.role.pk }}&amp;rendered_by={{ user.pk }}">{{ hours|hours }}</a>

@@ -17,16 +17,10 @@ class Migration(migrations.Migration):
                 blank=True,
                 choices=[
                     ("paid-work", "Paid work"),
-                    (
-                        "knowledge-transfer",
-                        "Knowledge transfer (debriefings, reading, exchanges)",
-                    ),
-                    (
-                        "social-care",
-                        "Social care (personal development, people care, care for the work environment)",
-                    ),
-                    ("outreach", "Outreach (corporate communication, acquisition)"),
-                    ("other", "Other (internal administration and coordination, etc.)"),
+                    ("knowledge-transfer", "Knowledge transfer"),
+                    ("social-care", "Social care"),
+                    ("outreach", "Outreach"),
+                    ("other", "Other internal matters"),
                 ],
                 max_length=20,
                 verbose_name="category",

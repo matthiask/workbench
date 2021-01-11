@@ -43,8 +43,11 @@
     <thead>
       <tr>
         <th>{% translate 'user'|capfirst %}</th>
-        {% for name, title, short in stats.categories %}
-          <th class="text-right" title="{{ title }}">{{ short }}</th>
+        {% for name, title, description in stats.categories %}
+          <th class="text-right">
+            {{ title }}<br>
+            <small>{{ description }}</small>
+          </th>
           <th></th>
         {% endfor %}
         <th class="text-right">{% translate 'Undefined' %}</th>
@@ -60,11 +63,19 @@
       {% else %}
         <th>{% translate 'total'|capfirst %}</th>
       {% endif %}
-      {% for hour in user_stats.per_category %}
-        <td class="text-right">{{ hour|hours }}</td>
+      {% for category, hour in user_stats.per_category %}
+        <td class="text-right">
+          <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.id }}&amp;category={{ category }}">
+            {{ hour|hours }}
+          </a>
+        </td>
         <td>{% percentage hour user_stats.total %}</td>
       {% endfor %}
-      <td class="text-right">{{ user_stats.undefined|hours }}</td>
+      <td class="text-right">
+          <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.id }}&amp;category=">
+            {{ user_stats.undefined|hours }}
+          </a>
+      </td>
       <td>{% percentage user_stats.undefined user_stats.total %}</td>
       <td class="text-right">{{ user_stats.total|hours }}</td>
     </tr>

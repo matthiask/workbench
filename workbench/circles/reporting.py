@@ -92,8 +92,8 @@ def hours_per_work_category(date_range, *, users=None):
             {
                 "total": sum(hours_per_work_category[user.id].values(), Z1),
                 "per_category": [
-                    hours_per_work_category[user.id][row[0]]
-                    for row in Role.WORK_CATEGORIES
+                    (row[0], hours_per_work_category[user.id][row[0]])
+                    for row in Role.CATEGORIES
                 ],
                 "undefined": hours_per_work_category[user.id][None],
             },
@@ -101,17 +101,17 @@ def hours_per_work_category(date_range, *, users=None):
         for user in User.objects.filter(id__in=seen_users)
     ]
     return {
-        "categories": Role.WORK_CATEGORIES,
+        "categories": Role.CATEGORIES,
         "users": users,
         "chart": [
             {
-                "label": short,
+                "label": title,
                 "hours": [
                     100 * hours_per_work_category[user.id][name] / user_stats["total"]
                     for user, user_stats in users
                 ],
             }
-            for name, title, short in Role.WORK_CATEGORIES
+            for name, title, description in Role.CATEGORIES
         ]
         + [
             {

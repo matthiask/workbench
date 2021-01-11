@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-11 10:01+0100\n"
+"POT-Creation-Date: 2021-01-11 17:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -583,43 +583,40 @@ msgid "circle"
 msgstr "Kreis"
 
 #: workbench/circles/models.py
-msgid "Knowledge transfer (debriefings, reading, exchanges)"
-msgstr "Wissenstransfer (Debriefings, Lesezeit, Austausch)"
-
-#: workbench/circles/models.py
-msgid ""
-"Social care (personal development, people care, care for the work "
-"environment)"
-msgstr ""
-"Social Care (Persönliche Entwicklung, People Care, Pflege des Arbeitsumfelds)"
-
-#: workbench/circles/models.py
-msgid "Outreach (corporate communication, acquisition)"
-msgstr "Outreach (Unternehmenskommunikation, Akquise)"
-
-#: workbench/circles/models.py
 msgid "Paid work"
 msgstr "Bezahlte Arbeit"
-
-#: workbench/circles/models.py
-msgid "Other (internal administration and coordination, etc.)"
-msgstr "Anderes (interne Administration und Koordination, etc.)"
 
 #: workbench/circles/models.py
 msgid "Knowledge transfer"
 msgstr "Wissenstransfer"
 
 #: workbench/circles/models.py
+msgid "debriefings, reading, exchanges"
+msgstr "Debriefings, Lesezeit, Austausch"
+
+#: workbench/circles/models.py
 msgid "Social care"
 msgstr "Social Care"
+
+#: workbench/circles/models.py
+msgid "personal development, people care, care for the work environment"
+msgstr "Persönliche Entwicklung, People Care, Pflege des Arbeitsumfelds"
 
 #: workbench/circles/models.py
 msgid "Outreach"
 msgstr "Outreach"
 
 #: workbench/circles/models.py
-msgid "Other"
-msgstr "Anderes"
+msgid "corporate communication, acquisition"
+msgstr "Unternehmenskommunikation, Akquise"
+
+#: workbench/circles/models.py
+msgid "Other internal matters"
+msgstr "Andere Internas"
+
+#: workbench/circles/models.py
+msgid "administration, bookkeeping, coordination, etc."
+msgstr "Interne Administration und Koordination, etc."
 
 #: workbench/circles/models.py
 msgid "for the circle"
@@ -630,6 +627,7 @@ msgid "is removed"
 msgstr "ist entfernt"
 
 #: workbench/circles/models.py
+#: workbench/templates/reporting/hours_by_circle.html
 msgid "category"
 msgstr "Kategorie"
 
@@ -646,6 +644,11 @@ msgstr "Rollen"
 #: workbench/circles/models.py
 msgid "(removed)"
 msgstr "(entfernt)"
+
+#: workbench/circles/reporting.py
+#: workbench/templates/reporting/hours_per_work_category.html
+msgid "Undefined"
+msgstr "Nicht definiert"
 
 #: workbench/contacts/__init__.py workbench/templates/base.html
 #: workbench/templates/contacts/object_list.html
@@ -3279,10 +3282,6 @@ msgstr "Anzahl"
 msgid "green"
 msgstr "Grün"
 
-#: workbench/templates/reporting/hours_per_work_category.html
-msgid "Undefined"
-msgstr "Nicht definiert"
-
 #: workbench/templates/reporting/key_data.html
 msgid "Facts"
 msgstr "Fakten"
@@ -3687,6 +3686,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Other"
+#~ msgstr "Anderes"
 
 #~ msgid "carryover the balance"
 #~ msgstr "Bilanz übertragen"
