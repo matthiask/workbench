@@ -92,8 +92,8 @@ def hours_per_work_category(date_range, *, users=None):
             {
                 "total": sum(hours_per_work_category[user.id].values(), Z1),
                 "per_category": [
-                    hours_per_work_category[user.id][category]
-                    for category in categories
+                    hours_per_work_category[user.id][name]
+                    for name, title in categories
                 ],
                 "undefined": hours_per_work_category[user.id][None],
             },
