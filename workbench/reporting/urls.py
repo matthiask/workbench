@@ -8,7 +8,7 @@ from workbench.accounts.features import (
     labor_costs_only,
 )
 from workbench.awt.views import absence_calendar, annual_working_time_view
-from workbench.circles.reporting import hours_by_circle
+from workbench.circles.reporting import hours_by_circle, hours_per_work_category
 from workbench.deals.reporting import accepted_deals, deal_history, declined_deals
 from workbench.projects.reporting import hours_per_customer
 from workbench.reporting.green_hours import green_hours
@@ -67,6 +67,15 @@ urlpatterns = [
             "stats_fn": hours_by_circle,
         },
         name="report_hours_by_circle",
+    ),
+    re_path(
+        r"^hours-per-work-category/$",
+        feature_required(FEATURES.GLASSFROG)(hours_filter_view),
+        {
+            "template_name": "reporting/hours_per_work_category.html",
+            "stats_fn": hours_per_work_category,
+        },
+        name="report_hours_per_work_category",
     ),
     re_path(
         r"^project-budget-statistics/$",

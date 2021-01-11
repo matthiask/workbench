@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% load fineforms i18n static workbench %}
+
+{% block title %}{% translate 'Hours per work category' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-sm-12 col-md-8">
+  <h1>{% translate 'Hours per work category' %}</h1>
+
+  <form method="get" class="mb-3" data-autosubmit>
+    {% ff_fields form %}
+  </form>
+
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>{% translate 'user'|capfirst %}</th>
+        {% for name, title in stats.categories %}
+        <th class="text-right">{{ title }}</th>
+        <th></th>
+        {% endfor %}
+        <th class="text-right">{% translate 'Undefined' %}</th>
+        <th></th>
+        <th class="text-right">{% translate 'total'|capfirst %}</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for user, user_stats in stats.users %}
+    <tr>
+      {% if user %}
+        <td>{{ user }}</td>
+      {% else %}
+        <th>{% translate 'total'|capfirst %}</th>
+      {% endif %}
+      {% for hour in user_stats.per_category %}
+        <td class="text-right">{{ hour|hours }}</td>
+        <td>{% percentage hour user_stats.total %}</td>
+      {% endfor %}
+      <td class="text-right">{{ user_stats.undefined|hours }}</td>
+      <td>{% percentage user_stats.undefined user_stats.total %}</td>
+      <td class="text-right">{{ user_stats.total|hours }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+</div>
+{% endblock %}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-11 09:28+0100\n"
+"POT-Creation-Date: 2021-01-11 09:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -105,6 +105,7 @@ msgstr "Person"
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/hours_per_work_category.html
 #: workbench/templates/reporting/labor_costs_by_user.html
 #: workbench/templates/reporting/logging.html
 #: workbench/templates/reporting/work_anniversaries.html
@@ -974,6 +975,7 @@ msgstr "Valuta"
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/hours_per_work_category.html
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
@@ -2783,6 +2785,11 @@ msgstr "Offene-Posten-Liste"
 msgid "Hours by circle"
 msgstr "Stunden pro Kreis"
 
+#: workbench/templates/base.html
+#: workbench/templates/reporting/hours_per_work_category.html
+msgid "Hours per work category"
+msgstr "Stunden pro Arbeitskategorie"
+
 #: workbench/templates/base.html workbench/templates/reporting/green_hours.html
 msgid "Green hours"
 msgstr "Grüne Stunden"
@@ -3267,6 +3274,12 @@ msgstr "Anzahl"
 #: workbench/templates/reporting/key_data.html
 msgid "green"
 msgstr "Grün"
+
+#: workbench/templates/reporting/hours_per_work_category.html
+#, fuzzy
+#| msgid "Undefined rate"
+msgid "Undefined"
+msgstr "Ohne Stundensatz"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Facts"

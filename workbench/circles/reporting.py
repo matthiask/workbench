@@ -6,6 +6,7 @@ from django.db.models import Sum
 from workbench.accounts.models import User
 from workbench.circles.models import Circle, Role
 from workbench.logbook.models import LoggedHours
+from workbench.tools.formats import Z1
 
 
 def hours_by_circle(date_range, *, users=None):
@@ -63,4 +64,43 @@ def hours_by_circle(date_range, *, users=None):
     return {
         "circles": circles,
         "total_hours": sum((circle["total"] for circle in circles), Decimal()),
+    }
+
+
+def hours_per_work_category(date_range, *, users=None):
+    queryset = LoggedHours.objects.order_by().filter(rendered_on__range=date_range)
+    if users:
+        queryset = queryset.filter(rendered_by__in=users)
+
+    queryset = queryset.values("service__role__work_category", "rendered_by").annotate(
+        Sum("hours")
+    )
+    seen_users = set()
+
+    hours_per_work_category = defaultdict(lambda: defaultdict(Decimal))
+
+    for row in queryset:
+        hours_per_work_category[row["rendered_by"]][
+            row["service__role__work_category"] or None
+        ] = row["hours__sum"]
+        seen_users.add(row["rendered_by"])
+
+    categories = list(Role.WORK_CATEGORY_SHORT.items())
+    users = [
+        (
+            user,
+            {
+                "total": sum(hours_per_work_category[user.id].values(), Z1),
+                "per_category": [
+                    hours_per_work_category[user.id][category]
+                    for category in categories
+                ],
+                "undefined": hours_per_work_category[user.id][None],
+            },
+        )
+        for user in User.objects.filter(id__in=seen_users)
+    ]
+    return {
+        "categories": categories,
+        "users": users,
     }
