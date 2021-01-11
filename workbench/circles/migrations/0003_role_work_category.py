@@ -16,6 +16,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 blank=True,
                 choices=[
+                    ("paid-work", "Paid work"),
                     (
                         "knowledge-transfer",
                         "Knowledge transfer (debriefings, reading, exchanges)",
@@ -25,7 +26,6 @@ class Migration(migrations.Migration):
                         "Social care (personal development, people care, care for the work environment)",
                     ),
                     ("outreach", "Outreach (corporate communication, acquisition)"),
-                    ("paid-work", "Paid work"),
                     ("other", "Other (internal administration and coordination, etc.)"),
                 ],
                 max_length=20,

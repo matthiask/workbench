@@ -2,6 +2,7 @@ from collections import defaultdict
 from decimal import Decimal
 
 from django.db.models import Sum
+from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
 from workbench.circles.models import Circle, Role
@@ -102,4 +103,23 @@ def hours_per_work_category(date_range, *, users=None):
     return {
         "categories": Role.WORK_CATEGORIES,
         "users": users,
+        "chart": [
+            {
+                "label": short,
+                "hours": [
+                    100 * hours_per_work_category[user.id][name] / user_stats["total"]
+                    for user, user_stats in users
+                ],
+            }
+            for name, title, short in Role.WORK_CATEGORIES
+        ]
+        + [
+            {
+                "label": _("Undefined"),
+                "hours": [
+                    100 * hours_per_work_category[user.id][None] / user_stats["total"]
+                    for user, user_stats in users
+                ],
+            }
+        ],
     }

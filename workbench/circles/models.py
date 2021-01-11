@@ -29,13 +29,18 @@ class RoleQuerySet(models.QuerySet):
 
 
 class Role(models.Model):
+    PAID_WORK = "paid-work"
     KNOWLEDGE_TRANSFER = "knowledge-transfer"
     SOCIAL_CARE = "social-care"
     OUTREACH = "outreach"
-    PAID_WORK = "paid-work"
     OTHER = "other"
 
     WORK_CATEGORIES = [
+        (
+            PAID_WORK,
+            _("Paid work"),
+            _("Paid work"),
+        ),
         (
             KNOWLEDGE_TRANSFER,
             _("Knowledge transfer (debriefings, reading, exchanges)"),
@@ -53,11 +58,6 @@ class Role(models.Model):
             OUTREACH,
             _("Outreach (corporate communication, acquisition)"),
             _("Outreach"),
-        ),
-        (
-            PAID_WORK,
-            _("Paid work"),
-            _("Paid work"),
         ),
         (
             OTHER,
