@@ -29,12 +29,58 @@ class RoleQuerySet(models.QuerySet):
 
 
 class Role(models.Model):
+    KNOWLEDGE_TRANSFER = "knowledge-transfer"
+    SOCIAL_CARE = "social-care"
+    OUTREACH = "outreach"
+    PAID_WORK = "paid-work"
+    OTHER = "other"
+
+    WORK_CATEGORY_CHOICES = [
+        (
+            KNOWLEDGE_TRANSFER,
+            _("Knowledge transfer (debriefings, reading, exchanges)"),
+        ),
+        (
+            SOCIAL_CARE,
+            _(
+                "Social care (personal development, people care,"
+                " care for the work environment)"
+            ),
+        ),
+        (
+            OUTREACH,
+            _("Outreach (corporate communication, acquisition)"),
+        ),
+        (
+            PAID_WORK,
+            _("Paid work"),
+        ),
+        (
+            OTHER,
+            _("Other"),
+        ),
+    ]
+
+    WORK_CATEGORY_SHORT = {
+        KNOWLEDGE_TRANSFER: _("Knowledge transfer"),
+        SOCIAL_CARE: _("Social care"),
+        OUTREACH: _("Outreach"),
+        PAID_WORK: _("Paid work"),
+        OTHER: _("Other"),
+    }
+
     circle = models.ForeignKey(
         Circle, on_delete=models.CASCADE, related_name="roles", verbose_name=_("circle")
     )
     name = models.CharField(_("name"), max_length=100)
     for_circle = models.BooleanField(_("for the circle"), default=False)
     is_removed = models.BooleanField(_("is removed"), default=False)
+    work_category = models.CharField(
+        _("category"),
+        max_length=20,
+        choices=WORK_CATEGORY_CHOICES,
+        blank=True,
+    )
 
     objects = RoleQuerySet.as_manager()
 
@@ -56,3 +102,6 @@ class Role(models.Model):
     @property
     def pretty_name(self):
         return capfirst(gettext("for the circle")) if self.for_circle else self.name
+
+    def get_short_work_category_display(self):
+        return self.WORK_CATEGORY_SHORT.get(self.work_category, self.work_category)

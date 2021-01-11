@@ -17,6 +17,17 @@
       <th class="text-right">{% translate 'service'|capfirst %}</th>
       <td>{% link_or_none object.service %}</td>
     </tr>
+    {% if request.user|has_feature:FEATURES.GLASSFROG %}
+    <tr>
+      <th class="text-right">{% translate 'role'|capfirst %}</th>
+      <td>
+        {{ object.service.role|default:'&ndash;' }}
+        <a href="{{ object.service.urls.update }}" data-toggle="ajaxmodal" class="inline">
+          <small>({% trans 'update' %})</small>
+        </a>
+      </td>
+    </tr>
+    {% endif %}
     <tr>
       <th class="text-right">{% translate 'created'|capfirst %}</th>
       <td>

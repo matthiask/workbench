@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-31 15:48+0100\n"
+"POT-Creation-Date: 2021-01-11 09:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -582,6 +582,41 @@ msgid "circle"
 msgstr "Kreis"
 
 #: workbench/circles/models.py
+msgid "Knowledge transfer (debriefings, reading, exchanges)"
+msgstr "Wissenstransfer (Debriefings, Lesezeit, Austausch)"
+
+#: workbench/circles/models.py
+msgid ""
+"Social care (personal development, people care, care for the work "
+"environment)"
+msgstr ""
+"Social Care (Persönliche Entwicklung, People Care, Pflege des Arbeitsumfelds)"
+
+#: workbench/circles/models.py
+msgid "Outreach (corporate communication, acquisition)"
+msgstr "Outreach (Unternehmenskommunikation, Akquise)"
+
+#: workbench/circles/models.py
+msgid "Paid work"
+msgstr "Bezahlte Arbeit"
+
+#: workbench/circles/models.py
+msgid "Other"
+msgstr "Anderes"
+
+#: workbench/circles/models.py
+msgid "Knowledge transfer"
+msgstr "Wissenstransfer"
+
+#: workbench/circles/models.py
+msgid "Social care"
+msgstr "Social Care"
+
+#: workbench/circles/models.py
+msgid "Outreach"
+msgstr "Outreach"
+
+#: workbench/circles/models.py
 msgid "for the circle"
 msgstr "Für den Kreis"
 
@@ -589,8 +624,13 @@ msgstr "Für den Kreis"
 msgid "is removed"
 msgstr "ist entfernt"
 
+#: workbench/circles/models.py
+msgid "category"
+msgstr "Kategorie"
+
 #: workbench/circles/models.py workbench/logbook/forms.py
 #: workbench/projects/models.py
+#: workbench/templates/logbook/loggedhours_detail.html
 msgid "role"
 msgstr "Rolle"
 
@@ -3039,6 +3079,10 @@ msgstr "umrechnen"
 #: workbench/templates/logbook/loggedcost_form.html
 msgid "expenses in foreign currency"
 msgstr "Spesen in Fremdwährung"
+
+#: workbench/templates/logbook/loggedhours_detail.html
+msgid "update"
+msgstr "bearbeiten"
 
 #: workbench/templates/logbook/loggedhours_form.html
 msgid "new service"
