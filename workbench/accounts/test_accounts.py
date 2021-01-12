@@ -60,7 +60,7 @@ class AccountsTest(TestCase):
         self.assertEqual(
             list(User.objects.choices(collapse_inactive=False)),
             [
-                ("", "Alle Benutzer"),
+                ("", "Alle Nutzer*innen"),
                 ("Aktiv", [(u1.pk, "M A")]),
                 ("Inaktiv", [(u2.pk, "M I")]),
             ],
@@ -69,8 +69,8 @@ class AccountsTest(TestCase):
         self.assertEqual(
             list(User.objects.choices(collapse_inactive=True)),
             [
-                ("", "Alle Benutzer"),
-                (0, "Inaktive Benutzer"),
+                ("", "Alle Nutzer*innen"),
+                (0, "Inaktive Nutzer*innen"),
                 ("Aktiv", [(u1.pk, "M A")]),
             ],
         )

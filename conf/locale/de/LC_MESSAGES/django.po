@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-11 17:43+0100\n"
+"POT-Creation-Date: 2021-01-12 14:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,7 +27,8 @@ msgstr "Feature nicht verfügbar"
 
 #: workbench/accounts/forms.py
 msgid "Contact your administrator to change this value."
-msgstr "Kontaktiere den Administrator, falls Du diesen Wert ändern willst."
+msgstr ""
+"Kontaktiere die Administrator*innen, falls Du diesen Wert ändern willst."
 
 #: workbench/accounts/middleware.py
 msgid "Please authenticate."
@@ -35,7 +36,7 @@ msgstr "Bitte anmelden."
 
 #: workbench/accounts/models.py
 msgid "All users"
-msgstr "Alle Benutzer"
+msgstr "Alle Nutzer*innen"
 
 #: workbench/accounts/models.py
 msgid "Show mine only"
@@ -43,7 +44,7 @@ msgstr "Nur meine anzeigen"
 
 #: workbench/accounts/models.py
 msgid "Inactive users"
-msgstr "Inaktive Benutzer"
+msgstr "Inaktive Nutzer*innen"
 
 #: workbench/accounts/models.py
 msgid "Active"
@@ -111,11 +112,11 @@ msgstr "Person"
 #: workbench/templates/reporting/work_anniversaries.html
 #: workbench/timer/models.py workbench/tools/xlsx.py
 msgid "user"
-msgstr "Benutzer"
+msgstr "Nutzer*in"
 
 #: workbench/accounts/models.py workbench/templates/base.html
 msgid "users"
-msgstr "Benutzer"
+msgstr "Nutzer*innen"
 
 #: workbench/accounts/models.py
 #, python-format
@@ -187,12 +188,12 @@ msgstr "Google-Konto auswählen"
 
 #: workbench/accounts/views.py
 msgid "Error while fetching user data. Please try again."
-msgstr "Fehler während Abholen der Nutzerdaten. Bitte nochmals versuchen."
+msgstr "Fehler während Abholen der Daten. Bitte nochmals versuchen."
 
 #: workbench/accounts/views.py
 #, python-format
 msgid "The user with email address %s is inactive."
-msgstr "Der Benutzer mit Emailadresse %s ist inaktiv."
+msgstr "Die Nutzer*in mit Emailadresse %s ist inaktiv."
 
 #: workbench/accounts/views.py
 msgid "Welcome! Please fill in your details."
@@ -201,7 +202,7 @@ msgstr "Willkommen! Bitte fülle das folgende Formular aus."
 #: workbench/accounts/views.py
 #, python-format
 msgid "No user with email address %s found."
-msgstr "Keinen Benutzer mit Emailadresse %s gefunden."
+msgstr "Keine Nutzer*innen mit Emailadresse %s gefunden."
 
 #: workbench/accounts/views.py
 msgid "You have been signed out."
@@ -567,7 +568,7 @@ msgid ""
 "No annual working time defined for user %(user)s with working time model "
 "%(working_time_model)s."
 msgstr ""
-"Keine Jahresarbeitszeit definiert für Benutzer %(user)s mit "
+"Keine Jahresarbeitszeit definiert für Nutzer*in %(user)s mit "
 "Arbeitszeitmodell %(working_time_model)s."
 
 #: workbench/awt/views.py workbench/reporting/views.py
@@ -2723,7 +2724,7 @@ msgstr "Suchformular zurücksetzen"
 
 #: workbench/templates/awt/year_detail.html
 msgid "active users"
-msgstr "Aktive Benutzer"
+msgstr "Aktive Nutzer*innen"
 
 #: workbench/templates/awt/year_detail.html
 msgid "facts"
@@ -3652,7 +3653,7 @@ msgstr ""
 
 #: workbench/tools/xlsx.py
 msgid "By service and user"
-msgstr "Nach Leistung und Benutzer"
+msgstr "Nach Leistung und Nutzer*in"
 
 #: workbench/tools/xlsx.py
 msgid "By service and month"
@@ -3660,7 +3661,7 @@ msgstr "Nach Leistung und Monat"
 
 #: workbench/tools/xlsx.py
 msgid "By user and month"
-msgstr "Nach Benutzer und Monat"
+msgstr "Nach Nutzer*in und Monat"
 
 #: workbench/tools/xlsx.py
 msgid "Logbook"

@@ -128,7 +128,7 @@ class LoginTestCase(TestCase):
         self.assertRedirects(response, "/accounts/login/")
         self.assertEqual(
             messages(response),
-            ["Fehler während Abholen der Nutzerdaten. Bitte nochmals versuchen."],
+            ["Fehler während Abholen der Daten. Bitte nochmals versuchen."],
         )
 
     def test_accounts_update_404(self):
