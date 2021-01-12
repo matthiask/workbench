@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-12 14:33+0100\n"
+"POT-Creation-Date: 2021-01-12 14:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -405,7 +405,7 @@ msgstr "Krankheit"
 
 #: workbench/awt/models.py
 msgid "paid leave (e.g. civilian service, maternity etc.)"
-msgstr "Bezahlter Urlaub (zB Zivildienst, Mutterschaft etc.)"
+msgstr "Bezahlter Urlaub (zB Zivildienst, Elternurlaub, Zügeln etc.)"
 
 #: workbench/awt/models.py
 msgid "other reasons (no working time)"
