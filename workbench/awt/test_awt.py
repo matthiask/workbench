@@ -472,3 +472,10 @@ class AWTTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 201)
+
+        absence = Absence.objects.get()
+        response = self.client.get(
+            absence.urls["update"],
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "<input")
