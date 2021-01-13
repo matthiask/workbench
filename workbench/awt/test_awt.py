@@ -441,3 +441,34 @@ class AWTTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertContains(response, "You are not permitted to edit absences of type")
+
+    def test_absences_without_enforce_same_week_logging(self):
+        """Absences in past years without enforce_same_week_logging"""
+        user = factories.UserFactory.create(enforce_same_week_logging=False)
+        self.client.force_login(user)
+        response = self.client.post(
+            "/absences/create/",
+            {
+                "modal-user": user.pk,
+                "modal-starts_on": dt.date(2020, 1, 1).isoformat(),
+                "modal-days": 3,
+                "modal-description": "Sick",
+                "modal-reason": "sickness",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "past-years-absences")
+
+        response = self.client.post(
+            "/absences/create/",
+            {
+                "modal-user": user.pk,
+                "modal-starts_on": dt.date(2020, 1, 1).isoformat(),
+                "modal-days": 3,
+                "modal-description": "Sick",
+                "modal-reason": "sickness",
+                WarningsForm.ignore_warnings_id: "past-years-absences",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)

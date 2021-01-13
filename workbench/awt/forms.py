@@ -89,14 +89,23 @@ class AbsenceForm(ModelForm, WarningsForm):
 
     def clean(self):
         data = super().clean()
-        if data.get("starts_on"):
+        if (starts_on := data.get("starts_on")) and (user := data.get("user")):
             today = dt.date.today()
-            if data["starts_on"].year < today.year:
+            if user.enforce_same_week_logging and starts_on.year < today.year:
                 self.add_error(
                     "starts_on", _("Creating absences for past years is not allowed.")
                 )
 
-            elif (data["starts_on"] - today).days > 366:
+            elif starts_on.year < today.year:
+                self.add_warning(
+                    _(
+                        "Creating absences for past years has effects on financial"
+                        " statements, carry-forward entries etc. Are you sure?"
+                    ),
+                    code="past-years-absences",
+                )
+
+            elif (starts_on - today).days > 366:
                 self.add_warning(
                     _(
                         "Impressive planning skills or wrong date?"
