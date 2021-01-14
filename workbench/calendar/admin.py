@@ -8,7 +8,7 @@ from . import models
 @admin.register(models.App)
 class AppAdmin(OrderableAdmin, admin.ModelAdmin):
     filter_horizontal = ["users"]
-    list_display = ["title", "ordering"]
+    list_display = ["title", "ordering", "is_paused"]
     list_editable = ["ordering"]
     ordering_field = "ordering"
     prepopulated_fields = {"slug": ["title"]}
