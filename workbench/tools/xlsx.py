@@ -1,7 +1,7 @@
 from collections import defaultdict
 from itertools import chain
 
-from django.utils.text import capfirst
+from django.utils.text import capfirst, slugify
 from django.utils.translation import gettext as _
 
 from xlsxdocument import XLSXDocument
@@ -50,7 +50,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
             by_user_and_month[h.rendered_by][month] += h.hours
             by_month[month] += h.hours
 
-        self.add_sheet(_("By service and user"))
+        self.add_sheet(slugify(_("By service and user")))
         users = sorted(
             set(
                 chain.from_iterable(
@@ -93,7 +93,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
             ],
         )
 
-        self.add_sheet(_("By service and month"))
+        self.add_sheet(slugify(_("By service and month")))
         months = sorted(
             set(
                 chain.from_iterable(
@@ -135,7 +135,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
             ],
         )
 
-        self.add_sheet(_("By user and month"))
+        self.add_sheet(slugify(_("By user and month")))
         months = sorted(
             set(
                 chain.from_iterable(
