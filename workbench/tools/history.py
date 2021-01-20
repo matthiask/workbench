@@ -222,6 +222,25 @@ def changes(model, fields, actions):
     return changes
 
 
+def _accounts_user_cfg(user):
+    fields = {
+        "email",
+        "is_active",
+        "is_admin",
+        "_short_name",
+        "_full_name",
+        "enforce_same_week_logging",
+        "language",
+        "working_time_model",
+        "planning_hours_per_day",
+        "person",
+    }
+    related = [(Employment, "user_id"), (Absence, "user_id")]
+    if user.features[FEATURES.PLANNING]:
+        related.extend([(PlannedWork, "user_id")])
+    return {"fields": fields, "related": related}
+
+
 def _credit_control_creditentry_cfg(user):
     if not user.features[FEATURES.CONTROLLING]:
         raise Http404
@@ -407,21 +426,7 @@ WITH_TOTAL = {
 }
 
 HISTORY = {
-    User: {
-        "fields": {
-            "email",
-            "is_active",
-            "is_admin",
-            "_short_name",
-            "_full_name",
-            "enforce_same_week_logging",
-            "language",
-            "working_time_model",
-            "planning_hours_per_day",
-            "person",
-        },
-        "related": [(Employment, "user_id"), (Absence, "user_id")],
-    },
+    User: _accounts_user_cfg,
     Team: {"fields": EVERYTHING},
     Absence: {"fields": EVERYTHING},
     Year: {"fields": EVERYTHING},
