@@ -24,7 +24,11 @@
         {{ object.service.role|default:'&ndash;' }}
         <a href="{{ object.service.urls.update }}" data-toggle="ajaxmodal" class="inline">
           <small>({% trans 'update' %})</small>
-        </a>
+        </a><br>
+        {% if object.service.role.work_category %}
+          {% translate 'category'|capfirst %}:
+          {{ object.service.role.get_work_category_display }}
+        {% endif %}
       </td>
     </tr>
     {% endif %}
