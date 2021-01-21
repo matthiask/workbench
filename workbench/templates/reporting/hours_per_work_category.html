@@ -65,7 +65,7 @@
       {% endif %}
       {% for category, hour in user_stats.per_category %}
         <td class="text-right">
-          <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.id }}&amp;category={{ category }}">
+          <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.id }}&amp;category={{ category }}" {% if not hour %}class="text-black-30"{% endif %}>
             {{ hour|hours }}
           </a>
         </td>
