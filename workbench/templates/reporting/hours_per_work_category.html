@@ -72,9 +72,9 @@
         <td>{% percentage hour user_stats.total %}</td>
       {% endfor %}
       <td class="text-right">
-          <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.id }}&amp;category=none">
-            {{ user_stats.undefined|hours }}
-          </a>
+        <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.id }}&amp;category=none" {% if not user_stats.undefined %}class="text-black-30"{% endif %}>
+          {{ user_stats.undefined|hours }}
+        </a>
       </td>
       <td>{% percentage user_stats.undefined user_stats.total %}</td>
       <td class="text-right">{{ user_stats.total|hours }}</td>
