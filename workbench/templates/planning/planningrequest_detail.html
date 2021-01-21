@@ -8,7 +8,29 @@
 
 {% block body %}
   <table class="table table-striped">
-    {% for name, value in object|field_value_pairs %}
+    <tr>
+      <th class="text-right">{% translate 'project'|capfirst %}</th>
+      <td>{% link_or_none object.project %}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% translate 'offer'|capfirst %}</th>
+      <td>{% link_or_none object.offer %}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{% translate 'hours'|capfirst %}</th>
+      <td>
+        {{ object.planned_hours|hours }} {% translate 'planned' %} /
+        {{ object.requested_hours|hours }} {% translate 'requested' %}
+      </td>
+    </tr>
+    <tr>
+      <th class="text-right">{% translate 'period'|capfirst %}</th>
+      <td>
+        {{ object.earliest_start_on|local_date_format }} &ndash;
+        {{ object.completion_requested_on|local_date_format }}
+      </td>
+    </tr>
+    {% for name, value in object|field_value_pairs:'created_by,title,description,is_provisional,closed_at' %}
     <tr>
       <th class="text-right">{{ name }}</th>
       <td>{% link_or_none value %}</td>
