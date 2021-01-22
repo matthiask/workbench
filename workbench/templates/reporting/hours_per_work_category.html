@@ -55,6 +55,26 @@
         <th class="text-right">{% translate 'total'|capfirst %}</th>
       </tr>
     </thead>
+    <tfoot>
+      <tr>
+        <th>{% trans 'total'|capfirst %}</th>
+        {% for category, hour in stats.summary.per_category %}
+          <td class="text-right">
+            <a href="{% url 'logbook_loggedhours_list' %}?category={{ category }}" {% if not hour %}class="text-black-30"{% endif %}>
+              {{ hour|hours }}
+            </a>
+          </td>
+          <td>{% percentage hour stats.summary.total %}</td>
+        {% endfor %}
+        <td class="text-right">
+          <a href="{% url 'logbook_loggedhours_list' %}?category=none" {% if not stats.summary.undefined %}class="text-black-30"{% endif %}>
+            {{ stats.summary.undefined|hours }}
+          </a>
+        </td>
+        <td>{% percentage stats.summary.undefined stats.summary.total %}</td>
+        <td class="text-right">{{ stats.summary.total|hours }}</td>
+      </tr>
+    </tfoot>
     <tbody>
     {% for user, user_stats in stats.users %}
     <tr>

@@ -78,24 +78,26 @@ def hours_per_work_category(date_range, *, users=None):
     )
     seen_users = set()
 
-    hours_per_work_category = defaultdict(lambda: defaultdict(Decimal))
+    by_user_and_category = defaultdict(lambda: defaultdict(Decimal))
+    by_category = defaultdict(Decimal)
 
     for row in queryset:
-        hours_per_work_category[row["rendered_by"]][
+        by_user_and_category[row["rendered_by"]][
             row["service__role__work_category"] or None
         ] = row["hours__sum"]
+        by_category[row["service__role__work_category"] or None] += row["hours__sum"]
         seen_users.add(row["rendered_by"])
 
     users = [
         (
             user,
             {
-                "total": sum(hours_per_work_category[user.id].values(), Z1),
+                "total": sum(by_user_and_category[user.id].values(), Z1),
                 "per_category": [
-                    (row[0], hours_per_work_category[user.id][row[0]])
+                    (row[0], by_user_and_category[user.id][row[0]])
                     for row in Role.CATEGORIES
                 ],
-                "undefined": hours_per_work_category[user.id][None],
+                "undefined": by_user_and_category[user.id][None],
             },
         )
         for user in User.objects.filter(id__in=seen_users)
@@ -107,7 +109,7 @@ def hours_per_work_category(date_range, *, users=None):
             {
                 "label": title,
                 "hours": [
-                    100 * hours_per_work_category[user.id][name] / user_stats["total"]
+                    100 * by_user_and_category[user.id][name] / user_stats["total"]
                     for user, user_stats in users
                 ],
             }
@@ -117,9 +119,14 @@ def hours_per_work_category(date_range, *, users=None):
             {
                 "label": _("Undefined"),
                 "hours": [
-                    100 * hours_per_work_category[user.id][None] / user_stats["total"]
+                    100 * by_user_and_category[user.id][None] / user_stats["total"]
                     for user, user_stats in users
                 ],
             }
         ],
+        "summary": {
+            "total": sum(by_category.values(), Z1),
+            "per_category": [(row[0], by_category[row[0]]) for row in Role.CATEGORIES],
+            "undefined": by_category[None],
+        },
     }
