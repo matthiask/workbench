@@ -183,6 +183,7 @@ WORKBENCH = {
     "feinheit": types.SimpleNamespace(
         TITLE="Feinheit",
         SSO_DOMAIN="feinheit.ch",
+        CURRENCY="CHF",
         PDF_LANGUAGE="de",
         PDF_COMPANY="Feinheit AG",
         PDF_ADDRESS=" · ".join(
@@ -229,6 +230,7 @@ WORKBENCH = {
     "dbpag": types.SimpleNamespace(
         TITLE="DBAG",
         SSO_DOMAIN="diebruchpiloten.com",
+        CURRENCY="CHF",
         PDF_LANGUAGE="de",
         PDF_COMPANY="Die Bruchpiloten AG",
         PDF_ADDRESS=(
@@ -270,6 +272,7 @@ WORKBENCH = {
     "bf": types.SimpleNamespace(
         TITLE="Blindflug",
         SSO_DOMAIN="blindflugstudios.com",
+        CURRENCY="CHF",
         PDF_LANGUAGE="de",
         PDF_COMPANY="Blindflug Studios AG",
         PDF_ADDRESS=(
@@ -332,6 +335,7 @@ WORKBENCH = {
     "test": types.SimpleNamespace(
         TITLE="Test",
         SSO_DOMAIN="feinheit.ch",
+        CURRENCY="CHF",
         PDF_LANGUAGE="de",
         PDF_COMPANY="Feinheit AG",
         PDF_ADDRESS="Feinheit AG · Fabrikstrasse 54 · 8005 Zürich · www.feinheit.ch",

@@ -1,6 +1,7 @@
 import datetime as dt
 from functools import total_ordering
 
+from django.conf import settings
 from django.contrib import messages
 from django.db import models
 from django.db.models import Q
@@ -247,7 +248,11 @@ class Offer(ModelWithTotal):
 
     @property
     def total_title(self):
-        return _("total CHF incl. tax") if self.liable_to_vat else _("total CHF")
+        return (
+            _("Total %(currency)s incl. tax")
+            if self.liable_to_vat
+            else _("Total %(currency)s")
+        ) % {"currency": settings.WORKBENCH.CURRENCY}
 
     @classmethod
     def allow_create(cls, request):

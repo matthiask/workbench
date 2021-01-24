@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-21 14:55+0100\n"
+"POT-Creation-Date: 2021-01-24 17:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1088,8 +1088,9 @@ msgstr ""
 
 #: workbench/deals/forms.py workbench/invoices/models.py
 #: workbench/offers/models.py
-msgid "total CHF"
-msgstr "Total CHF"
+#, python-format
+msgid "Total %(currency)s"
+msgstr "Total %(currency)s"
 
 #: workbench/deals/forms.py
 msgid "Expected"
@@ -1724,16 +1725,19 @@ msgid "Paid on %(closed_on)s"
 msgstr "Bezahlt am %(closed_on)s"
 
 #: workbench/invoices/models.py
-msgid "down payment total CHF incl. tax"
-msgstr "Total CHF inkl. MwSt. Akonto"
+#, python-format
+msgid "Down payment total %(currency)s incl. tax"
+msgstr "Total %(currency)s inkl. MwSt. Akonto"
 
 #: workbench/invoices/models.py
-msgid "down payment total CHF"
-msgstr "Total CHF Akonto"
+#, python-format
+msgid "Down payment total %(currency)s"
+msgstr "Total %(currency)s Akonto"
 
 #: workbench/invoices/models.py workbench/offers/models.py
-msgid "total CHF incl. tax"
-msgstr "Total CHF inkl. MwSt."
+#, python-format
+msgid "Total %(currency)s incl. tax"
+msgstr "Total %(currency)s inkl. MwSt."
 
 #: workbench/invoices/models.py
 msgid "Invoices in preparation may be deleted, others not."
@@ -3711,6 +3715,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Total CHF"
+#~ msgstr "Total CHF"
 
 #~ msgid "Other"
 #~ msgstr "Anderes"

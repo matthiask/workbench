@@ -1,5 +1,6 @@
 import datetime as dt
 
+from django.conf import settings
 from django.contrib import messages
 from django.db import connections, models
 from django.db.models import F, Q, Sum
@@ -337,12 +338,16 @@ class Invoice(ModelWithTotal):
     def total_title(self):
         if self.type == self.DOWN_PAYMENT:
             return (
-                _("down payment total CHF incl. tax")
+                _("Down payment total %(currency)s incl. tax")
                 if self.liable_to_vat
-                else _("down payment total CHF")
-            )
+                else _("Down payment total %(currency)s")
+            ) % {"currency": settings.WORKBENCH.CURRENCY}
         else:
-            return _("total CHF incl. tax") if self.liable_to_vat else _("total CHF")
+            return (
+                _("Total %(currency)s incl. tax")
+                if self.liable_to_vat
+                else _("Total %(currency)s")
+            ) % {"currency": settings.WORKBENCH.CURRENCY}
 
     def create_services_from_logbook(self, project_services):
         assert self.project, "cannot call create_services_from_logbook without project"

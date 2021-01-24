@@ -1,10 +1,10 @@
 import datetime as dt
 
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.http import Http404
 from django.utils.html import format_html, format_html_join
-from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -158,7 +158,11 @@ class DealForm(ModelForm):
                 continue
 
             self.fields[key] = field.formfield(
-                label="%s (%s)" % (vt.title, capfirst(_("total CHF"))),
+                label="%s (%s)"
+                % (
+                    vt.title,
+                    _("Total %(currency)s") % {"currency": settings.WORKBENCH.CURRENCY},
+                ),
                 required=False,
                 initial=values.get(vt.id),
             )

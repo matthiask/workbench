@@ -5,6 +5,7 @@ from functools import reduce
 from itertools import count
 
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import redirect
@@ -93,7 +94,11 @@ class ExpenseReportPDFView(generic.DetailView):
             pdf.table(
                 [
                     (
-                        "%s %s" % (_("total"), currency_code or "CHF"),
+                        "%s %s"
+                        % (
+                            capfirst(_("total")),
+                            currency_code or settings.WORKBENCH.CURRENCY,
+                        ),
                         currency(total_cost),
                     )
                 ],
