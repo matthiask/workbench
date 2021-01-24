@@ -19,20 +19,24 @@ file on the production server)::
     OAUTH2_CLIENT_ID=...
     OAUTH2_CLIENT_SECRET=...
 
+Prerequisites:
+
+* At least Python 3.8
+* Install `fh-fablib <https://github.com/feinheit/fh-fablib/>`__
+* Local PostgreSQL and Redis instances
+
 Local setup::
 
-    fab setup
-    fab pull_db:fh
+    fl local
+    fl pull-db  # Only if you have access to our server, sorry.
 
 Development::
 
-    fab dev
+    fl dev
 
 Code style & prettification::
 
-    tox
-    yarn prettier
-    yarn eslint
+    fl fmt check
 
 Compile the bootstrap library::
 
