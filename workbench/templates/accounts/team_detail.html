@@ -32,6 +32,9 @@
   <a href="{{ object.urls.planning }}" class="btn btn-primary">
     {% include 'svg/project.svg' %} {% translate 'planning'|capfirst %}
   </a>
+  <a href="{{ object.urls.retrospective }}" class="btn btn-primary">
+    {% include 'svg/project.svg' %} {% translate 'Retrospective' %}
+  </a>
   <a href="{% url 'awt_absence_calendar' %}?team={{ object.pk }}" class="btn btn-primary">
     {% translate 'Absence calendar' %}
   </a>

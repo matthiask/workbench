@@ -1,6 +1,6 @@
 import datetime as dt
 from collections import defaultdict
-from itertools import islice
+from itertools import islice, takewhile
 
 from django.db import connections
 from django.db.models import Q, Sum
@@ -367,8 +367,9 @@ where percentage is not NULL -- NULL produced by outer join
         }
 
 
-def user_planning(user):
-    weeks = list(islice(recurring(monday() - dt.timedelta(days=14), "weekly"), 80))
+def user_planning(user, date_range):
+    start, end = date_range
+    weeks = list(takewhile(lambda x: x <= end, recurring(monday(start), "weekly")))
     planning = Planning(weeks=weeks, users=[user])
     planning.add_planned_work(user.planned_work.all())
     planning.add_planning_requests(user.received_planning_requests.all())
@@ -377,8 +378,9 @@ def user_planning(user):
     return planning.report()
 
 
-def team_planning(team):
-    weeks = list(islice(recurring(monday() - dt.timedelta(days=14), "weekly"), 80))
+def team_planning(team, date_range):
+    start, end = date_range
+    weeks = list(takewhile(lambda x: x <= end, recurring(monday(start), "weekly")))
     planning = Planning(weeks=weeks, users=list(team.members.active()))
     planning.add_planned_work(PlannedWork.objects.filter(user__teams=team))
     planning.add_planning_requests(

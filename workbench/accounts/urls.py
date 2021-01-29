@@ -37,6 +37,12 @@ urlpatterns = [
         name="accounts_user_planning",
     ),
     path(
+        "users/<int:pk>/retrospective/",
+        user_planning,
+        {"retro": True},
+        name="accounts_user_retrospective",
+    ),
+    path(
         "users/<int:pk>/statistics/",
         views.ProfileView.as_view(),
         name="accounts_user_statistics",
@@ -66,6 +72,12 @@ urlpatterns = [
         "teams/<int:pk>/planning/",
         team_planning,
         name="accounts_team_planning",
+    ),
+    path(
+        "teams/<int:pk>/retrospective/",
+        team_planning,
+        {"retro": True},
+        name="accounts_team_retrospective",
     ),
     re_path(
         r"^teams/(?P<pk>\d+)/delete/$",

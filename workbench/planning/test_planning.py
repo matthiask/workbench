@@ -11,7 +11,10 @@ from workbench.planning import reporting
 from workbench.planning.forms import PlannedWorkSearchForm, PlanningRequestSearchForm
 from workbench.planning.models import PlannedWork, PlanningRequest
 from workbench.templatetags.workbench import link_or_none
-from workbench.tools.validation import monday
+from workbench.tools.validation import in_days, monday
+
+
+date_range = [in_days(-14), in_days(400)]
 
 
 class PlanningTest(TestCase):
@@ -72,7 +75,7 @@ class PlanningTest(TestCase):
         )
         pr.receivers.add(pw.user)
 
-        report = reporting.user_planning(pw.user)
+        report = reporting.user_planning(pw.user, date_range)
         self.assertAlmostEqual(sum(report["by_week"]), Decimal("26"))
         self.assertEqual(len(report["projects_offers"]), 1)
 
@@ -82,7 +85,7 @@ class PlanningTest(TestCase):
 
         team = factories.TeamFactory.create()
         team.members.add(pw.user)
-        report = reporting.team_planning(team)
+        report = reporting.team_planning(team, date_range)
         self.assertAlmostEqual(sum(report["by_week"]), Decimal("26"))
         self.assertEqual(len(report["projects_offers"]), 1)
 
@@ -92,7 +95,7 @@ class PlanningTest(TestCase):
             weeks=[monday()],
             request=pr,
         )
-        report = reporting.user_planning(pw.user)
+        report = reporting.user_planning(pw.user, date_range)
         self.assertAlmostEqual(sum(report["by_week"]), Decimal("46"))
         self.assertEqual(len(report["projects_offers"]), 1)
 
