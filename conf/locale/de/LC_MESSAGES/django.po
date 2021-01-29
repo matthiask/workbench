@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-29 09:08+0100\n"
+"POT-Creation-Date: 2021-01-29 10:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2672,6 +2672,11 @@ msgstr "Anmelden"
 #: workbench/templates/projects/project_detail.html
 msgid "Update"
 msgstr "Bearbeiten"
+
+#: workbench/templates/accounts/team_detail.html
+#: workbench/templates/accounts/user_base.html
+msgid "Retrospective"
+msgstr "Retrospektive"
 
 #: workbench/templates/accounts/team_detail.html
 #: workbench/templates/awt/absence_calendar.html workbench/templates/base.html
