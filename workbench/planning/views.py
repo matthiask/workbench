@@ -1,3 +1,5 @@
+from django.shortcuts import get_object_or_404, render
+
 from workbench import generic
 from workbench.accounts.models import Team, User
 from workbench.planning import reporting
@@ -14,21 +16,27 @@ class ProjectPlanningView(generic.DetailView):
         )
 
 
-class UserPlanningView(generic.DetailView):
-    model = User
-    template_name = "planning/user_planning.html"
+def user_planning(request, pk):
+    instance = get_object_or_404(User.objects.active(), pk=pk)
+    return render(
+        request,
+        "planning/user_planning.html",
+        {
+            "object": instance,
+            "user": instance,
+            "planning_data": reporting.user_planning(instance),
+        },
+    )
 
-    def get_context_data(self, **kwargs):
-        return super().get_context_data(
-            planning_data=reporting.user_planning(self.object), **kwargs
-        )
 
-
-class TeamPlanningView(generic.DetailView):
-    model = Team
-    template_name = "planning/team_planning.html"
-
-    def get_context_data(self, **kwargs):
-        return super().get_context_data(
-            planning_data=reporting.team_planning(self.object), **kwargs
-        )
+def team_planning(request, pk):
+    instance = get_object_or_404(Team.objects.all(), pk=pk)
+    return render(
+        request,
+        "planning/team_planning.html",
+        {
+            "object": instance,
+            "team": instance,
+            "planning_data": reporting.team_planning(instance),
+        },
+    )

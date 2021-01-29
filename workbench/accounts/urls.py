@@ -3,7 +3,7 @@ from django.urls import path, re_path
 from workbench import generic
 from workbench.accounts.forms import TeamForm, TeamSearchForm, UserSearchForm
 from workbench.accounts.models import Team, User
-from workbench.planning.views import TeamPlanningView, UserPlanningView
+from workbench.planning.views import team_planning, user_planning
 
 from . import views
 
@@ -33,7 +33,7 @@ urlpatterns = [
     ),
     path(
         "users/<int:pk>/planning/",
-        UserPlanningView.as_view(),
+        user_planning,
         name="accounts_user_planning",
     ),
     path(
@@ -64,7 +64,7 @@ urlpatterns = [
     ),
     path(
         "teams/<int:pk>/planning/",
-        TeamPlanningView.as_view(),
+        team_planning,
         name="accounts_team_planning",
     ),
     re_path(
