@@ -72,6 +72,10 @@
   color: #555;
 }
 
+.is-request {
+  font-style: italic;
+}
+
 .planning--add-pw {
   display: inline-block;
   font-size: 70%;
@@ -117,6 +121,10 @@
 
   &.is-project {
     background-color: var(--indigo);
+  }
+
+  &.is-worked {
+    background-color: blue;
   }
 
   &.is-total {

@@ -376,9 +376,42 @@ function Project({ by_week, offers, project }) {
           </Cell>
         )
       })}
+      {project.worked_hours ? <WorkedHours project={project} /> : null}
       {offers.map((offer, idx) => (
         <Offer key={idx} {...offer} />
       ))}
+    </>
+  )
+}
+
+function WorkedHours({ project }) {
+  const ctx = useContext(RowContext)
+  const row = ctx.next()
+
+  return (
+    <>
+      <Cell row={row} column={1} className="planning--title is-worked no-pr">
+        {gettext("Logged hours")}
+      </Cell>
+
+      {project.worked_hours.map((hours, idx) => {
+        hours = parseFloat(hours)
+        if (!hours) return null
+
+        return (
+          <Cell
+            key={idx}
+            row={row}
+            column={FIRST_DATA_COLUMN + idx}
+            className="planning--range planning--small is-worked no-pr"
+            style={{
+              opacity: opacityClamp(0.3 + hours / 20),
+            }}
+          >
+            {fixed(hours, 1)}
+          </Cell>
+        )
+      })}
     </>
   )
 }
@@ -428,7 +461,7 @@ function Offer({ offer, work_list }) {
         {offer.range}
       </Cell>
       <Cell row={row} column={4} className="planning--small text-right">
-        {`${fixed(offer.worked_hours, 0)}h / ${fixed(offer.planned_hours, 0)}h`}
+        {`${fixed(offer.planned_hours, 0)}h`}
       </Cell>
       {work_list.map((work, idx) => (
         <Work key={work.work.id} {...work} isEven={(1 + idx) % 2 === 0} />
@@ -440,6 +473,7 @@ function Offer({ offer, work_list }) {
 function Work({ work, hours_per_week, per_week, isEven }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
+  const cls = work.is_request ? "is-request" : "is-pw"
   return (
     <>
       {isEven ? (
@@ -451,9 +485,9 @@ function Work({ work, hours_per_week, per_week, isEven }) {
       <Cell
         row={row}
         column={1}
-        className={`planning--title ${
-          work.is_request ? "is-request" : "is-pw"
-        } ${work.is_provisional ? "is-provisional" : ""} planning--small pl-5`}
+        className={`planning--title ${cls} ${
+          work.is_provisional ? "is-provisional" : ""
+        } planning--small pl-5`}
       >
         <a href={work.url} data-toggle="ajaxmodal">
           {work.title}
@@ -463,7 +497,7 @@ function Work({ work, hours_per_week, per_week, isEven }) {
         <Cell
           row={row}
           column={2}
-          className="planning--small"
+          className={`planning--small ${cls}`}
           title={gettext("is provisional")}
         >
           {pgettext("provisional", "prov.")}
@@ -472,12 +506,16 @@ function Work({ work, hours_per_week, per_week, isEven }) {
       <Cell
         row={row}
         column={3}
-        className="planning--small text-center"
+        className={`planning--small text-center ${cls}`}
         style={{ whiteSpace: "nowrap" }}
       >
         {work.range}
       </Cell>
-      <Cell row={row} column={4} className="planning--small text-right">
+      <Cell
+        row={row}
+        column={4}
+        className={`planning--small text-right ${cls}`}
+      >
         {work.is_request
           ? `${fixed(work.missing_hours, 0)}h / ${fixed(
               work.requested_hours,

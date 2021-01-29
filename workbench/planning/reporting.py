@@ -41,8 +41,7 @@ class Planning:
         self._project_ids = set()
         self._user_ids = {user.id for user in users} if users else set()
 
-        self._worked_hours_by_offer = defaultdict(lambda: Z1)
-        self._worked_hours_by_project = defaultdict(lambda: Z1)
+        self._worked_hours = defaultdict(lambda: defaultdict(lambda: Z1))
 
         self._absences = defaultdict(lambda: [0] * len(weeks))
 
@@ -137,11 +136,12 @@ class Planning:
     def add_worked_hours(self, queryset):
         for row in (
             queryset.filter(service__project__in=self._project_ids)
-            .values("service__project", "service__offer")
+            .values("service__project", "service__offer", "rendered_on")
             .annotate(Sum("hours"))
         ):
-            self._worked_hours_by_offer[row["service__offer"]] += row["hours__sum"]
-            self._worked_hours_by_project[row["service__project"]] += row["hours__sum"]
+            self._worked_hours[row["service__project"]][
+                monday(row["rendered_on"])
+            ] += row["hours__sum"]
 
     def add_absences(self, queryset):
         for absence in queryset.filter(
@@ -228,7 +228,6 @@ class Planning:
                         "url": offer.get_absolute_url(),
                         "creatework": offer.project.urls["creatework"]
                         + "?offer={}".format(offer.pk),
-                        "worked_hours": self._worked_hours_by_offer[offer.id],
                     }
                     if offer
                     else {}
@@ -275,7 +274,9 @@ class Planning:
                     local_date_format(date_until, fmt="d.m."),
                 ),
                 "planned_hours": hours,
-                "worked_hours": self._worked_hours_by_project[project.id],
+                "worked_hours": [
+                    self._worked_hours[project.id][week] for week in self.weeks
+                ],
             },
             "by_week": [
                 self._by_project_and_week[project][week] for week in self.weeks
@@ -333,6 +334,7 @@ where percentage is not NULL -- NULL produced by outer join
             "this_week_index": this_week_index,
             "weeks": [
                 {
+                    "monday": week,
                     "month": local_date_format(week, fmt="M"),
                     "week": local_date_format(week, fmt="W"),
                     "period": "{}–{}".format(
