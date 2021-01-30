@@ -49,6 +49,9 @@
       color: grey;
     }
   }
+  &.is-worked {
+    background-color: var(--stripe1);
+  }
   &.is-offer {
     background-color: var(--stripe2);
 

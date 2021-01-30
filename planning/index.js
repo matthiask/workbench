@@ -298,7 +298,7 @@ function Project({ by_week, offers, project }) {
     <>
       <div
         style={{
-          gridRow: row,
+          gridRow: `${row} / ${row + (project.worked_hours ? 2 : 1)}`,
           gridColumn: `1 / -1`,
         }}
         className="planning--stripe1"
