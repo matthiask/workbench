@@ -9,9 +9,15 @@ class ValueInline(admin.TabularInline):
     extra = 0
 
 
+class ContributionInline(admin.TabularInline):
+    model = models.Contribution
+    extra = 0
+    raw_id_fields = ["user"]
+
+
 @admin.register(models.Deal)
 class DealAdmin(admin.ModelAdmin):
-    inlines = [ValueInline]
+    inlines = [ValueInline, ContributionInline]
     list_display = ["title", "owned_by", "value", "status", "probability", "created_at"]
     list_filter = ["status"]
     raw_id_fields = ["customer", "contact", "owned_by", "related_offers"]

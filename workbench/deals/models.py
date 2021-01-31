@@ -288,3 +288,17 @@ class Value(models.Model):
 
     def __str__(self):
         return currency(self.value)
+
+
+class Contribution(models.Model):
+    deal = models.ForeignKey(Deal, on_delete=models.CASCADE, verbose_name=_("deal"))
+    user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name=_("user"))
+    weight = models.SmallIntegerField(_("weight"), default=100)
+
+    class Meta:
+        ordering = ["-weight"]
+        verbose_name = _("contribution")
+        verbose_name_plural = _("contributions")
+
+    def __str__(self):
+        return f"{self.user}: {self.weight}"

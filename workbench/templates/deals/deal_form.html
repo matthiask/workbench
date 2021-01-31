@@ -1,0 +1,60 @@
+{% extends "generic/object_form.html" %}
+
+{% load bootstrap4 fineforms formset i18n %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <h1>
+      {% if object %}
+        <a href="{{ object.get_absolute_url }}">{{ title }}</a>
+      {% else %}
+        {{ title }}
+      {% endif %}
+    </h1>
+
+    <form method="POST" action="." class="form-horizontal">
+      {% csrf_token %}
+
+      {% include 'fineforms/warnings.html' %}
+      {% ff_errors form %}
+      {% ff_fields form %}
+
+      {% if form.formsets %}
+        <h4>{% translate 'contributions' %}</h4>
+        {% formset form.formsets.contributions "contributions" %}
+        <div id="{{ form_id }}" class="card bg-light mb-3">
+          <div class="card-body">
+            {{ form.id }}
+            {% ff_errors form %}
+            <div class="row">
+              <div class="col-6">{% ff_field form.user %}</div>
+              <div class="col-4">{% ff_field form.weight %}</div>
+              <div class="col-2">{% ff_field form.DELETE %}</div>
+            </div>
+            {% ff_fields form exclude='user,weight,DELETE' %}
+          </div>
+        </div>
+        {% endformset %}
+        <a href="#" class="btn btn-primary"
+          onclick="return addInlineForm('contributions')">
+          {% include 'svg/plus.svg' %}
+        </a>
+      {% endif %}
+
+      <div class="row mt-5">
+        <div class="col-sm-12">
+          <button type="submit" class="btn btn-primary">
+            {% translate 'Save' %}</button>
+
+          {% if object.get_absolute_url %}
+          <a href="{{ object.get_absolute_url }}" class="btn float-right btn-outline-danger">
+            {% translate 'cancel' %}</a>
+          {% endif %}
+        </div>
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}
