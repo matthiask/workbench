@@ -353,10 +353,7 @@ function Project({ by_week, offers, project }) {
         {project.range}
       </Cell>
       <Cell row={row} column={4} className="planning--small text-right">
-        {`${fixed(project.worked_hours, 0)}h / ${fixed(
-          project.planned_hours,
-          0
-        )}h`}
+        {fixed(project.planned_hours, 0)}h
       </Cell>
       {by_week.map((hours, idx) => {
         hours = parseFloat(hours)
@@ -387,11 +384,15 @@ function Project({ by_week, offers, project }) {
 function WorkedHours({ project }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
+  const sum = project.worked_hours.reduce((a, b) => a + parseFloat(b), 0)
 
   return (
     <>
       <Cell row={row} column={1} className="planning--title is-worked no-pr">
         {gettext("Logged hours")}
+      </Cell>
+      <Cell row={row} column={4} className="planning--small text-right">
+        {fixed(sum, 0)}h
       </Cell>
 
       {project.worked_hours.map((hours, idx) => {
@@ -461,7 +462,7 @@ function Offer({ offer, work_list }) {
         {offer.range}
       </Cell>
       <Cell row={row} column={4} className="planning--small text-right">
-        {`${fixed(offer.planned_hours, 0)}h`}
+        {fixed(offer.planned_hours, 0)}h
       </Cell>
       {work_list.map((work, idx) => (
         <Work key={work.work.id} {...work} isEven={(1 + idx) % 2 === 0} />
