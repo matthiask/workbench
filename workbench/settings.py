@@ -141,6 +141,7 @@ LOCALE_PATHS = [os.path.join(BASE_DIR, "conf", "locale")]
 AUTHENTICATION_BACKENDS = ["authlib.backends.EmailBackend"]
 
 DATABASES = {"default": dj_database_url.config(default="sqlite:///db.sqlite3")}
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 ATOMIC_REQUESTS = True
 
 LANGUAGE_CODE = "de"
@@ -423,3 +424,9 @@ if TESTING:  # pragma: no cover
     PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
     DATABASES["default"]["TEST"] = {"SERIALIZE": False}
     FEATURES = defaultdict(lambda: True)
+
+
+if True:
+    import django_countries.fields  # noqa
+
+    django_countries.fields.CountryField.db_collation = None

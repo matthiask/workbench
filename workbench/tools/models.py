@@ -142,3 +142,8 @@ class ModelWithTotal(Model):
         if self.discount:
             parts.append(" (%s %s)" % (currency(self.discount), gettext("discount")))
         return "".join(parts)
+
+
+class CalculationModel(ModelWithTotal):
+    class Meta:
+        managed = False

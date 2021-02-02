@@ -10,7 +10,7 @@ from workbench.contacts.models import Organization
 from workbench.projects.models import Project
 from workbench.tools import formats
 from workbench.tools.forms import Autocomplete
-from workbench.tools.models import ModelWithTotal
+from workbench.tools.models import CalculationModel
 from workbench.tools.testing import messages
 from workbench.tools.validation import is_title_specific
 
@@ -36,7 +36,7 @@ class ToolsTest(TestCase):
 
     def test_model_with_total(self):
         """The calculation of totals excl. and incl. tax work"""
-        m = ModelWithTotal(
+        m = CalculationModel(
             subtotal=Decimal("20"), discount=Decimal("5"), tax_rate=Decimal("8.0")
         )
         m._calculate_total()
