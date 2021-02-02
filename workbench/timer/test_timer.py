@@ -271,6 +271,24 @@ class TimestampsTest(TestCase):
         t.refresh_from_db()
         self.assertEqual(t.logged_hours.description, "Test")
 
+        # Timestamp belongs to someone else; shouldn't crash.
+        t = factories.UserFactory.create().timestamp_set.create(type=Timestamp.STOP)
+        response = self.client.post(
+            service.project.urls["createhours"] + "?timestamp={}".format(t.pk),
+            {
+                "modal-rendered_by": user.pk,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-service": service.id,
+                "modal-hours": "0.2",
+                "modal-description": "Test 2",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        t.refresh_from_db()
+        self.assertEqual(t.logged_hours, None)
+
     def test_list_timestamps(self):
         """The timestamps listing endpoint works"""
         user = factories.UserFactory.create()

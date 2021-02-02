@@ -527,7 +527,6 @@ class LoggedHoursForm(ModelForm):
                 timestamp = Timestamp.objects.filter(
                     user=self.request.user, id=pk
                 ).first()
-                timestamp.logged_hours = instance
             else:
                 timestamp = DetectedTimestampForm(self.request.GET).build_if_valid(
                     user=self.request.user, logged_hours=instance
@@ -550,6 +549,7 @@ class LoggedHoursForm(ModelForm):
             instance.service = service
         instance.save()
         if timestamp:
+            timestamp.logged_hours = instance
             timestamp.save()
 
         return instance
