@@ -479,3 +479,12 @@ class PlanningTest(TestCase):
 
         response = self.client.get(service.project.urls["creatework"] + "?service=bla")
         self.assertEqual(response.status_code, 200)  # No crash
+
+    def test_request_removal_notification(self):
+        """Deleting a planning request should send a notification"""
+        pr = factories.PlanningRequestFactory.create()
+        receiver = factories.UserFactory.create()
+        pr.receivers.add(receiver)
+        self.assertEqual(len(mail.outbox), 1)
+        pr.delete()
+        self.assertEqual(len(mail.outbox), 2)

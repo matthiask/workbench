@@ -150,7 +150,22 @@ def receivers_changed(sender, action, instance, pk_set, **kwargs):
         ).send(fail_silently=True)
 
 
+def request_deleted(sender, instance, **kwargs):
+    if receivers := instance.receivers.all():
+        render_to_mail(
+            "planning/planningrequest_deleted",
+            {
+                "object": instance,
+                "receivers": receivers,
+                "WORKBENCH": settings.WORKBENCH,
+            },
+            to=[user.email for user in receivers],
+            cc=[instance.created_by.email],
+        ).send(fail_silently=True)
+
+
 signals.m2m_changed.connect(receivers_changed, sender=PlanningRequest.receivers.through)
+signals.pre_delete.connect(request_deleted, sender=PlanningRequest)
 
 
 @model_urls
