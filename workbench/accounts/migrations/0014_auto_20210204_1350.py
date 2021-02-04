@@ -44,6 +44,8 @@ namespaces = {
             "WORKING_TIME_CORRECTION",
         },
     },
+    "dbpag": {},
+    "test": {},
 }
 
 
