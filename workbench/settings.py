@@ -9,6 +9,8 @@ import dj_database_url
 import dj_email_url
 from speckenv import env
 
+from workbench.accounts.features import FEATURES, F
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -215,16 +217,17 @@ WORKBENCH = {
         },
         URL="https://workbench.feinheit.ch",
         FEATURES={
-            "bookkeeping": {"jg@feinheit.ch", "mk@feinheit.ch"},
-            "campaigns": True,
-            "controlling": True,
-            "deals": True,
-            "foreign_currencies": False,
-            "glassfrog": True,
-            "labor_costs": False,
-            "planning": True,
-            "skip_breaks": False,
-            "working_time_correction": {"jg@feinheit.ch", "mk@feinheit.ch"},
+            FEATURES.BOOKKEEPING: F.USER,
+            FEATURES.CAMPAIGNS: F.ALWAYS,
+            FEATURES.CONTROLLING: F.ALWAYS,
+            FEATURES.DEALS: F.ALWAYS,
+            FEATURES.FOREIGN_CURRENCIES: F.NEVER,
+            FEATURES.GLASSFROG: F.ALWAYS,
+            FEATURES.LABOR_COSTS: F.NEVER,
+            FEATURES.LATE_LOGGING: F.USER,
+            FEATURES.PLANNING: F.ALWAYS,
+            FEATURES.SKIP_BREAKS: F.NEVER,
+            FEATURES.WORKING_TIME_CORRECTION: F.USER,
         },
         READ_WRITE_ADMIN=False,
     ),
@@ -257,16 +260,17 @@ WORKBENCH = {
         },
         URL="https://workbench.diebruchpiloten.com",
         FEATURES={
-            "bookkeeping": True,
-            "campaigns": False,
-            "controlling": True,
-            "deals": False,
-            "foreign_currencies": False,
-            "glassfrog": False,
-            "labor_costs": False,
-            "planning": False,
-            "skip_breaks": False,
-            "working_time_correction": True,
+            FEATURES.BOOKKEEPING: F.ALWAYS,
+            FEATURES.CAMPAIGNS: F.NEVER,
+            FEATURES.CONTROLLING: F.ALWAYS,
+            FEATURES.DEALS: F.NEVER,
+            FEATURES.FOREIGN_CURRENCIES: F.NEVER,
+            FEATURES.GLASSFROG: F.NEVER,
+            FEATURES.LABOR_COSTS: F.NEVER,
+            FEATURES.LATE_LOGGING: F.ALWAYS,
+            FEATURES.PLANNING: F.NEVER,
+            FEATURES.SKIP_BREAKS: F.NEVER,
+            FEATURES.WORKING_TIME_CORRECTION: F.ALWAYS,
         },
         READ_WRITE_ADMIN=False,
     ),
@@ -300,36 +304,17 @@ WORKBENCH = {
         },
         URL="https://workbench.blindflugstudios.com",
         FEATURES={
-            "bookkeeping": {
-                "moritz@blindflugstudios.com",
-                "jeremy@blindflugstudios.com",
-                "frederic@blindflugstudios.com",
-                "mk@feinheit.ch",
-            },
-            "campaigns": False,
-            "controlling": {
-                "moritz@blindflugstudios.com",
-                "jeremy@blindflugstudios.com",
-                "frederic@blindflugstudios.com",
-                "mk@feinheit.ch",
-            },
-            "deals": False,
-            "foreign_currencies": True,
-            "glassfrog": False,
-            "labor_costs": {
-                "moritz@blindflugstudios.com",
-                "jeremy@blindflugstudios.com",
-                "frederic@blindflugstudios.com",
-                "mk@feinheit.ch",
-            },
-            "planning": True,
-            "skip_breaks": True,  # For now
-            "working_time_correction": {
-                "moritz@blindflugstudios.com",
-                "jeremy@blindflugstudios.com",
-                "frederic@blindflugstudios.com",
-                "mk@feinheit.ch",
-            },
+            FEATURES.BOOKKEEPING: F.USER,
+            FEATURES.CAMPAIGNS: F.NEVER,
+            FEATURES.CONTROLLING: F.USER,
+            FEATURES.DEALS: F.NEVER,
+            FEATURES.FOREIGN_CURRENCIES: F.ALWAYS,
+            FEATURES.GLASSFROG: F.NEVER,
+            FEATURES.LABOR_COSTS: F.USER,
+            FEATURES.LATE_LOGGING: F.USER,
+            FEATURES.PLANNING: F.ALWAYS,
+            FEATURES.SKIP_BREAKS: F.ALWAYS,  # For now
+            FEATURES.WORKING_TIME_CORRECTION: F.USER,
         },
         READ_WRITE_ADMIN=True,
     ),
@@ -360,16 +345,17 @@ WORKBENCH = {
         },
         URL="https://workbench-test.feinheit.ch",
         FEATURES={
-            "bookkeeping": True,
-            "campaigns": False,
-            "controlling": True,
-            "deals": True,
-            "foreign_currencies": True,
-            "glassfrog": False,
-            "labor_costs": True,
-            "planning": True,
-            "skip_breaks": False,
-            "working_time_correction": True,
+            FEATURES.BOOKKEEPING: F.ALWAYS,
+            FEATURES.CAMPAIGNS: F.NEVER,
+            FEATURES.CONTROLLING: F.ALWAYS,
+            FEATURES.DEALS: F.ALWAYS,
+            FEATURES.FOREIGN_CURRENCIES: F.ALWAYS,
+            FEATURES.GLASSFROG: F.NEVER,
+            FEATURES.LABOR_COSTS: F.ALWAYS,
+            FEATURES.LATE_LOGGING: None,
+            FEATURES.PLANNING: F.ALWAYS,
+            FEATURES.SKIP_BREAKS: F.NEVER,
+            FEATURES.WORKING_TIME_CORRECTION: F.ALWAYS,
         },
         READ_WRITE_ADMIN=False,
     ),
@@ -423,7 +409,7 @@ BATCH_MAX_ITEMS = 250
 if TESTING:  # pragma: no cover
     PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
     DATABASES["default"]["TEST"] = {"SERIALIZE": False}
-    FEATURES = defaultdict(lambda: True)
+    FEATURES = defaultdict(lambda: F.ALWAYS, {"LATE_LOGGING": F.USER})
 
 
 if True:

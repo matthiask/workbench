@@ -7,6 +7,7 @@ from django.utils import timezone
 from time_machine import travel
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project
 from workbench.tools.forms import WarningsForm
@@ -114,10 +115,12 @@ class LogbookTest(TestCase):
         self.assertEqual(response.status_code, 202)
 
     def test_past_week_logging(self):
-        """Past week logging is allowed when enforce_same_week_logging is False"""
+        """Past week logging is allowed with LATE_LOGGING"""
         service = factories.ServiceFactory.create()
         project = service.project
-        user = factories.UserFactory.create(enforce_same_week_logging=False)
+        user = factories.UserFactory.create()
+        user._features.append(FEATURES.LATE_LOGGING)
+        user.save()
 
         self.client.force_login(project.owned_by)
 
@@ -144,7 +147,7 @@ class LogbookTest(TestCase):
             html=True,
         )
 
-        user.enforce_same_week_logging = True
+        user._features.remove(FEATURES.LATE_LOGGING)
         user.save()
 
         response = self.client.get(
@@ -242,7 +245,7 @@ class LogbookTest(TestCase):
             "Deselect the existing service if you want to create a new service.",
         )
 
-    @override_settings(FEATURES={"glassfrog": False})
+    @override_settings(FEATURES={FEATURES.GLASSFROG: F.NEVER})
     def test_no_service_role_without_glassfrog(self):
         """The service_role field isn't shown and isn't required without GLASSFROG"""
         service = factories.ServiceFactory.create()
@@ -682,7 +685,7 @@ class LogbookTest(TestCase):
         )
         self.assertEqual(response.status_code, 201)
 
-    @override_settings(FEATURES={"foreign_currencies": False})
+    @override_settings(FEATURES={FEATURES.FOREIGN_CURRENCIES: F.NEVER})
     def test_no_foreign_currencies(self):
         """Do not show expense currency and cost if no FOREIGN_CURRENCIES"""
         project = factories.ProjectFactory.create()

@@ -50,7 +50,7 @@
         <td>{% translate 'Jump to project' %}</td>
       </tr>
 
-      {% if request.user|has_feature:FEATURES.CONTROLLING %}
+      {% if request.user.features.CONTROLLING %}
       <tr>
         <th class="text-right text-nowrap">Ctrl-O</th>
         <td>{% translate 'offers'|capfirst %}</td>
@@ -67,7 +67,7 @@
         <td>{% translate 'timestamps'|capfirst %}</td>
       </tr>
 
-      {% if request.user|has_feature:FEATURES.DEALS %}
+      {% if request.user.features.DEALS %}
       <tr>
         <th class="text-right text-nowrap">Ctrl-D</th>
         <td>{% translate 'deals'|capfirst %}</td>

@@ -62,7 +62,7 @@
 
 <div class="row mt-5">
 
-  {% if request.user|has_feature:FEATURES.CONTROLLING %}
+  {% if request.user.features.CONTROLLING %}
     <div class="col-md-6 col-lg-3">
       <div class="card mb-3">
         <div class="card-header"><h3 class="my-0">{% translate 'Statistics' %}</h3></div>
@@ -121,7 +121,7 @@
     </div>
   </div>
 
-  {% if request.user|has_feature:FEATURES.CONTROLLING %}
+  {% if request.user.features.CONTROLLING %}
 
     <div class="col-md-6 col-lg-3">
       <div class="card mb-3">

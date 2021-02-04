@@ -13,7 +13,7 @@ class AuditTest(TestCase):
         user = factories.UserFactory.create(is_admin=True)
         self.client.force_login(user)
 
-        user.enforce_same_week_logging = False
+        user.planning_hours_per_day = 1
         user.save()
 
         response = self.client.get("/admin/audit/loggedaction/")

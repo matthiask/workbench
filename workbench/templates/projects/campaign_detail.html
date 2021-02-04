@@ -21,7 +21,7 @@
       <th class="text-right">{% translate 'projects'|capfirst %}</th>
       <td>
 
-        {% if request.user|has_feature:FEATURES.CONTROLLING %}
+        {% if request.user.features.CONTROLLING %}
           {% with statistics=object.statistics %}
           <table class="table table-sm table-hover">
             <thead class="sticky">

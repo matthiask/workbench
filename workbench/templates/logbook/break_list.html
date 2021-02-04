@@ -8,7 +8,7 @@
     {% include "svg/plus.svg" %}
     {{ view.meta.verbose_name|capfirst }}
   </a>
-  {% if request.user|has_feature:FEATURES.CONTROLLING %}
+  {% if request.user.features.CONTROLLING %}
     <a href="{% querystring export='xlsx' %}" class="btn btn-primary">
       {% include 'svg/desktop-download.svg' %} XLSX
     </a>

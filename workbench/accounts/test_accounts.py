@@ -5,9 +5,9 @@ from django.test.utils import override_settings
 from django.urls import reverse
 
 from workbench import factories
-from workbench.accounts.features import UnknownFeature
+from workbench.accounts.features import FEATURES, F
 from workbench.accounts.forms import TeamForm, TeamSearchForm
-from workbench.accounts.models import User
+from workbench.accounts.models import UnknownFeature, User
 from workbench.projects.models import Project
 from workbench.tools.testing import messages
 
@@ -79,7 +79,7 @@ class AccountsTest(TestCase):
         """Ordering of users while falling back to different attributes"""
         self.assertTrue(User(_short_name="a") < User(_full_name="b"))
 
-    @override_settings(FEATURES={"glassfrog": False})
+    @override_settings(FEATURES={FEATURES.GLASSFROG: F.NEVER})
     def test_feature_required(self):
         """The feature_required decorator redirects users and adds a message"""
         user = factories.UserFactory.create()
@@ -89,19 +89,17 @@ class AccountsTest(TestCase):
         self.assertRedirects(response, "/")
         self.assertEqual(messages(response), ["Feature not available"])
 
-    @override_settings(
-        FEATURES={"yes": True, "no": False, "maybe": {"test@example.com"}}
-    )
+    @override_settings(FEATURES={"yes": F.ALWAYS, "no": F.NEVER, "maybe": F.USER})
     def test_user_features(self):
         """Features may either be enabled for all, for some or for no users"""
-        user = User(email="test@example.org")
+        user = User(email="test@example.org", _features=[])
         self.assertTrue(user.features["yes"])
         self.assertFalse(user.features["no"])
         self.assertFalse(user.features["maybe"])
         with self.assertRaises(UnknownFeature):
             user.features["missing"]
 
-        user = User(email="test@example.com")
+        user = User(email="test@example.com", _features=["maybe"])
         self.assertTrue(user.features["yes"])
         self.assertFalse(user.features["no"])
         self.assertTrue(user.features["maybe"])

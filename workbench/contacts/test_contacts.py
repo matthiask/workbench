@@ -4,8 +4,10 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
+from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
 from workbench.contacts.models import Group, Organization, Person, PhoneNumber
 from workbench.contacts.urls import autocomplete_filter
 from workbench.tools.testing import messages
@@ -38,6 +40,9 @@ def person_to_dict(person, **kwargs):
 
 
 class ContactsTest(TestCase):
+    def setUp(self):
+        deactivate_all()
+
     def test_update(self):
         """A single-word salutation does not look right"""
         person = factories.PersonFactory.create()
@@ -303,7 +308,7 @@ class ContactsTest(TestCase):
 
     def test_organization_detail(self):
         """The organization detail page contains a few additional headings
-        depending on the controlling feature"""
+        depending on the CONTROLLING feature"""
         organization = factories.OrganizationFactory.create()
         self.client.force_login(organization.primary_contact)
 
@@ -312,7 +317,7 @@ class ContactsTest(TestCase):
         self.assertContains(response, "Recent invoices")
         self.assertContains(response, "Recent offers")
 
-        with override_settings(FEATURES={"controlling": False}):
+        with override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER}):
             response = self.client.get(organization.urls["detail"])
             self.assertContains(response, "Recent projects")
             self.assertNotContains(response, "Recent invoices")

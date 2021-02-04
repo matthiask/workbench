@@ -15,7 +15,7 @@
         <a class="nav-link" href="{{ user.urls.detail }}">{% translate 'user'|capfirst %}</a>
       </li>
       {% mark_current request.path %}
-      {% if request.user|has_feature:FEATURES.PLANNING %}
+      {% if request.user.features.PLANNING %}
         <li class="nav-item">
           <a class="nav-link" href="{{ user.urls.planning }}">{% translate 'Planning' %}</a>
         </li>

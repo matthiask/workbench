@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from workbench import factories
-from workbench.accounts.features import FEATURES
+from workbench.accounts.features import FEATURES, F
 from workbench.accounts.middleware import set_user_name
 from workbench.audit.models import LoggedAction
 from workbench.projects.models import Project
@@ -178,11 +178,11 @@ class HistoryTest(TestCase):
 
     def assert_only_visible_with(self, url, text, feature):
         """Helper for verifying that some values are only visisble with FEATURES"""
-        with override_settings(FEATURES={feature: True}):
+        with override_settings(FEATURES={feature: F.ALWAYS}):
             response = self.client.get(url)
             self.assertContains(response, text)
 
-        with override_settings(FEATURES={feature: False}):
+        with override_settings(FEATURES={feature: F.NEVER}):
             response = self.client.get(url)
             self.assertNotContains(response, text)
 
@@ -227,11 +227,11 @@ class HistoryTest(TestCase):
 
     def assert_404_without_feature(self, url, *, feature):
         """Helper for checking that some models even 404 with a missing FEATURE"""
-        with override_settings(FEATURES={feature: True}):
+        with override_settings(FEATURES={feature: F.ALWAYS}):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
-        with override_settings(FEATURES={feature: False}):
+        with override_settings(FEATURES={feature: F.NEVER}):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
 
@@ -240,14 +240,14 @@ class HistoryTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
         entry = factories.CreditEntryFactory.create()
         url = "/history/credit_control_creditentry/id/{}/".format(entry.pk)
-        self.assert_404_without_feature(url, feature="controlling")
+        self.assert_404_without_feature(url, feature=FEATURES.CONTROLLING)
 
     def test_invoice_visibility(self):
         """Invoices are invisible without CONTROLLING"""
         invoice = factories.InvoiceFactory.create()
         self.client.force_login(invoice.owned_by)
         url = "/history/invoices_invoice/id/{}/".format(invoice.pk)
-        self.assert_404_without_feature(url, feature="controlling")
+        self.assert_404_without_feature(url, feature=FEATURES.CONTROLLING)
 
     def test_invoice_service_visibility(self):
         """Invoice services are invisible without CONTROLLING"""
@@ -255,35 +255,35 @@ class HistoryTest(TestCase):
         self.client.force_login(invoice.owned_by)
         service = invoice.services.create()
         url = "/history/invoices_service/id/{}/".format(service.pk)
-        self.assert_404_without_feature(url, feature="controlling")
+        self.assert_404_without_feature(url, feature=FEATURES.CONTROLLING)
 
     def test_recurring_invoice_visibility(self):
         """Recurring invoices are invisible without CONTROLLING"""
         invoice = factories.RecurringInvoiceFactory.create()
         self.client.force_login(invoice.owned_by)
         url = "/history/invoices_recurringinvoice/id/{}/".format(invoice.pk)
-        self.assert_404_without_feature(url, feature="controlling")
+        self.assert_404_without_feature(url, feature=FEATURES.CONTROLLING)
 
     def test_campaign_visibility(self):
         """Campaigns are invisible without CAMPAIGNS"""
         campaign = factories.CampaignFactory.create()
         self.client.force_login(campaign.owned_by)
         url = "/history/projects_campaign/id/{}/".format(campaign.pk)
-        self.assert_404_without_feature(url, feature="campaigns")
+        self.assert_404_without_feature(url, feature=FEATURES.CAMPAIGNS)
 
     def test_deal_visibility(self):
         """Deals are invisible without DEALS"""
         deal = factories.DealFactory.create()
         self.client.force_login(deal.owned_by)
         url = "/history/deals_deal/id/{}/".format(deal.pk)
-        self.assert_404_without_feature(url, feature="deals")
+        self.assert_404_without_feature(url, feature=FEATURES.DEALS)
 
         url = "/history/deals_value/deal_id/{}/".format(deal.pk)
-        self.assert_404_without_feature(url, feature="deals")
+        self.assert_404_without_feature(url, feature=FEATURES.DEALS)
 
         type = factories.ValueTypeFactory.create()
         url = "/history/deals_valuetype/id/{}/".format(type.pk)
-        self.assert_404_without_feature(url, feature="deals")
+        self.assert_404_without_feature(url, feature=FEATURES.DEALS)
 
     def test_costcenter_visibility(self):
         """Cost centers are invisible without LABOR_COSTS"""
@@ -291,7 +291,7 @@ class HistoryTest(TestCase):
         url = "/history/reporting_costcenter/id/{}/".format(
             factories.CostCenterFactory.create().pk
         )
-        self.assert_404_without_feature(url, feature="labor_costs")
+        self.assert_404_without_feature(url, feature=FEATURES.LABOR_COSTS)
 
     def test_everything(self):
         """The EVERYTHING object truly contains everything"""

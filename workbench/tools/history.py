@@ -226,14 +226,13 @@ def _accounts_user_cfg(user):
     fields = {
         "email",
         "is_active",
-        "is_admin",
         "_short_name",
         "_full_name",
-        "enforce_same_week_logging",
         "language",
         "working_time_model",
         "planning_hours_per_day",
         "person",
+        "_features",
     }
     related = [(Employment, "user_id"), (Absence, "user_id")]
     if user.features[FEATURES.PLANNING]:

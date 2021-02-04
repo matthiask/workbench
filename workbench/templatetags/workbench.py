@@ -246,13 +246,6 @@ def percentage(value, one):
 
 
 @register.filter
-def has_feature(user, feature):
-    if not hasattr(user, "features"):  # e.g. AnonymousUser
-        return False
-    return user.features[feature]
-
-
-@register.filter
 def label(instance, field):
     return capfirst(instance._meta.get_field(field).verbose_name)
 

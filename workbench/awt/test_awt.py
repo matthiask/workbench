@@ -7,7 +7,7 @@ from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
 
 from workbench import factories
-from workbench.accounts.features import FEATURES
+from workbench.accounts.features import FEATURES, F
 from workbench.awt.models import Absence, Employment
 from workbench.awt.reporting import active_users, annual_working_time
 from workbench.awt.utils import monthly_days
@@ -152,7 +152,8 @@ class AWTTest(TestCase):
 
     def test_admin_list(self):
         """The admin changelist of years contains the calculated sum of working days"""
-        self.client.force_login(factories.UserFactory.create(is_admin=True))
+        user = factories.UserFactory.create(is_admin=True)
+        self.client.force_login(user)
         factories.YearFactory.create()
         response = self.client.get("/admin/awt/year/")
         self.assertContains(response, '<td class="field-days">360.00</td>')
@@ -423,9 +424,9 @@ class AWTTest(TestCase):
             Absence(**kw, ends_on=dt.date(2022, 1, 30)).full_clean()
         self.assertEqual(list(cm.exception), msg)
 
-    @override_settings(FEATURES={FEATURES.WORKING_TIME_CORRECTION: False})
+    @override_settings(FEATURES={FEATURES.WORKING_TIME_CORRECTION: F.NEVER})
     def test_correction(self):
-        """Absences with reason "correction" only with bookkeeping"""
+        """Absences with reason "correction" only with WORKING_TIME_CORRECTION"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -442,9 +443,11 @@ class AWTTest(TestCase):
         )
         self.assertContains(response, "You are not permitted to edit absences of type")
 
-    def test_absences_without_enforce_same_week_logging(self):
-        """Absences in past years without enforce_same_week_logging"""
-        user = factories.UserFactory.create(enforce_same_week_logging=False)
+    def test_absences_with_late_logging(self):
+        """Absences in past years with LATE_LOGGING"""
+        user = factories.UserFactory.create()
+        user._features.append(FEATURES.LATE_LOGGING)
+        user.save()
         self.client.force_login(user)
         response = self.client.post(
             "/absences/create/",

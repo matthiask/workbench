@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from workbench import factories
+from workbench.accounts.features import F
 from workbench.tools.search import process_query
 
 
@@ -25,7 +26,7 @@ class SearchTest(TestCase):
         self.assertContains(response, "offers")
         self.assertContains(response, "deals")
 
-        with override_settings(FEATURES={"controlling": False}):
+        with override_settings(FEATURES={"CONTROLLING": F.NEVER}):
             response = self.client.get("/search/?q=Test")
             self.assertContains(response, project.get_absolute_url())
 

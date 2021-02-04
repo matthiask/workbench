@@ -428,7 +428,7 @@ class LoggedHoursForm(ModelForm):
             self.fields.pop("service_description")
             self.fields.pop("service_role")
             if (
-                self.instance.rendered_by.enforce_same_week_logging
+                not self.instance.rendered_by.features[FEATURES.LATE_LOGGING]
                 and self.instance.rendered_on < logbook_lock()
             ):
                 self.fields["hours"].disabled = True
@@ -481,7 +481,7 @@ class LoggedHoursForm(ModelForm):
         if all(
             f in self.fields and data.get(f) for f in ["rendered_by", "rendered_on"]
         ) and (not self.instance.pk or ("rendered_on" in self.changed_data)):
-            if not data["rendered_by"].enforce_same_week_logging:
+            if data["rendered_by"].features[FEATURES.LATE_LOGGING]:
                 # Fine
                 pass
             elif data["rendered_on"] < logbook_lock():

@@ -8,6 +8,7 @@ from django.utils import timezone
 from time_machine import travel
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
 from workbench.logbook.models import Break
 from workbench.timer.models import Timestamp
 from workbench.tools.forms import WarningsForm
@@ -266,7 +267,7 @@ class BreaksTest(TestCase):
             "modal-description": "Test",
         }
 
-        with override_settings(FEATURES={"skip_breaks": False}):
+        with override_settings(FEATURES={FEATURES.SKIP_BREAKS: F.NEVER}):
             response = self.client.post(
                 service.project.urls["createhours"],
                 data,
@@ -288,7 +289,7 @@ class BreaksTest(TestCase):
             )
             self.assertEqual(response.status_code, 201)
 
-        # With skip_breaks=True, everything just works
+        # With SKIP_BREAKS=True, everything just works
         response = self.client.post(
             service.project.urls["createhours"],
             {**data, "modal-hours": "3.0"},  # No duplicate
@@ -297,6 +298,6 @@ class BreaksTest(TestCase):
         self.assertEqual(response.status_code, 201)
 
         # Now the message also appears by default
-        with override_settings(FEATURES={"skip_breaks": False}):
+        with override_settings(FEATURES={FEATURES.SKIP_BREAKS: F.NEVER}):
             response = self.client.get("/")
             self.assertContains(response, "You should take")

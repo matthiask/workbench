@@ -5,6 +5,7 @@ from functools import total_ordering
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.postgres.fields import ArrayField
 from django.core.signing import BadSignature, Signer
 from django.db import connections, models
 from django.db.models import Count, Q, Sum
@@ -12,11 +13,42 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from workbench.accounts.features import FEATURES, UserFeatures
+from workbench.accounts.features import FEATURES, F
 from workbench.tools.formats import Z1
 from workbench.tools.models import Model
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import in_days, monday
+
+
+KNOWN_FEATURES = {getattr(FEATURES, attr) for attr in dir(FEATURES) if attr.isupper()}
+
+
+class UnknownFeature(Exception):
+    pass
+
+
+class UserFeatures:
+    def __init__(self, *, features):
+        self.features = set(features)
+
+    def __getattr__(self, key):
+        try:
+            setting = settings.FEATURES[key]
+        except KeyError:
+            if key not in KNOWN_FEATURES:
+                raise UnknownFeature("Unknown feature: %r" % key)
+
+            return False
+        if setting is F.ALWAYS:
+            return True
+        elif setting is F.NEVER:
+            return False
+        elif setting is F.USER:
+            return key in self.features
+
+        raise ValueError(f"Unknown setting value {setting} for {key}")
+
+    __getitem__ = __getattr__
 
 
 signer = Signer(salt="user")
@@ -49,9 +81,9 @@ class UserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             working_time_model=WorkingTimeModel.objects.first(),
+            is_admin=True,
         )
         user.set_unusable_password()
-        user.is_admin = True
         user.save(using=self._db)
         return user
 
@@ -98,9 +130,6 @@ class User(Model, AbstractBaseUser):
     _short_name = models.CharField(_("initials"), blank=True, max_length=30)
     _full_name = models.CharField(_("full name"), blank=True, max_length=200)
 
-    enforce_same_week_logging = models.BooleanField(
-        _("enforce same week logging"), default=True
-    )
     language = models.CharField(
         _("language"), max_length=10, choices=settings.LANGUAGES
     )
@@ -122,6 +151,13 @@ class User(Model, AbstractBaseUser):
         blank=True,
         null=True,
         verbose_name=_("person"),
+    )
+    _features = ArrayField(
+        models.CharField(max_length=50),
+        verbose_name=_("features"),
+        blank=True,
+        null=True,
+        default=list,
     )
 
     objects = UserManager()
@@ -207,7 +243,7 @@ class User(Model, AbstractBaseUser):
 
     @cached_property
     def features(self):
-        return UserFeatures(email=self.email)
+        return UserFeatures(features=self._features)
 
     @cached_property
     def latest_created_at(self):

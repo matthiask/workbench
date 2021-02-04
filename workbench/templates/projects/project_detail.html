@@ -20,7 +20,7 @@
       {% link_or_none project.contact %}
       &nbsp;
 
-      {% if request.user|has_feature:FEATURES.CAMPAIGNS %}
+      {% if request.user.features.CAMPAIGNS %}
         <strong>{% translate 'campaign'|capfirst %}:</strong>
         {% link_or_none project.campaign %}
       {% endif %}
@@ -52,7 +52,7 @@
           </span>
           <span class="col-md-4">
 
-            {% if request.user|has_feature:FEATURES.CONTROLLING %}
+            {% if request.user.features.CONTROLLING %}
               <table class="table table-borderless table-sm">
                 <tr>
                   <th class="text-right">{% translate 'Total costs' %}</th>
@@ -103,12 +103,12 @@
         {% translate 'Copy' %}</a>
       <a href="{{ object.urls.statistics }}" class="btn btn-primary" data-toggle="ajaxmodal">
         {% translate 'Statistics' %}</a>
-      {% if request.user|has_feature:FEATURES.PLANNING %}
+      {% if request.user.features.PLANNING %}
         <a href="{{ object.urls.planning }}" class="btn btn-primary">
           {% include 'svg/project.svg' %} {% translate 'planning'|capfirst %}</a>
       {% endif %}
 
-      {% if request.user|has_feature:FEATURES.CONTROLLING and project.grouped_services.offers|length > 1 %}
+      {% if request.user.features.CONTROLLING and project.grouped_services.offers|length > 1 %}
         <span class="dropdown">
           <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             {% translate 'Project offers' %}
@@ -152,7 +152,7 @@
             </div>
 
             <div>
-              {% if request.user|has_feature:FEATURES.CONTROLLING %}
+              {% if request.user.features.CONTROLLING %}
                 <span class="btn-group {% if offer.is_declined %}offer-{{ offer.id }}-collapsed collapse{% endif %}">
                   <a href="{{ offer.urls.pdf }}" class="btn btn-primary btn-sm" target="_blank" rel="noopener noreferrer">PDF</a>
                   <button type="button" class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -165,7 +165,7 @@
                 </span>
               {% endif %}
 
-              {% if request.user|has_feature:FEATURES.PLANNING %}
+              {% if request.user.features.PLANNING %}
                 <span class="dropdown">
                   <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
                     id="offer-planning-dropdown-{{ offer.pk }}"
@@ -180,7 +180,7 @@
                 </span>
               {% endif %}
 
-              {% if request.user|has_feature:FEATURES.CONTROLLING %}
+              {% if request.user.features.CONTROLLING %}
                 <span class="dropdown {% if offer.is_declined %}offer-{{ offer.id }}-collapsed collapse{% endif %}">
                   <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
                     id="offer-dropdown-{{ offer.pk }}"
@@ -220,7 +220,7 @@
           <div class="d-flex w-100 justify-content-between">
             <h5 class="d-inline my-0">{% translate 'Not offered yet' %}</h5>
 
-            {% if request.user|has_feature:FEATURES.CONTROLLING %}
+            {% if request.user.features.CONTROLLING %}
               <a href="{{ project.urls.createoffer }}" class="btn btn-primary btn-sm">
                 {% include 'svg/plus.svg' %} {% translate 'offer'|capfirst %}</a>
             {% endif %}
@@ -259,7 +259,7 @@
               <span class="btn btn-primary btn-sm" title="{% translate 'Sort' %}" data-sortable-grabber>
                 {% include 'svg/grabber.svg' %}</span>
 
-              {% if request.user|has_feature:FEATURES.PLANNING %}
+              {% if request.user.features.PLANNING %}
                 <span class="dropdown">
                   <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
                     id="service-planning-dropdown-{{ row.service.pk }}"
@@ -274,7 +274,7 @@
                 </span>
               {% endif %}
 
-              {% if request.user|has_feature:FEATURES.CONTROLLING %}
+              {% if request.user.features.CONTROLLING %}
                 <span class="dropdown">
                   <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
                     id="service-dropdown-{{ row.service.pk }}"
@@ -362,7 +362,7 @@
     </div>
     {% endfor %}
 
-    {% if request.user|has_feature:FEATURES.CONTROLLING and object.project_invoices %}
+    {% if request.user.features.CONTROLLING and object.project_invoices %}
     <div class="card my-3">
       <div class="card-header d-flex align-items-center justify-content-between">
         <h5 class="d-inline my-0">{% translate 'invoices' %}</h5>
@@ -388,7 +388,7 @@
     </div>
     {% endif %}
 
-    {% if request.user|has_feature:FEATURES.CONTROLLING %}
+    {% if request.user.features.CONTROLLING %}
       <span class="dropdown">
         <button class="btn btn-primary dropdown-toggle" type="button"
           id="invoice-dropdown-button" data-toggle="dropdown"

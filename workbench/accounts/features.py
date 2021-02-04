@@ -1,9 +1,10 @@
+from enum import Enum, auto
 from functools import wraps
 
-from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-from django.utils.translation import gettext as _
+from django.utils.text import capfirst
+from django.utils.translation import gettext_lazy as _
 
 
 def feature_required(feature):
@@ -20,46 +21,71 @@ def feature_required(feature):
     return decorator
 
 
-class FEATURES:
-    BOOKKEEPING = "bookkeeping"
-    CAMPAIGNS = "campaigns"
-    CONTROLLING = "controlling"
-    DEALS = "deals"
-    FOREIGN_CURRENCIES = "foreign_currencies"
-    GLASSFROG = "glassfrog"
-    LABOR_COSTS = "labor_costs"
-    PLANNING = "planning"
-    SKIP_BREAKS = "skip_breaks"
-    WORKING_TIME_CORRECTION = "working_time_correction"
+class FEATURES(str, Enum):
+    BOOKKEEPING = "BOOKKEEPING"
+    CAMPAIGNS = "CAMPAIGNS"
+    CONTROLLING = "CONTROLLING"
+    DEALS = "DEALS"
+    FOREIGN_CURRENCIES = "FOREIGN_CURRENCIES"
+    GLASSFROG = "GLASSFROG"
+    LABOR_COSTS = "LABOR_COSTS"
+    LATE_LOGGING = "LATE_LOGGING"
+    PLANNING = "PLANNING"
+    SKIP_BREAKS = "SKIP_BREAKS"
+    WORKING_TIME_CORRECTION = "WORKING_TIME_CORRECTION"
+
+
+LABELS = {
+    FEATURES.BOOKKEEPING: {
+        "label": _("Bookkeeping"),
+    },
+    FEATURES.CAMPAIGNS: {
+        "label": capfirst(_("campaigns")),
+        "help_text": _("Campaigns allow grouping projects."),
+    },
+    FEATURES.CONTROLLING: {
+        "label": _("Controlling"),
+    },
+    FEATURES.DEALS: {
+        "label": _("Deals"),
+        "help_text": _("Allow managing the acquisition pipeline."),
+    },
+    FEATURES.FOREIGN_CURRENCIES: {
+        "label": _("Foreign currencies for expenses"),
+    },
+    FEATURES.GLASSFROG: {
+        "label": _("GlassFrog integration"),
+    },
+    FEATURES.LABOR_COSTS: {
+        "label": capfirst(_("labor costs")),
+    },
+    FEATURES.LATE_LOGGING: {
+        "label": _("Late logging"),
+        "help_text": _("Hours and absences can be added and changed late."),
+    },
+    FEATURES.PLANNING: {
+        "label": capfirst(_("planning")),
+    },
+    FEATURES.SKIP_BREAKS: {
+        "label": capfirst(_("Skip breaks")),
+        "help_text": _("Skip the missing breaks nag."),
+    },
+    FEATURES.WORKING_TIME_CORRECTION: {
+        "label": capfirst(_("Working time correction")),
+        "help_text": _(
+            "This user may add and change absences of type Working time correction."
+        ),
+    },
+}
+
+
+class F(Enum):
+    ALWAYS = auto()
+    NEVER = auto()
+    USER = auto()
 
 
 bookkeeping_only = feature_required(FEATURES.BOOKKEEPING)
 controlling_only = feature_required(FEATURES.CONTROLLING)
 deals_only = feature_required(FEATURES.DEALS)
 labor_costs_only = feature_required(FEATURES.LABOR_COSTS)
-
-
-KNOWN_FEATURES = {getattr(FEATURES, attr) for attr in dir(FEATURES) if attr.isupper()}
-
-
-class UnknownFeature(Exception):
-    pass
-
-
-class UserFeatures:
-    def __init__(self, *, email):
-        self.email = email
-
-    def __getattr__(self, key):
-        try:
-            setting = settings.FEATURES[key]
-        except KeyError:
-            if key not in KNOWN_FEATURES:
-                raise UnknownFeature("Unknown feature: %r" % key)
-
-            return False
-        if setting is True or setting is False:
-            return setting
-        return self.email in setting
-
-    __getitem__ = __getattr__

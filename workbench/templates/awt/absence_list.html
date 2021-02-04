@@ -8,7 +8,7 @@
     {% include "svg/plus.svg" %}
     {{ view.meta.verbose_name }}
   </a>
-  {% if request.GET and request.user|has_feature:FEATURES.CONTROLLING %}<a href="{% querystring export='xlsx' %}" class="btn btn-primary">
+  {% if request.GET and request.user.features.CONTROLLING %}<a href="{% querystring export='xlsx' %}" class="btn btn-primary">
     {% include 'svg/desktop-download.svg' %} XLSX</a>{% endif %}
 {% endblock %}
 

@@ -25,10 +25,10 @@
         <li class="nav-item"><a class="nav-link" href="/">{% translate 'dashboard'|capfirst %}</a></li>
         {% mark_current request.path %}
         <li class="nav-item"><a class="nav-link" href="{% url 'projects_project_list' %}">{% translate 'projects'|capfirst %}</a></li>
-        {% if request.user|has_feature:FEATURES.CONTROLLING %}
+        {% if request.user.features.CONTROLLING %}
           <li class="nav-item"><a class="nav-link" href="{% url 'invoices_invoice_list' %}">{% translate 'invoices'|capfirst %}</a></li>
         {% endif %}
-        {% if request.user|has_feature:FEATURES.DEALS %}
+        {% if request.user.features.DEALS %}
           <li class="nav-item"><a class="nav-link" href="{% url 'deals_deal_list' %}">{% translate 'deals'|capfirst %}</a></li>
         {% endif %}
         <li class="nav-item"><a class="nav-link" href="{% url 'contacts' %}">{% translate 'contacts'|capfirst %}</a></li>
@@ -51,11 +51,11 @@
             {% translate 'bookkeeping'|capfirst %}
           </a>
           <div class="dropdown-menu" aria-labelledby="bookkeepingDropdown">
-            {% if request.user|has_feature:FEATURES.CONTROLLING %}
+            {% if request.user.features.CONTROLLING %}
               <a class="dropdown-item" href="{% url 'invoices_recurringinvoice_list' %}">{% translate 'recurring invoices'|capfirst %}</a>
               <a class="dropdown-item" href="{% url 'credit_control_creditentry_list' %}">{% translate 'credit entries'|capfirst %}</a>
             {% endif %}
-            {% if request.user|has_feature:FEATURES.BOOKKEEPING %}
+            {% if request.user.features.BOOKKEEPING %}
               <a class="dropdown-item" href="{% url 'invoices_reminders' %}">{% translate 'Reminders' %}</a>
             {% endif %}
             <a class="dropdown-item" href="{% url 'expenses_expensereport_list' %}">{% translate 'expense reports'|capfirst %}</a>
@@ -67,7 +67,7 @@
             {% translate 'reports'|capfirst %}
           </a>
           <div class="dropdown-menu" aria-labelledby="reportsDropdown">
-            {% if request.user|has_feature:FEATURES.CONTROLLING %}
+            {% if request.user.features.CONTROLLING %}
               <a class="dropdown-item" href="{% url 'report_key_data' %}">{% translate 'Key data' %}</a>
             {% endif %}
 
@@ -76,7 +76,7 @@
             <a class="dropdown-item" href="{% url 'awt_year_report' %}">{% translate 'annual working time'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'awt_absence_calendar' %}">{% translate 'Absence calendar' %}</a>
 
-            {% if request.user|has_feature:FEATURES.CONTROLLING %}
+            {% if request.user.features.CONTROLLING %}
               <div class="dropdown-divider"></div>
               <div class="dropdown-header">{% translate 'projects'|capfirst %}</div>
               <a class="dropdown-item" href="{% url 'report_project_budget_statistics' %}">{% translate 'Project budget statistics' %}</a>
@@ -86,7 +86,7 @@
               <a class="dropdown-item" href="{% url 'report_open_items_list' %}">{% translate 'Open items list' %}</a>
               <div class="dropdown-divider"></div>
               <div class="dropdown-header">{% translate 'logged hours'|capfirst %}</div>
-              {% if request.user|has_feature:FEATURES.GLASSFROG %}
+              {% if request.user.features.GLASSFROG %}
                 <a class="dropdown-item" href="{% url 'report_hours_by_circle' %}">{% translate 'Hours by circle'|capfirst %}</a>
                 <a class="dropdown-item" href="{% url 'report_hours_per_work_category' %}">{% translate 'Hours per work category' %}</a>
               {% endif %}
@@ -95,7 +95,7 @@
               <a class="dropdown-item" href="{% url 'report_logging' %}">{% translate 'Logging statistics' %}</a>
             {% endif %} {# CONTROLLING #}
 
-            {% if request.user|has_feature:FEATURES.DEALS %}
+            {% if request.user.features.DEALS %}
               <div class="dropdown-divider"></div>
               <div class="dropdown-header">{% translate 'deals'|capfirst %}</div>
               <a class="dropdown-item" href="{% url 'report_accepted_deals' %}">{% translate 'Accepted deals' %}</a>
@@ -103,7 +103,7 @@
               <a class="dropdown-item" href="{% url 'report_deal_history' %}">{% translate 'Deal history' %}</a>
             {% endif %}
 
-            {% if request.user|has_feature:FEATURES.LABOR_COSTS %}
+            {% if request.user.features.LABOR_COSTS %}
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="{% url 'report_labor_costs' %}">{% translate 'Labor costs' %}</a>
             {% endif %}
@@ -122,7 +122,7 @@
 
             <div class="dropdown-header">{{ request.user.get_full_name }}</div>
             <a class="dropdown-item" href="{% url 'accounts_update' %}">{% translate 'Settings' %}</a>
-            {% if request.user|has_feature:FEATURES.PLANNING %}
+            {% if request.user.features.PLANNING %}
             <div class="dropdown-divider"></div>
             <div class="dropdown-header">{% translate 'planning'|capfirst %}</div>
             <a class="dropdown-item" href="{{ request.user.urls.planning }}">{% translate 'planned work'|capfirst %}</a>

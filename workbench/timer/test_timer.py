@@ -19,7 +19,7 @@ from workbench.tools.formats import local_date_format
 class TimerTest(TestCase):
     def test_timer(self):
         """The timer view does not crash"""
-        user = factories.UserFactory.create(is_admin=True)
+        user = factories.UserFactory.create()
         self.client.force_login(user)
 
         response = self.client.get("/timer/")

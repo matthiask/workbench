@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
 from workbench.contacts.models import Organization
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
@@ -542,7 +543,7 @@ class ProjectsTest(TestCase):
         self.assertEqual(service.effort_rate, 250)
         self.assertEqual(service.effort_type, "Pauschalsatz")
 
-    @override_settings(FEATURES={"glassfrog": False})
+    @override_settings(FEATURES={FEATURES.GLASSFROG: F.NEVER})
     def test_no_role(self):
         """The service form has no role field when not GLASSFROG"""
         project = factories.ProjectFactory.create()
@@ -561,7 +562,7 @@ class ProjectsTest(TestCase):
         response = self.client.get(project.urls["update"])
         self.assertContains(response, "id_flat_rate")
 
-        with override_settings(FEATURES={"controlling": False}):
+        with override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER}):
             response = self.client.get(project.urls["update"])
             self.assertNotContains(response, "id_flat_rate")
 

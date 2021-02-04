@@ -1,32 +1,15 @@
 import datetime as dt
 from decimal import Decimal
 
-from django.core import mail
 from django.test import RequestFactory, TestCase
 
-from time_machine import travel
-
 from workbench import factories
-from workbench.reporting.accounting import send_accounting_files
 from workbench.reporting.labor_costs import labor_costs_by_cost_center
 from workbench.reporting.models import Accruals
 from workbench.reporting.views import DateRangeAndTeamFilterForm
 
 
 class ReportingTest(TestCase):
-    def test_send_accounting_files(self):
-        """Accounting files are automatically sent on the first day of the year"""
-        factories.UserFactory.create(is_admin=True)
-        factories.ProjectFactory.create()
-
-        with travel("2019-12-26 12:00"):
-            send_accounting_files()
-            self.assertEqual(len(mail.outbox), 0)
-
-        with travel("2020-01-01 12:00"):
-            send_accounting_files()
-            self.assertEqual(len(mail.outbox), 1)
-
     def test_accruals(self):
         """Accrual calculation does not crash..."""
         obj = Accruals.objects.for_cutoff_date(dt.date.today())

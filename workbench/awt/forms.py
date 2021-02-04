@@ -91,7 +91,7 @@ class AbsenceForm(ModelForm, WarningsForm):
         data = super().clean()
         if (starts_on := data.get("starts_on")) and (user := data.get("user")):
             today = dt.date.today()
-            if user.enforce_same_week_logging and starts_on.year < today.year:
+            if not user.features[FEATURES.LATE_LOGGING] and starts_on.year < today.year:
                 self.add_error(
                     "starts_on", _("Creating absences for past years is not allowed.")
                 )

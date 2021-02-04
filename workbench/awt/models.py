@@ -187,7 +187,7 @@ class Absence(Model):
     @classmethod
     def allow_update(cls, instance, request):
         if (
-            instance.user.enforce_same_week_logging
+            not instance.user.features[FEATURES.LATE_LOGGING]
             and instance.starts_on.year < dt.date.today().year
         ):
             messages.error(request, _("Absences of past years are locked."))
