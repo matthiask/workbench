@@ -299,7 +299,7 @@ select max(created_at) from sq
         )
 
     def take_a_break_warning(self, *, add=0, day=None, request=None):
-        if self.features[FEATURES.SKIP_BREAKS]:
+        if not self.features[FEATURES.BREAKS_NAG]:
             return None
 
         day = day or dt.date.today()

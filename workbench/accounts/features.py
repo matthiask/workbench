@@ -31,13 +31,17 @@ class FEATURES(str, Enum):
     LABOR_COSTS = "LABOR_COSTS"
     LATE_LOGGING = "LATE_LOGGING"
     PLANNING = "PLANNING"
-    SKIP_BREAKS = "SKIP_BREAKS"
+    BREAKS_NAG = "BREAKS_NAG"
     WORKING_TIME_CORRECTION = "WORKING_TIME_CORRECTION"
 
 
 LABELS = {
     FEATURES.BOOKKEEPING: {
         "label": _("Bookkeeping"),
+    },
+    FEATURES.BREAKS_NAG: {
+        "label": capfirst(_("Breaks nag")),
+        "help_text": _("Warn if user is taking an insufficient amount of breaks."),
     },
     FEATURES.CAMPAIGNS: {
         "label": capfirst(_("campaigns")),
@@ -65,10 +69,6 @@ LABELS = {
     },
     FEATURES.PLANNING: {
         "label": capfirst(_("planning")),
-    },
-    FEATURES.SKIP_BREAKS: {
-        "label": capfirst(_("Skip breaks")),
-        "help_text": _("Skip the missing breaks nag."),
     },
     FEATURES.WORKING_TIME_CORRECTION: {
         "label": capfirst(_("Working time correction")),

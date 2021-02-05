@@ -267,7 +267,7 @@ class BreaksTest(TestCase):
             "modal-description": "Test",
         }
 
-        with override_settings(FEATURES={FEATURES.SKIP_BREAKS: F.NEVER}):
+        with override_settings(FEATURES={FEATURES.BREAKS_NAG: F.ALWAYS}):
             response = self.client.post(
                 service.project.urls["createhours"],
                 data,
@@ -289,15 +289,16 @@ class BreaksTest(TestCase):
             )
             self.assertEqual(response.status_code, 201)
 
-        # With SKIP_BREAKS=True, everything just works
-        response = self.client.post(
-            service.project.urls["createhours"],
-            {**data, "modal-hours": "3.0"},  # No duplicate
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
-        self.assertEqual(response.status_code, 201)
+        with override_settings(FEATURES={FEATURES.BREAKS_NAG: F.NEVER}):
+            # With BREAKS_NAG=F.NEVER, everything just works
+            response = self.client.post(
+                service.project.urls["createhours"],
+                {**data, "modal-hours": "3.0"},  # No duplicate
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            )
+            self.assertEqual(response.status_code, 201)
 
         # Now the message also appears by default
-        with override_settings(FEATURES={FEATURES.SKIP_BREAKS: F.NEVER}):
+        with override_settings(FEATURES={FEATURES.BREAKS_NAG: F.ALWAYS}):
             response = self.client.get("/")
             self.assertContains(response, "You should take")

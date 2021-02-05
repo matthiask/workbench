@@ -218,6 +218,7 @@ WORKBENCH = {
         URL="https://workbench.feinheit.ch",
         FEATURES={
             FEATURES.BOOKKEEPING: F.USER,
+            FEATURES.BREAKS_NAG: F.ALWAYS,
             FEATURES.CAMPAIGNS: F.ALWAYS,
             FEATURES.CONTROLLING: F.ALWAYS,
             FEATURES.DEALS: F.ALWAYS,
@@ -226,7 +227,6 @@ WORKBENCH = {
             FEATURES.LABOR_COSTS: F.NEVER,
             FEATURES.LATE_LOGGING: F.USER,
             FEATURES.PLANNING: F.ALWAYS,
-            FEATURES.SKIP_BREAKS: F.NEVER,
             FEATURES.WORKING_TIME_CORRECTION: F.USER,
         },
         READ_WRITE_ADMIN=False,
@@ -261,6 +261,7 @@ WORKBENCH = {
         URL="https://workbench.diebruchpiloten.com",
         FEATURES={
             FEATURES.BOOKKEEPING: F.ALWAYS,
+            FEATURES.BREAKS_NAG: F.ALWAYS,
             FEATURES.CAMPAIGNS: F.NEVER,
             FEATURES.CONTROLLING: F.ALWAYS,
             FEATURES.DEALS: F.NEVER,
@@ -269,7 +270,6 @@ WORKBENCH = {
             FEATURES.LABOR_COSTS: F.NEVER,
             FEATURES.LATE_LOGGING: F.ALWAYS,
             FEATURES.PLANNING: F.NEVER,
-            FEATURES.SKIP_BREAKS: F.NEVER,
             FEATURES.WORKING_TIME_CORRECTION: F.ALWAYS,
         },
         READ_WRITE_ADMIN=False,
@@ -305,6 +305,7 @@ WORKBENCH = {
         URL="https://workbench.blindflugstudios.com",
         FEATURES={
             FEATURES.BOOKKEEPING: F.USER,
+            FEATURES.BREAKS_NAG: F.NEVER,
             FEATURES.CAMPAIGNS: F.NEVER,
             FEATURES.CONTROLLING: F.USER,
             FEATURES.DEALS: F.NEVER,
@@ -313,7 +314,6 @@ WORKBENCH = {
             FEATURES.LABOR_COSTS: F.USER,
             FEATURES.LATE_LOGGING: F.USER,
             FEATURES.PLANNING: F.NEVER,
-            FEATURES.SKIP_BREAKS: F.ALWAYS,  # For now
             FEATURES.WORKING_TIME_CORRECTION: F.USER,
         },
         READ_WRITE_ADMIN=True,
@@ -346,6 +346,7 @@ WORKBENCH = {
         URL="https://workbench-test.feinheit.ch",
         FEATURES={
             FEATURES.BOOKKEEPING: F.ALWAYS,
+            FEATURES.BREAKS_NAG: F.ALWAYS,
             FEATURES.CAMPAIGNS: F.NEVER,
             FEATURES.CONTROLLING: F.ALWAYS,
             FEATURES.DEALS: F.ALWAYS,
@@ -354,7 +355,6 @@ WORKBENCH = {
             FEATURES.LABOR_COSTS: F.ALWAYS,
             FEATURES.LATE_LOGGING: None,
             FEATURES.PLANNING: F.ALWAYS,
-            FEATURES.SKIP_BREAKS: F.NEVER,
             FEATURES.WORKING_TIME_CORRECTION: F.ALWAYS,
         },
         READ_WRITE_ADMIN=False,

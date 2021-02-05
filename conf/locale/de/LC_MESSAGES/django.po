@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-05 08:50+0100\n"
+"POT-Creation-Date: 2021-02-05 08:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,6 +28,14 @@ msgstr "Feature nicht verfügbar"
 #: workbench/accounts/features.py
 msgid "Bookkeeping"
 msgstr "Buchhaltung"
+
+#: workbench/accounts/features.py
+msgid "Breaks nag"
+msgstr "Pausenmeckerei"
+
+#: workbench/accounts/features.py
+msgid "Warn if user is taking an insufficient amount of breaks."
+msgstr "Warenn, wenn die Nutzer*in nicht genügend Pausen macht."
 
 #: workbench/accounts/features.py workbench/projects/models.py
 #: workbench/templates/projects/object_list.html
@@ -79,14 +87,6 @@ msgstr ""
 #: workbench/templates/projects/project_detail.html
 msgid "planning"
 msgstr "Planung"
-
-#: workbench/accounts/features.py
-msgid "Skip breaks"
-msgstr "Pausenerkennung überspringen"
-
-#: workbench/accounts/features.py
-msgid "Skip the missing breaks nag."
-msgstr "Die Warnung betreffend fehlenden Pausen überspringen."
 
 #: workbench/accounts/features.py workbench/awt/models.py workbench/awt/pdf.py
 #: workbench/templates/awt/year_detail.html
@@ -3782,6 +3782,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Skip breaks"
+#~ msgstr "Pausenerkennung überspringen"
+
+#~ msgid "Skip the missing breaks nag."
+#~ msgstr "Die Warnung betreffend fehlenden Pausen überspringen."
 
 #~ msgid "enforce same week logging"
 #~ msgstr "Stundenerfassung in der gleichen Woche erzwingen"
