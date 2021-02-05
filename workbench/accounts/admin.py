@@ -18,12 +18,12 @@ class FeaturesWidget(forms.TextInput):
 
         def checkbox(feature, **kwargs):
             ret = {"value": feature, **kwargs}
-            value = settings.FEATURES[feature]
+            value = settings.FEATURES.get(feature, F.NEVER)
             if value == F.ALWAYS:
                 ret["attrs"] = "checked disabled"
             elif value == F.NEVER:
                 ret["attrs"] = "disabled"
-            elif value in current:
+            elif feature in current:
                 ret["attrs"] = "checked"
             return ret
 

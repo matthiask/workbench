@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-02 15:17+0100\n"
+"POT-Creation-Date: 2021-02-05 08:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,13 +17,87 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: workbench/accounts/__init__.py workbench/templates/base.html
+#: workbench/accounts/apps.py workbench/templates/base.html
 msgid "accounts"
 msgstr "Konten"
 
 #: workbench/accounts/features.py
 msgid "Feature not available"
 msgstr "Feature nicht verfügbar"
+
+#: workbench/accounts/features.py
+msgid "Bookkeeping"
+msgstr "Buchhaltung"
+
+#: workbench/accounts/features.py workbench/projects/models.py
+#: workbench/templates/projects/object_list.html
+msgid "campaigns"
+msgstr "Kampagnen"
+
+#: workbench/accounts/features.py
+msgid "Campaigns allow grouping projects."
+msgstr "Kampagnen ermöglichen die Gruppierung von Projekten."
+
+#: workbench/accounts/features.py
+msgid "Controlling"
+msgstr "Controller"
+
+#: workbench/accounts/features.py
+msgid "Deals"
+msgstr "Geschäfte"
+
+#: workbench/accounts/features.py
+msgid "Allow managing the acquisition pipeline."
+msgstr "Erlaubt das Management der Akquise-Pipeline."
+
+#: workbench/accounts/features.py
+msgid "Foreign currencies for expenses"
+msgstr "Fremdwährungen für Spesen."
+
+#: workbench/accounts/features.py
+msgid "GlassFrog integration"
+msgstr "GlassFrog-Integration"
+
+#: workbench/accounts/features.py
+msgid "labor costs"
+msgstr "Personalaufwand"
+
+#: workbench/accounts/features.py
+msgid "Late logging"
+msgstr "Späte Leistungserfassung erlauben"
+
+#: workbench/accounts/features.py
+msgid "Hours and absences can be added and changed late."
+msgstr ""
+"Stunden und Abwesenheiten können spät hinzugefügt und verändert werden."
+
+#: workbench/accounts/features.py workbench/planning/apps.py
+#: workbench/templates/accounts/team_detail.html workbench/templates/base.html
+#: workbench/templates/planning/project_planning.html
+#: workbench/templates/planning/team_planning.html
+#: workbench/templates/planning/user_planning.html
+#: workbench/templates/projects/project_detail.html
+msgid "planning"
+msgstr "Planung"
+
+#: workbench/accounts/features.py
+msgid "Skip breaks"
+msgstr "Pausenerkennung überspringen"
+
+#: workbench/accounts/features.py
+msgid "Skip the missing breaks nag."
+msgstr "Die Warnung betreffend fehlenden Pausen überspringen."
+
+#: workbench/accounts/features.py workbench/awt/models.py workbench/awt/pdf.py
+#: workbench/templates/awt/year_detail.html
+msgid "Working time correction"
+msgstr "Arbeitszeit-Korrektur"
+
+#: workbench/accounts/features.py
+msgid "This user may add and change absences of type Working time correction."
+msgstr ""
+"Diese Nutzer*in hat die Erlaubnis zur Bearbeitung von «Arbeitszeit-"
+"Korrektur»-Absenzen."
 
 #: workbench/accounts/forms.py
 msgid "Contact your administrator to change this value."
@@ -75,10 +149,6 @@ msgid "full name"
 msgstr "Voller Name"
 
 #: workbench/accounts/models.py
-msgid "enforce same week logging"
-msgstr "Stundenerfassung in der gleichen Woche erzwingen"
-
-#: workbench/accounts/models.py
 msgid "language"
 msgstr "Sprache"
 
@@ -99,6 +169,10 @@ msgstr "Wie viele Stunden sind frei verfügbar für die Projektplanung?"
 #: workbench/templates/contacts/organization_detail.html
 msgid "person"
 msgstr "Person"
+
+#: workbench/accounts/models.py
+msgid "features"
+msgstr "Features"
 
 #: workbench/accounts/models.py workbench/awt/models.py
 #: workbench/logbook/models.py workbench/management/commands/profitability.py
@@ -208,7 +282,7 @@ msgstr "Keine Nutzer*innen mit Emailadresse %s gefunden."
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
-#: workbench/audit/__init__.py
+#: workbench/audit/apps.py
 msgid "audit"
 msgstr "Beweissicherung"
 
@@ -220,14 +294,14 @@ msgstr "aufgezeichnete Aktion"
 msgid "logged actions"
 msgstr "aufgezeichnete Aktionen"
 
-#: workbench/awt/__init__.py workbench/awt/pdf.py
-#: workbench/templates/awt/year_detail.html workbench/templates/base.html
-msgid "annual working time"
-msgstr "Jahresarbeitszeit"
-
 #: workbench/awt/admin.py workbench/awt/models.py
 msgid "days"
 msgstr "Tage"
+
+#: workbench/awt/apps.py workbench/awt/pdf.py
+#: workbench/templates/awt/year_detail.html workbench/templates/base.html
+msgid "annual working time"
+msgstr "Jahresarbeitszeit"
 
 #: workbench/awt/forms.py workbench/contacts/forms.py
 #: workbench/credit_control/forms.py workbench/deals/forms.py
@@ -363,7 +437,7 @@ msgstr "Ferienwochen für ein volles Anstellungsjahr."
 
 #: workbench/awt/models.py workbench/awt/pdf.py workbench/contacts/models.py
 #: workbench/credit_control/forms.py workbench/credit_control/models.py
-#: workbench/credit_control/reporting.py workbench/notes/__init__.py
+#: workbench/credit_control/reporting.py workbench/notes/apps.py
 #: workbench/notes/models.py workbench/planning/models.py
 #: workbench/templates/awt/year_detail.html workbench/templates/base.html
 #: workbench/templates/credit_control/creditentry_list.html
@@ -418,11 +492,6 @@ msgstr "Bezahlter Urlaub (zB Zivildienst, Elternurlaub, Zügeln etc.)"
 #: workbench/awt/models.py
 msgid "other reasons (no working time)"
 msgstr "Andere Gründe (keine Arbeitszeit)"
-
-#: workbench/awt/models.py workbench/awt/pdf.py
-#: workbench/templates/awt/year_detail.html
-msgid "Working time correction"
-msgstr "Arbeitszeit-Korrektur"
 
 #: workbench/awt/models.py workbench/invoices/models.py
 msgid "starts on"
@@ -583,7 +652,7 @@ msgstr ""
 msgid "Everyone"
 msgstr "Alle"
 
-#: workbench/circles/__init__.py workbench/circles/models.py
+#: workbench/circles/apps.py workbench/circles/models.py
 msgid "circles"
 msgstr "Kreise"
 
@@ -660,7 +729,7 @@ msgstr "(entfernt)"
 msgid "Undefined"
 msgstr "Nicht definiert"
 
-#: workbench/contacts/__init__.py workbench/templates/base.html
+#: workbench/contacts/apps.py workbench/templates/base.html
 #: workbench/templates/contacts/object_list.html
 msgid "contacts"
 msgstr "Kontakte"
@@ -886,7 +955,7 @@ msgstr "Postadressen"
 msgid "Jump to person"
 msgstr "Zu Person springen"
 
-#: workbench/credit_control/__init__.py
+#: workbench/credit_control/apps.py
 msgid "credit control"
 msgstr "Debitorenmanagement"
 
@@ -1062,7 +1131,7 @@ msgstr "%(class)s wurden erfolgreich geändert."
 msgid "Assign credit entries"
 msgstr "Zahlungseingänge zuweisen"
 
-#: workbench/deals/__init__.py workbench/deals/models.py
+#: workbench/deals/apps.py workbench/deals/models.py
 #: workbench/templates/base.html workbench/templates/shortcuts.html
 msgid "deals"
 msgstr "Geschäfte"
@@ -1322,7 +1391,7 @@ msgstr ""
 "Die Offerte %(offer)s wurde erfolgreich von den zugehörigen Offerten "
 "entfernt."
 
-#: workbench/expenses/__init__.py workbench/expenses/forms.py
+#: workbench/expenses/apps.py workbench/expenses/forms.py
 #: workbench/logbook/forms.py
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -1448,7 +1517,7 @@ msgstr "%(object)s löschen"
 msgid "%(class)s '%(object)s' has been deleted successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
 
-#: workbench/invoices/__init__.py workbench/invoices/models.py
+#: workbench/invoices/apps.py workbench/invoices/models.py
 #: workbench/templates/base.html
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/invoices/reminders.html
@@ -1539,7 +1608,7 @@ msgid "Select all"
 msgstr "Alles auswählen"
 
 #: workbench/invoices/forms.py workbench/offers/forms.py
-#: workbench/services/__init__.py workbench/services/models.py
+#: workbench/services/apps.py workbench/services/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/offers/offer_pricing.html
 msgid "services"
@@ -1867,7 +1936,7 @@ msgstr "Stunden"
 msgid "cost"
 msgstr "Kosten"
 
-#: workbench/invoices/views.py workbench/logbook/__init__.py
+#: workbench/invoices/views.py workbench/logbook/apps.py
 #: workbench/templates/base.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/projects/campaign_detail.html
@@ -2122,7 +2191,7 @@ msgstr "Konnte Objekt nicht bestimmen, wo die Bemerkung angehängt werden soll."
 msgid "note"
 msgstr "Bemerkung"
 
-#: workbench/offers/__init__.py workbench/offers/models.py
+#: workbench/offers/apps.py workbench/offers/models.py
 #: workbench/templates/projects/object_list.html
 #: workbench/templates/shortcuts.html workbench/templates/start.html
 msgid "offers"
@@ -2231,15 +2300,6 @@ msgstr "Keine Offerten im Projekt."
 msgid "Copy %s to project"
 msgstr "%s zu Projekt kopieren"
 
-#: workbench/planning/__init__.py workbench/templates/accounts/team_detail.html
-#: workbench/templates/base.html
-#: workbench/templates/planning/project_planning.html
-#: workbench/templates/planning/team_planning.html
-#: workbench/templates/planning/user_planning.html
-#: workbench/templates/projects/project_detail.html
-msgid "planning"
-msgstr "Planung"
-
 #: workbench/planning/forms.py
 msgid "Select team"
 msgstr "Team auswählen"
@@ -2327,7 +2387,7 @@ msgstr "Nur Montage erlaubt, aber Feld enthält %s."
 msgid "%(planned_hours)s in %(weeks)s weeks (%(per_week)s per week)"
 msgstr "%(planned_hours)s in %(weeks)s Wochen (%(per_week)s pro Woche)"
 
-#: workbench/projects/__init__.py workbench/projects/models.py
+#: workbench/projects/apps.py workbench/projects/models.py
 #: workbench/templates/base.html
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/object_list.html
@@ -2438,10 +2498,6 @@ msgstr "Codes müssen eindeutig sein."
 msgid "campaign"
 msgstr "Kampagne"
 
-#: workbench/projects/models.py workbench/templates/projects/object_list.html
-msgid "campaigns"
-msgstr "Kampagnen"
-
 #: workbench/projects/models.py
 #: workbench/templates/accounts/user_statistics.html
 msgid "Order"
@@ -2523,10 +2579,6 @@ msgstr "Logbucheinträge von %(instance)s neu zuweisen"
 #: workbench/projects/views.py workbench/templates/shortcuts.html
 msgid "Jump to project"
 msgstr "Zu Projekt springen"
-
-#: workbench/reporting/accounting.py
-msgid "Accounting files"
-msgstr "Buchhaltungsdaten"
 
 #: workbench/reporting/models.py workbench/reporting/views.py
 msgid "cutoff date"
@@ -3730,6 +3782,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "enforce same week logging"
+#~ msgstr "Stundenerfassung in der gleichen Woche erzwingen"
+
+#~ msgid "Accounting files"
+#~ msgstr "Buchhaltungsdaten"
 
 #~ msgid "Total CHF"
 #~ msgstr "Total CHF"
