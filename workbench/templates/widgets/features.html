@@ -2,7 +2,7 @@
 
 <div style="float:left">
   {% for feature in widget.features %}
-  <label style="float:none;width:auto">
+  <label style="float:none;width:auto;{{ feature.style }}">
     <input type="checkbox" name="{{ widget.name }}" value="{{ feature.value }}" {{ feature.attrs }}>
     {{ feature.label }}
     {% if feature.help_text %}<small>{{ feature.help_text }}</small>{% endif %}

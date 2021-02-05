@@ -23,12 +23,16 @@ class FeaturesWidget(forms.TextInput):
                 ret["attrs"] = "checked disabled"
             elif value == F.NEVER:
                 ret["attrs"] = "disabled"
+                ret["style"] = "opacity:0.5;"
             elif feature in current:
                 ret["attrs"] = "checked"
             return ret
 
+        features = ((f, settings.FEATURES.get(f, F.NEVER)) for f in FEATURES)
+        ordering = {F.ALWAYS: 1, F.USER: 2, F.NEVER: 3}
         context["widget"]["features"] = [
-            checkbox(feature, **LABELS[feature]) for feature in FEATURES
+            checkbox(feature, **LABELS[feature])
+            for feature, value in sorted(features, key=lambda row: ordering[row[1]])
         ]
         return context
 
