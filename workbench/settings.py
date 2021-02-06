@@ -178,7 +178,7 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 
 def font(name):
-    return os.path.join(BASE_DIR, "stuff", "fonts", name)
+    return os.path.join(BASE_DIR, "conf", "fonts", name)
 
 
 NAMESPACE = env("NAMESPACE", required=True)
