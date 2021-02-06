@@ -8,6 +8,24 @@
   <link rel="stylesheet" href="{% static 'workbench/workbench.css' %}">
   <link rel="shortcut icon" href="{% static 'workbench/lib/favicon.png' %}">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+  {% if SPARKLES %}
+    <script src="{% static 'workbench/lib/sparkles.js' %}"></script>
+    <style>
+      :root { --blue: #cc1e6e; }
+      .btn-primary {
+        background-color: var(--blue);
+        border-color: var(--blue);
+      }
+      .bg-primary {
+        background-color: var(--blue) !important;
+      }
+      a {
+        color: var(--blue);
+      }
+    </style>
+  {% endif %}
+
 </head>
 
 <body class="d-flex flex-column {% if DEBUG %}debug-is-active{% endif %}" role="document">
