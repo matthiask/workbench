@@ -56,7 +56,7 @@ class CirclesTest(TestCase):
         s2 = factories.ServiceFactory.create(role=r2)
 
         factories.LoggedHoursFactory.create(service=s1, hours=4)
-        factories.LoggedHoursFactory.create(service=s2, hours=6)
+        hours = factories.LoggedHoursFactory.create(service=s2, hours=6)
 
         today = dt.date.today()
         circles = hours_by_circle(
@@ -84,6 +84,23 @@ class CirclesTest(TestCase):
         self.assertNotContains(response, "Role 3")
         self.assertNotContains(response, "Role 4")
         self.assertNotContains(response, "C4")
+
+        response = self.client.get("/report/hours-per-work-category/")
+        # print(response, response.content.decode("utf-8"))
+        self.assertContains(
+            response,
+            """<a href="/logbook/hours/?category=none">10.0h</a>""",
+            html=True,
+        )
+        response = self.client.get(
+            f"/report/hours-per-work-category/?team={-hours.rendered_by.pk}"
+        )
+        # print(response, response.content.decode("utf-8"))
+        self.assertContains(
+            response,
+            """<a href="/logbook/hours/?category=none">6.0h</a>""",
+            html=True,
+        )
 
     def test_role_warning(self):
         """Users are warned when creating a service without selecting a role"""
