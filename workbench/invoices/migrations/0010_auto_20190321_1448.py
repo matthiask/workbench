@@ -10,8 +10,8 @@ class Migration(migrations.Migration):
     dependencies = [("invoices", "0009_auto_20190321_0833")]
 
     operations = [
-        migrations.RunSQL(search.drop_old_shit("invoices_invoice")),
-        migrations.RunSQL(search.drop_old_shit("invoices_recurringinvoice")),
+        migrations.RunSQL(search.drop_old_fts("invoices_invoice")),
+        migrations.RunSQL(search.drop_old_fts("invoices_recurringinvoice")),
         migrations.RunSQL(search.create_structure("invoices_invoice")),
         migrations.RunSQL(search.create_structure("invoices_recurringinvoice")),
         migrations.RunSQL(

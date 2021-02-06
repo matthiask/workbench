@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     dependencies = [("credit_control", "0002_auto_20190308_1752")]
 
     operations = [
-        migrations.RunSQL(search.drop_old_shit("credit_control_creditentry")),
+        migrations.RunSQL(search.drop_old_fts("credit_control_creditentry")),
         migrations.RunSQL(search.create_structure("credit_control_creditentry")),
         migrations.RunSQL(
             search.fts(

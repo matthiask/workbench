@@ -10,8 +10,8 @@ class Migration(migrations.Migration):
     dependencies = [("contacts", "0005_auto_20190321_1025")]
 
     operations = [
-        migrations.RunSQL(search.drop_old_shit("contacts_organization")),
-        migrations.RunSQL(search.drop_old_shit("contacts_person")),
+        migrations.RunSQL(search.drop_old_fts("contacts_organization")),
+        migrations.RunSQL(search.drop_old_fts("contacts_person")),
         migrations.RunSQL(search.create_structure("contacts_organization")),
         migrations.RunSQL(search.create_structure("contacts_person")),
         migrations.RunSQL(search.fts("contacts_organization", ["name"])),

@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(search.drop_old_shit("deals_deal")),
+        migrations.RunSQL(search.drop_old_fts("deals_deal")),
         migrations.RunSQL(search.create_structure("deals_deal")),
         migrations.RunSQL(
             search.fts(

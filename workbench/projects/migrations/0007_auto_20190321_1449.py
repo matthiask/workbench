@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     dependencies = [("projects", "0006_auto_20190312_1254")]
 
     operations = [
-        migrations.RunSQL(search.drop_old_shit("projects_project")),
+        migrations.RunSQL(search.drop_old_fts("projects_project")),
         migrations.RunSQL(search.create_structure("projects_project")),
         migrations.RunSQL(search.fts("projects_project", ["title", "description"])),
     ]

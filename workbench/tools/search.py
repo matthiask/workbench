@@ -27,7 +27,7 @@ look like this::
 import re
 
 
-def drop_old_shit(table):
+def drop_old_fts(table):
     return """\
 DROP TRIGGER IF EXISTS {table}_fts_update_trigger ON {table};
 DROP TRIGGER IF EXISTS {table}_fts_insert_trigger ON {table};
