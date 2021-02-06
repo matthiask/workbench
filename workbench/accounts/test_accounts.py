@@ -165,3 +165,41 @@ class AccountsTest(TestCase):
         team.members.add(inactive)
         form = TeamForm(instance=team, request=req)
         self.assertEqual(set(form.fields["members"].queryset), {user, inactive})
+
+    @override_settings(
+        FEATURES={
+            FEATURES.BOOKKEEPING: F.ALWAYS,
+            FEATURES.BREAKS_NAG: F.NEVER,
+            FEATURES.CAMPAIGNS: F.USER,
+        }
+    )
+    def test_feature_admin(self):
+        user = factories.UserFactory.create(is_admin=True)
+        self.client.force_login(user)
+
+        response = self.client.get(f"/admin/accounts/user/{user.pk}/change/")
+        self.assertContains(
+            response,
+            '<input type="checkbox" name="_features" value="FEATURES.BOOKKEEPING" checked disabled>',  # noqa
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<input type="checkbox" name="_features" value="FEATURES.BREAKS_NAG" disabled>',  # noqa
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<input type="checkbox" name="_features" value="FEATURES.CAMPAIGNS">',  # noqa
+            html=True,
+        )
+
+        user._features.append(FEATURES.CAMPAIGNS)
+        user.save()
+
+        response = self.client.get(f"/admin/accounts/user/{user.pk}/change/")
+        self.assertContains(
+            response,
+            '<input type="checkbox" name="_features" value="FEATURES.CAMPAIGNS" checked>',  # noqa
+            html=True,
+        )
