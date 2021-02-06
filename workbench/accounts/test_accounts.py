@@ -48,9 +48,13 @@ class AccountsTest(TestCase):
             "employments-TOTAL_FORMS": 0,
             "employments-INITIAL_FORMS": 0,
             "employments-MAX_NUM_FORMS": 1000,
+            "_features": ["LATE_LOGGING"],
         }
         response = self.client.post("/admin/accounts/user/add/", data)
         self.assertEqual(response.status_code, 302)
+
+        user = User.objects.latest("pk")
+        self.assertEqual(user._features, ["LATE_LOGGING"])
 
     def test_choices(self):
         """User.objects.choices() does what it should"""
@@ -174,6 +178,7 @@ class AccountsTest(TestCase):
         }
     )
     def test_feature_admin(self):
+        """Feature checkboxes in the user admin form are shown correctly"""
         user = factories.UserFactory.create(is_admin=True)
         self.client.force_login(user)
 
