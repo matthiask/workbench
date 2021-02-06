@@ -225,6 +225,13 @@ class HistoryTest(TestCase):
         self.assert_only_visible_with(url, "'Cost'", FEATURES.CONTROLLING)
         self.assert_only_visible_with(url, "'Role'", FEATURES.GLASSFROG)
 
+    def test_accounts_user_visibility(self):
+        """PLanned work of users is only visible with PLANNING"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        url = f"/history/accounts_user/id/{user.pk}/"
+        self.assert_only_visible_with(url, "Planned work", FEATURES.PLANNING)
+
     def assert_404_without_feature(self, url, *, feature):
         """Helper for checking that some models even 404 with a missing FEATURE"""
         with override_settings(FEATURES={feature: F.ALWAYS}):
