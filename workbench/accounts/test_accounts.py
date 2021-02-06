@@ -89,7 +89,9 @@ class AccountsTest(TestCase):
         self.assertRedirects(response, "/")
         self.assertEqual(messages(response), ["Feature not available"])
 
-    @override_settings(FEATURES={"yes": F.ALWAYS, "no": F.NEVER, "maybe": F.USER})
+    @override_settings(
+        FEATURES={"yes": F.ALWAYS, "no": F.NEVER, "maybe": F.USER, "invalid": 42}
+    )
     def test_user_features(self):
         """Features may either be enabled for all, for some or for no users"""
         user = User(email="test@example.org", _features=[])
@@ -105,6 +107,9 @@ class AccountsTest(TestCase):
         self.assertTrue(user.features["maybe"])
         with self.assertRaises(UnknownFeature):
             user.features["missing"]
+
+        with self.assertRaises(ValueError):
+            user.features["invalid"]
 
     def test_user_views(self):
         """The user views do not crash"""

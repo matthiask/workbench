@@ -482,3 +482,13 @@ class AWTTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertContains(response, "<input")
+
+    def test_initialize_days(self):
+        """Initialize values using query parameters"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        response = self.client.get(
+            "/absences/create/?days=2",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, 'value="2"')

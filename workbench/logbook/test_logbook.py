@@ -447,10 +447,12 @@ class LogbookTest(TestCase):
         code("campaign=" + str(factories.CampaignFactory.create().pk))
         code("offer={}".format(factories.OfferFactory.create().pk))
         code("offer=0")
+        code("organization=" + str(hours.service.project.customer.pk))
         code("circle=0")
         code("circle=1")
         code("role=" + str(factories.RoleFactory.create().pk))
-        code("organization=" + str(hours.service.project.customer.pk))
+        code("category=none")
+        code("category=not_exists")  # Exact value does not matter
         code("not_archived=1")
         code("export=xlsx")
 

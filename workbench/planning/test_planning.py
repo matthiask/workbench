@@ -488,3 +488,8 @@ class PlanningTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         pr.delete()
         self.assertEqual(len(mail.outbox), 2)
+
+        pr = factories.PlanningRequestFactory.create()
+        self.assertEqual(len(mail.outbox), 2)  # No mail (post_add)
+        pr.delete()
+        self.assertEqual(len(mail.outbox), 2)  # No notification (post_delete)
