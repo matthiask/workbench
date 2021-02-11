@@ -30,6 +30,10 @@
         {% translate 'Planned' %}<br>
         {% translate 'Logged' %}<br>
       </th>
+      <td class="text-right">
+        <br>
+        {% percentage user_row.logged user_row.planned %}
+      </td>
     </tr>
   {% for customer_row in user_row.per_customer %}
   <tr>
@@ -50,6 +54,10 @@
       {% translate 'Planned' %}<br>
       {% translate 'Logged' %}<br>
     </th>
+    <td class="text-right">
+      <br>
+      {% percentage customer_row.logged customer_row.planned %}
+    </td>
   </tr>
   {% endfor %}
   </table>
