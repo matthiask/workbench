@@ -7,6 +7,7 @@ from django.db.models import Q, Sum
 
 from workbench.accounts.models import User
 from workbench.awt.models import Absence
+from workbench.contacts.models import Organization
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedHours
 from workbench.planning.models import PlannedWork, PlanningRequest
@@ -439,6 +440,111 @@ SELECT MIN(week), MAX(week) FROM sq
     return planning.report()
 
 
+def planning_vs_logbook(date_range, *, users):
+    planned = defaultdict(lambda: defaultdict(dict))
+    logged = defaultdict(lambda: defaultdict(dict))
+
+    user_ids = [user.id for user in users]
+
+    seen_customers = set()
+    seen_weeks = set()
+
+    for customer_id, user_id, week, hours in query(
+        """
+with
+planned_per_week as (
+    select
+        p.customer_id,
+        user_id,
+        unnest(weeks) as week,
+        planned_hours / array_length(weeks, 1) / 7 as hours
+    from planning_plannedwork pw
+    left join projects_project p on pw.project_id = p.id
+    where user_id = any(%s)
+),
+weeks as (
+    select
+        date_trunc('week', day) as week,
+        count(*) as days
+    from generate_series(%s::date, %s::date, '1 day') as day
+    group by week
+)
+
+select
+    customer_id,
+    user_id,
+    weeks.week,
+    sum(hours * weeks.days)
+from
+    planned_per_week, weeks
+where
+    planned_per_week.week = weeks.week
+group by customer_id, user_id, weeks.week
+        """,
+        [user_ids, *date_range],
+    ):
+        seen_customers.add(customer_id)
+        seen_weeks.add(week)
+        planned[user_id][customer_id][week] = hours
+
+    for customer_id, user_id, week, hours in query(
+        """
+select
+    p.customer_id,
+    rendered_by_id as user_id,
+    date_trunc('week', rendered_on) as week,
+    sum(hours) as hours
+from logbook_loggedhours lh
+left join projects_service ps on lh.service_id = ps.id
+left join projects_project p on ps.project_id = p.id
+where
+    rendered_by_id = any(%s)
+    and rendered_on between %s::date and %s::date
+group by customer_id, user_id, week
+        """,
+        [user_ids, *date_range],
+    ):
+        seen_customers.add(customer_id)
+        seen_weeks.add(week)
+        logged[user_id][customer_id][week] = hours
+
+    customers = {
+        customer.id: customer
+        for customer in Organization.objects.filter(id__in=seen_customers)
+    }
+    weeks = sorted(seen_weeks)
+
+    def _customer(planned, logged):
+        ret = [
+            {
+                "customer": customers[customer_id],
+                "per_week": [
+                    {
+                        "week": week,
+                        "planned": planned[customer_id].get(week),
+                        "logged": logged[customer_id].get(week),
+                    }
+                    for week in weeks
+                ],
+                "planned": sum(planned[customer_id].values(), Z1),
+                "logged": sum(logged[customer_id].values(), Z1),
+            }
+            for customer_id in planned.keys() | logged.keys()
+        ]
+        return sorted(ret, key=lambda row: -row["planned"])
+
+    return {
+        "per_user": [
+            {
+                "user": user,
+                "per_customer": _customer(planned[user.id], logged[user.id]),
+            }
+            for user in users
+        ],
+        "weeks": weeks,
+    }
+
+
 def test():  # pragma: no cover
     from pprint import pprint
 
@@ -447,7 +553,7 @@ def test():  # pragma: no cover
 
         pprint(user_planning(User.objects.get(pk=1)))
 
-    if True:
+    if False:
         from workbench.accounts.models import Team
 
         pprint(team_planning(Team.objects.get(pk=1)))
@@ -456,3 +562,13 @@ def test():  # pragma: no cover
         from workbench.projects.models import Project
 
         pprint(project_planning(Project.objects.get(pk=8238)))
+
+    if True:
+        from workbench.accounts.models import User
+
+        pprint(
+            planning_vs_logbook(
+                [dt.date(2021, 1, 1), dt.date.today()],
+                users=[User.objects.get(pk=1)],
+            )
+        )

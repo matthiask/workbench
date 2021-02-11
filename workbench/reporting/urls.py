@@ -10,6 +10,7 @@ from workbench.accounts.features import (
 from workbench.awt.views import absence_calendar, annual_working_time_view
 from workbench.circles.reporting import hours_by_circle, hours_per_work_category
 from workbench.deals.reporting import accepted_deals, deal_history, declined_deals
+from workbench.planning.reporting import planning_vs_logbook
 from workbench.projects.reporting import hours_per_customer
 from workbench.reporting.green_hours import green_hours
 from workbench.reporting.views import (
@@ -58,6 +59,15 @@ urlpatterns = [
             "stats_fn": hours_per_customer,
         },
         name="report_hours_per_customer",
+    ),
+    re_path(
+        r"^planning-vs-logbook/$",
+        hours_filter_view,
+        {
+            "template_name": "reporting/planning_vs_logbook.html",
+            "stats_fn": planning_vs_logbook,
+        },
+        name="report_planning_vs_logbook",
     ),
     re_path(
         r"^hours-by-circle/$",

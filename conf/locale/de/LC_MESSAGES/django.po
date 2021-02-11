@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-05 08:59+0100\n"
+"POT-Creation-Date: 2021-02-11 15:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2873,6 +2873,11 @@ msgstr "Stunden pro Kreis"
 msgid "Hours per work category"
 msgstr "Stunden pro Arbeitskategorie"
 
+#: workbench/templates/base.html
+#: workbench/templates/reporting/planning_vs_logbook.html
+msgid "Planning vs Logbook"
+msgstr "Planung vs Logbuch"
+
 #: workbench/templates/base.html workbench/templates/reporting/green_hours.html
 msgid "Green hours"
 msgstr "Grüne Stunden"
@@ -3357,6 +3362,7 @@ msgid "Scheduled"
 msgstr "Geplant"
 
 #: workbench/templates/projects/project_statistics.html
+#: workbench/templates/reporting/planning_vs_logbook.html
 msgid "Logged"
 msgstr "Erfasst"
 
@@ -3482,6 +3488,10 @@ msgstr "Durchschnitt"
 #: workbench/templates/reporting/logging.html
 msgid "Days with insufficient breaks"
 msgstr "Tage mit zuwenig Pausenzeit"
+
+#: workbench/templates/reporting/planning_vs_logbook.html
+msgid "Planned"
+msgstr "Geplant"
 
 #: workbench/templates/reporting/work_anniversaries.html
 msgid "Started on"
