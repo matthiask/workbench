@@ -441,21 +441,19 @@ SELECT MIN(week), MAX(week) FROM sq
 
 
 def planning_vs_logbook(date_range, *, users):
-    planned = defaultdict(lambda: defaultdict(dict))
-    logged = defaultdict(lambda: defaultdict(dict))
+    planned = defaultdict(dict)
+    logged = defaultdict(dict)
 
     user_ids = [user.id for user in users]
 
-    seen_customers = set()
     seen_weeks = set()
 
-    for customer_id, user_id, week, hours in query(
+    for customer_id, week, hours in query(
         """
 with
 planned_per_week as (
     select
         p.customer_id,
-        user_id,
         unnest(weeks) as week,
         planned_hours / array_length(weeks, 1) / 7 as hours
     from planning_plannedwork pw
@@ -472,26 +470,23 @@ weeks as (
 
 select
     customer_id,
-    user_id,
     weeks.week,
     sum(hours * weeks.days)
 from
     planned_per_week, weeks
 where
     planned_per_week.week = weeks.week
-group by customer_id, user_id, weeks.week
+group by customer_id, weeks.week
         """,
         [user_ids, *date_range],
     ):
-        seen_customers.add(customer_id)
         seen_weeks.add(week)
-        planned[user_id][customer_id][week] = hours
+        planned[customer_id][week] = hours
 
-    for customer_id, user_id, week, hours in query(
+    for customer_id, week, hours in query(
         """
 select
     p.customer_id,
-    rendered_by_id as user_id,
     date_trunc('week', rendered_on) as week,
     sum(hours) as hours
 from logbook_loggedhours lh
@@ -500,17 +495,18 @@ left join projects_project p on ps.project_id = p.id
 where
     rendered_by_id = any(%s)
     and rendered_on between %s::date and %s::date
-group by customer_id, user_id, week
+group by customer_id, week
         """,
         [user_ids, *date_range],
     ):
-        seen_customers.add(customer_id)
         seen_weeks.add(week)
-        logged[user_id][customer_id][week] = hours
+        logged[customer_id][week] = hours
 
     customers = {
         customer.id: customer
-        for customer in Organization.objects.filter(id__in=seen_customers)
+        for customer in Organization.objects.filter(
+            id__in=planned.keys() | logged.keys()
+        )
     }
     weeks = sorted(seen_weeks)
 
@@ -533,19 +529,13 @@ group by customer_id, user_id, week
         ]
         return sorted(ret, key=lambda row: -row["planned"])
 
-    def _user(user):
-        ret = {
-            "user": user,
-            "per_customer": _customer(planned[user.id], logged[user.id]),
-        }
-        ret["planned"] = sum((c["planned"] for c in ret["per_customer"]), Z1)
-        ret["logged"] = sum((c["logged"] for c in ret["per_customer"]), Z1)
-        return ret
-
-    return {
-        "per_user": [_user(user) for user in users],
+    ret = {
+        "per_customer": _customer(planned, logged),
         "weeks": weeks,
     }
+    ret["planned"] = sum((c["planned"] for c in ret["per_customer"]), Z1)
+    ret["logged"] = sum((c["logged"] for c in ret["per_customer"]), Z1)
+    return ret
 
 
 def test():  # pragma: no cover
