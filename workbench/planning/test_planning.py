@@ -7,6 +7,7 @@ from django.test import RequestFactory, TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.accounts.models import User
 from workbench.planning import reporting
 from workbench.planning.forms import PlannedWorkSearchForm, PlanningRequestSearchForm
 from workbench.planning.models import PlannedWork, PlanningRequest
@@ -104,6 +105,13 @@ class PlanningTest(TestCase):
         self.assertEqual(work_list[0]["work"]["id"], pr.id)
         self.assertEqual(work_list[1]["work"]["id"], pw2.id)
         self.assertEqual(work_list[2]["work"]["id"], pw.id)
+
+        report = reporting.planning_vs_logbook(date_range, users=User.objects.all())
+        self.assertAlmostEqual(report["logged"], Decimal("1.0"))
+        self.assertAlmostEqual(report["planned"], Decimal("40.0"))
+        # Exactly one customer
+        (c,) = report["per_customer"]
+        self.assertEqual(len(c["per_week"]), 1)
 
     def test_planning_search_forms(self):
         """Planning request search form branch test"""
