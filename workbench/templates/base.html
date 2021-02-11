@@ -91,7 +91,7 @@
                 <a class="dropdown-item" href="{% url 'report_hours_per_work_category' %}">{% translate 'Hours per work category' %}</a>
               {% endif %}
               <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">{% translate 'Hours per customer'|capfirst %}</a>
-              <a class="dropdown-item" href="{% url 'report_planning_vs_logbook' %}?team=-1&amp;date_until={% now 'Y-m-d' %}">{% translate 'Planning vs Logbook' %}</a>
+              <a class="dropdown-item" href="{% url 'report_planning_vs_logbook' %}?team=-1">{% translate 'Planning vs Logbook' %}</a>
               <a class="dropdown-item" href="{% url 'report_green_hours' %}">{% translate 'Green hours' %}</a>
               <a class="dropdown-item" href="{% url 'report_logging' %}">{% translate 'Logging statistics' %}</a>
             {% endif %} {# CONTROLLING #}
