@@ -533,14 +533,17 @@ group by customer_id, user_id, week
         ]
         return sorted(ret, key=lambda row: -row["planned"])
 
+    def _user(user):
+        ret = {
+            "user": user,
+            "per_customer": _customer(planned[user.id], logged[user.id]),
+        }
+        ret["planned"] = sum((c["planned"] for c in ret["per_customer"]), Z1)
+        ret["logged"] = sum((c["logged"] for c in ret["per_customer"]), Z1)
+        return ret
+
     return {
-        "per_user": [
-            {
-                "user": user,
-                "per_customer": _customer(planned[user.id], logged[user.id]),
-            }
-            for user in users
-        ],
+        "per_user": [_user(user) for user in users],
         "weeks": weeks,
     }
 
