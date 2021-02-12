@@ -455,7 +455,7 @@ planned_per_week as (
     select
         p.customer_id,
         unnest(weeks) as week,
-        planned_hours / array_length(weeks, 1) / 7 as hours
+        planned_hours / array_length(weeks, 1) / 5 as hours
     from planning_plannedwork pw
     left join projects_project p on pw.project_id = p.id
     where user_id = any(%s)
@@ -465,6 +465,7 @@ weeks as (
         date_trunc('week', day) as week,
         count(*) as days
     from generate_series(%s::date, %s::date, '1 day') as day
+    where extract(dow from day) between 1 and 5
     group by week
 )
 
