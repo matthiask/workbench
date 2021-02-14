@@ -1,20 +1,18 @@
 import datetime as dt
-from collections import OrderedDict
 
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.forms.models import inlineformset_factory
+from django.db.models import Q
 from django.http import Http404
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
 
-from workbench.accounts.models import User
+from workbench.accounts.models import Team, User
 from workbench.contacts.models import Organization, Person
 from workbench.deals.models import (
     Attribute,
     AttributeGroup,
-    Contribution,
     Deal,
     DealAttribute,
     Value,
@@ -140,15 +138,22 @@ class DealForm(ModelForm):
             "probability",
             "decision_expected_on",
             "owned_by",
+            "contributors",
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
             "contact": Autocomplete(model=Person, params={"only_employees": "on"}),
             "probability": forms.RadioSelect,
             "description": Textarea,
+            "contributors": forms.CheckboxSelectMultiple,
         }
 
     def __init__(self, *args, **kwargs):
+        if not kwargs.get("instance"):
+            initial = kwargs.setdefault("initial", {})
+            initial.setdefault("contributors", [kwargs["request"].user.pk])
+            print(args, kwargs)
+
         super().__init__(*args, **kwargs)
         warn_if_not_in_preparation(self)
 
@@ -207,11 +212,21 @@ class DealForm(ModelForm):
             ),
         )
 
-        kwargs.pop("request")
-        self.formsets = (
-            OrderedDict([("contributions", ContributionFormset(*args, **kwargs))])
-            if self.instance.pk
-            else OrderedDict()
+        q = Q(is_active=True)
+        if self.instance.pk:
+            q |= Q(id__in=self.instance.contributors.values_list("id", flat=True))
+        self.fields["contributors"].queryset = User.objects.filter(q)
+        self.fields["contributors"].help_text = format_html(
+            "{}: {}",
+            _("Select team"),
+            format_html_join(
+                ", ",
+                '<a href="#" data-select-receivers="{}">{}</a>',
+                [
+                    (",".join(str(member.id) for member in team.members.all()), team)
+                    for team in Team.objects.prefetch_related("members")
+                ],
+            ),
         )
 
     def clean(self):
@@ -226,12 +241,6 @@ class DealForm(ModelForm):
                 _("This field is required when probability is high."),
             )
         return data
-
-    def is_valid(self):
-        return all(
-            [super().is_valid()]
-            + [formset.is_valid() for formset in self.formsets.values()]
-        )
 
     def save(self):
         instance = super().save(commit=False)
@@ -257,29 +266,7 @@ class DealForm(ModelForm):
                 attributes.append(self.cleaned_data.get(key))
 
         instance.attributes.set(attributes)
-
-        for formset in self.formsets.values():
-            formset.save()
-
         return instance
-
-
-class ContributionForm(forms.ModelForm):
-    class Meta:
-        model = Contribution
-        fields = ("user", "weight")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["user"].choices = User.objects.choices(collapse_inactive=False)
-
-
-ContributionFormset = inlineformset_factory(
-    Deal,
-    Contribution,
-    form=ContributionForm,
-    extra=0,
-)
 
 
 class SetStatusForm(ModelForm):

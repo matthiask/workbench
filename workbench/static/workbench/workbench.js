@@ -283,7 +283,7 @@ $(function () {
     e.preventDefault()
     const arr = this.dataset.selectReceivers.split(",")
     const inputs = Array.from(
-      document.querySelectorAll('input[name="modal-receivers"]')
+      this.closest(".widget--checkboxselectmultiple").querySelectorAll("input")
     )
     inputs.forEach((el) => (el.checked = arr.includes(el.value)))
   })

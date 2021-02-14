@@ -154,6 +154,13 @@ class Deal(Model):
         verbose_name=_("related offers"),
     )
 
+    contributors = models.ManyToManyField(
+        User,
+        verbose_name=_("contributors"),
+        related_name="+",
+        through="Contribution",
+    )
+
     objects = DealQuerySet.as_manager()
 
     class Meta:
@@ -235,10 +242,10 @@ class Deal(Model):
 
     @property
     def all_contributions(self):
-        contributors = {self.owned_by: 100}
+        contributors = {}
         for contribution in self.contributions.all():
             contributors[contribution.user] = contribution.weight
-        total = sum(contributors.values())
+        total = sum(contributors.values(), 0)
         return sorted(
             (
                 {"user": user, "value": self.value * weight / total}

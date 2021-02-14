@@ -20,7 +20,7 @@ from workbench.contacts.models import (
     PostalAddress,
 )
 from workbench.credit_control.models import CreditEntry
-from workbench.deals.models import Deal, Value, ValueType
+from workbench.deals.models import Contribution, Deal, Value, ValueType
 from workbench.expenses.models import ExpenseReport
 from workbench.invoices.models import (
     Invoice,
@@ -256,12 +256,21 @@ def _credit_control_creditentry_cfg(user):
     }
 
 
-def _deals_deal_cfg(user):
+def _deals_contribution_cfg(user):
     if not user.features[FEATURES.DEALS]:
         raise Http404
     return {
         "fields": EVERYTHING,
         "related": [(Value, "deal_id")],
+    }
+
+
+def _deals_deal_cfg(user):
+    if not user.features[FEATURES.DEALS]:
+        raise Http404
+    return {
+        "fields": EVERYTHING,
+        "related": [(Value, "deal_id"), (Contribution, "deal_id")],
     }
 
 
@@ -430,6 +439,7 @@ HISTORY = {
     Absence: {"fields": EVERYTHING},
     Year: {"fields": EVERYTHING},
     CreditEntry: _credit_control_creditentry_cfg,
+    Contribution: _deals_contribution_cfg,
     Deal: _deals_deal_cfg,
     Value: _deals_value_cfg,
     ValueType: _deals_valuetype_cfg,

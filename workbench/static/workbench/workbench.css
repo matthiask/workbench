@@ -258,11 +258,11 @@ tbody th > a {
   background-image: url("lib/break.svg");
 }
 
-.receivers .widget--checkboxselectmultiple .my-2 {
+.widget--checkboxselectmultiple .my-2 {
   display: flex;
   flex-flow: row wrap;
 }
-.receivers .widget--checkboxselectmultiple .my-2 .form-check {
+.widget--checkboxselectmultiple .my-2 .form-check {
   flex: 1 0 50%;
   margin: 0 0 0.25rem 0;
 }
