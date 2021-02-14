@@ -70,6 +70,7 @@ class DealsTest(TestCase):
             deal.pretty_status,
             "Open since {}".format(local_date_format(dt.date.today())),
         )
+        self.assertEqual(list(deal.contributors.all()), [person.primary_contact])
 
         response = self.client.post(
             deal.urls["set_status"] + "?status={}".format(Deal.DECLINED),
@@ -467,3 +468,24 @@ class DealsTest(TestCase):
             deal.urls["remove_offer"], {"modal-offer": offer.pk}
         )
         self.assertRedirects(response, deal.urls["detail"])
+
+    def test_all_contributions(self):
+        """The contributions calculation works as expected"""
+        deal = factories.DealFactory.create()
+        deal.values.create(type=factories.ValueTypeFactory.create(), value=42)
+        deal.save()
+
+        c1 = deal.contributions.create(user=deal.owned_by, weight=300)
+        other = factories.UserFactory.create()
+        c2 = deal.contributions.create(user=other)
+
+        self.assertEqual(
+            deal.all_contributions,
+            [
+                {"user": deal.owned_by, "value": Decimal("31.50")},
+                {"user": other, "value": Decimal("10.50")},
+            ],
+        )
+
+        self.assertEqual(str(c1), f"{deal.owned_by}: 300")
+        self.assertEqual(str(c2), f"{other}: 100")

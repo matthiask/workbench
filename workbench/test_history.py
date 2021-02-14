@@ -285,6 +285,9 @@ class HistoryTest(TestCase):
         url = "/history/deals_deal/id/{}/".format(deal.pk)
         self.assert_404_without_feature(url, feature=FEATURES.DEALS)
 
+        url = "/history/deals_contribution/deal_id/{}/".format(deal.pk)
+        self.assert_404_without_feature(url, feature=FEATURES.DEALS)
+
         url = "/history/deals_value/deal_id/{}/".format(deal.pk)
         self.assert_404_without_feature(url, feature=FEATURES.DEALS)
 
