@@ -5,7 +5,7 @@ from django.db.models import Prefetch
 from django.utils import timezone
 
 from workbench.audit.models import LoggedAction
-from workbench.deals.models import Deal, Value, ValueType
+from workbench.deals.models import Contribution, Deal, Value, ValueType
 from workbench.tools.formats import Z2
 from workbench.tools.history import EVERYTHING, changes
 
@@ -15,7 +15,10 @@ def accepted_deals(date_range, *, users=None):
         Deal.objects.filter(status=Deal.ACCEPTED, closed_on__range=date_range)
         .select_related("customer", "contact__organization", "owned_by")
         .prefetch_related(
-            Prefetch("values", queryset=Value.objects.select_related("type"))
+            Prefetch(
+                "contributions", queryset=Contribution.objects.select_related("user")
+            ),
+            Prefetch("values", queryset=Value.objects.select_related("type")),
         )
         .order_by("closed_on")
     )
@@ -29,7 +32,10 @@ def accepted_deals(date_range, *, users=None):
     valuetypes = set()
 
     for deal in queryset:
-        by_user[deal.owned_by].append(deal)
+        weight = sum((c.weight for c in deal.contributions.all()), 0)
+        for c in deal.contributions.all():
+            deal.contribution = deal.value * c.weight / weight
+            by_user[c.user].append(deal)
 
         month = deal.closed_on.replace(day=1)
         for value in deal.values.all():
@@ -42,7 +48,7 @@ def accepted_deals(date_range, *, users=None):
             "user_id": str(user.id),
             "deals": deals,
             "count": len(deals),
-            "sum": sum(deal.value for deal in deals),
+            "sum": sum(deal.contribution for deal in deals),
         }
         for user, deals in by_user.items()
     ]

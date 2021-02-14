@@ -382,6 +382,7 @@ class DealsTest(TestCase):
         deal = factories.DealFactory.create(
             status=Deal.ACCEPTED, closed_on=dt.date.today()
         )
+        deal.contributions.create(user=deal.owned_by)
         vt1 = factories.ValueTypeFactory.create(position=1)
         vt2 = factories.ValueTypeFactory.create(position=0)
         deal.values.create(type=vt1, value=200)
