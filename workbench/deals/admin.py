@@ -15,6 +15,12 @@ class ContributionInline(admin.TabularInline):
     raw_id_fields = ["user"]
 
 
+@admin.register(models.Contribution)
+class ContributionAdmin(admin.ModelAdmin):
+    list_display = ["id", "deal", "user", "weight"]
+    ordering = ["-id"]
+
+
 @admin.register(models.Deal)
 class DealAdmin(admin.ModelAdmin):
     inlines = [ValueInline, ContributionInline]
