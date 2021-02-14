@@ -71,6 +71,15 @@
       </td>
     </tr>
 
+    <tr>
+      <th class="text-right">{% translate 'contributions'|capfirst %}</th>
+      <td>
+        {% for c in object.all_contributions %}
+          {{ c.user }}: {{ c.value|currency }}<br>
+        {% endfor %}
+      </td>
+    </tr>
+
     {% for attribute in object.attributes.select_related %}
     <tr>
       <th class="text-right">{{ attribute.group }}</th>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-11 15:29+0100\n"
+"POT-Creation-Date: 2021-02-14 11:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -175,8 +175,9 @@ msgid "features"
 msgstr "Features"
 
 #: workbench/accounts/models.py workbench/awt/models.py
-#: workbench/logbook/models.py workbench/management/commands/profitability.py
-#: workbench/planning/models.py workbench/templates/accounts/user_base.html
+#: workbench/deals/models.py workbench/logbook/models.py
+#: workbench/management/commands/profitability.py workbench/planning/models.py
+#: workbench/templates/accounts/user_base.html
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/green_hours.html
@@ -885,7 +886,7 @@ msgstr "Personen"
 msgid "work"
 msgstr "Arbeit"
 
-#: workbench/contacts/models.py
+#: workbench/contacts/models.py workbench/deals/models.py
 msgid "weight"
 msgstr "Gewichtung"
 
@@ -1371,6 +1372,15 @@ msgstr "Werttypen"
 #: workbench/deals/models.py
 msgid "values"
 msgstr "Werte"
+
+#: workbench/deals/models.py
+msgid "contribution"
+msgstr "Beitrag"
+
+#: workbench/deals/models.py workbench/templates/deals/deal_detail.html
+#: workbench/templates/deals/deal_form.html
+msgid "contributions"
+msgstr "Beiträge"
 
 #: workbench/deals/views.py
 #, python-format
@@ -2995,6 +3005,7 @@ msgid "Create %(class)s"
 msgstr "%(class)s erstellen"
 
 #: workbench/templates/contacts/person_form.html
+#: workbench/templates/deals/deal_form.html
 #: workbench/templates/fineforms/submit.html
 #: workbench/templates/generic/object_form.html
 #: workbench/templates/logbook/loggedcost_form.html
@@ -3006,6 +3017,7 @@ msgid "Save"
 msgstr "Sichern"
 
 #: workbench/templates/contacts/person_form.html
+#: workbench/templates/deals/deal_form.html
 #: workbench/templates/generic/object_confirm_delete.html
 #: workbench/templates/modal_confirm_delete.html
 #: workbench/templates/offers/offer_pricing.html
@@ -3039,6 +3051,17 @@ msgstr "Keine verbundenen Offerten"
 #: workbench/templates/deals/deal_detail.html
 msgid "Link offer"
 msgstr "Offerte verbinden"
+
+#: workbench/templates/deals/deal_form.html
+msgid ""
+"The deal owner's contribution defaults to a weight of 100. You may override "
+"this by explicitly specifying their contribution's weight. <br> The weight "
+"is an unitless value and weights do not have to sum up to 100 in total."
+msgstr ""
+"Der Beitrag der verantwortlichen Person hat standardmässig ein Gewicht von "
+"100. Du kannst diesen Wert überschreiben, indem Du den Beitrag explizit "
+"spezifizierst. <br> Das Gewicht ist ein einheitsloser Wert, die Gewichte "
+"müssen in der Summe nicht 100 ergeben."
 
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/invoice_detail.html

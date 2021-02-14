@@ -207,7 +207,7 @@ class DealForm(ModelForm):
             ),
         )
 
-        kwargs.pop("request")
+        print(kwargs.pop("request").POST)
         self.formsets = (
             OrderedDict([("contributions", ContributionFormset(*args, **kwargs))])
             if self.instance.pk
@@ -275,7 +275,10 @@ class ContributionForm(forms.ModelForm):
 
 
 ContributionFormset = inlineformset_factory(
-    Deal, Contribution, form=ContributionForm, extra=0
+    Deal,
+    Contribution,
+    form=ContributionForm,
+    extra=0,
 )
 
 

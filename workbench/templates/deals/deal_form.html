@@ -22,6 +22,15 @@
 
       {% if form.formsets %}
         <h4>{% translate 'contributions' %}</h4>
+        <p>
+          {% blocktranslate trimmed %}
+          The deal owner's contribution defaults to a weight of 100. You may
+          override this by explicitly specifying their contribution's weight.
+          <br>
+          The weight is an unitless value and weights do not have to sum up to
+          100 in total.
+          {% endblocktranslate %}
+        </p>
         {% formset form.formsets.contributions "contributions" %}
         <div id="{{ form_id }}" class="card bg-light mb-3">
           <div class="card-body">

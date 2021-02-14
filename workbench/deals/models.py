@@ -233,6 +233,21 @@ class Deal(Model):
     def pretty_closing_type(self):
         return self.closing_type or _("<closing type missing>")
 
+    @property
+    def all_contributions(self):
+        contributors = {self.owned_by: 100}
+        for contribution in self.contributions.all():
+            contributors[contribution.user] = contribution.weight
+        total = sum(contributors.values())
+        return sorted(
+            (
+                {"user": user, "value": self.value * weight / total}
+                for user, weight in contributors.items()
+            ),
+            key=lambda row: row["value"],
+            reverse=True,
+        )
+
 
 class DealAttribute(models.Model):
     deal = models.ForeignKey(Deal, on_delete=models.CASCADE, verbose_name=_("deal"))
@@ -291,12 +306,18 @@ class Value(models.Model):
 
 
 class Contribution(models.Model):
-    deal = models.ForeignKey(Deal, on_delete=models.CASCADE, verbose_name=_("deal"))
+    deal = models.ForeignKey(
+        Deal,
+        on_delete=models.CASCADE,
+        verbose_name=_("deal"),
+        related_name="contributions",
+    )
     user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name=_("user"))
     weight = models.SmallIntegerField(_("weight"), default=100)
 
     class Meta:
         ordering = ["-weight"]
+        unique_together = [("deal", "user")]
         verbose_name = _("contribution")
         verbose_name_plural = _("contributions")
 
