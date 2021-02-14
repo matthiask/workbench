@@ -60,8 +60,7 @@ class DealsTest(TestCase):
                 "title": "Some deal",
                 "probability": Deal.NORMAL,
                 "owned_by": person.primary_contact_id,
-                "contributions-TOTAL_FORMS": 0,
-                "contributions-INITIAL_FORMS": 0,
+                "contributors": [person.primary_contact_id],
             },
         )
         self.assertEqual(response.status_code, 302)
@@ -159,8 +158,7 @@ class DealsTest(TestCase):
                 "value_{}".format(type2.id): "",
                 "attribute_{}".format(group1.pk): attribute1_1.pk,
                 "attribute_{}".format(group2.pk): "",
-                "contributions-TOTAL_FORMS": 0,
-                "contributions-INITIAL_FORMS": 0,
+                "contributors": [person.primary_contact_id],
             },
         )
         self.assertEqual(response.status_code, 302)
@@ -259,8 +257,7 @@ class DealsTest(TestCase):
                 "title": "Some deal",
                 "probability": Deal.HIGH,
                 "owned_by": person.primary_contact_id,
-                "contributions-TOTAL_FORMS": 0,
-                "contributions-INITIAL_FORMS": 0,
+                "contributors": [person.primary_contact_id],
             },
         )
         self.assertContains(response, "This field is required when probability is high")
@@ -327,8 +324,7 @@ class DealsTest(TestCase):
                 "probability": Deal.NORMAL,
                 "owned_by": deal.owned_by_id,
                 "value_{}".format(vt.id): 500,
-                "contributions-TOTAL_FORMS": 0,
-                "contributions-INITIAL_FORMS": 0,
+                "contributors": [deal.owned_by_id],
             },
         )
         self.assertRedirects(response, deal.urls["detail"])

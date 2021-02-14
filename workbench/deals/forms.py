@@ -152,7 +152,6 @@ class DealForm(ModelForm):
         if not kwargs.get("instance"):
             initial = kwargs.setdefault("initial", {})
             initial.setdefault("contributors", [kwargs["request"].user.pk])
-            print(args, kwargs)
 
         super().__init__(*args, **kwargs)
         warn_if_not_in_preparation(self)
@@ -266,6 +265,7 @@ class DealForm(ModelForm):
                 attributes.append(self.cleaned_data.get(key))
 
         instance.attributes.set(attributes)
+        self.save_m2m()
         return instance
 
 
