@@ -207,7 +207,7 @@ class DealForm(ModelForm):
             ),
         )
 
-        print(kwargs.pop("request").POST)
+        kwargs.pop("request")
         self.formsets = (
             OrderedDict([("contributions", ContributionFormset(*args, **kwargs))])
             if self.instance.pk
