@@ -216,7 +216,8 @@ class DealForm(ModelForm):
             q |= Q(id__in=self.instance.contributors.values_list("id", flat=True))
         self.fields["contributors"].queryset = User.objects.filter(q)
         self.fields["contributors"].help_text = format_html(
-            "{}: {}",
+            "{}<br>{}: {}",
+            self.fields["contributors"].help_text,
             _("Select team"),
             format_html_join(
                 ", ",

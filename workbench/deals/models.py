@@ -159,6 +159,10 @@ class Deal(Model):
         verbose_name=_("contributors"),
         related_name="+",
         through="Contribution",
+        help_text=_(
+            "The value of the deal will be distributed among all"
+            " contributors in the accepted deals report."
+        ),
     )
 
     objects = DealQuerySet.as_manager()
