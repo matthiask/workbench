@@ -113,6 +113,9 @@ $z-index: (
 
   border-right: lighten($alto, 0%) var(--grid-gap) solid;
   background-color: $white;
+
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .absence {
