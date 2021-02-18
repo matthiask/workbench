@@ -1,5 +1,6 @@
 import datetime as dt
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -684,3 +685,13 @@ class ProjectsTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertContains(response, "unspecific-service")
+
+    def test_offer_project_mismatch(self):
+        """Services with offers must not have differing projects"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create()
+
+        msg = [("offer", ["The offer must belong to the same project as the service."])]
+        with self.assertRaises(ValidationError) as cm:
+            Service(project=project, offer=offer, title="Test").full_clean()
+        self.assertEqual(list(cm.exception), msg)

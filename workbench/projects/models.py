@@ -631,3 +631,12 @@ class Service(ServiceBase):
     @property
     def is_declined(self):
         return self.offer.is_declined if self.offer else False
+
+    def clean_fields(self, exclude=None):
+        super().clean_fields(exclude=exclude)
+        errors = {}
+        if self.offer and self.offer.project_id != self.project_id:
+            errors["offer"] = _(
+                "The offer must belong to the same project as the service."
+            )
+        raise_if_errors(errors)
