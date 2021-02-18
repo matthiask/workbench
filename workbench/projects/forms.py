@@ -482,7 +482,17 @@ class ServiceMoveForm(ModelForm):
         kwargs.setdefault("initial", {}).setdefault("project", "")
         super().__init__(*args, **kwargs)
 
+        if self.instance.offer and self.request.method == "GET":
+            messages.error(
+                self.request,
+                _("Cannot move a service which is already bound to an offer."),
+            )
+
     def clean(self):
+        if self.instance.offer:
+            raise forms.ValidationError(
+                _("Cannot move a service which is already bound to an offer.")
+            )
         data = super().clean()
         if data.get("project") and data.get("project").closed_on:
             self.add_error("project", _("This project is already closed."))

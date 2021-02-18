@@ -412,6 +412,32 @@ class ProjectsTest(TestCase):
         service.refresh_from_db()
         self.assertEqual(service.effort_rate, 100)
 
+    def test_move_service_bound_to_offer(self):
+        """Moving a service bound to an offer should fail"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        service = factories.ServiceFactory.create(project=project, offer=offer)
+
+        other = factories.ProjectFactory.create()
+
+        self.client.force_login(project.owned_by)
+        response = self.client.get(
+            service.urls["move"],
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(
+            response, "Cannot move a service which is already bound to an offer."
+        )
+
+        response = self.client.get(
+            service.urls["move"],
+            {"modal-project": other.pk},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(
+            response, "Cannot move a service which is already bound to an offer."
+        )
+
     def test_select(self):
         """Test the project select modal"""
         project = factories.ProjectFactory.create()
