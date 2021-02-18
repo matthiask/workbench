@@ -3,11 +3,13 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
 
 from time_machine import travel
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
 from workbench.audit.models import LoggedAction
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
@@ -103,6 +105,9 @@ class OffersTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/pdf")
 
+    @override_settings(
+        FEATURES={FEATURES.CONTROLLING: F.ALWAYS, FEATURES.GLASSFROG: F.NEVER}
+    )
     def test_update_offer(self):
         """Offer and bound services update warnings and errors"""
         offer = factories.OfferFactory.create(title="Test")
@@ -181,7 +186,6 @@ class OffersTest(TestCase):
             service.urls["update"],
             {
                 "allow_logging": False,
-                WarningsForm.ignore_warnings_id: "no-role-selected",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )

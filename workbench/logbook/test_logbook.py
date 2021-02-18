@@ -15,6 +15,13 @@ from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days, logbook_lock
 
 
+@override_settings(
+    FEATURES={
+        FEATURES.CONTROLLING: F.ALWAYS,
+        FEATURES.GLASSFROG: F.NEVER,
+        FEATURES.LATE_LOGGING: F.USER,
+    }
+)
 class LogbookTest(TestCase):
     fixtures = ["exchangerates.json"]
 
@@ -174,7 +181,6 @@ class LogbookTest(TestCase):
                 "modal-description": "Test",
                 "modal-service_title": "service title",
                 "modal-service_description": "service description",
-                "modal-service_role": factories.RoleFactory.create().pk,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -209,7 +215,6 @@ class LogbookTest(TestCase):
                 "modal-description": "Test",
                 "modal-service_title": "service title",
                 "modal-service_description": "service description",
-                "modal-service_role": factories.RoleFactory.create().pk,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -235,7 +240,6 @@ class LogbookTest(TestCase):
                 "modal-description": "Test",
                 "modal-service_title": "service title",
                 "modal-service_description": "service description",
-                "modal-service_role": factories.RoleFactory.create().pk,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -245,7 +249,6 @@ class LogbookTest(TestCase):
             "Deselect the existing service if you want to create a new service.",
         )
 
-    @override_settings(FEATURES={FEATURES.GLASSFROG: F.NEVER})
     def test_no_service_role_without_glassfrog(self):
         """The service_role field isn't shown and isn't required without GLASSFROG"""
         service = factories.ServiceFactory.create()
@@ -752,3 +755,38 @@ class LogbookTest(TestCase):
 
         hours.refresh_from_db()
         self.assertEqual(hours.service, service)
+
+    @override_settings(FEATURES={FEATURES.GLASSFROG: F.ALWAYS})
+    def test_glassfrog_requires_role(self):
+        """Role is required with GLASSFROG"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            project.urls["createhours"],
+            {
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": in_days(0).isoformat(),
+                "modal-hours": "0.1",
+                "modal-description": "Test",
+                "modal-service_title": "service title",
+                "modal-service_description": "service description",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "This field is required")
+
+        response = self.client.post(
+            project.urls["createhours"],
+            {
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": in_days(0).isoformat(),
+                "modal-hours": "0.1",
+                "modal-description": "Test",
+                "modal-service_title": "service title",
+                "modal-service_description": "service description",
+                "modal-service_role": factories.RoleFactory.create().pk,
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)

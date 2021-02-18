@@ -14,6 +14,7 @@ from workbench.tools.validation import in_days
 
 
 class ProjectsTest(TestCase):
+    @override_settings(FEATURES={FEATURES.GLASSFROG: F.NEVER})
     def test_create(self):
         """Create a project and create, update, delete and merge a few services"""
         user = factories.UserFactory.create()
@@ -44,7 +45,6 @@ class ProjectsTest(TestCase):
                 "effort_type": "Consulting",
                 "effort_rate": "180",
                 "allow_logging": True,
-                WarningsForm.ignore_warnings_id: "no-role-selected",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -57,7 +57,6 @@ class ProjectsTest(TestCase):
                 "effort_type": "Production",
                 # "effort_rate": "180",
                 "allow_logging": True,
-                WarningsForm.ignore_warnings_id: "no-role-selected",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -71,7 +70,6 @@ class ProjectsTest(TestCase):
                 "effort_rate": "180",
                 "third_party_costs": "20",
                 "allow_logging": True,
-                WarningsForm.ignore_warnings_id: "no-role-selected",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -85,7 +83,6 @@ class ProjectsTest(TestCase):
                 "effort_type": "Production",
                 "effort_rate": "180",
                 "allow_logging": True,
-                WarningsForm.ignore_warnings_id: "no-role-selected",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -112,7 +109,6 @@ class ProjectsTest(TestCase):
                 "effort_type": "Consulting",
                 "effort_rate": "200",
                 "effort_hours": 20,
-                WarningsForm.ignore_warnings_id: "no-role-selected",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )

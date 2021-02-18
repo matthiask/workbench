@@ -413,13 +413,12 @@ class ServiceForm(ModelForm):
             self.fields["effort_rate"].disabled = True
             self.fields.pop("service_type")
 
+        self.fields["role"].required = True
         if not self.request.user.features[FEATURES.GLASSFROG]:
             self.fields.pop("role")
 
     def clean(self):
         data = super().clean()
-        if self.request.user.features[FEATURES.GLASSFROG] and not data.get("role"):
-            self.add_warning(_("No role selected."), code="no-role-selected")
         if data.get("title") and not is_title_specific(data["title"]):
             self.add_warning(
                 _(

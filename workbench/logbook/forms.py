@@ -361,9 +361,7 @@ class LoggedHoursForm(ModelForm):
     service_description = forms.CharField(
         label=_("description"), required=False, widget=Textarea({"rows": 2})
     )
-    service_role = forms.ModelChoiceField(
-        queryset=Role.objects.all(), label=_("role"), required=False
-    )
+    service_role = forms.ModelChoiceField(queryset=Role.objects.all(), label=_("role"))
 
     class Meta:
         model = LoggedHours
@@ -471,12 +469,6 @@ class LoggedHoursForm(ModelForm):
                 ),
                 code="unspecific-service",
             )
-        if (
-            data.get("service_title")
-            and "service_role" in self.fields
-            and not data.get("service_role")
-        ):
-            self.add_warning(_("No role selected."), code="no-role-selected")
 
         if all(
             f in self.fields and data.get(f) for f in ["rendered_by", "rendered_on"]

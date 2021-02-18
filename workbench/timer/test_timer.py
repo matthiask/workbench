@@ -2,6 +2,7 @@ import datetime as dt
 from decimal import Decimal
 
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.timezone import localtime
@@ -10,6 +11,7 @@ from django.utils.translation import deactivate_all
 from time_machine import travel
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import User
 from workbench.logbook.forms import DetectedTimestampForm
 from workbench.timer.models import Timestamp
@@ -26,6 +28,7 @@ class TimerTest(TestCase):
         self.assertContains(response, "data-current-user")
 
 
+@override_settings(FEATURES={FEATURES.GLASSFROG: F.NEVER})
 class TimestampsTest(TestCase):
     def setUp(self):
         deactivate_all()
