@@ -12,6 +12,10 @@
     </h1>
 
     <p>
+      <strong>{% translate 'contact person'|capfirst %}:</strong>
+      {% link_or_none project.owned_by %}
+      &nbsp;
+
       <strong>{% translate 'customer'|capfirst %}:</strong>
       {% link_or_none project.customer %}
       &nbsp;

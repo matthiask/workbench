@@ -72,6 +72,10 @@
     </tr>
 
     <tr>
+      <th class="text-right">{% translate 'contact person'|capfirst %}</th>
+      <td>{% link_or_none object.owned_by %}</td>
+    </tr>
+    <tr>
       <th class="text-right">{% translate 'contributions'|capfirst %}</th>
       <td>
         {% for c in object.all_contributions %}

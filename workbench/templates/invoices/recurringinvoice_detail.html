@@ -9,6 +9,10 @@
 
   <table class="table table-striped">
     <tr>
+      <th class="text-right">{% translate 'contact person'|capfirst %}</th>
+      <td>{% link_or_none object.owned_by %}</td>
+    </tr>
+    <tr>
       <th class="text-right">{% translate 'customer' %}</th>
       <td>{% link_or_none object.customer %}</td>
     </tr>
