@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-15 09:12+0100\n"
+"POT-Creation-Date: 2021-02-19 09:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -662,8 +662,8 @@ msgid "circle"
 msgstr "Kreis"
 
 #: workbench/circles/models.py
-msgid "Paid work"
-msgstr "Bezahlte Arbeit"
+msgid "Customer work"
+msgstr "Kundschaft"
 
 #: workbench/circles/models.py
 msgid "Knowledge transfer"
@@ -696,6 +696,10 @@ msgstr "Andere Internas"
 #: workbench/circles/models.py
 msgid "administration, bookkeeping, coordination, etc."
 msgstr "Interne Administration und Koordination, etc."
+
+#: workbench/circles/models.py
+msgid "Uncategorized"
+msgstr "Nicht kategorisiert"
 
 #: workbench/circles/models.py
 msgid "for the circle"
@@ -1285,8 +1289,8 @@ msgstr "Kontakt"
 #: workbench/deals/models.py workbench/expenses/models.py
 #: workbench/invoices/models.py workbench/offers/models.py
 #: workbench/projects/models.py workbench/tools/xlsx.py
-msgid "responsible"
-msgstr "verantwortlich"
+msgid "contact person"
+msgstr "Ansprechperson"
 
 #: workbench/deals/models.py workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/accepted_deals_for_user.html
@@ -2028,8 +2032,8 @@ msgstr ""
 "spezifische Titel für Leistungen."
 
 #: workbench/logbook/forms.py workbench/projects/forms.py
-msgid "No role selected."
-msgstr "Keine Rolle ausgewählt."
+msgid "This field is required."
+msgstr "Dieses Feld ist zwingend erforderlich."
 
 #: workbench/logbook/forms.py
 msgid "Hours have to be logged in the same week."
@@ -2495,6 +2499,12 @@ msgstr ""
 "Versuche, die Leistung nach der Zuweisung der Logbucheinträge zu löschen"
 
 #: workbench/projects/forms.py
+msgid "Cannot move a service which is already bound to an offer."
+msgstr ""
+"Leistungen, welche schon mit einer Offerte verbunden sind, können nicht "
+"verschoben werden."
+
+#: workbench/projects/forms.py
 msgid "This project is already closed."
 msgstr "Dieses Projekt wurde schon geschlossen."
 
@@ -2506,10 +2516,6 @@ msgid ""
 msgstr ""
 "Das Projekt %(project)s hat einen Pauschalsatz, welcher auf diese Leistung "
 "auch angewendet wird."
-
-#: workbench/projects/forms.py
-msgid "This field is required."
-msgstr "Dieses Feld ist zwingend erforderlich."
 
 #: workbench/projects/forms.py
 msgid "Codes must be unique."
@@ -2592,6 +2598,10 @@ msgid ""
 msgstr ""
 "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht "
 "löschen."
+
+#: workbench/projects/models.py
+msgid "The offer must belong to the same project as the service."
+msgstr "Die Offerte muss zum gleichen Projekt gehören wie die Leistung."
 
 #: workbench/projects/urls.py
 #, python-format
@@ -3814,6 +3824,15 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Paid work"
+#~ msgstr "Bezahlte Arbeit"
+
+#~ msgid "responsible"
+#~ msgstr "verantwortlich"
+
+#~ msgid "No role selected."
+#~ msgstr "Keine Rolle ausgewählt."
 
 #~ msgid ""
 #~ "The deal owner's contribution defaults to a weight of 100. You may "
