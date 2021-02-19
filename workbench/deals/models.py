@@ -173,15 +173,10 @@ class Deal(Model):
         verbose_name_plural = _("deals")
 
     def __str__(self):
-        return "%s %s - %s" % (self.code, self.title, self.owned_by.get_short_name())
+        return "%s %s" % (self.code, self.title)
 
     def __html__(self):
-        return format_html(
-            "<small>{}</small> {} - {}",
-            self.code,
-            self.title,
-            self.owned_by.get_short_name(),
-        )
+        return format_html("<small>{}</small> {}", self.code, self.title)
 
     def get_related_offers(self):
         return self.related_offers.select_related("owned_by", "project")
