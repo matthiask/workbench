@@ -38,7 +38,7 @@ class Role(models.Model):
     CATEGORIES = [
         (
             PAID_WORK,
-            _("Paid work"),
+            _("Customer work"),
             "",
         ),
         (
@@ -63,7 +63,7 @@ class Role(models.Model):
         ),
     ]
 
-    CATEGORY_CHOICES = [row[:2] for row in CATEGORIES]
+    CATEGORY_CHOICES = [("", _("Uncategorized"))] + [row[:2] for row in CATEGORIES]
     CATEGORY_DESCRIPTION = {row[0]: row[2] for row in CATEGORIES}
 
     circle = models.ForeignKey(

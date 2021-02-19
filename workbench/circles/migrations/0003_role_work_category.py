@@ -16,7 +16,8 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 blank=True,
                 choices=[
-                    ("paid-work", "Paid work"),
+                    ("", "Uncategorized"),
+                    ("paid-work", "Customer work"),
                     ("knowledge-transfer", "Knowledge transfer"),
                     ("social-care", "Social care"),
                     ("outreach", "Outreach"),
