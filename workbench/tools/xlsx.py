@@ -223,7 +223,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
         self.table(
             [
                 capfirst(_("project")),
-                capfirst(_("responsible")),
+                capfirst(_("contact person")),
                 _("Offered"),
                 _("Logbook"),
                 _("Undefined rate"),

@@ -101,7 +101,7 @@ class Invoice(ModelWithTotal):
         _("service period until"), blank=True, null=True
     )
     owned_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, verbose_name=_("responsible")
+        User, on_delete=models.PROTECT, verbose_name=_("contact person")
     )
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
@@ -543,7 +543,7 @@ class RecurringInvoice(ModelWithTotal):
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
     owned_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, verbose_name=_("responsible")
+        User, on_delete=models.PROTECT, verbose_name=_("contact person")
     )
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
@@ -588,7 +588,7 @@ class RecurringInvoice(ModelWithTotal):
         return self.title
 
     def __html__(self):
-        return "%s - %s" % (self.title, self.owned_by.get_short_name())
+        return self.title
 
     @property
     def pretty_status(self):

@@ -283,7 +283,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.PROTECT,
                 to=settings.AUTH_USER_MODEL,
-                verbose_name="responsible",
+                verbose_name="contact person",
             ),
         ),
         migrations.AddField(

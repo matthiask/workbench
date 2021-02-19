@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="expensereports",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="responsible",
+                        verbose_name="contact person",
                     ),
                 ),
             ],

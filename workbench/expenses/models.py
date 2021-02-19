@@ -26,7 +26,7 @@ class ExpenseReport(Model):
         User,
         on_delete=models.PROTECT,
         related_name="expensereports",
-        verbose_name=_("responsible"),
+        verbose_name=_("contact person"),
     )
     total = MoneyField(
         _("total"),

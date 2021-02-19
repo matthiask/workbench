@@ -49,7 +49,7 @@ class Campaign(Model):
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
     owned_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, verbose_name=_("responsible")
+        User, on_delete=models.PROTECT, verbose_name=_("contact person")
     )
     _fts = models.TextField(editable=False, blank=True)
 
@@ -194,7 +194,7 @@ class Project(Model):
         ),
     )
     owned_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, verbose_name=_("responsible")
+        User, on_delete=models.PROTECT, verbose_name=_("contact person")
     )
 
     type = models.CharField(_("type"), choices=TYPE_CHOICES, max_length=20)
