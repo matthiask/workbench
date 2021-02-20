@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-20 11:20+0100\n"
+"POT-Creation-Date: 2021-02-20 12:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1071,8 +1071,9 @@ msgstr "Valuta"
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
 #: workbench/templates/reporting/logging.html
-#: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
-#: workbench/tools/pdf.py workbench/tools/xlsx.py
+#: workbench/templates/reporting/open_items_list.html
+#: workbench/templates/reporting/planning_vs_logbook.html
+#: workbench/tools/models.py workbench/tools/pdf.py workbench/tools/xlsx.py
 msgid "total"
 msgstr "Total"
 
@@ -2472,8 +2473,8 @@ msgstr "Alle Typen"
 msgid "Set predefined value:"
 msgstr "Vordefinierten Wert setzen:"
 
-#: workbench/projects/forms.py workbench/templates/start.html
-#: workbench/templates/timestamps.html
+#: workbench/projects/forms.py workbench/reporting/views.py
+#: workbench/templates/start.html workbench/templates/timestamps.html
 msgid "today"
 msgstr "heute"
 
@@ -2700,6 +2701,10 @@ msgstr "Datum bis"
 #: workbench/reporting/views.py
 msgid "Set predefined period"
 msgstr "Vordefinierte Periode setzen"
+
+#: workbench/reporting/views.py
+msgid "Set date"
+msgstr "Datum setzen"
 
 #: workbench/services/models.py
 msgid "service type"

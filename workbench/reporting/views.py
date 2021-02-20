@@ -313,6 +313,15 @@ class DateRangeFilterForm(Form):
                 ", ", '<a href="#" data-set-period="{}:{}">{}</a>', date_ranges()
             ),
         )
+        self.fields["date_until"].help_text = format_html(
+            "{}: {}",
+            _("Set date"),
+            format_html_join(
+                ", ",
+                '<a href="#" data-field-value="{}">{}</a>',
+                [(dt.date.today().isoformat(), _("today"))],
+            ),
+        )
 
 
 class DateRangeAndTeamFilterForm(DateRangeFilterForm):
