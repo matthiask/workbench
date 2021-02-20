@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-19 14:33+0100\n"
+"POT-Creation-Date: 2021-02-20 11:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1288,7 +1288,10 @@ msgstr "Kontakt"
 
 #: workbench/deals/models.py workbench/expenses/models.py
 #: workbench/invoices/models.py workbench/offers/models.py
-#: workbench/projects/models.py workbench/tools/xlsx.py
+#: workbench/projects/models.py workbench/templates/deals/deal_detail.html
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/projects/project_detail.html workbench/tools/xlsx.py
 msgid "contact person"
 msgstr "Ansprechperson"
 
@@ -2001,6 +2004,10 @@ msgstr "Kein Kreis"
 #: workbench/tools/xlsx.py
 msgid "Not archived"
 msgstr "Nicht archiviert"
+
+#: workbench/logbook/forms.py workbench/projects/forms.py
+msgid "Used in this project"
+msgstr "Verwendet in diesem Projekt"
 
 #: workbench/logbook/forms.py
 msgid "This field is required unless you create a new service."

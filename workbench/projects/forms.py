@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _, override
 
@@ -387,7 +387,6 @@ class ServiceForm(ModelForm):
 
         super().__init__(*args, **kwargs)
 
-        self.fields["role"].choices = Role.objects.choices()
         self.fields["offer"].choices = self.project.offers.in_preparation_choices(
             include=getattr(self.instance, "offer_id", None)
         )
@@ -413,8 +412,24 @@ class ServiceForm(ModelForm):
             self.fields["effort_rate"].disabled = True
             self.fields.pop("service_type")
 
-        self.fields["role"].required = True
-        if not self.request.user.features[FEATURES.GLASSFROG]:
+        if self.request.user.features[FEATURES.GLASSFROG]:
+            self.fields["role"].choices = Role.objects.choices()
+            self.fields["role"].required = True
+            self.fields["role"].help_text = format_html(
+                "{}: {}",
+                _("Used in this project"),
+                format_html_join(
+                    ", ",
+                    '<a href="#" data-field-value="{}">{}</a>',
+                    [
+                        (role.id, role)
+                        for role in Role.objects.filter(services__project=self.project)
+                        .select_related("circle")
+                        .distinct()
+                    ],
+                ),
+            )
+        else:
             self.fields.pop("role")
 
     def clean(self):

@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from django.utils.html import mark_safe
+from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.text import capfirst
 from django.utils.timezone import localtime
 from django.utils.translation import gettext, gettext_lazy as _, override
@@ -438,6 +438,22 @@ class LoggedHoursForm(ModelForm):
         else:
             if self.request.user.features[FEATURES.GLASSFROG]:
                 self.fields["service_role"].choices = Role.objects.choices()
+                self.fields["service_role"].help_text = format_html(
+                    "{}: {}",
+                    _("Used in this project"),
+                    format_html_join(
+                        ", ",
+                        '<a href="#" data-field-value="{}">{}</a>',
+                        [
+                            (role.id, role)
+                            for role in Role.objects.filter(
+                                services__project=self.project
+                            )
+                            .select_related("circle")
+                            .distinct()
+                        ],
+                    ),
+                )
             else:
                 self.fields.pop("service_role")
 
