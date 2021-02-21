@@ -371,6 +371,7 @@ class PlannedWorkForm(ModelForm):
         return instance
 
 
+@add_prefix("modal")
 class DeclineRequestForm(ModelForm):
     reason = forms.CharField(label=capfirst(_("reason")), widget=Textarea)
 

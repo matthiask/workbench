@@ -12,6 +12,7 @@ from workbench.planning import reporting
 from workbench.planning.forms import PlannedWorkSearchForm, PlanningRequestSearchForm
 from workbench.planning.models import PlannedWork, PlanningRequest
 from workbench.templatetags.workbench import link_or_none
+from workbench.tools.forms import WarningsForm
 from workbench.tools.validation import in_days, monday
 
 
@@ -501,3 +502,90 @@ class PlanningTest(TestCase):
         self.assertEqual(len(mail.outbox), 2)  # No mail (post_add)
         pr.delete()
         self.assertEqual(len(mail.outbox), 2)  # No notification (post_delete)
+
+    def test_decline_request(self):
+        """Decline and accept a request again"""
+        pr = factories.PlanningRequestFactory.create(
+            requested_hours=20,
+            earliest_start_on=monday(),
+            completion_requested_on=monday() + dt.timedelta(days=14),
+        )
+        self.assertEqual(len(mail.outbox), 0)  # Nothing yet
+
+        receiver = factories.UserFactory.create()
+        pr.receivers.add(receiver)
+        self.assertEqual(len(mail.outbox), 1)  # Request notification
+        self.client.force_login(receiver)
+
+        response = self.client.get(pr.urls["decline"])
+        self.assertNotContains(response, 'id="id_modal-delete_planned_work"')
+
+        factories.PlannedWorkFactory.create(
+            project=pr.project,
+            request=pr,
+            user=receiver,
+            planned_hours=20,
+            title=pr.title,
+            weeks=[pr.earliest_start_on],
+        )
+
+        pr.refresh_from_db()
+        self.assertEqual(pr.planned_hours, 20)
+
+        response = self.client.get(pr.urls["decline"])
+        self.assertContains(response, 'id="id_modal-delete_planned_work"')
+        self.assertContains(
+            response,
+            '<small class="form-text text-muted">Planning request (20.0h)</small>',
+            html=True,
+        )
+
+        response = self.client.post(
+            pr.urls["decline"],
+            {"modal-delete_planned_work": "on", "modal-reason": "My reasons"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(len(mail.outbox), 2)  # Decline notification
+
+        pr.refresh_from_db()
+        self.assertEqual(pr.planned_hours, 0)
+
+        self.assertFalse(receiver.planned_work.exists())
+        rr = receiver.receivedrequest_set.get(request=pr)
+        self.assertEqual(rr.reason, "My reasons")
+        self.assertTrue(bool(rr.declined_at))
+
+        response = self.client.post(
+            pr.project.urls["creatework"],
+            {
+                "modal-project": pr.project_id,
+                "modal-request": pr.id,
+                "modal-user": receiver.id,
+                "modal-planned_hours": 20,
+                "modal-title": pr.title,
+                "modal-weeks": [pr.earliest_start_on],
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, 'value="already-declined"')
+
+        response = self.client.post(
+            pr.project.urls["creatework"],
+            {
+                "modal-project": pr.project_id,
+                "modal-request": pr.id,
+                "modal-user": receiver.id,
+                "modal-planned_hours": 20,
+                "modal-title": pr.title,
+                "modal-weeks": [pr.earliest_start_on],
+                WarningsForm.ignore_warnings_id: "already-declined",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        # print(response, response.content.decode("utf-8"))
+        self.assertEqual(response.status_code, 201)
+
+        rr.refresh_from_db()
+        self.assertEqual(rr.reason, "")
+        self.assertEqual(rr.declined_at, None)
