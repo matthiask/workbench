@@ -430,13 +430,13 @@ class ProjectsTest(TestCase):
             response, "Cannot move a service which is already bound to an offer."
         )
 
-        response = self.client.get(
+        response = self.client.post(
             service.urls["move"],
             {"modal-project": other.pk},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertContains(
-            response, "Cannot move a service which is already bound to an offer."
+            response, "The offer must belong to the same project as the service."
         )
 
     def test_select(self):

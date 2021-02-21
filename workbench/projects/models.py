@@ -275,7 +275,7 @@ class Project(Model):
             errors["closed_on"] = _(
                 "Leave this empty if you do not want to close the project yet."
             )
-        raise_if_errors(errors)
+        raise_if_errors(errors, exclude)
 
     @property
     def status_badge(self):
@@ -629,4 +629,4 @@ class Service(ServiceBase):
             errors["offer"] = _(
                 "The offer must belong to the same project as the service."
             )
-        raise_if_errors(errors)
+        raise_if_errors(errors, exclude)

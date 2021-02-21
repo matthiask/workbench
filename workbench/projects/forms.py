@@ -504,10 +504,6 @@ class ServiceMoveForm(ModelForm):
             )
 
     def clean(self):
-        if self.instance.offer:
-            raise forms.ValidationError(
-                _("Cannot move a service which is already bound to an offer.")
-            )
         data = super().clean()
         if data.get("project") and data.get("project").closed_on:
             self.add_error("project", _("This project is already closed."))
