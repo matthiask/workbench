@@ -2,15 +2,19 @@ import datetime as dt
 from itertools import islice
 
 from django import forms
+from django.conf import settings
 from django.db.models import Q, Sum
+from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
+from authlib.email import render_to_mail
+
 from workbench.accounts.models import Team, User
 from workbench.invoices.utils import recurring
-from workbench.planning.models import PlannedWork, PlanningRequest
+from workbench.planning.models import PlannedWork, PlanningRequest, ReceivedRequest
 from workbench.projects.models import Project
 from workbench.tools.formats import Z1, local_date_format
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
@@ -342,4 +346,29 @@ class PlannedWorkForm(ModelForm):
         instance = super().save(commit=False)
         instance.weeks = self.cleaned_data.get("weeks")
         instance.save()
+        return instance
+
+
+class DeclineRequestForm(ModelForm):
+    reason = forms.CharField(label=capfirst(_("reason")), widget=Textarea)
+
+    class Meta:
+        model = PlanningRequest
+        fields = ()
+
+    def save(self):
+        instance, created = ReceivedRequest.objects.update_or_create(
+            request=self.instance,
+            user=self.request.user,
+            defaults={
+                "declined_at": timezone.now(),
+                "reason": self.cleaned_data["reason"],
+            },
+        )
+        render_to_mail(
+            "planning/planningrequest_declined",
+            {"object": instance, "WORKBENCH": settings.WORKBENCH},
+            to=[self.instance.created_by.email],
+            cc=[user.email for user in self.instance.receivers.all()],
+        ).send(fail_silently=True)
         return instance

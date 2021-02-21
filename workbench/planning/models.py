@@ -36,6 +36,24 @@ class PlanningRequestQuerySet(SearchQuerySet):
         )
 
 
+class ReceivedRequest(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))
+    request = models.ForeignKey(
+        "PlanningRequest", on_delete=models.CASCADE, verbose_name=_("planning request")
+    )
+    created_at = models.DateTimeField(_("created at"), default=timezone.now)
+    declined_at = models.DateTimeField(_("declined at"), blank=True, null=True)
+    reason = models.TextField(_("reason"), blank=True)
+
+    class Meta:
+        ordering = ["-pk"]
+        verbose_name = _("received request")
+        verbose_name_plural = _("received requests")
+
+    def __str__(self):
+        return f"{self.user} <--> {self.request}"
+
+
 @model_urls
 class PlanningRequest(Model):
     project = models.ForeignKey(
@@ -61,7 +79,10 @@ class PlanningRequest(Model):
     title = models.CharField(_("title"), max_length=100)
     description = models.TextField(_("description"), blank=True)
     receivers = models.ManyToManyField(
-        User, verbose_name=_("receivers"), related_name="received_planning_requests"
+        User,
+        through=ReceivedRequest,
+        verbose_name=_("receivers"),
+        related_name="received_planning_requests",
     )
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)

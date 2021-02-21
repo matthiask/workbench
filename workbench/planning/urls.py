@@ -1,8 +1,10 @@
 from django.urls import path
+from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
 from workbench.logbook.views import create
 from workbench.planning.forms import (
+    DeclineRequestForm,
     PlannedWorkForm,
     PlannedWorkSearchForm,
     PlanningRequestForm,
@@ -46,6 +48,16 @@ urlpatterns = [
             form_class=PlanningRequestForm,
         ),
         name="planning_planningrequest_update",
+    ),
+    path(
+        "requests/<int:pk>/decline/",
+        generic.UpdateView.as_view(
+            model=PlanningRequest,
+            form_class=DeclineRequestForm,
+            template_name="modalform.html",
+            title=_("Decline planning request"),
+        ),
+        name="planning_planningrequest_decline",
     ),
     path(
         "requests/<int:pk>/delete/",

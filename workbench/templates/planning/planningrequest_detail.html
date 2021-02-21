@@ -55,8 +55,11 @@
   </a>
   <a href="{{ object.project.urls.creatework }}?request={{ object.id }}"
      data-toggle="ajaxmodal"
-     class="btn btn-primary mr-auto">
+     class="btn btn-primary">
     {% translate 'Accept' %}
+  </a>
+  <a href="{{ object.urls.decline }}" data-toggle="ajaxmodal" class="btn btn-primary mr-auto">
+    {% translate 'Decline' %}
   </a>
   <a href="{{ object.urls.delete }}" data-toggle="ajaxmodal" class="btn btn-outline-danger">
     {% translate 'Delete' %}
