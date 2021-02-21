@@ -321,9 +321,9 @@ class PlanningTest(TestCase):
         self.assertEqual(len(pr.receivers_with_work), 3)
 
         receivers = dict(pr.receivers_with_work)
-        self.assertEqual(receivers[only_receiver], [])
-        self.assertEqual(receivers[both.user], [both])
-        self.assertEqual(receivers[only_pw.user], [only_pw])
+        self.assertEqual(receivers[only_receiver]["work"], [])
+        self.assertEqual(receivers[both.user]["work"], [both])
+        self.assertEqual(receivers[only_pw.user]["work"], [only_pw])
 
     def test_planning_views(self):
         """The planning views do not crash"""
