@@ -373,7 +373,13 @@ def user_planning(user, date_range):
     weeks = list(takewhile(lambda x: x <= end, recurring(monday(start), "weekly")))
     planning = Planning(weeks=weeks, users=[user])
     planning.add_planned_work(user.planned_work.all())
-    planning.add_planning_requests(user.received_planning_requests.all())
+    planning.add_planning_requests(
+        user.received_planning_requests.exclude(
+            id__in=user.receivedrequest_set.filter(declined_at__isnull=False).values(
+                "request"
+            )
+        )
+    )
     planning.add_worked_hours(user.loggedhours.all())
     planning.add_absences(user.absences.all())
     return planning.report()
