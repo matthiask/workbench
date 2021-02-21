@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-20 12:10+0100\n"
+"POT-Creation-Date: 2021-02-21 13:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -515,7 +515,10 @@ msgstr "endet am"
 msgid "description"
 msgstr "Beschreibung"
 
-#: workbench/awt/models.py workbench/templates/awt/absence_detail.html
+#: workbench/awt/models.py workbench/planning/forms.py
+#: workbench/planning/models.py workbench/templates/awt/absence_detail.html
+#: workbench/templates/planning/planningrequest_declined.txt
+#: workbench/templates/planning/planningrequest_detail.html
 msgid "reason"
 msgstr "Grund"
 
@@ -1713,6 +1716,7 @@ msgstr "Leistungen"
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/planning/planningrequest_declined.txt
 #: workbench/templates/planning/planningrequest_deleted.txt
 #: workbench/templates/planning/planningrequest_detail.html
 #: workbench/templates/planning/planningrequest_notification.txt
@@ -2356,6 +2360,40 @@ msgstr ""
 "Mindestens eine Woche liegt ausserhalb des angefragten Zeitraumes von "
 "%(from)s – %(until)s: %(weeks)s"
 
+#: workbench/planning/forms.py
+#, python-format
+msgid ""
+"%(user)s has already declined this planning request at %(declined_at)s with "
+"reason \"%(reason)s\"."
+msgstr ""
+"%(user)s hat diese Planungsanfrage um %(declined_at)s mit Grund «%(reason)s» "
+"schon abgelehnt."
+
+#: workbench/planning/forms.py
+msgid "I hereby confirm the deletion of already planned work."
+msgstr "Ich bestätige hiermit die Löschung der schon geplanten Arbeiten."
+
+#: workbench/planning/models.py
+#: workbench/templates/planning/planningrequest_declined.txt
+#: workbench/templates/planning/planningrequest_deleted.txt
+#: workbench/templates/planning/planningrequest_notification.txt
+#: workbench/templates/planning/project_planning.html
+#: workbench/templates/planning/team_planning.html
+msgid "planning request"
+msgstr "Planungsanfrage"
+
+#: workbench/planning/models.py
+msgid "declined at"
+msgstr "abgelehnt um"
+
+#: workbench/planning/models.py
+msgid "received request"
+msgstr "empfangene Anfrage"
+
+#: workbench/planning/models.py
+msgid "received requests"
+msgstr "empfangene Anfragen"
+
 #: workbench/planning/models.py
 msgid "requested hours"
 msgstr "angefragte Stunden"
@@ -2385,14 +2423,6 @@ msgid "is provisional"
 msgstr "ist provisorisch"
 
 #: workbench/planning/models.py
-#: workbench/templates/planning/planningrequest_deleted.txt
-#: workbench/templates/planning/planningrequest_notification.txt
-#: workbench/templates/planning/project_planning.html
-#: workbench/templates/planning/team_planning.html
-msgid "planning request"
-msgstr "Planungsanfrage"
-
-#: workbench/planning/models.py
 msgid "planning requests"
 msgstr "Planungsanfragen"
 
@@ -2420,6 +2450,10 @@ msgstr "Nur Montage erlaubt, aber Feld enthält %s."
 #, python-format
 msgid "%(planned_hours)s in %(weeks)s weeks (%(per_week)s per week)"
 msgstr "%(planned_hours)s in %(weeks)s Wochen (%(per_week)s pro Woche)"
+
+#: workbench/planning/urls.py
+msgid "Decline planning request"
+msgstr "Planungsanfrage ablehnen"
 
 #: workbench/projects/apps.py workbench/projects/models.py
 #: workbench/templates/base.html
@@ -3264,25 +3298,33 @@ msgstr "Diese Seite existiert nicht (mehr)."
 msgid "Periods"
 msgstr "Zeiträume"
 
-#: workbench/templates/planning/planningrequest_deleted.txt
+#: workbench/templates/planning/planningrequest_declined.txt
 #, python-format
-msgid "Deleted planning request on %(project)s"
-msgstr "Gelöschte Planungsanfrage auf %(project)s"
+msgid "%(user)s declined planning request on %(project)s"
+msgstr "%(user)s hat Planungsanfrage auf %(project)s abgelehnt"
 
+#: workbench/templates/planning/planningrequest_declined.txt
 #: workbench/templates/planning/planningrequest_deleted.txt
 #: workbench/templates/planning/planningrequest_notification.txt
 msgid "Missing hours"
 msgstr "Fehlende Stunden"
 
+#: workbench/templates/planning/planningrequest_declined.txt
 #: workbench/templates/planning/planningrequest_deleted.txt
 #: workbench/templates/planning/planningrequest_notification.txt
 msgid "Requested by"
 msgstr "Anfrage von"
 
+#: workbench/templates/planning/planningrequest_declined.txt
 #: workbench/templates/planning/planningrequest_deleted.txt
 #: workbench/templates/planning/planningrequest_notification.txt
 msgid "Receivers"
 msgstr "Adressat*innen"
+
+#: workbench/templates/planning/planningrequest_deleted.txt
+#, python-format
+msgid "Deleted planning request on %(project)s"
+msgstr "Gelöschte Planungsanfrage auf %(project)s"
 
 #: workbench/templates/planning/planningrequest_detail.html
 msgid "planned"
@@ -3297,8 +3339,18 @@ msgid "period"
 msgstr "Zeitraum"
 
 #: workbench/templates/planning/planningrequest_detail.html
+#, fuzzy, python-format
+#| msgid "Archived at %(archived_at)s"
+msgid "Declined at %(declined_at)s"
+msgstr "Archiviert um %(archived_at)s"
+
+#: workbench/templates/planning/planningrequest_detail.html
 msgid "Accept"
 msgstr "Akzeptieren"
+
+#: workbench/templates/planning/planningrequest_detail.html
+msgid "Decline"
+msgstr "Ablehnen"
 
 #: workbench/templates/planning/planningrequest_notification.txt
 #, python-format

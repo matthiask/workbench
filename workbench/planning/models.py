@@ -47,6 +47,7 @@ class ReceivedRequest(models.Model):
 
     class Meta:
         ordering = ["-pk"]
+        unique_together = [("user", "request")]
         verbose_name = _("received request")
         verbose_name_plural = _("received requests")
 
@@ -144,9 +145,25 @@ class PlanningRequest(Model):
 
     @cached_property
     def receivers_with_work(self):
-        work = {user: [] for user in self.receivers.all()}
+        work = {
+            rr.user: {
+                "created_by": rr.created_at,
+                "declined_at": rr.declined_at,
+                "reason": rr.reason,
+                "work": [],
+            }
+            for rr in self.receivedrequest_set.select_related("user")
+        }
         for pw in self.planned_work.select_related("user"):
-            work.setdefault(pw.user, []).append(pw)
+            work.setdefault(
+                pw.user,
+                {
+                    "created_by": None,
+                    "declined_at": None,
+                    "reason": None,
+                    "work": [],
+                },
+            )["work"].append(pw)
         return sorted(work.items())
 
     @property

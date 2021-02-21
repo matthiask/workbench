@@ -41,7 +41,8 @@
       <td>
         {% for user, work in object.receivers_with_work %}
           {{ user.get_full_name }}:
-          {% for pw in work %}<a data-toggle="ajaxmodal" class="d-inline" href="{{ pw.get_absolute_url }}">{{ pw }}</a>{% if not forloop.last %}, {% endif %}{% empty %}–{% endfor %}
+          {% for pw in work.work %}<a data-toggle="ajaxmodal" class="d-inline" href="{{ pw.get_absolute_url }}">{{ pw }}</a>{% if not forloop.last %}, {% endif %}{% empty %}–{% endfor %}
+          {% if work.declined_at %}{% blocktranslate with declined_at=work.declined_at|local_date_format trimmed %}Declined at {{ declined_at }}{% endblocktranslate %} ({% translate 'reason'|capfirst %}: {{ work.reason }}){% endif %}
           <br>
         {% endfor %}
       </td>

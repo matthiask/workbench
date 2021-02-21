@@ -340,12 +340,34 @@ class PlannedWorkForm(ModelForm):
                 _("The selected offer is declined."), code="offer-is-declined"
             )
 
+        if (request := data.get("request")) and (user := data.get("user")):
+            if rr := request.receivedrequest_set.filter(
+                user=user, declined_at__isnull=False
+            ).first():
+                self.add_warning(
+                    _(
+                        "%(user)s has already declined this planning request"
+                        ' at %(declined_at)s with reason "%(reason)s".'
+                    )
+                    % {
+                        "user": user,
+                        "declined_at": local_date_format(rr.declined_at),
+                        "reason": rr.reason,
+                    },
+                    code="already-declined",
+                )
+
         return data
 
     def save(self):
         instance = super().save(commit=False)
         instance.weeks = self.cleaned_data.get("weeks")
         instance.save()
+
+        if instance.request:
+            instance.request.receivedrequest_set.filter(
+                user=instance.user, declined_at__isnull=False
+            ).update(declined_at=None, reason="")
         return instance
 
 
@@ -356,6 +378,15 @@ class DeclineRequestForm(ModelForm):
         model = PlanningRequest
         fields = ()
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.pw = self.instance.planned_work.filter(user=self.request.user)
+        if self.pw:
+            self.fields["delete_planned_work"] = forms.BooleanField(
+                label=_("I hereby confirm the deletion of already planned work."),
+                help_text=", ".join(str(w) for w in self.pw),
+            )
+
     def save(self):
         instance, created = ReceivedRequest.objects.update_or_create(
             request=self.instance,
@@ -365,6 +396,8 @@ class DeclineRequestForm(ModelForm):
                 "reason": self.cleaned_data["reason"],
             },
         )
+        self.pw.delete()
+        self.instance.save()  # Update PlanningRequest.planned_hours
         render_to_mail(
             "planning/planningrequest_declined",
             {"object": instance, "WORKBENCH": settings.WORKBENCH},
