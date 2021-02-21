@@ -41,6 +41,6 @@ def create_recurring_invoices_and_notify():
             for (ri, invoice) in invoices
         )
         mail = EmailMultiAlternatives(
-            _("recurring invoices"), invoices, to=[owner.email], bcc=settings.BCC
+            _("recurring invoices"), invoices, to=[owner.email], cc=settings.CC
         )
         mail.send()
