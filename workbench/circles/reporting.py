@@ -68,13 +68,12 @@ def hours_by_circle(date_range, *, users=None):
     }
 
 
-def hours_per_work_category(date_range, *, users=None):
-    queryset = LoggedHours.objects.order_by().filter(rendered_on__range=date_range)
-    if users:
-        queryset = queryset.filter(rendered_by__in=users)
-
-    queryset = queryset.values("service__role__work_category", "rendered_by").annotate(
-        Sum("hours")
+def hours_per_work_category(date_range, *, users):
+    queryset = (
+        LoggedHours.objects.order_by()
+        .filter(rendered_on__range=date_range, rendered_by__in=users)
+        .values("service__role__work_category", "rendered_by")
+        .annotate(Sum("hours"))
     )
     seen_users = set()
 
