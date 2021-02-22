@@ -273,6 +273,24 @@ class PlannedWorkForm(ModelForm):
                     }
                 )
 
+        if pk := request.GET.get("copy"):
+            try:
+                pw = PlannedWork.objects.get(pk=pk)
+            except (PlannedWork.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update(
+                    {
+                        "project": pw.project_id,
+                        "offer": pw.offer_id,
+                        "request": pw.request_id,
+                        "title": pw.title,
+                        "notes": pw.notes,
+                        "planned_hours": pw.planned_hours,
+                        "weeks": pw.weeks,
+                    }
+                )
+
         super().__init__(*args, **kwargs)
         self.instance.project = self.project
 
@@ -287,6 +305,7 @@ class PlannedWorkForm(ModelForm):
             monday(),
             self.instance.weeks and min(self.instance.weeks),
             pr and min(pr.weeks),
+            initial.get("weeks") and min(initial["weeks"]),
         ]
         date_from = min(filter(None, date_from_options)) - dt.timedelta(days=21)
 
