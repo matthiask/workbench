@@ -170,6 +170,7 @@ class LogbookTest(TestCase):
         """Logging hours and creating a new service is possible at the same time"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
+        types = factories.service_types()
 
         response = self.client.post(
             project.urls["createhours"],
@@ -181,6 +182,7 @@ class LogbookTest(TestCase):
                 "modal-description": "Test",
                 "modal-service_title": "service title",
                 "modal-service_description": "service description",
+                "modal-service_type": types.administration.pk,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -188,7 +190,7 @@ class LogbookTest(TestCase):
 
         entry = LoggedHours.objects.get()
         self.assertEqual(entry.service.title, "service title")
-        self.assertIsNone(entry.service.effort_rate)
+        self.assertEqual(entry.service.effort_rate, types.administration.hourly_rate)
 
         response = self.client.get(
             entry.urls["detail"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
@@ -204,6 +206,12 @@ class LogbookTest(TestCase):
         flat rates assigns the flat rate"""
         project = factories.ProjectFactory.create(flat_rate=250)
         self.client.force_login(project.owned_by)
+
+        response = self.client.get(
+            project.urls["createhours"],
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertNotContains(response, "service_type")
 
         response = self.client.post(
             project.urls["createhours"],

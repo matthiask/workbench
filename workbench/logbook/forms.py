@@ -19,6 +19,7 @@ from workbench.expenses.models import ExchangeRates
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Campaign, Project, Service
+from workbench.services.models import ServiceType
 from workbench.timer.models import Timestamp
 from workbench.tools.forms import (
     Autocomplete,
@@ -364,6 +365,9 @@ class LoggedHoursForm(ModelForm):
     service_role = forms.ModelChoiceField(
         queryset=Role.objects.all(), label=_("role"), required=False
     )
+    service_type = forms.ModelChoiceField(
+        ServiceType.objects.all(), label=ServiceType._meta.verbose_name, required=False
+    )
 
     class Meta:
         model = LoggedHours
@@ -427,6 +431,7 @@ class LoggedHoursForm(ModelForm):
             self.fields.pop("service_title")
             self.fields.pop("service_description")
             self.fields.pop("service_role")
+            self.fields.pop("service_type")
             if (
                 not self.instance.rendered_by.features[FEATURES.LATE_LOGGING]
                 and self.instance.rendered_on < logbook_lock()
@@ -456,6 +461,9 @@ class LoggedHoursForm(ModelForm):
                 )
             else:
                 self.fields.pop("service_role")
+
+            if self.project.flat_rate is not None:
+                self.fields.pop("service_type")
 
     def clean(self):
         data = super().clean()
@@ -561,6 +569,9 @@ class LoggedHoursForm(ModelForm):
                 with override(settings.WORKBENCH.PDF_LANGUAGE):
                     service.effort_type = gettext("flat rate")
                     service.effort_rate = self.project.flat_rate
+            elif service_type := self.cleaned_data.get("service_type"):
+                service.effort_type = service_type.title
+                service.effort_rate = service_type.hourly_rate
             service.save()
             instance.service = service
         instance.save()
