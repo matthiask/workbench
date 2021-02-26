@@ -8,8 +8,7 @@ function _cl(el, cl, add) {
 }
 
 function doSubmit(el) {
-  const form = el.closest("form")
-  form.requestSubmit ? form.requestSubmit() : form.submit()
+  el.closest("form").requestSubmit()
 }
 
 $(function () {
