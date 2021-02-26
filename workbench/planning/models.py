@@ -32,7 +32,12 @@ class PlanningRequestQuerySet(SearchQuerySet):
 
     def maybe_actionable(self, *, user):
         return (
-            self.with_missing_hours().filter(receivers=user).select_related("project")
+            self.with_missing_hours()
+            .filter(
+                receivedrequest__user=user,
+                receivedrequest__declined_at__isnull=True,
+            )
+            .select_related("project")
         )
 
 

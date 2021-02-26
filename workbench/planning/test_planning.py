@@ -517,6 +517,10 @@ class PlanningTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)  # Request notification
         self.client.force_login(receiver)
 
+        self.assertEqual(
+            list(PlanningRequest.objects.maybe_actionable(user=receiver)), [pr]
+        )
+
         response = self.client.get(pr.urls["decline"])
         self.assertNotContains(response, 'id="id_modal-delete_planned_work"')
 
@@ -547,6 +551,10 @@ class PlanningTest(TestCase):
         )
         self.assertEqual(response.status_code, 202)
         self.assertEqual(len(mail.outbox), 2)  # Decline notification
+
+        self.assertEqual(
+            list(PlanningRequest.objects.maybe_actionable(user=receiver)), []
+        )
 
         pr.refresh_from_db()
         self.assertEqual(pr.planned_hours, 0)
@@ -589,3 +597,8 @@ class PlanningTest(TestCase):
         rr.refresh_from_db()
         self.assertEqual(rr.reason, "")
         self.assertEqual(rr.declined_at, None)
+
+        # All hours planned, not actionable
+        self.assertEqual(
+            list(PlanningRequest.objects.maybe_actionable(user=receiver)), []
+        )
