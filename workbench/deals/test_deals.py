@@ -419,8 +419,8 @@ class DealsTest(TestCase):
         offer = factories.OfferFactory.create(
             title="Test",
             postal_address="Test\nTest street\nTest",
-            offered_on=in_days(0),
-            valid_until=in_days(60),
+            # offered_on=in_days(0),
+            # valid_until=in_days(60),
         )
 
         self.client.force_login(deal.owned_by)
@@ -444,6 +444,19 @@ class DealsTest(TestCase):
 
         # Accept the deal, and accept related offers while doing this
         closing_type = factories.ClosingTypeFactory.create(represents_a_win=True)
+        response = self.client.post(
+            deal.urls["set_status"] + "?status=20",
+            {"closing_type": closing_type.pk, "related_offers": [offer.pk]},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertContains(response, "Offered on date missing for selected state.")
+        self.assertContains(response, "Valid until date missing for selected state.")
+        # print(response, response.content.decode("utf-8"))
+
+        offer.offered_on = in_days(0)
+        offer.valid_until = in_days(60)
+        offer.save()
+
         response = self.client.post(
             deal.urls["set_status"] + "?status=20",
             {"closing_type": closing_type.pk, "related_offers": [offer.pk]},

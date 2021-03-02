@@ -3,6 +3,7 @@ import datetime as dt
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.http import Http404
 from django.utils.html import format_html, format_html_join
@@ -341,6 +342,24 @@ class SetStatusForm(ModelForm):
             self.add_error(
                 "closing_type", _("This field is required when closing a deal.")
             )
+        self.offers_to_update = data.get("related_offers", ())
+        for offer in self.offers_to_update:
+            offer.status = (
+                offer.ACCEPTED
+                if data.get("status") == Deal.ACCEPTED
+                else offer.DECLINED
+            )
+            try:
+                offer.full_clean()
+            except ValidationError as exc:
+                self.add_error(
+                    "__all__",
+                    _("The offer %(offer)s is invalid: %(error)s")
+                    % {
+                        "offer": offer,
+                        "error": ", ".join(str(e) for e in exc.messages),
+                    },
+                )
         return data
 
     def save(self, *args, **kwargs):
@@ -355,13 +374,7 @@ class SetStatusForm(ModelForm):
             instance.closed_on = instance.closed_on or dt.date.today()
 
             projects = set()
-            for offer in self.cleaned_data.get("related_offers", ()):
-                offer.status = (
-                    offer.ACCEPTED
-                    if instance.status == Deal.ACCEPTED
-                    else offer.DECLINED
-                )
-                offer.full_clean()
+            for offer in self.offers_to_update:
                 offer.save()
                 projects.add(offer.project)
 
