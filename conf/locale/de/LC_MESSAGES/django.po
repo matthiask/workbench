@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-21 13:41+0100\n"
+"POT-Creation-Date: 2021-03-02 13:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1218,6 +1218,11 @@ msgstr "Offerten ablehnen"
 #: workbench/deals/forms.py
 msgid "This field is required when closing a deal."
 msgstr "Dieses Feld wird benötigt wenn Du ein Geschäft schliesst."
+
+#: workbench/deals/forms.py
+#, python-format
+msgid "The offer %(offer)s is invalid: %(error)s"
+msgstr "Die Offerte %(offer)s hat Fehler: %(error)s"
 
 #: workbench/deals/models.py
 msgid "is required"
@@ -3187,6 +3192,7 @@ msgstr "Total exkl. MwSt."
 
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/planning/plannedwork_detail.html
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_detail.html
 msgid "Copy"
