@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-02 13:40+0100\n"
+"POT-Creation-Date: 2021-03-02 14:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1221,8 +1221,12 @@ msgstr "Dieses Feld wird benötigt wenn Du ein Geschäft schliesst."
 
 #: workbench/deals/forms.py
 #, python-format
-msgid "The offer %(offer)s is invalid: %(error)s"
-msgstr "Die Offerte %(offer)s hat Fehler: %(error)s"
+msgid ""
+"Setting the status of offer \"%(offer)s\" to \"%(status)s\" is not possible "
+"because of the following errors: %(error)s"
+msgstr ""
+"Wegen folgenden Fehlern ist es nicht möglich, den Status der Offerte "
+"\"%(offer)s\" auf \"%(status)s\" zu setzen: %(error)s"
 
 #: workbench/deals/models.py
 msgid "is required"
@@ -3893,6 +3897,10 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-format
+#~ msgid "The offer %(offer)s is invalid: %(error)s"
+#~ msgstr "Die Offerte %(offer)s hat Fehler: %(error)s"
 
 #~ msgid "Paid work"
 #~ msgstr "Bezahlte Arbeit"

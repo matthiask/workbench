@@ -355,10 +355,14 @@ class SetStatusForm(ModelForm):
                 except ValidationError as exc:
                     self.add_error(
                         "__all__",
-                        _("The offer %(offer)s is invalid: %(error)s")
+                        _(
+                            'Setting the status of offer "%(offer)s" to "%(status)s" is'
+                            " not possible because of the following errors: %(error)s"
+                        )
                         % {
                             "offer": offer,
-                            "error": ", ".join(str(e) for e in exc.messages),
+                            "status": offer.get_status_display(),
+                            "error": " ".join(str(e) for e in exc.messages),
                         },
                     )
         return data
