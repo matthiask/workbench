@@ -342,24 +342,25 @@ class SetStatusForm(ModelForm):
             self.add_error(
                 "closing_type", _("This field is required when closing a deal.")
             )
-        self.offers_to_update = data.get("related_offers", ())
-        for offer in self.offers_to_update:
-            offer.status = (
-                offer.ACCEPTED
-                if data.get("status") == Deal.ACCEPTED
-                else offer.DECLINED
-            )
-            try:
-                offer.full_clean()
-            except ValidationError as exc:
-                self.add_error(
-                    "__all__",
-                    _("The offer %(offer)s is invalid: %(error)s")
-                    % {
-                        "offer": offer,
-                        "error": ", ".join(str(e) for e in exc.messages),
-                    },
+        if data.get("status") in {Deal.ACCEPTED, Deal.DECLINED}:
+            self.offers_to_update = data.get("related_offers", ())
+            for offer in self.offers_to_update:
+                offer.status = (
+                    offer.ACCEPTED
+                    if data.get("status") == Deal.ACCEPTED
+                    else offer.DECLINED
                 )
+                try:
+                    offer.full_clean()
+                except ValidationError as exc:
+                    self.add_error(
+                        "__all__",
+                        _("The offer %(offer)s is invalid: %(error)s")
+                        % {
+                            "offer": offer,
+                            "error": ", ".join(str(e) for e in exc.messages),
+                        },
+                    )
         return data
 
     def save(self, *args, **kwargs):
