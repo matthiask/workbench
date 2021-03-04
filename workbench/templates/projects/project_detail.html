@@ -137,7 +137,7 @@
     </div>
 
     {% for offer, offer_data in project.grouped_services.offers %}
-    <div class="card my-3 {% if offer and offer.is_declined %}border border-danger opacity-60{% endif %} {% if offer and offer.work_completed_on %}border border-success opacity-60{% endif %}">
+    <div class="card my-3 {% if offer and offer.is_declined %}border border-danger reduce-opacity{% endif %} {% if offer and offer.work_completed_on %}border border-success reduce-opacity{% endif %}">
       <div class="card-header">
         {% if offer %}
           <div class="d-flex w-100 justify-content-between">
@@ -148,11 +148,15 @@
               {% history_link offer %}
               &nbsp;
               {{ offer.status_badge }}
+              {% if offer.work_completed_on %}
+              <small class="badge badge-success">{% translate 'work completed on'|capfirst %} {{ offer.work_completed_on|local_date_format }}</small>
+              {% endif %}
 
               {% for deal in offer.deals.all %}
-                {% if forloop.first %}({% translate 'Related deals' %}:{% endif %}
-                {% link_or_none deal %}{% if forloop.last %}){% else %},{% endif %}
+                {% if forloop.first %}<br><small>{% translate 'Related deals' %}:{% endif %}
+                {% link_or_none deal %}{% if forloop.last %}</small>{% else %},{% endif %}
               {% endfor %}
+
             </div>
 
             <div>
@@ -169,7 +173,7 @@
                 </span>
               {% endif %}
 
-              {% if request.user.features.PLANNING %}
+              {% if request.user.features.PLANNING and not offer.work_completed_on %}
                 <span class="dropdown">
                   <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
                     id="offer-planning-dropdown-{{ offer.pk }}"
