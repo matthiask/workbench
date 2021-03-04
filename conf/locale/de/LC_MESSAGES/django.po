@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-02 14:26+0100\n"
+"POT-Creation-Date: 2021-03-04 18:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2298,6 +2298,18 @@ msgstr "offeriert am"
 #: workbench/offers/models.py workbench/tools/pdf.py
 msgid "valid until"
 msgstr "Gültig bis"
+
+#: workbench/offers/models.py
+msgid "work completed on"
+msgstr "Arbeit abgeschlossen am"
+
+#: workbench/offers/models.py
+msgid ""
+"Fill in this field if you want to prohibit further logging on this offers' "
+"services."
+msgstr ""
+"Fülle dieses Feld aus, wenn Du die weitere Leistungserfassung auf den "
+"Leistungen dieser Offerte verbieten willst."
 
 #: workbench/offers/models.py workbench/planning/models.py
 #: workbench/projects/models.py workbench/templates/offers/offer_pricing.html

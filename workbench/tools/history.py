@@ -348,6 +348,7 @@ def _offers_offer_cfg(user):
         "project",
         "offered_on",
         "closed_on",
+        "work_completed_on",
         "title",
         "description",
         "owned_by",

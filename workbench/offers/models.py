@@ -79,6 +79,15 @@ class Offer(ModelWithTotal):
     offered_on = models.DateField(_("offered on"), blank=True, null=True)
     valid_until = models.DateField(_("valid until"), blank=True, null=True)
     closed_on = models.DateField(_("closed on"), blank=True, null=True)
+    work_completed_on = models.DateField(
+        _("work completed on"),
+        blank=True,
+        null=True,
+        help_text=_(
+            "Fill in this field if you want to prohibit"
+            " further logging on this offers' services."
+        ),
+    )
 
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
@@ -268,6 +277,10 @@ class Offer(ModelWithTotal):
     @property
     def is_declined(self):
         return self.status == self.DECLINED
+
+    @property
+    def should_collapse(self):
+        return self.is_declined or bool(self.work_completed_on)
 
     def copy_to(self, *, project, owned_by):
         offer = Offer.objects.create(

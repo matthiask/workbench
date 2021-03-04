@@ -542,7 +542,16 @@ class ServiceQuerySet(SearchQuerySet):
         return self.filter(Q(offer__isnull=True) | ~Q(offer__status=Offer.DECLINED))
 
     def logging(self):
-        return self.budgeted().filter(allow_logging=True)
+        from workbench.offers.models import Offer
+
+        return self.filter(
+            Q(allow_logging=True),
+            Q(offer__isnull=True)
+            | (
+                ~Q(offer__status=Offer.DECLINED)
+                & Q(offer__work_completed_on__isnull=True)
+            ),
+        )
 
     def editable(self):
         from workbench.offers.models import Offer
@@ -618,10 +627,6 @@ class Service(ServiceBase):
         if not request.is_ajax():
             return instance.get_absolute_url() if instance else "projects_project_list"
 
-    @property
-    def is_declined(self):
-        return self.offer.is_declined if self.offer else False
-
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
         errors = {}
@@ -630,3 +635,16 @@ class Service(ServiceBase):
                 "The offer must belong to the same project as the service."
             )
         raise_if_errors(errors, exclude)
+
+    @property
+    def is_declined(self):
+        return self.offer.is_declined if self.offer else False
+
+    @property
+    def is_work_completed(self):
+        return bool(self.offer.work_completed_on) if self.offer else False
+
+    def is_logging_allowed(self):
+        return (
+            self.allow_logging and not self.is_declined and not self.is_work_completed
+        )

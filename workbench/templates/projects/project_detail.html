@@ -137,7 +137,7 @@
     </div>
 
     {% for offer, offer_data in project.grouped_services.offers %}
-    <div class="card my-3 {% if offer and offer.is_declined %}border border-danger opacity-60{% endif %}">
+    <div class="card my-3 {% if offer and offer.is_declined %}border border-danger opacity-60{% endif %} {% if offer and offer.work_completed_on %}border border-success opacity-60{% endif %}">
       <div class="card-header">
         {% if offer %}
           <div class="d-flex w-100 justify-content-between">
@@ -157,7 +157,7 @@
 
             <div>
               {% if request.user.features.CONTROLLING %}
-                <span class="btn-group {% if offer.is_declined %}offer-{{ offer.id }}-collapsed collapse{% endif %}">
+                <span class="btn-group {% if offer.should_collapse %}offer-{{ offer.id }}-collapsed collapse{% endif %}">
                   <a href="{{ offer.urls.pdf }}" class="btn btn-primary btn-sm" target="_blank" rel="noopener noreferrer">PDF</a>
                   <button type="button" class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="sr-only">Toggle Dropdown</span>
@@ -185,7 +185,7 @@
               {% endif %}
 
               {% if request.user.features.CONTROLLING %}
-                <span class="dropdown {% if offer.is_declined %}offer-{{ offer.id }}-collapsed collapse{% endif %}">
+                <span class="dropdown {% if offer.should_collapse %}offer-{{ offer.id }}-collapsed collapse{% endif %}">
                   <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
                     id="offer-dropdown-{{ offer.pk }}"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -202,7 +202,7 @@
                       {% translate 'Delete' %}</a>
                   </div>
                 </span>
-                {% if offer.is_declined %}
+                {% if offer.should_collapse %}
                   <a href="#"
                      data-toggle="collapse"
                      data-target=".offer-{{ offer.id }}-collapsed"
@@ -216,7 +216,7 @@
 
           </div>
 
-          <p {% if offer.is_declined %}class="offer-{{ offer.id }}-collapsed collapse"{% endif %}>
+          <p {% if offer.should_collapse %}class="offer-{{ offer.id }}-collapsed collapse"{% endif %}>
             {{ offer.description|linebreaksbr|urlize }}
           </p>
 
@@ -253,7 +253,7 @@
 
       </div>
 
-      <div class="list-group list-group-flush {% if offer.is_declined %}offer-{{ offer.id }}-collapsed collapse{% endif %}" data-sortable-container>
+      <div class="list-group list-group-flush {% if offer.should_collapse %}offer-{{ offer.id }}-collapsed collapse{% endif %}" data-sortable-container>
         {% for row in offer_data.services %}
         <div class="list-group-item" {% if row.service.pk %}data-sortable-item="{{ row.service.pk }}"{% endif %}>
           {% if row.service.pk %}
@@ -346,7 +346,7 @@
               {% if row.service.pk %}{% bar row.logged_cost row.service.cost %}{% endif %}
             </span>
             <span class="col-md-4 text-right">
-              {% if row.service.allow_logging and not row.service.is_declined %}
+              {% if row.service.is_logging_allowed %}
                 {% if row.service.pk %}
                   <a href="{{ project.urls.createhours }}?service={{ row.service.pk }}"
                     data-toggle="ajaxmodal">
