@@ -1,3 +1,7 @@
+body {
+  overflow-y: scroll;
+}
+
 .navbar {
   /* hacky fix for some bootstrap modal oddity */
   padding-right: 8px !important;
