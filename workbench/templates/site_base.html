@@ -9,34 +9,6 @@
   <link rel="shortcut icon" href="{% static 'workbench/lib/favicon.png' %}">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-  {% if WORKBENCH.SSO_DOMAIN == 'feinheit.ch' %}
-  <style>
-      :root {
-        --green: #26D07C;
-        --blue: #1c9E5D;
-        --darker: #1c9E5D;
-      }
-      .btn-primary {
-        background-color: var(--blue);
-        border-color: var(--blue);
-      }
-      .btn-primary.disabled,
-      .btn-primary:disabled {
-        background-color: var(--darker);
-        border-color: var(--darker);
-      }
-      .bg-primary {
-        background-color: var(--blue) !important;
-      }
-      .navbar {
-        background-color: var(--green) !important;
-      }
-      a {
-        color: var(--blue);
-      }
-  </style>
-  {% endif %}
-
   {% if SPARKLES %}
     <script src="{% static 'workbench/lib/sparkles.js' %}"></script>
     <style>
@@ -59,6 +31,32 @@
       }
       .navbar {
         background-color: var(--pink) !important;
+      }
+      a {
+        color: var(--blue);
+      }
+    </style>
+  {% elif WORKBENCH.SSO_DOMAIN == 'feinheit.ch' %}
+    <style>
+      :root {
+        --green: #26D07C;
+        --blue: #1c9E5D;
+        --darker: #1c9E5D;
+      }
+      .btn-primary {
+        background-color: var(--blue);
+        border-color: var(--blue);
+      }
+      .btn-primary.disabled,
+      .btn-primary:disabled {
+        background-color: var(--darker);
+        border-color: var(--darker);
+      }
+      .bg-primary {
+        background-color: var(--blue) !important;
+      }
+      .navbar {
+        background-color: var(--green) !important;
       }
       a {
         color: var(--blue);
