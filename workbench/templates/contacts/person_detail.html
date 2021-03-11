@@ -57,6 +57,12 @@
   {% include "svg/plus.svg" %}
   {% translate 'invoice'|capfirst %}
 </a>
+{% if request.user.features.DEALS %}
+  <a href="{% url 'deals_deal_create' %}?contact={{ object.pk }}" class="btn btn-primary">
+    {% include "svg/plus.svg" %}
+    {% translate 'deal'|capfirst %}
+  </a>
+{% endif %}
 <a href="{{ object.urls.vcard }}" class="btn btn-primary">
   {% include 'svg/desktop-download.svg' %} vCard
 </a>

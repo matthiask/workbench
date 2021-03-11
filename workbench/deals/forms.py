@@ -150,9 +150,26 @@ class DealForm(ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        request = kwargs["request"]
         if not kwargs.get("instance"):
             initial = kwargs.setdefault("initial", {})
-            initial.setdefault("contributors", [kwargs["request"].user.pk])
+            initial.setdefault("contributors", [request.user.pk])
+
+        if pk := request.GET.get("contact"):
+            try:
+                contact = Person.objects.get(pk=pk)
+            except (Person.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update({"customer": contact.organization, "contact": contact})
+
+        elif pk := request.GET.get("customer"):
+            try:
+                customer = Organization.objects.get(pk=pk)
+            except (Organization.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update({"customer": customer})
 
         super().__init__(*args, **kwargs)
         warn_if_not_in_preparation(self)

@@ -51,6 +51,10 @@
   {% include "svg/plus.svg" %}
   {% translate 'invoice'|capfirst %}
 </a>
+<a href="{% url 'deals_deal_create' %}?customer={{ object.pk }}" class="btn btn-primary">
+  {% include "svg/plus.svg" %}
+  {% translate 'deal'|capfirst %}
+</a>
 <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}"
   class="btn btn-primary">{% translate 'invoices'|capfirst %}</a>
 <a href="{{ object.urls.update }}" class="btn btn-primary">
