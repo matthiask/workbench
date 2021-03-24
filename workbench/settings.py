@@ -410,9 +410,3 @@ if TESTING:  # pragma: no cover
     PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
     DATABASES["default"]["TEST"] = {"SERIALIZE": False}
     FEATURES = defaultdict(lambda: F.ALWAYS, {"LATE_LOGGING": F.USER})
-
-
-if True:
-    import django_countries.fields  # noqa
-
-    django_countries.fields.CountryField.db_collation = None
