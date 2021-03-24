@@ -61,10 +61,15 @@ class Campaign(Model):
         verbose_name_plural = _("campaigns")
 
     def __str__(self):
-        return "%s %s" % (self.code, self.title)
+        return "%s %s - %s" % (self.code, self.title, self.owned_by.get_short_name())
 
     def __html__(self):
-        return format_html("<small>{}</small> {}", self.code, self.title)
+        return format_html(
+            "<small>{}</small> {} - {}",
+            self.code,
+            self.title,
+            self.owned_by.get_short_name(),
+        )
 
     def save(self, *args, **kwargs):
         self._fts = " ".join(str(part) for part in [self.code, self.customer.name])
@@ -230,10 +235,15 @@ class Project(Model):
         verbose_name_plural = _("projects")
 
     def __str__(self):
-        return "%s %s" % (self.code, self.title)
+        return "%s %s - %s" % (self.code, self.title, self.owned_by.get_short_name())
 
     def __html__(self):
-        return format_html("<small>{}</small> {}", self.code, self.title)
+        return format_html(
+            "<small>{}</small> {} - {}",
+            self.code,
+            self.title,
+            self.owned_by.get_short_name(),
+        )
 
     def __lt__(self, other):
         return self.id < other.id if isinstance(other, Project) else 1

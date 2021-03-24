@@ -111,10 +111,17 @@ class Offer(ModelWithTotal):
         verbose_name_plural = _("offers")
 
     def __str__(self):
-        return "{} {}".format(self.code, self.title)
+        return "{} {} - {}".format(
+            self.code, self.title, self.owned_by.get_short_name()
+        )
 
     def __html__(self):
-        return format_html("<small>{}</small> {}", self.code, self.title)
+        return format_html(
+            "<small>{}</small> {} - {}",
+            self.code,
+            self.title,
+            self.owned_by.get_short_name(),
+        )
 
     def __lt__(self, other):
         # Sorting:
