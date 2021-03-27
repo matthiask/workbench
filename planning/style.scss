@@ -75,10 +75,6 @@
   color: #555;
 }
 
-.is-request {
-  font-style: italic;
-}
-
 .planning--add-pw {
   display: inline-block;
   font-size: 70%;
@@ -146,42 +142,15 @@
     background-color: var(--teal);
   }
 
-  &.is-request {
-    background-image: linear-gradient(var(--planning) 0, var(--planning) 100%);
-    background-position: center center;
-    background-size: 100% 10%;
-    background-repeat: repeat-x;
-
-    &::before,
-    &::after {
-      background: var(--planning);
-      position: absolute;
-      content: "";
-      top: 6px;
-      bottom: 6px;
-      width: 2px;
-    }
-
-    &::before {
-      left: 0;
-    }
-
-    &::after {
-      right: 0;
-    }
-  }
-
   &.is-absence {
     background-color: var(--blue);
   }
 
-  &.is-pw:hover,
-  &.is-request:hover {
+  &.is-pw:hover {
     opacity: 0.7;
   }
 
-  &.is-pw,
-  &.is-request {
+  &.is-pw {
     span {
       position: absolute;
       color: #666;

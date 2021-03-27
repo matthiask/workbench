@@ -16,7 +16,6 @@ from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
-from workbench.planning.models import PlanningRequest
 from workbench.projects.models import Campaign, Project
 from workbench.tools.history import HISTORY, changes
 from workbench.tools.validation import in_days
@@ -40,15 +39,6 @@ def _needs_action(user):
                 "verbose_name_plural": Offer._meta.verbose_name_plural,
                 "url": Offer.urls["list"],
                 "objects": Offer.objects.maybe_actionable(user=user),
-            }
-        )
-    if user.features[FEATURES.PLANNING]:
-        rows.append(
-            {
-                "type": "planninrequests",
-                "verbose_name_plural": PlanningRequest._meta.verbose_name_plural,
-                "url": user.urls["planning"],
-                "objects": PlanningRequest.objects.maybe_actionable(user=user),
             }
         )
 

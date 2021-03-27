@@ -10,7 +10,7 @@ from workbench.awt.models import Absence
 from workbench.contacts.models import Organization
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedHours
-from workbench.planning.models import PlannedWork, PlanningRequest
+from workbench.planning.models import PlannedWork
 from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.reporting import query
 from workbench.tools.validation import monday
@@ -36,7 +36,6 @@ class Planning:
         self.users = users
 
         self._by_week = defaultdict(lambda: Z1)
-        self._requested_by_week = defaultdict(lambda: Z1)
         self._by_project_and_week = defaultdict(lambda: defaultdict(lambda: Z1))
         self._projects_offers = defaultdict(lambda: defaultdict(list))
         self._project_ids = set()
@@ -48,7 +47,7 @@ class Planning:
 
     def add_planned_work(self, queryset):
         for pw in queryset.filter(weeks__overlap=self.weeks).select_related(
-            "user", "project__owned_by", "offer__project", "offer__owned_by", "request"
+            "user", "project__owned_by", "offer__project", "offer__owned_by"
         ):
             per_week = (pw.planned_hours / len(pw.weeks)).quantize(Z2)
             for week in pw.weeks:
@@ -61,9 +60,7 @@ class Planning:
             self._projects_offers[pw.project][pw.offer].append(
                 {
                     "work": {
-                        "is_request": False,
                         "id": pw.id,
-                        "request_id": pw.request_id,
                         "title": pw.title,
                         "text": pw.user.get_short_name(),
                         "user": pw.user.get_short_name(),
@@ -75,9 +72,7 @@ class Planning:
                             local_date_format(date_from, fmt="d.m."),
                             local_date_format(date_until, fmt="d.m."),
                         ),
-                        "is_provisional": pw.request.is_provisional
-                        if pw.request
-                        else False,
+                        # "is_provisional": FIXME pw.request.is_provisional
                     },
                     "hours_per_week": [
                         per_week if week in pw.weeks else Z1 for week in self.weeks
@@ -88,51 +83,6 @@ class Planning:
 
             self._project_ids.add(pw.project.pk)
             self._user_ids.add(pw.user.id)
-
-    def add_planning_requests(self, queryset):
-        for pr in (
-            queryset.filter(
-                Q(earliest_start_on__lte=max(self.weeks)),
-                Q(completion_requested_on__gte=min(self.weeks)),
-            )
-            .select_related("project__owned_by", "offer__project", "offer__owned_by")
-            .prefetch_related("receivers")
-        ).distinct():
-            per_week = (pr.missing_hours / len(pr.weeks)).quantize(Z2)
-            for week in pr.weeks:
-                self._requested_by_week[week] += per_week
-
-            date_from = min(pr.weeks)
-            date_until = max(pr.weeks) + dt.timedelta(days=6)
-
-            self._projects_offers[pr.project][pr.offer].append(
-                {
-                    "work": {
-                        "is_request": True,
-                        "id": pr.id,
-                        "title": pr.title,
-                        "text": ", ".join(
-                            user.get_short_name() for user in pr.receivers.all()
-                        ),
-                        "requested_hours": pr.requested_hours,
-                        "planned_hours": pr.planned_hours,
-                        "missing_hours": pr.missing_hours,
-                        "url": pr.get_absolute_url(),
-                        "date_from": date_from,
-                        "date_until": date_until,
-                        "range": "{} – {}".format(
-                            local_date_format(date_from, fmt="d.m."),
-                            local_date_format(date_until, fmt="d.m."),
-                        ),
-                        "period": _period(self.weeks, min(pr.weeks), max(pr.weeks)),
-                        "is_provisional": pr.is_provisional,
-                    },
-                    "per_week": per_week,
-                }
-            )
-
-            self._project_ids.add(pr.project.pk)
-            self._user_ids |= {user.id for user in pr.receivers.all()}
 
     def add_worked_hours(self, queryset):
         for row in (
@@ -164,49 +114,11 @@ class Planning:
                 self._absences[absence.user][idx] += hours / len(weeks)
                 self._by_week[week] += hours / len(weeks)
 
-    def _sort_work_list(self, work_list):
-        for_requests = {}
-        everything_else = []
-
-        for row in work_list:
-            if row["work"].get("request_id"):
-                for_requests.setdefault(row["work"]["request_id"], []).append(row)
-            else:
-                everything_else.append(row)
-
-        for row in sorted(
-            everything_else,
-            key=lambda row: (
-                row["work"]["date_from"],
-                row["work"]["date_until"],
-            ),
-        ):
-            # Is request, has no missing hours and no planned hours in current view?
-            if (
-                row["work"]["is_request"]
-                and not row["work"]["missing_hours"]
-                and not for_requests.get(row["work"]["id"])
-            ):
-                continue
-
-            yield row
-            if row["work"]["is_request"] and row["work"]["id"] in for_requests:
-                yield from for_requests.pop(row["work"]["id"], [])
-
-        # Items where offers do not match or whatever
-        for items in for_requests.values():
-            yield from items
-
     def _offer_record(self, offer, work_list):
         date_from = min(pw["work"]["date_from"] for pw in work_list)
         date_until = max(pw["work"]["date_until"] for pw in work_list)
-        hours = sum(
-            pw["work"]["planned_hours"]
-            for pw in work_list
-            if not pw["work"]["is_request"]
-        )
+        hours = sum(pw["work"]["planned_hours"] for pw in work_list)
 
-        work_list = list(self._sort_work_list(work_list))
         if not work_list:
             return None
 
@@ -360,7 +272,6 @@ where percentage is not NULL -- NULL produced by outer join
                 ),
             ),
             "by_week": [self._by_week[week] for week in self.weeks],
-            "requested_by_week": [self._requested_by_week[week] for week in self.weeks],
             "absences": [
                 (str(user), lst) for user, lst in sorted(self._absences.items())
             ],
@@ -373,13 +284,6 @@ def user_planning(user, date_range):
     weeks = list(takewhile(lambda x: x <= end, recurring(monday(start), "weekly")))
     planning = Planning(weeks=weeks, users=[user])
     planning.add_planned_work(user.planned_work.all())
-    planning.add_planning_requests(
-        user.received_planning_requests.exclude(
-            id__in=user.receivedrequest_set.filter(declined_at__isnull=False).values(
-                "request"
-            )
-        )
-    )
     planning.add_worked_hours(user.loggedhours.all())
     planning.add_absences(user.absences.all())
     return planning.report()
@@ -390,11 +294,6 @@ def team_planning(team, date_range):
     weeks = list(takewhile(lambda x: x <= end, recurring(monday(start), "weekly")))
     planning = Planning(weeks=weeks, users=list(team.members.active()))
     planning.add_planned_work(PlannedWork.objects.filter(user__teams=team))
-    planning.add_planning_requests(
-        PlanningRequest.objects.filter(
-            Q(receivers__teams=team) | Q(planned_work__user__teams=team)
-        )
-    )
     planning.add_worked_hours(LoggedHours.objects.filter(rendered_by__teams=team))
     planning.add_absences(Absence.objects.filter(user__teams=team))
     return planning.report()
@@ -408,22 +307,10 @@ WITH sq AS (
     SELECT unnest(weeks) AS week
     FROM planning_plannedwork
     WHERE project_id=%s
-
-    UNION ALL
-
-    SELECT earliest_start_on AS week
-    FROM planning_planningrequest
-    WHERE project_id=%s
-
-    UNION ALL
-
-    SELECT completion_requested_on - 7 AS week
-    FROM planning_planningrequest
-    WHERE project_id=%s
 )
 SELECT MIN(week), MAX(week) FROM sq
             """,
-            [project.id, project.id, project.id],
+            [project.id],
         )
         result = list(cursor)[0]
 
@@ -440,7 +327,6 @@ SELECT MIN(week), MAX(week) FROM sq
 
     planning = Planning(weeks=weeks)
     planning.add_planned_work(project.planned_work.all())
-    planning.add_planning_requests(project.planning_requests.all())
     planning.add_worked_hours(LoggedHours.objects.all())
     planning.add_absences(Absence.objects.all())
     return planning.report()

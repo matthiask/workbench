@@ -181,7 +181,6 @@
                     {% translate 'planning'|capfirst %}
                   </button>
                   <div class="dropdown-menu dropdown-menu-right" aria-labelledby="offer-planning-dropdown-{{ offer.pk }}">
-                    <a class="dropdown-item" href="{{ project.urls.createrequest }}?plan_offer={{ offer.pk }}" data-toggle="ajaxmodal">{% translate 'Request work' %}</a>
                     <a class="dropdown-item" href="{{ project.urls.creatework }}?plan_offer={{ offer.pk }}" data-toggle="ajaxmodal">{% translate 'Plan work' %}</a>
 
                   </div>
@@ -275,7 +274,6 @@
                     {% translate 'planning'|capfirst %}
                   </button>
                   <div class="dropdown-menu dropdown-menu-right" aria-labelledby="service-planning-dropdown-{{ row.service.pk }}">
-                    <a class="dropdown-item" href="{{ project.urls.createrequest }}?service={{ row.service.pk }}" data-toggle="ajaxmodal">{% translate 'Request work' %}</a>
                     <a class="dropdown-item" href="{{ project.urls.creatework }}?service={{ row.service.pk }}" data-toggle="ajaxmodal">{% translate 'Plan work' %}</a>
 
                   </div>

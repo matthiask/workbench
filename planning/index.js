@@ -61,10 +61,6 @@ function Planning({ data }) {
     )
   }, [])
 
-  const plannedAndRequested = data.requested_by_week.map(
-    (hours, idx) => parseFloat(hours) + parseFloat(data.by_week[idx])
-  )
-
   return (
     <RowContext.Provider value={rowCtx}>
       <div
@@ -134,14 +130,6 @@ function Planning({ data }) {
           <>
             <DeltaByWeek
               planned={data.by_week}
-              capacity={data.capacity.total}
-            />
-            <TotalByWeek
-              by_week={data.requested_by_week}
-              title={gettext("Requested hours per week")}
-            />
-            <DeltaByWeek
-              planned={plannedAndRequested}
               capacity={data.capacity.total}
             />
           </>
@@ -474,7 +462,6 @@ function Offer({ offer, work_list }) {
 function Work({ work, hours_per_week, per_week, isEven }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
-  const cls = work.is_request ? "is-request" : "is-pw"
   return (
     <>
       {isEven ? (
@@ -486,7 +473,7 @@ function Work({ work, hours_per_week, per_week, isEven }) {
       <Cell
         row={row}
         column={1}
-        className={`planning--title ${cls} ${
+        className={`planning--title is-pw ${
           work.is_provisional ? "is-provisional" : ""
         } planning--small pl-5`}
       >
@@ -498,7 +485,7 @@ function Work({ work, hours_per_week, per_week, isEven }) {
         <Cell
           row={row}
           column={2}
-          className={`planning--small ${cls}`}
+          className={`planning--small is-pw`}
           title={gettext("is provisional")}
         >
           {pgettext("provisional", "prov.")}
@@ -507,29 +494,18 @@ function Work({ work, hours_per_week, per_week, isEven }) {
       <Cell
         row={row}
         column={3}
-        className={`planning--small text-center ${cls}`}
+        className={`planning--small text-center is-pr`}
         style={{ whiteSpace: "nowrap" }}
       >
         {work.range}
       </Cell>
-      <Cell
-        row={row}
-        column={4}
-        className={`planning--small text-right ${cls}`}
-      >
-        {work.is_request
-          ? `${fixed(work.missing_hours, 0)}h / ${fixed(
-              work.requested_hours,
-              0
-            )}h`
-          : `${fixed(work.planned_hours, 0)}h`}
+      <Cell row={row} column={4} className={`planning--small text-right is-pr`}>
+        {`${fixed(work.planned_hours, 0)}h`}
       </Cell>
       <Cell
         row={row}
         column={5}
-        className={`planning--small ${
-          work.is_request ? "font-italic" : ""
-        } text-center no-pr`}
+        className={`planning--small text-center no-pr`}
       >
         {work.user}
       </Cell>
