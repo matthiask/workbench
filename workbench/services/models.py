@@ -4,6 +4,8 @@ from django.utils import timezone
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 
+from colorfield.fields import ColorField
+
 from workbench.tools.formats import Z1, Z2
 from workbench.tools.models import HoursFieldAllowNegatives, Model, MoneyField
 from workbench.tools.validation import raise_if_errors
@@ -13,6 +15,7 @@ class ServiceType(Model):
     title = models.CharField(_("title"), max_length=40)
     hourly_rate = MoneyField(_("hourly rate"))
     position = models.IntegerField(_("position"), default=0)
+    color = ColorField(_("color"))
 
     class Meta:
         ordering = ("position", "id")

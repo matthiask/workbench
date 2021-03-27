@@ -11,6 +11,7 @@ Django==3.2rc1
 django-admin-ordering==0.13.1
 django-authlib==0.10.1
 django-bootstrap4==2.3.1
+django-colorfield==0.4.1
 django-cors-headers==3.7.0
 django-countries==7.1
 django-debug-toolbar==3.2.1

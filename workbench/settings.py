@@ -38,6 +38,7 @@ INSTALLED_APPS = [
         "django.contrib.postgres",
         "admin_ordering",
         "bootstrap4",
+        "colorfield",
         "django_countries",
         "authlib",
         "corsheaders",

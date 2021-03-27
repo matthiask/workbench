@@ -4,6 +4,7 @@ Django>=3.1b1
 django-admin-ordering
 django-authlib
 django-bootstrap4
+django-colorfield
 django-cors-headers
 django-countries
 django-debug-toolbar>=3.0a1
