@@ -19,6 +19,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const data = JSON.parse(document.querySelector("#planning-data").textContent)
   const el = document.querySelector("#planning-root")
   ReactDOM.render(<Planning data={data} />, el)
+
+  const style = data.service_types
+    .map(
+      ({ id, color }) =>
+        `.planning--range.st-${id} { background-color: ${color}; }`
+    )
+    .join("\n")
+  const styleEl = document.createElement("style")
+  styleEl.textContent = style
+  document.head.appendChild(styleEl)
 })
 
 const RowContext = createContext()
@@ -570,7 +580,7 @@ function Work({ work, hours_per_week, per_week, isEven }) {
             colspan={`span ${range.length}`}
             className={`planning--range planning--small is-pw ${
               work.is_provisional ? "is-provisional" : ""
-            }`}
+            } st-${work.service_type_id}`}
             tag="a"
             href={work.url}
             data-toggle="ajaxmodal"

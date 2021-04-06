@@ -11,6 +11,7 @@ from workbench.contacts.models import Organization
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedHours
 from workbench.planning.models import Milestone, PlannedWork
+from workbench.services.models import ServiceType
 from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.reporting import query
 from workbench.tools.validation import monday
@@ -73,6 +74,7 @@ class Planning:
                             local_date_format(date_from, fmt="d.m."),
                             local_date_format(date_until, fmt="d.m."),
                         ),
+                        "service_type_id": pw.service_type_id,
                         # "is_provisional": FIXME pw.request.is_provisional
                     },
                     "hours_per_week": [
@@ -294,6 +296,10 @@ where percentage is not NULL -- NULL produced by outer join
                 (str(user), lst) for user, lst in sorted(self._absences.items())
             ],
             "capacity": self.capacity() if self.users else None,
+            "service_types": [
+                {"id": type.id, "title": type.title, "color": type.color}
+                for type in ServiceType.objects.all()
+            ],
         }
 
 

@@ -78,6 +78,7 @@ class PlannedWorkForm(ModelForm):
             "offer",
             "user",
             "title",
+            "service_type",
             "notes",
             "planned_hours",
         )

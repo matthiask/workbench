@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
+from workbench.services.models import ServiceType
 from workbench.tools.formats import hours, local_date_format
 from workbench.tools.models import HoursField, Model
 from workbench.tools.urls import model_urls
@@ -71,6 +72,15 @@ class PlannedWork(Model):
     title = models.CharField(_("title"), max_length=200)
     notes = models.TextField(_("notes"), blank=True)
     weeks = ArrayField(models.DateField(), verbose_name=_("weeks"))
+    service_type = models.ForeignKey(
+        ServiceType,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_("service type"),
+        help_text=_("Colorize the work unit according to its service type."),
+        related_name="+",
+    )
 
     class Meta:
         ordering = ["-pk"]
