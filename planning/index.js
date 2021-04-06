@@ -362,6 +362,7 @@ function Project({ by_week, offers, project }) {
         )
       })}
       {project.worked_hours ? <WorkedHours project={project} /> : null}
+      {project.milestones ? <Milestones project={project} /> : null}
       {offers.map((offer, idx) => (
         <Offer key={idx} {...offer} />
       ))}
@@ -398,6 +399,40 @@ function WorkedHours({ project }) {
             }}
           >
             {fixed(hours, 1)}
+          </Cell>
+        )
+      })}
+    </>
+  )
+}
+
+function Milestones({ project }) {
+  const ctx = useContext(RowContext)
+  const row = ctx.next()
+
+  return (
+    <>
+      <Cell row={row} column={1} className="planning--title is-milestone">
+        {gettext("Milestones")}
+      </Cell>
+
+      {project.milestones.map((milestones, idx) => {
+        if (!milestones.length) return null
+
+        return (
+          <Cell
+            key={idx}
+            row={row}
+            column={FIRST_DATA_COLUMN + idx}
+            className="planning--range planning--small is-milestone"
+            title={milestones
+              .map((milestone) => `${milestone.title} (${milestone.dow})`)
+              .join(" / ")}
+            tag="a"
+            href={milestones[0].url}
+            data-toggle="ajaxmodal"
+          >
+            {milestones[0].date}
           </Cell>
         )
       })}

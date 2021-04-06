@@ -309,6 +309,7 @@ class CostCenterFactory(DjangoModelFactory):
 # PLANNING ####################################################################
 class PlannedWorkFactory(DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
+    created_by = factory.LazyAttribute(lambda obj: obj.user)
     user = factory.SubFactory(UserFactory)
     planned_hours = Decimal(20)
     title = "Planned work"

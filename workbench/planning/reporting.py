@@ -10,7 +10,7 @@ from workbench.awt.models import Absence
 from workbench.contacts.models import Organization
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedHours
-from workbench.planning.models import PlannedWork
+from workbench.planning.models import Milestone, PlannedWork
 from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.reporting import query
 from workbench.tools.validation import monday
@@ -44,6 +44,7 @@ class Planning:
         self._worked_hours = defaultdict(lambda: defaultdict(lambda: Z1))
 
         self._absences = defaultdict(lambda: [0] * len(weeks))
+        self._milestones = defaultdict(lambda: defaultdict(list))
 
     def add_planned_work(self, queryset):
         for pw in queryset.filter(weeks__overlap=self.weeks).select_related(
@@ -114,6 +115,20 @@ class Planning:
                 self._absences[absence.user][idx] += hours / len(weeks)
                 self._by_week[week] += hours / len(weeks)
 
+    def add_milestones(self, queryset):
+        for milestone in queryset.filter(project__in=self._project_ids).select_related(
+            "project"
+        ):
+            self._milestones[milestone.project][monday(milestone.date)].append(
+                {
+                    "id": milestone.id,
+                    "title": milestone.title,
+                    "dow": local_date_format(milestone.date, fmt="l, j.n."),
+                    "date": local_date_format(milestone.date, fmt="j."),
+                    "url": milestone.urls["detail"],
+                }
+            )
+
     def _offer_record(self, offer, work_list):
         date_from = min(pw["work"]["date_from"] for pw in work_list)
         date_until = max(pw["work"]["date_until"] for pw in work_list)
@@ -172,6 +187,8 @@ class Planning:
         date_until = max(rec["offer"]["date_until"] for rec in offers)
         hours = sum(rec["offer"]["planned_hours"] for rec in offers)
 
+        milestones = [self._milestones[project][week] for week in self.weeks]
+
         return {
             "project": {
                 "id": project.id,
@@ -190,6 +207,7 @@ class Planning:
                 "worked_hours": [
                     self._worked_hours[project.id][week] for week in self.weeks
                 ],
+                "milestones": milestones if any(milestones) else None,
             },
             "by_week": [
                 self._by_project_and_week[project][week] for week in self.weeks
@@ -286,6 +304,7 @@ def user_planning(user, date_range):
     planning.add_planned_work(user.planned_work.all())
     planning.add_worked_hours(user.loggedhours.all())
     planning.add_absences(user.absences.all())
+    planning.add_milestones(Milestone.objects.all())
     return planning.report()
 
 
@@ -296,6 +315,7 @@ def team_planning(team, date_range):
     planning.add_planned_work(PlannedWork.objects.filter(user__teams=team))
     planning.add_worked_hours(LoggedHours.objects.filter(rendered_by__teams=team))
     planning.add_absences(Absence.objects.filter(user__teams=team))
+    planning.add_milestones(Milestone.objects.all())
     return planning.report()
 
 
@@ -307,10 +327,16 @@ WITH sq AS (
     SELECT unnest(weeks) AS week
     FROM planning_plannedwork
     WHERE project_id=%s
+
+    UNION ALL
+
+    SELECT date_trunc('week', date)::date
+    FROM planning_milestone
+    WHERE project_id=%s
 )
 SELECT MIN(week), MAX(week) FROM sq
             """,
-            [project.id],
+            [project.id, project.id],
         )
         result = list(cursor)[0]
 
@@ -329,6 +355,7 @@ SELECT MIN(week), MAX(week) FROM sq
     planning.add_planned_work(project.planned_work.all())
     planning.add_worked_hours(LoggedHours.objects.all())
     planning.add_absences(Absence.objects.all())
+    planning.add_milestones(Milestone.objects.all())
     return planning.report()
 
 

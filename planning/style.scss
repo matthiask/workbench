@@ -52,6 +52,9 @@
   &.is-worked {
     background-color: var(--stripe1);
   }
+  &.is-milestone {
+    background-color: var(--stripe1);
+  }
   &.is-offer {
     background-color: var(--stripe2);
 
@@ -124,6 +127,10 @@
 
   &.is-worked {
     background-color: blue;
+  }
+
+  &.is-milestone {
+    background-color: var(--pink);
   }
 
   &.is-total {
