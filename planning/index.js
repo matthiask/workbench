@@ -429,6 +429,7 @@ function Milestones({ project }) {
       {project.milestones.map((milestones, idx) => {
         if (!milestones.length) return null
 
+        // FIXME doesn't properly handle several milestones within the same week
         return (
           <Cell
             key={idx}
