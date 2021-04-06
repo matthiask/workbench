@@ -9,11 +9,30 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.invoices.utils import recurring
-from workbench.planning.models import PlannedWork
+from workbench.planning.models import Milestone, PlannedWork
 from workbench.projects.models import Project
 from workbench.tools.formats import Z1, local_date_format
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
 from workbench.tools.validation import monday
+
+
+class MilestoneSearchForm(Form):
+    def filter(self, queryset):
+        return queryset.select_related("project")
+
+
+@add_prefix("modal")
+class MilestoneForm(ModelForm):
+    class Meta:
+        model = Milestone
+        fields = ["date", "title"]
+
+    def __init__(self, *args, **kwargs):
+        self.project = kwargs.pop("project", None)
+        if not self.project:  # Updating
+            self.project = kwargs["instance"].project
+        super().__init__(*args, **kwargs)
+        self.instance.project = self.project
 
 
 class PlannedWorkSearchForm(Form):

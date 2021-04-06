@@ -1,0 +1,13 @@
+{% extends "modalform.html" %}
+
+{% load bootstrap4 fineforms i18n workbench %}
+
+{% block title %}
+{% if view.project %}{{ view.project.title }}{% else %}{{ block.super }}{% endif %}
+{% endblock %}
+
+{% block body %}
+  {% include 'fineforms/warnings.html' %}
+  {% ff_errors form %}
+  {% ff_fields form %}
+{% endblock %}

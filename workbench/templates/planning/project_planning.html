@@ -32,6 +32,10 @@
       {% include 'svg/plus.svg' %}
       {% translate 'planned work'|capfirst %}
     </a>
+    <a href="{{ object.urls.createmilestone }}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
+      {% include 'svg/plus.svg' %}
+      {% translate 'milestone'|capfirst %}
+    </a>
   </div>
 </div>
 {% endblock %}

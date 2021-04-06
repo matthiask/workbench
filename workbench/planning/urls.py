@@ -2,12 +2,58 @@ from django.urls import path
 
 from workbench import generic
 from workbench.logbook.views import create
-from workbench.planning.forms import PlannedWorkForm, PlannedWorkSearchForm
-from workbench.planning.models import PlannedWork
+from workbench.planning.forms import (
+    MilestoneForm,
+    MilestoneSearchForm,
+    PlannedWorkForm,
+    PlannedWorkSearchForm,
+)
+from workbench.planning.models import Milestone, PlannedWork
 from workbench.projects.models import Project
 
 
 urlpatterns = [
+    # Milestones
+    path(
+        "milestone/",
+        generic.ListView.as_view(
+            model=Milestone,
+            search_form_class=MilestoneSearchForm,
+            show_create_button=False,
+        ),
+        name="planning_milestone_list",
+    ),
+    path(
+        "milestone/<int:pk>/",
+        generic.DetailView.as_view(model=Milestone),
+        name="planning_milestone_detail",
+    ),
+    path(
+        "milestone/create/",
+        create,
+        {"viewname": "createmilestone"},
+        name="planning_milestone_create",
+    ),
+    path(
+        "milestone/create/<int:pk>/",
+        generic.CreateRelatedView.as_view(
+            model=Milestone, form_class=MilestoneForm, related_model=Project
+        ),
+        name="projects_project_createmilestone",
+    ),
+    path(
+        "milestone/<int:pk>/update/",
+        generic.UpdateView.as_view(model=Milestone, form_class=MilestoneForm),
+        name="planning_milestone_update",
+    ),
+    path(
+        "milestone/<int:pk>/delete/",
+        generic.DeleteView.as_view(
+            model=Milestone, template_name="modal_confirm_delete.html"
+        ),
+        name="planning_milestone_delete",
+    ),
+    # Work
     path(
         "work/",
         generic.ListView.as_view(

@@ -17,6 +17,26 @@ from workbench.tools.validation import raise_if_errors
 
 
 @model_urls
+class Milestone(Model):
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        verbose_name=_("project"),
+        related_name="milestones",
+    )
+    date = models.DateField(_("date"))
+    title = models.CharField(_("title"), max_length=200)
+
+    class Meta:
+        ordering = ["date"]
+        verbose_name = _("milestone")
+        verbose_name_plural = _("milestones")
+
+    def __str__(self):
+        return self.title
+
+
+@model_urls
 class PlannedWork(Model):
     project = models.ForeignKey(
         Project,
@@ -33,6 +53,12 @@ class PlannedWork(Model):
         related_name="planned_work",
     )
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        verbose_name=_("created by"),
+        related_name="+",
+    )
     user = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
