@@ -14,6 +14,7 @@ from workbench.planning.reporting import planning_vs_logbook
 from workbench.projects.reporting import hours_per_customer
 from workbench.reporting.green_hours import green_hours
 from workbench.reporting.views import (
+    birthdays_view,
     hours_filter_view,
     key_data_gross_profit,
     key_data_third_party_costs,
@@ -132,5 +133,10 @@ urlpatterns = [
         r"^work-anniversaries/$",
         work_anniversaries_view,
         name="report_work_anniversaries",
+    ),
+    re_path(
+        r"^birthdays/$",
+        birthdays_view,
+        name="report_birthdays",
     ),
 ]

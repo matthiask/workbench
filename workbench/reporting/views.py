@@ -9,7 +9,11 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import Team, User
-from workbench.accounts.reporting import average_employment_duration, work_anniversaries
+from workbench.accounts.reporting import (
+    average_employment_duration,
+    birthdays,
+    work_anniversaries,
+)
 from workbench.invoices.models import Invoice
 from workbench.invoices.utils import next_valid_day
 from workbench.logbook.models import LoggedCost
@@ -431,4 +435,12 @@ def work_anniversaries_view(request):
         request,
         "reporting/work_anniversaries.html",
         {"work_anniversaries": work_anniversaries()},
+    )
+
+
+def birthdays_view(request):
+    return render(
+        request,
+        "reporting/birthdays.html",
+        {"birthdays": birthdays()},
     )

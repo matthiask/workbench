@@ -3,6 +3,7 @@ from collections import defaultdict
 
 from django.utils.translation import gettext as _
 
+from workbench.accounts.models import User
 from workbench.tools.reporting import query
 from workbench.tools.validation import in_days, monday
 
@@ -220,6 +221,36 @@ WHERE earliest.start IS NOT NULL AND u.is_active=TRUE
         )
 
     return sorted(anniversaries, key=lambda row: (row["this_year"], row["name"]))
+
+
+def age(day):
+    today = dt.date.today()
+    years = today.year - day.year
+    if (today.month, today.day) < (day.month, day.day):
+        years -= 1
+    return years
+
+
+def birthdays():
+    users = {True: [], False: []}
+    for user in User.objects.active().select_related("person"):
+        if user.person and (dob := user.person.date_of_birth):
+            users[True].append(((dob.month, dob.day), user))
+        else:
+            users[False].append(user)
+
+    today = dt.date.today()
+    return {
+        "users_with_birthdays": [
+            {
+                "user": row[1],
+                "already": row[0] < (today.month, today.day),
+                "age": age(row[1].person.date_of_birth),
+            }
+            for row in sorted(users[True])
+        ],
+        "users_without_birthdays": users[False],
+    }
 
 
 def average_employment_duration():
