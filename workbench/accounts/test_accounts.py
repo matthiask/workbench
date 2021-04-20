@@ -185,17 +185,17 @@ class AccountsTest(TestCase):
         response = self.client.get(f"/admin/accounts/user/{user.pk}/change/")
         self.assertContains(
             response,
-            '<input type="checkbox" name="_features" value="FEATURES.BOOKKEEPING" checked disabled>',  # noqa
+            '<input type="checkbox" name="_features" value="BOOKKEEPING" checked disabled>',  # noqa
             html=True,
         )
         self.assertContains(
             response,
-            '<input type="checkbox" name="_features" value="FEATURES.BREAKS_NAG" disabled>',  # noqa
+            '<input type="checkbox" name="_features" value="BREAKS_NAG" disabled>',  # noqa
             html=True,
         )
         self.assertContains(
             response,
-            '<input type="checkbox" name="_features" value="FEATURES.CAMPAIGNS">',  # noqa
+            '<input type="checkbox" name="_features" value="CAMPAIGNS">',  # noqa
             html=True,
         )
 
@@ -205,6 +205,6 @@ class AccountsTest(TestCase):
         response = self.client.get(f"/admin/accounts/user/{user.pk}/change/")
         self.assertContains(
             response,
-            '<input type="checkbox" name="_features" value="FEATURES.CAMPAIGNS" checked>',  # noqa
+            '<input type="checkbox" name="_features" value="CAMPAIGNS" checked>',  # noqa
             html=True,
         )
