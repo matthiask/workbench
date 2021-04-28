@@ -28,7 +28,8 @@
   grid-auto-rows: var(--default-height);
   grid-template-columns:
     var(--title-column-width) var(--action-width) var(--range-width)
-    var(--hours-total-width) var(--user-width);
+    var(--hours-total-width) var(--user-width) repeat(var(--weeks), var(--week-width));
+  grid-template-rows: 14px 16px 16px repeat(var(--rows), var(--default-height));
   font-size: 14px;
 }
 

@@ -62,9 +62,7 @@ function Planning({ data }) {
   }
 
   useLayoutEffect(() => {
-    gridRef.current.style.gridTemplateRows = `14px 16px 16px repeat(${
-      rowCtx.current() - 2
-    }, var(--default-height))`
+    gridRef.current.style.setProperty("--rows", rowCtx.current() - 2)
 
     Array.from(document.querySelectorAll(".planning--title a")).forEach(
       (el) => (el.title = el.textContent)
@@ -77,9 +75,7 @@ function Planning({ data }) {
         ref={gridRef}
         className="planning"
         style={{
-          gridTemplateColumns: `var(--title-column-width) var(--action-width) var(--range-width) var(--hours-total-width) var(--user-width) repeat(${
-            1 + data.weeks.length
-          }, var(--week-width))`,
+          "--weeks": data.weeks.length + 1,
         }}
       >
         {data.weeks.map((_, idx) => {
@@ -431,20 +427,29 @@ function Milestones({ project }) {
 
         // FIXME doesn't properly handle several milestones within the same week
         return (
-          <Cell
-            key={idx}
-            row={row}
-            column={FIRST_DATA_COLUMN + idx}
-            className="planning--range planning--small is-milestone"
-            title={milestones
-              .map((milestone) => `${milestone.title} (${milestone.dow})`)
-              .join(" / ")}
-            tag="a"
-            href={milestones[0].url}
-            data-toggle="ajaxmodal"
-          >
-            {milestones[0].date}
-          </Cell>
+          <>
+            <Cell
+              key={idx}
+              row={row}
+              column={FIRST_DATA_COLUMN + idx}
+              className="planning--range planning--small is-milestone"
+              title={milestones
+                .map((milestone) => `${milestone.title} (${milestone.dow})`)
+                .join(" / ")}
+              tag="a"
+              href={milestones[0].url}
+              data-toggle="ajaxmodal"
+            >
+              {milestones[0].date}
+            </Cell>
+            <Cell
+              key={`${idx}-span`}
+              row={row}
+              rowspan="-1"
+              column={FIRST_DATA_COLUMN + idx}
+              style={{ borderRight: "3px solid rgba(250, 0, 0, 0.2)" }}
+            />
+          </>
         )
       })}
     </>
