@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const style = data.service_types
     .map(
       ({ id, color }) =>
-        `.planning--range.st-${id} { --st-color: ${color}; background-color: ${color}; }`
+        `.planning--range.st-${id} { --st-color: ${color}; background-color: var(--st-color); }`
     )
     .join("\n")
   const styleEl = document.createElement("style")
@@ -184,7 +184,7 @@ function Capacity({ total, by_user }) {
         colspan={`span ${FIRST_DATA_COLUMN - 1}`}
         className="planning--scale text-right pr-2"
       >
-        <strong>{gettext("Capacity per week")}</strong>
+        <strong>{gettext("Remaining capacity per week")}</strong>
       </Cell>
       {total.map((hours, idx) => (
         <Cell
