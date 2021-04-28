@@ -75,7 +75,7 @@ class Planning:
                             local_date_format(date_until, fmt="d.m."),
                         ),
                         "service_type_id": pw.service_type_id,
-                        # "is_provisional": FIXME pw.request.is_provisional
+                        "is_provisional": pw.is_provisional,
                     },
                     "hours_per_week": [
                         per_week if week in pw.weeks else Z1 for week in self.weeks
