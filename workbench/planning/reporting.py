@@ -230,45 +230,79 @@ class Planning:
 select
     week,
     user_id,
-    percentage * 5 * planning_hours_per_day / 100
+    coalesce(percentage, 0) * 5 * planning_hours_per_day / 100
         - coalesce(pw_hours, 0)
         - coalesce(abs_hours, 0) as capacity
 
+--
+-- Determine the employment percentage and planning_hours_per_day
+-- for each user and week
+--
 from generate_series(%s::date, %s::date, '7 days') as week
 left outer join lateral (
-    select user_id, date_from, date_until, percentage, planning_hours_per_day
+    select
+        user_id,
+        date_from,
+        date_until,
+        percentage,
+        planning_hours_per_day
     from awt_employment
     left join accounts_user on awt_employment.user_id=accounts_user.id
     where user_id = any (%s)
 ) as employment
 on employment.date_from <= week and employment.date_until > week
 
+--
+-- Aggregate planned hours per week, distributing equally the planned_hours
+-- value over all weeks in the planned work record
+--
 left outer join lateral (
-  select
-    user_id as pw_user_id,
-    sum(planned_hours / cardinality(weeks)) as pw_hours,
-    unnest(weeks) as pw_week
-  from planning_plannedwork
-  where user_id = any (%s)
-  group by pw_user_id, pw_week
+    select
+        user_id as pw_user_id,
+        sum(planned_hours / cardinality(weeks)) as pw_hours,
+        unnest(weeks) as pw_week
+    from planning_plannedwork
+    where user_id = any (%s)
+    group by pw_user_id, pw_week
 ) as planned
 on week=pw_week and user_id=pw_user_id
 
 left outer join lateral(
-  select
-    user_id as abs_user_id,
-    sum(days * employment.planning_hours_per_day) as abs_hours,
-    date_trunc('week', starts_on) as abs_week
-  from awt_absence
-  where user_id = any(%s)
-  and user_id=employment.user_id
-  and employment.date_from <= date_trunc('week', starts_on)
-  and employment.date_until > date_trunc('week', starts_on)
-  group by abs_user_id, abs_week
+
+    --
+    -- Generate rows of absences (user_id, days, planning_hours, weeks::date[])
+    --
+    with sq as (
+        select
+            user_id as abs_user_id,
+            days,
+            planning_hours_per_day,
+            (
+              select array_agg(w::date) from generate_series(
+                date_trunc('week', starts_on),
+                date_trunc('week', ends_on),
+                '7 days'
+              ) as w
+            ) as weeks
+          from awt_absence
+          where user_id = any(%s)
+          and user_id=employment.user_id
+          and employment.date_from <= date_trunc('week', week)
+          and employment.date_until > date_trunc('week', week)
+    )
+    --
+    -- Calculate the planning hours for each absence and distribute the hours
+    -- over all weeks in which the absence takes place
+    --
+    select
+      abs_user_id,
+      sum(days * planning_hours_per_day / cardinality(weeks)) as abs_hours,
+      unnest(weeks) as abs_week
+    from sq
+    group by abs_user_id, abs_week
+
 ) as absences
 on week=abs_week and user_id=abs_user_id
-
-where percentage is not NULL -- NULL produced by outer join
             """,
             [min(self.weeks), max(self.weeks), user_ids, user_ids, user_ids],
         ):
