@@ -172,8 +172,8 @@
   &.is-pw.is-provisional {
     background-image: repeating-linear-gradient(
       125deg,
-      var(--teal) 0,
-      var(--teal) 5px,
+      var(--st-color, var(--teal)) 0,
+      var(--st-color, var(--teal)) 5px,
       #ccc 5px,
       #ccc 8px
     );

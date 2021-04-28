@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             model_name="servicetype",
             name="color",
             field=colorfield.fields.ColorField(
-                default="#20c997", max_length=18, verbose_name="color"
+                default="#FFFFFF", max_length=18, verbose_name="color"
             ),
         ),
     ]
