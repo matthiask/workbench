@@ -127,19 +127,11 @@ function Planning({ data }) {
           </Cell>
         ))}
 
-        {data.capacity && <Capacity {...data.capacity} />}
         <TotalByWeek
           by_week={data.by_week}
           title={gettext("Planned hours per week")}
         />
-        {data.capacity && (
-          <>
-            <DeltaByWeek
-              planned={data.by_week}
-              capacity={data.capacity.total}
-            />
-          </>
-        )}
+        {data.capacity && <Capacity {...data.capacity} />}
         {data.projects_offers.map((project) => (
           <Project key={project.project.id} {...project} />
         ))}
@@ -180,43 +172,6 @@ function TotalByWeek({ by_week, title }) {
   )
 }
 
-function DeltaByWeek({ planned, capacity }) {
-  const ctx = useContext(RowContext)
-  const row = ctx.next()
-  return (
-    <>
-      <Cell
-        row={row}
-        column={1}
-        colspan={`span ${FIRST_DATA_COLUMN - 1}`}
-        className="planning--scale text-right pr-2"
-      >
-        <strong>{gettext("Delta")}</strong>
-      </Cell>
-      {planned.map((hours, idx) => {
-        const delta = hours - capacity[idx]
-
-        return (
-          <Cell
-            key={idx}
-            row={row}
-            column={FIRST_DATA_COLUMN + idx}
-            className="planning--range planning--small is-delta"
-            style={{
-              backgroundColor:
-                delta > 0
-                  ? `hsl(0, ${clamp(0, delta * 5, 70)}%, 70%)`
-                  : `hsl(120, ${clamp(0, -delta * 3, 50)}%, 70%)`,
-            }}
-          >
-            {fixed(delta, 0)}
-          </Cell>
-        )
-      })}
-    </>
-  )
-}
-
 function Capacity({ total, by_user }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
@@ -236,9 +191,12 @@ function Capacity({ total, by_user }) {
           key={idx}
           row={row}
           column={FIRST_DATA_COLUMN + idx}
-          className="planning--range planning--small is-capacity"
+          className="planning--range planning--small is-delta"
           style={{
-            opacity: opacityClamp(0.3 + parseFloat(hours) / 20),
+            backgroundColor:
+              hours > 0
+                ? `hsl(120, ${clamp(0, hours * 3, 50)}%, 70%)`
+                : `hsl(0, ${clamp(0, -hours * 5, 70)}%, 70%)`,
           }}
         >
           {fixed(hours, 0)}
@@ -274,7 +232,10 @@ function UserCapacity({ user, capacity }) {
           column={FIRST_DATA_COLUMN + idx}
           className="planning--range planning--small is-user-capacity"
           style={{
-            opacity: opacityClamp(0.3 + parseFloat(hours) / 20),
+            backgroundColor:
+              hours > 0
+                ? `hsl(120, ${clamp(0, hours * 3, 50)}%, 70%)`
+                : `hsl(0, ${clamp(0, -hours * 5, 70)}%, 70%)`,
           }}
         >
           {fixed(hours, 0)}

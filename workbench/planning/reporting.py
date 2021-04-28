@@ -227,7 +227,13 @@ class Planning:
 
         for week, user, capacity in query(
             """
-select week, user_id, percentage * 5 * planning_hours_per_day / 100 as capacity
+select
+    week,
+    user_id,
+    percentage * 5 * planning_hours_per_day / 100
+        - coalesce(pw_hours, 0)
+        - coalesce(abs_hours, 0) as capacity
+
 from generate_series(%s::date, %s::date, '7 days') as week
 left outer join lateral (
     select user_id, date_from, date_until, percentage, planning_hours_per_day
@@ -236,9 +242,32 @@ left outer join lateral (
     where user_id = any (%s)
 ) as employment
 on employment.date_from <= week and employment.date_until > week
+
+left outer join lateral (
+  select
+    user_id as pw_user_id,
+    sum(planned_hours / cardinality(weeks)) as pw_hours,
+    unnest(weeks) as pw_week
+  from planning_plannedwork
+  where user_id = any (%s)
+  group by pw_user_id, pw_week
+) as planned
+on week=pw_week and user_id=pw_user_id
+
+left outer join lateral(
+  select
+    user_id as abs_user_id,
+    sum(days * 8) as abs_hours, -- FIXME *planning_hours_per_day, not *8
+    date_trunc('week', starts_on) as abs_week
+  from awt_absence
+  where user_id = any(%s)
+  group by abs_user_id, abs_week
+) as absences
+on week=abs_week and user_id=abs_user_id
+
 where percentage is not NULL -- NULL produced by outer join
             """,
-            [min(self.weeks), max(self.weeks), user_ids],
+            [min(self.weeks), max(self.weeks), user_ids, user_ids, user_ids],
         ):
             by_user[user][week.date()] = capacity
             total[week.date()] += capacity
