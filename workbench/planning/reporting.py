@@ -257,10 +257,13 @@ on week=pw_week and user_id=pw_user_id
 left outer join lateral(
   select
     user_id as abs_user_id,
-    sum(days * 8) as abs_hours, -- FIXME *planning_hours_per_day, not *8
+    sum(days * employment.planning_hours_per_day) as abs_hours,
     date_trunc('week', starts_on) as abs_week
   from awt_absence
   where user_id = any(%s)
+  and user_id=employment.user_id
+  and employment.date_from <= date_trunc('week', starts_on)
+  and employment.date_until > date_trunc('week', starts_on)
   group by abs_user_id, abs_week
 ) as absences
 on week=abs_week and user_id=abs_user_id
