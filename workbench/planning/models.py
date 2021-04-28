@@ -69,6 +69,7 @@ class PlannedWork(Model):
     planned_hours = HoursField(
         _("planned hours"), validators=[MinValueValidator(Decimal("0.1"))]
     )
+    is_provisional = models.BooleanField(_("is provisional"), default=False)
     title = models.CharField(_("title"), max_length=200)
     notes = models.TextField(_("notes"), blank=True)
     weeks = ArrayField(models.DateField(), verbose_name=_("weeks"))

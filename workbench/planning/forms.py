@@ -81,6 +81,7 @@ class PlannedWorkForm(ModelForm):
             "service_type",
             "notes",
             "planned_hours",
+            "is_provisional",
         )
         widgets = {
             "notes": Textarea,

@@ -19,6 +19,10 @@
       <td>{{ object.pretty_planned_hours }}</td>
     </tr>
     <tr>
+      <th class="text-right">{{ object|label:'is_provisional' }}</th>
+      <td>{{ object.is_provisional|yesno:_('yes,no') }}</td>
+    </tr>
+    <tr>
       <th class="text-right">{% translate 'Periods' %}</th>
       <td>
         {% for range in object.ranges %}{{ range.pretty }}<br />{% endfor %}
