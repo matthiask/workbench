@@ -23,10 +23,11 @@ def updated():
     ).values("user_name", "row_data__project_id")
     users = {user.id: user for user in User.objects.all()} | {None: None}
 
-    projects = defaultdict(list)
+    projects = defaultdict(set)
     for row in queryset:
         pid = int(row["row_data__project_id"])
-        projects[pid].append(users[audit_user_id(row["user_name"])])
+        if user := users[audit_user_id(row["user_name"])]:
+            projects[pid].add(user)
 
     return [
         {"project": project, "updated_by": projects[project.id]}
