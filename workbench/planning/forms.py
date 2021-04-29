@@ -34,6 +34,28 @@ class MilestoneForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.instance.project = self.project
 
+    def clean(self):
+        data = super().clean()
+
+        if self.instance.pk and (date := data.get("date")):
+            if after := [
+                pw
+                for pw in self.instance.plannedwork_set.all()
+                if max(pw.weeks) + dt.timedelta(days=6) >= date
+            ]:
+                self.add_warning(
+                    _(
+                        "The following work is planned after"
+                        " the new milestone date: %(work)s."
+                    )
+                    % {
+                        "work": ", ".join(str(pw) for pw in after),
+                    },
+                    code="work-after-milestone",
+                )
+
+        return data
+
 
 class PlannedWorkSearchForm(Form):
     project = forms.ModelChoiceField(
@@ -82,6 +104,7 @@ class PlannedWorkForm(ModelForm):
             "notes",
             "planned_hours",
             "is_provisional",
+            "milestone",
         )
         widgets = {
             "notes": Textarea,
@@ -154,6 +177,7 @@ class PlannedWorkForm(ModelForm):
         ].choices = self.instance.project.offers.not_declined_choices(
             include=self.instance.offer_id
         )
+        self.fields["milestone"].queryset = self.project.milestones.all()
 
         date_from_options = [
             monday(),
@@ -183,31 +207,23 @@ class PlannedWorkForm(ModelForm):
     def clean(self):
         data = super().clean()
 
-        """ XXX Check this after adding milestones
-        if data.get("request") and data.get("weeks"):
-            outside = [
-                week
-                for week in data["weeks"]
-                if week < data["request"].earliest_start_on
-                or week >= data["request"].completion_requested_on
-            ]
-            if outside:
+        if (weeks := data.get("weeks")) and (milestone := data.get("milestone")):
+            if after := [week for week in weeks if week >= monday(milestone.date)]:
                 self.add_warning(
                     _(
-                        "At least one week is outside the requested range of"
-                        " %(from)s – %(until)s: %(weeks)s"
+                        "The milestone is scheduled on %(date)s, but work is"
+                        " planned in the same or following week(s): %(weeks)s"
                     )
                     % {
-                        "from": local_date_format(data["request"].earliest_start_on),
-                        "until": local_date_format(
-                            data["request"].completion_requested_on
-                            - dt.timedelta(days=1)
+                        "date": local_date_format(milestone.date),
+                        "weeks": ", ".join(
+                            f"{local_date_format(week)} - "
+                            f"{local_date_format(week + dt.timedelta(days=6))}"
+                            for week in after
                         ),
-                        "weeks": ", ".join(local_date_format(week) for week in outside),
                     },
-                    code="weeks-outside-request",
+                    code="weeks-after-milestone",
                 )
-        """
 
         if data.get("offer") and data["offer"].is_declined:
             self.add_warning(

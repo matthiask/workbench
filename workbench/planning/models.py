@@ -34,7 +34,7 @@ class Milestone(Model):
         verbose_name_plural = _("milestones")
 
     def __str__(self):
-        return self.title
+        return f"{self.title} ({local_date_format(self.date, fmt='l, j.n.')})"
 
 
 @model_urls
@@ -70,6 +70,13 @@ class PlannedWork(Model):
         _("planned hours"), validators=[MinValueValidator(Decimal("0.1"))]
     )
     is_provisional = models.BooleanField(_("is provisional"), default=False)
+    milestone = models.ForeignKey(
+        Milestone,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_("milestone"),
+    )
     title = models.CharField(_("title"), max_length=200)
     notes = models.TextField(_("notes"), blank=True)
     weeks = ArrayField(models.DateField(), verbose_name=_("weeks"))
