@@ -163,7 +163,10 @@ class Planning:
                     else {}
                 ),
             },
-            "work_list": work_list,
+            "work_list": sorted(
+                work_list,
+                key=lambda row: (row["work"]["date_from"], row["work"]["date_until"]),
+            ),
         }
 
     def _project_record(self, project, offers):
