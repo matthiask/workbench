@@ -53,13 +53,13 @@ class PlannedWork(Model):
         verbose_name=_("offer"),
         related_name="planned_work",
     )
-    created_at = models.DateTimeField(_("created at"), default=timezone.now)
     created_by = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         verbose_name=_("created by"),
         related_name="+",
     )
+    created_at = models.DateTimeField(_("created at"), default=timezone.now)
     user = models.ForeignKey(
         User,
         on_delete=models.PROTECT,

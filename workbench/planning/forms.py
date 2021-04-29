@@ -234,6 +234,8 @@ class PlannedWorkForm(ModelForm):
 
     def save(self):
         instance = super().save(commit=False)
+        if not instance.pk:
+            instance.created_by = self.request.user
         instance.weeks = self.cleaned_data.get("weeks")
         if not instance.pk:
             instance.created_by = self.request.user
