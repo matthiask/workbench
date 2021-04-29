@@ -57,4 +57,5 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.RunSQL("UPDATE planning_plannedwork SET created_by_id=user_id", ""),
+        migrations.RunSQL("SELECT audit_audit_table('planning_milestone')", ""),
     ]
