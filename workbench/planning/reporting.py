@@ -230,7 +230,7 @@ class Planning:
 select
     week,
     user_id,
-    coalesce(percentage, 0) * 5 * planning_hours_per_day / 100
+    coalesce(percentage, 0) * 5 * coalesce(planning_hours_per_day, 0) / 100
         - coalesce(pw_hours, 0)
         - coalesce(abs_hours, 0) as capacity
 
