@@ -418,6 +418,7 @@ class TimestampsTest(TestCase):
         t = Timestamp.objects.get()
         self.assertEqual(slices[1]["timestamp_id"], t.id)
 
+    @travel("2021-04-26 18:00")  # Make 10800 seconds stay within the same day
     def test_break_autocreate_timestamp_from_detected(self):
         """The buttons for <detected> gaps lead to a form which fills the gap
         instead of appending new slices"""
