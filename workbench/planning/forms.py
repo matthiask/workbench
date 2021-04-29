@@ -178,6 +178,7 @@ class PlannedWorkForm(ModelForm):
             include=self.instance.offer_id
         )
         self.fields["milestone"].queryset = self.project.milestones.all()
+        self.fields["service_type"].required = True
 
         date_from_options = [
             monday(),

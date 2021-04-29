@@ -119,6 +119,8 @@ class PlanningTest(TestCase):
 
     def test_planned_work_crud(self):
         """Create, update and delete planned work"""
+        service_types = factories.service_types()
+
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -132,6 +134,7 @@ class PlanningTest(TestCase):
                 "modal-title": "bla",
                 "modal-planned_hours": 50,
                 "modal-weeks": [monday().isoformat()],
+                "modal-service_type": service_types.consulting.pk,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -145,6 +148,7 @@ class PlanningTest(TestCase):
                 "modal-title": "bla",
                 "modal-planned_hours": 50,
                 "modal-weeks": [monday().isoformat()],
+                "modal-service_type": service_types.consulting.pk,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -160,6 +164,7 @@ class PlanningTest(TestCase):
                     monday().isoformat(),
                     (monday() + dt.timedelta(days=7)).isoformat(),
                 ],
+                "modal-service_type": service_types.consulting.pk,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
