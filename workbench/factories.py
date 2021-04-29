@@ -323,6 +323,7 @@ class PlanningRequestFactory(DjangoModelFactory):
 class PlannedWorkFactory(DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     user = factory.SubFactory(UserFactory)
+    created_by = factory.LazyAttribute(lambda obj: obj.user)
     planned_hours = Decimal(20)
     title = "Planned work"
 

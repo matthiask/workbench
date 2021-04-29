@@ -235,6 +235,12 @@ class PlannedWork(Model):
         verbose_name=_("planning request"),
         related_name="planned_work",
     )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        verbose_name=_("created by"),
+        related_name="+",
+    )
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     user = models.ForeignKey(
         User,
