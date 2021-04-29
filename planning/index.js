@@ -63,6 +63,10 @@ function Planning({ data }) {
 
   useLayoutEffect(() => {
     gridRef.current.style.setProperty("--rows", rowCtx.current() - 2)
+    gridRef.current.style.setProperty(
+      "--first-project-row",
+      rowCtx.firstProjectRow
+    )
 
     Array.from(document.querySelectorAll(".planning--title a")).forEach(
       (el) => (el.title = el.textContent)
@@ -249,6 +253,9 @@ function Project({ by_week, offers, project }) {
   const ctx = useContext(RowContext)
   ctx.next() // Skip one row
   const row = ctx.next()
+  if (!ctx.firstProjectRow) {
+    ctx.firstProjectRow = row
+  }
   return (
     <>
       <div
@@ -405,10 +412,10 @@ function Milestones({ project }) {
             </Cell>
             <Cell
               key={`${idx}-span`}
-              row={row}
+              row="var(--first-project-row)"
               rowspan="-1"
               column={FIRST_DATA_COLUMN + idx}
-              style={{ borderRight: "3px solid rgba(250, 0, 0, 0.2)" }}
+              style={{ borderRight: "3px solid rgb(255, 200, 200)" }}
             />
           </>
         )
