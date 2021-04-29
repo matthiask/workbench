@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-29 02:15+0200\n"
+"POT-Creation-Date: 2021-04-29 15:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2390,6 +2390,7 @@ msgstr "Datum"
 
 #: workbench/planning/models.py
 #: workbench/templates/planning/project_planning.html
+#: workbench/templates/planning/team_planning.html
 #: workbench/templates/planning/user_planning.html
 msgid "milestone"
 msgstr "Meilenstein"
@@ -2406,12 +2407,12 @@ msgstr "geplante Stunden"
 msgid "is provisional"
 msgstr "ist provisorisch"
 
-#: workbench/planning/models.py workbench/services/models.py
-msgid "service type"
-msgstr "Leistungstyp"
+#: workbench/planning/models.py
+msgid "primary service type"
+msgstr "Haupt-Leistungstyp"
 
 #: workbench/planning/models.py
-msgid "Colorize the work unit according to its service type."
+msgid "Colorizes the work unit according to its service type."
 msgstr "Färbt die Arbeitseinheit gemäss ihrem Leistungstyp ein."
 
 #: workbench/planning/models.py workbench/templates/base.html
@@ -2719,6 +2720,10 @@ msgstr "Datum setzen"
 #: workbench/services/models.py
 msgid "color"
 msgstr "Farbe"
+
+#: workbench/services/models.py
+msgid "service type"
+msgstr "Leistungstyp"
 
 #: workbench/services/models.py
 msgid "service types"

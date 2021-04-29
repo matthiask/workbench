@@ -85,8 +85,8 @@ class PlannedWork(Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        verbose_name=_("service type"),
-        help_text=_("Colorize the work unit according to its service type."),
+        verbose_name=_("primary service type"),
+        help_text=_("Colorizes the work unit according to its service type."),
         related_name="+",
     )
 

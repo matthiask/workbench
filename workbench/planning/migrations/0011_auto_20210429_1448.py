@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='plannedwork',
             name='service_type',
-            field=models.ForeignKey(blank=True, help_text='Colorize the work unit according to its service type.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='services.servicetype', verbose_name='service type'),
+            field=models.ForeignKey(blank=True, help_text='Colorizes the work unit according to its service type.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='services.servicetype', verbose_name='primary service type'),
         ),
         migrations.DeleteModel(
             name='PlanningRequest',
