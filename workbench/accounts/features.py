@@ -25,6 +25,7 @@ class FEATURES(str, Enum):
     BOOKKEEPING = "BOOKKEEPING"
     BREAKS_NAG = "BREAKS_NAG"
     CAMPAIGNS = "CAMPAIGNS"
+    COFFEE = "COFFEE"
     CONTROLLING = "CONTROLLING"
     DEALS = "DEALS"
     FOREIGN_CURRENCIES = "FOREIGN_CURRENCIES"
@@ -46,6 +47,10 @@ LABELS = {
     FEATURES.CAMPAIGNS: {
         "label": capfirst(_("campaigns")),
         "help_text": _("Campaigns allow grouping projects."),
+    },
+    FEATURES.COFFEE: {
+        "label": _("Coffee break"),
+        "help_text": _("Receive regular invites for a coffee break?"),
     },
     FEATURES.CONTROLLING: {
         "label": _("Controlling"),

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-30 10:51+0200\n"
+"POT-Creation-Date: 2021-04-30 18:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,6 +45,15 @@ msgstr "Kampagnen"
 #: workbench/accounts/features.py
 msgid "Campaigns allow grouping projects."
 msgstr "Kampagnen ermöglichen die Gruppierung von Projekten."
+
+#: workbench/accounts/features.py workbench/accounts/forms.py
+#: workbench/templates/accounts/coffee_mail.txt
+msgid "Coffee break"
+msgstr "Kaffeepause"
+
+#: workbench/accounts/features.py workbench/accounts/forms.py
+msgid "Receive regular invites for a coffee break?"
+msgstr "Regelmässige Einladungen für eine Kaffeepause erhalten?"
 
 #: workbench/accounts/features.py
 msgid "Controlling"
@@ -2812,6 +2821,28 @@ msgstr "Zurück zum Start"
 msgid "No history found"
 msgstr "Keine Geschichte gefunden"
 
+#: workbench/templates/accounts/coffee_mail.txt
+#, python-format
+msgid ""
+"Hello %(names)s\n"
+"\n"
+"Here's your invitation for a coffee break. I hope you'll enjoy it :-)\n"
+"\n"
+"Yours truly,\n"
+"Coffee bot\n"
+msgstr ""
+"Hallo %(names)s\n"
+"\n"
+"Hier ist eure Einladung für eine Kaffeepause. Ich hoffe, ihr geniesst "
+"es :-)\n"
+"\n"
+"Herzliche Grüsse,\n"
+"Kaffee-Bot\n"
+
+#: workbench/templates/accounts/coffee_mail.txt
+msgid "Enough caffeine? You may opt out here:"
+msgstr "Genug Kaffee? Du kannst dich hier abmelden:"
+
 #: workbench/templates/accounts/login.html
 msgid "Sign in"
 msgstr "Anmelden"
@@ -3929,6 +3960,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Coffee time"
+#~ msgstr "Kaffeepause"
 
 #, python-format
 #~ msgid "The offer %(offer)s is invalid: %(error)s"
