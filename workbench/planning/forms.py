@@ -207,6 +207,7 @@ class PlannedWorkForm(ModelForm):
             "request",
             "user",
             "title",
+            "service_type",
             "notes",
             "planned_hours",
         )
@@ -299,6 +300,7 @@ class PlannedWorkForm(ModelForm):
         ].choices = self.instance.project.offers.not_declined_choices(
             include=self.instance.offer_id
         )
+        self.fields["service_type"].required = True
         self.fields["request"].queryset = self.instance.project.planning_requests.all()
 
         date_from_options = [
