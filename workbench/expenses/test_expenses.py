@@ -281,7 +281,9 @@ class ExchangeRatesTest(TestCase):
         exchange_rates()
         self.assertEqual(
             mock_get.call_args[0],
-            ("https://api.exchangeratesapi.io/latest?base=CHF",),
+            (
+                "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/chf.json",  # noqa
+            ),
         )
 
     def test_exchange_rates_someday(self, mock_get):
@@ -289,5 +291,7 @@ class ExchangeRatesTest(TestCase):
         exchange_rates(dt.date(2019, 10, 12))
         self.assertEqual(
             mock_get.call_args[0],
-            ("https://api.exchangeratesapi.io/2019-10-12?base=CHF",),
+            (
+                "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/2019-10-12/currencies/chf.json",  # noqa
+            ),
         )
