@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-29 15:00+0200\n"
+"POT-Creation-Date: 2021-04-30 10:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2361,7 +2361,7 @@ msgstr "%s zu Projekt kopieren"
 #, python-format
 msgid "The following work is planned after the new milestone date: %(work)s."
 msgstr ""
-"Die folgenden Arbeiten sind nach dem neuen Meilenstein-Datum geplant: "
+"Die folgenden Arbeiten sind geplant nach dem neuen Meilenstein-Datum: "
 "%(work)s."
 
 #: workbench/planning/forms.py workbench/planning/models.py
@@ -2375,8 +2375,8 @@ msgid ""
 "The milestone is scheduled on %(date)s, but work is planned in the same or "
 "following week(s): %(weeks)s"
 msgstr ""
-"Der Meilenstein ist terminiert auf %(date)s, aber Arbeit ist geplant in der "
-"gleichen oder den folgenden Woche(n): %(weeks)s"
+"Der Meilenstein ist geplant am %(date)s, aber Arbeit ist geplant in der "
+"gleichen oder den folgenden Wochen: %(weeks)s"
 
 #: workbench/planning/forms.py
 msgid "The selected offer is declined."
@@ -2409,11 +2409,7 @@ msgstr "ist provisorisch"
 
 #: workbench/planning/models.py
 msgid "primary service type"
-msgstr "Haupt-Leistungstyp"
-
-#: workbench/planning/models.py
-msgid "Colorizes the work unit according to its service type."
-msgstr "Färbt die Arbeitseinheit gemäss ihrem Leistungstyp ein."
+msgstr "Primärer Leistungstyp"
 
 #: workbench/planning/models.py workbench/templates/base.html
 #: workbench/templates/planning/project_planning.html
@@ -3130,7 +3126,9 @@ msgstr "Weiter"
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: workbench/templates/history_modal.html workbench/templatetags/workbench.py
+#: workbench/templates/history_modal.html
+#: workbench/templates/planning/user_planning.html
+#: workbench/templatetags/workbench.py
 msgid "History"
 msgstr "Geschichte"
 
@@ -3280,6 +3278,14 @@ msgstr "Diese Seite existiert nicht (mehr)."
 #: workbench/templates/planning/plannedwork_detail.html
 msgid "Periods"
 msgstr "Zeiträume"
+
+#: workbench/templates/planning/project_planning.html
+msgid "History of planned work"
+msgstr "Geschichte der geplanten Arbeit"
+
+#: workbench/templates/planning/project_planning.html
+msgid "History of milestones"
+msgstr "Geschichte der Meilensteine"
 
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html

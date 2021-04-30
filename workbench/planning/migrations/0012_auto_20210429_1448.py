@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ("services", "0005_servicetype_color"),
         ("projects", "0019_auto_20200523_0929"),
-        ("planning", "0010_alter_plannedwork_created_by"),
+        ("planning", "0011_plannedwork_service_type"),
     ]
 
     operations = [
@@ -63,19 +63,6 @@ class Migration(migrations.Migration):
             model_name="plannedwork",
             name="is_provisional",
             field=models.BooleanField(default=False, verbose_name="is provisional"),
-        ),
-        migrations.AddField(
-            model_name="plannedwork",
-            name="service_type",
-            field=models.ForeignKey(
-                blank=True,
-                help_text="Colorizes the work unit according to its service type.",
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                related_name="+",
-                to="services.servicetype",
-                verbose_name="primary service type",
-            ),
         ),
         migrations.DeleteModel(
             name="PlanningRequest",

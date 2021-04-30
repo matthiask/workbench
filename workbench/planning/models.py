@@ -86,7 +86,6 @@ class PlannedWork(Model):
         blank=True,
         null=True,
         verbose_name=_("primary service type"),
-        help_text=_("Colorizes the work unit according to its service type."),
         related_name="+",
     )
 
