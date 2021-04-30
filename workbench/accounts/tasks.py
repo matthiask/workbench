@@ -10,9 +10,9 @@ from workbench.accounts.models import User
 
 def coffee_invites():
     year, week, weekday = dt.date.today().isocalendar()
-    if weekday != 1 or week % 2 != 0:
+    if weekday != 1 or week % 2 == 0:
         return
-
+    # It is a monday in an odd ISO calendar week
     users = list(
         User.objects.active().order_by("?").filter(_features__overlap=[FEATURES.COFFEE])
     )
