@@ -36,6 +36,9 @@
       {% include 'svg/plus.svg' %}
       {% translate 'milestone'|capfirst %}
     </a>
+
+    <a href="{% url 'history' 'planning_plannedwork' 'project_id' object.pk %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">{% translate 'History of planned work' %}</a>
+    <a href="{% url 'history' 'planning_milestone' 'project_id' object.pk %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">{% translate 'History of milestones' %}</a>
   </div>
 </div>
 {% endblock %}

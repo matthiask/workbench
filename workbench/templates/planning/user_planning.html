@@ -25,6 +25,8 @@
       {% include 'svg/plus.svg' %}
       {% translate 'milestone'|capfirst %}
     </a>
+
+    <a href="{% url 'history' 'planning_plannedwork' 'user_id' object.pk %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">{% translate 'History' %}</a>
   </div>
 </div>
 {% endblock %}
