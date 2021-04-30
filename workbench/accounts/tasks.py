@@ -1,7 +1,8 @@
 import datetime as dt
 
-from authlib.email import render_to_mail
 from django.conf import settings
+
+from authlib.email import render_to_mail
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User

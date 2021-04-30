@@ -50,7 +50,10 @@ class UserForm(ModelForm):
         if not hasattr(user, "features") or not user.features[FEATURES.PLANNING]:
             self.fields.pop("planning_hours_per_day")
 
-        if settings.WORKBENCH.FEATURES[FEATURES.COFFEE] == F.USER:
+        if (
+            hasattr(user, "features")
+            and settings.WORKBENCH.FEATURES[FEATURES.COFFEE] == F.USER
+        ):
             self.fields["feature_coffee"] = forms.BooleanField(
                 label=_("Coffee break"),
                 help_text=_("Receive regular invites for a coffee break?"),
