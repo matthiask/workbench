@@ -570,6 +570,8 @@ class PlanningTest(TestCase):
         self.assertEqual(rr.reason, "My reasons")
         self.assertTrue(bool(rr.declined_at))
 
+        service_types = factories.service_types()
+
         response = self.client.post(
             pr.project.urls["creatework"],
             {
@@ -579,6 +581,7 @@ class PlanningTest(TestCase):
                 "modal-planned_hours": 20,
                 "modal-title": pr.title,
                 "modal-weeks": [pr.earliest_start_on],
+                "modal-service_type": service_types.consulting.pk,
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
@@ -593,6 +596,7 @@ class PlanningTest(TestCase):
                 "modal-planned_hours": 20,
                 "modal-title": pr.title,
                 "modal-weeks": [pr.earliest_start_on],
+                "modal-service_type": service_types.consulting.pk,
                 WarningsForm.ignore_warnings_id: "already-declined",
             },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
