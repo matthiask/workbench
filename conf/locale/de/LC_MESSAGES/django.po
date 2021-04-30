@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-04 18:23+0100\n"
+"POT-Creation-Date: 2021-04-30 10:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -180,6 +180,7 @@ msgstr "Features"
 #: workbench/templates/accounts/user_base.html
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/reporting/accepted_deals.html
+#: workbench/templates/reporting/birthdays.html
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/hours_per_work_category.html
 #: workbench/templates/reporting/labor_costs_by_user.html
@@ -1361,6 +1362,8 @@ msgstr ""
 "allen Beitragenden aufgeteilt."
 
 #: workbench/deals/models.py
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/contacts/person_detail.html
 #: workbench/templates/reporting/accepted_deals_for_user.html
 #: workbench/templates/reporting/declined_deals.html
 msgid "deal"
@@ -2299,7 +2302,7 @@ msgstr "offeriert am"
 msgid "valid until"
 msgstr "Gültig bis"
 
-#: workbench/offers/models.py
+#: workbench/offers/models.py workbench/templates/projects/project_detail.html
 msgid "work completed on"
 msgstr "Arbeit abgeschlossen am"
 
@@ -2454,6 +2457,10 @@ msgstr "Nur Montage erlaubt."
 #: workbench/planning/models.py
 msgid "Allow at least one week for the work please."
 msgstr "Mindestens eine Woche für die Arbeit zulassen."
+
+#: workbench/planning/models.py
+msgid "primary service type"
+msgstr "Primärer Leistungstyp"
 
 #: workbench/planning/models.py workbench/templates/base.html
 #: workbench/templates/planning/project_planning.html
@@ -2762,6 +2769,10 @@ msgid "Set date"
 msgstr "Datum setzen"
 
 #: workbench/services/models.py
+msgid "color"
+msgstr "Farbe"
+
+#: workbench/services/models.py
 msgid "service type"
 msgstr "Leistungstyp"
 
@@ -3028,6 +3039,11 @@ msgstr "Zeitmarken"
 #: workbench/templates/reporting/work_anniversaries.html
 msgid "Work anniversaries"
 msgstr "Jubiläen"
+
+#: workbench/templates/base.html workbench/templates/reporting/birthdays.html
+#: workbench/templates/start.html
+msgid "Birthdays"
+msgstr "Geburtstage"
 
 #: workbench/templates/base.html workbench/templates/shortcuts.html
 msgid "Keyboard shortcuts"
@@ -3496,6 +3512,14 @@ msgstr "Ziel"
 msgid "count"
 msgstr "Anzahl"
 
+#: workbench/templates/reporting/birthdays.html
+msgid "Birthday"
+msgstr "Geburtstag"
+
+#: workbench/templates/reporting/birthdays.html
+msgid "Age today"
+msgstr "Alter heute"
+
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data.html
 msgid "green"
@@ -3681,10 +3705,6 @@ msgstr "Keine aktiven Projekte"
 #: workbench/templates/start.html
 msgid "Possibly requiring action"
 msgstr "Benötigen evtl. eine Aktion"
-
-#: workbench/templates/start.html
-msgid "Birthdays"
-msgstr "Geburtstage"
 
 #: workbench/templates/start.html
 msgid "today's hours"
