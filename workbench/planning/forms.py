@@ -393,6 +393,10 @@ class PlannedWorkForm(ModelForm):
             ).update(declined_at=None, reason="")
         return instance
 
+    @property
+    def this_monday(self):
+        return monday()
+
 
 @add_prefix("modal")
 class DeclineRequestForm(ModelForm):
@@ -429,7 +433,3 @@ class DeclineRequestForm(ModelForm):
             cc=[user.email for user in self.instance.receivers.all()],
         ).send(fail_silently=True)
         return instance
-
-    @property
-    def this_monday(self):
-        return monday()
