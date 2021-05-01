@@ -14,10 +14,29 @@
 
   <div class="row">
     <div class="col-lg-7">
-      {% ff_fields form fields='offer,user,title,milestone,service_type,notes' %}
+      {% ff_field form.offer %}
+      {% ff_field form.title %}
+      {% ff_field form.notes %}
+      <div class="row">
+        <div class="col-sm-6">
+          {% ff_field form.milestone %}
+        </div>
+        <div class="col-sm-6">
+          {% ff_field form.service_type %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          {% ff_field form.user %}
+        </div>
+        <div class="col-sm-6">
+          {% ff_field form.planned_hours %}
+        </div>
+      </div>
+      {% ff_field form.is_provisional %}
     </div>
     <div class="col-lg-5">
-      {% ff_fields form exclude='offer,user,title,milestone,service_type,notes' %}
+      {% ff_fields form exclude='offer,title,milestone,service_type,notes,user,planned_hours,is_provisional' %}
     </div>
   </div>
 
