@@ -15,7 +15,7 @@ from workbench.accounts.features import FEATURES, F
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 SECRET_KEY = env("SECRET_KEY", required=True)
-DEBUG = env("DEBUG", default=bool({"runserver"}.intersection(sys.argv)))
+DEBUG = env("DEBUG", default=bool({"runserver", "shell"}.intersection(sys.argv)))
 TESTING = env("TESTING", default="test" in sys.argv)
 LIVE = env("LIVE", default=False)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
@@ -221,6 +221,7 @@ WORKBENCH = {
             FEATURES.BOOKKEEPING: F.USER,
             FEATURES.BREAKS_NAG: F.ALWAYS,
             FEATURES.CAMPAIGNS: F.ALWAYS,
+            FEATURES.COFFEE: F.USER,
             FEATURES.CONTROLLING: F.ALWAYS,
             FEATURES.DEALS: F.ALWAYS,
             FEATURES.FOREIGN_CURRENCIES: F.NEVER,
@@ -264,6 +265,7 @@ WORKBENCH = {
             FEATURES.BOOKKEEPING: F.ALWAYS,
             FEATURES.BREAKS_NAG: F.ALWAYS,
             FEATURES.CAMPAIGNS: F.NEVER,
+            FEATURES.COFFEE: F.NEVER,
             FEATURES.CONTROLLING: F.ALWAYS,
             FEATURES.DEALS: F.NEVER,
             FEATURES.FOREIGN_CURRENCIES: F.NEVER,
@@ -308,6 +310,7 @@ WORKBENCH = {
             FEATURES.BOOKKEEPING: F.USER,
             FEATURES.BREAKS_NAG: F.NEVER,
             FEATURES.CAMPAIGNS: F.NEVER,
+            FEATURES.COFFEE: F.USER,
             FEATURES.CONTROLLING: F.USER,
             FEATURES.DEALS: F.NEVER,
             FEATURES.FOREIGN_CURRENCIES: F.ALWAYS,
@@ -349,6 +352,7 @@ WORKBENCH = {
             FEATURES.BOOKKEEPING: F.ALWAYS,
             FEATURES.BREAKS_NAG: F.ALWAYS,
             FEATURES.CAMPAIGNS: F.NEVER,
+            FEATURES.COFFEE: F.NEVER,
             FEATURES.CONTROLLING: F.ALWAYS,
             FEATURES.DEALS: F.ALWAYS,
             FEATURES.FOREIGN_CURRENCIES: F.ALWAYS,

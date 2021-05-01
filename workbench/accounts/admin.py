@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
+from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.features import FEATURES, LABELS, F
 from workbench.accounts.models import Team, User
@@ -57,6 +58,19 @@ class EmploymentInline(admin.TabularInline):
     extra = 0
 
 
+class FeatureFilter(admin.SimpleListFilter):
+    title = _("feature")
+    parameter_name = "feature"
+
+    def lookups(self, request, model_admin):
+        return [(choice.value, LABELS[choice]["label"]) for choice in FEATURES]
+
+    def queryset(self, request, queryset):
+        if value := self.value():
+            queryset = queryset.filter(_features__overlap=[value])
+        return queryset
+
+
 class UserAdmin(UserAdmin):
     form = UserChangeForm
     add_form = UserChangeForm
@@ -71,7 +85,7 @@ class UserAdmin(UserAdmin):
         "person",
         "_features",
     )
-    list_filter = ("is_active", "working_time_model")
+    list_filter = ("is_active", "working_time_model", FeatureFilter)
     list_select_related = ["person__organization", "working_time_model"]
     fieldsets = add_fieldsets = [
         (
