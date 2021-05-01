@@ -380,46 +380,71 @@ function WorkedHours({ project }) {
   )
 }
 
+function weekdayToGradient(weekday) {
+  const width = 8
+  const start = Math.floor(((100 - width) * (weekday - 1)) / 7)
+  const end = start + width
+  return `linear-gradient(to right, transparent ${start}%, rgb(255, 200, 200) ${start}%, rgb(255, 200, 200) ${end}%, transparent ${end}%)`
+}
+
 function Milestones({ project }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
+  let rows = 1
 
   return (
     <>
-      <Cell row={row} column={1} className="planning--title is-milestone">
-        {gettext("Milestones")}
-      </Cell>
-
       {project.milestones.map((milestones, idx) => {
         if (!milestones.length) return null
 
-        // FIXME doesn't properly handle several milestones within the same week
+        console.log(milestones)
+
+        while (milestones.length > rows) {
+          ctx.next()
+          ++rows
+        }
+
         return (
           <>
-            <Cell
-              key={idx}
-              row={row}
-              column={FIRST_DATA_COLUMN + idx}
-              className="planning--range planning--small is-milestone"
-              title={milestones
-                .map((milestone) => `${milestone.title} (${milestone.dow})`)
-                .join(" / ")}
-              tag="a"
-              href={milestones[0].url}
-              data-toggle="ajaxmodal"
-            >
-              {milestones[0].date}
-            </Cell>
-            <Cell
-              key={`${idx}-span`}
-              row="var(--first-project-row)"
-              rowspan="-1"
-              column={FIRST_DATA_COLUMN + idx}
-              style={{ borderRight: "3px solid rgb(255, 200, 200)" }}
-            />
+            {milestones.map((milestone) => (
+              <Cell
+                key={milestone.id}
+                row="var(--first-project-row)"
+                rowspan="-1"
+                column={FIRST_DATA_COLUMN + idx}
+                style={{
+                  backgroundImage: weekdayToGradient(milestone.weekday),
+                }}
+              />
+            ))}
+            {milestones.map((milestone, milestoneIdx) => (
+              <Cell
+                key={milestone.id}
+                row={row + milestoneIdx}
+                column={FIRST_DATA_COLUMN + idx}
+                className="planning--range planning--small is-milestone"
+                style={{
+                  backgroundImage: weekdayToGradient(milestone.weekday),
+                }}
+                title={`${milestone.title} (${milestone.dow})`}
+                tag="a"
+                href={milestones[0].url}
+                data-toggle="ajaxmodal"
+              >
+                {milestone.date}
+              </Cell>
+            ))}
           </>
         )
       })}
+      <Cell
+        row={row}
+        rowspan={`span ${rows}`}
+        column={1}
+        className="planning--title is-milestone"
+      >
+        {gettext("Milestones")}
+      </Cell>
     </>
   )
 }

@@ -127,6 +127,7 @@ class Planning:
                     "title": milestone.title,
                     "dow": local_date_format(milestone.date, fmt="l, j.n."),
                     "date": local_date_format(milestone.date, fmt="j."),
+                    "weekday": milestone.date.isocalendar()[2],
                     "url": milestone.urls["detail"],
                 }
             )
