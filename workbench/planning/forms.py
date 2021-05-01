@@ -166,6 +166,9 @@ class PlannedWorkForm(ModelForm):
                         "notes": pw.notes,
                         "planned_hours": pw.planned_hours,
                         "weeks": pw.weeks,
+                        "is_provisional": pw.is_provisional,
+                        "service_type": pw.service_type_id,
+                        "milestone": pw.milestone_id,
                     }
                 )
 
