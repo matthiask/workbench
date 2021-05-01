@@ -20,4 +20,10 @@
       {% ff_fields form exclude='offer,request,user,title,service_type,notes' %}
     </div>
   </div>
+
+<style>
+#id_modal-weeks option[value="{{ form.this_monday.isoformat  }}"] {
+  background: rgba(150, 150, 250, 0.2);
+}
+</style>
 {% endblock %}
