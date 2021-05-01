@@ -242,3 +242,7 @@ class PlannedWorkForm(ModelForm):
             instance.created_by = self.request.user
         instance.save()
         return instance
+
+    @property
+    def this_monday(self):
+        return monday()
