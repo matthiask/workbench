@@ -208,3 +208,39 @@ class AccountsTest(TestCase):
             '<input type="checkbox" name="_features" value="CAMPAIGNS" checked>',  # noqa
             html=True,
         )
+
+    def test_coffee_feature(self):
+        """Coffee feature activation and deactivation"""
+        user = factories.UserFactory.create(_features=[FEATURES.BOOKKEEPING])
+        self.client.force_login(user)
+        self.assertEqual(user._features, [FEATURES.BOOKKEEPING])
+
+        response = self.client.post(
+            "/accounts/update/",
+            {
+                "_full_name": "Full Name",
+                "_short_name": "FN",
+                "language": "de",
+                "planning_hours_per_day": 6,
+                "feature_coffee": "on",
+            },
+        )
+        self.assertRedirects(response, "/")
+
+        user.refresh_from_db()
+        self.assertEqual(user._features, [FEATURES.BOOKKEEPING, FEATURES.COFFEE])
+
+        response = self.client.post(
+            "/accounts/update/",
+            {
+                "_full_name": "Full Name",
+                "_short_name": "FN",
+                "language": "de",
+                "planning_hours_per_day": 6,
+                "feature_coffee": "",
+            },
+        )
+        self.assertRedirects(response, "/")
+
+        user.refresh_from_db()
+        self.assertEqual(user._features, [FEATURES.BOOKKEEPING])
