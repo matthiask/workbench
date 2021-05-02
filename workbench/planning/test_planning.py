@@ -44,17 +44,17 @@ class PlanningTest(TestCase):
         factories.AbsenceFactory.create(user=pw.user)
 
         report = reporting.user_planning(pw.user, date_range)
-        self.assertAlmostEqual(sum(report["by_week"]), Decimal("26"))
+        self.assertAlmostEqual(sum(report["by_week"]), Decimal("28"))
         self.assertEqual(len(report["projects_offers"]), 1)
 
         report = reporting.project_planning(pw.project)
-        self.assertAlmostEqual(sum(report["by_week"]), Decimal("26"))
+        self.assertAlmostEqual(sum(report["by_week"]), Decimal("28"))
         self.assertEqual(len(report["projects_offers"]), 1)
 
         team = factories.TeamFactory.create()
         team.members.add(pw.user)
         report = reporting.team_planning(team, date_range)
-        self.assertAlmostEqual(sum(report["by_week"]), Decimal("26"))
+        self.assertAlmostEqual(sum(report["by_week"]), Decimal("28"))
         self.assertEqual(len(report["projects_offers"]), 1)
 
         pw2 = factories.PlannedWorkFactory.create(
@@ -63,7 +63,7 @@ class PlanningTest(TestCase):
             weeks=[monday()],
         )
         report = reporting.user_planning(pw.user, date_range)
-        self.assertAlmostEqual(sum(report["by_week"]), Decimal("46"))
+        self.assertAlmostEqual(sum(report["by_week"]), Decimal("48"))
         self.assertEqual(len(report["projects_offers"]), 1)
 
         work_list = report["projects_offers"][0]["offers"][0]["work_list"]
