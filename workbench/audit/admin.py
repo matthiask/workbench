@@ -6,9 +6,12 @@ from workbench.tools import admin
 
 @admin.register(LoggedAction)
 class LoggedActionAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "data", "user_name", "created_at")
+    list_display = ["created_at", "user_name", "table_name", "id", "action", "data"]
     list_filter = ["action", "table_name"]
     ordering = ("-created_at",)
+
+    def id(self, instance):
+        return instance.row_data.get("id")
 
     def data(self, instance):
         return json.dumps(
