@@ -1,7 +1,6 @@
 import datetime as dt
 from collections import defaultdict
 
-from django.db.models import Q
 from django.utils import timezone
 
 from workbench.accounts.models import User
@@ -16,28 +15,60 @@ def tryint(str):
         return None
 
 
-def updated():
+def updated(*, duration=dt.timedelta(hours=24)):
     queryset = LoggedAction.objects.filter(
-        created_at__gte=timezone.now() - dt.timedelta(hours=24),
+        created_at__gte=timezone.now() - duration,
         table_name__in=["planning_milestone", "planning_plannedwork"],
-    ).values("user_name", "row_data__project_id")
+    )
+
     users = {user.id: user for user in User.objects.all()} | {None: None}
+    projects = {
+        project.id: project
+        for project in Project.objects.filter(
+            id__in={action.row_data["project_id"] for action in queryset}
+        )
+    }
 
-    projects = defaultdict(set)
-    for row in queryset:
-        pid = int(row["row_data__project_id"])
-        if user := users[audit_user_id(row["user_name"])]:
-            projects[pid].add(user)
+    updates = defaultdict(
+        lambda: {
+            "milestones_changed": defaultdict(list),
+            "planned_work_deleted": defaultdict(list),
+            "planned_work_changed": defaultdict(list),
+        }
+    )
 
-    return [
-        {"project": project, "updated_by": projects[project.id]}
-        for project in Project.objects.open()
-        .select_related("owned_by")
-        .filter(Q(id__in=projects) & ~Q(type=Project.INTERNAL))
-    ]
+    for action in queryset:
+        by = audit_user_id(action.user_name)
+        project = projects.get(int(action.row_data["project_id"]))
+
+        # Skip updates by the Wizard (migrations etc.) or where the project is gone
+        if not by or not project:
+            continue
+
+        if action.table_name == "planning_milestone":
+            if by != project.owned_by_id:
+                updates[users[project.owned_by_id]]["milestones_changed"][
+                    project
+                ].append(action)
+            continue
+
+        elif action.table_name == "planning_plannedwork":
+            if action.action == "D" and by != project.owned_by_id:
+                updates[users[project.owned_by_id]]["planned_work_deleted"][
+                    project
+                ].append(action)
+
+            if (
+                (uid := int(action.row_data["user_id"]))
+                and (user := users.get(uid))
+                and by != uid
+            ):
+                updates[user]["planned_work_changed"][project].append(action)
+
+    return updates
 
 
 def test():  # pragma: no cover
     from pprint import pprint
 
-    pprint(updated())
+    pprint(dict(updated(duration=dt.timedelta(days=30))))

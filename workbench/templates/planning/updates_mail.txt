@@ -1,0 +1,15 @@
+{% load i18n %}{% autoescape off %}
+{% translate 'Planning updates' %}
+
+{% blocktranslate %}Hello {{ full_name }}{% endblocktranslate %}
+
+{% blocktranslate %}The following list of recent changes to planning has been compiled for you personally in the hope that it is interesting.{% endblocktranslate %}
+
+{% translate 'Your planned work entries have been changed by others:' %}
+
+{% translate 'Planned work has been deleted from projects owned by you:' %}
+
+{% translate 'Milestones have been changed on projects owned by you:' %}
+
+Here's a list of updates to planned work which you may be interested in:{% endblocktranslate %}
+{% endautoescape %}
