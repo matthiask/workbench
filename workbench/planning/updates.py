@@ -3,6 +3,7 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from authlib.email import render_to_mail
 
@@ -57,6 +58,12 @@ def updated(*, duration):
                     {
                         "action": action,
                         "by": by,
+                        "pretty": _("%(by)s changed a milestone: %(title)s (%(date)s)")
+                        % {
+                            "by": by,
+                            "title": action.new_row_data["title"],
+                            "date": action.new_row_data["date"],
+                        },
                     }
                 )
             continue
@@ -67,6 +74,14 @@ def updated(*, duration):
                     {
                         "action": action,
                         "by": by,
+                        "pretty": _(
+                            "%(by)s deleted work managed by you: %(title)s (%(hours)sh)"
+                        )
+                        % {
+                            "by": by,
+                            "title": action.row_data["title"],
+                            "hours": action.row_data["planned_hours"],
+                        },
                     }
                 )
 
@@ -79,6 +94,18 @@ def updated(*, duration):
                     {
                         "action": action,
                         "by": by,
+                        "pretty": (
+                            _("%(by)s added work for you: %(title)s (%(hours)sh)")
+                            if action.action == "I"
+                            else _(
+                                "%(by)s changed work for you: %(title)s (%(hours)sh)"
+                            )
+                        )
+                        % {
+                            "by": by,
+                            "title": action.new_row_data["title"],
+                            "hours": action.new_row_data["planned_hours"],
+                        },
                     }
                 )
 

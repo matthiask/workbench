@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-03 19:07+0200\n"
+"POT-Creation-Date: 2021-05-03 19:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2441,6 +2441,28 @@ msgstr "Nur Montage erlaubt, aber Feld enthält %s."
 msgid "%(planned_hours)s in %(weeks)s weeks (%(per_week)s per week)"
 msgstr "%(planned_hours)s in %(weeks)s Wochen (%(per_week)s pro Woche)"
 
+#: workbench/planning/updates.py
+#, python-format
+msgid "%(by)s changed a milestone: %(title)s (%(date)s)"
+msgstr "%(by)s hat einen Meilenstein geändert: %(title)s (%(date)s)"
+
+#: workbench/planning/updates.py
+#, python-format
+msgid "%(by)s deleted work managed by you: %(title)s (%(hours)sh)"
+msgstr ""
+"%(by)s hat Arbeit gelöscht, welche von dir koordiniert wird: %(title)s "
+"(%(hours)sh)"
+
+#: workbench/planning/updates.py
+#, python-format
+msgid "%(by)s added work for you: %(title)s (%(hours)sh)"
+msgstr "%(by)s hat Arbeit für dich hinzugefügt: %(title)s (%(hours)sh)"
+
+#: workbench/planning/updates.py
+#, python-format
+msgid "%(by)s changed work for you: %(title)s (%(hours)sh)"
+msgstr "%(by)s hat Arbeit für dich geändert: %(title)s (%(hours)sh)"
+
 #: workbench/projects/apps.py workbench/projects/models.py
 #: workbench/templates/base.html
 #: workbench/templates/projects/campaign_detail.html
@@ -3333,16 +3355,21 @@ msgstr "Hallo %(user)s"
 #: workbench/templates/planning/updates_mail.txt
 msgid ""
 "The following list of recent changes to planning has been compiled for you "
-"personally in the hope that it is interesting.\n"
+"personally in the hope that it is interesting. This mail contains milestone "
+"changes and work deletions for your owned projects and changes to your "
+"planned work carried out by others.\n"
 "\n"
 "Please always check your personal planning to ensure that it is manageable "
 "and up-to-date. Thanks ✨"
 msgstr ""
 "Die folgende Liste mit neuen Änderungen wurde für dich zusammengestellt, in "
-"der Hoffnung, dass sie nützlich und interessant ist.\n"
+"der Hoffnung, dass sie nützlich und interessant ist. Dieses Mail enthält "
+"Änderungen von Meilensteinen und gelöschte Arbeitseinheiten von Projekten, "
+"welche du koordinierst sowie durch andere eingetragene Änderungen deiner "
+"Arbeitseinheiten.\n"
 "\n"
-"Bitte überprüfe deine persönliche Planung und stelle sicher, dass die "
-"Arbeit überschaubar bleibt und die Planung aktuell. Merci ✨"
+"Bitte überprüfe deine persönliche Planung und stelle sicher, dass die Arbeit "
+"überschaubar bleibt und die Planung aktuell. Merci ✨"
 
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html
