@@ -1,5 +1,5 @@
 {% load i18n workbench %}{% autoescape off %}
-{% translate 'Planning updates' %}
+{% translate 'Planning updates' %} 🚀🕣
 
 {% blocktranslate %}Hello {{ user }}{% endblocktranslate %}
 

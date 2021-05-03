@@ -18,7 +18,7 @@ def tryint(str):
         return None
 
 
-def updated(*, duration=dt.timedelta(hours=24)):
+def updated(*, duration):
     queryset = LoggedAction.objects.filter(
         created_at__gte=timezone.now() - duration,
         table_name__in=["planning_milestone", "planning_plannedwork"],
@@ -85,8 +85,24 @@ def updated(*, duration=dt.timedelta(hours=24)):
     return updates
 
 
+def planning_update_mails():
+    updates = updated(duration=dt.timedelta(hours=25))
+
+    for user, user_updates in updates.items():
+        mail = render_to_mail(
+            "planning/updates_mail",
+            {
+                "user": user,
+                "updates": sorted(user_updates.items()),
+                "WORKBENCH": settings.WORKBENCH,
+            },
+            to=[user.email],
+        )
+        mail.send()
+
+
 def test():  # pragma: no cover
-    updates = updated(duration=dt.timedelta(days=30))
+    updates = updated(duration=dt.timedelta(days=10))
 
     # from pprint import pprint; pprint(updates)
 

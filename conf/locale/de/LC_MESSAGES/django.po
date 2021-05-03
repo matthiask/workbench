@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-01 08:48+0200\n"
+"POT-Creation-Date: 2021-05-03 19:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,10 +18,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: workbench/accounts/admin.py
-#, fuzzy
-#| msgid "features"
 msgid "feature"
-msgstr "Features"
+msgstr "Feature"
 
 #: workbench/accounts/apps.py workbench/templates/base.html
 msgid "accounts"
@@ -3323,6 +3321,29 @@ msgstr "Geschichte der geplanten Arbeit"
 msgid "History of milestones"
 msgstr "Geschichte der Meilensteine"
 
+#: workbench/templates/planning/updates_mail.txt
+msgid "Planning updates"
+msgstr "Planungsupdates"
+
+#: workbench/templates/planning/updates_mail.txt
+#, python-format
+msgid "Hello %(user)s"
+msgstr "Hallo %(user)s"
+
+#: workbench/templates/planning/updates_mail.txt
+msgid ""
+"The following list of recent changes to planning has been compiled for you "
+"personally in the hope that it is interesting.\n"
+"\n"
+"Please always check your personal planning to ensure that it is manageable "
+"and up-to-date. Thanks ✨"
+msgstr ""
+"Die folgende Liste mit neuen Änderungen wurde für dich zusammengestellt, in "
+"der Hoffnung, dass sie nützlich und interessant ist.\n"
+"\n"
+"Bitte überprüfe deine persönliche Planung und stelle sicher, dass die "
+"Arbeit überschaubar bleibt und die Planung aktuell. Merci ✨"
+
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "offered"
@@ -3871,9 +3892,6 @@ msgstr "%(model)s mit %(attribute)s=%(id)s"
 
 #~ msgid "I hereby confirm the deletion of already planned work."
 #~ msgstr "Ich bestätige hiermit die Löschung der schon geplanten Arbeiten."
-
-#~ msgid "planning request"
-#~ msgstr "Planungsanfrage"
 
 #~ msgid "declined at"
 #~ msgstr "abgelehnt um"
