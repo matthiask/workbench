@@ -1,5 +1,5 @@
 {% load i18n %}{% autoescape off %}
-{% translate 'Coffee break' %}
+{% translate 'Coffee break' %} ☕☕☕
 
 {% blocktranslate %}Hello {{ names }}
 
