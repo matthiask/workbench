@@ -62,3 +62,9 @@ class LoggedAction(models.Model):
     @cached_property
     def user_id(self):
         return audit_user_id(self.user_name)
+
+    @cached_property
+    def new_row_data(self):
+        if self.changed_fields:
+            return self.row_data | self.changed_fields
+        return self.row_data

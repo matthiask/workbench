@@ -1,15 +1,22 @@
-{% load i18n %}{% autoescape off %}
+{% load i18n workbench %}{% autoescape off %}
 {% translate 'Planning updates' %}
 
-{% blocktranslate %}Hello {{ full_name }}{% endblocktranslate %}
+{% blocktranslate %}Hello {{ user }}{% endblocktranslate %}
 
-{% blocktranslate %}The following list of recent changes to planning has been compiled for you personally in the hope that it is interesting.{% endblocktranslate %}
+{% blocktranslate %}The following list of recent changes to planning has been compiled for you personally in the hope that it is interesting.
 
-{% translate 'Your planned work entries have been changed by others:' %}
+Please always check your personal planning to ensure that it is manageable and up-to-date. Thanks ✨{% endblocktranslate %}
+{{ WORKBENCH.URL }}{{ user.urls.planning }}
 
-{% translate 'Planned work has been deleted from projects owned by you:' %}
+{% for project, project_updates in updates %}
+========================================================================
+{{ project }}
+{{ WORKBENCH.URL }}{{ project.urls.planning }}
+{% for update in project_updates.milestones %}
+- {{ update.by }} changed a milestone: {{ update.action.changed_fields }}{% endfor %}{% for update in project_updates.deleted_work %}
+- {{ update.by }} deleted work managed by you: {{ update.action.row_data.title }} ({{ update.action.row_data.planned_hours }}h){% endfor %}{% for update in project_updates.work %}
+- {{ update.by }} planned work for you: {{ update.action.changed_fields|default:update.action.row_data }}{% endfor %}
 
-{% translate 'Milestones have been changed on projects owned by you:' %}
+{% endfor %}
 
-Here's a list of updates to planned work which you may be interested in:{% endblocktranslate %}
 {% endautoescape %}
