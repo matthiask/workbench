@@ -13,9 +13,9 @@ Please always check your personal planning to ensure that it is manageable and u
 {{ project }}
 {{ WORKBENCH.URL }}{{ project.urls.planning }}
 {% for update in project_updates.milestones %}
-- {{ update.by }} changed a milestone: {{ update.action.changed_fields }}{% endfor %}{% for update in project_updates.deleted_work %}
+- {{ update.by }} changed a milestone: {{ update.action.new_row_data.title }} ({{ update.action.new_row_data.date }}){% endfor %}{% for update in project_updates.deleted_work %}
 - {{ update.by }} deleted work managed by you: {{ update.action.row_data.title }} ({{ update.action.row_data.planned_hours }}h){% endfor %}{% for update in project_updates.work %}
-- {{ update.by }} planned work for you: {{ update.action.changed_fields|default:update.action.row_data }}{% endfor %}
+- {{ update.by }} {% if update.action.action == "I" %}added{% else %}changed{% endif %} work for you: {{ update.action.new_row_data.title }} ({{ update.action.new_row_data.planned_hours }}h){% endfor %}
 
 {% endfor %}
 

@@ -102,7 +102,7 @@ def planning_update_mails():
 
 
 def test():  # pragma: no cover
-    updates = updated(duration=dt.timedelta(days=10))
+    updates = updated(duration=dt.timedelta(days=30))
 
     # from pprint import pprint; pprint(updates)
 
