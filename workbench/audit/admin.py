@@ -11,7 +11,10 @@ class LoggedActionAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
 
     def id(self, instance):
-        return instance.row_data.get("id")
+        try:
+            return instance.row_data["id"]
+        except Exception:
+            return None
 
     def data(self, instance):
         return json.dumps(
