@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name="planning_hours_per_day",
             field=models.DecimalField(
                 decimal_places=2,
-                default=6,
+                default=8,
                 help_text="How many hours are available for freely planning projects?",
                 max_digits=5,
                 verbose_name="planning hours per day",
