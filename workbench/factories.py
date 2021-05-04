@@ -18,7 +18,7 @@ from workbench.deals.models import AttributeGroup, ClosingType, Deal, ValueType
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
-from workbench.planning.models import PlannedWork
+from workbench.planning.models import Milestone, PlannedWork
 from workbench.projects.models import Campaign, Project, Service
 from workbench.reporting.models import CostCenter
 from workbench.services.models import ServiceType
@@ -307,6 +307,15 @@ class CostCenterFactory(DjangoModelFactory):
 
 
 # PLANNING ####################################################################
+class MilestoneFactory(DjangoModelFactory):
+    project = factory.SubFactory(ProjectFactory)
+    title = "Milestone"
+    date = factory.LazyAttribute(lambda a: dt.date.today())
+
+    class Meta:
+        model = Milestone
+
+
 class PlannedWorkFactory(DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     created_by = factory.LazyAttribute(lambda obj: obj.user)
