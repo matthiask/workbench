@@ -4,6 +4,7 @@ from django.contrib.admin import (  # noqa
     VERTICAL,
     ModelAdmin as ReadWriteModelAdmin,
     RelatedOnlyFieldListFilter,
+    SimpleListFilter,
     StackedInline,
     TabularInline,
     register,
