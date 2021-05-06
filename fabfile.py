@@ -1,10 +1,10 @@
 import fh_fablib as fl
-from fh_fablib import Collection, Connection, Path, config, task
 
 
-config.update(
+fl.require("1.0.20210506")
+fl.config.update(
     app="workbench",
-    base=Path(__file__).parent,
+    base=fl.Path(__file__).parent,
     host="deploy@workbench.feinheit.ch",
     domain="workbench.feinheit.ch",
     branch="main",
@@ -13,7 +13,7 @@ config.update(
 )
 
 
-@task
+@fl.task
 def check(ctx):
     fl.check(ctx)
     fl.run(
@@ -32,7 +32,7 @@ def check(ctx):
     )
 
 
-@task
+@fl.task
 def fmt(ctx):
     fl.fmt(ctx)
     fl.run(
@@ -59,59 +59,59 @@ def _do_deploy(conn, folder, rsync):
         fl.run(conn, 'find . -name "*.pyc" -delete')
         fl.run(conn, "venv/bin/pip install -U 'pip!=20.3.2' wheel setuptools")
         fl.run(conn, "venv/bin/pip install -r requirements.txt")
-        for wb in config.installations:
+        for wb in fl.config.installations:
             fl.run(conn, "DOTENV=.env/{} venv/bin/python manage.py migrate".format(wb))
     if rsync:
         conn.local(
-            "rsync -avz --delete static/ {}:{}static".format(config.host, folder)
+            "rsync -avz --delete static/ {}:{}static".format(fl.config.host, folder)
         )
     with conn.cd(folder):
         fl.run(
             conn,
             "DOTENV=.env/{} venv/bin/python manage.py collectstatic --noinput".format(
-                config.installations[0]
+                fl.config.installations[0]
             ),
         )
 
 
 def _restart_all(conn):
-    for wb in config.installations:
+    for wb in fl.config.installations:
         fl.run(conn, "systemctl --user restart workbench@{}".format(wb), echo=True)
 
 
-@task
+@fl.task
 def deploy(ctx):
     fl._check_branch(ctx)
     check(ctx)
     fl.run(ctx, "git push origin main")
     fl.run(ctx, "NODE_ENV=production yarn run webpack -p --bail")
-    with Connection(config.host) as conn:
+    with fl.Connection(fl.config.host) as conn:
         _do_deploy(conn, "www/workbench/", rsync=True)
         _restart_all(conn)
     fl.fetch(ctx)
 
 
-@task
+@fl.task
 def deploy_code(ctx):
     check(ctx)
     fl.run(ctx, "git push origin main")
-    with Connection(config.host) as conn:
+    with fl.Connection(fl.config.host) as conn:
         _do_deploy(conn, "www/workbench/", rsync=False)
         _restart_all(conn)
     fl.fetch(ctx)
 
 
-@task
+@fl.task
 def pull_db(ctx, installation="fh"):
     fl.run(ctx, "dropdb --if-exists workbench", warn=True)
     fl.run(ctx, "createdb workbench")
-    with Connection(config.host) as conn:
+    with fl.Connection(fl.config.host) as conn:
         e = fl._srv_env(conn, f"www/workbench/.env/{installation}")
         srv_dsn = e("DATABASE_URL")
     fl.run(
         ctx,
-        f'ssh -C {config.host} "pg_dump -Ox {srv_dsn}" | psql workbench',
+        f'ssh -C {fl.config.host} "pg_dump -Ox {srv_dsn}" | psql workbench',
     )
 
 
-ns = Collection(*fl.GENERAL, check, deploy, deploy_code, fmt, mm, pull_db)
+ns = fl.Collection(*fl.GENERAL, check, deploy, deploy_code, fmt, mm, pull_db)
