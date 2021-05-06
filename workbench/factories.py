@@ -318,7 +318,6 @@ class MilestoneFactory(DjangoModelFactory):
 
 class PlannedWorkFactory(DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
-    created_by = factory.LazyAttribute(lambda obj: obj.user)
     user = factory.SubFactory(UserFactory)
     created_by = factory.LazyAttribute(lambda obj: obj.user)
     planned_hours = Decimal(20)
