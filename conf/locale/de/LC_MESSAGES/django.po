@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-03 19:44+0200\n"
+"POT-Creation-Date: 2021-05-06 13:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -187,10 +187,10 @@ msgstr "Person"
 msgid "features"
 msgstr "Features"
 
-#: workbench/accounts/models.py workbench/awt/models.py
-#: workbench/deals/models.py workbench/logbook/models.py
-#: workbench/management/commands/profitability.py workbench/planning/models.py
-#: workbench/templates/accounts/user_base.html
+#: workbench/accounts/models.py workbench/audit/admin.py
+#: workbench/awt/models.py workbench/deals/models.py
+#: workbench/logbook/models.py workbench/management/commands/profitability.py
+#: workbench/planning/models.py workbench/templates/accounts/user_base.html
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/birthdays.html
@@ -353,6 +353,10 @@ msgid ""
 msgstr ""
 "Beeindruckende Planungsfähigkeiten oder falsches Datum? Abwesenheit beginnt "
 "in mehr als einem Jahr."
+
+#: workbench/awt/forms.py workbench/reporting/views.py
+msgid "Everyone"
+msgstr "Alle"
 
 #: workbench/awt/models.py workbench/deals/models.py
 #: workbench/reporting/models.py workbench/services/models.py
@@ -662,10 +666,6 @@ msgid ""
 msgstr ""
 "Keine Jahresarbeitszeit definiert für Nutzer*in %(user)s mit "
 "Arbeitszeitmodell %(working_time_model)s."
-
-#: workbench/awt/views.py workbench/reporting/views.py
-msgid "Everyone"
-msgstr "Alle"
 
 #: workbench/circles/apps.py workbench/circles/models.py
 msgid "circles"

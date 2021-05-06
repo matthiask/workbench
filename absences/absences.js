@@ -142,8 +142,8 @@ const Popup = ({ absence }) => {
       <p>
         {readableDate(new Date(absence.startsOn))} –{" "}
         {readableDate(new Date(absence.endsOn))} <br />
-        Beschreibung: {absence.description} <br />
-        Tage: {absence.days}d <br />
+        {gettext("Description")}: {absence.description} <br />
+        {gettext("Days")}: {absence.days}d <br />
       </p>
     </div>
   )
