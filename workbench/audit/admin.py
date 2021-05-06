@@ -15,6 +15,8 @@ class UserFilter(admin.SimpleListFilter):
         users = {user.id: user for user in User.objects.all()}
 
         def choice(user_name):
+            if not user_name:
+                return ("", _("<no value>"))
             if user := users.get(audit_user_id(user_name)):
                 return (f"user-{user.id}-{user.get_short_name()}", str(user))
             return (user_name, user_name)
@@ -32,7 +34,8 @@ class UserFilter(admin.SimpleListFilter):
         )
 
     def queryset(self, request, queryset):
-        if value := self.value():
+        value = self.value()
+        if value is not None:
             if user_id := audit_user_id(value):
                 queryset = queryset.filter(user_name__startswith=f"user-{user_id}-")
             else:
