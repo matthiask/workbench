@@ -34,6 +34,7 @@ class PlanningRequestSearchForm(Form):
         widget=forms.Select(attrs={"class": "custom-select"}),
         label="",
     )
+    missing_hours = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -45,13 +46,15 @@ class PlanningRequestSearchForm(Form):
         data = self.cleaned_data
         if data.get("project"):
             queryset = queryset.filter(project=data.get("project"))
+        if data.get("missing_hours"):
+            queryset = queryset.with_missing_hours()
         queryset = self.apply_owned_by(queryset, attribute="created_by")
         return queryset.select_related(
             "created_by",
             "project__owned_by",
             "project__customer",
             "project__contact__organization",
-        )
+        ).prefetch_related("receivers")
 
 
 @add_prefix("modal")

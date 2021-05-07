@@ -25,11 +25,20 @@
       {{ object.created_at.date|local_date_format }} {% translate 'by' %}
       {{ object.created_by.get_short_name }}
     </span>
+    <span>
+      {% for receiver in object.receivers.all %}{{ receiver.get_short_name }}{% if not forloop.last %},{% endif %} {% endfor %}
+    </span>
+    <span>
+      {{ object.earliest_start_on|local_date_format }} - {{ object.completion_requested_on|local_date_format }}
+    </span>
     <span>{{ object.planned_hours|hours }} / {{ object.requested_hours|hours }}</span>
     <span>
       {{ object.earliest_start_on|local_date_format }} –
       {{ object.completion_requested_on|local_date_format }}
     </span>
+  </div>
+  <div>
+    {{ object.description|linebreaksbr }}
   </div>
 </a>
 {% endfor %}
