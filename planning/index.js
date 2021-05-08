@@ -12,7 +12,6 @@ const clamp = (min, value, max) => Math.max(Math.min(value, max), min)
 const opacityClamp = (value) => clamp(0.3, value, 1)
 const gettext = window.gettext || ((t) => t)
 const pgettext = window.pgettext || ((ctx, t) => t)
-const interpolate = window.interpolate || ((t) => t)
 const fixed = (s, decimalPlaces) => parseFloat(s).toFixed(decimalPlaces)
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -503,7 +502,7 @@ function Offer({ offer, work_list }) {
   )
 }
 
-function Work({ work, hours_per_week, per_week, isEven }) {
+function Work({ work, hours_per_week, isEven }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
   return (
@@ -565,7 +564,7 @@ function Work({ work, hours_per_week, per_week, isEven }) {
           tag="a"
           href={work.url}
           data-toggle="ajaxmodal"
-          title={interpolate(gettext("%sh per week"), [fixed(per_week, 1)])}
+          title={work.tooltip}
         >
           <span className="no-pr">{work.text}</span>
         </Cell>
@@ -583,7 +582,7 @@ function Work({ work, hours_per_week, per_week, isEven }) {
             tag="a"
             href={work.url}
             data-toggle="ajaxmodal"
-            title={interpolate(gettext("%sh per week"), [fixed(per_week, 1)])}
+            title={work.tooltip}
           >
             <span className="no-pr">{work.text}</span>
           </Cell>

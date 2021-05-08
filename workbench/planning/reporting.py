@@ -4,6 +4,7 @@ from itertools import islice, takewhile
 
 from django.db import connections
 from django.db.models import Q, Sum
+from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
 from workbench.awt.models import Absence
@@ -76,11 +77,19 @@ class Planning:
                         ),
                         "service_type_id": pw.service_type_id,
                         "is_provisional": pw.is_provisional,
+                        "tooltip": ", ".join(
+                            filter(
+                                None,
+                                (
+                                    str(pw.service_type) if pw.service_type else None,
+                                    _("%.1fh per week") % per_week,
+                                ),
+                            )
+                        ),
                     },
                     "hours_per_week": [
                         per_week if week in pw.weeks else Z1 for week in self.weeks
                     ],
-                    "per_week": per_week,
                 }
             )
 
@@ -377,7 +386,7 @@ def user_planning(user, date_range):
     start, end = date_range
     weeks = list(takewhile(lambda x: x <= end, recurring(monday(start), "weekly")))
     planning = Planning(weeks=weeks, users=[user])
-    planning.add_planned_work(user.planned_work.all())
+    planning.add_planned_work(user.planned_work.select_related("service_type"))
     planning.add_worked_hours(user.loggedhours.all())
     planning.add_absences(user.absences.all())
     planning.add_milestones(Milestone.objects.all())
@@ -388,7 +397,9 @@ def team_planning(team, date_range):
     start, end = date_range
     weeks = list(takewhile(lambda x: x <= end, recurring(monday(start), "weekly")))
     planning = Planning(weeks=weeks, users=list(team.members.active()))
-    planning.add_planned_work(PlannedWork.objects.filter(user__teams=team))
+    planning.add_planned_work(
+        PlannedWork.objects.filter(user__teams=team).select_related("service_type")
+    )
     planning.add_worked_hours(LoggedHours.objects.filter(rendered_by__teams=team))
     planning.add_absences(Absence.objects.filter(user__teams=team))
     planning.add_milestones(Milestone.objects.all())
@@ -428,7 +439,7 @@ SELECT MIN(week), MAX(week) FROM sq
         weeks = list(islice(recurring(monday() - dt.timedelta(days=14), "weekly"), 80))
 
     planning = Planning(weeks=weeks)
-    planning.add_planned_work(project.planned_work.all())
+    planning.add_planned_work(project.planned_work.select_related("service_type"))
     planning.add_worked_hours(LoggedHours.objects.all())
     planning.add_absences(Absence.objects.all())
     planning.add_milestones(Milestone.objects.all())

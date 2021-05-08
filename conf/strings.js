@@ -1,4 +1,3 @@
-gettext("%sh per week")
 gettext("(closed)")
 gettext("(declined)")
 gettext("(not accepted yet)")

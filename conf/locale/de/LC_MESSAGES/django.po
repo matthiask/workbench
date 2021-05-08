@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-06 13:53+0200\n"
+"POT-Creation-Date: 2021-05-08 11:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -296,6 +296,10 @@ msgstr "Keine Nutzer*innen mit Emailadresse %s gefunden."
 #: workbench/accounts/views.py
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
+
+#: workbench/audit/admin.py workbench/tools/history.py
+msgid "<no value>"
+msgstr "<kein Wert>"
 
 #: workbench/audit/apps.py
 msgid "audit"
@@ -2441,6 +2445,11 @@ msgstr "Nur Montage erlaubt, aber Feld enthält %s."
 msgid "%(planned_hours)s in %(weeks)s weeks (%(per_week)s per week)"
 msgstr "%(planned_hours)s in %(weeks)s Wochen (%(per_week)s pro Woche)"
 
+#: workbench/planning/reporting.py
+#, python-format
+msgid "%.1fh per week"
+msgstr "%.1fh pro Woche"
+
 #: workbench/planning/updates.py
 #, python-format
 msgid "%(by)s changed a milestone: %(title)s (%(date)s)"
@@ -3764,10 +3773,6 @@ msgstr "Der Kontakt %(person)s gehört nicht zu %(organization)s."
 #: workbench/tools/forms.py
 msgid "No contact selected."
 msgstr "Kein Kontakt ausgewählt."
-
-#: workbench/tools/history.py
-msgid "<no value>"
-msgstr "<kein Wert>"
 
 #: workbench/tools/history.py
 #, python-format
