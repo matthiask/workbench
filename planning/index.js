@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const style = data.service_types
     .map(
       ({ id, color }) =>
-        `.planning--range.st-${id} { --st-color: ${color}; background-color: var(--st-color); }`
+        `.planning--range.st-${id} { --st-color: ${color}; background-color: var(--st-color) !important; }`
     )
     .join("\n")
   const styleEl = document.createElement("style")
