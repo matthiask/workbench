@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-30 18:04+0200\n"
+"POT-Creation-Date: 2021-05-06 13:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,12 +82,12 @@ msgid "Add planned work"
 msgstr "Geplante Arbeit hinzufügen"
 
 #: conf/strings.js
-msgid "Capacity per week"
-msgstr "Kapazität pro Woche"
+msgid "Days"
+msgstr "Tage"
 
 #: conf/strings.js
-msgid "Delta"
-msgstr "Delta"
+msgid "Description"
+msgstr "Beschreibung"
 
 #: conf/strings.js
 msgid "Go to the project"
@@ -100,6 +100,10 @@ msgstr "ist provisorisch"
 #: conf/strings.js
 msgid "Logged hours"
 msgstr "Erfasste Stunden"
+
+#: conf/strings.js
+msgid "Milestones"
+msgstr "Meilensteine"
 
 #: conf/strings.js
 msgid "No project selected"
@@ -125,17 +129,17 @@ msgstr "Öffne das Stundenformular"
 msgid "Overwrite seconds"
 msgstr "Sekunden überschreiben"
 
-#: conf/strings.js
+#: conf/strings.js planning/index.js
 msgid "Planned hours per week"
 msgstr "Geplante Stunden pro Woche"
+
+#: conf/strings.js
+msgid "Remaining capacity per week"
+msgstr "Verbleibende Kapazität pro Woche"
 
 #: conf/strings.js timer/activitySettings.js
 msgid "Remove"
 msgstr "Entfernen"
-
-#: conf/strings.js
-msgid "Requested hours per week"
-msgstr "Angefragte Stunden pro Woche"
 
 #: conf/strings.js timer/activitySettings.js
 msgid "Reset"
@@ -190,6 +194,12 @@ msgstr "Welches Ergebnis strebst Du an?"
 msgctxt "provisional"
 msgid "prov."
 msgstr "prov."
+
+#~ msgid "Delta"
+#~ msgstr "Delta"
+
+#~ msgid "Requested hours per week"
+#~ msgstr "Angefragte Stunden pro Woche"
 
 #, javascript-format
 #~ msgid "%sh/day"

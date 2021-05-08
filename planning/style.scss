@@ -28,7 +28,8 @@
   grid-auto-rows: var(--default-height);
   grid-template-columns:
     var(--title-column-width) var(--action-width) var(--range-width)
-    var(--hours-total-width) var(--user-width);
+    var(--hours-total-width) var(--user-width) repeat(var(--weeks), var(--week-width));
+  grid-template-rows: 14px 16px 16px repeat(var(--rows), var(--default-height));
   font-size: 14px;
 }
 
@@ -52,6 +53,9 @@
   &.is-worked {
     background-color: var(--stripe1);
   }
+  &.is-milestone {
+    background-color: var(--stripe1);
+  }
   &.is-offer {
     background-color: var(--stripe2);
 
@@ -73,10 +77,6 @@
 .planning--smaller {
   font-size: 70%;
   color: #555;
-}
-
-.is-request {
-  font-style: italic;
 }
 
 .planning--add-pw {
@@ -130,6 +130,10 @@
     background-color: blue;
   }
 
+  &.is-milestone {
+    background-color: var(--pink);
+  }
+
   &.is-total {
     background-color: var(--purple);
   }
@@ -146,42 +150,15 @@
     background-color: var(--teal);
   }
 
-  &.is-request {
-    background-image: linear-gradient(var(--planning) 0, var(--planning) 100%);
-    background-position: center center;
-    background-size: 100% 10%;
-    background-repeat: repeat-x;
-
-    &::before,
-    &::after {
-      background: var(--planning);
-      position: absolute;
-      content: "";
-      top: 6px;
-      bottom: 6px;
-      width: 2px;
-    }
-
-    &::before {
-      left: 0;
-    }
-
-    &::after {
-      right: 0;
-    }
-  }
-
   &.is-absence {
     background-color: var(--blue);
   }
 
-  &.is-pw:hover,
-  &.is-request:hover {
+  &.is-pw:hover {
     opacity: 0.7;
   }
 
-  &.is-pw,
-  &.is-request {
+  &.is-pw {
     span {
       position: absolute;
       color: #666;
@@ -196,8 +173,8 @@
   &.is-pw.is-provisional {
     background-image: repeating-linear-gradient(
       125deg,
-      var(--teal) 0,
-      var(--teal) 5px,
+      var(--st-color, var(--teal)) 0,
+      var(--st-color, var(--teal)) 5px,
       #ccc 5px,
       #ccc 8px
     );

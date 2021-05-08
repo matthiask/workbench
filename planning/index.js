@@ -19,6 +19,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const data = JSON.parse(document.querySelector("#planning-data").textContent)
   const el = document.querySelector("#planning-root")
   ReactDOM.render(<Planning data={data} />, el)
+
+  const style = data.service_types
+    .map(
+      ({ id, color }) =>
+        `.planning--range.st-${id} { --st-color: ${color}; background-color: var(--st-color); }`
+    )
+    .join("\n")
+  const styleEl = document.createElement("style")
+  styleEl.textContent = style
+  document.head.appendChild(styleEl)
 })
 
 const RowContext = createContext()
@@ -52,18 +62,16 @@ function Planning({ data }) {
   }
 
   useLayoutEffect(() => {
-    gridRef.current.style.gridTemplateRows = `14px 16px 16px repeat(${
-      rowCtx.current() - 2
-    }, var(--default-height))`
+    gridRef.current.style.setProperty("--rows", rowCtx.current() - 2)
+    gridRef.current.style.setProperty(
+      "--first-project-row",
+      rowCtx.firstProjectRow
+    )
 
     Array.from(document.querySelectorAll(".planning--title a")).forEach(
       (el) => (el.title = el.textContent)
     )
   }, [])
-
-  const plannedAndRequested = data.requested_by_week.map(
-    (hours, idx) => parseFloat(hours) + parseFloat(data.by_week[idx])
-  )
 
   return (
     <RowContext.Provider value={rowCtx}>
@@ -71,9 +79,7 @@ function Planning({ data }) {
         ref={gridRef}
         className="planning"
         style={{
-          gridTemplateColumns: `var(--title-column-width) var(--action-width) var(--range-width) var(--hours-total-width) var(--user-width) repeat(${
-            1 + data.weeks.length
-          }, var(--week-width))`,
+          "--weeks": data.weeks.length + 1,
         }}
       >
         {data.weeks.map((_, idx) => {
@@ -125,27 +131,11 @@ function Planning({ data }) {
           </Cell>
         ))}
 
-        {data.capacity && <Capacity {...data.capacity} />}
         <TotalByWeek
           by_week={data.by_week}
           title={gettext("Planned hours per week")}
         />
-        {data.capacity && (
-          <>
-            <DeltaByWeek
-              planned={data.by_week}
-              capacity={data.capacity.total}
-            />
-            <TotalByWeek
-              by_week={data.requested_by_week}
-              title={gettext("Requested hours per week")}
-            />
-            <DeltaByWeek
-              planned={plannedAndRequested}
-              capacity={data.capacity.total}
-            />
-          </>
-        )}
+        {data.capacity && <Capacity {...data.capacity} />}
         {data.projects_offers.map((project) => (
           <Project key={project.project.id} {...project} />
         ))}
@@ -186,43 +176,6 @@ function TotalByWeek({ by_week, title }) {
   )
 }
 
-function DeltaByWeek({ planned, capacity }) {
-  const ctx = useContext(RowContext)
-  const row = ctx.next()
-  return (
-    <>
-      <Cell
-        row={row}
-        column={1}
-        colspan={`span ${FIRST_DATA_COLUMN - 1}`}
-        className="planning--scale text-right pr-2"
-      >
-        <strong>{gettext("Delta")}</strong>
-      </Cell>
-      {planned.map((hours, idx) => {
-        const delta = hours - capacity[idx]
-
-        return (
-          <Cell
-            key={idx}
-            row={row}
-            column={FIRST_DATA_COLUMN + idx}
-            className="planning--range planning--small is-delta"
-            style={{
-              backgroundColor:
-                delta > 0
-                  ? `hsl(0, ${clamp(0, delta * 5, 70)}%, 70%)`
-                  : `hsl(120, ${clamp(0, -delta * 3, 50)}%, 70%)`,
-            }}
-          >
-            {fixed(delta, 0)}
-          </Cell>
-        )
-      })}
-    </>
-  )
-}
-
 function Capacity({ total, by_user }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
@@ -235,16 +188,19 @@ function Capacity({ total, by_user }) {
         colspan={`span ${FIRST_DATA_COLUMN - 1}`}
         className="planning--scale text-right pr-2"
       >
-        <strong>{gettext("Capacity per week")}</strong>
+        <strong>{gettext("Remaining capacity per week")}</strong>
       </Cell>
       {total.map((hours, idx) => (
         <Cell
           key={idx}
           row={row}
           column={FIRST_DATA_COLUMN + idx}
-          className="planning--range planning--small is-capacity"
+          className="planning--range planning--small is-delta"
           style={{
-            opacity: opacityClamp(0.3 + parseFloat(hours) / 20),
+            backgroundColor:
+              hours > 0
+                ? `hsl(120, ${clamp(0, hours * 3, 50)}%, 70%)`
+                : `hsl(0, ${clamp(0, -hours * 5, 70)}%, 70%)`,
           }}
         >
           {fixed(hours, 0)}
@@ -280,7 +236,10 @@ function UserCapacity({ user, capacity }) {
           column={FIRST_DATA_COLUMN + idx}
           className="planning--range planning--small is-user-capacity"
           style={{
-            opacity: opacityClamp(0.3 + parseFloat(hours) / 20),
+            backgroundColor:
+              hours > 0
+                ? `hsl(120, ${clamp(0, hours * 3, 50)}%, 70%)`
+                : `hsl(0, ${clamp(0, -hours * 5, 70)}%, 70%)`,
           }}
         >
           {fixed(hours, 0)}
@@ -294,6 +253,9 @@ function Project({ by_week, offers, project }) {
   const ctx = useContext(RowContext)
   ctx.next() // Skip one row
   const row = ctx.next()
+  if (!ctx.firstProjectRow) {
+    ctx.firstProjectRow = row
+  }
   return (
     <>
       <div
@@ -374,6 +336,7 @@ function Project({ by_week, offers, project }) {
         )
       })}
       {project.worked_hours ? <WorkedHours project={project} /> : null}
+      {project.milestones ? <Milestones project={project} /> : null}
       {offers.map((offer, idx) => (
         <Offer key={idx} {...offer} />
       ))}
@@ -413,6 +376,75 @@ function WorkedHours({ project }) {
           </Cell>
         )
       })}
+    </>
+  )
+}
+
+function weekdayToGradient(weekday) {
+  const width = 8
+  const start = Math.floor(((100 - width) * (weekday - 1)) / 7)
+  const end = start + width
+  return `linear-gradient(to right, transparent ${start}%, rgb(255, 200, 200) ${start}%, rgb(255, 200, 200) ${end}%, transparent ${end}%)`
+}
+
+function Milestones({ project }) {
+  const ctx = useContext(RowContext)
+  const row = ctx.next()
+  let rows = 1
+
+  return (
+    <>
+      {project.milestones.map((milestones, idx) => {
+        if (!milestones.length) return null
+
+        console.log(milestones)
+
+        while (milestones.length > rows) {
+          ctx.next()
+          ++rows
+        }
+
+        return (
+          <>
+            {milestones.map((milestone) => (
+              <Cell
+                key={milestone.id}
+                row="var(--first-project-row)"
+                rowspan="-1"
+                column={FIRST_DATA_COLUMN + idx}
+                style={{
+                  backgroundImage: weekdayToGradient(milestone.weekday),
+                }}
+              />
+            ))}
+            {milestones.map((milestone, milestoneIdx) => (
+              <Cell
+                key={milestone.id}
+                row={row + milestoneIdx}
+                column={FIRST_DATA_COLUMN + idx}
+                className="planning--range planning--small is-milestone"
+                style={{
+                  backgroundImage: weekdayToGradient(milestone.weekday),
+                }}
+                title={`${milestone.title} (${milestone.dow})`}
+                tag="a"
+                href={milestones[0].url}
+                data-toggle="ajaxmodal"
+              >
+                {milestone.date}
+              </Cell>
+            ))}
+          </>
+        )
+      })}
+      <Cell
+        row={row}
+        rowspan={`span ${rows}`}
+        column={1}
+        className="planning--title is-milestone"
+      >
+        {gettext("Milestones")}
+      </Cell>
     </>
   )
 }
@@ -474,7 +506,6 @@ function Offer({ offer, work_list }) {
 function Work({ work, hours_per_week, per_week, isEven }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
-  const cls = work.is_request ? "is-request" : "is-pw"
   return (
     <>
       {isEven ? (
@@ -486,7 +517,7 @@ function Work({ work, hours_per_week, per_week, isEven }) {
       <Cell
         row={row}
         column={1}
-        className={`planning--title ${cls} ${
+        className={`planning--title is-pw ${
           work.is_provisional ? "is-provisional" : ""
         } planning--small pl-5`}
       >
@@ -498,7 +529,7 @@ function Work({ work, hours_per_week, per_week, isEven }) {
         <Cell
           row={row}
           column={2}
-          className={`planning--small ${cls}`}
+          className={`planning--small is-pw`}
           title={gettext("is provisional")}
         >
           {pgettext("provisional", "prov.")}
@@ -507,29 +538,18 @@ function Work({ work, hours_per_week, per_week, isEven }) {
       <Cell
         row={row}
         column={3}
-        className={`planning--small text-center ${cls}`}
+        className={`planning--small text-center is-pr`}
         style={{ whiteSpace: "nowrap" }}
       >
         {work.range}
       </Cell>
-      <Cell
-        row={row}
-        column={4}
-        className={`planning--small text-right ${cls}`}
-      >
-        {work.is_request
-          ? `${fixed(work.missing_hours, 0)}h / ${fixed(
-              work.requested_hours,
-              0
-            )}h`
-          : `${fixed(work.planned_hours, 0)}h`}
+      <Cell row={row} column={4} className={`planning--small text-right is-pr`}>
+        {`${fixed(work.planned_hours, 0)}h`}
       </Cell>
       <Cell
         row={row}
         column={5}
-        className={`planning--small ${
-          work.is_request ? "font-italic" : ""
-        } text-center no-pr`}
+        className={`planning--small text-center no-pr`}
       >
         {work.user}
       </Cell>
@@ -559,7 +579,7 @@ function Work({ work, hours_per_week, per_week, isEven }) {
             colspan={`span ${range.length}`}
             className={`planning--range planning--small is-pw ${
               work.is_provisional ? "is-provisional" : ""
-            }`}
+            } st-${work.service_type_id}`}
             tag="a"
             href={work.url}
             data-toggle="ajaxmodal"

@@ -8,7 +8,7 @@
 
 {% block body %}
   <table class="table table-striped">
-    {% for name, value in object|field_value_pairs:'project,offer,request,created_at,user,title,service_type,notes' %}
+    {% for name, value in object|field_value_pairs:'project,offer,created_at,user,title,notes,milestone,service_type' %}
     <tr>
       <th class="text-right">{{ name }}</th>
       <td>{% link_or_none value %}</td>
@@ -17,6 +17,10 @@
     <tr>
       <th class="text-right">{{ object|label:'planned_hours' }}</th>
       <td>{{ object.pretty_planned_hours }}</td>
+    </tr>
+    <tr>
+      <th class="text-right">{{ object|label:'is_provisional' }}</th>
+      <td>{{ object.is_provisional|yesno:_('yes,no') }}</td>
     </tr>
     <tr>
       <th class="text-right">{% translate 'Periods' %}</th>

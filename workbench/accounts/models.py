@@ -140,7 +140,7 @@ class User(Model, AbstractBaseUser):
     )
     planning_hours_per_day = models.DecimalField(
         _("planning hours per day"),
-        default=6,
+        default=8,
         max_digits=5,
         decimal_places=2,
         help_text=_("How many hours are available for freely planning projects?"),

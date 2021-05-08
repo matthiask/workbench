@@ -21,6 +21,11 @@ class LoggedActionQuerySet(models.QuerySet):
         return queryset
 
 
+def audit_user_id(user_name):
+    match = re.search(r"^user-([0-9]+)-", user_name)
+    return int(match.groups()[0]) if match else None
+
+
 class LoggedAction(models.Model):
     ACTION_TYPES = (
         ("I", "INSERT"),
@@ -56,5 +61,10 @@ class LoggedAction(models.Model):
 
     @cached_property
     def user_id(self):
-        match = re.search(r"^user-([0-9]+)-", self.user_name)
-        return int(match.groups()[0]) if match else None
+        return audit_user_id(self.user_name)
+
+    @cached_property
+    def new_row_data(self):
+        if self.changed_fields:
+            return self.row_data | self.changed_fields
+        return self.row_data

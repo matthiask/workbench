@@ -29,7 +29,7 @@ from workbench.invoices.models import (
 )
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
-from workbench.planning.models import PlannedWork, PlanningRequest
+from workbench.planning.models import Milestone, PlannedWork
 from workbench.projects.models import Campaign, Project, Service as ProjectService
 from workbench.reporting.models import CostCenter
 from workbench.tools.formats import local_date_format
@@ -389,7 +389,7 @@ def _projects_project_cfg(user):
     if user.features[FEATURES.LABOR_COSTS]:
         fields |= {"cost_center"}
     if user.features[FEATURES.PLANNING]:
-        related.extend([(PlanningRequest, "project_id"), (PlannedWork, "project_id")])
+        related.append((PlannedWork, "project_id"))
     return {"fields": fields, "related": related}
 
 
@@ -477,8 +477,8 @@ HISTORY = {
     LoggedCost: _logbook_loggedcost_cfg,
     LoggedHours: _logbook_loggedhours_cfg,
     Offer: _offers_offer_cfg,
-    PlanningRequest: {"fields": EVERYTHING, "related": [(PlannedWork, "request_id")]},
     PlannedWork: {"fields": EVERYTHING},
+    Milestone: {"fields": EVERYTHING},
     Campaign: _projects_campaign_cfg,
     Project: _projects_project_cfg,
     ProjectService: _projects_service_cfg,

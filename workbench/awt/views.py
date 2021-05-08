@@ -2,18 +2,17 @@ import datetime as dt
 import time
 from collections import defaultdict
 
-from django import forms
 from django.contrib import messages
 from django.db.models.functions import Coalesce
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
 
 from workbench.accounts.features import FEATURES
-from workbench.accounts.models import Team, User
+from workbench.accounts.models import User
+from workbench.awt.forms import UserFilterForm
 from workbench.awt.models import Absence, Year
 from workbench.awt.pdf import annual_working_time_pdf
 from workbench.awt.reporting import active_users, annual_working_time
-from workbench.tools.forms import Form
 from workbench.tools.validation import filter_form, monday
 
 
@@ -66,19 +65,6 @@ def annual_working_time_view(request):
             "this_year": this_year,
         },
     )
-
-
-class UserFilterForm(Form):
-    team = forms.ModelChoiceField(
-        Team.objects.all(), empty_label=_("Everyone"), label="", required=False
-    )
-
-    def users(self):
-        data = self.cleaned_data
-        queryset = User.objects.active()
-        if data.get("team"):
-            queryset = queryset.filter(teams=data.get("team"))
-        return queryset
 
 
 @filter_form(UserFilterForm)

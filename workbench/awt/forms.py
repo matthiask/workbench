@@ -5,7 +5,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.features import FEATURES
-from workbench.accounts.models import User
+from workbench.accounts.models import Team, User
 from workbench.awt.models import Absence
 from workbench.tools.forms import Form, ModelForm, Textarea, WarningsForm, add_prefix
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -115,3 +115,16 @@ class AbsenceForm(ModelForm, WarningsForm):
                 )
 
         return data
+
+
+class UserFilterForm(Form):
+    team = forms.ModelChoiceField(
+        Team.objects.all(), empty_label=_("Everyone"), label="", required=False
+    )
+
+    def users(self):
+        data = self.cleaned_data
+        queryset = User.objects.active()
+        if data.get("team"):
+            queryset = queryset.filter(teams=data.get("team"))
+        return queryset

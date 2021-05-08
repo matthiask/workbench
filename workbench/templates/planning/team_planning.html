@@ -28,13 +28,13 @@
 
 <div class="row mt-5">
   <div class="col-12">
-    <a href="{% url 'planning_planningrequest_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
-      {% include 'svg/plus.svg' %}
-      {% translate 'planning request'|capfirst %}
-    </a>
     <a href="{% url 'planning_plannedwork_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
       {% include 'svg/plus.svg' %}
       {% translate 'planned work'|capfirst %}
+    </a>
+    <a href="{% url 'planning_milestone_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
+      {% include 'svg/plus.svg' %}
+      {% translate 'milestone'|capfirst %}
     </a>
   </div>
 </div>
