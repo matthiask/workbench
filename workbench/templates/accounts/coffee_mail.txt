@@ -3,7 +3,9 @@
 
 {% blocktranslate %}Hello {{ names }}
 
-Here's your invitation for a coffee break. I hope you'll enjoy it :-)
+Here's your invitation for a coffee break.
+
+{{ wish }}
 
 Yours truly,
 Coffee bot

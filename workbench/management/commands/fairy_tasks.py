@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.management import BaseCommand
 from django.utils.translation import activate
 
@@ -12,7 +13,7 @@ class Command(BaseCommand):
     help = "Fairy tasks"
 
     def handle(self, **options):
-        activate("de")
+        activate(settings.WORKBENCH.PDF_LANGUAGE)
         set_user_name("Fairy tasks")
         create_accruals_for_last_month()
         create_recurring_invoices_and_notify()

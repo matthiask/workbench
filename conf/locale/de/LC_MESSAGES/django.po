@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-08 11:50+0200\n"
+"POT-Creation-Date: 2021-05-11 08:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -266,6 +266,39 @@ msgstr "Samstag"
 #: workbench/accounts/reporting.py
 msgid "Sunday"
 msgstr "Sonntag"
+
+#: workbench/accounts/tasks.py
+msgid "I hope you’ll enjoy it :-)"
+msgstr "Ich hoffe, ihr geniesst es :-)"
+
+#: workbench/accounts/tasks.py
+msgid ""
+"But even a bad cup of coffee is better than no coffee at all. – David Lynch"
+msgstr ""
+
+#: workbench/accounts/tasks.py
+msgid "You can’t buy happiness but you can buy coffee and that’s pretty close."
+msgstr ""
+
+#: workbench/accounts/tasks.py
+msgid "What goes best with a cup of coffee? Another cup. – Henry Rollins"
+msgstr ""
+
+#: workbench/accounts/tasks.py
+msgid "Life is too short for bad coffee."
+msgstr ""
+
+#: workbench/accounts/tasks.py
+msgid "May your coffee be strong and your monday be short."
+msgstr ""
+
+#: workbench/accounts/tasks.py
+msgid "Time to drink some coffee."
+msgstr ""
+
+#: workbench/accounts/tasks.py
+msgid "Drink coffee. Do stupid things faster with more energy."
+msgstr ""
 
 #: workbench/accounts/views.py workbench/templates/base.html
 msgid "Settings"
@@ -2806,15 +2839,18 @@ msgstr "Keine Geschichte gefunden"
 msgid ""
 "Hello %(names)s\n"
 "\n"
-"Here's your invitation for a coffee break. I hope you'll enjoy it :-)\n"
+"Here's your invitation for a coffee break.\n"
+"\n"
+"%(wish)s\n"
 "\n"
 "Yours truly,\n"
 "Coffee bot\n"
 msgstr ""
 "Hallo %(names)s\n"
 "\n"
-"Hier ist eure Einladung für eine Kaffeepause. Ich hoffe, ihr geniesst "
-"es :-)\n"
+"Hier ist eure Einladung für eine Kaffeepause.\n"
+"\n"
+"%(wish)s\n"
 "\n"
 "Herzliche Grüsse,\n"
 "Kaffee-Bot\n"
