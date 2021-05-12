@@ -160,8 +160,8 @@ class InvoiceForm(PostalAddressSelectionForm):
             self.fields["subtotal"].label = _("Credit")
             self.fields.pop("service_period_from")
             self.fields.pop("service_period_until")
-            # self.data["subtotal"] = self.data["subtotal"]
-            # print(self["subtotal"].__dict__)
+            self.fields.pop("third_party_costs")
+            self.fields.pop("discount")
 
         if self.instance.type == self.instance.SERVICES:
             self.fields["subtotal"].disabled = True
@@ -174,7 +174,10 @@ class InvoiceForm(PostalAddressSelectionForm):
         else:
             self.fields.pop("show_service_details")
 
-        if self.instance.type != Invoice.DOWN_PAYMENT and self.instance.project_id:
+        if (
+            self.instance.type not in {Invoice.DOWN_PAYMENT, Invoice.CREDIT}
+            and self.instance.project_id
+        ):
             eligible_down_payment_invoices = Invoice.objects.invoiced().filter(
                 Q(project=self.instance.project),
                 Q(type=Invoice.DOWN_PAYMENT),
@@ -351,7 +354,9 @@ class CreateProjectInvoiceForm(InvoiceForm):
             title=self.project.title,
             description=self.project.description,
             type=type,
-            third_party_costs=Z2 if type == Invoice.SERVICES else None,
+            third_party_costs=Z2
+            if type in {Invoice.SERVICES, Invoice.CREDIT}
+            else None,
         )
 
         super().__init__(*args, **kwargs)
