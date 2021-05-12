@@ -138,6 +138,10 @@ class InvoiceForm(PostalAddressSelectionForm):
         }
 
     def __init__(self, *args, **kwargs):
+        if instance := kwargs.get("instance"):  # XXX Is this ever False?
+            if instance.type == instance.CREDIT:
+                kwargs.setdefault("initial", {})["subtotal"] = -instance.subtotal
+
         super().__init__(*args, **kwargs)
 
         self.fields["type"].choices = Invoice.TYPE_CHOICES
@@ -151,6 +155,13 @@ class InvoiceForm(PostalAddressSelectionForm):
             self.fields["subtotal"].label = _("Down payment")
             self.fields.pop("service_period_from")
             self.fields.pop("service_period_until")
+
+        if self.instance.type == self.instance.CREDIT:
+            self.fields["subtotal"].label = _("Credit")
+            self.fields.pop("service_period_from")
+            self.fields.pop("service_period_until")
+            # self.data["subtotal"] = self.data["subtotal"]
+            # print(self["subtotal"].__dict__)
 
         if self.instance.type == self.instance.SERVICES:
             self.fields["subtotal"].disabled = True
@@ -302,8 +313,12 @@ class InvoiceForm(PostalAddressSelectionForm):
     def save(self):
         instance = super().save(commit=False)
 
-        if instance.type in (instance.FIXED, instance.DOWN_PAYMENT):
+        if instance.type in {instance.FIXED, instance.DOWN_PAYMENT}:
             instance.subtotal = self.cleaned_data["subtotal"]
+            instance.down_payment_total = Z2
+
+        elif instance.type == instance.CREDIT:
+            instance.subtotal = -self.cleaned_data["subtotal"]
             instance.down_payment_total = Z2
 
         if "apply_down_payment" in self.cleaned_data:

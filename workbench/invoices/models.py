@@ -53,11 +53,13 @@ class Invoice(ModelWithTotal):
     FIXED = "fixed"
     DOWN_PAYMENT = "down-payment"
     SERVICES = "services"
+    CREDIT = "credit"
 
     TYPE_CHOICES = (
         (FIXED, _("Fixed amount")),
         (DOWN_PAYMENT, _("Down payment")),
         (SERVICES, _("Services")),
+        (CREDIT, _("Credit")),
     )
 
     customer = models.ForeignKey(
@@ -245,7 +247,10 @@ class Invoice(ModelWithTotal):
             if self.invoiced_on > self.due_on:
                 errors["due_on"] = _("Due date has to be after invoice date.")
 
-        if self.type in (self.SERVICES, self.DOWN_PAYMENT) and not self.project:
+        if (
+            self.type in {self.SERVICES, self.DOWN_PAYMENT, self.CREDIT}
+            and not self.project
+        ):
             errors["__all__"] = _("Invoices of type %(type)s require a project.") % {
                 "type": self.get_type_display()
             }
@@ -341,6 +346,12 @@ class Invoice(ModelWithTotal):
                 _("Down payment total %(currency)s incl. tax")
                 if self.liable_to_vat
                 else _("Down payment total %(currency)s")
+            ) % {"currency": settings.WORKBENCH.CURRENCY}
+        elif self.type == self.CREDIT:
+            return (
+                _("Credit total %(currency)s incl. tax")
+                if self.liable_to_vat
+                else _("Credit total %(currency)s")
             ) % {"currency": settings.WORKBENCH.CURRENCY}
         else:
             return (

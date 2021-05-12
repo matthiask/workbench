@@ -145,21 +145,21 @@ class PDFDocument(_PDFDocument):
             20.2 * cm,
             self.bounds.E - self.bounds.W,
             40 * mm,
-            **frame_kwargs
+            **frame_kwargs,
         )
         self.rest_frame = Frame(
             self.bounds.W,
             self.bounds.S,
             self.bounds.E - self.bounds.W,
             18.2 * cm,
-            **frame_kwargs
+            **frame_kwargs,
         )
         self.full_frame = Frame(
             self.bounds.W,
             self.bounds.S,
             self.bounds.E - self.bounds.W,
             self.bounds.N - self.bounds.S,
-            **frame_kwargs
+            **frame_kwargs,
         )
 
     def init_letter(self, *, page_fn=None, page_fn_later=None):
@@ -406,6 +406,12 @@ class PDFDocument(_PDFDocument):
         )
 
     def process_invoice(self, invoice):
+        title = _("invoice")
+        if invoice.type == invoice.DOWN_PAYMENT:
+            title = _("down payment invoice")
+        elif invoice.type == invoice.CREDIT:
+            title = _("credit")
+
         self.process_services_letter(
             invoice,
             watermark=""
@@ -413,9 +419,7 @@ class PDFDocument(_PDFDocument):
             else str(invoice.get_status_display()),
             details=[
                 (
-                    _("down payment invoice")
-                    if invoice.type == invoice.DOWN_PAYMENT
-                    else _("invoice"),
+                    title,
                     invoice.code,
                 ),
                 (
@@ -431,7 +435,11 @@ class PDFDocument(_PDFDocument):
                 (_("Our reference"), invoice.owned_by.get_full_name()),
                 ("MwSt.-Nr.", settings.WORKBENCH.PDF_VAT_NO),
             ],
-            footer=settings.WORKBENCH.PDF_INVOICE_PAYMENT
+            footer=(
+                settings.WORKBENCH.PDF_CREDIT
+                if invoice.type == invoice.CREDIT
+                else settings.WORKBENCH.PDF_INVOICE_PAYMENT
+            )
             % {
                 "code": invoice.code,
                 "due": (

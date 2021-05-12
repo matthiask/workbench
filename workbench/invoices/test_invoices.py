@@ -1005,3 +1005,38 @@ class InvoicesTest(TestCase):
         self.assertContains(
             response, "This project already has an invoice in preparation."
         )
+
+    def test_credit(self):
+        """CREDIT invoices"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        url = project.urls["createinvoice"] + "?type=credit"
+
+        response = self.client.post(
+            url,
+            {
+                "contact": project.contact_id,
+                "title": project.title,
+                "description": "bla",
+                "owned_by": project.owned_by_id,
+                "discount": 0,
+                "liable_to_vat": 1,
+                "postal_address": "Anything\nStreet\nCity",
+                "subtotal": 2500,
+                "third_party_costs": 0,
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        invoice = project.invoices.latest("pk")
+        self.assertRedirects(response, invoice.urls["detail"])
+
+        self.assertAlmostEqual(invoice.subtotal, -2500)
+        self.assertEqual(self.client.get(invoice.urls["pdf"]).status_code, 200)
+
+        response = self.client.get(
+            invoice.urls["update"],
+        )
+        self.assertContains(response, 'value="2500.00"')
+
+        response = self.client.get(invoice.urls["pdf"])
+        self.assertEqual(response.status_code, 200)  # No crash

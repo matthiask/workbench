@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-11 08:10+0200\n"
+"POT-Creation-Date: 2021-05-12 13:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1644,6 +1644,11 @@ msgstr "Durch Projekt bestimmt."
 msgid "Down payment"
 msgstr "Anzahlung"
 
+#: workbench/invoices/forms.py workbench/invoices/models.py
+#: workbench/templates/projects/project_detail.html
+msgid "Credit"
+msgstr "Gutschrift"
+
 #: workbench/invoices/forms.py
 msgid "Calculated from invoice services."
 msgstr "Berechnet aus Rechnungsleistungen."
@@ -1896,6 +1901,16 @@ msgstr "Total %(currency)s inkl. MwSt. Akonto"
 #, python-format
 msgid "Down payment total %(currency)s"
 msgstr "Total %(currency)s Akonto"
+
+#: workbench/invoices/models.py
+#, python-format
+msgid "Credit total %(currency)s incl. tax"
+msgstr "Gutschrift Total %(currency)s inkl. MwSt."
+
+#: workbench/invoices/models.py
+#, python-format
+msgid "Credit total %(currency)s"
+msgstr "Gutschrift Total %(currency)s"
 
 #: workbench/invoices/models.py workbench/offers/models.py
 #, python-format
@@ -3886,6 +3901,10 @@ msgstr "Unsere Referenz"
 #: workbench/tools/pdf.py
 msgid "down payment invoice"
 msgstr "Anzahlungsrechnung"
+
+#: workbench/tools/pdf.py
+msgid "credit"
+msgstr "Gutschrift"
 
 #: workbench/tools/validation.py
 msgid "Form was invalid."

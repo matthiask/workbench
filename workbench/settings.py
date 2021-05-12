@@ -210,6 +210,10 @@ WORKBENCH = {
             " der Referenznummer %(code)s bis zum %(due)s"
             " auf ZKB Konto IBAN CH52 0070 0114 8022 0855 1."
         ),
+        PDF_CREDIT=(
+            "Die Gutschrift wird bis zum %(due)s in Auftrag gegeben."
+            " Herzlichen Dank für Ihre Geduld."
+        ),
         FONTS={
             "regular": font("ZuricBTLig.ttf"),
             "bold": font("ZuricBTBol.ttf"),
@@ -253,6 +257,10 @@ WORKBENCH = {
             "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
             " der Referenznummer %(code)s bis zum %(due)s"
             " auf ZKB Konto IBAN CH78 0070 0110 0070 4877 9."
+        ),
+        PDF_CREDIT=(
+            "Die Gutschrift wird bis zum %(due)s in Auftrag gegeben."
+            " Herzlichen Dank für Ihre Geduld."
         ),
         FONTS={
             "regular": font("HelveticaNeueLight.ttf"),
@@ -299,6 +307,10 @@ WORKBENCH = {
             " auf Konto IBAN CH31 0687 7705 0560 9509 7 bei der"
             " Zürcher Landbank AG."
         ),
+        PDF_CREDIT=(
+            "Die Gutschrift wird bis zum %(due)s in Auftrag gegeben."
+            " Herzlichen Dank für Ihre Geduld."
+        ),
         FONTS={
             "regular": font("HelveticaNeueLight.ttf"),
             "bold": font("HelveticaNeueBold.ttf"),
@@ -340,6 +352,10 @@ WORKBENCH = {
             "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
             " der Referenznummer %(code)s bis zum %(due)s"
             " auf ZKB Konto IBAN CH52 0070 0114 8022 0855 1."
+        ),
+        PDF_CREDIT=(
+            "Die Gutschrift wird bis zum %(due)s in Auftrag gegeben."
+            " Herzlichen Dank für Ihre Geduld."
         ),
         FONTS={
             "regular": font("ZuricBTLig.ttf"),
