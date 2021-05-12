@@ -129,6 +129,7 @@ class Migration(migrations.Migration):
                             ("fixed", "Fixed amount"),
                             ("down-payment", "Down payment"),
                             ("services", "Services"),
+                            ("credit", "Credit"),
                         ],
                         max_length=20,
                         verbose_name="type",
