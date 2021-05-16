@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-12 13:35+0200\n"
+"POT-Creation-Date: 2021-05-16 15:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,8 +65,8 @@ msgid "(not accepted yet)"
 msgstr "(noch nicht akzeptiert)"
 
 #: conf/strings.js
-msgid "Absences"
-msgstr "Abwesenheiten"
+msgid "Absences and public holidays"
+msgstr "Abwesenheiten und öffentliche Feiertage"
 
 #: conf/strings.js timer/activity.js
 msgid "Activity"
@@ -189,6 +189,9 @@ msgstr "Welches Ergebnis strebst Du an?"
 msgctxt "provisional"
 msgid "prov."
 msgstr "prov."
+
+#~ msgid "Absences"
+#~ msgstr "Abwesenheiten"
 
 #, javascript-format
 #~ msgid "%sh per week"

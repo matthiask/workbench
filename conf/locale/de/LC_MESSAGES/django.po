@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-12 13:35+0200\n"
+"POT-Creation-Date: 2021-05-16 15:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -218,7 +218,7 @@ msgstr ""
 
 #: workbench/accounts/models.py workbench/awt/models.py
 #: workbench/circles/models.py workbench/contacts/models.py
-#: workbench/credit_control/models.py
+#: workbench/credit_control/models.py workbench/planning/models.py
 msgid "name"
 msgstr "Name"
 
@@ -2452,6 +2452,18 @@ msgstr "Die ausgewählte Offerte ist abgelehnt."
 #: workbench/tools/pdf.py
 msgid "date"
 msgstr "Datum"
+
+#: workbench/planning/models.py
+msgid "fraction"
+msgstr "Anteil"
+
+#: workbench/planning/models.py
+msgid "public holiday"
+msgstr "öffentlicher Feiertag"
+
+#: workbench/planning/models.py
+msgid "public holidays"
+msgstr "öffentliche Feiertage"
 
 #: workbench/planning/models.py
 #: workbench/templates/planning/project_planning.html

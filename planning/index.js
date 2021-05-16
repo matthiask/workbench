@@ -606,7 +606,7 @@ function Absences({ absences }) {
         className="planning--stripe1"
       />
       <Cell row={row} column={1} className="planning--title is-project">
-        <strong>{gettext("Absences")}</strong>
+        <strong>{gettext("Absences and public holidays")}</strong>
       </Cell>
       {absences.map((user, idx) => (
         <UserAbsences key={idx} user={user} />
@@ -624,18 +624,26 @@ function UserAbsences({ user }) {
       <Cell row={row} column={1} className="planning--title is-absence pl-3">
         {user[0]}
       </Cell>
-      {user[1].map((hours, idx) =>
-        hours ? (
+      {user[1].map((absences, idx) => {
+        if (!absences.length) return null
+
+        const hours = absences.reduce((a, b) => a + parseFloat(b[0]), 0)
+        const title = absences
+          .map((absence) => `${fixed(absence[0], 0)}h: ${absence[1]}`)
+          .join("\n")
+
+        return (
           <Cell
             key={idx}
             row={row}
             column={FIRST_DATA_COLUMN + idx}
             className="planning--range planning--small is-absence"
+            title={title}
           >
             {fixed(hours, 0)}
           </Cell>
-        ) : null
-      )}
+        )
+      })}
     </>
   )
 }

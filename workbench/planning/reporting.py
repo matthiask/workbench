@@ -11,7 +11,7 @@ from workbench.awt.models import Absence
 from workbench.contacts.models import Organization
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedHours
-from workbench.planning.models import Milestone, PlannedWork
+from workbench.planning.models import Milestone, PlannedWork, PublicHoliday
 from workbench.services.models import ServiceType
 from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.reporting import query
@@ -45,7 +45,7 @@ class Planning:
 
         self._worked_hours = defaultdict(lambda: defaultdict(lambda: Z1))
 
-        self._absences = defaultdict(lambda: [0] * len(weeks))
+        self._absences = defaultdict(lambda: [[] for i in weeks])
         self._milestones = defaultdict(lambda: defaultdict(list))
 
     def add_planned_work(self, queryset):
@@ -123,8 +123,38 @@ class Planning:
             ]
 
             for idx, week in weeks:
-                self._absences[absence.user][idx] += hours / len(weeks)
+                self._absences[absence.user][idx].append(
+                    (
+                        hours / len(weeks),
+                        f"{absence.get_reason_display()} - {absence.description}",
+                    )
+                )
                 self._by_week[week] += hours / len(weeks)
+
+    def add_public_holidays(self):
+        users = User.objects.filter(id__in=self._user_ids)
+        for ph in PublicHoliday.objects.filter(
+            date__range=[
+                min(self.weeks),
+                max(self.weeks) + dt.timedelta(days=6),
+            ]
+        ).order_by("date"):
+            # Skip weekends
+            if ph.date.weekday() >= 5:
+                continue
+
+            week = monday(ph.date)
+            idx = self.weeks.index(week)
+
+            for user in users:
+                hours = ph.fraction * user.planning_hours_per_day
+                self._absences[user][idx].append(
+                    (
+                        hours,
+                        ph.name,
+                    )
+                )
+                self._by_week[week] += hours
 
     def add_milestones(self, queryset):
         for milestone in queryset.filter(project__in=self._project_ids).select_related(
@@ -245,7 +275,9 @@ select
     user_id,
     coalesce(percentage, 0) * 5 * coalesce(planning_hours_per_day, 0) / 100
         - coalesce(pw_hours, 0)
-        - coalesce(abs_hours, 0) as capacity
+        - coalesce(abs_hours, 0)
+        - coalesce(ph_days, 0) * coalesce(planning_hours_per_day, 0)
+        as capacity
 
 --
 -- Determine the employment percentage and planning_hours_per_day
@@ -316,6 +348,17 @@ left outer join lateral(
 
 ) as absences
 on week=abs_week and user_id=abs_user_id
+
+left outer join lateral(
+    select
+      date_trunc('week', date) as ph_week,
+      sum(fraction) as ph_days
+    from planning_publicholiday
+    where extract(dow from date) between 1 and 6
+    group by ph_week
+) as public_holidays
+on week=ph_week
+
             """,
             [min(self.weeks), max(self.weeks), user_ids, user_ids, user_ids],
         ):
@@ -389,6 +432,7 @@ def user_planning(user, date_range):
     planning.add_planned_work(user.planned_work.select_related("service_type"))
     planning.add_worked_hours(user.loggedhours.all())
     planning.add_absences(user.absences.all())
+    planning.add_public_holidays()
     planning.add_milestones(Milestone.objects.all())
     return planning.report()
 
@@ -402,6 +446,7 @@ def team_planning(team, date_range):
     )
     planning.add_worked_hours(LoggedHours.objects.filter(rendered_by__teams=team))
     planning.add_absences(Absence.objects.filter(user__teams=team))
+    planning.add_public_holidays()
     planning.add_milestones(Milestone.objects.all())
     return planning.report()
 
@@ -442,6 +487,7 @@ SELECT MIN(week), MAX(week) FROM sq
     planning.add_planned_work(project.planned_work.select_related("service_type"))
     planning.add_worked_hours(LoggedHours.objects.all())
     planning.add_absences(Absence.objects.all())
+    planning.add_public_holidays()
     planning.add_milestones(Milestone.objects.all())
     return planning.report()
 

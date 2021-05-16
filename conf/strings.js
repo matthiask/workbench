@@ -1,7 +1,7 @@
 gettext("(closed)")
 gettext("(declined)")
 gettext("(not accepted yet)")
-gettext("Absences")
+gettext("Absences and public holidays")
 gettext("Activity")
 gettext("Add planned work")
 gettext("Days")
