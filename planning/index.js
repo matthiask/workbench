@@ -644,17 +644,12 @@ function UserAbsences({ user }) {
           </div>
         )
 
-        const title = absences
-          .map((absence) => `${fixed(absence[0], 0)}h: ${absence[1]}`)
-          .join("\n")
-
         return (
           <Cell
             key={idx}
             row={row}
             column={FIRST_DATA_COLUMN + idx}
             className="planning--range planning--small is-absence has-description-popup"
-            title={title}
           >
             {fixed(hours, 0)}
             {tooltip}
