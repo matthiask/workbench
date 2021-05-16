@@ -17,6 +17,22 @@ from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
 
 
+class PublicHoliday(models.Model):
+    date = models.DateField(_("date"))
+    name = models.CharField(_("name"), max_length=200)
+    fraction = models.DecimalField(
+        _("fraction"), default=1, max_digits=5, decimal_places=2
+    )
+
+    class Meta:
+        ordering = ["-date"]
+        verbose_name = _("public holiday")
+        verbose_name_plural = _("public holidays")
+
+    def __str__(self):
+        return self.name
+
+
 @model_urls
 class Milestone(Model):
     project = models.ForeignKey(
