@@ -2,19 +2,6 @@
 
 from django.db import migrations
 
-from workbench.planning.holidays import get_public_holidays
-
-
-def forwards(apps, schema_editor):
-    PublicHoliday = apps.get_model("planning", "PublicHoliday")
-    for year in range(2021, 2031):
-        for date, data in get_public_holidays(year).items():
-            PublicHoliday.objects.create(
-                date=date,
-                name=data[0],
-                fraction=data[1],
-            )
-
 
 class Migration(migrations.Migration):
 
@@ -22,6 +9,4 @@ class Migration(migrations.Migration):
         ("planning", "0013_publicholiday"),
     ]
 
-    operations = [
-        migrations.RunPython(forwards),
-    ]
+    operations = []
