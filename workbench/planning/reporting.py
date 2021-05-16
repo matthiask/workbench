@@ -127,6 +127,7 @@ class Planning:
                     (
                         hours / len(weeks),
                         f"{absence.get_reason_display()} - {absence.description}",
+                        absence.urls["detail"],
                     )
                 )
                 self._by_week[week] += hours / len(weeks)

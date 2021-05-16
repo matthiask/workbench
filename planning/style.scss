@@ -186,3 +186,32 @@
     display: none;
   }
 }
+
+.description-popup {
+  position: absolute;
+  z-index: 1;
+  top: 80%;
+  left: 0;
+  background: #fff;
+  box-shadow: 0 0 3px 0 rgba(0, 0, 50, 0.3);
+  text-align: left;
+  min-width: 10rem;
+  padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+  line-height: 1.3;
+
+  display: none;
+  color: var(--dark);
+}
+
+.description-popup p {
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+}
+
+.description-popup a {
+  color: var(--primary);
+}
+
+.has-description-popup:hover > .description-popup {
+  display: block;
+}

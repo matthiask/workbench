@@ -628,6 +628,22 @@ function UserAbsences({ user }) {
         if (!absences.length) return null
 
         const hours = absences.reduce((a, b) => a + parseFloat(b[0]), 0)
+        const tooltip = (
+          <div className="description-popup no-pr">
+            {absences.map(([hours, description, url], idx) => (
+              <p key={idx}>
+                {url ? (
+                  <a key={url} href={url} data-toggle="ajaxmodal">
+                    {fixed(hours, 0)}h: {description}
+                  </a>
+                ) : (
+                  `${fixed(hours, 0)}h: ${description}`
+                )}
+              </p>
+            ))}
+          </div>
+        )
+
         const title = absences
           .map((absence) => `${fixed(absence[0], 0)}h: ${absence[1]}`)
           .join("\n")
@@ -637,10 +653,11 @@ function UserAbsences({ user }) {
             key={idx}
             row={row}
             column={FIRST_DATA_COLUMN + idx}
-            className="planning--range planning--small is-absence"
+            className="planning--range planning--small is-absence has-description-popup"
             title={title}
           >
             {fixed(hours, 0)}
+            {tooltip}
           </Cell>
         )
       })}
