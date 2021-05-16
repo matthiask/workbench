@@ -138,9 +138,9 @@ class InvoiceForm(PostalAddressSelectionForm):
         }
 
     def __init__(self, *args, **kwargs):
-        if instance := kwargs.get("instance"):  # XXX Is this ever False?
-            if instance.type == instance.CREDIT:
-                kwargs.setdefault("initial", {})["subtotal"] = -instance.subtotal
+        instance = kwargs["instance"]
+        if instance.type == instance.CREDIT:
+            kwargs.setdefault("initial", {})["subtotal"] = -instance.subtotal
 
         super().__init__(*args, **kwargs)
 
