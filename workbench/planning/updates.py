@@ -142,5 +142,6 @@ def test():  # pragma: no cover
                 "WORKBENCH": settings.WORKBENCH,
             },
             to=[user.email],
+            cc=["workbench@feinheit.ch"],
         )
         mail.send()
