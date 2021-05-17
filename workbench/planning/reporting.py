@@ -153,6 +153,7 @@ class Planning:
                     (
                         hours,
                         ph.name,
+                        ph.get_absolute_url(),
                     )
                 )
                 self._by_week[week] += hours

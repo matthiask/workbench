@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-16 15:40+0200\n"
+"POT-Creation-Date: 2021-05-17 12:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -584,6 +584,9 @@ msgstr "ist Arbeitszeit"
 
 #: workbench/awt/models.py workbench/templates/awt/absence_calendar.html
 #: workbench/templates/awt/absence_detail.html
+#: workbench/templates/planning/project_planning.html
+#: workbench/templates/planning/team_planning.html
+#: workbench/templates/planning/user_planning.html
 msgid "absence"
 msgstr "Abwesenheit"
 
@@ -2454,8 +2457,8 @@ msgid "date"
 msgstr "Datum"
 
 #: workbench/planning/models.py
-msgid "fraction"
-msgstr "Anteil"
+msgid "fraction of day which is free"
+msgstr "Freier Anteil des Tages"
 
 #: workbench/planning/models.py
 msgid "public holiday"
@@ -3969,6 +3972,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "fraction"
+#~ msgstr "Anteil"
 
 #~ msgid "Coffee time"
 #~ msgstr "Kaffeepause"

@@ -1,0 +1,19 @@
+{% extends "modal.html" %}
+
+{% load i18n workbench %}
+
+{% block title %}{{ object }} {% history_link object %}{% endblock %}
+
+{% block body %}
+  <table class="table table-striped">
+    {% for name, value in object|field_value_pairs %}
+    <tr>
+      <th class="text-right">{{ name }}</th>
+      <td>{% link_or_none value %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

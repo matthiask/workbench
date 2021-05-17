@@ -17,11 +17,12 @@ from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
 
 
-class PublicHoliday(models.Model):
+@model_urls
+class PublicHoliday(Model):
     date = models.DateField(_("date"))
     name = models.CharField(_("name"), max_length=200)
     fraction = models.DecimalField(
-        _("fraction"), default=1, max_digits=5, decimal_places=2
+        _("fraction of day which is free"), default=1, max_digits=5, decimal_places=2
     )
 
     class Meta:

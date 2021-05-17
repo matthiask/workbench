@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                         decimal_places=2,
                         default=1,
                         max_digits=5,
-                        verbose_name="fraction",
+                        verbose_name="fraction of day which is free",
                     ),
                 ),
             ],

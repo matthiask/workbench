@@ -29,7 +29,7 @@ from workbench.invoices.models import (
 )
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
-from workbench.planning.models import Milestone, PlannedWork
+from workbench.planning.models import Milestone, PlannedWork, PublicHoliday
 from workbench.projects.models import Campaign, Project, Service as ProjectService
 from workbench.reporting.models import CostCenter
 from workbench.tools.formats import local_date_format
@@ -478,6 +478,7 @@ HISTORY = {
     LoggedHours: _logbook_loggedhours_cfg,
     Offer: _offers_offer_cfg,
     PlannedWork: {"fields": EVERYTHING},
+    PublicHoliday: {"fields": EVERYTHING},
     Milestone: {"fields": EVERYTHING},
     Campaign: _projects_campaign_cfg,
     Project: _projects_project_cfg,

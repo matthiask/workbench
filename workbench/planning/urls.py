@@ -8,7 +8,7 @@ from workbench.planning.forms import (
     PlannedWorkForm,
     PlannedWorkSearchForm,
 )
-from workbench.planning.models import Milestone, PlannedWork
+from workbench.planning.models import Milestone, PlannedWork, PublicHoliday
 from workbench.projects.models import Project
 
 
@@ -90,5 +90,11 @@ urlpatterns = [
             model=PlannedWork, template_name="modal_confirm_delete.html"
         ),
         name="planning_plannedwork_delete",
+    ),
+    # Public holidays
+    path(
+        "ph/<int:pk>/",
+        generic.DetailView.as_view(model=PublicHoliday),
+        name="planning_publicholiday_detail",
     ),
 ]
