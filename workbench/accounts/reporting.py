@@ -223,14 +223,6 @@ WHERE earliest.start IS NOT NULL AND u.is_active=TRUE
     return sorted(anniversaries, key=lambda row: (row["this_year"], row["name"]))
 
 
-def age(day):
-    today = dt.date.today()
-    years = today.year - day.year
-    if (today.month, today.day) < (day.month, day.day):
-        years -= 1
-    return years
-
-
 def birthdays():
     users = {True: [], False: []}
     for user in User.objects.active().select_related("person"):
@@ -245,7 +237,7 @@ def birthdays():
             {
                 "user": row[1],
                 "already": row[0] < (today.month, today.day),
-                "age": age(row[1].person.date_of_birth),
+                "age": today.year - row[1].person.date_of_birth.year,
             }
             for row in sorted(users[True])
         ],
