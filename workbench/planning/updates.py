@@ -124,6 +124,7 @@ def planning_update_mails():
                 "WORKBENCH": settings.WORKBENCH,
             },
             to=[user.email],
+            cc=["workbench@feinheit.ch"],
         )
         mail.send()
 
