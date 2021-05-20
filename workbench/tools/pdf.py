@@ -23,6 +23,7 @@ from pdfdocument.document import (
 )
 from pdfdocument.utils import pdf_response as _pdf_response
 
+from workbench.invoices.models import Invoice
 from workbench.tools.formats import currency, hours, local_date_format
 from workbench.tools.models import CalculationModel
 
@@ -312,9 +313,15 @@ class PDFDocument(_PDFDocument):
         )
 
     def table_total(self, instance):
-        total = [(_("subtotal"), currency(instance.subtotal.quantize(Z)))]
+        transform = lambda x: x  # noqa
+        if getattr(instance, "type", None) == Invoice.CREDIT:
+            transform = lambda x: -x  # noqa
+
+        total = [(_("subtotal"), currency(transform(instance.subtotal).quantize(Z)))]
         if instance.discount:
-            total.append((_("discount"), currency(-instance.discount.quantize(Z))))
+            total.append(
+                (_("discount"), currency(-transform(instance.discount).quantize(Z)))
+            )
         if getattr(instance, "down_payment_total", None):
             for invoice in instance.down_payment_invoices.all():
                 total.append(
@@ -330,14 +337,14 @@ class PDFDocument(_PDFDocument):
                             ),
                             self.style.normal,
                         ),
-                        currency(-invoice.total_excl_tax.quantize(Z)),
+                        currency(-transform(invoice.total_excl_tax).quantize(Z)),
                     )
                 )
         if instance.tax_amount:
             total.append(
                 (
                     "%0.1f%% %s" % (instance.tax_rate, _("tax")),
-                    currency(instance.tax_amount.quantize(Z)),
+                    currency(transform(instance.tax_amount).quantize(Z)),
                 )
             )
 
@@ -346,7 +353,7 @@ class PDFDocument(_PDFDocument):
             self.spacer(0.7 * mm)
 
         self.table(
-            [(instance.total_title, currency(instance.total.quantize(Z)))],
+            [(instance.total_title, currency(transform(instance.total).quantize(Z)))],
             self.style.tableColumns,
             self.style.tableHeadLine,
         )
