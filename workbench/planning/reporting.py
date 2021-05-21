@@ -582,7 +582,7 @@ group by customer_id, week
             }
             for customer_id in planned.keys() | logged.keys()
         ]
-        return sorted(ret, key=lambda row: -row["planned"])
+        return sorted(ret, key=lambda row: (-row["planned"], -row["logged"]))
 
     ret = {
         "per_customer": _customer(planned, logged),

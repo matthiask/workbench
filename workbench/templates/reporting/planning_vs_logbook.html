@@ -34,14 +34,17 @@
     </tr>
   {% for customer_row in stats.per_customer %}
   <tr>
-    <th>{{ customer_row.customer }}</th>
+    <th>
+      {{ customer_row.customer }}
+      {% bar customer_row.logged customer_row.planned %}
+    </th>
     <td>
       {% translate 'Planned' %}<br>
       {% translate 'Logged' %}<br>
     </td>
     <th class="text-right">
-      {{ customer_row.planned|hours }}<br>
-      {{ customer_row.logged|hours }}<br>
+      <span class="{% if not customer_row.planned %}text-black-30{% endif %}">{{ customer_row.planned|hours }}</span><br>
+      <span class="{% if not customer_row.logged %}text-black-30{% endif %}">{{ customer_row.logged|hours }}</span><br>
     </th>
     <td class="text-right">
       <br>
