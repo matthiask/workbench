@@ -4,6 +4,7 @@ from itertools import islice, takewhile
 
 from django.db import connections
 from django.db.models import Q, Sum
+from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
@@ -11,9 +12,9 @@ from workbench.awt.models import Absence
 from workbench.contacts.models import Organization
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedHours
-from workbench.planning.models import Milestone, PlannedWork, PublicHoliday
+from workbench.planning.models import Milestone, PlannedWork
 from workbench.services.models import ServiceType
-from workbench.tools.formats import Z1, Z2, local_date_format
+from workbench.tools.formats import Z1, Z2, hours, local_date_format
 from workbench.tools.reporting import query
 from workbench.tools.validation import monday
 
@@ -133,30 +134,75 @@ class Planning:
                 self._by_week[week] += hours / len(weeks)
 
     def add_public_holidays(self):
-        users = User.objects.filter(id__in=self._user_ids)
-        for ph in PublicHoliday.objects.filter(
-            date__range=[
-                min(self.weeks),
-                max(self.weeks) + dt.timedelta(days=6),
-            ]
-        ).order_by("date"):
+        ud = {user.id: user for user in User.objects.filter(id__in=self._user_ids)}
+
+        for (
+            id,
+            date,
+            name,
+            user_id,
+            planning_hours_per_day,
+            fraction,
+            percentage,
+        ) in query(
+            """
+select
+    ph.id,
+    ph.date,
+    ph.name,
+    user_id,
+    planning_hours_per_day,
+    fraction,
+    percentage
+
+from planning_publicholiday ph
+left outer join lateral (
+    select
+        user_id,
+        date_from,
+        date_until,
+        percentage,
+        planning_hours_per_day
+    from awt_employment
+    left join accounts_user on awt_employment.user_id=accounts_user.id
+    where user_id = any (%s)
+) as employment
+on employment.date_from <= ph.date and employment.date_until > ph.date
+
+where ph.date between %s and %s and user_id is not null
+order by ph.date
+            """,
+            [list(ud.keys()), min(self.weeks), max(self.weeks)],
+        ):
             # Skip weekends
-            if ph.date.weekday() >= 5:
+            if date.weekday() >= 5:
                 continue
 
-            week = monday(ph.date)
+            week = monday(date)
             idx = self.weeks.index(week)
 
-            for user in users:
-                hours = ph.fraction * user.planning_hours_per_day
-                self._absences[user][idx].append(
-                    (
-                        hours,
-                        ph.name,
-                        ph.get_absolute_url(),
-                    )
+            user = ud[user_id]
+            ph_hours = (
+                (planning_hours_per_day or 0)
+                * (fraction or 0)
+                * (percentage or 0)
+                / 100
+            )
+            detail = " × ".join(
+                (
+                    f"{hours(planning_hours_per_day)}/d",
+                    f"{percentage}%",
+                    f"{fraction}d",
                 )
-                self._by_week[week] += hours
+            )
+            self._absences[user][idx].append(
+                (
+                    ph_hours,
+                    f"{name} ({detail} = {hours(ph_hours)})",
+                    reverse("planning_publicholiday_detail", kwargs={"pk": id}),
+                )
+            )
+            self._by_week[week] += ph_hours
 
     def add_milestones(self, queryset):
         for milestone in queryset.filter(project__in=self._project_ids).select_related(
@@ -278,7 +324,9 @@ select
     coalesce(percentage, 0) * 5 * coalesce(planning_hours_per_day, 0) / 100
         - coalesce(pw_hours, 0)
         - coalesce(abs_hours, 0)
-        - coalesce(ph_days, 0) * coalesce(planning_hours_per_day, 0)
+        - coalesce(ph_days, 0)
+          * coalesce(planning_hours_per_day, 0)
+          * coalesce(percentage, 0) / 100
         as capacity
 
 --
@@ -502,7 +550,7 @@ def planning_vs_logbook(date_range, *, users):
 
     seen_weeks = set()
 
-    for customer_id, week, hours in query(
+    for customer_id, week, planned_hours in query(
         """
 with
 planned_per_week as (
@@ -536,9 +584,9 @@ group by customer_id, weeks.week
         [user_ids, *date_range],
     ):
         seen_weeks.add(week)
-        planned[customer_id][week] = hours
+        planned[customer_id][week] = planned_hours
 
-    for customer_id, week, hours in query(
+    for customer_id, week, worked_hours in query(
         """
 select
     p.customer_id,
@@ -555,7 +603,7 @@ group by customer_id, week
         [user_ids, *date_range],
     ):
         seen_weeks.add(week)
-        logged[customer_id][week] = hours
+        logged[customer_id][week] = worked_hours
 
     customers = {
         customer.id: customer
