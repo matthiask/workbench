@@ -1,4 +1,5 @@
 import datetime as dt
+import math
 import random
 from itertools import chain
 
@@ -42,9 +43,13 @@ def generate_pairings(users):
             yield group, [tuple(sorted((group[0].id, group[1].id)))]
 
 
-def overlap(pairing, previous):
+def rating(pairing, previous):
+    """The lower the rating value is the better"""
     current = set(chain.from_iterable(pair[1] for pair in pairing))
-    return len(current & previous)
+    overlaps = current & set(previous)
+    if overlaps:
+        return sum((math.pow(0.99, previous[overlap] / 86400) for overlap in overlaps))
+    return 0.0
 
 
 def coffee_invites():
@@ -58,11 +63,10 @@ def coffee_invites():
         # :-(
         return
 
+    now = timezone.now()
     previous = {
-        tuple(sorted(pairing.users))
-        for pairing in CoffeePairings.objects.filter(
-            created_at__gt=timezone.now() - dt.timedelta(days=14 * len(users) // 2)
-        )
+        tuple(sorted(pairing.users)): (now - pairing.created_at).total_seconds()
+        for pairing in CoffeePairings.objects.order_by("created_at")
     }
 
     # Generate $CANDIDATES candidate pairings
@@ -70,8 +74,12 @@ def coffee_invites():
 
     # Count how many pairs already occurred in the relevant comparison period
     rated_candidates = sorted(
-        (overlap(candidate, previous), candidate) for candidate in candidates
+        (rating(candidate, previous), candidate) for candidate in candidates
     )
+
+    # from pprint import pprint
+    # pprint(previous)
+    # pprint(rated_candidates)
 
     for group, pairs in rated_candidates[0][1]:
         for pair in pairs:
