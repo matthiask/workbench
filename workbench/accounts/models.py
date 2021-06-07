@@ -349,3 +349,12 @@ class Team(Model):
 
     def __str__(self):
         return self.name
+
+
+class CoffeePairings(models.Model):
+    created_at = models.DateTimeField(_("created at"), default=timezone.now)
+    users = ArrayField(models.SmallIntegerField(), verbose_name=_("users"))
+
+    class Meta:
+        verbose_name = _("coffee pairings")
+        verbose_name_plural = _("coffee pairings")
