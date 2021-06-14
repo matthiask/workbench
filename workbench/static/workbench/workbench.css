@@ -208,7 +208,7 @@ tbody th > a {
   top: -80px;
 }
 
-.debug-is-active::before {
+.debug-is-active::after {
   content: "DEBUG";
   position: fixed;
   left: 0;
