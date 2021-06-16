@@ -28,6 +28,7 @@ class FEATURES(str, Enum):
     COFFEE = "COFFEE"
     CONTROLLING = "CONTROLLING"
     DEALS = "DEALS"
+    EXPENSES = "EXPENSES"
     FOREIGN_CURRENCIES = "FOREIGN_CURRENCIES"
     GLASSFROG = "GLASSFROG"
     LABOR_COSTS = "LABOR_COSTS"
@@ -58,6 +59,10 @@ LABELS = {
     FEATURES.DEALS: {
         "label": _("Deals"),
         "help_text": _("Allow managing the acquisition pipeline."),
+    },
+    FEATURES.EXPENSES: {
+        "label": _("Expenses"),
+        "help_text": _("Personal expense tracking and reimbursement."),
     },
     FEATURES.FOREIGN_CURRENCIES: {
         "label": _("Foreign currencies for expenses"),

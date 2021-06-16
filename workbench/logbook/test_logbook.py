@@ -481,7 +481,7 @@ class LogbookTest(TestCase):
         code("rendered_by=" + str(user.pk))
         code("project=" + str(cost.service.project.pk))
         code("organization=" + str(cost.service.project.customer.pk))
-        code("expenses=on")
+        # code("expenses=on")
         code("date_from=2018-01-01")
         code("date_until=2018-01-01")
         code("service=" + str(service.pk))

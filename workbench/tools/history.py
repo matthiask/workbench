@@ -317,11 +317,11 @@ def _logbook_loggedcost_cfg(user):
         "cost",
         "third_party_costs",
         "description",
-        "are_expenses",
-        "expense_report",
     }
     if user.features[FEATURES.CONTROLLING]:
         fields |= {"invoice_service", "archived_at"}
+    if user.features[FEATURES.EXPENSES]:
+        fields |= {"expense_report", "are_expenses"}
     if user.features[FEATURES.FOREIGN_CURRENCIES]:
         fields |= {"expense_currency", "expense_cost"}
     return {"fields": fields}

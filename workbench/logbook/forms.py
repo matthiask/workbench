@@ -282,6 +282,9 @@ class LoggedCostSearchForm(Form):
             collapse_inactive=False, myself=True
         )
 
+        if not self.request.user.features[FEATURES.EXPENSES]:
+            self.fields.pop("expenses")
+
     def filter(self, queryset):
         data = self.cleaned_data
         queryset = queryset.search(data.get("q"))
@@ -646,6 +649,11 @@ class LoggedCostForm(ModelForm):
         else:
             self.fields.pop("expense_currency")
             self.fields.pop("expense_cost")
+
+        if not self.request.user.features[FEATURES.EXPENSES]:
+            self.fields.pop("are_expenses")
+            self.fields.pop("expense_currency", None)
+            self.fields.pop("expense_cost", None)
 
     def clean(self):
         data = super().clean()

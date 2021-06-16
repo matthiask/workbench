@@ -16,7 +16,7 @@
   </div>
   {% ff_field form.service %}
 
-  {% ff_field form.are_expenses %}
+  {% if form.are_expenses %}{% ff_field form.are_expenses %}{% endif %}
   {% if form.expense_currency %}
     <div class="form-row align-items-end {% if not form.instance.expense_cost %}d-none{% endif %}" id="foreign-currency">
       <div class="col-3">{% ff_field form.expense_currency %}</div>
