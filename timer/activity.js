@@ -16,12 +16,14 @@ import { gettext, OUTCOME } from "./i18n.js"
 import { clamp, prettyDuration } from "./utils.js"
 import * as icons from "./icons.js"
 
-const createUpdater = ({ id, dispatch }) => (fields) =>
-  dispatch({
-    type: "UPDATE_ACTIVITY",
-    id,
-    fields,
-  })
+const createUpdater =
+  ({ id, dispatch }) =>
+  (fields) =>
+    dispatch({
+      type: "UPDATE_ACTIVITY",
+      id,
+      fields,
+    })
 
 export const Activity = connect((state, ownProps) => ({
   activity: ownProps.activity,

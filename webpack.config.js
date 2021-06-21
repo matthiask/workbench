@@ -8,7 +8,7 @@ const HTTPS = !!process.env.HTTPS
 
 module.exports = merge.smart(
   config.commonConfig,
-  config.chunkSplittingConfig,
+  // config.chunkSplittingConfig,
   config.reactConfig,
   {
     context: path.join(__dirname),

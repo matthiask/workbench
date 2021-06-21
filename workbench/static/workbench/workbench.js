@@ -94,14 +94,17 @@ $(function () {
         }
       })
     } else {
-      $.get(this.action + "?" + $(this).serialize(), function (
-        data /*,
+      $.get(
+        this.action + "?" + $(this).serialize(),
+        function (
+          data /*,
         status,
         jqXHR
         */
-      ) {
-        initModal(data)
-      })
+        ) {
+          initModal(data)
+        }
+      )
     }
     return false
   })

@@ -11,8 +11,6 @@
 <span id="projects-base-url" data-url="{% url 'projects_project_list' %}"></span>
 <script src="{% url 'javascript-catalog' %}"></script>
 {% if not TESTING %}
-  {% render_bundle "manifest" %}
-  {% render_bundle "vendors" %}
   {% render_bundle "timer" %}
 {% endif %}
 {% endblock %}

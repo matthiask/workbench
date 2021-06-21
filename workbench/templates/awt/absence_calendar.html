@@ -24,8 +24,6 @@
   {{ absences_data|json_script:'absences-data' }}
   <script src="{% url 'javascript-catalog' %}"></script>
   {% if not TESTING %}
-    {% render_bundle "manifest" %}
-    {% render_bundle "vendors" %}
     {% render_bundle "absences" %}
   {% endif %}
 {% endblock %}

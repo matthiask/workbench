@@ -21,8 +21,6 @@
   {{ planning_data|json_script:'planning-data' }}
   <script src="{% url 'javascript-catalog' %}"></script>
   {% if not TESTING %}
-    {% render_bundle "manifest" %}
-    {% render_bundle "vendors" %}
     {% render_bundle "planning" %}
   {% endif %}
 
