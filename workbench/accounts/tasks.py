@@ -72,16 +72,19 @@ def coffee_invites():
     # Generate $CANDIDATES candidate pairings
     candidates = [list(generate_pairings(users)) for _ in range(CANDIDATES)]
 
-    # Count how many pairs already occurred in the relevant comparison period
+    # Rate the candidates
     rated_candidates = sorted(
         (rating(candidate, previous), candidate) for candidate in candidates
     )
+
+    # Select the pairing with the best (lowest) rating
+    best_pairing = rated_candidates[0][1]
 
     # from pprint import pprint
     # pprint(previous)
     # pprint(rated_candidates)
 
-    for group, pairs in rated_candidates[0][1]:
+    for group, pairs in best_pairing:
         for pair in pairs:
             CoffeePairings.objects.create(users=pair)
         render_to_mail(
