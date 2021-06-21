@@ -8,12 +8,16 @@
 
 {% block body %}
   <table class="table table-striped">
-    {% for name, value in object|field_value_pairs:'project,offer,created_at,user,title,notes,milestone,service_type' %}
+    {% for name, value in object|field_value_pairs:'project,offer,created_at,user,title,milestone,service_type' %}
     <tr>
       <th class="text-right">{{ name }}</th>
       <td>{% link_or_none value %}</td>
     </tr>
     {% endfor %}
+    <tr>
+      <th class="text-right">{{ object|label:'notes' }}</th>
+      <td>{{ object.notes|urlize|linebreaksbr }}</td>
+    </tr>
     <tr>
       <th class="text-right">{{ object|label:'planned_hours' }}</th>
       <td>{{ object.pretty_planned_hours }}</td>
