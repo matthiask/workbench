@@ -80,12 +80,13 @@ class UserAdmin(UserAdmin):
         "_short_name",
         "_full_name",
         "is_active",
+        "is_admin",
         "working_time_model",
         "last_login",
         "person",
         "_features",
     )
-    list_filter = ("is_active", "working_time_model", FeatureFilter)
+    list_filter = ("is_active", "is_admin", "working_time_model", FeatureFilter)
     list_select_related = ["person__organization", "working_time_model"]
     fieldsets = add_fieldsets = [
         (
