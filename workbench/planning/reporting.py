@@ -49,8 +49,8 @@ class Planning:
         self._absences = defaultdict(lambda: [[] for i in weeks])
         self._milestones = defaultdict(lambda: defaultdict(list))
 
-    def add_planned_work(self, queryset):
-        for pw in queryset.filter(weeks__overlap=self.weeks).select_related(
+    def add_planned_work_and_milestones(self, planned_work_qs, milestones_qs=False):
+        for pw in planned_work_qs.filter(weeks__overlap=self.weeks).select_related(
             "user", "project__owned_by", "offer__project", "offer__owned_by"
         ):
             per_week = (pw.planned_hours / len(pw.weeks)).quantize(Z2)
@@ -96,6 +96,14 @@ class Planning:
 
             self._project_ids.add(pw.project.pk)
             self._user_ids.add(pw.user.id)
+
+        # hacky, add projects anyway if there are upcoming milestones
+        if milestones_qs:
+            for ms in milestones_qs.filter(
+                Q(date__lte=max(self.weeks)) & Q(date__gte=min(self.weeks))
+            ):
+                self._projects_offers[ms.project].update()
+                self._project_ids.add(ms.project.pk)
 
     def add_worked_hours(self, queryset):
         for row in (
@@ -258,27 +266,33 @@ order by ph.date
         }
 
     def _project_record(self, project, offers):
-        offers = sorted(
-            filter(
-                None,
-                (
-                    self._offer_record(offer, work_list)
-                    for offer, work_list in sorted(offers.items())
+        offers = (
+            sorted(
+                filter(
+                    None,
+                    (
+                        self._offer_record(offer, work_list)
+                        for offer, work_list in sorted(offers.items())
+                    ),
                 ),
-            ),
-            key=lambda row: (
-                row["offer"]["date_from"],
-                row["offer"]["date_until"],
-                -row["offer"]["planned_hours"],
-            ),
+                key=lambda row: (
+                    row["offer"]["date_from"],
+                    row["offer"]["date_until"],
+                    -row["offer"]["planned_hours"],
+                ),
+            )
+            if offers
+            else None
         )
 
-        if not offers:
-            return None
+        # if not offers:
+        #     return None
 
-        date_from = min(rec["offer"]["date_from"] for rec in offers)
-        date_until = max(rec["offer"]["date_until"] for rec in offers)
-        hours = sum(rec["offer"]["planned_hours"] for rec in offers)
+        date_from = min(rec["offer"]["date_from"] for rec in offers) if offers else None
+        date_until = (
+            max(rec["offer"]["date_until"] for rec in offers) if offers else None
+        )
+        hours = sum(rec["offer"]["planned_hours"] for rec in offers) if offers else 0
 
         milestones = [self._milestones[project][week] for week in self.weeks]
 
@@ -295,7 +309,9 @@ order by ph.date
                 "range": "{} – {}".format(
                     local_date_format(date_from, fmt="d.m."),
                     local_date_format(date_until, fmt="d.m."),
-                ),
+                )
+                if date_from and date_until
+                else None,
                 "planned_hours": hours,
                 "worked_hours": [
                     self._worked_hours[project.id][week] for week in self.weeks
@@ -461,7 +477,9 @@ on week=ph_week
                     row["project"]["date_from"],
                     row["project"]["date_until"],
                     -row["project"]["planned_hours"],
-                ),
+                )
+                if row["project"]["date_from"] and row["project"]["date_until"]
+                else (),
             ),
             "by_week": [self._by_week[week] for week in self.weeks],
             "absences": [
@@ -479,7 +497,12 @@ def user_planning(user, date_range):
     start, end = date_range
     weeks = list(takewhile(lambda x: x <= end, recurring(monday(start), "weekly")))
     planning = Planning(weeks=weeks, users=[user])
-    planning.add_planned_work(user.planned_work.select_related("service_type"))
+    planning.add_planned_work_and_milestones(
+        user.planned_work.select_related("service_type"),
+        Milestone.objects.filter(
+            Q(project__planned_work__user=user) | Q(project__owned_by=user)
+        ),
+    )
     planning.add_worked_hours(user.loggedhours.all())
     planning.add_absences(user.absences.all())
     planning.add_public_holidays()
@@ -491,8 +514,9 @@ def team_planning(team, date_range):
     start, end = date_range
     weeks = list(takewhile(lambda x: x <= end, recurring(monday(start), "weekly")))
     planning = Planning(weeks=weeks, users=list(team.members.active()))
-    planning.add_planned_work(
-        PlannedWork.objects.filter(user__teams=team).select_related("service_type")
+    planning.add_planned_work_and_milestones(
+        PlannedWork.objects.filter(user__teams=team).select_related("service_type"),
+        Milestone.objects.filter(project__planned_work__user__teams=team),
     )
     planning.add_worked_hours(LoggedHours.objects.filter(rendered_by__teams=team))
     planning.add_absences(Absence.objects.filter(user__teams=team))
@@ -534,7 +558,10 @@ SELECT MIN(week), MAX(week) FROM sq
         weeks = list(islice(recurring(monday() - dt.timedelta(days=14), "weekly"), 80))
 
     planning = Planning(weeks=weeks)
-    planning.add_planned_work(project.planned_work.select_related("service_type"))
+    planning.add_planned_work_and_milestones(
+        project.planned_work.select_related("service_type"),
+        project.milestones.select_related(),
+    )
     planning.add_worked_hours(LoggedHours.objects.all())
     planning.add_absences(Absence.objects.all())
     planning.add_public_holidays()
