@@ -49,7 +49,7 @@ class Planning:
         self._absences = defaultdict(lambda: [[] for i in weeks])
         self._milestones = defaultdict(lambda: defaultdict(list))
 
-    def add_planned_work_and_milestones(self, planned_work_qs, milestones_qs=False):
+    def add_planned_work_and_milestones(self, planned_work_qs, milestones_qs):
         for pw in planned_work_qs.filter(weeks__overlap=self.weeks).select_related(
             "user", "project__owned_by", "offer__project", "offer__owned_by"
         ):
