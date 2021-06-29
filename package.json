@@ -25,5 +25,9 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
     "url-loader": "^4.1.1"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "semi": false
   }
 }

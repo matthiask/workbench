@@ -315,9 +315,11 @@ function Project({ by_week, offers, project }) {
       >
         {project.range}
       </Cell>
-      <Cell row={row} column={4} className="planning--small text-right">
-        {fixed(project.planned_hours, 0)}h
-      </Cell>
+      {project.planned_hours > 0 && (
+        <Cell row={row} column={4} className="planning--small text-right">
+          {fixed(project.planned_hours, 0)}h
+        </Cell>
+      )}
       {by_week.map((hours, idx) => {
         hours = parseFloat(hours)
         if (!hours) return null
@@ -338,9 +340,7 @@ function Project({ by_week, offers, project }) {
       })}
       {project.worked_hours ? <WorkedHours project={project} /> : null}
       {project.milestones ? <Milestones project={project} /> : null}
-      {offers.map((offer, idx) => (
-        <Offer key={idx} {...offer} />
-      ))}
+      {offers && offers.map((offer, idx) => <Offer key={idx} {...offer} />)}
     </>
   )
 }
@@ -397,8 +397,6 @@ function Milestones({ project }) {
     <>
       {project.milestones.map((milestones, idx) => {
         if (!milestones.length) return null
-
-        console.log(milestones)
 
         while (milestones.length > rows) {
           ctx.next()

@@ -16,3 +16,4 @@ node_modules
 tmp
 dist
 *.egg-info
+.vscode
