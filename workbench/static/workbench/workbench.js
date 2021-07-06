@@ -226,8 +226,10 @@ $(function () {
       $(".navbar input[type=search]").focus().select()
     } else if (e.keyCode === 13) {
       doSubmit(e.target)
-    } else if (e.keyCode >= 49 && e.keyCode <= 57) {
-      const el = _sel('[data-number-shortcut="' + (e.keyCode - 48) + '"]')
+    } else if (e.keyCode >= 48 && e.keyCode <= 57) {
+      const el = _sel(
+        '[data-number-shortcut="' + ((e.keyCode - 38) % 10) + '"]'
+      )
       if (!el) return
       if (el.dataset.toggle == "ajaxmodal") {
         window.openModalFromUrl(el.href)

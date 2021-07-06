@@ -27,8 +27,9 @@ def create(request, *, viewname):
                     "title": h(project),
                     "url": "{}?{}".format(project.urls[viewname], params),
                     "attrs": 'data-toggle="ajaxmodal"',
+                    "shortcut": (idx + 1) % 10 if idx < 10 else None,
                 }
-                for project in request.user.active_projects
+                for idx, project in enumerate(request.user.active_projects)
             ],
         },
     )

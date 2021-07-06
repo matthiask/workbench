@@ -31,8 +31,13 @@ def select(request):
             "form": form,
             "title": _("Jump to project"),
             "links": [
-                {"title": h(project), "url": project.get_absolute_url(), "attrs": ""}
-                for project in request.user.active_projects
+                {
+                    "title": h(project),
+                    "url": project.get_absolute_url(),
+                    "attrs": "",
+                    "shortcut": (idx + 1) % 10 if idx < 10 else None,
+                }
+                for idx, project in enumerate(request.user.active_projects)
             ],
         },
     )

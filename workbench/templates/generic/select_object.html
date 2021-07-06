@@ -19,8 +19,8 @@
           {% if links %}
           <div class="list-group">
             {% for link in links %}
-            <a href="{{ link.url }}" class="list-group-item list-group-item-action" {{ link.attrs|safe }} data-number-shortcut="{{ forloop.counter }}">
-              {% if forloop.counter <= 9 %}<span class="badge badge-dark float-right mt-1">{{ forloop.counter }}</span>{% endif  %}
+            <a href="{{ link.url }}" class="list-group-item list-group-item-action" {{ link.attrs|safe }} data-number-shortcut="{{ link.shortcut }}">
+              {% if link.shortcut is not None %}<span class="badge badge-dark float-right mt-1">{{ link.shortcut }}</span>{% endif  %}
               {{ link.title }}
             </a>
             {% endfor %}
