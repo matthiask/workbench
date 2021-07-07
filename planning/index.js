@@ -341,6 +341,9 @@ function Project({ by_week, offers, project }) {
       {project.worked_hours ? <WorkedHours project={project} /> : null}
       {project.milestones ? <Milestones project={project} /> : null}
       {offers && offers.map((offer, idx) => <Offer key={idx} {...offer} />)}
+      {project.absences ? (
+        <ProjectAbsences absences={project.absences} />
+      ) : null}
     </>
   )
 }
@@ -611,6 +614,43 @@ function Absences({ absences }) {
       {absences.map((user, idx) => (
         <UserAbsences key={idx} user={user} />
       ))}
+    </>
+  )
+}
+
+function ProjectAbsences({ absences }) {
+  return (
+    <>
+      {absences.map((absence, i) => (
+        <ProjectUserAbsence key={i} absence={absence} />
+      ))}
+    </>
+  )
+}
+
+function ProjectUserAbsence({ absence }) {
+  const ctx = useContext(RowContext)
+  const row = ctx.next()
+
+  return (
+    <>
+      {findContiguousWeekRanges(absence.hours_per_week).map((range, idx) => {
+        return (
+          <Cell
+            key={idx}
+            row={row}
+            column={FIRST_DATA_COLUMN + range.start}
+            colspan={`span ${range.length}`}
+            className={`planning--range planning--small is-pw`}
+            tag="a"
+            href={absence.url}
+            data-toggle="ajaxmodal"
+            // title={absence.tooltip}
+          >
+            <span className="no-pr">{absence.user}</span>
+          </Cell>
+        )
+      })}
     </>
   )
 }

@@ -49,6 +49,8 @@ class Planning:
         self._absences = defaultdict(lambda: [[] for i in weeks])
         self._milestones = defaultdict(lambda: defaultdict(list))
 
+        self._project_absences = defaultdict(list)
+
     def add_planned_work_and_milestones(self, planned_work_qs, milestones_qs):
         for pw in planned_work_qs.filter(weeks__overlap=self.weeks).select_related(
             "user", "project__owned_by", "offer__project", "offer__owned_by"
@@ -93,6 +95,37 @@ class Planning:
                     ],
                 }
             )
+
+            absences_per_project = Absence.objects.filter(
+                Q(user=pw.user),
+                Q(starts_on__lte=max(pw.weeks)),
+                Q(ends_on__isnull=False, ends_on__gte=min(pw.weeks))
+                | Q(ends_on__isnull=True, starts_on__gte=min(pw.weeks)),
+            )
+
+            for a in absences_per_project:
+
+                date_from = monday(a.starts_on)
+                date_until = monday(a.ends_on or a.starts_on)
+
+                weeks = [week for week in self.weeks if date_from <= week <= date_until]
+
+                hours_per_week = a.days * pw.user.planning_hours_per_day / len(weeks)
+
+                self._project_absences[pw.project].append(
+                    {
+                        # "date_from": monday(a.starts_on),
+                        # "date_until": monday(a.ends_on or a.starts_on),
+                        # "hours": a.days * pw.user.planning_hours_per_day,
+                        "user": pw.user.get_short_name(),
+                        "reason": f"{a.get_reason_display()} - {a.description}",
+                        "url": a.urls["detail"],
+                        "hours_per_week": [
+                            hours_per_week.quantize(Z2) if week in weeks else Z1
+                            for week in self.weeks
+                        ],
+                    }
+                )
 
             self._project_ids.add(pw.project.pk)
             self._user_ids.add(pw.user.id)
@@ -294,6 +327,7 @@ order by ph.date
         )
         hours = sum(rec["offer"]["planned_hours"] for rec in offers) if offers else 0
 
+        absences = self._project_absences[project]
         milestones = [self._milestones[project][week] for week in self.weeks]
 
         return {
@@ -316,6 +350,7 @@ order by ph.date
                 "worked_hours": [
                     self._worked_hours[project.id][week] for week in self.weeks
                 ],
+                "absences": absences if any(absences) else None,
                 "milestones": milestones if any(milestones) else None,
             },
             "by_week": [
