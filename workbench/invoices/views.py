@@ -53,9 +53,13 @@ class InvoiceXLSXView(generic.DetailView):
         hours = defaultdict(list)
         cost = defaultdict(list)
 
-        for entry in LoggedHours.objects.filter(invoice_service__invoice=self.object):
+        for entry in LoggedHours.objects.filter(
+            invoice_service__invoice=self.object
+        ).reverse():
             hours[entry.invoice_service_id].append(entry)
-        for entry in LoggedCost.objects.filter(invoice_service__invoice=self.object):
+        for entry in LoggedCost.objects.filter(
+            invoice_service__invoice=self.object
+        ).reverse():
             cost[entry.invoice_service_id].append(entry)
 
         for service in self.object.services.all():
