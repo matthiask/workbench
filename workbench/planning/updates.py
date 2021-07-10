@@ -100,6 +100,10 @@ def updated(*, duration):
                             else _(
                                 "%(by)s changed work for you: %(title)s (%(hours)sh)"
                             )
+                            if action.action == "U"
+                            else _(
+                                "%(by)s deleted work for you: %(title)s (%(hours)sh)"
+                            )
                         )
                         % {
                             "by": by,

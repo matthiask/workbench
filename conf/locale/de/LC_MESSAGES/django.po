@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-18 16:55+0200\n"
+"POT-Creation-Date: 2021-07-10 09:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,6 +70,14 @@ msgstr "Geschäfte"
 #: workbench/accounts/features.py
 msgid "Allow managing the acquisition pipeline."
 msgstr "Erlaubt das Management der Akquise-Pipeline."
+
+#: workbench/accounts/features.py
+msgid "Expenses"
+msgstr "Spesen"
+
+#: workbench/accounts/features.py
+msgid "Personal expense tracking and reimbursement."
+msgstr "Spesenerfassung und -rückerstattung."
 
 #: workbench/accounts/features.py
 msgid "Foreign currencies for expenses"
@@ -234,6 +242,19 @@ msgstr "Team"
 #: workbench/templates/base.html
 msgid "teams"
 msgstr "Teams"
+
+#: workbench/accounts/models.py workbench/deals/models.py
+#: workbench/expenses/models.py workbench/expenses/views.py
+#: workbench/invoices/models.py workbench/logbook/models.py
+#: workbench/notes/models.py workbench/offers/models.py
+#: workbench/planning/models.py workbench/projects/models.py
+#: workbench/services/models.py workbench/timer/models.py
+msgid "created at"
+msgstr "Erstellt um"
+
+#: workbench/accounts/models.py
+msgid "coffee pairings"
+msgstr "Kaffee-Paare"
 
 #: workbench/accounts/reporting.py
 msgid "All others"
@@ -1382,15 +1403,6 @@ msgstr "Wahrscheinlichkeit"
 msgid "decision expected on"
 msgstr "Entscheidung erwartet am"
 
-#: workbench/deals/models.py workbench/expenses/models.py
-#: workbench/expenses/views.py workbench/invoices/models.py
-#: workbench/logbook/models.py workbench/notes/models.py
-#: workbench/offers/models.py workbench/planning/models.py
-#: workbench/projects/models.py workbench/services/models.py
-#: workbench/timer/models.py
-msgid "created at"
-msgstr "Erstellt um"
-
 #: workbench/deals/models.py
 msgid "closing notice"
 msgstr "Abschlussnotiz"
@@ -2534,6 +2546,11 @@ msgstr "%(by)s hat Arbeit für dich hinzugefügt: %(title)s (%(hours)sh)"
 #, python-format
 msgid "%(by)s changed work for you: %(title)s (%(hours)sh)"
 msgstr "%(by)s hat Arbeit für dich geändert: %(title)s (%(hours)sh)"
+
+#: workbench/planning/updates.py
+#, python-format
+msgid "%(by)s deleted work for you: %(title)s (%(hours)sh)"
+msgstr "%(by)s hat Arbeit für dich gelöscht: %(title)s (%(hours)sh)"
 
 #: workbench/projects/apps.py workbench/projects/models.py
 #: workbench/templates/base.html
