@@ -34,7 +34,7 @@ class Slice(dict):
             return Decimal(0)
         else:
             return None
-        return Decimal((seconds - 1) / 3600).quantize(Z1, rounding=ROUND_UP)
+        return Decimal(max(1, (seconds - 1)) / 3600).quantize(Z1, rounding=ROUND_UP)
 
     @property
     def hours_create_url(self):
