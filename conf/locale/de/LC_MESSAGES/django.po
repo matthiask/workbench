@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-12 12:09+0200\n"
+"POT-Creation-Date: 2021-07-13 11:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,8 +72,6 @@ msgid "Allow managing the acquisition pipeline."
 msgstr "Erlaubt das Management der Akquise-Pipeline."
 
 #: workbench/accounts/features.py
-#, fuzzy
-#| msgid "expenses"
 msgid "Expenses"
 msgstr "Spesen"
 
@@ -255,10 +253,8 @@ msgid "created at"
 msgstr "Erstellt um"
 
 #: workbench/accounts/models.py
-#, fuzzy
-#| msgid "Ignore warnings"
 msgid "coffee pairings"
-msgstr "Warnungen ignorieren"
+msgstr "Kafi Grüppchen"
 
 #: workbench/accounts/reporting.py
 msgid "All others"

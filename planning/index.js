@@ -703,21 +703,6 @@ function UserAbsences({ user }) {
         if (!absences.length) return null
 
         const hours = absences.reduce((a, b) => a + parseFloat(b[0]), 0)
-        // const tooltip = (
-        //   <div className="description-popup no-pr">
-        //     {absences.map(([hours, description, url], idx) => (
-        //       <p key={idx}>
-        //         {url ? (
-        //           <a key={url} href={url} data-toggle="ajaxmodal">
-        //             {fixed(hours, 0)}h: {description}
-        //           </a>
-        //         ) : (
-        //           `${fixed(hours, 0)}h: ${description}`
-        //         )}
-        //       </p>
-        //     ))}
-        //   </div>
-        // )
 
         return (
           <Cell
