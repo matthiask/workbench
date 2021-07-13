@@ -14,6 +14,7 @@
   --stripe4: #f9f9f9;
 
   --planning: #186662;
+  --absences: rgba(221, 255, 240, 0.8);
 
   min-width: min-content;
   position: relative;
@@ -67,7 +68,7 @@
     }
   }
   &.is-project-absence {
-    background-color: var(--stripe3);
+    background-color: var(--absences);
   }
 }
 
@@ -115,6 +116,10 @@
 
 .planning--this-week {
   background-color: #b0efe6;
+}
+
+.planning--absences {
+  background-color: var(--absences);
 }
 
 .planning--range {

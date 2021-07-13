@@ -634,21 +634,23 @@ function ProjectUserAbsence({ i, absence }) {
 
   return (
     <>
-      <div
-        style={{
-          gridRow: row,
-          gridColumn: `1 / -1`,
-        }}
-        className="planning--stripe3"
-      />
       {i === 0 && (
-        <Cell
-          row={row}
-          column={1}
-          className="planning--title is-project-absence"
-        >
-          {gettext("Absences")}
-        </Cell>
+        <>
+          <div
+            style={{
+              gridRow: row,
+              gridColumn: `1 / -1`,
+            }}
+            className="planning--absences"
+          />
+          <Cell
+            row={row}
+            column={1}
+            className="planning--title is-project-absence"
+          >
+            {gettext("Absences")}
+          </Cell>
+        </>
       )}
       {findContiguousWeekRanges(absence.hours_per_week).map((range, idx) => {
         return (
