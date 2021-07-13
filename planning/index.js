@@ -622,18 +622,34 @@ function ProjectAbsences({ absences }) {
   return (
     <>
       {absences.map((absence, i) => (
-        <ProjectUserAbsence key={i} absence={absence} />
+        <ProjectUserAbsence key={i} {...{ i }} absence={absence} />
       ))}
     </>
   )
 }
 
-function ProjectUserAbsence({ absence }) {
+function ProjectUserAbsence({ i, absence }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
   return (
     <>
+      <div
+        style={{
+          gridRow: row,
+          gridColumn: `1 / -1`,
+        }}
+        className="planning--stripe3"
+      />
+      {i === 0 && (
+        <Cell
+          row={row}
+          column={1}
+          className="planning--title is-project-absence"
+        >
+          {gettext("Absences")}
+        </Cell>
+      )}
       {findContiguousWeekRanges(absence.hours_per_week).map((range, idx) => {
         return (
           <Cell
@@ -641,17 +657,36 @@ function ProjectUserAbsence({ absence }) {
             row={row}
             column={FIRST_DATA_COLUMN + range.start}
             colspan={`span ${range.length}`}
-            className={`planning--range planning--small is-pw`}
+            className={`planning--range planning--small is-project-absence has-description-popup`}
             tag="a"
             href={absence.url}
             data-toggle="ajaxmodal"
-            // title={absence.tooltip}
           >
-            <span className="no-pr">{absence.user}</span>
+            <span className="no-pr">{absence.user.short_name}</span>
+            <AbsencesTooltip absences={[[absence.hours, absence.reason]]} />
           </Cell>
         )
       })}
     </>
+  )
+}
+
+const AbsencesTooltip = ({ absences }) => {
+  console.log(absences)
+  return (
+    <div className="description-popup no-pr">
+      {absences.map(([hours, description, url], idx) => (
+        <p key={idx}>
+          {url ? (
+            <a key={url} href={url} data-toggle="ajaxmodal">
+              {fixed(hours, 0)}h: {description}
+            </a>
+          ) : (
+            `${fixed(hours, 0)}h: ${description}`
+          )}
+        </p>
+      ))}
+    </div>
   )
 }
 
@@ -668,21 +703,21 @@ function UserAbsences({ user }) {
         if (!absences.length) return null
 
         const hours = absences.reduce((a, b) => a + parseFloat(b[0]), 0)
-        const tooltip = (
-          <div className="description-popup no-pr">
-            {absences.map(([hours, description, url], idx) => (
-              <p key={idx}>
-                {url ? (
-                  <a key={url} href={url} data-toggle="ajaxmodal">
-                    {fixed(hours, 0)}h: {description}
-                  </a>
-                ) : (
-                  `${fixed(hours, 0)}h: ${description}`
-                )}
-              </p>
-            ))}
-          </div>
-        )
+        // const tooltip = (
+        //   <div className="description-popup no-pr">
+        //     {absences.map(([hours, description, url], idx) => (
+        //       <p key={idx}>
+        //         {url ? (
+        //           <a key={url} href={url} data-toggle="ajaxmodal">
+        //             {fixed(hours, 0)}h: {description}
+        //           </a>
+        //         ) : (
+        //           `${fixed(hours, 0)}h: ${description}`
+        //         )}
+        //       </p>
+        //     ))}
+        //   </div>
+        // )
 
         return (
           <Cell
@@ -692,7 +727,7 @@ function UserAbsences({ user }) {
             className="planning--range planning--small is-absence has-description-popup"
           >
             {fixed(hours, 0)}
-            {tooltip}
+            <AbsencesTooltip {...{ absences }} />
           </Cell>
         )
       })}
