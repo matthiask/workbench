@@ -341,6 +341,7 @@ function Project({ by_week, offers, project }) {
       {project.worked_hours ? <WorkedHours project={project} /> : null}
       {project.milestones ? <Milestones project={project} /> : null}
       {offers && offers.map((offer, idx) => <Offer key={idx} {...offer} />)}
+      {console.log(project.absences)}
       {project.absences ? (
         <ProjectAbsences absences={project.absences} />
       ) : null}

@@ -109,18 +109,17 @@ class Planning:
                 date_until = monday(a.ends_on or a.starts_on)
 
                 weeks = [
-                    week for week in self._by_week if date_from <= week <= date_until
+                    week
+                    for week in pw.weeks
+                    if date_from <= week <= date_until and week in self.weeks
                 ]
 
-                if weeks:
-                    hours = a.days * pw.user.planning_hours_per_day
+                hours = a.days * pw.user.planning_hours_per_day
+                if len(weeks) > 0 and hours > 0:
                     hours_per_week = hours / len(weeks)
 
                     self._project_absences[pw.project].append(
                         {
-                            # "date_from": monday(a.starts_on),
-                            # "date_until": monday(a.ends_on or a.starts_on),
-                            # "hours": a.days * pw.user.planning_hours_per_day,
                             "user": {
                                 "name": str(pw.user),
                                 "short_name": pw.user.get_short_name(),
