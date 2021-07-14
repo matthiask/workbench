@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-13 11:09+0200\n"
+"POT-Creation-Date: 2021-07-10 09:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,7 +77,7 @@ msgstr "Spesen"
 
 #: workbench/accounts/features.py
 msgid "Personal expense tracking and reimbursement."
-msgstr ""
+msgstr "Spesenerfassung und -rückerstattung."
 
 #: workbench/accounts/features.py
 msgid "Foreign currencies for expenses"
@@ -254,7 +254,7 @@ msgstr "Erstellt um"
 
 #: workbench/accounts/models.py
 msgid "coffee pairings"
-msgstr "Kafi Grüppchen"
+msgstr "Kaffee-Paare"
 
 #: workbench/accounts/reporting.py
 msgid "All others"
@@ -2546,6 +2546,11 @@ msgstr "%(by)s hat Arbeit für dich hinzugefügt: %(title)s (%(hours)sh)"
 #, python-format
 msgid "%(by)s changed work for you: %(title)s (%(hours)sh)"
 msgstr "%(by)s hat Arbeit für dich geändert: %(title)s (%(hours)sh)"
+
+#: workbench/planning/updates.py
+#, python-format
+msgid "%(by)s deleted work for you: %(title)s (%(hours)sh)"
+msgstr "%(by)s hat Arbeit für dich gelöscht: %(title)s (%(hours)sh)"
 
 #: workbench/projects/apps.py workbench/projects/models.py
 #: workbench/templates/base.html

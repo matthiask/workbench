@@ -532,3 +532,19 @@ class TimestampsTest(TestCase):
         slices = Timestamp.objects.slices(user)
         self.assertEqual(len(slices), 1)
         self.assertEqual(slices[0].elapsed_hours, None)
+
+    def test_edge_cases(self):
+        """Edge cases for the elapsed_hours calculation"""
+        user = factories.UserFactory.create()
+        now = timezone.now()
+        user.timestamp_set.create(
+            type=Timestamp.STOP, created_at=now - dt.timedelta(seconds=720)
+        )
+        user.timestamp_set.create(type=Timestamp.STOP, created_at=now)
+        user.timestamp_set.create(type=Timestamp.STOP, created_at=now)
+
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(len(slices), 3)
+        self.assertEqual(slices[0].elapsed_hours, Decimal("0.0"))
+        self.assertEqual(slices[1].elapsed_hours, Decimal("0.2"))  # 720sec = 0.2
+        self.assertEqual(slices[2].elapsed_hours, Decimal("0.1"))  # 0sec = 0.1
