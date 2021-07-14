@@ -341,7 +341,6 @@ function Project({ by_week, offers, project }) {
       {project.worked_hours ? <WorkedHours project={project} /> : null}
       {project.milestones ? <Milestones project={project} /> : null}
       {offers && offers.map((offer, idx) => <Offer key={idx} {...offer} />)}
-      {console.log(project.absences)}
       {project.absences ? (
         <ProjectAbsences absences={project.absences} />
       ) : null}
@@ -620,53 +619,63 @@ function Absences({ absences }) {
 }
 
 function ProjectAbsences({ absences }) {
+  const ctx = useContext(RowContext)
+  const row = ctx.next()
   return (
     <>
-      {absences.map((absence, i) => (
-        <ProjectUserAbsence key={i} {...{ i }} absence={absence} />
-      ))}
+      <div
+        style={{
+          gridRow: row,
+          gridColumn: `1 / -1`,
+        }}
+        className="planning--absences"
+      />
+      <Cell row={row} column={1} className="planning--title is-project-absence">
+        {gettext("Concurrent absences")}
+      </Cell>
+      {absences.map((users, idx) =>
+        users.map((user, i) => (
+          <ProjectUserAbsence key={`${idx}-${i}`} user={user} />
+        ))
+      )}
     </>
   )
 }
 
-function ProjectUserAbsence({ i, absence }) {
+function ProjectUserAbsence({ user }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
+  const userAbsences = user[1].map(
+    (hours) => (hours[0] && hours[0][0]) || "0.0"
+  )
+
   return (
     <>
-      {i === 0 && (
-        <>
-          <div
-            style={{
-              gridRow: row,
-              gridColumn: `1 / -1`,
-            }}
-            className="planning--absences"
-          />
-          <Cell
-            row={row}
-            column={1}
-            className="planning--title is-project-absence"
-          >
-            {gettext("Absences")}
-          </Cell>
-        </>
-      )}
-      {findContiguousWeekRanges(absence.hours_per_week).map((range, idx) => {
+      <Cell
+        row={row}
+        column={1}
+        className="planning--small is-project-absence pl-3"
+      >
+        {user[0].name}
+      </Cell>
+      <Cell
+        row={row}
+        column={5}
+        className={`planning--small text-center no-pr`}
+      >
+        {user[0].short_name}
+      </Cell>
+      {findContiguousWeekRanges(userAbsences).map((range, idx) => {
         return (
           <Cell
             key={idx}
             row={row}
             column={FIRST_DATA_COLUMN + range.start}
             colspan={`span ${range.length}`}
-            className={`planning--range planning--small is-project-absence has-description-popup`}
-            tag="a"
-            href={absence.url}
-            data-toggle="ajaxmodal"
+            className={`planning--range planning--small is-project-absence`}
           >
-            <span className="no-pr">{absence.user.short_name}</span>
-            <AbsencesTooltip absences={[[absence.hours, absence.reason]]} />
+            <span className="no-pr">{user[0].short_name}</span>
           </Cell>
         )
       })}
@@ -675,7 +684,6 @@ function ProjectUserAbsence({ i, absence }) {
 }
 
 const AbsencesTooltip = ({ absences }) => {
-  console.log(absences)
   return (
     <div className="description-popup no-pr">
       {absences.map(([hours, description, url], idx) => (
