@@ -49,7 +49,6 @@ class Planning:
         self._absences = defaultdict(lambda: [[] for i in weeks])
         self._milestones = defaultdict(lambda: defaultdict(list))
 
-        self._project_absences_users = defaultdict(set)
         self._project_absences = defaultdict(
             lambda: defaultdict(lambda: [[] for i in weeks])
         )
@@ -119,8 +118,6 @@ class Planning:
 
                 hours = a.days * pw.user.planning_hours_per_day
                 if len(weeks) > 0 and hours > 0:
-                    self._project_absences_users[pw.project].add(pw.user)
-
                     for idx, week in weeks:
                         self._project_absences[pw.project][pw.user][idx].append(
                             (
