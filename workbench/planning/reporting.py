@@ -49,9 +49,8 @@ class Planning:
         self._absences = defaultdict(lambda: [[] for i in weeks])
         self._milestones = defaultdict(lambda: defaultdict(list))
 
-        self._project_absences = defaultdict(
-            lambda: defaultdict(lambda: [[] for i in weeks])
-        )
+        self._projects_users = defaultdict(set)
+        self._planned_users_by_week = defaultdict(lambda: [set() for i in weeks])
 
     def add_planned_work_and_milestones(self, planned_work_qs, milestones_qs):
         for pw in planned_work_qs.filter(weeks__overlap=self.weeks).select_related(
@@ -61,6 +60,14 @@ class Planning:
             for week in pw.weeks:
                 self._by_week[week] += per_week
                 self._by_project_and_week[pw.project][week] += per_week
+
+            hours_per_week = list()
+            for idx, week in enumerate(self.weeks):
+                if week in pw.weeks:
+                    self._planned_users_by_week[pw.project][idx].add(pw.user)
+                    hours_per_week.append(per_week)
+                else:
+                    hours_per_week.append(Z1)
 
             date_from = min(pw.weeks)
             date_until = max(pw.weeks) + dt.timedelta(days=6)
@@ -92,58 +99,11 @@ class Planning:
                             )
                         ),
                     },
-                    "hours_per_week": [
-                        per_week if week in pw.weeks else Z1 for week in self.weeks
-                    ],
+                    "hours_per_week": hours_per_week,
                 }
             )
 
-            absences_per_project = Absence.objects.filter(
-                Q(user=pw.user),
-                Q(starts_on__lte=max(pw.weeks)),
-                Q(ends_on__isnull=False, ends_on__gte=min(pw.weeks))
-                | Q(ends_on__isnull=True, starts_on__gte=min(pw.weeks)),
-            )
-
-            for a in absences_per_project:
-
-                date_from = monday(a.starts_on)
-                date_until = monday(a.ends_on or a.starts_on)
-
-                weeks = [
-                    (idx, week)
-                    for idx, week in enumerate(self.weeks)
-                    if date_from <= week <= date_until and week in pw.weeks
-                ]
-
-                hours = a.days * pw.user.planning_hours_per_day
-                if len(weeks) > 0 and hours > 0:
-                    for idx, week in weeks:
-                        self._project_absences[pw.project][pw.user][idx].append(
-                            (
-                                hours / len(weeks),
-                                f"{a.get_reason_display()}",
-                                a.urls["detail"],
-                            )
-                        )
-                    # self._absences_by_project_and_user[pw.project][pw.user].add(a)
-                    # hours_per_week = hours / len(weeks)
-
-                    # self._absences_per_project[pw.project].add(a)
-                    # self._project_absences[pw.project][a] = {
-                    #     "user": {
-                    #         "name": str(pw.user),
-                    #         "short_name": pw.user.get_short_name(),
-                    #     },
-                    #     "reason": f"{a.get_reason_display()} - {a.description}",
-                    #     "url": a.urls["detail"],
-                    #     "hours_per_week": [
-                    #         hours_per_week.quantize(Z2) if week in weeks else Z1
-                    #         for week in self.weeks
-                    #     ],
-                    #     "hours": hours,
-                    # }
-
+            self._projects_users[pw.project].add(pw.user)
             self._project_ids.add(pw.project.pk)
             self._user_ids.add(pw.user.id)
 
@@ -342,9 +302,22 @@ order by ph.date
         hours = sum(rec["offer"]["planned_hours"] for rec in offers) if offers else 0
 
         absences = [
-            ({"name": str(user), "short_name": user.get_short_name()}, lst)
-            for user, lst in sorted(self._project_absences[project].items())
+            a
+            for a in [
+                (
+                    {"name": str(user), "short_name": user.get_short_name()},
+                    [
+                        self._absences[user][idx] if user in users else []
+                        for idx, users in enumerate(
+                            self._planned_users_by_week[project]
+                        )
+                    ],
+                )
+                for user in self._projects_users[project]
+            ]
+            if any(a[1])
         ]
+
         milestones = [self._milestones[project][week] for week in self.weeks]
 
         if not offers and not any(milestones):
