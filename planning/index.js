@@ -644,8 +644,6 @@ function ProjectUserAbsence({ user }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
-  console.log(user)
-
   const userAbsences = user[1].map(
     (hours) => (hours[0] && hours[0][0]) || "0.0"
   )
