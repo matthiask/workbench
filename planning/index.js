@@ -633,11 +633,9 @@ function ProjectAbsences({ absences }) {
       <Cell row={row} column={1} className="planning--title is-project-absence">
         {gettext("Concurrent absences")}
       </Cell>
-      {absences.map((users, idx) =>
-        users.map((user, i) => (
-          <ProjectUserAbsence key={`${idx}-${i}`} user={user} />
-        ))
-      )}
+      {absences.map((user, idx) => (
+        <ProjectUserAbsence key={idx} user={user} />
+      ))}
     </>
   )
 }
@@ -645,6 +643,8 @@ function ProjectAbsences({ absences }) {
 function ProjectUserAbsence({ user }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
+
+  console.log(user)
 
   const userAbsences = user[1].map(
     (hours) => (hours[0] && hours[0][0]) || "0.0"

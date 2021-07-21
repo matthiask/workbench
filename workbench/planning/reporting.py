@@ -335,23 +335,20 @@ order by ph.date
             else None
         )
 
-        # if not offers:
-        #     return None
-
         date_from = min(rec["offer"]["date_from"] for rec in offers) if offers else None
         date_until = (
             max(rec["offer"]["date_until"] for rec in offers) if offers else None
         )
         hours = sum(rec["offer"]["planned_hours"] for rec in offers) if offers else 0
 
-        absences = (
-            [
-                ({"name": str(user), "short_name": user.get_short_name()}, lst)
-                for user, lst in sorted(self._project_absences[project].items())
-            ],
-        )
-        # absences = [self._absences[user][week] for week in self.weeks]
+        absences = [
+            ({"name": str(user), "short_name": user.get_short_name()}, lst)
+            for user, lst in sorted(self._project_absences[project].items())
+        ]
         milestones = [self._milestones[project][week] for week in self.weeks]
+
+        if not offers and not any(milestones):
+            return None
 
         return {
             "project": {
