@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-14 16:30+0200\n"
+"POT-Creation-Date: 2021-07-29 15:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -89,6 +89,10 @@ msgid "Description"
 msgstr "Beschreibung"
 
 #: conf/strings.js
+msgid "external works"
+msgstr "Externe Aufwände"
+
+#: conf/strings.js
 msgid "Go to the project"
 msgstr "Zum Projekt gehen"
 
@@ -101,7 +105,7 @@ msgid "Logged hours"
 msgstr "Erfasste Stunden"
 
 #: conf/strings.js
-msgid "Milestones"
+msgid "milestones"
 msgstr "Meilensteine"
 
 #: conf/strings.js

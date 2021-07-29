@@ -45,6 +45,12 @@ class Milestone(Model):
     date = models.DateField(_("date"))
     title = models.CharField(_("title"), max_length=200)
 
+    estimated_total_hours = HoursField(
+        _("planned hours"),
+        validators=[MinValueValidator(Decimal("0.0"))],
+        default=Decimal("0.0"),
+    )
+
     class Meta:
         ordering = ["date"]
         verbose_name = _("milestone")
@@ -54,22 +60,7 @@ class Milestone(Model):
         return f"{self.title} ({local_date_format(self.date, fmt='l, j.n.')})"
 
 
-@model_urls
-class PlannedWork(Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE,
-        verbose_name=_("project"),
-        related_name="planned_work",
-    )
-    offer = models.ForeignKey(
-        Offer,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-        verbose_name=_("offer"),
-        related_name="planned_work",
-    )
+class AbstractPlannedWork(Model):
     created_by = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
@@ -77,16 +68,6 @@ class PlannedWork(Model):
         related_name="+",
     )
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
-    user = models.ForeignKey(
-        User,
-        on_delete=models.PROTECT,
-        verbose_name=_("user"),
-        related_name="planned_work",
-    )
-    planned_hours = HoursField(
-        _("planned hours"), validators=[MinValueValidator(Decimal("0.1"))]
-    )
-    is_provisional = models.BooleanField(_("is provisional"), default=False)
     milestone = models.ForeignKey(
         Milestone,
         on_delete=models.SET_NULL,
@@ -107,12 +88,7 @@ class PlannedWork(Model):
     )
 
     class Meta:
-        ordering = ["-pk"]
-        verbose_name = _("planned work")
-        verbose_name_plural = _("planned work")
-
-    def __str__(self):
-        return "{} ({})".format(self.title, hours(self.planned_hours))
+        abstract = True
 
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
@@ -165,3 +141,58 @@ class PlannedWork(Model):
             "weeks": len(self.weeks),
             "per_week": hours(self.planned_hours / len(self.weeks)),
         }
+
+
+@model_urls
+class ExternalWork(AbstractPlannedWork):
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        verbose_name=_("project"),
+        related_name="external_work",
+    )
+    provided_by = models.CharField(_("provided by"), max_length=200)
+
+    class Meta:
+        ordering = ["-pk"]
+        verbose_name = _("external work")
+        verbose_name_plural = _("external work")
+
+    def __str__(self):
+        return "{}: {}".format(self.provided_by, self.title)
+
+
+@model_urls
+class PlannedWork(AbstractPlannedWork):
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        verbose_name=_("project"),
+        related_name="planned_work",
+    )
+    offer = models.ForeignKey(
+        Offer,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        verbose_name=_("offer"),
+        related_name="planned_work",
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        verbose_name=_("user"),
+        related_name="planned_work",
+    )
+    planned_hours = HoursField(
+        _("planned hours"), validators=[MinValueValidator(Decimal("0.1"))]
+    )
+    is_provisional = models.BooleanField(_("is provisional"), default=False)
+
+    class Meta:
+        ordering = ["-pk"]
+        verbose_name = _("planned work")
+        verbose_name_plural = _("planned work")
+
+    def __str__(self):
+        return "{} ({})".format(self.title, hours(self.planned_hours))

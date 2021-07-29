@@ -15,6 +15,8 @@
 
   --planning: #186662;
   --absences: rgba(221, 255, 240, 0.8);
+  --milestones: rgba(255, 200, 200, 0.3);
+  --external: rgba(240, 173, 78, 0.2);
 
   min-width: min-content;
   position: relative;
@@ -55,7 +57,10 @@
     background-color: var(--stripe1);
   }
   &.is-milestone {
-    background-color: var(--stripe1);
+    background-color: transparent;
+  }
+  &.is-external {
+    background-color: transparent;
   }
   &.is-offer {
     background-color: var(--stripe2);
@@ -120,6 +125,13 @@
 
 .planning--absences {
   background-color: var(--absences);
+}
+
+.planning--milestones {
+  background-color: var(--milestones);
+}
+.planning--external {
+  background-color: var(--external);
 }
 
 .planning--range {
