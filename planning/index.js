@@ -342,9 +342,9 @@ function Project({ by_week, offers, project, external_work }) {
       {project.milestones ? <Milestones project={project} /> : null}
       {external_work && <ExternalExpenses {...{ external_work }} />}
       {offers && offers.map((offer, idx) => <Offer key={idx} {...offer} />)}
-      {project.absences ? (
+      {/* {project.absences ? (
         <ProjectAbsences absences={project.absences} />
-      ) : null}
+      ) : null} */}
     </>
   )
 }
@@ -546,9 +546,10 @@ function Offer({ offer, work_list }) {
   )
 }
 
-function Work({ work, hours_per_week, isEven }) {
+function Work({ work, hours_per_week, absences, isEven }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
+
   return (
     <>
       {isEven ? (
@@ -631,6 +632,23 @@ function Work({ work, hours_per_week, isEven }) {
             <span className="no-pr">{work.text}</span>
           </Cell>
         ))}
+      {absences.length > 0 &&
+        absences.map((absence, idx) => {
+          if (absence.length > 0) {
+            console.log(absence)
+
+            return (
+              <Cell
+                key={idx}
+                row={row}
+                column={FIRST_DATA_COLUMN + idx}
+                className="planning--range planning--small is-absence-graphic has-description-popup"
+              >
+                <AbsencesTooltip absences={absence} />
+              </Cell>
+            )
+          }
+        })}
     </>
   )
 }
@@ -706,8 +724,6 @@ const ExternalWork = ({ idx, work }) => {
         ))}
     </>
   )
-
-  // return <Work key={work.id} {...{ work }} isEven={(1 + idx) % 2 === 0} />
 }
 
 function Absences({ absences }) {
@@ -734,68 +750,68 @@ function Absences({ absences }) {
   )
 }
 
-function ProjectAbsences({ absences }) {
-  const ctx = useContext(RowContext)
-  const row = ctx.next()
-  return (
-    <>
-      <div
-        style={{
-          gridRow: row,
-          gridColumn: `1 / -1`,
-        }}
-        className="planning--absences"
-      />
-      <Cell row={row} column={1} className="planning--title is-project-absence">
-        {gettext("Concurrent absences")}
-      </Cell>
-      {absences.map((user, idx) => (
-        <ProjectUserAbsence key={idx} user={user} />
-      ))}
-    </>
-  )
-}
+// function ProjectAbsences({ absences }) {
+//   const ctx = useContext(RowContext)
+//   const row = ctx.next()
+//   return (
+//     <>
+//       <div
+//         style={{
+//           gridRow: row,
+//           gridColumn: `1 / -1`,
+//         }}
+//         className="planning--absences"
+//       />
+//       <Cell row={row} column={1} className="planning--title is-project-absence">
+//         {gettext("Concurrent absences")}
+//       </Cell>
+//       {absences.map((user, idx) => (
+//         <ProjectUserAbsence key={idx} user={user} />
+//       ))}
+//     </>
+//   )
+// }
 
-function ProjectUserAbsence({ user }) {
-  const ctx = useContext(RowContext)
-  const row = ctx.next()
+// function ProjectUserAbsence({ user }) {
+//   const ctx = useContext(RowContext)
+//   const row = ctx.next()
 
-  const userAbsences = user[1].map(
-    (hours) => (hours[0] && hours[0][0]) || "0.0"
-  )
+//   const userAbsences = user[1].map(
+//     (hours) => (hours[0] && hours[0][0]) || "0.0"
+//   )
 
-  return (
-    <>
-      <Cell
-        row={row}
-        column={1}
-        className="planning--small is-project-absence pl-3"
-      >
-        {user[0].name}
-      </Cell>
-      <Cell
-        row={row}
-        column={5}
-        className={`planning--small text-center no-pr`}
-      >
-        {user[0].short_name}
-      </Cell>
-      {findContiguousWeekRanges(userAbsences).map((range, idx) => {
-        return (
-          <Cell
-            key={idx}
-            row={row}
-            column={FIRST_DATA_COLUMN + range.start}
-            colspan={`span ${range.length}`}
-            className={`planning--range planning--small is-project-absence`}
-          >
-            <span className="no-pr">{user[0].short_name}</span>
-          </Cell>
-        )
-      })}
-    </>
-  )
-}
+//   return (
+//     <>
+//       <Cell
+//         row={row}
+//         column={1}
+//         className="planning--small is-project-absence pl-3"
+//       >
+//         {user[0].name}
+//       </Cell>
+//       <Cell
+//         row={row}
+//         column={5}
+//         className={`planning--small text-center no-pr`}
+//       >
+//         {user[0].short_name}
+//       </Cell>
+//       {findContiguousWeekRanges(userAbsences).map((range, idx) => {
+//         return (
+//           <Cell
+//             key={idx}
+//             row={row}
+//             column={FIRST_DATA_COLUMN + range.start}
+//             colspan={`span ${range.length}`}
+//             className={`planning--range planning--small is-project-absence`}
+//           >
+//             <span className="no-pr">{user[0].short_name}</span>
+//           </Cell>
+//         )
+//       })}
+//     </>
+//   )
+// }
 
 const AbsencesTooltip = ({ absences }) => {
   return (

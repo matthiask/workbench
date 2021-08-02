@@ -52,7 +52,7 @@ class Planning:
         self._absences = defaultdict(lambda: [[] for i in weeks])
         self._milestones = defaultdict(lambda: defaultdict(defaultdict))
 
-        self._projects_users = defaultdict(set)
+        self._work_ids_users = defaultdict(set)
         self._planned_users_by_week = defaultdict(lambda: [set() for i in weeks])
 
     def add_planned_work_and_milestones(
@@ -73,7 +73,6 @@ class Planning:
             hours_per_week = list()
             for idx, week in enumerate(self.weeks):
                 if week in pw.weeks:
-                    self._planned_users_by_week[pw.project][idx].add(pw.user)
                     hours_per_week.append(per_week)
                 else:
                     hours_per_week.append(Z1)
@@ -112,7 +111,7 @@ class Planning:
                 }
             )
 
-            self._projects_users[pw.project].add(pw.user)
+            self._work_ids_users[pw.id].add(pw.user)
 
             self.add_project_milestone(pw.project, pw.milestone)
             self._project_ids.add(pw.project.pk)
@@ -317,6 +316,17 @@ order by ph.date
         if not work_list:
             return None
 
+        for wl in work_list:
+            wl.update(
+                {
+                    "absences": [
+                        [a for a in self._absences[user][idx] if h > 0]
+                        for idx, h in enumerate(wl["hours_per_week"])
+                    ]
+                    for user in self._work_ids_users[wl["work"]["id"]]
+                }
+            )
+
         return {
             "offer": {
                 "date_from": date_from,
@@ -373,24 +383,6 @@ order by ph.date
         )
         hours = sum(rec["offer"]["planned_hours"] for rec in offers) if offers else 0
 
-        # TODO: Too complex
-        absences = [
-            a
-            for a in [
-                (
-                    {"name": str(user), "short_name": user.get_short_name()},
-                    [
-                        self._absences[user][idx] if user in users else []
-                        for idx, users in enumerate(
-                            self._planned_users_by_week[project]
-                        )
-                    ],
-                )
-                for user in self._projects_users[project]
-            ]
-            if any(a[1])
-        ]
-
         milestones = sorted(
             self._milestones[project].values(),
             key=lambda v: v["weeks"].index(1) if 1 in v["weeks"] else 0,
@@ -425,7 +417,6 @@ order by ph.date
                 "worked_hours": [
                     self._worked_hours[project.id][week] for week in self.weeks
                 ],
-                "absences": absences if any(absences) else None,
                 "milestones": milestones if any(milestones) else None,
             },
             "by_week": [
