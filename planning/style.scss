@@ -154,6 +154,16 @@
     background-color: var(--pink);
   }
 
+  &.is-milestone-graphic {
+    width: 0px;
+    &::before {
+      content: "🌟";
+      position: absolute;
+      left: -0.25rem;
+      bottom: 0;
+    }
+  }
+
   &.is-total {
     background-color: var(--purple);
   }

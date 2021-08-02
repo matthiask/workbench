@@ -45,6 +45,10 @@ class Milestone(Model):
     date = models.DateField(_("date"))
     title = models.CharField(_("title"), max_length=200)
 
+    phase_starts_on = models.DateField(
+        _("succeeds a phase and starts on"), blank=True, null=True
+    )
+
     estimated_total_hours = HoursField(
         _("planned hours"),
         validators=[MinValueValidator(Decimal("0.0"))],

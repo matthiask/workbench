@@ -385,12 +385,18 @@ function WorkedHours({ project }) {
   )
 }
 
-function weekdayToGradient(weekday, weekspan) {
-  const width = 8 / weekspan
-  const start =
-    (100 * (weekspan - 1) * 7 + (100 - width) * (weekday - 1)) / (weekspan * 7)
-  const end = start + width
-  return `linear-gradient(to right, transparent ${start}%, rgb(255, 200, 200) ${start}%, rgb(255, 200, 200) ${end}%, transparent ${end}%)`
+// function weekdayToGradient(weekday, weekspan) {
+//   const width = 8 / weekspan
+//   const start =
+//     (100 * (weekspan - 1) * 7 + (100 - width) * (weekday - 1)) / (weekspan * 7)
+//   const end = start + width
+//   return `linear-gradient(to right, transparent ${start}%, rgb(255, 200, 200) ${start}%, rgb(255, 200, 200) ${end}%, transparent ${end}%)`
+// }
+
+const weekdayBackgroundPosition = (weekday) => {
+  const width = 12
+  const start = Math.floor(((100 - width) * (weekday - 1)) / 7)
+  return `${start}%`
 }
 
 const Milestones = ({ project }) => {
@@ -456,8 +462,22 @@ const Milestones = ({ project }) => {
                   column={FIRST_DATA_COLUMN + range.start}
                   colspan={`span ${range.length}`}
                   className={`planning--range planning--small is-milestone`}
+                  tag="a"
+                  href={m.url}
+                  data-toggle="ajaxmodal"
+                  title={`${m.title} (${m.dow})`}
+                />
+              ))}
+            {m.graphical_weeks &&
+              findContiguousWeekRanges(m.graphical_weeks).map((range, idx) => (
+                <Cell
+                  key={idx}
+                  row={row}
+                  column={FIRST_DATA_COLUMN + range.start}
+                  colspan={`span ${range.length}`}
+                  className={`planning--range planning--small is-milestone-graphic`}
                   style={{
-                    backgroundImage: weekdayToGradient(m.weekday, range.length),
+                    left: weekdayBackgroundPosition(m.weekday),
                   }}
                   tag="a"
                   href={m.url}

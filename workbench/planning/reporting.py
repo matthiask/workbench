@@ -114,7 +114,7 @@ class Planning:
 
             self._projects_users[pw.project].add(pw.user)
 
-            self.add_project_milestone(pw.project, pw.milestone, date_from)
+            self.add_project_milestone(pw.project, pw.milestone)
             self._project_ids.add(pw.project.pk)
             self._user_ids.add(pw.user.id)
 
@@ -144,7 +144,7 @@ class Planning:
                     }
                 )
 
-                self.add_project_milestone(ew.project, ew.milestone, date_from)
+                self.add_project_milestone(ew.project, ew.milestone)
                 self._project_ids.add(ew.project.pk)
 
         # TODO: hacky, add projects anyway if there are upcoming milestones.
@@ -156,11 +156,22 @@ class Planning:
                 self._projects_offers[ms.project].update()
                 self._project_ids.add(ms.project.pk)
 
-    def add_project_milestone(self, project, milestone, date_from):
-        if milestone and (
-            not self._milestones[project][milestone]
-            or self._milestones[project][milestone]["date_from"] > date_from
-        ):
+    def add_project_milestone(self, project, milestone):
+        if milestone and (not self._milestones[project][milestone]):
+
+            start = (
+                milestone.phase_starts_on
+                if milestone.phase_starts_on
+                else milestone.date
+            )
+            weeks = [
+                1 if monday(start) <= w <= monday(milestone.date) else 0
+                for w in self.weeks
+            ]
+            graphical_weeks = [
+                1 if monday(milestone.date) == w else 0 for w in self.weeks
+            ]
+
             self._milestones[project][milestone].update(
                 {
                     "id": milestone.id,
@@ -168,16 +179,17 @@ class Planning:
                     "dow": local_date_format(milestone.date, fmt="l, j.n."),
                     "date": local_date_format(milestone.date, fmt="j."),
                     "range": "{} – {}".format(
-                        local_date_format(date_from, fmt="d.m."),
+                        local_date_format(start, fmt="d.m."),
                         local_date_format(milestone.date, fmt="d.m."),
-                    ),
+                    )
+                    if milestone.phase_starts_on
+                    else None,
                     "hours": milestone.estimated_total_hours,
-                    "date_from": date_from,
+                    "phase_starts_on": start if milestone.phase_starts_on else None,
                     "weekday": milestone.date.isocalendar()[2],
                     "url": milestone.urls["detail"],
-                    "weeks": [
-                        1 if date_from <= w <= milestone.date else 0 for w in self.weeks
-                    ],
+                    "weeks": weeks,
+                    "graphical_weeks": graphical_weeks,
                 }
             )
 
@@ -295,9 +307,7 @@ order by ph.date
             & Q(date__gte=min(self.weeks))
         ).select_related("project"):
             if not self._milestones[milestone.project][milestone]:
-                self.add_project_milestone(
-                    milestone.project, milestone, monday(milestone.date)
-                )
+                self.add_project_milestone(milestone.project, milestone)
 
     def _offer_record(self, offer, work_list):
         date_from = min(pw["work"]["date_from"] for pw in work_list)
