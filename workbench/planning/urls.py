@@ -4,6 +4,7 @@ from workbench import generic
 from workbench.logbook.views import create
 from workbench.planning.forms import (
     ExternalWorkForm,
+    ExternalWorkSearchForm,
     MilestoneForm,
     MilestoneSearchForm,
     PlannedWorkForm,
@@ -98,13 +99,13 @@ urlpatterns = [
         name="planning_plannedwork_delete",
     ),
     # External
-    # path(
-    #     "externalwork/",
-    #     generic.ListView.as_view(
-    #         model=ExternalWork, search_form_class=ExternalWorkSearchForm
-    #     ),
-    #     name="planning_externalwork_list",
-    # ),
+    path(
+        "externalwork/",
+        generic.ListView.as_view(
+            model=ExternalWork, search_form_class=ExternalWorkSearchForm
+        ),
+        name="planning_externalwork_list",
+    ),
     path(
         "externalwork/<int:pk>/",
         generic.DetailView.as_view(model=ExternalWork),

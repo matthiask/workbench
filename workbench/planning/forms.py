@@ -8,6 +8,7 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
+from workbench.contacts.models import Organization
 from workbench.invoices.utils import recurring
 from workbench.planning.models import ExternalWork, Milestone, PlannedWork
 from workbench.projects.models import Project
@@ -249,6 +250,32 @@ class PlannedWorkForm(ModelForm):
     @property
     def this_monday(self):
         return monday()
+
+
+class ExternalWorkSearchForm(Form):
+    project = forms.ModelChoiceField(
+        queryset=Project.objects.all(),
+        required=False,
+        widget=Autocomplete(model=Project),
+        label="",
+    )
+    provided_by = forms.ModelChoiceField(
+        queryset=Organization.objects.all(),
+        required=False,
+        widget=Autocomplete(model=Organization),
+        label="",
+    )
+
+    def filter(self, queryset):
+        data = self.cleaned_data
+        if data.get("project"):
+            queryset = queryset.filter(project=data.get("project"))
+        return queryset.select_related(
+            "provided_by",
+            "project__owned_by",
+            "project__customer",
+            "project__contact__organization",
+        )
 
 
 @add_prefix("modal")

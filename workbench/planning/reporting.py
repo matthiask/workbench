@@ -126,7 +126,7 @@ class Planning:
 
         if external_work_qs:
             for ew in external_work_qs.filter(weeks__overlap=self.weeks).select_related(
-                "milestone"
+                "milestone", "provided_by"
             ):
 
                 date_from = min(ew.weeks)
@@ -136,7 +136,7 @@ class Planning:
                     {
                         "id": ew.id,
                         "title": ew.title,
-                        "provided_by": ew.provided_by,
+                        "provided_by": ew.provided_by.name,
                         "url": ew.get_absolute_url(),
                         "date_from": date_from,
                         "date_until": date_until,

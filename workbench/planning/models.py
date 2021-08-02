@@ -11,6 +11,8 @@ from workbench.accounts.models import User
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.services.models import ServiceType
+from workbench.contacts.models import Organization
+
 from workbench.tools.formats import hours, local_date_format
 from workbench.tools.models import HoursField, Model
 from workbench.tools.urls import model_urls
@@ -45,9 +47,7 @@ class Milestone(Model):
     date = models.DateField(_("date"))
     title = models.CharField(_("title"), max_length=200)
 
-    phase_starts_on = models.DateField(
-        _("succeeds a phase and starts on"), blank=True, null=True
-    )
+    phase_starts_on = models.DateField(_("phase starts on"), blank=True, null=True)
 
     estimated_total_hours = HoursField(
         _("planned hours"),
@@ -155,7 +155,12 @@ class ExternalWork(AbstractPlannedWork):
         verbose_name=_("project"),
         related_name="external_work",
     )
-    provided_by = models.CharField(_("provided by"), max_length=200)
+    provided_by = models.ForeignKey(
+        Organization,
+        on_delete=models.CASCADE,
+        verbose_name=_("provided by"),
+        related_name="external_work",
+    )
 
     class Meta:
         ordering = ["-pk"]
@@ -163,7 +168,7 @@ class ExternalWork(AbstractPlannedWork):
         verbose_name_plural = _("external work")
 
     def __str__(self):
-        return "{}: {}".format(self.provided_by, self.title)
+        return "{} ({})".format(self.title, self.provided_by)
 
 
 @model_urls

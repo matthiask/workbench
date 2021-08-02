@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-29 15:54+0200\n"
+"POT-Creation-Date: 2021-08-02 19:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -103,6 +103,7 @@ msgstr ""
 #: workbench/accounts/features.py workbench/planning/apps.py
 #: workbench/templates/accounts/team_detail.html workbench/templates/base.html
 #: workbench/templates/planning/project_planning.html
+#: workbench/templates/planning/project_planning_external.html
 #: workbench/templates/planning/team_planning.html
 #: workbench/templates/planning/user_planning.html
 #: workbench/templates/projects/project_detail.html
@@ -2481,6 +2482,10 @@ msgid "public holidays"
 msgstr "öffentliche Feiertage"
 
 #: workbench/planning/models.py
+msgid "phase starts on"
+msgstr "Phase startet am"
+
+#: workbench/planning/models.py
 msgid "planned hours"
 msgstr "geplante Stunden"
 
@@ -3446,6 +3451,14 @@ msgstr "Geschichte der geplanten Arbeit"
 #: workbench/templates/planning/project_planning.html
 msgid "History of milestones"
 msgstr "Geschichte der Meilensteine"
+
+#: workbench/templates/planning/project_planning.html
+msgid "External planning view"
+msgstr "Externe Planungsansicht"
+
+#: workbench/templates/planning/project_planning_external.html
+msgid "back to project planning"
+msgstr "Zurück zum Projektplan"
 
 #: workbench/templates/planning/updates_mail.txt
 msgid "Planning updates"

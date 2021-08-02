@@ -157,7 +157,7 @@
   &.is-milestone-graphic {
     width: 0px;
     &::before {
-      content: "🌟";
+      content: "🌟"; // maybe too fancy, but i like it
       position: absolute;
       left: -0.25rem;
       bottom: 0;
