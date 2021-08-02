@@ -118,35 +118,37 @@ class Planning:
             self._project_ids.add(pw.project.pk)
             self._user_ids.add(pw.user.id)
 
-        for ew in external_work_qs.filter(weeks__overlap=self.weeks).select_related(
-            "milestone"
-        ):
+        if external_work_qs:
+            for ew in external_work_qs.filter(weeks__overlap=self.weeks).select_related(
+                "milestone"
+            ):
 
-            date_from = min(ew.weeks)
-            date_until = max(ew.weeks) + dt.timedelta(days=6)
+                date_from = min(ew.weeks)
+                date_until = max(ew.weeks) + dt.timedelta(days=6)
 
-            self._projects_external_work[ew.project].append(
-                {
-                    "id": ew.id,
-                    "title": ew.title,
-                    "provided_by": ew.provided_by,
-                    "url": ew.get_absolute_url(),
-                    "date_from": date_from,
-                    "date_until": date_until,
-                    "range": "{} – {}".format(
-                        local_date_format(date_from, fmt="d.m."),
-                        local_date_format(date_until, fmt="d.m."),
-                    ),
-                    "service_type_id": ew.service_type_id,
-                    "tooltip": str(ew.service_type) if ew.service_type else None,
-                    "by_week": [1 if w in ew.weeks else 0 for w in self.weeks],
-                }
-            )
+                self._projects_external_work[ew.project].append(
+                    {
+                        "id": ew.id,
+                        "title": ew.title,
+                        "provided_by": ew.provided_by,
+                        "url": ew.get_absolute_url(),
+                        "date_from": date_from,
+                        "date_until": date_until,
+                        "range": "{} – {}".format(
+                            local_date_format(date_from, fmt="d.m."),
+                            local_date_format(date_until, fmt="d.m."),
+                        ),
+                        "service_type_id": ew.service_type_id,
+                        "tooltip": str(ew.service_type) if ew.service_type else None,
+                        "by_week": [1 if w in ew.weeks else 0 for w in self.weeks],
+                    }
+                )
 
-            self.add_project_milestone(ew.project, ew.milestone, date_from)
-            self._project_ids.add(ew.project.pk)
+                self.add_project_milestone(ew.project, ew.milestone, date_from)
+                self._project_ids.add(ew.project.pk)
 
-        # hacky, add projects anyway if there are upcoming milestones
+        # TODO: hacky, add projects anyway if there are upcoming milestones.
+        # There must be a better way.
         if milestones_qs:
             for ms in milestones_qs.filter(
                 Q(date__lte=max(self.weeks)) & Q(date__gte=min(self.weeks))
@@ -287,9 +289,11 @@ order by ph.date
             self._by_week[week] += ph_hours
 
     def add_milestones(self, queryset):
-        for milestone in queryset.filter(project__in=self._project_ids).select_related(
-            "project"
-        ):
+        for milestone in queryset.filter(
+            Q(project__in=self._project_ids)
+            & Q(date__lte=max(self.weeks))
+            & Q(date__gte=min(self.weeks))
+        ).select_related("project"):
             if not self._milestones[milestone.project][milestone]:
                 self.add_project_milestone(
                     milestone.project, milestone, monday(milestone.date)
@@ -359,6 +363,7 @@ order by ph.date
         )
         hours = sum(rec["offer"]["planned_hours"] for rec in offers) if offers else 0
 
+        # TODO: Too complex
         absences = [
             a
             for a in [
@@ -416,7 +421,7 @@ order by ph.date
             "by_week": [
                 self._by_project_and_week[project][week] for week in self.weeks
             ],
-            "external_work": external_work,
+            "external_work": external_work if any(external_work) else None,
             "offers": offers,
         }
 
