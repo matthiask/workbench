@@ -132,13 +132,22 @@ function Planning({ data }) {
           </Cell>
         ))}
 
-        <TotalByWeek
-          by_week={data.by_week}
-          title={gettext("Planned hours per week")}
-        />
-        {data.capacity && <Capacity {...data.capacity} />}
+        {data.external_view || (
+          <>
+            <TotalByWeek
+              by_week={data.by_week}
+              title={gettext("Planned hours per week")}
+            />
+            {data.capacity && <Capacity {...data.capacity} />}
+          </>
+        )}
+
         {data.projects_offers.map((project) => (
-          <Project key={project.project.id} {...project} />
+          <Project
+            key={project.project.id}
+            {...project}
+            external_view={data.external_view}
+          />
         ))}
 
         <Absences absences={data.absences} />
@@ -250,7 +259,7 @@ function UserCapacity({ user, capacity }) {
   )
 }
 
-function Project({ by_week, offers, project, external_work }) {
+function Project({ by_week, offers, project, external_view, external_work }) {
   const ctx = useContext(RowContext)
   ctx.next() // Skip one row
   const row = ctx.next()
@@ -278,35 +287,37 @@ function Project({ by_week, offers, project, external_work }) {
           {project.is_closed ? <> {gettext("(closed)")}</> : ""}
         </a>
       </Cell>
-      <Cell
-        row={row}
-        column={2}
-        style={{ color: "var(--primary)" }}
-        className="no-pr"
-      >
-        <a
-          className="planning--add-pw"
-          data-toggle="ajaxmodal"
-          title={gettext("Add planned work")}
-          href={project.creatework}
+      {external_view || (
+        <Cell
+          row={row}
+          column={2}
+          style={{ color: "var(--primary)" }}
+          className="no-pr"
         >
-          +
-        </a>{" "}
-        <a href={project.planning}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="15"
-            height="16"
-            viewBox="0 0 15 16"
+          <a
+            className="planning--add-pw"
+            data-toggle="ajaxmodal"
+            title={gettext("Add planned work")}
+            href={project.creatework}
           >
-            <path
-              fill="currentColor"
-              fillRule="evenodd"
-              d="M10 12h3V2h-3v10zm-4-2h3V2H6v8zm-4 4h3V2H2v12zm-1 1h13V1H1v14zM14 0H1a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1z"
-            />
-          </svg>
-        </a>
-      </Cell>
+            +
+          </a>{" "}
+          <a href={project.planning}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="16"
+              viewBox="0 0 15 16"
+            >
+              <path
+                fill="currentColor"
+                fillRule="evenodd"
+                d="M10 12h3V2h-3v10zm-4-2h3V2H6v8zm-4 4h3V2H2v12zm-1 1h13V1H1v14zM14 0H1a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1z"
+              />
+            </svg>
+          </a>
+        </Cell>
+      )}
       <Cell
         row={row}
         column={3}
@@ -315,33 +326,38 @@ function Project({ by_week, offers, project, external_work }) {
       >
         {project.range}
       </Cell>
-      {project.planned_hours > 0 && (
+      {external_view || (
         <Cell row={row} column={4} className="planning--small text-right">
           {fixed(project.planned_hours, 0)}h
         </Cell>
       )}
-      {by_week.map((hours, idx) => {
-        hours = parseFloat(hours)
-        if (!hours) return null
+      {external_view ||
+        by_week.map((hours, idx) => {
+          hours = parseFloat(hours)
+          if (!hours) return null
 
-        return (
-          <Cell
-            key={idx}
-            row={row}
-            column={FIRST_DATA_COLUMN + idx}
-            className="planning--range planning--small is-project"
-            style={{
-              opacity: opacityClamp(0.3 + hours / 20),
-            }}
-          >
-            {hours.toFixed(1)}
-          </Cell>
-        )
-      })}
-      {project.worked_hours ? <WorkedHours project={project} /> : null}
+          return (
+            <Cell
+              key={idx}
+              row={row}
+              column={FIRST_DATA_COLUMN + idx}
+              className="planning--range planning--small is-project"
+              style={{
+                opacity: opacityClamp(0.3 + hours / 20),
+              }}
+            >
+              {hours.toFixed(1)}
+            </Cell>
+          )
+        })}
+      {external_view ||
+        (project.worked_hours && <WorkedHours project={project} />)}
       {project.milestones ? <Milestones project={project} /> : null}
       {external_work && <ExternalExpenses {...{ external_work }} />}
-      {offers && offers.map((offer, idx) => <Offer key={idx} {...offer} />)}
+      {offers &&
+        offers.map((offer, idx) => (
+          <Offer key={idx} {...offer} external_view={external_view} />
+        ))}
       {/* {project.absences ? (
         <ProjectAbsences absences={project.absences} />
       ) : null} */}
@@ -492,7 +508,7 @@ const Milestones = ({ project }) => {
   )
 }
 
-function Offer({ offer, work_list }) {
+function Offer({ offer, external_view, work_list }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
@@ -536,9 +552,11 @@ function Offer({ offer, work_list }) {
       >
         {offer.range}
       </Cell>
-      <Cell row={row} column={4} className="planning--small text-right">
-        {fixed(offer.planned_hours, 0)}h
-      </Cell>
+      {external_view || (
+        <Cell row={row} column={4} className="planning--small text-right">
+          {fixed(offer.planned_hours, 0)}h
+        </Cell>
+      )}
       {work_list.map((work, idx) => (
         <Work key={work.work.id} {...work} isEven={(1 + idx) % 2 === 0} />
       ))}
@@ -587,9 +605,15 @@ function Work({ work, hours_per_week, absences, isEven }) {
       >
         {work.range}
       </Cell>
-      <Cell row={row} column={4} className={`planning--small text-right is-pr`}>
-        {`${fixed(work.planned_hours, 0)}h`}
-      </Cell>
+      {work.planned_hours > 0 && (
+        <Cell
+          row={row}
+          column={4}
+          className={`planning--small text-right is-pr`}
+        >
+          {`${fixed(work.planned_hours, 0)}h`}
+        </Cell>
+      )}
       <Cell
         row={row}
         column={5}
@@ -635,8 +659,6 @@ function Work({ work, hours_per_week, absences, isEven }) {
       {absences.length > 0 &&
         absences.map((absence, idx) => {
           if (absence.length > 0) {
-            console.log(absence)
-
             return (
               <Cell
                 key={idx}

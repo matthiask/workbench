@@ -186,13 +186,12 @@
   }
 
   &.is-absence-graphic {
-    // height: 50%;
     background-image: repeating-linear-gradient(
-      -125deg,
+      -145deg,
       var(--st-color, var(--blue)) 0,
-      var(--st-color, var(--blue)) 5px,
-      transparent 5px,
-      transparent 8px
+      var(--st-color, var(--blue)) 50%,
+      transparent 50%,
+      transparent 100%
     );
   }
 

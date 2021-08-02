@@ -19,6 +19,19 @@ def project_planning(request, pk):
     )
 
 
+def project_planning_external(request, pk):
+    instance = get_object_or_404(Project.objects.all(), pk=pk)
+    return render(
+        request,
+        "planning/project_planning_external.html",
+        {
+            "object": instance,
+            "project": instance,
+            "planning_data": reporting.project_planning_external(instance),
+        },
+    )
+
+
 def user_planning(request, pk, retro=False):
     instance = get_object_or_404(User.objects.active(), pk=pk)
     date_range = [in_days(-180), in_days(14)] if retro else [in_days(-14), in_days(400)]

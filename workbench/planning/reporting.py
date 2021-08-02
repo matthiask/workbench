@@ -34,9 +34,11 @@ def _period(weeks, min, max):
 
 
 class Planning:
-    def __init__(self, *, weeks, users=None):
+    def __init__(self, *, external_view=False, weeks, users=None):
         self.weeks = weeks
         self.users = users
+
+        self.external = external_view
 
         self._by_week = defaultdict(lambda: Z1)
         self._by_project_and_week = defaultdict(lambda: defaultdict(lambda: Z1))
@@ -56,8 +58,13 @@ class Planning:
         self._planned_users_by_week = defaultdict(lambda: [set() for i in weeks])
 
     def add_planned_work_and_milestones(
-        self, planned_work_qs, milestones_qs, external_work_qs=None
+        self,
+        planned_work_qs,
+        milestones_qs,
+        external_work_qs=None,
     ):
+        if self.external:
+            planned_work_qs = planned_work_qs.filter(milestone__isnull=False)
         for pw in planned_work_qs.filter(weeks__overlap=self.weeks).select_related(
             "user",
             "project__owned_by",
@@ -87,7 +94,7 @@ class Planning:
                         "title": pw.title,
                         "text": pw.user.get_short_name(),
                         "user": pw.user.get_short_name(),
-                        "planned_hours": pw.planned_hours,
+                        "planned_hours": pw.planned_hours if not self.external else 0,
                         "url": pw.get_absolute_url(),
                         "date_from": date_from,
                         "date_until": date_until,
@@ -592,6 +599,7 @@ on week=ph_week
                 {"id": type.id, "title": type.title, "color": type.color}
                 for type in ServiceType.objects.all()
             ],
+            "external_view": self.external,
         }
 
 
@@ -627,7 +635,7 @@ def team_planning(team, date_range):
     return planning.report()
 
 
-def project_planning(project):
+def project_planning(project, external_view=False):
     with connections["default"].cursor() as cursor:
         cursor.execute(
             """\
@@ -659,17 +667,22 @@ SELECT MIN(week), MAX(week) FROM sq
     else:
         weeks = list(islice(recurring(monday() - dt.timedelta(days=14), "weekly"), 80))
 
-    planning = Planning(weeks=weeks)
+    planning = Planning(external_view=external_view, weeks=weeks)
     planning.add_planned_work_and_milestones(
         project.planned_work.select_related("service_type"),
         project.milestones,
         project.external_work.select_related("service_type"),
     )
-    planning.add_worked_hours(LoggedHours.objects.all())
+    if not external_view:
+        planning.add_worked_hours(LoggedHours.objects.all())
     planning.add_absences(Absence.objects.all())
     planning.add_public_holidays()
     planning.add_milestones(Milestone.objects.all())
     return planning.report()
+
+
+def project_planning_external(project):
+    return project_planning(project, True)
 
 
 def planning_vs_logbook(date_range, *, users):
