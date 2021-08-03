@@ -186,12 +186,11 @@
   }
 
   &.is-absence-graphic {
-    background-image: repeating-linear-gradient(
-      -145deg,
-      var(--st-color, var(--blue)) 0,
+    width: 50%;
+    background: linear-gradient(
+      0.33turn,
       var(--st-color, var(--blue)) 50%,
-      transparent 50%,
-      transparent 100%
+      rgba(20, 132, 80, 0) 50%
     );
   }
 
@@ -256,4 +255,22 @@
 
 .has-description-popup:hover > .description-popup {
   display: block;
+}
+
+.planning.external {
+  --title-column-width: 25rem;
+  --default-height: min-content;
+
+  & .planning--title {
+    white-space: initial;
+    line-height: 1.1;
+    padding: 0.2em 0;
+  }
+}
+
+@media print {
+  html {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
 }

@@ -8,11 +8,10 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
+from workbench.contacts.models import Organization
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.services.models import ServiceType
-from workbench.contacts.models import Organization
-
 from workbench.tools.formats import hours, local_date_format
 from workbench.tools.models import HoursField, Model
 from workbench.tools.urls import model_urls

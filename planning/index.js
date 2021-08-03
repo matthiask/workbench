@@ -76,7 +76,7 @@ function Planning({ data }) {
     <RowContext.Provider value={rowCtx}>
       <div
         ref={gridRef}
-        className="planning"
+        className={`planning${data.external_view ? " external" : ""}`}
         style={{
           "--weeks": data.weeks.length + 1,
         }}

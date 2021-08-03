@@ -30,10 +30,10 @@ from workbench.invoices.models import (
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.planning.models import (
+    ExternalWork,
     Milestone,
     PlannedWork,
     PublicHoliday,
-    ExternalWork,
 )
 from workbench.projects.models import Campaign, Project, Service as ProjectService
 from workbench.reporting.models import CostCenter
