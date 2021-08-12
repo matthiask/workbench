@@ -290,16 +290,19 @@ class ExternalWorkForm(ModelForm):
             "milestone",
         )
         widgets = {
+            "provided_by": Autocomplete(model=Organization),
             "notes": Textarea,
         }
 
     def __init__(self, *args, **kwargs):
+        initial = kwargs.setdefault("initial", {})
+        request = kwargs["request"]
+
         self.project = kwargs.pop("project", None)
         if not self.project:  # Updating
             self.project = kwargs["instance"].project
-
-        initial = kwargs.setdefault("initial", {})
-        request = kwargs["request"]
+        else:
+            initial["provided_by"] = self.project.customer_id
 
         if service_id := request.GET.get("service"):
             try:
