@@ -18,3 +18,9 @@ class MilestoneAdmin(admin.ModelAdmin):
 class PlannedWorkAdmin(admin.ModelAdmin):
     list_display = ["project", "user", "planned_hours", "weeks"]
     raw_id_fields = ["project", "offer", "user"]
+
+
+@admin.register(models.ExternalWork)
+class ExternalWorkAdmin(admin.ModelAdmin):
+    list_display = ["project", "provided_by", "weeks"]
+    raw_id_fields = ["project"]

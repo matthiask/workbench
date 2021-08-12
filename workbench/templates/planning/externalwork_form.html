@@ -1,0 +1,39 @@
+{% extends "modalform.html" %}
+
+{% load bootstrap4 fineforms i18n workbench %}
+
+{% block size %}modal-xl{% endblock %}
+
+{% block title %}
+{% if view.project %}{{ view.project.title }}{% else %}{{ block.super }}{% endif %}
+{% endblock %}
+
+{% block body %}
+  {% include 'fineforms/warnings.html' %}
+  {% ff_errors form %}
+
+  <div class="row">
+    <div class="col-lg-7">
+      {% ff_field form.title %}
+      {% ff_field form.provided_by %}
+      {% ff_field form.notes %}
+      <div class="row">
+        <div class="col-sm-6">
+          {% ff_field form.milestone %}
+        </div>
+        <div class="col-sm-6">
+          {% ff_field form.service_type %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      {% ff_fields form exclude='title,milestone,service_type,notes,provided_by' %}
+    </div>
+  </div>
+
+<style>
+#id_modal-weeks option[value="{{ form.this_monday.isoformat }}"] {
+  background: rgba(150, 150, 250, 0.2);
+}
+</style>
+{% endblock %}

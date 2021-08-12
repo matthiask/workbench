@@ -8,8 +8,9 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
+from workbench.contacts.models import Organization
 from workbench.invoices.utils import recurring
-from workbench.planning.models import Milestone, PlannedWork
+from workbench.planning.models import ExternalWork, Milestone, PlannedWork
 from workbench.projects.models import Project
 from workbench.tools.formats import Z1, local_date_format
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
@@ -25,7 +26,7 @@ class MilestoneSearchForm(Form):
 class MilestoneForm(ModelForm):
     class Meta:
         model = Milestone
-        fields = ["date", "title"]
+        fields = ["date", "phase_starts_on", "title", "estimated_total_hours"]
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project", None)
@@ -234,6 +235,157 @@ class PlannedWorkForm(ModelForm):
                 _("The selected offer is declined."), code="offer-is-declined"
             )
 
+        return data
+
+    def save(self):
+        instance = super().save(commit=False)
+        if not instance.pk:
+            instance.created_by = self.request.user
+        instance.weeks = self.cleaned_data.get("weeks")
+        if not instance.pk:
+            instance.created_by = self.request.user
+        instance.save()
+        return instance
+
+    @property
+    def this_monday(self):
+        return monday()
+
+
+class ExternalWorkSearchForm(Form):
+    project = forms.ModelChoiceField(
+        queryset=Project.objects.all(),
+        required=False,
+        widget=Autocomplete(model=Project),
+        label="",
+    )
+    provided_by = forms.ModelChoiceField(
+        queryset=Organization.objects.all(),
+        required=False,
+        widget=Autocomplete(model=Organization),
+        label="",
+    )
+
+    def filter(self, queryset):
+        data = self.cleaned_data
+        if data.get("project"):
+            queryset = queryset.filter(project=data.get("project"))
+        return queryset.select_related(
+            "provided_by",
+            "project__owned_by",
+            "project__customer",
+            "project__contact__organization",
+        )
+
+
+@add_prefix("modal")
+class ExternalWorkForm(ModelForm):
+    class Meta:
+        model = ExternalWork
+        fields = (
+            "provided_by",
+            "title",
+            "service_type",
+            "notes",
+            "milestone",
+        )
+        widgets = {
+            "notes": Textarea,
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.project = kwargs.pop("project", None)
+        if not self.project:  # Updating
+            self.project = kwargs["instance"].project
+
+        initial = kwargs.setdefault("initial", {})
+        request = kwargs["request"]
+
+        if service_id := request.GET.get("service"):
+            try:
+                service = self.project.services.get(pk=service_id)
+            except (self.project.services.model.DoesNotExist, TypeError, ValueError):
+                pass
+            else:
+                initial.update(
+                    {
+                        "title": f"{self.project.title}: {service.title}",
+                        "notes": service.description,
+                        "planned_hours": service.service_hours,
+                    }
+                )
+
+        # if pk := request.GET.get("copy"):
+        #     try:
+        #         pw = ExternalWork.objects.get(pk=pk)
+        #     except (ExternalWork.DoesNotExist, TypeError, ValueError):
+        #         pass
+        #     else:
+        #         initial.update(
+        #             {
+        #                 "project": pw.project_id,
+        #                 "offer": pw.offer_id,
+        #                 "title": pw.title,
+        #                 "notes": pw.notes,
+        #                 "planned_hours": pw.planned_hours,
+        #                 "weeks": pw.weeks,
+        #                 "is_provisional": pw.is_provisional,
+        #                 "service_type": pw.service_type_id,
+        #                 "milestone": pw.milestone_id,
+        #             }
+        #         )
+
+        super().__init__(*args, **kwargs)
+        self.instance.project = self.project
+
+        self.fields["milestone"].queryset = self.project.milestones.all()
+        # self.fields["service_type"].required = True
+
+        date_from_options = [
+            monday(),
+            self.instance.weeks and min(self.instance.weeks),
+            initial.get("weeks") and min(initial["weeks"]),
+        ]
+        date_from = min(filter(None, date_from_options)) - dt.timedelta(days=21)
+
+        self.fields["weeks"] = forms.TypedMultipleChoiceField(
+            label=capfirst(_("weeks")),
+            choices=[
+                (
+                    day,
+                    "KW{} ({} - {})".format(
+                        local_date_format(day, fmt="W"),
+                        local_date_format(day),
+                        local_date_format(day + dt.timedelta(days=6)),
+                    ),
+                )
+                for day in islice(recurring(date_from, "weekly"), 80)
+            ],
+            widget=forms.SelectMultiple(attrs={"size": 20}),
+            initial=self.instance.weeks or [monday()],
+            coerce=parse_date,
+        )
+
+    def clean(self):
+        data = super().clean()
+
+        if (weeks := data.get("weeks")) and (milestone := data.get("milestone")):
+            if after := [week for week in weeks if week >= monday(milestone.date)]:
+                self.add_warning(
+                    _(
+                        "The milestone is scheduled on %(date)s, but work is"
+                        " planned in the same or following week(s): %(weeks)s"
+                    )
+                    % {
+                        "date": local_date_format(milestone.date),
+                        "weeks": ", ".join(
+                            f"{local_date_format(week)} - "
+                            f"{local_date_format(week + dt.timedelta(days=6))}"
+                            for week in after
+                        ),
+                    },
+                    code="weeks-after-milestone",
+                )
         return data
 
     def save(self):

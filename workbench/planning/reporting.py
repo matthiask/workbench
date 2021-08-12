@@ -34,27 +34,43 @@ def _period(weeks, min, max):
 
 
 class Planning:
-    def __init__(self, *, weeks, users=None):
+    def __init__(self, *, external_view=False, weeks, users=None):
         self.weeks = weeks
         self.users = users
+
+        self.external = external_view
 
         self._by_week = defaultdict(lambda: Z1)
         self._by_project_and_week = defaultdict(lambda: defaultdict(lambda: Z1))
         self._projects_offers = defaultdict(lambda: defaultdict(list))
+
+        self._projects_external_work = defaultdict(list)
+
         self._project_ids = set()
         self._user_ids = {user.id for user in users} if users else set()
 
         self._worked_hours = defaultdict(lambda: defaultdict(lambda: Z1))
 
         self._absences = defaultdict(lambda: [[] for i in weeks])
-        self._milestones = defaultdict(lambda: defaultdict(list))
+        self._milestones = defaultdict(lambda: defaultdict(defaultdict))
 
-        self._projects_users = defaultdict(set)
+        self._work_ids_users = defaultdict(set)
         self._planned_users_by_week = defaultdict(lambda: [set() for i in weeks])
 
-    def add_planned_work_and_milestones(self, planned_work_qs, milestones_qs):
+    def add_planned_work_and_milestones(
+        self,
+        planned_work_qs,
+        milestones_qs,
+        external_work_qs=None,
+    ):
+        if self.external:
+            planned_work_qs = planned_work_qs.filter(milestone__isnull=False)
         for pw in planned_work_qs.filter(weeks__overlap=self.weeks).select_related(
-            "user", "project__owned_by", "offer__project", "offer__owned_by"
+            "user",
+            "project__owned_by",
+            "offer__project",
+            "offer__owned_by",
+            "milestone",
         ):
             per_week = (pw.planned_hours / len(pw.weeks)).quantize(Z2)
             for week in pw.weeks:
@@ -64,7 +80,6 @@ class Planning:
             hours_per_week = list()
             for idx, week in enumerate(self.weeks):
                 if week in pw.weeks:
-                    self._planned_users_by_week[pw.project][idx].add(pw.user)
                     hours_per_week.append(per_week)
                 else:
                     hours_per_week.append(Z1)
@@ -79,7 +94,7 @@ class Planning:
                         "title": pw.title,
                         "text": pw.user.get_short_name(),
                         "user": pw.user.get_short_name(),
-                        "planned_hours": pw.planned_hours,
+                        "planned_hours": pw.planned_hours if not self.external else 0,
                         "url": pw.get_absolute_url(),
                         "date_from": date_from,
                         "date_until": date_until,
@@ -103,17 +118,86 @@ class Planning:
                 }
             )
 
-            self._projects_users[pw.project].add(pw.user)
+            self._work_ids_users[pw.id].add(pw.user)
+
+            self.add_project_milestone(pw.project, pw.milestone)
             self._project_ids.add(pw.project.pk)
             self._user_ids.add(pw.user.id)
 
-        # hacky, add projects anyway if there are upcoming milestones
+        if external_work_qs:
+            for ew in external_work_qs.filter(weeks__overlap=self.weeks).select_related(
+                "milestone", "provided_by"
+            ):
+
+                date_from = min(ew.weeks)
+                date_until = max(ew.weeks) + dt.timedelta(days=6)
+
+                self._projects_external_work[ew.project].append(
+                    {
+                        "id": ew.id,
+                        "title": ew.title,
+                        "provided_by": ew.provided_by.name,
+                        "url": ew.get_absolute_url(),
+                        "date_from": date_from,
+                        "date_until": date_until,
+                        "range": "{} – {}".format(
+                            local_date_format(date_from, fmt="d.m."),
+                            local_date_format(date_until, fmt="d.m."),
+                        ),
+                        "service_type_id": ew.service_type_id,
+                        "tooltip": str(ew.service_type) if ew.service_type else None,
+                        "by_week": [1 if w in ew.weeks else 0 for w in self.weeks],
+                    }
+                )
+
+                self.add_project_milestone(ew.project, ew.milestone)
+                self._project_ids.add(ew.project.pk)
+
+        # TODO: hacky, add projects anyway if there are upcoming milestones.
+        # There must be a better way.
         if milestones_qs:
             for ms in milestones_qs.filter(
                 Q(date__lte=max(self.weeks)) & Q(date__gte=min(self.weeks))
             ):
                 self._projects_offers[ms.project].update()
                 self._project_ids.add(ms.project.pk)
+
+    def add_project_milestone(self, project, milestone):
+        if milestone and (not self._milestones[project][milestone]):
+
+            start = (
+                milestone.phase_starts_on
+                if milestone.phase_starts_on
+                else milestone.date
+            )
+            weeks = [
+                1 if monday(start) <= w <= monday(milestone.date) else 0
+                for w in self.weeks
+            ]
+            graphical_weeks = [
+                1 if monday(milestone.date) == w else 0 for w in self.weeks
+            ]
+
+            self._milestones[project][milestone].update(
+                {
+                    "id": milestone.id,
+                    "title": milestone.title,
+                    "dow": local_date_format(milestone.date, fmt="l, j.n."),
+                    "date": local_date_format(milestone.date, fmt="j."),
+                    "range": "{} – {}".format(
+                        local_date_format(start, fmt="d.m."),
+                        local_date_format(milestone.date, fmt="d.m."),
+                    )
+                    if milestone.phase_starts_on
+                    else None,
+                    "hours": milestone.estimated_total_hours,
+                    "phase_starts_on": start if milestone.phase_starts_on else None,
+                    "weekday": milestone.date.isocalendar()[2],
+                    "url": milestone.urls["detail"],
+                    "weeks": weeks,
+                    "graphical_weeks": graphical_weeks,
+                }
+            )
 
     def add_worked_hours(self, queryset):
         for row in (
@@ -223,19 +307,13 @@ order by ph.date
             self._by_week[week] += ph_hours
 
     def add_milestones(self, queryset):
-        for milestone in queryset.filter(project__in=self._project_ids).select_related(
-            "project"
-        ):
-            self._milestones[milestone.project][monday(milestone.date)].append(
-                {
-                    "id": milestone.id,
-                    "title": milestone.title,
-                    "dow": local_date_format(milestone.date, fmt="l, j.n."),
-                    "date": local_date_format(milestone.date, fmt="j."),
-                    "weekday": milestone.date.isocalendar()[2],
-                    "url": milestone.urls["detail"],
-                }
-            )
+        for milestone in queryset.filter(
+            Q(project__in=self._project_ids)
+            & Q(date__lte=max(self.weeks))
+            & Q(date__gte=min(self.weeks))
+        ).select_related("project"):
+            if not self._milestones[milestone.project][milestone]:
+                self.add_project_milestone(milestone.project, milestone)
 
     def _offer_record(self, offer, work_list):
         date_from = min(pw["work"]["date_from"] for pw in work_list)
@@ -244,6 +322,17 @@ order by ph.date
 
         if not work_list:
             return None
+
+        for wl in work_list:
+            wl.update(
+                {
+                    "absences": [
+                        [a for a in self._absences[user][idx] if h > 0]
+                        for idx, h in enumerate(wl["hours_per_week"])
+                    ]
+                    for user in self._work_ids_users[wl["work"]["id"]]
+                }
+            )
 
         return {
             "offer": {
@@ -301,26 +390,17 @@ order by ph.date
         )
         hours = sum(rec["offer"]["planned_hours"] for rec in offers) if offers else 0
 
-        absences = [
-            a
-            for a in [
-                (
-                    {"name": str(user), "short_name": user.get_short_name()},
-                    [
-                        self._absences[user][idx] if user in users else []
-                        for idx, users in enumerate(
-                            self._planned_users_by_week[project]
-                        )
-                    ],
-                )
-                for user in self._projects_users[project]
-            ]
-            if any(a[1])
-        ]
+        milestones = sorted(
+            self._milestones[project].values(),
+            key=lambda v: v["weeks"].index(1) if 1 in v["weeks"] else 0,
+        )
 
-        milestones = [self._milestones[project][week] for week in self.weeks]
+        external_work = sorted(
+            self._projects_external_work[project],
+            key=lambda v: v["by_week"].index(1) if 1 in v["by_week"] else 0,
+        )
 
-        if not offers and not any(milestones):
+        if not (offers or any(milestones) or any(external_work)):
             return None
 
         return {
@@ -331,6 +411,7 @@ order by ph.date
                 "url": project.get_absolute_url(),
                 "planning": project.urls["planning"],
                 "creatework": project.urls["creatework"],
+                "createexternalwork": project.urls["createexternalwork"],
                 "date_from": date_from,
                 "date_until": date_until,
                 "range": "{} – {}".format(
@@ -343,12 +424,12 @@ order by ph.date
                 "worked_hours": [
                     self._worked_hours[project.id][week] for week in self.weeks
                 ],
-                "absences": absences if any(absences) else None,
                 "milestones": milestones if any(milestones) else None,
             },
             "by_week": [
                 self._by_project_and_week[project][week] for week in self.weeks
             ],
+            "external_work": external_work if any(external_work) else None,
             "offers": offers,
         }
 
@@ -518,6 +599,7 @@ on week=ph_week
                 {"id": type.id, "title": type.title, "color": type.color}
                 for type in ServiceType.objects.all()
             ],
+            "external_view": self.external,
         }
 
 
@@ -553,7 +635,7 @@ def team_planning(team, date_range):
     return planning.report()
 
 
-def project_planning(project):
+def project_planning(project, external_view=False):
     with connections["default"].cursor() as cursor:
         cursor.execute(
             """\
@@ -585,16 +667,22 @@ SELECT MIN(week), MAX(week) FROM sq
     else:
         weeks = list(islice(recurring(monday() - dt.timedelta(days=14), "weekly"), 80))
 
-    planning = Planning(weeks=weeks)
+    planning = Planning(external_view=external_view, weeks=weeks)
     planning.add_planned_work_and_milestones(
         project.planned_work.select_related("service_type"),
-        project.milestones.select_related(),
+        project.milestones,
+        project.external_work.select_related("service_type"),
     )
-    planning.add_worked_hours(LoggedHours.objects.all())
+    if not external_view:
+        planning.add_worked_hours(LoggedHours.objects.all())
     planning.add_absences(Absence.objects.all())
     planning.add_public_holidays()
     planning.add_milestones(Milestone.objects.all())
     return planning.report()
+
+
+def project_planning_external(project):
+    return project_planning(project, True)
 
 
 def planning_vs_logbook(date_range, *, users):
