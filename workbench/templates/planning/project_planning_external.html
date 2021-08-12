@@ -1,0 +1,26 @@
+{% extends "generic/object_detail.html" %}
+
+{% load i18n workbench webpack_loader %}
+
+{% block title %}{% translate 'planning'|capfirst %} - {{ block.super }}{% endblock %}
+
+{% block uplink %}
+  <a href="{% url 'projects_project_planning' object.pk %}" class="btn btn-primary btn-sm uplink">
+    {% include 'svg/chevron-left.svg' %} {% translate 'back to project planning' %}
+  </a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <h1>{% translate 'planning'|capfirst %}: {{ object }}</h1>
+  </div>
+</div>
+
+  <div id="planning-root" class="planning-wrapper"></div>
+  {{ planning_data|json_script:'planning-data' }}
+  <script src="{% url 'javascript-catalog' %}"></script>
+  {% if not TESTING %}
+    {% render_bundle "planning" %}
+  {% endif %}
+{% endblock %}

@@ -15,6 +15,8 @@
 
   --planning: #186662;
   --absences: rgba(221, 255, 240, 0.8);
+  --milestones: rgba(255, 200, 200, 0.3);
+  --external: rgba(240, 173, 78, 0.2);
 
   min-width: min-content;
   position: relative;
@@ -55,7 +57,10 @@
     background-color: var(--stripe1);
   }
   &.is-milestone {
-    background-color: var(--stripe1);
+    background-color: transparent;
+  }
+  &.is-external {
+    background-color: transparent;
   }
   &.is-offer {
     background-color: var(--stripe2);
@@ -122,6 +127,13 @@
   background-color: var(--absences);
 }
 
+.planning--milestones {
+  background-color: var(--milestones);
+}
+.planning--external {
+  background-color: var(--external);
+}
+
 .planning--range {
   color: var(--white);
   text-align: center;
@@ -140,6 +152,16 @@
 
   &.is-milestone {
     background-color: var(--pink);
+  }
+
+  &.is-milestone-graphic {
+    width: 0px;
+    &::before {
+      content: "🌟"; // maybe too fancy, but i like it
+      position: absolute;
+      left: -0.25rem;
+      bottom: 0;
+    }
   }
 
   &.is-total {
@@ -161,6 +183,15 @@
   &.is-absence,
   &.is-project-absence {
     background-color: var(--blue);
+  }
+
+  &.is-absence-graphic {
+    width: 50%;
+    background: linear-gradient(
+      0.33turn,
+      var(--st-color, var(--blue)) 50%,
+      rgba(20, 132, 80, 0) 50%
+    );
   }
 
   &.is-pw:hover {
@@ -224,4 +255,22 @@
 
 .has-description-popup:hover > .description-popup {
   display: block;
+}
+
+.planning.external {
+  --title-column-width: 25rem;
+  --default-height: min-content;
+
+  & .planning--title {
+    white-space: initial;
+    line-height: 1.1;
+    padding: 0.2em 0;
+  }
+}
+
+@media print {
+  html {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
 }

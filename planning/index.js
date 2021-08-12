@@ -76,7 +76,7 @@ function Planning({ data }) {
     <RowContext.Provider value={rowCtx}>
       <div
         ref={gridRef}
-        className="planning"
+        className={`planning${data.external_view ? " external" : ""}`}
         style={{
           "--weeks": data.weeks.length + 1,
         }}
@@ -132,13 +132,22 @@ function Planning({ data }) {
           </Cell>
         ))}
 
-        <TotalByWeek
-          by_week={data.by_week}
-          title={gettext("Planned hours per week")}
-        />
-        {data.capacity && <Capacity {...data.capacity} />}
+        {data.external_view || (
+          <>
+            <TotalByWeek
+              by_week={data.by_week}
+              title={gettext("Planned hours per week")}
+            />
+            {data.capacity && <Capacity {...data.capacity} />}
+          </>
+        )}
+
         {data.projects_offers.map((project) => (
-          <Project key={project.project.id} {...project} />
+          <Project
+            key={project.project.id}
+            {...project}
+            external_view={data.external_view}
+          />
         ))}
 
         <Absences absences={data.absences} />
@@ -250,7 +259,7 @@ function UserCapacity({ user, capacity }) {
   )
 }
 
-function Project({ by_week, offers, project }) {
+function Project({ by_week, offers, project, external_view, external_work }) {
   const ctx = useContext(RowContext)
   ctx.next() // Skip one row
   const row = ctx.next()
@@ -278,35 +287,37 @@ function Project({ by_week, offers, project }) {
           {project.is_closed ? <> {gettext("(closed)")}</> : ""}
         </a>
       </Cell>
-      <Cell
-        row={row}
-        column={2}
-        style={{ color: "var(--primary)" }}
-        className="no-pr"
-      >
-        <a
-          className="planning--add-pw"
-          data-toggle="ajaxmodal"
-          title={gettext("Add planned work")}
-          href={project.creatework}
+      {external_view || (
+        <Cell
+          row={row}
+          column={2}
+          style={{ color: "var(--primary)" }}
+          className="no-pr"
         >
-          +
-        </a>{" "}
-        <a href={project.planning}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="15"
-            height="16"
-            viewBox="0 0 15 16"
+          <a
+            className="planning--add-pw"
+            data-toggle="ajaxmodal"
+            title={gettext("Add planned work")}
+            href={project.creatework}
           >
-            <path
-              fill="currentColor"
-              fillRule="evenodd"
-              d="M10 12h3V2h-3v10zm-4-2h3V2H6v8zm-4 4h3V2H2v12zm-1 1h13V1H1v14zM14 0H1a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1z"
-            />
-          </svg>
-        </a>
-      </Cell>
+            +
+          </a>{" "}
+          <a href={project.planning}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="16"
+              viewBox="0 0 15 16"
+            >
+              <path
+                fill="currentColor"
+                fillRule="evenodd"
+                d="M10 12h3V2h-3v10zm-4-2h3V2H6v8zm-4 4h3V2H2v12zm-1 1h13V1H1v14zM14 0H1a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1z"
+              />
+            </svg>
+          </a>
+        </Cell>
+      )}
       <Cell
         row={row}
         column={3}
@@ -315,35 +326,41 @@ function Project({ by_week, offers, project }) {
       >
         {project.range}
       </Cell>
-      {project.planned_hours > 0 && (
+      {external_view || (
         <Cell row={row} column={4} className="planning--small text-right">
           {fixed(project.planned_hours, 0)}h
         </Cell>
       )}
-      {by_week.map((hours, idx) => {
-        hours = parseFloat(hours)
-        if (!hours) return null
+      {external_view ||
+        by_week.map((hours, idx) => {
+          hours = parseFloat(hours)
+          if (!hours) return null
 
-        return (
-          <Cell
-            key={idx}
-            row={row}
-            column={FIRST_DATA_COLUMN + idx}
-            className="planning--range planning--small is-project"
-            style={{
-              opacity: opacityClamp(0.3 + hours / 20),
-            }}
-          >
-            {hours.toFixed(1)}
-          </Cell>
-        )
-      })}
-      {project.worked_hours ? <WorkedHours project={project} /> : null}
+          return (
+            <Cell
+              key={idx}
+              row={row}
+              column={FIRST_DATA_COLUMN + idx}
+              className="planning--range planning--small is-project"
+              style={{
+                opacity: opacityClamp(0.3 + hours / 20),
+              }}
+            >
+              {hours.toFixed(1)}
+            </Cell>
+          )
+        })}
+      {external_view ||
+        (project.worked_hours && <WorkedHours project={project} />)}
       {project.milestones ? <Milestones project={project} /> : null}
-      {offers && offers.map((offer, idx) => <Offer key={idx} {...offer} />)}
-      {project.absences ? (
+      {external_work && <ExternalExpenses {...{ external_work }} />}
+      {offers &&
+        offers.map((offer, idx) => (
+          <Offer key={idx} {...offer} external_view={external_view} />
+        ))}
+      {/* {project.absences ? (
         <ProjectAbsences absences={project.absences} />
-      ) : null}
+      ) : null} */}
     </>
   )
 }
@@ -384,74 +401,114 @@ function WorkedHours({ project }) {
   )
 }
 
-function weekdayToGradient(weekday) {
-  const width = 8
+// function weekdayToGradient(weekday, weekspan) {
+//   const width = 8 / weekspan
+//   const start =
+//     (100 * (weekspan - 1) * 7 + (100 - width) * (weekday - 1)) / (weekspan * 7)
+//   const end = start + width
+//   return `linear-gradient(to right, transparent ${start}%, rgb(255, 200, 200) ${start}%, rgb(255, 200, 200) ${end}%, transparent ${end}%)`
+// }
+
+const weekdayBackgroundPosition = (weekday) => {
+  const width = 12
   const start = Math.floor(((100 - width) * (weekday - 1)) / 7)
-  const end = start + width
-  return `linear-gradient(to right, transparent ${start}%, rgb(255, 200, 200) ${start}%, rgb(255, 200, 200) ${end}%, transparent ${end}%)`
+  return `${start}%`
 }
 
-function Milestones({ project }) {
+const Milestones = ({ project }) => {
   const ctx = useContext(RowContext)
   const row = ctx.next()
-  let rows = 1
-
   return (
     <>
-      {project.milestones.map((milestones, idx) => {
-        if (!milestones.length) return null
+      <div
+        style={{
+          gridRow: row,
+          gridColumn: `1 / -1`,
+        }}
+        className="planning--milestones"
+      />
+      <Cell row={row} column={1} className="planning--title is-milestone pl-3">
+        {gettext("milestones")}
+      </Cell>
+      {project.milestones.map((m, i) => {
+        const ctx = useContext(RowContext)
+        const row = ctx.next()
 
-        while (milestones.length > rows) {
-          ctx.next()
-          ++rows
-        }
+        const isEven = (1 + i) % 2 === 0
 
         return (
           <>
-            {milestones.map((milestone) => (
-              <Cell
-                key={milestone.id}
-                row="var(--first-project-row)"
-                rowspan="-1"
-                column={FIRST_DATA_COLUMN + idx}
-                style={{
-                  backgroundImage: weekdayToGradient(milestone.weekday),
-                }}
+            {isEven ? (
+              <div
+                style={{ gridRow: row, gridColumn: "1 / -1" }}
+                className="planning--stripe3"
               />
-            ))}
-            {milestones.map((milestone, milestoneIdx) => (
+            ) : null}
+            <Cell
+              row={row}
+              column={1}
+              className={`planning--title is-pw planning--small pl-5`}
+            >
+              <a href={m.url} data-toggle="ajaxmodal">
+                {m.title}
+              </a>
+            </Cell>
+            <Cell
+              row={row}
+              column={3}
+              className={`planning--small text-center is-pr`}
+              style={{ whiteSpace: "nowrap" }}
+            >
+              {m.range}
+            </Cell>
+            {m.hours > 0 && (
               <Cell
-                key={milestone.id}
-                row={row + milestoneIdx}
-                column={FIRST_DATA_COLUMN + idx}
-                className="planning--range planning--small is-milestone"
-                style={{
-                  backgroundImage: weekdayToGradient(milestone.weekday),
-                }}
-                title={`${milestone.title} (${milestone.dow})`}
-                tag="a"
-                href={milestones[0].url}
-                data-toggle="ajaxmodal"
+                row={row}
+                column={4}
+                className={`planning--small text-right is-pr`}
               >
-                {milestone.date}
+                {`${fixed(m.hours, 0)}h`}
               </Cell>
-            ))}
+            )}
+            {m.weeks &&
+              findContiguousWeekRanges(m.weeks).map((range, idx) => (
+                <Cell
+                  key={idx}
+                  row={row}
+                  column={FIRST_DATA_COLUMN + range.start}
+                  colspan={`span ${range.length}`}
+                  className={`planning--range planning--small is-milestone`}
+                  tag="a"
+                  href={m.url}
+                  data-toggle="ajaxmodal"
+                  title={`${m.title} (${m.dow})`}
+                />
+              ))}
+            {m.graphical_weeks &&
+              findContiguousWeekRanges(m.graphical_weeks).map((range, idx) => (
+                <Cell
+                  key={idx}
+                  row={row}
+                  column={FIRST_DATA_COLUMN + range.start}
+                  colspan={`span ${range.length}`}
+                  className={`planning--range planning--small is-milestone-graphic`}
+                  style={{
+                    left: weekdayBackgroundPosition(m.weekday),
+                  }}
+                  tag="a"
+                  href={m.url}
+                  data-toggle="ajaxmodal"
+                  title={`${m.title} (${m.dow})`}
+                />
+              ))}
           </>
         )
       })}
-      <Cell
-        row={row}
-        rowspan={`span ${rows}`}
-        column={1}
-        className="planning--title is-milestone"
-      >
-        {gettext("Milestones")}
-      </Cell>
     </>
   )
 }
 
-function Offer({ offer, work_list }) {
+function Offer({ offer, external_view, work_list }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
@@ -495,9 +552,11 @@ function Offer({ offer, work_list }) {
       >
         {offer.range}
       </Cell>
-      <Cell row={row} column={4} className="planning--small text-right">
-        {fixed(offer.planned_hours, 0)}h
-      </Cell>
+      {external_view || (
+        <Cell row={row} column={4} className="planning--small text-right">
+          {fixed(offer.planned_hours, 0)}h
+        </Cell>
+      )}
       {work_list.map((work, idx) => (
         <Work key={work.work.id} {...work} isEven={(1 + idx) % 2 === 0} />
       ))}
@@ -505,9 +564,10 @@ function Offer({ offer, work_list }) {
   )
 }
 
-function Work({ work, hours_per_week, isEven }) {
+function Work({ work, hours_per_week, absences, isEven }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
+
   return (
     <>
       {isEven ? (
@@ -545,9 +605,15 @@ function Work({ work, hours_per_week, isEven }) {
       >
         {work.range}
       </Cell>
-      <Cell row={row} column={4} className={`planning--small text-right is-pr`}>
-        {`${fixed(work.planned_hours, 0)}h`}
-      </Cell>
+      {work.planned_hours > 0 && (
+        <Cell
+          row={row}
+          column={4}
+          className={`planning--small text-right is-pr`}
+        >
+          {`${fixed(work.planned_hours, 0)}h`}
+        </Cell>
+      )}
       <Cell
         row={row}
         column={5}
@@ -590,6 +656,94 @@ function Work({ work, hours_per_week, isEven }) {
             <span className="no-pr">{work.text}</span>
           </Cell>
         ))}
+      {absences.length > 0 &&
+        absences.map((absence, idx) => {
+          if (absence.length > 0) {
+            return (
+              <Cell
+                key={idx}
+                row={row}
+                column={FIRST_DATA_COLUMN + idx}
+                className="planning--range planning--small is-absence-graphic has-description-popup"
+              >
+                <AbsencesTooltip absences={absence} />
+              </Cell>
+            )
+          }
+        })}
+    </>
+  )
+}
+
+const ExternalExpenses = ({ external_work }) => {
+  const ctx = useContext(RowContext)
+  const row = ctx.next()
+  return (
+    <>
+      <div
+        style={{
+          gridRow: row,
+          gridColumn: `1 / -1`,
+        }}
+        className="planning--external"
+      />
+      <Cell row={row} column={1} className="planning--title is-external pl-3">
+        {gettext("external works")}
+      </Cell>
+      {external_work.map((work, idx) => (
+        <ExternalWork key={idx} idx={idx} work={work} />
+      ))}
+    </>
+  )
+}
+
+const ExternalWork = ({ idx, work }) => {
+  const ctx = useContext(RowContext)
+  const row = ctx.next()
+
+  const isEven = (1 + idx) % 2 === 0
+
+  return (
+    <>
+      {isEven ? (
+        <div
+          style={{ gridRow: row, gridColumn: "1 / -1" }}
+          className="planning--stripe3"
+        />
+      ) : null}
+      <Cell
+        row={row}
+        column={1}
+        className={`planning--title is-pw ${
+          work.is_provisional ? "is-provisional" : ""
+        } planning--small pl-5`}
+      >
+        <a href={work.url} data-toggle="ajaxmodal">
+          {work.title} ({work.provided_by})
+        </a>
+      </Cell>
+      <Cell
+        row={row}
+        column={3}
+        className={`planning--small text-center is-pr`}
+        style={{ whiteSpace: "nowrap" }}
+      >
+        {work.range}
+      </Cell>
+      {work.by_week &&
+        findContiguousWeekRanges(work.by_week).map((range, idx) => (
+          <Cell
+            key={idx}
+            row={row}
+            column={FIRST_DATA_COLUMN + range.start}
+            colspan={`span ${range.length}`}
+            className={`planning--range planning--small is-pw st-${work.service_type_id}`}
+            tag="a"
+            href={work.url}
+            data-toggle="ajaxmodal"
+            title={work.tooltip}
+          />
+        ))}
     </>
   )
 }
@@ -618,68 +772,68 @@ function Absences({ absences }) {
   )
 }
 
-function ProjectAbsences({ absences }) {
-  const ctx = useContext(RowContext)
-  const row = ctx.next()
-  return (
-    <>
-      <div
-        style={{
-          gridRow: row,
-          gridColumn: `1 / -1`,
-        }}
-        className="planning--absences"
-      />
-      <Cell row={row} column={1} className="planning--title is-project-absence">
-        {gettext("Concurrent absences")}
-      </Cell>
-      {absences.map((user, idx) => (
-        <ProjectUserAbsence key={idx} user={user} />
-      ))}
-    </>
-  )
-}
+// function ProjectAbsences({ absences }) {
+//   const ctx = useContext(RowContext)
+//   const row = ctx.next()
+//   return (
+//     <>
+//       <div
+//         style={{
+//           gridRow: row,
+//           gridColumn: `1 / -1`,
+//         }}
+//         className="planning--absences"
+//       />
+//       <Cell row={row} column={1} className="planning--title is-project-absence">
+//         {gettext("Concurrent absences")}
+//       </Cell>
+//       {absences.map((user, idx) => (
+//         <ProjectUserAbsence key={idx} user={user} />
+//       ))}
+//     </>
+//   )
+// }
 
-function ProjectUserAbsence({ user }) {
-  const ctx = useContext(RowContext)
-  const row = ctx.next()
+// function ProjectUserAbsence({ user }) {
+//   const ctx = useContext(RowContext)
+//   const row = ctx.next()
 
-  const userAbsences = user[1].map(
-    (hours) => (hours[0] && hours[0][0]) || "0.0"
-  )
+//   const userAbsences = user[1].map(
+//     (hours) => (hours[0] && hours[0][0]) || "0.0"
+//   )
 
-  return (
-    <>
-      <Cell
-        row={row}
-        column={1}
-        className="planning--small is-project-absence pl-3"
-      >
-        {user[0].name}
-      </Cell>
-      <Cell
-        row={row}
-        column={5}
-        className={`planning--small text-center no-pr`}
-      >
-        {user[0].short_name}
-      </Cell>
-      {findContiguousWeekRanges(userAbsences).map((range, idx) => {
-        return (
-          <Cell
-            key={idx}
-            row={row}
-            column={FIRST_DATA_COLUMN + range.start}
-            colspan={`span ${range.length}`}
-            className={`planning--range planning--small is-project-absence`}
-          >
-            <span className="no-pr">{user[0].short_name}</span>
-          </Cell>
-        )
-      })}
-    </>
-  )
-}
+//   return (
+//     <>
+//       <Cell
+//         row={row}
+//         column={1}
+//         className="planning--small is-project-absence pl-3"
+//       >
+//         {user[0].name}
+//       </Cell>
+//       <Cell
+//         row={row}
+//         column={5}
+//         className={`planning--small text-center no-pr`}
+//       >
+//         {user[0].short_name}
+//       </Cell>
+//       {findContiguousWeekRanges(userAbsences).map((range, idx) => {
+//         return (
+//           <Cell
+//             key={idx}
+//             row={row}
+//             column={FIRST_DATA_COLUMN + range.start}
+//             colspan={`span ${range.length}`}
+//             className={`planning--range planning--small is-project-absence`}
+//           >
+//             <span className="no-pr">{user[0].short_name}</span>
+//           </Cell>
+//         )
+//       })}
+//     </>
+//   )
+// }
 
 const AbsencesTooltip = ({ absences }) => {
   return (

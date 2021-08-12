@@ -30,6 +30,10 @@
       {% include 'svg/plus.svg' %}
       {% translate 'planned work'|capfirst %}
     </a>
+    <a href="{{ object.urls.createexternalwork }}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
+      {% include 'svg/plus.svg' %}
+      {% translate 'external work'|capfirst %}
+    </a>
     <a href="{{ object.urls.createmilestone }}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
       {% include 'svg/plus.svg' %}
       {% translate 'milestone'|capfirst %}
@@ -41,6 +45,7 @@
 
     <a href="{% url 'history' 'planning_plannedwork' 'project_id' object.pk %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">{% translate 'History of planned work' %}</a>
     <a href="{% url 'history' 'planning_milestone' 'project_id' object.pk %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">{% translate 'History of milestones' %}</a>
+    <a href="{% url 'projects_project_planning_external' object.pk %}" class="btn btn-primary btn-sm">{% translate 'External planning view' %}</a>
   </div>
 </div>
 {% endblock %}
