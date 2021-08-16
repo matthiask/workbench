@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-02 19:48+0200\n"
+"POT-Creation-Date: 2021-08-16 18:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -132,7 +132,7 @@ msgstr "Öffne das Stundenformular"
 msgid "Overwrite seconds"
 msgstr "Sekunden überschreiben"
 
-#: conf/strings.js planning/index.js
+#: conf/strings.js
 msgid "Planned hours per week"
 msgstr "Geplante Stunden pro Woche"
 

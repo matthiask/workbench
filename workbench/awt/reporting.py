@@ -289,9 +289,22 @@ def annual_working_time(year, *, users):
     return {"months": months, "overall": overall, "statistics": statistics}
 
 
+def problematic_annual_working_times():
+    month = dt.date.today().replace(day=1) - dt.timedelta(days=1)
+
+    awt = annual_working_time(month.year, users=active_users(month.year))
+    problematic = [
+        (row["user"], row["running_sums"][: month.month])
+        for row in awt["statistics"]
+        if abs(row["running_sums"][month.month - 1]) > 40
+    ]
+    return problematic
+
+
 def test():  # pragma: no cover
     from pprint import pprint
 
-    year = dt.date.today().year
+    # year = dt.date.today().year
+    # pprint(annual_working_time(year, users=active_users(year)))
 
-    pprint(annual_working_time(year, users=active_users(year)))
+    pprint(problematic_annual_working_times())

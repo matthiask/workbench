@@ -1,0 +1,7 @@
+{% load i18n workbench %}{% autoescape off %}{% translate 'Problematic annual working times' %}
+
+{% for user, running_sums in problematic %}
+{{ user }}
+{% for sum in running_sums %}{{ sum|hours }}{% if not forloop.last %}, {% endif %}{% endfor %}
+{{ WORKBENCH.URL }}{% url 'awt_year_report' %}?user={{ user.pk }}
+{% endfor %}{% endautoescape %}

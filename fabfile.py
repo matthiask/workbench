@@ -1,7 +1,7 @@
 import fh_fablib as fl
 
 
-fl.require("1.0.20210721")
+fl.require("1.0.20210816")
 fl.config.update(
     app="workbench",
     base=fl.Path(__file__).parent,
@@ -40,15 +40,6 @@ def fmt(ctx):
         "yarn run prettier --write --no-semi --trailing-comma es5"
         ' "absences/**/*.*" "planning/**/*.*" "timer/**/*.*"',
     )
-
-
-@fl.task
-def mm(ctx):
-    fl.run(
-        ctx,
-        "venv/bin/python extract_gettext.py > conf/strings.js",
-    )
-    fl.mm(ctx)
 
 
 def _do_deploy(conn, folder, rsync):
@@ -114,4 +105,4 @@ def pull_db(ctx, installation="fh"):
     )
 
 
-ns = fl.Collection(*fl.GENERAL, check, deploy, deploy_code, fmt, mm, pull_db)
+ns = fl.Collection(*fl.GENERAL, check, deploy, deploy_code, fmt, pull_db)
