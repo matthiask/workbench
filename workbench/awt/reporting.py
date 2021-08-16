@@ -9,6 +9,7 @@ from django.utils.datastructures import OrderedSet
 from workbench.accounts.models import User
 from workbench.awt.models import Absence, Employment, Year
 from workbench.awt.utils import days_per_month, monthly_days
+from workbench.invoices.utils import next_valid_day
 from workbench.logbook.models import LoggedHours
 from workbench.tools.formats import Z1, Z2
 
@@ -146,17 +147,46 @@ def annual_working_time(year, *, users):
     ).order_by("starts_on"):
         month_data = months[absence.user_id]
         key = "absence_%s" % absence.reason
-        month_data[key][absence.starts_on.month - 1] += absence.days
         absences[absence.user_id][key].append(absence)
 
-        if absence.is_vacation:
-            if absence.days > remaining[absence.user_id]:
-                month_data["vacation_days_correction"][absence.starts_on.month - 1] += (
-                    remaining[absence.user_id] - absence.days
+        starts_on = absence.starts_on
+        ends_on = absence.ends_on or starts_on
+
+        if starts_on.month == ends_on.month:
+            days = [(absence.starts_on.month, absence.days)]
+        else:
+            total = Decimal((ends_on - starts_on).days + 1)
+            one_day = dt.timedelta(days=1)
+
+            calendar_days_per_month = [
+                (
+                    m,
+                    Decimal(
+                        (
+                            # end of absence or last day of this month
+                            min(ends_on, next_valid_day(ends_on.year, m, 99) - one_day)
+                            # start of absence or first day of this month
+                            - max(starts_on, dt.date(starts_on.year, m, 1))
+                        ).days
+                        # Always off by one
+                        + 1
+                    ),
                 )
-            remaining[absence.user_id] = max(
-                0, remaining[absence.user_id] - absence.days
-            )
+                for m in range(starts_on.month, ends_on.month + 1)
+            ]
+            days = [(m, absence.days * d / total) for m, d in calendar_days_per_month]
+
+        for month, d in days:
+            month_data[key][month - 1] += d
+
+        if absence.is_vacation:
+            for m, d in days:
+                if d > remaining[absence.user_id]:
+                    month_data["vacation_days_correction"][m - 1] += (
+                        remaining[absence.user_id] - d
+                    )
+
+                remaining[absence.user_id] = max(0, remaining[absence.user_id] - d)
 
     for user_id, vacation_days in remaining.items():
         if vacation_days > 0:
@@ -257,3 +287,11 @@ def annual_working_time(year, *, users):
     overall["absence_vacation"] -= overall["vacation_days_correction"]
 
     return {"months": months, "overall": overall, "statistics": statistics}
+
+
+def test():  # pragma: no cover
+    from pprint import pprint
+
+    year = dt.date.today().year
+
+    pprint(annual_working_time(year, users=active_users(year)))
