@@ -298,7 +298,7 @@ def problematic_annual_working_times():
         for row in awt["statistics"]
         if abs(row["running_sums"][month.month - 1]) > 40
     ]
-    return problematic
+    return {"month": month, "problematic": problematic}
 
 
 def test():  # pragma: no cover
