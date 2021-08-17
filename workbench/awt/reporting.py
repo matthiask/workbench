@@ -296,7 +296,7 @@ def problematic_annual_working_times():
     problematic = [
         (row["user"], row["running_sums"][month.month - 1])
         for row in awt["statistics"]
-        if abs(row["running_sums"][month.month - 1]) > 40
+        if row["user"].is_active and abs(row["running_sums"][month.month - 1]) > 40
     ]
     return {"month": month, "problematic": problematic}
 
