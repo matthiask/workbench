@@ -48,6 +48,9 @@ class AccountsTest(TestCase):
             "employments-TOTAL_FORMS": 0,
             "employments-INITIAL_FORMS": 0,
             "employments-MAX_NUM_FORMS": 1000,
+            "vacation_days_overrides-TOTAL_FORMS": 0,
+            "vacation_days_overrides-INITIAL_FORMS": 0,
+            "vacation_days_overrides-MAX_NUM_FORMS": 1000,
             "_features": ["LATE_LOGGING"],
         }
         response = self.client.post("/admin/accounts/user/add/", data)
