@@ -52,5 +52,5 @@ class AbsenceAdmin(admin.ModelAdmin):
 
 @admin.register(models.VacationDaysOverride)
 class VacationDaysOverrideAdmin(admin.ReadWriteModelAdmin):
-    list_display = ["year", "user", "days"]
+    list_display = ["year", "user", "days", "notes"]
     list_filter = ["year", "user"]

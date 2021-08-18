@@ -246,6 +246,7 @@ class VacationDaysOverride(models.Model):
     )
     year = models.IntegerField(_("year"))
     days = models.DecimalField(_("days"), max_digits=4, decimal_places=2)
+    notes = models.CharField(_("notes"), blank=True, max_length=500)
 
     class Meta:
         ordering = ["-year", "user"]
