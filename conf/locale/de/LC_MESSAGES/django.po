@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-16 18:15+0200\n"
+"POT-Creation-Date: 2021-08-18 10:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -195,6 +195,10 @@ msgstr "Person"
 #: workbench/accounts/models.py
 msgid "features"
 msgstr "Features"
+
+#: workbench/accounts/models.py
+msgid "date of employment"
+msgstr "Anstellungsbeginn"
 
 #: workbench/accounts/models.py workbench/audit/admin.py
 #: workbench/awt/models.py workbench/deals/models.py
@@ -3021,6 +3025,11 @@ msgstr "Suchformular zurücksetzen"
 msgid "Problematic annual working times"
 msgstr "Problematische Jahresarbeitszeiten"
 
+#: workbench/templates/awt/problematic_mail.txt
+#: workbench/templates/awt/year_detail.html
+msgid "net work hours"
+msgstr "Stundensaldo"
+
 #: workbench/templates/awt/year_detail.html
 msgid "active users"
 msgstr "Aktive Nutzer*innen"
@@ -3032,10 +3041,6 @@ msgstr "Fakten"
 #: workbench/templates/awt/year_detail.html
 msgid "corrected"
 msgstr "korrigiert"
-
-#: workbench/templates/awt/year_detail.html
-msgid "net work hours"
-msgstr "Stundensaldo"
 
 #: workbench/templates/awt/year_detail.html
 #, python-format
