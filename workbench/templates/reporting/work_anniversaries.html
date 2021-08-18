@@ -26,14 +26,24 @@
           </tr>
         {% endif %}{% endifchanged %}
         <tr>
-          <td>{{ anniversary.name }}</td>
-          <td>{{ anniversary.start|local_date_format }}</td>
+          <td>{{ anniversary.user.get_full_name }}</td>
+          <td>
+            {% if anniversary.user.date_of_employment %}
+              {{ anniversary.user.date_of_employment|local_date_format }}
+            {% else %}&ndash;
+            {% endif %}
+          </td>
           <td class="text-right">
             {% if anniversary.anniversary %}{{ anniversary.anniversary }}.
             {% else %}✨
             {% endif %}
           </td>
-          <td>{{ anniversary.this_year|local_date_format }}</td>
+          <td>
+            {% if anniversary.user.date_of_employment %}
+              {{ anniversary.this_year|local_date_format }}
+            {% else %}&ndash;
+            {% endif %}
+          </td>
         </tr>
       {% endfor %}
     </tbody>

@@ -159,6 +159,9 @@ class User(Model, AbstractBaseUser):
         null=True,
         default=list,
     )
+    date_of_employment = models.DateField(
+        _("date of employment"), blank=True, null=True
+    )
 
     objects = UserManager()
 

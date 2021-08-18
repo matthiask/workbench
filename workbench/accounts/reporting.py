@@ -172,55 +172,29 @@ def work_anniversaries():
     anniversaries = []
     today = dt.date.today()
 
-    for name, start in query(
-        """
-WITH
-employments AS (
-  SELECT
-    user_id,
-    date_from,
-    date_until
-  FROM awt_employment
-  WHERE percentage>0
-  ORDER BY date_from
-),
-ends AS (
-  SELECT
-    user_id,
-    array_agg(date_until + 1) AS ends
-  FROM employments
-  GROUP BY user_id
-),
-earliest AS (
-  SELECT
-    user_id,
-    -- The latest start which ...
-    MAX(date_from) AS start
-  FROM employments
-  LEFT JOIN ends USING (user_id)
-  -- ... has no ending employment preceeding it (one day difference)
-  WHERE date_from <> ALL(ends.ends)
-  GROUP BY user_id
-)
-SELECT _full_name, earliest.start
-FROM accounts_user u
-LEFT JOIN earliest ON u.id=earliest.user_id
-WHERE earliest.start IS NOT NULL AND u.is_active=TRUE
-        """,
-        [],
-    ):
-        this_year = start.replace(year=today.year)
-        anniversaries.append(
-            {
-                "name": name,
-                "start": start,
-                "this_year": this_year,
-                "anniversary": this_year.year - start.year,
-                "already": this_year > today,
-            }
-        )
+    for user in User.objects.active():
+        if user.date_of_employment:
+            this_year = user.date_of_employment.replace(year=today.year)
+            anniversaries.append(
+                {
+                    "user": user,
+                    "this_year": this_year,
+                    "anniversary": this_year.year - user.date_of_employment.year,
+                    "already": this_year > today,
+                }
+            )
+        else:
+            anniversaries.append(
+                {
+                    "user": user,
+                    "this_year": dt.date.max,
+                    "already": True,
+                }
+            )
 
-    return sorted(anniversaries, key=lambda row: (row["this_year"], row["name"]))
+    return sorted(
+        anniversaries, key=lambda row: (row["this_year"], row["user"].get_full_name())
+    )
 
 
 def birthdays():
