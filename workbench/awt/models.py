@@ -6,7 +6,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
-from workbench.tools.formats import hours, local_date_format
+from workbench.tools.formats import days, hours, local_date_format
 from workbench.tools.models import HoursField, Model, MoneyField
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
@@ -235,3 +235,23 @@ class Absence(Model):
             local_date_format(self.starts_on),
             local_date_format(self.ends_on or self.starts_on),
         )
+
+
+class VacationDaysOverride(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name=_("user"),
+        related_name="vacation_days_overrides",
+    )
+    year = models.IntegerField(_("year"))
+    days = models.DecimalField(_("days"), max_digits=4, decimal_places=2)
+
+    class Meta:
+        ordering = ["-year", "user"]
+        unique_together = [("user", "year")]
+        verbose_name = _("vacation days override")
+        verbose_name_plural = _("vacation days overrides")
+
+    def __str__(self):
+        return days(self.days)

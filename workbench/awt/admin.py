@@ -48,3 +48,9 @@ class AbsenceAdmin(admin.ModelAdmin):
     list_display = ["user", "starts_on", "days", "description", "is_vacation"]
     radio_fields = {"reason": admin.HORIZONTAL}
     readonly_fields = ["is_vacation"]
+
+
+@admin.register(models.VacationDaysOverride)
+class VacationDaysOverrideAdmin(admin.ReadWriteModelAdmin):
+    list_display = ["year", "user", "days"]
+    list_filter = ["year", "user"]

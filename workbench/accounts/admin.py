@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.features import FEATURES, LABELS, F
 from workbench.accounts.models import Team, User
-from workbench.awt.models import Employment
+from workbench.awt.models import Employment, VacationDaysOverride
 
 
 class FeaturesWidget(forms.TextInput):
@@ -55,6 +55,11 @@ class UserChangeForm(forms.ModelForm):
 
 class EmploymentInline(admin.TabularInline):
     model = Employment
+    extra = 0
+
+
+class VacationDaysOverrideInline(admin.TabularInline):
+    model = VacationDaysOverride
     extra = 0
 
 
@@ -107,7 +112,7 @@ class UserAdmin(UserAdmin):
     search_fields = ("email", "_short_name", "_full_name")
     ordering = ("email",)
     filter_horizontal = ()
-    inlines = [EmploymentInline]
+    inlines = [EmploymentInline, VacationDaysOverrideInline]
 
 
 admin.site.register(User, UserAdmin)

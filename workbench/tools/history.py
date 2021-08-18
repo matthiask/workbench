@@ -11,7 +11,7 @@ from django.utils.translation import gettext as _
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import Team, User
-from workbench.awt.models import Absence, Employment, Year
+from workbench.awt.models import Absence, Employment, VacationDaysOverride, Year
 from workbench.contacts.models import (
     EmailAddress,
     Organization,
@@ -239,7 +239,11 @@ def _accounts_user_cfg(user):
         "person",
         "_features",
     }
-    related = [(Employment, "user_id"), (Absence, "user_id")]
+    related = [
+        (Employment, "user_id"),
+        (VacationDaysOverride, "user_id"),
+        (Absence, "user_id"),
+    ]
     if user.features[FEATURES.PLANNING]:
         related.extend([(PlannedWork, "user_id")])
     return {"fields": fields, "related": related}
@@ -463,6 +467,7 @@ HISTORY = {
             "notes",
         }
     },
+    VacationDaysOverride: {"fields": EVERYTHING},
     EmailAddress: {"fields": EVERYTHING},
     PhoneNumber: {"fields": EVERYTHING},
     PostalAddress: {"fields": EVERYTHING},

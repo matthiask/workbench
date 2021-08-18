@@ -100,7 +100,7 @@
 
       <tr>
         <th class="text-nowrap">{% translate 'vacation days available' %}</th>
-        {% for value in stats.available_vacation_days %}<td class="text-right {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>{% endfor %}
+        {% for value in stats.available_vacation_days %}<td class="text-right {% if not value %}text-black-30{% endif %}">{% if value is None %}&ndash;{% else %}{{ value|days }}{% endif %}</td>{% endfor %}
         <th class="text-right">{{ totals.available_vacation_days|days }}</th>
       </tr>
 

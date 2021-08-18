@@ -86,7 +86,10 @@ def user_stats_pdf(data):
         )
         table.append(
             [_("vacation days available")]
-            + [days(value) for value in data["months"]["available_vacation_days"]]
+            + [
+                "-" if value is None else days(value)
+                for value in data["months"]["available_vacation_days"]
+            ]
             + [days(data["totals"]["available_vacation_days"])]
         )
         table.append(

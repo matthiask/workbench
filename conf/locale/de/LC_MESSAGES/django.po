@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-18 10:38+0200\n"
+"POT-Creation-Date: 2021-08-18 10:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -643,6 +643,14 @@ msgstr "Anfang und Ende müssen im gleichen Jahr liegen."
 #, python-format
 msgid "%s days"
 msgstr "%s Tage"
+
+#: workbench/awt/models.py
+msgid "vacation days override"
+msgstr "Manuell definierte Ferientage"
+
+#: workbench/awt/models.py
+msgid "vacation days overrides"
+msgstr "Manuell definierte Ferientage"
 
 #: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
 msgid "running net work hours"

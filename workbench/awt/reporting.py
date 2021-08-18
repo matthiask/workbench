@@ -7,7 +7,7 @@ from django.db.models.functions import ExtractMonth
 from django.utils.datastructures import OrderedSet
 
 from workbench.accounts.models import User
-from workbench.awt.models import Absence, Employment, Year
+from workbench.awt.models import Absence, Employment, VacationDaysOverride, Year
 from workbench.awt.utils import days_per_month, monthly_days
 from workbench.invoices.utils import next_valid_day
 from workbench.logbook.models import LoggedHours
@@ -95,6 +95,11 @@ def annual_working_time(year, *, users):
     vacation_days_credit = defaultdict(lambda: Z1)
     dpm = days_per_month(year)
 
+    overrides = {
+        override.user_id: override.days
+        for override in VacationDaysOverride.objects.filter(year=year, user__in=users)
+    }
+
     for employment in Employment.objects.filter(
         user__in=months.users_with_wtm
     ).order_by("-date_from"):
@@ -142,6 +147,8 @@ def annual_working_time(year, *, users):
             for user, month_data in months.items()
         },
     )
+    remaining.update(overrides)
+
     for absence in Absence.objects.filter(
         user__in=months.users_with_wtm, starts_on__year=year, is_working_time=True
     ).order_by("starts_on"):
@@ -219,6 +226,9 @@ def annual_working_time(year, *, users):
             sums[i] = wt[i] - data["target"][i]
         return sums
 
+    for user_id, days in overrides.items():
+        months[user_id]["available_vacation_days"] = [None] * 12
+
     statistics = []
     for user in months.users_with_wtm:
         month_data = months[user.id]
@@ -242,9 +252,9 @@ def annual_working_time(year, *, users):
                 "totals": {
                     "target_days": sum(month_data["target_days"]),
                     "percentage": sum(month_data["percentage"]) / 12,
-                    "available_vacation_days": sum(
-                        month_data["available_vacation_days"]
-                    ),
+                    "available_vacation_days": overrides[user.id]
+                    if user.id in overrides
+                    else sum(month_data["available_vacation_days"]),
                     "absence_vacation": sum(month_data["absence_vacation"]),
                     "vacation_days_correction": sum(
                         month_data["vacation_days_correction"]
