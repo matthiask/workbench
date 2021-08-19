@@ -20,7 +20,7 @@ TESTING = env("TESTING", default="test" in sys.argv)
 LIVE = env("LIVE", default=False)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
 ADMINS = MANAGERS = [("Matthias Kestenholz", "mk@feinheit.ch")]
-DEFAULT_FROM_EMAIL = SERVER_EMAIL = "workbench@workbench.feinheit.ch"
+DEFAULT_FROM_EMAIL = SERVER_EMAIL = "workbench@feinheit.ch"
 CC = env("CC", default=[row[1] for row in MANAGERS])
 
 DEBUG_TOOLBAR = DEBUG and not TESTING
