@@ -90,8 +90,18 @@ def user_stats_pdf(data):
                 "-" if value is None else days(value)
                 for value in data["months"]["available_vacation_days"]
             ]
-            + [days(data["totals"]["available_vacation_days"])]
+            + [
+                "({})".format(days(data["totals"]["calculated_vacation_days"]))
+                if data["totals"]["vacation_days_override"]
+                else days(data["totals"]["calculated_vacation_days"])
+            ]
         )
+        if override := data["totals"]["vacation_days_override"]:
+            table.append(
+                [_("vacation days override")]
+                + ["" for _i in range(11)]
+                + [override.notes, days(override.days)]
+            )
         table.append(
             [
                 "%s (%s)"

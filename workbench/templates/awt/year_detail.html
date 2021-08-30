@@ -101,8 +101,16 @@
       <tr>
         <th class="text-nowrap">{% translate 'vacation days available' %}</th>
         {% for value in stats.available_vacation_days %}<td class="text-right {% if not value %}text-black-30{% endif %}">{% if value is None %}&ndash;{% else %}{{ value|days }}{% endif %}</td>{% endfor %}
-        <th class="text-right">{{ totals.available_vacation_days|days }}</th>
+        <th class="text-right {% if totals.vacation_days_override %}text-black-30{% endif %}">{{ totals.calculated_vacation_days|days }}</th>
       </tr>
+
+      {% if totals.vacation_days_override %}
+      <tr>
+        <th class="text-nowrap">{% translate 'vacation days override'|capfirst %}</th>
+        <td colspan="12" class="text-right">{{ totals.vacation_days_override.notes }}</td>
+        <th class="text-right">{{ totals.vacation_days_override.days|days }}</th>
+      </tr>
+      {% endif %}
 
       <tr>
         <th class="text-nowrap">
