@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="vacationdaysoverride",
             name="notes",
-            field=models.CharField(blank=True, max_length=500, verbose_name="notes"),
+            field=models.CharField(max_length=500, verbose_name="notes"),
         ),
     ]
