@@ -21,3 +21,16 @@ def problematic_annual_working_times_mail():
         to=["partner@feinheit.ch"],
         cc=["workbench@feinheit.ch"],
     ).send()
+
+    for user, running_sum in stats["problematic"]:
+        render_to_mail(
+            "awt/individual_problematic_mail",
+            {
+                "user": user,
+                "running_sum": running_sum,
+                "month": stats["month"],
+                "WORKBENCH": settings.WORKBENCH,
+            },
+            to=[user.email],
+            cc=["workbench@feinheit.ch"],
+        ).send()

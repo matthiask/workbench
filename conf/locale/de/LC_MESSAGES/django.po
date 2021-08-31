@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-18 10:56+0200\n"
+"POT-Creation-Date: 2021-08-31 09:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -644,7 +644,8 @@ msgstr "Anfang und Ende müssen im gleichen Jahr liegen."
 msgid "%s days"
 msgstr "%s Tage"
 
-#: workbench/awt/models.py
+#: workbench/awt/models.py workbench/awt/pdf.py
+#: workbench/templates/awt/year_detail.html
 msgid "vacation days override"
 msgstr "Manuell definierte Ferientage"
 
@@ -3028,6 +3029,26 @@ msgstr "Stunden pro Kundschaft"
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "Reset the filter form"
 msgstr "Suchformular zurücksetzen"
+
+#: workbench/templates/awt/individual_problematic_mail.txt
+msgid "Problematic annual working time"
+msgstr "Problematische Jahresarbeitszeit"
+
+#: workbench/templates/awt/individual_problematic_mail.txt
+#, python-format
+msgid ""
+"\n"
+"Hello %(full_name)s\n"
+"\n"
+"Your net work hours balance up to and including %(month)s is "
+"%(running_sum)s.\n"
+"This is outside the range of +/- 40h.\n"
+msgstr ""
+"\n"
+"Hallo %(full_name)s\n"
+"\n"
+"Dein Stundensaldo bis und mit %(month)s beträgt %(running_sum)s.\n"
+"Dies ist ausserhalb des Bereichs von +/- 40h.\n"
 
 #: workbench/templates/awt/problematic_mail.txt
 msgid "Problematic annual working times"
