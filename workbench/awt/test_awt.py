@@ -1,15 +1,23 @@
 import datetime as dt
 from decimal import Decimal
 
+from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
 
+from time_machine import travel
+
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.awt.models import Absence, Employment
-from workbench.awt.reporting import active_users, annual_working_time
+from workbench.awt.reporting import (
+    active_users,
+    annual_working_time,
+    problematic_annual_working_times,
+)
+from workbench.awt.tasks import problematic_annual_working_times_mail
 from workbench.awt.utils import monthly_days
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
@@ -492,3 +500,39 @@ class AWTTest(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertContains(response, 'value="2"')
+
+    @travel("2021-09-07 12:00")
+    def test_problematic(self):
+        """Test the mail which is sent for problematic annual working times"""
+        user = factories.UserFactory.create()
+        factories.YearFactory.create(working_time_model=user.working_time_model)
+        Employment.objects.create(
+            user=user,
+            percentage=100,
+            vacation_weeks=5,
+            date_from=dt.date(2018, 1, 1),
+            date_until=dt.date.max,
+        )
+        user.loggedhours.create(
+            service=factories.ServiceFactory.create(),
+            created_by=user,
+            hours=10,
+            description="anything",
+            rendered_on=dt.date(2021, 1, 1),
+        )
+
+        stats = problematic_annual_working_times()
+        self.assertEqual(
+            stats,
+            {
+                "month": dt.date(2021, 8, 31),
+                "problematic": [(user, Decimal("-1910.000"))],
+            },
+        )
+
+        problematic_annual_working_times_mail()
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(
+            [msg.to for msg in mail.outbox],
+            [["partner@feinheit.ch"], [user.email]],
+        )

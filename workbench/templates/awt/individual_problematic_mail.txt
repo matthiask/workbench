@@ -8,3 +8,4 @@ This is outside the range of +/- 40h.
 {% endblocktranslate %}
 
 {{ WORKBENCH.URL }}{% url 'awt_year_report' %}?user={{ user.pk }}
+{% endautoescape %}
