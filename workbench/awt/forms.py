@@ -76,6 +76,7 @@ class AbsenceForm(ModelForm, WarningsForm):
                 initial[field] = value
 
         super().__init__(*args, **kwargs)
+        self.fields["user"].choices = User.objects.choices(collapse_inactive=False)
         self.fields["days"].help_text = format_html(
             '<a href="#" data-hours-button="{hours}">{hours}</a>',
             hours=_("Enter hours"),
