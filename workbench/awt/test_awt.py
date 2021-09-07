@@ -536,3 +536,11 @@ class AWTTest(TestCase):
             [msg.to for msg in mail.outbox],
             [["partner@feinheit.ch"], [user.email]],
         )
+
+        self.assertEqual(
+            [msg.subject for msg in mail.outbox],
+            [
+                "Annual working time warnings - August 2021",
+                "Annual working time warning - August 2021",
+            ],
+        )
