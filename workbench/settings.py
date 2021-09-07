@@ -222,6 +222,8 @@ WORKBENCH = {
         },
         URL="https://workbench.feinheit.ch",
         FEATURES={
+            FEATURES.AWT_WARNING_INDIVIDUAL: F.ALWAYS,
+            FEATURES.AWT_WARNING_ALL: F.USER,
             FEATURES.BOOKKEEPING: F.USER,
             FEATURES.BREAKS_NAG: F.ALWAYS,
             FEATURES.CAMPAIGNS: F.ALWAYS,
@@ -271,6 +273,8 @@ WORKBENCH = {
         },
         URL="https://workbench.diebruchpiloten.com",
         FEATURES={
+            FEATURES.AWT_WARNING_INDIVIDUAL: F.USER,
+            FEATURES.AWT_WARNING_ALL: F.USER,
             FEATURES.BOOKKEEPING: F.ALWAYS,
             FEATURES.BREAKS_NAG: F.ALWAYS,
             FEATURES.CAMPAIGNS: F.NEVER,
@@ -321,6 +325,8 @@ WORKBENCH = {
         },
         URL="https://workbench.blindflugstudios.com",
         FEATURES={
+            FEATURES.AWT_WARNING_INDIVIDUAL: F.USER,
+            FEATURES.AWT_WARNING_ALL: F.USER,
             FEATURES.BOOKKEEPING: F.USER,
             FEATURES.BREAKS_NAG: F.NEVER,
             FEATURES.CAMPAIGNS: F.NEVER,
@@ -368,6 +374,8 @@ WORKBENCH = {
         },
         URL="https://workbench-test.feinheit.ch",
         FEATURES={
+            FEATURES.AWT_WARNING_INDIVIDUAL: F.USER,
+            FEATURES.AWT_WARNING_ALL: F.USER,
             FEATURES.BOOKKEEPING: F.ALWAYS,
             FEATURES.BREAKS_NAG: F.ALWAYS,
             FEATURES.CAMPAIGNS: F.NEVER,

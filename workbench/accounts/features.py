@@ -22,6 +22,8 @@ def feature_required(feature):
 
 
 class FEATURES(str, Enum):
+    AWT_WARNING_INDIVIDUAL = "AWT_WARNING_INDIVIDUAL"
+    AWT_WARNING_ALL = "AWT_WARNING_ALL"
     BOOKKEEPING = "BOOKKEEPING"
     BREAKS_NAG = "BREAKS_NAG"
     CAMPAIGNS = "CAMPAIGNS"
@@ -38,6 +40,12 @@ class FEATURES(str, Enum):
 
 
 LABELS = {
+    FEATURES.AWT_WARNING_INDIVIDUAL: {
+        "label": _("Individual annual working time warning"),
+    },
+    FEATURES.AWT_WARNING_ALL: {
+        "label": _("Annual working time warnings for all"),
+    },
     FEATURES.BOOKKEEPING: {
         "label": _("Bookkeeping"),
     },

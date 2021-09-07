@@ -11,6 +11,7 @@ from time_machine import travel
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
+from workbench.accounts.models import User
 from workbench.awt.models import Absence, Employment
 from workbench.awt.reporting import (
     active_users,
@@ -502,6 +503,12 @@ class AWTTest(TestCase):
         self.assertContains(response, 'value="2"')
 
     @travel("2021-09-07 12:00")
+    @override_settings(
+        FEATURES={
+            FEATURES.AWT_WARNING_ALL: F.USER,
+            FEATURES.AWT_WARNING_INDIVIDUAL: F.USER,
+        }
+    )
     def test_awt_warning(self):
         """Test the mail which is sent for annual working time warnings"""
         user = factories.UserFactory.create()
@@ -530,11 +537,15 @@ class AWTTest(TestCase):
             },
         )
 
+        User.objects.update(_features=[])
+        user._features = [FEATURES.AWT_WARNING_ALL, FEATURES.AWT_WARNING_INDIVIDUAL]
+        user.save()
+
         annual_working_time_warnings_mails()
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
             [msg.to for msg in mail.outbox],
-            [["partner@feinheit.ch"], [user.email]],
+            [[user.email], [user.email]],
         )
 
         self.assertEqual(
