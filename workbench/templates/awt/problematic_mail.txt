@@ -1,8 +1,0 @@
-{% load i18n workbench %}{% autoescape off %}{% translate 'Problematic annual working times' %} - {{ stats.month|date:'F Y' %}
-
-{% translate 'Problematic annual working times' %} - {{ stats.month|date:'F Y' }}
-{% for user, running_sum in stats.problematic %}
-{{ user }}
-{% translate 'net work hours' %}: {{ running_sum|hours }}
-{{ WORKBENCH.URL }}{% url 'awt_year_report' %}?user={{ user.pk }}
-{% endfor %}{% endautoescape %}

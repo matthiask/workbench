@@ -15,9 +15,9 @@ from workbench.awt.models import Absence, Employment
 from workbench.awt.reporting import (
     active_users,
     annual_working_time,
-    problematic_annual_working_times,
+    annual_working_time_warnings,
 )
-from workbench.awt.tasks import problematic_annual_working_times_mail
+from workbench.awt.tasks import annual_working_time_warnings_mails
 from workbench.awt.utils import monthly_days
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
@@ -502,8 +502,8 @@ class AWTTest(TestCase):
         self.assertContains(response, 'value="2"')
 
     @travel("2021-09-07 12:00")
-    def test_problematic(self):
-        """Test the mail which is sent for problematic annual working times"""
+    def test_awt_warning(self):
+        """Test the mail which is sent for annual working time warnings"""
         user = factories.UserFactory.create()
         factories.YearFactory.create(working_time_model=user.working_time_model)
         Employment.objects.create(
@@ -521,16 +521,16 @@ class AWTTest(TestCase):
             rendered_on=dt.date(2021, 1, 1),
         )
 
-        stats = problematic_annual_working_times()
+        stats = annual_working_time_warnings()
         self.assertEqual(
             stats,
             {
                 "month": dt.date(2021, 8, 31),
-                "problematic": [(user, Decimal("-1910.000"))],
+                "warnings": [(user, Decimal("-1910.000"))],
             },
         )
 
-        problematic_annual_working_times_mail()
+        annual_working_time_warnings_mails()
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
             [msg.to for msg in mail.outbox],

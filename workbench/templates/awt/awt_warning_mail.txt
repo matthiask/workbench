@@ -1,0 +1,8 @@
+{% load i18n workbench %}{% autoescape off %}{% translate 'Annual working time warnings' %} - {{ stats.month|date:'F Y' }}
+
+{% translate 'Annual working time warnings' %} - {{ stats.month|date:'F Y' }}
+{% for user, running_sum in stats.warnings %}
+{{ user }}
+{% translate 'net work hours' %}: {{ running_sum|hours }}
+{{ WORKBENCH.URL }}{% url 'awt_year_report' %}?user={{ user.pk }}
+{% endfor %}{% endautoescape %}

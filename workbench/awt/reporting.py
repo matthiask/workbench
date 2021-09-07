@@ -301,16 +301,16 @@ def annual_working_time(year, *, users):
     return {"months": months, "overall": overall, "statistics": statistics}
 
 
-def problematic_annual_working_times():
+def annual_working_time_warnings():
     month = dt.date.today().replace(day=1) - dt.timedelta(days=1)
 
     awt = annual_working_time(month.year, users=active_users(month.year))
-    problematic = [
+    warnings = [
         (row["user"], row["running_sums"][month.month - 1])
         for row in awt["statistics"]
         if row["user"].is_active and abs(row["running_sums"][month.month - 1]) > 40
     ]
-    return {"month": month, "problematic": problematic}
+    return {"month": month, "warnings": warnings}
 
 
 def test():  # pragma: no cover
@@ -319,4 +319,4 @@ def test():  # pragma: no cover
     # year = dt.date.today().year
     # pprint(annual_working_time(year, users=active_users(year)))
 
-    pprint(problematic_annual_working_times())
+    pprint(annual_working_time_warnings())
