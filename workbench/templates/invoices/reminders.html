@@ -15,6 +15,7 @@
       <tr>
         <th class="">{% translate 'customer'|capfirst %}</th>
         <th class="text-nowrap">{% translate 'invoices'|capfirst %}</th>
+        <th class="text-nowrap text-right">{% translate 'Total excl. tax' %}</th>
         <th class="text-nowrap text-right">{% translate 'Last reminded on' %}</th>
       </tr>
     </thead>
@@ -35,6 +36,7 @@
             {% link_or_none invoice with_badge=True %}<br>
           {% endfor %}
         </td>
+        <td class="text-right">{{ row.total_excl_tax|currency }}</td>
         <td class="text-right">{{ row.last_reminded_on|local_date_format|default:_("Not reminded yet") }}</td>
       </tr>
     {% endfor %}

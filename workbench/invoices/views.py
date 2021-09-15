@@ -137,7 +137,11 @@ def reminders(request):
         return max(days) if days else None
 
     reminders = [
-        dict(row, last_reminded_on=last_reminded_on(row))
+        dict(
+            row,
+            last_reminded_on=last_reminded_on(row),
+            total_excl_tax=sum(invoice.total_excl_tax for invoice in row["invoices"]),
+        )
         for row in by_organization.values()
     ]
 
