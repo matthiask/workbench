@@ -120,6 +120,8 @@ def planning_update_mails():
     updates = updated(duration=dt.timedelta(hours=25))
 
     for user, user_updates in updates.items():
+        if not user.is_active:
+            continue
         mail = render_to_mail(
             "planning/updates_mail",
             {
