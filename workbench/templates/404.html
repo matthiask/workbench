@@ -1,23 +1,18 @@
 {% extends "site_base.html" %}
-
 {% load i18n %}
-
 {% block body %}
-
-<div class="container-fluid">
-  <div class="row justify-content-center">
-    <div class="col-lg-4 col-md-6">
-      <div style="height:100px"></div>
-
-      <div class="jumbotron text-center">
-        <h1>{% translate 'Page not found :-(' %}</h1>
-        <p>
-          <br>
-          <a href="/" class="btn btn-primary btn-lg">{% translate 'Back to the start' %}</a>
-        </p>
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-lg-4 col-md-6">
+        <div style="height:100px"></div>
+        <div class="jumbotron text-center">
+          <h1>{% translate 'Page not found :-(' %}</h1>
+          <p>
+            <br>
+            <a href="/" class="btn btn-primary btn-lg">{% translate 'Back to the start' %}</a>
+          </p>
+        </div>
       </div>
-
     </div>
   </div>
-</div>
 {% endblock %}

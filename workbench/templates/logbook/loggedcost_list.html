@@ -1,22 +1,28 @@
 {% extends "generic/object_list.html" %}
-
 {% load bootstrap4 i18n workbench %}
-
 {% block search-form-buttons %}
-{% if request.GET and request.user.features.CONTROLLING %}<a href="{% querystring export='xlsx' %}" class="btn btn-primary">
-  {% include 'svg/desktop-download.svg' %} XLSX</a>{% endif %}
+  {% if request.GET and request.user.features.CONTROLLING %}
+    <a href="{% querystring export='xlsx' %}" class="btn btn-primary">
+      {% include 'svg/desktop-download.svg' %}
+      XLSX
+    </a>
+  {% endif %}
 {% endblock %}
-
 {% block objects %}
-<div class="list-group list-group-flush">
-{% for cost in object_list %}
-<a class="list-group-item list-group-item-action px-0" href="{{ cost.get_absolute_url }}" data-toggle="ajaxmodal">
-  <small class="d-flex justify-content-between">
-    <span>{{ cost.service.project_service_title }}</span>
-    <span>{{ cost.rendered_by.get_short_name }} / {{ cost.rendered_on|local_date_format }}</span>
-  </small>
-  <p class="mb-0"><strong>{{ cost.cost|currency }}</strong> {{ cost.description }}</p>
-</a>
-{% endfor %}
-</div>
+  <div class="list-group list-group-flush">
+    {% for cost in object_list %}
+      <a class="list-group-item list-group-item-action px-0"
+         href="{{ cost.get_absolute_url }}"
+         data-toggle="ajaxmodal">
+        <small class="d-flex justify-content-between">
+        <span>{{ cost.service.project_service_title }}</span>
+        <span>{{ cost.rendered_by.get_short_name }} / {{ cost.rendered_on|local_date_format }}</span>
+        </small>
+        <p class="mb-0">
+          <strong>{{ cost.cost|currency }}</strong>
+          {{ cost.description }}
+        </p>
+      </a>
+    {% endfor %}
+  </div>
 {% endblock %}

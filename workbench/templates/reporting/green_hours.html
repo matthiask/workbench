@@ -1,57 +1,55 @@
 {% extends "base.html" %}
-
 {% load fineforms i18n static workbench %}
-
-{% block title %}{% translate 'Green hours' %} - {{ block.super }}{% endblock %}
-
+{% block title %}
+  {% translate 'Green hours' %} - {{ block.super }}
+{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-<div class="col-sm-12 col-md-8">
-  <h1>{% translate 'Green hours' %}</h1>
-
-  <form method="get" class="mb-3" data-autosubmit>
-    {% ff_fields form %}
-  </form>
-
-  <table class="table table-sm table-striped">
-    <thead>
-      <tr>
-        <th>{% translate 'user'|capfirst %}</th>
-        <th class="text-right">{% translate 'profitable'|capfirst %}</th>
-        <th></th>
-        <th class="text-right">{% translate 'overdrawn'|capfirst %}</th>
-        <th></th>
-        <th class="text-right">{% translate 'maintenance'|capfirst %}</th>
-        <th></th>
-        <th class="text-right">{% translate 'internal'|capfirst %}</th>
-        <th></th>
-        <th class="text-right">{% translate 'total'|capfirst %}</th>
-        <th class="text-right">{% translate 'green'|capfirst %}</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for user, stats in stats %}
-    <tr>
-      {% if user %}
-        <td>{{ user }}</td>
-      {% else %}
-        <th>{% translate 'total'|capfirst %}</th>
-      {% endif %}
-      <td class="text-right">{{ stats.green|hours }}</td>
-      <td>{% percentage stats.green stats.total %}</td>
-      <td class="text-right">{{ stats.red|hours }}</td>
-      <td>{% percentage stats.red stats.total %}</td>
-      <td class="text-right">{{ stats.maintenance|hours }}</td>
-      <td>{% percentage stats.maintenance stats.total %}</td>
-      <td class="text-right">{{ stats.internal|hours }}</td>
-      <td>{% percentage stats.internal stats.total %}</td>
-      <td class="text-right">{{ stats.total|hours }}</td>
-      <td class="text-right">{{ stats.percentage|stringformat:'d' }}% {% pie stats.percentage 100 type="good" %}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-
-</div>
-</div>
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-8">
+      <h1>{% translate 'Green hours' %}</h1>
+      <form method="get" class="mb-3" data-autosubmit>
+        {% ff_fields form %}
+      </form>
+      <table class="table table-sm table-striped">
+        <thead>
+          <tr>
+            <th>{% translate 'user'|capfirst %}</th>
+            <th class="text-right">{% translate 'profitable'|capfirst %}</th>
+            <th></th>
+            <th class="text-right">{% translate 'overdrawn'|capfirst %}</th>
+            <th></th>
+            <th class="text-right">{% translate 'maintenance'|capfirst %}</th>
+            <th></th>
+            <th class="text-right">{% translate 'internal'|capfirst %}</th>
+            <th></th>
+            <th class="text-right">{% translate 'total'|capfirst %}</th>
+            <th class="text-right">{% translate 'green'|capfirst %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user, stats in stats %}
+            <tr>
+              {% if user %}
+                <td>{{ user }}</td>
+              {% else %}
+                <th>{% translate 'total'|capfirst %}</th>
+              {% endif %}
+              <td class="text-right">{{ stats.green|hours }}</td>
+              <td>{% percentage stats.green stats.total %}</td>
+              <td class="text-right">{{ stats.red|hours }}</td>
+              <td>{% percentage stats.red stats.total %}</td>
+              <td class="text-right">{{ stats.maintenance|hours }}</td>
+              <td>{% percentage stats.maintenance stats.total %}</td>
+              <td class="text-right">{{ stats.internal|hours }}</td>
+              <td>{% percentage stats.internal stats.total %}</td>
+              <td class="text-right">{{ stats.total|hours }}</td>
+              <td class="text-right">
+                {{ stats.percentage|stringformat:'d' }}% {% pie stats.percentage 100 type="good" %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 {% endblock %}

@@ -1,5 +1,4 @@
 import datetime as dt
-import io
 
 from django.core.management import BaseCommand
 
@@ -18,5 +17,5 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         date_range = [dt.date(options["year"], 1, 1), dt.date(options["year"], 12, 31)]
-        with io.open(options["target"], "wb") as f:
+        with open(options["target"], "wb") as f:
             paid_debtors_zip(date_range, file=f)

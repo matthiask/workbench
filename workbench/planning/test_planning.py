@@ -98,7 +98,7 @@ class PlanningTest(TestCase):
             queryset = form.filter(model.objects.all())
             self.assertEqual(list(queryset), instances)
 
-            req = rf.get("/?project={}".format(project.pk))
+            req = rf.get(f"/?project={project.pk}")
             req.user = project.owned_by
             form = form_class(req.GET, request=req)
             self.assertTrue(form.is_valid())
@@ -111,11 +111,11 @@ class PlanningTest(TestCase):
         self.client.force_login(offer.owned_by)
 
         response = self.client.get(
-            offer.project.urls["creatework"] + "?offer={}".format(offer.pk)
+            offer.project.urls["creatework"] + f"?offer={offer.pk}"
         )
         self.assertContains(
             response,
-            '<option value="{}" selected>{}</option>'.format(offer.pk, offer),
+            f'<option value="{offer.pk}" selected>{offer}</option>',
             html=True,
         )
 

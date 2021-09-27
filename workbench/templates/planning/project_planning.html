@@ -1,51 +1,57 @@
 {% extends "generic/object_detail.html" %}
-
 {% load i18n workbench webpack_loader %}
-
-{% block title %}{% translate 'planning'|capfirst %} - {{ block.super }}{% endblock %}
-
+{% block title %}
+  {% translate 'planning'|capfirst %} - {{ block.super }}
+{% endblock %}
 {% block uplink %}
   <a href="{{ object.get_absolute_url }}" class="btn btn-primary btn-sm uplink">
-    {% include 'svg/chevron-left.svg' %} {% translate 'project' %}
+    {% include 'svg/chevron-left.svg' %}
+    {% translate 'project' %}
   </a>
 {% endblock %}
-
 {% block content %}
-<div class="row">
-  <div class="col-12">
-    <h1>{% translate 'planning'|capfirst %}: {{ object }}</h1>
+  <div class="row">
+    <div class="col-12">
+      <h1>{% translate 'planning'|capfirst %}: {{ object }}</h1>
+    </div>
   </div>
-</div>
-
   <div id="planning-root" class="planning-wrapper"></div>
   {{ planning_data|json_script:'planning-data' }}
   <script src="{% url 'javascript-catalog' %}"></script>
   {% if not TESTING %}
     {% render_bundle "planning" %}
   {% endif %}
-
-<div class="row mt-5">
-  <div class="col-12">
-    <a href="{{ object.urls.creatework }}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
-      {% include 'svg/plus.svg' %}
-      {% translate 'planned work'|capfirst %}
-    </a>
-    <a href="{{ object.urls.createexternalwork }}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
-      {% include 'svg/plus.svg' %}
-      {% translate 'external work'|capfirst %}
-    </a>
-    <a href="{{ object.urls.createmilestone }}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
-      {% include 'svg/plus.svg' %}
-      {% translate 'milestone'|capfirst %}
-    </a>
-    <a href="{% url 'awt_absence_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
-      {% include 'svg/plus.svg' %}
-      {% translate 'absence'|capfirst %}
-    </a>
-
-    <a href="{% url 'history' 'planning_plannedwork' 'project_id' object.pk %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">{% translate 'History of planned work' %}</a>
-    <a href="{% url 'history' 'planning_milestone' 'project_id' object.pk %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">{% translate 'History of milestones' %}</a>
-    <a href="{% url 'projects_project_planning_external' object.pk %}" class="btn btn-primary btn-sm">{% translate 'External planning view' %}</a>
+  <div class="row mt-5">
+    <div class="col-12">
+      <a href="{{ object.urls.creatework }}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
+        {% include 'svg/plus.svg' %}
+        {% translate 'planned work'|capfirst %}
+      </a>
+      <a href="{{ object.urls.createexternalwork }}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
+        {% include 'svg/plus.svg' %}
+        {% translate 'external work'|capfirst %}
+      </a>
+      <a href="{{ object.urls.createmilestone }}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
+        {% include 'svg/plus.svg' %}
+        {% translate 'milestone'|capfirst %}
+      </a>
+      <a href="{% url 'awt_absence_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
+        {% include 'svg/plus.svg' %}
+        {% translate 'absence'|capfirst %}
+      </a>
+      <a href="{% url 'history' 'planning_plannedwork' 'project_id' object.pk %}"
+         data-toggle="ajaxmodal"
+         class="btn btn-primary btn-sm">
+        {% translate 'History of planned work' %}
+      </a>
+      <a href="{% url 'history' 'planning_milestone' 'project_id' object.pk %}"
+         data-toggle="ajaxmodal"
+         class="btn btn-primary btn-sm">
+        {% translate 'History of milestones' %}
+      </a>
+      <a href="{% url 'projects_project_planning_external' object.pk %}" class="btn btn-primary btn-sm">
+        {% translate 'External planning view' %}
+      </a>
+    </div>
   </div>
-</div>
 {% endblock %}

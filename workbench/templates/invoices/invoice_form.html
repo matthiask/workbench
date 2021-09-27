@@ -1,18 +1,18 @@
 {% extends "generic/object_form.html" %}
-
 {% load i18n %}
-
 {% block uplink %}
-{% if view.project %}
-  <a href="{{ view.project.get_absolute_url }}" class="btn btn-primary btn-sm uplink">
-    {% include 'svg/chevron-left.svg' %} {% translate 'project' %}
-  </a>
-{% else %}{{ block.super }}
-{% endif %}
+  {% if view.project %}
+    <a href="{{ view.project.get_absolute_url }}" class="btn btn-primary btn-sm uplink">
+      {% include 'svg/chevron-left.svg' %}
+      {% translate 'project' %}
+    </a>
+  {% else %}
+    {{ block.super }}
+  {% endif %}
 {% endblock %}
-
-{% block js %}{{ block.super }}
-<script>
+{% block js %}
+  {{ block.super }}
+  <script>
 jQuery(function($) {
   $(document.body).on("change", "[data-toggle-following]", function() {
     var self = $(this),
@@ -21,5 +21,5 @@ jQuery(function($) {
     siblings.find("input").prop("checked", this.checked);
   });
 });
-</script>
+  </script>
 {% endblock %}

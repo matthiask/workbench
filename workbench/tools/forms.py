@@ -66,7 +66,7 @@ class Autocomplete(forms.TextInput):
             _AUTOCOMPLETE_TEMPLATE
             % {
                 "id": final_attrs["id"],
-                "url": reverse("%s_%s_autocomplete" % (opts.app_label, opts.model_name))
+                "url": reverse(f"{opts.app_label}_{opts.model_name}_autocomplete")
                 + self.params,
                 "field": format_html("<input{} />", flatatt(final_attrs)),
                 "pretty": escape(pretty),
@@ -94,7 +94,7 @@ class WarningsForm:
     """
 
     def __init__(self, *args, **kwargs):
-        super(WarningsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.warnings = {}
 
@@ -109,7 +109,7 @@ class WarningsForm:
         ``is_valid()`` override which returns ``False`` for forms with warnings
         if these warnings haven't been explicitly ignored
         """
-        if not super(WarningsForm, self).is_valid():
+        if not super().is_valid():
             return False
 
         if self.warnings and not self.should_ignore_warnings():
@@ -127,7 +127,7 @@ class WarningsForm:
     def ignore_warnings_value(self):
         return " ".join(sorted(self.warnings))
 
-    ignore_warnings_id = "__ig_{}".format(int(time.time() / 10800))
+    ignore_warnings_id = f"__ig_{int(time.time() / 10800)}"
 
 
 class DateInput(forms.TextInput):
@@ -158,7 +158,7 @@ class Form(WarningsForm, forms.Form):
     def apply_owned_by(self, queryset, *, attribute="owned_by"):
         value = self.cleaned_data.get(attribute)
         if value == 0:
-            return queryset.filter(**{"{}__is_active".format(attribute): False})
+            return queryset.filter(**{f"{attribute}__is_active": False})
         elif value:
             user = self.request.user if value == -1 else value
             return queryset.filter(**{attribute: user})

@@ -1,114 +1,105 @@
 {% extends "base.html" %}
-
 {% load i18n workbench %}
-
-{% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
-
+{% block title %}
+  {{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}
+{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-<div class="col-md-12">
-  <h1>{{ object|h }} {% history_link object %}</h1>
-
-  <table class="table">
-    {% for name, value in object|field_value_pairs %}
-    <tr>
-      <th class="text-right">{{ name }}</th>
-      <td>{% link_or_none value %}</td>
-    </tr>
-    {% endfor %}
-
-    <tr>
-      <th class="text-right">{% translate 'projects'|capfirst %}</th>
-      <td>
-
-        {% if request.user.features.CONTROLLING %}
-          {% with statistics=object.statistics %}
-          <table class="table table-sm table-hover">
-            <thead class="sticky">
-              <tr>
-                <th>{% translate 'project'|capfirst %}</th>
-                <th class="text-right">{% translate 'offered'|capfirst %}</th>
-                <th class="text-right">{% translate 'logbook'|capfirst %}</th>
-                <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
-                <th class="text-right">{% translate 'invoiced'|capfirst %}</th>
-                <th class="text-right">{% translate 'Not archived' %}</th>
-                <th class="text-right">&Delta;</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th></th>
-                <th class="text-right">{{ statistics.overall.offered|currency }}</th>
-                <th class="text-right">
-                  {{ statistics.overall.logbook|currency }}
-                  {% bar statistics.overall.logbook statistics.overall.offered %}
-                </th>
-                <th class="text-right">{{ statistics.overall.third_party_costs|currency }}</th>
-                <th class="text-right">{{ statistics.overall.invoiced|currency }}</th>
-                <th class="text-right text-nowrap">
-                  {{ statistics.overall.not_archived|hours }} / {{ statistics.overall.hours|hours }}
-                  {% pie statistics.overall.not_archived statistics.overall.hours %}
-                </th>
-                <th class="text-right">
-                  {{ statistics.overall.delta_positive|currency:True }}<br>
-                  {{ statistics.overall.delta_negative|currency:True }}
-                </th>
-              </tr>
-              {% for project in statistics.statistics %}
-                <tr>
-                  <td>{% link_or_none project.project with_badge=True %}</td>
-                  <td class="text-right {% if not project.offered %}text-black-30{% endif %}">{{ project.offered|currency }}</td>
-                  <td class="text-right text-nowrap {% if not project.logbook and not project.effort_hours_with_rate_undefined %}text-black-30{% endif %}">
-                    {{ project.logbook|currency }}
-                    {% if project.effort_hours_with_rate_undefined %}
-                    <span class="text-warning" title="{% translate 'undefined rate' %}">(+{{ project.effort_hours_with_rate_undefined|hours }})</span>
-                    {% endif %}
-                    {% bar project.logbook project.offered %}
-                  </td>
-                  <td class="text-right {% if not project.third_party_costs %}text-black-30{% endif %}">{{ project.third_party_costs|currency }}</td>
-                  <td class="text-right {% if not project.invoiced %}text-black-30{% endif %}">{{ project.invoiced|currency }}</td>
-                  <td class="text-right text-nowrap">
-                    {{ project.not_archived|hours }} / {{ project.hours|hours }}
-                    {% pie project.not_archived project.hours %}
-                  </td>
-                  <td class="text-right {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
-                </tr>
+  <div class="row justify-content-center">
+    <div class="col-md-12">
+      <h1>{{ object|h }} {% history_link object %}</h1>
+      <table class="table">
+        {% for name, value in object|field_value_pairs %}
+          <tr>
+            <th class="text-right">{{ name }}</th>
+            <td>{% link_or_none value %}</td>
+          </tr>
+        {% endfor %}
+        <tr>
+          <th class="text-right">{% translate 'projects'|capfirst %}</th>
+          <td>
+            {% if request.user.features.CONTROLLING %}
+              {% with statistics=object.statistics %}
+                <table class="table table-sm table-hover">
+                  <thead class="sticky">
+                    <tr>
+                      <th>{% translate 'project'|capfirst %}</th>
+                      <th class="text-right">{% translate 'offered'|capfirst %}</th>
+                      <th class="text-right">{% translate 'logbook'|capfirst %}</th>
+                      <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
+                      <th class="text-right">{% translate 'invoiced'|capfirst %}</th>
+                      <th class="text-right">{% translate 'Not archived' %}</th>
+                      <th class="text-right">&Delta;</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th></th>
+                      <th class="text-right">{{ statistics.overall.offered|currency }}</th>
+                      <th class="text-right">
+                        {{ statistics.overall.logbook|currency }}
+                        {% bar statistics.overall.logbook statistics.overall.offered %}
+                      </th>
+                      <th class="text-right">{{ statistics.overall.third_party_costs|currency }}</th>
+                      <th class="text-right">{{ statistics.overall.invoiced|currency }}</th>
+                      <th class="text-right text-nowrap">
+                        {{ statistics.overall.not_archived|hours }} / {{ statistics.overall.hours|hours }}
+                        {% pie statistics.overall.not_archived statistics.overall.hours %}
+                      </th>
+                      <th class="text-right">
+                        {{ statistics.overall.delta_positive|currency:True }}
+                        <br>
+                        {{ statistics.overall.delta_negative|currency:True }}
+                      </th>
+                    </tr>
+                    {% for project in statistics.statistics %}
+                      <tr>
+                        <td>{% link_or_none project.project with_badge=True %}</td>
+                        <td class="text-right {% if not project.offered %}text-black-30{% endif %}">{{ project.offered|currency }}</td>
+                        <td class="text-right text-nowrap {% if not project.logbook and not project.effort_hours_with_rate_undefined %}text-black-30{% endif %}">
+                          {{ project.logbook|currency }}
+                          {% if project.effort_hours_with_rate_undefined %}
+                            <span class="text-warning"
+                                  title="{% translate 'undefined rate' %}">(+{{ project.effort_hours_with_rate_undefined|hours }})</span>
+                          {% endif %}
+                          {% bar project.logbook project.offered %}
+                        </td>
+                        <td class="text-right {% if not project.third_party_costs %}text-black-30{% endif %}">
+                          {{ project.third_party_costs|currency }}
+                        </td>
+                        <td class="text-right {% if not project.invoiced %}text-black-30{% endif %}">{{ project.invoiced|currency }}</td>
+                        <td class="text-right text-nowrap">
+                          {{ project.not_archived|hours }} / {{ project.hours|hours }}
+                          {% pie project.not_archived project.hours %}
+                        </td>
+                        <td class="text-right {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              {% endwith %}
+              <strong>{% translate 'Gross margin / hour' %}:</strong>
+              {{ object.statistics.overall.gross_margin_per_hour|currency }}
+            {% else %}
+              {% for project in object.projects.all %}
+                {% link_or_none project with_badge=True %}
               {% endfor %}
-            </tbody>
-          </table>
-          {% endwith %}
-          <strong>{% translate 'Gross margin / hour' %}:</strong>
-          {{ object.statistics.overall.gross_margin_per_hour|currency }}
-        {% else %}
-          {% for project in object.projects.all %}
-            {% link_or_none project with_badge=True %}
-          {% endfor %}
-        {% endif %}
-
-      </td>
-    </tr>
-  </table>
-
-  <a href="{% url 'projects_project_create' %}?campaign={{ object.pk }}" class="btn btn-primary">
-    {% include "svg/plus.svg" %}
-    {% translate 'project'|capfirst %}
-  </a>
-  <a href="{{ object.urls.update }}" class="btn btn-primary">
-    {% translate 'Update' %}
-  </a>
-  <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-primary">
-    {% translate 'Copy' %}</a>
-
-  <a href="{% url 'logbook_loggedhours_list' %}?campaign={{ object.pk }}" class="btn btn-primary">
-    {% translate 'logged hours'|capfirst %}
-  </a>
-  <a href="{% url 'logbook_loggedcost_list' %}?campaign={{ object.pk }}" class="btn btn-primary">
-    {% translate 'logged cost'|capfirst %}
-  </a>
-
-  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
-    {% translate 'Delete' %}
-  </a>
-</div>
-</div>
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+      <a href="{% url 'projects_project_create' %}?campaign={{ object.pk }}" class="btn btn-primary">
+        {% include "svg/plus.svg" %}
+        {% translate 'project'|capfirst %}
+      </a>
+      <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
+      <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-primary">{% translate 'Copy' %}</a>
+      <a href="{% url 'logbook_loggedhours_list' %}?campaign={{ object.pk }}" class="btn btn-primary">
+        {% translate 'logged hours'|capfirst %}
+      </a>
+      <a href="{% url 'logbook_loggedcost_list' %}?campaign={{ object.pk }}" class="btn btn-primary">
+        {% translate 'logged cost'|capfirst %}
+      </a>
+      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">{% translate 'Delete' %}</a>
+    </div>
+  </div>
 {% endblock %}

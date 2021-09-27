@@ -1,5 +1,4 @@
 {% load bootstrap4 i18n %}
-
 <div class="modal">
   <div class="modal-dialog {% block size %}{% endblock %}">
     <div class="modal-content">
@@ -7,7 +6,9 @@
         <h4 class="modal-title">
           {% block title %}{{ title }}{% endblock %}
         </h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
       <div class="modal-body clearfix">
         {% bootstrap_messages %}
@@ -15,11 +16,10 @@
       </div>
       <div class="modal-footer">
         {% block footer %}
-          <button type="button" data-dismiss="modal" class="btn btn-primary">
-            {% translate 'Close' %}
-          </button>
+          <button type="button" data-dismiss="modal" class="btn btn-primary">{% translate 'Close' %}</button>
         {% endblock %}
       </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div>
+    </div>
+    <!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div>

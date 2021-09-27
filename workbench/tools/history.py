@@ -41,7 +41,7 @@ from workbench.tools.formats import local_date_format
 
 
 # This is an object which __contains__ everything
-EVERYTHING = type(str("c"), (), {"__contains__": lambda *a: True})()
+EVERYTHING = type("c", (), {"__contains__": lambda *a: True})()
 
 Change = namedtuple("Change", "changes created_at pretty_user_name values version")
 

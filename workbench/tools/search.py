@@ -70,7 +70,7 @@ DROP TRIGGER IF EXISTS {table}_fts_trigger ON {table};
 CREATE TRIGGER {table}_fts_trigger BEFORE INSERT OR UPDATE
   ON {table} FOR EACH ROW EXECUTE PROCEDURE {table}_fts();
 """.format(
-        table=table, fields=", ".join("new.{}".format(field) for field in fields)
+        table=table, fields=", ".join(f"new.{field}" for field in fields)
     )
 
 

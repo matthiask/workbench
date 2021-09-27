@@ -34,7 +34,7 @@ register_fonts_from_paths(font_name="Rep", **settings.WORKBENCH.FONTS)
 Z = D("0.00")
 
 
-class Empty(object):
+class Empty:
     pass
 
 
@@ -282,7 +282,11 @@ class PDFDocument(_PDFDocument):
                                 )
                                 if service.effort_hours and service.effort_rate
                                 else "",
-                                ("%s %s" % (currency(service.cost), _("fixed costs")))
+                                (
+                                    "{} {}".format(
+                                        currency(service.cost), _("fixed costs")
+                                    )
+                                )
                                 if service.cost
                                 else "",
                             ],
@@ -343,7 +347,7 @@ class PDFDocument(_PDFDocument):
         if instance.tax_amount:
             total.append(
                 (
-                    "%0.1f%% %s" % (instance.tax_rate, _("tax")),
+                    "{:0.1f}% {}".format(instance.tax_rate, _("tax")),
                     currency(transform(instance.tax_amount).quantize(Z)),
                 )
             )
@@ -369,7 +373,7 @@ class PDFDocument(_PDFDocument):
             self.p(instance.description)
         self.spacer(2 * mm)
         if getattr(instance, "service_period", None):
-            self.p("%s: %s" % (_("Service period"), instance.service_period))
+            self.p("{}: {}".format(_("Service period"), instance.service_period))
             self.spacer()
         self.table_services(
             instance.services.all(),

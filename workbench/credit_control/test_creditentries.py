@@ -1,5 +1,4 @@
 import datetime as dt
-import io
 import os
 from decimal import Decimal
 
@@ -37,8 +36,8 @@ class CreditEntriesTest(TestCase):
         response = self.client.post(
             "/credit-control/assign/",
             {
-                "entry_{}_invoice".format(entry_2.pk): invoice.pk,
-                "entry_{}_notes".format(entry_1.pk): "Stuff",
+                f"entry_{entry_2.pk}_invoice": invoice.pk,
+                f"entry_{entry_1.pk}_notes": "Stuff",
             },
         )
         self.assertRedirects(response, "/credit-control/assign/")
@@ -48,7 +47,7 @@ class CreditEntriesTest(TestCase):
 
         response = self.client.post(
             "/credit-control/assign/",
-            {"entry_{}_notes".format(entry_0.pk): "Stuff"},
+            {f"entry_{entry_0.pk}_notes": "Stuff"},
             follow=True,
         )
         self.assertRedirects(response, "/credit-control/")
@@ -66,7 +65,7 @@ class CreditEntriesTest(TestCase):
         ledger = factories.LedgerFactory.create()
 
         def send(data={}):
-            with io.open(
+            with open(
                 os.path.join(
                     settings.BASE_DIR, "workbench", "test", "account-statement.csv"
                 )
@@ -129,7 +128,7 @@ class CreditEntriesTest(TestCase):
         code("q=test")
         code("s=pending")
         code("s=processed")
-        code("ledger={}".format(ledger.pk))
+        code(f"ledger={ledger.pk}")
 
     def test_create_entry(self):
         """Creating credit entries "by hand" works"""
@@ -175,7 +174,7 @@ class CreditEntriesTest(TestCase):
 
     def test_postfinance_parse_csv(self):
         """Generating PostFinance reference numbers when uploading acc. statements"""
-        with io.open(
+        with open(
             os.path.join(
                 settings.BASE_DIR, "workbench", "test", "postfinance-export.csv"
             ),
@@ -203,7 +202,7 @@ class CreditEntriesTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
         ledger = factories.LedgerFactory.create()
 
-        with io.open(
+        with open(
             os.path.join(settings.BASE_DIR, "workbench", "test", "stopwatch.png"), "rb"
         ) as f:
             response = self.client.post(

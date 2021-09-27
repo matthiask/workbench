@@ -352,7 +352,7 @@ order by ph.date
                         "is_accepted": offer.is_accepted,
                         "url": offer.get_absolute_url(),
                         "creatework": offer.project.urls["creatework"]
-                        + "?offer={}".format(offer.pk),
+                        + f"?offer={offer.pk}",
                     }
                     if offer
                     else {}

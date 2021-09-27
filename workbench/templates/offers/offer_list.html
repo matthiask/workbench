@@ -1,24 +1,24 @@
 {% extends "projects/object_list.html" %}
-
 {% load bootstrap4 i18n workbench %}
-
 {% block objects %}
-<div class="list-group list-group-flush">
-  {% for object in object_list %}
-  <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action px-0">
-    <div class="d-flex w-100 justify-content-between">
-      <h5 class="mb-1">{{ object|h }}</h5>
-      {{ object.status_badge }}
-    </div>
-    <div class="row">
-      <div class="col-md-5 text-truncate">{{ object.project|h }}</div>
-      <div class="col-md-4 text-truncate">{{ object.project.contact.name_with_organization|default:object.project.customer }}</div>
-      <div class="col-md-3 text-truncate text-md-right">
-        {{ object.total_excl_tax|currency }} exkl. /
-        {{ object.total|currency }}
-      </div>
-    </div>
-  </a>
-  {% endfor %}
-</div>
+  <div class="list-group list-group-flush">
+    {% for object in object_list %}
+      <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action px-0">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">{{ object|h }}</h5>
+          {{ object.status_badge }}
+        </div>
+        <div class="row">
+          <div class="col-md-5 text-truncate">{{ object.project|h }}</div>
+          <div class="col-md-4 text-truncate">
+            {{ object.project.contact.name_with_organization|default:object.project.customer }}
+          </div>
+          <div class="col-md-3 text-truncate text-md-right">
+            {{ object.total_excl_tax|currency }} exkl. /
+            {{ object.total|currency }}
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
 {% endblock %}

@@ -102,7 +102,7 @@ class ExpenseReportForm(ModelForm):
                     cost.service,
                     cost.description,
                     currency(cost.third_party_costs),
-                    " ({} {})".format(cost.expense_currency, cost.expense_cost)
+                    f" ({cost.expense_currency} {cost.expense_cost})"
                     if cost.expense_cost
                     else "",
                 ),

@@ -137,7 +137,7 @@ class Offer(ModelWithTotal):
             return 0
 
     def get_absolute_url(self):
-        return "%s#offer%s" % (self.project.get_absolute_url(), self.pk)
+        return f"{self.project.get_absolute_url()}#offer{self.pk}"
 
     def save(self, *args, **kwargs):
         new = not self.pk

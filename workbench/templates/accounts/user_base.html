@@ -1,37 +1,30 @@
 {% extends "base.html" %}
-
 {% load i18n mark_current workbench %}
-
-{% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
-
+{% block title %}
+  {{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}
+{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-lg-10">
-
-    <h1>{{ object|h }} {% history_link object %}</h1>
-
-    <ul class="nav nav-tabs my-3">
-      <li class="nav-item">
-        <a class="nav-link" href="{{ user.urls.detail }}">{% translate 'user'|capfirst %}</a>
-      </li>
-      {% mark_current request.path %}
-      {% if request.user.features.PLANNING %}
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <h1>{{ object|h }} {% history_link object %}</h1>
+      <ul class="nav nav-tabs my-3">
         <li class="nav-item">
-          <a class="nav-link" href="{{ user.urls.planning }}">{% translate 'Planning' %}</a>
+          <a class="nav-link" href="{{ user.urls.detail }}">{% translate 'user'|capfirst %}</a>
         </li>
+        {% mark_current request.path %}
+        {% if request.user.features.PLANNING %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ user.urls.planning }}">{% translate 'Planning' %}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ user.urls.retrospective }}">{% translate 'Retrospective' %}</a>
+          </li>
+        {% endif %}
         <li class="nav-item">
-          <a class="nav-link" href="{{ user.urls.retrospective }}">{% translate 'Retrospective' %}</a>
+          <a class="nav-link" href="{{ user.urls.statistics }}">{% translate 'Statistics' %}</a>
         </li>
-      {% endif %}
-      <li class="nav-item">
-        <a class="nav-link" href="{{ user.urls.statistics }}">{% translate 'Statistics' %}</a>
-      </li>
       {% endmark_current %}
     </ul>
-
   </div>
 </div>
-
-{% block inner_content %}{% endblock %}
-
-{% endblock %}
+{% block inner_content %}{% endblock %}{% endblock %}

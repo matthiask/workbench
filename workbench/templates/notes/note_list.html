@@ -1,16 +1,14 @@
 {% extends "generic/object_list.html" %}
-
 {% load bootstrap4 i18n workbench %}
-
 {% block objects %}
-<div class="list-group list-group-flush">
-{% for object in object_list %}
-<a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action px-0">
-  <div class="d-flex w-100 justify-content-between">
-    <h5 class="mb-1">{{ object|h }}</h5>
-    {{ object.created_at|local_date_format }}
+  <div class="list-group list-group-flush">
+    {% for object in object_list %}
+      <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action px-0">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">{{ object|h }}</h5>
+          {{ object.created_at|local_date_format }}
+        </div>
+      </a>
+    {% endfor %}
   </div>
-</a>
-{% endfor %}
-</div>
 {% endblock %}

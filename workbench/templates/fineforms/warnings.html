@@ -3,11 +3,14 @@
   <div class="alert alert-warning alert-dismissable">
     <button class="close" type="button" data-dismiss="alert" aria-hidden="true">&#215;</button>
     {% for warning in form.warnings.values %}
-      {{ warning }}<br>
+      {{ warning }}
+      <br>
     {% endfor %}
-
     <br>
-    <input type="checkbox" name="{{ form.ignore_warnings_id }}" value="{{ form.ignore_warnings_value }}" id="id_{{ form.ignore_warnings_id }}">
+    <input type="checkbox"
+           name="{{ form.ignore_warnings_id }}"
+           value="{{ form.ignore_warnings_value }}"
+           id="id_{{ form.ignore_warnings_id }}">
     <label for="id_{{ form.ignore_warnings_id }}">{% translate 'Ignore warnings' %}</label>
   </div>
 {% endif %}

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import datetime
 from decimal import Decimal as D
@@ -13,7 +12,7 @@ from decimal import Decimal as D
 # ----------------------------------------------------------------------------#
 
 
-class EasterDay(object):
+class EasterDay:
 
     """
     Berechnung des Ostersonntages nach der Formel von Heiner Lichtenberg für
@@ -186,7 +185,7 @@ if __name__ == "__main__":
         days = get_public_holidays(i)
         print(
             "\n".join(
-                "%s: %s" % (day.strftime("%d.%m.%Y"), name)
+                "{}: {}".format(day.strftime("%d.%m.%Y"), name)
                 for day, name in sorted(days.items())
             )
         )

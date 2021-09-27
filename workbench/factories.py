@@ -259,10 +259,10 @@ class LedgerFactory(DjangoModelFactory):
 
 class CreditEntryFactory(DjangoModelFactory):
     ledger = factory.SubFactory(LedgerFactory)
-    reference_number = factory.Sequence(lambda n: "payment{}".format(n))
+    reference_number = factory.Sequence(lambda n: f"payment{n}")
     value_date = factory.LazyAttribute(lambda a: dt.date.today())
     total = 1
-    payment_notice = factory.Sequence(lambda n: "Payment {}".format(n))
+    payment_notice = factory.Sequence(lambda n: f"Payment {n}")
 
     class Meta:
         model = CreditEntry

@@ -60,7 +60,7 @@ class LoggedHours(Model):
         verbose_name_plural = _("logged hours")
 
     def __str__(self):
-        return "%s: %s" % (self.service.title, self.description)
+        return f"{self.service.title}: {self.description}"
 
     @classmethod
     def allow_delete(cls, instance, request):

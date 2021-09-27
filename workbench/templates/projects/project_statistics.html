@@ -1,89 +1,80 @@
 {% extends 'modal.html' %}
-
 {% load bootstrap4 i18n workbench %}
-
 {% block size %}modal-xl{% endblock %}
-
-{% block title %}{% translate 'Statistics' %}{% endblock %}
-
+{% block title %}
+  {% translate 'Statistics' %}
+{% endblock %}
 {% block body %}
-
-<h2>{% translate 'Logged hours per hourly rate' %}</h2>
-<table>
-{% for rate, hours in object.grouped_services.logged_hours_per_effort_rate %}
-<tr {% if rate is None %}class="text-warning"{% endif %}>
-  <td class="text-right">{{ hours|hours }} &nbsp;</td>
-  <td>
-    {% if rate is None %}{% translate 'undefined rate' %}
-    {% else %}{{ rate|currency }}/h
-    {% endif %}
-  </td>
-</tr>
-{% endfor %}
-</table>
-
-<h2>{% translate 'Logged hours per user' %}</h2>
-
-<table class="table table-sm table-responsive">
-  <tr>
-    <th></th>
-    <th>{% translate 'Scheduled' %}</th>
-    <th>{% translate 'Logged' %}</th>
-    <th></th>
-    {% for user, hours in object.grouped_services.logged_hours_per_user %}
-      <th class="text-right">{{ user.get_short_name }}</th>
+  <h2>{% translate 'Logged hours per hourly rate' %}</h2>
+  <table>
+    {% for rate, hours in object.grouped_services.logged_hours_per_effort_rate %}
+      <tr {% if rate is None %}class="text-warning"{% endif %}>
+        <td class="text-right">{{ hours|hours }} &nbsp;</td>
+        <td>
+          {% if rate is None %}
+            {% translate 'undefined rate' %}
+          {% else %}
+            {{ rate|currency }}/h
+          {% endif %}
+        </td>
+      </tr>
     {% endfor %}
-  </tr>
-  <tr>
-    <th>{% translate 'Total' %}</th>
-    <th class="text-right">
-      {{ object.grouped_services.service_hours|hours }}
-    </th>
-    <th class="text-right">
-      <a href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}">
-        {{ object.grouped_services.logged_hours|hours }}
-      </a>
-    </th>
-    <th class="progress-cell">
-      {% bar object.grouped_services.logged_hours object.grouped_services.service_hours %}
-    </th>
-    {% for user, hours in object.grouped_services.logged_hours_per_user %}
+  </table>
+  <h2>{% translate 'Logged hours per user' %}</h2>
+  <table class="table table-sm table-responsive">
+    <tr>
+      <th></th>
+      <th>{% translate 'Scheduled' %}</th>
+      <th>{% translate 'Logged' %}</th>
+      <th></th>
+      {% for user, hours in object.grouped_services.logged_hours_per_user %}
+        <th class="text-right">{{ user.get_short_name }}</th>
+      {% endfor %}
+    </tr>
+    <tr>
+      <th>{% translate 'Total' %}</th>
+      <th class="text-right">{{ object.grouped_services.service_hours|hours }}</th>
       <th class="text-right">
-        <a href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}&amp;rendered_by={{ user.pk }}">
-          {{ hours|hours }}
-        </a>
+        <a href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}">{{ object.grouped_services.logged_hours|hours }}</a>
       </th>
-    {% endfor %}
-  </tr>
-  {% for offer, offer_data in object.grouped_services.offers %}
-    {% for row in offer_data.services %}
-    {% if row.logged_hours or row.service.service_hours %}
-      <tr>
-        <th>{{ row.service.title }}</th>
-        <th class="text-right">{{ row.service.service_hours|hours }}</th>
+      <th class="progress-cell">
+        {% bar object.grouped_services.logged_hours object.grouped_services.service_hours %}
+      </th>
+      {% for user, hours in object.grouped_services.logged_hours_per_user %}
         <th class="text-right">
-          <a href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}">
-            {{ row.logged_hours|hours }}
+          <a href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}&amp;rendered_by={{ user.pk }}">
+            {{ hours|hours }}
           </a>
         </th>
-        <th class="progress-cell">
-          {% if row.service.allow_logging or row.logged_hours %}
-            {% bar row.logged_hours row.service.service_hours %}
-          {% endif %}
-        </th>
-        {% project_statistics_row object.grouped_services.logged_hours_per_user row.logged_hours_per_user as user_row %}
-        {% for user, hours in user_row %}
-          <td class="text-right">
-            {% if hours %}
-            <a href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}&amp;rendered_by={{ user.pk }}">
-              {{ hours|hours }}
-            </a>
-            {% endif %}
-          </td>
-        {% endfor %}
-      </tr>
-    {% endif %}
+      {% endfor %}
+    </tr>
+    {% for offer, offer_data in object.grouped_services.offers %}
+      {% for row in offer_data.services %}
+        {% if row.logged_hours or row.service.service_hours %}
+          <tr>
+            <th>{{ row.service.title }}</th>
+            <th class="text-right">{{ row.service.service_hours|hours }}</th>
+            <th class="text-right">
+              <a href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}">{{ row.logged_hours|hours }}</a>
+            </th>
+            <th class="progress-cell">
+              {% if row.service.allow_logging or row.logged_hours %}
+                {% bar row.logged_hours row.service.service_hours %}
+              {% endif %}
+            </th>
+            {% project_statistics_row object.grouped_services.logged_hours_per_user row.logged_hours_per_user as user_row %}
+            {% for user, hours in user_row %}
+              <td class="text-right">
+                {% if hours %}
+                  <a href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}&amp;rendered_by={{ user.pk }}">
+                    {{ hours|hours }}
+                  </a>
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+        {% endif %}
+      {% endfor %}
     {% endfor %}
-  {% endfor %}
-</table>
+  </table>
 {% endblock %}

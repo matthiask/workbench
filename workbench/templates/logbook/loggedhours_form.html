@@ -1,11 +1,12 @@
 {% extends "modalform.html" %}
-
 {% load fineforms i18n %}
-
 {% block title %}
-{% if view.project %}{{ view.project.title }}{% else %}{{ block.super }}{% endif %}
+  {% if view.project %}
+    {{ view.project.title }}
+  {% else %}
+    {{ block.super }}
+  {% endif %}
 {% endblock %}
-
 {% block body %}
   {% include 'fineforms/warnings.html' %}
   {% ff_errors form %}
@@ -14,8 +15,12 @@
       <h5>{% translate 'new service' %}</h5>
       {% ff_field form.service_title %}
       {% ff_field form.service_description %}
-      {% if form.service_role %}{% ff_field form.service_role %}{% endif %}
-      {% if form.service_type %}{% ff_field form.service_type %}{% endif %}
+      {% if form.service_role %}
+        {% ff_field form.service_role %}
+      {% endif %}
+      {% if form.service_type %}
+        {% ff_field form.service_type %}
+      {% endif %}
       <hr>
     </div>
   {% endif %}
@@ -27,11 +32,11 @@
   {% ff_field form.hours %}
   {% ff_field form.description %}
 {% endblock %}
-
 {% block footer %}
   {% if form.service_title and form.hide_new_service %}
-    <button type="button" class="btn btn-primary mr-auto"
-      onclick="_cl(this, 'invisible', true);_cl(_sel('#new-service'), 'd-none', false);_sel('#id_modal-service').value=''">
+    <button type="button"
+            class="btn btn-primary mr-auto"
+            onclick="_cl(this, 'invisible', true);_cl(_sel('#new-service'), 'd-none', false);_sel('#id_modal-service').value=''">
       {% translate 'new service' %}
     </button>
   {% endif %}

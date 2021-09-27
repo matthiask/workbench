@@ -1,23 +1,19 @@
 {% extends "generic/object_list.html" %}
-
 {% load bootstrap4 i18n workbench %}
-
 {% block objects %}
-<div class="list-group list-group-flush">
-  {% for invoice in object_list %}
-  <a href="{{ invoice.get_absolute_url }}" class="list-group-item list-group-item-action px-0">
-    <div class="d-flex w-100 justify-content-between">
-      <h5 class="mb-1">{{ invoice|h }}</h5>
-      {{ invoice.status_badge }}
-    </div>
-    <div class="row">
-      <div class="col-md-7">{{ invoice.contact.name_with_organization|default:invoice.customer }}</div>
-      <div class="col-md-2">{{ invoice.pretty_status }}</div>
-      <div class="col-md-3 text-md-right">
-        {{ invoice.total_excl_tax|currency }} exkl.
-      </div>
-    </div>
-  </a>
-  {% endfor %}
-</div>
+  <div class="list-group list-group-flush">
+    {% for invoice in object_list %}
+      <a href="{{ invoice.get_absolute_url }}" class="list-group-item list-group-item-action px-0">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">{{ invoice|h }}</h5>
+          {{ invoice.status_badge }}
+        </div>
+        <div class="row">
+          <div class="col-md-7">{{ invoice.contact.name_with_organization|default:invoice.customer }}</div>
+          <div class="col-md-2">{{ invoice.pretty_status }}</div>
+          <div class="col-md-3 text-md-right">{{ invoice.total_excl_tax|currency }} exkl.</div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
 {% endblock %}

@@ -1,44 +1,41 @@
 {% extends "generic/object_list.html" %}
-
 {% load bootstrap4 i18n workbench %}
-
 {% block search-form-buttons %}
-  <a href="{{ view.model.urls.create }}" class="btn btn-primary"
-    data-toggle="ajaxmodal">
+  <a href="{{ view.model.urls.create }}" class="btn btn-primary" data-toggle="ajaxmodal">
     {% include "svg/plus.svg" %}
     {{ view.meta.verbose_name|capfirst }}
   </a>
   {% if request.user.features.CONTROLLING %}
     <a href="{% querystring export='xlsx' %}" class="btn btn-primary">
-      {% include 'svg/desktop-download.svg' %} XLSX
+      {% include 'svg/desktop-download.svg' %}
+      XLSX
     </a>
   {% endif %}
 {% endblock %}
-
 {% block objects %}
-<div class="list-group list-group-flush">
-{% for object in object_list %}
-{% ifchanged object.day %}
-<h5 class="mt-3 mb-3 d-flex justify-content-between">
-  <span>{{ object.day|local_date_format }}</span>
-  {# <span class="text-right">{{ sum }}h</span> #}
-</h5>
-{% endifchanged %}
-<a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action px-0"
-  data-toggle="ajaxmodal">
-  <div class="d-flex w-100 justify-content-between">
-    <h5 class="mb-1">{{ object|h }}</h5>
-    <span>
-      {{ object.starts_at|date:'H:i' }} &ndash;
-      {{ object.ends_at|date:'H:i' }}
-    </span>
-  </div>
-  <div class="row">
-    <div class="col-md-4">{{ object.user.get_full_name }}</div>
-    {# <div class="col-md-4 text-right">{{ object.pretty_status }}</div> #}
-    {# <div class="col-md-4 text-right">{{ object.get_reason_display }}</div> #}
-  </div>
-</a>
-{% endfor %}
-</div>
-{% endblock %}
+  <div class="list-group list-group-flush">
+    {% for object in object_list %}
+      {% ifchanged object.day %}
+        <h5 class="mt-3 mb-3 d-flex justify-content-between">
+          <span>{{ object.day|local_date_format }}</span>
+          {# <span class="text-right">{{ sum }}h</span> #}
+        </h5>
+      {% endifchanged %}
+      <a href="{{ object.get_absolute_url }}"
+         class="list-group-item list-group-item-action px-0"
+         data-toggle="ajaxmodal">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">{{ object|h }}</h5>
+          <span>
+            {{ object.starts_at|date:'H:i' }} &ndash;
+            {{ object.ends_at|date:'H:i' }}
+          </span>
+        </div>
+        <div class="row">
+          <div class="col-md-4">{{ object.user.get_full_name }}</div>
+          {# <div class="col-md-4 text-right">{{ object.pretty_status }}</div> #}
+          {# <div class="col-md-4 text-right">{{ object.get_reason_display }}</div>#}</div>
+        </a>
+      {% endfor %}
+    </div>
+  {% endblock %}

@@ -13,7 +13,7 @@ import vanilla
 from workbench.services.models import ServiceType
 
 
-class ToolsMixin(object):
+class ToolsMixin:
     title = None
 
     @classonlymethod

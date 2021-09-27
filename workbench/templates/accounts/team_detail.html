@@ -1,46 +1,41 @@
 {% extends "base.html" %}
-
 {% load i18n workbench %}
-
-{% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
-
+{% block title %}
+  {{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}
+{% endblock %}
 {% block content %}
-<div class="row">
-<div class="col-md-6 offset-md-3">
-  <h1>{{ object|h }} {% history_link object %}</h1>
-
-  <table class="table table-striped">
-    {% for name, value in object|field_value_pairs %}
-    <tr>
-      <th class="text-right">{{ name }}</th>
-      <td>{% link_or_none value %}</td>
-    </tr>
-    {% endfor %}
-    <tr>
-      <th class="text-right">{{ object|label:'members' }}</th>
-      <td>
-        {% for user in object.members.active %}
-          {% link_or_none user %}
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <h1>{{ object|h }} {% history_link object %}</h1>
+      <table class="table table-striped">
+        {% for name, value in object|field_value_pairs %}
+          <tr>
+            <th class="text-right">{{ name }}</th>
+            <td>{% link_or_none value %}</td>
+          </tr>
         {% endfor %}
-      </td>
-    </tr>
-  </table>
-
-  <a href="{{ object.urls.update }}" class="btn btn-primary">
-    {% translate 'Update' %}
-  </a>
-  <a href="{{ object.urls.planning }}" class="btn btn-primary">
-    {% include 'svg/project.svg' %} {% translate 'planning'|capfirst %}
-  </a>
-  <a href="{{ object.urls.retrospective }}" class="btn btn-primary">
-    {% include 'svg/project.svg' %} {% translate 'Retrospective' %}
-  </a>
-  <a href="{% url 'awt_absence_calendar' %}?team={{ object.pk }}" class="btn btn-primary">
-    {% translate 'Absence calendar' %}
-  </a>
-  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
-    {% translate 'Delete' %}
-  </a>
-</div>
-</div>
+        <tr>
+          <th class="text-right">{{ object|label:'members' }}</th>
+          <td>
+            {% for user in object.members.active %}
+              {% link_or_none user %}
+            {% endfor %}
+          </td>
+        </tr>
+      </table>
+      <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
+      <a href="{{ object.urls.planning }}" class="btn btn-primary">
+        {% include 'svg/project.svg' %}
+        {% translate 'planning'|capfirst %}
+      </a>
+      <a href="{{ object.urls.retrospective }}" class="btn btn-primary">
+        {% include 'svg/project.svg' %}
+        {% translate 'Retrospective' %}
+      </a>
+      <a href="{% url 'awt_absence_calendar' %}?team={{ object.pk }}" class="btn btn-primary">
+        {% translate 'Absence calendar' %}
+      </a>
+      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">{% translate 'Delete' %}</a>
+    </div>
+  </div>
 {% endblock %}

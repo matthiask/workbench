@@ -7,7 +7,7 @@ def messages(response):
 
 def check_code(test, base_url):
     def code(param, status_code=200):
-        response = test.client.get("{}?{}".format(base_url, param))
+        response = test.client.get(f"{base_url}?{param}")
         test.assertEqual(response.status_code, status_code)
 
     return code

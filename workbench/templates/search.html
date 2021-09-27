@@ -1,43 +1,44 @@
 {% extends "base.html" %}
-
 {% load i18n workbench %}
-
-{% block title %}{% translate 'Search' %} - {{ block.super }}{% endblock %}
-
-{% block content %}
-<div class="row">
-  <div class="col-md-12">
-    <h1>{% translate 'Search' %}</h1>
-    {% for result in results %}
-      <h3><a href="{{ result.url }}?q={{ query }}">{{ result.verbose_name_plural }}</a></h3>
-      {% for result in result.results %}
-        {% if forloop.first %}<ul>{% endif %}
-
-        {% if forloop.counter == 101 %}
-          <li>{% translate 'Only showing 100 items. Additional results have been omitted.' %}</li>
-        {% else %}
-          <li>
-            <a href="{{ result.get_absolute_url }}">
-              {{ result|h }}
-              {{ result.status_badge }}
-              {% if result.organization %}({{ result.organization }}){% endif %}
-            </a>
-          </li>
-        {% endif %}
-
-        {% if forloop.last %}</ul>{% endif %}
-      {% empty %}
-        <p>{% translate 'No results found.' %}</p>
-      {% endfor %}
-    {% endfor %}
-  </div>
-</div>
+{% block title %}
+  {% translate 'Search' %} - {{ block.super }}
 {% endblock %}
-
-{% block js %}{{ block.super }}
-<script>
+{% block content %}
+  <div class="row">
+    <div class="col-md-12">
+      <h1>{% translate 'Search' %}</h1>
+      {% for result in results %}
+        <h3>
+          <a href="{{ result.url }}?q={{ query }}">{{ result.verbose_name_plural }}</a>
+        </h3>
+        {% for result in result.results %}
+          {% if forloop.first %}<ul>{% endif %}
+          {% if forloop.counter == 101 %}
+            <li>{% translate 'Only showing 100 items. Additional results have been omitted.' %}</li>
+          {% else %}
+            <li>
+              <a href="{{ result.get_absolute_url }}">
+                {{ result|h }}
+                {{ result.status_badge }}
+                {% if result.organization %}({{ result.organization }}){% endif %}
+              </a>
+            </li>
+          {% endif %}
+          {% if forloop.last %}</ul>{% endif %}
+        {% empty %}
+          <p>
+            {% translate 'No results found.' %}
+          </p>
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
+{% block js %}
+  {{ block.super }}
+  <script>
   $(function() {
     $('form[role=search] input').focus();
   });
-</script>
+  </script>
 {% endblock %}

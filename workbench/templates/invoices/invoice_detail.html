@@ -1,145 +1,133 @@
 {% extends "generic/object_detail.html" %}
-
 {% load i18n workbench %}
-
 {% block content %}
-<div class="row justify-content-center">
-<div class="col-md-10 col-lg-8">
-  <h1>{{ object|h }} {% history_link object %}</h1>
-
-  <table class="table table-striped">
-    <tr>
-      <th class="text-right">{% translate 'contact person'|capfirst %}</th>
-      <td>{% link_or_none object.owned_by %}</td>
-    </tr>
-    <tr>
-      <th class="text-right">{% translate 'customer'|capfirst %}</th>
-      <td>{% link_or_none object.customer %}</td>
-    </tr>
-    <tr>
-      <th class="text-right">{% translate 'contact'|capfirst %}</th>
-      <td>{% link_or_none object.contact %}</td>
-    </tr>
-    <tr>
-      <th class="text-right">{% translate 'project'|capfirst %}</th>
-      <td>{% link_or_none object.project %}</td>
-    </tr>
-    <tr>
-      <th class="text-right">{% translate 'invoiced on'|capfirst %}</th>
-      <td>{{ object.invoiced_on|local_date_format }}</td>
-    </tr>
-    <tr>
-      <th class="text-right">{% translate 'status'|capfirst %}</th>
-      <td>
-        {{ object.status_badge }}
-        {{ object.payment_notice|linebreaksbr }}
-      </td>
-    </tr>
-    <tr>
-      <th class="text-right">{% translate 'Payment reminders sent at' %}</th>
-      <td>
-        {% for day in object.payment_reminders_sent_at %}
-          {{ day|local_date_format }}{% if not forloop.last %},{% endif %}
-        {% empty %}{% translate 'None yet' %}
-        {% endfor %}
-      </td>
-    </tr>
-    <tr>
-      <th class="text-right">{% translate 'description'|capfirst %}</th>
-      <td>{{ object.description|linebreaksbr|default:"&ndash;" }}</td>
-    </tr>
-    <tr>
-      <th class="text-right">{% translate 'Service period' %}</th>
-      <td>{{ object.service_period|default:"&ndash;" }}</td>
-    </tr>
-    <tr>
-      <th class="text-right">{% translate 'postal address'|capfirst %}</th>
-      <td>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</td>
-    </tr>
-    {% if object.type == object.SERVICES %}
-      <tr>
-        <th class="text-right">{% translate 'services'|capfirst %}</th>
-        <td>
-          <table class="table">
-            {% for service in object.services.all %}
-            <tr>
-              <td>
-                <strong>
-                  {{ service.title }} {% history_link service %}
-                </strong>
-                <br>
-                {{ service.description|linebreaksbr }}
-              </td>
-              <td class="text-right">
-                {{ service.service_cost|currency }}
-              </td>
-              <td>
-                <a href="{{ service.urls.update }}" data-toggle="ajaxmodal">
-                  {% include 'svg/pencil.svg' %}
-                </a>
-              </td>
-            </tr>
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <h1>{{ object|h }} {% history_link object %}</h1>
+      <table class="table table-striped">
+        <tr>
+          <th class="text-right">{% translate 'contact person'|capfirst %}</th>
+          <td>{% link_or_none object.owned_by %}</td>
+        </tr>
+        <tr>
+          <th class="text-right">{% translate 'customer'|capfirst %}</th>
+          <td>{% link_or_none object.customer %}</td>
+        </tr>
+        <tr>
+          <th class="text-right">{% translate 'contact'|capfirst %}</th>
+          <td>{% link_or_none object.contact %}</td>
+        </tr>
+        <tr>
+          <th class="text-right">{% translate 'project'|capfirst %}</th>
+          <td>{% link_or_none object.project %}</td>
+        </tr>
+        <tr>
+          <th class="text-right">{% translate 'invoiced on'|capfirst %}</th>
+          <td>{{ object.invoiced_on|local_date_format }}</td>
+        </tr>
+        <tr>
+          <th class="text-right">{% translate 'status'|capfirst %}</th>
+          <td>
+            {{ object.status_badge }}
+            {{ object.payment_notice|linebreaksbr }}
+          </td>
+        </tr>
+        <tr>
+          <th class="text-right">{% translate 'Payment reminders sent at' %}</th>
+          <td>
+            {% for day in object.payment_reminders_sent_at %}
+              {{ day|local_date_format }}
+              {% if not forloop.last %},{% endif %}
+            {% empty %}{% translate 'None yet' %}
             {% endfor %}
-          </table>
-        </td>
-      </tr>
-    {% endif %}
-    <tr>
-      <th class="text-right">{% translate 'subtotal'|capfirst %}</th>
-      <td>{{ object.subtotal|currency }}</td>
-    </tr>
-    {% if object.discount %}
-      <tr>
-        <th class="text-right">{% translate 'discount'|capfirst %}</th>
-        <td>-{{ object.discount|currency }}</td>
-      </tr>
-    {% endif %}
-    {% if object.down_payment_total %}
-      <tr>
-        <th class="text-right">{% translate 'down payment total'|capfirst %}</th>
-        <td>-{{ object.down_payment_total|currency }}</td>
-      </tr>
-    {% endif %}
-    {% if object.liable_to_vat and object.subtotal != object.total_excl_tax %}
-      <tr>
-        <th class="text-right">{% translate 'total excl. tax'|capfirst %}</th>
-        <td>{{ object.total_excl_tax|currency }}</td>
-      </tr>
-    {% endif %}
-    <tr>
-      <th class="text-right">{{ object.total_title }}</th>
-      <td>{{ object.total|currency }}</td>
-    </tr>
-    <tr>
-      <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
-      <td>{{ object.third_party_costs|currency }}</td>
-    </tr>
-  </table>
-
-  <span class="btn-group">
-    <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">PDF</a>
-    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <span class="sr-only">Toggle Dropdown</span>
-    </button>
-    <div class="dropdown-menu dropdown-menu-right">
-      <a class="dropdown-item" href="{{ object.urls.pdf }}?disposition=attachment">
-        {% translate 'Download' %}</a>
+          </td>
+        </tr>
+        <tr>
+          <th class="text-right">{% translate 'description'|capfirst %}</th>
+          <td>{{ object.description|linebreaksbr|default:"&ndash;" }}</td>
+        </tr>
+        <tr>
+          <th class="text-right">{% translate 'Service period' %}</th>
+          <td>{{ object.service_period|default:"&ndash;" }}</td>
+        </tr>
+        <tr>
+          <th class="text-right">{% translate 'postal address'|capfirst %}</th>
+          <td>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</td>
+        </tr>
+        {% if object.type == object.SERVICES %}
+          <tr>
+            <th class="text-right">{% translate 'services'|capfirst %}</th>
+            <td>
+              <table class="table">
+                {% for service in object.services.all %}
+                  <tr>
+                    <td>
+                      <strong>{{ service.title }} {% history_link service %}</strong>
+                      <br>
+                      {{ service.description|linebreaksbr }}
+                    </td>
+                    <td class="text-right">{{ service.service_cost|currency }}</td>
+                    <td>
+                      <a href="{{ service.urls.update }}" data-toggle="ajaxmodal">{% include 'svg/pencil.svg' %}</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </table>
+            </td>
+          </tr>
+        {% endif %}
+        <tr>
+          <th class="text-right">{% translate 'subtotal'|capfirst %}</th>
+          <td>{{ object.subtotal|currency }}</td>
+        </tr>
+        {% if object.discount %}
+          <tr>
+            <th class="text-right">{% translate 'discount'|capfirst %}</th>
+            <td>-{{ object.discount|currency }}</td>
+          </tr>
+        {% endif %}
+        {% if object.down_payment_total %}
+          <tr>
+            <th class="text-right">{% translate 'down payment total'|capfirst %}</th>
+            <td>-{{ object.down_payment_total|currency }}</td>
+          </tr>
+        {% endif %}
+        {% if object.liable_to_vat and object.subtotal != object.total_excl_tax %}
+          <tr>
+            <th class="text-right">{% translate 'total excl. tax'|capfirst %}</th>
+            <td>{{ object.total_excl_tax|currency }}</td>
+          </tr>
+        {% endif %}
+        <tr>
+          <th class="text-right">{{ object.total_title }}</th>
+          <td>{{ object.total|currency }}</td>
+        </tr>
+        <tr>
+          <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
+          <td>{{ object.third_party_costs|currency }}</td>
+        </tr>
+      </table>
+      <span class="btn-group">
+        <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+          PDF
+        </a>
+        <button type="button"
+                class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+          <a class="dropdown-item" href="{{ object.urls.pdf }}?disposition=attachment">{% translate 'Download' %}</a>
+        </div>
+      </span>
+      {% if object.type == object.SERVICES %}
+        <a href="{{ object.urls.xlsx }}" class="btn btn-primary">{% translate 'logbook'|capfirst %} (XLSX)</a>
+      {% endif %}
+      <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
+      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">{% translate 'Delete' %}</a>
+      {% notes object %}
     </div>
-  </span>
-  {% if object.type == object.SERVICES %}
-    <a href="{{ object.urls.xlsx }}" class="btn btn-primary">
-      {% translate 'logbook'|capfirst %} (XLSX)
-    </a>
-  {% endif %}
-  <a href="{{ object.urls.update }}" class="btn btn-primary">
-    {% translate 'Update' %}
-  </a>
-  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
-    {% translate 'Delete' %}
-  </a>
-
-  {% notes object %}
-
-</div>
-</div>
+  </div>
 {% endblock %}

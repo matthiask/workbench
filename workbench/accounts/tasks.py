@@ -48,7 +48,7 @@ def rating(pairing, previous):
     current = set(chain.from_iterable(pair[1] for pair in pairing))
     overlaps = current & set(previous)
     if overlaps:
-        return sum((math.pow(0.97, previous[overlap] / 86400) for overlap in overlaps))
+        return sum(math.pow(0.97, previous[overlap] / 86400) for overlap in overlaps)
     return 0.0
 
 

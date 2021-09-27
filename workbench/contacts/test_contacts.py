@@ -302,7 +302,7 @@ class ContactsTest(TestCase):
         self.client.force_login(organization.primary_contact)
 
         response = self.client.get(
-            Person.urls["create"] + "?organization={}".format(organization.pk)
+            Person.urls["create"] + f"?organization={organization.pk}"
         )
         self.assertContains(response, 'value="ABCD"')
 

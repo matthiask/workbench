@@ -173,7 +173,7 @@ class Deal(Model):
         verbose_name_plural = _("deals")
 
     def __str__(self):
-        return "%s %s - %s" % (self.code, self.title, self.owned_by.get_short_name())
+        return f"{self.code} {self.title} - {self.owned_by.get_short_name()}"
 
     def __html__(self):
         return format_html(
@@ -271,7 +271,7 @@ class DealAttribute(models.Model):
         verbose_name_plural = _("deal attributes")
 
     def __str__(self):
-        return "{} - {}".format(self.deal, self.attribute)
+        return f"{self.deal} - {self.attribute}"
 
 
 @total_ordering

@@ -70,7 +70,7 @@ class StatisticsTest(TestCase):
         code = check_code(self, "/report/project-budget-statistics/")
         code("owned_by=-1")
         code("owned_by=0")
-        code("owned_by={}".format(user.pk))
+        code(f"owned_by={user.pk}")
         code("owned_by=bla", 302)
 
         code("closed_during_the_last_year=on")
@@ -215,7 +215,7 @@ class StatisticsTest(TestCase):
         response = self.client.get("/report/green-hours/")
         self.assertEqual(response.status_code, 200)
         response = self.client.get(
-            "/report/green-hours/?team={}".format(factories.TeamFactory.create().pk)
+            f"/report/green-hours/?team={factories.TeamFactory.create().pk}"
         )
         self.assertEqual(response.status_code, 200)
 

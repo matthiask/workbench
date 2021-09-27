@@ -169,7 +169,7 @@ class OffersTest(TestCase):
 
         response = self.client.get(service.urls["detail"])
         self.assertRedirects(
-            response, "%s#service%s" % (offer.project.urls["detail"], service.pk)
+            response, "{}#service{}".format(offer.project.urls["detail"], service.pk)
         )
 
         response = self.client.get(
@@ -252,8 +252,8 @@ class OffersTest(TestCase):
         code("s=10")
         code("s=20")
         code("s=20")
-        code("org={}".format(offer.project.customer_id))
-        code("owned_by={}".format(offer.owned_by_id))
+        code(f"org={offer.project.customer_id}")
+        code(f"owned_by={offer.owned_by_id}")
         code("owned_by=-1")  # mine
         code("owned_by=0")  # only inactive
 
@@ -264,7 +264,7 @@ class OffersTest(TestCase):
 
         self.assertRedirects(
             self.client.get("{}{}/".format(Offer.urls["list"], offer.id)),
-            "{}#offer{}".format(offer.project.get_absolute_url(), offer.id),
+            f"{offer.project.get_absolute_url()}#offer{offer.id}",
         )
 
     def test_create_message(self):
@@ -287,7 +287,7 @@ class OffersTest(TestCase):
         today = dt.date.today()
         self.assertEqual(
             Offer(project=project, status=Offer.IN_PREPARATION).pretty_status,
-            "In preparation since {}".format(local_date_format(today)),
+            f"In preparation since {local_date_format(today)}",
         )
         self.assertEqual(
             Offer(
@@ -296,13 +296,13 @@ class OffersTest(TestCase):
                 offered_on=today,
                 valid_until=today,
             ).pretty_status,
-            "Offered on {}".format(local_date_format(today)),
+            f"Offered on {local_date_format(today)}",
         )
         self.assertEqual(
             Offer(
                 project=project, status=Offer.DECLINED, closed_on=today
             ).pretty_status,
-            "Declined on {}".format(local_date_format(today)),
+            f"Declined on {local_date_format(today)}",
         )
         self.assertEqual(Offer(project=project, status="42").pretty_status, "42")
 
@@ -350,7 +350,7 @@ class OffersTest(TestCase):
         offer = project.offers.first()
         self.assertEqual(
             response.json(),
-            {"redirect": "%s#offer%s" % (project.get_absolute_url(), offer.pk)},
+            {"redirect": f"{project.get_absolute_url()}#offer{offer.pk}"},
         )
 
         self.assertEqual(project.offers.count(), 1)
@@ -472,8 +472,8 @@ class OffersTest(TestCase):
         project = factories.ProjectFactory.create()
         offer1 = factories.OfferFactory.create(project=project)
         offer2 = factories.OfferFactory.create(project=project)
-        field1 = "offer_{}_code".format(offer1.pk)
-        field2 = "offer_{}_code".format(offer2.pk)
+        field1 = f"offer_{offer1.pk}_code"
+        field2 = f"offer_{offer2.pk}_code"
 
         self.client.force_login(project.owned_by)
         response = self.client.get(project.urls["renumber_offers"])
@@ -543,7 +543,7 @@ class OffersTest(TestCase):
             [
                 "All offers of project {} are declined. You might "
                 "want to close the project now?".format(offer.project),
-                "Offer '{}' has been updated successfully.".format(offer),
+                f"Offer '{offer}' has been updated successfully.",
             ],
         )
 

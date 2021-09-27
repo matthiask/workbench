@@ -1,15 +1,14 @@
 {% extends "generic/object_form.html" %}
-
 {% load i18n %}
-
-{% block js %}{{ block.super }}
-<style>
+{% block js %}
+  {{ block.super }}
+  <style>
 [role="main"] form .widget--numberinput,
 [role="main"] form .widget--numberinput label {
   cursor: move;
 }
-</style>
-<script>
+  </style>
+  <script>
 jQuery(function($) {
   $("[role=\"main\"] form").sortable({
     cursor: "move",
@@ -24,5 +23,5 @@ jQuery(function($) {
     },
   });
 });
-</script>
+  </script>
 {% endblock %}

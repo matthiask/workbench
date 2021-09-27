@@ -1,17 +1,19 @@
 {% extends "modal.html" %}
 {% load i18n workbench %}
-
 {% block size %}modal-xl{% endblock %}
-
 {% block title %}
-  {% translate 'History' %}: {% if instance %}<a href="{{ instance.get_absolute_url }}">{{ instance|h }}</a>{% else %}{{ title }}{% endif %}
+  {% translate 'History' %}:
+  {% if instance %}
+    <a href="{{ instance.get_absolute_url }}">{{ instance|h }}</a>
+  {% else %}
+    {{ title }}
+  {% endif %}
   <small class="d-block">
-    {% for verbose_name_plural, url in related %}
+  {% for verbose_name_plural, url in related %}
     <a href="{{ url }}" data-toggle="ajaxmodal">{{ verbose_name_plural }}</a>
-    {% endfor %}
+  {% endfor %}
   </small>
 {% endblock %}
-
 {% block body %}
-{% include '_history.html' with changes=changes %}
+  {% include '_history.html' with changes=changes %}
 {% endblock %}

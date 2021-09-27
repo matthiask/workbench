@@ -1,35 +1,26 @@
 {% extends "site_base.html" %}
-
 {% load bootstrap4 i18n %}
-
-{% block title %}{% translate 'Sign in' %} - {{ block.super }}{% endblock %}
-
+{% block title %}
+  {% translate 'Sign in' %} - {{ block.super }}
+{% endblock %}
 {% block body %}
   <div class="container-fluid" role="main">
     <div class="row justify-content-center text-center">
       <div class="col-md-6 col-lg-4">
         <div style="height:1em"></div>
         <div class="hidden-xs" style="height:9em"></div>
-
         {% bootstrap_messages %}
-
         <div class="card card-primary">
-          <h3 class="card-header">
-            Workbench
-          </h3>
-
+          <h3 class="card-header">Workbench</h3>
           <div class="card-body">
-
             <div class="card-text">
-              <a href="{% url 'accounts_oauth2' %}{{ auth_params }}" class="btn btn-primary">
-                {{ auth_button|default:_("Sign in") }}
-              </a>
+              <a href="{% url 'accounts_oauth2' %}{{ auth_params }}"
+                 class="btn btn-primary">{{ auth_button|default:_("Sign in") }}</a>
             </div>
-
           </div>
         </div>
       </div>
     </div>
-
-  </div> <!-- /container -->
+  </div>
+  <!-- /container -->
 {% endblock body %}

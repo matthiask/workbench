@@ -24,14 +24,14 @@ class HistoryTest(TestCase):
 
         self.client.force_login(user1)
 
-        response = self.client.get("/history/accounts_user/id/{}/".format(user1.pk))
-        self.assertContains(response, "INSERT accounts_user {}".format(user1.pk))
+        response = self.client.get(f"/history/accounts_user/id/{user1.pk}/")
+        self.assertContains(response, f"INSERT accounts_user {user1.pk}")
 
-        response = self.client.get("/history/accounts_user/id/{}/".format(user2.pk))
-        self.assertContains(response, "INSERT accounts_user {}".format(user2.pk))
+        response = self.client.get(f"/history/accounts_user/id/{user2.pk}/")
+        self.assertContains(response, f"INSERT accounts_user {user2.pk}")
 
-        response = self.client.get("/history/accounts_user/id/{}/".format(user3.pk))
-        self.assertContains(response, "INSERT accounts_user {}".format(user3.pk))
+        response = self.client.get(f"/history/accounts_user/id/{user3.pk}/")
+        self.assertContains(response, f"INSERT accounts_user {user3.pk}")
 
     def test_history(self):
         """Initial values and changed values"""
@@ -42,9 +42,7 @@ class HistoryTest(TestCase):
         project.save()
 
         self.client.force_login(project.owned_by)
-        response = self.client.get(
-            "/history/projects_project/id/{}/".format(project.pk)
-        )
+        response = self.client.get(f"/history/projects_project/id/{project.pk}/")
         # print(response, response.content.decode("utf-8"))
         self.assertContains(response, "Initial value of 'Customer' was")
         self.assertContains(response, "The Organization Ltd")
@@ -53,7 +51,7 @@ class HistoryTest(TestCase):
         person.is_archived = True
         person.save()
         self.client.force_login(person.primary_contact)
-        response = self.client.get("/history/contacts_person/id/{}/".format(person.pk))
+        response = self.client.get(f"/history/contacts_person/id/{person.pk}/")
         # print(response, response.content.decode("utf-8"))
         self.assertContains(response, "New value of 'Is archived' was 'yes'.")
 
@@ -62,10 +60,10 @@ class HistoryTest(TestCase):
         pa = factories.PostalAddressFactory.create()
         self.client.force_login(pa.person.primary_contact)
         response = self.client.get(
-            "/history/contacts_postaladdress/person_id/{}/".format(pa.person_id)
+            f"/history/contacts_postaladdress/person_id/{pa.person_id}/"
         )
         # print(response, response.content.decode("utf-8"))
-        self.assertContains(response, "INSERT contacts_postaladdress {}".format(pa.pk))
+        self.assertContains(response, f"INSERT contacts_postaladdress {pa.pk}")
 
     def test_nothing(self):
         """History modal of a PK without any history entries"""
@@ -84,14 +82,14 @@ class HistoryTest(TestCase):
         organization.delete()
 
         self.client.force_login(factories.UserFactory.create())
-        response = self.client.get("/history/contacts_person/id/{}/".format(person.pk))
+        response = self.client.get(f"/history/contacts_person/id/{person.pk}/")
         self.assertContains(
             response,
             '<a href="/history/contacts_organization/id/{}/" data-toggle="ajaxmodal">'
             "Deleted organization instance</a>".format(pk),
         )
 
-        response = self.client.get("/history/contacts_organization/id/{}/".format(pk))
+        response = self.client.get(f"/history/contacts_organization/id/{pk}/")
         self.assertContains(
             response, "Final value of 'Name' was 'The Organization Ltd'."
         )
@@ -108,9 +106,7 @@ class HistoryTest(TestCase):
         service.save()
 
         self.client.force_login(service.project.owned_by)
-        response = self.client.get(
-            "/history/projects_service/id/{}/".format(service.id)
-        )
+        response = self.client.get(f"/history/projects_service/id/{service.id}/")
         self.assertContains(response, "INSERT")
         # Only two versions -- position changes are excluded
         self.assertContains(response, "UPDATE", 1)
@@ -126,9 +122,7 @@ class HistoryTest(TestCase):
         employment.save()
 
         self.client.force_login(employment.user)
-        response = self.client.get(
-            "/history/awt_employment/id/{}/".format(employment.id)
-        )
+        response = self.client.get(f"/history/awt_employment/id/{employment.id}/")
         self.assertContains(response, "INSERT", 1)
         self.assertNotContains(response, "UPDATE")  # Logged but not shown
 
@@ -190,14 +184,14 @@ class HistoryTest(TestCase):
         """Offer totals are only visible with CONTROLLING"""
         offer = factories.OfferFactory.create()
         self.client.force_login(offer.owned_by)
-        url = "/history/offers_offer/id/{}/".format(offer.pk)
+        url = f"/history/offers_offer/id/{offer.pk}/"
         self.assert_only_visible_with(url, "'Total'", FEATURES.CONTROLLING)
 
     def test_logged_cost_visibility(self):
         """Foreign currency cost fields are only visible with FOREIGN_CURRENCIES"""
         cost = factories.LoggedCostFactory.create()
         self.client.force_login(cost.rendered_by)
-        url = "/history/logbook_loggedcost/id/{}/".format(cost.pk)
+        url = f"/history/logbook_loggedcost/id/{cost.pk}/"
         self.assert_only_visible_with(url, "'Archived at'", FEATURES.CONTROLLING)
         self.assert_only_visible_with(
             url, "'Original cost'", FEATURES.FOREIGN_CURRENCIES
@@ -207,21 +201,21 @@ class HistoryTest(TestCase):
         """Logged hours archival is only visible with CONTROLLING"""
         hours = factories.LoggedHoursFactory.create()
         self.client.force_login(hours.rendered_by)
-        url = "/history/logbook_loggedhours/id/{}/".format(hours.pk)
+        url = f"/history/logbook_loggedhours/id/{hours.pk}/"
         self.assert_only_visible_with(url, "'Archived at'", FEATURES.CONTROLLING)
 
     def test_project_visibility(self):
         """Project flat rates are only visible with CONTROLLING"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
-        url = "/history/projects_project/id/{}/".format(project.pk)
+        url = f"/history/projects_project/id/{project.pk}/"
         self.assert_only_visible_with(url, "'Flat rate'", FEATURES.CONTROLLING)
 
     def test_project_service_visibility(self):
         """Services have various fields which are only visible with some feature"""
         service = factories.ServiceFactory.create()
         self.client.force_login(service.project.owned_by)
-        url = "/history/projects_service/id/{}/".format(service.pk)
+        url = f"/history/projects_service/id/{service.pk}/"
         self.assert_only_visible_with(url, "'Cost'", FEATURES.CONTROLLING)
         self.assert_only_visible_with(url, "'Role'", FEATURES.GLASSFROG)
 
@@ -246,14 +240,14 @@ class HistoryTest(TestCase):
         """Credit entries are invisible without CONTROLLING"""
         self.client.force_login(factories.UserFactory.create())
         entry = factories.CreditEntryFactory.create()
-        url = "/history/credit_control_creditentry/id/{}/".format(entry.pk)
+        url = f"/history/credit_control_creditentry/id/{entry.pk}/"
         self.assert_404_without_feature(url, feature=FEATURES.CONTROLLING)
 
     def test_invoice_visibility(self):
         """Invoices are invisible without CONTROLLING"""
         invoice = factories.InvoiceFactory.create()
         self.client.force_login(invoice.owned_by)
-        url = "/history/invoices_invoice/id/{}/".format(invoice.pk)
+        url = f"/history/invoices_invoice/id/{invoice.pk}/"
         self.assert_404_without_feature(url, feature=FEATURES.CONTROLLING)
 
     def test_invoice_service_visibility(self):
@@ -261,38 +255,38 @@ class HistoryTest(TestCase):
         invoice = factories.InvoiceFactory.create()
         self.client.force_login(invoice.owned_by)
         service = invoice.services.create()
-        url = "/history/invoices_service/id/{}/".format(service.pk)
+        url = f"/history/invoices_service/id/{service.pk}/"
         self.assert_404_without_feature(url, feature=FEATURES.CONTROLLING)
 
     def test_recurring_invoice_visibility(self):
         """Recurring invoices are invisible without CONTROLLING"""
         invoice = factories.RecurringInvoiceFactory.create()
         self.client.force_login(invoice.owned_by)
-        url = "/history/invoices_recurringinvoice/id/{}/".format(invoice.pk)
+        url = f"/history/invoices_recurringinvoice/id/{invoice.pk}/"
         self.assert_404_without_feature(url, feature=FEATURES.CONTROLLING)
 
     def test_campaign_visibility(self):
         """Campaigns are invisible without CAMPAIGNS"""
         campaign = factories.CampaignFactory.create()
         self.client.force_login(campaign.owned_by)
-        url = "/history/projects_campaign/id/{}/".format(campaign.pk)
+        url = f"/history/projects_campaign/id/{campaign.pk}/"
         self.assert_404_without_feature(url, feature=FEATURES.CAMPAIGNS)
 
     def test_deal_visibility(self):
         """Deals are invisible without DEALS"""
         deal = factories.DealFactory.create()
         self.client.force_login(deal.owned_by)
-        url = "/history/deals_deal/id/{}/".format(deal.pk)
+        url = f"/history/deals_deal/id/{deal.pk}/"
         self.assert_404_without_feature(url, feature=FEATURES.DEALS)
 
-        url = "/history/deals_contribution/deal_id/{}/".format(deal.pk)
+        url = f"/history/deals_contribution/deal_id/{deal.pk}/"
         self.assert_404_without_feature(url, feature=FEATURES.DEALS)
 
-        url = "/history/deals_value/deal_id/{}/".format(deal.pk)
+        url = f"/history/deals_value/deal_id/{deal.pk}/"
         self.assert_404_without_feature(url, feature=FEATURES.DEALS)
 
         type = factories.ValueTypeFactory.create()
-        url = "/history/deals_valuetype/id/{}/".format(type.pk)
+        url = f"/history/deals_valuetype/id/{type.pk}/"
         self.assert_404_without_feature(url, feature=FEATURES.DEALS)
 
     def test_costcenter_visibility(self):
@@ -322,5 +316,5 @@ class HistoryTest(TestCase):
         response = self.client.get(url)
         # print(response, response.content.decode("utf-8"))
         self.assertContains(
-            response, "/history/projects_project/id/{}/".format(pk), status_code=404
+            response, f"/history/projects_project/id/{pk}/", status_code=404
         )

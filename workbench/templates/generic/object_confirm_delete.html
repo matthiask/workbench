@@ -1,31 +1,28 @@
 {% extends "base.html" %}
-
 {% load bootstrap4 fineforms i18n workbench %}
-
-{% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
-
+{% block title %}
+  {{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}
+{% endblock %}
 {% block content %}
-<div class="row">
-  <div class="col-md-6 offset-md-3">
-    <h1>
-      {% blocktranslate %}Delete {{ object }}{% endblocktranslate %}
-    </h1>
-
-    <form method="POST" action="." class="form">
-      {% csrf_token %}
-      {% if form %}
-        {% include 'fineforms/warnings.html' %}
-        {% ff_errors form %}
-        {% ff_fields form %}
-      {% endif %}
-      {% buttons %}
-        <a href="{{ object.get_absolute_url }}" class="btn btn-primary">
-          {% translate 'cancel' %}</a>
-        <button type="submit" class="btn btn-danger float-right">
-          {% translate 'delete' %}</button>
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <h1>
+        {% blocktranslate %}
+          Delete {{ object }}
+        {% endblocktranslate %}
+      </h1>
+      <form method="POST" action="." class="form">
+        {% csrf_token %}
+        {% if form %}
+          {% include 'fineforms/warnings.html' %}
+          {% ff_errors form %}
+          {% ff_fields form %}
+        {% endif %}
+        {% buttons %}
+        <a href="{{ object.get_absolute_url }}" class="btn btn-primary">{% translate 'cancel' %}</a>
+        <button type="submit" class="btn btn-danger float-right">{% translate 'delete' %}</button>
       {% endbuttons %}
     </form>
-
   </div>
 </div>
 {% endblock %}

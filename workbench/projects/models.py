@@ -61,7 +61,7 @@ class Campaign(Model):
         verbose_name_plural = _("campaigns")
 
     def __str__(self):
-        return "%s %s - %s" % (self.code, self.title, self.owned_by.get_short_name())
+        return f"{self.code} {self.title} - {self.owned_by.get_short_name()}"
 
     def __html__(self):
         return format_html(
@@ -235,7 +235,7 @@ class Project(Model):
         verbose_name_plural = _("projects")
 
     def __str__(self):
-        return "%s %s - %s" % (self.code, self.title, self.owned_by.get_short_name())
+        return f"{self.code} {self.title} - {self.owned_by.get_short_name()}"
 
     def __html__(self):
         return format_html(
@@ -613,7 +613,7 @@ class Service(ServiceBase):
     objects = ServiceQuerySet.as_manager()
 
     def get_absolute_url(self):
-        return "%s#service%s" % (self.project.get_absolute_url(), self.pk)
+        return f"{self.project.get_absolute_url()}#service{self.pk}"
 
     @classmethod
     def allow_update(cls, instance, request):

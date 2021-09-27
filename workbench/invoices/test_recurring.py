@@ -66,9 +66,7 @@ class RecurringTest(TestCase):
         response = self.client.get("/recurring-invoices/create/")
         self.assertNotContains(response, 'name="title"')
 
-        response = self.client.get(
-            "/recurring-invoices/create/?contact={}".format(person.pk)
-        )
+        response = self.client.get(f"/recurring-invoices/create/?contact={person.pk}")
         self.assertContains(
             response,
             # No value!
@@ -78,7 +76,7 @@ class RecurringTest(TestCase):
         # print(response, response.content.decode("utf-8"))
 
         response = self.client.post(
-            "/recurring-invoices/create/?contact={}".format(person.pk),
+            f"/recurring-invoices/create/?contact={person.pk}",
             {
                 "customer": person.organization_id,
                 # "contact": person.id,
@@ -96,7 +94,7 @@ class RecurringTest(TestCase):
         self.assertContains(response, "No contact selected.")
 
         response = self.client.post(
-            "/recurring-invoices/create/?contact={}".format(person.pk),
+            f"/recurring-invoices/create/?contact={person.pk}",
             {
                 "customer": person.organization_id,
                 "contact": person.id,
@@ -115,7 +113,7 @@ class RecurringTest(TestCase):
         self.assertContains(response, 'value="short-postal-address"')
 
         response = self.client.post(
-            "/recurring-invoices/create/?contact={}".format(person.pk),
+            f"/recurring-invoices/create/?contact={person.pk}",
             {
                 "customer": person.organization_id,
                 "contact": person.id,
@@ -174,8 +172,8 @@ class RecurringTest(TestCase):
         code("q=test")
         code("s=all")
         code("s=closed")
-        code("org={}".format(factories.OrganizationFactory.create().pk))
-        code("owned_by={}".format(user.id))
+        code(f"org={factories.OrganizationFactory.create().pk}")
+        code(f"owned_by={user.id}")
         code("owned_by=-1")  # mine
         code("owned_by=0")  # only inactive
 
@@ -255,13 +253,13 @@ class RecurringTest(TestCase):
         # Existing
         organization = factories.OrganizationFactory.create()
         response = self.client.get(
-            RecurringInvoice.urls["create"] + "?customer={}".format(organization.pk)
+            RecurringInvoice.urls["create"] + f"?customer={organization.pk}"
         )
         self.assertContains(response, 'method="POST"')
 
         person = factories.PersonFactory.create()
         response = self.client.get(
-            RecurringInvoice.urls["create"] + "?contact={}".format(person.pk)
+            RecurringInvoice.urls["create"] + f"?contact={person.pk}"
         )
         self.assertContains(response, 'method="POST"')
 
@@ -271,7 +269,7 @@ class RecurringTest(TestCase):
         self.client.force_login(invoice.owned_by)
 
         response = self.client.get(invoice.urls["create"] + "?copy=" + str(invoice.pk))
-        self.assertContains(response, 'value="{}"'.format(invoice.title))
+        self.assertContains(response, f'value="{invoice.title}"')
         # print(response, response.content.decode("utf-8"))
 
         response = self.client.get(invoice.urls["create"] + "?copy=blub")

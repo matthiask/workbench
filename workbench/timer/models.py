@@ -116,7 +116,7 @@ class TimestampQuerySet(models.QuerySet):
                 "logged_hours__service", "logged_break"
             )
         )
-        known_logged_hours = set(entry.logged_hours for entry in entries)
+        known_logged_hours = {entry.logged_hours for entry in entries}
         logged_hours = user.loggedhours.filter(rendered_on=day).select_related(
             "service"
         )
@@ -127,7 +127,7 @@ class TimestampQuerySet(models.QuerySet):
             for entry in logged_hours
             if entry not in known_logged_hours
         )
-        known_breaks = set(entry.logged_break for entry in entries)
+        known_breaks = {entry.logged_break for entry in entries}
         breaks = user.breaks.filter(starts_at__date=day)
         entries.extend(
             self.model(
@@ -282,7 +282,7 @@ class Timestamp(models.Model):
     save.alters_data = True
 
     def __str__(self):
-        return "{:>5} {}".format(self.pretty_time, self.notes)
+        return f"{self.pretty_time:>5} {self.notes}"
 
     @property
     def pretty_time(self):

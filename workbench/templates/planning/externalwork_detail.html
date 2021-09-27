@@ -1,18 +1,16 @@
 {% extends "modal.html" %}
-
 {% load i18n workbench %}
-
 {% block size %}modal-lg{% endblock %}
-
-{% block title %}{{ object }} {% history_link object %}{% endblock %}
-
+{% block title %}
+  {{ object }} {% history_link object %}
+{% endblock %}
 {% block body %}
   <table class="table table-striped">
     {% for name, value in object|field_value_pairs:'project,created_at,title,milestone,service_type' %}
-    <tr>
-      <th class="text-right">{{ name }}</th>
-      <td>{% link_or_none value %}</td>
-    </tr>
+      <tr>
+        <th class="text-right">{{ name }}</th>
+        <td>{% link_or_none value %}</td>
+      </tr>
     {% endfor %}
     <tr>
       <th class="text-right">{{ object|label:'notes' }}</th>
@@ -21,19 +19,23 @@
     <tr>
       <th class="text-right">{% translate 'Periods' %}</th>
       <td>
-        {% for range in object.ranges %}{{ range.pretty }}<br />{% endfor %}
+        {% for range in object.ranges %}
+          {{ range.pretty }}
+          <br />
+        {% endfor %}
       </td>
     </tr>
   </table>
 {% endblock %}
-
 {% block footer %}
-  <a href="{{ object.urls.update }}" data-toggle="ajaxmodal" class="btn btn-primary">
-    {% translate 'Update' %}
-  </a>
-  {% comment %} <a href="{{ object.project.urls.createexternalwork }}?copy={{ object.pk }}" data-toggle="ajaxmodal" class="btn btn-primary mr-auto">
-    {% translate 'Copy' %}
-  </a> {% endcomment %}
+  <a href="{{ object.urls.update }}" data-toggle="ajaxmodal" class="btn btn-primary">{% translate 'Update' %}</a>
+  {% comment %}
+    <a href="{{ object.project.urls.createexternalwork }}?copy={{ object.pk }}"
+       data-toggle="ajaxmodal"
+       class="btn btn-primary mr-auto">
+      {% translate 'Copy' %}
+    </a>
+  {% endcomment %}
   <a href="{{ object.urls.delete }}" data-toggle="ajaxmodal" class="btn btn-outline-danger">
     {% translate 'Delete' %}
   </a>

@@ -566,7 +566,7 @@ class OffersRenumberForm(Form):
 
         self.offers = self.project.offers.order_by("_code")
         for offer in self.offers:
-            self.fields["offer_{}_code".format(offer.pk)] = forms.IntegerField(
+            self.fields[f"offer_{offer.pk}_code"] = forms.IntegerField(
                 label=str(offer),
                 initial=offer._code,
                 min_value=1,
@@ -575,7 +575,7 @@ class OffersRenumberForm(Form):
     def clean(self):
         data = super().clean()
         self.codes = {
-            offer: data.get("offer_{}_code".format(offer.pk)) for offer in self.offers
+            offer: data.get(f"offer_{offer.pk}_code") for offer in self.offers
         }
         if len(self.codes) != len(set(self.codes.values())):
             raise forms.ValidationError(_("Codes must be unique."))

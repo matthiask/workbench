@@ -255,11 +255,11 @@ class TimestampsTest(TestCase):
         )
 
         slices = Timestamp.objects.slices(user)
-        self.assertIn("timestamp={}".format(t.pk), slices[0].hours_create_url)
-        self.assertIn("timestamp={}".format(t.pk), slices[0].break_create_url)
+        self.assertIn(f"timestamp={t.pk}", slices[0].hours_create_url)
+        self.assertIn(f"timestamp={t.pk}", slices[0].break_create_url)
 
         response = self.client.post(
-            service.project.urls["createhours"] + "?timestamp={}".format(t.pk),
+            service.project.urls["createhours"] + f"?timestamp={t.pk}",
             {
                 "modal-rendered_by": user.pk,
                 "modal-rendered_on": dt.date.today().isoformat(),
@@ -277,7 +277,7 @@ class TimestampsTest(TestCase):
         # Timestamp belongs to someone else; shouldn't crash.
         t = factories.UserFactory.create().timestamp_set.create(type=Timestamp.STOP)
         response = self.client.post(
-            service.project.urls["createhours"] + "?timestamp={}".format(t.pk),
+            service.project.urls["createhours"] + f"?timestamp={t.pk}",
             {
                 "modal-rendered_by": user.pk,
                 "modal-rendered_on": dt.date.today().isoformat(),
@@ -299,9 +299,7 @@ class TimestampsTest(TestCase):
         response = self.client.get("/list-timestamps/")
         self.assertEqual(response.status_code, 400)
 
-        response = self.client.get(
-            "/list-timestamps/?user={}".format(user.signed_email)
-        )
+        response = self.client.get(f"/list-timestamps/?user={user.signed_email}")
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(
@@ -317,9 +315,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(len(slices), 1)
         self.assertEqual(slices[0]["timestamp_id"], stop.id)
 
-        response = self.client.get(
-            "/list-timestamps/?user={}".format(user.signed_email)
-        )
+        response = self.client.get(f"/list-timestamps/?user={user.signed_email}")
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(len(data["timestamps"]), 1)

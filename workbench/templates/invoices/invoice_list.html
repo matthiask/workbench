@@ -1,43 +1,49 @@
 {% extends "generic/object_list.html" %}
-
 {% load bootstrap4 i18n workbench %}
-
 {% block search-form-buttons %}
-{{ block.super }}
-
-<span class="btn-group">
-  <a href="{% querystring export='pdf' %}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">PDF</a>
-  <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    <span class="sr-only">Toggle Dropdown</span>
-  </button>
-  <div class="dropdown-menu dropdown-menu-right">
-    <a class="dropdown-item" href="{% querystring export='pdf' disposition='attachment' %}">
-      {% translate 'Download' %}</a>
-  </div>
-</span>
-<a href="{% querystring export='xlsx' %}" class="btn btn-primary">{% include 'svg/desktop-download.svg' %} XLSX</a>
-
-{% endblock %}
-
-{% block objects %}
-<div class="list-group list-group-flush">
-  {% for invoice in object_list %}
-  <a href="{{ invoice.get_absolute_url }}" class="list-group-item list-group-item-action px-0"
-      title="{{ invoice.description }}">
-    <div class="d-flex w-100 justify-content-between">
-      <h5 class="mb-1">{{ invoice|h }}</h5>
-      {{ invoice.status_badge }}
+  {{ block.super }}
+  <span class="btn-group">
+    <a href="{% querystring export='pdf' %}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+      PDF
+    </a>
+    <button type="button"
+            class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false">
+      <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+      <a class="dropdown-item" href="{% querystring export='pdf' disposition='attachment' %}">
+        {% translate 'Download' %}
+      </a>
     </div>
-    <div class="row">
-      <div class="col-md-6">{{ invoice.contact.name_with_organization|default:invoice.customer }}</div>
-      <div class="col-md-2">{{ invoice.get_type_display }}</div>
-      <div class="col-md-1">{{ invoice.invoiced_on|local_date_format }}</div>
-      <div class="col-md-3 text-md-right">
-        {{ invoice.total_excl_tax|currency }} exkl. /
-        {{ invoice.total|currency }}
-      </div>
-    </div>
+  </span>
+  <a href="{% querystring export='xlsx' %}" class="btn btn-primary">
+    {% include 'svg/desktop-download.svg' %}
+    XLSX
   </a>
-  {% endfor %}
-</div>
+{% endblock %}
+{% block objects %}
+  <div class="list-group list-group-flush">
+    {% for invoice in object_list %}
+      <a href="{{ invoice.get_absolute_url }}"
+         class="list-group-item list-group-item-action px-0"
+         title="{{ invoice.description }}">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">{{ invoice|h }}</h5>
+          {{ invoice.status_badge }}
+        </div>
+        <div class="row">
+          <div class="col-md-6">{{ invoice.contact.name_with_organization|default:invoice.customer }}</div>
+          <div class="col-md-2">{{ invoice.get_type_display }}</div>
+          <div class="col-md-1">{{ invoice.invoiced_on|local_date_format }}</div>
+          <div class="col-md-3 text-md-right">
+            {{ invoice.total_excl_tax|currency }} exkl. /
+            {{ invoice.total|currency }}
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
 {% endblock %}

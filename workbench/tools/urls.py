@@ -41,7 +41,7 @@ def model_urls(cls):
     """
 
     cls.urls = _Descriptor(
-        viewname_pattern="{}_{}_{{}}".format(cls._meta.app_label, cls._meta.model_name)
+        viewname_pattern=f"{cls._meta.app_label}_{cls._meta.model_name}_{{}}"
     )
     if not hasattr(cls, "get_absolute_url"):
         cls.get_absolute_url = lambda self: self.urls["detail"]

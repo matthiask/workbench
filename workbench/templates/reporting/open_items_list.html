@@ -1,54 +1,52 @@
 {% extends "base.html" %}
-
 {% load fineforms i18n workbench %}
-
-{% block title %}{% translate 'Open items list' %} - {{ block.super }}{% endblock %}
-
+{% block title %}
+  {% translate 'Open items list' %} - {{ block.super }}
+{% endblock %}
 {% block content %}
-<div class="row">
-<div class="col-sm-12">
-  <h1>{% translate 'Open items list' %}</h1>
-
-  <form method="get" class="mb-3" data-autosubmit>
-    {% ff_fields form %}
-  </form>
-
-  <table class="table table-sm table-hover table-responsive-lg">
-    <thead class="sticky">
-      <tr>
-        <th class="w-100">{% translate 'invoice'|capfirst %}</th>
-        <th class="text-nowrap text-right">{% translate 'invoiced on'|capfirst %}</th>
-        <th class="text-nowrap text-right">{% translate 'total excl. tax'|capfirst %}</th>
-        <th class="text-nowrap text-right">{% translate 'total'|capfirst %}</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for invoice in open_items_list.list %}
-      <tr>
-        <td>
-          <a href="{{ invoice.get_absolute_url }}">
-            {{ invoice.customer }}<br>
-            {{ invoice|h }}
-            {{ invoice.status_badge }}
-          </a>
-        </td>
-        <td class="text-right">{{ invoice.invoiced_on|local_date_format }}</td>
-        <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
-        <td class="text-right">{{ invoice.total|currency }}</td>
-      </tr>
-    {% endfor %}
-    </tbody>
-    <tfoot>
-      <th>{% translate 'total'|capfirst %}</th>
-      <th></th>
-      <th class="text-right">{{ open_items_list.total_excl_tax|currency }}</th>
-      <th class="text-right">{{ open_items_list.total|currency }}</th>
-    </tfoot>
-  </table>
-
-  <a href="{% querystring export='xlsx' %}" class="btn btn-primary">
-    {% include 'svg/desktop-download.svg' %} XLSX
-  </a>
-</div>
-</div>
+  <div class="row">
+    <div class="col-sm-12">
+      <h1>{% translate 'Open items list' %}</h1>
+      <form method="get" class="mb-3" data-autosubmit>
+        {% ff_fields form %}
+      </form>
+      <table class="table table-sm table-hover table-responsive-lg">
+        <thead class="sticky">
+          <tr>
+            <th class="w-100">{% translate 'invoice'|capfirst %}</th>
+            <th class="text-nowrap text-right">{% translate 'invoiced on'|capfirst %}</th>
+            <th class="text-nowrap text-right">{% translate 'total excl. tax'|capfirst %}</th>
+            <th class="text-nowrap text-right">{% translate 'total'|capfirst %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for invoice in open_items_list.list %}
+            <tr>
+              <td>
+                <a href="{{ invoice.get_absolute_url }}">
+                  {{ invoice.customer }}
+                  <br>
+                  {{ invoice|h }}
+                  {{ invoice.status_badge }}
+                </a>
+              </td>
+              <td class="text-right">{{ invoice.invoiced_on|local_date_format }}</td>
+              <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
+              <td class="text-right">{{ invoice.total|currency }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+        <th>{% translate 'total'|capfirst %}</th>
+        <th></th>
+        <th class="text-right">{{ open_items_list.total_excl_tax|currency }}</th>
+        <th class="text-right">{{ open_items_list.total|currency }}</th>
+        </tfoot>
+      </table>
+      <a href="{% querystring export='xlsx' %}" class="btn btn-primary">
+        {% include 'svg/desktop-download.svg' %}
+        XLSX
+      </a>
+    </div>
+  </div>
 {% endblock %}

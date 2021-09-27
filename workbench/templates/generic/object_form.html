@@ -1,51 +1,47 @@
 {% extends "base.html" %}
-
 {% load bootstrap4 fineforms i18n workbench %}
-
-{% block title %}{{ title }} - {% if object %}{{ object }} - {% endif %} {{ block.super }}{% endblock %}
-
+{% block title %}
+  {{ title }} -
+  {% if object %}{{ object }} -{% endif %}
+  {{ block.super }}
+{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-10 col-lg-8">
-    <h1>
-      {% if object %}
-        <a href="{{ object.get_absolute_url }}">{{ title }}</a>
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <h1>
+        {% if object %}
+          <a href="{{ object.get_absolute_url }}">{{ title }}</a>
+        {% else %}
+          {{ title }}
+        {% endif %}
+      </h1>
+      {% if form and form.pre_form %}
+        <form method="GET" action="{{ request.get_full_path }}">
+          {% ff_fields form %}
+          <button type="submit" class="btn btn-primary">{% translate 'continue' %}</button>
+        </form>
       {% else %}
-        {{ title }}
-      {% endif %}
-    </h1>
-
-    {% if form and form.pre_form %}
-      <form method="GET" action="{{ request.get_full_path }}">
-        {% ff_fields form %}
-        <button type="submit" class="btn btn-primary">{% translate 'continue' %}</button>
-      </form>
-    {% else %}
-      <form method="POST" action="{{ request.get_full_path }}"
-          {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
-        {% csrf_token %}
-
-        {% include 'fineforms/warnings.html' %}
-        {% ff_errors form %}
-        {% ff_fields form %}
-
-        {% for formset in form.formsets.values %}{{ formset }}{% endfor %}
-
-        <div class="row">
-          <div class="col-sm-12">
-            <button type="submit" class="btn btn-primary">
-              {% translate 'Save' %}</button>
-
-            {% if object.get_absolute_url %}
-            <a href="{{ object.get_absolute_url }}" class="btn float-right btn-outline-danger">
-              {% translate 'Cancel' %}</a>
-            {% endif %}
+        <form method="POST"
+              action="{{ request.get_full_path }}"
+              {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+          {% csrf_token %}
+          {% include 'fineforms/warnings.html' %}
+          {% ff_errors form %}
+          {% ff_fields form %}
+          {% for formset in form.formsets.values %}
+            {{ formset }}
+          {% endfor %}
+          <div class="row">
+            <div class="col-sm-12">
+              <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
+              {% if object.get_absolute_url %}
+                <a href="{{ object.get_absolute_url }}"
+                   class="btn float-right btn-outline-danger">{% translate 'Cancel' %}</a>
+              {% endif %}
+            </div>
           </div>
-        </div>
-
-      </form>
-    {% endif %}
-
+        </form>
+      {% endif %}
+    </div>
   </div>
-</div>
 {% endblock %}

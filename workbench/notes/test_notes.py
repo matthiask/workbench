@@ -31,8 +31,8 @@ class NotesTest(TestCase):
 
         content_type = ContentType.objects.get_for_model(deal)
 
-        self.assertContains(response, 'value="{}"'.format(content_type.pk))
-        self.assertContains(response, 'value="{}"'.format(deal.pk))
+        self.assertContains(response, f'value="{content_type.pk}"')
+        self.assertContains(response, f'value="{deal.pk}"')
 
         response = self.client.post(
             "/notes/add-note/",

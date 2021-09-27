@@ -18,7 +18,7 @@ class CampaignsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(
-            Campaign.urls["create"] + "?customer={}".format(organization.id)
+            Campaign.urls["create"] + f"?customer={organization.id}"
         )
         self.assertContains(response, 'value="The Organization Ltd"')
 
@@ -56,10 +56,8 @@ class CampaignsTest(TestCase):
         campaign = factories.CampaignFactory.create()
         self.client.force_login(campaign.owned_by)
 
-        response = self.client.get(
-            Project.urls["create"] + "?campaign={}".format(campaign.pk)
-        )
-        self.assertContains(response, 'value="{}"'.format(str(campaign)))
+        response = self.client.get(Project.urls["create"] + f"?campaign={campaign.pk}")
+        self.assertContains(response, f'value="{str(campaign)}"')
 
     def test_statistics(self):
         """Campaign statistics do not crash"""
@@ -81,8 +79,8 @@ class CampaignsTest(TestCase):
         code("s=")
         code("s=open")
         code("s=closed")
-        code("org={}".format(campaign.customer_id))
-        code("owned_by={}".format(campaign.owned_by_id))
+        code(f"org={campaign.customer_id}")
+        code(f"owned_by={campaign.owned_by_id}")
         code("owned_by=-1")  # mine
         code("owned_by=0")  # only inactive
 
@@ -106,7 +104,7 @@ class CampaignsTest(TestCase):
         response = self.client.get(
             campaign.urls["create"] + "?copy=" + str(campaign.pk)
         )
-        self.assertContains(response, 'value="{}"'.format(campaign.title))
+        self.assertContains(response, f'value="{campaign.title}"')
 
         response = self.client.get(campaign.urls["create"] + "?copy=blub")
         self.assertEqual(response.status_code, 200)  # No crash

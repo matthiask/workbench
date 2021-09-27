@@ -290,7 +290,7 @@ class InvoicesTest(TestCase):
         self.assertEqual(Invoice.objects.count(), 0)
         self.assertEqual(
             messages(response),
-            ["Invoice '{}' has been deleted successfully.".format(invoice)],
+            [f"Invoice '{invoice}' has been deleted successfully."],
         )
 
     def test_delete_service_invoice_with_logs(self):
@@ -341,7 +341,7 @@ class InvoicesTest(TestCase):
         self.assertRedirects(response, invoice.urls["list"])
         self.assertEqual(
             messages(response),
-            ["Invoice '{}' has been deleted successfully.".format(invoice)],
+            [f"Invoice '{invoice}' has been deleted successfully."],
         )
 
         cost.refresh_from_db()
@@ -394,7 +394,7 @@ class InvoicesTest(TestCase):
         )
         self.client.force_login(person.primary_contact)
 
-        url = Invoice.urls["create"] + "?contact={}".format(person.pk)
+        url = Invoice.urls["create"] + f"?contact={person.pk}"
         response = self.client.get(url)
         self.assertContains(response, 'method="POST"')
         self.assertNotContains(response, 'data-field-value="')
@@ -433,7 +433,7 @@ class InvoicesTest(TestCase):
         )
         self.client.force_login(person.primary_contact)
         response = self.client.get(
-            "/invoices/create/?customer={}".format(person.organization.id)
+            f"/invoices/create/?customer={person.organization.id}"
         )
         self.assertContains(
             response, 'value="The Organization Ltd" placeholder="Organization"'
@@ -446,7 +446,7 @@ class InvoicesTest(TestCase):
         person.organization.save()
 
         response = self.client.get(
-            "/invoices/create/?customer={}".format(person.organization.id)
+            f"/invoices/create/?customer={person.organization.id}"
         )
         self.assertContains(response, 'id="id_postal_address"')
         self.assertContains(response, 'data-field-value="')
@@ -533,8 +533,8 @@ class InvoicesTest(TestCase):
         code("q=test")
         code("s=open")
         code("s=40")  # PAID
-        code("org={}".format(factories.OrganizationFactory.create().pk))
-        code("owned_by={}".format(user.id))
+        code(f"org={factories.OrganizationFactory.create().pk}")
+        code(f"owned_by={user.id}")
         code("owned_by=-1")  # mine
         code("owned_by=0")  # only inactive
         code("export=xlsx")
@@ -748,7 +748,7 @@ class InvoicesTest(TestCase):
                     WarningsForm.ignore_warnings_id: (
                         "status-unexpected status-change-but-already-closed"
                     )
-                }
+                },
             ),
         )
         # print(response, response.content.decode("utf-8"))
@@ -857,11 +857,11 @@ class InvoicesTest(TestCase):
         fmt = local_date_format(today)
         self.assertEqual(
             Invoice(status=Invoice.IN_PREPARATION).pretty_status,
-            "In preparation since {}".format(fmt),
+            f"In preparation since {fmt}",
         )
         self.assertEqual(
             Invoice(status=Invoice.SENT, invoiced_on=today).pretty_status,
-            "Sent on {}".format(fmt),
+            f"Sent on {fmt}",
         )
         self.assertEqual(
             Invoice(
@@ -869,7 +869,7 @@ class InvoicesTest(TestCase):
                 invoiced_on=yesterday,
                 due_on=in_days(-5),
             ).pretty_status,
-            "Sent on {} but overdue".format(local_date_format(yesterday)),
+            f"Sent on {local_date_format(yesterday)} but overdue",
         )
         self.assertIn(
             "badge-warning",
@@ -883,11 +883,11 @@ class InvoicesTest(TestCase):
             Invoice(
                 status=Invoice.SENT, invoiced_on=yesterday, last_reminded_on=today
             ).pretty_status,
-            "Sent on {}, reminded on {}".format(local_date_format(yesterday), fmt),
+            f"Sent on {local_date_format(yesterday)}, reminded on {fmt}",
         )
         self.assertEqual(
             Invoice(status=Invoice.PAID, closed_on=today).pretty_status,
-            "Paid on {}".format(fmt),
+            f"Paid on {fmt}",
         )
         self.assertEqual(Invoice(status=Invoice.CANCELED).pretty_status, "Canceled")
 
@@ -973,9 +973,7 @@ class InvoicesTest(TestCase):
         self.assertContains(response, "Not reminded yet")
         # print(response, response.content.decode("utf-8"))
 
-        response = self.client.post(
-            "/invoices/dunning-letter/{}/".format(invoice.customer_id)
-        )
+        response = self.client.post(f"/invoices/dunning-letter/{invoice.customer_id}/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/pdf")
 

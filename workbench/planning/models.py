@@ -167,7 +167,7 @@ class ExternalWork(AbstractPlannedWork):
         verbose_name_plural = _("external work")
 
     def __str__(self):
-        return "{} ({})".format(self.title, self.provided_by)
+        return f"{self.title} ({self.provided_by})"
 
 
 @model_urls
@@ -203,4 +203,4 @@ class PlannedWork(AbstractPlannedWork):
         verbose_name_plural = _("planned work")
 
     def __str__(self):
-        return "{} ({})".format(self.title, hours(self.planned_hours))
+        return f"{self.title} ({hours(self.planned_hours)})"

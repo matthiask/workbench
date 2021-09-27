@@ -1,5 +1,4 @@
 {% load bootstrap4 fineforms i18n %}
-
 <div class="modal">
   <div class="modal-dialog {% block size %}{% endblock %}">
     <form method="post" action="{{ request.get_full_path }}">
@@ -8,7 +7,9 @@
           <h4 class="modal-title">
             {% block title %}{{ title }}{% endblock %}
           </h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
         <div class="modal-body clearfix">
           {% bootstrap_messages %}
@@ -24,7 +25,8 @@
             <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
           {% endblock %}
         </div>
-      </div><!-- /.modal-content -->
+      </div>
+      <!-- /.modal-content -->
     </form>
-  </div><!-- /.modal-dialog -->
-</div>
+    </div><!-- /.modal-dialog -->
+  </div>

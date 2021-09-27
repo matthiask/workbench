@@ -1,45 +1,46 @@
 {% extends "base.html" %}
-
 {% load fineforms i18n static workbench %}
-
-{% block title %}{% translate 'Birthdays' %} - {{ block.super }}{% endblock %}
-
+{% block title %}
+  {% translate 'Birthdays' %} - {{ block.super }}
+{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-<div class="col-sm-12 col-md-8 col-lg-6">
-  <h1>{% translate 'Birthdays' %}</h1>
-
-  <table class="table table-sm table-striped">
-    <thead>
-      <tr>
-        <th>{% translate 'user'|capfirst %}</th>
-        <th class="text-right">{% translate 'Birthday' %}</th>
-        <th class="text-right">{% translate 'Age on birthday' %}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for birthday in birthdays.users_with_birthdays %}
-        {% ifchanged birthday.already %}{% if not forloop.first %}
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-8 col-lg-6">
+      <h1>{% translate 'Birthdays' %}</h1>
+      <table class="table table-sm table-striped">
+        <thead>
           <tr>
-            <td colspan="4"><hr></td>
+            <th>{% translate 'user'|capfirst %}</th>
+            <th class="text-right">{% translate 'Birthday' %}</th>
+            <th class="text-right">{% translate 'Age on birthday' %}</th>
           </tr>
-        {% endif %}{% endifchanged %}
-        <tr>
-          <td>{% link_or_none birthday.user %}</td>
-          <td class="text-right">{{ birthday.user.person.date_of_birth|local_date_format }}</td>
-          <td class="text-right">{{ birthday.age }}</td>
-        </tr>
-      {% endfor %}
-      {% for user in birthdays.users_without_birthdays %}
-        <tr>
-          <td>{% link_or_none user %}</td>
-          <td class="text-right">?</td>
-          <td class="text-right">?</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-</div>
-</div>
+        </thead>
+        <tbody>
+          {% for birthday in birthdays.users_with_birthdays %}
+            {% ifchanged birthday.already %}
+              {% if not forloop.first %}
+                <tr>
+                  <td colspan="4">
+                    <hr>
+                  </td>
+                </tr>
+              {% endif %}
+            {% endifchanged %}
+            <tr>
+              <td>{% link_or_none birthday.user %}</td>
+              <td class="text-right">{{ birthday.user.person.date_of_birth|local_date_format }}</td>
+              <td class="text-right">{{ birthday.age }}</td>
+            </tr>
+          {% endfor %}
+          {% for user in birthdays.users_without_birthdays %}
+            <tr>
+              <td>{% link_or_none user %}</td>
+              <td class="text-right">?</td>
+              <td class="text-right">?</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 {% endblock %}

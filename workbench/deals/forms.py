@@ -100,14 +100,14 @@ class DealSearchForm(Form):
             for vt in ValueType.objects.all():
                 additional.append(
                     (
-                        "{}: {}".format(Value._meta.verbose_name, vt),
+                        f"{Value._meta.verbose_name}: {vt}",
                         (lambda id: lambda deal: values.get((deal.id, id)))(vt.id),
                     )
                 )
             for ag in AttributeGroup.objects.all():
                 additional.append(
                     (
-                        "{}: {}".format(Attribute._meta.verbose_name, ag),
+                        f"{Attribute._meta.verbose_name}: {ag}",
                         (lambda id: lambda deal: attributes.get((deal.id, id)))(ag.id),
                     )
                 )
@@ -177,7 +177,7 @@ class DealForm(ModelForm):
         field = Value._meta.get_field("value")
         values = {v.type_id: v.value for v in self.instance.values.all()}
         for vt in ValueType.objects.all():
-            key = "value_{}".format(vt.id)
+            key = f"value_{vt.id}"
 
             if vt.is_archived and vt.id not in values:
                 continue
@@ -198,7 +198,7 @@ class DealForm(ModelForm):
             else {}
         )
         for group in AttributeGroup.objects.all():
-            key = "attribute_{}".format(group.id)
+            key = f"attribute_{group.id}"
             if group.is_archived and group.id not in attributes:
                 continue
 
@@ -265,7 +265,7 @@ class DealForm(ModelForm):
         values = {}
 
         for vt in ValueType.objects.all():
-            key = "value_{}".format(vt.id)
+            key = f"value_{vt.id}"
             if self.cleaned_data.get(key) is not None:
                 values[vt] = self.cleaned_data[key]
 
@@ -278,7 +278,7 @@ class DealForm(ModelForm):
 
         attributes = []
         for group in AttributeGroup.objects.all():
-            key = "attribute_{}".format(group.id)
+            key = f"attribute_{group.id}"
 
             if self.cleaned_data.get(key) is not None:
                 attributes.append(self.cleaned_data.get(key))

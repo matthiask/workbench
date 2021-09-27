@@ -1,12 +1,9 @@
 {% extends "modal.html" %}
-
 {% load i18n workbench %}
-
 {% block title %}
   {{ view.meta.verbose_name }}
   {% history_link object %}
 {% endblock %}
-
 {% block body %}
   <table class="table table-striped">
     <tr>
@@ -18,19 +15,20 @@
       <td>{% link_or_none object.service %}</td>
     </tr>
     {% if request.user.features.GLASSFROG %}
-    <tr>
-      <th class="text-right">{% translate 'role'|capfirst %}</th>
-      <td>
-        {{ object.service.role|default:'&ndash;' }}
-        <a href="{{ object.service.urls.update }}" data-toggle="ajaxmodal" class="inline">
-          <small>({% trans 'update' %})</small>
-        </a><br>
-        {% if object.service.role.work_category %}
-          {% translate 'category'|capfirst %}:
-          {{ object.service.role.get_work_category_display }}
-        {% endif %}
-      </td>
-    </tr>
+      <tr>
+        <th class="text-right">{% translate 'role'|capfirst %}</th>
+        <td>
+          {{ object.service.role|default:'&ndash;' }}
+          <a href="{{ object.service.urls.update }}" data-toggle="ajaxmodal" class="inline">
+            <small>({% trans 'update' %})</small>
+          </a>
+          <br>
+          {% if object.service.role.work_category %}
+            {% translate 'category'|capfirst %}:
+            {{ object.service.role.get_work_category_display }}
+          {% endif %}
+        </td>
+      </tr>
     {% endif %}
     <tr>
       <th class="text-right">{% translate 'created'|capfirst %}</th>
@@ -57,33 +55,28 @@
     <tr>
       <th class="text-right">{% translate 'invoicing'|capfirst %}</th>
       <td>
-        {% if object.invoice_service %}{% link_or_none object.invoice_service %}
+        {% if object.invoice_service %}
+          {% link_or_none object.invoice_service %}
         {% elif object.archived_at %}
           {% blocktranslate with archived_at=object.archived_at|local_date_format trimmed %}
             Archived at {{ archived_at }}
           {% endblocktranslate %}
-        {% else %}&ndash;
+        {% else %}
+          &ndash;
         {% endif %}
       </td>
     </tr>
   </table>
 {% endblock %}
-
 {% block footer %}
-  <a href="{{ object.urls.update }}" class="btn btn-primary"
-    data-toggle="ajaxmodal">
-    {% translate 'Update' %}
-  </a>
-  <a href="{{ object.urls.move }}" class="btn btn-primary"
-    data-toggle="ajaxmodal">
-    {% translate 'Move' %}
-  </a>
-  <a href="{{ object.service.project.urls.createhours }}?copy={{ object.pk }}" class="btn btn-primary mr-auto"
-    data-toggle="ajaxmodal">
+  <a href="{{ object.urls.update }}" class="btn btn-primary" data-toggle="ajaxmodal">{% translate 'Update' %}</a>
+  <a href="{{ object.urls.move }}" class="btn btn-primary" data-toggle="ajaxmodal">{% translate 'Move' %}</a>
+  <a href="{{ object.service.project.urls.createhours }}?copy={{ object.pk }}"
+     class="btn btn-primary mr-auto"
+     data-toggle="ajaxmodal">
     {% translate 'Copy' %}
   </a>
-  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger"
-    data-toggle="ajaxmodal"
-    >{% translate 'Delete' %}
+  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger" data-toggle="ajaxmodal">
+    {% translate 'Delete' %}
   </a>
 {% endblock %}

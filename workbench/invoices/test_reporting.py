@@ -35,7 +35,7 @@ class ReportingTest(TestCase):
         self.assertContains(response, '<th class="text-right">300.00</th>')
 
         response = self.client.get(
-            "/report/open-items-list/?cutoff_date={}".format(in_days(-1).isoformat())
+            f"/report/open-items-list/?cutoff_date={in_days(-1).isoformat()}"
         )
         self.assertContains(response, '<th class="text-right">0.00</th>')
 

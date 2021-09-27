@@ -1,21 +1,18 @@
 {% extends "modalform.html" %}
-
 {% load bootstrap4 fineforms i18n workbench %}
-
 {% block size %}modal-xl{% endblock %}
-
 {% block title %}
-{% if view.project %}{{ view.project.title }}{% else %}{{ block.super }}{% endif %}
+  {% if view.project %}
+    {{ view.project.title }}
+  {% else %}
+    {{ block.super }}
+  {% endif %}
 {% endblock %}
-
 {% block body %}
   {% include 'fineforms/warnings.html' %}
   {% ff_errors form %}
-
   <div class="row">
-    <div class="col-md-7">
-      {% ff_fields form fields='title,description' %}
-    </div>
+    <div class="col-md-7">{% ff_fields form fields='title,description' %}</div>
     <div class="col-md-5">
       <div data-autofill="{{ view.default_service_types_json }}">
         <h5>{% translate 'effort' %}</h5>
@@ -26,7 +23,6 @@
           <div class="col-md-6">{% ff_fields form fields='effort_hours' %}</div>
         </div>
       </div>
-
       <h5>{% translate 'cost' %}</h5>
       <div class="row">
         <div class="col-md-6">{% ff_fields form fields='cost' %}</div>

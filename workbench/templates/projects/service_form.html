@@ -1,41 +1,42 @@
 {% extends "modalform.html" %}
-
 {% load bootstrap4 fineforms i18n workbench %}
-
 {% block size %}modal-xl{% endblock %}
-
 {% block title %}
-{% if view.project %}{{ view.project.title }}{% else %}{{ block.super }}{% endif %}
+  {% if view.project %}
+    {{ view.project.title }}
+  {% else %}
+    {{ block.super }}
+  {% endif %}
 {% endblock %}
-
 {% block body %}
   {% include 'fineforms/warnings.html' %}
   {% ff_errors form %}
-
   <div class="row">
     <div class="col-md-7">
       {% ff_field form.title %}
       {% ff_field form.description %}
-      {% if form.role %}{% ff_field form.role %}{% endif %}
+      {% if form.role %}
+        {% ff_field form.role %}
+      {% endif %}
       {% ff_field form.allow_logging %}
     </div>
     <div class="col-md-5">
       <div data-autofill="{{ view.default_service_types_json }}">
         <h5>{% translate 'effort' %}</h5>
-        {% if form.service_type %}{% ff_field form.service_type %}{% endif %}
+        {% if form.service_type %}
+          {% ff_field form.service_type %}
+        {% endif %}
         <div class="row">
           <div class="col-md-12">{% ff_field form.effort_type %}</div>
           <div class="col-md-6">{% ff_field form.effort_rate %}</div>
           <div class="col-md-6">{% ff_field form.effort_hours %}</div>
         </div>
       </div>
-
       <h5>{% translate 'cost' %}</h5>
       <div class="row">
         <div class="col-md-6">{% ff_field form.cost %}</div>
         <div class="col-md-6">{% ff_field form.third_party_costs %}</div>
       </div>
-
       <h5>{% translate 'offer' %}</h5>
       {% ff_fields form fields='offer,is_optional' %}
     </div>

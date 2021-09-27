@@ -57,7 +57,7 @@ class ExpensesTest(TestCase):
         code("")
         code("s=in-preparation")
         code("s=closed")
-        code("owned_by={}".format(user.id))
+        code(f"owned_by={user.id}")
         code("owned_by=-1")  # mine
         code("owned_by=0")  # only inactive
 

@@ -101,7 +101,7 @@ class ProjectsTest(TestCase):
 
         self.assertRedirects(
             self.client.get(service1.urls["detail"]),
-            "%s#service%s" % (project.urls["detail"], service1.pk),
+            "{}#service{}".format(project.urls["detail"], service1.pk),
         )
         response = self.client.post(
             service1.urls["update"],
@@ -262,10 +262,10 @@ class ProjectsTest(TestCase):
         code("s=solely-declined-offers")
         code("s=old-projects")
         code("s=invalid-customer-contact-combination")
-        code("org={}".format(project.customer_id))
+        code(f"org={project.customer_id}")
         code("type=internal")
         code("type=maintenance")
-        code("owned_by={}".format(user.id))
+        code(f"owned_by={user.id}")
         code("owned_by=-1")  # mine
         code("owned_by=0")  # only inactive
 
@@ -360,7 +360,7 @@ class ProjectsTest(TestCase):
         self.client.force_login(project.owned_by)
 
         response = self.client.get(project.urls["create"] + "?copy=" + str(project.pk))
-        self.assertContains(response, 'value="{}"'.format(project.title))
+        self.assertContains(response, f'value="{project.title}"')
         self.assertNotContains(response, "closed_on")
         # print(response, response.content.decode("utf-8"))
 
@@ -497,7 +497,7 @@ class ProjectsTest(TestCase):
         service_types = factories.service_types()
         response = self.client.get(
             service.urls["assign_service_type"]
-            + "?service_type={}".format(service_types.consulting.pk)
+            + f"?service_type={service_types.consulting.pk}"
         )
         self.assertRedirects(response, service.get_absolute_url())
 
@@ -644,16 +644,14 @@ class ProjectsTest(TestCase):
         )
 
         response = self.client.get(
-            Project.urls["create"] + "?customer={}".format(person.organization_id)
+            Project.urls["create"] + f"?customer={person.organization_id}"
         )
-        self.assertContains(response, 'value="{}"'.format(person.organization))
-        self.assertNotContains(response, 'value="{}"'.format(person))
+        self.assertContains(response, f'value="{person.organization}"')
+        self.assertNotContains(response, f'value="{person}"')
 
-        response = self.client.get(
-            Project.urls["create"] + "?contact={}".format(person.id)
-        )
-        self.assertContains(response, 'value="{}"'.format(person.organization))
-        self.assertContains(response, 'value="{}"'.format(person))
+        response = self.client.get(Project.urls["create"] + f"?contact={person.id}")
+        self.assertContains(response, f'value="{person.organization}"')
+        self.assertContains(response, f'value="{person}"')
 
     def test_unspecific_service_title(self):
         """Unspecific titles raise a warning"""

@@ -1,28 +1,34 @@
 {% extends "generic/object_list.html" %}
-
 {% load bootstrap4 i18n workbench %}
-
 {% block search-form-buttons %}
-{% if request.GET and request.user.features.CONTROLLING %}<a href="{% querystring export='xlsx' %}" class="btn btn-primary">
-  {% include 'svg/desktop-download.svg' %} XLSX</a>{% endif %}
+  {% if request.GET and request.user.features.CONTROLLING %}
+    <a href="{% querystring export='xlsx' %}" class="btn btn-primary">
+      {% include 'svg/desktop-download.svg' %}
+      XLSX
+    </a>
+  {% endif %}
 {% endblock %}
-
 {% block objects %}
-<div class="list-group list-group-flush">
-{% for day, sum, instances in object_list|group_hours_by_day %}
-<h5 class="mt-3 mb-3 d-flex justify-content-between">
-  <span>{{ day|local_date_format }}</span>
-  <span class="text-right">{{ sum }}h</span>
-</h5>
-{% for hours in instances %}
-<a class="list-group-item list-group-item-action px-0" href="{{ hours.get_absolute_url }}" data-toggle="ajaxmodal">
-  <small class="d-flex justify-content-between">
-    <span>{{ hours.service.project_service_title }}</span>
-    <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
-  </small>
-  <p class="mb-0"><strong>{{ hours.hours|hours }}</strong> {{ hours.description }}</p>
-</a>
-{% endfor %}
-{% endfor %}
-</div>
+  <div class="list-group list-group-flush">
+    {% for day, sum, instances in object_list|group_hours_by_day %}
+      <h5 class="mt-3 mb-3 d-flex justify-content-between">
+        <span>{{ day|local_date_format }}</span>
+        <span class="text-right">{{ sum }}h</span>
+      </h5>
+      {% for hours in instances %}
+        <a class="list-group-item list-group-item-action px-0"
+           href="{{ hours.get_absolute_url }}"
+           data-toggle="ajaxmodal">
+          <small class="d-flex justify-content-between">
+          <span>{{ hours.service.project_service_title }}</span>
+          <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
+          </small>
+          <p class="mb-0">
+            <strong>{{ hours.hours|hours }}</strong>
+            {{ hours.description }}
+          </p>
+        </a>
+      {% endfor %}
+    {% endfor %}
+  </div>
 {% endblock %}

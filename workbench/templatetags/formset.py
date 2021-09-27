@@ -40,7 +40,7 @@ class DynamicFormsetNode(template.Node):
             result.append("</script>")
 
         for idx, form in enumerate(formset.forms):
-            with context.push(form_id="%s-%s" % (slug, idx), form=form):
+            with context.push(form_id=f"{slug}-{idx}", form=form):
                 result.append(self.nodelist.render(context))
 
         return "".join(result)

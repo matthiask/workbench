@@ -35,8 +35,8 @@ class AccountsTest(TestCase):
         self.client.force_login(user)
 
         # Contains the signed email value
-        response = self.client.get("/admin/accounts/user/{}/change/".format(user.pk))
-        self.assertContains(response, '<div class="readonly">{}:'.format(user.email))
+        response = self.client.get(f"/admin/accounts/user/{user.pk}/change/")
+        self.assertContains(response, f'<div class="readonly">{user.email}:')
 
         # Creating an user through the admin interface is possible
         wtm = factories.WorkingTimeModelFactory.create()
@@ -133,10 +133,10 @@ class AccountsTest(TestCase):
         response = self.client.get("/users/")
         self.assertContains(response, user.get_full_name())
 
-        response = self.client.get("/users/{}/".format(user.id))
+        response = self.client.get(f"/users/{user.id}/")
         self.assertContains(response, user.email)
 
-        response = self.client.get("/users/{}/statistics/".format(user.id))
+        response = self.client.get(f"/users/{user.id}/statistics/")
         self.assertContains(response, "Hours per week")
 
     def test_work_anniversaries(self):

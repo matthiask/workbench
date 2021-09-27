@@ -1,113 +1,96 @@
 {% extends "base.html" %}
-
 {% load i18n workbench %}
-
-{% block title %}{% translate 'Keyboard shortcuts' %} - {{ block.super }}{% endblock %}
-
+{% block title %}
+  {% translate 'Keyboard shortcuts' %} - {{ block.super }}
+{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-8 col-lg-6">
-    <h1>{% translate 'Keyboard shortcuts' %}</h1>
-
-    <table class="table" data-shortcuts>
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-Q</th>
-        <td>{% translate 'Search everything' %}</td>
-      </tr>
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-F</th>
-        <td>{% translate 'Focus the search form in list views' %}</td>
-      </tr>
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-Return</th>
-        <td>{% translate 'Submit the current form' %}</td>
-      </tr>
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-H</th>
-        <td>{% translate 'Home' %}</td>
-      </tr>
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-C</th>
-        <td>{% translate 'people'|capfirst %}</td>
-      </tr>
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-Shift-C</th>
-        <td>{% translate 'Jump to person' %}</td>
-      </tr>
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-P</th>
-        <td>{% translate 'projects'|capfirst %}</td>
-      </tr>
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-Shift-P</th>
-        <td>{% translate 'Jump to project' %}</td>
-      </tr>
-
-      {% if request.user.features.CONTROLLING %}
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-O</th>
-        <td>{% translate 'offers'|capfirst %}</td>
-      </tr>
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-R</th>
-        <td>{% translate 'invoices'|capfirst %}</td>
-      </tr>
-      {% endif %}
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-T</th>
-        <td>{% translate 'timestamps'|capfirst %}</td>
-      </tr>
-
-      {% if request.user.features.DEALS %}
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-D</th>
-        <td>{% translate 'deals'|capfirst %}</td>
-      </tr>
-      {% endif %}
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-L</th>
-        <td>{% translate 'Log hours in active project or in any project if none is active' %}</td>
-      </tr>
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-Shift-L</th>
-        <td>{% translate 'Log hours in any project' %}</td>
-      </tr>
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-K</th>
-        <td>{% translate 'Log costs in active project or in any project if none is active' %}</td>
-      </tr>
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-Shift-K</th>
-        <td>{% translate 'Log costs in any project' %}</td>
-      </tr>
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-B</th>
-        <td>{% translate 'Log a break' %}</td>
-      </tr>
-
-      <tr>
-        <th class="text-right text-nowrap">Ctrl-Shift-B</th>
-        <td>{% translate 'breaks'|capfirst %}</td>
-      </tr>
-
-    </table>
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <h1>{% translate 'Keyboard shortcuts' %}</h1>
+      <table class="table" data-shortcuts>
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-Q</th>
+          <td>{% translate 'Search everything' %}</td>
+        </tr>
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-F</th>
+          <td>{% translate 'Focus the search form in list views' %}</td>
+        </tr>
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-Return</th>
+          <td>{% translate 'Submit the current form' %}</td>
+        </tr>
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-H</th>
+          <td>{% translate 'Home' %}</td>
+        </tr>
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-C</th>
+          <td>{% translate 'people'|capfirst %}</td>
+        </tr>
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-Shift-C</th>
+          <td>{% translate 'Jump to person' %}</td>
+        </tr>
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-P</th>
+          <td>{% translate 'projects'|capfirst %}</td>
+        </tr>
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-Shift-P</th>
+          <td>{% translate 'Jump to project' %}</td>
+        </tr>
+        {% if request.user.features.CONTROLLING %}
+          <tr>
+            <th class="text-right text-nowrap">Ctrl-O</th>
+            <td>{% translate 'offers'|capfirst %}</td>
+          </tr>
+          <tr>
+            <th class="text-right text-nowrap">Ctrl-R</th>
+            <td>{% translate 'invoices'|capfirst %}</td>
+          </tr>
+        {% endif %}
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-T</th>
+          <td>{% translate 'timestamps'|capfirst %}</td>
+        </tr>
+        {% if request.user.features.DEALS %}
+          <tr>
+            <th class="text-right text-nowrap">Ctrl-D</th>
+            <td>{% translate 'deals'|capfirst %}</td>
+          </tr>
+        {% endif %}
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-L</th>
+          <td>
+            {% translate 'Log hours in active project or in any project if none is active' %}
+          </td>
+        </tr>
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-Shift-L</th>
+          <td>{% translate 'Log hours in any project' %}</td>
+        </tr>
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-K</th>
+          <td>
+            {% translate 'Log costs in active project or in any project if none is active' %}
+          </td>
+        </tr>
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-Shift-K</th>
+          <td>{% translate 'Log costs in any project' %}</td>
+        </tr>
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-B</th>
+          <td>{% translate 'Log a break' %}</td>
+        </tr>
+        <tr>
+          <th class="text-right text-nowrap">Ctrl-Shift-B</th>
+          <td>{% translate 'breaks'|capfirst %}</td>
+        </tr>
+      </table>
+    </div>
   </div>
-</div>
-
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       if (!/Mac/.test(navigator.platform)) {

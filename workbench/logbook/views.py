@@ -25,7 +25,7 @@ def create(request, *, viewname):
             "links": [
                 {
                     "title": h(project),
-                    "url": "{}?{}".format(project.urls[viewname], params),
+                    "url": f"{project.urls[viewname]}?{params}",
                     "attrs": 'data-toggle="ajaxmodal"',
                     "shortcut": (idx + 1) % 10 if idx < 10 else None,
                 }

@@ -1,54 +1,59 @@
 {% extends "base.html" %}
-
 {% load fineforms i18n static workbench %}
-
-{% block title %}{% translate 'Work anniversaries' %} - {{ block.super }}{% endblock %}
-
+{% block title %}
+  {% translate 'Work anniversaries' %} - {{ block.super }}
+{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-<div class="col-sm-12 col-lg-8">
-  <h1>{% translate 'Work anniversaries' %}</h1>
-
-  <table class="table table-sm table-striped">
-    <thead>
-      <tr>
-        <th>{% translate 'user'|capfirst %}</th>
-        <th>{% translate 'Started on' %}</th>
-        <th class="text-right">{% translate 'Work anniversary' %}</th>
-        <th>{% translate 'On' %}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for anniversary in work_anniversaries %}
-        {% ifchanged anniversary.already %}{% if not forloop.first %}
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-lg-8">
+      <h1>{% translate 'Work anniversaries' %}</h1>
+      <table class="table table-sm table-striped">
+        <thead>
           <tr>
-            <td colspan="4"><hr></td>
+            <th>{% translate 'user'|capfirst %}</th>
+            <th>{% translate 'Started on' %}</th>
+            <th class="text-right">{% translate 'Work anniversary' %}</th>
+            <th>{% translate 'On' %}</th>
           </tr>
-        {% endif %}{% endifchanged %}
-        <tr>
-          <td>{{ anniversary.user.get_full_name }}</td>
-          <td>
-            {% if anniversary.user.date_of_employment %}
-              {{ anniversary.user.date_of_employment|local_date_format }}
-            {% else %}&ndash;
-            {% endif %}
-          </td>
-          <td class="text-right">
-            {% if anniversary.anniversary %}{{ anniversary.anniversary }}.
-            {% else %}✨
-            {% endif %}
-          </td>
-          <td>
-            {% if anniversary.user.date_of_employment %}
-              {{ anniversary.this_year|local_date_format }}
-            {% else %}&ndash;
-            {% endif %}
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-</div>
-</div>
+        </thead>
+        <tbody>
+          {% for anniversary in work_anniversaries %}
+            {% ifchanged anniversary.already %}
+              {% if not forloop.first %}
+                <tr>
+                  <td colspan="4">
+                    <hr>
+                  </td>
+                </tr>
+              {% endif %}
+            {% endifchanged %}
+            <tr>
+              <td>{{ anniversary.user.get_full_name }}</td>
+              <td>
+                {% if anniversary.user.date_of_employment %}
+                  {{ anniversary.user.date_of_employment|local_date_format }}
+                {% else %}
+                  &ndash;
+                {% endif %}
+              </td>
+              <td class="text-right">
+                {% if anniversary.anniversary %}
+                  {{ anniversary.anniversary }}.
+                {% else %}
+                  ✨
+                {% endif %}
+              </td>
+              <td>
+                {% if anniversary.user.date_of_employment %}
+                  {{ anniversary.this_year|local_date_format }}
+                {% else %}
+                  &ndash;
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 {% endblock %}

@@ -35,9 +35,7 @@ class ReportingTest(TestCase):
         response = self.client.get("/report/labor-costs/")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(
-            "/report/labor-costs/?project={}".format(service.project_id)
-        )
+        response = self.client.get(f"/report/labor-costs/?project={service.project_id}")
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(

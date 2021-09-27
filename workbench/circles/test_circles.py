@@ -74,7 +74,7 @@ class CirclesTest(TestCase):
         response = self.client.get("/report/hours-by-circle/")
         self.assertEqual(response.status_code, 200)
         response = self.client.get(
-            "/report/hours-by-circle/?users={}".format(s1.project.owned_by.id)
+            f"/report/hours-by-circle/?users={s1.project.owned_by.id}"
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "C1")

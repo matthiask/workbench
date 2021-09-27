@@ -5,7 +5,9 @@
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">{{ title }}</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
         <div class="modal-body clearfix">
           {% bootstrap_messages %}
@@ -15,19 +17,24 @@
             {% ff_errors form %}
             {% ff_fields form %}
           {% endblock %}
-
           {% if links %}
-          <div class="list-group">
-            {% for link in links %}
-            <a href="{{ link.url }}" class="list-group-item list-group-item-action" {{ link.attrs|safe }} data-number-shortcut="{{ link.shortcut }}">
-              {% if link.shortcut is not None %}<span class="badge badge-dark float-right mt-1">{{ link.shortcut }}</span>{% endif  %}
-              {{ link.title }}
-            </a>
-            {% endfor %}
-          </div>
+            <div class="list-group">
+              {% for link in links %}
+                <a href="{{ link.url }}"
+                   class="list-group-item list-group-item-action"
+                   {{ link.attrs|safe }}
+                   data-number-shortcut="{{ link.shortcut }}">
+                  {% if link.shortcut is not None %}
+                    <span class="badge badge-dark float-right mt-1">{{ link.shortcut }}</span>
+                  {% endif %}
+                  {{ link.title }}
+                </a>
+              {% endfor %}
+            </div>
           {% endif %}
         </div>
-      </div><!-- /.modal-content -->
+      </div>
+      <!-- /.modal-content -->
     </form>
-  </div><!-- /.modal-dialog -->
-</div>
+    </div><!-- /.modal-dialog -->
+  </div>

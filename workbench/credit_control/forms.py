@@ -143,7 +143,7 @@ class AssignCreditEntriesForm(forms.Form):
         for entry in CreditEntry.objects.reverse().filter(
             invoice__isnull=True, notes=""
         )[:20]:
-            self.fields["entry_{}_invoice".format(entry.pk)] = forms.TypedChoiceField(
+            self.fields[f"entry_{entry.pk}_invoice"] = forms.TypedChoiceField(
                 label=format_html(
                     '<a href="{}" target="_blank"'
                     ' rel="noopener noreferrer">{}, {}: {}</a>',
@@ -212,15 +212,15 @@ class AssignCreditEntriesForm(forms.Form):
                 widget=forms.RadioSelect,
             )
 
-            self.fields["entry_{}_notes".format(entry.pk)] = forms.CharField(
+            self.fields[f"entry_{entry.pk}_notes"] = forms.CharField(
                 widget=Textarea({"rows": 1}), label=_("notes"), required=False
             )
 
             self.entries.append(
                 (
                     entry,
-                    "entry_{}_invoice".format(entry.pk),
-                    "entry_{}_notes".format(entry.pk),
+                    f"entry_{entry.pk}_invoice",
+                    f"entry_{entry.pk}_notes",
                 )
             )
 

@@ -140,12 +140,12 @@ def labor_costs_by_cost_center(date_range):
     projects = _labor_costs_by_project_id(date_range)
 
     sorted_projects = sorted(
-        [
+        (
             {"project": project, **projects[project.id]}
             for project in Project.objects.filter(
                 id__in=projects.keys()
             ).select_related("cost_center", "owned_by")
-        ],
+        ),
         key=lambda row: (row["project"].cost_center_id or 1e100, -row["costs"]),
     )
 

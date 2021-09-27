@@ -1,15 +1,14 @@
 {% load static %}
 <!doctype html>
 <html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="shortcut icon" href="{% static 'workbench/lib/timestamps.png' %}">
-<link rel="apple-touch-icon" sizes="128x128" href="{% static 'workbench/lib/timestamps.png' %}">
-<link rel="icon" sizes="192x192" href="{% static 'workbench/lib/timestamps.png' %}">
-<title>Timestamps</title>
-
-<style>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'workbench/lib/timestamps.png' %}">
+    <link rel="apple-touch-icon" sizes="128x128" href="{% static 'workbench/lib/timestamps.png' %}">
+    <link rel="icon" sizes="192x192" href="{% static 'workbench/lib/timestamps.png' %}">
+    <title>Timestamps</title>
+    <style>
 body {
   font-family: sans-serif;
   min-height: 90vh;
@@ -89,9 +88,8 @@ button:active {
 .success {
   color: #9954bb;
 }
-</style>
-
-<script>
+    </style>
+    <script>
 document.addEventListener("DOMContentLoaded", () => {
   const $ = (sel, base=document) => base.querySelector(sel)
 
@@ -153,26 +151,20 @@ document.addEventListener("DOMContentLoaded", () => {
   })
 })
 
-</script>
-
-</head>
-<body>
-
-<main>
-  <h1>Timestamps</h1>
-
-  <div class="notes">
-    <input type="text" name="notes" value="" placeholder="Notes">
-    <input type="time" name="time" value="" placeholder="Time">
-  </div>
-
-  <div class="buttons">
-    <button type="button" data-type="start">Start</button>
-    <button type="button" data-type="stop">Stop</button>
-  </div>
-
-  <div id="status"></div>
-</main>
-
-</body>
+    </script>
+  </head>
+  <body>
+    <main>
+      <h1>Timestamps</h1>
+      <div class="notes">
+        <input type="text" name="notes" value="" placeholder="Notes">
+        <input type="time" name="time" value="" placeholder="Time">
+      </div>
+      <div class="buttons">
+        <button type="button" data-type="start">Start</button>
+        <button type="button" data-type="stop">Stop</button>
+      </div>
+      <div id="status"></div>
+    </main>
+  </body>
 </html>

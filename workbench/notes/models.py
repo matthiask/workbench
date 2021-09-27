@@ -53,5 +53,5 @@ class Note(Model):
 
     def get_absolute_url(self):
         model = self.content_type.model_class()
-        viewname = "%s_%s_detail" % (model._meta.app_label, model._meta.model_name)
+        viewname = f"{model._meta.app_label}_{model._meta.model_name}_detail"
         return reverse(viewname, kwargs={"pk": self.object_id})

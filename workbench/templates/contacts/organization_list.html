@@ -1,18 +1,20 @@
 {% extends "contacts/object_list.html" %}
-
 {% load bootstrap4 i18n %}
-
 {% block objects %}
-<div class="list-group list-group-flush">
-  {% for organization in object_list %}
-  <div class="list-group-item px-0">
-    <h5 class="mb-1"><a href="{{ organization.get_absolute_url }}">{{ organization }}</a></h5>
-    <p class="mb-0">
-      {% for person in organization.people.all %}
-        <a class="inline" href="{{ person.get_absolute_url }}">{{ person.full_name }}</a>{% if not forloop.last %},{% endif %}
-      {% empty %}&ndash;{% endfor %}
-    </p>
+  <div class="list-group list-group-flush">
+    {% for organization in object_list %}
+      <div class="list-group-item px-0">
+        <h5 class="mb-1">
+          <a href="{{ organization.get_absolute_url }}">{{ organization }}</a>
+        </h5>
+        <p class="mb-0">
+          {% for person in organization.people.all %}
+            <a class="inline" href="{{ person.get_absolute_url }}">{{ person.full_name }}</a>
+            {% if not forloop.last %},{% endif %}
+          {% empty %}&ndash;
+          {% endfor %}
+        </p>
+      </div>
+    {% endfor %}
   </div>
-  {% endfor %}
-</div>
 {% endblock %}

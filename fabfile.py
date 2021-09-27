@@ -51,11 +51,9 @@ def _do_deploy(conn, folder, rsync):
         fl.run(conn, "venv/bin/pip install -U 'pip!=20.3.2' wheel setuptools")
         fl.run(conn, "venv/bin/pip install -r requirements.txt")
         for wb in fl.config.installations:
-            fl.run(conn, "DOTENV=.env/{} venv/bin/python manage.py migrate".format(wb))
+            fl.run(conn, f"DOTENV=.env/{wb} venv/bin/python manage.py migrate")
     if rsync:
-        conn.local(
-            "rsync -avz --delete static/ {}:{}static".format(fl.config.host, folder)
-        )
+        conn.local(f"rsync -avz --delete static/ {fl.config.host}:{folder}static")
     with conn.cd(folder):
         fl.run(
             conn,
@@ -67,7 +65,7 @@ def _do_deploy(conn, folder, rsync):
 
 def _restart_all(conn):
     for wb in fl.config.installations:
-        fl.run(conn, "systemctl --user restart workbench@{}".format(wb), echo=True)
+        fl.run(conn, f"systemctl --user restart workbench@{wb}", echo=True)
 
 
 @fl.task

@@ -1,11 +1,10 @@
-{# <input type="text" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}> #}
-
+{# <input type="text" name="{{ widget.name }}"{% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}> #}
 <div style="float:left">
   {% for feature in widget.features %}
-  <label style="float:none;width:auto;{{ feature.style }}">
-    <input type="checkbox" name="{{ widget.name }}" value="{{ feature.value }}" {{ feature.attrs }}>
-    {{ feature.label }}
-    {% if feature.help_text %}<small>{{ feature.help_text }}</small>{% endif %}
-  </label>
+    <label style="float:none;width:auto;{{ feature.style }}">
+      <input type="checkbox" name="{{ widget.name }}" value="{{ feature.value }}" {{ feature.attrs }}>
+      {{ feature.label }}
+      {% if feature.help_text %}<small>{{ feature.help_text }}</small>{% endif %}
+    </label>
   {% endfor %}
 </div>

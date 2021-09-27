@@ -320,7 +320,7 @@ class AWTTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/zip")
 
-        response = self.client.get(url + "?export=pdf&user={}".format(user.pk))
+        response = self.client.get(url + f"?export=pdf&user={user.pk}")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/pdf")
 
@@ -339,7 +339,7 @@ class AWTTest(TestCase):
         code = check_code(self, "/absences/")
         code("")
         code("u=-1")
-        code("u={}".format(user.pk))
+        code(f"u={user.pk}")
         code("reason=sickness")
         code("reason=nothing", 302)
         code("export=xlsx")
@@ -405,7 +405,7 @@ class AWTTest(TestCase):
 
         team = factories.TeamFactory.create()
         user.teams.add(team)
-        code("team={}".format(team.pk))
+        code(f"team={team.pk}")
         code("team=abc", status_code=302)
 
     def test_absence_validation(self):

@@ -75,7 +75,7 @@ class LoginTestCase(TestCase):
             ["No user with email address user@example.com found."],
         )
 
-        FakeFlow.EMAIL = "user@{}".format(settings.WORKBENCH.SSO_DOMAIN)
+        FakeFlow.EMAIL = f"user@{settings.WORKBENCH.SSO_DOMAIN}"
         response = client.get("/accounts/oauth2/?code=x", HTTP_ACCEPT_LANGUAGE="en")
         self.assertRedirects(response, "/accounts/update/")
         self.assertEqual(messages(response), ["Welcome! Please fill in your details."])
@@ -99,7 +99,7 @@ class LoginTestCase(TestCase):
         # Disabled user
         User.objects.update(is_active=False)
         client = Client()
-        FakeFlow.EMAIL = "user@{}".format(settings.WORKBENCH.SSO_DOMAIN)
+        FakeFlow.EMAIL = f"user@{settings.WORKBENCH.SSO_DOMAIN}"
         response = client.get("/accounts/oauth2/?code=x", HTTP_ACCEPT_LANGUAGE="en")
         self.assertRedirects(response, "/accounts/login/?error=1")
         self.assertEqual(

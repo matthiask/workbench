@@ -68,7 +68,7 @@ class Year(Model):
         verbose_name_plural = _("years")
 
     def __str__(self):
-        return "%s %s" % (self.year, self.working_time_model)
+        return f"{self.year} {self.working_time_model}"
 
     @property
     def months(self):
@@ -76,7 +76,7 @@ class Year(Model):
 
     @property
     def pretty_working_time_per_day(self):
-        return "%s/%s" % (hours(self.working_time_per_day), _("day"))
+        return "{}/{}".format(hours(self.working_time_per_day), _("day"))
 
 
 class Employment(Model):
@@ -110,7 +110,7 @@ class Employment(Model):
     def __str__(self):
         if self.date_until.year > 3000:
             return _("since %s") % local_date_format(self.date_from)
-        return "%s - %s" % (
+        return "{} - {}".format(
             local_date_format(self.date_from),
             local_date_format(self.date_until),
         )
@@ -227,11 +227,11 @@ class Absence(Model):
 
     @property
     def pretty_status(self):
-        return "%s, %s" % (gettext("%s days") % self.days, self.pretty_period)
+        return "{}, {}".format(gettext("%s days") % self.days, self.pretty_period)
 
     @property
     def pretty_period(self):
-        return "%s - %s" % (
+        return "{} - {}".format(
             local_date_format(self.starts_on),
             local_date_format(self.ends_on or self.starts_on),
         )

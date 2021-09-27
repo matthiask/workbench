@@ -181,7 +181,7 @@ class Person(Model):
     @property
     def name_with_organization(self):
         if self.organization and not self.organization.is_private_person:
-            return "%s / %s" % (self.organization, self.full_name)
+            return f"{self.organization} / {self.full_name}"
         return self.full_name
 
     def save(self, *args, **kwargs):

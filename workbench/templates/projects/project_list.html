@@ -1,34 +1,30 @@
 {% extends "projects/object_list.html" %}
-
 {% load bootstrap4 i18n workbench %}
-
 {% block objects %}
-<div class="list-group list-group-flush">
-  {% for project in object_list|analyze_projects %}
-  <div class="list-group-item px-0">
-    <div class="d-flex w-100 justify-content-between">
-      <h5 class="mb-1">
-        <a href="{{ project.get_absolute_url }}">{{ project|h }}</a>
-      </h5>
-      {{ project.status_badge }}
-    </div>
-    <div class="d-flex w-100 justify-content-between">
-      <p class="mb-1">
-        {% if project.contact %}<a href="{{ project.contact.get_absolute_url }}">{{ project.contact.name_with_organization }}</a>
-        {% else %}<a href="{{ project.customer.get_absolute_url }}">{{ project.customer }}</a>
-        {% endif %}
-      </p>
-      <small>
-        <a href="{{ project.urls.createhours }}" data-toggle="ajaxmodal">
-          +{% translate 'hours'|capfirst %}
-        </a>
-      </small>
-    </div>
-
-    <div class="w-third" style="position:absolute;left:0;bottom:5px">
-      {% bar project.analyzed.logged_hours project.analyzed.service_hours %}
-    </div>
+  <div class="list-group list-group-flush">
+    {% for project in object_list|analyze_projects %}
+      <div class="list-group-item px-0">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">
+            <a href="{{ project.get_absolute_url }}">{{ project|h }}</a>
+          </h5>
+          {{ project.status_badge }}
+        </div>
+        <div class="d-flex w-100 justify-content-between">
+          <p class="mb-1">
+            {% if project.contact %}
+              <a href="{{ project.contact.get_absolute_url }}">{{ project.contact.name_with_organization }}</a>
+            {% else %}
+              <a href="{{ project.customer.get_absolute_url }}">{{ project.customer }}</a>
+            {% endif %}
+          </p>
+          <small>
+          <a href="{{ project.urls.createhours }}" data-toggle="ajaxmodal">+{% translate 'hours'|capfirst %}</a>
+          </small>
+        </div>
+        <div class="w-third"
+             style="position:absolute;left:0;bottom:5px">{% bar project.analyzed.logged_hours project.analyzed.service_hours %}</div>
+      </div>
+    {% endfor %}
   </div>
-  {% endfor %}
-</div>
 {% endblock %}

@@ -68,12 +68,12 @@ class DealsTest(TestCase):
         self.assertIsNone(deal.closed_on)
         self.assertEqual(
             deal.pretty_status,
-            "Open since {}".format(local_date_format(dt.date.today())),
+            f"Open since {local_date_format(dt.date.today())}",
         )
         self.assertEqual(list(deal.contributors.all()), [person.primary_contact])
 
         response = self.client.post(
-            deal.urls["set_status"] + "?status={}".format(Deal.DECLINED),
+            deal.urls["set_status"] + f"?status={Deal.DECLINED}",
             {
                 "closing_type": factories.ClosingTypeFactory.create(
                     represents_a_win=False
@@ -89,11 +89,11 @@ class DealsTest(TestCase):
         self.assertEqual(deal.closed_on, dt.date.today())
         self.assertEqual(
             deal.pretty_status,
-            "Declined on {}".format(local_date_format(dt.date.today())),
+            f"Declined on {local_date_format(dt.date.today())}",
         )
 
         response = self.client.post(
-            deal.urls["set_status"] + "?status={}".format(Deal.OPEN),
+            deal.urls["set_status"] + f"?status={Deal.OPEN}",
         )
         self.assertRedirects(response, deal.urls["detail"])
 
@@ -101,7 +101,7 @@ class DealsTest(TestCase):
         self.assertIsNone(deal.closed_on)
         self.assertEqual(
             deal.pretty_status,
-            "Open since {}".format(local_date_format(dt.date.today())),
+            f"Open since {local_date_format(dt.date.today())}",
         )
 
     def test_protected_m2m(self):
@@ -155,10 +155,10 @@ class DealsTest(TestCase):
                 "title": "Some deal",
                 "probability": Deal.NORMAL,
                 "owned_by": person.primary_contact_id,
-                "value_{}".format(type1.id): 200,
-                "value_{}".format(type2.id): "",
-                "attribute_{}".format(group1.pk): attribute1_1.pk,
-                "attribute_{}".format(group2.pk): "",
+                f"value_{type1.id}": 200,
+                f"value_{type2.id}": "",
+                f"attribute_{group1.pk}": attribute1_1.pk,
+                f"attribute_{group2.pk}": "",
                 "contributors": [person.primary_contact_id],
             },
         )
@@ -269,7 +269,7 @@ class DealsTest(TestCase):
         deal = Deal(decision_expected_on=today)
         self.assertEqual(
             deal.pretty_status,
-            "Decision expected on {}".format(local_date_format(today)),
+            f"Decision expected on {local_date_format(today)}",
         )
         self.assertIn("badge-info", deal.status_badge)
 
@@ -277,7 +277,7 @@ class DealsTest(TestCase):
 
         self.assertEqual(
             deal.pretty_status,
-            "Decision expected on {}".format(local_date_format(in_days(-1))),
+            f"Decision expected on {local_date_format(in_days(-1))}",
         )
         self.assertIn("badge-warning", deal.status_badge)
 
@@ -305,11 +305,11 @@ class DealsTest(TestCase):
         self.client.force_login(deal.owned_by)
         response = self.client.get(deal.urls["update"])
 
-        self.assertContains(response, 'name="value_{}"'.format(vt.id))
+        self.assertContains(response, f'name="value_{vt.id}"')
         self.assertContains(response, 'value="200.00"')
 
         self.assertNotContains(
-            self.client.get(deal.urls["create"]), 'name="value_{}"'.format(vt.id)
+            self.client.get(deal.urls["create"]), f'name="value_{vt.id}"'
         )
 
         # Deal has been saved twice (insert, and update with value)
@@ -324,7 +324,7 @@ class DealsTest(TestCase):
                 "title": deal.title,
                 "probability": Deal.NORMAL,
                 "owned_by": deal.owned_by_id,
-                "value_{}".format(vt.id): 500,
+                f"value_{vt.id}": 500,
                 "contributors": [deal.owned_by_id],
             },
         )

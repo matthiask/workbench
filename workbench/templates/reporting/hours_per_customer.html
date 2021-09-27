@@ -1,60 +1,67 @@
 {% extends "base.html" %}
-
 {% load fineforms i18n static workbench %}
-
-{% block title %}{% translate 'Hours per customer' %} - {{ block.super }}{% endblock %}
-
+{% block title %}
+  {% translate 'Hours per customer' %} - {{ block.super }}
+{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-<div class="col-sm-12 col-md-8">
-  <h1>{% translate 'Hours per customer' %}</h1>
-
-  <form method="get" class="mb-3" data-autosubmit>
-    {% ff_fields form %}
-  </form>
-
-  <table class="table table-sm table-striped">
-    <thead>
-      <tr>
-        <th></th>
-        {% for user in stats.users %}<th class="text-right">{{ user.get_short_name }}</th>{% endfor %}
-        <th></th>
-      </tr>
-      <tr>
-        <th></th>
-        {% for user, hours in stats.user_hours %}
-          <th class="text-right">
-            <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">{{ hours|hours }}</a>
-          </th>
-        {% endfor %}
-        <th class="text-right">{{ stats.total_hours|hours }}</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for row in stats.organizations %}
-    <tr>
-      <th><a href="{% url 'logbook_loggedhours_list' %}?organization={{ row.organization.id }}">{{ row.organization }}</a></th>
-      {% for user, hours in row.user_hours %}
-        {% if hours %}
-          <td class="text-right">
-            <a href="{% url 'logbook_loggedhours_list' %}?organization={{ row.organization.id }}&amp;rendered_by={{ user.pk }}">{{ hours|hours }}</a>
-          </td>
-        {% else %}<td></td>
-        {% endif %}
-      {% endfor %}
-      <th class="text-right">{{ row.total_hours|hours }}</th>
-    </tr>
-    {% if forloop.counter|divisibleby:10 and not forloop.last %}
-      <tr>
-        <th></th>
-        {% for user in stats.users %}<th class="text-right">{{ user.get_short_name }}</th>{% endfor %}
-        <th></th>
-      </tr>
-    {% endif %}
-    {% endfor %}
-    </tbody>
-  </table>
-
-</div>
-</div>
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-8">
+      <h1>{% translate 'Hours per customer' %}</h1>
+      <form method="get" class="mb-3" data-autosubmit>
+        {% ff_fields form %}
+      </form>
+      <table class="table table-sm table-striped">
+        <thead>
+          <tr>
+            <th></th>
+            {% for user in stats.users %}
+              <th class="text-right">{{ user.get_short_name }}</th>
+            {% endfor %}
+            <th></th>
+          </tr>
+          <tr>
+            <th></th>
+            {% for user, hours in stats.user_hours %}
+              <th class="text-right">
+                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.pk }}">{{ hours|hours }}</a>
+              </th>
+            {% endfor %}
+            <th class="text-right">{{ stats.total_hours|hours }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in stats.organizations %}
+            <tr>
+              <th>
+                <a href="{% url 'logbook_loggedhours_list' %}?organization={{ row.organization.id }}">
+                  {{ row.organization }}
+                </a>
+              </th>
+              {% for user, hours in row.user_hours %}
+                {% if hours %}
+                  <td class="text-right">
+                    <a href="{% url 'logbook_loggedhours_list' %}?organization={{ row.organization.id }}&amp;rendered_by={{ user.pk }}">
+                      {{ hours|hours }}
+                    </a>
+                  </td>
+                {% else %}
+                  <td></td>
+                {% endif %}
+              {% endfor %}
+              <th class="text-right">{{ row.total_hours|hours }}</th>
+            </tr>
+            {% if forloop.counter|divisibleby:10 and not forloop.last %}
+              <tr>
+                <th></th>
+                {% for user in stats.users %}
+                  <th class="text-right">{{ user.get_short_name }}</th>
+                {% endfor %}
+                <th></th>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 {% endblock %}

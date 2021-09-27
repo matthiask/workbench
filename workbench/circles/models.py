@@ -89,12 +89,12 @@ class Role(models.Model):
     def __str__(self):
         prefix = gettext("(removed)") + " " if self.is_removed else ""
         if self.for_circle:
-            return "%s%s [%s]" % (
+            return "{}{} [{}]".format(
                 prefix,
                 capfirst(gettext("for the circle")),
                 self.circle,
             )
-        return "%s%s [%s]" % (prefix, self.name, self.circle)
+        return f"{prefix}{self.name} [{self.circle}]"
 
     @property
     def pretty_name(self):

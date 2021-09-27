@@ -35,7 +35,7 @@ class BreaksTest(TestCase):
         code = check_code(self, "/logbook/breaks/")
         code("")
         code("user=-1")
-        code("user={}".format(user.pk))
+        code(f"user={user.pk}")
         code("export=xlsx")
 
         response = self.client.get(brk.urls["detail"])
@@ -191,7 +191,7 @@ class BreaksTest(TestCase):
         self.client.force_login(user)
 
         response = self.client.post(
-            Break.urls["create"] + "?timestamp={}".format(t.pk),
+            Break.urls["create"] + f"?timestamp={t.pk}",
             {
                 "modal-day": dt.date.today().isoformat(),
                 "modal-starts_at": "12:00",
@@ -211,7 +211,7 @@ class BreaksTest(TestCase):
 
         t2 = user.timestamp_set.create(type=Timestamp.STOP)
         response = self.client.post(
-            brk.urls["update"] + "?timestamp={}".format(t2.pk),
+            brk.urls["update"] + f"?timestamp={t2.pk}",
             {
                 "modal-day": dt.date.today().isoformat(),
                 "modal-starts_at": "12:00",

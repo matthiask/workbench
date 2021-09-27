@@ -1,43 +1,40 @@
 {% extends "base.html" %}
-
 {% load fineforms i18n workbench %}
-
-{% block title %}{% translate 'Declined deals' %} - {{ block.super }}{% endblock %}
-
+{% block title %}
+  {% translate 'Declined deals' %} - {{ block.super }}
+{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-<div class="col-md-10 col-lg-8">
-  <h1>{% translate 'Declined deals' %}</h1>
-
-  <form method="get" class="mb-3" data-autosubmit>
-    {% ff_fields form %}
-  </form>
-
-  <table class="table table-responsive-lg">
-    <thead class="sticky">
-      <tr>
-        <th>{% translate 'deal'|capfirst %}</th>
-        <th>{% translate 'customer'|capfirst %}</th>
-        <th>{% translate 'Reason for losing' %}</th>
-        <th class="text-nowrap text-right">{% translate 'value'|capfirst %}</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for deal in stats %}
-      <tr>
-        <td>
-          <a href="{{ deal.get_absolute_url }}">
-            {{ deal|h }} {{ deal.status_badge }}
-          </a>
-        </td>
-        <td>{{ deal.contact.name_with_organization|default:deal.customer }}</td>
-        <td>{{ deal.closing_type }}{% if deal.closing_notice %}: {{ deal.closing_notice }}{% endif %}</td>
-        <td class="text-right">{{ deal.value|currency }}</td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-
-</div>
-</div>
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <h1>{% translate 'Declined deals' %}</h1>
+      <form method="get" class="mb-3" data-autosubmit>
+        {% ff_fields form %}
+      </form>
+      <table class="table table-responsive-lg">
+        <thead class="sticky">
+          <tr>
+            <th>{% translate 'deal'|capfirst %}</th>
+            <th>{% translate 'customer'|capfirst %}</th>
+            <th>{% translate 'Reason for losing' %}</th>
+            <th class="text-nowrap text-right">{% translate 'value'|capfirst %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for deal in stats %}
+            <tr>
+              <td>
+                <a href="{{ deal.get_absolute_url }}">{{ deal|h }} {{ deal.status_badge }}</a>
+              </td>
+              <td>{{ deal.contact.name_with_organization|default:deal.customer }}</td>
+              <td>
+                {{ deal.closing_type }}
+                {% if deal.closing_notice %}: {{ deal.closing_notice }}{% endif %}
+              </td>
+              <td class="text-right">{{ deal.value|currency }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 {% endblock %}

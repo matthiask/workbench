@@ -74,7 +74,7 @@ def upload_changes_to_mailchimp():
             with override(None):
                 merge_fields["ADDRESS"] = "  ".join(
                     [
-                        "%s %s" % (address.street, address.house_number),
+                        f"{address.street} {address.house_number}",
                         address.address_suffix,
                         address.city,
                         "",  # Region

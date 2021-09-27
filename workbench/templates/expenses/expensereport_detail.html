@@ -1,57 +1,60 @@
 {% extends "base.html" %}
-
 {% load i18n workbench %}
-
-{% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
-
+{% block title %}
+  {{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}
+{% endblock %}
 {% block content %}
-<div class="row">
-<div class="col-md-6 offset-md-3">
-  <h1>{{ object|h }} {% history_link object %}</h1>
-
-  <table class="table table-striped">
-    <tr>
-      <th class="text-right">{% translate 'expenses'|capfirst %}</th>
-      <td>
-        {% for cost in object.expenses.all reversed %}
-          <a href="{{ cost.urls.detail }}" data-toggle="ajaxmodal">
-            {{ cost.rendered_on|local_date_format }}<br>
-            {{ cost.service.project|h }}: {{ cost.service|h }}<br>
-            {{ cost.description }}<br>
-            {{ cost.third_party_costs|currency }}
-            {% if cost.expense_cost %}({{ cost.expense_currency }} {{ cost.expense_cost }}){% endif %}
-            <br>
-          </a>
-          <br>
-        {% endfor %}
-      </td>
-    </tr>
-    <tr>
-      <th class="text-right">{% translate 'status'|capfirst %}</th>
-      <td>{{ object.status_badge }}</td>
-    </tr>
-    <tr>
-      <th class="text-right">{% translate 'total'|capfirst %}</th>
-      <td>{{ object.total|currency }}</td>
-    </tr>
-  </table>
-
-  <a href="{{ object.urls.update }}" class="btn btn-primary">
-    {% translate 'Update' %}
-  </a>
-  <span class="btn-group">
-    <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">PDF</a>
-    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <span class="sr-only">Toggle Dropdown</span>
-    </button>
-    <div class="dropdown-menu dropdown-menu-right">
-      <a class="dropdown-item" href="{{ object.urls.pdf }}?disposition=attachment">
-        {% translate 'Download' %}</a>
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <h1>{{ object|h }} {% history_link object %}</h1>
+      <table class="table table-striped">
+        <tr>
+          <th class="text-right">{% translate 'expenses'|capfirst %}</th>
+          <td>
+            {% for cost in object.expenses.all reversed %}
+              <a href="{{ cost.urls.detail }}" data-toggle="ajaxmodal">
+                {{ cost.rendered_on|local_date_format }}
+                <br>
+                {{ cost.service.project|h }}: {{ cost.service|h }}
+                <br>
+                {{ cost.description }}
+                <br>
+                {{ cost.third_party_costs|currency }}
+                {% if cost.expense_cost %}
+                  ({{ cost.expense_currency }} {{ cost.expense_cost }})
+                {% endif %}
+                <br>
+              </a>
+              <br>
+            {% endfor %}
+          </td>
+        </tr>
+        <tr>
+          <th class="text-right">{% translate 'status'|capfirst %}</th>
+          <td>{{ object.status_badge }}</td>
+        </tr>
+        <tr>
+          <th class="text-right">{% translate 'total'|capfirst %}</th>
+          <td>{{ object.total|currency }}</td>
+        </tr>
+      </table>
+      <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
+      <span class="btn-group">
+        <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+          PDF
+        </a>
+        <button type="button"
+                class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+          <a class="dropdown-item" href="{{ object.urls.pdf }}?disposition=attachment">{% translate 'Download' %}</a>
+        </div>
+      </span>
+      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">{% translate 'Delete' %}</a>
     </div>
-  </span>
-  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
-    {% translate 'Delete' %}
-  </a>
-</div>
-</div>
+  </div>
 {% endblock %}

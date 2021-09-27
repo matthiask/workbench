@@ -1,73 +1,75 @@
 {% extends "generic/object_detail.html" %}
-
 {% load i18n workbench %}
-
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-sm-12">
-    <h1>{{ person.full_name }} {% history_link person %}</h1>
-    {% if person.organization %}
-      <h2>{% link_or_none person.organization %}</h2>
-    {% endif %}
-  </div>
-
-  <div class="col-lg-4">
-    {% for phone in person.phonenumbers.all %}
-      <strong>{{ phone.type|capfirst }}:</strong><br>
-      <a href="tel:{{ phone.phone_number }}">{{ phone.pretty_number }}</a>
-      <br>
-    {% endfor %}
-    {% for email in person.emailaddresses.all %}
-    <strong>{{ email.type|capfirst }}:</strong><br>
-      <a href="mailto:{{ email.email }}">{{ email.email }}</a>
-      <br>
-    {% endfor %}
-  </div>
-  <div class="col-lg-4">
-    {% for address in person.postaladdresses.all %}
-      <strong>{{ address.type|capfirst }}:</strong><br>
-      {{ address.postal_address|linebreaksbr }}
-      {% if address.get_maps_url %}
-        <br>
-        <a href="{{ address.get_maps_url }}" target="_blank" rel="noopener noreferrer">{% translate 'Maps' %}</a>
+  <div class="row justify-content-center">
+    <div class="col-sm-12">
+      <h1>{{ person.full_name }} {% history_link person %}</h1>
+      {% if person.organization %}
+        <h2>{% link_or_none person.organization %}</h2>
       {% endif %}
+    </div>
+    <div class="col-lg-4">
+      {% for phone in person.phonenumbers.all %}
+        <strong>{{ phone.type|capfirst }}:</strong>
+        <br>
+        <a href="tel:{{ phone.phone_number }}">{{ phone.pretty_number }}</a>
+        <br>
+      {% endfor %}
+      {% for email in person.emailaddresses.all %}
+        <strong>{{ email.type|capfirst }}:</strong>
+        <br>
+        <a href="mailto:{{ email.email }}">{{ email.email }}</a>
+        <br>
+      {% endfor %}
+    </div>
+    <div class="col-lg-4">
+      {% for address in person.postaladdresses.all %}
+        <strong>{{ address.type|capfirst }}:</strong>
+        <br>
+        {{ address.postal_address|linebreaksbr }}
+        {% if address.get_maps_url %}
+          <br>
+          <a href="{{ address.get_maps_url }}" target="_blank" rel="noopener noreferrer">{% translate 'Maps' %}</a>
+        {% endif %}
+        <br>
+      {% endfor %}
+    </div>
+    <div class="col-lg-4">
+      <strong>{{ person|label:'date_of_birth' }}</strong>
       <br>
-    {% endfor %}
+      {{ person.date_of_birth|local_date_format|default:'&ndash;' }}
+      <br>
+      <strong>{{ person|label:'notes' }}</strong>
+      <br>
+      {{ person.notes|urlize|linebreaksbr|default:'&ndash;' }}
+      <br>
+      <strong>{{ person|label:'groups' }}</strong>
+      <br>
+      {% for group in person.groups.all %}
+        <a href="{% url 'contacts_person_list' %}?g={{ group.id }}">{{ group }}</a>
+        <br>
+      {% empty %}&ndash;
+      {% endfor %}
+    </div>
   </div>
-  <div class="col-lg-4">
-    <strong>{{ person|label:'date_of_birth' }}</strong><br>
-    {{ person.date_of_birth|local_date_format|default:'&ndash;' }}<br>
-    <strong>{{ person|label:'notes' }}</strong><br>
-    {{ person.notes|urlize|linebreaksbr|default:'&ndash;' }}
-    <br>
-    <strong>{{ person|label:'groups' }}</strong><br>
-    {% for group in person.groups.all %}
-      <a href="{% url 'contacts_person_list' %}?g={{ group.id }}">{{ group }}</a><br>
-    {% empty %}&ndash;
-    {% endfor %}
-  </div>
-
-</div>
-
-<a href="{% url 'projects_project_create' %}?contact={{ object.pk }}" class="btn btn-primary">
-  {% include "svg/plus.svg" %}
-  {% translate 'project'|capfirst %}
-</a>
-<a href="{% url 'invoices_invoice_create' %}?contact={{ object.pk }}" class="btn btn-primary">
-  {% include "svg/plus.svg" %}
-  {% translate 'invoice'|capfirst %}
-</a>
-{% if request.user.features.DEALS %}
-  <a href="{% url 'deals_deal_create' %}?contact={{ object.pk }}" class="btn btn-primary">
+  <a href="{% url 'projects_project_create' %}?contact={{ object.pk }}" class="btn btn-primary">
     {% include "svg/plus.svg" %}
-    {% translate 'deal'|capfirst %}
+    {% translate 'project'|capfirst %}
   </a>
-{% endif %}
-<a href="{{ object.urls.vcard }}" class="btn btn-primary">
-  {% include 'svg/desktop-download.svg' %} vCard
-</a>
-<a href="{{ object.urls.update }}" class="btn btn-primary">
-  {% translate 'Update' %}</a>
-<a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
-  {% translate 'Delete' %}</a>
+  <a href="{% url 'invoices_invoice_create' %}?contact={{ object.pk }}" class="btn btn-primary">
+    {% include "svg/plus.svg" %}
+    {% translate 'invoice'|capfirst %}
+  </a>
+  {% if request.user.features.DEALS %}
+    <a href="{% url 'deals_deal_create' %}?contact={{ object.pk }}" class="btn btn-primary">
+      {% include "svg/plus.svg" %}
+      {% translate 'deal'|capfirst %}
+    </a>
+  {% endif %}
+  <a href="{{ object.urls.vcard }}" class="btn btn-primary">
+    {% include 'svg/desktop-download.svg' %}
+    vCard
+  </a>
+  <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
+  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">{% translate 'Delete' %}</a>
 {% endblock %}

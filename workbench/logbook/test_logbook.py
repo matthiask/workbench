@@ -456,7 +456,7 @@ class LogbookTest(TestCase):
         code("date_until=2018-01-01")
         code("service=" + str(hours.service.pk))
         code("campaign=" + str(factories.CampaignFactory.create().pk))
-        code("offer={}".format(factories.OfferFactory.create().pk))
+        code(f"offer={factories.OfferFactory.create().pk}")
         code("offer=0")
         code("organization=" + str(hours.service.project.customer.pk))
         code("circle=0")
@@ -486,7 +486,7 @@ class LogbookTest(TestCase):
         code("date_until=2018-01-01")
         code("service=" + str(service.pk))
         code("campaign=" + str(factories.CampaignFactory.create().pk))
-        code("offer={}".format(factories.OfferFactory.create().pk))
+        code(f"offer={factories.OfferFactory.create().pk}")
         code("offer=0")
         code("not_archived=1")
         code("export=xlsx")
@@ -530,7 +530,7 @@ class LogbookTest(TestCase):
         )
         self.assertContains(
             response,
-            '<option value="{}" selected>Any service</option>'.format(hours.service_id),
+            f'<option value="{hours.service_id}" selected>Any service</option>',
         )
         self.assertContains(response, 'value="2.0"')  # hours
 
@@ -539,12 +539,12 @@ class LogbookTest(TestCase):
         )
         response = self.client.get(
             hours.service.project.urls["createhours"]
-            + "?service={}&description=blub".format(service.id),
+            + f"?service={service.id}&description=blub",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
 
         self.assertContains(
-            response, '<option value="{}" selected>Bla</option>'.format(service.id)
+            response, f'<option value="{service.id}" selected>Bla</option>'
         )
         self.assertContains(response, 'value="2.0"')  # hours
         self.assertContains(response, "blub")
@@ -562,7 +562,7 @@ class LogbookTest(TestCase):
         )
         self.assertContains(
             response,
-            '<option value="{}" selected>Any service</option>'.format(hours.service_id),
+            f'<option value="{hours.service_id}" selected>Any service</option>',
         )
         self.assertContains(
             response,

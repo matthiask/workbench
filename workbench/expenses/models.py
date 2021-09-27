@@ -42,7 +42,7 @@ class ExpenseReport(Model):
         verbose_name_plural = _("expense reports")
 
     def __str__(self):
-        return "%s, %s, %s" % (
+        return "{}, {}, {}".format(
             self.owned_by.get_full_name(),
             local_date_format(self.created_at.date()),
             currency(self.total),

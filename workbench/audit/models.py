@@ -52,7 +52,7 @@ class LoggedAction(models.Model):
         verbose_name_plural = _("logged actions")
 
     def __str__(self):
-        return "%s %s by %s at %s" % (
+        return "{} {} by {} at {}".format(
             self.get_action_display(),
             self.table_name,
             self.user_name,

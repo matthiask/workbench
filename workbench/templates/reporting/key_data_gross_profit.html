@@ -1,33 +1,31 @@
 {% extends "modal.html" %}
-
 {% load i18n workbench %}
-
 {% block size %}modal-xl{% endblock %}
-
-{% block title %}{% translate 'Gross profit' %} {{ date_range.0|date:'F Y' }}{% endblock %}
-
+{% block title %}
+  {% translate 'Gross profit' %} {{ date_range.0|date:'F Y' }}
+{% endblock %}
 {% block body %}
-<table class="table table-sm bg-light">
-  <tr>
-    <th class="w-100">{% translate 'invoice'|capfirst %}</th>
-    <th class="text-nowrap">{% translate 'type'|capfirst %}</th>
-    <th class="text-nowrap">{% translate 'invoiced on'|capfirst %}</th>
-    <th class="text-nowrap text-right">{% translate 'total'|capfirst %}</th>
-    <th class="text-nowrap text-right">{% translate 'total excl. tax'|capfirst %}</th>
-  </tr>
-  {% for invoice in invoices %}
+  <table class="table table-sm bg-light">
     <tr>
-      <td>
-        <a href="{{ invoice.get_absolute_url }}">
-          {{ invoice|h }}
-          {{ invoice.status_badge }}
-        </a>
-      </td>
-      <td>{{ invoice.get_type_display }}</td>
-      <td>{{ invoice.invoiced_on|local_date_format }}</td>
-      <td class="text-right">{{ invoice.total|currency }}</td>
-      <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
+      <th class="w-100">{% translate 'invoice'|capfirst %}</th>
+      <th class="text-nowrap">{% translate 'type'|capfirst %}</th>
+      <th class="text-nowrap">{% translate 'invoiced on'|capfirst %}</th>
+      <th class="text-nowrap text-right">{% translate 'total'|capfirst %}</th>
+      <th class="text-nowrap text-right">{% translate 'total excl. tax'|capfirst %}</th>
     </tr>
-  {% endfor %}
-</table>
+    {% for invoice in invoices %}
+      <tr>
+        <td>
+          <a href="{{ invoice.get_absolute_url }}">
+            {{ invoice|h }}
+            {{ invoice.status_badge }}
+          </a>
+        </td>
+        <td>{{ invoice.get_type_display }}</td>
+        <td>{{ invoice.invoiced_on|local_date_format }}</td>
+        <td class="text-right">{{ invoice.total|currency }}</td>
+        <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
+      </tr>
+    {% endfor %}
+  </table>
 {% endblock %}
