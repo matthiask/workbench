@@ -485,6 +485,8 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
             "due_on",
             "title",
             "description",
+            "service_period_from",
+            "service_period_until",
             "owned_by",
             "postal_address",
             "subtotal",
