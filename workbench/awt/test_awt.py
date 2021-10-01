@@ -18,7 +18,10 @@ from workbench.awt.reporting import (
     annual_working_time,
     annual_working_time_warnings,
 )
-from workbench.awt.tasks import annual_working_time_warnings_mails
+from workbench.awt.tasks import (
+    annual_working_time_warnings_mails,
+    is_previous_month_locked_starting_today,
+)
 from workbench.awt.utils import monthly_days
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
@@ -502,7 +505,7 @@ class AWTTest(TestCase):
         )
         self.assertContains(response, 'value="2"')
 
-    @travel("2021-09-07 12:00")
+    @travel("2021-09-06 12:00")
     @override_settings(
         FEATURES={
             FEATURES.AWT_WARNING_ALL: F.USER,
@@ -555,3 +558,20 @@ class AWTTest(TestCase):
                 "Annual working time warning - August 2021",
             ],
         )
+
+    def test_is_previous_month_locked_starting_today(self):
+        """Examples of is_previous_month_locked_starting_today"""
+        with travel(dt.date(2021, 1, 1)):
+            self.assertTrue(is_previous_month_locked_starting_today())
+        with travel(dt.date(2021, 1, 4)):  # Monday
+            self.assertFalse(is_previous_month_locked_starting_today())
+        with travel(dt.date(2021, 8, 2)):
+            self.assertTrue(is_previous_month_locked_starting_today())
+        with travel(dt.date(2021, 9, 6)):
+            self.assertTrue(is_previous_month_locked_starting_today())
+        with travel(dt.date(2021, 10, 4)):
+            self.assertTrue(is_previous_month_locked_starting_today())
+        with travel(dt.date(2021, 10, 5)):
+            self.assertFalse(is_previous_month_locked_starting_today())
+        with travel(dt.date(2021, 10, 11)):
+            self.assertFalse(is_previous_month_locked_starting_today())

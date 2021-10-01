@@ -7,10 +7,22 @@ from authlib.email import render_to_mail
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.awt.reporting import annual_working_time_warnings
+from workbench.tools.validation import logbook_lock
+
+
+def is_previous_month_locked_starting_today():
+    day = dt.date.today()
+    if day != logbook_lock():
+        return False
+    if day == logbook_lock() and day.month == 1 and day.day != 1:
+        return False
+    if day.day > 7:
+        return False
+    return True
 
 
 def annual_working_time_warnings_mails():
-    if dt.date.today().day != 7:
+    if not is_previous_month_locked_starting_today():
         return
 
     stats = annual_working_time_warnings()
