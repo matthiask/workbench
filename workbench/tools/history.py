@@ -24,6 +24,7 @@ from workbench.deals.models import Contribution, Deal, Value, ValueType
 from workbench.expenses.models import ExpenseReport
 from workbench.invoices.models import (
     Invoice,
+    ProjectedInvoice,
     RecurringInvoice,
     Service as InvoiceService,
 )
@@ -316,6 +317,15 @@ def _invoices_recurringinvoice_cfg(user):
     return {"fields": EVERYTHING}
 
 
+def _invoices_projectedinvoice_cfg(user):
+    if (
+        not user.features[FEATURES.CONTROLLING]
+        or not user.features[FEATURES.PROJECTED_INVOICES]
+    ):
+        raise Http404
+    return {"fields": EVERYTHING}
+
+
 def _logbook_loggedcost_cfg(user):
     fields = {
         "service",
@@ -483,6 +493,7 @@ HISTORY = {
     Invoice: _invoices_invoice_cfg,
     InvoiceService: _invoices_service_cfg,
     RecurringInvoice: _invoices_recurringinvoice_cfg,
+    ProjectedInvoice: _invoices_projectedinvoice_cfg,
     Break: {"fields": EVERYTHING},
     LoggedCost: _logbook_loggedcost_cfg,
     LoggedHours: _logbook_loggedhours_cfg,
