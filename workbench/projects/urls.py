@@ -16,6 +16,7 @@ from workbench.projects.forms import (
     CampaignDeleteForm,
     CampaignForm,
     CampaignSearchForm,
+    ProjectedInvoicesProjectForm,
     ProjectForm,
     ProjectSearchForm,
     ReassignLogbookForm,
@@ -147,6 +148,15 @@ urlpatterns = [
         r"^(?P<pk>\d+)/update/$",
         generic.UpdateView.as_view(form_class=ProjectForm, model=Project),
         name="projects_project_update",
+    ),
+    re_path(
+        r"^(?P<pk>\d+)/projected-invoices/$",
+        generic.UpdateView.as_view(
+            form_class=ProjectedInvoicesProjectForm,
+            model=Project,
+            template_name_suffix="_projected_invoices_form",
+        ),
+        name="projects_project_projected_invoices",
     ),
     re_path(
         r"^(?P<pk>\d+)/delete/$",

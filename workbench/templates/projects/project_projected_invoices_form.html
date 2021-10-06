@@ -1,0 +1,53 @@
+{% extends "generic/object_form.html" %}
+{% load bootstrap4 fineforms formset i18n workbench %}
+{% block title %}
+  {% translate 'projected invoices'|capfirst %} - {{ block.super }}
+{% endblock %}
+{% block uplink %}
+  <a href="{{ object.get_absolute_url }}" class="btn btn-primary btn-sm uplink">
+    {% include 'svg/chevron-left.svg' %}
+    {% translate 'project' %}
+  </a>
+{% endblock %}
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <h1>{{ object|h }}</h1>
+      <h2>{% translate 'Update projected invoices' %}</h2>
+      <form method="POST" action="." class="form-horizontal">
+        {% csrf_token %}
+        {% include 'fineforms/warnings.html' %}
+        {% ff_errors form %}
+        {% ff_fields form %}
+        {% if form.formsets %}
+          {% formset form.formsets.projected_invoices "projected_invoices" %}
+            <div id="{{ form_id }}" class="card bg-light mb-3">
+              <div class="card-body">
+                {{ form.id }}
+                {% ff_errors form %}
+                <div class="row">
+                  <div class="col-3">{% ff_field form.invoiced_on %}</div>
+                  <div class="col-3">{% ff_field form.gross_margin %}</div>
+                  <div class="col-6">{% ff_field form.description %}</div>
+                </div>
+                {% ff_fields form exclude='invoiced_on,gross_margin,description' %}
+              </div>
+            </div>
+          {% endformset %}
+          <a href="#" class="btn btn-primary" onclick="return addInlineForm('projected_invoices')">
+            {% include 'svg/plus.svg' %}
+          </a>
+        {% endif %}
+        <div class="row mt-5">
+          <div class="col-sm-12">
+            <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
+            {% if object.get_absolute_url %}
+              <a href="{{ object.get_absolute_url }}"
+                 class="btn float-right btn-outline-danger">{% translate 'cancel' %}</a>
+            {% endif %}
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

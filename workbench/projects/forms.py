@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.forms.models import inlineformset_factory
 from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _, override
@@ -9,9 +10,17 @@ from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.circles.models import Role
 from workbench.contacts.models import Organization, Person
+from workbench.invoices.models import ProjectedInvoice
 from workbench.projects.models import Campaign, Project, Service
 from workbench.services.models import ServiceType
-from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
+from workbench.tools.forms import (
+    Autocomplete,
+    DateInput,
+    Form,
+    ModelForm,
+    Textarea,
+    add_prefix,
+)
 from workbench.tools.validation import in_days, is_title_specific
 
 
@@ -586,3 +595,40 @@ class OffersRenumberForm(Form):
             offer._code = code
             offer.save()
         return self.project
+
+
+ProjectedInvoiceFormset = inlineformset_factory(
+    Project,
+    ProjectedInvoice,
+    fields=["invoiced_on", "gross_margin", "description"],
+    extra=0,
+    widgets={
+        "invoiced_on": DateInput,
+    },
+)
+
+
+class ProjectedInvoicesProjectForm(ModelForm):
+    class Meta:
+        model = Project
+        fields = ()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        kwargs.pop("request")
+        self.formsets = {
+            "projected_invoices": ProjectedInvoiceFormset(*args, **kwargs),
+        }
+
+    def is_valid(self):
+        return all(
+            [super().is_valid()]
+            + [formset.is_valid() for formset in self.formsets.values()]
+        )
+
+    def save(self, commit=True):
+        instance = super().save()
+        for formset in self.formsets.values():
+            formset.save()
+        return instance

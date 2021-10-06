@@ -115,6 +115,10 @@
             {% translate 'planning'|capfirst %}
           </a>
         {% endif %}
+        {% if request.user.features.PROJECTED_INVOICES %}
+          <a href="{{ object.urls.projected_invoices }}"
+             class="btn btn-primary">{% translate 'projected invoices'|capfirst %}</a>
+        {% endif %}
         {% if request.user.features.CONTROLLING and project.grouped_services.offers|length > 1 %}
           <span class="dropdown">
             <button type="button"
