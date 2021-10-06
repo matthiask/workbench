@@ -53,6 +53,8 @@ class Migration(migrations.Migration):
             ],
             options={
                 "ordering": ["invoiced_on"],
+                "verbose_name": "projected invoice",
+                "verbose_name_plural": "projected invoices",
             },
         ),
     ]
