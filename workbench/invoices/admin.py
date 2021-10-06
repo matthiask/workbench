@@ -55,4 +55,5 @@ class RecurringInvoiceAdmin(admin.ModelAdmin):
 class ProjectedInvoiceAdmin(admin.ReadWriteModelAdmin):
     date_hierarchy = "invoiced_on"
     list_display = ["project", "invoiced_on", "gross_margin", "description"]
+    ordering = ["-invoiced_on", "project"]
     raw_id_fields = ["project"]
