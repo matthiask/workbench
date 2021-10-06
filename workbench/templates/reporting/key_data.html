@@ -97,7 +97,7 @@
             <th class="text-right"></th>
             <th class="text-right">{% translate 'Gross margin' %}</th>
             <th class="text-right">
-              <a href="projected-invoices/" data-toggle="ajaxmodal">{% translate 'projected invoices'|capfirst %}</a>
+              <a href="projected-invoices/" data-toggle="ajaxmodal">{% translate 'Projected' %}</a>
             </th>
             <th class="text-right">{% translate 'FTE' %}</th>
             <th class="text-right">{% translate 'Margin / FTE' %}</th>
@@ -130,8 +130,8 @@
                 <td class="text-right text-muted">{{ month.accruals.accrual|currency }}</td>
                 <td class="text-right">{{ month.accruals.delta|currency:1 }}</td>
                 <td class="text-right">{{ month.gross_margin|currency }}</td>
-                <td class="text-right">
-                  {% if month.projected_invoices %}{{ month.projected_invoices|currency }}{% endif %}
+                <td class="text-right text-muted">
+                  {% if month.projected_invoices %}{{ month.projected_invoices|currency:1 }}{% endif %}
                 </td>
                 <td class="text-right">{{ month.fte|stringformat:'.1f' }}</td>
                 <td class="text-right">{{ month.margin_per_fte|currency }}</td>
