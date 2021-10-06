@@ -115,7 +115,7 @@
                 {% translate 'target time' %}
                 <small>
                 (
-                {% blocktranslate with hours=stats.year.working_time_per_day|hours %}
+                {% blocktranslate with hours=stats.year.working_time_per_day|hours trimmed %}
                   calculated with {{ hours }} per day
                 {% endblocktranslate %}
                 )
@@ -218,7 +218,7 @@
                 {% if is_last_year and user.is_active and request.user.features.WORKING_TIME_CORRECTION %}
                   <a href="{% url 'awt_absence_create' %}?reason=correction&amp;user={{ user.id }}&amp;starts_on={% now 'Y' %}-01-01&amp;days={{ totals.balance_days }}&amp;description={{ totals.vacation_days_credit }} {% translate 'vacation days' %}, {{ totals.running_sum }} {% translate 'hours' %}"
                      data-toggle="ajaxmodal">
-                    {% blocktranslate %}
+                    {% blocktranslate trimmed %}
                       carry forward the balance into {{ this_year }}
                     {% endblocktranslate %}
                   </a>
@@ -266,7 +266,7 @@
                 {% for absence in data.absences.absence_sickness %}
                   <tr>
                     <td>
-                      {% blocktranslate with date=absence.starts_on|local_date_format %}
+                      {% blocktranslate with date=absence.starts_on|local_date_format trimmed %}
                         from {{ date }}
                       {% endblocktranslate %}
                     </td>
@@ -284,7 +284,7 @@
                 {% for absence in data.absences.absence_paid %}
                   <tr>
                     <td>
-                      {% blocktranslate with date=absence.starts_on|local_date_format %}
+                      {% blocktranslate with date=absence.starts_on|local_date_format trimmed %}
                         from {{ date }}
                       {% endblocktranslate %}
                     </td>
@@ -298,7 +298,7 @@
                 {% for absence in data.absences.absence_correction %}
                   <tr>
                     <td>
-                      {% blocktranslate with date=absence.starts_on|local_date_format %}
+                      {% blocktranslate with date=absence.starts_on|local_date_format trimmed %}
                         from {{ date }}
                       {% endblocktranslate %}
                     </td>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-07 08:15+0200\n"
+"POT-Creation-Date: 2021-10-06 15:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,6 +28,14 @@ msgstr "Konten"
 #: workbench/accounts/features.py
 msgid "Feature not available"
 msgstr "Feature nicht verfügbar"
+
+#: workbench/accounts/features.py
+msgid "Individual annual working time warning"
+msgstr "Individuelle Arbeitszeit-Warnung"
+
+#: workbench/accounts/features.py
+msgid "Annual working time warnings for all"
+msgstr "Arbeitszeit-Warnungen betreffend allen"
 
 #: workbench/accounts/features.py
 msgid "Bookkeeping"
@@ -2028,6 +2036,10 @@ msgid "Next period starts on %(start)s, invoice will be created on %(create)s"
 msgstr ""
 "Nächste Periode beginnt am %(start)s, Rechnung wird am %(create)s erstellt."
 
+#: workbench/invoices/models.py
+msgid "gross margin"
+msgstr "Umsatz bereinigt"
+
 #: workbench/invoices/views.py workbench/logbook/models.py
 #: workbench/services/models.py
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -3380,6 +3392,10 @@ msgid "Create invoices"
 msgstr "Rechnungen erstellen"
 
 #: workbench/templates/invoices/reminders.html
+msgid "Total excl. tax"
+msgstr "Total exkl. MwSt."
+
+#: workbench/templates/invoices/reminders.html
 msgid "Last reminded on"
 msgstr "Zuletzt gemahnt am"
 
@@ -4052,173 +4068,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "Problematic annual working time"
-#~ msgstr "Problematische Jahresarbeitszeit"
-
-#~ msgid "Problematic annual working times"
-#~ msgstr "Problematische Jahresarbeitszeiten"
-
-#~ msgid "fraction"
-#~ msgstr "Anteil"
-
-#~ msgid "Coffee time"
-#~ msgstr "Kaffeepause"
-
-#, python-format
-#~ msgid ""
-#~ "At least one week is outside the requested range of %(from)s – %(until)s: "
-#~ "%(weeks)s"
-#~ msgstr ""
-#~ "Mindestens eine Woche liegt ausserhalb des angefragten Zeitraumes von "
-#~ "%(from)s – %(until)s: %(weeks)s"
-
-#, python-format
-#~ msgid ""
-#~ "%(user)s has already declined this planning request at %(declined_at)s "
-#~ "with reason \"%(reason)s\"."
-#~ msgstr ""
-#~ "%(user)s hat diese Planungsanfrage um %(declined_at)s mit Grund "
-#~ "«%(reason)s» schon abgelehnt."
-
-#~ msgid "I hereby confirm the deletion of already planned work."
-#~ msgstr "Ich bestätige hiermit die Löschung der schon geplanten Arbeiten."
-
-#~ msgid "declined at"
-#~ msgstr "abgelehnt um"
-
-#~ msgid "received request"
-#~ msgstr "empfangene Anfrage"
-
-#~ msgid "received requests"
-#~ msgstr "empfangene Anfragen"
-
-#~ msgid "requested hours"
-#~ msgstr "angefragte Stunden"
-
-#~ msgid "earliest start on"
-#~ msgstr "frühster Start ab"
-
-#~ msgid "completion requested on"
-#~ msgstr "Abschluss angefragt am"
-
-#~ msgid "receivers"
-#~ msgstr "Adressat*innen"
-
-#~ msgid "closed at"
-#~ msgstr "geschlossen um"
-
-#~ msgid "planning requests"
-#~ msgstr "Planungsanfragen"
-
-#~ msgid "Only mondays allowed."
-#~ msgstr "Nur Montage erlaubt."
-
-#~ msgid "Allow at least one week for the work please."
-#~ msgstr "Mindestens eine Woche für die Arbeit zulassen."
-
-#~ msgid "Decline planning request"
-#~ msgstr "Planungsanfrage ablehnen"
-
-#~ msgid "Sent requests"
-#~ msgstr "Versendete Anfragen"
-
-#, python-format
-#~ msgid "%(user)s declined planning request on %(project)s"
-#~ msgstr "%(user)s hat Planungsanfrage auf %(project)s abgelehnt"
-
-#~ msgid "Missing hours"
-#~ msgstr "Fehlende Stunden"
-
-#~ msgid "Requested by"
-#~ msgstr "Anfrage von"
-
-#~ msgid "Receivers"
-#~ msgstr "Adressat*innen"
-
-#, python-format
-#~ msgid "Deleted planning request on %(project)s"
-#~ msgstr "Gelöschte Planungsanfrage auf %(project)s"
-
-#~ msgid "planned"
-#~ msgstr "geplant"
-
-#~ msgid "requested"
-#~ msgstr "angefragt"
-
-#~ msgid "period"
-#~ msgstr "Zeitraum"
-
-#, python-format
-#~ msgid "Declined at %(declined_at)s"
-#~ msgstr "Abgelehnt um %(declined_at)s"
-
-#~ msgid "Accept"
-#~ msgstr "Akzeptieren"
-
-#~ msgid "Decline"
-#~ msgstr "Ablehnen"
-
-#, python-format
-#~ msgid "New planning request on %(project)s"
-#~ msgstr "Neue Planungsanfrage auf %(project)s"
-
-#~ msgid "Request work"
-#~ msgstr "Arbeit anfragen"
-
-#, python-format
-#~ msgid "The offer %(offer)s is invalid: %(error)s"
-#~ msgstr "Die Offerte %(offer)s hat Fehler: %(error)s"
-
-#~ msgid "Paid work"
-#~ msgstr "Bezahlte Arbeit"
-
-#~ msgid "responsible"
-#~ msgstr "verantwortlich"
-
-#~ msgid "No role selected."
-#~ msgstr "Keine Rolle ausgewählt."
-
-#~ msgid ""
-#~ "The deal owner's contribution defaults to a weight of 100. You may "
-#~ "override this by explicitly specifying their contribution's weight. <br> "
-#~ "The weight is an unitless value and weights do not have to sum up to 100 "
-#~ "in total."
-#~ msgstr ""
-#~ "Der Beitrag der verantwortlichen Person hat standardmässig ein Gewicht "
-#~ "von 100. Du kannst diesen Wert überschreiben, indem Du den Beitrag "
-#~ "explizit spezifizierst. <br> Das Gewicht ist ein einheitsloser Wert, die "
-#~ "Gewichte müssen in der Summe nicht 100 ergeben."
-
-#~ msgid "Skip breaks"
-#~ msgstr "Pausenerkennung überspringen"
-
-#~ msgid "Skip the missing breaks nag."
-#~ msgstr "Die Warnung betreffend fehlenden Pausen überspringen."
-
-#~ msgid "enforce same week logging"
-#~ msgstr "Stundenerfassung in der gleichen Woche erzwingen"
-
-#~ msgid "Accounting files"
-#~ msgstr "Buchhaltungsdaten"
-
-#~ msgid "Total CHF"
-#~ msgstr "Total CHF"
-
-#~ msgid "Other"
-#~ msgstr "Anderes"
-
-#~ msgid "carryover the balance"
-#~ msgstr "Bilanz übertragen"
-
-#~ msgid "Only used for the visualization of absences."
-#~ msgstr "Wird nur für die Visualisierung der Abwesenheiten verwendet."
-
-#~ msgid "other absences"
-#~ msgstr "Andere Abwesenheiten"
-
-#~ msgid "other reasons (does not count towards annual working time)"
-#~ msgstr "Andere Gründe (wird in der Jahresarbeitszeit nicht berücksichtigt)"
-
-#~ msgid "other reasons"
-#~ msgstr "Andere Gründe"

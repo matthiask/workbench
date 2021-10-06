@@ -5,11 +5,11 @@
     <div class="col-md-8 col-lg-6">
       <h1>
         {% if object %}
-          {% blocktranslate with object=object.full_name %}
+          {% blocktranslate with object=object.full_name trimmed %}
             Update {{ object }}
           {% endblocktranslate %}
         {% else %}
-          {% blocktranslate with class=view.meta.verbose_name %}
+          {% blocktranslate with class=view.meta.verbose_name trimmed %}
             Create {{ class }}
           {% endblocktranslate %}
         {% endif %}
