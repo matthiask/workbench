@@ -96,6 +96,21 @@
                     <th class="text-right">{% translate 'total excl. tax'|capfirst %}</th>
                     <td>{{ project.project_invoices_total_excl_tax|currency }}</td>
                   </tr>
+                  {% if request.user.features.PROJECTED_INVOICES %}
+                    <tr>
+                      <th class="text-right">{% translate 'projected invoices'|capfirst %}</th>
+                      <td>
+                        {% for pi in project.projected_invoices.all %}
+                          {{ pi.invoiced_on|local_date_format }}: {{ pi.gross_margin|currency }}
+                          {% if pi.description %}
+                            <br>
+                            {{ pi.description }}
+                          {% endif %}
+                          <br>
+                        {% endfor %}
+                      </td>
+                    </tr>
+                  {% endif %}
                 </table>
               {% endif %}
               {# CONTROLLING #}
