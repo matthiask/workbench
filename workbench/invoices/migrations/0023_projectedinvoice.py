@@ -57,5 +57,5 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "projected invoices",
             },
         ),
-        migrations.RunSQL("SELECT audit_audit_table('invoices_projectedinvoice')"),
+        migrations.RunSQL("SELECT audit_audit_table('invoices_projectedinvoice')", ""),
     ]

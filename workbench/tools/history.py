@@ -409,6 +409,8 @@ def _projects_project_cfg(user):
         fields |= {"cost_center"}
     if user.features[FEATURES.PLANNING]:
         related.append((PlannedWork, "project_id"))
+    if user.features[FEATURES.PROJECTED_INVOICES]:
+        related.append((ProjectedInvoice, "project_id"))
     return {"fields": fields, "related": related}
 
 
