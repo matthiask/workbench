@@ -53,7 +53,7 @@ def is_ios(user_agent):
 
 
 def render_vcard_response(request, vcard, subject=""):
-    if is_ios(request.headers.get('User-Agent') or ""):
+    if is_ios(request.headers.get("User-Agent") or ""):
         mail = EmailMultiAlternatives(
             ": ".join(filter(None, ("vCard", subject))), "", to=[request.user.email]
         )
@@ -68,7 +68,7 @@ def render_vcard_response(request, vcard, subject=""):
             )
             % request.user.email,
         )
-        return HttpResponseRedirect(request.headers.get('Referer') or "/")
+        return HttpResponseRedirect(request.headers.get("Referer") or "/")
 
     response = HttpResponse(vcard, content_type="text/x-vCard;charset=utf-8")
     response["Content-Disposition"] = 'inline; filename="vcard.vcf"'
