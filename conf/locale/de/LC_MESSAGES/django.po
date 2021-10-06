@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-06 15:45+0200\n"
+"POT-Creation-Date: 2021-10-06 17:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -117,6 +117,12 @@ msgstr ""
 #: workbench/templates/projects/project_detail.html
 msgid "planning"
 msgstr "Planung"
+
+#: workbench/accounts/features.py workbench/invoices/models.py
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_projected_invoices_form.html
+msgid "projected invoices"
+msgstr "geplante Rechnungen"
 
 #: workbench/accounts/features.py workbench/awt/models.py workbench/awt/pdf.py
 #: workbench/templates/awt/year_detail.html
@@ -1819,6 +1825,7 @@ msgstr "Leistungen"
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/project_projected_invoices_form.html
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/overdrawn_projects.html
 #: workbench/templates/reporting/project_budget_statistics.html
@@ -2043,10 +2050,6 @@ msgstr "Umsatz bereinigt"
 #: workbench/invoices/models.py
 msgid "projected invoice"
 msgstr "geplante Rechnung"
-
-#: workbench/invoices/models.py
-msgid "projected invoices"
-msgstr "geplante Rechnungen"
 
 #: workbench/invoices/views.py workbench/logbook/models.py
 #: workbench/services/models.py
@@ -2642,6 +2645,10 @@ msgstr "Alte Projekte (60 Tage Inaktivität)"
 #: workbench/projects/forms.py
 msgid "Invalid customer/contact combination"
 msgstr "Ungültige Kunde/Kontakt-Kombination"
+
+#: workbench/projects/forms.py
+msgid "No projected invoices"
+msgstr "Keine geplanten Rechnungen"
 
 #: workbench/projects/forms.py
 msgid "All types"
@@ -3282,6 +3289,7 @@ msgstr "%(class)s erstellen"
 #: workbench/templates/modalform.html workbench/templates/notes/note_form.html
 #: workbench/templates/notes/widget.html
 #: workbench/templates/offers/offer_pricing.html
+#: workbench/templates/projects/project_projected_invoices_form.html
 msgid "Save"
 msgstr "Sichern"
 
@@ -3289,6 +3297,7 @@ msgstr "Sichern"
 #: workbench/templates/generic/object_confirm_delete.html
 #: workbench/templates/modal_confirm_delete.html
 #: workbench/templates/offers/offer_pricing.html
+#: workbench/templates/projects/project_projected_invoices_form.html
 msgid "cancel"
 msgstr "Abbruch"
 
@@ -3633,6 +3642,10 @@ msgstr "Leistungen aus dem Logbuch"
 #: workbench/templates/projects/project_detail.html
 msgid "Services from offer"
 msgstr "Leistungen aus Offerte"
+
+#: workbench/templates/projects/project_projected_invoices_form.html
+msgid "Update projected invoices"
+msgstr "Geplante Rechnungen bearbeiten"
 
 #: workbench/templates/projects/project_statistics.html
 msgid "Logged hours per hourly rate"

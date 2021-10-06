@@ -159,6 +159,15 @@ class ProjectQuerySet(SearchQuerySet):
     def invalid_customer_contact_combination(self):
         return self.exclude(customer=F("contact__organization"))
 
+    def no_projected_invoices(self):
+        from workbench.invoices.models import ProjectedInvoice
+
+        return self.filter(
+            ~Q(pk__in=ProjectedInvoice.objects.values_list("project")),
+            ~Q(type=Project.INTERNAL),
+            Q(closed_on__isnull=True),
+        )
+
 
 @model_urls
 @total_ordering
