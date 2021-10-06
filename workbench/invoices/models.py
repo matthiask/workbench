@@ -16,7 +16,7 @@ from workbench.contacts.models import Organization, Person
 from workbench.invoices.utils import recurring
 from workbench.projects.models import Project
 from workbench.services.models import ServiceBase
-from workbench.tools.formats import Z1, Z2, local_date_format
+from workbench.tools.formats import Z1, Z2, currency, local_date_format
 from workbench.tools.models import ModelWithTotal, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import in_days, raise_if_errors
@@ -691,3 +691,21 @@ class RecurringInvoice(ModelWithTotal):
             this_period = next_period
         self.save()
         return invoices
+
+
+class ProjectedInvoice(models.Model):
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="projected_invoices",
+        verbose_name=_("project"),
+    )
+    invoiced_on = models.DateField(_("invoiced on"))
+    gross_margin = MoneyField(_("gross margin"))
+    description = models.CharField(_("description"), max_length=200, blank=True)
+
+    class Meta:
+        ordering = ["invoiced_on"]
+
+    def __str__(self):
+        return f"{local_date_format(self.invoiced_on)}: {currency(self.gross_margin)}"

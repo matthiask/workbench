@@ -49,3 +49,10 @@ class RecurringInvoiceAdmin(admin.ModelAdmin):
     list_filter = ["periodicity"]
     radio_fields = {"periodicity": admin.HORIZONTAL}
     raw_id_fields = ["customer", "contact"]
+
+
+@admin.register(models.ProjectedInvoice)
+class ProjectedInvoiceAdmin(admin.ReadWriteModelAdmin):
+    date_hierarchy = "invoiced_on"
+    list_display = ["project", "invoiced_on", "gross_margin", "description"]
+    raw_id_fields = ["project"]
