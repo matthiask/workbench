@@ -61,9 +61,10 @@
           },
           {% endfor %}
           {
-            label: "blub",
-            data: [30000, 30000, 40000, 50000, 100000],
-            backgroundColor: "rgba(0, 0, 0, 0.3)",
+            label: "{% translate 'projected invoices'|capfirst %}",
+            data: [{% for pi in projected_invoices %}{{ pi|stringformat:'d' }}, {% endfor %}],
+            backgroundColor: "rgba(100, 180, 180, 0.4)",
+            borderColor: "rgba(100, 180, 180, 0.6)",
             type: "bar",
             stack: "this",
           },
@@ -95,6 +96,9 @@
             <th class="text-right">{% translate 'accruals'|capfirst %}</th>
             <th class="text-right"></th>
             <th class="text-right">{% translate 'Gross margin' %}</th>
+            <th class="text-right">
+              <a href="projected-invoices/" data-toggle="ajaxmodal">{% translate 'projected invoices'|capfirst %}</a>
+            </th>
             <th class="text-right">{% translate 'FTE' %}</th>
             <th class="text-right">{% translate 'Margin / FTE' %}</th>
           </tr>
@@ -108,6 +112,7 @@
               <th></th>
               <th class="text-right">{{ year.accruals|currency }}</th>
               <th class="text-right">{{ year.gross_margin|currency }}</th>
+              <th class="text-right"></th>
               <th class="text-right">{{ year.fte|stringformat:'.1f' }}</th>
               <th class="text-right">{{ year.margin_per_fte|currency }}</th>
             </tr>
@@ -125,6 +130,9 @@
                 <td class="text-right text-muted">{{ month.accruals.accrual|currency }}</td>
                 <td class="text-right">{{ month.accruals.delta|currency:1 }}</td>
                 <td class="text-right">{{ month.gross_margin|currency }}</td>
+                <td class="text-right">
+                  {% if month.projected_invoices %}{{ month.projected_invoices|currency }}{% endif %}
+                </td>
                 <td class="text-right">{{ month.fte|stringformat:'.1f' }}</td>
                 <td class="text-right">{{ month.margin_per_fte|currency }}</td>
               </tr>

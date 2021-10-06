@@ -1,4 +1,5 @@
 import datetime as dt
+from functools import reduce
 from itertools import groupby
 
 from django import forms
@@ -139,6 +140,26 @@ def key_data_third_party_costs(request, date_range):
     )
 
 
+def key_data_projected_invoices(request):
+    pi = key_data.projected_invoices()
+    all_months = sorted(
+        reduce(lambda a, b: a | b["monthly"].keys(), pi["projects"], set())
+    )
+
+    return render(
+        request,
+        "reporting/key_data_projected_invoices.html",
+        {
+            "projects": [
+                project | {"monthly": [project["monthly"].get(m) for m in all_months]}
+                for project in pi["projects"]
+            ],
+            "months": [dt.date(m[0], m[1], 1) for m in all_months],
+            "monthly_overall": [pi["monthly_overall"].get(m) for m in all_months],
+        },
+    )
+
+
 def key_data_view(request):
     today = dt.date.today()
     this_months_end = next_valid_day(today.year, today.month + 1, 1) - dt.timedelta(
@@ -150,6 +171,8 @@ def key_data_view(request):
     gross_margin_months = {
         row["month"]: row["gross_margin"] for row in gross_margin_by_month
     }
+
+    projected_invoices = key_data.projected_invoices()
 
     gross_margin_by_years = {}
     for month in gross_margin_by_month:
@@ -215,6 +238,10 @@ def key_data_view(request):
             "invoiced_corrected": [
                 (year, [gross_margin_months.get((year, i), Z2) for i in range(1, 13)])
                 for year in range(date_range[0].year, date_range[1].year + 1)
+            ],
+            "projected_invoices": [
+                projected_invoices["monthly_overall"].get((today.year, i), Z2)
+                for i in range(1, 13)
             ],
             "green_hours": yearly_headline(gh),
             "hours_distribution": {

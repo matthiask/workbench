@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-06 17:43+0200\n"
+"POT-Creation-Date: 2021-10-06 19:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -121,6 +121,8 @@ msgstr "Planung"
 #: workbench/accounts/features.py workbench/invoices/models.py
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_projected_invoices_form.html
+#: workbench/templates/reporting/key_data.html
+#: workbench/templates/reporting/key_data_projected_invoices.html
 msgid "projected invoices"
 msgstr "geplante Rechnungen"
 
@@ -677,6 +679,7 @@ msgstr "Guthaben an Ferientagen"
 
 #: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
 #: workbench/templates/projects/project_statistics.html
+#: workbench/templates/reporting/key_data_projected_invoices.html
 msgid "Total"
 msgstr "Total"
 
@@ -1826,6 +1829,7 @@ msgstr "Leistungen"
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_projected_invoices_form.html
+#: workbench/templates/reporting/key_data_projected_invoices.html
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/overdrawn_projects.html
 #: workbench/templates/reporting/project_budget_statistics.html
@@ -2044,6 +2048,7 @@ msgstr ""
 "Nächste Periode beginnt am %(start)s, Rechnung wird am %(create)s erstellt."
 
 #: workbench/invoices/models.py
+#: workbench/templates/reporting/key_data_projected_invoices.html
 msgid "gross margin"
 msgstr "Umsatz bereinigt"
 
@@ -3738,6 +3743,15 @@ msgstr "Umsatz / FTE"
 msgid "Hours distribution"
 msgstr "Stundenverteilung"
 
+#: workbench/templates/reporting/key_data_projected_invoices.html
+msgid "Projected"
+msgstr "Geplant"
+
+#: workbench/templates/reporting/key_data_projected_invoices.html
+#: workbench/tools/xlsx.py
+msgid "Delta"
+msgstr "Delta"
+
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
 #: workbench/tools/xlsx.py
@@ -4077,10 +4091,6 @@ msgstr "Verrechnet"
 msgid "Total hours"
 msgstr "Stunden insgesamt"
 
-#: workbench/tools/xlsx.py
-msgid "Delta"
-msgstr "Delta"
-
 #: workbench/views.py
 msgid "Search query missing."
 msgstr "Suchanfrage fehlt."
@@ -4089,3 +4099,6 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "delta"
+#~ msgstr "Delta"

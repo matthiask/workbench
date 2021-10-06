@@ -17,6 +17,7 @@ from workbench.reporting.views import (
     birthdays_view,
     hours_filter_view,
     key_data_gross_profit,
+    key_data_projected_invoices,
     key_data_third_party_costs,
     key_data_view,
     labor_costs_view,
@@ -51,6 +52,10 @@ urlpatterns = [
     re_path(
         r"^key-data/third-party-costs/(?P<year>[0-9]{4})\.(?P<month>[0-9]{1,2})/$",
         controlling_only(key_data_third_party_costs),
+    ),
+    re_path(
+        r"^key-data/projected-invoices/",
+        controlling_only(key_data_projected_invoices),
     ),
     re_path(
         r"^hours-per-customer/$",

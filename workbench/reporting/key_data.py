@@ -90,6 +90,8 @@ def gross_margin_by_month(date_range):
     accruals = accruals_by_month(date_range)
     fte = full_time_equivalents_by_month()
 
+    pi = projected_invoices()
+
     months = sorted(set(chain.from_iterable([gross, third, accruals])))
     profit = []
     for month in months:
@@ -102,6 +104,7 @@ def gross_margin_by_month(date_range):
             "third_party_costs": third[month],
             "accruals": accruals.get(month) or {"accrual": None, "delta": Z2},
             "fte": fte.get(date, Z2),
+            "projected_invoices": pi["monthly_overall"].get((month[0], month[1])),
         }
         row["gross_margin"] = (
             row["gross_profit"] + row["third_party_costs"] + row["accruals"]["delta"]
@@ -142,10 +145,12 @@ def projected_invoices():
         projects[pi.project]["invoiced"].append(pi)
 
     for project, data in projects.items():
-        data["projected_total"] = sum(pi.gross_margin for pi in data["projected"])
+        data["projected_total"] = sum((pi.gross_margin for pi in data["projected"]), Z2)
         data["gross_margin"] = sum(
-            i.total_excl_tax - i.third_party_costs for i in data["invoiced"]
+            (i.total_excl_tax - i.third_party_costs for i in data["invoiced"]), Z2
         )
+
+    monthly_overall = defaultdict(lambda: Z2)
 
     def _monthly(data):
         monthly = defaultdict(lambda: Z2)
@@ -154,25 +159,36 @@ def projected_invoices():
         )
         delta = data["delta"]
         for pi in projected:
-            month = pi.invoiced_on.replace(day=1)
-            monthly[month] += min(delta, pi.gross_margin)
+            month = (pi.invoiced_on.year, pi.invoiced_on.month)
+            if (d := min(delta, pi.gross_margin)) > 0:
+                monthly[month] += d
+                monthly_overall[month] += d
+            else:
+                break
             delta -= pi.gross_margin
         data["monthly"] = dict(monthly)
         return data
 
-    projects = [
-        _monthly(
-            {
-                "project": project,
-                "delta": data["projected_total"] - data["gross_margin"],
-            }
-            | data
-        )
-        for project, data in projects.items()
-        if data["projected_total"] - data["gross_margin"] > 0
-    ]
+    projects = sorted(
+        (
+            _monthly(
+                {
+                    "project": project,
+                    "delta": data["projected_total"] - data["gross_margin"],
+                }
+                | data
+            )
+            for project, data in projects.items()
+            if data["projected_total"] > data["gross_margin"]
+        ),
+        key=lambda project: project["delta"],
+        reverse=True,
+    )
 
-    return projects
+    return {
+        "projects": projects,
+        "monthly_overall": monthly_overall,
+    }
 
 
 def logged_hours_in_open_orders():

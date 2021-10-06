@@ -1,0 +1,44 @@
+{% extends "modal.html" %}
+{% load i18n workbench %}
+{% block size %}modal-xl{% endblock %}
+{% block title %}
+  {% translate 'projected invoices'|capfirst %}
+{% endblock %}
+{% block body %}
+  <table class="table table-sm bg-light">
+    <tr>
+      <th class="w-100">{% translate 'project'|capfirst %}</th>
+      <th class="text-nowrap text-right">{% translate 'Projected' %}</th>
+      <th class="text-nowrap text-right">{% translate 'gross margin'|capfirst %}</th>
+      <th class="text-nowrap text-right">{% translate 'Delta' %}</th>
+      <th>&nbsp; &nbsp; &nbsp;</th>
+      {% for m in months %}
+        <th class="text-nowrap text-right">{{ m|date:'M y' }}</th>
+      {% endfor %}
+    </tr>
+    <tr>
+      <th class="w-100" colspan="4">{% translate 'Total' %}</th>
+      <th>&nbsp;</th>
+      {% for mo in monthly_overall %}
+        <th class="text-nowrap text-right">{{ mo|currency }}</th>
+      {% endfor %}
+    </tr>
+    {% for project in projects %}
+      <tr>
+        <td>
+          <a href="{{ project.project.get_absolute_url }}">
+            {{ project.project|h }}
+            {{ project.project.status_badge }}
+          </a>
+        </td>
+        <td class="text-right">{{ project.projected_total|currency }}</td>
+        <td class="text-right">{{ project.gross_margin|currency }}</td>
+        <td class="text-right">{{ project.delta|currency }}</td>
+        <td>&nbsp;</td>
+        {% for mo in project.monthly %}
+          <td class="text-nowrap text-right">{{ mo|currency }}</td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}
