@@ -89,6 +89,9 @@ LABELS = {
     FEATURES.PLANNING: {
         "label": capfirst(_("planning")),
     },
+    FEATURES.PROJECTED_INVOICES: {
+        "label": capfirst(_("projected invoices")),
+    },
     FEATURES.WORKING_TIME_CORRECTION: {
         "label": capfirst(_("Working time correction")),
         "help_text": _(
