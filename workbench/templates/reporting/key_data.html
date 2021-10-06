@@ -57,8 +57,16 @@
             backgroundColor: "{% cycle 'rgba(30, 0, 100, 0.3)' 'rgba(100, 30, 50, 0.3)' 'rgba(0, 150, 0, 0.3)' 'rgba(0, 0, 150, 0.3)' %}",
             borderColor: "{% cycle 'rgba(30, 0, 100, 0.3)' 'rgba(100, 30, 50, 0.4)' 'rgba(0, 150, 0, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
             type: "{% cycle 'line' 'line' 'line' 'bar' %}",
+            stack: "{% cycle '' '' '' 'this' %}",
           },
           {% endfor %}
+          {
+            label: "blub",
+            data: [30000, 30000, 40000, 50000, 100000],
+            backgroundColor: "rgba(0, 0, 0, 0.3)",
+            type: "bar",
+            stack: "this",
+          },
         ],
       },
       options: {

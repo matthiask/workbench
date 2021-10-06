@@ -6,7 +6,7 @@ from django.db.models import Q, Sum
 from django.db.models.functions import ExtractMonth, ExtractYear
 
 from workbench.awt.reporting import full_time_equivalents_by_month
-from workbench.invoices.models import Invoice
+from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
@@ -120,6 +120,59 @@ def service_hours_in_open_orders():
         .aggregate(h=Sum("service_hours"))["h"]
         or Z1
     )
+
+
+def projected_invoices():
+    open_projects = Project.objects.open()
+
+    projected = ProjectedInvoice.objects.filter(
+        project__in=open_projects
+    ).select_related("project__owned_by")
+    invoices = (
+        Invoice.objects.invoiced()
+        .filter(project__in=open_projects)
+        .select_related("project__owned_by")
+    )
+
+    projects = defaultdict(lambda: {"projected": [], "invoiced": []})
+
+    for pi in projected:
+        projects[pi.project]["projected"].append(pi)
+    for pi in invoices:
+        projects[pi.project]["invoiced"].append(pi)
+
+    for project, data in projects.items():
+        data["projected_total"] = sum(pi.gross_margin for pi in data["projected"])
+        data["gross_margin"] = sum(
+            i.total_excl_tax - i.third_party_costs for i in data["invoiced"]
+        )
+
+    def _monthly(data):
+        monthly = defaultdict(lambda: Z2)
+        projected = sorted(
+            data["projected"], key=lambda pi: pi.invoiced_on, reverse=True
+        )
+        delta = data["delta"]
+        for pi in projected:
+            month = pi.invoiced_on.replace(day=1)
+            monthly[month] += min(delta, pi.gross_margin)
+            delta -= pi.gross_margin
+        data["monthly"] = dict(monthly)
+        return data
+
+    projects = [
+        _monthly(
+            {
+                "project": project,
+                "delta": data["projected_total"] - data["gross_margin"],
+            }
+            | data
+        )
+        for project, data in projects.items()
+        if data["projected_total"] - data["gross_margin"] > 0
+    ]
+
+    return projects
 
 
 def logged_hours_in_open_orders():
