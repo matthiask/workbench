@@ -1,12 +1,13 @@
 import datetime as dt
 from collections import defaultdict
-from itertools import chain
+from itertools import takewhile
 
 from django.db.models import Q, Sum
 from django.db.models.functions import ExtractMonth, ExtractYear
 
 from workbench.awt.reporting import full_time_equivalents_by_month
 from workbench.invoices.models import Invoice, ProjectedInvoice
+from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
@@ -92,20 +93,36 @@ def gross_margin_by_month(date_range):
 
     pi = projected_invoices()
 
-    months = sorted(set(chain.from_iterable([gross, third, accruals])))
+    first_of_months = list(
+        takewhile(
+            lambda day: day < date_range[1],
+            recurring(date_range[0], "monthly"),
+        )
+    )
+
     profit = []
-    for month in months:
-        date = dt.date(month[0], month[1], 1)
+    for day in first_of_months:
+        month = (day.year, day.month)
         row = {
             "month": month,
             "key": "%s-%s" % month,
-            "date": date,
+            "date": day,
             "gross_profit": gross[month],
             "third_party_costs": third[month],
             "accruals": accruals.get(month) or {"accrual": None, "delta": Z2},
-            "fte": fte.get(date, Z2),
-            "projected_invoices": pi["monthly_overall"].get((month[0], month[1])),
+            "fte": fte.get(day, Z2),
+            "projected_invoices": pi["monthly_overall"].get(month),
         }
+        if not any(
+            (
+                row["gross_profit"],
+                row["third_party_costs"],
+                row["accruals"]["delta"],
+                row["projected_invoices"],
+            )
+        ):
+            continue
+
         row["gross_margin"] = (
             row["gross_profit"] + row["third_party_costs"] + row["accruals"]["delta"]
         )

@@ -162,10 +162,7 @@ def key_data_projected_invoices(request):
 
 def key_data_view(request):
     today = dt.date.today()
-    this_months_end = next_valid_day(today.year, today.month + 1, 1) - dt.timedelta(
-        days=1
-    )
-    date_range = [dt.date(this_months_end.year - 3, 1, 1), this_months_end]
+    date_range = [dt.date(today.year - 3, 1, 1), dt.date(today.year, 12, 31)]
 
     gross_margin_by_month = key_data.gross_margin_by_month(date_range)
     gross_margin_months = {
