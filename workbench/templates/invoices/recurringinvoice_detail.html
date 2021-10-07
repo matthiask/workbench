@@ -46,27 +46,31 @@
           <td>
             {{ object.status_badge }}
             <br>
-            {{ object.pretty_next_period }}
-          </td>
-        </tr>
-        <tr>
-          <th class="text-right">{% translate 'description' %}</th>
-          <td>{{ object.description|linebreaksbr|default:"&ndash;" }}</td>
-        </tr>
-        <tr>
-          <th class="text-right">{% translate 'postal address' %}</th>
-          <td>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</td>
-        </tr>
-        <tr>
-          <th class="text-right">{{ object|label:'create_project' }}</th>
-          <td>{{ object.create_project|yesno:_('yes,no') }}</td>
-        </tr>
-      </table>
-      <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
-      <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-primary">{% translate 'Copy' %}</a>
-      <a href="?create_invoices=1" class="btn btn-primary">{% translate 'Create invoices' %}</a>
-      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">{% translate 'Delete' %}</a>
-      {% notes object %}
+              {{ object.pretty_next_period }}
+            </td>
+          </tr>
+          <tr>
+            <th class="text-right">{% translate 'description' %}</th>
+            <td>{{ object.description|linebreaksbr|default:"&ndash;" }}</td>
+          </tr>
+          <tr>
+            <th class="text-right">{% translate 'postal address' %}</th>
+            <td>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</td>
+          </tr>
+          <tr>
+            <th class="text-right">{{ object|label:'create_project' }}</th>
+            <td>{{ object.create_project|yesno:_('yes,no') }}</td>
+          </tr>
+        </table>
+        <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
+        <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-primary">{% translate 'Copy' %}</a>
+        <a href="?create_invoices=1" class="btn btn-primary">
+          {% translate 'Create invoices' %}
+        </a>
+        <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
+          {% translate 'Delete' %}
+        </a>
+        {% notes object %}
+      </div>
     </div>
-  </div>
-{% endblock %}
+  {% endblock %}

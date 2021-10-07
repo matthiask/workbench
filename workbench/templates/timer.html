@@ -7,9 +7,9 @@
   {{ hours|json_script:'user-hours' }}
   <span id="current-user" data-current-user="{{ request.user.id }}"></span>
   <span id="projects-base-url" data-url="{% url 'projects_project_list' %}"></span>
-  <script src="{% url 'javascript-catalog' %}"></script>
-  {% if not TESTING %}
-    {% render_bundle "timer" %}
-  {% endif %}
+<script src="{% url 'javascript-catalog' %}"></script>
+{% if not TESTING %}
+  {% render_bundle "timer" %}
+{% endif %}
 {% endblock %}
 {% block fixed-add-button %}{% endblock %}

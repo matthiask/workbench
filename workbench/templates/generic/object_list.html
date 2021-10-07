@@ -15,8 +15,10 @@
         {% endblock %}
         <form method="GET" action="." class="form-inline form-search mb-3 mb-lg-0" data-autosubmit>
           {% if view.search_form.changed_data %}
-            <a class="btn btn-info" href="." title="{% translate 'Reset the filter form' %}" data-reset-filter>&times;
-            </a>
+            <a class="btn btn-info"
+               href="."
+               title="{% translate 'Reset the filter form' %}"
+               data-reset-filter>&times;</a>
           {% endif %}
           {% if view.search_form %}
             {% for label, url in view.search_form.hidden_filters %}

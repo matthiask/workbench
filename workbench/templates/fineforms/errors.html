@@ -4,9 +4,9 @@
     <button class="close" type="button" data-dismiss="alert" aria-hidden="true">&#215;</button>
     {% translate "Please correct the following errors:" %}
     <br>
-    {% for error in top_errors %}
-      {{ error }}
-      {% if not forloop.last %}<br>{% endif %}
-    {% endfor %}
-  </div>
-{% endif %}
+      {% for error in top_errors %}
+        {{ error }}
+        {% if not forloop.last %}<br>{% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}

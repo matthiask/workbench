@@ -33,16 +33,12 @@
           {% for row in stats.organizations %}
             <tr>
               <th>
-                <a href="{% url 'logbook_loggedhours_list' %}?organization={{ row.organization.id }}">
-                  {{ row.organization }}
-                </a>
+                <a href="{% url 'logbook_loggedhours_list' %}?organization={{ row.organization.id }}">{{ row.organization }}</a>
               </th>
               {% for user, hours in row.user_hours %}
                 {% if hours %}
                   <td class="text-right">
-                    <a href="{% url 'logbook_loggedhours_list' %}?organization={{ row.organization.id }}&amp;rendered_by={{ user.pk }}">
-                      {{ hours|hours }}
-                    </a>
+                    <a href="{% url 'logbook_loggedhours_list' %}?organization={{ row.organization.id }}&amp;rendered_by={{ user.pk }}">{{ hours|hours }}</a>
                   </td>
                 {% else %}
                   <td></td>

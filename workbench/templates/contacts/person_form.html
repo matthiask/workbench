@@ -51,9 +51,9 @@
               </div>
             </div>
           {% endformset %}
-          <a href="#" class="btn btn-primary" onclick="return addInlineForm('emailaddresses')">
-            {% include 'svg/plus.svg' %}
-          </a>
+          <a href="#"
+             class="btn btn-primary"
+             onclick="return addInlineForm('emailaddresses')">{% include 'svg/plus.svg' %}</a>
           <h4 class="mt-5">{% translate 'postal addresses' %}</h4>
           {% formset form.formsets.postaladdresses "postaladdresses" %}
             <div id="{{ form_id }}" class="card bg-light mb-3">
@@ -75,9 +75,9 @@
               </div>
             </div>
           {% endformset %}
-          <a href="#" class="btn btn-primary" onclick="return addInlineForm('postaladdresses')">
-            {% include 'svg/plus.svg' %}
-          </a>
+          <a href="#"
+             class="btn btn-primary"
+             onclick="return addInlineForm('postaladdresses')">{% include 'svg/plus.svg' %}</a>
         {% endif %}
         <div class="row mt-5">
           <div class="col-sm-12">

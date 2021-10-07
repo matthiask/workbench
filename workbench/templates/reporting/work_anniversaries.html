@@ -23,37 +23,37 @@
                 <tr>
                   <td colspan="4">
                     <hr>
-                  </td>
-                </tr>
-              {% endif %}
-            {% endifchanged %}
-            <tr>
-              <td>{{ anniversary.user.get_full_name }}</td>
-              <td>
-                {% if anniversary.user.date_of_employment %}
-                  {{ anniversary.user.date_of_employment|local_date_format }}
-                {% else %}
-                  &ndash;
+                    </td>
+                  </tr>
                 {% endif %}
-              </td>
-              <td class="text-right">
-                {% if anniversary.anniversary %}
-                  {{ anniversary.anniversary }}.
-                {% else %}
-                  ✨
-                {% endif %}
-              </td>
-              <td>
-                {% if anniversary.user.date_of_employment %}
-                  {{ anniversary.this_year|local_date_format }}
-                {% else %}
-                  &ndash;
-                {% endif %}
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+              {% endifchanged %}
+              <tr>
+                <td>{{ anniversary.user.get_full_name }}</td>
+                <td>
+                  {% if anniversary.user.date_of_employment %}
+                    {{ anniversary.user.date_of_employment|local_date_format }}
+                  {% else %}
+                    &ndash;
+                  {% endif %}
+                </td>
+                <td class="text-right">
+                  {% if anniversary.anniversary %}
+                    {{ anniversary.anniversary }}.
+                  {% else %}
+                    ✨
+                  {% endif %}
+                </td>
+                <td>
+                  {% if anniversary.user.date_of_employment %}
+                    {{ anniversary.this_year|local_date_format }}
+                  {% else %}
+                    &ndash;
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-{% endblock %}
+  {% endblock %}

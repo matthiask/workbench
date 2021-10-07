@@ -4,10 +4,10 @@
   <h1>
     {% translate 'contacts'|capfirst %}
     <small>
-    {% mark_current request.path %}
-    <a href="{% url 'contacts_person_list' %}">{% translate 'people'|capfirst %}</a>
-    <a href="{% url 'contacts_organization_list' %}">{% translate 'organizations'|capfirst %}</a>
-  {% endmark_current %}
+      {% mark_current request.path %}
+      <a href="{% url 'contacts_person_list' %}">{% translate 'people'|capfirst %}</a>
+      <a href="{% url 'contacts_organization_list' %}">{% translate 'organizations'|capfirst %}</a>
+    {% endmark_current %}
   </small>
 </h1>
 {% endblock %}

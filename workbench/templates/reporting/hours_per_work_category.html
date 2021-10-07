@@ -10,9 +10,9 @@
       <form method="get" class="mb-3" data-autosubmit>
         {% ff_fields form %}
       </form>
-      <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
-      <canvas id="hours-distribution" width="1200" height="450"></canvas>
-      <script>
+    <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
+    <canvas id="hours-distribution" width="1200" height="450"></canvas>
+    <script>
     new Chart("hours-distribution", {
       type: "bar",
       data: {
@@ -34,75 +34,67 @@
         },
       },
     });
-      </script>
-      <table class="table table-sm table-striped">
-        <thead>
-          <tr>
-            <th>{% translate 'user'|capfirst %}</th>
-            {% for name, title, description in stats.categories %}
-              <th class="text-right">
-                {{ title }}
-                <br>
-                <small>{{ description }}</small>
-              </th>
-              <th></th>
-            {% endfor %}
-            <th class="text-right">{% translate 'Undefined' %}</th>
+            </script>
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>{% translate 'user'|capfirst %}</th>
+        {% for name, title, description in stats.categories %}
+          <th class="text-right">
+            {{ title }}
+            <br>
+              <small>{{ description }}</small>
+            </th>
             <th></th>
-            <th class="text-right">{% translate 'total'|capfirst %}</th>
-          </tr>
-        </thead>
-        <tfoot>
+          {% endfor %}
+          <th class="text-right">{% translate 'Undefined' %}</th>
+          <th></th>
+          <th class="text-right">{% translate 'total'|capfirst %}</th>
+        </tr>
+      </thead>
+      <tfoot>
         <tr>
           <th>{% trans 'total'|capfirst %}</th>
           {% for category, hour in stats.summary.per_category %}
             <td class="text-right">
               <a href="{% url 'logbook_loggedhours_list' %}?category={{ category }}"
-                 {% if not hour %}class="text-black-30"{% endif %}>
-                {{ hour|hours }}
-              </a>
+                 {% if not hour %}class="text-black-30"{% endif %}>{{ hour|hours }}</a>
             </td>
             <td>{% percentage hour stats.summary.total %}</td>
           {% endfor %}
           <td class="text-right">
             <a href="{% url 'logbook_loggedhours_list' %}?category=none"
-               {% if not stats.summary.undefined %}class="text-black-30"{% endif %}>
-              {{ stats.summary.undefined|hours }}
-            </a>
+               {% if not stats.summary.undefined %}class="text-black-30"{% endif %}>{{ stats.summary.undefined|hours }}</a>
           </td>
           <td>{% percentage stats.summary.undefined stats.summary.total %}</td>
           <td class="text-right">{{ stats.summary.total|hours }}</td>
         </tr>
-        </tfoot>
-        <tbody>
-          {% for user, user_stats in stats.users %}
-            <tr>
-              {% if user %}
-                <td>{{ user }}</td>
-              {% else %}
-                <th>{% translate 'total'|capfirst %}</th>
-              {% endif %}
-              {% for category, hour in user_stats.per_category %}
-                <td class="text-right">
-                  <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.id }}&amp;category={{ category }}"
-                     {% if not hour %}class="text-black-30"{% endif %}>
-                    {{ hour|hours }}
-                  </a>
-                </td>
-                <td>{% percentage hour user_stats.total %}</td>
-              {% endfor %}
+      </tfoot>
+      <tbody>
+        {% for user, user_stats in stats.users %}
+          <tr>
+            {% if user %}
+              <td>{{ user }}</td>
+            {% else %}
+              <th>{% translate 'total'|capfirst %}</th>
+            {% endif %}
+            {% for category, hour in user_stats.per_category %}
               <td class="text-right">
-                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.id }}&amp;category=none"
-                   {% if not user_stats.undefined %}class="text-black-30"{% endif %}>
-                  {{ user_stats.undefined|hours }}
-                </a>
+                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.id }}&amp;category={{ category }}"
+                   {% if not hour %}class="text-black-30"{% endif %}>{{ hour|hours }}</a>
               </td>
-              <td>{% percentage user_stats.undefined user_stats.total %}</td>
-              <td class="text-right">{{ user_stats.total|hours }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+              <td>{% percentage hour user_stats.total %}</td>
+            {% endfor %}
+            <td class="text-right">
+              <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ user.id }}&amp;category=none"
+                 {% if not user_stats.undefined %}class="text-black-30"{% endif %}>{{ user_stats.undefined|hours }}</a>
+            </td>
+            <td>{% percentage user_stats.undefined user_stats.total %}</td>
+            <td class="text-right">{{ user_stats.total|hours }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
+</div>
 {% endblock %}

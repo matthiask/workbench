@@ -17,8 +17,8 @@
   </div>
   <div id="planning-root" class="planning-wrapper"></div>
   {{ planning_data|json_script:'planning-data' }}
-  <script src="{% url 'javascript-catalog' %}"></script>
-  {% if not TESTING %}
-    {% render_bundle "planning" %}
-  {% endif %}
+<script src="{% url 'javascript-catalog' %}"></script>
+{% if not TESTING %}
+  {% render_bundle "planning" %}
+{% endif %}
 {% endblock %}

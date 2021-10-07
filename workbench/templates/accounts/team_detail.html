@@ -32,9 +32,8 @@
         {% include 'svg/project.svg' %}
         {% translate 'Retrospective' %}
       </a>
-      <a href="{% url 'awt_absence_calendar' %}?team={{ object.pk }}" class="btn btn-primary">
-        {% translate 'Absence calendar' %}
-      </a>
+      <a href="{% url 'awt_absence_calendar' %}?team={{ object.pk }}"
+         class="btn btn-primary">{% translate 'Absence calendar' %}</a>
       <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">{% translate 'Delete' %}</a>
     </div>
   </div>

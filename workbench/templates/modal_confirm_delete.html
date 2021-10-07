@@ -9,8 +9,9 @@
   {% if form %}{{ block.super }}{% endif %}
 {% endblock %}
 {% block footer %}
-  <button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-primary mr-auto">
-    {% translate 'cancel' %}
-  </button>
+  <button type="button"
+          data-dismiss="modal"
+          aria-label="Close"
+          class="btn btn-primary mr-auto">{% translate 'cancel' %}</button>
   <button type="submit" class="btn btn-danger">{% translate 'delete' %}</button>
 {% endblock %}

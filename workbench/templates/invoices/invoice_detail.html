@@ -64,70 +64,98 @@
                     <td>
                       <strong>{{ service.title }} {% history_link service %}</strong>
                       <br>
-                      {{ service.description|linebreaksbr }}
-                    </td>
-                    <td class="text-right">{{ service.service_cost|currency }}</td>
-                    <td>
-                      <a href="{{ service.urls.update }}" data-toggle="ajaxmodal">{% include 'svg/pencil.svg' %}</a>
-                    </td>
-                  </tr>
-                {% endfor %}
-              </table>
+                        {{ service.description|linebreaksbr }}
+                      </td>
+                      <td class="text-right">{{ service.service_cost|currency }}</td>
+                      <td>
+                        <a href="{{ service.urls.update }}" data-toggle="ajaxmodal">{% include 'svg/pencil.svg' %}</a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </table>
+              </td>
+            </tr>
+          {% endif %}
+          <tr>
+            <th class="text-right">{% translate 'subtotal'|capfirst %}</th>
+            <td>{{ object.subtotal|currency }}</td>
+          </tr>
+          {% if object.discount %}
+            <tr>
+              <th class="text-right">{% translate 'discount'|capfirst %}</th>
+              <td>
+                -{{ object.discount|currency }}
+              </td>
+            </tr>
+          {% endif %}
+          {% if object.down_payment_total %}
+            <tr>
+              <th class="text-right">
+                {% translate 'down payment total'|capfirst %}
+              </th>
+              <td>
+                -{{ object.down_payment_total|currency }}
+              </td>
+            </tr>
+          {% endif %}
+          {% if object.liable_to_vat and object.subtotal != object.total_excl_tax %}
+            <tr>
+              <th class="text-right">
+                {% translate 'total excl. tax'|capfirst %}
+              </th>
+              <td>
+                {{ object.total_excl_tax|currency }}
+              </td>
+            </tr>
+          {% endif %}
+          <tr>
+            <th class="text-right">
+              {{ object.total_title }}
+            </th>
+            <td>
+              {{ object.total|currency }}
             </td>
           </tr>
-        {% endif %}
-        <tr>
-          <th class="text-right">{% translate 'subtotal'|capfirst %}</th>
-          <td>{{ object.subtotal|currency }}</td>
-        </tr>
-        {% if object.discount %}
           <tr>
-            <th class="text-right">{% translate 'discount'|capfirst %}</th>
-            <td>-{{ object.discount|currency }}</td>
+            <th class="text-right">
+              {% translate 'third party costs'|capfirst %}
+            </th>
+            <td>
+              {{ object.third_party_costs|currency }}
+            </td>
           </tr>
+        </table>
+        <span class="btn-group">
+          <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+            PDF
+          </a>
+          <button type="button"
+                  class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false">
+            <span class="sr-only">
+              Toggle Dropdown
+            </span>
+          </button>
+          <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="{{ object.urls.pdf }}?disposition=attachment">
+              {% translate 'Download' %}
+            </a>
+          </div>
+        </span>
+        {% if object.type == object.SERVICES %}
+          <a href="{{ object.urls.xlsx }}" class="btn btn-primary">
+            {% translate 'logbook'|capfirst %} (XLSX)
+          </a>
         {% endif %}
-        {% if object.down_payment_total %}
-          <tr>
-            <th class="text-right">{% translate 'down payment total'|capfirst %}</th>
-            <td>-{{ object.down_payment_total|currency }}</td>
-          </tr>
-        {% endif %}
-        {% if object.liable_to_vat and object.subtotal != object.total_excl_tax %}
-          <tr>
-            <th class="text-right">{% translate 'total excl. tax'|capfirst %}</th>
-            <td>{{ object.total_excl_tax|currency }}</td>
-          </tr>
-        {% endif %}
-        <tr>
-          <th class="text-right">{{ object.total_title }}</th>
-          <td>{{ object.total|currency }}</td>
-        </tr>
-        <tr>
-          <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
-          <td>{{ object.third_party_costs|currency }}</td>
-        </tr>
-      </table>
-      <span class="btn-group">
-        <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
-          PDF
+        <a href="{{ object.urls.update }}" class="btn btn-primary">
+          {% translate 'Update' %}
         </a>
-        <button type="button"
-                class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false">
-          <span class="sr-only">Toggle Dropdown</span>
-        </button>
-        <div class="dropdown-menu dropdown-menu-right">
-          <a class="dropdown-item" href="{{ object.urls.pdf }}?disposition=attachment">{% translate 'Download' %}</a>
-        </div>
-      </span>
-      {% if object.type == object.SERVICES %}
-        <a href="{{ object.urls.xlsx }}" class="btn btn-primary">{% translate 'logbook'|capfirst %} (XLSX)</a>
-      {% endif %}
-      <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
-      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">{% translate 'Delete' %}</a>
-      {% notes object %}
+        <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
+          {% translate 'Delete' %}
+        </a>
+        {% notes object %}
+      </div>
     </div>
-  </div>
-{% endblock %}
+  {% endblock %}

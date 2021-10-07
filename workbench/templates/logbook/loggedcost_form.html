@@ -19,7 +19,10 @@
     {% ff_field form.are_expenses %}
   {% endif %}
   {% if form.expense_currency %}
-    <div class="form-row align-items-end {% if not form.instance.expense_cost %}d-none{% endif %}"
+    <div class="form-row align-items-end
+                {% if not form.instance.expense_cost %}
+                  d-none
+                {% endif %}"
          id="foreign-currency">
       <div class="col-3">{% ff_field form.expense_currency %}</div>
       <div class="col-6">{% ff_field form.expense_cost %}</div>
@@ -36,9 +39,7 @@
   {% if form.expense_currency and not form.instance.expense_cost %}
     <button type="button"
             class="btn btn-primary mr-auto"
-            onclick="_cl(this, 'invisible', true);_cl(_sel('#foreign-currency'), 'd-none', false);_sel('#id_modal-are_expenses').checked=true">
-      {% translate 'expenses in foreign currency' %}
-    </button>
+            onclick="_cl(this, 'invisible', true);_cl(_sel('#foreign-currency'), 'd-none', false);_sel('#id_modal-are_expenses').checked=true">{% translate 'expenses in foreign currency' %}</button>
   {% endif %}
   <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
 {% endblock %}

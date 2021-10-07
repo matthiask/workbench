@@ -35,9 +35,7 @@
               {% for user, hours in circle.by_user %}
                 <th class="text-right">
                   {% if hours %}
-                    <a href="{% url 'logbook_loggedhours_list' %}?circle={{ circle.circle.pk|default:0 }}&amp;rendered_by={{ user.pk }}">
-                      {{ hours|hours }}
-                    </a>
+                    <a href="{% url 'logbook_loggedhours_list' %}?circle={{ circle.circle.pk|default:0 }}&amp;rendered_by={{ user.pk }}">{{ hours|hours }}</a>
                   {% else %}
                     -
                   {% endif %}
@@ -54,9 +52,7 @@
                 {% for user, hours in role.by_user %}
                   <td class="text-right">
                     {% if hours %}
-                      <a href="{% url 'logbook_loggedhours_list' %}?role={{ role.role.pk }}&amp;rendered_by={{ user.pk }}">
-                        {{ hours|hours }}
-                      </a>
+                      <a href="{% url 'logbook_loggedhours_list' %}?role={{ role.role.pk }}&amp;rendered_by={{ user.pk }}">{{ hours|hours }}</a>
                     {% else %}
                       -
                     {% endif %}

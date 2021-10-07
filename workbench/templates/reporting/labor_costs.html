@@ -20,9 +20,8 @@
             <th class="text-right">{% translate 'Productivity costs' %}</th>
             <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
             <th class="text-right">{% translate 'cost'|capfirst %}</th>
-            <th class="text-right" title="{% translate 'Hours times max(hourly rate, hourly labor cost)' %}">
-              {% translate 'Revenue' %}
-            </th>
+            <th class="text-right"
+                title="{% translate 'Hours times max(hourly rate, hourly labor cost)' %}">{% translate 'Revenue' %}</th>
             <th></th>
           </tr>
         </thead>
@@ -31,9 +30,10 @@
             <tr>
               <th>{{ cc_row.cost_center|default:_("No cost center defined") }}</th>
               <th class="text-right">{{ cc_row.hours|hours }}</th>
-              <th class="text-right {% if not cc_row.hours_with_rate_undefined %}text-black-30{% endif %}">
-                {{ cc_row.hours_with_rate_undefined|hours }}
-              </th>
+              <th class="text-right
+                         {% if not cc_row.hours_with_rate_undefined %}
+                           text-black-30
+                         {% endif %}">{{ cc_row.hours_with_rate_undefined|hours }}</th>
               <th class="text-right">{{ cc_row.costs|currency }}</th>
               <th class="text-right">{{ cc_row.costs_with_green_hours_target|currency }}</th>
               <th class="text-right">{{ cc_row.third_party_costs|currency }}</th>
@@ -43,9 +43,8 @@
               <th class="text-right">{{ cc_row.revenue|currency }}</th>
               <td>
                 {% if cc_row.cost_center %}
-                  <a href="{% querystring cost_center=cc_row.cost_center.id %}" data-toggle="ajaxmodal">
-                    {% translate 'Details' %}
-                  </a>
+                  <a href="{% querystring cost_center=cc_row.cost_center.id %}"
+                     data-toggle="ajaxmodal">{% translate 'Details' %}</a>
                 {% endif %}
               </td>
             </tr>
@@ -53,38 +52,54 @@
               <tr>
                 <td>{% link_or_none row.project %}</td>
                 <td class="text-right">
-                  <a href="{% url 'logbook_loggedhours_list' %}{% querystring date_from=date_range.0.isoformat date_until=date_range.1.isoformat project=row.project.id %}">
-                    {{ row.hours|hours }}
-                  </a>
+                  <a href="{% url 'logbook_loggedhours_list' %}{% querystring date_from=date_range.0.isoformat date_until=date_range.1.isoformat project=row.project.id %}">{{ row.hours|hours }}</a>
                 </td>
-                <td class="text-right {% if not row.hours_with_rate_undefined %}text-black-30{% endif %}">
-                  {{ row.hours_with_rate_undefined|hours }}
-                </td>
+                <td class="text-right
+                           {% if not row.hours_with_rate_undefined %}
+                             text-black-30
+                           {% endif %}">{{ row.hours_with_rate_undefined|hours }}</td>
                 <td class="text-right">{{ row.costs|currency }}</td>
                 <td class="text-right">{{ row.costs_with_green_hours_target|currency }}</td>
                 <td class="text-right">{{ row.third_party_costs|currency }}</td>
                 <td class="text-right">{{ row.costs_with_green_hours_target|addf:row.third_party_costs|currency }}</td>
                 <td class="text-right">{{ row.revenue|currency }}</td>
                 <td>
-                  <a href="{% querystring project=row.project.id %}"
-                     data-toggle="ajaxmodal">{% translate 'Details' %}</a>
+                  <a href="{% querystring project=row.project.id %}" data-toggle="ajaxmodal">
+                    {% translate 'Details' %}
+                  </a>
                 </td>
               </tr>
             {% endfor %}
           {% endfor %}
           <tr>
-            <th>{% translate 'total'|capfirst %}</th>
-            <th class="text-right">{{ stats.hours|hours }}</th>
+            <th>
+              {% translate 'total'|capfirst %}
+            </th>
+            <th class="text-right">
+              {{ stats.hours|hours }}
+            </th>
             <th class="text-right {% if not stats.hours_with_rate_undefined %}text-black-30{% endif %}">
               {{ stats.hours_with_rate_undefined|hours }}
             </th>
-            <th class="text-right">{{ stats.costs|currency }}</th>
-            <th class="text-right">{{ stats.costs_with_green_hours_target|currency }}</th>
-            <th class="text-right">{{ stats.third_party_costs|currency }}</th>
-            <th class="text-right">{{ stats.costs_with_green_hours_target|addf:stats.third_party_costs|currency }}</th>
-            <th class="text-right">{{ stats.revenue|currency }}</th>
+            <th class="text-right">
+              {{ stats.costs|currency }}
+            </th>
+            <th class="text-right">
+              {{ stats.costs_with_green_hours_target|currency }}
+            </th>
+            <th class="text-right">
+              {{ stats.third_party_costs|currency }}
+            </th>
+            <th class="text-right">
+              {{ stats.costs_with_green_hours_target|addf:stats.third_party_costs|currency }}
+            </th>
+            <th class="text-right">
+              {{ stats.revenue|currency }}
+            </th>
             <td>
-              <a href="{% querystring users='all' %}" data-toggle="ajaxmodal">{% translate 'Details' %}</a>
+              <a href="{% querystring users='all' %}" data-toggle="ajaxmodal">
+                {% translate 'Details' %}
+              </a>
             </td>
           </tr>
         </tbody>

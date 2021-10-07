@@ -20,8 +20,8 @@
            href="{{ hours.get_absolute_url }}"
            data-toggle="ajaxmodal">
           <small class="d-flex justify-content-between">
-          <span>{{ hours.service.project_service_title }}</span>
-          <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
+            <span>{{ hours.service.project_service_title }}</span>
+            <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
           </small>
           <p class="mb-0">
             <strong>{{ hours.hours|hours }}</strong>

@@ -22,24 +22,24 @@
               <td>
                 {% link_or_none row.organization %}
                 <br>
-                <form method="post" action="{% url 'invoices_dunning_letter' customer_id=row.organization.id %}">
-                  {% csrf_token %}
-                  <button type="submit"
-                          class="btn btn-sm btn-primary">{% translate 'Generate a dunning letter' %} (PDF)</button>
-                </form>
-              </td>
-              <td>
-                {% for invoice in row.invoices %}
-                  {% link_or_none invoice with_badge=True %}
-                  <br>
-                {% endfor %}
-              </td>
-              <td class="text-right">{{ row.total_excl_tax|currency }}</td>
-              <td class="text-right">{{ row.last_reminded_on|local_date_format|default:_("Not reminded yet") }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-{% endblock %}
+                  <form method="post" action="{% url 'invoices_dunning_letter' customer_id=row.organization.id %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="btn btn-sm btn-primary">{% translate 'Generate a dunning letter' %} (PDF)</button>
+                  </form>
+                </td>
+                <td>
+                  {% for invoice in row.invoices %}
+                    {% link_or_none invoice with_badge=True %}
+                    <br>
+                    {% endfor %}
+                  </td>
+                  <td class="text-right">{{ row.total_excl_tax|currency }}</td>
+                  <td class="text-right">{{ row.last_reminded_on|local_date_format|default:_("Not reminded yet") }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endblock %}

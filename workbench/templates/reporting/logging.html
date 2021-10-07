@@ -27,9 +27,7 @@
               <td>{{ row.user }}</td>
               <td>
                 <span class="badge badge-{{ row.mean_logging_delay.classification.1 }}"
-                      title="{{ row.mean_logging_delay.classification.2 }}">
-                  {{ row.mean_logging_delay.classification.0 }}
-                </span>
+                      title="{{ row.mean_logging_delay.classification.2 }}">{{ row.mean_logging_delay.classification.0 }}</span>
               </td>
               <td class="text-right">{{ row.logged_hours_stats.count }}</td>
               <td class="text-right">{{ row.logged_hours_stats.sum|hours }}</td>

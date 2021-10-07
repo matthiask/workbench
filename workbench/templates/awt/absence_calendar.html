@@ -8,8 +8,7 @@
     <h1 class="absences-title">{% translate 'Absence calendar' %}</h1>
     <form method="get" class="form-inline form-search mb-3 ml-auto mr-3" data-autosubmit>
       {% if form.changed_data %}
-        <a class="btn btn-info" href="." title="{% translate 'Reset the filter form' %}" data-reset-filter>&times;
-        </a>
+        <a class="btn btn-info" href="." title="{% translate 'Reset the filter form' %}" data-reset-filter>&times;</a>
       {% endif %}
       {% ff_fields form %}
     </form>
@@ -20,8 +19,8 @@
   </div>
   <div id="absences-root" class="absences-wrapper"></div>
   {{ absences_data|json_script:'absences-data' }}
-  <script src="{% url 'javascript-catalog' %}"></script>
-  {% if not TESTING %}
-    {% render_bundle "absences" %}
-  {% endif %}
+<script src="{% url 'javascript-catalog' %}"></script>
+{% if not TESTING %}
+  {% render_bundle "absences" %}
+{% endif %}
 {% endblock %}

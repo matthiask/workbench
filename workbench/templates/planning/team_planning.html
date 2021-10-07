@@ -17,24 +17,24 @@
   </div>
   <div id="planning-root" class="planning-wrapper"></div>
   {{ planning_data|json_script:'planning-data' }}
-  <script src="{% url 'javascript-catalog' %}"></script>
-  {% if not TESTING %}
-    {% render_bundle "planning" %}
-  {% endif %}
-  <div class="row mt-5">
-    <div class="col-12">
-      <a href="{% url 'planning_plannedwork_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
-        {% include 'svg/plus.svg' %}
-        {% translate 'planned work'|capfirst %}
-      </a>
-      <a href="{% url 'planning_milestone_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
-        {% include 'svg/plus.svg' %}
-        {% translate 'milestone'|capfirst %}
-      </a>
-      <a href="{% url 'awt_absence_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
-        {% include 'svg/plus.svg' %}
-        {% translate 'absence'|capfirst %}
-      </a>
-    </div>
+<script src="{% url 'javascript-catalog' %}"></script>
+{% if not TESTING %}
+  {% render_bundle "planning" %}
+{% endif %}
+<div class="row mt-5">
+  <div class="col-12">
+    <a href="{% url 'planning_plannedwork_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
+      {% include 'svg/plus.svg' %}
+      {% translate 'planned work'|capfirst %}
+    </a>
+    <a href="{% url 'planning_milestone_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
+      {% include 'svg/plus.svg' %}
+      {% translate 'milestone'|capfirst %}
+    </a>
+    <a href="{% url 'awt_absence_create' %}" data-toggle="ajaxmodal" class="btn btn-primary btn-sm">
+      {% include 'svg/plus.svg' %}
+      {% translate 'absence'|capfirst %}
+    </a>
   </div>
+</div>
 {% endblock %}

@@ -9,9 +9,9 @@
     {{ title }}
   {% endif %}
   <small class="d-block">
-  {% for verbose_name_plural, url in related %}
-    <a href="{{ url }}" data-toggle="ajaxmodal">{{ verbose_name_plural }}</a>
-  {% endfor %}
+    {% for verbose_name_plural, url in related %}
+      <a href="{{ url }}" data-toggle="ajaxmodal">{{ verbose_name_plural }}</a>
+    {% endfor %}
   </small>
 {% endblock %}
 {% block body %}

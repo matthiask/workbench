@@ -42,9 +42,7 @@
       </th>
       {% for user, hours in object.grouped_services.logged_hours_per_user %}
         <th class="text-right">
-          <a href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}&amp;rendered_by={{ user.pk }}">
-            {{ hours|hours }}
-          </a>
+          <a href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}&amp;rendered_by={{ user.pk }}">{{ hours|hours }}</a>
         </th>
       {% endfor %}
     </tr>
@@ -66,9 +64,7 @@
             {% for user, hours in user_row %}
               <td class="text-right">
                 {% if hours %}
-                  <a href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}&amp;rendered_by={{ user.pk }}">
-                    {{ hours|hours }}
-                  </a>
+                  <a href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}&amp;rendered_by={{ user.pk }}">{{ hours|hours }}</a>
                 {% endif %}
               </td>
             {% endfor %}

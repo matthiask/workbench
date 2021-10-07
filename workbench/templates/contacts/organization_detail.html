@@ -55,9 +55,8 @@
           {% translate 'deal'|capfirst %}
         </a>
       {% endif %}
-      <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}" class="btn btn-primary">
-        {% translate 'invoices'|capfirst %}
-      </a>
+      <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}"
+         class="btn btn-primary">{% translate 'invoices'|capfirst %}</a>
       <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
       <a href="{{ object.urls.delete }}"
          class="btn btn-outline-danger float-right">{% translate 'Delete or substitute' %}</a>
@@ -125,7 +124,9 @@
         <div class="card mb-3">
           <div class="card-header">
             <h3 class="my-0">
-              <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}">{% translate 'Recent invoices' %}</a>
+              <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}">
+                {% translate 'Recent invoices' %}
+              </a>
             </h3>
           </div>
           <div class="list-group list-group-flush">
@@ -142,7 +143,9 @@
         <div class="card mb-3">
           <div class="card-header">
             <h3 class="my-0">
-              <a href="{% url 'offers_offer_list' %}?org={{ organization.pk }}">{% translate 'Recent offers' %}</a>
+              <a href="{% url 'offers_offer_list' %}?org={{ organization.pk }}">
+                {% translate 'Recent offers' %}
+              </a>
             </h3>
           </div>
           <div class="list-group list-group-flush">

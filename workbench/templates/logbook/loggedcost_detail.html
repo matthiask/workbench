@@ -71,13 +71,11 @@
   </table>
 {% endblock %}
 {% block footer %}
-  <a href="{{ object.urls.update }}" class="btn btn-primary mr-auto" data-toggle="ajaxmodal">
-    {% translate 'Update' %}
-  </a>
-  <a href="{{ object.urls.move }}" class="btn btn-primary mr-auto" data-toggle="ajaxmodal">
-    {% translate 'Move' %}
-  </a>
-  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger" data-toggle="ajaxmodal">
-    {% translate 'Delete' %}
-  </a>
+  <a href="{{ object.urls.update }}"
+     class="btn btn-primary mr-auto"
+     data-toggle="ajaxmodal">{% translate 'Update' %}</a>
+  <a href="{{ object.urls.move }}" class="btn btn-primary mr-auto" data-toggle="ajaxmodal">{% translate 'Move' %}</a>
+  <a href="{{ object.urls.delete }}"
+     class="btn btn-outline-danger"
+     data-toggle="ajaxmodal">{% translate 'Delete' %}</a>
 {% endblock %}
