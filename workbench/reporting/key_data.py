@@ -186,21 +186,17 @@ def projected_invoices():
         data["monthly"] = dict(monthly)
         return data
 
-    projects = sorted(
-        (
-            _monthly(
-                {
-                    "project": project,
-                    "delta": data["projected_total"] - data["gross_margin"],
-                }
-                | data
-            )
-            for project, data in projects.items()
-            if data["projected_total"] > data["gross_margin"]
-        ),
-        key=lambda project: project["delta"],
-        reverse=True,
-    )
+    projects = [
+        _monthly(
+            {
+                "project": project,
+                "delta": data["projected_total"] - data["gross_margin"],
+            }
+            | data
+        )
+        for project, data in projects.items()
+        if data["projected_total"] > data["gross_margin"]
+    ]
 
     return {
         "projects": projects,

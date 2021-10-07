@@ -150,10 +150,15 @@ def key_data_projected_invoices(request):
         request,
         "reporting/key_data_projected_invoices.html",
         {
-            "projects": [
-                project | {"monthly": [project["monthly"].get(m) for m in all_months]}
-                for project in pi["projects"]
-            ],
+            "projects": sorted(
+                (
+                    project
+                    | {"monthly": [project["monthly"].get(m, Z2) for m in all_months]}
+                    for project in pi["projects"]
+                ),
+                key=lambda project: project["monthly"],
+                reverse=True,
+            ),
             "months": [dt.date(m[0], m[1], 1) for m in all_months],
             "monthly_overall": [pi["monthly_overall"].get(m) for m in all_months],
         },

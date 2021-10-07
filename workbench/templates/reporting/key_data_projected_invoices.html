@@ -36,7 +36,9 @@
         <td class="text-right">{{ project.delta|currency }}</td>
         <td>&nbsp;</td>
         {% for mo in project.monthly %}
-          <td class="text-nowrap text-right">{{ mo|currency }}</td>
+          <td class="text-nowrap text-right">
+            {% if mo %}{{ mo|currency }}{% endif %}
+          </td>
         {% endfor %}
       </tr>
     {% endfor %}
