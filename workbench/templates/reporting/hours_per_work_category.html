@@ -10,9 +10,9 @@
       <form method="get" class="mb-3" data-autosubmit>
         {% ff_fields form %}
       </form>
-    <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
-    <canvas id="hours-distribution" width="1200" height="450"></canvas>
-    <script>
+      <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
+      <canvas id="hours-distribution" width="1200" height="450"></canvas>
+      <script>
     new Chart("hours-distribution", {
       type: "bar",
       data: {
@@ -34,15 +34,15 @@
         },
       },
     });
-            </script>
-  <table class="table table-sm table-striped">
-    <thead>
-      <tr>
-        <th>{% translate 'user'|capfirst %}</th>
-        {% for name, title, description in stats.categories %}
-          <th class="text-right">
-            {{ title }}
-            <br>
+                </script>
+    <table class="table table-sm table-striped">
+      <thead>
+        <tr>
+          <th>{% translate 'user'|capfirst %}</th>
+          {% for name, title, description in stats.categories %}
+            <th class="text-right">
+              {{ title }}
+              <br>
               <small>{{ description }}</small>
             </th>
             <th></th>

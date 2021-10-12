@@ -73,101 +73,101 @@
               {% for object in row.objects %}
                 {% link_or_none object with_badge=True %}
                 <br>
-                {% endfor %}
               {% endfor %}
-            </div>
+            {% endfor %}
           </div>
-        {% endif %}
-        {% if birthdays %}
-          <div class="card mb-3 d-none d-md-block">
-            <div class="card-header">
-              <h3 class="my-0">{% translate "Birthdays" %}</h3>
-            </div>
-            <div class="card-body">
-              {% for birthday in birthdays %}
-                <a href="{% url 'contacts_person_detail' pk=birthday.id as url %}{{ url }}"
-                   class="text-nowrap
-                          {% if birthday.is_active_user %}
-                            font-weight-bold
-                          {% endif %}">
-                  {{ birthday.given_name }} {{ birthday.family_name }}
-                  ({{ birthday.date_of_birth|local_date_format }})
-                </a>
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            </div>
+        </div>
+      {% endif %}
+      {% if birthdays %}
+        <div class="card mb-3 d-none d-md-block">
+          <div class="card-header">
+            <h3 class="my-0">{% translate "Birthdays" %}</h3>
           </div>
+          <div class="card-body">
+            {% for birthday in birthdays %}
+              <a href="{% url 'contacts_person_detail' pk=birthday.id as url %}{{ url }}"
+                 class="text-nowrap
+                        {% if birthday.is_active_user %}
+                          font-weight-bold
+                        {% endif %}">
+                {{ birthday.given_name }} {{ birthday.family_name }}
+                ({{ birthday.date_of_birth|local_date_format }})
+              </a>
+              {% if not forloop.last %},{% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+    <div class="col-lg-6">
+      <div class="card mb-3">
+        <div class="card-header">
+          <h3 class="my-0">
+            <a class="d-block"
+               href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{% translate "today's hours"|capfirst %}</a>
+            <small>
+              <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}">{{ request.user.hours.today|hours }} {% translate 'today' %}</a>
+              /
+              <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{{ request.user.hours.week|hours }} {% translate 'this week' %}</a>
+              /
+              <a href="{% url 'timestamps' %}">{% translate 'timestamps'|capfirst %}</a>
+            </small>
+          </h3>
+        </div>
+        {% if todays_hours %}
+          <div class="list-group list-group-flush">
+            {% for hours in todays_hours %}
+              <a class="list-group-item list-group-item-action"
+                 href="{{ hours.get_absolute_url }}"
+                 data-toggle="ajaxmodal">
+                <small class="d-flex justify-content-between">
+                  <span>{{ hours.service.project_service_title }}</span>
+                  <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
+                </small>
+                <p class="card-text">
+                  <strong>{{ hours.hours|hours }}</strong>
+                  {{ hours.description }}
+                  {% if hours.timestamp %}
+                    <small title="{% translate 'timestamp'|capfirst %}">(@{{ hours.timestamp.pretty_time }})</small>
+                  {% endif %}
+                </p>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="card-body">{% translate 'no hours today'|capfirst %}</div>
         {% endif %}
       </div>
-      <div class="col-lg-6">
-        <div class="card mb-3">
-          <div class="card-header">
-            <h3 class="my-0">
-              <a class="d-block"
-                 href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{% translate "today's hours"|capfirst %}</a>
-              <small>
-                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}">{{ request.user.hours.today|hours }} {% translate 'today' %}</a>
-                /
-                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{{ request.user.hours.week|hours }} {% translate 'this week' %}</a>
-                /
-                <a href="{% url 'timestamps' %}">{% translate 'timestamps'|capfirst %}</a>
-              </small>
-            </h3>
-          </div>
-          {% if todays_hours %}
-            <div class="list-group list-group-flush">
-              {% for hours in todays_hours %}
-                <a class="list-group-item list-group-item-action"
-                   href="{{ hours.get_absolute_url }}"
-                   data-toggle="ajaxmodal">
-                  <small class="d-flex justify-content-between">
-                    <span>{{ hours.service.project_service_title }}</span>
-                    <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
-                  </small>
-                  <p class="card-text">
-                    <strong>{{ hours.hours|hours }}</strong>
-                    {{ hours.description }}
-                    {% if hours.timestamp %}
-                      <small title="{% translate 'timestamp'|capfirst %}">(@{{ hours.timestamp.pretty_time }})</small>
-                    {% endif %}
-                  </p>
-                </a>
-              {% endfor %}
-            </div>
-          {% else %}
-            <div class="card-body">{% translate 'no hours today'|capfirst %}</div>
-          {% endif %}
+      <div class="card mb-3">
+        <div class="card-header">
+          <h3 class="my-0">
+            <a href="{% url 'logbook_loggedhours_list' %}">{% translate "all users' hours"|capfirst %}</a>
+          </h3>
         </div>
-        <div class="card mb-3">
-          <div class="card-header">
-            <h3 class="my-0">
-              <a href="{% url 'logbook_loggedhours_list' %}">{% translate "all users' hours"|capfirst %}</a>
-            </h3>
+        {% if all_users_hours %}
+          <div class="list-group list-group-flush">
+            {% for hours in all_users_hours %}
+              <a class="list-group-item list-group-item-action"
+                 href="{{ hours.get_absolute_url }}"
+                 data-toggle="ajaxmodal">
+                <small class="d-flex justify-content-between">
+                  <span>{{ hours.service.project_service_title }}</span>
+                  <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
+                </small>
+                <p class="card-text">
+                  <strong>{{ hours.hours|hours }}</strong>
+                  {{ hours.description }}
+                  {% if hours.timestamp %}
+                    <small title="{% translate 'timestamp'|capfirst %}">(@{{ hours.timestamp.pretty_time }})</small>
+                  {% endif %}
+                </p>
+              </a>
+            {% endfor %}
           </div>
-          {% if all_users_hours %}
-            <div class="list-group list-group-flush">
-              {% for hours in all_users_hours %}
-                <a class="list-group-item list-group-item-action"
-                   href="{{ hours.get_absolute_url }}"
-                   data-toggle="ajaxmodal">
-                  <small class="d-flex justify-content-between">
-                    <span>{{ hours.service.project_service_title }}</span>
-                    <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
-                  </small>
-                  <p class="card-text">
-                    <strong>{{ hours.hours|hours }}</strong>
-                    {{ hours.description }}
-                    {% if hours.timestamp %}
-                      <small title="{% translate 'timestamp'|capfirst %}">(@{{ hours.timestamp.pretty_time }})</small>
-                    {% endif %}
-                  </p>
-                </a>
-              {% endfor %}
-            </div>
-          {% else %}
-            <div class="card-body">{% translate 'no hours today' %}</div>
-          {% endif %}
-        </div>
+        {% else %}
+          <div class="card-body">{% translate 'no hours today' %}</div>
+        {% endif %}
       </div>
     </div>
-  {% endblock %}
+  </div>
+{% endblock %}

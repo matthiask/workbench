@@ -19,8 +19,8 @@
   </div>
   <div id="absences-root" class="absences-wrapper"></div>
   {{ absences_data|json_script:'absences-data' }}
-<script src="{% url 'javascript-catalog' %}"></script>
-{% if not TESTING %}
-  {% render_bundle "absences" %}
-{% endif %}
+  <script src="{% url 'javascript-catalog' %}"></script>
+  {% if not TESTING %}
+    {% render_bundle "absences" %}
+  {% endif %}
 {% endblock %}

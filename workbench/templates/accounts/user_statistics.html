@@ -6,10 +6,10 @@
 {% block inner_content %}
   <div class="row justify-content-center">
     <div class="col-lg-10">
-    <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
-    <h2 class="mt-4">{% translate 'Hours per weekday' %}</h2>
-    <canvas id="hours-per-weekday" width="1200" height="250"></canvas>
-    <script>
+      <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
+      <h2 class="mt-4">{% translate 'Hours per weekday' %}</h2>
+      <canvas id="hours-per-weekday" width="1200" height="250"></canvas>
+      <script>
       new Chart("hours-per-weekday", {
         type: "bar",
         data: {
@@ -29,10 +29,10 @@
           ],
         },
       })
-            </script>
-  <h2 class="mt-4">{% translate 'Hours per week' %}</h2>
-  <canvas id="hours-per-week" width="1200" height="450"></canvas>
-  <script>
+                </script>
+    <h2 class="mt-4">{% translate 'Hours per week' %}</h2>
+    <canvas id="hours-per-week" width="1200" height="450"></canvas>
+    <script>
       new Chart("hours-per-week", {
         type: "bar",
         data: {
@@ -62,10 +62,10 @@
           },
         },
       })
-      </script>
-<h2 class="mt-4">{% translate 'Hours per customer' %}</h2>
-<canvas id="hours-per-customer" width="1200" height="600"></canvas>
-<script>
+        </script>
+  <h2 class="mt-4">{% translate 'Hours per customer' %}</h2>
+  <canvas id="hours-per-customer" width="1200" height="600"></canvas>
+  <script>
       new Chart("hours-per-customer", {
         type: "line",
         data: {

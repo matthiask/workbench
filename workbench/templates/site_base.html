@@ -11,8 +11,8 @@
     <link rel="shortcut icon" href="{% static 'workbench/lib/favicon.png' %}">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     {% if SPARKLES %}
-    <script src="{% static 'workbench/lib/sparkles.js' %}"></script>
-    <style>
+      <script src="{% static 'workbench/lib/sparkles.js' %}"></script>
+      <style>
       :root {
         --pink: #cc1e6e;
         --blue: #9954bb;
@@ -36,9 +36,9 @@
       a {
         color: var(--blue);
       }
-            </style>
-{% elif WORKBENCH.SSO_DOMAIN == 'feinheit.ch' and JUN14 %}
-  <style>
+                </style>
+  {% elif WORKBENCH.SSO_DOMAIN == 'feinheit.ch' and JUN14 %}
+    <style>
       :root {
         --green: #6c277d;
         --blue: #6c277d;
@@ -62,9 +62,9 @@
       a {
         color: var(--blue);
       }
-      </style>
+        </style>
 {% elif WORKBENCH.SSO_DOMAIN == 'feinheit.ch' %}
-<style>
+  <style>
       :root {
         --green: #15A45E;
         --blue: #148450;
@@ -104,11 +104,14 @@
 <body class="d-flex flex-column {% if DEBUG %}debug-is-active{% endif %}" role="document">
   {% block body %}
   {% endblock body %}
-<script src="{% static 'workbench/lib/main.js' %}"></script>
-<script src="{% static 'workbench/lib/jquery-ui.min.js' %}"></script>
-<script src="{% static 'workbench/workbench.js' %}"></script>
-<script src="{% static 'workbench/lib/form-request-submit-polyfill.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/npm/date-input-polyfill@2.14.0/date-input-polyfill.dist.js" integrity="sha256-FcR3bJqClBNWiJqgW1E9yEgSRoAqRNcjOfgRfaH0LVw=" crossorigin="anonymous" async></script>
-{% block js %}{% endblock %}
+  <script src="{% static 'workbench/lib/main.js' %}"></script>
+  <script src="{% static 'workbench/lib/jquery-ui.min.js' %}"></script>
+  <script src="{% static 'workbench/workbench.js' %}"></script>
+  <script src="{% static 'workbench/lib/form-request-submit-polyfill.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/date-input-polyfill@2.14.0/date-input-polyfill.dist.js"
+          integrity="sha256-FcR3bJqClBNWiJqgW1E9yEgSRoAqRNcjOfgRfaH0LVw="
+          crossorigin="anonymous"
+          async></script>
+  {% block js %}{% endblock %}
 </body>
 </html>
