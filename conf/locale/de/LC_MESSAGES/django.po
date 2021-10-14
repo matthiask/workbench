@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-06 19:54+0200\n"
+"POT-Creation-Date: 2021-10-14 11:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -595,7 +595,7 @@ msgstr "Andere Gründe (keine Arbeitszeit)"
 msgid "starts on"
 msgstr "startet am"
 
-#: workbench/awt/models.py workbench/invoices/models.py
+#: workbench/awt/models.py
 msgid "ends on"
 msgstr "endet am"
 
@@ -1996,6 +1996,10 @@ msgstr "monatlich"
 #: workbench/invoices/models.py
 msgid "weekly"
 msgstr "wöchentlich"
+
+#: workbench/invoices/models.py
+msgid "cancel the auto-renewal on"
+msgstr "Automatische Verlängerung aufheben am"
 
 #: workbench/invoices/models.py
 msgid "periodicity"
@@ -3732,6 +3736,11 @@ msgid "Gross margin"
 msgstr "Umsatz bereinigt"
 
 #: workbench/templates/reporting/key_data.html
+#: workbench/templates/reporting/key_data_projected_invoices.html
+msgid "Projected"
+msgstr "Geplant"
+
+#: workbench/templates/reporting/key_data.html
 msgid "FTE"
 msgstr "FTE"
 
@@ -3742,10 +3751,6 @@ msgstr "Umsatz / FTE"
 #: workbench/templates/reporting/key_data.html
 msgid "Hours distribution"
 msgstr "Stundenverteilung"
-
-#: workbench/templates/reporting/key_data_projected_invoices.html
-msgid "Projected"
-msgstr "Geplant"
 
 #: workbench/templates/reporting/key_data_projected_invoices.html
 #: workbench/tools/xlsx.py

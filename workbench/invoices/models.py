@@ -567,7 +567,7 @@ class RecurringInvoice(ModelWithTotal):
     postal_address = models.TextField(_("postal address"))
 
     starts_on = models.DateField(_("starts on"), default=dt.date.today)
-    ends_on = models.DateField(_("ends on"), blank=True, null=True)
+    ends_on = models.DateField(_("cancel the auto-renewal on"), blank=True, null=True)
     periodicity = models.CharField(
         _("periodicity"), max_length=20, choices=PERIODICITY_CHOICES
     )

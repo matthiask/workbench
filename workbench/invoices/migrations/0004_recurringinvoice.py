@@ -99,7 +99,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "ends_on",
-                    models.DateField(blank=True, null=True, verbose_name="ends on"),
+                    models.DateField(
+                        blank=True, null=True, verbose_name="cancel the auto-renewal on"
+                    ),
                 ),
                 (
                     "periodicity",
