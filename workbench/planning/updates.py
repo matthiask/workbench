@@ -46,11 +46,12 @@ def updated(*, duration):
     for action in queryset:
         by = users.get(audit_user_id(action.user_name))
         project = projects.get(int(action.row_data["project_id"]))
-        owner = users.get(project.owned_by_id)
 
         # Skip updates by the Wizard (migrations etc.) or where the project is gone
         if not by or not project:
             continue
+
+        owner = users.get(project.owned_by_id)
 
         if action.table_name == "planning_milestone":
             if by.id != project.owned_by_id:

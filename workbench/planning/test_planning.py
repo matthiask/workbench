@@ -348,3 +348,14 @@ class PlanningTest(TestCase):
 
         updates.planning_update_mails()
         self.assertEqual(len(mail.outbox), 2)
+
+    def test_updates_reporting_with_deleted_project(self):
+        """Generating updates should work even when projects have been deleted"""
+        user = factories.UserFactory.create()
+        set_user_name(f"user-{user.pk}-{user.get_short_name()}")
+
+        pw = factories.PlannedWorkFactory.create(weeks=[monday()])
+        pw.project.delete()
+
+        u = updates.updated(duration=dt.timedelta(hours=1))
+        self.assertEqual(dict(u), {})
