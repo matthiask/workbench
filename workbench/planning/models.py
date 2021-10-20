@@ -32,7 +32,7 @@ class PublicHoliday(Model):
         verbose_name_plural = _("public holidays")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({local_date_format(self.date, fmt='l, j.n.')})"
 
 
 @model_urls
@@ -203,4 +203,4 @@ class PlannedWork(AbstractPlannedWork):
         verbose_name_plural = _("planned work")
 
     def __str__(self):
-        return f"{self.title} ({hours(self.planned_hours)})"
+        return f"{self.title} ({hours(self.planned_hours)}, {self.pretty_from_until})"
