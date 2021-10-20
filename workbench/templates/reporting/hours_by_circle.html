@@ -15,9 +15,7 @@
           <tr>
             <th></th>
             <th>{% translate 'category'|capfirst %}</th>
-            {% for user in stats.circles.0.users %}
-              <th class="text-right">{{ user.get_short_name }}</th>
-            {% endfor %}
+            {% for user in stats.circles.0.users %}<th class="text-right">{{ user.get_short_name }}</th>{% endfor %}
             <th class="text-right">{{ stats.total_hours|hours }}</th>
           </tr>
         </thead>
@@ -35,7 +33,9 @@
               {% for user, hours in circle.by_user %}
                 <th class="text-right">
                   {% if hours %}
-                    <a href="{% url 'logbook_loggedhours_list' %}?circle={{ circle.circle.pk|default:0 }}&amp;rendered_by={{ user.pk }}">{{ hours|hours }}</a>
+                    <a href="{% url 'logbook_loggedhours_list' %}?circle={{ circle.circle.pk|default:0 }}&amp;rendered_by={{ user.pk }}">
+                      {{ hours|hours }}
+                    </a>
                   {% else %}
                     -
                   {% endif %}
@@ -48,11 +48,15 @@
                 <td>
                   <a href="https://app.glassfrog.com/roles/{{ role.role.pk }}">{{ role.role.pretty_name }}</a>
                 </td>
-                <td title="{{ role.role.get_work_category_description }}">{{ role.role.get_work_category_display|default:'&ndash;' }}</td>
+                <td title="{{ role.role.get_work_category_description }}">
+                  {{ role.role.get_work_category_display|default:'&ndash;' }}
+                </td>
                 {% for user, hours in role.by_user %}
                   <td class="text-right">
                     {% if hours %}
-                      <a href="{% url 'logbook_loggedhours_list' %}?role={{ role.role.pk }}&amp;rendered_by={{ user.pk }}">{{ hours|hours }}</a>
+                      <a href="{% url 'logbook_loggedhours_list' %}?role={{ role.role.pk }}&amp;rendered_by={{ user.pk }}">
+                        {{ hours|hours }}
+                      </a>
                     {% else %}
                       -
                     {% endif %}

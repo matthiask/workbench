@@ -37,13 +37,19 @@
               <div class="col-auto">
                 <a data-toggle="ajaxmodal"
                    href="{{ object.urls.set_status }}?status={{ object.OPEN }}"
-                   class="btn btn-sm btn-info">{% translate 'open'|capfirst %}</a>
+                   class="btn btn-sm btn-info">
+                  {% translate 'open'|capfirst %}
+                </a>
                 <a data-toggle="ajaxmodal"
                    href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}"
-                   class="btn btn-sm btn-success">{% translate 'accepted'|capfirst %}</a>
+                   class="btn btn-sm btn-success">
+                  {% translate 'accepted'|capfirst %}
+                </a>
                 <a data-toggle="ajaxmodal"
                    href="{{ object.urls.set_status }}?status={{ object.DECLINED }}"
-                   class="btn btn-sm btn-danger">{% translate 'declined'|capfirst %}</a>
+                   class="btn btn-sm btn-danger">
+                  {% translate 'declined'|capfirst %}
+                </a>
               </div>
             </div>
           </td>
@@ -87,7 +93,9 @@
           <td>
             {% for offer in object.get_related_offers %}
               <div class="clearfix mb-2">
-                <form method="post" action="{{ object.urls.remove_offer }}" class="float-right">
+                <form method="post"
+                      action="{{ object.urls.remove_offer }}"
+                      class="float-right">
                   {% csrf_token %}
                   <input type="hidden" name="modal-offer" value="{{ offer.pk }}">
                   <button type="submit"
@@ -106,7 +114,8 @@
       <a href="{{ object.urls.add_offer }}"
          class="btn btn-primary"
          data-toggle="ajaxmodal">{% translate 'Link offer' %}</a>
-      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
+      <a href="{{ object.urls.delete }}"
+         class="btn btn-outline-danger float-right">
         {% translate 'Delete' %}
       </a>
       {% notes object %}

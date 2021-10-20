@@ -1,4 +1,12 @@
-{# <input type="text" name="{{ widget.name }}"{% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}> #}
+{# <input type="text"
+        name="{{ widget.name }}"
+        {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
+        include
+        django
+        forms
+        widgets
+        attrs
+        html> #}
 <div style="float:left">
   {% for feature in widget.features %}
     <label style="float:none;width:auto;{{ feature.style }}">

@@ -18,7 +18,8 @@
           <td class="text-right">{{ organization|label:'groups' }}</td>
           <td>
             {% for group in organization.groups.all %}
-              <a class="inline" href="{% url 'contacts_organization_list' %}?g={{ group.id }}">{{ group }}</a>
+              <a class="inline"
+                 href="{% url 'contacts_organization_list' %}?g={{ group.id }}">{{ group }}</a>
               {% if not forloop.last %},{% endif %}
             {% empty %}&ndash;
             {% endfor %}
@@ -37,29 +38,37 @@
           <td>{{ organization.notes|urlize|linebreaksbr|default:"&ndash;" }}</td>
         </tr>
       </table>
-      <a href="{% url 'contacts_person_create' %}?organization={{ object.pk }}" class="btn btn-primary">
+      <a href="{% url 'contacts_person_create' %}?organization={{ object.pk }}"
+         class="btn btn-primary">
         {% include "svg/plus.svg" %}
         {% translate 'person'|capfirst %}
       </a>
-      <a href="{% url 'projects_project_create' %}?customer={{ object.pk }}" class="btn btn-primary">
+      <a href="{% url 'projects_project_create' %}?customer={{ object.pk }}"
+         class="btn btn-primary">
         {% include "svg/plus.svg" %}
         {% translate 'project'|capfirst %}
       </a>
-      <a href="{% url 'invoices_invoice_create' %}?customer={{ object.pk }}" class="btn btn-primary">
+      <a href="{% url 'invoices_invoice_create' %}?customer={{ object.pk }}"
+         class="btn btn-primary">
         {% include "svg/plus.svg" %}
         {% translate 'invoice'|capfirst %}
       </a>
       {% if request.user.features.DEALS %}
-        <a href="{% url 'deals_deal_create' %}?customer={{ object.pk }}" class="btn btn-primary">
+        <a href="{% url 'deals_deal_create' %}?customer={{ object.pk }}"
+           class="btn btn-primary">
           {% include "svg/plus.svg" %}
           {% translate 'deal'|capfirst %}
         </a>
       {% endif %}
       <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}"
-         class="btn btn-primary">{% translate 'invoices'|capfirst %}</a>
+         class="btn btn-primary">
+        {% translate 'invoices'|capfirst %}
+      </a>
       <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
       <a href="{{ object.urls.delete }}"
-         class="btn btn-outline-danger float-right">{% translate 'Delete or substitute' %}</a>
+         class="btn btn-outline-danger float-right">
+        {% translate 'Delete or substitute' %}
+      </a>
     </div>
   </div>
   <div class="row mt-5">
@@ -111,7 +120,8 @@
         </div>
         <div class="list-group list-group-flush">
           {% for object in organization.recent_projects %}
-            <a class="list-group-item list-group-item-action" href="{{ object.get_absolute_url }}">
+            <a class="list-group-item list-group-item-action"
+               href="{{ object.get_absolute_url }}">
               {{ object|h }}
               {{ object.status_badge }}
             </a>
@@ -131,7 +141,8 @@
           </div>
           <div class="list-group list-group-flush">
             {% for object in organization.recent_invoices %}
-              <a class="list-group-item list-group-item-action" href="{{ object.get_absolute_url }}">
+              <a class="list-group-item list-group-item-action"
+                 href="{{ object.get_absolute_url }}">
                 {{ object|h }}
                 {{ object.status_badge }}
               </a>
@@ -150,7 +161,8 @@
           </div>
           <div class="list-group list-group-flush">
             {% for object in organization.recent_offers %}
-              <a class="list-group-item list-group-item-action" href="{{ object.get_absolute_url }}">
+              <a class="list-group-item list-group-item-action"
+                 href="{{ object.get_absolute_url }}">
                 {{ object|h }}
                 {{ object.status_badge }}
               </a>

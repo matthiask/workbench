@@ -3,7 +3,10 @@
 {% block search-form-buttons %}
   {{ block.super }}
   <span class="btn-group">
-    <a href="{% querystring export='pdf' %}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">PDF</a>
+    <a href="{% querystring export='pdf' %}"
+       class="btn btn-primary"
+       target="_blank"
+       rel="noopener noreferrer">PDF</a>
     <button type="button"
             class="btn btn-primary dropdown-toggle dropdown-toggle-split"
             data-toggle="dropdown"

@@ -13,44 +13,44 @@
       new Chart("hours-per-weekday", {
         type: "bar",
         data: {
-          labels: [{% for row in logged_hours.rendered_hours_per_weekday %}"{{ row.name }}", {% endfor %}],
+          labels: [{% for row in logged_hours.rendered_hours_per_weekday %}"{{ row.name }}",{% endfor %}],
           datasets: [
             {
               label: "{% translate 'Rendered' %}",
-              data: [{% for row in logged_hours.rendered_hours_per_weekday %}{{ row.hours|stringformat:'.1f' }}, {% endfor %}],
+              data: [{% for row in logged_hours.rendered_hours_per_weekday %}{{ row.hours|stringformat:'.1f' }},{% endfor %}],
               backgroundColor: '#2780e3',
             },
             {
               label: "{% translate 'Created' %}",
-              data: [{% for row in logged_hours.created_hours_per_weekday %}{{ row.hours|stringformat:'.1f' }}, {% endfor %}],
+              data: [{% for row in logged_hours.created_hours_per_weekday %}{{ row.hours|stringformat:'.1f' }},{% endfor %}],
               backgroundColor: '#9954bb',
               borderColor: '#9954bb',
             },
           ],
         },
       })
-                </script>
-    <h2 class="mt-4">{% translate 'Hours per week' %}</h2>
-    <canvas id="hours-per-week" width="1200" height="450"></canvas>
-    <script>
+      </script>
+      <h2 class="mt-4">{% translate 'Hours per week' %}</h2>
+      <canvas id="hours-per-week" width="1200" height="450"></canvas>
+      <script>
       new Chart("hours-per-week", {
         type: "bar",
         data: {
-          labels: [{% for row in logged_hours.hours_per_week %}"KW{{ row.week|date:'W' }}", {% endfor %}],
+          labels: [{% for row in logged_hours.hours_per_week %}"KW{{ row.week|date:'W' }}",{% endfor %}],
           datasets: [
             {
               label: "{% translate 'Order' %}",
-              data: [{% for row in logged_hours.hours_per_week %}{{ row.by_type.order|default:0|stringformat:'.1f' }}, {% endfor %}],
+              data: [{% for row in logged_hours.hours_per_week %}{{ row.by_type.order|default:0|stringformat:'.1f' }},{% endfor %}],
               backgroundColor: '#3fb618',
             },
             {
               label: "{% translate 'Maintenance' %}",
-              data: [{% for row in logged_hours.hours_per_week %}{{ row.by_type.maintenance|default:0|stringformat:'.1f' }}, {% endfor %}],
+              data: [{% for row in logged_hours.hours_per_week %}{{ row.by_type.maintenance|default:0|stringformat:'.1f' }},{% endfor %}],
               backgroundColor: '#373a3c',
             },
             {
               label: "{% translate 'Internal' %}",
-              data: [{% for row in logged_hours.hours_per_week %}{{ row.by_type.internal|default:0|stringformat:'.1f' }}, {% endfor %}],
+              data: [{% for row in logged_hours.hours_per_week %}{{ row.by_type.internal|default:0|stringformat:'.1f' }},{% endfor %}],
               backgroundColor: '#9954bb',
             },
           ],
@@ -62,19 +62,19 @@
           },
         },
       })
-        </script>
-  <h2 class="mt-4">{% translate 'Hours per customer' %}</h2>
-  <canvas id="hours-per-customer" width="1200" height="600"></canvas>
-  <script>
+      </script>
+      <h2 class="mt-4">{% translate 'Hours per customer' %}</h2>
+      <canvas id="hours-per-customer" width="1200" height="600"></canvas>
+      <script>
       new Chart("hours-per-customer", {
         type: "line",
         data: {
-          labels: [{% for week in logged_hours.hours_per_customer.weeks %}"KW{{ week|date:'W' }}", {% endfor %}],
+          labels: [{% for week in logged_hours.hours_per_customer.weeks %}"KW{{ week|date:'W' }}",{% endfor %}],
           datasets: [
             {% for customer in logged_hours.hours_per_customer.by_customer %}
             {
               label: "{{ customer.name|escapejs }}",
-              data: [{% for hour in customer.hours %}{{ hour|stringformat:'.1f' }}, {% endfor %}],
+              data: [{% for hour in customer.hours %}{{ hour|stringformat:'.1f' }},{% endfor %}],
               backgroundColor: "{% cycle '#2780e3' '#6610f2' '#613d7c' '#e83e8c' '#ff0039' '#f0ad4e' '#ff7518' '#3fb618' '#20c997' '#9954bb' '#868e96' '#373a3c' '#2780e3' '#373a3c' '#3fb618' '#9954bb' '#ff7518' '#ff0039' '#f8f9fa' '#373a3c' %}",
 
             },
@@ -94,6 +94,6 @@
         },
       })
       </script>
-</div>
-</div>
+    </div>
+  </div>
 {% endblock %}

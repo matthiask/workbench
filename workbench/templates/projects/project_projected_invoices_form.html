@@ -4,7 +4,8 @@
   {% translate 'projected invoices'|capfirst %} - {{ block.super }}
 {% endblock %}
 {% block uplink %}
-  <a href="{{ object.get_absolute_url }}" class="btn btn-primary btn-sm uplink">
+  <a href="{{ object.get_absolute_url }}"
+     class="btn btn-primary btn-sm uplink">
     {% include 'svg/chevron-left.svg' %}
     {% translate 'project' %}
   </a>
@@ -36,7 +37,9 @@
           {% endformset %}
           <a href="#"
              class="btn btn-primary"
-             onclick="return addInlineForm('projected_invoices')">{% include 'svg/plus.svg' %}</a>
+             onclick="return addInlineForm('projected_invoices')">
+            {% include 'svg/plus.svg' %}
+          </a>
         {% endif %}
         <div class="row mt-5">
           <div class="col-sm-12">

@@ -7,7 +7,9 @@
         <h5 class="mb-1">{{ note.created_by }} at {{ note.created_at|local_date_format }}</h5>
         <a href="{{ note.urls.update }}"
            class="btn btn-primary btn-sm align-self-start"
-           data-toggle="ajaxmodal">{% translate 'Update' %}</a>
+           data-toggle="ajaxmodal">
+          {% translate 'Update' %}
+        </a>
       </div>
       <div class="card-body">
         <div class="card-title">
@@ -24,7 +26,9 @@
               class="btn btn-primary btn-sm align-self-start"
               data-target="#note-add-form"
               data-toggle="collapse"
-              aria-expanded="false">{% translate 'Toggle form' %}</button>
+              aria-expanded="false">
+        {% translate 'Toggle form' %}
+      </button>
     </div>
     <div class="card-body collapse" id="note-add-form">
       <form method="POST" action="{% url 'notes_note_add' %}">

@@ -6,13 +6,20 @@
 {% block content %}
   <div class="d-flex w-100 align-items-start justify-content-between">
     <h1 class="absences-title">{% translate 'Absence calendar' %}</h1>
-    <form method="get" class="form-inline form-search mb-3 ml-auto mr-3" data-autosubmit>
+    <form method="get"
+          class="form-inline form-search mb-3 ml-auto mr-3"
+          data-autosubmit>
       {% if form.changed_data %}
-        <a class="btn btn-info" href="." title="{% translate 'Reset the filter form' %}" data-reset-filter>&times;</a>
+        <a class="btn btn-info"
+           href="."
+           title="{% translate 'Reset the filter form' %}"
+           data-reset-filter>&times;</a>
       {% endif %}
       {% ff_fields form %}
     </form>
-    <a href="{% url 'awt_absence_create' %}" class="btn btn-primary" data-toggle="ajaxmodal">
+    <a href="{% url 'awt_absence_create' %}"
+       class="btn btn-primary"
+       data-toggle="ajaxmodal">
       {% include 'svg/plus.svg' %}
       {% translate 'absence'|capfirst %}
     </a>

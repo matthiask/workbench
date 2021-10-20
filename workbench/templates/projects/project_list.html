@@ -22,8 +22,9 @@
             <a href="{{ project.urls.createhours }}" data-toggle="ajaxmodal">+{% translate 'hours'|capfirst %}</a>
           </small>
         </div>
-        <div class="w-third"
-             style="position:absolute;left:0;bottom:5px">{% bar project.analyzed.logged_hours project.analyzed.service_hours %}</div>
+        <div class="w-third" style="position:absolute;left:0;bottom:5px">
+          {% bar project.analyzed.logged_hours project.analyzed.service_hours %}
+        </div>
       </div>
     {% endfor %}
   </div>

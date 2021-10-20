@@ -12,9 +12,13 @@
             {% translate "timestamps"|capfirst %}
             <small>
               {% if is_today %}
-                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}">{{ request.user.hours.today|hours }} {% translate 'today' %}</a>
+                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}">
+                  {{ request.user.hours.today|hours }} {% translate 'today' %}
+                </a>
                 /
-                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{{ request.user.hours.week|hours }} {% translate 'this week' %}</a>
+                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">
+                  {{ request.user.hours.week|hours }} {% translate 'this week' %}
+                </a>
               {% else %}
                 {{ day|local_date_format }} / {{ hours|hours }}
               {% endif %}
@@ -27,19 +31,25 @@
                         disabled
                       {% endif %}"
                title="{% translate 'Previous day' %}"
-               {% if not previous %}aria-disabled="true"{% endif %}>&laquo;</a>
+               {% if not previous %}aria-disabled="true"{% endif %}>
+              &laquo;
+            </a>
             <a href="?day={{ next.isoformat }}"
                class="btn btn-primary btn-sm align-self-start
                       {% if not next %}
                         disabled
                       {% endif %}"
                title="{% translate 'Next day' %}"
-               {% if not next %}aria-disabled="true"{% endif %}>&raquo;</a>
+               {% if not next %}aria-disabled="true"{% endif %}>
+              &raquo;
+            </a>
             <a href="{% url 'timestamps-controller' %}?user={{ request.user.signed_email }}&amp;url={{ url }}&amp;title={{ WORKBENCH.TITLE }}"
                class="btn btn-primary btn-sm align-self-start"
                target="_blank"
                rel="noopener noreferrer"
-               onclick="window.open(this.href, 'timestamps', 'innerHeight=450,innerWidth=400,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no');return false">{% translate 'Controller' %}</a>
+               onclick="window.open(this.href, 'timestamps', 'innerHeight=450,innerWidth=400,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no');return false">
+              {% translate 'Controller' %}
+            </a>
           </div>
         </div>
         <div class="list-group list-group-flush">
@@ -47,9 +57,7 @@
             <div class="list-group-item">
               <div class="d-flex w-100">
                 <div>
-                  <strong>
-                    {{ slice.starts_at|date:'H:i'|default:'?' }} - {{ slice.ends_at|date:'H:i'|default:'?' }}
-                  </strong>
+                  <strong>{{ slice.starts_at|date:'H:i'|default:'?' }} - {{ slice.ends_at|date:'H:i'|default:'?' }}</strong>
                   {% if slice.elapsed_hours %}({{ slice.elapsed_hours|hours:True }}){% endif %}
                   {{ slice.description }}
                   {% if slice.comment %}<em>{{ slice.comment }}</em>{% endif %}
@@ -58,21 +66,29 @@
                   {% if slice.hours_create_url %}
                     <a href="{{ slice.hours_create_url }}"
                        data-toggle="ajaxmodal"
-                       class="btn btn-sm align-self-start btn-primary">{% translate 'hours'|capfirst %}</a>
+                       class="btn btn-sm align-self-start btn-primary">
+                      {% translate 'hours'|capfirst %}
+                    </a>
                   {% endif %}
                   {% if not forloop.first and slice.break_create_url %}
                     <a href="{{ slice.break_create_url }}"
                        data-toggle="ajaxmodal"
-                       class="btn btn-sm align-self-start btn-primary">{% translate 'break'|capfirst %}</a>
+                       class="btn btn-sm align-self-start btn-primary">
+                      {% translate 'break'|capfirst %}
+                    </a>
                   {% endif %}
                   {% if slice.logged_hours %}
                     <a href="{{ slice.logged_hours.get_absolute_url }}"
                        data-toggle="ajaxmodal"
-                       class="btn btn-sm btn-outline-primary">{% translate 'hours'|capfirst %}</a>
+                       class="btn btn-sm btn-outline-primary">
+                      {% translate 'hours'|capfirst %}
+                    </a>
                   {% elif slice.logged_break %}
                     <a href="{{ slice.logged_break.get_absolute_url }}"
                        data-toggle="ajaxmodal"
-                       class="btn btn-sm btn-outline-primary">{% translate 'break'|capfirst %}</a>
+                       class="btn btn-sm btn-outline-primary">
+                      {% translate 'break'|capfirst %}
+                    </a>
                   {% elif slice.timestamp_id %}
                     <form class="d-inline"
                           method="post"

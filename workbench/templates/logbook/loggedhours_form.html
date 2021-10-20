@@ -11,7 +11,10 @@
   {% include 'fineforms/warnings.html' %}
   {% ff_errors form %}
   {% if form.service_title %}
-    <div class="{% if form.hide_new_service %}d-none{% endif %}" id="new-service">
+    <div class="{% if form.hide_new_service %}
+                  d-none
+                {% endif %}"
+         id="new-service">
       <h5>{% translate 'new service' %}</h5>
       {% ff_field form.service_title %}
       {% ff_field form.service_description %}
@@ -22,21 +25,23 @@
         {% ff_field form.service_type %}
       {% endif %}
       <hr>
-      </div>
-    {% endif %}
-    <div class="form-row">
-      <div class="col-6">{% ff_field form.rendered_by %}</div>
-      <div class="col-6">{% ff_field form.rendered_on %}</div>
     </div>
-    {% ff_field form.service %}
-    {% ff_field form.hours %}
-    {% ff_field form.description %}
-  {% endblock %}
-  {% block footer %}
-    {% if form.service_title and form.hide_new_service %}
-      <button type="button"
-              class="btn btn-primary mr-auto"
-              onclick="_cl(this, 'invisible', true);_cl(_sel('#new-service'), 'd-none', false);_sel('#id_modal-service').value=''">{% translate 'new service' %}</button>
-    {% endif %}
-    <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
-  {% endblock %}
+  {% endif %}
+  <div class="form-row">
+    <div class="col-6">{% ff_field form.rendered_by %}</div>
+    <div class="col-6">{% ff_field form.rendered_on %}</div>
+  </div>
+  {% ff_field form.service %}
+  {% ff_field form.hours %}
+  {% ff_field form.description %}
+{% endblock %}
+{% block footer %}
+  {% if form.service_title and form.hide_new_service %}
+    <button type="button"
+            class="btn btn-primary mr-auto"
+            onclick="_cl(this, 'invisible', true);_cl(_sel('#new-service'), 'd-none', false);_sel('#id_modal-service').value=''">
+      {% translate 'new service' %}
+    </button>
+  {% endif %}
+  <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
+{% endblock %}

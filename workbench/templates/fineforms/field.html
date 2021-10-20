@@ -10,9 +10,7 @@
           {% endfor %}
         </div>
       {% endif %}
-      {% if field.field.help_text %}
-        <small class="form-text text-muted">{{ field.field.help_text }}</small>
-      {% endif %}
+      {% if field.field.help_text %}<small class="form-text text-muted">{{ field.field.help_text }}</small>{% endif %}
     </div>
   {% else %}
     {% if field.label %}{{ label_tag }}{% endif %}

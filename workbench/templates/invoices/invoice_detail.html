@@ -126,7 +126,10 @@
         </tr>
       </table>
       <span class="btn-group">
-        <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+        <a href="{{ object.urls.pdf }}"
+           class="btn btn-primary"
+           target="_blank"
+           rel="noopener noreferrer">
           PDF
         </a>
         <button type="button"
@@ -139,7 +142,8 @@
           </span>
         </button>
         <div class="dropdown-menu dropdown-menu-right">
-          <a class="dropdown-item" href="{{ object.urls.pdf }}?disposition=attachment">
+          <a class="dropdown-item"
+             href="{{ object.urls.pdf }}?disposition=attachment">
             {% translate 'Download' %}
           </a>
         </div>
@@ -152,7 +156,8 @@
       <a href="{{ object.urls.update }}" class="btn btn-primary">
         {% translate 'Update' %}
       </a>
-      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
+      <a href="{{ object.urls.delete }}"
+         class="btn btn-outline-danger float-right">
         {% translate 'Delete' %}
       </a>
       {% notes object %}

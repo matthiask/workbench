@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 {% load fineforms i18n workbench %}
-{% block title %}
-  {{ view.meta.verbose_name_plural|capfirst }} - {{ block.super }}
-{% endblock %}
+{% block title %}{{ view.meta.verbose_name_plural|capfirst }} - {{ block.super }}{% endblock %}
 {% block content %}
   <div class="row">
     <div class="col-sm-12">
@@ -10,10 +8,15 @@
         {% block content-title %}
           <h1>
             <a class="text-reset text-decoration-none"
-               href="{{ view.model.urls.list }}">{{ view.meta.verbose_name_plural|capfirst }}</a>
+               href="{{ view.model.urls.list }}">
+              {{ view.meta.verbose_name_plural|capfirst }}
+            </a>
           </h1>
         {% endblock %}
-        <form method="GET" action="." class="form-inline form-search mb-3 mb-lg-0" data-autosubmit>
+        <form method="GET"
+              action="."
+              class="form-inline form-search mb-3 mb-lg-0"
+              data-autosubmit>
           {% if view.search_form.changed_data %}
             <a class="btn btn-info"
                href="."
@@ -38,7 +41,8 @@
       </div>
       {% block objects %}
         {% for object in object_list %}
-          <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action">
+          <a href="{{ object.get_absolute_url }}"
+             class="list-group-item list-group-item-action">
             <div class="d-flex w-100 justify-content-between">
               <h5 class="mb-1">{{ object|h }}</h5>
               {{ object.status_badge }}
@@ -51,7 +55,8 @@
           <ul class="pagination align-items-center">
             {% if page_obj.has_previous %}
               <li class="page-item">
-                <a class="page-link" href="{% querystring page=page_obj.previous_page_number %}">&laquo;</a>
+                <a class="page-link"
+                   href="{% querystring page=page_obj.previous_page_number %}">&laquo;</a>
               </li>
             {% else %}
               <li class="page-item disabled">
@@ -66,7 +71,8 @@
             {% endfor %}
             {% if page_obj.has_next %}
               <li class="page-item">
-                <a class="page-link" href="{% querystring page=page_obj.next_page_number %}">&raquo;</a>
+                <a class="page-link"
+                   href="{% querystring page=page_obj.next_page_number %}">&raquo;</a>
               </li>
             {% else %}
               <li class="page-item disabled">

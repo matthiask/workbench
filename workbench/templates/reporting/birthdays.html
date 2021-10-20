@@ -22,25 +22,25 @@
                 <tr>
                   <td colspan="4">
                     <hr>
-                    </td>
-                  </tr>
-                {% endif %}
-              {% endifchanged %}
-              <tr>
-                <td>{% link_or_none birthday.user %}</td>
-                <td class="text-right">{{ birthday.user.person.date_of_birth|local_date_format }}</td>
-                <td class="text-right">{{ birthday.age }}</td>
-              </tr>
-            {% endfor %}
-            {% for user in birthdays.users_without_birthdays %}
-              <tr>
-                <td>{% link_or_none user %}</td>
-                <td class="text-right">?</td>
-                <td class="text-right">?</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+                  </td>
+                </tr>
+              {% endif %}
+            {% endifchanged %}
+            <tr>
+              <td>{% link_or_none birthday.user %}</td>
+              <td class="text-right">{{ birthday.user.person.date_of_birth|local_date_format }}</td>
+              <td class="text-right">{{ birthday.age }}</td>
+            </tr>
+          {% endfor %}
+          {% for user in birthdays.users_without_birthdays %}
+            <tr>
+              <td>{% link_or_none user %}</td>
+              <td class="text-right">?</td>
+              <td class="text-right">?</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-  {% endblock %}
+  </div>
+{% endblock %}

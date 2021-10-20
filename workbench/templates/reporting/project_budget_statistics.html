@@ -58,14 +58,17 @@
                          {% endif %}">
                 {{ project.logbook|currency }}
                 {% if project.effort_hours_with_rate_undefined %}
-                  <span class="text-warning"
-                        title="{% translate 'undefined rate' %}">(+{{ project.effort_hours_with_rate_undefined|hours }})</span>
+                  <span class="text-warning" title="{% translate 'undefined rate' %}">
+                    (+{{ project.effort_hours_with_rate_undefined|hours }})
+                  </span>
                 {% endif %}
               </td>
               <td class="text-right
                          {% if not project.third_party_costs %}
                            text-black-30
-                         {% endif %}">{{ project.third_party_costs|currency }}</td>
+                         {% endif %}">
+                {{ project.third_party_costs|currency }}
+              </td>
               <td class="text-right
                          {% if not project.invoiced %}
                            text-black-30
@@ -74,10 +77,7 @@
                 {{ project.not_archived|hours }} / {{ project.hours|hours }}
                 {% pie project.not_archived project.hours %}
               </td>
-              <td class="text-right
-                         {% if not project.delta %}
-                           text-black-30
-                         {% endif %}">{{ project.delta|currency:True }}</td>
+              <td class="text-right {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
             </tr>
           {% endfor %}
         </tbody>

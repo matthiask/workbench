@@ -4,7 +4,8 @@
   {% translate 'planning'|capfirst %} - {{ block.super }}
 {% endblock %}
 {% block uplink %}
-  <a href="{% url 'projects_project_planning' object.pk %}" class="btn btn-primary btn-sm uplink">
+  <a href="{% url 'projects_project_planning' object.pk %}"
+     class="btn btn-primary btn-sm uplink">
     {% include 'svg/chevron-left.svg' %}
     {% translate 'back to project planning' %}
   </a>

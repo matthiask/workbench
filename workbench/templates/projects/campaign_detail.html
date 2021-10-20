@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 {% load i18n workbench %}
-{% block title %}
-  {{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}
-{% endblock %}
+{% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-md-12">
@@ -64,15 +62,18 @@
                                    {% endif %}">
                           {{ project.logbook|currency }}
                           {% if project.effort_hours_with_rate_undefined %}
-                            <span class="text-warning"
-                                  title="{% translate 'undefined rate' %}">(+{{ project.effort_hours_with_rate_undefined|hours }})</span>
+                            <span class="text-warning" title="{% translate 'undefined rate' %}">
+                              (+{{ project.effort_hours_with_rate_undefined|hours }})
+                            </span>
                           {% endif %}
                           {% bar project.logbook project.offered %}
                         </td>
                         <td class="text-right
                                    {% if not project.third_party_costs %}
                                      text-black-30
-                                   {% endif %}">{{ project.third_party_costs|currency }}</td>
+                                   {% endif %}">
+                          {{ project.third_party_costs|currency }}
+                        </td>
                         <td class="text-right
                                    {% if not project.invoiced %}
                                      text-black-30
@@ -81,10 +82,7 @@
                           {{ project.not_archived|hours }} / {{ project.hours|hours }}
                           {% pie project.not_archived project.hours %}
                         </td>
-                        <td class="text-right
-                                   {% if not project.delta %}
-                                     text-black-30
-                                   {% endif %}">{{ project.delta|currency:True }}</td>
+                        <td class="text-right {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
                       </tr>
                     {% endfor %}
                   </tbody>
@@ -100,17 +98,24 @@
           </td>
         </tr>
       </table>
-      <a href="{% url 'projects_project_create' %}?campaign={{ object.pk }}" class="btn btn-primary">
+      <a href="{% url 'projects_project_create' %}?campaign={{ object.pk }}"
+         class="btn btn-primary">
         {% include "svg/plus.svg" %}
         {% translate 'project'|capfirst %}
       </a>
       <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
-      <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-primary">{% translate 'Copy' %}</a>
+      <a href="{{ object.urls.create }}?copy={{ object.pk }}"
+         class="btn btn-primary">{% translate 'Copy' %}</a>
       <a href="{% url 'logbook_loggedhours_list' %}?campaign={{ object.pk }}"
-         class="btn btn-primary">{% translate 'logged hours'|capfirst %}</a>
+         class="btn btn-primary">
+        {% translate 'logged hours'|capfirst %}
+      </a>
       <a href="{% url 'logbook_loggedcost_list' %}?campaign={{ object.pk }}"
-         class="btn btn-primary">{% translate 'logged cost'|capfirst %}</a>
-      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">
+         class="btn btn-primary">
+        {% translate 'logged cost'|capfirst %}
+      </a>
+      <a href="{{ object.urls.delete }}"
+         class="btn btn-outline-danger float-right">
         {% translate 'Delete' %}
       </a>
     </div>

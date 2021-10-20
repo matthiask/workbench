@@ -22,10 +22,10 @@
               <td>
                 {% link_or_none row.organization %}
                 <br>
-                <form method="post" action="{% url 'invoices_dunning_letter' customer_id=row.organization.id %}">
+                <form method="post"
+                      action="{% url 'invoices_dunning_letter' customer_id=row.organization.id %}">
                   {% csrf_token %}
-                  <button type="submit"
-                          class="btn btn-sm btn-primary">{% translate 'Generate a dunning letter' %} (PDF)</button>
+                  <button type="submit" class="btn btn-sm btn-primary">{% translate 'Generate a dunning letter' %} (PDF)</button>
                 </form>
               </td>
               <td>

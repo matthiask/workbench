@@ -1,7 +1,9 @@
 {% extends "generic/object_list.html" %}
 {% load bootstrap4 i18n workbench %}
 {% block search-form-buttons %}
-  <a href="{{ view.model.urls.create }}" class="btn btn-primary" data-toggle="ajaxmodal">
+  <a href="{{ view.model.urls.create }}"
+     class="btn btn-primary"
+     data-toggle="ajaxmodal">
     {% include "svg/plus.svg" %}
     {{ view.meta.verbose_name|capfirst }}
   </a>

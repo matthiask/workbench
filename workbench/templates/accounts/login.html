@@ -15,7 +15,9 @@
           <div class="card-body">
             <div class="card-text">
               <a href="{% url 'accounts_oauth2' %}{{ auth_params }}"
-                 class="btn btn-primary">{{ auth_button|default:_("Sign in") }}</a>
+                 class="btn btn-primary">
+                {{ auth_button|default:_("Sign in") }}
+              </a>
             </div>
           </div>
         </div>

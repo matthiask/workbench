@@ -29,15 +29,11 @@
           <th>{% translate 'Open offers total excl. tax' %}</th>
         </tr>
         <tr>
-          <td class="text-right">
-            {{ average_employment_duration.current_users|stringformat:'.2f' }} {% translate 'years' %}
-          </td>
+          <td class="text-right">{{ average_employment_duration.current_users|stringformat:'.2f' }} {% translate 'years' %}</td>
           <th>{% translate 'Average employment duration of current users' %}</th>
         </tr>
         <tr>
-          <td class="text-right">
-            {{ average_employment_duration.all_users|stringformat:'.2f' }} {% translate 'years' %}
-          </td>
+          <td class="text-right">{{ average_employment_duration.all_users|stringformat:'.2f' }} {% translate 'years' %}</td>
           <th>{% translate 'Average employment duration of all users' %}</th>
         </tr>
       </table>
@@ -53,7 +49,7 @@
           {% for year, month_data in invoiced_corrected %}
           {
             label: "{{ year }}",
-            data: [{% for value in month_data %}{{ value|stringformat:"d" }}, {% endfor %}],
+            data: [{% for value in month_data %}{{ value|stringformat:"d" }},{% endfor %}],
             backgroundColor: "{% cycle 'rgba(30, 0, 100, 0.3)' 'rgba(100, 30, 50, 0.3)' 'rgba(0, 150, 0, 0.3)' 'rgba(0, 0, 150, 0.3)' %}",
             borderColor: "{% cycle 'rgba(30, 0, 100, 0.3)' 'rgba(100, 30, 50, 0.4)' 'rgba(0, 150, 0, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
             type: "{% cycle 'line' 'line' 'line' 'bar' %}",
@@ -62,7 +58,7 @@
           {% endfor %}
           {
             label: "{% translate 'projected invoices'|capfirst %}",
-            data: [{% for pi in projected_invoices %}{{ pi|stringformat:'d' }}, {% endfor %}],
+            data: [{% for pi in projected_invoices %}{{ pi|stringformat:'d' }},{% endfor %}],
             backgroundColor: "rgba(100, 180, 180, 0.4)",
             borderColor: "rgba(100, 180, 180, 0.6)",
             type: "bar",
@@ -86,105 +82,110 @@
         },
       }
     });
-                </script>
-    <table class="table table-hover">
-      <thead class="sticky">
-        <tr>
-          <th>{% translate 'month'|capfirst %}</th>
-          <th class="text-right">{% translate 'Gross profit' %}</th>
-          <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
-          <th class="text-right">{% translate 'accruals'|capfirst %}</th>
-          <th class="text-right"></th>
-          <th class="text-right">{% translate 'Gross margin' %}</th>
-          <th class="text-right">
-            <a href="projected-invoices/" data-toggle="ajaxmodal">{% translate 'Projected' %}</a>
-          </th>
-          <th class="text-right">{% translate 'FTE' %}</th>
-          <th class="text-right">{% translate 'Margin / FTE' %}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for year in gross_margin_by_years reversed %}
+      </script>
+      <table class="table table-hover">
+        <thead class="sticky">
           <tr>
-            <th>{{ year.year }}</th>
-            <th class="text-right">{{ year.gross_profit|currency }}</th>
-            <th class="text-right">{{ year.third_party_costs|currency }}</th>
-            <th></th>
+            <th>{% translate 'month'|capfirst %}</th>
+            <th class="text-right">{% translate 'Gross profit' %}</th>
+            <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
+            <th class="text-right">{% translate 'accruals'|capfirst %}</th>
+            <th class="text-right"></th>
+            <th class="text-right">{% translate 'Gross margin' %}</th>
             <th class="text-right">
-              {{ year.accruals|currency }}
+              <a href="projected-invoices/" data-toggle="ajaxmodal">{% translate 'Projected' %}</a>
             </th>
-            <th class="text-right">
-              {{ year.gross_margin|currency }}
-            </th>
-            <th class="text-right">
-            </th>
-            <th class="text-right">
-              {{ year.fte|stringformat:'.1f' }}
-            </th>
-            <th class="text-right">
-              {{ year.margin_per_fte|currency }}
-            </th>
+            <th class="text-right">{% translate 'FTE' %}</th>
+            <th class="text-right">{% translate 'Margin / FTE' %}</th>
           </tr>
-          {% for month in year.months reversed %}
+        </thead>
+        <tbody>
+          {% for year in gross_margin_by_years reversed %}
             <tr>
-              <td>
-                {{ month.date|date:'F' }}
-              </td>
-              <td class="text-right">
-                <a href="gross-profit/{{ month.date|date:'Y.m' }}/"
-                  data-toggle="ajaxmodal">
-                  {{ month.gross_profit|currency }}
-                </a>
-              </td>
-              <td class="text-right">
-                <a href="third-party-costs/{{ month.date|date:'Y.m' }}/"
-                  data-toggle="ajaxmodal">
-                  {{ month.third_party_costs|currency:1 }}
-                </a>
-              </td>
-              <td class="text-right text-muted">
-                {{ month.accruals.accrual|currency }}
-              </td>
-              <td class="text-right">
-                {{ month.accruals.delta|currency:1 }}
-              </td>
-              <td class="text-right">
-                {{ month.gross_margin|currency }}
-              </td>
-              <td class="text-right text-muted">
-                {% if month.projected_invoices %}
-                  <a href="projected-invoices/" data-toggle="ajaxmodal">
-                    {{ month.projected_invoices|currency:1 }}
-                  </a>
-                {% endif %}
-              </td>
-              <td class="text-right">
-                {{ month.fte|stringformat:'.1f' }}
-              </td>
-              <td class="text-right">
-                {{ month.margin_per_fte|currency }}
-              </td>
+              <th>{{ year.year }}</th>
+              <th class="text-right">
+                {{ year.gross_profit|currency }}
+              </th>
+              <th class="text-right">
+                {{ year.third_party_costs|currency }}
+              </th>
+              <th>
+              </th>
+              <th class="text-right">
+                {{ year.accruals|currency }}
+              </th>
+              <th class="text-right">
+                {{ year.gross_margin|currency }}
+              </th>
+              <th class="text-right">
+              </th>
+              <th class="text-right">
+                {{ year.fte|stringformat:'.1f' }}
+              </th>
+              <th class="text-right">
+                {{ year.margin_per_fte|currency }}
+              </th>
             </tr>
+            {% for month in year.months reversed %}
+              <tr>
+                <td>
+                  {{ month.date|date:'F' }}
+                </td>
+                <td class="text-right">
+                  <a href="gross-profit/{{ month.date|date:'Y.m' }}/"
+                     data-toggle="ajaxmodal">
+                    {{ month.gross_profit|currency }}
+                  </a>
+                </td>
+                <td class="text-right">
+                  <a href="third-party-costs/{{ month.date|date:'Y.m' }}/"
+                     data-toggle="ajaxmodal">
+                    {{ month.third_party_costs|currency:1 }}
+                  </a>
+                </td>
+                <td class="text-right text-muted">
+                  {{ month.accruals.accrual|currency }}
+                </td>
+                <td class="text-right">
+                  {{ month.accruals.delta|currency:1 }}
+                </td>
+                <td class="text-right">
+                  {{ month.gross_margin|currency }}
+                </td>
+                <td class="text-right text-muted">
+                  {% if month.projected_invoices %}
+                    <a href="projected-invoices/" data-toggle="ajaxmodal">
+                      {{ month.projected_invoices|currency:1 }}
+                    </a>
+                  {% endif %}
+                </td>
+                <td class="text-right">
+                  {{ month.fte|stringformat:'.1f' }}
+                </td>
+                <td class="text-right">
+                  {{ month.margin_per_fte|currency }}
+                </td>
+              </tr>
+            {% endfor %}
+            {# months #}
           {% endfor %}
-          {# months #}
-        {% endfor %}
-        {# years #}
-      </tbody>
-    </table>
-    <h2 class="mt-5">
-      {% translate 'Hours distribution' %}
-    </h2>
-    <canvas id="hours-distribution" width="1200" height="450"></canvas>
-    <script>
+          {# years #}
+        </tbody>
+      </table>
+      <h2 class="mt-5">
+        {% translate 'Hours distribution' %}
+      </h2>
+      <canvas id="hours-distribution" width="1200" height="450"></canvas>
+      <script>
     new Chart("hours-distribution", {
       type: "bar",
       data: {
-        labels: [{% for label in hours_distribution.labels %}"{{ label }}", {% endfor %}],
+        labels: [{% for label in hours_distribution.labels %}"{{ label }}",{% endfor %}],
         datasets: [
           {% for dataset in hours_distribution.datasets %}
           {
             label: "{{ dataset.label }}",
-            data: [{% for value in dataset.data %}{{ value|stringformat:".2f" }}, {% endfor %}],
+            data: [{% for value in dataset.data %}{{ value|stringformat:".2f" }},{% endfor %}],
             backgroundColor: "{% cycle 'rgba(0, 150, 0, 0.4)' 'rgba(150, 50, 30, 0.4)' 'rgba(50, 40, 30, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
           },
           {% endfor %}
@@ -197,109 +198,109 @@
         },
       },
     });
-        </script>
-  <table class="table">
-    <thead class="sticky">
-      <tr>
-        <th>
-          {% translate 'month' %}
-        </th>
-        <th class="text-right">
-          {% translate 'profitable' %}
-        </th>
-        <th>
-        </th>
-        <th class="text-right">
-          {% translate 'overdrawn' %}
-        </th>
-        <th>
-        </th>
-        <th class="text-right">
-          {% translate 'maintenance' %}
-        </th>
-        <th>
-        </th>
-        <th class="text-right">
-          {% translate 'internal' %}
-        </th>
-        <th>
-        </th>
-        <th class="text-right">
-          {% translate 'green' %}
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for year, year_stats, months in green_hours reversed %}
-        <tr>
-          <th>
-            {{ year }}
-          </th>
-          <th class="text-right">
-            {{ year_stats.green|hours }}
-          </th>
-          <th>
-            {% percentage year_stats.green year_stats.total %}
-          </th>
-          <th class="text-right">
-            {{ year_stats.red|hours }}
-          </th>
-          <th>
-            {% percentage year_stats.red year_stats.total %}
-          </th>
-          <th class="text-right">
-            {{ year_stats.maintenance|hours }}
-          </th>
-          <th>
-            {% percentage year_stats.maintenance year_stats.total %}
-          </th>
-          <th class="text-right">
-            {{ year_stats.internal|hours }}
-          </th>
-          <th>
-            {% percentage year_stats.internal year_stats.total %}
-          </th>
-          <th class="text-right">
-            {{ year_stats.percentage }}%
-          </th>
-        </tr>
-        {% for month in months reversed %}
+      </script>
+      <table class="table">
+        <thead class="sticky">
           <tr>
-            <td>
-              {{ month.month|date:'F' }}
-            </td>
-            <td class="text-right">
-              {{ month.green|hours }}
-            </td>
             <th>
-              {% percentage month.green month.total %}
+              {% translate 'month' %}
             </th>
-            <td class="text-right">
-              {{ month.red|hours }}
-            </td>
+            <th class="text-right">
+              {% translate 'profitable' %}
+            </th>
             <th>
-              {% percentage month.red month.total %}
             </th>
-            <td class="text-right">
-              {{ month.maintenance|hours }}
-            </td>
+            <th class="text-right">
+              {% translate 'overdrawn' %}
+            </th>
             <th>
-              {% percentage month.maintenance month.total %}
             </th>
-            <td class="text-right">
-              {{ month.internal|hours }}
-            </td>
+            <th class="text-right">
+              {% translate 'maintenance' %}
+            </th>
             <th>
-              {% percentage month.internal month.total %}
             </th>
-            <td class="text-right">
-              {{ month.percentage|stringformat:'d' }}%
-            </td>
+            <th class="text-right">
+              {% translate 'internal' %}
+            </th>
+            <th>
+            </th>
+            <th class="text-right">
+              {% translate 'green' %}
+            </th>
           </tr>
-        {% endfor %}
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-</div>
+        </thead>
+        <tbody>
+          {% for year, year_stats, months in green_hours reversed %}
+            <tr>
+              <th>
+                {{ year }}
+              </th>
+              <th class="text-right">
+                {{ year_stats.green|hours }}
+              </th>
+              <th>
+                {% percentage year_stats.green year_stats.total %}
+              </th>
+              <th class="text-right">
+                {{ year_stats.red|hours }}
+              </th>
+              <th>
+                {% percentage year_stats.red year_stats.total %}
+              </th>
+              <th class="text-right">
+                {{ year_stats.maintenance|hours }}
+              </th>
+              <th>
+                {% percentage year_stats.maintenance year_stats.total %}
+              </th>
+              <th class="text-right">
+                {{ year_stats.internal|hours }}
+              </th>
+              <th>
+                {% percentage year_stats.internal year_stats.total %}
+              </th>
+              <th class="text-right">
+                {{ year_stats.percentage }}%
+              </th>
+            </tr>
+            {% for month in months reversed %}
+              <tr>
+                <td>
+                  {{ month.month|date:'F' }}
+                </td>
+                <td class="text-right">
+                  {{ month.green|hours }}
+                </td>
+                <th>
+                  {% percentage month.green month.total %}
+                </th>
+                <td class="text-right">
+                  {{ month.red|hours }}
+                </td>
+                <th>
+                  {% percentage month.red month.total %}
+                </th>
+                <td class="text-right">
+                  {{ month.maintenance|hours }}
+                </td>
+                <th>
+                  {% percentage month.maintenance month.total %}
+                </th>
+                <td class="text-right">
+                  {{ month.internal|hours }}
+                </td>
+                <th>
+                  {% percentage month.internal month.total %}
+                </th>
+                <td class="text-right">
+                  {{ month.percentage|stringformat:'d' }}%
+                </td>
+              </tr>
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 {% endblock %}

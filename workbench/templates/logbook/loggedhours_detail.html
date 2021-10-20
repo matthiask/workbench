@@ -19,7 +19,9 @@
         <th class="text-right">{% translate 'role'|capfirst %}</th>
         <td>
           {{ object.service.role|default:'&ndash;' }}
-          <a href="{{ object.service.urls.update }}" data-toggle="ajaxmodal" class="inline">
+          <a href="{{ object.service.urls.update }}"
+             data-toggle="ajaxmodal"
+             class="inline">
             <small>({% trans 'update' %})</small>
           </a>
           <br>
@@ -69,11 +71,17 @@
   </table>
 {% endblock %}
 {% block footer %}
-  <a href="{{ object.urls.update }}" class="btn btn-primary" data-toggle="ajaxmodal">{% translate 'Update' %}</a>
-  <a href="{{ object.urls.move }}" class="btn btn-primary" data-toggle="ajaxmodal">{% translate 'Move' %}</a>
+  <a href="{{ object.urls.update }}"
+     class="btn btn-primary"
+     data-toggle="ajaxmodal">{% translate 'Update' %}</a>
+  <a href="{{ object.urls.move }}"
+     class="btn btn-primary"
+     data-toggle="ajaxmodal">{% translate 'Move' %}</a>
   <a href="{{ object.service.project.urls.createhours }}?copy={{ object.pk }}"
      class="btn btn-primary mr-auto"
-     data-toggle="ajaxmodal">{% translate 'Copy' %}</a>
+     data-toggle="ajaxmodal">
+    {% translate 'Copy' %}
+  </a>
   <a href="{{ object.urls.delete }}"
      class="btn btn-outline-danger"
      data-toggle="ajaxmodal">{% translate 'Delete' %}</a>

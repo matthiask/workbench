@@ -8,7 +8,11 @@
         <ul class="nav nav-tabs my-3">
           {% for y in years %}
             <li class="nav-item">
-              <a class="nav-link {% if y == year %}active{% endif %}" href="{% querystring year=y %}">{{ y }}</a>
+              <a class="nav-link
+                        {% if y == year %}
+                          active
+                        {% endif %}"
+                 href="{% querystring year=y %}">{{ y }}</a>
             </li>
           {% endfor %}
           {% if request.user.features.CONTROLLING %}
@@ -109,7 +113,10 @@
                   {% endif %}
                 </td>
               {% endfor %}
-              <th class="text-right {% if totals.vacation_days_override %}text-black-30{% endif %}">
+              <th class="text-right
+                         {% if totals.vacation_days_override %}
+                           text-black-30
+                         {% endif %}">
                 {{ totals.calculated_vacation_days|days }}
               </th>
             </tr>

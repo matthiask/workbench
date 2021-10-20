@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 {% load i18n workbench %}
-{% block title %}
-  {{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}
-{% endblock %}
+{% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
 {% block content %}
   <div class="row">
     <div class="col-md-6 offset-md-3">
@@ -33,8 +31,11 @@
         {% translate 'Retrospective' %}
       </a>
       <a href="{% url 'awt_absence_calendar' %}?team={{ object.pk }}"
-         class="btn btn-primary">{% translate 'Absence calendar' %}</a>
-      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-right">{% translate 'Delete' %}</a>
+         class="btn btn-primary">
+        {% translate 'Absence calendar' %}
+      </a>
+      <a href="{{ object.urls.delete }}"
+         class="btn btn-outline-danger float-right">{% translate 'Delete' %}</a>
     </div>
   </div>
 {% endblock %}

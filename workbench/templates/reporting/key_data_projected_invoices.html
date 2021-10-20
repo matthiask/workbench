@@ -12,16 +12,12 @@
       <th class="text-nowrap text-right">{% translate 'gross margin'|capfirst %}</th>
       <th class="text-nowrap text-right">{% translate 'Delta' %}</th>
       <th>&nbsp; &nbsp; &nbsp;</th>
-      {% for m in months %}
-        <th class="text-nowrap text-right">{{ m|date:'M y' }}</th>
-      {% endfor %}
+      {% for m in months %}<th class="text-nowrap text-right">{{ m|date:'M y' }}</th>{% endfor %}
     </tr>
     <tr>
       <th class="w-100" colspan="4">{% translate 'Total' %}</th>
       <th>&nbsp;</th>
-      {% for mo in monthly_overall %}
-        <th class="text-nowrap text-right">{{ mo|currency }}</th>
-      {% endfor %}
+      {% for mo in monthly_overall %}<th class="text-nowrap text-right">{{ mo|currency }}</th>{% endfor %}
     </tr>
     {% for project in projects %}
       <tr>

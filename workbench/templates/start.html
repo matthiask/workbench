@@ -104,11 +104,17 @@
         <div class="card-header">
           <h3 class="my-0">
             <a class="d-block"
-               href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{% translate "today's hours"|capfirst %}</a>
+               href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">
+              {% translate "today's hours"|capfirst %}
+            </a>
             <small>
-              <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}">{{ request.user.hours.today|hours }} {% translate 'today' %}</a>
+              <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}">
+                {{ request.user.hours.today|hours }} {% translate 'today' %}
+              </a>
               /
-              <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">{{ request.user.hours.week|hours }} {% translate 'this week' %}</a>
+              <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">
+                {{ request.user.hours.week|hours }} {% translate 'this week' %}
+              </a>
               /
               <a href="{% url 'timestamps' %}">{% translate 'timestamps'|capfirst %}</a>
             </small>

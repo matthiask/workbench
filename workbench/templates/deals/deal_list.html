@@ -18,7 +18,8 @@
           </div>
           <div class="list-group list-group-flush">
             {% for object in group.deals %}
-              <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action">
+              <a href="{{ object.get_absolute_url }}"
+                 class="list-group-item list-group-item-action">
                 <div class="d-flex w-100 justify-content-between">
                   <h5 class="mb-1">{{ object|h }}</h5>
                   {{ object.status_badge }}

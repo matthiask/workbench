@@ -48,9 +48,7 @@
             </th>
           </tr>
           <tr>
-            <th>
-              {% translate 'target'|capfirst %} ({{ stats.weeks|stringformat:'.1f' }} {% translate 'weeks' %})
-            </th>
+            <th>{% translate 'target'|capfirst %} ({{ stats.weeks|stringformat:'.1f' }} {% translate 'weeks' %})</th>
             {% for row in stats.by_valuetype %}
               <th class="text-right">{{ row.target|currency }}</th>
               <th></th>
@@ -73,9 +71,12 @@
           {% for row in stats.by_user %}
             <tr>
               <td>
-                <a href="deals/{% querystring user=row.user.id %}" data-toggle="ajaxmodal">{{ row.user }}</a>
+                <a href="deals/{% querystring user=row.user.id %}"
+                   data-toggle="ajaxmodal">{{ row.user }}</a>
               </td>
-              <td class="text-right">{{ row.count }}</td>
+              <td class="text-right">
+                {{ row.count }}
+              </td>
               <td class="text-right">
                 <div style="margin:-5px 0;display:inline-block">
                   {% pie row.sum stats.sum type='good' size=28 %}

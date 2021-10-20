@@ -22,15 +22,13 @@
         </form>
       {% else %}
         <form method="POST"
-          action="{{ request.get_full_path }}"
-          {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+              action="{{ request.get_full_path }}"
+              {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
           {% csrf_token %}
           {% include 'fineforms/warnings.html' %}
           {% ff_errors form %}
           {% ff_fields form %}
-          {% for formset in form.formsets.values %}
-            {{ formset }}
-          {% endfor %}
+          {% for formset in form.formsets.values %}{{ formset }}{% endfor %}
           <div class="row">
             <div class="col-sm-12">
               <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
