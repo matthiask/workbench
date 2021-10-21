@@ -224,14 +224,10 @@ def changes(*, since):
         return projects[project_id]
 
     actions_by_object = defaultdict(list)
-    project_updated_by = defaultdict(set)
 
     for action in queryset:
         key = change_object_key(action)
         actions_by_object[key].append(action)
-        project_updated_by[project_for_action(action)].add(
-            users.get(audit_user_id(action.user_name))
-        )
 
     milestones_by_id = {
         obj.id: obj
@@ -272,7 +268,7 @@ def changes(*, since):
             )
 
         elif key[0] == "planning_plannedwork":
-            obj = change_obj(type, actions, object=work_by_id.get(key[1]))
+            obj = change_obj(type, actions, object=work_by_id.get(key[1]), by=by)
             affected = (
                 {users.get(int(a.row_data["user_id"])) for a in actions}
                 | {
@@ -291,19 +287,16 @@ def changes(*, since):
 
     # Affected users are all those with planned work on the milestones' projects
     affected = {
-        project: {project.owned_by} | {w.user for w in p.planned_work.all()}
+        p: {p.owned_by} | {w.user for w in p.planned_work.all()}
         for p in Project.objects.filter(
             id__in=[p.id for p in milestones.keys()]
         ).prefetch_related("planned_work__user")
     }
+
     for project, affected_users in affected.items():
         for user in affected_users:
             if user.id:
                 changes[user][project]["milestones"].extend(milestones[project])
-
-    for projects in changes.values():
-        for project, data in projects.items():
-            data["by"] = project_updated_by[project] - {None}
 
     return dict(changes)
 
