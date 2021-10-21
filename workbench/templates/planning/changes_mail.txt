@@ -16,8 +16,8 @@ Merci, dass Du dir einen Moment Zeit nimmst, die Änderungen zu überprüfen.
 {{ WORKBENCH.URL }}{{ project.urls.planning }}
 Geändert von {% for user in planning_changes.by %}{{ user }}{% if not forloop.last %}, {% endif %}{% endfor %}.
 
-{% for obj in planning_changes.milestones %}- {{ obj.pretty_type }}: {{ obj.object }}{% if obj.changes %} ({{ obj.changes }}){% endif %}
-{% endfor %}{% for obj in planning_changes.work %}- {{ obj.pretty_type }}: {{ obj.object }}{% if obj.changes %} ({{ obj.changes }}){% endif %}
+{% for obj in planning_changes.objects %}- {{ obj.pretty_type }}: {{ obj.object }}{% if obj.changes %}
+  ({% for change in obj.changes %}{{ change.field }}: {{ change.old }} -> {{ change.new }}{% if not forloop.last %} / {% endif %}{% endfor %}){% endif %}
 {% endfor %}
 
 {% endfor %}

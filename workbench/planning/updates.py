@@ -170,7 +170,7 @@ def change_obj(
     actions,
     *,
     aux,
-    pretty_value_change=lambda x: x,
+    pretty_changes=lambda x: x,
     pretty_deleted_object=lambda x: x,
 ):
     if type in {CREATE_AND_DELETE, DELETE}:
@@ -203,12 +203,12 @@ def change_obj(
         return {
             "type": type,
             "pretty_type": _("Updated"),
-            "changes": [
-                pretty_value_change(
+            "changes": pretty_changes(
+                [
                     {"field": field, "old": actions[0].row_data[field], "new": updated}
-                )
-                for field, updated in updates.items()
-            ],
+                    for field, updated in updates.items()
+                ]
+            ),
         } | aux
 
     else:  # pragma: no cover
@@ -268,7 +268,7 @@ def changes(*, since):
     }
 
     milestones = defaultdict(list)
-    changes = defaultdict(lambda: defaultdict(lambda: {"work": [], "milestones": []}))
+    changes = defaultdict(lambda: defaultdict(lambda: {"objects": []}))
 
     for key, actions in actions_by_object.items():
         type = change_type(actions)
@@ -307,7 +307,7 @@ def changes(*, since):
             )
             for user in affected:
                 if user.id:
-                    changes[user][project]["work"].append(obj)
+                    changes[user][project]["objects"].append(obj)
 
         else:  # pragma: no cover
             raise NotImplementedError
@@ -323,19 +323,14 @@ def changes(*, since):
     for project, affected_users in affected.items():
         for user in affected_users:
             if user.id:
-                changes[user][project]["milestones"].extend(milestones[project])
+                changes[user][project]["objects"].extend(milestones[project])
 
     for user, user_changes in changes.items():
         for project, project_changes in user_changes.items():
             project_changes["by"] = sorted(
                 reduce(
                     operator.or_,
-                    (obj["by"] for obj in project_changes["milestones"]),
-                    set(),
-                )
-                | reduce(
-                    operator.or_,
-                    (obj["by"] for obj in project_changes["work"]),
+                    (obj["by"] for obj in project_changes["objects"]),
                     set(),
                 )
             )
