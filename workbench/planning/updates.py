@@ -283,7 +283,8 @@ def changes(*, since):
                 | {project.owned_by}
             )
             for user in affected:
-                changes[user][project]["work"].append(obj)
+                if user.id:
+                    changes[user][project]["work"].append(obj)
 
         else:  # pragma: no cover
             raise NotImplementedError
@@ -297,11 +298,12 @@ def changes(*, since):
     }
     for project, affected_users in affected.items():
         for user in affected_users:
-            changes[user][project]["milestones"].extend(milestones[project])
+            if user.id:
+                changes[user][project]["milestones"].extend(milestones[project])
 
     for projects in changes.values():
         for project, data in projects.items():
-            data["by"] = project_updated_by[project]
+            data["by"] = project_updated_by[project] - {None}
 
     return dict(changes)
 
