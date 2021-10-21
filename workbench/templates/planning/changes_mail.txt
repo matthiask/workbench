@@ -1,0 +1,26 @@
+{% autoescape off %}
+Planungsupdates
+
+Hallo {{ user }}
+
+In diesem Mail werden die Planungsupdates seit letztem Montag zusammengefasst.
+
+Merci, dass Du dir einen Moment Zeit nimmst, um die Änderungen auf ihre
+Korrektheit zu überprüfen.
+
+
+{% for project, planning_changes in changes %}
+========================================================================
+{{ project }}
+{{ WORKBENCH.URL }}{{ project.urls.planning }}
+
+{% for milestone in planning_changes.milestones %}Meilenstein: {{ milestone }}
+{% endfor %}
+
+{% for work in planning_changes.work %}{{ work }}
+{% endfor %}
+
+
+{% endfor %}
+
+{% endautoescape %}

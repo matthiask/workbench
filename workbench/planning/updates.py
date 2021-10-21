@@ -188,7 +188,7 @@ def change_obj(type, actions, **kwargs):
         return {
             "type": type,
             "updates": {
-                field: [actions[0].row_data[field], updated]
+                field: {"old": actions[0].row_data[field], "new": updated}
                 for field, updated in updates.items()
             },
             **kwargs,
@@ -301,11 +301,33 @@ def changes(*, since):
     return dict(changes)
 
 
+def start_of_monday():
+    return timezone.make_aware(dt.datetime.combine(monday(), dt.time.min))
+
+
+def changes_mails():
+    c = changes(since=start_of_monday() - dt.timedelta(days=7))
+
+    for user, planning_changes in c.items():
+        if not user.is_active:
+            continue
+        mail = render_to_mail(
+            "planning/changes_mail",
+            {
+                "user": user,
+                "changes": sorted(planning_changes.items()),
+                "WORKBENCH": settings.WORKBENCH,
+            },
+            to=[user.email],
+            cc=["workbench@feinheit.ch"],
+        )
+        mail.send()
+
+
 def test_changes():  # pragma: no cover
     from pprint import pprint
 
-    start_of_monday = timezone.make_aware(dt.datetime.combine(monday(), dt.time.min))
-    pprint(changes(since=start_of_monday - dt.timedelta(days=7)))
+    pprint(changes(since=start_of_monday() - dt.timedelta(days=7)))
 
 
 def test():  # pragma: no cover
