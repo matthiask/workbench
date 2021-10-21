@@ -147,7 +147,7 @@ def change_object_key(action):
 CREATE_AND_DELETE = "CREATE_AND_DELETE"
 CREATE = "CREATE"
 DELETE = "DELETE"
-UPDATE_ONLY = "UPDATE_ONLY"
+UPDATE = "UPDATE"
 
 
 def change_type(actions):
@@ -158,28 +158,43 @@ def change_type(actions):
     elif {"D"} <= types:
         return DELETE
     elif {"U"} == types:
-        return UPDATE_ONLY
+        return UPDATE
     elif {"I"} <= types:
         return CREATE
     else:  # pragma: no cover
         raise NotImplementedError
 
 
-def change_obj(type, actions, **kwargs):
+def change_obj(
+    type,
+    actions,
+    *,
+    aux,
+    pretty_value_change=lambda x: x,
+    pretty_deleted_object=lambda x: x,
+):
     if type in {CREATE_AND_DELETE, DELETE}:
-        return {
-            "type": type,
-            "final": actions[-1].row_data,
-            **kwargs,
-        }
+        return (
+            {
+                "type": type,
+                "pretty_type": _("Deleted")
+                if type == DELETE
+                else _("Created and deleted"),
+                "final": actions[-1].row_data,
+            }
+            | aux
+            | {
+                "object": pretty_deleted_object(actions[-1].row_data),
+            }
+        )
 
     elif type == CREATE:
         return {
             "type": type,
-            **kwargs,
-        }
+            "pretty_type": _("Created"),
+        } | aux
 
-    elif type == UPDATE_ONLY:
+    elif type == UPDATE:
         updates = reduce(
             operator.or_,
             (a.changed_fields for a in actions),
@@ -187,12 +202,14 @@ def change_obj(type, actions, **kwargs):
         )
         return {
             "type": type,
-            "updates": {
-                field: {"old": actions[0].row_data[field], "new": updated}
+            "pretty_type": _("Updated"),
+            "changes": [
+                pretty_value_change(
+                    {"field": field, "old": actions[0].row_data[field], "new": updated}
+                )
                 for field, updated in updates.items()
-            },
-            **kwargs,
-        }
+            ],
+        } | aux
 
     else:  # pragma: no cover
         raise NotImplementedError
@@ -264,11 +281,21 @@ def changes(*, since):
 
         if key[0] == "planning_milestone":
             milestones[project].append(
-                change_obj(type, actions, object=milestones_by_id.get(key[1]), by=by)
+                change_obj(
+                    type,
+                    actions,
+                    aux={"object": milestones_by_id.get(key[1]), "by": by},
+                    pretty_deleted_object=lambda x: f'{x["title"]} ({x["date"]})',
+                )
             )
 
         elif key[0] == "planning_plannedwork":
-            obj = change_obj(type, actions, object=work_by_id.get(key[1]), by=by)
+            obj = change_obj(
+                type,
+                actions,
+                aux={"object": work_by_id.get(key[1]), "by": by},
+                pretty_deleted_object=lambda x: f'{x["title"]} ({x["planned_hours"]})',
+            )
             affected = (
                 {users.get(int(a.row_data["user_id"])) for a in actions}
                 | {
@@ -298,6 +325,21 @@ def changes(*, since):
             if user.id:
                 changes[user][project]["milestones"].extend(milestones[project])
 
+    for user, user_changes in changes.items():
+        for project, project_changes in user_changes.items():
+            project_changes["by"] = sorted(
+                reduce(
+                    operator.or_,
+                    (obj["by"] for obj in project_changes["milestones"]),
+                    set(),
+                )
+                | reduce(
+                    operator.or_,
+                    (obj["by"] for obj in project_changes["work"]),
+                    set(),
+                )
+            )
+
     return dict(changes)
 
 
@@ -306,9 +348,13 @@ def start_of_monday():
 
 
 def changes_mails():
+    # Only on mondays
+    if dt.date.today().weekday != 1:
+        return
+
     c = changes(since=start_of_monday() - dt.timedelta(days=7))
 
-    for user, planning_changes in c.items():
+    for user, planning_changes in sorted(c.items()):
         if not user.is_active:
             continue
         mail = render_to_mail(

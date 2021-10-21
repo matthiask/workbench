@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-21 13:02+0200\n"
+"POT-Creation-Date: 2021-10-21 14:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2611,6 +2611,23 @@ msgstr "%(by)s hat Arbeit für dich geändert: %(title)s (%(hours)sh)"
 msgid "%(by)s deleted work for you: %(title)s (%(hours)sh)"
 msgstr "%(by)s hat Arbeit für dich gelöscht: %(title)s (%(hours)sh)"
 
+#: workbench/planning/updates.py
+msgid "Deleted"
+msgstr "Gelöscht"
+
+#: workbench/planning/updates.py
+msgid "Created and deleted"
+msgstr "Erstellt und gelöscht"
+
+#: workbench/planning/updates.py
+#: workbench/templates/accounts/user_statistics.html
+msgid "Created"
+msgstr "Erstellt"
+
+#: workbench/planning/updates.py
+msgid "Updated"
+msgstr "Bearbeitet"
+
 #: workbench/projects/apps.py workbench/projects/models.py
 #: workbench/templates/base.html
 #: workbench/templates/projects/campaign_detail.html
@@ -3049,10 +3066,6 @@ msgstr "Stunden pro Wochentag"
 #: workbench/templates/accounts/user_statistics.html
 msgid "Rendered"
 msgstr "Erbracht"
-
-#: workbench/templates/accounts/user_statistics.html
-msgid "Created"
-msgstr "Erstellt"
 
 #: workbench/templates/accounts/user_statistics.html
 msgid "Hours per week"

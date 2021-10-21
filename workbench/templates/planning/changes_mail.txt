@@ -5,22 +5,20 @@ Hallo {{ user }}
 
 In diesem Mail werden die Planungsupdates seit letztem Montag zusammengefasst.
 
-Merci, dass Du dir einen Moment Zeit nimmst, um die Änderungen auf ihre
-Korrektheit zu überprüfen.
+Merci, dass Du dir einen Moment Zeit nimmst, die Änderungen zu überprüfen.
+
+{{ WORKBENCH.URL }}{{ user.urls.planning }}
 
 
 {% for project, planning_changes in changes %}
 ========================================================================
 {{ project }}
 {{ WORKBENCH.URL }}{{ project.urls.planning }}
+Geändert von {% for user in planning_changes.by %}{{ user }}{% if not forloop.last %}, {% endif %}{% endfor %}.
 
-{% for milestone in planning_changes.milestones %}Meilenstein: {{ milestone }}
+{% for obj in planning_changes.milestones %}- {{ obj.pretty_type }}: {{ obj.object }}{% if obj.changes %} ({{ obj.changes }}){% endif %}
+{% endfor %}{% for obj in planning_changes.work %}- {{ obj.pretty_type }}: {{ obj.object }}{% if obj.changes %} ({{ obj.changes }}){% endif %}
 {% endfor %}
 
-{% for work in planning_changes.work %}{{ work }}
 {% endfor %}
-
-
-{% endfor %}
-
 {% endautoescape %}
