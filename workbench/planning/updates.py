@@ -4,6 +4,7 @@ from collections import defaultdict
 from functools import reduce
 
 from django.conf import settings
+from django.core.exceptions import FieldDoesNotExist
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -14,13 +15,6 @@ from workbench.audit.models import LoggedAction, audit_user_id
 from workbench.planning.models import Milestone, PlannedWork
 from workbench.projects.models import Project
 from workbench.tools.validation import monday
-
-
-def tryint(str):
-    try:
-        return int(str)
-    except (TypeError, ValueError):
-        return None
 
 
 def updated(*, duration):
@@ -215,6 +209,53 @@ def change_obj(
         raise NotImplementedError
 
 
+def pretty_changes_milestone():
+    def prettifier(changes):
+        def _row(row):
+            try:
+                field = Milestone._meta.get_field(row["field"])
+            except FieldDoesNotExist:
+                pass
+            else:
+                row["pretty_field"] = field.verbose_name
+            return row
+
+        return [_row(row) for row in changes]
+
+    return prettifier
+
+
+def pretty_changes_work(users):
+    def prettifier(changes):
+        def _row(row):
+            try:
+                field = PlannedWork._meta.get_field(row["field"])
+            except FieldDoesNotExist:
+                pass
+            else:
+                row["pretty_field"] = field.verbose_name
+
+            if row["field"] == "user_id":
+                row["old"] = users.get(int(row["old"]), row["old"])
+                row["new"] = users.get(int(row["new"]), row["new"])
+
+            elif row["field"] == "weeks":
+                weeks = row["old"].split(",")
+                row["old"] = f"{weeks[0]} - {weeks[1]}" if len(weeks) > 2 else weeks[0]
+                weeks = row["new"].split(",")
+                row["new"] = f"{weeks[0]} - {weeks[1]}" if len(weeks) > 2 else weeks[0]
+
+            return row
+
+        return [
+            _row(row)
+            for row in changes
+            if row["field"] not in {"notes", "service_type_id"}
+        ]
+
+    return prettifier
+
+
 def changes(*, since):
     users = {user.id: user for user in User.objects.all()}
     queryset = LoggedAction.objects.filter(
@@ -285,6 +326,7 @@ def changes(*, since):
                     type,
                     actions,
                     aux={"object": milestones_by_id.get(key[1]), "by": by},
+                    pretty_changes=pretty_changes_milestone(),
                     pretty_deleted_object=lambda x: f'{x["title"]} ({x["date"]})',
                 )
             )
@@ -294,6 +336,7 @@ def changes(*, since):
                 type,
                 actions,
                 aux={"object": work_by_id.get(key[1]), "by": by},
+                pretty_changes=pretty_changes_work(users=users),
                 pretty_deleted_object=lambda x: f'{x["title"]} ({x["planned_hours"]})',
             )
             affected = (
@@ -344,7 +387,7 @@ def start_of_monday():
 
 def changes_mails():
     # Only on mondays
-    if dt.date.today().weekday != 1:
+    if dt.date.today().weekday() != 0:
         return
 
     c = changes(since=start_of_monday() - dt.timedelta(days=7))

@@ -17,7 +17,7 @@ Merci, dass Du dir einen Moment Zeit nimmst, die Änderungen zu überprüfen.
 Geändert von {% for user in planning_changes.by %}{{ user }}{% if not forloop.last %}, {% endif %}{% endfor %}.
 
 {% for obj in planning_changes.objects %}- {{ obj.pretty_type }}: {{ obj.object }}{% if obj.changes %}
-  ({% for change in obj.changes %}{{ change.field }}: {{ change.old }} -> {{ change.new }}{% if not forloop.last %} / {% endif %}{% endfor %}){% endif %}
+  ({% for change in obj.changes %}{{ change.pretty_field|default:change.field }}: {{ change.old }} -> {{ change.new }}{% if not forloop.last %} / {% endif %}{% endfor %}){% endif %}
 {% endfor %}
 
 {% endfor %}
