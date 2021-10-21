@@ -408,6 +408,7 @@ def _projects_project_cfg(user):
     if user.features[FEATURES.LABOR_COSTS]:
         fields |= {"cost_center"}
     if user.features[FEATURES.PLANNING]:
+        fields |= {"suppress_planning_update_mails"}
         related.append((PlannedWork, "project_id"))
     if user.features[FEATURES.PROJECTED_INVOICES]:
         related.append((ProjectedInvoice, "project_id"))

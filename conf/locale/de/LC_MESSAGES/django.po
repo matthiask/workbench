@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-14 11:10+0200\n"
+"POT-Creation-Date: 2021-10-21 13:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2763,6 +2763,10 @@ msgstr ""
 #: workbench/projects/models.py workbench/reporting/models.py
 msgid "cost center"
 msgstr "Kostenstelle"
+
+#: workbench/projects/models.py
+msgid "suppress planning update mails for this project for everyone"
+msgstr "Planungsupdate-Mails für dieses Projekt für alle unterdrücken"
 
 #: workbench/projects/models.py
 msgid "Leave this empty if you do not want to close the project yet."

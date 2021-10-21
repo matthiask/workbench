@@ -248,6 +248,7 @@ class ProjectForm(ModelForm):
             "cost_center",
             "owned_by",
             "type",
+            "suppress_planning_update_mails",
             "flat_rate",
             "closed_on",
         )
@@ -313,6 +314,8 @@ class ProjectForm(ModelForm):
             self.fields.pop("campaign")
         if not self.request.user.features[FEATURES.LABOR_COSTS]:
             self.fields.pop("cost_center")
+        if not self.request.user.features[FEATURES.PLANNING]:
+            self.fields.pop("suppress_planning_update_mails")
         if self.instance.pk:
             self.fields["closed_on"].help_text = format_html(
                 '{} <a href="#" data-field-value="{}">{}</a>',

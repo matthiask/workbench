@@ -235,6 +235,10 @@ class Project(Model):
         verbose_name=_("campaign"),
         related_name="projects",
     )
+    suppress_planning_update_mails = models.BooleanField(
+        _("suppress planning update mails for this project for everyone"),
+        default=False,
+    )
 
     objects = ProjectQuerySet.as_manager()
 
