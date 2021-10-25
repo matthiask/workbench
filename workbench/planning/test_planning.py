@@ -1,15 +1,13 @@
 import datetime as dt
 from decimal import Decimal
 
-from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import RequestFactory, TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
-from workbench.accounts.middleware import set_user_name
 from workbench.accounts.models import User
-from workbench.planning import reporting, updates
+from workbench.planning import reporting
 from workbench.planning.forms import PlannedWorkSearchForm
 from workbench.planning.models import PlannedWork
 from workbench.tools.validation import in_days, monday
@@ -308,54 +306,3 @@ class PlanningTest(TestCase):
 
         response = self.client.get(service.project.urls["creatework"] + "?service=bla")
         self.assertEqual(response.status_code, 200)  # No crash
-
-    def test_updates_reporting(self):
-        """Reporting of planning updates"""
-        user = factories.UserFactory.create()
-        set_user_name(f"user-{user.pk}-{user.get_short_name()}")
-
-        pw = factories.PlannedWorkFactory.create(weeks=[monday()])
-        project = pw.project
-        factories.MilestoneFactory.create(project=project)
-        pw.delete()
-
-        u = updates.updated(duration=dt.timedelta(hours=1))
-
-        project = pw.project
-        u1, u2 = u.values()
-
-        self.assertEqual(list(u1), [project])
-        self.assertEqual(list(u2), [project])
-
-        self.assertEqual(u1[project]["milestones"], [])
-        self.assertEqual(u1[project]["deleted_work"], [])
-        self.assertEqual(
-            [update["action"].action for update in u1[project]["work"]],
-            ["I", "D"],
-        )
-
-        self.assertEqual(
-            [update["by"] for update in u2[project]["milestones"]],
-            [user],
-        )
-        self.assertEqual(
-            [update["by"] for update in u2[project]["deleted_work"]],
-            [user],
-        )
-        self.assertEqual(u2[project]["work"], [])
-
-        set_user_name("")
-
-        updates.planning_update_mails()
-        self.assertEqual(len(mail.outbox), 2)
-
-    def test_updates_reporting_with_deleted_project(self):
-        """Generating updates should work even when projects have been deleted"""
-        user = factories.UserFactory.create()
-        set_user_name(f"user-{user.pk}-{user.get_short_name()}")
-
-        pw = factories.PlannedWorkFactory.create(weeks=[monday()])
-        pw.project.delete()
-
-        u = updates.updated(duration=dt.timedelta(hours=1))
-        self.assertEqual(dict(u), {})

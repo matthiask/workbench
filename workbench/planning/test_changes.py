@@ -40,6 +40,7 @@ class ChangesTest(TestCase):
 
     @travel("2021-10-18")
     def test_updates(self):
+        """Test the planning updates functionality"""
         self.set_current_user()
 
         pw = factories.PlannedWorkFactory.create(weeks=[in_days(d) for d in (0, 7, 14)])
