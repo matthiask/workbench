@@ -291,7 +291,7 @@ class DealForm(ModelForm):
 class SetStatusForm(ModelForm):
     class Meta:
         model = Deal
-        fields = ["status", "closing_type", "closing_notice"]
+        fields = ["status", "closed_on", "closing_type", "closing_notice"]
         widgets = {
             "status": forms.RadioSelect,
             "closing_type": forms.RadioSelect,
@@ -301,14 +301,23 @@ class SetStatusForm(ModelForm):
     def __init__(self, *args, **kwargs):
         instance = kwargs["instance"]
         instance.status = int(kwargs["request"].GET.get("status", instance.status))
+        if instance.status in {Deal.ACCEPTED, Deal.DECLINED}:
+            instance.closed_on = dt.date.today()
+        elif instance.status in {Deal.OPEN}:
+            instance.closed_on = None
+            instance.closing_type = None
+            instance.closing_notice = ""
+
         super().__init__(*args, **kwargs)
         self.fields["status"].disabled = True
 
         if instance.status == Deal.OPEN:
+            self.fields.pop("closed_on")
             self.fields.pop("closing_type")
             self.fields.pop("closing_notice")
 
         elif instance.status == Deal.ACCEPTED:
+            self.fields["closed_on"].required = True
             self.fields["closing_type"].empty_label = None
             self.fields["closing_type"].label = _("Award of contract")
             self.fields["closing_type"].required = True
@@ -317,6 +326,7 @@ class SetStatusForm(ModelForm):
             ].queryset.filter(represents_a_win=True)
 
         elif instance.status == Deal.DECLINED:
+            self.fields["closed_on"].required = True
             self.fields["closing_type"].empty_label = None
             self.fields["closing_type"].label = _("Reason for losing")
             self.fields["closing_type"].required = True
@@ -388,13 +398,7 @@ class SetStatusForm(ModelForm):
         instance = super().save(commit=False)
         assert instance.status in {Deal.OPEN, Deal.ACCEPTED, Deal.DECLINED}
 
-        if instance.status == instance.OPEN:
-            instance.closed_on = None
-            instance.closing_type = None
-            instance.closing_notice = ""
-        else:
-            instance.closed_on = instance.closed_on or dt.date.today()
-
+        if instance.status in {Deal.ACCEPTED, Deal.DECLINED}:
             projects = set()
             for offer in self.offers_to_update:
                 offer.save()

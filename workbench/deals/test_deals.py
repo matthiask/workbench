@@ -75,6 +75,7 @@ class DealsTest(TestCase):
         response = self.client.post(
             deal.urls["set_status"] + f"?status={Deal.DECLINED}",
             {
+                "closed_on": dt.date.today().isoformat(),
                 "closing_type": factories.ClosingTypeFactory.create(
                     represents_a_win=False
                 ).pk,
@@ -464,7 +465,11 @@ class DealsTest(TestCase):
 
         response = self.client.post(
             deal.urls["set_status"] + "?status=20",
-            {"closing_type": closing_type.pk, "related_offers": [offer.pk]},
+            {
+                "closed_on": dt.date.today().isoformat(),
+                "closing_type": closing_type.pk,
+                "related_offers": [offer.pk],
+            },
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 202)
