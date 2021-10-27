@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-21 14:28+0200\n"
+"POT-Creation-Date: 2021-10-27 08:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2585,33 +2585,6 @@ msgid "%.1fh per week"
 msgstr "%.1fh pro Woche"
 
 #: workbench/planning/updates.py
-#, python-format
-msgid "%(by)s changed a milestone: %(title)s (%(date)s)"
-msgstr "%(by)s hat einen Meilenstein geändert: %(title)s (%(date)s)"
-
-#: workbench/planning/updates.py
-#, python-format
-msgid "%(by)s deleted work managed by you: %(title)s (%(hours)sh)"
-msgstr ""
-"%(by)s hat Arbeit gelöscht, welche von dir koordiniert wird: %(title)s "
-"(%(hours)sh)"
-
-#: workbench/planning/updates.py
-#, python-format
-msgid "%(by)s added work for you: %(title)s (%(hours)sh)"
-msgstr "%(by)s hat Arbeit für dich hinzugefügt: %(title)s (%(hours)sh)"
-
-#: workbench/planning/updates.py
-#, python-format
-msgid "%(by)s changed work for you: %(title)s (%(hours)sh)"
-msgstr "%(by)s hat Arbeit für dich geändert: %(title)s (%(hours)sh)"
-
-#: workbench/planning/updates.py
-#, python-format
-msgid "%(by)s deleted work for you: %(title)s (%(hours)sh)"
-msgstr "%(by)s hat Arbeit für dich gelöscht: %(title)s (%(hours)sh)"
-
-#: workbench/planning/updates.py
 msgid "Deleted"
 msgstr "Gelöscht"
 
@@ -2751,9 +2724,8 @@ msgid "Order"
 msgstr "Auftrag"
 
 #: workbench/projects/models.py
-#: workbench/templates/accounts/user_statistics.html
-msgid "Maintenance"
-msgstr "Wartung"
+msgid "Maintenance (generally without cost ceilings or offers)"
+msgstr "Wartung (normalerweise ohne Kostendach oder Offerten)"
 
 #: workbench/projects/models.py workbench/reporting/views.py
 #: workbench/templates/accounts/user_statistics.html
@@ -3070,6 +3042,10 @@ msgstr "Erbracht"
 #: workbench/templates/accounts/user_statistics.html
 msgid "Hours per week"
 msgstr "Stunden pro Woche"
+
+#: workbench/templates/accounts/user_statistics.html
+msgid "Maintenance"
+msgstr "Wartung"
 
 #: workbench/templates/accounts/user_statistics.html
 #: workbench/templates/base.html
@@ -4121,6 +4097,28 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-format
+#~ msgid "%(by)s changed a milestone: %(title)s (%(date)s)"
+#~ msgstr "%(by)s hat einen Meilenstein geändert: %(title)s (%(date)s)"
+
+#, python-format
+#~ msgid "%(by)s deleted work managed by you: %(title)s (%(hours)sh)"
+#~ msgstr ""
+#~ "%(by)s hat Arbeit gelöscht, welche von dir koordiniert wird: %(title)s "
+#~ "(%(hours)sh)"
+
+#, python-format
+#~ msgid "%(by)s added work for you: %(title)s (%(hours)sh)"
+#~ msgstr "%(by)s hat Arbeit für dich hinzugefügt: %(title)s (%(hours)sh)"
+
+#, python-format
+#~ msgid "%(by)s changed work for you: %(title)s (%(hours)sh)"
+#~ msgstr "%(by)s hat Arbeit für dich geändert: %(title)s (%(hours)sh)"
+
+#, python-format
+#~ msgid "%(by)s deleted work for you: %(title)s (%(hours)sh)"
+#~ msgstr "%(by)s hat Arbeit für dich gelöscht: %(title)s (%(hours)sh)"
 
 #~ msgid "delta"
 #~ msgstr "Delta"

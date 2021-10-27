@@ -178,7 +178,7 @@ class Project(Model):
 
     TYPE_CHOICES = [
         (ORDER, _("Order")),
-        (MAINTENANCE, _("Maintenance")),
+        (MAINTENANCE, _("Maintenance (generally without cost ceilings or offers)")),
         (INTERNAL, _("Internal")),
     ]
 
@@ -206,7 +206,9 @@ class Project(Model):
         User, on_delete=models.PROTECT, verbose_name=_("contact person")
     )
 
-    type = models.CharField(_("type"), choices=TYPE_CHOICES, max_length=20)
+    type = models.CharField(
+        _("type"), choices=TYPE_CHOICES, max_length=20, default=ORDER
+    )
     flat_rate = MoneyField(
         _("flat rate"),
         blank=True,
