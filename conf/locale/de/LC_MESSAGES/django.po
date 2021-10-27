@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-27 08:45+0200\n"
+"POT-Creation-Date: 2021-10-27 08:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2653,6 +2653,21 @@ msgstr "Keine geplanten Rechnungen"
 msgid "All types"
 msgstr "Alle Typen"
 
+#: workbench/projects/forms.py workbench/projects/models.py
+#: workbench/templates/accounts/user_statistics.html
+msgid "Order"
+msgstr "Auftrag"
+
+#: workbench/projects/forms.py
+msgid "Maintenance (normally fully chargeable, no cost ceiling)"
+msgstr "Wartung (normalerweise voll verrechenbar, kein Kostendach)"
+
+#: workbench/projects/forms.py workbench/projects/models.py
+#: workbench/reporting/views.py
+#: workbench/templates/accounts/user_statistics.html
+msgid "Internal"
+msgstr "Intern"
+
 #: workbench/projects/forms.py
 msgid "Set predefined value:"
 msgstr "Vordefinierten Wert setzen:"
@@ -2720,17 +2735,8 @@ msgstr "Kampagne"
 
 #: workbench/projects/models.py
 #: workbench/templates/accounts/user_statistics.html
-msgid "Order"
-msgstr "Auftrag"
-
-#: workbench/projects/models.py
-msgid "Maintenance (generally without cost ceilings or offers)"
-msgstr "Wartung (normalerweise ohne Kostendach oder Offerten)"
-
-#: workbench/projects/models.py workbench/reporting/views.py
-#: workbench/templates/accounts/user_statistics.html
-msgid "Internal"
-msgstr "Intern"
+msgid "Maintenance"
+msgstr "Wartung"
 
 #: workbench/projects/models.py
 msgid "project description"
@@ -3042,10 +3048,6 @@ msgstr "Erbracht"
 #: workbench/templates/accounts/user_statistics.html
 msgid "Hours per week"
 msgstr "Stunden pro Woche"
-
-#: workbench/templates/accounts/user_statistics.html
-msgid "Maintenance"
-msgstr "Wartung"
 
 #: workbench/templates/accounts/user_statistics.html
 #: workbench/templates/base.html

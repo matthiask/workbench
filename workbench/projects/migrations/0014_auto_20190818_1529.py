@@ -17,10 +17,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 choices=[
                     ("order", "Order"),
-                    (
-                        "maintenance",
-                        "Maintenance (generally without cost ceilings or offers)",
-                    ),
+                    ("maintenance", "Maintenance"),
                     ("internal", "Internal"),
                 ],
                 default="order",

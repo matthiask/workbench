@@ -307,7 +307,15 @@ class ProjectForm(ModelForm):
                 initial[field] = value
 
         super().__init__(*args, **kwargs)
-        self.fields["type"].choices = Project.TYPE_CHOICES
+        self.fields["type"].choices = [
+            (Project.ORDER, _("Order")),
+            (
+                Project.MAINTENANCE,
+                _("Maintenance (normally fully chargeable, no cost ceiling)"),
+            ),
+            (Project.INTERNAL, _("Internal")),
+        ]
+
         if not self.request.user.features[FEATURES.CONTROLLING]:
             self.fields.pop("flat_rate")
         if not self.request.user.features[FEATURES.CAMPAIGNS]:

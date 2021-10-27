@@ -178,7 +178,7 @@ class Project(Model):
 
     TYPE_CHOICES = [
         (ORDER, _("Order")),
-        (MAINTENANCE, _("Maintenance (generally without cost ceilings or offers)")),
+        (MAINTENANCE, _("Maintenance")),
         (INTERNAL, _("Internal")),
     ]
 
