@@ -5,6 +5,7 @@ from functools import reduce
 
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
+from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -240,10 +241,16 @@ def changes(*, since):
 
     # Affected users are all those with planned work on the milestones' projects
     affected = {
-        p: {p.owned_by} | {w.user for w in p.planned_work.all()}
-        for p in Project.objects.filter(
-            id__in=[p.id for p in milestones.keys()]
-        ).prefetch_related("planned_work__user")
+        p: {p.owned_by}
+        | {
+            w.user
+            for w in p.planned_work.annotate(
+                max_weeks=RawSQL(
+                    "(select max(elements) from unnest(weeks) elements)", ()
+                )
+            ).filter(max_weeks__gte=dt.date.today())
+        }
+        for p in Project.objects.filter(id__in=[p.id for p in milestones.keys()])
     }
 
     for project, affected_users in affected.items():
