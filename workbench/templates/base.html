@@ -221,6 +221,10 @@
             <a class="dropdown-item" href="{{ request.user.urls.planning }}">
               {% translate 'planned work'|capfirst %}
             </a>
+            <a class="dropdown-item"
+               href="{% url 'report_planning_vs_logbook' %}?team=-{{ request.user.pk }}">
+              {% translate 'Planning vs Logbook' %}
+            </a>
           {% endif %}
           <div class="dropdown-divider">
           </div>
