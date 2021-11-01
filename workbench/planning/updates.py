@@ -1,7 +1,7 @@
 import datetime as dt
 import operator
 from collections import defaultdict
-from functools import reduce
+from functools import partial, reduce
 
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
@@ -109,7 +109,11 @@ def pretty_changes_milestone():
     return prettifier
 
 
-def pretty_changes_work(users):
+def _weeks(weeks):
+    return weeks[1:-1].split(",")
+
+
+def pretty_changes_work(*, users, milestones):
     def prettifier(changes):
         def _row(row):
             try:
@@ -124,10 +128,20 @@ def pretty_changes_work(users):
                 row["new"] = users.get(int(row["new"]), row["new"])
 
             elif row["field"] == "weeks":
-                weeks = row["old"].split(",")
-                row["old"] = f"{weeks[0]} - {weeks[1]}" if len(weeks) > 2 else weeks[0]
-                weeks = row["new"].split(",")
-                row["new"] = f"{weeks[0]} - {weeks[1]}" if len(weeks) > 2 else weeks[0]
+                weeks = _weeks(row["old"])
+                row["old"] = f"{weeks[0]} - {weeks[-1]}" if len(weeks) > 2 else weeks[0]
+                weeks = _weeks(row["new"])
+                row["new"] = f"{weeks[0]} - {weeks[-1]}" if len(weeks) > 2 else weeks[0]
+
+            elif row["field"] == "milestone_id":
+                if row["old"]:
+                    row["old"] = milestones.get(int(row["old"]), row["old"])
+                else:
+                    row["old"] = _("<no value>")
+                if row["new"]:
+                    row["new"] = milestones.get(int(row["new"]), row["new"])
+                else:
+                    row["new"] = _("<no value>")
 
             return row
 
@@ -138,6 +152,15 @@ def pretty_changes_work(users):
         ]
 
     return prettifier
+
+
+def pretty_deleted_object_work(x, *, users):
+    u = users.get(int(x["user_id"]))
+    if u:
+        u = u.get_short_name()
+    else:
+        u = x["user_id"]
+    return f'{x["title"]} ({u}, {x["planned_hours"]}h)'
 
 
 def changes(*, since):
@@ -194,6 +217,9 @@ def changes(*, since):
 
     milestones = defaultdict(list)
     changes = defaultdict(lambda: defaultdict(lambda: {"objects": []}))
+    project_milestones = {
+        m.id: m for m in Milestone.objects.filter(project__in=projects.keys())
+    }
 
     for key, actions in actions_by_object.items():
         type = change_type(actions)
@@ -220,8 +246,10 @@ def changes(*, since):
                 type,
                 actions,
                 aux={"object": work_by_id.get(key[1]), "by": by},
-                pretty_changes=pretty_changes_work(users=users),
-                pretty_deleted_object=lambda x: f'{x["title"]} ({x["planned_hours"]})',
+                pretty_changes=pretty_changes_work(
+                    users=users, milestones=project_milestones
+                ),
+                pretty_deleted_object=partial(pretty_deleted_object_work, users=users),
             )
             affected = (
                 {users.get(int(a.row_data["user_id"])) for a in actions}

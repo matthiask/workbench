@@ -48,12 +48,13 @@ class ChangesTest(TestCase):
         m = factories.MilestoneFactory.create(project=pw.project, date=dt.date.today())
 
         LoggedAction.objects.all().update(
-            created_at=F("created_at") - dt.timedelta(days=10)
+            created_at=F("created_at") - dt.timedelta(days=14)
         )
 
         pw.user = pw.project.owned_by
         pw.hours = 50
         pw.weeks = [in_days(d) for d in (7, 14, 21)]
+        pw.milestone = m
         pw.save()
         m.date = dt.date.today() + dt.timedelta(days=1)
         m.save()

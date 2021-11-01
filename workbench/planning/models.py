@@ -203,4 +203,6 @@ class PlannedWork(AbstractPlannedWork):
         verbose_name_plural = _("planned work")
 
     def __str__(self):
-        return f"{self.title} ({hours(self.planned_hours)}, {self.pretty_from_until})"
+        u = self.user.get_short_name()
+        h = hours(self.planned_hours)
+        return f"{self.title} ({u}, {h}, {self.pretty_from_until})"
