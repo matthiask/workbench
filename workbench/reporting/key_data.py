@@ -143,7 +143,7 @@ def service_hours_in_open_orders():
 
 
 def projected_invoices():
-    open_projects = Project.objects.open()
+    open_projects = Project.objects.open().select_related("owned_by")
 
     projected = ProjectedInvoice.objects.filter(
         project__in=open_projects
@@ -202,6 +202,22 @@ def projected_invoices():
         "projects": projects,
         "monthly_overall": monthly_overall,
     }
+
+
+def unsent_projected_invoices():
+    today = dt.date.today()
+    this = (today.year, today.month)
+
+    def _filter():
+        for project in projected_invoices()["projects"]:
+            project["unsent"] = sum(
+                (total for month, total in project["monthly"].items() if month < this),
+                Z2,
+            )
+            if project["unsent"] > 0:
+                yield project
+
+    return _filter()
 
 
 def logged_hours_in_open_orders():

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-27 08:59+0200\n"
+"POT-Creation-Date: 2021-11-01 11:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -372,7 +372,8 @@ msgstr "Keine Nutzer*innen mit Emailadresse %s gefunden."
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
 
-#: workbench/audit/admin.py workbench/tools/history.py
+#: workbench/audit/admin.py workbench/planning/updates.py
+#: workbench/tools/history.py
 msgid "<no value>"
 msgstr "<kein Wert>"
 
@@ -2059,6 +2060,10 @@ msgstr "Umsatz bereinigt"
 #: workbench/invoices/models.py
 msgid "projected invoice"
 msgstr "geplante Rechnung"
+
+#: workbench/invoices/tasks.py
+msgid "Unsent projected invoices"
+msgstr "Nicht verschickte geplante Rechnungen"
 
 #: workbench/invoices/views.py workbench/logbook/models.py
 #: workbench/services/models.py
