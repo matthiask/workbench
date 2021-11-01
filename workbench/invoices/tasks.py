@@ -43,7 +43,10 @@ def create_recurring_invoices_and_notify():
             for (ri, invoice) in invoices
         )
         mail = EmailMultiAlternatives(
-            _("recurring invoices"), invoices, to=[owner.email], cc=settings.CC
+            _("recurring invoices"),
+            invoices,
+            to=[owner.email],
+            cc=["workbench@feinheit.ch"],
         )
         mail.send()
 
@@ -85,5 +88,5 @@ Das geplante Rechnungstotal wurde bei folgenden Projekten nicht erreicht:
 {body}
 """,
             to=[user.email],
-            cc=settings.CC,
+            cc=["workbench@feinheit.ch"],
         ).send()
