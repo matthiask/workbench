@@ -311,6 +311,17 @@ class InvoiceForm(PostalAddressSelectionForm):
                     code="status-change-but-already-closed",
                 )
 
+        if data["status"] == Invoice.CANCELED:
+            self.add_warning(
+                _(
+                    "You are canceling this invoice. If clients are still expected"
+                    " to pay for services rendered and this invoice hasn't been"
+                    " sent to bookkeeping already it may be better to delete"
+                    " the invoice and start anew."
+                ),
+                code="discourage-cancellations",
+            )
+
         return data
 
     def save(self):

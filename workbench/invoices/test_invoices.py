@@ -942,6 +942,13 @@ class InvoicesTest(TestCase):
             status=Invoice.CANCELED,
         )
 
+        self.client.force_login(invoice.owned_by)
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(invoice),
+        )
+        self.assertContains(response, "discourage-cancellations")
+
         msg = [
             (
                 "payment_notice",
