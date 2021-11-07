@@ -41,8 +41,11 @@ def link_or_none(object, pretty=None, none=mark_safe("&ndash;"), with_badge=Fals
         return none
     elif hasattr(object, "get_absolute_url"):
         return format_html(
-            '<a href="{}">{}{}</a>',
+            '<a href="{}"{}>{}{}</a>',
             object.get_absolute_url(),
+            mark_safe(' data-toggle="ajaxmodal"')
+            if getattr(object, "open_in_modal", False)
+            else "",
             h(pretty or object),
             format_html(" {}", object.status_badge)
             if with_badge and hasattr(object, "status_badge")

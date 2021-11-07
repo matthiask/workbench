@@ -176,7 +176,7 @@ class PlannedWorkQuerySet(SearchQuerySet):
         day = monday()
         weeks = [day + dt.timedelta(days=days) for days in [0, 7, 14, 21]]
         return self.filter(
-            Q(user=user),
+            Q(user=user) | Q(created_by=user) | Q(project__owned_by=user),
             Q(is_provisional=True),
             Q(weeks__overlap=weeks),
         )
@@ -184,6 +184,8 @@ class PlannedWorkQuerySet(SearchQuerySet):
 
 @model_urls
 class PlannedWork(AbstractPlannedWork):
+    open_in_modal = True
+
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE,
