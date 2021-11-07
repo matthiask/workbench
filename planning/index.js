@@ -138,6 +138,10 @@ function Planning({ data }) {
               by_week={data.by_week}
               title={gettext("Planned hours per week")}
             />
+            <TotalByWeek
+              by_week={data.by_week_provisional}
+              title={gettext("Of which provisional")}
+            />
             {data.capacity && <Capacity {...data.capacity} />}
           </>
         )}

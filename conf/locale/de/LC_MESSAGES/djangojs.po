@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-01 11:33+0100\n"
+"POT-Creation-Date: 2021-11-07 16:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -120,6 +120,10 @@ msgstr "Keine Leistungen verfügbar"
 msgid "Not part of an offer"
 msgstr "Nicht Teil einer Offerte"
 
+#: conf/strings.js
+msgid "Of which provisional"
+msgstr "Davon provisorisch"
+
 #: conf/strings.js timer/activitySettings.js
 msgid "OK"
 msgstr "OK"
@@ -197,20 +201,3 @@ msgstr "Welches Ergebnis strebst Du an?"
 msgctxt "provisional"
 msgid "prov."
 msgstr "prov."
-
-#~ msgid "Absences"
-#~ msgstr "Abwesenheiten"
-
-#, javascript-format
-#~ msgid "%sh per week"
-#~ msgstr "%sh pro Woche"
-
-#~ msgid "Delta"
-#~ msgstr "Delta"
-
-#~ msgid "Requested hours per week"
-#~ msgstr "Angefragte Stunden pro Woche"
-
-#, javascript-format
-#~ msgid "%sh/day"
-#~ msgstr "%sh/Tag"

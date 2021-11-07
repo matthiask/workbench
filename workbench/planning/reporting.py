@@ -41,6 +41,7 @@ class Planning:
         self.external = external_view
 
         self._by_week = defaultdict(lambda: Z1)
+        self._by_week_provisional = defaultdict(lambda: Z1)
         self._by_project_and_week = defaultdict(lambda: defaultdict(lambda: Z1))
         self._projects_offers = defaultdict(lambda: defaultdict(list))
 
@@ -76,6 +77,8 @@ class Planning:
             for week in pw.weeks:
                 self._by_week[week] += per_week
                 self._by_project_and_week[pw.project][week] += per_week
+                if pw.is_provisional:
+                    self._by_week_provisional[week] += per_week
 
             hours_per_week = list()
             for idx, week in enumerate(self.weeks):
@@ -591,6 +594,9 @@ on week=ph_week
                 else (),
             ),
             "by_week": [self._by_week[week] for week in self.weeks],
+            "by_week_provisional": [
+                self._by_week_provisional[week] for week in self.weeks
+            ],
             "absences": [
                 (str(user), lst) for user, lst in sorted(self._absences.items())
             ],
