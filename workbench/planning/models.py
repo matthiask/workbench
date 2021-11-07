@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -13,9 +14,9 @@ from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.services.models import ServiceType
 from workbench.tools.formats import hours, local_date_format
-from workbench.tools.models import HoursField, Model
+from workbench.tools.models import HoursField, Model, SearchQuerySet
 from workbench.tools.urls import model_urls
-from workbench.tools.validation import raise_if_errors
+from workbench.tools.validation import monday, raise_if_errors
 
 
 @model_urls
@@ -170,6 +171,17 @@ class ExternalWork(AbstractPlannedWork):
         return f"{self.title} ({self.provided_by})"
 
 
+class PlannedWorkQuerySet(SearchQuerySet):
+    def maybe_actionable(self, *, user):
+        day = monday()
+        weeks = [day + dt.timedelta(days=days) for days in [0, 7, 14, 21]]
+        return self.filter(
+            Q(user=user),
+            Q(is_provisional=True),
+            Q(weeks__overlap=weeks),
+        )
+
+
 @model_urls
 class PlannedWork(AbstractPlannedWork):
     project = models.ForeignKey(
@@ -196,6 +208,8 @@ class PlannedWork(AbstractPlannedWork):
         _("planned hours"), validators=[MinValueValidator(Decimal("0.1"))]
     )
     is_provisional = models.BooleanField(_("is provisional"), default=False)
+
+    objects = PlannedWorkQuerySet.as_manager()
 
     class Meta:
         ordering = ["-pk"]

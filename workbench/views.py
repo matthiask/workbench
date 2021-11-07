@@ -41,6 +41,17 @@ def _needs_action(user):
                 "objects": Offer.objects.maybe_actionable(user=user),
             }
         )
+        if user.features[FEATURES.PLANNING]:
+            rows.append(
+                {
+                    "type": "provisional_planned_work",
+                    "verbose_name_plural": _(
+                        "Provisional planned work in the near future"
+                    ),
+                    "url": user.urls["planning"],
+                    "objects": user.planned_work.maybe_actionable(user=user),
+                }
+            )
 
     return [row for row in rows if row["objects"]]
 
