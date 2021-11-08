@@ -16,6 +16,7 @@ from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
+from workbench.planning.models import PlannedWork
 from workbench.projects.models import Campaign, Project
 from workbench.tools.history import HISTORY, changes
 from workbench.tools.validation import in_days
@@ -23,6 +24,15 @@ from workbench.tools.validation import in_days
 
 def _needs_action(user):
     rows = []
+    if user.features[FEATURES.PLANNING]:
+        rows.append(
+            {
+                "type": "provisional_planned_work",
+                "verbose_name_plural": _("Provisional planned work in the near future"),
+                "url": user.urls["planning"],
+                "objects": PlannedWork.objects.maybe_actionable(user=user),
+            }
+        )
     if user.features[FEATURES.DEALS]:
         rows.append(
             {
@@ -41,17 +51,6 @@ def _needs_action(user):
                 "objects": Offer.objects.maybe_actionable(user=user),
             }
         )
-        if user.features[FEATURES.PLANNING]:
-            rows.append(
-                {
-                    "type": "provisional_planned_work",
-                    "verbose_name_plural": _(
-                        "Provisional planned work in the near future"
-                    ),
-                    "url": user.urls["planning"],
-                    "objects": user.planned_work.maybe_actionable(user=user),
-                }
-            )
 
     return [row for row in rows if row["objects"]]
 
