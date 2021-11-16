@@ -8,6 +8,8 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from colorfield.fields import ColorField
+
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.offers.models import Offer
@@ -17,6 +19,22 @@ from workbench.tools.formats import hours, local_date_format
 from workbench.tools.models import HoursField, Model, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import monday, raise_if_errors
+
+
+PW_COLOR_CHOICES = (
+    ("#2780E3", "blue"),
+    ("#6610F2", "indigo"),
+    ("#613D7C", "purple"),
+    ("#E83E8C", "pink"),
+    ("#FF0039", "red"),
+    ("#F0AD4E", "orange"),
+    ("#FF7518", "yellow"),
+    ("#3FB618", "green"),
+    ("#20C997", "teal"),
+    ("#9954BB", "cyan"),
+    ("#868E96", "gray"),
+    ("#373A3C", "dark-gray"),
+)
 
 
 @model_urls
@@ -89,6 +107,10 @@ class AbstractPlannedWork(Model):
         null=True,
         verbose_name=_("primary service type"),
         related_name="+",
+    )
+
+    color_override = ColorField(
+        _("override default coloring"), blank=True, choices=PW_COLOR_CHOICES
     )
 
     class Meta:

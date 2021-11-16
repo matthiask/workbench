@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-07 17:51+0100\n"
+"POT-Creation-Date: 2021-11-16 16:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2564,6 +2564,10 @@ msgstr "Meilensteine"
 #: workbench/planning/models.py
 msgid "primary service type"
 msgstr "Primärer Leistungstyp"
+
+#: workbench/planning/models.py
+msgid "override default coloring"
+msgstr "Standardfarbe überschreiben"
 
 #: workbench/planning/models.py
 #, python-format

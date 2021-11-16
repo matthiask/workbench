@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-07 16:50+0100\n"
+"POT-Creation-Date: 2021-11-16 16:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,10 +77,6 @@ msgid "Add planned work"
 msgstr "Geplante Arbeit hinzufügen"
 
 #: conf/strings.js
-msgid "Concurrent absences"
-msgstr "Parallele Absenzen"
-
-#: conf/strings.js
 msgid "Days"
 msgstr "Tage"
 
@@ -89,8 +85,8 @@ msgid "Description"
 msgstr "Beschreibung"
 
 #: conf/strings.js
-msgid "external works"
-msgstr "Externe Aufwände"
+msgid "Expenses"
+msgstr "Aufwände"
 
 #: conf/strings.js
 msgid "Go to the project"
@@ -201,3 +197,6 @@ msgstr "Welches Ergebnis strebst Du an?"
 msgctxt "provisional"
 msgid "prov."
 msgstr "prov."
+
+#~ msgid "Concurrent absences"
+#~ msgstr "Parallele Absenzen"

@@ -362,9 +362,6 @@ function Project({ by_week, offers, project, external_view, external_work }) {
         offers.map((offer, idx) => (
           <Offer key={idx} {...offer} external_view={external_view} />
         ))}
-      {/* {project.absences ? (
-        <ProjectAbsences absences={project.absences} />
-      ) : null} */}
     </>
   )
 }
@@ -404,14 +401,6 @@ function WorkedHours({ project }) {
     </>
   )
 }
-
-// function weekdayToGradient(weekday, weekspan) {
-//   const width = 8 / weekspan
-//   const start =
-//     (100 * (weekspan - 1) * 7 + (100 - width) * (weekday - 1)) / (weekspan * 7)
-//   const end = start + width
-//   return `linear-gradient(to right, transparent ${start}%, rgb(255, 200, 200) ${start}%, rgb(255, 200, 200) ${end}%, transparent ${end}%)`
-// }
 
 const weekdayBackgroundPosition = (weekday) => {
   const width = 12
@@ -656,6 +645,9 @@ function Work({ work, hours_per_week, absences, isEven }) {
             href={work.url}
             data-toggle="ajaxmodal"
             title={work.tooltip}
+            style={
+              work.color_override ? { "--st-color": work.color_override } : {}
+            }
           >
             <span className="no-pr">{work.text}</span>
           </Cell>
@@ -692,7 +684,7 @@ const ExternalExpenses = ({ external_work }) => {
         className="planning--external"
       />
       <Cell row={row} column={1} className="planning--title is-external pl-3">
-        {gettext("external works")}
+        {gettext("Expenses")}
       </Cell>
       {external_work.map((work, idx) => (
         <ExternalWork key={idx} idx={idx} work={work} />
@@ -720,7 +712,9 @@ const ExternalWork = ({ idx, work }) => {
         column={1}
         className={`planning--title is-pw ${
           work.is_provisional ? "is-provisional" : ""
-        } planning--small pl-5`}
+        } planning--small pl-5${
+          work.color_override ? ` pw-color-${work.color_override}` : ""
+        }`}
       >
         <a href={work.url} data-toggle="ajaxmodal">
           {work.title} ({work.provided_by})
@@ -775,69 +769,6 @@ function Absences({ absences }) {
     </>
   )
 }
-
-// function ProjectAbsences({ absences }) {
-//   const ctx = useContext(RowContext)
-//   const row = ctx.next()
-//   return (
-//     <>
-//       <div
-//         style={{
-//           gridRow: row,
-//           gridColumn: `1 / -1`,
-//         }}
-//         className="planning--absences"
-//       />
-//       <Cell row={row} column={1} className="planning--title is-project-absence">
-//         {gettext("Concurrent absences")}
-//       </Cell>
-//       {absences.map((user, idx) => (
-//         <ProjectUserAbsence key={idx} user={user} />
-//       ))}
-//     </>
-//   )
-// }
-
-// function ProjectUserAbsence({ user }) {
-//   const ctx = useContext(RowContext)
-//   const row = ctx.next()
-
-//   const userAbsences = user[1].map(
-//     (hours) => (hours[0] && hours[0][0]) || "0.0"
-//   )
-
-//   return (
-//     <>
-//       <Cell
-//         row={row}
-//         column={1}
-//         className="planning--small is-project-absence pl-3"
-//       >
-//         {user[0].name}
-//       </Cell>
-//       <Cell
-//         row={row}
-//         column={5}
-//         className={`planning--small text-center no-pr`}
-//       >
-//         {user[0].short_name}
-//       </Cell>
-//       {findContiguousWeekRanges(userAbsences).map((range, idx) => {
-//         return (
-//           <Cell
-//             key={idx}
-//             row={row}
-//             column={FIRST_DATA_COLUMN + range.start}
-//             colspan={`span ${range.length}`}
-//             className={`planning--range planning--small is-project-absence`}
-//           >
-//             <span className="no-pr">{user[0].short_name}</span>
-//           </Cell>
-//         )
-//       })}
-//     </>
-//   )
-// }
 
 const AbsencesTooltip = ({ absences }) => {
   return (

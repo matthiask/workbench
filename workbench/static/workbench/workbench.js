@@ -1,3 +1,5 @@
+/* global jscolor */
+
 function _sel(sel) {
   return document.querySelector(sel)
 }
@@ -445,6 +447,12 @@ function initWidgets() {
   $('input[type="number"]').each(function () {
     this.setAttribute("lang", "en-US")
   })
+
+  // Add colorpicker widgets
+  const colorWidgets = Array.from(document.querySelectorAll(".jscolor"))
+  if (colorWidgets.length > 0) {
+    jscolor.install()
+  }
 }
 
 window.addInlineForm = function addInlineForm(slug, onComplete) {

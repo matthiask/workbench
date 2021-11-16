@@ -7,6 +7,8 @@ from django.utils.dateparse import parse_date
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
+from colorfield.widgets import ColorWidget
+
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.invoices.utils import recurring
@@ -106,10 +108,9 @@ class PlannedWorkForm(ModelForm):
             "planned_hours",
             "is_provisional",
             "milestone",
+            "color_override",
         )
-        widgets = {
-            "notes": Textarea,
-        }
+        widgets = {"notes": Textarea, "color_override": ColorWidget}
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project", None)
@@ -288,10 +289,12 @@ class ExternalWorkForm(ModelForm):
             "service_type",
             "notes",
             "milestone",
+            "color_override",
         )
         widgets = {
             "provided_by": Autocomplete(model=Organization),
             "notes": Textarea,
+            "color_override": ColorWidget,
         }
 
     def __init__(self, *args, **kwargs):

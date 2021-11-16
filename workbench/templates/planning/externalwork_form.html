@@ -20,8 +20,11 @@
         <div class="col-sm-6">{% ff_field form.milestone %}</div>
         <div class="col-sm-6">{% ff_field form.service_type %}</div>
       </div>
+      <div class="row">
+        <div class="col-sm-6">{% ff_field form.color_override %}</div>
+      </div>
     </div>
-    <div class="col-lg-5">{% ff_fields form exclude='title,milestone,service_type,notes,provided_by' %}</div>
+    <div class="col-lg-5">{% ff_fields form exclude='title,milestone,service_type,notes,provided_by,color_override' %}</div>
   </div>
   <style>
 #id_modal-weeks option[value="{{ form.this_monday.isoformat }}"] {

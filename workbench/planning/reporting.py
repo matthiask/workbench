@@ -106,6 +106,9 @@ class Planning:
                             local_date_format(date_until, fmt="d.m."),
                         ),
                         "service_type_id": pw.service_type_id,
+                        "color_override": pw.color_override
+                        if pw.color_override
+                        else None,
                         "is_provisional": pw.is_provisional,
                         "tooltip": ", ".join(
                             filter(
@@ -148,6 +151,9 @@ class Planning:
                             local_date_format(date_until, fmt="d.m."),
                         ),
                         "service_type_id": ew.service_type_id,
+                        "color_override": ew.color_override
+                        if ew.color_override
+                        else None,
                         "tooltip": str(ew.service_type) if ew.service_type else None,
                         "by_week": [1 if w in ew.weeks else 0 for w in self.weeks],
                     }
