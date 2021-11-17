@@ -16,7 +16,14 @@ from workbench.contacts.models import (
     PhoneNumber,
     PostalAddress,
 )
-from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
+from workbench.tools.forms import (
+    Autocomplete,
+    DateInput,
+    Form,
+    ModelForm,
+    Textarea,
+    add_prefix,
+)
 from workbench.tools.models import ProtectedError, SlowCollector
 from workbench.tools.substitute_with import substitute_with
 from workbench.tools.vcard import person_to_vcard, render_vcard_response
@@ -60,10 +67,24 @@ class PersonSearchForm(Form):
         widget=forms.Select(attrs={"class": "custom-select"}),
         label="",
     )
+    added_since = forms.DateField(widget=DateInput, required=False, label="")
 
     def filter(self, queryset):
         data = self.cleaned_data
         queryset = queryset.search(data.get("q")).active()
+        if added_since := data.get("added_since"):
+            from workbench.audit.models import LoggedAction
+
+            queryset = queryset.filter(
+                id__in=[
+                    action.row_data["id"]
+                    for action in LoggedAction.objects.filter(
+                        table_name="contacts_person",
+                        action="I",
+                        created_at__gte=added_since,
+                    )
+                ],
+            )
         return self.apply_renamed(queryset, "g", "groups").select_related(
             "organization"
         )
