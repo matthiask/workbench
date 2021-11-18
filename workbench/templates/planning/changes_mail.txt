@@ -1,5 +1,5 @@
 {% autoescape off %}
-Planungsupdates
+Planungsupdates vom {% now "d.m.Y" %}
 
 Hallo {{ user }}
 
