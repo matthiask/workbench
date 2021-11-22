@@ -160,7 +160,9 @@ def pretty_deleted_object_work(x, *, users):
         u = u.get_short_name()
     else:
         u = x["user_id"]
-    return f'{x["title"]} ({u}, {x["planned_hours"]}h)'
+    weeks = _weeks(x["weeks"])
+    weeks = f"{weeks[0]} – {weeks[-1]}" if len(weeks) > 2 else weeks[0]
+    return f'{x["title"]} ({u}, {x["planned_hours"]}h, {weeks})'
 
 
 def changes(*, since):
