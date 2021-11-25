@@ -792,10 +792,10 @@ group by customer_id, week
 
 
 def campaign_planning_external(campaign):
-    return campaign_planning(campaign, True)
+    return campaign_planning(campaign, external_view=True)
 
 
-def campaign_planning(campaign, external_view=False):
+def campaign_planning(campaign, *, external_view=False):
     projects = Project.objects.filter(campaign=campaign)
     projects_ids = ([project.id for project in projects],)
 
