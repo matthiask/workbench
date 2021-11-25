@@ -12,7 +12,8 @@ from workbench.awt.models import Absence
 from workbench.contacts.models import Organization
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedHours
-from workbench.planning.models import Milestone, PlannedWork
+from workbench.planning.models import ExternalWork, Milestone, PlannedWork
+from workbench.projects.models import Project
 from workbench.services.models import ServiceType
 from workbench.tools.formats import Z1, Z2, hours, local_date_format
 from workbench.tools.reporting import query
@@ -34,7 +35,7 @@ def _period(weeks, min, max):
 
 
 class Planning:
-    def __init__(self, *, external_view=False, weeks, users=None):
+    def __init__(self, *, external_view=False, weeks, users=None, projects=None):
         self.weeks = weeks
         self.users = users
 
@@ -47,7 +48,7 @@ class Planning:
 
         self._projects_external_work = defaultdict(list)
 
-        self._project_ids = set()
+        self._project_ids = {project.id for project in projects} if projects else set()
         self._user_ids = {user.id for user in users} if users else set()
 
         self._worked_hours = defaultdict(lambda: defaultdict(lambda: Z1))
@@ -788,6 +789,60 @@ group by customer_id, week
     ret["planned"] = sum((c["planned"] for c in ret["per_customer"]), Z1)
     ret["logged"] = sum((c["logged"] for c in ret["per_customer"]), Z1)
     return ret
+
+
+def campaign_planning(campaign, external_view=False):
+    projects = Project.objects.filter(campaign=campaign)
+    projects_ids = ([project.id for project in projects],)
+
+    with connections["default"].cursor() as cursor:
+        cursor.execute(
+            """\
+WITH sq AS (
+    SELECT unnest(weeks) AS week
+    FROM planning_plannedwork
+    WHERE project_id = ANY %s
+
+    UNION ALL
+
+    SELECT date_trunc('week', date)::date
+    FROM planning_milestone
+    WHERE project_id = ANY %s
+)
+SELECT MIN(week), MAX(week) FROM sq
+            """,
+            [projects_ids, projects_ids],
+        )
+        result = list(cursor)[0]
+
+    if result[0]:
+        result = (min(result[0], monday() - dt.timedelta(days=14)), result[1])
+        weeks = list(
+            islice(
+                recurring(result[0], "weekly"),
+                2 + (result[1] - result[0]).days // 7,
+            )
+        )
+    else:
+        weeks = list(islice(recurring(monday() - dt.timedelta(days=14), "weekly"), 80))
+
+    planning = Planning(weeks=weeks, projects=projects, external_view=external_view)
+
+    planning.add_planned_work_and_milestones(
+        PlannedWork.objects.filter(project__campaign=campaign).select_related(
+            "service_type"
+        ),
+        Milestone.objects.filter(project__campaign=campaign),
+        ExternalWork.objects.filter(project__campaign=campaign).select_related(
+            "service_type"
+        ),
+    )
+    if not external_view:
+        planning.add_worked_hours(LoggedHours.objects.all())
+    planning.add_absences(Absence.objects.all())
+    planning.add_public_holidays()
+    planning.add_milestones(Milestone.objects.all())
+    return planning.report()
 
 
 def test():  # pragma: no cover

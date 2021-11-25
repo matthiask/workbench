@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render
 
 from workbench.accounts.models import Team, User
 from workbench.planning import reporting
-from workbench.projects.models import Project
+from workbench.projects.models import Campaign, Project
 from workbench.tools.validation import in_days
 
 
@@ -58,5 +58,18 @@ def team_planning(request, pk, retro=False):
             "object": instance,
             "team": instance,
             "planning_data": reporting.team_planning(instance, date_range),
+        },
+    )
+
+
+def campaign_planning(request, pk):
+    instance = get_object_or_404(Campaign.objects.all(), pk=pk)
+    return render(
+        request,
+        "planning/campaign_planning.html",
+        {
+            "object": instance,
+            "campaign": instance,
+            "planning_data": reporting.campaign_planning(instance),
         },
     )

@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import include, re_path
+from django.urls import include, path, re_path
 from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
@@ -11,7 +11,11 @@ from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.forms import OfferForm
 from workbench.offers.models import Offer
 from workbench.offers.views import ProjectOfferPDFView
-from workbench.planning.views import project_planning, project_planning_external
+from workbench.planning.views import (
+    campaign_planning,
+    project_planning,
+    project_planning_external,
+)
 from workbench.projects.forms import (
     CampaignDeleteForm,
     CampaignForm,
@@ -83,6 +87,11 @@ urlpatterns = [
             model=Campaign, delete_form_class=CampaignDeleteForm
         ),
         name="projects_campaign_delete",
+    ),
+    path(
+        "campaigns/<int:pk>/planning/",
+        campaign_planning,
+        name="projects_campaign_planning",
     ),
     # Projects
     re_path(
