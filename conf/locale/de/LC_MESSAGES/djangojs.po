@@ -89,8 +89,8 @@ msgid "Description"
 msgstr "Beschreibung"
 
 #: conf/strings.js
-msgid "external works"
-msgstr "Externe Aufwände"
+msgid "Efforts"
+msgstr "Aufwände"
 
 #: conf/strings.js
 msgid "Go to the project"

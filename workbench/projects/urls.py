@@ -13,6 +13,7 @@ from workbench.offers.models import Offer
 from workbench.offers.views import ProjectOfferPDFView
 from workbench.planning.views import (
     campaign_planning,
+    campaign_planning_external,
     project_planning,
     project_planning_external,
 )
@@ -92,6 +93,11 @@ urlpatterns = [
         "campaigns/<int:pk>/planning/",
         campaign_planning,
         name="projects_campaign_planning",
+    ),
+    path(
+        "campaigns/<int:pk>/external/",
+        campaign_planning_external,
+        name="projects_campaign_planning_external",
     ),
     # Projects
     re_path(

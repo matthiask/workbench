@@ -692,7 +692,7 @@ const ExternalExpenses = ({ external_work }) => {
         className="planning--external"
       />
       <Cell row={row} column={1} className="planning--title is-external pl-3">
-        {gettext("external works")}
+        {gettext("Efforts")}
       </Cell>
       {external_work.map((work, idx) => (
         <ExternalWork key={idx} idx={idx} work={work} />

@@ -7,6 +7,7 @@
   --week-width: 2.2rem;
   --user-width: 2rem;
   --default-height: 1.4rem;
+  --range-height: 1.4rem;
 
   --stripe1: rgba(239, 239, 239, 0.8);
   --stripe2: rgba(241, 241, 255, 0.8);
@@ -141,6 +142,7 @@
   transition: opacity 0.2s;
   border-radius: 3px;
   position: relative;
+  height: var(--range-height);
 
   &.is-project {
     background-color: var(--indigo);
@@ -157,7 +159,7 @@
   &.is-milestone-graphic {
     width: 0px;
     &::before {
-      content: "🌟"; // maybe too fancy, but i like it
+      content: "🌟";
       position: absolute;
       left: -0.25rem;
       bottom: 0;
@@ -187,11 +189,13 @@
 
   &.is-absence-graphic {
     width: 50%;
-    background: linear-gradient(
-      0.33turn,
-      var(--st-color, var(--blue)) 50%,
-      rgba(20, 132, 80, 0) 50%
-    );
+    &::before {
+      content: "⚠️";
+      font-size: 0.5rem;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
   }
 
   &.is-pw:hover {

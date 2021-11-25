@@ -73,3 +73,16 @@ def campaign_planning(request, pk):
             "planning_data": reporting.campaign_planning(instance),
         },
     )
+
+
+def campaign_planning_external(request, pk):
+    instance = get_object_or_404(Campaign.objects.all(), pk=pk)
+    return render(
+        request,
+        "planning/campaign_planning_external.html",
+        {
+            "object": instance,
+            "campaign": instance,
+            "planning_data": reporting.campaign_planning_external(instance),
+        },
+    )
