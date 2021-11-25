@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-07 17:51+0100\n"
+"POT-Creation-Date: 2021-11-25 09:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3551,34 +3551,6 @@ msgstr "Externe Planungsansicht"
 msgid "back to project planning"
 msgstr "Zurück zum Projektplan"
 
-#: workbench/templates/planning/updates_mail.txt
-msgid "Planning updates"
-msgstr "Planungsupdates"
-
-#: workbench/templates/planning/updates_mail.txt
-#, python-format
-msgid "Hello %(user)s"
-msgstr "Hallo %(user)s"
-
-#: workbench/templates/planning/updates_mail.txt
-msgid ""
-"The following list of recent changes to planning has been compiled for you "
-"personally in the hope that it is interesting. This mail contains milestone "
-"changes and work deletions for your owned projects and changes to your "
-"planned work carried out by others.\n"
-"\n"
-"Please always check your personal planning to ensure that it is manageable "
-"and up-to-date. Thanks ✨"
-msgstr ""
-"Die folgende Liste mit neuen Änderungen wurde für dich zusammengestellt, in "
-"der Hoffnung, dass sie nützlich und interessant ist. Dieses Mail enthält "
-"Änderungen von Meilensteinen und gelöschte Arbeitseinheiten von Projekten, "
-"welche du koordinierst sowie durch andere eingetragene Änderungen deiner "
-"Arbeitseinheiten.\n"
-"\n"
-"Bitte überprüfe deine persönliche Planung und stelle sicher, dass die Arbeit "
-"überschaubar bleibt und die Planung aktuell. Merci ✨"
-
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "offered"
@@ -4119,6 +4091,31 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Planning updates"
+#~ msgstr "Planungsupdates"
+
+#, python-format
+#~ msgid "Hello %(user)s"
+#~ msgstr "Hallo %(user)s"
+
+#~ msgid ""
+#~ "The following list of recent changes to planning has been compiled for "
+#~ "you personally in the hope that it is interesting. This mail contains "
+#~ "milestone changes and work deletions for your owned projects and changes "
+#~ "to your planned work carried out by others.\n"
+#~ "\n"
+#~ "Please always check your personal planning to ensure that it is "
+#~ "manageable and up-to-date. Thanks ✨"
+#~ msgstr ""
+#~ "Die folgende Liste mit neuen Änderungen wurde für dich zusammengestellt, "
+#~ "in der Hoffnung, dass sie nützlich und interessant ist. Dieses Mail "
+#~ "enthält Änderungen von Meilensteinen und gelöschte Arbeitseinheiten von "
+#~ "Projekten, welche du koordinierst sowie durch andere eingetragene "
+#~ "Änderungen deiner Arbeitseinheiten.\n"
+#~ "\n"
+#~ "Bitte überprüfe deine persönliche Planung und stelle sicher, dass die "
+#~ "Arbeit überschaubar bleibt und die Planung aktuell. Merci ✨"
 
 #, python-format
 #~ msgid "%(by)s changed a milestone: %(title)s (%(date)s)"

@@ -14,25 +14,6 @@ fl.config.update(
 
 
 @fl.task
-def check(ctx):
-    fl.check(ctx)
-    fl.run(
-        ctx,
-        "yarn run prettier --list-different --no-semi --trailing-comma es5"
-        ' "absences/**/*.*" "planning/**/*.*" "timer/**/*.*"',
-    )
-    fl.run(
-        ctx,
-        'yarn run eslint "absences/**/*.js" "planning/**/*.js" "timer/**/*.js"',
-    )
-    fl.run(
-        ctx,
-        "pipx run interrogate"
-        " -e node_modules -e venv -v -f 99 --whitelist-regex 'test_.*'",
-    )
-
-
-@fl.task
 def fmt(ctx):
     fl.fmt(ctx)
     fl.run(
@@ -71,7 +52,7 @@ def _restart_all(conn):
 @fl.task
 def deploy(ctx):
     fl._check_branch(ctx)
-    check(ctx)
+    fl.check(ctx)
     fl.run(ctx, "git push origin main")
     fl.run(ctx, "NODE_ENV=production yarn run webpack -p --bail")
     with fl.Connection(fl.config.host) as conn:
@@ -82,7 +63,7 @@ def deploy(ctx):
 
 @fl.task
 def deploy_code(ctx):
-    check(ctx)
+    fl.check(ctx)
     fl.run(ctx, "git push origin main")
     with fl.Connection(fl.config.host) as conn:
         _do_deploy(conn, "www/workbench/", rsync=False)
@@ -103,4 +84,4 @@ def pull_db(ctx, installation="fh"):
     )
 
 
-ns = fl.Collection(*fl.GENERAL, check, deploy, deploy_code, fmt, pull_db)
+ns = fl.Collection(*fl.GENERAL, deploy, deploy_code, fmt, pull_db)
