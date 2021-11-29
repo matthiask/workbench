@@ -76,7 +76,9 @@
             <tr>
               <th class="text-nowrap">
                 {% translate 'target days for full time employment' %}
-                <small>({{ stats.year }})</small>
+                <small>
+                  ({{ stats.year }} {% history_link stats.year %})
+                </small>
               </th>
               {% for value in stats.target_days %}
                 <td class="text-right {% if not value %}text-black-30{% endif %}">
