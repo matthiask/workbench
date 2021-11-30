@@ -47,3 +47,5 @@ class ProjectedInvoicesTest(TestCase):
         with travel("2021-11-28"):
             send_unsent_projected_invoices_reminders()
         self.assertEqual(len(mail.outbox), 1)
+
+        # print(mail.outbox[0].__dict__)

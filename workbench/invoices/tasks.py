@@ -81,14 +81,19 @@ def send_unsent_projected_invoices_reminders():
             )
             for project in projects
         )
+        eom = local_date_format(next_month - dt.timedelta(days=1))
         EmailMultiAlternatives(
-            _("Unsent projected invoices"),
+            "{} ({})".format(_("Unsent projected invoices"), eom),
             f"""\
 Hallo {user}
 
-Das geplante Rechnungstotal wurde bei folgenden Projekten nicht erreicht:
+Das geplante Rechnungstotal per {eom} wurde bei
+folgenden Projekten noch nicht erreicht:
 
 {body}
+
+Wenn Du die Rechnungen nicht stellen kannst, aktualisiere bitte
+die geplanten Rechnungen oder schliesse das Projekt.
 """,
             to=[user.email],
             cc=["workbench@feinheit.ch"],
