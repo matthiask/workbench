@@ -15,7 +15,7 @@ from workbench.circles.models import Circle, Role
 from workbench.contacts.models import Organization, Person, PostalAddress
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.deals.models import AttributeGroup, ClosingType, Deal, ValueType
-from workbench.invoices.models import Invoice, RecurringInvoice
+from workbench.invoices.models import Invoice, ProjectedInvoice, RecurringInvoice
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.planning.models import Milestone, PlannedWork
@@ -197,6 +197,16 @@ class RecurringInvoiceFactory(DjangoModelFactory):
 
     class Meta:
         model = RecurringInvoice
+
+
+class ProjectedInvoiceFactory(DjangoModelFactory):
+    project = factory.SubFactory(ProjectFactory)
+    invoiced_on = factory.LazyAttribute(lambda a: dt.date.today())
+    gross_margin = Decimal(0)
+    description = factory.Sequence(lambda n: f"Projected invoice {n}")
+
+    class Meta:
+        model = ProjectedInvoice
 
 
 # SERVICES ####################################################################

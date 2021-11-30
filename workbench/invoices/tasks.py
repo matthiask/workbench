@@ -6,6 +6,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.utils.translation import gettext as _
 
 from workbench.invoices.models import RecurringInvoice
+from workbench.invoices.utils import next_valid_day
 from workbench.reporting.key_data import unsent_projected_invoices
 from workbench.tools.formats import currency, local_date_format
 
@@ -59,13 +60,15 @@ Delta: {unsent}
 
 
 def send_unsent_projected_invoices_reminders():
-    if dt.date.today().day != 1:
+    today = dt.date.today()
+    next_month = next_valid_day(today.year, today.month, 99)
+    if (next_month - today).days != 3:  # third-last day of month
         return
 
-    projects = unsent_projected_invoices()
+    upi = unsent_projected_invoices(next_month)
     by_user = defaultdict(list)
 
-    for project in unsent_projected_invoices():
+    for project in upi:
         by_user[project["project"].owned_by].append(project)
 
     for user, projects in by_user.items():

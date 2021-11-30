@@ -204,9 +204,8 @@ def projected_invoices():
     }
 
 
-def unsent_projected_invoices():
-    today = dt.date.today()
-    this = (today.year, today.month)
+def unsent_projected_invoices(cutoff_date):
+    this = (cutoff_date.year, cutoff_date.month)
 
     def _filter():
         for project in projected_invoices()["projects"]:
