@@ -5,13 +5,12 @@ name: Python application
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     services:
@@ -21,35 +20,35 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
-        ports: ['5432:5432']
+        ports: ["5432:5432"]
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 .
-    - name: Test with the Django testsuite
-      env:
-        ALLOWED_HOSTS: '["*"]'
-        DATABASE_URL: 'postgres://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres'
-        DEBUG: 'True'
-        LIVE: 'False'
-        NAMESPACE: 'feinheit'
-        SECRET_KEY: 'unsafe'
-        TESTING: 'True'
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 .
+      - name: Test with the Django testsuite
+        env:
+          ALLOWED_HOSTS: '["*"]'
+          DATABASE_URL: "postgres://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres"
+          DEBUG: "True"
+          LIVE: "False"
+          NAMESPACE: "feinheit"
+          SECRET_KEY: "unsafe"
+          TESTING: "True"
 
-      run: |
-        mkdir -p tmp
-        coverage run ./manage.py test -v2
-        coverage report -m
+        run: |
+          mkdir -p tmp
+          coverage run ./manage.py test -v2
+          coverage report -m
