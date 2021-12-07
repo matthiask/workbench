@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-25 09:08+0100\n"
+"POT-Creation-Date: 2021-12-07 08:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -110,10 +110,13 @@ msgstr ""
 
 #: workbench/accounts/features.py workbench/planning/apps.py
 #: workbench/templates/accounts/team_detail.html workbench/templates/base.html
+#: workbench/templates/planning/campaign_planning.html
+#: workbench/templates/planning/campaign_planning_external.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/planning/project_planning_external.html
 #: workbench/templates/planning/team_planning.html
 #: workbench/templates/planning/user_planning.html
+#: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_detail.html
 msgid "planning"
 msgstr "Planung"
@@ -627,6 +630,7 @@ msgstr "ist Arbeitszeit"
 
 #: workbench/awt/models.py workbench/templates/awt/absence_calendar.html
 #: workbench/templates/awt/absence_detail.html
+#: workbench/templates/planning/campaign_planning.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/planning/team_planning.html
 #: workbench/templates/planning/user_planning.html
@@ -660,6 +664,24 @@ msgstr "Anfang und Ende müssen im gleichen Jahr liegen."
 #, python-format
 msgid "%s days"
 msgstr "%s Tage"
+
+#: workbench/awt/models.py
+msgid "absolute"
+msgstr "absolut"
+
+#: workbench/awt/models.py
+msgid "relative"
+msgstr "relativ"
+
+#: workbench/awt/models.py workbench/contacts/forms.py
+#: workbench/contacts/models.py workbench/deals/models.py
+#: workbench/invoices/forms.py workbench/invoices/models.py
+#: workbench/projects/models.py
+#: workbench/templates/reporting/key_data_gross_profit.html
+#: workbench/templates/reporting/key_data_third_party_costs.html
+#: workbench/timer/models.py
+msgid "type"
+msgstr "Typ"
 
 #: workbench/awt/models.py workbench/awt/pdf.py
 #: workbench/templates/awt/year_detail.html
@@ -880,15 +902,6 @@ msgstr ""
 "Diese Person ist der Kontakt der folgenden zugehörigen Objekte: %s. "
 "Vielleicht ist es weniger verwirrend, diesen Eintrag zu archivieren und "
 "einen neuen zu erstellen als die Organisation zu ändern."
-
-#: workbench/contacts/forms.py workbench/contacts/models.py
-#: workbench/deals/models.py workbench/invoices/forms.py
-#: workbench/invoices/models.py workbench/projects/models.py
-#: workbench/templates/reporting/key_data_gross_profit.html
-#: workbench/templates/reporting/key_data_third_party_costs.html
-#: workbench/timer/models.py
-msgid "type"
-msgstr "Typ"
 
 #: workbench/contacts/forms.py workbench/contacts/models.py
 msgid "default billing address"
@@ -2551,6 +2564,7 @@ msgid "planned hours"
 msgstr "geplante Stunden"
 
 #: workbench/planning/models.py
+#: workbench/templates/planning/campaign_planning.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/planning/team_planning.html
 #: workbench/templates/planning/user_planning.html
@@ -2589,6 +2603,7 @@ msgid "is provisional"
 msgstr "ist provisorisch"
 
 #: workbench/planning/models.py workbench/templates/base.html
+#: workbench/templates/planning/campaign_planning.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/planning/team_planning.html
 #: workbench/templates/planning/user_planning.html
@@ -2745,6 +2760,7 @@ msgid "Codes must be unique."
 msgstr "Codes müssen eindeutig sein."
 
 #: workbench/projects/models.py
+#: workbench/templates/planning/campaign_planning.html
 #: workbench/templates/projects/project_detail.html
 msgid "campaign"
 msgstr "Kampagne"
@@ -3529,6 +3545,15 @@ msgstr "Aufwände in Stunden"
 msgid "This page does not exist (anymore)."
 msgstr "Diese Seite existiert nicht (mehr)."
 
+#: workbench/templates/planning/campaign_planning.html
+#: workbench/templates/planning/project_planning.html
+msgid "External planning view"
+msgstr "Externe Planungsansicht"
+
+#: workbench/templates/planning/campaign_planning_external.html
+msgid "back to campaign planning"
+msgstr "Zurück zur Kampagnenplanung"
+
 #: workbench/templates/planning/externalwork_detail.html
 #: workbench/templates/planning/plannedwork_detail.html
 msgid "Periods"
@@ -3542,10 +3567,6 @@ msgstr "Geschichte der geplanten Arbeit"
 #: workbench/templates/planning/project_planning.html
 msgid "History of milestones"
 msgstr "Geschichte der Meilensteine"
-
-#: workbench/templates/planning/project_planning.html
-msgid "External planning view"
-msgstr "Externe Planungsansicht"
 
 #: workbench/templates/planning/project_planning_external.html
 msgid "back to project planning"

@@ -99,7 +99,6 @@ def annual_working_time(year, *, users):
         override.user_id: override
         for override in VacationDaysOverride.objects.filter(year=year, user__in=users)
     }
-    override_days = {user_id: override.days for user_id, override in overrides.items()}
 
     for employment in Employment.objects.filter(
         user__in=months.users_with_wtm
@@ -148,7 +147,14 @@ def annual_working_time(year, *, users):
             for user, month_data in months.items()
         },
     )
-    remaining.update(override_days)
+    for user_id, override in overrides.items():
+        if override.type == override.Type.ABSOLUTE:
+            remaining[user_id] = override.days
+        elif override.type == override.Type.RELATIVE:
+            remaining[user_id] += override.days
+        else:  # pragma: no cover
+            raise Exception(f"Unknown override type {override.type}")
+    available_vacation_days = defaultdict(lambda: Z1, remaining)
 
     for absence in Absence.objects.filter(
         user__in=months.users_with_wtm, starts_on__year=year, is_working_time=True
@@ -250,9 +256,7 @@ def annual_working_time(year, *, users):
                 "totals": {
                     "target_days": sum(month_data["target_days"]),
                     "percentage": sum(month_data["percentage"]) / 12,
-                    "available_vacation_days": override_days[user.id]
-                    if user.id in override_days
-                    else sum(month_data["available_vacation_days"]),
+                    "available_vacation_days": available_vacation_days[user.id],
                     "calculated_vacation_days": sum(
                         month_data["available_vacation_days"]
                     ),

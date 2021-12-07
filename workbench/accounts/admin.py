@@ -61,6 +61,7 @@ class EmploymentInline(admin.TabularInline):
 class VacationDaysOverrideInline(admin.TabularInline):
     model = VacationDaysOverride
     extra = 0
+    radio_fields = {"type": admin.HORIZONTAL}
 
 
 class FeatureFilter(admin.SimpleListFilter):

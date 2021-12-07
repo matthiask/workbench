@@ -100,7 +100,10 @@ def user_stats_pdf(data):
             table.append(
                 [_("vacation days override")]
                 + ["" for _i in range(11)]
-                + [override.notes, days(override.days)]
+                + [
+                    f"{override.notes} ({override.pretty_days})",
+                    days(data["totals"]["available_vacation_days"]),
+                ]
             )
         table.append(
             [

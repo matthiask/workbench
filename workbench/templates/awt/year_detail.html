@@ -129,9 +129,10 @@
                 </th>
                 <td colspan="12" class="text-right">
                   {{ totals.vacation_days_override.notes }}
+                  ({{ totals.vacation_days_override.pretty_days }})
                 </td>
                 <th class="text-right">
-                  {{ totals.vacation_days_override.days|days }}
+                  {{ totals.available_vacation_days|days }}
                 </th>
               </tr>
             {% endif %}

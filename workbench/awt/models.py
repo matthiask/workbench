@@ -238,6 +238,10 @@ class Absence(Model):
 
 
 class VacationDaysOverride(models.Model):
+    class Type(models.TextChoices):
+        ABSOLUTE = "absolute", _("absolute")
+        RELATIVE = "relative", _("relative")
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -246,6 +250,7 @@ class VacationDaysOverride(models.Model):
     )
     year = models.IntegerField(_("year"))
     days = models.DecimalField(_("days"), max_digits=4, decimal_places=2)
+    type = models.CharField(_("type"), max_length=10, choices=Type.choices)
     notes = models.CharField(_("notes"), max_length=500)
 
     class Meta:
@@ -255,4 +260,8 @@ class VacationDaysOverride(models.Model):
         verbose_name_plural = _("vacation days overrides")
 
     def __str__(self):
-        return days(self.days)
+        return f"{self.notes}: {self.pretty_days}"
+
+    @property
+    def pretty_days(self):
+        return days(self.days, plus_sign=self.type == self.Type.RELATIVE)
