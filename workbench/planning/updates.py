@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 from django.utils.translation import gettext as _
 
 from authlib.email import render_to_mail
@@ -15,6 +16,7 @@ from workbench.accounts.models import User
 from workbench.audit.models import LoggedAction, audit_user_id
 from workbench.planning.models import Milestone, PlannedWork
 from workbench.projects.models import Project
+from workbench.tools.formats import local_date_format
 from workbench.tools.validation import monday
 
 
@@ -110,7 +112,9 @@ def pretty_changes_milestone():
 
 
 def _weeks(weeks):
-    return weeks[1:-1].split(",")
+    w = weeks[1:-1].split(",")
+    start, end = parse_date(w[0]), parse_date(w[-1]) + dt.timedelta(days=6)
+    return f"{local_date_format(start)} - {local_date_format(end)}"
 
 
 def pretty_changes_work(*, users, milestones):
@@ -128,10 +132,8 @@ def pretty_changes_work(*, users, milestones):
                 row["new"] = users.get(int(row["new"]), row["new"])
 
             elif row["field"] == "weeks":
-                weeks = _weeks(row["old"])
-                row["old"] = f"{weeks[0]} - {weeks[-1]}" if len(weeks) > 2 else weeks[0]
-                weeks = _weeks(row["new"])
-                row["new"] = f"{weeks[0]} - {weeks[-1]}" if len(weeks) > 2 else weeks[0]
+                row["old"] = _weeks(row["old"])
+                row["new"] = _weeks(row["new"])
 
             elif row["field"] == "milestone_id":
                 if row["old"]:
@@ -161,7 +163,6 @@ def pretty_deleted_object_work(x, *, users):
     else:
         u = x["user_id"]
     weeks = _weeks(x["weeks"])
-    weeks = f"{weeks[0]} – {weeks[-1]}" if len(weeks) > 2 else weeks[0]
     return f'{x["title"]} ({u}, {x["planned_hours"]}h, {weeks})'
 
 
