@@ -232,6 +232,7 @@ def _accounts_user_cfg(user):
     fields = {
         "email",
         "is_active",
+        "is_admin",
         "_short_name",
         "_full_name",
         "language",
@@ -239,6 +240,7 @@ def _accounts_user_cfg(user):
         "planning_hours_per_day",
         "person",
         "_features",
+        "date_of_employment",
     }
     related = [
         (Employment, "user_id"),
