@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-07 08:27+0100\n"
+"POT-Creation-Date: 2021-12-24 10:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1766,6 +1766,18 @@ msgid "This project already has an invoice in preparation."
 msgstr "Dieses Projekt hat schon eine Rechnung in Vorbereitung."
 
 #: workbench/invoices/forms.py
+msgid "This is the final invoice, close the project"
+msgstr "Das ist die Schlussrechnung, schliesse das Projekt"
+
+#: workbench/invoices/forms.py
+msgid ""
+"You'll still be able to log hours for a few days. You can always reopen the "
+"project later."
+msgstr ""
+"Die Stundenerfassung ist während wenigen Tagen immer noch möglich. Das "
+"Projekt kannst Du später auch wieder öffnen."
+
+#: workbench/invoices/forms.py
 #, python-format
 msgid "%s logged but no hourly rate defined."
 msgstr "%s erfasst aber kein Stundensatz definiert."
@@ -2113,7 +2125,6 @@ msgstr "Stundensatz"
 
 #: workbench/invoices/views.py workbench/logbook/models.py
 #: workbench/management/commands/profitability.py workbench/services/models.py
-#: workbench/templates/awt/year_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_list.html
@@ -3141,11 +3152,6 @@ msgstr "berechnet mit %(hours)s pro Tag"
 
 #: workbench/templates/awt/year_detail.html
 #, python-format
-msgid "carry forward the balance into %(this_year)s"
-msgstr "Bilanz ins %(this_year)s übertragen"
-
-#: workbench/templates/awt/year_detail.html
-#, python-format
 msgid "from %(date)s"
 msgstr "Ab %(date)s"
 
@@ -4112,6 +4118,10 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-format
+#~ msgid "carry forward the balance into %(this_year)s"
+#~ msgstr "Bilanz ins %(this_year)s übertragen"
 
 #~ msgid "Planning updates"
 #~ msgstr "Planungsupdates"

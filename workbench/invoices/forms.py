@@ -392,6 +392,16 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 self.request, _("This project already has an invoice in preparation.")
             )
 
+        if not self.project.closed_on:
+            self.fields["close_project"] = forms.BooleanField(
+                label=_("This is the final invoice, close the project"),
+                help_text=_(
+                    "You'll still be able to log hours for a few days."
+                    " You can always reopen the project later."
+                ),
+                required=False,
+            )
+
     def add_services_field(self):
         source = self.request.GET.get("source")
         if source == "logbook":
@@ -460,19 +470,25 @@ class CreateProjectInvoiceForm(InvoiceForm):
         )
 
     def save(self):
-        if self.request.GET.get("type") != "services":
-            return super().save()
+        if self.request.GET.get("type") == "services":
+            instance = super().save()
+            services = self.project.services.filter(
+                id__in=self.cleaned_data["selected_services"]
+            )
+            if self.request.GET.get("source") == "logbook":
+                instance.create_services_from_logbook(services)
+            else:
+                instance.create_services_from_offer(services)
+            if self.cleaned_data["disable_logging"]:
+                services.update(allow_logging=False)
 
-        instance = super().save()
-        services = self.project.services.filter(
-            id__in=self.cleaned_data["selected_services"]
-        )
-        if self.request.GET.get("source") == "logbook":
-            instance.create_services_from_logbook(services)
         else:
-            instance.create_services_from_offer(services)
-        if self.cleaned_data["disable_logging"]:
-            services.update(allow_logging=False)
+            instance = super().save()
+
+        if self.cleaned_data.get("close_project"):
+            self.project.closed_on = dt.date.today()
+            self.project.save()
+
         return instance
 
 
