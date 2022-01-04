@@ -175,6 +175,7 @@ def key_data_view(request):
     }
 
     projected_invoices = key_data.projected_invoices()
+    ohr = key_data.offers_hourly_rate(date_range)
 
     gross_margin_by_years = {}
     for month in gross_margin_by_month:
@@ -198,6 +199,11 @@ def key_data_view(request):
         year["accruals"] += month["accruals"]["delta"]
         year["gross_margin"] += month["gross_margin"]
         year["fte"].append(month["fte"])
+
+        year["offers_hourly_rate"] = ohr["by_year"][year["year"]]
+        month["offers_hourly_rate"] = ohr["by_month"][
+            (month["date"].year, month["date"].month)
+        ]
 
     for year in gross_margin_by_years.values():
         year["fte"] = sum(year["fte"]) / len(year["fte"])

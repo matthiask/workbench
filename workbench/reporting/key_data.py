@@ -244,3 +244,64 @@ def open_offers_total():
     return (
         Offer.objects.offered().order_by().aggregate(t=Sum("total_excl_tax"))["t"] or Z2
     )
+
+
+def offers_hourly_rate(date_range):
+    margin_m = defaultdict(lambda: Z2)
+    hours_m = defaultdict(lambda: Z1)
+    margin_y = defaultdict(lambda: Z2)
+    hours_y = defaultdict(lambda: Z1)
+
+    def month(day):
+        return (day.year, day.month)
+
+    for offer in (
+        Offer.objects.accepted()
+        .filter(closed_on__range=date_range)
+        .prefetch_related("services")
+    ):
+        margin = offer.total_excl_tax - sum(
+            (
+                service.third_party_costs
+                for service in offer.services.all()
+                if service.third_party_costs
+            ),
+            Z2,
+        )
+        hours = sum(
+            (service.service_hours for service in offer.services.all()),
+            Z1,
+        )
+
+        margin_m[month(offer.closed_on)] += margin
+        hours_m[month(offer.closed_on)] += hours
+        margin_y[offer.closed_on.year] += margin
+        hours_y[offer.closed_on.year] += hours
+
+    months = [
+        month(m)
+        for m in takewhile(
+            lambda day: day < date_range[1],
+            recurring(date_range[0], "monthly"),
+        )
+    ]
+    return {
+        "by_month": {
+            month: {
+                "gross_margin": margin_m[month],
+                "hours": hours_m[month],
+                "hourly_rate": margin_m[month] / hours_m[month]
+                if hours_m[month]
+                else Z2,
+            }
+            for month in months
+        },
+        "by_year": {
+            year: {
+                "gross_margin": margin_y[year],
+                "hours": hours_y[year],
+                "hourly_rate": margin_y[year] / hours_y[year] if hours_y[year] else Z2,
+            }
+            for year in range(date_range[0].year, date_range[1].year + 1)
+        },
+    }
