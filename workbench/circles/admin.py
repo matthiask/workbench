@@ -14,6 +14,7 @@ class RoleAdmin(admin.ReadWriteModelAdmin):
     list_editable = ["work_category"]
     list_filter = ["work_category", "circle", "is_removed"]
     readonly_fields = ["circle", "name", "for_circle", "is_removed"]
+    search_fields = ["name"]
 
     def has_add_permission(self, request, obj=None):
         return False
