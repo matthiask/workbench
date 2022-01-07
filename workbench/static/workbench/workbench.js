@@ -28,7 +28,7 @@ $(function () {
   const initModal = function (data) {
     dismissModals()
 
-    $(data).modal()
+    $(data).modal({ backdrop: "static" })
 
     setTimeout(function () {
       const fields = $(".modal").find("input, select")
