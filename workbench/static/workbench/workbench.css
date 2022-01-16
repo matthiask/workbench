@@ -276,3 +276,7 @@ tbody th > a {
   font-size: 85%;
   color: #555;
 }
+
+.dropdown-menu.show {
+  z-index: 9999;
+}

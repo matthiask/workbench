@@ -1,7 +1,7 @@
 exclude: ".yarn/|yarn.lock"
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v4.1.0
     hooks:
       - id: check-added-large-files
       - id: check-merge-conflict
@@ -16,7 +16,7 @@ repos:
         language: system
         always_run: true
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.29.1
+    rev: v2.31.0
     hooks:
       - id: pyupgrade
         args: [--py36-plus]
@@ -46,15 +46,14 @@ repos:
         args: [--list-different, --no-semi]
         exclude: "^conf/|.*\\.html$"
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.4.0
+    rev: v8.7.0
     hooks:
       - id: eslint
         additional_dependencies:
-          - eslint@8.3.0
+          - eslint@8.7.0
           - eslint-config-prettier@8.3.0
-          - eslint-config-react@1.1.4
-          - eslint-plugin-react@^7.26.1
-          - eslint-plugin-react-hooks@^4.2.1-alpha-00ced1e2b-20211102
+          - eslint-plugin-react@^7.28.0
+          - eslint-plugin-react-hooks@^4.3.0
           - "@babel/core"
           - "@babel/eslint-parser"
           - "@babel/preset-env"
