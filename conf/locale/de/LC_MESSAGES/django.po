@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-24 10:52+0100\n"
+"POT-Creation-Date: 2022-01-30 09:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -59,7 +59,6 @@ msgid "Campaigns allow grouping projects."
 msgstr "Kampagnen ermöglichen die Gruppierung von Projekten."
 
 #: workbench/accounts/features.py workbench/accounts/forms.py
-#: workbench/templates/accounts/coffee_mail.txt
 msgid "Coffee break"
 msgstr "Kaffeepause"
 
@@ -105,8 +104,7 @@ msgstr "Späte Leistungserfassung erlauben"
 
 #: workbench/accounts/features.py
 msgid "Hours and absences can be added and changed late."
-msgstr ""
-"Stunden und Abwesenheiten können spät hinzugefügt und verändert werden."
+msgstr "Stunden und Abwesenheiten können spät hinzugefügt und verändert werden."
 
 #: workbench/accounts/features.py workbench/planning/apps.py
 #: workbench/templates/accounts/team_detail.html workbench/templates/base.html
@@ -136,14 +134,11 @@ msgstr "Arbeitszeit-Korrektur"
 
 #: workbench/accounts/features.py
 msgid "This user may add and change absences of type Working time correction."
-msgstr ""
-"Diese Nutzer*in hat die Erlaubnis zur Bearbeitung von «Arbeitszeit-"
-"Korrektur»-Absenzen."
+msgstr "Diese Nutzer*in hat die Erlaubnis zur Bearbeitung von «Arbeitszeit-Korrektur»-Absenzen."
 
 #: workbench/accounts/forms.py
 msgid "Contact your administrator to change this value."
-msgstr ""
-"Kontaktiere die Administrator*innen, falls Du diesen Wert ändern willst."
+msgstr "Kontaktiere die Administrator*innen, falls Du diesen Wert ändern willst."
 
 #: workbench/accounts/middleware.py
 msgid "Please authenticate."
@@ -241,12 +236,8 @@ msgstr "Nutzer*innen"
 
 #: workbench/accounts/models.py
 #, python-format
-msgid ""
-"You should take (and log!) a break of at least %(minutes)s minutes when "
-"working more than %(hours)s hours."
-msgstr ""
-"Du musst eine Pause von mindestens %(minutes)s Minuten machen (und "
-"erfassen!), wenn Du mehr als %(hours)s Stunden arbeitest."
+msgid "You should take (and log!) a break of at least %(minutes)s minutes when working more than %(hours)s hours."
+msgstr "Du musst eine Pause von mindestens %(minutes)s Minuten machen (und erfassen!), wenn Du mehr als %(hours)s Stunden arbeitest."
 
 #: workbench/accounts/models.py workbench/awt/models.py
 #: workbench/circles/models.py workbench/contacts/models.py
@@ -317,8 +308,7 @@ msgid "I hope you’ll enjoy it :-)"
 msgstr "Ich hoffe, ihr geniesst es :-)"
 
 #: workbench/accounts/tasks.py
-msgid ""
-"But even a bad cup of coffee is better than no coffee at all. – David Lynch"
+msgid "But even a bad cup of coffee is better than no coffee at all. – David Lynch"
 msgstr ""
 
 #: workbench/accounts/tasks.py
@@ -422,20 +412,12 @@ msgid "Creating absences for past years is not allowed."
 msgstr "Abwesenheiten in vergangenen Jahren erstellen ist nicht erlaubt."
 
 #: workbench/awt/forms.py
-msgid ""
-"Creating absences for past years has effects on financial statements, carry-"
-"forward entries etc. Are you sure?"
-msgstr ""
-"Abwesenheiten in vergangenen Jahren erstellen hat Konsequenzen auf "
-"Jahresabschlüsse, Überträge usw. Bist Du sicher?"
+msgid "Creating absences for past years has effects on financial statements, carry-forward entries etc. Are you sure?"
+msgstr "Abwesenheiten in vergangenen Jahren erstellen hat Konsequenzen auf Jahresabschlüsse, Überträge usw. Bist Du sicher?"
 
 #: workbench/awt/forms.py
-msgid ""
-"Impressive planning skills or wrong date? Absence starts in more than one "
-"year."
-msgstr ""
-"Beeindruckende Planungsfähigkeiten oder falsches Datum? Abwesenheit beginnt "
-"in mehr als einem Jahr."
+msgid "Impressive planning skills or wrong date? Absence starts in more than one year."
+msgstr "Beeindruckende Planungsfähigkeiten oder falsches Datum? Abwesenheit beginnt in mehr als einem Jahr."
 
 #: workbench/awt/forms.py workbench/reporting/views.py
 msgid "Everyone"
@@ -571,9 +553,7 @@ msgstr "Seit %s"
 
 #: workbench/awt/models.py
 msgid "Either provide both hourly labor costs and green hours target or none."
-msgstr ""
-"Entweder Lohnkosten pro Stunde UND Grüne Stunden-Zielwert angeben oder "
-"nichts von beidem."
+msgstr "Entweder Lohnkosten pro Stunde UND Grüne Stunden-Zielwert angeben oder nichts von beidem."
 
 #: workbench/awt/models.py
 msgid "Employments cannot end before they began."
@@ -646,11 +626,8 @@ msgid "Absences of past years are locked."
 msgstr "Abwesenheiten vergangener Jahre sind für die Bearbeitung gesperrt."
 
 #: workbench/awt/models.py
-msgid ""
-"You are not permitted to edit absences of type «Working time correction»."
-msgstr ""
-"Du hast die Erlaubnis zur Bearbeitung von «Arbeitszeit-Korrektur»-Absenzen "
-"nicht."
+msgid "You are not permitted to edit absences of type «Working time correction»."
+msgstr "Du hast die Erlaubnis zur Bearbeitung von «Arbeitszeit-Korrektur»-Absenzen nicht."
 
 #: workbench/awt/models.py
 msgid "Absences cannot end before they began."
@@ -775,12 +752,8 @@ msgstr "Generiert am %(day)s"
 
 #: workbench/awt/views.py
 #, python-format
-msgid ""
-"No annual working time defined for user %(user)s with working time model "
-"%(working_time_model)s."
-msgstr ""
-"Keine Jahresarbeitszeit definiert für Nutzer*in %(user)s mit "
-"Arbeitszeitmodell %(working_time_model)s."
+msgid "No annual working time defined for user %(user)s with working time model %(working_time_model)s."
+msgstr "Keine Jahresarbeitszeit definiert für Nutzer*in %(user)s mit Arbeitszeitmodell %(working_time_model)s."
 
 #: workbench/circles/apps.py workbench/circles/models.py
 msgid "circles"
@@ -877,31 +850,17 @@ msgid "substitute with"
 msgstr "ersetzen durch"
 
 #: workbench/contacts/forms.py
-msgid ""
-"This organization has related objects. It is therefore not possible to "
-"delete it, but you may reassign the related objects to a different "
-"organization. Alternatively, you can also archive the organization."
-msgstr ""
-"Diese Organisation hat verbundene Objekte. Es ist deshalb nicht möglich, die "
-"Organisation zu löschen, aber Du kannst die Objekte mit einer anderen "
-"Organisation verbinden. Alternativ kannst Du diese Organisation auch "
-"archivieren."
+msgid "This organization has related objects. It is therefore not possible to delete it, but you may reassign the related objects to a different organization. Alternatively, you can also archive the organization."
+msgstr "Diese Organisation hat verbundene Objekte. Es ist deshalb nicht möglich, die Organisation zu löschen, aber Du kannst die Objekte mit einer anderen Organisation verbinden. Alternativ kannst Du diese Organisation auch archivieren."
 
 #: workbench/contacts/forms.py
 msgid "This does not look right. Please add a full salutation."
-msgstr ""
-"Das sieht nicht korrekt aus. Bitte definiere eine vollständige Begrüssung."
+msgstr "Das sieht nicht korrekt aus. Bitte definiere eine vollständige Begrüssung."
 
 #: workbench/contacts/forms.py
 #, python-format
-msgid ""
-"This person is the contact of the following related objects: %s. Modifying "
-"this record may be more confusing than archiving this one and creating a new "
-"record instead."
-msgstr ""
-"Diese Person ist der Kontakt der folgenden zugehörigen Objekte: %s. "
-"Vielleicht ist es weniger verwirrend, diesen Eintrag zu archivieren und "
-"einen neuen zu erstellen als die Organisation zu ändern."
+msgid "This person is the contact of the following related objects: %s. Modifying this record may be more confusing than archiving this one and creating a new record instead."
+msgstr "Diese Person ist der Kontakt der folgenden zugehörigen Objekte: %s. Vielleicht ist es weniger verwirrend, diesen Eintrag zu archivieren und einen neuen zu erstellen als die Organisation zu ändern."
 
 #: workbench/contacts/forms.py workbench/contacts/models.py
 msgid "default billing address"
@@ -949,12 +908,8 @@ msgid "primary contact"
 msgstr "Hauptkontakt"
 
 #: workbench/contacts/models.py
-msgid ""
-"Mainly useful for organizations with a centralized accounts payable "
-"departement."
-msgstr ""
-"Hauptsächlich nützlich für Organisationen mit einem zentralen "
-"Kreditoreneingang."
+msgid "Mainly useful for organizations with a centralized accounts payable departement."
+msgstr "Hauptsächlich nützlich für Organisationen mit einem zentralen Kreditoreneingang."
 
 #: workbench/contacts/models.py
 msgid "organization"
@@ -1107,20 +1062,12 @@ msgstr "Kontoauszug"
 
 #: workbench/credit_control/forms.py
 #, python-format
-msgid ""
-"Error while parsing the statement. Did you upload a valid CSV file? "
-"(Technical error: %s)"
-msgstr ""
-"Fehler beim Einlesen des Auszugs. Hast Du eine gültige CSV-Datei "
-"hochgeladen? (Technischer Fehler: %s)"
+msgid "Error while parsing the statement. Did you upload a valid CSV file? (Technical error: %s)"
+msgstr "Fehler beim Einlesen des Auszugs. Hast Du eine gültige CSV-Datei hochgeladen? (Technischer Fehler: %s)"
 
 #: workbench/credit_control/forms.py
-msgid ""
-"The uploaded list only contains new payments. This is somewhat surprising if "
-"you exported the list from the correct bank account."
-msgstr ""
-"Die hochgeladene Liste enthält nur neue Zahlungen. Das ist zumindest "
-"unerwartet, falls die Liste vom korrekten Bankkonto exportiert wurde."
+msgid "The uploaded list only contains new payments. This is somewhat surprising if you exported the list from the correct bank account."
+msgstr "Die hochgeladene Liste enthält nur neue Zahlungen. Das ist zumindest unerwartet, falls die Liste vom korrekten Bankkonto exportiert wurde."
 
 #: workbench/credit_control/forms.py workbench/invoices/models.py
 #: workbench/templates/invoices/invoice_detail.html
@@ -1274,12 +1221,8 @@ msgid "Closed"
 msgstr "Abgeschlossen"
 
 #: workbench/deals/forms.py
-msgid ""
-"This deal is already closed. I assume you know what you're doing and wont "
-"stand in the way."
-msgstr ""
-"Dieses Geschäft ist schon geschlossen. Ich gehe davon aus, dass Du weisst "
-"was Du tust und werde nicht im Weg stehen."
+msgid "This deal is already closed. I assume you know what you're doing and wont stand in the way."
+msgstr "Dieses Geschäft ist schon geschlossen. Ich gehe davon aus, dass Du weisst was Du tust und werde nicht im Weg stehen."
 
 #: workbench/deals/forms.py workbench/invoices/models.py
 #: workbench/offers/models.py
@@ -1338,12 +1281,8 @@ msgstr "Dieses Feld wird benötigt wenn Du ein Geschäft schliesst."
 
 #: workbench/deals/forms.py
 #, python-format
-msgid ""
-"Setting the status of offer \"%(offer)s\" to \"%(status)s\" is not possible "
-"because of the following errors: %(error)s"
-msgstr ""
-"Wegen folgenden Fehlern ist es nicht möglich, den Status der Offerte "
-"\"%(offer)s\" auf \"%(status)s\" zu setzen: %(error)s"
+msgid "Setting the status of offer \"%(offer)s\" to \"%(status)s\" is not possible because of the following errors: %(error)s"
+msgstr "Wegen folgenden Fehlern ist es nicht möglich, den Status der Offerte \"%(offer)s\" auf \"%(status)s\" zu setzen: %(error)s"
 
 #: workbench/deals/models.py
 msgid "is required"
@@ -1461,12 +1400,8 @@ msgid "contributors"
 msgstr "Beitragende"
 
 #: workbench/deals/models.py
-msgid ""
-"The value of the deal will be distributed among all contributors in the "
-"accepted deals report."
-msgstr ""
-"Der Wert des Geschäfts wird beim «Gewonnene Geschäfte»-Bericht zwischen "
-"allen Beitragenden aufgeteilt."
+msgid "The value of the deal will be distributed among all contributors in the accepted deals report."
+msgstr "Der Wert des Geschäfts wird beim «Gewonnene Geschäfte»-Bericht zwischen allen Beitragenden aufgeteilt."
 
 #: workbench/deals/models.py
 #: workbench/templates/contacts/organization_detail.html
@@ -1531,9 +1466,7 @@ msgstr "Beiträge"
 #: workbench/deals/views.py
 #, python-format
 msgid "Successfully added the offer %(offer)s as a related offer."
-msgstr ""
-"Die Offerte %(offer)s wurde erfolgreich zu den zugehörigen Offerten "
-"hinzugefügt."
+msgstr "Die Offerte %(offer)s wurde erfolgreich zu den zugehörigen Offerten hinzugefügt."
 
 #: workbench/deals/views.py
 #, python-format
@@ -1543,9 +1476,7 @@ msgstr "Offerte mit Geschäft %(deal)s verbinden"
 #: workbench/deals/views.py
 #, python-format
 msgid "Successfully removed the offer %(offer)s as a related offer."
-msgstr ""
-"Die Offerte %(offer)s wurde erfolgreich von den zugehörigen Offerten "
-"entfernt."
+msgstr "Die Offerte %(offer)s wurde erfolgreich von den zugehörigen Offerten entfernt."
 
 #: workbench/expenses/apps.py workbench/expenses/forms.py
 #: workbench/logbook/forms.py
@@ -1618,12 +1549,8 @@ msgid "exchange rates"
 msgstr "Wechselkurse"
 
 #: workbench/expenses/views.py
-msgid ""
-"Please close the expense report first. Generating PDFs for open expense "
-"reports isn't allowed."
-msgstr ""
-"Bitte schliesse die Spesenabrechnung. Es können keine PDFs generiert werden "
-"für Spesenabrechnungen, welche sich noch in Vorbereitung befinden."
+msgid "Please close the expense report first. Generating PDFs for open expense reports isn't allowed."
+msgstr "Bitte schliesse die Spesenabrechnung. Es können keine PDFs generiert werden für Spesenabrechnungen, welche sich noch in Vorbereitung befinden."
 
 #: workbench/expenses/views.py workbench/templates/generic/object_list.html
 msgid "of"
@@ -1719,12 +1646,8 @@ msgstr "Anzahlungen anwenden"
 
 #: workbench/invoices/forms.py
 #, python-format
-msgid ""
-"You are attempting to change %(fields)s. I am trying to prevent "
-"unintentional changes. Are you sure?"
-msgstr ""
-"Du hast %(fields)s geändert. Ich versuche, unabsichtliche Änderungen zu "
-"verhindern. Bist Du sicher?"
+msgid "You are attempting to change %(fields)s. I am trying to prevent unintentional changes. Are you sure?"
+msgstr "Du hast %(fields)s geändert. Ich versuche, unabsichtliche Änderungen zu verhindern. Bist Du sicher?"
 
 #: workbench/invoices/forms.py
 #, python-format
@@ -1733,33 +1656,17 @@ msgstr "Status von '%(from)s' zu '%(to)s' ändern. Bist Du sicher?"
 
 #: workbench/invoices/forms.py
 #, python-format
-msgid ""
-"Moving status from '%(from)s' to '%(to)s' with an invoice date in the past "
-"(%(date)s). This may be correct but maybe it's not what you want."
-msgstr ""
-"Du änderst den Status von '%(from)s' zu '%(to)s' mit einem Rechnungsdatum in "
-"der Vergangenheit (%(date)s). Dies kann korrekt sein, aber ist "
-"möglicherweise nicht das, was Du willst."
+msgid "Moving status from '%(from)s' to '%(to)s' with an invoice date in the past (%(date)s). This may be correct but maybe it's not what you want."
+msgstr "Du änderst den Status von '%(from)s' zu '%(to)s' mit einem Rechnungsdatum in der Vergangenheit (%(date)s). Dies kann korrekt sein, aber ist möglicherweise nicht das, was Du willst."
 
 #: workbench/invoices/forms.py
 #, python-format
-msgid ""
-"You are attempting to set status to '%(to)s', but the invoice has already "
-"been closed on %(closed)s. Are you sure?"
-msgstr ""
-"Du versuchst, den Status auf '%(to)s' zu setzen, aber die Rechnung wurde "
-"schon am %(closed)s geschlossen. Bist Du sicher?"
+msgid "You are attempting to set status to '%(to)s', but the invoice has already been closed on %(closed)s. Are you sure?"
+msgstr "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Rechnung wurde schon am %(closed)s geschlossen. Bist Du sicher?"
 
 #: workbench/invoices/forms.py
-msgid ""
-"You are canceling this invoice. If clients are still expected to pay for "
-"services rendered and this invoice hasn't been sent to bookkeeping already "
-"it may be better to delete the invoice and start anew."
-msgstr ""
-"Du stornierst diese Rechnung. Wenn die Kundschaft die Leistungen immer noch "
-"bezahlen sollte und diese Rechnung noch nicht an die Buchhaltung übermittelt "
-"wurde, könnte es besser sein, die Rechnung zu löschen und nochmals neu zu "
-"beginnen."
+msgid "You are canceling this invoice. If clients are still expected to pay for services rendered and this invoice hasn't been sent to bookkeeping already it may be better to delete the invoice and start anew."
+msgstr "Du stornierst diese Rechnung. Wenn die Kundschaft die Leistungen immer noch bezahlen sollte und diese Rechnung noch nicht an die Buchhaltung übermittelt wurde, könnte es besser sein, die Rechnung zu löschen und nochmals neu zu beginnen."
 
 #: workbench/invoices/forms.py
 msgid "This project already has an invoice in preparation."
@@ -1770,12 +1677,8 @@ msgid "This is the final invoice, close the project"
 msgstr "Das ist die Schlussrechnung, schliesse das Projekt"
 
 #: workbench/invoices/forms.py
-msgid ""
-"You'll still be able to log hours for a few days. You can always reopen the "
-"project later."
-msgstr ""
-"Die Stundenerfassung ist während wenigen Tagen immer noch möglich. Das "
-"Projekt kannst Du später auch wieder öffnen."
+msgid "You'll still be able to log hours for a few days. You can always reopen the project later."
+msgstr "Die Stundenerfassung ist während wenigen Tagen immer noch möglich. Das Projekt kannst Du später auch wieder öffnen."
 
 #: workbench/invoices/forms.py
 #, python-format
@@ -1815,20 +1718,12 @@ msgid "Other invoice types must be created directly on a project."
 msgstr "Andere Rechnungstypen müssen direkt auf einem Projekt erstellt werden."
 
 #: workbench/invoices/forms.py
-msgid ""
-"Logged services are linked with this invoice. They will be released when "
-"deleting this invoice."
-msgstr ""
-"Logbuch-Einträge sind mit dieser Rechnung verbunden. Die Verbindung wird "
-"aufgelöst, wenn diese Rechnung gelöscht wird."
+msgid "Logged services are linked with this invoice. They will be released when deleting this invoice."
+msgstr "Logbuch-Einträge sind mit dieser Rechnung verbunden. Die Verbindung wird aufgelöst, wenn diese Rechnung gelöscht wird."
 
 #: workbench/invoices/forms.py
-msgid ""
-"Down payment invoices are subtracted from this invoice. Those down payments "
-"will be released when deleting this invoice."
-msgstr ""
-"Anzahlungsrechnungen wurden von dieser Rechnung abgezogen. Diese Anzahlungen "
-"stehen wieder zur Verfügung für andere Rechnungen, wenn diese gelöscht wird."
+msgid "Down payment invoices are subtracted from this invoice. Those down payments will be released when deleting this invoice."
+msgstr "Anzahlungsrechnungen wurden von dieser Rechnung abgezogen. Diese Anzahlungen stehen wieder zur Verfügung für andere Rechnungen, wenn diese gelöscht wird."
 
 #: workbench/invoices/forms.py workbench/projects/forms.py
 msgid "Optional, but useful for quickly filling the fields below."
@@ -1879,12 +1774,8 @@ msgid "due on"
 msgstr "Fällig am"
 
 #: workbench/invoices/models.py
-msgid ""
-"Payment date for paid invoices, date of replacement or cancellation "
-"otherwise."
-msgstr ""
-"Zahlungsdatum für bezahlte Rechnungen, andernfalls Datum der Ersetzung oder "
-"Stornierung."
+msgid "Payment date for paid invoices, date of replacement or cancellation otherwise."
+msgstr "Zahlungsdatum für bezahlte Rechnungen, andernfalls Datum der Ersetzung oder Stornierung."
 
 #: workbench/invoices/models.py
 msgid "last reminded on"
@@ -1918,14 +1809,11 @@ msgstr "Code"
 
 #: workbench/invoices/models.py
 msgid "This fields' value is overridden when processing credit entries."
-msgstr ""
-"Der Inhalt dieses Felds wird bei der Verarbeitung von Zahlungseingängen "
-"überschrieben."
+msgstr "Der Inhalt dieses Felds wird bei der Verarbeitung von Zahlungseingängen überschrieben."
 
 #: workbench/invoices/models.py
 msgid "Invoice and/or due date missing for selected state."
-msgstr ""
-"Rechnungs- und/oder Fälligkeitsdatum fehlen für den augewählten Status."
+msgstr "Rechnungs- und/oder Fälligkeitsdatum fehlen für den augewählten Status."
 
 #: workbench/invoices/models.py
 msgid "Invalid status when closed on is already set."
@@ -2011,12 +1899,8 @@ msgid "project service"
 msgstr "Projektleistung"
 
 #: workbench/invoices/models.py
-msgid ""
-"Cannot modify a service bound to an invoice which is not in preparation "
-"anymore."
-msgstr ""
-"Kann Leistung von Rechnung, welche nicht mehr in Vorbereitung ist, nicht "
-"mehr bearbeiten."
+msgid "Cannot modify a service bound to an invoice which is not in preparation anymore."
+msgstr "Kann Leistung von Rechnung, welche nicht mehr in Vorbereitung ist, nicht mehr bearbeiten."
 
 #: workbench/invoices/models.py
 msgid "yearly"
@@ -2048,8 +1932,7 @@ msgstr "erstelle Rechnung am Tag"
 
 #: workbench/invoices/models.py
 msgid "Invoices are created 20 days before their period begins by default."
-msgstr ""
-"Standardmässig werden Rechnungen 20 Tage bevor ihre Periode beginnt erstellt."
+msgstr "Standardmässig werden Rechnungen 20 Tage bevor ihre Periode beginnt erstellt."
 
 #: workbench/invoices/models.py
 msgid "next period starts on"
@@ -2085,8 +1968,7 @@ msgstr "%(periodicity)s seit %(from)s"
 #: workbench/invoices/models.py
 #, python-format
 msgid "Next period starts on %(start)s, invoice will be created on %(create)s"
-msgstr ""
-"Nächste Periode beginnt am %(start)s, Rechnung wird am %(create)s erstellt."
+msgstr "Nächste Periode beginnt am %(start)s, Rechnung wird am %(create)s erstellt."
 
 #: workbench/invoices/models.py
 #: workbench/templates/reporting/key_data_projected_invoices.html
@@ -2190,9 +2072,7 @@ msgstr "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung."
 
 #: workbench/logbook/forms.py
 msgid "Deselect the existing service if you want to create a new service."
-msgstr ""
-"Falls Du eine neue Leistung erstellen willst, darfst Du keine existierende "
-"Leistung wählen."
+msgstr "Falls Du eine neue Leistung erstellen willst, darfst Du keine existierende Leistung wählen."
 
 #: workbench/logbook/forms.py
 msgid "This project has been closed too long ago."
@@ -2207,11 +2087,8 @@ msgid "This entry is already part of an invoice."
 msgstr "Dieser Eintrag ist schon Teil einer Rechnung."
 
 #: workbench/logbook/forms.py workbench/projects/forms.py
-msgid ""
-"This title seems awfully unspecific. Please use specific titles for services."
-msgstr ""
-"Mir scheint, dass der Titel furchtbar unspezifisch ist. Bitte verwende "
-"spezifische Titel für Leistungen."
+msgid "This title seems awfully unspecific. Please use specific titles for services."
+msgstr "Mir scheint, dass der Titel furchtbar unspezifisch ist. Bitte verwende spezifische Titel für Leistungen."
 
 #: workbench/logbook/forms.py workbench/projects/forms.py
 msgid "This field is required."
@@ -2410,37 +2287,21 @@ msgid "offers"
 msgstr "Offerten"
 
 #: workbench/offers/forms.py
-msgid ""
-"This offer is not in preparation anymore. I assume you know what you're "
-"doing and wont stand in the way."
-msgstr ""
-"Diese Offerte befindet sich nicht mehr in Vorbereitung. Ich gehe davon aus, "
-"dass Du weisst was Du tust und werde nicht im Weg stehen."
+msgid "This offer is not in preparation anymore. I assume you know what you're doing and wont stand in the way."
+msgstr "Diese Offerte befindet sich nicht mehr in Vorbereitung. Ich gehe davon aus, dass Du weisst was Du tust und werde nicht im Weg stehen."
 
 #: workbench/offers/forms.py
 #, python-format
-msgid ""
-"You are attempting to set status to '%(to)s', but the offer has already been "
-"closed on %(closed)s. Are you sure?"
-msgstr ""
-"Du versuchst, den Status auf '%(to)s' zu setzen, aber die Offerte wurde "
-"schon am %(closed)s geschlossen. Bist Du sicher?"
+msgid "You are attempting to set status to '%(to)s', but the offer has already been closed on %(closed)s. Are you sure?"
+msgstr "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Offerte wurde schon am %(closed)s geschlossen. Bist Du sicher?"
 
 #: workbench/offers/forms.py
-msgid ""
-"You are setting the offer status to 'Declined'. However, if you just want to "
-"change a few things and send the offer to the client again then you could "
-"just as well put the offer back into preparation."
-msgstr ""
-"Du hast den Offertenstatus auf 'Abgelehnt' gesetzt. Wenn Du nur einige Dinge "
-"anpassen willst und die Offerte nochmals der Kundschaft senden willst, "
-"kannst Du die Offerte auch einfach zurück auf 'In Vorbereitung' setzen."
+msgid "You are setting the offer status to 'Declined'. However, if you just want to change a few things and send the offer to the client again then you could just as well put the offer back into preparation."
+msgstr "Du hast den Offertenstatus auf 'Abgelehnt' gesetzt. Wenn Du nur einige Dinge anpassen willst und die Offerte nochmals der Kundschaft senden willst, kannst Du die Offerte auch einfach zurück auf 'In Vorbereitung' setzen."
 
 #: workbench/offers/forms.py
 msgid "Same project selected as offer already belongs to."
-msgstr ""
-"Gleiches Projekt ausgewählt wie dasjenige, zu welchem die Offerte schon "
-"gehört."
+msgstr "Gleiches Projekt ausgewählt wie dasjenige, zu welchem die Offerte schon gehört."
 
 #: workbench/offers/forms.py
 msgid "Delete offers' services?"
@@ -2465,12 +2326,8 @@ msgid "work completed on"
 msgstr "Arbeit abgeschlossen am"
 
 #: workbench/offers/models.py
-msgid ""
-"Fill in this field if you want to prohibit further logging on this offers' "
-"services."
-msgstr ""
-"Fülle dieses Feld aus, wenn Du die weitere Leistungserfassung auf den "
-"Leistungen dieser Offerte verbieten willst."
+msgid "Fill in this field if you want to prohibit further logging on this offers' services."
+msgstr "Fülle dieses Feld aus, wenn Du die weitere Leistungserfassung auf den Leistungen dieser Offerte verbieten willst."
 
 #: workbench/offers/models.py workbench/planning/models.py
 #: workbench/projects/models.py workbench/templates/offers/offer_pricing.html
@@ -2507,12 +2364,8 @@ msgid "Offered on %(offered_on)s"
 msgstr "Offeriert am %(offered_on)s"
 
 #: workbench/offers/models.py
-msgid ""
-"Offers can only be created from projects. Go to the project and add services "
-"first, then you'll be able to create the offer itself."
-msgstr ""
-"Offerten können nur aus Projekten erstellt werden. Gehe zuerst zum Projekt, "
-"füge Leistungen hinzu, und dann kannst Du die eigentliche Offerte erstellen."
+msgid "Offers can only be created from projects. Go to the project and add services first, then you'll be able to create the offer itself."
+msgstr "Offerten können nur aus Projekten erstellt werden. Gehe zuerst zum Projekt, füge Leistungen hinzu, und dann kannst Du die eigentliche Offerte erstellen."
 
 #: workbench/offers/views.py
 msgid "No offers in project."
@@ -2526,9 +2379,7 @@ msgstr "%s zu Projekt kopieren"
 #: workbench/planning/forms.py
 #, python-format
 msgid "The following work is planned after the new milestone date: %(work)s."
-msgstr ""
-"Die folgenden Arbeiten sind geplant nach dem neuen Meilenstein-Datum: "
-"%(work)s."
+msgstr "Die folgenden Arbeiten sind geplant nach dem neuen Meilenstein-Datum: %(work)s."
 
 #: workbench/planning/forms.py workbench/planning/models.py
 #: workbench/templates/reporting/accepted_deals.html
@@ -2537,12 +2388,8 @@ msgstr "Wochen"
 
 #: workbench/planning/forms.py
 #, python-format
-msgid ""
-"The milestone is scheduled on %(date)s, but work is planned in the same or "
-"following week(s): %(weeks)s"
-msgstr ""
-"Der Meilenstein ist geplant am %(date)s, aber Arbeit ist geplant in der "
-"gleichen oder den folgenden Wochen: %(weeks)s"
+msgid "The milestone is scheduled on %(date)s, but work is planned in the same or following week(s): %(weeks)s"
+msgstr "Der Meilenstein ist geplant am %(date)s, aber Arbeit ist geplant in der gleichen oder den folgenden Wochen: %(weeks)s"
 
 #: workbench/planning/forms.py
 msgid "The selected offer is declined."
@@ -2652,12 +2499,8 @@ msgid "projects"
 msgstr "Projekte"
 
 #: workbench/projects/forms.py
-msgid ""
-"Projects are linked with this campaign. They will be released when deleting "
-"this campaign."
-msgstr ""
-"Projekte sind mit dieser Kampagne verbunden. Die Verbindung wird aufgelöst, "
-"wenn diese Kampagne gelöscht wird."
+msgid "Projects are linked with this campaign. They will be released when deleting this campaign."
+msgstr "Projekte sind mit dieser Kampagne verbunden. Die Verbindung wird aufgelöst, wenn diese Kampagne gelöscht wird."
 
 #: workbench/projects/forms.py
 msgid "Defined search"
@@ -2667,7 +2510,7 @@ msgstr "Definierte Suche"
 msgid "No invoices"
 msgstr "Keine Rechnungen"
 
-#: workbench/projects/forms.py
+#: workbench/projects/forms.py workbench/templates/reporting/key_data.html
 msgid "Accepted offers"
 msgstr "Akzeptierte Offerten"
 
@@ -2720,38 +2563,24 @@ msgid "today"
 msgstr "heute"
 
 #: workbench/projects/forms.py
-msgid ""
-"This project already has invoices. The invoices' customer record will be "
-"changed too."
-msgstr ""
-"Dieses Projekt hat schon Rechnungen. Der Rechnungskunde wird auch angepasst."
+msgid "This project already has invoices. The invoices' customer record will be changed too."
+msgstr "Dieses Projekt hat schon Rechnungen. Der Rechnungskunde wird auch angepasst."
 
 #: workbench/projects/forms.py
-msgid ""
-"You are adding a flat rate to a project which already has services. Those "
-"services' effort types and rates will be overwritten."
-msgstr ""
-"Du setzst einen Pauschalsatz bei einem Projekt, welches schon Leistungen "
-"hat. Der Aufwandtyp und Stundensatz dieser Leistungen wird überschrieben."
+msgid "You are adding a flat rate to a project which already has services. Those services' effort types and rates will be overwritten."
+msgstr "Du setzst einen Pauschalsatz bei einem Projekt, welches schon Leistungen hat. Der Aufwandtyp und Stundensatz dieser Leistungen wird überschrieben."
 
 #: workbench/projects/forms.py
-msgid ""
-"Most fields are disabled because service is bound to an offer which is not "
-"in preparation anymore."
-msgstr ""
-"Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte "
-"verbunden ist, welche sich nicht mehr in Vorbereitung befindet."
+msgid "Most fields are disabled because service is bound to an offer which is not in preparation anymore."
+msgstr "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte verbunden ist, welche sich nicht mehr in Vorbereitung befindet."
 
 #: workbench/projects/forms.py
 msgid "Try deleting the service after reassigning logbook entries"
-msgstr ""
-"Versuche, die Leistung nach der Zuweisung der Logbucheinträge zu löschen"
+msgstr "Versuche, die Leistung nach der Zuweisung der Logbucheinträge zu löschen"
 
 #: workbench/projects/forms.py
 msgid "Cannot move a service which is already bound to an offer."
-msgstr ""
-"Leistungen, welche schon mit einer Offerte verbunden sind, können nicht "
-"verschoben werden."
+msgstr "Leistungen, welche schon mit einer Offerte verbunden sind, können nicht verschoben werden."
 
 #: workbench/projects/forms.py
 msgid "This project is already closed."
@@ -2759,12 +2588,8 @@ msgstr "Dieses Projekt wurde schon geschlossen."
 
 #: workbench/projects/forms.py
 #, python-format
-msgid ""
-"The project %(project)s has a flat rate which will be applied to this "
-"service too."
-msgstr ""
-"Das Projekt %(project)s hat einen Pauschalsatz, welcher auf diese Leistung "
-"auch angewendet wird."
+msgid "The project %(project)s has a flat rate which will be applied to this service too."
+msgstr "Das Projekt %(project)s hat einen Pauschalsatz, welcher auf diese Leistung auch angewendet wird."
 
 #: workbench/projects/forms.py
 msgid "Codes must be unique."
@@ -2786,17 +2611,12 @@ msgid "project description"
 msgstr "Projektbeschreibung"
 
 #: workbench/projects/models.py
-msgid ""
-"Do not use this for the offer description. You can add the offer description "
-"later."
-msgstr ""
-"Verwende dieses Feld nicht für die Offertenbeschreibung. Diese kannst Du "
-"später hinzufügen."
+msgid "Do not use this for the offer description. You can add the offer description later."
+msgstr "Verwende dieses Feld nicht für die Offertenbeschreibung. Diese kannst Du später hinzufügen."
 
 #: workbench/projects/models.py
 msgid "Set this if you want all services to have the same hourly rate."
-msgstr ""
-"Setze dies, falls alle Leistungen den gleichen Stundensatz haben sollen."
+msgstr "Setze dies, falls alle Leistungen den gleichen Stundensatz haben sollen."
 
 #: workbench/projects/models.py workbench/reporting/models.py
 msgid "cost center"
@@ -2812,12 +2632,8 @@ msgstr "Bitte leer lassen, falls Du das Projekt noch nicht schliessen willst."
 
 #: workbench/projects/models.py
 #, python-format
-msgid ""
-"All offers of project %(project)s are declined. You might want to close the "
-"project now?"
-msgstr ""
-"Alle Offerten des Projektes %(project)s sind abgelehnt. Vielleicht möchtest "
-"Du das Projekt jetzt schliessen?"
+msgid "All offers of project %(project)s are declined. You might want to close the project now?"
+msgstr "Alle Offerten des Projektes %(project)s sind abgelehnt. Vielleicht möchtest Du das Projekt jetzt schliessen?"
 
 #: workbench/projects/models.py
 msgid "allow logging"
@@ -2836,12 +2652,8 @@ msgid "Optional services to not count towards the offer total."
 msgstr "Optionale Leistungen werden nicht zum Offertentotal hinzugerechnet."
 
 #: workbench/projects/models.py
-msgid ""
-"Cannot delete a service bound to an offer which is not in preparation "
-"anymore."
-msgstr ""
-"Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht "
-"löschen."
+msgid "Cannot delete a service bound to an offer which is not in preparation anymore."
+msgstr "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht löschen."
 
 #: workbench/projects/models.py
 msgid "The offer must belong to the same project as the service."
@@ -2987,11 +2799,15 @@ msgid "No history found"
 msgstr "Keine Geschichte gefunden"
 
 #: workbench/templates/accounts/coffee_mail.txt
+msgid "Coffee and donut break"
+msgstr "Kaffee- und Donut-Pause"
+
+#: workbench/templates/accounts/coffee_mail.txt
 #, python-format
 msgid ""
 "Hello %(names)s\n"
 "\n"
-"Here's your invitation for a coffee break.\n"
+"Here's your invitation for a coffee and donut break.\n"
 "\n"
 "%(wish)s\n"
 "\n"
@@ -3000,7 +2816,7 @@ msgid ""
 msgstr ""
 "Hallo %(names)s\n"
 "\n"
-"Hier ist eure Einladung für eine Kaffeepause.\n"
+"Hier ist eure Einladung für eine Kaffee- und Donut-Pause.\n"
 "\n"
 "%(wish)s\n"
 "\n"
@@ -3123,8 +2939,7 @@ msgid ""
 "\n"
 "Hello %(full_name)s\n"
 "\n"
-"Your net work hours balance up to and including %(month)s is "
-"%(running_sum)s.\n"
+"Your net work hours balance up to and including %(month)s is %(running_sum)s.\n"
 "This is outside the range of +/- 40h.\n"
 msgstr ""
 "\n"
@@ -3530,9 +3345,7 @@ msgstr "Neue Bemerkung bei %(content_object)s"
 #: workbench/templates/notes/note_notification.txt
 #, python-format
 msgid "%(created_by)s just created a new note on \"%(content_object)s\":"
-msgstr ""
-"%(created_by)s hat soeben eine neue Bemerkung bei \"%(content_object)s\" "
-"hinzugefügt:"
+msgstr "%(created_by)s hat soeben eine neue Bemerkung bei \"%(content_object)s\" hinzugefügt:"
 
 #: workbench/templates/notes/widget.html
 msgid "Add note"
@@ -3861,9 +3674,7 @@ msgstr "Start"
 
 #: workbench/templates/shortcuts.html
 msgid "Log hours in active project or in any project if none is active"
-msgstr ""
-"Stunden in aktuellem Projekt eintragen, oder in irgendeinem Projekt falls "
-"keins aktiv ist"
+msgstr "Stunden in aktuellem Projekt eintragen, oder in irgendeinem Projekt falls keins aktiv ist"
 
 #: workbench/templates/shortcuts.html
 msgid "Log hours in any project"
@@ -3871,9 +3682,7 @@ msgstr "Stunden in irgendeinem Projekt eintragen"
 
 #: workbench/templates/shortcuts.html
 msgid "Log costs in active project or in any project if none is active"
-msgstr ""
-"Kosten in aktuellem Projekt eintragen, oder in irgendeinem Projekt falls "
-"keins aktiv ist"
+msgstr "Kosten in aktuellem Projekt eintragen, oder in irgendeinem Projekt falls keins aktiv ist"
 
 #: workbench/templates/shortcuts.html
 msgid "Log costs in any project"
@@ -4021,9 +3830,7 @@ msgstr "Mehrwertsteuerpflichtig"
 
 #: workbench/tools/models.py
 msgid "For example invoices to foreign institutions are not liable to VAT."
-msgstr ""
-"zB Rechnungen für ausländische Institutionen sind nicht "
-"mehrwertsteuerpflichtig."
+msgstr "zB Rechnungen für ausländische Institutionen sind nicht mehrwertsteuerpflichtig."
 
 #: workbench/tools/models.py
 msgid "tax rate"
@@ -4073,14 +3880,8 @@ msgstr "Formular war ungültig."
 
 #: workbench/tools/vcard.py
 #, python-format
-msgid ""
-"You seem to be using iOS. iOS does not support directly opening vCard files. "
-"Instead, you have been sent an email containing the vCard to your email "
-"address, %s."
-msgstr ""
-"Es scheint, dass Du iOS verwendest. Leider unterstützt iOS das direkte "
-"Öffnen von vCard Dateien nicht. Stattdessen hast Du ein Mail an die Adresse "
-"%s erhalten, mit der vCard als Anhang."
+msgid "You seem to be using iOS. iOS does not support directly opening vCard files. Instead, you have been sent an email containing the vCard to your email address, %s."
+msgstr "Es scheint, dass Du iOS verwendest. Leider unterstützt iOS das direkte Öffnen von vCard Dateien nicht. Stattdessen hast Du ein Mail an die Adresse %s erhalten, mit der vCard als Anhang."
 
 #: workbench/tools/xlsx.py
 msgid "By service and user"
@@ -4131,22 +3932,13 @@ msgstr "%(model)s mit %(attribute)s=%(id)s"
 #~ msgstr "Hallo %(user)s"
 
 #~ msgid ""
-#~ "The following list of recent changes to planning has been compiled for "
-#~ "you personally in the hope that it is interesting. This mail contains "
-#~ "milestone changes and work deletions for your owned projects and changes "
-#~ "to your planned work carried out by others.\n"
+#~ "The following list of recent changes to planning has been compiled for you personally in the hope that it is interesting. This mail contains milestone changes and work deletions for your owned projects and changes to your planned work carried out by others.\n"
 #~ "\n"
-#~ "Please always check your personal planning to ensure that it is "
-#~ "manageable and up-to-date. Thanks ✨"
+#~ "Please always check your personal planning to ensure that it is manageable and up-to-date. Thanks ✨"
 #~ msgstr ""
-#~ "Die folgende Liste mit neuen Änderungen wurde für dich zusammengestellt, "
-#~ "in der Hoffnung, dass sie nützlich und interessant ist. Dieses Mail "
-#~ "enthält Änderungen von Meilensteinen und gelöschte Arbeitseinheiten von "
-#~ "Projekten, welche du koordinierst sowie durch andere eingetragene "
-#~ "Änderungen deiner Arbeitseinheiten.\n"
+#~ "Die folgende Liste mit neuen Änderungen wurde für dich zusammengestellt, in der Hoffnung, dass sie nützlich und interessant ist. Dieses Mail enthält Änderungen von Meilensteinen und gelöschte Arbeitseinheiten von Projekten, welche du koordinierst sowie durch andere eingetragene Änderungen deiner Arbeitseinheiten.\n"
 #~ "\n"
-#~ "Bitte überprüfe deine persönliche Planung und stelle sicher, dass die "
-#~ "Arbeit überschaubar bleibt und die Planung aktuell. Merci ✨"
+#~ "Bitte überprüfe deine persönliche Planung und stelle sicher, dass die Arbeit überschaubar bleibt und die Planung aktuell. Merci ✨"
 
 #, python-format
 #~ msgid "%(by)s changed a milestone: %(title)s (%(date)s)"
@@ -4154,9 +3946,7 @@ msgstr "%(model)s mit %(attribute)s=%(id)s"
 
 #, python-format
 #~ msgid "%(by)s deleted work managed by you: %(title)s (%(hours)sh)"
-#~ msgstr ""
-#~ "%(by)s hat Arbeit gelöscht, welche von dir koordiniert wird: %(title)s "
-#~ "(%(hours)sh)"
+#~ msgstr "%(by)s hat Arbeit gelöscht, welche von dir koordiniert wird: %(title)s (%(hours)sh)"
 
 #, python-format
 #~ msgid "%(by)s added work for you: %(title)s (%(hours)sh)"

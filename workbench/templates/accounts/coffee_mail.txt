@@ -1,9 +1,9 @@
 {% load i18n %}{% autoescape off %}
-{% translate 'Coffee break' %} ☕☕☕
+☕🍩☕ {% translate 'Coffee and donut break' %} 🍩☕🍩
 
 {% blocktranslate %}Hello {{ names }}
 
-Here's your invitation for a coffee break.
+Here's your invitation for a coffee and donut break.
 
 {{ wish }}
 
