@@ -6,28 +6,22 @@
     "workbench/static/workbench/lib"
   ],
   "dependencies": {
-    "babel-eslint": "^10.1.0",
     "bootstrap": "^4.6.0",
-    "eslint": "^8.0.1",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-react": "^7.26.1",
     "fh-webpack-config": "^2.0.0",
     "jquery": "^3.6.0",
     "popper.js": "^1.16.1",
-    "prettier": "^2.4.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-draggable": "^4.4.4",
-    "react-redux": "^7.2.5",
+    "react-redux": "^7.2.6",
     "react-select": "3",
-    "redux": "^4.1.1",
+    "redux": "^4.1.2",
     "redux-localstorage": "^0.4.1",
     "redux-logger": "^3.0.6",
-    "redux-thunk": "^2.3.0",
+    "redux-thunk": "^2.4.1",
     "url-loader": "^4.1.1"
   },
   "prettier": {
-    "trailingComma": "es5",
     "semi": false
   }
 }
