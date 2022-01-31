@@ -41,6 +41,12 @@ class DealSearchForm(Form):
                 _("Closed"),
                 [row for row in Deal.STATUS_CHOICES if not row[0] == Deal.OPEN],
             ),
+            (
+                _("Defined search"),
+                [
+                    ("archived-valuetypes", _("Deals with archived value types")),
+                ],
+            ),
         ),
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
@@ -74,6 +80,8 @@ class DealSearchForm(Form):
                 "-probability", "status", "decision_expected_on", "id"
             )
             self.should_group_deals = True
+        elif data.get("s") == "archived-valuetypes":
+            queryset = queryset.with_archived_valuestypes()
         elif data.get("s") != "all":
             queryset = queryset.filter(status=data.get("s")).order_by(
                 "-closed_on", "-pk"
@@ -182,11 +190,13 @@ class DealForm(ModelForm):
             if vt.is_archived and vt.id not in values:
                 continue
 
+            postfix = ", {}".format(_("archived value type")) if vt.is_archived else ""
             self.fields[key] = field.formfield(
-                label="%s (%s)"
+                label="%s (%s%s)"
                 % (
                     vt.title,
                     _("Total %(currency)s") % {"currency": settings.WORKBENCH.CURRENCY},
+                    postfix,
                 ),
                 required=False,
                 initial=values.get(vt.id),

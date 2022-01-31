@@ -76,6 +76,11 @@ class DealQuerySet(SearchQuerySet):
             Q(status=Deal.OPEN), Q(owned_by=user) | Q(owned_by__is_active=False)
         ).select_related("owned_by")
 
+    def with_archived_valuestypes(self):
+        return self.filter(
+            id__in=Value.objects.filter(type__is_archived=True).values("deal")
+        )
+
 
 @model_urls
 class Deal(Model):
@@ -287,6 +292,8 @@ class ValueType(models.Model):
         verbose_name_plural = _("value types")
 
     def __str__(self):
+        if self.is_archived:
+            return f"{self.title} ({_('is archived')})"
         return self.title
 
     def __lt__(self, other):

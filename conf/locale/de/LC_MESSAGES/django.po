@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-30 09:33+0100\n"
+"POT-Creation-Date: 2022-01-31 09:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1220,9 +1220,21 @@ msgstr "Offen"
 msgid "Closed"
 msgstr "Abgeschlossen"
 
+#: workbench/deals/forms.py workbench/projects/forms.py
+msgid "Defined search"
+msgstr "Definierte Suche"
+
+#: workbench/deals/forms.py
+msgid "Deals with archived value types"
+msgstr "Geschäfte mit archivierten Werttypen"
+
 #: workbench/deals/forms.py
 msgid "This deal is already closed. I assume you know what you're doing and wont stand in the way."
 msgstr "Dieses Geschäft ist schon geschlossen. Ich gehe davon aus, dass Du weisst was Du tust und werde nicht im Weg stehen."
+
+#: workbench/deals/forms.py
+msgid "archived value type"
+msgstr "archivierter Werttyp"
 
 #: workbench/deals/forms.py workbench/invoices/models.py
 #: workbench/offers/models.py
@@ -2501,10 +2513,6 @@ msgstr "Projekte"
 #: workbench/projects/forms.py
 msgid "Projects are linked with this campaign. They will be released when deleting this campaign."
 msgstr "Projekte sind mit dieser Kampagne verbunden. Die Verbindung wird aufgelöst, wenn diese Kampagne gelöscht wird."
-
-#: workbench/projects/forms.py
-msgid "Defined search"
-msgstr "Definierte Suche"
 
 #: workbench/projects/forms.py
 msgid "No invoices"
