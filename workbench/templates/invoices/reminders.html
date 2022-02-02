@@ -31,6 +31,9 @@
               <td>
                 {% for invoice in row.invoices %}
                   {% link_or_none invoice with_badge=True %}
+                  {% if invoice.payment_notice %}
+                    <small>{{ invoice.payment_notice }}</small>
+                  {% endif %}
                   <br>
                 {% endfor %}
               </td>
