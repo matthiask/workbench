@@ -1791,7 +1791,7 @@ msgstr "Zahlungsdatum für bezahlte Rechnungen, andernfalls Datum der Ersetzung 
 
 #: workbench/invoices/models.py
 msgid "last reminded on"
-msgstr "zuletzt gemahnt am"
+msgstr "zuletzt erinnert am"
 
 #: workbench/invoices/models.py
 msgid "service period from"
@@ -1860,7 +1860,7 @@ msgstr "In Vorbereitung seit %(created_at)s"
 #: workbench/invoices/models.py
 #, python-format
 msgid "Sent on %(invoiced_on)s, reminded on %(reminded_on)s"
-msgstr "Versendet am %(invoiced_on)s, gemahnt am %(reminded_on)s"
+msgstr "Versendet am %(invoiced_on)s, erinnert am %(reminded_on)s"
 
 #: workbench/invoices/models.py
 #, python-format
@@ -2988,7 +2988,7 @@ msgstr "Buchhaltung"
 
 #: workbench/templates/base.html workbench/templates/invoices/reminders.html
 msgid "Reminders"
-msgstr "Mahnungen"
+msgstr "Zahlungserinnerungen"
 
 #: workbench/templates/base.html
 msgid "reports"
@@ -3279,7 +3279,7 @@ msgstr "Total exkl. MwSt."
 
 #: workbench/templates/invoices/reminders.html
 msgid "Last reminded on"
-msgstr "Zuletzt gemahnt am"
+msgstr "Zuletzt erinnert am"
 
 #: workbench/templates/invoices/reminders.html
 msgid "Generate a dunning letter"
@@ -3287,7 +3287,7 @@ msgstr "Zahlungserinnerung generieren"
 
 #: workbench/templates/invoices/reminders.html
 msgid "Not reminded yet"
-msgstr "Noch nicht gemahnt"
+msgstr "Noch nicht erinnert"
 
 #: workbench/templates/invoices/service_form.html
 #: workbench/templates/projects/service_form.html
