@@ -3,10 +3,9 @@ import sys
 import types
 from collections import defaultdict
 
-from django.utils.translation import gettext_lazy as _
-
 import dj_database_url
 import dj_email_url
+from django.utils.translation import gettext_lazy as _
 from speckenv import env
 
 from workbench.accounts.features import FEATURES, F

@@ -3,7 +3,6 @@ from itertools import chain
 
 from django.utils.text import capfirst, slugify
 from django.utils.translation import gettext as _
-
 from xlsxdocument import XLSXDocument
 
 from workbench.contacts.models import PostalAddress

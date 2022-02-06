@@ -2,12 +2,11 @@ import itertools
 import re
 from urllib.parse import urlencode
 
+import phonenumbers
 from django.db import models
 from django.db.models import Sum
 from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _
-
-import phonenumbers
 from django_countries.fields import CountryField
 
 from workbench.accounts.models import User

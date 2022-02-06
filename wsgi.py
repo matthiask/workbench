@@ -1,8 +1,7 @@
 import os
 
-from django.core.wsgi import get_wsgi_application
-
 import speckenv
+from django.core.wsgi import get_wsgi_application
 
 
 speckenv.read_speckenv(filename=os.environ.get("DOTENV", ".env"))

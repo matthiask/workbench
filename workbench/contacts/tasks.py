@@ -3,7 +3,6 @@ import datetime as dt
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import override
-
 from mailchimp3 import MailChimp
 
 from workbench.audit.models import LoggedAction

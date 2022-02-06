@@ -3,14 +3,13 @@ import operator
 from collections import defaultdict
 from functools import partial, reduce
 
+from authlib.email import render_to_mail
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.utils.translation import gettext as _
-
-from authlib.email import render_to_mail
 
 from workbench.accounts.models import User
 from workbench.audit.models import LoggedAction, audit_user_id

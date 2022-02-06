@@ -5,7 +5,6 @@ from django.db.models import ProtectedError
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.translation import deactivate_all
-
 from time_machine import travel
 
 from workbench import factories

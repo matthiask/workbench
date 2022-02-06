@@ -1,10 +1,9 @@
+from colorfield.fields import ColorField
 from django.db import models
 from django.db.models import Max
 from django.utils import timezone
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
-
-from colorfield.fields import ColorField
 
 from workbench.tools.formats import Z1, Z2
 from workbench.tools.models import HoursFieldAllowNegatives, Model, MoneyField

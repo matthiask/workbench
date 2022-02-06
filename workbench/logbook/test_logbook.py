@@ -3,7 +3,6 @@ import datetime as dt
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
-
 from time_machine import travel
 
 from workbench import factories

@@ -3,7 +3,6 @@ import datetime as dt
 from django.core import mail
 from django.test import TestCase
 from django.utils.translation import deactivate_all
-
 from time_machine import travel
 
 from workbench import factories

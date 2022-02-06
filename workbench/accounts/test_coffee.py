@@ -1,6 +1,5 @@
 from django.core import mail
 from django.test import TestCase
-
 from time_machine import travel
 
 from workbench import factories

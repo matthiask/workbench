@@ -1,9 +1,8 @@
+from authlib.email import render_to_mail
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext as _, override
-
-from authlib.email import render_to_mail
 
 from workbench.notes.models import Note
 from workbench.tools.forms import Form, ModelForm, Textarea

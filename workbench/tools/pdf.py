@@ -6,7 +6,6 @@ from itertools import chain
 from django.conf import settings
 from django.utils.text import Truncator, capfirst
 from django.utils.translation import activate, gettext as _
-
 from pdfdocument.document import (
     TA_RIGHT,
     Frame,

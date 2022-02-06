@@ -3,11 +3,10 @@ import math
 import random
 from itertools import chain
 
+from authlib.email import render_to_mail
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-
-from authlib.email import render_to_mail
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import CoffeePairings, User

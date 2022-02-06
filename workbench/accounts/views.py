@@ -1,3 +1,4 @@
+from authlib.google import GoogleOAuth2Client
 from django.conf import settings
 from django.contrib import auth, messages
 from django.http import Http404, HttpResponseRedirect
@@ -5,8 +6,6 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.cache import never_cache
-
-from authlib.google import GoogleOAuth2Client
 
 from workbench.accounts.forms import UserForm
 from workbench.accounts.models import User

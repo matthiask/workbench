@@ -1,5 +1,6 @@
 import json
 
+import vanilla
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -7,8 +8,6 @@ from django.utils.decorators import classonlymethod
 from django.utils.functional import cached_property
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _, gettext_lazy
-
-import vanilla
 
 from workbench.services.models import ServiceType
 

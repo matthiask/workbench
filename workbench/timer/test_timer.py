@@ -7,7 +7,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.timezone import localtime
 from django.utils.translation import deactivate_all
-
 from time_machine import travel
 
 from workbench import factories

@@ -1,8 +1,7 @@
+import requests
 from django.conf import settings
 from django.db import transaction
 from django.db.models import ProtectedError
-
-import requests
 
 from workbench.circles.models import Circle, Role
 

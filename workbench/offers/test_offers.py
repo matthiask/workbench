@@ -5,7 +5,6 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
-
 from time_machine import travel
 
 from workbench import factories

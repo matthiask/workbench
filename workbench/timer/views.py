@@ -1,5 +1,6 @@
 import datetime as dt
 
+from corsheaders.middleware import CorsMiddleware
 from django import forms
 from django.contrib import messages
 from django.http import JsonResponse
@@ -10,8 +11,6 @@ from django.utils.timezone import make_aware
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
-
-from corsheaders.middleware import CorsMiddleware
 
 from workbench.accounts.models import User
 from workbench.timer.models import Timestamp

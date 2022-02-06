@@ -2,9 +2,8 @@ import datetime as dt
 import types
 from decimal import Decimal
 
-from django.utils import timezone
-
 import factory
+from django.utils import timezone
 from factory.django import DjangoModelFactory
 from faker import Factory
 from faker.providers import address

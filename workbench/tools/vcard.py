@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.translation import gettext as _
-
 from vobject import vCard, vcard
 
 
