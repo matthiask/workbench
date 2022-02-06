@@ -27,7 +27,7 @@ def _do_deploy(conn, folder, rsync):
     with conn.cd(folder):
         fl.run(conn, "git checkout main")
         fl.run(conn, "git fetch origin")
-        fl.run(conn, "git merge --ff-only origin/main")
+        fl.run(conn, "git reset --hard origin/main")
         fl.run(conn, 'find . -name "*.pyc" -delete')
         fl.run(conn, "venv/bin/pip install -U 'pip!=20.3.2' wheel setuptools")
         fl.run(conn, "venv/bin/pip install -r requirements.txt")
