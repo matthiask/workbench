@@ -352,7 +352,7 @@ select max(created_at) from sq
             )
             & Q(logged_hours__isnull=True, logged_break__isnull=True)
         ).count()
-        if unlogged > 3:
+        if unlogged > 1 + (t - m).days:  # about one per day
             messages.warning(
                 request,
                 _(
