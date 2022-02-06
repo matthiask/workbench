@@ -337,6 +337,29 @@ select max(created_at) from sq
             messages.warning(request, msg)
         return msg
 
+    def unlogged_timestamps_warning(self, *, request):
+        m = monday()
+        t = dt.date.today()
+        if m == t:
+            return
+
+        unlogged = self.timestamp_set.filter(
+            Q(
+                created_at__range=[
+                    timezone.make_aware(dt.datetime.combine(m, dt.time.min)),
+                    timezone.make_aware(dt.datetime.combine(t, dt.time.min)),
+                ]
+            )
+            & Q(logged_hours__isnull=True, logged_break__isnull=True)
+        ).count()
+        if unlogged > 3:
+            messages.warning(
+                request,
+                _(
+                    "You have {} unlogged timestamps from this week only. You should probably go and check them."
+                ).format(unlogged),
+            )
+
 
 @model_urls
 class Team(Model):

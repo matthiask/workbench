@@ -120,6 +120,7 @@ def _in_preparation(user):
 
 def start(request):
     request.user.take_a_break_warning(request=request)
+    request.user.unlogged_timestamps_warning(request=request)
 
     return render(
         request,

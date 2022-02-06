@@ -20,7 +20,7 @@
                   {{ request.user.hours.week|hours }} {% translate 'this week' %}
                 </a>
               {% else %}
-                {{ day|local_date_format }} / {{ hours|hours }}
+                {{ day|local_date_format:'l d.m.Y' }} / {{ hours|hours }}
               {% endif %}
             </small>
           </h3>

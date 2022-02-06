@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-31 09:33+0100\n"
+"POT-Creation-Date: 2022-02-06 16:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -238,6 +238,10 @@ msgstr "Nutzer*innen"
 #, python-format
 msgid "You should take (and log!) a break of at least %(minutes)s minutes when working more than %(hours)s hours."
 msgstr "Du musst eine Pause von mindestens %(minutes)s Minuten machen (und erfassen!), wenn Du mehr als %(hours)s Stunden arbeitest."
+
+#: workbench/accounts/models.py
+msgid "You have {} unlogged timestamps from this week only. You should probably go and check them."
+msgstr "Du hast {} nicht erfasste Zeitmarken, nur von dieser Woche. Du solltest diese vermutlich prüfen gehen."
 
 #: workbench/accounts/models.py workbench/awt/models.py
 #: workbench/circles/models.py workbench/contacts/models.py
