@@ -535,7 +535,13 @@ class AWTTest(TestCase):
             stats,
             {
                 "month": dt.date(2021, 8, 31),
-                "warnings": [(user, Decimal("-1910.000"))],
+                "warnings": [
+                    {
+                        "user": user,
+                        "running_sum": Decimal("-1910.000"),
+                        "monthly_sum": Decimal("-240.0"),
+                    }
+                ],
             },
         )
 

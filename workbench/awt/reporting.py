@@ -310,7 +310,11 @@ def annual_working_time_warnings():
 
     awt = annual_working_time(month.year, users=active_users(month.year))
     warnings = [
-        (row["user"], row["running_sums"][month.month - 1])
+        {
+            "user": row["user"],
+            "running_sum": row["running_sums"][month.month - 1],
+            "monthly_sum": row["monthly_sums"][month.month - 1],
+        }
         for row in awt["statistics"]
         if row["user"].is_active and abs(row["running_sums"][month.month - 1]) > 40
     ]

@@ -45,16 +45,15 @@ def annual_working_time_warnings_mails():
             cc=["workbench@feinheit.ch"],
         ).send()
 
-    for user, running_sum in stats["warnings"]:
-        if user in warning_individual:
+    for row in stats["warnings"]:
+        if row["user"] in warning_individual:
             render_to_mail(
                 "awt/individual_awt_warning_mail",
-                {
-                    "user": user,
-                    "running_sum": running_sum,
+                row
+                | {
                     "month": stats["month"],
                     "WORKBENCH": settings.WORKBENCH,
                 },
-                to=[user.email],
+                to=[row["user"].email],
                 cc=["workbench@feinheit.ch"],
             ).send()
