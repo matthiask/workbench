@@ -56,7 +56,7 @@ def coffee_invites():
     if weekday != 1 or week % 2 == 0:
         return
     # It is a monday in an odd ISO calendar week
-    users = list(User.objects.active().filter(_features__overlap=[FEATURES.COFFEE]))
+    users = [user for user in User.objects.active() if user.features[FEATURES.COFFEE]]
 
     if len(users) < 2:
         # :-(
