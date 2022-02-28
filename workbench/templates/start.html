@@ -145,13 +145,19 @@
         {% endif %}
       </div>
       <div class="card mb-3">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between">
           <h3 class="my-0">
             <a href="{% url 'logbook_loggedhours_list' %}">{% translate "all users' hours"|capfirst %}</a>
           </h3>
+          <button type="button"
+                  data-toggle="collapse"
+                  data-target="[data-all-users-hours]"
+                  class="btn btn-primary btn-sm">
+            {% translate 'Show' %}
+          </button>
         </div>
         {% if all_users_hours %}
-          <div class="list-group list-group-flush">
+          <div class="list-group list-group-flush collapse" data-all-users-hours>
             {% for hours in all_users_hours %}
               <a class="list-group-item list-group-item-action"
                  href="{{ hours.get_absolute_url }}"
