@@ -368,6 +368,7 @@ def _offers_offer_cfg(user):
         "created_at",
         "project",
         "offered_on",
+        "valid_until",
         "closed_on",
         "work_completed_on",
         "title",
