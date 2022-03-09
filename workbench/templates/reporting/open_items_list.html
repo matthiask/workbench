@@ -47,6 +47,33 @@
         {% include 'svg/desktop-download.svg' %}
         XLSX
       </a>
+
+      <br>
+      <br>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12 col-md-6 col-lg-4">
+      <h2>{% translate 'Due in calendar week' %}</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>{% trans 'week'|capfirst %}</th>
+            <th class="text-right">{% trans 'total excl. tax'|capfirst %}</th>
+            <th class="text-right">{% trans 'total'|capfirst %}</th>
+        </thead>
+        <tbody>
+          {% for week, per_week in open_items_list.weeks %}
+            <tr>
+              <td>KW{{ week|date:'W Y' }}</td>
+              <td class="text-right">{{ per_week.total_excl_tax|currency }}</td>
+              <td class="text-right">{{ per_week.total|currency }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
 {% endblock %}

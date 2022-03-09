@@ -1,4 +1,5 @@
 import datetime as dt
+from collections import defaultdict
 from functools import reduce
 from itertools import groupby
 
@@ -62,8 +63,15 @@ class OpenItemsForm(Form):
             .select_related("owned_by", "customer", "project")
         )
 
+        weeks = defaultdict(lambda: {"total_excl_tax": Z2, "total": Z2})
+        for invoice in open_items:
+            week = monday(invoice.due_on)
+            weeks[week]["total_excl_tax"] += invoice.total_excl_tax
+            weeks[week]["total"] += invoice.total
+
         return {
             "list": open_items,
+            "weeks": sorted(weeks.items()),
             "total_excl_tax": sum((i.total_excl_tax for i in open_items), Z2),
             "total": sum((i.total for i in open_items), Z2),
         }
