@@ -52,10 +52,10 @@ function Planning({ data }) {
   const gridRef = useRef(null)
   const rowCtx = {
     __row: FIRST_DATA_ROW,
-    current: function () {
+    current() {
       return this.__row
     },
-    next: function () {
+    next() {
       return ++this.__row
     },
   }
@@ -435,7 +435,6 @@ const Milestones = ({ project }) => {
         {gettext("milestones")}
       </Cell>
       {project.milestones.map((m, i) => {
-        const ctx = useContext(RowContext)
         const row = ctx.next()
 
         const isEven = (1 + i) % 2 === 0
@@ -902,11 +901,9 @@ function findContiguousWeekRanges(hours_per_week) {
         // Start new range
         rangeStart = i
       }
-    } else {
-      if (rangeStart >= 0) {
-        ranges.push({ start: rangeStart, length: i - rangeStart })
-        rangeStart = -1
-      }
+    } else if (rangeStart >= 0) {
+      ranges.push({ start: rangeStart, length: i - rangeStart })
+      rangeStart = -1
     }
   }
 

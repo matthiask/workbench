@@ -31,7 +31,7 @@ export const Absences = ({ absencesByPerson, dateList, reasonList }) => {
           week: !entryOfSameWeek ? week : "",
           month: !entryOfSameMonth ? date.getMonth() : "",
           year: !entryOfSameYear ? date.getFullYear() : "",
-          date: date,
+          date,
         })
 
         return acc
@@ -118,7 +118,7 @@ const Absence = ({ absence, person }) => {
       }}
     >
       <span className="absence__label">
-        {absence.reasonDisplay + " – " + absence.description}
+        {`${absence.reasonDisplay} – ${absence.description}`}
       </span>
       {showPopup ? <Popup absence={absence} /> : null}
     </a>

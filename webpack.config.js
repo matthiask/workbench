@@ -16,8 +16,8 @@ module.exports = merge.smart(
     output: {
       path: path.resolve("./static/workbench/"),
       publicPath: DEBUG
-        ? "http" + (HTTPS ? "s" : "") + "://" + HOST + ":4000/"
-        : (process.env.STATIC_URL || "/static/") + "workbench/",
+        ? `http${HTTPS ? "s" : ""}://${HOST}:4000/`
+        : `${process.env.STATIC_URL || "/static/"}workbench/`,
       filename: DEBUG ? "[name].js" : "[name]-[contenthash].js",
     },
   }

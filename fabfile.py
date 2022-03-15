@@ -1,7 +1,7 @@
 import fh_fablib as fl
 
 
-fl.require("1.0.20220211")
+fl.require("1.0.20220311")
 fl.config.update(
     app="workbench",
     base=fl.Path(__file__).parent,
@@ -11,16 +11,6 @@ fl.config.update(
     remote="production",
     installations=["fh", "dbpag", "bf", "test"],
 )
-
-
-@fl.task
-def fmt(ctx):
-    fl.fmt(ctx)
-    fl.run(
-        ctx,
-        "yarn run prettier --write --no-semi --trailing-comma es5"
-        ' "absences/**/*.*" "planning/**/*.*" "timer/**/*.*"',
-    )
 
 
 def _do_deploy(conn, folder, rsync):
@@ -52,7 +42,6 @@ def _restart_all(conn):
 @fl.task
 def deploy(ctx):
     fl._check_branch(ctx)
-    fl.check(ctx)
     fl.run(ctx, "git push origin main")
     fl.run(ctx, "NODE_ENV=production yarn run webpack -p --bail")
     with fl.Connection(fl.config.host) as conn:
@@ -63,7 +52,6 @@ def deploy(ctx):
 
 @fl.task
 def deploy_code(ctx):
-    fl.check(ctx)
     fl.run(ctx, "git push origin main")
     with fl.Connection(fl.config.host) as conn:
         _do_deploy(conn, "www/workbench/", rsync=False)
@@ -84,4 +72,4 @@ def pull_db(ctx, installation="fh"):
     )
 
 
-ns = fl.Collection(*fl.GENERAL, deploy, deploy_code, fmt, pull_db)
+ns = fl.Collection(*fl.GENERAL, deploy, deploy_code, pull_db)

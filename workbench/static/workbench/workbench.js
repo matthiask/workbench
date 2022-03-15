@@ -1,3 +1,4 @@
+/* global $ */
 function _sel(sel) {
   return document.querySelector(sel)
 }
@@ -11,7 +12,7 @@ function doSubmit(el) {
   el.closest("form").requestSubmit()
 }
 
-$(function () {
+$(() => {
   const gettext =
     window.gettext ||
     function (t) {
@@ -34,7 +35,7 @@ $(function () {
       backdrop: $data.find("form[method=post]").length ? "static" : true,
     })
 
-    setTimeout(function () {
+    setTimeout(() => {
       const fields = $(".modal").find("input, select")
       if (fields.filter("[autofocus]").length) {
         fields.filter("[autofocus]").focus()
@@ -49,11 +50,11 @@ $(function () {
   window.initModal = initModal
   window.openModalFromUrl = function (url) {
     $.ajax({
-      url: url,
-      success: function (data) {
+      url,
+      success(data) {
         initModal(data)
       },
-      error: function () {
+      error() {
         alert(gettext("Unable to open the form"))
       },
       xhrFields: {
@@ -74,7 +75,7 @@ $(function () {
       const action = this.action,
         data = $(this).serialize()
       this.parentNode.removeChild(this)
-      $.post(action, data, function (data, status, jqXHR) {
+      $.post(action, data, (data, status, jqXHR) => {
         // 201 CREATED, 202 ACCEPTED or 204 NO CONTENT
         if (
           jqXHR.status === 201 ||
@@ -99,13 +100,13 @@ $(function () {
       })
     } else {
       $.get(
-        this.action + "?" + $(this).serialize(),
-        function (
+        `${this.action}?${$(this).serialize()}`,
+        (
           data /*,
         status,
         jqXHR
         */
-        ) {
+        ) => {
           initModal(data)
         }
       )
@@ -125,7 +126,7 @@ $(function () {
 
       const fd = new FormData(this.form)
       let params = new URLSearchParams()
-      for (var part of fd) {
+      for (let part of fd) {
         if (part[1]) params.append(part[0], part[1])
       }
       params.sort()
@@ -135,7 +136,7 @@ $(function () {
   )
 
   // Search form restoration
-  $(".form-search").each(function () {
+  $(".form-search").each(() => {
     let params = new URLSearchParams(window.location.search.slice(1))
     // Also see workbench/generic.py
     ;["disposition", "error", "export", "page"].forEach((key) =>
@@ -163,12 +164,12 @@ $(function () {
     window.location.href = restoreSearch(this.getAttribute("href"))
   })
 
-  $("h1, [data-reset-filter]").on("click", function () {
+  $("h1, [data-reset-filter]").on("click", () => {
     window.localStorage.removeItem(localStorageKeyFor(window.location.pathname))
   })
 
   // Hotkeys
-  $(document.body).on("keydown", function (e) {
+  $(document.body).on("keydown", (e) => {
     if (/Mac/.test(navigator.platform) ? !e.ctrlKey : !e.altKey) {
       return
     }
@@ -231,9 +232,7 @@ $(function () {
     } else if (e.keyCode === 13) {
       doSubmit(e.target)
     } else if (e.keyCode >= 48 && e.keyCode <= 57) {
-      const el = _sel(
-        '[data-number-shortcut="' + ((e.keyCode - 38) % 10) + '"]'
-      )
+      const el = _sel(`[data-number-shortcut="${(e.keyCode - 38) % 10}"]`)
       if (!el) return
       if (el.dataset.toggle == "ajaxmodal") {
         window.openModalFromUrl(el.href)
@@ -299,22 +298,20 @@ $(function () {
 
 function initWidgets() {
   function addZero(num) {
-    return num < 10 ? "0" + num : "" + num
+    return num < 10 ? `0${num}` : `${num}`
   }
 
   const invoicedOn = $("#id_invoiced_on")
   const dueOn = $("#id_due_on")
   if (invoicedOn.length && dueOn.length) {
-    invoicedOn.on("change", function (_event) {
+    invoicedOn.on("change", (_event) => {
       const due = new Date(
         new Date(invoicedOn.val()).getTime() + 14 * 86400 * 1000
       )
       dueOn.val(
-        addZero(due.getFullYear()) +
-          "-" +
-          addZero(1 + due.getMonth()) +
-          "-" +
-          addZero(due.getDate())
+        `${addZero(due.getFullYear())}-${addZero(1 + due.getMonth())}-${addZero(
+          due.getDate()
+        )}`
       )
     })
   }
@@ -322,7 +319,7 @@ function initWidgets() {
   const startsOn = $("#id_modal-starts_on")
   const endsOn = $("#id_modal-ends_on")
   if (startsOn.length && endsOn.length) {
-    startsOn.on("change", function () {
+    startsOn.on("change", () => {
       if (!endsOn.val()) endsOn.val(startsOn.val())
     })
   }
@@ -330,16 +327,14 @@ function initWidgets() {
   const offeredOn = $("#id_offered_on")
   const validUntil = $("#id_valid_until")
   if (offeredOn.length && validUntil.length) {
-    offeredOn.on("change", function (_event) {
+    offeredOn.on("change", (_event) => {
       const day = new Date(
         new Date(offeredOn.val()).getTime() + 59 * 86400 * 1000
       )
       validUntil.val(
-        addZero(day.getFullYear()) +
-          "-" +
-          addZero(1 + day.getMonth()) +
-          "-" +
-          addZero(day.getDate())
+        `${addZero(day.getFullYear())}-${addZero(1 + day.getMonth())}-${addZero(
+          day.getDate()
+        )}`
       )
     })
   }
@@ -351,9 +346,9 @@ function initWidgets() {
 
     self.addClass("initialized")
     sel.on("change", function () {
-      if (data["" + this.value]) {
-        $.each(data["" + this.value], function (key, value) {
-          self.find("[name$='" + key + "']").val(value)
+      if (data[`${this.value}`]) {
+        $.each(data[`${this.value}`], (key, value) => {
+          self.find(`[name$='${key}']`).val(value)
         })
       }
     })
@@ -363,22 +358,22 @@ function initWidgets() {
     const self = $(this),
       url = self.data("autocomplete-url"),
       id = self.data("autocomplete-id"),
-      input = $("#" + id)
+      input = $(`#${id}`)
 
     self
       .addClass("initialized")
       .autocomplete({
         minLength: 2,
-        source: function (request, response) {
-          $.get(url, { q: request.term }, function (data) {
+        source(request, response) {
+          $.get(url, { q: request.term }, (data) => {
             response(data.results)
           })
         },
-        focus: function (event, ui) {
+        focus(event, ui) {
           self.val(ui.item.label)
           return false
         },
-        select: function (event, ui) {
+        select(event, ui) {
           self.val(ui.item.label)
           input.val(ui.item.value).trigger("change")
           return false
@@ -393,7 +388,7 @@ function initWidgets() {
     $(this.dataset.clear).val("").trigger("change")
   })
 
-  $(document.body).on("click", "[data-convert]", function () {
+  $(document.body).on("click", "[data-convert]", () => {
     const params = new URLSearchParams()
     params.append("day", $("#id_modal-rendered_on").val())
     params.append("currency", $("#id_modal-expense_currency").val())
@@ -401,7 +396,7 @@ function initWidgets() {
     console.log(params)
     console.log(params.toString())
 
-    $.getJSON("/expenses/convert/?" + params.toString(), function (data) {
+    $.getJSON(`/expenses/convert/?${params.toString()}`, (data) => {
       $("#id_modal-third_party_costs").val(data.cost)
     })
   })
@@ -452,20 +447,20 @@ function initWidgets() {
 }
 
 window.addInlineForm = function addInlineForm(slug, onComplete) {
-  const totalForms = $("#id_" + slug + "-TOTAL_FORMS"),
+  const totalForms = $(`#id_${slug}-TOTAL_FORMS`),
     newId = parseInt(totalForms.val()) || 0
 
   totalForms.val(newId + 1)
-  const empty = $("#" + slug + "-empty"),
+  const empty = $(`#${slug}-empty`),
     attributes = ["id", "name", "for"],
     form = $(empty.html())
 
-  form.removeClass("empty").attr("id", slug + "-" + newId)
+  form.removeClass("empty").attr("id", `${slug}-${newId}`)
 
   for (let i = 0; i < attributes.length; ++i) {
     const attr = attributes[i]
 
-    form.find("*[" + attr + "*=__prefix__]").each(function () {
+    form.find(`*[${attr}*=__prefix__]`).each(function () {
       const el = $(this)
       el.attr(attr, el.attr(attr).replace(/__prefix__/, newId))
     })
@@ -475,7 +470,7 @@ window.addInlineForm = function addInlineForm(slug, onComplete) {
   // cannot use siblings() here, because the empty element may be the
   // only one (if no objects exist until now)
   form
-    .insertAfter(empty.parent().children("[id|=" + slug + "]:last"))
+    .insertAfter(empty.parent().children(`[id|=${slug}]:last`))
     .hide()
     .fadeIn()
 

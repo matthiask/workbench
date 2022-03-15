@@ -1,6 +1,9 @@
+Django<4
+Pillow
 beautifulsoup4
 coverage
-Django<4
+dj-database-url
+dj-email-url
 django-admin-ordering
 django-authlib
 django-bootstrap4
@@ -12,15 +15,12 @@ django-fineforms
 django-slowtests
 django-vanilla-views
 django-webpack-loader
-dj-database-url
-dj-email-url
 factory-boy
 gunicorn
 lxml
 mailchimp3
 pdfdocument
 phonenumbers
-Pillow
 psycopg2-binary
 reportlab
 speckenv
