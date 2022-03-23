@@ -43,12 +43,6 @@ repos:
     hooks:
       - id: flake8
         args: ["--ignore=E203,E501,W503"]
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.5.1
-    hooks:
-      - id: prettier
-        args: [--list-different, --no-semi]
-        exclude: "^conf/|.*\\.html$|.*\\.json$"
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v8.11.0
     hooks:
@@ -70,4 +64,11 @@ repos:
           - "@babel/preset-react"
           - "@babel/plugin-syntax-class-properties"
           - "@babel/plugin-syntax-decorators"
+          - "@babel/plugin-syntax-jsx"
           - jest
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v2.5.1
+    hooks:
+      - id: prettier
+        args: [--list-different, --no-semi]
+        exclude: "^conf/|.*\\.html$|.*\\.json$"

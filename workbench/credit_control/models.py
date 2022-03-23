@@ -17,6 +17,7 @@ class Ledger(Model):
 
     name = models.CharField(_("name"), max_length=100)
     parser = models.CharField(_("parser"), max_length=20, choices=PARSER_CHOICES)
+    is_active = models.BooleanField(_("is active"), default=True)
 
     class Meta:
         ordering = ["name"]

@@ -79,9 +79,11 @@ class AccountStatementUploadForm(Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["ledger"].choices = [
-            (ledger.id, str(ledger)) for ledger in Ledger.objects.all()
+        self.fields["ledger"].choices = choices = [
+            (ledger.id, str(ledger)) for ledger in Ledger.objects.filter(is_active=True)
         ]
+        if len(choices) == 1:
+            self.fields["ledger"].initial = choices[0][0]
 
     def clean(self):
         data = super().clean()

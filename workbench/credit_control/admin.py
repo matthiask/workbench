@@ -4,6 +4,7 @@ from workbench.tools import admin
 
 @admin.register(models.Ledger)
 class LedgerAdmin(admin.ReadWriteModelAdmin):
+    list_display = ["name", "parser", "is_active"]
     radio_fields = {"parser": admin.VERTICAL}
 
 
