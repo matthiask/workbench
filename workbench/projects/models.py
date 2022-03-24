@@ -426,7 +426,7 @@ class Project(Model):
             total_logged_cost += row["logged_cost"]
             logged_hours_per_effort_rate[service.effort_rate] += row["logged_hours"]
 
-            if not service.is_declined:
+            if not service.is_declined and not service.is_optional:
                 service_hours[service.offer] += service.service_hours
                 service_cost[service.offer] += service.cost or Z2
                 service_hours[service.project] += service.service_hours
@@ -564,7 +564,10 @@ class ServiceQuerySet(SearchQuerySet):
     def budgeted(self):
         from workbench.offers.models import Offer
 
-        return self.filter(Q(offer__isnull=True) | ~Q(offer__status=Offer.DECLINED))
+        return self.filter(
+            (Q(offer__isnull=True) | ~Q(offer__status=Offer.DECLINED))
+            & Q(is_optional=False)
+        )
 
     def logging(self):
         from workbench.offers.models import Offer

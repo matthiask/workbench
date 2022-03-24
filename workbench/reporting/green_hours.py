@@ -19,7 +19,9 @@ service AS (
   SELECT ps.project_id, SUM(service_hours) AS hours
   FROM projects_service ps
   LEFT OUTER JOIN offers_offer o ON ps.offer_id=o.id
-  WHERE ps.offer_id IS NULL OR o.status != %s
+  WHERE
+    (ps.offer_id IS NULL OR o.status != %s)
+    AND NOT ps.is_optional
   GROUP BY ps.project_id
 ),
 logged AS (
@@ -105,7 +107,9 @@ service AS (
   SELECT ps.project_id, SUM(service_hours) AS hours
   FROM projects_service ps
   LEFT OUTER JOIN offers_offer o ON ps.offer_id=o.id
-  WHERE ps.offer_id IS NULL OR o.status!=40 -- Declined
+  WHERE
+    (ps.offer_id IS NULL OR o.status!=40) -- Declined
+    AND NOT ps.is_optional
   GROUP BY ps.project_id
 ),
 logged AS (
