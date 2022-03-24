@@ -1,7 +1,7 @@
 import fh_fablib as fl
 
 
-fl.require("1.0.20220317")
+fl.require("1.0.20220324")
 fl.config.update(
     app="workbench",
     base=fl.Path(__file__).parent,

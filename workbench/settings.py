@@ -205,7 +205,7 @@ WORKBENCH = {
         ),
         PDF_INVOICE_PAYMENT=(
             "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
-            " der Referenznummer %(code)s bis zum %(due)s"
+            " der Rechnungsnummer %(code)s als Zahlungszweck bis zum %(due)s"
             " auf ZKB Konto IBAN CH52 0070 0114 8022 0855 1."
         ),
         PDF_CREDIT=(
@@ -257,7 +257,7 @@ WORKBENCH = {
         ),
         PDF_INVOICE_PAYMENT=(
             "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
-            " der Referenznummer %(code)s bis zum %(due)s"
+            " der Rechnungsnummer %(code)s als Zahlungszweck bis zum %(due)s"
             " auf ZKB Konto IBAN CH78 0070 0110 0070 4877 9."
         ),
         PDF_CREDIT=(
@@ -309,7 +309,7 @@ WORKBENCH = {
         ),
         PDF_INVOICE_PAYMENT=(
             "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
-            " der Referenznummer %(code)s bis zum %(due)s"
+            " der Rechnungsnummer %(code)s als Zahlungszweck bis zum %(due)s"
             " auf Konto IBAN CH31 0687 7705 0560 9509 7 bei der"
             " Zürcher Landbank AG."
         ),
@@ -360,7 +360,7 @@ WORKBENCH = {
         ),
         PDF_INVOICE_PAYMENT=(
             "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
-            " der Referenznummer %(code)s bis zum %(due)s"
+            " der Rechnungsnummer %(code)s als Zahlungszweck bis zum %(due)s"
             " auf ZKB Konto IBAN CH52 0070 0114 8022 0855 1."
         ),
         PDF_CREDIT=(
