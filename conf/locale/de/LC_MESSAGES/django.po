@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-20 19:38+0100\n"
+"POT-Creation-Date: 2022-03-24 14:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -168,7 +168,7 @@ msgstr "Inaktiv"
 msgid "email"
 msgstr "Email"
 
-#: workbench/accounts/models.py
+#: workbench/accounts/models.py workbench/credit_control/models.py
 msgid "is active"
 msgstr "ist aktiv"
 
@@ -2957,7 +2957,8 @@ msgid ""
 "\n"
 "Please take the time to send a short mail to your supervisor with the reasons\n"
 "for this balance and include a plan for catching up or compensating your\n"
-"working time as appropriate. Thanks!\n"
+"working time as appropriate if the reasons aren't well known or if you're further\n"
+"away from well-balanced working hours than last month. Thanks!\n"
 msgstr ""
 "\n"
 "Hallo %(full_name)s\n"
@@ -2966,7 +2967,7 @@ msgstr ""
 "Dies ist ausserhalb des Bereichs von +/- 40h.\n"
 "Der Stundensaldo des letzten Monats war %(monthly_sum)s.\n"
 "\n"
-"Bitte wende dich mit einer kurzen Begründung für den Status Quo und einem kurz- oder langfristigen Plan zur Kompensation der Unter- oder Überzeit an die Rolle Unterschreiber*in. Die Regelungen hinsichtlich Arbeitszeit findest du im Arbeitszeitreglement. Merci!\n"
+"Bitte wende dich mit einer kurzen Begründung für den Status Quo und einem kurz- oder langfristigen Plan zur Kompensation der Unter- oder Überzeit an die Rolle Unterschreiber*in, falls die Gründe nicht allgemein bekannt sind oder falls Du weiter weg bist von einer ausgeglichenen Arbeitszeit. Die Regelungen hinsichtlich Arbeitszeit findest du im Arbeitszeitreglement. Merci!\n"
 
 #: workbench/templates/awt/year_detail.html
 msgid "active users"
@@ -3444,6 +3445,7 @@ msgid "offers PDF"
 msgstr "Offerten-PDF"
 
 #: workbench/templates/projects/project_detail.html
+#: workbench/templates/start.html
 msgid "Show"
 msgstr "Anzeigen"
 
@@ -3651,6 +3653,14 @@ msgstr "Durchschnitt"
 #: workbench/templates/reporting/logging.html
 msgid "Days with insufficient breaks"
 msgstr "Tage mit zuwenig Pausenzeit"
+
+#: workbench/templates/reporting/open_items_list.html
+msgid "Due in calendar week"
+msgstr "Fällig in Kalenderwoche"
+
+#: workbench/templates/reporting/open_items_list.html
+msgid "week"
+msgstr "Woche"
 
 #: workbench/templates/reporting/planning_vs_logbook.html
 msgid "Planned"

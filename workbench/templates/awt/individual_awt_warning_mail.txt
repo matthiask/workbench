@@ -9,7 +9,8 @@ The monthly balance of last month was {{ monthly_sum }}.
 
 Please take the time to send a short mail to your supervisor with the reasons
 for this balance and include a plan for catching up or compensating your
-working time as appropriate. Thanks!
+working time as appropriate if the reasons aren't well known or if you're further
+away from well-balanced working hours than last month. Thanks!
 {% endblocktranslate %}
 
 {{ WORKBENCH.URL }}{% url 'awt_year_report' %}?user={{ user.pk }}
