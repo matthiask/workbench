@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
             name="is_optional",
             field=models.BooleanField(
                 default=False,
-                help_text="Optional services to not count towards the offer total.",
+                help_text="Optional services do not count towards the offer total.",
                 verbose_name="is optional",
             ),
         )

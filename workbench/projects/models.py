@@ -614,7 +614,7 @@ class Service(ServiceBase):
     is_optional = models.BooleanField(
         _("is optional"),
         default=False,
-        help_text=_("Optional services to not count towards the offer total."),
+        help_text=_("Optional services do not count towards the offer total."),
     )
     role = models.ForeignKey(
         "circles.Role",

@@ -2660,7 +2660,7 @@ msgid "is optional"
 msgstr "ist optional"
 
 #: workbench/projects/models.py
-msgid "Optional services to not count towards the offer total."
+msgid "Optional services do not count towards the offer total."
 msgstr "Optionale Leistungen werden nicht zum Offertentotal hinzugerechnet."
 
 #: workbench/projects/models.py
