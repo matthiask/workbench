@@ -73,6 +73,11 @@ urlpatterns = [
         name="projects_campaign_detail",
     ),
     re_path(
+        r"^campaigns/(?P<pk>\d+)/statistics/$",
+        generic.DetailView.as_view(model=Campaign, template_name_suffix="_statistics"),
+        name="projects_campaign_statistics",
+    ),
+    re_path(
         r"^campaigns/create/$",
         generic.CreateView.as_view(form_class=CampaignForm, model=Campaign),
         name="projects_campaign_create",

@@ -106,6 +106,9 @@
       <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
       <a href="{{ object.urls.create }}?copy={{ object.pk }}"
          class="btn btn-primary">{% translate 'Copy' %}</a>
+        <a href="{{ object.urls.statistics }}"
+           class="btn btn-primary"
+           data-toggle="ajaxmodal">{% translate 'Statistics' %}</a>
       <a href="{% url 'logbook_loggedhours_list' %}?campaign={{ object.pk }}"
          class="btn btn-primary">
         {% translate 'logged hours'|capfirst %}

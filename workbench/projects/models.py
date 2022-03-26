@@ -97,6 +97,18 @@ class Campaign(Model):
         pbs["statistics"] = sorted(pbs["statistics"], key=lambda s: s["project"])
         return pbs
 
+    @cached_property
+    def logged_hours_per_effort_rate(self):
+        from workbench.logbook.models import LoggedHours
+
+        return (
+            LoggedHours.objects.filter(service__project__campaign=self)
+            .values("service__effort_rate")
+            .annotate(Sum("hours"))
+            .values_list("service__effort_rate", "hours__sum")
+            .order_by("service__effort_rate")
+        )
+
 
 class ProjectQuerySet(SearchQuerySet):
     def open(self, *, on=None):
