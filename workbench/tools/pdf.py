@@ -353,7 +353,7 @@ class PDFDocument(_PDFDocument):
 
         if len(total) > 1:
             self.table(total, self.style.tableColumns, self.style.tableHead)
-            self.spacer(0.7 * mm)
+            self.spacer(0.3 * mm)
 
         self.table(
             [(instance.total_title, currency(transform(instance.total).quantize(Z)))],
