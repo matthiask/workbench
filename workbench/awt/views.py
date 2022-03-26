@@ -9,7 +9,7 @@ from django.utils.translation import gettext as _
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
-from workbench.awt.forms import UserFilterForm
+from workbench.awt.forms import CalendarFilterForm
 from workbench.awt.models import Absence, Year
 from workbench.awt.pdf import annual_working_time_pdf
 from workbench.awt.reporting import active_users, annual_working_time
@@ -67,13 +67,12 @@ def annual_working_time_view(request):
     )
 
 
-@filter_form(UserFilterForm)
+@filter_form(CalendarFilterForm)
 def absence_calendar(request, form):
     users = form.users()
 
-    dates = {dt.date.today()}
     absences = defaultdict(list)
-    cutoff = monday() - dt.timedelta(days=7)
+    cutoff = form.cutoff()
     queryset = Absence.objects.annotate(
         _ends_on=Coalesce("ends_on", "starts_on")
     ).filter(
@@ -82,6 +81,9 @@ def absence_calendar(request, form):
         user__in=users,
     )
 
+    dates = set()
+    if not form.cleaned_data.get("year"):
+        dates.add(dt.date.today())
     for absence in queryset:
         absences[absence.user_id].append(absence)
         dates.add(max(absence.starts_on, cutoff))

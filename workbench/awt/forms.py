@@ -6,8 +6,9 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import Team, User
-from workbench.awt.models import Absence
+from workbench.awt.models import Absence, Year
 from workbench.tools.forms import Form, ModelForm, Textarea, WarningsForm, add_prefix
+from workbench.tools.validation import monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -118,10 +119,28 @@ class AbsenceForm(ModelForm, WarningsForm):
         return data
 
 
-class UserFilterForm(Form):
+class CalendarFilterForm(Form):
     team = forms.ModelChoiceField(
         Team.objects.all(), empty_label=_("Everyone"), label="", required=False
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["year"] = forms.ChoiceField(
+            label="",
+            required=False,
+            choices=[("", _("Next 12 months"))]
+            + [
+                (str(year), str(year))
+                for year in sorted(
+                    Year.objects.filter(year__lte=dt.date.today().year + 1)
+                    .order_by()
+                    .values_list("year", flat=True)
+                    .distinct(),
+                    reverse=True,
+                )
+            ],
+        )
 
     def users(self):
         data = self.cleaned_data
@@ -129,3 +148,11 @@ class UserFilterForm(Form):
         if data.get("team"):
             queryset = queryset.filter(teams=data.get("team"))
         return queryset
+
+    def cutoff(self):
+        year = self.cleaned_data["year"]
+
+        if year == "":
+            return monday() - dt.timedelta(days=7)
+        else:
+            return monday(dt.date(int(year), 1, 1))
