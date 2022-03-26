@@ -451,8 +451,9 @@ class PDFDocument(_PDFDocument):
             self.spacer(5 * mm)
             self.p(invoice.description)
         self.spacer(2 * mm)
-        self.p("{}: {}".format(_("Service period"), invoice.service_period))
-        self.spacer()
+        if invoice.service_period:
+            self.p("{}: {}".format(_("Service period"), invoice.service_period))
+            self.spacer()
         self.table_services(
             invoice.services.all(),
             show_details=invoice.show_service_details,
