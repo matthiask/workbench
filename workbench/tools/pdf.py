@@ -343,7 +343,7 @@ class PDFDocument(_PDFDocument):
                         currency(-transform(invoice.total_excl_tax).quantize(Z)),
                     )
                 )
-        if instance.tax_amount:
+        if instance.liable_to_vat:
             total.append(
                 (
                     "{:0.1f}% {}".format(instance.tax_rate, _("tax")),
