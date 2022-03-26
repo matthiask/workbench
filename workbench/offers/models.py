@@ -263,6 +263,14 @@ class Offer(ModelWithTotal):
             else _("Total %(currency)s")
         ) % {"currency": settings.WORKBENCH.CURRENCY}
 
+    @property
+    def optional_total_title(self):
+        return (
+            _("Total %(currency)s excl. tax for optional services")
+            if self.liable_to_vat
+            else _("Total %(currency)s for optional services")
+        ) % {"currency": settings.WORKBENCH.CURRENCY}
+
     @classmethod
     def allow_create(cls, request):
         if request.path == reverse("offers_offer_create"):

@@ -23,7 +23,7 @@ from pdfdocument.document import (
 from pdfdocument.utils import pdf_response as _pdf_response
 
 from workbench.invoices.models import Invoice
-from workbench.tools.formats import currency, hours, local_date_format
+from workbench.tools.formats import Z2, currency, hours, local_date_format
 from workbench.tools.models import CalculationModel
 
 
@@ -315,7 +315,7 @@ class PDFDocument(_PDFDocument):
             self.style.tableHead,
         )
 
-    def table_total(self, instance):
+    def table_total(self, instance, *, optional_total=None):
         transform = lambda x: x  # noqa
         if getattr(instance, "type", None) == Invoice.CREDIT:
             transform = lambda x: -x  # noqa
@@ -361,6 +361,22 @@ class PDFDocument(_PDFDocument):
             self.style.tableHeadLine,
         )
 
+        if optional_total:
+            self.spacer(1 * mm)
+            self.table(
+                [
+                    (
+                        instance.optional_total_title,
+                        MarkupParagraph(
+                            "<i>%s</i>" % currency(optional_total), self.style.right
+                        ),
+                        "",
+                    )
+                ],
+                self.style.tableThreeColumns,
+                self.style.table,
+            )
+
     def process_offer(self, offer):
         self.watermark(
             ""
@@ -402,11 +418,18 @@ class PDFDocument(_PDFDocument):
             self.spacer(5 * mm)
             self.p(offer.description)
         self.spacer(2 * mm)
+        services = offer.services.all()
         self.table_services(
-            offer.services.all(),
+            services,
             show_details=offer.show_service_details,
         )
-        self.table_total(offer)
+        self.table_total(
+            offer,
+            optional_total=sum(
+                (service.service_cost for service in services if service.is_optional),
+                Z2,
+            ),
+        )
         self.spacer(2 * mm)
         self.p(settings.WORKBENCH.PDF_OFFER_TERMS)
 

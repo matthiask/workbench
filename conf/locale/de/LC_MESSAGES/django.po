@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-24 14:11+0100\n"
+"POT-Creation-Date: 2022-03-26 11:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2378,6 +2378,16 @@ msgstr "Offeriert am %(offered_on)s, aber Offerte nicht mehr gültig"
 #, python-format
 msgid "Offered on %(offered_on)s"
 msgstr "Offeriert am %(offered_on)s"
+
+#: workbench/offers/models.py
+#, python-format
+msgid "Total %(currency)s excl. tax for optional services"
+msgstr "Total %(currency)s exkl. MwSt. für optionale Leistungen"
+
+#: workbench/offers/models.py
+#, python-format
+msgid "Total %(currency)s for optional services"
+msgstr "Total %(currency)s für optionale Leistungen"
 
 #: workbench/offers/models.py
 msgid "Offers can only be created from projects. Go to the project and add services first, then you'll be able to create the offer itself."
