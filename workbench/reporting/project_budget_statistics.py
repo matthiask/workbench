@@ -62,7 +62,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
         .annotate(Sum("hours"))
     }
 
-    offered_per_project = {
+    sold_per_project = {
         row["project"]: row["total_excl_tax__sum"]
         for row in Offer.objects.accepted()
         .filter(project__in=projects)
@@ -90,7 +90,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
                 project.id
             ],
             "third_party_costs": third_party_costs_per_project.get(project.id, Z2),
-            "offered": offered_per_project.get(project.id, Z2),
+            "sold": sold_per_project.get(project.id, Z2),
             "invoiced": invoiced_per_project.get(project.id, Z2),
             "hours": hours_per_project[project.id],
             "not_archived": not_archived_hours.get(project.id, Z1),
@@ -108,7 +108,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             "effort_cost",
             "effort_hours_with_rate_undefined",
             "third_party_costs",
-            "offered",
+            "sold",
             "invoiced",
             "hours",
             "not_archived",

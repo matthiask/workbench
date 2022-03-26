@@ -20,7 +20,7 @@
         <thead class="sticky">
           <tr>
             <th>{% translate 'project'|capfirst %}</th>
-            <th class="text-right">{% translate 'offered'|capfirst %}</th>
+            <th class="text-right" title="{% translate 'Offered and accepted' %}">{% translate 'sold'|capfirst %}</th>
             <th class="text-right">{% translate 'logbook'|capfirst %}</th>
             <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
             <th class="text-right">{% translate 'invoiced'|capfirst %}</th>
@@ -31,7 +31,7 @@
         <tbody>
           <tr>
             <th></th>
-            <th class="text-right">{{ statistics.overall.offered|currency }}</th>
+            <th class="text-right">{{ statistics.overall.sold|currency }}</th>
             <th class="text-right">{{ statistics.overall.logbook|currency }}</th>
             <th class="text-right">{{ statistics.overall.third_party_costs|currency }}</th>
             <th class="text-right">{{ statistics.overall.invoiced|currency }}</th>
@@ -49,9 +49,9 @@
             <tr>
               <td>{% link_or_none project.project with_badge=True %}</td>
               <td class="text-right
-                         {% if not project.offered %}
+                         {% if not project.sold %}
                            text-black-30
-                         {% endif %}">{{ project.offered|currency }}</td>
+                         {% endif %}">{{ project.sold|currency }}</td>
               <td class="text-right text-nowrap
                          {% if not project.logbook and not project.effort_hours_with_rate_undefined %}
                            text-black-30

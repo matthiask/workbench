@@ -223,7 +223,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
             [
                 capfirst(_("project")),
                 capfirst(_("contact person")),
-                _("Offered"),
+                _("sold"),
                 _("Logbook"),
                 _("Undefined rate"),
                 capfirst(_("third party costs")),
@@ -236,7 +236,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
                 (
                     project["project"],
                     project["project"].owned_by.get_short_name(),
-                    project["offered"],
+                    project["sold"],
                     project["logbook"],
                     project["effort_hours_with_rate_undefined"],
                     project["third_party_costs"],

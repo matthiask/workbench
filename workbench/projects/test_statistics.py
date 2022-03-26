@@ -161,7 +161,7 @@ class StatisticsTest(TestCase):
                     "invoiced": Decimal("1800.00"),
                     "logbook": Decimal("3600.000"),
                     "not_archived": Decimal("10.0"),
-                    "offered": Decimal("0.00"),
+                    "sold": Decimal("0.00"),
                     "project": project,
                     "third_party_costs": Decimal("0.00"),
                 }
