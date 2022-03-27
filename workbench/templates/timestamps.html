@@ -43,7 +43,7 @@
                {% if not next %}aria-disabled="true"{% endif %}>
               &raquo;
             </a>
-            <a href="{% url 'timestamps-controller' %}?user={{ request.user.signed_email }}&amp;url={{ url }}&amp;title={{ WORKBENCH.TITLE }}"
+            <a href="{% url 'timestamps-controller' %}?token={{ request.user.token }}&amp;url={{ url }}&amp;title={{ WORKBENCH.TITLE }}"
                class="btn btn-primary btn-sm align-self-start"
                target="_blank"
                rel="noopener noreferrer"

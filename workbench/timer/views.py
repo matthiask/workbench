@@ -32,22 +32,23 @@ def timer(request):
     )
 
 
-class SignedEmailUserMixin:
+class TokenUserMixin:
     def clean(self):
         data = super().clean()
         if self.request.user.is_authenticated:
             data["user"] = self.request.user
         else:
             try:
-                data["user"] = User.objects.get_by_signed_email(
-                    self.request.POST.get("user") or self.request.GET.get("user")
+                data["user"] = User.objects.get(
+                    token=self.request.POST.get("token")
+                    or self.request.GET.get("token")
                 )
             except Exception:
                 raise forms.ValidationError("Invalid user")
         return data
 
 
-class TimestampForm(SignedEmailUserMixin, ModelForm):
+class TimestampForm(TokenUserMixin, ModelForm):
     time = forms.TimeField(required=False)
 
     class Meta:
@@ -85,14 +86,14 @@ def create_timestamp(request):
     return JsonResponse({"success": str(form.save())}, status=201)
 
 
-class SignedEmailUserForm(SignedEmailUserMixin, Form):
+class TokenUserForm(TokenUserMixin, Form):
     pass
 
 
 @decorator_from_middleware(CorsMiddleware)
 @require_GET
 def list_timestamps(request):
-    form = SignedEmailUserForm(request.GET, request=request)
+    form = TokenUserForm(request.GET, request=request)
     if not form.is_valid():
         return JsonResponse({"errors": form.errors.as_json()}, status=400)
 

@@ -6,10 +6,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.postgres.fields import ArrayField
-from django.core.signing import BadSignature, Signer
 from django.db import connections, models
 from django.db.models import Count, Q, Sum
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -49,9 +49,6 @@ class UserFeatures:
         raise ValueError(f"Unknown setting value {setting} for {key}")
 
     __getitem__ = __getattr__
-
-
-signer = Signer(salt="user")
 
 
 class UserManager(BaseUserManager):
@@ -110,12 +107,6 @@ class UserManager(BaseUserManager):
     def active(self):
         return self.filter(is_active=True)
 
-    def get_by_signed_email(self, signed_email):
-        try:
-            return self.get(is_active=True, email=signer.unsign(signed_email))
-        except BadSignature:
-            raise self.model.DoesNotExist
-
 
 @model_urls
 @total_ordering
@@ -162,6 +153,7 @@ class User(Model, AbstractBaseUser):
     date_of_employment = models.DateField(
         _("date of employment"), blank=True, null=True
     )
+    token = models.CharField(_("token"), max_length=100, editable=False)
 
     objects = UserManager()
 
@@ -169,6 +161,18 @@ class User(Model, AbstractBaseUser):
         ordering = ("_full_name",)
         verbose_name = _("user")
         verbose_name_plural = _("users")
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.cycle_token(save=False)
+        return super().save(*args, **kwargs)
+
+    save.alters_data = True
+
+    def cycle_token(self, *, save=True):
+        self.token = f"{get_random_string(60)}-{self.pk}"
+        if save:
+            self.save()
 
     def get_full_name(self):
         return self._full_name or self.get_short_name()
@@ -239,10 +243,6 @@ class User(Model, AbstractBaseUser):
                 )
             )
         ).select_related("customer", "contact__organization", "owned_by")
-
-    @cached_property
-    def signed_email(self):
-        return signer.sign(self.email)
 
     @cached_property
     def features(self):

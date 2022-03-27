@@ -117,10 +117,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const params = new URLSearchParams(window.location.search)
   const url = params.get("url")
-  const user = params.get("user")
+  const token = params.get("token")
   const title = params.get("title")
 
-  if (!user || !url) {
+  if (!token || !url) {
     alert("Necessary configuration parameters missing.")
   }
 
@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fd.append("type", button.dataset.type)
       fd.append("notes", notes.value)
       fd.append("time", time.value)
-      fd.append("user", user)
+      fd.append("token", token)
       try {
         const response = await fetch(`${url}`, {
           method: "POST",

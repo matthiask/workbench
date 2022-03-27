@@ -69,7 +69,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(response.status_code, 400)
 
         response = self.client.post(
-            "/create-timestamp/", {"type": "start", "user": user.signed_email}
+            "/create-timestamp/", {"type": "start", "token": user.token}
         )
         self.assertEqual(response.status_code, 201)
 
@@ -82,7 +82,7 @@ class TimestampsTest(TestCase):
 
         response = self.client.post(
             "/create-timestamp/",
-            {"type": "start", "user": user.signed_email, "time": "09:23"},
+            {"type": "start", "token": user.token, "time": "09:23"},
         )
         self.assertEqual(response.status_code, 201)
 
@@ -298,7 +298,7 @@ class TimestampsTest(TestCase):
         response = self.client.get("/list-timestamps/")
         self.assertEqual(response.status_code, 400)
 
-        response = self.client.get(f"/list-timestamps/?user={user.signed_email}")
+        response = self.client.get(f"/list-timestamps/?token={user.token}")
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(
@@ -314,7 +314,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(len(slices), 1)
         self.assertEqual(slices[0]["timestamp_id"], stop.id)
 
-        response = self.client.get(f"/list-timestamps/?user={user.signed_email}")
+        response = self.client.get(f"/list-timestamps/?token={user.token}")
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(len(data["timestamps"]), 1)

@@ -103,13 +103,12 @@ class UserAdmin(UserAdmin):
                     for field in User._meta.get_fields()
                     if field.editable and field.name not in {"password", "id"}
                 ]
-                + ["signed_email"]
             },
         )
     ]
     radio_fields = {"language": admin.HORIZONTAL}
     raw_id_fields = ["person"]
-    readonly_fields = ["signed_email", "last_login"]
+    readonly_fields = ["last_login"]
     search_fields = ("email", "_short_name", "_full_name")
     ordering = ("email",)
     filter_horizontal = ()
