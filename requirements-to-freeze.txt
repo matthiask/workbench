@@ -18,7 +18,6 @@ django-webpack-loader
 factory-boy
 gunicorn
 lxml
-mailchimp3
 pdfdocument
 phonenumbers
 psycopg2-binary

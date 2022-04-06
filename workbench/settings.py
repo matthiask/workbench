@@ -412,8 +412,6 @@ else:
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
     WORKBENCH.TITLE = f"(debug) {WORKBENCH.TITLE}"
 
-MAILCHIMP_API_KEY = env("MAILCHIMP_API_KEY", warn=True)
-MAILCHIMP_LIST_ID = env("MAILCHIMP_LIST_ID", warn=True)
 GLASSFROG_TOKEN = env("GLASSFROG_TOKEN", warn=True)
 
 # Fine since it's only used for selected views
