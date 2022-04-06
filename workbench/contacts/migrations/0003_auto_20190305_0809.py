@@ -12,6 +12,7 @@ class Migration(migrations.Migration):
             model_name="person",
             name="salutation",
             field=models.CharField(
+                blank=True,
                 help_text="Dear John/Dear Ms Smith",
                 max_length=100,
                 verbose_name="complete salutation",

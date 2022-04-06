@@ -140,6 +140,7 @@ class Person(Model):
         _("complete salutation"),
         max_length=100,
         help_text=_("Dear John/Dear Ms Smith"),
+        blank=True,
     )
     date_of_birth = models.DateField(_("date of birth"), blank=True, null=True)
     notes = models.TextField(_("notes"), blank=True)
