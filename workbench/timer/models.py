@@ -113,12 +113,12 @@ class TimestampQuerySet(models.QuerySet):
         day = day or dt.date.today()
         entries = list(
             self.filter(user=user, created_at__date=day).select_related(
-                "logged_hours__service", "logged_break"
+                "logged_hours__service__project__owned_by", "logged_break"
             )
         )
         known_logged_hours = {entry.logged_hours for entry in entries}
         logged_hours = user.loggedhours.filter(rendered_on=day).select_related(
-            "service"
+            "service__project__owned_by"
         )
         entries.extend(
             self.model(
@@ -148,6 +148,9 @@ class TimestampQuerySet(models.QuerySet):
                 logged_break=entry.logged_break,
                 timestamp_id=entry.id,
                 is_start=entry.type == entry.START,
+                project=entry.logged_hours.service.project
+                if entry.logged_hours
+                else None,
             )
 
             if entry.logged_break:
