@@ -179,10 +179,13 @@
                     {% if offer and offer.is_declined %}
                       border border-danger reduce-opacity
                     {% endif %}
-
                     {% if offer and offer.work_completed_on %}
                       border border-success reduce-opacity
-                    {% endif %}">
+                    {% endif %}
+                    {% if offer and offer.is_budget_retainer %}
+                      border border-info reduce-opacity
+                    {% endif %}
+        ">
           <div class="card-header">
             {% if offer %}
               <div class="d-flex w-100 justify-content-between">
@@ -202,6 +205,11 @@
                   {% if offer.work_completed_on %}
                     <small class="badge badge-success">
                       {% translate 'work completed on'|capfirst %} {{ offer.work_completed_on|local_date_format }}
+                    </small>
+                  {% endif %}
+                  {% if offer.is_budget_retainer %}
+                    <small class="badge badge-info">
+                      {% translate 'is budget retainer' %}
                     </small>
                   {% endif %}
                   {% for deal in offer.deals.all %}

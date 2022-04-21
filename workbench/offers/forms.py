@@ -103,6 +103,7 @@ class OfferForm(PostalAddressSelectionForm):
             "liable_to_vat",
             "show_service_details",
             "work_completed_on",
+            "is_budget_retainer",
         )
         widgets = {
             "description": Textarea,
@@ -147,6 +148,7 @@ class OfferForm(PostalAddressSelectionForm):
                 "liable_to_vat",
                 "show_service_details",
                 "work_completed_on",
+                "is_budget_retainer",
             }
         )
 

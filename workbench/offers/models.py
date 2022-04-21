@@ -88,6 +88,14 @@ class Offer(ModelWithTotal):
             " further logging on this offers' services."
         ),
     )
+    is_budget_retainer = models.BooleanField(
+        _("is budget retainer"),
+        default=False,
+        help_text=_(
+            "The offer is only used for budgeting; services have to be created later"
+            " when rendering actual work."
+        ),
+    )
 
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
@@ -295,7 +303,11 @@ class Offer(ModelWithTotal):
 
     @property
     def should_collapse(self):
-        return self.is_declined or bool(self.work_completed_on)
+        return (
+            self.is_declined
+            or bool(self.work_completed_on)
+            or (self.is_budget_retainer and not (self.status <= self.OFFERED))
+        )
 
     def copy_to(self, *, project, owned_by):
         offer = Offer.objects.create(

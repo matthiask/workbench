@@ -371,6 +371,7 @@ def _offers_offer_cfg(user):
         "valid_until",
         "closed_on",
         "work_completed_on",
+        "is_budget_retainer",
         "title",
         "description",
         "owned_by",

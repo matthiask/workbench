@@ -590,6 +590,7 @@ class ServiceQuerySet(SearchQuerySet):
             | (
                 ~Q(offer__status=Offer.DECLINED)
                 & Q(offer__work_completed_on__isnull=True)
+                & Q(offer__is_budget_retainer=False)
             ),
         )
 
@@ -684,7 +685,14 @@ class Service(ServiceBase):
     def is_work_completed(self):
         return bool(self.offer.work_completed_on) if self.offer else False
 
+    @property
+    def is_budget_retainer(self):
+        return self.offer.is_budget_retainer if self.offer else False
+
     def is_logging_allowed(self):
         return (
-            self.allow_logging and not self.is_declined and not self.is_work_completed
+            self.allow_logging
+            and not self.is_declined
+            and not self.is_work_completed
+            and not self.is_budget_retainer
         )
