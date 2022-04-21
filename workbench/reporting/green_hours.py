@@ -108,7 +108,11 @@ service AS (
   FROM projects_service ps
   LEFT OUTER JOIN offers_offer o ON ps.offer_id=o.id
   WHERE
-    (ps.offer_id IS NULL OR o.status!=40) -- DECLINED
+    (
+      ps.offer_id IS NULL
+      OR o.status!=40 -- DECLINED
+      OR NOT o.is_budget_retainer
+    )
     AND NOT ps.is_optional
   GROUP BY ps.project_id
 ),

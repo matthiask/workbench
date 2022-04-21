@@ -438,7 +438,11 @@ class Project(Model):
             total_logged_cost += row["logged_cost"]
             logged_hours_per_effort_rate[service.effort_rate] += row["logged_hours"]
 
-            if not service.is_declined and not service.is_optional:
+            if (
+                not service.is_declined
+                and not service.is_optional
+                and not service.is_budget_retainer
+            ):
                 service_hours[service.offer] += service.service_hours
                 service_cost[service.offer] += service.cost or Z2
                 service_hours[service.project] += service.service_hours
@@ -449,7 +453,7 @@ class Project(Model):
                 total_logged_cost += service.effort_rate * row["logged_hours"]
             else:
                 total_logged_hours_rate_undefined += row["logged_hours"]
-                if not service.is_declined:
+                if not service.is_declined and not service.is_budget_retainer:
                     total_service_hours_rate_undefined += service.service_hours
 
             services_by_offer[offers_map.get(service.offer_id)]["services"].append(row)
