@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-26 12:13+0100\n"
+"POT-Creation-Date: 2022-04-22 09:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -213,6 +213,10 @@ msgstr "Features"
 #: workbench/accounts/models.py
 msgid "date of employment"
 msgstr "Anstellungsbeginn"
+
+#: workbench/accounts/models.py
+msgid "token"
+msgstr "Token"
 
 #: workbench/accounts/models.py workbench/audit/admin.py
 #: workbench/awt/models.py workbench/deals/models.py
@@ -426,6 +430,10 @@ msgstr "Beeindruckende Planungsfähigkeiten oder falsches Datum? Abwesenheit beg
 #: workbench/awt/forms.py workbench/reporting/views.py
 msgid "Everyone"
 msgstr "Alle"
+
+#: workbench/awt/forms.py
+msgid "Next 12 months"
+msgstr "Nächste 12 Monate"
 
 #: workbench/awt/models.py workbench/deals/models.py
 #: workbench/reporting/models.py workbench/services/models.py
@@ -2325,7 +2333,6 @@ msgstr "Offertleistungen löschen?"
 
 #: workbench/offers/models.py
 #: workbench/templates/contacts/organization_detail.html
-#: workbench/tools/xlsx.py
 msgid "Offered"
 msgstr "Offeriert"
 
@@ -2344,6 +2351,14 @@ msgstr "Arbeit abgeschlossen am"
 #: workbench/offers/models.py
 msgid "Fill in this field if you want to prohibit further logging on this offers' services."
 msgstr "Fülle dieses Feld aus, wenn Du die weitere Leistungserfassung auf den Leistungen dieser Offerte verbieten willst."
+
+#: workbench/offers/models.py workbench/templates/projects/project_detail.html
+msgid "is budget retainer"
+msgstr "behält Budget zurück"
+
+#: workbench/offers/models.py
+msgid "The offer is only used for budgeting; services have to be created later when rendering actual work."
+msgstr "Diese Offerte wird nur zur Zurückbehaltung von Budget verwendet; wenn später Stunden oder Kosten erfasst werden, müssen individuelle Leistungen erstellt werden."
 
 #: workbench/offers/models.py workbench/planning/models.py
 #: workbench/projects/models.py workbench/templates/offers/offer_pricing.html
@@ -2913,6 +2928,8 @@ msgstr "Planung"
 #: workbench/templates/accounts/user_base.html
 #: workbench/templates/accounts/user_statistics.html
 #: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/campaign_statistics.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_statistics.html
 msgid "Statistics"
@@ -3428,16 +3445,24 @@ msgid "Offered and accepted"
 msgstr "Offeriert und akzeptiert"
 
 #: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/xlsx.py
 msgid "sold"
 msgstr "verkauft"
 
 #: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/campaign_statistics.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_statistics.html
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "undefined rate"
 msgstr "ohne Stundensatz"
+
+#: workbench/templates/projects/campaign_statistics.html
+#: workbench/templates/projects/project_statistics.html
+msgid "Logged hours per hourly rate"
+msgstr "Erfasste Stunden pro Stundensatz"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Hours"
@@ -3446,6 +3471,23 @@ msgstr "Stunden"
 #: workbench/templates/projects/project_detail.html
 msgid "Cost"
 msgstr "Kosten"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Budget retainment"
+msgstr "Zurückbehaltung von Budget"
+
+#: workbench/templates/projects/project_detail.html
+#, python-format
+msgid "incl. %(discount)s discount"
+msgstr "inkl. %(discount)s Rabatt"
+
+#: workbench/templates/projects/project_detail.html
+msgid "freed"
+msgstr "freigegeben"
+
+#: workbench/templates/projects/project_detail.html
+msgid "retained"
+msgstr "zurückbehalten"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Total costs"
@@ -3515,10 +3557,6 @@ msgstr "Leistungen aus Offerte"
 #: workbench/templates/projects/project_projected_invoices_form.html
 msgid "Update projected invoices"
 msgstr "Geplante Rechnungen bearbeiten"
-
-#: workbench/templates/projects/project_statistics.html
-msgid "Logged hours per hourly rate"
-msgstr "Erfasste Stunden pro Stundensatz"
 
 #: workbench/templates/projects/project_statistics.html
 msgid "Logged hours per user"

@@ -1,6 +1,7 @@
 {% extends "generic/object_detail.html" %}
 {% load i18n mark_current static workbench %}
 {% block content %}
+{% with gs=project.grouped_services %}
   <div class="row">
     <div class="col-md-12">
       <h1>
@@ -25,7 +26,7 @@
       <div class="card my-3">
         <div class="card-body">
           <div class="row justify-content-between">
-            <span class="col-md-8">
+            <span class="col-md-7">
               <p>
                 {{ object.description|linebreaksbr|urlize }}
               </p>
@@ -34,43 +35,57 @@
                   {% translate 'Hours' %}:
                   <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}"
                      class="inline">
-                    {{ project.grouped_services.logged_hours|hours }}
+                    {{ gs.logged_hours|hours }}
                   </a>
-                  / {{ project.grouped_services.service_hours|hours }}
-                  {% bar project.grouped_services.logged_hours project.grouped_services.service_hours %}
+                  / {{ gs.service_hours|hours }}
+                  {% bar gs.logged_hours gs.service_hours %}
                 </div>
                 <div class="col-md-6">
                   {% translate 'Cost' %}:
                   <a href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}"
                      class="inline">
-                    {{ project.grouped_services.logged_cost|currency }}
+                    {{ gs.logged_cost|currency }}
                   </a>
-                  / {{ project.grouped_services.service_cost|currency }}
-                  {% bar project.grouped_services.logged_cost project.grouped_services.service_cost %}
+                  / {{ gs.service_cost|currency }}
+                  {% bar gs.logged_cost gs.service_cost %}
                 </div>
               </div>
             </span>
-            <span class="col-md-4">
+            <span class="col-md-5">
               {% if request.user.features.CONTROLLING %}
                 <table class="table table-borderless table-sm">
+
+                  {% if gs.has_budget_retainer_offers %}
+                    <tr>
+                      <th class="text-right">{% translate 'Budget retainment' %}</th>
+                      <td>
+                        {{ gs.budget_retainer_total|currency }} {% translate 'sold' %}
+                        {% if gs.budget_retainer_discount %}({% blocktranslate with discount=gs.budget_retainer_discount|currency %}incl. {{ discount }} discount{% endblocktranslate %}){% endif %}
+                        <br>
+                        {{ gs.total_service_cost|currency }} {% translate 'freed' %},
+                        {{ gs.budget_retainment|currency }} {% translate 'retained' %}
+                      </td>
+                    </tr>
+                  {% endif %}
+
                   <tr>
                     <th class="text-right">{% translate 'Total costs' %}</th>
                     <td>
-                      {{ project.grouped_services.total_logged_cost|currency }}
-                      {% if project.grouped_services.total_logged_hours_rate_undefined %}
+                      {{ gs.total_logged_cost|currency }}
+                      {% if gs.total_logged_hours_rate_undefined %}
                         <span class="text-warning" title="{% translate 'undefined rate' %}">
-                          (+{{ project.grouped_services.total_logged_hours_rate_undefined|hours }})
+                          (+{{ gs.total_logged_hours_rate_undefined|hours }})
                         </span>
                       {% endif %}
                       /
-                      {{ project.grouped_services.total_service_cost|currency }}
-                      {% if project.grouped_services.total_service_hours_rate_undefined %}
+                      {{ gs.total_service_cost|currency }}
+                      {% if gs.total_service_hours_rate_undefined %}
                         <span class="text-warning" title="{% translate 'undefined rate' %}">
-                          (+{{ project.grouped_services.total_service_hours_rate_undefined|hours }})
+                          (+{{ gs.total_service_hours_rate_undefined|hours }})
                         </span>
                       {% endif %}
-                      {% if project.grouped_services.total_discount %}
-                        (-{{ project.grouped_services.total_discount|currency }} {% translate 'discount' %})
+                      {% if not gs.has_budget_retainer_offers and gs.total_discount %}
+                        (-{{ gs.total_discount|currency }} {% translate 'discount' %})
                       {% endif %}
                     </td>
                   </tr>
@@ -117,8 +132,7 @@
                     </tr>
                   {% endif %}
                 </table>
-              {% endif %}
-              {# CONTROLLING #}
+              {% endif %} {# CONTROLLING #}
             </span>
           </div>
         </div>
@@ -141,7 +155,7 @@
             {% translate 'projected invoices'|capfirst %}
           </a>
         {% endif %}
-        {% if request.user.features.CONTROLLING and project.grouped_services.offers|length > 1 %}
+        {% if request.user.features.CONTROLLING and gs.offers|length > 1 %}
           <span class="dropdown">
             <button type="button"
                     class="btn btn-primary dropdown-toggle"
@@ -174,7 +188,7 @@
           {% translate 'Delete' %}
         </a>
       </div>
-      {% for offer, offer_data in project.grouped_services.offers %}
+      {% for offer, offer_data in gs.offers %}
         <div class="card my-3
                     {% if offer and offer.is_declined %}
                       border border-danger reduce-opacity
@@ -610,7 +624,9 @@
     </a>
   </div>
 </div>
+{% endwith %}
 {% endblock %}
+
 {% block fixed-add-button %}
   <a href="{{ project.urls.createhours }}"
      data-createhours
@@ -624,6 +640,7 @@
      title="{% translate 'took a break' %}">
   </a>
 {% endblock %}
+
 {% block js %}
   {{ block.super }}
   <style>

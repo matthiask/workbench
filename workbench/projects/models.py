@@ -464,7 +464,7 @@ class Project(Model):
             offer_data["service_cost"] = service_cost[offer]
             offer_data["logged_cost"] = logged_cost[offer]
 
-        return {
+        stats = {
             "offers": sorted(
                 item
                 for item in services_by_offer.items()
@@ -495,7 +495,31 @@ class Project(Model):
             "total_discount": sum(
                 (offer.discount for offer in offers if not offer.is_declined), Z2
             ),
+            # Budget retainment
+            "has_budget_retainer_offers": any(
+                offer.is_budget_retainer for offer in offers
+            ),
+            "budget_retainer_total": sum(
+                (
+                    offer.total_excl_tax
+                    for offer in offers
+                    if offer.is_budget_retainer and offer.is_accepted
+                ),
+                Z2,
+            ),
+            "budget_retainer_discount": sum(
+                (
+                    offer.discount
+                    for offer in offers
+                    if offer.is_budget_retainer and offer.is_accepted
+                ),
+                Z2,
+            ),
         }
+        stats["budget_retainment"] = (
+            stats["budget_retainer_total"] - stats["total_service_cost"]
+        )
+        return stats
 
     @cached_property
     def project_invoices(self):
