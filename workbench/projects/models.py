@@ -607,10 +607,7 @@ class ServiceQuerySet(SearchQuerySet):
         return self.filter(
             (
                 Q(offer__isnull=True)
-                | (
-                    ~Q(offer__status=Offer.DECLINED)
-                    & Q(offer__is_budget_retainer=False)
-                )
+                | ~(Q(offer__status=Offer.DECLINED) | Q(offer__is_budget_retainer=True))
             )
             & Q(is_optional=False)
         )
@@ -621,10 +618,10 @@ class ServiceQuerySet(SearchQuerySet):
         return self.filter(
             Q(allow_logging=True),
             Q(offer__isnull=True)
-            | (
-                ~Q(offer__status=Offer.DECLINED)
-                & Q(offer__work_completed_on__isnull=True)
-                & Q(offer__is_budget_retainer=False)
+            | ~(
+                Q(offer__status=Offer.DECLINED)
+                | Q(offer__work_completed_on__isnull=False)
+                | Q(offer__is_budget_retainer=True)
             ),
         )
 
