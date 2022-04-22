@@ -605,7 +605,13 @@ class ServiceQuerySet(SearchQuerySet):
         from workbench.offers.models import Offer
 
         return self.filter(
-            (Q(offer__isnull=True) | ~Q(offer__status=Offer.DECLINED))
+            (
+                Q(offer__isnull=True)
+                | (
+                    ~Q(offer__status=Offer.DECLINED)
+                    & Q(offer__is_budget_retainer=False)
+                )
+            )
             & Q(is_optional=False)
         )
 
