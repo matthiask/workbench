@@ -448,7 +448,7 @@ function initWidgets() {
 
 window.addInlineForm = function addInlineForm(slug, onComplete) {
   const totalForms = $(`#id_${slug}-TOTAL_FORMS`),
-    newId = parseInt(totalForms.val()) || 0
+    newId = parseInt(totalForms.val(), 10) || 0
 
   totalForms.val(newId + 1)
   const empty = $(`#${slug}-empty`),
