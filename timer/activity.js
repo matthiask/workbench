@@ -42,17 +42,6 @@ export const Activity = connect((state, ownProps) => ({
     fetchServices(activity.project.value).then((data) => setServices(data))
   }, [activity.project])
 
-  // Backwards compatibility, remove in a few weeks
-  useEffect(() => {
-    if (!activity.title && activity.project) {
-      dispatchUpdate({
-        title:
-          activity.titleOverride ||
-          activity.project.label.replace(/^[-0-9\s]+/, ""),
-      })
-    }
-  }, [activity.project])
-
   const activityTitle = activity.title || gettext("Activity")
 
   const isReady =
