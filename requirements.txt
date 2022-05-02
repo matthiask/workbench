@@ -7,7 +7,7 @@ charset-normalizer==2.0.12
 coverage==6.3.2
 dj-database-url==0.5.0
 dj-email-url==1.0.5
-Django==3.2.12
+Django==3.2.13
 django-admin-ordering==0.15.0
 django-authlib==0.13.0
 django-bootstrap4==22.1
