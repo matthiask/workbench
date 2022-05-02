@@ -17,7 +17,7 @@ from workbench.projects.models import Project
 from workbench.services.models import ServiceType
 from workbench.tools.formats import Z1, Z2, hours, local_date_format
 from workbench.tools.reporting import query
-from workbench.tools.validation import monday
+from workbench.tools.validation import in_days, monday
 
 
 def _period(weeks, min, max):
@@ -617,7 +617,8 @@ def user_planning(user, date_range):
     planning.add_planned_work_and_milestones(
         user.planned_work.select_related("service_type"),
         Milestone.objects.filter(
-            Q(project__planned_work__user=user) | Q(project__owned_by=user)
+            Q(project__planned_work__user=user) | Q(project__owned_by=user),
+            Q(project__closed_on__isnull=True) | Q(project__closed_on__gte=in_days(-7)),
         ),
     )
     planning.add_worked_hours(user.loggedhours.all())
@@ -633,7 +634,10 @@ def team_planning(team, date_range):
     planning = Planning(weeks=weeks, users=list(team.members.active()))
     planning.add_planned_work_and_milestones(
         PlannedWork.objects.filter(user__teams=team).select_related("service_type"),
-        Milestone.objects.filter(project__planned_work__user__teams=team),
+        Milestone.objects.filter(
+            Q(project__planned_work__user__teams=team),
+            Q(project__closed_on__isnull=True) | Q(project__closed_on__gte=in_days(-7)),
+        ),
     )
     planning.add_worked_hours(LoggedHours.objects.filter(rendered_by__teams=team))
     planning.add_absences(Absence.objects.filter(user__teams=team))

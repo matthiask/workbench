@@ -2580,11 +2580,6 @@ detect-file@^1.0.0:
   resolved "https://registry.yarnpkg.com/detect-file/-/detect-file-1.0.0.tgz#f0d66d03672a825cb1b73bdb3fe62310c8e552b7"
   integrity sha1-8NZtA2cqglyxtzvbP+YjEMjlUrc=
 
-detect-libc@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-1.0.3.tgz#fa137c4bd698edf55cd5cd02ac559f91a4c4ba9b"
-  integrity sha1-+hN8S9aY7fVc1c0CrFWfkaTEups=
-
 detect-node@^2.0.4:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.1.0.tgz#c9c70775a49c3d03bc2c06d9a73be550f978f8b1"
@@ -2986,10 +2981,10 @@ faye-websocket@^0.11.3:
   dependencies:
     websocket-driver ">=0.5.1"
 
-fh-webpack-config@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/fh-webpack-config/-/fh-webpack-config-2.0.0.tgz#f11d33b4fca71b469f1ecd5eb492637817ecda76"
-  integrity sha512-fibzx+iaAiiap0ruYYeF8ARpsahA7cgl3JSJaUckwfHWK6SbMAl5SKfkYOes0iZ3BhUPEyBfpawsqbkwvfwDQg==
+fh-webpack-config@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/fh-webpack-config/-/fh-webpack-config-2.0.1.tgz#8225d6255e82321d12126765b7413918cb5ea919"
+  integrity sha512-UvR1ZwqU1ZMAufr4mA18B0cd/Bv1WDS5ggyZhUCI/uEy3QXqd7W8f+3P3MOqUwtNAUSLqhNEqssSsZK7Hy65eA==
   dependencies:
     "@babel/core" "^7.7.4"
     "@babel/plugin-proposal-class-properties" "^7.7.4"
@@ -3003,7 +2998,6 @@ fh-webpack-config@^2.0.0:
     core-js "^3.6.2"
     css-loader "^3.2.1"
     exports-loader "^0.7.0"
-    fibers "^5.0.0"
     file-loader "^5.0.2"
     imports-loader "^0.8.0"
     mini-css-extract-plugin "^0.9.0"
@@ -3020,13 +3014,6 @@ fh-webpack-config@^2.0.0:
     webpack-cli "^3.3.10"
     webpack-dev-server "^3.9.0"
     webpack-merge "^4.2.2"
-
-fibers@^5.0.0:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/fibers/-/fibers-5.0.1.tgz#bb9b02aa022685185d21aed227363e456d87660d"
-  integrity sha512-VMC7Frt87Oo0AOJ6EcPFbi+tZmkQ4tD85aatwyWL6I9cYMJmm2e+pXUJsfGZ36U7MffXtjou2XIiWJMtHriErw==
-  dependencies:
-    detect-libc "^1.0.3"
 
 figgy-pudding@^3.5.1:
   version "3.5.2"

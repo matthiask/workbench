@@ -1,7 +1,7 @@
 import fh_fablib as fl
 
 
-fl.require("1.0.20220411")
+fl.require("1.0.20220422.1")
 fl.config.update(
     app="workbench",
     base=fl.Path(__file__).parent,
@@ -72,4 +72,9 @@ def pull_db(ctx, installation="fh"):
     )
 
 
-ns = fl.Collection(*fl.GENERAL, deploy, deploy_code, pull_db)
+@fl.task
+def dev(ctx):
+    fl._old_dev(ctx)
+
+
+ns = fl.Collection(*fl.GENERAL, deploy, deploy_code, dev, pull_db)
