@@ -1,3 +1,5 @@
+MAYBE Try out https://github.com/hprid/reportlab-qrcode/blob/master/reportlab_qrcode/__init__.py
+
 =========
 Workbench
 =========
