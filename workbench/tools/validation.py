@@ -21,7 +21,8 @@ def logbook_lock():
     day = dt.date.today()
     year_start = day.replace(month=1, day=1)
     week_start = monday(day)
-    return max(year_start, week_start)
+    saturday = last_saturday(day)
+    return max(year_start, week_start, saturday)
 
 
 def raise_if_errors(errors, exclude=None):
