@@ -13,9 +13,15 @@ def monday(day=None):
     return day - dt.timedelta(days=day.weekday())
 
 
+def last_saturday(day):
+    return day - dt.timedelta(days=(day.weekday() + 2) % 7)
+
+
 def logbook_lock():
     day = dt.date.today()
-    return max(day.replace(month=1, day=1), day - dt.timedelta(days=day.weekday()))
+    year_start = day.replace(month=1, day=1)
+    week_start = monday(day)
+    return max(year_start, week_start)
 
 
 def raise_if_errors(errors, exclude=None):

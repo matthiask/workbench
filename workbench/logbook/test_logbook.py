@@ -11,7 +11,7 @@ from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
-from workbench.tools.validation import in_days, logbook_lock
+from workbench.tools.validation import in_days, last_saturday, logbook_lock
 
 
 @override_settings(
@@ -718,6 +718,12 @@ class LogbookTest(TestCase):
     def test_logbook_lock_first_of_year(self):
         """Assert that the logbook locks on the first day of the year"""
         self.assertEqual(logbook_lock(), dt.date(2020, 1, 1))
+
+    def test_last_saturday(self):
+        with travel("2022-05-06 12:00"):
+            self.assertEqual(last_saturday(dt.date.today()), dt.date(2022, 4, 30))
+        with travel("2022-05-07 12:00"):
+            self.assertEqual(last_saturday(dt.date.today()), dt.date(2022, 5, 7))
 
     def test_move_logbook_entry(self):
         """Move logbook entries except if it is archived"""
