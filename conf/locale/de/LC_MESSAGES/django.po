@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-22 09:30+0200\n"
+"POT-Creation-Date: 2022-05-06 15:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -105,6 +105,14 @@ msgstr "Späte Leistungserfassung erlauben"
 #: workbench/accounts/features.py
 msgid "Hours and absences can be added and changed late."
 msgstr "Stunden und Abwesenheiten können spät hinzugefügt und verändert werden."
+
+#: workbench/accounts/features.py
+msgid "Late logging nag"
+msgstr "Meckern bei später Leistungserfassung"
+
+#: workbench/accounts/features.py
+msgid "Annoy users when they are late with their logging."
+msgstr "Nutzer*innen nerven wenn sie ihre Stunden spät eintragen."
 
 #: workbench/accounts/features.py workbench/planning/apps.py
 #: workbench/templates/accounts/team_detail.html workbench/templates/base.html
@@ -2125,6 +2133,11 @@ msgstr "Stunden müssen in der gleichen Woche erfasst werden."
 #: workbench/logbook/forms.py
 msgid "That's too far in the future."
 msgstr "Datum zu weit in der Zukunft."
+
+#: workbench/logbook/forms.py
+msgid "The working time standing order prescribes that hours should be logged immediately upon finishing work. You are a bit late."
+msgstr ""
+"Das Arbeitszeitreglement schreibt vor, dass Arbeitsstunden direkt nach Arbeitserledigung erfasst werden sollen. Du bist ein bisschen spät dran."
 
 #: workbench/logbook/forms.py
 msgid "This seems to be a duplicate. Is it?"

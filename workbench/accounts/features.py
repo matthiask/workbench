@@ -35,6 +35,7 @@ class FEATURES(str, Enum):
     GLASSFROG = "GLASSFROG"
     LABOR_COSTS = "LABOR_COSTS"
     LATE_LOGGING = "LATE_LOGGING"
+    LATE_LOGGING_NAG = "LATE_LOGGING_NAG"
     PLANNING = "PLANNING"
     PROJECTED_INVOICES = "PROJECTED_INVOICES"
     WORKING_TIME_CORRECTION = "WORKING_TIME_CORRECTION"
@@ -85,6 +86,10 @@ LABELS = {
     FEATURES.LATE_LOGGING: {
         "label": _("Late logging"),
         "help_text": _("Hours and absences can be added and changed late."),
+    },
+    FEATURES.LATE_LOGGING_NAG: {
+        "label": _("Late logging nag"),
+        "help_text": _("Annoy users when they are late with their logging."),
     },
     FEATURES.PLANNING: {
         "label": capfirst(_("planning")),

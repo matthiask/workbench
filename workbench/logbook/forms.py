@@ -516,6 +516,16 @@ class LoggedHoursForm(ModelForm):
             elif data["rendered_on"] > in_days(7):
                 errors["rendered_on"] = _("That's too far in the future.")
 
+            if data["rendered_by"].features[FEATURES.LATE_LOGGING_NAG] and data[
+                "rendered_on"
+            ] < in_days(-1):
+                self.add_warning(
+                    _(
+                        "The working time standing order prescribes that hours should be logged immediately upon finishing work. You are a bit late."
+                    ),
+                    code="you-are-late",
+                )
+
         if (
             all(data.get(f) for f in ["rendered_by", "rendered_on", "hours"])
             and not self.instance.pk
