@@ -1,6 +1,5 @@
+from workbench.projects import models
 from workbench.tools import admin
-
-from . import models
 
 
 @admin.register(models.Service)

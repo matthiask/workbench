@@ -1,6 +1,5 @@
+from workbench.planning import models
 from workbench.tools import admin
-
-from . import models
 
 
 @admin.register(models.PublicHoliday)

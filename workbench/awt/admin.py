@@ -1,9 +1,8 @@
 from admin_ordering.admin import OrderableAdmin
 from django.utils.translation import gettext_lazy as _
 
+from workbench.awt import models
 from workbench.tools import admin
-
-from . import models
 
 
 @admin.register(models.WorkingTimeModel)

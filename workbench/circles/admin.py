@@ -1,6 +1,5 @@
+from workbench.circles import models
 from workbench.tools import admin
-
-from . import models
 
 
 @admin.register(models.Circle)

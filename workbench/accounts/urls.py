@@ -1,11 +1,10 @@
 from django.urls import path, re_path
 
 from workbench import generic
+from workbench.accounts import views
 from workbench.accounts.forms import TeamForm, TeamSearchForm, UserSearchForm
 from workbench.accounts.models import Team, User
 from workbench.planning.views import team_planning, user_planning
-
-from . import views
 
 
 urlpatterns = [
