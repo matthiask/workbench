@@ -3,6 +3,6 @@
 {% translate 'Annual working time warnings' %} - {{ stats.month|date:'F Y' }}
 {% for row in stats.warnings %}
 {{ row.user }}
-{% translate 'net work hours' %}: {{ row.running_sum|hours }}
+{% translate 'net work hours' %}: {{ row.running_sum|hours }} ({{ row.monthly_sum|hours:True }})
 {{ WORKBENCH.URL }}{% url 'awt_year_report' %}?user={{ row.user.pk }}
 {% endfor %}{% endautoescape %}
