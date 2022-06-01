@@ -34,6 +34,13 @@ class InvoiceQuerySet(SearchQuerySet):
             status=Invoice.SENT, due_on__isnull=False, due_on__lte=in_days(-15)
         )
 
+    def maybe_actionable(self, *, user):
+        return self.filter(
+            Q(status=Invoice.IN_PREPARATION)
+            | Q(status=Invoice.SENT, due_on__isnull=False, due_on__lte=in_days(-15)),
+            Q(owned_by=user) | Q(owned_by__is_active=False),
+        ).select_related("project", "owned_by")
+
 
 @model_urls
 class Invoice(ModelWithTotal):

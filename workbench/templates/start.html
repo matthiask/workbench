@@ -6,6 +6,26 @@
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-lg-6">
+
+      {% if needs_action %}
+        <div class="card mb-3 d-none d-md-block">
+          <div class="card-header" style="background-color:#ffe3d1">
+            <h3 class="my-0">{% translate 'Possibly requiring action' %}</h3>
+          </div>
+          <div class="card-body">
+            {% for row in needs_action %}
+              <h4 {% if not forloop.first %}class="mt-4"{% endif %}>
+                <a href="{{ row.url }}">{{ row.verbose_name_plural }}</a>
+              </h4>
+              {% for object in row.objects %}
+                {% link_or_none object with_badge=True %}
+                <br>
+              {% endfor %}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
       <div class="card mb-3">
         <div class="card-header">
           <h3 class="my-0">
@@ -32,47 +52,7 @@
           <div class="card-body">{% translate 'no active projects' %}</div>
         {% endif %}
       </div>
-      {% if in_preparation %}
-        <div class="card mb-3 d-none d-md-block">
-          <div class="card-header">
-            <h3 class="my-0">{% translate 'In preparation' %}</h3>
-          </div>
-          <div class="card-body">
-            {% for thing in in_preparation.offers %}
-              {% if forloop.first %}
-                <strong>{% translate 'offers' %}:</strong>
-              {% endif %}
-              {% link_or_none thing %}
-              {% if forloop.last %}<br>{% endif %}
-            {% endfor %}
-            {% for thing in in_preparation.invoices %}
-              {% if forloop.first %}
-                <strong>{% translate 'invoices' %}:</strong>
-              {% endif %}
-              {% link_or_none thing %}
-              {% if forloop.last %}<br>{% endif %}
-            {% endfor %}
-          </div>
-        </div>
-      {% endif %}
-      {% if needs_action %}
-        <div class="card mb-3 d-none d-md-block">
-          <div class="card-header">
-            <h3 class="my-0">{% translate 'Possibly requiring action' %}</h3>
-          </div>
-          <div class="card-body">
-            {% for row in needs_action %}
-              <h4 {% if not forloop.first %}class="mt-4"{% endif %}>
-                <a href="{{ row.url }}">{{ row.verbose_name_plural }}</a>
-              </h4>
-              {% for object in row.objects %}
-                {% link_or_none object with_badge=True %}
-                <br>
-              {% endfor %}
-            {% endfor %}
-          </div>
-        </div>
-      {% endif %}
+
       {% if birthdays %}
         <div class="card mb-3 d-none d-md-block">
           <div class="card-header">

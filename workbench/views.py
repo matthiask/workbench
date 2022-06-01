@@ -51,6 +51,14 @@ def _needs_action(user):
                 "objects": Offer.objects.maybe_actionable(user=user),
             }
         )
+        rows.append(
+            {
+                "type": "invoices",
+                "verbose_name_plural": Invoice._meta.verbose_name_plural,
+                "url": Invoice.urls["list"],
+                "objects": Invoice.objects.maybe_actionable(user=user),
+            }
+        )
 
     return [row for row in rows if row["objects"]]
 
@@ -103,21 +111,6 @@ ORDER BY (diff + 180) % 365 DESC
         ]
 
 
-def _in_preparation(user):
-    invoices = Invoice.objects.filter(
-        owned_by=user, status=Invoice.IN_PREPARATION
-    ).select_related("project", "owned_by")
-    offers = Offer.objects.filter(
-        owned_by=user, status=Offer.IN_PREPARATION
-    ).select_related("project", "owned_by")
-
-    return {
-        key: value
-        for key, value in [("invoices", invoices), ("offers", offers)]
-        if value
-    }
-
-
 def start(request):
     request.user.take_a_break_warning(request=request)
     request.user.unlogged_timestamps_warning(request=request)
@@ -130,7 +123,6 @@ def start(request):
             "todays_hours": _todays_hours(request.user),
             "all_users_hours": _all_users_hours(),
             "birthdays": _birthdays(),
-            "in_preparation": _in_preparation(request.user),
         },
     )
 
