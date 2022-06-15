@@ -33,14 +33,13 @@ def parse_zkb_csv(data):
         except (AttributeError, IndexError, ValueError):
             continue
         if day and amount:
-            details = next(reader)
             entries.append(
                 {
                     "reference_number": reference,
                     "value_date": day,
                     "total": amount,
                     "payment_notice": "; ".join(
-                        filter(None, (details[1], details[10], row[4]))
+                        filter(None, (row[1], row[10], row[4]))
                     ),
                 }
             )

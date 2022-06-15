@@ -1,3 +1,2 @@
-"Datum";"Buchungstext";"Whg";"Betrag Detail";"ZKB-Referenz";"Referenznummer";"Belastung CHF";"Gutschrift CHF";"Valuta";"Saldo CHF";"Zahlungszweck"
-"14.03.2019";"Gutschrift Auftraggeber: Company";"";"";"xxxx03130CF54579-blip";"";"";"4308.00";"14.03.2019";"";""
-"";"Company";"";"";"";"";"";"";"";"";"Rg. 00001 Umbau"
+"Datum";"Buchungstext";"Whg";"Betrag Detail";"ZKB-Referenz";"Referenznummer";"Belastung CHF";"Gutschrift CHF";"Valuta";"Saldo CHF";"Zahlungszweck";"Details"
+"15.06.2022";"Gutschrift Auftraggeber";"";"";"BA22061438393";"";"";"4308.00";"15.06.2022";"4308";"00001";""

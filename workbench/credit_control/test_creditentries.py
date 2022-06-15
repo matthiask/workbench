@@ -99,7 +99,7 @@ class CreditEntriesTest(TestCase):
         response = self.client.get("/credit-control/assign/")
         self.assertContains(response, "<strong><small>00001</small>")
 
-        entry = CreditEntry.objects.get(reference_number="xxxx03130CF54579")
+        entry = CreditEntry.objects.get(reference_number="BA22061438393")
         response = self.client.post(
             entry.urls["update"],
             {
