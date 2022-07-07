@@ -21,8 +21,10 @@ lxml
 pdfdocument
 phonenumbers
 psycopg2-binary
+qrbill
 reportlab
 speckenv
+svglib
 time-machine
 vobject
 xlsxdocument
