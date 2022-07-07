@@ -14,7 +14,7 @@ from workbench.tools.xlsx import WorkbenchXLSXDocument
 def append_invoice(*, zf, ledger_slug, invoice):
     with io.BytesIO() as buf:
         pdf = PDFDocument(buf)
-        pdf.init_letter()
+        pdf.init_invoice_letter()
         pdf.process_invoice(invoice)
         pdf.generate()
 

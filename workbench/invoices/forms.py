@@ -89,7 +89,7 @@ class InvoiceSearchForm(Form):
                 as_attachment=request.GET.get("disposition") == "attachment",
             )
             for invoice in queryset:
-                pdf.init_letter()
+                pdf.init_invoice_letter()
                 pdf.process_invoice(invoice)
                 pdf.restart()
             pdf.generate()
