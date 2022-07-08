@@ -533,7 +533,7 @@ class PDFDocument(_PDFDocument):
             },
         )
 
-        if settings.WORKBENCH.QRBILL:
+        if settings.WORKBENCH.QRBILL and invoice.total > 0:
             self.story.append(NextPageTemplate("QR"))
             self.next_frame()
             self.append_qr_bill(invoice)
@@ -684,17 +684,11 @@ def pdf_response(*args, **kwargs):
 
 def get_debtor_address(postal_address):
     address_lines = postal_address.splitlines()
-    country = "LI" if "LI" in address_lines[-1] else "CH"
-    if len(address_lines) >= 3:
-        return {
-            "name": " ".join(address_lines[0:-3])[:70],
-            "line1": address_lines[-2][:70],
-            "line2": address_lines[-1][:70],
-            "country": country,
-        }
-    else:
-        return {
-            "name": address_lines[0][:70] or "",
-            "line1": address_lines[1][:70] or "",
-            "country": country,
-        }
+    return {
+        "name": " ".join(address_lines[0:-3])[:70] if len(address_lines) > 0 else "",
+        "line1": (address_lines[-2][:70] if len(address_lines) > 2 else ""),
+        "line2": (address_lines[-1][:70] if len(address_lines) > 2 else ""),
+        "country": (
+            "LI" if len(address_lines) > 1 and "LI" in address_lines[-1] else "CH"
+        ),
+    }
