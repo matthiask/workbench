@@ -544,7 +544,7 @@ class PDFDocument(_PDFDocument):
     def append_qr_bill(self, invoice):
         import tempfile
 
-        from qrbill.bill import CombinedAddress, QRBill, StructuredAddress
+        from qrbill.bill import CombinedAddress, QRBill
         from svglib.svglib import svg2rlg
 
         bill = QRBill(
@@ -556,23 +556,7 @@ class PDFDocument(_PDFDocument):
             **settings.WORKBENCH.QRBILL,
         )
 
-        def get_debtor_address(invoice):
-            if structured_address := invoice.structured_billing_address:
-                return StructuredAddress(**structured_address.address_dict())
-            else:
-                postal_address = invoice.postal_address.splitlines()
-                return CombinedAddress(
-                    **{
-                        "name": postal_address[0] or "",
-                        "line1": postal_address[1] or "",
-                        "line2": postal_address[2] or "",
-                        "country": postal_address[3]
-                        if postal_address[3] and len(postal_address[3]) == 2
-                        else "",
-                    }
-                )
-
-        bill.debtor = get_debtor_address(invoice)
+        bill.debtor = CombinedAddress(**get_debtor_address(invoice.postal_address))
 
         with tempfile.NamedTemporaryFile(mode="w") as f:
             bill.as_svg(f)
@@ -696,3 +680,21 @@ def pdf_response(*args, **kwargs):
     activate(settings.WORKBENCH.PDF_LANGUAGE)
     kwargs["pdfdocument"] = PDFDocument
     return _pdf_response(*args, **kwargs)
+
+
+def get_debtor_address(postal_address):
+    address_lines = postal_address.splitlines()
+    country = "LI" if "LI" in address_lines[-1] else "CH"
+    if len(address_lines) >= 3:
+        return {
+            "name": " ".join(address_lines[0:-3])[:70],
+            "line1": address_lines[-2][:70],
+            "line2": address_lines[-1][:70],
+            "country": country,
+        }
+    else:
+        return {
+            "name": address_lines[0][:70] or "",
+            "line1": address_lines[1][:70] or "",
+            "country": country,
+        }

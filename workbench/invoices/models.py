@@ -134,16 +134,6 @@ class Invoice(ModelWithTotal):
     )
 
     postal_address = models.TextField(_("postal address"))
-    structured_billing_address = models.ForeignKey(
-        "invoices.StructuredBillingAddress",
-        verbose_name=_("structured billing address"),
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        help_text=_(
-            "Provide structured address data for more precise qr bills (only 'CH'/'LI' addresses)."
-        ),
-    )
 
     _code = models.IntegerField(_("code"))
     _fts = models.TextField(editable=False, blank=True)
@@ -583,16 +573,6 @@ class RecurringInvoice(ModelWithTotal):
         help_text=_("Only used for statistical purposes."),
     )
     postal_address = models.TextField(_("postal address"))
-    structured_billing_address = models.ForeignKey(
-        "invoices.StructuredBillingAddress",
-        verbose_name=_("structured billing address"),
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        help_text=_(
-            "Provide structured address data for more precise qr bills (only 'CH'/'LI' addresses)."
-        ),
-    )
 
     starts_on = models.DateField(_("starts on"), default=dt.date.today)
     ends_on = models.DateField(_("cancel the auto-renewal on"), blank=True, null=True)
@@ -739,42 +719,3 @@ class ProjectedInvoice(models.Model):
 
     def __str__(self):
         return f"{local_date_format(self.invoiced_on)}: {currency(self.gross_margin)}"
-
-
-@model_urls
-class StructuredBillingAddress(models.Model):
-    name = models.CharField(_("name"), max_length=70)
-    street = models.CharField(_("street"), max_length=70, blank=True)
-    house_num = models.CharField(_("house number"), max_length=16, blank=True)
-    pcode = models.CharField(_("postcode"), max_length=16)
-    city = models.CharField(_("city"), max_length=35)
-    country = models.CharField(
-        _("country"),
-        max_length=2,
-        choices=[("CH", _("Schweiz")), ("LI", _("Fürstentum Liechtenstein"))],
-        blank=True,
-    )
-
-    class Meta:
-        verbose_name = _("structured billing address")
-        verbose_name_plural = _("structured billing addresses")
-
-    def __str__(self):
-        return f"{self.name} {self.city}"
-
-    def address_dict(self):
-        return {
-            "name": self.name,
-            "street": self.street,
-            "house_num": self.house_num,
-            "pcode": self.pcode,
-            "city": self.city,
-            "country": self.country,
-        }
-
-    def clean_fields(self, exclude):
-        super().clean_fields(exclude)
-        if settings.WORKBENCH.QRBILL:
-            from qrbill.bill import StructuredAddress
-
-            StructuredAddress(**self.address_dict())

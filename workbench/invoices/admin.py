@@ -35,7 +35,6 @@ class InvoiceAdmin(admin.ModelAdmin):
         "contact",
         "project",
         "down_payment_applied_to",
-        "structured_billing_address",
     )
 
 
@@ -53,7 +52,7 @@ class RecurringInvoiceAdmin(admin.ModelAdmin):
     ]
     list_filter = ["periodicity"]
     radio_fields = {"periodicity": admin.HORIZONTAL}
-    raw_id_fields = ["customer", "contact", "structured_billing_address"]
+    raw_id_fields = ["customer", "contact"]
 
 
 @admin.register(models.ProjectedInvoice)
@@ -62,9 +61,3 @@ class ProjectedInvoiceAdmin(admin.ReadWriteModelAdmin):
     list_display = ["project", "invoiced_on", "gross_margin", "description"]
     ordering = ["-invoiced_on", "project"]
     raw_id_fields = ["project"]
-
-
-@admin.register(models.StructuredBillingAddress)
-class StructuredBillingAddressAdmin(admin.ModelAdmin):
-    list_display = ["name", "city"]
-    ordering = ["name"]
