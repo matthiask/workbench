@@ -30,7 +30,13 @@ class InvoiceAdmin(admin.ModelAdmin):
     )
     list_filter = ("type", "status")
     radio_fields = {"status": admin.HORIZONTAL, "type": admin.HORIZONTAL}
-    raw_id_fields = ("customer", "contact", "project", "down_payment_applied_to")
+    raw_id_fields = (
+        "customer",
+        "contact",
+        "project",
+        "down_payment_applied_to",
+        "structured_billing_address",
+    )
 
 
 @admin.register(models.RecurringInvoice)
@@ -47,7 +53,7 @@ class RecurringInvoiceAdmin(admin.ModelAdmin):
     ]
     list_filter = ["periodicity"]
     radio_fields = {"periodicity": admin.HORIZONTAL}
-    raw_id_fields = ["customer", "contact"]
+    raw_id_fields = ["customer", "contact", "structured_billing_address"]
 
 
 @admin.register(models.ProjectedInvoice)
@@ -56,3 +62,9 @@ class ProjectedInvoiceAdmin(admin.ReadWriteModelAdmin):
     list_display = ["project", "invoiced_on", "gross_margin", "description"]
     ordering = ["-invoiced_on", "project"]
     raw_id_fields = ["project"]
+
+
+@admin.register(models.StructuredBillingAddress)
+class StructuredBillingAddressAdmin(admin.ModelAdmin):
+    list_display = ["name", "city"]
+    ordering = ["name"]

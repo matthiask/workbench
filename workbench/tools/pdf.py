@@ -544,30 +544,35 @@ class PDFDocument(_PDFDocument):
     def append_qr_bill(self, invoice):
         import tempfile
 
-        from qrbill.bill import MAX_CHARS_PAYMENT_LINE, CombinedAddress, QRBill
+        from qrbill.bill import CombinedAddress, QRBill, StructuredAddress
         from svglib.svglib import svg2rlg
 
         bill = QRBill(
             amount=str(invoice.total),
-            extra_infos="{}: {}".format(capfirst(_("invoice")), invoice.code),
+            additional_information="{}: {}".format(
+                capfirst(_("invoice")), invoice.code
+            ),
             language=settings.WORKBENCH.PDF_LANGUAGE,
             **settings.WORKBENCH.QRBILL,
         )
 
-        class DebtorAddress(CombinedAddress):
-            def data_list(self):
-                # 'K': combined address
-                lines = [line for line in invoice.postal_address.splitlines() if line]
-                for i in range(len(lines), 8):
-                    lines.append("")
-                return ["K", *lines]
-
-            def as_paragraph(self, max_chars=MAX_CHARS_PAYMENT_LINE):
-                return chain(
-                    *(self._split(line, max_chars) for line in self.data_list())
+        def get_debtor_address(invoice):
+            if structured_address := invoice.structured_billing_address:
+                return StructuredAddress(**structured_address.address_dict())
+            else:
+                postal_address = invoice.postal_address.splitlines()
+                return CombinedAddress(
+                    **{
+                        "name": postal_address[0] or "",
+                        "line1": postal_address[1] or "",
+                        "line2": postal_address[2] or "",
+                        "country": postal_address[3]
+                        if postal_address[3] and len(postal_address[3]) == 2
+                        else "",
+                    }
                 )
 
-        bill.debtor = DebtorAddress()
+        bill.debtor = get_debtor_address(invoice)
 
         with tempfile.NamedTemporaryFile(mode="w") as f:
             bill.as_svg(f)

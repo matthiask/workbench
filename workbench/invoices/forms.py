@@ -120,6 +120,7 @@ class InvoiceForm(PostalAddressSelectionForm):
             "closed_on",
             "payment_notice",
             "postal_address",
+            "structured_billing_address",
             "type",
             "subtotal",
             "third_party_costs",
