@@ -684,11 +684,14 @@ def pdf_response(*args, **kwargs):
 
 def get_debtor_address(postal_address):
     address_lines = postal_address.splitlines()
-    return {
-        "name": " ".join(address_lines[0:-3])[:70] if len(address_lines) > 0 else "",
+    ret = {
+        "name": " ".join(address_lines[0:-2])[:70] if len(address_lines) > 0 else "",
         "line1": (address_lines[-2][:70] if len(address_lines) > 2 else ""),
         "line2": (address_lines[-1][:70] if len(address_lines) > 2 else ""),
         "country": (
             "LI" if len(address_lines) > 1 and "LI" in address_lines[-1] else "CH"
         ),
     }
+    # print(postal_address)
+    # print(ret)
+    return ret
