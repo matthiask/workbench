@@ -42,6 +42,20 @@ Adresszusatz
             "line2": "1234 Musterstadt",
             "country": "CH",
         },
+        # XXX it would perhaps be preferrable to keep the street on line1
+    ),
+    (
+        """\
+Universität Liechtenstein
+Fürst-Franz-Josef-Strasse
+9490 Vaduz
+Liechtenstein""",
+        {
+            "name": "Universität Liechtenstein",
+            "line1": "Fürst-Franz-Josef-Strasse",
+            "line2": "9490 Vaduz",
+            "country": "LI",
+        },
     ),
 ]
 
