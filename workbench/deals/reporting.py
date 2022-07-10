@@ -76,6 +76,8 @@ def accepted_deals(date_range, *, users=None):
 
     def median(iterable):
         lst = sorted(iterable)
+        if not lst:
+            return None
         return lst[len(lst) // 2]
 
     median_age_by_valuetype = {
