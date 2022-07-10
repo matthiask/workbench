@@ -1,5 +1,6 @@
 import datetime as dt
 from collections import defaultdict
+from itertools import chain
 
 from django.db.models import Prefetch
 from django.utils import timezone
@@ -105,6 +106,7 @@ def accepted_deals(date_range, *, users=None):
         * date_range_length
         / 7,
         "weeks": date_range_length / 7,
+        "median_age": median(chain.from_iterable(age_by_valuetype.values())),
     }
 
 
