@@ -262,6 +262,17 @@ WORKBENCH = {
             "Die Gutschrift wird bis zum %(due)s in Auftrag gegeben."
             " Herzlichen Dank für Ihre Geduld."
         ),
+        QRBILL={
+            "account": "CH7800700110007048779",
+            "creditor": {
+                "name": "Die Bruchpiloten AG",
+                "street": "Fabrikstrasse",
+                "house_num": "54",
+                "pcode": "8005",
+                "city": "Zürich",
+                "country": "CH",
+            },
+        },
         FONTS={
             "regular": font("HelveticaNeueLight.ttf"),
             "bold": font("HelveticaNeueBold.ttf"),
