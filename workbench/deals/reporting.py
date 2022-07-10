@@ -28,6 +28,7 @@ def accepted_deals(date_range, *, users=None):
 
     by_user = defaultdict(list)
     by_month_and_valuetype = defaultdict(lambda: defaultdict(lambda: Z2))
+    age_by_valuetype = defaultdict(list)
 
     valuetypes = set()
 
@@ -41,6 +42,10 @@ def accepted_deals(date_range, *, users=None):
         for value in deal.values.all():
             by_month_and_valuetype[month][value.type] += value.value
             valuetypes.add(value.type)
+
+            age_by_valuetype[value.type].append(
+                (deal.closed_on - deal.created_at.date()).days
+            )
 
     deals = [
         {
@@ -68,6 +73,14 @@ def accepted_deals(date_range, *, users=None):
     ]
     date_range_length = (date_range[1] - date_range[0]).days + 1
 
+    def median(iterable):
+        lst = sorted(iterable)
+        return lst[len(lst) // 2]
+
+    median_age_by_valuetype = {
+        valuetype: median(ages) for valuetype, ages in age_by_valuetype.items()
+    }
+
     return {
         "by_user": sorted(deals, key=lambda row: row["sum"], reverse=True),
         "by_month_and_valuetype": sorted(months, key=lambda row: row["month"]),
@@ -81,6 +94,7 @@ def accepted_deals(date_range, *, users=None):
                 "target": type.weekly_target * date_range_length / 7
                 if type.weekly_target is not None
                 else None,
+                "median_age": median_age_by_valuetype[type],
             }
             for type in valuetypes
         ],

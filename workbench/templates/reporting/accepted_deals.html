@@ -56,6 +56,14 @@
             <th class="text-right">{{ stats.target|currency }}</th>
             <th></th>
           </tr>
+          <tr>
+            <th>{% translate 'median age' %}</th>
+            {% for row in stats.by_valuetype %}
+              <th class="text-right">{{ row.median_age }} {% translate 'days' %}</th>
+              <th></th>
+            {% endfor %}
+            <th></th>
+            <th></th>
         </tbody>
       </table>
       <table class="table table-sm table-striped">
