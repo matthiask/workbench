@@ -691,7 +691,9 @@ def get_debtor_address(postal_address):
     elif address_lines and "LI" in address_lines[-1]:
         country = "LI"
 
-    if len(address_lines) <= 4:
+    if len(address_lines) < 3:
+        name, line1, line2, *rest = address_lines + ["", "", ""]
+    elif len(address_lines) <= 4:
         name = " ".join(address_lines[0:-2])
         line1 = address_lines[-2]
         line2 = address_lines[-1]

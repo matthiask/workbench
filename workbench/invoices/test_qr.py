@@ -5,6 +5,35 @@ from workbench.tools.pdf import get_debtor_address
 
 DEBTOR_ADDRESES = [
     (
+        "",
+        {
+            "name": "",
+            "line1": "",
+            "line2": "",
+            "country": "CH",
+        },
+    ),
+    (
+        "Hans Muster",
+        {
+            "name": "Hans Muster",
+            "line1": "",
+            "line2": "",
+            "country": "CH",
+        },
+    ),
+    (
+        """\
+Hans Muster
+1234 Musterstadt""",
+        {
+            "name": "Hans Muster",
+            "line1": "1234 Musterstadt",
+            "line2": "",
+            "country": "CH",
+        },
+    ),
+    (
         """\
 Hans Muster
 Musterstrasse 42
