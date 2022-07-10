@@ -198,6 +198,17 @@ WORKBENCH = {
             "Die Gutschrift wird bis zum %(due)s in Auftrag gegeben."
             " Herzlichen Dank für Ihre Geduld."
         ),
+        QRBILL={
+            "account": "CH5200700114802208551",
+            "creditor": {
+                "name": "Feinheit AG",
+                "street": "Fabrikstrasse",
+                "house_num": "54",
+                "pcode": "8005",
+                "city": "Zürich",
+                "country": "CH",
+            },
+        },
         FONTS={
             "regular": font("ZuricBTLig.ttf"),
             "bold": font("ZuricBTBol.ttf"),

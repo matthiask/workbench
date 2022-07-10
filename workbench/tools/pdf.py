@@ -161,6 +161,17 @@ class PDFDocument(_PDFDocument):
             self.bounds.N - self.bounds.S,
             **frame_kwargs,
         )
+        self.bill_frame = Frame(
+            0,
+            0,
+            21 * cm,
+            11 * cm,
+            showBoundary=False,
+            leftPadding=0,
+            rightPadding=0,
+            topPadding=0,
+            bottomPadding=0,
+        )
 
     def init_letter(self, *, page_fn=None, page_fn_later=None):
         page_fn = page_fn or self.stationery()
@@ -180,6 +191,29 @@ class PDFDocument(_PDFDocument):
             ]
         )
         self.story.append(NextPageTemplate("Later"))
+
+    def init_invoice_letter(self, *, page_fn=None, page_fn_later=None):
+        page_fn = page_fn or self.stationery()
+        self.generate_style()
+        self.doc.addPageTemplates(
+            [
+                PageTemplate(
+                    id="First",
+                    frames=[self.address_frame, self.rest_frame],
+                    onPage=page_fn,
+                ),
+                PageTemplate(
+                    id="QR",
+                    frames=[self.bill_frame],
+                    onPage=page_fn,
+                ),
+                PageTemplate(
+                    id="Later",
+                    frames=[self.full_frame],
+                    onPage=page_fn_later or page_fn,
+                ),
+            ]
+        )
 
     def init_report(self, *, page_fn=None):
         page_fn = page_fn or self.stationery()
@@ -499,6 +533,37 @@ class PDFDocument(_PDFDocument):
             },
         )
 
+        if settings.WORKBENCH.QRBILL and invoice.total > 0:
+            self.story.append(NextPageTemplate("QR"))
+            self.next_frame()
+            self.append_qr_bill(invoice)
+        else:
+            self.story.append(NextPageTemplate("Later"))
+        self.next_frame()
+
+    def append_qr_bill(self, invoice):
+        import tempfile
+
+        from qrbill.bill import CombinedAddress, QRBill
+        from svglib.svglib import svg2rlg
+
+        bill = QRBill(
+            amount=str(invoice.total),
+            additional_information="{}: {}".format(
+                capfirst(_("invoice")), invoice.code
+            ),
+            language=settings.WORKBENCH.PDF_LANGUAGE,
+            **settings.WORKBENCH.QRBILL,
+        )
+
+        bill.debtor = CombinedAddress(**get_debtor_address(invoice.postal_address))
+
+        with tempfile.NamedTemporaryFile(mode="w") as f:
+            bill.as_svg(f)
+            f.seek(0)
+            drawing = svg2rlg(f.name)
+            self.story.append(drawing)
+
     def offers_pdf(self, *, project, offers):
         self.init_letter()
         self.p(offers[-1].postal_address)
@@ -601,7 +666,7 @@ als gegenstandslos zu betrachten.</p>
         )
         self.restart()
         for invoice in invoices:
-            self.init_letter(page_fn=self.stationery())
+            self.init_invoice_letter(page_fn=self.stationery())
             self.process_invoice(invoice)
             self.restart()
 
@@ -615,3 +680,15 @@ def pdf_response(*args, **kwargs):
     activate(settings.WORKBENCH.PDF_LANGUAGE)
     kwargs["pdfdocument"] = PDFDocument
     return _pdf_response(*args, **kwargs)
+
+
+def get_debtor_address(postal_address):
+    address_lines = postal_address.splitlines()
+    return {
+        "name": " ".join(address_lines[0:-3])[:70] if len(address_lines) > 0 else "",
+        "line1": (address_lines[-2][:70] if len(address_lines) > 2 else ""),
+        "line2": (address_lines[-1][:70] if len(address_lines) > 2 else ""),
+        "country": (
+            "LI" if len(address_lines) > 1 and "LI" in address_lines[-1] else "CH"
+        ),
+    }

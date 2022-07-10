@@ -134,6 +134,7 @@ class Invoice(ModelWithTotal):
     )
 
     postal_address = models.TextField(_("postal address"))
+
     _code = models.IntegerField(_("code"))
     _fts = models.TextField(editable=False, blank=True)
 

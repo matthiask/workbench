@@ -24,7 +24,7 @@ class InvoicePDFView(generic.DetailView):
             as_attachment=request.GET.get("disposition") == "attachment",
         )
 
-        pdf.init_letter()
+        pdf.init_invoice_letter()
         pdf.process_invoice(self.object)
         pdf.generate()
 

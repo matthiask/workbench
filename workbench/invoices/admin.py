@@ -30,7 +30,12 @@ class InvoiceAdmin(admin.ModelAdmin):
     )
     list_filter = ("type", "status")
     radio_fields = {"status": admin.HORIZONTAL, "type": admin.HORIZONTAL}
-    raw_id_fields = ("customer", "contact", "project", "down_payment_applied_to")
+    raw_id_fields = (
+        "customer",
+        "contact",
+        "project",
+        "down_payment_applied_to",
+    )
 
 
 @admin.register(models.RecurringInvoice)
