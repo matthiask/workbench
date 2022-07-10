@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-06 15:51+0200\n"
+"POT-Creation-Date: 2022-07-10 14:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -399,6 +399,7 @@ msgid "logged actions"
 msgstr "aufgezeichnete Aktionen"
 
 #: workbench/awt/admin.py workbench/awt/models.py
+#: workbench/templates/reporting/accepted_deals.html
 msgid "days"
 msgstr "Tage"
 
@@ -1523,7 +1524,6 @@ msgstr "Alle"
 
 #: workbench/expenses/forms.py workbench/expenses/models.py
 #: workbench/invoices/models.py workbench/offers/models.py
-#: workbench/templates/start.html
 msgid "In preparation"
 msgstr "In Vorbereitung"
 
@@ -1637,7 +1637,7 @@ msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/invoices/reminders.html
 #: workbench/templates/projects/project_detail.html
-#: workbench/templates/shortcuts.html workbench/templates/start.html
+#: workbench/templates/shortcuts.html
 msgid "invoices"
 msgstr "Rechnungen"
 
@@ -2136,8 +2136,7 @@ msgstr "Datum zu weit in der Zukunft."
 
 #: workbench/logbook/forms.py
 msgid "The working time standing order prescribes that hours should be logged immediately upon finishing work. You are a bit late."
-msgstr ""
-"Das Arbeitszeitreglement schreibt vor, dass Arbeitsstunden direkt nach Arbeitserledigung erfasst werden sollen. Du bist ein bisschen spät dran."
+msgstr "Das Arbeitszeitreglement schreibt vor, dass Arbeitsstunden direkt nach Arbeitserledigung erfasst werden sollen. Du bist ein bisschen spät dran."
 
 #: workbench/logbook/forms.py
 msgid "This seems to be a duplicate. Is it?"
@@ -2319,7 +2318,7 @@ msgstr "Bemerkung"
 
 #: workbench/offers/apps.py workbench/offers/models.py
 #: workbench/templates/projects/object_list.html
-#: workbench/templates/shortcuts.html workbench/templates/start.html
+#: workbench/templates/shortcuts.html
 msgid "offers"
 msgstr "Offerten"
 
@@ -3594,6 +3593,10 @@ msgid "target"
 msgstr "Ziel"
 
 #: workbench/templates/reporting/accepted_deals.html
+msgid "median age"
+msgstr "Median-Alter"
+
+#: workbench/templates/reporting/accepted_deals.html
 msgid "count"
 msgstr "Anzahl"
 
@@ -3789,16 +3792,16 @@ msgid "Log a break"
 msgstr "Pause erfassen"
 
 #: workbench/templates/start.html
+msgid "Possibly requiring action"
+msgstr "Benötigen evtl. eine Aktion"
+
+#: workbench/templates/start.html
 msgid "active projects"
 msgstr "Aktive Projekte"
 
 #: workbench/templates/start.html
 msgid "no active projects"
 msgstr "Keine aktiven Projekte"
-
-#: workbench/templates/start.html
-msgid "Possibly requiring action"
-msgstr "Benötigen evtl. eine Aktion"
 
 #: workbench/templates/start.html
 msgid "today's hours"

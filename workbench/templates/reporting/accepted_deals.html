@@ -59,7 +59,7 @@
           <tr>
             <th>{% translate 'median age' %}</th>
             {% for row in stats.by_valuetype %}
-              <th class="text-right">{{ row.median_age }} {% translate 'days' %}</th>
+              <th class="text-right">{% if row.median_age is not None %}{{ row.median_age }} {% translate 'days' %}{% endif %}</th>
               <th></th>
             {% endfor %}
             <th></th>

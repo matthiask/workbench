@@ -94,7 +94,7 @@ def accepted_deals(date_range, *, users=None):
                 "target": type.weekly_target * date_range_length / 7
                 if type.weekly_target is not None
                 else None,
-                "median_age": median_age_by_valuetype[type],
+                "median_age": median_age_by_valuetype.get(type),
             }
             for type in valuetypes
         ],
