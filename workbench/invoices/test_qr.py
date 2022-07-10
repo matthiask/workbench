@@ -37,12 +37,11 @@ Musterstrasse 42
 Adresszusatz
 1234 Musterstadt""",
         {
-            "name": "Musterfirma Hans Muster Musterstrasse 42",
-            "line1": "Adresszusatz",
+            "name": "Musterfirma Hans Muster",
+            "line1": "Musterstrasse 42 Adresszusatz",
             "line2": "1234 Musterstadt",
             "country": "CH",
         },
-        # XXX it would perhaps be preferrable to keep the street on line1
     ),
     (
         """\
