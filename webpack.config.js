@@ -1,3 +1,8 @@
+const crypto = require("crypto")
+const crypto_orig_createHash = crypto.createHash
+crypto.createHash = (algorithm) =>
+  crypto_orig_createHash(algorithm == "md4" ? "sha1" : algorithm)
+
 const merge = require("webpack-merge")
 const config = require("fh-webpack-config")
 

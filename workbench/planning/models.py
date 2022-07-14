@@ -194,7 +194,7 @@ class PlannedWork(AbstractPlannedWork):
     )
     offer = models.ForeignKey(
         Offer,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         blank=True,
         null=True,
         verbose_name=_("offer"),
