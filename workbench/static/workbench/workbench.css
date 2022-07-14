@@ -280,3 +280,8 @@ tbody th > a {
 .dropdown-menu.show {
   z-index: 9999;
 }
+
+.btn {
+  margin-right: 1px;
+  margin-bottom: 4px;
+}

@@ -124,6 +124,8 @@ module.exports = (PRODUCTION) => {
         path: path.join(cwd, "static"),
         publicPath: "/static/",
         filename: PRODUCTION ? "[name].[contenthash].js" : "[name].js",
+        // Same as the default but prefixed with "_/[name]."
+        assetModuleFilename: "_/[name].[hash][ext][query]",
       },
       plugins: truthy(
         miniCssExtractPlugin(),
