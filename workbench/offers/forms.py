@@ -297,9 +297,16 @@ class OfferDeleteForm(ModelForm):
                 label=_("Delete offers' services?"), required=False
             )
 
+        if self.instance.planned_work.exists():
+            self.fields["delete_planned_work"] = forms.BooleanField(
+                label=_("Delete planned work linked to offer?"), required=True
+            )
+
     def delete(self):
         if self.cleaned_data.get("delete_services"):
             self.instance.services.all().delete()
+        if self.cleaned_data.get("delete_planned_work"):
+            self.instance.planned_work.all().delete()
         self.instance.delete()
 
 

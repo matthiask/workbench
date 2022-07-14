@@ -293,6 +293,12 @@ class Offer(ModelWithTotal):
             return False
         return True
 
+    @classmethod
+    def allow_delete(cls, instance, request):
+        if instance.planned_work.exists():
+            return None
+        return super().allow_delete(instance, request)
+
     @property
     def is_accepted(self):
         return self.status == self.ACCEPTED
