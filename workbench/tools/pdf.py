@@ -533,12 +533,12 @@ class PDFDocument(_PDFDocument):
             },
         )
 
-        if settings.WORKBENCH.QRBILL and invoice.total > 0:
+        if getattr(settings.WORKBENCH, "QRBILL", None) and invoice.total > 0:
             self.story.append(NextPageTemplate("QR"))
             self.next_frame()
             self.append_qr_bill(invoice)
-        else:
-            self.story.append(NextPageTemplate("Later"))
+
+        self.story.append(NextPageTemplate("Later"))
         self.next_frame()
 
     def append_qr_bill(self, invoice):
