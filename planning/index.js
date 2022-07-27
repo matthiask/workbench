@@ -2,10 +2,12 @@ import "./style.scss"
 
 import ReactDOM from "react-dom"
 import React, {
+  Fragment,
   createContext,
   useContext,
   useLayoutEffect,
   useRef,
+  useState,
 } from "react"
 
 const clamp = (min, value, max) => Math.max(Math.min(value, max), min)
@@ -60,6 +62,21 @@ function Planning({ data }) {
     },
   }
 
+  const getCollapse = () => {
+    const storage = window.localStorage.getItem("planningCollapse")
+    return storage ? JSON.parse(storage) : []
+  }
+  const [collapse, setCollapse] = useState(getCollapse())
+  const toggleCollapse = (id) => {
+    const storage = window.localStorage.getItem("planningCollapse")
+    let storageData = storage ? JSON.parse(storage) : []
+    let index = storageData.indexOf(id)
+    if (index >= 0) storageData.splice(index, 1)
+    else storageData.push(id)
+    window.localStorage.setItem("planningCollapse", JSON.stringify(storageData))
+    setCollapse(storageData)
+  }
+
   useLayoutEffect(() => {
     gridRef.current.style.setProperty("--rows", rowCtx.current() - 2)
     gridRef.current.style.setProperty(
@@ -70,7 +87,7 @@ function Planning({ data }) {
     Array.from(document.querySelectorAll(".planning--title a")).forEach(
       (el) => (el.title = el.textContent)
     )
-  }, [])
+  }, [collapse])
 
   return (
     <RowContext.Provider value={rowCtx}>
@@ -151,6 +168,10 @@ function Planning({ data }) {
             key={project.project.id}
             {...project}
             external_view={data.external_view}
+            collapse={collapse.includes(project.project.id)}
+            toggleCollapse={() => {
+              toggleCollapse(project.project.id)
+            }}
           />
         ))}
 
@@ -263,13 +284,22 @@ function UserCapacity({ user, capacity }) {
   )
 }
 
-function Project({ by_week, offers, project, external_view, external_work }) {
+function Project({
+  by_week,
+  offers,
+  project,
+  external_view,
+  external_work,
+  collapse,
+  toggleCollapse,
+}) {
   const ctx = useContext(RowContext)
   ctx.next() // Skip one row
   const row = ctx.next()
   if (!ctx.firstProjectRow) {
     ctx.firstProjectRow = row
   }
+
   return (
     <>
       <div
@@ -291,13 +321,20 @@ function Project({ by_week, offers, project, external_view, external_work }) {
           {project.is_closed ? <> {gettext("(closed)")}</> : ""}
         </a>
       </Cell>
+
       {external_view || (
         <Cell
           row={row}
           column={2}
           style={{ color: "var(--primary)" }}
-          className="no-pr"
+          className="planning--actions no-pr no-wrap"
         >
+          <Collapse
+            key={project.id}
+            name={`planning-collapse-${project.id}`}
+            collapse={collapse}
+            toggleCollapse={toggleCollapse}
+          />{" "}
           <a
             className="planning--add-pw"
             data-toggle="ajaxmodal"
@@ -354,17 +391,18 @@ function Project({ by_week, offers, project, external_view, external_work }) {
             </Cell>
           )
         })}
-      {external_view ||
-        (project.worked_hours && <WorkedHours project={project} />)}
-      {project.milestones ? <Milestones project={project} /> : null}
-      {external_work && <ExternalExpenses {...{ external_work }} />}
-      {offers &&
-        offers.map((offer, idx) => (
-          <Offer key={idx} {...offer} external_view={external_view} />
-        ))}
-      {/* {project.absences ? (
-        <ProjectAbsences absences={project.absences} />
-      ) : null} */}
+      {collapse || (
+        <>
+          {external_view ||
+            (project.worked_hours && <WorkedHours project={project} />)}
+          {project.milestones ? <Milestones project={project} /> : null}
+          {external_work && <ExternalExpenses {...{ external_work }} />}
+          {offers &&
+            offers.map((offer, idx) => (
+              <Offer key={idx} {...offer} external_view={external_view} />
+            ))}
+        </>
+      )}
     </>
   )
 }
@@ -440,7 +478,7 @@ const Milestones = ({ project }) => {
         const isEven = (1 + i) % 2 === 0
 
         return (
-          <>
+          <Fragment key={i}>
             {isEven ? (
               <div
                 style={{ gridRow: row, gridColumn: "1 / -1" }}
@@ -504,7 +542,7 @@ const Milestones = ({ project }) => {
                   title={`${m.title} (${m.dow})`}
                 />
               ))}
-          </>
+          </Fragment>
         )
       })}
     </>
@@ -945,3 +983,40 @@ const Cell = React.forwardRef(
       children
     )
 )
+
+const Collapse = ({ name, collapse, toggleCollapse }) => {
+  return (
+    <>
+      <input
+        type="checkbox"
+        id={name}
+        checked={collapse}
+        onChange={() => {
+          toggleCollapse()
+        }}
+        className="planning--collapse__input"
+      />
+      <label for={name}>
+        {collapse ? (
+          <svg
+            class="planning--collapse__icon"
+            focusable="false"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+          >
+            <path d="m7 10 5 5 5-5z" />
+          </svg>
+        ) : (
+          <svg
+            class="planning--collapse__icon"
+            focusable="false"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+          >
+            <path d="m7 14 5-5 5 5z" />
+          </svg>
+        )}
+      </label>
+    </>
+  )
+}
