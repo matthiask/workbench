@@ -1,7 +1,7 @@
 .planning-wrapper {
   --grid-gap: 0.125rem;
   --title-column-width: 16rem;
-  --action-width: 2.5rem;
+  --action-width: 3.5rem;
   --range-width: 5rem;
   --hours-total-width: 4.5rem;
   --week-width: 2.2rem;
@@ -232,6 +232,10 @@
   }
 }
 
+.no-wrap {
+  white-space: nowrap;
+}
+
 .description-popup {
   position: absolute;
   z-index: 1;
@@ -277,4 +281,19 @@
     -webkit-print-color-adjust: exact !important;
     color-adjust: exact !important;
   }
+}
+
+.planning--collapse__input {
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.planning--collapse__icon {
+  width: 1rem;
+  height: 1rem;
+  transform: scale(1.5);
 }
