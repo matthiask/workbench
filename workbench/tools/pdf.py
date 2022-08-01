@@ -165,7 +165,7 @@ class PDFDocument(_PDFDocument):
             0,
             0,
             21 * cm,
-            11 * cm,
+            10.6 * cm,
             showBoundary=False,
             leftPadding=0,
             rightPadding=0,
@@ -537,9 +537,9 @@ class PDFDocument(_PDFDocument):
             self.story.append(NextPageTemplate("QR"))
             self.next_frame()
             self.append_qr_bill(invoice)
-
-        self.story.append(NextPageTemplate("Later"))
-        self.next_frame()
+        else:
+            self.story.append(NextPageTemplate("Later"))
+            self.next_frame()
 
     def append_qr_bill(self, invoice):
         import tempfile
