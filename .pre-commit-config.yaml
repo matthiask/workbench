@@ -18,7 +18,7 @@ repos:
         language: system
         always_run: true
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.34.0
+    rev: v2.37.3
     hooks:
       - id: pyupgrade
         args: [--py39-plus]
@@ -41,19 +41,19 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/pycqa/flake8
-    rev: 4.0.1
+    rev: 5.0.4
     hooks:
       - id: flake8
         args: ["--ignore=E203,E501,W503"]
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.19.0
+    rev: v8.21.0
     hooks:
       - id: eslint
         args: [--fix]
         types_or: [css, scss, javascript]
         verbose: true
         additional_dependencies:
-          - eslint@^8.19.0
+          - eslint@^8.21.0
           - eslint-config-prettier
           - eslint-config-preact
           - eslint-plugin-compat

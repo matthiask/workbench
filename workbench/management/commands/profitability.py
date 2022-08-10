@@ -114,4 +114,22 @@ class Command(BaseCommand):
         xlsx = WorkbenchXLSXDocument()
         xlsx.add_sheet("profitability")
         xlsx.table(None, data)
+        xlsx.add_sheet("users")
+        xlsx.table(
+            [_("user"), _("is active"), _("rate"), _("earned"), _("hours")],
+            [
+                [
+                    u["user"],
+                    int(u["user"].is_active),
+                    u["rate"],
+                    u["earned"],
+                    u["hours"],
+                ]
+                for u in sorted(
+                    users,
+                    key=lambda u: (int(u["user"].is_active), u["rate"]),
+                    reverse=True,
+                )
+            ],
+        )
         xlsx.workbook.save("profitability.xlsx")
