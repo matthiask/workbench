@@ -1,5 +1,6 @@
 import datetime as dt
 from collections import defaultdict
+from decimal import Decimal
 from functools import reduce
 from itertools import groupby
 
@@ -219,6 +220,14 @@ def key_data_view(request):
             year["gross_margin"] / year["fte"] if year["fte"] else None
         )
 
+    gmp_factor = Decimal("365.24") / Decimal((today - dt.date(today.year, 1, 1)).days)
+    gm = gross_margin_by_years[today.year]
+    gross_margin_projection = {
+        "gross_profit": gm["gross_profit"] * gmp_factor,
+        "gross_margin": gm["gross_margin"] * gmp_factor,
+        "margin_per_fte": gm["margin_per_fte"] * gmp_factor,
+    }
+
     gh = [
         row
         for row in green_hours.green_hours_by_month()
@@ -250,6 +259,7 @@ def key_data_view(request):
             "gross_margin_by_years": [
                 row[1] for row in sorted(gross_margin_by_years.items())
             ],
+            "gross_margin_projection": gross_margin_projection,
             "gross_margin_by_month": gross_margin_by_month,
             "invoiced_corrected": [
                 (year, [gross_margin_months.get((year, i), Z2) for i in range(1, 13)])

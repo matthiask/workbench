@@ -101,6 +101,24 @@
           </tr>
         </thead>
         <tbody>
+          <tr style="font-style:italic">
+            <th>{% translate 'projection'|capfirst %}</th>
+            <th class="text-right">
+              {{ gross_margin_projection.gross_profit|currency }}
+            </th>
+            <th class="text-right"></th>
+            <th></th>
+            <th class="text-right"></th>
+            <th class="text-right">
+              {{ gross_margin_projection.gross_margin|currency }}
+            </th>
+            <th class="text-right"></th>
+            <th class="text-right"></th>
+            <th class="text-right">
+              {{ gross_margin_projection.margin_per_fte|currency }}
+            </th>
+            <th class="text-right"></th>
+          </tr>
           {% for year in gross_margin_by_years reversed %}
             <tr>
               <th>{{ year.year }}</th>
