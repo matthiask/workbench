@@ -225,7 +225,9 @@ def key_data_view(request):
     gross_margin_projection = {
         "gross_profit": gm["gross_profit"] * gmp_factor,
         "gross_margin": gm["gross_margin"] * gmp_factor,
-        "margin_per_fte": gm["margin_per_fte"] * gmp_factor,
+        "margin_per_fte": gm["margin_per_fte"] * gmp_factor
+        if gm["margin_per_fte"]
+        else None,
     }
 
     gh = [
