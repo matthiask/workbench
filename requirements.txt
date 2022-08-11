@@ -8,7 +8,7 @@ coverage==6.3.2
 cssselect2==0.6.0
 dj-database-url==0.5.0
 dj-email-url==1.0.5
-Django==3.2.14
+Django==3.2.15
 django-admin-ordering==0.15.0
 django-authlib==0.13.0
 django-bootstrap4==22.1
