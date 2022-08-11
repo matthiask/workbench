@@ -37,6 +37,7 @@ class FEATURES(str, Enum):
     LATE_LOGGING = "LATE_LOGGING"
     LATE_LOGGING_NAG = "LATE_LOGGING_NAG"
     PLANNING = "PLANNING"
+    PRIDE = "PRIDE"
     PROJECTED_INVOICES = "PROJECTED_INVOICES"
     WORKING_TIME_CORRECTION = "WORKING_TIME_CORRECTION"
 
@@ -93,6 +94,9 @@ LABELS = {
     },
     FEATURES.PLANNING: {
         "label": capfirst(_("planning")),
+    },
+    FEATURES.PRIDE: {
+        "label": capfirst(_("pride")),
     },
     FEATURES.PROJECTED_INVOICES: {
         "label": capfirst(_("projected invoices")),
