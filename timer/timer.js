@@ -24,7 +24,7 @@ export const Timer = connect(({ activities, current }) => ({
     if (!current || current.id != activity.id) return activity
 
     const seconds = Math.ceil(
-      activity.seconds + timestamp() - current.startedAt
+      activity.seconds + timestamp() - current.startedAt,
     )
     return {
       ...activity,
@@ -34,7 +34,7 @@ export const Timer = connect(({ activities, current }) => ({
   })
 
   const totalSeconds = Math.ceil(
-    activities.reduce((sum, activity) => sum + activity.seconds, 0)
+    activities.reduce((sum, activity) => sum + activity.seconds, 0),
   )
 
   return (

@@ -8,7 +8,7 @@ function activities(state = {}, action) {
       return { ...state, [action.activity.id]: action.activity }
     case "REMOVE_ACTIVITY":
       return Object.fromEntries(
-        Object.entries(state).filter(([id]) => id != action.id)
+        Object.entries(state).filter(([id]) => id != action.id),
       )
     case "UPDATE_ACTIVITY":
       return {

@@ -25,7 +25,7 @@ module.exports = merge.smart(
         : `${process.env.STATIC_URL || "/static/"}workbench/`,
       filename: DEBUG ? "[name].js" : "[name]-[contenthash].js",
     },
-  }
+  },
 )
 
 // Smart webpack merging is not smart enough to remove the default `main` entrypoint

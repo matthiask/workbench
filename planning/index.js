@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const style = data.service_types
     .map(
       ({ id, color }) =>
-        `.planning--range.st-${id} { --st-color: ${color}; background-color: var(--st-color) !important; }`
+        `.planning--range.st-${id} { --st-color: ${color}; background-color: var(--st-color) !important; }`,
     )
     .join("\n")
   const styleEl = document.createElement("style")
@@ -81,11 +81,11 @@ function Planning({ data }) {
     gridRef.current.style.setProperty("--rows", rowCtx.current() - 2)
     gridRef.current.style.setProperty(
       "--first-project-row",
-      rowCtx.firstProjectRow
+      rowCtx.firstProjectRow,
     )
 
     Array.from(document.querySelectorAll(".planning--title a")).forEach(
-      (el) => (el.title = el.textContent)
+      (el) => (el.title = el.textContent),
     )
   }, [collapse])
 
@@ -967,7 +967,7 @@ const Cell = React.forwardRef(
       style = {},
       ...props
     },
-    ref
+    ref,
   ) =>
     React.createElement(
       tag,
@@ -980,8 +980,8 @@ const Cell = React.forwardRef(
         },
         ...props,
       },
-      children
-    )
+      children,
+    ),
 )
 
 const Collapse = ({ name, collapse, toggleCollapse }) => {

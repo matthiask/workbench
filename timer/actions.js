@@ -88,7 +88,7 @@ export async function sendLogbook(dispatch, { activity, current }) {
   body.append("modal-hours", Math.ceil(activity.seconds / 360) / 10)
   body.append(
     "modal-rendered_by",
-    document.getElementById("current-user").dataset.currentUser
+    document.getElementById("current-user").dataset.currentUser,
   )
   body.append("modal-rendered_on", new Date().toISOString().replace(/T.*/, ""))
 
@@ -121,7 +121,7 @@ export async function sendLogbook(dispatch, { activity, current }) {
 export function overwriteSeconds(dispatch, { activity, current }) {
   const seconds = parseInt(
     prompt(gettext("Overwrite seconds"), Math.ceil(activity.seconds)),
-    10
+    10,
   )
   if (!isNaN(seconds)) {
     dispatch({

@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <Provider store={storeInstance}>
       <Timer />
     </Provider>,
-    el
+    el,
   )
 })
 

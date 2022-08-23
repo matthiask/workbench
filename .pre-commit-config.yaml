@@ -23,7 +23,7 @@ repos:
       - id: pyupgrade
         args: [--py39-plus]
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.7.0
+    rev: 1.8.0
     hooks:
       - id: django-upgrade
         args: [--target-version, "4.0"]
@@ -45,15 +45,17 @@ repos:
     hooks:
       - id: flake8
         args: ["--ignore=E203,E501,W503"]
+        additional_dependencies:
+          - flake8-bugbear
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.21.0
+    rev: v8.22.0
     hooks:
       - id: eslint
         args: [--fix]
         types_or: [css, scss, javascript]
         verbose: true
         additional_dependencies:
-          - eslint@^8.21.0
+          - eslint@^8.22.0
           - eslint-config-prettier
           - eslint-config-preact
           - eslint-plugin-compat
@@ -69,7 +71,7 @@ repos:
           - "@babel/plugin-syntax-jsx"
           - jest
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.7.1
+    rev: v3.0.0-alpha.0
     hooks:
       - id: prettier
         args: [--list-different, --no-semi]

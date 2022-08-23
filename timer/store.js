@@ -33,7 +33,7 @@ const deserialize = (blob) => {
       return {
         ...data,
         activities: Object.fromEntries(
-          data.activities.map((activity) => [activity.id, activity])
+          data.activities.map((activity) => [activity.id, activity]),
         ),
       }
     }
@@ -45,8 +45,8 @@ const deserialize = (blob) => {
     ...data,
     activities: Object.fromEntries(
       Object.entries(data.activities).filter(
-        ([id]) => id && id != "null" && id != "undefined"
-      )
+        ([id]) => id && id != "null" && id != "undefined",
+      ),
     ),
   }
 }
@@ -55,7 +55,7 @@ export function configureStore() {
   let initialState
   try {
     initialState = JSON.parse(
-      document.getElementById("timer-state").textContent
+      document.getElementById("timer-state").textContent,
     )
   } catch (e) {
     /* intentionally empty */
@@ -72,9 +72,9 @@ export function configureStore() {
         notifier,
         // remotePersister,
         thunk,
-        logger
-      )
-    )
+        logger,
+      ),
+    ),
   )
 
   if (module.hot) {

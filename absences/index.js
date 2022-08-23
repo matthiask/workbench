@@ -23,12 +23,12 @@ function getDateList(start, end) {
 
 document.addEventListener("DOMContentLoaded", () => {
   let { absencesByPerson, reasonList, timeBoundaries } = JSON.parse(
-    document.getElementById("absences-data").textContent
+    document.getElementById("absences-data").textContent,
   )
 
   const dateList = getDateList(
     new Date(timeBoundaries.start),
-    new Date(timeBoundaries.end)
+    new Date(timeBoundaries.end),
   )
 
   const el = document.querySelector("#absences-root")
@@ -39,6 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
       dateList={dateList}
       reasonList={reasonList}
     />,
-    el
+    el,
   )
 })

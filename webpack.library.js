@@ -130,7 +130,7 @@ module.exports = (PRODUCTION) => {
       plugins: truthy(
         miniCssExtractPlugin(),
         htmlSingleChunkPlugin(),
-        htmlInlineScriptPlugin()
+        htmlInlineScriptPlugin(),
       ),
       optimization: PRODUCTION
         ? {

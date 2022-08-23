@@ -36,7 +36,7 @@ export const Absences = ({ absencesByPerson, dateList, reasonList }) => {
 
         return acc
       }, []),
-    [dateList]
+    [dateList],
   )
 
   return (
@@ -98,7 +98,7 @@ const Absence = ({ absence, person }) => {
   const { startsOn, endsOn } = absence
   const style = {
     gridColumn: `${getColumnName(startsOn)} / ${getColumnName(
-      endsOn + 24 * 60 * 60 * 1000
+      endsOn + 24 * 60 * 60 * 1000,
     )}`,
     gridRowStart: getRowName(person.id),
   }

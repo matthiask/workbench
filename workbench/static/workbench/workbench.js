@@ -105,10 +105,10 @@ $(() => {
           data /*,
         status,
         jqXHR
-        */
+        */,
         ) => {
           initModal(data)
-        }
+        },
       )
     }
     return false
@@ -132,7 +132,7 @@ $(() => {
       params.sort()
       params = params.toString()
       window.location.href = params ? `?${params}` : "."
-    }
+    },
   )
 
   // Search form restoration
@@ -140,7 +140,7 @@ $(() => {
     let params = new URLSearchParams(window.location.search.slice(1))
     // Also see workbench/generic.py
     ;["disposition", "error", "export", "page"].forEach((key) =>
-      params.delete(key)
+      params.delete(key),
     )
     params = params.toString()
     const key = `search-${window.location.pathname}`
@@ -290,7 +290,7 @@ $(() => {
     e.preventDefault()
     const arr = this.dataset.selectReceivers.split(",")
     const inputs = Array.from(
-      this.closest(".widget--checkboxselectmultiple").querySelectorAll("input")
+      this.closest(".widget--checkboxselectmultiple").querySelectorAll("input"),
     )
     inputs.forEach((el) => (el.checked = arr.includes(el.value)))
   })
@@ -306,12 +306,12 @@ function initWidgets() {
   if (invoicedOn.length && dueOn.length) {
     invoicedOn.on("change", (_event) => {
       const due = new Date(
-        new Date(invoicedOn.val()).getTime() + 14 * 86400 * 1000
+        new Date(invoicedOn.val()).getTime() + 14 * 86400 * 1000,
       )
       dueOn.val(
         `${addZero(due.getFullYear())}-${addZero(1 + due.getMonth())}-${addZero(
-          due.getDate()
-        )}`
+          due.getDate(),
+        )}`,
       )
     })
   }
@@ -329,12 +329,12 @@ function initWidgets() {
   if (offeredOn.length && validUntil.length) {
     offeredOn.on("change", (_event) => {
       const day = new Date(
-        new Date(offeredOn.val()).getTime() + 59 * 86400 * 1000
+        new Date(offeredOn.val()).getTime() + 59 * 86400 * 1000,
       )
       validUntil.val(
         `${addZero(day.getFullYear())}-${addZero(1 + day.getMonth())}-${addZero(
-          day.getDate()
-        )}`
+          day.getDate(),
+        )}`,
       )
     })
   }
