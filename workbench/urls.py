@@ -12,11 +12,9 @@ admin.site.enable_nav_sidebar = False
 
 
 urlpatterns = [
-    re_path(r"^$", views.start),
-    re_path(r"^404/$", render, {"template_name": "404.html"}),
-    re_path(
-        r"^shortcuts/$", render, {"template_name": "shortcuts.html"}, name="shortcuts"
-    ),
+    path("", views.start),
+    path("404/", render, {"template_name": "404.html"}),
+    path("shortcuts/", render, {"template_name": "shortcuts.html"}, name="shortcuts"),
     re_path(r"^admin/", admin.site.urls),
     re_path(r"", include("workbench.accounts.urls")),
     re_path(r"^contacts/", include("workbench.contacts.urls")),
@@ -29,7 +27,7 @@ urlpatterns = [
     re_path(r"^expenses/", include("workbench.expenses.urls")),
     re_path(r"^deals/", include("workbench.deals.urls")),
     re_path(r"^planning/", include("workbench.planning.urls")),
-    re_path(r"^search/$", views.search, name="search"),
+    path("search/", views.search, name="search"),
     re_path(r"^history/(\w+)/(\w+)/([0-9]+)/$", views.history, name="history"),
     re_path(r"^report/", include("workbench.reporting.urls")),
     re_path(r"", include("workbench.timer.urls")),

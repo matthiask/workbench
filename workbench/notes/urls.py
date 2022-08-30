@@ -1,4 +1,4 @@
-from django.urls import re_path
+from django.urls import path
 
 from workbench import generic
 from workbench.notes import views
@@ -7,21 +7,21 @@ from workbench.notes.models import Note
 
 
 urlpatterns = [
-    re_path(r"^add-note/$", views.add_note, name="notes_note_add"),
-    re_path(
-        r"^$",
+    path("add-note/", views.add_note, name="notes_note_add"),
+    path(
+        "",
         generic.ListView.as_view(
             model=Note, search_form_class=NoteSearchForm, show_create_button=False
         ),
         name="notes_note_list",
     ),
-    re_path(
-        r"(?P<pk>[0-9]+)/update/$",
+    path(
+        "<int:pk>/update/",
         generic.UpdateView.as_view(model=Note, form_class=NoteForm),
         name="notes_note_update",
     ),
-    re_path(
-        r"^(?P<pk>[0-9]+)/delete/$",
+    path(
+        "<int:pk>/delete/",
         generic.DeleteView.as_view(
             model=Note, template_name="modal_confirm_delete.html"
         ),

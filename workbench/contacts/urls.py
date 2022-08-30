@@ -1,5 +1,5 @@
 from django.shortcuts import redirect
-from django.urls import re_path
+from django.urls import path
 
 from workbench import generic
 from workbench.contacts.forms import (
@@ -21,49 +21,49 @@ def autocomplete_filter(*, request, queryset):
 
 
 urlpatterns = [
-    re_path(r"^$", lambda request: redirect("contacts_person_list"), name="contacts"),
-    re_path(
-        r"^organizations/$",
+    path("", lambda request: redirect("contacts_person_list"), name="contacts"),
+    path(
+        "organizations/",
         OrganizationListView.as_view(),
         name="contacts_organization_list",
     ),
-    re_path(
-        r"^organizations/autocomplete/$",
+    path(
+        "organizations/autocomplete/",
         generic.AutocompleteView.as_view(
             model=Organization,
             queryset=Organization.objects.active(),
         ),
         name="contacts_organization_autocomplete",
     ),
-    re_path(
-        r"^organizations/(?P<pk>\d+)/$",
+    path(
+        "organizations/<int:pk>/",
         generic.DetailView.as_view(model=Organization),
         name="contacts_organization_detail",
     ),
-    re_path(
-        r"^organizations/create/$",
+    path(
+        "organizations/create/",
         generic.CreateView.as_view(form_class=OrganizationForm, model=Organization),
         name="contacts_organization_create",
     ),
-    re_path(
-        r"^organizations/(?P<pk>\d+)/update/$",
+    path(
+        "organizations/<int:pk>/update/",
         generic.UpdateView.as_view(form_class=OrganizationForm, model=Organization),
         name="contacts_organization_update",
     ),
-    re_path(
-        r"^organizations/(?P<pk>\d+)/delete/$",
+    path(
+        "organizations/<int:pk>/delete/",
         generic.DeleteView.as_view(
             model=Organization, delete_form_class=OrganizationDeleteForm
         ),
         name="contacts_organization_delete",
     ),
-    re_path(
-        r"^people/$",
+    path(
+        "people/",
         generic.ListView.as_view(model=Person, search_form_class=PersonSearchForm),
         name="contacts_person_list",
     ),
-    re_path(
-        r"^people/autocomplete/$",
+    path(
+        "people/autocomplete/",
         generic.AutocompleteView.as_view(
             model=Person,
             queryset=Person.objects.active().select_related("organization"),
@@ -72,26 +72,26 @@ urlpatterns = [
         ),
         name="contacts_person_autocomplete",
     ),
-    re_path(r"^people/select/$", select, name="contacts_person_select"),
-    re_path(
-        r"^people/(?P<pk>\d+)/$",
+    path("people/select/", select, name="contacts_person_select"),
+    path(
+        "people/<int:pk>/",
         generic.DetailView.as_view(model=Person),
         name="contacts_person_detail",
     ),
-    re_path(
-        r"^people/create/$",
+    path(
+        "people/create/",
         generic.CreateAndUpdateView.as_view(model=Person, form_class=PersonForm),
         name="contacts_person_create",
     ),
-    re_path(
-        r"^people/(?P<pk>\d+)/update/$",
+    path(
+        "people/<int:pk>/update/",
         generic.UpdateView.as_view(form_class=PersonForm, model=Person),
         name="contacts_person_update",
     ),
-    re_path(
-        r"^people/(?P<pk>\d+)/delete/$",
+    path(
+        "people/<int:pk>/delete/",
         generic.DeleteView.as_view(model=Person),
         name="contacts_person_delete",
     ),
-    re_path(r"^people/(?P<pk>\d+)/vcard/$", person_vcard, name="contacts_person_vcard"),
+    path("people/<int:pk>/vcard/", person_vcard, name="contacts_person_vcard"),
 ]

@@ -1,4 +1,4 @@
-from django.urls import re_path
+from django.urls import path
 
 from workbench import generic
 from workbench.accounts.features import controlling_only
@@ -8,8 +8,8 @@ from workbench.invoices.views import RecurringInvoiceDetailView
 
 
 urlpatterns = [
-    re_path(
-        r"^$",
+    path(
+        "",
         controlling_only(
             generic.ListView.as_view(
                 model=RecurringInvoice, search_form_class=RecurringInvoiceSearchForm
@@ -17,13 +17,13 @@ urlpatterns = [
         ),
         name="invoices_recurringinvoice_list",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/$",
+    path(
+        "<int:pk>/",
         controlling_only(RecurringInvoiceDetailView.as_view(model=RecurringInvoice)),
         name="invoices_recurringinvoice_detail",
     ),
-    re_path(
-        r"^create/$",
+    path(
+        "create/",
         controlling_only(
             generic.CreateView.as_view(
                 model=RecurringInvoice, form_class=RecurringInvoiceForm
@@ -31,8 +31,8 @@ urlpatterns = [
         ),
         name="invoices_recurringinvoice_create",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/update/$",
+    path(
+        "<int:pk>/update/",
         controlling_only(
             generic.UpdateView.as_view(
                 model=RecurringInvoice, form_class=RecurringInvoiceForm
@@ -40,8 +40,8 @@ urlpatterns = [
         ),
         name="invoices_recurringinvoice_update",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/delete/$",
+    path(
+        "<int:pk>/delete/",
         controlling_only(generic.DeleteView.as_view(model=RecurringInvoice)),
         name="invoices_recurringinvoice_delete",
     ),

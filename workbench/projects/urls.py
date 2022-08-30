@@ -50,13 +50,13 @@ def autocomplete_filter(*, request, queryset):
 urlpatterns = [
     re_path(r"^offers/", include("workbench.offers.urls")),
     # Campaigns
-    re_path(
-        r"^campaigns/$",
+    path(
+        "campaigns/",
         generic.ListView.as_view(model=Campaign, search_form_class=CampaignSearchForm),
         name="projects_campaign_list",
     ),
-    re_path(
-        r"^campaigns/autocomplete/$",
+    path(
+        "campaigns/autocomplete/",
         generic.AutocompleteView.as_view(
             model=Campaign,
             queryset=Campaign.objects.select_related("owned_by"),
@@ -64,31 +64,31 @@ urlpatterns = [
         ),
         name="projects_campaign_autocomplete",
     ),
-    re_path(
-        r"^campaigns/(?P<pk>\d+)/$",
+    path(
+        "campaigns/<int:pk>/",
         generic.DetailView.as_view(
             model=Campaign,
             queryset=Campaign.objects.select_related("owned_by", "customer"),
         ),
         name="projects_campaign_detail",
     ),
-    re_path(
-        r"^campaigns/(?P<pk>\d+)/statistics/$",
+    path(
+        "campaigns/<int:pk>/statistics/",
         generic.DetailView.as_view(model=Campaign, template_name_suffix="_statistics"),
         name="projects_campaign_statistics",
     ),
-    re_path(
-        r"^campaigns/create/$",
+    path(
+        "campaigns/create/",
         generic.CreateView.as_view(form_class=CampaignForm, model=Campaign),
         name="projects_campaign_create",
     ),
-    re_path(
-        r"^campaigns/(?P<pk>\d+)/update/$",
+    path(
+        "campaigns/<int:pk>/update/",
         generic.UpdateView.as_view(form_class=CampaignForm, model=Campaign),
         name="projects_campaign_update",
     ),
-    re_path(
-        r"^campaigns/(?P<pk>\d+)/delete/$",
+    path(
+        "campaigns/<int:pk>/delete/",
         generic.DeleteView.as_view(
             model=Campaign, delete_form_class=CampaignDeleteForm
         ),
@@ -105,13 +105,13 @@ urlpatterns = [
         name="projects_campaign_planning_external",
     ),
     # Projects
-    re_path(
-        r"^$",
+    path(
+        "",
         generic.ListView.as_view(model=Project, search_form_class=ProjectSearchForm),
         name="projects_project_list",
     ),
-    re_path(
-        r"^autocomplete/$",
+    path(
+        "autocomplete/",
         generic.AutocompleteView.as_view(
             model=Project,
             queryset=Project.objects.select_related("owned_by"),
@@ -119,9 +119,9 @@ urlpatterns = [
         ),
         name="projects_project_autocomplete",
     ),
-    re_path(r"^select/$", select, name="projects_project_select"),
-    re_path(
-        r"^(?P<pk>\d+)/$",
+    path("select/", select, name="projects_project_select"),
+    path(
+        "<int:pk>/",
         generic.DetailView.as_view(
             model=Project,
             queryset=Project.objects.select_related(
@@ -130,28 +130,28 @@ urlpatterns = [
         ),
         name="projects_project_detail",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/statistics/$",
+    path(
+        "<int:pk>/statistics/",
         generic.DetailView.as_view(model=Project, template_name_suffix="_statistics"),
         name="projects_project_statistics",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/planning/$",
+    path(
+        "<int:pk>/planning/",
         project_planning,
         name="projects_project_planning",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/external/$",
+    path(
+        "<int:pk>/external/",
         project_planning_external,
         name="projects_project_planning_external",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/offers-pdf/$",
+    path(
+        "<int:pk>/offers-pdf/",
         controlling_only(ProjectOfferPDFView.as_view()),
         name="projects_project_offers_pdf",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/renumber-offers/$",
+    path(
+        "<int:pk>/renumber-offers/",
         controlling_only(
             OffersRenumberView.as_view(
                 model=Project, template_name_suffix="_renumber_offers"
@@ -159,18 +159,18 @@ urlpatterns = [
         ),
         name="projects_project_renumber_offers",
     ),
-    re_path(
-        r"^create/$",
+    path(
+        "create/",
         generic.CreateView.as_view(form_class=ProjectForm, model=Project),
         name="projects_project_create",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/update/$",
+    path(
+        "<int:pk>/update/",
         generic.UpdateView.as_view(form_class=ProjectForm, model=Project),
         name="projects_project_update",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/projected-invoices/$",
+    path(
+        "<int:pk>/projected-invoices/",
         generic.UpdateView.as_view(
             form_class=ProjectedInvoicesProjectForm,
             model=Project,
@@ -178,61 +178,61 @@ urlpatterns = [
         ),
         name="projects_project_projected_invoices",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/delete/$",
+    path(
+        "<int:pk>/delete/",
         generic.DeleteView.as_view(model=Project),
         name="projects_project_delete",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/createoffer/$",
+    path(
+        "<int:pk>/createoffer/",
         generic.CreateRelatedView.as_view(
             model=Offer, form_class=OfferForm, related_model=Project
         ),
         name="projects_project_createoffer",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/createinvoice/$",
+    path(
+        "<int:pk>/createinvoice/",
         generic.CreateRelatedView.as_view(
             model=Invoice, form_class=CreateProjectInvoiceForm, related_model=Project
         ),
         name="projects_project_createinvoice",
     ),
     # HOURS
-    re_path(
-        r"^(?P<pk>\d+)/createhours/$",
+    path(
+        "<int:pk>/createhours/",
         generic.CreateRelatedView.as_view(
             model=LoggedHours, form_class=LoggedHoursForm, related_model=Project
         ),
         name="projects_project_createhours",
     ),
     # COSTS
-    re_path(
-        r"^(?P<pk>\d+)/createcost/$",
+    path(
+        "<int:pk>/createcost/",
         generic.CreateRelatedView.as_view(
             model=LoggedCost, form_class=LoggedCostForm, related_model=Project
         ),
         name="projects_project_createcost",
     ),
     # Services
-    re_path(
-        r"^(?P<pk>\d+)/createservice/$",
+    path(
+        "<int:pk>/createservice/",
         generic.CreateRelatedView.as_view(
             model=Service, form_class=ServiceForm, related_model=Project
         ),
         name="projects_project_createservice",
     ),
-    re_path(
-        r"^service/(?P<pk>\d+)/$",
+    path(
+        "service/<int:pk>/",
         lambda request, pk: redirect(get_object_or_404(Service, pk=pk)),
         name="projects_service_detail",
     ),
-    re_path(
-        r"^service/(?P<pk>\d+)/update/$",
+    path(
+        "service/<int:pk>/update/",
         generic.UpdateView.as_view(model=Service, form_class=ServiceForm),
         name="projects_service_update",
     ),
-    re_path(
-        r"^service/(?P<pk>\d+)/reassign-logbook/$",
+    path(
+        "service/<int:pk>/reassign-logbook/",
         generic.UpdateView.as_view(
             model=Service,
             form_class=ReassignLogbookForm,
@@ -241,34 +241,34 @@ urlpatterns = [
         ),
         name="projects_service_reassign_logbook",
     ),
-    re_path(
-        r"^service/(?P<pk>\d+)/delete/$",
+    path(
+        "service/<int:pk>/delete/",
         generic.DeleteView.as_view(
             model=Service, template_name="modal_confirm_delete.html"
         ),
         name="projects_service_delete",
     ),
-    re_path(
-        r"^service/(?P<pk>\d+)/move/$",
+    path(
+        "service/<int:pk>/move/",
         generic.UpdateView.as_view(
             model=Service, form_class=ServiceMoveForm, template_name="modalform.html"
         ),
         name="projects_service_move",
     ),
-    re_path(
-        r"^service/(?P<pk>\d+)/assign-service-type/$",
+    path(
+        "service/<int:pk>/assign-service-type/",
         assign_service_type,
         name="projects_service_assign_service_type",
     ),
-    re_path(r"^service/set-order/$", set_order, name="projects_service_set_order"),
-    re_path(
-        r"^(?P<pk>[0-9]+)/services/$",
+    path("service/set-order/", set_order, name="projects_service_set_order"),
+    path(
+        "<int:pk>/services/",
         services,
         name="projects_project_services",
     ),
-    re_path(r"^projects/$", projects, name="projects_project_projects"),
-    re_path(
-        r"^service/autocomplete/$",
+    path("projects/", projects, name="projects_project_projects"),
+    path(
+        "service/autocomplete/",
         generic.AutocompleteView.as_view(
             model=Service,
             queryset=Service.objects.filter(

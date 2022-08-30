@@ -1,4 +1,4 @@
-from django.urls import re_path
+from django.urls import path, re_path
 
 from workbench.accounts.features import (
     FEATURES,
@@ -30,21 +30,19 @@ from workbench.reporting.views import (
 
 
 urlpatterns = [
-    re_path(r"^absence-calendar/$", absence_calendar, name="awt_absence_calendar"),
-    re_path(
-        r"^annual-working-time/$", annual_working_time_view, name="awt_year_report"
-    ),
-    re_path(
-        r"^overdrawn-projects/$",
+    path("absence-calendar/", absence_calendar, name="awt_absence_calendar"),
+    path("annual-working-time/", annual_working_time_view, name="awt_year_report"),
+    path(
+        "overdrawn-projects/",
         controlling_only(overdrawn_projects_view),
         name="report_overdrawn_projects",
     ),
-    re_path(
-        r"^open-items-list/$",
+    path(
+        "open-items-list/",
         controlling_only(open_items_list),
         name="report_open_items_list",
     ),
-    re_path(r"^key-data/$", controlling_only(key_data_view), name="report_key_data"),
+    path("key-data/", controlling_only(key_data_view), name="report_key_data"),
     re_path(
         r"^key-data/gross-profit/(?P<year>[0-9]{4})\.(?P<month>[0-9]{1,2})/$",
         controlling_only(key_data_gross_profit),
@@ -57,8 +55,8 @@ urlpatterns = [
         r"^key-data/projected-invoices/",
         controlling_only(key_data_projected_invoices),
     ),
-    re_path(
-        r"^hours-per-customer/$",
+    path(
+        "hours-per-customer/",
         hours_filter_view,
         {
             "template_name": "reporting/hours_per_customer.html",
@@ -66,8 +64,8 @@ urlpatterns = [
         },
         name="report_hours_per_customer",
     ),
-    re_path(
-        r"^planning-vs-logbook/$",
+    path(
+        "planning-vs-logbook/",
         hours_filter_view,
         {
             "template_name": "reporting/planning_vs_logbook.html",
@@ -75,8 +73,8 @@ urlpatterns = [
         },
         name="report_planning_vs_logbook",
     ),
-    re_path(
-        r"^hours-by-circle/$",
+    path(
+        "hours-by-circle/",
         feature_required(FEATURES.GLASSFROG)(hours_filter_view),
         {
             "template_name": "reporting/hours_by_circle.html",
@@ -84,8 +82,8 @@ urlpatterns = [
         },
         name="report_hours_by_circle",
     ),
-    re_path(
-        r"^hours-per-work-category/$",
+    path(
+        "hours-per-work-category/",
         feature_required(FEATURES.GLASSFROG)(hours_filter_view),
         {
             "template_name": "reporting/hours_per_work_category.html",
@@ -93,54 +91,52 @@ urlpatterns = [
         },
         name="report_hours_per_work_category",
     ),
-    re_path(
-        r"^project-budget-statistics/$",
+    path(
+        "project-budget-statistics/",
         controlling_only(project_budget_statistics_view),
         name="report_project_budget_statistics",
     ),
-    re_path(
-        r"^green-hours/$",
+    path(
+        "green-hours/",
         controlling_only(hours_filter_view),
         {"template_name": "reporting/green_hours.html", "stats_fn": green_hours},
         name="report_green_hours",
     ),
-    re_path(
-        r"^accepted-deals/$",
+    path(
+        "accepted-deals/",
         deals_only(hours_filter_view),
         {"template_name": "reporting/accepted_deals.html", "stats_fn": accepted_deals},
         name="report_accepted_deals",
     ),
-    re_path(
-        r"^accepted-deals/deals/$",
+    path(
+        "accepted-deals/deals/",
         deals_only(hours_filter_view),
         {
             "template_name": "reporting/accepted_deals_for_user.html",
             "stats_fn": accepted_deals,
         },
     ),
-    re_path(
-        r"^declined-deals/$",
+    path(
+        "declined-deals/",
         deals_only(hours_filter_view),
         {"template_name": "reporting/declined_deals.html", "stats_fn": declined_deals},
         name="report_declined_deals",
     ),
-    re_path(
-        r"^deal-history/$",
+    path(
+        "deal-history/",
         deals_only(hours_filter_view),
         {"template_name": "reporting/deal_history.html", "stats_fn": deal_history},
         name="report_deal_history",
     ),
-    re_path(
-        r"^labor-costs/$", labor_costs_only(labor_costs_view), name="report_labor_costs"
-    ),
-    re_path(r"^logging/$", controlling_only(logging), name="report_logging"),
-    re_path(
-        r"^work-anniversaries/$",
+    path("labor-costs/", labor_costs_only(labor_costs_view), name="report_labor_costs"),
+    path("logging/", controlling_only(logging), name="report_logging"),
+    path(
+        "work-anniversaries/",
         work_anniversaries_view,
         name="report_work_anniversaries",
     ),
-    re_path(
-        r"^birthdays/$",
+    path(
+        "birthdays/",
         birthdays_view,
         name="report_birthdays",
     ),

@@ -1,4 +1,4 @@
-from django.urls import re_path
+from django.urls import path
 
 from workbench import generic
 from workbench.awt.forms import AbsenceForm, AbsenceSearchForm
@@ -6,8 +6,8 @@ from workbench.awt.models import Absence
 
 
 urlpatterns = [
-    re_path(
-        r"^$",
+    path(
+        "",
         generic.ListView.as_view(
             model=Absence,
             search_form_class=AbsenceSearchForm,
@@ -15,23 +15,23 @@ urlpatterns = [
         ),
         name="awt_absence_list",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/$",
+    path(
+        "<int:pk>/",
         generic.DetailView.as_view(model=Absence),
         name="awt_absence_detail",
     ),
-    re_path(
-        r"^create/$",
+    path(
+        "create/",
         generic.CreateView.as_view(model=Absence, form_class=AbsenceForm),
         name="awt_absence_create",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/update/$",
+    path(
+        "<int:pk>/update/",
         generic.UpdateView.as_view(model=Absence, form_class=AbsenceForm),
         name="awt_absence_update",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/delete/$",
+    path(
+        "<int:pk>/delete/",
         generic.DeleteView.as_view(
             model=Absence, template_name="modal_confirm_delete.html"
         ),

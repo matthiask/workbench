@@ -1,4 +1,4 @@
-from django.urls import path, re_path
+from django.urls import path
 
 from workbench import generic
 from workbench.accounts import views
@@ -8,13 +8,11 @@ from workbench.planning.views import team_planning, user_planning
 
 
 urlpatterns = [
-    re_path(r"^accounts/$", views.accounts, name="accounts"),
-    re_path(
-        r"^accounts/update/$", views.UserUpdateView.as_view(), name="accounts_update"
-    ),
-    re_path(r"^accounts/login/$", views.login, name="login"),
-    re_path(r"^accounts/oauth2/$", views.oauth2, name="accounts_oauth2"),
-    re_path(r"^accounts/logout/$", views.logout, name="logout"),
+    path("accounts/", views.accounts, name="accounts"),
+    path("accounts/update/", views.UserUpdateView.as_view(), name="accounts_update"),
+    path("accounts/login/", views.login, name="login"),
+    path("accounts/oauth2/", views.oauth2, name="accounts_oauth2"),
+    path("accounts/logout/", views.logout, name="logout"),
     #
     path(
         "users/",
@@ -47,23 +45,23 @@ urlpatterns = [
         name="accounts_user_statistics",
     ),
     # Teams
-    re_path(
-        r"^teams/$",
+    path(
+        "teams/",
         generic.ListView.as_view(model=Team, search_form_class=TeamSearchForm),
         name="accounts_team_list",
     ),
-    re_path(
-        r"^teams/(?P<pk>\d+)/$",
+    path(
+        "teams/<int:pk>/",
         generic.DetailView.as_view(model=Team),
         name="accounts_team_detail",
     ),
-    re_path(
-        r"^teams/create/$",
+    path(
+        "teams/create/",
         generic.CreateView.as_view(form_class=TeamForm, model=Team),
         name="accounts_team_create",
     ),
-    re_path(
-        r"^teams/(?P<pk>\d+)/update/$",
+    path(
+        "teams/<int:pk>/update/",
         generic.UpdateView.as_view(form_class=TeamForm, model=Team),
         name="accounts_team_update",
     ),
@@ -78,8 +76,8 @@ urlpatterns = [
         {"retro": True},
         name="accounts_team_retrospective",
     ),
-    re_path(
-        r"^teams/(?P<pk>\d+)/delete/$",
+    path(
+        "teams/<int:pk>/delete/",
         generic.DeleteView.as_view(model=Team),
         name="accounts_team_delete",
     ),

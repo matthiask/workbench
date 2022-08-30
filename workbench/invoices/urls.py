@@ -1,4 +1,4 @@
-from django.urls import re_path
+from django.urls import path
 
 from workbench import generic
 from workbench.accounts.features import bookkeeping_only, controlling_only
@@ -14,28 +14,28 @@ from workbench.invoices.models import Invoice, Service
 
 
 urlpatterns = [
-    re_path(
-        r"^$",
+    path(
+        "",
         controlling_only(
             generic.ListView.as_view(model=Invoice, search_form_class=InvoiceSearchForm)
         ),
         name="invoices_invoice_list",
     ),
-    re_path(
-        r"^autocomplete/$",
+    path(
+        "autocomplete/",
         generic.AutocompleteView.as_view(
             model=Invoice,
             queryset=Invoice.objects.select_related("project", "owned_by"),
         ),
         name="invoices_invoice_autocomplete",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/$",
+    path(
+        "<int:pk>/",
         controlling_only(generic.DetailView.as_view(model=Invoice)),
         name="invoices_invoice_detail",
     ),
-    re_path(
-        r"^create/$",
+    path(
+        "create/",
         controlling_only(
             generic.CreateView.as_view(
                 model=Invoice, form_class=CreatePersonInvoiceForm
@@ -43,15 +43,15 @@ urlpatterns = [
         ),
         name="invoices_invoice_create",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/update/$",
+    path(
+        "<int:pk>/update/",
         controlling_only(
             generic.UpdateView.as_view(form_class=InvoiceForm, model=Invoice)
         ),
         name="invoices_invoice_update",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/delete/$",
+    path(
+        "<int:pk>/delete/",
         controlling_only(
             generic.DeleteView.as_view(
                 model=Invoice, delete_form_class=InvoiceDeleteForm
@@ -59,19 +59,19 @@ urlpatterns = [
         ),
         name="invoices_invoice_delete",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/pdf/$",
+    path(
+        "<int:pk>/pdf/",
         controlling_only(views.InvoicePDFView.as_view()),
         name="invoices_invoice_pdf",
     ),
-    re_path(
-        r"^(?P<pk>\d+)/xlsx/$",
+    path(
+        "<int:pk>/xlsx/",
         controlling_only(views.InvoiceXLSXView.as_view()),
         name="invoices_invoice_xlsx",
     ),
     # Services
-    re_path(
-        r"^(?P<pk>\d+)/createservice/$",
+    path(
+        "<int:pk>/createservice/",
         controlling_only(
             generic.CreateRelatedView.as_view(
                 model=Service, form_class=ServiceForm, related_model=Invoice
@@ -79,18 +79,16 @@ urlpatterns = [
         ),
         name="invoices_invoice_createservice",
     ),
-    re_path(
-        r"^services/(?P<pk>[0-9]+)/update/$",
+    path(
+        "services/<int:pk>/update/",
         controlling_only(
             generic.UpdateView.as_view(model=Service, form_class=ServiceForm)
         ),
         name="invoices_service_update",
     ),
-    re_path(
-        r"^reminders/$", bookkeeping_only(views.reminders), name="invoices_reminders"
-    ),
-    re_path(
-        r"^dunning-letter/(?P<customer_id>[0-9]+)/$",
+    path("reminders/", bookkeeping_only(views.reminders), name="invoices_reminders"),
+    path(
+        "dunning-letter/<int:customer_id>/",
         bookkeeping_only(views.dunning_letter),
         name="invoices_dunning_letter",
     ),
