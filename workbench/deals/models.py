@@ -12,6 +12,7 @@ from workbench.contacts.models import Organization, Person
 from workbench.tools.formats import Z2, currency, local_date_format
 from workbench.tools.models import Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
+from workbench.tools.validation import in_days
 
 
 class NotArchivedQuerySet(models.QuerySet):
@@ -73,7 +74,16 @@ class ClosingType(models.Model):
 class DealQuerySet(SearchQuerySet):
     def maybe_actionable(self, *, user):
         return self.filter(
-            Q(status=Deal.OPEN), Q(owned_by=user) | Q(owned_by__is_active=False)
+            Q(status=Deal.OPEN),
+            Q(owned_by=user) | Q(owned_by__is_active=False),
+            Q(probability__gte=Deal.HIGH)
+            | (
+                Q(probability__lt=Deal.HIGH)
+                & (
+                    Q(decision_expected_on__isnull=True)
+                    | Q(decision_expected_on__gte=in_days(-90))
+                )
+            ),
         ).select_related("owned_by")
 
     def with_archived_valuestypes(self):
