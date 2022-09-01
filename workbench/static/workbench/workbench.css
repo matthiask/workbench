@@ -199,6 +199,10 @@ tbody th > a {
   color: rgba(0, 0, 0, 0.3) !important;
 }
 
+.text-break {
+  overflow-wrap: break-word;
+}
+
 .anchor-container {
   position: relative;
 }

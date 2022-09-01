@@ -2,6 +2,7 @@ from django import forms
 from django.contrib import messages
 from django.db.models import Q
 from django.forms.models import inlineformset_factory
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -9,7 +10,7 @@ from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
-from workbench.tools.formats import local_date_format
+from workbench.tools.formats import currency, local_date_format
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
 from workbench.tools.models import ProtectedError, SlowCollector
 
@@ -131,12 +132,31 @@ class OfferForm(PostalAddressSelectionForm):
             label=_("services"),
             widget=forms.CheckboxSelectMultiple,
             required=False,
-            initial=(
-                self.instance.services.values_list("pk", flat=True)
-                if self.instance.pk
-                else self.service_candidates.values_list("pk", flat=True)
-            ),
         )
+        self.fields["services"].choices = [
+            (
+                format_html(
+                    "<u>{}</u><br>"
+                    '<div class="form-check">'
+                    '<input type="checkbox" data-toggle-following>'
+                    "{}"
+                    "</div>",
+                    _("Not offered yet"),
+                    _("Select all"),
+                ),
+                [
+                    (
+                        service.id,
+                        format_html(
+                            '<div class="mb-2 text-break"><strong>{}</strong><br>{}</div>',
+                            service.title,
+                            currency(service.service_cost),
+                        ),
+                    )
+                    for service in self.service_candidates
+                ],
+            ),
+        ]
 
         self.order_fields(
             field

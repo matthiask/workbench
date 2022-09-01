@@ -440,7 +440,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                         (
                             row["service"].id,
                             format_html(
-                                '<div class="mb-2"><strong>{}</strong>'
+                                '<div class="mb-2 text-break"><strong>{}</strong>'
                                 "<br>{}{}</div>",
                                 row["service"].title,
                                 format_html("{}<br>", row["service"].description)
