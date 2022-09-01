@@ -132,6 +132,11 @@ class OfferForm(PostalAddressSelectionForm):
             label=_("services"),
             widget=forms.CheckboxSelectMultiple,
             required=False,
+            initial=(
+                self.instance.services.values_list("pk", flat=True)
+                if self.instance.pk
+                else []
+            ),
         )
         self.fields["services"].choices = [
             (

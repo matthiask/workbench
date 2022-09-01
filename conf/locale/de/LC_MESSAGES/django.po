@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-10 14:58+0200\n"
+"POT-Creation-Date: 2022-09-01 10:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -127,6 +127,10 @@ msgstr "Nutzer*innen nerven wenn sie ihre Stunden spät eintragen."
 msgid "planning"
 msgstr "Planung"
 
+#: workbench/accounts/features.py
+msgid "pride"
+msgstr "Pride"
+
 #: workbench/accounts/features.py workbench/invoices/models.py
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_projected_invoices_form.html
@@ -177,6 +181,7 @@ msgid "email"
 msgstr "Email"
 
 #: workbench/accounts/models.py workbench/credit_control/models.py
+#: workbench/management/commands/profitability.py
 msgid "is active"
 msgstr "ist aktiv"
 
@@ -1717,12 +1722,13 @@ msgstr "Die Stundenerfassung ist während wenigen Tagen immer noch möglich. Das
 msgid "%s logged but no hourly rate defined."
 msgstr "%s erfasst aber kein Stundensatz definiert."
 
-#: workbench/invoices/forms.py workbench/projects/models.py
-#: workbench/projects/views.py workbench/templates/projects/project_detail.html
+#: workbench/invoices/forms.py workbench/offers/forms.py
+#: workbench/projects/models.py workbench/projects/views.py
+#: workbench/templates/projects/project_detail.html
 msgid "Not offered yet"
 msgstr "Noch nicht offeriert"
 
-#: workbench/invoices/forms.py
+#: workbench/invoices/forms.py workbench/offers/forms.py
 msgid "Select all"
 msgstr "Alles auswählen"
 
@@ -1790,6 +1796,7 @@ msgstr "Leistungen"
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/offers/offer_form.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_projected_invoices_form.html
@@ -2346,6 +2353,10 @@ msgstr "Offertleistungen löschen?"
 #: workbench/offers/forms.py
 msgid "Delete planned work linked to offer?"
 msgstr "Verbundene geplante Arbeit löschen?"
+
+#: workbench/offers/models.py
+msgid "Service group"
+msgstr "Leistungsgruppe"
 
 #: workbench/offers/models.py
 #: workbench/templates/contacts/organization_detail.html
@@ -3518,7 +3529,6 @@ msgid "offers PDF"
 msgstr "Offerten-PDF"
 
 #: workbench/templates/projects/project_detail.html
-#: workbench/templates/start.html
 msgid "Show"
 msgstr "Anzeigen"
 

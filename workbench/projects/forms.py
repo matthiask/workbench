@@ -413,13 +413,13 @@ class ServiceForm(ModelForm):
 
         super().__init__(*args, **kwargs)
 
-        self.fields["offer"].choices = self.project.offers.in_preparation_choices(
+        self.fields["offer"].choices = self.project.offers.service_form_choices(
             include=getattr(self.instance, "offer_id", None)
         )
         self.instance.project = self.project
 
         offer = self.instance.offer
-        if offer and offer.status > offer.IN_PREPARATION:
+        if offer and offer.status > offer.SERVICE_GROUP:
             for field in self.fields:
                 if field not in {"role", "allow_logging"}:
                     self.fields[field].disabled = True

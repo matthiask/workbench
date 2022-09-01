@@ -20,12 +20,29 @@ from workbench.tools.validation import raise_if_errors
 
 
 class OfferQuerySet(SearchQuerySet):
-    def in_preparation_choices(self, *, include=None):
-        offers = {True: [], False: []}
-        for offer in self.filter(Q(status=Offer.IN_PREPARATION) | Q(pk=include)):
-            offers[offer.id == include].append((offer.pk, offer))
+    def service_form_choices(self, *, include=None):
+        offers = {
+            True: [],
+            Offer.IN_PREPARATION: [],
+            Offer.SERVICE_GROUP: [],
+        }
+        for offer in self.filter(Q(status__lte=Offer.SERVICE_GROUP) | Q(pk=include)):
+            offers[True if offer.id == include else offer.status].append(
+                (offer.pk, offer)
+            )
         return (
-            [("", "----------")] + offers[True] + [(_("In preparation"), offers[False])]
+            [("", "----------")]
+            + offers[True]
+            + (
+                [(_("In preparation"), offers[Offer.IN_PREPARATION])]
+                if offers[Offer.IN_PREPARATION]
+                else []
+            )
+            + (
+                [(_("Service group"), offers[Offer.SERVICE_GROUP])]
+                if offers[Offer.SERVICE_GROUP]
+                else []
+            )
         )
 
     def not_declined_choices(self, *, include=None):
@@ -42,7 +59,7 @@ class OfferQuerySet(SearchQuerySet):
 
     def maybe_actionable(self, *, user):
         return self.filter(
-            Q(status__lt=Offer.ACCEPTED),
+            Q(status__lt=Offer.SERVICE_GROUP),
             Q(owned_by=user) | Q(owned_by__is_active=False),
         ).select_related("project", "owned_by")
 
@@ -57,12 +74,14 @@ class OfferQuerySet(SearchQuerySet):
 @total_ordering
 class Offer(ModelWithTotal):
     IN_PREPARATION = 10
+    SERVICE_GROUP = 15
     OFFERED = 20
     ACCEPTED = 30
     DECLINED = 40
 
     STATUS_CHOICES = (
         (IN_PREPARATION, _("In preparation")),
+        (SERVICE_GROUP, _("Service group")),
         (OFFERED, _("Offered")),
         (ACCEPTED, _("Accepted")),
         (DECLINED, _("Declined")),
@@ -254,6 +273,7 @@ class Offer(ModelWithTotal):
         else:
             css = {
                 self.IN_PREPARATION: "info",
+                self.SERVICE_GROUP: "default",
                 self.OFFERED: "success",
                 self.ACCEPTED: "default",
                 self.DECLINED: "danger",
