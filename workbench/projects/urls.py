@@ -32,6 +32,7 @@ from workbench.projects.models import Campaign, Project, Service
 from workbench.projects.views import (
     OffersRenumberView,
     assign_service_type,
+    cost_by_month_and_service_xlsx,
     projects,
     select,
     services,
@@ -134,6 +135,11 @@ urlpatterns = [
         "<int:pk>/statistics/",
         generic.DetailView.as_view(model=Project, template_name_suffix="_statistics"),
         name="projects_project_statistics",
+    ),
+    path(
+        "<int:pk>/cost-by-month-and-service-xlsx/",
+        cost_by_month_and_service_xlsx,
+        name="projects_project_cost_by_month_and_service_xlsx",
     ),
     path(
         "<int:pk>/planning/",

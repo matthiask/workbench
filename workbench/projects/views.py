@@ -1,13 +1,18 @@
+from collections import defaultdict
+
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
+from xlsxdocument import XLSXDocument
 
 from workbench import generic
+from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.forms import OffersRenumberForm, ProjectAutocompleteForm
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 from workbench.templatetags.workbench import h
+from workbench.tools.formats import Z2, local_date_format
 
 
 def select(request):
@@ -101,3 +106,87 @@ def projects(request):
             ],
         }
     )
+
+
+def cost_by_month_and_service_xlsx(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+    project_costs = defaultdict(lambda: Z2)
+    service_costs = defaultdict(lambda: defaultdict(lambda: Z2))
+    offer_costs = defaultdict(lambda: defaultdict(lambda: Z2))
+    offers = defaultdict(set)
+    months = set()
+
+    for hours in LoggedHours.objects.filter(service__project=project).select_related(
+        "service__offer"
+    ):
+        month = hours.rendered_on.replace(day=1)
+        months.add(month)
+
+        c = (hours.service.effort_rate or 0) * hours.hours
+        project_costs[month] += c
+        service_costs[hours.service][month] += c
+        offer_costs[hours.service.offer][month] += c
+        offers[hours.service.offer].add(hours.service)
+
+    for cost in LoggedCost.objects.filter(service__project=project).select_related(
+        "service__offer"
+    ):
+        month = cost.rendered_on.replace(day=1)
+        months.add(month)
+
+        project_costs[month] += cost.cost
+        service_costs[cost.service][month] += cost.cost
+        offer_costs[cost.service.offer][month] += cost.cost
+        offers[cost.service.offer].add(cost.service)
+
+    months = sorted(months)
+
+    rows = []
+    rows.append(
+        [
+            _("Cost by month and service"),
+        ]
+    )
+    rows.append(
+        ["", _("cost"), "", _("cost")]
+        + [local_date_format(month, fmt="F Y") for month in months]
+    )
+    rows.append([_("project")])
+    rows.append(
+        [
+            project,
+            sum(project_costs.values()),
+            "",
+            "",
+        ]
+        + [project_costs.get(month) for month in months]
+    )
+    rows.append([])
+    rows.append([_("offer or service group"), "", _("service"), ""] + [])
+
+    for offer, services in sorted(offers.items()):
+        rows.append(
+            [
+                offer,
+                sum(offer_costs[offer].values()),
+                "",
+                "",
+            ]
+            + [offer_costs[offer].get(month) for month in months]
+        )
+        for service in sorted(services):
+            rows.append(
+                [
+                    "",
+                    "",
+                    service,
+                    sum(service_costs[service].values()),
+                ]
+                + [service_costs[service].get(month) for month in months]
+            )
+        rows.append([])
+
+    xlsx = XLSXDocument()
+    xlsx.add_sheet(_("Statistics"))
+    xlsx.table(None, rows)
+    return xlsx.to_response(f"project-{project.id}.xlsx")

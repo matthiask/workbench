@@ -1,3 +1,5 @@
+from functools import total_ordering
+
 from colorfield.fields import ColorField
 from django.db import models
 from django.db.models import Max
@@ -25,6 +27,7 @@ class ServiceType(Model):
         return self.title
 
 
+@total_ordering
 class ServiceBase(Model):
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
 
@@ -58,6 +61,9 @@ class ServiceBase(Model):
         return Truncator(": ".join(filter(None, (self.title, self.description)))).chars(
             100
         )
+
+    def __lt__(self, other):
+        return self.position < other.position if isinstance(other, ServiceBase) else 1
 
     def project_service_title(self):
         title = "{}: {}{}{}".format(
