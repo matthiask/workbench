@@ -97,7 +97,6 @@
             </th>
             <th class="text-right">{% translate 'FTE' %}</th>
             <th class="text-right">{% translate 'Margin / FTE' %}</th>
-            <th class="text-right" style="max-width:15ch">{% translate 'Accepted offers' %}</th>
           </tr>
         </thead>
         <tbody>
@@ -119,7 +118,6 @@
             <th class="text-right">
               {{ gross_margin_projection.margin_per_fte|currency }}
             </th>
-            <th class="text-right"></th>
           </tr>
           {% for year in gross_margin_by_years reversed %}
             <tr>
@@ -146,9 +144,6 @@
               </th>
               <th class="text-right">
                 {{ year.margin_per_fte|currency }}
-              </th>
-              <th class="text-right" title="{{ year.offers_hourly_rate.gross_margin|currency }} / {{ year.offers_hourly_rate.hours|hours }}">
-                {{ year.offers_hourly_rate.hourly_rate|currency }}/h
               </th>
             </tr>
             {% for month in year.months reversed %}
@@ -189,9 +184,6 @@
                 </td>
                 <td class="text-right">
                   {{ month.margin_per_fte|currency }}
-                </td>
-                <td class="text-right" title="{{ month.offers_hourly_rate.gross_margin|currency }} / {{ month.offers_hourly_rate.hours|hours }}">
-                  {{ month.offers_hourly_rate.hourly_rate|currency }}/h
                 </td>
               </tr>
             {% endfor %}
