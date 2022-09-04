@@ -158,6 +158,9 @@ class Command(BaseCommand):
 
         gh = dict(green_hours(date_range, users=users.keys()))
 
+        all_users_margin = sum(row["margin"] for row in users.values())
+        all_users_hours_in_range = sum(row["hours_in_range"] for row in users.values())
+
         users_table = [
             [
                 "User",
@@ -181,10 +184,9 @@ class Command(BaseCommand):
             [
                 "Total",
                 sum(current_percentage.values()),
-                sum(row["margin"] for row in users.values()),
-                sum(row["hours_in_range"] for row in users.values()),
-                sum(row["margin"] for row in users.values())
-                / sum(row["hours_in_range"] for row in users.values()),
+                all_users_margin,
+                all_users_hours_in_range,
+                all_users_margin / all_users_hours_in_range,
                 "",
                 gh[0]["green"],
                 gh[0]["red"],
@@ -195,12 +197,9 @@ class Command(BaseCommand):
                 "",
                 100 - 100 * gh[0]["internal"] / gh[0]["total"],
                 "",
-                sum(row["margin"] for row in users.values())
-                / sum(row["hours_in_range"] for row in users.values())
-                / gh[0]["percentage"]
-                * 100,
-                sum(row["margin"] for row in users.values())
-                / sum(row["hours_in_range"] for row in users.values())
+                all_users_margin / all_users_hours_in_range / gh[0]["percentage"] * 100,
+                all_users_margin
+                / all_users_hours_in_range
                 / (1 - gh[0]["internal"] / gh[0]["total"]),
             ],
             [],
