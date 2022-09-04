@@ -208,7 +208,7 @@ class Command(BaseCommand):
             (
                 [
                     user,
-                    current_percentage.get(user.id),
+                    current_percentage.get(user.id, 0),
                     row["margin"],
                     row["hours_in_range"],
                     row["margin"] / row["hours_in_range"],
