@@ -165,6 +165,23 @@ class Command(BaseCommand):
                 "",
                 "Prozent Kundenjobs",
             ],
+            [
+                "Total",
+                sum(row["margin"] for row in users.values()),
+                sum(row["hours_in_range"] for row in users.values()),
+                sum(row["margin"] for row in users.values())
+                / sum(row["hours_in_range"] for row in users.values()),
+                "",
+                gh[0]["green"],
+                gh[0]["red"],
+                gh[0]["maintenance"],
+                gh[0]["internal"],
+                gh[0]["total"],
+                gh[0]["percentage"],
+                "",
+                100 - 100 * gh[0]["internal"] / gh[0]["total"],
+            ],
+            [],
         ] + sorted(
             (
                 [
