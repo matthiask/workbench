@@ -138,7 +138,11 @@ class Command(BaseCommand):
                 "",
             ]
             + list(chain.from_iterable(("Stunden", "Umsatz") for _u in all_users)),
-        ] + [project_row(row, all_users, users=users) for row in projects.values()]
+        ] + sorted(
+            (project_row(row, all_users, users=users) for row in projects.values()),
+            key=lambda row: row[4],
+            reverse=True,
+        )
 
         gh = dict(green_hours(date_range, users=users.keys()))
 
