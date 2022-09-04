@@ -197,6 +197,7 @@ def key_data_view(request):
                 "third_party_costs": Z2,
                 "accruals": Z2,
                 "gross_margin": Z2,
+                "projected_invoices": Z2,
                 "fte": [],
                 "margin_per_fte": [],
                 "months": [],
@@ -207,6 +208,7 @@ def key_data_view(request):
         year["third_party_costs"] += month["third_party_costs"]
         year["accruals"] += month["accruals"]["delta"]
         year["gross_margin"] += month["gross_margin"]
+        year["projected_invoices"] += month["projected_invoices"] or Z2
         year["fte"].append(month["fte"])
 
         year["offers_hourly_rate"] = ohr["by_year"][year["year"]]
@@ -225,8 +227,11 @@ def key_data_view(request):
     gross_margin_projection = {
         "gross_profit": gm["gross_profit"] * gmp_factor,
         "gross_margin": gm["gross_margin"] * gmp_factor,
-        "margin_per_fte": gm["margin_per_fte"] * gmp_factor
-        if gm["margin_per_fte"]
+        "gross_margin_incl_projected_invoices": gm["gross_margin"] * gmp_factor
+        + gm["projected_invoices"],
+        "margin_per_fte": (gm["gross_margin"] * gmp_factor + gm["projected_invoices"])
+        / gm["fte"]
+        if gm["fte"]
         else None,
     }
 

@@ -112,7 +112,9 @@
             <th class="text-right">
               {{ gross_margin_projection.gross_margin|currency }}
             </th>
-            <th class="text-right"></th>
+            <th class="text-right">
+              {{ gross_margin_projection.gross_margin_incl_projected_invoices|currency }}
+            </th>
             <th class="text-right"></th>
             <th class="text-right">
               {{ gross_margin_projection.margin_per_fte|currency }}
@@ -137,6 +139,7 @@
                 {{ year.gross_margin|currency }}
               </th>
               <th class="text-right">
+                {{ year.projected_invoices|currency }}
               </th>
               <th class="text-right">
                 {{ year.fte|stringformat:'.1f' }}
