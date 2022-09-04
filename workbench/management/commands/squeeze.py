@@ -1,7 +1,9 @@
 import datetime as dt
+import io
 from collections import defaultdict
 from itertools import chain
 
+from django.core.mail import EmailMultiAlternatives
 from django.core.management import BaseCommand
 from django.db.models import Sum
 from django.utils.translation import activate
@@ -23,6 +25,10 @@ class Command(BaseCommand):
             type=int,
             default=dt.date.today().year,
             help="The year (default: %(default)s)",
+        )
+        parser.add_argument(
+            "--mailto",
+            type=str,
         )
 
     def handle(self, **options):
@@ -190,7 +196,26 @@ class Command(BaseCommand):
         xlsx.table(None, header + users_table)
         xlsx.add_sheet("Projekte")
         xlsx.table(None, header + projects_table)
-        xlsx.workbook.save(f"squeeze-{options['year']}.xlsx")
+
+        filename = f"squeeze-{options['year']}.xlsx"
+
+        if options["mailto"]:
+            mail = EmailMultiAlternatives(
+                "Squeeze",
+                str(date_range),
+                to=[options["mailto"]],
+            )
+            with io.BytesIO() as f:
+                xlsx.workbook.save(f)
+                f.seek(0)
+                mail.attach(
+                    filename,
+                    f.getvalue(),
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                )
+            mail.send()
+        else:
+            xlsx.workbook.save(filename)
 
 
 def project_row(row, all_users, *, users):
