@@ -113,11 +113,8 @@ class Command(BaseCommand):
 
         all_users = sorted(users.keys())
 
-        header = [
-            [
-                f"Squeeze {local_date_format(date_range[0])} - {local_date_format(date_range[1])}"
-            ]
-        ]
+        body = f"Squeeze {local_date_format(date_range[0])} - {local_date_format(date_range[1])}"
+        header = [[body]]
 
         projects_table = [
             [
@@ -202,7 +199,7 @@ class Command(BaseCommand):
         if options["mailto"]:
             mail = EmailMultiAlternatives(
                 "Squeeze",
-                str(date_range),
+                body,
                 to=options["mailto"].split(","),
             )
             with io.BytesIO() as f:
