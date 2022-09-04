@@ -203,7 +203,7 @@ class Command(BaseCommand):
             mail = EmailMultiAlternatives(
                 "Squeeze",
                 str(date_range),
-                to=[options["mailto"]],
+                to=options["mailto"].split(","),
             )
             with io.BytesIO() as f:
                 xlsx.workbook.save(f)
