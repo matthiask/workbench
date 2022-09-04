@@ -148,11 +148,15 @@ class Command(BaseCommand):
                 "Massgeblicher Umsatz",
                 "Massgebliche Stunden",
                 "Ansatz",
+                "",
                 "Grüne Stunden",
                 "Rote Stunden",
                 "Wartung",
                 "Intern",
-                "Prozent",
+                "Total",
+                "Prozent grün",
+                "",
+                "Prozent Kundenjobs",
             ],
         ] + sorted(
             (
@@ -161,11 +165,15 @@ class Command(BaseCommand):
                     row["margin"],
                     row["hours_in_range"],
                     row["margin"] / row["hours_in_range"],
+                    "",
                     gh[user]["green"],
                     gh[user]["red"],
                     gh[user]["maintenance"],
                     gh[user]["internal"],
+                    gh[user]["total"],
                     gh[user]["percentage"],
+                    "",
+                    100 - 100 * gh[user]["internal"] / gh[user]["total"],
                 ]
                 for user, row in users.items()
             ),
