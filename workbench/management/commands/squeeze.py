@@ -174,6 +174,9 @@ class Command(BaseCommand):
                 "Prozent grün",
                 "",
                 "Prozent Kundenjobs",
+                "",
+                "Verrechnet pro grüne Stunde",
+                "Verrechnet pro Kundenstunde",
             ],
             [
                 "Total",
@@ -191,6 +194,14 @@ class Command(BaseCommand):
                 gh[0]["percentage"],
                 "",
                 100 - 100 * gh[0]["internal"] / gh[0]["total"],
+                "",
+                sum(row["margin"] for row in users.values())
+                / sum(row["hours_in_range"] for row in users.values())
+                / gh[0]["percentage"]
+                * 100,
+                sum(row["margin"] for row in users.values())
+                / sum(row["hours_in_range"] for row in users.values())
+                / (1 - gh[0]["internal"] / gh[0]["total"]),
             ],
             [],
         ] + sorted(
@@ -210,6 +221,15 @@ class Command(BaseCommand):
                     gh[user]["percentage"],
                     "",
                     100 - 100 * gh[user]["internal"] / gh[user]["total"],
+                    "",
+                    row["margin"] / row["hours_in_range"] / gh[user]["percentage"] * 100
+                    if gh[user]["percentage"]
+                    else "",
+                    row["margin"]
+                    / row["hours_in_range"]
+                    / (1 - gh[user]["internal"] / gh[user]["total"])
+                    if gh[user]["percentage"]
+                    else "",
                 ]
                 for user, row in users.items()
             ),
