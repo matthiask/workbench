@@ -9,6 +9,7 @@ from django.db.models import Sum
 from django.utils.translation import activate
 
 from workbench.accounts.models import User
+from workbench.awt.models import Employment
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
@@ -113,6 +114,14 @@ class Command(BaseCommand):
 
         all_users = sorted(users.keys())
 
+        current_percentage = {
+            e.user_id: e.percentage
+            for e in Employment.objects.filter(
+                user__in=all_users,
+                date_until__gte=date_range[1],
+            ).order_by("-date_until")
+        }
+
         body = f"Squeeze {local_date_format(date_range[0])} - {local_date_format(date_range[1])}"
         header = [[body]]
 
@@ -152,6 +161,7 @@ class Command(BaseCommand):
         users_table = [
             [
                 "User",
+                "Stellenprozent",
                 "Massgeblicher Umsatz",
                 "Massgebliche Stunden",
                 "Ansatz",
@@ -167,6 +177,7 @@ class Command(BaseCommand):
             ],
             [
                 "Total",
+                sum(current_percentage.values()),
                 sum(row["margin"] for row in users.values()),
                 sum(row["hours_in_range"] for row in users.values()),
                 sum(row["margin"] for row in users.values())
@@ -186,6 +197,7 @@ class Command(BaseCommand):
             (
                 [
                     user,
+                    current_percentage.get(user.id),
                     row["margin"],
                     row["hours_in_range"],
                     row["margin"] / row["hours_in_range"],
@@ -201,7 +213,7 @@ class Command(BaseCommand):
                 ]
                 for user, row in users.items()
             ),
-            key=lambda row: row[3],
+            key=lambda row: row[4],
             reverse=True,
         )
 
