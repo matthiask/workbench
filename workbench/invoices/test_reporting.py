@@ -15,7 +15,7 @@ class ReportingTest(TestCase):
             status=factories.Invoice.SENT,
             third_party_costs=5,  # key data branch
         )
-        for i in range(5):
+        for _i in range(5):
             factories.InvoiceFactory.create(
                 customer=invoice.customer,
                 contact=invoice.contact,

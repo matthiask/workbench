@@ -64,7 +64,7 @@ class CreditEntriesTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
         ledger = factories.LedgerFactory.create()
 
-        def send(data={}):
+        def send(data=None):
             with open(
                 os.path.join(
                     settings.BASE_DIR, "workbench", "test", "account-statement.csv"
@@ -72,7 +72,7 @@ class CreditEntriesTest(TestCase):
             ) as f:
                 return self.client.post(
                     "/credit-control/upload/",
-                    {"statement": f, "ledger": ledger.pk, **data},
+                    {"statement": f, "ledger": ledger.pk, **(data or {})},
                 )
 
         response = send({"ledger": -1})

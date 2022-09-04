@@ -33,8 +33,11 @@ def local_date_format_filter(dttm, fmt=None):
     return local_date_format(dttm, fmt=fmt)
 
 
+_ndash = mark_safe("&ndash;")
+
+
 @register.simple_tag
-def link_or_none(object, pretty=None, none=mark_safe("&ndash;"), with_badge=False):
+def link_or_none(object, pretty=None, none=_ndash, with_badge=False):
     if object == 0:
         return object
     elif not object:

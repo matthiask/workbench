@@ -82,7 +82,7 @@ class Planning:
                     self._by_week_provisional[week] += per_week
 
             hours_per_week = list()
-            for idx, week in enumerate(self.weeks):
+            for week in self.weeks:
                 if week in pw.weeks:
                     hours_per_week.append(per_week)
                 else:

@@ -544,7 +544,7 @@ class InvoicesTest(TestCase):
         """Creating a PDF with too many invoices fails"""
         invoice = factories.InvoiceFactory.create()
 
-        for i in range(5):
+        for _i in range(5):
             factories.InvoiceFactory.create(
                 customer=invoice.customer,
                 contact=invoice.contact,

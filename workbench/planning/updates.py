@@ -288,8 +288,8 @@ def changes(*, since):
             if user.id:
                 changes[user][project]["objects"].extend(milestones[project])
 
-    for user, user_changes in changes.items():
-        for project, project_changes in user_changes.items():
+    for user_changes in changes.values():
+        for project_changes in user_changes.values():
             project_changes["by"] = sorted(
                 reduce(
                     operator.or_,
