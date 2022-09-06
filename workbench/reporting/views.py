@@ -418,8 +418,22 @@ class DateRangeAndTeamFilterForm(DateRangeFilterForm):
         return queryset
 
 
+@filter_form(DateRangeFilterForm)
+def date_range_filter_view(request, form, *, template_name, stats_fn):
+    return render(
+        request,
+        template_name,
+        {
+            "form": form,
+            "stats": stats_fn(
+                [form.cleaned_data["date_from"], form.cleaned_data["date_until"]]
+            ),
+        },
+    )
+
+
 @filter_form(DateRangeAndTeamFilterForm)
-def hours_filter_view(request, form, *, template_name, stats_fn):
+def date_range_and_users_filter_view(request, form, *, template_name, stats_fn):
     return render(
         request,
         template_name,

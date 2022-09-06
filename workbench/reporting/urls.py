@@ -15,7 +15,8 @@ from workbench.projects.reporting import hours_per_customer
 from workbench.reporting.green_hours import green_hours
 from workbench.reporting.views import (
     birthdays_view,
-    hours_filter_view,
+    date_range_and_users_filter_view,
+    date_range_filter_view,
     key_data_gross_profit,
     key_data_projected_invoices,
     key_data_third_party_costs,
@@ -57,7 +58,7 @@ urlpatterns = [
     ),
     path(
         "hours-per-customer/",
-        hours_filter_view,
+        date_range_and_users_filter_view,
         {
             "template_name": "reporting/hours_per_customer.html",
             "stats_fn": hours_per_customer,
@@ -66,7 +67,7 @@ urlpatterns = [
     ),
     path(
         "planning-vs-logbook/",
-        hours_filter_view,
+        date_range_and_users_filter_view,
         {
             "template_name": "reporting/planning_vs_logbook.html",
             "stats_fn": planning_vs_logbook,
@@ -75,7 +76,7 @@ urlpatterns = [
     ),
     path(
         "hours-by-circle/",
-        feature_required(FEATURES.GLASSFROG)(hours_filter_view),
+        feature_required(FEATURES.GLASSFROG)(date_range_and_users_filter_view),
         {
             "template_name": "reporting/hours_by_circle.html",
             "stats_fn": hours_by_circle,
@@ -84,7 +85,7 @@ urlpatterns = [
     ),
     path(
         "hours-per-work-category/",
-        feature_required(FEATURES.GLASSFROG)(hours_filter_view),
+        feature_required(FEATURES.GLASSFROG)(date_range_and_users_filter_view),
         {
             "template_name": "reporting/hours_per_work_category.html",
             "stats_fn": hours_per_work_category,
@@ -98,19 +99,19 @@ urlpatterns = [
     ),
     path(
         "green-hours/",
-        controlling_only(hours_filter_view),
+        controlling_only(date_range_and_users_filter_view),
         {"template_name": "reporting/green_hours.html", "stats_fn": green_hours},
         name="report_green_hours",
     ),
     path(
         "accepted-deals/",
-        deals_only(hours_filter_view),
+        deals_only(date_range_filter_view),
         {"template_name": "reporting/accepted_deals.html", "stats_fn": accepted_deals},
         name="report_accepted_deals",
     ),
     path(
         "accepted-deals/deals/",
-        deals_only(hours_filter_view),
+        deals_only(date_range_and_users_filter_view),
         {
             "template_name": "reporting/accepted_deals_for_user.html",
             "stats_fn": accepted_deals,
@@ -118,13 +119,13 @@ urlpatterns = [
     ),
     path(
         "declined-deals/",
-        deals_only(hours_filter_view),
+        deals_only(date_range_filter_view),
         {"template_name": "reporting/declined_deals.html", "stats_fn": declined_deals},
         name="report_declined_deals",
     ),
     path(
         "deal-history/",
-        deals_only(hours_filter_view),
+        deals_only(date_range_and_users_filter_view),
         {"template_name": "reporting/deal_history.html", "stats_fn": deal_history},
         name="report_deal_history",
     ),
