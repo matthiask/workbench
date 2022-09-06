@@ -6,7 +6,7 @@ from django.test import TestCase
 from workbench import factories
 from workbench.invoices.models import Invoice
 from workbench.projects.models import Project
-from workbench.projects.reporting import hours_per_customer, overdrawn_projects
+from workbench.projects.reporting import hours_per_customer
 from workbench.reporting import green_hours, project_budget_statistics
 from workbench.reporting.models import Accruals
 from workbench.tools.formats import Z1, Z2
@@ -15,40 +15,9 @@ from workbench.tools.validation import in_days
 
 
 class StatisticsTest(TestCase):
-    def test_overdrawn_projects(self):
-        """Overdrawn projects are overdrawn"""
-        service1 = factories.ServiceFactory.create(effort_hours=2)
-        factories.ServiceFactory.create(effort_hours=4)
-
-        user = factories.UserFactory.create()
-
-        op = list(overdrawn_projects())
-        self.assertEqual(op, [])
-
-        factories.LoggedHoursFactory.create(
-            service=service1, created_by=user, rendered_by=user, hours=10
-        )
-
-        op = list(overdrawn_projects())
-        self.assertEqual(len(op), 1)
-        self.assertEqual(
-            op,
-            [
-                {
-                    "project": service1.project,
-                    "logged_hours": Decimal("10.0"),
-                    "service_hours": Decimal("2.0"),
-                    "delta": Decimal("8.0"),
-                }
-            ],
-        )
-
     def test_view(self):
         """Hit a few reporting views"""
         self.client.force_login(factories.UserFactory.create())
-
-        response = self.client.get("/report/overdrawn-projects/")
-        self.assertContains(response, "Overdrawn projects")
 
         response = self.client.get("/report/hours-per-customer/")
         self.assertContains(response, "Hours per customer")

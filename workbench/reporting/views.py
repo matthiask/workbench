@@ -22,7 +22,6 @@ from workbench.invoices.utils import next_valid_day
 from workbench.logbook.models import LoggedCost
 from workbench.logbook.reporting import logbook_stats
 from workbench.projects.models import Project
-from workbench.projects.reporting import overdrawn_projects
 from workbench.reporting import (
     green_hours,
     key_data,
@@ -34,14 +33,6 @@ from workbench.tools.formats import Z0, Z2, local_date_format
 from workbench.tools.forms import DateInput, Form
 from workbench.tools.validation import filter_form, in_days, monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
-
-
-def overdrawn_projects_view(request):
-    return render(
-        request,
-        "reporting/overdrawn_projects.html",
-        {"overdrawn_projects": overdrawn_projects()},
-    )
 
 
 class OpenItemsForm(Form):

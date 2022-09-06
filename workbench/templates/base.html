@@ -115,6 +115,12 @@
           <div class="dropdown-menu" aria-labelledby="reportsDropdown">
             {% if request.user.features.CONTROLLING %}
               <a class="dropdown-item" href="{% url 'report_key_data' %}">{% translate 'Key data' %}</a>
+              <a class="dropdown-item"
+                 href="{% url 'report_project_budget_statistics' %}">
+                {% translate 'Project budget statistics' %}
+              </a>
+              <div class="dropdown-divider">
+              </div>
             {% endif %}
             <div class="dropdown-divider"></div>
             <div class="dropdown-header">{% translate 'working time'|capfirst %}</div>
@@ -123,19 +129,7 @@
             {% if request.user.features.CONTROLLING %}
               <div class="dropdown-divider"></div>
               <div class="dropdown-header">
-                {% translate 'projects'|capfirst %}
-              </div>
-              <a class="dropdown-item"
-                 href="{% url 'report_project_budget_statistics' %}">
-                {% translate 'Project budget statistics' %}
-              </a>
-              <a class="dropdown-item" href="{% url 'report_overdrawn_projects' %}">
-                {% translate 'Overdrawn projects' %}
-              </a>
-              <div class="dropdown-divider">
-              </div>
-              <div class="dropdown-header">
-                {% translate 'logged hours'|capfirst %}
+                {% translate 'logbook'|capfirst %}
               </div>
               {% if request.user.features.GLASSFROG %}
                 <a class="dropdown-item" href="{% url 'report_hours_by_circle' %}">

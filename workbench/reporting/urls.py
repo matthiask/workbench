@@ -24,7 +24,6 @@ from workbench.reporting.views import (
     labor_costs_view,
     logging,
     open_items_list,
-    overdrawn_projects_view,
     project_budget_statistics_view,
     work_anniversaries_view,
 )
@@ -33,11 +32,6 @@ from workbench.reporting.views import (
 urlpatterns = [
     path("absence-calendar/", absence_calendar, name="awt_absence_calendar"),
     path("annual-working-time/", annual_working_time_view, name="awt_year_report"),
-    path(
-        "overdrawn-projects/",
-        controlling_only(overdrawn_projects_view),
-        name="report_overdrawn_projects",
-    ),
     path(
         "open-items-list/",
         controlling_only(open_items_list),
