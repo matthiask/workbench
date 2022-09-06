@@ -90,6 +90,9 @@
                  href="{% url 'credit_control_creditentry_list' %}">
                 {% translate 'credit entries'|capfirst %}
               </a>
+              <a class="dropdown-item" href="{% url 'report_open_items_list' %}">
+                {% translate 'Open items list' %}
+              </a>
             {% endif %}
             {% if request.user.features.BOOKKEEPING %}
               <a class="dropdown-item" href="{% url 'invoices_reminders' %}">{% translate 'Reminders' %}</a>
@@ -128,14 +131,6 @@
               </a>
               <a class="dropdown-item" href="{% url 'report_overdrawn_projects' %}">
                 {% translate 'Overdrawn projects' %}
-              </a>
-              <div class="dropdown-divider">
-              </div>
-              <div class="dropdown-header">
-                {% translate 'invoices'|capfirst %}
-              </div>
-              <a class="dropdown-item" href="{% url 'report_open_items_list' %}">
-                {% translate 'Open items list' %}
               </a>
               <div class="dropdown-divider">
               </div>
