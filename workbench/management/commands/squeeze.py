@@ -19,6 +19,41 @@ from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
+FIELDS = [
+    (
+        "Programmierung",
+        (1, 36, 58, 105, 149, 157, 158, 159, 169),
+    ),
+    (
+        "Grafik",
+        (85, 98, 100, 112, 142, 167, 172),
+    ),
+    (
+        "Intern & Auszubildende",
+        (140, 154, 170, 171),
+    ),
+    (
+        "Online Marketing",
+        (62, 88, 122, 146, 155, 165),
+    ),
+    (
+        "Politik und Campagning",
+        (114, 116, 126, 151, 156, 164, 166),
+    ),
+    (
+        "Web-Beratung und -Koordination",
+        (132, 150, 153, 162),
+    ),
+]
+
+IDS = list(chain.from_iterable(ids for name, ids in FIELDS))
+assert len(IDS) == len(set(IDS)), "Duplicate IDs"
+
+USER_FIELDS = {}
+for name, ids in FIELDS:
+    USER_FIELDS.update({id: name for id in ids})
+
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
@@ -164,6 +199,7 @@ class Command(BaseCommand):
         users_table = [
             [
                 "User",
+                "Fachbereich",
                 "Stellenprozent",
                 "Massgeblicher Umsatz",
                 "Massgebliche Stunden",
@@ -183,6 +219,7 @@ class Command(BaseCommand):
             ],
             [
                 "Total",
+                "",
                 sum(current_percentage.values()),
                 all_users_margin,
                 all_users_hours_in_range,
@@ -207,6 +244,7 @@ class Command(BaseCommand):
             (
                 [
                     user,
+                    USER_FIELDS.get(user.id, "<unbekannt>"),
                     current_percentage.get(user.id, 0),
                     row["margin"],
                     row["hours_in_range"],
@@ -232,13 +270,47 @@ class Command(BaseCommand):
                 ]
                 for user, row in users.items()
             ),
+            key=lambda row: row[5],
+            reverse=True,
+        )
+
+        fields = defaultdict(lambda: {"margin": Z2, "hours_in_range": Z1, "names": []})
+        for user, row in users.items():
+            field = USER_FIELDS.get(user.id, "<unbekannt>")
+            fields[field]["margin"] += row["margin"]
+            fields[field]["hours_in_range"] += row["hours_in_range"]
+            fields[field]["names"].append(str(user))
+
+        fields_table = [
+            [
+                "Fachbereich",
+                "Mitarbeitende",
+                "Massgeblicher Umsatz",
+                "Massgebliche Stunden",
+                "Ansatz",
+            ]
+        ] + sorted(
+            (
+                [
+                    name,
+                    ", ".join(sorted(row["names"])),
+                    row["margin"],
+                    row["hours_in_range"],
+                    row["margin"] / row["hours_in_range"]
+                    if row["hours_in_range"]
+                    else 0,
+                ]
+                for name, row in fields.items()
+            ),
             key=lambda row: row[4],
             reverse=True,
         )
 
         xlsx = WorkbenchXLSXDocument()
-        xlsx.add_sheet("Users")
+        xlsx.add_sheet("Mitarbeitende")
         xlsx.table(None, header + users_table)
+        xlsx.add_sheet("Fachbereiche")
+        xlsx.table(None, header + fields_table)
         xlsx.add_sheet("Projekte")
         xlsx.table(None, header + projects_table)
 
