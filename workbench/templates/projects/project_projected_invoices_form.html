@@ -1,7 +1,7 @@
 {% extends "generic/object_form.html" %}
 {% load bootstrap4 fineforms formset i18n workbench %}
 {% block title %}
-  {% translate 'projected invoices'|capfirst %} - {{ block.super }}
+  {% translate 'projected gross margin'|capfirst %} - {{ block.super }}
 {% endblock %}
 {% block uplink %}
   <a href="{{ object.get_absolute_url }}"
@@ -14,7 +14,7 @@
   <div class="row justify-content-center">
     <div class="col-lg-10">
       <h1>{{ object|h }}</h1>
-      <h2>{% translate 'Update projected invoices' %}</h2>
+      <h2>{% translate 'Update projected gross margin' %}</h2>
       <form method="POST" action="." class="form-horizontal">
         {% csrf_token %}
         {% include 'fineforms/warnings.html' %}

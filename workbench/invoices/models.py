@@ -714,8 +714,8 @@ class ProjectedInvoice(models.Model):
 
     class Meta:
         ordering = ["invoiced_on"]
-        verbose_name = _("projected invoice")
-        verbose_name_plural = _("projected invoices")
+        verbose_name = _("projected gross margin")
+        verbose_name_plural = _("projected gross margin")
 
     def __str__(self):
         return f"{local_date_format(self.invoiced_on)}: {currency(self.gross_margin)}"

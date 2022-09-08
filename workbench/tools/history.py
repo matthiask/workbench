@@ -322,7 +322,7 @@ def _invoices_recurringinvoice_cfg(user):
 def _invoices_projectedinvoice_cfg(user):
     if (
         not user.features[FEATURES.CONTROLLING]
-        or not user.features[FEATURES.PROJECTED_INVOICES]
+        or not user.features[FEATURES.PROJECTED_GROSS_MARGIN]
     ):
         raise Http404
     return {"fields": EVERYTHING}
@@ -420,7 +420,7 @@ def _projects_project_cfg(user):
     if user.features[FEATURES.PLANNING]:
         fields |= {"suppress_planning_update_mails"}
         related.append((PlannedWork, "project_id"))
-    if user.features[FEATURES.PROJECTED_INVOICES]:
+    if user.features[FEATURES.PROJECTED_GROSS_MARGIN]:
         related.append((ProjectedInvoice, "project_id"))
     return {"fields": fields, "related": related}
 

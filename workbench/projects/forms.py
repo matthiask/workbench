@@ -172,8 +172,8 @@ class ProjectSearchForm(Form):
                         _("Invalid customer/contact combination"),
                     ),
                     (
-                        "no-projected-invoices",
-                        _("No projected invoices"),
+                        "no-projected-gross-margin",
+                        _("No projected gross margin"),
                     ),
                 ],
             ),
@@ -226,8 +226,8 @@ class ProjectSearchForm(Form):
             queryset = queryset.old_projects()
         elif data.get("s") == "invalid-customer-contact-combination":
             queryset = queryset.invalid_customer_contact_combination()
-        elif data.get("s") == "no-projected-invoices":
-            queryset = queryset.no_projected_invoices()
+        elif data.get("s") == "no-projected-gross-margin":
+            queryset = queryset.no_projected_gross_margin()
         queryset = self.apply_renamed(queryset, "org", "customer")
         queryset = self.apply_simple(queryset, "type")
         queryset = self.apply_owned_by(queryset)

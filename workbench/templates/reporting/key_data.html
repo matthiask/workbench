@@ -57,7 +57,7 @@
           },
           {% endfor %}
           {
-            label: "{% translate 'projected invoices'|capfirst %}",
+            label: "{% translate 'projected gross margin'|capfirst %}",
             data: [{% for pi in projected_invoices %}{{ pi|stringformat:'d' }},{% endfor %}],
             backgroundColor: "rgba(100, 180, 180, 0.4)",
             borderColor: "rgba(100, 180, 180, 0.6)",

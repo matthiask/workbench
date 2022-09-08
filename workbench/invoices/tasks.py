@@ -52,7 +52,7 @@ def create_recurring_invoices_and_notify():
         mail.send()
 
 
-PROJECTED_INVOICES_TEMPLATE = """\
+PROJECTED_GROSS_MARGIN_TEMPLATE = """\
 {project}
 {base_url}{project_url}
 Delta: {unsent}
@@ -73,7 +73,7 @@ def send_unsent_projected_invoices_reminders():
 
     for user, projects in by_user.items():
         body = "\n\n".join(
-            PROJECTED_INVOICES_TEMPLATE.format(
+            PROJECTED_GROSS_MARGIN_TEMPLATE.format(
                 project=project["project"],
                 base_url=settings.WORKBENCH.URL,
                 project_url=project["project"].get_absolute_url(),

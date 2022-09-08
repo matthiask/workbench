@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-01 11:24+0200\n"
+"POT-Creation-Date: 2022-09-08 15:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -136,8 +136,8 @@ msgstr "Pride"
 #: workbench/templates/projects/project_projected_invoices_form.html
 #: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/key_data_projected_invoices.html
-msgid "projected invoices"
-msgstr "geplante Rechnungen"
+msgid "projected gross margin"
+msgstr "geplanter Umsatz"
 
 #: workbench/accounts/features.py workbench/awt/models.py workbench/awt/pdf.py
 #: workbench/templates/awt/year_detail.html
@@ -748,9 +748,7 @@ msgstr "Anrechenbare Abwesenheitsstunden"
 #: workbench/awt/pdf.py workbench/logbook/models.py
 #: workbench/templates/awt/year_detail.html workbench/templates/base.html
 #: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/projects/campaign_detail.html
-#: workbench/templates/reporting/overdrawn_projects.html
-#: workbench/timer/models.py
+#: workbench/templates/projects/campaign_detail.html workbench/timer/models.py
 msgid "logged hours"
 msgstr "Erfasste Stunden"
 
@@ -1381,7 +1379,6 @@ msgstr "hoch"
 #: workbench/templates/invoices/reminders.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/declined_deals.html
-#: workbench/templates/reporting/overdrawn_projects.html
 msgid "customer"
 msgstr "Kundschaft"
 
@@ -1803,7 +1800,6 @@ msgstr "Leistungen"
 #: workbench/templates/projects/project_projected_invoices_form.html
 #: workbench/templates/reporting/key_data_projected_invoices.html
 #: workbench/templates/reporting/labor_costs.html
-#: workbench/templates/reporting/overdrawn_projects.html
 #: workbench/templates/reporting/project_budget_statistics.html
 #: workbench/tools/xlsx.py
 msgid "project"
@@ -2014,10 +2010,6 @@ msgstr "Nächste Periode beginnt am %(start)s, Rechnung wird am %(create)s erste
 #: workbench/templates/reporting/key_data_projected_invoices.html
 msgid "gross margin"
 msgstr "Umsatz bereinigt"
-
-#: workbench/invoices/models.py
-msgid "projected invoice"
-msgstr "geplante Rechnung"
 
 #: workbench/invoices/tasks.py
 msgid "Unsent projected invoices"
@@ -2576,7 +2568,7 @@ msgstr "Projekte sind mit dieser Kampagne verbunden. Die Verbindung wird aufgel�
 msgid "No invoices"
 msgstr "Keine Rechnungen"
 
-#: workbench/projects/forms.py workbench/templates/reporting/key_data.html
+#: workbench/projects/forms.py
 msgid "Accepted offers"
 msgstr "Akzeptierte Offerten"
 
@@ -2597,8 +2589,8 @@ msgid "Invalid customer/contact combination"
 msgstr "Ungültige Kunde/Kontakt-Kombination"
 
 #: workbench/projects/forms.py
-msgid "No projected invoices"
-msgstr "Keine geplanten Rechnungen"
+msgid "No projected gross margin"
+msgstr "Kein geplanter Umsatz"
 
 #: workbench/projects/forms.py
 msgid "All types"
@@ -2805,7 +2797,6 @@ msgstr "Profitabel"
 
 #: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data.html
-#: workbench/templates/reporting/overdrawn_projects.html
 msgid "overdrawn"
 msgstr "Überzogen"
 
@@ -3064,6 +3055,11 @@ msgstr "Dashboard"
 msgid "bookkeeping"
 msgstr "Buchhaltung"
 
+#: workbench/templates/base.html
+#: workbench/templates/reporting/open_items_list.html
+msgid "Open items list"
+msgstr "Offene-Posten-Liste"
+
 #: workbench/templates/base.html workbench/templates/invoices/reminders.html
 msgid "Reminders"
 msgstr "Zahlungserinnerungen"
@@ -3080,16 +3076,6 @@ msgstr "Kennzahlen"
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "Project budget statistics"
 msgstr "Projekt-Budgetstatistik"
-
-#: workbench/templates/base.html
-#: workbench/templates/reporting/overdrawn_projects.html
-msgid "Overdrawn projects"
-msgstr "Überzogene Projekte"
-
-#: workbench/templates/base.html
-#: workbench/templates/reporting/open_items_list.html
-msgid "Open items list"
-msgstr "Offene-Posten-Liste"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/hours_by_circle.html
@@ -3442,7 +3428,6 @@ msgid "Toggle form"
 msgstr "Formular anzeigen"
 
 #: workbench/templates/offers/offer_pricing.html
-#: workbench/templates/reporting/overdrawn_projects.html
 msgid "effort hours"
 msgstr "Aufwände in Stunden"
 
@@ -3592,8 +3577,8 @@ msgid "Services from offer"
 msgstr "Leistungen aus Offerte"
 
 #: workbench/templates/projects/project_projected_invoices_form.html
-msgid "Update projected invoices"
-msgstr "Geplante Rechnungen bearbeiten"
+msgid "Update projected gross margin"
+msgstr "Geplanten Umsatz bearbeiten"
 
 #: workbench/templates/projects/project_statistics.html
 msgid "Logged hours per user"
@@ -4047,6 +4032,15 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "projected invoices"
+#~ msgstr "geplante Rechnungen"
+
+#~ msgid "projected invoice"
+#~ msgstr "geplante Rechnung"
+
+#~ msgid "Overdrawn projects"
+#~ msgstr "Überzogene Projekte"
 
 #~ msgid "offered"
 #~ msgstr "Offeriert"

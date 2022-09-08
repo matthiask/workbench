@@ -16,7 +16,7 @@ class ProjectedInvoicesTest(TestCase):
 
     @travel("2021-11-30")
     def test_projected_invoices(self):
-        """Functionality around projected invoices and reminder mails"""
+        """Functionality around projected gross margin and reminder mails"""
         obj = factories.ProjectedInvoiceFactory.create(gross_margin=Decimal(1000))
         pi = projected_invoices()
 

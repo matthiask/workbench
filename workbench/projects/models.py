@@ -171,7 +171,7 @@ class ProjectQuerySet(SearchQuerySet):
     def invalid_customer_contact_combination(self):
         return self.exclude(customer=F("contact__organization"))
 
-    def no_projected_invoices(self):
+    def no_projected_gross_margin(self):
         from workbench.invoices.models import ProjectedInvoice
 
         return self.filter(

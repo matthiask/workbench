@@ -115,9 +115,9 @@
                     <th class="text-right">{% translate 'total excl. tax'|capfirst %}</th>
                     <td>{{ project.project_invoices_total_excl_tax|currency }}</td>
                   </tr>
-                  {% if request.user.features.PROJECTED_INVOICES %}
+                  {% if request.user.features.PROJECTED_GROSS_MARGIN %}
                     <tr>
-                      <th class="text-right">{% translate 'projected invoices'|capfirst %}</th>
+                      <th class="text-right">{% translate 'projected gross margin'|capfirst %}</th>
                       <td>
                         {% for pi in project.projected_invoices.all %}
                           {{ pi.invoiced_on|local_date_format }}: {{ pi.gross_margin|currency }}
@@ -150,9 +150,9 @@
             {% translate 'planning'|capfirst %}
           </a>
         {% endif %}
-        {% if request.user.features.PROJECTED_INVOICES %}
+        {% if request.user.features.PROJECTED_GROSS_MARGIN %}
           <a href="{{ object.urls.projected_invoices }}" class="btn btn-primary">
-            {% translate 'projected invoices'|capfirst %}
+            {% translate 'projected gross margin'|capfirst %}
           </a>
         {% endif %}
         {% if request.user.features.CONTROLLING and gs.offers|length > 1 %}
