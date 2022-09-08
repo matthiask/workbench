@@ -115,7 +115,7 @@ class Command(BaseCommand):
         offered_hours = (
             Service.objects.order_by()
             .budgeted()
-            .filter(project__in=projects.keys())
+            .filter(project__in=projects.keys(), project__closed_on__isnull=True)
             .values("project")
             .annotate(Sum("service_hours"))
         )
