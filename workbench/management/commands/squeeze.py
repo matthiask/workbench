@@ -6,7 +6,7 @@ from itertools import chain
 from django.core.mail import EmailMultiAlternatives
 from django.core.management import BaseCommand
 from django.db.models import Sum
-from django.utils.translation import activate
+from django.utils.translation import activate, gettext as _
 
 from workbench.accounts.models import User
 from workbench.awt.models import Employment
@@ -169,12 +169,12 @@ class Command(BaseCommand):
                 "Massgebliche Stunden",
                 "Ansatz",
                 "",
-                "Grüne Stunden",
-                "Rote Stunden",
-                "Wartung",
-                "Intern",
-                "Total",
-                "Prozent grün",
+                _("profitable"),
+                _("overdrawn"),
+                _("maintenance"),
+                _("internal"),
+                _("total"),
+                _("green"),
                 "",
                 "Prozent Kundenjobs",
                 "",
