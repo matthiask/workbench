@@ -131,15 +131,6 @@
               <div class="dropdown-header">
                 {% translate 'logbook'|capfirst %}
               </div>
-              {% if request.user.features.GLASSFROG %}
-                <a class="dropdown-item" href="{% url 'report_hours_by_circle' %}">
-                  {% translate 'Hours by circle'|capfirst %}
-                </a>
-                <a class="dropdown-item"
-                   href="{% url 'report_hours_per_work_category' %}">
-                  {% translate 'Hours per work category' %}
-                </a>
-              {% endif %}
               <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">
                 {% translate 'Hours per customer'|capfirst %}
               </a>

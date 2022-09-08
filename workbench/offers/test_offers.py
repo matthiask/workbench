@@ -104,9 +104,7 @@ class OffersTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/pdf")
 
-    @override_settings(
-        FEATURES={FEATURES.CONTROLLING: F.ALWAYS, FEATURES.GLASSFROG: F.NEVER}
-    )
+    @override_settings(FEATURES={FEATURES.CONTROLLING: F.ALWAYS})
     def test_update_offer(self):
         """Offer and bound services update warnings and errors"""
         offer = factories.OfferFactory.create(title="Test")

@@ -663,14 +663,6 @@ class Service(ServiceBase):
         default=False,
         help_text=_("Optional services do not count towards the offer total."),
     )
-    role = models.ForeignKey(
-        "circles.Role",
-        on_delete=models.PROTECT,
-        related_name="services",
-        verbose_name=_("role"),
-        blank=True,
-        null=True,
-    )
 
     objects = ServiceQuerySet.as_manager()
 

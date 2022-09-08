@@ -32,7 +32,6 @@ class FEATURES(str, Enum):
     DEALS = "DEALS"
     EXPENSES = "EXPENSES"
     FOREIGN_CURRENCIES = "FOREIGN_CURRENCIES"
-    GLASSFROG = "GLASSFROG"
     LABOR_COSTS = "LABOR_COSTS"
     LATE_LOGGING = "LATE_LOGGING"
     LATE_LOGGING_NAG = "LATE_LOGGING_NAG"
@@ -77,9 +76,6 @@ LABELS = {
     },
     FEATURES.FOREIGN_CURRENCIES: {
         "label": _("Foreign currencies for expenses"),
-    },
-    FEATURES.GLASSFROG: {
-        "label": _("GlassFrog integration"),
     },
     FEATURES.LABOR_COSTS: {
         "label": capfirst(_("labor costs")),

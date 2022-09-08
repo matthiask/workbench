@@ -2,13 +2,12 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.forms.models import inlineformset_factory
-from django.utils.html import format_html, format_html_join
+from django.utils.html import format_html
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _, override
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
-from workbench.circles.models import Role
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import ProjectedInvoice
 from workbench.projects.models import Campaign, Project, Service
@@ -389,7 +388,6 @@ class ServiceForm(ModelForm):
         fields = [
             "title",
             "description",
-            "role",
             "allow_logging",
             "offer",
             "is_optional",
@@ -421,7 +419,7 @@ class ServiceForm(ModelForm):
         offer = self.instance.offer
         if offer and offer.status > offer.SERVICE_GROUP:
             for field in self.fields:
-                if field not in {"role", "allow_logging"}:
+                if field not in {"allow_logging"}:
                     self.fields[field].disabled = True
 
             if self.request.method == "GET":
@@ -437,26 +435,6 @@ class ServiceForm(ModelForm):
             self.fields["effort_type"].disabled = True
             self.fields["effort_rate"].disabled = True
             self.fields.pop("service_type")
-
-        if self.request.user.features[FEATURES.GLASSFROG]:
-            self.fields["role"].choices = Role.objects.choices()
-            self.fields["role"].required = True
-            self.fields["role"].help_text = format_html(
-                "{}: {}",
-                _("Used in this project"),
-                format_html_join(
-                    ", ",
-                    '<a href="#" data-field-value="{}">{}</a>',
-                    [
-                        (role.id, role)
-                        for role in Role.objects.filter(services__project=self.project)
-                        .select_related("circle")
-                        .distinct()
-                    ],
-                ),
-            )
-        else:
-            self.fields.pop("role")
 
     def clean(self):
         data = super().clean()

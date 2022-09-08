@@ -82,13 +82,13 @@ class AccountsTest(TestCase):
         """Ordering of users while falling back to different attributes"""
         self.assertTrue(User(_short_name="a") < User(_full_name="b"))
 
-    @override_settings(FEATURES={FEATURES.GLASSFROG: F.NEVER})
+    @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
     def test_feature_required(self):
         """The feature_required decorator redirects users and adds a message"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        response = self.client.get(reverse("report_hours_by_circle"))
+        response = self.client.get(reverse("report_open_items_list"))
         self.assertRedirects(response, "/")
         self.assertEqual(messages(response), ["Feature not available"])
 

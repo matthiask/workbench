@@ -351,7 +351,6 @@ class Offer(ModelWithTotal):
                 offer=offer,
                 allow_logging=service.allow_logging,
                 is_optional=service.is_optional,
-                role=service.role,
                 title=service.title,
                 description=service.description,
                 position=service.position,

@@ -15,7 +15,6 @@ from workbench.tools.validation import in_days
 
 
 class ProjectsTest(TestCase):
-    @override_settings(FEATURES={FEATURES.GLASSFROG: F.NEVER})
     def test_create(self):
         """Create a project and create, update, delete and merge a few services"""
         user = factories.UserFactory.create()
@@ -565,17 +564,6 @@ class ProjectsTest(TestCase):
         service = project.services.get()
         self.assertEqual(service.effort_rate, 250)
         self.assertEqual(service.effort_type, "Pauschalsatz")
-
-    @override_settings(FEATURES={FEATURES.GLASSFROG: F.NEVER})
-    def test_no_role(self):
-        """The service form has no role field when not GLASSFROG"""
-        project = factories.ProjectFactory.create()
-        self.client.force_login(project.owned_by)
-
-        response = self.client.get(
-            project.urls["createservice"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
-        )
-        self.assertNotContains(response, "id_role")
 
     def test_no_flat_rate(self):
         """Uses without CONTROLLING do not see the flat rate field"""

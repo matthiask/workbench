@@ -217,7 +217,6 @@ class HistoryTest(TestCase):
         self.client.force_login(service.project.owned_by)
         url = f"/history/projects_service/id/{service.pk}/"
         self.assert_only_visible_with(url, "'Cost'", FEATURES.CONTROLLING)
-        self.assert_only_visible_with(url, "'Role'", FEATURES.GLASSFROG)
 
     def test_accounts_user_visibility(self):
         """PLanned work of users is only visible with PLANNING"""

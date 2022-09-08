@@ -10,7 +10,6 @@ from faker.providers import address
 
 from workbench.accounts.models import Team, User
 from workbench.awt.models import Absence, Employment, WorkingTimeModel, Year
-from workbench.circles.models import Circle, Role
 from workbench.contacts.models import Organization, Person, PostalAddress
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.deals.models import AttributeGroup, ClosingType, Deal, ValueType
@@ -334,19 +333,3 @@ class PlannedWorkFactory(DjangoModelFactory):
 
     class Meta:
         model = PlannedWork
-
-
-# CIRCLES #####################################################################
-class CircleFactory(DjangoModelFactory):
-    name = factory.Sequence(lambda n: f"Circle {n}")
-
-    class Meta:
-        model = Circle
-
-
-class RoleFactory(DjangoModelFactory):
-    circle = factory.SubFactory(CircleFactory)
-    name = factory.Sequence(lambda n: f"Role {n}")
-
-    class Meta:
-        model = Role

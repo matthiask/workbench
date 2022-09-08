@@ -445,8 +445,6 @@ def _projects_service_cfg(user):
             "cost",
             "third_party_costs",
         }
-    if user.features[FEATURES.GLASSFROG]:
-        fields |= {"role"}
     return {"fields": fields}
 
 

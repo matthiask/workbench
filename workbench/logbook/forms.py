@@ -6,14 +6,13 @@ from django.contrib import messages
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from django.utils.html import format_html, format_html_join, mark_safe
+from django.utils.html import mark_safe
 from django.utils.text import capfirst
 from django.utils.timezone import localtime
 from django.utils.translation import gettext, gettext_lazy as _, override
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
-from workbench.circles.models import Circle, Role
 from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
@@ -101,11 +100,6 @@ class LoggedHoursSearchForm(Form):
         label="",
     )
     offer = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
-    circle = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
-    role = forms.ModelChoiceField(
-        queryset=Role.objects.all(), required=False, widget=forms.HiddenInput, label=""
-    )
-    category = forms.CharField(required=False, widget=forms.HiddenInput, label="")
     not_archived = forms.BooleanField(
         required=False, widget=forms.HiddenInput, label=""
     )
@@ -168,48 +162,6 @@ class LoggedHoursSearchForm(Form):
                 ),
             )
             queryset = queryset.filter(service__offer=offer)
-        if data.get("circle") == 0:
-            queryset = queryset.filter(service__role__isnull=True)
-            self.hidden_filters.append(
-                (_("No circle"), querystring(self.request.GET, circle=""))
-            )
-        elif data.get("circle"):
-            circle = Circle.objects.filter(pk=data.get("circle")).first()
-            self.hidden_filters.append(
-                (
-                    f"{capfirst(Circle._meta.verbose_name)}: {circle}",
-                    querystring(self.request.GET, circle=""),
-                ),
-            )
-            queryset = queryset.filter(service__role__circle=circle)
-        if data.get("role"):
-            role = data.get("role")
-            self.hidden_filters.append(
-                (
-                    f"{capfirst(role._meta.verbose_name)}: {role}",
-                    querystring(self.request.GET, role=""),
-                ),
-            )
-            queryset = queryset.filter(service__role=role)
-        if data.get("category") == "none":
-            self.hidden_filters.append(
-                (
-                    f"{capfirst(_('category'))}: {_('Undefined')}",
-                    querystring(self.request.GET, category=""),
-                ),
-            )
-            queryset = queryset.filter(
-                Q(service__role__isnull=True) | Q(service__role__work_category="")
-            )
-
-        elif category := data.get("category"):
-            self.hidden_filters.append(
-                (
-                    f"{capfirst(_('category'))}: {category}",
-                    querystring(self.request.GET, category=""),
-                ),
-            )
-            queryset = queryset.filter(service__role__work_category=category)
         if data.get("not_archived"):
             self.hidden_filters.append(
                 (_("Not archived"), querystring(self.request.GET, not_archived=""))
@@ -365,9 +317,6 @@ class LoggedHoursForm(ModelForm):
     service_description = forms.CharField(
         label=_("description"), required=False, widget=Textarea({"rows": 2})
     )
-    service_role = forms.ModelChoiceField(
-        queryset=Role.objects.all(), label=_("role"), required=False
-    )
     service_type = forms.ModelChoiceField(
         ServiceType.objects.all(), label=ServiceType._meta.verbose_name, required=False
     )
@@ -433,7 +382,6 @@ class LoggedHoursForm(ModelForm):
         if self.instance.pk:
             self.fields.pop("service_title")
             self.fields.pop("service_description")
-            self.fields.pop("service_role")
             self.fields.pop("service_type")
             if (
                 not self.instance.rendered_by.features[FEATURES.LATE_LOGGING]
@@ -444,27 +392,6 @@ class LoggedHoursForm(ModelForm):
                 self.fields["rendered_on"].disabled = True
 
         else:
-            if self.request.user.features[FEATURES.GLASSFROG]:
-                self.fields["service_role"].choices = Role.objects.choices()
-                self.fields["service_role"].help_text = format_html(
-                    "{}: {}",
-                    _("Used in this project"),
-                    format_html_join(
-                        ", ",
-                        '<a href="#" data-field-value="{}">{}</a>',
-                        [
-                            (role.id, role)
-                            for role in Role.objects.filter(
-                                services__project=self.project
-                            )
-                            .select_related("circle")
-                            .distinct()
-                        ],
-                    ),
-                )
-            else:
-                self.fields.pop("service_role")
-
             if self.project.flat_rate is not None:
                 self.fields.pop("service_type")
 
@@ -498,12 +425,6 @@ class LoggedHoursForm(ModelForm):
                 ),
                 code="unspecific-service",
             )
-        if (
-            data.get("service_title")
-            and self.request.user.features[FEATURES.GLASSFROG]
-            and not data.get("service_role")
-        ):
-            self.add_error("service_role", _("This field is required."))
 
         if all(
             f in self.fields and data.get(f) for f in ["rendered_by", "rendered_on"]
@@ -576,7 +497,6 @@ class LoggedHoursForm(ModelForm):
                 project=self.project,
                 title=self.cleaned_data["service_title"],
                 description=self.cleaned_data["service_description"],
-                role=self.cleaned_data.get("service_role"),
             )
             if self.project.flat_rate is not None:
                 with override(settings.WORKBENCH.PDF_LANGUAGE):

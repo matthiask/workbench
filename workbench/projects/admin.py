@@ -13,7 +13,7 @@ class ServiceAdmin(admin.ModelAdmin):
     )
     list_select_related = ["project__owned_by", "offer__project", "offer__owned_by"]
     ordering = ["-pk"]
-    raw_id_fields = ["project", "offer", "role"]
+    raw_id_fields = ["project", "offer"]
     search_fields = ["project__title", "title", "description"]
 
 

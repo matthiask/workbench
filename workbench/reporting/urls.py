@@ -1,14 +1,7 @@
 from django.urls import path, re_path
 
-from workbench.accounts.features import (
-    FEATURES,
-    controlling_only,
-    deals_only,
-    feature_required,
-    labor_costs_only,
-)
+from workbench.accounts.features import controlling_only, deals_only, labor_costs_only
 from workbench.awt.views import absence_calendar, annual_working_time_view
-from workbench.circles.reporting import hours_by_circle, hours_per_work_category
 from workbench.deals.reporting import accepted_deals, deal_history, declined_deals
 from workbench.planning.reporting import planning_vs_logbook
 from workbench.projects.reporting import hours_per_customer
@@ -67,24 +60,6 @@ urlpatterns = [
             "stats_fn": planning_vs_logbook,
         },
         name="report_planning_vs_logbook",
-    ),
-    path(
-        "hours-by-circle/",
-        feature_required(FEATURES.GLASSFROG)(date_range_and_users_filter_view),
-        {
-            "template_name": "reporting/hours_by_circle.html",
-            "stats_fn": hours_by_circle,
-        },
-        name="report_hours_by_circle",
-    ),
-    path(
-        "hours-per-work-category/",
-        feature_required(FEATURES.GLASSFROG)(date_range_and_users_filter_view),
-        {
-            "template_name": "reporting/hours_per_work_category.html",
-            "stats_fn": hours_per_work_category,
-        },
-        name="report_hours_per_work_category",
     ),
     path(
         "project-budget-statistics/",
