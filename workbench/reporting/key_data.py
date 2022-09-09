@@ -240,6 +240,15 @@ def sent_invoices_total():
     )
 
 
+def due_invoices_total():
+    return (
+        Invoice.objects.filter(status=Invoice.SENT, due_on__lte=dt.date.today())
+        .order_by()
+        .aggregate(t=Sum("total_excl_tax"))["t"]
+        or Z2
+    )
+
+
 def open_offers_total():
     return (
         Offer.objects.offered().order_by().aggregate(t=Sum("total_excl_tax"))["t"] or Z2

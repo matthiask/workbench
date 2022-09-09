@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-08 15:33+0200\n"
+"POT-Creation-Date: 2022-09-09 08:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -89,10 +89,6 @@ msgstr "Spesenerfassung und -rückerstattung."
 #: workbench/accounts/features.py
 msgid "Foreign currencies for expenses"
 msgstr "Fremdwährungen für Spesen."
-
-#: workbench/accounts/features.py
-msgid "GlassFrog integration"
-msgstr "GlassFrog-Integration"
 
 #: workbench/accounts/features.py
 msgid "labor costs"
@@ -239,7 +235,6 @@ msgstr "Token"
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/birthdays.html
 #: workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/hours_per_work_category.html
 #: workbench/templates/reporting/labor_costs_by_user.html
 #: workbench/templates/reporting/logging.html
 #: workbench/templates/reporting/work_anniversaries.html
@@ -261,8 +256,8 @@ msgid "You have {} unlogged timestamps from this week only. You should probably 
 msgstr "Du hast {} nicht erfasste Zeitmarken, nur von dieser Woche. Du solltest diese vermutlich prüfen gehen."
 
 #: workbench/accounts/models.py workbench/awt/models.py
-#: workbench/circles/models.py workbench/contacts/models.py
-#: workbench/credit_control/models.py workbench/planning/models.py
+#: workbench/contacts/models.py workbench/credit_control/models.py
+#: workbench/planning/models.py
 msgid "name"
 msgstr "Name"
 
@@ -779,87 +774,6 @@ msgstr "Generiert am %(day)s"
 msgid "No annual working time defined for user %(user)s with working time model %(working_time_model)s."
 msgstr "Keine Jahresarbeitszeit definiert für Nutzer*in %(user)s mit Arbeitszeitmodell %(working_time_model)s."
 
-#: workbench/circles/apps.py workbench/circles/models.py
-msgid "circles"
-msgstr "Kreise"
-
-#: workbench/circles/models.py
-msgid "circle"
-msgstr "Kreis"
-
-#: workbench/circles/models.py
-msgid "Customer work"
-msgstr "Kundenarbeit"
-
-#: workbench/circles/models.py
-msgid "Knowledge transfer"
-msgstr "Wissenstransfer"
-
-#: workbench/circles/models.py
-msgid "debriefings, reading, exchanges"
-msgstr "Debriefings, Lesezeit, Austausch"
-
-#: workbench/circles/models.py
-msgid "Social care"
-msgstr "Social Care"
-
-#: workbench/circles/models.py
-msgid "personal development, people care, care for the work environment"
-msgstr "Persönliche Entwicklung, People Care, Pflege des Arbeitsumfelds"
-
-#: workbench/circles/models.py
-msgid "Outreach"
-msgstr "Outreach"
-
-#: workbench/circles/models.py
-msgid "corporate communication, acquisition"
-msgstr "Unternehmenskommunikation, Akquise"
-
-#: workbench/circles/models.py
-msgid "Other internal matters"
-msgstr "Andere Internas"
-
-#: workbench/circles/models.py
-msgid "administration, bookkeeping, coordination, etc."
-msgstr "Interne Administration und Koordination, etc."
-
-#: workbench/circles/models.py
-msgid "Uncategorized"
-msgstr "Nicht kategorisiert"
-
-#: workbench/circles/models.py
-msgid "for the circle"
-msgstr "Für den Kreis"
-
-#: workbench/circles/models.py
-msgid "is removed"
-msgstr "ist entfernt"
-
-#: workbench/circles/models.py
-#: workbench/templates/logbook/loggedhours_detail.html
-#: workbench/templates/reporting/hours_by_circle.html
-msgid "category"
-msgstr "Kategorie"
-
-#: workbench/circles/models.py workbench/logbook/forms.py
-#: workbench/projects/models.py
-#: workbench/templates/logbook/loggedhours_detail.html
-msgid "role"
-msgstr "Rolle"
-
-#: workbench/circles/models.py
-msgid "roles"
-msgstr "Rollen"
-
-#: workbench/circles/models.py
-msgid "(removed)"
-msgstr "(entfernt)"
-
-#: workbench/circles/reporting.py
-#: workbench/templates/reporting/hours_per_work_category.html
-msgid "Undefined"
-msgstr "Nicht definiert"
-
 #: workbench/contacts/apps.py workbench/templates/base.html
 #: workbench/templates/contacts/object_list.html
 msgid "contacts"
@@ -1152,12 +1066,12 @@ msgstr "Valuta"
 
 #: workbench/credit_control/models.py workbench/credit_control/reporting.py
 #: workbench/expenses/models.py workbench/expenses/views.py
+#: workbench/management/commands/squeeze.py
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/hours_per_work_category.html
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
@@ -2083,21 +1997,12 @@ msgstr "<entdeckt>"
 msgid "No offer"
 msgstr "Keine Offerte"
 
-#: workbench/logbook/forms.py
-#: workbench/templates/reporting/hours_by_circle.html
-msgid "No circle"
-msgstr "Kein Kreis"
-
 #: workbench/logbook/forms.py workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html
 #: workbench/tools/xlsx.py
 msgid "Not archived"
 msgstr "Nicht archiviert"
-
-#: workbench/logbook/forms.py workbench/projects/forms.py
-msgid "Used in this project"
-msgstr "Verwendet in diesem Projekt"
 
 #: workbench/logbook/forms.py
 msgid "This field is required unless you create a new service."
@@ -2122,10 +2027,6 @@ msgstr "Dieser Eintrag ist schon Teil einer Rechnung."
 #: workbench/logbook/forms.py workbench/projects/forms.py
 msgid "This title seems awfully unspecific. Please use specific titles for services."
 msgstr "Mir scheint, dass der Titel furchtbar unspezifisch ist. Bitte verwende spezifische Titel für Leistungen."
-
-#: workbench/logbook/forms.py workbench/projects/forms.py
-msgid "This field is required."
-msgstr "Dieses Feld ist zwingend erforderlich."
 
 #: workbench/logbook/forms.py
 msgid "Hours have to be logged in the same week."
@@ -2304,6 +2205,36 @@ msgstr "Verrechnet"
 #: workbench/management/commands/profitability.py
 msgid "rate"
 msgstr "Ansatz"
+
+#: workbench/management/commands/squeeze.py workbench/reporting/views.py
+#: workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
+msgid "profitable"
+msgstr "Profitabel"
+
+#: workbench/management/commands/squeeze.py workbench/reporting/views.py
+#: workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
+msgid "overdrawn"
+msgstr "Überzogen"
+
+#: workbench/management/commands/squeeze.py workbench/reporting/views.py
+#: workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
+msgid "maintenance"
+msgstr "Wartung"
+
+#: workbench/management/commands/squeeze.py workbench/reporting/views.py
+#: workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
+msgid "internal"
+msgstr "Intern"
+
+#: workbench/management/commands/squeeze.py
+#: workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
+msgid "green"
+msgstr "Grün"
 
 #: workbench/notes/admin.py
 msgid "content object"
@@ -2650,6 +2581,10 @@ msgid "The project %(project)s has a flat rate which will be applied to this ser
 msgstr "Das Projekt %(project)s hat einen Pauschalsatz, welcher auf diese Leistung auch angewendet wird."
 
 #: workbench/projects/forms.py
+msgid "This field is required."
+msgstr "Dieses Feld ist zwingend erforderlich."
+
+#: workbench/projects/forms.py
 msgid "Codes must be unique."
 msgstr "Codes müssen eindeutig sein."
 
@@ -2789,26 +2724,6 @@ msgstr "dieses Jahr"
 #: workbench/reporting/utils.py
 msgid "last year"
 msgstr "letztes Jahr"
-
-#: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/key_data.html
-msgid "profitable"
-msgstr "Profitabel"
-
-#: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/key_data.html
-msgid "overdrawn"
-msgstr "Überzogen"
-
-#: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/key_data.html
-msgid "maintenance"
-msgstr "Wartung"
-
-#: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/key_data.html
-msgid "internal"
-msgstr "Intern"
 
 #: workbench/reporting/views.py
 msgid "Closed during the last year"
@@ -3076,16 +2991,6 @@ msgstr "Kennzahlen"
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "Project budget statistics"
 msgstr "Projekt-Budgetstatistik"
-
-#: workbench/templates/base.html
-#: workbench/templates/reporting/hours_by_circle.html
-msgid "Hours by circle"
-msgstr "Stunden pro Kreis"
-
-#: workbench/templates/base.html
-#: workbench/templates/reporting/hours_per_work_category.html
-msgid "Hours per work category"
-msgstr "Stunden pro Arbeitskategorie"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/planning_vs_logbook.html
@@ -3397,10 +3302,6 @@ msgstr "umrechnen"
 msgid "expenses in foreign currency"
 msgstr "Spesen in Fremdwährung"
 
-#: workbench/templates/logbook/loggedhours_detail.html
-msgid "update"
-msgstr "bearbeiten"
-
 #: workbench/templates/logbook/loggedhours_form.html
 msgid "new service"
 msgstr "Neue Leistung"
@@ -3618,11 +3519,6 @@ msgstr "Geburtstag"
 msgid "Age on birthday"
 msgstr "Alter am Geburtstag"
 
-#: workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/key_data.html
-msgid "green"
-msgstr "Grün"
-
 #: workbench/templates/reporting/key_data.html
 msgid "Facts"
 msgstr "Fakten"
@@ -3638,6 +3534,10 @@ msgstr "Erfasste Stunden in offenen Aufträgen"
 #: workbench/templates/reporting/key_data.html
 msgid "Sent invoices total excl. tax"
 msgstr "Total exkl. MwSt. aller offenen Rechnungen"
+
+#: workbench/templates/reporting/key_data.html
+msgid "Total excl. tax of all invoices due today or earlier"
+msgstr "Total exkl. MwSt aller fälligen Rechnungen"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Open offers total excl. tax"
@@ -4032,6 +3932,81 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "GlassFrog integration"
+#~ msgstr "GlassFrog-Integration"
+
+#~ msgid "circles"
+#~ msgstr "Kreise"
+
+#~ msgid "circle"
+#~ msgstr "Kreis"
+
+#~ msgid "Customer work"
+#~ msgstr "Kundenarbeit"
+
+#~ msgid "Knowledge transfer"
+#~ msgstr "Wissenstransfer"
+
+#~ msgid "debriefings, reading, exchanges"
+#~ msgstr "Debriefings, Lesezeit, Austausch"
+
+#~ msgid "Social care"
+#~ msgstr "Social Care"
+
+#~ msgid "personal development, people care, care for the work environment"
+#~ msgstr "Persönliche Entwicklung, People Care, Pflege des Arbeitsumfelds"
+
+#~ msgid "Outreach"
+#~ msgstr "Outreach"
+
+#~ msgid "corporate communication, acquisition"
+#~ msgstr "Unternehmenskommunikation, Akquise"
+
+#~ msgid "Other internal matters"
+#~ msgstr "Andere Internas"
+
+#~ msgid "administration, bookkeeping, coordination, etc."
+#~ msgstr "Interne Administration und Koordination, etc."
+
+#~ msgid "Uncategorized"
+#~ msgstr "Nicht kategorisiert"
+
+#~ msgid "for the circle"
+#~ msgstr "Für den Kreis"
+
+#~ msgid "is removed"
+#~ msgstr "ist entfernt"
+
+#~ msgid "category"
+#~ msgstr "Kategorie"
+
+#~ msgid "role"
+#~ msgstr "Rolle"
+
+#~ msgid "roles"
+#~ msgstr "Rollen"
+
+#~ msgid "(removed)"
+#~ msgstr "(entfernt)"
+
+#~ msgid "Undefined"
+#~ msgstr "Nicht definiert"
+
+#~ msgid "No circle"
+#~ msgstr "Kein Kreis"
+
+#~ msgid "Used in this project"
+#~ msgstr "Verwendet in diesem Projekt"
+
+#~ msgid "Hours by circle"
+#~ msgstr "Stunden pro Kreis"
+
+#~ msgid "Hours per work category"
+#~ msgstr "Stunden pro Arbeitskategorie"
+
+#~ msgid "update"
+#~ msgstr "bearbeiten"
 
 #~ msgid "projected invoices"
 #~ msgstr "geplante Rechnungen"

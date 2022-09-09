@@ -25,6 +25,10 @@
           <th>{% translate 'Sent invoices total excl. tax' %}</th>
         </tr>
         <tr>
+          <td class="text-right">{{ due_invoices_total|currency }}</td>
+          <th>{% translate 'Total excl. tax of all invoices due today or earlier' %}</th>
+        </tr>
+        <tr>
           <td class="text-right">{{ open_offers_total|currency }}</td>
           <th>{% translate 'Open offers total excl. tax' %}</th>
         </tr>
