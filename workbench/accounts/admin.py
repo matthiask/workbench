@@ -92,7 +92,13 @@ class UserAdmin(UserAdmin):
         "person",
         "_features",
     )
-    list_filter = ("is_active", "is_admin", "working_time_model", FeatureFilter)
+    list_filter = (
+        "is_active",
+        "is_admin",
+        "working_time_model",
+        "specialist_field",
+        FeatureFilter,
+    )
     list_select_related = ["person__organization", "working_time_model"]
     fieldsets = add_fieldsets = [
         (

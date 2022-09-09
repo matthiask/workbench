@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-09 08:20+0200\n"
+"POT-Creation-Date: 2022-09-09 21:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -90,6 +90,14 @@ msgstr "Spesenerfassung und -rückerstattung."
 msgid "Foreign currencies for expenses"
 msgstr "Fremdwährungen für Spesen."
 
+#: workbench/accounts/features.py workbench/projects/models.py
+msgid "internal types"
+msgstr "Interner Typ"
+
+#: workbench/accounts/features.py
+msgid "Additional categorization and reportings for internal projects."
+msgstr "Zusätzliche Kategorisierung und Reportings für interne Projekte."
+
 #: workbench/accounts/features.py
 msgid "labor costs"
 msgstr "Personalaufwand"
@@ -128,10 +136,11 @@ msgid "pride"
 msgstr "Pride"
 
 #: workbench/accounts/features.py workbench/invoices/models.py
+#: workbench/templates/base.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_projected_invoices_form.html
 #: workbench/templates/reporting/key_data.html
-#: workbench/templates/reporting/key_data_projected_invoices.html
+#: workbench/templates/reporting/projected_gross_margin.html
 msgid "projected gross margin"
 msgstr "geplanter Umsatz"
 
@@ -227,6 +236,10 @@ msgstr "Anstellungsbeginn"
 msgid "token"
 msgstr "Token"
 
+#: workbench/accounts/models.py
+msgid "specialist field"
+msgstr "Fachbereich"
+
 #: workbench/accounts/models.py workbench/audit/admin.py
 #: workbench/awt/models.py workbench/deals/models.py
 #: workbench/logbook/models.py workbench/management/commands/profitability.py
@@ -257,7 +270,7 @@ msgstr "Du hast {} nicht erfasste Zeitmarken, nur von dieser Woche. Du solltest 
 
 #: workbench/accounts/models.py workbench/awt/models.py
 #: workbench/contacts/models.py workbench/credit_control/models.py
-#: workbench/planning/models.py
+#: workbench/planning/models.py workbench/projects/models.py
 msgid "name"
 msgstr "Name"
 
@@ -286,6 +299,10 @@ msgstr "Erstellt um"
 #: workbench/accounts/models.py
 msgid "coffee pairings"
 msgstr "Kaffee-Paare"
+
+#: workbench/accounts/models.py
+msgid "specialist fields"
+msgstr "Fachbereiche"
 
 #: workbench/accounts/reporting.py
 msgid "All others"
@@ -526,7 +543,7 @@ msgstr "Datum von"
 msgid "date until"
 msgstr "Datum bis"
 
-#: workbench/awt/models.py workbench/awt/pdf.py
+#: workbench/awt/models.py workbench/awt/pdf.py workbench/projects/models.py
 #: workbench/templates/awt/year_detail.html
 msgid "percentage"
 msgstr "Prozent"
@@ -700,7 +717,7 @@ msgstr "Guthaben an Ferientagen"
 
 #: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
 #: workbench/templates/projects/project_statistics.html
-#: workbench/templates/reporting/key_data_projected_invoices.html
+#: workbench/templates/reporting/projected_gross_margin.html
 msgid "Total"
 msgstr "Total"
 
@@ -1712,9 +1729,9 @@ msgstr "Leistungen"
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_projected_invoices_form.html
-#: workbench/templates/reporting/key_data_projected_invoices.html
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/templates/reporting/projected_gross_margin.html
 #: workbench/tools/xlsx.py
 msgid "project"
 msgstr "Projekt"
@@ -1921,7 +1938,7 @@ msgid "Next period starts on %(start)s, invoice will be created on %(create)s"
 msgstr "Nächste Periode beginnt am %(start)s, Rechnung wird am %(create)s erstellt."
 
 #: workbench/invoices/models.py
-#: workbench/templates/reporting/key_data_projected_invoices.html
+#: workbench/templates/reporting/projected_gross_margin.html
 msgid "gross margin"
 msgstr "Umsatz bereinigt"
 
@@ -2543,6 +2560,10 @@ msgid "Internal"
 msgstr "Intern"
 
 #: workbench/projects/forms.py
+msgid "Not internal"
+msgstr "Nicht intern"
+
+#: workbench/projects/forms.py
 msgid "Set predefined value:"
 msgstr "Vordefinierten Wert setzen:"
 
@@ -2550,6 +2571,10 @@ msgstr "Vordefinierten Wert setzen:"
 #: workbench/templates/start.html workbench/templates/timestamps.html
 msgid "today"
 msgstr "heute"
+
+#: workbench/projects/forms.py
+msgid "Selecting an internal type is required for internal projects."
+msgstr "Bei internen Projekten muss ein interner Typ ausgewählt werden."
 
 #: workbench/projects/forms.py
 msgid "This project already has invoices. The invoices' customer record will be changed too."
@@ -2587,6 +2612,14 @@ msgstr "Dieses Feld ist zwingend erforderlich."
 #: workbench/projects/forms.py
 msgid "Codes must be unique."
 msgstr "Codes müssen eindeutig sein."
+
+#: workbench/projects/models.py
+msgid "assigned users"
+msgstr "Zugeordnete Nutzer*innen"
+
+#: workbench/projects/models.py
+msgid "internal type"
+msgstr "interner Typ"
 
 #: workbench/projects/models.py
 #: workbench/templates/planning/campaign_planning.html
@@ -3560,7 +3593,7 @@ msgid "Gross margin"
 msgstr "Umsatz bereinigt"
 
 #: workbench/templates/reporting/key_data.html
-#: workbench/templates/reporting/key_data_projected_invoices.html
+#: workbench/templates/reporting/projected_gross_margin.html
 msgid "Projected"
 msgstr "Geplant"
 
@@ -3579,11 +3612,6 @@ msgstr "Hochrechnung"
 #: workbench/templates/reporting/key_data.html
 msgid "Hours distribution"
 msgstr "Stundenverteilung"
-
-#: workbench/templates/reporting/key_data_projected_invoices.html
-#: workbench/tools/xlsx.py
-msgid "Delta"
-msgstr "Delta"
 
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
@@ -3648,6 +3676,11 @@ msgstr "Woche"
 #: workbench/templates/reporting/planning_vs_logbook.html
 msgid "Planned"
 msgstr "Geplant"
+
+#: workbench/templates/reporting/projected_gross_margin.html
+#: workbench/tools/xlsx.py
+msgid "Delta"
+msgstr "Delta"
 
 #: workbench/templates/reporting/work_anniversaries.html
 msgid "Started on"
