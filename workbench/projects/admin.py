@@ -7,7 +7,7 @@ from workbench.tools import admin
 @admin.register(models.InternalType)
 class InternalTypeAdmin(OrderableAdmin, admin.ReadWriteModelAdmin):
     filter_horizontal = ["assigned_users"]
-    list_display = ["name", "percentage", "ordering"]
+    list_display = ["name", "percentage", "is_selectable", "ordering"]
     list_editable = ["ordering"]
 
 

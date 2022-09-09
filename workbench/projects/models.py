@@ -26,6 +26,7 @@ class InternalType(OrderableModel):
     name = models.CharField(_("name"), max_length=100)
     percentage = models.IntegerField(_("percentage"))
     assigned_users = models.ManyToManyField(User, verbose_name=_("assigned users"))
+    is_selectable = models.BooleanField(_("is selectable"), default=True)
 
     class Meta(OrderableModel.Meta):
         verbose_name = _("internal type")
@@ -238,6 +239,7 @@ class Project(Model):
     internal_type = models.ForeignKey(
         InternalType,
         on_delete=models.PROTECT,
+        limit_choices_to={"is_selectable": True},
         blank=True,
         null=True,
         related_name="+",
