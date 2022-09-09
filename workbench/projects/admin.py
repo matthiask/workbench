@@ -1,5 +1,14 @@
+from admin_ordering.admin import OrderableAdmin
+
 from workbench.projects import models
 from workbench.tools import admin
+
+
+@admin.register(models.InternalType)
+class InternalTypeAdmin(OrderableAdmin, admin.ReadWriteModelAdmin):
+    filter_horizontal = ["assigned_users"]
+    list_display = ["name", "percentage", "ordering"]
+    list_editable = ["ordering"]
 
 
 @admin.register(models.Service)

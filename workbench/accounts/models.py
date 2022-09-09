@@ -154,6 +154,13 @@ class User(Model, AbstractBaseUser):
         _("date of employment"), blank=True, null=True
     )
     token = models.CharField(_("token"), max_length=100, editable=False)
+    specialist_field = models.ForeignKey(
+        "SpecialistField",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_("specialist field"),
+    )
 
     objects = UserManager()
 
@@ -385,3 +392,15 @@ class CoffeePairings(models.Model):
     class Meta:
         verbose_name = _("coffee pairings")
         verbose_name_plural = _("coffee pairings")
+
+
+class SpecialistField(models.Model):
+    name = models.CharField(_("name"), max_length=100)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = _("specialist field")
+        verbose_name_plural = _("specialist fields")
+
+    def __str__(self):
+        return self.name

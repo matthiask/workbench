@@ -3,6 +3,7 @@ from collections import defaultdict
 from decimal import Decimal
 from functools import total_ordering
 
+from admin_ordering.models import OrderableModel
 from django.contrib import messages
 from django.db import models
 from django.db.models import F, Prefetch, Q, Sum
@@ -19,6 +20,19 @@ from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.models import Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import in_days, raise_if_errors
+
+
+class InternalType(OrderableModel):
+    name = models.CharField(_("name"), max_length=100)
+    percentage = models.IntegerField(_("percentage"))
+    assigned_users = models.ManyToManyField(User, verbose_name=_("assigned users"))
+
+    class Meta(OrderableModel.Meta):
+        verbose_name = _("internal type")
+        verbose_name_plural = _("internal types")
+
+    def __str__(self):
+        return self.name
 
 
 class CampaignQuerySet(SearchQuerySet):
@@ -220,6 +234,14 @@ class Project(Model):
 
     type = models.CharField(
         _("type"), choices=TYPE_CHOICES, max_length=20, default=ORDER
+    )
+    internal_type = models.ForeignKey(
+        InternalType,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        related_name="+",
+        verbose_name=_("internal type"),
     )
     flat_rate = MoneyField(
         _("flat rate"),

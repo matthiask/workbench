@@ -6,7 +6,7 @@ from django.contrib.auth.models import Group
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.features import FEATURES, LABELS, F
-from workbench.accounts.models import Team, User
+from workbench.accounts.models import SpecialistField, Team, User
 from workbench.awt.models import Employment, VacationDaysOverride
 
 
@@ -122,3 +122,8 @@ admin.site.unregister(Group)  # We are not using stock users or groups.
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     filter_horizontal = ["members"]
+
+
+@admin.register(SpecialistField)
+class SpecialistFieldAdmin(admin.ModelAdmin):
+    pass

@@ -32,6 +32,7 @@ class FEATURES(str, Enum):
     DEALS = "DEALS"
     EXPENSES = "EXPENSES"
     FOREIGN_CURRENCIES = "FOREIGN_CURRENCIES"
+    INTERNAL_TYPES = "INTERNAL_TYPES"
     LABOR_COSTS = "LABOR_COSTS"
     LATE_LOGGING = "LATE_LOGGING"
     LATE_LOGGING_NAG = "LATE_LOGGING_NAG"
@@ -76,6 +77,12 @@ LABELS = {
     },
     FEATURES.FOREIGN_CURRENCIES: {
         "label": _("Foreign currencies for expenses"),
+    },
+    FEATURES.INTERNAL_TYPES: {
+        "label": capfirst(_("internal types")),
+        "help_text": _(
+            "Additional categorization and reportings for internal projects."
+        ),
     },
     FEATURES.LABOR_COSTS: {
         "label": capfirst(_("labor costs")),
