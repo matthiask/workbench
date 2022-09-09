@@ -19,41 +19,6 @@ from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
-FIELDS = [
-    (
-        "Programmierung",
-        (1, 36, 58, 105, 149, 157, 158, 159, 169),
-    ),
-    (
-        "Grafik",
-        (85, 98, 100, 112, 142, 167, 172),
-    ),
-    (
-        "Intern & Auszubildende",
-        (140, 154, 170, 171),
-    ),
-    (
-        "Online Marketing",
-        (62, 88, 122, 146, 155, 165),
-    ),
-    (
-        "Politik und Campagning",
-        (114, 116, 126, 151, 156, 164, 166),
-    ),
-    (
-        "Web-Beratung und -Koordination",
-        (132, 150, 153, 162),
-    ),
-]
-
-IDS = list(chain.from_iterable(ids for name, ids in FIELDS))
-assert len(IDS) == len(set(IDS)), "Duplicate IDs"
-
-USER_FIELDS = {}
-for name, ids in FIELDS:
-    USER_FIELDS.update({id: name for id in ids})
-
-
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
@@ -244,7 +209,9 @@ class Command(BaseCommand):
             (
                 [
                     user,
-                    USER_FIELDS.get(user.id, "<unbekannt>"),
+                    user.specialist_field.name
+                    if user.specialist_field
+                    else "<unbekannt>",
                     current_percentage.get(user.id, 0),
                     row["margin"],
                     row["hours_in_range"],
@@ -276,7 +243,9 @@ class Command(BaseCommand):
 
         fields = defaultdict(lambda: {"margin": Z2, "hours_in_range": Z1, "names": []})
         for user, row in users.items():
-            field = USER_FIELDS.get(user.id, "<unbekannt>")
+            field = (
+                user.specialist_field.name if user.specialist_field else "<unbekannt>"
+            )
             fields[field]["margin"] += row["margin"]
             fields[field]["hours_in_range"] += row["hours_in_range"]
             fields[field]["names"].append(str(user))
