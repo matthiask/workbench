@@ -24,7 +24,7 @@ from workbench.tools.validation import in_days, raise_if_errors
 
 class InternalType(OrderableModel):
     name = models.CharField(_("name"), max_length=100)
-    percentage = models.IntegerField(_("percentage"))
+    percentage = models.DecimalField(_("percentage"), max_digits=5, decimal_places=2)
     assigned_users = models.ManyToManyField(User, verbose_name=_("assigned users"))
     is_selectable = models.BooleanField(_("is selectable"), default=True)
 
