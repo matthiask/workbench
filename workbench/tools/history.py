@@ -10,7 +10,7 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
 from workbench.accounts.features import FEATURES
-from workbench.accounts.models import Team, User
+from workbench.accounts.models import SpecialistField, Team, User
 from workbench.awt.models import Absence, Employment, VacationDaysOverride, Year
 from workbench.contacts.models import (
     EmailAddress,
@@ -36,7 +36,12 @@ from workbench.planning.models import (
     PlannedWork,
     PublicHoliday,
 )
-from workbench.projects.models import Campaign, Project, Service as ProjectService
+from workbench.projects.models import (
+    Campaign,
+    InternalType,
+    Project,
+    Service as ProjectService,
+)
 from workbench.reporting.models import CostCenter
 from workbench.tools.formats import local_date_format
 
@@ -241,6 +246,7 @@ def _accounts_user_cfg(user):
         "person",
         "_features",
         "date_of_employment",
+        "specialist_field",
     }
     related = [
         (Employment, "user_id"),
@@ -415,6 +421,8 @@ def _projects_project_cfg(user):
         fields |= {"flat_rate"}
     if user.features[FEATURES.CAMPAIGNS]:
         fields |= {"campaign"}
+    if user.features[FEATURES.INTERNAL_TYPES]:
+        fields |= {"internal_type"}
     if user.features[FEATURES.LABOR_COSTS]:
         fields |= {"cost_center"}
     if user.features[FEATURES.PLANNING]:
@@ -467,6 +475,7 @@ WITH_TOTAL = {
 HISTORY = {
     User: _accounts_user_cfg,
     Team: {"fields": EVERYTHING},
+    SpecialistField: {"fields": EVERYTHING},
     Absence: {"fields": EVERYTHING},
     Year: {"fields": EVERYTHING},
     CreditEntry: _credit_control_creditentry_cfg,
@@ -516,5 +525,6 @@ HISTORY = {
     Campaign: _projects_campaign_cfg,
     Project: _projects_project_cfg,
     ProjectService: _projects_service_cfg,
+    InternalType: {"fields": EVERYTHING},
     CostCenter: _reporting_costcenter_cfg,
 }

@@ -15,6 +15,7 @@ from workbench.tools.validation import in_days
 
 
 class ProjectsTest(TestCase):
+    @override_settings(FEATURES={"INTERNAL_TYPES": F.NEVER})
     def test_create(self):
         """Create a project and create, update, delete and merge a few services"""
         user = factories.UserFactory.create()
@@ -33,6 +34,7 @@ class ProjectsTest(TestCase):
                 "type": Project.INTERNAL,
             },
         )
+        self.assertEqual(response.status_code, 302)
         project = Project.objects.get()
         self.assertEqual(project.customer, person.organization)
         self.assertEqual(project.contact, person)

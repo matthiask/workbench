@@ -247,6 +247,7 @@ class ProjectForm(ModelForm):
             "cost_center",
             "owned_by",
             "type",
+            "internal_type",
             "suppress_planning_update_mails",
             "flat_rate",
             "closed_on",
@@ -257,6 +258,7 @@ class ProjectForm(ModelForm):
             "campaign": Autocomplete(model=Campaign),
             "description": Textarea,
             "type": forms.RadioSelect,
+            "internal_type": forms.RadioSelect,
         }
 
     def __init__(self, *args, **kwargs):
@@ -276,6 +278,7 @@ class ProjectForm(ModelForm):
                         "title": project.title,
                         "description": project.description,
                         "type": project.type,
+                        "internal_type": project.internal_type_id,
                         "flat_rate": project.flat_rate,
                         "owned_by": (
                             project.owned_by_id
@@ -314,7 +317,9 @@ class ProjectForm(ModelForm):
             ),
             (Project.INTERNAL, _("Internal")),
         ]
-
+        self.fields["internal_type"].empty_label = _("Not internal")
+        if not self.request.user.features[FEATURES.INTERNAL_TYPES]:
+            self.fields.pop("internal_type")
         if not self.request.user.features[FEATURES.CONTROLLING]:
             self.fields.pop("flat_rate")
         if not self.request.user.features[FEATURES.CAMPAIGNS]:
@@ -335,6 +340,16 @@ class ProjectForm(ModelForm):
 
     def clean(self):
         data = super().clean()
+
+        if (
+            self.request.user.features[FEATURES.INTERNAL_TYPES]
+            and data.get("type") == Project.INTERNAL
+            and not data.get("internal_type")
+        ):
+            self.add_error(
+                "internal_type",
+                _("Selecting an internal type is required for internal projects."),
+            )
 
         if set(self.changed_data) & {"customer"} and self.instance.invoices.exists():
             self.add_warning(
