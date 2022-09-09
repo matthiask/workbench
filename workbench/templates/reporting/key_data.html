@@ -97,7 +97,7 @@
             <th class="text-right"></th>
             <th class="text-right">{% translate 'Gross margin' %}</th>
             <th class="text-right">
-              <a href="projected-invoices/" data-toggle="ajaxmodal">{% translate 'Projected' %}</a>
+              <a href="projected-invoices/" target="_blank">{% translate 'Projected' %}</a>
             </th>
             <th class="text-right">{% translate 'FTE' %}</th>
             <th class="text-right">{% translate 'Margin / FTE' %}</th>
@@ -178,7 +178,7 @@
                 </td>
                 <td class="text-right text-muted">
                   {% if month.projected_invoices %}
-                    <a href="projected-invoices/" data-toggle="ajaxmodal">
+                    <a href="projected-invoices/" target="_blank">
                       {{ month.projected_invoices|currency:1 }}
                     </a>
                   {% endif %}

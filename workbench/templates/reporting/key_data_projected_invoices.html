@@ -1,11 +1,14 @@
-{% extends "modal.html" %}
+{% extends "base.html" %}
 {% load i18n workbench %}
-{% block size %}modal-xl{% endblock %}
+
 {% block title %}
-  {% translate 'projected gross margin'|capfirst %}
+  {% translate 'projected gross margin'|capfirst %} - {{ block.super }}
 {% endblock %}
-{% block body %}
-  <table class="table table-sm bg-light">
+
+{% block content %}
+  <h1>{% translate 'projected gross margin'|capfirst %}</h1>
+  <table class="table table-sm bg-light vertical-stripes">
+    <thead>
     <tr>
       <th class="w-100">{% translate 'project'|capfirst %}</th>
       <th class="text-nowrap text-right">{% translate 'Projected' %}</th>
@@ -15,10 +18,15 @@
       {% for m in months %}<th class="text-nowrap text-right">{{ m|date:'M y' }}</th>{% endfor %}
     </tr>
     <tr>
-      <th class="w-100" colspan="4">{% translate 'Total' %}</th>
+      <th class="w-100">{% translate 'Total' %}</th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
       <th>&nbsp;</th>
       {% for mo in monthly_overall %}<th class="text-nowrap text-right">{{ mo|currency }}</th>{% endfor %}
     </tr>
+    </thead>
+    <tbody>
     {% for project in projects %}
       <tr>
         <td>
@@ -38,5 +46,17 @@
         {% endfor %}
       </tr>
     {% endfor %}
+    </tbody>
   </table>
+<style>
+.vertical-stripes thead {
+  position: sticky;
+  top: 0;
+  background: #fff;
+}
+.vertical-stripes th:nth-child(2n+6),
+.vertical-stripes td:nth-child(2n+6) {
+  background: #eee;
+}
+</style>
 {% endblock %}
