@@ -7,7 +7,7 @@ from time_machine import travel
 
 from workbench import factories
 from workbench.invoices.tasks import send_unsent_projected_invoices_reminders
-from workbench.reporting.key_data import projected_invoices
+from workbench.reporting.key_data import projected_gross_margin
 
 
 class ProjectedInvoicesTest(TestCase):
@@ -18,11 +18,11 @@ class ProjectedInvoicesTest(TestCase):
     def test_projected_invoices(self):
         """Functionality around projected gross margin and reminder mails"""
         obj = factories.ProjectedInvoiceFactory.create(gross_margin=Decimal(1000))
-        pi = projected_invoices()
+        pgm = projected_gross_margin()
 
-        self.assertEqual(pi["monthly_overall"][(2021, 11)], Decimal(1000))
+        self.assertEqual(pgm["monthly_overall"][(2021, 11)], Decimal(1000))
         self.assertEqual(
-            pi["projects"],
+            pgm["projects"],
             [
                 {
                     "delta": Decimal("1000.00"),

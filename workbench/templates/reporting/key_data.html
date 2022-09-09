@@ -62,7 +62,7 @@
           {% endfor %}
           {
             label: "{% translate 'projected gross margin'|capfirst %}",
-            data: [{% for pi in projected_invoices %}{{ pi|stringformat:'d' }},{% endfor %}],
+            data: [{% for pi in projected_gross_margin %}{{ pi|stringformat:'d' }},{% endfor %}],
             backgroundColor: "rgba(100, 180, 180, 0.4)",
             borderColor: "rgba(100, 180, 180, 0.6)",
             type: "bar",
@@ -97,7 +97,7 @@
             <th class="text-right"></th>
             <th class="text-right">{% translate 'Gross margin' %}</th>
             <th class="text-right">
-              <a href="projected-invoices/" target="_blank">{% translate 'Projected' %}</a>
+              <a href="{% url 'report_projected_gross_margin' %}" target="_blank">{% translate 'Projected' %}</a>
             </th>
             <th class="text-right">{% translate 'FTE' %}</th>
             <th class="text-right">{% translate 'Margin / FTE' %}</th>
@@ -116,7 +116,7 @@
               {{ gross_margin_projection.gross_margin|currency }}
             </th>
             <th class="text-right">
-              {{ gross_margin_projection.gross_margin_incl_projected_invoices|currency }}
+              {{ gross_margin_projection.gross_margin_incl_projected|currency }}
             </th>
             <th class="text-right"></th>
             <th class="text-right">
@@ -141,7 +141,9 @@
                 {{ year.gross_margin|currency }}
               </th>
               <th class="text-right">
-                {{ year.projected_invoices|currency }}
+                {% if year.projected_gross_margin %}
+                  {{ year.projected_gross_margin|currency }}
+                {% endif %}
               </th>
               <th class="text-right">
                 {{ year.fte|stringformat:'.1f' }}
@@ -177,10 +179,8 @@
                   {{ month.gross_margin|currency }}
                 </td>
                 <td class="text-right text-muted">
-                  {% if month.projected_invoices %}
-                    <a href="projected-invoices/" target="_blank">
-                      {{ month.projected_invoices|currency:1 }}
-                    </a>
+                  {% if month.projected_gross_margin %}
+                    {{ month.projected_gross_margin|currency:1 }}
                   {% endif %}
                 </td>
                 <td class="text-right">

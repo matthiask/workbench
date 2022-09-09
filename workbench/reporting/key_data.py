@@ -91,7 +91,7 @@ def gross_margin_by_month(date_range):
     accruals = accruals_by_month(date_range)
     fte = full_time_equivalents_by_month()
 
-    pi = projected_invoices()
+    pgm = projected_gross_margin()
 
     first_of_months = list(
         takewhile(
@@ -111,14 +111,14 @@ def gross_margin_by_month(date_range):
             "third_party_costs": third[month],
             "accruals": accruals.get(month) or {"accrual": None, "delta": Z2},
             "fte": fte.get(day, Z2),
-            "projected_invoices": pi["monthly_overall"].get(month),
+            "projected_gross_margin": pgm["monthly_overall"].get(month),
         }
         if not any(
             (
                 row["gross_profit"],
                 row["third_party_costs"],
                 row["accruals"]["delta"],
-                row["projected_invoices"],
+                row["projected_gross_margin"],
             )
         ):
             continue
@@ -142,7 +142,7 @@ def service_hours_in_open_orders():
     )
 
 
-def projected_invoices():
+def projected_gross_margin():
     open_projects = Project.objects.open().select_related("owned_by")
 
     projected = ProjectedInvoice.objects.filter(
@@ -208,7 +208,7 @@ def unsent_projected_invoices(cutoff_date):
     this = (cutoff_date.year, cutoff_date.month)
 
     def _filter():
-        for project in projected_invoices()["projects"]:
+        for project in projected_gross_margin()["projects"]:
             project["unsent"] = sum(
                 (total for month, total in project["monthly"].items() if month < this),
                 Z2,

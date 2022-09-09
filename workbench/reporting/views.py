@@ -140,15 +140,15 @@ def key_data_third_party_costs(request, date_range):
     )
 
 
-def key_data_projected_invoices(request):
-    pi = key_data.projected_invoices()
+def projected_gross_margin(request):
+    pi = key_data.projected_gross_margin()
     all_months = sorted(
         reduce(lambda a, b: a | b["monthly"].keys(), pi["projects"], set())
     )
 
     return render(
         request,
-        "reporting/key_data_projected_invoices.html",
+        "reporting/projected_gross_margin.html",
         {
             "projects": sorted(
                 (
@@ -174,7 +174,7 @@ def key_data_view(request):
         row["month"]: row["gross_margin"] for row in gross_margin_by_month
     }
 
-    projected_invoices = key_data.projected_invoices()
+    projected_gross_margin = key_data.projected_gross_margin()
 
     gross_margin_by_years = {}
     for month in gross_margin_by_month:
@@ -187,7 +187,7 @@ def key_data_view(request):
                 "third_party_costs": Z2,
                 "accruals": Z2,
                 "gross_margin": Z2,
-                "projected_invoices": Z2,
+                "projected_gross_margin": Z2,
                 "fte": [],
                 "margin_per_fte": [],
                 "months": [],
@@ -198,7 +198,7 @@ def key_data_view(request):
         year["third_party_costs"] += month["third_party_costs"]
         year["accruals"] += month["accruals"]["delta"]
         year["gross_margin"] += month["gross_margin"]
-        year["projected_invoices"] += month["projected_invoices"] or Z2
+        year["projected_gross_margin"] += month["projected_gross_margin"] or Z2
         year["fte"].append(month["fte"])
 
     for year in gross_margin_by_years.values():
@@ -212,9 +212,11 @@ def key_data_view(request):
     gross_margin_projection = {
         "gross_profit": gm["gross_profit"] * gmp_factor,
         "gross_margin": gm["gross_margin"] * gmp_factor,
-        "gross_margin_incl_projected_invoices": gm["gross_margin"] * gmp_factor
-        + gm["projected_invoices"],
-        "margin_per_fte": (gm["gross_margin"] * gmp_factor + gm["projected_invoices"])
+        "gross_margin_incl_projected": gm["gross_margin"] * gmp_factor
+        + gm["projected_gross_margin"],
+        "margin_per_fte": (
+            gm["gross_margin"] * gmp_factor + gm["projected_gross_margin"]
+        )
         / gm["fte"]
         if gm["fte"]
         else None,
@@ -257,8 +259,8 @@ def key_data_view(request):
                 (year, [gross_margin_months.get((year, i), Z2) for i in range(1, 13)])
                 for year in range(date_range[0].year, date_range[1].year + 1)
             ],
-            "projected_invoices": [
-                projected_invoices["monthly_overall"].get((today.year, i), Z2)
+            "projected_gross_margin": [
+                projected_gross_margin["monthly_overall"].get((today.year, i), Z2)
                 for i in range(1, 13)
             ],
             "green_hours": yearly_headline(gh),

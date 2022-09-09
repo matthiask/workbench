@@ -11,13 +11,13 @@ from workbench.reporting.views import (
     date_range_and_users_filter_view,
     date_range_filter_view,
     key_data_gross_profit,
-    key_data_projected_invoices,
     key_data_third_party_costs,
     key_data_view,
     labor_costs_view,
     logging,
     open_items_list,
     project_budget_statistics_view,
+    projected_gross_margin,
     work_anniversaries_view,
 )
 
@@ -40,8 +40,9 @@ urlpatterns = [
         controlling_only(key_data_third_party_costs),
     ),
     re_path(
-        r"^key-data/projected-invoices/",
-        controlling_only(key_data_projected_invoices),
+        r"^projected-gross-margin/",
+        controlling_only(projected_gross_margin),
+        name="report_projected_gross_margin",
     ),
     path(
         "hours-per-customer/",
