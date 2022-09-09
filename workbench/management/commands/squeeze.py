@@ -1,6 +1,7 @@
 import datetime as dt
 import io
 from collections import defaultdict
+from decimal import Decimal
 from itertools import chain
 
 from django.core.mail import EmailMultiAlternatives
@@ -13,7 +14,7 @@ from workbench.awt.models import Employment
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
-from workbench.projects.models import Project, Service
+from workbench.projects.models import InternalType, Project, Service
 from workbench.reporting.green_hours import green_hours
 from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -161,6 +162,31 @@ class Command(BaseCommand):
         all_users_margin = sum(row["margin"] for row in users.values())
         all_users_hours_in_range = sum(row["hours_in_range"] for row in users.values())
 
+        user_internal_types = defaultdict(set)
+        for m2m in InternalType.assigned_users.through.objects.all():
+            user_internal_types[m2m.user_id].add(m2m.internaltype_id)
+        types = list(InternalType.objects.all())
+
+        def user_expectation(user, row, employment_percentage):
+            user_types = [
+                -type.percentage if type.id in user_internal_types[user.id] else 0
+                for type in types
+            ]
+            profitable_percentage = 100 + sum(user_types)
+            # FIXME employment_percentage YTD, not current percentage
+            expected_gross_margin = (
+                150
+                * 1820
+                * Decimal(profitable_percentage)
+                / 100
+                * Decimal(employment_percentage)
+                / 100
+            )
+            # FIXME expectation YTD, not full year
+            delta = row["margin"] - expected_gross_margin
+
+            return user_types + [expected_gross_margin, delta]
+
         users_table = [
             [
                 "User",
@@ -181,6 +207,13 @@ class Command(BaseCommand):
                 "",
                 "Verrechnet pro grüne Stunde",
                 "Verrechnet pro Kundenstunde",
+                "",
+                "Basis",
+            ]
+            + [type.name for type in types]
+            + [
+                "Erwartung",
+                "Delta",
             ],
             [
                 "Total",
@@ -234,7 +267,10 @@ class Command(BaseCommand):
                     / (1 - gh[user]["internal"] / gh[user]["total"])
                     if gh[user]["percentage"]
                     else "",
+                    "",
+                    100,
                 ]
+                + user_expectation(user, row, current_percentage.get(user.id, 0))
                 for user, row in users.items()
             ),
             key=lambda row: row[5],
