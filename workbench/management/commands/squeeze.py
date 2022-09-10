@@ -16,7 +16,7 @@ from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import InternalType, InternalTypeUser, Project, Service
-from workbench.reporting.green_hours import green_hours
+from workbench.projects.reporting import hours_per_type
 from workbench.tools.formats import Z0, Z1, Z2, local_date_format
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -142,15 +142,15 @@ class Command(BaseCommand):
 
         projects_table = [
             [
-                "Projekt",
-                "Offeriert (nur offene Projekte)",
-                "Geplante Rechnungen (nur offene Projekte)",
-                "Verrechnet minus Fremdkosten",
-                "Massgeblicher Umsatz",
-                "Offerierte Stunden",
-                "Erfasste Stunden",
-                "Massgebliche Stunden",
-                "Ansatz",
+                _("project"),
+                _("offered (only open projects)"),
+                _("projected gross margin (only open projects)"),
+                _("invoiced without third party costs"),
+                _("relevant gross margin"),
+                _("offered hours (only open projects)"),
+                _("logged hours"),
+                _("relevant hours"),
+                _("rate"),
             ]
             + list(chain.from_iterable((str(u), "") for u in all_users)),
             [
@@ -164,14 +164,17 @@ class Command(BaseCommand):
                 "",
                 "",
             ]
-            + list(chain.from_iterable(("Stunden", "Umsatz") for _u in all_users)),
+            + list(
+                chain.from_iterable((_("hours"), _("gross margin")) for _u in all_users)
+            ),
         ] + sorted(
             (project_row(row, all_users, users=users) for row in projects.values()),
             key=lambda row: row[4],
             reverse=True,
         )
 
-        gh = dict(green_hours(date_range, users=users.keys()))
+        hpt = hours_per_type(date_range, users=users.keys())
+        hptu = {row["user"]: row for row in hpt["users"]}
 
         all_users_margin = sum(row["margin"] for row in users.values())
         all_users_hours_in_range = sum(row["hours_in_range"] for row in users.values())
@@ -201,71 +204,62 @@ class Command(BaseCommand):
 
             return [p or None for p in internal_percentages] + [
                 profitable_percentage,
-                gh[user]["external_percentage"] - profitable_percentage,
+                100 * hptu[user]["external"] / hptu[user]["total"]
+                - profitable_percentage,
                 expected_gross_margin,
                 delta,
             ]
 
         users_table = [
             [
-                "User",
-                "Fachbereich",
-                "Stellenprozent YTD",
-                "Massgeblicher Umsatz",
-                "Massgebliche Stunden",
-                "Ansatz",
+                _("user"),
+                _("specialist field"),
+                _("employment percentage YTD"),
+                _("relevant gross margin"),
+                _("relevant hours"),
+                _("rate"),
                 "",
-                _("profitable"),
-                _("overdrawn"),
-                _("maintenance"),
-                _("internal"),
-                _("total"),
-                _("green"),
+                _("internal hours"),
+                _("external hours"),
+                _("total hours"),
+                _("external percentage"),
                 "",
-                "Prozent Kundenjobs",
+                _("invoiced per external hour"),
                 "",
-                "Verrechnet pro grüne Stunde",
-                "Verrechnet pro Kundenstunde",
-                "",
-                "Basis",
+                _("starting point"),
             ]
             + [type.name for type in types]
             + [
-                "Erwartung Prozent Kundenjobs",
+                _("Target value: external percentage"),
                 "",
-                "Erwartung Umsatz YTD",
+                _("Target value: gross margin"),
                 "",
             ],
             [
-                "Total",
+                _("Total"),
                 "",
                 sum((average_percentage(user) for user in all_users), Z0),
                 all_users_margin,
                 all_users_hours_in_range,
                 all_users_margin / all_users_hours_in_range,
                 "",
-                gh[0]["profitable"],
-                gh[0]["overdrawn"],
-                gh[0]["maintenance"],
-                gh[0]["internal"],
-                gh[0]["total"],
-                gh[0]["percentage"],
+                hpt["total"]["internal"],
+                hpt["total"]["external"],
+                hpt["total"]["total"],
+                100 * hpt["total"]["external"] / hpt["total"]["total"],
                 "",
-                gh[0]["external_percentage"],
-                "",
-                all_users_margin / all_users_hours_in_range / gh[0]["percentage"] * 100,
                 all_users_margin
                 / all_users_hours_in_range
-                / (1 - gh[0]["internal"] / gh[0]["total"]),
+                / (1 - hpt["total"]["internal"] / hpt["total"]["total"]),
                 "",
                 "",
             ]
             + ["" for _type in types]
             + [
-                "Erreicht",
-                "Delta",
-                "Erreicht (150/h)",
-                "Delta",
+                _("Reached"),
+                _("Delta"),
+                _("Reached (150/h)"),
+                _("Delta"),
             ],
             [],
         ] + sorted(
@@ -274,29 +268,22 @@ class Command(BaseCommand):
                     user,
                     user.specialist_field.name
                     if user.specialist_field
-                    else "<unbekannt>",
+                    else _("<unknown>"),
                     average_percentage(user),
                     row["margin"],
                     row["hours_in_range"],
                     row["margin"] / row["hours_in_range"],
                     "",
-                    gh[user]["profitable"],
-                    gh[user]["overdrawn"],
-                    gh[user]["maintenance"],
-                    gh[user]["internal"],
-                    gh[user]["total"],
-                    gh[user]["percentage"],
+                    hptu[user]["internal"],
+                    hptu[user]["external"],
+                    hptu[user]["total"],
+                    100 * hptu[user]["external"] / hptu[user]["total"],
                     "",
-                    gh[user]["external_percentage"],
-                    "",
-                    row["margin"] / row["hours_in_range"] / gh[user]["percentage"] * 100
-                    if gh[user]["percentage"]
-                    else "",
                     row["margin"]
                     / row["hours_in_range"]
-                    / (1 - gh[user]["internal"] / gh[user]["total"])
-                    if gh[user]["percentage"]
-                    else "",
+                    / (1 - hptu[user]["internal"] / hptu[user]["total"])
+                    if hptu[user]["external"]
+                    else 0,
                     "",
                     100,
                 ]
@@ -318,11 +305,11 @@ class Command(BaseCommand):
 
         fields_table = [
             [
-                "Fachbereich",
-                "Mitarbeitende",
-                "Massgeblicher Umsatz",
-                "Massgebliche Stunden",
-                "Ansatz",
+                _("specialist field"),
+                _("users"),
+                _("relevant gross margin"),
+                _("relevant hours"),
+                _("rate"),
             ]
         ] + sorted(
             (
@@ -342,11 +329,11 @@ class Command(BaseCommand):
         )
 
         xlsx = WorkbenchXLSXDocument()
-        xlsx.add_sheet("Mitarbeitende")
+        xlsx.add_sheet(_("users").replace("*", "_"))
         xlsx.table(None, header + users_table)
-        xlsx.add_sheet("Fachbereiche")
+        xlsx.add_sheet(_("specialist fields"))
         xlsx.table(None, header + fields_table)
-        xlsx.add_sheet("Projekte")
+        xlsx.add_sheet(_("projects"))
         xlsx.table(None, header + projects_table)
 
         filename = f"squeeze-{options['year']}.xlsx"

@@ -76,7 +76,7 @@ def hours_per_type(date_range, *, users=None):
     external_type = SimpleNamespace(id=0, name=_("External"), description="")
     internal_types = list(InternalType.objects.all())
 
-    def hours_per_type(u, row):
+    def _user(u, row):
         uit = user_internal_types[u]
 
         internal_percentages = [
@@ -84,29 +84,42 @@ def hours_per_type(date_range, *, users=None):
         ]
         profitable_percentage = 100 - sum(internal_percentages)
         total = sum(row.values(), 0)
-        return [
-            {
-                "type": external_type,
-                "hours": row[0],
-                "expected": profitable_percentage,
-                "reached": 100 * row[0] / total,
-            }
-        ] + [
-            {
-                "type": type.name,
-                "hours": row[type.id],
-                "expected": uit[type].percentage if type in uit else 0,
-                "reached": 100 * row[type.id] / total,
-            }
-            for type in internal_types
-        ]
+        return {
+            "user": u,
+            "hours_per_type": [
+                {
+                    "type": external_type,
+                    "hours": row[0],
+                    "expected": profitable_percentage,
+                    "reached": 100 * row[0] / total,
+                    "is_internal": False,
+                }
+            ]
+            + [
+                {
+                    "type": type.name,
+                    "hours": row[type.id],
+                    "expected": uit[type].percentage if type in uit else 0,
+                    "reached": 100 * row[type.id] / total,
+                    "is_internal": True,
+                }
+                for type in internal_types
+            ],
+            "internal": total - row[0],
+            "external": row[0],
+            "total": total,
+        }
+
+    users = [_user(u, row) for u, row in sorted(hours.items())]
 
     return {
         "types": [external_type] + internal_types,
-        "users": [
-            {"user": u, "hours_per_type": hours_per_type(u, row)}
-            for u, row in sorted(hours.items())
-        ],
+        "users": users,
+        "total": {
+            "internal": sum((row["internal"] for row in users), Z1),
+            "external": sum((row["external"] for row in users), Z1),
+            "total": sum((row["total"] for row in users), Z1),
+        },
     }
 
 

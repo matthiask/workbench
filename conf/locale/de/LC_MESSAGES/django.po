@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-10 12:15+0200\n"
+"POT-Creation-Date: 2022-09-10 17:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -235,14 +235,15 @@ msgstr "Anstellungsbeginn"
 msgid "token"
 msgstr "Token"
 
-#: workbench/accounts/models.py
+#: workbench/accounts/models.py workbench/management/commands/squeeze.py
 msgid "specialist field"
 msgstr "Fachbereich"
 
 #: workbench/accounts/models.py workbench/audit/admin.py
 #: workbench/awt/models.py workbench/deals/models.py
-#: workbench/logbook/models.py workbench/planning/models.py
-#: workbench/projects/models.py workbench/templates/accounts/user_base.html
+#: workbench/logbook/models.py workbench/management/commands/squeeze.py
+#: workbench/planning/models.py workbench/projects/models.py
+#: workbench/templates/accounts/user_base.html
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/birthdays.html
@@ -254,7 +255,8 @@ msgstr "Fachbereich"
 msgid "user"
 msgstr "Nutzer*in"
 
-#: workbench/accounts/models.py workbench/templates/base.html
+#: workbench/accounts/models.py workbench/management/commands/squeeze.py
+#: workbench/templates/base.html
 msgid "users"
 msgstr "Nutzer*innen"
 
@@ -299,7 +301,7 @@ msgstr "Erstellt um"
 msgid "coffee pairings"
 msgstr "Kaffee-Paare"
 
-#: workbench/accounts/models.py
+#: workbench/accounts/models.py workbench/management/commands/squeeze.py
 msgid "specialist fields"
 msgstr "Fachbereiche"
 
@@ -714,7 +716,8 @@ msgstr "Stundensaldo fortlaufend"
 msgid "vacation days credit"
 msgstr "Guthaben an Ferientagen"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/management/commands/squeeze.py
+#: workbench/templates/awt/year_detail.html
 #: workbench/templates/projects/project_statistics.html
 #: workbench/templates/reporting/projected_gross_margin.html
 msgid "Total"
@@ -757,6 +760,7 @@ msgid "countable absence hours"
 msgstr "Anrechenbare Abwesenheitsstunden"
 
 #: workbench/awt/pdf.py workbench/logbook/models.py
+#: workbench/management/commands/squeeze.py
 #: workbench/templates/awt/year_detail.html workbench/templates/base.html
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/projects/campaign_detail.html workbench/timer/models.py
@@ -1082,7 +1086,6 @@ msgstr "Valuta"
 
 #: workbench/credit_control/models.py workbench/credit_control/reporting.py
 #: workbench/expenses/models.py workbench/expenses/views.py
-#: workbench/management/commands/squeeze.py
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
@@ -1715,9 +1718,9 @@ msgstr "Fixbetrag"
 msgid "Services"
 msgstr "Leistungen"
 
-#: workbench/invoices/models.py workbench/offers/models.py
-#: workbench/planning/models.py workbench/projects/models.py
-#: workbench/projects/views.py
+#: workbench/invoices/models.py workbench/management/commands/squeeze.py
+#: workbench/offers/models.py workbench/planning/models.py
+#: workbench/projects/models.py workbench/projects/views.py
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/invoices/invoice_detail.html
@@ -1936,7 +1939,7 @@ msgstr "%(periodicity)s seit %(from)s"
 msgid "Next period starts on %(start)s, invoice will be created on %(create)s"
 msgstr "Nächste Periode beginnt am %(start)s, Rechnung wird am %(create)s erstellt."
 
-#: workbench/invoices/models.py
+#: workbench/invoices/models.py workbench/management/commands/squeeze.py
 #: workbench/templates/reporting/projected_gross_margin.html
 msgid "gross margin"
 msgstr "Umsatz bereinigt"
@@ -1968,7 +1971,7 @@ msgid "hourly rate"
 msgstr "Stundensatz"
 
 #: workbench/invoices/views.py workbench/logbook/models.py
-#: workbench/services/models.py
+#: workbench/management/commands/squeeze.py workbench/services/models.py
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_list.html
@@ -2208,35 +2211,96 @@ msgstr "%(object)s verschieben"
 msgid "Select project for logging"
 msgstr "Projekt für Erfassung auswählen"
 
-#: workbench/management/commands/squeeze.py workbench/reporting/views.py
-#: workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/key_data.html
-msgid "profitable"
-msgstr "Profitabel"
-
-#: workbench/management/commands/squeeze.py workbench/reporting/views.py
-#: workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/key_data.html
-msgid "overdrawn"
-msgstr "Überzogen"
-
-#: workbench/management/commands/squeeze.py workbench/reporting/views.py
-#: workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/key_data.html
-msgid "maintenance"
-msgstr "Wartung"
-
-#: workbench/management/commands/squeeze.py workbench/reporting/views.py
-#: workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/key_data.html
-msgid "internal"
-msgstr "Intern"
+#: workbench/management/commands/squeeze.py
+msgid "offered (only open projects)"
+msgstr "Offeriert (nur offene Projekte)"
 
 #: workbench/management/commands/squeeze.py
-#: workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/key_data.html
-msgid "green"
-msgstr "Grün"
+msgid "projected gross margin (only open projects)"
+msgstr "geplanter Umsatz (nur offene Projekte)"
+
+#: workbench/management/commands/squeeze.py
+msgid "invoiced without third party costs"
+msgstr "Verrechnet minus Fremdkosten"
+
+#: workbench/management/commands/squeeze.py
+msgid "relevant gross margin"
+msgstr "relevanter Umsatz"
+
+#: workbench/management/commands/squeeze.py
+msgid "offered hours (only open projects)"
+msgstr "offerierte Stunden (nur offene Projekte)"
+
+#: workbench/management/commands/squeeze.py
+msgid "relevant hours"
+msgstr "relevante Stunden"
+
+#: workbench/management/commands/squeeze.py
+msgid "rate"
+msgstr "Ansatz"
+
+#: workbench/management/commands/squeeze.py
+msgid "employment percentage YTD"
+msgstr "Stellenprozent YTD"
+
+#: workbench/management/commands/squeeze.py
+msgid "internal hours"
+msgstr "interne Stunden"
+
+#: workbench/management/commands/squeeze.py
+msgid "external hours"
+msgstr "externe Stunden"
+
+#: workbench/management/commands/squeeze.py
+msgid "total hours"
+msgstr "Stunden insgesamt"
+
+#: workbench/management/commands/squeeze.py
+msgid "external percentage"
+msgstr "externe Prozente"
+
+#: workbench/management/commands/squeeze.py
+msgid "invoiced per external hour"
+msgstr "Verrechnet pro externer Stunde"
+
+#: workbench/management/commands/squeeze.py
+msgid "starting point"
+msgstr "Ausgangspunkt"
+
+#: workbench/management/commands/squeeze.py
+msgid "Target value: external percentage"
+msgstr "Erwartung externe Prozente"
+
+#: workbench/management/commands/squeeze.py
+msgid "Target value: gross margin"
+msgstr "Erwartung Umsatz"
+
+#: workbench/management/commands/squeeze.py
+#: workbench/templates/reporting/hours_per_type.html
+msgid "Reached"
+msgstr "Erreicht"
+
+#: workbench/management/commands/squeeze.py
+#: workbench/templates/reporting/projected_gross_margin.html
+#: workbench/tools/xlsx.py
+msgid "Delta"
+msgstr "Delta"
+
+#: workbench/management/commands/squeeze.py
+msgid "Reached (150/h)"
+msgstr "Erreicht (150/h)"
+
+#: workbench/management/commands/squeeze.py
+msgid "<unknown>"
+msgstr "<unbekannt>"
+
+#: workbench/management/commands/squeeze.py workbench/projects/apps.py
+#: workbench/projects/models.py workbench/templates/base.html
+#: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/object_list.html
+#: workbench/templates/shortcuts.html workbench/tools/xlsx.py
+msgid "projects"
+msgstr "Projekte"
 
 #: workbench/notes/admin.py
 msgid "content object"
@@ -2484,14 +2548,6 @@ msgstr "Erstellt"
 #: workbench/planning/updates.py
 msgid "Updated"
 msgstr "Bearbeitet"
-
-#: workbench/projects/apps.py workbench/projects/models.py
-#: workbench/templates/base.html
-#: workbench/templates/projects/campaign_detail.html
-#: workbench/templates/projects/object_list.html
-#: workbench/templates/shortcuts.html workbench/tools/xlsx.py
-msgid "projects"
-msgstr "Projekte"
 
 #: workbench/projects/forms.py
 msgid "Projects are linked with this campaign. They will be released when deleting this campaign."
@@ -2754,6 +2810,26 @@ msgstr "dieses Jahr"
 #: workbench/reporting/utils.py
 msgid "last year"
 msgstr "letztes Jahr"
+
+#: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
+msgid "profitable"
+msgstr "Profitabel"
+
+#: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
+msgid "overdrawn"
+msgstr "Überzogen"
+
+#: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
+msgid "maintenance"
+msgstr "Wartung"
+
+#: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
+msgid "internal"
+msgstr "Intern"
 
 #: workbench/reporting/views.py
 msgid "Closed during the last year"
@@ -3560,13 +3636,14 @@ msgstr "Geburtstag"
 msgid "Age on birthday"
 msgstr "Alter am Geburtstag"
 
+#: workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
+msgid "green"
+msgstr "Grün"
+
 #: workbench/templates/reporting/hours_per_type.html
 msgid "Target value"
 msgstr "Richtwert"
-
-#: workbench/templates/reporting/hours_per_type.html
-msgid "Reached"
-msgstr "Erreicht"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Facts"
@@ -3692,11 +3769,6 @@ msgstr "Woche"
 #: workbench/templates/reporting/planning_vs_logbook.html
 msgid "Planned"
 msgstr "Geplant"
-
-#: workbench/templates/reporting/projected_gross_margin.html
-#: workbench/tools/xlsx.py
-msgid "Delta"
-msgstr "Delta"
 
 #: workbench/templates/reporting/work_anniversaries.html
 msgid "Started on"
@@ -3984,9 +4056,6 @@ msgstr "%(model)s mit %(attribute)s=%(id)s"
 
 #~ msgid "earned"
 #~ msgstr "Verdient"
-
-#~ msgid "rate"
-#~ msgstr "Ansatz"
 
 #~ msgid "assigned users"
 #~ msgstr "Zugeordnete Nutzer*innen"
