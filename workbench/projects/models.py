@@ -25,7 +25,6 @@ from workbench.tools.validation import in_days, raise_if_errors
 class InternalType(OrderableModel):
     name = models.CharField(_("name"), max_length=100)
     percentage = models.DecimalField(_("percentage"), max_digits=5, decimal_places=2)
-    assigned_users = models.ManyToManyField(User, verbose_name=_("assigned users"))
 
     class Meta(OrderableModel.Meta):
         verbose_name = _("internal type")
