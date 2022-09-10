@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load fineforms i18n static workbench %}
+{% block title %}
+  {% translate 'Hours per type' %} - {{ block.super }}
+{% endblock %}
+{% block content %}
+  <h1>{% translate 'Hours per type' %}</h1>
+  <form method="get" class="mb-3" data-autosubmit>
+    {% ff_fields form %}
+  </form>
+  <table class="table table-sm vertical-stripes">
+    <thead>
+      <tr>
+        <th></th>
+        {% for type in stats.types %}
+          <th colspan="3">{{ type.name }}</th>
+        {% endfor %}
+        <th></th>
+      </tr>
+      <tr>
+        <th></th>
+        {% for type in stats.types %}
+          <td colspan="3">{{ type.description }}</td>
+        {% endfor %}
+        <th></th>
+      </tr>
+      <tr>
+        <th></th>
+        {% for type in stats.types %}
+          <th class="text-right">{% translate 'Hours' %}</th>
+          <th class="text-right">{% translate 'Target value' %}</th>
+          <th class="text-right">{% translate 'Reached' %}</th>
+        {% endfor %}
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in stats.users %}
+        <tr>
+          <th class="text-nowrap">{{ row.user }}</th>
+          {% for type in row.hours_per_type %}
+            <td class="text-right {% if not type.hours %}text-black-30{% endif %}">{{ type.hours|hours }}</td>
+            <td class="text-right {% if not type.expected %}text-black-30{% endif %}">{{ type.expected|stringformat:".0f" }}%</td>
+            <td class="text-right
+                {% if not type.reached %}text-black-30{% endif %}
+                {% if not forloop.counter0 and type.reached >= type.expected %}text-success{% endif %}
+                {% if not forloop.counter0 and type.reached|add:15 < type.expected %}text-warning{% endif %}
+                {% if forloop.counter0 and type.reached > type.expected %}text-warning{% endif %}
+                "
+              >{{ type.reached|stringformat:".0f" }}%</td>
+          {% endfor %}
+          <th class="text-right"></th>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+<style>
+.vertical-stripes tbody td:nth-child(6n+2),
+.vertical-stripes tbody td:nth-child(6n+3),
+.vertical-stripes tbody td:nth-child(6n+4) {
+  background: #eee;
+}
+</style>
+{% endblock %}

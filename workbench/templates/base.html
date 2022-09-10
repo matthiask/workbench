@@ -126,7 +126,6 @@
               <div class="dropdown-divider">
               </div>
             {% endif %}
-            <div class="dropdown-divider"></div>
             <div class="dropdown-header">{% translate 'working time'|capfirst %}</div>
             <a class="dropdown-item" href="{% url 'awt_year_report' %}">{% translate 'annual working time'|capfirst %}</a>
             <a class="dropdown-item" href="{% url 'awt_absence_calendar' %}">{% translate 'Absence calendar' %}</a>
@@ -137,6 +136,9 @@
               </div>
               <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">
                 {% translate 'Hours per customer'|capfirst %}
+              </a>
+              <a class="dropdown-item" href="{% url 'report_hours_per_type' %}">
+                {% translate 'Hours per type'|capfirst %}
               </a>
               <a class="dropdown-item"
                  href="{% url 'report_planning_vs_logbook' %}?team=-{{ request.user.pk }}">

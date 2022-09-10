@@ -13,7 +13,7 @@ class InternalTypeUserInline(admin.TabularInline):
 @admin.register(models.InternalType)
 class InternalTypeAdmin(OrderableAdmin, admin.ReadWriteModelAdmin):
     inlines = [InternalTypeUserInline]
-    list_display = ["name", "percentage", "ordering"]
+    list_display = ["name", "description", "percentage", "ordering"]
     list_editable = ["ordering"]
 
 

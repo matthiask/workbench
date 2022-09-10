@@ -4,7 +4,7 @@ from workbench.accounts.features import controlling_only, deals_only, labor_cost
 from workbench.awt.views import absence_calendar, annual_working_time_view
 from workbench.deals.reporting import accepted_deals, deal_history, declined_deals
 from workbench.planning.reporting import planning_vs_logbook
-from workbench.projects.reporting import hours_per_customer
+from workbench.projects.reporting import hours_per_customer, hours_per_type
 from workbench.reporting.green_hours import green_hours
 from workbench.reporting.views import (
     birthdays_view,
@@ -52,6 +52,12 @@ urlpatterns = [
             "stats_fn": hours_per_customer,
         },
         name="report_hours_per_customer",
+    ),
+    path(
+        "hours-per-type/",
+        controlling_only(date_range_and_users_filter_view),
+        {"template_name": "reporting/hours_per_type.html", "stats_fn": hours_per_type},
+        name="report_hours_per_type",
     ),
     path(
         "planning-vs-logbook/",

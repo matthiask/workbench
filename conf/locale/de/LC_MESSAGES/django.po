@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-09 21:25+0200\n"
+"POT-Creation-Date: 2022-09-10 12:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -186,7 +186,6 @@ msgid "email"
 msgstr "Email"
 
 #: workbench/accounts/models.py workbench/credit_control/models.py
-#: workbench/management/commands/profitability.py
 msgid "is active"
 msgstr "ist aktiv"
 
@@ -242,8 +241,8 @@ msgstr "Fachbereich"
 
 #: workbench/accounts/models.py workbench/audit/admin.py
 #: workbench/awt/models.py workbench/deals/models.py
-#: workbench/logbook/models.py workbench/management/commands/profitability.py
-#: workbench/planning/models.py workbench/templates/accounts/user_base.html
+#: workbench/logbook/models.py workbench/planning/models.py
+#: workbench/projects/models.py workbench/templates/accounts/user_base.html
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/birthdays.html
@@ -1304,7 +1303,7 @@ msgid "high"
 msgstr "hoch"
 
 #: workbench/deals/models.py workbench/invoices/models.py
-#: workbench/management/commands/profitability.py workbench/projects/models.py
+#: workbench/projects/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/invoices/reminders.html
@@ -1969,7 +1968,7 @@ msgid "hourly rate"
 msgstr "Stundensatz"
 
 #: workbench/invoices/views.py workbench/logbook/models.py
-#: workbench/management/commands/profitability.py workbench/services/models.py
+#: workbench/services/models.py
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_list.html
@@ -2208,20 +2207,6 @@ msgstr "%(object)s verschieben"
 #: workbench/logbook/views.py
 msgid "Select project for logging"
 msgstr "Projekt für Erfassung auswählen"
-
-#: workbench/management/commands/profitability.py
-msgid "earned"
-msgstr "Verdient"
-
-#: workbench/management/commands/profitability.py
-#: workbench/templates/projects/campaign_detail.html
-#: workbench/templates/reporting/project_budget_statistics.html
-msgid "invoiced"
-msgstr "Verrechnet"
-
-#: workbench/management/commands/profitability.py
-msgid "rate"
-msgstr "Ansatz"
 
 #: workbench/management/commands/squeeze.py workbench/reporting/views.py
 #: workbench/templates/reporting/green_hours.html
@@ -2614,12 +2599,20 @@ msgid "Codes must be unique."
 msgstr "Codes müssen eindeutig sein."
 
 #: workbench/projects/models.py
-msgid "assigned users"
-msgstr "Zugeordnete Nutzer*innen"
-
-#: workbench/projects/models.py
 msgid "internal type"
 msgstr "interner Typ"
+
+#: workbench/projects/models.py
+msgid "Inherit the default internal type percentage if left empty."
+msgstr "Erbt die Standard-Prozentzahl falls leer."
+
+#: workbench/projects/models.py
+msgid "internal type user"
+msgstr "Interner Typ-User"
+
+#: workbench/projects/models.py
+msgid "internal type users"
+msgstr "Interne Typ-Users"
 
 #: workbench/projects/models.py
 #: workbench/templates/planning/campaign_planning.html
@@ -2684,6 +2677,10 @@ msgstr "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht 
 #: workbench/projects/models.py
 msgid "The offer must belong to the same project as the service."
 msgstr "Die Offerte muss zum gleichen Projekt gehören wie die Leistung."
+
+#: workbench/projects/reporting.py
+msgid "External"
+msgstr "Extern"
 
 #: workbench/projects/urls.py
 #, python-format
@@ -3024,6 +3021,11 @@ msgstr "Kennzahlen"
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "Project budget statistics"
 msgstr "Projekt-Budgetstatistik"
+
+#: workbench/templates/base.html
+#: workbench/templates/reporting/hours_per_type.html
+msgid "Hours per type"
+msgstr "Stunden pro Typ"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/planning_vs_logbook.html
@@ -3409,6 +3411,11 @@ msgid "sold"
 msgstr "verkauft"
 
 #: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "invoiced"
+msgstr "Verrechnet"
+
+#: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/campaign_statistics.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_statistics.html
@@ -3422,6 +3429,7 @@ msgid "Logged hours per hourly rate"
 msgstr "Erfasste Stunden pro Stundensatz"
 
 #: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/hours_per_type.html
 msgid "Hours"
 msgstr "Stunden"
 
@@ -3551,6 +3559,14 @@ msgstr "Geburtstag"
 #: workbench/templates/reporting/birthdays.html
 msgid "Age on birthday"
 msgstr "Alter am Geburtstag"
+
+#: workbench/templates/reporting/hours_per_type.html
+msgid "Target value"
+msgstr "Richtwert"
+
+#: workbench/templates/reporting/hours_per_type.html
+msgid "Reached"
+msgstr "Erreicht"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Facts"
@@ -3965,6 +3981,15 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "earned"
+#~ msgstr "Verdient"
+
+#~ msgid "rate"
+#~ msgstr "Ansatz"
+
+#~ msgid "assigned users"
+#~ msgstr "Zugeordnete Nutzer*innen"
 
 #~ msgid "GlassFrog integration"
 #~ msgstr "GlassFrog-Integration"

@@ -24,6 +24,7 @@ from workbench.tools.validation import in_days, raise_if_errors
 
 class InternalType(OrderableModel):
     name = models.CharField(_("name"), max_length=100)
+    description = models.CharField(_("description"), max_length=100, blank=True)
     percentage = models.DecimalField(_("percentage"), max_digits=5, decimal_places=2)
 
     class Meta(OrderableModel.Meta):
@@ -31,7 +32,7 @@ class InternalType(OrderableModel):
         verbose_name_plural = _("internal types")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.description})"
 
 
 class InternalTypeUser(models.Model):
