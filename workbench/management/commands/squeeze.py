@@ -22,10 +22,10 @@ from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 def working_hours_estimation(date_range):
     days = (date_range[1] - date_range[0]).days + 1
-    per_week_ratio = Decimal(5) / 7  # 5 work days per week
+    work_days_ratio = Decimal(250) / 365  # ~250 working days per year
     vacation_ratio = Decimal(47) / 52  # 5 weeks vacation per year
     working_time_per_day = Decimal(8)
-    return days * per_week_ratio * vacation_ratio * working_time_per_day
+    return days * work_days_ratio * vacation_ratio * working_time_per_day
 
 
 class Command(BaseCommand):
