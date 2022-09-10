@@ -229,19 +229,25 @@ def key_data_view(request):
     ]
 
     def yearly_headline(gh):
-        zero = {"green": Z2, "red": Z2, "maintenance": Z2, "internal": Z2, "total": Z2}
+        zero = {
+            "profitable": Z2,
+            "overdrawn": Z2,
+            "maintenance": Z2,
+            "internal": Z2,
+            "total": Z2,
+        }
 
         for key, months in groupby(gh, key=lambda row: row["month"].year):
             this = zero.copy()
             months = list(months)
             for month in months:
-                this["green"] += month["green"]
-                this["red"] += month["red"]
+                this["profitable"] += month["profitable"]
+                this["overdrawn"] += month["overdrawn"]
                 this["maintenance"] += month["maintenance"]
                 this["internal"] += month["internal"]
                 this["total"] += month["total"]
             this["percentage"] = (
-                100 * (this["green"] + this["maintenance"]) / this["total"]
+                100 * (this["profitable"] + this["maintenance"]) / this["total"]
             ).quantize(Z0)
             yield key, this, months
 
@@ -272,8 +278,8 @@ def key_data_view(request):
                         "data": [100 * row[attribute] / row["total"] for row in gh],
                     }
                     for label, attribute in [
-                        (_("profitable"), "green"),
-                        (_("overdrawn"), "red"),
+                        (_("profitable"), "profitable"),
+                        (_("overdrawn"), "overdrawn"),
                         (_("maintenance"), "maintenance"),
                         (_("internal"), "internal"),
                     ]

@@ -52,8 +52,8 @@ WHERE service.hours / logged.hours < 1;
         user_ids.add(row["rendered_by"])
         within[row["service__project"]][row["rendered_by"]] = row["hours__sum"]
 
-    green = defaultdict(lambda: Z1)
-    red = defaultdict(lambda: Z1)
+    profitable = defaultdict(lambda: Z1)
+    overdrawn = defaultdict(lambda: Z1)
     maintenance = defaultdict(lambda: Z1)
     internal = defaultdict(lambda: Z1)
 
@@ -66,19 +66,19 @@ WHERE service.hours / logged.hours < 1;
             elif type == Project.MAINTENANCE:
                 maintenance[user_id] += hours
             else:
-                green[user_id] += green_hours_factor[project_id] * hours
-                red[user_id] += (1 - green_hours_factor[project_id]) * hours
+                profitable[user_id] += green_hours_factor[project_id] * hours
+                overdrawn[user_id] += (1 - green_hours_factor[project_id]) * hours
 
     def data(user_id):
         ret = {
-            "green": green[user_id],
-            "red": red[user_id],
+            "profitable": profitable[user_id],
+            "overdrawn": overdrawn[user_id],
             "maintenance": maintenance[user_id],
             "internal": internal[user_id],
         }
         ret["total"] = sum(ret.values())
         ret["percentage"] = (
-            100 * (ret["green"] + ret["maintenance"]) / ret["total"]
+            100 * (ret["profitable"] + ret["maintenance"]) / ret["total"]
             if ret["total"]
             else 0
         )
@@ -91,8 +91,8 @@ WHERE service.hours / logged.hours < 1;
     ret = {}
     for user in users:
         ret[user] = data(user.id)
-        green[0] += green[user.id]
-        red[0] += red[user.id]
+        profitable[0] += profitable[user.id]
+        overdrawn[0] += overdrawn[user.id]
         maintenance[0] += maintenance[user.id]
         internal[0] += internal[user.id]
     ret[0] = data(0)
@@ -200,11 +200,11 @@ ORDER BY th.month
         return [
             {
                 "month": row[0].date(),
-                "green": row[1],
+                "profitable": row[1],
                 "maintenance": row[2],
                 "internal": row[3],
                 "total": row[4],
-                "red": row[4] - row[1] - row[2] - row[3],
+                "overdrawn": row[4] - row[1] - row[2] - row[3],
                 "percentage": (100 * (row[1] + row[2]) / row[4]).quantize(Z0),
             }
             for row in cursor

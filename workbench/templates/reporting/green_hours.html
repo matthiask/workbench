@@ -34,10 +34,10 @@
               {% else %}
                 <th>{% translate 'total'|capfirst %}</th>
               {% endif %}
-              <td class="text-right">{{ stats.green|hours }}</td>
-              <td>{% percentage stats.green stats.total %}</td>
-              <td class="text-right">{{ stats.red|hours }}</td>
-              <td>{% percentage stats.red stats.total %}</td>
+              <td class="text-right">{{ stats.profitable|hours }}</td>
+              <td>{% percentage stats.profitable stats.total %}</td>
+              <td class="text-right">{{ stats.overdrawn|hours }}</td>
+              <td>{% percentage stats.overdrawn stats.total %}</td>
               <td class="text-right">{{ stats.maintenance|hours }}</td>
               <td>{% percentage stats.maintenance stats.total %}</td>
               <td class="text-right">{{ stats.internal|hours }}</td>

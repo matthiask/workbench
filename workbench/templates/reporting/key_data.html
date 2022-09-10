@@ -261,16 +261,16 @@
                 {{ year }}
               </th>
               <th class="text-right">
-                {{ year_stats.green|hours }}
+                {{ year_stats.profitable|hours }}
               </th>
               <th>
-                {% percentage year_stats.green year_stats.total %}
+                {% percentage year_stats.profitable year_stats.total %}
               </th>
               <th class="text-right">
-                {{ year_stats.red|hours }}
+                {{ year_stats.overdrawn|hours }}
               </th>
               <th>
-                {% percentage year_stats.red year_stats.total %}
+                {% percentage year_stats.overdrawn year_stats.total %}
               </th>
               <th class="text-right">
                 {{ year_stats.maintenance|hours }}
@@ -294,16 +294,16 @@
                   {{ month.month|date:'F' }}
                 </td>
                 <td class="text-right">
-                  {{ month.green|hours }}
+                  {{ month.profitable|hours }}
                 </td>
                 <th>
-                  {% percentage month.green month.total %}
+                  {% percentage month.profitable month.total %}
                 </th>
                 <td class="text-right">
-                  {{ month.red|hours }}
+                  {{ month.overdrawn|hours }}
                 </td>
                 <th>
-                  {% percentage month.red month.total %}
+                  {% percentage month.overdrawn month.total %}
                 </th>
                 <td class="text-right">
                   {{ month.maintenance|hours }}
