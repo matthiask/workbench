@@ -189,7 +189,6 @@ class Command(BaseCommand):
                 for type in types
             ]
             profitable_percentage = 100 + sum(internal_percentages)
-            # FIXME employment_percentage YTD, not current percentage
             expected_gross_margin = (
                 150
                 * working_hours_estimation(date_range)
@@ -198,7 +197,6 @@ class Command(BaseCommand):
                 * Decimal(employment_percentage)
                 / 100
             )
-            # FIXME expectation YTD, not full year
             delta = row["margin"] - expected_gross_margin
 
             return [p or None for p in internal_percentages] + [
