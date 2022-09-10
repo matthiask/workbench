@@ -40,14 +40,14 @@
           <th class="text-nowrap">{{ row.user }}</th>
           {% for type in row.hours_per_type %}
             <td class="text-right {% if not type.hours %}text-black-30{% endif %}">{{ type.hours|hours }}</td>
-            <td class="text-right {% if not type.expected %}text-black-30{% endif %}">{{ type.expected|stringformat:".0f" }}%</td>
+            <td class="text-right {% if not type.expected %}text-black-30{% endif %}">{{ type.expected|stringformat:".1f" }}%</td>
             <td class="text-right
                 {% if not type.reached %}text-black-30{% endif %}
                 {% if not forloop.counter0 and type.reached >= type.expected %}text-success{% endif %}
                 {% if not forloop.counter0 and type.reached|add:15 < type.expected %}text-warning{% endif %}
                 {% if forloop.counter0 and type.reached > type.expected %}text-warning{% endif %}
                 "
-              >{{ type.reached|stringformat:".0f" }}%</td>
+              >{{ type.reached|stringformat:".1f" }}%</td>
           {% endfor %}
           <th class="text-right"></th>
         </tr>
