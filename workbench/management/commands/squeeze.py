@@ -12,11 +12,12 @@ from django.utils.translation import activate, gettext as _
 from workbench.accounts.models import User
 from workbench.awt.reporting import employment_percentages
 from workbench.invoices.models import Invoice, ProjectedInvoice
+from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import InternalType, InternalTypeUser, Project, Service
 from workbench.reporting.green_hours import green_hours
-from workbench.tools.formats import Z1, Z2, local_date_format
+from workbench.tools.formats import Z0, Z1, Z2, local_date_format
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -129,12 +130,12 @@ class Command(BaseCommand):
         ep = employment_percentages()
 
         def average_percentage(user):
-            percentages = [
-                percentage
-                for month, percentage in ep[user].items()
-                if date_range[0] <= month < date_range[1]
-            ] or [0]
-            return sum(percentages, Decimal(0)) / len(percentages)
+            percentages = []
+            for month in recurring(date_range[0], "monthly"):
+                if month > date_range[1]:
+                    break
+                percentages.append(ep[user].get(month, Z0))
+            return sum(percentages, Z0) / len(percentages)
 
         body = f"Squeeze {local_date_format(date_range[0])} - {local_date_format(date_range[1])}"
         header = [[body]]
@@ -240,7 +241,7 @@ class Command(BaseCommand):
             [
                 "Total",
                 "",
-                sum((average_percentage(user) for user in all_users), Decimal(0)),
+                sum((average_percentage(user) for user in all_users), Z0),
                 all_users_margin,
                 all_users_hours_in_range,
                 all_users_margin / all_users_hours_in_range,
@@ -265,7 +266,7 @@ class Command(BaseCommand):
             + [
                 "Erreicht",
                 "Delta",
-                "Erreicht",
+                "Erreicht (150/h)",
                 "Delta",
             ],
             [],
