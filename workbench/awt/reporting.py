@@ -66,11 +66,11 @@ def active_users(year):
     )
 
 
-def full_time_equivalents_by_month():
-    months = defaultdict(lambda: Z1)
+def employment_percentages():
+    user_months = defaultdict(lambda: defaultdict(lambda: Z1))
     this_year = dt.date.today().year
-    for employment in Employment.objects.all():
-        percentage_factor = Decimal(employment.percentage) / 100
+    for employment in Employment.objects.select_related("user"):
+        percentage_factor = Decimal(employment.percentage)
         for month, days in monthly_days(  # pragma: no branch
             employment.date_from, employment.date_until
         ):
@@ -78,7 +78,17 @@ def full_time_equivalents_by_month():
                 break
             dpm = days_per_month(month.year)
             partial_month_factor = Decimal(days) / dpm[month.month - 1]
-            months[month] += percentage_factor * partial_month_factor
+            user_months[employment.user][month] += (
+                percentage_factor * partial_month_factor
+            )
+    return user_months
+
+
+def full_time_equivalents_by_month():
+    months = defaultdict(lambda: Z1)
+    for user_data in employment_percentages().values():
+        for month, percentage in user_data.items():
+            months[month] += percentage / 100
     return months
 
 

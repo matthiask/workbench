@@ -10,7 +10,7 @@ from django.db.models import Sum
 from django.utils.translation import activate, gettext as _
 
 from workbench.accounts.models import User
-from workbench.awt.models import Employment
+from workbench.awt.reporting import employment_percentages
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
@@ -42,12 +42,13 @@ class Command(BaseCommand):
         )
 
     def handle(self, **options):
+        activate("de")
+
+        last_month_end = dt.date.today().replace(day=1) - dt.timedelta(days=1)
         date_range = [
             dt.date(options["year"], 1, 1),
-            min(dt.date.today(), dt.date(options["year"], 12, 31)),
+            min(last_month_end, dt.date(options["year"], 12, 31)),
         ]
-
-        activate("de")
 
         projects = defaultdict(
             lambda: {
@@ -125,14 +126,15 @@ class Command(BaseCommand):
             projects[project_id]["project"] = project
 
         all_users = sorted(users.keys())
+        ep = employment_percentages()
 
-        current_percentage = {
-            e.user_id: e.percentage
-            for e in Employment.objects.filter(
-                user__in=all_users,
-                date_until__gte=date_range[1],
-            ).order_by("-date_until")
-        }
+        def average_percentage(user):
+            percentages = [
+                percentage
+                for month, percentage in ep[user].items()
+                if date_range[0] <= month < date_range[1]
+            ] or [0]
+            return sum(percentages, Decimal(0)) / len(percentages)
 
         body = f"Squeeze {local_date_format(date_range[0])} - {local_date_format(date_range[1])}"
         header = [[body]]
@@ -209,7 +211,7 @@ class Command(BaseCommand):
             [
                 "User",
                 "Fachbereich",
-                "Stellenprozent",
+                "Stellenprozent YTD",
                 "Massgeblicher Umsatz",
                 "Massgebliche Stunden",
                 "Ansatz",
@@ -238,7 +240,7 @@ class Command(BaseCommand):
             [
                 "Total",
                 "",
-                sum(current_percentage.values()),
+                sum((average_percentage(user) for user in all_users), Decimal(0)),
                 all_users_margin,
                 all_users_hours_in_range,
                 all_users_margin / all_users_hours_in_range,
@@ -274,7 +276,7 @@ class Command(BaseCommand):
                     user.specialist_field.name
                     if user.specialist_field
                     else "<unbekannt>",
-                    current_percentage.get(user.id, 0),
+                    average_percentage(user),
                     row["margin"],
                     row["hours_in_range"],
                     row["margin"] / row["hours_in_range"],
@@ -299,7 +301,7 @@ class Command(BaseCommand):
                     "",
                     100,
                 ]
-                + user_expectation(user, row, current_percentage.get(user.id, 0))
+                + user_expectation(user, row, average_percentage(user))
                 for user, row in users.items()
             ),
             key=lambda row: row[5],
