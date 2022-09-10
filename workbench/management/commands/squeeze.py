@@ -168,13 +168,13 @@ class Command(BaseCommand):
         types = list(InternalType.objects.all())
 
         def user_expectation(user, row, employment_percentage):
-            user_types = [
+            internal_percentages = [
                 -user_internal_types[user.id][type].percentage
                 if type in user_internal_types[user.id]
                 else 0
                 for type in types
             ]
-            profitable_percentage = 100 + sum(user_types)
+            profitable_percentage = 100 + sum(internal_percentages)
             # FIXME employment_percentage YTD, not current percentage
             expected_gross_margin = (
                 150
@@ -187,7 +187,12 @@ class Command(BaseCommand):
             # FIXME expectation YTD, not full year
             delta = row["margin"] - expected_gross_margin
 
-            return user_types + [expected_gross_margin, delta]
+            return [p or None for p in internal_percentages] + [
+                profitable_percentage,
+                gh[user]["external_percentage"] - profitable_percentage,
+                expected_gross_margin,
+                delta,
+            ]
 
         users_table = [
             [
@@ -216,6 +221,8 @@ class Command(BaseCommand):
             + [
                 "Erwartung",
                 "Delta",
+                "Jahresumsatz (Hochrechnung)",
+                "Delta",
             ],
             [
                 "Total",
@@ -232,7 +239,7 @@ class Command(BaseCommand):
                 gh[0]["total"],
                 gh[0]["percentage"],
                 "",
-                100 - 100 * gh[0]["internal"] / gh[0]["total"],
+                gh[0]["external_percentage"],
                 "",
                 all_users_margin / all_users_hours_in_range / gh[0]["percentage"] * 100,
                 all_users_margin
@@ -259,7 +266,7 @@ class Command(BaseCommand):
                     gh[user]["total"],
                     gh[user]["percentage"],
                     "",
-                    100 - 100 * gh[user]["internal"] / gh[user]["total"],
+                    gh[user]["external"],
                     "",
                     row["margin"] / row["hours_in_range"] / gh[user]["percentage"] * 100
                     if gh[user]["percentage"]

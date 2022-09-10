@@ -82,6 +82,7 @@ WHERE service.hours / logged.hours < 1;
             if ret["total"]
             else 0
         )
+        ret["external_percentage"] = 100 - 100 * internal[user_id] / ret["total"]
         return ret
 
     users = users or User.objects.filter(id__in=user_ids)
