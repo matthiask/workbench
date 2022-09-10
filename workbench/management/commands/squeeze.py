@@ -20,6 +20,14 @@ from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
+def working_hours_estimation(date_range):
+    days = (date_range[1] - date_range[0]).days + 1
+    per_week_ratio = Decimal(5) / 7  # 5 work days per week
+    vacation_ratio = Decimal(47) / 52  # 5 weeks vacation per year
+    working_time_per_day = Decimal(8)
+    return days * per_week_ratio * vacation_ratio * working_time_per_day
+
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
@@ -34,7 +42,10 @@ class Command(BaseCommand):
         )
 
     def handle(self, **options):
-        date_range = [dt.date(options["year"], 1, 1), dt.date(options["year"], 12, 31)]
+        date_range = [
+            dt.date(options["year"], 1, 1),
+            min(dt.date.today(), dt.date(options["year"], 12, 31)),
+        ]
 
         activate("de")
 
@@ -178,7 +189,7 @@ class Command(BaseCommand):
             # FIXME employment_percentage YTD, not current percentage
             expected_gross_margin = (
                 150
-                * 1820
+                * working_hours_estimation(date_range)
                 * Decimal(profitable_percentage)
                 / 100
                 * Decimal(employment_percentage)
@@ -219,10 +230,10 @@ class Command(BaseCommand):
             ]
             + [type.name for type in types]
             + [
-                "Erwartung",
-                "Delta",
-                "Jahresumsatz (Hochrechnung)",
-                "Delta",
+                "Erwartung Prozent Kundenjobs",
+                "",
+                "Erwartung Umsatz YTD",
+                "",
             ],
             [
                 "Total",
@@ -245,6 +256,15 @@ class Command(BaseCommand):
                 all_users_margin
                 / all_users_hours_in_range
                 / (1 - gh[0]["internal"] / gh[0]["total"]),
+                "",
+                "",
+            ]
+            + ["" for _type in types]
+            + [
+                "Erreicht",
+                "Delta",
+                "Erreicht",
+                "Delta",
             ],
             [],
         ] + sorted(
@@ -266,7 +286,7 @@ class Command(BaseCommand):
                     gh[user]["total"],
                     gh[user]["percentage"],
                     "",
-                    gh[user]["external"],
+                    gh[user]["external_percentage"],
                     "",
                     row["margin"] / row["hours_in_range"] / gh[user]["percentage"] * 100
                     if gh[user]["percentage"]
