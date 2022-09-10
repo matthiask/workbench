@@ -264,7 +264,6 @@ class Project(Model):
     internal_type = models.ForeignKey(
         InternalType,
         on_delete=models.PROTECT,
-        limit_choices_to={"is_selectable": True},
         blank=True,
         null=True,
         related_name="+",

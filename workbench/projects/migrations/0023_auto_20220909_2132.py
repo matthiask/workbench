@@ -21,7 +21,6 @@ class Migration(migrations.Migration):
             name="internal_type",
             field=models.ForeignKey(
                 blank=True,
-                limit_choices_to={"is_selectable": True},
                 null=True,
                 on_delete=django.db.models.deletion.PROTECT,
                 related_name="+",
