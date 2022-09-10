@@ -14,7 +14,7 @@ from workbench.awt.models import Employment
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
-from workbench.projects.models import InternalType, Project, Service
+from workbench.projects.models import InternalType, InternalTypeUser, Project, Service
 from workbench.reporting.green_hours import green_hours
 from workbench.tools.formats import Z1, Z2, local_date_format
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -162,14 +162,16 @@ class Command(BaseCommand):
         all_users_margin = sum(row["margin"] for row in users.values())
         all_users_hours_in_range = sum(row["hours_in_range"] for row in users.values())
 
-        user_internal_types = defaultdict(set)
-        for m2m in InternalType.assigned_users.through.objects.all():
-            user_internal_types[m2m.user_id].add(m2m.internaltype_id)
+        user_internal_types = defaultdict(dict)
+        for m2m in InternalTypeUser.objects.select_related("internal_type"):
+            user_internal_types[m2m.user_id][m2m.internal_type] = m2m
         types = list(InternalType.objects.all())
 
         def user_expectation(user, row, employment_percentage):
             user_types = [
-                -type.percentage if type.id in user_internal_types[user.id] else 0
+                -user_internal_types[user.id][type].percentage
+                if type in user_internal_types[user.id]
+                else 0
                 for type in types
             ]
             profitable_percentage = 100 + sum(user_types)

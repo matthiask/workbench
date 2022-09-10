@@ -4,10 +4,16 @@ from workbench.projects import models
 from workbench.tools import admin
 
 
+class InternalTypeUserInline(admin.TabularInline):
+    model = models.InternalTypeUser
+    extra = 0
+    ordering = ["user"]
+
+
 @admin.register(models.InternalType)
 class InternalTypeAdmin(OrderableAdmin, admin.ReadWriteModelAdmin):
-    filter_horizontal = ["assigned_users"]
-    list_display = ["name", "percentage", "is_selectable", "ordering"]
+    inlines = [InternalTypeUserInline]
+    list_display = ["name", "percentage", "ordering"]
     list_editable = ["ordering"]
 
 

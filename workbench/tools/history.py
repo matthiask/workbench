@@ -39,6 +39,7 @@ from workbench.planning.models import (
 from workbench.projects.models import (
     Campaign,
     InternalType,
+    InternalTypeUser,
     Project,
     Service as ProjectService,
 )
@@ -526,5 +527,6 @@ HISTORY = {
     Project: _projects_project_cfg,
     ProjectService: _projects_service_cfg,
     InternalType: {"fields": EVERYTHING},
+    InternalTypeUser: {"fields": EVERYTHING},
     CostCenter: _reporting_costcenter_cfg,
 }

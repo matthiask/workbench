@@ -26,7 +26,6 @@ class InternalType(OrderableModel):
     name = models.CharField(_("name"), max_length=100)
     percentage = models.DecimalField(_("percentage"), max_digits=5, decimal_places=2)
     assigned_users = models.ManyToManyField(User, verbose_name=_("assigned users"))
-    is_selectable = models.BooleanField(_("is selectable"), default=True)
 
     class Meta(OrderableModel.Meta):
         verbose_name = _("internal type")
@@ -34,6 +33,33 @@ class InternalType(OrderableModel):
 
     def __str__(self):
         return self.name
+
+
+class InternalTypeUser(models.Model):
+    internal_type = models.ForeignKey(
+        InternalType, on_delete=models.CASCADE, verbose_name=_("internal type")
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))
+    _percentage = models.DecimalField(
+        _("percentage"),
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        help_text=_("Inherit the default internal type percentage if left empty."),
+    )
+
+    class Meta:
+        verbose_name = _("internal type user")
+        verbose_name_plural = _("internal type users")
+
+    @property
+    def percentage(self):
+        return (
+            self.internal_type.percentage
+            if self._percentage is None
+            else self._percentage
+        )
 
 
 class CampaignQuerySet(SearchQuerySet):
