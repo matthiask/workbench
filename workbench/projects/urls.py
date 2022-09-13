@@ -176,7 +176,7 @@ urlpatterns = [
         name="projects_project_update",
     ),
     path(
-        "<int:pk>/projected-invoices/",
+        "<int:pk>/projected-gross-margin/",
         generic.UpdateView.as_view(
             form_class=ProjectedInvoicesProjectForm,
             model=Project,
