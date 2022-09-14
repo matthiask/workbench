@@ -43,7 +43,7 @@
             <td class="text-right {% if not type.expected %}text-black-30{% endif %}">{{ type.expected|stringformat:".1f" }}%</td>
             <td class="text-right
                 {% if not type.reached %}text-black-30{% endif %}
-                {% if not forloop.counter0 and type.reached >= type.expected %}text-success{% endif %}
+                {% if not forloop.counter0 and type.reached >= type.expected|add:3 %}text-success{% endif %}
                 {% if not forloop.counter0 and type.reached|add:10 < type.expected %}text-warning{% endif %}
                 {% if forloop.counter0 and type.reached > type.expected %}text-warning{% endif %}
                 "
