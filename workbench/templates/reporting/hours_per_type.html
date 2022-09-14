@@ -12,12 +12,14 @@
     <thead>
       <tr>
         <th></th>
+        <th></th>
         {% for type in stats.types %}
           <th colspan="3">{{ type.name }}</th>
         {% endfor %}
         <th></th>
       </tr>
       <tr>
+        <th></th>
         <th></th>
         {% for type in stats.types %}
           <td colspan="3">{{ type.description }}</td>
@@ -26,6 +28,7 @@
       </tr>
       <tr>
         <th></th>
+        <th>{% translate 'Total' %}</th>
         {% for type in stats.types %}
           <th class="text-right">{% translate 'Hours' %}</th>
           <th class="text-right">{% translate 'Target value' %}</th>
@@ -38,6 +41,7 @@
       {% for row in stats.users %}
         <tr>
           <th class="text-nowrap">{{ row.user }}</th>
+          <th class="text-right">{{ row.total|hours }}</th>
           {% for type in row.hours_per_type %}
             <td class="text-right {% if not type.hours %}text-black-30{% endif %}">{{ type.hours|hours }}</td>
             <td class="text-right {% if not type.expected %}text-black-30{% endif %}">{{ type.expected|stringformat:".1f" }}%</td>
@@ -55,9 +59,9 @@
     </tbody>
   </table>
 <style>
-.vertical-stripes tbody td:nth-child(6n+2),
 .vertical-stripes tbody td:nth-child(6n+3),
-.vertical-stripes tbody td:nth-child(6n+4) {
+.vertical-stripes tbody td:nth-child(6n+4),
+.vertical-stripes tbody td:nth-child(6n+5) {
   background: #eee;
 }
 </style>
