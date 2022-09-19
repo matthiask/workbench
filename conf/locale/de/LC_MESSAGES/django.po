@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-10 17:16+0200\n"
+"POT-Creation-Date: 2022-09-19 16:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -719,6 +719,7 @@ msgstr "Guthaben an Ferientagen"
 #: workbench/awt/pdf.py workbench/management/commands/squeeze.py
 #: workbench/templates/awt/year_detail.html
 #: workbench/templates/projects/project_statistics.html
+#: workbench/templates/reporting/hours_per_type.html
 #: workbench/templates/reporting/projected_gross_margin.html
 msgid "Total"
 msgstr "Total"
@@ -1168,7 +1169,7 @@ msgstr "Geschäfte"
 
 #: workbench/deals/forms.py workbench/deals/models.py
 #: workbench/invoices/forms.py workbench/offers/forms.py
-#: workbench/projects/forms.py
+#: workbench/projects/forms.py workbench/reporting/views.py
 msgid "Open"
 msgstr "Offen"
 
@@ -1454,6 +1455,7 @@ msgid "expenses"
 msgstr "Spesen"
 
 #: workbench/expenses/forms.py workbench/projects/forms.py
+#: workbench/reporting/views.py
 msgid "All"
 msgstr "Alle"
 
@@ -1732,6 +1734,7 @@ msgstr "Leistungen"
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_projected_invoices_form.html
 #: workbench/templates/reporting/labor_costs.html
+#: workbench/templates/reporting/playing_bank.html
 #: workbench/templates/reporting/project_budget_statistics.html
 #: workbench/templates/reporting/projected_gross_margin.html
 #: workbench/tools/xlsx.py
@@ -2553,7 +2556,7 @@ msgstr "Bearbeitet"
 msgid "Projects are linked with this campaign. They will be released when deleting this campaign."
 msgstr "Projekte sind mit dieser Kampagne verbunden. Die Verbindung wird aufgelöst, wenn diese Kampagne gelöscht wird."
 
-#: workbench/projects/forms.py
+#: workbench/projects/forms.py workbench/reporting/views.py
 msgid "No invoices"
 msgstr "Keine Rechnungen"
 
@@ -2569,7 +2572,7 @@ msgstr "Akzeptierte Offerten aber keine Rechnungen"
 msgid "Solely declined offers"
 msgstr "Ausschliesslich abgelehnte Offerten"
 
-#: workbench/projects/forms.py
+#: workbench/projects/forms.py workbench/reporting/views.py
 msgid "Old projects (60 days inactivity)"
 msgstr "Alte Projekte (60 Tage Inaktivität)"
 
@@ -2577,7 +2580,7 @@ msgstr "Alte Projekte (60 Tage Inaktivität)"
 msgid "Invalid customer/contact combination"
 msgstr "Ungültige Kunde/Kontakt-Kombination"
 
-#: workbench/projects/forms.py
+#: workbench/projects/forms.py workbench/reporting/views.py
 msgid "No projected gross margin"
 msgstr "Kein geplanter Umsatz"
 
@@ -2834,6 +2837,10 @@ msgstr "Intern"
 #: workbench/reporting/views.py
 msgid "Closed during the last year"
 msgstr "Geschlossen während dem letzten Jahr"
+
+#: workbench/reporting/views.py
+msgid "Still open or closed during the current year"
+msgstr "Immer noch offen oder geschlossen im laufenden Jahr"
 
 #: workbench/reporting/views.py
 msgid "Date from"
@@ -3487,6 +3494,7 @@ msgid "sold"
 msgstr "verkauft"
 
 #: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/reporting/playing_bank.html
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "invoiced"
 msgstr "Verrechnet"
@@ -3769,6 +3777,22 @@ msgstr "Woche"
 #: workbench/templates/reporting/planning_vs_logbook.html
 msgid "Planned"
 msgstr "Geplant"
+
+#: workbench/templates/reporting/playing_bank.html
+msgid "Playing bank"
+msgstr "Bank spielen"
+
+#: workbench/templates/reporting/playing_bank.html
+msgid "offered"
+msgstr "Offeriert"
+
+#: workbench/templates/reporting/playing_bank.html
+msgid "logged"
+msgstr "Erfasst"
+
+#: workbench/templates/reporting/playing_bank.html
+msgid "delta"
+msgstr "Delta"
 
 #: workbench/templates/reporting/work_anniversaries.html
 msgid "Started on"
@@ -4144,9 +4168,6 @@ msgstr "%(model)s mit %(attribute)s=%(id)s"
 #~ msgid "Overdrawn projects"
 #~ msgstr "Überzogene Projekte"
 
-#~ msgid "offered"
-#~ msgstr "Offeriert"
-
 #, python-format
 #~ msgid ""
 #~ "\n"
@@ -4200,6 +4221,3 @@ msgstr "%(model)s mit %(attribute)s=%(id)s"
 #, python-format
 #~ msgid "%(by)s deleted work for you: %(title)s (%(hours)sh)"
 #~ msgstr "%(by)s hat Arbeit für dich gelöscht: %(title)s (%(hours)sh)"
-
-#~ msgid "delta"
-#~ msgstr "Delta"

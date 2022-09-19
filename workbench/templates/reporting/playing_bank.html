@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load fineforms i18n workbench %}
+{% block title %}
+  {% translate 'Playing bank' %} - {{ block.super }}
+{% endblock %}
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <h1>{% translate 'Playing bank' %}</h1>
+      <form method="get" class="form-inline form-search mb-3" data-autosubmit>
+        {% ff_fields form %}
+      </form>
+      <table class="table table-responsive-lg">
+        <thead class="sticky">
+          <tr>
+            <th>{% translate 'project'|capfirst %}</th>
+            <th class="text-nowrap text-right">{% translate 'offered'|capfirst %}</th>
+            <th class="text-nowrap text-right">{% translate 'logged'|capfirst %}</th>
+            <th class="text-nowrap text-right">{% translate 'invoiced'|capfirst %}</th>
+            <th class="text-nowrap text-right">{% translate 'delta'|capfirst %}</th>
+          </tr>
+          <tr>
+            <td colspan="4"></td>
+            <td class="text-nowrap text-right">
+              {{ statistics.total_minus|currency:True }}<br>
+              {{ statistics.total_plus|currency:True }}<br>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in statistics.projects %}
+            <tr>
+              <td>
+                {% link_or_none row.project with_badge=True %}
+              </td>
+              <td class="text-right">{{ row.offered|currency }}</td>
+              <td class="text-right">{{ row.logged|currency }}</td>
+              <td class="text-right">{{ row.invoiced|currency }}</td>
+              <td class="text-right">{{ row.delta|currency:True }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

@@ -123,6 +123,12 @@
                  href="{% url 'report_projected_gross_margin' %}">
                 {% translate 'projected gross margin'|capfirst %}
               </a>
+              {% if request.user.features.BOOKKEEPING %}
+                <a class="dropdown-item"
+                   href="{% url 'report_third_party_costs' %}">
+                  {% translate 'Playing bank' %}
+                </a>
+              {% endif %}
               <div class="dropdown-divider">
               </div>
             {% endif %}

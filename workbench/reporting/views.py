@@ -27,6 +27,7 @@ from workbench.reporting import (
     key_data,
     labor_costs,
     project_budget_statistics,
+    third_party_costs,
 )
 from workbench.reporting.utils import date_ranges
 from workbench.tools.formats import Z0, Z2, local_date_format
@@ -363,6 +364,40 @@ def project_budget_statistics_view(request, form):
     return render(
         request,
         "reporting/project_budget_statistics.html",
+        {"form": form, "statistics": statistics},
+    )
+
+
+class PlayingBankForm(Form):
+    s = forms.ChoiceField(
+        choices=[
+            ("", _("Open")),
+            ("this-year", _("Still open or closed during the current year")),
+        ],
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
+    )
+
+    def queryset(self):
+        data = self.cleaned_data
+        queryset = Project.objects.all()
+        if data.get("s") == "":
+            queryset = queryset.open()
+        elif data.get("s") == "this-year":
+            queryset = queryset.filter(
+                Q(closed_on__isnull=True)
+                | Q(closed_on__gte=dt.date.today().replace(month=1, day=1))
+            )
+        return queryset.select_related("owned_by")
+
+
+@filter_form(PlayingBankForm)
+def playing_bank_view(request, form):
+    statistics = third_party_costs.playing_bank(projects=form.queryset())
+    return render(
+        request,
+        "reporting/playing_bank.html",
         {"form": form, "statistics": statistics},
     )
 

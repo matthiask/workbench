@@ -16,6 +16,7 @@ from workbench.reporting.views import (
     labor_costs_view,
     logging,
     open_items_list,
+    playing_bank_view,
     project_budget_statistics_view,
     projected_gross_margin,
     work_anniversaries_view,
@@ -72,6 +73,11 @@ urlpatterns = [
         "project-budget-statistics/",
         controlling_only(project_budget_statistics_view),
         name="report_project_budget_statistics",
+    ),
+    path(
+        "playing-bank/",
+        controlling_only(playing_bank_view),
+        name="report_third_party_costs",
     ),
     path(
         "green-hours/",
