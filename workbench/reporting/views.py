@@ -298,6 +298,17 @@ def key_data_view(request):
 class ProjectBudgetStatisticsForm(Form):
     owned_by = forms.TypedChoiceField(label="", coerce=int, required=False)
     cutoff_date = forms.DateField(widget=DateInput, label="")
+    s = forms.ChoiceField(
+        choices=[
+            ("", _("All")),
+            ("no-invoices", _("No invoices")),
+            ("old-projects", _("Old projects (60 days inactivity)")),
+            ("no-projected-gross-margin", _("No projected gross margin")),
+        ],
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
+    )
     closed_during_the_last_year = forms.BooleanField(
         label=_("Closed during the last year"), required=False
     )
@@ -319,6 +330,12 @@ class ProjectBudgetStatisticsForm(Form):
             queryset = Project.objects.closed().filter(closed_on__gte=in_days(-366))
         else:
             queryset = Project.objects.open(on=self.cleaned_data.get("cutoff_date"))
+        if data.get("s") == "no-invoices":
+            queryset = queryset.orders().without_invoices()
+        elif data.get("s") == "old-projects":
+            queryset = queryset.old_projects()
+        elif data.get("s") == "no-projected-gross-margin":
+            queryset = queryset.no_projected_gross_margin()
         if data.get("internal"):
             queryset = queryset.filter(type=Project.INTERNAL)
         else:
