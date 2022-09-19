@@ -34,7 +34,11 @@
                 {% link_or_none row.project with_badge=True %}
               </td>
               <td class="text-right {% if not row.offered %}text-black-30{% endif %}">{{ row.offered|currency }}</td>
-              <td class="text-right {% if not row.logged %}text-black-30{% endif %}">{{ row.logged|currency }}</td>
+              <td class="text-right {% if not row.logged %}text-black-30{% endif %}">
+                <a href="{% url 'logbook_loggedcost_list' %}?project={{ row.project.pk }}">
+                  {{ row.logged|currency }}
+                </a>
+              </td>
               <td class="text-right {% if not row.invoiced %}text-black-30{% endif %}">{{ row.invoiced|currency }}</td>
               <td class="text-right {% if not row.delta %}text-black-30{% endif %}">{{ row.delta|currency:True }}</td>
             </tr>
