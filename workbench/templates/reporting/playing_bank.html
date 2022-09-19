@@ -5,12 +5,12 @@
 {% endblock %}
 {% block content %}
   <div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8">
+    <div class="col-md-12 col-lg-8">
       <h1>{% translate 'Playing bank' %}</h1>
       <form method="get" class="form-inline form-search mb-3" data-autosubmit>
         {% ff_fields form %}
       </form>
-      <table class="table table-responsive-lg">
+      <table class="table table-sm table-responsive-lg">
         <thead class="sticky">
           <tr>
             <th>{% translate 'project'|capfirst %}</th>
@@ -33,10 +33,10 @@
               <td>
                 {% link_or_none row.project with_badge=True %}
               </td>
-              <td class="text-right">{{ row.offered|currency }}</td>
-              <td class="text-right">{{ row.logged|currency }}</td>
-              <td class="text-right">{{ row.invoiced|currency }}</td>
-              <td class="text-right">{{ row.delta|currency:True }}</td>
+              <td class="text-right {% if not row.offered %}text-black-30{% endif %}">{{ row.offered|currency }}</td>
+              <td class="text-right {% if not row.logged %}text-black-30{% endif %}">{{ row.logged|currency }}</td>
+              <td class="text-right {% if not row.invoiced %}text-black-30{% endif %}">{{ row.invoiced|currency }}</td>
+              <td class="text-right {% if not row.delta %}text-black-30{% endif %}">{{ row.delta|currency:True }}</td>
             </tr>
           {% endfor %}
         </tbody>
