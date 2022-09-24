@@ -110,61 +110,6 @@ ORDER BY series.week
         }
     )
 
-    dows = [
-        None,
-        _("Monday"),
-        _("Tuesday"),
-        _("Wednesday"),
-        _("Thursday"),
-        _("Friday"),
-        _("Saturday"),
-        _("Sunday"),
-    ]
-
-    stats["rendered_hours_per_weekday"] = [
-        {"dow": int(dow), "name": dows[int(dow)], "hours": hours}
-        for dow, hours in query(
-            """
-WITH sq AS (
-    SELECT
-        (extract(isodow from rendered_on)::integer) as dow,
-        SUM(hours) AS hours
-    FROM logbook_loggedhours
-    WHERE rendered_by_id=%s AND rendered_on>=%s
-    GROUP BY dow
-    ORDER BY dow
-)
-SELECT series.dow, COALESCE(sq.hours, 0)
-FROM generate_series(1, 7) AS series(dow)
-LEFT OUTER JOIN sq ON series.dow=sq.dow
-ORDER BY series.dow
-            """,
-            [user.id, from_],
-        )
-    ]
-
-    stats["created_hours_per_weekday"] = [
-        {"dow": int(dow), "name": dows[int(dow)], "hours": hours}
-        for dow, hours in query(
-            """
-WITH sq AS (
-    SELECT
-        (extract(isodow from timezone('CET', created_at))::integer) as dow,
-        SUM(hours) AS hours
-    FROM logbook_loggedhours
-    WHERE rendered_by_id=%s AND rendered_on>=%s
-    GROUP BY dow
-    ORDER BY dow
-)
-SELECT series.dow, COALESCE(sq.hours, 0)
-FROM generate_series(1, 7) AS series(dow)
-LEFT OUTER JOIN sq ON series.dow=sq.dow
-ORDER BY series.dow
-            """,
-            [user.id, from_],
-        )
-    ]
-
     return stats
 
 

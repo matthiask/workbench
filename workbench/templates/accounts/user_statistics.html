@@ -7,34 +7,11 @@
   <div class="row justify-content-center">
     <div class="col-lg-10">
       <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
-      <h2 class="mt-4">{% translate 'Hours per weekday' %}</h2>
-      <canvas id="hours-per-weekday" width="1200" height="250"></canvas>
-      <script>
-      new Chart("hours-per-weekday", {
-        type: "bar",
-        data: {
-          labels: [{% for row in logged_hours.rendered_hours_per_weekday %}"{{ row.name }}",{% endfor %}],
-          datasets: [
-            {
-              label: "{% translate 'Rendered' %}",
-              data: [{% for row in logged_hours.rendered_hours_per_weekday %}{{ row.hours|stringformat:'.1f' }},{% endfor %}],
-              backgroundColor: '#2780e3',
-            },
-            {
-              label: "{% translate 'Created' %}",
-              data: [{% for row in logged_hours.created_hours_per_weekday %}{{ row.hours|stringformat:'.1f' }},{% endfor %}],
-              backgroundColor: '#9954bb',
-              borderColor: '#9954bb',
-            },
-          ],
-        },
-      })
-      </script>
       <h2 class="mt-4">{% translate 'Hours per week' %}</h2>
       <canvas id="hours-per-week" width="1200" height="450"></canvas>
       <script>
       new Chart("hours-per-week", {
-        type: "bar",
+        type: "line",
         data: {
           labels: [{% for row in logged_hours.hours_per_week %}"KW{{ row.week|date:'W' }}",{% endfor %}],
           datasets: [
@@ -59,6 +36,11 @@
           scales: {
             xAxes: [{stacked: true}],
             yAxes: [{stacked: true}],
+          },
+          elements: {
+            line: {
+              tension: 0,
+            },
           },
         },
       })
@@ -86,11 +68,11 @@
             xAxes: [{stacked: true}],
             yAxes: [{stacked: true}],
           },
-        elements: {
-          line: {
-            tension: 0,
+          elements: {
+            line: {
+              tension: 0,
+            },
           },
-        },
         },
       })
       </script>
