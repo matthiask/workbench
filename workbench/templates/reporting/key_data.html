@@ -202,7 +202,7 @@
       <canvas id="hours-distribution" width="1200" height="450"></canvas>
       <script>
     new Chart("hours-distribution", {
-      type: "bar",
+      type: "line",
       data: {
         labels: [{% for label in hours_distribution.labels %}"{{ label }}",{% endfor %}],
         datasets: [
@@ -219,6 +219,11 @@
         scales: {
           xAxes: [{stacked: true}],
           yAxes: [{stacked: true, ticks: {min: 0, max: 100}}],
+        },
+        elements: {
+          line: {
+            tension: 0,
+          },
         },
       },
     });
