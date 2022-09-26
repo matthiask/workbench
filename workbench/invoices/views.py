@@ -24,9 +24,15 @@ class InvoicePDFView(generic.DetailView):
             as_attachment=request.GET.get("disposition") == "attachment",
         )
 
-        pdf.init_invoice_letter()
-        pdf.process_invoice(self.object)
-        pdf.generate()
+        try:
+            pdf.init_invoice_letter()
+            pdf.process_invoice(self.object)
+            pdf.generate()
+        except Exception as exc:
+            messages.error(
+                request, gettext("Unable to generate the PDF: {}").format(exc)
+            )
+            return redirect(self.object)
 
         return response
 

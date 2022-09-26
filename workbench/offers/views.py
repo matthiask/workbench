@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext
 
 from workbench import generic
 from workbench.offers.forms import OfferCopyForm, OfferDeleteForm
@@ -21,9 +21,15 @@ class OfferPDFView(generic.DetailView):
             as_attachment=request.GET.get("disposition") == "attachment",
         )
 
-        pdf.init_letter()
-        pdf.process_offer(self.object)
-        pdf.generate()
+        try:
+            pdf.init_letter()
+            pdf.process_offer(self.object)
+            pdf.generate()
+        except Exception as exc:
+            messages.error(
+                request, gettext("Unable to generate the PDF: {}").format(exc)
+            )
+            return redirect(self.object)
 
         return response
 
@@ -36,7 +42,7 @@ class ProjectOfferPDFView(generic.DetailView):
         offers = list(self.object.offers.order_by("_code"))
 
         if not offers:
-            messages.error(request, _("No offers in project."))
+            messages.error(request, gettext("No offers in project."))
             return redirect(self.object)
 
         pdf, response = pdf_response(
@@ -68,5 +74,5 @@ def copy_offer(request, pk):
     return render(
         request,
         "generic/select_object.html",
-        {"form": form, "title": _("Copy %s to project") % offer},
+        {"form": form, "title": gettext("Copy %s to project") % offer},
     )

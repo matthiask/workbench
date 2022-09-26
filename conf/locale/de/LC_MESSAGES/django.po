@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-19 16:15+0200\n"
+"POT-Creation-Date: 2022-09-26 14:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -308,34 +308,6 @@ msgstr "Fachbereiche"
 #: workbench/accounts/reporting.py
 msgid "All others"
 msgstr "Alle anderen"
-
-#: workbench/accounts/reporting.py
-msgid "Monday"
-msgstr "Montag"
-
-#: workbench/accounts/reporting.py
-msgid "Tuesday"
-msgstr "Dienstag"
-
-#: workbench/accounts/reporting.py
-msgid "Wednesday"
-msgstr "Mittwoch"
-
-#: workbench/accounts/reporting.py
-msgid "Thursday"
-msgstr "Donnerstag"
-
-#: workbench/accounts/reporting.py
-msgid "Friday"
-msgstr "Freitag"
-
-#: workbench/accounts/reporting.py
-msgid "Saturday"
-msgstr "Samstag"
-
-#: workbench/accounts/reporting.py
-msgid "Sunday"
-msgstr "Sonntag"
 
 #: workbench/accounts/tasks.py
 msgid "I hope you’ll enjoy it :-)"
@@ -1951,6 +1923,10 @@ msgstr "Umsatz bereinigt"
 msgid "Unsent projected invoices"
 msgstr "Nicht verschickte geplante Rechnungen"
 
+#: workbench/invoices/views.py workbench/offers/views.py
+msgid "Unable to generate the PDF: {}"
+msgstr "Konnte das PDF nicht generieren: {}"
+
 #: workbench/invoices/views.py workbench/logbook/models.py
 #: workbench/projects/views.py workbench/services/models.py
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -2544,7 +2520,6 @@ msgid "Created and deleted"
 msgstr "Erstellt und gelöscht"
 
 #: workbench/planning/updates.py
-#: workbench/templates/accounts/user_statistics.html
 msgid "Created"
 msgstr "Erstellt"
 
@@ -2993,14 +2968,6 @@ msgid "Planning"
 msgstr "Planung"
 
 #: workbench/templates/accounts/user_statistics.html
-msgid "Hours per weekday"
-msgstr "Stunden pro Wochentag"
-
-#: workbench/templates/accounts/user_statistics.html
-msgid "Rendered"
-msgstr "Erbracht"
-
-#: workbench/templates/accounts/user_statistics.html
 msgid "Hours per week"
 msgstr "Stunden pro Woche"
 
@@ -3104,6 +3071,11 @@ msgstr "Kennzahlen"
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "Project budget statistics"
 msgstr "Projekt-Budgetstatistik"
+
+#: workbench/templates/base.html
+#: workbench/templates/reporting/playing_bank.html
+msgid "Playing bank"
+msgstr "Bank spielen"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/hours_per_type.html
@@ -3779,10 +3751,6 @@ msgid "Planned"
 msgstr "Geplant"
 
 #: workbench/templates/reporting/playing_bank.html
-msgid "Playing bank"
-msgstr "Bank spielen"
-
-#: workbench/templates/reporting/playing_bank.html
 msgid "offered"
 msgstr "Offeriert"
 
@@ -4077,6 +4045,33 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Monday"
+#~ msgstr "Montag"
+
+#~ msgid "Tuesday"
+#~ msgstr "Dienstag"
+
+#~ msgid "Wednesday"
+#~ msgstr "Mittwoch"
+
+#~ msgid "Thursday"
+#~ msgstr "Donnerstag"
+
+#~ msgid "Friday"
+#~ msgstr "Freitag"
+
+#~ msgid "Saturday"
+#~ msgstr "Samstag"
+
+#~ msgid "Sunday"
+#~ msgstr "Sonntag"
+
+#~ msgid "Hours per weekday"
+#~ msgstr "Stunden pro Wochentag"
+
+#~ msgid "Rendered"
+#~ msgstr "Erbracht"
 
 #~ msgid "earned"
 #~ msgstr "Verdient"
