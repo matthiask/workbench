@@ -21,11 +21,15 @@
             <th class="text-nowrap text-right">{% translate 'delta'|capfirst %}</th>
           </tr>
           <tr>
-            <td colspan="5"></td>
-            <td class="text-nowrap text-right">
+            <th></th>
+            <th class="text-nowrap text-right">{{ statistics.total_offered|currency }}</th>
+            <th class="text-nowrap text-right">{{ statistics.total_logged.past|currency }}</th>
+            <th class="text-nowrap text-right">{{ statistics.total_logged.future|currency }}</th>
+            <th class="text-nowrap text-right">{{ statistics.total_invoiced|currency }}</th>
+            <th class="text-nowrap text-right">
               {{ statistics.total_minus|currency:True }}<br>
               {{ statistics.total_plus|currency:True }}<br>
-            </td>
+            </th>
           </tr>
         </thead>
         <tbody>

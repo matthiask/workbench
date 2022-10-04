@@ -66,6 +66,12 @@ def playing_bank(projects):
         "projects": sorted(projects, key=lambda row: row["delta"]),
         "total_plus": sums[True],
         "total_minus": sums[False],
+        "total_offered": sum(row["offered"] for row in projects),
+        "total_logged": {
+            "past": sum(row["logged"]["past"] for row in projects),
+            "future": sum(row["logged"]["future"] for row in projects),
+        },
+        "total_invoiced": sum(row["invoiced"] for row in projects),
     }
 
 
