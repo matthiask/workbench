@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-26 14:30+0200\n"
+"POT-Creation-Date: 2022-10-04 11:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3755,8 +3755,12 @@ msgid "offered"
 msgstr "Offeriert"
 
 #: workbench/templates/reporting/playing_bank.html
-msgid "logged"
-msgstr "Erfasst"
+msgid "logged (past)"
+msgstr "Erfasst (Vergangenheit)"
+
+#: workbench/templates/reporting/playing_bank.html
+msgid "logged (future)"
+msgstr "Erfasst (Zukunft)"
 
 #: workbench/templates/reporting/playing_bank.html
 msgid "delta"
@@ -4045,6 +4049,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "logged"
+#~ msgstr "Erfasst"
 
 #~ msgid "Monday"
 #~ msgstr "Montag"

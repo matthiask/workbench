@@ -1,3 +1,6 @@
+import datetime as dt
+from collections import defaultdict
+
 from django.db.models import Sum
 
 from workbench.invoices.models import Invoice
@@ -7,14 +10,19 @@ from workbench.tools.formats import Z2
 
 
 def playing_bank(projects):
-    logged = {
-        row["service__project"]: row["third_party_costs__sum"]
-        for row in LoggedCost.objects.order_by()
+    logged = defaultdict(lambda: {"past": Z2, "future": Z2})
+    for row in (
+        LoggedCost.objects.order_by()
+        .extra(select={"_is_future": f"rendered_on > '{dt.date.today().isoformat()}'"})
         .filter(third_party_costs__isnull=False)
         .exclude(third_party_costs=0)
-        .values("service__project")
+        .values("service__project", "_is_future")
         .annotate(Sum("third_party_costs"))
-    }
+    ):
+        logged[row["service__project"]][
+            "future" if row["_is_future"] else "past"
+        ] += row["third_party_costs__sum"]
+
     invoiced = {
         row["project"]: row["third_party_costs__sum"]
         for row in Invoice.objects.invoiced()
@@ -36,7 +44,7 @@ def playing_bank(projects):
     sums = {True: Z2, False: Z2}
 
     def _statsify(row):
-        delta = row["logged"] - row["invoiced"]
+        delta = sum(row["logged"].values(), Z2) - row["invoiced"]
         sums[delta > 0] += delta
         return row | {"delta": delta}
 
@@ -45,7 +53,7 @@ def playing_bank(projects):
             {
                 "project": project,
                 "offered": offered.get(project.id, Z2),
-                "logged": logged.get(project.id, Z2),
+                "logged": logged[project.id],
                 "invoiced": invoiced.get(project.id, Z2),
             }
         )

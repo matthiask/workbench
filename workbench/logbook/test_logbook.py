@@ -339,7 +339,7 @@ class LogbookTest(TestCase):
         response = send(cost.urls["update"])
         self.assertContains(response, "This project has been closed too long ago.")
 
-        response = send(cost.urls["update"], rendered_on=in_days(10).isoformat())
+        response = send(cost.urls["update"], rendered_on=in_days(400).isoformat())
         self.assertContains(response, "That&#x27;s too far in the future.")
 
     def test_update_old_disabled_fields(self):

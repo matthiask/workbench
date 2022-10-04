@@ -609,7 +609,7 @@ class LoggedCostForm(ModelForm):
                     _("Third party costs shouldn't be higher than costs."),
                     code="third-party-costs-higher",
                 )
-        if data.get("rendered_on") and data["rendered_on"] > in_days(7):
+        if data.get("rendered_on") and data["rendered_on"] > in_days(360):
             errors["rendered_on"] = _("That's too far in the future.")
         raise_if_errors(errors)
         return data
