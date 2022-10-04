@@ -9,7 +9,7 @@ from django.http import Http404
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
 
-from workbench.accounts.models import Team, User
+from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.deals.models import (
     Attribute,
@@ -243,19 +243,6 @@ class DealForm(ModelForm):
         if self.instance.pk:
             q |= Q(id__in=self.instance.contributors.values_list("id", flat=True))
         self.fields["contributors"].queryset = User.objects.filter(q)
-        self.fields["contributors"].help_text = format_html(
-            "{}<br>{}: {}",
-            self.fields["contributors"].help_text,
-            _("Select team"),
-            format_html_join(
-                ", ",
-                '<a href="#" data-select-receivers="{}">{}</a>',
-                [
-                    (",".join(str(member.id) for member in team.members.all()), team)
-                    for team in Team.objects.prefetch_related("members")
-                ],
-            ),
-        )
 
     def clean(self):
         data = super().clean()
