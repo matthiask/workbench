@@ -74,7 +74,7 @@ class DealsTest(TestCase):
         response = self.client.post(
             deal.urls["set_status"] + f"?status={Deal.DECLINED}",
             {
-                "closed_on": dt.date.today().isoformat(),
+                "closed_on": in_days(300).isoformat(),
                 "closing_type": factories.ClosingTypeFactory.create(
                     represents_a_win=False
                 ).pk,
@@ -86,10 +86,10 @@ class DealsTest(TestCase):
         self.assertContains(response, "This deal is already closed.")
 
         deal.refresh_from_db()
-        self.assertEqual(deal.closed_on, dt.date.today())
+        self.assertEqual(deal.closed_on, in_days(300))
         self.assertEqual(
             deal.pretty_status,
-            f"Declined on {local_date_format(dt.date.today())}",
+            f"Declined on {local_date_format(in_days(300))}",
         )
 
         response = self.client.post(
