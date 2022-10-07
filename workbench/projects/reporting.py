@@ -9,6 +9,7 @@ from workbench.contacts.models import Organization
 from workbench.logbook.models import LoggedHours
 from workbench.projects.models import InternalType, InternalTypeUser, Project
 from workbench.tools.formats import Z1
+from workbench.tools.forms import querystring
 
 
 def hours_per_customer(date_range, *, users=None):
@@ -76,6 +77,16 @@ def hours_per_type(date_range, *, users=None):
     external_type = SimpleNamespace(id=0, name=_("External"), description="")
     internal_types = list(InternalType.objects.all())
 
+    def _logbook_url(**kwargs):
+        return "{}{}".format(
+            LoggedHours.urls["list"],
+            querystring(
+                date_from=date_range[0].isoformat(),
+                date_until=date_range[1].isoformat(),
+                **kwargs,
+            ),
+        )
+
     def _user(u, row):
         uit = user_internal_types[u]
 
@@ -93,6 +104,7 @@ def hours_per_type(date_range, *, users=None):
                     "expected": profitable_percentage,
                     "reached": 100 * row[0] / total,
                     "is_internal": False,
+                    "url": _logbook_url(rendered_by=u.id, internal_type=-1),
                 }
             ]
             + [
@@ -102,12 +114,14 @@ def hours_per_type(date_range, *, users=None):
                     "expected": uit[type].percentage if type in uit else 0,
                     "reached": 100 * row[type.id] / total,
                     "is_internal": True,
+                    "url": _logbook_url(rendered_by=u.id, internal_type=type.id),
                 }
                 for type in internal_types
             ],
             "internal": total - row[0],
             "external": row[0],
             "total": total,
+            "url": _logbook_url(rendered_by=u.id),
         }
 
     users = [_user(u, row) for u, row in sorted(hours.items())]
@@ -120,6 +134,13 @@ def hours_per_type(date_range, *, users=None):
             "external": sum((row["external"] for row in users), Z1),
             "total": sum((row["total"] for row in users), Z1),
         },
+        "logbook_url": "{}{}".format(
+            LoggedHours.urls["list"],
+            querystring(
+                date_from=date_range[0].isoformat(),
+                date_until=date_range[1].isoformat(),
+            ),
+        ),
     }
 
 

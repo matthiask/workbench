@@ -17,7 +17,7 @@ from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
-from workbench.projects.models import Campaign, Project, Service
+from workbench.projects.models import Campaign, InternalType, Project, Service
 from workbench.services.models import ServiceType
 from workbench.timer.models import Timestamp
 from workbench.tools.forms import (
@@ -103,6 +103,9 @@ class LoggedHoursSearchForm(Form):
     not_archived = forms.BooleanField(
         required=False, widget=forms.HiddenInput, label=""
     )
+    internal_type = forms.IntegerField(
+        required=False, widget=forms.HiddenInput, label=""
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -167,6 +170,21 @@ class LoggedHoursSearchForm(Form):
                 (_("Not archived"), querystring(self.request.GET, not_archived=""))
             )
             queryset = queryset.filter(archived_at__isnull=True)
+        if data.get("internal_type") == -1:
+            self.hidden_filters.append(
+                (_("External"), querystring(self.request.GET, internal_type=""))
+            )
+            queryset = queryset.exclude(service__project__type=Project.INTERNAL)
+        elif (pk := data.get("internal_type")) and (
+            internal_type := InternalType.objects.filter(pk=pk).first()
+        ):
+            self.hidden_filters.append(
+                (
+                    f"{capfirst(internal_type._meta.verbose_name)}: {internal_type}",
+                    querystring(self.request.GET, internal_type=""),
+                )
+            )
+            queryset = queryset.filter(service__project__internal_type=internal_type)
 
         return queryset.select_related("service__project__owned_by", "rendered_by")
 

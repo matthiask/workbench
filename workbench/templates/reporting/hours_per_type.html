@@ -41,9 +41,9 @@
       {% for row in stats.users %}
         <tr>
           <th class="text-nowrap">{{ row.user }}</th>
-          <th class="text-right">{{ row.total|hours }}</th>
+          <th class="text-right"><a href="{{ row.url }}">{{ row.total|hours }}</a></th>
           {% for type in row.hours_per_type %}
-            <td class="text-right {% if not type.hours %}text-black-30{% endif %}">{{ type.hours|hours }}</td>
+            <td class="text-right {% if not type.hours %}text-black-30{% endif %}"><a href="{{ type.url }}">{{ type.hours|hours }}</a></td>
             <td class="text-right {% if not type.expected %}text-black-30{% endif %}">{{ type.expected|stringformat:".1f" }}%</td>
             <td class="text-right
                 {% if not type.reached %}text-black-30{% endif %}

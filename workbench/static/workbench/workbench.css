@@ -195,7 +195,8 @@ tbody th > a {
   background-color: lightskyblue;
 }
 
-.text-black-30 {
+.text-black-30,
+.text-black-30 a {
   color: rgba(0, 0, 0, 0.3) !important;
 }
 
