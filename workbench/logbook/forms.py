@@ -180,7 +180,7 @@ class LoggedHoursSearchForm(Form):
         ):
             self.hidden_filters.append(
                 (
-                    f"{capfirst(internal_type._meta.verbose_name)}: {internal_type}",
+                    f"{capfirst(internal_type._meta.verbose_name)}: {internal_type.name}",
                     querystring(self.request.GET, internal_type=""),
                 )
             )
