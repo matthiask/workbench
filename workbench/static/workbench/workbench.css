@@ -307,8 +307,7 @@ tbody th > a {
   display: none;
 }
 
-.contribution-select label::before {
-  content: "💪";
+.contribution-select label {
   cursor: pointer;
   font-size: 1.5em;
 }
