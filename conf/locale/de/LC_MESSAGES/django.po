@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-07 10:04+0200\n"
+"POT-Creation-Date: 2022-10-07 09:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1192,6 +1192,18 @@ msgstr "in zwei Monaten"
 msgid "in three months"
 msgstr "in drei Monaten"
 
+#: workbench/deals/forms.py workbench/deals/models.py
+msgid "normal"
+msgstr "normal"
+
+#: workbench/deals/forms.py
+msgid "contributing force"
+msgstr "beitragende Kraft"
+
+#: workbench/deals/forms.py
+msgid "main driving force"
+msgstr "hauptsächlich treibende Kraft"
+
 #: workbench/deals/forms.py
 msgid "This field is required when probability is high."
 msgstr "Dieses Feld wird benötigt wenn die Wahrscheinlichkeit hoch ist."
@@ -1267,10 +1279,6 @@ msgid "unknown"
 msgstr "unbekannt"
 
 #: workbench/deals/models.py
-msgid "normal"
-msgstr "normal"
-
-#: workbench/deals/models.py
 msgid "high"
 msgstr "hoch"
 
@@ -1332,7 +1340,7 @@ msgstr "Abschlussnotiz"
 msgid "related offers"
 msgstr "verbundenen Offerten"
 
-#: workbench/deals/models.py
+#: workbench/deals/models.py workbench/templates/deals/deal_form.html
 msgid "driving force"
 msgstr "treibende Kraft"
 
@@ -3202,6 +3210,7 @@ msgid "Create %(class)s"
 msgstr "%(class)s erstellen"
 
 #: workbench/templates/contacts/person_form.html
+#: workbench/templates/deals/deal_form.html
 #: workbench/templates/fineforms/submit.html
 #: workbench/templates/generic/object_form.html
 #: workbench/templates/logbook/loggedcost_form.html
@@ -3249,6 +3258,12 @@ msgstr "Keine verbundenen Offerten"
 msgid "Link offer"
 msgstr "Offerte verbinden"
 
+#: workbench/templates/deals/deal_form.html
+#: workbench/templates/generic/object_form.html
+#: workbench/templates/notes/widget.html
+msgid "Cancel"
+msgstr "Abbrechen"
+
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/invoice_list.html
@@ -3272,11 +3287,6 @@ msgstr "Löschen"
 #: workbench/templates/generic/object_form.html
 msgid "continue"
 msgstr "Weiter"
-
-#: workbench/templates/generic/object_form.html
-#: workbench/templates/notes/widget.html
-msgid "Cancel"
-msgstr "Abbrechen"
 
 #: workbench/templates/history_modal.html workbench/templatetags/workbench.py
 msgid "History"

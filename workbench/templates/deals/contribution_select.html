@@ -1,0 +1,6 @@
+<div id="{{ widget.attrs.id }}" class="contribution-select">
+  {% for group, options, index in widget.optgroups %}{% for option in options %}
+  <label for="{{ option.attrs.id }}" title="{{ option.label }}"></label>
+  <input type="radio" name="{{ option.name }}" value="{{ option.value }}" {% include "django/forms/widgets/attrs.html" with widget=option %}>
+  {% endfor %}{% endfor %}
+</div>

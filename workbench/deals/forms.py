@@ -147,21 +147,18 @@ class DealForm(ModelForm):
             "probability",
             "decision_expected_on",
             "owned_by",
-            "contributors",
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
             "contact": Autocomplete(model=Person, params={"only_employees": "on"}),
             "probability": forms.RadioSelect,
             "description": Textarea,
-            "contributors": forms.CheckboxSelectMultiple,
         }
 
     def __init__(self, *args, **kwargs):
         request = kwargs["request"]
         if not kwargs.get("instance"):
             initial = kwargs.setdefault("initial", {})
-            initial.setdefault("contributors", [request.user.pk])
 
         if pk := request.GET.get("contact"):
             try:
@@ -242,7 +239,30 @@ class DealForm(ModelForm):
         q = Q(is_active=True)
         if self.instance.pk:
             q |= Q(id__in=self.instance.contributors.values_list("id", flat=True))
-        self.fields["contributors"].queryset = User.objects.filter(q)
+
+        weights = (
+            dict(self.instance.contributions.values_list("user_id", "weight"))
+            if self.instance.pk
+            else {request.user.pk: 100}
+        )
+
+        contribution_select_fields = []
+        for user in User.objects.filter(q):
+            name = f"user_{user.id}_contribution"
+            self.fields[name] = forms.TypedChoiceField(
+                label=user.get_full_name(),
+                widget=ContributionSelect,
+                choices=[
+                    (0, _("normal")),
+                    (50, _("contributing force")),
+                    (100, _("main driving force")),
+                ],
+                initial=weights.get(user.id, 0),
+                coerce=int,
+                required=False,
+            )
+            contribution_select_fields.append(name)
+        self.contribution_select_fields = ",".join(contribution_select_fields)
 
     def clean(self):
         data = super().clean()
@@ -282,7 +302,25 @@ class DealForm(ModelForm):
 
         instance.attributes.set(attributes)
         self.save_m2m()
+
+        to_delete = []
+        for user in User.objects.all():
+            name = f"user_{user.id}_contribution"
+            weight = self.cleaned_data.get(name) or 0
+            if weight:
+                instance.contributions.update_or_create(
+                    user=user, defaults={"weight": weight}
+                )
+            else:
+                to_delete.append(user.id)
+        if to_delete:
+            instance.contributions.filter(user__in=to_delete).delete()
+
         return instance
+
+
+class ContributionSelect(forms.RadioSelect):
+    template_name = "deals/contribution_select.html"
 
 
 class SetStatusForm(ModelForm):

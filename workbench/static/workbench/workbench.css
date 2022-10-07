@@ -290,3 +290,34 @@ tbody th > a {
   margin-right: 1px;
   margin-bottom: 4px;
 }
+
+.contribution-selects {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.widget--contributionselect {
+  display: grid;
+  grid-template-columns: 25ch 1fr;
+  align-items: center;
+  margin: 0;
+}
+
+.contribution-select input {
+  display: none;
+}
+
+.contribution-select label::before {
+  content: "💪";
+  cursor: pointer;
+  font-size: 1.5em;
+}
+
+.contribution-select label:first-of-type {
+  filter: hue-rotate(180deg) grayscale(0.3);
+}
+
+.contribution-select input:checked ~ label {
+  filter: grayscale(1) brightness(1.1);
+  transform: scale(0.85);
+}
