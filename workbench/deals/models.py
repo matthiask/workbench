@@ -75,7 +75,9 @@ class DealQuerySet(SearchQuerySet):
     def maybe_actionable(self, *, user):
         return self.filter(
             Q(status=Deal.OPEN),
-            Q(owned_by=user) | Q(owned_by__is_active=False),
+            Q(owned_by=user)
+            | Q(owned_by__is_active=False)
+            | Q(id__in=user.contribution_set.values("deal")),
             Q(probability__gte=Deal.HIGH)
             | (
                 Q(probability__lt=Deal.HIGH)
@@ -171,13 +173,10 @@ class Deal(Model):
 
     contributors = models.ManyToManyField(
         User,
-        verbose_name=_("contributors"),
+        verbose_name=_("driving force"),
         related_name="+",
         through="Contribution",
-        help_text=_(
-            "The value of the deal will be distributed among all"
-            " contributors in the accepted deals report."
-        ),
+        help_text=_("Who is the driving force behind the deal?"),
     )
 
     objects = DealQuerySet.as_manager()

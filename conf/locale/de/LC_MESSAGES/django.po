@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-04 11:43+0200\n"
+"POT-Creation-Date: 2022-10-07 10:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1193,10 +1193,6 @@ msgid "in three months"
 msgstr "in drei Monaten"
 
 #: workbench/deals/forms.py
-msgid "Select team"
-msgstr "Team auswählen"
-
-#: workbench/deals/forms.py
 msgid "This field is required when probability is high."
 msgstr "Dieses Feld wird benötigt wenn die Wahrscheinlichkeit hoch ist."
 
@@ -1337,12 +1333,12 @@ msgid "related offers"
 msgstr "verbundenen Offerten"
 
 #: workbench/deals/models.py
-msgid "contributors"
-msgstr "Beitragende"
+msgid "driving force"
+msgstr "treibende Kraft"
 
 #: workbench/deals/models.py
-msgid "The value of the deal will be distributed among all contributors in the accepted deals report."
-msgstr "Der Wert des Geschäfts wird beim «Gewonnene Geschäfte»-Bericht zwischen allen Beitragenden aufgeteilt."
+msgid "Who is the driving force behind the deal?"
+msgstr "Wer treibt die Akquise voran bei diesem Geschäft?"
 
 #: workbench/deals/models.py
 #: workbench/templates/contacts/organization_detail.html
@@ -2001,6 +1997,10 @@ msgstr "Keine Offerte"
 #: workbench/tools/xlsx.py
 msgid "Not archived"
 msgstr "Nicht archiviert"
+
+#: workbench/logbook/forms.py workbench/projects/reporting.py
+msgid "External"
+msgstr "Extern"
 
 #: workbench/logbook/forms.py
 msgid "This field is required unless you create a new service."
@@ -2712,10 +2712,6 @@ msgstr "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht 
 msgid "The offer must belong to the same project as the service."
 msgstr "Die Offerte muss zum gleichen Projekt gehören wie die Leistung."
 
-#: workbench/projects/reporting.py
-msgid "External"
-msgstr "Extern"
-
 #: workbench/projects/urls.py
 #, python-format
 msgid "Reassign logbook entries of %(instance)s"
@@ -2796,13 +2792,13 @@ msgstr "Profitabel"
 
 #: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data.html
-msgid "overdrawn"
-msgstr "Überzogen"
+msgid "maintenance"
+msgstr "Wartung"
 
 #: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data.html
-msgid "maintenance"
-msgstr "Wartung"
+msgid "overdrawn"
+msgstr "Überzogen"
 
 #: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data.html
@@ -4049,6 +4045,15 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Select team"
+#~ msgstr "Team auswählen"
+
+#~ msgid "contributors"
+#~ msgstr "Beitragende"
+
+#~ msgid "The value of the deal will be distributed among all contributors in the accepted deals report."
+#~ msgstr "Der Wert des Geschäfts wird beim «Gewonnene Geschäfte»-Bericht zwischen allen Beitragenden aufgeteilt."
 
 #~ msgid "logged"
 #~ msgstr "Erfasst"
