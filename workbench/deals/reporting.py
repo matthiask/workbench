@@ -27,17 +27,17 @@ def accepted_deals(date_range, *, users=None):
     if users is not None:
         queryset = queryset.filter(owned_by__in=users)
 
-    by_user = defaultdict(list)
+    by_user = defaultdict(dict)
     by_month_and_valuetype = defaultdict(lambda: defaultdict(lambda: Z2))
     age_by_valuetype = defaultdict(list)
 
     valuetypes = set()
 
     for deal in queryset:
-        weight = sum((c.weight for c in deal.contributions.all()), 0)
-        for c in deal.contributions.all():
-            deal.contribution = deal.value * c.weight / weight
-            by_user[c.user].append(deal)
+        contributions = deal.contributions.all()
+        weight = sum((c.weight for c in contributions), 0)
+        for c in contributions:
+            by_user[c.user][deal] = deal.value * c.weight / weight
 
         month = deal.closed_on.replace(day=1)
         for value in deal.values.all():
@@ -54,7 +54,7 @@ def accepted_deals(date_range, *, users=None):
             "user_id": str(user.id),
             "deals": deals,
             "count": len(deals),
-            "sum": sum(deal.contribution for deal in deals),
+            "sum": sum(deals.values(), Z2),
         }
         for user, deals in by_user.items()
     ]
@@ -85,6 +85,7 @@ def accepted_deals(date_range, *, users=None):
     }
 
     return {
+        "deals": queryset,
         "by_user": sorted(deals, key=lambda row: row["sum"], reverse=True),
         "by_month_and_valuetype": sorted(months, key=lambda row: row["month"]),
         "by_valuetype": [

@@ -66,6 +66,8 @@
             <th></th>
         </tbody>
       </table>
+      <br>
+
       <table class="table table-sm table-striped">
         <thead>
           <tr>
@@ -103,6 +105,34 @@
               {{ stats.count }}
             </th>
             <th>
+            </th>
+            <th class="text-right">
+              {{ stats.sum|currency }}
+            </th>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+
+      <table class="table table-sm table-striped">
+        <thead>
+          <tr>
+            <th>{% translate 'deal'|capfirst %}</th>
+            <th class="text-right">{% translate 'value'|capfirst %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for deal in stats.deals %}
+            <tr>
+              <td>{% link_or_none deal with_badge=True %}</td>
+              <td class="text-right">
+                {{ deal.value|currency }}
+              </td>
+            </tr>
+          {% endfor %}
+          <tr>
+            <th>
+              {% translate 'total'|capfirst %}
             </th>
             <th class="text-right">
               {{ stats.sum|currency }}

@@ -15,7 +15,7 @@
           <th class="text-right">{% translate 'value' %}</th>
           <th class="text-right">{% translate 'contribution' %}</th>
         </tr>
-        {% for deal in row.deals %}
+        {% for deal, contribution in row.deals.items %}
           <tr>
             <td>{% link_or_none deal with_badge=True %}</td>
             <td>{{ deal.contact.name_with_organization|default:deal.customer }}</td>
@@ -24,7 +24,7 @@
               {% if deal.closing_notice %}: {{ deal.closing_notice }}{% endif %}
             </td>
             <td class="text-right">{{ deal.value|currency }}</td>
-            <td class="text-right">{{ deal.contribution|currency }}</td>
+            <td class="text-right">{{ contribution|currency }}</td>
           </tr>
         {% endfor %}
       </table>
