@@ -223,7 +223,9 @@ class InvoiceForm(PostalAddressSelectionForm):
         )
 
         self.add_postal_address_selection_if_empty(
-            person=self.instance.contact, for_billing=True
+            person=self.instance.contact,
+            organization=self.instance.customer,
+            for_billing=True,
         )
 
     def _is_status_unexpected(self, to_status):
