@@ -47,7 +47,7 @@ module.exports = (PRODUCTION) => {
       presets: [
         [
           "@babel/preset-env",
-          { useBuiltIns: "usage", corejs: "3.22", targets: "defaults" },
+          { useBuiltIns: "usage", corejs: "3.25", targets: "defaults" },
         ],
       ],
       plugins: plugins || [],
@@ -59,7 +59,7 @@ module.exports = (PRODUCTION) => {
       options.plugins = plugins
     }
     return {
-      test: /\.m?js$/,
+      test: /\.m?js$/i,
       exclude: /(node_modules)/,
       use: {
         loader: "babel-loader",
@@ -98,16 +98,9 @@ module.exports = (PRODUCTION) => {
 
   function postcssLoaders(plugins) {
     return [
-      MiniCssExtractPlugin.loader,
-      {
-        loader: "css-loader",
-      },
-      {
-        loader: "postcss-loader",
-        options: {
-          postcssOptions: { plugins },
-        },
-      },
+      PRODUCTION ? MiniCssExtractPlugin.loader : { loader: "style-loader" },
+      { loader: "css-loader" },
+      { loader: "postcss-loader", options: { postcssOptions: { plugins } } },
     ]
   }
 
@@ -144,6 +137,11 @@ module.exports = (PRODUCTION) => {
             runtimeChunk: "single",
           },
     },
+    noSplitting: {
+      optimization: PRODUCTION
+        ? { minimizer: ["...", new CssMinimizerPlugin()] }
+        : {},
+    },
     devServer(proxySettings) {
       return {
         host: "0.0.0.0",
@@ -165,7 +163,7 @@ module.exports = (PRODUCTION) => {
     },
     assetRule() {
       return {
-        test: /\.(png|woff2?|svg|eot|ttf|otf|gif|jpe?g)$/,
+        test: /\.(png|woff2?|svg|eot|ttf|otf|gif|jpe?g|mp3|wav)$/i,
         type: "asset",
         parser: { dataUrlCondition: { maxSize: 512 /* bytes */ } },
       }

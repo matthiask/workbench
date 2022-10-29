@@ -77,6 +77,7 @@ class FeatureFilter(admin.SimpleListFilter):
         return queryset
 
 
+@admin.register(User)
 class UserAdmin(UserAdmin):
     form = UserChangeForm
     add_form = UserChangeForm
@@ -121,7 +122,6 @@ class UserAdmin(UserAdmin):
     inlines = [EmploymentInline, VacationDaysOverrideInline]
 
 
-admin.site.register(User, UserAdmin)
 admin.site.unregister(Group)  # We are not using stock users or groups.
 
 

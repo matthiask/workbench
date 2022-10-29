@@ -234,8 +234,8 @@ function Capacity({ total, by_user }) {
           style={{
             backgroundColor:
               hours > 0
-                ? `hsl(120, ${clamp(0, hours * 3, 50)}%, 70%)`
-                : `hsl(0, ${clamp(0, -hours * 5, 70)}%, 70%)`,
+                ? `hsl(var(--_good), ${clamp(0, hours * 3, 50)}%, 70%)`
+                : `hsl(var(--_bad), ${clamp(0, -hours * 5, 70)}%, 70%)`,
           }}
         >
           {fixed(hours, 0)}
@@ -273,8 +273,8 @@ function UserCapacity({ user, capacity }) {
           style={{
             backgroundColor:
               hours > 0
-                ? `hsl(120, ${clamp(0, hours * 3, 50)}%, 70%)`
-                : `hsl(0, ${clamp(0, -hours * 5, 70)}%, 70%)`,
+                ? `hsl(var(--_good), ${clamp(0, hours * 3, 50)}%, 70%)`
+                : `hsl(var(--_bad), ${clamp(0, -hours * 5, 70)}%, 70%)`,
           }}
         >
           {fixed(hours, 0)}
