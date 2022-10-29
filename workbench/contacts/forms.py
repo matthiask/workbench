@@ -338,6 +338,7 @@ class PostalAddressSelectionForm(ModelForm):
                     person__organization=organization
                 )
                 .exclude(person=person)
+                .exclude(person__is_archived=True)
                 .select_related("person__organization")
             )
 
