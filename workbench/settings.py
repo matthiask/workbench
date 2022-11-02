@@ -330,6 +330,17 @@ WORKBENCH = {
             "Die Gutschrift wird bis zum %(due)s in Auftrag gegeben."
             " Herzlichen Dank für Ihre Geduld."
         ),
+        QRBILL={
+            "account": "CH3106877705056095097",
+            "creditor": {
+                "name": "Blindflug Studios AG",
+                "street": "Fabrikstrasse",
+                "house_num": "54",
+                "pcode": "8005",
+                "city": "Zürich",
+                "country": "CH",
+            },
+        },
         FONTS={
             "regular": font("HelveticaNeueLight.ttf"),
             "bold": font("HelveticaNeueBold.ttf"),
