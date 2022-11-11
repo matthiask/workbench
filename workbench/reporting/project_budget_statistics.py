@@ -66,7 +66,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     sold_per_project = {
         row["project"]: row["total_excl_tax__sum"]
         for row in Offer.objects.accepted()
-        .filter(project__in=projects)
+        .filter(project__in=projects, is_budget_retainer=False)
         .order_by()
         .values("project")
         .annotate(Sum("total_excl_tax"))
