@@ -231,8 +231,25 @@ class WorkbenchXLSXDocument(XLSXDocument):
                 _("Not archived"),
                 _("Total hours"),
                 _("Delta"),
+                capfirst(_("projected gross margin")),
             ],
             [
+                [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    _("total"),
+                    statistics["cutoff_date"],
+                ]
+            ]
+            + [
                 (
                     project["project"],
                     project["project"].owned_by.get_short_name(),
@@ -244,6 +261,8 @@ class WorkbenchXLSXDocument(XLSXDocument):
                     project["not_archived"],
                     project["hours"],
                     project["delta"],
+                    project["projected_gross_margin"],
+                    project["projected_gross_margin_on_cutoff_date"],
                 )
                 for project in statistics["statistics"]
             ],

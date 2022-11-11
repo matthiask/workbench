@@ -1,10 +1,11 @@
 import datetime as dt
 from collections import defaultdict
 
+from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
 
-from workbench.invoices.models import Invoice
+from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.tools.formats import Z1, Z2
@@ -79,6 +80,28 @@ def project_budget_statistics(projects, *, cutoff_date=None):
         .annotate(Sum("total_excl_tax"))
     }
 
+    projected_gross_margin_on_cutoff_date = {}
+    projected_gross_margin = defaultdict(lambda: Z2)
+    for row in (
+        ProjectedInvoice.objects.filter(
+            project__in=projects, project__closed_on__isnull=True
+        )
+        .annotate(
+            before_cutoff_date=models.ExpressionWrapper(
+                models.Q(invoiced_on__lte=cutoff_date),
+                output_field=models.BooleanField(),
+            )
+        )
+        .order_by()
+        .values("project", "before_cutoff_date")
+        .annotate(Sum("gross_margin"))
+    ):
+        if row["before_cutoff_date"]:
+            projected_gross_margin_on_cutoff_date[row["project"]] = row[
+                "gross_margin__sum"
+            ]
+        projected_gross_margin[row["project"]] += row["gross_margin__sum"]
+
     statistics = [
         {
             "project": project,
@@ -97,6 +120,10 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             "delta": cost_per_project.get(project.id, Z2)
             + effort_cost_per_project[project.id]
             - invoiced_per_project.get(project.id, Z2),
+            "projected_gross_margin": projected_gross_margin[project.id],
+            "projected_gross_margin_on_cutoff_date": projected_gross_margin_on_cutoff_date.get(
+                project.id, Z2
+            ),
         }
         for project in projects
     ]
@@ -112,6 +139,8 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             "invoiced",
             "hours",
             "not_archived",
+            "projected_gross_margin",
+            "projected_gross_margin_on_cutoff_date",
         ]
     }
     overall["delta_positive"] = sum(s["delta"] for s in statistics if s["delta"] > 0)
@@ -120,4 +149,5 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     return {
         "statistics": sorted(statistics, key=lambda s: s["delta"], reverse=True),
         "overall": overall,
+        "cutoff_date": cutoff_date,
     }

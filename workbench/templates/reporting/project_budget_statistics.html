@@ -5,7 +5,7 @@
 {% endblock %}
 {% block content %}
   <div class="row justify-content-center">
-    <div class="col-sm-12 col-lg-10">
+    <div class="col-sm-12">
       <h1>{% translate 'Project budget statistics' %}</h1>
       <form method="get" class="form-inline form-search mb-3" data-autosubmit>
         {% if form.changed_data %}
@@ -26,6 +26,12 @@
             <th class="text-right">{% translate 'invoiced'|capfirst %}</th>
             <th class="text-right">{% translate 'Not archived' %}</th>
             <th class="text-right">&Delta;</th>
+            <th class="text-right" colspan="2">{% translate 'projected gross margin'|capfirst %}</th>
+          </tr>
+          <tr>
+            <th colspan="7"></th>
+            <th class="text-right">{% translate 'total' %}</th>
+            <th class="text-right">{{ statistics.cutoff_date|date:'d.m.' }}</th>
           </tr>
         </thead>
         <tbody>
@@ -44,6 +50,8 @@
               <br>
               {{ statistics.overall.delta_negative|currency:True }}
             </th>
+            <th class="text-right {% if not statistics.overall.projected_gross_margin %}text-black-30{% endif %}">{{ statistics.overall.projected_gross_margin|currency }}</th>
+            <th class="text-right {% if not statistics.overall.projected_gross_margin_on_cutoff_date %}text-black-30{% endif %}">{{ statistics.overall.projected_gross_margin_on_cutoff_date|currency }}</th>
           </tr>
           {% for project in statistics.statistics %}
             <tr>
@@ -78,6 +86,8 @@
                 {% pie project.not_archived project.hours %}
               </td>
               <td class="text-right {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
+              <td class="text-right {% if not project.projected_gross_margin %}text-black-30{% endif %}">{{ project.projected_gross_margin|currency }}</td>
+              <td class="text-right {% if not project.projected_gross_margin_on_cutoff_date %}text-black-30{% endif %}">{{ project.projected_gross_margin_on_cutoff_date|currency }}</td>
             </tr>
           {% endfor %}
         </tbody>
