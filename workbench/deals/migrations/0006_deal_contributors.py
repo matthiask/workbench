@@ -16,11 +16,11 @@ class Migration(migrations.Migration):
             model_name="deal",
             name="contributors",
             field=models.ManyToManyField(
-                help_text="The value of the deal will be distributed among all contributors in the accepted deals report.",
+                help_text="Who is the driving force behind the deal?",
                 related_name="_deals_deal_contributors_+",
                 through="deals.Contribution",
                 to=settings.AUTH_USER_MODEL,
-                verbose_name="contributors",
+                verbose_name="driving force",
             ),
         ),
         migrations.RunSQL(
