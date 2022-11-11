@@ -8,6 +8,7 @@ from django.utils import timezone
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
+from workbench.projects.models import Service
 from workbench.tools.formats import Z1, Z2
 
 
@@ -56,11 +57,13 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             )
         hours_per_project[row["service__project"]] += row["hours__sum"]
 
-    not_archived_hours = {
-        row["service__project"]: row["hours__sum"]
-        for row in hours.filter(archived_at__isnull=True)
-        .values("service__project")
-        .annotate(Sum("hours"))
+    service_hours = {
+        row["project"]: row["service_hours__sum"]
+        for row in Service.objects.budgeted()
+        .filter(project__in=projects)
+        .order_by()
+        .values("project")
+        .annotate(Sum("service_hours"))
     }
 
     sold_per_project = {
@@ -116,7 +119,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             "sold": sold_per_project.get(project.id, Z2),
             "invoiced": invoiced_per_project.get(project.id, Z2),
             "hours": hours_per_project[project.id],
-            "not_archived": not_archived_hours.get(project.id, Z1),
+            "service_hours": service_hours.get(project.id, Z1),
             "delta": cost_per_project.get(project.id, Z2)
             + effort_cost_per_project[project.id]
             - invoiced_per_project.get(project.id, Z2),
@@ -138,7 +141,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             "sold",
             "invoiced",
             "hours",
-            "not_archived",
+            "service_hours",
             "projected_gross_margin",
             "projected_gross_margin_on_cutoff_date",
         ]

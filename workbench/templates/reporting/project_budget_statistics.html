@@ -24,7 +24,7 @@
             <th class="text-right">{% translate 'logbook'|capfirst %}</th>
             <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
             <th class="text-right">{% translate 'invoiced'|capfirst %}</th>
-            <th class="text-right">{% translate 'Not archived' %}</th>
+            <th class="text-right">{% translate 'service hours'|capfirst %}</th>
             <th class="text-right">&Delta;</th>
             <th class="text-right" colspan="2">{% translate 'projected gross margin'|capfirst %}</th>
           </tr>
@@ -42,8 +42,8 @@
             <th class="text-right">{{ statistics.overall.third_party_costs|currency }}</th>
             <th class="text-right">{{ statistics.overall.invoiced|currency }}</th>
             <th class="text-right text-nowrap">
-              {{ statistics.overall.not_archived|hours }} / {{ statistics.overall.hours|hours }}
-              {% pie statistics.overall.not_archived statistics.overall.hours %}
+              {{ statistics.overall.hours|hours }} / {{ statistics.overall.service_hours|hours }}
+              {% bar statistics.overall.hours statistics.overall.service_hours %}
             </th>
             <th class="text-right">
               {{ statistics.overall.delta_positive|currency:True }}
@@ -82,8 +82,9 @@
                            text-black-30
                          {% endif %}">{{ project.invoiced|currency }}</td>
               <td class="text-right text-nowrap">
-                {{ project.not_archived|hours }} / {{ project.hours|hours }}
-                {% pie project.not_archived project.hours %}
+                {{ project.hours|hours }} /
+                {{ project.service_hours|hours }}
+                {% bar project.hours project.service_hours %}
               </td>
               <td class="text-right {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
               <td class="text-right {% if not project.projected_gross_margin %}text-black-30{% endif %}">{{ project.projected_gross_margin|currency }}</td>

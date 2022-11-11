@@ -122,17 +122,19 @@ class StatisticsTest(TestCase):
             stats["statistics"],
             [
                 {
-                    "cost": Decimal("0.00"),
-                    "delta": Decimal("1800.000"),
-                    "effort_cost": Decimal("3600.000"),
-                    "effort_hours_with_rate_undefined": Decimal("20.00"),
-                    "hours": Decimal("40.00"),
-                    "invoiced": Decimal("1800.00"),
-                    "logbook": Decimal("3600.000"),
-                    "not_archived": Decimal("10.0"),
-                    "sold": Decimal("0.00"),
                     "project": project,
+                    "logbook": Decimal("3600.000"),
+                    "cost": Decimal("0.00"),
+                    "effort_cost": Decimal("3600.000"),
+                    "effort_hours_with_rate_undefined": Decimal("20.0"),
                     "third_party_costs": Decimal("0.00"),
+                    "sold": Decimal("0.00"),
+                    "invoiced": Decimal("1800.00"),
+                    "hours": Decimal("40.0"),
+                    "service_hours": Decimal("0.0"),
+                    "delta": Decimal("1800.000"),
+                    "projected_gross_margin": Decimal("0.00"),
+                    "projected_gross_margin_on_cutoff_date": Decimal("0.00"),
                 }
             ],
         )
