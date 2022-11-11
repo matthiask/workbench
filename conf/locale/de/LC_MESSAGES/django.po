@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-07 09:56+0200\n"
+"POT-Creation-Date: 2022-11-11 16:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -140,7 +140,9 @@ msgstr "Pride"
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_projected_invoices_form.html
 #: workbench/templates/reporting/key_data.html
+#: workbench/templates/reporting/project_budget_statistics.html
 #: workbench/templates/reporting/projected_gross_margin.html
+#: workbench/tools/xlsx.py
 msgid "projected gross margin"
 msgstr "geplanter Umsatz"
 
@@ -161,15 +163,15 @@ msgstr "Kontaktiere die Administrator*innen, falls Du diesen Wert ändern willst
 msgid "Please authenticate."
 msgstr "Bitte anmelden."
 
-#: workbench/accounts/models.py
+#: workbench/accounts/models.py workbench/reporting/views.py
 msgid "All users"
 msgstr "Alle Nutzer*innen"
 
-#: workbench/accounts/models.py
+#: workbench/accounts/models.py workbench/reporting/views.py
 msgid "Show mine only"
 msgstr "Nur meine anzeigen"
 
-#: workbench/accounts/models.py
+#: workbench/accounts/models.py workbench/reporting/views.py
 msgid "Inactive users"
 msgstr "Inaktive Nutzer*innen"
 
@@ -1070,6 +1072,7 @@ msgstr "Valuta"
 #: workbench/templates/reporting/logging.html
 #: workbench/templates/reporting/open_items_list.html
 #: workbench/templates/reporting/planning_vs_logbook.html
+#: workbench/templates/reporting/project_budget_statistics.html
 #: workbench/tools/models.py workbench/tools/pdf.py workbench/tools/xlsx.py
 msgid "total"
 msgstr "Total"
@@ -1351,6 +1354,7 @@ msgstr "Wer treibt die Akquise voran bei diesem Geschäft?"
 #: workbench/deals/models.py
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
+#: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/accepted_deals_for_user.html
 #: workbench/templates/reporting/declined_deals.html
 msgid "deal"
@@ -2001,8 +2005,6 @@ msgstr "Keine Offerte"
 
 #: workbench/logbook/forms.py workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/project_budget_statistics.html
-#: workbench/tools/xlsx.py
 msgid "Not archived"
 msgstr "Nicht archiviert"
 
@@ -2818,6 +2820,14 @@ msgid "Closed during the last year"
 msgstr "Geschlossen während dem letzten Jahr"
 
 #: workbench/reporting/views.py
+msgid "Open customer projects right now"
+msgstr "Hat aktuell offene Kundenprojekte"
+
+#: workbench/reporting/views.py
+msgid "Other active users"
+msgstr "Andere aktive Nutzer*innen"
+
+#: workbench/reporting/views.py
 msgid "Still open or closed during the current year"
 msgstr "Immer noch offen oder geschlossen im laufenden Jahr"
 
@@ -2850,6 +2860,8 @@ msgid "service types"
 msgstr "Leistungstypen"
 
 #: workbench/services/models.py
+#: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/xlsx.py
 msgid "service hours"
 msgstr "Leistungsstunden"
 

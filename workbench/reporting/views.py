@@ -321,9 +321,29 @@ class ProjectBudgetStatisticsForm(Form):
         data.setdefault("cutoff_date", today.isoformat())
         kwargs.setdefault("initial", {}).setdefault("cutoff_date", today)
         super().__init__(data, *args, **kwargs)
-        self.fields["owned_by"].choices = User.objects.choices(
-            collapse_inactive=True, myself=True
+
+        users = [(user.id, user) for user in User.objects.filter(is_active=True)]
+        open_project_owners = set(
+            Project.objects.open()
+            .external()
+            .order_by()
+            .values_list("owned_by", flat=True)
+            .distinct()
         )
+
+        self.fields["owned_by"].choices = [
+            ("", _("All users")),
+            (-1, _("Show mine only")),
+            (0, _("Inactive users")),
+            (
+                _("Open customer projects right now"),
+                [choice for choice in users if choice[0] in open_project_owners],
+            ),
+            (
+                _("Other active users"),
+                [choice for choice in users if choice[0] not in open_project_owners],
+            ),
+        ]
 
     def queryset(self):
         data = self.cleaned_data

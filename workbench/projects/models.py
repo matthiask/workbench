@@ -164,6 +164,9 @@ class ProjectQuerySet(SearchQuerySet):
             )
         )
 
+    def external(self):
+        return self.exclude(type=Project.INTERNAL)
+
     def closed(self):
         return self.filter(closed_on__isnull=False)
 
