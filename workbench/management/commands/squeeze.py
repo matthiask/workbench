@@ -192,6 +192,7 @@ class Command(BaseCommand):
                 for type in types
             ]
             profitable_percentage = 100 + sum(internal_percentages)
+            external_percentage = 100 * hptu[user]["external"] / hptu[user]["total"]
             expected_gross_margin = (
                 150
                 * working_hours_estimation(date_range)
@@ -204,8 +205,8 @@ class Command(BaseCommand):
 
             return [p or None for p in internal_percentages] + [
                 profitable_percentage,
-                100 * hptu[user]["external"] / hptu[user]["total"]
-                - profitable_percentage,
+                external_percentage,
+                external_percentage - profitable_percentage,
                 expected_gross_margin,
                 delta,
             ]
@@ -222,7 +223,6 @@ class Command(BaseCommand):
                 _("internal hours"),
                 _("external hours"),
                 _("total hours"),
-                _("external percentage"),
                 "",
                 _("invoiced per external hour"),
                 "",
@@ -231,6 +231,7 @@ class Command(BaseCommand):
             + [type.name for type in types]
             + [
                 _("Target value: external percentage"),
+                _("external percentage"),
                 "",
                 _("Target value: gross margin"),
                 "",
@@ -246,7 +247,6 @@ class Command(BaseCommand):
                 hpt["total"]["internal"],
                 hpt["total"]["external"],
                 hpt["total"]["total"],
-                100 * hpt["total"]["external"] / hpt["total"]["total"],
                 "",
                 all_users_margin
                 / all_users_hours_in_range
@@ -256,7 +256,8 @@ class Command(BaseCommand):
             ]
             + ["" for _type in types]
             + [
-                _("Reached"),
+                "",
+                100 * hpt["total"]["external"] / hpt["total"]["total"],
                 _("Delta"),
                 _("Reached (150/h)"),
                 _("Delta"),
@@ -277,7 +278,6 @@ class Command(BaseCommand):
                     hptu[user]["internal"],
                     hptu[user]["external"],
                     hptu[user]["total"],
-                    100 * hptu[user]["external"] / hptu[user]["total"],
                     "",
                     row["margin"]
                     / row["hours_in_range"]
