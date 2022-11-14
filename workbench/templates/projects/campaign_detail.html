@@ -40,8 +40,8 @@
                       <th class="text-right">{{ statistics.overall.third_party_costs|currency }}</th>
                       <th class="text-right">{{ statistics.overall.invoiced|currency }}</th>
                       <th class="text-right text-nowrap">
-                        {{ statistics.overall.not_archived|hours }} / {{ statistics.overall.hours|hours }}
-                        {% pie statistics.overall.not_archived statistics.overall.hours %}
+                        {{ statistics.overall.hours|hours }} / {{ statistics.overall.service_hours|hours }}
+                        {% bar statistics.overall.hours statistics.overall.service_hours %}
                       </th>
                       <th class="text-right">
                         {{ statistics.overall.delta_positive|currency:True }}
@@ -79,8 +79,9 @@
                                      text-black-30
                                    {% endif %}">{{ project.invoiced|currency }}</td>
                         <td class="text-right text-nowrap">
-                          {{ project.not_archived|hours }} / {{ project.hours|hours }}
-                          {% pie project.not_archived project.hours %}
+                          {{ project.hours|hours }} /
+                          {{ project.service_hours|hours }}
+                          {% bar project.hours project.service_hours %}
                         </td>
                         <td class="text-right {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
                       </tr>
