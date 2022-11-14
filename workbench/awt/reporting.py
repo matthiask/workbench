@@ -66,15 +66,16 @@ def active_users(year):
     )
 
 
-def employment_percentages():
+def employment_percentages(*, until_year=False):
     user_months = defaultdict(lambda: defaultdict(lambda: Z1))
     this_year = dt.date.today().year
+    until_year = until_year or this_year
     for employment in Employment.objects.select_related("user"):
         percentage_factor = Decimal(employment.percentage)
         for month, days in monthly_days(  # pragma: no branch
             employment.date_from, employment.date_until
         ):
-            if month.year > this_year:
+            if month.year > until_year:
                 break
             dpm = days_per_month(month.year)
             partial_month_factor = Decimal(days) / dpm[month.month - 1]

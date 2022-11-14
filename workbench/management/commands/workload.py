@@ -78,7 +78,7 @@ class Command(BaseCommand):
             for week, hours in hours_per_week_for_planned_work(pw).items():
                 hours_per_week_and_user[week][pw.user][type] += hours
 
-        ep = employment_percentages()
+        ep = employment_percentages(until_year=dt.date.today().year + 1)
         for ph in PublicHoliday.objects.filter(date__range=[start, end]):
             week = monday(ph.date)
             month = ph.date.replace(day=1)
