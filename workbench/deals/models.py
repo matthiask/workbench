@@ -107,11 +107,13 @@ class Deal(Model):
     )
 
     UNKNOWN = 10
+    LOW = 15
     NORMAL = 20
     HIGH = 30
 
     PROBABILITY_CHOICES = [
         (UNKNOWN, _("unknown")),
+        (LOW, _("low")),
         (NORMAL, _("normal")),
         (HIGH, _("high")),
     ]

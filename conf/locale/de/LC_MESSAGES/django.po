@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-11 16:27+0100\n"
+"POT-Creation-Date: 2022-11-16 09:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -238,14 +238,15 @@ msgid "token"
 msgstr "Token"
 
 #: workbench/accounts/models.py workbench/management/commands/squeeze.py
+#: workbench/management/commands/workload.py
 msgid "specialist field"
 msgstr "Fachbereich"
 
 #: workbench/accounts/models.py workbench/audit/admin.py
 #: workbench/awt/models.py workbench/deals/models.py
 #: workbench/logbook/models.py workbench/management/commands/squeeze.py
-#: workbench/planning/models.py workbench/projects/models.py
-#: workbench/templates/accounts/user_base.html
+#: workbench/management/commands/workload.py workbench/planning/models.py
+#: workbench/projects/models.py workbench/templates/accounts/user_base.html
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/birthdays.html
@@ -258,7 +259,7 @@ msgid "user"
 msgstr "Nutzer*in"
 
 #: workbench/accounts/models.py workbench/management/commands/squeeze.py
-#: workbench/templates/base.html
+#: workbench/management/commands/workload.py workbench/templates/base.html
 msgid "users"
 msgstr "Nutzer*innen"
 
@@ -304,6 +305,7 @@ msgid "coffee pairings"
 msgstr "Kaffee-Paare"
 
 #: workbench/accounts/models.py workbench/management/commands/squeeze.py
+#: workbench/management/commands/workload.py
 msgid "specialist fields"
 msgstr "Fachbereiche"
 
@@ -630,7 +632,8 @@ msgstr "ist Arbeitszeit"
 msgid "absence"
 msgstr "Abwesenheit"
 
-#: workbench/awt/models.py workbench/templates/base.html
+#: workbench/awt/models.py workbench/management/commands/workload.py
+#: workbench/templates/base.html
 msgid "absences"
 msgstr "Abwesenheiten"
 
@@ -1280,6 +1283,10 @@ msgstr "Abgelehnt"
 #: workbench/deals/models.py
 msgid "unknown"
 msgstr "unbekannt"
+
+#: workbench/deals/models.py
+msgid "low"
+msgstr "tief"
 
 #: workbench/deals/models.py
 msgid "high"
@@ -2245,10 +2252,6 @@ msgid "total hours"
 msgstr "Stunden insgesamt"
 
 #: workbench/management/commands/squeeze.py
-msgid "external percentage"
-msgstr "externe Prozente"
-
-#: workbench/management/commands/squeeze.py
 msgid "invoiced per external hour"
 msgstr "Verrechnet pro externer Stunde"
 
@@ -2261,13 +2264,12 @@ msgid "Target value: external percentage"
 msgstr "Erwartung externe Prozente"
 
 #: workbench/management/commands/squeeze.py
-msgid "Target value: gross margin"
-msgstr "Erwartung Umsatz"
+msgid "external percentage"
+msgstr "externe Prozente"
 
 #: workbench/management/commands/squeeze.py
-#: workbench/templates/reporting/hours_per_type.html
-msgid "Reached"
-msgstr "Erreicht"
+msgid "Target value: gross margin"
+msgstr "Erwartung Umsatz"
 
 #: workbench/management/commands/squeeze.py
 #: workbench/templates/reporting/projected_gross_margin.html
@@ -2290,6 +2292,20 @@ msgstr "<unbekannt>"
 #: workbench/templates/shortcuts.html workbench/tools/xlsx.py
 msgid "projects"
 msgstr "Projekte"
+
+#: workbench/management/commands/workload.py
+msgid "workload"
+msgstr "Arbeitslast"
+
+#: workbench/management/commands/workload.py
+msgid "external"
+msgstr "Extern"
+
+#: workbench/management/commands/workload.py workbench/reporting/views.py
+#: workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
+msgid "internal"
+msgstr "Intern"
 
 #: workbench/notes/admin.py
 msgid "content object"
@@ -2809,11 +2825,6 @@ msgstr "Wartung"
 #: workbench/templates/reporting/key_data.html
 msgid "overdrawn"
 msgstr "Überzogen"
-
-#: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/key_data.html
-msgid "internal"
-msgstr "Intern"
 
 #: workbench/reporting/views.py
 msgid "Closed during the last year"
@@ -3642,6 +3653,10 @@ msgstr "Grün"
 #: workbench/templates/reporting/hours_per_type.html
 msgid "Target value"
 msgstr "Richtwert"
+
+#: workbench/templates/reporting/hours_per_type.html
+msgid "Reached"
+msgstr "Erreicht"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Facts"

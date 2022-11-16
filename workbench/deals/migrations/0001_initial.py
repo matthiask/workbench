@@ -142,7 +142,12 @@ class Migration(migrations.Migration):
                 (
                     "probability",
                     models.IntegerField(
-                        choices=[(10, "unknown"), (20, "normal"), (30, "high")],
+                        choices=[
+                            (10, "unknown"),
+                            (15, "low"),
+                            (20, "normal"),
+                            (30, "high"),
+                        ],
                         default=10,
                         verbose_name="probability",
                     ),
