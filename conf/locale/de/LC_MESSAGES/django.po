@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-16 09:47+0100\n"
+"POT-Creation-Date: 2022-11-16 09:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3918,6 +3918,10 @@ msgstr "Hohe Wahrscheinlichkeit, später"
 #: workbench/templatetags/workbench.py
 msgid "normal probability"
 msgstr "Normale Wahrscheinlichkeit"
+
+#: workbench/templatetags/workbench.py
+msgid "low probability"
+msgstr "Tiefe Wahrscheinlichkeit"
 
 #: workbench/templatetags/workbench.py
 msgid "unknown probability"

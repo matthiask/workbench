@@ -124,6 +124,8 @@ def deal_group(deal):
             return (3, _("high probability, later"))
     elif deal.probability == deal.NORMAL:
         return (4, _("normal probability"))
+    elif deal.probability == deal.LOW:
+        return (4, _("low probability"))
     else:
         return (5, _("unknown probability"))
 
