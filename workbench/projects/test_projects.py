@@ -8,7 +8,7 @@ from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.contacts.models import Organization
 from workbench.offers.models import Offer
-from workbench.projects.models import Project, Service
+from workbench.projects.models import InternalType, Project, Service
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days
@@ -683,3 +683,62 @@ class ProjectsTest(TestCase):
         with self.assertRaises(ValidationError) as cm:
             Service(project=project, offer=offer, title="Test").full_clean()
         self.assertEqual(list(cm.exception), msg)
+
+    @override_settings(FEATURES={"INTERNAL_TYPES": F.ALWAYS})
+    def test_internal_type_selecting(self):
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        it = InternalType.objects.create(percentage=10)
+
+        response = self.client.post(
+            project.urls["update"],
+            {
+                "customer": project.customer_id,
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "type": project.INTERNAL,
+            },
+        )
+        self.assertContains(response, "Selecting an internal type is required")
+
+        response = self.client.post(
+            project.urls["update"],
+            {
+                "customer": project.customer_id,
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "type": project.INTERNAL,
+                "internal_type": it.id,
+            },
+        )
+        self.assertRedirects(response, project.urls["detail"])
+
+        response = self.client.post(
+            project.urls["update"],
+            {
+                "customer": project.customer_id,
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "type": project.MAINTENANCE,
+                "internal_type": it.id,
+            },
+        )
+        self.assertContains(
+            response, "The internal type must not be set when project is not internal."
+        )
+
+        response = self.client.post(
+            project.urls["update"],
+            {
+                "customer": project.customer_id,
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "type": project.MAINTENANCE,
+            },
+        )
+        self.assertRedirects(response, project.urls["detail"])

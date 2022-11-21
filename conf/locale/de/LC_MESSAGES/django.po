@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-16 09:51+0100\n"
+"POT-Creation-Date: 2022-11-21 13:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2620,6 +2620,10 @@ msgstr "heute"
 #: workbench/projects/forms.py
 msgid "Selecting an internal type is required for internal projects."
 msgstr "Bei internen Projekten muss ein interner Typ ausgewählt werden."
+
+#: workbench/projects/forms.py
+msgid "The internal type must not be set when project is not internal."
+msgstr "Der interne Typ darf nicht gesetzt sein, wenn ein Projekt nicht intern ist."
 
 #: workbench/projects/forms.py
 msgid "This project already has invoices. The invoices' customer record will be changed too."

@@ -350,6 +350,15 @@ class ProjectForm(ModelForm):
                 "internal_type",
                 _("Selecting an internal type is required for internal projects."),
             )
+        elif (
+            self.request.user.features[FEATURES.INTERNAL_TYPES]
+            and data.get("type") != Project.INTERNAL
+            and data.get("internal_type")
+        ):
+            self.add_error(
+                "internal_type",
+                _("The internal type must not be set when project is not internal."),
+            )
 
         if set(self.changed_data) & {"customer"} and self.instance.invoices.exists():
             self.add_warning(
