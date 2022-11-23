@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import include, path, re_path
+from django.urls import include, path
 from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
@@ -49,7 +49,7 @@ def autocomplete_filter(*, request, queryset):
 
 
 urlpatterns = [
-    re_path(r"^offers/", include("workbench.offers.urls")),
+    path("offers/", include("workbench.offers.urls")),
     # Campaigns
     path(
         "campaigns/",
