@@ -1,4 +1,6 @@
+from django.contrib import messages
 from django.shortcuts import get_object_or_404, render
+from django.utils.translation import gettext as _
 
 from workbench.accounts.models import Team, User
 from workbench.planning import reporting
@@ -21,6 +23,8 @@ def project_planning(request, pk):
 
 def project_planning_external(request, pk):
     instance = get_object_or_404(Project.objects.all(), pk=pk)
+    if not instance.milestones.exists():
+        messages.error(request, _("Please define at least one milestone."))
     return render(
         request,
         "planning/project_planning_external.html",

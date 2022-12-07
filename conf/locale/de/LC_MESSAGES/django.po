@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-21 13:52+0100\n"
+"POT-Creation-Date: 2022-12-07 09:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2552,6 +2552,10 @@ msgstr "Erstellt"
 #: workbench/planning/updates.py
 msgid "Updated"
 msgstr "Bearbeitet"
+
+#: workbench/planning/views.py
+msgid "Please define at least one milestone."
+msgstr "Bitte definiere mindestens einen Meilenstein."
 
 #: workbench/projects/forms.py
 msgid "Projects are linked with this campaign. They will be released when deleting this campaign."
