@@ -6,7 +6,8 @@ from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
-from django.utils.translation import gettext_lazy as _
+from django.utils.text import capfirst
+from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
@@ -97,7 +98,35 @@ class InvoiceSearchForm(Form):
 
         if request.GET.get("export") == "xlsx":
             xlsx = WorkbenchXLSXDocument()
-            xlsx.table_from_queryset(queryset)
+            xlsx.table_from_queryset(
+                queryset,
+                additional=[
+                    (
+                        capfirst(gettext("project")),
+                        lambda invoice: invoice.project.title
+                        if invoice.project
+                        else None,
+                    ),
+                    (
+                        capfirst(gettext("contact person")),
+                        lambda invoice: invoice.project.owned_by
+                        if invoice.project
+                        else None,
+                    ),
+                    (
+                        capfirst(gettext("type")),
+                        lambda invoice: invoice.project.get_type_display()
+                        if invoice.project
+                        else None,
+                    ),
+                    (
+                        capfirst(gettext("closed on")),
+                        lambda invoice: invoice.project.closed_on
+                        if invoice.project
+                        else None,
+                    ),
+                ],
+            )
             return xlsx.to_response("invoices.xlsx")
 
 
