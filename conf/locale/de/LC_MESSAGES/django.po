@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-07 09:59+0100\n"
+"POT-Creation-Date: 2022-12-12 17:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1109,8 +1109,9 @@ msgid "credit entries"
 msgstr "Zahlungseingänge"
 
 #: workbench/credit_control/reporting.py workbench/deals/models.py
-#: workbench/expenses/models.py workbench/invoices/models.py
-#: workbench/offers/models.py workbench/projects/models.py
+#: workbench/expenses/models.py workbench/invoices/forms.py
+#: workbench/invoices/models.py workbench/offers/models.py
+#: workbench/projects/models.py
 msgid "closed on"
 msgstr "Geschlossen am"
 
@@ -1311,8 +1312,9 @@ msgid "contact"
 msgstr "Kontakt"
 
 #: workbench/deals/models.py workbench/expenses/models.py
-#: workbench/invoices/models.py workbench/offers/models.py
-#: workbench/projects/models.py workbench/templates/deals/deal_detail.html
+#: workbench/invoices/forms.py workbench/invoices/models.py
+#: workbench/offers/models.py workbench/projects/models.py
+#: workbench/templates/deals/deal_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/projects/project_detail.html workbench/tools/xlsx.py
@@ -1578,6 +1580,28 @@ msgstr "Keine Rechnungen gefunden."
 msgid "%s invoices in selection, that's too many."
 msgstr "%s Rechnungen in der Auswahl, das sind zu viele."
 
+#: workbench/invoices/forms.py workbench/invoices/models.py
+#: workbench/management/commands/squeeze.py workbench/offers/models.py
+#: workbench/planning/models.py workbench/projects/models.py
+#: workbench/projects/views.py
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/contacts/person_detail.html
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/invoice_form.html
+#: workbench/templates/logbook/loggedcost_detail.html
+#: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/offers/offer_form.html
+#: workbench/templates/planning/project_planning.html
+#: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/project_projected_invoices_form.html
+#: workbench/templates/reporting/labor_costs.html
+#: workbench/templates/reporting/playing_bank.html
+#: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/templates/reporting/projected_gross_margin.html
+#: workbench/tools/xlsx.py
+msgid "project"
+msgstr "Projekt"
+
 #: workbench/invoices/forms.py
 msgid "Determined by project."
 msgstr "Durch Projekt bestimmt."
@@ -1706,27 +1730,6 @@ msgstr "Fixbetrag"
 #: workbench/invoices/models.py workbench/tools/pdf.py
 msgid "Services"
 msgstr "Leistungen"
-
-#: workbench/invoices/models.py workbench/management/commands/squeeze.py
-#: workbench/offers/models.py workbench/planning/models.py
-#: workbench/projects/models.py workbench/projects/views.py
-#: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/contacts/person_detail.html
-#: workbench/templates/invoices/invoice_detail.html
-#: workbench/templates/invoices/invoice_form.html
-#: workbench/templates/logbook/loggedcost_detail.html
-#: workbench/templates/logbook/loggedhours_detail.html
-#: workbench/templates/offers/offer_form.html
-#: workbench/templates/planning/project_planning.html
-#: workbench/templates/projects/campaign_detail.html
-#: workbench/templates/projects/project_projected_invoices_form.html
-#: workbench/templates/reporting/labor_costs.html
-#: workbench/templates/reporting/playing_bank.html
-#: workbench/templates/reporting/project_budget_statistics.html
-#: workbench/templates/reporting/projected_gross_margin.html
-#: workbench/tools/xlsx.py
-msgid "project"
-msgstr "Projekt"
 
 #: workbench/invoices/models.py
 msgid "due on"
@@ -2278,8 +2281,8 @@ msgid "Delta"
 msgstr "Delta"
 
 #: workbench/management/commands/squeeze.py
-msgid "Reached (150/h)"
-msgstr "Erreicht (150/h)"
+msgid "Target value w/ 150/h"
+msgstr "Richtwert mit 150/h"
 
 #: workbench/management/commands/squeeze.py
 msgid "<unknown>"
@@ -4094,6 +4097,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Reached (150/h)"
+#~ msgstr "Erreicht (150/h)"
 
 #~ msgid "Select team"
 #~ msgstr "Team auswählen"

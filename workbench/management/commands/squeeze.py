@@ -259,7 +259,7 @@ class Command(BaseCommand):
                 "",
                 100 * hpt["total"]["external"] / hpt["total"]["total"],
                 _("Delta"),
-                _("Reached (150/h)"),
+                _("Target value w/ 150/h"),
                 _("Delta"),
             ],
             [],
@@ -290,7 +290,7 @@ class Command(BaseCommand):
                 + user_expectation(user, row, average_percentage(user))
                 for user, row in users.items()
             ),
-            key=lambda row: row[5],
+            key=lambda row: row[-1],
             reverse=True,
         )
 
@@ -324,7 +324,7 @@ class Command(BaseCommand):
                 ]
                 for name, row in fields.items()
             ),
-            key=lambda row: row[4],
+            key=lambda row: row[-1],
             reverse=True,
         )
 
