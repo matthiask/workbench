@@ -35,7 +35,6 @@ class Command(BaseCommand):
             "--year",
             type=int,
             default=dt.date.today().year,
-            help="The year (default: %(default)s)",
         )
         parser.add_argument(
             "--mailto",
@@ -50,6 +49,10 @@ class Command(BaseCommand):
             dt.date(options["year"], 1, 1),
             min(last_month_end, dt.date(options["year"], 12, 31)),
         ]
+
+        if date_range[0] >= date_range[1]:
+            self.stderr.write("Date range empty.")
+            return
 
         projects = defaultdict(
             lambda: {
@@ -336,7 +339,7 @@ class Command(BaseCommand):
         xlsx.add_sheet(_("projects"))
         xlsx.table(None, header + projects_table)
 
-        filename = f"squeeze-{options['year']}.xlsx"
+        filename = f"squeeze-{date_range[0]}-{date_range[1]}.xlsx"
 
         if options["mailto"]:
             mail = EmailMultiAlternatives(
