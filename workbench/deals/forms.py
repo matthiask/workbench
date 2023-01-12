@@ -264,6 +264,8 @@ class DealForm(ModelForm):
             contribution_select_fields.append(name)
         self.contribution_select_fields = ",".join(contribution_select_fields)
 
+        self.fields["probability"].choices = self.fields["probability"].choices[1:]
+
     def clean(self):
         data = super().clean()
         if (
