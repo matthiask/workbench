@@ -604,10 +604,10 @@ class RecurringInvoice(ModelWithTotal):
         verbose_name_plural = _("recurring invoices")
 
     def __str__(self):
-        return self.title
+        return f"{self.title} - {self.owned_by.get_short_name()}"
 
     def __html__(self):
-        return self.title
+        return format_html("{} - {}", self.title, self.owned_by.get_short_name())
 
     @property
     def pretty_status(self):
