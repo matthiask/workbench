@@ -18,7 +18,7 @@ repos:
         language: system
         always_run: true
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.2.2
+    rev: v3.3.1
     hooks:
       - id: pyupgrade
         args: [--py39-plus]
@@ -32,12 +32,12 @@ repos:
     hooks:
       - id: absolufy-imports
   - repo: https://github.com/pycqa/isort
-    rev: 5.10.1
+    rev: 5.11.4
     hooks:
       - id: isort
         args: [--profile=black, --lines-after-imports=2, --combine-as]
   - repo: https://github.com/psf/black
-    rev: 22.10.0
+    rev: 22.12.0
     hooks:
       - id: black
   - repo: https://github.com/pycqa/flake8
@@ -48,14 +48,14 @@ repos:
         additional_dependencies:
           - flake8-bugbear
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.28.0
+    rev: v8.32.0
     hooks:
       - id: eslint
         args: [--fix]
         types_or: [css, scss, javascript]
         verbose: true
         additional_dependencies:
-          - eslint@^8.28.0
+          - eslint@^8.32.0
           - eslint-config-prettier
           - eslint-config-preact
           - eslint-plugin-compat

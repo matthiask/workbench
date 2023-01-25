@@ -16,7 +16,8 @@ A basic webpack file may looks as follows:
             postcssRule({
               plugins: [
                 "postcss-nested",
-                ["postcss-custom-media", { importFrom: "./theme.config.js" }],
+                "postcss-import",
+                "postcss-custom-media",
                 "autoprefixer",
               ],
             }),
