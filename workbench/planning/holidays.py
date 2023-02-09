@@ -25,7 +25,6 @@ class EasterDay:
         self.year = year
 
     def get_k(self):
-
         """
         Säkularzahl:
         K(X) = X div 100
@@ -35,7 +34,6 @@ class EasterDay:
         return k
 
     def get_m(self):
-
         """
         säkulare Mondschaltung:
         M(K) = 15 + (3K + 3) div 4 − (8K + 13) div 25
@@ -46,7 +44,6 @@ class EasterDay:
         return m
 
     def get_s(self):
-
         """
         säkulare Sonnenschaltung:
         S(K) = 2 − (3K + 3) div 4
@@ -57,7 +54,6 @@ class EasterDay:
         return s
 
     def get_a(self):
-
         """
         Mondparameter:
         A(X) = X mod 19
@@ -67,7 +63,6 @@ class EasterDay:
         return a
 
     def get_d(self):
-
         """
         Keim für den ersten Vollmond im Frühling:
         D(A,M) = (19A + M) mod 30
@@ -79,7 +74,6 @@ class EasterDay:
         return d
 
     def get_r(self):
-
         """
         kalendarische Korrekturgröße:
         R(D,A) = D div 29 + (D div 28 − D div 29) (A div 11)
@@ -91,7 +85,6 @@ class EasterDay:
         return r
 
     def get_og(self):
-
         """
         Ostergrenze:
         OG(D,R) = 21 + D − R
@@ -103,7 +96,6 @@ class EasterDay:
         return og
 
     def get_sz(self):
-
         """
         erster Sonntag im März:
         SZ(X,S) = 7 − (X + X div 4 + S) mod 7
@@ -114,7 +106,6 @@ class EasterDay:
         return sz
 
     def get_oe(self):
-
         """
         Entfernung des Ostersonntags von der Ostergrenze
         (Osterentfernung in Tagen):
@@ -127,7 +118,6 @@ class EasterDay:
         return oe
 
     def get_os(self):
-
         """
         das Datum des Ostersonntags als Märzdatum
         (32. März = 1. April usw.):
@@ -140,7 +130,6 @@ class EasterDay:
         return os
 
     def get_date(self):
-
         """
         Ausgabe des Ostersonntags als datetime-Objekt
         """

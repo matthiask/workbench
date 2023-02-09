@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("awt", "0005_auto_20191207_1304"),
         ("accounts", "0004_user_language"),

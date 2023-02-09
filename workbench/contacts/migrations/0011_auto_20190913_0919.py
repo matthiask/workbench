@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("contacts", "0010_organization_default_billing_address")]
 
     operations = [

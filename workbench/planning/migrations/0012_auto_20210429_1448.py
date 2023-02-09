@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("services", "0005_servicetype_color"),
         ("projects", "0019_auto_20200523_0929"),

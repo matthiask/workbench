@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("offers", "0002_offer_project"), ("audit", "0001_initial")]
 
     operations = [migrations.RunSQL("SELECT audit_audit_table('offers_offer');", "")]

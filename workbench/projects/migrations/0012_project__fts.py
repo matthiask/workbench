@@ -6,7 +6,6 @@ from workbench.tools import search
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("projects", "0011_auto_20190629_0943")]
 
     operations = [

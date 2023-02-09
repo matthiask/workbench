@@ -27,7 +27,6 @@ def forwards(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("invoices", "0012_invoice__fts")]
 
     operations = [migrations.RunPython(forwards)]

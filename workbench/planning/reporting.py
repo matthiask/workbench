@@ -81,7 +81,7 @@ class Planning:
                 if pw.is_provisional:
                     self._by_week_provisional[week] += per_week
 
-            hours_per_week = list()
+            hours_per_week = []
             for week in self.weeks:
                 if week in pw.weeks:
                     hours_per_week.append(per_week)
@@ -132,7 +132,6 @@ class Planning:
             for ew in external_work_qs.filter(weeks__overlap=self.weeks).select_related(
                 "milestone", "provided_by"
             ):
-
                 date_from = min(ew.weeks)
                 date_until = max(ew.weeks) + dt.timedelta(days=6)
 
@@ -168,7 +167,6 @@ class Planning:
 
     def add_project_milestone(self, project, milestone):
         if milestone and (not self._milestones[project][milestone]):
-
             start = (
                 milestone.phase_starts_on
                 if milestone.phase_starts_on

@@ -6,7 +6,6 @@ from workbench.tools import search
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("projects", "0017_project_cost_center"),
     ]

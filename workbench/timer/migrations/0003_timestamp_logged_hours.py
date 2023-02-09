@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("logbook", "0016_auto_20191210_1537"),
         ("timer", "0002_timestamp"),

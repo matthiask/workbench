@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("audit", "0001_initial"),
         ("credit_control", "0003_auto_20190321_1447"),

@@ -29,7 +29,6 @@ def forwards(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("logbook", "0012_auto_20190913_0919"),
         ("projects", "0016_auto_20190915_1249"),

@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("offers", "0008_auto_20190916_1110"),
         ("deals", "0003_valuetype_weekly_target"),

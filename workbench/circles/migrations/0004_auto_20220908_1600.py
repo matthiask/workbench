@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("projects", "0021_remove_service_role"),
         ("circles", "0003_role_work_category"),

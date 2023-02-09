@@ -13,7 +13,6 @@ with open(os.path.join(settings.BASE_DIR, "workbench", "tools", "audit.sql")) as
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = []

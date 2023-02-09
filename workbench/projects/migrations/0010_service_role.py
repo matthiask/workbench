@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("circles", "0001_initial"),
         ("projects", "0009_service_is_optional"),

@@ -37,7 +37,6 @@ def backwards(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("invoices", "0023_projectedinvoice"),
     ]

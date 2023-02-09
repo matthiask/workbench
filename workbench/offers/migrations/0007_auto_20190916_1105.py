@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("offers", "0006_offer_total_excl_tax")]
 
     operations = [

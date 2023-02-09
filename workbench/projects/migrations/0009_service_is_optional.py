@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("projects", "0008_service_is_logging_prohibited")]
 
     operations = [

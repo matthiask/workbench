@@ -11,7 +11,6 @@ with open(os.path.join(settings.BASE_DIR, "workbench", "tools", "audit.sql")) as
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("audit", "0003_auto_20190703_0813"),
     ]

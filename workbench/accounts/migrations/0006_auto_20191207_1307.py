@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("awt", "0007_auto_20191207_1307"),
         ("accounts", "0005_user_working_time_model"),

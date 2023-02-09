@@ -10,7 +10,6 @@ def forwards(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("awt", "0005_auto_20191207_1304"),
         ("accounts", "0005_user_working_time_model"),

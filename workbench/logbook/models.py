@@ -211,7 +211,6 @@ class Break(Model):
         super().clean_fields(exclude=exclude)
         errors = {}
         if self.starts_at and self.ends_at:
-
             if self.starts_at.date() != self.ends_at.date():
                 errors["ends_at"] = _("Breaks must start and end on the same day.")
 

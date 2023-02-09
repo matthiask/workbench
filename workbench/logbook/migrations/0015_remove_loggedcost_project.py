@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("logbook", "0014_auto_20190915_1250")]
 
     operations = [migrations.RemoveField(model_name="loggedcost", name="project")]

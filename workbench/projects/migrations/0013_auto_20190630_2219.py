@@ -19,7 +19,6 @@ def forwards(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("projects", "0012_project__fts")]
 
     operations = [migrations.RunPython(forwards)]

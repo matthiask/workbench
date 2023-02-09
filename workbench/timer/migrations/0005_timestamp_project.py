@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("projects", "0018_auto_20200402_2212"),
         ("timer", "0004_timestamp_logged_break"),

@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("contacts", "0013_organization_is_archived"),
         ("planning", "0015_auto_20210729_1141"),

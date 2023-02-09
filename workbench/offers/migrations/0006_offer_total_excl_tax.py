@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("offers", "0005_offer_show_service_details")]
 
     operations = [

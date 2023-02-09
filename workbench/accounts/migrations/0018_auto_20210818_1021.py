@@ -47,7 +47,6 @@ WHERE accounts_user.id=date_of_employment.id
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0017_user_date_of_employment"),
     ]

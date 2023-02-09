@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("contacts", "0009_organization_is_private_person")]
 
     operations = [

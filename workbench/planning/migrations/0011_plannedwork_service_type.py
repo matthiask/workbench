@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("services", "0005_servicetype_color"),
         ("planning", "0010_alter_plannedwork_created_by"),

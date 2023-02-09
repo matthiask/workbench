@@ -14,7 +14,6 @@ def forwards(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("contacts", "0007_person__fts")]
 
     operations = [migrations.RunPython(forwards, lambda *a: None)]

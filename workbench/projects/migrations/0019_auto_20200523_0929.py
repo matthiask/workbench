@@ -8,7 +8,6 @@ from workbench.tools import search
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("contacts", "0012_person_date_of_birth"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

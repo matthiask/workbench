@@ -6,7 +6,6 @@ from workbench.tools import search
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("invoices", "0019_auto_20191002_1005"),
         ("credit_control", "0006_ledger_parser"),

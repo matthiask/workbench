@@ -4,7 +4,10 @@ repos:
     rev: v4.4.0
     hooks:
       - id: check-added-large-files
+      - id: check-builtin-literals
+      - id: check-executables-have-shebangs
       - id: check-merge-conflict
+      - id: detect-private-key
       - id: end-of-file-fixer
       - id: trailing-whitespace
       - id: file-contents-sorter
@@ -32,12 +35,12 @@ repos:
     hooks:
       - id: absolufy-imports
   - repo: https://github.com/pycqa/isort
-    rev: 5.11.4
+    rev: 5.12.0
     hooks:
       - id: isort
         args: [--profile=black, --lines-after-imports=2, --combine-as]
   - repo: https://github.com/psf/black
-    rev: 22.12.0
+    rev: 23.1.0
     hooks:
       - id: black
   - repo: https://github.com/pycqa/flake8
@@ -48,14 +51,14 @@ repos:
         additional_dependencies:
           - flake8-bugbear
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.32.0
+    rev: v8.33.0
     hooks:
       - id: eslint
         args: [--fix]
         types_or: [css, scss, javascript]
         verbose: true
         additional_dependencies:
-          - eslint@^8.32.0
+          - eslint@^8.33.0
           - eslint-config-prettier
           - eslint-config-preact
           - eslint-plugin-compat
