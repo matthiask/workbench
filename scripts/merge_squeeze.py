@@ -11,12 +11,14 @@ users = defaultdict(
     lambda: {
         "percentage": 0,
         "gross_margin": [None for _ in sheets],
+        "expected_gross_margin": 0,
     }
 )
 
 for idx, sheet in enumerate(sheets):
     for row in list(sheet.rows)[4:]:
         users[row[0].value]["percentage"] = row[2].value
+        users[row[0].value]["expected_gross_margin"] = row[22].value
         users[row[0].value]["gross_margin"][idx] = row[3].value
 
 xlsx = XLSXDocument()
@@ -24,9 +26,11 @@ xlsx.add_sheet("Nutzer_innen")
 xlsx.table(
     ["Nutzer*in"]
     + [list(sheet.rows)[0][0].value.removeprefix("Squeeze ") for sheet in sheets]
-    + ["Prozent"],
+    + ["Prozent", "Erwartung Umsatz (150/h)"],
     [
-        [user] + data["gross_margin"] + [data["percentage"]]
+        [user]
+        + data["gross_margin"]
+        + [data["percentage"], data["expected_gross_margin"]]
         for user, data in sorted(users.items())
     ],
 )
