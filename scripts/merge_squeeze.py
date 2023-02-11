@@ -6,7 +6,7 @@ from xlsxdocument import XLSXDocument
 
 
 workbooks = [load_workbook(name) for name in sys.argv[1:]]
-sheets = [wb.worksheets[0] for wb in workbooks]
+sheets = [list(wb.worksheets[0].rows) for wb in workbooks]
 users = defaultdict(
     lambda: {
         "percentage": 0,
@@ -16,7 +16,7 @@ users = defaultdict(
 )
 
 for idx, sheet in enumerate(sheets):
-    for row in list(sheet.rows)[4:]:
+    for row in sheet[4:]:
         users[row[0].value]["percentage"] = row[2].value
         users[row[0].value]["expected_gross_margin"] = row[22].value
         users[row[0].value]["gross_margin"][idx] = row[3].value
@@ -24,9 +24,9 @@ for idx, sheet in enumerate(sheets):
 xlsx = XLSXDocument()
 xlsx.add_sheet("Nutzer_innen")
 xlsx.table(
-    ["Nutzer*in"]
-    + [list(sheet.rows)[0][0].value.removeprefix("Squeeze ") for sheet in sheets]
-    + ["Prozent", "Erwartung Umsatz (150/h)"],
+    [sheets[0][1][0].value]
+    + [sheet[0][0].value.removeprefix("Squeeze ") for sheet in sheets]
+    + [sheets[0][1][2].value, sheets[0][1][22].value],
     [
         [user]
         + data["gross_margin"]
