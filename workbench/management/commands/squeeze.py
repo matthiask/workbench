@@ -1,5 +1,7 @@
+import argparse
 import datetime as dt
 import io
+import re
 from collections import defaultdict
 from decimal import Decimal
 from itertools import chain
@@ -29,12 +31,24 @@ def working_hours_estimation(date_range):
     return days * work_days_ratio * vacation_ratio * working_time_per_day
 
 
+def range_type(arg_value):
+    if matches := re.match(r"(\d{4})(\d{2})(\d{2})-(\d{4})(\d{2})(\d{2})", arg_value):
+        groups = [int(group) for group in matches.groups()]
+        return [dt.date(*groups[:3]), dt.date(*groups[3:])]
+    raise argparse.ArgumentTypeError("invalid value")
+
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             "--year",
             type=int,
             default=dt.date.today().year,
+        )
+        parser.add_argument(
+            "--range",
+            type=range_type,
+            help="Specify as YYYYMMDD-YYYYMMDD",
         )
         parser.add_argument(
             "--mailto",
@@ -45,7 +59,7 @@ class Command(BaseCommand):
         activate("de")
 
         last_month_end = dt.date.today().replace(day=1) - dt.timedelta(days=1)
-        date_range = [
+        date_range = options["range"] or [
             dt.date(options["year"], 1, 1),
             min(last_month_end, dt.date(options["year"], 12, 31)),
         ]
