@@ -206,7 +206,9 @@ class Deal(Model):
         skip_value_calculation = kwargs.pop("skip_value_calculation", False)
 
         if not skip_value_calculation:
-            self.value = sum((v.value for v in self.values.all()), Z2)
+            self.value = (
+                sum((v.value for v in self.values.all()), Z2) if self.pk else Z2
+            )
 
         self._fts = " ".join(
             str(part)

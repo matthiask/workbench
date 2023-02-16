@@ -2,7 +2,7 @@ import datetime as dt
 from decimal import Decimal
 
 from django.utils.formats import date_format
-from django.utils.timezone import localtime
+from django.utils.timezone import is_naive, localtime, make_aware
 from django.utils.translation import ngettext
 
 
@@ -14,7 +14,9 @@ Z2 = Decimal("0.00")
 def local_date_format(dttm, *, fmt=None):
     if not dttm:
         return ""
-    if hasattr(dttm, "astimezone"):
+    if isinstance(dttm, dt.datetime):
+        if is_naive(dttm):
+            dttm = make_aware(dttm)
         dttm = localtime(dttm)
     return date_format(
         dttm, fmt or ("d.m.Y H:i" if isinstance(dttm, dt.datetime) else "d.m.Y")

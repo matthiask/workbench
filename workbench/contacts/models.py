@@ -185,14 +185,15 @@ class Person(Model):
         return self.full_name
 
     def save(self, *args, **kwargs):
-        self._fts = " ".join(
-            itertools.chain(
-                [self.organization.name if self.organization else ""],
-                (detail.phone_number for detail in self.phonenumbers.all()),
-                (detail.email for detail in self.emailaddresses.all()),
-                (detail.postal_address for detail in self.postaladdresses.all()),
+        if self.pk:
+            self._fts = " ".join(
+                itertools.chain(
+                    [self.organization.name if self.organization else ""],
+                    (detail.phone_number for detail in self.phonenumbers.all()),
+                    (detail.email for detail in self.emailaddresses.all()),
+                    (detail.postal_address for detail in self.postaladdresses.all()),
+                )
             )
-        )
         super().save(*args, **kwargs)
 
     save.alters_data = True

@@ -180,7 +180,11 @@ class DealForm(ModelForm):
         warn_if_not_in_preparation(self)
 
         field = Value._meta.get_field("value")
-        values = {v.type_id: v.value for v in self.instance.values.all()}
+        values = (
+            {v.type_id: v.value for v in self.instance.values.all()}
+            if self.instance.pk
+            else {}
+        )
         for vt in ValueType.objects.all():
             key = f"value_{vt.id}"
 

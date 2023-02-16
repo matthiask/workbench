@@ -197,13 +197,17 @@ class Offer(ModelWithTotal):
         return "%s-o%02d" % (self.project.code, self._code)
 
     def _calculate_total(self):
-        self.subtotal = sum(
-            (
-                service.service_cost
-                for service in self.services.all()
-                if not service.is_optional
-            ),
-            Z2,
+        self.subtotal = (
+            sum(
+                (
+                    service.service_cost
+                    for service in self.services.all()
+                    if not service.is_optional
+                ),
+                Z2,
+            )
+            if self.pk
+            else Z2
         )
         super()._calculate_total()
 

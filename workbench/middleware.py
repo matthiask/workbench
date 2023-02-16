@@ -1,10 +1,16 @@
 import re
 
+from django.http import HttpRequest
 from django.shortcuts import render
 from django.urls import reverse
 
 
 FALLBACKS = None
+
+
+HttpRequest.is_ajax = (
+    lambda self: self.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest"
+)
 
 
 def initialize_fallbacks():

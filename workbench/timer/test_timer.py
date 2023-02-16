@@ -454,7 +454,7 @@ class TimestampsTest(TestCase):
         self.assertFalse(DetectedTimestampForm({}).is_valid())
         self.assertFalse(DetectedTimestampForm({"detected_ends_at": ""}).is_valid())
         self.assertFalse(
-            DetectedTimestampForm({"detected_ends_at": "2010-01-01"}).is_valid()
+            DetectedTimestampForm({"detected_ends_at": "2010-21-01"}).is_valid()
         )
         self.assertTrue(
             DetectedTimestampForm(
