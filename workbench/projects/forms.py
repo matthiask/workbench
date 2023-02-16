@@ -360,7 +360,11 @@ class ProjectForm(ModelForm):
                 _("The internal type must not be set when project is not internal."),
             )
 
-        if set(self.changed_data) & {"customer"} and self.instance.invoices.exists():
+        if (
+            set(self.changed_data) & {"customer"}
+            and self.instance.pk
+            and self.instance.invoices.exists()
+        ):
             self.add_warning(
                 _(
                     "This project already has invoices. The invoices'"
@@ -372,6 +376,7 @@ class ProjectForm(ModelForm):
         if (
             set(self.changed_data) & {"flat_rate"}
             and data.get("flat_rate") is not None
+            and self.instance.pk
             and self.instance.services.exists()
         ):
             self.add_warning(
@@ -387,7 +392,7 @@ class ProjectForm(ModelForm):
 
     def save(self):
         instance = super().save(commit=False)
-        if self.instance.flat_rate is not None:
+        if self.instance.pk and self.instance.flat_rate is not None:
             with override(settings.WORKBENCH.PDF_LANGUAGE):
                 self.instance.services.editable().update(
                     effort_type=gettext("flat rate"),
