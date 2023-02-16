@@ -87,7 +87,7 @@ class Prettifier:
 
         return default_if_none(value, _("<no value>"))
 
-    def handle_datetiome(self, values, field):
+    def handle_datetime(self, values, field):
         value = values.get(field.attname)
         if value is None:
             return _("<no value>")
@@ -159,7 +159,7 @@ class Prettifier:
             return self.handle_bool(values, field)
 
         if isinstance(field, models.DateTimeField):
-            return self.handle_datetiome(values, field)
+            return self.handle_datetime(values, field)
 
         if isinstance(field, models.DateField):
             return self.handle_date(values, field)
