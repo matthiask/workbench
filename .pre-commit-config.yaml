@@ -26,7 +26,7 @@ repos:
       - id: pyupgrade
         args: [--py39-plus]
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.12.0
+    rev: 1.13.0
     hooks:
       - id: django-upgrade
         args: [--target-version, "4.0"]
@@ -51,14 +51,14 @@ repos:
         additional_dependencies:
           - flake8-bugbear
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.33.0
+    rev: v8.34.0
     hooks:
       - id: eslint
         args: [--fix]
         types_or: [css, scss, javascript]
         verbose: true
         additional_dependencies:
-          - eslint@^8.33.0
+          - eslint@^8.34.0
           - eslint-config-prettier
           - eslint-config-preact
           - eslint-plugin-compat
