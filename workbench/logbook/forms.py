@@ -455,9 +455,11 @@ class LoggedHoursForm(ModelForm):
             elif data["rendered_on"] > in_days(7):
                 errors["rendered_on"] = _("That's too far in the future.")
 
-            if data["rendered_by"].features[FEATURES.LATE_LOGGING_NAG] and data[
-                "rendered_on"
-            ] < in_days(-2):
+            if (
+                data["rendered_by"].features[FEATURES.LATE_LOGGING_NAG]
+                and data["rendered_on"] < in_days(-2)
+                and data["rendered_on"] >= logbook_lock()
+            ):
                 self.add_warning(
                     _(
                         "You are a bit late. Please try logging your hours immediately upon finishing work."
