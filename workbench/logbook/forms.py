@@ -460,7 +460,7 @@ class LoggedHoursForm(ModelForm):
             ] < in_days(-2):
                 self.add_warning(
                     _(
-                        "The working time standing order prescribes that hours should be logged immediately upon finishing work. You are a bit late."
+                        "You are a bit late. Please try logging your hours immediately upon finishing work."
                     ),
                     code="you-are-late",
                 )

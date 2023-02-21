@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-12 17:11+0100\n"
+"POT-Creation-Date: 2023-02-21 09:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2055,8 +2055,8 @@ msgid "That's too far in the future."
 msgstr "Datum zu weit in der Zukunft."
 
 #: workbench/logbook/forms.py
-msgid "The working time standing order prescribes that hours should be logged immediately upon finishing work. You are a bit late."
-msgstr "Das Arbeitszeitreglement schreibt vor, dass Arbeitsstunden direkt nach Arbeitserledigung erfasst werden sollen. Du bist ein bisschen spät dran."
+msgid "You are a bit late. Please try logging your hours immediately upon finishing work."
+msgstr "Du bist ein bisschen spät dran. Bitte versuche, deine Arbeitsstunden direkt nach Arbeitserledigung zu erfassen."
 
 #: workbench/logbook/forms.py
 msgid "This seems to be a duplicate. Is it?"
@@ -3043,20 +3043,13 @@ msgid ""
 "Your net work hours balance up to and including %(month)s is %(running_sum)s.\n"
 "This is outside the range of +/- 40h.\n"
 "The monthly balance of last month was %(monthly_sum)s.\n"
-"\n"
-"Please take the time to send a short mail to your supervisor with the reasons\n"
-"for this balance and include a plan for catching up or compensating your\n"
-"working time as appropriate if the reasons aren't well known or if you're further\n"
-"away from well-balanced working hours than last month. Thanks!\n"
 msgstr ""
 "\n"
 "Hallo %(full_name)s\n"
 "\n"
 "Dein Stundensaldo bis und mit %(month)s beträgt %(running_sum)s.\n"
 "Dies ist ausserhalb des Bereichs von +/- 40h.\n"
-"Der Stundensaldo des letzten Monats war %(monthly_sum)s.\n"
-"\n"
-"Bitte wende dich mit einer kurzen Begründung für den Status Quo und einem kurz- oder langfristigen Plan zur Kompensation der Unter- oder Überzeit an die Rolle Unterschreiber*in, falls die Gründe nicht allgemein bekannt sind oder falls Du weiter weg bist von einer ausgeglichenen Arbeitszeit. Die Regelungen hinsichtlich Arbeitszeit findest du im Arbeitszeitreglement. Merci!\n"
+"Der Saldo betrug %(monthly_sum)s am Ende des letzten Monats.\n"
 
 #: workbench/templates/awt/year_detail.html
 msgid "active users"
@@ -4097,189 +4090,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "Reached (150/h)"
-#~ msgstr "Erreicht (150/h)"
-
-#~ msgid "Select team"
-#~ msgstr "Team auswählen"
-
-#~ msgid "contributors"
-#~ msgstr "Beitragende"
-
-#~ msgid "The value of the deal will be distributed among all contributors in the accepted deals report."
-#~ msgstr "Der Wert des Geschäfts wird beim «Gewonnene Geschäfte»-Bericht zwischen allen Beitragenden aufgeteilt."
-
-#~ msgid "logged"
-#~ msgstr "Erfasst"
-
-#~ msgid "Monday"
-#~ msgstr "Montag"
-
-#~ msgid "Tuesday"
-#~ msgstr "Dienstag"
-
-#~ msgid "Wednesday"
-#~ msgstr "Mittwoch"
-
-#~ msgid "Thursday"
-#~ msgstr "Donnerstag"
-
-#~ msgid "Friday"
-#~ msgstr "Freitag"
-
-#~ msgid "Saturday"
-#~ msgstr "Samstag"
-
-#~ msgid "Sunday"
-#~ msgstr "Sonntag"
-
-#~ msgid "Hours per weekday"
-#~ msgstr "Stunden pro Wochentag"
-
-#~ msgid "Rendered"
-#~ msgstr "Erbracht"
-
-#~ msgid "earned"
-#~ msgstr "Verdient"
-
-#~ msgid "assigned users"
-#~ msgstr "Zugeordnete Nutzer*innen"
-
-#~ msgid "GlassFrog integration"
-#~ msgstr "GlassFrog-Integration"
-
-#~ msgid "circles"
-#~ msgstr "Kreise"
-
-#~ msgid "circle"
-#~ msgstr "Kreis"
-
-#~ msgid "Customer work"
-#~ msgstr "Kundenarbeit"
-
-#~ msgid "Knowledge transfer"
-#~ msgstr "Wissenstransfer"
-
-#~ msgid "debriefings, reading, exchanges"
-#~ msgstr "Debriefings, Lesezeit, Austausch"
-
-#~ msgid "Social care"
-#~ msgstr "Social Care"
-
-#~ msgid "personal development, people care, care for the work environment"
-#~ msgstr "Persönliche Entwicklung, People Care, Pflege des Arbeitsumfelds"
-
-#~ msgid "Outreach"
-#~ msgstr "Outreach"
-
-#~ msgid "corporate communication, acquisition"
-#~ msgstr "Unternehmenskommunikation, Akquise"
-
-#~ msgid "Other internal matters"
-#~ msgstr "Andere Internas"
-
-#~ msgid "administration, bookkeeping, coordination, etc."
-#~ msgstr "Interne Administration und Koordination, etc."
-
-#~ msgid "Uncategorized"
-#~ msgstr "Nicht kategorisiert"
-
-#~ msgid "for the circle"
-#~ msgstr "Für den Kreis"
-
-#~ msgid "is removed"
-#~ msgstr "ist entfernt"
-
-#~ msgid "category"
-#~ msgstr "Kategorie"
-
-#~ msgid "role"
-#~ msgstr "Rolle"
-
-#~ msgid "roles"
-#~ msgstr "Rollen"
-
-#~ msgid "(removed)"
-#~ msgstr "(entfernt)"
-
-#~ msgid "Undefined"
-#~ msgstr "Nicht definiert"
-
-#~ msgid "No circle"
-#~ msgstr "Kein Kreis"
-
-#~ msgid "Used in this project"
-#~ msgstr "Verwendet in diesem Projekt"
-
-#~ msgid "Hours by circle"
-#~ msgstr "Stunden pro Kreis"
-
-#~ msgid "Hours per work category"
-#~ msgstr "Stunden pro Arbeitskategorie"
-
-#~ msgid "update"
-#~ msgstr "bearbeiten"
-
-#~ msgid "projected invoices"
-#~ msgstr "geplante Rechnungen"
-
-#~ msgid "projected invoice"
-#~ msgstr "geplante Rechnung"
-
-#~ msgid "Overdrawn projects"
-#~ msgstr "Überzogene Projekte"
-
-#, python-format
-#~ msgid ""
-#~ "\n"
-#~ "Hello %(full_name)s\n"
-#~ "\n"
-#~ "Your net work hours balance up to and including %(month)s is %(running_sum)s.\n"
-#~ "This is outside the range of +/- 40h.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "Hallo %(full_name)s\n"
-#~ "\n"
-#~ "Dein Stundensaldo bis und mit %(month)s beträgt %(running_sum)s.\n"
-#~ "Dies ist ausserhalb des Bereichs von +/- 40h.\n"
-
-#, python-format
-#~ msgid "carry forward the balance into %(this_year)s"
-#~ msgstr "Bilanz ins %(this_year)s übertragen"
-
-#~ msgid "Planning updates"
-#~ msgstr "Planungsupdates"
-
-#, python-format
-#~ msgid "Hello %(user)s"
-#~ msgstr "Hallo %(user)s"
-
-#~ msgid ""
-#~ "The following list of recent changes to planning has been compiled for you personally in the hope that it is interesting. This mail contains milestone changes and work deletions for your owned projects and changes to your planned work carried out by others.\n"
-#~ "\n"
-#~ "Please always check your personal planning to ensure that it is manageable and up-to-date. Thanks ✨"
-#~ msgstr ""
-#~ "Die folgende Liste mit neuen Änderungen wurde für dich zusammengestellt, in der Hoffnung, dass sie nützlich und interessant ist. Dieses Mail enthält Änderungen von Meilensteinen und gelöschte Arbeitseinheiten von Projekten, welche du koordinierst sowie durch andere eingetragene Änderungen deiner Arbeitseinheiten.\n"
-#~ "\n"
-#~ "Bitte überprüfe deine persönliche Planung und stelle sicher, dass die Arbeit überschaubar bleibt und die Planung aktuell. Merci ✨"
-
-#, python-format
-#~ msgid "%(by)s changed a milestone: %(title)s (%(date)s)"
-#~ msgstr "%(by)s hat einen Meilenstein geändert: %(title)s (%(date)s)"
-
-#, python-format
-#~ msgid "%(by)s deleted work managed by you: %(title)s (%(hours)sh)"
-#~ msgstr "%(by)s hat Arbeit gelöscht, welche von dir koordiniert wird: %(title)s (%(hours)sh)"
-
-#, python-format
-#~ msgid "%(by)s added work for you: %(title)s (%(hours)sh)"
-#~ msgstr "%(by)s hat Arbeit für dich hinzugefügt: %(title)s (%(hours)sh)"
-
-#, python-format
-#~ msgid "%(by)s changed work for you: %(title)s (%(hours)sh)"
-#~ msgstr "%(by)s hat Arbeit für dich geändert: %(title)s (%(hours)sh)"
-
-#, python-format
-#~ msgid "%(by)s deleted work for you: %(title)s (%(hours)sh)"
-#~ msgstr "%(by)s hat Arbeit für dich gelöscht: %(title)s (%(hours)sh)"
