@@ -36,6 +36,12 @@ def chainify(iterable):
     return list(chain.from_iterable(iterable))
 
 
+def average_workload(workloads):
+    if None in workloads:
+        return None
+    return sum(workloads) / len(workloads)
+
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
@@ -176,6 +182,44 @@ class Command(BaseCommand):
         xlsx.table(None, user_table)
         xlsx.add_sheet(_("specialist fields").replace("*", "_"))
         xlsx.table(None, sf_table)
+
+        group_weeks = 4
+        index = 2
+
+        user_grouped_table = [row[0:2] for row in user_table]
+        sf_grouped_table = [row[0:2] for row in sf_table]
+
+        while index < len(user_table[2]):
+            for row_index, row in enumerate(user_table):
+                if row_index == 0:
+                    user_grouped_table[0].append(row[index])
+                elif row_index == 1:
+                    pass
+                else:
+                    try:
+                        workloads = [row[index + i * 4] for i in range(group_weeks)]
+                    except IndexError:
+                        continue
+                    user_grouped_table[row_index].append(average_workload(workloads))
+
+            for row_index, row in enumerate(sf_table):
+                if row_index == 0:
+                    sf_grouped_table[0].append(row[index])
+                elif row_index == 1:
+                    pass
+                else:
+                    try:
+                        workloads = [row[index + i * 4] for i in range(group_weeks)]
+                    except IndexError:
+                        continue
+                    sf_grouped_table[row_index].append(average_workload(workloads))
+
+            index += group_weeks * 4
+
+        xlsx.add_sheet(_("user workload"))
+        xlsx.table(None, user_grouped_table)
+        xlsx.add_sheet(_("specialist fields workload"))
+        xlsx.table(None, sf_grouped_table)
 
         filename = f"workload-{start}--{end}.xlsx"
 

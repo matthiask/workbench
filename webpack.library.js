@@ -187,6 +187,7 @@ module.exports = (PRODUCTION) => {
             options: {
               sassOptions: {
                 includePaths: [path.resolve(path.join(cwd, "node_modules"))],
+                quietDeps: true,
               },
             },
           },
