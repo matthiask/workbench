@@ -309,9 +309,15 @@ def annual_working_time(year, *, users):
             "hours",
             "running_sum",
             "balance",
+            "working_time",
         ]
     }
     overall["absence_vacation"] -= overall["vacation_days_correction"]
+    overall["sickness_by_fte"] = (
+        overall["absence_sickness"] / (overall["working_time"] / 250 / 8)
+        if overall["working_time"]
+        else None
+    )
 
     return {"months": months, "overall": overall, "statistics": statistics}
 

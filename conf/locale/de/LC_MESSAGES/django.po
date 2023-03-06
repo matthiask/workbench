@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-21 09:01+0100\n"
+"POT-Creation-Date: 2023-03-06 10:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2310,6 +2310,14 @@ msgstr "Extern"
 msgid "internal"
 msgstr "Intern"
 
+#: workbench/management/commands/workload.py
+msgid "user workload"
+msgstr "Arbeitslast der Mitarbeitenden"
+
+#: workbench/management/commands/workload.py
+msgid "specialist fields workload"
+msgstr "Arbeitslast in den Fachbereichen"
+
 #: workbench/notes/admin.py
 msgid "content object"
 msgstr "Inhaltsobjekt"
@@ -3062,6 +3070,11 @@ msgstr "Fakten"
 #: workbench/templates/awt/year_detail.html
 msgid "corrected"
 msgstr "korrigiert"
+
+#: workbench/templates/awt/year_detail.html
+#, python-format
+msgid "Estimated %(sickness_by_fte)s days per full time equivalent per year"
+msgstr "Geschätzte %(sickness_by_fte)s Tage pro 100%% und Jahr"
 
 #: workbench/templates/awt/year_detail.html
 #, python-format

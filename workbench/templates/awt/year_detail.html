@@ -38,7 +38,16 @@
           </tr>
           <tr>
             <td class="text-right">{{ overall.absence_sickness|days }}</td>
-            <th>{% translate 'sickness days' %}</th>
+            <th>
+              {% translate 'sickness days' %}
+              {% if overall.sickness_by_fte %}
+              <span style="font-weight:normal">
+                ({% blocktranslate with sickness_by_fte=overall.sickness_by_fte|stringformat:'.1f' trimmed %}
+                Estimated {{ sickness_by_fte }} days per full time equivalent per year
+                {% endblocktranslate %})
+              </span>
+              {% endif %}
+            </th>
           </tr>
           <tr>
             <td class="text-right">{{ overall.absence_paid|days }}</td>
