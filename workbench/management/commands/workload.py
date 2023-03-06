@@ -60,7 +60,7 @@ class Command(BaseCommand):
             specialist_field_users[user.specialist_field].append(user)
 
         start = monday()
-        end = start + dt.timedelta(days=7 * 16)
+        end = start + dt.timedelta(days=7 * 26)
         weeks = list(takewhile(lambda x: x <= end, recurring(start, "weekly")))
 
         hours_per_week_and_user = defaultdict(
