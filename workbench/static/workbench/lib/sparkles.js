@@ -164,6 +164,7 @@ function createDiv(height, width) {
   div.style.width=width+"px";
   div.style.overflow="hidden";
   div.style.backgroundColor=colour;
-  div.style.zIndex = 9999999999;
+  div.style.zIndex=9999999999;
+  div.style.pointerEvents="none";
   return (div);
 }
