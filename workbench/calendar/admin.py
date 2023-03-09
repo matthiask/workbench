@@ -35,6 +35,9 @@ class DayOfWeekDefaultAdmin(admin.ModelAdmin):
     list_filter = ["app"]
     ordering = ["app", "day_of_week"]
 
+    def has_change_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(models.PublicHoliday)
 class PublicHolidayAdmin(admin.ModelAdmin):
