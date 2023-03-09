@@ -84,11 +84,10 @@ class UserAdmin(UserAdmin):
 
     list_display = (
         "email",
-        "_short_name",
-        "_full_name",
         "is_active",
         "is_admin",
         "working_time_model",
+        "planning_hours_per_day",
         "last_login",
         "person",
         "_features",
