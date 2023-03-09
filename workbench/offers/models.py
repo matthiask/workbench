@@ -64,7 +64,7 @@ class OfferQuerySet(SearchQuerySet):
         ).select_related("project", "owned_by")
 
     def offered(self):
-        return self.filter(status=Offer.OFFERED)
+        return self.filter(project__closed_on__isnull=True, status=Offer.OFFERED)
 
     def accepted(self):
         return self.filter(status=Offer.ACCEPTED)

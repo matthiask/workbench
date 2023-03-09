@@ -60,7 +60,9 @@ class OfferSearchForm(Form):
         elif data.get("s"):
             queryset = queryset.filter(status=data.get("s"))
         else:
-            queryset = queryset.filter(status__lte=Offer.OFFERED)
+            queryset = queryset.filter(
+                project__closed_on__isnull=True, status__lte=Offer.OFFERED
+            )
         queryset = self.apply_renamed(queryset, "org", "project__customer")
         queryset = self.apply_owned_by(queryset)
         return queryset.select_related(
