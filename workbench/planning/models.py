@@ -176,7 +176,9 @@ class PlannedWorkQuerySet(SearchQuerySet):
         day = monday()
         weeks = [day + dt.timedelta(days=days) for days in [0, 7, 14, 21]]
         return self.filter(
-            Q(user=user) | Q(created_by=user) | Q(project__owned_by=user),
+            Q(user=user)
+            | Q(created_by=user)
+            | Q(project__owned_by=user, project__suppress_planning_update_mails=False),
             Q(is_provisional=True),
             Q(weeks__overlap=weeks),
         )
