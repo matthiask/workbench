@@ -1,4 +1,5 @@
 import datetime as dt
+import re
 from decimal import ROUND_UP, Decimal
 from urllib.parse import urlencode
 
@@ -27,6 +28,12 @@ class Slice(dict):
             return self["logged_hours"].hours
         elif self.get("logged_break"):
             seconds = self["logged_break"].timedelta.total_seconds()
+        elif (
+            (d := self["description"])
+            and isinstance(d, str)
+            and (match := re.match(r"^([0-9]+(\.[0-9])?h) ", d))
+        ):
+            return Decimal(match.group(1).removesuffix("h"))
         elif self.get("starts_at") and self.get("ends_at"):
             seconds = (self["ends_at"] - self["starts_at"]).total_seconds()
         elif not self.get("starts_at") and self.get("ends_at"):

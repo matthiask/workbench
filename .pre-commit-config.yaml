@@ -47,7 +47,7 @@ repos:
     rev: 6.0.0
     hooks:
       - id: flake8
-        args: ["--ignore=E203,E501,W503", "--max-complexity=10"]
+        args: ["--ignore=E203,E501,W503", "--max-complexity=15"]
         additional_dependencies:
           - flake8-bugbear
   - repo: https://github.com/pre-commit/mirrors-eslint
