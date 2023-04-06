@@ -88,5 +88,5 @@ class TeamForm(ModelForm):
         super().__init__(*args, **kwargs)
         candidates = User.objects.active()
         if self.instance.pk:
-            candidates |= self.instance.members.all()
+            candidates |= self.instance.members.active()
         self.fields["members"].queryset = candidates.distinct()
