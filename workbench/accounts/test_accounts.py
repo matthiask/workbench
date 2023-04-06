@@ -167,7 +167,7 @@ class AccountsTest(TestCase):
 
         team.members.add(inactive)
         form = TeamForm(instance=team, request=req)
-        self.assertEqual(set(form.fields["members"].queryset), {user, inactive})
+        self.assertEqual(set(form.fields["members"].queryset), {user})
 
     @override_settings(
         FEATURES={
