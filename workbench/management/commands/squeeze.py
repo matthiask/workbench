@@ -135,10 +135,18 @@ class Command(BaseCommand):
         ):
             projects[pi.project_id]["projected"] += pi.gross_margin
 
-        for offer in Offer.objects.accepted().filter(
+        offers = Offer.objects.accepted().filter(
             project__in=projects.keys(), project__closed_on__isnull=True
-        ):
+        )
+        for offer in offers:
             projects[offer.project_id]["offered"] += offer.total_excl_tax
+        for row in (
+            Service.objects.filter(offer__in=offers, third_party_costs__isnull=False)
+            .order_by()
+            .values("project")
+            .annotate(Sum("third_party_costs"))
+        ):
+            projects[offer.project_id]["offered"] -= row["third_party_costs__sum"]
 
         for project_id, project in Project.objects.in_bulk(projects.keys()).items():
             projects[project_id]["project"] = project
