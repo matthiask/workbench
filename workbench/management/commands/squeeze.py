@@ -384,12 +384,7 @@ class Command(BaseCommand):
 
 def project_row(row, all_users, *, users):
     margin = max((row["offered"], row["projected"], row["invoiced"]))
-    hours = max(
-        (
-            row["hours_offered"],
-            row["hours_logged"],
-        )
-    )
+    hours = max((row["hours_offered"], row["hours_logged"]))
 
     def user_cells(u):
         if by_user := row["hours_in_range_by_user"].get(u):
