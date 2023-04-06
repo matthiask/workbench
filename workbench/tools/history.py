@@ -155,7 +155,7 @@ class Prettifier:
         if field.related_model:
             return self.handle_related_model(values, field)
 
-        if isinstance(field, (models.BooleanField, models.NullBooleanField)):
+        if isinstance(field, models.BooleanField | models.NullBooleanField):
             return self.handle_bool(values, field)
 
         if isinstance(field, models.DateTimeField):

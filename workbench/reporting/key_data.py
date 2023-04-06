@@ -73,7 +73,7 @@ def accruals_by_month(date_range):
         "delta": None,
     }
 
-    dates = list(sorted(accruals))
+    dates = sorted(accruals)
     for this, next in zip(dates, dates[1:]):
         accruals[next]["delta"] = accruals[next]["accrual"] - accruals[this]["accrual"]
 
@@ -105,7 +105,7 @@ def gross_margin_by_month(date_range):
         month = (day.year, day.month)
         row = {
             "month": month,
-            "key": "%s-%s" % month,
+            "key": "{}-{}".format(*month),
             "date": day,
             "gross_profit": gross[month],
             "third_party_costs": third[month],

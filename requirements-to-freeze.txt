@@ -1,7 +1,7 @@
 Django<4.2
 Pillow
 beautifulsoup4
-coverage
+coverage[toml]
 dj-database-url
 dj-email-url
 django-admin-ordering

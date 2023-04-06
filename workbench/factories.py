@@ -64,7 +64,7 @@ class UserFactory(DjangoModelFactory):
     email = factory.LazyAttribute(lambda obj: "%s@example.com" % obj._short_name)
     language = "en"
     working_time_model = factory.SubFactory(WorkingTimeModelFactory)
-    _features = factory.LazyFunction(lambda: [])
+    _features = factory.LazyFunction(list)
 
     class Meta:
         model = User

@@ -477,7 +477,7 @@ select min(min_date), max(max_date) from sq
     def service_period(self):
         period = [self.service_period_from, self.service_period_until]
         return (
-            "%s - %s" % tuple(local_date_format(day) for day in period)
+            "{} - {}".format(*tuple(local_date_format(day) for day in period))
             if all(period)
             else None
         )
