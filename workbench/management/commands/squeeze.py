@@ -146,7 +146,7 @@ class Command(BaseCommand):
             .values("project")
             .annotate(Sum("third_party_costs"))
         ):
-            projects[offer.project_id]["offered"] -= row["third_party_costs__sum"]
+            projects[row["project"]]["offered"] -= row["third_party_costs__sum"]
 
         for project_id, project in Project.objects.in_bulk(projects.keys()).items():
             projects[project_id]["project"] = project
