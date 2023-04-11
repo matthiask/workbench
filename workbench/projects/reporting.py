@@ -95,31 +95,34 @@ def hours_per_type(date_range, *, users=None):
         ]
         profitable_percentage = 100 - sum(internal_percentages)
         total = sum(row.values(), 0)
+        hours_per_type = [
+            {
+                "id": 0,
+                "type": external_type,
+                "hours": row[0],
+                "expected": profitable_percentage,
+                "reached": 100 * row[0] / total,
+                "is_internal": False,
+                "url": _logbook_url(rendered_by=u.id, internal_type=-1),
+            }
+        ] + [
+            {
+                "id": type.id,
+                "type": type.name,
+                "hours": row[type.id],
+                "expected": uit[type].percentage if type in uit else 0,
+                "reached": 100 * row[type.id] / total,
+                "is_internal": True,
+                "url": _logbook_url(rendered_by=u.id, internal_type=type.id),
+            }
+            for type in internal_types
+        ]
         return {
             "user": u,
-            "hours_per_type": [
-                {
-                    "type": external_type,
-                    "hours": row[0],
-                    "expected": profitable_percentage,
-                    "reached": 100 * row[0] / total,
-                    "is_internal": False,
-                    "url": _logbook_url(rendered_by=u.id, internal_type=-1),
-                }
-            ]
-            + [
-                {
-                    "type": type.name,
-                    "hours": row[type.id],
-                    "expected": uit[type].percentage if type in uit else 0,
-                    "reached": 100 * row[type.id] / total,
-                    "is_internal": True,
-                    "url": _logbook_url(rendered_by=u.id, internal_type=type.id),
-                }
-                for type in internal_types
-            ],
+            "hours_per_type": hours_per_type,
             "internal": total - row[0],
             "external": row[0],
+            "total_hours_per_type": {row["id"]: row["hours"] for row in hours_per_type},
             "total": total,
             "url": _logbook_url(rendered_by=u.id),
         }
@@ -134,6 +137,11 @@ def hours_per_type(date_range, *, users=None):
             "external": sum((row["external"] for row in users), Z1),
             "total": sum((row["total"] for row in users), Z1),
         },
+        "overall": [sum((row["total_hours_per_type"][0] for row in users), Z1)]
+        + [
+            sum((row["total_hours_per_type"][type.id] for row in users), Z1)
+            for type in internal_types
+        ],
         "logbook_url": "{}{}".format(
             LoggedHours.urls["list"],
             querystring(

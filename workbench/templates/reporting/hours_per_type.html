@@ -57,6 +57,16 @@
         </tr>
       {% endfor %}
     </tbody>
+    <tfoot>
+      <tr>
+        <th>{% translate 'Total' %}</th>
+        <th class="text-right">{{ stats.total.total|hours }}</th>
+        {% for hours in stats.overall %}
+          <th class="text-right">{{ hours|hours }}</th>
+          <th class="text-right" colspan="2">{% percentage hours stats.total.total %}</th>
+        {% endfor %}
+      </tr>
+    </tfoot>
   </table>
 <style>
 .vertical-stripes tbody td:nth-child(6n+3),
