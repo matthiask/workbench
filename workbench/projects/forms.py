@@ -33,8 +33,8 @@ class CampaignSearchForm(Form):
     )
     s = forms.ChoiceField(
         choices=[
-            ("", _("All")),
-            (capfirst(_("status")), [("open", _("Open")), ("closed", _("Closed"))]),
+            ("all", _("All")),
+            (capfirst(_("status")), [("", _("Open")), ("closed", _("Closed"))]),
         ],
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
@@ -62,7 +62,7 @@ class CampaignSearchForm(Form):
     def filter(self, queryset):
         data = self.cleaned_data
         queryset = queryset.search(data.get("q"))
-        if data.get("s") == "open":
+        if data.get("s") == "":
             queryset = queryset.open()
         elif data.get("s") == "closed":
             queryset = queryset.closed()
@@ -651,7 +651,7 @@ class ProjectedInvoicesProjectForm(ModelForm):
             + [formset.is_valid() for formset in self.formsets.values()]
         )
 
-    def save(self, commit=True):
+    def save(self, *, commit=True):
         instance = super().save()
         for formset in self.formsets.values():
             formset.save()

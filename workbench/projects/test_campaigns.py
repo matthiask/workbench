@@ -77,7 +77,7 @@ class CampaignsTest(TestCase):
         code("")
         code("q=test")
         code("s=")
-        code("s=open")
+        code("s=all")
         code("s=closed")
         code(f"org={campaign.customer_id}")
         code(f"owned_by={campaign.owned_by_id}")
