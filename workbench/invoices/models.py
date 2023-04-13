@@ -242,18 +242,14 @@ class Invoice(ModelWithTotal):
         super().clean_fields(exclude=exclude)
         errors = {}
 
-        if self.status >= self.SENT:
-            if not self.invoiced_on or not self.due_on:
-                errors["status"] = _(
-                    "Invoice and/or due date missing for selected state."
-                )
+        if self.status >= self.SENT and (not self.invoiced_on or not self.due_on):
+            errors["status"] = _("Invoice and/or due date missing for selected state.")
 
         if self.status <= self.SENT and self.closed_on:
             errors["status"] = _("Invalid status when closed on is already set.")
 
-        if self.invoiced_on and self.due_on:
-            if self.invoiced_on > self.due_on:
-                errors["due_on"] = _("Due date has to be after invoice date.")
+        if self.invoiced_on and self.due_on and self.invoiced_on > self.due_on:
+            errors["due_on"] = _("Due date has to be after invoice date.")
 
         if (
             self.type in {self.SERVICES, self.DOWN_PAYMENT, self.CREDIT}

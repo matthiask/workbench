@@ -39,7 +39,7 @@ class DealSearchForm(Form):
             ("", _("Open")),
             (
                 _("Closed"),
-                [row for row in Deal.STATUS_CHOICES if not row[0] == Deal.OPEN],
+                [row for row in Deal.STATUS_CHOICES if row[0] != Deal.OPEN],
             ),
             (
                 _("Defined search"),

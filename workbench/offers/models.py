@@ -225,11 +225,10 @@ class Offer(ModelWithTotal):
                     _("Valid until date missing for selected state.")
                 )
 
-        if self.offered_on and self.valid_until:
-            if self.offered_on > self.valid_until:
-                errors["valid_until"] = _(
-                    "Valid until date has to be after offered on date."
-                )
+        if self.offered_on and self.valid_until and self.offered_on > self.valid_until:
+            errors["valid_until"] = _(
+                "Valid until date has to be after offered on date."
+            )
 
         if self.status >= self.ACCEPTED and not self.closed_on:
             self.closed_on = dt.date.today()

@@ -38,22 +38,27 @@ class MilestoneForm(ModelForm):
     def clean(self):
         data = super().clean()
 
-        if self.instance.pk and (date := data.get("date")):
-            if after := [
-                pw
-                for pw in self.instance.plannedwork_set.all()
-                if max(pw.weeks) + dt.timedelta(days=6) >= date
-            ]:
-                self.add_warning(
-                    _(
-                        "The following work is planned after"
-                        " the new milestone date: %(work)s."
-                    )
-                    % {
-                        "work": ", ".join(str(pw) for pw in after),
-                    },
-                    code="work-after-milestone",
+        if (
+            self.instance.pk
+            and (date := data.get("date"))
+            and (
+                after := [
+                    pw
+                    for pw in self.instance.plannedwork_set.all()
+                    if max(pw.weeks) + dt.timedelta(days=6) >= date
+                ]
+            )
+        ):
+            self.add_warning(
+                _(
+                    "The following work is planned after"
+                    " the new milestone date: %(work)s."
                 )
+                % {
+                    "work": ", ".join(str(pw) for pw in after),
+                },
+                code="work-after-milestone",
+            )
 
         return data
 

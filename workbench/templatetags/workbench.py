@@ -178,10 +178,7 @@ def bar(value, one):
 
 @register.simple_tag
 def pie(value, one, size=20, type="bad"):
-    if not one:
-        angle = 0
-    else:
-        angle = 2 * math.pi * min(0.999, float(value / one))
+    angle = 0 if not one else 2 * math.pi * min(0.999, float(value / one))
 
     hsize = size // 2
 

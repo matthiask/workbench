@@ -157,10 +157,7 @@ def pretty_changes_work(*, users, milestones):
 
 def pretty_deleted_object_work(x, *, users):
     u = users.get(int(x["user_id"]))
-    if u:
-        u = u.get_short_name()
-    else:
-        u = x["user_id"]
+    u = u.get_short_name() if u else x["user_id"]
     weeks = _weeks(x["weeks"])
     return f'{x["title"]} ({u}, {x["planned_hours"]}h, {weeks})'
 
@@ -200,9 +197,7 @@ def changes(*, since):
         obj.id: obj
         for obj in Milestone.objects.filter(
             id__in=[
-                key[1]
-                for key in actions_by_object.keys()
-                if key[0] == "planning_milestone"
+                key[1] for key in actions_by_object if key[0] == "planning_milestone"
             ]
         )
     }
@@ -210,9 +205,7 @@ def changes(*, since):
         obj.id: obj
         for obj in PlannedWork.objects.filter(
             id__in=[
-                key[1]
-                for key in actions_by_object.keys()
-                if key[0] == "planning_plannedwork"
+                key[1] for key in actions_by_object if key[0] == "planning_plannedwork"
             ]
         )
     }
@@ -280,7 +273,7 @@ def changes(*, since):
                 )
             ).filter(max_weeks__gte=dt.date.today())
         }
-        for p in Project.objects.filter(id__in=[p.id for p in milestones.keys()])
+        for p in Project.objects.filter(id__in=[p.id for p in milestones])
     }
 
     for project, affected_users in affected.items():

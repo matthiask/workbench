@@ -591,7 +591,7 @@ class OffersTest(TestCase):
 
         self.assertTrue(accepted < in_preparation)  # _code
         self.assertTrue(in_preparation < None)
-        self.assertTrue(None < declined)
+        self.assertTrue(declined > None)
         self.assertTrue(in_preparation < declined)
 
         self.assertEqual(
