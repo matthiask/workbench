@@ -505,7 +505,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
             instance = super().save()
             services = self.project.services.filter(
                 id__in=self.cleaned_data["selected_services"]
-            )
+            ).select_related("offer")
             if self.request.GET.get("source") == "logbook":
                 instance.create_services_from_logbook(services)
             else:

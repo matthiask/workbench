@@ -364,10 +364,18 @@ class Invoice(ModelWithTotal):
                 else _("Total %(currency)s")
             ) % {"currency": settings.WORKBENCH.CURRENCY}
 
+    def _ordered_services(self, project_services):
+        return [
+            service
+            for _offer, service in sorted(
+                (service.offer, service) for service in project_services
+            )
+        ]
+
     def create_services_from_logbook(self, project_services):
         assert self.project, "cannot call create_services_from_logbook without project"
 
-        for ps in project_services:
+        for position, ps in enumerate(self._ordered_services(project_services)):
             not_archived_effort = ps.loggedhours.filter(
                 archived_at__isnull=True
             ).order_by()
@@ -384,7 +392,7 @@ class Invoice(ModelWithTotal):
                     project_service=ps,
                     title=ps.title,
                     description=ps.description,
-                    position=ps.position,
+                    position=position + 1,
                     effort_rate=ps.effort_rate,
                     effort_type=ps.effort_type,
                     effort_hours=hours,
@@ -410,13 +418,13 @@ class Invoice(ModelWithTotal):
     def create_services_from_offer(self, project_services):
         assert self.project, "cannot call create_services_from_offer without project"
 
-        for ps in project_services:
+        for position, ps in enumerate(self._ordered_services(project_services)):
             service = Service(
                 invoice=self,
                 project_service=ps,
                 title=ps.title,
                 description=ps.description,
-                position=ps.position,
+                position=position + 1,
                 effort_rate=ps.effort_rate,
                 effort_type=ps.effort_type,
                 effort_hours=ps.effort_hours,
