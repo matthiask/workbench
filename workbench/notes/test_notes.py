@@ -69,7 +69,7 @@ class NotesTest(TestCase):
         response = self.client.post(
             note.urls["update"],
             {"title": "Updated", "description": note.description},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
 

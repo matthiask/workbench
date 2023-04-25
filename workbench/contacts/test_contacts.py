@@ -335,8 +335,10 @@ class ContactsTest(TestCase):
         self.assertEqual(len(mail.outbox), 0)
         response = self.client.get(
             person.urls["vcard"],
-            HTTP_REFERER=person.urls["detail"],
-            HTTP_USER_AGENT="Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",  # noqa
+            headers={
+                "referer": person.urls["detail"],
+                "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
+            },
         )
         self.assertRedirects(response, person.urls["detail"])
         self.assertEqual(len(mail.outbox), 1)

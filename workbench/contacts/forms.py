@@ -231,8 +231,7 @@ class PersonForm(ModelForm):
             ]:
                 if count:
                     related.append(
-                        "%s %s"
-                        % (
+                        "{} {}".format(
                             count,
                             ngettext(
                                 model._meta.verbose_name,

@@ -265,8 +265,7 @@ class PDFDocument(_PDFDocument):
         return [
             (
                 MarkupParagraph(
-                    "<b>%s</b> %s<br/>%s"
-                    % (
+                    "<b>{}</b> {}<br/>{}".format(
                         sanitize(service.title),
                         _("(optional)") if is_optional else "",
                         sanitize(service.description),
@@ -288,8 +287,7 @@ class PDFDocument(_PDFDocument):
         return [
             (
                 MarkupParagraph(
-                    "<b>%s</b> %s<br/>%s"
-                    % (
+                    "<b>{}</b> {}<br/>{}".format(
                         sanitize(service.title),
                         _("(optional)") if is_optional else "",
                         sanitize(service.description),
@@ -306,8 +304,7 @@ class PDFDocument(_PDFDocument):
                             None,
                             [
                                 (
-                                    "%s %s à %s/h"
-                                    % (
+                                    "{} {} à {}/h".format(
                                         hours(service.effort_hours),
                                         service.effort_type,
                                         currency(service.effort_rate),
@@ -364,8 +361,7 @@ class PDFDocument(_PDFDocument):
                 total.append(
                     (
                         MarkupParagraph(
-                            "%s: %s (%s)"
-                            % (
+                            "{}: {} ({})".format(
                                 _("Down payment"),
                                 Truncator(invoice).chars(60),
                                 invoice.invoiced_on.strftime("%d.%m.%Y")

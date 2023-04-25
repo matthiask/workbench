@@ -1,7 +1,8 @@
 [tool.ruff]
-extend-select = ["B", "E", "F", "W", "C90", "I", "N", "UP", "FBT", "C4", "DJ", "PIE", "INT", "SIM", "YTT", "G"]
-extend-ignore = ["E501"]
+extend-select = ["B", "E", "F", "W", "C90", "I", "N", "UP", "FBT", "C4", "DJ", "PIE", "INT", "SIM", "YTT", "G", "RUF100"]
+extend-ignore = ["E501", "N999"]
 fix = true
+show-fixes = true
 target-version = "py310"
 
 [tool.ruff.isort]
@@ -9,7 +10,7 @@ combine-as-imports = true
 lines-after-imports = 2
 
 [tool.ruff.mccabe]
-max-complexity = 10
+max-complexity = 15
 
 [tool.coverage.run]
 branch = true

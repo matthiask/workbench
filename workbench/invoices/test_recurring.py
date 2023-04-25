@@ -69,7 +69,7 @@ class RecurringTest(TestCase):
         self.assertContains(
             response,
             # No value!
-            '<input type="number" name="third_party_costs" step="0.01" class="form-control" required id="id_third_party_costs">',  # noqa
+            '<input type="number" name="third_party_costs" step="0.01" class="form-control" required id="id_third_party_costs">',
             html=True,
         )
         # print(response, response.content.decode("utf-8"))

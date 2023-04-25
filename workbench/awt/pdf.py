@@ -24,8 +24,7 @@ def annual_working_time_pdf(statistics):
         with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
             for data in statistics["statistics"]:
                 zf.writestr(
-                    "%s-%s.pdf"
-                    % (
+                    "{}-{}.pdf".format(
                         slugify(data["user"].get_full_name()),
                         data["months"]["year"].year,
                     ),
@@ -107,8 +106,7 @@ def user_stats_pdf(data):
             )
         table.append(
             [
-                "%s (%s)"
-                % (
+                "{} ({})".format(
                     _("target time"),
                     data["months"]["year"].pretty_working_time_per_day,
                 )

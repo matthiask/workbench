@@ -19,8 +19,9 @@ def append_invoice(*, zf, ledger_slug, invoice):
         pdf.generate()
 
         zf.writestr(
-            "%s-%s/%s.pdf"
-            % (ledger_slug, invoice.closed_on.strftime("%Y.%m"), invoice.code),
+            "{}-{}/{}.pdf".format(
+                ledger_slug, invoice.closed_on.strftime("%Y.%m"), invoice.code
+            ),
             buf.getvalue(),
         )
 

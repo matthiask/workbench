@@ -136,7 +136,7 @@ class PlanningTest(TestCase):
                 "modal-weeks": [monday().isoformat()],
                 "modal-service_type": service_types.consulting.pk,
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
@@ -150,7 +150,7 @@ class PlanningTest(TestCase):
                 "modal-weeks": [monday().isoformat()],
                 "modal-service_type": service_types.consulting.pk,
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
 
@@ -166,7 +166,7 @@ class PlanningTest(TestCase):
                 ],
                 "modal-service_type": service_types.consulting.pk,
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         # print(response, response.content.decode("utf-8"))
         self.assertEqual(response.status_code, 201)
@@ -237,7 +237,7 @@ class PlanningTest(TestCase):
                 "modal-weeks": [monday().isoformat()],
                 "modal-offer": offer.id,
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, 'value="offer-is-declined"')
 

@@ -66,8 +66,7 @@ class ExpenseReportPDFView(generic.DetailView):
                     (
                         "%d." % (next(counter),),
                         MarkupParagraph(
-                            "%s<br />%s: %s<br />%s<br />&nbsp;"
-                            % (
+                            "{}<br />{}: {}<br />{}<br />&nbsp;".format(
                                 local_date_format(cost.rendered_on),
                                 cost.service.project,
                                 cost.service,
@@ -94,8 +93,7 @@ class ExpenseReportPDFView(generic.DetailView):
             pdf.table(
                 [
                     (
-                        "%s %s"
-                        % (
+                        "{} {}".format(
                             capfirst(_("total")),
                             currency_code or settings.WORKBENCH.CURRENCY,
                         ),

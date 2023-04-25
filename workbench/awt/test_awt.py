@@ -182,19 +182,19 @@ class AWTTest(TestCase):
                 "modal-description": "Sick",
                 "modal-reason": "sickness",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
         absence = Absence.objects.get()
 
         response = self.client.get(
-            absence.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            absence.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertEqual(response.status_code, 200)
 
         Absence.objects.update(starts_on=dt.date(2018, 1, 1))
         response = self.client.get(
-            absence.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            absence.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Absences of past years are locked.")
@@ -208,7 +208,7 @@ class AWTTest(TestCase):
                 "modal-description": "Sick",
                 "modal-reason": "sickness",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(
             response, "Creating absences for past years is not allowed."
@@ -219,7 +219,7 @@ class AWTTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
         response = self.client.post(
-            "/absences/create/", {}, HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            "/absences/create/", {}, headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertEqual(response.status_code, 200)
 
@@ -236,7 +236,7 @@ class AWTTest(TestCase):
                 "modal-description": "Sick",
                 "modal-reason": "sickness",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(
             response,
@@ -254,7 +254,7 @@ class AWTTest(TestCase):
                 "modal-reason": "sickness",
                 WarningsForm.ignore_warnings_id: "impressive-planning-skills",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
@@ -442,15 +442,13 @@ class AWTTest(TestCase):
         self.client.force_login(user)
 
         response = self.client.get(
-            Absence.urls["create"],
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            Absence.urls["create"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertNotContains(response, 'value="correction"')
 
         absence = factories.AbsenceFactory.create(user=user, reason=Absence.CORRECTION)
         response = self.client.get(
-            absence.urls["update"],
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            absence.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(response, "You are not permitted to edit absences of type")
 
@@ -469,7 +467,7 @@ class AWTTest(TestCase):
                 "modal-description": "Sick",
                 "modal-reason": "sickness",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "past-years-absences")
 
@@ -483,14 +481,13 @@ class AWTTest(TestCase):
                 "modal-reason": "sickness",
                 WarningsForm.ignore_warnings_id: "past-years-absences",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
         absence = Absence.objects.get()
         response = self.client.get(
-            absence.urls["update"],
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            absence.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(response, "<input")
 
@@ -499,8 +496,7 @@ class AWTTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
         response = self.client.get(
-            "/absences/create/?days=2",
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            "/absences/create/?days=2", headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(response, 'value="2"')
 

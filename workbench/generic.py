@@ -45,8 +45,7 @@ class ToolsMixin:
         if self.template_name is not None:
             return [self.template_name]
         return [
-            "%s/%s%s.html"
-            % (
+            "{}/{}{}.html".format(
                 self.model._meta.app_label,
                 self.model._meta.object_name.lower(),
                 self.template_name_suffix,

@@ -452,7 +452,7 @@ class DealsTest(TestCase):
         response = self.client.post(
             deal.urls["set_status"] + "?status=20",
             {"closing_type": closing_type.pk, "related_offers": [offer.pk]},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "Offered on date missing for selected state.")
         self.assertContains(response, "Valid until date missing for selected state.")
@@ -469,7 +469,7 @@ class DealsTest(TestCase):
                 "closing_type": closing_type.pk,
                 "related_offers": [offer.pk],
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
 

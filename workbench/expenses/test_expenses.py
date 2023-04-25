@@ -26,7 +26,7 @@ class ExpensesTest(TestCase):
         self.client.force_login(costs.created_by)
 
         response = self.client.post(
-            costs.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            costs.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -35,7 +35,7 @@ class ExpensesTest(TestCase):
 
         costs = factories.LoggedCostFactory.create()
         response = self.client.post(
-            costs.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            costs.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertEqual(response.status_code, 204)
 
@@ -79,7 +79,7 @@ class ExpensesTest(TestCase):
                 "modal-are_expenses": "on",
                 # "modal-third_party_costs": "9",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(
             response, "Providing third party costs is necessary for expenses."
@@ -96,7 +96,7 @@ class ExpensesTest(TestCase):
                 "modal-are_expenses": "on",
                 "modal-third_party_costs": "9",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
@@ -120,16 +120,16 @@ class ExpensesTest(TestCase):
 
         # Some fields are now disabled
         response = self.client.get(
-            cost1.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            cost1.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(
             response,
-            '<input type="number" name="modal-third_party_costs" value="9.00" step="0.01" class="form-control" disabled id="id_modal-third_party_costs">',  # noqa
+            '<input type="number" name="modal-third_party_costs" value="9.00" step="0.01" class="form-control" disabled id="id_modal-third_party_costs">',
             html=True,
         )
 
         response = self.client.get(
-            cost1.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            cost1.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(
             response, "Expenses are part of an expense report, cannot delete entry."
@@ -282,7 +282,7 @@ class ExchangeRatesTest(TestCase):
         self.assertEqual(
             mock_get.call_args[0],
             (
-                "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/chf.json",  # noqa
+                "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/chf.json",
             ),
         )
 
@@ -292,6 +292,6 @@ class ExchangeRatesTest(TestCase):
         self.assertEqual(
             mock_get.call_args[0],
             (
-                "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/2019-10-12/currencies/chf.json",  # noqa
+                "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/2019-10-12/currencies/chf.json",
             ),
         )

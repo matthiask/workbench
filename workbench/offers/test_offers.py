@@ -170,7 +170,7 @@ class OffersTest(TestCase):
         )
 
         response = self.client.get(
-            service.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            service.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(
             response,
@@ -184,7 +184,7 @@ class OffersTest(TestCase):
             {
                 "allow_logging": False,
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
         service.refresh_from_db()
@@ -195,7 +195,7 @@ class OffersTest(TestCase):
         self.assertEqual(service.offer, offer)
 
         response = self.client.get(
-            service.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            service.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(
             response,
@@ -460,7 +460,7 @@ class OffersTest(TestCase):
         response = self.client.get(offer.urls["pricing"])
         self.assertContains(
             response,
-            '<input type="number" name="services-0-effort_rate" step="0.01" class="form-control" disabled id="id_services-0-effort_rate">',  # noqa
+            '<input type="number" name="services-0-effort_rate" step="0.01" class="form-control" disabled id="id_services-0-effort_rate">',
             html=True,
         )
 
@@ -557,7 +557,7 @@ class OffersTest(TestCase):
 
         self.assertEqual(
             offer.status_badge,
-            '<span class="badge badge-warning">Offered on 21.04.2020, but project closed on 21.04.2020</span>',  # noqa
+            '<span class="badge badge-warning">Offered on 21.04.2020, but project closed on 21.04.2020</span>',
         )
 
     @travel("2020-05-04 12:00")
@@ -573,7 +573,7 @@ class OffersTest(TestCase):
 
         self.assertEqual(
             offer.status_badge,
-            '<span class="badge badge-warning">Offered on 04.02.2020, but not valid anymore</span>',  # noqa
+            '<span class="badge badge-warning">Offered on 04.02.2020, but not valid anymore</span>',
         )
 
     def test_offers_ordering(self):

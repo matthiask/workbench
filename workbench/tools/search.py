@@ -79,7 +79,7 @@ def process_query(s):
     Converts the user's search string into something suitable for passing to
     to_tsquery.
     """
-    # noqa Thanks https://www.fusionbox.com/blog/detail/partial-word-search-with-postgres-full-text-search-in-django/632/
+    # Thanks https://www.fusionbox.com/blog/detail/partial-word-search-with-postgres-full-text-search-in-django/632/
     query = re.sub(r"[^-+@\w]+", " ", s).strip()
     if query:
         query = re.sub(r"\s+", " & ", query)
@@ -94,9 +94,10 @@ def search(queryset, terms):
     return (
         queryset.extra(
             where=[
-                "%s.fts_document"
-                " @@ to_tsquery('pg_catalog.german', unaccent(%%s))"
-                % (queryset.model._meta.db_table,)
+                "{}.fts_document"
+                " @@ to_tsquery('pg_catalog.german', unaccent(%s))".format(
+                    queryset.model._meta.db_table
+                )
             ],
             params=[process_query(terms)],
         )

@@ -263,7 +263,7 @@ class TimestampsTest(TestCase):
                 "modal-hours": "0.2",
                 "modal-description": "Test",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
@@ -281,7 +281,7 @@ class TimestampsTest(TestCase):
                 "modal-hours": "0.2",
                 "modal-description": "Test 2",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
@@ -400,7 +400,7 @@ class TimestampsTest(TestCase):
                 "modal-hours": "2",
                 "modal-description": "Test",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
@@ -438,7 +438,7 @@ class TimestampsTest(TestCase):
                 "modal-ends_at": localtime(slices[1]["ends_at"]).time().isoformat(),
                 "modal-description": "Test",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 

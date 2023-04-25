@@ -63,15 +63,15 @@ class TemplateTagsTest(TestCase):
             t.render(Context({"value": 10, "one": 100})),
             '<div class="progress progress-line" title="10%">'
             '<div class="progress-bar bg-success" role="progressbar"'
-            ' style="width:10%"></div></div>',  # noqa
+            ' style="width:10%"></div></div>',
         )
         self.assertEqual(
             t.render(Context({"value": 80, "one": 100})),
-            '<div class="progress progress-line" title="80%"><div class="progress-bar bg-success" role="progressbar" style="width:75%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:5%"></div></div>',  # noqa
+            '<div class="progress progress-line" title="80%"><div class="progress-bar bg-success" role="progressbar" style="width:75%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:5%"></div></div>',
         )
         self.assertEqual(
             t.render(Context({"value": 150, "one": 100})),
-            '<div class="progress progress-line" title="150%"><div class="progress-bar bg-success" role="progressbar" style="width:50.0%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:16.67%"></div><div class="progress-bar bg-danger" role="progressbar" style="width:33.33%"></div></div>',  # noqa
+            '<div class="progress progress-line" title="150%"><div class="progress-bar bg-success" role="progressbar" style="width:50.0%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:16.67%"></div><div class="progress-bar bg-danger" role="progressbar" style="width:33.33%"></div></div>',
         )
 
     def test_pie(self):
@@ -82,7 +82,7 @@ class TemplateTagsTest(TestCase):
             """<svg width="22" height="22" class="pie bad" style="display: inline-block">
   <circle r="10" cx="10" cy="10" class="pie-circle" />
   <path d="M 10 0 A 10 10 0 0 1 18.66025403784439 14.999999999999998 L 10 10 z" class="pie-arc" />
-</svg>""",  # noqa
+</svg>""",
         )
 
         t = Template("{% load workbench %}{% pie 1 0 %}")
@@ -91,7 +91,7 @@ class TemplateTagsTest(TestCase):
             """<svg width="22" height="22" class="pie bad" style="display: inline-block">
   <circle r="10" cx="10" cy="10" class="pie-circle" />
   <path d="M 10 0 A 10 10 0 0 1 10.0 0.0 L 10 10 z" class="pie-arc" />
-</svg>""",  # noqa
+</svg>""",
         )
 
     def test_link_or_none(self):

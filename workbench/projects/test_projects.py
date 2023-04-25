@@ -48,7 +48,7 @@ class ProjectsTest(TestCase):
                 "effort_rate": "180",
                 "allow_logging": True,
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
@@ -60,7 +60,7 @@ class ProjectsTest(TestCase):
                 # "effort_rate": "180",
                 "allow_logging": True,
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "Either fill in all fields or none.")
 
@@ -73,7 +73,7 @@ class ProjectsTest(TestCase):
                 "third_party_costs": "20",
                 "allow_logging": True,
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "Either fill in all fields or none.")
         self.assertContains(response, "Cannot be empty if third party costs is set.")
@@ -86,7 +86,7 @@ class ProjectsTest(TestCase):
                 "effort_rate": "180",
                 "allow_logging": True,
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
@@ -112,14 +112,14 @@ class ProjectsTest(TestCase):
                 "effort_rate": "200",
                 "effort_hours": 20,
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
         service1.refresh_from_db()
         self.assertAlmostEqual(service1.service_cost, 4000)
 
         response = self.client.post(
-            service1.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            service1.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(set(project.services.all()), {service1, service2})
@@ -129,7 +129,7 @@ class ProjectsTest(TestCase):
         response = self.client.post(
             service1.urls["reassign_logbook"],
             {"service": service2.pk},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
 
@@ -139,7 +139,7 @@ class ProjectsTest(TestCase):
         response = self.client.post(
             service1.urls["reassign_logbook"],
             {"service": service2.pk, "try_delete": "on"},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
         self.assertEqual(set(project.services.all()), {service2})
@@ -150,7 +150,8 @@ class ProjectsTest(TestCase):
         self.client.force_login(service.project.owned_by)
 
         response = self.client.get(
-            service.urls["reassign_logbook"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            service.urls["reassign_logbook"],
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "try_delete")
         offer = factories.OfferFactory.create(
@@ -159,7 +160,8 @@ class ProjectsTest(TestCase):
         service.offer = offer
         service.save()
         response = self.client.get(
-            service.urls["reassign_logbook"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            service.urls["reassign_logbook"],
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertNotContains(response, "try_delete")
 
@@ -178,14 +180,16 @@ class ProjectsTest(TestCase):
         self.client.force_login(project.owned_by)
 
         response = self.client.get(
-            project.urls["createservice"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            project.urls["createservice"],
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, 'data-autofill="{}"')
 
         factories.service_types()
 
         response = self.client.get(
-            project.urls["createservice"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            project.urls["createservice"],
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "&quot;effort_type&quot;: &quot;consulting&quot;")
         self.assertContains(response, "&quot;effort_rate&quot;: 250")
@@ -379,21 +383,21 @@ class ProjectsTest(TestCase):
         response = self.client.post(
             service.urls["move"],
             {"modal-project": closed.pk},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "This project is already closed.")
 
         response = self.client.post(
             service.urls["move"],
             {"modal-project": flat_rate.pk},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, 'value="new-project-has-flat-rate"')
 
         response = self.client.post(
             service.urls["move"],
             {"modal-project": project.pk},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
 
@@ -407,7 +411,7 @@ class ProjectsTest(TestCase):
                 "modal-project": flat_rate.pk,
                 WarningsForm.ignore_warnings_id: "new-project-has-flat-rate",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
 
@@ -424,8 +428,7 @@ class ProjectsTest(TestCase):
 
         self.client.force_login(project.owned_by)
         response = self.client.get(
-            service.urls["move"],
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            service.urls["move"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(
             response, "Cannot move a service which is already bound to an offer."
@@ -434,7 +437,7 @@ class ProjectsTest(TestCase):
         response = self.client.post(
             service.urls["move"],
             {"modal-project": other.pk},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(
             response, "The offer must belong to the same project as the service."
@@ -449,7 +452,7 @@ class ProjectsTest(TestCase):
         self.assertRedirects(response, "/")
 
         response = self.client.get(
-            project.urls["select"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            project.urls["select"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(
             response,
@@ -461,7 +464,7 @@ class ProjectsTest(TestCase):
         response = self.client.post(
             project.urls["select"],
             {"modal-project": project.pk},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 299)
         self.assertEqual(response.json(), {"redirect": project.get_absolute_url()})
@@ -513,19 +516,18 @@ class ProjectsTest(TestCase):
 
         response = self.client.get(
             project.urls["createservice"],
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-            HTTP_ACCEPT_LANGUAGE="en",
+            headers={"x-requested-with": "XMLHttpRequest", "accept-language": "en"},
         )
         # print(response.content.decode("utf-8"))
 
         self.assertContains(
             response,
-            '<input type="number" name="effort_rate" value="250.00" step="0.01" class="form-control" disabled id="id_effort_rate">',  # noqa
+            '<input type="number" name="effort_rate" value="250.00" step="0.01" class="form-control" disabled id="id_effort_rate">',
             html=True,
         )
         self.assertContains(
             response,
-            '<input type="text" name="effort_type" value="Pauschalsatz" maxlength="50" class="form-control" disabled id="id_effort_type">',  # noqa
+            '<input type="text" name="effort_type" value="Pauschalsatz" maxlength="50" class="form-control" disabled id="id_effort_type">',
             html=True,
         )
         self.assertNotContains(response, 'id="id_service_type"')
@@ -656,7 +658,7 @@ class ProjectsTest(TestCase):
                 "effort_rate": "180",
                 "allow_logging": True,
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "unspecific-service")
 
@@ -670,7 +672,7 @@ class ProjectsTest(TestCase):
                 "modal-service_title": "Programmierung allgemein",
                 "modal-service_description": "service description",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "unspecific-service")
 

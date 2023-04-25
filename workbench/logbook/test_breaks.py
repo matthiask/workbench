@@ -130,7 +130,7 @@ class BreaksTest(TestCase):
                 "modal-ends_at": "12:45",
                 "modal-description": "",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "This field is required.")
 
@@ -142,7 +142,7 @@ class BreaksTest(TestCase):
                 "modal-ends_at": "12",
                 "modal-description": "",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "Enter a valid time.")
 
@@ -154,7 +154,7 @@ class BreaksTest(TestCase):
                 "modal-ends_at": "12:45",
                 "modal-description": "",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "Breaks have to be logged promptly.")
 
@@ -166,7 +166,7 @@ class BreaksTest(TestCase):
                 "modal-ends_at": "12:45",
                 "modal-description": "",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "That&#x27;s too far in the future.")
 
@@ -178,7 +178,7 @@ class BreaksTest(TestCase):
                 "modal-ends_at": "12:45",
                 "modal-description": "",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
@@ -197,7 +197,7 @@ class BreaksTest(TestCase):
                 "modal-ends_at": "12:45",
                 "modal-description": "",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
@@ -217,7 +217,7 @@ class BreaksTest(TestCase):
                 "modal-ends_at": "12:45",
                 "modal-description": "",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
 
@@ -236,12 +236,12 @@ class BreaksTest(TestCase):
         self.client.force_login(user)
 
         response = self.client.get(
-            brk.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            brk.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(response, "Cannot modify breaks of other users.")
 
         response = self.client.get(
-            brk.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            brk.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(response, "Cannot modify breaks of other users.")
 
@@ -270,7 +270,7 @@ class BreaksTest(TestCase):
             response = self.client.post(
                 service.project.urls["createhours"],
                 data,
-                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+                headers={"x-requested-with": "XMLHttpRequest"},
             )
             self.assertContains(response, "You should take")
 
@@ -284,7 +284,7 @@ class BreaksTest(TestCase):
             response = self.client.post(
                 service.project.urls["createhours"],
                 {**data, WarningsForm.ignore_warnings_id: "take-a-break"},
-                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+                headers={"x-requested-with": "XMLHttpRequest"},
             )
             self.assertEqual(response.status_code, 201)
 
@@ -293,7 +293,7 @@ class BreaksTest(TestCase):
             response = self.client.post(
                 service.project.urls["createhours"],
                 {**data, "modal-hours": "3.0"},  # No duplicate
-                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+                headers={"x-requested-with": "XMLHttpRequest"},
             )
             self.assertEqual(response.status_code, 201)
 

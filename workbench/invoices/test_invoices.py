@@ -131,7 +131,7 @@ class InvoicesTest(TestCase):
                 "cost": service.cost or "",
                 "third_party_costs": service.third_party_costs or "",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
 
@@ -232,7 +232,7 @@ class InvoicesTest(TestCase):
                 "cost": 2 * cost.cost,
                 "description": cost.description,
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "This entry is already part of an invoice.")
@@ -246,7 +246,7 @@ class InvoicesTest(TestCase):
                 "hours": hours.hours,
                 "description": hours.description,
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "This entry is already part of an invoice.")
@@ -262,7 +262,7 @@ class InvoicesTest(TestCase):
                 "modal-description": cost.description,
                 WarningsForm.ignore_warnings_id: "part-of-invoice",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
 
@@ -908,7 +908,7 @@ class InvoicesTest(TestCase):
         self.assertRedirects(response, invoice.urls["detail"])
 
         response = self.client.get(
-            service.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            service.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertEqual(response.status_code, 200)
 
@@ -916,7 +916,7 @@ class InvoicesTest(TestCase):
         invoice.save()
 
         response = self.client.get(
-            service.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            service.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(

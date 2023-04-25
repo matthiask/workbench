@@ -193,8 +193,7 @@ class DealForm(ModelForm):
 
             postfix = ", {}".format(_("archived value type")) if vt.is_archived else ""
             self.fields[key] = field.formfield(
-                label="%s (%s%s)"
-                % (
+                label="{} ({}{})".format(
                     vt.title,
                     _("Total %(currency)s") % {"currency": settings.WORKBENCH.CURRENCY},
                     postfix,

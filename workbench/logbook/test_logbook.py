@@ -38,7 +38,9 @@ class LogbookTest(TestCase):
                 "modal-description": "Test",
             }
             data.update({"modal-%s" % key: value for key, value in kwargs.items()})
-            return self.client.post(url, data, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+            return self.client.post(
+                url, data, headers={"x-requested-with": "XMLHttpRequest"}
+            )
 
         response = send()
         self.assertEqual(response.status_code, 201)
@@ -95,7 +97,7 @@ class LogbookTest(TestCase):
                 "modal-hours": "0.1",
                 "modal-description": "Test",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "Hours have to be logged in the same week.")
 
@@ -115,7 +117,7 @@ class LogbookTest(TestCase):
                 # "modal-hours": "0.1",
                 "modal-description": "Test 2",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
 
@@ -138,17 +140,17 @@ class LogbookTest(TestCase):
                 "modal-hours": "0.1",
                 "modal-description": "Test",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
         entry = LoggedHours.objects.get()
         response = self.client.get(
-            entry.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            entry.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(
             response,
-            '<input type="number" name="modal-hours" value="0.1" step="0.1" class="form-control" required id="id_modal-hours">',  # noqa
+            '<input type="number" name="modal-hours" value="0.1" step="0.1" class="form-control" required id="id_modal-hours">',
             html=True,
         )
 
@@ -156,11 +158,11 @@ class LogbookTest(TestCase):
         user.save()
 
         response = self.client.get(
-            entry.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            entry.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(
             response,
-            '<input type="number" name="modal-hours" value="0.1" step="0.1" class="form-control" required disabled id="id_modal-hours">',  # noqa
+            '<input type="number" name="modal-hours" value="0.1" step="0.1" class="form-control" required disabled id="id_modal-hours">',
             html=True,
         )
 
@@ -182,7 +184,7 @@ class LogbookTest(TestCase):
                 "modal-service_description": "service description",
                 "modal-service_type": types.administration.pk,
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
@@ -191,7 +193,7 @@ class LogbookTest(TestCase):
         self.assertEqual(entry.service.effort_rate, types.administration.hourly_rate)
 
         response = self.client.get(
-            entry.urls["detail"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            entry.urls["detail"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(
             response,
@@ -206,8 +208,7 @@ class LogbookTest(TestCase):
         self.client.force_login(project.owned_by)
 
         response = self.client.get(
-            project.urls["createhours"],
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            project.urls["createhours"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertNotContains(response, "service_type")
 
@@ -222,7 +223,7 @@ class LogbookTest(TestCase):
                 "modal-service_title": "service title",
                 "modal-service_description": "service description",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
@@ -247,7 +248,7 @@ class LogbookTest(TestCase):
                 "modal-service_title": "service title",
                 "modal-service_description": "service description",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(
@@ -269,7 +270,7 @@ class LogbookTest(TestCase):
                 "modal-hours": "0.1",
                 "modal-description": "Test",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Enter a valid date.")
@@ -293,7 +294,7 @@ class LogbookTest(TestCase):
                 "modal-hours": "0.1",
                 "modal-description": "Test",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Enter a valid date.")
@@ -315,7 +316,9 @@ class LogbookTest(TestCase):
             }
             data.update(additional or {})
             data.update({"modal-%s" % key: value for key, value in kwargs.items()})
-            return self.client.post(url, data, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+            return self.client.post(
+                url, data, headers={"x-requested-with": "XMLHttpRequest"}
+            )
 
         response = send()
         self.assertEqual(response.status_code, 201)
@@ -347,7 +350,7 @@ class LogbookTest(TestCase):
         hours = factories.LoggedHoursFactory.create(rendered_on=in_days(-10))
         self.client.force_login(hours.rendered_by)
         response = self.client.get(
-            hours.urls["update"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            hours.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(
             response,
@@ -369,7 +372,7 @@ class LogbookTest(TestCase):
         hours = factories.LoggedHoursFactory.create(rendered_on=in_days(-10))
         self.client.force_login(hours.rendered_by)
         response = self.client.post(
-            hours.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            hours.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -380,14 +383,14 @@ class LogbookTest(TestCase):
         hours.save()
 
         response = self.client.post(
-            hours.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            hours.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(messages(response), ["Cannot delete archived logged hours."])
 
         hours = factories.LoggedHoursFactory.create()
         response = self.client.post(
-            hours.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            hours.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertEqual(response.status_code, 204)
 
@@ -397,7 +400,7 @@ class LogbookTest(TestCase):
         self.client.force_login(costs.created_by)
 
         response = self.client.post(
-            costs.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            costs.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -406,7 +409,7 @@ class LogbookTest(TestCase):
 
         costs = factories.LoggedCostFactory.create()
         response = self.client.post(
-            costs.urls["delete"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            costs.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertEqual(response.status_code, 204)
 
@@ -492,7 +495,7 @@ class LogbookTest(TestCase):
 
         response = self.client.get(
             hours.service.project.urls["createhours"],
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(
             response,
@@ -506,7 +509,7 @@ class LogbookTest(TestCase):
         response = self.client.get(
             hours.service.project.urls["createhours"]
             + f"?service={service.id}&description=blub",
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
 
         self.assertContains(
@@ -524,7 +527,7 @@ class LogbookTest(TestCase):
 
         response = self.client.get(
             hours.service.project.urls["createhours"],
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(
             response,
@@ -532,7 +535,7 @@ class LogbookTest(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="number" name="modal-hours" step="0.1" class="form-control" required id="id_modal-hours">',  # noqa
+            '<input type="number" name="modal-hours" step="0.1" class="form-control" required id="id_modal-hours">',
             html=True,
         )
 
@@ -547,7 +550,7 @@ class LogbookTest(TestCase):
         self.client.force_login(project.owned_by)
         response = self.client.get(
             project.urls["createhours"] + "?hours=1.5",
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, 'value="1.5"')
 
@@ -558,13 +561,13 @@ class LogbookTest(TestCase):
 
         response = self.client.get(
             hours.service.project.urls["createhours"] + "?copy=" + str(hours.pk),
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, " selected>Any service</option>")
 
         response = self.client.get(
             hours.service.project.urls["createhours"] + "?copy=bla",
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 200)  # No crash
 
@@ -577,7 +580,7 @@ class LogbookTest(TestCase):
         self.assertRedirects(response, "/")
 
         response = self.client.get(
-            "/logbook/hours/create/", HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            "/logbook/hours/create/", headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(
             response,
@@ -589,7 +592,7 @@ class LogbookTest(TestCase):
         response = self.client.post(
             "/logbook/hours/create/",
             {"modal-project": project.pk},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         # Do not fetch the redirect response because the X-Requested-With
         # header value will be missing on the second request.
@@ -600,7 +603,7 @@ class LogbookTest(TestCase):
         response = self.client.post(
             "/logbook/hours/create/?hours=3",
             {"modal-project": project.pk},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertRedirects(
             response,
@@ -612,7 +615,7 @@ class LogbookTest(TestCase):
         response = self.client.post(
             "/logbook/hours/create/",
             {"modal-project": project.pk, "modal-service": service.pk},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertRedirects(
             response,
@@ -622,7 +625,7 @@ class LogbookTest(TestCase):
         )
 
         response = self.client.post(
-            "/logbook/hours/create/", {}, HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            "/logbook/hours/create/", {}, headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(response, "This field is required.")
 
@@ -642,7 +645,7 @@ class LogbookTest(TestCase):
                 "modal-third_party_costs": "11",
                 "modal-description": "Anything",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(
@@ -660,7 +663,7 @@ class LogbookTest(TestCase):
                 "modal-description": "Anything",
                 WarningsForm.ignore_warnings_id: "third-party-costs-higher",
             },
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
 
@@ -671,7 +674,7 @@ class LogbookTest(TestCase):
         self.client.force_login(project.owned_by)
 
         response = self.client.get(
-            project.urls["createcost"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            project.urls["createcost"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertNotContains(response, "id_modal-expense_currency")
         self.assertNotContains(response, "id_modal-expense_cost")
@@ -694,7 +697,7 @@ class LogbookTest(TestCase):
 
         hours = factories.LoggedHoursFactory.create(archived_at=timezone.now())
         response = self.client.get(
-            hours.urls["move"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            hours.urls["move"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(response, "Cannot move archived logbook entries.")
 
@@ -703,14 +706,14 @@ class LogbookTest(TestCase):
         hours.service.project.save()
 
         response = self.client.get(
-            hours.urls["move"], HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            hours.urls["move"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(response, "Cannot move logbook entries of closed projects.")
 
         response = self.client.post(
             hours.urls["move"],
             {"modal-service": service.pk},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         # Once as django.contrib.messages message, once as validation error
         self.assertContains(
@@ -723,7 +726,7 @@ class LogbookTest(TestCase):
         response = self.client.post(
             hours.urls["move"],
             {"modal-service": service.pk},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
 

@@ -154,8 +154,7 @@ def search(request):
             {
                 "verbose_name_plural": queryset.model._meta.verbose_name_plural,
                 "url": reverse(
-                    "%s_%s_list"
-                    % (queryset.model._meta.app_label, queryset.model._meta.model_name)
+                    f"{queryset.model._meta.app_label}_{queryset.model._meta.model_name}_list"
                 ),
                 "results": queryset.search(q)[:101],
             }

@@ -34,7 +34,7 @@ _AUTOCOMPLETE_TEMPLATE = """
   </div>
 </div>
 %(field)s
-"""  # noqa
+"""
 
 
 class Autocomplete(forms.TextInput):

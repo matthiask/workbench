@@ -112,7 +112,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             + effort_cost_per_project[project.id],
             "cost": cost_per_project.get(project.id, Z2),
             "effort_cost": effort_cost_per_project[project.id],
-            "effort_hours_with_rate_undefined": effort_hours_with_rate_undefined_per_project[  # noqa
+            "effort_hours_with_rate_undefined": effort_hours_with_rate_undefined_per_project[
                 project.id
             ],
             "third_party_costs": third_party_costs_per_project.get(project.id, Z2),
