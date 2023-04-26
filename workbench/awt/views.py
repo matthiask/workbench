@@ -4,6 +4,7 @@ from collections import defaultdict
 
 from django.contrib import messages
 from django.db.models.functions import Coalesce
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
 
@@ -88,6 +89,10 @@ def absence_calendar(request, form):
         absences[absence.user_id].append(absence)
         dates.add(max(absence.starts_on, cutoff))
         dates.add(absence._ends_on)
+
+    if not dates:
+        messages.warning(request, _("Filter invalid, no absences available."))
+        return HttpResponseRedirect(".")
 
     absences = [
         {
