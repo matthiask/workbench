@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-06 10:05+0100\n"
+"POT-Creation-Date: 2023-04-26 09:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -771,6 +771,10 @@ msgstr "Generiert am %(day)s"
 #, python-format
 msgid "No annual working time defined for user %(user)s with working time model %(working_time_model)s."
 msgstr "Keine Jahresarbeitszeit definiert für Nutzer*in %(user)s mit Arbeitszeitmodell %(working_time_model)s."
+
+#: workbench/awt/views.py
+msgid "Filter invalid, no absences available."
+msgstr "Filter ungültig, keine Abwesenheiten verfügbar."
 
 #: workbench/contacts/apps.py workbench/templates/base.html
 #: workbench/templates/contacts/object_list.html
