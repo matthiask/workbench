@@ -42,8 +42,8 @@ def _restart_all(conn):
 @fl.task
 def deploy(ctx):
     fl._check_branch(ctx)
-    fl.run(ctx, "git push origin main")
-    fl.run(ctx, "NODE_ENV=production yarn run webpack -p --bail")
+    fl.run_local(ctx, "git push origin main")
+    fl.run_local(ctx, "NODE_ENV=production yarn run webpack -p --bail")
     with fl.Connection(fl.config.host) as conn:
         _do_deploy(conn, "www/workbench/", rsync=True)
         _restart_all(conn)
@@ -52,7 +52,7 @@ def deploy(ctx):
 
 @fl.task
 def deploy_code(ctx):
-    fl.run(ctx, "git push origin main")
+    fl.run_local(ctx, "git push origin main")
     with fl.Connection(fl.config.host) as conn:
         _do_deploy(conn, "www/workbench/", rsync=False)
         _restart_all(conn)
@@ -61,12 +61,12 @@ def deploy_code(ctx):
 
 @fl.task
 def pull_db(ctx, installation="fh"):
-    fl.run(ctx, "dropdb --if-exists workbench", warn=True)
-    fl.run(ctx, "createdb workbench")
+    fl.run_local(ctx, "dropdb --if-exists workbench", warn=True)
+    fl.run_local(ctx, "createdb workbench")
     with fl.Connection(fl.config.host) as conn:
         e = fl._srv_env(conn, f"www/workbench/.env/{installation}")
         srv_dsn = e("DATABASE_URL")
-    fl.run(
+    fl.run_local(
         ctx,
         f'ssh -C {fl.config.host} "pg_dump -Ox {srv_dsn}" | psql workbench',
     )
