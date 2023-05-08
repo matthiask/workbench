@@ -47,7 +47,7 @@ msgstr "Pausenmeckerei"
 
 #: workbench/accounts/features.py
 msgid "Warn if user is taking an insufficient amount of breaks."
-msgstr "Warenn, wenn die Nutzer*in nicht genügend Pausen macht."
+msgstr "Warenn, wenn die Nutzer:in nicht genügend Pausen macht."
 
 #: workbench/accounts/features.py workbench/projects/models.py
 #: workbench/templates/projects/object_list.html
@@ -116,7 +116,7 @@ msgstr "Meckern bei später Leistungserfassung"
 
 #: workbench/accounts/features.py
 msgid "Annoy users when they are late with their logging."
-msgstr "Nutzer*innen nerven wenn sie ihre Stunden spät eintragen."
+msgstr "Nutzer:innen nerven wenn sie ihre Stunden spät eintragen."
 
 #: workbench/accounts/features.py workbench/planning/apps.py
 #: workbench/templates/accounts/team_detail.html workbench/templates/base.html
@@ -153,11 +153,11 @@ msgstr "Arbeitszeit-Korrektur"
 
 #: workbench/accounts/features.py
 msgid "This user may add and change absences of type Working time correction."
-msgstr "Diese Nutzer*in hat die Erlaubnis zur Bearbeitung von «Arbeitszeit-Korrektur»-Absenzen."
+msgstr "Diese Nutzer:in hat die Erlaubnis zur Bearbeitung von «Arbeitszeit-Korrektur»-Absenzen."
 
 #: workbench/accounts/forms.py
 msgid "Contact your administrator to change this value."
-msgstr "Kontaktiere die Administrator*innen, falls Du diesen Wert ändern willst."
+msgstr "Kontaktiere die Administrator:innen, falls Du diesen Wert ändern willst."
 
 #: workbench/accounts/middleware.py
 msgid "Please authenticate."
@@ -165,7 +165,7 @@ msgstr "Bitte anmelden."
 
 #: workbench/accounts/models.py workbench/reporting/views.py
 msgid "All users"
-msgstr "Alle Nutzer*innen"
+msgstr "Alle Nutzer:innen"
 
 #: workbench/accounts/models.py workbench/reporting/views.py
 msgid "Show mine only"
@@ -173,7 +173,7 @@ msgstr "Nur meine anzeigen"
 
 #: workbench/accounts/models.py workbench/reporting/views.py
 msgid "Inactive users"
-msgstr "Inaktive Nutzer*innen"
+msgstr "Inaktive Nutzer:innen"
 
 #: workbench/accounts/models.py
 msgid "Active"
@@ -256,12 +256,12 @@ msgstr "Fachbereich"
 #: workbench/templates/reporting/work_anniversaries.html
 #: workbench/timer/models.py workbench/tools/xlsx.py
 msgid "user"
-msgstr "Nutzer*in"
+msgstr "Nutzer:in"
 
 #: workbench/accounts/models.py workbench/management/commands/squeeze.py
 #: workbench/management/commands/workload.py workbench/templates/base.html
 msgid "users"
-msgstr "Nutzer*innen"
+msgstr "Nutzer:innen"
 
 #: workbench/accounts/models.py
 #, python-format
@@ -360,7 +360,7 @@ msgstr "Fehler während Abholen der Daten. Bitte nochmals versuchen."
 #: workbench/accounts/views.py
 #, python-format
 msgid "The user with email address %s is inactive."
-msgstr "Die Nutzer*in mit Emailadresse %s ist inaktiv."
+msgstr "Die Nutzer:in mit Emailadresse %s ist inaktiv."
 
 #: workbench/accounts/views.py
 msgid "Welcome! Please fill in your details."
@@ -369,7 +369,7 @@ msgstr "Willkommen! Bitte fülle das folgende Formular aus."
 #: workbench/accounts/views.py
 #, python-format
 msgid "No user with email address %s found."
-msgstr "Keine Nutzer*innen mit Emailadresse %s gefunden."
+msgstr "Keine Nutzer:innen mit Emailadresse %s gefunden."
 
 #: workbench/accounts/views.py
 msgid "You have been signed out."
@@ -770,7 +770,7 @@ msgstr "Generiert am %(day)s"
 #: workbench/awt/views.py
 #, python-format
 msgid "No annual working time defined for user %(user)s with working time model %(working_time_model)s."
-msgstr "Keine Jahresarbeitszeit definiert für Nutzer*in %(user)s mit Arbeitszeitmodell %(working_time_model)s."
+msgstr "Keine Jahresarbeitszeit definiert für Nutzer:in %(user)s mit Arbeitszeitmodell %(working_time_model)s."
 
 #: workbench/awt/views.py
 msgid "Filter invalid, no absences available."
@@ -2177,7 +2177,7 @@ msgstr "Pausen sollten später enden als beginnen."
 
 #: workbench/logbook/models.py
 msgid "Cannot modify breaks of other users."
-msgstr "Es ist nicht erlaubt, Pausen anderer Nutzer*innen zu ändern."
+msgstr "Es ist nicht erlaubt, Pausen anderer Nutzer:innen zu ändern."
 
 #: workbench/logbook/reporting.py
 #, python-format
@@ -2859,7 +2859,7 @@ msgstr "Hat aktuell offene Kundenprojekte"
 
 #: workbench/reporting/views.py
 msgid "Other active users"
-msgstr "Andere aktive Nutzer*innen"
+msgstr "Andere aktive Nutzer:innen"
 
 #: workbench/reporting/views.py
 msgid "Still open or closed during the current year"
@@ -3065,7 +3065,7 @@ msgstr ""
 
 #: workbench/templates/awt/year_detail.html
 msgid "active users"
-msgstr "Aktive Nutzer*innen"
+msgstr "Aktive Nutzer:innen"
 
 #: workbench/templates/awt/year_detail.html
 msgid "facts"
@@ -3630,7 +3630,7 @@ msgstr "Geplanten Umsatz bearbeiten"
 
 #: workbench/templates/projects/project_statistics.html
 msgid "Logged hours per user"
-msgstr "Erfasste Stunden pro Nutzer*in"
+msgstr "Erfasste Stunden pro Nutzer:in"
 
 #: workbench/templates/projects/project_statistics.html
 msgid "Scheduled"
@@ -3705,11 +3705,11 @@ msgstr "Total exkl. MwSt. aller offenen Offerten"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Average employment duration of current users"
-msgstr "Durchschnittliche Anstellungsdauer der aktuellen Mitarbeiter*innen"
+msgstr "Durchschnittliche Anstellungsdauer der aktuellen Mitarbeiter:innen"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Average employment duration of all users"
-msgstr "Durchschnittliche Anstellungsdauer aller Mitarbeiter*innen"
+msgstr "Durchschnittliche Anstellungsdauer aller Mitarbeiter:innen"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Revenue minus third party costs and accruals"
@@ -4073,7 +4073,7 @@ msgstr "Es scheint, dass Du iOS verwendest. Leider unterstützt iOS das direkte 
 
 #: workbench/tools/xlsx.py
 msgid "By service and user"
-msgstr "Nach Leistung und Nutzer*in"
+msgstr "Nach Leistung und Nutzer:in"
 
 #: workbench/tools/xlsx.py
 msgid "By service and month"
@@ -4081,7 +4081,7 @@ msgstr "Nach Leistung und Monat"
 
 #: workbench/tools/xlsx.py
 msgid "By user and month"
-msgstr "Nach Nutzer*in und Monat"
+msgstr "Nach Nutzer:in und Monat"
 
 #: workbench/tools/xlsx.py
 msgid "Logbook"
