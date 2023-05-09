@@ -178,9 +178,9 @@ class Command(BaseCommand):
             )
 
         xlsx = WorkbenchXLSXDocument()
-        xlsx.add_sheet(_("users").replace("*", "_"))
+        xlsx.add_sheet(_("users").replace(":", "_"))
         xlsx.table(None, user_table)
-        xlsx.add_sheet(_("specialist fields").replace("*", "_"))
+        xlsx.add_sheet(_("specialist fields").replace(":", "_"))
         xlsx.table(None, sf_table)
 
         group_weeks = 4

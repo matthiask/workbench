@@ -354,7 +354,7 @@ class Command(BaseCommand):
         )
 
         xlsx = WorkbenchXLSXDocument()
-        xlsx.add_sheet(_("users").replace("*", "_"))
+        xlsx.add_sheet(_("users").replace(":", "_"))
         xlsx.table(None, header + users_table)
         xlsx.add_sheet(_("specialist fields"))
         xlsx.table(None, header + fields_table)
