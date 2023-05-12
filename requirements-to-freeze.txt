@@ -20,7 +20,7 @@ gunicorn
 lxml
 pdfdocument
 phonenumbers
-psycopg2-binary
+psycopg[binary]
 qrbill
 reportlab
 speckenv
