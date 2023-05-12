@@ -32,7 +32,7 @@ logged AS (
 SELECT logged.project_id, service.hours / logged.hours
 FROM logged
 LEFT JOIN service ON logged.project_id=service.project_id
-WHERE service.hours / logged.hours < 1;
+WHERE service.hours / logged.hours < 1
             """,
             [Offer.DECLINED],
         )
