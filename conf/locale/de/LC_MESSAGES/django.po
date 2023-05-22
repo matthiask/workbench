@@ -92,7 +92,7 @@ msgstr "Fremdwährungen für Spesen."
 
 #: workbench/accounts/features.py workbench/projects/models.py
 msgid "internal types"
-msgstr "Interner Typ"
+msgstr "Interne Typen"
 
 #: workbench/accounts/features.py
 msgid "Additional categorization and reportings for internal projects."
@@ -2691,11 +2691,11 @@ msgstr "Erbt die Standard-Prozentzahl falls leer."
 
 #: workbench/projects/models.py
 msgid "internal type user"
-msgstr "Interner Typ-User"
+msgstr "Interner Typ-User Zuordnung"
 
 #: workbench/projects/models.py
 msgid "internal type users"
-msgstr "Interne Typ-Users"
+msgstr "Interne Typ-User Zuordnungen"
 
 #: workbench/projects/models.py
 #: workbench/templates/planning/campaign_planning.html
