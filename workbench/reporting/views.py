@@ -468,10 +468,19 @@ class DateRangeAndTeamFilterForm(DateRangeFilterForm):
             ]
             + [
                 [
-                    capfirst(User._meta.verbose_name_plural),
+                    capfirst(_("users")),
                     [
                         (-user.id, str(user))
                         for user in User.objects.filter(is_active=True)
+                    ],
+                ]
+            ]
+            + [
+                [
+                    _("Inactive users"),
+                    [
+                        (-user.id, str(user))
+                        for user in User.objects.filter(is_active=False)
                     ],
                 ]
             ],
