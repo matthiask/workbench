@@ -143,7 +143,16 @@ class TimestampQuerySet(models.QuerySet):
             for entry in breaks
             if entry not in known_breaks
         )
-        entries = sorted(entries, key=lambda timestamp: timestamp.created_at)
+
+        # Prefer the ends_at timestamp of breaks to the created_at value. The
+        # created_at value of automatically created timestamps may be too
+        # recent.
+        entries = sorted(
+            entries,
+            key=lambda timestamp: timestamp.logged_break.ends_at
+            if timestamp.logged_break
+            else timestamp.created_at,
+        )
 
         # 1. Create slices
         slices = []
