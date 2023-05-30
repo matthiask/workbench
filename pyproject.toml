@@ -1,6 +1,6 @@
 [tool.ruff]
 extend-select = ["B", "E", "F", "W", "C90", "I", "N", "UP", "FBT", "C4", "DJ", "PIE", "INT", "SIM", "YTT", "G", "RUF100"]
-extend-ignore = ["E501", "N999"]
+extend-ignore = ["E501", "B905", "N999"]
 fix = true
 show-fixes = true
 target-version = "py310"
