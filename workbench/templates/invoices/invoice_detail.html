@@ -36,8 +36,7 @@
           <th class="text-right">{% translate 'Payment reminders sent at' %}</th>
           <td>
             {% for day in object.payment_reminders_sent_at %}
-              {{ day|local_date_format }}
-              {% if not forloop.last %},{% endif %}
+              {{ day|local_date_format }}{% if not forloop.last %},{% endif %}
             {% empty %}{% translate 'None yet' %}
             {% endfor %}
           </td>

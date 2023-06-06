@@ -67,8 +67,7 @@
                         {% endif %}">
                 {{ birthday.given_name }} {{ birthday.family_name }}
                 ({{ birthday.date_of_birth|local_date_format }})
-              </a>
-              {% if not forloop.last %},{% endif %}
+              </a>{% if not forloop.last %},{% endif %}
             {% endfor %}
           </div>
         </div>

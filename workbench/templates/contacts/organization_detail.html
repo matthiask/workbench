@@ -9,8 +9,7 @@
           <td class="text-right">{% translate 'people'|capfirst %}</td>
           <td>
             {% for person in organization.people.all %}
-              <a class="inline" href="{{ person.get_absolute_url }}">{{ person }}</a>
-              {% if not forloop.last %},{% endif %}
+              <a class="inline" href="{{ person.get_absolute_url }}">{{ person }}</a>{% if not forloop.last %},{% endif %}
             {% endfor %}
           </td>
         </tr>
@@ -18,9 +17,7 @@
           <td class="text-right">{{ organization|label:'groups' }}</td>
           <td>
             {% for group in organization.groups.all %}
-              <a class="inline"
-                 href="{% url 'contacts_organization_list' %}?g={{ group.id }}">{{ group }}</a>
-              {% if not forloop.last %},{% endif %}
+              <a class="inline" href="{% url 'contacts_organization_list' %}?g={{ group.id }}">{{ group }}</a>{% if not forloop.last %},{% endif %}
             {% empty %}&ndash;
             {% endfor %}
           </td>

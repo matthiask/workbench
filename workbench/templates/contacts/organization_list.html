@@ -9,8 +9,7 @@
         </h5>
         <p class="mb-0">
           {% for person in organization.people.all %}
-            <a class="inline" href="{{ person.get_absolute_url }}">{{ person.full_name }}</a>
-            {% if not forloop.last %},{% endif %}
+            <a class="inline" href="{{ person.get_absolute_url }}">{{ person.full_name }}</a>{% if not forloop.last %},{% endif %}
           {% empty %}&ndash;
           {% endfor %}
         </p>
