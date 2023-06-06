@@ -1,6 +1,7 @@
 @font-face {
   font-family: "Source Sans Pro";
-  src: url("./lib/fonts/SourceSansPro-Bold.otf") format("opentype"),
+  src:
+    url("./lib/fonts/SourceSansPro-Bold.otf") format("opentype"),
     /* Open Type Font */ url("./lib/fonts/SourceSansPro-Bold.svg") format("svg"),
     /* Legacy iOS */ url("./lib/fonts/SourceSansPro-Bold.ttf")
       format("truetype"),
@@ -14,7 +15,8 @@
 
 @font-face {
   font-family: "Source Sans Pro";
-  src: url("./lib/fonts/SourceSansPro-Regular.otf") format("opentype"),
+  src:
+    url("./lib/fonts/SourceSansPro-Regular.otf") format("opentype"),
     /* Open Type Font */ url("./lib/fonts/SourceSansPro-Regular.svg")
       format("svg"),
     /* Legacy iOS */ url("./lib/fonts/SourceSansPro-Regular.ttf")

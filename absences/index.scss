@@ -46,7 +46,8 @@ $z-index: (
   margin-right: $popup-width;
 
   background:
-    /* Person Row Divider */ repeating-linear-gradient(
+    /* Person Row Divider */
+    repeating-linear-gradient(
       to bottom,
       $alto 0,
       $alto var(--grid-gap),
@@ -67,14 +68,17 @@ $z-index: (
         $white 0,
         $white calc((var(--day-column-width) + var(--grid-gap)) * 2 * 7)
       );
-  background-position: 0 var(--scale-row-height), 0,
+  background-position:
+    0 var(--scale-row-height),
+    0,
     calc(
         var(--name-column-width) + var(--grid-gap) + var(--day-column-offset) *
           ((var(--day-column-width) + var(--grid-gap)))
       )
       0;
   background-repeat: no-repeat, no-repeat, repeat;
-  background-size: 100%
+  background-size:
+    100%
       calc(var(--person-count) * (var(--person-row-height) + var(--grid-gap))),
     calc(var(--name-column-width) + var(--grid-gap)) auto,
     calc(var(--day-count) * ((var(--day-column-width) + var(--grid-gap)))) 100%;
