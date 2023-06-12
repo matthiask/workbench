@@ -39,7 +39,7 @@ def parse_zkb_csv(data):
                     "value_date": day,
                     "total": amount,
                     "payment_notice": "; ".join(
-                        filter(None, (row[1], row[11], row[5]))
+                        filter(None, (row[1], row[10], row[11], row[5]))
                     ),
                 }
             )
