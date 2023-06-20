@@ -303,6 +303,7 @@ class ProjectBudgetStatisticsForm(Form):
         choices=[
             ("", _("All")),
             ("no-invoices", _("No invoices")),
+            ("maintenance", _("Maintenance")),
             ("old-projects", _("Old projects (60 days inactivity)")),
             ("no-projected-gross-margin", _("No projected gross margin")),
         ],
@@ -353,6 +354,8 @@ class ProjectBudgetStatisticsForm(Form):
             queryset = Project.objects.open(on=self.cleaned_data.get("cutoff_date"))
         if data.get("s") == "no-invoices":
             queryset = queryset.orders().without_invoices()
+        elif data.get("s") == "maintenance":
+            queryset = queryset.filter(type=Project.MAINTENANCE)
         elif data.get("s") == "old-projects":
             queryset = queryset.old_projects()
         elif data.get("s") == "no-projected-gross-margin":
