@@ -15,9 +15,12 @@ A basic webpack file may looks as follows:
             assetRule(),
             postcssRule({
               plugins: [
-                "postcss-nested",
-                "postcss-import",
+                [
+                  "@csstools/postcss-global-data",
+                  { files: ["./frontend/custom-media.css"] },
+                ],
                 "postcss-custom-media",
+                "postcss-nesting",
                 "autoprefixer",
               ],
             }),
