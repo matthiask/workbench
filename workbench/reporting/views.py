@@ -274,7 +274,7 @@ def key_data_view(request):
                 (
                     year["year"],
                     [
-                        sum(month["margin_per_fte"] for month in quarter)
+                        sum(month["margin_per_fte"] or 0 for month in quarter)
                         for quarter in chunked(year["months"], 3)
                     ],
                 )
