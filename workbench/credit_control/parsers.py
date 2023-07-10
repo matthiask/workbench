@@ -27,9 +27,9 @@ def parse_zkb_csv(data):
         if not row:
             continue
         try:
-            day = dt.datetime.strptime(row[9], "%d.%m.%Y").date()
-            amount = row[8] and Decimal(row[8])
-            reference = row[5].strip()
+            day = dt.datetime.strptime(row[8], "%d.%m.%Y").date()
+            amount = row[7] and Decimal(row[7])
+            reference = row[4]
         except (AttributeError, IndexError, ValueError):
             continue
         if day and amount:
@@ -39,7 +39,7 @@ def parse_zkb_csv(data):
                     "value_date": day,
                     "total": amount,
                     "payment_notice": "; ".join(
-                        filter(None, (row[1], row[10], row[11], row[5]))
+                        filter(None, (row[1], row[10], row[4]))
                     ),
                 }
             )
