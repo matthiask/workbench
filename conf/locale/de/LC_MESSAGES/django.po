@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-26 09:06+0200\n"
+"POT-Creation-Date: 2023-07-10 09:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -259,7 +259,8 @@ msgid "user"
 msgstr "Nutzer:in"
 
 #: workbench/accounts/models.py workbench/management/commands/squeeze.py
-#: workbench/management/commands/workload.py workbench/templates/base.html
+#: workbench/management/commands/workload.py workbench/reporting/views.py
+#: workbench/templates/base.html
 msgid "users"
 msgstr "Nutzer:innen"
 
@@ -1644,6 +1645,10 @@ msgid "Moving status from '%(from)s' to '%(to)s' with an invoice date in the pas
 msgstr "Du änderst den Status von '%(from)s' zu '%(to)s' mit einem Rechnungsdatum in der Vergangenheit (%(date)s). Dies kann korrekt sein, aber ist möglicherweise nicht das, was Du willst."
 
 #: workbench/invoices/forms.py
+msgid "You are setting the payment date to a value over 6 months ago. Are you sure?"
+msgstr "Du setzt das Zahlungsdatum auf einen Zeitpunkt vor über sechs Monaten. Bist Du sicher?"
+
+#: workbench/invoices/forms.py
 #, python-format
 msgid "You are attempting to set status to '%(to)s', but the invoice has already been closed on %(closed)s. Are you sure?"
 msgstr "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Rechnung wurde schon am %(closed)s geschlossen. Bist Du sicher?"
@@ -2703,7 +2708,7 @@ msgstr "Interne Typ-User Zuordnungen"
 msgid "campaign"
 msgstr "Kampagne"
 
-#: workbench/projects/models.py
+#: workbench/projects/models.py workbench/reporting/views.py
 #: workbench/templates/accounts/user_statistics.html
 msgid "Maintenance"
 msgstr "Wartung"
@@ -3714,6 +3719,10 @@ msgstr "Durchschnittliche Anstellungsdauer aller Mitarbeiter:innen"
 #: workbench/templates/reporting/key_data.html
 msgid "Revenue minus third party costs and accruals"
 msgstr "Umsatz minus Fremdkosten minus Abgrenzungen"
+
+#: workbench/templates/reporting/key_data.html
+msgid "Revenue minus third party costs and accruals per FTE"
+msgstr "Umsatz minus Fremdkosten minus Abgrenzungen pro FTE"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Gross margin"

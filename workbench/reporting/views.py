@@ -10,6 +10,7 @@ from django.shortcuts import render
 from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
+from more_itertools import chunked
 
 from workbench.accounts.models import Team, User
 from workbench.accounts.reporting import (
@@ -252,14 +253,13 @@ def key_data_view(request):
             ).quantize(Z0)
             yield key, this, months
 
+    gross_margin_by_years = [row[1] for row in sorted(gross_margin_by_years.items())]
     return render(
         request,
         "reporting/key_data.html",
         {
             "date_range": date_range,
-            "gross_margin_by_years": [
-                row[1] for row in sorted(gross_margin_by_years.items())
-            ],
+            "gross_margin_by_years": gross_margin_by_years,
             "gross_margin_projection": gross_margin_projection,
             "gross_margin_by_month": gross_margin_by_month,
             "invoiced_corrected": [
@@ -269,6 +269,16 @@ def key_data_view(request):
             "projected_gross_margin": [
                 projected_gross_margin["monthly_overall"].get((today.year, i), Z2)
                 for i in range(1, 13)
+            ],
+            "invoiced_corrected_per_fte": [
+                (
+                    year["year"],
+                    [
+                        sum(month["margin_per_fte"] for month in quarter)
+                        for quarter in chunked(year["months"], 3)
+                    ],
+                )
+                for year in gross_margin_by_years
             ],
             "green_hours": yearly_headline(gh),
             "hours_distribution": {

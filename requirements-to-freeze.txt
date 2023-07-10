@@ -18,6 +18,7 @@ django-webpack-loader
 factory-boy
 gunicorn
 lxml
+more-itertools
 pdfdocument
 phonenumbers
 psycopg2-binary

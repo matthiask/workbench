@@ -42,6 +42,7 @@
         </tr>
       </table>
       <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
+
       <h2 class="mt-5">{% translate 'Revenue minus third party costs and accruals' %}</h2>
       <canvas id="invoiced-corrected" width="1200" height="450"></canvas>
       <script>
@@ -87,6 +88,45 @@
       }
     });
       </script>
+
+      <h2 class="mt-5">{% translate 'Revenue minus third party costs and accruals per FTE' %}</h2>
+      <canvas id="invoiced-corrected-per-fte" width="1200" height="250"></canvas>
+      <script>
+    new Chart("invoiced-corrected-per-fte", {
+      type: "bar",
+      data: {
+        labels: ["Q1", "Q2", "Q3", "Q4"],
+        datasets: [
+          {% for year, quarters in invoiced_corrected_per_fte %}
+          {
+            label: "{{ year }}",
+            data: [{% for quarter in quarters %}{{ quarter|stringformat:"d" }},{% endfor %}],
+            backgroundColor: "{% cycle 'rgba(30, 0, 100, 0.3)' 'rgba(100, 30, 50, 0.3)' 'rgba(0, 150, 0, 0.3)' 'rgba(0, 0, 150, 0.3)' %}",
+            borderColor: "{% cycle 'rgba(30, 0, 100, 0.3)' 'rgba(100, 30, 50, 0.4)' 'rgba(0, 150, 0, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
+            type: "{% cycle 'line' 'line' 'line' 'bar' %}",
+            stack: "{% cycle '' '' '' 'this' %}",
+          },
+          {% endfor %}
+        ],
+      },
+      options: {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        },
+        elements: {
+          line: {
+            tension: 0,
+            fill: "none",
+          }
+        },
+      }
+    });
+      </script>
+
       <table class="table table-hover">
         <thead class="sticky">
           <tr>

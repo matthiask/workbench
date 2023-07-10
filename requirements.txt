@@ -10,7 +10,7 @@ dj-database-url==2.0.0
 dj-email-url==1.0.6
 Django==4.2.3
 django-admin-ordering==0.17.0
-django-authlib==0.14.0
+django-authlib==0.15.0
 django-bootstrap4==23.2
 django-colorfield==0.9.0
 django-cors-headers==4.1.0
@@ -27,11 +27,12 @@ Faker==18.11.2
 gunicorn==20.1.0
 idna==3.4
 iso3166==2.1.1
-lxml==4.9.2
+lxml==4.9.3
+more-itertools==9.1.0
 oauthlib==3.2.2
 openpyxl==3.1.2
 pdfdocument==4.0.0
-phonenumbers==8.13.15
+phonenumbers==8.13.16
 Pillow==10.0.0
 psycopg2-binary==2.9.6
 pypng==0.20220715.0
@@ -50,6 +51,7 @@ svglib==1.5.1
 svgwrite==1.4.3
 time-machine==2.10.0
 tinycss2==1.2.1
+tomli==2.0.1
 typing_extensions==4.7.1
 urllib3==2.0.3
 vobject==0.9.6.1
