@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-10 09:06+0200\n"
+"POT-Creation-Date: 2023-07-10 10:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4107,6 +4107,10 @@ msgstr "Stunden insgesamt"
 #: workbench/views.py
 msgid "Provisional planned work in the near future"
 msgstr "Provisorische geplante Arbeiten in näherer Zukunft"
+
+#: workbench/views.py
+msgid "Old projects"
+msgstr "Alte Projekte"
 
 #: workbench/views.py
 msgid "Search query missing."

@@ -53,6 +53,9 @@ class InternalTypeUser(models.Model):
         verbose_name = _("internal type user")
         verbose_name_plural = _("internal type users")
 
+    def __str__(self):
+        return ""
+
     @property
     def percentage(self):
         return (
@@ -211,6 +214,9 @@ class ProjectQuerySet(SearchQuerySet):
                 .values("service__project")
             )
         )
+
+    def own_or_inactive(self, user):
+        return self.filter(Q(owned_by=user) | Q(owned_by__is_active=False))
 
     def invalid_customer_contact_combination(self):
         return self.exclude(customer=F("contact__organization"))
@@ -388,7 +394,7 @@ class Project(Model):
         return ", ".join(parts)
 
     @cached_property
-    def grouped_services(self):
+    def grouped_services(self):  # noqa: PLR0915
         # Avoid circular imports
         from workbench.deals.models import Deal
         from workbench.logbook.models import LoggedCost, LoggedHours

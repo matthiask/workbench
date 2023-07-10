@@ -59,6 +59,14 @@ def _needs_action(user):
                 "objects": Invoice.objects.maybe_actionable(user=user),
             }
         )
+    rows.append(
+        {
+            "type": "old_projects",
+            "verbose_name_plural": _("Old projects"),
+            "url": Project.urls["list"] + "?s=old-projects",
+            "objects": Project.objects.old_projects().own_or_inactive(user),
+        }
+    )
 
     return [row for row in rows if row["objects"]]
 
@@ -173,8 +181,8 @@ def history(request, db_table, attribute, id):
     try:
         model = DB_TABLE_TO_MODEL[db_table]
         cfg = HISTORY[model]
-    except KeyError:
-        raise Http404
+    except KeyError as exc:
+        raise Http404 from exc
 
     if callable(cfg):
         cfg = cfg(request.user)
