@@ -46,7 +46,9 @@ def annual_working_time_pdf(statistics):
             with io.BytesIO() as x:
                 xlsx.workbook.save(x)
                 zf.writestr("statistics.xlsx", x.getvalue())
-        response = HttpResponse(buf.getvalue(), content_type="application/zip")
+        response = HttpResponse(
+            buf.getvalue(), content_type="application/x-zip-compressed"
+        )
         response["Content-Disposition"] = 'attachment; filename="awt.zip"'
         return response
 
