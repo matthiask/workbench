@@ -320,7 +320,7 @@ class AWTTest(TestCase):
 
         response = self.client.get(url + "?export=pdf&user=active")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["content-type"], "application/zip")
+        self.assertEqual(response["content-type"], "application/x-zip-compressed")
 
         response = self.client.get(url + f"?export=pdf&user={user.pk}")
         self.assertEqual(response.status_code, 200)
