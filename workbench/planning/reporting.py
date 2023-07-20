@@ -644,7 +644,7 @@ def team_planning(team, date_range):
     return planning.report()
 
 
-def project_planning(project, external_view=False):
+def project_planning(project, *, external_view=False):
     with connections["default"].cursor() as cursor:
         cursor.execute(
             """\
@@ -691,7 +691,7 @@ SELECT MIN(week), MAX(week) FROM sq
 
 
 def project_planning_external(project):
-    return project_planning(project, True)
+    return project_planning(project, external_view=True)
 
 
 def planning_vs_logbook(date_range, *, users):

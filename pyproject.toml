@@ -29,7 +29,7 @@ extend-select = [
   # pygrep-hooks
   "PGH",
   # pylint
-  "PL",
+  "PLE", "PLW",
   # unused noqa
   "RUF100",
 ]
