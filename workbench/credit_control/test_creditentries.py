@@ -85,12 +85,16 @@ class CreditEntriesTest(TestCase):
 
         # print(response, response.content.decode("utf-8"))
         self.assertRedirects(response, "/credit-control/")
-        self.assertEqual(messages(response), ["Created 2 credit entries."])
+        self.assertEqual(
+            messages(response), ["Found 2 credit entries.", "Created 2 credit entries."]
+        )
 
         response = send()
 
         self.assertRedirects(response, "/credit-control/")
-        self.assertEqual(messages(response), ["Created 0 credit entries."])
+        self.assertEqual(
+            messages(response), ["Found 2 credit entries.", "Created 0 credit entries."]
+        )
 
         invoice = factories.InvoiceFactory.create(
             subtotal=Decimal("4000"), _code="00001"
