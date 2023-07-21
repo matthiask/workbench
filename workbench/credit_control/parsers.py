@@ -17,7 +17,18 @@ def parse_zkb_csv(data):
     dialect = csv.Sniffer().sniff(f.read(4096))
     f.seek(0)
     reader = csv.reader(f, dialect)
-    next(reader)  # Skip first line
+    first_line = next(reader)
+
+    day_column = first_line.index("Valuta")
+    amount_column = first_line.index("Gutschrift CHF")
+    reference_column = first_line.index("ZKB-Referenz")
+    detail_columns = [
+        first_line.index("Buchungstext"),
+        first_line.index("Zahlungszweck"),
+        first_line.index("Details"),
+        first_line.index("ZKB-Referenz"),
+    ]
+
     entries = []
     while True:
         try:
@@ -27,9 +38,9 @@ def parse_zkb_csv(data):
         if not row:
             continue
         try:
-            day = dt.datetime.strptime(row[8], "%d.%m.%Y").date()
-            amount = row[7] and Decimal(row[7])
-            reference = row[4]
+            day = dt.datetime.strptime(row[day_column], "%d.%m.%Y").date()
+            amount = row[amount_column] and Decimal(row[amount_column])
+            reference = row[reference_column]
         except (AttributeError, IndexError, ValueError):
             continue
         if day and amount:
@@ -39,7 +50,7 @@ def parse_zkb_csv(data):
                     "value_date": day,
                     "total": amount,
                     "payment_notice": "; ".join(
-                        filter(None, (row[1], row[10], row[4]))
+                        filter(None, (row[c] for c in detail_columns))
                     ),
                 }
             )
