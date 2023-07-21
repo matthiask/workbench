@@ -97,6 +97,11 @@ class AccountStatementUploadForm(Form):
                         " Did you upload a valid CSV file? (Technical error: %s)"
                     )
                     % exc
+                ) from exc
+
+            if not self.statement_list:
+                raise forms.ValidationError(
+                    _("Unable to find any payments in the uploaded CSV file.")
                 )
 
             reference_numbers = [
