@@ -1,9 +1,11 @@
 import datetime as dt
 from collections import defaultdict
 
+from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
+from workbench.tools.forms import querystring
 from workbench.tools.reporting import query
 from workbench.tools.validation import in_days, monday
 
@@ -13,6 +15,7 @@ def logged_hours(user):
 
     from_ = monday(in_days(-180))
 
+    logged_hours_url = reverse("logbook_loggedhours_list")
     hours_per_week = {}
     for week, type, hours in query(
         """
@@ -42,6 +45,14 @@ ORDER BY series.week
                 "week": week,
                 "hours": hours,
                 "by_type": {type: hours},
+                "url": logged_hours_url
+                + querystring(
+                    {
+                        "rendered_by": user.pk,
+                        "date_from": week.date().isoformat(),
+                        "date_until": (week.date() + dt.timedelta(days=6)).isoformat(),
+                    }
+                ),
             }
 
     stats["hours_per_week"] = [row[1] for row in sorted(hours_per_week.items())]

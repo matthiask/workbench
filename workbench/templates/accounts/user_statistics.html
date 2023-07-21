@@ -8,6 +8,17 @@
     <div class="col-lg-10">
       <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
       <h2 class="mt-4">{% translate 'Hours per week' %}</h2>
+
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      {% url 'logbook_loggedhours_list' as base %}
+      {% for row in logged_hours.hours_per_week|slice:"-8:" %}
+        <a href="{{ row.url }}" style="text-align:center">
+          KW{{ row.week|date:"W" }}
+          <h3>{{ row.hours|hours }}</h3>
+        </a>
+      {% endfor %}
+      </div>
+
       <canvas id="hours-per-week" width="1200" height="450"></canvas>
       <script>
       new Chart("hours-per-week", {
