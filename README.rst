@@ -2,8 +2,9 @@
 Workbench
 =========
 
-.. image:: https://travis-ci.org/matthiask/workbench.svg?branch=main
-    :target: https://travis-ci.org/matthiask/workbench
+.. image:: https://github.com/matthiask/workbench/actions/workflows/python-app.yml/badge.svg
+    :target: https://github.com/matthiask/workbench/
+    :alt: CI Status
 
 Recommended contents of ``.env`` (add some random value for
 ``SECRET_KEY`` and copy the ``OAUTH2_CLIENT_*`` values from the ``.env``
