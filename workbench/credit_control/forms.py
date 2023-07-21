@@ -1,6 +1,7 @@
 import re
 
 from django import forms
+from django.contrib import messages
 from django.utils.html import format_html, mark_safe
 from django.utils.translation import gettext, gettext_lazy as _
 
@@ -90,6 +91,13 @@ class AccountStatementUploadForm(Form):
         if data.get("statement") and data.get("ledger"):
             try:
                 self.statement_list = data["ledger"].parse_fn(data["statement"].read())
+                messages.info(
+                    self.request,
+                    _("Found {count} credit entries.").format(
+                        count=len(self.statement_list)
+                    ),
+                )
+
             except Exception as exc:
                 raise forms.ValidationError(
                     _(
@@ -98,11 +106,6 @@ class AccountStatementUploadForm(Form):
                     )
                     % exc
                 ) from exc
-
-            if not self.statement_list:
-                raise forms.ValidationError(
-                    _("Unable to find any payments in the uploaded CSV file.")
-                )
 
             reference_numbers = [
                 entry["reference_number"] for entry in self.statement_list
