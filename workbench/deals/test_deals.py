@@ -176,16 +176,15 @@ class DealsTest(TestCase):
         self.assertEqual(da.attribute, attribute1_1)
         self.assertEqual(
             str(da),
-            "{} Some deal - {} - A1.1".format(
-                deal.code, person.primary_contact.get_short_name()
-            ),
+            f"{deal.code} Some deal - {person.primary_contact.get_short_name()} - A1.1",
         )
 
         response = self.client.get(deal.urls["update"])
         self.assertContains(
             response,
-            '<input class="form-check-input" type="radio" name="attribute_%(g)s" value="%(a)s" class="my-2" required id="id_attribute_%(g)s_0" checked>'  # noqa
-            % {"g": attribute1_1.group_id, "a": attribute1_1.id},
+            '<input class="form-check-input" type="radio" name="attribute_{g}" value="{a}" class="my-2" required id="id_attribute_{g}_0" checked>'.format(
+                g=attribute1_1.group_id, a=attribute1_1.id
+            ),
             html=True,
         )
 

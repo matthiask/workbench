@@ -112,7 +112,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <th class="text-right">{% translate 'total excl. tax'|capfirst %}</th>
+                    <th class="text-right">{% translate 'Total invoiced excl. tax' %}</th>
                     <td>{{ project.project_invoices_total_excl_tax|currency }}</td>
                   </tr>
                   {% if request.user.features.PROJECTED_GROSS_MARGIN %}

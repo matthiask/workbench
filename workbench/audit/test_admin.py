@@ -23,9 +23,7 @@ class AuditTest(TestCase):
         self.assertContains(response, "UPDATE")  # change
 
         response = self.client.get(
-            "/admin/audit/loggedaction/{}/change/".format(
-                LoggedAction.objects.all()[0].pk
-            )
+            f"/admin/audit/loggedaction/{LoggedAction.objects.all()[0].pk}/change/"
         )
         self.assertNotContains(response, 'type="text"')
         self.assertNotContains(response, "<select")

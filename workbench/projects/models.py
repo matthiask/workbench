@@ -394,7 +394,7 @@ class Project(Model):
         return ", ".join(parts)
 
     @cached_property
-    def grouped_services(self):  # noqa: PLR0915
+    def grouped_services(self):
         # Avoid circular imports
         from workbench.deals.models import Deal
         from workbench.logbook.models import LoggedCost, LoggedHours

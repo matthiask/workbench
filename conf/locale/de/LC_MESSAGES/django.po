@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-21 10:01+0200\n"
+"POT-Creation-Date: 2023-08-08 14:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3373,7 +3373,6 @@ msgstr "Rabatt"
 
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/key_data_third_party_costs.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
@@ -3573,6 +3572,10 @@ msgstr "zurückbehalten"
 #: workbench/templates/projects/project_detail.html
 msgid "Total costs"
 msgstr "Gesamtkosten"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Total invoiced excl. tax"
+msgstr "Total verrechnet exkl. MwSt."
 
 #: workbench/templates/projects/project_detail.html
 msgid "Project offers"

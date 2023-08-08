@@ -138,9 +138,7 @@ class Offer(ModelWithTotal):
         verbose_name_plural = _("offers")
 
     def __str__(self):
-        return "{} {} - {}".format(
-            self.code, self.title, self.owned_by.get_short_name()
-        )
+        return f"{self.code} {self.title} - {self.owned_by.get_short_name()}"
 
     def __html__(self):
         return format_html(
@@ -269,9 +267,9 @@ class Offer(ModelWithTotal):
 
     @property
     def status_badge(self):
-        if self.status == self.OFFERED and self.project.closed_on:
-            css = "warning"
-        elif self.status == self.OFFERED and self.valid_until < dt.date.today():
+        if self.status == self.OFFERED and (
+            self.project.closed_on or self.valid_until < dt.date.today()
+        ):
             css = "warning"
         else:
             css = {
