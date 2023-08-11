@@ -538,8 +538,8 @@ class OffersTest(TestCase):
         self.assertEqual(
             messages(response),
             [
-                "All offers of project {} are declined. You might "
-                "want to close the project now?".format(offer.project),
+                f"All offers of project {offer.project} are declined. You might "
+                "want to close the project now?",
                 f"Offer '{offer}' has been updated successfully.",
             ],
         )

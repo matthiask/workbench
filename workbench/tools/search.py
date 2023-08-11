@@ -28,26 +28,22 @@ import re
 
 
 def drop_old_fts(table):
-    return """\
+    return f"""\
 DROP TRIGGER IF EXISTS {table}_fts_update_trigger ON {table};
 DROP TRIGGER IF EXISTS {table}_fts_insert_trigger ON {table};
 DROP FUNCTION IF EXISTS {table}_fts_document (integer);
 DROP FUNCTION IF EXISTS {table}_fts_document_trigger ();
-""".format(
-        table=table
-    )
+"""
 
 
 def create_structure(table):
-    return """\
+    return f"""\
 ALTER TABLE {table} DROP COLUMN IF EXISTS fts_document;
 DROP INDEX IF EXISTS {table}_fts_index;
 
 ALTER TABLE {table} ADD COLUMN fts_document tsvector;
 CREATE INDEX {table}_fts_index ON {table} USING gin(fts_document);
-""".format(
-        table=table
-    )
+"""
 
 
 def fts(table, fields):
@@ -94,10 +90,8 @@ def search(queryset, terms):
     return (
         queryset.extra(
             where=[
-                "{}.fts_document"
-                " @@ to_tsquery('pg_catalog.german', unaccent(%s))".format(
-                    queryset.model._meta.db_table
-                )
+                f"{queryset.model._meta.db_table}.fts_document"
+                " @@ to_tsquery('pg_catalog.german', unaccent(%s))"
             ],
             params=[process_query(terms)],
         )

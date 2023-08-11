@@ -294,14 +294,14 @@ class Timestamp(models.Model):
         verbose_name = _("timestamp")
         verbose_name_plural = _("timestamps")
 
+    def __str__(self):
+        return f"{self.pretty_time:>5} {self.notes}"
+
     def save(self, *args, **kwargs):
         assert self.type in {self.START, self.STOP}, "Not to be used for timestamps"
         super().save(*args, **kwargs)
 
     save.alters_data = True
-
-    def __str__(self):
-        return f"{self.pretty_time:>5} {self.notes}"
 
     @property
     def pretty_time(self):
