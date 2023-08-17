@@ -11,6 +11,7 @@ django-colorfield
 django-cors-headers
 django-countries
 django-debug-toolbar
+django-fast-export
 django-fineforms
 django-slowtests
 django-vanilla-views

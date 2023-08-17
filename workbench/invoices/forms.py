@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _
+from django_fast_export.csv import StreamingCSVResponse, all_values, all_verbose_names
 
 from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
@@ -19,7 +20,6 @@ from workbench.tools.formats import Z2, currency, hours, local_date_format
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
 from workbench.tools.pdf import pdf_response
 from workbench.tools.validation import in_days
-from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
 class InvoiceSearchForm(Form):
@@ -97,37 +97,26 @@ class InvoiceSearchForm(Form):
             return response
 
         if request.GET.get("export") == "xlsx":
-            xlsx = WorkbenchXLSXDocument()
-            xlsx.table_from_queryset(
-                queryset,
-                additional=[
-                    (
-                        capfirst(gettext("project")),
-                        lambda invoice: invoice.project.title
-                        if invoice.project
-                        else None,
-                    ),
-                    (
-                        capfirst(gettext("contact person")),
-                        lambda invoice: invoice.project.owned_by
-                        if invoice.project
-                        else None,
-                    ),
-                    (
-                        capfirst(gettext("type")),
-                        lambda invoice: invoice.project.get_type_display()
-                        if invoice.project
-                        else None,
-                    ),
-                    (
-                        capfirst(gettext("closed on")),
-                        lambda invoice: invoice.project.closed_on
-                        if invoice.project
-                        else None,
-                    ),
-                ],
-            )
-            return xlsx.to_response("invoices.xlsx")
+
+            def generate():
+                yield all_verbose_names(queryset.model) + [
+                    capfirst(gettext("project")),
+                    capfirst(gettext("contact person")),
+                    capfirst(gettext("type")),
+                    capfirst(gettext("closed on")),
+                ]
+                yield from (
+                    all_values(invoice)
+                    + [
+                        invoice.project.title if invoice.project else None,
+                        invoice.project.owned_by if invoice.project else None,
+                        invoice.project.get_type_display() if invoice.project else None,
+                        invoice.project.closed_on if invoice.project else None,
+                    ]
+                    for invoice in queryset
+                )
+
+            return StreamingCSVResponse(generate(), filename="invoices.csv")
 
 
 class InvoiceForm(PostalAddressSelectionForm):

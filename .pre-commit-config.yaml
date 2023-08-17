@@ -24,7 +24,7 @@ repos:
         language: system
         always_run: true
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.14.0
+    rev: 1.14.1
     hooks:
       - id: django-upgrade
         args: [--target-version, "4.2"]
@@ -41,7 +41,7 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.46.0
+    rev: v8.47.0
     hooks:
       - id: eslint
         args: [--fix]
@@ -64,13 +64,13 @@ repos:
           - "@babel/plugin-syntax-jsx"
           - jest
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.1
+    rev: v3.0.2
     hooks:
       - id: prettier
         args: [--list-different, --no-semi]
         exclude: "^conf/|.*\\.html$|.*\\.json$"
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: 0.13.0
+    rev: 0.13.1
     hooks:
       - id: pyproject-fmt
   - repo: https://github.com/abravalheri/validate-pyproject
