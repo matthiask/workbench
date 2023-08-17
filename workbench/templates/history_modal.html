@@ -4,7 +4,7 @@
 {% block title %}
   {% translate 'History' %}:
   {% if instance %}
-    <a href="{{ instance.get_absolute_url }}">{{ instance|h }}</a>
+    {% link_or_none instance %}
   {% else %}
     {{ title }}
   {% endif %}

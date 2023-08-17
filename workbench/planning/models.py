@@ -38,6 +38,8 @@ class PublicHoliday(Model):
 
 @model_urls
 class Milestone(Model):
+    open_in_modal = True
+
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE,
@@ -149,6 +151,8 @@ class AbstractPlannedWork(Model):
 
 @model_urls
 class ExternalWork(AbstractPlannedWork):
+    open_in_modal = True
+
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE,
