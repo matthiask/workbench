@@ -13,82 +13,46 @@
     <link rel="shortcut icon" href="{% static 'workbench/lib/favicon.png' %}">
     <meta name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    {% if SPARKLES %}
-      <script src="{% static 'workbench/lib/sparkles.js' %}"></script>
-      <style>
-      :root {
-        --pink: #cc1e6e;
-        --blue: #9954bb;
-        --violet: #9954bb;
-      }
+    <style>
       .btn-primary {
         background-color: var(--blue);
         border-color: var(--blue);
       }
       .btn-primary.disabled,
       .btn-primary:disabled {
-        background-color: var(--violet);
-        border-color: var(--violet);
+        background-color: var(--darker);
+        border-color: var(--darker);
       }
       .bg-primary {
         background-color: var(--blue) !important;
       }
       .navbar {
-        background-color: var(--pink) !important;
+        background-color: var(--blue) !important;
       }
       a {
         color: var(--blue);
+      }
+    </style>
+    {% if SPARKLES %}
+      <script src="{% static 'workbench/lib/sparkles.js' %}"></script>
+      <style>
+      :root {
+        --blue: #b049a5;
+        --darker: #3c034b;
       }
       </style>
     {% elif request.user.features.PRIDE and JUN14 %}
       <style>
       :root {
-        --green: #6c277d;
-        --blue: #6c277d;
+        --blue: #b049a5;
         --darker: #3c034b;
       }
-      .btn-primary {
-        background-color: var(--blue);
-        border-color: var(--blue);
-      }
-      .btn-primary.disabled,
-      .btn-primary:disabled {
-        background-color: var(--darker);
-        border-color: var(--darker);
-      }
-      .bg-primary {
-        background-color: var(--blue) !important;
-      }
-      .navbar {
-        background-color: var(--green) !important;
-      }
-      a {
-        color: var(--blue);
-      }
       </style>
-    {% elif request.user.features.PRIDE %}
+    {% else %}
       <style>
       :root {
-        --blue: rgba(51, 37, 91, 0.8);
-        --darker: rgba(51, 37, 91, 1);
-      }
-      .btn-primary {
-        background-color: var(--blue);
-        border-color: var(--blue);
-      }
-      .btn-primary.disabled,
-      .btn-primary:disabled {
-        background-color: var(--darker);
-        border-color: var(--darker);
-      }
-      .bg-primary {
-        background-color: var(--blue) !important;
-      }
-      .navbar {
-        background-color: var(--blue) !important;
-      }
-      a {
-        color: var(--blue);
+        --blue: #0061c8;
+        --darker: #0031a0;
       }
       </style>
     {% endif %}

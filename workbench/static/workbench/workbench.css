@@ -13,8 +13,15 @@ body {
   margin-right: 1rem;
 }
 
-.navbar .form-inline input {
-  max-width: 10em;
+.navbar .form-inline {
+  width: 10em;
+  position: relative;
+}
+
+.navbar .form-inline .input-group {
+  position: absolute;
+  width: 10em;
+  top: -3px;
 }
 
 @media screen and (max-width: 575px) {
