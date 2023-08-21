@@ -225,7 +225,7 @@ class ProjectSearchForm(Form):
         elif data.get("s") == "old-projects":
             queryset = queryset.old_projects()
         elif data.get("s") == "empty-logbook":
-            queryset = queryset.open().empty_logbook()
+            queryset = queryset.empty_logbook()
         elif data.get("s") == "invalid-customer-contact-combination":
             queryset = queryset.invalid_customer_contact_combination()
         elif data.get("s") == "no-projected-gross-margin":
