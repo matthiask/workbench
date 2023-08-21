@@ -230,6 +230,22 @@ class ProjectQuerySet(SearchQuerySet):
             Q(closed_on__isnull=True),
         )
 
+    def empty_logbook(self):
+        from workbench.logbook.models import LoggedCost, LoggedHours
+
+        return self.open().exclude(
+            Q(
+                id__in=LoggedHours.objects.filter(
+                    service__project__closed_on__isnull=True
+                ).values("service__project")
+            )
+            | Q(
+                id__in=LoggedCost.objects.filter(
+                    service__project__closed_on__isnull=True
+                ).values("service__project")
+            )
+        )
+
 
 @model_urls
 @total_ordering

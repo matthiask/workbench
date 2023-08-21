@@ -166,6 +166,7 @@ class ProjectSearchForm(Form):
                     ),
                     ("solely-declined-offers", _("Solely declined offers")),
                     ("old-projects", _("Old projects (60 days inactivity)")),
+                    ("empty-logbook", _("Empty logbook")),
                     (
                         "invalid-customer-contact-combination",
                         _("Invalid customer/contact combination"),
@@ -223,6 +224,8 @@ class ProjectSearchForm(Form):
             queryset = queryset.solely_declined_offers()
         elif data.get("s") == "old-projects":
             queryset = queryset.old_projects()
+        elif data.get("s") == "empty-logbook":
+            queryset = queryset.open().empty_logbook()
         elif data.get("s") == "invalid-customer-contact-combination":
             queryset = queryset.invalid_customer_contact_combination()
         elif data.get("s") == "no-projected-gross-margin":

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-08 14:14+0200\n"
+"POT-Creation-Date: 2023-08-21 09:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -119,7 +119,7 @@ msgid "Annoy users when they are late with their logging."
 msgstr "Nutzer:innen nerven wenn sie ihre Stunden spät eintragen."
 
 #: workbench/accounts/features.py workbench/planning/apps.py
-#: workbench/templates/accounts/team_detail.html workbench/templates/base.html
+#: workbench/templates/accounts/team_detail.html
 #: workbench/templates/planning/campaign_planning.html
 #: workbench/templates/planning/campaign_planning_external.html
 #: workbench/templates/planning/project_planning.html
@@ -2607,6 +2607,10 @@ msgid "Old projects (60 days inactivity)"
 msgstr "Alte Projekte (60 Tage Inaktivität)"
 
 #: workbench/projects/forms.py
+msgid "Empty logbook"
+msgstr "Leeres Logbuch"
+
+#: workbench/projects/forms.py
 msgid "Invalid customer/contact combination"
 msgstr "Ungültige Kunde/Kontakt-Kombination"
 
@@ -2791,6 +2795,7 @@ msgstr "Offerte oder Leistungsgruppe"
 
 #: workbench/projects/views.py workbench/templates/accounts/user_base.html
 #: workbench/templates/accounts/user_statistics.html
+#: workbench/templates/base.html
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/campaign_statistics.html
@@ -3100,10 +3105,6 @@ msgstr "berechnet mit %(hours)s pro Tag"
 msgid "from %(date)s"
 msgstr "Ab %(date)s"
 
-#: workbench/templates/base.html workbench/templates/start.html
-msgid "dashboard"
-msgstr "Dashboard"
-
 #: workbench/templates/base.html
 msgid "bookkeeping"
 msgstr "Buchhaltung"
@@ -3120,6 +3121,10 @@ msgstr "Zahlungserinnerungen"
 #: workbench/templates/base.html
 msgid "reports"
 msgstr "Berichte"
+
+#: workbench/templates/base.html
+msgid "controlling"
+msgstr "Controlling"
 
 #: workbench/templates/base.html workbench/templates/reporting/key_data.html
 msgid "Key data"
@@ -3894,6 +3899,10 @@ msgid "Log a break"
 msgstr "Pause erfassen"
 
 #: workbench/templates/start.html
+msgid "dashboard"
+msgstr "Dashboard"
+
+#: workbench/templates/start.html
 msgid "Possibly requiring action"
 msgstr "Benötigen evtl. eine Aktion"
 
@@ -3972,6 +3981,10 @@ msgstr "Start"
 #: workbench/timer/models.py
 msgid "Stop"
 msgstr "Stop"
+
+#: workbench/tools/csv.py
+msgid "Export selected items as CSV"
+msgstr "Ausgewählte Objekte als CSV exportieren"
 
 #: workbench/tools/formats.py
 #, python-format
