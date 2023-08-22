@@ -222,6 +222,13 @@ class DealsTest(TestCase):
             ).pretty_status,
             "Accepted on 18.02.2020",
         )
+        self.assertEqual(
+            factories.DealFactory.create(
+                status=Deal.OPEN,
+                probability=Deal.LOW,
+            ).status_badge,
+            '<span class="badge badge-info">Open since 18.02.2020</span>',
+        )
 
     def test_xlsx(self):
         """Smoke test of the deals XLSX export"""
