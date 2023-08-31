@@ -179,6 +179,7 @@ class InvoiceFactory(DjangoModelFactory):
     title = factory.Sequence(lambda n: "Invoice %d" % n)
     type = Invoice.FIXED
     invoiced_on = factory.LazyAttribute(lambda a: dt.date.today())
+    tax_rate = Decimal("7.70")
 
     class Meta:
         model = Invoice

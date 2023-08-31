@@ -1,3 +1,4 @@
+import datetime as dt
 from decimal import Decimal
 from functools import partial
 from itertools import islice
@@ -95,6 +96,10 @@ HoursField = partial(
 HoursFieldAllowNegatives = partial(models.DecimalField, max_digits=10, decimal_places=1)
 
 
+def default_tax_rate():
+    return Decimal("7.70") if dt.date.today().year < 2024 else Decimal("8.10")
+
+
 class ModelWithTotal(Model):
     subtotal = MoneyField(_("subtotal"), default=Z2)
     discount = MoneyField(_("discount"), default=Z2)
@@ -106,7 +111,14 @@ class ModelWithTotal(Model):
         ),
     )
     total_excl_tax = MoneyField(_("total excl. tax"), default=Z2)
-    tax_rate = MoneyField(_("tax rate"), default=Decimal("7.7"))
+    tax_rate = MoneyField(
+        _("tax rate"),
+        choices=[
+            (Decimal("8.10"), _("8.1% (2024 and onwards)")),
+            (Decimal("7.70"), _("7.7% (until the end of 2023)")),
+        ],
+        default=default_tax_rate,
+    )
     total = MoneyField(_("total"), default=Z2)
     show_service_details = models.BooleanField(_("show service details"), default=True)
 

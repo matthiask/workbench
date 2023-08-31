@@ -105,6 +105,7 @@ class OfferForm(PostalAddressSelectionForm):
             "subtotal",
             "discount",
             "liable_to_vat",
+            "tax_rate",
             "show_service_details",
             "work_completed_on",
             "is_budget_retainer",
@@ -113,6 +114,7 @@ class OfferForm(PostalAddressSelectionForm):
             "description": Textarea,
             "status": forms.RadioSelect,
             "postal_address": Textarea,
+            "tax_rate": forms.RadioSelect,
         }
 
     def __init__(self, *args, **kwargs):
@@ -174,6 +176,7 @@ class OfferForm(PostalAddressSelectionForm):
                 "subtotal",
                 "discount",
                 "liable_to_vat",
+                "tax_rate",
                 "show_service_details",
                 "work_completed_on",
                 "is_budget_retainer",
@@ -232,7 +235,14 @@ class OfferForm(PostalAddressSelectionForm):
 class OfferPricingForm(ModelForm):
     class Meta:
         model = Offer
-        fields = ("subtotal", "discount", "total_excl_tax", "liable_to_vat", "total")
+        fields = (
+            "subtotal",
+            "discount",
+            "total_excl_tax",
+            "liable_to_vat",
+            "tax_rate",
+            "total",
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-21 09:43+0200\n"
+"POT-Creation-Date: 2023-08-31 16:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4053,6 +4053,14 @@ msgstr "zB Rechnungen für ausländische Institutionen sind nicht mehrwertsteuer
 #: workbench/tools/models.py
 msgid "tax rate"
 msgstr "MwSt.-Satz"
+
+#: workbench/tools/models.py
+msgid "8.1% (2024 and onwards)"
+msgstr "8.1% (2024 und weiter)"
+
+#: workbench/tools/models.py
+msgid "7.7% (until the end of 2023)"
+msgstr "(7.7% (bis Ende 2023)"
 
 #: workbench/tools/models.py
 msgid "show service details"

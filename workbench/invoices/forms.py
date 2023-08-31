@@ -143,6 +143,7 @@ class InvoiceForm(PostalAddressSelectionForm):
             "third_party_costs",
             "discount",
             "liable_to_vat",
+            "tax_rate",
             "show_service_details",
         )
         widgets = {
@@ -153,6 +154,7 @@ class InvoiceForm(PostalAddressSelectionForm):
             "payment_notice": Textarea({"rows": 2}),
             "postal_address": Textarea,
             "type": forms.RadioSelect,
+            "tax_rate": forms.RadioSelect,
         }
 
     def __init__(self, *args, **kwargs):
@@ -236,6 +238,7 @@ class InvoiceForm(PostalAddressSelectionForm):
                 "discount",
                 "apply_down_payment",
                 "liable_to_vat",
+                "tax_rate",
                 "show_service_details",
             }
         )
@@ -553,12 +556,14 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
             "third_party_costs",
             "discount",
             "liable_to_vat",
+            "tax_rate",
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
             "contact": Autocomplete(model=Person, params={"only_employees": "on"}),
             "description": Textarea,
             "postal_address": Textarea,
+            "tax_rate": forms.RadioSelect,
         }
 
     def __init__(self, *args, **kwargs):
