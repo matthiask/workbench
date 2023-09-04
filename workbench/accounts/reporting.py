@@ -122,10 +122,14 @@ ORDER BY series.week
     )
 
     total = sum(sum(row.values()) for row in hours_per_customer.values())
-    stats["hours_per_customer"]["by_customer"] = [
-        row | {"name": f"{row['name']} ({round(100 * sum(row['hours']) / total)}%)"}
-        for row in stats["hours_per_customer"]["by_customer"]
-    ]
+    stats["hours_per_customer"]["by_customer"] = (
+        [
+            row | {"name": f"{row['name']} ({round(100 * sum(row['hours']) / total)}%)"}
+            for row in stats["hours_per_customer"]["by_customer"]
+        ]
+        if total
+        else []
+    )
 
     return stats
 
