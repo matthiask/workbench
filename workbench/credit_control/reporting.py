@@ -16,7 +16,11 @@ def append_invoice(*, zf, ledger_slug, invoice):
         pdf = PDFDocument(buf)
         pdf.init_invoice_letter()
         pdf.process_invoice(invoice)
-        pdf.generate()
+        try:
+            pdf.generate()
+        except Exception:
+            print(f"Error while processing invoice {invoice} (ID {invoice.id})")
+            raise
 
         zf.writestr(
             "{}-{}/{}.pdf".format(
