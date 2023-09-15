@@ -714,13 +714,9 @@ class RecurringInvoiceSearchForm(Form):
         data = self.cleaned_data
         queryset = queryset.search(data.get("q"))
         if data.get("s") == "":
-            queryset = queryset.filter(
-                Q(ends_on__isnull=True) | Q(ends_on__gte=dt.date.today())
-            )
+            queryset = queryset.open()
         elif data.get("s") == "closed":
-            queryset = queryset.filter(
-                Q(ends_on__isnull=False) & Q(ends_on__lt=dt.date.today())
-            )
+            queryset = queryset.closed()
         queryset = self.apply_renamed(queryset, "org", "customer")
         queryset = self.apply_owned_by(queryset)
         return queryset.select_related("customer", "contact__organization", "owned_by")

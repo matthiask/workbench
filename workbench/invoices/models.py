@@ -542,6 +542,15 @@ class RecurringInvoiceQuerySet(SearchQuerySet):
             .select_related("customer", "contact", "owned_by")
         )
 
+    def open(self):
+        return self.filter(Q(ends_on__isnull=True) | Q(ends_on__gte=dt.date.today()))
+
+    def closed(self):
+        return self.filter(Q(ends_on__isnull=False) & Q(ends_on__lt=dt.date.today()))
+
+    def maybe_actionable(self):
+        return self.open().filter(owned_by__is_active=False)
+
 
 @model_urls
 class RecurringInvoice(ModelWithTotal):

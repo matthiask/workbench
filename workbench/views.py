@@ -59,6 +59,14 @@ def _needs_action(user):
                 "objects": Invoice.objects.maybe_actionable(user=user),
             }
         )
+        rows.append(
+            {
+                "type": "recurringinvoices",
+                "verbose_name_plural": RecurringInvoice._meta.verbose_name_plural,
+                "url": RecurringInvoice.urls["list"],
+                "objects": RecurringInvoice.objects.maybe_actionable(),
+            }
+        )
     rows.append(
         {
             "type": "old_projects",
