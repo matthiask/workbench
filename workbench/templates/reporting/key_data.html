@@ -41,7 +41,7 @@
           <th>{% translate 'Average employment duration of all users' %}</th>
         </tr>
       </table>
-      <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
+      <script src="{% static 'workbench/lib/chart.js' %}"></script>
 
       <h2 class="mt-5">{% translate 'Revenue minus third party costs and accruals' %}</h2>
       <canvas id="invoiced-corrected" width="1200" height="450"></canvas>
@@ -251,14 +251,18 @@
             label: "{{ dataset.label }}",
             data: [{% for value in dataset.data %}{{ value|stringformat:".2f" }},{% endfor %}],
             backgroundColor: "{% cycle 'rgba(0, 150, 0, 0.4)' 'rgba(50, 40, 30, 0.4)' 'rgba(150, 50, 30, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
+            fill: true,
           },
           {% endfor %}
         ],
       },
       options: {
         scales: {
-          xAxes: [{stacked: true}],
-          yAxes: [{stacked: true, ticks: {min: 0, max: 100}}],
+          y: {
+            stacked: true,
+            min: 0,
+            max: 100,
+          },
         },
         elements: {
           line: {

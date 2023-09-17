@@ -6,7 +6,7 @@
 {% block inner_content %}
   <div class="row justify-content-center">
     <div class="col-lg-10">
-      <script src="{% static 'workbench/lib/Chart.min.js' %}"></script>
+      <script src="{% static 'workbench/lib/chart.js' %}"></script>
       <h2 class="mt-4">{% translate 'Hours per week' %}</h2>
 
       <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
@@ -45,12 +45,25 @@
         },
         options: {
           scales: {
-            xAxes: [{stacked: true}],
-            yAxes: [{stacked: true}],
+            y: {
+              stacked: true,
+            },
           },
           elements: {
             line: {
               tension: 0,
+              fill: true,
+            },
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || ""
+                  label += ": " + Math.abs(context.parsed.y) + "h"
+                  return label
+                }
+              },
             },
           },
         },
@@ -69,15 +82,16 @@
               label: "{{ customer.name|escapejs }}",
               data: [{% for hour in customer.hours %}{{ hour|stringformat:'.1f' }},{% endfor %}],
               backgroundColor: "{% cycle '#2780e3' '#6610f2' '#613d7c' '#e83e8c' '#ff0039' '#f0ad4e' '#ff7518' '#3fb618' '#20c997' '#9954bb' '#868e96' '#373a3c' '#2780e3' '#373a3c' '#3fb618' '#9954bb' '#ff7518' '#ff0039' '#f8f9fa' '#373a3c' %}",
-
+              fill: true,
             },
             {% endfor %}
           ],
         },
         options: {
           scales: {
-            xAxes: [{stacked: true}],
-            yAxes: [{stacked: true}],
+            y: {
+              stacked: true,
+            },
           },
           elements: {
             line: {
