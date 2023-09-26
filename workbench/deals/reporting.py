@@ -114,7 +114,7 @@ def accepted_deals(date_range, *, users=None):
 
 
 def declined_deals(date_range, *, users=None):
-    queryset = (
+    return (
         Deal.objects.filter(status=Deal.DECLINED, closed_on__range=date_range)
         .select_related("customer", "contact__organization", "owned_by")
         .prefetch_related(
@@ -122,7 +122,6 @@ def declined_deals(date_range, *, users=None):
         )
         .order_by("-closed_on")
     )
-    return queryset
 
 
 def deal_history(date_range, *, users=None):

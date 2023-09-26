@@ -12,6 +12,8 @@ extend-select = [
   "UP",
   # flake8-2020
   "YTT",
+  # flake8-async
+  "ASYNC",
   # flake8-boolean-trap
   "FBT",
   # flake8-bugbear
@@ -22,18 +24,33 @@ extend-select = [
   "DJ",
   # flake8-implicit-string-concatenation
   "ISC",
+  # flake8-no-pep420
+  "INP",
   # flake8-pie
   "PIE",
+  # flake8-return
+  "RET",
+  # flake8-slots
+  "SLOT",
   # flake8-simplify
   "SIM",
   # flake8-gettext
   "INT",
+  # flake8-use-pathlib
+  "PTH",
   # pygrep-hooks
   "PGH",
   # pylint
   "PLC", "PLE", "PLW",
-  # unused noqa
-  "RUF100",
+  # tryceratops
+  "TRY",
+  # refurb
+  "FURB",
+  # flake8-logging
+  "LOG",
+  # ruff
+  "RUF005", "RUF006", "RUF007", "RUF008", "RUF009", "RUF010", "RUF011",
+  "RUF015", "RUF016", "RUF017", "RUF100", "RUF200",
 ]
 extend-ignore = [
   # Allow zip() without strict=
@@ -44,6 +61,7 @@ extend-ignore = [
 fix = true
 show-fixes = true
 target-version = "py311"
+preview = true
 
 [tool.ruff.isort]
 combine-as-imports = true
@@ -62,6 +80,10 @@ max-complexity = 15
 "fabfile.py" = [
   # No boolean trap in function definitions in the fabfile
   "FBT002",
+]
+"conf/*" = [
+  # Allow Python files in conf/ without __init__
+  "INP",
 ]
 
 [tool.coverage.run]

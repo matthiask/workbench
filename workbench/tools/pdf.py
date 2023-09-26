@@ -101,11 +101,13 @@ class PDFDocument(_PDFDocument):
             ("ALIGN", (0, 0), (-1, -1), "LEFT"),
             ("VALIGN", (0, 0), (-1, -1), "TOP"),
         )
-        self.style.tableServices = self.style.table + (
+        self.style.tableServices = (
+            *self.style.table,
             ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
         )
 
-        self.style.tableHeadLine = self.style.table + (
+        self.style.tableHeadLine = (
+            *self.style.table,
             ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
             ("RIGHTPADDING", (0, 0), (0, -1), 2 * mm),
             ("LINEABOVE", (0, 0), (-1, 0), 0.2, colors.black),
@@ -115,7 +117,8 @@ class PDFDocument(_PDFDocument):
             ("BOTTOMPADDING", (0, 0), (-1, 0), 2),
         )
 
-        self.style.tableHead = self.style.tableHeadLine + (
+        self.style.tableHead = (
+            *self.style.tableHeadLine,
             ("TOPPADDING", (0, 1), (-1, 1), 1),
         )
 
@@ -618,7 +621,7 @@ class PDFDocument(_PDFDocument):
                 for offer in offers
             ],
             (self.bounds.E - self.bounds.W - 40 * mm, 24 * mm, 16 * mm),
-            self.style.tableHead + (("ALIGN", (1, 0), (1, -1), "LEFT"),),
+            (*self.style.tableHead, ("ALIGN", (1, 0), (1, -1), "LEFT")),
         )
 
         total = CalculationModel(
@@ -685,7 +688,7 @@ als gegenstandslos zu betrachten.</p>
                 for invoice in invoices
             ],
             (self.bounds.E - self.bounds.W - 40 * mm, 24 * mm, 16 * mm),
-            self.style.tableHead + (("ALIGN", (1, 0), (1, -1), "LEFT"),),
+            (*self.style.tableHead, ("ALIGN", (1, 0), (1, -1), "LEFT")),
         )
         self.restart()
         for invoice in invoices:
@@ -715,7 +718,7 @@ def get_debtor_address(postal_address):
         country = "LI"
 
     if len(address_lines) < 3:
-        name, line1, line2, *rest = address_lines + ["", "", ""]
+        name, line1, line2, *rest = [*address_lines, "", "", ""]
     elif len(address_lines) <= 4:
         name = " ".join(address_lines[0:-2])
         line1 = address_lines[-2]

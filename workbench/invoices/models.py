@@ -475,7 +475,7 @@ select min(min_date), max(max_date) from sq
                 """,
                 [self.id, self.id],
             )
-            return list(cursor)[0]
+            return next(iter(cursor))
 
     @property
     def service_period(self):
@@ -528,6 +528,7 @@ class Service(ServiceBase):
     def get_redirect_url(cls, instance, request):
         if not request.is_ajax():
             return instance.get_absolute_url() if instance else "invoices_invoice_list"
+        return None
 
 
 class RecurringInvoiceQuerySet(SearchQuerySet):

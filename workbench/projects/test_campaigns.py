@@ -57,7 +57,7 @@ class CampaignsTest(TestCase):
         self.client.force_login(campaign.owned_by)
 
         response = self.client.get(Project.urls["create"] + f"?campaign={campaign.pk}")
-        self.assertContains(response, f'value="{str(campaign)}"')
+        self.assertContains(response, f'value="{campaign!s}"')
 
     def test_statistics(self):
         """Campaign statistics do not crash"""

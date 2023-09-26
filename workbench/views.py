@@ -43,29 +43,27 @@ def _needs_action(user):
             }
         )
     if user.features[FEATURES.CONTROLLING]:
-        rows.append(
-            {
-                "type": "offers",
-                "verbose_name_plural": Offer._meta.verbose_name_plural,
-                "url": Offer.urls["list"],
-                "objects": Offer.objects.maybe_actionable(user=user),
-            }
-        )
-        rows.append(
-            {
-                "type": "invoices",
-                "verbose_name_plural": Invoice._meta.verbose_name_plural,
-                "url": Invoice.urls["list"],
-                "objects": Invoice.objects.maybe_actionable(user=user),
-            }
-        )
-        rows.append(
-            {
-                "type": "recurringinvoices",
-                "verbose_name_plural": RecurringInvoice._meta.verbose_name_plural,
-                "url": RecurringInvoice.urls["list"],
-                "objects": RecurringInvoice.objects.maybe_actionable(),
-            }
+        rows.extend(
+            (
+                {
+                    "type": "offers",
+                    "verbose_name_plural": Offer._meta.verbose_name_plural,
+                    "url": Offer.urls["list"],
+                    "objects": Offer.objects.maybe_actionable(user=user),
+                },
+                {
+                    "type": "invoices",
+                    "verbose_name_plural": Invoice._meta.verbose_name_plural,
+                    "url": Invoice.urls["list"],
+                    "objects": Invoice.objects.maybe_actionable(user=user),
+                },
+                {
+                    "type": "recurringinvoices",
+                    "verbose_name_plural": RecurringInvoice._meta.verbose_name_plural,
+                    "url": RecurringInvoice.urls["list"],
+                    "objects": RecurringInvoice.objects.maybe_actionable(),
+                },
+            )
         )
     rows.append(
         {

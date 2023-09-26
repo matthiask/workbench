@@ -214,6 +214,7 @@ class Absence(Model):
             return cls.urls["list"] + "?u={}".format(
                 instance.user_id if instance else ""
             )
+        return None
 
     def clean_fields(self, exclude):
         super().clean_fields(exclude)

@@ -764,6 +764,7 @@ class Service(ServiceBase):
     def get_redirect_url(cls, instance, request):
         if not request.is_ajax():
             return instance.get_absolute_url() if instance else "projects_project_list"
+        return None
 
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)

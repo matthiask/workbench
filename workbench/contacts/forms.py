@@ -105,6 +105,7 @@ class PersonSearchForm(Form):
                     )[: settings.BATCH_MAX_ITEMS]
                 ),
             )
+        return None
 
 
 class OrganizationForm(ModelForm):

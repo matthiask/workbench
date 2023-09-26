@@ -55,6 +55,7 @@ class DetectedTimestampForm(forms.Form):
                 created_at=self.cleaned_data["detected_ends_at"],
                 **kwargs,
             )
+        return None
 
 
 class LoggedHoursSearchForm(Form):
@@ -196,6 +197,7 @@ class LoggedHoursSearchForm(Form):
             xlsx = WorkbenchXLSXDocument()
             xlsx.logged_hours(queryset)
             return xlsx.to_response("hours.xlsx")
+        return None
 
 
 class LoggedCostSearchForm(Form):
@@ -325,6 +327,7 @@ class LoggedCostSearchForm(Form):
             xlsx = WorkbenchXLSXDocument()
             xlsx.logged_costs(queryset)
             return xlsx.to_response("costs.xlsx")
+        return None
 
 
 @add_prefix("modal")
@@ -661,6 +664,7 @@ class BreakSearchForm(Form):
             xlsx = WorkbenchXLSXDocument()
             xlsx.table_from_queryset(queryset)
             return xlsx.to_response("breaks.xlsx")
+        return None
 
 
 @add_prefix("modal")

@@ -99,15 +99,16 @@ class InvoiceSearchForm(Form):
         if request.GET.get("export") == "xlsx":
 
             def generate():
-                yield all_verbose_names(queryset.model) + [
+                yield [
+                    *all_verbose_names(queryset.model),
                     capfirst(gettext("project")),
                     capfirst(gettext("contact person")),
                     capfirst(gettext("type")),
                     capfirst(gettext("closed on")),
                 ]
                 yield from (
-                    all_values(invoice)
-                    + [
+                    [
+                        *all_values(invoice),
                         invoice.project.title if invoice.project else None,
                         invoice.project.owned_by if invoice.project else None,
                         invoice.project.get_type_display() if invoice.project else None,
@@ -117,6 +118,7 @@ class InvoiceSearchForm(Form):
                 )
 
             return StreamingCSVResponse(generate(), filename="invoices.csv")
+        return None
 
 
 class InvoiceForm(PostalAddressSelectionForm):

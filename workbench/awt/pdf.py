@@ -61,7 +61,7 @@ def user_stats_pdf(data):
         awt_columns = [9.5 * mm for i in range(12)]
         awt_columns.append(12 * mm)
         awt_columns.insert(0, pdf.bounds.E - pdf.bounds.W - sum(awt_columns))
-        awt_table_style = pdf.style.tableHead + (("TOPPADDING", (0, 1), (-1, -1), 3),)
+        awt_table_style = (*pdf.style.tableHead, ("TOPPADDING", (0, 1), (-1, -1), 3))
 
         pdf.h1(data["user"])
         pdf.spacer(1 * mm)
@@ -69,33 +69,28 @@ def user_stats_pdf(data):
         pdf.spacer(3 * mm)
 
         table = []
-        table.append(
-            [data["months"]["year"]]
-            + [date_format(day, "M") for day in data["months"]["months"]]
-            + [_("Total")]
-        )
-
-        table.append(
-            [_("target days for full time employment")]
-            + data["months"]["target_days"]
-            + [data["totals"]["target_days"]]
-        )
-        table.append(
-            [_("pensum")]
-            + ["%.0f%%" % p for p in data["months"]["percentage"]]
-            + ["%.0f%%" % data["totals"]["percentage"]]
-        )
-        table.append(
-            [_("vacation days available")]
-            + [
-                "-" if value is None else days(value)
-                for value in data["months"]["available_vacation_days"]
-            ]
-            + [
-                "({})".format(days(data["totals"]["calculated_vacation_days"]))
-                if data["totals"]["vacation_days_override"]
-                else days(data["totals"]["calculated_vacation_days"])
-            ]
+        table.extend(
+            (
+                [data["months"]["year"]]
+                + [date_format(day, "M") for day in data["months"]["months"]]
+                + [_("Total")],
+                [_("target days for full time employment")]
+                + data["months"]["target_days"]
+                + [data["totals"]["target_days"]],
+                [_("pensum")]
+                + ["%.0f%%" % p for p in data["months"]["percentage"]]
+                + ["%.0f%%" % data["totals"]["percentage"]],
+                [_("vacation days available")]
+                + [
+                    "-" if value is None else days(value)
+                    for value in data["months"]["available_vacation_days"]
+                ]
+                + [
+                    "({})".format(days(data["totals"]["calculated_vacation_days"]))
+                    if data["totals"]["vacation_days_override"]
+                    else days(data["totals"]["calculated_vacation_days"])
+                ],
+            )
         )
         if override := data["totals"]["vacation_days_override"]:
             table.append(
@@ -106,31 +101,29 @@ def user_stats_pdf(data):
                     days(data["totals"]["available_vacation_days"]),
                 ]
             )
-        table.append(
-            [
-                "{} ({})".format(
-                    _("target time"),
-                    data["months"]["year"].pretty_working_time_per_day,
-                )
-            ]
-            + [hours(value) for value in data["months"]["target"]]
-            + [hours(data["totals"]["target"])]
-        )
-        table.append(
-            [_("vacation days taken")]
-            + [
-                days(value) if value else ""
-                for value in data["months"]["absence_vacation"]
-            ]
-            + [days(data["totals"]["absence_vacation"])]
-        )
-        table.append(
-            [_("sickness days")]
-            + [
-                days(value) if value else ""
-                for value in data["months"]["absence_sickness"]
-            ]
-            + [days(data["totals"]["absence_sickness"])]
+        table.extend(
+            (
+                [
+                    "{} ({})".format(
+                        _("target time"),
+                        data["months"]["year"].pretty_working_time_per_day,
+                    )
+                ]
+                + [hours(value) for value in data["months"]["target"]]
+                + [hours(data["totals"]["target"])],
+                [_("vacation days taken")]
+                + [
+                    days(value) if value else ""
+                    for value in data["months"]["absence_vacation"]
+                ]
+                + [days(data["totals"]["absence_vacation"])],
+                [_("sickness days")]
+                + [
+                    days(value) if value else ""
+                    for value in data["months"]["absence_sickness"]
+                ]
+                + [days(data["totals"]["absence_sickness"])],
+            )
         )
         if data["totals"]["absence_paid"]:
             table.append(
@@ -159,25 +152,21 @@ def user_stats_pdf(data):
                 ]
                 + [days(data["totals"]["vacation_days_correction"])]
             )
-        table.append(
-            [_("countable absence hours")]
-            + [hours(value) if value else "" for value in data["absences_time"]]
-            + [hours(data["totals"]["absences_time"])]
-        )
-        table.append(
-            [_("logged hours")]
-            + [hours(value) if value else "" for value in data["months"]["hours"]]
-            + [hours(data["totals"]["hours"])]
-        )
-        table.append(
-            [_("working time")]
-            + [hours(value) if value else "" for value in data["working_time"]]
-            + [hours(data["totals"]["working_time"])]
-        )
-        table.append(
-            [_("net work hours per month")]
-            + [hours(value) for value in data["monthly_sums"]]
-            + [""]
+        table.extend(
+            (
+                [_("countable absence hours")]
+                + [hours(value) if value else "" for value in data["absences_time"]]
+                + [hours(data["totals"]["absences_time"])],
+                [_("logged hours")]
+                + [hours(value) if value else "" for value in data["months"]["hours"]]
+                + [hours(data["totals"]["hours"])],
+                [_("working time")]
+                + [hours(value) if value else "" for value in data["working_time"]]
+                + [hours(data["totals"]["working_time"])],
+                [_("net work hours per month")]
+                + [hours(value) for value in data["monthly_sums"]]
+                + [""],
+            )
         )
 
         pdf.table(table, awt_columns, awt_table_style)
@@ -202,7 +191,7 @@ def user_stats_pdf(data):
         pdf.table(
             table,
             awt_columns,
-            awt_table_style + (("FONT", (0, 0), (-1, 0), "Rep", pdf.style.fontSize),),
+            (*awt_table_style, ("FONT", (0, 0), (-1, 0), "Rep", pdf.style.fontSize)),
         )
         pdf.spacer()
 
@@ -219,10 +208,12 @@ def user_stats_pdf(data):
 
         if table:
             pdf.table(
-                [[_("employment"), _("percentage"), _("vacation weeks"), _("notes")]]
-                + table,
+                [
+                    [_("employment"), _("percentage"), _("vacation weeks"), _("notes")],
+                    *table,
+                ],
                 pdf.table_columns((35 * mm, 15 * mm, 20 * mm, None)),
-                awt_table_style + (("ALIGN", (0, 0), (-1, -1), "LEFT"),),
+                (*awt_table_style, ("ALIGN", (0, 0), (-1, -1), "LEFT")),
             )
             pdf.spacer()
 
@@ -238,9 +229,9 @@ def user_stats_pdf(data):
             ]
             if table:
                 pdf.table(
-                    [[reason, "", ""]] + table,
+                    [[reason, "", ""], *table],
                     pdf.table_columns((35 * mm, 15 * mm, None)),
-                    awt_table_style + (("ALIGN", (0, 0), (-1, -1), "LEFT"),),
+                    (*awt_table_style, ("ALIGN", (0, 0), (-1, -1), "LEFT")),
                 )
                 pdf.spacer()
 

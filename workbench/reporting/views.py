@@ -472,30 +472,26 @@ class DateRangeAndTeamFilterForm(DateRangeFilterForm):
         super().__init__(*args, **kwargs)
 
         self.fields["team"] = forms.TypedChoiceField(
-            choices=[("", _("Everyone"))]
-            + [
+            choices=[
+                ("", _("Everyone")),
                 [
                     capfirst(Team._meta.verbose_name_plural),
                     [(team.id, str(team)) for team in Team.objects.all()],
-                ]
-            ]
-            + [
+                ],
                 [
                     capfirst(_("users")),
                     [
                         (-user.id, str(user))
                         for user in User.objects.filter(is_active=True)
                     ],
-                ]
-            ]
-            + [
+                ],
                 [
                     _("Inactive users"),
                     [
                         (-user.id, str(user))
                         for user in User.objects.filter(is_active=False)
                     ],
-                ]
+                ],
             ],
             label=capfirst(Team._meta.verbose_name),
             required=False,

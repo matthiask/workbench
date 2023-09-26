@@ -78,6 +78,7 @@ class LoggedHours(Model):
             return cls.urls["list"] + "?project={}".format(
                 instance.service.project_id if instance else ""
             )
+        return None
 
 
 class LoggedCostQuerySet(SearchQuerySet):
@@ -168,6 +169,7 @@ class LoggedCost(Model):
             return cls.urls["list"] + "?project={}".format(
                 instance.service.project_id if instance else ""
             )
+        return None
 
     def clean_fields(self, exclude):
         super().clean_fields(exclude)

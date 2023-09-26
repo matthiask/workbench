@@ -130,7 +130,7 @@ def hours_per_type(date_range, *, users=None):
     users = [_user(u, row) for u, row in sorted(hours.items())]
 
     return {
-        "types": [external_type] + internal_types,
+        "types": [external_type, *internal_types],
         "users": users,
         "total": {
             "internal": sum((row["internal"] for row in users), Z1),

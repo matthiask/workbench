@@ -295,7 +295,7 @@ select max(created_at) from sq
                 """,
                 [dt.date.today(), self.id, self.id, self.id, self.id],
             )
-            return list(cursor)[0][0]
+            return next(iter(cursor))[0]
 
     @cached_property
     def hours_since_latest(self):

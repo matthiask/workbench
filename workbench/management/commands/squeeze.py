@@ -176,8 +176,8 @@ class Command(BaseCommand):
                 _("logged hours"),
                 _("relevant hours"),
                 _("rate"),
-            ]
-            + list(chain.from_iterable((str(u), "") for u in all_users)),
+                *list(chain.from_iterable((str(u), "") for u in all_users)),
+            ],
             [
                 "",
                 "",
@@ -188,15 +188,18 @@ class Command(BaseCommand):
                 "",
                 "",
                 "",
-            ]
-            + list(
-                chain.from_iterable((_("hours"), _("gross margin")) for _u in all_users)
+                *list(
+                    chain.from_iterable(
+                        (_("hours"), _("gross margin")) for _u in all_users
+                    )
+                ),
+            ],
+            *sorted(
+                (project_row(row, all_users, users=users) for row in projects.values()),
+                key=lambda row: row[4],
+                reverse=True,
             ),
-        ] + sorted(
-            (project_row(row, all_users, users=users) for row in projects.values()),
-            key=lambda row: row[4],
-            reverse=True,
-        )
+        ]
 
         hpt = hours_per_type(date_range, users=users.keys())
         hptu = {row["user"]: row for row in hpt["users"]}
@@ -288,36 +291,37 @@ class Command(BaseCommand):
                 _("Delta"),
             ],
             [],
-        ] + sorted(
-            (
-                [
-                    user,
-                    user.specialist_field.name
-                    if user.specialist_field
-                    else _("<unknown>"),
-                    average_percentage(user),
-                    row["margin"],
-                    row["hours_in_range"],
-                    row["margin"] / row["hours_in_range"],
-                    "",
-                    hptu[user]["internal"],
-                    hptu[user]["external"],
-                    hptu[user]["total"],
-                    "",
-                    row["margin"]
-                    / row["hours_in_range"]
-                    / (1 - hptu[user]["internal"] / hptu[user]["total"])
-                    if hptu[user]["external"]
-                    else 0,
-                    "",
-                    100,
-                ]
-                + user_expectation(user, row, average_percentage(user))
-                for user, row in users.items()
+            *sorted(
+                (
+                    [
+                        user,
+                        user.specialist_field.name
+                        if user.specialist_field
+                        else _("<unknown>"),
+                        average_percentage(user),
+                        row["margin"],
+                        row["hours_in_range"],
+                        row["margin"] / row["hours_in_range"],
+                        "",
+                        hptu[user]["internal"],
+                        hptu[user]["external"],
+                        hptu[user]["total"],
+                        "",
+                        row["margin"]
+                        / row["hours_in_range"]
+                        / (1 - hptu[user]["internal"] / hptu[user]["total"])
+                        if hptu[user]["external"]
+                        else 0,
+                        "",
+                        100,
+                        *user_expectation(user, row, average_percentage(user)),
+                    ]
+                    for user, row in users.items()
+                ),
+                key=lambda row: row[-1],
+                reverse=True,
             ),
-            key=lambda row: row[-1],
-            reverse=True,
-        )
+        ]
 
         fields = defaultdict(lambda: {"margin": Z2, "hours_in_range": Z1, "names": []})
         for user, row in users.items():
@@ -335,23 +339,24 @@ class Command(BaseCommand):
                 _("relevant gross margin"),
                 _("relevant hours"),
                 _("rate"),
-            ]
-        ] + sorted(
-            (
-                [
-                    name,
-                    ", ".join(sorted(row["names"])),
-                    row["margin"],
-                    row["hours_in_range"],
-                    row["margin"] / row["hours_in_range"]
-                    if row["hours_in_range"]
-                    else 0,
-                ]
-                for name, row in fields.items()
+            ],
+            *sorted(
+                (
+                    [
+                        name,
+                        ", ".join(sorted(row["names"])),
+                        row["margin"],
+                        row["hours_in_range"],
+                        row["margin"] / row["hours_in_range"]
+                        if row["hours_in_range"]
+                        else 0,
+                    ]
+                    for name, row in fields.items()
+                ),
+                key=lambda row: row[-1],
+                reverse=True,
             ),
-            key=lambda row: row[-1],
-            reverse=True,
-        )
+        ]
 
         xlsx = WorkbenchXLSXDocument()
         xlsx.add_sheet(_("users").replace(":", "_"))
@@ -403,4 +408,5 @@ def project_row(row, all_users, *, users):
         row["hours_logged"],
         hours,
         margin / hours,
-    ] + list(chain.from_iterable(user_cells(u) for u in all_users))
+        *list(chain.from_iterable(user_cells(u) for u in all_users)),
+    ]

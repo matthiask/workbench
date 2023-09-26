@@ -61,8 +61,10 @@ class BootstrapFieldWrapper(FieldWrapper):
                     attrs=({"class": " ".join(extra_classes + extra_label_classes)}),
                 ),
                 "css_classes": self.field.css_classes(
-                    extra_classes=extra_classes
-                    + [f"widget--{self.field.field.widget.__class__.__name__.lower()}"]
+                    extra_classes=[
+                        *extra_classes,
+                        f"widget--{self.field.field.widget.__class__.__name__.lower()}",
+                    ]
                 ),
             },
         )

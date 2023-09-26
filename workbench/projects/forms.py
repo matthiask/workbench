@@ -189,7 +189,7 @@ class ProjectSearchForm(Form):
         label="",
     )
     type = forms.ChoiceField(
-        choices=[("", _("All types"))] + Project.TYPE_CHOICES,
+        choices=[("", _("All types")), *Project.TYPE_CHOICES],
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
         label="",

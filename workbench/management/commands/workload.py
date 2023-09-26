@@ -102,18 +102,19 @@ class Command(BaseCommand):
                     )
 
         user_table = [
-            [_("user"), _("specialist field")]
-            + chainify([week, "", "", ""] for week in weeks),
-            ["", ""]
-            + chainify(
-                [
-                    _("workload"),
-                    _("external"),
-                    _("internal"),
-                    _("absences"),
-                ]
-                for week in weeks
-            ),
+            [
+                _("user"),
+                _("specialist field"),
+                *chainify([week, "", "", ""] for week in weeks),
+            ],
+            [
+                "",
+                "",
+                *chainify(
+                    [_("workload"), _("external"), _("internal"), _("absences")]
+                    for week in weeks
+                ),
+            ],
         ]
 
         def _user_week_workload(week, user):
@@ -133,23 +134,24 @@ class Command(BaseCommand):
                 [
                     user,
                     user.specialist_field,
+                    *chainify(_user_week_workload(week, user) for week in weeks),
                 ]
-                + chainify(_user_week_workload(week, user) for week in weeks)
             )
 
         sf_table = [
-            [_("specialist field"), _("users")]
-            + chainify([week, "", "", ""] for week in weeks),
-            ["", ""]
-            + chainify(
-                [
-                    _("workload"),
-                    _("external"),
-                    _("internal"),
-                    _("absences"),
-                ]
-                for week in weeks
-            ),
+            [
+                _("specialist field"),
+                _("users"),
+                *chainify([week, "", "", ""] for week in weeks),
+            ],
+            [
+                "",
+                "",
+                *chainify(
+                    [_("workload"), _("external"), _("internal"), _("absences")]
+                    for week in weeks
+                ),
+            ],
         ]
 
         def _sf_week_workload(week, sf, users):
@@ -173,8 +175,8 @@ class Command(BaseCommand):
                 [
                     sf,
                     ", ".join(str(u) for u in users),
+                    *chainify(_sf_week_workload(week, sf, users) for week in weeks),
                 ]
-                + chainify(_sf_week_workload(week, sf, users) for week in weeks)
             )
 
         xlsx = WorkbenchXLSXDocument()

@@ -663,7 +663,7 @@ SELECT MIN(week), MAX(week) FROM sq
             """,
             [project.id, project.id],
         )
-        result = list(cursor)[0]
+        result = next(iter(cursor))
 
     if result[0]:
         result = (
@@ -825,7 +825,7 @@ SELECT MIN(week), MAX(week) FROM sq
             """,
             [projects_ids, projects_ids],
         )
-        result = list(cursor)[0]
+        result = next(iter(cursor))
 
     if result[0]:
         result = (min(result[0], monday() - dt.timedelta(days=14)), result[1])

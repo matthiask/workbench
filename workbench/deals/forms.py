@@ -121,6 +121,7 @@ class DealSearchForm(Form):
                 )
             xlsx.table_from_queryset(queryset, additional=additional)
             return xlsx.to_response("deals.xlsx")
+        return None
 
 
 def warn_if_not_in_preparation(form):

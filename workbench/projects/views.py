@@ -142,27 +142,18 @@ def cost_by_month_and_service_xlsx(request, pk):
     months = sorted(months)
 
     rows = []
-    rows.append(
-        [
-            _("Cost by month and service"),
-        ]
+    rows.extend(
+        (
+            [_("Cost by month and service")],
+            ["", _("cost"), "", _("cost")]
+            + [local_date_format(month, fmt="F Y") for month in months],
+            [_("project")],
+            [project, sum(project_costs.values()), "", ""]
+            + [project_costs.get(month) for month in months],
+            [],
+            [_("offer or service group"), "", _("service"), ""],
+        )
     )
-    rows.append(
-        ["", _("cost"), "", _("cost")]
-        + [local_date_format(month, fmt="F Y") for month in months]
-    )
-    rows.append([_("project")])
-    rows.append(
-        [
-            project,
-            sum(project_costs.values()),
-            "",
-            "",
-        ]
-        + [project_costs.get(month) for month in months]
-    )
-    rows.append([])
-    rows.append([_("offer or service group"), "", _("service"), ""] + [])
 
     for offer, services in sorted(offers.items()):
         rows.append(

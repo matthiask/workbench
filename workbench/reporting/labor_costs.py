@@ -56,7 +56,7 @@ USER_KEYS = [
     "costs",
     "costs_with_green_hours_target",
 ]
-PROJECT_KEYS = USER_KEYS + ["third_party_costs", "revenue"]
+PROJECT_KEYS = [*USER_KEYS, "third_party_costs", "revenue"]
 
 
 def _labor_costs_by_project_id(date_range, *, project=None, cost_center=None):

@@ -29,7 +29,7 @@ class AbsenceSearchForm(Form):
     reason = forms.ChoiceField(
         required=False,
         widget=forms.Select(attrs={"class": "custom-select"}),
-        choices=[("", _("All reasons"))] + Absence.REASON_CHOICES,
+        choices=[("", _("All reasons")), *Absence.REASON_CHOICES],
         label="",
     )
 
@@ -58,6 +58,7 @@ class AbsenceSearchForm(Form):
             xlsx = WorkbenchXLSXDocument()
             xlsx.table_from_queryset(queryset)
             return xlsx.to_response("absences.xlsx")
+        return None
 
 
 @add_prefix("modal")
