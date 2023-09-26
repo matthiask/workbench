@@ -26,11 +26,10 @@ class UserUpdateView(UpdateView):
     def get_object(self):
         if self.request.user.is_authenticated:
             return self.request.user
-        elif "user_email" in self.request.session:
+        if "user_email" in self.request.session:
             email = self.request.session["user_email"]
             return User(email=email, _short_name=email.split("@")[0])
-        else:
-            raise Http404
+        raise Http404
 
     def form_valid(self, form):
         response = HttpResponseRedirect(self.get_success_url())
@@ -48,6 +47,15 @@ class UserUpdateView(UpdateView):
 
 @never_cache
 def login(request):
+    if (
+        settings.DEBUG
+        and not settings.LIVE
+        and (email := request.GET.get("force_login"))
+    ):
+        user = auth.authenticate(request, email=email)
+        if user:
+            auth.login(request, user)
+            return redirect("/")
     if request.user.is_authenticated:
         return redirect("/")
     return render(
@@ -87,7 +95,7 @@ def oauth2(request):
         response.set_cookie("login_hint", user.email, expires=180 * 86400)
         return response
 
-    elif User.objects.filter(email=email).exists():
+    if User.objects.filter(email=email).exists():
         messages.error(
             request, _("The user with email address %s is inactive.") % email
         )
@@ -95,16 +103,15 @@ def oauth2(request):
         response.delete_cookie("login_hint")
         return response
 
-    elif email.endswith("@%s" % settings.WORKBENCH.SSO_DOMAIN):
+    if email.endswith("@%s" % settings.WORKBENCH.SSO_DOMAIN):
         messages.info(request, _("Welcome! Please fill in your details."))
         request.session["user_email"] = email
         return redirect("accounts_update")
 
-    else:
-        messages.error(request, _("No user with email address %s found.") % email)
-        response = HttpResponseRedirect("{}?error=1".format(reverse("login")))
-        response.delete_cookie("login_hint")
-        return response
+    messages.error(request, _("No user with email address %s found.") % email)
+    response = HttpResponseRedirect("{}?error=1".format(reverse("login")))
+    response.delete_cookie("login_hint")
+    return response
 
 
 def logout(request):
