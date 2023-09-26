@@ -152,8 +152,6 @@ class CalendarFilterForm(Form):
 
     def cutoff(self):
         year = self.cleaned_data["year"]
-
-        if year == "":
+        if not year:
             return monday() - dt.timedelta(days=7)
-        else:
-            return monday(dt.date(int(year), 1, 1))
+        return monday(dt.date(int(year), 1, 1))

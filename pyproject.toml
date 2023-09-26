@@ -81,10 +81,9 @@ max-complexity = 15
   # No boolean trap in function definitions in the fabfile
   "FBT002",
 ]
-"conf/*" = [
-  # Allow Python files in conf/ without __init__
-  "INP",
-]
+# Allow Python files in conf/ and scripts/ without __init__
+"conf/*" = ["INP"]
+"scripts/*" = ["INP"]
 
 [tool.coverage.run]
 branch = true

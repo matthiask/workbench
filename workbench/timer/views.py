@@ -43,8 +43,8 @@ class TokenUserMixin:
                     token=self.request.POST.get("token")
                     or self.request.GET.get("token")
                 )
-            except Exception:
-                raise forms.ValidationError("Invalid user")
+            except Exception as exc:
+                raise forms.ValidationError("Invalid user") from exc
         return data
 
 

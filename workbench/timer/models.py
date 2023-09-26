@@ -24,18 +24,18 @@ class Slice(dict):
 
     @property
     def elapsed_hours(self):
-        if self.get("logged_hours"):
-            return self["logged_hours"].hours
-        elif self.get("logged_break"):
-            seconds = self["logged_break"].timedelta.total_seconds()
+        if obj := self.get("logged_hours"):
+            return obj.hours
+        if obj := self.get("logged_break"):
+            seconds = obj.timedelta.total_seconds()
         elif (
             (d := self["description"])
             and isinstance(d, str)
             and (match := re.match(r"^([0-9]+(\.[0-9])?h) ", d))
         ):
             return Decimal(match.group(1).removesuffix("h"))
-        elif self.get("starts_at") and self.get("ends_at"):
-            seconds = (self["ends_at"] - self["starts_at"]).total_seconds()
+        elif (start := self.get("starts_at")) and (end := self.get("ends_at")):
+            seconds = (end - start).total_seconds()
         elif not self.get("starts_at") and self.get("ends_at"):
             # STOP only; no way to prefill a nonzero elapsed hours value
             return Decimal(0)
@@ -223,12 +223,11 @@ class TimestampQuerySet(models.QuerySet):
                     previous = slice
                     continue
 
-                else:
-                    gap = (slice["starts_at"] - previous["starts_at"]).total_seconds()
-                    if gap <= TIMESTAMPS_DETECT_GAP:
-                        result[-1] = slice
-                        previous = slice
-                        continue
+                gap = (slice["starts_at"] - previous["starts_at"]).total_seconds()
+                if gap <= TIMESTAMPS_DETECT_GAP:
+                    result[-1] = slice
+                    previous = slice
+                    continue
 
             if slice.get("starts_at") and previous.get("ends_at"):
                 gap = (slice["starts_at"] - previous["ends_at"]).total_seconds()
