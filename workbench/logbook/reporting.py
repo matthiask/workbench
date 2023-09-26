@@ -9,16 +9,13 @@ from workbench.tools.formats import Z1, days, hours
 
 def classify_logging_delay(delay):
     explanation = _("Average logging time is %s after noon.") % hours(delay)
-
-    if delay < 3:
-        return _("Promptly"), "success", explanation
-    elif delay < 8:
-        return _("Same day"), "light", explanation
-    elif delay < 30:
-        return _("Next day"), "caveat", explanation
+    if delay < 8:
+        return _("Same day"), "success", explanation
+    if delay < 30:
+        return _("Next day"), "light", explanation
 
     explanation = _("Average logging delay is %s.") % days(delay / 24)
-    return _("Late"), "danger", explanation
+    return _("Late"), "caveat", explanation
 
 
 def mean_logging_delay(date_range):
