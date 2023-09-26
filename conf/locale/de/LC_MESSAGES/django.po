@@ -4060,7 +4060,7 @@ msgstr "8.1% (2024 und weiter)"
 
 #: workbench/tools/models.py
 msgid "7.7% (until the end of 2023)"
-msgstr "(7.7% (bis Ende 2023)"
+msgstr "7.7% (bis Ende 2023)"
 
 #: workbench/tools/models.py
 msgid "show service details"
