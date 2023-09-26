@@ -4064,7 +4064,7 @@ msgstr "MwSt.-Satz"
 
 #: workbench/tools/models.py
 msgid "8.1% (2024 and onwards)"
-msgstr "8.1% (2024 und weiter)"
+msgstr "8.1% (ab 2024)"
 
 #: workbench/tools/models.py
 msgid "7.7% (until the end of 2023)"
