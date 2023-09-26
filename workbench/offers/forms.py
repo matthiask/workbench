@@ -239,9 +239,6 @@ class OfferPricingForm(ModelForm):
             "subtotal",
             "discount",
             "total_excl_tax",
-            "liable_to_vat",
-            "tax_rate",
-            "total",
         )
 
     def __init__(self, *args, **kwargs):
@@ -250,7 +247,6 @@ class OfferPricingForm(ModelForm):
 
         self.fields["subtotal"].disabled = True
         self.fields["total_excl_tax"].disabled = True
-        self.fields["total"].disabled = True
 
         kwargs.pop("request")
         self.formsets = (

@@ -475,13 +475,10 @@ function initWidgets() {
       })
 
       const discount = read("#id_discount")
-      const liableToVat = document.querySelector("#id_liable_to_vat").checked
       const totalExclTax = offerCost - discount
-      const total = totalExclTax * (liableToVat ? 1.081 : 1)
 
       write("#id_subtotal", offerCost)
       write("#id_total_excl_tax", totalExclTax)
-      write("#id_total", total)
     }
 
     recalculate()
