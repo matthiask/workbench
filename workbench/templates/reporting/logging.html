@@ -34,7 +34,7 @@
               <td class="text-right">{{ row.logged_hours_stats.count }}</td>
               <td class="text-right">{{ row.logged_hours_stats.sum|hours }}</td>
               <td class="text-right">{{ row.logged_hours_stats.avg|stringformat:'.2f' }}h</td>
-              <td class="text-right">
+              <td class="text-right {% if row.insufficient_breaks.danger %}text-danger font-weight-bold{% endif %}">
                 {{ row.insufficient_breaks.days }} / {{ row.insufficient_breaks.of }}
                 {% pie row.insufficient_breaks.days row.insufficient_breaks.of %}
               </td>

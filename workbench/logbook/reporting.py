@@ -115,7 +115,14 @@ group by user_id
             [*date_range, *date_range],
         )
 
-        return {user_id: {"days": days, "of": of} for user_id, of, days in cursor}
+        return {
+            user_id: {
+                "days": days,
+                "of": of,
+                "danger": days / of > 0.2 if of else False,
+            }
+            for user_id, of, days in cursor
+        }
 
 
 def logbook_stats(date_range):
