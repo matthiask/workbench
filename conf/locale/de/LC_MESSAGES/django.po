@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-31 16:50+0200\n"
+"POT-Creation-Date: 2023-09-26 10:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1661,6 +1661,14 @@ msgstr "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Rechnung wurde
 #: workbench/invoices/forms.py
 msgid "You are canceling this invoice. If clients are still expected to pay for services rendered and this invoice hasn't been sent to bookkeeping already it may be better to delete the invoice and start anew."
 msgstr "Du stornierst diese Rechnung. Wenn die Kundschaft die Leistungen immer noch bezahlen sollte und diese Rechnung noch nicht an die Buchhaltung übermittelt wurde, könnte es besser sein, die Rechnung zu löschen und nochmals neu zu beginnen."
+
+#: workbench/invoices/forms.py
+msgid "Are you sure the tax rate is correct? The service period extends into 2024 but you have selected the old tax rate."
+msgstr "Bist Du sicher, dass der MwSt.-Satz korrekt ist? Der Zeitraum der Leistungserbringung reicht ins 2024 aber Du hast den alten MwSt.-Satz gewählt."
+
+#: workbench/invoices/forms.py
+msgid "Are you sure the tax rate is correct? The service period ends before 2024 but you have selected the new tax rate."
+msgstr "Bist Du sicher, dass der MwSt.-Satz korrekt ist? Der Zeitraum der Leistungserbringung endet vor 2024 aber Du hast den neuen MwSt.-Satz gewählt."
 
 #: workbench/invoices/forms.py
 msgid "This project already has an invoice in preparation."

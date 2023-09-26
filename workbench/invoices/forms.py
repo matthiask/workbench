@@ -1,4 +1,5 @@
 import datetime as dt
+from decimal import Decimal
 
 from django import forms
 from django.conf import settings
@@ -360,6 +361,30 @@ class InvoiceForm(PostalAddressSelectionForm):
                 code="discourage-cancellations",
             )
 
+        if (
+            data.get("liable_to_vat")
+            and (tax_rate := data["tax_rate"])
+            and (service_period_until := data.get("service_period_until"))
+        ):
+            if service_period_until >= dt.date(2024, 1, 1) and tax_rate == Decimal(
+                "7.70"
+            ):
+                self.add_warning(
+                    _(
+                        "Are you sure the tax rate is correct? The service period extends into 2024 but you have selected the old tax rate."
+                    ),
+                    code="tax-rate",
+                )
+            if service_period_until < dt.date(2024, 1, 1) and tax_rate == Decimal(
+                "8.10"
+            ):
+                self.add_warning(
+                    _(
+                        "Are you sure the tax rate is correct? The service period ends before 2024 but you have selected the new tax rate."
+                    ),
+                    code="tax-rate",
+                )
+
         return data
 
     def save(self):
@@ -447,7 +472,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
             def amount(row):
                 if row["service"].effort_rate is not None:
                     return currency(row["not_archived"])
-                elif row["logged_hours"]:
+                if row["logged_hours"]:
                     return format_html(
                         '{} <small class="bg-warning px-1">{}</small>',
                         currency(row["not_archived"]),
@@ -720,7 +745,7 @@ class RecurringInvoiceSearchForm(Form):
     def filter(self, queryset):
         data = self.cleaned_data
         queryset = queryset.search(data.get("q"))
-        if data.get("s") == "":
+        if not data.get("s"):
             queryset = queryset.open()
         elif data.get("s") == "closed":
             queryset = queryset.closed()
