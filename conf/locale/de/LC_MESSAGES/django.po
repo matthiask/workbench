@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-26 10:57+0200\n"
+"POT-Creation-Date: 2023-10-02 17:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2077,6 +2077,10 @@ msgid "That's too far in the future."
 msgstr "Datum zu weit in der Zukunft."
 
 #: workbench/logbook/forms.py
+msgid "Logging (too) early is certainly better than logging (too) late, but are you sure this is correct?"
+msgstr "(Zu) früh erfassen ist sicher besser als (zu) spät, aber bist Du sicher, dass das korrekt ist?"
+
+#: workbench/logbook/forms.py
 msgid "You are a bit late. Please try logging your hours immediately upon finishing work."
 msgstr "Du bist ein bisschen spät dran. Bitte versuche, deine Arbeitsstunden direkt nach Arbeitserledigung zu erfassen."
 
@@ -2201,10 +2205,6 @@ msgstr "Es ist nicht erlaubt, Pausen anderer Nutzer:innen zu ändern."
 #, python-format
 msgid "Average logging time is %s after noon."
 msgstr "Durchschnittliche Erfassungszeit ist %s nach dem Mittag."
-
-#: workbench/logbook/reporting.py
-msgid "Promptly"
-msgstr "Zeitnah"
 
 #: workbench/logbook/reporting.py
 msgid "Same day"
@@ -4157,3 +4157,6 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Promptly"
+#~ msgstr "Zeitnah"

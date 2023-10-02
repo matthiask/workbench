@@ -457,6 +457,13 @@ class LoggedHoursForm(ModelForm):
                 errors["rendered_on"] = _("Hours have to be logged in the same week.")
             elif data["rendered_on"] > in_days(7):
                 errors["rendered_on"] = _("That's too far in the future.")
+            elif data["rendered_on"] > in_days(1):
+                self.add_warning(
+                    _(
+                        "Logging (too) early is certainly better than logging (too) late, but are you sure this is correct?"
+                    ),
+                    code="maybe-too-early",
+                )
 
             if data["rendered_by"].features[
                 FEATURES.LATE_LOGGING_NAG
