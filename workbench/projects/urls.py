@@ -48,6 +48,10 @@ def autocomplete_filter(*, request, queryset):
     )
 
 
+def service_autocomplete_filter(*, request, queryset):
+    return queryset.logging() if request.GET.get("logging") else queryset
+
+
 urlpatterns = [
     path("offers/", include("workbench.offers.urls")),
     # Campaigns
@@ -280,6 +284,7 @@ urlpatterns = [
             queryset=Service.objects.filter(
                 project__closed_on__isnull=True
             ).select_related("project__owned_by"),
+            filter=service_autocomplete_filter,
             label_from_instance=lambda service: f"{service} ({service.project})",
         ),
         name="projects_service_autocomplete",

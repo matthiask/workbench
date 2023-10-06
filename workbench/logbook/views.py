@@ -8,7 +8,9 @@ from workbench.templatetags.workbench import h
 def create(request, *, viewname):
     if not request.is_ajax():
         return redirect("/")
-    form = ProjectAutocompleteForm(request.POST if request.method == "POST" else None)
+    form = ProjectAutocompleteForm(
+        request.POST if request.method == "POST" else None, logging=True
+    )
     params = request.GET.urlencode()
     if form.is_valid():
         if form.cleaned_data["service"]:

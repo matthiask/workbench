@@ -576,12 +576,18 @@ class ProjectAutocompleteForm(forms.Form):
         label="",
         required=False,
     )
-    service = forms.ModelChoiceField(
-        queryset=Service.objects.all(),
-        widget=Autocomplete(model=Service),
-        label="",
-        required=False,
-    )
+
+    def __init__(self, *args, **kwargs):
+        logging = kwargs.pop("logging", False)
+        super().__init__(*args, **kwargs)
+        self.fields["service"] = forms.ModelChoiceField(
+            queryset=Service.objects.all(),
+            widget=Autocomplete(
+                model=Service, params={"logging": "on" if logging else ""}
+            ),
+            label="",
+            required=False,
+        )
 
     def clean(self):
         data = super().clean()
