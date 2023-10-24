@@ -137,9 +137,19 @@ def hours_per_type(date_range, *, users=None):
             "external": sum((row["external"] for row in users), Z1),
             "total": sum((row["total"] for row in users), Z1),
         },
-        "overall": [sum((row["total_hours_per_type"][0] for row in users), Z1)]
+        "overall": [
+            {
+                "hours": sum((row["total_hours_per_type"][0] for row in users), Z1),
+                "url": _logbook_url(internal_type=-1),
+            }
+        ]
         + [
-            sum((row["total_hours_per_type"][type.id] for row in users), Z1)
+            {
+                "hours": sum(
+                    (row["total_hours_per_type"][type.id] for row in users), Z1
+                ),
+                "url": _logbook_url(internal_type=type.id),
+            }
             for type in internal_types
         ],
         "logbook_url": "{}{}".format(
