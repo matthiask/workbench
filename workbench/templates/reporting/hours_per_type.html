@@ -60,7 +60,7 @@
     <tfoot>
       <tr>
         <th>{% translate 'Total' %}</th>
-        <th class="text-right">{{ stats.total.total|hours }}</th>
+        <th class="text-right"><a href="{{ stats.logbook_url }}">{{ stats.total.total|hours }}</a></th>
         {% for row in stats.overall %}
           <th class="text-right"><a href="{{ row.url }}">{{ row.hours|hours }}</a></th>
           <th class="text-right" colspan="2">{% percentage row.hours stats.total.total %}</th>
