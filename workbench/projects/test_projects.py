@@ -536,7 +536,14 @@ class ProjectsTest(TestCase):
     def test_add_flat_rate_to_existing_project(self):
         """Adding a flat rate to a project with services warns about
         overridding their effort rate"""
-        project = factories.ServiceFactory.create().project
+        service = factories.ServiceFactory.create(
+            effort_type="Hello",
+            effort_rate=200,
+            effort_hours=1,
+        )
+        self.assertEqual(service.service_cost, 200)
+
+        project = service.project
         self.client.force_login(project.owned_by)
 
         response = self.client.post(
@@ -566,9 +573,10 @@ class ProjectsTest(TestCase):
         )
         self.assertRedirects(response, project.urls["detail"])
 
-        service = project.services.get()
+        service.refresh_from_db()
         self.assertEqual(service.effort_rate, 250)
         self.assertEqual(service.effort_type, "Pauschalsatz")
+        self.assertEqual(service.service_cost, 250)
 
     def test_no_flat_rate(self):
         """Uses without CONTROLLING do not see the flat rate field"""

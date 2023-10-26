@@ -397,10 +397,10 @@ class ProjectForm(ModelForm):
         instance = super().save(commit=False)
         if self.instance.pk and self.instance.flat_rate is not None:
             with override(settings.WORKBENCH.PDF_LANGUAGE):
-                self.instance.services.editable().update(
-                    effort_type=gettext("flat rate"),
-                    effort_rate=self.instance.flat_rate,
-                )
+                for service in self.instance.services.editable():
+                    service.effort_type = gettext("flat rate")
+                    service.effort_rate = self.instance.flat_rate
+                    service.save(skip_related_model=True)
         instance.save()
         if "customer" in self.changed_data:
             instance.invoices.update(customer=instance.customer)
