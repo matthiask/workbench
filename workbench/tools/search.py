@@ -65,9 +65,7 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS {table}_fts_trigger ON {table};
 CREATE TRIGGER {table}_fts_trigger BEFORE INSERT OR UPDATE
   ON {table} FOR EACH ROW EXECUTE PROCEDURE {table}_fts();
-""".format(
-        table=table, fields=", ".join(f"new.{field}" for field in fields)
-    )
+""".format(table=table, fields=", ".join(f"new.{field}" for field in fields))
 
 
 def process_query(s):

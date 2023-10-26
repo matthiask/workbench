@@ -1,6 +1,6 @@
 import datetime as dt
 from collections import defaultdict
-from itertools import islice, takewhile
+from itertools import islice, starmap, takewhile
 
 from django.db import connections
 from django.db.models import Q, Sum
@@ -371,10 +371,7 @@ order by ph.date
             sorted(
                 filter(
                     None,
-                    (
-                        self._offer_record(offer, work_list)
-                        for offer, work_list in sorted(offers.items())
-                    ),
+                    starmap(self._offer_record, sorted(offers.items())),
                 ),
                 key=lambda row: (
                     row["offer"]["date_from"],
@@ -579,10 +576,7 @@ on week=ph_week
             "projects_offers": sorted(
                 filter(
                     None,
-                    (
-                        self._project_record(project, offers)
-                        for project, offers in self._projects_offers.items()
-                    ),
+                    starmap(self._project_record, self._projects_offers.items()),
                 ),
                 key=lambda row: (
                     row["project"]["date_from"],

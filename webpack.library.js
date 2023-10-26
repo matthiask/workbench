@@ -51,7 +51,7 @@ module.exports = (PRODUCTION) => {
       presets: [
         [
           "@babel/preset-env",
-          { useBuiltIns: "usage", corejs: "3.25", targets: "defaults" },
+          { useBuiltIns: "usage", corejs: "3.33", targets: "defaults" },
         ],
       ],
       plugins: plugins || [],
@@ -207,6 +207,18 @@ module.exports = (PRODUCTION) => {
           ],
         ],
       })
+    },
+    resolvePreactAsReact() {
+      return {
+        resolve: {
+          alias: {
+            react: "preact/compat",
+            "react-dom/test-utils": "preact/test-utils",
+            "react-dom": "preact/compat", // Must be below test-utils
+            "react/jsx-runtime": "preact/jsx-runtime",
+          },
+        },
+      }
     },
     babelWithReactRule() {
       return babelRule({

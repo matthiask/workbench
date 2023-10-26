@@ -70,7 +70,7 @@ def field_value_pairs(object, fields=None):
             or field.one_to_one
             or field.many_to_many
             or field.primary_key
-            or field.name in {"_fts"}
+            or field.name == "_fts"
             or field.name not in fields
         ):
             continue

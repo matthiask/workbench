@@ -254,7 +254,7 @@ def querystring(params=None, **kwargs):
         sorted(
             (key, value)
             for key, value in dict(params, **kwargs).items()
-            if key not in {"error"} and value
+            if key != "error" and value
         )
     )
     return "?%s" % query

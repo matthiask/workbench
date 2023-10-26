@@ -344,7 +344,7 @@ class SetStatusForm(ModelForm):
         instance.status = int(kwargs["request"].GET.get("status", instance.status))
         if instance.status in {Deal.ACCEPTED, Deal.DECLINED}:
             instance.closed_on = dt.date.today()
-        elif instance.status in {Deal.OPEN}:
+        elif instance.status == Deal.OPEN:
             instance.closed_on = None
             instance.closing_type = None
             instance.closing_notice = ""

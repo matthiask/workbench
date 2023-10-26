@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import starmap
 from types import SimpleNamespace
 
 from django.db.models import Sum
@@ -127,7 +128,7 @@ def hours_per_type(date_range, *, users=None):
             "url": _logbook_url(rendered_by=u.id),
         }
 
-    users = [_user(u, row) for u, row in sorted(hours.items())]
+    users = list(starmap(_user, sorted(hours.items())))
 
     return {
         "types": [external_type, *internal_types],

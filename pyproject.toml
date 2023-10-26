@@ -34,6 +34,8 @@ extend-select = [
   "SLOT",
   # flake8-simplify
   "SIM",
+  # flake8-tidy-imports
+  "TID",
   # flake8-gettext
   "INT",
   # flake8-use-pathlib
@@ -81,9 +83,14 @@ max-complexity = 15
   # No boolean trap in function definitions in the fabfile
   "FBT002",
 ]
-# Allow Python files in conf/ and scripts/ without __init__
-"conf/*" = ["INP"]
-"scripts/*" = ["INP"]
+"conf/*" = [
+  # Allow Python files in conf/ without __init__
+  "INP",
+]
+"scripts/*" = [
+  # Allow Python files in scripts/ without __init__
+  "INP",
+]
 
 [tool.coverage.run]
 branch = true

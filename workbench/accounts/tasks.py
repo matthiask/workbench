@@ -30,11 +30,14 @@ def generate_pairings(users):
 
     while randomized:
         if len(randomized) == 3:
-            yield randomized, [
-                tuple(sorted((randomized[0].id, randomized[1].id))),
-                tuple(sorted((randomized[0].id, randomized[2].id))),
-                tuple(sorted((randomized[1].id, randomized[2].id))),
-            ]
+            yield (
+                randomized,
+                [
+                    tuple(sorted((randomized[0].id, randomized[1].id))),
+                    tuple(sorted((randomized[0].id, randomized[2].id))),
+                    tuple(sorted((randomized[1].id, randomized[2].id))),
+                ],
+            )
             break
 
         else:
