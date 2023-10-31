@@ -32,16 +32,23 @@ _AUTOCOMPLETE_TEMPLATE = """
     <button type="button" class="btn btn-primary" %(btn_attrs)s
       data-clear="#%(id)s,#%(id)s_pretty">&times;</button>
   </div>
+  %(plus)s
 </div>
 %(field)s
+"""
+_PLUS_TEMPLATE = """
+  <div class="input-group-append">
+    <a href="%(url)s" target="_blank" class="btn btn-primary">&plus;</a>
+  </div>
 """
 
 
 class Autocomplete(forms.TextInput):
-    def __init__(self, model, attrs=None, *, params=None):
+    def __init__(self, model, attrs=None, *, params=None, plus=False):
         super().__init__(attrs)
         self.model = model
         self.params = ("?" + urlencode(params)) if params else ""
+        self.plus = plus
 
     def render(self, name, value, attrs=None, choices=(), renderer=None):
         if value is None:
@@ -62,6 +69,9 @@ class Autocomplete(forms.TextInput):
             return super().render(name, pretty or value, attrs, renderer=renderer)
 
         opts = self.model._meta
+        plus = (
+            (_PLUS_TEMPLATE % {"url": self.model.urls["create"]}) if self.plus else ""
+        )
         return mark_safe(
             _AUTOCOMPLETE_TEMPLATE
             % {
@@ -72,6 +82,7 @@ class Autocomplete(forms.TextInput):
                 "pretty": escape(pretty),
                 "placeholder": capfirst(opts.verbose_name),
                 "btn_attrs": "" if value else "disabled",
+                "plus": plus,
             }
         )
 

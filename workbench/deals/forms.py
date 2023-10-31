@@ -150,8 +150,10 @@ class DealForm(ModelForm):
             "owned_by",
         )
         widgets = {
-            "customer": Autocomplete(model=Organization),
-            "contact": Autocomplete(model=Person, params={"only_employees": "on"}),
+            "customer": Autocomplete(model=Organization, plus=True),
+            "contact": Autocomplete(
+                model=Person, params={"only_employees": "on"}, plus=True
+            ),
             "probability": forms.RadioSelect,
             "description": Textarea,
         }

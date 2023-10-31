@@ -84,7 +84,7 @@ class CampaignForm(ModelForm):
             "owned_by",
         )
         widgets = {
-            "customer": Autocomplete(model=Organization),
+            "customer": Autocomplete(model=Organization, plus=True),
             "description": Textarea,
         }
 
@@ -256,8 +256,10 @@ class ProjectForm(ModelForm):
             "closed_on",
         )
         widgets = {
-            "customer": Autocomplete(model=Organization),
-            "contact": Autocomplete(model=Person, params={"only_employees": "on"}),
+            "customer": Autocomplete(model=Organization, plus=True),
+            "contact": Autocomplete(
+                model=Person, params={"only_employees": "on"}, plus=True
+            ),
             "campaign": Autocomplete(model=Campaign),
             "description": Textarea,
             "type": forms.RadioSelect,
