@@ -9,6 +9,7 @@ A basic webpack file may looks as follows:
 
       return {
         ...base,
+        // ...resolvePreactAsReact(),
         devServer: devServer({ backendPort: env.backend }),
         module: {
           rules: [

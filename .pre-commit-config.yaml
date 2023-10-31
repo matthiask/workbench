@@ -14,6 +14,7 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
       - id: file-contents-sorter
+        args: [--ignore-case, --unique]
         files: requirements-to-freeze.txt
   - repo: local
     hooks:
@@ -29,7 +30,7 @@ repos:
       - id: django-upgrade
         args: [--target-version, "4.2"]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.1.2"
+    rev: "v0.1.3"
     hooks:
       - id: ruff
       - id: ruff-format
@@ -63,7 +64,7 @@ repos:
         args: [--list-different, --no-semi]
         exclude: "^conf/|.*\\.html$|.*\\.json$"
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: 1.2.0
+    rev: 1.3.0
     hooks:
       - id: pyproject-fmt
   - repo: https://github.com/abravalheri/validate-pyproject
