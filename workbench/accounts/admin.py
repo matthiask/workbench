@@ -49,7 +49,7 @@ class FeaturesWidget(forms.TextInput):
 class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = "__all__"
+        fields = "__all__"  # noqa: DJ007
         widgets = {"_features": FeaturesWidget}
 
 
@@ -113,7 +113,7 @@ class UserAdmin(UserAdmin):
         )
     ]
     radio_fields = {"language": admin.HORIZONTAL}
-    raw_id_fields = ["person"]
+    raw_id_fields = ["person", "pinned_projects"]
     readonly_fields = ["last_login"]
     search_fields = ("email", "_short_name", "_full_name")
     ordering = ("email",)
