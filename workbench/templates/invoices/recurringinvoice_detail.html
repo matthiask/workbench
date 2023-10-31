@@ -27,15 +27,11 @@
             <td>-{{ object.discount|currency }}</td>
           </tr>
         {% endif %}
-        {% if object.liable_to_vat and object.subtotal != object.total_excl_tax %}
-          <tr>
-            <th class="text-right">{% translate 'total excl. tax' %}</th>
-            <td>{{ object.total_excl_tax|currency }}</td>
-          </tr>
-        {% endif %}
         <tr>
-          <th class="text-right">{% translate 'total' %}</th>
-          <td>{{ object.total|currency }}</td>
+          <th class="text-right">
+            {% if object.liable_to_vat %}{% translate 'total excl. tax' %}{% else %}{% translate 'total' %}{% endif %}
+          </th>
+          <td>{{ object.total_excl_tax|currency }}</td>
         </tr>
         <tr>
           <th class="text-right">{% translate 'third party costs' %}</th>
