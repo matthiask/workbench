@@ -327,3 +327,15 @@ tbody th > a {
   filter: grayscale(1) brightness(1.1);
   transform: scale(0.85);
 }
+
+.pin {
+  border: none;
+  line-height: 1;
+  background: none;
+  font-size: 1rem;
+  filter: grayscale(1);
+
+  &[data-pinned="true"] {
+    filter: none;
+  }
+}

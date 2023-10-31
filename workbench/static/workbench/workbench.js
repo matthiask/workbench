@@ -344,6 +344,13 @@ $(() => {
     )
     inputs.forEach((el) => (el.checked = arr.includes(el.value)))
   })
+
+  $(document.body).on("click", "[data-pin]", (e) => {
+    const url = e.target.dataset.pin
+    fetch(`${url}?pinned=${e.target.dataset.pinned === "true" ? "" : "pinned"}`)
+      .then((r) => r.json())
+      .then((data) => (e.target.dataset.pinned = data.pinned))
+  })
 })
 
 function initWidgets() {

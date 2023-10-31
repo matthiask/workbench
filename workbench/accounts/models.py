@@ -1,6 +1,7 @@
 import datetime as dt
 from decimal import ROUND_UP, Decimal
 from functools import total_ordering
+from itertools import chain
 
 from django.conf import settings
 from django.contrib import messages
@@ -162,6 +163,10 @@ class User(Model, AbstractBaseUser):
         verbose_name=_("specialist field"),
     )
 
+    pinned_projects = models.ManyToManyField(
+        "projects.Project", blank=True, verbose_name=_("pinned projects")
+    )
+
     objects = UserManager()
 
     class Meta:
@@ -235,21 +240,39 @@ class User(Model, AbstractBaseUser):
     def active_projects(self):
         from workbench.projects.models import Project
 
-        return Project.objects.filter(
-            Q(
-                closed_on__isnull=True,
-                id__in=self.loggedhours.filter(rendered_on__gte=in_days(-3))
-                .values("service__project")
-                .annotate(Count("id"))
-                .filter(id__count__gte=3)
-                .values("service__project"),
+        pinned = [
+            obj.project
+            for obj in self.pinned_projects.through.objects.filter(user=self)
+            .select_related(
+                "project__customer",
+                "project__contact__organization",
+                "project__owned_by",
             )
-            | Q(
-                id__in=self.loggedhours.filter(rendered_on__gte=dt.date.today()).values(
-                    "service__project"
+            .order_by("pk")
+        ]
+        for project in pinned:
+            project.is_pinned = True
+
+        return chain(
+            pinned,
+            Project.objects.filter(
+                Q(
+                    closed_on__isnull=True,
+                    id__in=self.loggedhours.filter(rendered_on__gte=in_days(-3))
+                    .values("service__project")
+                    .annotate(Count("id"))
+                    .filter(id__count__gte=3)
+                    .values("service__project"),
+                )
+                | Q(
+                    id__in=self.loggedhours.filter(
+                        rendered_on__gte=dt.date.today()
+                    ).values("service__project")
                 )
             )
-        ).select_related("customer", "contact__organization", "owned_by")
+            .exclude(id__in=[project.pk for project in pinned])
+            .select_related("customer", "contact__organization", "owned_by"),
+        )
 
     @cached_property
     def features(self):

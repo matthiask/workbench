@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
 from workbench.accounts.features import controlling_only
+from workbench.accounts.views import pin
 from workbench.invoices.forms import CreateProjectInvoiceForm
 from workbench.invoices.models import Invoice
 from workbench.logbook.forms import LoggedCostForm, LoggedHoursForm
@@ -134,6 +135,12 @@ urlpatterns = [
             ),
         ),
         name="projects_project_detail",
+    ),
+    path(
+        "<int:pk>/pin/",
+        pin,
+        {"model": Project, "attribute": "pinned_projects"},
+        name="projects_project_pin",
     ),
     path(
         "<int:pk>/statistics/",

@@ -5,6 +5,7 @@
   <div class="row">
     <div class="col-md-12">
       <h1>
+        {% project_pin project=object user=request.user %}
         {{ project|h }} {% history_link project %}
         <span style="font-size:14px">{{ object.status_badge }}</span>
       </h1>

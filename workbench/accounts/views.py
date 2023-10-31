@@ -1,8 +1,8 @@
 from authlib.google import GoogleOAuth2Client
 from django.conf import settings
 from django.contrib import auth, messages
-from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.http import Http404, HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.cache import never_cache
@@ -131,3 +131,14 @@ class ProfileView(DetailView):
         return super().get_context_data(
             logged_hours=logged_hours(self.object), **kwargs
         )
+
+
+def pin(request, pk, *, model, attribute):
+    instance = get_object_or_404(model, pk=pk)
+    manager = getattr(request.user, attribute)
+    if request.GET.get("pinned"):
+        manager.add(instance)
+        return JsonResponse({"pinned": True})
+    else:
+        manager.remove(instance)
+        return JsonResponse({"pinned": False})

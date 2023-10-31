@@ -38,6 +38,7 @@
               <div class="list-group-item">
                 <div class="d-flex w-100 justify-content-between">
                   <h5 class="mb-1">
+                    {% if project.is_pinned %}<small>&#128204;</small>{% endif %}
                     <a href="{{ project.get_absolute_url }}">{{ project|h }}</a>
                     <small>{{ project.status_badge }}</small>
                   </h5>

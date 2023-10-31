@@ -297,3 +297,11 @@ def analyze_projects(object_list):
             "logged_hours": logged_hours.get(object.pk, 0),
         }
     return object_list
+
+
+@register.inclusion_tag("accounts/pin.html")
+def project_pin(*, project, user):
+    return {
+        "object": project,
+        "pinned": user.pinned_projects.filter(id=project.id).exists(),
+    }
