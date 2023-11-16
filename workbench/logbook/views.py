@@ -30,6 +30,7 @@ def create(request, *, viewname):
                     "url": f"{project.urls[viewname]}?{params}",
                     "attrs": 'data-toggle="ajaxmodal"',
                     "shortcut": (idx + 1) % 10 if idx < 10 else None,
+                    "is_pinned": getattr(project, "is_pinned", False),
                 }
                 for idx, project in enumerate(request.user.active_projects)
             ],
