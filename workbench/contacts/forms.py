@@ -1,10 +1,13 @@
+import datetime as dt
 from collections import OrderedDict
 
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.db.models import Q
 from django.forms.models import inlineformset_factory
 from django.template.defaultfilters import linebreaksbr
+from django.utils import timezone
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _, ngettext
 
@@ -60,6 +63,24 @@ class PersonSearchForm(Form):
         ),
         label="",
     )
+    s = forms.ChoiceField(
+        choices=[
+            ("", _("Active")),
+            ("all", _("All")),
+            (
+                _("Defined search"),
+                [
+                    (
+                        "any-projects-deals",
+                        _("Any projects or deals in the last 5 years"),
+                    ),
+                ],
+            ),
+        ],
+        required=False,
+        widget=forms.Select(attrs={"class": "custom-select"}),
+        label="",
+    )
     g = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         required=False,
@@ -71,7 +92,24 @@ class PersonSearchForm(Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
-        queryset = queryset.search(data.get("q")).active()
+        queryset = queryset.search(data.get("q"))
+
+        if not data.get("s"):
+            queryset = queryset.active()
+        elif data.get("s") == "any-projects-deals":
+            from workbench.deals.models import Deal
+            from workbench.projects.models import Project
+
+            cutoff = timezone.now() - dt.timedelta(days=5 * 366)
+            queryset = queryset.filter(
+                Q(id__in=Deal.objects.filter(created_at__gte=cutoff).values("contact"))
+                | Q(
+                    id__in=Project.objects.filter(created_at__gte=cutoff).values(
+                        "contact"
+                    )
+                )
+            ).active()
+
         if added_since := data.get("added_since"):
             from workbench.audit.models import LoggedAction
 
@@ -95,7 +133,7 @@ class PersonSearchForm(Form):
             xlsx.people(queryset)
             return xlsx.to_response("people.xlsx")
 
-        elif request.GET.get("export") == "vcard":
+        if request.GET.get("export") == "vcard":
             return render_vcard_response(
                 request,
                 "\n".join(
@@ -261,7 +299,7 @@ class PersonForm(ModelForm):
             + [formset.is_valid() for formset in self.formsets.values()]
         )
 
-    def save(self, commit=True):
+    def save(self, *, commit=True):
         instance = super().save()
         for formset in self.formsets.values():
             formset.save()
