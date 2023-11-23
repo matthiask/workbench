@@ -87,9 +87,4 @@ urlpatterns = [
         name="invoices_service_update",
     ),
     path("reminders/", bookkeeping_only(views.reminders), name="invoices_reminders"),
-    path(
-        "dunning-letter/<int:customer_id>/",
-        bookkeeping_only(views.dunning_letter),
-        name="invoices_dunning_letter",
-    ),
 ]

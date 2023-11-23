@@ -2,9 +2,9 @@ import datetime as dt
 from collections import defaultdict
 
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext, ngettext
-from django.views.decorators.http import require_POST
 
 from workbench import generic
 from workbench.invoices.models import Invoice
@@ -122,62 +122,28 @@ class RecurringInvoiceDetailView(generic.DetailView):
 
 
 def reminders(request):
-    invoices = Invoice.objects.overdue().select_related(
-        "customer", "owned_by", "project"
-    )
-    by_organization = {}
-    for invoice in invoices:
-        if invoice.customer not in by_organization:
-            by_organization[invoice.customer] = {
-                "organization": invoice.customer,
-                "last_reminded_on": {invoice.last_reminded_on},
-                "invoices": [invoice],
-            }
-        else:
-            row = by_organization[invoice.customer]
-            row["invoices"].append(invoice)
-            row["last_reminded_on"].add(invoice.last_reminded_on)
-
-    def last_reminded_on(row):
-        days = row["last_reminded_on"] - {None}
-        return max(days) if days else None
-
-    reminders = [
-        dict(
-            row,
-            last_reminded_on=last_reminded_on(row),
-            total_excl_tax=sum(invoice.total_excl_tax for invoice in row["invoices"]),
+    if request.method == "POST":
+        Invoice.objects.filter(id=request.POST.get("invoice")).update(
+            last_reminded_on=dt.date.today()
         )
-        for row in by_organization.values()
-    ]
+        return HttpResponseRedirect(".")
+
+    invoices = (
+        Invoice.objects.overdue()
+        .select_related("customer", "contact__organization", "owned_by", "project")
+        .order_by("customer", "contact")
+    )
+
+    nested = {}
+    for invoice in invoices:
+        nested.setdefault(invoice.customer, {}).setdefault(invoice.contact, []).append(
+            invoice
+        )
 
     return render(
         request,
         "invoices/reminders.html",
         {
-            "reminders": sorted(
-                reminders,
-                key=lambda row: (
-                    row["last_reminded_on"] or dt.date.min,
-                    row["organization"].name,
-                ),
-            )
+            "nested": nested,
         },
     )
-
-
-@require_POST
-def dunning_letter(request, customer_id):
-    invoices = (
-        Invoice.objects.overdue()
-        .filter(customer=customer_id)
-        .select_related("customer", "contact__organization", "owned_by", "project")
-    )
-
-    pdf, response = pdf_response("reminders", as_attachment=True)
-    pdf.dunning_letter(invoices=list(invoices))
-    pdf.generate()
-
-    invoices.update(last_reminded_on=dt.date.today())
-
-    return response

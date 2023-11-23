@@ -642,65 +642,6 @@ class PDFDocument(_PDFDocument):
 
         self.generate()
 
-    def dunning_letter(self, *, invoices):
-        self.init_letter()
-        self.p(invoices[-1].postal_address)
-        self.next_frame()
-        self.p("Zürich, %s" % local_date_format(dt.date.today()))
-        self.spacer()
-        self.h1("Zahlungserinnerung")
-        self.spacer()
-        self.mini_html(
-            (
-                """\
-<p>Sehr geehrte Damen und Herren</p>
-<p>Bei der beiliegenden Rechnung konnten wir leider noch keinen Zahlungseingang
-verzeichnen. Wir bitten Sie, den ausstehenden Betrag innerhalb von 10 Tagen auf
-das angegebene Konto zu überweisen. Bei allfälligen Unstimmigkeiten setzen Sie
-sich bitte mit uns in Verbindung.</p>
-<p>Falls sich Ihre Zahlung mit diesem Schreiben kreuzt, bitten wir Sie, dieses
-als gegenstandslos zu betrachten.</p>
-<p>Freundliche Grüsse</p>
-<p>%s</p>"""
-                if len(invoices) == 1
-                else """\
-<p>Sehr geehrte Damen und Herren</p>
-<p>Bei den beiliegenden Rechnungen konnten wir leider noch keinen Zahlungseingang
-verzeichnen. Wir bitten Sie, die ausstehenden Beträge innerhalb von 10 Tagen auf
-das angegebene Konto zu überweisen. Bei allfälligen Unstimmigkeiten setzen Sie
-sich bitte mit uns in Verbindung.</p>
-<p>Falls sich Ihre Zahlung mit diesem Schreiben kreuzt, bitten wir Sie, dieses
-als gegenstandslos zu betrachten.</p>
-<p>Freundliche Grüsse</p>
-<p>%s</p>"""
-            )
-            % settings.WORKBENCH.PDF_COMPANY
-        )
-        self.spacer()
-        self.table(
-            [tuple(capfirst(title) for title in (_("invoice"), _("date"), _("total")))]
-            + [
-                (
-                    MarkupParagraph(invoice.title, self.style.normal),
-                    local_date_format(invoice.invoiced_on),
-                    currency(invoice.total),
-                )
-                for invoice in invoices
-            ],
-            (self.bounds.E - self.bounds.W - 40 * mm, 24 * mm, 16 * mm),
-            (*self.style.tableHead, ("ALIGN", (1, 0), (1, -1), "LEFT")),
-        )
-        self.restart()
-        for invoice in invoices:
-            self.init_invoice_letter(page_fn=self.stationery())
-            self.process_invoice(invoice)
-            self.restart()
-
-    def table_columns(self, columns):
-        given = sum(filter(None, columns))
-        calculated = (self.bounds.E - self.bounds.W - given) / columns.count(None)
-        return [calculated if col is None else col for col in columns]
-
 
 def pdf_response(*args, **kwargs):
     activate(settings.WORKBENCH.PDF_LANGUAGE)

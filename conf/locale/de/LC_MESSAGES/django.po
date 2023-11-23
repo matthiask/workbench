@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-02 17:58+0200\n"
+"POT-Creation-Date: 2023-11-23 18:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -175,7 +175,7 @@ msgstr "Nur meine anzeigen"
 msgid "Inactive users"
 msgstr "Inaktive Nutzer:innen"
 
-#: workbench/accounts/models.py
+#: workbench/accounts/models.py workbench/contacts/forms.py
 msgid "Active"
 msgstr "Aktiv"
 
@@ -241,6 +241,12 @@ msgstr "Token"
 #: workbench/management/commands/workload.py
 msgid "specialist field"
 msgstr "Fachbereich"
+
+#: workbench/accounts/models.py
+#, fuzzy
+#| msgid "Old projects"
+msgid "pinned projects"
+msgstr "Alte Projekte"
 
 #: workbench/accounts/models.py workbench/audit/admin.py
 #: workbench/awt/models.py workbench/deals/models.py
@@ -786,6 +792,20 @@ msgstr "Kontakte"
 msgid "All groups"
 msgstr "Alle Gruppen"
 
+#: workbench/contacts/forms.py workbench/expenses/forms.py
+#: workbench/projects/forms.py workbench/reporting/views.py
+msgid "All"
+msgstr "Alle"
+
+#: workbench/contacts/forms.py workbench/deals/forms.py
+#: workbench/projects/forms.py
+msgid "Defined search"
+msgstr "Definierte Suche"
+
+#: workbench/contacts/forms.py
+msgid "Any projects or deals in the last 5 years"
+msgstr ""
+
 #: workbench/contacts/forms.py
 msgid "substitute with"
 msgstr "ersetzen durch"
@@ -1017,6 +1037,7 @@ msgstr "Die hochgeladene Liste enthält nur neue Zahlungen. Das ist zumindest un
 
 #: workbench/credit_control/forms.py workbench/invoices/models.py
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/reminders.html
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/open_items_list.html
 msgid "invoiced on"
@@ -1102,6 +1123,7 @@ msgstr "Zahlungsnotiz"
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/credit_control/creditentry_detail.html
 #: workbench/templates/credit_control/creditentry_list.html
+#: workbench/templates/invoices/reminders.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/key_data_third_party_costs.html
@@ -1166,10 +1188,6 @@ msgstr "Offen"
 #: workbench/invoices/forms.py workbench/projects/forms.py
 msgid "Closed"
 msgstr "Abgeschlossen"
-
-#: workbench/deals/forms.py workbench/projects/forms.py
-msgid "Defined search"
-msgstr "Definierte Suche"
 
 #: workbench/deals/forms.py
 msgid "Deals with archived value types"
@@ -1307,7 +1325,6 @@ msgstr "hoch"
 #: workbench/projects/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/templates/invoices/reminders.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/declined_deals.html
 msgid "customer"
@@ -1317,6 +1334,7 @@ msgstr "Kundschaft"
 #: workbench/projects/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/invoices/reminders.html
 #: workbench/templates/projects/project_detail.html
 msgid "contact"
 msgstr "Kontakt"
@@ -1453,11 +1471,6 @@ msgstr "Die Offerte %(offer)s wurde erfolgreich von den zugehörigen Offerten en
 msgid "expenses"
 msgstr "Spesen"
 
-#: workbench/expenses/forms.py workbench/projects/forms.py
-#: workbench/reporting/views.py
-msgid "All"
-msgstr "Alle"
-
 #: workbench/expenses/forms.py workbench/expenses/models.py
 #: workbench/invoices/models.py workbench/offers/models.py
 msgid "In preparation"
@@ -1571,7 +1584,6 @@ msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
 #: workbench/invoices/apps.py workbench/invoices/models.py
 #: workbench/templates/base.html
 #: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/invoices/reminders.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/shortcuts.html
 msgid "invoices"
@@ -2654,7 +2666,8 @@ msgid "Set predefined value:"
 msgstr "Vordefinierten Wert setzen:"
 
 #: workbench/projects/forms.py workbench/reporting/views.py
-#: workbench/templates/start.html workbench/templates/timestamps.html
+#: workbench/templates/invoices/reminders.html workbench/templates/start.html
+#: workbench/templates/timestamps.html
 msgid "today"
 msgstr "heute"
 
@@ -3413,10 +3426,6 @@ msgid "Last reminded on"
 msgstr "Zuletzt erinnert am"
 
 #: workbench/templates/invoices/reminders.html
-msgid "Generate a dunning letter"
-msgstr "Zahlungserinnerung generieren"
-
-#: workbench/templates/invoices/reminders.html
 msgid "Not reminded yet"
 msgstr "Noch nicht erinnert"
 
@@ -4157,6 +4166,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Generate a dunning letter"
+#~ msgstr "Zahlungserinnerung generieren"
 
 #~ msgid "Promptly"
 #~ msgstr "Zeitnah"
