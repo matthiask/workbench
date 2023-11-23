@@ -21,13 +21,11 @@
         </thead>
         <tbody>
           {% for customer, contact_invoices in nested.items %}
+          <tr>
+            <th colspan="6">{% link_or_none customer %}</th>
+          <tr>
           {% for contact, invoices in contact_invoices.items %}
           {% for invoice in invoices %}
-          {% ifchanged invoice.customer %}
-          <tr>
-            <th colspan="6">{% link_or_none invoice.customer %}</th>
-          <tr>
-          {% endifchanged %}
           <tr>
             <td>{% ifchanged invoice.contact %}{% link_or_none invoice.contact %}{% endifchanged %}</td>
             <td>{% link_or_none invoice %}</td>
