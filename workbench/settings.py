@@ -2,16 +2,16 @@ import os
 import sys
 import types
 from collections import defaultdict
+from pathlib import Path
 
-import dj_database_url
-import dj_email_url
 from django.utils.translation import gettext_lazy as _
 from speckenv import env
+from speckenv_django import django_database_url, django_email_url
 
 from workbench.accounts.features import FEATURES, F
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = env("SECRET_KEY", required=True)
 DEBUG = env("DEBUG", default=bool({"runserver", "shell"}.intersection(sys.argv)))
@@ -100,16 +100,16 @@ ROOT_URLCONF = "workbench.urls"
 WSGI_APPLICATION = "wsgi.application"
 WEBPACK_LOADER = {
     "DEFAULT": {
-        "STATS_FILE": os.path.join(
-            BASE_DIR, "static", "webpack-stats-%s.json" % ("dev" if DEBUG else "prod")
-        )
+        "STATS_FILE": BASE_DIR
+        / "static"
+        / ("webpack-stats-%s.json" % ("dev" if DEBUG else "prod"))
     }
 }
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, "workbench", "templates")],
+        "DIRS": [BASE_DIR / "workbench" / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -124,11 +124,11 @@ TEMPLATES = [
     }
 ]
 
-LOCALE_PATHS = [os.path.join(BASE_DIR, "conf", "locale")]
+LOCALE_PATHS = [BASE_DIR / "conf" / "locale"]
 
 AUTHENTICATION_BACKENDS = ["authlib.backends.EmailBackend"]
 
-DATABASES = {"default": dj_database_url.config(default="sqlite:///db.sqlite3")}
+DATABASES = {"default": django_database_url(env("DATABASE_URL", required=True))}
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 ATOMIC_REQUESTS = True
 
@@ -144,7 +144,7 @@ if LIVE:  # pragma: no cover
         "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
     )
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = BASE_DIR / "static"
 
 GOOGLE_CLIENT_ID = env("OAUTH2_CLIENT_ID", default="")
 GOOGLE_CLIENT_SECRET = env("OAUTH2_CLIENT_SECRET", default=None)
@@ -164,7 +164,7 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 
 def font(name):
-    return os.path.join(BASE_DIR, "conf", "fonts", name)
+    return BASE_DIR / "conf" / "fonts" / name
 
 
 NAMESPACE = env("NAMESPACE", required=True)
@@ -449,9 +449,9 @@ else:
 CORS_ORIGIN_ALLOW_ALL = True
 
 if DEBUG:  # pragma: no cover
-    globals().update(dj_email_url.parse(env("EMAIL_URL", default="console:")))
+    globals().update(django_email_url(env("EMAIL_URL", default="console:")))
 else:  # pragma: no cover
-    globals().update(dj_email_url.parse(env("EMAIL_URL", default="smtp:", warn=True)))
+    globals().update(django_email_url(env("EMAIL_URL", default="smtp:")))
 
 if env("SQL", default=False):  # pragma: no cover
     from django.utils.log import DEFAULT_LOGGING as LOGGING

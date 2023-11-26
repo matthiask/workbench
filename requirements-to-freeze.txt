@@ -1,7 +1,5 @@
 beautifulsoup4
 coverage[toml]
-dj-database-url
-dj-email-url
 django-admin-ordering
 django-authlib
 django-bootstrap4
