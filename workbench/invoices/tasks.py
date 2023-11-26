@@ -151,6 +151,7 @@ def autodunning():
             f"{contact.organization}\n{contact}\n{currency(sum(invoice.total_excl_tax for invoice in contact_invoices))}"
             for contact, contact_invoices in contacts.items()
         ),
+        to=managers,
         cc=list({invoice.owned_by.email for invoice in invoices}),
     )
     for contact, contact_invoices in contacts.items():
