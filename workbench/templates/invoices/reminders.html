@@ -22,11 +22,10 @@
           {% for customer, contact_invoices in nested.items %}
           {% for contact, invoices in contact_invoices.items %}
           <tr>
-            <th colspan="1">{% link_or_none customer %}{% link_or_none contact %}</th>
-            <td colspan="1">
+            <th colspan="4">{% link_or_none customer %}{% link_or_none contact %}</th>
+            <td colspan="1" class="text-right">
               <a href="{% url 'invoices_dunning_letter' contact_id=contact.id %}">{% translate 'dunning letter' %}</a>
             </td>
-            <td colspan="2"></td>
           </tr>
           {% for invoice in invoices %}
           <tr>
