@@ -215,11 +215,11 @@ class ProjectSearchForm(Form):
         elif data.get("s") == "closed":
             queryset = queryset.closed()
         elif data.get("s") == "no-invoices":
-            queryset = queryset.orders().without_invoices()
+            queryset = queryset.orders().without_invoices().open()
         elif data.get("s") == "accepted-offers":
             queryset = queryset.with_accepted_offers()
         elif data.get("s") == "accepted-offers-no-invoices":
-            queryset = queryset.with_accepted_offers().without_invoices()
+            queryset = queryset.with_accepted_offers().without_invoices().open()
         elif data.get("s") == "solely-declined-offers":
             queryset = queryset.solely_declined_offers()
         elif data.get("s") == "old-projects":
