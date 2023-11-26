@@ -60,15 +60,16 @@ def deploy_code(ctx):
 
 
 @fl.task
-def pull_db(ctx, installation="fh"):
+def pull_db(ctx, installation="fh", audit=False):
     fl.run_local(ctx, "dropdb --if-exists workbench", warn=True)
     fl.run_local(ctx, "createdb workbench")
     with fl.Connection(fl.config.host) as conn:
         e = fl._srv_env(conn, f"www/workbench/.env/{installation}")
         srv_dsn = e("DATABASE_URL")
+    audit = "" if audit else " --exclude-table-data audit_logged_actions"
     fl.run_local(
         ctx,
-        f'ssh -C {fl.config.host} "pg_dump -Ox {srv_dsn}" | psql workbench',
+        f'ssh -C {fl.config.host} "pg_dump -Ox {srv_dsn}{audit}" | psql workbench',
     )
 
 
