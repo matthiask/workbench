@@ -47,7 +47,7 @@ def create_recurring_invoices_and_notify():
             _("recurring invoices"),
             invoices,
             to=[owner.email],
-            cc=["workbench@feinheit.ch"],
+            cc=settings.RECURRING_INVOICES_CC,
         )
         mail.send()
 
@@ -96,5 +96,4 @@ Wenn Du die Rechnungen nicht stellen kannst, aktualisiere bitte
 die geplanten Rechnungen oder schliesse das Projekt.
 """,
             to=[user.email],
-            cc=["workbench@feinheit.ch"],
         ).send()

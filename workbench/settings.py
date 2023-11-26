@@ -20,6 +20,7 @@ LIVE = env("LIVE", default=False)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
 ADMINS = MANAGERS = [("Matthias Kestenholz", "mk@feinheit.ch")]
 DEFAULT_FROM_EMAIL = SERVER_EMAIL = "workbench@feinheit.ch"
+RECURRING_INVOICES_CC = env("RECURRING_INVOICES_CC", default=[])
 
 DEBUG_TOOLBAR = DEBUG and not TESTING
 
