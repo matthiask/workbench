@@ -1,5 +1,3 @@
-Django<5.0
-Pillow
 beautifulsoup4
 coverage[toml]
 dj-database-url
@@ -16,12 +14,14 @@ django-fineforms
 django-slowtests
 django-vanilla-views
 django-webpack-loader
+Django<5.0
 factory-boy
 gunicorn
 lxml
 more-itertools
 pdfdocument
 phonenumbers
+Pillow
 psycopg2-binary
 qrbill
 reportlab
