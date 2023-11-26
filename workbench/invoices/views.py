@@ -147,3 +147,17 @@ def reminders(request):
             "nested": nested,
         },
     )
+
+
+def dunning_letter(request, contact_id):
+    invoices = (
+        Invoice.objects.overdue()
+        .filter(contact=contact_id)
+        .select_related("customer", "contact__organization", "owned_by", "project")
+    )
+
+    pdf, response = pdf_response("reminders", as_attachment=True)
+    pdf.dunning_letter(invoices=list(invoices))
+    pdf.generate()
+
+    return response

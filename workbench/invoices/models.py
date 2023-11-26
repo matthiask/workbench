@@ -34,6 +34,11 @@ class InvoiceQuerySet(SearchQuerySet):
             status=Invoice.SENT, due_on__isnull=False, due_on__lte=in_days(-15)
         )
 
+    def autodunning(self):
+        return self.overdue().filter(
+            Q(last_reminded_on__isnull=True) | Q(last_reminded_on__lte=in_days(-15))
+        )
+
     def maybe_actionable(self, *, user):
         return self.filter(
             Q(status=Invoice.IN_PREPARATION)

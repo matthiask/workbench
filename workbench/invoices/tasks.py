@@ -1,11 +1,15 @@
 import datetime as dt
+import io
 from collections import defaultdict
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.utils.translation import gettext as _
 
-from workbench.invoices.models import RecurringInvoice
+from workbench.accounts.features import FEATURES
+from workbench.accounts.models import User
+from workbench.credit_control.models import CreditEntry
+from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.invoices.utils import next_valid_day
 from workbench.reporting.key_data import unsent_projected_invoices
 from workbench.tools.formats import currency, local_date_format
@@ -97,3 +101,63 @@ die geplanten Rechnungen oder schliesse das Projekt.
 """,
             to=[user.email],
         ).send()
+
+
+def autodunning():
+    managers = [
+        user.email
+        for user in User.objects.active()
+        if user.features[FEATURES.AUTODUNNING]
+    ]
+    if not managers:
+        return
+
+    try:
+        latest = CreditEntry.objects.latest("value_date").value_date
+    except CreditEntry.DoesNotExist:
+        latest = dt.date.min
+
+    if (dt.date.today() - latest).days > 3:
+        EmailMultiAlternatives(
+            _("Auto dunning"),
+            _(
+                "Please update the list of credit entries. Generating dunning letters doesn't make sense without up-to-date payment information."
+            ),
+            to=managers,
+        ).send()
+        return
+
+    invoices = (
+        Invoice.objects.autodunning()
+        .select_related("customer", "contact__organization", "owned_by", "project")
+        .order_by("customer", "contact")
+    )
+
+    if not invoices:
+        EmailMultiAlternatives(
+            _("Auto dunning"),
+            _("No overdue invoices with missing recent reminders."),
+            to=managers,
+        ).send()
+        return
+
+    contacts = {}
+    for invoice in invoices:
+        contacts.setdefault(invoice.contact, []).append(invoice)
+    mail = EmailMultiAlternatives(
+        _("Auto dunning"),
+        "",
+        cc=list({invoice.owned_by.email for invoice in invoices}),
+    )
+    for invoices in contacts.values():
+        with io.BytesIO() as f:
+            pdf = PDFDocument(f)
+            pdf.dunning_letter(invoices=invoices)
+            pdf.generate()
+            f.seek(0)
+            mail.attach(
+                f"reminders-{contact.id}.pdf",
+                f.getvalue(),
+                "application/pdf",
+            )
+    mail.send()

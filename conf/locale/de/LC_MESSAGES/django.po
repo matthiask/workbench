@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-23 18:41+0100\n"
+"POT-Creation-Date: 2023-11-26 10:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,6 +28,14 @@ msgstr "Konten"
 #: workbench/accounts/features.py
 msgid "Feature not available"
 msgstr "Feature nicht verfügbar"
+
+#: workbench/accounts/features.py workbench/invoices/tasks.py
+msgid "Auto dunning"
+msgstr "Automatische Zahlungserinnerung"
+
+#: workbench/accounts/features.py
+msgid "Auto dunnning process manager"
+msgstr "Prozessmanager der automatischen Zahlungserinnerungen"
 
 #: workbench/accounts/features.py
 msgid "Individual annual working time warning"
@@ -243,10 +251,8 @@ msgid "specialist field"
 msgstr "Fachbereich"
 
 #: workbench/accounts/models.py
-#, fuzzy
-#| msgid "Old projects"
 msgid "pinned projects"
-msgstr "Alte Projekte"
+msgstr "Gepinnte Projekte"
 
 #: workbench/accounts/models.py workbench/audit/admin.py
 #: workbench/awt/models.py workbench/deals/models.py
@@ -804,7 +810,7 @@ msgstr "Definierte Suche"
 
 #: workbench/contacts/forms.py
 msgid "Any projects or deals in the last 5 years"
-msgstr ""
+msgstr "Irgendwelche Projekte oder Geschäfte in den letzten 5 Jahren"
 
 #: workbench/contacts/forms.py
 msgid "substitute with"
@@ -1974,6 +1980,14 @@ msgstr "Umsatz bereinigt"
 #: workbench/invoices/tasks.py
 msgid "Unsent projected invoices"
 msgstr "Nicht verschickte geplante Rechnungen"
+
+#: workbench/invoices/tasks.py
+msgid "Please update the list of credit entries. Generating dunning letters doesn't make sense without up-to-date payment information."
+msgstr "Bitte aktualisiere die Liste der Zahlungseingänge. Zahlungserinnerungen generieren macht keinen Sinn, wenn die Liste der Zahlungseingänge nicht aktuell ist."
+
+#: workbench/invoices/tasks.py
+msgid "No overdue invoices with missing recent reminders."
+msgstr "Keine überfälligen Rechnungen mit fehlenden Zahlungserinnerungen."
 
 #: workbench/invoices/views.py workbench/offers/views.py
 msgid "Unable to generate the PDF: {}"
@@ -3426,6 +3440,10 @@ msgid "Last reminded on"
 msgstr "Zuletzt erinnert am"
 
 #: workbench/templates/invoices/reminders.html
+msgid "dunning letter"
+msgstr "Zahlungserinnerung"
+
+#: workbench/templates/invoices/reminders.html
 msgid "Not reminded yet"
 msgstr "Noch nicht erinnert"
 
@@ -4166,9 +4184,6 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "Generate a dunning letter"
-#~ msgstr "Zahlungserinnerung generieren"
 
 #~ msgid "Promptly"
 #~ msgstr "Zeitnah"

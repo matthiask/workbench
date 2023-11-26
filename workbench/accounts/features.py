@@ -22,6 +22,7 @@ def feature_required(feature):
 
 
 class FEATURES(str, Enum):
+    AUTODUNNING = "AUTODUNNING"
     AWT_WARNING_INDIVIDUAL = "AWT_WARNING_INDIVIDUAL"
     AWT_WARNING_ALL = "AWT_WARNING_ALL"
     BOOKKEEPING = "BOOKKEEPING"
@@ -43,6 +44,10 @@ class FEATURES(str, Enum):
 
 
 LABELS = {
+    FEATURES.AUTODUNNING: {
+        "label": _("Auto dunning"),
+        "help_text": _("Auto dunnning process manager"),
+    },
     FEATURES.AWT_WARNING_INDIVIDUAL: {
         "label": _("Individual annual working time warning"),
     },

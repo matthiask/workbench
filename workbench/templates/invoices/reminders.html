@@ -13,7 +13,7 @@
           <tr>
             <th class="">{% translate 'contact'|capfirst %}</th>
             <th class="text-nowrap">{% translate 'invoice'|capfirst %}</th>
-            <th class="text-nowrap">PDF</th>
+            <th class="text-nowrap"></th>
             <th class="text-nowrap text-right">{% translate 'Total excl. tax' %}</th>
             <th class="text-nowrap text-right">{% translate 'invoiced on'|capfirst %}</th>
             <th class="text-nowrap text-right">{% translate 'Last reminded on' %}</th>
@@ -25,9 +25,16 @@
             <th colspan="6">{% link_or_none customer %}</th>
           <tr>
           {% for contact, invoices in contact_invoices.items %}
+          <tr>
+            <th colspan="2">{% link_or_none contact %}</th>
+            <td colspan="1">
+              <a href="{% url 'invoices_dunning_letter' contact_id=contact.id %}">{% translate 'dunning letter' %}</a>
+            </td>
+            <td colspan="3"></td>
+          </tr>
           {% for invoice in invoices %}
           <tr>
-            <td>{% ifchanged invoice.contact %}{% link_or_none invoice.contact %}{% endifchanged %}</td>
+            <td></td>
             <td>{% link_or_none invoice %}</td>
             <td><a href="{{ invoice.urls.pdf }}?disposition=attachment">PDF</a></td>
             <td class="text-nowrap text-right">{{ invoice.total_excl_tax|currency }}</td>
