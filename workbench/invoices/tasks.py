@@ -152,7 +152,13 @@ def autodunning():
             for contact, contact_invoices in contacts.items()
         ),
         to=managers,
-        cc=list({invoice.owned_by.email for invoice in invoices}),
+        cc=list(
+            {
+                invoice.owned_by.email
+                for invoice in invoices
+                if invoice.owned_by.is_active
+            }
+        ),
     )
     for contact, contact_invoices in contacts.items():
         with io.BytesIO() as f:
