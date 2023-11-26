@@ -8,6 +8,7 @@ from workbench.awt.tasks import annual_working_time_warnings_mails
 from workbench.invoices.tasks import (
     create_recurring_invoices_and_notify,
     send_unsent_projected_invoices_reminders,
+    tuesday_autodunning,
 )
 from workbench.planning.updates import changes_mails
 from workbench.reporting.tasks import create_accruals_for_last_month
@@ -25,3 +26,4 @@ class Command(BaseCommand):
         changes_mails()
         annual_working_time_warnings_mails()
         send_unsent_projected_invoices_reminders()
+        tuesday_autodunning()

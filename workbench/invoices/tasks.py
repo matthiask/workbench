@@ -13,6 +13,7 @@ from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.invoices.utils import next_valid_day
 from workbench.reporting.key_data import unsent_projected_invoices
 from workbench.tools.formats import currency, local_date_format
+from workbench.tools.pdf import PDFDocument
 
 
 TEMPLATE = """\
@@ -33,7 +34,7 @@ def create_recurring_invoices_and_notify():
             by_owner[invoice.owned_by].append((ri, invoice))
 
     for owner, invoices in by_owner.items():
-        invoices = "\n".join(
+        body = "\n".join(
             TEMPLATE.format(
                 invoice=invoice,
                 customer=invoice.contact.name_with_organization
@@ -49,7 +50,7 @@ def create_recurring_invoices_and_notify():
         )
         mail = EmailMultiAlternatives(
             _("recurring invoices"),
-            invoices,
+            body,
             to=[owner.email],
             cc=settings.RECURRING_INVOICES_CC,
         )
@@ -146,13 +147,16 @@ def autodunning():
         contacts.setdefault(invoice.contact, []).append(invoice)
     mail = EmailMultiAlternatives(
         _("Auto dunning"),
-        "",
+        "\n\n".join(
+            f"{contact.organization}\n{contact}\n{currency(sum(invoice.total_excl_tax for invoice in contact_invoices))}"
+            for contact, contact_invoices in contacts.items()
+        ),
         cc=list({invoice.owned_by.email for invoice in invoices}),
     )
-    for invoices in contacts.values():
+    for contact, contact_invoices in contacts.items():
         with io.BytesIO() as f:
             pdf = PDFDocument(f)
-            pdf.dunning_letter(invoices=invoices)
+            pdf.dunning_letter(invoices=contact_invoices)
             pdf.generate()
             f.seek(0)
             mail.attach(
@@ -161,3 +165,11 @@ def autodunning():
                 "application/pdf",
             )
     mail.send()
+    invoices.update(last_reminded_on=dt.date.today())
+
+
+def tuesday_autodunning():
+    today = dt.date.today()
+    if today.weekday() != 2:
+        return
+    autodunning()
