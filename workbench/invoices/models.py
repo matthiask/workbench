@@ -36,7 +36,7 @@ class InvoiceQuerySet(SearchQuerySet):
 
     def autodunning(self):
         return self.overdue().filter(
-            Q(last_reminded_on__isnull=True) | Q(last_reminded_on__lte=in_days(-15))
+            Q(last_reminded_on__isnull=True) | Q(last_reminded_on__lte=in_days(-30))
         )
 
     def maybe_actionable(self, *, user):
@@ -305,7 +305,7 @@ class Invoice(ModelWithTotal):
 
         if self.status == self.IN_PREPARATION:
             return _("In preparation since %(created_at)s") % d
-        elif self.status == self.SENT:
+        if self.status == self.SENT:
             if self.last_reminded_on:
                 return _("Sent on %(invoiced_on)s, reminded on %(reminded_on)s") % d
 
@@ -313,10 +313,9 @@ class Invoice(ModelWithTotal):
                 return _("Sent on %(invoiced_on)s but overdue") % d
 
             return _("Sent on %(invoiced_on)s") % d
-        elif self.status == self.PAID:
+        if self.status == self.PAID:
             return _("Paid on %(closed_on)s") % d
-        else:
-            return self.get_status_display()
+        return self.get_status_display()
 
     def payment_reminders_sent_at(self):
         from workbench.tools.history import changes  # Avoid a circular import
@@ -340,9 +339,10 @@ class Invoice(ModelWithTotal):
             self.CANCELED: "danger",
         }[self.status]
 
-        if self.status == self.SENT:
-            if self.last_reminded_on or (self.due_on and dt.date.today() > self.due_on):
-                css = "warning"
+        if self.status == self.SENT and (
+            self.last_reminded_on or (self.due_on and dt.date.today() > self.due_on)
+        ):
+            css = "warning"
 
         return format_html(
             '<span class="badge badge-{}">{}</span>', css, self.pretty_status
@@ -356,18 +356,17 @@ class Invoice(ModelWithTotal):
                 if self.liable_to_vat
                 else _("Down payment total %(currency)s")
             ) % {"currency": settings.WORKBENCH.CURRENCY}
-        elif self.type == self.CREDIT:
+        if self.type == self.CREDIT:
             return (
                 _("Credit total %(currency)s incl. tax")
                 if self.liable_to_vat
                 else _("Credit total %(currency)s")
             ) % {"currency": settings.WORKBENCH.CURRENCY}
-        else:
-            return (
-                _("Total %(currency)s incl. tax")
-                if self.liable_to_vat
-                else _("Total %(currency)s")
-            ) % {"currency": settings.WORKBENCH.CURRENCY}
+        return (
+            _("Total %(currency)s incl. tax")
+            if self.liable_to_vat
+            else _("Total %(currency)s")
+        ) % {"currency": settings.WORKBENCH.CURRENCY}
 
     def _ordered_services(self, project_services):
         return [
