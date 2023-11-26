@@ -11,7 +11,6 @@
       <table class="table table-responsive-lg">
         <thead class="sticky">
           <tr>
-            <th class="">{% translate 'contact'|capfirst %}</th>
             <th class="text-nowrap">{% translate 'invoice'|capfirst %}</th>
             <th class="text-nowrap"></th>
             <th class="text-nowrap text-right">{% translate 'Total excl. tax' %}</th>
@@ -21,20 +20,16 @@
         </thead>
         <tbody>
           {% for customer, contact_invoices in nested.items %}
-          <tr>
-            <th colspan="6">{% link_or_none customer %}</th>
-          <tr>
           {% for contact, invoices in contact_invoices.items %}
           <tr>
-            <th colspan="2">{% link_or_none contact %}</th>
+            <th colspan="1">{% link_or_none customer %}{% link_or_none contact %}</th>
             <td colspan="1">
               <a href="{% url 'invoices_dunning_letter' contact_id=contact.id %}">{% translate 'dunning letter' %}</a>
             </td>
-            <td colspan="3"></td>
+            <td colspan="2"></td>
           </tr>
           {% for invoice in invoices %}
           <tr>
-            <td></td>
             <td>{% link_or_none invoice %}</td>
             <td><a href="{{ invoice.urls.pdf }}?disposition=attachment">PDF</a></td>
             <td class="text-nowrap text-right">{{ invoice.total_excl_tax|currency }}</td>
