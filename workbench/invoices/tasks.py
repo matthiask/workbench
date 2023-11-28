@@ -146,7 +146,7 @@ def autodunning():
     for invoice in invoices:
         contacts.setdefault(invoice.contact, []).append(invoice)
     contact_details = "\n\n".join(
-        f"{contact.organization}\n{contact}\n{currency(sum(invoice.total_excl_tax for invoice in contact_invoices))}"
+        f"reminders-{contact.id}\n{contact.organization}\n{contact}\n{currency(sum(invoice.total_excl_tax for invoice in contact_invoices))}"
         for contact, contact_invoices in contacts.items()
     )
     cc = list(
