@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-26 10:44+0100\n"
+"POT-Creation-Date: 2023-11-28 14:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1340,7 +1340,6 @@ msgstr "Kundschaft"
 #: workbench/projects/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/templates/invoices/reminders.html
 #: workbench/templates/projects/project_detail.html
 msgid "contact"
 msgstr "Kontakt"
@@ -1988,6 +1987,14 @@ msgstr "Bitte aktualisiere die Liste der Zahlungseingänge. Zahlungserinnerungen
 #: workbench/invoices/tasks.py
 msgid "No overdue invoices with missing recent reminders."
 msgstr "Keine überfälligen Rechnungen mit fehlenden Zahlungserinnerungen."
+
+#: workbench/invoices/tasks.py
+msgid "Responsible"
+msgstr "Verantwortlich"
+
+#: workbench/invoices/tasks.py
+msgid "For your information"
+msgstr "Zur Kenntnisnahme"
 
 #: workbench/invoices/views.py workbench/offers/views.py
 msgid "Unable to generate the PDF: {}"

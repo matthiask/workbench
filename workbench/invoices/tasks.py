@@ -145,20 +145,32 @@ def autodunning():
     contacts = {}
     for invoice in invoices:
         contacts.setdefault(invoice.contact, []).append(invoice)
+    contact_details = "\n\n".join(
+        f"{contact.organization}\n{contact}\n{currency(sum(invoice.total_excl_tax for invoice in contact_invoices))}"
+        for contact, contact_invoices in contacts.items()
+    )
+    cc = list(
+        {invoice.owned_by.email for invoice in invoices if invoice.owned_by.is_active}
+    )
+
     mail = EmailMultiAlternatives(
         _("Auto dunning"),
-        "\n\n".join(
-            f"{contact.organization}\n{contact}\n{currency(sum(invoice.total_excl_tax for invoice in contact_invoices))}"
-            for contact, contact_invoices in contacts.items()
+        "\n".join(
+            (
+                "{}: {}".format(
+                    _("Responsible"),
+                    ", ".join(managers),
+                ),
+                "{}: {}".format(
+                    _("For your information"),
+                    ", ".join(cc),
+                ),
+                "",
+                contact_details,
+            )
         ),
         to=managers,
-        cc=list(
-            {
-                invoice.owned_by.email
-                for invoice in invoices
-                if invoice.owned_by.is_active
-            }
-        ),
+        cc=cc,
     )
     for contact, contact_invoices in contacts.items():
         with io.BytesIO() as f:
