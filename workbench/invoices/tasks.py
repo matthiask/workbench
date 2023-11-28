@@ -177,6 +177,6 @@ def autodunning():
 
 def tuesday_autodunning():
     today = dt.date.today()
-    if today.weekday() != 2:
+    if today.weekday() != 1:
         return
     autodunning()
