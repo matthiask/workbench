@@ -4,6 +4,7 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
 from workbench.accounts.features import FEATURES
@@ -179,7 +180,7 @@ def autodunning():
             pdf.generate()
             f.seek(0)
             mail.attach(
-                f"reminders-{contact.id}.pdf",
+                f"reminders-{slugify(contact.name_with_organization)}.pdf",
                 f.getvalue(),
                 "application/pdf",
             )
