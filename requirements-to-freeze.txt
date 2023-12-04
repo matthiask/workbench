@@ -12,7 +12,7 @@ django-fineforms
 django-slowtests
 django-vanilla-views
 django-webpack-loader
-Django<5.0
+Django<5.1
 factory-boy
 gunicorn
 lxml
