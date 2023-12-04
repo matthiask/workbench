@@ -205,7 +205,7 @@ class InvoiceForm(PostalAddressSelectionForm):
                 Q(project=self.instance.project),
                 Q(type=Invoice.DOWN_PAYMENT),
                 Q(down_payment_applied_to__isnull=True)
-                | Q(down_payment_applied_to=self.instance),
+                | Q(down_payment_applied_to=self.instance.pk),
             )
             if eligible_down_payment_invoices:
                 self.fields["apply_down_payment"] = forms.ModelMultipleChoiceField(

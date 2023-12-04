@@ -122,9 +122,10 @@ class ExpensesTest(TestCase):
         response = self.client.get(
             cost1.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
         )
+        # print(response.content.decode("utf-8"))
         self.assertContains(
             response,
-            '<input type="number" name="modal-third_party_costs" value="9.00" step="0.01" class="form-control" disabled id="id_modal-third_party_costs">',
+            '<input type="number" name="modal-third_party_costs" value="9.00" step="0.01" class="form-control" disabled aria-describedby="id_modal-third_party_costs_helptext" id="id_modal-third_party_costs">',
             html=True,
         )
 

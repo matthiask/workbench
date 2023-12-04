@@ -129,7 +129,7 @@ class OfferForm(PostalAddressSelectionForm):
 
         self.instance.project = self.project
         self.service_candidates = Service.objects.filter(
-            Q(project=self.project), Q(offer__isnull=True) | Q(offer=self.instance)
+            Q(project=self.project), Q(offer__isnull=True) | Q(offer=self.instance.pk)
         )
 
         self.fields["services"] = forms.ModelMultipleChoiceField(
