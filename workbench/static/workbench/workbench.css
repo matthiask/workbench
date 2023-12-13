@@ -304,10 +304,14 @@ tbody th > a {
 }
 
 .widget--contributionselect {
-  display: grid;
-  grid-template-columns: 25ch 1fr;
+  display: flex;
+  gap: 0.5rem;
   align-items: center;
   margin: 0;
+}
+
+.widget--contributionselect label {
+  order: 1;
 }
 
 .contribution-select input {
