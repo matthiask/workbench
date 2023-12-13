@@ -24,7 +24,11 @@
           <tr>
             <th colspan="4">{% link_or_none customer %}{% link_or_none contact %}</th>
             <td colspan="1" class="text-right">
-              <a href="{% url 'invoices_dunning_letter' contact_id=contact.id %}">{% translate 'dunning letter' %}</a>
+              {% if contact.id %}
+                <a href="{% url 'invoices_dunning_letter' contact_id=contact.id %}">{% translate 'dunning letter' %}</a>
+              {% else %}
+                {% translate 'Contact missing' %}
+              {% endif %}
             </td>
           </tr>
           {% for invoice in invoices %}
