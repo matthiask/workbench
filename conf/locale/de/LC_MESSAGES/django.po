@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-28 14:52+0100\n"
+"POT-Creation-Date: 2023-12-13 08:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3394,6 +3394,10 @@ msgid "History"
 msgstr "Geschichte"
 
 #: workbench/templates/invoices/invoice_detail.html
+msgid "notes of the organization"
+msgstr "Bemerkungen bei der Organisation"
+
+#: workbench/templates/invoices/invoice_detail.html
 msgid "Payment reminders sent at"
 msgstr "Zahlungserinnerungen verschickt am"
 
@@ -4191,6 +4195,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "organization notes"
+#~ msgstr "Organisationnotizen"
 
 #~ msgid "Promptly"
 #~ msgstr "Zeitnah"

@@ -11,7 +11,14 @@
         </tr>
         <tr>
           <th class="text-right">{% translate 'customer'|capfirst %}</th>
-          <td>{% link_or_none object.customer %}</td>
+          <td>
+            {% link_or_none object.customer %}
+            {% if object.customer.notes %}
+              <div style="margin-top:1rem;padding:0.75rem 1rem;border:1px solid #ccc">
+                <strong>{% translate 'notes of the organization' %}:</strong><br>{{ object.customer.notes|linebreaksbr }}
+              </div>
+            {% endif %}
+          </td>
         </tr>
         <tr>
           <th class="text-right">{% translate 'contact'|capfirst %}</th>
