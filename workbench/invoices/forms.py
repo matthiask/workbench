@@ -35,6 +35,7 @@ class InvoiceSearchForm(Form):
         choices=(
             ("", _("All states")),
             ("open", _("Open")),
+            ("due", _("Due")),
             (_("Exact"), Invoice.STATUS_CHOICES),
         ),
         required=False,
@@ -65,6 +66,8 @@ class InvoiceSearchForm(Form):
         queryset = queryset.search(data.get("q"))
         if data.get("s") == "open":
             queryset = queryset.open()
+        elif data.get("s") == "due":
+            queryset = queryset.due()
         elif data.get("s"):
             queryset = queryset.filter(status=data.get("s"))
         queryset = self.apply_renamed(queryset, "org", "customer")
@@ -528,7 +531,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 (1, _("Yes, disable logging from now on")),
                 (0, _("No, do not change anything")),
             ],
-            coerce=lambda x: int(x),
+            coerce=lambda x: int(x),  # noqa: PLW0108
             widget=forms.RadioSelect,
         )
 

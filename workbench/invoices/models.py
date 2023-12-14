@@ -29,6 +29,11 @@ class InvoiceQuerySet(SearchQuerySet):
     def invoiced(self):
         return self.filter(status__in=Invoice.INVOICED_STATUSES)
 
+    def due(self):
+        return self.filter(
+            status=Invoice.SENT, due_on__isnull=False, due_on__lte=dt.date.today()
+        )
+
     def overdue(self):
         return self.filter(
             status=Invoice.SENT, due_on__isnull=False, due_on__lte=in_days(-15)
@@ -292,6 +297,7 @@ class Invoice(ModelWithTotal):
             "invoiced_on": (
                 local_date_format(self.invoiced_on) if self.invoiced_on else None
             ),
+            "due_on": (local_date_format(self.due_on) if self.due_on else None),
             "reminded_on": (
                 local_date_format(self.last_reminded_on)
                 if self.last_reminded_on
@@ -309,8 +315,8 @@ class Invoice(ModelWithTotal):
             if self.last_reminded_on:
                 return _("Sent on %(invoiced_on)s, reminded on %(reminded_on)s") % d
 
-            if self.due_on and dt.date.today() > self.due_on:
-                return _("Sent on %(invoiced_on)s but overdue") % d
+            if self.due_on:
+                return _("Sent on %(invoiced_on)s, due on %(due_on)s") % d
 
             return _("Sent on %(invoiced_on)s") % d
         if self.status == self.PAID:

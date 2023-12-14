@@ -865,6 +865,7 @@ class InvoicesTest(TestCase):
         """Test various results of the status badge"""
         today = dt.date.today()
         yesterday = in_days(-1)
+        due = in_days(-5)
         fmt = local_date_format(today)
         self.assertEqual(
             Invoice(status=Invoice.IN_PREPARATION).pretty_status,
@@ -880,7 +881,7 @@ class InvoicesTest(TestCase):
                 invoiced_on=yesterday,
                 due_on=in_days(-5),
             ).pretty_status,
-            f"Sent on {local_date_format(yesterday)} but overdue",
+            f"Sent on {local_date_format(yesterday)}, due on {local_date_format(due)}",
         )
         self.assertIn(
             "badge-warning",

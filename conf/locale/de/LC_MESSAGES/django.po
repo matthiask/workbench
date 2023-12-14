@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-13 10:55+0100\n"
+"POT-Creation-Date: 2023-12-14 17:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1594,6 +1594,10 @@ msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
 msgid "invoices"
 msgstr "Rechnungen"
 
+#: workbench/invoices/forms.py
+msgid "Due"
+msgstr "Fällig"
+
 #: workbench/invoices/forms.py workbench/offers/forms.py
 msgid "Exact"
 msgstr "Exakt"
@@ -1853,8 +1857,8 @@ msgstr "Versendet am %(invoiced_on)s, erinnert am %(reminded_on)s"
 
 #: workbench/invoices/models.py
 #, python-format
-msgid "Sent on %(invoiced_on)s but overdue"
-msgstr "Versendet am %(invoiced_on)s, aber überfällig"
+msgid "Sent on %(invoiced_on)s, due on %(due_on)s"
+msgstr "Versendet am %(invoiced_on)s, fällig am %(due_on)s"
 
 #: workbench/invoices/models.py
 #, python-format
@@ -4199,6 +4203,10 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-format
+#~ msgid "Sent on %(invoiced_on)s but overdue"
+#~ msgstr "Versendet am %(invoiced_on)s, aber überfällig"
 
 #~ msgid "organization notes"
 #~ msgstr "Organisationnotizen"
