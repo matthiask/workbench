@@ -268,6 +268,14 @@ class InvoiceForm(PostalAddressSelectionForm):
         data = super().clean()
         s_dict = dict(Invoice.STATUS_CHOICES)
 
+        if (subtotal := data.get("subtotal")) and subtotal < 0:
+            self.add_error(
+                "subtotal",
+                _(
+                    "A negative subtotal is almost certainly an error. Did you want to create a credit?"
+                ),
+            )
+
         if self.instance.status > self.instance.IN_PREPARATION and set(
             self.changed_data
         ) - {

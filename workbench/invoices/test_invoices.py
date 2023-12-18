@@ -1062,3 +1062,48 @@ class InvoicesTest(TestCase):
 
         response = self.client.get(invoice.urls["pdf"])
         self.assertEqual(response.status_code, 200)  # No crash
+
+    def test_no_negative_invoices(self):
+        """Invoice subtotals should not be negative"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        url = project.urls["createinvoice"] + "?type=credit"
+        response = self.client.post(
+            url,
+            {
+                "contact": project.contact_id,
+                "title": project.title,
+                "description": "bla",
+                "owned_by": project.owned_by_id,
+                "discount": 0,
+                "liable_to_vat": "1",
+                "tax_rate": "7.70",
+                "postal_address": "Anything\nStreet\nCity",
+                "subtotal": -2500,
+                "third_party_costs": 0,
+            },
+        )
+        self.assertContains(
+            response, "A negative subtotal is almost certainly an error."
+        )
+
+        url = project.urls["createinvoice"] + "?type=fixed"
+        response = self.client.post(
+            url,
+            {
+                "contact": project.contact_id,
+                "title": project.title,
+                "description": "bla",
+                "owned_by": project.owned_by_id,
+                "discount": 0,
+                "liable_to_vat": "1",
+                "tax_rate": "7.70",
+                "postal_address": "Anything\nStreet\nCity",
+                "subtotal": -2500,
+                "third_party_costs": 0,
+            },
+        )
+        self.assertContains(
+            response, "A negative subtotal is almost certainly an error."
+        )

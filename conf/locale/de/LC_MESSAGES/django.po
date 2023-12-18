@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-14 17:16+0100\n"
+"POT-Creation-Date: 2023-12-18 09:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1654,6 +1654,10 @@ msgstr "Berechnet aus Rechnungsleistungen."
 #: workbench/invoices/forms.py
 msgid "Apply down payment invoices"
 msgstr "Anzahlungen anwenden"
+
+#: workbench/invoices/forms.py
+msgid "A negative subtotal is almost certainly an error. Did you want to create a credit?"
+msgstr "Ein negatives Zwischentotal ist fast sicher ein Fehler. Wolltest Du eine Gutschrift erstellen?"
 
 #: workbench/invoices/forms.py
 #, python-format
