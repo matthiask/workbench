@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "vacation days override",
                 "verbose_name_plural": "vacation days overrides",
-                "ordering": ["-year", "user"],
+                "ordering": ["year"],
                 "unique_together": {("user", "year")},
             },
         ),

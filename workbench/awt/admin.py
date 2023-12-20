@@ -52,3 +52,4 @@ class AbsenceAdmin(admin.ModelAdmin):
 class VacationDaysOverrideAdmin(admin.ReadWriteModelAdmin):
     list_display = ["year", "user", "days", "notes"]
     list_filter = ["year", "user"]
+    ordering = ["-year", "user"]

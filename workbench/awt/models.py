@@ -255,7 +255,7 @@ class VacationDaysOverride(models.Model):
     notes = models.CharField(_("notes"), max_length=500)
 
     class Meta:
-        ordering = ["-year", "user"]
+        ordering = ["year"]
         unique_together = [("user", "year")]
         verbose_name = _("vacation days override")
         verbose_name_plural = _("vacation days overrides")
