@@ -4,6 +4,7 @@ from django.utils.translation import activate
 
 from workbench.accounts.middleware import set_user_name
 from workbench.accounts.tasks import coffee_invites
+from workbench.audit.tasks import prune_audit
 from workbench.awt.tasks import annual_working_time_warnings_mails
 from workbench.invoices.tasks import (
     create_recurring_invoices_and_notify,
@@ -27,3 +28,4 @@ class Command(BaseCommand):
         annual_working_time_warnings_mails()
         send_unsent_projected_invoices_reminders()
         tuesday_autodunning()
+        prune_audit()
