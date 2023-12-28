@@ -96,6 +96,11 @@ tbody th > a {
   text-decoration: none;
 }
 
+.table th.inline-links > a,
+.table td.inline-links > a {
+  display: inline-block !important;
+}
+
 .table .sticky {
   position: sticky;
   z-index: 1;

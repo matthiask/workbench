@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-18 09:41+0100\n"
+"POT-Creation-Date: 2023-12-28 17:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2695,8 +2695,7 @@ msgid "Set predefined value:"
 msgstr "Vordefinierten Wert setzen:"
 
 #: workbench/projects/forms.py workbench/reporting/views.py
-#: workbench/templates/invoices/reminders.html workbench/templates/start.html
-#: workbench/templates/timestamps.html
+#: workbench/templates/start.html workbench/templates/timestamps.html
 msgid "today"
 msgstr "heute"
 
@@ -3457,6 +3456,10 @@ msgstr "Total exkl. MwSt."
 #: workbench/templates/invoices/reminders.html
 msgid "Last reminded on"
 msgstr "Zuletzt erinnert am"
+
+#: workbench/templates/invoices/reminders.html
+msgid "reminded today"
+msgstr "heute erinnert"
 
 #: workbench/templates/invoices/reminders.html
 msgid "dunning letter"

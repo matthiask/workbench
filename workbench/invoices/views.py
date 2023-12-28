@@ -123,7 +123,7 @@ class RecurringInvoiceDetailView(generic.DetailView):
 
 def reminders(request):
     if request.method == "POST":
-        Invoice.objects.filter(id=request.POST.get("invoice")).update(
+        Invoice.objects.filter(id__in=request.POST.getlist("invoice")).update(
             last_reminded_on=dt.date.today()
         )
         return HttpResponseRedirect(".")

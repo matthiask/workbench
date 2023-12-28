@@ -185,7 +185,6 @@ def autodunning():
                 "application/pdf",
             )
     mail.send()
-    invoices.update(last_reminded_on=dt.date.today())
 
 
 def tuesday_autodunning():
