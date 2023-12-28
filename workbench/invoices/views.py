@@ -151,17 +151,17 @@ def reminders(request):
 
 
 def dunning_letter(request, contact_id):
-    invoices = list(
+    if invoices := list(
         Invoice.objects.overdue()
         .filter(contact=contact_id)
         .select_related("customer", "contact__organization", "owned_by", "project")
-    )
-
-    pdf, response = pdf_response(
-        f"reminders-{slugify(invoices[0].contact.name_with_organization)}",
-        as_attachment=True,
-    )
-    pdf.dunning_letter(invoices=invoices)
-    pdf.generate()
-
-    return response
+    ):
+        pdf, response = pdf_response(
+            f"reminders-{slugify(invoices[0].contact.name_with_organization)}",
+            as_attachment=True,
+        )
+        pdf.dunning_letter(invoices=invoices)
+        pdf.generate()
+        return response
+    messages.error(request, gettext("No overdue invoices for this contact."))
+    return redirect("invoices_reminders")

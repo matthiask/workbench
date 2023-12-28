@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-28 17:55+0100\n"
+"POT-Creation-Date: 2023-12-28 18:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2067,6 +2067,10 @@ msgid "Created %s invoice."
 msgid_plural "Created %s invoices."
 msgstr[0] "%s Rechnung erstellt."
 msgstr[1] "%s Rechnungen erstellt."
+
+#: workbench/invoices/views.py
+msgid "No overdue invoices for this contact."
+msgstr "Keine überfälligen Rechnungen für diese Kontaktperson."
 
 #: workbench/logbook/forms.py workbench/timer/models.py
 msgid "<detected>"
