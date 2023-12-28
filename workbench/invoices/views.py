@@ -4,6 +4,7 @@ from collections import defaultdict
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
+from django.utils.text import slugify
 from django.utils.translation import gettext, ngettext
 
 from workbench import generic
@@ -156,7 +157,10 @@ def dunning_letter(request, contact_id):
         .select_related("customer", "contact__organization", "owned_by", "project")
     )
 
-    pdf, response = pdf_response("reminders", as_attachment=True)
+    pdf, response = pdf_response(
+        f"reminders-{slugify(invoices[0].contact.name_with_organization)}",
+        as_attachment=True,
+    )
     pdf.dunning_letter(invoices=list(invoices))
     pdf.generate()
 
