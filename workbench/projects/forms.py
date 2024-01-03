@@ -98,18 +98,16 @@ class CampaignForm(ModelForm):
             except (Campaign.DoesNotExist, TypeError, ValueError):
                 pass
             else:
-                initial.update(
-                    {
-                        "customer": campaign.customer_id,
-                        "title": campaign.title,
-                        "description": campaign.description,
-                        "owned_by": (
-                            campaign.owned_by_id
-                            if campaign.owned_by.is_active
-                            else request.user.id
-                        ),
-                    }
-                )
+                initial.update({
+                    "customer": campaign.customer_id,
+                    "title": campaign.title,
+                    "description": campaign.description,
+                    "owned_by": (
+                        campaign.owned_by_id
+                        if campaign.owned_by.is_active
+                        else request.user.id
+                    ),
+                })
 
         elif pk := request.GET.get("customer"):
             try:
@@ -276,22 +274,20 @@ class ProjectForm(ModelForm):
             except (Project.DoesNotExist, TypeError, ValueError):
                 pass
             else:
-                initial.update(
-                    {
-                        "customer": project.customer_id,
-                        "contact": project.contact_id,
-                        "title": project.title,
-                        "description": project.description,
-                        "type": project.type,
-                        "internal_type": project.internal_type_id,
-                        "flat_rate": project.flat_rate,
-                        "owned_by": (
-                            project.owned_by_id
-                            if project.owned_by.is_active
-                            else request.user.id
-                        ),
-                    }
-                )
+                initial.update({
+                    "customer": project.customer_id,
+                    "contact": project.contact_id,
+                    "title": project.title,
+                    "description": project.description,
+                    "type": project.type,
+                    "internal_type": project.internal_type_id,
+                    "flat_rate": project.flat_rate,
+                    "owned_by": (
+                        project.owned_by_id
+                        if project.owned_by.is_active
+                        else request.user.id
+                    ),
+                })
 
         elif pk := request.GET.get("contact"):
             try:

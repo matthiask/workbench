@@ -167,48 +167,44 @@ class AssignCreditEntriesForm(forms.Form):
                     (
                         invoice.id,
                         mark_safe(
-                            " ".join(
-                                (
-                                    format_html(
-                                        '<span title="{}">', invoice.description
-                                    ),
-                                    format_html(
-                                        "<strong>{}</strong>"
-                                        if re.search(
-                                            r"\b" + invoice.code + r"\b",
-                                            entry.payment_notice,
-                                        )
-                                        else "{}",
-                                        invoice,
-                                    ),
-                                    invoice.status_badge,
-                                    "<br>",
-                                    format_html(
-                                        "{}",
-                                        invoice.contact.name_with_organization
-                                        if invoice.contact
-                                        else invoice.customer,
-                                    ),
-                                    "<br>",
-                                    format_html(
-                                        "{} {}",
-                                        _("invoiced on"),
-                                        local_date_format(invoice.invoiced_on),
+                            " ".join((
+                                format_html('<span title="{}">', invoice.description),
+                                format_html(
+                                    "<strong>{}</strong>"
+                                    if re.search(
+                                        r"\b" + invoice.code + r"\b",
+                                        entry.payment_notice,
                                     )
-                                    if invoice.invoiced_on
-                                    else gettext("NO DATE YET"),
-                                    "<br>",
-                                    currency(invoice.total),
-                                    format_html(
-                                        "<br><span style='color:darkred'>{}: {}</span>",
-                                        _("third party costs"),
-                                        currency(invoice.third_party_costs),
-                                    )
-                                    if invoice.third_party_costs
-                                    else "",
-                                    "</span>",
+                                    else "{}",
+                                    invoice,
+                                ),
+                                invoice.status_badge,
+                                "<br>",
+                                format_html(
+                                    "{}",
+                                    invoice.contact.name_with_organization
+                                    if invoice.contact
+                                    else invoice.customer,
+                                ),
+                                "<br>",
+                                format_html(
+                                    "{} {}",
+                                    _("invoiced on"),
+                                    local_date_format(invoice.invoiced_on),
                                 )
-                            )
+                                if invoice.invoiced_on
+                                else gettext("NO DATE YET"),
+                                "<br>",
+                                currency(invoice.total),
+                                format_html(
+                                    "<br><span style='color:darkred'>{}: {}</span>",
+                                    _("third party costs"),
+                                    currency(invoice.third_party_costs),
+                                )
+                                if invoice.third_party_costs
+                                else "",
+                                "</span>",
+                            ))
                         ),
                     )
                     for invoice in Invoice.objects.open()
@@ -226,13 +222,11 @@ class AssignCreditEntriesForm(forms.Form):
                 widget=Textarea({"rows": 1}), label=_("notes"), required=False
             )
 
-            self.entries.append(
-                (
-                    entry,
-                    f"entry_{entry.pk}_invoice",
-                    f"entry_{entry.pk}_notes",
-                )
-            )
+            self.entries.append((
+                entry,
+                f"entry_{entry.pk}_invoice",
+                f"entry_{entry.pk}_notes",
+            ))
 
     def save(self):
         for entry, invoice_field, notes_field in self.entries:

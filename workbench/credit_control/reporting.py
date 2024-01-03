@@ -42,15 +42,13 @@ def paid_debtors_zip(date_range, *, file):
                 .order_by("value_date")
                 .select_related("invoice__project", "invoice__owned_by")
             ):
-                rows.append(
-                    (
-                        entry.value_date,
-                        entry.total,
-                        entry.payment_notice,
-                        entry.invoice,
-                        entry.notes,
-                    )
-                )
+                rows.append((
+                    entry.value_date,
+                    entry.total,
+                    entry.payment_notice,
+                    entry.invoice,
+                    entry.notes,
+                ))
 
                 if entry.invoice:
                     append_invoice(
@@ -82,9 +80,12 @@ def paid_debtors_zip(date_range, *, file):
             .order_by("closed_on")
             .select_related("project")
         ):
-            rows.append(
-                (invoice.closed_on, invoice.total, invoice.payment_notice, invoice)
-            )
+            rows.append((
+                invoice.closed_on,
+                invoice.total,
+                invoice.payment_notice,
+                invoice,
+            ))
 
             append_invoice(zf=zf, ledger_slug="unknown", invoice=invoice)
 

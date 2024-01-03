@@ -425,13 +425,11 @@ def _projects_project_cfg(user):
     }
     related = []
     if user.features[FEATURES.CONTROLLING]:
-        related.extend(
-            [
-                (Offer, "project_id"),
-                (Invoice, "project_id"),
-                (ProjectService, "project_id"),
-            ]
-        )
+        related.extend([
+            (Offer, "project_id"),
+            (Invoice, "project_id"),
+            (ProjectService, "project_id"),
+        ])
         fields |= {"flat_rate"}
     if user.features[FEATURES.CAMPAIGNS]:
         fields |= {"campaign"}

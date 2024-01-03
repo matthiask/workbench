@@ -106,19 +106,15 @@ class DealSearchForm(Form):
             }
 
             for vt in ValueType.objects.all():
-                additional.append(
-                    (
-                        f"{Value._meta.verbose_name}: {vt}",
-                        (lambda id: lambda deal: values.get((deal.id, id)))(vt.id),
-                    )
-                )
+                additional.append((
+                    f"{Value._meta.verbose_name}: {vt}",
+                    (lambda id: lambda deal: values.get((deal.id, id)))(vt.id),
+                ))
             for ag in AttributeGroup.objects.all():
-                additional.append(
-                    (
-                        f"{Attribute._meta.verbose_name}: {ag}",
-                        (lambda id: lambda deal: attributes.get((deal.id, id)))(ag.id),
-                    )
-                )
+                additional.append((
+                    f"{Attribute._meta.verbose_name}: {ag}",
+                    (lambda id: lambda deal: attributes.get((deal.id, id)))(ag.id),
+                ))
             xlsx.table_from_queryset(queryset, additional=additional)
             return xlsx.to_response("deals.xlsx")
         return None

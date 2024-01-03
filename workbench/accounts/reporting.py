@@ -46,13 +46,11 @@ ORDER BY series.week
                 "hours": hours,
                 "by_type": {type: hours},
                 "url": logged_hours_url
-                + querystring(
-                    {
-                        "rendered_by": user.pk,
-                        "date_from": week.date().isoformat(),
-                        "date_until": (week.date() + dt.timedelta(days=6)).isoformat(),
-                    }
-                ),
+                + querystring({
+                    "rendered_by": user.pk,
+                    "date_from": week.date().isoformat(),
+                    "date_until": (week.date() + dt.timedelta(days=6)).isoformat(),
+                }),
             }
 
     stats["hours_per_week"] = [row[1] for row in sorted(hours_per_week.items())]
@@ -104,22 +102,20 @@ ORDER BY series.week
         ],
     }
     customers = set(customers)
-    stats["hours_per_customer"]["by_customer"].append(
-        {
-            "name": _("All others"),
-            "hours": [
-                sum(
-                    (
-                        hours
-                        for customer, hours in hours_per_customer[week].items()
-                        if customer not in customers
-                    ),
-                    0,
-                )
-                for week in weeks
-            ],
-        }
-    )
+    stats["hours_per_customer"]["by_customer"].append({
+        "name": _("All others"),
+        "hours": [
+            sum(
+                (
+                    hours
+                    for customer, hours in hours_per_customer[week].items()
+                    if customer not in customers
+                ),
+                0,
+            )
+            for week in weeks
+        ],
+    })
 
     total = sum(sum(row.values()) for row in hours_per_customer.values())
     stats["hours_per_customer"]["by_customer"] = (
@@ -141,22 +137,18 @@ def work_anniversaries():
     for user in User.objects.active():
         if user.date_of_employment:
             this_year = user.date_of_employment.replace(year=today.year)
-            anniversaries.append(
-                {
-                    "user": user,
-                    "this_year": this_year,
-                    "anniversary": this_year.year - user.date_of_employment.year,
-                    "already": this_year > today,
-                }
-            )
+            anniversaries.append({
+                "user": user,
+                "this_year": this_year,
+                "anniversary": this_year.year - user.date_of_employment.year,
+                "already": this_year > today,
+            })
         else:
-            anniversaries.append(
-                {
-                    "user": user,
-                    "this_year": dt.date.max,
-                    "already": True,
-                }
-            )
+            anniversaries.append({
+                "user": user,
+                "this_year": dt.date.max,
+                "already": True,
+            })
 
     return sorted(
         anniversaries, key=lambda row: (row["this_year"], row["user"].get_full_name())

@@ -35,13 +35,11 @@ class DynamicFormsetNode(template.Node):
         result = [str(formset.management_form)]
 
         with context.push(form_id="%s-empty" % slug, form=formset.empty_form):
-            result.extend(
-                (
-                    '<script type="text/template" id="%s-empty">' % slug,
-                    self.nodelist.render(context),
-                    "</script>",
-                )
-            )
+            result.extend((
+                '<script type="text/template" id="%s-empty">' % slug,
+                self.nodelist.render(context),
+                "</script>",
+            ))
 
         for idx, form in enumerate(formset.forms):
             with context.push(form_id=f"{slug}-{idx}", form=form):

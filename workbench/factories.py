@@ -212,14 +212,12 @@ class ProjectedInvoiceFactory(DjangoModelFactory):
 def service_types():
     service_types = [("consulting", 250), ("production", 180), ("administration", 130)]
 
-    return types.SimpleNamespace(
-        **{
-            row[0]: ServiceType.objects.create(
-                title=row[0], hourly_rate=row[1], position=idx
-            )
-            for idx, row in enumerate(service_types)
-        }
-    )
+    return types.SimpleNamespace(**{
+        row[0]: ServiceType.objects.create(
+            title=row[0], hourly_rate=row[1], position=idx
+        )
+        for idx, row in enumerate(service_types)
+    })
 
 
 # LOGBOOK #####################################################################

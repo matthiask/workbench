@@ -26,15 +26,13 @@ class ToolsMixin:
 
     @cached_property
     def default_service_types_json(self):
-        return json.dumps(
-            {
-                str(type.id): {
-                    "effort_type": type.title,
-                    "effort_rate": int(type.hourly_rate),
-                }
-                for type in self.default_service_types
+        return json.dumps({
+            str(type.id): {
+                "effort_type": type.title,
+                "effort_rate": int(type.hourly_rate),
             }
-        )
+            for type in self.default_service_types
+        })
 
     def get_template_names(self):
         """
@@ -289,13 +287,11 @@ class AutocompleteView(ToolsMixin, vanilla.ListView):
         queryset = (
             self.filter(queryset=queryset, request=request) if self.filter else queryset
         )
-        return JsonResponse(
-            {
-                "results": [
-                    {"label": self.label_from_instance(instance), "value": instance.pk}
-                    for instance in queryset[:50]
-                ]
-                if q
-                else []
-            }
-        )
+        return JsonResponse({
+            "results": [
+                {"label": self.label_from_instance(instance), "value": instance.pk}
+                for instance in queryset[:50]
+            ]
+            if q
+            else []
+        })

@@ -222,18 +222,16 @@ class ModelForm(WarningsForm, forms.ModelForm):
 
             if data.get("customer") and data.get("contact"):
                 if data.get("customer") != data.get("contact").organization:
-                    raise forms.ValidationError(
-                        {
-                            "contact": gettext(
-                                "The contact %(person)s does not belong to"
-                                " %(organization)s."
-                            )
-                            % {
-                                "person": data.get("contact"),
-                                "organization": data.get("customer"),
-                            }
+                    raise forms.ValidationError({
+                        "contact": gettext(
+                            "The contact %(person)s does not belong to"
+                            " %(organization)s."
+                        )
+                        % {
+                            "person": data.get("contact"),
+                            "organization": data.get("customer"),
                         }
-                    )
+                    })
 
             if not data.get("customer") and "customer" in self.fields:
                 raise forms.ValidationError(

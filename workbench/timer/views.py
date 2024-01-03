@@ -103,28 +103,26 @@ def list_timestamps(request):
         (slice["logged_hours"].hours for slice in slices if slice.get("logged_hours")),
         Z1,
     )
-    return JsonResponse(
-        {
-            "success": True,
-            "user": str(user),
-            "hours": daily_hours,
-            "timestamps": [
-                {
-                    "timestamp": "{:>5} - {:>5} {:^7} {}".format(
-                        local_date_format(slice.get("starts_at"), fmt="H:i") or "?  ",
-                        local_date_format(slice.get("ends_at"), fmt="H:i") or "?  ",
-                        f"({hours(slice.elapsed_hours, plus_sign=True)})"
-                        if slice.elapsed_hours is not None
-                        else "?",
-                        slice["description"] or "-",
-                    ),
-                    "elapsed": slice.elapsed_hours,
-                    "comment": slice.get("comment", ""),
-                }
-                for slice in slices
-            ],
-        }
-    )
+    return JsonResponse({
+        "success": True,
+        "user": str(user),
+        "hours": daily_hours,
+        "timestamps": [
+            {
+                "timestamp": "{:>5} - {:>5} {:^7} {}".format(
+                    local_date_format(slice.get("starts_at"), fmt="H:i") or "?  ",
+                    local_date_format(slice.get("ends_at"), fmt="H:i") or "?  ",
+                    f"({hours(slice.elapsed_hours, plus_sign=True)})"
+                    if slice.elapsed_hours is not None
+                    else "?",
+                    slice["description"] or "-",
+                ),
+                "elapsed": slice.elapsed_hours,
+                "comment": slice.get("comment", ""),
+            }
+            for slice in slices
+        ],
+    })
 
 
 @require_POST

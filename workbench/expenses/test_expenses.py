@@ -45,13 +45,11 @@ class ExpensesTest(TestCase):
         self.client.force_login(user)
 
         report = ExpenseReport.objects.create(created_by=user, owned_by=user)
-        report.expenses.set(
-            [
-                factories.LoggedCostFactory.create(
-                    rendered_by=user, are_expenses=True, third_party_costs=5
-                )
-            ]
-        )
+        report.expenses.set([
+            factories.LoggedCostFactory.create(
+                rendered_by=user, are_expenses=True, third_party_costs=5
+            )
+        ])
 
         code = check_code(self, "/expenses/")
         code("")

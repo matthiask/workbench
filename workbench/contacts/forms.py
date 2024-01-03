@@ -238,13 +238,11 @@ class PersonForm(ModelForm):
         super().__init__(*args, **kwargs)
         kwargs.pop("request")
         self.formsets = (
-            OrderedDict(
-                (
-                    ("phonenumbers", PhoneNumberFormset(*args, **kwargs)),
-                    ("emailaddresses", EmailAddressFormset(*args, **kwargs)),
-                    ("postaladdresses", PostalAddressFormset(*args, **kwargs)),
-                )
-            )
+            OrderedDict((
+                ("phonenumbers", PhoneNumberFormset(*args, **kwargs)),
+                ("emailaddresses", EmailAddressFormset(*args, **kwargs)),
+                ("postaladdresses", PostalAddressFormset(*args, **kwargs)),
+            ))
             if self.instance.pk
             else OrderedDict()
         )
@@ -373,12 +371,10 @@ class PostalAddressSelectionForm(ModelForm):
                 and person.organization
                 and person.organization.default_billing_address
             ):
-                postal_addresses.append(
-                    (
-                        _("default billing address"),
-                        person.organization.default_billing_address,
-                    )
-                )
+                postal_addresses.append((
+                    _("default billing address"),
+                    person.organization.default_billing_address,
+                ))
             postal_addresses.extend(
                 (pa.type, pa.postal_address)
                 for pa in PostalAddress.objects.filter(person=person).select_related(
@@ -388,9 +384,10 @@ class PostalAddressSelectionForm(ModelForm):
 
         if organization and (not person or not postal_addresses):
             if for_billing and organization.default_billing_address:
-                postal_addresses.append(
-                    (_("default billing address"), organization.default_billing_address)
-                )
+                postal_addresses.append((
+                    _("default billing address"),
+                    organization.default_billing_address,
+                ))
             postal_addresses.extend(
                 (pa.type, pa.postal_address)
                 for pa in PostalAddress.objects.filter(

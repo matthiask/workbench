@@ -515,9 +515,10 @@ def date_range_filter_view(request, form, *, template_name, stats_fn):
         template_name,
         {
             "form": form,
-            "stats": stats_fn(
-                [form.cleaned_data["date_from"], form.cleaned_data["date_until"]]
-            ),
+            "stats": stats_fn([
+                form.cleaned_data["date_from"],
+                form.cleaned_data["date_until"],
+            ]),
         },
     )
 

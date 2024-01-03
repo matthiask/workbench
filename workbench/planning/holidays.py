@@ -13,7 +13,6 @@ from decimal import Decimal as D
 
 
 class EasterDay:
-
     """
     Berechnung des Ostersonntages nach der Formel von Heiner Lichtenberg für
     den gregorianischen Kalender. Diese Formel stellt eine Erweiterung der

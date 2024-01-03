@@ -70,35 +70,35 @@ class InvoiceXLSXView(generic.DetailView):
             cost[entry.invoice_service_id].append(entry)
 
         for service in self.object.services.all():
-            data.append(
-                [
-                    service.title,
-                    service.description,
-                    "",
-                    service.effort_type,
-                    service.effort_rate,
-                    "",
-                    "",
-                ]
-            )
+            data.append([
+                service.title,
+                service.description,
+                "",
+                service.effort_type,
+                service.effort_rate,
+                "",
+                "",
+            ])
             for entry in hours[service.id]:
-                data.append(
-                    [
-                        "",
-                        entry.description,
-                        entry.rendered_on,
-                        "",
-                        "",
-                        entry.hours,
-                        entry.hours * service.effort_rate
-                        if service.effort_rate
-                        else "",
-                    ]
-                )
+                data.append([
+                    "",
+                    entry.description,
+                    entry.rendered_on,
+                    "",
+                    "",
+                    entry.hours,
+                    entry.hours * service.effort_rate if service.effort_rate else "",
+                ])
             for entry in cost[service.id]:
-                data.append(
-                    ["", entry.description, entry.rendered_on, "", "", "", entry.cost]
-                )
+                data.append([
+                    "",
+                    entry.description,
+                    entry.rendered_on,
+                    "",
+                    "",
+                    "",
+                    entry.cost,
+                ])
             data.append([])
 
         xlsx = WorkbenchXLSXDocument()

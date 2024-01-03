@@ -181,51 +181,47 @@ class PDFDocument(_PDFDocument):
     def init_letter(self, *, page_fn=None, page_fn_later=None):
         page_fn = page_fn or self.stationery()
         self.generate_style()
-        self.doc.addPageTemplates(
-            [
-                PageTemplate(
-                    id="First",
-                    frames=[self.address_frame, self.rest_frame],
-                    onPage=page_fn,
-                ),
-                PageTemplate(
-                    id="Later",
-                    frames=[self.full_frame],
-                    onPage=page_fn_later or page_fn,
-                ),
-            ]
-        )
+        self.doc.addPageTemplates([
+            PageTemplate(
+                id="First",
+                frames=[self.address_frame, self.rest_frame],
+                onPage=page_fn,
+            ),
+            PageTemplate(
+                id="Later",
+                frames=[self.full_frame],
+                onPage=page_fn_later or page_fn,
+            ),
+        ])
         self.story.append(NextPageTemplate("Later"))
 
     def init_invoice_letter(self, *, page_fn=None, page_fn_later=None):
         page_fn = page_fn or self.stationery()
         self.generate_style()
-        self.doc.addPageTemplates(
-            [
-                PageTemplate(
-                    id="First",
-                    frames=[self.address_frame, self.rest_frame],
-                    onPage=page_fn,
-                ),
-                PageTemplate(
-                    id="QR",
-                    frames=[self.bill_frame],
-                    onPage=page_fn,
-                ),
-                PageTemplate(
-                    id="Later",
-                    frames=[self.full_frame],
-                    onPage=page_fn_later or page_fn,
-                ),
-            ]
-        )
+        self.doc.addPageTemplates([
+            PageTemplate(
+                id="First",
+                frames=[self.address_frame, self.rest_frame],
+                onPage=page_fn,
+            ),
+            PageTemplate(
+                id="QR",
+                frames=[self.bill_frame],
+                onPage=page_fn,
+            ),
+            PageTemplate(
+                id="Later",
+                frames=[self.full_frame],
+                onPage=page_fn_later or page_fn,
+            ),
+        ])
 
     def init_report(self, *, page_fn=None):
         page_fn = page_fn or self.stationery()
         self.generate_style()
-        self.doc.addPageTemplates(
-            [PageTemplate(id="Page", frames=[self.full_frame], onPage=page_fn)]
-        )
+        self.doc.addPageTemplates([
+            PageTemplate(id="Page", frames=[self.full_frame], onPage=page_fn)
+        ])
 
     def stationery(self):
         pdf = self
@@ -383,33 +379,30 @@ class PDFDocument(_PDFDocument):
 
         total = [(_("subtotal"), currency(transform(instance.subtotal).quantize(Z)))]
         if instance.discount:
-            total.append(
-                (_("discount"), currency(-transform(instance.discount).quantize(Z)))
-            )
+            total.append((
+                _("discount"),
+                currency(-transform(instance.discount).quantize(Z)),
+            ))
         if getattr(instance, "down_payment_total", None):
             for invoice in instance.down_payment_invoices.all():
-                total.append(
-                    (
-                        MarkupParagraph(
-                            "{}: {} ({})".format(
-                                _("Down payment"),
-                                Truncator(invoice).chars(60),
-                                invoice.invoiced_on.strftime("%d.%m.%Y")
-                                if invoice.invoiced_on
-                                else _("NO DATE YET"),
-                            ),
-                            self.style.normal,
+                total.append((
+                    MarkupParagraph(
+                        "{}: {} ({})".format(
+                            _("Down payment"),
+                            Truncator(invoice).chars(60),
+                            invoice.invoiced_on.strftime("%d.%m.%Y")
+                            if invoice.invoiced_on
+                            else _("NO DATE YET"),
                         ),
-                        currency(-transform(invoice.total_excl_tax).quantize(Z)),
-                    )
-                )
+                        self.style.normal,
+                    ),
+                    currency(-transform(invoice.total_excl_tax).quantize(Z)),
+                ))
         if instance.liable_to_vat:
-            total.append(
-                (
-                    "{:0.1f}% {}".format(instance.tax_rate, _("tax")),
-                    currency(transform(instance.tax_amount).quantize(Z)),
-                )
-            )
+            total.append((
+                "{:0.1f}% {}".format(instance.tax_rate, _("tax")),
+                currency(transform(instance.tax_amount).quantize(Z)),
+            ))
 
         if len(total) > 1:
             self.table(total, self.style.tableColumns, self.style.tableHead)

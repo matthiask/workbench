@@ -254,46 +254,40 @@ def annual_working_time(year, *, users):
             sum(sums)
             + month_data["year"].working_time_per_day * vacation_days_credit[user.id]
         )
-        statistics.append(
-            {
-                "user": user,
-                "months": month_data,
-                "absences": absences[user.id],
-                "employments": month_data["employments"],
-                "working_time": wt,
-                "absences_time": at,
-                "monthly_sums": sums,
-                "running_sums": [sum(sums[:i], Z1) for i in range(1, 13)],
-                "totals": {
-                    "target_days": sum(month_data["target_days"]),
-                    "percentage": sum(month_data["percentage"]) / 12,
-                    "available_vacation_days": available_vacation_days[user.id],
-                    "calculated_vacation_days": sum(
-                        month_data["available_vacation_days"]
-                    ),
-                    "vacation_days_override": overrides.get(user.id),
-                    "absence_vacation": sum(month_data["absence_vacation"]),
-                    "vacation_days_correction": sum(
-                        month_data["vacation_days_correction"]
-                    ),
-                    "vacation_days_credit": vacation_days_credit[user.id].quantize(
-                        Z2, rounding=ROUND_UP
-                    ),
-                    "balance": balance,
-                    "balance_days": (
-                        balance / month_data["year"].working_time_per_day
-                    ).quantize(Z2, rounding=ROUND_UP),
-                    "absence_sickness": sum(month_data["absence_sickness"]),
-                    "absence_paid": sum(month_data["absence_paid"]),
-                    "absence_correction": sum(month_data["absence_correction"]),
-                    "target": sum(month_data["target"]),
-                    "hours": sum(month_data["hours"]),
-                    "absences_time": sum(at),
-                    "working_time": sum(wt),
-                    "running_sum": sum(sums).quantize(Z1),
-                },
-            }
-        )
+        statistics.append({
+            "user": user,
+            "months": month_data,
+            "absences": absences[user.id],
+            "employments": month_data["employments"],
+            "working_time": wt,
+            "absences_time": at,
+            "monthly_sums": sums,
+            "running_sums": [sum(sums[:i], Z1) for i in range(1, 13)],
+            "totals": {
+                "target_days": sum(month_data["target_days"]),
+                "percentage": sum(month_data["percentage"]) / 12,
+                "available_vacation_days": available_vacation_days[user.id],
+                "calculated_vacation_days": sum(month_data["available_vacation_days"]),
+                "vacation_days_override": overrides.get(user.id),
+                "absence_vacation": sum(month_data["absence_vacation"]),
+                "vacation_days_correction": sum(month_data["vacation_days_correction"]),
+                "vacation_days_credit": vacation_days_credit[user.id].quantize(
+                    Z2, rounding=ROUND_UP
+                ),
+                "balance": balance,
+                "balance_days": (
+                    balance / month_data["year"].working_time_per_day
+                ).quantize(Z2, rounding=ROUND_UP),
+                "absence_sickness": sum(month_data["absence_sickness"]),
+                "absence_paid": sum(month_data["absence_paid"]),
+                "absence_correction": sum(month_data["absence_correction"]),
+                "target": sum(month_data["target"]),
+                "hours": sum(month_data["hours"]),
+                "absences_time": sum(at),
+                "working_time": sum(wt),
+                "running_sum": sum(sums).quantize(Z1),
+            },
+        })
 
     overall = {
         key: sum((s["totals"][key] for s in statistics), Z1)

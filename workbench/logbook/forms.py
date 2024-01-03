@@ -153,9 +153,10 @@ class LoggedHoursSearchForm(Form):
             )
             queryset = queryset.filter(service__project__campaign=campaign)
         if data.get("offer") == 0:
-            self.hidden_filters.append(
-                (_("No offer"), querystring(self.request.GET, offer=""))
-            )
+            self.hidden_filters.append((
+                _("No offer"),
+                querystring(self.request.GET, offer=""),
+            ))
             queryset = queryset.filter(service__offer__isnull=True)
         elif data.get("offer"):
             offer = Offer.objects.filter(pk=data.get("offer")).first()
@@ -167,24 +168,24 @@ class LoggedHoursSearchForm(Form):
             )
             queryset = queryset.filter(service__offer=offer)
         if data.get("not_archived"):
-            self.hidden_filters.append(
-                (_("Not archived"), querystring(self.request.GET, not_archived=""))
-            )
+            self.hidden_filters.append((
+                _("Not archived"),
+                querystring(self.request.GET, not_archived=""),
+            ))
             queryset = queryset.filter(archived_at__isnull=True)
         if data.get("internal_type") == -1:
-            self.hidden_filters.append(
-                (_("External"), querystring(self.request.GET, internal_type=""))
-            )
+            self.hidden_filters.append((
+                _("External"),
+                querystring(self.request.GET, internal_type=""),
+            ))
             queryset = queryset.exclude(service__project__type=Project.INTERNAL)
         elif (pk := data.get("internal_type")) and (
             internal_type := InternalType.objects.filter(pk=pk).first()
         ):
-            self.hidden_filters.append(
-                (
-                    f"{capfirst(internal_type._meta.verbose_name)}: {internal_type.name}",
-                    querystring(self.request.GET, internal_type=""),
-                )
-            )
+            self.hidden_filters.append((
+                f"{capfirst(internal_type._meta.verbose_name)}: {internal_type.name}",
+                querystring(self.request.GET, internal_type=""),
+            ))
             queryset = queryset.filter(service__project__internal_type=internal_type)
 
         return queryset.select_related("service__project__owned_by", "rendered_by")
@@ -298,9 +299,10 @@ class LoggedCostSearchForm(Form):
             )
             queryset = queryset.filter(service__project__campaign=campaign)
         if data.get("offer") == 0:
-            self.hidden_filters.append(
-                (_("No offer"), querystring(self.request.GET, offer=""))
-            )
+            self.hidden_filters.append((
+                _("No offer"),
+                querystring(self.request.GET, offer=""),
+            ))
             queryset = queryset.filter(service__offer__isnull=True)
         elif data.get("offer"):
             offer = Offer.objects.filter(pk=data.get("offer")).first()
@@ -312,9 +314,10 @@ class LoggedCostSearchForm(Form):
             )
             queryset = queryset.filter(service__offer=offer)
         if data.get("not_archived"):
-            self.hidden_filters.append(
-                (_("Not archived"), querystring(self.request.GET, not_archived=""))
-            )
+            self.hidden_filters.append((
+                _("Not archived"),
+                querystring(self.request.GET, not_archived=""),
+            ))
             queryset = queryset.filter(archived_at__isnull=True)
 
         return queryset.select_related("service__project__owned_by", "rendered_by")
@@ -359,14 +362,12 @@ class LoggedHoursForm(ModelForm):
                 except (LoggedHours.DoesNotExist, TypeError, ValueError):
                     pass
                 else:
-                    initial.update(
-                        {
-                            "service": hours.service_id,
-                            "rendered_on": hours.rendered_on.isoformat(),
-                            "hours": hours.hours,
-                            "description": hours.description,
-                        }
-                    )
+                    initial.update({
+                        "service": hours.service_id,
+                        "rendered_on": hours.rendered_on.isoformat(),
+                        "hours": hours.hours,
+                        "description": hours.description,
+                    })
 
             for field in ["description", "hours", "rendered_on", "service"]:
                 if value := request.GET.get(field):

@@ -113,14 +113,12 @@ def gross_margin_by_month(date_range):
             "fte": fte.get(day, Z2),
             "projected_gross_margin": pgm["monthly_overall"].get(month),
         }
-        if not any(
-            (
-                row["gross_profit"],
-                row["third_party_costs"],
-                row["accruals"]["delta"],
-                row["projected_gross_margin"],
-            )
-        ):
+        if not any((
+            row["gross_profit"],
+            row["third_party_costs"],
+            row["accruals"]["delta"],
+            row["projected_gross_margin"],
+        )):
             continue
 
         row["gross_margin"] = (

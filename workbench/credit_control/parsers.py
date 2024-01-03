@@ -44,16 +44,14 @@ def parse_zkb_csv(data):
         except (AttributeError, IndexError, ValueError):
             continue
         if day and amount:
-            entries.append(
-                {
-                    "reference_number": reference,
-                    "value_date": day,
-                    "total": amount,
-                    "payment_notice": "; ".join(
-                        filter(None, (row[c] for c in detail_columns))
-                    ),
-                }
-            )
+            entries.append({
+                "reference_number": reference,
+                "value_date": day,
+                "total": amount,
+                "payment_notice": "; ".join(
+                    filter(None, (row[c] for c in detail_columns))
+                ),
+            })
     return entries
 
 
@@ -98,12 +96,10 @@ def parse_postfinance_csv(data):
             continue
 
         payment_notice = postfinance_preprocess_notice(row[1])
-        entries.append(
-            {
-                "reference_number": postfinance_reference_number(payment_notice, day),
-                "value_date": day,
-                "total": Decimal(row[2]),
-                "payment_notice": payment_notice,
-            }
-        )
+        entries.append({
+            "reference_number": postfinance_reference_number(payment_notice, day),
+            "value_date": day,
+            "total": Decimal(row[2]),
+            "payment_notice": payment_notice,
+        })
     return entries

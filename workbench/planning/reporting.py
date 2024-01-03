@@ -91,36 +91,34 @@ class Planning:
             date_from = min(pw.weeks)
             date_until = max(pw.weeks) + dt.timedelta(days=6)
 
-            self._projects_offers[pw.project][pw.offer].append(
-                {
-                    "work": {
-                        "id": pw.id,
-                        "title": pw.title,
-                        "text": pw.user.get_short_name(),
-                        "user": pw.user.get_short_name(),
-                        "planned_hours": pw.planned_hours if not self.external else 0,
-                        "url": pw.get_absolute_url(),
-                        "date_from": date_from,
-                        "date_until": date_until,
-                        "range": "{} – {}".format(
-                            local_date_format(date_from, fmt="d.m."),
-                            local_date_format(date_until, fmt="d.m."),
-                        ),
-                        "service_type_id": pw.service_type_id,
-                        "is_provisional": pw.is_provisional,
-                        "tooltip": ", ".join(
-                            filter(
-                                None,
-                                (
-                                    str(pw.service_type) if pw.service_type else None,
-                                    _("%.1fh per week") % per_week,
-                                ),
-                            )
-                        ),
-                    },
-                    "hours_per_week": hours_per_week,
-                }
-            )
+            self._projects_offers[pw.project][pw.offer].append({
+                "work": {
+                    "id": pw.id,
+                    "title": pw.title,
+                    "text": pw.user.get_short_name(),
+                    "user": pw.user.get_short_name(),
+                    "planned_hours": pw.planned_hours if not self.external else 0,
+                    "url": pw.get_absolute_url(),
+                    "date_from": date_from,
+                    "date_until": date_until,
+                    "range": "{} – {}".format(
+                        local_date_format(date_from, fmt="d.m."),
+                        local_date_format(date_until, fmt="d.m."),
+                    ),
+                    "service_type_id": pw.service_type_id,
+                    "is_provisional": pw.is_provisional,
+                    "tooltip": ", ".join(
+                        filter(
+                            None,
+                            (
+                                str(pw.service_type) if pw.service_type else None,
+                                _("%.1fh per week") % per_week,
+                            ),
+                        )
+                    ),
+                },
+                "hours_per_week": hours_per_week,
+            })
 
             self._work_ids_users[pw.id].add(pw.user)
 
@@ -135,23 +133,21 @@ class Planning:
                 date_from = min(ew.weeks)
                 date_until = max(ew.weeks) + dt.timedelta(days=6)
 
-                self._projects_external_work[ew.project].append(
-                    {
-                        "id": ew.id,
-                        "title": ew.title,
-                        "provided_by": ew.provided_by.name,
-                        "url": ew.get_absolute_url(),
-                        "date_from": date_from,
-                        "date_until": date_until,
-                        "range": "{} – {}".format(
-                            local_date_format(date_from, fmt="d.m."),
-                            local_date_format(date_until, fmt="d.m."),
-                        ),
-                        "service_type_id": ew.service_type_id,
-                        "tooltip": str(ew.service_type) if ew.service_type else None,
-                        "by_week": [1 if w in ew.weeks else 0 for w in self.weeks],
-                    }
-                )
+                self._projects_external_work[ew.project].append({
+                    "id": ew.id,
+                    "title": ew.title,
+                    "provided_by": ew.provided_by.name,
+                    "url": ew.get_absolute_url(),
+                    "date_from": date_from,
+                    "date_until": date_until,
+                    "range": "{} – {}".format(
+                        local_date_format(date_from, fmt="d.m."),
+                        local_date_format(date_until, fmt="d.m."),
+                    ),
+                    "service_type_id": ew.service_type_id,
+                    "tooltip": str(ew.service_type) if ew.service_type else None,
+                    "by_week": [1 if w in ew.weeks else 0 for w in self.weeks],
+                })
 
                 self.add_project_milestone(ew.project, ew.milestone)
                 self._project_ids.add(ew.project.pk)
@@ -180,26 +176,24 @@ class Planning:
                 1 if monday(milestone.date) == w else 0 for w in self.weeks
             ]
 
-            self._milestones[project][milestone].update(
-                {
-                    "id": milestone.id,
-                    "title": milestone.title,
-                    "dow": local_date_format(milestone.date, fmt="l, j.n."),
-                    "date": local_date_format(milestone.date, fmt="j."),
-                    "range": "{} – {}".format(
-                        local_date_format(start, fmt="d.m."),
-                        local_date_format(milestone.date, fmt="d.m."),
-                    )
-                    if milestone.phase_starts_on
-                    else None,
-                    "hours": milestone.estimated_total_hours,
-                    "phase_starts_on": start if milestone.phase_starts_on else None,
-                    "weekday": milestone.date.isocalendar()[2],
-                    "url": milestone.urls["detail"],
-                    "weeks": weeks,
-                    "graphical_weeks": graphical_weeks,
-                }
-            )
+            self._milestones[project][milestone].update({
+                "id": milestone.id,
+                "title": milestone.title,
+                "dow": local_date_format(milestone.date, fmt="l, j.n."),
+                "date": local_date_format(milestone.date, fmt="j."),
+                "range": "{} – {}".format(
+                    local_date_format(start, fmt="d.m."),
+                    local_date_format(milestone.date, fmt="d.m."),
+                )
+                if milestone.phase_starts_on
+                else None,
+                "hours": milestone.estimated_total_hours,
+                "phase_starts_on": start if milestone.phase_starts_on else None,
+                "weekday": milestone.date.isocalendar()[2],
+                "url": milestone.urls["detail"],
+                "weeks": weeks,
+                "graphical_weeks": graphical_weeks,
+            })
 
     def add_worked_hours(self, queryset):
         for row in (
@@ -207,9 +201,9 @@ class Planning:
             .values("service__project", "service__offer", "rendered_on")
             .annotate(Sum("hours"))
         ):
-            self._worked_hours[row["service__project"]][
-                monday(row["rendered_on"])
-            ] += row["hours__sum"]
+            self._worked_hours[row["service__project"]][monday(row["rendered_on"])] += (
+                row["hours__sum"]
+            )
 
     def add_absences(self, queryset):
         for absence in queryset.filter(
@@ -228,13 +222,11 @@ class Planning:
             ]
 
             for idx, week in weeks:
-                self._absences[absence.user][idx].append(
-                    (
-                        hours / len(weeks),
-                        f"{absence.get_reason_display()} - {absence.description}",
-                        absence.urls["detail"],
-                    )
-                )
+                self._absences[absence.user][idx].append((
+                    hours / len(weeks),
+                    f"{absence.get_reason_display()} - {absence.description}",
+                    absence.urls["detail"],
+                ))
                 self._by_week[week] += hours / len(weeks)
 
     def add_public_holidays(self):
@@ -292,20 +284,16 @@ order by ph.date
                 * (percentage or 0)
                 / 100
             )
-            detail = " × ".join(
-                (
-                    f"{hours(planning_hours_per_day)}/d",
-                    f"{percentage}%",
-                    f"{fraction}d",
-                )
-            )
-            self._absences[user][idx].append(
-                (
-                    ph_hours,
-                    f"{name} ({detail} = {hours(ph_hours)})",
-                    reverse("planning_publicholiday_detail", kwargs={"pk": id}),
-                )
-            )
+            detail = " × ".join((
+                f"{hours(planning_hours_per_day)}/d",
+                f"{percentage}%",
+                f"{fraction}d",
+            ))
+            self._absences[user][idx].append((
+                ph_hours,
+                f"{name} ({detail} = {hours(ph_hours)})",
+                reverse("planning_publicholiday_detail", kwargs={"pk": id}),
+            ))
             self._by_week[week] += ph_hours
 
     def add_milestones(self, queryset):
@@ -326,15 +314,13 @@ order by ph.date
             return None
 
         for wl in work_list:
-            wl.update(
-                {
-                    "absences": [
-                        [a for a in self._absences[user][idx] if h > 0]
-                        for idx, h in enumerate(wl["hours_per_week"])
-                    ]
-                    for user in self._work_ids_users[wl["work"]["id"]]
-                }
-            )
+            wl.update({
+                "absences": [
+                    [a for a in self._absences[user][idx] if h > 0]
+                    for idx, h in enumerate(wl["hours_per_week"])
+                ]
+                for user in self._work_ids_users[wl["work"]["id"]]
+            })
 
         return {
             "offer": {

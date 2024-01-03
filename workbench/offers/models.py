@@ -27,9 +27,10 @@ class OfferQuerySet(SearchQuerySet):
             Offer.SERVICE_GROUP: [],
         }
         for offer in self.filter(Q(status__lte=Offer.SERVICE_GROUP) | Q(pk=include)):
-            offers[True if offer.id == include else offer.status].append(
-                (offer.pk, offer)
-            )
+            offers[True if offer.id == include else offer.status].append((
+                offer.pk,
+                offer,
+            ))
         return (
             [("", "----------")]
             + offers[True]

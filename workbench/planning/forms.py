@@ -133,16 +133,14 @@ class PlannedWorkForm(ModelForm):
             except (self.project.offers.model.DoesNotExist, TypeError, ValueError):
                 pass
             else:
-                initial.update(
-                    {
-                        "title": offer.title,
-                        "notes": offer.description,
-                        "planned_hours": offer.services.aggregate(
-                            h=Sum("service_hours")
-                        )["h"]
-                        or Z1,
-                    }
-                )
+                initial.update({
+                    "title": offer.title,
+                    "notes": offer.description,
+                    "planned_hours": offer.services.aggregate(h=Sum("service_hours"))[
+                        "h"
+                    ]
+                    or Z1,
+                })
 
         if service_id := request.GET.get("service"):
             try:
@@ -150,13 +148,11 @@ class PlannedWorkForm(ModelForm):
             except (self.project.services.model.DoesNotExist, TypeError, ValueError):
                 pass
             else:
-                initial.update(
-                    {
-                        "title": f"{self.project.title}: {service.title}",
-                        "notes": service.description,
-                        "planned_hours": service.service_hours,
-                    }
-                )
+                initial.update({
+                    "title": f"{self.project.title}: {service.title}",
+                    "notes": service.description,
+                    "planned_hours": service.service_hours,
+                })
 
         if pk := request.GET.get("copy"):
             try:
@@ -164,19 +160,17 @@ class PlannedWorkForm(ModelForm):
             except (PlannedWork.DoesNotExist, TypeError, ValueError):
                 pass
             else:
-                initial.update(
-                    {
-                        "project": pw.project_id,
-                        "offer": pw.offer_id,
-                        "title": pw.title,
-                        "notes": pw.notes,
-                        "planned_hours": pw.planned_hours,
-                        "weeks": pw.weeks,
-                        "is_provisional": pw.is_provisional,
-                        "service_type": pw.service_type_id,
-                        "milestone": pw.milestone_id,
-                    }
-                )
+                initial.update({
+                    "project": pw.project_id,
+                    "offer": pw.offer_id,
+                    "title": pw.title,
+                    "notes": pw.notes,
+                    "planned_hours": pw.planned_hours,
+                    "weeks": pw.weeks,
+                    "is_provisional": pw.is_provisional,
+                    "service_type": pw.service_type_id,
+                    "milestone": pw.milestone_id,
+                })
 
         super().__init__(*args, **kwargs)
         self.instance.project = self.project
@@ -315,13 +309,11 @@ class ExternalWorkForm(ModelForm):
             except (self.project.services.model.DoesNotExist, TypeError, ValueError):
                 pass
             else:
-                initial.update(
-                    {
-                        "title": f"{self.project.title}: {service.title}",
-                        "notes": service.description,
-                        "planned_hours": service.service_hours,
-                    }
-                )
+                initial.update({
+                    "title": f"{self.project.title}: {service.title}",
+                    "notes": service.description,
+                    "planned_hours": service.service_hours,
+                })
 
         # if pk := request.GET.get("copy"):
         #     try:

@@ -13,9 +13,9 @@ def substitute_with(*, to_delete, keep):
     ]
 
     for related_object in fields:
-        queryset = related_object.related_model._base_manager.complex_filter(
-            {related_object.field.name: to_delete.pk}
-        )
+        queryset = related_object.related_model._base_manager.complex_filter({
+            related_object.field.name: to_delete.pk
+        })
 
         queryset.update(**{related_object.field.name: keep.pk})
     to_delete.delete()

@@ -457,9 +457,9 @@ class TimestampsTest(TestCase):
             DetectedTimestampForm({"detected_ends_at": "2010-21-01"}).is_valid()
         )
         self.assertTrue(
-            DetectedTimestampForm(
-                {"detected_ends_at": "2010-01-01 15:30+02:00"}
-            ).is_valid()
+            DetectedTimestampForm({
+                "detected_ends_at": "2010-01-01 15:30+02:00"
+            }).is_valid()
         )
 
     def test_start_with_log(self):

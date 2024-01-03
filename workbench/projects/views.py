@@ -80,33 +80,28 @@ def services(request, pk):
     for service in project.services.logging().select_related("offer__owned_by"):
         if service.offer not in offers:
             offers[service.offer] = {"label": str(service.offer), "options": []}
-        offers[service.offer]["options"].append(
-            {"label": str(service), "value": service.id}
-        )
+        offers[service.offer]["options"].append({
+            "label": str(service),
+            "value": service.id,
+        })
 
-    return JsonResponse(
-        {
-            "id": project.id,
-            "code": project.code,
-            "title": project.title,
-            "owned_by": project.owned_by.get_short_name(),
-            "customer_id": project.customer_id,
-            "services": [
-                data for offer, data in sorted(offers.items()) if data["options"]
-            ],
-        }
-    )
+    return JsonResponse({
+        "id": project.id,
+        "code": project.code,
+        "title": project.title,
+        "owned_by": project.owned_by.get_short_name(),
+        "customer_id": project.customer_id,
+        "services": [data for offer, data in sorted(offers.items()) if data["options"]],
+    })
 
 
 def projects(request):
-    return JsonResponse(
-        {
-            "projects": [
-                {"label": str(project), "value": project.pk}
-                for project in request.user.active_projects
-            ],
-        }
-    )
+    return JsonResponse({
+        "projects": [
+            {"label": str(project), "value": project.pk}
+            for project in request.user.active_projects
+        ],
+    })
 
 
 def cost_by_month_and_service_xlsx(request, pk):
@@ -143,18 +138,16 @@ def cost_by_month_and_service_xlsx(request, pk):
     months = sorted(months)
 
     rows = []
-    rows.extend(
-        (
-            [_("Cost by month and service")],
-            ["", _("cost"), "", _("cost")]
-            + [local_date_format(month, fmt="F Y") for month in months],
-            [_("project")],
-            [project, sum(project_costs.values()), "", ""]
-            + [project_costs.get(month) for month in months],
-            [],
-            [_("offer or service group"), "", _("service"), ""],
-        )
-    )
+    rows.extend((
+        [_("Cost by month and service")],
+        ["", _("cost"), "", _("cost")]
+        + [local_date_format(month, fmt="F Y") for month in months],
+        [_("project")],
+        [project, sum(project_costs.values()), "", ""]
+        + [project_costs.get(month) for month in months],
+        [],
+        [_("offer or service group"), "", _("service"), ""],
+    ))
 
     for offer, services in sorted(offers.items()):
         rows.append(

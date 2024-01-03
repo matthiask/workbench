@@ -202,24 +202,22 @@ class TimestampQuerySet(models.QuerySet):
                 and not slice["is_start"]
             ):
                 if not slice.has_associated_log:
-                    previous.update(
-                        {
-                            "timestamp_id": slice["timestamp_id"],
-                            "logged_hours": slice["logged_hours"],
-                            "logged_break": slice["logged_break"],
-                            "is_start": False,  # Not anymore
-                            "description": "; ".join(
-                                filter(
-                                    None,
-                                    [
-                                        str(previous["description"]),
-                                        str(slice["description"]),
-                                    ],
-                                )
-                            ),
-                            "ends_at": slice["ends_at"],
-                        }
-                    )
+                    previous.update({
+                        "timestamp_id": slice["timestamp_id"],
+                        "logged_hours": slice["logged_hours"],
+                        "logged_break": slice["logged_break"],
+                        "is_start": False,  # Not anymore
+                        "description": "; ".join(
+                            filter(
+                                None,
+                                [
+                                    str(previous["description"]),
+                                    str(slice["description"]),
+                                ],
+                            )
+                        ),
+                        "ends_at": slice["ends_at"],
+                    })
                     previous = slice
                     continue
 

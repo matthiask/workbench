@@ -35,13 +35,11 @@ def hours_per_customer(date_range, *, users=None):
     user_list = User.objects.filter(id__in=seen_users)
 
     for org in Organization.objects.filter(id__in=seen_organizations):
-        organizations.append(
-            {
-                "organization": org,
-                "user_hours": [(user, hours[org.id][user.id]) for user in user_list],
-                "total_hours": sum(hours[org.id].values(), Z1),
-            }
-        )
+        organizations.append({
+            "organization": org,
+            "user_hours": [(user, hours[org.id][user.id]) for user in user_list],
+            "total_hours": sum(hours[org.id].values(), Z1),
+        })
 
     return {
         "organizations": sorted(

@@ -25,54 +25,46 @@ from workbench.tools.validation import in_days
 def _needs_action(user):
     rows = []
     if user.features[FEATURES.PLANNING]:
-        rows.append(
-            {
-                "type": "provisional_planned_work",
-                "verbose_name_plural": _("Provisional planned work in the near future"),
-                "url": user.urls["planning"],
-                "objects": PlannedWork.objects.maybe_actionable(user=user),
-            }
-        )
+        rows.append({
+            "type": "provisional_planned_work",
+            "verbose_name_plural": _("Provisional planned work in the near future"),
+            "url": user.urls["planning"],
+            "objects": PlannedWork.objects.maybe_actionable(user=user),
+        })
     if user.features[FEATURES.DEALS]:
-        rows.append(
-            {
-                "type": "deals",
-                "verbose_name_plural": Deal._meta.verbose_name_plural,
-                "url": Deal.urls["list"],
-                "objects": Deal.objects.maybe_actionable(user=user),
-            }
-        )
+        rows.append({
+            "type": "deals",
+            "verbose_name_plural": Deal._meta.verbose_name_plural,
+            "url": Deal.urls["list"],
+            "objects": Deal.objects.maybe_actionable(user=user),
+        })
     if user.features[FEATURES.CONTROLLING]:
-        rows.extend(
-            (
-                {
-                    "type": "offers",
-                    "verbose_name_plural": Offer._meta.verbose_name_plural,
-                    "url": Offer.urls["list"],
-                    "objects": Offer.objects.maybe_actionable(user=user),
-                },
-                {
-                    "type": "invoices",
-                    "verbose_name_plural": Invoice._meta.verbose_name_plural,
-                    "url": Invoice.urls["list"],
-                    "objects": Invoice.objects.maybe_actionable(user=user),
-                },
-                {
-                    "type": "recurringinvoices",
-                    "verbose_name_plural": RecurringInvoice._meta.verbose_name_plural,
-                    "url": RecurringInvoice.urls["list"],
-                    "objects": RecurringInvoice.objects.maybe_actionable(),
-                },
-            )
-        )
-    rows.append(
-        {
-            "type": "old_projects",
-            "verbose_name_plural": _("Old projects"),
-            "url": Project.urls["list"] + "?s=old-projects",
-            "objects": Project.objects.old_projects().own_or_inactive(user),
-        }
-    )
+        rows.extend((
+            {
+                "type": "offers",
+                "verbose_name_plural": Offer._meta.verbose_name_plural,
+                "url": Offer.urls["list"],
+                "objects": Offer.objects.maybe_actionable(user=user),
+            },
+            {
+                "type": "invoices",
+                "verbose_name_plural": Invoice._meta.verbose_name_plural,
+                "url": Invoice.urls["list"],
+                "objects": Invoice.objects.maybe_actionable(user=user),
+            },
+            {
+                "type": "recurringinvoices",
+                "verbose_name_plural": RecurringInvoice._meta.verbose_name_plural,
+                "url": RecurringInvoice.urls["list"],
+                "objects": RecurringInvoice.objects.maybe_actionable(),
+            },
+        ))
+    rows.append({
+        "type": "old_projects",
+        "verbose_name_plural": _("Old projects"),
+        "url": Project.urls["list"] + "?s=old-projects",
+        "objects": Project.objects.old_projects().own_or_inactive(user),
+    })
 
     return [row for row in rows if row["objects"]]
 
@@ -149,21 +141,17 @@ def search(request):
         ]
         if request.user.features[FEATURES.CAMPAIGNS]:
             sources.append(Campaign.objects.select_related("owned_by"))
-        sources.extend(
-            [
-                Organization.objects.active(),
-                Person.objects.active().select_related("organization"),
-            ]
-        )
+        sources.extend([
+            Organization.objects.active(),
+            Person.objects.active().select_related("organization"),
+        ])
         if request.user.features[FEATURES.CONTROLLING]:
-            sources.extend(
-                [
-                    Invoice.objects.select_related("project", "owned_by"),
-                    RecurringInvoice.objects.all(),
-                    Offer.objects.select_related("project", "owned_by").order_by("-pk"),
-                    Deal.objects.order_by("-pk"),
-                ]
-            )
+            sources.extend([
+                Invoice.objects.select_related("project", "owned_by"),
+                RecurringInvoice.objects.all(),
+                Offer.objects.select_related("project", "owned_by").order_by("-pk"),
+                Deal.objects.order_by("-pk"),
+            ])
         results = [
             {
                 "verbose_name_plural": queryset.model._meta.verbose_name_plural,

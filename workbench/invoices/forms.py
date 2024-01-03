@@ -499,34 +499,32 @@ class CreateProjectInvoiceForm(InvoiceForm):
 
         choices = []
         for offer, offer_data in self.project.grouped_services["offers"]:
-            choices.append(
-                (
-                    format_html(
-                        "<u>{}</u><br>"
-                        '<div class="form-check">'
-                        '<input type="checkbox" data-toggle-following>'
-                        "{}"
-                        "</div>",
-                        offer if offer else _("Not offered yet"),
-                        _("Select all"),
-                    ),
-                    [
-                        (
-                            row["service"].id,
-                            format_html(
-                                '<div class="mb-2 text-break"><strong>{}</strong>'
-                                "<br>{}{}</div>",
-                                row["service"].title,
-                                format_html("{}<br>", row["service"].description)
-                                if row["service"].description
-                                else "",
-                                amount(row),
-                            ),
-                        )
-                        for row in offer_data["services"]
-                    ],
-                )
-            )
+            choices.append((
+                format_html(
+                    "<u>{}</u><br>"
+                    '<div class="form-check">'
+                    '<input type="checkbox" data-toggle-following>'
+                    "{}"
+                    "</div>",
+                    offer if offer else _("Not offered yet"),
+                    _("Select all"),
+                ),
+                [
+                    (
+                        row["service"].id,
+                        format_html(
+                            '<div class="mb-2 text-break"><strong>{}</strong>'
+                            "<br>{}{}</div>",
+                            row["service"].title,
+                            format_html("{}<br>", row["service"].description)
+                            if row["service"].description
+                            else "",
+                            amount(row),
+                        ),
+                    )
+                    for row in offer_data["services"]
+                ],
+            ))
         self.fields["selected_services"] = forms.MultipleChoiceField(
             choices=choices,
             label=_("services"),
@@ -810,22 +808,20 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             except (RecurringInvoice.DoesNotExist, TypeError, ValueError):
                 pass
             else:
-                initial.update(
-                    {
-                        "customer": invoice.customer_id,
-                        "contact": invoice.contact_id,
-                        "title": invoice.title,
-                        "description": invoice.description,
-                        "owned_by": invoice.owned_by_id,
-                        "postal_address": invoice.postal_address,
-                        "periodicity": invoice.periodicity,
-                        "create_invoice_on_day": invoice.create_invoice_on_day,
-                        "subtotal": invoice.subtotal,
-                        "discount": invoice.discount,
-                        "third_party_costs": invoice.third_party_costs,
-                        "liable_to_vat": invoice.liable_to_vat,
-                    }
-                )
+                initial.update({
+                    "customer": invoice.customer_id,
+                    "contact": invoice.contact_id,
+                    "title": invoice.title,
+                    "description": invoice.description,
+                    "owned_by": invoice.owned_by_id,
+                    "postal_address": invoice.postal_address,
+                    "periodicity": invoice.periodicity,
+                    "create_invoice_on_day": invoice.create_invoice_on_day,
+                    "subtotal": invoice.subtotal,
+                    "discount": invoice.discount,
+                    "third_party_costs": invoice.third_party_costs,
+                    "liable_to_vat": invoice.liable_to_vat,
+                })
 
         elif pk := request.GET.get("contact"):
             try:

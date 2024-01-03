@@ -82,12 +82,10 @@ def change_obj(
         return {
             "type": type,
             "pretty_type": _("Updated"),
-            "changes": pretty_changes(
-                [
-                    {"field": field, "old": actions[0].row_data[field], "new": updated}
-                    for field, updated in updates.items()
-                ]
-            ),
+            "changes": pretty_changes([
+                {"field": field, "old": actions[0].row_data[field], "new": updated}
+                for field, updated in updates.items()
+            ]),
         } | aux
 
     else:  # pragma: no cover

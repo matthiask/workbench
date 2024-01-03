@@ -48,9 +48,9 @@ def project_budget_statistics(projects, *, cutoff_date=None):
 
     for row in hours:
         if row["service__effort_rate"] is None:
-            effort_hours_with_rate_undefined_per_project[
-                row["service__project"]
-            ] += row["hours__sum"]
+            effort_hours_with_rate_undefined_per_project[row["service__project"]] += (
+                row["hours__sum"]
+            )
         else:
             effort_cost_per_project[row["service__project"]] += (
                 row["service__effort_rate"] * row["hours__sum"]

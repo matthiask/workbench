@@ -19,9 +19,9 @@ def playing_bank(projects):
         .values("service__project", "_is_future")
         .annotate(Sum("third_party_costs"))
     ):
-        logged[row["service__project"]][
-            "future" if row["_is_future"] else "past"
-        ] += row["third_party_costs__sum"]
+        logged[row["service__project"]]["future" if row["_is_future"] else "past"] += (
+            row["third_party_costs__sum"]
+        )
 
     invoiced = {
         row["project"]: row["third_party_costs__sum"]
@@ -49,14 +49,12 @@ def playing_bank(projects):
         return row | {"delta": delta}
 
     projects = [
-        _statsify(
-            {
-                "project": project,
-                "offered": offered.get(project.id, Z2),
-                "logged": logged[project.id],
-                "invoiced": invoiced.get(project.id, Z2),
-            }
-        )
+        _statsify({
+            "project": project,
+            "offered": offered.get(project.id, Z2),
+            "logged": logged[project.id],
+            "invoiced": invoiced.get(project.id, Z2),
+        })
         for project in projects.filter(
             id__in=offered.keys() | logged.keys() | invoiced.keys()
         )

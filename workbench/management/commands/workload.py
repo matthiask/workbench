@@ -130,13 +130,11 @@ class Command(BaseCommand):
             ]
 
         for user in users:
-            user_table.append(
-                [
-                    user,
-                    user.specialist_field,
-                    *chainify(_user_week_workload(week, user) for week in weeks),
-                ]
-            )
+            user_table.append([
+                user,
+                user.specialist_field,
+                *chainify(_user_week_workload(week, user) for week in weeks),
+            ])
 
         sf_table = [
             [
@@ -171,13 +169,11 @@ class Command(BaseCommand):
             ]
 
         for sf, users in specialist_field_users.items():
-            sf_table.append(
-                [
-                    sf,
-                    ", ".join(str(u) for u in users),
-                    *chainify(_sf_week_workload(week, sf, users) for week in weeks),
-                ]
-            )
+            sf_table.append([
+                sf,
+                ", ".join(str(u) for u in users),
+                *chainify(_sf_week_workload(week, sf, users) for week in weeks),
+            ])
 
         xlsx = WorkbenchXLSXDocument()
         xlsx.add_sheet(_("users").replace(":", "_"))
