@@ -1,0 +1,7 @@
+# Only used for building
+DEBUG=False
+DATABASE_URL=postgres://localhost:5432/postgres
+CACHE_URL=hiredis://localhost:6379/1/
+SECRET_KEY=unsafe
+ALLOWED_HOSTS=["*", ".localhost"]
+NAMESPACE=feinheit

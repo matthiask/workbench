@@ -149,7 +149,7 @@ STATIC_ROOT = BASE_DIR / "static"
 GOOGLE_CLIENT_ID = env("OAUTH2_CLIENT_ID", default="")
 GOOGLE_CLIENT_SECRET = env("OAUTH2_CLIENT_SECRET", default=None)
 
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 SESSION_COOKIE_HTTPONLY = True
@@ -462,10 +462,6 @@ if env("SQL", default=False):  # pragma: no cover
     }
 
 FEATURES = WORKBENCH.FEATURES
-TEST_RUNNER = "django_slowtests.testrunner.DiscoverSlowestTestsRunner"
-TESTS_REPORT_TMP_FILES_PREFIX = "tmp/slowtests_"
-NUM_SLOW_TESTS = 20
-
 BATCH_MAX_ITEMS = 250
 
 if TESTING:  # pragma: no cover

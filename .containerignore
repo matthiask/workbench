@@ -1,0 +1,8 @@
+.env
+.git
+media
+node_modules
+**/__pycache__
+.ruff_cache
+tmp
+venv
