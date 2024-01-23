@@ -101,8 +101,7 @@ WHERE service.hours / logged.hours < 1
 
 def green_hours_by_month():
     with connections["default"].cursor() as cursor:
-        cursor.execute(
-            """\
+        cursor.execute("""\
 DROP TABLE IF EXISTS green_hours_factor;
 CREATE TEMPORARY TABLE green_hours_factor AS
 WITH
@@ -194,8 +193,7 @@ LEFT OUTER JOIN green_hours gh ON th.month=gh.month
 LEFT OUTER JOIN maintenance_hours mh ON th.month=mh.month
 LEFT OUTER JOIN internal_hours ih ON th.month=ih.month
 ORDER BY th.month
-        """
-        )
+        """)
 
         return [
             {

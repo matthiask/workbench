@@ -129,8 +129,8 @@ export const Activity = connect((state, ownProps) => ({
                 services.length
                   ? gettext("Select service...")
                   : activity.project
-                  ? gettext("No services available")
-                  : gettext("No project selected")
+                    ? gettext("No services available")
+                    : gettext("No project selected")
               }
               value={activity.service}
             />

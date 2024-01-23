@@ -7,8 +7,7 @@ class Migration(migrations.Migration):
     dependencies = [("invoices", "0018_auto_20190916_1110")]
 
     operations = [
-        migrations.RunSQL(
-            """
+        migrations.RunSQL("""
 UPDATE invoices_invoice i
 SET
 third_party_costs=COALESCE(
@@ -22,6 +21,5 @@ third_party_costs=COALESCE(
     0
 )
 WHERE i.type='services';
-                """
-        )
+                """)
     ]

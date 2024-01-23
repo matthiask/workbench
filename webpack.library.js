@@ -153,6 +153,13 @@ module.exports = (PRODUCTION) => {
         hot: true,
         port: 8000,
         allowedHosts: "all",
+        client: {
+          overlay: {
+            errors: true,
+            warnings: false,
+            runtimeErrors: true,
+          },
+        },
         devMiddleware: {
           headers: { "Access-Control-Allow-Origin": "*" },
           index: true,
@@ -191,7 +198,6 @@ module.exports = (PRODUCTION) => {
             options: {
               sassOptions: {
                 includePaths: [path.resolve(path.join(cwd, "node_modules"))],
-                quietDeps: true,
               },
             },
           },

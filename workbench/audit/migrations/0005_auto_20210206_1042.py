@@ -9,8 +9,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            """
+        migrations.RunSQL("""
 UPDATE audit_logged_actions
 SET
     row_data=row_data - '{fts_document,_fts}'::text[],
@@ -18,6 +17,5 @@ SET
 WHERE
     row_data ?| '{fts_document,_fts}'::text[]
     OR changed_fields ?| '{fts_document,_fts}'::text[]
-            """
-        ),
+            """),
     ]

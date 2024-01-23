@@ -87,8 +87,7 @@ def _all_users_hours():
 
 def _birthdays():
     with connections["default"].cursor() as cursor:
-        cursor.execute(
-            """
+        cursor.execute("""
 SELECT id, given_name, family_name, date_of_birth, is_active_user FROM (
     SELECT
         p.id,
@@ -103,8 +102,7 @@ SELECT id, given_name, family_name, date_of_birth, is_active_user FROM (
 ) AS subquery
 WHERE diff < 7 or diff > 350
 ORDER BY (diff + 180) % 365 DESC
-            """
-        )
+            """)
         return [
             {
                 "id": row[0],

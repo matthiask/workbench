@@ -11,8 +11,7 @@ from workbench.templatetags.workbench import field_value_pairs, link_or_none
 class TemplateTagsTest(TestCase):
     def test_mark_current(self):
         """{% mark_current %}"""
-        t = Template(
-            """
+        t = Template("""
             {% load mark_current %}
             {% mark_current path %}
             <a href="/a/">a</a>
@@ -25,8 +24,7 @@ class TemplateTagsTest(TestCase):
             <li class="g"><a class="g" href="/g/">g</a></li>
             </ul>
             {% endmark_current %}
-            """
-        )
+            """)
 
         for path, exists, notexists in [
             (
