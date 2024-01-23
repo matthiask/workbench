@@ -1,3 +1,4 @@
+import datetime as dt
 import operator
 from collections import OrderedDict
 from decimal import Decimal
@@ -114,6 +115,12 @@ class ConvertForm(forms.Form):
     day = forms.DateField()
     currency = forms.CharField()
     cost = forms.DecimalField(max_digits=10, decimal_places=2)
+
+    def clean(self):
+        data = super().clean()
+        if (day := data.get("day")) and day > dt.date.today():
+            self.add_error("__all__", _("Crystal ball missing, sorry."))
+        return data
 
 
 def convert(request):
