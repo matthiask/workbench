@@ -87,7 +87,7 @@ urlpatterns = [
         name="logbook_loggedcost_update",
     ),
     path(
-        "hours/<int:pk>/move/",
+        "costs/<int:pk>/move/",
         generic.UpdateView.as_view(
             model=LoggedCost,
             form_class=LoggedCostMoveForm,
