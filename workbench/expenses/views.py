@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import redirect
+from django.utils.html import strip_tags
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
@@ -126,7 +127,11 @@ class ConvertForm(forms.Form):
 def convert(request):
     form = ConvertForm(request.GET)
     if not form.is_valid():
-        return JsonResponse({"cost": ""}, status=400)
+        try:
+            error = strip_tags(str(form.errors["__all__"]))
+        except Exception:
+            error = _("Failure while determining the exchange rate.")
+        return JsonResponse({"cost": "", "error": error})
     rates = ExchangeRates.objects.for_day(form.cleaned_data["day"])
     cost = form.cleaned_data["cost"] / Decimal(
         str(rates.rates["rates"][form.cleaned_data["currency"]])

@@ -454,7 +454,11 @@ function initWidgets() {
     console.log(params.toString())
 
     $.getJSON(`/expenses/convert/?${params.toString()}`, (data) => {
-      $("#id_modal-third_party_costs").val(data.cost)
+      if (data.error) {
+        alert(data.error)
+      } else {
+        $("#id_modal-third_party_costs").val(data.cost)
+      }
     })
   })
 

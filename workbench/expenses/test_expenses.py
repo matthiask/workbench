@@ -210,8 +210,11 @@ class ExpensesTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
 
         response = self.client.get("/expenses/convert/")
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {"cost": ""})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {"cost": "", "error": "Failure while determining the exchange rate."},
+        )
 
         response = self.client.get(
             "/expenses/convert/?day=2019-12-11&currency=EUR&cost=100"
