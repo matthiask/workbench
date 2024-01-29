@@ -1,4 +1,4 @@
-FROM python:3.12 as backend
+FROM python:3.11 as backend
 WORKDIR /src
 ENV PYTHONUNBUFFERED 1
 ADD requirements.txt .
