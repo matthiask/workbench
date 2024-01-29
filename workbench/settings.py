@@ -464,6 +464,12 @@ if env("SQL", default=False):  # pragma: no cover
 FEATURES = WORKBENCH.FEATURES
 BATCH_MAX_ITEMS = 250
 
+if SENTRY_DSN := env("SENTRY_DSN"):
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()])
+
 if TESTING:  # pragma: no cover
     PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
     DATABASES["default"]["TEST"] = {"SERIALIZE": False}

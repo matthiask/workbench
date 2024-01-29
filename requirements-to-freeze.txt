@@ -22,6 +22,7 @@ Pillow
 psycopg2-binary
 qrbill
 reportlab
+sentry-sdk
 speckenv
 svglib
 time-machine
