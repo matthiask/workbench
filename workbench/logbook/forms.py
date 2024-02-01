@@ -566,9 +566,29 @@ class LoggedCostForm(ModelForm):
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project", None)
         if self.project:
-            kwargs.setdefault("initial", {}).setdefault(
-                "service", kwargs["request"].GET.get("service")
-            )
+            initial = kwargs.setdefault("initial", {})
+            request = kwargs["request"]
+
+            if pk := request.GET.get("copy"):
+                try:
+                    cost = LoggedCost.objects.get(pk=pk)
+                except (LoggedHours.DoesNotExist, TypeError, ValueError):
+                    pass
+                else:
+                    initial.update({
+                        "service": cost.service_id,
+                        "rendered_on": cost.rendered_on,
+                        "expense_currency": cost.expense_currency,
+                        "expense_cost": cost.expense_cost,
+                        "third_party_costs": cost.third_party_costs,
+                        "are_expenses": cost.are_expenses,
+                        "cost": cost.cost,
+                        "description": cost.description,
+                    })
+
+            elif service := request.GET.get("service"):
+                initial.setdefault("service", service)
+
         else:
             self.project = kwargs["instance"].service.project
 

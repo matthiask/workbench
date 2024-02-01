@@ -555,7 +555,7 @@ class LogbookTest(TestCase):
         )
         self.assertContains(response, 'value="1.5"')
 
-    def test_copy(self):
+    def test_copy_hours(self):
         """Hours can be copied"""
         hours = factories.LoggedHoursFactory.create()
         self.client.force_login(factories.UserFactory.create())
@@ -568,6 +568,23 @@ class LogbookTest(TestCase):
 
         response = self.client.get(
             hours.service.project.urls["createhours"] + "?copy=bla",
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 200)  # No crash
+
+    def test_copy_cost(self):
+        """Logged cost can be copied"""
+        cost = factories.LoggedCostFactory.create()
+        self.client.force_login(factories.UserFactory.create())
+
+        response = self.client.get(
+            cost.service.project.urls["createcost"] + "?copy=" + str(cost.pk),
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, " selected>Any service</option>")
+
+        response = self.client.get(
+            cost.service.project.urls["createcost"] + "?copy=bla",
             headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 200)  # No crash
