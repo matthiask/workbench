@@ -13,16 +13,8 @@ urlpatterns = [
     re_path(r"^admin/", admin.site.urls),
     path("accounts/", include("workbench.accounts.urls")),
     path("calendar/", include("workbench.calendar.urls")),
-    path("search/", views.search, name="search"),
     re_path(r"^history/(\w+\.\w+)/([0-9]+)/$", views.history, name="history"),
 ]
 
 if settings.DEBUG:
-    import debug_toolbar
-    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-
-    urlpatterns = (
-        urlpatterns
-        + [path("__debug__/", include(debug_toolbar.urls))]
-        + staticfiles_urlpatterns()
-    )
+    urlpatterns = [*urlpatterns, path("__debug__/", include("debug_toolbar.urls"))]

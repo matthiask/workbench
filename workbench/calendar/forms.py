@@ -25,15 +25,17 @@ class DaySearchForm(forms.Form):
     )
 
     def filter(self, queryset):
+        queryset = queryset.select_related("handled_by")
+
         data = self.cleaned_data
-        if data.get("year"):
-            return queryset.filter(day__year=data["year"])
-        else:
-            today = date.today()
-            monday = today - timedelta(days=today.weekday())
-            return queryset.filter(
-                day__range=[monday - timedelta(days=7), monday + timedelta(days=7 * 12)]
-            )
+        if year := data.get("year"):
+            return queryset.filter(day__year=year)
+
+        today = date.today()
+        monday = today - timedelta(days=today.weekday())
+        return queryset.filter(
+            day__range=[monday - timedelta(days=7), monday + timedelta(days=7 * 12)]
+        )
 
 
 class DayForm(WarningsForm, ModelForm):

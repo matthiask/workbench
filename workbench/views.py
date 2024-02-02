@@ -1,21 +1,6 @@
 from django.apps import apps
-from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
-from django.utils.translation import gettext as _
-
-
-def search(request):
-    results = []
-    q = request.GET.get("q", "")
-    if q:
-        results = [
-            (model._meta.verbose_name_plural, model.objects.search(q)) for model in []
-        ]
-    else:
-        messages.error(request, _("Search query missing."))
-
-    return render(request, "search.html", {"search": {"query": q, "results": results}})
 
 
 HISTORY = {
@@ -45,7 +30,7 @@ def history(request, label, pk):
     try:
         fields = HISTORY[label]
     except KeyError:
-        raise Http404("No or disallowed history: %s" % label)
+        raise Http404("No or disallowed history: %s" % label) from None
 
     instance = get_object_or_404(apps.get_model(label), pk=pk)
 

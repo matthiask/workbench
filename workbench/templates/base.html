@@ -18,29 +18,11 @@
       <div id="navbar" class="navbar-collapse collapse">
         {% mark_current request.path %}
         <ul class="nav navbar-nav">
-          <li>
-            <form class="navbar-form" role="search" method="GET" action="{% url 'search' %}">
-              <div class="input-group">
-                <input name="q" type="text" class="form-control" placeholder="{% trans 'Search' %}" value="{{ search.query|default:'' }}">
-                <div class="input-group-btn">
-                  <button class="btn btn-info">
-                    <span class="glyphicon glyphicon-search"></span>
-                  </button>
-                </div>
-              </div>
-            </form>
-          </li>
           {% if user.pk %}
           {% for app in user.apps.all %}
           <li><a href="{{ app.get_absolute_url }}">{{ app.title }}</a></li>
           {% endfor %}
           {% endif %}
-          {% comment %}
-          <li><a href="{% url 'contacts_organization_list' %}">{% trans 'organizations' %}</a></li>
-          <li><a href="{% url 'contacts_person_list' %}">{% trans 'people' %}</a></li>
-          <li><a href="{% url 'projects_project_list' %}">{% trans 'projects' %}</a></li>
-          <li><a href="{% url 'invoices_invoice_list' %}">{% trans 'invoices' %}</a></li>
-          {% endcomment %}
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
@@ -57,15 +39,6 @@
                 {% trans 'Admin panel' %}
               </a></li>
               {% endif %}
-              {% comment %}
-              <li class="divider"></li>
-              <li><a href="{% url 'activities_activity_list' %}">{% trans 'activities' %}</a></li>
-              <li><a href="{% url 'projects_task_list' %}">{% trans 'tasks' %}</a></li>
-              <li><a href="{% url 'logbook_loggedhours_list' %}">{% trans 'logged hours' %}</a></li>
-              <li class="divider"></li>
-              <li><a href="{% url 'deals_deal_list' %}">{% trans 'deals' %}</a></li>
-              <li><a href="{% url 'offers_offer_list' %}">{% trans 'offers' %}</a></li>
-              {% endcomment %}
               <li class="divider"></li>
               <li><a href="{% url 'logout' %}">
                 <span class="glyphicon glyphicon-log-out"></span>
