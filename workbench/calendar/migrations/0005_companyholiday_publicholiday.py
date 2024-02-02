@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("calendar", "0004_auto_20181121_1717")]
 
     operations = [

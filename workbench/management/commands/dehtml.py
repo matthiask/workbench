@@ -1,8 +1,7 @@
-from html.parser import HTMLParser
 import re
+from html.parser import HTMLParser
 
 from django.core.management.base import BaseCommand
-
 from invoices.models import Invoice
 from offers.models import Offer
 from projects.models import Project

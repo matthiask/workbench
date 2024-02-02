@@ -1,5 +1,5 @@
-from functools import reduce
 import operator
+from functools import reduce
 
 from django import template
 from django.utils.http import urlencode

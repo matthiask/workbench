@@ -2,7 +2,6 @@ from datetime import timedelta
 
 from django.core.signing import Signer
 from django.http import HttpResponse
-
 from icalendar import Calendar, Event
 
 from .models import Day
@@ -21,7 +20,7 @@ def ics(request, code):
         event.add("dtstamp", day.day)
         event.add("dtstart", day.day)
         event.add("dtend", day.day + timedelta(days=1))
-        event.add("uid", "bruchpiloten-hangar-{}".format(day.pk))
+        event.add("uid", f"bruchpiloten-hangar-{day.pk}")
         cal.add_component(event)
 
     response = HttpResponse(cal.to_ical(), content_type="text/calendar")

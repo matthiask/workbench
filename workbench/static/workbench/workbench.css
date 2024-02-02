@@ -23,7 +23,7 @@
   }
 }
 
-.form-inline.fieldset>.row {
+.form-inline.fieldset > .row {
   margin-left: 0;
 }
 .form-inline.fieldset .form-group {
@@ -33,9 +33,11 @@
 }
 .form-inline.fieldset input,
 .form-inline.fieldset select,
-.form-inline.fieldset textarea { width: 100%; }
+.form-inline.fieldset textarea {
+  width: 100%;
+}
 
-.form-group.required>.control-label {
+.form-group.required > .control-label {
   /* TODO? */
 }
 
@@ -50,10 +52,22 @@ th.number {
   text-align: right;
 }
 
-.number input:-moz-placeholder { color: #ccc; text-overflow: ellipsis; }
-.number input::-moz-input-placeholder { color: #ccc; text-overflow: ellipsis; }
-.number input::-webkit-input-placeholder { color: #ccc; text-overflow: ellipsis; }
-.number input:-ms-input-placeholder { color: #ccc; text-overflow: ellipsis; }
+.number input:-moz-placeholder {
+  color: #ccc;
+  text-overflow: ellipsis;
+}
+.number input::-moz-input-placeholder {
+  color: #ccc;
+  text-overflow: ellipsis;
+}
+.number input::-webkit-input-placeholder {
+  color: #ccc;
+  text-overflow: ellipsis;
+}
+.number input:-ms-input-placeholder {
+  color: #ccc;
+  text-overflow: ellipsis;
+}
 
 .navbar a {
   font-weight: bold;
@@ -61,7 +75,7 @@ th.number {
 
 .tiny-icons {
   display: inline-block;
-  font-size: .5em;
+  font-size: 0.5em;
   vertical-align: top;
 }
 
@@ -78,7 +92,7 @@ th.number {
     text-align: right;
     padding-top: 21px;
   }
-  .right-head>* {
+  .right-head > * {
     display: inline-block;
   }
 }
@@ -87,13 +101,13 @@ small {
   font-size: 80%;
 }
 
-small>a.active {
+small > a.active {
   text-decoration: underline;
 }
 
 .label {
   font-size: 85%;
-  padding: .1em .4em;
+  padding: 0.1em 0.4em;
   font-weight: normal;
 }
 
@@ -145,12 +159,12 @@ tbody th > a {
 }
 
 .set-to-today::after {
-  content: 'Today';
+  content: "Today";
   display: inline-block;
   position: relative;
   left: 5px;
   top: -2px;
-  font-family: Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .help-block {

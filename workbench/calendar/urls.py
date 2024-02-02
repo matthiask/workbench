@@ -1,15 +1,14 @@
-from django.conf.urls import url
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.urls import re_path, reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
 
+from . import views
 from .forms import DayForm, DaySearchForm, PresenceForm
 from .models import App, Day, activate_app, current_app
-from . import views
 
 
 def app_mixin(view):
@@ -35,7 +34,7 @@ list_url = reverse_lazy("calendar_day_list", kwargs={"app": current_app})
 
 
 urlpatterns = [
-    url(
+    re_path(
         r"^(?P<app>\w+)/$",
         app_mixin(generic.ListView).as_view(
             model=Day,
@@ -46,12 +45,12 @@ urlpatterns = [
         ),
         name="calendar_day_list",
     ),
-    url(
+    re_path(
         r"^(?P<app>\w+)/(?P<pk>[0-9]+)/$",
         app_mixin(generic.DetailView).as_view(model=Day),
         name="calendar_day_detail",
     ),
-    url(
+    re_path(
         r"^(?P<app>\w+)/create/$",
         app_mixin(generic.MessageView).as_view(
             redirect_to=list_url,
@@ -60,14 +59,14 @@ urlpatterns = [
         ),
         name="calendar_day_create",
     ),
-    url(
+    re_path(
         r"^(?P<app>\w+)/(?P<pk>[0-9]+)/update/$",
         app_mixin(generic.UpdateView).as_view(
             model=Day, form_class=DayForm, success_url=list_url
         ),
         name="calendar_day_update",
     ),
-    url(
+    re_path(
         r"^(?P<app>\w+)/(?P<pk>[0-9]+)/delete/$",
         app_mixin(generic.MessageView).as_view(
             redirect_to=list_url,
@@ -76,7 +75,7 @@ urlpatterns = [
         ),
         name="calendar_day_delete",
     ),
-    url(
+    re_path(
         r"^(?P<app>\w+)/update/$",
         staff_member_required(
             app_mixin(generic.UpdateView).as_view(
@@ -89,5 +88,5 @@ urlpatterns = [
         ),
         name="calendar_app_update",
     ),
-    url(r"^ics/(?P<code>[^/]+)/hangar\.ics$", views.ics, name="calendar_ics"),
+    re_path(r"^ics/(?P<code>[^/]+)/hangar\.ics$", views.ics, name="calendar_ics"),
 ]

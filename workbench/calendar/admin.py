@@ -1,6 +1,5 @@
-from django.contrib import admin
-
 from admin_ordering.admin import OrderableAdmin
+from django.contrib import admin
 
 from . import models
 

@@ -12,7 +12,7 @@ def run(year=None):
 
 
 def run_app(app, year):
-    print("{}".format(app))
+    print(f"{app}")
     counts = Counter(
         app.days.filter(day__year=year).values_list("handled_by", flat=True)
     )
@@ -51,17 +51,11 @@ def run_app(app, year):
             )
         else:
             without_presence.append(
-                "{:>20.20}:           {:>4} Tage".format(
-                    user.get_full_name(), -counts[user.id]
-                )
+                f"{user.get_full_name():>20.20}:           {-counts[user.id]:>4} Tage"
             )
 
-    print("Gesamthaft                       {} Tage".format(sum(counts.values())))
+    print(f"Gesamthaft                       {sum(counts.values())} Tage")
     print("\n".join(without_presence))
     print()
-    print(
-        "Zu verteilen auf      {:>3}%:      {:>3} Tage".format(
-            presences_sum, counts_sum
-        )
-    )
+    print(f"Zu verteilen auf      {presences_sum:>3}%:      {counts_sum:>3} Tage")
     print("\n".join(with_presence))

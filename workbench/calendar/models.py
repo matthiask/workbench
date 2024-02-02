@@ -8,7 +8,7 @@ from django.db.models import Q, signals
 from django.urls import reverse
 from django.utils.dates import WEEKDAYS
 from django.utils.functional import lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.middleware import set_user_name
 from workbench.accounts.models import User
@@ -60,7 +60,7 @@ class App(Model):
         company_holidays = list(CompanyHoliday.objects.all())
 
         start = date(year, 1, 1)
-        for offset in range(0, 366):
+        for offset in range(366):
             day = start + timedelta(days=offset)
             if day.isoweekday() <= 5 and day.year == year:
                 if (
@@ -109,17 +109,13 @@ class App(Model):
             else:
                 continue
 
-            rows.append(
-                {
-                    "user": user,
-                    "presence": presence,
-                    "target": round(target, 1) if target else None,
-                    "handled": counts[user.id],
-                    "reached": (
-                        round(100 * counts[user.id] / target) if target else None
-                    ),
-                }
-            )
+            rows.append({
+                "user": user,
+                "presence": presence,
+                "target": round(target, 1) if target else None,
+                "handled": counts[user.id],
+                "reached": (round(100 * counts[user.id] / target) if target else None),
+            })
 
         return {
             "year": year,
@@ -127,7 +123,7 @@ class App(Model):
                 rows,
                 key=lambda row: (
                     row["handled"],
-                    -1e9 if row["reached"] is None else -row["reached"]
+                    -1e9 if row["reached"] is None else -row["reached"],
                 ),
                 reverse=True,
             ),
@@ -164,7 +160,7 @@ class Day(Model):
     def __str__(self):
         parts = [local_date_format(self.day, "D d.m.Y")]
         if self.handled_by:
-            parts.append("({})".format(self.handled_by))
+            parts.append(f"({self.handled_by})")
         return " ".join(parts)
 
     @classmethod
@@ -206,7 +202,7 @@ class Presence(Model):
         verbose_name_plural = _("presences")
 
     def __str__(self):
-        return "{}%".format(self.percentage)
+        return f"{self.percentage}%"
 
 
 class DayOfWeekDefault(Model):
@@ -272,7 +268,7 @@ class PublicHoliday(models.Model):
         verbose_name_plural = _("public holidays")
 
     def __str__(self):
-        return "{} ({})".format(self.name, self.day)
+        return f"{self.name} ({self.day})"
 
 
 class CompanyHoliday(models.Model):
@@ -284,7 +280,7 @@ class CompanyHoliday(models.Model):
         verbose_name_plural = _("company holidays")
 
     def __str__(self):
-        return "{} - {}".format(self.date_from, self.date_until)
+        return f"{self.date_from} - {self.date_until}"
 
     def contains(self, day):
         return self.date_from <= day <= self.date_until

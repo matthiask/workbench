@@ -1,6 +1,7 @@
+import types
+
 import factory
 from faker import Factory
-import types
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
@@ -89,11 +90,9 @@ class InvoiceFactory(factory.DjangoModelFactory):
 def service_types():
     SERVICE_TYPES = [("consulting", 250), ("production", 180), ("administration", 130)]
 
-    return types.SimpleNamespace(
-        **{
-            row[0]: ServiceType.objects.create(
-                title=row[0], billing_per_hour=row[1], position=idx
-            )
-            for idx, row in enumerate(SERVICE_TYPES)
-        }
-    )
+    return types.SimpleNamespace(**{
+        row[0]: ServiceType.objects.create(
+            title=row[0], billing_per_hour=row[1], position=idx
+        )
+        for idx, row in enumerate(SERVICE_TYPES)
+    })

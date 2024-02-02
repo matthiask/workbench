@@ -3,7 +3,7 @@ from datetime import date, timedelta
 
 from django import forms
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.tools.forms import ModelForm, WarningsForm
@@ -48,9 +48,10 @@ class DayForm(WarningsForm, ModelForm):
         for user in User.objects.filter(
             Q(is_active=True, apps__slug=current_app) | Q(pk=pk)
         ).distinct():
-            d[user.is_active].append(
-                (formfield.prepare_value(user), formfield.label_from_instance(user))
-            )
+            d[user.is_active].append((
+                formfield.prepare_value(user),
+                formfield.label_from_instance(user),
+            ))
         choices = [(_("Active"), d.get(True, []))]
         if d.get(False):
             choices[0:0] = d.get(False)
@@ -78,11 +79,12 @@ class PresenceForm(forms.Form):
         self.year = date.today().year
         super().__init__(*args, **kwargs)
         presences = {
-            p.user_id: p.percentage for p in self.app.presences.filter(year=self.year, user__is_active=True)
+            p.user_id: p.percentage
+            for p in self.app.presences.filter(year=self.year, user__is_active=True)
         }
 
         for user in self.app.users.filter(is_active=True):
-            self.fields["presence_{}".format(user.id)] = forms.IntegerField(
+            self.fields[f"presence_{user.id}"] = forms.IntegerField(
                 label=user.get_full_name(),
                 required=False,
                 initial=presences.get(user.id),
@@ -91,7 +93,7 @@ class PresenceForm(forms.Form):
     def save(self):
         to_delete = set()
         for user in self.app.users.filter(is_active=True):
-            value = self.cleaned_data.get("presence_{}".format(user.id))
+            value = self.cleaned_data.get(f"presence_{user.id}")
             if value is None:
                 to_delete.add(user.id)
             else:

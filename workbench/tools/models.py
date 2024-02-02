@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models import ProtectedError
 from django.db.models.deletion import Collector
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.tools.search import search
 
@@ -44,7 +44,7 @@ class Model(models.Model):
         except ProtectedError as exc:
             messages.error(
                 request,
-                ugettext(
+                gettext(
                     "Cannot delete '%(object)s'"
                     " because of related objects (%(related)s)."
                 )
@@ -97,7 +97,7 @@ class ModelWithTotal(Model):
         _("liable to VAT"),
         default=True,
         help_text=_(
-            "For example invoices to foreign institutions are not" " liable to VAT."
+            "For example invoices to foreign institutions are not liable to VAT."
         ),
     )
     tax_rate = MoneyField(_("tax rate"), default=Decimal("7.7"))

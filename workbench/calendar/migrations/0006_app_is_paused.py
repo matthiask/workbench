@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('calendar', '0005_companyholiday_publicholiday'),
+        ("calendar", "0005_companyholiday_publicholiday"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='app',
-            name='is_paused',
-            field=models.BooleanField(default=False, verbose_name='is paused'),
+            model_name="app",
+            name="is_paused",
+            field=models.BooleanField(default=False, verbose_name="is paused"),
         ),
     ]

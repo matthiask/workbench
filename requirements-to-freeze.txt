@@ -1,11 +1,11 @@
-Django
+dj-database-url
+dj-email-url
 django-admin-ordering
 django-bootstrap3
 django-canonical-domain
 django-debug-toolbar
 django-vanilla-views
-dj-database-url
-dj-email-url
+Django<5.1
 flake8
 gunicorn
 icalendar

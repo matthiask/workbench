@@ -1,11 +1,11 @@
+import re
 from collections import namedtuple
 from functools import lru_cache
-import re
 
 from django.db import models
 from django.utils import dateparse
 from django.utils.text import capfirst
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
 from workbench.audit.models import LoggedAction
@@ -39,7 +39,7 @@ def date_formatter(value):
     return value
 
 
-@lru_cache()
+@lru_cache
 def formatter(field):
     """
     Returns a formatter for the passed model field instance

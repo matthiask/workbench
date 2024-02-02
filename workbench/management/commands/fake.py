@@ -1,11 +1,10 @@
-import faker
 import random
 
-from django.core.management import BaseCommand
-
+import faker
 from accounts.middleware import set_user_name
 from accounts.models import User
 from contacts.models import Person
+from django.core.management import BaseCommand
 from projects.models import Project, Task
 
 

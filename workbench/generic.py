@@ -1,14 +1,13 @@
+import vanilla
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext as _
-
-import vanilla
+from django.utils.translation import gettext as _
 
 
-class ToolsMixin(object):
+class ToolsMixin:
     def get_template_names(self):
         """
         Returns a list of template names to use when rendering the response.

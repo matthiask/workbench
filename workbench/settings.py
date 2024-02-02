@@ -8,18 +8,20 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
-import dj_database_url
-import dj_email_url
 import os
 import sys
-from speckenv import read_speckenv, env
+
+import dj_database_url
+import dj_email_url
+from speckenv import env, read_speckenv
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 read_speckenv(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("SECRET_KEY", required=True)
-DEBUG = any(arg in ("runserver",) for arg in sys.argv)
-TESTING = any(arg in ("test",) for arg in sys.argv)
+DEBUG = any(arg == "runserver" for arg in sys.argv)
+TESTING = any(arg == "test" for arg in sys.argv)
 LIVE = env("LIVE", default=False)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
 ADMINS = (("Matthias Kestenholz", "mk@feinheit.ch"),)
@@ -108,11 +110,11 @@ LOCALE_PATHS = (os.path.join(BASE_DIR, "conf", "locale"),)
 AUTHENTICATION_BACKENDS = ["workbench.accounts.backends.AuthBackend"]
 
 DATABASES = {"default": dj_database_url.config(default="sqlite:///db.sqlite3")}
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 LANGUAGE_CODE = "de-ch"
 TIME_ZONE = "Europe/Zurich"
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"

@@ -36,7 +36,7 @@ class Command(BaseCommand):
                     continue
 
                 mail = EmailMultiAlternatives(
-                    "Wochenplan: {}".format(app.title),
+                    f"Wochenplan: {app.title}",
                     bcc=[user.email for user in app.users.filter(is_active=True)],
                 )
                 mail.attach_alternative(
@@ -59,7 +59,7 @@ class Command(BaseCommand):
                 continue
             with activate_app(app.slug):
                 mail = EmailMultiAlternatives(
-                    "Nicht besetzte Tage: {}".format(app.title),
+                    f"Nicht besetzte Tage: {app.title}",
                     bcc=[user.email for user in app.users.filter(is_active=True)],
                 )
                 mail.attach_alternative(

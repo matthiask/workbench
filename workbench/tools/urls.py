@@ -1,7 +1,7 @@
 from django.urls import NoReverseMatch, reverse
 
 
-class _MUHelper(object):
+class _MUHelper:
     def __init__(self, viewname_pattern, kwargs):
         self.viewname_pattern = viewname_pattern
         self.kwargs = kwargs
@@ -38,7 +38,7 @@ def model_urls(reverse_kwargs_fn=lambda object: {"pk": object.pk}, default="deta
     """
 
     def _dec(cls):
-        class _descriptor(object):
+        class _descriptor:
             def __get__(self, obj, objtype=None):
                 viewname_pattern = "%s_%s_%%s" % (
                     obj._meta.app_label,

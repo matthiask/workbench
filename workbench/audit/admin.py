@@ -5,6 +5,7 @@ from django.contrib import admin
 from workbench.audit.models import LoggedAction
 
 
+@admin.register(LoggedAction)
 class LoggedActionAdmin(admin.ModelAdmin):
     date_hierarchy = "created_at"
     list_display = ("__str__", "data", "user_name", "created_at")
@@ -27,6 +28,3 @@ class LoggedActionAdmin(admin.ModelAdmin):
             instance.changed_fields.pop("fts_document", None)
             return json.dumps(instance.changed_fields)
         return json.dumps(instance.row_data)
-
-
-admin.site.register(LoggedAction, LoggedActionAdmin)

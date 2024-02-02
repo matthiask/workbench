@@ -1,14 +1,14 @@
+import itertools
 from collections import OrderedDict
 from datetime import date, datetime
 from decimal import Decimal
-import itertools
 
 from django import template
 from django.db import models
 from django.template.defaultfilters import linebreaksbr
 from django.utils import timezone
 from django.utils.html import format_html, mark_safe
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from workbench.tools.formats import local_date_format
 
@@ -29,7 +29,7 @@ def link_or_none(object, pretty=None):
 
 @register.filter
 def currency(value):
-    return "{:,.2f}".format(value).replace(",", "’")
+    return f"{value:,.2f}".replace(",", "’")
 
 
 @register.filter

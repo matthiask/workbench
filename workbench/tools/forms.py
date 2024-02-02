@@ -4,10 +4,10 @@ from django import forms
 from django.db.models import Q
 from django.forms.utils import flatatt
 from django.urls import reverse
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
 
@@ -58,9 +58,10 @@ class ModelForm(forms.ModelForm):
     def _only_active_and_initial_users(self, formfield, pk):
         d = defaultdict(list)
         for user in User.objects.filter(Q(is_active=True) | Q(pk=pk)):
-            d[user.is_active].append(
-                (formfield.prepare_value(user), formfield.label_from_instance(user))
-            )
+            d[user.is_active].append((
+                formfield.prepare_value(user),
+                formfield.label_from_instance(user),
+            ))
         choices = [(_("Active"), d.get(True, []))]
         if d.get(False):
             choices[0:0] = d.get(False)
@@ -77,26 +78,20 @@ class ModelForm(forms.ModelForm):
 
             if data.get("customer") and data.get("contact"):
                 if data.get("customer") != data.get("contact").organization:
-                    raise forms.ValidationError(
-                        {
-                            "contact": ugettext(
-                                "The contact %(person)s does not belong to"
-                                "  %(organization)s."
-                            )
-                            % {
-                                "person": data.get("contact"),
-                                "organization": data.get("customer"),
-                            }
+                    raise forms.ValidationError({
+                        "contact": gettext(
+                            "The contact %(person)s does not belong to"
+                            "  %(organization)s."
+                        )
+                        % {
+                            "person": data.get("contact"),
+                            "organization": data.get("customer"),
                         }
-                    )
+                    })
 
             if not data.get("customer"):
                 raise forms.ValidationError(
-                    {
-                        "customer": self.fields["customer"].error_messages[
-                            "required"
-                        ]  # noqa
-                    },
+                    {"customer": self.fields["customer"].error_messages["required"]},
                     code="required",
                 )
 
@@ -127,7 +122,7 @@ class Picker(forms.TextInput):
         final_attrs = self.build_attrs(attrs, {"type": "hidden", "name": name})
         if value != "":
             # Only add the 'value' attribute if a value is non-empty.
-            final_attrs["value"] = force_text(self.format_value(value))
+            final_attrs["value"] = force_str(self.format_value(value))
 
         pretty = ""
         try:
