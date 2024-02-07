@@ -87,13 +87,21 @@ def paid_debtors_zip(date_range, *, file):
                 invoice.total,
                 invoice.payment_notice,
                 invoice,
+                invoice.invoiced_on,
             ))
 
             append_invoice(zf=zf, ledger_slug="unknown", invoice=invoice)
 
         xlsx.add_sheet("unknown")
         xlsx.table(
-            (_("closed on"), _("total"), _("payment notice"), _("invoice")), rows
+            (
+                _("closed on"),
+                _("total"),
+                _("payment notice"),
+                _("invoice"),
+                _("invoiced on"),
+            ),
+            rows,
         )
 
         with io.BytesIO() as buf:
