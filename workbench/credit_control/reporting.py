@@ -47,6 +47,7 @@ def paid_debtors_zip(date_range, *, file):
                     entry.total,
                     entry.payment_notice,
                     entry.invoice,
+                    entry.invoice.invoiced_on if entry.invoice else None,
                     entry.notes,
                 ))
 
@@ -64,6 +65,7 @@ def paid_debtors_zip(date_range, *, file):
                     _("total"),
                     _("payment notice"),
                     _("invoice"),
+                    _("invoiced on"),
                     _("notes"),
                 ),
                 rows,
