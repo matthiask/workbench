@@ -1107,3 +1107,28 @@ class InvoicesTest(TestCase):
         self.assertContains(
             response, "A negative subtotal is almost certainly an error."
         )
+
+    def test_invoice_date_validation(self):
+        """ """
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        url = project.urls["createinvoice"] + "?type=fixed"
+        response = self.client.post(
+            url,
+            {
+                "contact": project.contact_id,
+                "title": project.title,
+                "description": "bla",
+                "owned_by": project.owned_by_id,
+                "discount": 0,
+                "liable_to_vat": "1",
+                "tax_rate": "8.10",
+                "postal_address": "Anything\nStreet\nCity",
+                "subtotal": 2500,
+                "third_party_costs": 0,
+                "invoiced_on": in_days(360).isoformat(),
+                "due_on": in_days(360).isoformat(),
+            },
+        )
+        self.assertContains(response, "invoiced-in-future")
