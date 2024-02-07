@@ -9,7 +9,7 @@ charset-normalizer==3.3.2
 click==8.1.7
 coverage==7.4.1
 cssselect2==0.7.0
-Django==5.0.1
+Django==5.0.2
 django-admin-ordering==0.17.0
 django-authlib==0.16.4
 django-bootstrap4==24.1
