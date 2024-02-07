@@ -328,6 +328,14 @@ class InvoiceForm(PostalAddressSelectionForm):
                 code="invoiced-in-past",
             )
 
+        if (invoiced_on := data.get("invoiced_on")) and invoiced_on > in_days(90):
+            self.add_warning(
+                _(
+                    "Attention! The invoice date is more than three months in the future!"
+                ),
+                code="invoiced-in-future",
+            )
+
         if (
             self.instance._orig_status < Invoice.PAID
             and data["status"] == Invoice.PAID
