@@ -15,7 +15,7 @@ def append_invoice(*, zf, ledger_slug, invoice):
     with io.BytesIO() as buf:
         pdf = PDFDocument(buf)
         pdf.init_invoice_letter()
-        pdf.process_invoice(invoice)
+        pdf.process_invoice(invoice, qr=False)
         try:
             pdf.generate()
         except Exception:

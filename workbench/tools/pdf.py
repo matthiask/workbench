@@ -486,7 +486,7 @@ class PDFDocument(_PDFDocument):
         self.spacer(2 * mm)
         self.p(settings.WORKBENCH.PDF_OFFER_TERMS)
 
-    def process_invoice(self, invoice):
+    def process_invoice(self, invoice, *, qr=True):
         title = _("invoice")
         if invoice.type == invoice.DOWN_PAYMENT:
             title = _("down payment invoice")
@@ -552,7 +552,7 @@ class PDFDocument(_PDFDocument):
             },
         )
 
-        if getattr(settings.WORKBENCH, "QRBILL", None) and invoice.total > 0:
+        if qr and getattr(settings.WORKBENCH, "QRBILL", None) and invoice.total > 0:
             self.story.append(NextPageTemplate("QR"))
             self.next_frame()
             self.append_qr_bill(invoice)
