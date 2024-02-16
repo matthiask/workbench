@@ -356,7 +356,14 @@
               <table class="table table-sm table-bordered table-responsive-lg">
                 <tr class="thead-light">
                   <th colspan="3">
-                    {% translate 'vacation days' %}
+                    <div class="d-flex w-100 justify-content-between">
+                      {% translate 'vacation days' %}
+                      <a href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=vacation"
+                         data-toggle="ajaxmodal"
+                       >
+                        &plus;
+                      </a>
+                    </div>
                   </th>
                 </tr>
                 {% for absence in data.absences.absence_vacation %}
@@ -368,7 +375,7 @@
                       {{ absence.days|days }}
                     </td>
                     <td>
-                      {{ absence.description }}
+                      {% link_or_none absence %}
                     </td>
                   </tr>
                 {% endfor %}
@@ -389,7 +396,14 @@
               <table class="table table-sm table-bordered table-responsive-lg">
                 <tr class="thead-light">
                   <th colspan="3">
-                    {% translate 'sickness days' %}
+                    <div class="d-flex w-100 justify-content-between">
+                      {% translate 'sickness days' %}
+                      <a href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=sickness"
+                         data-toggle="ajaxmodal"
+                       >
+                        &plus;
+                      </a>
+                    </div>
                   </th>
                 </tr>
                 {% for absence in data.absences.absence_sickness %}
@@ -403,7 +417,7 @@
                       {{ absence.days|days }}
                     </td>
                     <td>
-                      {{ absence.description }}
+                      {% link_or_none absence %}
                     </td>
                   </tr>
                 {% endfor %}
@@ -413,7 +427,14 @@
               <table class="table table-sm table-bordered table-responsive-lg">
                 <tr class="thead-light">
                   <th colspan="3">
-                    {% translate 'Paid leave' %}
+                    <div class="d-flex w-100 justify-content-between">
+                      {% translate 'Paid leave' %}
+                      <a href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=paid"
+                         data-toggle="ajaxmodal"
+                       >
+                        &plus;
+                      </a>
+                    </div>
                   </th>
                 </tr>
                 {% for absence in data.absences.absence_paid %}
@@ -427,7 +448,7 @@
                       {{ absence.days|days }}
                     </td>
                     <td>
-                      {{ absence.description }}
+                      {% link_or_none absence %}
                     </td>
                   </tr>
                 {% endfor %}
@@ -447,7 +468,7 @@
                       {{ absence.days|days }}
                     </td>
                     <td>
-                      {{ absence.description }}
+                      {% link_or_none absence %}
                     </td>
                   </tr>
                 {% endfor %}

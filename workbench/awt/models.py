@@ -144,6 +144,8 @@ class Employment(Model):
 
 @model_urls
 class Absence(Model):
+    open_in_modal = True
+
     VACATION = "vacation"
     SICKNESS = "sickness"
     PAID = "paid"
