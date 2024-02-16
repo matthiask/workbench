@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-28 18:07+0100\n"
+"POT-Creation-Date: 2024-02-16 15:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1041,7 +1041,8 @@ msgstr "Fehler beim Einlesen des Auszugs. Hast Du eine gültige CSV-Datei hochge
 msgid "The uploaded list only contains new payments. This is somewhat surprising if you exported the list from the correct bank account."
 msgstr "Die hochgeladene Liste enthält nur neue Zahlungen. Das ist zumindest unerwartet, falls die Liste vom korrekten Bankkonto exportiert wurde."
 
-#: workbench/credit_control/forms.py workbench/invoices/models.py
+#: workbench/credit_control/forms.py workbench/credit_control/reporting.py
+#: workbench/invoices/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/reminders.html
 #: workbench/templates/reporting/key_data_gross_profit.html
@@ -1546,6 +1547,14 @@ msgstr "von"
 msgid "receipt"
 msgstr "Beleg"
 
+#: workbench/expenses/views.py
+msgid "Crystal ball missing, sorry."
+msgstr ""
+
+#: workbench/expenses/views.py
+msgid "Failure while determining the exchange rate."
+msgstr ""
+
 #: workbench/generic.py
 msgid "Search form was invalid."
 msgstr "Suchformular war ungültig."
@@ -1673,6 +1682,10 @@ msgstr "Status von '%(from)s' zu '%(to)s' ändern. Bist Du sicher?"
 #, python-format
 msgid "Moving status from '%(from)s' to '%(to)s' with an invoice date in the past (%(date)s). This may be correct but maybe it's not what you want."
 msgstr "Du änderst den Status von '%(from)s' zu '%(to)s' mit einem Rechnungsdatum in der Vergangenheit (%(date)s). Dies kann korrekt sein, aber ist möglicherweise nicht das, was Du willst."
+
+#: workbench/invoices/forms.py
+msgid "Attention! The invoice date is more than three months in the future!"
+msgstr ""
 
 #: workbench/invoices/forms.py
 msgid "You are setting the payment date to a value over 6 months ago. Are you sure?"
@@ -3154,6 +3167,18 @@ msgid "calculated with %(hours)s per day"
 msgstr "berechnet mit %(hours)s pro Tag"
 
 #: workbench/templates/awt/year_detail.html
+msgid "Vacation planning!"
+msgstr "Ferienplanung!"
+
+#: workbench/templates/awt/year_detail.html
+msgid "Less than half of all vacation days planned."
+msgstr "Weniger als die Hälfte der Ferientage sind geplant."
+
+#: workbench/templates/awt/year_detail.html
+msgid "Plan at least one vacation with a duration of two weeks, please."
+msgstr "Bitte mindestens einmal zwei Wochen Ferien am Stück einplanen."
+
+#: workbench/templates/awt/year_detail.html
 #, python-format
 msgid "from %(date)s"
 msgstr "Ab %(date)s"
@@ -3442,6 +3467,7 @@ msgid "total excl. tax"
 msgstr "Total exkl. MwSt."
 
 #: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/planning/plannedwork_detail.html
 #: workbench/templates/projects/campaign_detail.html

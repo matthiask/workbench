@@ -123,7 +123,7 @@ def annual_working_time(year, *, users):
         for month, days in monthly_days(employment.date_from, employment.date_until):
             if month.year < year:
                 continue
-            elif month.year > year:
+            if month.year > year:
                 break
             partial_month_factor = Decimal(days) / dpm[month.month - 1]
             month_data["target"][month.month - 1] += (
@@ -254,40 +254,46 @@ def annual_working_time(year, *, users):
             sum(sums)
             + month_data["year"].working_time_per_day * vacation_days_credit[user.id]
         )
-        statistics.append({
-            "user": user,
-            "months": month_data,
-            "absences": absences[user.id],
-            "employments": month_data["employments"],
-            "working_time": wt,
-            "absences_time": at,
-            "monthly_sums": sums,
-            "running_sums": [sum(sums[:i], Z1) for i in range(1, 13)],
-            "totals": {
-                "target_days": sum(month_data["target_days"]),
-                "percentage": sum(month_data["percentage"]) / 12,
-                "available_vacation_days": available_vacation_days[user.id],
-                "calculated_vacation_days": sum(month_data["available_vacation_days"]),
-                "vacation_days_override": overrides.get(user.id),
-                "absence_vacation": sum(month_data["absence_vacation"]),
-                "vacation_days_correction": sum(month_data["vacation_days_correction"]),
-                "vacation_days_credit": vacation_days_credit[user.id].quantize(
-                    Z2, rounding=ROUND_UP
-                ),
-                "balance": balance,
-                "balance_days": (
-                    balance / month_data["year"].working_time_per_day
-                ).quantize(Z2, rounding=ROUND_UP),
-                "absence_sickness": sum(month_data["absence_sickness"]),
-                "absence_paid": sum(month_data["absence_paid"]),
-                "absence_correction": sum(month_data["absence_correction"]),
-                "target": sum(month_data["target"]),
-                "hours": sum(month_data["hours"]),
-                "absences_time": sum(at),
-                "working_time": sum(wt),
-                "running_sum": sum(sums).quantize(Z1),
-            },
-        })
+        statistics.append(
+            vacation_planning_warnings({
+                "user": user,
+                "months": month_data,
+                "absences": absences[user.id],
+                "employments": month_data["employments"],
+                "working_time": wt,
+                "absences_time": at,
+                "monthly_sums": sums,
+                "running_sums": [sum(sums[:i], Z1) for i in range(1, 13)],
+                "totals": {
+                    "target_days": sum(month_data["target_days"]),
+                    "percentage": sum(month_data["percentage"]) / 12,
+                    "available_vacation_days": available_vacation_days[user.id],
+                    "calculated_vacation_days": sum(
+                        month_data["available_vacation_days"]
+                    ),
+                    "vacation_days_override": overrides.get(user.id),
+                    "absence_vacation": sum(month_data["absence_vacation"]),
+                    "vacation_days_correction": sum(
+                        month_data["vacation_days_correction"]
+                    ),
+                    "vacation_days_credit": vacation_days_credit[user.id].quantize(
+                        Z2, rounding=ROUND_UP
+                    ),
+                    "balance": balance,
+                    "balance_days": (
+                        balance / month_data["year"].working_time_per_day
+                    ).quantize(Z2, rounding=ROUND_UP),
+                    "absence_sickness": sum(month_data["absence_sickness"]),
+                    "absence_paid": sum(month_data["absence_paid"]),
+                    "absence_correction": sum(month_data["absence_correction"]),
+                    "target": sum(month_data["target"]),
+                    "hours": sum(month_data["hours"]),
+                    "absences_time": sum(at),
+                    "working_time": sum(wt),
+                    "running_sum": sum(sums).quantize(Z1),
+                },
+            })
+        )
 
     overall = {
         key: sum((s["totals"][key] for s in statistics), Z1)
@@ -332,10 +338,32 @@ def annual_working_time_warnings():
     return {"month": month, "warnings": warnings}
 
 
+def vacation_planning_warnings(row):
+    available = row["totals"]["available_vacation_days"]
+    vacation_absences = row["absences"]["absence_vacation"]
+    planned = sum((absence.days for absence in vacation_absences), Z2)
+
+    vacation_planning = {
+        "ratio": planned / available if available else None,
+        "two_weeks": any(
+            (absence.ends_on - absence.starts_on).days >= 14
+            for absence in vacation_absences
+        ),
+    }
+    vacation_planning["fine"] = (
+        vacation_planning["ratio"] >= Decimal("0.5") and vacation_planning["two_weeks"]
+    )
+
+    return row | {"vacation_planning": vacation_planning}
+
+
 def test():  # pragma: no cover
     from pprint import pprint
 
     # year = dt.date.today().year
     # pprint(annual_working_time(year, users=active_users(year)))
 
-    pprint(annual_working_time_warnings())
+    # pprint(annual_working_time_warnings())
+
+    # pprint(vacation_planning_required())
+    pprint(annual_working_time(2024, users=active_users(2024).filter(is_active=True)))

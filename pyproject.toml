@@ -44,8 +44,6 @@ extend-select = [
   "PGH",
   # pylint
   "PLC", "PLE", "PLW",
-  # tryceratops
-  "TRY",
   # refurb
   "FURB",
   # flake8-logging

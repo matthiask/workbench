@@ -373,6 +373,17 @@
                   </tr>
                 {% endfor %}
               </table>
+              {% if not data.vacation_planning.fine %}
+              <div class="alert alert-warning" role="alert">
+                <h4 class="alert-heading">{% translate 'Vacation planning!' %}</h4>
+                {% if data.vacation_planning.ratio < 0.5 %}
+                  {% translate 'Less than half of all vacation days planned.' %}<br>
+                {% endif %}
+                {% if not data.vacation_planning.two_weeks %}
+                  {% translate 'Plan at least one vacation with a duration of two weeks, please.' %}<br>
+                {% endif %}
+              </div>
+              {% endif %}
             </div>
             <div class="col-md-4 col-12">
               <table class="table table-sm table-bordered table-responsive-lg">
