@@ -344,9 +344,9 @@ def vacation_planning_warnings(row):
     planned = sum((absence.days for absence in vacation_absences), Z2)
 
     vacation_planning = {
-        "ratio": planned / available if available else None,
+        "ratio": planned / available if available else 1,
         "two_weeks": any(
-            (absence.ends_on - absence.starts_on).days >= 14
+            absence.ends_on and (absence.ends_on - absence.starts_on).days >= 14
             for absence in vacation_absences
         ),
     }
