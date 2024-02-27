@@ -1,10 +1,8 @@
 import datetime as dt
-import io
 from collections import defaultdict
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
-from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
 from workbench.accounts.features import FEATURES
@@ -14,7 +12,6 @@ from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.invoices.utils import next_valid_day
 from workbench.reporting.key_data import unsent_projected_invoices
 from workbench.tools.formats import currency, local_date_format
-from workbench.tools.pdf import PDFDocument
 
 
 TEMPLATE = """\
@@ -171,17 +168,6 @@ def autodunning():
         to=managers,
         cc=cc,
     )
-    for contact, contact_invoices in contacts.items():
-        with io.BytesIO() as f:
-            pdf = PDFDocument(f)
-            pdf.dunning_letter(invoices=contact_invoices)
-            pdf.generate()
-            f.seek(0)
-            mail.attach(
-                f"reminders-{slugify(contact.name_with_organization)}.pdf",
-                f.getvalue(),
-                "application/pdf",
-            )
     mail.send()
 
 
