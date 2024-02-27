@@ -2,7 +2,7 @@ FROM --platform=linux/amd64 python:3.11 as backend
 WORKDIR /src
 ENV PYTHONUNBUFFERED 1
 ADD requirements.txt .
-RUN --mount=type=cache,target=/root/.cache python -m venv venv && venv/bin/pip install -U pip && venv/bin/pip install -r requirements.txt
+RUN python -m venv venv && venv/bin/pip install -U pip && venv/bin/pip install -r requirements.txt
 ADD . /src
 COPY conf/_env .env
 RUN venv/bin/python manage.py collectstatic --noinput && rm .env
