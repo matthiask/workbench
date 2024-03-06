@@ -25,12 +25,12 @@ repos:
         language: system
         always_run: true
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.15.0
+    rev: 1.16.0
     hooks:
       - id: django-upgrade
         args: [--target-version, "4.2"]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.1.13"
+    rev: "v0.3.0"
     hooks:
       - id: ruff
       - id: ruff-format
@@ -65,10 +65,10 @@ repos:
         types_or: [css, scss, javascript]
         exclude: "^conf/|.*\\.html$|.*\\.json$"
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: 1.6.0
+    rev: 1.7.0
     hooks:
       - id: pyproject-fmt
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.15
+    rev: v0.16
     hooks:
       - id: validate-pyproject

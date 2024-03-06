@@ -48,7 +48,7 @@ def person_to_vcard(person):
 
 
 def is_ios(user_agent):
-    return re.search(r"(ios|ipad|iphone)", user_agent, re.I)
+    return re.search(r"(ios|ipad|iphone)", user_agent, re.IGNORECASE)
 
 
 def render_vcard_response(request, vcard, subject=""):

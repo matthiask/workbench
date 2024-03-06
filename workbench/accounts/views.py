@@ -139,6 +139,5 @@ def pin(request, pk, *, model, attribute):
     if request.GET.get("pinned"):
         manager.add(instance)
         return JsonResponse({"pinned": True})
-    else:
-        manager.remove(instance)
-        return JsonResponse({"pinned": False})
+    manager.remove(instance)
+    return JsonResponse({"pinned": False})

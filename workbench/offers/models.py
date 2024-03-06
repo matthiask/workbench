@@ -157,10 +157,9 @@ class Offer(ModelWithTotal):
         myself = (self.is_declined, True, self._code)
         if other is None:
             return myself < (False, True, 1e100)
-        elif isinstance(other, Offer):
+        if isinstance(other, Offer):
             return myself < (other.is_declined, True, other._code)
-        else:
-            return 0
+        return 0
 
     def get_absolute_url(self):
         return f"{self.project.get_absolute_url()}#offer{self.pk}"
@@ -242,7 +241,7 @@ class Offer(ModelWithTotal):
             return _("In preparation since %(created_at)s") % {
                 "created_at": local_date_format(self.created_at.date())
             }
-        elif self.status == self.OFFERED:
+        if self.status == self.OFFERED:
             if self.project.closed_on:
                 return _(
                     "Offered on %(offered_on)s, but project closed on %(closed_on)s"
@@ -259,7 +258,7 @@ class Offer(ModelWithTotal):
             return _("Offered on %(offered_on)s") % {
                 "offered_on": local_date_format(self.offered_on)
             }
-        elif self.status in (self.ACCEPTED, self.DECLINED):
+        if self.status in (self.ACCEPTED, self.DECLINED):
             return _("%(status)s on %(closed_on)s") % {
                 "status": self.get_status_display(),
                 "closed_on": local_date_format(self.closed_on),

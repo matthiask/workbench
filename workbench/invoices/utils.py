@@ -41,22 +41,21 @@ def recurring(start, periodicity):
             for i in itertools.count()
         )
 
-    elif periodicity == "quarterly":
+    if periodicity == "quarterly":
         return (  # pragma: no branch
             next_valid_day(start.year, start.month + i * 3, start.day)
             for i in itertools.count()
         )
 
-    elif periodicity == "monthly":
+    if periodicity == "monthly":
         return (  # pragma: no branch
             next_valid_day(start.year, start.month + i, start.day)
             for i in itertools.count()
         )
 
-    elif periodicity == "weekly":
+    if periodicity == "weekly":
         return (  # pragma: no branch
             start + dt.timedelta(days=i * 7) for i in itertools.count()
         )
 
-    else:
-        raise ValueError("Unknown periodicity %r" % periodicity)
+    raise ValueError("Unknown periodicity %r" % periodicity)

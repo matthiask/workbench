@@ -40,9 +40,9 @@ _ndash = mark_safe("&ndash;")
 def link_or_none(object, pretty=None, none=_ndash, with_badge=False):
     if object == 0:
         return object
-    elif not object:
+    if not object:
         return none
-    elif hasattr(object, "get_absolute_url"):
+    if hasattr(object, "get_absolute_url"):
         return format_html(
             '<a href="{}"{}>{}{}</a>',
             object.get_absolute_url(),
@@ -118,16 +118,14 @@ def deal_group(deal):
     if deal.probability == deal.HIGH:
         if decision_expected_within <= 4 * 7:
             return (1, _("high probability, next 4 weeks"))
-        elif decision_expected_within <= 12 * 7:
+        if decision_expected_within <= 12 * 7:
             return (2, _("high probability, next 12 weeks"))
-        else:
-            return (3, _("high probability, later"))
-    elif deal.probability == deal.NORMAL:
+        return (3, _("high probability, later"))
+    if deal.probability == deal.NORMAL:
         return (4, _("normal probability"))
-    elif deal.probability == deal.LOW:
+    if deal.probability == deal.LOW:
         return (4, _("low probability"))
-    else:
-        return (5, _("unknown probability"))
+    return (5, _("unknown probability"))
 
 
 @register.filter

@@ -199,15 +199,15 @@ class Person(Model):
     save.alters_data = True
 
 
-_home_re = re.compile(r"(home|hause|privat)", re.I)
+_home_re = re.compile(r"(home|hause|privat)", re.IGNORECASE)
 
 
 class PersonDetail(Model):
     WEIGHTS = (
-        (re.compile(r"mobil", re.I), 30),
-        (re.compile(r"(work|arbeit)", re.I), 20),
+        (re.compile(r"mobil", re.IGNORECASE), 30),
+        (re.compile(r"(work|arbeit)", re.IGNORECASE), 20),
         (_home_re, 10),
-        (re.compile(r"(organization|firm)", re.I), -100),
+        (re.compile(r"(organization|firm)", re.IGNORECASE), -100),
     )
 
     type = models.CharField(_("type"), max_length=40, default=_("work"))

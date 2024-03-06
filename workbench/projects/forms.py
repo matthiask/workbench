@@ -592,7 +592,7 @@ class ProjectAutocompleteForm(forms.Form):
         if data["service"]:
             data["project"] = data["service"].project
             return data
-        elif data["project"]:
+        if data["project"]:
             return data
         self.add_error("project", _("This field is required."))
         return data

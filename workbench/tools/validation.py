@@ -44,7 +44,7 @@ def in_days(days):
     return dt.date.today() + dt.timedelta(days=days)
 
 
-UNSPECIFIC_TITLE = re.compile(r"(general|allg|unspec)", re.I)
+UNSPECIFIC_TITLE = re.compile(r"(general|allg|unspec)", re.IGNORECASE)
 WHITESPACE = re.compile(r"\s+")
 
 

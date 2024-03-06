@@ -67,10 +67,10 @@ class Prettifier:
         if value in {True, "t"}:
             values[field.attname] = True
             return _("yes")
-        elif value in {False, "f"}:
+        if value in {False, "f"}:
             values[field.attname] = False
             return _("no")
-        elif value is None:
+        if value is None:
             values[field.attname] = None
             return _("<no value>")
         return value

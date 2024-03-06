@@ -34,14 +34,14 @@ def change_type(actions):
 
     if {"I", "D"} <= types:
         return CREATE_AND_DELETE
-    elif {"D"} <= types:
+    if {"D"} <= types:
         return DELETE
-    elif {"U"} == types:
+    if {"U"} == types:
         return UPDATE
-    elif {"I"} <= types:
+    if {"I"} <= types:
         return CREATE
-    else:  # pragma: no cover
-        raise NotImplementedError
+    # pragma: no cover
+    raise NotImplementedError
 
 
 def change_obj(
@@ -67,13 +67,13 @@ def change_obj(
             }
         )
 
-    elif type == CREATE:
+    if type == CREATE:
         return {
             "type": type,
             "pretty_type": _("Created"),
         } | aux
 
-    elif type == UPDATE:
+    if type == UPDATE:
         updates = reduce(
             operator.or_,
             (a.changed_fields for a in actions),
@@ -88,8 +88,8 @@ def change_obj(
             ]),
         } | aux
 
-    else:  # pragma: no cover
-        raise NotImplementedError
+    # pragma: no cover
+    raise NotImplementedError
 
 
 def pretty_changes_milestone():

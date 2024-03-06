@@ -170,7 +170,7 @@ class Form(WarningsForm, forms.Form):
         value = self.cleaned_data.get(attribute)
         if value == 0:
             return queryset.filter(**{f"{attribute}__is_active": False})
-        elif value:
+        if value:
             user = self.request.user if value == -1 else value
             return queryset.filter(**{attribute: user})
         return queryset

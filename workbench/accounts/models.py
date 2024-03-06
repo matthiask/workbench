@@ -42,9 +42,9 @@ class UserFeatures:
             return False
         if setting is F.ALWAYS:
             return True
-        elif setting is F.NEVER:
+        if setting is F.NEVER:
             return False
-        elif setting is F.USER:
+        if setting is F.USER:
             return key in self.features
 
         raise ValueError(f"Unknown setting value {setting} for {key}")
