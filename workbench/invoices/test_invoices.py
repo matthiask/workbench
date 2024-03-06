@@ -2,6 +2,7 @@ import datetime as dt
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
+from django.db.models import ProtectedError
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
@@ -288,6 +289,11 @@ class InvoicesTest(TestCase):
         response = self.client.get(invoice.urls["xlsx"])
         self.assertEqual(response.status_code, 200)  # No crash
 
+        # Deleting invoices with linked logbook entries fails ...
+        with self.assertRaises(ProtectedError):
+            invoice.delete()
+
+        # ... but the InvoiceDeleteForm knows how to cut those ties.
         response = self.client.post(
             invoice.urls["delete"],
             {WarningsForm.ignore_warnings_id: "release-logged-services"},
