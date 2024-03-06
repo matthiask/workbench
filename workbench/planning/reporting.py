@@ -113,6 +113,11 @@ class Planning:
                             (
                                 str(pw.service_type) if pw.service_type else None,
                                 _("%.1fh per week") % per_week,
+                                _("KW %s-%s")
+                                % (
+                                    local_date_format(date_from, fmt="W"),
+                                    local_date_format(date_until, fmt="W"),
+                                ),
                             ),
                         )
                     ),
