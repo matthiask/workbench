@@ -2,16 +2,15 @@ import io
 import zipfile
 
 from django.conf import settings
-from django.utils.text import slugify
 from django.utils.translation import activate, gettext as _
 
-from workbench.credit_control.models import CreditEntry, Ledger
+from workbench.credit_control.models import CreditEntry
 from workbench.invoices.models import Invoice
 from workbench.tools.pdf import PDFDocument
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
-def append_invoice(*, zf, ledger_slug, invoice):
+def append_invoice(*, zf, invoice):
     with io.BytesIO() as buf:
         pdf = PDFDocument(buf)
         pdf.init_invoice_letter()
@@ -23,9 +22,7 @@ def append_invoice(*, zf, ledger_slug, invoice):
             raise
 
         zf.writestr(
-            "{}-{}/{}.pdf".format(
-                ledger_slug, invoice.closed_on.strftime("%Y.%m"), invoice.code
-            ),
+            "{}/{}.pdf".format(invoice.invoiced_on.strftime("%Y.%m"), invoice.code),
             buf.getvalue(),
         )
 
@@ -34,74 +31,89 @@ def paid_debtors_zip(date_range, *, file):
     activate(settings.WORKBENCH.PDF_LANGUAGE)
     xlsx = WorkbenchXLSXDocument()
 
+    invoices = (
+        Invoice.objects.filter(invoiced_on__range=date_range)
+        .exclude(status=Invoice.IN_PREPARATION)
+        .order_by("invoiced_on", "id")
+        .select_related("project", "owned_by")
+    )
+    credit_entries = {
+        ce.invoice_id: ce for ce in CreditEntry.objects.filter(invoice__in=invoices)
+    }
+
     with zipfile.ZipFile(file, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-        for ledger in Ledger.objects.all():
-            rows = []
-            for entry in (
-                CreditEntry.objects.filter(ledger=ledger, value_date__range=date_range)
-                .order_by("value_date")
-                .select_related("invoice__project", "invoice__owned_by")
-            ):
-                rows.append((
+        rows = []
+        for invoice in invoices:
+            append_invoice(zf=zf, invoice=invoice)
+            rows.append([
+                invoice.code,
+                invoice.invoiced_on,
+                invoice.title,
+                invoice.owned_by.get_short_name(),
+                invoice.total_excl_tax,
+                invoice.total,
+                invoice.get_status_display(),
+                invoice.closed_on,
+                invoice.payment_notice,
+            ])
+
+            if entry := credit_entries.get(invoice.id):
+                rows[-1].extend([
                     entry.value_date,
                     entry.total,
                     entry.payment_notice,
-                    entry.invoice,
-                    entry.invoice.invoiced_on if entry.invoice else None,
                     entry.notes,
-                ))
+                ])
 
-                if entry.invoice:
-                    append_invoice(
-                        zf=zf,
-                        ledger_slug=slugify(ledger.name),
-                        invoice=entry.invoice,
-                    )
-
-            xlsx.add_sheet(slugify(ledger.name))
-            xlsx.table(
-                (
-                    _("value date"),
-                    _("total"),
-                    _("payment notice"),
-                    _("invoice"),
-                    _("invoiced on"),
-                    _("notes"),
-                ),
-                rows,
-            )
-
-        rows = []
-        for invoice in (
-            Invoice.objects.filter(closed_on__range=date_range, status=Invoice.PAID)
-            .exclude(
-                pk__in=CreditEntry.objects.filter(invoice__isnull=False).values(
-                    "invoice"
-                )
-            )
-            .order_by("closed_on")
-            .select_related("project")
-        ):
-            rows.append((
-                invoice.closed_on,
-                invoice.total,
-                invoice.payment_notice,
-                invoice,
-                invoice.invoiced_on,
-            ))
-
-            append_invoice(zf=zf, ledger_slug="unknown", invoice=invoice)
-
-        xlsx.add_sheet("unknown")
+        xlsx.add_sheet(_("invoices"))
         xlsx.table(
             (
+                _("code"),
+                _("invoiced on"),
+                _("title"),
+                _("contact person"),
+                _("total excl. tax"),
+                _("total"),
+                _("status"),
                 _("closed on"),
+                _("payment notice"),
+                _("value date"),
                 _("total"),
                 _("payment notice"),
-                _("invoice"),
-                _("invoiced on"),
+                _("notes"),
             ),
             rows,
+        )
+
+        xlsx.add_sheet(_("Canceled"))
+        xlsx.table(
+            (
+                _("code"),
+                _("invoiced on"),
+                _("title"),
+                _("contact person"),
+                _("total excl. tax"),
+                _("total"),
+                _("status"),
+                _("closed on"),
+                _("payment notice"),
+            ),
+            [
+                (
+                    invoice.code,
+                    invoice.invoiced_on,
+                    invoice.title,
+                    invoice.owned_by.get_short_name(),
+                    invoice.total_excl_tax,
+                    invoice.total,
+                    invoice.get_status_display(),
+                    invoice.closed_on,
+                    invoice.payment_notice,
+                )
+                for invoice in Invoice.objects.filter(status=Invoice.CANCELED)
+                .order_by("closed_on")
+                .select_related("project", "owned_by")
+            ],
         )
 
         with io.BytesIO() as buf:
