@@ -111,7 +111,7 @@ def paid_debtors_zip(date_range, *, file):
                     invoice.payment_notice,
                 )
                 for invoice in Invoice.objects.filter(status=Invoice.CANCELED)
-                .order_by("closed_on")
+                .order_by("closed_on", "id")
                 .select_related("project", "owned_by")
             ],
         )
