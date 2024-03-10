@@ -3,8 +3,8 @@ import datetime as dt
 from corsheaders.middleware import CorsMiddleware
 from django import forms
 from django.contrib import messages
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.decorators import decorator_from_middleware
 from django.utils.timezone import make_aware
@@ -134,7 +134,7 @@ def delete_timestamp(request, pk):
         _("%(class)s '%(object)s' has been deleted successfully.")
         % {"class": timestamp._meta.verbose_name, "object": timestamp},
     )
-    return redirect("timestamps")
+    return HttpResponseRedirect(reverse("timestamps") + request.POST.get("next", ""))
 
 
 class DayForm(Form):

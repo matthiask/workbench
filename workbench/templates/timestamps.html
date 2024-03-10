@@ -96,6 +96,7 @@
                           action="{% url 'delete_timestamp' slice.timestamp_id %}"
                           onsubmit="return confirm('{% translate 'Really delete?'|escapejs %}')">
                       {% csrf_token %}
+                      <input type="hidden" name="next" value="?{{ request.GET.urlencode }}">
                       <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
                     </form>
                   {% endif %}
