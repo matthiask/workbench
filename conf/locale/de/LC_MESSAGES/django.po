@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-16 15:35+0100\n"
+"POT-Creation-Date: 2024-03-10 16:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1549,11 +1549,11 @@ msgstr "Beleg"
 
 #: workbench/expenses/views.py
 msgid "Crystal ball missing, sorry."
-msgstr ""
+msgstr "Tut mir leid, die Kristallkugel ist verschwunden."
 
 #: workbench/expenses/views.py
 msgid "Failure while determining the exchange rate."
-msgstr ""
+msgstr "Fehler beim Bestimmen des Wechselkurses."
 
 #: workbench/generic.py
 msgid "Search form was invalid."
@@ -1665,6 +1665,10 @@ msgid "Apply down payment invoices"
 msgstr "Anzahlungen anwenden"
 
 #: workbench/invoices/forms.py
+msgid "This invoice is archived, only a small subset of fields are editable."
+msgstr "Diese Rechnung ist archiviert, nur wenige Felder sind bearbeitbar."
+
+#: workbench/invoices/forms.py
 msgid "A negative subtotal is almost certainly an error. Did you want to create a credit?"
 msgstr "Ein negatives Zwischentotal ist fast sicher ein Fehler. Wolltest Du eine Gutschrift erstellen?"
 
@@ -1685,7 +1689,7 @@ msgstr "Du änderst den Status von '%(from)s' zu '%(to)s' mit einem Rechnungsdat
 
 #: workbench/invoices/forms.py
 msgid "Attention! The invoice date is more than three months in the future!"
-msgstr ""
+msgstr "Achtung! Das Rechnungsdatum liegt mehr als drei Monate in der Zukunft!"
 
 #: workbench/invoices/forms.py
 msgid "You are setting the payment date to a value over 6 months ago. Are you sure?"
@@ -1697,8 +1701,8 @@ msgid "You are attempting to set status to '%(to)s', but the invoice has already
 msgstr "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Rechnung wurde schon am %(closed)s geschlossen. Bist Du sicher?"
 
 #: workbench/invoices/forms.py
-msgid "You are canceling this invoice. If clients are still expected to pay for services rendered and this invoice hasn't been sent to bookkeeping already it may be better to delete the invoice and start anew."
-msgstr "Du stornierst diese Rechnung. Wenn die Kundschaft die Leistungen immer noch bezahlen sollte und diese Rechnung noch nicht an die Buchhaltung übermittelt wurde, könnte es besser sein, die Rechnung zu löschen und nochmals neu zu beginnen."
+msgid "You are canceling this invoice. It may be cleaner to delete the invoice instead."
+msgstr "Du versuchst, die Rechnung zu storieren. Es könnte sauberer sein, die Rechnung zu löschen."
 
 #: workbench/invoices/forms.py
 msgid "Are you sure the tax rate is correct? The service period extends into 2024 but you have selected the old tax rate."
@@ -1833,6 +1837,10 @@ msgstr "Code"
 msgid "This fields' value is overridden when processing credit entries."
 msgstr "Der Inhalt dieses Felds wird bei der Verarbeitung von Zahlungseingängen überschrieben."
 
+#: workbench/invoices/models.py workbench/logbook/models.py
+msgid "archived at"
+msgstr "Archiviert um"
+
 #: workbench/invoices/models.py
 msgid "Invoice and/or due date missing for selected state."
 msgstr "Rechnungs- und/oder Fälligkeitsdatum fehlen für den augewählten Status."
@@ -1911,6 +1919,10 @@ msgstr "Gutschrift Total %(currency)s"
 #, python-format
 msgid "Total %(currency)s incl. tax"
 msgstr "Total %(currency)s inkl. MwSt."
+
+#: workbench/invoices/models.py
+msgid "Archived invoices cannot be deleted."
+msgstr "Archivierte Rechnungen können nicht gelöscht werden."
 
 #: workbench/invoices/models.py
 msgid "Invoices in preparation may be deleted, others not."
@@ -2190,10 +2202,6 @@ msgstr "Erbracht von"
 #: workbench/logbook/models.py
 msgid "invoice service"
 msgstr "Rechnungsleistung"
-
-#: workbench/logbook/models.py
-msgid "archived at"
-msgstr "Archiviert um"
 
 #: workbench/logbook/models.py
 msgid "Cannot delete archived logged hours."
@@ -2627,6 +2635,11 @@ msgstr "geplante Arbeit"
 #, python-format
 msgid "%.1fh per week"
 msgstr "%.1fh pro Woche"
+
+#: workbench/planning/reporting.py
+#, python-format
+msgid "KW %s-%s"
+msgstr "KW %s-%s"
 
 #: workbench/planning/updates.py
 msgid "Deleted"
@@ -4240,6 +4253,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "You are canceling this invoice. If clients are still expected to pay for services rendered and this invoice hasn't been sent to bookkeeping already it may be better to delete the invoice and start anew."
+#~ msgstr "Du stornierst diese Rechnung. Wenn die Kundschaft die Leistungen immer noch bezahlen sollte und diese Rechnung noch nicht an die Buchhaltung übermittelt wurde, könnte es besser sein, die Rechnung zu löschen und nochmals neu zu beginnen."
 
 #, python-format
 #~ msgid "Sent on %(invoiced_on)s but overdue"

@@ -38,14 +38,10 @@ extend-select = [
   "TID",
   # flake8-gettext
   "INT",
-  # flake8-use-pathlib
-  "PTH",
   # pygrep-hooks
   "PGH",
   # pylint
   "PLC", "PLE", "PLW",
-  # refurb
-  "FURB",
   # flake8-logging
   "LOG",
   # ruff

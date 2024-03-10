@@ -14,6 +14,7 @@ from workbench.accounts.models import User
 from workbench.audit.models import LoggedAction
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.utils import recurring
+from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project
 from workbench.services.models import ServiceBase
 from workbench.tools.formats import Z1, Z2, currency, local_date_format
@@ -154,6 +155,8 @@ class Invoice(ModelWithTotal):
         help_text=_("This fields' value is overridden when processing credit entries."),
     )
 
+    archived_at = models.DateTimeField(_("archived at"), blank=True, null=True)
+
     objects = InvoiceQuerySet.as_manager()
 
     class Meta:
@@ -215,6 +218,10 @@ class Invoice(ModelWithTotal):
             super().save()
         else:
             super().save(*args, **kwargs)
+
+        if self.status == self.CANCELED:
+            self._unlink_logbook()
+            self._unlink_down_payments()
 
     save.alters_data = True
 
@@ -324,7 +331,9 @@ class Invoice(ModelWithTotal):
         return self.get_status_display()
 
     def payment_reminders_sent_at(self):
-        from workbench.tools.history import changes  # Avoid a circular import
+        from workbench.tools.history import (  # noqa: PLC0415
+            changes,  # Avoid a circular import
+        )
 
         actions = LoggedAction.objects.for_model(self).with_data(id=self.id)
         return [
@@ -455,8 +464,22 @@ class Invoice(ModelWithTotal):
         ) = self.service_period_from_logbook()
         self.save()
 
+    def _unlink_logbook(self):
+        LoggedHours.objects.filter(invoice_service__invoice=self).update(
+            invoice_service=None, archived_at=None
+        )
+        LoggedCost.objects.filter(invoice_service__invoice=self).update(
+            invoice_service=None, archived_at=None
+        )
+
+    def _unlink_down_payments(self):
+        self.down_payment_invoices.update(down_payment_applied_to=None)
+
     @classmethod
     def allow_delete(cls, instance, request):
+        if instance.archived_at:
+            messages.error(request, _("Archived invoices cannot be deleted."))
+            return False
         if instance.status > instance.IN_PREPARATION:
             messages.error(
                 request, _("Invoices in preparation may be deleted, others not.")

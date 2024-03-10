@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.test import TestCase
+from django.utils import timezone
 
 from workbench import factories
 from workbench.credit_control.models import CreditEntry
@@ -21,7 +22,9 @@ class CreditEntriesTest(TestCase):
         """Batch assignment of credit entries to invoices"""
         for i in range(10):
             invoice = factories.InvoiceFactory.create(
-                subtotal=10 + i, liable_to_vat=False
+                subtotal=10 + i,
+                liable_to_vat=False,
+                archived_at=timezone.now(),
             )
 
         entry_0 = factories.CreditEntryFactory.create(total=12)
@@ -68,7 +71,8 @@ class CreditEntriesTest(TestCase):
             with open(
                 os.path.join(
                     settings.BASE_DIR, "workbench", "test", "account-statement.csv"
-                )
+                ),
+                encoding="utf-8",
             ) as f:
                 return self.client.post(
                     "/credit-control/upload/",

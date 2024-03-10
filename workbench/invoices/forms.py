@@ -255,6 +255,37 @@ class InvoiceForm(PostalAddressSelectionForm):
             for_billing=True,
         )
 
+        if self.instance.archived_at:
+            messages.warning(
+                self.request,
+                _(
+                    "This invoice is archived, only a small subset of fields are editable."
+                ),
+            )
+            for field in [
+                "invoiced_on",
+                "due_on",
+                "service_period_from",
+                "service_period_until",
+                "subtotal",
+                "total",
+                "liable_to_vat",
+                "tax_rate",
+                "show_service_details",
+            ]:
+                self.fields.pop(field, None)
+
+            if self.instance.status == Invoice.SENT:
+                self.fields["status"].choices = [
+                    row
+                    for row in Invoice.STATUS_CHOICES
+                    if row[0] in {Invoice.SENT, Invoice.PAID, Invoice.CANCELED}
+                ]
+            else:
+                self.fields.pop("status", None)
+                self.fields.pop("closed_on", None)
+                self.fields.pop("payment_notice", None)
+
     def _is_status_unexpected(self, to_status):
         from_status = self.instance._orig_status
 
@@ -369,13 +400,10 @@ class InvoiceForm(PostalAddressSelectionForm):
                     code="status-change-but-already-closed",
                 )
 
-        if data["status"] == Invoice.CANCELED:
+        if not self.instance.archived_at and data["status"] == Invoice.CANCELED:
             self.add_warning(
                 _(
-                    "You are canceling this invoice. If clients are still expected"
-                    " to pay for services rendered and this invoice hasn't been"
-                    " sent to bookkeeping already it may be better to delete"
-                    " the invoice and start anew."
+                    "You are canceling this invoice. It may be cleaner to delete the invoice instead."
                 ),
                 code="discourage-cancellations",
             )
@@ -689,13 +717,8 @@ class InvoiceDeleteForm(ModelForm):
             )
 
     def delete(self):
-        LoggedHours.objects.filter(invoice_service__invoice=self.instance).update(
-            invoice_service=None, archived_at=None
-        )
-        LoggedCost.objects.filter(invoice_service__invoice=self.instance).update(
-            invoice_service=None, archived_at=None
-        )
-        self.instance.down_payment_invoices.update(down_payment_applied_to=None)
+        self.instance._unlink_logbook()
+        self.instance._unlink_down_payments()
         self.instance.delete()
 
 
