@@ -292,6 +292,20 @@ class Invoice(ModelWithTotal):
         ):
             errors["service_period_until"] = _("Until date has to be after from date.")
 
+        if (
+            self._state.adding
+            and self.invoiced_on
+            and (
+                latest := Invoice.objects.filter(archived_at__isnull=False)
+                .order_by("-invoiced_on")
+                .first()
+            )
+            and self.invoiced_on <= latest.invoiced_on
+        ):
+            errors["invoiced_on"] = _(
+                "Cannot create an invoice with a date of {} or earlier."
+            ).format(local_date_format(latest.invoiced_on))
+
         raise_if_errors(errors, exclude)
 
     @property
