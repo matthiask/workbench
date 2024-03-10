@@ -1,8 +1,11 @@
 import datetime as dt
 
-from django.core.management import BaseCommand
+from django.core.management import BaseCommand, CommandError
+from django.utils import timezone
+from django.utils.dateparse import parse_date
 
 from workbench.credit_control.reporting import paid_debtors_zip
+from workbench.invoices.models import Invoice
 
 
 class Command(BaseCommand):
@@ -14,8 +17,30 @@ class Command(BaseCommand):
             help="The year for which to export debtors (defaults to %(default)s)",
         )
         parser.add_argument("target", type=str)
+        parser.add_argument("--archive", type=str)
 
     def handle(self, **options):
+        if a := options["archive"]:
+            archive = parse_date(a)
+            if not archive:
+                raise CommandError(f"Invalid archive value {a!r}")
+
         date_range = [dt.date(options["year"], 1, 1), dt.date(options["year"], 12, 31)]
         with open(options["target"], "wb") as f:
             paid_debtors_zip(date_range, file=f)
+
+        if a:
+            updated = (
+                Invoice.objects.filter(
+                    invoiced_on__lte=archive, archived_at__isnull=True
+                )
+                .exclude(status=Invoice.IN_PREPARATION)
+                .update(archived_at=timezone.now())
+            )
+
+            self.stdout.write(f"Archived {updated} invoices.")
+
+        else:
+            self.stdout.write(
+                "--archive argument not provided, not archiving anything."
+            )
