@@ -16,8 +16,4 @@ class Migration(migrations.Migration):
                 blank=True, null=True, verbose_name="archived at"
             ),
         ),
-        migrations.RunSQL(
-            "update invoices_invoice set archived_at=now() where invoiced_on is not null and invoiced_on <= '2023-12-31' and status > 10",
-            "",
-        ),
     ]
