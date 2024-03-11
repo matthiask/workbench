@@ -10,11 +10,11 @@ from workbench.tools.pdf import PDFDocument
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
-def append_invoice(*, zf, invoice):
+def append_invoice(*, zf, invoice, qr):
     with io.BytesIO() as buf:
         pdf = PDFDocument(buf)
         pdf.init_invoice_letter()
-        pdf.process_invoice(invoice, qr=False)
+        pdf.process_invoice(invoice, qr=qr)
         try:
             pdf.generate()
         except Exception:
@@ -27,7 +27,7 @@ def append_invoice(*, zf, invoice):
         )
 
 
-def paid_debtors_zip(date_range, *, file):
+def paid_debtors_zip(date_range, *, file, qr=False):
     activate(settings.WORKBENCH.PDF_LANGUAGE)
     xlsx = WorkbenchXLSXDocument()
 
@@ -44,7 +44,7 @@ def paid_debtors_zip(date_range, *, file):
     with zipfile.ZipFile(file, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         rows = []
         for invoice in invoices:
-            append_invoice(zf=zf, invoice=invoice)
+            append_invoice(zf=zf, invoice=invoice, qr=qr)
             rows.append([
                 invoice.code,
                 invoice.invoiced_on,

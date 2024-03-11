@@ -18,6 +18,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("target", type=str)
         parser.add_argument("--archive", type=str)
+        parser.add_argument("--qr", action="store_true")
 
     def handle(self, **options):
         if a := options["archive"]:
@@ -27,7 +28,7 @@ class Command(BaseCommand):
 
         date_range = [dt.date(options["year"], 1, 1), dt.date(options["year"], 12, 31)]
         with open(options["target"], "wb") as f:
-            paid_debtors_zip(date_range, file=f)
+            paid_debtors_zip(date_range, file=f, qr=options["qr"])
 
         if a:
             updated = (
