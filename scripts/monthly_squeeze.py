@@ -3,7 +3,7 @@ import subprocess
 from itertools import pairwise
 
 
-_year_from = 2022
+_year_from = 2023
 _month = dt.timedelta(days=31)
 _day = dt.timedelta(days=1)
 _today = dt.date.today()
