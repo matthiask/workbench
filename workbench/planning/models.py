@@ -6,6 +6,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
@@ -228,3 +229,6 @@ class PlannedWork(AbstractPlannedWork):
         u = self.user.get_short_name()
         h = hours(self.planned_hours)
         return f"{self.title} ({u}, {h}, {self.pretty_from_until})"
+
+    def __html__(self):
+        return format_html("{} - {}", self.project.title, self.__str__())

@@ -2,7 +2,7 @@
 {% load i18n workbench %}
 {% block size %}modal-lg{% endblock %}
 {% block title %}
-  {{ object }} {% history_link object %}
+  {{ object|h }} {% history_link object %}
 {% endblock %}
 {% block body %}
   <table class="table table-striped">
