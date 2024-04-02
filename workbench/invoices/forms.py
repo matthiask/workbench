@@ -262,18 +262,18 @@ class InvoiceForm(PostalAddressSelectionForm):
                     "This invoice is archived, only a small subset of fields are editable."
                 ),
             )
-            for field in [
-                "invoiced_on",
-                "due_on",
-                "service_period_from",
-                "service_period_until",
-                "subtotal",
-                "total",
-                "liable_to_vat",
-                "tax_rate",
-                "show_service_details",
-            ]:
-                self.fields.pop(field, None)
+            for field in list(self.fields):
+                if field not in {
+                    "contact",
+                    "customer",
+                    "title",
+                    "description",
+                    "owned_by",
+                    "postal_address",
+                    "type",
+                    "third_party_costs",
+                }:
+                    self.fields.pop(field)
 
             if self.instance.status == Invoice.SENT:
                 self.fields["status"].choices = [
