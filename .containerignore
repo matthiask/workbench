@@ -1,5 +1,6 @@
 .env
 .git
+.tox
 media
 node_modules
 **/__pycache__
