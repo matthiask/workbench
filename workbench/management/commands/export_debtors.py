@@ -25,6 +25,10 @@ class Command(BaseCommand):
             archive = parse_date(a)
             if not archive:
                 raise CommandError(f"Invalid archive value {a!r}")
+        else:
+            self.stdout.write(
+                "--archive argument not provided, not archiving anything."
+            )
 
         date_range = [dt.date(options["year"], 1, 1), dt.date(options["year"], 12, 31)]
         with open(options["target"], "wb") as f:
@@ -40,8 +44,3 @@ class Command(BaseCommand):
             )
 
             self.stdout.write(f"Archived {updated} invoices.")
-
-        else:
-            self.stdout.write(
-                "--archive argument not provided, not archiving anything."
-            )
