@@ -317,7 +317,6 @@ class CostCenterFactory(DjangoModelFactory):
 class MilestoneFactory(DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     title = "Milestone"
-    date = factory.LazyAttribute(lambda a: dt.date.today())
 
     class Meta:
         model = Milestone
