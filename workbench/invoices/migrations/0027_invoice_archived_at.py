@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
             model_name="invoice",
             name="archived_at",
             field=models.DateTimeField(
-                blank=True, null=True, verbose_name="archived at"
+                blank=True, null=True, verbose_name="freezed at"
             ),
         ),
     ]

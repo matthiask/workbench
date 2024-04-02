@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-10 16:06+0100\n"
+"POT-Creation-Date: 2024-04-02 16:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -841,12 +841,12 @@ msgstr "Wähle eine der folgenden Adressen:"
 msgid "The postal address should probably be at least three lines long."
 msgstr "Die Postadresse müsste vermutlich mindestens drei Zeilen lang sein."
 
-#: workbench/contacts/models.py workbench/deals/models.py
-#: workbench/invoices/models.py workbench/logbook/forms.py
-#: workbench/notes/models.py workbench/offers/models.py
-#: workbench/planning/models.py workbench/projects/models.py
-#: workbench/reporting/models.py workbench/services/models.py
-#: workbench/templates/offers/offer_pricing.html
+#: workbench/contacts/models.py workbench/credit_control/reporting.py
+#: workbench/deals/models.py workbench/invoices/models.py
+#: workbench/logbook/forms.py workbench/notes/models.py
+#: workbench/offers/models.py workbench/planning/models.py
+#: workbench/projects/models.py workbench/reporting/models.py
+#: workbench/services/models.py workbench/templates/offers/offer_pricing.html
 msgid "title"
 msgstr "Titel"
 
@@ -1124,8 +1124,7 @@ msgstr "Total"
 msgid "payment notice"
 msgstr "Zahlungsnotiz"
 
-#: workbench/credit_control/models.py workbench/credit_control/reporting.py
-#: workbench/invoices/models.py
+#: workbench/credit_control/models.py workbench/invoices/models.py
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/credit_control/creditentry_detail.html
@@ -1147,12 +1146,58 @@ msgstr "Zahlungseingang"
 msgid "credit entries"
 msgstr "Zahlungseingänge"
 
+#: workbench/credit_control/reporting.py workbench/invoices/apps.py
+#: workbench/invoices/models.py workbench/templates/base.html
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/shortcuts.html
+msgid "invoices"
+msgstr "Rechnungen"
+
+#: workbench/credit_control/reporting.py workbench/invoices/models.py
+#: workbench/offers/models.py workbench/projects/models.py
+msgid "code"
+msgstr "Code"
+
+#: workbench/credit_control/reporting.py workbench/deals/models.py
+#: workbench/expenses/models.py workbench/invoices/forms.py
+#: workbench/invoices/models.py workbench/offers/models.py
+#: workbench/projects/models.py workbench/templates/deals/deal_detail.html
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/projects/project_detail.html workbench/tools/xlsx.py
+msgid "contact person"
+msgstr "Ansprechperson"
+
+#: workbench/credit_control/reporting.py
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/reporting/key_data_gross_profit.html
+#: workbench/templates/reporting/key_data_third_party_costs.html
+#: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
+msgid "total excl. tax"
+msgstr "Total exkl. MwSt."
+
+#: workbench/credit_control/reporting.py workbench/deals/models.py
+#: workbench/expenses/forms.py workbench/expenses/views.py
+#: workbench/invoices/models.py workbench/offers/models.py
+#: workbench/projects/forms.py
+#: workbench/templates/expenses/expensereport_detail.html
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
+msgid "status"
+msgstr "Status"
+
 #: workbench/credit_control/reporting.py workbench/deals/models.py
 #: workbench/expenses/models.py workbench/invoices/forms.py
 #: workbench/invoices/models.py workbench/offers/models.py
 #: workbench/projects/models.py
 msgid "closed on"
 msgstr "Geschlossen am"
+
+#: workbench/credit_control/reporting.py workbench/invoices/models.py
+msgid "Canceled"
+msgstr "Storniert"
 
 #: workbench/credit_control/views.py
 #: workbench/templates/credit_control/creditentry_list.html
@@ -1345,30 +1390,11 @@ msgstr "Kundschaft"
 msgid "contact"
 msgstr "Kontakt"
 
-#: workbench/deals/models.py workbench/expenses/models.py
-#: workbench/invoices/forms.py workbench/invoices/models.py
-#: workbench/offers/models.py workbench/projects/models.py
-#: workbench/templates/deals/deal_detail.html
-#: workbench/templates/invoices/invoice_detail.html
-#: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/templates/projects/project_detail.html workbench/tools/xlsx.py
-msgid "contact person"
-msgstr "Ansprechperson"
-
 #: workbench/deals/models.py workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/accepted_deals_for_user.html
 #: workbench/templates/reporting/declined_deals.html
 msgid "value"
 msgstr "Wert"
-
-#: workbench/deals/models.py workbench/expenses/forms.py
-#: workbench/expenses/views.py workbench/invoices/models.py
-#: workbench/offers/models.py workbench/projects/forms.py
-#: workbench/templates/expenses/expensereport_detail.html
-#: workbench/templates/invoices/invoice_detail.html
-#: workbench/templates/invoices/recurringinvoice_detail.html
-msgid "status"
-msgstr "Status"
 
 #: workbench/deals/models.py
 msgid "probability"
@@ -1595,14 +1621,6 @@ msgstr "%(object)s löschen"
 msgid "%(class)s '%(object)s' has been deleted successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
 
-#: workbench/invoices/apps.py workbench/invoices/models.py
-#: workbench/templates/base.html
-#: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/shortcuts.html
-msgid "invoices"
-msgstr "Rechnungen"
-
 #: workbench/invoices/forms.py
 msgid "Due"
 msgstr "Fällig"
@@ -1665,8 +1683,8 @@ msgid "Apply down payment invoices"
 msgstr "Anzahlungen anwenden"
 
 #: workbench/invoices/forms.py
-msgid "This invoice is archived, only a small subset of fields are editable."
-msgstr "Diese Rechnung ist archiviert, nur wenige Felder sind bearbeitbar."
+msgid "This invoice is freezed, only a small subset of fields are editable."
+msgstr "Diese Rechnung ist eingefroren, nur wenige Felder sind bearbeitbar."
 
 #: workbench/invoices/forms.py
 msgid "A negative subtotal is almost certainly an error. Did you want to create a credit?"
@@ -1783,10 +1801,6 @@ msgid "Paid"
 msgstr "Bezahlt"
 
 #: workbench/invoices/models.py
-msgid "Canceled"
-msgstr "Storniert"
-
-#: workbench/invoices/models.py
 #: workbench/templates/projects/project_detail.html
 msgid "Fixed amount"
 msgstr "Fixbetrag"
@@ -1828,18 +1842,13 @@ msgstr "Anzahlungstotal"
 msgid "Only used for statistical purposes."
 msgstr "Wird nur für statistische Auswertungen verwendet."
 
-#: workbench/invoices/models.py workbench/offers/models.py
-#: workbench/projects/models.py
-msgid "code"
-msgstr "Code"
-
 #: workbench/invoices/models.py
 msgid "This fields' value is overridden when processing credit entries."
 msgstr "Der Inhalt dieses Felds wird bei der Verarbeitung von Zahlungseingängen überschrieben."
 
-#: workbench/invoices/models.py workbench/logbook/models.py
-msgid "archived at"
-msgstr "Archiviert um"
+#: workbench/invoices/models.py
+msgid "freezed at"
+msgstr "Eingefroren um"
 
 #: workbench/invoices/models.py
 msgid "Invoice and/or due date missing for selected state."
@@ -1869,6 +1878,10 @@ msgstr "Entweder beide Felder einfüllen oder keines."
 #: workbench/invoices/models.py
 msgid "Until date has to be after from date."
 msgstr "Bis-Datum muss später als Von-Datum sein."
+
+#: workbench/invoices/models.py
+msgid "Cannot create an invoice with a date of {} or earlier anymore."
+msgstr "Kann Rechnungen mit einem Datum von {} oder früher nicht mehr erstellen."
 
 #: workbench/invoices/models.py workbench/offers/models.py
 #, python-format
@@ -2202,6 +2215,10 @@ msgstr "Erbracht von"
 #: workbench/logbook/models.py
 msgid "invoice service"
 msgstr "Rechnungsleistung"
+
+#: workbench/logbook/models.py
+msgid "archived at"
+msgstr "Archiviert um"
 
 #: workbench/logbook/models.py
 msgid "Cannot delete archived logged hours."
@@ -3470,14 +3487,6 @@ msgstr "Zwischentotal"
 #: workbench/tools/pdf.py
 msgid "discount"
 msgstr "Rabatt"
-
-#: workbench/templates/invoices/invoice_detail.html
-#: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/templates/reporting/key_data_gross_profit.html
-#: workbench/templates/reporting/key_data_third_party_costs.html
-#: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
-msgid "total excl. tax"
-msgstr "Total exkl. MwSt."
 
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html

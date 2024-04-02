@@ -155,7 +155,7 @@ class Invoice(ModelWithTotal):
         help_text=_("This fields' value is overridden when processing credit entries."),
     )
 
-    archived_at = models.DateTimeField(_("archived at"), blank=True, null=True)
+    archived_at = models.DateTimeField(_("freezed at"), blank=True, null=True)
 
     objects = InvoiceQuerySet.as_manager()
 
@@ -303,7 +303,7 @@ class Invoice(ModelWithTotal):
             and self.invoiced_on <= latest.invoiced_on
         ):
             errors["invoiced_on"] = _(
-                "Cannot create an invoice with a date of {} or earlier."
+                "Cannot create an invoice with a date of {} or earlier anymore."
             ).format(local_date_format(latest.invoiced_on))
 
         raise_if_errors(errors, exclude)

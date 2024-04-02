@@ -259,7 +259,7 @@ class InvoiceForm(PostalAddressSelectionForm):
             messages.warning(
                 self.request,
                 _(
-                    "This invoice is archived, only a small subset of fields are editable."
+                    "This invoice is freezed, only a small subset of fields are editable."
                 ),
             )
             for field in list(self.fields):
