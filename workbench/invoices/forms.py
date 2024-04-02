@@ -272,6 +272,8 @@ class InvoiceForm(PostalAddressSelectionForm):
                     "postal_address",
                     "type",
                     "third_party_costs",
+                    "status",
+                    "payment_notice",
                 }:
                     self.fields.pop(field)
 
