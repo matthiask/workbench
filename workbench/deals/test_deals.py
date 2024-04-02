@@ -121,6 +121,7 @@ class DealsTest(TestCase):
 
         type1 = factories.ValueTypeFactory.create()
         type2 = factories.ValueTypeFactory.create(title="programming")
+        type3 = factories.ValueTypeFactory.create(title="foo")
 
         group1 = factories.AttributeGroupFactory.create(title="G1")
         self.assertEqual(str(group1), "G1")
@@ -157,6 +158,7 @@ class DealsTest(TestCase):
                 "owned_by": person.primary_contact_id,
                 f"value_{type1.id}": 200,
                 f"value_{type2.id}": "",
+                f"value_{type3.id}": 0,
                 f"attribute_{group1.pk}": attribute1_1.pk,
                 f"attribute_{group2.pk}": "",
                 f"user_{person.primary_contact_id}_contribution": 100,

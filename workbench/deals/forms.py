@@ -75,7 +75,7 @@ class DealSearchForm(Form):
         data = self.cleaned_data
         queryset = queryset.search(data.get("q"))
         self.should_group_deals = False
-        if data.get("s") == "":
+        if not data.get("s"):
             queryset = queryset.filter(status=Deal.OPEN).order_by(
                 "-probability", "status", "decision_expected_on", "id"
             )
@@ -108,12 +108,12 @@ class DealSearchForm(Form):
             for vt in ValueType.objects.all():
                 additional.append((
                     f"{Value._meta.verbose_name}: {vt}",
-                    (lambda id: lambda deal: values.get((deal.id, id)))(vt.id),
+                    (lambda deal, id=vt.id: values.get((deal.id, id))),
                 ))
             for ag in AttributeGroup.objects.all():
                 additional.append((
                     f"{Attribute._meta.verbose_name}: {ag}",
-                    (lambda id: lambda deal: attributes.get((deal.id, id)))(ag.id),
+                    (lambda deal, id=ag.id: attributes.get((deal.id, id))),
                 ))
             xlsx.table_from_queryset(queryset, additional=additional)
             return xlsx.to_response("deals.xlsx")
@@ -287,7 +287,7 @@ class DealForm(ModelForm):
 
         for vt in ValueType.objects.all():
             key = f"value_{vt.id}"
-            if self.cleaned_data.get(key) is not None:
+            if self.cleaned_data.get(key):
                 values[vt] = self.cleaned_data[key]
 
         instance.value = sum(values.values(), Z2)
