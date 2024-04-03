@@ -52,12 +52,7 @@ class LoggedAction(models.Model):
         verbose_name_plural = _("logged actions")
 
     def __str__(self):
-        return "{} {} by {} at {}".format(
-            self.get_action_display(),
-            self.table_name,
-            self.user_name,
-            self.created_at,
-        )
+        return f"{self.get_action_display()} {self.table_name} by {self.user_name} at {self.created_at}"
 
     @cached_property
     def user_id(self):

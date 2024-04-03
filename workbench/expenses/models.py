@@ -42,11 +42,7 @@ class ExpenseReport(Model):
         verbose_name_plural = _("expense reports")
 
     def __str__(self):
-        return "{}, {}, {}".format(
-            self.owned_by.get_full_name(),
-            local_date_format(self.created_at.date()),
-            currency(self.total),
-        )
+        return f"{self.owned_by.get_full_name()}, {local_date_format(self.created_at.date())}, {currency(self.total)}"
 
     def save(self, *args, **kwargs):
         if self.pk:

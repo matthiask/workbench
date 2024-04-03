@@ -14,7 +14,7 @@ const clamp = (min, value, max) => Math.max(Math.min(value, max), min)
 const opacityClamp = (value) => clamp(0.3, value, 1)
 const gettext = window.gettext || ((t) => t)
 const pgettext = window.pgettext || ((ctx, t) => t)
-const fixed = (s, decimalPlaces) => parseFloat(s).toFixed(decimalPlaces)
+const fixed = (s, decimalPlaces) => Number.parseFloat(s).toFixed(decimalPlaces)
 
 document.addEventListener("DOMContentLoaded", () => {
   const data = JSON.parse(document.querySelector("#planning-data").textContent)
@@ -41,7 +41,7 @@ function months(weeks) {
   const months = []
   let month = null
   for (let index = 0; index < weeks.length; ++index) {
-    let week = weeks[index]
+    const week = weeks[index]
     if (week.month !== month) {
       month = week.month
       months.push({ index, month })
@@ -69,8 +69,8 @@ function Planning({ data }) {
   const [collapse, setCollapse] = useState(getCollapse())
   const toggleCollapse = (id) => {
     const storage = window.localStorage.getItem("planningCollapse")
-    let storageData = storage ? JSON.parse(storage) : []
-    let index = storageData.indexOf(id)
+    const storageData = storage ? JSON.parse(storage) : []
+    const index = storageData.indexOf(id)
     if (index >= 0) storageData.splice(index, 1)
     else storageData.push(id)
     window.localStorage.setItem("planningCollapse", JSON.stringify(storageData))
@@ -201,7 +201,7 @@ function TotalByWeek({ by_week, title }) {
           column={FIRST_DATA_COLUMN + idx}
           className="planning--range planning--small is-total"
           style={{
-            opacity: opacityClamp(0.3 + parseFloat(hours) / 20),
+            opacity: opacityClamp(0.3 + Number.parseFloat(hours) / 20),
           }}
         >
           {fixed(hours, 0)}
@@ -374,7 +374,7 @@ function Project({
       )}
       {external_view ||
         by_week.map((hours, idx) => {
-          hours = parseFloat(hours)
+          hours = Number.parseFloat(hours)
           if (!hours) return null
 
           return (
@@ -410,7 +410,7 @@ function Project({
 function WorkedHours({ project }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
-  const sum = project.worked_hours.reduce((a, b) => a + parseFloat(b), 0)
+  const sum = project.worked_hours.reduce((a, b) => a + Number.parseFloat(b), 0)
 
   return (
     <>
@@ -422,7 +422,7 @@ function WorkedHours({ project }) {
       </Cell>
 
       {project.worked_hours.map((hours, idx) => {
-        hours = parseFloat(hours)
+        hours = Number.parseFloat(hours)
         if (!hours) return null
 
         return (
@@ -906,7 +906,7 @@ function UserAbsences({ user }) {
       {user[1].map((absences, idx) => {
         if (!absences.length) return null
 
-        const hours = absences.reduce((a, b) => a + parseFloat(b[0]), 0)
+        const hours = absences.reduce((a, b) => a + Number.parseFloat(b[0]), 0)
 
         return (
           <Cell
@@ -925,13 +925,13 @@ function UserAbsences({ user }) {
 }
 
 function findContiguousWeekRanges(hours_per_week) {
-  hours_per_week = hours_per_week.map((hours) => parseFloat(hours))
+  hours_per_week = hours_per_week.map((hours) => Number.parseFloat(hours))
 
   let rangeStart = -1
   // const ranges = [{start: 0, length: hours_per_week.length - 1}]
   // return ranges
 
-  let ranges = []
+  const ranges = []
 
   for (let i = 0; i < hours_per_week.length; ++i) {
     if (hours_per_week[i]) {

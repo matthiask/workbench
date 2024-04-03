@@ -39,9 +39,7 @@ class ReportingTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(
-            "/report/labor-costs/?cost_center={}".format(
-                factories.CostCenterFactory.create().pk
-            )
+            f"/report/labor-costs/?cost_center={factories.CostCenterFactory.create().pk}"
         )
         self.assertEqual(response.status_code, 200)
 

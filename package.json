@@ -2,9 +2,6 @@
   "scripts": {
     "build-bootstrap": "webpack -p --config webpack.config.bootstrap.js"
   },
-  "eslintIgnore": [
-    "workbench/static/workbench/lib"
-  ],
   "dependencies": {
     "bootstrap": "^4.6.0",
     "fh-webpack-config": "^2.0.1",

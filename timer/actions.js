@@ -119,7 +119,7 @@ export async function sendLogbook(dispatch, { activity, current }) {
 }
 
 export function overwriteSeconds(dispatch, { activity, current }) {
-  const seconds = parseInt(
+  const seconds = Number.parseInt(
     prompt(gettext("Overwrite seconds"), Math.ceil(activity.seconds)),
     10,
   )

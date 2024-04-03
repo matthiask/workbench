@@ -110,10 +110,7 @@ class Employment(Model):
     def __str__(self):
         if self.date_until.year > 3000:
             return _("since %s") % local_date_format(self.date_from)
-        return "{} - {}".format(
-            local_date_format(self.date_from),
-            local_date_format(self.date_until),
-        )
+        return f"{local_date_format(self.date_from)} - {local_date_format(self.date_until)}"
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -234,10 +231,7 @@ class Absence(Model):
 
     @property
     def pretty_period(self):
-        return "{} - {}".format(
-            local_date_format(self.starts_on),
-            local_date_format(self.ends_on or self.starts_on),
-        )
+        return f"{local_date_format(self.starts_on)} - {local_date_format(self.ends_on or self.starts_on)}"
 
 
 class VacationDaysOverride(models.Model):

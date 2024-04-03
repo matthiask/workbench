@@ -184,9 +184,7 @@ class DealsTest(TestCase):
         response = self.client.get(deal.urls["update"])
         self.assertContains(
             response,
-            '<input class="form-check-input" type="radio" name="attribute_{g}" value="{a}" class="my-2" required id="id_attribute_{g}_0" checked>'.format(
-                g=attribute1_1.group_id, a=attribute1_1.id
-            ),
+            f'<input class="form-check-input" type="radio" name="attribute_{attribute1_1.group_id}" value="{attribute1_1.id}" class="my-2" required id="id_attribute_{attribute1_1.group_id}_0" checked>',
             html=True,
         )
 

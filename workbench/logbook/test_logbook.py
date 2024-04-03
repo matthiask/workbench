@@ -197,9 +197,8 @@ class LogbookTest(TestCase):
         )
         self.assertContains(
             response,
-            '<a href="{}#service{}">service title: service description' "</a>".format(
-                project.get_absolute_url(), entry.service.id
-            ),
+            f'<a href="{project.get_absolute_url()}#service{entry.service.id}">service title: service description'
+            "</a>",
         )
 
     def test_log_and_create_service_with_flat_rate(self):
@@ -361,9 +360,9 @@ class LogbookTest(TestCase):
         )
         self.assertContains(
             response,
-            '<input type="date" name="modal-rendered_on" value="{}"'
+            f'<input type="date" name="modal-rendered_on" value="{hours.rendered_on.isoformat()}"'
             ' class="form-control" required disabled id="id_modal-rendered_on">'
-            "".format(hours.rendered_on.isoformat()),
+            "",
             html=True,
         )
 

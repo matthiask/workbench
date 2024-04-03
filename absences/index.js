@@ -6,7 +6,7 @@ import React from "react"
 import { Absences } from "./absences"
 
 function getDateList(start, end) {
-  let list = []
+  const list = []
   let currentDate = start
 
   while (currentDate <= end) {
@@ -22,7 +22,7 @@ function getDateList(start, end) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  let { absencesByPerson, reasonList, timeBoundaries } = JSON.parse(
+  const { absencesByPerson, reasonList, timeBoundaries } = JSON.parse(
     document.getElementById("absences-data").textContent,
   )
 

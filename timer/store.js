@@ -22,7 +22,7 @@ const serialize = (data) => {
 
 const deserialize = (blob) => {
   const deserializeRaw = () => {
-    let parsed = JSON.parse(blob)
+    const parsed = JSON.parse(blob)
     if (!parsed || !parsed._v) return {}
     const { _v, ...data } = parsed
     if (_v == VERSION) {
@@ -60,7 +60,7 @@ export function configureStore() {
   } catch (e) {
     /* intentionally empty */
   }
-  let store = createStore(
+  const store = createStore(
     reducer,
     initialState,
     compose(
@@ -79,7 +79,7 @@ export function configureStore() {
 
   if (module.hot) {
     module.hot.accept(() => {
-      let reducer = require("./reducers").default
+      const reducer = require("./reducers").default
       store.replaceReducer(reducer)
     })
   }

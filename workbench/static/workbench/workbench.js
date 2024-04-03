@@ -13,20 +13,16 @@ function doSubmit(el) {
 }
 
 $(() => {
-  const gettext =
-    window.gettext ||
-    function (t) {
-      return t
-    }
+  const gettext = window.gettext || ((t) => t)
 
   // AJAX modals
-  const dismissModals = function () {
+  const dismissModals = () => {
     // LOL, dismiss.
     $(".modal, .modal-backdrop").remove()
     $(document.body).removeClass("modal-open").removeAttr("style")
   }
 
-  const initModal = function (data) {
+  const initModal = (data) => {
     dismissModals()
 
     const $data = $(data)
@@ -48,7 +44,7 @@ $(() => {
   }
 
   window.initModal = initModal
-  window.openModalFromUrl = function (url) {
+  window.openModalFromUrl = (url) => {
     $.ajax({
       url,
       success(data) {
@@ -124,7 +120,7 @@ $(() => {
 
     const fd = new FormData(form)
     let params = new URLSearchParams()
-    for (let part of fd) {
+    for (const part of fd) {
       if (part[1]) params.append(part[0], part[1])
     }
     params.sort()
@@ -146,12 +142,11 @@ $(() => {
     // Calling debounce returns a new anonymous function
     return function () {
       // reference the context and args for the setTimeout function
-      let context = this,
-        args = arguments
+      const args = arguments
 
       // Should the function be called now? If immediate is true
       //   and not already in a timeout then the answer is: Yes
-      let callNow = immediate && !timeout
+      const callNow = immediate && !timeout
 
       // This is the basic debounce behaviour where you can call this
       //   function several times, but it will only execute once
@@ -170,12 +165,12 @@ $(() => {
           // Call the original function with apply
           // apply lets you define the 'this' object as well as the arguments
           //    (both captured before setTimeout)
-          func.apply(context, args)
+          func.apply(this, args)
         }
       }, wait)
 
       // Immediate mode and no wait timer? Execute the function..
-      if (callNow) func.apply(context, args)
+      if (callNow) func.apply(this, args)
     }
   }
 
@@ -304,17 +299,17 @@ $(() => {
   $(document.body).on("click", "[data-hours-button]", function () {
     this.blur()
     const value = prompt(this.dataset.hoursButton)
-    if (parseFloat(value)) {
+    if (Number.parseFloat(value)) {
       $("#id_modal-days")
-        .val((parseFloat(value) / 8).toFixed(2))
+        .val((Number.parseFloat(value) / 8).toFixed(2))
         .focus()
     }
   })
 
   $(document.body).on("click", "[data-multiply-cost]", function (e) {
     e.preventDefault()
-    const factor = parseFloat(this.dataset.multiplyCost),
-      tpc = parseFloat($("#id_modal-third_party_costs").val()),
+    const factor = Number.parseFloat(this.dataset.multiplyCost),
+      tpc = Number.parseFloat($("#id_modal-third_party_costs").val()),
       cost = $("#id_modal-cost")
 
     if (tpc && factor) {
@@ -467,7 +462,7 @@ function initWidgets() {
     // const form = $(this)
     //
     const read = (sel, root = document) =>
-      parseFloat(root.querySelector(sel).value) || 0
+      Number.parseFloat(root.querySelector(sel).value) || 0
     const write = (sel, value, root = document) =>
       (root.querySelector(sel).value = value.toFixed(2))
 
@@ -506,7 +501,7 @@ function initWidgets() {
 
 window.addInlineForm = function addInlineForm(slug, onComplete) {
   const totalForms = $(`#id_${slug}-TOTAL_FORMS`),
-    newId = parseInt(totalForms.val(), 10) || 0
+    newId = Number.parseInt(totalForms.val(), 10) || 0
 
   totalForms.val(newId + 1)
   const empty = $(`#${slug}-empty`),

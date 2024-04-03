@@ -750,8 +750,8 @@ class InvoicesTest(TestCase):
         self.assertContains(
             response,
             "You are attempting to set status to &#x27;In preparation&#x27;,"
-            " but the invoice has already been closed on {}."
-            " Are you sure?".format(local_date_format(dt.date.today())),
+            f" but the invoice has already been closed on {local_date_format(dt.date.today())}."
+            " Are you sure?",
         )
 
         response = self.client.post(

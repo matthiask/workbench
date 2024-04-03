@@ -28,9 +28,7 @@ def _do_deploy(conn, folder, rsync):
     with conn.cd(folder):
         fl.run(
             conn,
-            "DOTENV=.env/{} venv/bin/python manage.py collectstatic --noinput".format(
-                fl.config.installations[0]
-            ),
+            f"DOTENV=.env/{fl.config.installations[0]} venv/bin/python manage.py collectstatic --noinput",
         )
 
 

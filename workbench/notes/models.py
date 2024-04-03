@@ -44,12 +44,7 @@ class Note(Model):
         verbose_name_plural = _("notes")
 
     def __str__(self):
-        return "{} - {} {} - {}".format(
-            self.title,
-            self.content_type.name,
-            self.object_id,
-            self.created_by.get_short_name(),
-        )
+        return f"{self.title} - {self.content_type.name} {self.object_id} - {self.created_by.get_short_name()}"
 
     def get_absolute_url(self):
         model = self.content_type.model_class()

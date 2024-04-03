@@ -322,11 +322,7 @@ class PDFDocument(_PDFDocument):
                                 None,
                                 [
                                     (
-                                        "{} {} à {}/h".format(
-                                            hours(service.effort_hours),
-                                            service.effort_type,
-                                            currency(service.effort_rate),
-                                        )
+                                        f"{hours(service.effort_hours)} {service.effort_type} à {currency(service.effort_rate)}/h"
                                     )
                                     if service.effort_hours and service.effort_rate
                                     else "",

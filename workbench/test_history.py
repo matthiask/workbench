@@ -85,8 +85,8 @@ class HistoryTest(TestCase):
         response = self.client.get(f"/history/contacts_person/id/{person.pk}/")
         self.assertContains(
             response,
-            '<a href="/history/contacts_organization/id/{}/" data-toggle="ajaxmodal">'
-            "Deleted organization instance</a>".format(pk),
+            f'<a href="/history/contacts_organization/id/{pk}/" data-toggle="ajaxmodal">'
+            "Deleted organization instance</a>",
         )
 
         response = self.client.get(f"/history/contacts_organization/id/{pk}/")
@@ -291,9 +291,7 @@ class HistoryTest(TestCase):
     def test_costcenter_visibility(self):
         """Cost centers are invisible without LABOR_COSTS"""
         self.client.force_login(factories.UserFactory.create())
-        url = "/history/reporting_costcenter/id/{}/".format(
-            factories.CostCenterFactory.create().pk
-        )
+        url = f"/history/reporting_costcenter/id/{factories.CostCenterFactory.create().pk}/"
         self.assert_404_without_feature(url, feature=FEATURES.LABOR_COSTS)
 
     def test_everything(self):

@@ -51,7 +51,7 @@ extend-select = [
   # flake8-logging
   "LOG",
   # ruff
-  "RUF005", "RUF006", "RUF007", "RUF008", "RUF009", "RUF010", "RUF011",
+  "RUF005", "RUF006", "RUF007", "RUF008", "RUF009", "RUF010",
   "RUF015", "RUF016", "RUF017", "RUF100", "RUF200",
 ]
 extend-ignore = [

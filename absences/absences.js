@@ -9,9 +9,19 @@ const getRowName = (id) => `person-${id}`
 
 // prettier-ignore
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June", "July", "August",
-  "September", "October", "November", "December"
-].map(m => gettext(m))
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+].map((m) => gettext(m))
 
 export const Absences = ({ absencesByPerson, dateList, reasonList }) => {
   const scaleValues = useMemo(

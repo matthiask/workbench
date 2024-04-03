@@ -112,10 +112,7 @@ class AbstractPlannedWork(Model):
 
     @property
     def pretty_from_until(self):
-        return "{} – {}".format(
-            local_date_format(min(self.weeks)),
-            local_date_format(max(self.weeks) + dt.timedelta(days=6)),
-        )
+        return f"{local_date_format(min(self.weeks))} – {local_date_format(max(self.weeks) + dt.timedelta(days=6))}"
 
     @property
     def ranges(self):
@@ -135,10 +132,7 @@ class AbstractPlannedWork(Model):
             yield {
                 "from": from_,
                 "until": until_,
-                "pretty": "{} – {}".format(
-                    local_date_format(from_),
-                    local_date_format(until_ + dt.timedelta(days=6)),
-                ),
+                "pretty": f"{local_date_format(from_)} – {local_date_format(until_ + dt.timedelta(days=6))}",
             }
 
     @property
