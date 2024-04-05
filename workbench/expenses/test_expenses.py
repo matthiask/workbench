@@ -249,7 +249,8 @@ class ExpensesTest(TestCase):
 
 def mocked_json(*args, **kwargs):
     with open(
-        os.path.join(settings.BASE_DIR, "workbench", "fixtures", "exchangerates.json")
+        os.path.join(settings.BASE_DIR, "workbench", "fixtures", "exchangerates.json"),
+        encoding="utf-8",
     ) as f:
         return json.load(f)[0]["fields"]["rates"]
 
@@ -284,7 +285,7 @@ class ExchangeRatesTest(TestCase):
         self.assertEqual(
             mock_get.call_args[0],
             (
-                "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/chf.json",
+                "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/chf.json",
             ),
         )
 
@@ -294,6 +295,6 @@ class ExchangeRatesTest(TestCase):
         self.assertEqual(
             mock_get.call_args[0],
             (
-                "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/2019-10-12/currencies/chf.json",
+                "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2019-10-12/v1/currencies/chf.json",
             ),
         )
