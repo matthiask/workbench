@@ -6,7 +6,7 @@ import requests
 def exchange_rates(day=None):
     today = dt.date.today()
     day = day or today
-    url = f"https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/{'latest' if day == today else day.isoformat()}/currencies/chf.json"
+    url = f"https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@{'latest' if day == today else day.isoformat()}/v1/currencies/chf.json"
     data = requests.get(url, timeout=2).json()
     # Format from old api.exchangeratesapi.io endpoint
     return {
