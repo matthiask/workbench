@@ -127,7 +127,19 @@ def convert(request):
         except Exception:
             error = _("Failure while determining the exchange rate.")
         return JsonResponse({"cost": "", "error": error})
-    rates = ExchangeRates.objects.for_day(form.cleaned_data["day"])
+    try:
+        rates = ExchangeRates.objects.for_day(form.cleaned_data["day"])
+    except Exception as exc:
+        # Request timeout, response format not JSON, etc...
+        return JsonResponse({
+            "cost": "",
+            "error": "%s: %s"
+            % (
+                _("Failure while determining the exchange rate."),
+                exc,
+            ),
+        })
+
     cost = form.cleaned_data["cost"] / Decimal(
         str(rates.rates["rates"][form.cleaned_data["currency"]])
     )
