@@ -2,9 +2,10 @@ import io
 import zipfile
 
 from django.conf import settings
+from django.utils.text import slugify
 from django.utils.translation import activate, gettext as _
 
-from workbench.credit_control.models import CreditEntry
+from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.invoices.models import Invoice
 from workbench.tools.pdf import PDFDocument
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -115,6 +116,44 @@ def paid_debtors_zip(date_range, *, file, qr=False):
                 .select_related("project", "owned_by")
             ],
         )
+
+        for ledger in Ledger.objects.all():
+            rows = []
+            for entry in (
+                CreditEntry.objects.filter(ledger=ledger, value_date__range=date_range)
+                .order_by("value_date")
+                .select_related("invoice__project", "invoice__owned_by")
+            ):
+                rows.append((
+                    entry.value_date,
+                    entry.total,
+                    entry.payment_notice,
+                    entry.invoice,
+                    entry.invoice.invoiced_on if entry.invoice else None,
+                    entry.notes,
+                ))
+
+                if entry.invoice and entry.invoice not in invoices:
+                    print(entry.invoice)
+                    append_invoice(
+                        zf=zf,
+                        invoice=entry.invoice,
+                        qr=qr,
+                    )
+
+            if rows:
+                xlsx.add_sheet(slugify(ledger.name))
+                xlsx.table(
+                    (
+                        _("value date"),
+                        _("total"),
+                        _("payment notice"),
+                        _("invoice"),
+                        _("invoiced on"),
+                        _("notes"),
+                    ),
+                    rows,
+                )
 
         with io.BytesIO() as buf:
             xlsx.workbook.save(buf)
