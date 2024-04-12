@@ -25,7 +25,7 @@ et-xmlfile==1.1.0
 factory-boy==3.3.0
 Faker==24.0.0
 granian==1.1.1
-idna==3.6
+idna==3.7
 iso3166==2.1.1
 lxml==5.1.0
 more-itertools==10.2.0
