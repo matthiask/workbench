@@ -48,7 +48,7 @@ setuptools==69.1.1
 six==1.16.0
 soupsieve==2.5
 speckenv==6.2
-sqlparse==0.4.4
+sqlparse==0.5.0
 svglib==1.5.1
 svgwrite==1.4.3
 time-machine==2.14.0
