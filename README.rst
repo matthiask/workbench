@@ -50,7 +50,10 @@ Development
 Then, visit http://127.0.0.1:8000/accounts/login/?force_login=EMAIL in your
 browser and replace ``EMAIL`` with the email address you used when creating the
 superuser. Note that this only works when you're running with ``DEBUG=True``
-**and** ``LIVE=False``, this never works in a production environment.
+**and** ``LIVE=False``, this never works in a production environment. The
+production environment (and optionally the local environment also) use Google
+OAuth2, you can create the necessary credentials here
+https://console.cloud.google.com/welcome
 
 You should probably visit the admin panel now and add a few service types incl.
 their hourly rate at http://127.0.0.1:8000/admin/services/servicetype/
