@@ -113,7 +113,6 @@ class UserManager(BaseUserManager):
 @total_ordering
 class User(Model, AbstractBaseUser):
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["working_time_model"]
 
     email = models.EmailField(_("email"), max_length=254, unique=True)
     is_active = models.BooleanField(_("is active"), default=True)
