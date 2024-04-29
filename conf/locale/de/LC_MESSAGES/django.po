@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-02 16:01+0200\n"
+"POT-Creation-Date: 2024-04-29 11:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1124,7 +1124,8 @@ msgstr "Total"
 msgid "payment notice"
 msgstr "Zahlungsnotiz"
 
-#: workbench/credit_control/models.py workbench/invoices/models.py
+#: workbench/credit_control/models.py workbench/credit_control/reporting.py
+#: workbench/invoices/models.py
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/credit_control/creditentry_detail.html
@@ -1158,6 +1159,10 @@ msgstr "Rechnungen"
 #: workbench/offers/models.py workbench/projects/models.py
 msgid "code"
 msgstr "Code"
+
+#: workbench/credit_control/reporting.py
+msgid "freezed"
+msgstr "eingefroren"
 
 #: workbench/credit_control/reporting.py workbench/deals/models.py
 #: workbench/expenses/models.py workbench/invoices/forms.py
