@@ -41,6 +41,10 @@ def range_type(arg_value):
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
+            "--last-month",
+            action="store_true",
+        )
+        parser.add_argument(
             "--year",
             type=int,
             default=dt.date.today().year,
@@ -63,6 +67,12 @@ class Command(BaseCommand):
             dt.date(options["year"], 1, 1),
             min(last_month_end, dt.date(options["year"], 12, 31)),
         ]
+
+        if options["last_month"]:
+            date_range = [
+                date_range[1].replace(day=1),
+                date_range[1],
+            ]
 
         if date_range[0] >= date_range[1]:
             self.stderr.write("Date range empty.")
