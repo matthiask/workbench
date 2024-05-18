@@ -13,7 +13,7 @@ django-vanilla-views
 django-webpack-loader
 Django<5.1
 factory-boy
-granian
+gunicorn
 lxml
 more-itertools
 pdfdocument

@@ -1,7 +1,7 @@
 exclude: ".yarn/|yarn.lock|workbench/static/workbench/lib"
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: check-added-large-files
       - id: check-builtin-literals
@@ -25,12 +25,12 @@ repos:
         language: system
         always_run: true
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.16.0
+    rev: 1.17.0
     hooks:
       - id: django-upgrade
         args: [--target-version, "5.0"]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.3.5"
+    rev: "v0.4.4"
     hooks:
       - id: ruff
       - id: ruff-format
@@ -39,18 +39,18 @@ repos:
     hooks:
       - id: prettier
         args: [--list-different, --no-semi]
-        types_or: [scss]
+        types_or: [css, scss]
         exclude: "^conf/|.*\\.html$|.*\\.json$"
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: 1.7.0
+    rev: 2.1.1
     hooks:
       - id: pyproject-fmt
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.16
+    rev: v0.17
     hooks:
       - id: validate-pyproject
   - repo: https://github.com/biomejs/pre-commit
     rev: "v0.1.0"
     hooks:
-    -   id: biome-check
-        additional_dependencies: ["@biomejs/biome@1.6.3"]
+      - id: biome-check
+        additional_dependencies: ["@biomejs/biome@1.7.3"]

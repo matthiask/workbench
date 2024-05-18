@@ -165,12 +165,14 @@ module.exports = (PRODUCTION) => {
           index: true,
           writeToDisk: (path) => /\.html$/.test(path),
         },
-        proxy: proxySettings
-          ? {
-              context: () => true,
-              target: `http://127.0.0.1:${proxySettings.backendPort}`,
-            }
-          : {},
+        proxy: [
+          proxySettings
+            ? {
+                context: () => true,
+                target: `http://127.0.0.1:${proxySettings.backendPort}`,
+              }
+            : {},
+        ],
       }
     },
     assetRule() {
