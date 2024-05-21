@@ -40,7 +40,7 @@ python-stdnum==1.20
 qrbill==1.1.0
 qrcode==7.4.2
 reportlab==4.2.0
-requests==2.31.0
+requests==2.32.0
 requests-oauthlib==2.0.0
 sentry-sdk==2.2.0
 six==1.16.0
