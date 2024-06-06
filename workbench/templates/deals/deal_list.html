@@ -9,7 +9,7 @@
 {% endblock %}
 {% block objects %}
   <div class="row">
-    {% for group in object_list|group_deals_by_probability:view.search_form.should_group_deals %}
+    {% for group in object_list|load_overview_attributes|group_deals_by_probability:view.search_form.should_group_deals %}
       <div class="col-lg-6 col-xl-4">
         <div class="card mb-5">
           <div class="card-header d-flex align-items-center justify-content-between">
@@ -20,14 +20,13 @@
             {% for object in group.deals %}
               <a href="{{ object.get_absolute_url }}"
                  class="list-group-item list-group-item-action">
-                <div class="d-flex w-100 justify-content-between">
-                  <h5 class="mb-1">{{ object|h }}</h5>
-                  {{ object.status_badge }}
-                </div>
+                <span style="float:right">{{ object.status_badge }}</span>
+                <h5 class="mb-1">{{ object|h }}</h5>
                 <div class="row">
                   <div class="col-md-9">{{ object.contact.name_with_organization|default:object.customer }}</div>
                   <div class="col-md-3 text-md-right">{{ object.value|currency }}</div>
                 </div>
+                {{ object.overview_attributes }}
               </a>
             {% endfor %}
           </div>

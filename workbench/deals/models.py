@@ -25,6 +25,7 @@ class AttributeGroup(models.Model):
     position = models.PositiveIntegerField(_("position"), default=0)
     is_archived = models.BooleanField(_("is archived"), default=False)
     is_required = models.BooleanField(_("is required"), default=True)
+    show_on_overview = models.BooleanField(_("show on overview"), default=False)
 
     class Meta:
         ordering = ("position", "id")

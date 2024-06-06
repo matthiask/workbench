@@ -1,5 +1,6 @@
 import datetime as dt
 import math
+from collections import defaultdict
 from itertools import groupby
 
 from django import template
@@ -11,6 +12,7 @@ from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
+from workbench.deals.models import Deal
 from workbench.logbook.models import LoggedHours
 from workbench.notes.forms import NoteForm
 from workbench.notes.models import Note
@@ -126,6 +128,20 @@ def deal_group(deal):
     if deal.probability == deal.LOW:
         return (4, _("low probability"))
     return (5, _("unknown probability"))
+
+
+@register.filter
+def load_overview_attributes(iterable):
+    attributes = defaultdict(list)
+    for m in Deal.attributes.through.objects.filter(
+        attribute__group__show_on_overview=True,
+        deal__in=iterable,
+    ).select_related("attribute"):
+        attributes[m.deal_id].append(m.attribute.title)
+
+    for obj in iterable:
+        obj.overview_attributes = ", ".join(attributes[obj.id])
+    return iterable
 
 
 @register.filter
