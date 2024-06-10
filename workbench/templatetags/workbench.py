@@ -135,7 +135,7 @@ def load_overview_attributes(iterable):
     attributes = defaultdict(list)
     for m in Deal.attributes.through.objects.filter(
         attribute__group__show_on_overview=True,
-        deal__in=iterable,
+        deal__in=list(iterable),
     ).select_related("attribute"):
         attributes[m.deal_id].append(m.attribute.title)
 
