@@ -401,3 +401,39 @@ class ExternalWorkForm(ModelForm):
     @property
     def this_monday(self):
         return monday()
+
+
+class PlannedWorkBatchForm(Form):
+    def __init__(self, *args, **kwargs):
+        self._work = kwargs.pop("work").order_by("weeks")
+        super().__init__(*args, **kwargs)
+
+        today = dt.date.today()
+        self.fields["work"] = forms.ModelMultipleChoiceField(
+            self._work,
+            label=capfirst(_("planned work")),
+            initial=[work.id for work in self._work if work.weeks[0] > today],
+            # widget=forms.CheckboxSelectMultiple,
+            widget=forms.SelectMultiple(attrs={"size": 10}),
+        )
+        self.fields["move_by_weeks"] = forms.IntegerField(
+            label=_("Move by weeks"), initial=0
+        )
+        self.fields["assign_to"] = forms.ModelChoiceField(
+            User.objects.active(),
+            label=_("Assign to"),
+            required=False,
+        )
+
+    def process(self):
+        data = self.cleaned_data
+        work = data["work"]
+        if move_by_weeks := data.get("move_by_weeks"):
+            delta = dt.timedelta(days=7 * move_by_weeks)
+            for unit in work:
+                unit.weeks = [week + delta for week in unit.weeks]
+        if assign_to := data.get("assign_to"):
+            for unit in work:
+                unit.user = assign_to
+        for unit in work:
+            unit.save()

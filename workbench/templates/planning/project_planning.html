@@ -48,6 +48,11 @@
         {% include 'svg/plus.svg' %}
         {% translate 'absence'|capfirst %}
       </a>
+      <a href="{{ object.urls.planning_batch_update }}"
+         data-toggle="ajaxmodal"
+         class="btn btn-primary btn-sm">
+        {% translate 'Batch update' %}
+      </a>
       <a href="{% url 'history' 'planning_plannedwork' 'project_id' object.pk %}"
          data-toggle="ajaxmodal"
          class="btn btn-primary btn-sm">

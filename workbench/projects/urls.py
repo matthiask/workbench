@@ -15,6 +15,7 @@ from workbench.offers.views import ProjectOfferPDFView
 from workbench.planning.views import (
     campaign_planning,
     campaign_planning_external,
+    planning_batch_update,
     project_planning,
     project_planning_external,
 )
@@ -156,6 +157,12 @@ urlpatterns = [
         "<int:pk>/planning/",
         project_planning,
         name="projects_project_planning",
+    ),
+    path(
+        "<int:pk>/planning/batch-update/",
+        planning_batch_update,
+        {"kind": "project"},
+        name="projects_project_planning_batch_update",
     ),
     path(
         "<int:pk>/external/",

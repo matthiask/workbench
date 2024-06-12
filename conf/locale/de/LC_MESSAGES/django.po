@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-29 11:06+0200\n"
+"POT-Creation-Date: 2024-06-12 10:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1331,6 +1331,10 @@ msgid "is required"
 msgstr "ist obligatorisch"
 
 #: workbench/deals/models.py
+msgid "show on overview"
+msgstr "Auf Übersicht anzeigen"
+
+#: workbench/deals/models.py
 msgid "attribute group"
 msgstr "Attributgruppe"
 
@@ -2580,6 +2584,23 @@ msgstr "Der Meilenstein ist geplant am %(date)s, aber Arbeit ist geplant in der 
 msgid "The selected offer is declined."
 msgstr "Die ausgewählte Offerte ist abgelehnt."
 
+#: workbench/planning/forms.py workbench/planning/models.py
+#: workbench/templates/base.html
+#: workbench/templates/planning/campaign_planning.html
+#: workbench/templates/planning/project_planning.html
+#: workbench/templates/planning/team_planning.html
+#: workbench/templates/planning/user_planning.html
+msgid "planned work"
+msgstr "geplante Arbeit"
+
+#: workbench/planning/forms.py
+msgid "Move by weeks"
+msgstr "Um Wochen verschieben"
+
+#: workbench/planning/forms.py
+msgid "Assign to"
+msgstr "Zuweisen"
+
 #: workbench/planning/models.py
 #: workbench/templates/reporting/key_data_third_party_costs.html
 #: workbench/tools/pdf.py
@@ -2644,14 +2665,6 @@ msgstr "Kundenarbeit"
 #: workbench/planning/models.py
 msgid "is provisional"
 msgstr "ist provisorisch"
-
-#: workbench/planning/models.py workbench/templates/base.html
-#: workbench/templates/planning/campaign_planning.html
-#: workbench/templates/planning/project_planning.html
-#: workbench/templates/planning/team_planning.html
-#: workbench/templates/planning/user_planning.html
-msgid "planned work"
-msgstr "geplante Arbeit"
 
 #: workbench/planning/reporting.py
 #, python-format
@@ -3607,6 +3620,11 @@ msgstr "Aufwände in Stunden"
 #: workbench/templates/open-modal.html
 msgid "This page does not exist (anymore)."
 msgstr "Diese Seite existiert nicht (mehr)."
+
+#: workbench/templates/planning/batch_update.html
+#: workbench/templates/planning/project_planning.html
+msgid "Batch update"
+msgstr "Batch-Bearbeitung"
 
 #: workbench/templates/planning/campaign_planning.html
 #: workbench/templates/planning/project_planning.html
