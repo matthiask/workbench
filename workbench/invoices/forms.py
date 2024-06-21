@@ -275,7 +275,7 @@ class InvoiceForm(PostalAddressSelectionForm):
                     "status",
                     "payment_notice",
                 }:
-                    self.fields.pop(field)
+                    self.fields[field].disabled = True
 
             if self.instance.status == Invoice.SENT:
                 self.fields["status"].choices = [
