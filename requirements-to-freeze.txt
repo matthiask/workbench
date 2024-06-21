@@ -9,6 +9,7 @@ django-countries
 django-debug-toolbar
 django-fast-export
 django-fineforms
+django-prose-editor
 django-vanilla-views
 django-webpack-loader
 Django<5.1

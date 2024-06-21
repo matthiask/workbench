@@ -15,6 +15,7 @@ from workbench.accounts.models import User
 from workbench.projects.models import Project, Service
 from workbench.tools.formats import Z2, local_date_format
 from workbench.tools.models import ModelWithTotal, SearchQuerySet
+from workbench.tools.prose import RestrictedProseField
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
 
@@ -118,7 +119,7 @@ class Offer(ModelWithTotal):
     )
 
     title = models.CharField(_("title"), max_length=200)
-    description = models.TextField(_("description"), blank=True)
+    description = RestrictedProseField(_("description"), blank=True)
     owned_by = models.ForeignKey(
         User, on_delete=models.PROTECT, verbose_name=_("contact person")
     )

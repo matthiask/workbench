@@ -61,6 +61,7 @@ INSTALLED_APPS = [
         "workbench.reporting",
         "workbench.services",
         "workbench.timer",
+        "django_prose_editor",
         "debug_toolbar" if DEBUG_TOOLBAR else "",
     ]
     if a

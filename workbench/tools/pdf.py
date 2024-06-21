@@ -465,7 +465,7 @@ class PDFDocument(_PDFDocument):
         )
         if offer.description:
             self.spacer(5 * mm)
-            self.p(offer.description)
+            self.mini_html(offer.description)
         self.spacer(2 * mm)
         services = offer.services.all()
         self.table_services(
