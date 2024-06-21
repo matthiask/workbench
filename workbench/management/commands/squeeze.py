@@ -15,7 +15,7 @@ from workbench.accounts.models import User
 from workbench.awt.reporting import employment_percentages
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.invoices.utils import recurring
-from workbench.logbook.models import LoggedHours
+from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import InternalType, InternalTypeUser, Project, Service
 from workbench.projects.reporting import hours_per_type
@@ -139,6 +139,23 @@ class Command(BaseCommand):
             projects[row["project"]]["invoiced"] = (
                 row["total_excl_tax__sum"] - row["third_party_costs__sum"]
             )
+
+        # Subtract third party costs from logged costs which have not been
+        # invoiced yet. Maybe we're double counting here but I'd rather have a
+        # pessimistic outlook here.
+        for row in (
+            LoggedCost.objects.filter(
+                service__project__in=projects.keys(),
+                third_party_costs__isnull=False,
+                invoice_service__isnull=True,
+            )
+            .order_by()
+            .values("service__project")
+            .annotate(Sum("third_party_costs"))
+        ):
+            projects[row["service__project"]]["invoiced"] -= row[
+                "third_party_costs__sum"
+            ]
 
         for pi in ProjectedInvoice.objects.filter(
             project__in=projects.keys(), project__closed_on__isnull=True
