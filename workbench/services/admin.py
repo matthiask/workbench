@@ -6,6 +6,6 @@ from workbench.tools import admin
 
 @admin.register(ServiceType)
 class ServiceTypeAdmin(OrderableAdmin, admin.ReadWriteModelAdmin):
-    list_display = ["title", "hourly_rate", "position", "color"]
-    list_editable = ["position", "color"]
+    list_display = ["__str__", "title", "hourly_rate", "color", "position"]
+    list_editable = ["title", "hourly_rate", "color", "position"]
     ordering_field = "position"
