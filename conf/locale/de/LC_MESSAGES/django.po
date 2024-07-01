@@ -3190,7 +3190,7 @@ msgstr ""
 "\n"
 "Dein Stundensaldo bis und mit %(month)s beträgt %(running_sum)s.\n"
 "Dies ist ausserhalb des Bereichs von +/- 40h.\n"
-"Der Saldo betrug %(monthly_sum)s am Ende des letzten Monats.\n"
+"Der Saldo des letzten Monats war %(monthly_sum)s.\n"
 
 #: workbench/templates/awt/year_detail.html
 msgid "active users"
