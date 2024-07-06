@@ -2,7 +2,7 @@
 
 asgiref==3.8.1
 beautifulsoup4==4.13.0b2
-certifi==2024.6.2
+certifi==2024.7.4
 chardet==5.2.0
 charset-normalizer==3.3.2
 coverage==7.5.4
