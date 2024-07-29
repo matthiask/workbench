@@ -71,6 +71,8 @@ lint.extend-ignore = [
   "B905",
   # No line length errors
   "E501",
+  # Percent-formatting is fine
+  "UP031",
 ]
 lint.per-file-ignores."*/migrat*/*" = [
   # Allow using PascalCase model names in migrations

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-12 10:54+0200\n"
+"POT-Creation-Date: 2024-07-29 09:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -599,6 +599,11 @@ msgstr "Krankheit"
 msgid "paid leave (e.g. civilian service, maternity etc.)"
 msgstr "Bezahlter Urlaub (zB Zivildienst, Elternurlaub, Zügeln etc.)"
 
+#: workbench/awt/models.py workbench/awt/pdf.py
+#: workbench/templates/awt/year_detail.html
+msgid "School attendance of apprentices"
+msgstr "Schulbesuch durch Auszubildende"
+
 #: workbench/awt/models.py
 msgid "other reasons (no working time)"
 msgstr "Andere Gründe (keine Arbeitszeit)"
@@ -741,6 +746,10 @@ msgstr "Krankheitstage"
 #: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
 msgid "Paid leave"
 msgstr "Bezahlter Urlaub"
+
+#: workbench/awt/pdf.py
+msgid "School attendance"
+msgstr "Schulbesuch"
 
 #: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
 msgid "vacation days correction"

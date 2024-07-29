@@ -54,6 +54,10 @@
             <th>{% translate 'Paid leave' %}</th>
           </tr>
           <tr>
+            <td class="text-right">{{ overall.absence_school|days }}</td>
+            <th>{% translate 'School attendance of apprentices' %}</th>
+          </tr>
+          <tr>
             <td class="text-right">{{ overall.absence_correction|days }}</td>
             <th>{% translate 'Working time correction' %}</th>
           </tr>
@@ -203,6 +207,21 @@
                 {% endfor %}
                 <th class="text-right">
                   {{ totals.absence_paid|days }}
+                </th>
+              </tr>
+            {% endif %}
+            {% if totals.absence_school %}
+              <tr>
+                <th class="text-nowrap">
+                  {% translate 'School attendance of apprentices' %}
+                </th>
+                {% for value in stats.absence_school %}
+                  <td class="text-left {% if not value %}text-black-30{% endif %}">
+                    {{ value|days }}
+                  </td>
+                {% endfor %}
+                <th class="text-right">
+                  {{ totals.absence_school|days }}
                 </th>
               </tr>
             {% endif %}
@@ -438,6 +457,33 @@
                   </th>
                 </tr>
                 {% for absence in data.absences.absence_paid %}
+                  <tr>
+                    <td>
+                      {% blocktranslate with date=absence.starts_on|local_date_format trimmed %}
+                        from {{ date }}
+                      {% endblocktranslate %}
+                    </td>
+                    <td>
+                      {{ absence.days|days }}
+                    </td>
+                    <td>
+                      {% link_or_none absence %}
+                    </td>
+                  </tr>
+                {% endfor %}
+                <tr class="thead-light">
+                  <th colspan="3">
+                    <div class="d-flex w-100 justify-content-between">
+                      {% translate 'School attendance of apprentices' %}
+                      <a href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=school"
+                         data-toggle="ajaxmodal"
+                       >
+                        &plus;
+                      </a>
+                    </div>
+                  </th>
+                </tr>
+                {% for absence in data.absences.absence_school %}
                   <tr>
                     <td>
                       {% blocktranslate with date=absence.starts_on|local_date_format trimmed %}

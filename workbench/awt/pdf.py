@@ -128,6 +128,15 @@ def user_stats_pdf(data):
                 ]
                 + [days(data["totals"]["absence_paid"])]
             )
+        if data["totals"]["absence_school"]:
+            table.append(
+                [_("School attendance")]
+                + [
+                    days(value) if value else ""
+                    for value in data["months"]["absence_school"]
+                ]
+                + [days(data["totals"]["absence_school"])]
+            )
         if data["totals"]["absence_correction"]:
             table.append(
                 [_("Working time correction")]
@@ -211,6 +220,7 @@ def user_stats_pdf(data):
             ("absence_vacation", _("vacation days")),
             ("absence_sickness", _("sickness days")),
             ("absence_paid", _("Paid leave")),
+            ("absence_school", _("School attendance of apprentices")),
             ("absence_correction", _("Working time correction")),
         ]:
             table = [

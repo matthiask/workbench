@@ -146,6 +146,7 @@ class Absence(Model):
     VACATION = "vacation"
     SICKNESS = "sickness"
     PAID = "paid"
+    SCHOOL = "school"
     OTHER = "other"
     CORRECTION = "correction"
 
@@ -153,6 +154,7 @@ class Absence(Model):
         (VACATION, _("vacation")),
         (SICKNESS, _("sickness")),
         (PAID, _("paid leave (e.g. civilian service, maternity etc.)")),
+        (SCHOOL, _("School attendance of apprentices")),
         (OTHER, _("other reasons (no working time)")),
         (CORRECTION, _("Working time correction")),
     ]
