@@ -283,6 +283,7 @@ class InvoiceForm(PostalAddressSelectionForm):
                     for row in Invoice.STATUS_CHOICES
                     if row[0] in {Invoice.SENT, Invoice.PAID, Invoice.CANCELED}
                 ]
+                self.fields["closed_on"].disabled = False
             else:
                 self.fields.pop("status", None)
                 self.fields.pop("closed_on", None)
