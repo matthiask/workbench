@@ -1,5 +1,6 @@
 beautifulsoup4
 coverage[toml]
+Django
 django-admin-ordering
 django-authlib
 django-bootstrap4
@@ -11,7 +12,6 @@ django-fast-export
 django-fineforms
 django-vanilla-views
 django-webpack-loader
-Django<5.1
 factory-boy
 gunicorn
 lxml
