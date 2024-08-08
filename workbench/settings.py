@@ -139,10 +139,20 @@ USE_I18N = True
 USE_L10N = False
 USE_TZ = True
 
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
 if LIVE:  # pragma: no cover
-    STATICFILES_STORAGE = (
+    STORAGES["staticfiles"]["BACKEND"] = (
         "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
     )
+
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "static"
 
