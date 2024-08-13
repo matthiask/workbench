@@ -197,7 +197,12 @@ class ProjectQuerySet(SearchQuerySet):
             Q(id__in=Offer.objects.values("project"))
             & ~Q(
                 id__in=Offer.objects.filter(
-                    status__in=(Offer.IN_PREPARATION, Offer.OFFERED, Offer.ACCEPTED)
+                    status__in=(
+                        Offer.IN_PREPARATION,
+                        Offer.SERVICE_GROUP,
+                        Offer.OFFERED,
+                        Offer.ACCEPTED,
+                    )
                 ).values("project")
             )
         )
