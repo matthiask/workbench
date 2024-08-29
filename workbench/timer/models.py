@@ -14,7 +14,7 @@ from workbench.logbook.models import Break, LoggedHours
 from workbench.tools.formats import Z1, local_date_format
 
 
-TIMESTAMPS_DETECT_GAP = 300  # seconds
+TIMESTAMPS_DETECT_GAP = 120  # seconds
 
 
 class Slice(dict):
@@ -112,7 +112,7 @@ class TimestampQuerySet(models.QuerySet):
                account by comparing the start of subsequent slices to the
                ``TIMESTAMPS_DETECT_GAP``.
             c. If the gap between two slices is longer than
-               ``TIMESTAMPS_DETECT_GAP`` (300 seconds or 5 minutes) the algorithm
+               ``TIMESTAMPS_DETECT_GAP`` (120 seconds or 2 minutes) the algorithm
                detects a missing gap.
         3. Update the start and end of all slices now that slices have been merged
            and/or detected.
