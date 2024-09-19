@@ -3,6 +3,7 @@ import datetime as dt
 from corsheaders.middleware import CorsMiddleware
 from django import forms
 from django.contrib import messages
+from django.db.models import Sum
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -16,7 +17,7 @@ from workbench.accounts.models import User
 from workbench.timer.models import Timestamp
 from workbench.tools.formats import Z1, hours, local_date_format
 from workbench.tools.forms import Form, ModelForm
-from workbench.tools.validation import filter_form
+from workbench.tools.validation import filter_form, monday
 
 
 def timer(request):
@@ -151,13 +152,6 @@ def timestamps(request, form):
     today = dt.date.today()
     day = form.cleaned_data["day"] or today
 
-    # Calculate the start of the week (Monday) and the end of the week (today)
-    week_start = today - dt.timedelta(days=today.weekday())
-    week_end = today
-
-    # Check if the displayed day is within the current week
-    is_this_week = week_start <= day <= week_end
-
     # Fetch the timestamps for the selected day
     slices = Timestamp.objects.slices(request.user, day=day)
 
@@ -167,23 +161,17 @@ def timestamps(request, form):
         Z1,
     )
 
-    # Loop through each day of the week (from Monday to the current day)
-    weekly_hours = Z1
-    for i in range(7):
-        current_day = week_start + dt.timedelta(days=i)
-        # Fetch the timestamps for the current day
-        day_slices = Timestamp.objects.slices(request.user, day=current_day)
-
-        # Sum the hours for the current day, if present
-        daily_hours = sum(
-            (
-                slice["logged_hours"].hours
-                for slice in day_slices
-                if slice.get("logged_hours")
-            ),
-            Z1,
+    is_this_week = day >= monday()
+    weekly_hours = request.user.hours["week"]
+    if not is_this_week:
+        weekly_hours = (
+            request.user.loggedhours.filter(
+                rendered_on__gte=monday(day),
+                rendered_on__lt=monday(day) + dt.timedelta(days=7),
+            )
+            .order_by()
+            .aggregate(hours=Sum("hours"))["hours"]
         )
-        weekly_hours += daily_hours
 
     return render(
         request,
