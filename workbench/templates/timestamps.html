@@ -19,8 +19,10 @@
                 <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">
                   {{ request.user.hours.week|hours }} {% translate 'this week' %}
                 </a>
+              {% elif is_this_week %}
+                {{ day|local_date_format:'l d.m.Y' }} / {{ hours|hours }} / {{ request.user.hours.week|hours }} {% translate 'this week' %}
               {% else %}
-                {{ day|local_date_format:'l d.m.Y' }} / {{ hours|hours }}
+                {{ day|local_date_format:'l d.m.Y' }} / {{ hours|hours }} / {{ weekly_hours|hours }} {% translate 'during the week' %}
               {% endif %}
             </small>
           </h3>

@@ -103,6 +103,7 @@ def list_timestamps(request):
         (slice["logged_hours"].hours for slice in slices if slice.get("logged_hours")),
         Z1,
     )
+
     return JsonResponse({
         "success": True,
         "user": str(user),
@@ -112,9 +113,11 @@ def list_timestamps(request):
                 "timestamp": "{:>5} - {:>5} {:^7} {}".format(
                     local_date_format(slice.get("starts_at"), fmt="H:i") or "?  ",
                     local_date_format(slice.get("ends_at"), fmt="H:i") or "?  ",
-                    f"({hours(slice.elapsed_hours, plus_sign=True)})"
-                    if slice.elapsed_hours is not None
-                    else "?",
+                    (
+                        f"({hours(slice.elapsed_hours, plus_sign=True)})"
+                        if slice.elapsed_hours is not None
+                        else "?"
+                    ),
                     slice["description"] or "-",
                 ),
                 "elapsed": slice.elapsed_hours,
@@ -147,21 +150,53 @@ def timestamps(request, form):
     request.user.unlogged_timestamps_warning(request=request)
     today = dt.date.today()
     day = form.cleaned_data["day"] or today
+
+    # Calculate the start of the week (Monday) and the end of the week (today)
+    week_start = today - dt.timedelta(days=today.weekday())
+    week_end = today
+
+    # Check if the displayed day is within the current week
+    is_this_week = week_start <= day <= week_end
+
+    # Fetch the timestamps for the selected day
     slices = Timestamp.objects.slices(request.user, day=day)
+
+    # Calculate the logged hours for the day
     hours = sum(
         (slice["logged_hours"].hours for slice in slices if slice.get("logged_hours")),
         Z1,
     )
+
+    # Loop through each day of the week (from Monday to the current day)
+    weekly_hours = Z1
+    for i in range(7):
+        current_day = week_start + dt.timedelta(days=i)
+        # Fetch the timestamps for the current day
+        day_slices = Timestamp.objects.slices(request.user, day=current_day)
+
+        # Sum the hours for the current day, if present
+        daily_hours = sum(
+            (
+                slice["logged_hours"].hours
+                for slice in day_slices
+                if slice.get("logged_hours")
+            ),
+            Z1,
+        )
+        weekly_hours += daily_hours
+
     return render(
         request,
         "timestamps.html",
         {
             "slices": slices,
             "hours": hours,
+            "weekly_hours": weekly_hours,
             "day": day,
             "previous": day - dt.timedelta(days=1),
             "next": day + dt.timedelta(days=1) if day < today else None,
             "url": request.build_absolute_uri(reverse("create_timestamp")),
             "is_today": day == today,
+            "is_this_week": is_this_week,
         },
     )
