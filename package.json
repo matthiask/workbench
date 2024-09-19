@@ -3,7 +3,7 @@
     "build-bootstrap": "webpack -p --config webpack.config.bootstrap.js"
   },
   "dependencies": {
-    "bootstrap": "^4.6.0",
+    "bootstrap": "^5.0.0",
     "fh-webpack-config": "^2.0.1",
     "jquery": "^3.7.1",
     "popper.js": "^1.16.1",
