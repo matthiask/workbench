@@ -26,32 +26,41 @@ repos:
         always_run: true
       - id: prettier
         name: prettier
-        entry: npx prettier@3.3.2 --no-semi --write
+        entry: npx prettier@3.3.3 --no-semi --write
         language: system
         types_or: [css, scss]
         require_serial: true
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.19.0
+    rev: 1.21.0
     hooks:
       - id: django-upgrade
         args: [--target-version, "5.0"]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.5.1"
+    rev: "v0.6.4"
     hooks:
       - id: ruff
+        args: [--unsafe-fixes]
       - id: ruff-format
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: 2.1.4
+    rev: 2.2.3
     hooks:
       - id: pyproject-fmt
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.18
+    rev: v0.19
     hooks:
       - id: validate-pyproject
   - repo: https://github.com/biomejs/pre-commit
     rev: "v0.4.0"
     hooks:
       - id: biome-check
-        additional_dependencies: ["@biomejs/biome@1.8.2"]
+        additional_dependencies: ["@biomejs/biome@1.9.0"]
         args: [--unsafe]
         types_or: [javascript, json]
+  - repo: https://github.com/boidolr/pre-commit-images
+    rev: v1.8.1
+    hooks:
+      - id: optimize-avif
+      - id: optimize-jpg
+      - id: optimize-png
+      - id: optimize-svg
+      - id: optimize-webp

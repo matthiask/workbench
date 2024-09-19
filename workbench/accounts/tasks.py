@@ -55,7 +55,7 @@ def rating(pairing, previous):
 
 
 def coffee_invites():
-    year, week, weekday = dt.date.today().isocalendar()
+    _year, week, weekday = dt.date.today().isocalendar()
     if weekday != 1 or week % 2 == 0:
         return
     # It is a monday in an odd ISO calendar week

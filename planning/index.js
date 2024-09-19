@@ -1,6 +1,5 @@
 import "./style.scss"
 
-import ReactDOM from "react-dom"
 import React, {
   Fragment,
   createContext,
@@ -9,11 +8,12 @@ import React, {
   useRef,
   useState,
 } from "react"
+import ReactDOM from "react-dom"
 
 const clamp = (min, value, max) => Math.max(Math.min(value, max), min)
 const opacityClamp = (value) => clamp(0.3, value, 1)
 const gettext = window.gettext || ((t) => t)
-const pgettext = window.pgettext || ((ctx, t) => t)
+const pgettext = window.pgettext || ((_ctx, t) => t)
 const fixed = (s, decimalPlaces) => Number.parseFloat(s).toFixed(decimalPlaces)
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -305,7 +305,7 @@ function Project({
       <div
         style={{
           gridRow: `${row} / ${row + (project.worked_hours ? 2 : 1)}`,
-          gridColumn: `1 / -1`,
+          gridColumn: "1 / -1",
         }}
         className="planning--stripe1"
       />
@@ -397,10 +397,9 @@ function Project({
             (project.worked_hours && <WorkedHours project={project} />)}
           {project.milestones ? <Milestones project={project} /> : null}
           {external_work && <ExternalExpenses {...{ external_work }} />}
-          {offers &&
-            offers.map((offer, idx) => (
-              <Offer key={idx} {...offer} external_view={external_view} />
-            ))}
+          {offers?.map((offer, idx) => (
+            <Offer key={idx} {...offer} external_view={external_view} />
+          ))}
         </>
       )}
     </>
@@ -465,7 +464,7 @@ const Milestones = ({ project }) => {
       <div
         style={{
           gridRow: row,
-          gridColumn: `1 / -1`,
+          gridColumn: "1 / -1",
         }}
         className="planning--milestones"
       />
@@ -488,7 +487,7 @@ const Milestones = ({ project }) => {
             <Cell
               row={row}
               column={1}
-              className={`planning--title is-pw planning--small pl-5`}
+              className={"planning--title is-pw planning--small pl-5"}
             >
               <a href={m.url} data-toggle="ajaxmodal">
                 {m.title}
@@ -497,7 +496,7 @@ const Milestones = ({ project }) => {
             <Cell
               row={row}
               column={3}
-              className={`planning--small text-center is-pr`}
+              className={"planning--small text-center is-pr"}
               style={{ whiteSpace: "nowrap" }}
             >
               {m.range}
@@ -506,7 +505,7 @@ const Milestones = ({ project }) => {
               <Cell
                 row={row}
                 column={4}
-                className={`planning--small text-right is-pr`}
+                className={"planning--small text-right is-pr"}
               >
                 {`${fixed(m.hours, 0)}h`}
               </Cell>
@@ -518,7 +517,7 @@ const Milestones = ({ project }) => {
                   row={row}
                   column={FIRST_DATA_COLUMN + range.start}
                   colspan={`span ${range.length}`}
-                  className={`planning--range planning--small is-milestone`}
+                  className={"planning--range planning--small is-milestone"}
                   tag="a"
                   href={m.url}
                   data-toggle="ajaxmodal"
@@ -532,7 +531,9 @@ const Milestones = ({ project }) => {
                   row={row}
                   column={FIRST_DATA_COLUMN + range.start}
                   colspan={`span ${range.length}`}
-                  className={`planning--range planning--small is-milestone-graphic`}
+                  className={
+                    "planning--range planning--small is-milestone-graphic"
+                  }
                   style={{
                     left: weekdayBackgroundPosition(m.weekday),
                   }}
@@ -562,7 +563,7 @@ function Offer({ offer, external_view, work_list }) {
       <div
         style={{
           gridRow: row,
-          gridColumn: `1 / -1`,
+          gridColumn: "1 / -1",
         }}
         className="planning--stripe2"
       />
@@ -632,7 +633,7 @@ function Work({ work, hours_per_week, absences, isEven }) {
         <Cell
           row={row}
           column={2}
-          className={`planning--small is-pw`}
+          className={"planning--small is-pw"}
           title={gettext("is provisional")}
         >
           {pgettext("provisional", "prov.")}
@@ -641,7 +642,7 @@ function Work({ work, hours_per_week, absences, isEven }) {
       <Cell
         row={row}
         column={3}
-        className={`planning--small text-center is-pr`}
+        className={"planning--small text-center is-pr"}
         style={{ whiteSpace: "nowrap" }}
       >
         {work.range}
@@ -650,7 +651,7 @@ function Work({ work, hours_per_week, absences, isEven }) {
         <Cell
           row={row}
           column={4}
-          className={`planning--small text-right is-pr`}
+          className={"planning--small text-right is-pr"}
         >
           {`${fixed(work.planned_hours, 0)}h`}
         </Cell>
@@ -658,7 +659,7 @@ function Work({ work, hours_per_week, absences, isEven }) {
       <Cell
         row={row}
         column={5}
-        className={`planning--small text-center no-pr`}
+        className={"planning--small text-center no-pr"}
       >
         {work.user}
       </Cell>
@@ -724,7 +725,7 @@ const ExternalExpenses = ({ external_work }) => {
       <div
         style={{
           gridRow: row,
-          gridColumn: `1 / -1`,
+          gridColumn: "1 / -1",
         }}
         className="planning--external"
       />
@@ -766,7 +767,7 @@ const ExternalWork = ({ idx, work }) => {
       <Cell
         row={row}
         column={3}
-        className={`planning--small text-center is-pr`}
+        className={"planning--small text-center is-pr"}
         style={{ whiteSpace: "nowrap" }}
       >
         {work.range}
@@ -799,7 +800,7 @@ function Absences({ absences }) {
       <div
         style={{
           gridRow: row,
-          gridColumn: `1 / -1`,
+          gridColumn: "1 / -1",
         }}
         className="planning--stripe1"
       />

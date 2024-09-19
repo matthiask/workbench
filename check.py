@@ -7,7 +7,7 @@ from workbench.invoices.models import Invoice
 
 
 def check():
-    with open("/home/matthias/Downloads/transformed.csv") as f:
+    with open("/home/matthias/Downloads/transformed.csv", encoding="utf-8") as f:
         # data = list(csv.reader(f))[407:613]
         data = list(csv.reader(f))
 

@@ -1,6 +1,6 @@
 import datetime as dt
 from collections import defaultdict
-from itertools import takewhile
+from itertools import pairwise, takewhile
 
 from django.db.models import Q, Sum
 from django.db.models.functions import ExtractMonth, ExtractYear
@@ -74,7 +74,7 @@ def accruals_by_month(date_range):
     }
 
     dates = sorted(accruals)
-    for this, next in zip(dates, dates[1:]):
+    for this, next in pairwise(dates):
         accruals[next]["delta"] = accruals[next]["accrual"] - accruals[this]["accrual"]
 
     return {

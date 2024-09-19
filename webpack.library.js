@@ -35,7 +35,7 @@ NOTE: PLEASE DO NOT EVER UPDATE THIS FILE WITHOUT CONTRIBUTING THE CHANGES BACK
 TO FH-FABLIB AT https://github.com/feinheit/fh-fablib
 */
 
-const path = require("path")
+const path = require("node:path")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")

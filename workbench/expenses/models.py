@@ -102,7 +102,7 @@ class ExchangeRatesQuerySet(models.QuerySet):
         try:
             return self.get(day=day)
         except self.model.DoesNotExist:
-            instance, created = self.update_or_create(
+            instance, _created = self.update_or_create(
                 day=day, defaults={"rates": exchange_rates(day)}
             )
             return instance

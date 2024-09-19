@@ -61,7 +61,7 @@ def mark_current(navigation, current):
 
 def do_mark_current(parser, token):
     try:
-        tag_name, url_variable = token.split_contents()
+        _tag_name, url_variable = token.split_contents()
     except ValueError:
         raise template.TemplateSyntaxError(
             "%r tag requires one argument" % token.contents.split()[0]

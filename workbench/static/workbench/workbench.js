@@ -60,18 +60,18 @@ $(() => {
   }
 
   $(document.body).on("click", "[data-toggle]", function (event) {
-    if (this.dataset.toggle == "ajaxmodal") {
+    if (this.dataset.toggle === "ajaxmodal") {
       event.preventDefault()
       window.openModalFromUrl(this.href)
     }
   })
 
   $(document.body).on("submit", ".modal-dialog form", function (_event) {
-    if (this.method.toLowerCase() == "post") {
-      const action = this.action,
-        data = $(this).serialize()
+    if (this.method.toLowerCase() === "post") {
+      const action = this.action
+      const data = $(this).serialize()
       this.parentNode.removeChild(this)
-      $.post(action, data, (data, status, jqXHR) => {
+      $.post(action, data, (data, _status, jqXHR) => {
         // 201 CREATED, 202 ACCEPTED or 204 NO CONTENT
         if (
           jqXHR.status === 201 ||
@@ -113,7 +113,7 @@ $(() => {
   // Autosubmit forms
   function autosubmit(e) {
     const form = e.target.form
-    if (form.method != "get") {
+    if (form.method !== "get") {
       doSubmit(form)
       return
     }
@@ -279,13 +279,13 @@ $(() => {
     } else if (e.keyCode >= 48 && e.keyCode <= 57) {
       const el = _sel(`[data-number-shortcut="${(e.keyCode - 38) % 10}"]`)
       if (!el) return
-      if (el.dataset.toggle == "ajaxmodal") {
+      if (el.dataset.toggle === "ajaxmodal") {
         window.openModalFromUrl(el.href)
       } else {
         window.location.href = el.href
       }
     } else {
-      window.console && window.console.log(e, e.keyCode)
+      window.console?.log(e, e.keyCode)
       return
     }
 
@@ -308,9 +308,9 @@ $(() => {
 
   $(document.body).on("click", "[data-multiply-cost]", function (e) {
     e.preventDefault()
-    const factor = Number.parseFloat(this.dataset.multiplyCost),
-      tpc = Number.parseFloat($("#id_modal-third_party_costs").val()),
-      cost = $("#id_modal-cost")
+    const factor = Number.parseFloat(this.dataset.multiplyCost)
+    const tpc = Number.parseFloat($("#id_modal-third_party_costs").val())
+    const cost = $("#id_modal-cost")
 
     if (tpc && factor) {
       cost.val((factor * tpc).toFixed(2)).focus()
@@ -392,9 +392,9 @@ function initWidgets() {
   }
 
   $("[data-autofill]:not(.initialized)").each(function () {
-    const self = $(this),
-      data = self.data("autofill"),
-      sel = self.find("select")
+    const self = $(this)
+    const data = self.data("autofill")
+    const sel = self.find("select")
 
     self.addClass("initialized")
     sel.on("change", function () {
@@ -407,10 +407,10 @@ function initWidgets() {
   })
 
   $("[data-autocomplete-id]:not(.initialized)").each(function () {
-    const self = $(this),
-      url = self.data("autocomplete-url"),
-      id = self.data("autocomplete-id"),
-      input = $(`#${id}`)
+    const self = $(this)
+    const url = self.data("autocomplete-url")
+    const id = self.data("autocomplete-id")
+    const input = $(`#${id}`)
 
     self
       .addClass("initialized")
@@ -421,11 +421,11 @@ function initWidgets() {
             response(data.results)
           })
         },
-        focus(event, ui) {
+        focus(_event, ui) {
           self.val(ui.item.label)
           return false
         },
-        select(event, ui) {
+        select(_event, ui) {
           self.val(ui.item.label)
           input.val(ui.item.value).trigger("change")
           return false
@@ -500,13 +500,13 @@ function initWidgets() {
 }
 
 window.addInlineForm = function addInlineForm(slug, onComplete) {
-  const totalForms = $(`#id_${slug}-TOTAL_FORMS`),
-    newId = Number.parseInt(totalForms.val(), 10) || 0
+  const totalForms = $(`#id_${slug}-TOTAL_FORMS`)
+  const newId = Number.parseInt(totalForms.val(), 10) || 0
 
   totalForms.val(newId + 1)
-  const empty = $(`#${slug}-empty`),
-    attributes = ["id", "name", "for"],
-    form = $(empty.html())
+  const empty = $(`#${slug}-empty`)
+  const attributes = ["id", "name", "for"]
+  const form = $(empty.html())
 
   form.removeClass("empty").attr("id", `${slug}-${newId}`)
 

@@ -573,7 +573,7 @@ class PDFDocument(_PDFDocument):
 
         bill.debtor = CombinedAddress(**get_debtor_address(invoice.postal_address))
 
-        with tempfile.NamedTemporaryFile(mode="w") as f:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8") as f:
             bill.as_svg(f)
             f.seek(0)
             drawing = svg2rlg(f.name)
@@ -707,7 +707,7 @@ def get_debtor_address(postal_address):
         country = "LI"
 
     if len(address_lines) < 3:
-        name, line1, line2, *rest = [*address_lines, "", "", ""]
+        name, line1, line2, *_rest = [*address_lines, "", "", ""]
     elif len(address_lines) <= 4:
         name = " ".join(address_lines[0:-2])
         line1 = address_lines[-2]

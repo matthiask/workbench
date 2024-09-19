@@ -1,7 +1,6 @@
 import "./index.scss"
 
 import ReactDOM from "react-dom"
-import React from "react"
 
 import { Absences } from "./absences"
 

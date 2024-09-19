@@ -14,7 +14,7 @@ class AccrualsQuerySet(models.QuerySet):
         return statistics["overall"]["delta_negative"]
 
     def for_cutoff_date(self, cutoff_date):
-        instance, created = self.update_or_create(
+        instance, _created = self.update_or_create(
             cutoff_date=cutoff_date,
             defaults={"accruals": self.accruals(cutoff_date)},
         )

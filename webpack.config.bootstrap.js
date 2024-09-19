@@ -1,9 +1,9 @@
-const crypto = require("crypto")
+const crypto = require("node:crypto")
 const crypto_orig_createHash = crypto.createHash
 crypto.createHash = (algorithm) =>
-  crypto_orig_createHash(algorithm == "md4" ? "sha1" : algorithm)
+  crypto_orig_createHash(algorithm === "md4" ? "sha1" : algorithm)
 
-const path = require("path")
+const path = require("node:path")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
 module.exports = {

@@ -6,7 +6,9 @@ from django.conf import settings
 from django.db import migrations
 
 
-with open(os.path.join(settings.BASE_DIR, "workbench", "tools", "audit.sql")) as f:
+with open(
+    os.path.join(settings.BASE_DIR, "workbench", "tools", "audit.sql"), encoding="utf-8"
+) as f:
     AUDIT_SQL = f.read()
 
 

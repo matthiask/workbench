@@ -30,8 +30,6 @@ lint.extend-select = [
   "ISC",
   # flake8-logging
   "LOG",
-  # pep8-naming
-  "N",
   # pygrep-hooks
   "PGH",
   # flake8-pie
@@ -54,8 +52,6 @@ lint.extend-select = [
   "RUF017",
   "RUF100",
   "RUF200",
-  # flake8-simplify
-  "SIM",
   # flake8-slots
   "SLOT",
   # flake8-tidy-imports
@@ -107,3 +103,7 @@ omit = [
 [tool.coverage.report]
 skip_covered = true
 show_missing = true
+
+[tool.pyright]
+venvPath = ".venv"
+venv = "."

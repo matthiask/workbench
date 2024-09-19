@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react"
 
 const { gettext, interpolate } = window
 
-import { formatDate, readableDate, getWeekNumber } from "./utils"
+import { formatDate, getWeekNumber, readableDate } from "./utils"
 
 const getColumnName = (t) => `date-${formatDate(new Date(t))}`
 const getRowName = (id) => `person-${id}`

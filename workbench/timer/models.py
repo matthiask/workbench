@@ -1,4 +1,5 @@
 import datetime as dt
+import itertools
 import re
 from decimal import ROUND_UP, Decimal
 from urllib.parse import urlencode
@@ -245,7 +246,7 @@ class TimestampQuerySet(models.QuerySet):
             previous = slice
 
         # 3. Fill in boundaries
-        for previous, slice in zip(result, result[1:]):
+        for previous, slice in itertools.pairwise(result):
             boundary = previous.get("ends_at") or slice.get("starts_at")
             slice["starts_at"] = previous["ends_at"] = boundary
 

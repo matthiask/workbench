@@ -1,28 +1,52 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.8.2/schema.json",
-  "organizeImports": {
-    "enabled": false
-  },
+  "$schema": "https://biomejs.dev/schemas/1.9.0/schema.json",
   "formatter": {
     "enabled": true,
-    "indentStyle": "space",
-    "indentWidth": 2
+    "useEditorconfig": true
   },
   "linter": {
     "enabled": true,
-    "rules": {}
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "noSvgWithoutTitle": "off"
+      },
+      "complexity": {
+        "noUselessStringConcat": "error",
+        "noUselessUndefinedInitialization": "error"
+      },
+      "correctness": {
+        "noUndeclaredVariables": "error",
+        "noUnusedFunctionParameters": "error",
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error",
+        "useArrayLiterals": "error",
+        "useHookAtTopLevel": "error"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
+      },
+      "style": {
+        "noParameterAssign": "off",
+        "useConsistentBuiltinInstantiation": "error",
+        "useForOf": "warn"
+      },
+      "suspicious": {
+        "noArrayIndexKey": "warn",
+        "noAssignInExpressions": "off",
+        "useErrorMessage": "error"
+      }
+    }
   },
   "javascript": {
     "formatter": {
       "semicolons": "asNeeded"
-    }
-  },
-  "css": {
-    "formatter": {
-      "enabled": true
     },
-    "linter": {
-      "enabled": true
+    "globals": ["$"]
+  },
+  "json": {
+    "formatter": {
+      "enabled": false
     }
   }
 }
