@@ -2,13 +2,16 @@ import { combineReducers } from "redux"
 
 import { timestamp } from "./utils.js"
 
-function activities(state = {}, action) {
+function activities(state, action) {
+  if (typeof state === "undefined") {
+    state = {}
+  }
   switch (action.type) {
     case "ADD_ACTIVITY":
       return { ...state, [action.activity.id]: action.activity }
     case "REMOVE_ACTIVITY":
       return Object.fromEntries(
-        Object.entries(state).filter(([id]) => id != action.id),
+        Object.entries(state).filter(([id]) => id !== action.id),
       )
     case "UPDATE_ACTIVITY":
       return {
@@ -35,7 +38,10 @@ function activities(state = {}, action) {
   }
 }
 
-function current(state = null, action) {
+function current(state, action) {
+  if (typeof state === "undefined") {
+    state = null
+  }
   switch (action.type) {
     case "START":
       return {
@@ -45,13 +51,16 @@ function current(state = null, action) {
     case "STOP":
       return null
     case "REMOVE_ACTIVITY":
-      return state && state.id == action.id ? null : state
+      return state && state.id === action.id ? null : state
     default:
       return state
   }
 }
 
-function modalActivity(state = null, action) {
+function modalActivity(state, action) {
+  if (typeof state === "undefined") {
+    state = null
+  }
   switch (action.type) {
     case "MODAL_ACTIVITY":
       return action.id
@@ -62,7 +71,10 @@ function modalActivity(state = null, action) {
   }
 }
 
-function projects(state = [], action) {
+function projects(state, action) {
+  if (typeof state === "undefined") {
+    state = []
+  }
   switch (action.type) {
     case "PROJECTS":
       return action.projects

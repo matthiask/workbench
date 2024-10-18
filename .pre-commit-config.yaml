@@ -1,4 +1,4 @@
-exclude: ".yarn/|yarn.lock|workbench/static/workbench/lib"
+exclude: ".yarn/|yarn.lock|conf/strings.js|workbench/static/workbench/lib"
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0

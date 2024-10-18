@@ -1,5 +1,3 @@
-import React from "react"
-
 import { COLORS } from "./colors.js"
 import { gettext } from "./i18n.js"
 
@@ -24,7 +22,7 @@ export const ActivitySettings = ({
       {COLORS.map((c) => (
         <label
           key={c}
-          className={c == color ? "checked" : ""}
+          className={c === color ? "checked" : ""}
           style={{ backgroundColor: c }}
         >
           <input

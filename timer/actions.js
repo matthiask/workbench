@@ -60,7 +60,7 @@ export async function loadProjects(dispatch) {
 }
 
 export async function openForm(dispatch, { activity, current }) {
-  if (current && current.id == activity.id) dispatch({ type: "STOP", current })
+  if (current && current.id === activity.id) dispatch({ type: "STOP", current })
   dispatch({ type: "MODAL_ACTIVITY", id: activity.id })
 
   const url = endpoint(CREATE_HOURS, activity.project.value)
@@ -102,10 +102,10 @@ export async function sendLogbook(dispatch, { activity, current }) {
     body,
     headers,
   })
-  if (response.status == 200) {
+  if (response.status === 200) {
     window.initModal(await response.text())
-  } else if (response.status == 201) {
-    if (current && current.id == activity.id)
+  } else if (response.status === 201) {
+    if (current && current.id === activity.id)
       dispatch({ type: "STOP", current })
     dispatch({
       type: "UPDATE_ACTIVITY",
@@ -123,13 +123,13 @@ export function overwriteSeconds(dispatch, { activity, current }) {
     prompt(gettext("Overwrite seconds"), Math.ceil(activity.seconds)),
     10,
   )
-  if (!isNaN(seconds)) {
+  if (!Number.isNaN(seconds)) {
     dispatch({
       type: "UPDATE_ACTIVITY",
       id: activity.id,
       fields: { seconds },
     })
-    if (current && current.id == activity.id) {
+    if (current && current.id === activity.id) {
       dispatch({ type: "START", id: activity.id })
     }
   }

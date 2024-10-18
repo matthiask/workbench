@@ -1,10 +1,8 @@
-import React from "react"
-
-import { createStore, applyMiddleware, compose } from "redux"
-import reducer from "./reducers"
-import thunk from "redux-thunk"
-import logger from "redux-logger"
+import { applyMiddleware, compose, createStore } from "redux"
 import persistState from "redux-localstorage"
+import logger from "redux-logger"
+import thunk from "redux-thunk"
+import reducer from "./reducers"
 
 const VERSION = 3
 
@@ -25,11 +23,13 @@ const deserialize = (blob) => {
     const parsed = JSON.parse(blob)
     if (!parsed || !parsed._v) return {}
     const { _v, ...data } = parsed
-    if (_v == VERSION) {
+    if (_v === VERSION) {
       return data
-    } else if (_v == 2) {
+    }
+    if (_v === 2) {
       return data
-    } else if (_v == 1) {
+    }
+    if (_v === 1) {
       return {
         ...data,
         activities: Object.fromEntries(
@@ -45,7 +45,7 @@ const deserialize = (blob) => {
     ...data,
     activities: Object.fromEntries(
       Object.entries(data.activities).filter(
-        ([id]) => id && id != "null" && id != "undefined",
+        ([id]) => id && id !== "null" && id !== "undefined",
       ),
     ),
   }
@@ -57,7 +57,7 @@ export function configureStore() {
     initialState = JSON.parse(
       document.getElementById("timer-state").textContent,
     )
-  } catch (e) {
+  } catch (_e) {
     /* intentionally empty */
   }
   const store = createStore(

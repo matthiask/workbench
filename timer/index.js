@@ -1,7 +1,6 @@
 import "./index.scss"
 
 import ReactDOM from "react-dom"
-import React from "react"
 import { Provider } from "react-redux"
 
 import { createActivity, loadProjects } from "./actions.js"
@@ -52,7 +51,7 @@ function migrateOldData(dispatch) {
     })
 
     localStorage.removeItem("workbench-timer")
-  } catch (e) {
+  } catch (_e) {
     /* Do nothing */
   }
 }

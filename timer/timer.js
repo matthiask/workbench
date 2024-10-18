@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { connect } from "react-redux"
 
 import { Activity } from "./activity.js"
@@ -21,7 +21,7 @@ export const Timer = connect(({ activities, current }) => ({
   }, [current])
 
   activities = Object.values(activities).map((activity) => {
-    if (!current || current.id != activity.id) return activity
+    if (!current || current.id !== activity.id) return activity
 
     const seconds = Math.ceil(
       activity.seconds + timestamp() - current.startedAt,

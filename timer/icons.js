@@ -1,7 +1,5 @@
 /* Thanks https://github.com/FortAwesome/Font-Awesome/tree/master/svgs/solid */
 
-import React from "react"
-
 export const cog = (
   <svg
     style={{ fill: "currentColor", width: "1.8em" }}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import Draggable from "react-draggable"
 import { connect } from "react-redux"
 import Select from "react-select"
@@ -12,9 +12,9 @@ import {
   sendLogbook,
 } from "./actions.js"
 import { ActivitySettings } from "./activitySettings.js"
-import { gettext, OUTCOME } from "./i18n.js"
-import { clamp, prettyDuration } from "./utils.js"
+import { OUTCOME, gettext } from "./i18n.js"
 import * as icons from "./icons.js"
+import { clamp, prettyDuration } from "./utils.js"
 
 const createUpdater =
   ({ id, dispatch }) =>
@@ -45,8 +45,7 @@ export const Activity = connect((state, ownProps) => ({
   const activityTitle = activity.title || gettext("Activity")
 
   const isReady =
-    activity.description &&
-    activity.description.length &&
+    activity.description?.length &&
     activity.project &&
     activity.service &&
     activity.seconds > 0
@@ -64,7 +63,7 @@ export const Activity = connect((state, ownProps) => ({
           Math.floor(clamp(activity.top, 0, window.innerHeight - 300) / 10),
       }}
       grid={[10, 10]}
-      onStop={(e, data) =>
+      onStop={(_e, data) =>
         dispatchUpdate({
           left: data.x,
           top: data.y,
