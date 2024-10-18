@@ -2,7 +2,8 @@
 {% load fineforms i18n static workbench %}
 {% block title %}
   {% translate 'Labor costs' %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-sm-12 col-lg-10">
@@ -118,4 +119,4 @@
       </table>
     </div>
   </div>
-{% endblock %}
+{% endblock content %}

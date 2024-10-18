@@ -2,7 +2,8 @@
 {% load fineforms i18n static workbench %}
 {% block title %}
   {% translate 'Planning vs Logbook' %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-sm-12 col-md-8">
@@ -70,4 +71,4 @@
       </table>
     </div>
   </div>
-{% endblock %}
+{% endblock content %}

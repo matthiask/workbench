@@ -2,7 +2,8 @@
 {% load i18n workbench %}
 {% block title %}
   {% translate 'dashboard'|capfirst %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-lg-6">
@@ -146,4 +147,4 @@
       </div>
     </div>
   </div>
-{% endblock %}
+{% endblock content %}

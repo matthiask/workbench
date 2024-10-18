@@ -1,6 +1,7 @@
 {% extends "modal.html" %}
 {% load i18n workbench %}
 {% block size %}modal-xl{% endblock %}
+
 {% block title %}
   {% translate 'History' %}:
   {% if instance %}
@@ -13,7 +14,8 @@
       <a href="{{ url }}" data-toggle="ajaxmodal">{{ verbose_name_plural }}</a>
     {% endfor %}
   </small>
-{% endblock %}
+{% endblock title %}
+
 {% block body %}
   {% include '_history.html' with changes=changes %}
-{% endblock %}
+{% endblock body %}

@@ -23,7 +23,8 @@
     {% include 'svg/desktop-download.svg' %}
     XLSX
   </a>
-{% endblock %}
+{% endblock search-form-buttons %}
+
 {% block objects %}
   <div class="list-group list-group-flush">
     {% for invoice in object_list %}
@@ -46,4 +47,4 @@
       </a>
     {% endfor %}
   </div>
-{% endblock %}
+{% endblock objects %}

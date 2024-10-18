@@ -1,9 +1,11 @@
 {% extends "modal.html" %}
 {% load i18n workbench %}
 {% block size %}modal-xl{% endblock %}
+
 {% block title %}
   {% translate 'Gross profit' %} {{ date_range.0|date:'F Y' }}
-{% endblock %}
+{% endblock title %}
+
 {% block body %}
   <table class="table table-sm bg-light">
     <tr>
@@ -28,4 +30,4 @@
       </tr>
     {% endfor %}
   </table>
-{% endblock %}
+{% endblock body %}

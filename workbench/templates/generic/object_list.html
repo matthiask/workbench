@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load fineforms i18n workbench %}
 {% block title %}{{ view.meta.verbose_name_plural|capfirst }} - {{ block.super }}{% endblock %}
+
 {% block content %}
   <div class="row">
     <div class="col-sm-12">
@@ -12,7 +13,7 @@
               {{ view.meta.verbose_name_plural|capfirst }}
             </a>
           </h1>
-        {% endblock %}
+        {% endblock content-title %}
         <form method="GET"
               action="."
               class="form-inline form-search mb-3 mb-lg-0"
@@ -36,7 +37,7 @@
                 {{ view.meta.verbose_name|capfirst }}
               </a>
             {% endif %}
-          {% endblock %}
+          {% endblock search-form-buttons %}
         </form>
       </div>
       {% block objects %}
@@ -49,7 +50,7 @@
             </div>
           </a>
         {% endfor %}
-      {% endblock %}
+      {% endblock objects %}
       {% if page_obj %}
         <nav class="mt-3">
           <ul class="pagination align-items-center">
@@ -88,4 +89,4 @@
       {# page_obj #}
     </div>
   </div>
-{% endblock %}
+{% endblock content %}

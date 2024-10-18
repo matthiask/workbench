@@ -3,7 +3,8 @@
 {% block title %}
   {{ view.meta.verbose_name }}
   {% history_link object %}
-{% endblock %}
+{% endblock title %}
+
 {% block body %}
   <table class="table table-striped">
     <tr>
@@ -69,7 +70,8 @@
       </td>
     </tr>
   </table>
-{% endblock %}
+{% endblock body %}
+
 {% block footer %}
   <a href="{{ object.urls.update }}"
      class="btn btn-primary mr-auto"
@@ -85,4 +87,4 @@
   <a href="{{ object.urls.delete }}"
      class="btn btn-outline-danger"
      data-toggle="ajaxmodal">{% translate 'Delete' %}</a>
-{% endblock %}
+{% endblock footer %}

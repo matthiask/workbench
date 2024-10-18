@@ -6,7 +6,8 @@
   {% else %}
     {{ block.super }}
   {% endif %}
-{% endblock %}
+{% endblock title %}
+
 {% block body %}
   {% include 'fineforms/warnings.html' %}
   {% ff_errors form %}
@@ -31,7 +32,8 @@
   {% ff_field form.service %}
   {% ff_field form.hours %}
   {% ff_field form.description %}
-{% endblock %}
+{% endblock body %}
+
 {% block footer %}
   {% if form.service_title and form.hide_new_service %}
     <button type="button"
@@ -41,4 +43,4 @@
     </button>
   {% endif %}
   <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
-{% endblock %}
+{% endblock footer %}

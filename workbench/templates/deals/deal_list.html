@@ -6,7 +6,8 @@
     {% include 'svg/desktop-download.svg' %}
     XLSX
   </a>
-{% endblock %}
+{% endblock search-form-buttons %}
+
 {% block objects %}
   <div class="row">
     {% for group in object_list|load_overview_attributes|group_deals_by_probability:view.search_form.should_group_deals %}
@@ -34,4 +35,4 @@
       </div>
     {% endfor %}
   </div>
-{% endblock %}
+{% endblock objects %}

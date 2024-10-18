@@ -2,7 +2,8 @@
 {% load fineforms i18n workbench %}
 {% block title %}
   {% translate 'Deal history' %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-md-10 col-lg-8">
@@ -13,4 +14,4 @@
       {% include '_history.html' with changes=stats %}
     </div>
   </div>
-{% endblock %}
+{% endblock content %}

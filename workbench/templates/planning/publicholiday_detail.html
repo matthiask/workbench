@@ -2,7 +2,8 @@
 {% load i18n workbench %}
 {% block title %}
   {{ object }} {% history_link object %}
-{% endblock %}
+{% endblock title %}
+
 {% block body %}
   <table class="table table-striped">
     {% for name, value in object|field_value_pairs %}
@@ -12,5 +13,6 @@
       </tr>
     {% endfor %}
   </table>
-{% endblock %}
+{% endblock body %}
+
 {% block footer %}{% endblock %}

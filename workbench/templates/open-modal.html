@@ -4,11 +4,12 @@
   <center class="py-5">
     <h1>{% translate 'This page does not exist (anymore).' %}</h1>
   </center>
-{% endblock %}
+{% endblock content %}
+
 {% block js %}
   <script>
     $(function() {
       window.openModalFromUrl("{{ url }}")
     })
   </script>
-{% endblock %}
+{% endblock js %}

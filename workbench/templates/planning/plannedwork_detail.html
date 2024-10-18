@@ -1,9 +1,11 @@
 {% extends "modal.html" %}
 {% load i18n workbench %}
 {% block size %}modal-lg{% endblock %}
+
 {% block title %}
   {{ object|h }} {% history_link object %}
-{% endblock %}
+{% endblock title %}
+
 {% block body %}
   <table class="table table-striped">
     {% for name, value in object|field_value_pairs:'project,offer,created_at,user,title,milestone,service_type' %}
@@ -34,7 +36,8 @@
       </td>
     </tr>
   </table>
-{% endblock %}
+{% endblock body %}
+
 {% block footer %}
   <a href="{{ object.urls.update }}"
      data-toggle="ajaxmodal"
@@ -47,4 +50,4 @@
   <a href="{{ object.urls.delete }}"
      data-toggle="ajaxmodal"
      class="btn btn-outline-danger">{% translate 'Delete' %}</a>
-{% endblock %}
+{% endblock footer %}

@@ -1,15 +1,17 @@
 {% extends "generic/object_detail.html" %}
-{% load i18n workbench webpack_loader %}
+{% load i18n webpack_loader workbench %}
 {% block title %}
   {% translate 'planning'|capfirst %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block uplink %}
   <a href="{{ object.get_absolute_url }}"
      class="btn btn-primary btn-sm uplink">
     {% include 'svg/chevron-left.svg' %}
     {% translate 'project' %}
   </a>
-{% endblock %}
+{% endblock uplink %}
+
 {% block content %}
   <div class="row">
     <div class="col-12">
@@ -69,4 +71,4 @@
       </a>
     </div>
   </div>
-{% endblock %}
+{% endblock content %}

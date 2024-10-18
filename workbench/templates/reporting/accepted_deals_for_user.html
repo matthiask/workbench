@@ -1,9 +1,11 @@
 {% extends "modal.html" %}
 {% load i18n workbench %}
 {% block size %}modal-xl{% endblock %}
+
 {% block title %}
   {% translate 'Accepted deals' %}
-{% endblock %}
+{% endblock title %}
+
 {% block body %}
   {% for row in stats.by_user %}
     {% if row.user_id == request.GET.user %}
@@ -30,4 +32,4 @@
       </table>
     {% endif %}
   {% endfor %}
-{% endblock %}
+{% endblock body %}

@@ -2,7 +2,8 @@
 {% load fineforms i18n static workbench %}
 {% block title %}
   {% translate 'Birthdays' %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-sm-12 col-md-8 col-lg-6">
@@ -43,4 +44,4 @@
       </table>
     </div>
   </div>
-{% endblock %}
+{% endblock content %}

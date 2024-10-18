@@ -2,7 +2,8 @@
 {% load fineforms i18n static workbench %}
 {% block title %}
   {% translate 'Project budget statistics' %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-sm-12">
@@ -99,4 +100,4 @@
       </a>
     </div>
   </div>
-{% endblock %}
+{% endblock content %}

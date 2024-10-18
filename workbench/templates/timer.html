@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load bootstrap4 static webpack_loader %}
 {% block title %}Timer - {{ block.super }}{% endblock %}
+
 {% block js %}
   {{ block.super }}
   {{ state|json_script:'timer-state' }}
@@ -11,5 +12,6 @@
   {% if not TESTING %}
     {% render_bundle "timer" %}
   {% endif %}
-{% endblock %}
+{% endblock js %}
+
 {% block fixed-add-button %}{% endblock %}

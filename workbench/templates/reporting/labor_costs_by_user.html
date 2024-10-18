@@ -1,9 +1,11 @@
 {% extends "modal.html" %}
 {% load i18n workbench %}
 {% block size %}modal-xl{% endblock %}
+
 {% block title %}
   {% translate 'Labor costs' %} {{ date_range.0|date:'F Y' }}
-{% endblock %}
+{% endblock title %}
+
 {% block body %}
   <table class="table table-sm bg-light">
     <tr>
@@ -35,4 +37,4 @@
       <td class="text-right">{{ stats.third_party_costs|currency }}</td>
     </tr>
   </table>
-{% endblock %}
+{% endblock body %}

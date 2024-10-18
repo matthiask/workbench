@@ -617,7 +617,7 @@
   </div>
 </div>
 {% endwith %}
-{% endblock %}
+{% endblock content %}
 
 {% block fixed-add-button %}
   <a href="{{ project.urls.createhours }}"
@@ -631,7 +631,7 @@
      class="btn btn-primary fixed-btn break"
      title="{% translate 'took a break' %}">
   </a>
-{% endblock %}
+{% endblock fixed-add-button %}
 
 {% block js %}
   {{ block.super }}
@@ -660,4 +660,4 @@ jQuery(function($) {
   });
 });
   </script>
-{% endblock %}
+{% endblock js %}

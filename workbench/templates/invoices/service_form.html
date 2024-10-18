@@ -1,13 +1,15 @@
 {% extends "modalform.html" %}
 {% load bootstrap4 fineforms i18n workbench %}
 {% block size %}modal-xl{% endblock %}
+
 {% block title %}
   {% if view.project %}
     {{ view.project.title }}
   {% else %}
     {{ block.super }}
   {% endif %}
-{% endblock %}
+{% endblock title %}
+
 {% block body %}
   {% include 'fineforms/warnings.html' %}
   {% ff_errors form %}
@@ -30,4 +32,4 @@
       </div>
     </div>
   </div>
-{% endblock %}
+{% endblock body %}

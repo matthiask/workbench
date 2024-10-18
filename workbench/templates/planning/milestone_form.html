@@ -6,9 +6,10 @@
   {% else %}
     {{ block.super }}
   {% endif %}
-{% endblock %}
+{% endblock title %}
+
 {% block body %}
   {% include 'fineforms/warnings.html' %}
   {% ff_errors form %}
   {% ff_fields form %}
-{% endblock %}
+{% endblock body %}

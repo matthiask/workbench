@@ -6,7 +6,8 @@
     <a href="{{ view.model.urls.assign }}" class="btn btn-primary">{% translate 'Assign credit entries' %}</a>
   {% endif %}
   {{ block.super }}
-{% endblock %}
+{% endblock search-form-buttons %}
+
 {% block objects %}
   <table class="table table-hover table-striped">
     <thead>
@@ -36,4 +37,4 @@
       {% endfor %}
     </tbody>
   </table>
-{% endblock %}
+{% endblock objects %}

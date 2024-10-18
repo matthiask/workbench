@@ -6,7 +6,8 @@
   {% else %}
     {{ block.super }}
   {% endif %}
-{% endblock %}
+{% endblock title %}
+
 {% block body %}
   {% include 'fineforms/warnings.html' %}
   {% ff_errors form %}
@@ -34,7 +35,8 @@
   {% ff_field form.third_party_costs %}
   {% ff_field form.cost %}
   {% ff_field form.description %}
-{% endblock %}
+{% endblock body %}
+
 {% block footer %}
   {% if form.expense_currency and not form.instance.expense_cost %}
     <button type="button"
@@ -44,4 +46,4 @@
     </button>
   {% endif %}
   <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
-{% endblock %}
+{% endblock footer %}

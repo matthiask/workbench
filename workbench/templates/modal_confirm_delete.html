@@ -4,10 +4,12 @@
   {% blocktranslate trimmed %}
     Delete {{ object }}
   {% endblocktranslate %}
-{% endblock %}
+{% endblock title %}
+
 {% block body %}
   {% if form %}{{ block.super }}{% endif %}
-{% endblock %}
+{% endblock body %}
+
 {% block footer %}
   <button type="button"
           data-dismiss="modal"
@@ -16,4 +18,4 @@
     {% translate 'cancel' %}
   </button>
   <button type="submit" class="btn btn-danger">{% translate 'delete' %}</button>
-{% endblock %}
+{% endblock footer %}

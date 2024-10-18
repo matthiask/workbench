@@ -18,12 +18,12 @@
             {% include 'fineforms/warnings.html' %}
             {% ff_errors form %}
             {% ff_fields form %}
-          {% endblock %}
+          {% endblock body %}
         </div>
         <div class="modal-footer">
           {% block footer %}
             <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
-          {% endblock %}
+          {% endblock footer %}
         </div>
       </div>
       <!-- /.modal-content -->

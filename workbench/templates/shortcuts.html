@@ -2,7 +2,8 @@
 {% load i18n workbench %}
 {% block title %}
   {% translate 'Keyboard shortcuts' %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
@@ -117,4 +118,4 @@
       }
   })
   </script>
-{% endblock %}
+{% endblock content %}

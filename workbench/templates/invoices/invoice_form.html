@@ -10,7 +10,8 @@
   {% else %}
     {{ block.super }}
   {% endif %}
-{% endblock %}
+{% endblock uplink %}
+
 {% block js %}
   {{ block.super }}
   <script>
@@ -23,4 +24,4 @@ jQuery(function($) {
   });
 });
   </script>
-{% endblock %}
+{% endblock js %}

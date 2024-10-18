@@ -1,9 +1,11 @@
 {% extends 'modal.html' %}
 {% load bootstrap4 i18n workbench %}
 {% block size %}modal-xl{% endblock %}
+
 {% block title %}
   {% translate 'Statistics' %}
-{% endblock %}
+{% endblock title %}
+
 {% block body %}
   <h2>{% translate 'Logged hours per hourly rate' %}</h2>
   <table>
@@ -20,4 +22,4 @@
       </tr>
     {% endfor %}
   </table>
-{% endblock %}
+{% endblock body %}

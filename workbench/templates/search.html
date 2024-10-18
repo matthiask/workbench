@@ -2,7 +2,8 @@
 {% load i18n workbench %}
 {% block title %}
   {% translate 'Search' %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block content %}
   <div class="row">
     <div class="col-md-12">
@@ -33,7 +34,8 @@
       {% endfor %}
     </div>
   </div>
-{% endblock %}
+{% endblock content %}
+
 {% block js %}
   {{ block.super }}
   <script>
@@ -41,4 +43,4 @@
     $('form[role=search] input').focus();
   });
   </script>
-{% endblock %}
+{% endblock js %}

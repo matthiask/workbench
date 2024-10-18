@@ -4,7 +4,8 @@
   {{ title }} -
   {% if object %}{{ object }} -{% endif %}
   {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-md-10 col-lg-8">
@@ -42,4 +43,4 @@
       {% endif %}
     </div>
   </div>
-{% endblock %}
+{% endblock content %}

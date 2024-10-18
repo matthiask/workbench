@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% load fineforms i18n workbench webpack_loader %}
+{% load fineforms i18n webpack_loader workbench %}
 {% block title %}
   {% translate 'Absence calendar' %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block content %}
   <div class="d-flex w-100 align-items-start justify-content-between">
     <h1 class="absences-title">{% translate 'Absence calendar' %}</h1>
@@ -30,4 +31,4 @@
   {% if not TESTING %}
     {% render_bundle "absences" %}
   {% endif %}
-{% endblock %}
+{% endblock content %}

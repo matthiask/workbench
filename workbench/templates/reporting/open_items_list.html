@@ -2,7 +2,8 @@
 {% load fineforms i18n workbench %}
 {% block title %}
   {% translate 'Open items list' %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block content %}
   <div class="row">
     <div class="col-sm-12">
@@ -60,9 +61,9 @@
       <table class="table">
         <thead>
           <tr>
-            <th>{% trans 'week'|capfirst %}</th>
-            <th class="text-right">{% trans 'total excl. tax'|capfirst %}</th>
-            <th class="text-right">{% trans 'total'|capfirst %}</th>
+            <th>{% translate 'week'|capfirst %}</th>
+            <th class="text-right">{% translate 'total excl. tax'|capfirst %}</th>
+            <th class="text-right">{% translate 'total'|capfirst %}</th>
         </thead>
         <tbody>
           {% for week, per_week in open_items_list.weeks %}
@@ -76,4 +77,4 @@
       </table>
     </div>
   </div>
-{% endblock %}
+{% endblock content %}

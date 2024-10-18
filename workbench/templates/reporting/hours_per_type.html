@@ -2,7 +2,8 @@
 {% load fineforms i18n static workbench %}
 {% block title %}
   {% translate 'Hours per type' %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block content %}
   <h1>{% translate 'Hours per type' %}</h1>
   <form method="get" class="mb-3" data-autosubmit>
@@ -75,4 +76,4 @@
   background: #eee;
 }
 </style>
-{% endblock %}
+{% endblock content %}

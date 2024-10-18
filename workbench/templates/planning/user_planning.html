@@ -1,8 +1,9 @@
 {% extends "accounts/user_base.html" %}
-{% load i18n workbench webpack_loader %}
+{% load i18n webpack_loader workbench %}
 {% block title %}
   {% translate 'planning'|capfirst %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block inner_content %}
   <div id="planning-root" class="planning-wrapper"></div>
   {{ planning_data|json_script:'planning-data' }}
@@ -37,4 +38,4 @@
       </a>
     </div>
   </div>
-{% endblock %}
+{% endblock inner_content %}

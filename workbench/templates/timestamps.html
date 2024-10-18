@@ -2,7 +2,8 @@
 {% load i18n workbench %}
 {% block title %}
   {% translate 'timestamps'|capfirst %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-lg-10 col-xl-8">
@@ -110,4 +111,4 @@
       </div>
     </div>
   </div>
-{% endblock %}
+{% endblock content %}

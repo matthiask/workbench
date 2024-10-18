@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n workbench %}
 {% block title %}{{ object }} - {{ view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
+
 {% block content %}
   <div class="row">
     <div class="col-md-6 offset-md-3">
@@ -18,4 +19,4 @@
          class="btn btn-outline-danger float-right">{% translate 'Delete' %}</a>
     </div>
   </div>
-{% endblock %}
+{% endblock content %}

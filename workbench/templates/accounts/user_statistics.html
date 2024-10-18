@@ -2,7 +2,8 @@
 {% load i18n static workbench %}
 {% block title %}
   {% translate 'Statistics' %} - {{ block.super }}
-{% endblock %}
+{% endblock title %}
+
 {% block inner_content %}
   <div class="row justify-content-center">
     <div class="col-lg-10">
@@ -103,4 +104,4 @@
       </script>
     </div>
   </div>
-{% endblock %}
+{% endblock inner_content %}

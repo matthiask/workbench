@@ -7,7 +7,8 @@
       XLSX
     </a>
   {% endif %}
-{% endblock %}
+{% endblock search-form-buttons %}
+
 {% block objects %}
   <div class="list-group list-group-flush">
     {% for day, sum, instances in object_list|group_hours_by_day %}
@@ -31,4 +32,4 @@
       {% endfor %}
     {% endfor %}
   </div>
-{% endblock %}
+{% endblock objects %}
