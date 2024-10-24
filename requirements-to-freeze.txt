@@ -19,7 +19,7 @@ more-itertools
 pdfdocument
 phonenumbers
 Pillow
-psycopg2-binary
+psycopg[binary]
 qrbill
 reportlab
 sentry-sdk

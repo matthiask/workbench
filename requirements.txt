@@ -31,9 +31,10 @@ more-itertools==10.5.0
 oauthlib==3.2.2
 openpyxl==3.1.5
 pdfdocument==4.0.0
-phonenumbers==8.13.47
+phonenumbers==8.13.48
 pillow==11.0.0
-psycopg2-binary==2.9.10
+psycopg==3.2.3
+psycopg-binary==3.2.3
 python-dateutil==2.9.0.post0
 python-stdnum==1.20
 pytz==2024.2
