@@ -87,8 +87,8 @@ small > a.active {
   text-decoration: none;
 }
 
-.table tbody th > a:not(.btn),  /* override */
-.table tbody td > a:not(.btn),  /* override */
+.table tbody th > a:not(.btn) /* override */,
+.table tbody td > a:not(.btn) /* override */,
 tbody th > a {
   display: block;
   margin: -8px;
@@ -153,7 +153,7 @@ tbody th > a {
   display: block;
   margin: -10px 0 8px;
   font-size: 85%;
-  font-color: #443;
+  color: #443 !important;
 }
 
 .navbar-brand svg {

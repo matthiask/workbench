@@ -28,7 +28,7 @@ repos:
         name: prettier
         entry: npx prettier@3.3.3 --no-semi --write
         language: system
-        types_or: [css, scss]
+        types_or: [scss]
         require_serial: true
   - repo: https://github.com/adamchainz/django-upgrade
     rev: 1.21.0
@@ -58,9 +58,9 @@ repos:
     rev: "v0.5.0"
     hooks:
       - id: biome-check
-        additional_dependencies: ["@biomejs/biome@1.9.2"]
+        additional_dependencies: ["@biomejs/biome@1.9.4"]
         args: [--unsafe]
-        types_or: [javascript, json]
+        types_or: [css, javascript, json]
   - repo: https://github.com/boidolr/pre-commit-images
     rev: v1.8.1
     hooks:

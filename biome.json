@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.2/schema.json",
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
   "formatter": {
     "enabled": true,
     "useEditorconfig": true
@@ -17,11 +17,17 @@
       },
       "correctness": {
         "noUndeclaredVariables": "error",
+        "noUnknownMediaFeatureName": "off",
         "noUnusedFunctionParameters": "error",
         "noUnusedImports": "error",
         "noUnusedVariables": "error",
         "useArrayLiterals": "error",
         "useHookAtTopLevel": "error"
+      },
+      "nursery": {
+        "noDuplicateProperties": "error",
+        "noUnknownTypeSelector": "error",
+        "useCollapsedIf": "error"
       },
       "security": {
         "noDangerouslySetInnerHtml": "warn"
