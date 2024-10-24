@@ -332,7 +332,10 @@ class InvoiceForm(PostalAddressSelectionForm):
                 code="maybe-unintentional-invoice-change",
             )
 
-        if self._is_status_unexpected(data["status"]):
+        # Freezed invoices to not have an editable status field.
+        has_status = "status" in data
+
+        if has_status and self._is_status_unexpected(data["status"]):
             self.add_warning(
                 _("Moving status from '%(from)s' to '%(to)s'. Are you sure?")
                 % {
@@ -343,7 +346,8 @@ class InvoiceForm(PostalAddressSelectionForm):
             )
 
         if (
-            self.instance._orig_status == Invoice.IN_PREPARATION
+            has_status
+            and self.instance._orig_status == Invoice.IN_PREPARATION
             and data["status"] > Invoice.IN_PREPARATION
             and data.get("invoiced_on")
             and data["invoiced_on"] < in_days(-3)
@@ -371,7 +375,8 @@ class InvoiceForm(PostalAddressSelectionForm):
             )
 
         if (
-            self.instance._orig_status < Invoice.PAID
+            has_status
+            and self.instance._orig_status < Invoice.PAID
             and data["status"] == Invoice.PAID
             and (closed_on := data.get("closed_on"))
             and closed_on < in_days(-180)
@@ -383,10 +388,10 @@ class InvoiceForm(PostalAddressSelectionForm):
                 code="paid-in-past",
             )
 
-        if data["status"] >= Invoice.PAID and not data["closed_on"]:
+        if has_status and data["status"] >= Invoice.PAID and not data["closed_on"]:
             data["closed_on"] = dt.date.today()
 
-        if self.instance.closed_on and data["status"] < Invoice.PAID:
+        if has_status and self.instance.closed_on and data["status"] < Invoice.PAID:
             if self.should_ignore_warnings():
                 data["closed_on"] = None
             else:
@@ -403,7 +408,11 @@ class InvoiceForm(PostalAddressSelectionForm):
                     code="status-change-but-already-closed",
                 )
 
-        if not self.instance.archived_at and data["status"] == Invoice.CANCELED:
+        if (
+            has_status
+            and not self.instance.archived_at
+            and data["status"] == Invoice.CANCELED
+        ):
             self.add_warning(
                 _(
                     "You are canceling this invoice. It may be cleaner to delete the invoice instead."
