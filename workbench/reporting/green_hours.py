@@ -195,6 +195,13 @@ LEFT OUTER JOIN internal_hours ih ON th.month=ih.month
 ORDER BY th.month
         """)
 
+        # psycopg 3 supports returning all results, not just the last.
+        # Advance through resultsets until we get to the one returning tuples.
+        import psycopg.pq  # noqa: PLC0415
+
+        while not cursor.pgresult.status == psycopg.pq.ExecStatus.TUPLES_OK:
+            cursor.nextset()
+
         return [
             {
                 "month": row[0].date(),
@@ -210,8 +217,8 @@ ORDER BY th.month
 
 
 def test():  # pragma: no cover
-    import datetime as dt
-    from pprint import pprint
+    import datetime as dt  # noqa: PLC0415
+    from pprint import pprint  # noqa: PLC0415
 
     pprint(green_hours([dt.date(2019, 1, 1), dt.date(2019, 12, 31)]))
     pprint(green_hours_by_month())
