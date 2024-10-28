@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load bootstrap4 fineforms i18n workbench %}
-{% block title %}{{ object|default:view.meta.verbose_name_plural }} - {{ block.super }}{% endblock %}
+{% block title %}{{ object|default:view.meta.verbose_name }} - {{ block.super }}{% endblock %}
 
 {% block content %}
   <div class="row">
