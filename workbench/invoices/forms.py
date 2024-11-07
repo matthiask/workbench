@@ -255,7 +255,7 @@ class InvoiceForm(PostalAddressSelectionForm):
             for_billing=True,
         )
 
-        if self.instance.archived_at:
+        if self.instance.archived_at and self.request.method == "GET":
             messages.warning(
                 self.request,
                 _(
