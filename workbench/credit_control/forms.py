@@ -228,6 +228,21 @@ class AssignCreditEntriesForm(forms.Form):
                 f"entry_{entry.pk}_notes",
             ))
 
+    def clean(self):
+        data = super().clean()
+        seen_ids = set()
+        for _entry, invoice_field, _notes_field in self.entries:
+            if invoice_id := data.get(invoice_field):
+                if invoice_id in seen_ids:
+                    self.add_error(
+                        invoice_field,
+                        _(
+                            "This invoice has already been assigned to a previous credit entry in this form."
+                        ),
+                    )
+                seen_ids.add(invoice_id)
+        return data
+
     def save(self):
         for entry, invoice_field, notes_field in self.entries:
             entry.invoice_id = self.cleaned_data.get(invoice_field) or None

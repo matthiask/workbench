@@ -218,3 +218,28 @@ class CreditEntriesTest(TestCase):
             )
 
         self.assertContains(response, "Error while parsing the statement.")
+
+    def test_collision(self):
+        """Selecting the same invoice in two credit entries doesn't crash"""
+
+        invoice = factories.InvoiceFactory.create(
+            subtotal=10,
+            liable_to_vat=False,
+        )
+
+        entry_0 = factories.CreditEntryFactory.create(total=10)
+        entry_1 = factories.CreditEntryFactory.create(total=10)
+
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.post(
+            "/credit-control/assign/",
+            {
+                f"entry_{entry_0.pk}_invoice": invoice.pk,
+                f"entry_{entry_1.pk}_invoice": invoice.pk,
+            },
+        )
+        # print(response, response.content.decode("utf-8"))
+        self.assertContains(
+            response,
+            "This invoice has already been assigned to a previous credit entry in this form.",
+        )
