@@ -1,4 +1,3 @@
-/* eslint-disable */
 gettext("(closed)")
 gettext("(declined)")
 gettext("(not accepted yet)")
