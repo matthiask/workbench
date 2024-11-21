@@ -262,7 +262,7 @@ def annual_working_time(year, *, users):
                 "user": user,
                 "months": month_data,
                 "absences": absences[user.id],
-                "employments": month_data["employments"],
+                "employments": reversed(month_data["employments"]),
                 "working_time": wt,
                 "absences_time": at,
                 "monthly_sums": sums,
