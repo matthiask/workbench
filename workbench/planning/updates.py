@@ -157,7 +157,7 @@ def pretty_deleted_object_work(x, *, users):
     u = users.get(int(x["user_id"]))
     u = u.get_short_name() if u else x["user_id"]
     weeks = _weeks(x["weeks"])
-    return f'{x["title"]} ({u}, {x["planned_hours"]}h, {weeks})'
+    return f"{x['title']} ({u}, {x['planned_hours']}h, {weeks})"
 
 
 def changes(*, since):
@@ -230,7 +230,7 @@ def changes(*, since):
                     actions,
                     aux={"object": milestones_by_id.get(key[1]), "by": by},
                     pretty_changes=pretty_changes_milestone(),
-                    pretty_deleted_object=lambda x: f'{x["title"]} ({x["date"]})',
+                    pretty_deleted_object=lambda x: f"{x['title']} ({x['date']})",
                 )
             )
 

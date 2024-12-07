@@ -73,8 +73,7 @@ class ContactsTest(TestCase):
         # print(response, response.content.decode("utf-8"))
         self.assertContains(
             response,
-            "This person is the contact of the following related objects:"
-            " 1 project.",
+            "This person is the contact of the following related objects: 1 project.",
         )
 
         factories.Project.objects.all().delete()

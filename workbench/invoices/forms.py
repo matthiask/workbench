@@ -701,9 +701,9 @@ class InvoiceDeleteForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        assert (
-            self.instance.status <= self.instance.IN_PREPARATION
-        ), "Trying to delete an invoice not in preparation"
+        assert self.instance.status <= self.instance.IN_PREPARATION, (
+            "Trying to delete an invoice not in preparation"
+        )
         if (
             LoggedHours.objects.filter(invoice_service__invoice=self.instance).exists()
             or LoggedCost.objects.filter(

@@ -1,7 +1,7 @@
-exclude: ".yarn/|yarn.lock|conf/strings.js|workbench/static/workbench/lib"
+exclude: ".yarn/|yarn.lock|package.json|conf/strings.js|workbench/static/workbench/lib"
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
       - id: check-builtin-literals
@@ -31,38 +31,39 @@ repos:
         types_or: [scss]
         require_serial: true
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.21.0
+    rev: 1.22.2
     hooks:
       - id: django-upgrade
         args: [--target-version, "5.1"]
   -   repo: https://github.com/adamchainz/djade-pre-commit
-      rev: "1.1.1"
+      rev: "1.3.2"
       hooks:
       -   id: djade
           args: [--target-version, "5.1"]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.6.8"
+    rev: "v0.8.2"
     hooks:
       - id: ruff
         args: [--unsafe-fixes]
       - id: ruff-format
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: 2.2.4
+    rev: v2.5.0
     hooks:
       - id: pyproject-fmt
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.20.2
+    rev: v0.23
     hooks:
       - id: validate-pyproject
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v0.5.0"
+    rev: "v0.6.0"
     hooks:
       - id: biome-check
         additional_dependencies: ["@biomejs/biome@1.9.4"]
         args: [--unsafe]
         types_or: [css, javascript, json]
+        verbose: true
   - repo: https://github.com/boidolr/pre-commit-images
-    rev: v1.8.1
+    rev: v1.8.2
     hooks:
       - id: optimize-avif
       - id: optimize-jpg

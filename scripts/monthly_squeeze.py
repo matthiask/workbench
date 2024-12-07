@@ -30,7 +30,7 @@ for start, end in months():
         "manage.py",
         "squeeze",
         "--range",
-        f'{start.strftime("%Y%m%d")}-{end.strftime("%Y%m%d")}',
+        f"{start.strftime('%Y%m%d')}-{end.strftime('%Y%m%d')}",
     ]
     print(" ".join(cmd))
     subprocess.run(cmd, check=True)

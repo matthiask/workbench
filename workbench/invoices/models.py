@@ -226,9 +226,9 @@ class Invoice(ModelWithTotal):
     save.alters_data = True
 
     def delete(self, *args, **kwargs):
-        assert (
-            self.status <= self.IN_PREPARATION
-        ), "Trying to delete an invoice not in preparation"
+        assert self.status <= self.IN_PREPARATION, (
+            "Trying to delete an invoice not in preparation"
+        )
         super().delete(*args, **kwargs)
 
     delete.alters_data = True

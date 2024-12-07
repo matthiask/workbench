@@ -256,8 +256,7 @@ WORKBENCH = {
         PDF_LANGUAGE="de",
         PDF_COMPANY="Die Bruchpiloten AG",
         PDF_ADDRESS=(
-            "Die Bruchpiloten AG · Fabrikstrasse 54 · 8005 Zürich"
-            " · diebruchpiloten.com"
+            "Die Bruchpiloten AG · Fabrikstrasse 54 · 8005 Zürich · diebruchpiloten.com"
         ),
         PDF_VAT_NO="CHE-239.647.366 MWST",
         PDF_OFFER_TERMS=(

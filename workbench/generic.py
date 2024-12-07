@@ -78,9 +78,9 @@ class ListView(ToolsMixin, vanilla.ListView):
 
     @classonlymethod
     def as_view(cls, **initkwargs):
-        assert cls.search_form_class or initkwargs.get(
-            "search_form_class"
-        ), "search_form_class is required for list view"
+        assert cls.search_form_class or initkwargs.get("search_form_class"), (
+            "search_form_class is required for list view"
+        )
         return super().as_view(**initkwargs)
 
     def get(self, request, *args, **kwargs):
@@ -224,9 +224,9 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
                 else redirect(self.object)
             )
         else:
-            assert (
-                self.delete_form_class
-            ), "delete_form_class must be set if allow_delete returns None"
+            assert self.delete_form_class, (
+                "delete_form_class must be set if allow_delete returns None"
+            )
 
         url = self.model.get_redirect_url(self.object, request)
         if url:

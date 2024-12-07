@@ -131,8 +131,7 @@ class Employment(Model):
         errors = {}
         if (self.hourly_labor_costs is None) != (self.green_hours_target is None):
             errors["__all__"] = _(
-                "Either provide both hourly labor costs"
-                " and green hours target or none."
+                "Either provide both hourly labor costs and green hours target or none."
             )
         if self.date_from and self.date_until and self.date_from > self.date_until:
             errors["date_until"] = _("Employments cannot end before they began.")
