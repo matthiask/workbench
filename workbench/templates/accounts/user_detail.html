@@ -10,6 +10,12 @@
             <td>{% link_or_none value %}</td>
           </tr>
         {% endfor %}
+        {% if user.features.PLANNING %}
+          <tr>
+            <th class="text-right">{% translate 'planning hours per day'|capfirst %}</th>
+            <td>{{ user.planning_hours_per_day|hours }}</td>
+          </tr>
+        {% endif %}
         <tr>
           <th class="text-right">{% translate 'person'|capfirst %}</th>
           <td>{% link_or_none object.person %}</td>
