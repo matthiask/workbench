@@ -218,7 +218,10 @@ class Planning:
             | Q(ends_on__isnull=True, starts_on__gte=min(self.weeks)),
         ).select_related("user"):
             date_from = monday(absence.starts_on)
-            date_until = monday(absence.ends_on or absence.starts_on)
+            # If absence starts on weekend move it to the next monday
+            if absence.starts_on.weekday() in {5, 6}:
+                date_from += dt.timedelta(days=7)
+            date_until = monday(absence.ends_on or date_from)
             hours = absence.days * absence.user.planning_hours_per_day
             weeks = [
                 (idx, week)
@@ -489,7 +492,12 @@ left outer join lateral(
             planning_hours_per_day,
             (
               select array_agg(w::date) from generate_series(
-                date_trunc('week', starts_on),
+                date_trunc('week', starts_on) + (
+                    --
+                    -- If absence starts on weekend move it to the next monday
+                    --
+                    case when extract('isodow' from starts_on) >= 6 then '7 days'::interval else '0 days'::interval end
+                ),
                 date_trunc('week', ends_on),
                 '7 days'
               ) as w
