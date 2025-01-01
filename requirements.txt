@@ -4,8 +4,8 @@ asgiref==3.8.1
 beautifulsoup4==4.13.0b2
 certifi==2024.12.14
 chardet==5.2.0
-charset-normalizer==3.4.0
-coverage==7.6.9
+charset-normalizer==3.4.1
+coverage==7.6.10
 cssselect2==0.7.0
 django==5.1.4
 django-admin-ordering==0.20.0
@@ -53,7 +53,7 @@ svgwrite==1.4.3
 time-machine==2.16.0
 tinycss2==1.4.0
 typing-extensions==4.12.2
-urllib3==2.2.3
+urllib3==2.3.0
 vobject==0.9.9
 webencodings==0.5.1
 whitenoise==6.8.2
