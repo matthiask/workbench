@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-11 10:56+0100\n"
+"POT-Creation-Date: 2025-01-01 18:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -219,7 +219,7 @@ msgstr "Sprache"
 msgid "working time model"
 msgstr "Arbeitszeitmodell"
 
-#: workbench/accounts/models.py
+#: workbench/accounts/models.py workbench/templates/accounts/user_detail.html
 msgid "planning hours per day"
 msgstr "Planungsstunden pro Tag"
 
@@ -2613,6 +2613,14 @@ msgstr "Um Wochen verschieben"
 #: workbench/planning/forms.py
 msgid "Assign to"
 msgstr "Zuweisen"
+
+#: workbench/planning/forms.py
+msgid "Move to project"
+msgstr "Zu Projekt verschieben"
+
+#: workbench/planning/forms.py
+msgid "Is work provisional?"
+msgstr "Ist die Arbeit provisorisch?"
 
 #: workbench/planning/models.py
 #: workbench/templates/reporting/key_data_third_party_costs.html

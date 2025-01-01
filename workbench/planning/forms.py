@@ -424,6 +424,15 @@ class PlannedWorkBatchForm(Form):
             label=_("Assign to"),
             required=False,
         )
+        self.fields["project"] = forms.ModelChoiceField(
+            Project.objects.open(),
+            label=_("Move to project"),
+            required=False,
+        )
+        self.fields["provisional"] = forms.NullBooleanField(
+            label=_("Is work provisional?"),
+            required=False,
+        )
 
     def process(self):
         data = self.cleaned_data
@@ -435,5 +444,13 @@ class PlannedWorkBatchForm(Form):
         if assign_to := data.get("assign_to"):
             for unit in work:
                 unit.user = assign_to
+        if project := data.get("project"):
+            for unit in work:
+                unit.project = project
+                unit.offer = None
+        if (is_provisional := data.get("provisional")) in {True, False}:
+            for unit in work:
+                unit.is_provisional = is_provisional
+
         for unit in work:
             unit.save()
