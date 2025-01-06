@@ -1,14 +1,20 @@
+import datetime as dt
+
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from workbench.projects.models import Project
-from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.tools.formats import local_date_format
 from workbench.tools.models import MoneyField
 
 
 class AccrualsQuerySet(models.QuerySet):
     def accruals(self, cutoff_date):
+        from workbench.reporting.project_budget_statistics import (  # noqa: PLC0415
+            project_budget_statistics,
+        )
+
         projects = Project.objects.open(on=cutoff_date)
         statistics = project_budget_statistics(projects, cutoff_date=cutoff_date)
         return statistics["overall"]["delta_negative"]
@@ -47,3 +53,24 @@ class CostCenter(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class FreezeDateQuerySet(models.QuerySet):
+    def up_to(self):
+        if last := self.latest("up_to"):
+            return last.up_to
+        return dt.date.min
+
+
+class FreezeDate(models.Model):
+    created_at = models.DateTimeField(_("created at"), default=timezone.now)
+    up_to = models.DateField(_("freeze up to"))
+
+    objects = FreezeDateQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("freeze date")
+        verbose_name_plural = _("freeze dates")
+
+    def __str__(self):
+        return local_date_format(self.up_to)

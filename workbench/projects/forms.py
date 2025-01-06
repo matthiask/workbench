@@ -9,8 +9,9 @@ from django.utils.translation import gettext, gettext_lazy as _, override
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
-from workbench.invoices.models import Invoice, ProjectedInvoice
+from workbench.invoices.models import ProjectedInvoice
 from workbench.projects.models import Campaign, Project, Service
+from workbench.reporting.models import FreezeDate
 from workbench.services.models import ServiceType
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import (
@@ -63,7 +64,7 @@ class CampaignSearchForm(Form):
     def filter(self, queryset):
         data = self.cleaned_data
         queryset = queryset.search(data.get("q"))
-        if data.get("s") == "":
+        if not data.get("s"):
             queryset = queryset.open()
         elif data.get("s") == "closed":
             queryset = queryset.closed()
@@ -209,7 +210,7 @@ class ProjectSearchForm(Form):
     def filter(self, queryset):
         data = self.cleaned_data
         queryset = queryset.search(data.get("q"))
-        if data.get("s") == "":
+        if not data.get("s"):
             queryset = queryset.open()
         elif data.get("s") == "closed":
             queryset = queryset.closed()
@@ -265,7 +266,7 @@ class ProjectForm(ModelForm):
             "internal_type": forms.RadioSelect,
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa: C901
         initial = kwargs.setdefault("initial", {})
         request = kwargs["request"]
 
@@ -393,18 +394,14 @@ class ProjectForm(ModelForm):
         if (
             set(self.changed_data) & {"closed_on"}
             and (closed_on := data.get("closed_on"))
-            and (
-                latest := Invoice.objects.filter(archived_at__isnull=False)
-                .order_by("-invoiced_on")
-                .first()
-            )
-            and closed_on <= latest.invoiced_on
+            and (freeze := FreezeDate.objects.up_to())
+            and closed_on <= freeze
         ):
             self.add_error(
                 "closed_on",
                 _(
                     "Cannot close a project with a date of {} or earlier anymore."
-                ).format(local_date_format(latest.invoiced_on)),
+                ).format(local_date_format(freeze)),
             )
 
         return data

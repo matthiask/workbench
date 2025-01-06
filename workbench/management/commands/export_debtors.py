@@ -6,6 +6,7 @@ from django.utils.dateparse import parse_date
 
 from workbench.credit_control.reporting import paid_debtors_zip
 from workbench.invoices.models import Invoice
+from workbench.reporting.models import FreezeDate
 
 
 class Command(BaseCommand):
@@ -42,5 +43,7 @@ class Command(BaseCommand):
                 .exclude(status=Invoice.IN_PREPARATION)
                 .update(archived_at=timezone.now())
             )
+
+            FreezeDate.objects.create(up_to=a)
 
             self.stdout.write(f"Archived {updated} invoices.")
