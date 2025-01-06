@@ -9,9 +9,10 @@ from django.utils.translation import gettext, gettext_lazy as _, override
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
-from workbench.invoices.models import ProjectedInvoice
+from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.projects.models import Campaign, Project, Service
 from workbench.services.models import ServiceType
+from workbench.tools.formats import local_date_format
 from workbench.tools.forms import (
     Autocomplete,
     DateInput,
@@ -387,6 +388,23 @@ class ProjectForm(ModelForm):
                     " will be overwritten."
                 ),
                 code="flat-rate-but-already-services",
+            )
+
+        if (
+            set(self.changed_data) & {"closed_on"}
+            and (closed_on := data.get("closed_on"))
+            and (
+                latest := Invoice.objects.filter(archived_at__isnull=False)
+                .order_by("-invoiced_on")
+                .first()
+            )
+            and closed_on <= latest.invoiced_on
+        ):
+            self.add_error(
+                "closed_on",
+                _(
+                    "Cannot close a project with a date of {} or earlier anymore."
+                ).format(local_date_format(latest.invoiced_on)),
             )
 
         return data
