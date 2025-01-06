@@ -25,6 +25,9 @@ class StatisticsTest(TestCase):
         response = self.client.get("/report/hours-per-customer/?date_from=bla")
         self.assertRedirects(response, "/report/hours-per-customer/")
 
+        response = self.client.get("/report/hours-per-type/")
+        self.assertContains(response, "Hours per type")
+
     def test_some_project_budget_statistics_view(self):
         """Project budget statistics filter form smoke test"""
         user = factories.UserFactory.create()

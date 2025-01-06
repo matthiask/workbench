@@ -547,6 +547,7 @@ class InvoicesTest(TestCase):
         code("")
         code("q=test")
         code("s=open")
+        code("s=due")
         code("s=40")  # PAID
         code(f"org={factories.OrganizationFactory.create().pk}")
         code(f"owned_by={user.id}")
@@ -766,7 +767,7 @@ class InvoicesTest(TestCase):
                 },
             ),
         )
-        print(response, response.content.decode("utf-8"))
+        # print(response, response.content.decode("utf-8"))
         self.assertRedirects(response, invoice.urls["detail"])
         invoice.refresh_from_db()
         self.assertEqual(invoice.status, Invoice.IN_PREPARATION)
@@ -995,24 +996,25 @@ class InvoicesTest(TestCase):
 
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/invoices/reminders/")
-        self.assertContains(response, "Not reminded yet")
+        self.assertContains(response, "Not reminded yet", 2)
         # print(response, response.content.decode("utf-8"))
 
-        """
-        TODO
-
-        response = self.client.post(f"/invoices/dunning-letter/{invoice.customer_id}/")
+        response = self.client.get(f"/invoices/reminders/{invoice.contact_id}/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/pdf")
 
         invoice.refresh_from_db()
-        self.assertEqual(invoice.last_reminded_on, dt.date.today())
+        self.assertIs(invoice.last_reminded_on, None)
 
+        response = self.client.post("/invoices/reminders/", {"invoice": [invoice.pk]})
+        self.assertRedirects(response, "/invoices/reminders/")
+
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.last_reminded_on, dt.date.today())
         self.assertEqual(invoice.payment_reminders_sent_at(), [dt.date.today()])
 
         response = self.client.get("/invoices/reminders/")
-        self.assertNotContains(response, "Not reminded yet")
-        """
+        self.assertContains(response, "Not reminded yet", 1)
 
     def test_reset_last_invoiced_on(self):
         """last_reminded_on < invoiced_on values are silently corrected/dropped"""
@@ -1138,3 +1140,20 @@ class InvoicesTest(TestCase):
             },
         )
         self.assertContains(response, "invoiced-in-future")
+
+    def test_invoice_closed_on_in_past(self):
+        """ """
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        invoice = factories.InvoiceFactory.create(postal_address="Test\nStreet\nCity")
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(invoice)
+            | {
+                "status": Invoice.PAID,
+                "closed_on": in_days(-200).isoformat(),
+            },
+        )
+        self.assertContains(response, "paid-in-past")
+        # print(response, response.content.decode("utf-8"))
