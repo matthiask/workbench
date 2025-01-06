@@ -57,9 +57,10 @@ class CostCenter(models.Model):
 
 class FreezeDateQuerySet(models.QuerySet):
     def up_to(self):
-        if last := self.latest("up_to"):
-            return last.up_to
-        return dt.date.min
+        try:
+            return self.latest("up_to").up_to
+        except models.ObjectDoesNotExist:
+            return dt.date.min
 
 
 class FreezeDate(models.Model):
