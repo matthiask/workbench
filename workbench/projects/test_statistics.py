@@ -46,6 +46,15 @@ class StatisticsTest(TestCase):
         code("internal=on")
         code("export=xlsx")
 
+    def test_projected_gross_margin_view(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        factories.ProjectFactory.create()
+
+        response = self.client.get("/report/projected-gross-margin/")
+        self.assertContains(response, "Projected gross margin")
+
     def test_not_archived_hours_grouped_services_green_hours_hpc(self):
         """Test a scenario"""
         service1 = factories.ServiceFactory.create(effort_rate=180, effort_type="Any")
@@ -237,4 +246,9 @@ class StatisticsTest(TestCase):
         hours = factories.LoggedHoursFactory.create()
         self.client.force_login(hours.rendered_by)
         response = self.client.get(hours.service.project.urls["statistics"])
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(
+            hours.service.project.urls["cost_by_month_and_service_xlsx"]
+        )
         self.assertEqual(response.status_code, 200)
