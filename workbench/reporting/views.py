@@ -178,23 +178,22 @@ def key_data_view(request):
 
     projected_gross_margin = key_data.projected_gross_margin()
 
-    gross_margin_by_years = {}
-    for month in gross_margin_by_month:
-        try:
-            year = gross_margin_by_years[month["date"].year]
-        except KeyError:
-            gross_margin_by_years[month["date"].year] = year = {
-                "year": month["date"].year,
-                "gross_profit": Z2,
-                "third_party_costs": Z2,
-                "accruals": Z2,
-                "gross_margin": Z2,
-                "projected_gross_margin": Z2,
-                "fte": [],
-                "margin_per_fte": [],
-                "months": [],
-            }
+    gross_margin_by_years = defaultdict(
+        lambda: {
+            "year": month["date"].year,
+            "gross_profit": Z2,
+            "third_party_costs": Z2,
+            "accruals": Z2,
+            "gross_margin": Z2,
+            "projected_gross_margin": Z2,
+            "fte": [],
+            "margin_per_fte": [],
+            "months": [],
+        }
+    )
 
+    for month in gross_margin_by_month:
+        year = gross_margin_by_years[month["date"].year]
         year["months"].append(month)
         year["gross_profit"] += month["gross_profit"]
         year["third_party_costs"] += month["third_party_costs"]
