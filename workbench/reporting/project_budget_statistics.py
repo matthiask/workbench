@@ -74,6 +74,14 @@ def project_budget_statistics(projects, *, cutoff_date=None):
         .values("project")
         .annotate(Sum("total_excl_tax"))
     }
+    discount_per_project = {
+        row["project"]: -row["discount__sum"]
+        for row in Offer.objects.not_declined()
+        .filter(project__in=projects, is_budget_retainer=False)
+        .order_by()
+        .values("project")
+        .annotate(Sum("discount"))
+    }
     invoiced_per_project = {
         row["project"]: row["total_excl_tax__sum"]
         for row in Invoice.objects.invoiced()
@@ -117,6 +125,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             ],
             "third_party_costs": third_party_costs_per_project.get(project.id, Z2),
             "sold": sold_per_project.get(project.id, Z2),
+            "discount": discount_per_project.get(project.id, Z2),
             "invoiced": invoiced_per_project.get(project.id, Z2),
             "hours": hours_per_project[project.id],
             "service_hours": service_hours.get(project.id, Z1),
@@ -139,6 +148,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             "effort_hours_with_rate_undefined",
             "third_party_costs",
             "sold",
+            "discount",
             "invoiced",
             "hours",
             "service_hours",

@@ -224,6 +224,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
                 capfirst(_("project")),
                 capfirst(_("contact person")),
                 _("sold"),
+                _("discount"),
                 _("Logbook"),
                 _("Undefined rate"),
                 capfirst(_("third party costs")),
@@ -245,6 +246,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
                     "",
                     "",
                     "",
+                    "",
                     _("total"),
                     statistics["cutoff_date"],
                 ]
@@ -254,6 +256,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
                     project["project"],
                     project["project"].owned_by.get_short_name(),
                     project["sold"],
+                    project["discount"],
                     project["logbook"],
                     project["effort_hours_with_rate_undefined"],
                     project["third_party_costs"],

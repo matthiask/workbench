@@ -22,6 +22,7 @@
           <tr>
             <th>{% translate 'project'|capfirst %}</th>
             <th class="text-right" title="{% translate 'Offered and accepted' %}">{% translate 'sold'|capfirst %}</th>
+            <th class="text-right">{% translate 'discount'|capfirst %}</th>
             <th class="text-right">{% translate 'logbook'|capfirst %}</th>
             <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
             <th class="text-right">{% translate 'invoiced'|capfirst %}</th>
@@ -30,7 +31,7 @@
             <th class="text-right" colspan="2">{% translate 'projected gross margin'|capfirst %}</th>
           </tr>
           <tr>
-            <th colspan="7"></th>
+            <th colspan="8"></th>
             <th class="text-right">{% translate 'total' %}</th>
             <th class="text-right">{{ statistics.cutoff_date|date:'d.m.' }}</th>
           </tr>
@@ -39,6 +40,7 @@
           <tr>
             <th></th>
             <th class="text-right">{{ statistics.overall.sold|currency }}</th>
+            <th class="text-right">{{ statistics.overall.discount|currency }}</th>
             <th class="text-right">{{ statistics.overall.logbook|currency }}</th>
             <th class="text-right">{{ statistics.overall.third_party_costs|currency }}</th>
             <th class="text-right">{{ statistics.overall.invoiced|currency }}</th>
@@ -61,6 +63,10 @@
                          {% if not project.sold %}
                            text-black-30
                          {% endif %}">{{ project.sold|currency }}</td>
+              <td class="text-right
+                         {% if not project.discount %}
+                           text-black-30
+                         {% endif %}">{{ project.discount|currency }}</td>
               <td class="text-right text-nowrap
                          {% if not project.logbook and not project.effort_hours_with_rate_undefined %}
                            text-black-30
