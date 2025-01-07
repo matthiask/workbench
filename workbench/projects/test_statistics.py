@@ -141,6 +141,7 @@ class StatisticsTest(TestCase):
                     "effort_hours_with_rate_undefined": Decimal("20.0"),
                     "third_party_costs": Decimal("0.00"),
                     "sold": Decimal("0.00"),
+                    "discount": Decimal("0.00"),
                     "invoiced": Decimal("1800.00"),
                     "hours": Decimal("40.0"),
                     "service_hours": Decimal("0.0"),
