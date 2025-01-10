@@ -30,8 +30,7 @@
           <td class="text-right">{{ entry.total|currency }}</td>
           <td>
             {% link_or_none entry.invoice none='' %}
-            {% if entry.invoice and entry.notes %},{% endif %}
-            {{ entry.notes }}
+            {{ entry.notes|linebreaksbr }}
           </td>
         </tr>
       {% endfor %}
