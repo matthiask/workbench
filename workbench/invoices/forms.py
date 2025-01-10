@@ -255,13 +255,15 @@ class InvoiceForm(PostalAddressSelectionForm):
             for_billing=True,
         )
 
-        if self.instance.archived_at and self.request.method == "GET":
-            messages.warning(
-                self.request,
-                _(
-                    "This invoice is freezed, only a small subset of fields are editable."
-                ),
-            )
+        if self.instance.archived_at:
+            if self.request.method == "GET":
+                messages.warning(
+                    self.request,
+                    _(
+                        "This invoice is freezed, only a small subset of fields are editable."
+                    ),
+                )
+
             for field in list(self.fields):
                 if field not in {
                     "contact",
