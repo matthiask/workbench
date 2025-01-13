@@ -488,7 +488,7 @@ class Invoice(ModelWithTotal):
 
     @classmethod
     def allow_delete(cls, instance, request):
-        if instance.archived_at:
+        if instance.is_freezed:
             messages.error(request, _("Archived invoices cannot be deleted."))
             return False
         if instance.status > instance.IN_PREPARATION:

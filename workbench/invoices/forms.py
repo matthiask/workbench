@@ -256,7 +256,7 @@ class InvoiceForm(PostalAddressSelectionForm):
             for_billing=True,
         )
 
-        if self.instance.archived_at:
+        if self.instance.is_freezed:
             if self.request.method == "GET":
                 messages.warning(
                     self.request,
@@ -426,7 +426,7 @@ class InvoiceForm(PostalAddressSelectionForm):
 
         if (
             has_status
-            and not self.instance.archived_at
+            and not self.instance.is_freezed
             and data["status"] == Invoice.CANCELED
         ):
             self.add_warning(

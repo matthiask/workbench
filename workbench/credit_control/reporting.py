@@ -48,7 +48,7 @@ def paid_debtors_zip(date_range, *, file, qr=False):
             append_invoice(zf=zf, invoice=invoice, qr=qr)
             rows.append([
                 invoice.code,
-                bool(invoice.archived_at),
+                invoice.is_freezed,
                 invoice.invoiced_on,
                 invoice.title,
                 invoice.owned_by.get_short_name(),
@@ -105,7 +105,7 @@ def paid_debtors_zip(date_range, *, file, qr=False):
             [
                 (
                     invoice.code,
-                    bool(invoice.archived_at),
+                    invoice.is_freezed,
                     invoice.invoiced_on,
                     invoice.title,
                     invoice.owned_by.get_short_name(),
