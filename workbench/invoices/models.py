@@ -16,6 +16,7 @@ from workbench.contacts.models import Organization, Person
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project
+from workbench.reporting.models import FreezeDate
 from workbench.services.models import ServiceBase
 from workbench.tools.formats import Z1, Z2, currency, local_date_format
 from workbench.tools.models import ModelWithTotal, MoneyField, SearchQuerySet
@@ -297,6 +298,16 @@ class Invoice(ModelWithTotal):
     @property
     def is_invoiced(self):
         return self.status in self.INVOICED_STATUSES
+
+    @property
+    def is_freezed(self):
+        if self.archived_at:
+            return True
+
+        if self.invoiced_on and (freeze := FreezeDate.objects.up_to):
+            return self.invoiced_on <= freeze
+
+        return False
 
     @property
     def pretty_status(self):

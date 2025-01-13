@@ -68,6 +68,10 @@ class CampaignsTest(TestCase):
         self.assertEqual(len(campaign.statistics["statistics"]), 2)
         self.assertIs(campaign.statistics["overall"]["gross_margin_per_hour"], None)
 
+        self.client.force_login(campaign.owned_by)
+        response = self.client.get(campaign.urls["statistics"])
+        self.assertEqual(response.status_code, 200)
+
     def test_lists(self):
         """Filter form smoke test"""
         campaign = factories.CampaignFactory.create()

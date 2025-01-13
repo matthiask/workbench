@@ -266,6 +266,7 @@ class ProjectsTest(TestCase):
         code("s=accepted-offers-no-invoices")
         code("s=solely-declined-offers")
         code("s=old-projects")
+        code("s=no-projected-gross-margin")
         code("s=empty-logbook")
         code("s=invalid-customer-contact-combination")
         code(f"org={project.customer_id}")
@@ -701,6 +702,8 @@ class ProjectsTest(TestCase):
         self.client.force_login(project.owned_by)
 
         it = InternalType.objects.create(percentage=10)
+        itu = it.internaltypeuser_set.create(user=project.owned_by)
+        self.assertEqual(itu.percentage, 10)
 
         response = self.client.post(
             project.urls["update"],

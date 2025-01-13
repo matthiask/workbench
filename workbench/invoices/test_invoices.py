@@ -1117,7 +1117,7 @@ class InvoicesTest(TestCase):
         )
 
     def test_invoice_date_validation(self):
-        """ """
+        """Warn when invoice date is too far in the future"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
@@ -1142,7 +1142,7 @@ class InvoicesTest(TestCase):
         self.assertContains(response, "invoiced-in-future")
 
     def test_invoice_closed_on_in_past(self):
-        """ """
+        """Warn when invoice payment date is too far in the past"""
         project = factories.ProjectFactory.create()
         self.client.force_login(project.owned_by)
 
